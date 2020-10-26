@@ -3,6 +3,9 @@
 	* support/regression/tests/bug-3135.c,
 	  src/z80/ralloc2.cc:
 	  Attempt to fix bug #3135.
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Improve register allocation for bitwise operations.
 
 2020-10-21 Sergey Belyashov <sergey.belyashov@gmail.com>
 

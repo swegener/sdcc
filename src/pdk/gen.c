@@ -2967,39 +2967,42 @@ genOr (const iCode *ic)
 
   int size = result->aop->size;
 
-  /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || (right->aop->type == AOP_STK || right->aop->type == AOP_SFR) && !aopInReg (left->aop, 0, A_IDX))
-    {
-      operand *t = right;
-      right = left;
-      left = t;
-    }
-
   bool p_free = regDead (P_IDX, ic) && !aopInReg (left->aop, 0, P_IDX) && !aopInReg (left->aop, 1, P_IDX) && !aopInReg (right->aop, 0, P_IDX) && !aopInReg (right->aop, 1, P_IDX);
+  bool a_free = regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (left->aop, 1, A_IDX) && !aopInReg (right->aop, 0, A_IDX) && !aopInReg (right->aop, 1, A_IDX);
 
   for (int i = 0; i < size; i++)
     {
-      if (regDead (P_IDX, ic) && (aopInReg (left->aop, i, P_IDX) || aopInReg (right->aop, i, P_IDX)))
+      /* Swap if left is literal or right is in A. */
+      if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || (right->aop->type == AOP_STK || right->aop->type == AOP_SFR) && !aopInReg (left->aop, i, A_IDX))
+        {
+          operand *t = right;
+          right = left;
+          left = t;
+        }
+    
+      if (regDead (P_IDX, ic) && aopInReg (left->aop, i, P_IDX))
         p_free = true;
+      if (regDead (A_IDX, ic) && aopInReg (left->aop, i, A_IDX))
+        a_free = true;
 
       int bit = right->aop->type == AOP_LIT ? isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) : -1;
 
       if (aopIsLitVal (right->aop, i, 1, 0x00))
         {
-          cheapMove (result->aop, i, left->aop, i, true, p_free, true);
+          cheapMove (result->aop, i, left->aop, i, a_free, p_free, true);
         }
       else if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX)) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
         {
           emit2 ("set1", "%s, #%d", aopGet (left->aop, i), bit);
           cost (1, 1);
         }
-      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX) && right->aop->type != AOP_STK) && aopSame (left->aop, i, result->aop, i, 1))
+      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX) && right->aop->type != AOP_STK) && aopSame (left->aop, i, result->aop, i, 1) && a_free)
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true, p_free && !aopInReg (left->aop, i, P_IDX), true);
           emit2 ("or", "%s, a", aopGet (left->aop, i));
           cost (1, 1);
         }
-      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX) && left->aop->type != AOP_STK) && aopSame (right->aop, i, result->aop, i, 1))
+      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX) && left->aop->type != AOP_STK) && aopSame (right->aop, i, result->aop, i, 1) && a_free)
         {
           cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
           emit2 ("or", "%s, a", aopGet (right->aop, i));
@@ -3007,6 +3010,8 @@ genOr (const iCode *ic)
         }
       else if (right->aop->type == AOP_STK || right->aop->type == AOP_SFR)
         {
+          if (!a_free)
+            pushAF();
           if (!p_free)
             pushPF (!aopInReg (right->aop, i, A_IDX));
           cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
@@ -3016,17 +3021,39 @@ genOr (const iCode *ic)
           cheapMove (result->aop, i, ASMOP_A, 0, true, true, true);
           if (!p_free)
             popPF (!aopInReg (result->aop, i, A_IDX));
+          if (!a_free)
+            popAF();
+        }
+      else if (aopInReg (left->aop, i, P_IDX) && aopInReg (result->aop, i, P_IDX) && !a_free)
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("or", "a, %s", aopGet (right->aop, i));
+          emit2 ("xch", "a, p");
+          cost (3, 3);
+        }
+      else if (aopInReg (right->aop, i, P_IDX) && aopInReg (result->aop, i, P_IDX) && !a_free)
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("or", "a, %s", aopGet (left->aop, i));
+          emit2 ("xch", "a, p");
+          cost (3, 3);
         }
       else
         {
+          if (!a_free)
+            pushAF();
           cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
           emit2 ("or", "a, %s", aopGet (right->aop, i));
           cost (1, 1);
           cheapMove (result->aop, i, ASMOP_A, 0, true, p_free, true);
+          if (!a_free)
+            popAF();
         }
 
       if (aopInReg (result->aop, i, P_IDX))
         p_free = false;
+      if (aopInReg (result->aop, i, A_IDX))
+        a_free = false;
     }
 
   freeAsmop (right);
@@ -3187,13 +3214,16 @@ genAnd (const iCode *ic, iCode *ifx)
       goto release;
     }
 
-  bool p_dead = regDead (P_IDX, ic) && !aopInReg (left->aop, 0, P_IDX) && !aopInReg (left->aop, 1, P_IDX) && !aopInReg (right->aop, 0, P_IDX) && !aopInReg (right->aop, 1, P_IDX);
+  bool p_free = regDead (P_IDX, ic) && !aopInReg (left->aop, 0, P_IDX) && !aopInReg (left->aop, 1, P_IDX) && !aopInReg (right->aop, 0, P_IDX) && !aopInReg (right->aop, 1, P_IDX);
+  bool a_free = regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (left->aop, 1, A_IDX) && !aopInReg (right->aop, 0, A_IDX) && !aopInReg (right->aop, 1, A_IDX);
 
   for (int i = 0; i < size; i++)
     {
       if (regDead (P_IDX, ic) && (aopInReg (left->aop, i, P_IDX) || aopInReg (right->aop, i, P_IDX)))
-        p_dead = true;
-
+        p_free = true;
+      if (regDead (A_IDX, ic) && (aopInReg (left->aop, i, A_IDX) || aopInReg (right->aop, i, A_IDX)))
+        a_free = true;
+        
       if (aopInReg (right->aop, i, A_IDX))
         {
           operand *t = right;
@@ -3204,12 +3234,12 @@ genAnd (const iCode *ic, iCode *ifx)
       int bit = right->aop->type == AOP_LIT ? isLiteralBit (~byteOfVal (right->aop->aopu.aop_lit, i) & 0xff) : -1;
 
       if (aopIsLitVal (right->aop, i, 1, 0xff))
-        cheapMove (result->aop, i, left->aop, i, true, p_dead, true);
+        cheapMove (result->aop, i, left->aop, i, a_free, p_free, true);
       else if (aopIsLitVal (right->aop, i, 1, 0x00))
         {
           int zend;
           for (zend = i; zend + 1 < size && aopIsLitVal (right->aop, zend + 1, 1, 0x00); zend++);
-          genMove_o (result->aop, i, ASMOP_ZERO, 0, zend + 1 - i, true, p_dead);
+          genMove_o (result->aop, i, ASMOP_ZERO, 0, zend + 1 - i, a_free, p_free);
           i = zend;
         }
       else if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX)) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
@@ -3217,29 +3247,47 @@ genAnd (const iCode *ic, iCode *ifx)
           emit2 ("set0", "%s, #%d", aopGet (left->aop, i), bit);
           cost (1, 1);
         }
-      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX) && right->aop->type != AOP_STK) && aopSame (left->aop, i, result->aop, i, 1))
+      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX) && right->aop->type != AOP_STK) && aopSame (left->aop, i, result->aop, i, 1) && a_free)
         {
-          cheapMove (ASMOP_A, 0, right->aop, i, true, p_dead && !aopInReg (left->aop, i, P_IDX), true);
+          cheapMove (ASMOP_A, 0, right->aop, i, true, p_free && !aopInReg (left->aop, i, P_IDX), true);
           emit2 ("and", "%s, a", aopGet (left->aop, i));
           cost (1, 1);
         }
-      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX) && left->aop->type != AOP_STK) && aopSame (right->aop, i, result->aop, i, 1))
+      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX) && left->aop->type != AOP_STK) && aopSame (right->aop, i, result->aop, i, 1) && a_free)
         {
-          cheapMove (ASMOP_A, 0, left->aop, i, true, p_dead && !aopInReg (right->aop, i, P_IDX), true);
+          cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
           emit2 ("and", "%s, a", aopGet (right->aop, i));
           cost (1, 1);
         }
       else if (right->aop->type == AOP_STK)
         {
-          if (!p_dead)
+          if (!a_free)
+            pushAF();
+          if (!p_free)
             pushPF (!aopInReg (left->aop, i, A_IDX));
           cheapMove (ASMOP_A, 0, left->aop, i, true, !aopInReg (right->aop, i, P_IDX), true);
           cheapMove (ASMOP_P, 0, right->aop, i, false, true, true);
           emit2 ("and", "a, p");
           cost (1, 1);
           cheapMove (result->aop, i, ASMOP_A, 0, true, true, true);
-          if (!p_dead)
+          if (!p_free)
             popPF (!aopInReg (result->aop, i, A_IDX));
+           if (!a_free)
+            popAF();
+        }
+      else if (aopInReg (left->aop, i, P_IDX) && aopInReg (result->aop, i, P_IDX) && !a_free)
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("and", "a, %s", aopGet (right->aop, i));
+          emit2 ("xch", "a, p");
+          cost (3, 3);
+        }
+      else if (aopInReg (right->aop, i, P_IDX) && aopInReg (result->aop, i, P_IDX) && !a_free && left->aop->type != AOP_STK)
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("and", "a, %s", aopGet (left->aop, i));
+          emit2 ("xch", "a, p");
+          cost (3, 3);
         }
       else if (right->aop->type == AOP_SFR)
         {
@@ -3248,14 +3296,20 @@ genAnd (const iCode *ic, iCode *ifx)
         }
       else
         {
-          cheapMove (ASMOP_A, 0, left->aop, i, true, p_dead && !aopInReg (right->aop, i, P_IDX), true);
+          if (!a_free)
+            pushAF();
+          cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
           emit2 ("and", "a, %s", aopGet (right->aop, i));
           cost (1, 1);
-          cheapMove (result->aop, i, ASMOP_A, 0, true, p_dead, true);
+          cheapMove (result->aop, i, ASMOP_A, 0, true, p_free, true);
+          if (!a_free)
+            popAF();
         }
 
       if (aopInReg (result->aop, i, P_IDX))
-        p_dead = false;
+        p_free = false;
+      if (aopInReg (result->aop, i, A_IDX))
+        a_free = false;
     }
 
 release:

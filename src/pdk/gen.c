@@ -1081,7 +1081,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       cheapMove (result, roffset + 0, source, soffset + 0, false, p_dead_global, true);
       return;
     }
-  else if (size == 2 && result->type == AOP_STK && aopInReg (source, soffset, A_IDX) && aopInReg (source, soffset + 1, P_IDX))
+  else if (size >= 2 && result->type == AOP_STK && aopInReg (source, soffset, A_IDX) && aopInReg (source, soffset + 1, P_IDX))
     {
       if (!p_dead_global)
         pushPF (false);
@@ -1091,11 +1091,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       cheapMove (result, roffset + 1, ASMOP_A, 0, false, true, true);
       popAF ();
       cheapMove (result, roffset + 0, ASMOP_A, 0, a_dead_global, true, true);
+      genMove_o (result, 2, ASMOP_ZERO, 0, size - 2, a_dead_global, true);
       if (!p_dead_global)
         popPF (a_dead_global);
       return;
     }
-  else if (size == 2 && result->type == AOP_STK && aopInReg (source, soffset, P_IDX) && aopInReg (source, soffset + 1, A_IDX))
+  else if (size >= 2 && result->type == AOP_STK && aopInReg (source, soffset, P_IDX) && aopInReg (source, soffset + 1, A_IDX))
     {
       if (!p_dead_global)
         pushPF (false);
@@ -1105,6 +1106,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       cheapMove (result, roffset + 0, ASMOP_A, 0, false, true, true);
       popAF ();
       cheapMove (result, roffset + 1, ASMOP_A, 0, a_dead_global, true, true);
+      genMove_o (result, 2, ASMOP_ZERO, 0, size - 2, a_dead_global, true);
       if (!p_dead_global)
         popPF (a_dead_global);
       return;
@@ -1335,6 +1337,13 @@ genXorByte (const asmop *result_aop, const asmop *left_aop, const asmop *right_a
   else if (aopIsLitVal (right_aop, i, 1, 0x00))
     {
       cheapMove (result_aop, i, left_aop, i, a_dead, p_dead, true);
+    }
+  else if (aopInReg (left_aop, i, P_IDX) && aopInReg (result_aop, i, P_IDX) && right_aop->type != AOP_STK && !a_dead)
+    {
+      emit2 ("xch", "a, p");
+      emit2 ("xor", "a, %s", aopGet (right_aop, i));
+      emit2 ("xch", "a, p");
+      cost (3, 3);
     }
   else
     {

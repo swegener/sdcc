@@ -1,3 +1,10 @@
+2020-10-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.h:
+	  Increase limits, patch by Oleg Endo <olegendo@gcc.gnu.org>.
+	* support/regression/Makefile.in:
+	  add pdk15-stack-auto ton default target.
+
 2020-10-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/ralloc2.cc,

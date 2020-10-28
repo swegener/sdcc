@@ -82,7 +82,8 @@ cl_port_ui::add_port(class cl_port_data *p, int nr)
   pd[nr].keyset  = p->keyset;
   pd[nr].basx    = p->basx;
   pd[nr].basy    = p->basy;
-
+  pd[nr].width   = p->width;
+  
   pd[nr].set_name(p->get_name());
 
   if (act_port < 0)
@@ -138,7 +139,8 @@ cl_port_ui::handle_input(int c)
 	{
 	  if (pd[i].cell_p == NULL)
 	    continue;
-	  int w= pd[i].cell_p->get_width();
+	  int w= //pd[i].cell_p->get_width();
+	    pd[i].width;
 	  
 	  if (pd[i].keyset != NULL)
 	    {
@@ -183,7 +185,8 @@ cl_port_ui::refresh_display(bool force)
     {
       if (pd[i].cell_p == NULL)
 	continue;
-      w= pd[i].cell_p->get_width();
+      //w= pd[i].cell_p->get_width();
+      w= pd[i].width;
       // name
       pio->tu_go(pd[i].basx, pd[i].basy);
       pio->dd_printf("\033[%dm", (act_port == i)?7:0);

@@ -50,7 +50,8 @@ class cl_port_data: public cl_base
   class cl_memory_cell *cell_p, *cell_in, *cell_dir;
   t_mem cache_p, cache_in, cache_dir, cache_value;
   const char *keyset;
-  int basx, basy;
+  int basx, basy, width;
+  virtual int init(void) { width=8; return 0; }
 };
 
 enum { NUOF_PORT_UIS= 16 };

@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "glob.h"
 #include "serialcl.h"
+#include "portcl.h"
 
 #include "m6809cl.h"
 
@@ -111,8 +112,37 @@ cl_m6809::mk_hw_elements(void)
       o->hide();
     }
 
-  add_hw(h= new cl_serial(this, 0xc000));
+  add_hw(h= new cl_serial(this, 0, 0xc000));
   h->init();
+
+  class cl_port *p0;
+  
+  add_hw(p0= new cl_port(this, 0, 0xc010));
+  p0->init();
+
+  class cl_port_ui *d;
+  add_hw(d= new cl_port_ui(this, 0, "dport"));
+  d->init();
+
+  class cl_port_data pd;
+  pd.init();
+  pd.set_name("P0A");
+  pd.cell_dir= p0->ddra;
+  pd.cell_p  = p0->ora;
+  pd.cell_in = p0->ina;
+  pd.keyset  = keysets[0];
+  pd.basx    = 1;
+  pd.basy    = 4;
+  d->add_port(&pd, 0);
+
+  pd.set_name("P0B");
+  pd.cell_dir= p0->ddrb;
+  pd.cell_p  = p0->orb;
+  pd.cell_in = p0->inb;
+  pd.keyset  = keysets[1];
+  pd.basx    = 20;
+  pd.basy    = 4;
+  d->add_port(&pd, 1);
 }
 
 void

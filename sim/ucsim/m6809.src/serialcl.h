@@ -65,8 +65,7 @@ class cl_serial: public cl_serial_hw
   bool  ren;          // Receiving is enabled
   bool  ten;          // Transmitter is enabled
  public:
-  cl_serial(class cl_uc *auc,
-	    t_addr abase);
+  cl_serial(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_serial(void);
   virtual int init(void);
   virtual int cfg_size(void) { return 10; }

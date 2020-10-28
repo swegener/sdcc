@@ -49,7 +49,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= simm6809.o m6809.o glob.o serial.o
+OBJECTS_SHARED	= simm6809.o m6809.o glob.o serial.o port.o
 
 OBJECTS_EXE	= sm6809.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

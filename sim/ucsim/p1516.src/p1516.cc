@@ -98,7 +98,8 @@ cl_p1516::mk_hw_elements(void)
   class cl_port_data d;
   d.init();
   d.cell_dir= NULL;
-
+  d.width= 32;
+  
   d.set_name("PA");
   d.cell_p = pa->dr;
   d.cell_in= pa->dr;

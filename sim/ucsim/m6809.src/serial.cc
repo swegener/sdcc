@@ -42,8 +42,8 @@ enum reg_idx
    dr = 1, 
   };
 
-cl_serial::cl_serial(class cl_uc *auc, t_addr abase):
-  cl_serial_hw(auc, 1, "uart")
+cl_serial::cl_serial(class cl_uc *auc, int aid, t_addr abase):
+  cl_serial_hw(auc, aid, "uart")
 {
   base= abase;
 }
@@ -77,6 +77,8 @@ cl_serial::init(void)
   cl_var *v;
   chars pn= chars("", "uart%d_base", id);
   uc->vars->add(v= new cl_var(pn, cfg, m6850conf_base, cfg_help(m6850conf_base)));
+  v->init();
+  
   return(0);
 }
 
@@ -191,7 +193,7 @@ cl_serial::set_cmd(class cl_cmdline *cmdline,
       init();
     }
   else
-    con->dd_printf("set hardware uart[%d] address\n");
+    con->dd_printf("set hardware uart[%d] address\n", id);
 }
 
 int

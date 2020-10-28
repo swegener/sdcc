@@ -772,7 +772,7 @@ cl_51core::mk_hw_elements(void)
   class cl_port_data pd;
   pd.init();
   pd.cell_dir= NULL;
-
+  
   pd.set_name("P0");
   pd.cell_p  = p0->cell_p;
   pd.cell_in = p0->cell_in;

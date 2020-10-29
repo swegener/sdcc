@@ -393,126 +393,124 @@ colopt2ansiseq(char *opt)
 {
   bool fg_rgb= false, bg_rgb= false;
   bool fg_bright= false, bg_bright= false;
-  const char *o, *s;
-  chars r= "";
-  size_t l;
+  chars r= "", full= opt, tok= "";
   int fg= -1, bg= -1;
   int ctype= ct_none;
 
   if (!opt ||
       !*opt)
     return r;
-  s= opt;
-  o= strchr(s, ':');
-  l= o - s;
-  while (s)
+  tok.start_parse();
+  tok= full.token(":");
+  while (tok.nempty())
     {
-      if (strncmp(s, "black", l) == 0)
+      const char *s= tok.c_str();
+      if (tok=="black")
 	{
 	  if (fg<0)
 	    fg= 0;
 	  else
 	    bg= 0;
 	}
-      else if (strncmp(s, "bblack", l) == 0)
+      else if (tok=="bblack")
 	{
 	  if (fg<0)
 	    fg= 0, fg_bright= true;
 	  else
 	    bg= 0, bg_bright= true;
 	}
-      else if (strncmp(s, "red", l) == 0)
+      else if (tok=="red")
 	{
 	  if (fg<0)
 	    fg= 1;
 	  else
 	    bg= 1;
 	}
-      else if (strncmp(s, "bred", l) == 0)
+      else if (tok=="bred")
 	{
 	  if (fg<0)
 	    fg= 1, fg_bright= true;
 	  else
 	    bg= 1, bg_bright= true;
 	}
-      else if (strncmp(s, "green", l) == 0)
+      else if (tok=="green")
 	{
 	  if (fg<0)
 	    fg= 2;
 	  else
 	    bg= 2;
 	}
-      else if (strncmp(s, "bgreen", l) == 0)
+      else if (tok=="bgreen")
 	{
 	  if (fg<0)
 	    fg= 2, fg_bright= true;
 	  else
 	    bg= 2, bg_bright= true;
 	}
-      else if (strncmp(s, "yellow", l) == 0)
+      else if (tok=="yellow")
 	{
 	  if (fg<0)
 	    fg= 3;
 	  else
 	    bg= 3;
 	}
-      else if (strncmp(s, "byellow", l) == 0)
+      else if (tok=="byellow")
 	{
 	  if (fg<0)
 	    fg= 3, fg_bright= true;
 	  else
 	    bg= 3, bg_bright= true;
 	}
-      else if (strncmp(s, "blue", l) == 0)
+      else if (tok=="blue")
 	{
 	  if (fg<0)
 	    fg= 4;
 	  else
 	    bg= 4;
 	}
-      else if (strncmp(s, "bblue", l) == 0)
+      else if (tok=="bblue")
 	{
 	  if (fg<0)
 	    fg= 4, fg_bright= true;
 	  else
 	    bg= 4, bg_bright= true;
 	}
-      else if (strncmp(s, "magenta", l) == 0)
+      else if (tok=="magenta")
 	{
 	  if (fg<0)
 	    fg= 5;
 	  else
 	    bg= 5;
 	}
-      else if (strncmp(s, "bmagenta", l) == 0)
+      else if (tok=="bmagenta")
 	{
 	  if (fg<0)
 	    fg= 5, fg_bright= true;
 	  else
 	    bg= 5, bg_bright= true;
 	}
-      else if (strncmp(s, "cyan", l) == 0)
+      else if (tok=="cyan")
 	{
 	  if (fg<0)
 	    fg= 6;
 	  else
 	    bg= 6;
 	}
-      else if (strncmp(s, "bcyan", l) == 0)
+      else if (tok=="bcyan")
 	{
 	  if (fg<0)
 	    fg= 6, fg_bright= true;
 	  else
 	    bg= 6, bg_bright= true;
 	}
-      else if (strncmp(s, "white", l) == 0)
+      else if (tok=="white")
 	{
 	  if (fg<0)
 	    fg= 7;
 	  else
 	    bg= 7;
 	}
-      else if (strncmp(s, "bwhite", l) == 0)
+      else if (tok=="bwhite")
 	{
 	  if (fg<0)
 	    fg= 7, fg_bright= true;
@@ -527,32 +525,29 @@ colopt2ansiseq(char *opt)
 	  else
 	    bg= c, bg_rgb= true;
 	}
-      else if (strspn(s, "bBfFiIuUdDcCoOkKlL") > 0)
+      else
 	{
 	  int i;
-	  for (i=0; s[i]; i++)
-	    {
-	      switch (toupper(s[i]))
-		{
-		case 'B': ctype|= ct_bold; break;
-		case 'F': ctype|= ct_faint; break;
-		case 'I': ctype|= ct_italic; break;
-		case 'U': ctype|= ct_underl; break;
-		case 'D': ctype|= ct_dunderl; break;
-		case 'C': ctype|= ct_crossed; break;
-		case 'O': ctype|= ct_overl; break;
-		case 'K': ctype|= ct_blink; break;
-		case 'L': ctype|= ct_blink; break;
-		}
-	    }
+	  if (strcspn(s, "bBfFiIuUdDcCoOkKlL") == 0)
+	    for (i=0; s[i]; i++)
+	      {
+		switch (toupper(s[i]))
+		  {
+		  case 'B': ctype|= ct_bold; break;
+		  case 'F': ctype|= ct_faint; break;
+		  case 'I': ctype|= ct_italic; break;
+		  case 'U': ctype|= ct_underl; break;
+		  case 'D': ctype|= ct_dunderl; break;
+		  case 'C': ctype|= ct_crossed; break;
+		  case 'O': ctype|= ct_overl; break;
+		  case 'K': ctype|= ct_blink; break;
+		  case 'L': ctype|= ct_blink; break;
+		  }
+	      }
 	}
-      s= o;
-      if (s) {
-        o= strchr(++s, ':');
-        l= o - s;
-      }
+      tok= full.token(":");
     }
-
+    
   /* set character rendering mode */
   if (ctype != ct_none)
     {

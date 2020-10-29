@@ -2,24 +2,30 @@
 .SH NAME
 uCsim \- Micro\-controller simulator
 .SH SYNOPSIS
-.B s51|sz80|savr|sxa|shc08|spdk|sst7|sstm8|stlc
-.BR \-t type
+.B s51|sz80|savr|sxa|shc08|spdk|sst7|sstm8|stlc|sp1516|sm6809
+.BR \-t cpu_type
 .BR \-X freq[k|M]
 .BR \-R seed
-.BR \-C file
+.BR \-C cfg_file
 .BR \-e command
 .BR \-c file
 .BR \-Z portnum
+.BR \-k portnum
 .BR \-s file
 .BR \-S options
 .BR \-I options
 .BR \-p prompt
 .BR \-P
+.BR \-o colors
+.BR \-l
+.BR \-b
+.BR \-B
 .BR \-g
 .BR \-G
 .BR \-a nr
 .BR \-w
 .BR \-V
+.BR \-v
 .BR \-H
 .BR \-h
 .SH DESCRIPTION
@@ -30,7 +36,7 @@ command is Z80 simulator.
 .PP
 .B Options of the command
 .TP
-.B \-t type
+.B \-t cpu_type
 Specifies type of the controller. Use \-H to list possible values.
 .PP
 .TP
@@ -130,6 +136,10 @@ Prompt is a null ('\\0') character
 List of color specification: what=colspec,... where colspec is :
 separated list of color options e.g.: prompt=b:white:black (bold white
 on black)
+.PP
+.TP
+.B \-l
+Use colors of the light theme (default is dark).
 .PP
 .TP
 .B \-b

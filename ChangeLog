@@ -1,3 +1,8 @@
+2020-10-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3134.
+
 2020-10-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.h:

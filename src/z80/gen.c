@@ -10076,7 +10076,7 @@ genLeftShift (const iCode *ic)
         result->aop->type == AOP_REG &&
         (getPartPairId (result->aop, offset) == PAIR_HL ||
         !started && getPartPairId (result->aop, offset) == PAIR_IY ||
-        (IS_RAB || optimize.codeSize && !started) && getPartPairId (result->aop, offset) == PAIR_DE))
+        (IS_RAB || optimize.codeSize && !started && !IS_GB) && getPartPairId (result->aop, offset) == PAIR_DE))
         {
           if (result->aop->aopu.aop_reg[offset]->rIdx == L_IDX)
             {
@@ -10097,6 +10097,7 @@ genLeftShift (const iCode *ic)
             }
           else
             {
+              wassert (!IS_GB);
               emit2 ("ex de, hl");
               emit2 (started ? "adc hl, hl" : "add hl, hl");
               emit2 ("ex de, hl");

@@ -1,3 +1,8 @@
+2020-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c:
+	  Disable array initalizer support for gbz80 in trunk, so the remining issues can be worked out in a branch instead.
+
 2020-10-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

@@ -9562,6 +9562,9 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
                          && (AOP (result)->aopu.aop_reg[0]->rIdx == B_IDX || AOP (result)->aopu.aop_reg[1]->rIdx == B_IDX)));
 
       tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+      
+      if (requiresHL (result->aop))
+        spillPair (PAIR_HL);
 
       if (!regalloc_dry_run)
         {
@@ -9707,6 +9710,9 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
                   emitLabel (tlbl);
                 }
               regalloc_dry_run_cost += 2;
+              
+              if (requiresHL (shiftaop))
+                spillPair (PAIR_HL);
             }
 
           if (!use_b && bitVectBitValue (ic->rSurv, A_IDX))
@@ -10064,10 +10070,11 @@ genLeftShift (const iCode *ic)
       regalloc_dry_run_cost += 3;
     }
   if (!(shift_by_lit && shiftcount == 1) && !regalloc_dry_run)
-    emitLabel (tlbl);
-
-  if (requiresHL (AOP (result)))
-    spillPair (PAIR_HL);
+    {
+      emitLabel (tlbl);
+      if (requiresHL (result->aop))
+        spillPair (PAIR_HL);
+    }
 
   started = false;
   while (size)
@@ -10459,7 +10466,7 @@ genRightShift (const iCode * ic)
   if (!shift_by_one && !regalloc_dry_run)
     IS_GB ? emitLabelSpill (tlbl) : emitLabel (tlbl);
 
-  if (requiresHL (AOP (result)))
+  if (!shift_by_one && requiresHL (result->aop))
     spillPair (PAIR_HL);
 
   while (size)

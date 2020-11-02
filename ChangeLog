@@ -3,6 +3,9 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/bug-3141.c:
 	  Fix bug #3141.
+	* src/z80/gen.c,
+	  support/regression/tests/shifts2.c:
+	  Fix bug #3142.
 
 2020-11-02 Philipp Klaus Krause <pkk AT spth.de>
 

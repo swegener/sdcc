@@ -1,5 +1,11 @@
 2020-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-3141.c:
+	  Fix bug #3141.
+
+2020-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/main.c:
 	  Disable array initalizer support for gbz80 in trunk, so the remining issues can be worked out in a branch instead.
 

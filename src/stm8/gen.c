@@ -3428,7 +3428,7 @@ genCall (const iCode *ic)
   G.stack.pushed += prestackadjust;
 
   if (ic->parmBytes || bigreturn)
-    adjustStack (ic->parmBytes + bigreturn * 2, !(SomethingReturned && getSize (ftype->next) == 1), !(SomethingReturned && (getSize (ftype->next) == 2 || getSize (ftype->next) == 4)), !(SomethingReturned && getSize (ftype->next) == 4));
+    adjustStack (ic->parmBytes + bigreturn * 2, !(SomethingReturned && !bigreturn && getSize (ftype->next) == 1), !(SomethingReturned && !bigreturn && getSize (ftype->next) >= 2), !(SomethingReturned && !bigreturn && getSize (ftype->next) > 2));
 
   const bool half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
 

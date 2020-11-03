@@ -115,8 +115,8 @@ public:
   virtual void push_regs(bool do_cc);
   virtual void pull_regs(bool do_cc);
   
-  virtual int inst_add8 (t_mem code,  u8_t *acc,  u8_t op, int c, bool store);
-  virtual int inst_add16(t_mem code, u16_t *acc, u16_t op, int c, bool store);
+  virtual int inst_add8 (t_mem code,  u8_t *acc,  u8_t op, int c, bool store, bool invert_c);
+  virtual int inst_add16(t_mem code, u16_t *acc, u16_t op, int c, bool store, bool invert_c);
   virtual int inst_bool (t_mem code, char bop, u8_t *acc, u8_t op, bool store);
   virtual int inst_ld8  (t_mem code,  u8_t *acc,  u8_t op);
   virtual int inst_ld16 (t_mem code, u16_t *acc, u16_t op);

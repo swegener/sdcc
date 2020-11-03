@@ -7,4 +7,4 @@ if [ ! -f sm6809 ]; then
     exit 1
 fi
 
-./sm6809 -e uart1_base=0xe000 -S uart=1,port=5555 test/v09.hex "$@"
+./sm6809 -e uart0_base=0xe000 -S uart=0,port=5555 test/v09.hex "$@"

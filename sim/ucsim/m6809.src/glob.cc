@@ -174,6 +174,21 @@ struct dis_entry disass_m6809[]=
 
 struct dis_entry disass_m6809_10[]=
   {
+   { 0x21, 0xff, ' ', 1, "LBRN %E"	, 0, 0 },
+   { 0x22, 0xff, ' ', 1, "LBHI %E"	, 0, 0 },
+   { 0x23, 0xff, ' ', 1, "LBLS %E"	, 0, 0 },
+   { 0x24, 0xff, ' ', 1, "LBCC %E"	, 0, 0 },
+   { 0x25, 0xff, ' ', 1, "LBCS %E"	, 0, 0 },
+   { 0x26, 0xff, ' ', 1, "LBNE %E"	, 0, 0 },
+   { 0x27, 0xff, ' ', 1, "LBEQ %E"	, 0, 0 },
+   { 0x28, 0xff, ' ', 1, "LBVC %E"	, 0, 0 },
+   { 0x29, 0xff, ' ', 1, "LBVS %E"	, 0, 0 },
+   { 0x2a, 0xff, ' ', 1, "LBPL %E"	, 0, 0 },
+   { 0x2b, 0xff, ' ', 1, "LBMI %E"	, 0, 0 },
+   { 0x2c, 0xff, ' ', 1, "LBGE %E"	, 0, 0 },
+   { 0x2d, 0xff, ' ', 1, "LBLT %E"	, 0, 0 },
+   { 0x2e, 0xff, ' ', 1, "LBGT %E"	, 0, 0 },
+   { 0x2f, 0xff, ' ', 1, "LBLE %E"	, 0, 0 },
    { 0x83, 0xcf, ' ', 1, "CMPD %U"	, 0, 0 },
    { 0x8c, 0xcf, ' ', 1, "CMPY %U"	, 0, 0 },
    { 0xce, 0xcf, ' ', 1, "LDS %U"	, 0, 0 },

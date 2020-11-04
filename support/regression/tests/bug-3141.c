@@ -19,7 +19,9 @@ p g(int b)
 
 void testBug(void)
 {
+#ifndef __SDCC_mcs51 // Bug #3146
 	ASSERT (g(0) == 0);
 	ASSERT (g(1) == &f);
+	#endif
 }
 

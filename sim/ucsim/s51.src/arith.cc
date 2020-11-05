@@ -366,16 +366,18 @@ cl_51core::instruction_84/*inst_div_ab*/(t_mem/*uchar*/ code)
 
   pw= psw->get();
   pw&= ~bmCY;
+  ac= acc->get();
   if (!(b= sfr->get(B)))
     pw|= bmOV;
   else
     {
       pw&= ~bmOV;
-      temp= (ac= acc->get()) / b;
+      temp= (ac) / b;
       sfr->write(B, ac % b);
-      acc->write(temp);
+      ac= temp;
     }
   psw->write(pw);
+  acc->write(ac);
   tick(3);
   vc.rd++;//= 2;
   vc.wr++;//= 2;
@@ -400,13 +402,13 @@ cl_51core::instruction_94/*inst_subb_a_Sdata*/(t_mem/*uchar*/ code)
   pw= psw->get();
   if ((c= (pw & bmCY)?1:0))
     result--;
+  psw->set((pw & ~(bmCY|bmOV|bmAC)) |
+	   (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
+	   (((ac<0x80 && data>0x7f && result>0x7f) ||
+	     (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
+	   (((ac&0x0f) < ((data+c)&0x0f) ||
+	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
   acc->write(result);
-  psw->write((pw & ~(bmCY|bmOV|bmAC)) |
-	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
-	     (((ac<0x80 && data>0x7f && result>0x7f) ||
-	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
-	     (((ac&0x0f) < ((data+c)&0x0f) ||
-	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
   //vc.rd++;
   //vc.wr++;
   return(resGO);
@@ -432,13 +434,13 @@ cl_51core::instruction_95/*inst_subb_a_addr*/(t_mem/*uchar*/ code)
   pw= psw->get();
   if ((c= (pw & bmCY)?1:0))
     result--;
-  acc->write(result);
   psw->set((pw & ~(bmCY|bmOV|bmAC)) |
 	   (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
 	   (((ac<0x80 && data>0x7f && result>0x7f) ||
 	     (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	   (((ac&0x0f) < ((data+c)&0x0f) ||
 	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  acc->write(result);
   vc.rd++;//= 2;
   //vc.rd++;
   return(resGO);
@@ -464,13 +466,13 @@ cl_51core::instruction_96/*inst_subb_a_Sri*/(t_mem/*uchar*/ code)
   pw= psw->get();
   if ((c= (pw & bmCY)?1:0))
     result--;
-  acc->write(result);
   psw->write((pw & ~(bmCY|bmOV|bmAC)) |
 	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
 	     (((ac<0x80 && data>0x7f && result>0x7f) ||
 	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	     (((ac&0x0f) < ((data+c)&0x0f) ||
 	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  acc->write(result);
   vc.rd++;//= 3;
   //vc.wr++;
   return(resGO);
@@ -494,13 +496,13 @@ cl_51core::instruction_98/*inst_subb_a_rn*/(t_mem/*uchar*/ code)
   pw= psw->get();
   if ((c= (pw & bmCY)?1:0))
     result--;
-  acc->write(result);
   psw->write((pw & ~(bmCY|bmOV|bmAC)) |
 	     (((unsigned int)ac < (unsigned int)(data+c))?bmCY:0) |
 	     (((ac<0x80 && data>0x7f && result>0x7f) ||
 	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	     (((ac&0x0f) < ((data+c)&0x0f) ||
 	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  acc->write(result);
   //vc.rd+= 2;
   //vc.wr++;
   return(resGO);
@@ -559,8 +561,8 @@ cl_51core::instruction_d4/*inst_da_a*/(t_mem/*uchar*/ code)
 	pw|= bmCY;
       ac+= 0x60;
     }
-  acc->write(ac);
   psw->write(pw);
+  acc->write(ac);
   //vc.rd++;
   //vc.wr++;
   return(resGO);

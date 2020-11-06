@@ -193,7 +193,9 @@ struct dis_entry disass_m6809_10[]=
    { 0x8c, 0xcf, ' ', 1, "CMPY %U"	, 0, 0 },
    { 0xce, 0xcf, ' ', 1, "LDS %U"	, 0, 0 },
    { 0x8e, 0xcf, ' ', 1, "LDY %U"	, 0, 0 },
-
+   { 0xcf, 0xcf, ' ', 1, "STS %U"	, 0, 0 },
+   { 0x8f, 0xcf, ' ', 1, "STY %U"	, 0, 0 },
+   
    { 0x3f, 0xff, ' ', 1, "SWI2"		, 0, 0 },
    
    { 0, 0, 0, 0, 0, 0 }

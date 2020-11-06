@@ -1645,12 +1645,15 @@ cl_m6809::inst_com(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
     {
       op8= *acc= ~(*acc);
     }
-  op8= ~(rom->read(ea));
-  tick(1);
-  vc.rd++;
-  rom->write(ea, op8);
-  tick(1);
-  vc.wr++;
+  else
+    {
+      op8= ~(rom->read(ea));
+      tick(1);
+      vc.rd++;
+      rom->write(ea, op8);
+      tick(1);
+      vc.wr++;
+    }
   
   SET_C(1);
   SET_O(0);
@@ -1668,14 +1671,17 @@ cl_m6809::inst_lsr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
       SET_C(*acc & 1);
       op8= *acc= (*acc) >> 1;
     }
-  op8= rom->read(ea);
-  tick(1);
-  vc.rd++;
-  SET_C(op8 & 1);
-  op8>>= 1;
-  rom->write(ea, op8);
-  tick(1);
-  vc.wr++;
+  else
+    {
+      op8= rom->read(ea);
+      tick(1);
+      vc.rd++;
+      SET_C(op8 & 1);
+      op8>>= 1;
+      rom->write(ea, op8);
+      tick(1);
+      vc.wr++;
+    }
   
   SET_Z(op8);
   SET_S(op8 & 0x80);

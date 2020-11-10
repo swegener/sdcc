@@ -1664,8 +1664,8 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
 	}
       else if (d->is_in(begin, end))
 	{
-	  // decoder sould shrink
-	  D("    Sould shrink\n");
+	  // decoder should shrink
+	  D("    Should shrink\n");
 	  if (d->shrink_out_of(begin, end))
 	    {
 	      D("    Can be removed after shrink\n");

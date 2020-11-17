@@ -98,7 +98,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	    }
 	}
     }
-  con->dd_printf("Simulation started, PC=0x%06x\n"), AI(sim->uc->PC);
+  con->dd_printf("Simulation started, PC=0x%06x\n", AI(sim->uc->PC));
   /*
   if (sim->uc->fbrk_at(sim->uc->PC))
     sim->uc->do_inst(1);

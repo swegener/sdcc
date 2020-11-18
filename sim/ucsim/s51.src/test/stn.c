@@ -14,7 +14,7 @@ main(void)
   volatile unsigned int i, j;
   volatile __xdata int xi;
   volatile int __xdata xii;
-  
+
   sif= (unsigned char __xdata *)0xffff;
   xi= 1;
   xii= 2;
@@ -30,6 +30,7 @@ main(void)
 	ptr4_xdata= (__xdata char *)(0x7788); // 88 77 00
 	ptr5_code = (__code  char *)(0x99aa); // aa 99 80
       }
+
   * (char __idata *) 0 = * (char __xdata *) 0xfffe;
   *sif= 's';
 }

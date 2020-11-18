@@ -1713,6 +1713,7 @@ cl_51core::exec_inst(void)
 int
 cl_51core::do_inst(int step)
 {
+  t_addr PCsave;
   result= resGO;
   while ((result == resGO) &&
 	 (state != stPD) &&
@@ -1724,6 +1725,7 @@ cl_51core::do_inst(int step)
 	{
 	  interrupt->was_reti= false;
 	  pre_inst();
+	  PCsave= PC;
 	  result= exec_inst();
 	  post_inst();
 	}
@@ -1734,6 +1736,14 @@ cl_51core::do_inst(int step)
 	  post_inst();
 	  tick(1);
 	}
+
+      if ((result == resGO) && (PC == PCsave) && stop_selfjump)
+	{
+	  result= resSELFJUMP;
+	  sim->stop(result);
+	  break;
+	}
+
       if (result == resGO)
 	{
 	  int res;

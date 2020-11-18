@@ -126,6 +126,27 @@ cl_xtal_option::option_changed(void)
   uc->xtal= d;
 }
 
+cl_stop_selfjump_option::cl_stop_selfjump_option(class cl_uc *the_uc):
+  cl_optref(the_uc)
+{
+  uc= the_uc;
+}
+
+int
+cl_stop_selfjump_option::init(void)
+{
+  cl_optref::init();
+  create(uc, bool_opt, "selfjump_stop", "Stop when jump branches to itself");
+  return 0;
+}
+
+void
+cl_stop_selfjump_option::option_changed(void)
+{
+  bool b;
+  option->get_value(&b);
+  uc->stop_selfjump= b;
+}
 
 /* Time measurer */
 
@@ -337,6 +358,8 @@ cl_uc::cl_uc(class cl_sim *asim):
   //for (i= MEM_ROM; i < MEM_TYPES; i++) mems->add(0);
   xtal_option= new cl_xtal_option(this);
   xtal_option->init();
+  stop_selfjump_option= new cl_stop_selfjump_option(this);
+  stop_selfjump_option->init();
   ticks= new cl_ticker(+1, 0, "time");
   isr_ticks= new cl_ticker(+1, TICK_INISR, "isr");
   idle_ticks= new cl_ticker(+1, TICK_IDLE, "idle");
@@ -390,6 +413,8 @@ cl_uc::init(void)
     xtal= xtal_option->get_value(xtal);
   else
     xtal= 11059200;
+  stop_selfjump= false;
+  stop_selfjump_option->option->set_value(stop_selfjump);
   vars= new cl_var_list();
   make_variables();
   make_memories();
@@ -2219,6 +2244,13 @@ cl_uc::do_inst(int step)
 	  inst_ticks= 1;
 	  post_inst();
 	  tick(1);
+	}
+
+      if ((res == resGO) && (PC == PCsave) && stop_selfjump)
+	{
+	  res= resSELFJUMP;
+	  sim->stop(res);
+	  break;
 	}
       
       if ((res == resGO) &&

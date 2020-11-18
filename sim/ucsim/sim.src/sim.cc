@@ -252,6 +252,9 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	case resSIMIF:
 	  cmd->frozen_console->dd_printf("Program stopped itself\n");
 	  break;
+	case resSELFJUMP:
+	  cmd->frozen_console->dd_printf("Jump to itself\n");
+	  break;
 	default:
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
 	  break;

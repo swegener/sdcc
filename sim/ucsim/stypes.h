@@ -288,6 +288,7 @@ enum inst_result {
   resSIMIF	= 110,	/* Stopped by simulated prog itself through sim interface */
   resNOT_DONE	= 111,	/* Intruction has not simulated */
   resEVENTBREAK = 112,  /* Event breakpoint */
+  resSELFJUMP	= 113,  /* Jump to itself */
 };
   
 #define BIT_MASK(bitaddr) (1 << (bitaddr & 0x07))

@@ -78,6 +78,16 @@ public:
   virtual void option_changed(void);
 };
 
+class cl_stop_selfjump_option: public cl_optref
+{
+protected:
+  class cl_uc *uc;
+public:
+  cl_stop_selfjump_option(class cl_uc *the_uc);
+  virtual int init(void);
+  virtual void option_changed(void);
+};
+
 struct vcounter_t {
   t_mem inst;
   t_mem fetch;
@@ -195,7 +205,8 @@ public:
   int state;			// GO, IDLE, PD
   //class cl_list *options;
   class cl_xtal_option *xtal_option;
-
+  class cl_stop_selfjump_option *stop_selfjump_option;
+  
   t_addr PC, instPC;		// Program Counter
   bool inst_exec;		// Instruction is executed
   class cl_ticker *ticks;	// Nr of XTAL clocks
@@ -205,6 +216,7 @@ public:
   int inst_ticks;		// ticks of an instruction
   double xtal;			// Clock speed
   struct vcounter_t vc;		// Virtual clk counter
+  bool stop_selfjump;		// Whether it should stop on selfjump
   
   int brk_counter;		// Number of breakpoints
   class brk_coll *fbrk;		// Collection of FETCH break-points

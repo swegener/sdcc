@@ -47,6 +47,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "simifcl.h"
 
 
+cl_exec_hist::cl_exec_hist(class cl_uc *auc):
+  cl_base()
+{
+  uc= auc;
+  len= 100;
+  hist= (struct t_hist_elem*)malloc(sizeof(struct t_hist_elem) * len);
+  ff= lu= 0;
+}
+
+cl_exec_hist::~cl_exec_hist(void)
+{
+  if (hist)
+    free(hist);
+}
+
+int
+cl_exec_hist::init(void)
+{
+  return 0;
+}
+
+
 /*
  * Simulator
  */
@@ -71,11 +93,13 @@ cl_sim::init(void)
     return(1);
   uc->init();
   simif= uc->get_hw("simif", 0);
+  hist= new cl_exec_hist(uc);
   return(0);
 }
 
 cl_sim::~cl_sim(void)
 {
+  delete hist;
   if (uc)
     delete uc;
 }

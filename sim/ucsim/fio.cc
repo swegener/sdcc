@@ -230,6 +230,12 @@ cl_f::init(void)
   if (server_port > 0)
     {
       file_id= mk_srv_socket(server_port);
+      if (file_id <= 0)
+	{
+	  file_id= -1;
+	  own= false;
+	  return -1;
+	}
       listen(file_id, 50);
       own= true;
       tty= false;

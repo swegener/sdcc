@@ -43,7 +43,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uccl.h"
 #include "argcl.h"
 
+struct t_hist_elem
+{
+  int nr;
+  t_addr addr;
+};
 
+class cl_exec_hist: public cl_base
+{
+protected:
+  int len;
+  int ff, lu;
+  struct t_hist_elem *hist;
+  class cl_uc *uc;
+public:
+  cl_exec_hist(class cl_uc *auc);
+  virtual ~cl_exec_hist(void);
+  virtual int init(void);
+};
+  
 class cl_sim: public cl_base
 {
 public:
@@ -55,6 +73,7 @@ public:
   class cl_uc *uc;
   class cl_gui *gui;
   class cl_hw *simif;
+  class cl_exec_hist *hist;
   
   double start_at, stop_at;
   unsigned long start_tick;

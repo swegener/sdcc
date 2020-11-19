@@ -573,7 +573,7 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
 {
   class cl_cmd_arg *next_parm;
   int len, i, j;
-  t_mem *array;
+  t_mem *array, *temp;
 
   len= 0;
   array= 0;
@@ -591,7 +591,12 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
 	  if (!array)
 	    array= (t_mem*)malloc(sizeof(t_mem)*l);
 	  else
-	    array= (t_mem*)realloc(array, sizeof(t_mem)*(l+len));
+	    {
+	      temp= (t_mem*)realloc(array, sizeof(t_mem)*(l+len));
+	      if (temp == NULL)
+		break;
+	      array= temp;
+	    }
 	  for (j= 0; j < l; j++)
 	    {
 	      array[len]= s[j];
@@ -611,7 +616,12 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
 	  if (!array)
 	    array= (t_mem*)malloc(sizeof(t_mem));
 	  else
-	    array= (t_mem*)realloc(array, sizeof(t_mem)*(1+len));
+	    {
+	      temp= (t_mem*)realloc(array, sizeof(t_mem)*(1+len));
+	      if (temp == NULL)
+		break;
+	      array= temp;
+	    }
 	  array[len]= next_parm->value.data;
 	  len++;
 	}

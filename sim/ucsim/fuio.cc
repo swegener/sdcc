@@ -270,6 +270,7 @@ mk_srv_socket(int port)
   if (bind(sock, (struct sockaddr *)&name, sizeof(name)) < 0)
     {
       perror("bind");
+      close(sock);
       return(0);
     }
 

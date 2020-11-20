@@ -50,7 +50,7 @@ void
 set_get_help(class cl_cmd *cmd)
 {
   cmd->set_help("get subcommand",
-		"Get value of differend objects",
+		"Get value of different objects",
 		"Long of get");
 }
 

@@ -70,7 +70,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
   if (params[1])
     if (!(params[1]->get_address(sim->uc, &end)))
       {
-	con->dd_printf("Error: wromg end address\n");
+	con->dd_printf("Error: wrong end address\n");
 	return(false);
       }
   if (params[0])

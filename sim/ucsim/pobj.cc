@@ -59,7 +59,7 @@ cl_base::cl_base(void)
 
 
 /*
- * Destructing the object: calling hte virtual Done method
+ * Destructing the object: calling the virtual Done method
  */
 
 cl_base::~cl_base(void)
@@ -433,7 +433,7 @@ cl_list::put_at(t_index index, void *item)
 
 
 /*
- * Action taken when an error occure
+ * Action taken when an error occurred
  */
 
 void
@@ -667,7 +667,7 @@ cl_list::set_limit(t_index alimit)
 */
 
 /*
- * Initilizing the sorted collection
+ * Initializing the sorted collection
  */
 
 cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, const char *aname):
@@ -774,7 +774,7 @@ cl_sorted_list::search(const void *key, t_index &index)
 */
 
 /*
- * Initilizing the string collection
+ * Initializing the string collection
  */
 
 cl_strings::cl_strings(t_index alimit, t_index adelta, const char *aname):
@@ -817,7 +817,7 @@ cl_strings::free_item(void* item)
 */
 
 /*
- * Initilizing the unsorted string collection
+ * Initializing the unsorted string collection
  */
 
 cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, const char *aname):
@@ -828,7 +828,7 @@ cl_ustrings::~cl_ustrings(void) {}
 
 
 /*
- * Comapare two string from the collection
+ * Compare two string from the collection
  */
 
 int

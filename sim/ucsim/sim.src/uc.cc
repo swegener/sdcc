@@ -2709,18 +2709,17 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 void
 cl_error_unknown_code::print(class cl_commander_base *c)
 {
-  //FILE *f= c->get_out();
-  /*cmd_fprintf(f,*/c->dd_printf("%s: unknown instruction code at ", get_type_name());
+  c->dd_printf("%s: unknown instruction code at ", get_type_name());
   if (uc->rom)
     {
-      /*cmd_fprintf(f,*/c->dd_printf(uc->rom->addr_format, PC);
-      /*cmd_fprintf(f,*/c->dd_printf(" (");
-      /*cmd_fprintf(f,*/c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
-      /*cmd_fprintf(f,*/c->dd_printf(")");
+      c->dd_printf(uc->rom->addr_format, PC);
+      c->dd_printf(" (");
+      c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
+      c->dd_printf(")");
     }
   else
-    /*cmd_fprintf(f,*/c->dd_printf("0x%06x", AU(PC));
-  /*cmd_fprintf(f,*/c->dd_printf("\n");
+    c->dd_printf("0x%06x", AU(PC));
+  c->dd_printf("\n");
 }
 
 

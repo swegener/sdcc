@@ -397,7 +397,7 @@ COMMAND_DO_WORK_APP(cl_set_console_cmd)
   else if ((strstr(s1, "c") == s1) ||
 	   (strstr(s1, "e") == s1))
     {
-      // coocked, edited
+      // cooked, edited
       con->set_cooked(true);
     }
   else

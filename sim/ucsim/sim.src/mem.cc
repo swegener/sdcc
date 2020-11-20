@@ -2603,10 +2603,9 @@ cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr):
 void
 cl_error_mem_invalid_address::print(class cl_commander_base *c)
 {
-  //FILE *f= c->get_fout();
-  /*cmd_fprintf(f,*/c->dd_printf("%s: invalid address ", get_type_name());
-  /*cmd_fprintf(f,*/c->dd_printf(mem->addr_format, addr);
-  /*cmd_fprintf(f,*/c->dd_printf(" in memory %s.\n", mem->get_name());
+  c->dd_printf("%s: invalid address ", get_type_name());
+  c->dd_printf(mem->addr_format, addr);
+  c->dd_printf(" in memory %s.\n", mem->get_name());
 }
 
 /* Non-decoded address space access */
@@ -2621,10 +2620,9 @@ cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr):
 void
 cl_error_mem_non_decoded::print(class cl_commander_base *c)
 {
-  //FILE *f= c->get_fout();
-  /*cmd_fprintf(f,*/c->dd_printf("%s: access of non-decoded address ", get_type_name());
-  /*cmd_fprintf(f,*/c->dd_printf(mem->addr_format, addr);
-  /*cmd_fprintf(f,*/c->dd_printf(" in memory %s.\n", mem->get_name());
+  c->dd_printf("%s: access of non-decoded address ", get_type_name());
+  c->dd_printf(mem->addr_format, addr);
+  c->dd_printf(" in memory %s.\n", mem->get_name());
 }
 
 cl_mem_error_registry::cl_mem_error_registry(void)

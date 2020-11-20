@@ -370,7 +370,7 @@ cl_io::changed(void)
   if (server_port > 0)
     {
       //printf("win opened socket id=%d\n", file_id);
-      handle= (void*)file_id;
+      handle= (void *)file_id;
       type= F_SOCKET;
       deb("assuming TTY on socket %d\n", file_id);
       tty= true;

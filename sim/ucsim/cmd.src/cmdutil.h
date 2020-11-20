@@ -36,9 +36,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern char *proc_escape(char *string, int *len);
-extern int cmd_vfprintf(FILE *f, char *format, va_list ap);
-extern int cmd_fprintf(FILE *f, char *format, ...);
-
 extern int bool_name(char *s, int *val);
 
   

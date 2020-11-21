@@ -1,3 +1,8 @@
+2020-11-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pic14/glue.c:
+	  --code-loc support for pic14, patch by Georgi Georgiev.
+
 2020-11-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/sim.src/mem.cc:

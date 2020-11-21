@@ -437,7 +437,7 @@ pic14createInterruptVect (struct dbuf_s *vBuf)
   dbuf_printf (vBuf, "; reset vector \n");
   dbuf_printf (vBuf, "%s", iComments2);
   // Lkr file should place section STARTUP at address 0x0, but does not ...
-  dbuf_printf (vBuf, "STARTUP\t%s 0x0000\n", CODE_NAME);
+  dbuf_printf (vBuf, "STARTUP\t%s 0x%04X\n", CODE_NAME, options.code_loc);
   dbuf_printf (vBuf, "\tnop\n");        /* first location for used by incircuit debugger */
   dbuf_printf (vBuf, "\tpagesel __sdcc_gsinit_startup\n");
   dbuf_printf (vBuf, "\tgoto\t__sdcc_gsinit_startup\n");
@@ -655,7 +655,7 @@ pic14_emitInterruptHandler (FILE *asmFile)
       // Note - for mplink may have to enlarge section vectors in .lnk file
       // Note: Do NOT name this code_interrupt to avoid nameclashes with
       //       source files's code segment (interrupt.c -> code_interrupt)
-      fprintf (asmFile, "c_interrupt\t%s\t0x0004\n", CODE_NAME);
+      fprintf (asmFile, "c_interrupt\t%s\t0x%04X\n", CODE_NAME, options.code_loc+4);
 
       /* interrupt service routine */
       fprintf (asmFile, "__sdcc_interrupt:\n");

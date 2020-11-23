@@ -223,9 +223,9 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   if (eic->op == GET_VALUE_AT_ADDRESS && !optimize.allow_unsafe_read)
     safety_required = true;
 
-  // The division routines for z80-like ports and the hc08/s08's and stm8's hardware division just give an undefined result
+  // The division routines for z80-like ports, the hc08/s08's, the pdk ports and stm8's hardware division just give an undefined result
   // for division by zero, but there are no harmful side effects. I don't know about the other ports.
-  if ((eic->op == '/' || eic->op == '%') && !TARGET_Z80_LIKE && !TARGET_HC08_LIKE && !TARGET_IS_STM8)
+  if ((eic->op == '/' || eic->op == '%') && !TARGET_Z80_LIKE && !TARGET_HC08_LIKE && !TARGET_PDK_LIKE && !TARGET_IS_STM8)
     safety_required = true;
 
   // TODO: Relax this! There are cases where allowing unsafe optimizations will improve speed.

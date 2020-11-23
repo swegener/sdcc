@@ -2939,7 +2939,7 @@ offsetFoldUse (eBBlock **ebbs, int count)
   iCode *ic;
   iCode *uic;
 
-  if (!TARGET_IS_Z80 && !TARGET_IS_Z180 && !TARGET_IS_RABBIT && !TARGET_IS_EZ80_Z80 && !TARGET_IS_Z80N && !TARGET_IS_STM8)
+  if (!(TARGET_Z80_LIKE && !TARGET_IS_GBZ80) && !TARGET_IS_STM8) // All z80-related targets except gbz80 support non-zero right operand. stm8 also supports it.
     return;
   
   for (i = 0; i < count; i++)
@@ -3257,7 +3257,7 @@ eBBlockFromiCode (iCode *ic)
       if (options.dump_i_code)
         dumpEbbsToFileExt (DUMP_LOSPRE, ebbi);
 
-      /* GCSE, lospre and maybe other optimizations sometimes create temporaries that have non-connected live ranges, which is bad. Split them. */
+      /* GCSE, lospre and maybe other optimizations sometimes create temporaries that have non-connected live ranges, which is bad (e.g. for offsetFoldUse and register allocation). Split them. */
       freeeBBlockData (ebbi);
       ebbi = iCodeBreakDown (ic);
       computeControlFlow (ebbi);

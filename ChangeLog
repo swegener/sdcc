@@ -1,3 +1,10 @@
+2020-11-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Enable non-zero right GET_VALUE_AT_ADDRESS operand for tlcs90.
+	* src/SDCClospre.cc:
+	  Enable speculative division for pdk in lospre (though pdk does not use lospre yet).
+
 2020-11-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pic14/glue.c:

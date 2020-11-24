@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Improve handling of rematerialized stack locations in +,-.
+	* src/stm8/peeph.def:
+	  Improve negation of carry result.
 
 2020-11-23 Philipp Klaus Krause <pkk AT spth.de>
 

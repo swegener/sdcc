@@ -447,7 +447,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #0
-	; peephole 20-0 replaced or by bcpl.
+	; peephole 20-0 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -457,7 +457,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #1
-	; peephole 20-1 replaced or by bcpl.
+	; peephole 20-1 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -467,7 +467,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #2
-	; peephole 20-2 replaced or by bcpl.
+	; peephole 20-2 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -477,7 +477,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #3
-	; peephole 20-3 replaced or by bcpl.
+	; peephole 20-3 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -487,7 +487,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #4
-	; peephole 20-4 replaced or by bcpl.
+	; peephole 20-4 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -497,7 +497,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #5
-	; peephole 20-5 replaced or by bcpl.
+	; peephole 20-5 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -507,7 +507,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #6
-	; peephole 20-6 replaced or by bcpl.
+	; peephole 20-6 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -517,7 +517,7 @@ replace restart {
 	ld	(%1), a
 } by {
 	bcpl	%2, #7
-	; peephole 20-7 replaced or by bcpl.
+	; peephole 20-7 replaced xor by bcpl.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -526,7 +526,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #0
-	; peephole 21-0 replaced or by bcpl.
+	; peephole 21-0 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -535,7 +535,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #1
-	; peephole 21-1 replaced or by bcpl.
+	; peephole 21-1 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -544,7 +544,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #2
-	; peephole 21-2 replaced or by bcpl.
+	; peephole 21-2 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -553,7 +553,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #3
-	; peephole 21-3 replaced or by bcpl.
+	; peephole 21-3 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -562,7 +562,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #4
-	; peephole 21-4 replaced or by bcpl.
+	; peephole 21-4 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1, %2)
 
 replace restart {
@@ -571,7 +571,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #5
-	; peephole 21-5 replaced or by bcpl.
+	; peephole 21-5 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -580,7 +580,7 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #6
-	; peephole 21-6 replaced or by bcpl.
+	; peephole 21-6 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
@@ -589,8 +589,17 @@ replace restart {
 	ld	%1, a
 } by {
 	bcpl	%2, #7
-	; peephole 21-7 replaced or by bcpl.
+	; peephole 21-7 replaced xor by bcpl.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	rlc	a
+	xor	a, #0x01
+} by {
+	ccf
+	; peephole 20a replaced xor by ccf-
+	rlc	a
+} if notUsed('c')
 
 replace restart {
 	clr	a

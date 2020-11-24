@@ -1,6 +1,11 @@
 2020-11-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
+	  Unify ~,^.
+
+2020-11-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
 	  Improve handling of rematerialized stack locations in +,-.
 	* src/stm8/peeph.def:
 	  Improve negation of carry result.

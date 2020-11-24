@@ -1,3 +1,8 @@
+2020-11-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve handling of rematerialized stack locations in +,-.
+
 2020-11-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

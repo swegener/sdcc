@@ -2703,8 +2703,18 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           if (!y && !x_free)
             push (ASMOP_X, 0, 2);
           emit2 ("ldw", y ? "y, sp" : "x, sp");
-          emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)(left_aop->aopu.stk_off) + G.stack.pushed - offset);
-          cost (4 + 2 * y, 3);
+          cost (1 + y, 1);
+          switch ((long)(left_aop->aopu.stk_off) + G.stack.pushed - offset)
+            {
+            case 2:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+            case 1:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+              break;
+            default:
+              emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)(left_aop->aopu.stk_off) + G.stack.pushed - offset);
+              cost (3 + y, 2);
+            }
           if (!lit)
             {
               emit2 ("subw", y ? "y, %s" : "x, %s", aopGet2 (right_aop, i));
@@ -4015,8 +4025,18 @@ genPlus (const iCode *ic)
           if (!y && !x_free)
             push (ASMOP_X, 0, 2);
           emit2 ("ldw", y ? "y, sp" : "x, sp");
-          emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)((leftop->type == AOP_STL ? left : right)->aop->aopu.stk_off) + G.stack.pushed + offset);
-          cost (4 + 2 * y, 3);
+          cost (1 + y, 1);
+          switch ((long)((leftop->type == AOP_STL ? left : right)->aop->aopu.stk_off) + G.stack.pushed + offset)
+            {
+            case 2:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+            case 1:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+              break;
+            default:
+              emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)((leftop->type == AOP_STL ? left : right)->aop->aopu.stk_off) + G.stack.pushed + offset);
+              cost (3 + y, 2);
+            }
           if (!lit)
             {
               emit2 ("addw", y ? "y, %s" : "x, %s", aopGet2 (leftop->type == AOP_STL ? rightop : leftop, i));

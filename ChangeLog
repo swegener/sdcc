@@ -1,3 +1,8 @@
+2020-11-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c:
+	  Change Rabbit default data location to 0xa000.
+
 2020-11-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

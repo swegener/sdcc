@@ -793,7 +793,13 @@ _setDefaultOptions (void)
   /* Default code and data locations. */
   options.code_loc = 0x200;
 
-  options.data_loc = IS_GB ? 0xC000 : 0x8000;
+  if (IS_GB)
+    options.data_loc = 0xc000;
+  else if (IS_RAB) // Match default crt0
+    options.data_loc = 0xa000;
+  else
+    options.data_loc = 0x8000;
+
   options.out_fmt = 'i';        /* Default output format is ihx */
 }
 

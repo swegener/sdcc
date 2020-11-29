@@ -2326,7 +2326,10 @@ setIncludePath (void)
 
       tempSet = processStrSet (dataDirsSet, NULL, INCLUDE_DIR_SUFFIX, NULL);
       includeDirsSet = processStrSet (tempSet, NULL, DIR_SEPARATOR_STRING, NULL);
-      includeDirsSet = processStrSet (includeDirsSet, NULL, port->target, NULL);
+      if (TARGET_IS_RABBIT) // Rabbits have a shared include directory.
+        includeDirsSet = processStrSet (includeDirsSet, NULL, "rab", NULL);
+      else
+        includeDirsSet = processStrSet (includeDirsSet, NULL, port->target, NULL);
       mergeSets (&includeDirsSet, tempSet);
 
       if (options.use_non_free)

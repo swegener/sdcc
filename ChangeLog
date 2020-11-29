@@ -1,3 +1,11 @@
+2020-11-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  device/include/Makefile.in,
+	  device/include/rab,
+	  .version:
+	  Migrate Rabbit headers from OpenRabbit to SDCC.
+
 2020-11-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c:

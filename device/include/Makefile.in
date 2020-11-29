@@ -60,10 +60,10 @@ install: all installdirs
 	    done; \
 	  fi; \
 	done;
-	# z80 family: z180, r2k, r2ka, r3ka, gbz80, and tlcs90
+	# z80 family: z180, r2k, r2ka, r3ka, etc
 	if [ "`grep z80 $(top_builddir)/ports.build`" = "z80" ]; \
 	then \
-	  for target in z180 r2k r2ka r3ka gbz80 tlcs90; \
+	  for target in z180 rab; \
 	  do \
 	    for mask in '*.h' '*.inc' '*.txt'; \
 	    do \
@@ -128,7 +128,7 @@ installcheck:
 # ---------------------------------
 installdirs:
 	mkdir -p $(sdcc_includedir)
-	for target in mcs51 ds390 ds400 pic14 pic16 z80 z180 gbz80 hc08; \
+	for target in mcs51 ds390 ds400 pic14 pic16 z180 rab hc08; \
 	do \
 	  if [ -d $(srcdir)/$${target} ]; \
 	  then \

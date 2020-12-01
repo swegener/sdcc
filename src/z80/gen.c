@@ -8944,6 +8944,15 @@ genAnd (const iCode * ic, iCode * ifx)
               i += 2;
               continue;
             }
+          else if (IS_TLCS90 &&
+            (aopInReg (left->aop, i, HL_IDX) && aopInReg (result->aop, i, HL_IDX) || aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX)))
+            {
+              unsigned short mask = aopInReg (result->aop, i, L_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
+              emit2 ("and hl, !immedword", mask);
+              regalloc_dry_run_cost += 3;
+              i += 2;
+              continue;
+            }
         }
 
       if (IS_RAB)
@@ -9164,6 +9173,15 @@ genOr (const iCode * ic, iCode * ifx)
               emit2 (mask_in_de ? "ld de, !immedword" : "ld hl, !immedword", mask);
               emit2 ("or hl, de");
               regalloc_dry_run_cost += 4;
+              i += 2;
+              continue;
+            }
+          else if (IS_TLCS90 &&
+            (aopInReg (left->aop, i, HL_IDX) && aopInReg (result->aop, i, HL_IDX) || aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX)))
+            {
+              unsigned short mask = aopInReg (result->aop, i, L_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
+              emit2 ("or hl, !immedword", mask);
+              regalloc_dry_run_cost += 3;
               i += 2;
               continue;
             }

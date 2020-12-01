@@ -9256,66 +9256,61 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genXor - code for xclusive or                                   */
+/* genEor - code for xclusive or                                   */
 /*-----------------------------------------------------------------*/
 static void
-genXor (const iCode *ic, iCode *ifx)
+genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 {
-  operand *left, *right, *result;
   int size, offset = 0;
   unsigned long long lit = 0;
   bool pushed_a = false;
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
-
-  bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= 0 && right->aop->regs[A_IDX] <= 0;
+  bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && left_aop->regs[A_IDX] <= 0 && right_aop->regs[A_IDX] <= 0;
 
   /* if left is a literal & right is not then exchange them */
-  if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) || (AOP_NEEDSACC (right) && !AOP_NEEDSACC (left)))
+  if ((left_aop->type == AOP_LIT && right_aop->type != AOP_LIT) || ((right_aop->type == AOP_SFR || right_aop->type == AOP_CRY) && !(left_aop->type == AOP_SFR || left_aop->type == AOP_CRY)))
     {
-      operand *tmp = right;
-      right = left;
-      left = tmp;
+      asmop *taop = right_aop;
+      right_aop = left_aop;
+      left_aop = taop;
     }
 
   /* if result = right then exchange them */
-  if (sameRegs (result->aop, AOP (right)) && !AOP_NEEDSACC (left))
+  if (sameRegs (result_aop, right_aop) && !(left_aop->type == AOP_SFR || left_aop->type == AOP_CRY))
     {
-      operand *tmp = right;
-      right = left;
-      left = tmp;
+      asmop *taop = right_aop;
+      right_aop = left_aop;
+      left_aop = taop;
     }
 
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = ullFromVal (AOP (right)->aopu.aop_lit);
+  if (right_aop->type == AOP_LIT)
+    lit = ullFromVal (right_aop->aopu.aop_lit);
 
-  size = AOP_SIZE (result);
+  size = result_aop->size;
 
-  if (AOP_TYPE (left) == AOP_CRY)
+  if (left_aop->type == AOP_CRY)
     {
       wassertl (0, "Tried to XOR a bit");
-      goto release;
+      return;
     }
 
   /* Make sure A is on the left to not overwrite it. */
-  if (aopInReg (right->aop, 0, A_IDX))
+  if (aopInReg (right_aop, 0, A_IDX))
     {
-      wassert (!AOP_NEEDSACC (left));
-      operand *tmp = right;
-      right = left;
-      left = tmp;
+      wassert (!(left_aop->type == AOP_SFR || left_aop->type == AOP_CRY));
+      asmop *taop = right_aop;
+      right_aop = left_aop;
+      left_aop = taop;
     }
 
   // if(val & 0xZZ)       - size = 0, ifx != FALSE  -
   // bit = val & 0xZZ     - size = 1, ifx = FALSE -
-  if ((AOP_TYPE (right) == AOP_LIT) && (AOP_TYPE (result) == AOP_CRY) && (AOP_TYPE (left) != AOP_CRY))
+  if ((right_aop->type == AOP_LIT) && (result_aop->type == AOP_CRY) && (left_aop->type != AOP_CRY))
     {
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       int sizel;
 
-      sizel = AOP_SIZE (left);
+      sizel = left_aop->size;
 
       if (size)
         {
@@ -9324,7 +9319,7 @@ genXor (const iCode *ic, iCode *ifx)
         }
       while (sizel--)
         {
-          if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= offset && right->aop->regs[A_IDX] <= offset && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= offset))
+          if (!bitVectBitValue (ic->rSurv, A_IDX) && left_aop->regs[A_IDX] <= offset && right_aop->regs[A_IDX] <= offset && (result_aop->regs[A_IDX] < 0 || result_aop->regs[A_IDX] >= offset))
             a_free = true;
 
           if (!a_free)
@@ -9339,7 +9334,7 @@ genXor (const iCode *ic, iCode *ifx)
                   wassert (regalloc_dry_run);
                 }
             }
-          else if (pushed_a && (aopInReg (left->aop, offset, A_IDX) || aopInReg (right->aop, offset, A_IDX)))
+          else if (pushed_a && (aopInReg (left_aop, offset, A_IDX) || aopInReg (right_aop, offset, A_IDX)))
             {
               _pop (PAIR_AF);
               if (bitVectBitValue (ic->rSurv, A_IDX))
@@ -9348,12 +9343,12 @@ genXor (const iCode *ic, iCode *ifx)
                 pushed_a = false;
             }
 
-          if (aopInReg (right->aop, offset, A_IDX))
-            emit3_o (A_XOR, ASMOP_A, 0, left->aop, offset);
+          if (aopInReg (right_aop, offset, A_IDX))
+            emit3_o (A_XOR, ASMOP_A, 0, left_aop, offset);
           else
             {
-              cheapMove (ASMOP_A, 0, left->aop, offset, true);
-              emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
+              cheapMove (ASMOP_A, 0, left_aop, offset, true);
+              emit3_o (A_XOR, ASMOP_A, 0, right_aop, offset);
             }
           if (ifx)              /* emit jmp only, if it is actually used * */
             if (!regalloc_dry_run)
@@ -9371,21 +9366,21 @@ genXor (const iCode *ic, iCode *ifx)
         {
           wassertl (0, "Result of XOR was destined for a bit");
         }
-      goto release;
+      return;
     }
 
     // left & result in different registers
-    if (AOP_TYPE (result) == AOP_CRY)
+    if (result_aop->type == AOP_CRY)
       {
         wassertl (0, "Result of XOR is in a bit");
       }
     else
       for (; (size--); offset++)
         {
-          if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= offset && right->aop->regs[A_IDX] <= offset && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= offset))
+          if (!bitVectBitValue (ic->rSurv, A_IDX) && left_aop->regs[A_IDX] <= offset && right_aop->regs[A_IDX] <= offset && (result_aop->regs[A_IDX] < 0 || result_aop->regs[A_IDX] >= offset))
             a_free = true;
 
-          if (pushed_a && (aopInReg (left->aop, offset, A_IDX) || aopInReg (right->aop, offset, A_IDX)))
+          if (pushed_a && (aopInReg (left_aop, offset, A_IDX) || aopInReg (right_aop, offset, A_IDX)))
             {
               _pop (PAIR_AF);
               if (bitVectBitValue (ic->rSurv, A_IDX))
@@ -9396,12 +9391,12 @@ genXor (const iCode *ic, iCode *ifx)
 
           // normal case
           // result = left & right
-          if (right->aop->type == AOP_LIT)
+          if (right_aop->type == AOP_LIT)
             {
               if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
                 {
-                  cheapMove (result->aop, offset, left->aop, offset, a_free);
-                  if (aopInReg (result->aop, offset, A_IDX))
+                  cheapMove (result_aop, offset, left_aop, offset, a_free);
+                  if (aopInReg (result_aop, offset, A_IDX))
                     a_free = false;
                   continue;
                 }
@@ -9416,27 +9411,39 @@ genXor (const iCode *ic, iCode *ifx)
               pushed_a = true;
             }
 
-          if (aopInReg (right->aop, offset, A_IDX))
-            emit3_o (A_XOR, ASMOP_A, 0, left->aop, offset);
+          if (aopInReg (right_aop, offset, A_IDX))
+            emit3_o (A_XOR, ASMOP_A, 0, left_aop, offset);
           else
             {
-              cheapMove (ASMOP_A, 0, left->aop, offset, true);
-              if (right->aop->type == AOP_LIT && ((lit >> (offset * 8)) & 0xff) == 0xff)
+              cheapMove (ASMOP_A, 0, left_aop, offset, true);
+              if (right_aop->type == AOP_LIT && ((lit >> (offset * 8)) & 0xff) == 0xff)
                 emit3 (A_CPL, 0, 0);
               else
-                emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
+                emit3_o (A_XOR, ASMOP_A, 0, right_aop, offset);
             }
-          cheapMove (result->aop, offset, ASMOP_A, 0, true);
-          if (aopInReg (result->aop, offset, A_IDX))
+          cheapMove (result_aop, offset, ASMOP_A, 0, true);
+          if (aopInReg (result_aop, offset, A_IDX))
             a_free = false;
         }
   if (pushed_a)
      _pop (PAIR_AF);
+}
 
-release:
-  freeAsmop (left, NULL);
-  freeAsmop (right, NULL);
-  freeAsmop (result, NULL);
+/*-----------------------------------------------------------------*/
+/* genXor - code for xclusive or                                   */
+/*-----------------------------------------------------------------*/
+static void
+genXor (const iCode *ic, iCode *ifx)
+{
+  aopOp (IC_LEFT (ic), ic, false, false);
+  aopOp (IC_RIGHT (ic), ic, false, false);
+  aopOp (IC_RESULT (ic), ic, false, false);
+  
+  genEor (ic, ifx, IC_RESULT (ic)->aop, IC_LEFT (ic)->aop, IC_RIGHT (ic)->aop);
+  
+  freeAsmop (IC_LEFT (ic), NULL);
+  freeAsmop (IC_RIGHT (ic), NULL);
+  freeAsmop (IC_RESULT (ic), NULL);
 }
 
 /*-----------------------------------------------------------------*/

@@ -242,7 +242,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_zero, asmop_one, asmop_return;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_zero, asmop_one, asmop_mone, asmop_return;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -257,6 +257,7 @@ static struct asmop *const ASMOP_DE = &asmop_de;
 static struct asmop *const ASMOP_BC = &asmop_bc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
+static struct asmop *const ASMOP_MONE = &asmop_mone;
 static struct asmop *const ASMOP_RETURN = &asmop_return;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
@@ -344,6 +345,11 @@ z80_init_asmops (void)
   asmop_one.size = 1;
   memset (asmop_one.regs, -1, 9);
 
+  asmop_mone.type = AOP_LIT;
+  asmop_mone.aopu.aop_lit = constVal ("-1");
+  asmop_mone.size = 1;
+  memset (asmop_mone.regs, -1, 9);
+  
   asmop_return.type = AOP_REG;
   asmop_return.size = 4;
   memset (asmop_return.regs, -1, 9);
@@ -9107,6 +9113,10 @@ genOr (const iCode * ic, iCode * ifx)
 
   for (int i = 0; i < size;)
     {
+      const bool hl_free = isPairDead (PAIR_HL, ic) &&
+        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
+        (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
+        
       if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i))
         a_free = true;
 
@@ -9123,16 +9133,14 @@ genOr (const iCode * ic, iCode * ifx)
         {
           bytelit = byteOfVal (right->aop->aopu.aop_lit, i);
 
-          if (bytelit == 0xff)
+          if (bytelit == 0x00 || bytelit == 0xff)
             {
-              // TODO
-            }
-          else if (bytelit == 0x00)
-            {
-              cheapMove (result->aop, i, left->aop, i, a_free);
-              if (aopInReg (result->aop, i, A_IDX))
+              int end;
+              for(end = i; end < size && byteOfVal (right->aop->aopu.aop_lit, end) == bytelit; end++);
+              genMove_o (result->aop, i, bytelit == 0x00 ? left->aop : ASMOP_MONE, i, end - i, a_free, hl_free, !isPairInUse (PAIR_DE, ic));
+              if (result->aop->regs[A_IDX] >= i && result->aop->regs[A_IDX] < end)
                 a_free = false;
-              i++;
+              i = end;
               continue;
             }
           else if (isLiteralBit (bytelit) >= 0 &&

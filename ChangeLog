@@ -1,7 +1,7 @@
 2020-12-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve &, | by integer constant expression.
+	  Improve &, |, ^ by integer constant expression, merge ^ and ~.
 
 2020-11-29 Philipp Klaus Krause <pkk AT spth.de>
 

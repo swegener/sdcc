@@ -600,7 +600,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
     return(true);
 
-  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB || ic->op == '~') && // First byte of input and last byte of output may be in A.
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB) && // First byte of input and last byte of output may be in A.
     IS_ITEMP(result) && dying_A &&
     (IS_ITEMP(left) || IS_OP_LITERAL(left) || operand_on_stack(left, a, i, G)) &&
     (!right || IS_ITEMP(right) || IS_OP_LITERAL(right) || operand_on_stack(right, a, i, G)))
@@ -697,8 +697,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         !((ic->op == RIGHT_OP || ic->op == LEFT_OP) &&
           (IS_OP_LITERAL(right) || operand_in_reg(right, REG_A, ia, i, G) || getSize(operandType(IC_RESULT(ic))) == 1 && ia.registers[REG_B][1] < 0)) &&
         !((ic->op == '=' || ic->op == CAST) && !(IY_RESERVED && POINTER_SET(ic))) &&
-        !IS_BITWISE_OP (ic) &&
-        !(ic->op == '~') &&
         !(ic->op == '*' && (IS_ITEMP(IC_LEFT(ic)) || IS_OP_LITERAL(IC_LEFT(ic))) && (IS_ITEMP(IC_RIGHT(ic)) || IS_OP_LITERAL(IC_RIGHT(ic)))) &&
         !((ic->op == '-' || ic->op == '+' || ic->op == EQ_OP) && IS_OP_LITERAL(IC_RIGHT(ic))))
         {
@@ -721,7 +719,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       ic->op != '+' &&
       ic->op != '-' &&
       (ic->op != '*' || !IS_OP_LITERAL(IC_LEFT(ic)) && !IS_OP_LITERAL(right)) &&
-      !IS_BITWISE_OP(ic) &&
       ic->op != GET_VALUE_AT_ADDRESS &&
       ic->op != '=' &&
       ic->op != EQ_OP &&

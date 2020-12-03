@@ -591,6 +591,8 @@ struct
      "unicode string literal requires ISO C 11 or later", 0 },
   { W_PREFIXED_STRINGS, ERROR_LEVEL_WARNING,
      "sequence of differently prefixed string literals", 0 },
+  { W_DIGIT_SEPARATOR_C23, ERROR_LEVEL_WARNING,
+     "digit separators require ISO C23 or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

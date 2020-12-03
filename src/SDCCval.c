@@ -1172,6 +1172,54 @@ constVal (const char *s)
 }
 
 /*-----------------------------------------------------------------*/
+/* sepStrToUll - like stroull, but also handles digit separators   */
+/*-----------------------------------------------------------------*/
+static unsigned long long 
+sepStrToUll (const char *nptr, char **endptr, int base)
+{
+  wassert (base >= 2 && base <= 16);
+
+  unsigned long long ret = 0ull;
+  bool separated = false;
+
+  for(;;nptr++)
+    {
+      int next = nptr[0];
+
+      // Skip digit separators
+      if (next == '\'')
+        {
+          separated = true;
+          continue;
+        }
+      
+      // Assumes 0-9, a-f and A-F are consecutive in character set.
+      if (next >= 'a' && next <= 'f')
+        next = next - 'a' + 10;
+      else if (next >= 'A' && next <= 'F')
+        next = next - 'A' + 10;
+      else if (next >= '0' && next <= '9')
+        next = next - '0';
+      else
+        break;
+
+      if (!(next >= 0 && next < base))
+        break;
+        
+      ret *= base;
+      ret += next;
+    }
+
+  if(separated && !options.std_c2x)
+    werror (W_DIGIT_SEPARATOR_C23);
+
+  if (endptr) 
+    *endptr = (char *)nptr;
+
+  return(ret);
+}
+
+/*-----------------------------------------------------------------*/
 /* constIntVal - converts an integer constant into correct type    */
 /* See ISO C11, section 6.4.4.1 for the rules.                     */
 /*-----------------------------------------------------------------*/
@@ -1194,9 +1242,11 @@ constIntVal (const char *s)
   if (s[0] == '0')
     {
       if (s[1] == 'b' || s[1] == 'B')
-        llval = strtoull (s + 2, &p, 2);
+        llval = sepStrToUll (s + 2, &p, 2);
+      else if (s[1] == 'x' || s[1] == 'X')
+        llval = sepStrToUll (s + 2, &p, 16);
       else
-        llval = strtoull (s, &p, 0);
+        llval = sepStrToUll (s, &p, 8);
       dval = (double)(unsigned long long int) llval;
       decimal = FALSE;
     }
@@ -1204,10 +1254,17 @@ constIntVal (const char *s)
     {
       dval = strtod (s, &p);
       if (dval >= 0.0)
-        llval = strtoull (s, &p, 0);
+        {
+          llval = sepStrToUll (s, &p, 10);
+          dval = (double)(unsigned long long int) llval;
+        }
       else
-        llval = strtoll (s, &p, 0);
-      decimal = TRUE;
+        {
+          llval = sepStrToUll (s + 1, &p, 10);
+          llval = -llval;
+          dval = (double) llval;
+        }
+      decimal = true;
     }
 
   if (errno)

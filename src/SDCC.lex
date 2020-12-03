@@ -225,16 +225,16 @@ static void checkCurrFile (const char *s);
   count ();
   return check_type();
 }
-0[bB]{B}+{IS}?          {
+0[bB]('?{B})+{IS}?          {
   if (!options.std_sdcc && !options.std_c2x)
     werror (W_BINARY_INTEGER_CONSTANT_C23);
   count ();
   yylval.val = constIntVal (yytext);
   return CONSTANT;
 }
-0[xX]{H}+{IS}?               { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
-0[0-7]*{IS}?                 { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
-[1-9]{D}*{IS}?               { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+0[xX]('?{H})+{IS}?           { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+0('?[0-7])*{IS}?             { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+[1-9]('?{D})*{IS}?           { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
 {CP}?'(\\.|[^\\'])+'         { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
 {D}+{E}{FS}?                 { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?       { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }

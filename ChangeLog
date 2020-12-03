@@ -1,6 +1,16 @@
 2020-12-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCval.c,
+	  .version,
+	  support/regression/test/digit_separators.c:
+	  C23 digit separators.
+
+2020-12-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
 	  src/SDCCerr.h,
 	  src/SDCCerr.c,
 	  src/SDCCval.c,

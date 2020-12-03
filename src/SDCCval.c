@@ -1537,11 +1537,11 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
-  utf_8 = copyStr (s[0] == '"' ? s : s + 1, &utf_8_size);
-
-  if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
+  if (s[0] == '"' || s[0] == 'u' && s[1] == '8' && s[2] == '"') // UTF-8 string literal
     {
+      // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 (handling all escape sequences, etc).
+      utf_8 = copyStr (s[0] == '"' ? s : s + 2, &utf_8_size);
+
       SPEC_NOUN (val->etype) = V_CHAR;
       SPEC_USIGN (val->etype) = !options.signed_char;
       val->etype->select.s.b_implicit_sign = true;
@@ -1550,6 +1550,9 @@ strVal (const char *s)
     }
   else
     {
+      // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+      utf_8 = copyStr (s + 1, &utf_8_size);
+      
       size_t utf_32_size;
       // Convert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
       const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size);

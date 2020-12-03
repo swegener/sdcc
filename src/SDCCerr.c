@@ -587,6 +587,10 @@ struct
      "access to invalid stack location", 0 },
   { W_BINARY_INTEGER_CONSTANT_C23, ERROR_LEVEL_WARNING,
      "binary integer constant requires C23 or later", 0 },
+  { E_U8CHAR_STRING_C11, ERROR_LEVEL_ERROR,
+     "unicode string literal requires ISO C 11 or later", 0 },
+  { W_PREFIXED_STRINGS, ERROR_LEVEL_WARNING,
+     "sequence of differently prefixed string literals", 0 },
 };
 
 /* -------------------------------------------------------------------------------

@@ -244,7 +244,7 @@ static void checkCurrFile (const char *s);
 0[xX]{H}+"."{H}*({BE})?{FS}? { count (); if (!options.std_c99) werror(E_HEXFLOAT_C99); yylval.val = constFloatVal (yytext); return CONSTANT; }
 \"                           { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
 "L\""                        { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral ('L'); return STRING_LITERAL; }
-"u8\""                       { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"u8\""                       { count (); if (!options.std_c11) werror(E_U8CHAR_STRING_C11); yylval.yystr = stringLiteral ('8'); return STRING_LITERAL; }
 "u\""                        { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
 "U\""                        { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
@@ -559,11 +559,17 @@ stringLiteral (char enc)
     case 'u': // UTF-16
       dbuf_append_str(&dbuf, "u\"");
       break;
-    case 'L':
+    case 'L': // UTF-32
+      enc = 'L';
+      dbuf_append_str(&dbuf, "L\"");
+      break;
     case 'U': // UTF-32
       enc = 'U';
       dbuf_append_str(&dbuf, "U\"");
       break;
+    case '8': // UTF-8
+      enc = '8';
+      dbuf_append_str(&dbuf, "u8\"");
     default: // UTF-8 or whatever else the source character set is encoded in
       dbuf_append_char(&dbuf, '"');
     }
@@ -676,7 +682,7 @@ stringLiteral (char enc)
           if (ch == EOF)
             goto out;
 
-          if (ch == 'u' || ch == 'U' || ch == 'L') /* Could be an utf-16 or utf-32 wide string literal prefix */
+          if (ch == 'u' || ch == 'U' || ch == 'L') /* Could be an utf-16 or utf-32 wide string literal prefix or an utf-8 prefix */
             {
               int ch2;
 
@@ -697,6 +703,8 @@ stringLiteral (char enc)
                       dbuf_prepend_char(&dbuf, ch == 'L' ? 'U' : ch);
                       enc = ch;
                     }
+                  else if (enc != ch)
+                    werror (W_PREFIXED_STRINGS);
                   count_char(ch);
                   count_char(ch2);
                   break;
@@ -720,6 +728,10 @@ stringLiteral (char enc)
                   unput('u');
                   goto out;
                 }
+              if (!enc)
+                enc = '8';
+              else if (enc != '8')
+                werror (W_PREFIXED_STRINGS);
             }
           if (ch != '"')
             {

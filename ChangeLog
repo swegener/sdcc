@@ -1,3 +1,12 @@
+2020-12-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCval.c,
+	  .version:
+	  C23 disallows concatenation of differently-prefixed string literals (N2594).
+
 2020-12-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

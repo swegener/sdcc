@@ -160,6 +160,114 @@ Warning: maybe not instruction at 000020
  * 000020 ff       MOV   R7,A
 &gt; </pre>
     <hr>
+
+    
+    <h3><a name="history">history</a></h3>
+    
+    History command can be used to inspect and manipulate history of
+    executed instructions. It accepts following subcommands:
+
+    <p><a href="#history_">history</a>
+      <br>history <a href="#history_information">information</a>
+      <br>history <a href="#history_list">list</a>
+      <br>history <a href="#history_clear">clear</a>
+
+      <blockquote>
+	<h4><a name="history_">history</a></h4>
+	This command (without a subcommand) prints out last 10
+	elements of the command history in disassembled form.
+	<pre>0&gt; <font color="#118811">hist</font>
+ ? 0x0211 78          LD      A,B
+ ? 0x0212 de 22       SBC     A,#0x22
+ ? 0x0214 38 f7       JR      C,#-9
+ ? 0x0216 c9          RET
+ ? 0x0109 c3 04 02    JP      #0x0204
+ ? 0x0204 3e 00       LD      A,#0x00
+ ? 0x0206 cf          RST     8
+ ? 0x0008 fb          EI
+ ? 0x0009 ed 4d       RETI
+ ? 0x0207 76          HALT
+0&gt;
+	</pre>
+
+	<hr>
+	<h4><a name="history_information">history information</a></h4>
+	Print out information about execution history.
+
+	<pre>0&gt; <font color="#118811">hist info</font>
+len: 100
+used: 100
+insts: 100
+0&gt;
+	</pre>
+
+	<b>Len</b> is size of the history, <b>used</b> shows how many
+	slots are filled, <b>insts</b> is number of the instructions
+	recorded by the history.
+
+	<hr>
+	<h4><a name="history_list">history list [nr]</a>
+	<br>history print [nr]</h4>
+
+	This command is the same as the <a href="#history_">history</a> command
+	but it accepts a parameter which specifies how many records to
+	print (defaults to 10):
+
+	<pre>0&gt; <font color="#118811">hist list 3</font>
+ ? 0x0008 fb          EI
+ ? 0x0009 ed 4d       RETI
+ ? 0x0207 76          HALT
+0&gt; <font color="#118811">hist list 30</font>
+ ? 0x020e 79          LD      A,C
+ ? 0x020f d6 33       sub     #0x33
+ ? 0x0211 78          LD      A,B
+ ? 0x0212 de 22       SBC     A,#0x22
+ ? 0x0214 38 f7       JR      C,#-9
+ ? 0x020d 03          INC     BC
+ ? 0x020e 79          LD      A,C
+ ? 0x020f d6 33       sub     #0x33
+ ? 0x0211 78          LD      A,B
+ ? 0x0212 de 22       SBC     A,#0x22
+ ? 0x0214 38 f7       JR      C,#-9
+ ? 0x020d 03          INC     BC
+ ? 0x020e 79          LD      A,C
+ ? 0x020f d6 33       sub     #0x33
+ ? 0x0211 78          LD      A,B
+ ? 0x0212 de 22       SBC     A,#0x22
+ ? 0x0214 38 f7       JR      C,#-9
+ ? 0x020d 03          INC     BC
+ ? 0x020e 79          LD      A,C
+ ? 0x020f d6 33       sub     #0x33
+ ? 0x0211 78          LD      A,B
+ ? 0x0212 de 22       SBC     A,#0x22
+ ? 0x0214 38 f7       JR      C,#-9
+ ? 0x0216 c9          RET
+ ? 0x0109 c3 04 02    JP      #0x0204
+ ? 0x0204 3e 00       LD      A,#0x00
+ ? 0x0206 cf          RST     8
+ ? 0x0008 fb          EI
+ ? 0x0009 ed 4d       RETI
+ ? 0x0207 76          HALT
+0&gt;
+	</pre>
+
+	<hr>
+	<h4><a name="history_clear">history clear</a></h4>
+
+	This command clears the history, it deletes all recorded elements.
+
+	<pre>0&gt; <font color="#118811">hist list 3</font>
+ ? 0x0008 fb          EI
+ ? 0x0009 ed 4d       RETI
+ ? 0x0207 76          HALT
+0&gt; <font color="#118811">hist clear</font>
+0&gt; <font color="#118811">hist info</font>
+len: 100
+used: 0
+insts: 0
+0&gt;
+	</pre>
+      </blockquote>
     <!--OK-->
   </body>
 </html>

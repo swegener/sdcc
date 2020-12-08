@@ -34,8 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern void set_conf_help(class cl_cmd *cmd);
 
 // CONF
-//COMMAND_ON(uc,cl_conf_cmd);
-class cl_conf_cmd: public cl_cmd
+COMMAND_ON(uc,cl_conf_cmd);
+/*class cl_conf_cmd: public cl_cmd
 {
  public:
  cl_conf_cmd(const char *aname,
@@ -44,7 +44,7 @@ class cl_conf_cmd: public cl_cmd
   virtual int do_work(class cl_uc *uc ,
 		      class cl_cmdline *cmdline, class cl_console_base *con);
   virtual void set_help(void);
-};
+  };*/
 
 // CONF OBJECTS
 COMMAND_ON(app,cl_conf_objects_cmd);

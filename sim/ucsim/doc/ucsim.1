@@ -73,13 +73,13 @@ Open command console on
 .B \-Z portnum
 Use
 .I localhost:portnum
-for command console
+for command console.
 .PP
 .TP
 .B \-k portnum
 Use
 .I localhost:portnum
-for serial I/O
+for serial I/O.
 .PP
 .TP
 .B \-s file
@@ -95,19 +95,19 @@ is a comma separated list of options according to serial interface. Know options
 number of uart (default=0)
 .br
 .I in=file
-serial input will be read from file named `file'
+serial input will be read from file named `file'.
 .br
 .I out=file
-serial output will be written to `file'
+serial output will be written to `file'.
 .br
 .I port=nr
-Use localhost:nr as server for serial line
+Use localhost:nr as server for serial line.
 .br
 .I iport=nr
-Use localhost:nr as server for serial input
+Use localhost:nr as server for serial input.
 .br
 .I oport=nr
-Use localhost:nr as server for serial onput
+Use localhost:nr as server for serial onput.
 .PP
 .TP
 .B \-I options
@@ -115,27 +115,27 @@ Use localhost:nr as server for serial onput
 is a comma separated list of options according to simulator interface. Known options are:
 .br
 .I if=memory[address]
-turn on interface on given memory location
+turn on interface on given memory location.
 .br
 .I in=file
-specify input file for IO
+specify input file for IO.
 .br
 .I out=file
-specify output file for IO
+specify output file for IO.
 .PP
 .TP
 .B \-p prompt
-Specify string for prompt
+Specify string for prompt.
 .PP
 .TP
 .B \-P
-Prompt is a null ('\\0') character
+Prompt is a null ('\\0') character.
 .PP
 .TP
 .B \-o colors
 List of color specification: what=colspec,... where colspec is :
 separated list of color options e.g.: prompt=b:white:black (bold white
-on black)
+on black).
 .PP
 .TP
 .B \-l
@@ -143,39 +143,43 @@ Use colors of the light theme (default is dark).
 .PP
 .TP
 .B \-b
-Black & white (non-color) console
+Black & white (non-color) console.
+.PP
+.TP
+.B \-B
+Beep on breakpoints.
 .PP
 .TP
 .B \-g
-Go, start simulation
+Go, start simulation.
 .PP
 .TP
 .B \-G
-Go, start simulation, quit on stop
+Go, start simulation, quit on stop.
 .PP
 .TP
 .B \-a nr
-Specify size of variable space (default=256)
+Specify size of variable space (default=256).
 .PP
 .TP
 .B \-w
-Writable flash
+Writable flash.
 .PP
 .TP
 .B \-V
-Verbose mode
+Verbose mode.
 .PP
 .TP
 .B \-v
-Print out version number and quit
+Print out version number and quit.
 .PP
 .TP
 .B \-H
-Print out types of known CPUs and quit
+Print out types of known CPUs and quit.
 .PP
 .TP
 .B \-h
-Print out this help and quit
+Print out this help and quit.
 .SH EXAMPLES
 None yet.
 .SH "SEE ALSO"

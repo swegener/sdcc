@@ -14,10 +14,14 @@
       ST7 family is simulated by <b>sst7</b> <br>
       STM8 family is simulated by <b>sstm8</b> <br>
       TLCS90 family is simulated by <b>stlcs<br>
-      </b>Padauk family is simulated by <b>spdk</b></p>
+      </b>Padauk family is simulated by <b>spdk</b>
+      <br>p1516 family is simulated by <b>sp1516</b>
+      <br>Motorola MC6809 family is simulated by <b>sm6809</b>
+    </p>
+
     <p>The simulator can be started in the following way: </p>
-    <p><tt><font color="blue">$</font> s51 [-hHVvPgGwb] [-p prompt] [-t CPU] [-X
-        freq[k|M]] [-C cfg_file] [-e command] [-c file] [-s file] [-S
+    <p><tt><font color="blue">$</font> s51 [-hHVvPgGwlbB] [-p prompt] [-t CPU] [-X
+        freq[k|M]] [-R seed] [-C cfg_file] [-e command] [-c file] [-s file] [-S
         optionlist] [-I if_optionlist] [-a nr] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
     <p>Specified files must be names of Intel hex files. Simulator loads them in
       the specified order into the ROM of the simulated system. If the file is
@@ -47,6 +51,8 @@
         used to specify frequency in kHZ or MHz. Space is not allowed between
         the number and the <b>k</b> or <b>M</b>. Default value is 11059200 Hz.
         <a name="coption"></a></dd>
+      <dt><tt><b>-R seed</b></tt></dt>
+      <dd>Set seed value for the random number generator.</dd>
       <dt><span style="font-family: monospace;"><b>-C cfg_file</b></span></dt>
       <dd>Read and execute initial commands from specified file.</dd>
       <dt><b><span style="font-family: monospace;">-e command</span></b></dt>
@@ -187,8 +193,13 @@ under certain conditions; type `show c' for details.
         underlined bright green on black):<br>
         <span style="font-family: monospace;">-o
           prompt=lb:white:green,command=u:bgreen:black</span></dd>
+      <dt><b><tt>-l</tt></b></dt>
+      <dd>Use colors of light theme (default is dark)</dd>
       <dt><b><span style="font-family: monospace;">-b</span></b></dt>
       <dd>Black &amp; white (non-color) console.</dd>
+      <dt><tt><b>-B</b></tt></dt>
+      <dd>Beep on breakpoints. Print out a beep character to the
+      console when a breakpoint hits.</dd>
       <dt><span style="font-family: monospace;"><b>-g</b></span></dt>
       <dd>Go, start simulation when the program is loaded.</dd>
       <dt><span style="font-family: monospace;"><b>-G</b></span></dt>

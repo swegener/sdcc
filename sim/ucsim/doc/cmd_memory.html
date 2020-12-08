@@ -283,5 +283,39 @@ Address decoders:
     This command is same as <a href="cmd_general.html#info_memory">info
       memory</a>.
     <hr>
+
+    <a name="var"><h4>var name [memory addr]</h4></a>
+
+    This command assigns a name to a memory location. This
+    name can be used in <a href="cmd_general.html#expression">expression</a>s
+    as variable. If memory is not specified, next yet unnamed location
+    will be used from a special address space, called <b>variables</b>. This
+    address sapce have 256 locations by default (32 bit each), but the
+    size can be specified using <a href="invoke.html">-a option</a> of
+    the simulator program. 
+
+    <pre>
+0&gt; <font color="#118811">var abc</font>
+0&gt; <font color="#118811">i v abc</font>
+abc variables[0x00] = 00000000
+0&gt; <font color="#118811">abc=12</font>
+12
+0&gt; <font color="#118811">expr /b abc</font>
+00000000000000000000000000001100
+0&gt; 
+    </pre>
+
+    Memory location can be specified in two forms:
+
+    <pre>
+0&gt; <font color="#118811">var vname rom 45</font>
+0&gt; <font color="#118811">i var vname</font>
+vname rom[0x002d] = 73d4d3c4
+0&gt; <font color="#118811">var other rom[45]</font>
+0&gt; <font color="#118811">i v other</font>
+other rom[0x002d] = 73d4d3c4
+0&gt;
+    </pre>
+
   </body>
 </html>

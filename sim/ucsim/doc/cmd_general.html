@@ -142,7 +142,28 @@ under certain conditions; type `show c' for details.
 0&gt; <font color="#118811">expr xram[256*dph+dpl]= &amp;sp</font>
 129
 0&gt; 
-</pre>
+    </pre>
+
+    Following formats are supported:
+
+    <ul>
+      <li><b>x</b> hexadecimal</li>
+      <li><b>X</b> hexadecimal prefixed with <tt>0x</tt></li>
+      <li><b>0</b> 8 characted long hexadecimal prefixed with <tt>0x</tt></li>
+      <li><b>d</b> signed decimal</li>
+      <li><b>o</b> octal</li>
+      <li><b>u</b> unsigned decimal</li>
+      <li><b>b</b> binary</li>
+    </ul>
+
+    If more then one format character is used then all requested form
+    will be printed:
+
+    <pre>0&gt; <font color="#118811">expr /bx 123</font>
+00000000000000000000000001111011
+7b
+0&gt;    </pre>
+    
     <hr>
     <h3><a name="show">show</a></h3>
     Show command can be used to display different kind of information. It must
@@ -473,7 +494,8 @@ under certain conditions; type `show c' for details.
       info <a href="#info_hardware">hardware</a> <br>
       <!-- info <a href="#info_stack">stack</a> <br>--> info <a href="#info_memory">memory</a>
       <br>
-      info <a href="#info_variables">variables</a> </p>
+      info <a href="#info_variables">variables</a>
+      <br>info <a href="#info_history">history</a> </p>
     <blockquote>
       <h4><a name="info_breakpoints">info breakpoints</a></h4>
       This subcommand prints out information about breakpoints:
@@ -742,7 +764,51 @@ Address decoders:
 0&gt; 
 </pre>
       <hr>
-      <h4><a name="info_variables">info variables</a></h4>
+      <h4><a name="info_variables">info variables [name]</a></h4>
+
+      Print out information about variables. Variable is memory
+      location which has a name. It can be created by <a href="cmd_memory.html#var">var</a>
+      command and several variables are created by the
+      simulator. Optionaly the name can be specified in the command to
+      search for it in variable names.
+
+      <pre>0&gt; <font color="#118811">info var a</font>
+pa rom[0xf000] = 00000000
+  Data register of pa
+sim_real_time simif_0_cfg[0xa] = 00000000
+  Real time since reset in msec (int, RO)
+sim_reason simif_0_cfg[0x5] = 00000000
+  Reason of last stop (int, RO)
+sim_start simif_0_cfg[0x2] = 00000000
+  WR: start simulation, RD: true if running
+sim_xtal simif_0_cfg[0x6] = 00a8c000
+  Xtal frequency in Hz (int, RW)
+0&gt; <font color="#118811">var abc</font>
+0&gt; <font color="#118811">i v a</font>
+abc variables[0x00] = 00000000
+pa rom[0xf000] = 00000000
+  Data register of pa
+sim_real_time simif_0_cfg[0xa] = 00000000
+  Real time since reset in msec (int, RO)
+sim_reason simif_0_cfg[0x5] = 00000000
+  Reason of last stop (int, RO)
+sim_start simif_0_cfg[0x2] = 00000000
+  WR: start simulation, RD: true if running
+sim_xtal simif_0_cfg[0x6] = 00a8c000
+  Xtal frequency in Hz (int, RW)
+0&gt;
+      </pre>
+
+      First word is the name of the variable, followed by memory and
+      the address, last word is the actual value in
+      hexadecimal. Predefined variables have a short description which
+      is printed in next line.
+      
+      <hr>
+      <h4><a name="info_history">info history</a></h4>
+
+      This command is the same as <a href="cmd_exec.html#history_information">history information</a>.
+      
     </blockquote>
     <hr>
     <h3><a name="timer">timer</a></h3>

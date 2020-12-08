@@ -265,4 +265,5 @@ CMDHELP(cl_info_var_cmd,
 	"Information about variables",
 	"long help of info variables")
 
+
 /* End of cmd.src/cmd_info.cc */

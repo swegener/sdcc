@@ -298,7 +298,7 @@ cl_memory::dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 	 (a <= hva))
     {
       char c= d;
-      int i= d;
+      int i= d & 0xff;
       if (a >= lva)
 	{
 	  switch (c)

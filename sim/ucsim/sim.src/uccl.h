@@ -194,6 +194,34 @@ class cl_cdb_recs: public cl_sorted_list
   }
 };
 
+struct t_hist_elem
+{
+  int nr;
+  t_addr addr;
+};
+
+class cl_exec_hist: public cl_base
+{
+protected:
+  int len;
+  int h, t;
+  struct t_hist_elem *hist;
+  class cl_uc *uc;
+public:
+  cl_exec_hist(class cl_uc *auc);
+  virtual ~cl_exec_hist(void);
+  virtual int init(void);
+  virtual void put(void);
+  virtual void list(class cl_console_base *con, bool inc, int nr);
+  virtual void clear() { keep(0); }
+  virtual void keep(int nr);
+  
+  virtual int get_len(void) { return len-1; }
+  virtual int get_used();
+  virtual unsigned int get_insts();
+};
+  
+
 /* Abstract microcontroller */
 
 class cl_uc: public cl_base
@@ -227,6 +255,7 @@ public:
  public:
   class cl_hw *cpu;
   class cl_hws *hws;
+  class cl_exec_hist *hist;
 
  public:
   class cl_list *memchips;      // v3
@@ -323,7 +352,8 @@ public:
   virtual int exec_inst(void);
   virtual int exec_inst_tab(instruction_wrapper_fn itab[]);
   virtual void post_inst(void);
-
+  virtual void save_hist();
+  
   virtual int do_interrupt(void);
   virtual int priority_of(uchar nuof_it) {return(0);}
   virtual int priority_main() { return 0; }
@@ -356,7 +386,8 @@ public:
   // disassembling and symbol recognition
   virtual char *disass(t_addr addr, const char *sep);
   virtual struct dis_entry *dis_tbl(void);
-  virtual void print_disass(t_addr addr, class cl_console_base *con);
+  virtual int print_disass(t_addr addr, class cl_console_base *con, bool nl);
+  virtual int print_disass(t_addr addr, class cl_console_base *con);
   virtual void print_regs(class cl_console_base *con);
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);

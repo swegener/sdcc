@@ -55,6 +55,13 @@ COMMAND_ON(app,cl_exec_cmd);
 COMMAND_ON(app,cl_expression_cmd);
 
 
+// History
+COMMAND_ON(uc,cl_hist_cmd);
+COMMAND_ON(uc,cl_hist_info_cmd);
+COMMAND_ON(uc,cl_hist_clear_cmd);
+COMMAND_ON(uc,cl_hist_list_cmd);
+
+
 #endif
 
 /* End of cmd.src/cmd_execcl.h */

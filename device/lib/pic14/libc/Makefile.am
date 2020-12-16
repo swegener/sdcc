@@ -51,8 +51,8 @@ libc_a_SOURCES += vsprintf.c
 # stdlib.h
 libc_a_SOURCES += _atof.c
 libc_a_SOURCES += _ftoa.c
-libc_a_SOURCES += _itoa.c
-libc_a_SOURCES += _ltoa.c
+libc_a_SOURCES += __itoa.c
+libc_a_SOURCES += __ltoa.c
 libc_a_SOURCES += abs.c
 libc_a_SOURCES += aligned_alloc.c
 libc_a_SOURCES += atoi.c

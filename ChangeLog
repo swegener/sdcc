@@ -4,6 +4,8 @@
 	  Update to automake 1.16.2 to fix bug #3140.
 	* device/lib/pic14/libc/Makefile.am:
 	  Port itoa, ltoa rename to pic14 to fix bug #3110.
+	* src/clean.mk:
+	  Include pdk ports in make clean to fix bug #3152.
 
 2020-12-03 Philipp Klaus Krause <pkk AT spth.de>
 

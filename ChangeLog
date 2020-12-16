@@ -6,6 +6,9 @@
 	  Port itoa, ltoa rename to pic14 to fix bug #3110.
 	* src/clean.mk:
 	  Include pdk ports in make clean to fix bug #3152.
+	* support/regression/ports/stm8/spec.mk,
+	  support/regression/ports/stm8-large/spec.mk:
+	  Increase stm8 test timeout by 50%, to accomodate slow macOS PPC (bug #3149).
 
 2020-12-03 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1,7 +1,7 @@
 # Regression test specification for the stm8 target running with uCsim
 
 # simulation timeout in seconds
-SIM_TIMEOUT = 30
+SIM_TIMEOUT = 45
 
 # path to uCsim
 ifdef SDCC_BIN_PATH

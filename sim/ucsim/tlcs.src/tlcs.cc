@@ -176,16 +176,17 @@ cl_tlcs::id_string(void)
 
 
 void
+cl_tlcs::make_cpu_hw(void)
+{
+  add_hw(cpu= new cl_tlcs_cpu(this));
+  cpu->init();
+}
+
+void
 cl_tlcs::mk_hw_elements(void)
 {
-  //class cl_base *o;
-  //hws->add(o= new cl_port(this));
-  //o->init();
-  class cl_hw *h;
+  //class cl_hw *h;
   cl_uc::mk_hw_elements();
-
-  add_hw(h= new cl_tlcs_cpu(this));
-  h->init();
 }
 
 

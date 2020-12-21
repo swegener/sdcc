@@ -148,6 +148,7 @@ class cl_console_base: public cl_base
   virtual bool need_check(void) { return false; }
   
   virtual void print_prompt(void);
+  virtual void print_expr_result(t_mem val, const char *fmt);
   virtual int dd_printf(const char *format, ...);
   virtual int dd_cprintf(const char *color_name, const char *format, ...);
   virtual chars get_color_ansiseq(const char *color_name, bool add_reset= false);

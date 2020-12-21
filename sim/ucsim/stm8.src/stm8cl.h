@@ -66,6 +66,7 @@ public:
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_port(t_addr base, chars n);
+  virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
 

@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include <stdarg.h>
 #include <string.h>
+#include <ctype.h>
 
 //#include "ddconfig.h"
 
@@ -489,59 +490,35 @@ CMDHELP(cl_exec_cmd,
 
 COMMAND_DO_WORK_APP(cl_expression_cmd)
 {
-  const char *s= cmdline->cmd;
-  const char *fmt= NULL;
-  int fmt_len= 0;
-  int i;
-  chars cs= chars();
+  const char *s;
+  chars cs, w, fmt;
+  
+  cmdline->shift();
+  s= cmdline->cmd;
   if (!s ||
       !*s)
     return(false);
 
-  for (i=0;i<cmdline->tokens->get_count();i++)
+  cs= s;
+  cs.start_parse();
+  w= cs.token(" \r\n\v\r");
+  fmt= "";
+  con->dd_color("result");
+  while (w.nempty())
     {
-      const char *p= (const char*)(cmdline->tokens->at(i));
-      cs+= " ";
-      cs+= p;
-    }
-
-  s= cs.c_str();
-  i= strspn(s, " \t\v\n\r");
-  s+= i;
-  t_mem v= 0;
-  if (s && *s)
-    {
-      if (*s == '/')
-	{
-	  i= strcspn(s, " \t\v\n\r");
-	  fmt= s+1;
-	  fmt_len= i;
-	  s+= i;
-	  i= strspn(s, " \t\v\n\r");
-	  s+= i;
-	}
-      if (s && *s)
-	{
-	  v= application->eval(s);
-	}
-      if (fmt)
-	{
-	  for (i= 0; i < fmt_len; i++)
-	    {
-	      switch (fmt[i])
-		{
-		case 'x': con->dd_printf("%x\n", MU(v)); break;
-		case 'X': con->dd_printf("0x%x\n", MU(v)); break;
-		case '0': con->dd_printf("0x%08x\n", MU32(v)); break;
-		case 'd': con->dd_printf("%d\n", MI(v)); break;
-		case 'o': con->dd_printf("%o\n", MU(v)); break;
-		case 'u': con->dd_printf("%u\n", MU(v)); break;
-		case 'b': con->dd_printf("%s\n", cbin(v,8*sizeof(v)).c_str()); break;
-		}
-	    }
-	}
+      if (w.starts_with("/"))
+	fmt= w;
       else
-	con->dd_printf("%d\n", MI(v));
+	{
+	  t_mem v= 0;
+	  if (w.nempty())
+	    {
+	      v= application->eval(w);
+	      con->print_expr_result(v, fmt.nempty()?((const char *)fmt):NULL);
+	    }
+	  fmt= "";
+	}
+      w= cs.token(" \n\r\v\t");
     }
   return(false);
 }

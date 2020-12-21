@@ -67,6 +67,13 @@ cl_port::init(void)
   orb = cfg_cell(cfg_orb);
   inb = cfg_cell(cfg_inb);
   
+  oca = cfg_cell(cfg_oca);
+  ddca= cfg_cell(cfg_ddca);
+  inca= cfg_cell(cfg_inca);
+  ocb = cfg_cell(cfg_ocb);
+  ddcb= cfg_cell(cfg_ddcb);
+  incb= cfg_cell(cfg_incb);
+
   cl_var *v;
   chars pn= chars("", "port%d_", id);
   uc->vars->add(v= new cl_var(pn+chars("base"), cfg, cfg_base,
@@ -103,6 +110,25 @@ cl_port::init(void)
 			      cfg_help(cfg_ina)));
   v->init();
 
+  uc->vars->add(v= new cl_var(pn+chars("oca"), cfg, cfg_oca,
+			      cfg_help(cfg_oca)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("ddca"), cfg, cfg_ddca,
+			      cfg_help(cfg_ddca)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("inca"), cfg, cfg_inca,
+			      cfg_help(cfg_inca)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("ocb"), cfg, cfg_ocb,
+			      cfg_help(cfg_ocb)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("ddcb"), cfg, cfg_ddcb,
+			      cfg_help(cfg_ddcb)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("incb"), cfg, cfg_incb,
+			      cfg_help(cfg_incb)));
+  v->init();
+
   return(0);
 }
 
@@ -124,14 +150,20 @@ cl_port::cfg_help(t_addr addr)
     {
     case cfg_on		: return "Turn/get on/off state (bool, RW)";
     case cfg_base	: return "Base address of the port (int, RW)";
-    case cfg_cra	: return "Control Register A (int, RW)";
-    case cfg_ddra	: return "Data Direction Register A (int, RW)";
-    case cfg_ora	: return "Peripheral Register A (int, RW)";
-    case cfg_ina	: return "Outside value of port A pins (int, RW)";
-    case cfg_crb	: return "Control Register B (int, RW)";
-    case cfg_ddrb	: return "Data Direction Register B (int, RW)";
-    case cfg_orb	: return "Peripheral Register B (int, RW)";
-    case cfg_inb	: return "Outside value of port B pins (int, RW)";
+    case cfg_cra	: return "CRA  - Control Register A (int, RW)";
+    case cfg_ddra	: return "DDRA - Data Direction Register A (int, RW)";
+    case cfg_ora	: return "ORA  - Peripheral Register A (int, RW)";
+    case cfg_ina	: return "ina  - Outside value of port A pins (int, RW)";
+    case cfg_crb	: return "CRB  - Control Register B (int, RW)";
+    case cfg_ddrb	: return "DDRB - Data Direction Register B (int, RW)";
+    case cfg_orb	: return "ORB  - Peripheral Register B (int, RW)";
+    case cfg_inb	: return "inb  - Outside value of port B pins (int, RW)";
+    case cfg_oca	: return "oca  - Output value of port CA (int, RW)";
+    case cfg_ddca	: return "ddca - Direction of port CA (int, RW)";
+    case cfg_inca	: return "inca - Outside value of port CA pins (int, RW)";
+    case cfg_ocb	: return "ocb  - Output value of port CB (int, RW)";
+    case cfg_ddcb	: return "ddcb - Direction of port CB (int, RW)";
+    case cfg_incb	: return "incb - Outside value of port CB pins (int, RW)";
     }
   return "Not used";
 }
@@ -170,6 +202,7 @@ cl_port::read(class cl_memory_cell *cell)
       u8_t i, o, d;
       if (r == ora)
 	{
+	  cra->set(cra->get() & 0x3f);
 	  d= ddra->get();
 	  i= ina->get();
 	  o= ora->get();
@@ -177,6 +210,7 @@ cl_port::read(class cl_memory_cell *cell)
 	}
       if (r == orb)
 	{
+	  crb->set(crb->get() & 0x3f);
 	  d= ddrb->get();
 	  i= inb->get();
 	  o= orb->get();
@@ -237,6 +271,13 @@ cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case cfg_ddrb	: r= ddrb; break;
     case cfg_orb	: r= orb; break;
     case cfg_inb	: r= inb; break;
+
+    case cfg_oca	: r= oca; break;
+    case cfg_ddca	: r= ddca; break;
+    case cfg_inca	: r= inca; break;
+    case cfg_ocb	: r= ocb; break;
+    case cfg_ddcb	: r= ddcb; break;
+    case cfg_incb	: r= incb; break;
     }
   if (r)
     {
@@ -247,6 +288,12 @@ cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     }
   v= cell->get();
   return v;
+}
+
+int
+cl_port::tick(int cycles)
+{
+  return 0;
 }
 
 void

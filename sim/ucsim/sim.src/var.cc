@@ -28,6 +28,7 @@
 /*@1@*/
 
 #include <string.h>
+#include <ctype.h>
 
 #include "varcl.h"
 
@@ -58,6 +59,21 @@ cl_var::init(void)
   return 0;
 }
 
+t_mem
+cl_var::write(t_mem val)
+{
+  if (!cell)
+    return 0;
+  return cell->write(val);
+}
+
+t_mem
+cl_var::set(t_mem val)
+{
+  if (!cell)
+    return 0;
+  return cell->set(val);
+}
 
 void
 cl_var::print_info(cl_console_base *con)
@@ -79,6 +95,10 @@ cl_var::print_info(cl_console_base *con)
 	{
 	  con->dd_printf("= ");
 	  con->dd_printf(as->data_format, v);
+	  con->dd_printf(",%u", MU(v));
+	  con->dd_printf(",%d", MI(v));
+	  if (isprint(MI(v)))
+	    con->dd_printf(",'%c'", MI(v));
 	}
     }
   con->dd_printf("\n");

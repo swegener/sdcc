@@ -837,6 +837,7 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
     cmd->init();
     cset->add(cmd= new cl_info_hw_cmd("hardware", 0));
     cmd->add_name("hw");
+    cmd->add_name("h");
     cmd->init();
     /*
     cset->add(cmd= new cl_info_stack_cmd("stack", 0,
@@ -1713,6 +1714,8 @@ cl_uc::get_hw(const char *id_string, int *idx)
 
   if (idx)
     i= *idx;
+  if (strcmp(id_string, "cpu") == 0)
+    return cpu;
   for (; i < hws->count; i++)
     {
       hw= (class cl_hw *)(hws->at(i));

@@ -41,6 +41,7 @@ enum port_cfg {
   port_on		= 0, // RW
   port_pin		= 1, // RW
   port_value		= 2, // RO
+  port_odr		= 3,
 };
 
 class cl_port: public cl_hw
@@ -55,7 +56,7 @@ public:
   cl_port(class cl_uc *auc, int aid);
   cl_port(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
-  virtual int cfg_size(void) { return 3; }
+  virtual int cfg_size(void) { return 4; }
   virtual const char *cfg_help(t_addr addr);
   
   virtual t_mem read(class cl_memory_cell *cell);

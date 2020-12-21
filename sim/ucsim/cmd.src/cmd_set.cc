@@ -163,36 +163,22 @@ CMDHELP(cl_set_bit_cmd,
 COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 {
   class cl_hw *hw= 0;
-  class cl_cmd_arg *params[1]= { cmdline->param(0)/*,
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3)*/ };
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
   
-  if (params[0] && /*cmdline->syntax_match(uc, HW)*/params[0]->as_hw(uc)) {
+  if (params[0] && params[0]->as_hw(uc)) {
     hw= params[0]->value.hw;
-    //pn= hw->id;
-    //l= params[1]->value.number;
   }
-  /*else if (cmdline->syntax_match(uc, NUMBER NUMBER)) {
-    pn= params[0]->value.number;
-    l= params[1]->value.number;
-    hw= uc->get_hw(HW_PORT, pn, 0);
-    }*/
   else
     syntax_error(con);
-  /*if (pn < 0 ||
-      pn > 3)
-    con->dd_printf("Error: wrong port\n");
-    else*/
+
+  if (hw)
     {
-      if (hw)
-	{
-	  cmdline->shift();
-	  hw->set_cmd(cmdline, con);
-	}
-      else
-	con->dd_printf("Error: no hw\n");
+      cmdline->shift();
+      hw->set_cmd(cmdline, con);
     }
+  else
+    con->dd_printf("Error: no hw\n");
+
   return(false);;
 }
 

@@ -734,7 +734,7 @@ cl_51core::id_string(void)
 void
 cl_51core::make_cpu_hw(void)
 {
-  cpu= new cl_uc51_cpu(this);
+  add_hw(cpu= new cl_uc51_cpu(this));
   cpu->init();
 }
 
@@ -1697,6 +1697,38 @@ cl_51core::exec_inst(void)
 }
 
 
+int
+cl_51core::high_movxri(void)
+{
+  t_mem mode= cpu->cfg_read(uc51cpu_movxri_mode);
+
+  if (mode == 'm')
+    {
+      t_addr addr= cpu->cfg_read(uc51cpu_movxri_addr);
+      switch (cpu->cfg_read(uc51cpu_movxri_as))
+	{
+	case 's': return sfr->read(addr);
+	case 'c':
+	case 'r': return rom->read(addr);
+	case 'i': return iram->read(addr);
+	default: return xram->read(addr);
+	}
+    }
+  else if (mode == 'e')
+    {
+      t_mem v;
+      class cl_uc51_cpu *c= (class cl_uc51_cpu *)cpu;
+      v= application->eval(c->movxri_expr);
+      return v & 0xff;
+    }
+  else
+    {
+      return sfr->read(P2);
+    }
+  return 0;
+}
+
+
 /*
  * Simulating execution of next instruction
  *
@@ -2013,7 +2045,23 @@ cl_uc51_cpu::init(void)
   uc->vars->add(v= new cl_var("cpu_mask_mdpc", cfg, uc51cpu_mask_mdpc,
 			      cfg_help(uc51cpu_mask_mdpc)));
   v->init();
-  
+  uc->vars->add(v= new cl_var("cpu_mdp_mode", cfg, uc51cpu_mdp_mode,
+			      cfg_help(uc51cpu_mdp_mode)));
+  v->init();
+  uc->vars->add(v= new cl_var("cpu_movxri_mode", cfg, uc51cpu_movxri_mode,
+			      cfg_help(uc51cpu_movxri_mode)));
+  v->init();
+  v->write('m');
+  uc->vars->add(v= new cl_var("cpu_movxri_as", cfg, uc51cpu_movxri_as,
+			      cfg_help(uc51cpu_movxri_as)));
+  v->init();
+  v->write('s');
+  uc->vars->add(v= new cl_var("cpu_movxri_addr", cfg, uc51cpu_movxri_addr,
+			      cfg_help(uc51cpu_movxri_addr)));
+  v->init();
+  v->write(0xa0);
+
+  movxri_expr= "port2_odr";
   return(0);
 }
 
@@ -2034,6 +2082,14 @@ cl_uc51_cpu::cfg_help(t_addr addr)
       return "Address of multi_DPTR_chip selector, WR selects this stlye of multi_DPTR (int, RW)";
     case uc51cpu_mask_mdpc:
       return "Mask in multi_DPTR_chip selector (int, RW)";
+    case uc51cpu_mdp_mode:
+      return "Multi DPTR simulation mode 's'=sfr, 'c'=chip, 'n'=none (int, RO)";
+    case uc51cpu_movxri_mode:
+      return "Calc mode of high address for MOVX @Ri, 'm'=memory, 'e'=expr  (int, RW)";
+    case uc51cpu_movxri_as:
+      return "Address space where high address is in 'm' mode, 'i','s','x','c' (int, RW)";
+    case uc51cpu_movxri_addr:
+      return "Address where high address is in 'm' mode (int, RW)";
     }
   return "Not used";
 }
@@ -2104,11 +2160,55 @@ cl_uc51_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       break;
     case uc51cpu_mask_mdpc: // mask in multi_DPTR_chip selector
       break;
-  
+
+    case uc51cpu_mdp_mode: // mode of dual dptr simulation
+      {
+	t_mem adps= cfg_get(uc51cpu_aof_mdps),
+	  dpl1= cfg_get(uc51cpu_aof_mdps1l),
+	  dph1= cfg_get(uc51cpu_aof_mdps1h),
+	  adpc= cfg_get(uc51cpu_aof_mdpc);;
+	if (adps > 0x7f &&
+	    dpl1 > 0x7f &&
+	    dph1 > 0x7f)
+	  cell->set('s');
+	else if (adpc > 0x7f)
+	  cell->set('c');
+	else
+	  cell->set('n');
+	break;
+      }
+
+    case uc51cpu_movxri_mode:
+      break;
+    case uc51cpu_movxri_as:
+      break;
+    case uc51cpu_movxri_addr:
+      break;
+      
     case uc51cpu_nuof:
       break;
     }
   return cell->get();
+}
+
+
+void
+cl_uc51_cpu::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
+{
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+
+  if (cmdline->syntax_match(uc, STRING))
+    {
+      movxri_expr= params[0]->value.string.string;
+    }
+}
+
+void
+cl_uc51_cpu::print_info(class cl_console_base *con)
+{
+  con->dd_printf("%s[%d]\n", id_string, id);
+  con->dd_printf("Expression for MOVX @Ri: \"%s\"\n", movxri_expr.c_str());
+  print_cfg_info(con);
 }
 
 /* End of s51.src/uc51.cc */

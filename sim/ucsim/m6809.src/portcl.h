@@ -44,6 +44,12 @@ enum port_cfg
    cfg_ddrb	= 7,
    cfg_orb	= 8,
    cfg_inb	= 9,
+   cfg_oca	= 10, // out value of CA2
+   cfg_ddca	= 11, // data direction of CA2(,CA1)
+   cfg_inca	= 12, // input value for CA2,CA1
+   cfg_ocb	= 13, // out value of CB2
+   cfg_ddcb	= 14, // data direction of CB2(,CB1)
+   cfg_incb	= 15, // input value for CB2,CB1   
   };
 
 class cl_port: public cl_hw
@@ -58,12 +64,18 @@ public:
   class cl_memory_cell *ddrb;
   class cl_memory_cell *orb;
   class cl_memory_cell *inb;
+  class cl_memory_cell *oca;
+  class cl_memory_cell *ddca;
+  class cl_memory_cell *inca;
+  class cl_memory_cell *ocb;
+  class cl_memory_cell *ddcb;
+  class cl_memory_cell *incb;
   class cl_memory_cell *rs[4];
  public:
   cl_port(class cl_uc *auc, int aid);
   cl_port(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
-  virtual int cfg_size(void) { return 10; }
+  virtual int cfg_size(void) { return 16; }
   virtual const char *cfg_help(t_addr addr);
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
 
@@ -72,6 +84,7 @@ public:
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
+  virtual int tick(int cycles);
   virtual void reset(void);
   
   virtual void print_info(class cl_console_base *con);

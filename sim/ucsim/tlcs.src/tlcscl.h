@@ -169,6 +169,7 @@ class cl_tlcs: public cl_uc
 
   //virtual t_addr get_mem_size(enum mem_class type);
   //virtual int get_mem_width(enum mem_class type);
+  virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
 

@@ -119,14 +119,18 @@ cl_z80::get_mem_size(enum mem_class type)
 */
 
 void
+cl_z80::make_cpu_hw(void)
+{
+  add_hw(cpu= new cl_z80_cpu(this));
+  cpu->init();
+}
+
+void
 cl_z80::mk_hw_elements(void)
 {
   //class cl_base *o;
-  class cl_hw *h;
+  //class cl_hw *h;
   cl_uc::mk_hw_elements();
-
-  add_hw(h= new cl_z80_cpu(this));
-  h->init();
 }
 
 void

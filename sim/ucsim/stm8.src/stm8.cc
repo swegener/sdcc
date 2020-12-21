@@ -191,6 +191,13 @@ cl_stm8::mk_port(t_addr base, chars n)
 }
 
 void
+cl_stm8::make_cpu_hw(void)
+{
+  add_hw(cpu= new cl_stm8_cpu(this));
+  cpu->init();
+}
+
+void
 cl_stm8::mk_hw_elements(void)
 {
   class cl_hw *h;
@@ -268,9 +275,6 @@ cl_stm8::mk_hw_elements(void)
   add_hw(d= new cl_port_ui(this, 0, "dport"));
   d->init();
   pd.init();
-  
-  add_hw(h= new cl_stm8_cpu(this));
-  h->init();
   
   if (type->type == CPU_STM8S)
     {

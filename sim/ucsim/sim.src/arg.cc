@@ -335,6 +335,8 @@ cl_cmd_sym_arg::as_hw(class cl_uc *uc)
   hw= found= uc->get_hw(get_svalue(), &i);
   if (!hw)
     return(false);
+  if (hw && (strcmp(get_svalue(), "cpu")==0))
+    return value.hw= hw, true;
   i++;
   found= uc->get_hw(get_svalue(), &i);
   if (found)

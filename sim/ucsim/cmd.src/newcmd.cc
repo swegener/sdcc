@@ -209,6 +209,65 @@ cl_console_base::print_prompt(void)
     }
 }
 
+void
+cl_console_base::print_expr_result(t_mem val, const char *fmt)
+{
+  class cl_console_base *con= this;
+  t_mem v= val;
+  if (fmt == NULL)
+    {
+      class cl_option *o= application->options->get_option("expression_format");
+      char *cc= NULL;
+      if (o)
+	{
+	  o->get_value(&cc);
+	  fmt= cc;
+	}
+    }
+  if (fmt)
+    {
+      int i, fmt_len= strlen(fmt);
+      for (i= 0; i < fmt_len; i++)
+	{
+	  switch (fmt[i])
+	    {
+	    case 'x': con->dd_printf("%x\n", MU(v)); break;
+	    case 'X': con->dd_printf("0x%x\n", MU(v)); break;
+	    case '0': con->dd_printf("0x%08x\n", MU32(v)); break;
+	    case 'd': con->dd_printf("%d\n", MI(v)); break;
+	    case 'o': con->dd_printf("%o\n", MU(v)); break;
+	    case 'u': con->dd_printf("%u\n", MU(v)); break;
+	    case 'b': con->dd_printf("%s\n", cbin(v,8*sizeof(v)).c_str()); break;
+	    case 'B': con->dd_printf("%d\n", (v)?1:0); break;
+	    case 'L': con->dd_printf("%c\n", (v)?'T':'F'); break;
+	    case 'c':
+	      if (isprint(MI(v)))
+		con->dd_printf("'%c'\n",MI(v));
+	      else
+		{
+		  switch (MI(v))
+		    {
+		    case '\a': con->dd_printf("'\\a\n'"); break;
+		    case '\b': con->dd_printf("'\\b\n'"); break;
+		    case '\e': con->dd_printf("'\\e\n'"); break;
+		    case '\f': con->dd_printf("'\\f\n'"); break;
+		    case '\n': con->dd_printf("'\\n\n'"); break;
+		    case '\r': con->dd_printf("'\\r\n'"); break;
+		    case '\t': con->dd_printf("'\\t\n'"); break;
+		    case '\v': con->dd_printf("'\\v\n'"); break;
+		    default:
+		      con->dd_printf("'\\%03o'\n",MI(v));
+		      break;
+		    }
+		}
+	      break;
+	    }
+	}
+    }
+  else
+    con->dd_printf("%d\n", MI(v));
+}
+
 int
 cl_console_base::dd_printf(const char *format, ...)
 {
@@ -628,8 +687,9 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
 		  char *e= cmdline->cmd;
 		  if (strlen(e) > 0)
 		    {
-		      long l= application->eval(e);
-		      dd_cprintf("result", "%ld\n", l);
+		      t_mem l= application->eval(e);
+		      dd_color("result");
+		      print_expr_result(l, NULL);
 		    }
 		}
 	      if (get_fin() != NULL)

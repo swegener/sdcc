@@ -118,6 +118,9 @@ cl_port::init(void)
   uc->vars->add(v= new cl_var(pn+chars("value"), cfg, port_value,
 			      cfg_help(port_value)));
   v->init();
+  uc->vars->add(v= new cl_var(pn+chars("odr"), cfg, port_odr,
+			      cfg_help(port_odr)));
+  v->init();
 
   pn= chars("", "pin%d", id);
   uc->vars->add(v= new cl_var(pn, cfg, port_pin,
@@ -140,6 +143,7 @@ cl_port::cfg_help(t_addr addr)
     case port_on: return "Turn/get on/off state (bool, RW)";
     case port_pin: return "Outside value of port pins (int, RW)";
     case port_value: return "Value of the port (int, RO)";
+    case port_odr: return "Value of output register (int, RW)";
     }
   return "Not used";
 }
@@ -227,7 +231,13 @@ cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       break;
     case port_value:
       if (val)
-	*val= cell->get();//cell->set(*val);
+	//*val= cell->get();
+	cell->set(*val);
+      break;
+    case port_odr:
+      if (val)
+	cell_p->write(*val);
+      cell->set(cell_p->get());
       break;
     }
   return cell->get();

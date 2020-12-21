@@ -449,9 +449,10 @@ int
 cl_51core::instruction_e2/*inst_movx_a_Sri*/(t_mem/*uchar*/ code)
 {
   t_mem d;
-
+  int ah= high_movxri();
+  
   d= R[code & 0x01]->read();
-  acc->write(xram->read(sfr->read(P2)*256 + d));
+  acc->write(xram->read(ah*256 + d));
   tick(1);
   vc.rd++;//= 2;
   //vc.wr++;
@@ -555,9 +556,11 @@ cl_51core::instruction_f2/*inst_movx_Sri_a*/(t_mem/*uchar*/ code)
 {
   t_mem d, v;
   t_addr a;
+  int ah;
   
   d= R[code & 0x01]->read();
-  a= sfr->read(P2)*256 + d;
+  ah= high_movxri();
+  a= ah + d;
   v= acc->read();
   xram->write(a, v);
   tick(1);

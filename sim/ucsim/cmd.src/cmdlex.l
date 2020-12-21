@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "cmdlexcl.h"
 #include "cmdpars.hh"
+#include "cmdutil.h"
 
 static int uc_yy_check_id(char *token);
 static int uc_yy_input(char *buf, int max_size);
@@ -73,6 +74,22 @@ static int uc_yy_input(char *buf, int max_size);
 }
 
 [a-zA-Z_][0-9a-zA-Z_]*	return(uc_yy_check_id(yytext));
+
+'.*' {
+  char *s, *p;
+  int l= strlen(&yytext[1]);
+  yylval.number=0;
+  if (l>0)
+  {
+    s= strdup(&yytext[1]);
+    s[strlen(s)-1]= 0;
+    p= proc_escape(s, &l);
+    yylval.number= p[0];
+    free(s);
+    free(p);
+  }
+  return PTOK_NUMBER;
+}
 
 .			return(yytext[0]);
 

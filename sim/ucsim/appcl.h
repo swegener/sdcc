@@ -110,7 +110,7 @@ public:
   class cl_uc *get_uc(void);
   class cl_commander_base *get_commander(void) { return(commander); }
   //virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
-  virtual long eval(chars expr);
+  virtual t_mem eval(chars expr);
   virtual void exec(chars line);
   
 public: // messages to broadcast

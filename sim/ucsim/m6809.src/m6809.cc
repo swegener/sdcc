@@ -148,7 +148,7 @@ cl_m6809::mk_hw_elements(void)
 void
 cl_m6809::make_cpu_hw(void)
 {
-  cpu= new cl_m6809_cpu(this);
+  add_hw(cpu= new cl_m6809_cpu(this));
   cpu->init();
   add_hw(cpu);
 }

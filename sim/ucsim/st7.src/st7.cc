@@ -123,15 +123,19 @@ cl_st7::get_mem_size(enum mem_class type)
  return(cl_uc::get_mem_size(type));
 }
 */
+
+void
+cl_st7::make_cpu_hw(void)
+{
+  add_hw(cpu= new cl_st7_cpu(this));
+  cpu->init();
+}
+
 void
 cl_st7::mk_hw_elements(void)
 {
   //class cl_base *o;
-  class cl_hw *h;
   cl_uc::mk_hw_elements();
-
-  add_hw(h= new cl_st7_cpu(this));
-  h->init();
 }
 
 void

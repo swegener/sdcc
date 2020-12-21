@@ -769,7 +769,7 @@ cl_app::get_cmd(class cl_cmdline *cmdline)
   return(0);
 }
 */
-long
+t_mem
 cl_app::eval(chars expr)
 {
   expr_result= 0;
@@ -803,8 +803,9 @@ cl_app::exec(chars line)
 	  char *e= cmdline->cmd;
 	  if (strlen(e) > 0)
 	    {
-	      long l= eval(e);
-	      c->dd_printf("%ld\n", l);
+	      t_mem l= eval(e);
+	      c->dd_color("result");
+	      c->print_expr_result(l, NULL);
 	    }
 	}
       line= cmdline->rest;
@@ -1050,6 +1051,11 @@ cl_app::mk_options(void)
 					    "Beep at breakpoint hit (-B)"));
   o->init();
   o->set_value((bool)false);
+
+  options->new_option(o= new cl_string_option(this, "expression_format",
+					      "Format specifier to print expression result"));
+  o->init();
+  o->set_value("d");
   
   options->new_option(o= new cl_string_option(this, "color_prompt",
 					      "Prompt color"));

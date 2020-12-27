@@ -12329,7 +12329,7 @@ genCast (const iCode *ic)
 
   /* So we now know that the size of destination is greater
      than the size of the source */
-  genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, true, isPairDead (PAIR_HL, ic), false);
+  genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, !surviving_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   /* now depending on the sign of the destination */
   size = result->aop->size - right->aop->size;
@@ -12337,25 +12337,34 @@ genCast (const iCode *ic)
   /* Unsigned or not an integral type - fill with zeros */
   if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
     {
-      cheapMove (result->aop, offset, right->aop, offset, true);
+      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
+      cheapMove (result->aop, offset, right->aop, offset, !surviving_a);
       offset++;
-      genMove_o (result->aop, offset, ASMOP_ZERO, 0, size, true, false, false);
+      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
+      bool hl_dead = isPairDead (PAIR_HL, ic) && (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= offset) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= offset);
+      bool de_dead = isPairDead (PAIR_DE, ic) && (result->aop->regs[E_IDX] < 0 || result->aop->regs[E_IDX] >= offset) && (result->aop->regs[D_IDX] < 0 || result->aop->regs[D_IDX] >= offset);
+      genMove_o (result->aop, offset, ASMOP_ZERO, 0, size, !surviving_a, hl_dead, de_dead);
     }
   else
     {
+      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
       if (surviving_a && !pushed_a)
-        _push (PAIR_AF), pushed_a = TRUE;
+        _push (PAIR_AF), pushed_a = true;
 
       cheapMove (ASMOP_A, 0, AOP (right), offset, true);
-      if (AOP (right)->type != AOP_REG || AOP (result)->type != AOP_REG || AOP (right)->aopu.aop_reg[offset] != AOP (result)->aopu.aop_reg[offset])
-        cheapMove (AOP (result), offset, ASMOP_A, 0, true);
+      if (right->aop->type != AOP_REG || AOP (result)->type != AOP_REG || right->aop->aopu.aop_reg[offset] != result->aop->aopu.aop_reg[offset])
+        cheapMove (result->aop, offset, ASMOP_A, 0, true);
       offset++;
+      
+      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
+      if (surviving_a && !pushed_a)
+        _push (PAIR_AF), pushed_a = true;
 
       /* we need to extend the sign */
       emit3 (A_RLA, 0, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_A);
       while (size--)
-        cheapMove (AOP (result), offset++, ASMOP_A, 0, true);
+        cheapMove (result->aop, offset++, ASMOP_A, 0, true);
     }
 
 release:

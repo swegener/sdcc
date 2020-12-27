@@ -1,3 +1,8 @@
+2020-12-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix an issue in handling of surviving registers in unsigned upcast.
+
 2020-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/pic14/aclocal.m4:

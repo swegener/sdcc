@@ -104,7 +104,7 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pa->dr;
   d.cell_in= pa->dr;
   d.keyset = NULL;
-  d.basx   = 1;
+  d.basx   = 15;
   d.basy   = 4;
   u->add_port(&d, 0);
   uo->add_port(&d, 0);
@@ -113,7 +113,7 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pb->dr;
   d.cell_in= pb->dr;
   d.keyset = NULL;
-  d.basx   = 1;
+  d.basx   = 15;
   d.basy   = 9;
   u->add_port(&d, 1);
   uo->add_port(&d, 1);
@@ -122,7 +122,7 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pc->dr;
   d.cell_in= pc->dr;
   d.keyset = NULL;
-  d.basx   = 1;
+  d.basx   = 15;
   d.basy   = 14;
   uo->add_port(&d, 2);
 
@@ -130,7 +130,7 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pd->dr;
   d.cell_in= pd->dr;
   d.keyset = NULL;
-  d.basx   = 1;
+  d.basx   = 15;
   d.basy   = 19;
   uo->add_port(&d, 3);
 
@@ -138,8 +138,8 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pi->dr;
   d.cell_in= pi->cfg_cell(port_pin);
   d.keyset = chars("                qwertyui12345678");
-  d.basx   = 1;
-  d.basy   = 14;
+  d.basx   = 15;
+  d.basy   = 15;
   u->add_port(&d, 2);
   d.basy   = 4;
   ui->add_port(&d, 0);
@@ -148,7 +148,7 @@ cl_p1516::mk_hw_elements(void)
   d.cell_p = pj->dr;
   d.cell_in= pj->cfg_cell(port_pin);
   d.keyset = chars("                asdfghjkzxcvbnm,");
-  d.basx   = 1;
+  d.basx   = 15;
   d.basy   = 20;
   u->add_port(&d, 3);
   d.basy   = 10;

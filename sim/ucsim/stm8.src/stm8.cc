@@ -156,7 +156,7 @@ cl_stm8::get_mem_size(enum mem_class type)
 
 static class cl_port_ui *d= NULL;
 static int puix= 1;
-static int puiy= 4;
+static int puiy= 5;
 static int puik= 0;
 static int puis= 1;
 static const char *puiks= keysets[puik];

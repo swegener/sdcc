@@ -81,6 +81,7 @@ class cl_serial_hw: public cl_hw
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
   virtual bool proc_input(void);
   virtual void refresh_display(bool force) {}
+  virtual void draw_state_time(bool force) {}
   virtual void draw_display(void) {}
 
   virtual void reset(void);

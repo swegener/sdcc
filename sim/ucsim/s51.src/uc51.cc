@@ -778,7 +778,7 @@ cl_51core::mk_hw_elements(void)
   pd.cell_in = p0->cell_in;
   pd.keyset  = keysets[0];
   pd.basx    = 1;
-  pd.basy    = 4;
+  pd.basy    = 5;
   d->add_port(&pd, 0);
   
   pd.set_name("P1");
@@ -786,7 +786,7 @@ cl_51core::mk_hw_elements(void)
   pd.cell_in = p1->cell_in;
   pd.keyset  = keysets[1];
   pd.basx    = 20;
-  pd.basy    = 4;
+  pd.basy    = 5;
   d->add_port(&pd, 1);
   
   pd.set_name("P2");
@@ -794,7 +794,7 @@ cl_51core::mk_hw_elements(void)
   pd.cell_in = p2->cell_in;
   pd.keyset  = keysets[2];
   pd.basx    = 40;
-  pd.basy    = 4;
+  pd.basy    = 5;
   d->add_port(&pd, 2);
   
   pd.set_name("P3");
@@ -802,7 +802,7 @@ cl_51core::mk_hw_elements(void)
   pd.cell_in = p3->cell_in;
   pd.keyset  = keysets[3];
   pd.basx    = 60;
-  pd.basy    = 4;
+  pd.basy    = 5;
   d->add_port(&pd, 3);
   
   add_hw(interrupt= new cl_interrupt(this));
@@ -2208,7 +2208,7 @@ cl_uc51_cpu::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d]\n", id_string, id);
   con->dd_printf("Expression for MOVX @Ri: \"%s\"\n", movxri_expr.c_str());
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 /* End of s51.src/uc51.cc */

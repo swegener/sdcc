@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (portcl.h)
+ * Simulator of microcontrollers (piacl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,34 +25,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef PORTCL_HEADER
-#define PORTCL_HEADER
+#ifndef PIACL_HEADER
+#define PIACL_HEADER
 
 #include "hwcl.h"
 #include "port_hwcl.h"
 
 
-enum port_cfg
+enum pia_cfg
   {
    cfg_on	= 0,
    cfg_base	= 1,
-   cfg_cra	= 2,
-   cfg_ddra	= 3,
-   cfg_ora	= 4,
-   cfg_ina	= 5,
-   cfg_crb	= 6,
-   cfg_ddrb	= 7,
-   cfg_orb	= 8,
-   cfg_inb	= 9,
-   cfg_oca	= 10, // out value of CA2
-   cfg_ddca	= 11, // data direction of CA2(,CA1)
-   cfg_inca	= 12, // input value for CA2,CA1
-   cfg_ocb	= 13, // out value of CB2
-   cfg_ddcb	= 14, // data direction of CB2(,CB1)
-   cfg_incb	= 15, // input value for CB2,CB1   
+   cfg_reqs	= 2,
+   cfg_ca1_req	= 3,
+   cfg_ca2_req	= 4,
+   cfg_cb1_req	= 5,
+   cfg_cb2_req	= 6,
+   cfg_ddra	= 7,
+   cfg_ora	= 8,
+   cfg_ina	= 9,
+   cfg_ira	= 10,
+   cfg_ddrb	= 11,
+   cfg_orb	= 12,
+   cfg_inb	= 13,
+   cfg_irb	= 14,
+   cfg_oca	= 15, // out value of CA2
+   cfg_ddca	= 16, // data direction of CA2(,CA1)
+   cfg_inca	= 17, // input value for CA2,CA1
+   cfg_ocb	= 18, // out value of CB2
+   cfg_ddcb	= 19, // data direction of CB2(,CB1)
+   cfg_incb	= 20, // input value for CB2,CB1
   };
 
-class cl_port: public cl_hw
+class cl_pia: public cl_hw
 {
 public:
   t_addr base;
@@ -71,11 +76,14 @@ public:
   class cl_memory_cell *ddcb;
   class cl_memory_cell *incb;
   class cl_memory_cell *rs[4];
+  int prev_ca1, prev_ca2, prev_cb1, prev_cb2;
+  class cl_var *vcra, *vcrb;
+  class cl_m6809_src_base *is_ca1, *is_ca2, *is_cb1, *is_cb2;
  public:
-  cl_port(class cl_uc *auc, int aid);
-  cl_port(class cl_uc *auc, int aid, t_addr the_addr);
+  cl_pia(class cl_uc *auc, int aid);
+  cl_pia(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
-  virtual int cfg_size(void) { return 16; }
+  virtual int cfg_size(void) { return 21; }
   virtual const char *cfg_help(t_addr addr);
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
 
@@ -84,7 +92,14 @@ public:
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
-  virtual int tick(int cycles);
+  virtual int ira(void);
+  virtual int irb(void);
+  virtual int ca1(void);
+  virtual int ca2(void);
+  virtual int cb1(void);
+  virtual int cb2(void);
+  
+  virtual int check_edges(void);
   virtual void reset(void);
   
   virtual void print_info(class cl_console_base *con);
@@ -93,4 +108,4 @@ public:
 
 #endif
 
-/* End of m6898.src/portcl.h */
+/* End of m6898.src/piacl.h */

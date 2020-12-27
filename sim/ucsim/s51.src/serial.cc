@@ -438,7 +438,7 @@ cl_serial::print_info(class cl_console_base *con)
   con->dd_printf("s_tr_t1=%d s_tr_bit=%d s_tr_tick=%d\n",
 		 s_tr_t1, s_tr_bit, s_tr_tick);
 		 con->dd_printf("divby=%d bits=%d\n", _divby, _bits);*/
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

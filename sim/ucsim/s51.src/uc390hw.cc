@@ -262,7 +262,7 @@ cl_uc390_hw::print_info(class cl_console_base *con)
       sfr->get (DPH1) * 256 +
       sfr->get (DPL1);
   con->dd_printf ("\tDPTR1 0x%06lx\n", l);
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 /* End of s51.src/uc390hw.cc */

@@ -390,35 +390,35 @@ void
 cl_serial::print_info(class cl_console_base *con)
 {
   u8_t u8= r_sr;//regs[sr]->get();
-  con->dd_printf("%s[%d] at 0x%06x %s\n", id_string, id, base, on?"on":"off");
+  con->dd_printf("%s[%d] at 0x%06x %s\n", id_string, id, base, on?"on ":"off");
   con->dd_printf("Input: ");
   class cl_f *fin= io->get_fin(), *fout= io->get_fout();
   if (fin)
-    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
+    con->dd_printf("%30s/%3d ", fin->get_file_name(), fin->file_id);
   con->dd_printf("Output: ");
   if (fout)
-    con->dd_printf("%s/%d", fout->get_file_name(), fout->file_id);
+    con->dd_printf("%30s/%3d", fout->get_file_name(), fout->file_id);
   con->dd_printf("\n");
   con->dd_printf("mcnt=%d\n", mcnt);
-  con->dd_printf("Sending: %s, %s, %d/%d bits\n",
-		 s_sending?"yes":"no",
-		 ten?"en":"dis",
+  con->dd_printf("Sending: %s, %s, %2d/%2d bits\n",
+		 s_sending?"yes":"no ",
+		 ten?"en ":"dis",
 		 s_tr_bit, bits);
-  con->dd_printf("Receiving: %s, %s, %d/%d bits\n",
-		 s_receiving?"yes":"no",
-		 ren?"en":"dis",
+  con->dd_printf("Receiving: %s, %s, %2d/%2d bits\n",
+		 s_receiving?"yes":"no ",
+		 ren?"en ":"dis",
 		 s_rec_bit, bits);
   con->dd_printf("CR: ");
   con->print_bin(r_cr, 8);
   con->dd_printf(" 0x%02x", r_cr);
-  con->dd_printf(" div=%d bits=%d\n", div, bits);
+  con->dd_printf(" div=%8d bits=%2d\n", div, bits);
   con->dd_printf("SR: ");
   con->print_bin(u8, 8);
   con->dd_printf(" 0x%02x", u8);
   con->dd_printf(" RDRF=%d TDRE=%d\n",
 		 (u8&1)?1:0,
 		 (u8&2)?1:0);
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 /* End of m6809.src/serial.cc */

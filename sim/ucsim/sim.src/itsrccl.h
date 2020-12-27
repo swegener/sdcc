@@ -69,6 +69,7 @@ public:
 	    int    apoll_priority);
   virtual ~cl_it_src(void);
   virtual int init(void);
+  virtual bool is_nmi(void) { return false; }
   
           bool is_active(void);
   virtual void set_active_status(bool Aactive);

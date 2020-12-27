@@ -459,7 +459,7 @@ cl_vcd::print_info(class cl_console_base *con)
       as= uc->address_space(c, &a);
       con->dd_printf("  %s[0x%x] %s\n", as?(as->get_name()):"?", AU(a), uc->cell_name(c).c_str());
     }
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

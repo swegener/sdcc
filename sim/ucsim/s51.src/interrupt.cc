@@ -182,7 +182,7 @@ cl_interrupt::print_info(class cl_console_base *con)
 	  con->dd_printf("\n");
 	}
     }
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

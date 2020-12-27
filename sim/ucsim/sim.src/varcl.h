@@ -50,6 +50,7 @@ class cl_var: public cl_base
  public:
   cl_var(const char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr= -1);
   virtual int init(void);
+  virtual int move(t_addr new_addr);
   virtual class cl_memory_cell *get_cell(void) { return cell; }
 
   virtual t_mem write(t_mem val);

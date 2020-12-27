@@ -406,6 +406,7 @@ public:
 				     char *name);
   virtual chars cell_name(class cl_memory_cell *cell);
   virtual class cl_var *var(char *nam);
+  virtual class cl_var *var(chars n);
   
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,

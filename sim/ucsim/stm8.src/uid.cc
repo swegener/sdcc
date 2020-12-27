@@ -67,55 +67,25 @@ t_mem
 cl_uid::read(class cl_memory_cell *cell)
 {
   t_mem v= cell->get();
-  //t_addr a;
   
   if (conf(cell, NULL))
     return v;
-  /*
-  if (!uc->rom->is_owned(cell, &a))
-    return v;
-  if ((a < base) ||
-      (a >= base+12))
-    return v;
-  a-= base;
 
-  cell->set(v= uid[a]);
-  */
   return v;
 }
 
 void
 cl_uid::write(class cl_memory_cell *cell, t_mem *val)
 {
-  //t_addr a;
-
   if (conf(cell, val))
     return;
-  /*
-  if (!uc->rom->is_owned(cell, &a))
-    return;  
-  if ((a < base) ||
-      (a >= base+12))
-    return;
-  a-= base;
-  *val= uid[a];
-  */
 }
 
 void
 cl_uid::print_info(class cl_console_base *con)
 {
-  /*
-  con->dd_printf("base= 0x%04x\n", base);
-  con->dd_printf("end = 0x%04x\n", base+12);
-  con->dd_printf("uid =");
-  int i;
-  for (i= 0; i < 12; i++)
-    con->dd_printf(" %02x", uc->rom->get(base+i));
-  con->dd_printf("\n");
-  */
-  uc->rom->dump(base, base+12, 16, con/*->get_fout()*/);
-  print_cfg_info(con);
+  uc->rom->dump(base, base+12, 16, con);
+  //print_cfg_info(con);
 }
 
 

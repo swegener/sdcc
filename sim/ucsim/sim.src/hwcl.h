@@ -121,6 +121,7 @@ class cl_hw: public cl_guiobj
   virtual bool proc_input(void);
   virtual bool handle_input(int c);
   virtual void refresh_display(bool force);
+  virtual void draw_state_time(bool force);
   virtual void draw_display(void);
   virtual cl_hw *next_displayer(void);
   

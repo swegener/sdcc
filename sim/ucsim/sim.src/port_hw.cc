@@ -144,8 +144,8 @@ cl_port_ui::handle_input(int c)
 	  
 	  if (pd[i].keyset != NULL)
 	    {
-	      int bit, l= strlen(pd[i].keyset);
-	      for (bit= 0; (bit < l) && pd[i].keyset[bit]; bit++)
+	      int bit, l= strlen(pd[i].keyset), bc= 0;
+	      for (bit= 0; (bit < l) && (bc < w) && pd[i].keyset[bit]; bit++, bc++)
 		if ((pd[i].keyset[bit]!=' ') && (pd[i].keyset[bit] == c))
 		  {
 		    t_mem m= pd[i].cell_in->read();
@@ -294,12 +294,23 @@ cl_port_ui::draw_display(void)
       pio->tu_go(pd[i].basx, pd[i].basy+1);
       pio->dd_printf("Out ");
       pio->tu_go(pd[i].basx, pd[i].basy+2);
-      pio->dd_printf("Bit 76543210");
+      pio->dd_printf("Bit ");
+      int m;
+      m= pd[i].width;
+      while (m)
+	{
+	  pio->dd_printf("%d", 7-(m%8));
+	  m--;
+	}
       pio->tu_go(pd[i].basx, pd[i].basy+3);
       pio->dd_printf("In  ");
       pio->tu_go(pd[i].basx, pd[i].basy+4);
+      pio->dd_printf("Key ");
       if (pd[i].keyset)
-	pio->dd_printf("Key %s", pd[i].keyset);
+	{
+	  for (m= 0; m < pd[i].width; m++)
+	    pio->dd_printf("%c", pd[i].keyset[m]);
+	}
 
       pd[i].cache_p= pd[i].cell_p->get();
       pd[i].cache_in= pd[i].cell_in->read();

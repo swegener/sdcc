@@ -413,10 +413,8 @@ cl_hw::handle_input(int c)
 }
 
 void
-cl_hw::refresh_display(bool force)
+cl_hw::draw_state_time(bool force)
 {
-  if (!io)
-    return ;
   int n= uc->sim->state & SIM_GO;
   if ((n != cache_run) ||
       force)
@@ -441,6 +439,20 @@ cl_hw::refresh_display(bool force)
 }
 
 void
+cl_hw::refresh_display(bool force)
+{
+  if (!io)
+    return ;
+
+  io->tu_hide();
+  io->tu_go(1,4);
+  io->dd_color("answer");
+  print_info(io);
+  draw_state_time(force);
+  io->tu_show();
+}
+
+void
 cl_hw::draw_display(void)
 {
   if (!io)
@@ -462,6 +474,11 @@ cl_hw::draw_display(void)
   io->tu_go(66,2);
   chars s("", "%s[%d]", id_string, id);
   io->dd_cprintf("ui_title", "%-13s", s.c_str());
+
+  io->tu_go(1,3);
+  io->dd_printf("\033[2K"); // entire line
+  io->dd_printf("\033[0J"); // from cursor to end of screen
+  io->dd_printf("\n");
 }
 
 class cl_hw *
@@ -477,7 +494,7 @@ void
 cl_hw::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d]\n", id_string, id);
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 void
@@ -489,7 +506,7 @@ cl_hw::print_cfg_info(class cl_console_base *con)
   if (cfg)
     {      
       s= cfg->get_start_address();
-      e= s + cfg->get_size();
+      e= s + cfg->get_size()-1;
       for (a= s; a <= e; a++)
 	{
 	  v= cfg->read(a);

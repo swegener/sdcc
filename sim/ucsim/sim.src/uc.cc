@@ -2082,6 +2082,12 @@ cl_uc::var(char *nam)
   return v;
 }
 
+class cl_var *
+cl_uc::var(chars n)
+{
+  const char *s= n.c_str();
+  return var((char*)s);
+}
 
 /*
  * Messages to broadcast
@@ -2528,20 +2534,19 @@ int
 cl_uc::do_interrupt(void)
 {
   int i;
-  // NMI?
-
-  // Maskable interrupts
-  if (!it_enabled())
-    {
-      //printf("do_interrupt skip (it disabled)\n");
-      return resGO;
-    }
+  bool is_en= it_enabled();
   class it_level *il= (class it_level *)(it_levels->top()), *IL= 0;
+
   irq= false;
   //printf("Checking IRQs...\n");
   for (i= 0; i < it_sources->count; i++)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
+      if (!is->is_nmi())
+	{
+	  if (!is_en)
+	    continue;
+	}
       bool A= is->is_active();
       bool E= is->enabled();
       bool P= is->pending();

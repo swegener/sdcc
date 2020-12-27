@@ -445,7 +445,7 @@ cl_tim::print_info(class cl_console_base *con)
 		 prescaler_cnt, prescaler_cnt,
 		 calc_prescaler(), calc_prescaler());
   con->dd_printf("arr= 0x%04x %d\n", get_arr(), get_arr());
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

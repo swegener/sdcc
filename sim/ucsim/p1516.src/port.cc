@@ -109,7 +109,6 @@ cl_porto::print(class cl_console_base *con)
 {
   u32_t m;
   t_mem d= value;//dr->get();
-  con->dd_color("answer");
   con->dd_printf("%s at %04x %08x\n", get_name(), addr, d);
   for (m= 0x80000000; m; m>>= 1)
     {
@@ -124,7 +123,7 @@ void
 cl_porto::print_info(class cl_console_base *con)
 {
   print(con);
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 void
@@ -169,7 +168,7 @@ cl_porto::refresh_display(bool force)
     }
   pio->dd_color("answer");
   
-  cl_hw::refresh_display(force);
+  draw_state_time(force);
 }
 
 void

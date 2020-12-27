@@ -433,7 +433,7 @@ cl_serial::print_info(class cl_console_base *con)
   if (fout)
     con->dd_printf("%s/%d", fout->get_file_name(), fout->file_id);
   con->dd_printf("\n");
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

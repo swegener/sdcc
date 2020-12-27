@@ -359,7 +359,7 @@ void
 cl_pca::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] FIXME\n", id_string, id);
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

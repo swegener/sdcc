@@ -301,7 +301,7 @@ cl_port::print_info(class cl_console_base *con)
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value on the port pins)\n",
 		 data, data, isprint(data)?data:'.');
-  print_cfg_info(con);
+  //print_cfg_info(con);
 }
 
 

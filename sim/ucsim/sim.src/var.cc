@@ -59,6 +59,18 @@ cl_var::init(void)
   return 0;
 }
 
+int
+cl_var::move(t_addr new_addr)
+{
+  if (addr == new_addr)
+    return 0;
+  if (cell && (bitnr < 0))
+    cell->set_flag(CELL_VAR, false);
+  addr= new_addr;
+  cell= NULL;
+  return init();
+}
+
 t_mem
 cl_var::write(t_mem val)
 {

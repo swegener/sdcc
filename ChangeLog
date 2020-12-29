@@ -1,3 +1,10 @@
+2020-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixes in handling register operands.
+	* src/z80/ralloc2.cc:
+	  More flexibility for register operands in cast and ^.
+
 2020-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

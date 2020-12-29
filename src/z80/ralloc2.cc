@@ -399,8 +399,8 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
   if(!result || !IS_SYMOP(result))
     return;
     
-  if(!(ic->op == UNARYMINUS || ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)) 
-    return; // Code generation can always handle all other operations. Todo: Handle ^, |, BITWISEAND and float UNARYMINUS there as well.
+  if(!(ic->op == UNARYMINUS || ic->op == '+' || ic->op == '-' || ic->op == '|' || ic->op == BITWISEAND)) 
+    return; // Code generation can always handle all other operations. Todo: Handle |, BITWISEAND and float UNARYMINUS there as well.
    
   operand_map_t::const_iterator oir, oir_end, oirs; 
   boost::tie(oir, oir_end) = n.operands.equal_range(OP_SYMBOL_CONST(result)->key);
@@ -581,7 +581,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
-  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~' || ic->op == LEFT_OP) // Codegen can handle it all.
+  if (ic->op == CAST || ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~' || ic->op == LEFT_OP) // Codegen can handle it all.
     return(true);
 
   if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right))

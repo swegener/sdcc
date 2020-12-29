@@ -3419,7 +3419,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       else if (aopOnStack (result, roffset + i, 1) && requiresHL (result) && !hl_free)
         {
           _push(PAIR_HL);
-          cheapMove (result, roffset + i, source, soffset + i, true);
+          cheapMove (result, roffset + i, source, soffset + i, a_free);
           _pop(PAIR_HL);
           assigned[i] = true;
           regsize--;
@@ -3428,7 +3428,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         }
       else if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
         {
-          cheapMove (result, roffset + i, source, soffset + i, true);
+          cheapMove (result, roffset + i, source, soffset + i, a_free);
           assigned[i] = true;
           regsize--;
           size--;
@@ -3460,7 +3460,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       if (aopInReg (operand, offset, A_IDX))
         a_free = false;
       else if (aopInReg (operand, offset, L_IDX) || aopInReg (operand, offset, H_IDX))
-        hl_free = FALSE;
+        hl_free = false;
     }
   genCopyStack (result, roffset, source, soffset, n, assigned, &size, a_free, hl_free, false);
 
@@ -8900,8 +8900,13 @@ genAnd (const iCode * ic, iCode * ifx)
 
       if (!a_free)
         {
-          wassert (!pushed_a);
-          _push (PAIR_AF);
+          if (pushed_a)
+            {
+              regalloc_dry_run_cost += 200;
+              wassert (regalloc_dry_run);
+            }
+          else
+            _push (PAIR_AF);
           pushed_a = true;
           a_free = true;
         }
@@ -9316,7 +9321,7 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
           }
             
         // normal case
-        // result = left & right
+        // result = left ^ right
         if (right_aop->type == AOP_LIT)
           {
             unsigned int bytelit = byteOfVal (right_aop->aopu.aop_lit, i);
@@ -9326,6 +9331,12 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
                 int end;
                 for(end = i; end < size && byteOfVal (right_aop->aopu.aop_lit, end) == bytelit; end++);
                 genMove_o (result_aop, i, left_aop, i, end - i, a_free, hl_free, !isPairInUse (PAIR_DE, ic));
+                if(result_aop->type == AOP_REG &&
+                  (left_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] >= end || right_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] >= end))
+                  {
+                    wassert(regalloc_dry_run);
+                    regalloc_dry_run_cost += 150;
+                  }
                 if (result_aop->regs[A_IDX] >= i && result_aop->regs[A_IDX] < end)
                   a_free = false;
                 i = end;
@@ -9389,6 +9400,12 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
               emit3_o (A_XOR, ASMOP_A, 0, right_aop, i);
           }
         cheapMove (result_aop, i, ASMOP_A, 0, true);
+        if(result_aop->type == AOP_REG &&
+          (left_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] > i || right_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] > i))
+          {
+            wassert(regalloc_dry_run);
+            regalloc_dry_run_cost += 150;
+          }
         if (aopInReg (result_aop, i, A_IDX))
           a_free = false;
 

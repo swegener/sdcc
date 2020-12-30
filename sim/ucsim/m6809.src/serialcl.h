@@ -96,6 +96,7 @@ class cl_serial: public cl_serial_hw
   virtual void show_tx_complete(bool val);
   virtual void show_idle(bool vol);
   virtual void set_dr(t_mem val);
+  virtual void set_sr_irq(void);
   
   virtual void print_info(class cl_console_base *con);
 };

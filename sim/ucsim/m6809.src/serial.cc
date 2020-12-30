@@ -84,7 +84,16 @@ cl_serial::init(void)
   chars pn= chars("", "uart%d_", id);
   uc->vars->add(v= new cl_var(pn+"base", cfg, acia_cfg_base, cfg_help(acia_cfg_base)));
   v->init();
-
+  uc->vars->add(v= new cl_var(pn+"cr", cfg, acia_cfg_cr,
+			      cfg_help(acia_cfg_cr)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+"sr", cfg, acia_cfg_sr,
+			      cfg_help(acia_cfg_sr)));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+"req", cfg, acia_cfg_req,
+			      cfg_help(acia_cfg_req)));
+  v->init();
+  
   is_t= new cl_m6809_slave_src(uc,
 			       r_cr, 0x60, 0x20,
 			       r_sr, 2,
@@ -144,6 +153,7 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
       pick_div();
       pick_ctrl();
       //*val= cell->get();
+      set_sr_irq();
     }
   else
     {
@@ -194,7 +204,13 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       break;
       
     case acia_cfg_cr: break;
-    case acia_cfg_sr: break;
+    case acia_cfg_sr:
+      if (val)
+	{
+	  cell->set(*val&= 0x7f);
+	  set_sr_irq();
+	}
+      break;
       
     default:
       break;
@@ -392,6 +408,7 @@ cl_serial::show_writable(bool val)
     r_sr->set_bit1(2);//regs[sr]->write_bit1(0x02);
   else
     r_sr->set_bit0(2);//regs[sr]->write_bit0(0x02);
+  set_sr_irq();
 }
 
 void
@@ -402,6 +419,7 @@ cl_serial::show_readable(bool val)
     r_sr->set_bit1(1);//regs[sr]->write_bit1(0x01);
   else
     r_sr->set_bit0(1);//regs[sr]->write_bit0(0x01);
+  set_sr_irq();
 }
 
 void
@@ -419,6 +437,19 @@ void
 cl_serial::set_dr(t_mem val)
 {
   regs[dr]->set(val);
+}
+
+void
+cl_serial::set_sr_irq(void)
+{
+  bool t= false, r= false;
+  u8_t c= r_cr->get(), s= r_sr->get();
+  t= ((c & 0x60) == 0x20) && (s & 2);
+  r= (c & 0x80) && (s && 1);
+  s&= 0x7f;
+  if (r || t)
+    s|= 0x80;
+  r_sr->set(s);
 }
 
 void

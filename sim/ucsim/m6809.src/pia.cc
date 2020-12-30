@@ -291,6 +291,10 @@ cl_pia::read(class cl_memory_cell *cell)
       if (r == ora)
 	{
 	  cra->set(cra->get() & 0x3f);
+	  if ((cra->get() & 0x30) == 0x20)
+	    {
+	      oca->write(oca->get() & ~0x02);
+	    }
 	  return ira();
 	}
       if (r == orb)
@@ -313,6 +317,32 @@ cl_pia::write(class cl_memory_cell *cell, t_mem *val)
 	{
 	  *val&= 0x3f;
 	  *val|= (r->get() & 0xc0);
+
+	  if (r == cra)
+	    {
+	      if ((*val & 0x30) == 0x30)
+		{
+		  if (*val & 0x08)
+		    oca->write(oca->get() | 0x02);
+		  else
+		    oca->write(oca->get() & ~0x02);
+		}
+	    }
+	  if (r == crb)
+	    {
+	      if ((*val & 0x30) == 0x30)
+		{
+		  if (*val & 0x08)
+		    ocb->write(ocb->get() | 0x02);
+		  else
+		    ocb->write(ocb->get() & ~0x02);
+		}
+	    }
+	}
+      if (r == orb)
+	{
+	  if ((crb->get() & 0x30) == 0x20)
+	    ocb->write(ocb->get() & ~0x02);
 	}
     }
   conf(cell, val);
@@ -530,7 +560,13 @@ cl_pia::check_edges(void)
     {
       *prev= signal;
       if (!(edge ^ signal))
-	cr->set_bit1(0x80);
+	{
+	  cr->set_bit1(0x80);
+	  if ((cr->get() & 0x38) == 0x20)
+	    {
+	      oca->write(oca->get() | 0x02);
+	    }
+	}
     }
   if (!(cr->get() & 0x20))
     {
@@ -553,7 +589,14 @@ cl_pia::check_edges(void)
     {
       *prev= signal;
       if (!(edge ^ signal))
-	cr->set_bit1(0x80);
+	{
+	  cr->set_bit1(0x80);
+	  if ((cr->get() & 0x38) == 0x20)
+	    {
+	      // TODO: CRB-b7 must first be cleared by a read of data.
+	      ocb->write(ocb->get() | 0x02);
+	    }
+	}
     }
   if (!(cr->get() & 0x20))
     {
@@ -566,6 +609,20 @@ cl_pia::check_edges(void)
 	  if (!(edge ^ signal))
 	    cr->set_bit1(0x40);
 	}
+    }
+  return 0;
+}
+
+int
+cl_pia::tick(int cycles)
+{
+  if ((cra->get() & 0x38) == 0x28)
+    {
+      oca->write(oca->get() | 0x02);
+    }
+  if ((crb->get() & 0x38) == 0x28)
+    {
+      ocb->write(ocb->get() | 0x02);
     }
   return 0;
 }

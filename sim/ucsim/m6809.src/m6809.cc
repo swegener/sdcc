@@ -115,10 +115,15 @@ cl_m6809::mk_hw_elements(void)
   add_hw(h= new cl_serial(this, 0, 0xc000));
   h->init();
 
-  class cl_pia *p0;
+  add_hw(h= new cl_serial(this, 1, 0xc008));
+  h->init();
+
+  class cl_pia *p0, *p1;
   
   add_hw(p0= new cl_pia(this, 0, 0xc010));
   p0->init();
+  add_hw(p1= new cl_pia(this, 1, 0xc020));
+  p1->init();
 
   class cl_port_ui *d;
   add_hw(d= new cl_port_ui(this, 0, "dport"));
@@ -165,6 +170,48 @@ cl_m6809::mk_hw_elements(void)
   pd.basy    = 5;
   pd.width   = 2;
   d->add_port(&pd, 3);
+
+  // Port #1
+  pd.init();
+  pd.set_name("P1A");
+  pd.cell_dir= p1->ddra;
+  pd.cell_p  = p1->ora;
+  pd.cell_in = p1->ina;
+  pd.keyset  = keysets[4];
+  pd.basx    = 1;
+  pd.basy    = 11;
+  d->add_port(&pd, 4);
+
+  pd.set_name("P1B");
+  pd.cell_dir= p1->ddrb;
+  pd.cell_p  = p1->orb;
+  pd.cell_in = p1->inb;
+  pd.keyset  = keysets[5];
+  pd.basx    = 20;
+  pd.basy    = 11;
+  d->add_port(&pd, 5);
+
+  pd.set_name("P1CA");
+  pd.cell_dir= p1->ddca;
+  pd.cell_p  = p1->oca;
+  pd.cell_in = p1->inca;
+  pd.cell_dir= p1->ddca;
+  pd.keyset  = keysets[6];
+  pd.basx    = 40;
+  pd.basy    = 11;
+  pd.width   = 2;
+  d->add_port(&pd, 6);
+
+  pd.set_name("P1CB");
+  pd.cell_dir= p1->ddcb;
+  pd.cell_p  = p1->ocb;
+  pd.cell_in = p1->incb;
+  pd.cell_dir= p1->ddcb;
+  pd.keyset  = keysets[7];
+  pd.basx    = 54;
+  pd.basy    = 11;
+  pd.width   = 2;
+  d->add_port(&pd, 7);
 }
 
 void
@@ -172,7 +219,6 @@ cl_m6809::make_cpu_hw(void)
 {
   add_hw(cpu= new cl_m6809_cpu(this));
   cpu->init();
-  add_hw(cpu);
 }
 
 void
@@ -2317,9 +2363,9 @@ cl_m6809_src_base::get_parent(void)
 void
 cl_m6809_src_base::set_pass_to(t_mem value)
 {
-  if (value == (t_mem)irq_firq)
+  if (value == 'f')
     pass_to= irq_firq;
-  else if (value == (t_mem)irq_nmi)
+  else if (value == 'n')
     pass_to= irq_nmi;
   else
     pass_to= irq_irq;

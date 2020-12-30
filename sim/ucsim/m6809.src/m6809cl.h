@@ -175,10 +175,10 @@ enum cpu_cfg
   };
 
 enum irq_nr {
-  irq_none= '-',
-  irq_nmi= 'n',
-  irq_firq= 'f',
-  irq_irq= 'i'
+  irq_none= 0,
+  irq_nmi= 1,
+  irq_firq= 2,
+  irq_irq= 3
 };
 
 // This is used as NMI source
@@ -259,6 +259,7 @@ public:
     ie_value= Iie_value;
   }
   virtual bool enabled(void);
+  virtual void clear(void) {}
 };
 
 // "CPU" peripheral

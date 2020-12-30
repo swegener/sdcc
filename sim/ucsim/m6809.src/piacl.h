@@ -100,6 +100,7 @@ public:
   virtual int cb2(void);
   
   virtual int check_edges(void);
+  virtual int tick(int cycles);
   virtual void reset(void);
   
   virtual void print_info(class cl_console_base *con);

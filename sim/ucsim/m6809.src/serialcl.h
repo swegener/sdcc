@@ -37,9 +37,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "newcmdposixcl.h"
 
-enum m6850_cfg
+enum acia_cfg
   {
-   m6850conf_base	= serconf_nr+0
+    acia_cfg_base	= serconf_nr+0,
+    acia_cfg_cr		= serconf_nr+1,
+    acia_cfg_sr		= serconf_nr+2,
+    acia_cfg_req	= serconf_nr+3,
   };
 
 class cl_serial_listener;
@@ -51,8 +54,9 @@ class cl_serial: public cl_serial_hw
   class cl_memory_cell *regs[2];
   int div;
   int mcnt;
-  u8_t  r_cr;         // Copy of written CR value
-  u8_t  r_sr;         // Simulated SR value
+  class cl_m6809_src_base *is_r, *is_t;
+  class cl_memory_cell *r_cr;         // Copy of written CR value
+  class cl_memory_cell *r_sr;         // Simulated SR value
   u8_t  s_in;         // Serial channel input reg
   u8_t  s_out;        // Serial channel output reg
   u8_t  s_txd;	      // TX data register
@@ -68,7 +72,7 @@ class cl_serial: public cl_serial_hw
   cl_serial(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_serial(void);
   virtual int init(void);
-  virtual int cfg_size(void) { return 10; }
+  virtual int cfg_size(void) { return 11; }
   virtual const char *cfg_help(t_addr addr);
 
   virtual t_mem read(class cl_memory_cell *cell);

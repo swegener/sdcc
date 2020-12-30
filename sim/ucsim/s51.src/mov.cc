@@ -560,7 +560,7 @@ cl_51core::instruction_f2/*inst_movx_Sri_a*/(t_mem/*uchar*/ code)
   
   d= R[code & 0x01]->read();
   ah= high_movxri();
-  a= ah + d;
+  a= ah*256 + d;
   v= acc->read();
   xram->write(a, v);
   tick(1);

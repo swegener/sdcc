@@ -3,8 +3,8 @@
 //#include <stdint.h>
 #include <unistd.h>
 #include "cmdlexcl.h"
-#include "cmdpars.hh"
 #include "cmdutil.h"
+#include "cmdpars.hh"
 
 static int uc_yy_check_id(char *token);
 static int uc_yy_input(char *buf, int max_size);

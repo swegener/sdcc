@@ -1,3 +1,7 @@
+2020-01-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/cmd.src/cmdlex.l: change #include order so SOCKET defined
+
 2020-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

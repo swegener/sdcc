@@ -28,11 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef CMD_CMDUTIL_HEADER
 #define CMD_CMDUTIL_HEADER
 
+#include "ddconfig.h"
+
 #ifdef SOCKET_AVAIL
 # include HEADER_SOCKET
 #endif
-
-#include "ddconfig.h"
 
 
 extern char *proc_escape(char *string, int *len);

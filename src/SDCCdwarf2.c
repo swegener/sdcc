@@ -3048,7 +3048,10 @@ dwWriteCLine (iCode *ic)
 {
   dwline * lp;
   char * debugSym;
-  
+
+  if (ic->inlined)
+    return 0;
+
   lp = Safe_alloc (sizeof (dwline));
 
   lp->line = ic->lineno;

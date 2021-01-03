@@ -9,6 +9,9 @@
 #include <stdint.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#ifdef __z88dk_fastcall
+#undef __z88dk_fastcall
+#endif
 #define __z88dk_fastcall __reentrant
 #elif !(defined(__SDCC_z80) || defined(__SDCC_z180))
 #define __z88dk_fastcall

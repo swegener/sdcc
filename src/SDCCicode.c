@@ -41,6 +41,7 @@ int block;
 long scopeLevel;
 int seqPoint;
 int inCriticalPair = 0;
+int inlinedActive = 0;
 
 symbol *returnLabel;            /* function return label */
 symbol *entryLabel;             /* function entry  label */
@@ -572,6 +573,7 @@ newiCode (int op, operand *left, operand *right)
   ic->key = iCodeKey++;
   IC_LEFT (ic) = left;
   IC_RIGHT (ic) = right;
+  ic->inlined = inlinedActive;
 
   // Err on the save side for now, settign this to false later is up to later analysis.
   ic->localEscapeAlive = true;
@@ -4314,6 +4316,9 @@ ast2iCode (ast * tree, int lvl)
   /* if we find a nullop */
   if (tree->type == EX_OP && (tree->opval.op == NULLOP || tree->opval.op == BLOCK))
     {
+      int oldInlinedActive = inlinedActive;
+      if (tree->inlined)
+        inlinedActive = 1;
       if (tree->left && tree->left->type == EX_VALUE)
         geniCodeDummyRead (ast2iCode (tree->left, lvl + 1));
       else
@@ -4322,6 +4327,7 @@ ast2iCode (ast * tree, int lvl)
         geniCodeDummyRead (ast2iCode (tree->right, lvl + 1));
       else
         ast2iCode (tree->right, lvl + 1);
+      inlinedActive = oldInlinedActive;
       return NULL;
     }
 

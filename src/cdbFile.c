@@ -294,6 +294,9 @@ cdbWriteCLine (iCode *ic)
   char debugSym[INITIAL_INLINEASM];
   
   if (!cdbFilePtr) return 0;
+  
+  if (ic->inlined)
+    return 0;
 
   sprintf (debugSym, "C$%s$%d$%ld_%ld$%d",
            FileBaseName (ic->filename), ic->lineno,

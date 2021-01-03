@@ -254,6 +254,7 @@ copyAst (ast * src)
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
+  dest->inlined = src->inlined;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -7050,6 +7051,7 @@ fixupInline (ast * tree, long level)
 
   tree->level = level;
   tree->block = currBlockno;
+  tree->inlined = 1;
 
   /* Update symbols */
   if (IS_AST_VALUE (tree) && tree->opval.val->sym)

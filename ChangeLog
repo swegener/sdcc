@@ -1,3 +1,8 @@
+2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix an issue in handling surviving a when assigning single bytes from (hl) to stack.
+
 2021-01-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c,

@@ -1,5 +1,12 @@
 2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/pdk/gen.c,
+	  support/regression/tests/bug-3167.c:
+	  Fix bug #3167.
+
+2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fix an issue in handling surviving a when assigning single bytes from (hl) to stack.
 	* support/regression/tests/bug-3166.c:

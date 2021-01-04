@@ -6805,7 +6805,40 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           continue;
         }
 
-      if (right->type != AOP_LIT)
+      if (right->type == AOP_SFR) // Right operand needs to go through a
+        {
+          bool l_dead = !(bitVectBitValue (ic->rSurv, L_IDX) || left->regs[L_IDX] > offset || result->regs[L_IDX] >= 0 && result->regs[L_IDX] < offset);
+          bool h_dead = !(bitVectBitValue (ic->rSurv, L_IDX) || left->regs[L_IDX] > offset || result->regs[L_IDX] >= 0 && result->regs[L_IDX] < offset);
+
+          asmop *tmpaop;
+
+          if (aopInReg (left, offset, H_IDX))
+            tmpaop = ASMOP_L;
+          else if (aopInReg (left, offset, L_IDX))
+            tmpaop = ASMOP_H;
+          else if (!l_dead && h_dead)
+            tmpaop = ASMOP_H;
+          else
+            tmpaop = ASMOP_L;
+
+          bool tmpaop_dead = aopInReg (tmpaop, 0, L_IDX) ? l_dead : h_dead;
+          
+          if (!tmpaop_dead)
+            _push (PAIR_HL);
+
+          if (aopInReg (left, offset, A_IDX))
+            cheapMove (tmpaop, 0, right, offset, false);
+          else
+            {
+              cheapMove (tmpaop, 0, right, offset, true);
+              cheapMove (ASMOP_A, 0, left, offset, true);
+            }
+          emit3_o (offset ? A_SBC : A_SUB, ASMOP_A, 0, tmpaop, 0);
+
+          if (!tmpaop_dead)
+            _pop (PAIR_HL);
+        }
+      else if (right->type != AOP_LIT)
         {
           if (!offset)
             {

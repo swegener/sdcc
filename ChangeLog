@@ -1,3 +1,8 @@
+2020-01-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix an issue in handling of non-dead a in __sfr access, possibly bug #3168.
+
 2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

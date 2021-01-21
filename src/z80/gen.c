@@ -11552,7 +11552,8 @@ genPointerSet (iCode *ic)
   bool isBitvar;
   sym_link *retype;
   sym_link *letype;
-  bool pushed_a = FALSE;
+  bool pushed_a = false;
+  bool pushed_pair = false;
   bool surviving_a = !options.oldralloc && bitVectBitValue (ic->rSurv, A_IDX);
 
   right = IC_RIGHT (ic);
@@ -11753,7 +11754,14 @@ genPointerSet (iCode *ic)
       if (isBitvar && getPairId (AOP (result)) != PAIR_INVALID && (getPairId (AOP (result)) != PAIR_IY || SPEC_BLEN (IS_BITVAR (retype) ? retype : letype) < 8 || isPairDead (getPairId (AOP (result)), ic)))   /* Avoid destroying result by increments */
         pairId = getPairId (AOP (result));
       else
-        fetchPairLong (pairId, AOP (result), ic, 0);
+        {
+          fetchPairLong (pairId, result->aop, ic, 0);
+          if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId && result->aop->type != AOP_REG)
+            {
+              _push (pairId);
+              pushed_pair = true;
+            }
+        }
     }
   /* so hl now contains the address */
   /*freeAsmop (result, NULL, ic);*/
@@ -11810,8 +11818,8 @@ genPointerSet (iCode *ic)
           else
             {
               if (surviving_a && !pushed_a && (!aopInReg (right->aop, 0, A_IDX) || offset))
-                _push (PAIR_AF), pushed_a = TRUE;
-              cheapMove (ASMOP_A, 0, AOP (right), offset, true);
+                _push (PAIR_AF), pushed_a = true;
+              cheapMove (ASMOP_A, 0, right->aop, offset, true);
               zero_a = false;
               emit2 ("ld !mems, a", _pairs[pairId].name);
               regalloc_dry_run_cost += 1;
@@ -11838,6 +11846,8 @@ genPointerSet (iCode *ic)
         }
     }
 release:
+  if (pushed_pair)
+    _pop (pairId);
   if (pushed_a)
     _pop (PAIR_AF);
 

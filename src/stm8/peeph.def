@@ -7,10 +7,10 @@ replace restart {
 } if notVolatile(%1), notVolatile(%2), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {
-	ldw	a, (%2, sp)
+	ld	a, (%2, sp)
 } by {
 	; peephole 0a removed dead load into a from %2.
-} if notUsed('n'), notUsed('z')
+} if notUsed('a'), notUsed('n'), notUsed('z')
 
 replace restart {
 	ldw	%1, %2

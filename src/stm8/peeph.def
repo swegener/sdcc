@@ -185,19 +185,35 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	addw	%1, #(%2 + 0)
+	addw	%1, #(_%2)
 	ld	a, (%1)
 } by {
 	; peephole 10b moved addition of offset into storage instruction
-	ld	a, (%2, %1)
+	ld	a, (_%2, %1)
 } if notUsed(%1), notUsed('c')
 
 replace restart {
-	addw	%1, #(%2 + 0)
+	addw	%1, #(_%2)
 	inc	(%1)
 } by {
 	; peephole 10c moved addition of offset into increment instruction
-	inc	(%2, %1)
+	inc	(_%2, %1)
+} if notUsed(%1), notUsed('c')
+
+replace restart {
+	addw	%1, #(_%2)
+	ldw	%1, (%1)
+} by {
+	; peephole 10d moved addition of offset into storage instruction
+	ldw	%1, (_%2, %1)
+}if notUsed('c')
+
+replace restart {
+	addw	%1, #(_%2)
+	ld	(%1), a
+} by {
+	; peephole 10e moved addition of offset into storage instruction
+	ld	(_%2, %1), a
 } if notUsed(%1), notUsed('c')
 
 replace restart {

@@ -1,3 +1,8 @@
+2020-01-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Pick some improvements from patch #362 by Visenri.
+
 2020-01-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

@@ -217,6 +217,15 @@ replace restart {
 } if notUsed(%1), notUsed('c')
 
 replace restart {
+	ldw %1, sp
+	addw    %1, #%2
+	ld  a, (%1)
+} by {
+	ld  a, (%2, sp)
+	; peephole 10f moved addition to sp to storage instruction.
+} if notUsed(%1), notUsed('c'), operandsLiteral(%2), immdInRange(0 255 '+' 0 %2 %9)
+
+replace restart {
 	ldw	(%1, sp), x
 	ldw	x, (%2, sp)
 	addw	x, (%1, sp)

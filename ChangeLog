@@ -4,6 +4,8 @@
 	  Pick some improvements from patch #362 by Visenri.
 	* support/regression/tests/bug-3172.c:
 	  Test for bug #3172.
+	* device/lib/_strcpy.c:
+	  Pick a fix from noasm2 branch.
 
 2020-01-26 Philipp Klaus Krause <pkk AT spth.de>
 

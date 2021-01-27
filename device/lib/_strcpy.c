@@ -29,6 +29,8 @@
 #include <string.h>
 #include <sdcc-lib.h>
 
+#undef strcpy /* Avoid conflict with wrapper macro of the same name */
+
 #if !_SDCC_PORT_PROVIDES_STRCPY
 
 char * strcpy ( char * d, const char * s )

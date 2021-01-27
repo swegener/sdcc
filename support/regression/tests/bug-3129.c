@@ -1,5 +1,5 @@
 /*
-   bug-lnlc.c
+   bug-3129.c
    Based on an error in the stdcbench self-test. 
  */
 

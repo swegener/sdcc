@@ -31,13 +31,19 @@ replace restart {
 replace restart {
 	%1	hl, %2
 } by {
-	; common peephole 2a removed %1 hl,%2 due to unused result.
-} if same(%1 'adc' 'add' 'sbc'), notUsed('hl' 'f')
+	; common peephole 2a removed %1 hl, %2 due to unused result.
+} if same(%1 'adc' 'sbc'), notUsed('hl' 'f')
+
+replace restart {
+	add	hl, %2
+} by {
+	; common peephole 2b removed add hl, %2 due to unused result.
+} if notUsed('hl' 'cf')
 
 replace restart {
 	%1	%2
 } by {
-	; common peephole 2b removed %1 %2 due to unused result.
+	; common peephole 2c removed %1 %2 due to unused result.
 } if same(%1 'dec' 'inc'), same(%2 'bc' 'de' 'hl' 'sp' 'ix' 'iy'), notUsed(%2)
 
 replace restart {

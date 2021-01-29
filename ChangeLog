@@ -2,6 +2,8 @@
 
 	* src/z80/peep.c:
 	  Fix bug #3173.
+	* src/z80/peeph.def:
+	  Split rule for add from adc, sbc rule due to differences in flag handling.
 
 2020-01-27 Philipp Klaus Krause <pkk AT spth.de>
 

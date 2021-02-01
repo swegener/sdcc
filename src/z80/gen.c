@@ -6550,14 +6550,6 @@ genPlus (iCode * ic)
           else
             premoved = FALSE;
 
-          // Can't handle overwritten operand in hl.
-          if (started && (IC_RESULT (ic)->aop->type == AOP_EXSTK ||  IC_RESULT (ic)->aop->type == AOP_PAIRPTR) && requiresHL (IC_RESULT (ic)->aop) &&
-            (aopInReg (leftop, i, L_IDX) || aopInReg (leftop, i, H_IDX) || aopInReg (rightop, i, L_IDX) || aopInReg (rightop, i, H_IDX)))
-            {
-              wassert (regalloc_dry_run);
-              regalloc_dry_run_cost += 1000;
-            }
-
           if (!started && aopIsLitVal (rightop, i, 1, 0))
             ; // Skip over this byte.
           // We can use inc / dec only for the only, top non-zero byte, since it neither takes into account an existing carry nor does it update the carry.
@@ -6583,8 +6575,16 @@ genPlus (iCode * ic)
               cached[cached[0] == -1 ? 0 : 1] = offset++;
               _push (PAIR_AF);
             }
+          // Avoid overwriting still-needed operand in h or l.
+          else if (i + 1 < size && requiresHL (IC_RESULT (ic)->aop) && (IC_RESULT (ic)->aop->type == AOP_EXSTK || IC_RESULT (ic)->aop->type == AOP_PAIRPTR) &&
+            (!isPairDead(PAIR_HL, ic) || IC_LEFT(ic)->aop->regs[L_IDX] > i || IC_LEFT(ic)->aop->regs[H_IDX] > i || IC_RIGHT(ic)->aop->regs[L_IDX] > i || IC_RIGHT(ic)->aop->regs[H_IDX] > i))
+            {
+              _push (PAIR_HL);
+              cheapMove (IC_RESULT (ic)->aop, i, ASMOP_A, 0, true);
+              _pop (PAIR_HL);
+            }
           else
-            cheapMove (AOP (IC_RESULT (ic)), i, ASMOP_A, 0, true);
+            cheapMove (IC_RESULT (ic)->aop, i, ASMOP_A, 0, true);
           i++;
         }
     }

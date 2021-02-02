@@ -1,3 +1,12 @@
+2020-02-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCattr.h,
+	  src/SDCCattr.c,
+	  src/SDCC.y,
+	  src/SDCCsymt.h,
+	  src/Makefile.in:
+	  Infrastructure for attributes.
+
 2020-02-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

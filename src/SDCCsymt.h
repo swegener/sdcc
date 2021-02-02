@@ -26,6 +26,7 @@
 #define SDCC_NAME_MAX  3*SDCC_SYMNAME_MAX       // big enough for _<func>_<var>_etc
 #include "SDCChasht.h"
 #include "SDCCglobl.h"
+#include "SDCCattr.h"
 #include "dbuf.h"
 
 #define INTNO_MAX 255           /* maximum allowed interrupt number */

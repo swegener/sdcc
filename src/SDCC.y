@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "SDCCglobl.h"
+#include "SDCCattr.h"
 #include "SDCCsymt.h"
 #include "SDCChasht.h"
 #include "SDCCval.h"
@@ -72,6 +73,7 @@ bool uselessDecl = TRUE;
 %expect 11
 
 %union {
+    attribute  *attr;       /* attribute                              */
     symbol     *sym;        /* symbol table pointer                   */
     structdef  *sdef;       /* structure definition                   */
     char       yychar[SDCC_NAME_MAX+1];
@@ -110,7 +112,8 @@ bool uselessDecl = TRUE;
 %token ASM
 
 %type <yyint> Interrupt_storage
-%type <sym> identifier declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
+%type <attr> attribute_specifier_sequence attribute_specifier_sequence_opt attribute_specifier attribute_list attribute
+%type <sym> identifier attribute_token declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
 %type <sym> member_declarator function_declarator
 %type <sym> member_declarator_list member_declaration member_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
@@ -1644,12 +1647,27 @@ static_assert_declaration
 
 attribute_specifier_sequence
    : attribute_specifier_sequence attribute_specifier
+     {
+       $$ = $1;
+       attribute *a;
+       for (a = $$; a->next; a = a->next);
+       a->next = $2;
+     }
    | attribute_specifier
+     {
+       $$ = $1;
+     }
    ;
 
 attribute_specifier_sequence_opt
    : /* empty */
+     {
+       $$ = 0;
+     }
    | attribute_specifier_sequence
+     {
+       $$ = $1;
+     }
    ;
 
 attribute_specifier
@@ -1657,24 +1675,54 @@ attribute_specifier
      {
        if (!options.std_c2x)
          werror(E_ATTRIBUTE_C2X);
+       $$ = $3;
      }
    ;
 
 attribute_list
    : /* empty */
+     {
+       $$ = 0;
+     }
    | attribute
+     {
+       $$ = $1;
+     }
    | attribute_list ','
+     {
+       $$ = $1;
+     }
    | attribute_list ',' attribute
+     {
+       $$ = $1;
+       attribute *a;
+       for (a = $$; a->next; a = a->next);
+       a->next = $3;
+     }
    ;
 
 attribute
    : attribute_token
+   {
+     $$ = newAttribute ($1, 0);
+   }
    | attribute_token attribute_argument_clause
+   {
+     $$ = newAttribute ($1, 0);
+   }
    ;
 
 attribute_token
    : identifier
+     {
+       $$ = $1;
+       $$->next = 0;
+     }
    | identifier ATTRIBCOLON identifier
+     {
+       $$ = $1;
+       $$->next = $3;
+     }
    ;
 
 attribute_argument_clause

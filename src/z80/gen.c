@@ -308,7 +308,8 @@ z80_init_asmops (void)
   asmop_mone.aopu.aop_lit = constVal ("-1");
   asmop_mone.size = 1;
   memset (asmop_mone.regs, -1, 9);
-  
+
+  // Adjust returnregs in isReturned in peep.c accordingly when changing asmop_return here.
   asmop_return.type = AOP_REG;
   asmop_return.size = 4;
   memset (asmop_return.regs, -1, 9);
@@ -5341,7 +5342,11 @@ genEndFunction (iCode * ic)
       cost2 (2, 10, 7, 4, 0, 6, 2);
     }
   else
-    adjustStack (_G.stack.offset, !IS_TLCS90, TRUE, retsize == 0 || retsize > 4, !IY_RESERVED);
+    adjustStack (_G.stack.offset,
+      !IS_TLCS90,
+      retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] > retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] > retsize),
+      retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] > retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] > retsize),
+      !IY_RESERVED);
 
   if(!IS_GB && !_G.omitFramePtr)
     {

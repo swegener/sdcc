@@ -3548,9 +3548,11 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               for (args = FUNC_ARGS (type); args; args = args->next)
                 {
                   dbuf_printTypeChain (args->type, dbuf);
-                  if (args->next)
+                  if (args->next || FUNC_HASVARARGS(type))
                     dbuf_append_str (dbuf, ", ");
                 }
+              if (FUNC_HASVARARGS(type))
+                dbuf_append_str (dbuf, "...");
               dbuf_append_str (dbuf, ")");
               if (IFFUNC_ISREENT (type) && isTargetKeyword("__reentrant"))
                 dbuf_append_str (dbuf, " __reentrant");

@@ -121,39 +121,13 @@ isReturned(const char *what)
       NOTUSEDERROR();
       size = 4;
     }
+    
+  const char *returnregs = IS_GB ? "hlde" : "dehl";
 
-  if(!IS_GB)
-  {
-    switch(*what)
-      {
-      case 'd':
-        return(size >= 4);
-      case 'e':
-        return(size >= 3);
-      case 'h':
-        return(size >= 2);
-      case 'l':
-        return(size >= 1);
-      default:
-        return FALSE;
-      }
-  }
-  else
-  {
-    switch(*what)
-      {
-      case 'h':
-        return(size >= 4);
-      case 'l':
-        return(size >= 3);
-      case 'd':
-        return(size >= 2);
-      case 'e':
-        return(size >= 1);
-      default:
-        return FALSE;
-      }
-  }
+  for(int i = 0; i <= size; i++)
+    if(*what == returnregs[3 - i])
+      return true;
+  return false;
 }
 
 /*-----------------------------------------------------------------*/

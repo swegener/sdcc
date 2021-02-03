@@ -5450,20 +5450,16 @@ genRet (const iCode *ic)
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
 
-  if (size == 2)
+  if (size <= 4)
     {
-      fetchPairLong (IS_GB ? PAIR_DE : PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-    }
-  else if (size <= 4)
-    {
-      if (IC_LEFT (ic)->aop->type == AOP_REG)
-        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true, true);
-      else  if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
+      if (IC_LEFT (ic)->aop->type == AOP_REG || size <= 2)
+        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, size, true, true, true);
+      else  if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))) && aopInReg (ASMOP_RETURN, 0, DE_IDX) && aopInReg (ASMOP_RETURN, 2, HL_IDX))
         {
           fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), 0, 0);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
         }
-      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY)) // Use ld rr, (nn)
+      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY) && aopInReg (ASMOP_RETURN, 0, HL_IDX) && aopInReg (ASMOP_RETURN, 2, DE_IDX)) // Use ld rr, (nn)
         {
           fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 2);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 0);

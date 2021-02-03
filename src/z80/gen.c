@@ -242,7 +242,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_zero, asmop_one, asmop_mone, asmop_return;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_zero, asmop_one, asmop_mone, asmop_return, asmop_z88dk_fastcall_arg;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -259,6 +259,7 @@ static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
 static struct asmop *const ASMOP_RETURN = &asmop_return;
+static struct asmop *const ASMOP_Z88DK_FASTCALL_ARG = &asmop_z88dk_fastcall_arg;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
 
@@ -317,6 +318,8 @@ z80_init_asmops (void)
     z80_init_reg_asmop(&asmop_return, (const signed char[]){E_IDX, D_IDX, L_IDX, H_IDX, -1});
   else
     z80_init_reg_asmop(&asmop_return, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
+    
+  z80_init_reg_asmop(&asmop_z88dk_fastcall_arg, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
 }
 
 static bool regalloc_dry_run;
@@ -4787,11 +4790,11 @@ static void genSend (const iCode *ic)
       _saveRegsForCall (walk, FALSE);
     }
 
-  genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  genMove_o (ASMOP_Z88DK_FASTCALL_ARG, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   
   for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
     if (!regalloc_dry_run)
-      z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
+      z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_Z88DK_FASTCALL_ARG->aopu.aop_reg[i]->rIdx] = true;
 
   freeAsmop (IC_LEFT (ic), NULL);
 }
@@ -12394,7 +12397,7 @@ genReceive (const iCode *ic)
   operand *result = IC_RESULT (ic);
   aopOp (result, ic, FALSE, FALSE);
 
-  genMove (result->aop, ASMOP_RETURN, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  genMove (result->aop, ASMOP_Z88DK_FASTCALL_ARG, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   freeAsmop (IC_RESULT (ic), NULL);
 }

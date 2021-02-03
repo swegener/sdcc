@@ -5037,7 +5037,7 @@ genCall (const iCode *ic)
   _G.stack.pushed += prestackadjust;
 
   /* Mark the registers as restored. */
-  _G.saves.saved = FALSE;
+  _G.saves.saved = false;
 
   /* adjust the stack for parameters if required */
   if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (ftype) || z88dk_callee))
@@ -5045,12 +5045,17 @@ genCall (const iCode *ic)
       if (!regalloc_dry_run)
         {
           _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
-          z80_symmParm_in_calls_from_current_function = FALSE;
+          z80_symmParm_in_calls_from_current_function = false;
         }
     }
   else if ((ic->parmBytes || bigreturn))
     {
-      adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned || bigreturn, !IY_RESERVED);
+      bool return_in_reg = SomethingReturned && !bigreturn;
+      adjustStack (ic->parmBytes + bigreturn * 2,
+        !IS_TLCS90 && (!return_in_reg || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] > IC_RESULT (ic)->aop->size) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] > IC_RESULT (ic)->aop->size) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] > IC_RESULT (ic)->aop->size),
+        !IY_RESERVED);
 
       if (regalloc_dry_run)
         _G.stack.pushed += ic->parmBytes + bigreturn * 2;

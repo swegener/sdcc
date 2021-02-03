@@ -262,78 +262,37 @@ static struct asmop *const ASMOP_RETURN = &asmop_return;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
 
+// Init aop as a an asmop for data in registers, as given by the -1-terminated array regidx.
+static void
+z80_init_reg_asmop(asmop *aop, const signed char *regidx)
+{
+  aop->type = AOP_REG;
+  aop->size = 0;
+  memset (aop->regs, -1, sizeof(aop->regs));
+  
+  for(int i = 0; regidx[i] >= 0; i++)
+    {
+      aop->aopu.aop_reg[i] = regsZ80 + regidx[i];
+      aop->regs[regidx[i]] = i;
+      aop->size++;
+    }
+}
+
 void
 z80_init_asmops (void)
 {
-  asmop_a.type = AOP_REG;
-  asmop_a.size = 1;
-  asmop_a.aopu.aop_reg[0] = regsZ80 + A_IDX;
-  memset (asmop_a.regs, -1, 9);
-  asmop_a.regs[A_IDX] = 0;
-  asmop_b.type = AOP_REG;
-  asmop_b.size = 1;
-  asmop_b.aopu.aop_reg[0] = regsZ80 + B_IDX;
-  memset (asmop_b.regs, -1, 9);
-  asmop_b.regs[B_IDX] = 0;
-  asmop_c.type = AOP_REG;
-  asmop_c.size = 1;
-  asmop_c.aopu.aop_reg[0] = regsZ80 + C_IDX;
-  memset (asmop_c.regs, -1, 9);
-  asmop_c.regs[C_IDX] = 0;
-  asmop_d.type = AOP_REG;
-  asmop_d.size = 1;
-  asmop_d.aopu.aop_reg[0] = regsZ80 + D_IDX;
-  memset (asmop_d.regs, -1, 9);
-  asmop_d.regs[D_IDX] = 0;
-  asmop_e.type = AOP_REG;
-  asmop_e.size = 1;
-  asmop_e.aopu.aop_reg[0] = regsZ80 + E_IDX;
-  memset (asmop_e.regs, -1, 9);
-  asmop_e.regs[E_IDX] = 0;
-  asmop_h.type = AOP_REG;
-  asmop_h.size = 1;
-  asmop_h.aopu.aop_reg[0] = regsZ80 + H_IDX;
-  memset (asmop_h.regs, -1, 9);
-  asmop_h.regs[H_IDX] = 0;
-  asmop_l.type = AOP_REG;
-  asmop_l.size = 1;
-  asmop_l.aopu.aop_reg[0] = regsZ80 + L_IDX;
-  memset (asmop_l.regs, -1, 9);
-  asmop_l.regs[L_IDX] = 0;
-  asmop_iyh.type = AOP_REG;
-  asmop_iyh.size = 1;
-  asmop_iyh.aopu.aop_reg[0] = regsZ80 + IYH_IDX;
-  memset (asmop_iyh.regs, -1, 9);
-  asmop_iyh.regs[IYH_IDX] = 0;
-  asmop_iyl.type = AOP_REG;
-  asmop_iyl.size = 1;
-  asmop_iyl.aopu.aop_reg[0] = regsZ80 + IYL_IDX;
-  memset (asmop_iyl.regs, -1, 9);
-  asmop_iyl.regs[IYL_IDX] = 0;
-
-  asmop_hl.type = AOP_REG;
-  asmop_hl.size = 2;
-  asmop_hl.aopu.aop_reg[0] = regsZ80 + L_IDX;
-  asmop_hl.aopu.aop_reg[1] = regsZ80 + H_IDX;
-  memset (asmop_hl.regs, -1, 9);
-  asmop_hl.regs[L_IDX] = 0;
-  asmop_hl.regs[H_IDX] = 1;
-
-  asmop_de.type = AOP_REG;
-  asmop_de.size = 2;
-  asmop_de.aopu.aop_reg[0] = regsZ80 + E_IDX;
-  asmop_de.aopu.aop_reg[1] = regsZ80 + D_IDX;
-  memset (asmop_de.regs, -1, 9);
-  asmop_de.regs[E_IDX] = 0;
-  asmop_de.regs[D_IDX] = 1;
-
-  asmop_bc.type = AOP_REG;
-  asmop_bc.size = 2;
-  asmop_bc.aopu.aop_reg[0] = regsZ80 + C_IDX;
-  asmop_bc.aopu.aop_reg[1] = regsZ80 + B_IDX;
-  memset (asmop_bc.regs, -1, 9);
-  asmop_bc.regs[C_IDX] = 0;
-  asmop_bc.regs[B_IDX] = 1;
+  z80_init_reg_asmop(&asmop_a, (const signed char[]){A_IDX, -1});
+  z80_init_reg_asmop(&asmop_b, (const signed char[]){B_IDX, -1});
+  z80_init_reg_asmop(&asmop_c, (const signed char[]){C_IDX, -1});
+  z80_init_reg_asmop(&asmop_d, (const signed char[]){D_IDX, -1});
+  z80_init_reg_asmop(&asmop_e, (const signed char[]){E_IDX, -1});
+  z80_init_reg_asmop(&asmop_h, (const signed char[]){H_IDX, -1});
+  z80_init_reg_asmop(&asmop_l, (const signed char[]){L_IDX, -1});
+  z80_init_reg_asmop(&asmop_iyh, (const signed char[]){IYH_IDX, -1});
+  z80_init_reg_asmop(&asmop_iyl, (const signed char[]){IYL_IDX, -1});
+  z80_init_reg_asmop(&asmop_hl, (const signed char[]){L_IDX, H_IDX, -1});
+  z80_init_reg_asmop(&asmop_de, (const signed char[]){E_IDX, D_IDX, -1});
+  z80_init_reg_asmop(&asmop_bc, (const signed char[]){C_IDX, B_IDX, -1});
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.aopu.aop_lit = constVal ("0");
@@ -354,27 +313,9 @@ z80_init_asmops (void)
   asmop_return.size = 4;
   memset (asmop_return.regs, -1, 9);
   if (IS_GB)
-    {
-      asmop_return.aopu.aop_reg[0] = regsZ80 + E_IDX;
-      asmop_return.regs[E_IDX] = 0;
-      asmop_return.aopu.aop_reg[1] = regsZ80 + D_IDX;
-      asmop_return.regs[D_IDX] = 1;
-      asmop_return.aopu.aop_reg[2] = regsZ80 + L_IDX;
-      asmop_return.regs[L_IDX] = 2;
-      asmop_return.aopu.aop_reg[3] = regsZ80 + H_IDX;
-      asmop_return.regs[H_IDX] = 3;
-    }
+    z80_init_reg_asmop(&asmop_return, (const signed char[]){E_IDX, D_IDX, L_IDX, H_IDX, -1});
   else
-    {
-      asmop_return.aopu.aop_reg[0] = regsZ80 + L_IDX;
-      asmop_return.regs[L_IDX] = 0;
-      asmop_return.aopu.aop_reg[1] = regsZ80 + H_IDX;
-      asmop_return.regs[H_IDX] = 1;
-      asmop_return.aopu.aop_reg[2] = regsZ80 + E_IDX;
-      asmop_return.regs[E_IDX] = 2;
-      asmop_return.aopu.aop_reg[3] = regsZ80 + D_IDX;
-      asmop_return.regs[D_IDX] = 3;
-    }
+    z80_init_reg_asmop(&asmop_return, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
 }
 
 static bool regalloc_dry_run;

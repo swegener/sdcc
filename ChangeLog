@@ -2,6 +2,9 @@
 
 	* src/SDCCsymt.c:
 	  Fix printing of function with variable arguments (e.g. for debug dumps).
+	* src/z80/gen.c,
+	  src/stm8/gen.c:
+	  Refactor register asmop intialization.
 
 2020-02-02 Philipp Klaus Krause <pkk AT spth.de>
 

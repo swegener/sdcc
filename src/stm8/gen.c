@@ -132,77 +132,31 @@ static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
 
+// Init aop as a an asmop for data in registers, as given by the -1-terminated array regidx.
+static void
+stm8_init_reg_asmop(asmop *aop, const signed char *regidx)
+{
+  aop->type = AOP_REG;
+  aop->size = 0;
+  memset (aop->regs, -1, sizeof(aop->regs));
+  
+  for(int i = 0; regidx[i] >= 0; i++)
+    {
+      aop->aopu.bytes[i].byteu.reg = stm8_regs + regidx[i];
+      aop->regs[regidx[i]] = i;
+      aop->aopu.bytes[i].in_reg = true;
+      aop->size++;
+    }
+}
+
 void
 stm8_init_asmops (void)
 {
-  asmop_a.type = AOP_REG;
-  asmop_a.size = 1;
-  asmop_a.aopu.bytes[0].in_reg = TRUE;
-  asmop_a.aopu.bytes[0].byteu.reg = stm8_regs + A_IDX;
-  asmop_a.regs[A_IDX] = 0;
-  asmop_a.regs[XL_IDX] = -1;
-  asmop_a.regs[XH_IDX] = -1;
-  asmop_a.regs[YL_IDX] = -1;
-  asmop_a.regs[YH_IDX] = -1;
-  asmop_a.regs[C_IDX] = -1;
-
-  asmop_x.type = AOP_REG;
-  asmop_x.size = 2;
-  asmop_x.aopu.bytes[0].in_reg = TRUE;
-  asmop_x.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
-  asmop_x.aopu.bytes[1].in_reg = TRUE;
-  asmop_x.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
-  asmop_x.regs[A_IDX] = -1;
-  asmop_x.regs[XL_IDX] = 0;
-  asmop_x.regs[XH_IDX] = 1;
-  asmop_x.regs[YL_IDX] = -1;
-  asmop_x.regs[YH_IDX] = -1;
-  asmop_x.regs[C_IDX] = -1;
-
-  asmop_y.type = AOP_REG;
-  asmop_y.size = 2;
-  asmop_y.aopu.bytes[0].in_reg = TRUE;
-  asmop_y.aopu.bytes[0].byteu.reg = stm8_regs + YL_IDX;
-  asmop_y.aopu.bytes[1].in_reg = TRUE;
-  asmop_y.aopu.bytes[1].byteu.reg = stm8_regs + YH_IDX;
-  asmop_y.regs[A_IDX] = -1;
-  asmop_y.regs[XL_IDX] = -1;
-  asmop_y.regs[XH_IDX] = -1;
-  asmop_y.regs[YL_IDX] = 0;
-  asmop_y.regs[YH_IDX] = 1;
-  asmop_y.regs[C_IDX] = -1;
-
-  asmop_xy.type = AOP_REG;
-  asmop_xy.size = 4;
-  asmop_xy.aopu.bytes[0].in_reg = TRUE;
-  asmop_xy.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
-  asmop_xy.aopu.bytes[1].in_reg = TRUE;
-  asmop_xy.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
-  asmop_xy.aopu.bytes[2].in_reg = TRUE;
-  asmop_xy.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
-  asmop_xy.aopu.bytes[3].in_reg = TRUE;
-  asmop_xy.aopu.bytes[3].byteu.reg = stm8_regs + YH_IDX;
-  asmop_xy.regs[A_IDX] = -1;
-  asmop_xy.regs[XL_IDX] = 0;
-  asmop_xy.regs[XH_IDX] = 1;
-  asmop_xy.regs[YL_IDX] = 2;
-  asmop_xy.regs[YH_IDX] = 3;
-  asmop_xy.regs[C_IDX] = -1;
-
-  asmop_xyl.type = AOP_REG;
-  asmop_xyl.size = 3;
-  asmop_xyl.aopu.bytes[0].in_reg = TRUE;
-  asmop_xyl.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
-  asmop_xyl.aopu.bytes[1].in_reg = TRUE;
-  asmop_xyl.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
-  asmop_xyl.aopu.bytes[2].in_reg = TRUE;
-  asmop_xyl.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
-  asmop_xyl.regs[A_IDX] = -1;
-  asmop_xyl.regs[XL_IDX] = 0;
-  asmop_xyl.regs[XH_IDX] = 1;
-  asmop_xyl.regs[YL_IDX] = 2;
-  asmop_xyl.regs[YH_IDX] = -1;
-  asmop_xyl.regs[C_IDX] = -1;
+  stm8_init_reg_asmop(&asmop_a, (const signed char[]){A_IDX, -1});
+  stm8_init_reg_asmop(&asmop_x, (const signed char[]){XL_IDX, XH_IDX, -1});
+  stm8_init_reg_asmop(&asmop_y, (const signed char[]){YL_IDX, YH_IDX, -1});
+  stm8_init_reg_asmop(&asmop_xy, (const signed char[]){XL_IDX, XH_IDX, YL_IDX, YH_IDX, -1});
+  stm8_init_reg_asmop(&asmop_xyl, (const signed char[]){XL_IDX, XH_IDX, YL_IDX, -1});
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;

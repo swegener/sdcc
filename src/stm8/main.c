@@ -156,7 +156,6 @@ stm8_init (void)
   asm_addTree (&asm_asxxxx_mapping);
 }
 
-
 static void
 stm8_reset_regparm (struct sym_link *funcType)
 {

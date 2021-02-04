@@ -5346,7 +5346,7 @@ genEndFunction (iCode * ic)
     }
   else
     adjustStack (_G.stack.offset,
-      !IS_TLCS90,
+      !IS_TLCS90 && (retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] > retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] > retsize)),
       retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] > retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] > retsize),
       retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] > retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] > retsize),
       !IY_RESERVED);

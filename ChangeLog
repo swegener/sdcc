@@ -1,3 +1,8 @@
+2020-02-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Make end-of-call stack adjustment tolerate return value in a.
+
 2020-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

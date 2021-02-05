@@ -1,25 +1,30 @@
-2020-02-04 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCattr.c: fix include filename
+	* ChangeLog: it's no longer 2020
+
+2021-02-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Make end-of-call stack adjustment tolerate return value in a.
 
-2020-02-03 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Separate __z88dk_fastcall registers from return value registers.
 
-2020-02-03 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix a bug in code generation for wide unary minus with upper operand word in hl.
 
-2020-02-03 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/z80/peep.c:
 	  Refactor handling of return value registers.
 
-2020-02-03 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:
 	  Fix printing of function with variable arguments (e.g. for debug dumps).
@@ -27,7 +32,7 @@
 	  src/stm8/gen.c:
 	  Refactor register asmop intialization.
 
-2020-02-02 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCattr.h,
 	  src/SDCCattr.c,
@@ -36,20 +41,20 @@
 	  src/Makefile.in:
 	  Infrastructure for attributes.
 
-2020-02-01 Philipp Klaus Krause <pkk AT spth.de>
+2021-02-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Fix bug #3174.
 
-2020-01-29 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
 	  Fix bug #3173.
 	* src/z80/peeph.def:
 	  Split rule for add from adc, sbc rule due to differences in flag handling.
 
-2020-01-27 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
 	  Pick some improvements from patch #362 by Visenri.
@@ -58,40 +63,40 @@
 	* device/lib/_strcpy.c:
 	  Pick a fix from noasm2 branch.
 
-2020-01-26 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
 	  Pick some improvements from patch #362 by Visenri.
 
-2020-01-25 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
 	  Pick some improvements from patch #362 by Visenri.
 
-2020-01-22 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
 	  Fix bug #3170.
 
-2020-01-21 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3169.c:
 	  Fix bug #3169.
 
-2020-01-12 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix an issue in handling of non-dead a in __sfr access, possibly bug #3168.
 
-2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/pdk/gen.c,
 	  support/regression/tests/bug-3167.c:
 	  Fix bug #3167.
 
-2020-01-01 Philipp Klaus Krause <pkk AT spth.de>
+2021-01-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix an issue in handling surviving a when assigning single bytes from (hl) to stack.

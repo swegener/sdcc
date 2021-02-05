@@ -20,7 +20,7 @@
 
 #include "SDCCattr.h"
 #include "SDCCsymt.h"
-#include "src/SDCCutil.h"
+#include "SDCCutil.h"
 #include "newalloc.h"
 
 attribute *newAttribute(const symbol *token_sym, const char *argument_clause)

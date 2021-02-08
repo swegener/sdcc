@@ -1,5 +1,9 @@
 2021-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* src/SDCCpeeph.c: fix function names in error messages
+
+2021-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* support/makebin/makebin.c: add patch #360
 
 2021-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

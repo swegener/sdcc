@@ -1124,7 +1124,7 @@ FBYNAME (notUsedFrom)
   if (port->peep.notUsedFrom)
     return port->peep.notUsedFrom (what, label, head);
 
-  fprintf (stderr, "Function notUsed not initialized in port structure\n");
+  fprintf (stderr, "Function notUsedFrom not initialized in port structure\n");
   return FALSE;
 }
 
@@ -1140,7 +1140,7 @@ FBYNAME (unusedReg)
   if (sscanf (cmdLine, " %%%d%n", &dst, &n) != 1 || dst <= 0)
     {
       fprintf (stderr,
-               "*** internal error: unusedReg() peephole restriction"
+               "*** internal error: unusedReg peephole restriction"
                " malformed: %s\n", cmdLine);
       return FALSE;
     }
@@ -1149,7 +1149,7 @@ FBYNAME (unusedReg)
   if (!operands || elementsInSet (operands) < 2 || elementsInSet (operands) > 3)
     {
       fprintf (stderr,
-               "*** internal error: canAssign peephole restriction"
+               "*** internal error: unusedReg peephole restriction"
                " malformed: %s\n", cmdLine);
       return FALSE;
     }

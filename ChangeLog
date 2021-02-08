@@ -1,3 +1,7 @@
+2021-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* support/makebin/makebin.c: add patch #360
+
 2021-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCattr.c: fix include filename

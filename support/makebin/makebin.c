@@ -4,6 +4,8 @@
   Copyright (c) 2000 Michael Hope
   Copyright (c) 2010 Borut Razem
   Copyright (c) 2012 Noel Lemouel
+  Copyright (c) 2020-2021 Sebastian 'basxto' Riedel
+  Copyright (c) 2020 'bbbbbr'
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -90,7 +92,7 @@ usage (void)
            "  -s romsize     size of the binary file (default: rom banks * 16384)\n"
            "  -Z             genarate GameBoy format binary file\n"
            "GameBoy format options (applicable only with -Z option):\n"
-           "  -yo n          number of rom banks (default: 2)\n"
+           "  -yo n          number of rom banks (default: 2) (autosize: A)\n"
            "  -ya n          number of ram banks (default: 0)\n"
            "  -yt n          MBC type (default: no MBC)\n"
            "  -yl n          old licensee code (default: 0x33)\n"
@@ -118,6 +120,7 @@ struct gb_opt_s
   BYTE is_gbc;                    /* 1 if GBC compatible, 2 if GBC only, false for all other*/
   BYTE is_sgb;                    /* True if SGB, false for all other*/
   BYTE non_jp;                    /* True if non-Japanese region, false for all other*/
+  BYTE rom_banks_autosize;        /* True if rom banks should be auto-sized (default false)*/
 };
 
 void
@@ -302,7 +305,41 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 }
 
 int
-read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
+rom_autosize_grow(BYTE **rom, int test_size, int *size, struct gb_opt_s *o)
+{
+  int last_size = *size;
+
+  while ((test_size > *size) && (o->nb_rom_banks <= 512))
+    {
+      o->nb_rom_banks *= 2;
+      // banks work differently for mbc6, they have half the size
+      // but this in general ignored by -yo
+      *size = o->nb_rom_banks * 0x4000;
+    }
+
+  if (o->nb_rom_banks > 512)
+    {
+      fprintf (stderr, "error: auto-size banks exceeded max of 512 banks.\n");
+      return 0;
+    }
+  else
+    {
+      BYTE * t_rom = *rom;
+      *rom = realloc (*rom, *size);
+      if (*rom == NULL)
+        {
+          free(t_rom);
+          fprintf (stderr, "error: couldn't re-allocate size for larger rom image.\n");
+          return 0;
+        }
+      memset (*rom + last_size, FILL_BYTE, *size - last_size);
+    }
+
+  return 1;
+}
+
+int
+read_ihx (FILE *fin, BYTE **rom, int *size, int *real_size, struct gb_opt_s *o)
 {
   int record_type;
 
@@ -356,16 +393,25 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
           return 0;
         }
 
-      if (addr + nbytes > size)
+      if (addr + nbytes > *size)
         {
-          fprintf (stderr, "error: size of the buffer is too small.\n");
-          return 0;
+          // If auto-size is enabled, grow rom bank size by power of 2 when needed
+          if (o->rom_banks_autosize)
+            {
+              if (rom_autosize_grow(rom, addr + nbytes, size, o) == 0)
+                return 0;
+            }
+          else
+            {
+              fprintf (stderr, "error: size of the buffer is too small.\n");
+              return 0;
+            }
         }
 
       while (nbytes--)
         {
-          if (addr < size)
-            rom[addr++] = getbyte (fin, &sum);
+          if (addr < *size)
+            (*rom)[addr++] = getbyte (fin, &sum);
         }
 
       if (addr > *real_size)
@@ -395,7 +441,7 @@ main (int argc, char **argv)
   FILE *fin, *fout;
   int ret;
   int gb = 0;
-  struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0 };
+  struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0 , 0};
 
 #if defined(_WIN32)
   setmode (fileno (stdout), O_BINARY);
@@ -442,8 +488,14 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              gb_opt.nb_rom_banks = strtoul (*argv, NULL, 0);
-              size = gb_opt.nb_rom_banks * 0x4000;
+              // Use auto-size for rom banks if -yto size param is 'A'
+              if ((*argv)[0] == 'A' || (*argv)[0] == 'a')
+                  gb_opt.rom_banks_autosize = 1;
+              else
+                {
+                  gb_opt.nb_rom_banks = strtoul (*argv, NULL, 0);
+                  size = gb_opt.nb_rom_banks * 0x4000;
+                }
               break;
 
             case 'a':
@@ -551,7 +603,7 @@ main (int argc, char **argv)
     }
   memset (rom, FILL_BYTE, size);
 
-  ret = read_ihx (fin, rom, size, &real_size, gb);
+  ret = read_ihx (fin, &rom, &size, &real_size, &gb_opt);
 
   fclose (fin);
 

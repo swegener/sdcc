@@ -25,7 +25,7 @@
 bool z80notUsed(const char *what, lineNode *endPl, lineNode *head);
 bool z80notUsedFrom(const char *what, const char *label, lineNode *head);
 bool z80canAssign (const char *dst, const char *src, const char *exotic);
-bool z80symmParmStack (void);
+bool z80symmParmStack (const char *name);
 bool z80canJoinRegs (const char **regs, char dst[20]);
 bool z80canSplitReg (const char *reg, char dst[][16], int nDst);
 int z80instructionSize(lineNode *node);

@@ -1642,8 +1642,10 @@ int z80instructionSize(lineNode *pl)
   return(999);
 }
 
-bool z80symmParmStack (void)
+bool z80symmParmStack (const char *name)
 {
+  if (!strcmp (name, "___sdcc_enter_ix"))
+   return false;
   return z80_symmParm_in_calls_from_current_function;
 }
 

@@ -1500,9 +1500,25 @@ FBYNAME (notSimilar)
 /*-----------------------------------------------------------------*/
 FBYNAME (symmParmStack)
 {
+  set *operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+  {
+    fprintf (stderr,
+             "*** internal error: symmParmStack peephole restriction"
+             " requires operand: %s\n", cmdLine);
+    return FALSE;
+  }
+
+  const char *name = setFirstItem (operands);
+
+  bool ret = false;
+
   if (port->peep.symmParmStack)
-    return port->peep.symmParmStack();
-  return FALSE;
+    return port->peep.symmParmStack (name);
+  deleteSet(&operands);
+
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/

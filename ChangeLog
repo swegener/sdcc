@@ -1,3 +1,13 @@
+2021-02-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c
+	  src/port.h
+	  src/z80/gen.c
+	  src/z80/peep.c
+	  src/z80/peep.h,
+	  support/regression/tests/bug-3178.c:
+	  Fix bug #3178.
+
 2021-02-09 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCerr.c,

@@ -593,6 +593,8 @@ struct
      "sequence of differently prefixed string literals", 0 },
   { W_DIGIT_SEPARATOR_C23, ERROR_LEVEL_WARNING,
      "digit separators require ISO C23 or later", 0 },
+  { E_INVALID_LANG_OVERRIDE, ERROR_LEVEL_ERROR,
+     "argument to option -x is not a valid file type override", 0},
 };
 
 /* -------------------------------------------------------------------------------

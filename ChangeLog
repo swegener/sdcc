@@ -1,3 +1,10 @@
+2021-02-09 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCmain.c:
+	  Add language override option -x (feature request #667).
+
 2021-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/SDCCpeeph.c: fix function names in error messages

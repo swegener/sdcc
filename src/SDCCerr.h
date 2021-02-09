@@ -292,6 +292,7 @@ enum {
   E_U8CHAR_STRING_C11           = 262, /* unicode string literal requires ISO C 11 or later */
   W_PREFIXED_STRINGS            = 263, /* sequence of differently prefixed string literals */
   W_DIGIT_SEPARATOR_C23         = 264, /* digit separators require ISO C23 or later */
+  E_INVALID_LANG_OVERRIDE       = 265, /* argument to option -x is not a valid file type override */
   
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -76,6 +76,15 @@ set *userIncDirsSet = NULL;     /* list of user include directories */
 set *libDirsSet = NULL;         /* list of lib search directories */
 bool regalloc_dry_run = FALSE;
 
+/* language override constants and variable for handling -x during command line parsing */
+enum
+{
+  LANG_OVERRIDE_NONE,
+  LANG_OVERRIDE_C,
+  LANG_OVERRIDE_C_HEADER
+};
+int langOverride = LANG_OVERRIDE_NONE;
+
 static const char *dstPath = "";          /* path for the output files; */
                                           /* "" is equivalent with cwd */
 static const char *moduleNameBase = NULL; /* module name base is source file without path and extension */
@@ -176,6 +185,7 @@ static const OPTION optionsTable[] = {
   {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
   {0,   "--c1mode", &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code."},
   {'o', NULL, NULL, "Place the output into the given path resp. file"},
+  {'x', NULL, NULL, "Optional file type override (c, c-header or none), valid until the next -x"},
   {0,   OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
   {0,   OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
   {0,   OPTION_USE_STDOUT, NULL, "send errors to stdout instead of stderr"},
@@ -283,7 +293,6 @@ typedef struct
 
 static const UNSUPPORTEDOPT unsupportedOptTable[] = {
   {'X', NULL, "use --xstack-loc instead"},
-  {'x', NULL, "use --xstack instead"},
   {'i', NULL, "use --idata-loc instead"},
   {'r', NULL, "use --xdata-loc instead"},
   {'s', NULL, "use --code-loc instead"},
@@ -673,7 +682,7 @@ processFile (char *s)
   /* get the file extension.
      If no '.' then we don't know what the file type is
      so give an error and return */
-  if (!dbuf_splitFile (s, &path, &ext))
+  if (!dbuf_splitFile (s, &path, &ext) && langOverride == LANG_OVERRIDE_NONE)
     {
       werror (E_UNKNOWN_FEXT, s);
 
@@ -685,7 +694,8 @@ processFile (char *s)
 
   /* otherwise depending on the file type */
   extp = dbuf_c_str (&ext);
-  if (STRCASECMP (extp, ".c") == 0 || STRCASECMP (extp, ".h") == 0)
+  if (STRCASECMP (extp, ".c") == 0 || langOverride == LANG_OVERRIDE_C
+      || STRCASECMP (extp, ".h") == 0 || langOverride == LANG_OVERRIDE_C_HEADER)
     {
       char *p, *m;
 
@@ -1371,6 +1381,21 @@ parseCmdLine (int argc, char **argv)
                     else
                       dbuf_destroy (&path);
                   }
+                break;
+              }
+
+            case 'x':
+              {
+                char *langName = getStringArg ("-x", argv, &i, argc);
+
+                if (strcmp (langName, "none") == 0)
+                  langOverride = LANG_OVERRIDE_NONE;
+                else if (strcmp (langName, "c") == 0)
+                  langOverride = LANG_OVERRIDE_C;
+                else if (strcmp (langName, "c-header") == 0)
+                  langOverride = LANG_OVERRIDE_C_HEADER;
+                else
+                  werror (E_INVALID_LANG_OVERRIDE);
                 break;
               }
 

@@ -102,6 +102,7 @@ usage (void)
            "  -yC            GameBoy Color only\n"
            "  -ys            Super GameBoy\n"
            "  -yj            set non-Japanese region flag\n"
+           "  -yp addr=value Set address in ROM to given value (address 0x100-0x1FE)\n"
            "Arguments:\n"
            "  <in_file>      optional IHX input file, '-' means stdin. (default: stdin)\n"
            "  <out_file>     optional output file, '-' means stdout. (default: stdout)\n");
@@ -121,6 +122,7 @@ struct gb_opt_s
   BYTE is_sgb;                    /* True if SGB, false for all other*/
   BYTE non_jp;                    /* True if non-Japanese region, false for all other*/
   BYTE rom_banks_autosize;        /* True if rom banks should be auto-sized (default false)*/
+  BYTE address_overwrite[16];     /* For limited compatibility with very old versions */
 };
 
 void
@@ -285,6 +287,44 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 
   rom[0x14B] = o->licensee_id;
 
+  for (i = 0; i < 16; i+=2)
+    {
+      if(o->address_overwrite[i] != 0xFF)
+        {
+          rom[0x0100 & o->address_overwrite[i]] = o->address_overwrite[i+1];
+          // warnings for builds ported from ancient GBDK
+          fprintf (stderr, "caution: -yp0x01%02x=0x%02x is outdated", o->address_overwrite[i], o->address_overwrite[i+1]);
+          if(o->address_overwrite[i] == 0x43)
+            switch(o->address_overwrite[i+1]&0xC0)
+              {
+              case 0x80:
+                fprintf (stderr, ", please use -yc instead");
+                break;
+              case 0xC0:
+                fprintf (stderr, ", please use -yC instead");
+                break;
+              default:
+                o->address_overwrite[i] = 0xFF;
+              }
+          if(o->address_overwrite[i] == 0x44 || o->address_overwrite[i] == 0x45)
+              fprintf (stderr, ", please use -yk cc instead");
+          if(o->address_overwrite[i] == 0x46)
+            if(o->address_overwrite[i+1] == 0x03)
+              fprintf (stderr, ", please use -ys instead");
+            else
+              o->address_overwrite[i] = 0xFF;
+          if(o->address_overwrite[i] == 0x47)
+            fprintf (stderr, ", please use -yt 0x%02x instead", o->address_overwrite[i+1]);
+          if(o->address_overwrite[i] == 0x4A)
+            fprintf (stderr, ", please use -yl 0x%02x instead", o->address_overwrite[i+1]);
+          if(o->address_overwrite[i] == 0x4B && o->address_overwrite[i+1] == 1)
+            fprintf (stderr, ", please use -yj instead");
+          if(o->address_overwrite[i] == 0xFF)
+            fprintf (stderr, ", this setting is the default");
+          fprintf (stderr, ".\n");
+        }
+    }
+
   /* Update complement checksum */
   chk = 0;
   for (i = 0x134; i < 0x14d; ++i)
@@ -436,12 +476,13 @@ read_ihx (FILE *fin, BYTE **rom, int *size, int *real_size, struct gb_opt_s *o)
 int
 main (int argc, char **argv)
 {
-  int size = 32768, pack = 0, real_size = 0;
+  int size = 32768, pack = 0, real_size = 0, i = 0;
+  char *token;
   BYTE *rom;
   FILE *fin, *fout;
   int ret;
   int gb = 0;
-  struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0 , 0};
+  struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0, 0, 0, {0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0}};
 
 #if defined(_WIN32)
   setmode (fileno (stdout), O_BINARY);
@@ -558,6 +599,24 @@ main (int argc, char **argv)
 
             case 'j':
               gb_opt.non_jp = 1;
+              break;
+
+            // like -yp0x143=0x80
+            case 'p':
+              // remove "-yp"
+              *argv += 3;
+              // effectively split string into argv and token
+              strtok(*argv, "=");
+              token = strtok(NULL, "=");
+              for (i = 0; i < 16; i+=2)
+                { 
+                  if(gb_opt.address_overwrite[i] == 0xFF)
+                    {
+                      gb_opt.address_overwrite[i] = strtoul (*argv, NULL, 0);
+                      gb_opt.address_overwrite[i+1] = strtoul (token, NULL, 0);
+                      break;
+                    }
+                }
               break;
 
             default:

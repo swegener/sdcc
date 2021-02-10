@@ -1,3 +1,7 @@
+2021-02-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* support/makebin/makebin.c: Add patch #364 (-yp)
+
 2021-02-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c

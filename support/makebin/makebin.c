@@ -384,10 +384,17 @@ int
 noi2sym (char *filename)
 {
   FILE *noi, *sym;
-  char *nname, *sname, *line, *address;
-  ssize_t read;
+  char *nname, *sname;
+  //ssize_t read;
+  char read = ' ';
+  // no$gmb's implementation is limited to 32 character labels
+  // we can safely throw away the rest
+  char label[33];
+  // 0x + 6 digit hex number
+  // -> 65536 rom banks is the maximum homebrew cartrideges support (TPP1)
+  char value[9];
   int name_len = strlen(filename);
-  size_t line_len = 0;
+  int i = 0;
   // copy filename's value to nname and sname
   nname = malloc((name_len+1) * sizeof(char));
   strcpy (nname, filename);
@@ -416,28 +423,71 @@ noi2sym (char *filename)
   // write header
   fprintf (sym, "; no$gmb compatible .sym file\n; Generated automagically by makebin\n");
   // iterate through .noi file
-  while ((read = getline(&line, &line_len, noi)) != -1) {
-    // replace space with \0
-    strtok(line, " ");// DEF
-    strtok(NULL, " ");// label
-    // filter out irrelevant lines and debug symbols
-    if(strcmp(line, "DEF") == 0 && strcmp(line+4, ".__.ABS.") != 0 && strncmp(line+4, "l__", 3) != 0)
-      {
-        address = strtok(NULL, " ");
-        if (!address)
-          fprintf (stderr, "error: can't parse line in noi file: %s %s\n", line, line+4);
-        else
-          {
-            // write in no$gmb format
-            strtok(address, "\n"); // replace \n with \0
-            fprintf (sym, "%02X:%04X %s\n", (unsigned int)(strtoul(address, NULL, 0)>>16), (unsigned int)strtoul(address, NULL, 0)&0xFFFF, line+4);
-          }
-      }
-  }
+  while (read != EOF && (read = fgetc(noi)) != EOF)
+    {
+      // just skip line breaks
+      if (read == '\r' || read == '\n')
+        continue;
+      // read first 4 chars
+      for (i = 0; i < 4; ++i)
+        {
+          value[i] = read;
+          if ((read = fgetc(noi)) == EOF || read == '\r' || read == '\n')
+            {
+              // leave for-loop
+              break;
+            }
+        }
+      // we left loop early
+      if (i != 4)
+        continue;
+      // only accept if line starts with this
+      if (strncmp(value, "DEF ", 4) == 0)
+        {
+          // read label
+          for (i = 0; i < 32; ++i)
+            {
+              label[i] = read;
+              if ((read = fgetc(noi)) == EOF || read == '\r' || read == '\n' || read == ' ')
+                {
+                  // leave for-loop
+                  break;
+                }
+            }
+          // skip rest of the label
+          while (read != EOF && read != '\r' && read != '\n' && read != ' ')
+            read = fgetc(noi);
+          // it has to be end of file or line if it's not space
+          if (read != ' ')
+            continue;
+          // strings have to end with \0
+          label[i+1] = '\0';
+          // read value
+          for (i = 0; i < 8; ++i)
+            {
+              value[i] = read;
+              if ((read = fgetc(noi)) == EOF || read == '\r' || read == '\n')
+                {
+                  // leave for-loop
+                  break;
+                }
+            }
+          // number is too long; ignore
+          if (read != EOF && read != '\r' && read != '\n')
+            continue;
+          value[i+1] = '\0';
+          // we successfully read label and value
 
-  // free space and close files
-  if (line)
-    free(line);
+          // but filter out some invalid symbols
+          if (strcmp(label, ".__.ABS.") != 0 && strncmp(label, "l__", 3) != 0)
+            fprintf (sym, "%02X:%04X %s\n", (unsigned int)(strtoul(value, NULL, 0)>>16), (unsigned int)strtoul(value, NULL, 0)&0xFFFF, label);
+        }
+      else
+        // skip until file/line end
+        while ((read = fgetc(noi))!= EOF && read != '\r' && read != '\n');
+    }
+
+  // free close files
   fclose (noi);
   fclose (sym);
 

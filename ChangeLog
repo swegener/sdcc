@@ -1,5 +1,9 @@
 2021-02-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* support/makebin/makebin.c: Replace getline with fgetc
+
+2021-02-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* support/makebin/makebin.c: Tone down filter of -yS
 
 2021-02-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>

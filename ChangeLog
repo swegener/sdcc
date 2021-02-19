@@ -1,3 +1,9 @@
+2021-02-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/lonesha256.c:
+	  Fix gbz80 xor code generation bug #3181.
+
 2021-02-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* support/makebin/makebin.c: Replace getline with fgetc

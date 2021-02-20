@@ -8,7 +8,7 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       4.0.0
+Version:       4.1.0
 Release:       2
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
@@ -19,7 +19,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
-(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+(formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
 HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
 Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
@@ -37,7 +37,7 @@ Requires:      sdcc
 SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
-(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+(formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
 HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
 Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
@@ -54,7 +54,7 @@ Summary:       Documentation for the SDCC C compiler
 SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
-(formerly Dallas) DS80C390 variants, Freescale (formerly Motorola)
+(formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
 HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
 Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
@@ -98,7 +98,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
-* Sat Jan 18 2029 - pkk AT spth.de
+* Sat Feb 20 2021 - pkk AT spth.de
+- version updated to 4.0.0
+* Sat Jan 18 2020 - pkk AT spth.de
 - version updated to 4.0.0
 * Fri Apr 05 2019 - krauseph AT informatik.uni-freiburg.de
 - version updated to 3.9.0

@@ -236,15 +236,12 @@ isOperandInReg (operand * op)
 static bool
 isOperandInFarSpace2 (operand * op)
 {
-  symbol * opsym;
-  
   if (isOperandInFarSpace (op))
     return TRUE;
 
   if (!IS_ITEMP (op))
     return FALSE;
-    
-  opsym = OP_SYMBOL (op);
+
   if (isOperandInReg (op))
     return FALSE;
 

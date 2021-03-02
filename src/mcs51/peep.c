@@ -553,7 +553,10 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
 static bool
 doPushScan (lineNode **pl, const char *pReg)
 {
-  lineNode *plConditional, *pushPl = NULL;
+#if 0
+  lineNode *pushPl = NULL;
+#endif
+  lineNode *plConditional;
 
   for (;; *pl = (*pl)->next)
     {
@@ -589,7 +592,7 @@ doPushScan (lineNode **pl, const char *pReg)
 #else
             /* two possible destinations: give up */
             return FALSE;
-#endif   
+#endif
           default:
             return FALSE;
         }

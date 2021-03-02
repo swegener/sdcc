@@ -1,3 +1,8 @@
+2021-03-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/ralloc.c (isOperandInFarSpace2): fixed warning
+	* src/mcs51/peep.c (doPushScan): fixed warning
+
 2021-02-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* .version,

@@ -985,11 +985,14 @@ cl_commander_base::input_avail_on_frozen(void)
 class cl_console_base *
 cl_commander_base::exec_on(class cl_console_base *cons, char *file_name)
 {
-  FILE *dummy= fopen(file_name, "r");
+  FILE *dummy;
   bool oped= false;
+  if ((file_name == NULL) || (*file_name == 0))
+    return 0;
+  dummy= fopen(file_name, "r");
   if (dummy)
     oped= true, fclose(dummy);
-  if (!cons || !file_name || !oped)
+  if (!cons || !oped)
     return 0;
 
   class cl_console_base *subcon = cons->clone_for_exec(file_name);

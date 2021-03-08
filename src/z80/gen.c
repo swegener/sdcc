@@ -3593,6 +3593,9 @@ skip_byte:
   // Last, move everything from stack to registers.
   for (int i = 0; i < n;)
     {
+      const bool a_free = a_dead && (result->regs[A_IDX] < 0 || !assigned[result->regs[A_IDX] - roffset]);
+      const bool hl_free = hl_dead && (result->regs[L_IDX] < 0 || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
+
       if (i + 1 < n && source->type == AOP_STK &&
         (aopInReg (result, roffset + i, HL_IDX) && IS_RAB ||
         (aopInReg (result, roffset + i, BC_IDX) || aopInReg (result, roffset + i, DE_IDX) || aopInReg (result, roffset + i, HL_IDX) || aopInReg (result, roffset + i, IY_IDX)) && (IS_EZ80_Z80 || IS_TLCS90)))
@@ -3608,7 +3611,6 @@ skip_byte:
      else if (i + 1 < n && source->type == AOP_STK &&
         aopInReg (result, roffset + i, DE_IDX) && IS_RAB)
         {
-          bool hl_free = hl_dead && (result->regs[L_IDX] < 0 || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
           if (!hl_free)
             emit2 ("ex de, hl");
           if (!regalloc_dry_run)
@@ -3623,7 +3625,11 @@ skip_byte:
         }
       else if (aopRS (result) && aopOnStack (source, soffset + i, 1) && !aopOnStack (result, roffset + i, 1))
         {
-          cheapMove (result, roffset + i, source, soffset + i, true);
+          if (requiresHL (source) && source->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
+          cheapMove (result, roffset + i, source, soffset + i, a_free);
+          if (requiresHL (source) && source->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
           assigned[i] = true;
           size--;
           i++;
@@ -3703,6 +3709,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
+      else if (getPairId_o(result, roffset + i) != PAIR_INVALID && (source->type == AOP_IY || source->type == AOP_DIR))
+        {
+          emit2 ("ld %s, !mems", _pairs[getPairId_o(result, roffset + i)].name, aopGetLitWordLong (source, soffset + i, false));
+          regalloc_dry_run_cost += 3 + (getPairId_o(result, roffset + i) != PAIR_HL);
+          i += 2;
+          continue;      
+        }
         
       else if(i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID)
         {
@@ -3739,7 +3752,11 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else
         {
+          if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
+            _push (PAIR_HL);
           cheapMove (result, roffset + i, source, soffset + i, a_dead_global);
+           if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
+            _pop (PAIR_HL);
           zeroed_a = false;
         }
 
@@ -8620,7 +8637,7 @@ genAnd (const iCode * ic, iCode * ifx)
             }
 
           /* Testing for the border bits of the accumulator destructively is cheap. */
-          if ((isLiteralBit (bytelit) == 0 || isLiteralBit (bytelit) == 7) && aopInReg (left->aop, 0, A_IDX) && !bitVectBitValue (ic->rSurv, A_IDX))
+          if ((isLiteralBit (bytelit) == 0 || isLiteralBit (bytelit) == 7) && aopInReg (left->aop, offset, A_IDX) && !bitVectBitValue (ic->rSurv, A_IDX))
             {
               emit3 (isLiteralBit (bytelit) == 0 ? A_RRCA : A_RLCA, 0 , 0);
               jumpcond = "C";
@@ -8802,7 +8819,7 @@ genAnd (const iCode * ic, iCode * ifx)
 
   for (int i = 0; i < size;)
     {
-      const bool hl_free = isPairDead (PAIR_HL, ic) &&
+      bool hl_free = isPairDead (PAIR_HL, ic) &&
         (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
 
@@ -8907,13 +8924,33 @@ genAnd (const iCode * ic, iCode * ifx)
 
       // Use plain and in a.
       if (aopInReg (right->aop, i, A_IDX))
-        emit3_o (A_AND, ASMOP_A, 0, left->aop, i);
+        {
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
+          emit3_o (A_AND, ASMOP_A, 0, left->aop, i);
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
+        }
       else
         {
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
           cheapMove (ASMOP_A, 0, left->aop, i, true);
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
+
+          if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
           emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
+          if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
         }
-      cheapMove (result->aop, i, ASMOP_A, 0, true);
+
+      hl_free = isPairDead (PAIR_HL, ic) &&
+        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i & right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
+        (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
+
+      genMove_o (result->aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));
 
       if (aopInReg (result->aop, i, A_IDX))
         a_free = false;
@@ -9039,7 +9076,7 @@ genOr (const iCode * ic, iCode * ifx)
 
   for (int i = 0; i < size;)
     {
-      const bool hl_free = isPairDead (PAIR_HL, ic) &&
+      bool hl_free = isPairDead (PAIR_HL, ic) &&
         (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
         
@@ -9151,13 +9188,34 @@ genOr (const iCode * ic, iCode * ifx)
         }
 
       if (aopInReg (right->aop, i, A_IDX))
-        emit3_o (A_OR, ASMOP_A, 0, left->aop, i);
+        {
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
+          emit3_o (A_OR, ASMOP_A, 0, left->aop, i);
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
+        }
       else
         {
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
           cheapMove (ASMOP_A, 0, left->aop, i, true);
+          if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
+
+          if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
+            _push (PAIR_HL);
           emit3_o (A_OR, ASMOP_A, 0, right->aop, i);
+          if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
+            _pop (PAIR_HL);
         }
-      cheapMove (result->aop, i, ASMOP_A, 0, true);
+
+      hl_free = isPairDead (PAIR_HL, ic) &&
+        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i & right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
+        (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
+
+      genMove_o (result->aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));
+        
       if (aopInReg (result->aop, i, A_IDX))
         a_free = false;
       i++;
@@ -9293,7 +9351,7 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
       
     for (int i = 0; i < size;)
       {
-        const bool hl_free = isPairDead (PAIR_HL, ic) &&
+        bool hl_free = isPairDead (PAIR_HL, ic) &&
           (left_aop->regs[L_IDX] < i && left_aop->regs[H_IDX] < i & right_aop->regs[L_IDX] < i && right_aop->regs[H_IDX] < i) &&
           (result_aop->regs[L_IDX] < 0 || result_aop->regs[L_IDX] >= i) && (result_aop->regs[H_IDX] < 0 || result_aop->regs[H_IDX] >= i);
         
@@ -9384,10 +9442,20 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
           }
 
         if (aopInReg (right_aop, i, A_IDX))
-          emit3_o (A_XOR, ASMOP_A, 0, left_aop, i);
+          {
+            if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
+              _push (PAIR_HL);
+            emit3_o (A_XOR, ASMOP_A, 0, left_aop, i);
+            if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
+              _pop (PAIR_HL);
+          }
         else
           {
+            if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
+               _push (PAIR_HL);
             cheapMove (ASMOP_A, 0, left_aop, i, true);
+            if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
+               _pop (PAIR_HL);
             if (right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) == 0xff)
               emit3 (A_CPL, 0, 0);
             else
@@ -9399,7 +9467,13 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
                   _pop (PAIR_HL);
               }
           }
-        cheapMove (result_aop, i, ASMOP_A, 0, true);
+          
+        hl_free = isPairDead (PAIR_HL, ic) &&
+          (left_aop->regs[L_IDX] <= i && left_aop->regs[H_IDX] <= i & right_aop->regs[L_IDX] <= i && right_aop->regs[H_IDX] <= i) &&
+          (result_aop->regs[L_IDX] < 0 || result_aop->regs[L_IDX] >= i) && (result_aop->regs[H_IDX] < 0 || result_aop->regs[H_IDX] >= i);
+
+        genMove_o (result_aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));
+
         if(result_aop->type == AOP_REG &&
           (left_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] > i || right_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] > i))
           {

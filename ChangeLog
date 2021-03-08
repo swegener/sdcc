@@ -1,6 +1,47 @@
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge sdcc-next branch to trunk.
+
 2021-03-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* .version: post release bump to 4.1.1
+
+2021-03-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Document the use of DWARF debug information with ELF binaries.
+
+2021-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improved handling of a.
+	* src/pdk/gen.c,
+	  support/regression/tests/rotate2.c:
+	  Fix bug #3185.
+
+2021-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improved handling of hl.
+
+2021-03-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improved handling of hl in binary bitwise operators.
+
+2021-03-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix another issue related to bug #3181.
+	* src/stm8/gen.c:
+	  exg, exgw handling cleanup, picked from patch #363 by Visenri.
+	* support/regression/tests/rotate2.c:
+	  Tests for rotation and swap, picked from patch #363 by Visenri.
+	* sdas/linksrc/lksdcdb.c:
+	  Fix a debug info issue, patch #346 by Benedikt Kleiner.
 
 2021-03-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

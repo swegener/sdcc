@@ -55,6 +55,8 @@ enum asminst
   A_CPLW,
   A_DEC,
   A_DECW,
+  A_EXG,
+  A_EXGW,
   A_INC,
   A_INCW,
   A_LD,
@@ -77,6 +79,7 @@ enum asminst
   A_SRLW,
   A_SUB,
   A_SWAP,
+  A_SWAPW,
   A_TNZ,
   A_TNZW,
   A_XOR
@@ -95,6 +98,8 @@ static const char *asminstnames[] =
   "cplw",
   "dec",
   "decw",
+  "exg",
+  "exgw",
   "inc",
   "incw",
   "ld",
@@ -117,6 +122,7 @@ static const char *asminstnames[] =
   "srlw",
   "sub",
   "swap",
+  "swapw",
   "tnz",
   "tnzw",
   "xor"
@@ -576,6 +582,15 @@ opw_cost2 (const asmop *op1, int offset1)
 }
 
 static void
+exg_cost (const asmop *op2)
+{
+  if (op2->type == AOP_DIR)
+    cost (3, 3);
+  else
+    cost (1, 1);
+}
+
+static void
 ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
 {
   int r1Idx, r2Idx;
@@ -705,6 +720,9 @@ emit3cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
   case A_DEC:
     op_cost (op1, offset1);
     break;
+  case A_EXG:
+    exg_cost (op2);
+    break;
   case A_LD:
     ld_cost (op1, offset1, op2, offset2);
     break;
@@ -759,6 +777,11 @@ emit3wcost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
   case A_INCW:
     opw_cost (op1, offset1);
     break;
+  case A_EXGW:
+    if (offset1 != 0 || offset2 != 0 || !aopSame (op1, 0, ASMOP_X, 0, 2) || !aopSame (op2, 0, ASMOP_Y, 0, 2))
+      wassertl_bt (0, "Tried to get cost for EXGW with invalid arguments");
+    cost (1, 1);
+    break;
   case A_NEGW:
   case A_RLCW:
     opw_cost2 (op1, offset1);
@@ -777,6 +800,9 @@ emit3wcost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
   case A_SRLW:
   case A_TNZW:
     opw_cost2 (op1, offset1);
+    break;
+  case A_SWAPW:
+    opw_cost (op1, offset1);
     break;
   default:
     wassertl_bt (0, "Tried to get cost for unknown 16-bit instruction");
@@ -1222,15 +1248,13 @@ void swap_to_a(int idx)
 	case A_IDX:
       break;
     case XL_IDX:
-      emit2 ("exg", "a, xl");
-      cost (1, 1);
+      emit3 (A_EXG, ASMOP_A, ASMOP_X);
       break;
     case XH_IDX:
       emit3w (A_RLWA, ASMOP_X, 0);
       break;
     case YL_IDX:
-      emit2 ("exg", "a, yl");
-      cost (1, 1);
+      emit3 (A_EXG, ASMOP_A, ASMOP_Y);
       break;
     case YH_IDX:
       emit3w (A_RLWA, ASMOP_Y, 0);
@@ -1247,15 +1271,13 @@ void swap_from_a(int idx)
     case A_IDX:
       break;
     case XL_IDX:
-      emit2 ("exg", "a, xl");
-      cost (1, 1);
+      emit3 (A_EXG, ASMOP_A, ASMOP_X);
       break;
     case XH_IDX:
       emit3w (A_RRWA, ASMOP_X, 0);
       break;
     case YL_IDX:
-      emit2 ("exg", "a, yl");
-      cost (1, 1);
+      emit3 (A_EXG, ASMOP_A, ASMOP_Y);
       break;
     case YH_IDX:
       emit3w (A_RRWA, ASMOP_Y, 0);
@@ -1618,8 +1640,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
           emit2 ("ldw", aopInReg (source, soffset + i, X_IDX) ? "%s, x" : "%s, y", aopGet2 (result, roffset + i));
           cost (2, 2);
-          assigned[i] = TRUE;
-          assigned[i + 1] = TRUE;
+          assigned[i] = true;
+          assigned[i + 1] = true;
           regsize -= 2;
           size -= 2;
           i += 2;
@@ -1695,8 +1717,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       if (exsum == 4)
         {
-          emit2 ("exgw", "x, y");
-          cost (1, 1);
+          emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
           if(ex[0] >= 0)
             assigned[ex[0]] = TRUE;
           if(ex[1] >= 0)
@@ -1825,10 +1846,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       if (ex[0] >= 0 && ex[1] >= 0)
         {
-          emit2 ("exg", "a, xl");
-          cost (1, 1);
-          assigned[ex[0]] = TRUE;
-          assigned[ex[1]] = TRUE;
+          emit3 (A_EXG, ASMOP_A, ASMOP_X);
+          assigned[ex[0]] = true;
+          assigned[ex[1]] = true;
           regsize -= 2;
           size -= 2;
         }
@@ -1848,10 +1868,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       if (ex[0] >= 0 && ex[1] >= 0)
         {
-          emit2 ("exg", "a, yl");
-          cost (1, 1);
-          assigned[ex[0]] = TRUE;
-          assigned[ex[1]] = TRUE;
+          emit3 (A_EXG, ASMOP_A, ASMOP_Y);
+          assigned[ex[0]] = true;
+          assigned[ex[1]] = true;
           regsize -= 2;
           size -= 2;
         }
@@ -1871,8 +1890,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       if (ex[0] >= 0 && ex[1] >= 0)
         {
-          emit2 ("swapw", "x");
-          cost (1, 1);
+          emit3w (A_SWAPW, ASMOP_X, 0);
           assigned[ex[0]] = TRUE;
           assigned[ex[1]] = TRUE;
           regsize -= 2;
@@ -1894,8 +1912,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       if (ex[0] >= 0 && ex[1] >= 0)
         {
-          emit2 ("swapw", "y");
-          cost (2, 1);
+          emit3w (A_SWAPW, ASMOP_Y, 0);
           assigned[ex[0]] = TRUE;
           assigned[ex[1]] = TRUE;
           regsize -= 2;
@@ -1940,8 +1957,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     {
       if(x_dead && assign_l && assign_h)
         {
-          emit2 ("exgw", "x, y");
-          cost (1, 1);
+          emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
         }
       else
         {
@@ -2011,7 +2027,7 @@ skip_byte:
           cheapMove (result, roffset + i, source, soffset + i, TRUE);       // We can safely assign a byte.
           regsize--;
           size--;
-          assigned[i] = TRUE;
+          assigned[i] = true;
           continue;
         }
 
@@ -2020,7 +2036,7 @@ skip_byte:
         wassertl_bt (0, "Unimplemented.");
       cost (180, 180);
       return;
-    }  
+    }
 
   // Copy (stack-to-stack) what we can with whatever free regs we have now.
   a_free = a_dead;
@@ -4710,8 +4726,7 @@ genDivMod2 (const iCode *ic)
 
   if (ic->op == '%' && stm8_extend_stack)
     {
-      emit2 ("exgw", "x, y");
-      cost (1, 1);
+      emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
     }
 
   if (!regDead (Y_IDX, ic))
@@ -4783,8 +4798,7 @@ genDivMod1 (const iCode *ic)
     {
       cheapMove (ASMOP_X, 1, ASMOP_ZERO, 0, false);
       cheapMove (ASMOP_A, 0, left->aop, 0, false);
-      emit2 ("exg", "a, xl");
-      cost (1, 1);
+      emit3 (A_EXG, ASMOP_A, ASMOP_X);
     }
   else if (aopInReg (right->aop, 0, use_y ? YL_IDX : XL_IDX) || aopInReg (right->aop, 0, use_y ? YH_IDX : XH_IDX))
     {
@@ -5175,10 +5189,10 @@ genCmp (const iCode *ic, iCode *ifx)
             }
           else
             {
-              emit2 ("exgw", "x, y");
+              emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
               emit2 ("cpw", "x, %s", aopGet2 (right->aop, 0));
-              emit2 ("exgw", "x, y");
-              cost (4, 4);
+              cost (2, 2);
+              emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
             }
         }
       else
@@ -5410,10 +5424,10 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
                 }
               else
                 {
-                  emit2 ("exgw", "x, y");
+                  emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
                   emit2 ("cpw", "x, %s", aopGet2 (right->aop, i));
-                  emit2 ("exgw", "x, y");
-                  cost (4, 4);
+                  cost (2, 2);
+                  emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
                 }
             }
           else
@@ -7813,20 +7827,16 @@ genIfx (const iCode *ic)
           // We can't just use swap_to_a() to improve the following four cases because it might use rrwa and rlwa which destroy the Z flag.
           else if (aopInReg (cond->aop, i, XL_IDX) && (!floattopbyte || regDead (XL_IDX, ic)))
             {
-              emit2 ("exg", "a, xl");
-              cost (1, 1);
-              emit3(floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
-              emit2 ("exg", "a, xl");
-              cost (1, 1);
+              emit3 (A_EXG, ASMOP_A, ASMOP_X);
+              emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
+              emit3 (A_EXG, ASMOP_A, ASMOP_X);
               i++;
             }
           else if (aopInReg (cond->aop, i, YL_IDX) && (!floattopbyte || regDead (YL_IDX, ic)))
             {
-              emit2 ("exg", "a, yl");
-              cost (1, 1);
-              emit3(floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
-              emit2 ("exg", "a, yl");
-              cost (1, 1);
+              emit3 (A_EXG, ASMOP_A, ASMOP_Y);
+              emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
+              emit3 (A_EXG, ASMOP_A, ASMOP_Y);
               i++;
             }
           else if (!floattopbyte && !aopInReg (cond->aop, i, XH_IDX) && !aopInReg (cond->aop, i, YH_IDX))

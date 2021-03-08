@@ -262,8 +262,8 @@ status collapsed
 
 \end_inset
 
-, etc.), Dallas DS80C390 variants, NXP (formerly Freescale/Motorola) HC08 based
- (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, eZ80 in Z80 mode, gbz80,
+, etc.), Dallas DS80C390 variants, NXP (formerly Freescale/Motorola) HC08
+ based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, eZ80 in Z80 mode, gbz80,
  Rabbit 2000/3000, Rabbit 3000A 
 \begin_inset Index idx
 status collapsed
@@ -13564,8 +13564,8 @@ status collapsed
  
 \series default
 When this option is used the compiler will generate debug information.
- The debug information collected in a file with .cdb extension can be used
- with the SDCDB.
+ By default, the debug information collected in a file with .cdb extension
+ can be used with the SDCDB.
  For more information see documentation for SDCDB.
  Another file with a .omf extension contains debug information in AOMF or
  AOMF51
@@ -13579,6 +13579,7 @@ AOMF, AOMF51
 \end_inset
 
  format which is commonly used by third party tools.
+ When –out-gmt-elf is used, the debug information is in DWARF format instead.
 \end_layout
 
 \begin_layout Labeling
@@ -16369,7 +16370,8 @@ HC08
 
 \end_inset
 
- and S08 processors)
+, S08 and STM8 processors).
+ When used with –debug, the debug info is in DWARF format instead of CDB.
 \end_layout
 
 \begin_layout Labeling
@@ -55465,6 +55467,21 @@ Toggle list mode
 \end_inset
 
 ;;
+\end_layout
+
+\begin_layout Section
+Debugging with other debuggers (e.g.
+ GDB): ELF / DWARF
+\end_layout
+
+\begin_layout Standard
+For some ports, SDCC can create ELF binaries with DWARF debug information.
+ This can e.g.
+ be used for on-target debugging on STM8 using OpenOCD and GDB.
+ To do so, compile with –debug –out-fmt-elf.
+ Note that –out-fmt-elf needs to be specified both when compiling (to generate
+ the debug info in DWARF rather than CDB format) and linking (to get an
+ ELF binary instead of Intel Hex).
 \end_layout
 
 \begin_layout Chapter

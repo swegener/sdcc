@@ -3389,7 +3389,7 @@ genLeftShift (const iCode *ic)
           if (shCount == 7 && (size - offset) == 1 && (result->aop->type == AOP_REG || result->aop->type == AOP_DIR))
             {
               emit2 ("sr", "%s", aopGet (result->aop, offset));
-              if (aopInReg (result->aop, 0, A_IDX))
+              if (aopInReg (result->aop, offset, A_IDX))
                 emit2("mov", "a, #0x00");
               else
                 emit2 ("clear", "%s", aopGet (result->aop, offset));

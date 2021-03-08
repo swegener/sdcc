@@ -156,7 +156,9 @@ VOID DefineSDCDB(char *name, a_uint value)
 	if (yfp == NULL) return;
 
 	/*
-	 * SDCC symbols have 3 or more $ characters
+	 * SDCC symbols have 2 or more $ characters
+	 * with the shortest being the Linker ASM Record
+	 * eg L:A$TinyBuffer$2320:A13
 	 */
 	j = 0;
 	p1 = name;
@@ -165,7 +167,7 @@ VOID DefineSDCDB(char *name, a_uint value)
 		j += 1;
 	}
 
-	if (j > 2) {
+	if (j > 1) {
 #ifdef	LONGINT
 		fprintf(yfp, "L:%s:%lX\n", name ,value);
 #else

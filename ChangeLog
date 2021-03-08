@@ -1,5 +1,10 @@
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c:
+	  Pick notUsedFrom improvement and optimizeFor from patch #62 by Visenri.
+
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* Merge sdcc-next branch to trunk.
 
 2021-03-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

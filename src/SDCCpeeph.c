@@ -1068,6 +1068,85 @@ operandBaseName (const char *op)
   return op;
 }
 
+/*------------------------------------------------------------------*/
+/* optimizeFor - check optimization conditions                      */
+/* valid parameters:                                                */
+/*  code-size  -> checks for optimize.codeSize > 0                  */
+/*  code-speed -> checks for optimize.codeSpeed > 0                 */
+/*  add the ! symbol before each parameter to negate the condition  */
+/* combinations with multiple parameters                            */
+/*  '!code-speed' '!code-size': apply for balanced opt.             */
+/*  '!code-size!: apply for balanced and when optimizign for speed  */
+/*  '!code-speed': apply unless optimizing for code speed           */
+/*------------------------------------------------------------------*/
+FBYNAME (optimizeFor)
+{
+  const char *cond;
+  int speed = 0, size = 0; // 0: nothing requested, >0 optimization requested, <0 negated optimization requested
+  
+  bool ret = false, error = false;
+
+  set *operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+  {
+    fprintf (stderr,
+             "*** internal error: optimizeFor peephole restriction"
+             " requires operand(s): %s\n", cmdLine);
+    return false;
+  }
+
+  // Loop through all conditions to check requested optimizations
+  for (cond = setFirstItem (operands); !error && cond != NULL; cond = setNextItem (operands))
+    {
+      const char *condTextSpeed = strstr (cond, "code-speed");
+      const char *condTextSize  = strstr (cond, "code-size");
+      const char *condNegated = strstr (cond, "!");
+      const char *condText = condTextSpeed ? condTextSpeed : condTextSize;
+      
+      // Check for invalid conditions or invalid combinations in the same string
+      if (!condText || condTextSpeed && condTextSize || condNegated && (condNegated + 1 != condText))
+        {
+          error = true;
+          break;
+        }
+      if (condTextSize)
+        {
+          if (size == 0)
+            size = condNegated ? -1 : 1;
+          else
+            error = true;
+        }
+      else
+        {
+          if (speed == 0)
+            speed = condNegated ? -1 : 1;
+          else
+            error = true;
+        }
+    }
+  // check error, invalid combination of both speed and size or nothing
+  if (error || (speed != -1) && (speed == size) )
+    {
+      fprintf (stderr,
+             "*** internal error: optimizeFor peephole restriction"
+             " malformed: %s\n", cmdLine);
+      error = true;
+    }
+  else
+    { // Check conditions and generate return value
+      ret = true;
+      if (speed != 0)
+        ret &= (speed < 0) ^ (optimize.codeSpeed > 0);
+        
+      if (size != 0)
+        ret &= (size < 0) ^ (optimize.codeSize > 0);
+    }
+    
+  deleteSet(&operands);
+  return (ret);
+}
+
 /*-----------------------------------------------------------------*/
 /* notUsed - Check, if values in all registers are not read again  */
 /*-----------------------------------------------------------------*/
@@ -1102,30 +1181,50 @@ FBYNAME (notUsed)
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsedFrom - Check, if value in register is not read again     */
+/* notUsedFrom - Check, if values in registers are not read again  */
 /*           starting from label                                   */
+/*           Registers are checked from left to right              */
 /*-----------------------------------------------------------------*/
 FBYNAME (notUsedFrom)
 {
   const char *what, *label;
+  bool ret;
+  
+  if (!port->peep.notUsedFrom)
+    {
+      fprintf (stderr, "Function notUsedFrom not initialized in port structure\n");
+      return false;
+    }
+  
   set *operands = setFromConditionArgs (cmdLine, vars);
 
-  if (!operands || elementsInSet(operands) != 2)
+  if (!operands)
+  {
+    fprintf (stderr,
+             "*** internal error: notUsedFrom peephole restriction"
+             " requires operand(s): %s\n", cmdLine);
+    return false;
+  }
+  if (elementsInSet(operands) < 2)
   {
     fprintf (stderr,
              "*** internal error: notUsedFrom peephole restriction"
              " malformed: %s\n", cmdLine);
-    return FALSE;
+    deleteSet(&operands);
+    return false;
   }
+  
+  operands = reverseSet(operands);
 
-  what = setFirstItem (operands);
-  label = setNextItem (operands); 
+  label = setFirstItem (operands);
+  what = setNextItem (operands);
 
-  if (port->peep.notUsedFrom)
-    return port->peep.notUsedFrom (what, label, head);
+  for (ret = true; ret && what; what = setNextItem (operands))
+      ret = port->peep.notUsedFrom (what, label, head);
+  
+  deleteSet(&operands);
 
-  fprintf (stderr, "Function notUsedFrom not initialized in port structure\n");
-  return FALSE;
+  return (ret);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1665,9 +1764,9 @@ immdError (const char *info, const char *param, const char *cmd)
   return FALSE;
 }
 
-/*-----------------------------------------------------------------*/
-/* immdInRange - returns true if the sum or difference of two      */
-/* immediates is in a give range.                                  */
+/*-----------------------------------------------------------------*/ 
+/* immdInRange - returns true if the result of a given operation   */
+/* of two immediates is in a give range.                           */
 /*-----------------------------------------------------------------*/
 FBYNAME (immdInRange)
 {
@@ -1820,7 +1919,7 @@ FBYNAME (immdInRange)
           i = left_l | right_l;
           j = 1;
           break;
-        }
+        }  
   if (!j)
     return immdError ("bad operator", operator, cmdLine);
 
@@ -1964,6 +2063,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "inSequence", inSequence                        // z88dk z80
+  },
+  {
+    "optimizeFor", optimizeFor
   },
   {
     "optimizeReturn", optimizeReturn                // ? just a guess

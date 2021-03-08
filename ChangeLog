@@ -1,5 +1,10 @@
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix a gbz80 parameter push bug.
+
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc,
 	  src/z80/gen.c,
 	  src/z80/peeph.def_

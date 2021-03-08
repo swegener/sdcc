@@ -3630,12 +3630,14 @@ skip_byte:
 
   // Last, move everything from stack to registers.
   for (int i = 0; i < n;)
-    {
+    {emit2(";genCopy: stack-to-register copy.");
       const int fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       const int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
-      const bool a_free = a_dead && (result->regs[A_IDX] < 0 || !assigned[result->regs[A_IDX] - roffset]);
+      bool a_free = a_dead && (result->regs[A_IDX] < 0 || !assigned[result->regs[A_IDX] - roffset]);
       const bool hl_free = hl_dead && (result->regs[L_IDX] < 0 || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
+      const bool e_free = de_dead && (result->regs[E_IDX] < 0 || !assigned[result->regs[E_IDX] - roffset]);
+      const bool d_free = de_dead && (result->regs[D_IDX] < 0 || !assigned[result->regs[D_IDX] - roffset]);
       
       if (assigned[i])
         {
@@ -3681,12 +3683,22 @@ skip_byte:
           size -= 2;
           i += 2;      
         }
-      else if (i + 1 < n && !assigned[i + 1] && (source->type == AOP_STK || source->type == AOP_EXSTK) && requiresHL (source) && a_free &&
+      else if (i + 1 < n && !assigned[i + 1] && (source->type == AOP_STK || source->type == AOP_EXSTK) && requiresHL (source) &&
         (aopInReg (result, roffset + i, HL_IDX) || aopInReg (result, roffset + i, H_IDX) && aopInReg (result, roffset + i + 1, L_IDX))) // Stack access might go through hl.
         {
-          cheapMove (ASMOP_A, 0, source, soffset + i, true);
+          bool a_pushed = false;
+          if (!a_free && !e_free && !d_free)
+            {
+              _push (PAIR_AF);
+              a_pushed = true;
+              a_free = true;
+            }
+          asmop *tmpaop = a_free ? ASMOP_A : e_free ? ASMOP_E : ASMOP_D;
+          cheapMove (tmpaop, 0, source, soffset + i, true);
           cheapMove (result, roffset + i + 1, source, soffset + i + 1, false);
-          cheapMove (result, roffset + i, ASMOP_A, 0, true);
+          cheapMove (result, roffset + i, tmpaop, 0, true);
+          if (a_pushed)
+            _pop (PAIR_AF);
           assigned[i] = true;
           assigned[i + 1] = true;
           size -= 2;
@@ -4643,6 +4655,11 @@ genIpush (const iCode *ic)
               pair = ASMOP_DE;
             else if (bc_free)
               pair = ASMOP_BC;
+              
+            if (IS_GB && requiresHL (IC_LEFT (ic)->aop) && IC_LEFT (ic)->aop->type != AOP_REG && de_free)
+              pair = ASMOP_DE;
+            else if (IS_GB && requiresHL (IC_LEFT (ic)->aop) && IC_LEFT (ic)->aop->type != AOP_REG && bc_free)
+              pair = ASMOP_BC;
 
             if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free || h_free && aopInReg (IC_LEFT (ic)->aop, size - 2, L_IDX))
               pair = ASMOP_HL;
@@ -4650,7 +4667,7 @@ genIpush (const iCode *ic)
               pair = ASMOP_DE;
             else if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || b_free && aopInReg (IC_LEFT (ic)->aop, size - 2, C_IDX))
               pair = ASMOP_BC;
-
+            
             genMove_o (pair, 0, IC_LEFT (ic)->aop, size - 2, 2, a_free, hl_free, de_free);
             emit2 ("push %s", _pairs[getPairId (pair)].name);
             regalloc_dry_run_cost++;

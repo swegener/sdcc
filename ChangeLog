@@ -1,5 +1,12 @@
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peeph.def_
+	  Improve use of iy.
+
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Optimize last byte of negation, part of RFE #734.
 

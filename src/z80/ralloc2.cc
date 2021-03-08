@@ -1032,19 +1032,16 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G))) // Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
 
-  if(ic->op == CALL)
+  // Some instructions can handle anything.
+  if(ic->op == IPUSH || ic->op == CALL ||
+    ic->op == '=' && !POINTER_SET(ic) ||
+    ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))))
     return(true);
 
   if(!result_in_IY && !input_in_IY &&
     !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
     !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
     !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
-    return(true);
-
-  // variables partially in IY can be pushed.
-  if(ic->op == IPUSH &&
-    operand_in_reg(left, REG_IYL, ia, i, G) && operand_in_reg(left, REG_IYH, ia, i, G) &&
-    (I[ia.registers[REG_IYL][1]].byte == 0 && I[ia.registers[REG_IYH][1]].byte == 1 || I[ia.registers[REG_IYL][1]].byte == 2 && I[ia.registers[REG_IYH][1]].byte == 3))
     return(true);
 
   // Code generator mostly cannot handle variables that are only partially in IY.
@@ -1077,17 +1074,12 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 #endif
 
   if(result_in_IY &&
-    (ic->op == '=' && !(POINTER_SET(ic) && isOperandInDirSpace(IC_RIGHT(ic))) ||
-    ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) || 
-    ic->op == '+')) // todo: More instructions that can write iy.
+    (ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS)) // todo: More instructions that can write iy.
     return(true);
 
   // Todo: Multiplication.
 
   if(ic->op == LEFT_OP)
-    return(true);
-
-  if(ic->op == '-' && result_in_IY && input_in_IY && IS_VALOP (IC_RIGHT (ic)) && operandLitValue (IC_RIGHT (ic)) < 4)
     return(true);
 
 #if 0
@@ -1105,16 +1097,10 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     operand_is_pair(IC_RESULT(ic), a, i, G)) // DirSpace access won't use iy here.
     return(true);
 
-  if(ic->op == IPUSH) // todo: More instructions that can use IY.
-    return(true);
-
   if(ic->op == GET_VALUE_AT_ADDRESS && isOperandInDirSpace(IC_RESULT(ic)))
     return(false);
 
-  if(input_in_IY && !result_in_IY &&
-    (ic->op == '=' && !POINTER_SET(ic) ||
-     ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) ||
-     ic->op == GET_VALUE_AT_ADDRESS))
+  if(input_in_IY && !result_in_IY && ic->op == GET_VALUE_AT_ADDRESS)
     return(true);
 
 #if 0

@@ -2083,7 +2083,7 @@ replace restart {
 	cp	a, #%7
 	%5	C, %6
 %9:
-} if same(%5 'jr' 'jp' 'call'), notUsed('a'), newLabel(%9)
+} if same(%5 'jr' 'jp' 'call'), notUsed('a'), canAssign('b' %3), canAssign('b' %3), newLabel(%9)
 
 replace restart {
 	ld	a, %1
@@ -2106,7 +2106,7 @@ replace restart {
 	sbc	a, #%8
 	%5	C, %6
 %9:
-} if same(%5 'jr' 'jp' 'call'), notUsed('a'), newLabel(%9)
+} if same(%5 'jr' 'jp' 'call'), notUsed('a'), canAssign('b' %3), newLabel(%9)
 
 replace restart {
 	ld	a, #0xff

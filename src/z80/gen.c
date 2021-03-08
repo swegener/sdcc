@@ -7649,6 +7649,45 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           result_in_carry = TRUE;
           goto release;
         }
+        
+      if (AOP_TYPE (right) == AOP_LIT && !ullFromVal (AOP (right)->aopu.aop_lit)) // special case: comparison to 0. Do it here early, so we don't run into gbz80 workarounds below.
+        {
+          if (!sign)
+            {
+              /* No sign so it's always false */
+              emit3 (A_CP, ASMOP_A, ASMOP_A);
+              result_in_carry = TRUE;
+            }
+          else
+            {
+              if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx &&
+                (AOP_TYPE (left) == AOP_REG || AOP_TYPE (left) == AOP_STK && !IS_GB))
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("bit 7, %s", aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
+                  regalloc_dry_run_cost += ((AOP_TYPE (left) == AOP_REG) ? 2 : 4);
+                  genIfxJump (ifx, "nz");
+                  return;
+                }
+             /* Just load in the top most bit */
+             cheapMove (ASMOP_A, 0, AOP (left), AOP_SIZE (left) - 1, true);
+             if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
+               {
+                 genIfxJump (ifx, "7");
+                 return;
+               }
+             else
+               {
+                  if (ifx)
+                    {
+                      genIfxJump (ifx, "nc");
+                      return;
+                    }
+                  result_in_carry = FALSE;
+                }
+            }
+          goto release;
+        }
 
       // On the Gameboy we can't afford to adjust HL as it may trash the carry.
       if (size > 1 && (IS_GB || IY_RESERVED) && left->aop->type != AOP_REG && right->aop->type != AOP_REG && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
@@ -7761,46 +7800,6 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       if (AOP_TYPE (right) == AOP_LIT)
         {
           lit = ullFromVal (AOP (right)->aopu.aop_lit);
-
-          /* optimize if(x < 0) or if(x >= 0) */
-          if (lit == 0ull)
-            {
-              if (!sign)
-                {
-                  /* No sign so it's always false */
-                  emit3 (A_CP, ASMOP_A, ASMOP_A);
-                  result_in_carry = TRUE;
-                }
-              else
-                {
-                  if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx &&
-                    (AOP_TYPE (left) == AOP_REG || AOP_TYPE (left) == AOP_STK && !IS_GB))
-                    {
-                      if (!regalloc_dry_run)
-                        emit2 ("bit 7, %s", aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
-                      regalloc_dry_run_cost += ((AOP_TYPE (left) == AOP_REG) ? 2 : 4);
-                      genIfxJump (ifx, "nz");
-                      return;
-                    }
-                  /* Just load in the top most bit */
-                  cheapMove (ASMOP_A, 0, AOP (left), AOP_SIZE (left) - 1, true);
-                  if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
-                    {
-                      genIfxJump (ifx, "7");
-                      return;
-                    }
-                  else
-                    {
-                      if (ifx)
-                        {
-                          genIfxJump (ifx, "nc");
-                          return;
-                        }
-                      result_in_carry = FALSE;
-                    }
-                }
-              goto release;
-            }
 
           while (!((lit >> (offset * 8)) & 0xffull))
             {

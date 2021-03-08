@@ -4,6 +4,8 @@
 	  Pick notUsedFrom improvement and optimizeFor from patch #62 by Visenri.
 	* src/z80/peeph.def:
 	  Small z80 peephole rule cleanup.
+	* src/z80/gen.c:
+	  Improve gbz80 comparison with 0, part of RFE #734.
 
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 

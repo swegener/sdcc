@@ -2135,7 +2135,7 @@ replace restart {
 } by {
 	; common peephole 156 used ex to load hl into de.
 	ex	de,hl
-} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r3ka' 'tlcs90'), notUsed('hl')
+} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r2ka' 'r3ka' 'tlcs90'), notUsed('hl')
 
 replace restart {
 	ld	l,e
@@ -2143,7 +2143,7 @@ replace restart {
 } by {
 	; common peephole 157 used ex to load de into hl.
 	ex	de,hl
-} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r3ka' 'tlcs90'), notUsed('de')
+} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r2ka' 'r3ka' 'tlcs90'), notUsed('de')
 
 barrier
 
@@ -2331,7 +2331,7 @@ replace {
 	jr	%9
 	jr	%10
 %2:
-} if isPort('r2k' 'r3ka'), labelJTInRange
+} if isPort('r2k' 'r2ka' 'r3ka'), labelJTInRange
 
 replace {
 	add	hl,de
@@ -2432,12 +2432,21 @@ replace restart {
 // Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
 barrier
 
+// On Z80 and Z80N, jr is smaller, but slower than jp.
 replace restart {
 	jp	%5
 } by {
 	; common peephole 162 changed absolute to relative unconditional jump.
 	jr	%5
-} if labelInRange(%5)
+} if optimizeFor('!code-speed'), labelInRange(%5)
+
+// On Z180, eZ80, Rabbit and TLCS-90, jr is smaller, and at least as fast as jp.
+replace restart {
+	jp	%5
+} by {
+	; common peephole 162a changed absolute to relative unconditional jump.
+	jr	%5
+} if isPort('z180' 'ez80_z80' 'r2k' 'r2ka' 'r3ka' 'tlcs90'), labelInRange(%5)
 
 replace restart {
 	jp	%1, %5
@@ -2452,6 +2461,6 @@ replace {
 } by {
 	; common peephole 167 used djnz
 	djnz	%5
-} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r3ka' 'tlcs90')
+} if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r2ka' 'r3ka' 'tlcs90')
 
 barrier

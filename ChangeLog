@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix a gbz80 parameter push bug.
+	* support/regression/tests/rotate2.c:
+	  Disable test for mcs51 (bug #3188).
 
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -217,6 +217,7 @@ TYPE rotate_test_5_xor2(TYPE value)
 static void
 testSwaps(void)
 {
+#ifndef __SDCC_mcs51 // Bug #3188
 #ifndef __SDCC_pdk14 // Lack of memory
     volatile TYPE t = TEST_VALUE;
     TYPE u;
@@ -243,6 +244,7 @@ testSwaps(void)
     ASSERT( rotate_test_5(u)      == ROTATE_RESULT);
     ASSERT( rotate_test_5_xor1(u) == ROTATE_RESULT_XOR);
     ASSERT( rotate_test_5_xor2(u) == ROTATE_RESULT_XOR);
+#endif
 #endif
 #endif
 }

@@ -1,6 +1,11 @@
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Optimize last byte of negation, part of RFE #734.
+
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix bug #3187.
 
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>

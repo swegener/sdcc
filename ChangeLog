@@ -1,5 +1,10 @@
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix bug #3187.
+
+2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCpeeph.c:
 	  Pick notUsedFrom improvement and optimizeFor from patch #62 by Visenri.
 	* src/z80/peeph.def:

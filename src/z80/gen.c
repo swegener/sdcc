@@ -12148,11 +12148,11 @@ genAssign (const iCode *ic)
     }
   else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && IS_GB)
     {
-      /* Special case.  Load into a and d, then load out. */
-      cheapMove (ASMOP_A, 0, AOP (right), 0, true);
-      emit3_o (A_LD, ASMOP_E, 0, AOP (right), 1);
-      cheapMove (AOP (result), 0, ASMOP_A, 0, true);
-      cheapMove (AOP (result), 1, ASMOP_E, 0, true);
+      /* Special case.  Load into de, then load out. */
+      cheapMove (ASMOP_E, 0, AOP (right), 0, true);
+      emit3_o (A_LD, ASMOP_D, 0, AOP (right), 1);
+      cheapMove (AOP (result), 0, ASMOP_E, 0, true);
+      cheapMove (AOP (result), 1, ASMOP_D, 0, true);
     }
   else if (size == 4 && (requiresHL (right->aop) && right->aop->type != AOP_REG) && (requiresHL (result->aop) && result->aop->type != AOP_REG ) && isPairDead (PAIR_DE, ic) && (IS_GB || IY_RESERVED))
     {

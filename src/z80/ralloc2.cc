@@ -1034,6 +1034,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   // Some instructions can handle anything.
   if(ic->op == IPUSH || ic->op == CALL ||
+    ic->op == '+' ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) ||
     ic->op == SEND)

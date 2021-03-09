@@ -2970,7 +2970,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
   const bool from_index = aopInReg (from, from_offset, IYL_IDX) || aopInReg (from, from_offset, IYH_IDX);
   const bool to_index = aopInReg (to, to_offset, IYL_IDX)  || aopInReg (to, to_offset, IYH_IDX);
   const bool index = to_index || from_index;
-      
+
   if (to->type == AOP_REG && from->type == AOP_REG)
     {
       if (to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
@@ -2981,7 +2981,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
           bool a = aopInReg (to, to_offset, A_IDX) || aopInReg (from, from_offset, A_IDX);
           if (!regalloc_dry_run)
             aopPut (to, aopGet (from, from_offset, false), to_offset);
-          regalloc_dry_run_cost += 1 + (IS_TLCS90 + !a) + index;
+          regalloc_dry_run_cost += 1 + (IS_TLCS90 && !a) + index;
           return;
         }
       if (aopInReg (from, from_offset, IYL_IDX) && !to_index && a_dead)
@@ -3066,7 +3066,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     }
   else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && // Go through a.
     (from->type == AOP_DIR ||
-    from->type == AOP_HL && to->type == AOP_STK ||
+    (from->type == AOP_HL || from->type == AOP_IY) && to->type == AOP_STK ||
     from->type == AOP_SFR ||
     to->type == AOP_SFR ||
     to->type == AOP_STK && from->type == AOP_STK ||
@@ -3630,7 +3630,7 @@ skip_byte:
 
   // Last, move everything from stack to registers.
   for (int i = 0; i < n;)
-    {emit2(";genCopy: stack-to-register copy.");
+    {
       const int fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       const int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
@@ -3806,7 +3806,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
 
       // Cache a copy of zero in a.
-      if (result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead)
+      if (size > 1 && result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead)
         {
           emit3 (A_XOR, ASMOP_A, ASMOP_A);
           regalloc_dry_run_cost += 1;
@@ -4638,7 +4638,7 @@ genIpush (const iCode *ic)
         if (getPairId_o (IC_LEFT (ic)->aop, size - 2) != PAIR_INVALID)
           {
             emit2 ("push %s", _pairs[getPairId_o (IC_LEFT (ic)->aop, size - 2)].name);
-            regalloc_dry_run_cost += 1 + (getPairId_o (IC_LEFT (ic)->aop, 2) == PAIR_IY);
+            regalloc_dry_run_cost += 1 + (getPairId_o (IC_LEFT (ic)->aop, size - 2) == PAIR_IY);
             d = 2;
           }
         else if (size >= 2 &&
@@ -4892,6 +4892,13 @@ static void genSend (const iCode *ic)
         }
       _saveRegsForCall (walk, FALSE);
     }
+
+  for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
+    if (bitVectBitValue (ic->rSurv, ASMOP_Z88DK_FASTCALL_ARG->aopu.aop_reg[i]->rIdx))
+      {
+        regalloc_dry_run_cost += 100;
+        wassert (regalloc_dry_run);
+      }
 
   genMove_o (ASMOP_Z88DK_FASTCALL_ARG, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   
@@ -14092,7 +14099,7 @@ static void
 dryZ80Code (iCode * lic)
 {
   iCode *ic;
-last_dry_run = true;
+
   for (ic = lic; ic; ic = ic->next)
     if (ic->op != FUNCTION && ic->op != ENDFUNCTION && ic->op != LABEL && ic->op != GOTO && ic->op != INLINEASM)
       printf ("; iCode %d total cost: %d\n", ic->key, (int) (dryZ80iCode (ic)));

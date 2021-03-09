@@ -1,3 +1,9 @@
+2021-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Fix an issue affecting cost estimation for some register-to-register loads.
+
 2021-03-09 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peeph-gbz80.def,

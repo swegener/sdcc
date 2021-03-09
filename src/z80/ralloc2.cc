@@ -1035,7 +1035,8 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // Some instructions can handle anything.
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '=' && !POINTER_SET(ic) ||
-    ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))))
+    ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) ||
+    ic->op == SEND)
     return(true);
 
   if(!result_in_IY && !input_in_IY &&
@@ -1439,7 +1440,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
       varset_t::const_iterator vi, vi_end;
       for(vi = a.local.begin(), vi_end = a.local.end(); vi != vi_end; ++vi)
         if(a.global[*vi] == REG_IYL || a.global[*vi] == REG_IYH)
-          c += 8.0f;
+          c += 2.0f;
     }
 
   // An artifical ordering of assignments.

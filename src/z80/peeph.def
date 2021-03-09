@@ -1,6 +1,6 @@
 // peeph.def - Common Z80 and gbz80 peephole rules
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2021
 // (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2021
 //
 // This program is free software; you can redistribute it and/or modify it

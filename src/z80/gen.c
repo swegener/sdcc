@@ -3810,6 +3810,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emit2 ("ld %s, !mems", _pairs[getPairId_o(result, roffset + i)].name, aopGetLitWordLong (source, soffset + i, false));
           regalloc_dry_run_cost += 3 + (getPairId_o(result, roffset + i) != PAIR_HL);
+          spillPair (getPairId_o(result, roffset + i));
           i += 2;
           continue;      
         }
@@ -5814,11 +5815,11 @@ genPlusIncr (const iCode *ic)
           if (icount > 3)
             return FALSE;
           if (!delayed_move)
-            fetchPairLong (getPairId (IC_RESULT (ic)->aop), IC_LEFT (ic)->aop, ic, 0);
+            genMove (IC_RESULT (ic)->aop, IC_LEFT (ic)->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
         }
       while (icount--)
         {
-          PAIR_ID pair = delayed_move ? getPairId (AOP (IC_LEFT (ic))) : getPairId (AOP (IC_RESULT (ic)));
+          PAIR_ID pair = delayed_move ? getPairId (IC_LEFT (ic)->aop) : getPairId (IC_RESULT (ic)->aop);
           emit2 ("inc %s", _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
         }
@@ -5855,7 +5856,7 @@ genPlusIncr (const iCode *ic)
   if (size == 2 && icount <= 2 && isPairDead (PAIR_HL, ic) && !IS_GB &&
     (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY))
     {
-      fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+      genMove (ASMOP_HL, IC_LEFT (ic)->aop, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
       while (icount--)
         emit2 ("inc hl");
       regalloc_dry_run_cost++;

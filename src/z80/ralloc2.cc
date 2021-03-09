@@ -1037,7 +1037,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == '+' ||
     ic->op == '|' ||
     ic->op == '=' && !POINTER_SET(ic) ||
-    ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) ||
+    ic->op == CAST ||
     ic->op == SEND)
     return(true);
 

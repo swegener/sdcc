@@ -1,6 +1,7 @@
 // peeph.def - Common Z80 and gbz80 peephole rules
 //
 // (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
+// (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -439,13 +440,29 @@ replace restart {
 } if notUsed('d'), notUsed('a')
 
 replace restart {
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+	ld	a, #%3
+	ld	(%2), a
+} by {
+	; common peephole 36 used hl instead of %2.
+	pop	%1
+	pop	hl
+	push	hl
+	push	%1
+	ld	(hl), #%3
+} if notUsed('hl' %2)
+
+replace restart {
 	push	af
 	inc	sp
 	ld	a,#%1
 	push	af
 	inc	sp
 } by {
-	; common peephole 36 pushed de instead of pushing a twice.
+	; common peephole 37a pushed de instead of pushing a twice.
 	ld	d,a
 	ld	e,#%1
 	push	de
@@ -458,7 +475,7 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	; common peephole 37 pushed bc instead of pushing a twice.
+	; common peephole 37b pushed bc instead of pushing a twice.
 	ld	%2, a
 	ld	%3, #%1
 	push	%4
@@ -484,6 +501,22 @@ replace restart {
 	ld	h, %3
 	inc	hl
 } if canSplitReg(%2 %3 %4), immdInRange(1 1 '+' %1 0 %9)
+
+replace restart {
+	and	a, #%1
+	and	a, #%2
+} by {
+	; common peephole 40a combined redundant ANDs #%1 and #%2.
+	and	a, #%3
+} if operandsLiteral(%1 %2), immdInRange(0x00 0xFF '&' %1 %2 %x3)
+
+replace restart {
+	or	a, #%1
+	or	a, #%2
+} by {
+	; common peephole 40b combined redundant ORs #%1 and #%2.
+	or	a, #%3
+} if operandsLiteral(%1 %2), immdInRange(0x00 0xFF '|' %1 %2 %x3)
 
 replace restart {
 	push	af
@@ -895,6 +928,15 @@ replace {
 	ld	(#%2), %1
 }
 
+// should improve flag based optimizations
+replace restart {
+	jp	%1,%2
+	jp	%2
+} by {
+	; common peephole 78 removed redundant jp
+	jp	%2
+} if labelRefCountChange(%2 -1)
+
 replace restart {
 	jp	NC,%1
 	jp	%2
@@ -1037,15 +1079,7 @@ replace {
 	ld	d, #0x%2
 } by {
 	ld	de, #0x%2%1
-	; common peephole 92 combined constant loads into register pair.
-}
-
-replace {
-	ld	d, #0x%1
-	ld	e, #0x%2
-} by {
-	ld	de, #0x%1%2
-	; common peephole 93 combined constant loads into register pair.
+	; common peephole 92a combined constant loads into register pair.
 }
 
 replace {
@@ -1053,15 +1087,7 @@ replace {
 	ld	h, #0x%2
 } by {
 	ld	hl, #0x%2%1
-	; common peephole 94 combined constant loads into register pair.
-}
-
-replace {
-	ld	h, #0x%1
-	ld	l, #0x%2
-} by {
-	ld	hl, #0x%1%2
-	; common peephole 95 combined constant loads into register pair.
+	; common peephole 92b combined constant loads into register pair.
 }
 
 replace {
@@ -1069,7 +1095,23 @@ replace {
 	ld	b, #0x%2
 } by {
 	ld	bc, #0x%2%1
-	; common peephole 96 combined constant loads into register pair.
+	; common peephole 92c combined constant loads into register pair.
+}
+
+replace {
+	ld	d, #0x%1
+	ld	e, #0x%2
+} by {
+	ld	de, #0x%1%2
+	; common peephole 93a combined constant loads into register pair.
+}
+
+replace {
+	ld	h, #0x%1
+	ld	l, #0x%2
+} by {
+	ld	hl, #0x%1%2
+	; common peephole 93b combined constant loads into register pair.
 }
 
 replace {
@@ -1077,8 +1119,49 @@ replace {
 	ld	c, #0x%2
 } by {
 	ld	bc, #0x%1%2
-	; common peephole 97 combined constant loads into register pair.
+	; common peephole 93c combined constant loads into register pair.
 }
+
+replace {
+	ld	%1, #%2
+	xor	a, a
+} by {
+	; common peephole 94a reused constant #0 loaded into register.
+	xor	a, a
+	ld	%1, a
+} if same(%1 'a' 'b' 'c' 'd' 'e' 'h' 'l'), operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3)
+
+replace {
+	ld	%1, %2
+	push	%1
+	ld	%1, %2
+} by {
+	ld	%1, %2
+	push	%1
+	; common peephole 94b pushed register pair twice.
+}
+
+// check if constant loaded into (hl) is the same that's loaded into the second register
+replace {
+	ld	(hl), #%2
+	ld	%1, #%3
+} by {
+	; common peephole 97a reused constant loaded into register pair. %2 %3
+	ld	%1, #%3
+	ld	(hl), %5
+} if same(%1 'bc' 'de'), operandsLiteral(%2 %3), canSplitReg(%1 %4 %5), immdInRange(0x00 0xff '&' %3 0xff %7), immdInRange(0 0 '-' %7 %2 %8)
+// ., ., ., ., get second byte, compare second byte with %2
+
+// check if constant loaded into (hl) is the same that's loaded into the first register
+replace {
+	ld	(hl), #%2
+	ld	%1, #%3
+} by {
+	; common peephole 97b reused constant loaded into register pair.
+	ld	%1, #%3
+	ld	(hl), %4
+} if same(%1 'bc' 'de'), operandsLiteral(%2 %3), canSplitReg(%1 %4 %5), immdInRange(0x00 0xff '/' %3 0xff %6), immdInRange(0x00 0xff '&' %6 0xff %7), immdInRange(0 0 '-' %7 %2 %8)
+// ., ., ., ., bit shift, get second byte, compare second byte with %2
 
 replace restart {
 	ld	%1, a
@@ -1423,6 +1506,73 @@ replace restart {
 	; common peephole 122 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
+replace {
+	ld  a, (hl)
+	sbc a, #%1
+} by {
+	; common peephole 122a optimized carry substraction by 0.
+	sbc a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, #%1
+	sbc a, (hl)
+} by {
+	; common peephole 122b optimized carry substraction by 0.
+	sbc a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, (hl)
+	sub a, #%1
+} by {
+	; common peephole 122c optimized carry substraction by 0.
+	xor a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, #%1
+	sub a, (hl)
+} by {
+	; common peephole 122d optimized carry substraction by 0.
+	xor a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, #%1
+	inc hl
+	sbc a, (hl)
+} by {
+	inc hl
+	; common peephole 122e optimized carry substraction by 0.
+	sbc a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, #%1
+	inc hl
+	sub a, (hl)
+} by {
+	inc hl
+	; common peephole 122f optimized carry substraction by 0.
+	xor a, a
+	sub a, (hl)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
+replace {
+	ld  a, #%1
+	sbc a, %2 (ix)
+} by {
+	; common peephole 122g optimized carry substraction by 0.
+	sbc a, a
+	sub a, %2 (ix)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+
 replace restart {
 	sub	a,%1
 	jp	NZ,%2
@@ -1431,21 +1581,21 @@ replace restart {
 	sub	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; common peephole 123 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	inc	a
-	jp	NZ,%1
-	ld	%2,#0x00
-} by {
-	inc	a
-	jp	NZ,%1
-	ld	%2,a
 	; common peephole 124 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
+	inc	a
+	jp	NZ,%1
+	ld	%2,#0x00
+} by {
+	inc	a
+	jp	NZ,%1
+	ld	%2,a
+	; common peephole 125a replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+replace restart {
 	dec	a
 	jp	NZ,%1
 	ld	%2,#0x00
@@ -1453,7 +1603,7 @@ replace restart {
 	dec	a
 	jp	NZ,%1
 	ld	%2,a
-	; common peephole 125 replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; common peephole 125b replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
@@ -1489,7 +1639,17 @@ replace restart {
 } by {
 	ld	hl,#%1+1
 	add	hl,%2
-	; common peephole 129 moved increment of hl to constant.
+	; common peephole 129a moved increment of hl to constant.
+}
+
+replace restart {
+	ld	hl,#%1
+	add	hl,%2
+	dec hl
+} by {
+	ld	hl,#%1-1
+	add	hl,%2
+	; common peephole 129b moved decrement of hl to constant.
 }
 
 replace restart {

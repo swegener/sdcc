@@ -2,6 +2,7 @@
 //
 //
 // (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
+// (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2021
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -124,35 +125,106 @@ replace {
 
 replace {
 	ld	(hl), a
-	inc	de
-	ld	a, (de)
+	inc	%2
+	ld	a, (%2)
 	inc	hl
 } by {
 	ld	(hl+), a
 	; gbz80 peephole 7 used ldi to increment hl
-	inc	de
-	ld	a, (de)
-}
+	inc	%2
+	ld	a, (%2)
+} if notSame('hl' %2)
 
 replace {
 	ld	a, (hl)
-	ld	(bc), a
-	inc	bc
+	ld	(%2), a
+	inc	%2
 	inc	hl
 } by {
 	ld	a, (hl+)
 	; gbz80 peephole 8 used ldi to increment hl
-	ld	(bc), a
-	inc	bc
-}
+	ld	(%2), a
+	inc	%2
+} if notSame('hl' %2)
+
+replace {
+	dec	hl
+	ld	a, (hl+)
+	ld	h, (hl)
+	ld	l, a
+} by {
+	; gbz80 peephole 9 reversed loading order of hl
+	ld	a, (hl-)
+	ld	l, (hl)
+	ld	h, a
+} if notUsed('a')
+
+replace restart {
+	ldhl	sp,#%1
+	ld	(hl), %2
+	ldhl	sp,#%1
+
+} by {
+	; gbz80 peephole 10a removed redundant ldhl.
+	ldhl	sp,#%1
+	ld	(hl), %2
+} if immdInRange(-128 127 '-' %1 1 %2)
 
 replace restart {
 	ldhl	sp,#%1
 	dec	hl
 } by {
-	; gbz80 peephole 7 combined ld and dec.
+	; gbz80 peephole 10b combined ld and dec.
 	ldhl	sp,#%2
 } if immdInRange(-128 127 '-' %1 1 %2)
+
+replace restart {
+	ldhl	sp,#%1
+	inc	hl
+} by {
+	; gbz80 peephole 10c combined ld and inc.
+	ldhl	sp,#%2
+} if immdInRange(-128 127 '+' %1 1 %2)
+
+replace restart {
+	and	a, #%1
+	swap a
+	and	a, #%2
+} by {
+	; gbz80 peephole 11 combined redundant ANDs #%2 and swapped #%1.
+	swap a
+	and	a, #%7
+} if operandsLiteral(%1 %2), immdInRange(0x00 0xff '/' %1 0x10 %3), immdInRange(0x00 0xfff '*' %1 0x10 %4), immdInRange(0x00 0xff '&' %4 0xF0 %5), immdInRange(0x00 0xff '|' %3 %5 %6), immdInRange(0x00 0xff '&' %2 %6 %x7)
+
+replace restart {
+	ldh a, (%1)
+	inc a
+	ldh (%1), a
+} by {
+	; gbz80 peephole 12 turned ldh into inc (hl).
+	ld hl, #((%1) | 0xFF00)
+	inc (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
+
+replace restart {
+	ldh a, (%1)
+	dec a
+	ldh (%1), a
+} by {
+	; gbz80 peephole 13 turned ldh into dec (hl).
+	ld hl, #((%1) | 0xFF00)
+	dec (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
+
+replace restart {
+	ldh a, (%1)
+	srl a
+	ldh (%1), a
+} by {
+	; gbz80 peephole 14 turned ldh into srl (hl).
+	ld hl, #((%1) | 0xFF00)
+	srl (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
 
 replace {
 	pop	%1
@@ -196,3 +268,51 @@ replace {
 } by {
 	; peephole sp6 removed not needed pop
 } if notUsed(%1), notUsed('sp')
+
+replace {
+	inc	sp
+	inc	sp
+} by {
+	; peephole sp7 increased SP by addition
+	add	sp, #2
+} if notUsed('f')
+
+replace restart {
+	add	sp, #%1
+	inc	sp
+} by {
+	; peephole sp8 increased SP by addition
+	add	sp, #%2
+} if immdInRange(-128 127 '+' %1 1 %2), notUsed('hf' 'cf')
+
+replace restart {
+	add	sp, #%1
+	add	sp, #%2
+} by {
+	; peephole sp9 combined SP additions
+	add	sp, #%3
+} if immdInRange(-128 127 '+' %1 %2 %3), notUsed('hf' 'cf')
+
+replace {
+	add	sp, #%1
+} by {
+	; peephole sp10a increased SP by %1 through pop
+	pop	%3
+} if immdInRange(2 2 '+' %1 0 %2), unusedReg(%3 'bc' 'de' 'hl'), notUsed('f')
+
+// unusedReg does not support 'af'
+replace {
+	add	sp, #%1
+} by {
+	; peephole sp10b increased SP by %1 through pop
+	pop	af
+} if immdInRange(2 2 '+' %1 0 %2), notUsed('af')
+
+// if f was used
+replace {
+	inc	sp
+	inc	sp
+} by {
+	; peephole sp10c increased SP by 2 through pop
+	pop	%3
+} if unusedReg(%3 'bc' 'de' 'hl')

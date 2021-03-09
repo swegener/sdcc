@@ -1,3 +1,9 @@
+2021-03-09 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph-gbz80.def,
+	  src/z80/peeph.def:
+	  Add new peephole rules. (Based on generated code from stdlib)
+
 2021-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

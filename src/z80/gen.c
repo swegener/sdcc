@@ -6124,26 +6124,26 @@ genPlus (iCode * ic)
 
       spillPair (PAIR_HL);
 
-      if (left == PAIR_HL && right != PAIR_INVALID && right != PAIR_IY)
+      if (left == PAIR_HL && right != PAIR_INVALID && (IS_TLCS90 || right != PAIR_IY))
         {
           emit2 ("add hl, %s", _pairs[right].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }
-      else if (right == PAIR_HL && left != PAIR_INVALID && left != PAIR_IY)
+      else if (right == PAIR_HL && left != PAIR_INVALID && (IS_TLCS90 || left != PAIR_IY))
         {
           emit2 ("add hl, %s", _pairs[left].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }
-      else if (right != PAIR_INVALID && right != PAIR_HL && right != PAIR_IY)
+      else if (right != PAIR_INVALID && right != PAIR_HL && (IS_TLCS90 || right != PAIR_IY))
         {
           fetchPair (PAIR_HL, leftop);
           emit2 ("add hl, %s", getPairName (AOP (IC_RIGHT (ic))));
           regalloc_dry_run_cost += 1;
           goto release;
         }
-      else if (left != PAIR_INVALID && left != PAIR_HL && left != PAIR_IY)
+      else if (left != PAIR_INVALID && left != PAIR_HL && (IS_TLCS90 || left != PAIR_IY))
         {
           fetchPair (PAIR_HL, rightop);
           emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
@@ -6435,7 +6435,7 @@ genPlus (iCode * ic)
           i += 2;
         }
       else if ((!premoved || i) && !started && i == size - 2 && !i && isPair (rightop) && leftop->type == AOP_IMMD &&
-        getPairId (rightop) != PAIR_HL && getPairId (rightop) != PAIR_IY &&
+        getPairId (rightop) != PAIR_HL && (IS_TLCS90 || getPairId (rightop) != PAIR_IY) &&
         isPairDead (PAIR_HL, ic))
         {
           fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
@@ -6447,7 +6447,7 @@ genPlus (iCode * ic)
           i += 2;
         }
      else  if ((!premoved || i) && !started && i == size - 2 && !i && isPair (leftop) && (rightop->type == AOP_LIT  || rightop->type == AOP_IMMD) &&
-       getPairId (leftop) != PAIR_HL && getPairId (leftop) != PAIR_IY &&
+       getPairId (leftop) != PAIR_HL && (IS_TLCS90 || getPairId (leftop) != PAIR_IY) &&
        isPairDead (PAIR_HL, ic))
         {
           fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
@@ -6459,7 +6459,7 @@ genPlus (iCode * ic)
           i += 2;
         }
       else if ((!premoved || i) && !started && i == size - 2 && !i && aopInReg (leftop, i, HL_IDX) &&
-        isPair (rightop) && getPairId (rightop) != PAIR_HL && getPairId (rightop) != PAIR_IY &&
+        isPair (rightop) && getPairId (rightop) != PAIR_HL && (IS_TLCS90 || getPairId (rightop) != PAIR_IY) &&
         isPairDead (PAIR_HL, ic))
         {
           emit2 ("add hl, %s", getPairName (AOP (IC_RIGHT (ic))));
@@ -6469,7 +6469,7 @@ genPlus (iCode * ic)
           i += 2;
         }
       else if ((!premoved || i) && !started && i == size - 2 && !i &&
-        isPair (leftop) && getPairId (leftop) != PAIR_HL && getPairId (leftop) != PAIR_IY &&
+        isPair (leftop) && getPairId (leftop) != PAIR_HL && (IS_TLCS90 || getPairId (leftop) != PAIR_IY) &&
         aopInReg (rightop, i, HL_IDX) && isPairDead (PAIR_HL, ic))
         {
           emit2 ("add hl, %s", getPairName (leftop));
@@ -9286,6 +9286,18 @@ genOr (const iCode * ic, iCode * ifx)
               i += 2;
               continue;
             }
+          else if (IS_RAB &&
+            (aopInReg (result->aop, i, IY_IDX) && (aopInReg (left->aop, i, IY_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, DE_IDX)) ||
+            aopInReg (result->aop, i, IYH_IDX) && aopInReg (result->aop, i + 1, IYL_IDX) && (aopInReg (left->aop, i, IYH_IDX) && aopInReg (left->aop, i + 1, IYL_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i + 1, E_IDX))))
+            {
+              unsigned short mask = aopInReg (result->aop, i, IYL_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
+              bool mask_in_de = (aopInReg (left->aop, i, IYL_IDX) | aopInReg (left->aop, i, IYH_IDX));
+              emit2 (mask_in_de ? "ld de, !immedword" : "ld iy, !immedword", mask);
+              emit2 ("or iy, de");
+              regalloc_dry_run_cost += 5 + !mask_in_de;
+              i += 2;
+              continue;
+            }
           else if (IS_TLCS90 &&
             (aopInReg (left->aop, i, HL_IDX) && aopInReg (result->aop, i, HL_IDX) || aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX)))
             {
@@ -9308,20 +9320,28 @@ genOr (const iCode * ic, iCode * ifx)
           const bool next_byte_h = aopInReg (result->aop, i + 1, H_IDX) &&
             (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (left->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (left->aop, i + 1, H_IDX));
 
-          const bool this_byte = this_byte_l || this_byte_h;
-          const bool next_byte = next_byte_l || next_byte_h;
+          const bool this_byte_hl = this_byte_l || this_byte_h;
+          const bool next_byte_hl = next_byte_l || next_byte_h;
 
-          const bool next_byte_unused = !bitVectBitValue (ic->rMask, this_byte_l ? H_IDX : L_IDX);
+          const bool next_byte_hl_unused = !bitVectBitValue (ic->rMask, this_byte_l ? H_IDX : L_IDX);
 
-          if (this_byte && (next_byte || next_byte_unused))
+          if (this_byte_hl && (next_byte_hl || next_byte_hl_unused))
             {
               emit2 ("or hl, de");
               regalloc_dry_run_cost++;
-              i += (1 + next_byte);
+              i += (1 + next_byte_hl);
               continue;
             }
             
-          if (aopInReg (right->aop, i, DE_IDX) &&
+          if (aopInReg (result->aop, i, IY_IDX) &&
+           (aopInReg (left->aop, i, IY_IDX) && aopInReg (right->aop, i, DE_IDX) || aopInReg (left->aop, i, DE_IDX) && aopInReg (right->aop, i, IY_IDX)))
+            {
+              emit2 ("or iy, de");
+              regalloc_dry_run_cost += 2;
+              i += 2;
+              continue;
+            }
+          else if (aopInReg (right->aop, i, DE_IDX) &&
             (left->aop->type == AOP_STK || left->aop->type == AOP_DIR || left->aop->type == AOP_IY) &&
             (aopInReg (result->aop, i, HL_IDX) || isPairDead(PAIR_HL, ic) && right->aop->regs[L_IDX] < i + 2 && right->aop->regs[H_IDX] < i + 2 && (result->aop->type == AOP_DIR || result->aop->type == AOP_IY || result->aop->type == AOP_STK)))
             {
@@ -9343,11 +9363,19 @@ genOr (const iCode * ic, iCode * ifx)
           a_free = true;
         }
 
-      if (aopInReg (right->aop, i, A_IDX))
+      if (aopInReg (right->aop, i, A_IDX) || aopInReg (right->aop, i, IYL_IDX) || aopInReg (right->aop, i, IYH_IDX) || right->aop->type == AOP_SFR)
         {
+          cheapMove (ASMOP_A, 0, right->aop, i, true);
+
           if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
             _push (PAIR_HL);
-          emit3_o (A_OR, ASMOP_A, 0, left->aop, i);
+          if (left->aop->type == AOP_SFR || aopInReg (right->aop, i, A_IDX) || aopInReg (right->aop, i, IYL_IDX) || aopInReg (right->aop, i, IYH_IDX))
+            {
+              regalloc_dry_run_cost += 200;
+              wassert (regalloc_dry_run);
+            }
+          else
+            emit3_o (A_OR, ASMOP_A, 0, left->aop, i);
           if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
             _pop (PAIR_HL);
         }

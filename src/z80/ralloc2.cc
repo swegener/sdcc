@@ -1035,6 +1035,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // Some instructions can handle anything.
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '+' ||
+    ic->op == '|' ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) ||
     ic->op == SEND)
@@ -1076,7 +1077,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 #endif
 
   if(result_in_IY &&
-    (ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS)) // todo: More instructions that can write iy.
+    (ic->op == '-' || ic->op == UNARYMINUS)) // todo: More instructions that can write iy.
     return(true);
 
   // Todo: Multiplication.

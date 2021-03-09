@@ -3,6 +3,10 @@
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Improve handling of iy.
+	* device/include/string.h,
+	  device/lib/memset_explicit.c,
+	  device/lib/incl.mk:
+	  C23 memset_explicit.
 
 2021-03-09 Philipp Klaus Krause <pkk AT spth.de>
 

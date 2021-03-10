@@ -581,8 +581,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
+  // For some iCodes, we can handle anything.
   if(ic->op == '~' || ic->op == IPUSH || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
+    ic->op == GETBYTE ||
     ic->op == LEFT_OP ||
     ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST)
     return(true);
@@ -782,6 +784,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // For some iCodes, code generation can handle anything.
   if(ic->op == '~' || ic->op == CALL || ic->op == RETURN || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
+    ic->op == GETBYTE ||
     !IS_GB && !IY_RESERVED && (ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST) ||
     ic->op == RECEIVE || ic->op == SEND)
     return(true);
@@ -1036,6 +1039,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '+' ||
     ic->op == '|' ||
+    ic->op == GETBYTE ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST ||
     ic->op == SEND)

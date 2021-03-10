@@ -9787,7 +9787,7 @@ genRLC (const iCode * ic)
 /* genGetByte - generates code get a single byte                   */
 /*-----------------------------------------------------------------*/
 static void
-genGetByte (iCode * ic)
+genGetByte (const iCode *ic)
 {
   operand *left, *right, *result;
   int offset;
@@ -9802,7 +9802,7 @@ genGetByte (iCode * ic)
   aopOp (result, ic, FALSE, FALSE);
 
   offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
-  aopPut (AOP (result), aopGet (AOP (left), offset, FALSE), 0);
+  genMove_o (result->aop, 0, left->aop, offset, 1, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   freeAsmop (result, NULL);
   freeAsmop (right, NULL);

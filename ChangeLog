@@ -2,6 +2,9 @@
 
 	* device/include/typeof.h:
 	  Remove apparently unused header that has been broken for many years.
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Flexible register handling for GETBYTE.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

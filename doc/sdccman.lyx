@@ -2623,7 +2623,7 @@ In 3.6.0, the default for char changed from signed to unsigned.
 
 \begin_layout Itemize
 In 3.7.0, the prototype for putchar() changed from void putchar(char) to int
- putchar(int)
+ putchar(int).
 \end_layout
 
 \begin_layout Itemize
@@ -2636,7 +2636,7 @@ In 3.7.0, the option –nojtbound and the corresponding pragma have been depreca
 
 \begin_layout Itemize
 In 3.7.0, the prototype for getchar() changed from char getchar(void) to int
- getchar().
+ getchar(void).
 \end_layout
 
 \begin_layout Itemize

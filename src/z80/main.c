@@ -911,10 +911,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 static bool
 hasExtBitOp (int op, int size)
 {
-  if (op == GETHBIT)
-    return TRUE;
-  else
-    return FALSE;
+  switch (op)
+    {
+    case GETHBIT:
+    case GETBYTE:
+      return TRUE;
+    }
+  return FALSE;
 }
 
 /* Indicate the expense of an access to an output storage class */

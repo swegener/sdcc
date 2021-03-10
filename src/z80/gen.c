@@ -9740,6 +9740,32 @@ genRLC (const iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genGetByte - generates code get a single byte                   */
+/*-----------------------------------------------------------------*/
+static void
+genGetByte (iCode * ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  emitcode (";", "genGetByte");
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (right, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
+  aopPut (AOP (result), aopGet (AOP (left), offset, FALSE), 0);
+
+  freeAsmop (result, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
+}
+
+/*-----------------------------------------------------------------*/
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
 static void
@@ -14080,6 +14106,11 @@ genZ80iCode (iCode * ic)
     case GETABIT:
       emitDebug ("; genGetAbit");
       genGetAbit (ic);
+      break;
+
+    case GETBYTE:
+      emitDebug ("; genGetByte");
+      genGetByte (ic);
       break;
 
     case LEFT_OP:

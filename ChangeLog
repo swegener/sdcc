@@ -1,4 +1,7 @@
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+	* src/z80/gen.c: Get parameters faster on gbz80 sometimes.
+
+2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 	* device/lib/gbz80/setjmp.s:
 	  Rewrite setjmp for gbz80.
 

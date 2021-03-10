@@ -1,3 +1,8 @@
+2021-03-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/typeof.h:
+	  Remove apparently unused header that has been broken for many years.
+
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/gen.c,

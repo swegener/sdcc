@@ -36,8 +36,8 @@ __initrleblock::
 	pop	hl
 1$:
 	;; Fetch the run
-	ld	c, (hl)
-	inc	hl
+	ld	a, (hl+)
+	ld	c, a
 	;; Negative means a run
 	bit	7, c
 	jr	Z, 2$

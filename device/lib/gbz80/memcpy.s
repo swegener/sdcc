@@ -2,6 +2,7 @@
 ;  memcpy.s
 ;
 ;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -33,7 +34,7 @@
 
 _memcpy::
 ___memcpy::
-	lda	hl, 7(sp)
+	ldhl	sp, #7
 	ld	a, (hl-)
 	ld	d, a
 	ld	a, (hl-)
@@ -62,8 +63,8 @@ ___memcpy::
 	jr	nz, 100$
 	pop	bc
 190$:
-	lda	hl, 2(sp)
-	ld	e, (hl)
-	inc	hl
+	ldhl	sp, #2
+	ld	a, (hl+)
+	ld	e, a
 	ld	d, (hl)
 	ret

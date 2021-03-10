@@ -49,7 +49,7 @@
         reti
 
         .org    0x100
-        jp      0x150
+        jp      init
 
         .org    0x150
 init:

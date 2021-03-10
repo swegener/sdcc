@@ -2,6 +2,7 @@
 ;  setjmp.s
 ;
 ;  Copyright (C) 2011-2014, Philipp Klaus Krause
+;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -42,20 +43,18 @@ ___setjmp:
 	push	hl
 	pop	de
 	pop	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	inc	hl
+	ld	a, e
+	ld	(hl+), a
+	ld	a, d
+	ld	(hl+), a
 
 	; Store return address.
-	ld	(hl), c
-	inc	hl
+	ld	a, c
+	ld	(hl+), a
 	ld	(hl), b
 
 	; Return 0.
-	xor	a, a
-	ld	e, a
-	ld	d, a
+	ld	de, #0
 	ret
 
 .globl _longjmp
@@ -73,10 +72,10 @@ _longjmp:
 0001$:
 
 	; Get stack pointer.
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
+	ld	a, (hl+)
+	ld	c, a
+	ld	a, (hl+)
+	ld	b, a
 
 	; Adjust stack pointer.
 	push	hl
@@ -88,8 +87,8 @@ _longjmp:
 	pop	hl
 
 	; Get return address.
-	ld	c, (hl)
-	inc	hl
+	ld	a, (hl+)
+	ld	c, a
 	ld	b, (hl)
 
 	; Set return address.

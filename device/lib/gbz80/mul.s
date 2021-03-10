@@ -2,6 +2,7 @@
 ;  mul.s
 ;
 ;  Copyright (C) 2000, Michael Hope
+;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -39,31 +40,28 @@
 ; operands have different sign
 
 __mulsuchar:
-        ld      hl,#2+1
-        ld      b, h
-        add     hl,sp
+        ldhl    sp,#2+1
+        ld      b, #0
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      c,(hl)
         jr      signexte
 
 __muluschar:
-        ld      hl,#2
-        ld      b, h
-        add     hl,sp
+        ldhl    sp,#2
+        ld      b, #0
 
-        ld      e,(hl)
-        inc     hl
+        ld      a,(hl+)
+        ld      e,a
         ld      c,(hl)
         jr      signexte
 
 __mulschar:
-        ld      hl,#2
-        add     hl,sp
+        ldhl    sp,#2
 
-        ld      e,(hl)
-        inc     hl
+        ld      a,(hl+)
+        ld      e,a
         ld      l,(hl)
 
         ;; Need to sign extend before going in.
@@ -82,12 +80,10 @@ signexte:
         jp      .mul16
 
 __muluchar:
-        ld      hl,#2
-        add     hl,sp
+        ldhl    sp,#2
 
-        ld      e,(hl)
-
-        inc     hl
+        ld      a,(hl+)
+        ld      e,a
         ld      c,(hl)
 
         ;; Clear the top
@@ -98,15 +94,13 @@ __muluchar:
         jp      .mul16
 
 __mulint:
-        ld      hl,#2
-        add     hl,sp
+        ldhl    sp,#2
 
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        inc     hl
-        ld      a,(hl)
-        inc     hl
+        ld      a,(hl+)
+        ld      e,a
+        ld      a,(hl+)
+        ld      d,a
+        ld      a,(hl+)
         ld      h,(hl)
         ld      l,a
 

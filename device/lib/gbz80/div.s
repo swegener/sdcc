@@ -2,6 +2,7 @@
 ;  div.s
 ;
 ;  Copyright (C) 2000, Michael Hope
+;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -43,15 +44,14 @@
 .globl	__moduint
 
 __divsuchar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      c,(hl)
         ld      b,#0
 
-        call      signexte
+        call    signexte
 
 	ld	e,c
 	ld	d,b
@@ -59,23 +59,21 @@ __divsuchar:
 	ret
 
 __modsuchar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      c,(hl)
         ld      b,#0
 
-        jp    signexte
+        jp      signexte
 
 __divuschar:
-        ld      hl,#2+1
-        ld      d, h
-        add     hl,sp
+        ldhl    sp,#2+1
+        ld      d, #0
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      c,(hl)
 
         ld      a,c             ; Sign extend
@@ -91,12 +89,11 @@ __divuschar:
 	ret
 
 __moduschar:
-        ld      hl,#2+1
-        ld      d, h
-        add     hl,sp
+        ldhl    sp,#2+1
+        ld      d, #0
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      c,(hl)
 
         ld      a,c             ; Sign extend
@@ -109,11 +106,10 @@ __moduschar:
         ret
 
 __divschar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      l,(hl)
 
         ld      c,l
@@ -126,11 +122,10 @@ __divschar:
         ret
 
 __modschar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      l,(hl)
 
         ld      c,l
@@ -142,15 +137,13 @@ __modschar:
         ret
 
 __divsint:
-        ld      hl,#2+3
-        add     hl,sp
+        ldhl    sp,#2+3
 
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      d,a
+        ld      a,(hl-)
+        ld      e,a
+        ld      a,(hl-)
         ld      l,(hl)
         ld      h,a
 
@@ -165,15 +158,13 @@ __divsint:
         ret
 
 __modsint:
-        ld      hl,#2+3
-        add     hl,sp
+        ldhl    sp,#2+3
 
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      d,a
+        ld      a,(hl-)
+        ld      e,a
+        ld      a,(hl-)
         ld      l,(hl)
         ld      h,a
 
@@ -188,11 +179,10 @@ __modsint:
 
         ;; Unsigned
 __divuchar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      l,(hl)
 
         ld      c,l
@@ -204,11 +194,10 @@ __divuchar:
         ret
 
 __moduchar:
-        ld      hl,#2+1
-        add     hl,sp
+        ldhl    sp,#2+1
 
-        ld      e,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      e,a
         ld      l,(hl)
 
         ld      c,l
@@ -219,15 +208,13 @@ __moduchar:
         ret
 
 __divuint:
-        ld      hl,#2+3
-        add     hl,sp
+        ldhl    sp,#2+3
 
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      d,a
+        ld      a,(hl-)
+        ld      e,a
+        ld      a,(hl-)
         ld      l,(hl)
         ld      h,a
 
@@ -241,15 +228,13 @@ __divuint:
         ret
 
 __moduint:
-        ld      hl,#2+3
-        add     hl,sp
+        ldhl    sp,#2+3
 
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
+        ld      a,(hl-)
+        ld      d,a
+        ld      a,(hl-)
+        ld      e,a
+        ld      a,(hl-)
         ld      l,(hl)
         ld      h,a
 
@@ -406,8 +391,7 @@ signexte:
         jr      NZ,.dvloop
         jr      .nodrop
 .drop:
-        inc     sp
-        inc     sp
+        pop     af              ; faster and smaller than 2x inc sp
         pop     af              ; recover # bits remaining, carry flag destroyed
         dec     a
         scf                     ; restore (set) the carry flag

@@ -2648,6 +2648,10 @@ In 4.0.3, _itoa, _uitoa, _ltoa, _ultoa were renamed to __itoa, __uitoa, __ltoa,
  __ultoa.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.1, typeof.h has been removed.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

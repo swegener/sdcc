@@ -10459,6 +10459,7 @@ genLeftShift (const iCode *ic)
     {
       if (size >= 2 && offset + 1 >= byteshift &&
         result->aop->type == AOP_REG &&
+        (!started || !IS_GB) && // gbz80 doesn't have wide adc
         (getPartPairId (result->aop, offset) == PAIR_HL ||
         !started && getPartPairId (result->aop, offset) == PAIR_IY ||
         (IS_RAB || optimize.codeSize && !started && !IS_GB) && getPartPairId (result->aop, offset) == PAIR_DE))

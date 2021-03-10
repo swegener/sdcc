@@ -1,5 +1,10 @@
 2021-03-10 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix issue that resulted in adc hl, hl being emitted on gbz80.
+
+2021-03-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/include/typeof.h:
 	  Remove apparently unused header that has been broken for many years.
 	* src/z80/ralloc2.cc,

@@ -90,7 +90,7 @@ usage (void)
            "Options:\n"
            "  -p             pack mode: the binary file size will be truncated to the last occupied byte\n"
            "  -s romsize     size of the binary file (default: rom banks * 16384)\n"
-           "  -Z             genarate GameBoy format binary file\n"
+           "  -Z             generate GameBoy format binary file\n"
            "GameBoy format options (applicable only with -Z option):\n"
            "  -yo n          number of rom banks (default: 2) (autosize: A)\n"
            "  -ya n          number of ram banks (default: 0)\n"

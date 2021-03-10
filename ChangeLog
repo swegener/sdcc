@@ -1,4 +1,9 @@
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+	* src/z80/main.c,
+	  support/makebin/makebin.c:
+	  Fix help texts for gbz80.
+
+2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 	* src/z80/gen.c: Get parameters faster on gbz80 sometimes.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>

@@ -1,3 +1,9 @@
+2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/gen.c,
+	  src/z80/mappings.i:
+	  Use placeholders more and add new ones. (Improves rgbds asm generation)
+
 2021-03-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
@@ -15,18 +21,22 @@
 	  Improve handling of iyl and iyh in + and | for eZ80.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* src/z80/main.c,
 	  support/makebin/makebin.c:
 	  Fix help texts for gbz80.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* src/z80/gen.c: Get parameters faster on gbz80 sometimes.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* device/lib/gbz80/setjmp.s:
 	  Rewrite setjmp for gbz80.
 
 2021-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* device/lib/gbz80/__initrleblock.s,
 	  device/lib/gbz80/crt0.s,
 	  device/lib/gbz80/div.s,

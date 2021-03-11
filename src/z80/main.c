@@ -916,6 +916,8 @@ hasExtBitOp (int op, int size)
     case GETHBIT:
     case GETBYTE:
       return TRUE;
+    case SWAP:
+      return size <= 4;
     }
   return FALSE;
 }

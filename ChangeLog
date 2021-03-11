@@ -1,3 +1,9 @@
+2021-03-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c,
+	  src/z80/main.c:
+	  Add basic support for SWAP iCode for all Z80 ports.
+
 2021-03-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
@@ -22,7 +28,7 @@
 	* src/z80/gen.c:
 	  Improve register pair handling in code generation.
 
-2021-03-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+2021-03-10 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c,
 	  src/z80/main.c:

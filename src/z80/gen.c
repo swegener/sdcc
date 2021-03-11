@@ -10177,12 +10177,29 @@ genSwap (iCode * ic)
         }
       break;
     case 2:                    /* swap bytes in word */
-      genMove_o (AOP (result), 1, AOP (left), 0, 1, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
-      genMove_o (AOP (result), 0, AOP (left), 1, 1, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+      if (sameRegs (AOP(result), AOP(left)) || operandsEqu (result, left))
+        {
+          _moveA (aopGet (AOP (left), 0, FALSE));
+          _push (PAIR_AF);
+          cheapMove (AOP (result), 0, AOP (left), 1, TRUE);
+          _pop (PAIR_AF);
+          cheapMove (AOP (result), 1, ASMOP_A, 0, TRUE);
+        }
+      else
+        {
+          aopPut (AOP (result), aopGet (AOP (left), 1, FALSE), 0);
+          aopPut (AOP (result), aopGet (AOP (left), 0, FALSE), 1);
+        }
       break;
     case 4:                    /* swap words in double word */
-      genMove_o (AOP (result), 2, AOP (left), 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
-      genMove_o (AOP (result), 0, AOP (left), 2, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+      genMove_o (AOP (result), 2, AOP (left), 0, 2, 
+                 !bitVectBitValue (ic->rSurv, A_IDX),
+                 isPairDead (PAIR_HL, ic) && !aopInReg (AOP (left), 2, HL_IDX),
+                 isPairDead (PAIR_DE, ic) && !aopInReg (AOP (left), 2, HL_IDX));
+      genMove_o (AOP (result), 0, AOP (left), 2, 2,
+                 !bitVectBitValue (ic->rSurv, A_IDX),
+                 isPairDead (PAIR_HL, ic) && !aopInReg (AOP (result), 2, HL_IDX),
+                 isPairDead (PAIR_DE, ic) && !aopInReg (AOP (result), 2, DE_IDX));
       break;
     default:
       wassertl (FALSE, "unsupported SWAP operand size");

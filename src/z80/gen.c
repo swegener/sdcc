@@ -10141,40 +10141,44 @@ genSwap (iCode * ic)
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
 
-  switch (AOP_SIZE (left))
+  switch (left->aop->size)
     {
-    case 1:                    /* swap nibbles in byte */
-      wassertl (!IS_GB || !IS_Z80N, "unsupported SWAP operand size");
-      if (IS_GB && (AOP_TYPE (left) == AOP_REG || AOP_TYPE (left) == AOP_HL) && sameRegs (AOP (left), AOP (result)))
-        emit3 (A_SWAP, AOP (left), 0);
-      else if (IS_GB && (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HL)) /* GBZ80 use swap r8 */
+    case 1: // swap nibbles in byte
+      ;
+      bool pushed_a = false;
+
+      // For gbz80, options other than a can make sense for swapping in.
+      asmop *shiftop = ASMOP_A;
+      if (IS_GB && result->aop->type == AOP_REG) 
+        shiftop = result->aop;
+      else if (IS_GB && left->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, left->aop->aopu.aop_reg[0]->rIdx))
+        shiftop = left->aop;
+      else if (IS_GB && result->aop->type == AOP_STK || IS_GB && result->aop->type == AOP_HL)
+        shiftop = result->aop;
+
+      if (bitVectBitValue (ic->rSurv, A_IDX) && aopInReg (shiftop, 0, A_IDX))
         {
-          aopPut (AOP (result), aopGet (AOP (left), 0, FALSE), 0);
-          emit3 (A_SWAP, AOP (result), 0);
+          _push (PAIR_AF);
+          pushed_a = true;
         }
-      else if (IS_GB || IS_Z80N) /* Z80N or GBZ80 and source is differ than destination or source is not r8 or (hl) */
+
+      genMove (shiftop, left->aop, !bitVectBitValue (ic->rSurv, A_IDX) || pushed_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+
+      if (IS_GB || IS_Z80N)
+        emit3 (A_SWAP, shiftop, 0);
+      else
         {
-          if (AOP_TYPE (left) == AOP_REG && sameRegs (AOP(result), ASMOP_A)) /* source register is A */
-            emit3 (A_SWAP, AOP (left), 0);
-          else
-            { //todo: use any free register for GBZ80
-              _moveA (aopGet (AOP (left), 0, FALSE));
-              emit3 (A_SWAP, ASMOP_A, 0);
-            }
-          if (AOP_TYPE (result) != AOP_REG || !sameRegs (AOP(result), ASMOP_A))
-            aopPut (AOP (result), "a", 0);
+          emit3 (A_RLCA, 0, 0);
+          emit3 (A_RLCA, 0, 0);
+          emit3 (A_RLCA, 0, 0);
+          emit3 (A_RLCA, 0, 0);
         }
-      else /* Not Z80N or GBZ80 */
-        {
-          if (AOP_TYPE (left) != AOP_REG || !sameRegs (AOP(result), ASMOP_A)) /* source register is not A */
-            _moveA (aopGet (AOP (left), 0, FALSE));
-          emit3 (A_RLCA, 0, 0);
-          emit3 (A_RLCA, 0, 0);
-          emit3 (A_RLCA, 0, 0);
-          emit3 (A_RLCA, 0, 0);
-          if (AOP_TYPE (result) != AOP_REG || !sameRegs (AOP(result), ASMOP_A))
-            aopPut (AOP (result), "a", 0);
-        }
+
+      genMove (result->aop, shiftop, !bitVectBitValue (ic->rSurv, A_IDX) || pushed_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+        
+      if (pushed_a)
+        _pop (PAIR_AF);  
+
       break;
     case 2:                    /* swap bytes in word */
       if (sameRegs (AOP(result), AOP(left)) || operandsEqu (result, left))

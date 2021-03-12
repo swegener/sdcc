@@ -1,3 +1,9 @@
+2021-03-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Some small improvements and fixes in register handling.
+
 2021-03-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

@@ -1149,7 +1149,7 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if (ic->op == '=' && POINTER_SET(ic) && !operand_is_pair(result, a, i, G))
     return(false);
 
-  if((ic->op == '=' || ic->op == CAST) && getSize(operandType(result)) >= 2 &&
+  if((ic->op == '=' || ic->op == CAST) && getSize(operandType(result)) > 2 &&
      (operand_on_stack(right, a, i, G) || operand_in_reg(right, REG_L, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G)) &&
      (operand_on_stack(result, a, i, G) || operand_in_reg(result, REG_L, ia, i, G) || operand_in_reg(result, REG_H, ia, i, G)))
     return(false);

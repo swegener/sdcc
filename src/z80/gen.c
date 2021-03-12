@@ -3125,7 +3125,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     from->type == AOP_SFR ||
     to->type == AOP_SFR ||
     to->type == AOP_STK && from->type == AOP_STK ||
-    (to->type == AOP_IY /*|| to->type == AOP_HL*/) && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK) ||
+    (to->type == AOP_IY || to->type == AOP_HL) && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK) ||
     (to->type == AOP_HL || IS_GB && to->type == AOP_STK || to->type == AOP_EXSTK) && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))))
     {
       if (!a_dead)
@@ -5609,7 +5609,7 @@ genEndFunction (iCode * ic)
             {
               symbol *tlbl = newiTempLabel (NULL);
               //restore P/O flag
-              if (retsize > 0 && retsize <= 4 && ASMOP_RETURN->regs[A_IDX] > 0 && ASMOP_RETURN->regs[A_IDX] < retsize) // Preserve return value in a.
+              if (retsize > 0 && retsize <= 4 && ASMOP_RETURN->regs[A_IDX] >= 0 && ASMOP_RETURN->regs[A_IDX] < retsize) // Preserve return value in a.
                 {
                   wassert (!IS_GB);
                   emit2 ("ex (sp), hl");

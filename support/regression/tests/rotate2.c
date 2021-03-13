@@ -122,7 +122,7 @@ TYPE rotate_test_1_xor2(TYPE value)
     return (((value ^ rotate_test_value_xor) << SHIFT_L) | ((value ^ rotate_test_value_xor) >> SHIFT_R)) AND_OPERATION;
 }
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined(__SDCC_pdk14) || defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of memory
 
 TYPE rotate_test_2(TYPE value)
 {
@@ -218,7 +218,7 @@ static void
 testSwaps(void)
 {
 #ifndef __SDCC_mcs51 // Bug #3188
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined(__SDCC_pdk14) || defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of memory
     volatile TYPE t = TEST_VALUE;
     TYPE u;
     
@@ -227,7 +227,7 @@ testSwaps(void)
     ASSERT( rotate_test_1(u)      == ROTATE_RESULT);
     ASSERT( rotate_test_1_xor1(u) == ROTATE_RESULT_XOR);
     ASSERT( rotate_test_1_xor2(u) == ROTATE_RESULT_XOR);
-  
+
     ASSERT( rotate_test_2(u)      == ROTATE_RESULT);
     ASSERT( rotate_test_2_xor1(u) == ROTATE_RESULT_XOR);
     ASSERT( rotate_test_2_xor2(u) == ROTATE_RESULT_XOR);
@@ -240,7 +240,7 @@ testSwaps(void)
     ASSERT( rotate_test_4(u)      == ROTATE_RESULT);
     ASSERT( rotate_test_4_xor1(u) == ROTATE_RESULT_XOR);
     ASSERT( rotate_test_4_xor2(u) == ROTATE_RESULT_XOR);
-    
+
     ASSERT( rotate_test_5(u)      == ROTATE_RESULT);
     ASSERT( rotate_test_5_xor1(u) == ROTATE_RESULT_XOR);
     ASSERT( rotate_test_5_xor2(u) == ROTATE_RESULT_XOR);

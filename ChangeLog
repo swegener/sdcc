@@ -2,6 +2,11 @@
 
 	* support/regression/Makefile.in:
 	  Helper rule for testing pdk ports.
+	* src/pdk/gen.c,
+	  src/pdk/main.c:
+	  8-bit swap for pdk.
+	* support/regression/tests/rotate2.c:
+	  Disable test for pdk15-stack-auto due to lack of memory.
 
 2021-03-12 Philipp Klaus Krause <pkk AT spth.de>
 

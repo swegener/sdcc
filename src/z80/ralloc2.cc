@@ -789,6 +789,9 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == RECEIVE || ic->op == SEND)
     return(true);
 
+  if((ic->op == EQ_OP || ic->op == NE_OP) && IS_VALOP(right))
+    return(true);
+
   // Due to lack of ex hl, (sp), the generic push code generation fallback doesn't work for gbz80, so we need to be able to use hl if we can't just push a pair or use a.
   if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G) && ia.registers[REG_A][1] >= 0 &&
     !(getSize(operandType(left)) == 1 && (operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(left, REG_B, ia, i, G) || operand_in_reg(left, REG_D, ia, i, G) || operand_in_reg(left, REG_H, ia, i, G))))
@@ -934,9 +937,6 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
   if((ic->op == '<' || ic->op == '>') && (IS_ITEMP(left) || IS_OP_LITERAL(left) || IS_ITEMP(right) || IS_OP_LITERAL(right))) // Todo: Fix for large stack.
-    return(true);
-    
-  if(ic->op == EQ_OP && IS_VALOP(right))
     return(true);
 
   if(ic->op == CALL)

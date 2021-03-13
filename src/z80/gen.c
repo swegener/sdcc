@@ -8342,8 +8342,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
   int offset = 0;
-  bool a_result = FALSE;
-  bool next_zero;
+  bool a_result = false;
 
   /* Swap the left and right if it makes the computation easier */
   if (AOP_TYPE (left) == AOP_LIT || aopInReg (right->aop, 0, A_IDX))
@@ -8355,12 +8354,25 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 
   /* Non-destructive compare */
   if (aopInReg (left->aop, 0, A_IDX) && bitVectBitValue (ic->rSurv, A_IDX) &&
-    (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (right)->aopu.aop_reg[offset]->rIdx != IYH_IDX || AOP_TYPE (right) == AOP_STK))
+    (right->aop->type == AOP_LIT ||
+    right->aop->type == AOP_REG && (IS_EZ80_Z80 || right->aop->aopu.aop_reg[offset]->rIdx != IYL_IDX && right->aop->aopu.aop_reg[offset]->rIdx != IYH_IDX) ||
+    right->aop->type == AOP_STK))
     {
-      if (AOP_TYPE (right) == AOP_LIT && !byteOfVal (AOP (right)->aopu.aop_lit, 0))
+      bool pushed_hl = false;
+      if(requiresHL (right->aop) && right->aop->type != AOP_REG && !isPairDead(PAIR_HL, ic))
+        {
+          _push (PAIR_HL);
+          pushed_hl = true;
+        }
+        
+      if (right->aop->type == AOP_LIT && !byteOfVal (right->aop->aopu.aop_lit, 0))
         emit3 (A_OR, ASMOP_A, ASMOP_A);
       else
-        emit3 (A_CP, ASMOP_A, AOP (right));
+        emit3 (A_CP, ASMOP_A, right->aop);
+        
+      if (pushed_hl)
+        _pop (PAIR_HL);
+
       if (!regalloc_dry_run)
         emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
       regalloc_dry_run_cost += 3;
@@ -8370,7 +8382,14 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
     {
       while (size--)
         {
-          next_zero = size && !byteOfVal (AOP (right)->aopu.aop_lit, offset + 1);
+          bool pushed_hl = false;
+          bool next_zero = size && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
+
+          if(requiresHL (right->aop) && right->aop->type != AOP_REG && !isPairDead(PAIR_HL, ic))
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+            }
 
           // Test for 0 can be done more efficiently using or
           if (!byteOfVal (AOP (right)->aopu.aop_lit, offset))
@@ -8430,6 +8449,9 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 
               a_result = true;
             }
+
+          if (pushed_hl)
+            _pop (PAIR_HL);
 
           // Only emit jump now if there is no following test for 0 (which would just or to a current result in a)
           if (!(next_zero && a_result))
@@ -8659,9 +8681,8 @@ genCmpEq (iCode * ic, iCode * ifx)
         }
       /* if the result is used in an arithmetic operation
          then put the result in place */
-      if (AOP_TYPE (result) != AOP_CRY)
-        outAcc (result);
-      /* leave the result in acc */
+      if (result->aop->type != AOP_CRY)
+        genMove (result->aop, ASMOP_A, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
     }
 
 release:

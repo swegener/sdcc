@@ -3336,7 +3336,7 @@ genSwap (const iCode *ic)
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
 
-  D (emit2 ("; genLeftShift", ""));
+  D (emit2 ("; genSwap", ""));
 
   aopOp (result, ic);
   aopOp (left, ic);

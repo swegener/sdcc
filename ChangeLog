@@ -7,6 +7,9 @@
 	  8-bit swap for pdk.
 	* support/regression/tests/rotate2.c:
 	  Disable test for pdk15-stack-auto due to lack of memory.
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improve handling of hl in equality comparison.
 
 2021-03-12 Philipp Klaus Krause <pkk AT spth.de>
 

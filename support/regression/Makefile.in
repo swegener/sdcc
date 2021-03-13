@@ -221,6 +221,9 @@ test-ucz80n:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucz80n
 
+# Helper rule for testing the pdk ports only
+test-pdk: test-pdk14 test-pdk14 test-pdk15-stack-auto
+
 # Helper rule for testing the pdk14 port only(use uCsim simulator)
 test-pdk14:
 	$(MAKE) test-common

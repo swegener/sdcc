@@ -8385,7 +8385,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
           bool pushed_hl = false;
           bool next_zero = size && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
 
-          if(requiresHL (right->aop) && right->aop->type != AOP_REG && !isPairDead(PAIR_HL, ic))
+          if(requiresHL (left->aop) && left->aop->type != AOP_REG && !isPairDead(PAIR_HL, ic))
             {
               _push (PAIR_HL);
               pushed_hl = true;

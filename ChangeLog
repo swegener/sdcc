@@ -1,5 +1,11 @@
 2021-03-13 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Fix bug #3190.
+
+2021-03-13 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/Makefile.in:
 	  Helper rule for testing pdk ports.
 	* src/pdk/gen.c,

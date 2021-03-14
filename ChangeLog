@@ -1,3 +1,8 @@
+2021-03-14 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/gen.c:
+	  Improve 16b swap for z80ies.
+
 2021-03-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

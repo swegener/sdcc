@@ -3741,7 +3741,8 @@ skip_byte:
       else if (i + 1 < n && !assigned[i + 1] && (source->type == AOP_STK || source->type == AOP_EXSTK) &&
         sp_offset == 2 && getPairId_o (result, roffset + i) != PAIR_INVALID &&
         (getPairId_o (result, roffset + i) != PAIR_HL && hl_free || getPairId_o (result, roffset + i) != PAIR_DE && de_free) &&
-        (!regalloc_dry_run || source->aopu.aop_stk > 0)) // Stack locations might change, unless its a parameter.
+        (!regalloc_dry_run || source->aopu.aop_stk > 0) &&  // Stack locations might change, unless its a parameter.
+        (!IS_GB || optimize.codeSize)) // GameBoy can do it faster (worst case 2B bigger, but 1B smaller if lucky -> hl reuse)
         {
           PAIR_ID pair = getPairId_o (result, roffset + i);
           PAIR_ID extrapair = (getPairId_o (result, roffset + i) != PAIR_HL && hl_free) ? PAIR_HL : PAIR_DE; // If we knew it is dead, we could use bc as extrapair here, too.
@@ -10198,13 +10199,11 @@ genSwap (iCode * ic)
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
-
+  bool pushed_a = false;
   switch (left->aop->size)
     {
     case 1: // swap nibbles in byte
       ;
-      bool pushed_a = false;
-
       // For gbz80, options other than a can make sense for swapping in.
       asmop *shiftop = ASMOP_A;
       if (IS_GB && result->aop->type == AOP_REG) 
@@ -10241,11 +10240,29 @@ genSwap (iCode * ic)
     case 2:                    /* swap bytes in word */
       if (sameRegs (AOP(result), AOP(left)) || operandsEqu (result, left))
         {
+          // avoid push/pop by finding free register
+          asmop *free_reg = ASMOP_A;
+          if (!bitVectBitValue (ic->rSurv, B_IDX))
+            free_reg = ASMOP_B;
+          if (!bitVectBitValue (ic->rSurv, C_IDX))
+            free_reg = ASMOP_C;
+          if (!bitVectBitValue (ic->rSurv, D_IDX))
+            free_reg = ASMOP_D;
+          if (!bitVectBitValue (ic->rSurv, E_IDX))
+            free_reg = ASMOP_E;
           _moveA (aopGet (AOP (left), 0, FALSE));
-          _push (PAIR_AF);
-          cheapMove (AOP (result), 0, AOP (left), 1, TRUE);
-          _pop (PAIR_AF);
-          cheapMove (AOP (result), 1, ASMOP_A, 0, TRUE);
+          if (free_reg == ASMOP_A)
+            {
+              _push (PAIR_AF);
+              pushed_a = true;
+            }
+          // if left and result are registers, this should get optimized away
+          cheapMove (free_reg, 0, AOP (left), 1, FALSE);
+          cheapMove (AOP (result), (free_reg == ASMOP_A ? 0 : 1), ASMOP_A, 0, FALSE);
+          if(pushed_a){
+            _pop (PAIR_AF);
+          }
+          cheapMove (AOP (result), (free_reg == ASMOP_A ? 1 : 0), free_reg, 0, TRUE);
         }
       else
         {
@@ -13073,11 +13090,11 @@ _dbFlush (DBEMITCTX * self)
   if (self->pos > 0)
     {
       int i;
-      sprintf (line, ".db !immedbyte", self->buffer[0]);
+      sprintf (line, ".db !immed%d", self->buffer[0]);
 
       for (i = 1; i < self->pos; i++)
         {
-          sprintf (line + strlen (line), ", !immedbyte", self->buffer[i]);
+          sprintf (line + strlen (line), ", !immed%d", self->buffer[i]);
         }
       emit2 (line);
     }

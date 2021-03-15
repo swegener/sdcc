@@ -2,6 +2,12 @@
 
 	* src/z80/gen.c,
 	  src/z80/main.c:
+	  Add RLC/RRC for all Z80 ports (GBZ80: only 8b).
+
+2021-03-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c,
+	  src/z80/main.c:
 	  Add 32b swap for all Z80 ports.
 
 2021-03-14 Sebastian 'basxto' Riedel <sdcc@basxto.de>

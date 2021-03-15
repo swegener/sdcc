@@ -9830,7 +9830,62 @@ genCpl (const iCode *ic)
 static void
 genRRC (const iCode * ic)
 {
-  wassert (0);
+  operand *left, *result;
+  bool pushed_a = bitVectBitValue (ic->rSurv, A_IDX);
+  /* rotate right with carry */
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  if (pushed_a)
+    _push (PAIR_AF);
+
+  int size = AOP_SIZE (result);
+  int offset = size - 1;
+  if (size == 0)
+    {
+      /* special case for 1 byte */
+      _moveA (aopGet (left->aop, 0, false));
+      emit3_o (A_RRCA, 0, 0, 0, 0);
+      aopPut (result->aop, "a", 0);
+    }
+  else if (left->aop->type == AOP_REG || result->aop->type == AOP_STK ||
+           result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
+           result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
+    {
+      if (left->aop->type != AOP_REG)
+        {
+          /* always prefer register operations */
+          genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+          left = result;
+        }
+      _moveA (aopGet (left->aop, offset, false));
+      emit3_o (A_RRA, 0, 0, 0, 0);
+      while (--offset >= 0)
+        emit3_o (A_RR, left->aop, offset, 0, 0);
+      emit3_o (A_RR, left->aop, size - 1, 0, 0);
+      if (!operandsEqu (result, left))
+        genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+    }
+  else
+    {
+      while (offset >= 0)
+        {
+          _moveA (aopGet (left->aop, offset, false));
+          emit3_o (A_RRA, 0, 0, 0, 0);
+          if (offset != size - 1)
+            aopPut (result->aop, "a", offset);
+          --offset;
+        }
+      _moveA (aopGet (left->aop, size - 1, false));
+      emit3_o (A_RRA, 0, 0, 0, 0);
+      aopPut (result->aop, "a", size - 1);
+    }
+  if (pushed_a)
+    _pop (PAIR_AF);
+  freeAsmop (IC_LEFT (ic), 0);
+  freeAsmop (IC_RESULT (ic), 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9839,7 +9894,60 @@ genRRC (const iCode * ic)
 static void
 genRLC (const iCode * ic)
 {
-  wassert (0);
+  operand *left, *result;
+  bool pushed_a = bitVectBitValue (ic->rSurv, A_IDX);
+  /* rotate left with carry */
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  if (pushed_a)
+    _push (PAIR_AF);
+
+  int size = AOP_SIZE (result);
+  if (size == 0)
+    {
+      /* special case for 1 byte */
+      _moveA (aopGet (left->aop, 0, false));
+      emit3_o (A_RLCA, 0, 0, 0, 0);
+      aopPut (result->aop, "a", 0);
+    }
+  else if (left->aop->type == AOP_REG || result->aop->type == AOP_STK ||
+           result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
+           result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
+    {
+      if (left->aop->type != AOP_REG)
+        {
+          /* always prefer register operations */
+          genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+          left = result;
+        }
+      _moveA (aopGet (left->aop, 0, false));
+      emit3_o (A_RLA, 0, 0, 0, 0);
+      for (int offset = 1; offset < size; ++offset)
+        emit3_o (A_RL, left->aop, offset, 0, 0);
+      emit3_o (A_RL, left->aop, 0, 0, 0);
+      if (!operandsEqu (result, left))
+        genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+    }
+  else
+    {
+      for (int offset = 0; offset < size; ++offset)
+        {
+          _moveA (aopGet (left->aop, offset, false));
+          emit3_o (A_RLA, 0, 0, 0, 0);
+          if (offset != 0)
+            aopPut (result->aop, "a", offset);
+        }
+      _moveA (aopGet (left->aop, 0, false));
+      emit3_o (A_RLA, 0, 0, 0, 0);
+      aopPut (result->aop, "a", 0);
+    }
+  if (pushed_a)
+    _pop (PAIR_AF);
+  freeAsmop (IC_LEFT (ic), 0);
+  freeAsmop (IC_RESULT (ic), 0);
 }
 
 /*-----------------------------------------------------------------*/

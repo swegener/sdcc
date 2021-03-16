@@ -1,3 +1,8 @@
+2021-03-16 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  Fix typos (replace & by && in some conditions).
+
 2021-03-15 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c,

@@ -9091,7 +9091,7 @@ genAnd (const iCode * ic, iCode * ifx)
   for (int i = 0; i < size;)
     {
       bool hl_free = isPairDead (PAIR_HL, ic) &&
-        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
+        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i && right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
 
       if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i))
@@ -9218,7 +9218,7 @@ genAnd (const iCode * ic, iCode * ifx)
         }
 
       hl_free = isPairDead (PAIR_HL, ic) &&
-        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i & right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
+        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i && right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
 
       genMove_o (result->aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));
@@ -9348,7 +9348,7 @@ genOr (const iCode * ic, iCode * ifx)
   for (int i = 0; i < size;)
     {
       bool hl_free = isPairDead (PAIR_HL, ic) &&
-        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
+        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i && right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
         
       if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i))
@@ -9511,7 +9511,7 @@ genOr (const iCode * ic, iCode * ifx)
         }
 
       hl_free = isPairDead (PAIR_HL, ic) &&
-        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i & right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
+        (left->aop->regs[L_IDX] <= i && left->aop->regs[H_IDX] <= i && right->aop->regs[L_IDX] <= i && right->aop->regs[H_IDX] <= i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
 
       genMove_o (result->aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));
@@ -9648,13 +9648,13 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
         wassertl (0, "Result of XOR is in a bit");
         return;
       }
-      
+
     for (int i = 0; i < size;)
       {
         bool hl_free = isPairDead (PAIR_HL, ic) &&
-          (left_aop->regs[L_IDX] < i && left_aop->regs[H_IDX] < i & right_aop->regs[L_IDX] < i && right_aop->regs[H_IDX] < i) &&
+          (left_aop->regs[L_IDX] < i && left_aop->regs[H_IDX] < i && right_aop->regs[L_IDX] < i && right_aop->regs[H_IDX] < i) &&
           (result_aop->regs[L_IDX] < 0 || result_aop->regs[L_IDX] >= i) && (result_aop->regs[H_IDX] < 0 || result_aop->regs[H_IDX] >= i);
-        
+
         if (!bitVectBitValue (ic->rSurv, A_IDX) && left_aop->regs[A_IDX] <= i && right_aop->regs[A_IDX] <= i && (result_aop->regs[A_IDX] < 0 || result_aop->regs[A_IDX] >= i))
           a_free = true;
 
@@ -9769,7 +9769,7 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
           }
           
         hl_free = isPairDead (PAIR_HL, ic) &&
-          (left_aop->regs[L_IDX] <= i && left_aop->regs[H_IDX] <= i & right_aop->regs[L_IDX] <= i && right_aop->regs[H_IDX] <= i) &&
+          (left_aop->regs[L_IDX] <= i && left_aop->regs[H_IDX] <= i && right_aop->regs[L_IDX] <= i && right_aop->regs[H_IDX] <= i) &&
           (result_aop->regs[L_IDX] < 0 || result_aop->regs[L_IDX] >= i) && (result_aop->regs[H_IDX] < 0 || result_aop->regs[H_IDX] >= i);
 
         genMove_o (result_aop, i, ASMOP_A, 0, 1, true, hl_free, !isPairInUse (PAIR_DE, ic));

@@ -3936,10 +3936,19 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else
         {
-          if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
-            _push (PAIR_HL);
+          bool pushed_hl = false;
+          if ((requiresHL (result) && result->type != AOP_REG || requiresHL (source) && source->type != AOP_REG) && !hl_dead)
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+              if (aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, H_IDX)) // Problem: pop hl below would destroy result.
+                {
+                  regalloc_dry_run_cost += 200;
+                  wassert (regalloc_dry_run);
+                }
+            }
           cheapMove (result, roffset + i, source, soffset + i, a_dead_global);
-           if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
+          if (pushed_hl)
             _pop (PAIR_HL);
           zeroed_a = false;
         }

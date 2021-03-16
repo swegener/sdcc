@@ -920,7 +920,7 @@ hasExtBitOp (int op, int size)
       return size <= 4;
     case RLC:
     case RRC:
-      return (size == 1) || !IS_GB;
+      return TRUE;
     }
   return FALSE;
 }

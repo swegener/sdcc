@@ -2358,7 +2358,7 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
     case AOP_STK:
       ; int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
 
-      if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < 3)
+      if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < (_G.preserveCarry ? 5 : 3))
         adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
       else
         setupPairFromSP (pairId, abso + _G.stack.pushed);
@@ -9854,7 +9854,7 @@ genRRC (const iCode * ic)
            result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
            result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
     {
-      if (left->aop->type != AOP_REG)
+      if (left->aop->type != AOP_REG && !operandsEqu (result, left))
         {
           /* always prefer register operations */
           genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
@@ -9864,6 +9864,12 @@ genRRC (const iCode * ic)
       emit3_o (A_RRA, 0, 0, 0, 0);
       while (--offset >= 0)
         emit3_o (A_RR, left->aop, offset, 0, 0);
+      if (IS_GB && requiresHL (left->aop))
+        { /* ldhl sp,N changes CARRY */
+          emit3_o (A_RRA, 0, 0, 0, 0);
+          aopGet (left->aop, size - 1, false);
+          emit3_o (A_RLA, 0, 0, 0, 0);
+        }
       emit3_o (A_RR, left->aop, size - 1, 0, 0);
       if (!operandsEqu (result, left))
         genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
@@ -9917,7 +9923,7 @@ genRLC (const iCode * ic)
            result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
            result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
     {
-      if (left->aop->type != AOP_REG)
+      if (left->aop->type != AOP_REG && !operandsEqu (result, left))
         {
           /* always prefer register operations */
           genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
@@ -9927,6 +9933,12 @@ genRLC (const iCode * ic)
       emit3_o (A_RLA, 0, 0, 0, 0);
       for (int offset = 1; offset < size; ++offset)
         emit3_o (A_RL, left->aop, offset, 0, 0);
+      if (IS_GB && requiresHL (left->aop))
+        { /* ldhl sp,N changes CARRY */
+          emit3_o (A_RRA, 0, 0, 0, 0);
+          aopGet (left->aop, 0, false);
+          emit3_o (A_RLA, 0, 0, 0, 0);
+        }
       emit3_o (A_RL, left->aop, 0, 0, 0);
       if (!operandsEqu (result, left))
         genMove_o (result->aop, 0, left->aop, 0, size, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));

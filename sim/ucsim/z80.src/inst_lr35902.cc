@@ -47,8 +47,8 @@ int cl_lr35902::inst_cb(void) {
   case 0x31: result = regs.bc.l = swap_nibbles(regs.bc.l); break; /* c */
   case 0x32: result = regs.de.h = swap_nibbles(regs.de.h); break; /* d */
   case 0x33: result = regs.de.l = swap_nibbles(regs.de.l); break; /* e */
-  case 0x34: result = regs.hl.l = swap_nibbles(regs.hl.h); break; /* h */
-  case 0x35: result = regs.hl.h = swap_nibbles(regs.hl.l); break; /* l */
+  case 0x34: result = regs.hl.h = swap_nibbles(regs.hl.h); break; /* h */
+  case 0x35: result = regs.hl.l = swap_nibbles(regs.hl.l); break; /* l */
   case 0x36: /* SWAP (HL) */
     {
       result = swap_nibbles(get1(regs.HL));

@@ -1,5 +1,10 @@
 2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/peeph.def:
+	  Add two new peepholes for Z80.
+
+2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/SDCCicode.c:
 	  Fix RFE #736.
 

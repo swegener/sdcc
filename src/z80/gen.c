@@ -10035,7 +10035,53 @@ genGetHbit (const iCode * ic)
 static void
 genGetAbit (const iCode * ic)
 {
-  wassert (0);
+  operand *left, *right, *result;
+  int shCount;
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (right, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
+
+  /* get the needed byte into a */
+  cheapMove (ASMOP_A, 0, left->aop, shCount / 8, true);
+  shCount %= 8;
+  if (shCount == 4 && (IS_GB || IS_Z80N))
+    {
+      emit3_o (A_SWAP, ASMOP_A, 0, 0, 0);
+      shCount -= 4;
+    }
+  if (AOP_TYPE (result) == AOP_CRY)
+    {
+      
+      if (shCount < 4)
+        while (shCount-- >= 0)
+          emit3_o (A_RRCA, 0, 0, 0, 0);
+      else
+        while (shCount++ < 8)
+          emit3_o (A_RLCA, 0, 0, 0, 0);
+      outBitC (result);
+    }
+  else
+    {
+      if (shCount < 5)
+        while (shCount-- > 0)
+          emit3_o (A_RRCA, 0, 0, 0, 0);
+      else
+        while (shCount++ < 8)
+          emit3_o (A_RLCA, 0, 0, 0, 0);
+      emit2 ("and a, !immedbyte", 0x01);
+      regalloc_dry_run_cost++;
+      outAcc (result);
+    }
+
+  freeAsmop (result, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
 }
 
 static void

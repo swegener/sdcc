@@ -913,14 +913,14 @@ hasExtBitOp (int op, int size)
 {
   switch (op)
     {
+    case GETABIT:
     case GETHBIT:
     case GETBYTE:
-      return TRUE;
-    case SWAP:
-      return size <= 4;
     case RLC:
     case RRC:
       return TRUE;
+    case SWAP:
+      return size <= 4;
     }
   return FALSE;
 }

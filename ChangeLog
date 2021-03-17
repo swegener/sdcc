@@ -1,3 +1,9 @@
+2021-03-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c,
+	  src/z80/main.c:
+	  Add GetABit for all Z80 ports.
+
 2021-03-16 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* sim/ucsim/z80.src/inst_lr35902.cc:

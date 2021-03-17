@@ -135,10 +135,12 @@ enum asminst
   A_RLA,
   A_RLC,
   A_RLCA,
+  A_RLD,
   A_RR,
   A_RRA,
   A_RRC,
   A_RRCA,
+  A_RRD,
   A_SBC,
   A_SLA,
   A_SRA,
@@ -164,10 +166,12 @@ static const char *asminstnames[] =
   "rla",
   "rlc",
   "rlca",
+  "rld",
   "rr",
   "rra",
   "rrc",
   "rrca",
+  "rrd",
   "sbc",
   "sla",
   "sra",
@@ -917,6 +921,8 @@ emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
     case A_RRCA:
       return (1);
     case A_NEG:
+    case A_RLD:
+    case A_RRD:
       return(2);
     case A_LD:
       return (ld_cost (op1, offset1, op2, offset2));
@@ -10379,14 +10385,16 @@ genSwap (iCode * ic)
     {
     case 1: // swap nibbles in byte
       ;
+      bool needLastMove = true;
       // For gbz80, options other than a can make sense for swapping in.
       asmop *shiftop = ASMOP_A;
-      if (IS_GB && result->aop->type == AOP_REG) 
-        shiftop = result->aop;
-      else if (IS_GB && left->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, left->aop->aopu.aop_reg[0]->rIdx))
-        shiftop = left->aop;
-      else if (IS_GB && result->aop->type == AOP_STK || IS_GB && result->aop->type == AOP_HL)
-        shiftop = result->aop;
+      if (IS_GB)
+        {
+          if (result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_HL) 
+            shiftop = result->aop;
+          else if (left->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, left->aop->aopu.aop_reg[0]->rIdx))
+            shiftop = left->aop;
+        }
 
       if (bitVectBitValue (ic->rSurv, A_IDX) && aopInReg (shiftop, 0, A_IDX))
         {
@@ -10398,6 +10406,13 @@ genSwap (iCode * ic)
 
       if (IS_GB || IS_Z80N)
         emit3 (A_SWAP, shiftop, 0);
+      else if (result->aop->type == AOP_HL)
+        {
+          if (left->aop->type != AOP_HL)
+            cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
+          emit3 (A_RRD, 0, 0);
+          needLastMove = false;
+        }
       else
         {
           emit3 (A_RLCA, 0, 0);
@@ -10406,7 +10421,8 @@ genSwap (iCode * ic)
           emit3 (A_RLCA, 0, 0);
         }
 
-      genMove (result->aop, shiftop, !bitVectBitValue (ic->rSurv, A_IDX) || pushed_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+      if (needLastMove)
+        genMove (result->aop, shiftop, !bitVectBitValue (ic->rSurv, A_IDX) || pushed_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
       if (pushed_a)
         _pop (PAIR_AF);  
@@ -10502,6 +10518,43 @@ genSwap (iCode * ic)
               regalloc_dry_run_cost++;
               _push (PAIR_HL);
             }
+          break;
+        }
+
+      if (result->aop->type == AOP_REG && left->aop->type == AOP_STK &&
+          left->aop->aopu.aop_stk == -4)
+        { /* result in registers but left is on top of stack */
+          PAIR_ID p[2];
+          for (int i = 0; i < 2; i++)
+            {
+              if (aopInReg (result->aop, i*2, HL_IDX))
+                p[i] = PAIR_HL;
+              else if (aopInReg (result->aop, i*2, DE_IDX))
+                p[i] = PAIR_DE;
+              else if (aopInReg (result->aop, i*2, BC_IDX))
+                p[i] = PAIR_BC;
+              else if (aopInReg (result->aop, i*2, IY_IDX))
+                p[i] = PAIR_IY;
+              else
+                wassertl (FALSE, "Unsupported pair");
+            }
+          _pop (p[1]);
+          _pop (p[0]);
+          _push (p[0]);
+          _push (p[1]);
+          break;
+        }
+
+      if (!IS_RAB && result->aop->type == AOP_REG && left->aop->type != AOP_REG)
+        { /* result in registers but left is not */
+          bool a_free = !bitVectBitValue (ic->rSurv, A_IDX);
+          genMove_o (result->aop, 0, left->aop, 2, 2, a_free,
+                     isPairDead (PAIR_HL, ic),
+                     isPairDead (PAIR_DE, ic));
+          genMove_o (result->aop, 2, left->aop, 0, 2,
+                     a_free && !aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX),
+                     isPairDead (PAIR_HL, ic) && !aopInReg (result->aop, 0, HL_IDX),
+                     isPairDead (PAIR_DE, ic) && !aopInReg (result->aop, 0, DE_IDX));
           break;
         }
 
@@ -12111,11 +12164,9 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
         }
       else if (blen == 4 && bstr % 4 == 0 && pair == PAIR_HL && !aopInReg (right->aop, 0, A_IDX) && !requiresHL (right->aop) && (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N))
         {
-          emit2 (bstr ? "rld" : "rrd");
-          regalloc_dry_run_cost += 2;
+          emit3 ((bstr ? A_RLD : A_RRD), 0, 0);
           cheapMove (ASMOP_A, 0, AOP (right), 0, true);
-          emit2 (bstr ? "rrd" : "rld");
-          regalloc_dry_run_cost += 2;
+          emit3 ((bstr ? A_RRD : A_RLD), 0, 0);
           return;
         }
       else

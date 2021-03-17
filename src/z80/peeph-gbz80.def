@@ -226,6 +226,33 @@ replace restart {
 	srl (hl)
 } if notSame(%1 'c'), notUsed('a' 'hl')
 
+replace restart {
+	%1
+	%2	hl
+} by {
+	; gbz80 peephole 15a move %2 hl before %1
+	%2	hl
+	%1
+} if same(%2 'inc' 'dec'), same(%1 'rlca' 'rrca' 'rra' 'rla' 'cpl' 'scf' 'daa' 'ccf' 'sra' 'swap' 'nop')
+
+replace restart {
+	%4	%1, %2
+	%3	hl
+} by {
+	; gbz80 peephole 15b move %3 hl before %4 %1, %2
+	%3	hl
+	%4	%1, %2
+} if same(%3 'inc' 'dec'), same(%4 'ld' 'ldh' 'cp' 'add' 'adc' 'and' 'or' 'xor' 'sub' 'sbc' 'set' 'res' 'bit'), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	%2	%1
+	%3	hl
+} by {
+	; gbz80 peephole 15c move %3 hl before %2 %1
+	%3	hl
+	%2	%1
+} if same(%3 'inc' 'dec'), same(%2 'inc' 'dec' 'rl' 'rlc' 'rr' 'rrc' 'srl' 'sla' 'sra' 'swap' 'r' ), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
+
 replace {
 	pop	%1
 	push	%1
@@ -316,3 +343,4 @@ replace {
 	; peephole sp10c increased SP by 2 through pop
 	pop	%3
 } if unusedReg(%3 'bc' 'de' 'hl')
+

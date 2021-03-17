@@ -1,5 +1,10 @@
 2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/peeph-gbz80.def:
+	  Added rules to move inc/dec hl possible upper.
+
+22021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph.def:
 	  Add two new peepholes for Z80.
 

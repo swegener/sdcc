@@ -916,6 +916,7 @@ hasExtBitOp (int op, int size)
     case GETABIT:
     case GETHBIT:
     case GETBYTE:
+    case GETWORD:
     case RLC:
     case RRC:
       return TRUE;

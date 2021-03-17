@@ -10002,6 +10002,30 @@ genGetByte (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genGetWord - generates code get a 16-bit word                   */
+/*-----------------------------------------------------------------*/
+static void
+genGetWord (const iCode *ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (right, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
+  genMove_o (result->aop, 0, left->aop, offset, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+
+  freeAsmop (result, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
+}
+
+/*-----------------------------------------------------------------*/
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
 static void
@@ -14640,6 +14664,11 @@ genZ80iCode (iCode * ic)
     case GETBYTE:
       emitDebug ("; genGetByte");
       genGetByte (ic);
+      break;
+
+    case GETWORD:
+      emitDebug ("; genGetWord");
+      genGetWord (ic);
       break;
 
     case SWAP:

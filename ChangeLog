@@ -1,6 +1,11 @@
 2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c:
+	  Add Z80 GETWORD optimization for Z80.
+
+2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
 	  Add Z80 SWAP implementation using RRD.
 
 2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>

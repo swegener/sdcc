@@ -1503,6 +1503,13 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         retval = operandFromLit ((i << (getSize (operandType (left)) * 8 - 1)) | (i >> 1));
       }
       break;
+    case SWAP:
+      {
+        TYPE_TARGET_ULONG i = (TYPE_TARGET_ULONG) double2ul (operandLitValue (left));
+        unsigned sz = getSize (operandType (left)) * 4;
+        retval = operandFromLit ((i >> sz) | (i << sz));
+      }
+      break;
     case GETABIT:
       retval = operandFromLit (((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >>
                                 (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))) & 1);

@@ -1,5 +1,11 @@
 2021-03-18 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improve register allocation for GETWORD and SWAP iCodes.
+
+2021-03-18 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Use genMove to simplify genSwap.
 

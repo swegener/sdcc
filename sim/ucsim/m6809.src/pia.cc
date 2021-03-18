@@ -33,6 +33,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "m6809cl.h"
+#include "irqcl.h"
+
 #include "piacl.h"
 
 

@@ -475,7 +475,7 @@ struct dis_entry disass_z80_ed[]= {
   { 0x006B, 0x00ff, ' ', 1, "LD HL,(nnnn)" },
   { 0x006F, 0x00ff, ' ', 1, "RLD" },
   { 0x0070, 0x00ff, ' ', 1, "IN (C)" },
-  { 0x0071, 0x00ff, ' ', 1, " OUT (C),0" },
+  { 0x0071, 0x00ff, ' ', 1, "OUT (C),0" },
   { 0x0072, 0x00ff, ' ', 1, "SBC HL,SP" },
   { 0x0073, 0x00ff, ' ', 1, "LD (nnnn),SP" },
   { 0x0078, 0x00ff, ' ', 1, "IN A,(C)" },

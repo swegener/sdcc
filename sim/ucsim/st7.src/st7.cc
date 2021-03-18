@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim
 #include "simcl.h"
+#include "dregcl.h"
 
 // local
 #include "st7cl.h"
@@ -135,7 +136,11 @@ void
 cl_st7::mk_hw_elements(void)
 {
   //class cl_base *o;
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
 }
 
 void

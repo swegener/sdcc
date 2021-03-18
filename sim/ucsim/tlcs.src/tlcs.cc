@@ -39,6 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "simcl.h"
 //#include "memcl.h"
 //#include "stackcl.h"
+#include "dregcl.h"
 
 // local
 #include "tlcscl.h"
@@ -185,8 +186,11 @@ cl_tlcs::make_cpu_hw(void)
 void
 cl_tlcs::mk_hw_elements(void)
 {
-  //class cl_hw *h;
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
 }
 
 

@@ -1841,7 +1841,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
     }
   len+= con->dd_cprintf("dump_char", " %s", dis);
   if (nl)
-    con->dd_printf("\n");
+    con->dd_printf("\033[0K\n");
   free((char *)dis);
   return len;
 }

@@ -48,6 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // sim
 //#include "optioncl.h"
 #include "iwrap.h"
+#include "dregcl.h"
 
 //cmd.src
 #include "cmd_uccl.h"
@@ -753,6 +754,9 @@ cl_51core::mk_hw_elements(void)
   add_hw(h= new cl_timer1(this, 1, "timer1"));
   h->init();
   add_hw(h= new cl_serial(this));
+  h->init();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
 
   class cl_port_ui *d;

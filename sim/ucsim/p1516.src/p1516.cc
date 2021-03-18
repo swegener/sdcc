@@ -27,6 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdlib.h>
 
+#include "dregcl.h"
+
 #include "glob.h"
 #include "portcl.h"
 
@@ -70,7 +72,12 @@ cl_p1516::set_PC(t_addr addr)
 void
 cl_p1516::mk_hw_elements(void)
 {
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+  
   add_hw(pa= new cl_porto(this, 0xf000, "pa"));
   pa->init();
   add_hw(pb= new cl_porto(this, 0xf001, "pb"));

@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim
 //#include "simcl.h"
+#include "dregcl.h"
 
 // local
 #include "stm8cl.h"
@@ -272,6 +273,9 @@ cl_stm8::mk_hw_elements(void)
       o->hide();
     }
   
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+
   add_hw(d= new cl_port_ui(this, 0, "dport"));
   d->init();
   pd.init();

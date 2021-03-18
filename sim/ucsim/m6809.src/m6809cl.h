@@ -30,7 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
-#include "itsrccl.h"
 
 
 /*
@@ -161,121 +160,6 @@ public:
 #define SET_S(v) ( (reg.CC)= ((reg.CC)&~flagS) | ((v)?flagS:0) )
 #define SET_O(v) ( (reg.CC)= ((reg.CC)&~flagV) | ((v)?flagV:0) )
 #define SET_H(v) ( (reg.CC)= ((reg.CC)&~flagH) | ((v)?flagH:0) )
-
-
-enum cpu_cfg
-  {
-   cpu_nmi_en	= 0,
-   cpu_nmi	= 1,
-   cpu_irq_en	= 2,
-   cpu_irq	= 3,
-   cpu_firq_en	= 4,
-   cpu_firq	= 5,
-   cpu_nr	= 6
-  };
-
-enum irq_nr {
-  irq_none= 0,
-  irq_nmi= 1,
-  irq_firq= 2,
-  irq_irq= 3
-};
-
-// This is used as NMI source
-class cl_m6809_src_base: public cl_it_src
-{
-public:
-  u8_t Evalue;
-  u8_t IFvalue;
-  enum irq_nr pass_to;
-public:
-  cl_m6809_src_base(cl_uc  *Iuc,
-		    int    Inuof,
-		    class  cl_memory_cell *Iie_cell,
-		    t_mem  Iie_mask,
-		    class  cl_memory_cell *Isrc_cell,
-		    t_mem  Isrc_mask,
-		    t_addr Iaddr,
-		    const  char *Iname,
-		    int    apoll_priority,
-		    u8_t   aEvalue,
-		    u8_t   aIFvalue,
-		    enum irq_nr Ipass_to):
-    cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
-  {
-    Evalue= aEvalue;
-    IFvalue= aIFvalue;
-    pass_to= Ipass_to;
-  }
-  virtual bool is_nmi(void) { return true; }
-  virtual void clear(void) { src_cell->write(0); }
-  virtual class cl_m6809_src_base *get_parent(void);
-  virtual void set_pass_to(enum irq_nr value) { pass_to= value; }
-  virtual void set_pass_to(t_mem value);
-};
-
-// Source of IRQ and FIRQ
-class cl_m6809_irq_src: public cl_m6809_src_base
-{
-public:
-  cl_m6809_irq_src(cl_uc  *Iuc,
-		   int    Inuof,
-		   class  cl_memory_cell *Iie_cell,
-		   t_mem  Iie_mask,
-		   class  cl_memory_cell *Isrc_cell,
-		   t_mem  Isrc_mask,
-		   t_addr Iaddr,
-		   const  char *Iname,
-		   int    apoll_priority,
-		   u8_t   aEvalue,
-		   u8_t   aIFvalue,
-		   enum irq_nr Ipass_to):
-    cl_m6809_src_base(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue, aIFvalue, Ipass_to)
-  {}
-  virtual bool is_nmi(void) { return false; }
-  virtual bool enabled(void);
-};
-
-// This irq will be passed to a parent (one of IRQ, FIRQ, NMI)
-class cl_m6809_slave_src: public cl_m6809_irq_src
-{
-protected:
-  t_mem ie_value;
-public:
-  cl_m6809_slave_src(cl_uc *Iuc,
-		     class  cl_memory_cell *Iie_cell,
-		     t_mem  Iie_mask,
-		     t_mem  Iie_value,
-		     class  cl_memory_cell *Isrc_cell,
-		     t_mem  Isrc_mask,
-		     const  char *Iname):
-    cl_m6809_irq_src(Iuc, 0,
-		     Iie_cell, Iie_mask, Isrc_cell, Isrc_mask,
-		     0,
-		     Iname,
-		     0, 0, 0,
-		     irq_irq)
-  {
-    ie_value= Iie_value;
-  }
-  virtual bool enabled(void);
-  virtual void clear(void) {}
-};
-
-// "CPU" peripheral
-class cl_m6809_cpu: public cl_hw
-{
-public:
-  class cl_m6809 *muc;
-public:
-  cl_m6809_cpu(class cl_uc *auc);
-  virtual int init(void);
-  virtual int cfg_size(void) { return cpu_nr; }
-  virtual const char *cfg_help(t_addr addr);
-  virtual void reset(void);
-  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
-  virtual void print_info(class cl_console_base *con);  
-};
 
   
 #endif

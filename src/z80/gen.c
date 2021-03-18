@@ -10416,7 +10416,8 @@ static void
 genSwap (iCode * ic)
 {
   operand *left, *result;
-
+  asmop swapped_result_aop;
+  
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
@@ -10469,7 +10470,18 @@ genSwap (iCode * ic)
         _pop (PAIR_AF);  
 
       break;
-    case 2:                    /* swap bytes in word */
+    case 2: // swap bytes in word
+      if (result->aop->type == AOP_REG) // Create result asmop with swapped bytes, let genMove handle the details.
+        {
+          signed char idxarray[3];
+          idxarray[0] = result->aop->aopu.aop_reg[1]->rIdx;
+          idxarray[1] = result->aop->aopu.aop_reg[0]->rIdx;
+          idxarray[2] = -1;
+          z80_init_reg_asmop(&swapped_result_aop, idxarray);
+          genMove (&swapped_result_aop, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+          break;
+        }
+    
       if (sameRegs (AOP(result), AOP(left)) || operandsEqu (result, left))
         {
           // avoid push/pop by finding free register
@@ -10502,33 +10514,18 @@ genSwap (iCode * ic)
           aopPut (AOP (result), aopGet (AOP (left), 0, FALSE), 1);
         }
       break;
-    case 4:                    /* swap words in double word */
-      /* --== optimized implementations ==-- */
-      if (!IS_GB && operandsEqu (result, left) && left->aop->type == AOP_REG &&
-          (aopInReg (left->aop, 0, HL_IDX) || aopInReg (left->aop, 2, HL_IDX)) &&
-          (aopInReg (left->aop, 0, DE_IDX) || aopInReg (left->aop, 2, DE_IDX)))
-        { /* result and left are same hlde */
-          emit2 ("ex de, hl");
-          swapPairs (PAIR_HL, PAIR_DE);
-          regalloc_dry_run_cost++;
-          break;
-        }
 
-      if (result->aop->type == AOP_REG && left->aop->type == AOP_REG &&
-          ((aopInReg (left->aop, 0, HL_IDX) && aopInReg (result->aop, 2, HL_IDX)) ||
-           (aopInReg (left->aop, 0, DE_IDX) && aopInReg (result->aop, 2, DE_IDX)) ||
-           (aopInReg (left->aop, 0, BC_IDX) && aopInReg (result->aop, 2, BC_IDX))))
-        { /* high word of result is same registers as low word of left */
-          genMove_o (result->aop, 0, left->aop, 2, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
-          break;
-        }
-
-      if (result->aop->type == AOP_REG && left->aop->type == AOP_REG &&
-          ((aopInReg (left->aop, 2, HL_IDX) && aopInReg (result->aop, 0, HL_IDX)) ||
-           (aopInReg (left->aop, 2, DE_IDX) && aopInReg (result->aop, 0, DE_IDX)) ||
-           (aopInReg (left->aop, 2, BC_IDX) && aopInReg (result->aop, 0, BC_IDX))))
-        { /* low word of result is same registers as high word of left */
-          genMove_o (result->aop, 2, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+    case 4: // swap words in double word
+        if (result->aop->type == AOP_REG) // Create result asmop with swapped words, let genMove handle the details.
+        {
+          signed char idxarray[5];
+          idxarray[0] = result->aop->aopu.aop_reg[2]->rIdx;
+          idxarray[1] = result->aop->aopu.aop_reg[3]->rIdx;
+          idxarray[2] = result->aop->aopu.aop_reg[0]->rIdx;
+          idxarray[3] = result->aop->aopu.aop_reg[1]->rIdx;
+          idxarray[4] = -1;
+          z80_init_reg_asmop(&swapped_result_aop, idxarray);
+          genMove (&swapped_result_aop, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           break;
         }
 
@@ -10563,47 +10560,8 @@ genSwap (iCode * ic)
           break;
         }
 
-      if (result->aop->type == AOP_REG && left->aop->type == AOP_STK &&
-          left->aop->aopu.aop_stk == -4)
-        { /* result in registers but left is on top of stack */
-          PAIR_ID p[2];
-          for (int i = 0; i < 2; i++)
-            {
-              if (aopInReg (result->aop, i*2, HL_IDX))
-                p[i] = PAIR_HL;
-              else if (aopInReg (result->aop, i*2, DE_IDX))
-                p[i] = PAIR_DE;
-              else if (aopInReg (result->aop, i*2, BC_IDX))
-                p[i] = PAIR_BC;
-              else if (aopInReg (result->aop, i*2, IY_IDX))
-                p[i] = PAIR_IY;
-              else
-                wassertl (FALSE, "Unsupported pair");
-            }
-          _pop (p[1]);
-          _pop (p[0]);
-          _push (p[0]);
-          _push (p[1]);
-          spillPair (p[0]);
-          spillPair (p[1]);
-          break;
-        }
-
-      if (!IS_RAB && result->aop->type == AOP_REG && left->aop->type != AOP_REG)
-        { /* result in registers but left is not */
-          bool a_free = !bitVectBitValue (ic->rSurv, A_IDX);
-          genMove_o (result->aop, 0, left->aop, 2, 2, a_free,
-                     isPairDead (PAIR_HL, ic),
-                     isPairDead (PAIR_DE, ic));
-          genMove_o (result->aop, 2, left->aop, 0, 2,
-                     a_free && !aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX),
-                     isPairDead (PAIR_HL, ic) && !aopInReg (result->aop, 0, HL_IDX),
-                     isPairDead (PAIR_DE, ic) && !aopInReg (result->aop, 0, DE_IDX));
-          break;
-        }
-
       /* --== generic implementations ==-- */
-      if (result->aop->type == AOP_REG || !operandsEqu (result, left))
+      if (!operandsEqu (result, left))
         { /* result is registers or left differs than result */
           bool pushed = bitVectBitValue (ic->rSurv, A_IDX);
           if (pushed)
@@ -10625,32 +10583,25 @@ genSwap (iCode * ic)
           bool dead_de = isPairDead (PAIR_DE, ic);
           bool dead_hl = isPairDead (PAIR_HL, ic);
           if (isPairDead (PAIR_BC, ic) &&
-              (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, BC_IDX)) &&
-              (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, BC_IDX)))
+              (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, BC_IDX)))
             tmp = ASMOP_BC;
           else if (dead_hl &&
-              (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, HL_IDX)) &&
-              (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, HL_IDX)))
+              (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, HL_IDX)))
             tmp = ASMOP_HL;
           else if (dead_de &&
-                   (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, DE_IDX)) &&
-                   (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, DE_IDX)))
+                   (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, DE_IDX)))
             tmp = ASMOP_DE;
           else if (!IS_GB && !IY_RESERVED && isPairDead (PAIR_IY, ic) &&
-                   (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, IY_IDX)) &&
-                   (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, IY_IDX)))
+                   (left->aop->type != AOP_REG || !aopInReg (left->aop, 0, IY_IDX)))
             tmp = ASMOP_IY;
           else 
             {
               pushed = true;
-              if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, HL_IDX)) &&
-                  (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, HL_IDX)))
+              if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, HL_IDX)))
                 tmp = ASMOP_HL;
-              else if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, BC_IDX)) &&
-                  (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, BC_IDX)))
+              else if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, BC_IDX)))
                 tmp = ASMOP_BC;
-              else if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, DE_IDX)) &&
-                  (result->aop->type != AOP_REG || !aopInReg (result->aop, 0, DE_IDX)))
+              else if ((left->aop->type != AOP_REG || !aopInReg (left->aop, 0, DE_IDX)))
                 tmp = ASMOP_DE;
               else
                 wassertl (FALSE, "impossible case");

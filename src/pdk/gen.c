@@ -3328,6 +3328,29 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* genGetByte - generates code to get a single byte                */
+/*-----------------------------------------------------------------*/
+static void
+genGetByte (const iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+  
+  aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
+
+  int offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
+  
+  cheapMove (ASMOP_A, 0, left->aop, offset, regDead (A_IDX, ic), regDead (P_IDX, ic), true);
+
+  freeAsmop (result);
+  freeAsmop (right);
+  freeAsmop (left);
+}
+
+/*-----------------------------------------------------------------*/
 /* genSwap - generates code for nibble swapping                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -5129,6 +5152,14 @@ genPdkiCode (iCode *ic)
       break;
 
     case GETABIT:
+      wassertl (0, "Unimplemented iCode");
+      break;
+      
+    case GETBYTE:
+      genGetByte (ic);
+      break;
+      
+    case GETWORD:
       wassertl (0, "Unimplemented iCode");
       break;
       

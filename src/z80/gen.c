@@ -10004,7 +10004,7 @@ genRLC (const iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetByte - generates code get a single byte                   */
+/* genGetByte - generates code to get a single byte                */
 /*-----------------------------------------------------------------*/
 static void
 genGetByte (const iCode *ic)
@@ -10028,7 +10028,7 @@ genGetByte (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetWord - generates code get a 16-bit word                   */
+/* genGetWord - generates code to get a 16-bit word                */
 /*-----------------------------------------------------------------*/
 static void
 genGetWord (const iCode *ic)

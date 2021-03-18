@@ -1,9 +1,14 @@
+2021-03-18 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph.def:
+	  Fix common peephole rule 41a: do not elimitate ld l,? before ld l,(hl)
+
 2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph-gbz80.def:
 	  Added rules to move inc/dec hl possible upper.
 
-22021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+2021-03-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph.def:
 	  Add two new peepholes for Z80.

@@ -1,5 +1,10 @@
 2021-03-18 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/gen.c:
+	  Fix bug #3194.
+
+2021-03-18 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph.def:
 	  Fix common peephole rule 41a: do not elimitate ld l,? before ld l,(hl)
 

@@ -1162,6 +1162,18 @@ spillPairReg (const char *regname)
     }
 }
 
+/* swap pairs fiels type/base */
+static void
+swapPairs (PAIR_ID pair1Id, PAIR_ID pair2Id)
+{
+  AOP_TYPE tt = _G.pairs[pair1Id].last_type;
+  _G.pairs[pair1Id].last_type = _G.pairs[pair2Id].last_type;
+  _G.pairs[pair2Id].last_type = tt;
+  const char *tb = _G.pairs[pair1Id].base;
+  _G.pairs[pair1Id].base = _G.pairs[pair2Id].base;
+  _G.pairs[pair2Id].base = tb;
+}
+
 static void
 _push (PAIR_ID pairId)
 {
@@ -3230,6 +3242,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy) // Obsol
               if (!IS_GB && aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == L_IDX && aop->aopu.aop_reg[1]->rIdx == H_IDX && !dont_destroy)
                 {
                   emit2 ("ex de, hl");
+                  swapPairs (PAIR_DE, PAIR_HL);
                   regalloc_dry_run_cost++;
                 }
               else
@@ -3253,6 +3266,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy) // Obsol
               else if (!IS_GB && aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == E_IDX && aop->aopu.aop_reg[1]->rIdx == D_IDX && !dont_destroy)
                 {
                   emit2 ("ex de, hl");
+                  swapPairs (PAIR_DE, PAIR_HL);
                   regalloc_dry_run_cost++;
                 }
               else
@@ -3605,6 +3619,7 @@ skip_byte_push_iy:
       if (!no && exsum >= 2 && hl_dead && de_dead)
         {
           emit2 ("ex de, hl");
+          swapPairs (PAIR_DE, PAIR_HL);
           cost2 (1, 4, 3, 2, 0, 2, 1);
           if(ex[0] >= 0)
             assigned[ex[0]] = TRUE;
@@ -4263,6 +4278,7 @@ regMove (const short *dst, const short *src, size_t n, bool preserve_a) // Todo:
       if (ex[0] >= 0 && ex[1] >= 0 && ex[2] >= 0 && ex[3] >= 0)
         {
           emit2 ("ex de, hl");
+          swapPairs (PAIR_DE, PAIR_HL);
           regalloc_dry_run_cost++;
           assigned[ex[0]] = TRUE;
           assigned[ex[1]] = TRUE;
@@ -7032,6 +7048,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           if (aopInReg (result, offset, DE_IDX))
             {
               emit2 ("ex de, hl");
+              swapPairs (PAIR_DE, PAIR_HL);
               regalloc_dry_run_cost++;
             }
           offset += 2;
@@ -10492,6 +10509,7 @@ genSwap (iCode * ic)
           (aopInReg (left->aop, 0, DE_IDX) || aopInReg (left->aop, 2, DE_IDX)))
         { /* result and left are same hlde */
           emit2 ("ex de, hl");
+          swapPairs (PAIR_HL, PAIR_DE);
           regalloc_dry_run_cost++;
           break;
         }
@@ -10513,7 +10531,7 @@ genSwap (iCode * ic)
           genMove_o (result->aop, 2, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           break;
         }
-      
+
       if (operandsEqu (result, left) && left->aop->type == AOP_STK &&
           left->aop->aopu.aop_stk == -4 && isPairDead(PAIR_HL, ic) &&
           (!IS_GB || isPairDead(PAIR_DE, ic) || isPairDead(PAIR_BC, ic)))
@@ -10566,6 +10584,8 @@ genSwap (iCode * ic)
           _pop (p[0]);
           _push (p[0]);
           _push (p[1]);
+          spillPair (p[0]);
+          spillPair (p[1]);
           break;
         }
 

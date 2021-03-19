@@ -3,6 +3,7 @@
 	* src/pdk/gen.c,
 	  src/pdk/main.c,
 	  src/pdk/ralloc2.cc:
+	  GETBYTE support for pdk.
 
 2021-03-18 Philipp Klaus Krause <pkk AT spth.de>
 

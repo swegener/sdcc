@@ -161,20 +161,46 @@ replace {
 
 replace restart {
 	ldhl	sp,#%1
-	ld	(hl), %2
+	ld	%2, %3
 	ldhl	sp,#%1
-
 } by {
 	; gbz80 peephole 10a removed redundant ldhl.
 	ldhl	sp,#%1
-	ld	(hl), %2
-} if immdInRange(-128 127 '-' %1 1 %2)
+	ld	%2, %3
+} if notSame('(hl+)' %2 %3),  notSame('(hl+)' %2 %3)
+
+// 10b and c are for pushing stack addresses
+replace restart {
+	ldhl	sp,	#%1
+	ld	%3, %4
+	ld	%5, %6
+	ldhl	sp,	#%2
+} by {
+	ldhl	sp,	#1
+	ld	%3, %4
+	ld	%5, %6
+	; gbz80 peephole 10b turned ldhl into dec hl
+	dec	hl
+} if operandsLiteral(%1 %2), notSame('l' %3 %5), notSame('l' %3 %5), immdInRange(0x01 0x01 '-' %1 %2 %3), operandsNotRelated('hl' %3 %4 %5 %6)
+
+replace restart {
+	ldhl	sp,	#%1
+	ld	%3, %4
+	ld	%5, %6
+	ldhl	sp,	#%2
+} by {
+	ldhl	sp,	#1
+	ld	%3, %4
+	ld	%5, %6
+	; gbz80 peephole 10c turned ldhl into inc hl
+	inc	hl
+} if operandsLiteral(%1 %2), notSame('l' %3 %5), notSame('l' %3 %5), immdInRange(0x01 0x01 '-' %2 %1 %3), operandsNotRelated('hl' %3 %4 %5 %6)
 
 replace restart {
 	ldhl	sp,#%1
 	dec	hl
 } by {
-	; gbz80 peephole 10b combined ld and dec.
+	; gbz80 peephole 10d combined ld and dec.
 	ldhl	sp,#%2
 } if immdInRange(-128 127 '-' %1 1 %2)
 
@@ -182,7 +208,7 @@ replace restart {
 	ldhl	sp,#%1
 	inc	hl
 } by {
-	; gbz80 peephole 10c combined ld and inc.
+	; gbz80 peephole 10e combined ld and inc.
 	ldhl	sp,#%2
 } if immdInRange(-128 127 '+' %1 1 %2)
 
@@ -252,6 +278,13 @@ replace restart {
 	%3	hl
 	%2	%1
 } if same(%3 'inc' 'dec'), same(%2 'inc' 'dec' 'rl' 'rlc' 'rr' 'rrc' 'srl' 'sla' 'sra' 'swap' 'r' ), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
+
+replace restart {
+	rra
+	rla
+} by {
+	; gbz80 peephole 16 removed redundant rra/rla
+} if notUsed('cf' 'hf' 'nf' 'zf')
 
 replace {
 	pop	%1

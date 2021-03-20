@@ -1,3 +1,9 @@
+2021-03-19 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph-gbz80.def,
+	  src/z80/peeph.def:
+	  Add new peephole rules for precalc, constants reusage and stack access rearranging.
+
 2021-03-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

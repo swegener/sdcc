@@ -847,6 +847,7 @@ replace restart {
 	; common peephole 68 used hl instead of %4.
 } if same(%5 'adc' 'add' 'and' 'ld' 'or' 'sbc' 'sub' 'xor'), notUsed(%4 'hl')
 
+// can be further optimized to (hl+) on gbz80
 replace restart {
 	ld	%1, l
 	ld	%2, h
@@ -922,27 +923,52 @@ replace restart {
 	ld	a, %1 (%2)
 } if same(%4 'set' 'res')
 
+replace restart {
+	ld	%1, #%2 + %3
+	inc	%1
+} by {
+	ld	%1, #%2 + %4
+	; common peephole 77a incremented immediate.
+} if operandsLiteral(%3), immdInRange(0 256 '+' %3 1 %4), notUsed('f')
+
+replace restart {
+	ld	%1, #%2 - %3
+	inc	%1
+} by {
+	ld	%1, #%2 - %4
+	; common peephole 77b incremented immediate.
+} if operandsLiteral(%3), immdInRange(0 256 '-' %3 1 %4), notUsed('f')
+
+replace restart {
+	ld	%1, #%2 + %3
+	dec	%1
+} by {
+	ld	%1, #%2 + %4
+	; common peephole 77c decremented immediate.
+} if operandsLiteral(%3), immdInRange(0 256 '-' %3 1 %4), notUsed('f')
+
+replace restart {
+	ld	%1, #%2 - %3
+	dec	%1
+} by {
+	ld	%1, #%2 - %4
+	; common peephole 77d decremented immediate.
+} if operandsLiteral(%3), immdInRange(0 256 '+' %3 1 %4), notUsed('f')
+
+replace {
+	ld	%1, #%2 - 0
+} by {
+	ld	%1, #%2 + 0
+	; common peephole 77e changed -0 to +0.
+}
+
 replace {
 	ld	%1, #%2 + 0
+	dec	%1
 } by {
-	; common peephole 77a removed unnecessary +0 to immediate
-	ld	%1, #%2
-}
-
-// Bug #3102
-//replace {
-//	ld	%1, (#%2 + 0)
-//} by {
-//	; common peephole 77b removed unnecessary +0 to immediate
-//	ld	%1, (#%2)
-//}
-
-replace {
-	ld	(#%2 + 0), %1
-} by {
-	; common peephole 77c removed unnecessary +0 to immediate
-	ld	(#%2), %1
-}
+	ld	%1, #%2 - 1
+	; common peephole 77f decremented immediate.
+} if notUsed('f')
 
 // should improve flag based optimizations
 replace restart {
@@ -1047,7 +1073,7 @@ replace restart {
 %2:
 	jp	%3
 } by {
-	; common peephole 88b removed unreachable jump to %3
+	; common peephole 87b removed unreachable jump to %3
 	jp	%1
 } if labelRefCount(%2 0), labelRefCountChange(%3 -1)
 
@@ -1157,6 +1183,57 @@ replace {
 	; common peephole 94b pushed register pair twice.
 }
 
+// optimizes genRet
+replace restart {
+	ld	(%1), %2
+	inc	%1
+	ld	(%1), %3
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+	ld	%5, (%1)
+} by {
+	; common peephole 95a switched loads to %4 and %5.
+	ld	(%1), %2
+	inc	%1
+	ld	(%1), %3
+	ld	%5, (%1)
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+} if operandsNotRelated(%4 %5 %1), operandsNotRelated(%5 %1)
+
+replace restart {
+	ld	(%1), %2
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+	ld	%5, (%1)
+} by {
+	; common peephole 95b switched loads to %4 and %5.
+	ld	(%1), %2
+	ld	%5, (%1)
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+} if operandsNotRelated(%4 %5 %1), operandsNotRelated(%5 %1)
+
+// improves genRet after (hl) access
+replace restart {
+	%2	(%1)
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+	ld	%5, (%1)
+} by {
+	; common peephole 95c switched loads to %4 and %5.
+	%2	(%1)
+	ld	%5, (%1)
+	dec	%1
+	ld	%4, (%1)
+	inc	%1
+}if operandsNotRelated(%4 %5 %1), operandsNotRelated(%5 %1)
+
 // check if constant loaded into (hl) is the same that's loaded into the second register
 replace {
 	ld	(hl), #%2
@@ -1229,6 +1306,17 @@ replace restart {
 }
 
 replace restart {
+	%2	%1
+	ld	a, %1
+	or	a, a
+} by {
+	%2	%1
+	ld	a, %1
+	; common peephole 100b removed redundant or after %2
+
+} if same(%2 'inc' 'dec'), notUsed('cf' 'hf' 'nf' 'sf' 'pf')
+
+replace restart {
 	xor	a,%1
 	or	a,a
 } by {
@@ -1294,6 +1382,15 @@ replace {
 } if notVolatile(%1 %2), canAssign(%1 'a'), operandsNotRelated(%1 %2), notSame(%1 '(hl+)' '(hl-)'), notSame(%2 '(hl+)' '(hl-)')
 
 replace restart {
+	ld	%2, #%1
+	ld	%3, #%1
+} by {
+	; common peephole 103b loaded constant in %2 first and used it next
+	ld	%2, #%1
+	ld	%3, %2
+} if notVolatile(%2), canAssign(%3 %2)
+
+replace restart {
 	ld	%1,%2
 	ld	%3,%4
 	ld	%2,%1
@@ -1303,6 +1400,16 @@ replace restart {
 	ld	%3,%4
 	; common peephole 104 removed redundant load from %3%1 into %4%2
 } if notVolatile(%1 %2 %3 %4), notSame(%1 '(hl+)' '(hl-)'), notSame(%2 '(hl+)' '(hl-)'), notSame(%3 '(hl+)' '(hl-)'), notSame(%4 '(hl+)' '(hl-)')
+
+replace restart {
+	ld	%2, %1
+	%3	%2
+	ld	%1, %2
+} by {
+	%3	%1
+	ld	%2, %1
+	; common peephole 104b %3 %1 directly to remove redundant load from %2 into %1
+} if same(%1 'a' 'b' 'c' 'd' 'e' 'h' 'l' '(hl)'), same(%3 'inc' 'dec')
 
 replace restart {
 	push	de
@@ -1653,9 +1760,30 @@ replace restart {
 	add	hl,%2
 	inc	hl
 } by {
-	ld	hl,#%1+1
+	ld	hl,#%3
 	add	hl,%2
 	; common peephole 129a moved increment of hl to constant.
+} if operandsLiteral(%1), immdInRange(0 0xFFFF '+' %1 1 %x3)
+
+// breaks 130 otherwise
+replace restart {
+	ld	hl,#%1
+	add	hl,%2
+	dec hl
+} by {
+	ld	hl,#%3
+	add	hl,%2
+	; common peephole 129b moved decrement of hl to constant.
+} if operandsLiteral(%1), immdInRange(0 0xFFFF '-' %1 1 %x3)
+
+replace restart {
+	ld	hl,#%1
+	add	hl,%2
+	inc	hl
+} by {
+	ld	hl,#%1 + 1
+	add	hl,%2
+	; common peephole 129b moved increment of hl to constant.
 }
 
 replace restart {
@@ -1663,9 +1791,68 @@ replace restart {
 	add	hl,%2
 	dec hl
 } by {
-	ld	hl,#%1-1
+	ld	hl,#%1 - 1
 	add	hl,%2
-	; common peephole 129b moved decrement of hl to constant.
+	; common peephole 129c moved decrement of hl to constant.
+}
+
+replace {
+	ld	%1, #%2 + 0
+} by {
+	; common peephole 130a removed unnecessary +0 from constant
+	ld	%1, #%2
+}
+
+//TODO: %2 matches 4+1+1
+replace {
+	ld	%1, #%2 + %3
+} by {
+	; common peephole 130b added +%3 to immediate %2
+	ld	%1, #%4
+} if operandsLiteral(%2 %3), immdInRange(0 0xFF '+' %2 %3 %x4)
+
+replace {
+	ld	%1, #%2 + %3
+} by {
+	; common peephole 130c added +%3 to immediate %2
+	ld	%1, #%4
+} if operandsLiteral(%2 %3), immdInRange(0 0xFFFF '+' %2 %3 %x4), canSplitReg(%1 %0 %0)
+
+replace {
+	ld	%1, #%2 - 0
+} by {
+	; common peephole 130d removed unnecessary -0 from constant
+	ld	%1, #%2
+}
+
+replace {
+	ld	%1, #%2 - %3
+} by {
+	; common peephole 130e substracted -%3 from immediate %2
+	ld	%1, #%4
+} if operandsLiteral(%2 %3), immdInRange(0 0xFF '-' %2 %3 %x4)
+
+replace {
+	ld	%1, #%2 - %3
+} by {
+	; common peephole 130f substracted -%3 from to immediate %2
+	ld	%1, #%4
+} if operandsLiteral(%2 %3), immdInRange(0 0xFFFF '-' %2 %3 %x4), canSplitReg(%1 %0 %0)
+
+
+// Bug #3102
+//replace {
+//	ld	%1, (#%2 + 0)
+//} by {
+//	; common peephole 130g removed unnecessary +0 to immediate
+//	ld	%1, (#%2)
+//}
+
+replace {
+	ld	(#%2 + 0), %1
+} by {
+	; common peephole 130h removed unnecessary +0 to immediate
+	ld	(#%2), %1
 }
 
 replace restart {
@@ -1678,7 +1865,7 @@ replace restart {
 	push	hl
 	pop	iy
 	pop	hl
-	; common peephole 130 incremented in hl instead of iy.
+	; common peephole 131a incremented in hl instead of iy.
 }
 
 replace restart {
@@ -1689,7 +1876,7 @@ replace restart {
 	inc	bc
 	push	bc
 	pop	iy
-	; common peephole 131 incremented in bc instead of iy.
+	; common peephole 131b incremented in bc instead of iy.
 } if notUsed('bc')
 
 replace restart {

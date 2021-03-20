@@ -1,3 +1,9 @@
+2021-03-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sim/ucsim/z80.src/inst_lr35902.cc:
+	  Harmonize disassembly syntax with syntax emitted by sdcc.
+
+
 2021-03-19 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peeph-gbz80.def,

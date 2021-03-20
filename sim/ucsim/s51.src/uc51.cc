@@ -1280,6 +1280,7 @@ cl_51core::print_regs(class cl_console_base *con)
   
   // show regs
   start= psw->get() & 0x18;
+  con->dd_color("answer");
   con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n");
   iram->dump(start, start+7, 8, con/*->get_fout()*/);
   con->dd_color("answer");

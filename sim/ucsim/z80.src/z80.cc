@@ -63,6 +63,13 @@ cl_z80::cl_z80(struct cpu_entry *Itype, class cl_sim *asim):
   cl_uc(asim)
 {
   type= Itype;
+  BIT_C= 0x01;  // carry status(out of bit 7)
+  BIT_N= 0x02,  // Not addition: subtract status(1 after subtract).
+  BIT_P= 0x04,  // parity/overflow, 1=even, 0=odd parity.  arith:1=overflow
+  BIT_A= 0x10,  // aux carry status(out of bit 3)
+  BIT_Z= 0x40,  // zero status, 1=zero, 0=nonzero
+  BIT_S= 0x80,  // sign status(value of bit 7)
+  BIT_ALL= (BIT_C |BIT_N |BIT_P |BIT_A |BIT_Z |BIT_S);
 }
 
 int
@@ -567,6 +574,7 @@ cl_z80::disass(t_addr addr, const char *sep)
 void
 cl_z80::print_regs(class cl_console_base *con)
 {
+  con->dd_color("answer");
   con->dd_printf("SZ-A-PNC  Flags= 0x%02x %3d %c  ",
                  regs.raf.F, regs.raf.F, isprint(regs.raf.F)?regs.raf.F:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",

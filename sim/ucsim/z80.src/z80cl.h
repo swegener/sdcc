@@ -52,6 +52,13 @@ public:
   class cl_sp_limit_opt *sp_limit_opt;
   t_addr sp_limit;
   bool IFF1, IFF2;
+  u8_t BIT_C;
+  u8_t BIT_N;
+  u8_t BIT_P;
+  u8_t BIT_A;
+  u8_t BIT_Z;
+  u8_t BIT_S;
+  u8_t BIT_ALL;
 public:
   cl_z80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);

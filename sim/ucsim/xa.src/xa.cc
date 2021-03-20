@@ -969,6 +969,7 @@ cl_xa::print_regs(class cl_console_base *con)
   unsigned char flags;
 
   flags = get_psw();
+  con->dd_color("answer");
   con->dd_printf("CA---VNZ | ", flags);
   con->dd_printf("R0:%04x R1:%04x R2:%04x R3:%04x\n",
                  reg2(0), reg2(1), reg2(2), reg2(3));

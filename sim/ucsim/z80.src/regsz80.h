@@ -97,6 +97,7 @@ struct t_regs
   u8_t R;
 };
 
+/*
 enum {
   BIT_C=	0x01,  // carry status(out of bit 7)
   BIT_N=	0x02,  // Not addition: subtract status(1 after subtract).
@@ -106,6 +107,7 @@ enum {
   BIT_S=	0x80,  // sign status(value of bit 7)
   BIT_ALL=	(BIT_C |BIT_N |BIT_P |BIT_A |BIT_Z |BIT_S)  // all bits
 };
+*/
 
 enum {
   BITPOS_C= 0,    // 1

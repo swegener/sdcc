@@ -178,7 +178,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  e= false;
 	  if (o) o->get_value(&e);
 	  if (e)
-	    cmd->dd_printf("%s\n", b->commands.c_str());
+	    cmd->dd_cprintf("answer", "%s\n", b->commands.c_str());
 	  application->exec(b->commands);
 	  steps_done= 0;
 	}
@@ -259,7 +259,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
 	  break;
 	}
-      cmd->frozen_console->dd_printf("F 0x%06x\n", AU(uc->PC)); // for sdcdb
+      cmd->frozen_console->dd_cprintf("answer", "F 0x%06x\n", AU(uc->PC)); // for sdcdb
       unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
       if ((reason != resSTEP) ||
 	  (steps_done > 1))

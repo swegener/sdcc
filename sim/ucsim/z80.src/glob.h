@@ -50,8 +50,8 @@ extern struct dis_entry disass_r2k_fd[];
 extern struct dis_entry disass_r2k_ddcb[];
 extern struct dis_entry disass_r2k_fdcb[];
 
-extern struct dis_entry disass_lr35902[];
-extern struct dis_entry disass_lr35902_cb[];
+extern struct dis_entry disass_gb80[];
+extern struct dis_entry disass_gb80_cb[];
 
 #endif
 

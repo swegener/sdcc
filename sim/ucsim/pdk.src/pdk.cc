@@ -390,6 +390,7 @@ char *cl_pdk::disass(t_addr addr, const char *sep) {
 }
 
 void cl_pdk::print_regs(class cl_console_base *con) {
+  con->dd_color("answer");
   con->dd_printf("A= 0x%02x(%3d)\n", regs.a, regs.a);
   con->dd_printf("Flag= 0x%02x(%3d)  \n", get_flags(), get_flags());
   con->dd_printf("SP= 0x%02x(%3d)\n", get_SP(), get_SP());

@@ -27,7 +27,7 @@
 
 #include "stypes.h"
 
-#define  DISASS_NAME(X)  disass_lr35902##X
+#define  DISASS_NAME(X)  disass_gb80##X
 
 
 /* 
@@ -37,17 +37,17 @@
   */
 /*  uint  code, mask;  char  branch;  uchar length;  char  *mnemonic; */
 
-struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
+struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
   { 0x0000, 0x00ff, ' ', 1, "NOP" },
   { 0x0001, 0x00ff, ' ', 3, "LD BC,%w" },
   { 0x0002, 0x00ff, ' ', 1, "LD (BC),A" },
   { 0x0003, 0x00ff, ' ', 1, "INC BC" },
   { 0x0004, 0x00ff, ' ', 1, "INC B" },
   { 0x0005, 0x00ff, ' ', 1, "DEC B" },
-  { 0x0006, 0x00ff, ' ', 2, "LD B,%b" },
+  { 0x0006, 0x00ff, ' ', 2, "LD b,%b" },
   { 0x0007, 0x00ff, ' ', 1, "RLCA" },
 
-  { 0x0008, 0x00ff, ' ', 3, "LD (%w),SP" },  // unique to LR35902
+  { 0x0008, 0x00ff, ' ', 3, "LD (%w),SP" },  // unique to GB80
   { 0x0009, 0x00ff, ' ', 1, "ADD HL,BC" },
   { 0x000a, 0x00ff, ' ', 1, "LD A,(BC)" },
   { 0x000b, 0x00ff, ' ', 1, "DEC BC" },
@@ -57,7 +57,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
   { 0x000f, 0x00ff, ' ', 1, "RRCA" },
 
 #if 1
-  { 0x0010, 0x00ff, ' ', 2, "STOP 0" },  // unique to LR35902
+  { 0x0010, 0x00ff, ' ', 2, "STOP 0" },  // unique to GB80
 #else
   { 0x0010, 0x00ff, 'R', 2, "DJNZ %d" },
 #endif
@@ -80,7 +80,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
 
   { 0x0020, 0x00ff, 'R', 2, "JR NZ,%d" },
   { 0x0021, 0x00ff, ' ', 3, "LD HL,%w" },
-  { 0x0022, 0x00ff, ' ', 1, "LD (HL+),A" },// unique to LR35902
+  { 0x0022, 0x00ff, ' ', 1, "LDI (HL),A" },// unique to GB80
   { 0x0023, 0x00ff, ' ', 1, "INC HL" },
   { 0x0024, 0x00ff, ' ', 1, "INC H" },
   { 0x0025, 0x00ff, ' ', 1, "DEC H" },
@@ -89,7 +89,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
 
   { 0x0028, 0x00ff, 'R', 2, "JR Z,%d" },
   { 0x0029, 0x00ff, ' ', 1, "ADD HL,HL" },
-  { 0x002a, 0x00ff, ' ', 1, "LD A,(HL+)" },// unique to LR35902
+  { 0x002a, 0x00ff, ' ', 1, "LDI A,(HL)" },// unique to GB80
   { 0x002b, 0x00ff, ' ', 1, "DEC HL" },
   { 0x002c, 0x00ff, ' ', 1, "INC L" },
   { 0x002d, 0x00ff, ' ', 1, "DEC L" },
@@ -98,7 +98,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
 
   { 0x0030, 0x00ff, 'R', 2, "JR NC,%d" },
   { 0x0031, 0x00ff, ' ', 3, "LD SP,%w" },
-  { 0x0032, 0x00ff, ' ', 1, "LD (HL-),A" },  // unique to LR35902
+  { 0x0032, 0x00ff, ' ', 1, "LDD (HL),A" },  // unique to GB80
   { 0x0033, 0x00ff, ' ', 1, "INC SP" },
   { 0x0034, 0x00ff, ' ', 1, "INC (HL)" },
   { 0x0035, 0x00ff, ' ', 1, "DEC (HL)" },
@@ -107,7 +107,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
 
   { 0x0038, 0x00ff, 'R', 2, "JR C,%d" },
   { 0x0039, 0x00ff, ' ', 1, "ADD HL,SP" },
-  { 0x003a, 0x00ff, ' ', 1, "LD A,(HL-)" },  // unique to LR35902
+  { 0x003a, 0x00ff, ' ', 1, "LDD A,(HL)" },  // unique to GB80
   { 0x003b, 0x00ff, ' ', 1, "DEC SP" },
   { 0x003c, 0x00ff, ' ', 1, "INC A" },
   { 0x003d, 0x00ff, ' ', 1, "DEC A" },
@@ -121,7 +121,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
   { 0x0044, 0x00ff, ' ', 1, "LD B,H" },
   { 0x0045, 0x00ff, ' ', 1, "LD B,L" },
   { 0x0046, 0x00ff, ' ', 1, "LD B,(HL)" },
-  { 0x0047, 0x00ff, ' ', 1, "LD B,A" },
+  { 0x0047, 0x00ff, ' ', 1, "LD B,a" },
 
   { 0x0048, 0x00ff, ' ', 1, "LD C,B" },
   { 0x0049, 0x00ff, ' ', 1, "LD C,C" },
@@ -265,7 +265,7 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
   { 0x00c4, 0x00ff, 'l', 3, "CALL NZ,%w" },
   { 0x00c5, 0x00ff, ' ', 1, "PUSH BC" },
   { 0x00c6, 0x00ff, ' ', 2, "ADD A,%b" },
-  { 0x00c7, 0x00ff, ' ', 1, "RST 0x00" },
+  { 0x00c7, 0x00ff, ' ', 1, "RST 0" },
 
   { 0x00c8, 0x00ff, ' ', 1, "RET Z" },
   { 0x00c9, 0x00ff, ' ', 1, "RET" },
@@ -275,61 +275,61 @@ struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
   { 0x00cc, 0x00ff, 'l', 3, "CALL Z,%w" },
   { 0x00cd, 0x00ff, 'l', 3, "CALL %w" },
   { 0x00ce, 0x00ff, ' ', 2, "ADC A,%b" },
-  { 0x00cf, 0x00ff, ' ', 1, "RST 0x08" },
+  { 0x00cf, 0x00ff, ' ', 1, "RST 8" },
   
   { 0x00d0, 0x00ff, ' ', 1, "RET NC" },
   { 0x00d1, 0x00ff, ' ', 1, "POP DE" },
   { 0x00d2, 0x00ff, 'A', 3, "JP NC,%w" },
-  { 0x00d3, 0x00ff, ' ', 2, "Illegal Op" },  // in/out do not exist on LR35902
+  { 0x00d3, 0x00ff, ' ', 2, "Illegal Op" },  // in/out do not exist on GB80
   { 0x00d4, 0x00ff, 'l', 3, "CALL NC,%w" },
   { 0x00d5, 0x00ff, ' ', 1, "PUSH DE" },
-  { 0x00d6, 0x00ff, ' ', 2, "SUB %b" },
-  { 0x00d7, 0x00ff, ' ', 1, "RST 0x10" },
+  { 0x00d6, 0x00ff, ' ', 2, "sub %b" },
+  { 0x00d7, 0x00ff, ' ', 1, "RST 10H" },
 
   { 0x00d8, 0x00ff, ' ', 1, "RET C" },
-  { 0x00d9, 0x00ff, ' ', 1, "RETI" },  // unique to LR35902
+  { 0x00d9, 0x00ff, ' ', 1, "RETI" },  // unique to GB80
   { 0x00da, 0x00ff, 'A', 3, "JP C,%w" },
-  { 0x00db, 0x00ff, ' ', 2, "Illegal Op" },  // in/out do not exist on LR35902
+  { 0x00db, 0x00ff, ' ', 2, "Illegal Op" },  // in/out do not exist on GB80
   { 0x00dc, 0x00ff, 'l', 3, "CALL C,%w" },
   { 0x00dd, 0x00ff, ' ', 2, "Illegal Op" },  /* 0xdd - ESC codes,about 284, vary lengths, IX centric */
   { 0x00de, 0x00ff, ' ', 2, "SBC A,%b" },
-  { 0x00df, 0x00ff, ' ', 1, "RST 0x18" },
+  { 0x00df, 0x00ff, ' ', 1, "RST 18H" },
 
-  { 0x00e0, 0x00ff, ' ', 2, "LDH (0xFF00+%b),A" },  // unique to LR35902
+  { 0x00e0, 0x00ff, ' ', 2, "LDH (0xFF00+%b),A" },  // unique to GB80
   { 0x00e1, 0x00ff, ' ', 1, "POP HL" },
-  { 0x00e2, 0x00ff, 'A', 2, "LDH (C),A" },  // unique to LR35902
+  { 0x00e2, 0x00ff, 'A', 2, "LD (0xFF00+C),A" },  // unique to GB80
   { 0x00e3, 0x00ff, ' ', 1, "Illegal Op" },
   { 0x00e4, 0x00ff, 'l', 1, "Illegal Op" },
   { 0x00e5, 0x00ff, ' ', 1, "PUSH HL" },
   { 0x00e6, 0x00ff, ' ', 2, "AND %b" },
-  { 0x00e7, 0x00ff, ' ', 1, "RST 0x20" },
+  { 0x00e7, 0x00ff, ' ', 1, "RST 20H" },
 
-  { 0x00e8, 0x00ff, ' ', 2, "ADD SP,%d" },  // unique to LR35902
+  { 0x00e8, 0x00ff, ' ', 2, "ADD SP,%d" },  // unique to GB80
   { 0x00e9, 0x00ff, 'A', 1, "JP (HL)" },
-  { 0x00ea, 0x00ff, ' ', 3, "LD (%w),A" },  // unique to LR35902
+  { 0x00ea, 0x00ff, ' ', 3, "LD (%w),A" },  // unique to GB80
   { 0x00eb, 0x00ff, ' ', 1, "Illegal Op" },
   { 0x00ec, 0x00ff, 'l', 1, "Illegal Op" },
   { 0x00ed, 0x00ff, ' ', 1, "Illegal Op" },
   { 0x00ee, 0x00ff, ' ', 2, "XOR %b" },
-  { 0x00ef, 0x00ff, ' ', 1, "RST 0x28" },
+  { 0x00ef, 0x00ff, ' ', 1, "RST 28H" },
 
-  { 0x00f0, 0x00ff, ' ', 2, "LDH A,(0xFF00+%b)" },  // unique to LR35902
+  { 0x00f0, 0x00ff, ' ', 2, "LDH A,(0xFF00+%b)" },  // unique to GB80
   { 0x00f1, 0x00ff, ' ', 1, "POP AF" },
-  { 0x00f2, 0x00ff, ' ', 2, "LDH A,(C)" },  // unique to LR35902
+  { 0x00f2, 0x00ff, ' ', 2, "LD A,(0xFF00+C)" },  // unique to GB80
   { 0x00f3, 0x00ff, ' ', 1, "DI" },
   { 0x00f4, 0x00ff, 'l', 3, "Illegal Op" },
   { 0x00f5, 0x00ff, ' ', 1, "PUSH AF" },
   { 0x00f6, 0x00ff, ' ', 2, "OR %b" },
-  { 0x00f7, 0x00ff, ' ', 1, "RST 0x30" },
+  { 0x00f7, 0x00ff, ' ', 1, "RST 30H" },
 
-  { 0x00f8, 0x00ff, ' ', 2, "LDHL SP,#%d" },  // unique to LR35902
+  { 0x00f8, 0x00ff, ' ', 2, "LD HL,SP+%d" },  // unique to GB80
   { 0x00f9, 0x00ff, ' ', 1, "LD SP,HL" },
-  { 0x00fa, 0x00ff, ' ', 3, "LD A,(%w)" },  // unique to LR35902
+  { 0x00fa, 0x00ff, ' ', 3, "LD A,(%w)" },  // unique to GB80
   { 0x00fb, 0x00ff, ' ', 1, "EI" },
   { 0x00fc, 0x00ff, 'l', 1, "Illegal Op" },
   { 0x00fd, 0x00ff, ' ', 1, "Illegal Op" },
   { 0x00fe, 0x00ff, ' ', 2, "CP %b" },
-  { 0x00ff, 0x00ff, ' ', 1, "RST 0x38" },
+  { 0x00ff, 0x00ff, ' ', 1, "RST 38H" },
 
   { 0, 0, 0, 0, NULL }
 };
@@ -594,3 +594,5 @@ struct dis_entry DISASS_NAME(_cb)[]= {
   { 0x00FF, 0x00ff, ' ', 1, "SET 7,A" },
   { 0, 0, 0, 0, NULL }
 };
+
+/* End of z80.src/glob_gb80.cc */

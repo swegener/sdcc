@@ -1261,6 +1261,7 @@ cl_uc390::print_regs (class cl_console_base *con)
   t_mem data;
   uchar dps;
 
+  con->dd_color("answer");
   if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       cl_51core::print_regs (con);

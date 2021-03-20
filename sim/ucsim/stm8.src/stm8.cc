@@ -962,6 +962,7 @@ cl_stm8::disass(t_addr addr, const char *sep)
 void
 cl_stm8::print_regs(class cl_console_base *con)
 {
+  con->dd_color("answer");
   con->dd_printf("V-IHINZC  Flags= 0x%02x %3d %c  ",
                  regs.CC, regs.CC, isprint(regs.CC)?regs.CC:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",

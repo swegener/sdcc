@@ -143,8 +143,9 @@ enum cpu_type {
   CPU_R3KA      = 0x0010,
   CPU_EZ80	= 0x0020,
   CPU_Z80N      = 0x0040,
+  CPU_GB80      = 0x0080,
   CPU_ALL_Z80   = (CPU_Z80|CPU_Z180|CPU_R2K|CPU_LR35902|CPU_R3KA|CPU_EZ80|
-		   CPU_Z80N),
+		   CPU_Z80N|CPU_GB80),
 
   CPU_XA	= 0x0001,
   CPU_ALL_XA	= (CPU_XA),

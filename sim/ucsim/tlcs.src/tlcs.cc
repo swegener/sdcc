@@ -483,6 +483,7 @@ cl_tlcs::inst_length(t_addr addr)
 void
 cl_tlcs::print_regs(class cl_console_base *con)
 {
+  con->dd_color("answer");
   con->dd_printf("SZIHXVNC  Flags= 0x%02x %3d %c  ",
                  reg.raf.f, reg.raf.f, isprint(reg.raf.f)?reg.raf.f:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",

@@ -438,6 +438,7 @@ cl_hc08::disass(t_addr addr, const char *sep)
 void
 cl_hc08::print_regs(class cl_console_base *con)
 {
+  con->dd_color("answer");
   con->dd_printf("V--HINZC  Flags= 0x%02x %3d %c  ",
 		 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",

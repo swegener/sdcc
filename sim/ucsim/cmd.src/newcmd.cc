@@ -242,24 +242,25 @@ cl_console_base::print_expr_result(t_mem val, const char *fmt)
 	    case 'L': con->dd_printf("%c\n", (v)?'T':'F'); break;
 	    case 'c':
 	      if (isprint(MI(v)))
-		con->dd_printf("'%c'\n",MI(v));
+		con->dd_printf("'%c'",MI(v));
 	      else
 		{
 		  switch (MI(v))
 		    {
-		    case '\a': con->dd_printf("'\\a\n'"); break;
-		    case '\b': con->dd_printf("'\\b\n'"); break;
-		    case '\e': con->dd_printf("'\\e\n'"); break;
-		    case '\f': con->dd_printf("'\\f\n'"); break;
-		    case '\n': con->dd_printf("'\\n\n'"); break;
-		    case '\r': con->dd_printf("'\\r\n'"); break;
-		    case '\t': con->dd_printf("'\\t\n'"); break;
-		    case '\v': con->dd_printf("'\\v\n'"); break;
+		    case '\a': con->dd_printf("'\\a'"); break;
+		    case '\b': con->dd_printf("'\\b'"); break;
+		    case '\e': con->dd_printf("'\\e'"); break;
+		    case '\f': con->dd_printf("'\\f'"); break;
+		    case '\n': con->dd_printf("'\\n'"); break;
+		    case '\r': con->dd_printf("'\\r'"); break;
+		    case '\t': con->dd_printf("'\\t'"); break;
+		    case '\v': con->dd_printf("'\\v'"); break;
 		    default:
-		      con->dd_printf("'\\%03o'\n",MI(v));
+		      con->dd_printf("'\\%03o'",MI(v));
 		      break;
 		    }
 		}
+	      con->dd_printf("\n");
 	      break;
 	    }
 	}

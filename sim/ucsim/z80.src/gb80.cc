@@ -1,13 +1,8 @@
 /*
- * Simulator of microcontrollers (r2k.cc)
+ * Simulator of microcontrollers (z80.src/gb80.cc)
  *
- * Derived from ucSim z80.src/z80.cc
- * Modified for rabbit 2000 by Leland Morrison 2011
- *
- * some z80 code base from Karl Bongers karl@turbobit.com
- *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
+ * Copyright (C) 2021,21 Drotos Daniel, Talker Bt.
+ * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -32,7 +27,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "ddconfig.h"
 
-//#include <stdarg.h> /* for va_list */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -40,14 +34,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 //#include "pobjcl.h"
-#include "globals.h"
 
 // sim
-//#include "simcl.h"
+#include "simcl.h"
 
 // local
 //#include "z80cl.h"
-#include "r2kcl.h"
+#include "gb80cl.h"
 #include "glob.h"
 
 #define uint32 t_addr
@@ -55,107 +48,81 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /*******************************************************************/
 
+lr35902_memory::lr35902_memory( cl_uc &uc_parent_ref ):uc_r(uc_parent_ref) { }
 
-/*
- * Rabbit 2000 micro-controller object
- *  (base for Rabbit 3000/4000/5000)
- */
-
-cl_r2k::cl_r2k(struct cpu_entry *Itype, class cl_sim *asim):
-  cl_z80(Itype, asim), mmu(this)
+cl_gb80::cl_gb80(struct cpu_entry *Itype, class cl_sim *asim):
+  cl_z80(Itype, asim), mem(*this)
 {
   type= Itype;
-}
-
-cl_r3ka::cl_r3ka(struct cpu_entry *Itype, class cl_sim *asim):
-  cl_r2k(Itype, asim)
-{
-  SU = 0;
+  BIT_C= 0x10;
+  BIT_A= 0x20;
+  BIT_N= 0x40;
+  BIT_Z= 0x80;
+  BIT_ALL= (BIT_C |BIT_N |BIT_A |BIT_Z);
+  BIT_P= 0;
+  BIT_S= 0;
+  regs.raf.F= 0;
+  regs.ralt_af.aF= 0;
 }
 
 int
-cl_r2k::init(void)
+cl_gb80::init(void)
 {
   cl_uc::init(); /* Memories now exist */
 
-  //rom= address_space(MEM_ROM_ID);
-//  ram= mem(MEM_XRAM);
-  //ram= rom;
-
+  //rom= address_space(MEM_ROM_ID);  // code goes here...
+  
+  //  ram= mem(MEM_XRAM);
+  //ram= address_space(MEM_XRAM_ID);  // data goes here...
+  
+  
   // zero out ram(this is assumed in regression tests)
-  for (int i=0x8000; i<0x10000; i++) {
+  for (int i=0xA000; i<0xFF80; i++) {
     ram->set((t_addr) i, 0);
   }
-  /*
-  sp_limit_opt= new cl_sp_limit_opt(this);
-  sp_limit_opt->set_value((char*)"0xf000");
-  application->options->add(sp_limit_opt);
-  */
-  
+
   return(0);
 }
 
 const char *
-cl_r2k::id_string(void)
+cl_gb80::id_string(void)
 {
-  return("rabbit 2000");
+  return("GB80");
 }
 
-const char *
-cl_r3ka::id_string(void)
-{
-  return("rabbit 3000A");
-}
-
-/*
- * Making elements of the controller
- */
-/*
-t_addr
-cl_r2k::get_mem_size(enum mem_class type)
-{
-  switch(type)
-    {
-    case MEM_ROM: return(0x10000);
-    case MEM_XRAM: return(0x10000);
-    default: return(0);
-    }
- return(cl_uc::get_mem_size(type));
-}
-*/
 
 void
-cl_r2k::mk_hw_elements(void)
+cl_gb80::mk_hw_elements(void)
 {
   //class cl_base *o;
-  class cl_hw *h;
   cl_uc::mk_hw_elements();
+}
+
+void lr35902_memory::init(void) {
+  cl_address_space *as_rom;
+  cl_address_space *as_ram;
   
-  add_hw(h= new cl_z80_cpu(this));
-  h->init();
+  as_rom = new cl_address_space("rom"/*MEM_ROM_ID*/,
+				lr35902_rom_start, lr35902_rom_size, 8);
+  as_rom->init();
+  uc_r.address_spaces->add(as_rom);
+  rom = as_rom;
+  
+  as_ram = new cl_address_space(MEM_XRAM_ID,
+				lr35902_ram_start, lr35902_ram_size, 8);
+  as_ram->init();
+  uc_r.address_spaces->add(as_ram);
+  ram = as_ram;
 }
 
 void
-cl_r2k::make_memories(void)
+cl_gb80::make_memories(void)
 {
-  class cl_address_space *as;
-
-  rom= ram= as= new cl_address_space("rom", 0, 0x100000, 8);
-  as->init();
-  address_spaces->add(as);
-
-  class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
-
-  chip= new cl_memory_chip("rom_chip", 0x100000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xfffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  regs8= new cl_address_space("regs8", 0, 18, 8);
+  mem.init( );
+  rom= mem.rom;
+  ram= mem.ram;
+  
+  regs8= new cl_address_space("regs8", 0, 16, 8);
   regs8->init();
   regs8->get_cell(0)->decode((t_mem*)&regs.raf.A);
   regs8->get_cell(1)->decode((t_mem*)&regs.raf.F);
@@ -165,17 +132,15 @@ cl_r2k::make_memories(void)
   regs8->get_cell(5)->decode((t_mem*)&regs.de.l);
   regs8->get_cell(6)->decode((t_mem*)&regs.hl.h);
   regs8->get_cell(7)->decode((t_mem*)&regs.hl.l);
-  regs8->get_cell(8)->decode((t_mem*)&iir);
-  regs8->get_cell(9)->decode((t_mem*)&eir);
 
-  regs8->get_cell(9)->decode((t_mem*)&regs.ralt_af.aA);
-  regs8->get_cell(10)->decode((t_mem*)&regs.ralt_af.aF);
-  regs8->get_cell(11)->decode((t_mem*)&regs.a_bc.h);
-  regs8->get_cell(12)->decode((t_mem*)&regs.a_bc.l);
-  regs8->get_cell(13)->decode((t_mem*)&regs.a_de.h);
-  regs8->get_cell(14)->decode((t_mem*)&regs.a_de.l);
-  regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.h);
-  regs8->get_cell(16)->decode((t_mem*)&regs.a_hl.l);
+  regs8->get_cell(8)->decode((t_mem*)&regs.ralt_af.aA);
+  regs8->get_cell(9)->decode((t_mem*)&regs.ralt_af.aF);
+  regs8->get_cell(10)->decode((t_mem*)&regs.a_bc.h);
+  regs8->get_cell(11)->decode((t_mem*)&regs.a_bc.l);
+  regs8->get_cell(12)->decode((t_mem*)&regs.a_de.h);
+  regs8->get_cell(13)->decode((t_mem*)&regs.a_de.l);
+  regs8->get_cell(14)->decode((t_mem*)&regs.a_hl.h);
+  regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.l);
 
   regs16= new cl_address_space("regs16", 0, 11, 16);
   regs16->init();
@@ -212,26 +177,22 @@ cl_r2k::make_memories(void)
   v->init();
   vars->add(v= new cl_var("L", regs8, 7, ""));
   v->init();
-  vars->add(v= new cl_var("IIR", regs8, 8, ""));
-  v->init();
-  vars->add(v= new cl_var("EIR", regs8, 9, ""));
-  v->init();
 
-  vars->add(v= new cl_var("ALT_A", regs8, 10, ""));
+  vars->add(v= new cl_var("ALT_A", regs8, 8, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_F", regs8, 11, ""));
+  vars->add(v= new cl_var("ALT_F", regs8, 9, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_B", regs8, 12, ""));
+  vars->add(v= new cl_var("ALT_B", regs8, 10, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_C", regs8, 13, ""));
+  vars->add(v= new cl_var("ALT_C", regs8, 11, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_D", regs8, 14, ""));
+  vars->add(v= new cl_var("ALT_D", regs8, 12, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_E", regs8, 15, ""));
+  vars->add(v= new cl_var("ALT_E", regs8, 13, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_H", regs8, 16, ""));
+  vars->add(v= new cl_var("ALT_H", regs8, 14, ""));
   v->init();
-  vars->add(v= new cl_var("ALT_L", regs8, 17, ""));
+  vars->add(v= new cl_var("ALT_L", regs8, 15, ""));
   v->init();
 
   vars->add(v= new cl_var("AF", regs16, 0, ""));
@@ -258,32 +219,77 @@ cl_r2k::make_memories(void)
   v->init();
 }
 
+void cl_gb80::store1( u16_t addr, t_mem val ) {
+  mem.store1( addr, val );
+}
+
+void cl_gb80::store2( u16_t addr, u16_t val ) {
+  mem.store2( addr, val );
+}
+
+u8_t  cl_gb80::get1( u16_t addr ) {
+  return mem.get1( addr );
+}
+
+u16_t  cl_gb80::get2( u16_t addr ) {
+  return mem.get2( addr );
+}
+
+void lr35902_memory::store1( u16_t addr, t_mem val ) {
+  if (addr < lr35902_ram_start) {
+    /* flag illegal operation ? */
+    return;
+  }
+  
+  if ((addr- lr35902_ram_start) < lr35902_ram_size) {
+    ram->write(addr, val);
+  }
+}
+
+void lr35902_memory::store2( u16_t addr, u16_t val ) {
+  store1(addr,   val & 0xff);
+  store1(addr+1, (val >> 8) & 0xff);
+}
+
+u8_t  lr35902_memory::get1( u16_t addr ) {
+  if (addr < lr35902_rom_size) {
+    return rom->read(addr);    
+  }
+  
+  if (addr < lr35902_ram_start) {
+    /* flag illegal operation ? */
+    return (addr & 0xff);
+  }
+  
+  if ((addr-lr35902_ram_start) < lr35902_ram_size) {
+    return ram->read(addr);
+  }
+  
+  return (addr & 0xff);
+}
+
+u16_t  lr35902_memory::get2( u16_t addr ) {
+  u16_t  l, h;
+  
+  l = get1(addr  );
+  h = get1(addr+1);
+  
+  return (h << 8) | l;
+}
 
 /*
  * Help command interpreter
  */
 
 struct dis_entry *
-cl_r2k::dis_tbl(void)
+cl_gb80::dis_tbl(void)
 {
-  return(disass_r2k);
+  return(disass_gb80);
 }
 
-/*struct name_entry *
-cl_r2k::sfr_tbl(void)
-{
-  return(0);
-}*/
-
-/*struct name_entry *
-cl_r2k::bit_tbl(void)
-{
-  //FIXME
-  return(0);
-}*/
 
 int
-cl_r2k::inst_length(t_addr addr)
+cl_gb80::inst_length(t_addr addr)
 {
   int len = 0;
 
@@ -293,7 +299,7 @@ cl_r2k::inst_length(t_addr addr)
 }
 
 int
-cl_r2k::inst_branch(t_addr addr)
+cl_gb80::inst_branch(t_addr addr)
 {
   int b;
 
@@ -303,14 +309,14 @@ cl_r2k::inst_branch(t_addr addr)
 }
 
 int
-cl_r2k::longest_inst(void)
+cl_gb80::longest_inst(void)
 {
   return 4;
 }
 
 
 const char *
-cl_r2k::get_disasm_info(t_addr addr,
+cl_gb80::get_disasm_info(t_addr addr,
                         int *ret_len,
                         int *ret_branch,
                         int *immed_offset)
@@ -323,95 +329,31 @@ cl_r2k::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= rom->get/*_mem*/(/*MEM_ROM_ID,*/ addr++);
+  code= rom->get(addr++);
   dis_e = NULL;
 
   switch(code) {
     case 0xcb:  /* ESC code to lots of op-codes, all 2-byte */
-      code= rom->get/*_mem*/(/*MEM_ROM_ID,*/ addr++);
-      i= 0;
-      while ((code & disass_r2k_cb[i].mask) != disass_r2k_cb[i].code &&
-        disass_r2k_cb[i].mnemonic)
-        i++;
-      dis_e = &disass_r2k_cb[i];
-      b= disass_r2k_cb[i].mnemonic;
-      if (b != NULL)
-        len += (disass_r2k_cb[i].length + 1);
-    break;
-
-    case 0xed: /* ESC code to about 80 opcodes of various lengths */
-      code= rom->get/*_mem*/(/*MEM_ROM_ID,*/ addr++);
-      i= 0;
-      while ((code & disass_r2k_ed[i].mask) != disass_r2k_ed[i].code &&
-        disass_r2k_ed[i].mnemonic)
-        i++;
-      dis_e = &disass_r2k_ed[i];
-      b= disass_r2k_ed[i].mnemonic;
-      if (b != NULL)
-        len += (disass_r2k_ed[i].length + 1);
-    break;
-
-    case 0xdd: /* ESC codes,about 284, vary lengths, IX centric */
       code= rom->get(addr++);
-      if (code == 0xcb) {
-        immed_n = 2;
-        addr++;  // pass up immed data
-        code= rom->get(addr++);
-        i= 0;
-        while ((code & disass_r2k_ddcb[i].mask) != disass_r2k_ddcb[i].code &&
-          disass_r2k_ddcb[i].mnemonic)
-          i++;
-        dis_e = &disass_r2k_ddcb[i];
-        b= disass_r2k_ddcb[i].mnemonic;
-        if (b != NULL)
-          len += (disass_r2k_ddcb[i].length + 2);
-      } else {
-        i= 0;
-        while ((code & disass_r2k_dd[i].mask) != disass_r2k_dd[i].code &&
-          disass_r2k_dd[i].mnemonic)
-          i++;
-        dis_e = &disass_r2k_dd[i];
-        b= disass_r2k_dd[i].mnemonic;
-        if (b != NULL)
-          len += (disass_r2k_dd[i].length + 1);
-      }
-    break;
-
-    case 0xfd: /* ESC codes,sme as dd but IY centric */
-      code= rom->get(addr++);
-      if (code == 0xcb) {
-        immed_n = 2;
-        addr++;  // pass up immed data
-        code= rom->get(addr++);
-        i= 0;
-        while ((code & disass_r2k_fdcb[i].mask) != disass_r2k_fdcb[i].code &&
-          disass_r2k_fdcb[i].mnemonic)
-          i++;
-        dis_e = &disass_r2k_fdcb[i];
-        b= disass_r2k_fdcb[i].mnemonic;
-        if (b != NULL)
-          len += (disass_r2k_fdcb[i].length + 2);
-      } else {
-        i= 0;
-        while ((code & disass_r2k_fd[i].mask) != disass_r2k_fd[i].code &&
-          disass_r2k_fd[i].mnemonic)
-          i++;
-        dis_e = &disass_r2k_fd[i];
-        b= disass_r2k_fd[i].mnemonic;
-        if (b != NULL)
-          len += (disass_r2k_fd[i].length + 1);
-      }
+      i= 0;
+      while ((code & disass_gb80_cb[i].mask) != disass_gb80_cb[i].code &&
+        disass_gb80_cb[i].mnemonic)
+        i++;
+      dis_e = &disass_gb80_cb[i];
+      b= disass_gb80_cb[i].mnemonic;
+      if (b != NULL)
+        len += (disass_gb80_cb[i].length + 1);
     break;
 
     default:
       i= 0;
-      while ((code & disass_r2k[i].mask) != disass_r2k[i].code &&
-             disass_r2k[i].mnemonic)
+      while ((code & disass_gb80[i].mask) != disass_gb80[i].code &&
+             disass_gb80[i].mnemonic)
         i++;
-      dis_e = &disass_r2k[i];
-      b= disass_r2k[i].mnemonic;
+      dis_e = &disass_gb80[i];
+      b= disass_gb80[i].mnemonic;
       if (b != NULL)
-        len += (disass_r2k[i].length);
+        len += (disass_gb80[i].length);
     break;
   }
 
@@ -436,7 +378,7 @@ cl_r2k::get_disasm_info(t_addr addr,
 }
 
 char *
-cl_r2k::disass(t_addr addr, const char *sep)
+cl_gb80::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
   const char *b;
@@ -516,20 +458,23 @@ cl_r2k::disass(t_addr addr, const char *sep)
 
 
 void
-cl_r2k::print_regs(class cl_console_base *con)
+cl_gb80::print_regs(class cl_console_base *con)
 {
   con->dd_color("answer");
-  con->dd_printf("SZ-A-PNC  Flags= 0x%02x %3d %c  ",
+  con->dd_printf("ZNHC---  Flags= 0x%02x %3d %c  ",
                  regs.raf.F, regs.raf.F, isprint(regs.raf.F)?regs.raf.F:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
                  regs.raf.A, regs.raf.A, isprint(regs.raf.A)?regs.raf.A:'.');
-  con->dd_printf("%c%c-%c-%c%c%c\n",
-                 (regs.raf.F&BIT_S)?'1':'0',
+  con->dd_printf("%c%c%c%c%c%c%c%c\n",
                  (regs.raf.F&BIT_Z)?'1':'0',
-                 (regs.raf.F&BIT_A)?'1':'0',
-                 (regs.raf.F&BIT_P)?'1':'0',
                  (regs.raf.F&BIT_N)?'1':'0',
-                 (regs.raf.F&BIT_C)?'1':'0');
+                 (regs.raf.F&BIT_A)?'1':'0',
+                 (regs.raf.F&BIT_C)?'1':'0',
+                 (regs.raf.F& 0x08)?'1':'0',
+                 (regs.raf.F& 0x04)?'1':'0',
+                 (regs.raf.F& 0x03)?'1':'0',
+                 (regs.raf.F& 0x08)?'1':'0'
+		 );
   con->dd_printf("BC= 0x%04x [BC]= %02x %3d %c  ",
                  regs.BC, ram->get(regs.BC), ram->get(regs.BC),
                  isprint(ram->get(regs.BC))?ram->get(regs.BC):'.');
@@ -539,16 +484,9 @@ cl_r2k::print_regs(class cl_console_base *con)
   con->dd_printf("HL= 0x%04x [HL]= %02x %3d %c\n",
                  regs.HL, ram->get(regs.HL), ram->get(regs.HL),
                  isprint(ram->get(regs.HL))?ram->get(regs.HL):'.');
-  con->dd_printf("IX= 0x%04x [IX]= %02x %3d %c  ",
-                 regs.IX, ram->get(regs.IX), ram->get(regs.IX),
-                 isprint(ram->get(regs.IX))?ram->get(regs.IX):'.');
-  con->dd_printf("IY= 0x%04x [IY]= %02x %3d %c  ",
-                 regs.IY, ram->get(regs.IY), ram->get(regs.IY),
-                 isprint(ram->get(regs.IY))?ram->get(regs.IY):'.');
   con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
                  regs.SP, ram->get(regs.SP), ram->get(regs.SP),
                  isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
-  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
 
   print_disass(PC, con);
 }
@@ -558,88 +496,85 @@ cl_r2k::print_regs(class cl_console_base *con)
  */
 
 int
-cl_r2k::exec_inst(void)
+cl_gb80::exec_inst(void)
 {
   t_mem code;
-  
-  ins_start = PC;
-  instPC = PC;
-  
+
+  instPC= PC;
+
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);
-  
-  /* handling for IOI and IOE prefixes */
-  mmu.io_flag = 0;
-  if ((code == 0xd3) || (code == 0xdb)) {
-    mmu.io_flag = (code == 0xd3) ? IOI : IOE;
-    
-    if (fetch(&code))
-      return(resBREAKPOINT);
-    tick(1);
-  }
-  
-  return exec_code( code );
-}
-
-int cl_r2k::exec_code(t_mem code)
-{
   switch (code)
     {
     case 0x00: return(inst_nop(code));
     case 0x01: case 0x02: case 0x06: return(inst_ld(code));
     case 0x03: case 0x04: return(inst_inc(code));
     case 0x05: return(inst_dec(code));
-    case 0x07: return(inst_rlca(code));
-
-    case 0x08: return(inst_ex(code));
+    case 0x07: {
+      int ret= (inst_rlca(code));
+      regs.raf.F&= ~(BIT_Z|BIT_A|BIT_N);
+      return ret;
+    }
+    case 0x08: return(inst_st_sp_abs(code));
     case 0x09: return(inst_add(code));
     case 0x0a: case 0x0e: return(inst_ld(code));
     case 0x0b: case 0x0d: return(inst_dec(code));
     case 0x0c: return(inst_inc(code));
-    case 0x0f: return(inst_rrca(code));
+    case 0x0f: {
+      int ret= (inst_rrca(code));
+      regs.raf.F&= ~(BIT_Z|BIT_A|BIT_N);
+      return ret;
+    }
 
-    case 0x10: return(inst_djnz(code));
+    case 0x10: return(inst_stop0(code));
     case 0x11: case 0x12: case 0x16: return(inst_ld(code));
     case 0x13: case 0x14: return(inst_inc(code));
     case 0x15: return(inst_dec(code));
-    case 0x17: return(inst_rla(code));
-
+    case 0x17: {
+      int ret= (inst_rla(code));
+      regs.raf.F&= ~(BIT_Z|BIT_A|BIT_N);
+      return ret;
+    }
     case 0x18: return(inst_jr(code));
     case 0x19: return(inst_add(code));
     case 0x1a: case 0x1e: return(inst_ld(code));
     case 0x1b: case 0x1d: return(inst_dec(code));
     case 0x1c: return(inst_inc(code));
-    case 0x1f: return(inst_rra(code));
-
+    case 0x1f: {
+      int ret= (inst_rra(code));
+      regs.raf.F&= ~(BIT_Z|BIT_A|BIT_N);
+      return ret;
+    }
 
     case 0x20: return(inst_jr(code));
-    case 0x21: case 0x22: case 0x26: return(inst_ld(code));
+    case 0x21: case 0x26: return(inst_ld(code));
+    case 0x22: return inst_ldi(code);
     case 0x23: case 0x24: return(inst_inc(code));
     case 0x25: return(inst_dec(code));
-
-      //case 0x27: return(inst_daa(code));
-    case 0x27: return(inst_add_sp_d(code));
+    case 0x27: return(inst_daa(code));
       
     case 0x28: return(inst_jr(code));
     case 0x29: return(inst_add(code));
-    case 0x2a: case 0x2e: return(inst_ld(code));
+    case 0x2a: return(inst_ldi(code));
     case 0x2b: case 0x2d: return(inst_dec(code));
     case 0x2c: return(inst_inc(code));
+    case 0x2e: return(inst_ld(code));
     case 0x2f: return(inst_cpl(code));
 
-
     case 0x30: return(inst_jr(code));
-    case 0x31: case 0x32: case 0x36: return(inst_ld(code));
+    case 0x31: case 0x36: return(inst_ld(code));
+    case 0x32: return(inst_ldd(code));
     case 0x33: case 0x34: return(inst_inc(code));
     case 0x35: return(inst_dec(code));
     case 0x37: return(inst_scf(code));
-
+      
     case 0x38: return(inst_jr(code));
     case 0x39: return(inst_add(code));
-    case 0x3a: case 0x3e: return(inst_ld(code));
+    case 0x3a: return inst_ldd(code);
     case 0x3b: case 0x3d: return(inst_dec(code));
     case 0x3c: return(inst_inc(code));
+    case 0x3e: return(inst_ld(code));
     case 0x3f: return(inst_ccf(code));
 
     case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
@@ -657,9 +592,7 @@ int cl_r2k::exec_code(t_mem code)
     case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
     case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
       return(inst_ld(code));
-    case 0x76:
-      //return(inst_halt(code));
-      return(inst_altd(code));
+    case 0x76: return(inst_halt(code));
 
     case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
       return(inst_add(code));
@@ -682,109 +615,87 @@ int cl_r2k::exec_code(t_mem code)
       return(inst_cp(code));
 
     case 0xc0: return(inst_ret(code));
-    case 0xc1: return(inst_pop(code));
+    case 0xc1: {
+      int ret= (inst_pop(code));
+      regs.raf.F&= 0xf0;
+      return ret;
+    }
     case 0xc2: case 0xc3: return(inst_jp(code));
-    case 0xc4: return(inst_r2k_ld(code));
+    case 0xc4: return(inst_call(code));
     case 0xc5: return(inst_push(code));
     case 0xc6: return(inst_add(code));
-    case 0xc7: return(inst_ljp(code));
+    case 0xc7: return(inst_rst(code));
 
     case 0xc8: case 0xc9: return(inst_ret(code));
     case 0xca: return(inst_jp(code));
 
       /* CB escapes out to 2 byte opcodes(CB include), opcodes
          to do register bit manipulations */
-    case 0xcb: return(inst_cb());
-    case 0xcc: return(inst_bool(code));
-    case 0xcd: return(inst_call(code));
+    case 0xcb: return(inst_cb( ));
+    case 0xcc: case 0xcd: return(inst_call(code));
     case 0xce: return(inst_adc(code));
-    case 0xcf: return(inst_lcall(code));
-
+    case 0xcf: return(inst_rst(code));
 
     case 0xd0: return(inst_ret(code));
     case 0xd1: return(inst_pop(code));
     case 0xd2: return(inst_jp(code));
-    case 0xd3: /* error (ioi prefix) */ break;
-    case 0xd4: return(inst_r2k_ld(code));
+    case 0xd3: break;
+    case 0xd4: return(inst_call(code));
     case 0xd5: return(inst_push(code));
     case 0xd6: return(inst_sub(code));
     case 0xd7: return(inst_rst(code));
 
     case 0xd8: return(inst_ret(code));
-    case 0xd9: return(inst_exx(code));
+ case 0xd9: return(inst_reti(code));
     case 0xda: return(inst_jp(code));
-    case 0xdb: /* error (ioe prefix) */ break;
-    case 0xdc: return(inst_r2k_and(code));
-      /* DD escapes out to 2 to 4 byte opcodes(DD included)
-        with a variety of uses.  It can precede the CB escape
-        sequence to extend CB codes with IX+immed_byte */
-    case 0xdd: return(inst_xd(code));
+    case 0xdb: break;
+    case 0xdc: return(inst_call(code));
+      
+ case 0xdd: break;  /* IX register doesn't exist on the GB80 */
     case 0xde: return(inst_sbc(code));
     case 0xdf: return(inst_rst(code));
-
-
-    case 0xe0: return(inst_ret(code));
+      
+      
+    case 0xe0: return(inst_ldh(code));
     case 0xe1: return(inst_pop(code));
-    case 0xe2: return(inst_jp(code));
-    case 0xe3: return(inst_r2k_ex(code));
-    case 0xe4: return(inst_r2k_ld(code));
+    case 0xe2: return(inst_ldh(code));
+    case 0xe3:
+ case 0xe4: break;
     case 0xe5: return(inst_push(code));
     case 0xe6: return(inst_and(code));
     case 0xe7: return(inst_rst(code));
 
-    case 0xe8: return(inst_ret(code));
+    case 0xe8: return(inst_add_sp_d(code));
     case 0xe9: return(inst_jp(code));
-    case 0xea: return(inst_jp(code));
-    case 0xeb: return(inst_ex(code));
-    case 0xec: return(inst_r2k_or (code));
-      /* ED escapes out to other oddball opcodes */
-    case 0xed: return(inst_ed(0xed));
+    case 0xea: return(inst_ld16(code));
+    case 0xeb:
+    case 0xec: case 0xed: break;
     case 0xee: return(inst_xor(code));
     case 0xef: return(inst_rst(code));
       
-    case 0xf0: return(inst_ret(code));
+    case 0xf0: return(inst_ldh(code));
     case 0xf1: return(inst_pop(code));
-    case 0xf2: return(inst_jp(code));
-    case 0xf3: return(inst_rl_de(code));
-    case 0xf4: return(inst_r2k_ld(code));
+ case 0xf2: return(inst_ldh(code));
+    case 0xf3: return(inst_di(code));
+    case 0xf4: break;
     case 0xf5: return(inst_push(code));
     case 0xf6: return(inst_or(code));
-    case 0xf7: return(inst_mul(code));
+    case 0xf7: return(inst_rst(code));
 
-    case 0xf8: return(inst_ret(code));
+    case 0xf8: return(inst_ldhl_sp(code));
     case 0xf9: return(inst_ld(code));
-    case 0xfa: return(inst_jp(code));
-    case 0xfb: return(inst_rr_de(code));
-    case 0xfc: return(inst_rr_hl(code));
-      /* FD escapes out to 2 to 4 byte opcodes(DD included)
-        with a variety of uses.  It can precede the CB escape
-        sequence to extend CB codes with IX+immed_byte */
-    case 0xfd: return(inst_xd(code));
+    case 0xfa: return(inst_ld16(code));
+    case 0xfb: return(inst_ei(code));
+    case 0xfc: 
+    case 0xfd: break;
     case 0xfe: return(inst_cp(code));
     case 0xff: return(inst_rst(code));
     }
 
-  /*if (PC)
-    PC--;
-  else
-  PC= get_mem_size(MEM_ROM_ID)-1;*/
   PC= rom->inc_address(PC, -1);
 
   sim->stop(resINV_INST);
   return(resINV_INST);
 }
 
-int cl_r3ka::exec_code(t_mem code)
-{
-  if (code == 0x5B)
-    {
-      // IDET
-      // if (EDMR && (SU & 0x01))
-      //  system violation interrupt...
-      ;
-    }
-  
-  return cl_r2k::exec_code(code);
-}
-
-/* End of z80.src/z80.cc */
+/* End of z80.src/gb80.cc */

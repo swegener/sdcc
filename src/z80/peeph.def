@@ -1783,7 +1783,7 @@ replace restart {
 } by {
 	ld	hl,#%1 + 1
 	add	hl,%2
-	; common peephole 129b moved increment of hl to constant.
+	; common peephole 129c moved increment of hl to constant.
 }
 
 replace restart {
@@ -1793,7 +1793,7 @@ replace restart {
 } by {
 	ld	hl,#%1 - 1
 	add	hl,%2
-	; common peephole 129c moved decrement of hl to constant.
+	; common peephole 129d moved decrement of hl to constant.
 }
 
 replace {

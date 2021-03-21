@@ -1,3 +1,8 @@
+2021-03-21 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/SDCCpeeph.c:
+	  Make operandsLiteral pickier and fix bug #3198.
+
 2021-03-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sim/ucsim/z80.src/inst_lr35902.cc:

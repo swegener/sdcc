@@ -758,11 +758,15 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
         return global_not_volatile;
       if (strstr (var, "(de)"))
         return global_not_volatile;
-      if (strstr (var, "(hl)"))
+      if (strstr (var, "(hl"))
         return global_not_volatile;
       if (strstr (var, "(ix"))
         return global_not_volatile;
       if (strstr (var, "(iy"))
+        return global_not_volatile;
+      // gbz80 specific ldh can be volatile
+      // but HRAM doesn't have to be volatile
+      if (TARGET_ID_GBZ80 && strstr (var, "(c)"))
         return global_not_volatile;
     }
 
@@ -1698,6 +1702,7 @@ FBYNAME (operandsLiteral)
 {
   set *operands;
   const char *op;
+  const char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
   operands = setFromConditionArgs (cmdLine, vars);
 
@@ -1711,11 +1716,51 @@ FBYNAME (operandsLiteral)
 
   for (op = setFirstItem (operands); op; op = setNextItem (operands))
     {
-      if (!isdigit( (unsigned char)(*op) ))
+      unsigned char base = 10;
+      // has to start with a number or a sign
+      if(!isdigit( (unsigned char)(*op) ) && (*op) != '-' && (*op) != '+')
         {
           deleteSet (&operands);
           return FALSE;
         }
+      // handle 0b 0o 0d 0x
+      if((*op) == '0' && tolower((unsigned char)(op[1])) == 'b')
+        {
+          base = 2;
+          op += 2;
+        }
+      else if((*op) == '0' && tolower((unsigned char)(op[1])) == 'o')
+        {
+          base = 8;
+          op += 2;
+        }
+      else if((*op) == '0' && tolower((unsigned char)(op[1])) == 'd')
+        {
+          base = 10;
+          op += 2;
+        }
+      else if((*op) == '0' && tolower((unsigned char)(op[1])) == 'x')
+        {
+          base = 16;
+          op += 2;
+        }
+      else
+        ++op;
+      
+      while((unsigned char)(*op) != '\0'){
+        unsigned char i;
+        for(i = 0; i < base; ++i){
+          if(tolower((unsigned char)(*op)) == digits[i])
+            break;
+        }
+        // number was too big
+        if(i >= base)
+          {
+            deleteSet (&operands);
+            return FALSE;
+          }
+        ++op;
+      }
     }
 
   deleteSet (&operands);

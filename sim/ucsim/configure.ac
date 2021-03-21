@@ -717,21 +717,25 @@ AC_DEFINE_UNQUOTED(_M_, "${M}", [XXX])
 AC_OUTPUT(Makefile
 main.mk:main_in.mk
 packages.mk:packages_in.mk
-sim.src/Makefile
 cmd.src/Makefile
-s51.src/Makefile
-avr.src/Makefile
-z80.src/Makefile
-tlcs.src/Makefile
-hc08.src/Makefile
-xa.src/Makefile
-stm8.src/Makefile
-pdk.src/Makefile
-st7.src/Makefile
-p1516.src/Makefile
-m6809.src/Makefile
+
+sim.src/Makefile   sim.src/test/Makefile
+
+avr.src/Makefile   avr.src/test/Makefile
+hc08.src/Makefile  hc08.src/test/Makefile
+m6809.src/Makefile m6809.src/test/Makefile
+p1516.src/Makefile p1516.src/test/Makefile
+pdk.src/Makefile   pdk.src/test/Makefile
+s51.src/Makefile   s51.src/test/Makefile
+st7.src/Makefile   st7.src/test/Makefile
+stm8.src/Makefile  stm8.src/test/Makefile
+tlcs.src/Makefile  tlcs.src/test/Makefile
+xa.src/Makefile    xa.src/test/Makefile
+z80.src/Makefile   z80.src/test/Makefile
+
 gui.src/Makefile
 gui.src/serio.src/Makefile
+
 doc/Makefile
 )
 

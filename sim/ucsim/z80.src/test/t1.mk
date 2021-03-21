@@ -1,3 +1,3 @@
 MAIN		= t1
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk

@@ -1,11 +1,11 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>Breakpoints commands of &mu;Csim</title>
+    <title>Breakpoints commands of &#956;Csim</title>
   </head>
-  <body style=" background-color: white;">
+  <body style="   background-color: white;">
     <!-- BREAKPOINTS -->
-    <h2>Commands of <i>&mu;Csim</i> to manage breakpoints</h2>
+    <h2>Commands of <i>&#956;Csim</i> to manage breakpoints</h2>
     Two kind of breakpoint can be used: fetch and event breakpoint. <b>Fetch</b>
     breakpoints are classical breakpoints. They can be placed at any instruction
     in the code memory. Breakpoint will be hit if CPU fetches instruction code
@@ -78,6 +78,9 @@ Simulation started, PC=0x000000
 Stop at 000160: (4) Breakpoint
 F 000160
 &gt; </pre>
+    Breakpoint hits can be made more noticeable by printing a beep character on
+    the console. This function can be turned on by <a href="cmd_general.html#set_option">setting
+      the option</a> <b>beep_break</b> (FALSE by default).<br>
     <hr> <a name="clear">
       <h3>clear <i>[addr...]</i></h3>
     </a> Delete fetch breakpoint. Parameter specifies address of breakpoint. If
@@ -104,8 +107,17 @@ Num Type       Disp Hit   Cnt   Address  What
     </a> Delete breakpoint(s) by its number.
     <p>If parameter is not used then all breakpoints are deleted. </p>
     <hr> <a name="commands">
-      <h3>commands <i>script</i></h3>
+      <h3>commands <i>[breakpoint-nr] script</i></h3>
     </a>
+    <p><a name="commands">Attach a script to a breakpoint. Breakpoint number can
+        be omitted if only one breakpoint exists. Breakpoint numbers can be
+        checked by </a><a href="cmd_general.html#info_breakpoints">info
+        breakpoint</a> command. Script is command or a list of commands
+      separated by ; character. It will be executed when the specified
+      breakpoint is hit. If the text of the script is printed before execution
+      is controlled by the option <b>echo_script</b>, which is FALSE by
+      default. See <a href="cmd_general.html#set_option">set option</a> command
+      how to set it.</p>
     <p> </p>
     <hr>
   </body>

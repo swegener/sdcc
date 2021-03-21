@@ -18218,7 +18218,7 @@ _ACEOF
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk sim.src/Makefile cmd.src/Makefile s51.src/Makefile avr.src/Makefile z80.src/Makefile tlcs.src/Makefile hc08.src/Makefile xa.src/Makefile stm8.src/Makefile pdk.src/Makefile st7.src/Makefile p1516.src/Makefile m6809.src/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile hc08.src/Makefile hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19309,12 +19309,16 @@ do
     "sim.src/Makefile") CONFIG_FILES="$CONFIG_FILES sim.src/Makefile" ;;
     "cmd.src/Makefile") CONFIG_FILES="$CONFIG_FILES cmd.src/Makefile" ;;
     "s51.src/Makefile") CONFIG_FILES="$CONFIG_FILES s51.src/Makefile" ;;
+    "s51.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES s51.src/test/Makefile" ;;
     "avr.src/Makefile") CONFIG_FILES="$CONFIG_FILES avr.src/Makefile" ;;
     "z80.src/Makefile") CONFIG_FILES="$CONFIG_FILES z80.src/Makefile" ;;
+    "z80.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES z80.src/test/Makefile" ;;
     "tlcs.src/Makefile") CONFIG_FILES="$CONFIG_FILES tlcs.src/Makefile" ;;
+    "tlcs.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES tlcs.src/test/Makefile" ;;
     "hc08.src/Makefile") CONFIG_FILES="$CONFIG_FILES hc08.src/Makefile" ;;
     "xa.src/Makefile") CONFIG_FILES="$CONFIG_FILES xa.src/Makefile" ;;
     "stm8.src/Makefile") CONFIG_FILES="$CONFIG_FILES stm8.src/Makefile" ;;
+    "stm8.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES stm8.src/test/Makefile" ;;
     "pdk.src/Makefile") CONFIG_FILES="$CONFIG_FILES pdk.src/Makefile" ;;
     "st7.src/Makefile") CONFIG_FILES="$CONFIG_FILES st7.src/Makefile" ;;
     "p1516.src/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/Makefile" ;;

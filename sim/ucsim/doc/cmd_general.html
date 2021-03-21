@@ -3,10 +3,10 @@
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
     <title>General commands of ?Csim</title>
   </head>
-  <body style="background-color: white;">
-    <h2>General commands of <i>?Csim</i></h2>
+  <body style="  background-color: white;">
+    <h2>General commands of <i>&#956;Csim</i></h2>
     <h3><a name="conf">conf</a></h3>
-    Conf command can be used to display different kind of information about <i>?Csim</i>.
+    Conf command can be used to display different kind of information about <i>&#956;Csim</i>.
     It can be followed by a subcommand:
     <p><a href="#conf_">conf</a> <br>
       conf <a href="#conf_objects">objects</a> </p>
@@ -81,8 +81,7 @@ long help of timer run
     <h3><a name="q">quit</a></h3>
     Quit. This command terminates actual console, it does not ask you to confirm
     your intention. Simulator always reads commands from a file so end of file
-    condition finishes too. If command console is on standard input/output,
-    pressing the CTRL-D will quit just like the quit command.
+    condition finishes too.
     <p>Note that if <a href="invoke.html#Zoption">-Z option</a> was used at
       invocation then the quit command does not terminate the simulator program.
       In this case <a href="#kill">kill</a> command can be used to terminate
@@ -101,7 +100,7 @@ $ </pre>
     doesn't matter how many consoles are used and what commands are running on
     them.
     <hr>
-    <h3><a name="exec">exec <i>file</i></a></h3>
+    <h3><a name="exec">exec <i>"file"</i></a></h3>
     Reads commands from "file" and executes them. This command opens a new
     console (which will use same in/out file as the actual one) to execute the
     file. This means the "quit" command in the file will not exit the simulator:
@@ -143,9 +142,7 @@ under certain conditions; type `show c' for details.
 129
 0&gt; 
     </pre>
-
     Following formats are supported:
-
     <ul>
       <li><b>x</b> hexadecimal</li>
       <li><b>X</b> hexadecimal prefixed with <tt>0x</tt></li>
@@ -156,17 +153,15 @@ under certain conditions; type `show c' for details.
       <li><b>b</b> binary</li>
       <li><b>B</b> logical value as one bit</li>
       <li><b>L</b> logical value in T/F form</li>
-      <li><b>c</b> chacter constant in 'c' form (non-printable values are excaped in c syntax)</li>
+      <li><b>c</b> chacter constant in 'c' form (non-printable values are
+        escaped in c syntax)</li>
     </ul>
-
-    If more then one format character is used then all requested form
-    will be printed:
-
+    If more then one format character is used then all requested form will be
+    printed:
     <pre>0&gt; <font color="#118811">expr /bx 123</font>
 00000000000000000000000001111011
 7b
 0&gt;    </pre>
-    
     <hr>
     <h3><a name="show">show</a></h3>
     Show command can be used to display different kind of information. It must
@@ -192,7 +187,7 @@ under certain conditions; type `show c' for details.
       Errors or warnings are events which can happen in the simulated system
       during simulation. Report of that events can be turned on or off using <a
         href="#set_error"><b>set error</b></a> command. Errors are organized in
-      parent-child relationship. Childs are listed under the parent:
+      parent-child relationship. Children are listed under the parent:
       <pre>0&gt; <font color="#118811">sh er</font>
 Error: non-classified [on/ON]
   Error: memory [on/ON]
@@ -360,7 +355,7 @@ Ambiguous option name, use number instead
       <h4><a name="set_memory">set memory <i>memory_type address data...</i></a></h4>
       This command can be used to modify content of any simulated memory. First
       parameter must be a class name to specify type of memory. Class names can
-      de checked by <a href="cmd_general.html#info_memory">info memory</a>
+      be checked by <a href="cmd_general.html#info_memory">info memory</a>
       command. Chips and address spaces can be used as well.
       <p>Second parameter specifies start address of the modification. </p>
       <p>Remaining parameters will be written into the memory starting at
@@ -441,11 +436,14 @@ Nothing to do
     <h3><a name="state">state</a></h3>
     State of the simulator and the simulated microcontroller:
     <pre>&gt; <font color="#118811">state</font>
-CPU state= OK PC= 0x004349 XTAL= 1.10592e+07
-Total time since last reset= 0.614873 sec (6800004 clks)
-Time in isr = 0.0144227 sec (159504 clks) 2.3%
+CPU state= OK PC= 0x009c6c XTAL= 1.10592e+07
+Operation since last reset= (51682412 vclks)
+Inst= 51682412 Fetch= 51682412 Read= 0 Write= 0
+Total time since last reset= 56.079 sec (620188944 clks)
+Time in isr = 0 sec (0 clks)   0%
 Time in idle= 0 sec (0 clks)   0%
-Max value of stack pointer= 0x000049, avg= 0x000026
+Max value of stack pointer= 0x000007, avg= 0x000003
+Simulation: stopped
 &gt; 
 </pre> The "CPU state" in the first line is an internal information. PC is value
     of the program counter. First line shows XTAL frequency too.
@@ -454,8 +452,9 @@ Max value of stack pointer= 0x000049, avg= 0x000026
       number of clock periods then same data is printed out about time spent in
       interrupt service routines as well as in idle mode. Last data in lines of
       ISR and IDLE time shows ratio of ISRs, Idle times and main program. </p>
-    <p>Last line informs about maximum value of the stack pointer and a "not
-      very well" calculated average value of it. </p>
+    <p>Last lines inform about maximum value of the stack pointer and a "not
+      very well" calculated average value of it, and if the simulation is
+      running or stopped. </p>
     <hr>
     <h3><a name="reset">reset</a></h3>
     Reset command. It resets the microcontroller. It has same effect as active
@@ -495,10 +494,9 @@ under certain conditions; type `show c' for details.
     <p>info <a href="#info_breakpoints">breakpoints</a> <br>
       info <a href="#info_registers">registers</a> <br>
       info <a href="#info_hardware">hardware</a> <br>
-      <!-- info <a href="#info_stack">stack</a> <br>--> info <a href="#info_memory">memory</a>
-      <br>
-      info <a href="#info_variables">variables</a>
-      <br>info <a href="#info_history">history</a> </p>
+      info <a href="#info_memory">memory</a> <br>
+      info <a href="#info_variables">variables</a> <br>
+      info <a href="#info_history">history</a> </p>
     <blockquote>
       <h4><a name="info_breakpoints">info breakpoints</a></h4>
       This subcommand prints out information about breakpoints:
@@ -697,21 +695,8 @@ timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
 </pre>
       <hr>
       <!-- 
-      <h4><a name="info_stack">info stack</a></h4>      This command prints out information about data stored in the CPU's stack
-      and operations which put them there.      <pre>$ <font color="#118811">s51 ~/remo.hex</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute itunder certain conditions; type `show c' for details.
-55470 words read from /home/staff/drdani/remo.hex0&gt; <font color="#118811">set opt irq_stop true</font>
-0&gt; <font color="#118811">r</font>Simulation started, PC=0x000000
-Stop at 0x000023: (2) InterruptF 0x000023
-0&gt; <font color="#118811">i s</font>OP   SP before-after   L DATA/ADDR   INSTRUCTION
-call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379
-call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,3674
-0&gt; </pre> First column shows the operation which can be <b>call</b> or <b>push</b>
-      or <b>intr</b> (interrupt call). Next column contains value of the SP      register before and after the operation. Column "L" shows size of the
-      data, and the next column the data itself. Note, that for call operations      (call, and intr) the <b>called</b> address is printed, not the pushed
-      one! Last column is the instruction which has been executed when the      operation occurred.
-<hr>-->
+      <h4><a name="info_stack">info stack</a></h4>      This command prints out information about data stored in the CPU's stack      and operations which put them there.      <pre>$ <font color="#118811">s51 ~/remo.hex</font>uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.This is free software, and you are welcome to redistribute itunder certain conditions; type `show c' for details.55470 words read from /home/staff/drdani/remo.hex0&gt; <font color="#118811">set opt irq_stop true</font>0&gt; <font color="#118811">r</font>Simulation started, PC=0x000000Stop at 0x000023: (2) InterruptF 0x0000230&gt; <font color="#118811">i s</font>OP   SP before-after   L DATA/ADDR   INSTRUCTION
+call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,36740&gt; </pre> First column shows the operation which can be <b>call</b> or <b>push</b>      or <b>intr</b> (interrupt call). Next column contains value of the SP      register before and after the operation. Column "L" shows size of the      data, and the next column the data itself. Note, that for call operations      (call, and intr) the <b>called</b> address is printed, not the pushed      one! Last column is the instruction which has been executed when the      operation occurred.<hr>-->
       <h4><a name="info_memory">info memory</a></h4>
       This command shows information about <a href="memory.html">memory system</a>:
       chips, address spaces and address decoders.
@@ -768,13 +753,10 @@ Address decoders:
 </pre>
       <hr>
       <h4><a name="info_variables">info variables [name]</a></h4>
-
-      Print out information about variables. Variable is memory
-      location which has a name. It can be created by <a href="cmd_memory.html#var">var</a>
-      command and several variables are created by the
-      simulator. Optionaly the name can be specified in the command to
-      search for it in variable names.
-
+      Print out information about variables. Variable is memory location which
+      has a name. It can be created by <a href="cmd_memory.html#var">var</a>
+      command and several variables are created by the simulator. Optionally the
+      name can be specified in the command to search for it in variable names.
       <pre>0&gt; <font color="#118811">info var a</font>
 pa rom[0xf000] = 00000000
   Data register of pa
@@ -801,18 +783,13 @@ sim_xtal simif_0_cfg[0x6] = 00a8c000
   Xtal frequency in Hz (int, RW)
 0&gt;
       </pre>
-
-      First word is the name of the variable, followed by memory and
-      the address, last word is the actual value in
-      hexadecimal. Predefined variables have a short description which
-      is printed in next line.
-      
+      First word is the name of the variable, followed by memory and the
+      address, last word is the actual value in hexadecimal. Predefined
+      variables have a short description which is printed in next line.
       <hr>
       <h4><a name="info_history">info history</a></h4>
-
-      This command is the same as <a href="cmd_exec.html#history_information">history information</a>.
-      
-    </blockquote>
+      This command is the same as <a href="cmd_exec.html#history_information">history
+        information</a>. </blockquote>
     <hr>
     <h3><a name="timer">timer</a></h3>
     Handling of timers. Don't be confused! This command doesn't handle timer
@@ -827,7 +804,7 @@ sim_xtal simif_0_cfg[0x6] = 00a8c000
       timer <a href="#timer_set">set</a> </p>
     <p>Each subcommand can (some must) be followed by a timer id which can be a
       number or a string. Timers are numbered from 1. You can use any number
-      greater than 0 to identify a timer. Or you can use a simbolic name, in
+      greater than 0 to identify a timer. Or you can use a symbolic name, in
       this case simulator uses the first unused number to allocate a new timer.
     </p>
     <blockquote>

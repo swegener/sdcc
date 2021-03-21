@@ -3,6 +3,6 @@ MAIN		= stt
 
 OTHERS		= timer t0 serial
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= large

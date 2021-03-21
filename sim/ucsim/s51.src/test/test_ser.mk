@@ -2,6 +2,6 @@ MAIN		= test_ser
 
 OTHERS		= 
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= small

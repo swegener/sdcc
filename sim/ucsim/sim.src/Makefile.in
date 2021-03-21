@@ -68,7 +68,9 @@ uninstall:
 check: test
 	./test_mem_speed
 
-test: test_mem_speed
+.PHONY:	test
+test:
+	@$(MAKE) --no-print-directory -C test
 
 # Performing installation test
 # ----------------------------

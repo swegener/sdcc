@@ -1,0 +1,38 @@
+uCsim 0.6-pre65, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+ucsim version 0.6-pre65
+Type of microcontroller: P1516
+Controller has 11 hardware element(s).
+   on simif[0]
+   on vcd[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pi[0]
+   on pj[0]
+   on dport[0]
+   on oports[0]
+   on iports[0]
+  F= 0x0  S=0 C=0 Z=0 O=0 
+ R0= 0x00000000  [R0]= 0x5d888a08  R1= 0x00000000  [R1]= 0x5d888a08
+ R2= 0x00000000  [R2]= 0x5d888a08  R3= 0x00000000  [R3]= 0x5d888a08
+ R4= 0x00000000  [R4]= 0x5d888a08  R5= 0x00000000  [R5]= 0x5d888a08
+ R6= 0x00000000  [R6]= 0x5d888a08  R7= 0x00000000  [R7]= 0x5d888a08
+ R8= 0x00000000  [R8]= 0x5d888a08  R9= 0x00000000  [R9]= 0x5d888a08
+R10= 0x00000000 [R10]= 0x5d888a08 R11= 0x00000000 [R11]= 0x5d888a08
+R12= 0x00000000 [R12]= 0x5d888a08 R13= 0x00000000 [R13]= 0x5d888a08
+R14= 0x00000000 [R14]= 0x5d888a08 R15= 0x00000000 [R15]= 0x5d888a08
+ ? 0x0000 5d888a08 C0 call  0x5888a08
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
+  0x000000-0x003fff    16384 rom_chip (32,%08x,0x%04lx)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom (32,%08x,0x%04lx)
+  0x000000-0x00000f       16 regs (32,%08x,0x%01lx)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0x3fff -> rom_chip 0x0000 activated

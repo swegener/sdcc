@@ -235,7 +235,7 @@ COMMAND_DO_WORK_SIM(cl_step_cmd)
 }
 
 CMDHELP(cl_step_cmd,
-	"step [number [unit]]",
+	"step [number[unit]]",
 	"Step",
 	"long help of step")
 /*

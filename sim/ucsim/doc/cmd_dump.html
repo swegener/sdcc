@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
     <title>Dump commands of &#956;Csim</title>
   </head>
-  <body bgcolor="white">
+  <body style="background-color: white;">
     <h2>Dump commands of &#956;Csim</h2>
     <a name="dump">
       <h3>dump <i>[/format] memory_type [start [end [bytes_per_line]]]</i> <br>
@@ -12,10 +12,10 @@
     used to check value of bit or bits.
     <blockquote> <a name="dump_memory">
         <h4>dump <i>[/format] memory_type [start [end [bytes_per_line]]]</i></h4>
-      </a> Hexadecimal dump of a memory region. First parameter specifies
-      memory. It can be name of an address space or a chip, and can be checked
-      using <a href="cmd_general.html#info_memory">info memory</a> command
-      which lists size and name of all available memories.
+      </a> Hexadecimal (or other specified format) dump of a memory region.
+      First parameter specifies memory. It can be name of an address space or a
+      chip, and can be checked using <a href="cmd_general.html#info_memory">info
+        memory</a> command which lists size and name of all available memories.
       <p><b>start</b> and <b>end</b> parameters can be used to specify the
         first and last address of the dumped region. If <b>end</b> is omitted
         then 64 memory location is dumped. If both <b>start</b> and <b>end</b>
@@ -62,7 +62,41 @@ F 0x000515
 0x0055 00 00 00 94 a7 01 0c a6 ........
 0x005d 00 6f ff 00 00 00 00 00 .o......
 &gt;
-</pre>
+</pre>First parameter can be a dump format specifier if it starts with /
+      character. Following characters select format and can set some parameters
+      for it. Know fomats are:<br>
+      <dl>
+        <dt>/h</dt>
+        <dd>Hexadecimal dump, this is the default format. See examples above.</dd>
+        <dt>/s</dt>
+        <dd>String format. Ascii characters of bytes will be printed from
+          specified address until first 0 byte. None-printable characters will
+          be escaped in C style.</dd>
+        <dt>/i</dt>
+        <dd>Intel hex format. It can be useful to save code memory content for
+          reload it later.</dd>
+        <dt>/b</dt>
+        <dd>Binary dump. It is not supported on command console. To produce
+          binary dump the output of the command must be redirected to a file.</dd>
+      </dl>
+      Some other characters can be <b>appended</b> to format specifier to
+      define ho many bytes are used as one data entity and the byte order:<br>
+      <dl>
+        <dt>/l</dt>
+        <dd>Use little endian byte order.</dd>
+        <dt>/b</dt>
+        <dd>Use big endian byte order.</dd>
+        <dt>/1</dt>
+        <dd>Use 1 byte as one data.</dd>
+        <dt>/2</dt>
+        <dd>Two bytes is dumped as one data.</dd>
+        <dt>/4</dt>
+        <dd>Four bytes treated as one data.</dd>
+        <dt>/8</dt>
+        <dd>Eight bytes mean one data.</dd>
+      </dl>
+      Default data size is determined by the memory width and the byte order is
+      determined by the simulated processor.<br>
       <hr> <a name="dump_bit">
         <h4>dump <i>bit_name...</i></h4>
       </a> If the simulated controller supports addressable bits (such as MCS51
@@ -155,7 +189,7 @@ under certain conditions; type `show c' for details.
     instructions which discovered by the <a href="analyzer.html">code analyser</a>.
     First two parameters specify the address where the list starts. First
     parameter is address where the command starts to search an instruction. This
-    search goes forward. When the first instruction marked by code analyser
+    search goes forward. When the first instruction marked by code analyzer
     found the simulator skips as many instructions as you specify in second
     parameter. If <b>offset</b> is negative the simulator goes backward and
     skips specified number of instructions. Default value of <b>start</b>
@@ -206,9 +240,9 @@ D  000189 22       RET
 &gt; </pre>
     If there is an <b>F</b> or <b>D</b> character at the beginning of the
     line, it means that there is a fix or dynamic fetch breakpoint at listed
-    address. Next element on the list can be an asterix (<b>*</b>) which means
-    that the listed address is not marked by the code analyser. <b>dis</b>
-    lists marked instructions only so asterix never appears in the list. Next
+    address. Next element on the list can be an asterisk (<b>*</b>) which means
+    that the listed address is not marked by the code analyzer. <b>dis</b>
+    lists marked instructions only so asterisk never appears in the list. Next
     element of the list is address displayed as six digit hexadecimal number.
     Address is followed by hexadecimal dump of instruction's code. Last element
     of the list is disassembled instruction. Every number appeared on the list

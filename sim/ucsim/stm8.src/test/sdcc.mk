@@ -1,6 +1,5 @@
-VPATH		= ..
+VPATH = $(srcdir)
 
-vpath		%.mk $(VPATH)
 
 TARGET		= stm8
 
@@ -11,7 +10,7 @@ CFLAGS		= --debug
 LDFLAGS		=
 LIBS		=
 
--include	$(MAIN).mk
+-include	$(srcdir)/$(MAIN).mk
 
 DEVICES		?= S208
 
@@ -25,21 +24,16 @@ CPPFLAGS	= -DDEVICE=DEV_STM8$(DEVICE) -I$(VPATH)
 
 .PHONY: $(DEVICES)
 
-all: $(DEVICES)
+all: $(DEVICES) | silent
+
+silent:
+	@echo -n
 
 $(DEVICES):
-	test -d $@ || mkdir $@
-	$(MAKE) -C $@ DEVICE=$@ REAL=yes MAIN=$(MAIN) -I$(VPATH) -f$(VPATH)/sdcc.mk compile copy_result
+	@test -d $@ || mkdir $@
+	@$(MAKE) --no-print-directory -C $@ DEVICE=$@ REAL=yes MAIN=$(MAIN) -f$(VPATH)/sdcc.mk compile
 
-copy_result: $(VPATH)/$(MAIN)_$(DEVICE).hex $(VPATH)/$(MAIN)_$(DEVICE).cdb
-
-$(VPATH)/$(MAIN)_$(DEVICE).hex: $(MAIN).hex
-	cp $< $@
-
-$(VPATH)/$(MAIN)_$(DEVICE).cdb: $(MAIN).cdb
-	cp $(MAIN).cdb $@
-
-compile: dep $(MAIN).hex
+compile: dep $(MAIN).hex | silent
 
 .c.rel:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
@@ -54,9 +48,10 @@ $(MAIN).cdb: $(MAIN).hex
 
 dep: $(MAIN).dep
 
-$(MAIN).dep: $(addprefix ../,$(OBJECTS:.rel=.c)) ../*.h
-	for c in $(addprefix ../,$(OBJECTS:.rel=.c)); do \
-		$(CC) -MM $(CPPFLAGS) $$c >>$@; \
+$(MAIN).dep: $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)) $(srcdir)/*.h
+	@>'$@'
+	@for c in $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)); do \
+		$(CC) -MM $(CPPFLAGS) $$c >>'$@'; \
 	done
 
 clean:

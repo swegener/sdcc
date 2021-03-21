@@ -55,6 +55,7 @@ uninstall:
 check:
 
 test:
+	@true
 
 
 # Performing installation test

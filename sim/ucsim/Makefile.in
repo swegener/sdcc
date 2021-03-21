@@ -88,12 +88,14 @@ distclean: clean
 	@for pkg in $(PKGS_ALL); do\
 	  $(MAKE) -C $$pkg -f clean.mk distclean ;\
 	done
+	@for pkg in $(PKGS) sim.src; do\
+		if test -d $$pkg/test; then \
+			$(MAKE) -C $$pkg/test clean ;\
+			if test -f $$pkg/test/Makefile.in; then rm -f $$pkg/test/Makefile; fi ;\
+		fi ;\
+	done
 	rm -rf doc/*~ doc/*.bak Makefile packages.mk libtool
 	$(MAKE) -C example clean
-	$(MAKE) -C s51.src/test clean
-	$(MAKE) -C stm8.src/test clean
-	$(MAKE) -C tlcs.src/test clean
-	$(MAKE) -C z80.src/test clean
 
 
 # Like clean but some files may still exist
@@ -106,7 +108,7 @@ mostlyclean: clean
 
 
 # Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, stc.
+# everything deleted by distclean plus files created by bison, etc.
 # -----------------------------------------------------------------------
 realclean: distclean
 	$(MAKE) -f clean.mk realclean
@@ -123,11 +125,13 @@ check:
 	  $(MAKE) -C $$pkg check ;\
 	done
 
-test:
-	$(MAKE) -f main.mk test
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg test ;\
-	done
+# We want tests to be parallelizable so a simple shell loop is
+# not good enough.
+PKGS_TEST = $(foreach pkg, sim.src $(PKGS), $(pkg)/test)
+.PHONY:	test $(PKGS_TEST)
+test: $(PKGS_TEST)
+$(PKGS_TEST):
+	-$(MAKE) --no-print-directory -C $(dir $@) test
 
 
 # Performing installation test

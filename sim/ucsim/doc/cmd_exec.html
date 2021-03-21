@@ -1,37 +1,31 @@
 <html>
   <head>
-    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
-    <title>Execution commands of &mu;Csim</title>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
+    <title>Execution commands of &#956;Csim</title>
   </head>
   <body bgcolor="white">
-    <h2>Execution commands of <i>&mu;Csim</i></h2>
+    <h2>Execution commands of <i>&#956;Csim</i></h2>
     <a name="run">
       <h3>r,run,go [start [stop]]</h3>
-    </a>
-    This command starts the execution of the simulated program.
-    <p>Parameters are optional. First parameter specifies start address of
-      the execution. By default execution starts at address specified by
-      actual value of the PC. This can be overridden by first parameter.
-    </p>
+    </a> This command starts the execution of the simulated program.
+    <p>Parameters are optional. First parameter specifies start address of the
+      execution. By default execution starts at address specified by actual
+      value of the PC. This can be overridden by first parameter. </p>
     <p>If second parameter is specified it places a dynamic breakpoint at
-      specified address which stops the execution. If stop address is not
-      given the simulator stops if it reaches a breakpoint, or the CPU
-      accepts an interrupt and <b>stopit</b> option is TRUE, or fatal error
-      occurs or <a href="#stop">stop</a> command is used on an other
-      console, or ENTER key is pressed on the console where the run command
-      was issued.
-    </p>
-    <p>If program execution is started the console is <i>frozen</i> it is
-      not possible to give commands on this console to the simulator while
-      execution is running. If it is needed to control the simulator during
-      program execution then more consoles can be used. See using <a href="mulcons.html">multiple
-        consoles</a> for more information.
-    </p>
-    <p>Note that first instruction is executed without effect of
-      breakpoints and simulation will be started afterwards. It means that
-      if there is a breakpoint at start address then it will not be hit. See
-      following example:
-    </p>
+      specified address which stops the execution. If stop address is not given
+      the simulator stops if it reaches a breakpoint, or the CPU accepts an
+      interrupt and <b>stopit</b> option is TRUE, or fatal error occurs or <a
+        href="#stop">stop</a> command is used on an other console, or ENTER key
+      is pressed on the console where the run command was issued. </p>
+    <p>If program execution is started the console is <i>frozen</i> it is not
+      possible to give commands on this console to the simulator while execution
+      is running. If it is needed to control the simulator during program
+      execution then more consoles can be used. See using <a href="mulcons.html">multiple
+        consoles</a> for more information. </p>
+    <p>Note that first instruction is executed without effect of breakpoints and
+      simulation will be started afterwards. It means that if there is a
+      breakpoint at start address then it will not be hit. See following
+      example: </p>
     <pre>$ <font color="#118811">./s51</font>
 ucsim 0.2.38-pre1, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -48,11 +42,9 @@ Stop at 0x000020: (104) Breakpoint
 F 0x000020
 &gt; 
 </pre>
-    <hr>
-    <a name="stop">
+    <hr> <a name="stop">
       <h3>stop</h3>
-    </a>
-    This command stops the simulation, it freezes the CPU and all the
+    </a> This command stops the simulation, it freezes the CPU and all the
     peripherals.
     <pre>$ <font color="#118811">s51 remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
@@ -70,21 +62,17 @@ Simulation started
 &gt; <font color="#118811">stop</font>
    006ac5 24 a5    ADD   A,#a5
 &gt; 
-</pre>
-    Simulated program is executed in background and the simulator accepts
-    commands. If it stopped by the stop command the instruction pointed by
-    PC is disassembled, see the <a href="#dis"><b>dis</b></a> command for
-    description of disassembled form.
-    <hr>
-    <a name="step">
+</pre> Simulated program is executed in background and the simulator accepts
+    commands. If it stopped by the stop command the instruction pointed by PC is
+    disassembled, see the <a href="#dis"><b>dis</b></a> command for description
+    of disassembled form.
+    <hr> <a name="step">
       <h3>s,step [steps]</h3>
-    </a>
-    Step command. It executes one instruction without effect of
+    </a> Step command. It executes one instruction without effect of
     breakpoints.
-    <p>The optional parameter can be used to specify number of instructions
-      to execute. Note that breakpoints will stop the execution after the
-      first instruction.
-    </p>
+    <p>The optional parameter can be used to specify number of instructions to
+      execute. Note that breakpoints will stop the execution after the first
+      instruction. </p>
     <pre>$ <font color="#118811">s51 remoansi.hex</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -97,21 +85,41 @@ under certain conditions; type `show c' for details.
 000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
    000160 c2 90    CLR   P1.0
 &gt; </pre>
-    After execution of actual instruction pointed by PC (or all
-    instructions specified by the optional parameter) the <b>step</b>
-    command dumps out the register set.
-    <hr>
-    <a name="n">
+    <p> After execution of actual instruction pointed by PC (or all instructions
+      specified by the optional parameter) the <b>step</b> command dumps out
+      the register set.</p>
+    <p>Number of steps can be specified in different units. If no unit is
+      appended to step number then it will be interpreted as number of
+      instruction. Other know units are:</p>
+    <dl>
+      <dt> s, sec</dt>
+      <dd>Simulated execution time in seconds.</dd>
+      <dt>ms, msec</dt>
+      <dd>Simulated execution time in milliseconds.</dd>
+      <dt>us, usec</dt>
+      <dd>Simulated execution time in microseconds.</dd>
+      <dt>ns, nsec</dt>
+      <dd>Simulated execution time in nanoseconds.</dd>
+      <dt>vclk</dt>
+      <dd>Number of virtual clock counts.</dd>
+      <dt>fclk, fetch</dt>
+      <dd>Number of fetches.</dd>
+      <dt>rclk, read</dt>
+      <dd>Number of memory read operations.</dd>
+      <dt>wclk, write</dt>
+      <dd>Number of memory write operations.</dd>
+    </dl>
+    <br>
+    <hr> <a name="n">
       <h3>n,next</h3>
-    </a>
-    Execute until next instruction is reached. This command is similar to
-    <a href="#s"><b>step</b></a> command described above but if actual
-    instruction to execute is a subroutine call the <b>next</b> command
-    places a dynamic breakpoint after the call instruction and starts to
-    execute the subroutine. If the subroutine is infinite the breakpoint
-    set by <b>next</b> will never reached. It can be a dangerous situation
-    because the execution started by the <b>next</b> command can not be
-    stopped interactively. But it can be stopped by other breakpoints.
+    </a> Execute until next instruction is reached. This command is similar to <a
+      href="#s"><b>step</b></a> command described above but if actual
+    instruction to execute is a subroutine call the <b>next</b> command places
+    a dynamic breakpoint after the call instruction and starts to execute the
+    subroutine. If the subroutine is infinite the breakpoint set by <b>next</b>
+    will never reached. It can be a dangerous situation because the execution
+    started by the <b>next</b> command can not be stopped interactively. But it
+    can be stopped by other breakpoints.
     <pre>$ <font color="#118811">s51 remoansi.hex</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -138,13 +146,10 @@ under certain conditions; type `show c' for details.
 000004 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
    000177 0f       INC   R7
 &gt; </pre>
-    <hr>
-    <a name="pc">
+    <hr> <a name="pc">
       <h3>pc [address]</h3>
-    </a>
-    Using this command without any parameter it simply dumps out
-    instruction pointed by the PC. Specify address if you want to set the
-    PC.
+    </a> Using this command without any parameter it simply dumps out
+    instruction pointed by the PC. Specify address if you want to set the PC.
     <pre>$ s51
 S51 0.1.5, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 S51 comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -160,23 +165,18 @@ Warning: maybe not instruction at 000020
  * 000020 ff       MOV   R7,A
 &gt; </pre>
     <hr>
-
-    
     <h3><a name="history">history</a></h3>
-    
-    History command can be used to inspect and manipulate history of
-    executed instructions. It accepts following subcommands:
-
-    <p><a href="#history_">history</a>
-      <br>history <a href="#history_information">information</a>
-      <br>history <a href="#history_list">list</a>
-      <br>history <a href="#history_clear">clear</a>
-
-      <blockquote>
-	<h4><a name="history_">history</a></h4>
-	This command (without a subcommand) prints out last 10
-	elements of the command history in disassembled form.
-	<pre>0&gt; <font color="#118811">hist</font>
+    History command can be used to inspect and manipulate history of executed
+    instructions. It accepts following subcommands:
+    <p><a href="#history_">history</a> <br>
+      history <a href="#history_information">information</a> <br>
+      history <a href="#history_list">list</a> <br>
+      history <a href="#history_clear">clear</a> </p>
+    <blockquote>
+      <h4><a name="history_">history</a></h4>
+      This command (without a subcommand) prints out last 10 elements of the
+      command history in disassembled form.
+      <pre>0&gt; <font color="#118811">hist</font>
  ? 0x0211 78          LD      A,B
  ? 0x0212 de 22       SBC     A,#0x22
  ? 0x0214 38 f7       JR      C,#-9
@@ -189,31 +189,25 @@ Warning: maybe not instruction at 000020
  ? 0x0207 76          HALT
 0&gt;
 	</pre>
-
-	<hr>
-	<h4><a name="history_information">history information</a></h4>
-	Print out information about execution history.
-
-	<pre>0&gt; <font color="#118811">hist info</font>
+      <hr>
+      <h4><a name="history_information">history information</a></h4>
+      Print out information about execution history.
+      <pre>0&gt; <font color="#118811">hist info</font>
 len: 100
 used: 100
 insts: 100
 0&gt;
 	</pre>
-
-	<b>Len</b> is size of the history, <b>used</b> shows how many
-	slots are filled, <b>insts</b> is number of the instructions
-	recorded by the history.
-
-	<hr>
-	<h4><a name="history_list">history list [nr]</a>
-	<br>history print [nr]</h4>
-
-	This command is the same as the <a href="#history_">history</a> command
-	but it accepts a parameter which specifies how many records to
-	print (defaults to 10):
-
-	<pre>0&gt; <font color="#118811">hist list 3</font>
+      <b>Len</b> is size of the history, <b>used</b> shows how many slots are
+      filled, <b>insts</b> is number of the instructions recorded by the
+      history.
+      <hr>
+      <h4><a name="history_list">history list [nr]</a> <br>
+        history print [nr]</h4>
+      This command is the same as the <a href="#history_">history</a> command
+      but it accepts a parameter which specifies how many records to print
+      (defaults to 10):
+      <pre>0&gt; <font color="#118811">hist list 3</font>
  ? 0x0008 fb          EI
  ? 0x0009 ed 4d       RETI
  ? 0x0207 76          HALT
@@ -250,13 +244,10 @@ insts: 100
  ? 0x0207 76          HALT
 0&gt;
 	</pre>
-
-	<hr>
-	<h4><a name="history_clear">history clear</a></h4>
-
-	This command clears the history, it deletes all recorded elements.
-
-	<pre>0&gt; <font color="#118811">hist list 3</font>
+      <hr>
+      <h4><a name="history_clear">history clear</a></h4>
+      This command clears the history, it deletes all recorded elements.
+      <pre>0&gt; <font color="#118811">hist list 3</font>
  ? 0x0008 fb          EI
  ? 0x0009 ed 4d       RETI
  ? 0x0207 76          HALT
@@ -267,7 +258,7 @@ used: 0
 insts: 0
 0&gt;
 	</pre>
-      </blockquote>
+    </blockquote>
     <!--OK-->
   </body>
 </html>

@@ -2,6 +2,6 @@ MAIN		= test_mdu517
 
 OTHERS		= serial print mdu517
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= large

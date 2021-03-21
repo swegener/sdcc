@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>&mu;Csim: Regression Testing</title>
+  </head>
+  <body bgcolor="white">
+    <h1>Regression Testing</h1>
+
+    <h2>Running Tests</h2>
+
+    <p>If you are making changes to &mu;Csim you should both run tests
+    to ensure nothing breaks and write new tests to ensure your changes
+    work and do not get broken in the future!</p>
+    <p>In all cases the tests are run using the locally built simulators.
+    i.e. you need to have completed a successful build before you can
+    test it! Tests produce output when run which is captured to a file
+    and compared with baseline output held in the source tree. If there
+    are any differences they are output and the test is considered
+    failed. In that case either the code needs to be changed to correct
+    the output or the baseline needs to be updated to reflect the new
+    expected output. Only when there are no differences to the baseline
+    can tests be said to have passed.</p>
+
+    <h3>All Tests</h3>
+
+    <p>To run all tests run <code>make test</code> in the top-level
+    <code>ucsim</code> directory.<br />
+    E.g.:
+
+      <pre>.../ucsim$ <font color="#118811">make test</font></pre>
+    </p>
+
+    <h3>For a Single MCU</h3>
+
+    <p>To run tests for a single MCU type run <code>make test</code>
+    in the directory for that simulator.<br />
+    E.g.:
+
+      <pre>.../ucsim/s51.src$ <font color="#118811">make test</font></pre>
+
+    or run <code>make</code> in the <code>test</code> subdirectory.<br />
+    E.g.:
+
+      <pre>.../ucsim/s51.src/test$ <font color="#118811">make</font></pre>
+    </p>
+
+    <p>Note that tests for functionality generic to all simulators and that
+    does not depend on a particular MCU type lives in
+    <code>sim.src/test</code> and should be run there. These tests require
+    at least one simulator to have been built but unless there is only one
+    it is indeterminate which simulator will be used.</p>
+
+    <h3>Running a Single Test</h3>
+    <p>To run a single test run <code>make <i>test_name</i></code>
+    in the <code>test</code> subdirectory of the relevant simulator. E.g.:
+
+      <pre>.../ucsim/s51.src/test$ <font color="#118811">make config</font></pre>
+
+    In this case the test is run verbosely and the commands executed by make
+    are displayed. In all other cases only the final differences to baseline
+    (if any) are displayed.</p>
+
+
+    <h2>Writing Tests</h2>
+
+    <ol>
+        <li>Create a directory named after your test under the relevant simulator's
+            <code>test</code> directory:
+        </li>
+
+        <li>Place the data needed for your test, <code>.cmd</code> files, <code>.asm</code>
+            or <code>C</code> files etc, in your test directory:
+        </li>
+
+        <li>Create a <code>baseline</code> directory in your test directory:
+        </li>
+
+        <li>Create an empty file in the <code>baseline</code> directory for each
+            output that your test generates:
+        </li>
+
+        <li>Create a <code>Makefile</code> that lists the output(s) to be generated,
+            the recipes to create them and which includes <code>test-lib.mk</code>:
+        </li>
+
+        <li>Run your test, verify the contents of the <code>out</code> directory
+            and then copy it to the <code>baseline</code> directory:
+        </li>
+    </ol>
+
+    <pre>
+.../ucsim/s51.src/test$ <font color="#118811">mkdir <i>name</i></font>
+.../ucsim/s51.src/test$ <font color="#118811">cd <i>name</i></font>
+.../ucsim/s51.src/test/<i>name</i>$ <font color="#118811">vim test.{cmd,asm}</font>
+.../ucsim/s51.src/test/<i>name</i>$ <font color="#118811">mkdir baseline</font>
+.../ucsim/s51.src/test/<i>name</i>$ <font color="#118811">touch baseline/<i>stdout</i></font>
+.../ucsim/s51.src/test/<i>name</i>$ <font color="#118811">cat &gt; Makefile &lt;&lt;EOF</font>
+OUTPUTS = <i>stdout</i>
+
+<i>stdout</i>: <i>mytest</i>.ihx <i>mytest</i>.cmd
+        $(call run-sim)
+
+include test-lib.mk
+EOF
+.../ucsim/s51.src/test/<i>name</i>$ <font color="#118811">cd ..</font>
+.../ucsim/s51.src/test$ <font color="#118811">make <i>name</i></font>
+.../ucsim/s51.src/test$ <font color="#118811">cp -r <i>name</i>/out <i>name</i>/baseline/.</font></pre>
+
+    <p><code>test-lib.mk</code> takes care of building any <code>.ihx</code> files
+    needed from corresponding <code>.asm</code> or <code>.c</code> files.
+    The call to <code>run-sim</code> will invoke the simulator with the
+    <code>.ihx</code> and <code>.cmd</code> prerequisites, capturing the
+    output.</p>
+
+    <p>If there are no <code>.cmd</code> prerequisites and there is no
+    <code>-e</code> in the arguments to <code>run-sim</code> it
+    will add a <code>-g</code> argument to start the simulator running.
+    It is assumed there is at least one <code>.ihx</code> file in the
+    prerequisites in this case and that it places code at the reset
+    address.</p>
+
+    <p>If you wish to pass arguments of your own to the simulator these
+    can be given as arguments to run-sim. This can be used to pass commands
+    with the <code>-e</code> option rather than using a <code>.cmd</code> file
+    for instance, as is done with the config tests.</p>
+
+    <p>If you create any other output from within the simulator you should
+    specify a pathname starting with <code>out/</code>. Anything written
+    to the <code>out</code> directory will be compared to the baseline
+    when the test is complete.</p>
+    </p>
+
+    <hr>
+  </body>
+</html>

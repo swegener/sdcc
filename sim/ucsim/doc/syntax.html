@@ -90,7 +90,7 @@ Port0 11111111 0xff 255 . (Value on the port pins)
         style="font-family: monospace;">1</span></b> characters. In this case it
     is interpreted as <i>binary</i> number. If it begins with <tt><b>0</b></tt>
     followed by digits it is interpreted as <i>octal</i> number. In other cases
-    it is interpreted as <i>decimal</i> number.
+    it is interpreted as <i>decimal</i> number.<br>
     <h4><a name="symbol_type">Symbol type</a></h4>
     If a command parameter can not be classified in other ways (doesn't start
     with a digit or a quote, doesn't contain dot or [) then it will be treated
@@ -173,7 +173,9 @@ Port0 11111111 0xff 255 . (Value on the port pins)
 0&gt; 
 
 </pre> Numbers must be integers (floating point is not supported) and not bigger
-    than the value which can be stored as <b>long int</b>.
+    than the value which can be stored as <b>long int</b>. Numbers can be
+    specified in ascii form too: <b>'a'</b>, result will be ascii code of the
+    character. This form accepts C style escapes, for example: <b>'\n'</b> or <b>'\033'</b>.
     <h4>Memory operands</h4>
     Memory can be an address space location or a memory chip cell. It can be
     specified in following form:

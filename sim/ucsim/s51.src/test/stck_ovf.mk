@@ -2,6 +2,6 @@ MAIN		= stck_ovf
 
 OTHERS		=
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= small

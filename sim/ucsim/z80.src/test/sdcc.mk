@@ -1,3 +1,5 @@
+VPATH = $(srcdir)
+
 CC		= sdcc -mz80
 
 CPPFLAGS	=
@@ -8,14 +10,17 @@ LIBS		=
 ALL		= $(MAIN) $(OTHERS)
 OBJECTS		= $(MAIN).rel $(OTHERS:=.rel)
 
-all: $(MAIN).hex
+all: $(MAIN).hex | silent
+
+silent:
+	@echo -n
 
 dep: $(MAIN).dep
 
-$(MAIN).dep: $(OBJECTS:.rel=.c) *.h
-	@>$(MAIN).dep
-	@for c in $(OBJECTS:.rel=.c); do \
-		$(CC) -MM $(CPPFALGS) $$c >>$(MAIN).dep ;\
+$(MAIN).dep: $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)) $(srcdir)/*.h
+	@>'$@'
+	@for c in $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)); do \
+		$(CC) -MM $(CPPFLAGS) $$c >>'$@' ;\
 	done
 
 include $(MAIN).dep

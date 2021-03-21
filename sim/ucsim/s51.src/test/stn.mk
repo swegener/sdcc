@@ -1,5 +1,5 @@
 MAIN		= stn
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= small

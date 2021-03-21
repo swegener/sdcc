@@ -1,35 +1,29 @@
 <html>
   <head>
-    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
-    <title>Memory manipulation commands of &mu;Csim</title>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
+    <title>Memory manipulation commands of &#956;Csim</title>
   </head>
   <body bgcolor="white">
-    <h2>Memory manipulation commands of &mu;Csim</h2>
+    <h2>Memory manipulation commands of &#956;Csim</h2>
     Every command which changes content of ROM area such as <b><a href="#dl">dl</a></b>
-    or <b><a href="cmd_general#set_memory">set
-        memory</a></b> deletes result of <a href="analyzer.html">code
-      analyser</a> and causes to re-analyse the code.
-    <hr>
-    <a name="file">
-      <h3>file,load <i>"FILE"</i></h3>
-    </a>
-    Loads file named FILE into the simulated code memory. File must
-    contain data in Intel HEX format.
+    or <b><a href="cmd_general#set_memory">set memory</a></b> deletes result of
+    <a href="analyzer.html">code analyser</a> and causes to re-analyse the code.
+    <hr> <a name="file">
+      <h3>file,load <i>"file"</i></h3>
+    </a> Loads file named file into the simulated code memory. File must contain
+    data in Intel HEX format.
     <pre>&gt; <font color="#118811">file "../../remo.hex"</font>
 55470 words read from ../../remo.hex
 &gt; 
-</pre>
-    Don't forget to enclose file name in quotes to make the parameter to
-    be a string.
-    <hr>
-    <a name="dl">
+</pre> Don't forget to enclose file name in quotes to make the parameter to be a
+    string.
+    <hr> <a name="dl">
       <h3>download,dl</h3>
-    </a>
-    Download command. It is same as <a href="#l">load</a> above but it
-    reads information from command console which is standard input by
-    default. This command stops read records when it detects an "END"
-    record which is normally the last record. This command has two
-    equivalent forms <b>download</b> and <b>dl</b>.
+    </a> Download command. It is same as <a href="#l">load</a> above but it
+    reads information from command console which is standard input by default.
+    This command stops read records when it detects an "END" record which is
+    normally the last record. This command has two equivalent forms <b>download</b>
+    and <b>dl</b>.
     <pre>$ <font color="#118811">s51 -V</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -53,20 +47,15 @@ under certain conditions; type `show c' for details.
 :00000001FF</font>
 197 bytes loaded
 &gt; </pre>
-    <hr>
-    <a name="fill">
+    <hr> <a name="fill">
       <h3>fill <i>memory_type start end data</i></h3>
-    </a>
-    Fill memory region with specified data. First parameter specifies
+    </a> Fill memory region with specified data. First parameter specifies
     memory. Name of the memory must be used, it can be checked using <a href="cmd_general.html#info_memory">info
-      memory</a> command which
-    lists size and name of all available memories.
-    <p><b>start</b> and <b>end</b> parameters specify first and last
-      address of the memory region to be filled.
-    </p>
-    <p><b>data</b> parameter specifies the data which is used to fill the
-      memory region.
-    </p>
+      memory</a> command which lists size and name of all available memories.
+    <p><b>start</b> and <b>end</b> parameters specify first and last address of
+      the memory region to be filled. </p>
+    <p><b>data</b> parameter specifies the data which is used to fill the memory
+      region. </p>
     <pre>$ <font color="#118811">s51</font> 
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -80,24 +69,18 @@ under certain conditions; type `show c' for details.
 0x0018 00 00 00 00 00 00 00 00 ........
 0x0020 00                      .
 &gt; </pre>
-    <hr>
-    <a name="where">
+    <hr> <a name="where">
       <h3>where,Where <i>memory_type data...</i></h3>
-    </a>
-    Searching for some data in memory. First parameter specifies
-    memory. Name of the memory must be used, it can be checked using <a href="cmd_general.html#info_memory">info
-      memory</a> command which
-    lists size and name of all available memories.
-    <p>Other parameters can be mixed list of strings (characters between "
-      and ") and numbers. Strings can contain escape sequencies. &mu;Csim
-      merges all parameters together and will search for merged list of
-      values in specified memory.
-    </p>
+    </a> Searching for some data in memory. First parameter specifies memory.
+    Name of the memory must be used, it can be checked using <a href="cmd_general.html#info_memory">info
+      memory</a> command which lists size and name of all available memories.
+    <p>Other parameters can be mixed list of strings (characters between " and
+      ") and numbers. Strings can contain escape sequencies. &#956;Csim merges all
+      parameters together and will search for merged list of values in specified
+      memory. </p>
     <p><b>where</b> command do case unsensitive search while <b>Where</b>
-      command is for case sensitive search.
-    </p>
-    <p>Search is done in whole memory and all matches are dumped out.
-    </p>
+      command is for case sensitive search. </p>
+    <p>Search is done in whole memory and all matches are dumped out. </p>
     <pre>$ <font color="#118811">s51</font>
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -115,16 +98,14 @@ under certain conditions; type `show c' for details.
 &gt; <font color="#118811">Where xram "d ani"</font>
 0x0019 64 20 61 6e 69          d ani
 &gt; </pre>
-    <hr>
-    <a name="hole">
+    <hr> <a name="hole">
       <h3>hole <i>[memory [length [value]]]</i></h3>
     </a>
-    <p>Searching for a memory area where all locations are filled with
-    value. By default this command searches rom but any memory can be
-    specified. Areas shorter than specified length (default is 100)
-    will not be listed. Searched value is 0 (zero) by default but
-    other can be sepcified as the last patrameter.
-    </p>
+    <p>Searching for a memory area where all locations are filled with value. By
+      default this command searches rom but any memory can be specified. Areas
+      shorter than specified length (default is 100) will not be listed.
+      Searched value is 0 (zero) by default but other can be specified as the
+      last parameter. </p>
     <pre>$ <font color="#118811">s51</font>
 uCsim 0.6-pre55, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -137,7 +118,7 @@ under certain conditions; type `show c' for details.
 0&gt; <font color="#118811">hole xram 50 11</font>
 0x0100 255
 0&gt; <font color="#118811">fill xram 0x500 0x600 11</font>
-0&ht; <font color="#118811">hole xram 50 11</font>    
+0&amp;ht; <font color="#118811">hole xram 50 11</font>    
 0x0100 255
 0x0500 256
 0&gt; <font color="#118811">rom[0x200]=1</font>
@@ -146,61 +127,43 @@ under certain conditions; type `show c' for details.
 0x0000 511
 0x0201 65022
 0&gt; </pre>
-    <p>
-      Data of found areas are listed in two columns. First column is
-      the start address of the area in hexadecimal and the second
-      column is area lenght (in decimal).
-    </p>
-    <hr>
-    <a name="memory">
+    <p> Data of found areas are listed in two columns. First column is the start
+      address of the area in hexadecimal and the second column is area length
+      (in decimal). </p>
+    <hr> <a name="memory">
       <h3>memory</h3>
-    </a>
-    This set of commands can be used to manipulate <a href="memory.html">memory
+    </a> This set of commands can be used to manipulate <a href="memory.html">memory
       system</a> including <a href="memory.html#chip">chips</a>, <a href="memory.html#address_space">address
       spaces</a> and <a href="memory.html#address_decoder">address decoders</a>.
-    <p>Subcommands are:
-    </p>
-    <p>memory <a href="#memory_createchip">createchip</a>
-      <br>
-      memory <a href="#memory_createaddressspace">createaddressspace</a>
-      <br>
-      memory <a href="#memory_createaddressdecoder">createaddressdecoder</a>
-      <br>
-      memory <a href="#memory_info">info</a>
-    </p>
-    <blockquote>
-      <a name="memory_createchip">
-        <h4>memory createchip|cchip <i>id size
-            cellsize</i></h4>
-      </a>
-      This command creates a chip (array of storage elements). <b>id</b>
+    <p>Subcommands are: </p>
+    <p>memory <a href="#memory_createchip">createchip</a> <br>
+      memory <a href="#memory_createaddressspace">createaddressspace</a> <br>
+      memory <a href="#memory_createaddressdecoder">createaddressdecoder</a> <br>
+      memory <a href="#memory_info">info</a> </p>
+    <blockquote> <a name="memory_createchip">
+        <h4>memory createchip|cchip <i>id size cellsize</i></h4>
+      </a> This command creates a chip (array of storage elements). <b>id</b>
       must be a unique name which will be used to identify the chip in other
-      commands. <b>size</b> is number of storage elements, <b>cellsize</b>
-      is number of bits stored in one element.
-      <hr>
-      <a name="memory_createaddressspace">
+      commands. <b>size</b> is number of storage elements, <b>cellsize</b> is
+      number of bits stored in one element.
+      <hr> <a name="memory_createaddressspace">
         <h4>memory
-createaddressspace|caddressspace|caddrspace|caspace|createaddrspace|createaspace
+          createaddressspace|caddressspace|caddrspace|caspace|createaddrspace|createaspace
           <i>id startaddr size</i></h4>
-      </a>
-      This command should never be used. It defines an address space, names
-      it as <b>id</b> sets its starting address and size. Simulator programs
-      (<b>s51</b>, <b>savr</b>, etc.) define necessary address spaces for
-      themself, so this command is not needed.
-      <hr>
-      <a name="memory_createaddressdecoder">
+      </a> This command should never be used. It defines an address space, names
+      it as <b>id</b>, sets its starting address and size. Simulator programs (<b>s51</b>,
+      <b>savr</b>, etc.) define necessary address spaces for themself, so this
+      command is not needed.
+      <hr> <a name="memory_createaddressdecoder">
         <h4>memory
-createaddressdecoder|caddrdecoder|caddressdecoder|cadecoder|createaddrdecoder|createadecoder
+          createaddressdecoder|caddrdecoder|caddressdecoder|cadecoder|createaddrdecoder|createadecoder
           <i>addressspace begin end chip begin</i></h4>
-      </a>
-      Address decoder maps a part of the address space to a chip
-      area. <b>addressspace</b> parameter is name of the address space,
-      <b>begin</b> and <b>end</b> specify address range of the address space
-      to be mapped. <b>chip</b> parameter is name of the memory chip and
-      the second <b>begin</b> parameter is the (start of the) chip address
-      where the area is mapped to.
-      <p>Address space will be split if a "middle" are is mapped:
-      </p>
+      </a> Address decoder maps a part of the address space to a chip area. <b>addressspace</b>
+      parameter is name of the address space, <b>begin</b> and <b>end</b>
+      specify address range of the address space to be mapped. <b>chip</b>
+      parameter is name of the memory chip and the second <b>begin</b>
+      parameter is the (start of the) chip address where the area is mapped to.
+      <p>Address space will be split if a "middle" are is mapped: </p>
       <pre>$ <font color="#118811">s51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -244,8 +207,7 @@ Address decoders:
  1 xram 0x04d2 0x07d0 -&gt; myram 0x00f activated
  2 xram 0x07d1 0xffff -&gt; xram_chip 0x07d1 activated
 0&gt; 
-</pre>
-      It is easy to share chip area between address spaces:
+</pre> It is easy to share chip area between address spaces:
       <pre>$ <font color="#118811">s51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -275,27 +237,20 @@ Address decoders:
 171
 0&gt; 
 </pre>
-      <hr>
-    </blockquote>
+      <hr> </blockquote>
     <a name="memory_info">
       <h4>memory info</h4>
-    </a>
-    This command is same as <a href="cmd_general.html#info_memory">info
+    </a> This command is same as <a href="cmd_general.html#info_memory">info
       memory</a>.
-    <hr>
-
-    <a name="var"><h4>var name [memory addr]</h4></a>
-
-    This command assigns a name to a memory location. This
-    name can be used in <a href="cmd_general.html#expression">expression</a>s
-    as variable. If memory is not specified, next yet unnamed location
-    will be used from a special address space, called <b>variables</b>. This
-    address sapce have 256 locations by default (32 bit each), but the
-    size can be specified using <a href="invoke.html">-a option</a> of
-    the simulator program. 
-
-    <pre>
-0&gt; <font color="#118811">var abc</font>
+    <hr> <a name="var">
+      <h4>var name [memory addr]</h4>
+    </a> This command assigns a name to a memory location. This name can be used
+    in <a href="cmd_general.html#expression">expression</a>s as variable. If
+    memory is not specified, next yet unnamed location will be used from a
+    special address space, called <b>variables</b>. This address space have 256
+    locations by default (32 bit each), but the size can be specified using <a
+      href="invoke.html">-a option</a> of the simulator program.
+    <pre>0&gt; <font color="#118811">var abc</font>
 0&gt; <font color="#118811">i v abc</font>
 abc variables[0x00] = 00000000
 0&gt; <font color="#118811">abc=12</font>
@@ -304,11 +259,8 @@ abc variables[0x00] = 00000000
 00000000000000000000000000001100
 0&gt; 
     </pre>
-
     Memory location can be specified in two forms:
-
-    <pre>
-0&gt; <font color="#118811">var vname rom 45</font>
+    <pre>0&gt; <font color="#118811">var vname rom 45</font>
 0&gt; <font color="#118811">i var vname</font>
 vname rom[0x002d] = 73d4d3c4
 0&gt; <font color="#118811">var other rom[45]</font>
@@ -316,6 +268,5 @@ vname rom[0x002d] = 73d4d3c4
 other rom[0x002d] = 73d4d3c4
 0&gt;
     </pre>
-
   </body>
 </html>

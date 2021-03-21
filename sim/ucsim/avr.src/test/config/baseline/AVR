@@ -1,0 +1,28 @@
+uCsim 0.6-pre56, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+ucsim version 0.6-pre56
+Type of microcontroller: unspecified AVR
+Controller has 3 hardware element(s).
+   on simif[0]
+   on vcd[0]
+   on port[0]
+0x0000 cc b7 87 44 5c fd 44 8a 3a de 87 58 a1 8f ca ce ...D\.D.:..X....
+0x0010 a8 8f 15 fe db 79 ac fe 2b 85 20 44 7d 8d b9 49 .....y..+. D}..I
+ITHSVNZC  SREG= 0x1b  27 .
+00011011  SP  = 0x0027ad
+X= 0x4420 [X]= 0x00   0 .  Y= 0x8d7d [Y]= 0x00   0 .  Z= 0x49b9 [Z]= 0x00   0 .
+ ? 0x0000 8a08      std   Y+16,r0
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom_chip (16,%04x,0x%04lx)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02lx)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom (16,%04x,0x%04lx)
+  0x000000-0x00ffff    65536 iram (8,%02x,0x%04lx)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x0000 0x007f -> iram_chip 0x00 activated

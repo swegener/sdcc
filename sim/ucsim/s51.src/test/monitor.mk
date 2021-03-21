@@ -2,6 +2,6 @@ MAIN		= monitor
 
 OTHERS		= serial print
 
-include sdcc.mk
+include $(srcdir)/sdcc.mk
 
 MODEL		= small

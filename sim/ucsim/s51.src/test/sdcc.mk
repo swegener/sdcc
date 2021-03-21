@@ -1,3 +1,5 @@
+VPATH = $(srcdir)
+
 CC		= sdcc 
 
 MODEL		= large
@@ -11,14 +13,17 @@ OBJECTS		= $(MAIN).rel $(OTHERS:=.rel)
 
 APP		?= $(MAIN)
 
-all: $(APP).hex
+all: $(APP).hex | silent
+
+silent:
+	@echo -n
 
 dep: $(APP).dep
 
-$(APP).dep: $(OBJECTS:.rel=.c) *.h
-	@>$(APP).dep
-	@for c in $(OBJECTS:.rel=.c); do \
-		$(CC) -MM $(CPPFALGS) $$c >>$(APP).dep ;\
+$(APP).dep: $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)) $(srcdir)/*.h
+	>'$@'
+	for c in $(addprefix $(srcdir)/,$(OBJECTS:.rel=.c)); do \
+		$(CC) -MM $(CPPFLAGS) $$c >>'$@' ;\
 	done
 
 include $(APP).dep

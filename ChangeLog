@@ -1,5 +1,12 @@
 2021-03-21 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* src/z80/peeph-gbz80.def:
+	  Add rules for faster stack push.
+	* src/z80/peeph.def:
+	  Improve safety of some rules.
+
+2021-03-21 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* src/SDCCpeeph.c:
 	  Make operandsLiteral pickier and fix bug #3198.
 

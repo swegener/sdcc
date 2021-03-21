@@ -287,6 +287,124 @@ replace restart {
 } if notUsed('cf' 'hf' 'nf' 'zf')
 
 replace {
+	xor	a, a
+	push 	af
+	inc	sp
+	xor	a, a
+	push 	af
+	inc	sp
+} by {
+	; gbz80 peephole 17a pushed double `xor a` fast
+	xor	a, a
+	rra
+	push	af
+	xor	a, a
+}
+
+//TOOD: fails for unknown reasons
+//replace {
+//	ld	%1, #%2
+//	push	%1
+//} by {
+//	; gbz80 peephole 17b pushed #%2 faster
+//	xor	a, a
+//	rra
+//	push	af
+//} if operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18a pushed #%2 faster
+	sub	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00C0 0x00C0 '+' %2 0 %x3), notUsed(%1 'af')
+
+
+// Those rules save 1 byte and 4 cycles each
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18b pushed #%2 faster
+	xor	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0080 0x0080 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18c pushed #%2 faster
+	xor	a, a
+	scf
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0090 0x0090 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18d pushed #%2 faster
+	xor	a, a
+	and	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00A0 0x00A0 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18e pushed #%2 faster
+	xor	a, a
+	scf
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00D0 0x00D0 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18f pushed #%2 faster
+	xor	a, a
+	inc	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0100 0x0100 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18g pushed #%2 faster
+	scf
+	sbc	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xFF30 0xFF30 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; gbz80 peephole 18h pushed #%2 faster
+	xor	a, a
+	dec	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xFF60 0xFF60 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	push	af
+	inc	sp
+	ld	a, #%2
+	push	af
+	inc	sp
+} by {
+	; gbz80 peephole 19 pushed #%2 via flags
+	cp	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xC0 0xC0 '+' %2 0 %x3), notUsed('f')
+
+replace {
 	pop	%1
 	push	%1
 } by {
@@ -377,3 +495,21 @@ replace {
 	pop	%3
 } if unusedReg(%3 'bc' 'de' 'hl')
 
+barrier
+
+// some could be replace now since saved bytes
+replace restart {
+	jp	%5
+} by {
+	; peephole jump1 changed absolute to relative unconditional jump.
+	jr	%5
+} if labelInRange(%5)
+
+replace restart {
+	jp	%1, %5
+} by {
+	; peephole jump2 changed absolute to relative conditional jump.
+	jr	%1, %5
+} if labelInRange(%5)
+
+barrier

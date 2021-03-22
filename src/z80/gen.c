@@ -2102,7 +2102,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
           regalloc_dry_run_cost += 3;
         }
       /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for the Rabbit, which has an even cheaper sp-relative load).
-         GameBoy is nearly twice as fast doing it byte by byte, but that's a byte bigger.
+         SM83 is nearly twice as fast doing it byte by byte, but that's a byte bigger.
          Stack allocation can change after register allocation, so assume this optimization is not possible for the allocator's cost function (unless the stack location is for a parameter). */
       else if (!IS_RAB && (!IS_GB || optimize.codeSize) && aop->size - offset >= 2 &&
                (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (!regalloc_dry_run || aop->aopu.aop_stk > 0)
@@ -3763,7 +3763,7 @@ skip_byte:
         sp_offset == 2 && getPairId_o (result, roffset + i) != PAIR_INVALID &&
         (getPairId_o (result, roffset + i) != PAIR_HL && hl_free || getPairId_o (result, roffset + i) != PAIR_DE && de_free) &&
         (!regalloc_dry_run || source->aopu.aop_stk > 0) &&  // Stack locations might change, unless its a parameter.
-        (!IS_GB || optimize.codeSize)) // GameBoy can do it faster (worst case 2B bigger, but 1B smaller if lucky -> hl reuse)
+        (!IS_GB || optimize.codeSize)) // SM83 can do it faster (worst case 2B bigger, but 1B smaller if lucky -> hl reuse)
         {
           PAIR_ID pair = getPairId_o (result, roffset + i);
           PAIR_ID extrapair = (getPairId_o (result, roffset + i) != PAIR_HL && hl_free) ? PAIR_HL : PAIR_DE; // If we knew it is dead, we could use bc as extrapair here, too.
@@ -4782,6 +4782,16 @@ genIpush (const iCode *ic)
           {
             emit2 ("push %s", _pairs[getPairId_o (IC_LEFT (ic)->aop, size - 2)].name);
             regalloc_dry_run_cost += 1 + (getPairId_o (IC_LEFT (ic)->aop, size - 2) == PAIR_IY);
+            d = 2;
+          }
+        // gbz80 flag handling differs from other z80 variants, allowing this hack to push a 16-bit zero.
+        else if (size >= 2 && IS_GB && a_free &&
+          IC_LEFT (ic)->aop->type == AOP_LIT && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 2) && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 1))
+          {
+            emit2 ("xor a, a"); // Resets all flags except for z
+            emit2 ("rra");      // Resets z (and since a is already 0, c stays reset)
+            emit2 ("push af");  // Pushes 0 in a, 0 for the unused upper 4 flag bits, 4 flag bits that are all reset, giving us a 16-bit 0 push.
+            regalloc_dry_run_cost += 3;
             d = 2;
           }
         else if (size >= 2 &&
@@ -8090,7 +8100,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           goto release;
         }
 
-      // On the Gameboy we can't afford to adjust HL as it may trash the carry.
+      // On the SM83 we can't afford to adjust HL as it may trash the carry.
       if (size > 1 && (IS_GB || IY_RESERVED) && left->aop->type != AOP_REG && right->aop->type != AOP_REG && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
         {
           if (!isPairDead (PAIR_DE, ic))

@@ -1,3 +1,12 @@
+2021-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  configure.ac,
+	  configure:
+	  The GameBoy's CPU core is the SM83, also used in some Sharp microcontrollers.
+
 2021-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/float.h: added __NAN

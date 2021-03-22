@@ -1638,7 +1638,7 @@ PORT gbz80_port =
 {
   TARGET_ID_GBZ80,
   "gbz80",
-  "Gameboy Z80-like",           /* Target name */
+  "Sharp SM83",           /* Target name */
   NULL,
   {
     glue,

@@ -11059,7 +11059,7 @@ status collapsed
 
 
 \series default
- Generate code for the LR35902 GameBoy Z80
+ Generate code for the Sharp SM83
 \begin_inset Index idx
 status collapsed
 
@@ -43684,7 +43684,7 @@ Z80
 \end_inset
 
 , Z180, eZ80 in Z80 mode, Rabbit 2000, Rabbit 2000A, Rabbit 3000A and LR35902,
- the Nintendo GameBoy's Z80-like gbz80
+ the Sharp SM83 (used .e.g in the Nintendo GameBoy) gbz80
 \begin_inset Index idx
 status collapsed
 
@@ -43944,8 +43944,9 @@ Unsafe reads
 \end_layout
 
 \begin_layout Standard
-Usually, Z80-based systems (except for the Gameboy) have separate I/O and
- memory spaces, and any normal memory location can be read without side-effects.
+Usually, Z80-based systems (except for the SM83 and TLCS-90) have separate
+ I/O and memory spaces, and any normal memory location can be read without
+ side-effects.
  For such systems, the option –allow-unsafe-reads can be used to enable
  some extra optimizations.
 \end_layout

@@ -1,5 +1,10 @@
 2021-03-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* src/z80/gen.c:
+	  Optimize pushing of 4B+ constant arguments.
+
+2021-03-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* device/lib/gbz80/crt0.s,
 	  support/regression/ports/ucgbz80/uCsim.cmd:
 	  Change emulator entry to 0x100 like after real bootrom

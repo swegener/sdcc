@@ -4792,12 +4792,15 @@ genIpush (const iCode *ic)
           {
             asmop *pair = 0;
             
-            if (hl_free)
+            /* hl has lower priority on GB, because it's needed for stack access */
+            if (!IS_GB && hl_free)
               pair = ASMOP_HL;
             else if (de_free)
               pair = ASMOP_DE;
             else if (bc_free)
               pair = ASMOP_BC;
+            else if (hl_free)
+              pair = ASMOP_HL;
               
             if (IS_GB && requiresHL (IC_LEFT (ic)->aop) && IC_LEFT (ic)->aop->type != AOP_REG && de_free)
               pair = ASMOP_DE;
@@ -4815,6 +4818,38 @@ genIpush (const iCode *ic)
             emit2 ("push %s", _pairs[getPairId (pair)].name);
             regalloc_dry_run_cost++;
             d = 2;
+            /* reuse the current register pair */
+            /* TODO: support float */
+            while (IC_LEFT (ic)->aop->type == AOP_LIT && !IS_FLOAT (AOP (IC_LEFT (ic))->aopu.aop_lit->type) && size - (d+2) >= 0)
+              {
+                unsigned long current = (ullFromVal(IC_LEFT (ic)->aop->aopu.aop_lit)>>((size - d    )*8)) & 0xFFFF;
+                unsigned long next = (ullFromVal(IC_LEFT (ic)->aop->aopu.aop_lit)>>((size - (d+2))*8)) & 0xFFFF;
+                if (current == next)
+                  {
+                    emitDebug ("; genIpush identical value again");
+                    emit2 ("push %s", _pairs[getPairId (pair)].name);
+                    regalloc_dry_run_cost++;
+                    d+=2;
+                  }
+                else if ((current & 0xFF) == (next & 0xFF))
+                  {
+                    emitDebug ("; genIpush similar value again");
+                    emit2 ("ld %s, !immedbyte", _pairs[getPairId (pair)].h, next>>8);
+                    emit2 ("push %s", _pairs[getPairId (pair)].name);
+                    regalloc_dry_run_cost++;
+                    d+=2;
+                  }
+                else if ((current & 0xFF00) == (next & 0xFF00))
+                  {
+                    emitDebug ("; genIpush similar value again");
+                    emit2 ("ld %s, !immedbyte", _pairs[getPairId (pair)].l, next & 0xFF);
+                    emit2 ("push %s", _pairs[getPairId (pair)].name);
+                    regalloc_dry_run_cost++;
+                    d+=2;
+                  }
+                else
+                  break;
+              }
          }
        else if (size >= 2 && IS_Z80N && (IC_LEFT (ic)->aop->type == AOP_LIT || IC_LEFT (ic)->aop->type == AOP_IMMD)) // Same size, but slower (21 vs 23 cycles) than going through a register pair other than iy. Only worth it under high register pressure.
          {

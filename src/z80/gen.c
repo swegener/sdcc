@@ -3017,7 +3017,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
           regalloc_dry_run_cost += 1 + (IS_TLCS90 && !a) + index;
           return;
         }
-#if 0 // Might destroy carry.
+#if 0 // Might destroy carry. Would also mess up interrupts on TLCS-90.
       if (aopInReg (from, from_offset, IYH_IDX) && !to_index && a_dead)
         {
           _push(PAIR_IY);
@@ -4534,11 +4534,20 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld d, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (eInRet)
+      else if (eInRet && !IS_TLCS90) // TLCS-90 has interrupt settings in f, so we can't pop af unless we did push af before.
         {
           /* Only restore D */
           _pop (PAIR_AF);
           emit2 ("ld d, a");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (eInRet)
+        {
+          /* Only restore D */
+          emit2 ("ld a, e");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_DE);
+          emit2 ("ld e, a");
           regalloc_dry_run_cost += 1;
         }
       else
@@ -4558,11 +4567,20 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld b, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (cInRet)
+      else if (cInRet && !IS_TLCS90)
         {
           /* Only restore B */
           _pop (PAIR_AF);
           emit2 ("ld b, a");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (cInRet)
+        {
+          /* Only restore B */
+          emit2 ("ld a, c");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_BC);
+          emit2 ("ld c, a");
           regalloc_dry_run_cost += 1;
         }
       else
@@ -4582,11 +4600,20 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld h, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (lInRet)
+      else if (lInRet && !IS_TLCS90)
         {
           /* Only restore D */
           _pop (PAIR_AF);
           emit2 ("ld h, a");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (lInRet)
+        {
+          /* Only restore E */
+          emit2 ("ld a, l");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_HL);
+          emit2 ("ld l, a");
           regalloc_dry_run_cost += 1;
         }
       else

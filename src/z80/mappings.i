@@ -45,6 +45,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
       "ld a, #4\n"
       "rst\t0x08"
     },
+    { "here", "." },
     { NULL, NULL }
 };
 

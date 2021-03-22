@@ -30,9 +30,9 @@
 
         .area   _HEADER (ABS)
         ;; Reset vector
-        .org    0
-        jp      init
-
+        .org    0x00
+        reti
+        ;; Used by regression tests
         .org    0x08
         reti
         .org    0x10
@@ -45,7 +45,20 @@
         reti
         .org    0x30
         reti
+        ;; 0xFF (rst 0x38) is the default value of empty memory
         .org    0x38
+        jp      _exit
+
+        ;; Interrupt vector
+        .org    0x40
+        reti
+        .org    0x48
+        reti
+        .org    0x50
+        reti
+        .org    0x58
+        reti
+        .org    0x60
         reti
 
         .org    0x100
@@ -54,7 +67,7 @@
         .org    0x150
 init:
         di
-        ;; Set stack pointer directly above top of memory.
+        ;; Set stack pointer directly above top of Work RAM.
         ld      sp,#0xe000
 
         ;; Setup global data

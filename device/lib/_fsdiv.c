@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -29,7 +29,7 @@
 
 #define __SDCC_FLOAT_LIB
 #include <float.h>
-
+#include <sdcc-lib.h>
 
 #ifdef FLOAT_ASM_MCS51
 
@@ -40,8 +40,8 @@ static void dummy(void) __naked
 	.globl	___fsdiv
 ___fsdiv:
 	// extract the two inputs, placing them into:
-	//      sign     exponent   mantiassa
-	//      ----     --------   ---------
+	//      sign     exponent   mantissa
+	//      ----     --------   --------
 	//  a:  sign_a   exp_a      r4/r3/r2
 	//  b:  sign_b   exp_b      r7/r6/r5
 
@@ -274,93 +274,95 @@ union float_long
 static float __fsdiv_org (float a1, float a2)
 {
   volatile union float_long fl1, fl2;
-  volatile long result;
-  volatile unsigned long mask;
-  volatile long mant1, mant2;
-  volatile int exp;
+  long result;
+  unsigned long mask;
+  unsigned long mant1, mant2;
+  int exp;
   char sign;
- 
-  fl1.f = a1;
-  fl2.f = a2;
 
+  fl1.f = a1;
+
+  exp = EXP (fl1.l);
+  /* numerator denormal??? */
+  if (!exp)
+    return (0);
+
+  fl2.f = a2;
   /* subtract exponents */
-  exp = EXP (fl1.l) ;
   exp -= EXP (fl2.l);
   exp += EXCESS;
 
+  if (exp < 1) /* denormal */
+    return (0);
+
   /* compute sign */
   sign = SIGN (fl1.l) ^ SIGN (fl2.l);
-
-  /* divide by zero??? */
-  if (!fl2.l)
-    {/* return NaN or -NaN */
-      fl2.l = 0x7FC00000;
-      return (fl2.f);
-    }
-
-  /* numerator zero??? */
-  if (!fl1.l)
-    return (0);
 
   /* now get mantissas */
   mant1 = MANT (fl1.l);
   mant2 = MANT (fl2.l);
 
-  /* this assures we have 25 bits of precision in the end */
+  /* this assures we have 24 bits of precision in the end */
   if (mant1 < mant2)
     {
-      mant1 <<= 1;
-      exp--;
+      mask = 0x1000000;
     }
-
-  /* now we perform repeated subtraction of fl2.l from fl1.l */
-  mask = 0x1000000;
-  result = 0;
-  while (mask)
-    {
-      if (mant1 >= mant2)
-	{
-	  result |= mask;
-	  mant1 -= mant2;
-	}
-      mant1 <<= 1;
-      mask >>= 1;
-    }
-
-  /* round */
-  result += 1;
-
-  /* normalize down */
-  exp++;
-  result >>= 1;
-
-  result &= ~HIDDEN;
-
-  /* pack up and go home */
-  if (exp >= 0x100)
-    fl1.l = (sign ? SIGNBIT : 0) | __INFINITY;
-  else if (exp < 0)
-    fl1.l = 0;
   else
-    fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
+    {
+      mask = 0x0800000;
+      exp++;
+    }
+
+  if (exp >= 255)
+    {
+      fl1.l = sign ? SIGNBIT | __INFINITY : __INFINITY;
+    }
+  else
+    {
+      /* now we perform repeated subtraction of fl2.l from fl1.l */
+      result = 0;
+      do
+        {
+          long diff = mant1 - mant2;
+          if (diff >= 0)
+            {
+              mant1 = diff;
+              result |= mask;
+            }
+          mant1 <<= 1;
+          mask >>= 1;
+        }
+      while (mask);
+
+      /* round */
+      if (mant1 >= mant2)
+        result += 1;
+
+      result &= ~HIDDEN;
+
+      /* pack up and go home */
+      fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
+    }
   return (fl1.f);
 }
 
 float __fsdiv (float a1, float a2)
 {
-  float f;
-  unsigned long *p = (unsigned long *) &f;
+  unsigned long _AUTOMEM *p2 = (unsigned long *) &a2;
 
-  if (a2 == 0.0f && a1 > 0.0f)
-    *p = 0x7f800000; // inf
-  else if (a2 == 0.0f && a1 < 0.0f)
-    *p = 0xff800000; // -inf
-  else if (a2 == 0.0f && a1 == 0.0f)
-    *p = 0xffc00000; // nan
-  else
-    f = __fsdiv_org (a1, a2);
-
-  return f; 
+  if (EXP (*p2) == 0) // a2 is denormal or zero, treat as zero
+    {
+      float f;
+      unsigned long _AUTOMEM *p = (unsigned long *) &f;
+      if (a1 > 0.0f)
+        *p = __INFINITY;           // +inf
+      else if (a1 < 0.0f)
+        *p = SIGNBIT | __INFINITY; // -inf
+      else // a1 is denormal, zero or nan
+        *p = __NAN;                // nan
+      return f;
+    }
+  return __fsdiv_org (a1, a2);
 }
 
 #endif

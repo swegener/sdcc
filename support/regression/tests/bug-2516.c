@@ -59,7 +59,7 @@ testBug (void)
   ASSERT (!isinf (divTest (1.0, 0.5)));
   ASSERT (!isnan (divTest (1.0, 0.5)));
 
-  ASSERT (!isnan (divTest (1e38, 1e-38)));
-  ASSERT (isinf (divTest (1e38, 1e-38)));
+  ASSERT (!isnan (divTest (3e38, 2e-38)));
+  ASSERT (isinf (divTest (3e38, 2e-38)));
 #endif
 }

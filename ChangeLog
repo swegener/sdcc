@@ -1,3 +1,10 @@
+2021-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/float.h: added __NAN
+	* device/lib/_fsdiv.c: many small optimizations
+	* device/lib/_ulong2fs.c: fixed warning
+	* support/regression/tests/bug-2516.c: do not use denormal float
+
 2021-03-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/mappings.i:

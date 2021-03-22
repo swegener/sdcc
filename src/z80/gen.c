@@ -5725,7 +5725,85 @@ genRet (const iCode *ic)
 
   if (size <= 4)
     {
-      if (IC_LEFT (ic)->aop->type == AOP_REG || size <= 2)
+      /* TODO: get this working with floats */
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT && size == 4 && !IS_FLOAT (AOP (IC_LEFT (ic))->aopu.aop_lit->type))
+        {
+          /* if we have to use two register pairs
+             we can reuse values, this is also a prototype
+             for the later literal on stack case */
+          /* double load is slower, if one is immd, than 2B immd load,
+             so we have to make sure both can be reused */
+          bool first = false;
+          unsigned char value[4];
+          PAIR_ID regpairs[2];
+          unsigned char offset[2] = {0, 2};
+          unsigned long lit = ulFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
+          value[0] = lit&0xff;
+          lit>>=8;
+          value[1] = lit&0xff;
+          lit>>=8;
+          value[2] = lit&0xff;
+          lit>>=8;
+          value[3] = lit&0xff;
+
+          if(IS_GB)
+            {
+              regpairs[0] = PAIR_DE;
+              regpairs[1] = PAIR_HL;
+            }
+          else
+            {
+              regpairs[0] = PAIR_HL;
+              regpairs[1] = PAIR_DE;
+            }
+
+          /* swap if first pair can't hold the immd */
+          if(value[0] == value[1] && value[2] != value[3])
+            {
+              PAIR_ID tmpair = regpairs[0];
+              regpairs[0] = regpairs[1];
+              regpairs[1] = tmpair;
+
+              unsigned char tmp = value[0];
+              value[0] = value[2];
+              value[2] = tmp;
+              tmp = value[1];
+              value[1] = value[3];
+              value[3] = tmp;
+
+              tmp = offset[0];
+              offset[0] = offset[1];
+              offset[1] = tmp;
+            }
+          
+          fetchPairLong (regpairs[0], AOP (IC_LEFT (ic)), 0, offset[0]);
+          if(value[2] == value[0])
+            {
+              emit2 ("ld %s, %s", _pairs[regpairs[1]].l, _pairs[regpairs[0]].l);
+              first = true;
+            }
+          else if(value[2] == value[1])
+            {
+              emit2 ("ld %s, %s", _pairs[regpairs[1]].l, _pairs[regpairs[0]].h);
+              first = true;
+            }
+          
+          if(value[3] == value[0] && first == true)
+            {
+              emit2 ("ld %s, %s", _pairs[regpairs[1]].h, _pairs[regpairs[0]].l);
+            }
+          else if(value[3] == value[1] && first == true)
+            {
+              emit2 ("ld %s, %s", _pairs[regpairs[1]].h, _pairs[regpairs[0]].h);
+            }
+          else
+            {
+              /* Makes previous loads redundant, which
+                 will be optimized by peep hole rules */
+              fetchPairLong (regpairs[1], AOP (IC_LEFT (ic)), 0, offset[1]);
+            }
+        }
+      else if (IC_LEFT (ic)->aop->type == AOP_REG || size <= 2)
         genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, size, true, true, true);
       else  if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))) && aopInReg (ASMOP_RETURN, 0, DE_IDX) && aopInReg (ASMOP_RETURN, 2, HL_IDX))
         {

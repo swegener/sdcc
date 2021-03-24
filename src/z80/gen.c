@@ -4811,6 +4811,7 @@ genIpush (const iCode *ic)
             regalloc_dry_run_cost += 1 + (getPairId_o (IC_LEFT (ic)->aop, size - 2) == PAIR_IY);
             d = 2;
           }
+#if 0 // Fails regression tests. Simulator issue regarding flags?
         // gbz80 flag handling differs from other z80 variants, allowing this hack to push a 16-bit zero.
         else if (size >= 2 && IS_GB && a_free &&
           IC_LEFT (ic)->aop->type == AOP_LIT && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 2) && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 1))
@@ -4821,6 +4822,7 @@ genIpush (const iCode *ic)
             regalloc_dry_run_cost += 3;
             d = 2;
           }
+#endif
         else if (size >= 2 &&
           (hl_free || de_free || bc_free ||
           aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || b_free && aopInReg (IC_LEFT (ic)->aop, size - 2, C_IDX) ||

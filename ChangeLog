@@ -1,3 +1,8 @@
+2021-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Disable accidentially comitted gbz80 zero push optimization.
+
 2021-03-24 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph.def:

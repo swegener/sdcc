@@ -292,9 +292,6 @@ static float __fsdiv_org (float a1, float a2)
   exp -= EXP (fl2.l);
   exp += EXCESS;
 
-  if (exp < 1) /* denormal */
-    return (0);
-
   /* compute sign */
   sign = SIGN (fl1.l) ^ SIGN (fl2.l);
 
@@ -312,6 +309,9 @@ static float __fsdiv_org (float a1, float a2)
       mask = 0x0800000;
       exp++;
     }
+
+  if (exp < 1) /* denormal */
+    return (0);
 
   if (exp >= 255)
     {

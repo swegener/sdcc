@@ -51,7 +51,7 @@
 #define HIDDEN		(unsigned long)(1ul << 23)
 #define SIGN(fp)	(((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
 #define EXP(fp)		(((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)
-#define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
+#define MANT(fp)	(((fp) & (unsigned long)0x00FFFFFF) | HIDDEN)
 #define NORM            0xff000000
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 #endif

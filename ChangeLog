@@ -1,3 +1,8 @@
+2021-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_fsdiv.c: fixed bug with very small, but normal numbers
+	* device/include/float.h: no need to mask off bit23 in MANT() macro
+
 2021-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

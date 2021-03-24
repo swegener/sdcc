@@ -5169,9 +5169,17 @@ genCall (const iCode *ic)
             0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
       pair = (ic->op == PCALL && !IS_GB && !IY_RESERVED) ? PAIR_IY : PAIR_HL;
-      emit2 ("ld %s, !immedword", _pairs[pair].name, sp_offset);
-      emit2 ("add %s, sp", _pairs[pair].name);
-      regalloc_dry_run_cost += (pair == PAIR_IY ? 6 : 4);
+      if (IS_GB && sp_offset <= 127 && sp_offset >= -128)
+        {
+          emit2 ("!ldahlsp", sp_offset);
+          regalloc_dry_run_cost += 2;
+        }
+      else
+        {
+          emit2 ("ld %s, !immedword", _pairs[pair].name, sp_offset);
+          emit2 ("add %s, sp", _pairs[pair].name);
+          regalloc_dry_run_cost += (pair == PAIR_IY ? 6 : 4);
+        }
       if (ic->op == PCALL && IS_GB)
         {
           emit2 ("ld e, l");

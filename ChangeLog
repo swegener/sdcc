@@ -1,3 +1,9 @@
+2021-03-24 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph-gbz80.def,
+	  src/z80/peeph.def:
+	  Make some GBZ80 rules common.
+
 2021-03-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

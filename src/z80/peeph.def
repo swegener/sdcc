@@ -616,7 +616,7 @@ replace restart {
 	ld	a, (hl)
 	ld	%3, a
 	push	%4
-} if same(%1 'inc' 'dec'), unusedReg(%4 'bc' 'de), canSplitReg(%4 %2 %3), notUsed('a')
+} if same(%1 'inc' 'dec'), unusedReg(%4 'bc' 'de'), canSplitReg(%4 %2 %3), notUsed('a')
 
 replace restart {
 	ld	a, (%5)
@@ -626,7 +626,7 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	; common peephole 47c pushed (%5), %1, (%6) through %4 instead of af.
+	; common peephole 47c pushed (%5), (%6) through %4 instead of af.
 	ld	a, (%5)
 	ld	%2, a
 	ld	a, (%6)
@@ -1267,6 +1267,42 @@ replace restart {
 	ld	%4, (%1)
 	inc	%1
 }if operandsNotRelated(%4 %5 %1), operandsNotRelated(%5 %1)
+
+replace restart {
+	%1
+	%2	%3
+} by {
+	; common peephole 96a move %2 %3 before %1
+	%2	%3
+	%1
+} if same(%2 'inc' 'dec'), same(%3 'hl'), same(%1 'rlca' 'rrca' 'rra' 'rla' 'cpl' 'scf' 'daa' 'ccf' 'sra' 'swap' 'nop')
+
+replace restart {
+	%4	%1, %2
+	%3	%5
+} by {
+	; common peephole 96b move %3 %5 before %4 %1, %2
+	%3	%5
+	%4	%1, %2
+} if same(%3 'inc' 'dec'), same(%5 'hl'), same(%4 'ld' 'ldh' 'cp' 'add' 'adc' 'and' 'or' 'xor' 'sub' 'sbc' 'set' 'res' 'bit' 'in' 'out' 'in0' 'out0'), operandsNotRelated(%1 %5), operandsNotRelated(%2 %5)
+
+replace restart {
+	%2	%1
+	%3	%4
+} by {
+	; common peephole 96c move %3 %4 before %2 %1
+	%3	%4
+	%2	%1
+} if same(%3 'inc' 'dec'), same(%4 'hl'), same(%2 'inc' 'dec' 'rl' 'rlc' 'rr' 'rrc' 'srl' 'sla' 'sra' 'swap'), operandsNotRelated(%1 %4), operandsNotRelated(%2 %4)
+
+replace restart {
+	%2	%1
+	%3	%4
+} by {
+	; common peephole 96d move %3 %4 before %2 (%1)
+	%3	%4
+	%2	%1
+} if same(%3 'inc' 'dec'), same(%4 'hl'), same(%2 'push' 'pop'), notSame(%1 %4)
 
 // check if constant loaded into (hl) is the same that's loaded into the second register
 replace {

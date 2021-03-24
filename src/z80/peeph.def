@@ -670,8 +670,15 @@ replace restart {
 	pop	%1
 	push	%1
 } by {
-	; common peephole 50 eleminated dead pop/push pair.
+	; common peephole 50a eleminated dead pop/push pair.
 } if notUsed(%1)
+
+replace restart {
+	push	%1
+	pop	%1
+} by {
+	; common peephole 50b eleminated dead push/pop pair.
+}
 
 replace restart {
 	pop	%1
@@ -1685,7 +1692,7 @@ replace restart {
 	or	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; common peephole 121 replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; common peephole 121a replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
@@ -1696,74 +1703,50 @@ replace restart {
 	and	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; common peephole 122 replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; common peephole 121b replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace {
-	ld  a, (hl)
-	sbc a, #%1
+	ld	a, #%1
+	sbc	a, %3
 } by {
 	; common peephole 122a optimized carry substraction by 0.
-	sbc a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+	sbc	a, a
+	sub	a, %3
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notVolatile(%3), notUsed('f')
 
 replace {
-	ld  a, #%1
-	sbc a, (hl)
+	ld	a, #%1
+	sub	a, %3
 } by {
 	; common peephole 122b optimized carry substraction by 0.
-	sbc a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+	xor	a, a
+	sub	a, %3
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notVolatile(%3), notUsed('f')
 
 replace {
-	ld  a, (hl)
-	sub a, #%1
+	ld	a, #%1
+	sbc	a, %2 (ix)
 } by {
 	; common peephole 122c optimized carry substraction by 0.
-	xor a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+	sbc	a, a
+	sub	a, %2 (ix)
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %3), notUsed('f')
 
 replace {
-	ld  a, #%1
-	sub a, (hl)
+	ld	a, #%1
+	sbc	a, %2
 } by {
 	; common peephole 122d optimized carry substraction by 0.
-	xor a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
+	sbc	a, a
+	sub	a, %2
+} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %3), notUsed('f')
 
-replace {
-	ld  a, #%1
-	inc hl
-	sbc a, (hl)
+replace restart {
+	ld	a, #%1
 } by {
-	inc hl
-	; common peephole 122e optimized carry substraction by 0.
-	sbc a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
-
-replace {
-	ld  a, #%1
-	inc hl
-	sub a, (hl)
-} by {
-	inc hl
-	; common peephole 122f optimized carry substraction by 0.
-	xor a, a
-	sub a, (hl)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
-
-replace {
-	ld  a, #%1
-	sbc a, %2 (ix)
-} by {
-	; common peephole 122g optimized carry substraction by 0.
-	sbc a, a
-	sub a, %2 (ix)
+	; common peephole 123 optimize ld a, %1
+	xor	a, a
 } if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
 
 replace restart {

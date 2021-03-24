@@ -1,5 +1,10 @@
 2021-03-24 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/peeph.def:
+	  Fix some rules and remove invalid ones.
+
+2021-03-24 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph-gbz80.def,
 	  src/z80/peeph.def:
 	  Make some GBZ80 rules common.

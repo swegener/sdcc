@@ -1632,7 +1632,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
       /* On-stack for dry run. */
       if (sym->nRegs && regalloc_dry_run)
         {
-          sym->aop = op->aop = aop = newAsmop (AOP_STK);
+          sym->aop = op->aop = aop = newAsmop (_G.omitFramePtr ? AOP_EXSTK : AOP_STK);
           aop->size = getSize (sym->type);
           return;
         }
@@ -9228,7 +9228,7 @@ genAnd (const iCode * ic, iCode * ifx)
             {
               if (bitVectBitValue (ic->rSurv, A_IDX) || left->aop->regs[A_IDX] > offset || right->aop->regs[A_IDX] > offset)
                 {
-                  regalloc_dry_run_cost += 100;
+                  regalloc_dry_run_cost += 200;
                   wassert (regalloc_dry_run);
                 }
 

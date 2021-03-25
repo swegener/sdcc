@@ -44,7 +44,7 @@ typedef enum
   AOP_IY,
   /* Is pointed to by HL */
   AOP_HL,
-  /* Is in the extended stack pointer (IY on the Z80) */
+  /* Is on the extended stack (addressed via IY or HL) */
   AOP_EXSTK,
   /* Is referenced by a pointer in a register pair. */
   AOP_PAIRPTR,

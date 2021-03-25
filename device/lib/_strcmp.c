@@ -36,14 +36,15 @@ int strcmp ( const char * asrc, const char * adst )
 #if _SDCC_Z80_STYLE_LIB_OPT
 #pragma noinduction
 
-	char ret = 0;
 	const char * src = asrc;
 	const char * dst = adst;
 
-	while( ! (*src - *dst) && *dst)
-		++src, ++dst;
-
-	return *src - *dst;
+	for (;;) {
+		char d = *dst++;
+		signed char ret = *src++ - d;
+		if (ret != 0 || d == '\0')
+			return ret;
+	}
 #else
 	register int ret = 0;
 

@@ -1,3 +1,8 @@
+2021-03-25 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* device/lib/_strcmp.c:
+	  strcmp optimization.
+
 2021-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/gen.c:

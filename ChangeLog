@@ -1,6 +1,11 @@
 2021-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Fix an issue affecting 4-byte swap with both operands on extended stack.
+
+2021-03-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix handling of extended stack in addition and subtraction.
 
 2021-03-25 Philipp Klaus Krause <pkk AT spth.de>

@@ -1,6 +1,11 @@
 2021-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Fix handling of extended stack in addition and subtraction.
+
+2021-03-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix handling of frame pointer omission in dry run.
 
 2021-03-25 Sergey Belyashov <sergey.belyashov@gmail.com>

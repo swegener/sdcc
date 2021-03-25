@@ -6652,7 +6652,13 @@ genPlus (iCode * ic)
           premoved = TRUE;
         }
 
-      setupToPreserveCarry (AOP (IC_RESULT (ic)), leftop, rightop);
+      if ((requiresHL (IC_RESULT (ic)->aop) && IC_RESULT (ic)->aop->type != AOP_REG || requiresHL (leftop) && leftop->type != AOP_REG || requiresHL (rightop) && rightop->type != AOP_REG) &&
+        (leftop->regs[L_IDX] > 0 || leftop->regs[H_IDX] > 0 || rightop->regs[L_IDX] > 0 || rightop->regs[H_IDX] > 0))
+        {
+          regalloc_dry_run_cost += 100;
+          wassert (regalloc_dry_run);
+        }
+      setupToPreserveCarry (IC_RESULT (ic)->aop, leftop, rightop);
     }
   // But if we don't actually want to use hl for the addition, it can make sense to setup an op to use cheaper hl instead of iy.
   if (size == 1 && !aopInReg(leftop, 0, H_IDX) && !aopInReg(leftop, 0, L_IDX) && isPairDead (PAIR_HL, ic))
@@ -7186,6 +7192,12 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
         }
     }
 
+  if ((requiresHL (result) && result->type != AOP_REG || requiresHL (left) && left->type != AOP_REG || requiresHL (right) && right->type != AOP_REG) &&
+    (left->regs[L_IDX] > 0 || left->regs[H_IDX] > 0 || right->regs[L_IDX] > 0 || right->regs[H_IDX] > 0))
+    {
+      regalloc_dry_run_cost += 100;
+      wassert (regalloc_dry_run);
+    }
   setupToPreserveCarry (result, left, right);
 
   /* if literal right, add a, #-lit, else normal subb */

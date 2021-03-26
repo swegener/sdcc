@@ -3139,11 +3139,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     }
   else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && // Go through a.
     (from->type == AOP_DIR ||
-    (from->type == AOP_HL || from->type == AOP_IY) && to->type == AOP_STK ||
-    from->type == AOP_SFR ||
-    to->type == AOP_SFR ||
-    to->type == AOP_STK && from->type == AOP_STK ||
-    (to->type == AOP_HL || to->type == AOP_IY || to->type == AOP_EXSTK) && (from->type == AOP_HL || from->type == AOP_IY || from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK) ||
+    from->type == AOP_SFR || to->type == AOP_SFR ||
+    (to->type == AOP_HL || to->type == AOP_IY || to->type == AOP_EXSTK || to->type == AOP_STK) && (from->type == AOP_HL || from->type == AOP_IY || from->type == AOP_EXSTK || from->type == AOP_STK) ||
     (to->type == AOP_HL || IS_GB && to->type == AOP_STK || to->type == AOP_EXSTK) && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))))
     {
       if (!a_dead)
@@ -3462,7 +3459,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           i += 2;
         }
       else if (!IS_GB && i + 1 < n && aopOnStack (result, roffset + i, 2) && requiresHL (result) &&
-        aopInReg (source, soffset + i, HL_IDX))
+        aopInReg (source, soffset + i, HL_IDX) && hl_free)
         {
           if (!de_free)
             _push (PAIR_DE);
@@ -3771,6 +3768,7 @@ skip_byte:
           _pop (pair);
           _push (pair);
           _push (extrapair);
+          spillPair (extrapair);
           assigned[i] = true;
           assigned[i + 1] = true;
           size -= 2;
@@ -3907,7 +3905,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID && (source->type == AOP_IY || source->type == AOP_DIR))
+      else if (i + 1 < size && soffset + i + 1 < source->size && getPairId_o(result, roffset + i) != PAIR_INVALID && (source->type == AOP_IY || source->type == AOP_DIR))
         {
           emit2 ("ld %s, !mems", _pairs[getPairId_o(result, roffset + i)].name, aopGetLitWordLong (source, soffset + i, false));
           regalloc_dry_run_cost += 3 + (getPairId_o(result, roffset + i) != PAIR_HL);
@@ -4299,7 +4297,7 @@ regMove (const short *dst, const short *src, size_t n, bool preserve_a) // Todo:
 
   // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
   while (size)
-    {emit2(";size %d", (int)size);
+    {
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {

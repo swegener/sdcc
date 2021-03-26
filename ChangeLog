@@ -1,3 +1,8 @@
+2021-03-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix issues in handling of (iy) operands (last part of fix for bug #3202).
+
 2021-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

@@ -458,28 +458,28 @@ replace restart {
 replace restart {
 	push	af
 	inc	sp
-	ld	a,#%1
-	push	af
-	inc	sp
-} by {
-	; common peephole 37a pushed de instead of pushing a twice.
-	ld	d,a
-	ld	e,#%1
-	push	de
-} if notUsed('de')
-
-replace restart {
-	push	af
-	inc	sp
 	ld	a, #%1
 	push	af
 	inc	sp
 } by {
-	; common peephole 37b pushed bc instead of pushing a twice.
+	; common peephole 37a pushed %4 instead of pushing a twice.
 	ld	%2, a
 	ld	%3, #%1
 	push	%4
-} if unusedReg(%4 'bc' 'de' 'hl'), canSplitReg(%4 %2 %3)
+} if unusedReg(%4 'bc' 'de' 'hl'), canSplitReg(%4 %2 %3), notUsed('a')
+
+replace restart {
+	push	af
+	inc	sp
+	xor	a, a
+	push	af
+	inc	sp
+} by {
+	; common peephole 37b pushed %4 instead of pushing a twice.
+	ld	%2, a
+	ld	%3, #0x00
+	push	%4
+} if unusedReg(%4 'bc' 'de' 'hl'), canSplitReg(%4 %2 %3), notUsed('af')
 
 replace restart {
 	push	%1
@@ -568,9 +568,25 @@ replace restart {
 } by {
 	ld	%4, %1
 	ld	%5, %2 (%3)
-	; common peephole 44 combined pushing of %1 and %2 (%3).
+	; common peephole 44a combined pushing of %1 and %2 (%3).
 	push	%6
 } if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), canAssign(%4 %1), notUsed('a')
+
+replace restart {
+	ld	a, (%1)
+	push	af
+	inc	sp
+	ld	a, (%2)
+	push	af
+	inc	sp
+} by {
+	ld	a, (%1)
+	ld	%4, a
+	ld	a, (%2)
+	ld	%5, a
+	; common peephole 44b combined pushing of (%1) and (%2).
+	push	%6
+} if unusedReg(%6 'bc' 'de' 'hl'), notSame(%6 %1 %2), canSplitReg(%6 %4 %5)
 
 replace restart {
 	ld	%1, #%2
@@ -1158,52 +1174,66 @@ replace restart {
 } if notUsed('a'), notUsedFrom(%1 'a')
 
 replace {
-	ld	e, #%1
-	ld	d, #%2
+	ld	%5, #%1
+	ld	%6, #%2
 } by {
-	ld	de, #%4
+	ld	%7, #%4
 	; common peephole 92a combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %2 0x100 %3), immdInRange(0x00 0xffff '|' %3 %1 %x4)
+} if canJoinRegs(%6 %5 %7), operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %2 0x100 %3), immdInRange(0x00 0xffff '|' %3 %1 %x4)
 
 replace {
-	ld	l, #%1
-	ld	h, #%2
+	xor a, a
+	ld	%5, a
+	ld	%6, #%2
 } by {
-	ld	hl, #%4
+	ld	%7, #%4
 	; common peephole 92b combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %2 0x100 %3), immdInRange(0x00 0xffff '|' %3 %1 %x4)
+} if canJoinRegs(%6 %5 %7), operandsLiteral(%2), immdInRange(0x00 0xffff '*' %2 0x100 %x4)
 
 replace {
-	ld	c, #%1
-	ld	b, #%2
+	xor a, a
+	ld	%5, #%1
+	ld	%6, a
 } by {
-	ld	bc, #%4
+	ld	%7, #%1
 	; common peephole 92c combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %2 0x100 %3), immdInRange(0x00 0xffff '|' %3 %1 %x4)
+} if canJoinRegs(%6 %5 %7), operandsLiteral(%1)
 
 replace {
-	ld	d, #%1
-	ld	e, #%2
+	ld	%5, #%1
+	ld	%6, #%2
 } by {
-	ld	de, #%4
+	ld	%7, #%4
 	; common peephole 93a combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
 
 replace {
-	ld	h, #%1
-	ld	l, #%2
+	xor a, a
+	ld	%5, a
+	ld	%6, #%2
 } by {
-	ld	hl, #%4
+	ld	%7, #%2
 	; common peephole 93b combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%2)
 
 replace {
-	ld	b, #%1
-	ld	c, #%2
+	xor a, a
+	ld	%5, #%1
+	ld	%6, a
 } by {
-	ld	bc, #%4
+	ld	%7, #%4
 	; common peephole 93c combined constant loads into register pair.
-} if operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%1), immdInRange(0x00 0xffff '*' %1 0x100 %x4)
+
+replace {
+	ld	%8, #%1
+	ld	%5, %8
+	ld	%6, #%2
+} by {
+	ld	%8, #%1
+	ld	%7, #%4
+	; common peephole 93d combined constant loads into register pair.
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
 
 replace {
 	ld	%1, #%2
@@ -1215,13 +1245,37 @@ replace {
 } if same(%1 'a' 'b' 'c' 'd' 'e' 'h' 'l'), operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3)
 
 replace {
+	xor	a, a
+	ld	(%1), a
+	ld	(hl), #%2
+} by {
+	; common peephole 94b reused constant #0 loaded into register.
+	xor	a, a
+	ld	(%1), a
+	ld	(hl), a
+} if same(%1 'hl' 'hl+' 'hl-'), operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3)
+
+replace {
+	xor	a, a
+	ld	(hl), a
+	%1	hl
+	ld	(hl), #%2
+} by {
+	; common peephole 94c reused constant #0 loaded into register.
+	xor	a, a
+	ld	(hl), a
+	%1	hl
+	ld	(hl), a
+} if same(%1 'inc' 'dec'), operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3)
+
+replace {
 	ld	%1, %2
 	push	%1
 	ld	%1, %2
 } by {
 	ld	%1, %2
 	push	%1
-	; common peephole 94b pushed register pair twice.
+	; common peephole 94d pushed register pair twice.
 }
 
 // optimizes genRet
@@ -2163,16 +2217,35 @@ replace {
 }
 
 replace restart {
-	or	a,%1
+	%4	a,%1
 	jp	NZ,%2
 	xor	a,a
-	jp	%3
 } by {
-	or	a,%1
+	%4	a,%1
 	jp	NZ,%2
-	; common peephole 154 removed redundant zeroing of a (which has just been tested to be #0x00).
-	jp	%3
-}
+	; common peephole 154a removed redundant zeroing of a (which has just been tested to be #0x00).
+} if same(%4 'or' 'and'), notUsed('f')
+
+replace restart {
+	%4	a
+	jp	NZ,%2
+	xor	a,a
+} by {
+	%4	a
+	jp	NZ,%2
+	; common peephole 154b removed redundant zeroing of a (which has just been tested to be #0x00).
+} if same(%4 'inc' 'dec'), notUsed('f')
+
+replace restart {
+	%4	%1
+	jp	NZ,%2
+	xor	a,a
+} by {
+	%4	%1
+	jp	NZ,%2
+	; common peephole 154c reuseded zero of register (which has just been tested to be #0x00).
+	ld	a, %1
+} if same(%4 'inc' 'dec'), notUsed('f')
 
 replace restart {
 	add	a, #%1
@@ -2187,6 +2260,13 @@ replace restart {
 	; common peephole 155b turned sub into dec.
 	dec	a
 } if operandsLiteral(%1), immdInRange(1 1 '+' %1 0 %2), notUsed('cf')
+
+replace restart {
+	add	a, #%1
+} by {
+	; common peephole 155c turned add into dec.
+	dec	a
+} if operandsLiteral(%1), immdInRange(0xFF 0xFF '+' %1 0 %2), notUsed('cf')
 
 replace restart {
 	dec	%1

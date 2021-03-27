@@ -413,7 +413,7 @@ replace restart {
 	; common peephole 33 loaded %3 from %2 instead of going through %1 (%4).
 	ld	%1 (%4), %2
 	ld	%3, %2
-} if same(%4 'ix' 'iy'), canAssign(%3 %2)
+} if same(%4 'ix' 'iy'), canAssign(%3 %2), notSame(%3 'bc' 'de' 'hl' 'ix' 'iy')
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {

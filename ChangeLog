@@ -1,3 +1,8 @@
+2021-03-27 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph.def:
+	  Partially fix bug #3203.
+
 2021-03-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peeph.def::

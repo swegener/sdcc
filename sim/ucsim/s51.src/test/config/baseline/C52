@@ -1,15 +1,17 @@
-uCsim 0.6-pre56, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre56
+ucsim version 0.6-pre68
 Type of microcontroller: C52 CMOS cmos
-Controller has 12 hardware element(s).
+Controller has 14 hardware element(s).
+   on cpu[0]
    on simif[0]
    on vcd[0]
    on timer0[0]
    on timer1[1]
    on uart[0]
+   on dreg[0]
    on dport[0]
    on port[0]
    on port[1]
@@ -23,7 +25,7 @@ Controller has 12 hardware element(s).
 @R1 84 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
 SP 0x07 48 54 29 8a b2 d4 70 08 HT)...p.
    DPTR= 0x0000 @DPTR= 0x95 149 .
- ? 0x0000 00       NOP
+ ? 0x0000 00       NOP[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

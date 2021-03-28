@@ -1,16 +1,17 @@
-uCsim 0.6-pre56, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre56
+ucsim version 0.6-pre68
 Type of microcontroller: pdk15
-Controller has 2 hardware element(s).
+Controller has 3 hardware element(s).
    on simif[0]
    on vcd[0]
+   on dreg[0]
 A= 0x00(  0)
 Flag= 0x00(  0)  
 SP= 0x00(  0)
- ? 0x000 0000 nop
+ ? 0x000 0000 nop[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x000fff     4096 rom_chip (16,%04x,0x%03lx)

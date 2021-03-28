@@ -1,14 +1,15 @@
-uCsim 0.6-pre65, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre65
+ucsim version 0.6-pre68
 Type of microcontroller: STM8 S,AF 62[12]3, 622[36]A
-Controller has 19 hardware element(s).
+Controller has 20 hardware element(s).
+   on cpu[0]
    on simif[0]
    on vcd[0]
+   on dreg[0]
    on dport[0]
-   on cpu[0]
    on clk[0]
    on uart[4]
    on itc[0]
@@ -27,7 +28,7 @@ Controller has 19 hardware element(s).
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08000 00 00          neg   (0x00,SP)
+ ? 0x08000 00 00          neg   (0x00,SP)[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0017ff     6144 ram_chip (8,%02x,0x%04lx)

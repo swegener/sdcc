@@ -81,6 +81,8 @@ check:
 
 test:
 
+baseline:
+
 
 # Performing installation test
 # ----------------------------

@@ -22,6 +22,7 @@ endif
 
 
 TESTS := $(patsubst $(srcdir)/%/Makefile,%,$(wildcard $(srcdir)/*/Makefile))
+BASELINES := $(patsubst %,%-baseline,$(TESTS))
 CLEAN_TESTS := $(addprefix Makefile/,$(TESTS))
 
 
@@ -33,6 +34,12 @@ all::		$(SIM) $(TESTS)
 $(SIM):
 	@echo 'FAIL $(SIM) does not exist. Build it before trying to test it!'
 	@exit 1
+
+baseline:	$(BASELINES) always
+
+%-baseline:	% always
+	@echo 'BASELINE $(srcdir)/$<'
+	@cp '$</out'/* '$(srcdir)/$</baseline'/.
 
 clean::	$(CLEAN_TESTS)
 
@@ -46,7 +53,7 @@ $(CLEAN_TESTS):
 
 %::	%/Makefile always
 	@+test -d '$@' || mkdir '$@'
-	@$(MAKE) -Otarget $(if $(MAKECMDGOALS),,-s) -C '$@' -f '$<' -I '$(abs_top_srcdir)' srcdir='$(srcdir)/$@' SIM='$(SIM)' all || true
+	@$(MAKE) -Otarget $(if $(subst baseline,,$(MAKECMDGOALS)),,-s) -C '$@' -f '$(abspath $<)' -I '$(abs_top_srcdir)' srcdir='$(srcdir)/$@' SIM='$(SIM)' all || true
 
 
 TESTS_OLD := $(basename $(filter-out sdcc.mk, $(notdir $(wildcard $(srcdir)/*.mk))))

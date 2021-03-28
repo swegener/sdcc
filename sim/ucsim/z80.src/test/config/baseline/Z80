@@ -1,19 +1,20 @@
-uCsim 0.6-pre65, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre65
+ucsim version 0.6-pre68
 Type of microcontroller: Z80
-Controller has 3 hardware element(s).
+Controller has 4 hardware element(s).
+   on cpu[0]
    on simif[0]
    on vcd[0]
-   on cpu[0]
+   on dreg[0]
 SZ-A-PNC  Flags= 0x00   0 .  A= 0x00   0 .
 00-0-000
 BC= 0x0000 [BC]= 08   8 .  DE= 0x0000 [DE]= 08   8 .  HL= 0x0000 [HL]= 08   8 .
 IX= 0x0000 [IX]= 08   8 .  IY= 0x0000 [IY]= 08   8 .  SP= 0x0000 [SP]= 08   8 .
 SP limit= 0xf000
- ? 0x0000 08          EX      AF,AF'
+ ? 0x0000 08          EX      AF,AF'[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

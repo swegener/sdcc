@@ -8,6 +8,7 @@ clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
 	rm -f stlcs$(EXEEXT) stlcs.exe
+	$(MAKE) -C test -f clean.mk clean
 
 
 # Deleting all files created by configuring or building the program
@@ -16,6 +17,7 @@ distclean: clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
 	rm -f *.obj *.list *.lst *.hex
+	$(MAKE) -C test -f clean.mk distclean
 
 
 # Like clean but some files may still exist

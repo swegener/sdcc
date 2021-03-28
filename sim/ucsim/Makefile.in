@@ -128,10 +128,15 @@ check:
 # We want tests to be parallelizable so a simple shell loop is
 # not good enough.
 PKGS_TEST = $(foreach pkg, sim.src $(PKGS), $(pkg)/test)
-.PHONY:	test $(PKGS_TEST)
+PKGS_BASELINE = $(patsubst %,%/baseline,$(PKGS_TEST))
+.PHONY:	test $(PKGS_TEST) baseline $(PKGS_BASELINE)
 test: $(PKGS_TEST)
 $(PKGS_TEST):
-	-$(MAKE) --no-print-directory -C $(dir $@) test
+	-@$(MAKE) --no-print-directory -C $(dir $@) test
+
+baseline: $(PKGS_BASELINE)
+$(PKGS_BASELINE):
+	-@$(MAKE) --no-print-directory -C $(patsubst %/test/baseline,%,$@) baseline
 
 
 # Performing installation test

@@ -60,6 +60,23 @@
     are displayed. In all other cases only the final differences to baseline
     (if any) are displayed.</p>
 
+    <h3>Updating the Baselines</h3>
+    <p>If changes to the simulator code base lead to changes in test outputs
+    <em>and these changes are as expected</em> then the baselines should be
+    updated to match the new output by copying the contents of the <code>out</code>
+    directories to the corresponding <code>baseline</code> directories.</p>
+
+    <p>To update all baselines run <code>make baseline</code> in the top-level
+    <code>ucsim</code> directory.<br />
+
+    <p>To update baselines for a single MCU type run <code>make baseline</code>
+    in the directory for that simulator.<br />
+
+    <p>If you need to update the baseline for a single test you should copy the
+    relevant files manually.</p>
+
+    <p><em>Remember that the updated baselines form part of your changes and
+    need to be committed or submitted as part of your patch!</em></p>
 
     <h2>Writing Tests</h2>
 

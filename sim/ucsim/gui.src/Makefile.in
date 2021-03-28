@@ -131,6 +131,8 @@ endif
 
 test_local:
 
+baseline:
+
 
 # Performing installation test
 # ----------------------------

@@ -54,7 +54,7 @@ uninstall:
 # --------------------
 check:
 
-test:
+test baseline:
 	@true
 
 

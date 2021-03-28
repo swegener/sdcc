@@ -1,12 +1,13 @@
-uCsim 0.6-pre65, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre65
+ucsim version 0.6-pre68
 Type of microcontroller: P1516
-Controller has 11 hardware element(s).
+Controller has 12 hardware element(s).
    on simif[0]
    on vcd[0]
+   on dreg[0]
    on pa[0]
    on pb[0]
    on pc[0]
@@ -25,7 +26,7 @@ Controller has 11 hardware element(s).
 R10= 0x00000000 [R10]= 0x5d888a08 R11= 0x00000000 [R11]= 0x5d888a08
 R12= 0x00000000 [R12]= 0x5d888a08 R13= 0x00000000 [R13]= 0x5d888a08
 R14= 0x00000000 [R14]= 0x5d888a08 R15= 0x00000000 [R15]= 0x5d888a08
- ? 0x0000 5d888a08 C0 call  0x5888a08
+ ? 0x0000 5d888a08 C0 call  0x5888a08[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x003fff    16384 rom_chip (32,%08x,0x%04lx)

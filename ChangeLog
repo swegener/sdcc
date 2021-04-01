@@ -1,4 +1,9 @@
-2021-03-28 Sergey Belyashov <sergey.belyashov@gmail.com>
+2021-04-01 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  Partially fix bug #3203.
+
+2021-04-01 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph.def:
 	  Fix many regressions caused by changes in r12173.

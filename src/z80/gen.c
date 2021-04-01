@@ -418,6 +418,18 @@ aopOnStack (const asmop *aop, int offset, int size)
   return (true);
 }
 
+static inline int
+fpOffset (int aop_stk)
+{
+  return aop_stk + (aop_stk > 0 ? _G.stack.param_offset : 0);
+}
+
+static int
+spOffset (int aop_stk)
+{
+  return fpOffset (aop_stk) + _G.stack.pushed + _G.stack.offset;
+}
+
 /* WARNING: This function is dangerous to use. It works literally:
    It will return true if ic the the last use of op, even if ic might
    be executed again, e.g. due to a loop. Most of the time you will want
@@ -10707,11 +10719,11 @@ genSwap (iCode * ic)
           genMove (&swapped_result_aop, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           break;
         }
-
       if (operandsEqu (result, left) && left->aop->type == AOP_STK &&
-          left->aop->aopu.aop_stk == -4 && isPairDead(PAIR_HL, ic) &&
+          spOffset (left->aop->aopu.aop_stk) == 0 && isPairDead (PAIR_HL, ic) &&
           (!IS_GB || isPairDead(PAIR_DE, ic) || isPairDead(PAIR_BC, ic)))
         { /* result & left are top of stack and there are free register pairs */
+          emit2 ("; stack_exchange");
           if (IS_GB)
             {
               if (isPairDead(PAIR_DE, ic))

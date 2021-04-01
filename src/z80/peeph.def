@@ -1168,8 +1168,8 @@ replace restart {
 	and	a, #0x01
 	jp	NZ, %1
 } by {
-	rlca
 	; common peephole 91 removed and by changing jump condition.
+	rlca
 	jp	C, %1
 } if notUsed('a'), notUsedFrom(%1 'a')
 
@@ -1177,53 +1177,53 @@ replace {
 	ld	%5, #%1
 	ld	%6, #%2
 } by {
-	ld	%7, #%4
 	; common peephole 92a combined constant loads into register pair.
+	ld	%7, #%4
 } if canJoinRegs(%6 %5 %7), operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %2 0x100 %3), immdInRange(0x00 0xffff '|' %3 %1 %x4)
 
 replace {
-	xor a, a
+	xor	a, a
 	ld	%5, a
 	ld	%6, #%2
 } by {
-	ld	%7, #%4
 	; common peephole 92b combined constant loads into register pair.
-} if canJoinRegs(%6 %5 %7), operandsLiteral(%2), immdInRange(0x00 0xffff '*' %2 0x100 %x4)
+	ld	%7, #%4
+} if canJoinRegs(%6 %5 %7), operandsLiteral(%2), immdInRange(0x00 0xffff '*' %2 0x100 %x4), notUsed('a' 'cf' 'zf')
 
 replace {
-	xor a, a
+	xor	a, a
 	ld	%5, #%1
 	ld	%6, a
 } by {
-	ld	%7, #%1
 	; common peephole 92c combined constant loads into register pair.
-} if canJoinRegs(%6 %5 %7), operandsLiteral(%1)
+	ld	%7, #%1
+} if canJoinRegs(%6 %5 %7), operandsLiteral(%1), notUsed('a' 'cf' 'zf')
 
 replace {
 	ld	%5, #%1
 	ld	%6, #%2
 } by {
-	ld	%7, #%4
 	; common peephole 93a combined constant loads into register pair.
+	ld	%7, #%4
 } if canJoinRegs(%5 %6 %7), operandsLiteral(%1 %2), immdInRange(0x00 0xffff '*' %1 0x100 %3), immdInRange(0x00 0xffff '|' %3 %2 %x4)
 
 replace {
-	xor a, a
+	xor	a, a
 	ld	%5, a
 	ld	%6, #%2
 } by {
-	ld	%7, #%2
 	; common peephole 93b combined constant loads into register pair.
-} if canJoinRegs(%5 %6 %7), operandsLiteral(%2)
+	ld	%7, #%2
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%2), notUsed('a' 'cf' 'zf')
 
 replace {
-	xor a, a
+	xor	a, a
 	ld	%5, #%1
 	ld	%6, a
 } by {
-	ld	%7, #%4
 	; common peephole 93c combined constant loads into register pair.
-} if canJoinRegs(%5 %6 %7), operandsLiteral(%1), immdInRange(0x00 0xffff '*' %1 0x100 %x4)
+	ld	%7, #%4
+} if canJoinRegs(%5 %6 %7), operandsLiteral(%1), immdInRange(0x00 0xffff '*' %1 0x100 %x4), notUsed('a' 'cf' 'zf')
 
 replace {
 	ld	%8, #%1
@@ -1467,19 +1467,19 @@ replace restart {
 	dec	a
 	or	a, a
 } by {
-	dec	a
 	; common peephole 102a removed redundant or after dec.
-}
+	dec	a
+} if notUsed('cf')
 
 replace restart {
 	dec	%1
 	ld	a, %1
 	or	a, a
 } by {
+	; common peephole 102b removed redundant or after dec.
 	dec	%1
 	ld	a, %1
-	; common peephole 102b removed redundant or after dec.
-}
+} if notUsed('cf')
 
 replace restart {
 	sbc	hl, %1

@@ -1,3 +1,8 @@
+2021-03-28 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph.def:
+	  Fix many regressions caused by changes in r12173.
+
 2021-03-27 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph.def:

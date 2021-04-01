@@ -1,5 +1,10 @@
 2021-04-01 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* sdas/asz80/z80mch.c:
+	  Enable undocumented Z80 instructions for Z80N.
+
+2021-04-01 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/gen.c:
 	  Partially fix bug #3203.
 

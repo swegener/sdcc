@@ -56,7 +56,7 @@ $(CLEAN_TESTS):
 	@$(MAKE) -Otarget $(if $(subst baseline,,$(MAKECMDGOALS)),,-s) -C '$@' -f '$(abspath $<)' -I '$(abs_top_srcdir)' srcdir='$(srcdir)/$@' SIM='$(SIM)' all || true
 
 
-TESTS_OLD := $(basename $(filter-out sdcc.mk, $(notdir $(wildcard $(srcdir)/*.mk))))
+TESTS_OLD := $(basename $(filter-out sdcc.mk clean.mk, $(notdir $(wildcard $(srcdir)/*.mk))))
 
 .PHONY:	all_old clean_old
 
@@ -66,5 +66,6 @@ clean_old::
 	-for p in $(TESTS_OLD); do \
 		$(MAKE) MAIN=$$p srcdir='$(srcdir)' -f '$(srcdir)'/$$p.mk clean; \
 	done
+	$(MAKE) -f '$(srcdir)'/clean.mk clean; \
 	rm -f *.out *.sout *.tim *.csv *.sim
 	rm -f st*[56][0-9][0-9].cmd st*[56]*.txt

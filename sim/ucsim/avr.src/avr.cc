@@ -134,13 +134,7 @@ cl_avr::init(void)
   for (i= 0; sfr_tabl[i].name != NULL; i++)
     {
       if (type->type & sfr_tabl[i].cpu_type)
-	{
-	  class cl_var *v;
-	  vars->add(v= new cl_var(chars(sfr_tabl[i].name),
-				  ram,
-				  sfr_tabl[i].addr, ""));
-	  v->init();
-	}
+        vars->add(sfr_tabl[i].name, ram, sfr_tabl[i].addr, 7, 0, "");
     }
   return(0);
 }

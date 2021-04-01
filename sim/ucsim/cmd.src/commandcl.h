@@ -69,6 +69,7 @@ public:
 private:
   virtual void split_out_string(char **_start, char **_end);
   virtual void split_out_output_redirection(char **_start, char **_end);
+  virtual void add_bit(char *dot, char *colon, class cl_cmd_arg *sfr);
   virtual void split_out_bit(char *dot, char *param_str);
   virtual void split_out_array(char *dot, char *param_str);
   virtual int token_length(char *start);

@@ -82,103 +82,37 @@ cl_pia::init(void)
   cfg_set(cfg_cb1_req, 'i');
   cfg_set(cfg_cb2_req, 'i');
   
-  cl_var *v;
   chars pn= chars("", "pia%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("base"), cfg, cfg_base,
-			      cfg_help(cfg_base)));
-  v->init();
+
+  uc->vars->add(pn + "base", cfg, cfg_base, 7, 0, cfg_help(cfg_base));
+  uc->vars->add(pn + "on", cfg, cfg_on, 7, 0, cfg_help(cfg_on));
   
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, cfg_on,
-			      cfg_help(cfg_on)));
-  v->init();
+  uc->vars->add(pn + "cra", uc->rom, base+1, 7, 0, "CRA Control Register port A");
+  uc->vars->add(pn + "crb", uc->rom, base+3, 7, 0, "CRB Control Register port B");
 
-  chars vn;
-  vn= pn+"cra";
-  v= uc->var(vn);
-  if (v)
-    {
-      vcra= v;
-      vcra->move(base+1);
-    }
-  else
-    {
-      uc->vars->add(vcra= new cl_var(vn, uc->rom, base+1,
-				     "CRA Control Register port A"));
-      vcra->init();
-    }
-  vn= pn+"crb";
-  v= uc->var(vn);
-  if (v)
-    {
-      vcrb= v;
-      vcrb->move(base+3);
-    }
-  else
-    {
-      uc->vars->add(vcrb= new cl_var(vn, uc->rom, base+3,
-				     "CRB Control Register port B"));
-      vcrb->init();
-    }
-  
-  uc->vars->add(v= new cl_var(pn+chars("ddra"), cfg, cfg_ddra,
-			      cfg_help(cfg_ddra)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ora"), cfg, cfg_ora,
-			      cfg_help(cfg_ora)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ina"), cfg, cfg_ina,
-			      cfg_help(cfg_ina)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ira"), cfg, cfg_ira,
-			      cfg_help(cfg_ira)));
-  v->init();
+  uc->vars->add(pn + "ddra", cfg, cfg_ddra, 7, 0, cfg_help(cfg_ddra));
+  uc->vars->add(pn + "ora", cfg, cfg_ora, 7, 0, cfg_help(cfg_ora));
+  uc->vars->add(pn + "ina", cfg, cfg_ina, 7, 0, cfg_help(cfg_ina));
+  uc->vars->add(pn + "ira", cfg, cfg_ira, 7, 0, cfg_help(cfg_ira));
 
-  uc->vars->add(v= new cl_var(pn+chars("ddrb"), cfg, cfg_ddrb,
-			      cfg_help(cfg_ddra)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("orb"), cfg, cfg_orb,
-			      cfg_help(cfg_ora)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("inb"), cfg, cfg_inb,
-			      cfg_help(cfg_ina)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("irb"), cfg, cfg_irb,
-			      cfg_help(cfg_irb)));
-  v->init();
+  uc->vars->add(pn + "ddrb", cfg, cfg_ddrb, 7, 0, cfg_help(cfg_ddrb));
+  uc->vars->add(pn + "orb", cfg, cfg_orb, 7, 0, cfg_help(cfg_orb));
+  uc->vars->add(pn + "inb", cfg, cfg_inb, 7, 0, cfg_help(cfg_inb));
+  uc->vars->add(pn + "irb", cfg, cfg_irb, 7, 0, cfg_help(cfg_irb));
 
-  uc->vars->add(v= new cl_var(pn+chars("oca"), cfg, cfg_oca,
-			      cfg_help(cfg_oca)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ddca"), cfg, cfg_ddca,
-			      cfg_help(cfg_ddca)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("inca"), cfg, cfg_inca,
-			      cfg_help(cfg_inca)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ocb"), cfg, cfg_ocb,
-			      cfg_help(cfg_ocb)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ddcb"), cfg, cfg_ddcb,
-			      cfg_help(cfg_ddcb)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("incb"), cfg, cfg_incb,
-			      cfg_help(cfg_incb)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("reqs"), cfg, cfg_reqs,
-			      cfg_help(cfg_reqs)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ca1_req"), cfg, cfg_ca1_req,
-			      cfg_help(cfg_ca1_req)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("ca2_req"), cfg, cfg_ca2_req,
-			      cfg_help(cfg_ca2_req)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("cb1_req"), cfg, cfg_cb1_req,
-			      cfg_help(cfg_cb1_req)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("cb2_req"), cfg, cfg_cb2_req,
-			      cfg_help(cfg_cb2_req)));
-  v->init();
+  uc->vars->add(pn + "oca", cfg, cfg_oca, 7, 0, cfg_help(cfg_oca));
+  uc->vars->add(pn + "ddca", cfg, cfg_ddca, 7, 0, cfg_help(cfg_ddca));
+  uc->vars->add(pn + "inca", cfg, cfg_inca, 7, 0, cfg_help(cfg_inca));
+
+  uc->vars->add(pn + "ocb", cfg, cfg_ocb, 7, 0, cfg_help(cfg_ocb));
+  uc->vars->add(pn + "ddcb", cfg, cfg_ddcb, 7, 0, cfg_help(cfg_ddcb));
+  uc->vars->add(pn + "incb", cfg, cfg_incb, 7, 0, cfg_help(cfg_incb));
+
+  uc->vars->add(pn + "reqs", cfg, cfg_reqs, 7, 0, cfg_help(cfg_reqs));
+  uc->vars->add(pn + "ca1_req", cfg, cfg_ca1_req, 7, 0, cfg_help(cfg_ca1_req));
+  uc->vars->add(pn + "ca2_req", cfg, cfg_ca2_req, 7, 0, cfg_help(cfg_ca2_req));
+  uc->vars->add(pn + "cb1_req", cfg, cfg_cb1_req, 7, 0, cfg_help(cfg_cb1_req));
+  uc->vars->add(pn + "cb2_req", cfg, cfg_cb2_req, 7, 0, cfg_help(cfg_cb2_req));
 
   is_ca1= new cl_m6809_slave_src(uc,
 				 cra, 1, 1,

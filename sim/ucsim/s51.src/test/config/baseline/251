@@ -22,10 +22,10 @@ Controller has 16 hardware element(s).
    on wdt[0]
    on pca[0]
      R0 R1 R2 R3 R4 R5 R6 R7
-0x00 08 70 d4 b2 8a 29 54 48 .p...)TH
+     08 70 d4 b2 8a 29 54 48
 @R0 9a .  ACC= 0x00   0 .  B= 0x00
 @R1 84 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
-SP 0x07 48 54 29 8a b2 d4 70 08 HT)...p.
+SP 0x07 -> 48 54 29 8a b2 d4 70 08
   *DPTR0= 0xb053 @DPTR0= 0x94 148 .
    DPTR1= 0xe0f8 @DPTR1= 0x4f  79 O
  ? 0x0000 00       NOP[0K

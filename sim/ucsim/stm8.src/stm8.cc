@@ -633,18 +633,19 @@ cl_stm8::make_memories(void)
   address_spaces->add(regs8);
   address_spaces->add(regs16);
 
-  class cl_var *v;
-  vars->add(v= new cl_var("A", regs8, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("CC", regs8, 1, ""));
-  v->init();
+  vars->add("A",     regs8, 0, 7, 0, "Accumulator");
+  vars->add("CC",    regs8, 1, -1, -1, "Condition Code");
+  vars->add("CC_C",  regs8, 1, BITPOS_C,  BITPOS_C,  "Carry");
+  vars->add("CC_Z",  regs8, 1, BITPOS_Z,  BITPOS_Z,  "Zero");
+  vars->add("CC_N",  regs8, 1, BITPOS_N,  BITPOS_N,  "Negative");
+  vars->add("CC_I0", regs8, 1, BITPOS_I0, BITPOS_I0, "Interrupt mask level 0");
+  vars->add("CC_H",  regs8, 1, BITPOS_H,  BITPOS_H,  "Half carry");
+  vars->add("CC_I1", regs8, 1, BITPOS_I1, BITPOS_I1, "Interrupt mask level 1");
+  vars->add("CC_V",  regs8, 1, BITPOS_V,  BITPOS_V,  "Overflow");
   
-  vars->add(v= new cl_var("X", regs16, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("Y", regs16, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("SP", regs16, 2, ""));
-  v->init();
+  vars->add("X",  regs16, 0, 15, 0, "X index register");
+  vars->add("Y",  regs16, 1, 15, 0, "Y index register");
+  vars->add("SP", regs16, 2, 15, 0, "Stack pointer");
 }
 
 

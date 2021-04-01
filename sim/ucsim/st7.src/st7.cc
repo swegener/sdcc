@@ -178,18 +178,17 @@ cl_st7::make_memories(void)
   address_spaces->add(regs8);
   address_spaces->add(regs16);
 
-  class cl_var *v;
-  vars->add(v= new cl_var("A", regs8, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("CC", regs8, 1, ""));
-  v->init();
-  
-  vars->add(v= new cl_var("X", regs16, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("Y", regs16, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("SP", regs16, 2, ""));
-  v->init();
+  vars->add("A",  regs8, 0, 7, 0, "Accumulator");
+  vars->add("CC", regs8, 1, 7, 0, "Condition Code Register");
+  vars->add("CC_C", regs8, 1, BITPOS_C, BITPOS_C, "Carry");
+  vars->add("CC_Z", regs8, 1, BITPOS_Z, BITPOS_Z, "Zero");
+  vars->add("CC_N", regs8, 1, BITPOS_N, BITPOS_N, "Negative");
+  vars->add("CC_I", regs8, 1, BITPOS_I, BITPOS_I, "Interrupt Mask");
+  vars->add("CC_H", regs8, 1, BITPOS_H, BITPOS_H, "Half Carry");
+
+  vars->add("X",  regs16, 0, 15, 0, "X Index Register");
+  vars->add("Y",  regs16, 1, 15, 0, "Y Index Register");
+  vars->add("SP", regs16, 2, 15, 0, "Stack Pointer");
 }
 
 

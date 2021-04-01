@@ -1087,6 +1087,11 @@ cl_app::mk_options(void)
   o->init();
   o->set_value("byellow:black");
   
+  options->new_option(o= new cl_string_option(this, "color_dump_label",
+					      "Label color in dump"));
+  o->init();
+  o->set_value((char*)"bgreen:black");
+
   options->new_option(o= new cl_string_option(this, "color_dump_number",
 					      "Value color in dump"));
   o->init();
@@ -1152,6 +1157,10 @@ cl_app::mk_options(void)
   o->init();
   o->set_value("white:red");
   
+  options->new_option(o= new cl_number_option(this, "label_width",
+					      "Space to allow for labels in dumps and disassembly (-1 for auto)"));
+  o->init();
+  o->set_value((long)-1);
 }
 
 

@@ -356,7 +356,7 @@ is_cdb_file(class cl_f *f)
 
   option_name=
 	prompt prompt_console command answer
-  	dump_address dump_number dump_char
+	dump_address dump_label dump_number dump_char
 
   col_opt=
 	B bold

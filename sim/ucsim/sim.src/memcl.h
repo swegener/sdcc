@@ -45,31 +45,12 @@ class cl_event_handler;
 // Cell flags
 enum cell_flag {
   CELL_NONE		= 0x00,
-  CELL_VAR		= 0x01, /* At least one variable points to it */
   CELL_INST		= 0x04,	/* Marked as instruction */
   CELL_FETCH_BRK	= 0x08,	/* Fetch breakpoint */
   CELL_READ_ONLY	= 0x10, /* Cell is readonly */
   CELL_NON_DECODED	= 0x40	/* Cell is not decoded (yet) */
 };
 
-enum dump_format {
-  // main formats
-  df_format	= 0x000f,
-  df_hex	= 0x0001,
-  df_string	= 0x0002,
-  df_ihex	= 0x0003,
-  df_binary	= 0x0004,
-  // modifiers
-  df_data_size	= 0x00f0,
-  df_1		= 0x0010,
-  df_2		= 0x0020,
-  df_4		= 0x0040,
-  df_8		= 0x0080,
-  // endianes
-  df_endian	= 0x0100,
-  df_little	= 0x0000,
-  df_big	= 0x0100,
-};
 
 #define CELL_GENERAL	(CELL_NORMAL|CELL_INST|CELL_FETCH_BRK)
 
@@ -111,14 +92,18 @@ public:
   virtual void err_inv_addr(t_addr addr);
   virtual void err_non_decoded(t_addr addr);
 
-  virtual t_addr dump(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
-  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
-  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
-  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
-  virtual t_addr dump(/*class cl_f *f*/class cl_console_base *con);
-  virtual t_addr dump(enum dump_format fmt,
-		      t_addr start, t_addr stop, int bpl,
-		      /*class cl_f *f*/class cl_console_base *con);
+  virtual t_addr dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_low, int bpl, class cl_console_base *con);
+  virtual t_addr dump(int smart, t_addr start, t_addr stop, int bpl, class cl_console_base *con) {
+    return dump(smart, start, stop, -1, -1, bpl, con);
+  }
+  virtual t_addr dump(t_addr addr, int bitnr_high, int bitnr_low, class cl_console_base *con) {
+    return dump(2, addr, addr, bitnr_high, bitnr_low, -1, con);
+  }
+  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
+  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
+  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
+  virtual t_addr dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con) { return dump(1, start, stop, bpl, con); }
+  //virtual t_addr dump(class cl_console_base *con) { return(dump(df_smart, -1, -1, -1, con)); }
   virtual bool search_next(bool case_sensitive,
 			   t_mem *array, int len, t_addr *addr);
 
@@ -423,13 +408,13 @@ class cl_address_space: public cl_memory
   virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
-class cl_address_space_list: public cl_list
+class cl_memory_list: public cl_list
 {
 protected:
   class cl_uc *uc;
 public:
-  cl_address_space_list(class cl_uc *the_uc);
-  virtual t_index add(class cl_address_space *mem);
+  cl_memory_list(class cl_uc *the_uc, const char *name);
+  virtual t_index add(class cl_memory *mem);
 };
 
 
@@ -487,6 +472,9 @@ public:
   virtual bool is_bander() { return false; }
 
   virtual bool activate(class cl_console_base *con);
+
+  t_addr as_to_chip(t_addr addr) { return addr - as_begin + chip_begin; }
+  t_addr chip_to_as(t_addr addr) { return addr - chip_begin + as_begin; }
 
   virtual bool fully_covered_by(t_addr begin, t_addr end);
   virtual bool is_in(t_addr begin, t_addr end);

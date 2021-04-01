@@ -9,8 +9,7 @@ Controller has 4 hardware element(s).
    on vcd[0]
    on dreg[0]
    on port[0]
-0x0000 cc b7 87 44 5c fd 44 8a 3a de 87 58 a1 8f ca ce ...D\.D.:..X....
-0x0010 a8 8f 15 fe db 79 ac fe 2b 85 20 44 7d 8d b9 49 .....y..+. D}..I
+0x0000[31:16]                      0b-------- 0x0000 '..'     0
 ITHSVNZC  SREG= 0x1b  27 .
 00011011  SP  = 0x0027ad
 X= 0x4420 [X]= 0x00   0 .  Y= 0x8d7d [Y]= 0x00   0 .  Z= 0x49b9 [Z]= 0x00   0 .

@@ -258,8 +258,8 @@ public:
   class cl_exec_hist *hist;
 
  public:
-  class cl_list *memchips;      // v3
-  class cl_address_space_list *address_spaces;
+  class cl_memory_list *memchips;      // v3
+  class cl_memory_list *address_spaces;
   class cl_address_space *rom;  // Required for almost every uc
   //class cl_list *address_decoders;
   class cl_address_space *variables;
@@ -395,23 +395,20 @@ public:
   virtual int longest_inst(void);
   virtual bool addr_name(t_addr addr, class cl_address_space *as, char *buf);
   virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr, char *buf);
+  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr_high, int bitnr_low, char *buf);
   virtual bool symbol2address(char *sym,
-			      class cl_address_space **as,
+			      class cl_memory **mem,
 			      t_addr *addr);
-  virtual char *symbolic_bit_name(t_addr bit_address,
-				  class cl_memory *mem,
-				  t_addr mem_addr,
-				  t_mem bit_mask);
   virtual name_entry *get_name_entry(struct name_entry tabl[],
 				     char *name);
-  virtual chars cell_name(class cl_memory_cell *cell);
-  virtual class cl_var *var(char *nam);
-  virtual class cl_var *var(chars n);
-  
+  virtual chars cell_name(class cl_memory_cell *cell, int bitnr_high, int bitnr_low);
+  virtual chars cell_name(class cl_memory_cell *cell) { return cell_name(cell, -1, -1); }
+
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
 					  t_addr *memaddr,
-					  t_mem *bitmask);
+					  int *bitnr_high,
+					  int *bitnr_low);
   virtual t_addr bit_address(class cl_memory *mem,
                              t_addr mem_address,
                              int bit_number) { return(-1); }

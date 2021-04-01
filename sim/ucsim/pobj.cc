@@ -340,7 +340,7 @@ cl_list::disconn_at(t_index index)
  */
 
 void
-cl_list::disconn(void *item)
+cl_list::disconn(const void *item)
 {
   t_index i;
 
@@ -522,7 +522,7 @@ cl_list::top(void)
  */
 
 t_index
-cl_list::index_of(void *item)
+cl_list::index_of(const void *item)
 {
   for (t_index i= 0; i < count; i++)
     if (item == Items[i])
@@ -532,7 +532,7 @@ cl_list::index_of(void *item)
 }
 
 bool
-cl_list::index_of(void *item, t_index *idx)
+cl_list::index_of(const void *item, t_index *idx)
 {
   for (t_index i= 0; i < count; i++)
     if (item == Items[i])
@@ -696,7 +696,7 @@ cl_sorted_list::key_of(const void *item) const
  */
 
 t_index
-cl_sorted_list::index_of(void *item)
+cl_sorted_list::index_of(const void *item)
 {
   t_index	i;
 

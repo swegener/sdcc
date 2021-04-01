@@ -103,35 +103,20 @@ cl_port::init(void)
   prev= cell_p->get();
   cell_in= cfg->get_cell(port_pin);
   cfg->set(port_value, prev & cell_in->get());
-  
-  cl_var *v;
+
   chars pn= chars("", "port%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port_on,
-			      cfg_help(port_on)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("pin"), cfg, port_pin,
-			      cfg_help(port_pin)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("pins"), cfg, port_pin,
-			      cfg_help(port_pin)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("value"), cfg, port_value,
-			      cfg_help(port_value)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("odr"), cfg, port_odr,
-			      cfg_help(port_odr)));
-  v->init();
+  uc->vars->add(pn+"on", cfg, port_on, cfg_help(port_on));
+  uc->vars->add(pn+"pin", cfg, port_pin, cfg_help(port_pin));
+  uc->vars->add(pn+"pins", cfg, port_pin, cfg_help(port_pin));
+  uc->vars->add(pn+"value", cfg, port_value, cfg_help(port_value));
+  uc->vars->add(pn+"odr", cfg, port_odr, cfg_help(port_odr));
 
   pn= chars("", "pin%d", id);
-  uc->vars->add(v= new cl_var(pn, cfg, port_pin,
-			      cfg_help(port_pin)));
-  v->init();
+  uc->vars->add(pn, cfg, port_pin, cfg_help(port_pin));
 
   pn= chars("", "pins%d", id);
-  uc->vars->add(v= new cl_var(pn, cfg, port_pin,
-			      cfg_help(port_pin)));
-  v->init();
-  
+  uc->vars->add(pn, cfg, port_pin, cfg_help(port_pin));
+
   return(0);
 }
 

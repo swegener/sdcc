@@ -113,7 +113,9 @@ public:
   virtual char *disass(t_addr addr, const char *sep);
   virtual void   print_regs(class cl_console_base *con);
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
-					  t_addr *memaddr, t_mem *bitmask);
+					  t_addr *memaddr,
+					  int *bitnr_high,
+					  int *bitnr_low);
   virtual t_addr bit_address(class cl_memory *mem,
 			     t_addr mem_address,
 			     int bit_number);

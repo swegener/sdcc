@@ -44,9 +44,9 @@ List of subcommands:
                    Set value of an option
 <b>set error</b> on|off|unset
                    Set value of an error
-<b>set memory</b> memory_type address data...
+<b>set memory</b> memory_type address data... or bitspec data
                    Place list of data into memory
-<b>set bit</b> addr 0|1   Set specified bit to 0 or 1
+<b>set bit</b> bitspec data   Set specified bit(s)
 <b>set hardware</b> cathegory params...
                    Set parameters of specified hardware element
 </pre>
@@ -61,9 +61,10 @@ List of subcommands:
 0.s51&gt; 
 </pre>
     <h4><a name="bit_type">Bit type</a></h4>
-    If parameter contains a dot (.) it is treated as bit specification. Part
-    before the dot gives memory address and part after the dot means bit number
-    in the specified data.
+    If a parameter contains a dot (.) or a colon contained in square brackets ([...:...])
+    it is treated as a bit specification. If there is a dot the part before the dot gives
+    the memory address and part after the dot gives the bit number. The bracketed form is
+    used to specify a range of bits.
     <pre>0&gt; <font color="green">dump <b>p1.1</b></font>
       P1.1 0x90 ff 1
 0&gt; <font color="green">dump <b>0x80.1</b></font>
@@ -126,14 +127,31 @@ Port0 11111111 0xff 255 . (Value on the port pins)
     Bits can be specified by several ways. One way is using bit type of command
     parameter:
     <pre>0&gt; <font color="green">dump 0.2</font>
-    0x00.2 0x00 00 0
+    0x00000.2               0
 0&gt; <font color="green">dump 0xc3.2</font>
-    0xc3.2 0xc3 00 0
-0&gt; <font color="green">dump p2.3</font>
-      P2.3 0xa0 ff 1
+    0x000c3.2               1
+0&gt; <font color="green">var a_reg rom[0x1000]</font>
+0&gt; <font color="green">dump a_reg[7:0]</font>
+      0x01000      a_reg           0b11110111 0xf7 '.' 247 ( -9)
+0&gt; <font color="green">dump a_reg[5:2]</font>
+      0x01000[5:2] a_reg[5:2]      0b--1101-- 0x0d '.'  13 ( -3)
+0&gt; <font color="green">var some_bits rom[0x1000][5:2]</font>
+0&gt; <font color="green">dump some_bits</font>
+      0x01000[5:2] some_bits       0b--1101-- 0x0d '.'  13 ( -3)
+0&gt; <font color="green">dump some_bits[4:3]</font>
+      0x01000[4:3] a_reg[4:3]      0b---10--- 0x02 '.'   2 ( -2)
 0&gt;
-</pre> In this way, any IRAM or SFR location can be addressed as the above
-    example shows.
+</pre>
+    <p>Note that in the above the <code>[4:3]</code> <em>overrides</em> the
+    <code>[5:2]</code> defined for the var and <code>some_bits[4:3]</code>means
+    bits 4 through 3 of the value stored at 0x1000. It does <em>not</em> mean
+    take the bits defined by the var and then take a subset of those bits.
+    Note also that the output does not tell us we are looking at <code>some_bit</code>
+    (because we're not) but since we have a var set for the address as a whole
+    it does tell us that we are looking at a subset of <code>a_reg</code>.</p>
+
+    <p>In this way, any IRAM or SFR location can be addressed as the above
+    example shows.</p>
     <p>Other way is using bit address either by value or by symbolic name: </p>
     <pre>0&gt; <font color="green">dump ea</font>
      IE0.7 0xa8 00 0

@@ -6,25 +6,103 @@
   <body style="background-color: white;">
     <h2>Dump commands of &#956;Csim</h2>
     <a name="dump">
-      <h3>dump <i>[/format] memory_type [start [end [bytes_per_line]]]</i> <br>
-        dump <i>bit_name...</i></h3>
-    </a> First form can be used get content of memory while second form can be
-    used to check value of bit or bits.
-    <blockquote> <a name="dump_memory">
-        <h4>dump <i>[/format] memory_type [start [end [bytes_per_line]]]</i></h4>
-      </a> Hexadecimal (or other specified format) dump of a memory region.
-      First parameter specifies memory. It can be name of an address space or a
-      chip, and can be checked using <a href="cmd_general.html#info_memory">info
-        memory</a> command which lists size and name of all available memories.
+      <h3>dump <i>[/format] memory_type [start [end [bytes_per_line]]]</i>
+        <br>
+        dump <i>bit...</i></h3>
+    </a>
+    The first form can be used get the contents of memory while the second form can be
+    used to check the value of one or more bits.
+    <blockquote>
+      <a name="dump_memory">
+        <h4>dump <i>[/format] memory_name [start [end
+            [bytes_per_line]]]</i></h4>
+      </a>
+      Dump a memory region.
+      <p>The optional <b>/format</b> specifies how memory is to be dumped.
+      <dl>
+        <dt><b>/b</b> - binary</dt>
+          <dd>Dumps raw binary data. The output MUST be redirected to a file.</dd>
+        <dt><b>/h</b> - hexadecimal</dt>
+          <dd>Dumps data in a tabular hexadecimal format with an accompanying
+              table of equivalent characters to the right.</dd>
+        <dt><b>/i</b> - ihex</dt>
+          <dd>Dumps data in ihex format.</dd>
+        <dt><b>/s</b> - string</dt>
+          <dd>Dumps a single, null terminated string starting at <b>start</b>.</dd>
+      </dl>
+      If no <b>format</b> is given dump uses a "smart" mode. This is like the
+      hexadecimal format except that where labels (vars that name an address)
+      are found they are shown between the address and data and where HW
+      registers (vars that name an address AND specify the full bit range)
+      are found that address is shown on a line of its own and the data is
+      given as binary, character, hex, unsigned decimal and, if the high bit
+      is set, signed decimal. Note that smart mode only applies if
+      <b>memory_name</b> is an address space since vars can only be set for
+      cells within an address space. If <b>memory_name</b> is a chip the
+      output is the same as hexadecimal (<b>/h</b>) output.
+      </p>
+      <p><b>memory_name</b> specifies
+      memory. It can be the name of an address space or a chip, and can be
+      checked using <a href="cmd_general.html#info_memory">info memory</a>
+      command which lists size and name of all available memories.
+      </p>
       <p><b>start</b> and <b>end</b> parameters can be used to specify the
         first and last address of the dumped region. If <b>end</b> is omitted
-        then 64 memory location is dumped. If both <b>start</b> and <b>end</b>
-        are omitted then next 64 memory location will be dumped out. Every time
-        when dump command is used the address of last dumped memory location is
-        stored and next dump command automatically continues at next address. </p>
-      <p>Last parameter can be used to specify how many memory locations should
-        be dumped out in one line. It is 8 by default. </p>
-      <pre>$ <font color="#118811">s51 remo.hex</font>
+        then 64 memory locations are dumped. If both <b>start</b> and <b>end</b>
+        are omitted then the next 64 memory locations will be dumped out. Every
+        time when dump command is used the address of the last dumped memory
+        location is stored and next dump command automatically continues at
+        the next address.
+      </p>
+      <p><b>bytes_per_line</b> can be used to specify how many memory locations
+        should be dumped out in one line. It is 8 by default.
+      </p>
+      <pre>$ <font color="#118811">s51</font>
+uCsim 0.6-pre34, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">dump regs</font>
+regs[0x0]      R0         0b00001000 0x08 '.'   8
+regs[0x1]      R1         0b01110000 0x70 'p' 112
+regs[0x2]      R2         0b11010100 0xd4 '.' 212 (212)
+regs[0x3]      R3         0b10110010 0xb2 '.' 178 (178)
+regs[0x4]      R4         0b10001010 0x8a '.' 138 (138)
+regs[0x5]      R5         0b00101001 0x29 ')'  41
+regs[0x6]      R6         0b01010100 0x54 'T'  84
+regs[0x7]      R7         0b01001000 0x48 'H'  72
+&gt; <font color="#118811">dump rom 0</font>
+0x0000            00 00 00 00 00 00 00 00 ........
+0x0008            00 00 00 00 00 00 00 00 ........
+0x0010            00 00 00 00 00 00 00 00 ........
+0x0018            00 00 00 00 00 00 00 00 ........
+0x0020            00 00 00 00 00 00 00 00 ........
+0x0028            00 00 00 00 00 00 00 00 ........
+0x0030            00 00 00 00 00 00 00 00 ........
+0x0038            00 00 00 00 00 00 00 00 ........
+0x0040            00 00 00 00 00 00 00 00 ........
+0x0048            00 00 00 00 00 00 00 00 ........
+&gt; <font color="#118811">var label1 rom 0x0016</font>
+&gt; <font color="#118811">var reg1 rom[0x0020][7:0]</font>
+&gt; <font color="#118811">var reg2 rom[0x0021][7:0]</font>
+&gt; <font color="#118811">dump rom 0</font>
+0x0000            00 00 00 00 00 00 00 00 ........
+0x0008            00 00 00 00 00 00 00 00 ........
+0x0010            00 00 00 00 00 00       ......
+0x0016 label1     00 00 00 00 00 00 00 00 ........
+0x001e            00 00                   ..
+0x0020 reg1       0b00000000 0x00 '.'   0
+0x0021 reg2       0b00000000 0x00 '.'   0
+0x0022            00 00 00 00 00 00 00 00 ........
+0x002a            00 00 00 00 00 00 00 00 ........
+0x0032            00 00 00 00 00 00 00 00 ........
+0x003a            00 00 00 00 00 00 00 00 ........
+0x0042            00 00 00 00 00 00 00 00 ........
+0x004a            00 00 00 00 00 00       ......
+&gt;
+</pre>
+
+      <pre>$ <font color="#118811">s51</font>
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it

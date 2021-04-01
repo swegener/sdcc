@@ -179,18 +179,19 @@ cl_hc08::make_memories(void)
   address_spaces->add(regs8);
   address_spaces->add(regs16);
 
-  class cl_var *v;
-  vars->add(v= new cl_var("A", regs8, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("P", regs8, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("H", regs8, 2, ""));
-  v->init();
-  vars->add(v= new cl_var("X", regs8, 3, ""));
-  v->init();
+  vars->add("A", regs8, 0, 7, 0, "Accumulator");
+  vars->add("P", regs8, 1, -1, -1, "Condition Code Register");
+  vars->add("CC", regs8, 1, -1, -1, "Condition Code Register");
+  vars->add("CC_C", regs8, 1, BITPOS_C, BITPOS_C, "Carry");
+  vars->add("CC_Z", regs8, 1, BITPOS_Z, BITPOS_Z, "Zero");
+  vars->add("CC_N", regs8, 1, BITPOS_N, BITPOS_N, "Negative");
+  vars->add("CC_I", regs8, 1, BITPOS_I, BITPOS_I, "Interrupt Mask");
+  vars->add("CC_H", regs8, 1, BITPOS_H, BITPOS_H, "Half Carry");
+  vars->add("CC_V", regs8, 1, BITPOS_V, BITPOS_V, "Two's Complement Overflow");
+  vars->add("H", regs8, 2, 7, 0, "H Index Register");
+  vars->add("X", regs8, 3, 7, 0, "X Index Register");
 
-  vars->add(v= new cl_var("SP", regs16, 0, ""));
-  v->init();
+  vars->add("SP", regs16, 0, 15, 0, "Stack Pointer");
 }
 
 

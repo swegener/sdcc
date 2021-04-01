@@ -43,14 +43,8 @@ cl_porto::init(void)
   cl_hw::init();
   dr= register_cell(uc->rom, addr);
   dr->decode((t_mem*)&value);
-  
-  cl_var *v;
-  chars s= chars();
-  s= get_name();
-  
-  v= new cl_var(s, uc->rom, addr, chars("", "Data register of %s", get_name()));
-  v->init();
-  uc->vars->add(v);
+
+  uc->vars->add(get_name(), uc->rom, addr, 31, 0, chars("", "Data register of %s", get_name()));
 
   cache= 0;
   
@@ -214,13 +208,7 @@ cl_porti::init(void)
 {
   cl_porto::init();
 
-  cl_var *v;
-  chars s= chars();
-  s= get_name();
-  s+= "_pins";
-  v= new cl_var(s, cfg, port_pin, cfg_help(port_pin));
-  v->init();
-  uc->vars->add(v);
+  uc->vars->add(chars("", "%s_pins", get_name()), cfg, port_pin, 31, 0, cfg_help(port_pin));
 
   return 0;
 }

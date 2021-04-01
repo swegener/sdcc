@@ -36,9 +36,6 @@ extern void set_set_help(class cl_cmd *cmd);
 // SET MEMORY
 COMMAND_ON(uc,cl_set_mem_cmd);
 
-// SET BIT
-COMMAND_ON(uc,cl_set_bit_cmd);
-
 // SET HW
 COMMAND_ON(uc,cl_set_hw_cmd);
 

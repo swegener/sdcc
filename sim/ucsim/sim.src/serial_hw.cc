@@ -185,29 +185,13 @@ cl_serial_hw::init(void)
   cfg_set(serconf_check_often, false);
   cfg_set(serconf_escape, 'x'-'a'+1);
 
-  cl_var *v;
-  chars pn= chars("", "%s%d_", id_string, id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on,
-			      cfg_help(serconf_on)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("check_often"), cfg, serconf_check_often,
-			      cfg_help(serconf_check_often)));
-  v->init();
-  uc->vars->add(v= new cl_var(pn+chars("esc_char"), cfg, serconf_escape,
-			      cfg_help(serconf_escape)));
-  v->init();
-
-  uc->vars->add(v= new cl_var(pn+chars("received_char"), cfg, serconf_received,
-			      cfg_help(serconf_received)));
-  v->init();
-		
-  uc->vars->add(v= new cl_var(pn+chars("flowctrl"), cfg, serconf_flowctrl,
-			      cfg_help(serconf_flowctrl)));
-  v->init();
-
-  uc->vars->add(v= new cl_var(pn+chars("able_receive"), cfg, serconf_able_receive,
-			      cfg_help(serconf_able_receive)));
-  v->init();
+  chars pn("", "%s%d_", id_string, id);
+  uc->vars->add(pn+"on", cfg, serconf_on, cfg_help(serconf_on));
+  uc->vars->add(pn+"check_often", cfg, serconf_check_often, cfg_help(serconf_check_often));
+  uc->vars->add(pn+"esc_char", cfg, serconf_escape, cfg_help(serconf_escape));
+  uc->vars->add(pn+"received_char", cfg, serconf_received, cfg_help(serconf_received));
+  uc->vars->add(pn+"flowctrl", cfg, serconf_flowctrl, cfg_help(serconf_flowctrl));
+  uc->vars->add(pn+"able_receive", cfg, serconf_able_receive, cfg_help(serconf_able_receive));
 
   cfg_set(serconf_able_receive, 1);
   return 0;

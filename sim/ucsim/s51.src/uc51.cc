@@ -1082,59 +1082,34 @@ cl_51core::decode_dptr(void)
       ad->activate(0);
     }
   
-  cl_var *v;
-  vars->add(v= new cl_var(chars("dpl"), dptr, 0, ""));
-  v->init();
-  vars->add(v= new cl_var(chars("DPL"), dptr, 0, ""));
-  v->init();
-  vars->add(v= new cl_var(chars("dph"), dptr, 1, ""));
-  v->init();
-  vars->add(v= new cl_var(chars("DPH"), dptr, 1, ""));
-  v->init();
+  vars->add("dpl", dptr, 0, 7, 0, "");
+  vars->add("DPL", dptr, 0, 7, 0, "");
+  vars->add("dph", dptr, 1, 7, 0, "");
+  vars->add("DPH", dptr, 1, 7, 0, "");
 }
 
 void
 cl_51core::make_vars(void)
 {
-  cl_var *v;
-
-  vars->add(v= new cl_var("R0", regs, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("R1", regs, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("R2", regs, 2, ""));
-  v->init();
-  vars->add(v= new cl_var("R3", regs, 3, ""));
-  v->init();
-  vars->add(v= new cl_var("R4", regs, 4, ""));
-  v->init();
-  vars->add(v= new cl_var("R5", regs, 5, ""));
-  v->init();
-  vars->add(v= new cl_var("R6", regs, 6, ""));
-  v->init();
-  vars->add(v= new cl_var("R7", regs, 7, ""));
-  v->init();
+  vars->add("R0", regs, 0, 7, 0, "");
+  vars->add("R1", regs, 1, 7, 0, "");
+  vars->add("R2", regs, 2, 7, 0, "");
+  vars->add("R3", regs, 3, 7, 0, "");
+  vars->add("R4", regs, 4, 7, 0, "");
+  vars->add("R5", regs, 5, 7, 0, "");
+  vars->add("R6", regs, 6, 7, 0, "");
+  vars->add("R7", regs, 7, 7, 0, "");
 
   int i;
   for (i= 0; sfr_tab51[i].name != NULL; i++)
     {
       if (type->type & sfr_tab51[i].cpu_type)
-	{
-	  vars->add(v= new cl_var(chars(sfr_tab51[i].name),
-				  sfr,
-				  sfr_tab51[i].addr, ""));
-	  v->init();
-	}
+        vars->add(sfr_tab51[i].name, sfr, sfr_tab51[i].addr, 7, 0, "");
     }
   for (i= 0; bit_tab51[i].name != NULL; i++)
     {
       if (type->type & bit_tab51[i].cpu_type)
-	{
-	  vars->add(v= new cl_var(chars(bit_tab51[i].name),
-				  bits,
-				  bit_tab51[i].addr, ""));
-	  v->init();
-	}
+        vars->add(bit_tab51[i].name, bits, bit_tab51[i].addr, 7, 0, "");
     }
 }
 
@@ -1281,8 +1256,10 @@ cl_51core::print_regs(class cl_console_base *con)
   // show regs
   start= psw->get() & 0x18;
   con->dd_color("answer");
-  con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n");
-  iram->dump(start, start+7, 8, con/*->get_fout()*/);
+  con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n    ");
+  for (t_addr i= 0; i < 8; i++)
+    con->dd_cprintf("dump_number", " %02x", iram->get(start + i));
+  con->dd_printf("\n");
   con->dd_color("answer");
   // show indirectly addressed IRAM and some basic regs
   data= iram->get(iram->get(start));
@@ -1297,13 +1274,17 @@ cl_51core::print_regs(class cl_console_base *con)
               (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
               (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
   /* show stack pointer */
-  start= sfr->get (SP);
+  start = sfr->get (SP);
   if (start >= 7)
     stop = start-7;
   else
     stop= 0;
-  con->dd_printf ("SP ");
-  iram->dump (start, stop, 8, con/*->get_fout()*/);
+  con->dd_printf ("SP ", start);
+  con->dd_cprintf("dump_address", iram->addr_format, start);
+  con->dd_printf (" ->");
+  for (; start >= stop; start--)
+    con->dd_cprintf("dump_number", " %02x", iram->get(start));
+  con->dd_printf("\n");
   con->dd_color("answer");
   // show DPTR(s)
   if (dptr)
@@ -1411,7 +1392,7 @@ cl_51core::print_regs(class cl_console_base *con)
  */
 
 class cl_address_space *
-cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
+cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, int *bitnr_high, int *bitnr_low)
 {
   class cl_address_space *m;
   t_addr ma;
@@ -1429,8 +1410,12 @@ cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
     }
   if (memaddr)
     *memaddr= ma;
-  if (bitmask)
-    *bitmask= 1 << (bitaddr & 0x7);
+  if (bitnr_low)
+    {
+      *bitnr_low= (bitaddr & 0x7);
+      if (bitnr_high)
+        *bitnr_high = *bitnr_low;
+    }
   return(m);
 }
 
@@ -2031,42 +2016,23 @@ cl_uc51_cpu::init(void)
   for (i= 0; i < 8; i++)
     acc_bits[i]= register_cell(bas, ACC+i);
 
+  uc->vars->add("cpu_aof_mdps", cfg, uc51cpu_aof_mdps, cfg_help(uc51cpu_aof_mdps));
+  uc->vars->add("cpu_mask_mdps", cfg, uc51cpu_mask_mdps, cfg_help(uc51cpu_mask_mdps));
+  uc->vars->add("cpu_aof_mdps1l", cfg, uc51cpu_aof_mdps1l, cfg_help(uc51cpu_aof_mdps1l));
+  uc->vars->add("cpu_aof_mdps1h", cfg, uc51cpu_aof_mdps1h, cfg_help(uc51cpu_aof_mdps1h));
+  uc->vars->add("cpu_aof_mdpc", cfg, uc51cpu_aof_mdpc, cfg_help(uc51cpu_aof_mdpc));
+  uc->vars->add("cpu_mask_mdpc", cfg, uc51cpu_mask_mdpc, cfg_help(uc51cpu_mask_mdpc));
+  uc->vars->add("cpu_mdp_mode", cfg, uc51cpu_mdp_mode, cfg_help(uc51cpu_mdp_mode));
   cl_var *v;
-  uc->vars->add(v= new cl_var("cpu_aof_mdps", cfg, uc51cpu_aof_mdps,
-			      cfg_help(uc51cpu_aof_mdps)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_mask_mdps", cfg, uc51cpu_mask_mdps,
-			      cfg_help(uc51cpu_mask_mdps)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_aof_mdps1l", cfg, uc51cpu_aof_mdps1l,
-			      cfg_help(uc51cpu_aof_mdps1l)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_aof_mdps1h", cfg, uc51cpu_aof_mdps1h,
-			      cfg_help(uc51cpu_aof_mdps1h)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_aof_mdpc", cfg, uc51cpu_aof_mdpc,
-			      cfg_help(uc51cpu_aof_mdpc)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_mask_mdpc", cfg, uc51cpu_mask_mdpc,
-			      cfg_help(uc51cpu_mask_mdpc)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_mdp_mode", cfg, uc51cpu_mdp_mode,
-			      cfg_help(uc51cpu_mdp_mode)));
-  v->init();
-  uc->vars->add(v= new cl_var("cpu_movxri_mode", cfg, uc51cpu_movxri_mode,
-			      cfg_help(uc51cpu_movxri_mode)));
-  v->init();
+  v = uc->vars->add("cpu_movxri_mode", cfg, uc51cpu_movxri_mode, cfg_help(uc51cpu_movxri_mode));
   v->write('m');
-  uc->vars->add(v= new cl_var("cpu_movxri_as", cfg, uc51cpu_movxri_as,
-			      cfg_help(uc51cpu_movxri_as)));
-  v->init();
+  v = uc->vars->add("cpu_movxri_as", cfg, uc51cpu_movxri_as, cfg_help(uc51cpu_movxri_as));
   v->write('s');
-  uc->vars->add(v= new cl_var("cpu_movxri_addr", cfg, uc51cpu_movxri_addr,
-			      cfg_help(uc51cpu_movxri_addr)));
-  v->init();
+  v = uc->vars->add("cpu_movxri_addr", cfg, uc51cpu_movxri_addr, cfg_help(uc51cpu_movxri_addr));
   v->write(0xa0);
 
   movxri_expr= "port2_odr";
+
   return(0);
 }
 

@@ -292,27 +292,16 @@ cl_m6809::make_memories(void)
   regs16->get_cell(3)->decode((t_mem*)&(reg.Y));
   regs16->get_cell(4)->decode((t_mem*)&(reg.acc.rD));
 
-  class cl_var *v;
-  
-  vars->add(v= new cl_var("A", regs8, 0, "CPU register A"));
-  v->init();
-  vars->add(v= new cl_var("B", regs8, 1, "CPU register B"));
-  v->init();
-  vars->add(v= new cl_var("DP", regs8, 2, "CPU register DP"));
-  v->init();
-  vars->add(v= new cl_var("CC", regs8, 3, "CPU register CC"));
-  v->init();
+  vars->add("A", regs8, 0, 7, 0, "CPU register A");
+  vars->add("B", regs8, 1, 7, 0, "CPU register B");
+  vars->add("DP", regs8, 2, 7, 0, "CPU register DP");
+  vars->add("CC", regs8, 3, 7, 0, "CPU register CC");
 
-  vars->add(v= new cl_var("U", regs16, 0, "CPU register U"));
-  v->init();
-  vars->add(v= new cl_var("S", regs16, 1, "CPU register S"));
-  v->init();
-  vars->add(v= new cl_var("X", regs16, 2, "CPU register X"));
-  v->init();
-  vars->add(v= new cl_var("Y", regs16, 3, "CPU register Y"));
-  v->init();
-  vars->add(v= new cl_var("D", regs16, 4, "CPU register D"));
-  v->init();
+  vars->add("U", regs16, 0, 15, 0, "CPU register U");
+  vars->add("S", regs16, 1, 15, 0, "CPU register S");
+  vars->add("X", regs16, 2, 15, 0, "CPU register X");
+  vars->add("Y", regs16, 3, 15, 0, "CPU register Y");
+  vars->add("D", regs16, 4, 15, 0, "CPU register D");
 }
 
 

@@ -97,8 +97,6 @@ cl_tlcs::cl_tlcs(class cl_sim *asim):
 int
 cl_tlcs::init(void)
 {
-  class cl_var *v;
-
   cl_uc::init(); /* Memories now exist */
   //ram= address_space(MEM_IRAM_ID);
   //rom= address_space(MEM_ROM_ID);
@@ -109,62 +107,51 @@ cl_tlcs::init(void)
     nas->set((t_addr) i, 0);
   }
 
-  vars->add(v= new cl_var("A", regs8, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("F", regs8, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("B", regs8, 2, ""));
-  v->init();
-  vars->add(v= new cl_var("C", regs8, 3, ""));
-  v->init();
-  vars->add(v= new cl_var("D", regs8, 4, ""));
-  v->init();
-  vars->add(v= new cl_var("E", regs8, 5, ""));
-  v->init();
-  vars->add(v= new cl_var("H", regs8, 6, ""));
-  v->init();
-  vars->add(v= new cl_var("L", regs8, 7, ""));
-  v->init();
+  vars->add("A", regs8, 0, 7, 0, "");
+  vars->add("F", regs8, 1, 7, 0, "");
+  vars->add("F_S", regs8, 1, 7, 7, "");
+  vars->add("F_Z", regs8, 1, 7, 7, "Zero");
+  vars->add("F_I", regs8, 1, 5, 5, "Interrupt Mask");
+  vars->add("F_H", regs8, 1, 4, 4, "Half Carry");
+  vars->add("F_X", regs8, 1, 3, 3, "");
+  vars->add("F_V", regs8, 1, 2, 2, "Overflow");
+  vars->add("F_N", regs8, 1, 1, 1, "Negative");
+  vars->add("F_C", regs8, 1, 0, 0, "Carry");
+  vars->add("B", regs8, 2, 7, 0, "");
+  vars->add("C", regs8, 3, 7, 0, "");
+  vars->add("D", regs8, 4, 7, 0, "");
+  vars->add("E", regs8, 5, 7, 0, "");
+  vars->add("H", regs8, 6, 7, 0, "");
+  vars->add("L", regs8, 7, 7, 0, "");
 
-  vars->add(v= new cl_var("ALT_A", regs8, 8, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_F", regs8, 9, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_B", regs8, 10, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_C", regs8, 11, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_D", regs8, 12, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_E", regs8, 13, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_H", regs8, 14, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_L", regs8, 15, ""));
-  v->init();
+  vars->add("ALT_A", regs8, 8, 7, 0, "");
+  vars->add("ALT_F", regs8, 9, 7, 0, "");
+  vars->add("ALT_F_S", regs8, 9, 7, 7, "");
+  vars->add("ALT_F_Z", regs8, 9, 7, 7, "Zero");
+  vars->add("ALT_F_I", regs8, 9, 5, 5, "Interrupt Mask");
+  vars->add("ALT_F_H", regs8, 9, 4, 4, "Half Carry");
+  vars->add("ALT_F_X", regs8, 9, 3, 3, "");
+  vars->add("ALT_F_V", regs8, 9, 2, 2, "Overflow");
+  vars->add("ALT_F_N", regs8, 9, 1, 1, "Negative");
+  vars->add("ALT_F_C", regs8, 9, 0, 0, "Carry");
+  vars->add("ALT_B", regs8, 10, 7, 0, "");
+  vars->add("ALT_C", regs8, 11, 7, 0, "");
+  vars->add("ALT_D", regs8, 12, 7, 0, "");
+  vars->add("ALT_E", regs8, 13, 7, 0, "");
+  vars->add("ALT_H", regs8, 14, 7, 0, "");
+  vars->add("ALT_L", regs8, 15, 7, 0, "");
 
-  vars->add(v= new cl_var("AF", regs16, 0, ""));
-  v->init();
-  vars->add(v= new cl_var("BC", regs16, 1, ""));
-  v->init();
-  vars->add(v= new cl_var("DE", regs16, 2, ""));
-  v->init();
-  vars->add(v= new cl_var("HL", regs16, 3, ""));
-  v->init();
-  vars->add(v= new cl_var("IX", regs16, 4, ""));
-  v->init();
-  vars->add(v= new cl_var("IY", regs16, 5, ""));
-  v->init();
-  vars->add(v= new cl_var("SP", regs16, 6, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_AF", regs16, 7, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_BC", regs16, 8, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_DE", regs16, 9, ""));
-  v->init();
-  vars->add(v= new cl_var("ALT_HL", regs16, 11, ""));
-  v->init();
+  vars->add("AF", regs16, 0, 15, 0, "");
+  vars->add("BC", regs16, 1, 15, 0, "");
+  vars->add("DE", regs16, 2, 15, 0, "");
+  vars->add("HL", regs16, 3, 15, 0, "");
+  vars->add("IX", regs16, 4, 15, 0, "");
+  vars->add("IY", regs16, 5, 15, 0, "");
+  vars->add("SP", regs16, 6, 15, 0, "");
+  vars->add("ALT_AF", regs16, 7, 15, 0, "");
+  vars->add("ALT_BC", regs16, 8, 15, 0, "");
+  vars->add("ALT_DE", regs16, 9, 15, 0, "");
+  vars->add("ALT_HL", regs16, 11, 15, 0, "");
 
   return(0);
 }

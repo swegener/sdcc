@@ -177,11 +177,8 @@ void cl_pdk::make_memories(void) {
     regs8->get_cell(io_size)->decode(&(regs._a));
   }
 
-  class cl_var *v;
-  vars->add(v = new cl_var("flag", regs8, 0, ""));
-  v->init();
-  vars->add(v = new cl_var("sp", regs8, 1, ""));
-  v->init();
+  vars->add("flag", regs8, 0, 7, 0, "Flags");
+  vars->add("sp", regs8, 1, 7, 0, "Stack Pointer");
 }
 
 /*

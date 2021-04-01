@@ -131,8 +131,8 @@ public:
     return (Items[index]);
   }
   class cl_base *object_at(t_index index);
-  virtual t_index  index_of(void *item);
-  virtual bool     index_of(void *item, t_index *idx);
+  virtual t_index  index_of(const void *item);
+  virtual bool     index_of(const void *item, t_index *idx);
   virtual void     *next(void *item);
   	  int	   get_count(void);
   virtual void     *pop(void);
@@ -144,7 +144,7 @@ public:
 	  void	   free_at(t_index index);
           void     free_all(void);
 	  void	   disconn_at(t_index index);
-	  void	   disconn(void *item);
+	  void	   disconn(const void *item);
 	  void	   disconn_all(void);
 
 	  void	   add_at(t_index index, void *item);
@@ -179,7 +179,7 @@ public:
   virtual ~cl_sorted_list(void);
   
   virtual bool	   search(const void *key, t_index& index);
-  virtual t_index  index_of(void *item);
+  virtual t_index  index_of(const void *item);
   virtual t_index  add(void *item);
   virtual const void *key_of(const void *item) const;
 private:

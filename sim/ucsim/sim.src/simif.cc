@@ -568,53 +568,22 @@ cl_simulator_interface::init(void)
   commands->add(c= new cl_sif_write(this));
   c->init();
 
-  cl_var *v;
-  uc->vars->add(v= new cl_var("simif_on", cfg, simif_on,
-			      cfg_help(simif_on)));
-  v->init();
+  uc->vars->add("simif_on", cfg, simif_on, cfg_help(simif_on));
   cfg_set(simif_on, 1);
-  uc->vars->add(v= new cl_var("sim_run", cfg, simif_run,
-			      cfg_help(simif_run)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_start", cfg, simif_start,
-			      cfg_help(simif_start)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_stop", cfg, simif_stop,
-			      cfg_help(simif_stop)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_quit", cfg, simif_quit,
-			      cfg_help(simif_quit)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_reason", cfg, simif_reason,
-			      cfg_help(simif_reason)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_xtal", cfg, simif_xtal,
-			      cfg_help(simif_xtal)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_ticks", cfg, simif_ticks,
-			      cfg_help(simif_ticks)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_isr_ticks", cfg, simif_isr_ticks,
-			      cfg_help(simif_isr_ticks)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_idle_ticks", cfg, simif_idle_ticks,
-			      cfg_help(simif_idle_ticks)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_real_time", cfg, simif_real_time,
-			      cfg_help(simif_real_time)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_vclk", cfg, simif_vclk,
-			      cfg_help(simif_vclk)));
-  v->init();
-  uc->vars->add(v= new cl_var("PC", cfg, simif_pc,
-			      cfg_help(simif_pc)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_print", cfg, simif_print,
-			      cfg_help(simif_print)));
-  v->init();
-  uc->vars->add(v= new cl_var("sim_write", cfg, simif_write,
-			      cfg_help(simif_write)));
-  v->init();
+  uc->vars->add("sim_run", cfg, simif_run, cfg_help(simif_run));
+  uc->vars->add("sim_start", cfg, simif_start, cfg_help(simif_start));
+  uc->vars->add("sim_stop", cfg, simif_stop, cfg_help(simif_stop));
+  uc->vars->add("sim_quit", cfg, simif_quit, cfg_help(simif_quit));
+  uc->vars->add("sim_reason", cfg, simif_reason, cfg_help(simif_reason));
+  uc->vars->add("sim_xtal", cfg, simif_xtal, cfg_help(simif_xtal));
+  uc->vars->add("sim_ticks", cfg, simif_ticks, cfg_help(simif_ticks));
+  uc->vars->add("sim_isr_ticks", cfg, simif_isr_ticks, cfg_help(simif_isr_ticks));
+  uc->vars->add("sim_idle_ticks", cfg, simif_idle_ticks, cfg_help(simif_idle_ticks));
+  uc->vars->add("sim_real_time", cfg, simif_real_time, cfg_help(simif_real_time));
+  uc->vars->add("sim_vclk", cfg, simif_vclk, cfg_help(simif_vclk));
+  uc->vars->add("PC", cfg, simif_pc, cfg_help(simif_pc));
+  uc->vars->add("sim_print", cfg, simif_print, cfg_help(simif_print));
+  uc->vars->add("sim_write", cfg, simif_write, cfg_help(simif_write));
 
   return(0);
 }

@@ -161,10 +161,17 @@ cl_cmdline::split(void)
           strncpy(param_str, start, i);
 	  param_str[i]= '\0';
 	  tokens->add(strdup(param_str));
-	  if ((dot= strchr(param_str, '.')) != NULL)
+	  if ((dot= strchr(param_str, '[')) != NULL)
+            {
+              char *p;
+              for (p= dot+1; *p && *p != ']' && *p != ':'; p++);
+              if (*p == ':')
+	        split_out_bit(dot, param_str);
+              else
+                split_out_array(dot, param_str);
+            }
+	  else if ((dot= strchr(param_str, '.')) != NULL)
 	    split_out_bit(dot, param_str);
-	  else if ((dot= strchr(param_str, '[')) != NULL)
-	    split_out_array(dot, param_str);
 	  else if (param_str[0] == '0' && param_str[1] == 'b')
             {
               long n= 0;
@@ -256,12 +263,68 @@ cl_cmdline::split_out_output_redirection(char **_start, char **_end)
 }
 
 void
+cl_cmdline::add_bit(char *dot, char *colon, class cl_cmd_arg *sfr)
+{
+  class cl_cmd_arg *bit_low = NULL, *bit_high = NULL;
+
+  if (colon)
+    {
+      *(colon++) = '\0';
+
+      char *end = strchr(colon, ']');
+
+      if (end)
+          *end = '\0';
+      else
+        {
+          con->dd_printf("Incomplete bit address\n");
+          delete sfr;
+          return;
+        }
+    }
+
+  if (*dot == '\0')
+    {
+      con->dd_printf("Incomplete bit address\n");
+      delete sfr;
+      return;
+    }
+
+  while (dot)
+    {
+      bit_high= bit_low;
+
+      if (strchr("0123456789", *dot) != NULL)
+       {
+         bit_low= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+         bit_low->init();
+       }
+      else
+       {
+         bit_low= new cl_cmd_sym_arg(dot);
+         bit_low->init();
+       }
+
+      dot= colon;
+      colon= NULL;
+    }
+
+  class cl_cmd_arg *arg;
+  params->add(arg= new cl_cmd_bit_arg(sfr, bit_low, bit_high));
+  arg->init();
+}
+
+void
 cl_cmdline::split_out_bit(char *dot, char *param_str)
 {
-  class cl_cmd_arg *sfr, *bit;
+  char *colon = NULL;
+  class cl_cmd_arg *sfr;
 
-  *dot= '\0';
-  dot++;
+  if (*dot == '[')
+    colon = strchr(dot+1, ':');
+
+  *(dot++) = '\0';
+
   if (strchr("0123456789", *param_str) != NULL)
     {
       sfr= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
@@ -272,28 +335,8 @@ cl_cmdline::split_out_bit(char *dot, char *param_str)
       sfr= new cl_cmd_sym_arg(param_str);
       sfr->init();
     }
-  if (*dot == '\0')
-    {
-      bit= 0;
-      con->dd_printf("Uncomplete bit address\n");
-      delete sfr;
-    }
-  else
-    {
-      if (strchr("0123456789", *dot) != NULL)
-       {
-         bit= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
-         bit->init();
-       }
-      else
-       {
-         bit= new cl_cmd_sym_arg(dot);
-         bit->init();
-       }
-      class cl_cmd_arg *arg;
-      params->add(arg= new cl_cmd_bit_arg(sfr, bit));
-      arg->init();
-    }
+
+  add_bit(dot, colon, sfr);
 }
 
 void
@@ -320,37 +363,40 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
     }
   else
     {
-      char *p;
-      p= dot + strlen(dot) - 1;
-      while (p > dot &&
-            *p != ']')
-       {
-         *p= '\0';
-         p--;
-       }
-      if (*p == ']')
-       *p= '\0';
-      if (strlen(dot) == 0)
-       {
-         con->dd_printf("Uncomplete array index\n");
-         delete aname;
-       }
-      else    
-       {
-         if (strchr("0123456789", *dot) != NULL)
-           {
-             aindex= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
-             aindex->init();
-           }
-         else
-           {
-             aindex= new cl_cmd_sym_arg(dot);
-             aindex->init();
-           }
-         class cl_cmd_arg *arg;
-         params->add(arg= new cl_cmd_array_arg(aname, aindex));
-         arg->init();
-       }
+      char *p = strchr(dot, ']');
+      if (!p)
+        {
+          con->dd_printf("Missing ']' in array index\n");
+          delete aname;
+        }
+      else
+        {
+          *(p++)= '\0';
+          if (strlen(dot) == 0)
+            {
+              con->dd_printf("Uncomplete array index\n");
+              delete aname;
+            }
+          else
+            {
+              if (strchr("0123456789", *dot) != NULL)
+                {
+                  aindex= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+                  aindex->init();
+                }
+              else
+                {
+                  aindex= new cl_cmd_sym_arg(dot);
+                  aindex->init();
+                }
+              class cl_cmd_arg *arg= new cl_cmd_array_arg(aname, aindex);
+              arg->init();
+              if (*p == '.' || *p == '[')
+                  add_bit(p+1, strchr(p+1, ':'), arg);
+              else
+                  params->add(arg);
+            }
+        }
     }
 }
 

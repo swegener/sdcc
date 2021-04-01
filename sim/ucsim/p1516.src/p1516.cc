@@ -193,12 +193,12 @@ cl_p1516::make_memories(void)
     }
   address_spaces->add(regs);
 
-  class cl_var *v;
+  chars n, d;
   for (i=0; i<16; i++)
     {
-      v= new cl_var(chars("", "R%d", i), regs, i, chars("", "CPU register %d",i));
-      v->init();
-      vars->add(v);
+      n.format("R%d", i);
+      d.format("CPU register %d", i);
+      vars->add(n, regs, i, 31, 0, d);
     }
 }
 

@@ -84,7 +84,10 @@ cl_uid::write(class cl_memory_cell *cell, t_mem *val)
 void
 cl_uid::print_info(class cl_console_base *con)
 {
-  uc->rom->dump(base, base+12, 16, con);
+  for (t_addr i = 0; i < 12; i++)
+    con->dd_cprintf("dump_number", "%02x ", uc->rom->get(base+i));
+  con->dd_printf("\n");
+
   //print_cfg_info(con);
 }
 

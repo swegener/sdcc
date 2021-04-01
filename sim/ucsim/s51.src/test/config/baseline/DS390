@@ -21,10 +21,10 @@ Controller has 15 hardware element(s).
    on timer2[2]
    on ds390hw[0]
      R0 R1 R2 R3 R4 R5 R6 R7
-0x00 00 00 00 00 00 00 00 00 ........
+     00 00 00 00 00 00 00 00
 @R0 00 .  ACC= 0x00   0 .  B= 0x00
 @R1 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
-SP 0x07 00 00 00 00 00 00 00 00 ........
+SP 0x07 -> 00 00 00 00 00 00 00 00
    DPTR= 0x0000 @DPTR= 0x00   0 .
  ? 0x00000 ff       MOV   R7,A[0K
 Memory chips:

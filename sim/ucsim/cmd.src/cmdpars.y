@@ -40,7 +40,7 @@ static void yyerror (const char *msg);
 %token <memory_object> PTOK_MEMORY_OBJECT
 %token <memory> PTOK_MEMORY
 %token <number> PTOK_NUMBER
-%token <bit> PTOK_BIT
+%token <bit> PTOK_BITS
 
 %type <number> ucsim_grammar expr
 %type <number> primary_expr postfix_expr
@@ -66,7 +66,7 @@ static void yyerror (const char *msg);
   struct {
     class cl_memory *memory;
     long mem_address, bit_address;
-    long mask;
+    int bitnr_high, bitnr_low;
   } bit;
 }
 
@@ -140,7 +140,12 @@ address_of_expression:
 primary_expr
 /*   : identifier      */
 : memory { $$= $1.memory->read($1.address); }
-| bit { $$= ($1.memory->read($1.mem_address) & $1.mask)?1:0; }
+| bit
+	{
+		t_mem mask = 0;
+		for (int i = $1.bitnr_low; i <= $1.bitnr_high; mask |= 1U << i++);
+		$$= ($1.memory->read($1.mem_address) & mask) >> $1.bitnr_low;
+	}
 | PTOK_NUMBER { $$= $1; }
      /*   | string_literal_val*/
 | PTOK_LEFT_PAREN expr PTOK_RIGHT_PAREN { $$= $2; }
@@ -355,18 +360,11 @@ assignment_expr
 	}
 | bit PTOK_EQUAL assignment_expr
 	{
-	  if ($3)
-	    {
-	      $1.memory->write($1.mem_address,
-			       $1.memory->read($1.mem_address) | $1.mask);
-	      $$= 1;
-	    }
-	  else
-	    {
-	      $1.memory->write($1.mem_address,
-			       $1.memory->read($1.mem_address) & ~($1.mask));
-	      $$= 0;
-	    }
+		t_mem mask = 0;
+		for (int i = $1.bitnr_low; i <= $1.bitnr_high; mask |= 1U << i++);
+		mask= ($1.memory->read($1.mem_address) & (~mask)) | (($3 & mask) << $1.bitnr_low);
+		$1.memory->write($1.mem_address, mask);
+		$$= mask;
 	}
 ;
 
@@ -398,16 +396,32 @@ memory:
 	  }
 
 bit:
-	  PTOK_BIT
+	  PTOK_BITS
 	| memory PTOK_DOT expr
 	  {
 	    $$.memory= $1.memory;
 	    $$.mem_address= $1.address;
-	    $$.mask= 1 << $3;
+	    $$.bitnr_low= $$.bitnr_high= $3;
 	    $$.bit_address= -1;
 	    class cl_uc *uc= application->get_uc();
 	    if (uc)
 	      $$.bit_address= uc->bit_address($1.memory, $1.address, $3);
+	  }
+	| memory PTOK_LEFT_BRACKET expr PTOK_COLON expr PTOK_RIGHT_BRACKET
+	  {
+	    $$.memory= $1.memory;
+	    $$.mem_address= $1.address;
+	    if ($3 < $5)
+	      {
+	        $$.bitnr_low= $3;
+	        $$.bitnr_high= $5;
+	      }
+	    else
+	      {
+	        $$.bitnr_low= $5;
+	        $$.bitnr_high= $3;
+	      }
+	    $$.bit_address= -1;
 	  }
 	;
 

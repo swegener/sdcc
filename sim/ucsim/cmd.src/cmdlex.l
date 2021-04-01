@@ -166,11 +166,10 @@ uc_yy_check_id(char *token)
 	}
       
       t_addr addr;
-      class cl_address_space *as;
       bool found;
-      if ((found= uc->symbol2address(yytext, &as, &addr)))
+      if ((found= uc->symbol2address(yytext, &mem, &addr)))
 	  {
-	      yylval.memory.memory= as;
+	      yylval.memory.memory= mem;
 	      yylval.memory.address= addr;
 	      return PTOK_MEMORY;
 	  }
@@ -187,12 +186,13 @@ uc_yy_check_id(char *token)
       if (found)
 	{
 	  t_addr memaddr;
-	  t_mem mask;
-	  yylval.bit.memory= uc->bit2mem(addr, &memaddr, &mask);
+	  int bitnr_low, bitnr_high;
+	  yylval.bit.memory= uc->bit2mem(addr, &memaddr, &bitnr_high, &bitnr_low);
 	  yylval.bit.mem_address = memaddr;
 	  yylval.bit.bit_address = addr;
-	  yylval.bit.mask = mask;
-	  return PTOK_BIT;
+	  yylval.bit.bitnr_high = bitnr_high;
+	  yylval.bit.bitnr_low = bitnr_low;
+	  return PTOK_BITS;
 	}
     }
 

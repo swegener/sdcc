@@ -2,6 +2,7 @@
 #include <stdio.h>
 //#include <stdint.h>
 #include <unistd.h>
+#include <string.h>
 #include "cmdlexcl.h"
 #include "cmdpars.hh"
 #include "cmdutil.h"

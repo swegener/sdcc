@@ -59,26 +59,36 @@ class cl_var: public cl_base
 };
 
 
-class cl_var_by_name_list final: public cl_sorted_list
+class cl_var_by_name_list: public cl_sorted_list
 {
  public:
   cl_var_by_name_list(): cl_sorted_list(10, 10, "symlist") {}
   ~cl_var_by_name_list(void);
 
-  const class cl_var *at(t_index index) { return static_cast<const cl_var *>(cl_sorted_list::at(index)); }
+  const class cl_var *at(t_index index)
+  {
+    const void *a= cl_sorted_list::at(index);
+    const class cl_var *v= (const class cl_var *)a;
+    return /*static_cast<const cl_var *>*/(v);
+  }
 
  private:
-  virtual const void *key_of(const void *item) const override final;
-  virtual int compare(const void *key1, const void *key2) override final;
+  virtual const void *key_of(const void *item) const;
+  virtual int compare(const void *key1, const void *key2);
 };
 
-class cl_var_by_addr_list final: public cl_sorted_list
+class cl_var_by_addr_list: public cl_sorted_list
 {
  public:
   cl_var_by_addr_list(): cl_sorted_list(10, 10, "symlist_by_addr") {}
   ~cl_var_by_addr_list(void);
 
-  const class cl_var *at(t_index index) { return static_cast<const cl_var *>(cl_sorted_list::at(index)); }
+  const class cl_var *at(t_index index)
+  {
+    const void *a= cl_sorted_list::at(index);
+    const class cl_var *v= (const class cl_var *)a;
+    return /*static_cast<const cl_var *>*/(v);
+  }
   bool search(const class cl_memory *mem, t_addr addr, t_index &index);
   bool search(const class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, t_index &index);
 
@@ -86,7 +96,7 @@ class cl_var_by_addr_list final: public cl_sorted_list
   int compare_addr(const class cl_var *var, const class cl_memory *mem, t_addr addr) const;
   int compare_addr_and_bits(const class cl_var *var, const class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low) const;
 
-  virtual int compare(const void *key1, const void *key2) override final;
+  virtual int compare(const void *key1, const void *key2);
 };
 
 struct var_def {
@@ -103,14 +113,14 @@ struct var_def {
 class cl_var_list: public cl_base
 {
  private:
-  int max_name_len = 0;
+  int max_name_len;
 
  public:
   class cl_var_by_name_list by_name;
   class cl_var_by_addr_list by_addr;
 
  public:
-  cl_var_list() {}
+  cl_var_list() {max_name_len = 0;}
 
   /*! \brief Add the given cl_var replacing any that already exist with the same name.
    */

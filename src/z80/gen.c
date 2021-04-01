@@ -3738,6 +3738,7 @@ skip_byte:
         {
           if (!regalloc_dry_run)
             emit2 ("ld %s, %d (sp)", _pairs[getPairId_o (result, roffset + i)].name, sp_offset);
+          spillPair (getPairId_o (result, roffset + i));
           cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 0);
           assigned[i] = true;
           assigned[i + 1] = true;
@@ -3750,6 +3751,7 @@ skip_byte:
         {
           if (!regalloc_dry_run)
             emit2 ("ld %s, %s", _pairs[getPairId_o (result, roffset + i)].name, aopGet (source, soffset + i, false));
+          spillPair (getPairId_o (result, roffset + i));
           cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 5);
           assigned[i] = true;
           assigned[i + 1] = true;
@@ -10723,7 +10725,6 @@ genSwap (iCode * ic)
           spOffset (left->aop->aopu.aop_stk) == 0 && isPairDead (PAIR_HL, ic) &&
           (!IS_GB || isPairDead(PAIR_DE, ic) || isPairDead(PAIR_BC, ic)))
         { /* result & left are top of stack and there are free register pairs */
-          emit2 ("; stack_exchange");
           if (IS_GB)
             {
               if (isPairDead(PAIR_DE, ic))

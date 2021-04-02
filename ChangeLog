@@ -1,5 +1,11 @@
 2021-04-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/z80.h,
+	  src/z80/ralloc2.cc:
+	  Remove infrastructure for reserving hl in register allocator.
+
+2021-04-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc.c,
 	  src/z80/gen.c:
 	  Remove old register allocator code from z80-related backends.

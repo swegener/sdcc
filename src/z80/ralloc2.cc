@@ -91,7 +91,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
 
               if(byteregs[0] == REG_A)
                 c -= 0.4f;
-              else if(OPTRALLOC_HL && byteregs[0] == REG_L)
+              else if(byteregs[0] == REG_L)
                 c -= 0.1f;
               else if((OPTRALLOC_IY && byteregs[0] == REG_IYL) || byteregs[0] == REG_IYH)
                 c += 0.1f;
@@ -1256,7 +1256,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   if(!Ainst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
-  if(OPTRALLOC_HL && !HLinst_ok(a, i, G, I))
+  if(!HLinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
   if(!DEinst_ok(a, i, G, I))
@@ -1375,8 +1375,7 @@ static bool assignment_hopeless(const assignment &a, unsigned short int i, const
   const i_assignment_t &ia = a.i_assignment;
 
   // Can only check for HLinst_ok() in some cases.
-  if(OPTRALLOC_HL &&
-      (ia.registers[REG_L][1] >= 0 && ia.registers[REG_H][1] >= 0) &&
+  if((ia.registers[REG_L][1] >= 0 && ia.registers[REG_H][1] >= 0) &&
       (ia.registers[REG_L][0] >= 0 && ia.registers[REG_H][0] >= 0) &&
       !HLinst_ok(a, i, G, I))
     return(true);
@@ -1403,7 +1402,7 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
         {
           varset_t::const_iterator vi, vi_end;
           for(vi = ai->local.begin(), vi_end = ai->local.end(); vi != vi_end; ++vi)
-            if(ai->global[*vi] == REG_A || OPTRALLOC_HL && (ai->global[*vi] == REG_H || ai->global[*vi] == REG_L) || OPTRALLOC_IY && (ai->global[*vi] == REG_IYH || ai->global[*vi] == REG_IYL))
+            if(ai->global[*vi] == REG_A || (ai->global[*vi] == REG_H || ai->global[*vi] == REG_L) || OPTRALLOC_IY && (ai->global[*vi] == REG_IYH || ai->global[*vi] == REG_IYL))
               goto too_risky;
           ai_best = ai;
         }
@@ -1427,8 +1426,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 
   c += weird_byte_order(a, I);
 
-  if(OPTRALLOC_HL &&
-     ia.registers[REG_L][1] >= 0 &&
+  if(ia.registers[REG_L][1] >= 0 &&
      ia.registers[REG_H][1] >= 0 &&
      ((ia.registers[REG_L][0] >= 0) == (ia.registers[REG_H][0] >= 0)) &&
      !HLinst_ok(a, i, G, I))
@@ -1437,7 +1435,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   if(ia.registers[REG_A][1] < 0)
     c += 0.03f;
 
-  if(OPTRALLOC_HL && ia.registers[REG_L][1] < 0)
+  if(ia.registers[REG_L][1] < 0)
     c += 0.02f;
 
   // Using IY is rarely a good choice, so discard the IY-users first when in doubt.

@@ -1,6 +1,11 @@
 2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c:
+	  Remove AOP, AOP_SIZE, AOP_TYPE macros.
+
+2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
 	  Fix possible errors caused by operands allocation.
 
 2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>

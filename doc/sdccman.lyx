@@ -2652,6 +2652,23 @@ In 4.0.3, _itoa, _uitoa, _ltoa, _ultoa were renamed to __itoa, __uitoa, __ltoa,
 In 4.1.1, typeof.h has been removed.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.3, support for -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-oldralloc has been removed for the z80-related backends.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -17890,71 +17907,6 @@ status collapsed
 \end_inset
 
 -fomit-frame-pointer.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--oldralloc
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--oldralloc
-\end_layout
-
-\end_inset
-
-
-\size large
- 
-\size default
-Use old register allocator.
- The old register allocator is typically is faster than the current one,
- but the current one generates better code.
- This differences are the most noticeable, when a high value for -
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--max-allocs-per-node is used.
 \end_layout
 
 \begin_layout Labeling

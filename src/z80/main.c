@@ -89,7 +89,7 @@ static OPTION _z80_options[] = {
   {0, OPTION_DATA_SEG,        &options.data_seg, "<name> use this name for the data segment", CLAT_STRING},
   {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.rel"},
   {0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY (incompatible with --fomit-frame-pointer)"},
-  {0, OPTION_OLDRALLOC,       &options.oldralloc, "Use old register allocator"},
+  {0, OPTION_OLDRALLOC,       &options.oldralloc, "Use old register allocator (deprecated)"},
   {0, OPTION_FRAMEPOINTER,    &z80_opts.noOmitFramePtr, "Do not omit frame pointer"},
   {0, OPTION_EMIT_EXTERNS,    NULL, "Emit externs list in generated asm"},
   {0, OPTION_LEGACY_BANKING,  &z80_opts.legacyBanking, "Use legacy method to call banked functions"},
@@ -659,7 +659,12 @@ _parseOptions (int *pargc, char **argv, int *i)
       else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
         {
           port->assembler.externGlobal = 1;
-          return TRUE;
+          return true;
+        }
+      else if (!strncmp (argv[*i], OPTION_OLDRALLOC, sizeof (OPTION_OLDRALLOC) - 1))
+        {
+          werror (W_DEPRECATED_OPTION, "--oldralloc");
+          return true;
         }
     }
   return FALSE;

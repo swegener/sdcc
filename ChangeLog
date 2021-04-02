@@ -1,3 +1,11 @@
+2021-04-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c,
+	  src/z80/ralloc.c,
+	  .version,
+	  doc/sdccman.lyx:
+	  Deprecate --oldralloc for z80-related backends.
+
 2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c:
@@ -30,7 +38,7 @@
 
 2021-03-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
-	* src/z80/peeph.def::
+	* src/z80/peeph.def:
 	  Add new rules for pushing and treating xor a like #0.
 
 2021-03-26 Philipp Klaus Krause <pkk AT spth.de>

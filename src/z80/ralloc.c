@@ -86,7 +86,7 @@ enum
 #define DISABLE_PACKREGSFORACCUSE       1
 
 // Build the old register allocator. It can be used by command-line options
-#define OLDRALLOC 1
+// #define OLDRALLOC 1
 
 /** Local static variables */
 static struct

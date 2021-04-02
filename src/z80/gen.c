@@ -6656,7 +6656,7 @@ genPlus (iCode * ic)
 
   // Avoid overwriting operand in h or l when setupToPreserveCarry () loads hl - only necessary if carry is actually used during addition.
   premoved = FALSE;
-  if (size > 1 && !(size == 2 && (isPair (leftop) && rightop->type == AOP_LIT)))
+  if (size > 1 && !(size == 2 && isPair (leftop) && (rightop->type == AOP_LIT || rightop->type == AOP_IY)))
     {
       if (!couldDestroyCarry (leftop) && (couldDestroyCarry (rightop) || couldDestroyCarry (AOP (IC_RESULT (ic)))))
         {

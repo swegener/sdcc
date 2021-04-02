@@ -3869,6 +3869,7 @@ static void
 genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool hl_dead_global, bool de_dead_global)
 {
   emitDebug ("; genMove_o");
+  wassert (result->size >= roffset + size);
 
   if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK)) // Todo: enable for source->type == AOP_EXSTK once implemented in genCopy().
     {
@@ -9445,9 +9446,26 @@ genOr (const iCode * ic, iCode * ifx)
   unsigned long long lit = 0;
   int bytelit = 0;
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
+  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+
+  if (result->aop->type == AOP_REG && left->aop->type != AOP_REG && right->aop->type != AOP_REG)
+    {
+      if (!requiresHL (right->aop) || (result->aop->regs[L_IDX] < 0 && result->aop->regs[H_IDX] < 0))
+        { /* only if not (right requires HL and result use HL) */
+          genMove (result->aop, left->aop,
+                   !bitVectBitValue (ic->rSurv, A_IDX),
+                   isPairDead (PAIR_HL, ic),
+                   isPairDead (PAIR_DE, ic) && right->aop->regs[D_IDX] < 0 && right->aop->regs[E_IDX] < 0);
+          left = result;
+        }
+    }
+
 
   bool pushed_a = false;
   bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= 0 && right->aop->regs[A_IDX] <= 0;
@@ -9722,9 +9740,9 @@ genOr (const iCode * ic, iCode * ifx)
     _pop (PAIR_AF);
 
 release:
-  freeAsmop (left, NULL);
-  freeAsmop (right, NULL);
-  freeAsmop (result, NULL);
+  freeAsmop (IC_LEFT (ic), NULL);
+  freeAsmop (IC_RIGHT (ic), NULL);
+  freeAsmop (IC_RESULT (ic), NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9995,7 +10013,7 @@ genXor (const iCode *ic, iCode *ifx)
 {
   aopOp (IC_LEFT (ic), ic, false, false);
   aopOp (IC_RIGHT (ic), ic, false, false);
-  aopOp (IC_RESULT (ic), ic, false, false);
+  aopOp (IC_RESULT (ic), ic, true, false);
   
   genEor (ic, ifx, IC_RESULT (ic)->aop, IC_LEFT (ic)->aop, IC_RIGHT (ic)->aop);
   
@@ -10030,10 +10048,11 @@ genRRC (const iCode * ic)
   operand *left, *result;
   bool pushed_a = bitVectBitValue (ic->rSurv, A_IDX);
   /* rotate right with carry */
+  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
 
   if (pushed_a)
     _push (PAIR_AF);
@@ -10087,6 +10106,7 @@ genRRC (const iCode * ic)
     }
   if (pushed_a)
     _pop (PAIR_AF);
+
   freeAsmop (IC_LEFT (ic), 0);
   freeAsmop (IC_RESULT (ic), 0);
 }
@@ -10100,10 +10120,11 @@ genRLC (const iCode * ic)
   operand *left, *result;
   bool pushed_a = bitVectBitValue (ic->rSurv, A_IDX);
   /* rotate left with carry */
+  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
 
   if (pushed_a)
     _push (PAIR_AF);
@@ -10153,8 +10174,10 @@ genRLC (const iCode * ic)
       emit3_o (A_RLA, 0, 0, 0, 0);
       aopPut (result->aop, "a", 0);
     }
+
   if (pushed_a)
     _pop (PAIR_AF);
+
   freeAsmop (IC_LEFT (ic), 0);
   freeAsmop (IC_RESULT (ic), 0);
 }
@@ -10173,7 +10196,7 @@ genGetByte (const iCode *ic)
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
+  aopOp (result, ic, TRUE, FALSE);
 
   offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
   genMove_o (result->aop, 0, left->aop, offset, 1, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
@@ -10197,7 +10220,7 @@ genGetWord (const iCode *ic)
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
+  aopOp (result, ic, TRUE, FALSE);
 
   offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
   genMove_o (result->aop, 0, left->aop, offset, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
@@ -10218,7 +10241,7 @@ genGetHbit (const iCode * ic)
   result = IC_RESULT (ic);
 
   aopOp (left, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
+  aopOp (result, ic, TRUE, FALSE);
 
   /* get the highest order byte into a */
   cheapMove (ASMOP_A, 0, left->aop, AOP_SIZE (left) - 1, true);
@@ -10255,7 +10278,7 @@ genGetAbit (const iCode * ic)
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
-  aopOp (result, ic, FALSE, FALSE);
+  aopOp (result, ic, TRUE, FALSE);
 
   shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
 

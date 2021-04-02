@@ -1,3 +1,13 @@
+2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  Fix possible errors caused by operands allocation.
+
+2021-04-02 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  Fix one of highlighted bugs by change from Apr 01.
+
 2021-04-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/z80.h,

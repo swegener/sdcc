@@ -64,7 +64,8 @@ AC_CHECK_PROGS(LEX, flex lex, :)
 dnl Don't use AC_PROG_YACC
 AC_CHECK_PROGS(YACC, 'bison -y' byacc yacc, :)
 
-AC_CHECK_PROGS(PYTHON, python3.6 python2.7 python2 python3, python)
+# 2.7 is just a guess for the minimum version. I know it works with 2.7 (and 3.6 and 3.9), but should test if a lower version is sufficient.
+AM_PATH_PYTHON([2.7],, [:])
 
 AC_DEFUN([SDCC_REQUIRE_PROG],
 [if test "$1" = ":"; then

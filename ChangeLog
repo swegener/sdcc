@@ -1,5 +1,18 @@
 2021-04-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/ez80_z80/crt0.s,
+	  device/lib/tlcs90/crt0.s,
+	  device/lib/z180/crt0.s,
+	  device/lib/z80/crt0.s,
+	  device/lib/z80n/crt0.s:
+	  Do default-initalization in crt0 to not rely on simulator zeroing memory.
+	* device/lib/gbz80/crt0.s:
+	  src/z80/main.c,
+	  .version:
+	  Improve explicit initialization.
+
+2021-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCClospre.cc:
 	  Fix bug #3207.
 

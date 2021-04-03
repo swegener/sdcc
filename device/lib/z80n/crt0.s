@@ -37,7 +37,6 @@
 	.org	0x08
 	ei
 	reti
-	ei
 	.org	0x10
 	ei
 	reti
@@ -96,6 +95,25 @@ _exit::
 
 	.area   _GSINIT
 gsinit::
+
+	; Default-initialized global variables.
+        ld      bc, #l__DATA
+        ld      a, b
+        or      a, c
+        jr      Z, zeroed_data
+        ld      hl, #s__DATA
+        ld      (hl), #0x00
+        dec     bc
+        ld      a, b
+        or      a, c
+        jr      Z, zeroed_data
+        ld      e, l
+        ld      d, h
+        inc     de
+        ldir
+zeroed_data:
+
+	; Explicitly initialized global variables.
 	ld	bc, #l__INITIALIZER
 	ld	a, b
 	or	a, c
@@ -103,6 +121,7 @@ gsinit::
 	ld	de, #s__INITIALIZED
 	ld	hl, #s__INITIALIZER
 	ldir
+
 gsinit_next:
 
 	.area   _GSFINAL

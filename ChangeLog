@@ -8,6 +8,8 @@
 	  Fix implicit initialization.
 	* src/z80/ralloc2.cc:
 	  Document frame pointer omission heuristic.
+	* support/regression/tests/bug-3205.c:
+	  Regression test for bug #3205.
 
 2021-04-03 Philipp Klaus Krause <pkk AT spth.de>
 

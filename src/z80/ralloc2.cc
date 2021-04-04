@@ -1591,6 +1591,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
 }
 
 // Omit the frame pointer for functions with low register pressure and few parameter accesses.
+// This is just a heuristic, including the magic value of 21. Many other, more complex heuristics have been tried, but didn't perform better for the regression tests.
 template <class G_t>
 static bool omit_frame_ptr(const G_t &G)
 {
@@ -1599,8 +1600,8 @@ static bool omit_frame_ptr(const G_t &G)
 
   if(options.omitFramePtr)
     return(true);
-    
-  signed char omitcost = -16;
+
+  signed char omitcost = -10; // Overhead for setting up frame pointer is 10 bytes of code
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     {
       if((int)G[i].alive.size() > port->num_regs - 4)
@@ -1609,6 +1610,7 @@ static bool omit_frame_ptr(const G_t &G)
       const iCode *const ic = G[i].ic;
       const operand *o;
       o = IC_RESULT(ic);
+      // Accesses without frame pointer, when using iy, tend to cost 6 bytes of overhead per variable (there is no difference in per-byte-specific costs).
       if(o && IS_SYMOP(o) && OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
         omitcost += 6;
       o = IC_LEFT(ic);
@@ -1618,7 +1620,7 @@ static bool omit_frame_ptr(const G_t &G)
       if(o && IS_SYMOP(o) && OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
         omitcost += 6;
 
-      if(omitcost > 14) // Chosen greater than zero, since the peephole optimizer often can optimize the use of iy into use of hl, reducing the cost.
+      if(omitcost > 20) // Chosen greater than zero, since the peephole optimizer often can optimize the use of iy into use of hl, reducing the cost.
         return(false);
     }
 

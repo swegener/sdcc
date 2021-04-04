@@ -6,6 +6,8 @@
 	  Avoid unecessary flush of cout.
 	* device/lib/tlcs90/crt0.s:
 	  Fix implicit initialization.
+	* src/z80/ralloc2.cc:
+	  Document frame pointer omission heuristic.
 
 2021-04-03 Philipp Klaus Krause <pkk AT spth.de>
 

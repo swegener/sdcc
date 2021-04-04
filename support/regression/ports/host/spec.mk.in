@@ -1,4 +1,8 @@
-# Port specification for compiling on the host machines version of gcc
+# Port specification for compiling on the host machines compiler
+
+# runtimeout in seconds
+RUN_TIMEOUT = 1
+
 SDCC = @CC@
 SDCCFLAGS = @CFLAGS@ @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
 SDLDFLAGS = @LDFLAGS@
@@ -18,9 +22,9 @@ INC_DIR = .
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 include $(srcdir)/fwk/lib/spec.mk
 
-%.out: %$(BINEXT)
+%.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$< > $@
+	-$(CASES_DIR)/timeout $(RUN_TIMEOUT) $< > $@
 	-grep -n FAIL $@ /dev/null || true
 
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB)

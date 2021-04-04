@@ -672,7 +672,6 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
         }
       inserter_t& operator++(int i)
         {
-          i;
           return(*this);
         }
       private:

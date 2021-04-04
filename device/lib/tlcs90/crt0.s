@@ -266,21 +266,6 @@ _astart:
 ;	set   1,(INTEL)		; rx
 
 	;call _boot1
-	
-	ld    hl, #s__DATA	; data start
-	ld    a, #0x00
-	
-clear_ram:
-	call  _wd_reset_asm
-
-	cp    hl, #0xFFC0	; io start, 160 bytes data
-	jr    z, zeroed_data
-	
-	ld    (hl),a
-	inc   hl
-
-	jr	clear_ram
-zeroed_data:
 
 	call  _wd_reset_asm
 

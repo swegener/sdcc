@@ -1,3 +1,10 @@
+2021-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20060110-volatile.c,
+	  support/regression/tests/stack-restore.c,
+	  support/regression/tests/swap_add.c:
+	  Improve stm8 peephole rule coverage, picked from patch #373 by Visenri.
+
 2021-04-07 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c:

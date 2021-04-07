@@ -1,3 +1,8 @@
+2021-04-07 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  isRegInUse renamed to isRegDead.
+
 2021-04-06 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/gen.c:

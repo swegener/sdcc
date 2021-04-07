@@ -1,3 +1,8 @@
+2021-04-06 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c:
+	  Make code more readable by adding isRegInUse.
+
 2021-04-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/ports/host/spec.mk.in:

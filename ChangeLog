@@ -5,6 +5,9 @@
 	  support/regression/tests/bitfields-checks.c,
 	  support/regression/tests/bitfields-dead-loop.c:
 	  Tests for bitfields at absolute addresses, picked from patch #373 by Visenri.
+	* src/z80/gen.c,
+	  support/regression/tests/bitwise8reg.c:
+	  Fix use of 16-bit bitwise instructions for 8-bit calculations.
 
 2021-04-07 Philipp Klaus Krause <pkk AT spth.de>
 

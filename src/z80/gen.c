@@ -9424,18 +9424,21 @@ genAnd (const iCode * ic, iCode * ifx)
       if (IS_RAB)
         {
           const bool this_byte_l = aopInReg (result->aop, i, L_IDX) &&
-            (aopInReg (left->aop, i, L_IDX) && aopInReg (left->aop, i, E_IDX) || aopInReg (left->aop, i, E_IDX) && aopInReg (left->aop, i, L_IDX));
+            (aopInReg (left->aop, i, L_IDX) && aopInReg (right->aop, i, E_IDX) || aopInReg (left->aop, i, E_IDX) && aopInReg (right->aop, i, L_IDX));
           const bool this_byte_h = aopInReg (result->aop, i, H_IDX) &&
-            (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i, D_IDX) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i, H_IDX));
+            (aopInReg (left->aop, i, H_IDX) && aopInReg (right->aop, i, D_IDX) || aopInReg (left->aop, i, D_IDX) && aopInReg (right->aop, i, H_IDX));
           const bool next_byte_l = aopInReg (result->aop, i + 1, L_IDX) &&
-            (aopInReg (left->aop, i + 1, L_IDX) && aopInReg (left->aop, i + 1, E_IDX) || aopInReg (left->aop, i + 1, E_IDX) && aopInReg (left->aop, i + 1, L_IDX));
+            (aopInReg (left->aop, i + 1, L_IDX) && aopInReg (right->aop, i + 1, E_IDX) || aopInReg (left->aop, i + 1, E_IDX) && aopInReg (right->aop, i + 1, L_IDX));
           const bool next_byte_h = aopInReg (result->aop, i + 1, H_IDX) &&
-            (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (left->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (left->aop, i + 1, H_IDX));
+            (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (right->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (right->aop, i + 1, H_IDX));
 
           const bool this_byte = this_byte_l || this_byte_h;
           const bool next_byte = next_byte_l || next_byte_h;
 
-          const bool next_byte_unused = !bitVectBitValue (ic->rMask, this_byte_l ? H_IDX : L_IDX);
+          const int next_byte_idx = this_byte_l ? H_IDX : L_IDX;
+          const bool next_byte_unused = isRegDead (next_byte_idx, ic) &&
+            left->aop->regs[next_byte_idx] <= i && right->aop->regs[next_byte_idx] <= i &&
+            (result->aop->regs[next_byte_idx] < 0 || result->aop->regs[next_byte_idx] >= i);
 
           if (this_byte && (next_byte || next_byte_unused))
             {
@@ -9710,18 +9713,21 @@ genOr (const iCode * ic, iCode * ifx)
       if (IS_RAB)
         {
           const bool this_byte_l = aopInReg (result->aop, i, L_IDX) &&
-            (aopInReg (left->aop, i, L_IDX) && aopInReg (left->aop, i, E_IDX) || aopInReg (left->aop, i, E_IDX) && aopInReg (left->aop, i, L_IDX));
+            (aopInReg (left->aop, i, L_IDX) && aopInReg (right->aop, i, E_IDX) || aopInReg (left->aop, i, E_IDX) && aopInReg (right->aop, i, L_IDX));
           const bool this_byte_h = aopInReg (result->aop, i, H_IDX) &&
-            (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i, D_IDX) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i, H_IDX));
+            (aopInReg (left->aop, i, H_IDX) && aopInReg (right->aop, i, D_IDX) || aopInReg (left->aop, i, D_IDX) && aopInReg (right->aop, i, H_IDX));
           const bool next_byte_l = aopInReg (result->aop, i + 1, L_IDX) &&
-            (aopInReg (left->aop, i + 1, L_IDX) && aopInReg (left->aop, i + 1, E_IDX) || aopInReg (left->aop, i + 1, E_IDX) && aopInReg (left->aop, i + 1, L_IDX));
+            (aopInReg (left->aop, i + 1, L_IDX) && aopInReg (right->aop, i + 1, E_IDX) || aopInReg (left->aop, i + 1, E_IDX) && aopInReg (right->aop, i + 1, L_IDX));
           const bool next_byte_h = aopInReg (result->aop, i + 1, H_IDX) &&
-            (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (left->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (left->aop, i + 1, H_IDX));
+            (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (right->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (right->aop, i + 1, H_IDX));
 
           const bool this_byte_hl = this_byte_l || this_byte_h;
           const bool next_byte_hl = next_byte_l || next_byte_h;
 
-          const bool next_byte_hl_unused = !bitVectBitValue (ic->rMask, this_byte_l ? H_IDX : L_IDX);
+          const int next_byte_hl_idx = this_byte_l ? H_IDX : L_IDX;
+          const bool next_byte_hl_unused = isRegDead (next_byte_hl_idx, ic) &&
+            left->aop->regs[next_byte_hl_idx] <= i && right->aop->regs[next_byte_hl_idx] <= i &&
+            (result->aop->regs[next_byte_hl_idx] < 0 || result->aop->regs[next_byte_hl_idx] >= i);
 
           if (this_byte_hl && (next_byte_hl || next_byte_hl_unused))
             {

@@ -1,3 +1,11 @@
+2021-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bitfields-bits1.c,
+	  support/regression/tests/bitfields-bits2.c,
+	  support/regression/tests/bitfields-checks.c,
+	  support/regression/tests/bitfields-dead-loop.c:
+	  Tests for bitfields at absolute addresses, picked from patch #373 by Visenri.
+
 2021-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20060110-volatile.c,

@@ -1594,6 +1594,44 @@ sameRegs (asmop * aop1, asmop * aop2)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopSame - two asmops refer to the same storage                  */
+/*-----------------------------------------------------------------*/
+static bool
+aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int size)
+{
+  if (aop1 == aop2 && offset1 == offset2)
+    return (true);
+
+  for(; size; size--, offset1++, offset2++)
+    {
+      if (offset1 >= aop1->size || offset2 >= aop2->size)
+        return (false);
+
+      if (aop1->type == AOP_REG && aop2->type == AOP_REG && // Same register
+        aop1->aopu.aop_reg[offset1]->rIdx == aop2->aopu.aop_reg[offset2]->rIdx)
+        continue;
+
+      if (aopOnStack (aop1, offset1, 1) && aopOnStack (aop2, offset2, 1) && !regalloc_dry_run && // Same stack location - stack locations might change after register allocation, so make no assumption during dry run.
+        aop1->aopu.aop_stk + offset1 == aop2->aopu.aop_stk + offset2)
+        continue;
+
+      if (aop1->type == AOP_LIT && aop2->type == AOP_LIT && // Same literal
+        byteOfVal (aop1->aopu.aop_lit, offset1) == byteOfVal (aop2->aopu.aop_lit, offset2))
+        continue;
+
+      // Same file-scope variable.
+      if ((aop1->type == AOP_DIR || aop1->type == AOP_HL || aop1->type == AOP_IY) &&
+        (aop2->type == AOP_DIR || aop2->type == AOP_HL || aop2->type == AOP_IY) &&
+        offset1 == offset2 && !strcmp(aop1->aopu.aop_dir, aop2->aopu.aop_dir))
+        return (true);
+  
+      return (false);
+    }
+
+  return (true);
+}
+
+/*-----------------------------------------------------------------*/
 /* aopOp - allocates an asmop for an operand  :                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -3938,6 +3976,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 {
   emitDebug ("; genMove_o");
   wassert (result->size >= roffset + size);
+  
+  if (aopSame (result, roffset, source, soffset, size))
+    return;
 
   if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK)) // Todo: enable for source->type == AOP_EXSTK once implemented in genCopy().
     {

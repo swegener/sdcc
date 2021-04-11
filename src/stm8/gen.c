@@ -300,6 +300,9 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
 {
   for(; size; size--, offset1++, offset2++)
     {
+      if (offset1 >= aop1->size || offset2 >= aop2->size)
+        return (false);
+
       if (aopRS (aop1) && aopRS (aop2) && // Same register
         aop1->aopu.bytes[offset1].in_reg && aop2->aopu.bytes[offset2].in_reg &&
         aop1->aopu.bytes[offset1].byteu.reg == aop2->aopu.bytes[offset2].byteu.reg)

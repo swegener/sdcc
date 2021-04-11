@@ -1,7 +1,7 @@
 2021-04-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve unsigned shift by 4.
+	  Improve unsigned shift by 4 and 5.
 
 2021-04-11 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -10471,15 +10471,27 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
         }
       return;
     }
-  else if (!IS_GB && !is_signed && aopSame (result->aop, offr, left->aop, offl, 2) && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) && shCount == 4 &&
+  else if (!IS_GB && !IS_RAB && !is_signed && aopSame (result->aop, offr, left->aop, offl, 2) && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
+    (shCount == 4 || shCount == 5) &&
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
       emit2 ("xor a, a");
       emit2 ("ld hl, !hashedstr+1", result->aop->aopu.aop_dir);
-      emit2 ("rrd");
+      regalloc_dry_run_cost += 4;
+      emit3 (A_RRD, 0, 0);
+      if (shCount == 5)
+        {
+          emit2 ("srl (hl)");
+          regalloc_dry_run_cost++;
+        }
       emit2 ("dec hl");
-      emit2 ("rrd");
-      regalloc_dry_run_cost += 9;
+      regalloc_dry_run_cost++;
+      emit3 (A_RRD, 0, 0);
+      if (shCount == 5)
+        {
+          emit2 ("rr (hl)");
+          regalloc_dry_run_cost++;
+        }
       return;
     }
   else if (IS_RAB && !is_signed && shCount >= 2 && isPairDead (PAIR_HL, ic) &&
@@ -10762,7 +10774,7 @@ genSwap (iCode * ic)
 
       if (IS_GB || IS_Z80N)
         emit3 (A_SWAP, shiftop, 0);
-      else if (result->aop->type == AOP_HL)
+      else if (!IS_GB && !IS_RAB && result->aop->type == AOP_HL)
         {
           if (left->aop->type != AOP_HL)
             cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
@@ -11021,7 +11033,7 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
           regalloc_dry_run_cost++;
         }
     }
-  else if (!IS_GB && aopSame (result->aop, offr, left->aop, offr, 1) && !offr && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
+  else if (!IS_GB && !IS_RAB && aopSame (result->aop, offr, left->aop, offr, 1) && !offr && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
       emit2 ("xor a, a");
@@ -11395,7 +11407,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
       emit2 ("mlt %s", _pairs[pair].name);
       regalloc_dry_run_cost += 4;
     }
-  else if (!IS_GB && !is_signed && aopSame (result->aop, 0, left->aop, 0, 1) && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
+  else if (!IS_GB && !IS_RAB && !is_signed && aopSame (result->aop, 0, left->aop, 0, 1) && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
       emit2 ("xor a, a");

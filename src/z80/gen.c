@@ -10471,6 +10471,17 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
         }
       return;
     }
+  else if (!IS_GB && !is_signed && aopSame (result->aop, offr, left->aop, offl, 2) && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) && shCount == 4 &&
+    (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+    {
+      emit2 ("xor a, a");
+      emit2 ("ld hl, !hashedstr+1", result->aop->aopu.aop_dir);
+      emit2 ("rrd");
+      emit2 ("dec hl");
+      emit2 ("rrd");
+      regalloc_dry_run_cost += 9;
+      return;
+    }
   else if (IS_RAB && !is_signed && shCount >= 2 && isPairDead (PAIR_HL, ic) &&
       ((isPair (left->aop) && getPairId (left->aop) == PAIR_HL || isPair (result->aop)
         && getPairId (result->aop) == PAIR_HL) && isPairDead (PAIR_DE, ic) || isPair (left->aop)
@@ -11010,6 +11021,14 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
           regalloc_dry_run_cost++;
         }
     }
+  else if (!IS_GB && aopSame (result->aop, offr, left->aop, offr, 1) && !offr && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
+    (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+    {
+      emit2 ("xor a, a");
+      emit2 ("ld hl, !hashedstr", result->aop->aopu.aop_dir);
+      emit2 ("rld");
+      regalloc_dry_run_cost += 6;
+    }
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
      in place using sla; when shifting by more than 2 shifting in
@@ -11375,6 +11394,14 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
       emit2 ("ld %s, !immed%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << (8 - shCount));
       emit2 ("mlt %s", _pairs[pair].name);
       regalloc_dry_run_cost += 4;
+    }
+  else if (!IS_GB && !is_signed && aopSame (result->aop, 0, left->aop, 0, 1) && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
+    (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+    {
+      emit2 ("xor a, a");
+      emit2 ("ld hl, !hashedstr", result->aop->aopu.aop_dir);
+      emit2 ("rrd");
+      regalloc_dry_run_cost += 6;
     }
   else if (!is_signed && // Shifting in the accumulator is cheap for unsigned operands.
     (aopInReg (result->aop, 0, A_IDX) ||

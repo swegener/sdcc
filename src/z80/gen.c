@@ -4141,6 +4141,8 @@ getDataSize (operand * op)
 static void
 adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
 {
+  if(n != 0)
+    emitDebug("; adjustStack by %d", n);
   _G.stack.pushed -= n;
 
   if (IS_TLCS90 && abs(n) > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) * 2: 1))
@@ -4183,8 +4185,8 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
 
   while (abs(n))
     {
-      if ((IS_RAB || IS_GB) && abs(n) > (optimize.codeSize ? 2 : 1))
-        {
+      if ((IS_RAB && abs(n) > (optimize.codeSize ? 2 : 1) ) || (IS_GB && abs(n) > 2))
+        { // on sm83 inc/dec is nicer for 2B because it touches no flags
           int d;
           if (n > 127)
             d = 127;
@@ -4196,25 +4198,26 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
           cost (2, IS_GB ? 16 : 4);
           n -= d;
         }
-      else if (n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+      // on sm83 pop is smaller and faster, but that makes detection of unitialized memory harder
+      else if (!IS_GB && n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop af");
           cost2 (1, 10, 9, 7, 12, 10, 3);
           n -= 2;
         }
-      else if (n <= -2 && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+      else if (!IS_GB && n <= -2 && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("push af");
           cost2 (1, 10, 11, 7, 12, 10, 3);
           n += 2;
         }
-      else if (n >= 2 && bc_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+      else if (!IS_GB && n >= 2 && bc_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop bc");
           cost2 (1, 10, 9, 7, 12, 10, 3);
           n -= 2;
         }
-      else if (n >= 2 && hl_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+      else if (!IS_GB && n >= 2 && hl_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop hl");
           cost2 (1, 10, 9, 7, 12, 10, 3);

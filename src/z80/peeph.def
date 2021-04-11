@@ -39,7 +39,7 @@ replace restart {
 	add	hl, %2
 } by {
 	; common peephole 2b removed add hl, %2 due to unused result.
-} if notUsed('hl' 'cf')
+} if notUsed('hl' 'cf' 'nf')
 
 replace restart {
 	%1	%2

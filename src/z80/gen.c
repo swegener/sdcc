@@ -13553,7 +13553,7 @@ genCast (const iCode *ic)
         _push (PAIR_AF), pushed_a = true;
 
       /* we need to extend the sign */
-      emit3 (A_RLA, 0, 0);
+      emit3 (A_RLCA, 0, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_A);
       while (size--)
         cheapMove (result->aop, offset++, ASMOP_A, 0, true);

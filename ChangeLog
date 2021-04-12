@@ -1,12 +1,16 @@
 2021-04-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* src/z80/gen.c:
+	  Get sign bit with rlca instead of rla to allow flag restricted ph rules.
+
+2021-04-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* sdas/asgb/gbpst.c,
 	  sdas/asgb/gbmch.c,
 	  sdas/asgb/gb.h,
 	  sdas/asxxsrc/asmain.c,
 	  sdas/asxxsrc/asxxxx.h:
 	  Backport .incbin and .tile for sm83 from ASXXXX 5.40
-
 
 2021-04-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

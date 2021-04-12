@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- *  Copyright (C) 1989-2012  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -520,7 +520,9 @@ struct  sym
 #define   O_TITLE    0          /* .title */
 #define   O_SBTTL    1          /* .sbttl */
 #define S_MODUL         5       /* .module */
-#define S_INCL          6       /* .include */
+#define	S_INCL		6	/* .include, .incbin */
+#define	  I_CODE     0		/* .include */
+#define	  I_BNRY     1		/* .incbin */
 #define S_AREA          7       /* .area */
 #define S_ATYP          8       /* .area type */
 #define S_ORG           11      /* .org */

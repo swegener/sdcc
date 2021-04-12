@@ -1,7 +1,7 @@
 /* gb.h */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -182,6 +182,7 @@
 #define S_LDHL	90	/* LDHL SP,offset */
 #define	S_LDA	91
 #define	S_STOP	83
+#define S_TILE	93	/* .TILE pseudo-op */
 
 struct adsym
 {

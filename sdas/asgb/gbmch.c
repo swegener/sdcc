@@ -1,7 +1,7 @@
 /* gbmch.c */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ struct mne *mp;
         int op, t1, t2;
         struct expr e1, e2;
         int rf, v1, v2;
+	int d,c,i,th,tl,oops; /* for dealing with .tile */
 
         clrexpr(&e1);
         clrexpr(&e2);
@@ -483,6 +484,116 @@ struct mne *mp;
                 aerr();
                 break;
 
+	case S_TILE:
+                /* Ported from ASXXXX 5.40 */
+		/* The .tile pseudo-op. It generates two bytes from
+		 * an 8-character ASCII string to represent a line of
+		 * pixels in a Gameboy character.
+		 */
+
+		/* Like .ASCII, the first character after .TILE is used
+		 * as the string delimiter. Get it.
+		 */
+
+		if ((d = getnb()) == '^') {
+		  d = get();
+		}
+		if(d == '\0' ) {
+		  //xerr('q', "TILE is a chunk of 8 characters."); 
+                  qerr();
+		}
+
+		/* .tile deals with chunks of 8 characters. We need to
+		 * generate an error if we get fewer than 8 characters in
+		 * chunk, so we have a modulo-8 counter to keep track of
+		 * how many characters we've processed. We also need to
+		 * generate an error if we see a character we don't 
+		 * recognize; this can be done either with a goto
+		 * or an 'oops' flag. Although I normally lean towards
+		 * goto implementations, since I didn't design _all_
+		 * of this code that would be ugly; so we need to
+		 * initialize the oops flag. We also need to initialize
+		 * the variables we'll be using to collect the bits.
+		 */
+
+		i = 0;
+		c = get(); /* Prime the pump */
+		th = 0;
+		tl = 0;
+		oops = 0;
+
+		/* Process characters until we find one we don't
+		 * understand, encounter the delimiter, or run into
+		 * the end of line.
+		 */
+
+		while( ( oops == 0 ) && ( c != d ) && ( c != 0 ) ) {
+
+		  th = th << 1;
+		  tl = tl << 1;
+
+		  switch( c ) {
+		    case ' ':
+		    case '0':
+		      break;
+		    case '.':
+		    case '1':
+		      tl++; 
+		      break;
+		    case '+':
+		    case '2':
+		      th++; 
+		      break;
+		    case '*':
+		    case '3':
+		      th++; 
+		      tl++; 
+		      break;
+		    default:  
+		      oops = 1;
+		      break;
+		  }
+
+		  c = get();
+		  i++;
+
+		  /* Spit out the tile data.
+		   */
+
+		  if( i == 8 ) {
+		    outab( tl );
+		    outab( th );
+		    i = 0;
+		    tl = 0;
+		    th = 0;
+		  }
+		}
+
+		/* Figure out whether we left the while loop early. If so,
+		 * complain.
+		 */
+
+		if( i != 0 ) {
+		  //xerr('a', "Invalid character or terminated without 8 characters.");
+                  aerr();
+		  break;
+		}
+
+		/* Make sure we have the delimiter next. This should
+		 * already have been fetched by the end of the while().
+		 * What this primarily buys us that the check for
+		 * the modulo-8 counter does not is detecting a string
+		 * which ended with an end-of-line rather than a
+		 * delimiter.
+		 */
+
+		if( c != d ) {
+		  //xerr('q', "Missing TILE terminator.");
+                  qerr();
+		  break;
+		}
+
+		break;
         default:
                 err('o');
                 break;

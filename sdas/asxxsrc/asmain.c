@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- *  Copyright (C) 1989-2012  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -751,7 +751,7 @@ asmbl(void)
         char *p;
         int d, uaf, uf;
         a_uint n, v;
-        int flags;
+        int skp, cnt, flags;
         FILE * fp;
         int m_type;
         /* sdas specific */
@@ -1380,34 +1380,101 @@ loop:
                 break;
 
         case S_INCL:
-                lmode = SLIST;
-                if (incfil > maxinc) {
-                        maxinc = incfil;
-                }
-                /*
-                 * Copy the .include file specification
-                 */
-                getdstr(fn, FILSPC + FILSPC);
-                /*
-                 * Open File
-                 */
-                if ((fp = search_path_fopen(fn, "r")) == NULL) {
-                        --incfil;
-                        err('i');
-                } else {
-                        asmi = (struct asmf *) new (sizeof (struct asmf));
-                        asmi->next = asmc;
-                        asmi->objtyp = T_INCL;
-                        asmi->line = srcline;
-                        asmi->flevel = flevel;
-                        asmi->tlevel = tlevel;
-                        asmi->lnlist = lnlist;
-                        asmi->fp = fp;
-                        asmi->afp = afptmp;
-                        strcpy(asmi->afn,afntmp);
-                        if (lnlist & LIST_PAG) {
-                                lop = NLPP;
+		switch(mp->m_valu) {
+		case I_CODE:
+                        lmode = SLIST;
+                        if (incfil > maxinc) {
+                                maxinc = incfil;
                         }
+                        /*
+                        * Copy the .include file specification
+                        */
+                        getdstr(fn, FILSPC + FILSPC);
+                        /*
+                        * Open File
+                        */
+                        if ((fp = search_path_fopen(fn, "r")) == NULL) {
+                                --incfil;
+                                err('i');
+                        } else {
+                                asmi = (struct asmf *) new (sizeof (struct asmf));
+                                asmi->next = asmc;
+                                asmi->objtyp = T_INCL;
+                                asmi->line = srcline;
+                                asmi->flevel = flevel;
+                                asmi->tlevel = tlevel;
+                                asmi->lnlist = lnlist;
+                                asmi->fp = fp;
+                                asmi->afp = afptmp;
+                                strcpy(asmi->afn,afntmp);
+                                if (lnlist & LIST_PAG) {
+                                        lop = NLPP;
+                                }
+                        }
+                        break;
+
+                case I_BNRY:
+                        /*
+                        * Copy the .incbin file specification
+                        */
+                        getdstr(fn, FILSPC + FILSPC);
+                        /* ported from ASXXXX 5.40 */
+                        /*
+                         * Skip Count
+                         */
+                        skp = 0;
+                        comma(0);
+                        if (more() && !comma(0))
+                                skp = (int) absexpr();
+                        /*
+                         * Insert Count
+                         */
+#ifdef	LONGINT
+                        cnt = 0x7FFFFFFFl;
+#else
+                        cnt = 0x7FFFFFFF;
+#endif
+                        comma(0);
+                        if (more())
+                                cnt = (int) absexpr();
+                        /*
+                         * Open File
+                         */
+                        if ((fp = fopen(fn, "rb")) == NULL) {
+                                //xerr('i', "File not found.");
+                                err('i');
+                                break;
+                        }
+                        /*
+                         * Skip To Position
+                         */
+                        fseek(fp, skp, SEEK_SET);
+                        if (fread(&c, 1, 1, fp) != 1) {
+                                //xerr('i', "Offset past End-Of-File.");
+                                err('i');
+                                break;
+                        }
+                        fseek(fp, skp, SEEK_SET);
+                        /*
+                         * Read Bytes
+                         */
+                        while (cnt > 0) {
+                                if (fread(&c, 1, 1, fp) == 1) {
+                                        outab(c);
+                                } else {
+                                        break;
+                                }
+                                cnt -= 1;
+                        }
+                        /*
+                         * Close File
+                         */
+                        fclose(fp);
+                        break;
+
+		default:
+                        err('i');
+			break;
                 }
                 break;
 

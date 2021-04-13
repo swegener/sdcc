@@ -1,3 +1,9 @@
+2021-04-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCbtree.h,
+	  src/SDCCbtree.cc:
+	  Use int consistently for block, patch by Oleg Endo.
+
 2021-04-13 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/gen.c:

@@ -24,10 +24,10 @@
 void btree_clear(void);
 
 // Add child as a sub-block of parent.
-void btree_add_child(short parent, short child);
+void btree_add_child(int parent, int child);
 
 // Gives the lowest common ancestor for blocks a and b.
-short btree_lowest_common_ancestor(short a, short b);
+int btree_lowest_common_ancestor(int a, int b);
 
 // Add symbol to block tree for allocation.
 void btree_add_symbol(struct symbol *s);

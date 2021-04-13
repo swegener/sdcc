@@ -57,7 +57,7 @@ void btree_clear(void)
   btree_clear_subtree(0);
 }
 
-void btree_add_child(short parent, short child)
+void btree_add_child(int parent, int child)
 {
 #ifdef BTREE_DEBUG
   std::cout << "Adding child " << child << " at parent " << parent << "\n"; std::cout.flush();
@@ -94,7 +94,7 @@ static btree_t::vertex_descriptor btree_lowest_common_ancestor_impl(btree_t::ver
   return(btree_lowest_common_ancestor(a, b));
 }
 
-short btree_lowest_common_ancestor(short a, short b)
+int btree_lowest_common_ancestor(int a, int b)
 {
   return(bmaprev[btree_lowest_common_ancestor_impl(bmap[a], bmap[b])]);
 }

@@ -1,3 +1,8 @@
+2021-04-13 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/gen.c:
+	  Overwrite A in genMove_o only if not source register.
+
 2021-04-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/gen.c:

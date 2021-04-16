@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: unspecified HC08
 Controller has 4 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on cpu[0]
 V--HINZC  Flags= 0x60  96 `  A= 0x00   0 .

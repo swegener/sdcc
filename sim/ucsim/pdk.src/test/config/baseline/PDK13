@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: pdk13
 Controller has 3 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
 A= 0x00(  0)
 Flag= 0x00(  0)  

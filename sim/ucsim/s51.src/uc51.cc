@@ -1754,8 +1754,6 @@ cl_51core::do_inst(int step)
       else
 	{
 	  // tick hw in idle state
-	  inst_ticks= 1;
-	  post_inst();
 	  tick(1);
 	}
 

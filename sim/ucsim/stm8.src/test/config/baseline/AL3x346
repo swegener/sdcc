@@ -7,7 +7,7 @@ Type of microcontroller: STM8 AL,L 31[346]x, 3L[46]x
 Controller has 21 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]

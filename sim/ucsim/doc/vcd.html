@@ -3,44 +3,157 @@
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-2">
     <title>&#956;Csim: VCD file dumper</title>
   </head>
-  <body>
-    <h1>VCD file dumper</h1>
-    <p>1. specify output file:<br>
-      <br>
-      0&gt; set hw vcd[0] file "name.vcd"<br>
-      <br>
-      2. add locations to dump (bits can not be dumped yet):<br>
-      <br>
-      0&gt; set hw vcd[0] add pc_odr<br>
-      0&gt; set hw vcd[0] add rom[0x500a]<br>
-      <br>
-      You can set the name of the module if you want (set hw vcd[0] module
-      name), it will be<br>
-      ucsim_vcd_0 by default.<br>
-      <br>
-      3. start recording:<br>
-      <br>
-      0&gt; set hw vcd[0] start<br>
-      <br>
-      4. run the program</p>
-    <p>5. you can suspend/resume recording:<br>
-      <br>
-      0&gt; set hw vcd[0] pause<br>
-      0&gt; set hw vcd[0] restart<br>
-      <br>
-      You can create an additional recorder with "set hw vcd[0] new id" and
-      setup it with "set<br>
-      hw vcd[id] ..." commands ("id" must be a number).<br>
-      <br>
-      6. stop recording and close the vcd file:<br>
-      <br>
-      0&gt; set hw vcd[0] stop<br>
-      <br>
-      After "stop", you have to specify a new file, because "start" overwrites
-      the old one!<br>
-      <br>
-      For examine, gtkwave can be used on linux/windows.<br>
-    </p>
-    <hr>
+  <body style="background-color: white;">
+    <h1>VCD file I/O</h1>
+
+      <p>Initially there is one vcd defined called "vcd[0]" (or just "vcd").
+      You can create an additional vcds with "set hw vcd[0] new <i>id</i>" and
+      configure it with "set hw vcd[<i>id</i>] ..." commands ("<i>id</i>" must
+      be an integer).</p>
+
+    <h2>Output (event logging)</h2>
+
+      <p>The vcd module creates VCD files compatible with industry standards and
+      readable with open source tools such as gtkwave and sigrok/pulseview.</p>
+      <p>(N.B. sigrok/pulseview only supports VCD files containing events that
+      are 1 bit wide only.)</p>
+
+      <ol>
+        <li>Specify output file<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] output "name.vcd"</font>
+          </pre>
+        </li>
+
+        <li>Add locations to dump<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] add pc_odr</font>
+          0&gt; <font color="#118811">set hw vcd[0] add rom[0x500a].3</font>
+          </pre>
+          You can set the name of the module if you want (set hw vcd[0] module
+          name), it will be ucsim_vcd_0 by default.<br>
+          <br>
+        </li>
+
+        <li>Check the configuration<br>
+          <pre>
+          0&gt; <font color="#118811">info hw vcd[0]</font>
+          vcd[0] value change dump
+            Modul:      ucsim_vcd_0
+            Started:    no
+            Paused:     no
+            File:       name.vcd
+            Mode:       output
+            Time scale: auto set on start
+            Start time: 0.000000000000000 s
+            Last event: 0.000000000000000 s
+            Simul time: 0.000000000000000 s
+            Variables:
+              Address           Symbol
+              rom[0x0500a][7:0] pc_odr
+              rom[0x0500a].3
+          </pre>
+        </li>
+
+        <li>Start recording<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] start</font>
+          </pre>
+        </li>
+
+        <li>Run the program<br>
+          <br>
+        </li>
+
+        <li>You can pause/resume recording<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] pause</font>
+          0&gt; <font color="#118811">set hw vcd[0] restart</font>
+          </pre>
+        </li>
+
+        <li>Stop recording and close the VCD file<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] stop</font>
+          </pre>
+        </li>
+      </ol>
+
+    <h2>Input (event replay)</h2>
+
+      <ol>
+        <li>Define any variables used by the input file<br>
+          <pre>
+          0&gt; <font color="#118811">var loc1 rom[0x5001]</font>
+          </pre>
+        </li>
+
+        <li>Specify input file<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] input "name.vcd"</font>
+          </pre>
+        </li>
+
+        <li>Start the replay<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] start</font>
+          <pre>
+        </li>
+
+        <li>Check the configuration<br>
+          N.B. The VCD file's header is only parsed when the vcd is started.
+          Until then the configuration details are unknown.<br>
+          <pre>
+          0&gt; <font color="#118811">info hw vcd[0]</font>
+          vcd[0] value change dump
+            Modul:      ucsim_vcd_0
+            Started:    YES
+            Paused:     no
+            File:       name.vcd
+            Mode:       input
+            Break:      disabled
+            Time scale: 1 ns
+            Start time: 0.000000000000000 s
+            Next event: 0.000000000000000 s
+            Simul time: 0.000000000000000 s
+            Variables:
+              Address           Symbol
+              rom[0x0500a]      pc_odr
+              rom[0x0500a].3
+          </pre>
+        </li>
+
+        <li>Run the program<br>
+          <br>
+        </li>
+
+        <li>Pause/resume replay<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] pause</font>
+          0&gt; <font color="#118811">set hw vcd[0] restart</font>
+          </pre>
+          <p>While the replay is paused any cycles used by the simulator
+          are ignored by vcd and do NOT advance you towards the next
+          event.</p>
+          <br>
+        </li>
+
+        <li>Toggle the break flag as required<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] break</font>
+          </pre>
+          <p>The break flag causes vcd to generate a break each an event
+          is replayed giving you the opportunity to check that your program
+          responds to it correctly.</p>
+          <br>
+        </li>
+
+        <li>Stop the replay and close the VCD file<br>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] stop</font>
+          </pre>
+        </li>
+      </ol>
+
   </body>
 </html>

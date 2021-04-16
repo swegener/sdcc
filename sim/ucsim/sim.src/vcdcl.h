@@ -31,33 +31,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hwcl.h"
 
 
+class cl_vcd_var;
+
 class cl_vcd: public cl_hw
 {
- protected:
-  class cl_list *locs;
-  bool started, paused;
-  class cl_f *fout;
-  bool change;
-  double change_time;
+ private:
+  char var_id;
+  char *filename;
+  FILE *fd;
+  class cl_vcd_var *vars;
+  double starttime, timescale, event;
+  int state;
+  bool started, paused, dobreak;
   chars modul;
+  char word[64];
+
  public:
   cl_vcd(class cl_uc *auc, int aid, chars aid_string);
+  int init(void);
 
-  virtual void add(class cl_memory_cell *cell);
-  virtual bool add(class cl_memory *m, t_addr a, class cl_console_base *con);
-  virtual void del(class cl_memory_cell *cell);
-  virtual bool del(class cl_memory *m, t_addr a, class cl_console_base *con);
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  inline bool is_running(void) const { return started && !paused; }
 
-  virtual t_mem read(class cl_memory_cell *cell);
-  virtual void write(class cl_memory_cell *cell, t_mem *val);
-  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
-  virtual const char *cfg_help(t_addr addr);
-  
-  virtual void report(class cl_memory_cell *cell, int nr);
-  virtual int tick(int cycles);
+  inline char get_next_var_id(void) { return var_id++; }
 
-  virtual void print_info(class cl_console_base *con);
+  void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+
+  int tick(int cycles);
+
+  void report(struct cl_vcd_var *var, t_mem v);
+  void print_info(class cl_console_base *con);
+
+ private:
+  inline void reset_next_var_id(void) { var_id = 33; }
+  void add_var(class cl_console_base *con, class cl_memory_cell *cell, int bitnr_low, int bitnr_high)
+    {
+      add_var(con, 0, cell, bitnr_low, bitnr_high);
+    }
+  void add_var(class cl_console_base *con, char id, class cl_memory_cell *cell, int bitnr_low, int bitnr_high);
+  void add_var(class cl_console_base *con, class cl_memory *m, t_addr a, int bitnr_low, int bitnr_high);
+  void del_var(class cl_console_base *con, class cl_memory_cell *cell, int bitnr_low, int bitnr_high);
+  void del_var(class cl_console_base *con, class cl_memory *m, t_addr a, int bitnr_low, int bitnr_high);
+
+  bool read_word(unsigned int i);
+  void clear_vars(void);
+  bool parse_header(cl_console_base *con);
 };
 
 

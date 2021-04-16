@@ -1268,19 +1268,12 @@ cl_memory_cell::wtoggle_bits(t_mem bits)
 void
 cl_memory_cell::append_operator(class cl_memory_operator *op)
 {
-  if (!operators)
-    operators= op;
-  else
-    {
-      class cl_memory_operator *o= operators, *n;
-      n= o->get_next();
-      while (n)
-	{
-	  o= n;
-	  n= o->get_next();
-	}
-      o->set_next(op);
-    }
+  class cl_memory_operator **op_p;
+
+  for (op_p = &operators; *op_p; op_p = &(*op_p)->next_operator)
+    ;
+  op->next_operator = NULL;
+  *op_p = op;
 }
 
 void
@@ -1288,58 +1281,52 @@ cl_memory_cell::prepend_operator(class cl_memory_operator *op)
 {
   if (op)
     {
-      op->set_next(operators);
-      operators= op;
+      op->next_operator = operators;
+      operators = op;
+    }
+}
+
+void
+cl_memory_cell::remove_operator(class cl_memory_operator *op)
+{
+  for (class cl_memory_operator **op_p = &operators; *op_p; op_p = &(*op_p)->next_operator)
+    {
+      if (*op_p == op)
+        {
+          *op_p = op->next_operator;
+          op->next_operator = NULL;
+          break;
+        }
     }
 }
 
 void
 cl_memory_cell::del_operator(class cl_brk *brk)
 {
-  if (!operators)
-    return;
-  class cl_memory_operator *op= operators;
-  if (operators->match(brk))
+  for (class cl_memory_operator **op_p = &operators; *op_p; op_p = &(*op_p)->next_operator)
     {
-      operators= op->get_next();
-      delete op;
-    }
-  else
-    {
-      while (op->get_next() &&
-	     !op->get_next()->match(brk))
-	op= op->get_next();
-      if (op->get_next())
-	{
-	  class cl_memory_operator *m= op->get_next();
-	  op->set_next(m->get_next());;
-	  delete m;
-	}
+      if ((*op_p)->match(brk))
+        {
+          class cl_memory_operator *old = *op_p;
+          *op_p = (*op_p)->next_operator;
+          delete old;
+          break;
+        }
     }
 }
 
 void 	 
 cl_memory_cell::del_operator(class cl_hw *hw)
 {
-  if (!operators)
-    return;
-  class cl_memory_operator *op= operators;
-  if (operators->match(hw))
+  for (class cl_memory_operator **op_p = &operators; *op_p; op_p = &(*op_p)->next_operator)
     {
-      operators= op->get_next();
-      delete op;
-    }
-  else
-    {
-      while (op->get_next() &&
-	     !op->get_next()->match(hw))
-	op= op->get_next();
-      if (op->get_next())
-	{
-	  class cl_memory_operator *m= op->get_next();
-	  op->set_next(m->get_next());
-	  delete m;
-	}
+      if ((*op_p)->match(hw))
+        {
+          class cl_memory_operator *old = *op_p;
+          *op_p = (*op_p)->next_operator;
+          delete old;
+          break;
+        }
     }
 }
 

@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: P1516
 Controller has 12 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on pa[0]
    on pb[0]

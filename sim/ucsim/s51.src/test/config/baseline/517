@@ -7,7 +7,7 @@ Type of microcontroller: 517 CMOS cmos
 Controller has 15 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on timer0[0]
    on timer1[1]
    on uart[0]

@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: unspecified XA
 Controller has 3 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
 CA---VNZ | R0:eb90 R1:612a R2:fbc2 R3:9ce2
 00---000 | R4:7658 R5:39b5 R6:4a63 SP:0100 ES:0000  DS:0000

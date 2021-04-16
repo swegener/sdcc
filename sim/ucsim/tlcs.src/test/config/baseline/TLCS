@@ -7,7 +7,7 @@ Type of microcontroller: unspecified TLCS
 Controller has 4 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
 SZIHXVNC  Flags= 0x00   0 .  A= 0x00   0 .
 00000000

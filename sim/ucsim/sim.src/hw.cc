@@ -85,14 +85,17 @@ cl_hw::init(void)
   n+= s;
   n+= "_cfg";
 
-  cfg= new cl_address_space(n, 0, cfg_size(), sizeof(t_mem)*8);
-  cfg->init();
-  cfg->hidden= true;
-  uc->address_spaces->add(cfg);
-
-  for (i= 0; i < cfg_size(); i++)
+  if (cfg_size())
     {
-      cfg->register_hw(i, this, false);
+      cfg= new cl_address_space(n, 0, cfg_size(), sizeof(t_mem)*8);
+      cfg->init();
+      cfg->hidden= true;
+      uc->address_spaces->add(cfg);
+
+      for (i= 0; i < cfg_size(); i++)
+        {
+          cfg->register_hw(i, this, false);
+        }
     }
 
   cache_run= -1;
@@ -146,7 +149,7 @@ bool
 cl_hw::conf(class cl_memory_cell *cell, t_mem *val)
 {
   t_addr a;
-  if (cfg->is_owned(cell, &a))
+  if (cfg && cfg->is_owned(cell, &a))
     {
       conf_op(cell, a, val);
       if (val)
@@ -502,9 +505,9 @@ cl_hw::print_cfg_info(class cl_console_base *con)
 {
   t_mem v;
   t_addr a, s, e;
-  con->dd_printf("Configuration memory of %s\n", get_name());
   if (cfg)
-    {      
+    {
+      con->dd_printf("Configuration memory of %s\n", get_name());
       s= cfg->get_start_address();
       e= s + cfg->get_size()-1;
       for (a= s; a <= e; a++)

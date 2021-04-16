@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: unspecified AVR
 Controller has 4 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on port[0]
 0x0000[31:16]                      0b-------- 0x0000 '..'     0

@@ -6,7 +6,7 @@ ucsim version 0.6-pre68
 Type of microcontroller: M6809
 Controller has 9 hardware element(s).
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on irq[0]
    on uart[0]

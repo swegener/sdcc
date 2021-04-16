@@ -2186,12 +2186,15 @@ cl_uc::tick_hw(int cycles)
   int i;//, cpc= clock_per_cycle();
 
   // tick hws
-  for (i= 0; i < hws->count; i++)
+  while (cycles-- > 0)
     {
-      hw= (class cl_hw *)(hws->at(i));
-      if ((hw->flags & HWF_INSIDE) &&
-	  (hw->on))
-	hw->tick(cycles);
+      for (i= 0; i < hws->count; i++)
+        {
+          hw= (class cl_hw *)(hws->at(i));
+          if ((hw->flags & HWF_INSIDE) &&
+              (hw->on))
+            hw->tick(1);
+        }
     }
   do_extra_hw(cycles);
   return(0);
@@ -2225,8 +2228,7 @@ cl_uc::tick(int cycles)
 	}
     }
 
-  // tick for hardwares
-  inst_ticks+= cycles;
+  tick_hw(cycles);
   return(0);
 }
 
@@ -2393,7 +2395,6 @@ cl_uc::do_inst(int step)
 	}
       else
 	{
-	  inst_ticks= 1;
 	  post_inst();
 	  tick(1);
 	}
@@ -2431,7 +2432,6 @@ void
 cl_uc::pre_inst(void)
 {
   inst_exec= true;
-  inst_ticks= 0;
   events->disconn_all();
   vc.inst++;
 }
@@ -2470,7 +2470,6 @@ cl_uc::exec_inst_tab(instruction_wrapper_fn itab[])
 void
 cl_uc::post_inst(void)
 {
-  tick_hw(inst_ticks);
   if (errors->count)
     check_errors();
   if (events->count)

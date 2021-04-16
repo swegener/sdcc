@@ -7,7 +7,7 @@ Type of microcontroller: GB80
 Controller has 3 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
 ZNHC---  Flags= 0x00   0 .  A= 0x00   0 .
 00000000
 BC= 0x0000 [BC]= 00   0 .  DE= 0x0000 [DE]= 00   0 .  HL= 0x0000 [HL]= 00   0 .

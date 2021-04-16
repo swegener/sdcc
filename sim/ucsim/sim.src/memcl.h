@@ -131,8 +131,7 @@ class cl_banker;
 
 class cl_memory_operator: public cl_base
 {
-protected:
-  //t_addr address;
+public:
   t_mem mask;
   class cl_memory_operator *next_operator;
   class cl_memory_cell *cell;
@@ -281,6 +280,7 @@ class cl_memory_cell: public cl_cell_data
   
   virtual void append_operator(class cl_memory_operator *op);
   virtual void prepend_operator(class cl_memory_operator *op);
+  virtual void remove_operator(class cl_memory_operator *op);
   virtual void del_operator(class cl_brk *brk);
   virtual void del_operator(class cl_hw *hw);
   virtual class cl_banker *get_banker(void);

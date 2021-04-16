@@ -35,6 +35,7 @@ DIFF_COLOUR ?= $(if $(findstring --jobserver, $(MAKEFLAGS)),always,auto)
 DIFF_OPTS += -I '^uCsim [^,]*, Copyright '
 DIFF_OPTS += -I '^ucsim version '
 DIFF_OPTS += -I '^Simulated [[:digit:]]\+ ticks '
+DIFF_OPTS += -I '^Host usage: '
 DIFF_OPTS += -I '[[:upper:]][[:alpha:]]\{2\} [[:upper:]][[:alpha:]]\{2\} .[[:digit:]] [[:digit:]]\{2\}:[[:digit:]]\{2\}:[[:digit:]]\{2\} [[:digit:]]\{4\}'
 
 

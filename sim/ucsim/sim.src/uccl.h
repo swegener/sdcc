@@ -241,7 +241,6 @@ public:
   class cl_ticker *isr_ticks;	// Time in ISRs
   class cl_ticker *idle_ticks;	// Time in idle mode
   class cl_list *counters;	// User definable timers (tickers)
-  int inst_ticks;		// ticks of an instruction
   double xtal;			// Clock speed
   struct vcounter_t vc;		// Virtual clk counter
   bool stop_selfjump;		// Whether it should stop on selfjump

@@ -154,6 +154,18 @@ if test $enable_m6809_port  != "no"; then
     enable_m6809_port="yes"
 fi,
 enable_m6809_port="yes")
+AC_ARG_ENABLE(m6800-port,
+[  --enable-m6800-port     compile simulator for m6800],
+if test $enable_m6800_port  != "no"; then
+    enable_m6800_port="yes"
+fi,
+enable_m6800_port="yes")
+AC_ARG_ENABLE(mcs6502-port,
+[  --enable-mcs6502-port     compile simulator for mcs6502],
+if test $enable_mcs6502_port  != "no"; then
+    enable_mcs6502_port="yes"
+fi,
+enable_mcs6502_port="yes")
 AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -179,6 +191,8 @@ AC_SUBST(enable_st7_port)
 AC_SUBST(enable_pdk_port)
 AC_SUBST(enable_p1516_port)
 AC_SUBST(enable_m6809_port)
+AC_SUBST(enable_m6800_port)
+AC_SUBST(enable_mcs6502_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -724,6 +738,8 @@ sim.src/Makefile   sim.src/test/Makefile
 avr.src/Makefile   avr.src/test/Makefile
 hc08.src/Makefile  hc08.src/test/Makefile
 m6809.src/Makefile m6809.src/test/Makefile
+m6800.src/Makefile m6800.src/test/Makefile
+mcs6502.src/Makefile mcs6502.src/test/Makefile
 p1516.src/Makefile p1516.src/test/Makefile
 pdk.src/Makefile   pdk.src/test/Makefile
 s51.src/Makefile   s51.src/test/Makefile

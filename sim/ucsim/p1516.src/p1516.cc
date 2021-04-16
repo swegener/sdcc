@@ -131,6 +131,7 @@ cl_p1516::mk_hw_elements(void)
   d.keyset = NULL;
   d.basx   = 15;
   d.basy   = 14;
+  u->add_port(&d, 2);
   uo->add_port(&d, 2);
 
   d.set_name("PD");
@@ -139,6 +140,7 @@ cl_p1516::mk_hw_elements(void)
   d.keyset = NULL;
   d.basx   = 15;
   d.basy   = 19;
+  u->add_port(&d, 3);
   uo->add_port(&d, 3);
 
   d.set_name("PI");
@@ -146,8 +148,8 @@ cl_p1516::mk_hw_elements(void)
   d.cell_in= pi->cfg_cell(port_pin);
   d.keyset = chars("                qwertyui12345678");
   d.basx   = 15;
-  d.basy   = 15;
-  u->add_port(&d, 2);
+  d.basy   = 24;
+  u->add_port(&d, 4);
   d.basy   = 4;
   ui->add_port(&d, 0);
 
@@ -156,8 +158,8 @@ cl_p1516::mk_hw_elements(void)
   d.cell_in= pj->cfg_cell(port_pin);
   d.keyset = chars("                asdfghjkzxcvbnm,");
   d.basx   = 15;
-  d.basy   = 20;
-  u->add_port(&d, 3);
+  d.basy   = 29;
+  u->add_port(&d, 5);
   d.basy   = 10;
   ui->add_port(&d, 1);
 }

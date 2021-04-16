@@ -149,7 +149,7 @@ cl_var_by_addr_list::compare_addr(const class cl_var *var, const class cl_memory
 {
   int ret;
 
-  if (!(ret = var->mem - mem))
+  if (!(ret = strcmp(var->mem->get_name(), mem->get_name())))
     ret = var->addr - addr;
 
   return ret;
@@ -160,7 +160,7 @@ cl_var_by_addr_list::compare_addr_and_bits(const class cl_var *var, const class 
 {
   int ret;
 
-  if (!(ret = var->mem - mem) &&
+  if (!(ret = strcmp(var->mem->get_name(), mem->get_name())) &&
      !(ret = var->addr - addr) &&
      (!(ret = (var->bitnr_high < 0
                ? (bitnr_high < 0 ? 0 : -1)

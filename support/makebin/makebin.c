@@ -91,6 +91,19 @@ usage (void)
            "  -p             pack mode: the binary file size will be truncated to the last occupied byte\n"
            "  -s romsize     size of the binary file (default: rom banks * 16384)\n"
            "  -Z             generate GameBoy format binary file\n"
+           "  -S             generate Sega Master System format binary file\n"
+
+           "SMS format options (applicable only with -S option):\n"
+           "  -xo n          rom size (0xa-0x2)\n"
+           "  -xj n          set region code (3-7)\n"
+           //"  -xc n          product code (0-159999)\n"
+           "  -xv n          version number (0-15)\n"
+           //"  -xV n          SDSC version number\n"
+           //"  -xd n          SDSC date\n"
+           //"  -xA n          SDSC author pointer\n"
+           //"  -xn n          SDSC program name pointer\n"
+           //"  -xD n          SDSC description pointer\n"
+
            "GameBoy format options (applicable only with -Z option):\n"
            "  -yo n          number of rom banks (default: 2) (autosize: A)\n"
            "  -ya n          number of ram banks (default: 0)\n"
@@ -125,6 +138,13 @@ struct gb_opt_s
   BYTE non_jp;                    /* True if non-Japanese region, false for all other*/
   BYTE rom_banks_autosize;        /* True if rom banks should be auto-sized (default false)*/
   BYTE address_overwrite[16];     /* For limited compatibility with very old versions */
+};
+
+struct sms_opt_s
+{
+  BYTE rom_size;                  /* Doesn't have to be the real size, needed for checksum */
+  BYTE region_code;               /* Region code Japan/Export/International and SMS/GG */
+  BYTE version;                   /* Game version */
 };
 
 void
@@ -344,6 +364,74 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 
   if (*real_size < 0x150)
     *real_size = 0x150;
+}
+
+void
+sms_postproc (BYTE * rom, int size, int *real_size, struct sms_opt_s *o)
+{
+  // based on https://www.smspower.org/Development/ROMHeader
+  // 0x1ff0 and 0x3ff0 are also possible, but never used
+  static const char tmr_sega[] = "TMR SEGA  ";
+  short header_base = 0x7ff0;
+  int chk = 0;
+  unsigned long i;
+  // choose earlier positions for smaller roms
+  if (header_base > size)
+    header_base = 0x3ff0;
+  if (header_base > size)
+    header_base = 0x1ff0;
+
+  memcpy (&rom[header_base], tmr_sega, sizeof (tmr_sega) - 1);
+  // configure amounts of bytes to check
+  switch(o->rom_size)
+    {
+      case 0xa:
+      default:
+        i = 0x1FEF;
+        break;
+      case 0xb:
+        i = 0x3FEF;
+        break;
+      case 0xc:
+        i = 0x7FEF;
+        break;
+      case 0xd:
+        i = 0xBFEF;
+        break;
+      case 0xe:
+        i = 0xFFFF;
+        break;
+      case 0xf:
+        i = 0x1FFFF;
+        break;
+      case 0x0:
+        i = 0x3FFFF;
+        break;
+      case 0x1:
+        i = 0x7FFFF;
+        break;
+      case 0x2:
+        i = 0xFFFFF;
+        break;
+    }
+  // calculate checksum
+  for(;i > 0; --i)
+    {
+      chk += rom[i];
+      // 0x7FF0 - 0x7FFF is skipped
+      if(i == 0x8000)
+        i = 0x7FF0;
+    }
+  // we  skipped index 0
+  chk += rom[0];
+  // little endian
+  rom[header_base + 0xa] = chk & 0xff;
+  rom[header_base + 0xb] = (chk>>8) & 0xff;
+  // game version
+  rom[header_base + 0xe] &= 0xF0;
+  rom[header_base + 0xe] |= o->version;
+  // rom size
+  rom[header_base + 0xf] = (o->region_code << 4) | o->rom_size;
 }
 
 int
@@ -600,7 +688,9 @@ main (int argc, char **argv)
   char *filename = NULL;
   int ret;
   int gb = 0;
+  int sms = 0;
   struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0, 0, 0, 0, {0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0}};
+  struct sms_opt_s sms_opt = { 0xa, 7, 0 };
 
 #if defined(_WIN32)
   setmode (fileno (stdout), O_BINARY);
@@ -731,13 +821,77 @@ main (int argc, char **argv)
               strtok(*argv, "=");
               token = strtok(NULL, "=");
               for (i = 0; i < 16; i+=2)
-                { 
+                {
                   if(gb_opt.address_overwrite[i] == 0xFF)
                     {
                       gb_opt.address_overwrite[i] = strtoul (*argv, NULL, 0);
                       gb_opt.address_overwrite[i+1] = strtoul (token, NULL, 0);
                       break;
                     }
+                }
+              break;
+
+            default:
+              usage ();
+              return 1;
+            }
+          break;
+
+        case 'S':
+          /* generate SMS binary file */
+          sms = 1;
+          break;
+
+        case 'x':
+
+          switch (argv[0][2])
+            {
+            case 'o':
+              if (!*++argv)
+                {
+                  usage ();
+                  return 1;
+                }
+              sms_opt.rom_size = strtoul (*argv, NULL, 0);
+              if ( sms_opt.rom_size > 2 && (sms_opt.rom_size < 0xa || sms_opt.rom_size > 0xf ) )
+                {
+                  fprintf (stderr, "error: invalid rom size (0x%X)", sms_opt.rom_size);
+                  perror(NULL);
+                  return 1;
+                }
+              if ( sms_opt.rom_size == 0xd || sms_opt.rom_size == 0x2 )
+                {
+                  fprintf (stderr, "warning: this rom size (0x%X) is bugged in some BIOSes\n", sms_opt.rom_size);
+                }
+              break;
+
+            case 'j':
+              if (!*++argv)
+                {
+                  usage ();
+                  return 1;
+                }
+              sms_opt.region_code = strtoul (*argv, NULL, 0);
+              if ( sms_opt.region_code < 3 && sms_opt.region_code > 7 )
+                {
+                  fprintf (stderr, "error: invalid region code (0x%X)", sms_opt.region_code);
+                  perror(NULL);
+                  return 1;
+                }
+              break;
+
+            case 'v':
+              if (!*++argv)
+                {
+                  usage ();
+                  return 1;
+                }
+              sms_opt.version = strtoul (*argv, NULL, 0);
+              if ( sms_opt.version > 0xf )
+                {
+                  fprintf (stderr, "error: invalid version (0x%X)", sms_opt.version);
+                  perror(NULL);
+                  return 1;
                 }
               break;
 
@@ -803,6 +957,8 @@ main (int argc, char **argv)
     {
       if (gb)
         gb_postproc (rom, size, &real_size, &gb_opt);
+      else if (sms)
+        sms_postproc (rom, size, &real_size, &sms_opt);
 
       if (*argv)
         {

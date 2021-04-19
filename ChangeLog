@@ -1,3 +1,8 @@
+2021-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use genCopy also for assignment with source on extended stack.
+
 2021-04-18 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* support/makebin/makebin.c:

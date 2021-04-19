@@ -3418,8 +3418,10 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           continue;
         }
   
-      int source_fp_offset = source->aopu.aop_stk + soffset + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-      int result_fp_offset = result->aopu.aop_stk + roffset + (result->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      int source_fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      int source_sp_offset = source_fp_offset + _G.stack.pushed + _G.stack.offset;
+      int result_fp_offset = result->aopu.aop_stk + roffset + i + (result->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      int result_sp_offset = result_fp_offset + _G.stack.pushed + _G.stack.offset;
         
       if (result_fp_offset == source_fp_offset && !regalloc_dry_run) // Stack locations can change, so in dry run do not assume stack coalescing will happen.
         {
@@ -3428,12 +3430,22 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           continue;
         }
 
-      if (i + 1 < n && !assigned[i + 1] && hl_free && (IS_RAB || IS_EZ80_Z80 || IS_TLCS90))
+      bool source_sp = IS_RAB && source_sp_offset <= 255 || IS_TLCS90 && source_sp_offset <= 127;
+      bool result_sp = IS_RAB && result_sp_offset <= 255 || IS_TLCS90 && result_sp_offset <= 127;
+      if (i + 1 < n && !assigned[i + 1] && hl_free && (IS_RAB || IS_EZ80_Z80 || IS_TLCS90) && // Todo: For Rabbit, use ld hl n (sp) and ld n(sp), hl when sp_offset is <= 255.
+        (result->type == AOP_STK && result_fp_offset >= -128 && result_fp_offset <= 127 || result_sp) &&
+        (source->type == AOP_STK && source_fp_offset >= -128 && source_fp_offset <= 127 || source_sp))
         {
           if (!regalloc_dry_run)
             {
-              emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
-              emit2 ("ld %s, hl", aopGet (result, roffset + i, false));
+              if (source_sp)
+                emit2 ("ld hl, %d (sp)", source_sp_offset);
+              else
+                emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
+              if (result_sp)
+                emit2 ("ld %d (sp), hl", result_sp_offset);
+              else
+                emit2 ("ld %s, hl", aopGet (result, roffset + i, false));
             }
           cost2 (6 - 2 * IS_RAB, 0, 0, 22, 0, 21, 10);
 
@@ -3448,7 +3460,11 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 
       if (a_free || really_do_it_now)
         {
+          if ((requiresHL (result)  || requiresHL (source)) && !hl_free)
+            _push (PAIR_HL);
           cheapMove (result, roffset + i, source, soffset + i, a_free);
+          if ((requiresHL (result)  || requiresHL (source)) && !hl_free)
+            _pop (PAIR_HL);
           assigned[i] = true;
           (*size)--;
           i++;
@@ -3477,9 +3493,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   wassertl_bt (aopRS (source), "Invalid source type.");
   wassertl_bt (aopRS (result), "Invalid result type.");
   
-  a_dead |= (result->regs[A_IDX] >= 0);
-  hl_dead |= (result->regs[L_IDX] >= 0 && result->regs[H_IDX] >= 0);
-  de_dead |= (result->regs[E_IDX] >= 0 && result->regs[D_IDX] >= 0);
+  a_dead |= (result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + sizex);
+  hl_dead |= (result->regs[L_IDX] >= roffset && result->regs[L_IDX] < roffset + sizex && result->regs[H_IDX] >= roffset && result->regs[H_IDX] < roffset + sizex);
+  de_dead |= (result->regs[E_IDX] >= roffset && result->regs[E_IDX] < roffset + sizex && result->regs[D_IDX] >= roffset && result->regs[D_IDX] < roffset + sizex);
 
   size = n;
   regsize = 0;
@@ -3828,7 +3844,7 @@ skip_byte:
       const bool e_free = de_dead && (result->regs[E_IDX] < 0 || !assigned[result->regs[E_IDX] - roffset]);
       const bool d_free = de_dead && (result->regs[D_IDX] < 0 || !assigned[result->regs[D_IDX] - roffset]);
       const bool de_free = e_free && d_free;
-      
+ 
       if (assigned[i])
         {
           i++;
@@ -3890,13 +3906,17 @@ skip_byte:
           size -= 2;
           i += 2;
         }
-      else if (i + 1 < n && !assigned[i + 1] && source->type == AOP_STK &&
+      else if (i + 1 < n && !assigned[i + 1] &&
+        (source->type == AOP_STK && fp_offset <= 127 || sp_offset <= 255) &&
         aopInReg (result, roffset + i, DE_IDX) && IS_RAB)
         {
           if (!hl_free)
             emit2 ("ex de, hl");
           if (!regalloc_dry_run)
-            emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
+            if (sp_offset <= 255)
+              emit2 ("ld hl, %d (sp)", sp_offset);
+            else
+              emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
           emit2("ex de, hl");
           cost2 (3 + !hl_free, 0, 0, 13 + !hl_free * 2, 0, 0, 0);
           spillPair (PAIR_HL);
@@ -3980,7 +4000,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   if (aopSame (result, roffset, source, soffset, size))
     return;
 
-  if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK)) // Todo: enable for source->type == AOP_EXSTK once implemented in genCopy().
+  if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK || source->type == AOP_EXSTK))
     {
       int csize = size > source->size - soffset ? source->size - soffset : size;
       genCopy (result, roffset, source, soffset, csize, a_dead_global, hl_dead_global, de_dead_global);
@@ -7447,12 +7467,15 @@ genMinus (const iCode *ic)
 /* genUminusFloat - unary minus for floating points                */
 /*-----------------------------------------------------------------*/
 static void
-genUminusFloat (operand *op, operand *result)
+genUminusFloat (const iCode *ic, operand *result, operand *op)
 {
   emitDebug ("; genUminusFloat");
 
   /* for this we just need to flip the
      first bit then copy the rest in place */
+     
+  if (!isRegDead (A_IDX, ic))
+    _push (PAIR_AF);
 
   cheapMove (ASMOP_A, 0, op->aop, MSB32, true);
 
@@ -7460,10 +7483,10 @@ genUminusFloat (operand *op, operand *result)
   regalloc_dry_run_cost += 2;
   cheapMove (result->aop, MSB32, ASMOP_A, 0, true);
 
-  if (operandsEqu (result, op))
-    return;
-
-  genMove_o (result->aop, 0, op->aop, 0, op->aop->size - 1, !aopInReg(result->aop, MSB32, A_IDX), false, false);
+  genMove_o (result->aop, 0, op->aop, 0, op->aop->size - 1, !aopInReg (result->aop, MSB32, A_IDX), false, false);
+  
+  if (!isRegDead (A_IDX, ic))
+    _pop (PAIR_AF);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7485,7 +7508,7 @@ genUminus (const iCode *ic)
     }
 
   if (IS_FLOAT (operandType (IC_LEFT (ic))))
-    genUminusFloat (IC_LEFT (ic), IC_RESULT (ic));
+    genUminusFloat (ic, IC_RESULT (ic), IC_LEFT (ic));
   else
     genSub (ic, IC_RESULT (ic)->aop, ASMOP_ZERO, IC_LEFT (ic)->aop);
 

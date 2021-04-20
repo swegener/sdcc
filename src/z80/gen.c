@@ -7887,7 +7887,7 @@ genMult (iCode *ic)
       goto release;
     }
 no_mlt:
-  
+
   if (IS_RAB && !IS_R2K && isPairDead(PAIR_DE, ic) && isPairDead(PAIR_BC, ic) && // mul might be cheaper than a series of additions. mul is broken on the original Rabbit 2000.
     !byteResult && (IC_LEFT (ic)->aop->size > 1 || SPEC_USIGN (getSpec (operandType (IC_LEFT (ic))))))
     {
@@ -7898,14 +7898,14 @@ no_mlt:
         {
           if (count != 0 && active)
             num_add++;
-          else if (i & 0x8000u)
+          if (i & 0x8000u)
             {
               active = true;
               num_add += active;
             }
           i <<= 1;
         }
-   
+
       if(num_add > (optimize.codeSize ? 4 : 6))
         {
           if (getPairId (IC_LEFT (ic)->aop) == PAIR_BC)

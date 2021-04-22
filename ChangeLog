@@ -9,6 +9,8 @@
 	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c,
 	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_global_xy.c:
 	  Skip tests that fail due to broken clang 11 (memory model PNVI-ae-udi non-compliance).
+	* sdccman.lyx:
+	  Simplify --max-allocs-per-node documentation.
 
 2021-04-20 Philipp Klaus Krause <pkk AT spth.de>
 

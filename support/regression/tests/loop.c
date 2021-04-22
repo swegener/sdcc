@@ -1,4 +1,4 @@
-/** loopp counter narrowing optimizatrion test
+/** loop counter narrowing optimizatrion test
     type: unsigned long, signed long
 */
 #include <testfwk.h>
@@ -85,6 +85,11 @@ void jump(unsigned char *a)
 }
 #endif
 
+// Get FreeBSD version to skip part of test for known broken setjmp (FreeBSD bug #255320).
+#ifdef __FreeBSD__
+#include <sys/param.h>
+#endif
+
 void testLoop(void)
 {
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
@@ -106,9 +111,10 @@ void testLoop(void)
 	address (array);
 	ASSERT (array[17] == 17);
 	ASSERT (array[18] == 18);
-
+#if !defined(__FreeBSD__) || __FreeBSD_version > 1300139
 	jump (array);
 	ASSERT (array[0] != 13);
+#endif
 #endif
 }
 

@@ -3,6 +3,8 @@
 	* sdcc/support/regression/tests/setjmp.c,
 	  sdcc/support/regression/tests/loop.c:
 	  Skip tests that fail due to broken FreeBSD 13 setjmp.
+	* support/regression/tests/gcc-torture-execute-20040409-?.c:
+	  Skip tests that fail due to broken clang.
 
 2021-04-20 Philipp Klaus Krause <pkk AT spth.de>
 

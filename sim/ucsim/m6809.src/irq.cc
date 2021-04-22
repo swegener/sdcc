@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /* CPU interrupt handling */
 
-class cl_m6809_src_base *
+class cl_m6xxx_src *
 cl_m6809_src_base::get_parent(void)
 {
   class cl_m6809 *muc= (class cl_m6809 *)(application->get_uc());
@@ -54,17 +54,6 @@ cl_m6809_src_base::get_parent(void)
       return NULL;
     }
   return NULL;
-}
-
-void
-cl_m6809_src_base::set_pass_to(t_mem value)
-{
-  if (value == 'f')
-    pass_to= irq_firq;
-  else if (value == 'n')
-    pass_to= irq_nmi;
-  else
-    pass_to= irq_irq;
 }
 
 bool
@@ -111,45 +100,6 @@ cl_m6809_irq::init()
   uc->vars->add(v= new cl_var("FIRQ", cfg, cpu_firq, "FIRQ request/clear"));
   v->init();
 
-  muc->src_irq= new cl_m6809_irq_src(uc,
-				     irq_irq,
-				     muc->regs8->get_cell(3), flagI,
-				     cfg->get_cell(cpu_irq), 1,
-				     0xfff8,
-				     "Interrupt request",
-				     0,
-				     flagE,
-				     flagI,
-				     irq_none);
-  muc->src_irq->init();
-  uc->it_sources->add(muc->src_irq);
-
-  muc->src_firq= new cl_m6809_irq_src(uc,
-				      irq_firq,
-				      muc->regs8->get_cell(3), flagF,
-				      cfg->get_cell(cpu_firq), 1,
-				      0xfff6,
-				      "Fast interrupt request",
-				      0,
-				      0,
-				      flagI|flagF,
-				      irq_none);
-  muc->src_firq->init();
-  uc->it_sources->add(muc->src_firq);
-
-  muc->src_nmi= new cl_m6809_src_base(uc,
-				      irq_nmi,
-				      cfg->get_cell(cpu_nmi_en), 1,
-				      cfg->get_cell(cpu_nmi), 1,
-				      0xfffc,
-				      "Non-maskable interrupt request",
-				      0,
-				      flagE,
-				      flagI|flagF,
-				      irq_none);
-  muc->src_nmi->init();
-  uc->it_sources->add(muc->src_nmi);
-  
   return 0;
 }
 
@@ -229,8 +179,8 @@ cl_m6809_irq::print_info(class cl_console_base *con)
     {
       class cl_m6809_src_base *is=
 	(class cl_m6809_src_base *)(uc->it_sources->at(i));
-      class cl_m6809_src_base *pa= is->get_parent();
-      class cl_m6809_src_base *isp= (pa)?pa:is;
+      class cl_m6xxx_src *pa= is->get_parent();
+      class cl_m6xxx_src *isp= (pa)?pa:is;
       t_addr a= uc->rom->get(isp->addr) * 256 + uc->rom->get(isp->addr+1);
       con->dd_printf("  [0x%04x] 0x%04x", AU(isp->addr), a);
       con->dd_printf(" %-3s", (is->enabled())?"en":"dis");

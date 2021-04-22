@@ -241,7 +241,7 @@ cl_console_base::print_expr_result(t_mem val, const char *fmt)
 	    case 'B': con->dd_printf("%d\n", (v)?1:0); break;
 	    case 'L': con->dd_printf("%c\n", (v)?'T':'F'); break;
 	    case 'c':
-	      if (isprint(MI(v)))
+	      if ((MU(v) < 0x100) && isprint(MI(v)))
 		con->dd_printf("'%c'",MI(v));
 	      else
 		{

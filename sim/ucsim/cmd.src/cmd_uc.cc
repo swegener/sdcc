@@ -213,7 +213,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 {
   class cl_memory *mem= uc->rom;
   t_addr start = -1, end = -1;
-  long bpl= 8;
+  long bpl= -1;
 
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
@@ -232,20 +232,21 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
               char c = tolower(s[i]);
               switch (c)
                 {
-                  case 'b':
-                    if (con->get_fout() && con->get_fout()->tty)
-                      {
-                        con->dd_printf("Error: binary format not supported on tty\n");
-                        return false;
-                      }
-                    break;
-                  case 'h': // hex
-                  case 'i': // ihex
-                  case 's': // string
-                    break;
-		  default:
-                    con->dd_printf("Error: unknown format option '%c'\n", c);
-                    return false;
+		case 'b':
+		  if (con->get_fout() && con->get_fout()->tty)
+		    {
+		      con->dd_printf("Error: binary format not supported on tty\n");
+		      return false;
+		    }
+		  break;
+		case 'x':
+		case 'h': // hex
+		case 'i': // ihex
+		case 's': // string
+		  break;
+		default:
+		  con->dd_printf("Error: unknown format option '%c'\n", c);
+		  return false;
                 }
               fmt = c;
             }
@@ -331,21 +332,21 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 
   switch (fmt)
     {
-      case 0: // default
-        mem->dump(1, start, end, bpl, con);
-        break;
-      case 'b': // binary
-        mem->dump_b(start, end, bpl, con);
-        break;
-      case 'h': // hex
-        mem->dump(0, start, end, bpl, con);
-        break;
-      case 'i': // ihex
-        mem->dump_i(start, end, 32, con);
-        break;
-      case 's': // string
-        mem->dump_s(start, end, bpl, con);
-        break;
+    case 0: // default
+      mem->dump(1, start, end, bpl, con);
+      break;
+    case 'b': // binary
+      mem->dump_b(start, end, bpl, con);
+      break;
+    case 'h': case 'x':// hex
+      mem->dump(0, start, end, bpl, con);
+      break;
+    case 'i': // ihex
+      mem->dump_i(start, end, 32, con);
+      break;
+    case 's': // string
+      mem->dump_s(start, end, bpl, con);
+      break;
     }
 
   return(false);;

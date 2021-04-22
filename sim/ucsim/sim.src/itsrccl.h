@@ -84,6 +84,49 @@ public:
   virtual t_mem read(class cl_memory_cell *cell);
 };
 
+/* Somehow specialized base which is used by several simulators */
+
+enum irq_nr {
+  irq_none= 0,
+  irq_nmi= 1,
+  irq_firq= 2,
+  irq_irq= 3
+};
+
+class cl_m6xxx_src: public cl_it_src
+{
+public:
+  u8_t Evalue;
+  u8_t IFvalue;
+  enum irq_nr pass_to;
+public:
+  cl_m6xxx_src(cl_uc  *Iuc,
+	       int    Inuof,
+	       class  cl_memory_cell *Iie_cell,
+	       t_mem  Iie_mask,
+	       class  cl_memory_cell *Isrc_cell,
+	       t_mem  Isrc_mask,
+	       t_addr Iaddr,
+	       const  char *Iname,
+	       int    apoll_priority,
+	       u8_t   aEvalue,
+	       u8_t   aIFvalue,
+	       enum irq_nr Ipass_to):
+    cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
+  {
+    Evalue= aEvalue;
+    IFvalue= aIFvalue;
+    pass_to= Ipass_to;
+  }
+  virtual bool is_nmi(void) { return false; }
+  virtual void clear(void) { src_cell->write(0); }
+  virtual class cl_m6xxx_src *get_parent(void) { return NULL; }
+  virtual void set_pass_to(enum irq_nr value) { pass_to= value; }
+  virtual void set_pass_to(t_mem value);
+};
+
+
+/* IRQ list */
 
 class cl_irqs: public cl_sorted_list
 {

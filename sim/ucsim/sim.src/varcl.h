@@ -38,24 +38,41 @@
 #include "memcl.h"
 
 
-class cl_var: public cl_base
+class cl_cvar: public cl_base
 {
  public:
-  class cl_memory *mem;
-  t_addr addr;
   int bitnr_high, bitnr_low;
   chars desc;
  protected:
   class cl_memory_cell *cell;
  public:
+  cl_cvar(chars iname, class cl_memory_cell *icell, chars adesc, int ibitnr_high= -1, int ibitnr_low= -1);
+  virtual int init(void);
+  virtual class cl_memory_cell *get_cell(void) const { return cell; }
+  virtual class cl_memory *get_mem() { return NULL; }
+  virtual t_addr get_addr() { return 0; }
+  virtual bool is_mem_var() { return false; }
+
+  virtual t_mem write(t_mem val);
+  virtual t_mem read();
+  virtual t_mem set(t_mem val);
+
+  virtual void print_info(cl_console_base *con) const;
+};
+
+class cl_var: public cl_cvar
+{
+protected:
+  class cl_memory *mem;
+  t_addr addr;
+public:
   cl_var(chars iname, class cl_memory *imem, t_addr iaddr, chars adesc, int ibitnr_high= -1, int ibitnr_low= -1);
-  int init(void);
-  class cl_memory_cell *get_cell(void) const { return cell; }
+  virtual int init(void);
+  virtual class cl_memory *get_mem() { return mem; }
+  virtual t_addr get_addr() { return addr; }
+  virtual bool is_mem_var() { return true; }
 
-  t_mem write(t_mem val);
-  t_mem set(t_mem val);
-
-  void print_info(cl_console_base *con) const;
+  virtual void print_info(cl_console_base *con) const;
 };
 
 
@@ -65,11 +82,11 @@ class cl_var_by_name_list: public cl_sorted_list
   cl_var_by_name_list(): cl_sorted_list(10, 10, "symlist") {}
   ~cl_var_by_name_list(void);
 
-  const class cl_var *at(t_index index)
+  class cl_cvar *at(t_index index)
   {
     const void *a= cl_sorted_list::at(index);
-    const class cl_var *v= (const class cl_var *)a;
-    return /*static_cast<const cl_var *>*/(v);
+    class cl_cvar *v= (class cl_cvar *)a;
+    return v;
   }
 
  private:
@@ -83,18 +100,18 @@ class cl_var_by_addr_list: public cl_sorted_list
   cl_var_by_addr_list(): cl_sorted_list(10, 10, "symlist_by_addr") {}
   ~cl_var_by_addr_list(void);
 
-  const class cl_var *at(t_index index)
+  class cl_var *at(t_index index)
   {
     const void *a= cl_sorted_list::at(index);
-    const class cl_var *v= (const class cl_var *)a;
-    return /*static_cast<const cl_var *>*/(v);
+    class cl_var *v= (class cl_var *)a;
+    return v;
   }
-  bool search(const class cl_memory *mem, t_addr addr, t_index &index);
-  bool search(const class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, t_index &index);
+  bool search(class cl_memory *mem, t_addr addr, t_index &index);
+  bool search(class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, t_index &index);
 
  private:
-  int compare_addr(const class cl_var *var, const class cl_memory *mem, t_addr addr) const;
-  int compare_addr_and_bits(const class cl_var *var, const class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low) const;
+  int compare_addr(class cl_var *var, class cl_memory *mem, t_addr addr);
+  int compare_addr_and_bits(class cl_var *var, class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low);
 
   virtual int compare(const void *key1, const void *key2);
 };
@@ -124,19 +141,19 @@ class cl_var_list: public cl_base
 
   /*! \brief Add the given cl_var replacing any that already exist with the same name.
    */
-  cl_var *add(cl_var *item);
+  class cl_cvar *add(class cl_cvar *item);
 
   /*! \brief Create and add (or replace) a var naming a set of bits in the cell given by mem and addr.
    */
-  cl_var *add(chars name, class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, chars desc);
+  class cl_cvar *add(chars name, class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, chars desc);
 
   /*! \brief Create and add (or replace) a var naming a set of bits in the cell given by a named var.
    */
-  cl_var *add(chars name, const char *cellname, int bitnr_high, int bitnr_low, chars desc);
+  class cl_cvar *add(chars name, const char *cellname, int bitnr_high, int bitnr_low, chars desc);
 
   /*! \brief Create and add (or replace) a var labelling a cell.
    */
-  cl_var *add(chars name, class cl_memory *mem, t_addr addr, chars desc) {
+  class cl_cvar *add(chars name, class cl_memory *mem, t_addr addr, chars desc) {
     return add(name, mem, addr, -1, -1, desc);
   }
 
@@ -148,9 +165,13 @@ class cl_var_list: public cl_base
    */
   bool del(const char *name);
 
+  
   /*! \brief Return the length of the longest var name.
    */
   int get_max_name_len(void) { return max_name_len; }
+
+  virtual t_mem read(chars name);
+
 };
 
 

@@ -39,11 +39,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_m6800: public cl_uc
 {
 public:
+  u8_t A, B, CC;
+  u16_t IX, SP;
+  class cl_memory_cell cA, cB, cCC, cIX, cSP;
+public:
   cl_m6800(class cl_sim *asim);
   virtual int init(void);
+  virtual const char *id_string(void);
+  virtual void reset(void);
+  virtual void set_PC(t_addr addr);
+
+  virtual void mk_hw_elements(void);
+  virtual void make_cpu_hw(void);
+  virtual void make_memories(void);
+
+  virtual int clock_per_cycle(void) { return 1; }
+
+  virtual void print_regs(class cl_console_base *con);
 };
 
-  
+
+/* Unused bits of CC forced to be 1 */
+
+class cl_cc_operator: public cl_memory_operator
+{
+public:
+  cl_cc_operator(class cl_memory_cell *acell): cl_memory_operator(acell) {}
+  virtual t_mem write(t_mem val) { return val|= 0xc0; }
+};
+
+
 #endif
 
 /* End of m6800.src/m6800.cc */

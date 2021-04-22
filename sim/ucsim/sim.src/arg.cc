@@ -304,11 +304,11 @@ cl_cmd_sym_arg::get_bit_address(class cl_uc *uc, // input
   t_index i;
   if (uc->vars->by_name.search(get_svalue(), i))
     {
-      const class cl_var *v= uc->vars->by_name.at(i);
+      class cl_var *v= (cl_var*)uc->vars->by_name.at(i);
       if (mem)
-        *mem= v->mem;
+        *mem= v->get_mem();
       if (mem_addr)
-        *mem_addr= v->addr;
+        *mem_addr= v->get_addr();
       if (bitnr_high)
         *bitnr_high= v->bitnr_high;
       if (bitnr_low)

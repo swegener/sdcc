@@ -51,6 +51,7 @@
 
 
 static class cl_mem_error_registry mem_error_registry;
+static unsigned int mem_uids= 0;
 
 /*
  *                                                3rd version of memory system
@@ -67,6 +68,7 @@ cl_memory::cl_memory(const char *id, t_addr asize, int awidth):
   start_address= 0;
   uc= 0;
   hidden= false;
+  uid= mem_uids++;
 }
 
 cl_memory::~cl_memory(void)
@@ -187,7 +189,11 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
     return dump_finished;
 
   if (bpl < 0)
-    bpl= 8;
+    {
+      bpl= 8;
+      if (width > 16)
+	bpl= 4;
+    }
 
   if (start < 0)
     start= dump_finished;
@@ -237,8 +243,8 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
   bool bitmode = (smart == 2 || (smart && bitnr_high >= 0));
 
   t_index var_i;
-  const class cl_var *var = NULL;
-  const class cl_var *var_next = NULL;
+  class cl_var *var = NULL;
+  class cl_var *var_next = NULL;
 
   int state = 0;
 
@@ -276,7 +282,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
                 {
                   while (var_i < uc->vars->by_addr.count &&
                          (var = uc->vars->by_addr.at(var_i)) &&
-                         var->mem == this && var->addr == start)
+                         var->get_mem() == this && var->get_addr() == start)
                     {
                       // If _any_ var for this location names bits we output in bitmode
                       // regardless of whether the named bits are in the requested range.
@@ -299,7 +305,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
           if (var_i < uc->vars->by_addr.count &&
               var &&
-              var->mem == this && var->addr == start &&
+              var->get_mem() == this && var->get_addr() == start &&
               (var->bitnr_high < 0 ||
 	       (state < 2 && ((var->bitnr_high == bitnr_high && var->bitnr_low == bitnr_low) ||
                               (bitnr_high < 0 && var->bitnr_high == width - 1 && var->bitnr_low == 0))) ||
@@ -321,7 +327,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
               // Find the next relevant var.
               while (++var_i < uc->vars->by_addr.count &&
                      (var_next = uc->vars->by_addr.at(var_i)) &&
-                     var_next->mem == this && var_next->addr == start)
+                     var_next->get_mem() == this && var_next->get_addr() == start)
                 {
                   // If _any_ var for this location names bits we output in bitmode
                   // regardless of whether the named bits are in the requested range.
@@ -340,7 +346,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               if (var_i < uc->vars->by_addr.count &&
                   var_next &&
-                  var_next->mem == this && var_next->addr == start)
+                  var_next->get_mem() == this && var_next->get_addr() == start)
                 {
                   // If it aliases the previous we do not need to output data now.
                   if ((var_next->bitnr_high == var->bitnr_high && var_next->bitnr_low == var->bitnr_low) ||
@@ -415,7 +421,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
               // Only advance if there is no more to say about this location.
               if (var_i < uc->vars->by_addr.count &&
                   var_next &&
-                  var_next->mem == this && var_next->addr == start)
+                  var_next->get_mem() == this && var_next->get_addr() == start)
                 var = var_next;
 	      else
                 {
@@ -452,7 +458,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
                 break;
             }
           con->dd_printf(" ");
-          con->dd_printf(data_format, get(start+n*step));
+          con->dd_printf(data_format, read(start+n*step));
         }
       con->dd_printf("%-*s", (bpl - n) * (width/4 + ((width%4)?1:0) + 1) + 1, " ");
 
@@ -487,15 +493,11 @@ cl_memory::dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
   t_addr hva= highest_valid_address();
   class cl_f *f= con->get_fout();
 
-  if (stop < 0)
-    stop= start + 10 * bpl - 1;
-
   t_addr a= start;
   t_mem d= read(a);
   char last= '\n';
   con->dd_printf("%s", con->get_color_ansiseq("dump_char").c_str());
-  while ((a <= stop) &&
-	 (d != 0) &&
+  while ((d != 0) &&
 	 (a <= hva))
     {
       char c= d;
@@ -1007,6 +1009,25 @@ cl_bit_cell16::d(t_mem v)
  *                                                                  Memory cell
  */
 
+cl_memory_cell::cl_memory_cell()
+{
+  data= 0;
+  flags= CELL_NON_DECODED;
+  width= 8;
+  def_data= 0;
+  operators= NULL;
+#ifdef STATISTIC
+  nuof_writes= nuof_reads= 0;
+#endif
+  mask= 1;
+  int w= width;
+  for (--w; w; w--)
+    {
+      mask<<= 1;
+      mask|= 1;
+    }
+}
+
 cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
 {
   data= 0;
@@ -1054,6 +1075,18 @@ cl_memory_cell::init(void)
   return(0);
 }
 
+void
+cl_memory_cell::set_width(uchar awidth)
+{
+  width= awidth;
+  mask= 1;
+  int w= width;
+  for (--w; w; w--)
+    {
+      mask<<= 1;
+      mask|= 1;
+    }
+}
 
 uchar
 cl_memory_cell::get_flags(void)

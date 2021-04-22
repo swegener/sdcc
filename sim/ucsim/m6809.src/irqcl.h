@@ -43,20 +43,9 @@ enum cpu_cfg
    cpu_nr	= 6
   };
 
-enum irq_nr {
-  irq_none= 0,
-  irq_nmi= 1,
-  irq_firq= 2,
-  irq_irq= 3
-};
-
 // This is used as NMI source
-class cl_m6809_src_base: public cl_it_src
+class cl_m6809_src_base: public cl_m6xxx_src
 {
-public:
-  u8_t Evalue;
-  u8_t IFvalue;
-  enum irq_nr pass_to;
 public:
   cl_m6809_src_base(cl_uc  *Iuc,
 		    int    Inuof,
@@ -70,17 +59,9 @@ public:
 		    u8_t   aEvalue,
 		    u8_t   aIFvalue,
 		    enum irq_nr Ipass_to):
-    cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
-  {
-    Evalue= aEvalue;
-    IFvalue= aIFvalue;
-    pass_to= Ipass_to;
-  }
+    cl_m6xxx_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue, aIFvalue, Ipass_to) {}
   virtual bool is_nmi(void) { return true; }
-  virtual void clear(void) { src_cell->write(0); }
-  virtual class cl_m6809_src_base *get_parent(void);
-  virtual void set_pass_to(enum irq_nr value) { pass_to= value; }
-  virtual void set_pass_to(t_mem value);
+  virtual class cl_m6xxx_src *get_parent(void);
 };
 
 // Source of IRQ and FIRQ

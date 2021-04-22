@@ -147,6 +147,45 @@ cl_m6809::mk_hw_elements(void)
   add_hw(h= new cl_m6809_irq(this));
   h->init();
 
+  src_irq= new cl_m6809_irq_src(this,
+				irq_irq,
+				regs8->get_cell(3), flagI,
+				h->cfg_cell(cpu_irq), 1,
+				0xfff8,
+				"Interrupt request",
+				0,
+				flagE,
+				flagI,
+				irq_none);
+  src_irq->init();
+  it_sources->add(src_irq);
+  
+  src_firq= new cl_m6809_irq_src(this,
+				 irq_firq,
+				 regs8->get_cell(3), flagF,
+				 h->cfg_cell(cpu_firq), 1,
+				 0xfff6,
+				 "Fast interrupt request",
+				 0,
+				 0,
+				 flagI|flagF,
+				 irq_none);
+  src_firq->init();
+  it_sources->add(src_firq);
+  
+  src_nmi= new cl_m6809_src_base(this,
+				 irq_nmi,
+				 h->cfg_cell(cpu_nmi_en), 1,
+				 h->cfg_cell(cpu_nmi), 1,
+				 0xfffc,
+				 "Non-maskable interrupt request",
+				 0,
+				 flagE,
+				 flagI|flagF,
+				 irq_none);
+  src_nmi->init();
+  it_sources->add(src_nmi);
+  
   add_hw(h= new cl_serial(this, 0, 0xc000));
   h->init();
 
@@ -645,19 +684,19 @@ cl_m6809::print_regs(class cl_console_base *con)
   con->dd_printf("DP= 0x%02x\n", reg.DP);
 
   con->dd_printf("X= ");
-  rom->dump(reg.X, reg.X+7, 8, con);
+  rom->dump(0, reg.X, reg.X+7, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("Y= ");
-  rom->dump(reg.Y, reg.Y+7, 8, con);
+  rom->dump(0, reg.Y, reg.Y+7, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("S= ");
-  rom->dump(reg.S, reg.S+7, 8, con);
+  rom->dump(0, reg.S, reg.S+7, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("U= ");
-  rom->dump(reg.U, reg.U+7, 8, con);
+  rom->dump(0, reg.U, reg.U+7, 8, con);
   con->dd_color("answer");
   
   print_disass(PC, con);
@@ -765,7 +804,7 @@ cl_m6809::index2ea(u8_t idx, t_addr *res_ea)
   u16_t iv;
   i16_t off;
   u16_t *ir= &reg.X;
-  t_addr ea;
+  t_addr ea= 0;
 
   switch (idx & 0x60)
     {
@@ -1407,7 +1446,7 @@ cl_m6809::inst_branch(t_mem code, bool l)
   bool z= reg.CC & flagZ;
   bool n= reg.CC & flagN;
   bool v= reg.CC & flagV;
-  bool t;
+  bool t= 0;
   
   switch (code & 0x0f)
     {
@@ -2324,8 +2363,8 @@ int
 cl_m6809::accept_it(class it_level *il)
 {
   //class cl_m6809_src_base *org= NULL;
-  class cl_m6809_src_base *is= (class cl_m6809_src_base *)(il->source);
-  class cl_m6809_src_base *parent= NULL;
+  class cl_m6xxx_src *is= (class cl_m6xxx_src *)(il->source);
+  class cl_m6xxx_src *parent= NULL;
 
   if (is)
     {

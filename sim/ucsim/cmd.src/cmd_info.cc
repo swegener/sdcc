@@ -236,7 +236,7 @@ CMDHELP(cl_info_memory_cmd,
 
 COMMAND_DO_WORK_UC(cl_info_var_cmd)
 {
-  const class cl_var *v;
+  class cl_cvar *v;
   int i;
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
   char *s= NULL;
@@ -253,7 +253,7 @@ COMMAND_DO_WORK_UC(cl_info_var_cmd)
       v= uc->vars->by_name.at(i);
       if ((s == NULL) ||
 	  (
-	   (strstr(v->mem->get_name(), s) != NULL) ||
+	   //(strstr(v->mem->get_name(), s) != NULL) ||
 	   (strstr(v->get_name(), s) != NULL)
 	   )
 	  )

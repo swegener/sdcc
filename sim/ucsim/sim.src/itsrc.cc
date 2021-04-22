@@ -211,6 +211,22 @@ cl_irqs::compare(const void *key1, const void *key2)
 
 
 /*
+ * Specialized source
+ */
+
+void
+cl_m6xxx_src::set_pass_to(t_mem value)
+{
+  if (value == 'f')
+    pass_to= irq_firq;
+  else if (value == 'n')
+    pass_to= irq_nmi;
+  else
+    pass_to= irq_irq;
+}
+
+
+/*
  * Interrupt level
  ******************************************************************************
  */

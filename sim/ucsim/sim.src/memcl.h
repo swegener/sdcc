@@ -61,6 +61,8 @@ enum cell_flag {
 
 class cl_memory: public cl_base
 {
+private:
+  unsigned int uid;
 public:
   t_addr start_address;
 protected:
@@ -80,6 +82,7 @@ public:
 
   t_addr get_start_address(void) { return(start_address); }
   t_addr get_size(void) { return(size); }
+  unsigned int get_uid() { return uid; }
   virtual void set_uc(class cl_uc *auc) { uc= auc; }
   virtual bool valid_address(t_addr addr);
   virtual t_addr inc_address(t_addr addr, int val);
@@ -241,10 +244,12 @@ class cl_memory_cell: public cl_cell_data
   /*TYPE_UBYTE*/uchar flags;
   class cl_memory_operator *operators;
  public:
+  cl_memory_cell();
   cl_memory_cell(uchar awidth);
   virtual ~cl_memory_cell(void);
   virtual int init(void);
-
+  virtual void set_width(uchar awidth);
+  
   virtual t_mem *get_data(void) { return(data); }
   virtual t_mem get_mask(void) { return(mask); }
   virtual void set_mask(t_mem m) { mask= m; }

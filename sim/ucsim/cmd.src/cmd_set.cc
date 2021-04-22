@@ -66,9 +66,9 @@ set_set_help(class cl_cmd *cmd)
 COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 {
   class cl_memory *mem= 0;
-  t_addr start;
-  t_mem *array;
-  int len;
+  t_addr start= 0;
+  t_mem *array= NULL;
+  int len= 0;
   int bitnr_low= -1, bitnr_high= -1;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),

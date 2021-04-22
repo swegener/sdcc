@@ -36,14 +36,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base of MCS6502 processor
  */
 
-class cl_mcs6502: public cl_uc
+class cl_mcs6502: public cl_uc  
 {
+public:
+  u8_t A, X, Y, SP, CC;
+  class cl_memory_cell cA, cX, cY, cSP, cCC;
 public:
   cl_mcs6502(class cl_sim *asim);
   virtual int init(void);
+  virtual const char *id_string(void);
+  virtual void reset(void);
+  virtual void set_PC(t_addr addr);
+
+  virtual void mk_hw_elements(void);
+  virtual void make_cpu_hw(void);
+  virtual void make_memories(void);
+
+  virtual int clock_per_cycle(void) { return 1; }
+
+  virtual void print_regs(class cl_console_base *con);
 };
 
-  
+
+/* Unused bits of CC forced to be 1 */
+
+class cl_cc_operator: public cl_memory_operator
+{
+public:
+  cl_cc_operator(class cl_memory_cell *acell): cl_memory_operator(acell) {}
+  virtual t_mem write(t_mem val) { return val|= 0x20; }
+};
+
+
 #endif
 
 /* End of mcs6502.src/mcs6502.cc */

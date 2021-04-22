@@ -41,6 +41,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_mcs6502::cl_mcs6502(class cl_sim *asim):
   cl_uc(asim)
 {
+  cA.init();
+  cA.decode((t_mem*)&A);
+  cX.init();
+  cX.decode((t_mem*)&X);
+  cY.init();
+  cY.decode((t_mem*)&Y);
+  cSP.init();
+  cSP.decode((t_mem*)&SP);
+  cCC.init();
+  cCC.decode((t_mem*)&CC);
+
+  class cl_memory_operator *op= new cl_cc_operator(&cCC);
+  cCC.append_operator(op);
 }
 
 int
@@ -53,5 +66,95 @@ cl_mcs6502::init(void)
   return 0;
 }
 
+
+const char *
+cl_mcs6502::id_string(void)
+{
+  return "MCS6502";
+}
+
+void
+cl_mcs6502::reset(void)
+{
+  cl_uc::reset();
+
+  CC= 0x20;
+  PC= rom->read(0xfffd)*256 + rom->read(0xfffc);
+  tick(6);
+}
+
+  
+void
+cl_mcs6502::set_PC(t_addr addr)
+{
+  PC= addr;
+}
+
+void
+cl_mcs6502::mk_hw_elements(void)
+{
+  class cl_hw *h;
+  
+  cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+}
+
+void
+cl_mcs6502::make_cpu_hw(void)
+{
+}
+
+void
+cl_mcs6502::make_memories(void)
+{
+  class cl_address_space *as;
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+  
+  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  class cl_cvar *v;
+  vars->add(v= new cl_cvar("A", &cA, "CPU register A"));
+  v->init();
+  vars->add(v= new cl_cvar("X", &cX, "CPU register X"));
+  v->init();
+  vars->add(v= new cl_cvar("Y", &cY, "CPU register Y"));
+  v->init();
+  vars->add(v= new cl_cvar("S", &cSP, "CPU register S"));
+  v->init();
+  vars->add(v= new cl_cvar("P", &cCC, "CPU register P"));
+  v->init();
+}
+
+void
+cl_mcs6502::print_regs(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("X= 0x%02x %3d %+4d %c  ", X, X, (i8_t)X, isprint(X)?X:'.');
+  con->dd_printf("Y= 0x%02x %3d %+4d %c  ", Y, Y, (i8_t)Y, isprint(Y)?Y:'.');
+  con->dd_printf("\n");
+  con->dd_printf("P= "); con->print_bin(CC, 8); con->dd_printf("\n");
+  con->dd_printf("   NV BDIZC\n");
+
+  con->dd_printf("S= ");
+  rom->dump(0, 0x100+SP, 0x100+SP+7, 8, con);
+  con->dd_color("answer");
+  
+  print_disass(PC, con);
+}
 
 /* End of mcs6502.src/mcs6502.cc */

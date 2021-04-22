@@ -41,6 +41,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_m6800::cl_m6800(class cl_sim *asim):
   cl_uc(asim)
 {
+  cA.init();
+  cA.decode((t_mem*)&A);
+  cB.init();
+  cB.decode((t_mem*)&B);
+  cCC.init();
+  cCC.decode((t_mem*)&CC);
+  cIX.set_width(16);
+  cIX.init();
+  cIX.decode((t_mem*)&IX);
+  cSP.set_width(16);
+  cSP.init();
+  cSP.decode((t_mem*)&SP);
+
+  class cl_memory_operator *op= new cl_cc_operator(&cCC);
+  cCC.append_operator(op);
 }
 
 int
@@ -53,5 +68,96 @@ cl_m6800::init(void)
   return 0;
 }
 
+const char *
+cl_m6800::id_string(void)
+{
+  return "M6800";
+}
+
+void
+cl_m6800::reset(void)
+{
+  cl_uc::reset();
+
+  CC= 0xc0;
+  PC= rom->read(0xfffe)*256 + rom->read(0xffff);
+  tick(6);
+}
+  
+void
+cl_m6800::set_PC(t_addr addr)
+{
+  PC= addr;
+}
+
+void
+cl_m6800::mk_hw_elements(void)
+{
+  class cl_hw *h;
+  
+  cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+}
+
+void
+cl_m6800::make_cpu_hw(void)
+{
+}
+
+void
+cl_m6800::make_memories(void)
+{
+  class cl_address_space *as;
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+  
+  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  class cl_cvar *v;
+  vars->add(v= new cl_cvar("A", &cA, "CPU register A"));
+  v->init();
+  vars->add(v= new cl_cvar("B", &cB, "CPU register B"));
+  v->init();
+  vars->add(v= new cl_cvar("CC", &cCC, "CPU register CC"));
+  v->init();
+  vars->add(v= new cl_cvar("IX", &cIX, "CPU register IX"));
+  v->init();
+  vars->add(v= new cl_cvar("SP", &cSP, "CPU register SP"));
+  v->init();
+}
+
+void
+cl_m6800::print_regs(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("B= 0x%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
+  con->dd_printf("\n");
+  con->dd_printf("CC= "); con->print_bin(CC, 8); con->dd_printf("\n");
+  con->dd_printf("      HINZVC\n");
+
+  con->dd_printf("IX= ");
+  rom->dump(0, IX, IX+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("SP= ");
+  rom->dump(0, SP, SP+7, 8, con);
+  con->dd_color("answer");
+  
+  print_disass(PC, con);
+}
 
 /* End of m6800.src/m6800.cc */

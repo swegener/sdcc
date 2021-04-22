@@ -1735,7 +1735,7 @@ cl_51core::high_movxri(void)
 int
 cl_51core::do_inst(int step)
 {
-  t_addr PCsave;
+  t_addr PCsave= PC;
   result= resGO;
   while ((result == resGO) &&
 	 (state != stPD) &&
@@ -2021,7 +2021,7 @@ cl_uc51_cpu::init(void)
   uc->vars->add("cpu_aof_mdpc", cfg, uc51cpu_aof_mdpc, cfg_help(uc51cpu_aof_mdpc));
   uc->vars->add("cpu_mask_mdpc", cfg, uc51cpu_mask_mdpc, cfg_help(uc51cpu_mask_mdpc));
   uc->vars->add("cpu_mdp_mode", cfg, uc51cpu_mdp_mode, cfg_help(uc51cpu_mdp_mode));
-  cl_var *v;
+  class cl_cvar *v;
   v = uc->vars->add("cpu_movxri_mode", cfg, uc51cpu_movxri_mode, cfg_help(uc51cpu_movxri_mode));
   v->write('m');
   v = uc->vars->add("cpu_movxri_as", cfg, uc51cpu_movxri_as, cfg_help(uc51cpu_movxri_as));

@@ -174,16 +174,6 @@ uc_yy_check_id(char *token)
 	      yylval.memory.address= addr;
 	      return PTOK_MEMORY;
 	  }
-      /*
-      else if ((found= uc->symbol2address(yytext, uc->sfr_tbl(), &addr)))
-	{
-	  //yylval.number= addr; return PTOK_NUMBER;
-	  yylval.memory.memory = uc->address_space(MEM_SFR_ID);
-	  yylval.memory.address = addr;
-	  return PTOK_MEMORY;
-	}
-      */
-      //found= uc->symbol2address(yytext, uc->bit_tbl(), &addr);
       if (found)
 	{
 	  t_addr memaddr;
@@ -195,6 +185,16 @@ uc_yy_check_id(char *token)
 	  yylval.bit.bitnr_low = bitnr_low;
 	  return PTOK_BITS;
 	}
+      {
+	t_index i;
+	found= uc->vars->by_name.search(token, i);
+	if (found)
+	  {
+	    class cl_cvar *v= (class cl_cvar *)uc->vars->by_name.at(i);
+	    yylval.cell= v->get_cell();
+	    return PTOK_CELL;
+          }
+       }
     }
 
   return 0;

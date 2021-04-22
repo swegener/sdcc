@@ -5,6 +5,10 @@
 	  Skip tests that fail due to broken FreeBSD 13 setjmp.
 	* support/regression/tests/gcc-torture-execute-20040409-?.c:
 	  Skip tests that fail due to broken clang.
+	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c,
+	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c,
+	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_global_xy.c:
+	  Skip tests that fail due to broken clang 11 (memory model PNVI-ae-udi non-compliance).
 
 2021-04-20 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -33,7 +33,7 @@ testMM(void)
 {
 // PNVI-ae-udi non-compliance in PPC for at least GCC 4.9.2 and GCC 7.2.0
 #if !(defined(__GNUC__) && (defined(__PPC__) || defined(__POWERPC__))) 
-#if !(defined(__clang__) && __clang_major__ <= 6)
+#if !(defined(__clang__) && __clang_major__ <= 11) // On FreeBSD 13 on arch64, this test fails for clang 11. On amd64 it fails for clang 6.
   int y=2, x=1;
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;

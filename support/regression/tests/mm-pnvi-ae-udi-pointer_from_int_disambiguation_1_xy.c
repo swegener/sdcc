@@ -33,7 +33,7 @@ int x=1, y=2;
 void
 testMM(void)
 {
-#if !(defined(__clang__) && __clang_major__ <= 6)
+#if !(defined(__clang__) && __clang_major__ <= 11) // On FreeBSD 13 on arch64, this test fails for clang 11. On amd64 it fails for clang 6.
   int *p = &x+1;
   int *q = &y;
   uintptr_t i = (uintptr_t)p;

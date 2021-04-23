@@ -230,6 +230,8 @@ int     jflag;          /*      -j, generate debug information flag
                          */
 int     lflag;          /*      -l, generate listing flag
                          */
+int     nflag;          /*      -n, don't resolve global assigned value symbols flag
+                         */
 int     oflag;          /*      -o, generate relocatable output flag
                          */
 int     pflag;          /*      -p, disable listing pagination

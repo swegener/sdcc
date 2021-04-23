@@ -320,6 +320,7 @@ absexpr(void)
  *      global variables:
  *              char    ctype[]         array of character types, one per
  *                                      ASCII character
+ *              int     nflag           don't resolve global assigned value symbols flag
  *              sym *   symp            pointer to a symbol structure
  *
  *      functions called:
@@ -549,13 +550,25 @@ term(struct expr *esp)
                 getid(id, c);
                 esp->e_mode = S_USER;
                 sp = lookup(id);
-                if (sp->s_type == S_NEW) {
+                /* Handle if the symbol or label is not yet defined.
+
+                   Also leave unevaluated if it's a global with an assigned value
+                   and the don't resolve global symbol assigns flag is set.
+                   This allows the value to get resolved at link time instead
+                   of during compile time. */
+                if ((sp->s_type == S_NEW) || ((sp->s_flag & S_GBL) && (sp->s_flag & S_ASG) && (nflag))) {
                         esp->e_addr = 0;
+                        /*
+                         * Flag the expression symbol as external if it's global
+                         */
                         if (sp->s_flag&S_GBL) {
                                 esp->e_flag = 1;
                                 esp->e_base.e_sp = sp;
                                 return;
                         }
+                        /*
+                         * Otherwise it's an undefined symbol
+                         */
                         err('u');
                 } else {
                         esp->e_mode = sp->s_type;

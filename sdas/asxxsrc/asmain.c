@@ -233,6 +233,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     lnlist          current LIST-NLIST state
  *              int     lop             current line number on page
  *              int     maxinc          maximum include file nesting counter
+ *              int     nflag           -n, don't resolve global assigned value symbols flag
  *              int     oflag           -o, generate relocatable output flag
  *              int     jflag           -j, generate debug info flag
  *              int     page            current page number
@@ -366,6 +367,11 @@ main(int argc, char *argv[])
                                 case 'l':
                                 case 'L':
                                         ++lflag;
+                                        break;
+
+                                case 'n':
+                                case 'N':
+                                        nflag = 1;
                                         break;
 
                                 case 'o':
@@ -2204,6 +2210,7 @@ char *usetxt[] = {
         "  -q   Octal   listing",
         "  -x   Hex     listing (default)",
         "  -g   Undefined symbols made global",
+        "  -n   Don't resolve global assigned value symbols",
         "  -a   All user symbols made global",
         "  -b   Display .define substitutions in listing",
         "  -bb  and display without .define substitutions",

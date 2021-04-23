@@ -1,3 +1,11 @@
+2021-04-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asxxsrc/asxxxx.h,
+	  sdas/asxxsrc/asdata.c,
+	  sdas/asxxsrc/asexpr.c,
+	  sdas/asxxsrc/asmain.c:
+	  Option to defer resolution of some symbols to link time, patch by Tony Pavlov.
+
 2021-04-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdcc/support/regression/tests/setjmp.c,

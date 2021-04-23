@@ -974,6 +974,8 @@ extern  int     lflag;          /*      -l, generate listing flag
                                  */
 extern  int     oflag;          /*      -o, generate relocatable output flag
                                  */
+extern  int     nflag;          /*      -n, don't resolve global symbols flag
+                                 */
 extern  int     pflag;          /*      -p, disable listing pagination
                                  */
 extern  int     sflag;          /*      -s, generate symbol table flag

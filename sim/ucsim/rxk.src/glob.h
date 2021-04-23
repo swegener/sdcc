@@ -31,9 +31,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stypes.h"
 
 
-extern struct dis_entry disass_mcs6502[];
+extern struct dis_entry disass_rxk[];
 
 
 #endif
 
-/* End of mcs6502.src/glob.h */
+/* End of rxk.src/glob.h */

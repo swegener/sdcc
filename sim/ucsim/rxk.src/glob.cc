@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (glob.cc)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,15 +25,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#include "glob.h"
 
-#include "stypes.h"
+// code mask branch len mn call tick
+struct dis_entry disass_rxk[]=
+  {  
+   { 0, 0, 0, 0, 0, 0 }
+  };
 
-
-extern struct dis_entry disass_mcs6502[];
-
-
-#endif
-
-/* End of mcs6502.src/glob.h */
+/* End of rxk.src/glob.cc */

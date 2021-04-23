@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (simrxkcl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,15 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#ifndef SIMRXKCL_HEADER
+#define SIMRXKCL_HEADER
 
-#include "stypes.h"
+#include "simcl.h"
 
 
-extern struct dis_entry disass_mcs6502[];
+class cl_simrxk: public cl_sim
+{
+public:
+  cl_simrxk(class cl_app *the_app);
+
+  virtual class cl_uc *mk_controller(void);
+};
 
 
 #endif
 
-/* End of mcs6502.src/glob.h */
+/* End of rxk.src/simrxkcl.h */

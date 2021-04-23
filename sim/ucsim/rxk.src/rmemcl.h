@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (@@F@@)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,17 +23,29 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
-/*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#ifndef RMEMCL_HEADER
+#define RMEMCL_HEADER
 
-#include "stypes.h"
+#include "memcl.h"
 
-
-extern struct dis_entry disass_mcs6502[];
-
+class cl_ras: public cl_address_space
+{
+ public:
+  class cl_memory_chip *chip;
+ public:
+  u8_t segsize, dataseg, stackseg, xpc;
+ public:
+  cl_ras(chars id, class cl_memory_chip *achip);
+ public:
+  virtual t_addr log2phy(t_addr log);
+  virtual t_mem read(t_addr addr);
+  virtual t_mem get(t_addr addr);
+  virtual t_mem write(t_addr addr, t_mem val);
+  virtual void set(t_addr addr, t_mem val);
+  virtual void download(t_addr addr, t_mem val);
+};
 
 #endif
 
-/* End of mcs6502.src/glob.h */
+/* End of rxk.src/rmemcl.h */

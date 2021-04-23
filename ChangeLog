@@ -5,6 +5,9 @@
 	  sdas/asxxsrc/asexpr.c,
 	  sdas/asxxsrc/asmain.c:
 	  Option to defer resolution of some symbols to link time, patch by Tony Pavlov.
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-3215.c:
+	  Fix bug #3215.
 
 2021-04-22 Philipp Klaus Krause <pkk AT spth.de>
 

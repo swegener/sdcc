@@ -2680,7 +2680,7 @@ optimizeStdLibCall (eBBlock ** ebbs, int count)
           if (IC_RESULT (nic) && (!IS_ITEMP (IC_RESULT (nic)) || bitVectnBitsOn (OP_USES (IC_RESULT (nic)))))
             continue;
 
-          // Chek that their parameters are string literals
+          // Check that their parameters are string literals
           strsym = findStrLitDef (IC_LEFT (ic->prev), 0);
           nstrsym = findStrLitDef (IC_LEFT (nic->prev), &ndic);
           if (!strsym || !nstrsym)
@@ -2710,7 +2710,7 @@ optimizeStdLibCall (eBBlock ** ebbs, int count)
           dbuf_destroy (&dbuf);
 
           // Make second call print the combined string (which allows further optimization with subsequent calls)
-          IC_LEFT (ndic)->key = cstrsym->key;
+          IC_LEFT (ndic)->key = cstrsym->key = ++operandKey;
           IC_LEFT (ndic)->svt.symOperand = cstrsym;
 
           // Change unused call to assignments to self to mark it for dead-code elimination.

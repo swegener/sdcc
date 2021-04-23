@@ -10,6 +10,8 @@
 	  Fix bug #3215.
 	* src/z80/gen.c:
 	  Fix bug #3214.
+	* support/valdiag/tests/bug-3010.c:
+	  Simplify test.
 
 2021-04-22 Philipp Klaus Krause <pkk AT spth.de>
 

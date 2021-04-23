@@ -9340,9 +9340,13 @@ genAnd (const iCode * ic, iCode * ifx)
           else if (isLiteralBit (bytelit) >= 0 &&
             (left->aop->type == AOP_STK || aopInReg (left->aop, 0, A_IDX) || left->aop->type == AOP_HL || left->aop->type == AOP_IY || left->aop->type == AOP_REG && left->aop->aopu.aop_reg[0]->rIdx != IYL_IDX))
             {
+              if (requiresHL (left->aop) && left->aop->type != AOP_REG)
+                _push (PAIR_HL);
               if (!regalloc_dry_run)
                 emit2 ("bit %d, %s", isLiteralBit (bytelit), aopGet (left->aop, offset, FALSE));
               regalloc_dry_run_cost += (left->aop->type == AOP_STK || left->aop->type == AOP_IY) ? 4 : 2;
+              if (requiresHL (left->aop) && left->aop->type != AOP_REG)
+                _pop (PAIR_HL);
               sizel--;
               offset++;
             }

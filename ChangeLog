@@ -8,6 +8,8 @@
 	* src/SDCCopt.c,
 	  support/regression/tests/bug-3215.c:
 	  Fix bug #3215.
+	* src/z80/gen.c:
+	  Fix bug #3214.
 
 2021-04-22 Philipp Klaus Krause <pkk AT spth.de>
 

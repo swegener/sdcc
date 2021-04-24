@@ -4012,10 +4012,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 
   bool zeroed_a = false;
   long value_hl = -1;
-  bool a_dead = a_dead_global;
-  bool hl_dead = hl_dead_global;
+
   for (unsigned int i = 0; i < size;)
     {
+      bool a_dead = a_dead_global && source->regs[A_IDX] <= i && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= i);
+      bool hl_dead = hl_dead_global && source->regs[L_IDX] <= i && source->regs[H_IDX] <= i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= i)  && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= i);
+
       if ((IS_EZ80_Z80 || IS_RAB || IS_TLCS90) && i + 1 < size && result->type == AOP_STK &&
         source->type == AOP_LIT && (value_hl >= 0 && aopIsLitVal (source, soffset + i, 2, value_hl) || hl_dead))
         {
@@ -4120,11 +4122,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             }
           zeroed_a = false;
         }
-
-      if (aopInReg (result, roffset + i, A_IDX))
-        a_dead = false;
-      if (aopInReg (result, roffset + i, H_IDX) || aopInReg (result, roffset + i, L_IDX))
-        hl_dead = false;
 
       i++;
     }

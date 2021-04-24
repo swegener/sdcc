@@ -1,5 +1,10 @@
 2021-04-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix a bug affecting z80 code generation for --reserve-regs-iy.
+
+2021-04-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3216.c:
 	  Fix bug #3216.

@@ -13409,7 +13409,7 @@ genAssign (const iCode *ic)
               goto release;
             }
         }
-      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || right->aop->type == AOP_IY))
+      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK || result->aop->type == AOP_IY) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || right->aop->type == AOP_IY))
         genMove (result->aop, right->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
       else
         while (size--)

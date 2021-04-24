@@ -1,3 +1,9 @@
+2021-04-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3216.c:
+	  Fix bug #3216.
+
 2021-04-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/asxxsrc/asxxxx.h,

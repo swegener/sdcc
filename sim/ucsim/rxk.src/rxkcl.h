@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 #ifdef WORDS_BIGENDIAN
-#define RP(N.N16,NH,NL) union			\
+#define RP(N,N16,NH,NL) union			\
 		      {				\
 			u16_t N16;		\
 			struct {		\
@@ -68,9 +68,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define rBC (BC.BC)
 #define rDE (DE.DE)
 #define rHL (HL.HL)
-#define rIX (IX)
-#define rIY (IY)
-#define rSP (SP)
+
+#define raA (aAF.r.A)
+#define raF (aAF.r.F)
+#define raB (aBC.r.B)
+#define raC (aBC.r.C)
+#define raD (aDE.r.D)
+#define raE (aDE.r.E)
+#define raH (aHL.r.H)
+#define raL (aHL.r.L)
+#define raAF (aAF.AF)
+#define raBC (aBC.BC)
+#define raDE (aDE.DE)
+#define raHL (aHL.HL)
 
   
 class cl_rxk: public cl_uc  
@@ -84,12 +94,11 @@ public:
   RP(aBC,BC,B,C);
   RP(aDE,DE,D,E);
   RP(aHL,HL,H,L);
-  u16_t IX, IY, SP;
-  class cl_memory_cell cA, cF, cAF;
-  class cl_memory_cell cB, cC, cBC;
-  class cl_memory_cell cD, cE, cDE;
-  class cl_memory_cell cH, cL, cHL;
-  class cl_memory_cell cIX, cIY, cSP;
+  u8_t rIP, rIIR, rEIR;
+  u16_t rIX, rIY, rSP;
+  class cl_cell8 cIP, cIIR, cEIR;
+  class cl_cell8 cA, cF, cB, cC, cD, cE, cH, cL;
+  class cl_cell16 cAF, cBC, cDE, cHL, cIX, cIY, cSP;
   class cl_ras *mem;
   class cl_address_space *ioi, *ioe;
   bool ioi_prefix, ioe_prefix;
@@ -111,21 +120,25 @@ public:
 
 
 enum rxkcpu_cfg {
-  rxk_cpu_segsize	= 0,
-  rxk_cpu_dataseg	= 1,
-  rxk_cpu_stackseg	= 2,
-  rxk_cpu_xpc		= 3,
+  rxk_cpu_xpc		= 0,
 
-  rxkcpu_nuof	= 4
+  rxk_cpu_nuof	= 1
 };
 
 class cl_rxk_cpu: public cl_hw
 {
 protected:
   class cl_rxk *ruc;
+  class cl_cell8 *xpc, *segsize, *dataseg, *stackseg;
 public:
   cl_rxk_cpu(class cl_uc *auc);
-  virtual int cfg_size() { return rxkcpu_nuof; }
+  virtual int init(void);
+  //virtual int cfg_size() { return rxk_cpu_nuof; }
+  virtual const char *cfg_help(t_addr addr);
+  
+  //virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+
+  virtual void print_info(class cl_console_base *con);
 };
 
 

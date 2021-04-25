@@ -542,32 +542,32 @@ cl_stm8::make_memories(void)
   rom_chip->init();
   memchips->add(rom_chip);*/
 
-  ram_chip= new cl_memory_chip("ram_chip", 0x1800, 8);
+  ram_chip= new cl_chip8("ram_chip", 0x1800, 8);
   ram_chip->init();
   memchips->add(ram_chip);
-  eeprom_chip= new cl_memory_chip("eeprom_chip", 0x0800, 8, 0);
+  eeprom_chip= new cl_chip8("eeprom_chip", 0x0800, 8, 0);
   eeprom_chip->init();
   memchips->add(eeprom_chip);
-  option_chip= new cl_memory_chip("option_chip", 0x0800, 8, 0);
+  option_chip= new cl_chip8("option_chip", 0x0800, 8, 0);
   option_chip->init();
   memchips->add(option_chip);
-  io_chip= new cl_memory_chip("io_chip", 0x0800, 8);
+  io_chip= new cl_chip8("io_chip", 0x0800, 8);
   io_chip->init();
   memchips->add(io_chip);
   if (type->subtype & DEV_STM8S105)
-    boot_chip= new cl_memory_chip("boot_chip_s105", bl_s105_length, 8, bl_s105);
+    boot_chip= new cl_chip8("boot_chip_s105", bl_s105_length, 8, bl_s105, bl_s105_length);
   else if (type->subtype & DEV_STM8L15x46)
-    boot_chip= new cl_memory_chip("boot_chip_l15x46", bl_l15x46_length, 8, bl_l15x46);
+    boot_chip= new cl_chip8("boot_chip_l15x46", bl_l15x46_length, 8, bl_l15x46, bl_l15x46_length);
   /*else if (type->subtype & DEV_STM8L101)
     boot_chip= new cl_memory_chip("boot_chip_l101", bl_l15x46_length, 8, bl_l15x46);*/
   else
-    boot_chip= new cl_memory_chip("boot_chip", 0x0800, 8);
+    boot_chip= new cl_chip8("boot_chip", 0x0800, 8);
   boot_chip->init();
   memchips->add(boot_chip);
-  cpu_chip= new cl_memory_chip("cpu_chip", 0x0100, 8);
+  cpu_chip= new cl_chip8("cpu_chip", 0x0100, 8);
   cpu_chip->init();
   memchips->add(cpu_chip);
-  flash_chip= new cl_memory_chip("flash_chip", 0x20000, 8, 0);
+  flash_chip= new cl_chip8("flash_chip", 0x20000, 8, 0);
   flash_chip->init();
   memchips->add(flash_chip);
   /*

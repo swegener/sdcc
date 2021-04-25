@@ -139,8 +139,8 @@ cl_serial::read(class cl_memory_cell *cell)
   if (cell == regs[dr])
     {
       if (sr_read)
-	regs[sr]->set_bit0(0x1f);
-      regs[sr]->set_bit0(0x20);
+	regs[sr]->set(regs[sr]->get() | 0x1f);
+      regs[sr]->set(regs[sr]->get() & ~0x20);
       cfg_set(serconf_able_receive, 1);
       return s_in;
     }
@@ -326,7 +326,7 @@ cl_serial::received()
   set_dr(s_in);
   cfg_write(serconf_received, s_in);
   if (regs[sr]->get() & 0x20)
-    regs[sr]->set_bit1(0x08); // overrun
+    regs[sr]->set(regs[sr]->get() | 0x08); // overrun
   show_readable(true);
 }
 
@@ -381,37 +381,37 @@ cl_serial::show_writable(bool val)
 {
   if (val)
     // TXE=1
-    regs[sr]->write_bit1(0x80);
+    regs[sr]->write(regs[sr]->read() | 0x80);
   else
     // TXE=0
-    regs[sr]->write_bit0(0x80);
+    regs[sr]->write(regs[sr]->read() & ~0x80);
 }
 
 void
 cl_serial::show_readable(bool val)
 {
   if (val)
-    regs[sr]->write_bit1(0x20);
+    regs[sr]->write(regs[sr]->read() | 0x20);
   else
-    regs[sr]->write_bit0(0x20);
+    regs[sr]->write(regs[sr]->read() & ~0x20);
 }
 
 void
 cl_serial::show_tx_complete(bool val)
 {
   if (val)
-    regs[sr]->write_bit1(0x40);
+    regs[sr]->write(regs[sr]->read() | 0x40);
   else
-    regs[sr]->write_bit0(0x40);
+    regs[sr]->write(regs[sr]->read() & ~0x40);
 }
 
 void
 cl_serial::show_idle(bool val)
 {
   if (val)
-    regs[sr]->write_bit1(0x10);
+    regs[sr]->write(regs[sr]->read() | 0x10);
   else
-    regs[sr]->write_bit0(0x10);
+    regs[sr]->write(regs[sr]->read() & ~0x10);
 }
 
 void

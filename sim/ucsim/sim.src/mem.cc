@@ -35,7 +35,6 @@
 //#include "i_string.h"
 
 // prj
-//#include "utils.h"
 #include "globals.h"
 
 // sim
@@ -47,7 +46,6 @@
 
 // local
 #include "memcl.h"
-//#include "hwcl.h"
 
 
 static class cl_mem_error_registry mem_error_registry;
@@ -711,27 +709,6 @@ cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell/*,
   next_operator= 0;
   //address= addr;
 }
-/*
-cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell,
-				       t_addr addr,
-				       t_mem *data_place, t_mem the_mask):
-  cl_base()
-{
-  cell= acell;
-  //data= data_place;
-  mask= the_mask;
-  next_operator= 0;
-  address= addr;
-}
-*/
-/*
-void
-cl_memory_operator::set_data(t_mem *data_place, t_mem the_mask)
-{
-  data= data_place;
-  mask= the_mask;
-}
-*/
 
 t_mem
 cl_memory_operator::read(void)
@@ -838,10 +815,9 @@ cl_hw_operator::write(t_mem val)
 
 /* Write event break on cell */
 
-cl_write_operator::cl_write_operator(class cl_memory_cell *acell/*, t_addr addr*/,
-				     //t_mem *data_place, t_mem the_mask,
+cl_write_operator::cl_write_operator(class cl_memory_cell *acell,
 				     class cl_uc *auc, class cl_brk *the_bp):
-  cl_event_break_operator(acell/*, addr*//*, data_place, the_mask*/, auc, the_bp)
+  cl_event_break_operator(acell, auc, the_bp)
 {
   uc= auc;
   bp= the_bp;
@@ -851,23 +827,21 @@ cl_write_operator::cl_write_operator(class cl_memory_cell *acell/*, t_addr addr*
 t_mem
 cl_write_operator::write(t_mem val)
 {
-  //printf("write event at 0x%x bp=%p\n",address,bp);
   if (bp->do_hit())
     uc->events->add(bp);
   if (next_operator)
     return(next_operator->write(val));
   else if (cell)
-    return(/* *data=*/cell->set(val /*& mask*/));
+    return(cell->set(val));
   return val;
 }
 
 
 /* Read event break on cell */
 
-cl_read_operator::cl_read_operator(class cl_memory_cell *acell/*, t_addr addr*/,
-				   //t_mem *data_place, t_mem the_mask,
+cl_read_operator::cl_read_operator(class cl_memory_cell *acell,
 				   class cl_uc *auc, class cl_brk *the_bp):
-  cl_event_break_operator(acell/*, addr*//*, data_place, the_mask*/, auc, the_bp)
+  cl_event_break_operator(acell, auc, the_bp)
 {
   uc= auc;
   bp= the_bp;
@@ -877,13 +851,12 @@ cl_read_operator::cl_read_operator(class cl_memory_cell *acell/*, t_addr addr*/,
 t_mem
 cl_read_operator::read(void)
 {
-  //printf("read event at 0x%x bp=%p\n",address,bp);
   if (bp->do_hit())
     uc->events->add(bp);
   if (next_operator)
     return(next_operator->read());
   else if (cell)
-    return(/* *data*/cell->get());
+    return(cell->get());
   return 0;
 }
 
@@ -891,27 +864,30 @@ cl_read_operator::read(void)
 /*
  *                                                                  Cell data
  */
-
+/*
 t_mem
 cl_cell_data::d()
 {
   return data?(*data):0;
 }
-
+*/
+/*
 void
 cl_cell_data::d(t_mem v)
 {
   data?(*data=v):0;
 }
-
+*/
+/*
 void
 cl_cell_data::dl(t_mem v)
 {
   data?(*data=v):0;
 }
+*/
 
 // bit cell for bit spaces
-
+/*
 t_mem
 cl_bit_cell::d()
 {
@@ -930,20 +906,26 @@ cl_bit_cell::d(t_mem v)
   else
     *data&= ~mask;
 }
-
+*/
 
 // 8 bit cell;
 
 t_mem
 cl_cell8::d()
 {
-  return data?((/*u8_t*/uchar)*data):0;
+  return data?(*((u8_t*)data)):0;
 }
 
 void
 cl_cell8::d(t_mem v)
 {
-  data?(*data=(/*u8_t*/uchar)v):0;
+  data?(*((u8_t*)data)=(u8_t)v):0;
+}
+
+void
+cl_cell8::dl(t_mem v)
+{
+  data?(*((u8_t*)data)=(u8_t)v):0;
 }
 
 // 8 bit cell for bit spaces
@@ -953,7 +935,7 @@ cl_bit_cell8::d()
 {
   if (!data)
     return 0;
-  /*u8_t*/uchar x= (/*u8_t*/uchar) *data;
+  u8_t x= *((u8_t*)data);
   x&= mask;
   return x?1:0;
 }
@@ -964,23 +946,30 @@ cl_bit_cell8::d(t_mem v)
   if (!data)
     return;
   if (v)
-    *data |= (/*u8_t*/uchar)mask;
+    *((u8_t*)data) |= (u8_t)mask;
   else
-    *data &= ~(/*u8_t*/uchar)mask;
+    *((u8_t*)data) &= ~((u8_t)mask);
 }
+
 
 // 16 bit cell;
 
 t_mem
 cl_cell16::d()
 {
-  return data?((u16_t)*data):0;
+  return data?(*((u16_t*)data)):0;
 }
 
 void
 cl_cell16::d(t_mem v)
 {
-  data?(*data=(u16_t)v):0;
+  data?(*((u16_t*)data)=(u16_t)v):0;
+}
+
+void
+cl_cell16::dl(t_mem v)
+{
+  data?(*((u16_t*)data)=(u16_t)v):0;
 }
 
 // 16 bit cell for bit spaces
@@ -990,7 +979,9 @@ cl_bit_cell16::d()
 {
   if (!data)
     return 0;
-  return (((u16_t)*data)&((u16_t)mask))?1:0;
+  u16_t x= *((u16_t*)data);
+  x&= mask;
+  return x?1:0;
 }
 
 void
@@ -999,9 +990,52 @@ cl_bit_cell16::d(t_mem v)
   if (!data)
     return;
   if (v)
-    *data |= (u16_t)mask;
+    *((u16_t*)data) |= (u16_t)mask;
   else
-    *data &= ~(u16_t)mask;
+    *((u16_t*)data) &= ~((u16_t)mask);
+}
+
+// 32 bit cell;
+
+t_mem
+cl_cell32::d()
+{
+  return data?(*((u32_t*)data)):0;
+}
+
+void
+cl_cell32::d(t_mem v)
+{
+  data?(*((u32_t*)data)=(u32_t)v):0;
+}
+
+void
+cl_cell32::dl(t_mem v)
+{
+  data?(*((u32_t*)data)=(u32_t)v):0;
+}
+
+// 32 bit cell for bit spaces
+
+t_mem
+cl_bit_cell32::d()
+{
+  if (!data)
+    return 0;
+  u32_t x= *((u32_t*)data);
+  x&= mask;
+  return x?1:0;
+}
+
+void
+cl_bit_cell32::d(t_mem v)
+{
+  if (!data)
+    return;
+  if (v)
+    *((u32_t*)data) |= (u32_t)mask;
+  else
+    *((u32_t*)data) &= ~((u32_t)mask);
 }
 
 
@@ -1052,10 +1086,6 @@ cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
 
 cl_memory_cell::~cl_memory_cell(void)
 {
-  if ((flags & CELL_NON_DECODED) && data)
-    {
-      //free(data);
-    }
 }
 
 int
@@ -1063,15 +1093,6 @@ cl_memory_cell::init(void)
 {
   //cl_base::init();
   data= &def_data;
-  //flags= CELL_NON_DECODED;
-  /*mask= 1;
-  int w= width;
-  for (--w; w; w--)
-    {
-      mask<<= 1;
-      mask|= 1;
-      }*/
-  //set(0/*rand()*/);
   return(0);
 }
 
@@ -1121,7 +1142,7 @@ cl_memory_cell::un_decode(void)
 {
   if ((flags & CELL_NON_DECODED) == 0)
     {
-      data= &def_data;//(t_mem *)malloc(sizeof(t_mem));
+      data= &def_data;
       flags|= CELL_NON_DECODED;
     }
 }
@@ -1129,14 +1150,10 @@ cl_memory_cell::un_decode(void)
 void
 cl_memory_cell::decode(class cl_memory_chip *chip, t_addr addr)
 {
-  if (flags & CELL_NON_DECODED)
-    {
-      //free(data);
-    }
   data= chip->get_slot(addr);
   if (!data)
     {
-      data= &def_data;//(t_mem *)malloc(sizeof(t_mem));
+      data= &def_data;
       flags|= CELL_NON_DECODED;
     }
   else
@@ -1144,7 +1161,7 @@ cl_memory_cell::decode(class cl_memory_chip *chip, t_addr addr)
 }
 
 void
-cl_memory_cell::decode(t_mem *data_ptr)
+cl_memory_cell::decode(void *data_ptr)
 {
   if (data_ptr == NULL)
     {
@@ -1159,7 +1176,7 @@ cl_memory_cell::decode(t_mem *data_ptr)
 }
 
 void
-cl_memory_cell::decode(t_mem *data_ptr, t_mem bit_mask)
+cl_memory_cell::decode(void *data_ptr, t_mem bit_mask)
 {
   if (data_ptr == NULL)
     {
@@ -1182,7 +1199,7 @@ cl_memory_cell::read(void)
 #endif
   if (operators)
     return(operators->read());
-  return /* *data*/d();
+  return d();
 }
 
 t_mem
@@ -1193,13 +1210,13 @@ cl_memory_cell::read(enum hw_cath skip)
 #endif
   if (operators)
     return(operators->read(skip));
-  return /* *data*/d();
+  return d();
 }
 
 t_mem
 cl_memory_cell::get(void)
 {
-  return /* *data*/d();
+  return d();
 }
 
 t_mem
@@ -1227,8 +1244,8 @@ cl_memory_cell::set(t_mem val)
   if (width == 1)
     d(val);
   else
-    /* *data=*/d(val & mask);
-  return /* *data*/d();
+    d(val & mask);
+  return d();
 }
 
 t_mem
@@ -1237,64 +1254,37 @@ cl_memory_cell::download(t_mem val)
   if (width == 1)
     dl(val);
   else
-    /* *data=*/dl(val & mask);
-  return /* *data*/d();
+    dl(val & mask);
+  return d();
 }
-
+/*
 t_mem
 cl_memory_cell::add(long what)
 {
-  /* *data=*/ d( (*data + what) & mask);
-  return(/* *data*/d());
+  set(get()+what);
+  return(d());
 }
-
+*/
+/*
 t_mem
 cl_memory_cell::wadd(long what)
 {
-  t_mem d= (*data + what) & mask;
+  t_mem d= (read() + what) & mask;
   return(write(d));
 }
-
-void
-cl_memory_cell::set_bit1(t_mem bits)
-{
-  bits&= mask;
-  /*(*data)|=*//*d*/set(d()| bits);
-}
-
-void
-cl_memory_cell::write_bit1(t_mem bits)
-{
-  bits&= mask;
-  /*(*data)|=*//*d*/write(d()| bits);
-}
-
-void
-cl_memory_cell::set_bit0(t_mem bits)
-{
-  bits&= mask;
-  /*(*data)&=*//*d*/set(d()& ~bits);
-}
-
-void
-cl_memory_cell::write_bit0(t_mem bits)
-{
-  bits&= mask;
-  /*(*data)&=*//*d*/write(d()& ~bits);
-}
-
+*/
 void
 cl_memory_cell::toggle_bits(t_mem bits)
 {
   bits&= mask;
-  /*d*/set(d() ^ bits);
+  set(d() ^ bits);
 }
 
 void
 cl_memory_cell::wtoggle_bits(t_mem bits)
 {
   bits&= mask;
-  /*d*/write(d() ^ bits);
+  write(d() ^ bits);
 }
 
 
@@ -1442,20 +1432,32 @@ cl_memory_cell::print_operators(const char *pre, class cl_console_base *con)
  */
 
 t_mem
+cl_dummy_cell::d()
+{
+  return data?(*((u32_t*)data)):0;
+}
+
+void
+cl_dummy_cell::d(t_mem v)
+{
+  *((u32_t*)data)= (u32_t)v;
+}
+
+t_mem
 cl_dummy_cell::write(t_mem val)
 {
 #ifdef STATISTIC
   nuof_writes++;
 #endif
-  *data= rand() & mask;
-  return(*data);
+  *((u32_t*)data)= rand() & mask;
+  return(*((u32_t*)data));
 }
 
 t_mem
 cl_dummy_cell::set(t_mem val)
 {
-  *data= rand() & mask;
-  return(*data);
+  *((u32_t*)data)= rand() & mask;
+  return(*((u32_t*)data));
 }
 
 
@@ -1467,11 +1469,11 @@ cl_address_space::cl_address_space(const char *id,
 				   t_addr astart, t_addr asize, int awidth):
   cl_memory(id, asize, awidth)
 {
-  class cl_memory_cell c(awidth);
   class cl_bit_cell8 bc8(awidth);
   class cl_cell8 c8(awidth);
   class cl_cell16 c16(awidth);
-  class cl_memory_cell *cell= &c;
+  class cl_cell32 c32(awidth);
+  class cl_memory_cell *cell= &c32;
   start_address= astart;
   decoders= new cl_decoder_list(2, 2, false);
   cella= (class cl_memory_cell *)malloc(size * sizeof(class cl_memory_cell));
@@ -1487,7 +1489,7 @@ cl_address_space::cl_address_space(const char *id,
     {
       void *p1= &(cella[i]);
       void *p2= cell;
-      memcpy(p1, p2, sizeof(c));
+      memcpy(p1, p2, sizeof(c32));
       cella[i].init();
     }
   dummy= new cl_dummy_cell(awidth);
@@ -1587,7 +1589,7 @@ cl_address_space::download(t_addr addr, t_mem val)
     }
   /* *(cella[idx].data)=*/cella[idx].download( val/*&(data_mask)*/);
 }
-
+/*
 t_mem
 cl_address_space::wadd(t_addr addr, long what)
 {
@@ -1599,30 +1601,7 @@ cl_address_space::wadd(t_addr addr, long what)
     }
   return(cella[idx].wadd(what));
 }
-
-/* Set or clear bits, without callbacks */
-
-void
-cl_address_space::set_bit1(t_addr addr, t_mem bits)
-{
-  t_addr idx= addr-start_address;
-  if (idx >= size ||
-      addr < start_address)
-    return;
-  class cl_memory_cell *cell= &(cella[idx]);
-  cell->set_bit1(bits);
-}
-
-void
-cl_address_space::set_bit0(t_addr addr, t_mem bits)
-{
-  t_addr idx= addr-start_address;
-  if (idx >= size ||
-      addr < start_address)
-    return;
-  class cl_memory_cell *cell= &(cella[idx]);
-  cell->set_bit0(bits);
-}
+*/
 
 
 class cl_memory_cell *
@@ -1965,13 +1944,27 @@ cl_memory_list::add(class cl_memory *mem)
  *                                                                  Memory chip
  */
 
+cl_chip_data::cl_chip_data(const char *id, t_addr asize, int awidth):
+  cl_memory(id, asize, awidth)
+{
+}
+
 cl_memory_chip::cl_memory_chip(const char *id,
 			       int asize,
 			       int awidth,
 			       int initial):
-  cl_memory(id, asize, awidth)
+  cl_chip_data(id, asize, awidth)
 {
-  array= (t_mem *)malloc(size * sizeof(t_mem));
+  if (awidth > 32)
+    width= 32;
+  if (width <= 8)
+    bwidth= 1;
+  else if (width <= 16)
+    bwidth= 2;
+  else
+    bwidth= 4;
+  alloc_size= size * sizeof(t_mem);
+  array= (t_mem *)malloc(alloc_size);
   init_value= initial;
   array_is_mine= true;
 }
@@ -1979,9 +1972,18 @@ cl_memory_chip::cl_memory_chip(const char *id,
 cl_memory_chip::cl_memory_chip(const char *id,
 			       int asize,
 			       int awidth,
-			       t_mem *aarray):
-  cl_memory(id, asize, awidth)
+			       t_mem *aarray, int arrsize):
+  cl_chip_data(id, asize, awidth)
 {
+if (awidth > 32)
+    width= 32;
+  if (width <= 8)
+    bwidth= 1;
+  else if (width <= 16)
+    bwidth= 2;
+  else
+    bwidth= 4;
+  alloc_size= arrsize;
   array= aarray;
   init_value= 0;
   array_is_mine= false;
@@ -2010,25 +2012,28 @@ cl_memory_chip::init(void)
 }
 
 
-t_mem *
+void *
 cl_memory_chip::get_slot(t_addr addr)
 {
+  u8_t *a= (u8_t*)array;
   if (!array ||
       size <= addr)
     return(0);
-  return(&array[addr]);
+  return(a+(addr*bwidth));
 }
 
 t_addr
-cl_memory_chip::is_slot(t_mem *data_ptr)
+cl_memory_chip::is_slot(/*t_mem*/void *data_ptr)
 {
-  if (data_ptr < &(array[0]))
+  u8_t *p= (u8_t *)data_ptr;
+  u8_t *a= (u8_t *)array;
+  if (p < &(a[0]))
     return -1;
-  if (data_ptr > &(array[size-1]))
+  if (p > &(a[alloc_size-1]))
     return -2;
-  return data_ptr - &(array[0]);
+  return p - &(a[0]);
 }
-
+/*
 t_mem
 cl_memory_chip::get(t_addr addr)
 {
@@ -2037,7 +2042,8 @@ cl_memory_chip::get(t_addr addr)
     return(0);
   return(array[addr]);
 }
-
+*/
+/*
 void
 cl_memory_chip::set(t_addr addr, t_mem val)
 {
@@ -2046,25 +2052,7 @@ cl_memory_chip::set(t_addr addr, t_mem val)
     return;
   array[addr]= val & data_mask;
 }
-
-void
-cl_memory_chip::set_bit1(t_addr addr, t_mem bits)
-{
-  if (!array ||
-      size <= addr)
-    return;
-  array[addr]|= (bits & data_mask);
-}
-
-void
-cl_memory_chip::set_bit0(t_addr addr, t_mem bits)
-{
-  if (!array ||
-      size <= addr)
-    return;
-  array[addr]&= ((~bits) & data_mask);
-}
-
+*/
 void
 cl_memory_chip::print_info(const char *pre, class cl_console_base *con)
 {
@@ -2078,6 +2066,119 @@ cl_memory_chip::print_info(const char *pre, class cl_console_base *con)
 		     get_name(),
 		     width, data_format, addr_format);
     }
+}
+
+
+// Chip with 1 byte slots
+
+cl_chip8::cl_chip8(const char *id, int asize, int awidth, int initial):
+  cl_memory_chip(id, asize, awidth, initial)
+{}
+
+cl_chip8::cl_chip8(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+  cl_memory_chip(id, asize, awidth, aarray, arrsize)
+{}
+
+t_mem
+cl_chip8::d(t_addr addr)
+{
+  if (!array ||
+      size <= addr)
+    return 0;
+  return (((u8_t*)array)[addr]) & data_mask;
+}
+
+void
+cl_chip8::d(t_addr addr, t_mem v)
+{
+  if (!array ||
+      size <= addr)
+    return;
+  v&= data_mask;
+  ((u8_t*)array)[addr]= v;
+}
+
+
+// Chip with 2 byte slots
+
+cl_chip16::cl_chip16(const char *id, int asize, int awidth, int initial):
+  cl_memory_chip(id, asize, awidth, initial)
+{}
+
+cl_chip16::cl_chip16(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+  cl_memory_chip(id, asize, awidth, aarray, arrsize)
+{}
+
+t_mem
+cl_chip16::d(t_addr addr)
+{
+  if (!array ||
+      size <= addr)
+    return 0;
+  return (((u16_t*)array)[addr]) & data_mask;
+}
+
+void
+cl_chip16::d(t_addr addr, t_mem v)
+{
+  if (!array ||
+      size <= addr)
+    return;
+  v&= data_mask;
+  ((u16_t*)array)[addr]= v;
+}
+
+
+// Chip with 4 byte slots
+
+cl_chip32::cl_chip32(const char *id, int asize, int awidth, int initial):
+  cl_memory_chip(id, asize, awidth, initial)
+{}
+
+cl_chip32::cl_chip32(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+  cl_memory_chip(id, asize, awidth, aarray, arrsize)
+{}
+
+t_mem
+cl_chip32::d(t_addr addr)
+{
+  if (!array ||
+      size <= addr)
+    return 0;
+  return (((u32_t*)array)[addr]) & data_mask;
+}
+
+void
+cl_chip32::d(t_addr addr, t_mem v)
+{
+  if (!array ||
+      size <= addr)
+    return;
+  v&= data_mask;
+  ((u32_t*)array)[addr]= v;
+}
+
+class cl_memory_chip *
+new_chip(const char *id, int awidth, int initial)
+{
+  class cl_memory_chip *c= 0;
+  
+  if (awidth < 1)
+    awidth= 1;
+  if (awidth > 32)
+    awidth= 32;
+
+  if (awidth <= 8)
+    c= new cl_chip8(id, awidth, initial);
+  else if (awidth <= 16)
+    c= new cl_chip16(id, awidth, initial);
+  else
+    c= new cl_chip32(id, awidth, initial);
+
+  if (c)
+    c->init();
+
+  return c;
 }
 
 
@@ -2521,7 +2622,7 @@ cl_banker::activate(class cl_console_base *con)
 {
   int b= actual_bank();
   t_addr i, s;
-  t_mem *data;
+  void *data;
   class cl_memory_cell *c;
 
   if (b == bank)
@@ -2546,7 +2647,7 @@ cl_banker::switch_to(int bank_nr, class cl_console_base *con)
 {
   int b= bank_nr;//actual_bank();
   t_addr i, s;
-  t_mem *data;
+  void *data;
   class cl_memory_cell *c;
 
   if (b == bank)
@@ -2651,7 +2752,7 @@ cl_bander::activate(class cl_console_base *con)
 	  b= 0;
 	  m= 1;
 	}
-      t_mem *slot= memchip->get_slot(ca);
+      void *slot= memchip->get_slot(ca);
       cl_memory_cell *c= address_space->get_cell(asa);
       c->decode(slot, m);
       b++;

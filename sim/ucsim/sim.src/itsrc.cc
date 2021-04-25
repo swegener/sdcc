@@ -132,7 +132,8 @@ void
 cl_it_src::clear(void)
 {
   if (clr_bit)
-    src_cell->set_bit0(src_mask);
+    //src_cell->set_bit0(src_mask);
+    src_cell->set(src_cell->get() & ~src_mask);
 }
 
 void

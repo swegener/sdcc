@@ -282,6 +282,9 @@ public:
   virtual const char *id_string(void);
   virtual void reset(void);
   virtual void set_PC(t_addr addr) { PC= addr; }
+  virtual void reg_cell_var(class cl_memory_cell *cell,
+			    void *store,
+			    chars vname, chars vdesc);
   
   // making objects
   virtual void make_memories(void);

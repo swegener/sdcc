@@ -331,18 +331,18 @@ void
 cl_mdu517::set_ovr(bool val)
 {
   if (val)
-    con->set_bit1(0x40);
+    con->set(con->get() | 0x40);
   else
-    con->set_bit0(0x40);
+    con->set(con->get() | 0x40);
 }
 
 void
 cl_mdu517::set_err(bool val)
 {
   if (val)
-    con->set_bit1(0x80);
+    con->set(con->get() | 0x80);
   else
-    con->set_bit0(0x80);
+    con->set(con->get() & ~0x80);
 }
 
 t_mem
@@ -627,18 +627,18 @@ void
 cl_mdu88x::set_err(bool val)
 {
   if (val)
-    stat->set_bit1(0x02);
+    stat->set(stat->get() | 0x02);
   else
-    stat->set_bit0(0x02);
+    stat->set(stat->get() & ~0x02);
 }
 
 void
 cl_mdu88x::set_bsy(bool val)
 {
   if (val)
-    stat->set_bit1(0x04);
+    stat->set(stat->get() | 0x04);
   else
-    stat->set_bit0(0x04);
+    stat->set(stat->get() & ~0x04);
 }
 
 bool

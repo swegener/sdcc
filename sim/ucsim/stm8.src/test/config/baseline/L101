@@ -1,8 +1,8 @@
-uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre68
+ucsim version 0.6-pre69
 Type of microcontroller: STM8 L101 L101xx
 Controller has 18 hardware element(s).
    on cpu[0]

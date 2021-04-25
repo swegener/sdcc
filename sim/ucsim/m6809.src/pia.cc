@@ -501,7 +501,7 @@ cl_pia::check_edges(void)
       *prev= signal;
       if (!(edge ^ signal))
 	{
-	  cr->set_bit1(0x80);
+	  cr->set(cr->get() | 0x80);
 	  if ((cr->get() & 0x38) == 0x20)
 	    {
 	      oca->write(oca->get() | 0x02);
@@ -517,7 +517,7 @@ cl_pia::check_edges(void)
 	{
 	  *prev= signal;
 	  if (!(edge ^ signal))
-	    cr->set_bit1(0x40);
+	    cr->set(cr->get() | 0x40);
 	}
     }
   
@@ -530,7 +530,7 @@ cl_pia::check_edges(void)
       *prev= signal;
       if (!(edge ^ signal))
 	{
-	  cr->set_bit1(0x80);
+	  cr->set(cr->get() | 0x80);
 	  if ((cr->get() & 0x38) == 0x20)
 	    {
 	      // TODO: CRB-b7 must first be cleared by a read of data.
@@ -547,7 +547,7 @@ cl_pia::check_edges(void)
 	{
 	  *prev= signal;
 	  if (!(edge ^ signal))
-	    cr->set_bit1(0x40);
+	    cr->set(cr->get() | 0x40);
 	}
     }
   return 0;

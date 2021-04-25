@@ -1,4 +1,4 @@
-uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -19,7 +19,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 5 ticks (6.250e-07 sec)
-Host usage: 0.000011 sec, rate=0.056988
+Host usage: 0.000006 sec, rate=0.104858
 
 # Start the vcd (we set the input file via the Makefile) and
 # have it stop execution each time an event occurs.
@@ -29,7 +29,7 @@ Break on events enabled
 
 # Make sure what it is going to do is what we asked.
 conf
-ucsim version 0.6-pre68
+ucsim version 0.6-pre69
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -61,7 +61,7 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File:       /home/mjagdis/git/work/sdcc/sdcc/sim/ucsim/stm8.src/test/vcd-in/test.vcd
+  File:       test.vcd
   Mode:       input
   Break:      enabled
   Time scale: 1 ns
@@ -92,7 +92,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000006 sec, rate=0.020972
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -106,7 +106,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000004 sec, rate=0.030840
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -120,7 +120,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000010 sec, rate=0.012483
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -134,7 +134,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000007 sec, rate=0.018079
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -148,7 +148,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000004 sec, rate=0.030840
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -162,7 +162,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000010 sec, rate=0.012483
+Host usage: 0.000003 sec, rate=0.040330
 dump rom 0 1
 0x00000 loc1:                01    .
 0x00001 loc2:                00    .
@@ -176,7 +176,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000004 sec, rate=0.032768
+Host usage: 0.000001 sec, rate=0.104858
 dump rom 0 1
 0x00000 loc1:                01    .
 0x00001 loc2:                00    .
@@ -190,7 +190,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000006 sec, rate=0.020165
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                01    .
 0x00001 loc2:                01    .
@@ -204,7 +204,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000004 sec, rate=0.032768
+Host usage: 0.000002 sec, rate=0.058254
 timer get
 timer #0("time") ON: 1.75e-06 sec (14 clks)
 timer #0("isr") ON,ISR: 0 sec (0 clks)
@@ -216,7 +216,7 @@ dump rom 0 1
 set hw vcd pause
 Paused
 conf
-ucsim version 0.6-pre68
+ucsim version 0.6-pre69
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -274,7 +274,7 @@ F 0x00800c
 set hw vcd pause
 Unpaused
 conf
-ucsim version 0.6-pre68
+ucsim version 0.6-pre69
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -315,7 +315,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000005 sec, rate=0.024966
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                02    .
 0x00001 loc2:                01    .
@@ -329,7 +329,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000003 sec, rate=0.043691
+Host usage: 0.000002 sec, rate=0.058254
 timer get
 timer #0("time") ON: 2.5e-06 sec (20 clks)
 timer #0("isr") ON,ISR: 0 sec (0 clks)
@@ -347,7 +347,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000004 sec, rate=0.032768
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                06    .
 0x00001 loc2:                02    .
@@ -361,7 +361,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000003 sec, rate=0.040330
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                04    .
 0x00001 loc2:                02    .
@@ -375,7 +375,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000012 sec, rate=0.010486
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                04    .
 0x00001 loc2:                03    .
@@ -389,7 +389,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000003 sec, rate=0.043691
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                0c    .
 0x00001 loc2:                03    .
@@ -417,7 +417,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.065536
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                08    .
 0x00001 loc2:                04    .
@@ -445,7 +445,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.065536
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                10    .
 0x00001 loc2:                04    .
@@ -481,7 +481,7 @@ dump rom 0 1
 # Stop now
 set hw vcd stop
 conf
-ucsim version 0.6-pre68
+ucsim version 0.6-pre69
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]

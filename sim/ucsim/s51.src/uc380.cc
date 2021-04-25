@@ -78,7 +78,7 @@ cl_uc380::make_chips(void)
 {
   cl_uc52::make_chips();
   sfr_chip->set_name("sfr_0_chip");
-  sfr_f_chip= new cl_memory_chip("sfr_f_chip", 0x80, 8, 0);
+  sfr_f_chip= new cl_chip8("sfr_f_chip", 0x80, 8, 0);
   sfr_f_chip->init();
   memchips->add(sfr_f_chip);
 }

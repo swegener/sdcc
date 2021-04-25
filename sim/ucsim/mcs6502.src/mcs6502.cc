@@ -41,19 +41,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_mcs6502::cl_mcs6502(class cl_sim *asim):
   cl_uc(asim)
 {
-  cA.init();
-  cA.decode((t_mem*)&A);
-  cX.init();
-  cX.decode((t_mem*)&X);
-  cY.init();
-  cY.decode((t_mem*)&Y);
-  cSP.init();
-  cSP.decode((t_mem*)&SP);
-  cCC.init();
-  cCC.decode((t_mem*)&CC);
-
-  class cl_memory_operator *op= new cl_cc_operator(&cCC);
-  cCC.append_operator(op);
 }
 
 int
@@ -63,6 +50,17 @@ cl_mcs6502::init(void)
 
   xtal= 1000000;
     
+#define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
+  RCV(A);
+  RCV(X);
+  RCV(Y);
+  RCV(SP);
+  RCV(P);
+#undef RCV
+  
+  class cl_memory_operator *op= new cl_cc_operator(&cCC);
+  cCC.append_operator(op);
+
   return 0;
 }
 
@@ -117,7 +115,7 @@ cl_mcs6502::make_memories(void)
   as->init();
   address_spaces->add(as);
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip= new cl_chip8("rom_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom,
@@ -125,18 +123,6 @@ cl_mcs6502::make_memories(void)
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
-
-  class cl_cvar *v;
-  vars->add(v= new cl_cvar("A", &cA, "CPU register A"));
-  v->init();
-  vars->add(v= new cl_cvar("X", &cX, "CPU register X"));
-  v->init();
-  vars->add(v= new cl_cvar("Y", &cY, "CPU register Y"));
-  v->init();
-  vars->add(v= new cl_cvar("S", &cSP, "CPU register S"));
-  v->init();
-  vars->add(v= new cl_cvar("P", &cCC, "CPU register P"));
-  v->init();
 }
 
 void

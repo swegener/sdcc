@@ -123,13 +123,13 @@ cl_51core::instruction_11/*inst_acall_addr*/(t_mem/*uchar*/ code)
   h= (code >> 5) & 0x07;
   l= fetch();
   sp_before= sfr->get(SP);
-  sp= sfr->wadd(SP, 1);
+  sp= sfr->write(SP, sfr->read(SP) + 1);
   //proc_write_sp(sp);
   stck= iram->get_cell(sp);
   stck->write(PC & 0xff); // push low byte
   tick(1);
 
-  sp= /*sp_after*= */sfr->wadd(SP, 1);
+  sp= /*sp_after*= */sfr->write(SP, sfr->read(SP) + 1);
   //proc_write_sp(sp);
   stck= iram->get_cell(sp);
   stck->write((PC >> 8) & 0xff); // push high byte
@@ -162,14 +162,14 @@ cl_51core::inst_lcall(t_mem code, uint addr, bool intr)
       l= fetch();
     }
   sp_before= sfr->get(SP);
-  sp= sfr->wadd(SP, 1);
+  sp= sfr->write(SP, sfr->read(SP) + 1);
   //proc_write_sp(sp);
   stck= iram->get_cell(sp);
   stck->write(PC & 0xff); // push low byte
   if (!addr)
     tick(1);
 
-  sp= sfr->wadd(SP, 1);
+  sp= sfr->write(SP, sfr->read(SP) + 1);
   //proc_write_sp(sp);
   stck= iram->get_cell(sp);
   stck->write((PC >> 8) & 0xff); // push high byte
@@ -233,12 +233,12 @@ cl_51core::instruction_22/*inst_ret*/(t_mem/*uchar*/ code)
   sp= sp_before= sfr->read(SP);
   stck= iram->get_cell(sp);
   h= stck->read();
-  sp= sfr->wadd(SP, -1);
+  sp= sfr->write(SP, sfr->read(SP) - 1);
   tick(1);
 
   stck= iram->get_cell(sp);
   l= stck->read();
-  sp= sfr->wadd(SP, -1);
+  sp= sfr->write(SP, sfr->read(SP)  - 1);
   PC= h*256 + l;
   class cl_stack_op *so= new cl_stack_ret(instPC, PC, sp_before, sp/*_after*/);
   so->init();
@@ -291,12 +291,12 @@ cl_51core::instruction_32/*inst_reti*/(t_mem/*uchar*/ code)
   sp= sp_before= sfr->read(SP);
   stck= iram->get_cell(sp);
   h= stck->read();
-  sp= sfr->wadd(SP, -1);
+  sp= sfr->write(SP, sfr->read(SP) - 1);
   tick(1);
 
   stck= iram->get_cell(sp);
   l= stck->read();
-  sp= sp_after= sfr->wadd(SP, -1);
+  sp= sp_after= sfr->write(SP, sfr->read(SP) - 1);
   PC= h*256 + l;
 
   interrupt->was_reti= true;
@@ -564,7 +564,7 @@ cl_51core::instruction_d8/*inst_djnz_rn_addr*/(t_mem/*uchar*/ code)
   reg  = R[code & 0x07];
   jaddr= fetch();
   tick(1);
-  t_mem r= reg->wadd(-1);
+  t_mem r= reg->write(reg->read() - 1);
   if (r)
     PC= rom->validate_address(PC + (signed char)jaddr);
   //vc.rd++;

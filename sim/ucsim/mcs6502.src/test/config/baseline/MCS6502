@@ -1,0 +1,25 @@
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+ucsim version 0.6-pre69
+Type of microcontroller: MCS6502
+Controller has 3 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+A= 0x00   0   +0 .  X= 0x00   0   +0 .  Y= 0x00   0   +0 .  
+P= 00100000
+   NV BDIZC
+S= 0x0100 95 aa 82 ca 6c 49 ae 90 ....lI..
+ ? 0xf719 bd uc::disass() unimplemented
+[0K
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated

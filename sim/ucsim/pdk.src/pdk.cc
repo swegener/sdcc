@@ -163,7 +163,7 @@ void cl_pdk::make_memories(void) {
     class cl_address_decoder *ad;
     class cl_memory_chip *chip;
 
-    chip = new cl_memory_chip("rom_chip", rom_storage, 16);
+    chip = new cl_chip16("rom_chip", rom_storage, 16);
     chip->init();
     memchips->add(chip);
 

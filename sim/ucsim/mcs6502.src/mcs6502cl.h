@@ -32,6 +32,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 
 
+#define rA  (A)
+#define rX  (X)
+#define rY  (Y)
+#define rSP (SP)
+#define rCC (CC)
+#define rP  (CC)
+#define rF  (CC)
+#define cP  (cCC)
+#define cF  (cCC)
+
 /*
  * Base of MCS6502 processor
  */
@@ -40,7 +50,7 @@ class cl_mcs6502: public cl_uc
 {
 public:
   u8_t A, X, Y, SP, CC;
-  class cl_memory_cell cA, cX, cY, cSP, cCC;
+  class cl_cell8 cA, cX, cY, cSP, cCC;
 public:
   cl_mcs6502(class cl_sim *asim);
   virtual int init(void);

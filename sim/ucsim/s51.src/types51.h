@@ -30,17 +30,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
-
+/*
 #define SET_BIT(newbit, reg, bitmask) \
 if (newbit) \
   (mem(MEM_SFR))->set_bit1((reg), (bitmask)); \
 else \
   (mem(MEM_SFR))->set_bit0((reg), (bitmask));
+*/
+#define SET_BIT(newbit, reg, bitmask)				\
+  if (newbit)							\
+    (mem(MEM_SFR))->set(mem(MEM_SFR)->get(reg) | (bitmask));	\
+  else								\
+    (mem(MEM_SFR))->set(mem(MEM_SFR)->get(reg) & ~(bitmask));
+/*
 #define SFR_SET_BIT(newbit, reg, bitmask) \
 if (newbit) \
   sfr->set_bit1((reg), (bitmask)); \
 else \
   sfr->set_bit0((reg), (bitmask));
+*/
+#define SFR_SET_BIT(newbit, reg, bitmask)	\
+  if (newbit)					\
+    sfr->set(reg, sfr->get(reg) | (bitmask));	\
+  else						\
+    sfr->set(reg, sfr->get(reg) & ~(bitmask));
 //#define GET_C     (get_mem(MEM_SFR, PSW) & bmCY)
 //#define SFR_GET_C (sfr->get(PSW) & bmCY)
 //#define SET_C(newC) SET_BIT((newC), PSW, bmCY)

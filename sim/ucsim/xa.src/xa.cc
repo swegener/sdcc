@@ -320,7 +320,7 @@ cl_xa::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip= new cl_chip8("rom_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xffff, 0);
@@ -328,7 +328,7 @@ cl_xa::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("iram_chip", 0x2000, 8);
+  chip= new cl_chip8("iram_chip", 0x2000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("iram"), chip, 0, 0x1fff, 0);
@@ -336,7 +336,7 @@ cl_xa::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("xram_chip", 0x10000, 8);
+  chip= new cl_chip8("xram_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("xram"), chip, 0, 0xffff, 0);
@@ -344,7 +344,7 @@ cl_xa::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("sfr_chip", 0x2000, 8);
+  chip= new cl_chip8("sfr_chip", 0x2000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("sfr"), chip, 0x0, 0x1fff, 0);

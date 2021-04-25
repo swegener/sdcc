@@ -1,4 +1,4 @@
-uCsim 0.6-pre68, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -83,7 +83,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset  0x0000,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000026 sec, rate=0.119156
+Host usage: 0.000037 sec, rate=0.084563
 
 # Remove the probe from every second bit.
 # Removing probes while started is ok - we just stop logging changes.
@@ -107,6 +107,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset  0x0000,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000025 sec, rate=0.124830
+Host usage: 0.000026 sec, rate=0.120250
 Loading from test.ihx
 111 words read from test.ihx

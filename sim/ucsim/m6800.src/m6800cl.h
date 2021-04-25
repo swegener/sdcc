@@ -32,6 +32,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 
 
+#define rA  (A)
+#define rB  (B)
+#define rCC (CC)
+#define rIX (IX)
+#define rSP (SP)
+
 /*
  * Base of M6800 processor
  */
@@ -41,7 +47,8 @@ class cl_m6800: public cl_uc
 public:
   u8_t A, B, CC;
   u16_t IX, SP;
-  class cl_memory_cell cA, cB, cCC, cIX, cSP;
+  class cl_cell8 cA, cB, cCC;
+  class cl_cell16 cIX, cSP;
 public:
   cl_m6800(class cl_sim *asim);
   virtual int init(void);

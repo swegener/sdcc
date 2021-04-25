@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 cl_51core::instruction_04/*inst_inc_a*/(t_mem/*uchar*/ code)
 {
-  acc->wadd(1);
+  acc->write(acc->read() + 1);
   return(resGO);
   //vc.rd++;
   //vc.wr++;
@@ -79,7 +79,7 @@ cl_51core::instruction_06/*inst_inc_Sri*/(t_mem/*uchar*/ code)
   class cl_memory_cell *cell;
 
   cell= iram->get_cell(R[code & 0x01]->read());
-  cell->wadd(1);
+  cell->write(cell->read() + 1);
   vc.rd++;//= 2;
   vc.wr++;
   return(resGO);
@@ -97,7 +97,7 @@ cl_51core::instruction_08/*inst_inc_rn*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *reg= R[code & 0x07];
 
-  reg->wadd(1);
+  reg->write(reg->read() + 1);
   //vc.rd++;
   //vc.wr++;
   return(resGO);
@@ -113,7 +113,7 @@ cl_51core::instruction_08/*inst_inc_rn*/(t_mem/*uchar*/ code)
 int
 cl_51core::instruction_14/*inst_dec_a*/(t_mem/*uchar*/ code)
 {
-  acc->wadd(-1);
+  acc->write(acc->read() - 1);
   //vc.rd++;
   //vc.wr++;
   return(resGO);
@@ -152,7 +152,7 @@ cl_51core::instruction_16/*inst_dec_Sri*/(t_mem/*uchar*/ code)
   class cl_memory_cell *cell;
 
   cell= iram->get_cell(R[code & 0x01]->read());
-  cell->add(-1);
+  cell->set(cell->get() - 1);
   vc.rd++;//= 2;
   vc.wr++;
   return(resGO);
@@ -170,7 +170,7 @@ cl_51core::instruction_18/*inst_dec_rn*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *reg= R[code & 0x07];
 
-  reg->wadd(-1);
+  reg->write(reg->read() - 1);
   //vc.rd++;
   //vc.wr++;
   return(resGO);

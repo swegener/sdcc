@@ -34,7 +34,7 @@ class cl_ras: public cl_address_space
  public:
   class cl_memory_chip *chip;
  public:
-  u8_t segsize, dataseg, stackseg, xpc;
+  u8_t xpc, segsize, dataseg, stackseg;
  public:
   cl_ras(chars id, class cl_memory_chip *achip);
  public:

@@ -93,8 +93,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_chip_cmd)
     con->dd_printf("Wrong width\n");
   else
     {
-      class cl_memory *mem= new cl_memory_chip(memid, size, width);
-      mem->init();
+      class cl_memory *mem= new_chip(memid, size, width);
       uc->memchips->add(mem);
       mem->set_uc(uc);
     }

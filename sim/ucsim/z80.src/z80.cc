@@ -156,7 +156,7 @@ cl_z80::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip= new cl_chip8("rom_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xffff, 0);
@@ -166,7 +166,7 @@ cl_z80::make_memories(void)
 
   inputs= new cl_address_space("inputs", 0, 0x10000, 8);
   inputs->init();
-  chip= new cl_memory_chip("in_chip", 0x10000, 8);
+  chip= new cl_chip8("in_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(inputs, chip, 0, 0xffff, 0);
@@ -175,7 +175,7 @@ cl_z80::make_memories(void)
   address_spaces->add(inputs);
   outputs= new cl_address_space("outputs", 0, 0x10000, 8);
   outputs->init();
-  chip= new cl_memory_chip("out_chip", 0x10000, 8);
+  chip= new cl_chip8("out_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(outputs, chip, 0, 0xffff, 0);

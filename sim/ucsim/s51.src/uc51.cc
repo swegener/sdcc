@@ -885,19 +885,19 @@ cl_51core::make_address_spaces(void)
 void
 cl_51core::make_chips(void)
 {
-  rom_chip= new cl_memory_chip("rom_chip", 0x10000, 8, 0/*, 0xff*/);
+  rom_chip= new cl_chip8("rom_chip", 0x10000, 8, 0/*, 0xff*/);
   rom_chip->init();
   memchips->add(rom_chip);
   
-  iram_chip= new cl_memory_chip("iram_chip", 0x100, 8);
+  iram_chip= new cl_chip8("iram_chip", 0x100, 8);
   iram_chip->init();
   memchips->add(iram_chip);
 
-  xram_chip= new cl_memory_chip("xram_chip", 0x10000, 8);
+  xram_chip= new cl_chip8("xram_chip", 0x10000, 8);
   xram_chip->init();
   memchips->add(xram_chip);
 
-  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8);
+  sfr_chip= new cl_chip8("sfr_chip", 0x80, 8);
   sfr_chip->init();
   memchips->add(sfr_chip);
 }
@@ -1039,7 +1039,7 @@ cl_51core::decode_dptr(void)
 	  class cl_memory_chip *dptr_chip= (cl_memory_chip*)memory("dptr_chip");
 	  if (dptr_chip == 0)
 	    {
-	      dptr_chip= new cl_memory_chip("dptr_chip", 3*8, 8);
+	      dptr_chip= new cl_chip8("dptr_chip", 3*8, 8);
 	      dptr_chip->init();
 	      memchips->add(dptr_chip);
 	    }
@@ -1082,10 +1082,10 @@ cl_51core::decode_dptr(void)
       ad->activate(0);
     }
   
-  vars->add("dpl", dptr, 0, 7, 0, "");
-  vars->add("DPL", dptr, 0, 7, 0, "");
-  vars->add("dph", dptr, 1, 7, 0, "");
-  vars->add("DPH", dptr, 1, 7, 0, "");
+  vars->add("dpl", dptr, 0, "");
+  vars->add("DPL", dptr, 0, "");
+  vars->add("dph", dptr, 1, "");
+  vars->add("DPH", dptr, 1, "");
 }
 
 void
@@ -1251,8 +1251,8 @@ cl_51core::print_regs(class cl_console_base *con)
 {
   t_addr start, stop;
   t_mem data;
-  t_mem dp;
-  
+  u16_t dp;
+
   // show regs
   start= psw->get() & 0x18;
   con->dd_color("answer");
@@ -1315,7 +1315,7 @@ cl_51core::print_regs(class cl_console_base *con)
 		  for (di= dptr->get_size()-1; di >= 0; di--)
 		    dp= (dp*256) + dptr_chip->get(a+di);
 		  con->dd_printf("  %cDPTR%d= ", (i==act)?'*':' ', i);
-		  con->dd_printf(xram->addr_format, dp);
+		  con->dd_printf("0x%04x", dp);
 		  data= xram->read(dp);
 		  con->dd_printf(" @DPTR%d= ", i);
 		  con->dd_printf("0x%02x %3d %c\n", data, data,
@@ -1339,7 +1339,7 @@ cl_51core::print_regs(class cl_console_base *con)
 	  dp= (sfr_chip->get(DPL-0x80) +
 	       sfr_chip->get(DPH-0x80) * 256) & 0xffff;
 	  con->dd_printf("  %cDPTR%d= ", (i==act)?'*':' ', i);
-	  con->dd_printf(xram->addr_format, dp);
+	  con->dd_printf("0x%04x", dp);
 	  data= xram->read(dp);
 	  con->dd_printf(" @DPTR%d= ", i);
 	  con->dd_printf("0x%02x %3d %c\n", data, data,
@@ -1829,7 +1829,7 @@ cl_51core::do_interrupt(void)
 	  if (state == stIDLE)
 	    {
 	      state= stGO;
-	      sfr->set_bit0(PCON, bmIDL);
+	      sfr->set(PCON, sfr->get(PCON) & ~bmIDL);
 	      interrupt->was_reti= true;
 	      return(resGO);
 	    }
@@ -1861,7 +1861,7 @@ int
 cl_51core::accept_it(class it_level *il)
 {
   state= stGO;
-  sfr->set_bit0(PCON, bmIDL);
+  sfr->set(PCON, sfr->get(PCON) & ~bmIDL);
   it_levels->push(il);
   tick(1);
   int res= inst_lcall(0, il->addr, true);
@@ -2094,9 +2094,9 @@ cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
 	  uc>>= 1;
 	}
       if (p)
-	cell_psw->set_bit1(bmP);
+	cell_psw->set(cell_psw->get() | bmP);
       else
-	cell_psw->set_bit0(bmP);
+	cell_psw->set(cell_psw->get() & ~bmP);
     }
   /*else if (cell == cell_pcon)
     {

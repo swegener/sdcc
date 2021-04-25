@@ -42,47 +42,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_rxk::cl_rxk(class cl_sim *asim):
   cl_uc(asim)
 {
-  cA.init();
-  cA.decode((t_mem*)&AF.r.A);
-  cF.init();
-  cF.decode((t_mem*)&AF.r.F);
-  cAF.init();
-  cAF.set_width(16);
-  cAF.decode((t_mem*)&AF.AF);
-
-  cB.init();
-  cB.decode((t_mem*)&BC.r.B);
-  cC.init();
-  cC.decode((t_mem*)&BC.r.B);
-  cBC.init();
-  cBC.set_width(16);
-  cBC.decode((t_mem*)&BC.BC);
-
-  cD.init();
-  cD.decode((t_mem*)&DE.r.D);
-  cE.init();
-  cE.decode((t_mem*)&DE.r.E);
-  cDE.init();
-  cDE.set_width(16);
-  cDE.decode((t_mem*)&DE.DE);
-
-  cH.init();
-  cH.decode((t_mem*)&HL.r.H);
-  cL.init();
-  cL.decode((t_mem*)&HL.r.L);
-  cHL.init();
-  cHL.set_width(16);
-  cHL.decode((t_mem*)&HL.HL);
-
-  cIX.init();
-  cIX.set_width(16);
-  cIX.decode((t_mem*)&IX);
-  cIY.init();
-  cIY.set_width(16);
-  cIY.decode((t_mem*)&IY);
-  cSP.init();
-  cSP.set_width(16);
-  cSP.decode((t_mem*)&SP);
 }
 
 int
@@ -93,7 +52,30 @@ cl_rxk::init(void)
   ioe_prefix= false;
   
   xtal= 1000000;
-    
+
+#define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
+  RCV(A);
+  RCV(F);
+  RCV(AF);
+  RCV(B);
+  RCV(C);
+  RCV(BC);
+  RCV(D);
+  RCV(E);
+  RCV(DE);
+  RCV(H);
+  RCV(L);
+  RCV(HL);
+
+  RCV(IX);
+  RCV(IY);
+  RCV(SP);
+
+  RCV(IP);
+  RCV(IIR);
+  RCV(EIR);
+#undef RCV
+  
   return 0;
 }
 
@@ -110,12 +92,15 @@ cl_rxk::reset(void)
   cl_uc::reset();
 
   // MMU reset
-  mem->segsize= 0;
   mem->dataseg= 0;
-  mem->dataseg= 0;
+  mem->segsize= 0xff;
   mem->stackseg= 0;
   mem->xpc= 0;
 
+  rIP= 0xff;
+  rIIR= 0;
+  rEIR= 0;
+  rSP= 0;
 }
 
   
@@ -150,7 +135,7 @@ cl_rxk::make_memories(void)
   class cl_address_space *as;
   class cl_address_decoder *ad;
 
-  chip= new cl_memory_chip("rom_chip", 0x100000, 8);
+  chip= new cl_chip8("rom_chip", 0x100000, 8);
   chip->init();
   memchips->add(chip);
 
@@ -163,7 +148,7 @@ cl_rxk::make_memories(void)
   as->init();
   address_spaces->add(as);
 
-  chip= new cl_memory_chip("ioi_chip", 0x10000, 8);
+  chip= new cl_chip8("ioi_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as,
@@ -176,7 +161,7 @@ cl_rxk::make_memories(void)
   as->init();
   address_spaces->add(as);
 
-  chip= new cl_memory_chip("ioe_chip", 0x10000, 8);
+  chip= new cl_chip8("ioe_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as,
@@ -197,6 +182,9 @@ cl_rxk::print_regs(class cl_console_base *con)
   con->dd_printf("\n");
   con->dd_printf("                  SZxxxVxC\n");
 
+  con->dd_printf("XPC= 0x%02x IP= 0x%02x IIR= 0x%02x EIR= 0x%02x\n",
+		 mem->xpc, rIP, rIIR, rEIR);
+  
   con->dd_printf("BC= ");
   rom->dump(0, rBC, rBC+7, 8, con);
   con->dd_color("answer");
@@ -216,6 +204,12 @@ cl_rxk::print_regs(class cl_console_base *con)
   rom->dump(0, rSP, rSP+7, 8, con);
   con->dd_color("answer");
 
+  con->dd_printf("aAF= 0x%02x-0x%02x  ", raA, raF);
+  con->dd_printf("aBC= 0x%02x-0x%02x  ", raB, raC);
+  con->dd_printf("aDE= 0x%02x-0x%02x  ", raD, raE);
+  con->dd_printf("aHL= 0x%02x-0x%02x  ", raH, raL);
+  con->dd_printf("\n");
+  
   print_disass(PC, con);
 }
 
@@ -228,6 +222,70 @@ cl_rxk_cpu::cl_rxk_cpu(class cl_uc *auc):
   cl_hw(auc, HW_CPU, 0, "cpu")
 {
   ruc= (class cl_rxk *)auc;
+}
+
+int
+cl_rxk_cpu::init(void)
+{
+  cl_hw::init();
+
+  stackseg= (cl_cell8*)ruc->ioi->get_cell(0x11);
+  dataseg = (cl_cell8*)ruc->ioi->get_cell(0x12);
+  segsize = (cl_cell8*)ruc->ioi->get_cell(0x13);
+  xpc= new cl_cell8(8);
+
+  uc->reg_cell_var(stackseg, &(ruc->mem->stackseg),
+		   "STACKSEG", "MMU register: STACKSEG");
+  uc->reg_cell_var(dataseg, &(ruc->mem->dataseg),
+		   "DATASEG", "MMU register: DATASEG");
+  uc->reg_cell_var(segsize, &(ruc->mem->segsize),
+		   "SEGSIZE", "MMU register: SEGSIZE");
+  uc->reg_cell_var(xpc, &(ruc->mem->xpc),
+		   "XPC", "MMU register: XPC");
+
+  return 0;
+}
+
+const char *
+cl_rxk_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case rxk_cpu_xpc: return "MMU register: XPC";
+    case rxk_cpu_nuof: return "";
+    }
+  return "Not used";
+}
+
+/*
+t_mem
+cl_rxk_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  switch ((enum rxkcpu_cfg)addr)
+    {
+    case rxk_cpu_xpc:
+      if (val) cell->set(ruc->mem->xpc= *val);
+      return ruc->mem->xpc;
+    case rxk_cpu_nuof:
+      return 0;
+    }
+  return 0;
+
+  if (val)
+    cell->set(*val);
+  return cell->get();
+}
+*/
+
+void
+cl_rxk_cpu::print_info(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("%s[%d]\n", id_string, id);
+  con->dd_printf("SEGSIZE : 0x%02x\n", segsize->read());
+  con->dd_printf("DATASEG : 0x%02x\n", dataseg->read());
+  con->dd_printf("STACKSEG: 0x%02x\n", stackseg->read());
+  con->dd_printf("XPC     : 0x%02x\n", xpc->read());
 }
 
 

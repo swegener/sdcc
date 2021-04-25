@@ -293,7 +293,7 @@ cl_serial::tick(int cycles)
       (s_tr_bit >= _bits))
     {
       s_sending= false;
-      scon->set_bit1(bmTI);
+      scon->set(scon->get() | bmTI);
       io->write((char*)(&s_out), 1);
       s_tr_bit-= _bits;
     }
@@ -339,7 +339,7 @@ cl_serial::tick(int cycles)
 void
 cl_serial::received(int c)
 {
-  scon->set_bit1(bmRI);
+  scon->set(scon->get() | bmRI);
   cfg_write(serconf_received, c);
 }
 

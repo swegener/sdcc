@@ -378,9 +378,9 @@ cl_avr::bst_Rd_b(t_mem code)
   mask= 1<<b;
   t_mem data= ram->read(d);
   if (data & mask)
-    ram->set_bit1(SREG, BIT_T);
+    ram->set(SREG, ram->get(SREG) | BIT_T);
   else
-    ram->set_bit0(SREG, BIT_T);
+    ram->set(SREG, ram->get(SREG) & ~BIT_T);
   vc.rd++;
   return(resGO);
 }

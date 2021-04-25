@@ -407,9 +407,9 @@ cl_serial::show_writable(bool val)
 {
   // TDRE: Transmit Data Register Empty: sr.1
   if (val)
-    r_sr->set_bit1(2);//regs[sr]->write_bit1(0x02);
+    r_sr->set(r_sr->get() | 2);
   else
-    r_sr->set_bit0(2);//regs[sr]->write_bit0(0x02);
+    r_sr->set(r_sr->get() & ~2);
   set_sr_irq();
 }
 
@@ -418,9 +418,9 @@ cl_serial::show_readable(bool val)
 {
   // RDRF: Receive Data Register Full (sr.0)
   if (val)
-    r_sr->set_bit1(1);//regs[sr]->write_bit1(0x01);
+    r_sr->set(r_sr->get() | 1);
   else
-    r_sr->set_bit0(1);//regs[sr]->write_bit0(0x01);
+    r_sr->set(r_sr->get() & ~1);
   set_sr_irq();
 }
 

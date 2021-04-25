@@ -287,7 +287,7 @@ cl_51core::instruction_c0/*inst_push*/(t_mem/*uchar*/ code)
 
   cell= get_direct(fetch());
   sp_before= sfr->get(SP);
-  sp= /*sp_after= */sfr->wadd(SP, 1);
+  sp= /*sp_after= */sfr->write(SP, sfr->read(SP) + 1);
   stck= iram->get_cell(sp);
   stck->write(data= cell->read());
   class cl_stack_op *so=
@@ -385,7 +385,7 @@ cl_51core::instruction_d0/*inst_pop*/(t_mem/*uchar*/ code)
   stck= iram->get_cell(/*sfr->get(SP)*/sp_before);
   /* Order of decrement and write changed to fix POP SP, reported by
      Alexis Pavlov <alexis.pavlov@certess.com> */
-  sp= sfr->wadd(SP, -1);
+  sp= sfr->write(SP, sfr->read(SP) - 1);
   cell->write(data= stck->read());
   tick(1);
   class cl_stack_op *so=

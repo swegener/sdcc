@@ -241,13 +241,13 @@ cl_timer0::do_mode0(int cycles)
   while (cycles--)
     {
       // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-      t_mem tl= cell_tl->add(1);
+      t_mem tl= cell_tl->set(cell_tl->get() + 1);
       if ((tl & 0x1f) == 0)
 	{
 	  cell_tl->set(0);
-	  if (!cell_th->add(1))
+	  if (!cell_th->set(cell_th->get() + 1))
 	    {
-	      cell_tcon->set_bit1(mask_TF);
+	      cell_tcon->set(cell_tcon->get() | mask_TF);
 	      overflow();
 	    }
 	}
@@ -282,11 +282,11 @@ cl_timer0::do_mode1(int cycles)
   while (cycles--)
     {
       // mod 1 TH+TL= 16 bit t/c
-      if (!cell_tl->add(1))
+      if (!cell_tl->set(cell_tl->get() + 1))
 	{
-	  if (!cell_th->add(1))
+	  if (!cell_th->set(cell_th->get() + 1))
 	    {
-	      cell_tcon->set_bit1(mask_TF);
+	      cell_tcon->set(cell_tcon->get() | mask_TF);
 	      overflow();
 	    }
 	}
@@ -322,10 +322,10 @@ cl_timer0::do_mode2(int cycles)
   while (cycles--)
     {
       // mod 2 TL= 8 bit t/c auto reload from TH
-      if (!cell_tl->add(1))
+      if (!cell_tl->set(cell_tl->get() + 1))
 	{
 	  cell_tl->set(cell_th->get());
-	  cell_tcon->set_bit1(mask_TF);
+	  cell_tcon->set(cell_tcon->get() | mask_TF);
 	  //printf("timer%d overflow %d (%d) %d\n",id,uc->ticks->ticks,i,startt+(i*12));
 	  overflow();
 	}
@@ -361,9 +361,9 @@ cl_timer0::do_mode3(int cycles)
 
   while (cycles--)
     {
-      if (!cell_tl->add(1))
+      if (!cell_tl->set(cell_tl->get() + 1))
 	{
-	  cell_tcon->set_bit1(mask_TF);
+	  cell_tcon->set(cell_tcon->get() | mask_TF);
 	  overflow();
 	}
     }
@@ -372,8 +372,8 @@ cl_timer0::do_mode3(int cycles)
   if ((cell_tcon->get() & bmTR1) != 0)
     while (cyc--)
       {
-	if (!cell_th->add(1))
-	  cell_tcon->set_bit1(bmTF1);
+	if (!cell_th->set(cell_th->get() + 1))
+	  cell_tcon->set(cell_tcon->get() | bmTF1);
       }
   return(0);
 }

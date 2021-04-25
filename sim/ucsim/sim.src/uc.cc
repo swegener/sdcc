@@ -637,6 +637,26 @@ cl_uc::reset(void)
     }
 }
 
+void
+cl_uc::reg_cell_var(class cl_memory_cell *cell,
+		    void *store,
+		    chars vname, chars vdesc)
+{
+  if (cell)
+    {
+      cell->init();
+      if (store)
+	cell->decode(store);
+      if (vname.nempty())
+	{
+	  class cl_cvar *v;
+	  vars->add(v= new cl_cvar(vname, cell, vdesc));
+	  v->init();
+	}
+    }
+}
+
+
 /*
  * Making elements
  */
@@ -667,7 +687,7 @@ cl_uc::make_variables(void)
       as->init();
       address_spaces->add(as);
 
-      chip= new cl_memory_chip("variable_storage", l, 32);
+      chip= new cl_chip32("variable_storage", l, 32);
       chip->init();
       memchips->add(chip);
       ad= new cl_address_decoder(variables, chip, 0, l-1, 0);

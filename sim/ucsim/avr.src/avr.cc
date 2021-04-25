@@ -179,7 +179,7 @@ cl_avr::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 16);
+  chip= new cl_chip16("rom_chip", 0x10000, 16);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
@@ -188,7 +188,7 @@ cl_avr::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("iram_chip", 0x80, 8);
+  chip= new cl_chip8("iram_chip", 0x80, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= ram/*address_space(MEM_IRAM_ID)*/,

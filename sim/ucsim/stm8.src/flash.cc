@@ -165,9 +165,9 @@ void
 cl_flash::finish_program(bool ok)
 {
   if (ok)
-    iapsr->set_bit1(0x04);
+    iapsr->set(iapsr->get() | 0x04);
   else
-    iapsr->set_bit1(0x01);
+    iapsr->set(iapsr->get() | 0x01);
   state= fs_wait_mode;
 }
 

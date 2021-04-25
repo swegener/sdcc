@@ -403,23 +403,23 @@ cl_uc390::make_address_spaces(void)
 void
 cl_uc390::make_chips(void)
 {
-  rom_chip= new cl_memory_chip("rom_chip", 0x20000, 8, 0xff);
+  rom_chip= new cl_chip8("rom_chip", 0x20000, 8, 0xff);
   rom_chip->init();
   memchips->add(rom_chip);
 
-  iram_chip= new cl_memory_chip("iram_chip", 0x100, 8, 0);
+  iram_chip= new cl_chip8("iram_chip", 0x100, 8, 0);
   iram_chip->init();
   memchips->add(iram_chip);
 
-  xram_chip= new cl_memory_chip("xram_chip", 0x100000+128, 8, 0);
+  xram_chip= new cl_chip8("xram_chip", 0x100000+128, 8, 0);
   xram_chip->init();
   memchips->add(xram_chip);
 
-  ixram_chip= new cl_memory_chip("ixram_chip", 0x1000, 8);
+  ixram_chip= new cl_chip8("ixram_chip", 0x1000, 8);
   ixram_chip->init();
   memchips->add(ixram_chip);
 
-  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
+  sfr_chip= new cl_chip8("sfr_chip", 0x80, 8, 0);
   sfr_chip->init();
   memchips->add(sfr_chip);
 }
@@ -554,11 +554,11 @@ cl_uc390::push_byte (t_mem uc)
 {
   t_addr sp;
 
-  sp = sfr->wadd (SP, 1);
+  sp = sfr->write(SP, sfr->read(SP) + 1);
   if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
     {
       if (sp == 0) /* overflow SP */
-        sfr->wadd (R51_ESP, 1);
+        sfr->write(R51_ESP, sfr->read(R51_ESP) + 1);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
       write_mem (MEM_IXRAM_ID, sp, uc); // fixme
     }
@@ -582,9 +582,9 @@ cl_uc390::pop_byte (void)
       sp = sfr->read (SP);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
       temp = read_mem (MEM_IXRAM_ID, sp); // fixme
-      sp = sfr->wadd (SP, -1);
+      sp = sfr->write(SP, sfr->read(SP) - 1);
       if (sp == 0xff) /* underflow SP */
-        sfr->wadd (R51_ESP, -1);
+        sfr->write(R51_ESP, sfr->read(R51_ESP) - 1);
       return temp;
     }
   else
@@ -593,7 +593,7 @@ cl_uc390::pop_byte (void)
 
       stck = iram->get_cell (sfr->get (SP));
       temp = stck->read();
-      sp = sfr->wadd (SP, -1);
+      sp = sfr->write(SP, sfr->read(SP) - 1);
       return temp;
     }
 }
@@ -974,11 +974,11 @@ cl_uc390::instruction_11/*inst_acall_addr*/ (t_mem/*uchar*/ code)
 
       h = (code >> 5) & 0x07;
       l = fetch();
-      sp = sfr->wadd (SP, 1);
+      sp = sfr->write(SP, sfr->read(SP) + 1);
       stck = iram->get_cell (sp);
       stck->write (PC & 0xff); // push low byte
 
-      sp = sfr->wadd (SP, 1);
+      sp = sfr->write(SP, sfr->read(SP) + 1);
       stck = iram->get_cell (sp);
       stck->write ((PC >> 8) & 0xff); // push high byte
       PC = (PC & 0xf800) | (h*256 + l);

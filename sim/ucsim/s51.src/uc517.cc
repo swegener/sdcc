@@ -44,7 +44,7 @@ cl_uc517::init(void)
   cpu->cfg_set(uc51cpu_aof_mdpc, 0x92);
   cpu->cfg_set(uc51cpu_mask_mdpc, 7);
   class cl_memory_chip *dptr_chip=
-    new cl_memory_chip("dptr_chip", 3*8, 8);
+    new cl_chip8("dptr_chip", 3*8, 8);
   dptr_chip->init();
   memchips->add(dptr_chip);
   decode_dptr();

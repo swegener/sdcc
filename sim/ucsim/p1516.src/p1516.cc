@@ -180,8 +180,7 @@ cl_p1516::make_memories(void)
   chip= new cl_chip32("rom_chip", 0x4000, 32);
   chip->init();
   memchips->add(chip);
-  ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-			     chip, 0, 0x3fff, 0);
+  ad= new cl_address_decoder(as= rom, chip, 0, 0x3fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -200,7 +199,7 @@ cl_p1516::make_memories(void)
     {
       n.format("R%d", i);
       d.format("CPU register %d", i);
-      vars->add(n, regs, i, 31, 0, d);
+      vars->add(n, regs, i, d);
     }
 }
 

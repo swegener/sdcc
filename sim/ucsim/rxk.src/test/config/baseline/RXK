@@ -11,7 +11,7 @@ Controller has 4 hardware element(s).
    on dreg[0]
 A= 0x00   0 .  F= 00000000 0x00   0 .
                   SZxxxVxC
-XPC= 0x00 IP= 0x00 IIR= 0x00 EIR= 0x00
+XPC= 0x00 IP= 0xff IIR= 0x00 EIR= 0x00
 BC= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 DE= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 HL= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH

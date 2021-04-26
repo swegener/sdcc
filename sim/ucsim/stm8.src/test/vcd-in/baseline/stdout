@@ -106,7 +106,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -148,7 +148,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000001 sec, rate=0.104858
 dump rom 0 1
 0x00000 loc1:                00    .
 0x00001 loc2:                00    .
@@ -176,7 +176,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.104858
+Host usage: 0.000001 sec, rate=0.131072
 dump rom 0 1
 0x00000 loc1:                01    .
 0x00001 loc2:                00    .
@@ -204,7 +204,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.058254
+Host usage: 0.000002 sec, rate=0.065536
 timer get
 timer #0("time") ON: 1.75e-06 sec (14 clks)
 timer #0("isr") ON,ISR: 0 sec (0 clks)
@@ -347,7 +347,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.065536
+Host usage: 0.000002 sec, rate=0.058254
 dump rom 0 1
 0x00000 loc1:                06    .
 0x00001 loc2:                02    .
@@ -389,7 +389,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000002 sec, rate=0.058254
 dump rom 0 1
 0x00000 loc1:                0c    .
 0x00001 loc2:                03    .
@@ -403,7 +403,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                08    .
 0x00001 loc2:                03    .
@@ -417,7 +417,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                08    .
 0x00001 loc2:                04    .
@@ -431,7 +431,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.065536
+Host usage: 0.000002 sec, rate=0.058254
 dump rom 0 1
 0x00000 loc1:                18    .
 0x00001 loc2:                04    .
@@ -445,7 +445,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000001 sec, rate=0.131072
+Host usage: 0.000002 sec, rate=0.065536
 dump rom 0 1
 0x00000 loc1:                10    .
 0x00001 loc2:                04    .
@@ -459,7 +459,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp    0x800c[0K
 F 0x00800c
 Simulated 1 ticks (1.250e-07 sec)
-Host usage: 0.000002 sec, rate=0.065536
+Host usage: 0.000002 sec, rate=0.058254
 dump rom 0 1
 0x00000 loc1:                10    .
 0x00001 loc2:                05    .

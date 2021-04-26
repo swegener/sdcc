@@ -273,12 +273,6 @@ class cl_memory_cell: public cl_cell_data
   virtual t_mem set(t_mem val);
   virtual t_mem download(t_mem val);
   
-  //virtual t_mem add(long what);
-  //virtual t_mem wadd(long what);
-
-  virtual void toggle_bits(t_mem bits);
-  virtual void wtoggle_bits(t_mem bits);
-  
   virtual void append_operator(class cl_memory_operator *op);
   virtual void prepend_operator(class cl_memory_operator *op);
   virtual void remove_operator(class cl_memory_operator *op);
@@ -475,7 +469,7 @@ protected:
   int bwidth; // size of array elements, in bytes
 public:
   cl_memory_chip(const char *id, int asize, int awidth, int initial= -1);
-  cl_memory_chip(const char *id, int asize, int awidth, t_mem *aarray, int arrsize);
+  cl_memory_chip(const char *id, int asize, int awidth, void *aarray, int arrsize);
   virtual ~cl_memory_chip(void);
   virtual int init(void);
 
@@ -497,7 +491,7 @@ class cl_chip8: public cl_memory_chip
 {
 public:
   cl_chip8(const char *id, int asize, int awidth, int initial= -1);
-  cl_chip8(const char *id, int asize, int awidth, t_mem *aarray, int arrsize);
+  cl_chip8(const char *id, int asize, int awidth, void *aarray, int arrsize);
 public:
   virtual t_mem d(t_addr addr);
   virtual void d(t_addr addr, t_mem v);
@@ -507,7 +501,7 @@ class cl_chip16: public cl_memory_chip
 {
 public:
   cl_chip16(const char *id, int asize, int awidth, int initial= -1);
-  cl_chip16(const char *id, int asize, int awidth, t_mem *aarray, int arrsize);
+  cl_chip16(const char *id, int asize, int awidth, void *aarray, int arrsize);
 public:
   virtual t_mem d(t_addr addr);
   virtual void d(t_addr addr, t_mem v);
@@ -517,7 +511,7 @@ class cl_chip32: public cl_memory_chip
 {
 public:
   cl_chip32(const char *id, int asize, int awidth, int initial= -1);
-  cl_chip32(const char *id, int asize, int awidth, t_mem *aarray, int arrsize);
+  cl_chip32(const char *id, int asize, int awidth, void *aarray, int arrsize);
 public:
   virtual t_mem d(t_addr addr);
   virtual void d(t_addr addr, t_mem v);

@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_flash_cell: public cl_cell8
 {
  public:
- cl_flash_cell(uchar awidth): cl_cell8(awidth) {}
+  cl_flash_cell(uchar awidth): cl_cell8(awidth) {}
   virtual t_mem write(t_mem val);
 };
 

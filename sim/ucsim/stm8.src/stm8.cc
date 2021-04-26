@@ -555,9 +555,11 @@ cl_stm8::make_memories(void)
   io_chip->init();
   memchips->add(io_chip);
   if (type->subtype & DEV_STM8S105)
-    boot_chip= new cl_chip8("boot_chip_s105", bl_s105_length, 8, bl_s105, bl_s105_length);
+    boot_chip= new cl_chip8("boot_chip_s105",
+			    bl_s105_length, 8, bl_s105, bl_s105_length);
   else if (type->subtype & DEV_STM8L15x46)
-    boot_chip= new cl_chip8("boot_chip_l15x46", bl_l15x46_length, 8, bl_l15x46, bl_l15x46_length);
+    boot_chip= new cl_chip8("boot_chip_l15x46",
+			    bl_l15x46_length, 8, bl_l15x46, bl_l15x46_length);
   /*else if (type->subtype & DEV_STM8L101)
     boot_chip= new cl_memory_chip("boot_chip_l101", bl_l15x46_length, 8, bl_l15x46);*/
   else

@@ -380,7 +380,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               con->dd_printf(" ");
 
-              t_mem m= read(start);
+              /*t_mem*/u64_t m= read(start);
 
               int i;
               con->dd_printf("0b");
@@ -393,7 +393,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               int nbits = b_high - b_low + 1;
 
-              m = (m >> b_low) & ((1U << nbits) - 1);
+              m = (m >> b_low) & (((u64_t)1U << nbits) - 1);
 
               con->dd_printf(" 0x%0*x", (nbits > 16 ? 8 : (nbits > 8 ? 4 : 2)), m);
 
@@ -691,23 +691,19 @@ cl_memory::print_info(const char *pre, class cl_console_base *con)
  *                                                             Memory operators
  */
 
-cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell/*,
-								    t_addr addr*/):
+cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell):
   cl_base()
 {
   cell= acell;
   if (cell)
     {
-      //data= cell->data;
       mask= cell->mask;
     }
   else
     {
-      //data= 0;
       mask= ~0;
     }
   next_operator= 0;
-  //address= addr;
 }
 
 t_mem
@@ -716,7 +712,7 @@ cl_memory_operator::read(void)
   if (next_operator)
     return(next_operator->read());
   else if (cell)
-    return(/* *data*/cell->get());
+    return(cell->get());
   return 0;
 }
 
@@ -726,7 +722,7 @@ cl_memory_operator::write(t_mem val)
   if (next_operator)
     return(next_operator->write(val));
   else if (cell)
-    return(/* *data=*/cell->set(val/* & mask*/));
+    return(cell->set(val));
   return val;
 }
 
@@ -734,9 +730,8 @@ cl_memory_operator::write(t_mem val)
 /* Memory operator for bank switcher */
 
 cl_bank_switcher_operator::cl_bank_switcher_operator(class cl_memory_cell *acell,
-						     /*t_addr addr,*/
 						     class cl_banker *the_banker):
-  cl_memory_operator(acell/*, addr*/)
+  cl_memory_operator(acell)
 {
   banker= the_banker;
   set_name("bank_switcher");
@@ -747,20 +742,20 @@ cl_bank_switcher_operator::write(t_mem val)
 {
   if (next_operator)
     next_operator->write(val);
-  if (cell) /* *data=*/ cell->set(val /*& mask*/);
+  if (cell)
+    cell->set(val);
   banker->activate(NULL);
   if (cell)
     return cell->get();
-  return /* *data*/ 0;  
+  return 0;  
 }
 
 
 /* Memory operator for hw callbacks */
 
-cl_hw_operator::cl_hw_operator(class cl_memory_cell *acell/*, t_addr addr*/,
-			       //t_mem *data_place, t_mem the_mask,
+cl_hw_operator::cl_hw_operator(class cl_memory_cell *acell,
 			       class cl_hw *ahw):
-  cl_memory_operator(acell/*, addr*//*, data_place, the_mask*/)
+  cl_memory_operator(acell)
 {
   hw= ahw;
   set_name(chars("hw:")+hw->get_name());
@@ -784,7 +779,7 @@ cl_hw_operator::read(void)
 t_mem
 cl_hw_operator::read(enum hw_cath skip)
 {
-  t_mem d1= 0/* *data*/, d2= d1;
+  t_mem d1= 0, d2= d1;
   bool use= false;
 
   if (hw &&
@@ -808,7 +803,6 @@ cl_hw_operator::write(t_mem val)
     hw->write(cell, &val);
   if (next_operator)
     val= next_operator->write(val);
-  //if (cell) return(/* *data=*//*cell->set(val & mask)*/val);
   return val;
 }
 
@@ -864,49 +858,6 @@ cl_read_operator::read(void)
 /*
  *                                                                  Cell data
  */
-/*
-t_mem
-cl_cell_data::d()
-{
-  return data?(*data):0;
-}
-*/
-/*
-void
-cl_cell_data::d(t_mem v)
-{
-  data?(*data=v):0;
-}
-*/
-/*
-void
-cl_cell_data::dl(t_mem v)
-{
-  data?(*data=v):0;
-}
-*/
-
-// bit cell for bit spaces
-/*
-t_mem
-cl_bit_cell::d()
-{
-  if (!data)
-    return 0;
-  return (*data&mask)?1:0;
-}
-
-void
-cl_bit_cell::d(t_mem v)
-{
-  if (!data)
-    return;
-  if (v)
-    *data|= mask;
-  else
-    *data&= ~mask;
-}
-*/
 
 // 8 bit cell;
 
@@ -1062,16 +1013,13 @@ cl_memory_cell::cl_memory_cell()
     }
 }
 
-cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
+cl_memory_cell::cl_memory_cell(uchar awidth)
 {
   data= 0;
   flags= CELL_NON_DECODED;
   width= awidth;
-  //*data= 0;
   def_data= 0;
   operators= NULL;
-  //bank= 0;
-  //banked_data_ptrs= 0;
 #ifdef STATISTIC
   nuof_writes= nuof_reads= 0;
 #endif
@@ -1091,7 +1039,6 @@ cl_memory_cell::~cl_memory_cell(void)
 int
 cl_memory_cell::init(void)
 {
-  //cl_base::init();
   data= &def_data;
   return(0);
 }
@@ -1257,36 +1204,6 @@ cl_memory_cell::download(t_mem val)
     dl(val & mask);
   return d();
 }
-/*
-t_mem
-cl_memory_cell::add(long what)
-{
-  set(get()+what);
-  return(d());
-}
-*/
-/*
-t_mem
-cl_memory_cell::wadd(long what)
-{
-  t_mem d= (read() + what) & mask;
-  return(write(d));
-}
-*/
-void
-cl_memory_cell::toggle_bits(t_mem bits)
-{
-  bits&= mask;
-  set(d() ^ bits);
-}
-
-void
-cl_memory_cell::wtoggle_bits(t_mem bits)
-{
-  bits&= mask;
-  write(d() ^ bits);
-}
-
 
 void
 cl_memory_cell::append_operator(class cl_memory_operator *op)
@@ -1370,9 +1287,9 @@ cl_memory_cell::get_banker(void)
 }
 
 class cl_memory_cell *
-cl_memory_cell::add_hw(class cl_hw *hw/*, t_addr addr*/)
+cl_memory_cell::add_hw(class cl_hw *hw)
 {
-  class cl_hw_operator *o= new cl_hw_operator(this/*, addr*//*, data, mask*/, hw);
+  class cl_hw_operator *o= new cl_hw_operator(this, hw);
   append_operator(o);
   return(this);
 }
@@ -1382,12 +1299,6 @@ cl_memory_cell::remove_hw(class cl_hw *hw)
 { 	 
   del_operator(hw); 	 
 }
-
-/*class cl_hw *
-cl_memory_cell::get_hw(int ith)
-{
-  return(0);
-}*/
 
 class cl_event_handler *
 cl_memory_cell::get_event_handler(void)
@@ -1972,7 +1883,7 @@ cl_memory_chip::cl_memory_chip(const char *id,
 cl_memory_chip::cl_memory_chip(const char *id,
 			       int asize,
 			       int awidth,
-			       t_mem *aarray, int arrsize):
+			       void *aarray, int arrsize):
   cl_chip_data(id, asize, awidth)
 {
 if (awidth > 32)
@@ -2075,7 +1986,7 @@ cl_chip8::cl_chip8(const char *id, int asize, int awidth, int initial):
   cl_memory_chip(id, asize, awidth, initial)
 {}
 
-cl_chip8::cl_chip8(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+cl_chip8::cl_chip8(const char *id, int asize, int awidth, void *aarray, int arrsize):
   cl_memory_chip(id, asize, awidth, aarray, arrsize)
 {}
 
@@ -2105,7 +2016,7 @@ cl_chip16::cl_chip16(const char *id, int asize, int awidth, int initial):
   cl_memory_chip(id, asize, awidth, initial)
 {}
 
-cl_chip16::cl_chip16(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+cl_chip16::cl_chip16(const char *id, int asize, int awidth, void *aarray, int arrsize):
   cl_memory_chip(id, asize, awidth, aarray, arrsize)
 {}
 
@@ -2135,7 +2046,7 @@ cl_chip32::cl_chip32(const char *id, int asize, int awidth, int initial):
   cl_memory_chip(id, asize, awidth, initial)
 {}
 
-cl_chip32::cl_chip32(const char *id, int asize, int awidth, t_mem *aarray, int arrsize):
+cl_chip32::cl_chip32(const char *id, int asize, int awidth, void *aarray, int arrsize):
   cl_memory_chip(id, asize, awidth, aarray, arrsize)
 {}
 

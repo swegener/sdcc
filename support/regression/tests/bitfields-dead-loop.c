@@ -12,6 +12,13 @@
 #define DUMMY_CASE
 #endif
 
+// These tests assume the bitfields are allocated in LSB to MSB order
+// but some hosts allocate them in MSB to LSB order. Disable the
+// tests on these hosts
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+#define DUMMY_CASE
+#endif
+
 #include <testfwk.h>
 #ifdef __sun__
 #include <inttypes.h>

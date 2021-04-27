@@ -27,6 +27,19 @@
 
 typedef struct
 {
+// Use MSB to LSB order for hosts that use this order for bitfields
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+    unsigned int bit7       : 1;
+    unsigned int bit6       : 1;
+    unsigned int bit5       : 1;
+    unsigned int bit4       : 1;
+    unsigned int bit3       : 1;
+    unsigned int bit2       : 1;
+    unsigned int bit1       : 1;
+    unsigned int bit0       : 1;
+#else
+// Use LSB to MSB order for SDCC and generic hosts (likely to be
+// x86 or other little endian)
     unsigned int bit0       : 1;
     unsigned int bit1       : 1;
     unsigned int bit2       : 1;
@@ -35,6 +48,7 @@ typedef struct
     unsigned int bit5       : 1;
     unsigned int bit6       : 1;
     unsigned int bit7       : 1;
+#endif
 }struct_8bits;
 
 #define bitToTest__(b) bit ## b

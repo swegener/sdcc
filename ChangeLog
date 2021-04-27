@@ -1,3 +1,11 @@
+2021-04-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bitfields-bits1.c,
+	  support/regression/tests/bitfields-checks.c,
+	  support/regression/tests/bitfields-dead-loop.c:
+	  Fix or disable host tests on hosts that allocate bitfields
+	  in MSB to LSB order
+
 2021-04-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

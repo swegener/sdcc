@@ -12913,12 +12913,12 @@ genPointerSet (iCode *ic)
         pairId = getPairId (result->aop);
       else
         {
-          fetchPairLong (pairId, result->aop, ic, 0);
           if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId && result->aop->type != AOP_REG)
             {
               _push (pairId);
               pushed_pair = true;
             }
+          fetchPairLong (pairId, result->aop, ic, 0);
         }
     }
   /* so hl now contains the address */

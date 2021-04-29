@@ -1,5 +1,10 @@
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix a --reserve-regs-iy bug.
+
+2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/_mullong.c,
 	  src/z80/main.c,
 	  src/SDCCopt.c:

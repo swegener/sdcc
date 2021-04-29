@@ -1483,7 +1483,7 @@ int z80instructionSize(lineNode *pl)
         return(1);
       return(2);
     }
-  if(ISINST(pl->line, "add") && (!STRNCASECMP(op1start, "ix", 2) || !STRNCASECMP(op1start, "iy", 2)))
+  if((ISINST(pl->line, "add") || IS_RAB && (ISINST(pl->line, "and") || ISINST(pl->line, "or")))&& (!STRNCASECMP(op1start, "ix", 2) || !STRNCASECMP(op1start, "iy", 2)))
     return(2);
 
   /* signed 8 bit adjustment to stack pointer */

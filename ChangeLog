@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix bug #3217.
+	* src/z80/peep.c:
+	  Fix instruction size for or hl, de and and hl, de.
 
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
 

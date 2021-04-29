@@ -2110,7 +2110,9 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
           old_low = (v_old >> 0) & 0xff;
           old_high = (v_old >> 8) & 0xff;
 
-          if (IS_RAB && !new_high && (new_low == 1 && (old_high || old_low)) && f_dead)
+          if (new_low == old_low && new_high == old_high)
+            goto adjusted;
+          else if (IS_RAB && !new_high && (new_low == 1 && (old_high || old_low)) && f_dead)
             {
               emit2 ("bool hl");
               regalloc_dry_run_cost++;

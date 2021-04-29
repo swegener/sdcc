@@ -3583,8 +3583,12 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           emit2 ("ex de, hl");
           if (!regalloc_dry_run)
             emit2 ("ld %d %s, hl", use_sp ? sp_offset : fp_offset, use_sp ? "(sp)" : "(ix)");
-          emit2("ex de, hl");
-          cost2 (4, 0, 0, 15, 0, 0, 0);
+          cost2 (3, 0, 0, 13, 0, 0, 0);
+          if (!de_dead || !hl_dead || source->regs[L_IDX] >= 0 && !assigned[source->regs[L_IDX]] || source->regs[H_IDX] >= 0 && !assigned[source->regs[H_IDX]])
+            {
+              emit2("ex de, hl");
+              cost2 (1, 0, 0, 2, 0, 0, 0);
+            }
           spillPair (PAIR_HL);
           assigned[i] = true;
           assigned[i + 1] = true;
@@ -3912,7 +3916,8 @@ skip_byte:
         }
       else if (i + 1 < n && !assigned[i + 1] &&
         (source->type == AOP_STK && fp_offset <= 127 || sp_offset <= 255) &&
-        aopInReg (result, roffset + i, DE_IDX) && IS_RAB)
+        (aopInReg (result, roffset + i, DE_IDX) || result->type == AOP_REG && result->regs[L_IDX] < i && result->regs[IYL_IDX] < i && result->regs[H_IDX] < i && result->regs[IYH_IDX] < i && hl_free) &&
+        IS_RAB)
         {
           if (!hl_free)
             emit2 ("ex de, hl");
@@ -3921,9 +3926,19 @@ skip_byte:
               emit2 ("ld hl, %d (sp)", sp_offset);
             else
               emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
-          emit2("ex de, hl");
-          cost2 (3 + !hl_free, 0, 0, 13 + !hl_free * 2, 0, 0, 0);
+          cost2 (2 + !hl_free, 0, 0, 11 + !hl_free * 2, 0, 0, 0);
           spillPair (PAIR_HL);
+          if (aopInReg (result, roffset + i, DE_IDX))
+            {
+              emit2("ex de, hl");
+              cost2 (1, 0, 0, 2, 0, 0, 0);
+            }
+          else
+            {
+              wassert (hl_free);
+              emit3_o (A_LD, result, roffset + i, ASMOP_L, 0);
+              emit3_o (A_LD, result, roffset + i + 1, ASMOP_H, 0);
+            }
           assigned[i] = true;
           assigned[i + 1] = true;
           size -= 2;
@@ -7711,7 +7726,7 @@ genMultTwoChar (const iCode *ic)
   wassert (IS_RAB && !IS_R2K); // mul instruction is broken on Rabbit 2000.
   
   bool save_bc = !isPairDead(PAIR_BC, ic);
-  bool save_de = !isPairDead(PAIR_DE, ic);
+  bool save_de = !isPairDead(PAIR_DE, ic) && getPairId (left->aop) != PAIR_DE && getPairId (right->aop) != PAIR_DE;
 
   if (save_bc)
     _push (PAIR_BC);

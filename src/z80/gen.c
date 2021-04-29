@@ -2504,7 +2504,9 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
 
       break;
 
-    case AOP_HL: // Legacy.
+    // Legacy.
+    case AOP_HL:
+    case AOP_IY:
       fetchLitPair (pairId, (asmop *) aop, offset);
       _G.pairs[pairId].offset = offset;
       break;
@@ -4015,10 +4017,10 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   bool zeroed_a = false;
   long value_hl = -1;
 
-  for (unsigned int i = 0; i < size;)
+  for (int i = 0; i < size;)
     {
       bool a_dead = a_dead_global && source->regs[A_IDX] <= i && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= i);
-      bool hl_dead = hl_dead_global && source->regs[L_IDX] <= i && source->regs[H_IDX] <= i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= i)  && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= i);
+      bool hl_dead = hl_dead_global && source->regs[L_IDX] <= i && source->regs[H_IDX] <= i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= i) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= i);
 
       if ((IS_EZ80_Z80 || IS_RAB || IS_TLCS90) && i + 1 < size && result->type == AOP_STK &&
         source->type == AOP_LIT && (value_hl >= 0 && aopIsLitVal (source, soffset + i, 2, value_hl) || hl_dead))
@@ -6082,6 +6084,7 @@ genRet (const iCode *ic)
         }
       emit2 ("ld bc, !immed%d", size);
       emit2 ("ldir");
+      spillPair (PAIR_HL);
       regalloc_dry_run_cost += 5;
     }
   else
@@ -10799,10 +10802,12 @@ genSwap (iCode * ic)
 
       if (IS_GB || IS_Z80N)
         emit3 (A_SWAP, shiftop, 0);
-      else if (!IS_GB && !IS_RAB && result->aop->type == AOP_HL)
+      else if (!IS_GB && !IS_RAB && aopInReg (shiftop, 0, A_IDX) &&
+        (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY) && isPairDead (PAIR_HL, ic))
         {
-          if (left->aop->type != AOP_HL)
-            cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
+          if (!aopSame (result->aop, 0, left->aop, 0, 1))
+            cheapMove (result->aop, 0, ASMOP_A, 0, true);
+          pointPairToAop (PAIR_HL, result->aop, 0);
           emit3 (A_RRD, 0, 0);
           needLastMove = false;
         }
@@ -11062,9 +11067,10 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
       emit2 ("xor a, a");
-      emit2 ("ld hl, !hashedstr", result->aop->aopu.aop_dir);
+      regalloc_dry_run_cost++;
+      pointPairToAop (PAIR_HL, result->aop, 0);
       emit2 ("rld");
-      regalloc_dry_run_cost += 6;
+      regalloc_dry_run_cost += 2;
     }
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
@@ -11436,9 +11442,10 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
       emit2 ("xor a, a");
-      emit2 ("ld hl, !hashedstr", result->aop->aopu.aop_dir);
+      regalloc_dry_run_cost++;
+      pointPairToAop (PAIR_HL, result->aop, 0);
       emit2 ("rrd");
-      regalloc_dry_run_cost += 6;
+      regalloc_dry_run_cost += 2;
     }
   else if (!is_signed && // Shifting in the accumulator is cheap for unsigned operands.
     (aopInReg (result->aop, 0, A_IDX) ||
@@ -13359,10 +13366,7 @@ genAssign (const iCode *ic)
                   regalloc_dry_run_cost += 5;
                 }
               else
-                {
-                  emit2 ("ld de, !hashedstr", IC_RESULT (ic)->aop->aopu.aop_dir);
-                  regalloc_dry_run_cost += 3;
-                }
+                pointPairToAop (PAIR_DE, result->aop, 0);
 
               if (right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK)
                 {
@@ -13371,14 +13375,11 @@ genAssign (const iCode *ic)
                         0 ? _G.stack.param_offset : 0);
                   int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
                   emit2 ("!ldahlsp", sp_offset);
+                  spillPair (PAIR_HL);
                   regalloc_dry_run_cost += 4;
                 }
               else
-                {
-                  emit2 ("ld hl, !hashedstr", IC_RIGHT (ic)->aop->aopu.aop_dir);
-                  regalloc_dry_run_cost += 3;
-                }
-              spillPair (PAIR_HL);
+                pointPairToAop (PAIR_HL, right->aop, 0);
 
               if (size <= 2 + optimize.codeSpeed || // Early Rabbits have a wait state bug when ldir copies between different types of memory.
                 (IS_R2K || IS_R2KA) && !((right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK)))
@@ -13393,6 +13394,9 @@ genAssign (const iCode *ic)
                   emit2 ("ldir");
                   regalloc_dry_run_cost += 5;
                 }
+              spillPair (PAIR_HL);
+              spillPair (PAIR_DE);
+              spillPair (PAIR_BC);
 
               if (bc_alive)
                 _pop (PAIR_BC);
@@ -14456,11 +14460,10 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
       if (indirect_c)
         {
           fetchPair (PAIR_DE, dst->aop);
-          emit2 ("ld hl, !hashedstr", c->aop->aopu.aop_dir);
-          regalloc_dry_run_cost += 3;
+          pointPairToAop (PAIR_HL, c->aop, 0);
         }
       else
-		{
+        {
 		  setupForMemset (ic, dst, c, direct_c);
 
 		  if (!regalloc_dry_run)
@@ -14478,7 +14481,7 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
 		      regalloc_dry_run_cost++;
 		      preinc = TRUE;
 		    }
-		}
+        }
       emit2 ("ld bc, !immedword", size - preinc);
       regalloc_dry_run_cost += 3;
       if (IS_R2K || IS_R2KA) // Work around ldir wait state bug that affects copies between different types of memory.

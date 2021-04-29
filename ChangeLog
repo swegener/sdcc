@@ -1,6 +1,11 @@
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Fix bug #3217.
+
+2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix a --reserve-regs-iy bug.
 
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>

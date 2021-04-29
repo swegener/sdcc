@@ -1,3 +1,12 @@
+2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/_mullong.c,
+	  src/z80/main.c,
+	  src/SDCCopt.c:
+	  Improve Rabbit multiplication.
+	* src/z80/gen.c:
+	  Fix gbz80 part of bug #3217.
+
 2021-04-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bitfields-bits1.c,

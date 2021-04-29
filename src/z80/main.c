@@ -901,7 +901,9 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   /* Same for any multiplication with 8 bit result. */
   else if (result_size == 1 && !IS_GB)
     return(true);
-  else if (IS_RAB && !IS_R2K && result_size == 2 && getSize (left) == 2 && getSize(right) == 2)
+  // Rabbits have signed 16x16->32 multiplication, which is broken on original Rabbit 2000.
+  else if (IS_RAB && !IS_R2K && getSize (left) == 2 && getSize(right) == 2 &&
+    (result_size == 2 || result_size <= 4 && !IS_UNSIGNED (left) && !IS_UNSIGNED (right)))
     return(true);
   else
     return(false);

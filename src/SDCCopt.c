@@ -752,19 +752,13 @@ convilong (iCode * ic, eBBlock * ebp)
   SPEC_SHORT (leftType) = 0;
   SPEC_SHORT (rightType) = 0;
 
-  remiCodeFromeBBlock (ebp, ic);
-
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  if (IS_SYMOP (left))
-      bitVectUnSetBit (OP_USES (left), ic->key);
-  if (IS_SYMOP (right))
-      bitVectUnSetBit (OP_USES (right), ic->key);
-
-  if (op == '*' && (muls16tos32[0] || muls16tos32[1]) &&
-    (IS_SYMOP (left) && bitVectnBitsOn (OP_DEFS (left)) == 1 && bitVectnBitsOn (OP_USES (left)) == 0 || IS_OP_LITERAL (left) && operandLitValue (left) < 32768 && operandLitValue (left) >= -32768) &&
-    (IS_SYMOP (right) && bitVectnBitsOn (OP_DEFS (right)) == 1 && bitVectnBitsOn (OP_USES (right)) == 0 || IS_OP_LITERAL (right) && operandLitValue (right) < 32768 && operandLitValue (right) >= -32768) &&
+  // Special case: 16x16->32 multiplication.
+  if (op == '*' && (muls16tos32[0] || muls16tos32[1] || port->hasNativeMulFor) &&
+    (IS_SYMOP (left) && bitVectnBitsOn (OP_DEFS (left)) == 1 && bitVectnBitsOn (OP_USES (left)) == 1 || IS_OP_LITERAL (left) && operandLitValue (left) < 32768 && operandLitValue (left) >= -32768) &&
+    (IS_SYMOP (right) && bitVectnBitsOn (OP_DEFS (right)) == 1 && bitVectnBitsOn (OP_USES (right)) == 1 || IS_OP_LITERAL (right) && operandLitValue (right) < 32768 && operandLitValue (right) >= -32768) &&
     getSize (leftType) == 4 && getSize (rightType) == 4)
     {
       iCode *lic = IS_SYMOP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
@@ -775,24 +769,29 @@ convilong (iCode * ic, eBBlock * ebp)
         {
           func = muls16tos32[SPEC_USIGN (operandType (left))];
 
-          if (lic)
+          if (func || port->hasNativeMulFor && lic && ric && port->hasNativeMulFor (ic, operandType (IC_RIGHT (lic)),operandType (IC_RIGHT (ric))))
             {
-              lic->op = '=';
-              OP_SYMBOL (left)->type = newIntLink();
-            }
-          else
-            IC_LEFT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (left), operandLitValue (left)));
+              if (lic)
+                {
+                  lic->op = '=';
+                  OP_SYMBOL (left)->type = newIntLink();
+                }
+              else
+                IC_LEFT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (left), operandLitValue (left)));
 
-          if (ric)
-            {
-              ric->op = '=';
-              OP_SYMBOL (right)->type = newIntLink();
-            }
-          else
-            IC_RIGHT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (right), operandLitValue (right)));
+              if (ric)
+                {
+                  ric->op = '=';
+                  OP_SYMBOL (right)->type = newIntLink();
+                }
+              else
+                IC_RIGHT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (right), operandLitValue (right)));
 
-          if (func)
-            goto found;
+              if (func) // Use 16x16->32 support function
+                goto found;
+              else // Native
+                return;
+            }
         }
     }
 
@@ -858,6 +857,13 @@ convilong (iCode * ic, eBBlock * ebp)
   werrorfl (filename, lineno, E_INVALID_OP, "");
   return;
 found:
+  remiCodeFromeBBlock (ebp, ic);
+    
+  if (IS_SYMOP (left))
+      bitVectUnSetBit (OP_USES (left), ic->key);
+  if (IS_SYMOP (right))
+      bitVectUnSetBit (OP_USES (right), ic->key);
+
   /* if int & long support routines NOT compiled as reentrant */
   if (!options.intlong_rent)
     {

@@ -246,7 +246,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_zero, asmop_one, asmop_mone, asmop_return, asmop_z88dk_fastcall_arg;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_hlbc, asmop_zero, asmop_one, asmop_mone, asmop_return, asmop_z88dk_fastcall_arg;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -260,6 +260,7 @@ static struct asmop *const ASMOP_HL = &asmop_hl;
 static struct asmop *const ASMOP_DE = &asmop_de;
 static struct asmop *const ASMOP_BC = &asmop_bc;
 static struct asmop *const ASMOP_IY = &asmop_iy;
+static struct asmop *const ASMOP_HLBC = &asmop_hlbc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
@@ -300,6 +301,7 @@ z80_init_asmops (void)
   z80_init_reg_asmop(&asmop_de, (const signed char[]){E_IDX, D_IDX, -1});
   z80_init_reg_asmop(&asmop_hl, (const signed char[]){L_IDX, H_IDX, -1});
   z80_init_reg_asmop(&asmop_iy, (const signed char[]){IYL_IDX, IYH_IDX, -1});
+  z80_init_reg_asmop(&asmop_hlbc, (const signed char[]){C_IDX, B_IDX, L_IDX, H_IDX, -1});
   
   asmop_zero.type = AOP_LIT;
   asmop_zero.aopu.aop_lit = constVal ("0");
@@ -4031,7 +4033,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (i + 1 < size && IS_GB &&result->type != AOP_REG && requiresHL (result) && source->type == AOP_REG && requiresHL (source) && de_dead_global && hl_dead_global) // word through de is cheaper than direct byte-by-byte, since it requires fewer updates of hl.
+      else if (i + 1 < size && IS_GB && result->type != AOP_REG && requiresHL (result) && source->type == AOP_REG && requiresHL (source) && de_dead_global && hl_dead_global) // word through de is cheaper than direct byte-by-byte, since it requires fewer updates of hl.
         {
           cheapMove (ASMOP_E, 0, source, i, a_dead);
           cheapMove (ASMOP_D, 0, source, i + 1, a_dead);
@@ -4040,14 +4042,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (i + 1 < size && getPairId_o(source, soffset + i) != PAIR_INVALID && (result->type == AOP_IY || result->type == AOP_DIR))
+      else if (!IS_GB && i + 1 < size && getPairId_o(source, soffset + i) != PAIR_INVALID &&
+        (result->type == AOP_IY || result->type == AOP_DIR || result->type == AOP_HL && (getPairId_o(source, soffset + i) == PAIR_HL || !hl_dead)))
         {
           emit2 ("ld !mems, %s", aopGetLitWordLong (result, roffset + i, false), _pairs[getPairId_o(source, soffset + i)].name);
           regalloc_dry_run_cost += 3 + (getPairId_o(source, soffset + i) != PAIR_HL);
           i += 2;
           continue;
         }
-      else if (i + 1 < size && soffset + i + 1 < source->size && getPairId_o(result, roffset + i) != PAIR_INVALID && (source->type == AOP_IY || source->type == AOP_DIR))
+      else if (!IS_GB && i + 1 < size && soffset + i + 1 < source->size && getPairId_o(result, roffset + i) != PAIR_INVALID &&
+        (source->type == AOP_IY || source->type == AOP_DIR || source->type == AOP_HL && (getPairId_o(result, roffset + i) == PAIR_HL || !hl_dead)))
         {
           emit2 ("ld %s, !mems", _pairs[getPairId_o(result, roffset + i)].name, aopGetLitWordLong (source, soffset + i, false));
           regalloc_dry_run_cost += 3 + (getPairId_o(result, roffset + i) != PAIR_HL);
@@ -4059,12 +4063,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         !(aopIsLitVal (source, soffset + i, 2, 0x0000) && zeroed_a))
         {
           fetchLitPair (getPairId_o(result, roffset + i), source, soffset + i);
-          i += 2;
-          continue;
-        }
-      else if(i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID)
-        {
-          fetchPairLong (getPairId_o(result, roffset + i), source, 0, soffset + i);
           i += 2;
           continue;
         }
@@ -7699,9 +7697,9 @@ genMultOneChar (const iCode * ic)
   genMove (result, ASMOP_HL, isRegDead (A_IDX, ic), true, isPairDead (PAIR_DE, ic));
 }
 
-/*-----------------------------------------------------------------*/
-/* genMultTwoChar - generates code for 16x16->16 multiplication    */
-/*-----------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
+/* genMultTwoChar - generates code for 16x16->(16 to 32) multiplication */
+/*----------------------------------------------------------------------*/
 static void
 genMultTwoChar (const iCode *ic)
 {
@@ -7741,7 +7739,7 @@ genMultTwoChar (const iCode *ic)
   emit2 ("mul");
   regalloc_dry_run_cost++;
   
-  genMove (IC_RESULT (ic)->aop, ASMOP_BC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), true);
+  genMove (IC_RESULT (ic)->aop, ASMOP_HLBC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), true);
   
   if (save_de)
     _pop (PAIR_DE);
@@ -7770,7 +7768,7 @@ genMult (iCode *ic)
 
   byteResult = (IC_RESULT (ic)->aop->size == 1);
 
-  if (IC_LEFT (ic)->aop->size > 2 || IC_RIGHT (ic)->aop->size > 2 || IC_RESULT (ic)->aop->size > 2)
+  if (IC_LEFT (ic)->aop->size > 2 || IC_RIGHT (ic)->aop->size > 2)
     wassertl (0, "Large multiplication is handled through support function calls.");
 
   /* Swap left and right such that right is a literal */
@@ -10834,7 +10832,7 @@ genSwap (iCode * ic)
           genMove (&swapped_result_aop, left->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           break;
         }
-    
+
       if (sameRegs (result->aop, left->aop) || operandsEqu (result, left))
         {
           // avoid push/pop by finding free register

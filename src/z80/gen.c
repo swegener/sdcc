@@ -8492,13 +8492,24 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       /* Subtract through, propagating the carry */
       while (size)
         {
-          if (!IS_GB && (!sign || size > 2) &&
+          if (!IS_GB && size >=2 && (!sign || size > 2) &&
             isPairDead (PAIR_HL, ic) &&
             (getPartPairId (left->aop, offset) == PAIR_HL || left->aop->type == AOP_LIT && right->aop->regs[L_IDX] < offset && right->aop->regs[H_IDX] < offset) &&
             (getPartPairId (right->aop, offset) == PAIR_DE || getPartPairId (right->aop, offset) == PAIR_BC))
             {
               fetchPairLong (PAIR_HL, left->aop, 0, offset);
               emit2 ("sbc hl, %s", _pairs[getPartPairId (right->aop, offset)].name);
+              regalloc_dry_run_cost += 2;
+              size -= 2;
+              offset += 2;
+            }
+          else if (IS_RAB && size >= 2 && (!sign || size > 2) &&
+            isPairDead (PAIR_HL, ic) && isPairDead (PAIR_DE, ic) &&
+            left->aop->type == AOP_STK && right->aop->type == AOP_STK)
+            {
+              genMove_o (ASMOP_DE, 0, right->aop, offset, 2, isRegDead (A_IDX, ic), true, true);
+              genMove_o (ASMOP_HL, 0, left->aop, offset, 2, isRegDead (A_IDX, ic), true, false);
+              emit2 ("sbc hl, de");
               regalloc_dry_run_cost += 2;
               size -= 2;
               offset += 2;

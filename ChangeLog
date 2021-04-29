@@ -1,7 +1,7 @@
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Small wide load improvements for Rabbits.
+	  Small wide improvements for Rabbits.
 
 2021-04-29 Philipp Klaus Krause <pkk AT spth.de>
 

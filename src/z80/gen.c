@@ -3843,7 +3843,34 @@ skip_byte:
     }
   genCopyStack (result, roffset, source, soffset, n, assigned, &size, a_free, hl_free, false);
 
-  // Last, move everything from stack to registers.
+  // Take de from stack first on Rabbit, while hl is still free, so we can do with just one ex de, hl.
+  if (IS_RAB && hl_free &&
+    result->regs[E_IDX] > roffset && result->regs[E_IDX] < roffset + n && !assigned[result->regs[E_IDX] - roffset] &&
+    result->regs[D_IDX] > roffset && result->regs[D_IDX] < roffset + n && !assigned[result->regs[D_IDX] - roffset] &&
+    result->regs[E_IDX] + 1 == result->regs[D_IDX])
+    {
+      int i = result->regs[E_IDX] - roffset;
+      const int fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      const int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;     
+      if (sp_offset <= 255 || fp_offset <= 127)
+        {
+          if (!regalloc_dry_run)
+            if (sp_offset <= 255)
+              emit2 ("ld hl, %d (sp)", sp_offset);
+            else
+              emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
+          emit2 ("ex de, hl");
+          regalloc_dry_run_cost += 3;
+          spillPair (PAIR_HL);
+          spillPair (PAIR_DE);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          size -= 2;
+          i += 2;
+        }
+    }
+  
+  // Last, move everything else from stack to registers.
   for (int i = 0; i < n;)
     {
       const int fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);

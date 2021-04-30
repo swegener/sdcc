@@ -1,6 +1,11 @@
 2021-04-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Improve shifts.
+
+2021-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Do not use double pusp / pop for 16-bit load when optimizing for speed.
 
 2021-04-30 Philipp Klaus Krause <pkk AT spth.de>

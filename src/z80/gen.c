@@ -11239,6 +11239,7 @@ genLeftShift (const iCode *ic)
   int size, offset;
   symbol *tlbl = 0, *tlbl1 = 0;
   operand *left, *right, *result;
+  asmop *shiftop;
   int countreg;
   bool shift_by_lit;
   int shiftcount = 0;
@@ -11301,9 +11302,19 @@ genLeftShift (const iCode *ic)
     !(left->aop->type == AOP_REG && result->aop->type != AOP_REG ||
     !IS_GB && (left->aop->type == AOP_STK && canAssignToPtr3 (result->aop) || result->aop->type == AOP_STK && canAssignToPtr3 (left->aop)));
 
+  shiftop = result->aop;
+  if (result->aop->type != AOP_REG && left->aop->type == AOP_REG && result->aop->size == left->aop->size && left->aop->regs[countreg] < 0)
+    {
+      bool left_dead = true;
+      for (int i = 0; i < left->aop->size; i++)
+        left_dead &= isRegDead (left->aop->aopu.aop_reg[i]->rIdx, ic);
+      if (left_dead)
+        shiftop = left->aop;
+    }
+
   /* now move the left to the result if they are not the
      same */
-  if (!sameRegs (left->aop, result->aop))
+  if (!sameRegs (shiftop, left->aop) || shiftop->type == AOP_REG)
     {
       if (save_a_inner)
         _push (PAIR_AF);
@@ -11313,12 +11324,15 @@ genLeftShift (const iCode *ic)
         byteshift = shiftcount / 8;
         shiftcount %= 8;
       }
-      size = result->aop->size - byteshift;
+      size = shiftop->size - byteshift;
       int lsize = left->aop->size - byteshift;
 
-      genMove_o (result->aop, byteshift, left->aop, 0, size <= lsize ? size : lsize, (save_a_inner || countreg != A_IDX) && (isRegDead (A_IDX, ic) || save_a_outer), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
-
-      genMove_o (result->aop, 0, ASMOP_ZERO, 0, byteshift, (save_a_inner || countreg != A_IDX) && (isRegDead (A_IDX, ic) || save_a_outer), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+      bool hl_dead = isPairDead (PAIR_HL, ic) && (countreg != L_IDX && countreg != H_IDX || shift_by_lit);
+      bool de_dead = isPairDead (PAIR_DE, ic) && (countreg != E_IDX && countreg != D_IDX || shift_by_lit);
+      genMove_o (shiftop, byteshift, left->aop, 0, size <= lsize ? size : lsize, (save_a_inner || countreg != A_IDX) && (isRegDead (A_IDX, ic) || save_a_outer), hl_dead, de_dead, true);
+      hl_dead &= shiftop->regs[L_IDX] < byteshift && shiftop->regs[L_IDX] < byteshift;
+      de_dead &= shiftop->regs[E_IDX] < byteshift && shiftop->regs[D_IDX] < byteshift;
+      genMove_o (shiftop, 0, ASMOP_ZERO, 0, byteshift, (save_a_inner || countreg != A_IDX) && (isRegDead (A_IDX, ic) || save_a_outer), hl_dead, de_dead, true);
 
       if (save_a_inner)
         _pop (PAIR_AF);
@@ -11329,8 +11343,8 @@ genLeftShift (const iCode *ic)
       tlbl = newiTempLabel (NULL);
       tlbl1 = newiTempLabel (NULL);
     }
-  size = result->aop->size;
-  offset = 0;
+  size = shiftop->size - byteshift;
+  offset = byteshift;
 
   if (shift_by_lit && !shiftcount)
     goto end;
@@ -11350,7 +11364,7 @@ genLeftShift (const iCode *ic)
   if (!(shift_by_lit && shiftcount == 1) && !regalloc_dry_run)
     {
       emitLabel (tlbl);
-      if (requiresHL (result->aop))
+      if (requiresHL (shiftop))
         spillPair (PAIR_HL);
     }
 
@@ -11358,18 +11372,18 @@ genLeftShift (const iCode *ic)
   while (size)
     {
       if (size >= 2 && offset + 1 >= byteshift &&
-        result->aop->type == AOP_REG &&
+        shiftop->type == AOP_REG &&
         (!started || !IS_GB) && // gbz80 doesn't have wide adc
-        (getPartPairId (result->aop, offset) == PAIR_HL ||
-        !started && getPartPairId (result->aop, offset) == PAIR_IY ||
-        (IS_RAB || optimize.codeSize && !started && !IS_GB) && getPartPairId (result->aop, offset) == PAIR_DE))
+        (getPartPairId (shiftop, offset) == PAIR_HL ||
+        !started && getPartPairId (shiftop, offset) == PAIR_IY ||
+        (IS_RAB || optimize.codeSize && !started && !IS_GB) && getPartPairId (shiftop, offset) == PAIR_DE))
         {
-          if (result->aop->aopu.aop_reg[offset]->rIdx == L_IDX)
+          if (shiftop->aopu.aop_reg[offset]->rIdx == L_IDX)
             {
               emit2 (started ? "adc hl, hl" : "add hl, hl");
               regalloc_dry_run_cost += 1 + started;
             }
-          else if (result->aop->aopu.aop_reg[offset]->rIdx == IYL_IDX)
+          else if (shiftop->aopu.aop_reg[offset]->rIdx == IYL_IDX)
             {
               emit2 ("add iy, iy");
               regalloc_dry_run_cost += 2;
@@ -11397,10 +11411,10 @@ genLeftShift (const iCode *ic)
         {
           if (offset >= byteshift)
             {
-              if (aopInReg (result->aop, offset, A_IDX))
+              if (aopInReg (shiftop, offset, A_IDX))
                 emit3 (started ? A_ADC : A_ADD, ASMOP_A, ASMOP_A);
               else
-                emit3_o (started ? A_RL : A_SLA, result->aop, offset, 0, 0);
+                emit3_o (started ? A_RL : A_SLA, shiftop, offset, 0, 0);
               started = true;
             }
           size--, offset++;
@@ -11427,9 +11441,11 @@ genLeftShift (const iCode *ic)
     }
 
 end:
-  if (!shift_by_lit && requiresHL (result->aop)) // Shift by 0 skips over hl adjustments.
+  if (!shift_by_lit && requiresHL (shiftop)) // Shift by 0 skips over hl adjustments.
     spillPair (PAIR_HL);
-    
+
+  genMove_o (result->aop, 0, shiftop, 0, result->aop->size, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+
   if (save_a_outer)
     _pop (PAIR_AF);
 
@@ -11635,6 +11651,7 @@ static void
 genRightShift (const iCode * ic)
 {
   operand *right, *left, *result;
+  asmop *shiftop;
   sym_link *retype;
   int size, offset, first = 1;
   bool is_signed;
@@ -11699,12 +11716,22 @@ genRightShift (const iCode * ic)
     !(left->aop->type == AOP_REG && result->aop->type != AOP_REG ||
     !IS_GB && (left->aop->type == AOP_STK && canAssignToPtr3 (result->aop) || result->aop->type == AOP_STK && canAssignToPtr3 (left->aop)));
 
-  /* now move the left to the result if they are not the
+  shiftop = result->aop;
+  if (result->aop->type != AOP_REG && left->aop->type == AOP_REG && result->aop->size == left->aop->size && left->aop->regs[countreg] < 0)
+    {
+      bool left_dead = true;
+      for (int i = 0; i < left->aop->size; i++)
+        left_dead &= isRegDead (left->aop->aopu.aop_reg[i]->rIdx, ic);
+      if (left_dead)
+        shiftop = left->aop;
+    }
+
+  /* now move the left to the shiftop if they are not the
      same */
-  if (!sameRegs (left->aop, result->aop))
+  if (!sameRegs (shiftop, left->aop) || shiftop->type == AOP_REG)
     {
       int soffset = 0;
-      size = result->aop->size;
+      size = shiftop->size;
 
       if (!is_signed && shift_by_lit)
       {
@@ -11717,9 +11744,10 @@ genRightShift (const iCode * ic)
       if (save_a)
         _push (PAIR_AF);
 
-      genMove_o (result->aop, 0, left->aop, soffset, size, true, isPairDead (PAIR_HL, ic), false, true);
-
-      genMove_o (result->aop, result->aop->size - byteoffset, ASMOP_ZERO, 0, byteoffset, true, false, false, true);
+      bool hl_dead = isPairDead (PAIR_HL, ic) && (countreg != L_IDX && countreg != H_IDX || shift_by_lit);
+      genMove_o (shiftop, 0, left->aop, soffset, size, true, hl_dead, false, true);
+      hl_dead &= (shiftop->regs[L_IDX] < 0 || shiftop->regs[L_IDX] >= size) && (shiftop->regs[H_IDX] < 0 || shiftop->regs[H_IDX] >= size);
+      genMove_o (shiftop, shiftop->size - byteoffset, ASMOP_ZERO, 0, byteoffset, true, hl_dead, false, true);
 
       if (save_a)
         _pop (PAIR_AF);
@@ -11754,20 +11782,20 @@ genRightShift (const iCode * ic)
   if (!shift_by_one && !regalloc_dry_run)
     IS_GB ? emitLabelSpill (tlbl) : emitLabel (tlbl);
 
-  if (!shift_by_one && requiresHL (result->aop))
+  if (!shift_by_one && requiresHL (shiftop))
     spillPair (PAIR_HL);
 
   while (size)
     {
-      if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && result->aop->type == AOP_REG &&
-        (getPartPairId (result->aop, offset - 1) == PAIR_HL || getPartPairId (result->aop, offset - 1) == PAIR_DE))
+      if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && shiftop->type == AOP_REG &&
+        (getPartPairId (shiftop, offset - 1) == PAIR_HL || getPartPairId (shiftop, offset - 1) == PAIR_DE))
         {
           if (first)
             {
               emit3 (A_CP, ASMOP_A, ASMOP_A);
               first = 0;
             }
-          emit2 (result->aop->aopu.aop_reg[offset - 1]->rIdx == L_IDX ? "rr hl" : "rr de");
+          emit2 (shiftop->aopu.aop_reg[offset - 1]->rIdx == L_IDX ? "rr hl" : "rr de");
           regalloc_dry_run_cost++;
           size -= 2, offset -= 2;
         }
@@ -11775,13 +11803,13 @@ genRightShift (const iCode * ic)
         size--, offset--;
       else if (first)
         {
-          emit3_o (is_signed ? A_SRA : A_SRL, result->aop, offset, 0, 0);
+          emit3_o (is_signed ? A_SRA : A_SRL, shiftop, offset, 0, 0);
           first = 0;
           size--, offset--;
         }
       else
         {
-          emit3_o (A_RR, result->aop, offset, 0, 0);
+          emit3_o (A_RR, shiftop, offset, 0, 0);
           size--, offset--;
         }
     }
@@ -11806,8 +11834,10 @@ genRightShift (const iCode * ic)
     }
 
 end:
-  if (!shift_by_lit && requiresHL (result->aop)) // Shift by 0 skips over hl adjustments.
+  if (!shift_by_lit && requiresHL (shiftop)) // Shift by 0 skips over hl adjustments.
     spillPair (PAIR_HL);
+
+  genMove_o (result->aop, 0, shiftop, 0, result->aop->size, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
 
   freeAsmop (left, NULL);
   freeAsmop (right, NULL);

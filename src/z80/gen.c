@@ -13698,9 +13698,20 @@ genCast (const iCode *ic)
 
       /* we need to extend the sign */
       emit3 (A_RLCA, 0, 0);
-      emit3 (A_SBC, ASMOP_A, ASMOP_A);
-      while (size--)
-        cheapMove (result->aop, offset++, ASMOP_A, 0, true);
+
+      if (!IS_GB && isPairDead (PAIR_HL, ic) && size == 2 && /* writing AOP_HL is so cheap, it is not worth the 2-byte sbc hl, hl here */
+        (aopInReg (result->aop, offset, HL_IDX) || result->aop->type == AOP_IY || (IS_RAB || IS_TLCS90 || IS_EZ80_Z80) && result->aop->type == AOP_STK))
+        {
+          emit2 ("sbc hl, hl");
+          regalloc_dry_run_cost += 2;
+          genMove_o (result->aop, offset, ASMOP_HL, 0, 2, true, true, isPairDead (PAIR_DE, ic), false);
+        }
+      else
+        {
+          emit3 (A_SBC, ASMOP_A, ASMOP_A);
+          while (size--)
+            cheapMove (result->aop, offset++, ASMOP_A, 0, true);
+        }
     }
 
 release:

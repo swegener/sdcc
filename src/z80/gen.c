@@ -13701,6 +13701,7 @@ genCast (const iCode *ic)
         {
           emit2 ("sbc hl, hl");
           regalloc_dry_run_cost += 2;
+          spillPair (PAIR_HL);
           genMove_o (result->aop, offset, ASMOP_HL, 0, 2, true, true, isPairDead (PAIR_DE, ic), false);
         }
       else

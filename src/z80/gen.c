@@ -3902,7 +3902,8 @@ skip_byte:
         sp_offset == 2 && getPairId_o (result, roffset + i) != PAIR_INVALID &&
         (getPairId_o (result, roffset + i) != PAIR_HL && hl_free || getPairId_o (result, roffset + i) != PAIR_DE && de_free) &&
         (!regalloc_dry_run || source->aopu.aop_stk > 0) &&  // Stack locations might change, unless its a parameter.
-        (!IS_GB || optimize.codeSize)) // SM83 can do it faster (worst case 2B bigger, but 1B smaller if lucky -> hl reuse)
+        (!IS_GB || optimize.codeSize) // SM83 can do it faster (worst case 2B bigger, but 1B smaller if lucky -> hl reuse)
+        && !optimize.codeSpeed) // A bit slower (42 vs 38 cycles on Z80 and Z80N), so don't do it when optimizing for speed.
         {
           PAIR_ID pair = getPairId_o (result, roffset + i);
           PAIR_ID extrapair = (getPairId_o (result, roffset + i) != PAIR_HL && hl_free) ? PAIR_HL : PAIR_DE; // If we knew it is dead, we could use bc as extrapair here, too.
@@ -13396,7 +13397,7 @@ genAssign (const iCode *ic)
               (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) * 4 -
               (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 6;    
           else // Z80
-            cyclecost_l = 21 * size + 51 + hl_alive * 20 + de_alive * 20 + bc_alive * 20 -
+            cyclecost_l = 21 * size + 51 + hl_alive * 21 + de_alive * 21 + bc_alive * 21 -
               (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) * 11 -
               (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 15;
 

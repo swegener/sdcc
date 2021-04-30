@@ -6045,7 +6045,7 @@ genRet (const iCode *ic)
               fetchPairLong (regpairs[1], IC_LEFT (ic)->aop, 0, offset[1]);
             }
         }
-      else if (IC_LEFT (ic)->aop->type == AOP_REG || IC_LEFT (ic)->aop->type == AOP_STK || size <= 2)
+      else if (IC_LEFT (ic)->aop->type == AOP_REG || IC_LEFT (ic)->aop->type == AOP_STK || IC_LEFT (ic)->aop->type == AOP_LIT || size <= 2)
         genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, size, true, true, true, true);
       else  if (IS_GB && size == 4 && requiresHL (IC_LEFT (ic)->aop) && aopInReg (ASMOP_RETURN, 0, DE_IDX) && aopInReg (ASMOP_RETURN, 2, HL_IDX))
         {
@@ -12231,7 +12231,7 @@ genPointerGet (const iCode *ic)
               regalloc_dry_run_cost += 3;
             }
           else
-            fetchPair (PAIR_DE, left->aop);
+            genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), true, true);
           emit2 ("!ldahlsp", sp_offset);
           emit2 ("ex de, hl");
           regalloc_dry_run_cost += 5;

@@ -1,6 +1,11 @@
 2021-04-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Another fix for #3220.
+
+2021-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Improve handling of 32-Bit variables.
 
 2021-04-30 Philipp Klaus Krause <pkk AT spth.de>

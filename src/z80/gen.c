@@ -4,7 +4,7 @@
   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
   Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
-  Copyright (C) 2011-2018, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de)
+  Copyright (C) 2011-2021, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -3119,7 +3119,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     a_dead = true;
 
   const bool from_index = aopInReg (from, from_offset, IYL_IDX) || aopInReg (from, from_offset, IYH_IDX);
-  const bool to_index = aopInReg (to, to_offset, IYL_IDX)  || aopInReg (to, to_offset, IYH_IDX);
+  const bool to_index = aopInReg (to, to_offset, IYL_IDX) || aopInReg (to, to_offset, IYH_IDX);
   const bool index = to_index || from_index;
 
   if (to->type == AOP_REG && from->type == AOP_REG)
@@ -13354,41 +13354,57 @@ genAssign (const iCode *ic)
            || result->aop->type == AOP_IY) && (right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK
                || right->aop->type == AOP_DIR || right->aop->type == AOP_IY) && size >= 2)
         {
-          /* This estimation is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
+          // This estimation is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the Z80, Z180, eZ80, Z80N or Rabbit 3000A.
           int sizecost_n, sizecost_l, cyclecost_n, cyclecost_l;
           const bool hl_alive = !isPairDead (PAIR_HL, ic);
           const bool de_alive = !isPairDead (PAIR_DE, ic);
           const bool bc_alive = !isPairDead (PAIR_BC, ic);
           bool l_better;
-          sizecost_n = 6 * size;
-          sizecost_l = 13 + hl_alive * 2 + de_alive * 2 + bc_alive * 2 - (right->aop->type == AOP_DIR
-                       || right->aop->type == AOP_IY) - (result->aop->type ==
-                           AOP_DIR
-                           || result->aop->type
-                           == AOP_IY) * 2;
-          if (IS_Z180 || IS_EZ80_Z80)
+
+          if (IS_EZ80_Z80 && result->aop->type == AOP_STK && right->aop->type == AOP_STK) // eZ80: Use 16-Bit loads, except for odd trailing byte.
+            sizecost_n = (size / 2 * 6) + (size % 2 * 6);
+          else if (IS_RAB && result->aop->type == AOP_STK && right->aop->type == AOP_STK) // Rabbit: Use 16-Bit loads, except for odd trailing byte.
+            sizecost_n = (size / 2 * 4) + (size % 2 * 6);
+          else // Use 8-Bit loads: Z80, Z180, Z80N.
+            sizecost_n = 6 * size;
+
+          sizecost_l = 13 + hl_alive * 2 + de_alive * 2 + bc_alive * 2 -
+            (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) -
+            (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 2;
+
+          if (IS_EZ80_Z80 && result->aop->type == AOP_STK && right->aop->type == AOP_STK)
+            cyclecost_n = (size / 2 * 10) + (size % 2 * 8);
+          else if (IS_RAB && result->aop->type == AOP_STK && right->aop->type == AOP_STK)
+            cyclecost_n = (size / 2 * 18) + (size % 2 * 18);
+          else if (IS_EZ80_Z80)
+            cyclecost_n = 8 * size;
+          else if (IS_Z180)
             cyclecost_n = 30 * size;
-          else                  /* Z80 */
+          else if (IS_RAB)
+            cyclecost_n = 18 * size;
+          else // Z80, Z80N
             cyclecost_n = 38 * size;
-          if (IS_Z180 || IS_EZ80_Z80)
-            cyclecost_l = 14 * size + 42 + hl_alive * 22 + de_alive * 22 + bc_alive * 22 - (right->aop->type == AOP_DIR
-                          || right->aop->type ==
-                          AOP_IY) * 7 - (result->aop->type ==
-                                         AOP_DIR
-                                         || result->aop->type
-                                         == AOP_IY) * 10;
-          else                  /* Z80 */
-            cyclecost_l = 21 * size + 51 + hl_alive * 20 + de_alive * 20 + bc_alive * 20 - (right->aop->type == AOP_DIR
-                          || right->aop->type ==
-                          AOP_IY) * 11 - (result->aop->type ==
-                                          AOP_DIR
-                                          || result->aop->type
-                                          == AOP_IY) * 15;
+
+          if (IS_EZ80_Z80)
+            cyclecost_l = 2 * size + 9 + hl_alive * 6 + de_alive * 6 + bc_alive * 6; // lea is as fast as ld rr, nn. So it does not matter if the operands are on stack.
+          else if (IS_Z180)
+            cyclecost_l = 14 * size + 42 + hl_alive * 22 + de_alive * 22 + bc_alive * 22 -
+              (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) * 7 -
+              (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 10;
+          else if (IS_RAB)
+            cyclecost_l = 7 * size + 34 + hl_alive * 17 + de_alive * 17 + bc_alive * 17 -
+              (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) * 4 -
+              (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 6;    
+          else // Z80
+            cyclecost_l = 21 * size + 51 + hl_alive * 20 + de_alive * 20 + bc_alive * 20 -
+              (right->aop->type == AOP_DIR || right->aop->type == AOP_IY) * 11 -
+              (result->aop->type == AOP_DIR || result->aop->type == AOP_IY) * 15;
 
           if (optimize.codeSize)
             l_better = (sizecost_l < sizecost_n || sizecost_l == sizecost_n && cyclecost_l < cyclecost_n);
           else
             l_better = (cyclecost_l < cyclecost_n || cyclecost_l == cyclecost_n && sizecost_l < sizecost_n);
+
           if (l_better)
             {
               if (hl_alive)
@@ -13424,7 +13440,8 @@ genAssign (const iCode *ic)
               else
                 pointPairToAop (PAIR_HL, right->aop, 0);
 
-              if (size <= 2 + optimize.codeSpeed || // Early Rabbits have a wait state bug when ldir copies between different types of memory.
+              if (size <= 2 + (!IS_RAB && optimize.codeSpeed) ||
+                // Early Rabbits have a wait state bug when ldir copies between different types of memory.
                 (IS_R2K || IS_R2KA) && !((right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK)))
                 for(int i = 0; i < size; i++)
                   {

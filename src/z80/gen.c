@@ -4107,8 +4107,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;      
         }
-      else if (i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID && source->type == AOP_LIT &&
-        !(aopIsLitVal (source, soffset + i, 2, 0x0000) && zeroed_a))
+      else if (i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID &&
+        (source->type == AOP_LIT && !(aopIsLitVal (source, soffset + i, 2, 0x0000) && zeroed_a) || source->type == AOP_IMMD))
         {
           fetchLitPair (getPairId_o(result, roffset + i), source, soffset + i, f_dead);
           i += 2;

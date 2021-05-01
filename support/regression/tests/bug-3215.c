@@ -23,7 +23,7 @@ bug ()
     return 0;
 }
 
-#ifndef TEST_HOST
+#ifndef PORT_HOST
 int putchar (int c)
 {
 	static int i;

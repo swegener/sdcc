@@ -202,6 +202,32 @@ CMDHELP(cl_reset_cmd,
 	"long help of reset")
 
 /*
+ * Command: tick
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_tick_cmd)
+{
+  class cl_cmd_arg *params[1];
+  params[0]= cmdline->param(0);
+  int cycles= 1;
+
+  if (params[0] != NULL)
+    cycles= params[0]->i_value;
+
+  uc->tick(cycles);
+
+  return 0;
+}
+
+CMDHELP(cl_tick_cmd,
+	"tick [number]",
+	"Tick a given number of clock cycles without execution",
+	"Ticks a given number of clock cycles. Timers and HW update but no"
+	" execution takes place.")
+
+
+/*
  * Command: dump
  *----------------------------------------------------------------------------
  */
@@ -865,7 +891,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
 	    {
 	      t_index i;
 	      for (addr= 0; addr < uc->variables->get_size(); addr++)
-		if (uc->vars->by_addr.search(uc->variables, addr, i))
+		if (!uc->vars->by_addr.search(uc->variables, addr, i))
 		  break;
 	      if (addr == uc->variables->get_size())
 		return con->dd_printf("no space\n"),

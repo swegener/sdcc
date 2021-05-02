@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
+#include "itsrccl.h"
 
 
 /*
@@ -50,7 +51,9 @@ public:
   int poll_priority;
   int    nuof;	   // Number of IT to check priority
   t_mem  ie_mask;  // Mask in IE register
+  t_mem  ie_value; // Enabled when masked cell equals to this
   t_mem  src_mask; // Mask of source bit in src_reg
+  t_mem  src_value;// Requested when masked cell equals to this
   t_addr addr;     // Address of service routine
   bool   clr_bit;  // Request bit must be cleared when IT accepted
   bool   active;   // Acceptance can be disabled
@@ -69,6 +72,8 @@ public:
 	    int    apoll_priority);
   virtual ~cl_it_src(void);
   virtual int init(void);
+  virtual void set_ie_value(t_mem iv) { ie_value= iv; }
+  virtual void set_src_value(t_mem sv) { src_value= sv; }
   virtual bool is_nmi(void) { return false; }
   
           bool is_active(void);
@@ -96,8 +101,6 @@ enum irq_nr {
 class cl_m6xxx_src: public cl_it_src
 {
 public:
-  u8_t Evalue;
-  u8_t IFvalue;
   enum irq_nr pass_to;
 public:
   cl_m6xxx_src(cl_uc  *Iuc,
@@ -109,13 +112,9 @@ public:
 	       t_addr Iaddr,
 	       const  char *Iname,
 	       int    apoll_priority,
-	       u8_t   aEvalue,
-	       u8_t   aIFvalue,
 	       enum irq_nr Ipass_to):
     cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
   {
-    Evalue= aEvalue;
-    IFvalue= aIFvalue;
     pass_to= Ipass_to;
   }
   virtual bool is_nmi(void) { return false; }

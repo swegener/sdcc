@@ -49,7 +49,8 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= simmcs6502.o mcs6502.o glob.o
+OBJECTS_SHARED	= simmcs6502.o mcs6502.o glob.o irq.o \
+		  inst.o ialu.o ibranch.o imove.o
 
 OBJECTS_EXE	= smcs6502.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

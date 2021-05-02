@@ -210,142 +210,123 @@ cl_avr::dis_tbl(void)
 }
 
 char *
-cl_avr::disass(t_addr addr, const char *sep)
+cl_avr::disass(t_addr addr)
 {
-  char work[256], temp[20];
-  char *buf, *p, *t, *s;
+  chars work= chars();//, temp[20];
   const char *b;
   uint code, data= 0;
   int i;
+  bool first;
+  
+  work= "";
 
-  p= work;
-
-  code= rom/*get_mem*/->get(/*MEM_ROM_ID,*/ addr);
+  code= rom->get(addr);
   i= 0;
   while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
 	 dis_tbl()[i].mnemonic)
     i++;
   if (dis_tbl()[i].mnemonic == NULL)
     {
-      buf= (char*)malloc(30);
-      strcpy(buf, "UNKNOWN/INVALID");
-      return(buf);
+      return(strdup("UNKNOWN/INVALID"));
     }
   b= dis_tbl()[i].mnemonic;
 
+  first= true;
   while (*b)
     {
+      if ((*b == ' ') && first)
+	{
+	  first= false;
+	  while (work.len() < 6) work.append(' ');
+	}
       if (*b == '%')
 	{
 	  b++;
+	  chars temp= chars();
+	  temp= "";
 	  switch (*(b++))
 	    {
 	    case 'd': // Rd   .... ...d dddd ....  0<=d<=31
-	      if (!/*get*/addr_name(data= (code&0x01f0)>>4, /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "r%d", data);
+	      if (!addr_name(data= (code&0x01f0)>>4, ram, &temp))
+		temp.format("r%d", data);
 	      break;
 	    case 'D': // Rd   .... .... dddd ....  16<=d<=31
-	      if (!/*get*/addr_name(data= 16+((code&0xf0)>>4), /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "r%d", data);
+	      if (!addr_name(data= 16+((code&0xf0)>>4), ram, &temp))
+		temp.format("r%d", data);
 	      break;
 	    case 'K': // K    .... KKKK .... KKKK  0<=K<=255
-	      sprintf(temp, "%d", ((code&0xf00)>>4)|(code&0xf));
+	      temp.appendf("%d", ((code&0xf00)>>4)|(code&0xf));
 	      break;
 	    case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
-	      if (!/*get*/addr_name(data= ((code&0x0200)>>5)|(code&0x000f),
-				    /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "r%d", data);
+	      if (!addr_name(data= ((code&0x0200)>>5)|(code&0x000f),
+			     ram, &temp))
+		temp.format("r%d", data);
 	      break;
 	    case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
-	      if (!/*get*/addr_name(data= 24+(2*((code&0x0030)>>4)),
-				    /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "r%d", data);
+	      if (!addr_name(data= 24+(2*((code&0x0030)>>4)),
+			     ram, &temp))
+		temp.format("r%d", data);
 	      break;
 	    case '6': // K    .... .... KK.. KKKK  0<=K<=63
-	      sprintf(temp, "%d", ((code&0xc0)>>2)|(code&0xf));
+	      temp.format("%d", ((code&0xc0)>>2)|(code&0xf));
 	      break;
 	    case 's': // s    .... .... .sss ....  0<=s<=7
-	      sprintf(temp, "%d", (code&0x70)>>4);
+	      temp.format("%d", (code&0x70)>>4);
 	      break;
 	    case 'b': // b    .... .... .... .bbb  0<=b<=7
-	      sprintf(temp, "%d", code&0x7);
+	      temp.format("%d", code&0x7);
 	      break;
 	    case 'k': // k    .... ..kk kkkk k...  -64<=k<=+63
 	      {
 		int k= (code&0x3f8)>>3;
 		if (code&0x200)
 		  k|= -128;
-		sprintf(temp, "0x%06x", k+1+(signed int)addr);
+		temp.format("0x%06x", k+1+(signed int)addr);
 		break;
 	      }
 	    case 'A': // k    .... ...k kkkk ...k  0<=k<=64K
 	              //      kkkk kkkk kkkk kkkk  0<=k<=4M
-	      sprintf(temp, "0x%06x",
-		      (((code&0x1f0)>>3)|(code&1))*0x10000+
-		      (uint)rom->get/*_mem*/(/*MEM_ROM_ID,*/ addr+1));
+	      temp.format("0x%06x",
+			  (((code&0x1f0)>>3)|(code&1))*0x10000+
+			  (uint)rom->get(addr+1));
 	      break;
 	    case 'P': // P    .... .... pppp p...  0<=P<=31
 	      data= (code&0xf8)>>3;
-	      if (!/*get*/addr_name(data+0x20, /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "%d", data);
+	      if (!addr_name(data+0x20, ram, &temp))
+		temp.format("%d", data);
 	      break;
 	    case 'p': // P    .... .PP. .... PPPP  0<=P<=63
 	      data= ((code&0x600)>>5)|(code&0xf);
-	      if (!/*get*/addr_name(data+0x20, /*sfr_tbl()*/ram, temp))
-		sprintf(temp, "%d", data);
+	      if (!addr_name(data+0x20, ram, &temp))
+		temp.format("%d", data);
 	      break;
 	    case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63
-	      sprintf(temp, "%d",
-		      ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
+	      temp.format("%d",
+			  ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
 	      break;
 	    case 'R': // k    SRAM address on second word 0<=k<=65535
-	      sprintf(temp, "0x%06x", (uint)rom->get/*_mem*/(/*MEM_ROM_ID,*/ addr+1));
+	      temp.format("0x%06x", (uint)rom->get(addr+1));
 	      break;
 	    case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
 	      {
 		int k= code&0xfff;
 		if (code&0x800)
 		  k|= -4096;
-		sprintf(temp, "0x%06x",
-			(int)rom->validate_address(k+1+(signed int)addr));
+		temp.format("0x%06x",
+			    (int)rom->validate_address(k+1+(signed int)addr));
 		break;
 	      }
 	    default:
-	      strcpy(temp, "?");
+	      temp= "?";
 	      break;
 	    }
-	  t= temp;
-	  while (*t)
-	    *(p++)= *(t++);
+	  work+= temp;
 	}
       else
-	*(p++)= *(b++);
+	work+= *(b++);
     }
-  *p= '\0';
 
-  p= strchr(work, ' ');
-  if (!p)
-    {
-      buf= strdup(work);
-      return(buf);
-    }
-  if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
-  else
-    buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, s= buf; *p != ' '; p++, s++)
-    *s= *p;
-  p++;
-  *s= '\0';
-  if (sep == NULL)
-    {
-      while (strlen(buf) < 6)
-	strcat(buf, " ");
-    }
-  else
-    strcat(buf, sep);
-  strcat(buf, p);
-  return(buf);
+  return(strdup(work.c_str()));
 }
 
 

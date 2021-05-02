@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (decode.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,18 +25,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#ifndef DECODE_HEADER
+#define DECODE_HEADER
 
-#include "stypes.h"
-#include "iwrap.h"
-
-
-extern instruction_wrapper_fn itab[256];
-
-extern struct dis_entry disass_rxk[];
-
+#define NOP instruction_ea
 
 #endif
 
-/* End of rxk.src/glob.h */
+/* End of mcs6502.src/decode.h */

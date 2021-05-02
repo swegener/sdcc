@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
+#include "decode.h"
 
 
 /*
@@ -101,7 +102,8 @@ public:
   class cl_cell16 cAF, cBC, cDE, cHL, cIX, cIY, cSP;
   class cl_ras *mem;
   class cl_address_space *ioi, *ioe;
-  bool ioi_prefix, ioe_prefix;
+  class cl_address_space *rwas;
+  bool io_prefix;
 public:
   cl_rxk(class cl_sim *asim);
   virtual int init(void);
@@ -114,8 +116,13 @@ public:
   virtual void make_memories(void);
 
   virtual int clock_per_cycle(void) { return 1; }
+  virtual struct dis_entry *dis_tbl(void);
+  virtual char *disass(t_addr addr);
 
   virtual void print_regs(class cl_console_base *con);
+
+  virtual int exec_inst(void);
+  virtual int NOP(t_mem code);
 };
 
 

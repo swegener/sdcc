@@ -47,6 +47,9 @@ enum cpu_cfg
 class cl_m6809_src_base: public cl_m6xxx_src
 {
 public:
+  u8_t Evalue;
+  u8_t IFvalue;
+public:
   cl_m6809_src_base(cl_uc  *Iuc,
 		    int    Inuof,
 		    class  cl_memory_cell *Iie_cell,
@@ -59,7 +62,11 @@ public:
 		    u8_t   aEvalue,
 		    u8_t   aIFvalue,
 		    enum irq_nr Ipass_to):
-    cl_m6xxx_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue, aIFvalue, Ipass_to) {}
+    cl_m6xxx_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, Ipass_to)
+  {
+      Evalue= aEvalue;
+    IFvalue= aIFvalue;
+  }
   virtual bool is_nmi(void) { return true; }
   virtual class cl_m6xxx_src *get_parent(void);
 };

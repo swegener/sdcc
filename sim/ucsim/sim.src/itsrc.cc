@@ -58,14 +58,16 @@ cl_it_src::cl_it_src(cl_uc  *Iuc,
 {
   uc= Iuc;
   poll_priority= apoll_priority;
-  nuof    = Inuof;
-  ie_cell = Iie_cell;
-  ie_mask = Iie_mask;
-  src_cell= Isrc_cell;
-  src_mask= Isrc_mask;
-  addr    = Iaddr;
-  clr_bit = Iclr_bit;
-  indirect= Iindirect;
+  nuof     = Inuof;
+  ie_cell  = Iie_cell;
+  ie_mask  = Iie_mask;
+  ie_value = Iie_mask;
+  src_cell = Isrc_cell;
+  src_mask = Isrc_mask;
+  src_value= Isrc_mask;
+  addr     = Iaddr;
+  clr_bit  = Iclr_bit;
+  indirect = Iindirect;
   if (Iname != NULL)
     set_name(Iname);
   else
@@ -115,7 +117,7 @@ cl_it_src::enabled(void)
     return false;
   t_mem e= ie_cell->get();
   e&= ie_mask;
-  return e != 0;
+  return e == ie_value;
 }
 
 bool
@@ -125,15 +127,19 @@ cl_it_src::pending(void)
     return false;
   t_mem s= src_cell->get();
   s&= src_mask;
-  return s != 0;
+  return s == src_value;
 }
 
 void
 cl_it_src::clear(void)
 {
   if (clr_bit)
-    //src_cell->set_bit0(src_mask);
-    src_cell->set(src_cell->get() & ~src_mask);
+    {
+      if (src_value)
+	src_cell->set(src_cell->get() & ~src_mask);
+      else
+	src_cell->set(src_cell->get() | src_mask);
+    }
 }
 
 void

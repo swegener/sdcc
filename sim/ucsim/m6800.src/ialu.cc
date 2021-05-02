@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (ialu.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,20 +23,79 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
-/*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
-
-#include "stypes.h"
-#include "iwrap.h"
+#include "m6800cl.h"
 
 
-extern instruction_wrapper_fn itab[256];
+int
+cl_m6800::INX(t_mem code)
+{
+  if (++rIX)
+    rF&= ~mZ;
+  else
+    rF|= mZ;
+  tick(3);
+  return resGO;
+}
 
-extern struct dis_entry disass_rxk[];
+int
+cl_m6800::DEX(t_mem code)
+{
+  if (--rIX)
+    rF&= ~mZ;
+  else
+    rF|= mZ;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_m6800::CLV(t_mem code)
+{
+  rF&= ~mV;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::SEV(t_mem code)
+{
+  rF|= mV;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::CLC(t_mem code)
+{
+  rF&= ~mC;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::SEC(t_mem code)
+{
+  rF|= mC;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::CLI(t_mem code)
+{
+  rF&= ~mI;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::SEI(t_mem code)
+{
+  rF|= mI;
+  tick(1);
+  return resGO;
+}
 
 
-#endif
-
-/* End of rxk.src/glob.h */
+/* End of m6800.src/ialu.cc */

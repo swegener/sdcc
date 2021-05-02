@@ -360,7 +360,7 @@ cl_tlcs::condname_C(u8_t cc)
 }
 
 char *
-cl_tlcs::disass(t_addr addr, const char *sep)
+cl_tlcs::disass(t_addr addr)
 {
   struct dis_entry *de;
   u64_t c;

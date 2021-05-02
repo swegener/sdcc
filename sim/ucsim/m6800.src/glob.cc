@@ -27,10 +27,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "glob.h"
 
+
+instruction_wrapper_fn itab[256];
+
 // code mask branch len mn call tick
 struct dis_entry disass_m6800[]=
-  {  
-   { 0, 0, 0, 0, 0, 0 }
+  {
+    { 0x01, 0xff, ' ', 1, "NOP" },
+    { 0x06, 0xff, ' ', 1, "TAP" },
+    { 0x07, 0xff, ' ', 1, "TAP" },
+    { 0x08, 0xff, ' ', 1, "INX" },
+    { 0x09, 0xff, ' ', 1, "DEX" },
+    { 0x0a, 0xff, ' ', 1, "CLV" },
+    { 0x0b, 0xff, ' ', 1, "SEV" },
+    { 0x0c, 0xff, ' ', 1, "CLC" },
+    { 0x0d, 0xff, ' ', 1, "SEC" },
+    { 0x0e, 0xff, ' ', 1, "CLI" },
+    { 0x0f, 0xff, ' ', 1, "SEI" },
+    { 0, 0, 0, 0, 0, 0 }
   };
 
 /* End of m6800.src/glob.cc */

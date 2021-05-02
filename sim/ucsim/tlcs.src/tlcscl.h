@@ -183,7 +183,7 @@ class cl_tlcs: public cl_uc
   virtual const char *bitname(u8_t b);
   virtual const char *condname_cc(u8_t cc);
   virtual const char *condname_C(u8_t cc);
-  virtual char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
   virtual int inst_length(t_addr addr);
 

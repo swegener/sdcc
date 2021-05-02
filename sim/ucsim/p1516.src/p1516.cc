@@ -211,7 +211,7 @@ cl_p1516::dis_tbl(void)
 }
 
 char *
-cl_p1516::disass(t_addr addr, const char *sep)
+cl_p1516::disass(t_addr addr)
 {
   chars work= chars(), temp= chars();
   const char *b;

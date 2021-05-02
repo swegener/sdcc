@@ -30,13 +30,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
+#include "decode.h"
 
 
 #define rA  (A)
 #define rB  (B)
 #define rCC (CC)
+#define rF  (CC)
 #define rIX (IX)
+#define rX  (IX)
 #define rSP (SP)
+
+#define cF  (cCC)
+
+
+//  Flag bit masks
+enum {
+  mC= 0x01,
+  mO= 0x02,
+  mV= 0x02,
+  mZ= 0x04,
+  mN= 0x08,
+  mS= 0x08,
+  mI= 0x10,
+  mH= 0x20,
+  mA= 0x40
+};
+
 
 /*
  * Base of M6800 processor
@@ -61,8 +81,23 @@ public:
   virtual void make_memories(void);
 
   virtual int clock_per_cycle(void) { return 1; }
+  virtual struct dis_entry *dis_tbl(void);
+  virtual char *disass(t_addr addr);
 
   virtual void print_regs(class cl_console_base *con);
+
+  virtual int exec_inst(void);
+  virtual int NOP(t_mem code);
+  virtual int TAP(t_mem code);
+  virtual int TPA(t_mem code);
+  virtual int INX(t_mem code);
+  virtual int DEX(t_mem code);
+  virtual int CLV(t_mem code);
+  virtual int SEV(t_mem code);
+  virtual int CLC(t_mem code);
+  virtual int SEC(t_mem code);
+  virtual int CLI(t_mem code);
+  virtual int SEI(t_mem code);
 };
 
 
@@ -78,4 +113,4 @@ public:
 
 #endif
 
-/* End of m6800.src/m6800.cc */
+/* End of m6800.src/m6800cl.h */

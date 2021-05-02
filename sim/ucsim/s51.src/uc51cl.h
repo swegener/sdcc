@@ -110,7 +110,7 @@ public:
   virtual int clock_per_cycle(void) { return(12); }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  virtual char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr);
   virtual void   print_regs(class cl_console_base *con);
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
 					  t_addr *memaddr,
@@ -119,8 +119,8 @@ public:
   virtual t_addr bit_address(class cl_memory *mem,
 			     t_addr mem_address,
 			     int bit_number);
-  virtual void   daddr_name(t_addr addr, char *buf);
-  virtual void   baddr_name(t_addr addr, char *buf);
+  virtual void   daddr_name(t_addr addr, chars *buf);
+  virtual void   baddr_name(t_addr addr, chars *buf);
   
   virtual void   reset(void);
   virtual void   clear_sfr(void);
@@ -146,7 +146,6 @@ protected:
   //virtual void  post_inst(void);
   virtual int high_movxri(void);
   
-  virtual int inst_unknown(void);
   virtual int instruction_00/*inst_nop*/(t_mem/*uchar*/ code);		/* 00 */
   virtual int instruction_01/*inst_ajmp_addr*/(t_mem/*uchar*/ code);	/* [02468ace]1 */
   virtual int instruction_02/*inst_ljmp*/(t_mem/*uchar*/ code);		/* 02 */

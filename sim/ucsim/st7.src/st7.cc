@@ -343,27 +343,30 @@ cl_st7::get_disasm_info(t_addr addr,
 }
 
 char *
-cl_st7::disass(t_addr addr, const char *sep)
+cl_st7::disass(t_addr addr)
 {
-  char work[256], temp[20];
+  chars work, temp;
   const char *b;
-  char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
+  bool first= true;
 
-
-  p= work;
+  work= "";
 
   b = get_disasm_info(addr, &len, NULL, &immed_offset, NULL);
 
-  if (b == NULL) {
-    buf= (char*)malloc(30);
-    strcpy(buf, "UNKNOWN/INVALID");
-    return(buf);
-  }
+  if (b == NULL)
+    {
+      return strdup("UNKNOWN/INVALID");
+    }
 
   while (*b)
     {
+      if ((*b == ' ') && first)
+	{
+	  first= false;
+	  while (work.len() < 6) work.append(' ');
+	}
       if (*b == '%')
         {
           b++;
@@ -390,21 +393,21 @@ cl_st7::disass(t_addr addr, const char *sep)
             //  ++immed_offset;
             //  break;
             case 'b': // b    byte immediate operand
-              sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("#0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'd': // d    short direct addressing
-              sprintf(temp, "$0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("$0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'x': // x    long direct
-              sprintf(temp, "$0x%04x",
-                 (uint)((rom->get(addr+immed_offset)<<8) |
-                        (rom->get(addr+immed_offset+1))) );
+              temp.format("$0x%04x",
+			  (uint)((rom->get(addr+immed_offset)<<8) |
+				 (rom->get(addr+immed_offset+1))) );
               ++immed_offset;
               ++immed_offset;
               break;
-            //case '3': // 3    24bit index offset
+	    //case '3': // 3    24bit index offset
             //  sprintf(temp, "0x%06lx",
             //     (ulong)((rom->get(addr+immed_offset)<<16) |
             //            (rom->get(addr+immed_offset+1)<<8) |
@@ -414,60 +417,35 @@ cl_st7::disass(t_addr addr, const char *sep)
             //  ++immed_offset;
             // break;
             case '2': // 2    word index offset
-              sprintf(temp, "0x%04x",
-                 (uint)((rom->get(addr+immed_offset)<<8) |
-                        (rom->get(addr+immed_offset+1))) );
+              temp.format("0x%04x",
+			  (uint)((rom->get(addr+immed_offset)<<8) |
+				 (rom->get(addr+immed_offset+1))) );
               ++immed_offset;
               ++immed_offset;
               break;
             case '1': // b    byte index offset
-              sprintf(temp, "0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'p': // b    byte index offset
 	      {
 		int i= (int)(addr+immed_offset+1
 			     +(char)rom->get(addr+immed_offset)); 
-		sprintf(temp, "0x%04x", i&0xffff);
+		temp.format("0x%04x", i&0xffff);
 		++immed_offset;
 		break;
 	      }
             default:
-              strcpy(temp, "?");
+              temp= "?";
               break;
             }
-          t= temp;
-          while (*t)
-            *(p++)= *(t++);
+	  work+= temp;
         }
       else
-        *(p++)= *(b++);
+        work+= *(b++);
     }
-  *p= '\0';
 
-  p= strchr(work, ' ');
-  if (!p)
-    {
-      buf= strdup(work);
-      return(buf);
-    }
-  if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
-  else
-    buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, t= buf; *p != ' '; p++, t++)
-    *t= *p;
-  p++;
-  *t= '\0';
-  if (sep == NULL)
-    {
-      while (strlen(buf) < 6)
-        strcat(buf, " ");
-    }
-  else
-    strcat(buf, sep);
-  strcat(buf, p);
-  return(buf);
+  return strdup(work.c_str());
 }
 
 

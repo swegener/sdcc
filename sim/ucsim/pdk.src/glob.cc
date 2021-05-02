@@ -105,13 +105,13 @@ struct dis_entry disass_pdk_13[]= {
   { 0x0A40, ~0x003F, ' ', 2, "neg %m" },
 
   { 0x0E00, ~0x00FF, ' ', 2, "set0 %in, %n" },
-  { 0x0300, ~0x00FE, ' ', 2, "set0 %mn, %n" },
+  { 0x0300, ~0x00EF, ' ', 2, "set0 %mn, %n" },
   { 0x0F00, ~0x00FF, ' ', 2, "set1 %in, %n" },
-  { 0x0301, ~0x00FE, ' ', 2, "set1 %mn, %n" },
+  { 0x0310, ~0x00EF, ' ', 2, "set1 %mn, %n" },
   { 0x0C00, ~0x00FF, ' ', 2, "t0sn %in, %n" },
-  { 0x0200, ~0x00FE, ' ', 2, "t0sn %mn, %n" },
+  { 0x0200, ~0x00EF, ' ', 2, "t0sn %mn, %n" },
   { 0x0D00, ~0x00FF, ' ', 2, "t1sn %in, %n" },
-  { 0x0201, ~0x00FE, ' ', 2, "t1sn %mn, %n" },
+  { 0x0210, ~0x00EF, ' ', 2, "t1sn %mn, %n" },
 
   { 0x1200, ~0x00FF, ' ', 2, "ceqsn %k" },
   { 0x0B80, ~0x003F, ' ', 2, "ceqsn %m" },

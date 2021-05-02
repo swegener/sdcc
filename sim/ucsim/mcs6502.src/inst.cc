@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (inst.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,20 +23,13 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
-/*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#include "mcs6502cl.h"
 
-#include "stypes.h"
-#include "iwrap.h"
+int
+cl_mcs6502::NOP(t_mem code)
+{
+  return resGO;
+}
 
-
-extern instruction_wrapper_fn itab[256];
-
-extern struct dis_entry disass_rxk[];
-
-
-#endif
-
-/* End of rxk.src/glob.h */
+/* End of mcs6502.src/inst.cc */

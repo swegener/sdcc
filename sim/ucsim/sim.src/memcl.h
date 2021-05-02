@@ -366,6 +366,7 @@ class cl_bit_cell32: public cl_memory_cell
 class cl_dummy_cell: public cl_memory_cell
 {
 public:
+  cl_dummy_cell(): cl_memory_cell() {}
   cl_dummy_cell(uchar awidth): cl_memory_cell(awidth) {}
 
   virtual t_mem d();

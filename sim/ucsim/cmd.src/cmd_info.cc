@@ -57,18 +57,16 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
-      char *s= uc->disass(fb->addr, NULL);
-      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s %s\n", fb->nr,
+      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s ", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
                      fb->hit, fb->cnt, AU(fb->addr),
-		     fb->condition()?"true":"false",
-		     s);
+		     fb->condition()?"true":"false");
+      uc->print_disass(fb->addr, con);
       extra= false;
       if (!(fb->cond.empty()))
 	con->dd_printf("     cond=\"%s\"", fb->cond.c_str()), extra= true;
       if (!(fb->commands.empty()))
 	con->dd_printf("     cmd=\"%s\"", fb->commands.c_str()), extra= true;
-      free(s);
       if (extra) con->dd_printf("\n");
     }
   for (i= 0; i < uc->ebrk->count; i++)

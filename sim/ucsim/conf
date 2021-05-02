@@ -108,6 +108,10 @@ case $TARGET in
 	;;
 esac
 
+for d in s51 m6809 stm8 tlcs z80; do
+    [ -L ${d}.src/dtest ] || ln -s ../../test/$d ${d}.src/dtest
+done
+
 if [ "$COMP" = "yes" ]; then
     make clean
     make

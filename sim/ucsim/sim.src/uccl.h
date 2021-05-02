@@ -361,7 +361,8 @@ public:
   virtual int priority_main() { return 0; }
   virtual int accept_it(class it_level *il);
   virtual bool it_enabled(void) { return false; }
-
+  virtual int inst_unknown(t_mem code);
+  
 #include "uccl_instructions.h"
   
   // stack tracking
@@ -386,7 +387,7 @@ public:
   virtual void stop_when(class cl_time_measurer *t);
   
   // disassembling and symbol recognition
-  virtual char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr);
   virtual struct dis_entry *dis_tbl(void);
   virtual int print_disass(t_addr addr, class cl_console_base *con, bool nl);
   virtual int print_disass(t_addr addr, class cl_console_base *con);
@@ -395,9 +396,9 @@ public:
   virtual int inst_branch(t_addr addr);
   virtual bool is_call(t_addr addr);
   virtual int longest_inst(void);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, char *buf);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr, char *buf);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr_high, int bitnr_low, char *buf);
+  virtual bool addr_name(t_addr addr, class cl_address_space *as, chars *buf);
+  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr, chars *buf);
+  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr_high, int bitnr_low, chars *buf);
   virtual bool symbol2address(char *sym,
 			      class cl_memory **mem,
 			      t_addr *addr);
@@ -405,7 +406,8 @@ public:
 				     char *name);
   virtual chars cell_name(class cl_memory_cell *cell, int bitnr_high, int bitnr_low);
   virtual chars cell_name(class cl_memory_cell *cell) { return cell_name(cell, -1, -1); }
-
+  virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
+  
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
 					  t_addr *memaddr,

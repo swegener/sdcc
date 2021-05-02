@@ -87,7 +87,7 @@ public:
   bool cwai;
 public:
   class cl_address_space *rom;
-  class cl_m6xxx_src *src_irq, *src_firq, *src_nmi;
+  class cl_m6809_src_base *src_irq, *src_firq, *src_nmi;
 protected:
   u8_t *reg8_ptr[8];
   u16_t *reg16_ptr[8];
@@ -107,7 +107,7 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual void disass_indexed(t_addr *addr, chars *work, int siz);
   virtual void disass_immediate(t_addr *addr, chars *work, int siz);
-  virtual char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
   virtual int indexed_length(t_addr addr);
   virtual int inst_length(t_addr addr);

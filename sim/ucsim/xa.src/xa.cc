@@ -404,21 +404,28 @@ cl_xa::longest_inst(void)
 }
 
 static char dir_name[64];
-char *cl_xa::get_dir_name(short addr) {
-  if (!/*get*/addr_name(addr, sfr/*_tbl()*/, dir_name)) {
-    sprintf (dir_name, "0x%03x", addr);
+char *cl_xa::get_dir_name(short addr)
+{
+  chars dn= chars();
+  if (!addr_name(addr, sfr, &dn)) {
+    dn.format("0x%03x", addr);
   }
+  strcpy(dir_name, dn.c_str());
   return dir_name;
 }
 
 static char bit_name[64];
-char *cl_xa::get_bit_name(short addr) {
+char *cl_xa::get_bit_name(short addr)
+{
   t_addr a= addr; int offset= 0, bitnr= addr%8;
+  chars bn= "";
   if (a >= 0x200) { a-= 0x200; offset= 0x400; }
   a= offset+a/8;
-  if (!/*get*/addr_name(a/*ddr*/, sfr/*bit_tbl()*/, bitnr, bit_name)) {
-    sprintf (bit_name, "0x%03x", addr);
-  }
+  if (!addr_name(a, sfr, bitnr, &bn))
+    {
+      bn.format("0x%03x", addr);
+    }
+  strcpy(bit_name, bn.c_str());
   return bit_name;
 }
 
@@ -516,26 +523,25 @@ disass - Disassemble an opcode.
     sep - optionally points to string(tab) to use as separator.
 |--------------------------------------------------------------------*/
 char *
-cl_xa::disass(t_addr addr, const char *sep)
+cl_xa::disass(t_addr addr)
 {
-  char work[256], parm_str[140];
-  char *buf, *p, *b;
+  chars work;
+  char parm_str[140];
   int code;
   int len = 0;
   int immed_offset = 0;
   int operands;
   int mnemonic;
   const char **reg_strs;
-
-  p= work;
+  
+  work= "";
 
   code = get_disasm_info(addr, &len, NULL, &immed_offset, &operands, &mnemonic);
 
-  if (mnemonic == BAD_OPCODE) {
-    buf= (char*)malloc(30);
-    strcpy(buf, "UNKNOWN/INVALID");
-    return(buf);
-  }
+  if (mnemonic == BAD_OPCODE)
+    {
+      return strdup("UNKNOWN/INVALID");
+    }
 
   if (code & 0x0800)
     reg_strs = w_reg_strs;
@@ -919,34 +925,11 @@ cl_xa::disass(t_addr addr, const char *sep)
     break;
   }
 
-  sprintf(work, "%s %s",
-          op_mnemonic_str[ mnemonic ],
-          parm_str);
+  work= op_mnemonic_str[ mnemonic ];
+  while (work.len() < 6) work.append(' ');
+  work+= parm_str;
 
-  p= strchr(work, ' ');
-  if (!p)
-    {
-      buf= strdup(work);
-      return(buf);
-    }
-  if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
-  else
-    buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-
-  for (p= work, b= buf; *p != ' '; p++, b++)
-    *b= *p;
-  p++;
-  *b= '\0';
-  if (sep == NULL)
-    {
-      while (strlen(buf) < 6)
-        strcat(buf, " ");
-    }
-  else
-    strcat(buf, sep);
-  strcat(buf, p);
-  return(buf);
+  return strdup(work.c_str());
 }
 
 /*--------------------------------------------------------------------

@@ -82,7 +82,7 @@ public:
 
   /* mods for disassembly of flat24 */
   virtual struct dis_entry *dis_tbl(void);
-  virtual char * disass(t_addr addr, const char *sep);
+  virtual char * disass(t_addr addr);
   virtual void   print_regs(class cl_console_base *con);
 
 protected:

@@ -477,7 +477,7 @@ cl_51core::instruction_e5/*inst_mov_a_addr*/(t_mem/*uchar*/ code)
     {
       //sim->app->get_commander()->
       //debug("Invalid Instruction : E5 E0  MOV A,ACC  at  %06x\n", PC);
-      inst_unknown();
+      inst_unknown(code);
     }
   else
     {

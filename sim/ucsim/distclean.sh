@@ -8,6 +8,11 @@ for pkg in cmd.src sim.src gui.src \
 		   doc
 do
     make -C $pkg -f clean.mk distclean
+    [ -L ${pkg}/dtest ] && rm -f ${pkg}/dtest
 done
 make -C example clean
 make -C test clean
+
+for d in $(ls ../test); do
+    make -C ../test/$d clean
+done

@@ -284,106 +284,109 @@ const char *cl_pdk::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
   return b;
 }
 
-char *cl_pdk::disass(t_addr addr, const char *sep) {
-  char work[256], temp[20];
+char *cl_pdk::disass(t_addr addr)
+{
+  chars work, temp;
   const char *b;
-  char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
   struct dis_entry *dis_e;
-
-  p = work;
+  bool first= true;
+  
+  work= "";
 
   b = get_disasm_info(addr, &len, NULL, &immed_offset, &dis_e);
 
-  if (b == NULL) {
-    buf = (char *)malloc(30);
-    strcpy(buf, "UNKNOWN/INVALID");
-    return (buf);
-  }
+  if (b == NULL)
+    {
+      return (strdup("UNKNOWN/INVALID"));
+    }
 
-  while (*b) {
-    if (*b == '%') {
-      b++;
-      uint code = rom->get(addr) & ~(uint)dis_e->mask;
-      switch (*(b++)) {
-        case 'k':  // k    immediate addressing
-          sprintf(temp, "#%u", code);
-          break;
-        case 'm':  // m    memory addressing
-          if (*b == 'n') {
-            code &= 0x3F;
-            ++b;
-          }
-          sprintf(temp, "%u", code);
-          break;
-        case 'i':  // i    IO addressing
-          // TODO: Maybe add pretty printing.
-          if (*b == 'n') {
-            switch (type->type) {
-            case CPU_PDK13:
-              code &= 0x1F;
-              break;
-            case CPU_PDK14:
-              code &= 0x3F;
-              break;
-            case CPU_PDK15:
-              code &= 0x7F;
-              break;
-            default:
-              ;//__builtin_unreachable();
-           }
+  while (*b)
+    {
+      if ((*b == ' ') && first)
+	{
+	  first= false;
+	  while (work.len() < 6) work.append(' ');
+	}
+      if (*b == '%')
+	{
+	  temp= "";
+	  b++;
+	  uint code = rom->get(addr) & ~(uint)dis_e->mask;
+	  switch (*(b++))
+	    {
+	    case 'k':  // k    immediate addressing
+	      temp.format("#%u", code);
+	      break;
+	    case 'm':  // m    memory addressing
+	      if (*b == 'n') {
+		switch (type->type) {
+		case CPU_PDK13:
+		  code &= 0x0F;
+		  break;
+		case CPU_PDK14:
+		  code &= 0x3F;
+		  break;
+		case CPU_PDK15:
+		  code &= 0x7F;
+		  break;
+		default:
+		  ;//__builtin_unreachable();
+		}
+		++b;
+	      }
+	      temp.format("%u", code);
+	      break;
+	    case 'i':  // i    IO addressing
+	      // TODO: Maybe add pretty printing.
+	      if (*b == 'n') {
+		switch (type->type) {
+		case CPU_PDK13:
+		  code &= 0x1F;
+		  break;
+		case CPU_PDK14:
+		  code &= 0x3F;
+		  break;
+		case CPU_PDK15:
+		  code &= 0x7F;
+		  break;
+		default:
+		  ;//__builtin_unreachable();
+		}
+		
+		++b;
+	      }
+	      temp.format("[%u]", code);
+	      break;
+	    case 'n':  // n    N-bit addressing
+	      uint n;
+	      switch (type->type) {
+	      case CPU_PDK13:
+		n = (code & 0xE0) >> 5;
+		break;
+	      case CPU_PDK14:
+		n = (code & 0x1C0) >> 6;
+		break;
+	      case CPU_PDK15:
+		n = (code & 0x380) >> 7;
+		break;
+	      default:
+		n= 0;//__builtin_unreachable();
+	      }
+	      temp.format("#%u", n);
+	      break;
+	    default:
+	      temp= "%?";
+	      break;
+	    }
+	  work+= temp;
+	}
+      else
+	work+= *(b++);
+    }
 
-            ++b;
-          }
-          sprintf(temp, "[%u]", code);
-          break;
-        case 'n':  // n    N-bit addressing
-          uint n;
-          switch (type->type) {
-          case CPU_PDK13:
-            n = (code & 0xE0) >> 5;
-            break;
-          case CPU_PDK14:
-            n = (code & 0x1C0) >> 6;
-            break;
-          case CPU_PDK15:
-            n = (code & 0x380) >> 7;
-            break;
-          default:
-            n= 0;//__builtin_unreachable();
-          }
-          sprintf(temp, "#%u", n);
-          break;
-        default:
-          strcpy(temp, "%?");
-          break;
-      }
-      t = temp;
-      while (*t) *(p++) = *(t++);
-    } else
-      *(p++) = *(b++);
-  }
-  *p = '\0';
-
-  p = strchr(work, ' ');
-  if (!p) {
-    buf = strdup(work);
-    return (buf);
-  }
-  if (sep == NULL)
-    buf = (char *)malloc(6 + strlen(p) + 1);
-  else
-    buf = (char *)malloc((p - work) + strlen(sep) + strlen(p) + 1);
-  for (p = work, t = buf; *p != ' '; p++, t++) *t = *p;
-  p++;
-  *t = '\0';
-  if (sep == NULL) {
-    while (strlen(buf) < 6) strcat(buf, " ");
-  } else
-    strcat(buf, sep);
-  strcat(buf, p);
-  return (buf);
+  return strdup(work.c_str());
 }
 
 void cl_pdk::print_regs(class cl_console_base *con) {

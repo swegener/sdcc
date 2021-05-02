@@ -191,7 +191,8 @@ static struct
   struct
   {
     AOP_TYPE last_type;
-    const char *base;
+    const char *base;   // For addresses
+    unsigned int value; // For AOP_LIT
     int offset;
   } pairs[NUM_PAIRS];
   struct
@@ -1247,12 +1248,19 @@ spillPairReg (const char *regname)
 static void
 swapPairs (PAIR_ID pair1Id, PAIR_ID pair2Id)
 {
-  AOP_TYPE tt = _G.pairs[pair1Id].last_type;
+  /*AOP_TYPE tt = _G.pairs[pair1Id].last_type;
   _G.pairs[pair1Id].last_type = _G.pairs[pair2Id].last_type;
   _G.pairs[pair2Id].last_type = tt;
   const char *tb = _G.pairs[pair1Id].base;
+  unsigned int tv = _G.pairs[pair1Id].value;
   _G.pairs[pair1Id].base = _G.pairs[pair2Id].base;
   _G.pairs[pair2Id].base = tb;
+  _G.pairs[pair1Id].value = _G.pairs[pair2Id].value;
+  _G.pairs[pair2Id].value = tv;*/
+  
+  // For now just spill both: Makign this work would require proper tracking of de (i.e. adding spillPair (PAIR_DE) as consistently as has been done for spillPair (PAIR_HL)
+  spillPair (pair1Id);
+  spillPair (pair2Id);
 }
 
 static void
@@ -1306,6 +1314,7 @@ genMovePairPair (PAIR_ID srcPair, PAIR_ID dstPair)
     }
   _G.pairs[dstPair].last_type = _G.pairs[srcPair].last_type;
   _G.pairs[dstPair].base = _G.pairs[srcPair].base;
+  _G.pairs[dstPair].value = _G.pairs[srcPair].value;
   _G.pairs[dstPair].offset = _G.pairs[srcPair].offset;
 }
 
@@ -2014,48 +2023,6 @@ requiresHL (const asmop * aop)
     }
 }
 
-/*----------------------------------------------------------*/
-/* strtoul_z80: a wrapper to strtoul, which can also handle */
-/* hex numbers with a $ prefix.                             */
-/*----------------------------------------------------------*/
-static unsigned long int
-strtoul_z80asm (const char *nptr, char **endptr, int base)
-{
-  char *p = NULL;
-  int i, flag = 0, len;
-  unsigned long ret;
-
-  if (nptr != NULL && (p = malloc ((len = strlen (nptr)) + 1 + 1)) != NULL)
-    {
-      memset (p, 0, len + 2);
-      for (i = 0; i < len; i++)
-        {
-          if (!flag)
-            if (isspace (nptr[i]))
-              p[i] = nptr[i];
-            else if (nptr[i] == '$')
-              {
-                p[i] = '0';
-                p[i + 1] = 'x';
-                flag = 1;
-              }
-            else
-              break;
-          else
-            p[i + 1] = nptr[i];
-        }
-    }
-
-  if (flag)
-    ret = strtoul (p, endptr, base);
-  else
-    ret = strtoul (nptr, endptr, base);
-
-  if (p)
-    free (p);
-  return ret;
-}
-
 static void
 fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
 {
@@ -2066,7 +2033,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
 
   wassert (pair);
 
-  emitDebug (";fetchLitPair");
+  emitDebug (";fetchLitPair %s",  pair);
 
   if (isPtr (pair))
     {
@@ -2099,16 +2066,13 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
             }
         }
 
-      if (pairId == PAIR_HL && left->type == AOP_LIT && _G.pairs[pairId].last_type == AOP_LIT &&
-          !IS_FLOAT (left->aopu.aop_lit->type) && offset == 0 && _G.pairs[pairId].offset == 0)
+      if (pairId == PAIR_HL && left->type == AOP_LIT && _G.pairs[pairId].last_type == AOP_LIT)
         {
           unsigned new_low, new_high, old_low, old_high;
-          unsigned long v_new = ulFromVal (left->aopu.aop_lit);
-          unsigned long v_old = strtoul_z80asm (_G.pairs[pairId].base, NULL, 0);
-          new_low = (v_new >> 0) & 0xff;
-          new_high = (v_new >> 8) & 0xff;
-          old_low = (v_old >> 0) & 0xff;
-          old_high = (v_old >> 8) & 0xff;
+          new_low = byteOfVal (left->aopu.aop_lit, offset);
+          new_high = byteOfVal (left->aopu.aop_lit, offset + 1);
+          old_low = (_G.pairs[pairId].value >> 0) & 0xff;
+          old_high = (_G.pairs[pairId].value >> 8) & 0xff;
 
           if (new_low == old_low && new_high == old_high)
             goto adjusted;
@@ -2131,21 +2095,16 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
           /* Change lower byte only. */
           else if (new_high == old_high)
             {
-              emit3_o (A_LD, ASMOP_L, 0, left, 0);
+              emit3_o (A_LD, ASMOP_L, 0, left, offset);
               goto adjusted;
             }
           /* Change upper byte only. */
           else if (new_low == old_low)
             {
-              emit3_o (A_LD, ASMOP_H, 0, left, 1);
+              emit3_o (A_LD, ASMOP_H, 0, left, offset + 1);
               goto adjusted;
             }
         }
-
-
-      _G.pairs[pairId].last_type = left->type;
-      _G.pairs[pairId].base = traceAlloc (&_G.trace.aops, Safe_strdup (base));
-      _G.pairs[pairId].offset = offset;
     }
   
   /* Both a lit on the right and a true symbol on the left */
@@ -2160,13 +2119,13 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
     emit2 ("ld %s, !hashedstr", pair, l);
     regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY) ? 4 : 3;
   }
-  Safe_free (base_str);
-  Safe_free (l);
-  return;
 
 adjusted:
   _G.pairs[pairId].last_type = left->type;
-  _G.pairs[pairId].base = traceAlloc (&_G.trace.aops, Safe_strdup (base));
+  if (left->type == AOP_LIT)
+    _G.pairs[pairId].value = byteOfVal (left->aopu.aop_lit, offset) + (byteOfVal (left->aopu.aop_lit, offset + 1) << 8);
+  else
+    _G.pairs[pairId].base = traceAlloc (&_G.trace.aops, Safe_strdup (base));
   _G.pairs[pairId].offset = offset;
   Safe_free (base_str);
   Safe_free (l);
@@ -3532,7 +3491,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         aopInReg (source, soffset + i, HL_IDX) && hl_dead && // If we knew that iy was dead, we could also use ex (sp), iy here.
         !regalloc_dry_run) // Stack positions will change, so do not assume this is possible in the cost function.
         {
-          emit2("ex (sp), hl");
+          emit2 ("ex (sp), hl");
           cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5);
           spillPair (PAIR_HL);
           assigned[i] = true;
@@ -3588,7 +3547,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           cost2 (3, 0, 0, 13, 0, 0, 0);
           if (!de_dead || !hl_dead || source->regs[L_IDX] >= 0 && !assigned[source->regs[L_IDX]] || source->regs[H_IDX] >= 0 && !assigned[source->regs[H_IDX]])
             {
-              emit2("ex de, hl");
+              emit2 ("ex de, hl");
               cost2 (1, 0, 0, 2, 0, 0, 0);
             }
           spillPair (PAIR_HL);
@@ -3961,7 +3920,7 @@ skip_byte:
           spillPair (PAIR_HL);
           if (aopInReg (result, roffset + i, DE_IDX))
             {
-              emit2("ex de, hl");
+              emit2 ("ex de, hl");
               cost2 (1, 0, 0, 2, 0, 0, 0);
             }
           else
@@ -5018,9 +4977,9 @@ genIpush (const iCode *ic)
             emit2 ("push %s", _pairs[getPairId (pair)].name);
             regalloc_dry_run_cost++;
             d = 2;
-            /* reuse the current register pair */
-            /* TODO: support float */
-            while (IC_LEFT (ic)->aop->type == AOP_LIT && !IS_FLOAT (IC_LEFT (ic)->aop->aopu.aop_lit->type) && size - (d+2) >= 0)
+
+            // For hl and iy, genMove_o can do better caching of literal values than what we do here. TODO: Remove this, and make genMove_o handle cahing well for bc and de, too (will require quite some spillPair() calls througout codegen).
+            while (getPairId (pair) != PAIR_HL && IC_LEFT (ic)->aop->type == AOP_LIT && !IS_FLOAT (IC_LEFT (ic)->aop->aopu.aop_lit->type) && size - (d+2) >= 0)
               {
                 unsigned long current = (ullFromVal(IC_LEFT (ic)->aop->aopu.aop_lit)>>((size - d    )*8)) & 0xFFFF;
                 unsigned long next = (ullFromVal(IC_LEFT (ic)->aop->aopu.aop_lit)>>((size - (d+2))*8)) & 0xFFFF;
@@ -5811,6 +5770,9 @@ genFunction (const iCode * ic)
     }
 
   _G.stack.offset = sym->stack;
+  
+  for (PAIR_ID pairId = 0; pairId < NUM_PAIRS; pairId++)
+    spillPair (pairId);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7390,6 +7352,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
             emit3 (A_CP, ASMOP_A, ASMOP_A);
           emit2 ("sbc hl, %s", _pairs[rightpair].name);
           regalloc_dry_run_cost += 2;
+          spillPair (PAIR_HL);
           genMove_o (result, offset, ASMOP_HL, 0, 2, a_dead, true, false, size <= 2);
           offset += 2;
           size -= 2;
@@ -7625,6 +7588,7 @@ genMultOneChar (const iCode * ic)
            && result->aopu.aop_reg[0]->rIdx == L_IDX))
         {
           emit2 ("mlt hl");
+          spillPair (PAIR_HL);
           regalloc_dry_run_cost += 2;
           return;
         }
@@ -7659,6 +7623,7 @@ genMultOneChar (const iCode * ic)
 
       emit2 ("mul");
       regalloc_dry_run_cost++;
+      spillPair (PAIR_HL);
 
       genMove (result, resultsize > 1 ? ASMOP_BC : ASMOP_C, !isRegDead (A_IDX, ic), true, false);
 
@@ -7697,7 +7662,7 @@ genMultOneChar (const iCode * ic)
     {
       emit2 ("ld l, e");
       emit2 ("mlt hl");
-      regalloc_dry_run_cost += 3;
+      regalloc_dry_run_cost += 3;  
     }
   else if (IS_RAB && !IS_R2K) // A wait state bug makes mul unuseable in most scenarios on the original Rabbit 2000.
     {
@@ -7726,7 +7691,6 @@ genMultOneChar (const iCode * ic)
     }
   else
     regalloc_dry_run_cost += 12;
-
 
   spillPair (PAIR_HL);
 
@@ -7958,6 +7922,7 @@ no_mlt:
             }
           emit2 ("mul");
           regalloc_dry_run_cost++;
+          spillPair (PAIR_HL);
           genMove (IC_RESULT (ic)->aop, ASMOP_BC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           goto release;
         }
@@ -8456,7 +8421,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                     }
                   emit2 ("sbc hl, %s", _pairs[litpair].name);
                   regalloc_dry_run_cost += 2;
-                  result_in_carry = TRUE;
+                  spillPair (PAIR_HL);
+                  result_in_carry = true;
                   goto release;
                 }
 
@@ -8497,6 +8463,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           emit3 (A_XOR, ASMOP_A, ASMOP_A); // Clear carry.
           emit2 ("sbc hl, %s", _pairs[getPartPairId (right->aop, offset)].name);
           regalloc_dry_run_cost += 2;
+          spillPair (PAIR_HL);
           size -= 2;
           offset += 2;
         }
@@ -8534,8 +8501,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                   regalloc_dry_run_cost++;
                 }
               emit2 ("sbc hl, %s", _pairs[getPartPairId (right->aop, offset)].name);
-              spillPair (PAIR_HL);
               regalloc_dry_run_cost += 2;
+              spillPair (PAIR_HL);
               size -= 2;
               offset += 2;
             }
@@ -8552,8 +8519,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                   regalloc_dry_run_cost++;
                 }
               emit2 ("sbc hl, de");
-              spillPair (PAIR_HL);
               regalloc_dry_run_cost += 2;
+              spillPair (PAIR_HL);
               size -= 2;
               offset += 2;
             }
@@ -8898,7 +8865,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
               if (!regalloc_dry_run)
                 emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 5;
-
+              spillPair (PAIR_HL);
               offset += 2;
               size--;
               continue;
@@ -11123,8 +11090,8 @@ AccLsh (unsigned int shCount)
 static void
 shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount, const iCode *ic)
 {
-  // add hl, hl is cheap in code size.
-  if (sameRegs (result->aop, left->aop) && aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic) && !optimize.codeSpeed && offr == offl)
+  // add hl, hl is cheap in code size. On Rabbits it is also fastest.
+  if (sameRegs (result->aop, left->aop) && aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic) && offr == offl && (!optimize.codeSpeed && IS_RAB))
     {
       while (shCount--)
         {

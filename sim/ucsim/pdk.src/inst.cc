@@ -682,7 +682,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x1F;
     store_io(addr, get_io(addr) & ~(1 << bit));
-  } else if (CODE_MASK(0x0300, 0xFE)) {
+  } else if (CODE_MASK(0x0300, 0xEF)) {
     // set0 m, k
     const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x0F;
@@ -692,7 +692,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x1F;
     store_io(addr, get_io(addr) | (1 << bit));
-  } else if (CODE_MASK(0x0301, 0xFE)) {
+  } else if (CODE_MASK(0x0301, 0xEF)) {
     // set1 m, k
     const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x0F;
@@ -702,7 +702,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     int n = (code & 0xE0) >> 5;
     if (!(get_io(code & 0x1F) & (1 << n)))
       ++PC;
-  } else if (CODE_MASK(0x0200, 0xFE)) {
+  } else if (CODE_MASK(0x0200, 0xEF)) {
     // t0sn m, k
     int n = (code & 0xE0) >> 5;
     if (!(get_mem(code & 0x0F) & (1 << n)))
@@ -712,7 +712,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     int n = (code & 0xE0) >> 5;
     if (get_io(code & 0x1F) & (1 << n))
       ++PC;
-  } else if (CODE_MASK(0x0201, 0xFE)) {
+  } else if (CODE_MASK(0x0201, 0xEF)) {
     // t1sn m, k
     int n = (code & 0xE0) >> 5;
     if (get_mem(code & 0x0F) & (1 << n))

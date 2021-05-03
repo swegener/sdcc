@@ -36,6 +36,19 @@ unsigned long int (*p4)(unsigned long int) __z88dk_callee;
 unsigned long int (*p4)(unsigned long int) __z88dk_callee __reentrant;
 #endif
 
+int j;
+
+void g0(void)
+{
+	j++;
+}
+
+void g1(int i) __z88dk_callee
+{
+	j = i;
+	g0(); // Tail call optimization should not done here, as it would skip stack cleanup.
+}
+
 void
 testZ88dk(void)
 {
@@ -55,5 +68,8 @@ testZ88dk(void)
   ASSERT ((*p3) (23, 42) == 65);
   ASSERT ((*p4) (23) == 24);
 #endif
+
+  g1(1);
+  ASSERT (j == 2);
 }
 

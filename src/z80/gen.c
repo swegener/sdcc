@@ -4889,6 +4889,12 @@ genIpush (const iCode *ic)
           emit2 ("push hl");
           regalloc_dry_run_cost++;
         }
+      else if (isRegDead (HL_IDX, ic))
+        {
+          cheapMove (ASMOP_L, 0, IC_LEFT (ic)->aop, 0, true);
+          emit2 ("push hl");
+          regalloc_dry_run_cost++;
+        }
       else if (isRegDead (A_IDX, ic))
         {
           emit2 ("dec sp");
@@ -5876,21 +5882,57 @@ genEndFunction (iCode *ic)
         }
       else // Do it the hard way: Copy return address on stack before stack pointer adjustment.
         {
-          emit2 ("push bc");
-          emit2 ("push hl");
-          emit2 ("ld hl, !immedword", 4ul & 0xffff);
-          emit2 ("add hl, sp");
-          emit2 ("ld c, (hl)");
-          emit2 ("inc hl");
-          emit2 ("ld b, (hl)");
-          emit2 ("ld hl, !immedword", (4ul + stackparmbytes) & 0xffff);
-          emit2 ("add hl, sp");
-          emit2 ("ld (hl), c");
-          emit2 ("inc hl");
-          emit2 ("ld (hl), b");
-          emit2 ("pop hl");
-          emit2 ("pop bc");
-          regalloc_dry_run_cost += 18;
+          if (stackparmbytes == 1)
+            {
+              wassert (stackparmbytes == 1);
+              emit2 ("push hl");
+              emit2 ("push de");
+              emit2 ("ld hl, !immedword", 4);
+              emit2 ("add hl, sp");
+              emit2 ("ld e, (hl)");
+              emit2 ("inc hl");
+              emit2 ("ld d, (hl)");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("pop hl");
+              regalloc_dry_run_cost += 14;
+            }
+          else if (IS_GB)
+            {
+              emit2 ("push hl");
+              emit2 ("push de");
+              emit2 ("!ldahlsp", 4);
+              emit2 ("ld e, (hl)");
+              emit2 ("inc hl");
+              emit2 ("ld d, (hl)");
+              emit2 ("ld hl, !immedword", 4 + stackparmbytes);
+              emit2 ("add hl, sp");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("pop hl");
+              regalloc_dry_run_cost += 16;
+            }
+          else
+            {
+              wassert (!IS_GB);
+              wassert (stackparmbytes != 1); // Avoid overwriting return address and hl.
+              emit2 ("ex (sp), hl");
+              emit2 ("push de");
+              emit2 ("ex de, hl");
+              emit2 ("ld hl, !immedword", 2 + stackparmbytes);
+              emit2 ("add hl, sp");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("ex (sp), hl");
+              regalloc_dry_run_cost += 12;
+            }
+
           adjustStack (stackparmbytes,
           !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
           retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),

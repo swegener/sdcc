@@ -43874,7 +43874,6 @@ There are three other calling conventions supported, which can be specified
  For __z88dk_callee, parameters are passed on the stack, but the stack is
  not adjusted for the parameters after the call (thus the callee has to
  do this instead).
- __z88dk_callee is currently supported on the caller side only.
  __z88dk_callee can be combined with __smallc.
 \end_layout
 

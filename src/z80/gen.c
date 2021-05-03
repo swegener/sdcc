@@ -4862,7 +4862,10 @@ genIpush (const iCode *ic)
   if (!regalloc_dry_run && !_G.saves.saved && !regalloc_dry_run) /* Cost is counted at CALL or PCALL instead */
     _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
 
-  const bool smallc = IFFUNC_ISSMALLC (operandType (IC_LEFT (walk)));
+  sym_link *ftype = operandType (IC_LEFT (walk));
+  if (walk->op == PCALL)
+    ftype = ftype->next;
+  const bool smallc = IFFUNC_ISSMALLC (ftype);
 
   /* then do the push */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -5779,7 +5782,7 @@ genFunction (const iCode * ic)
 /* genEndFunction - generates epilogue for functions               */
 /*-----------------------------------------------------------------*/
 static void
-genEndFunction (iCode * ic)
+genEndFunction (iCode *ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   int retsize = getSize (sym->type->next);
@@ -5787,15 +5790,24 @@ genEndFunction (iCode * ic)
   bool is_nmi = (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC;
 
   wassert (!regalloc_dry_run);
-  wassertl (!_G.stack.pushed, "Unbalanced stack.");
+  //wassertl (!_G.stack.pushed, "Unbalanced stack.");
 
   if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {
       emitDebug (IFFUNC_ISNAKED (sym->type) ? "; naked function: No epilogue." : "; _Noreturn function: No epilogue.");
       return;
     }
-
-  wassertl(regalloc_dry_run || !IFFUNC_ISZ88DK_CALLEE(sym->type), "Unimplemented __z88dk_callee support on callee side");
+  
+  int stackparmbytes = 0;
+  for (value *arg = FUNC_ARGS(sym->type); arg; arg = arg->next)
+    {
+      wassert (arg->sym);
+      int argsize = getSize (arg->sym->type);
+      if (FUNC_ISSMALLC (sym->type)) // SmallC calling convention passes 8-bit stack arguments as 16 bit.
+        argsize++;
+      if (!SPEC_REGPARM (arg->etype))
+        stackparmbytes += argsize;
+    }
 
   if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
     {
@@ -5804,7 +5816,7 @@ genEndFunction (iCode * ic)
     }
   else
     adjustStack (_G.stack.offset,
-      !IS_TLCS90 && (retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize)),
+      !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
       retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
       retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize),
       !IY_RESERVED);
@@ -5815,6 +5827,7 @@ genEndFunction (iCode * ic)
       regalloc_dry_run_cost += 2;
     }
 
+  wassertl(regalloc_dry_run || !(IFFUNC_ISZ88DK_CALLEE(sym->type) && (_G.calleeSaves.pushedDE || _G.calleeSaves.pushedBC)), "Unimplemented __z88dk_callee support for calle-saved bc/de on callee side");
   if (_G.calleeSaves.pushedDE)
     {
       emit2 ("pop de");
@@ -5834,8 +5847,64 @@ genEndFunction (iCode * ic)
       emit2 ("!profileexit");
     }
 
+  if (IFFUNC_ISZ88DK_CALLEE(sym->type) && stackparmbytes)
+    {
+      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
+      wassertl(regalloc_dry_run || !IFFUNC_ISBANKEDCALL (sym->type), "Unimplemented __banked __z88dk_callee support on callee side");
+
+      if (retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize))
+        {
+          _pop (PAIR_HL);
+          adjustStack (stackparmbytes,
+          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
+          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
+          false,
+          !IY_RESERVED);
+          emit2 ("jp (hl)");
+          regalloc_dry_run_cost += 2;
+        }
+      else if (!IS_GB && !IY_RESERVED)
+        {
+          _pop (PAIR_IY);
+          adjustStack (stackparmbytes,
+          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
+          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
+          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize),
+          false);
+          emit2 ("jp (iy)");
+          regalloc_dry_run_cost += 2;
+        }
+      else // Do it the hard way: Copy return address on stack before stack pointer adjustment.
+        {
+          emit2 ("push bc");
+          emit2 ("push hl");
+          emit2 ("ld hl, !immedword", 4ul & 0xffff);
+          emit2 ("add hl, sp");
+          emit2 ("ld c, (hl)");
+          emit2 ("inc hl");
+          emit2 ("ld b, (hl)");
+          emit2 ("ld hl, !immedword", (4ul + stackparmbytes) & 0xffff);
+          emit2 ("add hl, sp");
+          emit2 ("ld (hl), c");
+          emit2 ("inc hl");
+          emit2 ("ld (hl), b");
+          emit2 ("pop hl");
+          emit2 ("pop bc");
+          regalloc_dry_run_cost += 18;
+          adjustStack (stackparmbytes,
+          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
+          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
+          false,
+          !IY_RESERVED);
+          emit2 ("ret");
+          regalloc_dry_run_cost++;
+        }
+        
+      goto done;
+    }
+
   /* if this is an interrupt service routine
-     then save all potentially used registers. */
+     then restore all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
       emit2 ("!popa");
@@ -5903,6 +5972,7 @@ genEndFunction (iCode * ic)
       regalloc_dry_run_cost++;
     }
 
+done:
   _G.flushStatics = 1;
   _G.stack.pushed = 0;
   _G.stack.offset = 0;

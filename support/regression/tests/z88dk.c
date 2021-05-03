@@ -5,8 +5,6 @@
 
 #ifndef __SDCC_pdk14
 
-/* __z88dk_fastcall is supported both on the caller and the callee side */
-
 unsigned char f1(unsigned char c) __z88dk_fastcall
 {
 	return c + 1;
@@ -33,8 +31,6 @@ unsigned long int (*p4)(unsigned long int) __z88dk_fastcall;
 #else
 unsigned long int (*p4)(unsigned long int) __z88dk_fastcall __reentrant;
 #endif
-
-/* __z88dk_callee is currently only supported on the caller side */
 
 void s1(int x, int y) __smallc;
 

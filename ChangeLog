@@ -1,3 +1,12 @@
+2021-05-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  doc/sdccman.lyx,
+	  .version,
+	  support/regression/tests/z88dk.c,
+	  support/regression/tests/z88dk_callee.c:
+	  Implement __z88dk_callee support on callee side.
+
 2021-05-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

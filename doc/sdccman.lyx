@@ -43965,6 +43965,11 @@ Arguments are passed on the stack right-to-left.
  Return values are in a (8 bit), x (16 bit), xyl (24 bit), xy (32 bit) or
  use a hidden extra pointer parameter pointing to the location (anything
  wider than 32 bit).
+ There is one other calling convention supported, which can be specified
+ using the keyword __z88dk_callee.
+ For __z88dk_callee, parameters are passed on the stack, but the stack is
+ not adjusted for the parameters after the call (thus the callee has to
+ do this instead).
 \end_layout
 
 \begin_layout Section

@@ -1,5 +1,15 @@
 2021-05-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/stm8/main.c,
+	  doc/sdccman.lyx,
+	  .version,
+	  support/regression/fwk/include/testfwk.h,
+	  support/regression/tests/z88dk_callee.c:
+	  __z88dk_callee support for stm8.
+
+2021-05-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  doc/sdccman.lyx,
 	  .version,

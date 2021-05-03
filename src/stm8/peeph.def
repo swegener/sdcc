@@ -1481,22 +1481,6 @@ replace restart {
 barrier
 
 replace restart {
-	call	%1
-	ret
-} by {
-	jp	%1
-	; peephole j35 replaced call at end of function by jump (tail call optimization).
-}
-
-replace restart {
-	callf	%1
-	retf
-} by {
-	jpf	%1
-	; peephole j36 replaced call at end of function by jump (tail call optimization).
-}
-
-replace restart {
 	ld	xl, a
 	ld	a, xh
 } by {

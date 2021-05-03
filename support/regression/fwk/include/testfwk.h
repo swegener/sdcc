@@ -18,7 +18,7 @@ void __printf(const char *szFormat, ...);
  #define _STATMEM
 #endif
 
-#if defined(__SDCC_stm8) ||defined(PORT_HOST)
+#if defined(__SDCC_stm8) || defined(PORT_HOST)
 #define __data
 #define __idata
 #define __pdata
@@ -40,8 +40,10 @@ void __printf(const char *szFormat, ...);
 #define __reentrant
 #else
 #define __smallc
-#define __z88dk_callee
 #define __z88dk_fastcall
+#ifndef __SDCC_stm8
+#define __z88dk_callee
+#endif
 #endif
 
 #ifdef __SDCC_gbz80

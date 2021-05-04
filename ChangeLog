@@ -1,5 +1,10 @@
 2021-05-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Code clenaup.
+
+2021-05-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3223.c:
 	  Fix bug #3223.

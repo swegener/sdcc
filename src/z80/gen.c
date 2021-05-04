@@ -1715,31 +1715,9 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
     {
-      wassert (!sym->ruonly);
+      wassert (!sym->ruonly); // iTemp optimized out via ifxForOp shouldn'T reach here.
 
-      if (sym->accuse)
-        {
-          if (sym->accuse == ACCUSE_A) /* For compability with old register allocator only */
-            {
-              sym->aop = op->aop = aop = newAsmop (AOP_REG);
-              aop->size = getSize (sym->type);
-              wassertl (aop->size == 1, "Internal error: Caching in A, but too big to fit in A");
-              aop->aopu.aop_reg[0] = regsZ80 + A_IDX;
-            }
-          else if (sym->accuse == ACCUSE_IY) /* For compability with old register allocator only */
-            {
-              sym->aop = op->aop = aop = newAsmop (AOP_REG);
-              aop->size = getSize (sym->type);
-              wassertl (aop->size <= 2, "Internal error: Caching in IY, but too big to fit in IY");
-              aop->aopu.aop_reg[0] = regsZ80 + IYL_IDX;
-              aop->aopu.aop_reg[0] = regsZ80 + IYH_IDX;
-            }
-          else
-            {
-              wassertl (0, "Marked as being allocated into A or IY but is actually in neither");
-            }
-          return;
-        }
+      wassert (!sym->accuse); // Should not happen anymore with curetn register allocator.
 
       /* rematerialize it NOW */
       if (sym->remat)
@@ -4640,10 +4618,8 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
   bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
   bool SomethingReturned;
 
-  SomethingReturned = (result && IS_ITEMP (result) &&
-                      (OP_SYMBOL_CONST (result)->nRegs ||
-                      OP_SYMBOL_CONST (result)->spildir ||
-                      OP_SYMBOL_CONST (result)->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (result);
+  SomethingReturned = result && IS_ITEMP (result) && (OP_SYMBOL_CONST (result)->nRegs || OP_SYMBOL_CONST (result)->spildir)
+                      || IS_TRUE_SYMOP (result);
 
   if (SomethingReturned)
     {
@@ -5280,10 +5256,8 @@ genCall (const iCode *ic)
   _saveRegsForCall (ic, FALSE);
 
   const bool bigreturn = (getSize (ftype->next) > 4); // Return value of big type or returning struct or union.
-  const bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-                        OP_SYMBOL (IC_RESULT (ic))->spildir ||
-                        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
+  const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
+                       IS_TRUE_SYMOP (IC_RESULT (ic));
 
   aopOp (IC_LEFT (ic), ic, false, false);
   if (SomethingReturned && !bigreturn)
@@ -14740,10 +14714,8 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
   int i;
   bool SomethingReturned;
 
-  SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                      (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-                      OP_SYMBOL (IC_RESULT (ic))->spildir ||
-                      OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
+  SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
+                      IS_TRUE_SYMOP (IC_RESULT (ic));
 
   wassertl (nParams == 2, "Built-in strcpy() must have two parameters.");
   wassertl (!IS_GB, "Built-in strcpy() not available for gbz80.");
@@ -14898,10 +14870,8 @@ genBuiltInStrchr (const iCode *ic, int nParams, operand **pparams)
   symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel(0);
   symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel(0);
 
-  SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                      (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-                      OP_SYMBOL (IC_RESULT (ic))->spildir ||
-                      OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
+  SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
+                      IS_TRUE_SYMOP (IC_RESULT (ic));
 
   wassertl (nParams == 2, "Built-in strchr() must have two parameters.");
 

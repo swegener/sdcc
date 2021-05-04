@@ -1170,6 +1170,27 @@ aopOp (operand *op, const iCode *ic)
   }
 }
 
+// Get registers containing return type of function.
+static asmop *
+aopRet (const sym_link *ftype)
+{
+  int size = getSize (ftype->next);
+  
+  switch (size)
+    {
+    case 1:
+      return (ASMOP_A);
+    case 2:
+      return (ASMOP_X);
+    case 3:
+      return (ASMOP_XYL);
+    case 4:
+      return (ASMOP_XY);   
+    default:
+      return 0;
+    }
+}
+
 static void
 push (const asmop *op, int offset, int size)
 {
@@ -3521,9 +3542,9 @@ genCall (const iCode *ic)
   // Adjust the stack for parameters if required.
   if (ic->parmBytes || bigreturn)
     {
-      const bool a_free = !(SomethingReturned && !bigreturn && getSize (ftype->next) == 1);
-      const bool x_free = !(SomethingReturned && !bigreturn && getSize (ftype->next) >= 2);
-      const bool y_free = !(SomethingReturned && !bigreturn && getSize (ftype->next) > 2);
+      const bool a_free = !aopRet (ftype) || aopRet (ftype)->regs[A_IDX] < 0;
+      const bool x_free = !aopRet (ftype) || (aopRet (ftype)->regs[XL_IDX] < 0 && aopRet (ftype)->regs[XH_IDX] < 0);
+      const bool y_free = !aopRet (ftype) || (aopRet (ftype)->regs[YL_IDX] < 0 && aopRet (ftype)->regs[YH_IDX] < 0);
       if (IFFUNC_ISNORETURN (ftype) || z88dk_callee)
         {
           G.stack.pushed -= ic->parmBytes + bigreturn * 2;
@@ -3534,15 +3555,23 @@ genCall (const iCode *ic)
     }
 
 
-  const bool half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
+  const bool half = stm8_extend_stack && SomethingReturned && (aopRet (ftype)->regs[YL_IDX] >= 0 || aopRet (ftype)->regs[YH_IDX] >= 0);
 
   /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
 
-  /* Special handling of assignment of long result value when using extended stack. */
-  if (half)
+  /* Special handling of assignment of result value in y when using extended stack. */
+  if (half && !(aopOnStack (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size) && !aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
+    {
+      genMove (IC_RESULT (ic)->aop, aopRet (ftype), true, true, true);
+      pop (ASMOP_Y, 0, 2);
+      goto restore;
+    }  
+  else if (half)
     {
       asmop *result;
       int save_a = 0;
+      
+      wassert (regalloc_dry_run || aopRet (ftype) == ASMOP_XY || aopRet (ftype) == ASMOP_XYL); // Implementation assumes a 24-Bit or 32-Bit return value in XY.
 
       result = IC_RESULT (ic)->aop;
 
@@ -3596,11 +3625,12 @@ genCall (const iCode *ic)
 
       wassert (getSize (ftype->next) >= 1 && getSize (ftype->next) <= 4);
 
-      genMove_o (IC_RESULT (ic)->aop, 0, getSize (ftype->next) == 1 ? ASMOP_A : ASMOP_XY, 0, size, TRUE, TRUE, !stm8_extend_stack);
+      genMove_o (IC_RESULT (ic)->aop, 0, aopRet (ftype), 0, size, TRUE, TRUE, !stm8_extend_stack);
 
       freeAsmop (IC_RESULT (ic));
     }
 
+restore:
   // Restore regs.
   if (!regDead (Y_IDX, ic) && !stm8_extend_stack)
     if (regDead (YH_IDX, ic))
@@ -3750,7 +3780,6 @@ static void
 genEndFunction (iCode *ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  int retsize = getSize (sym->type->next);
 
   D (emit2 ("; genEndFunction", ""));
 
@@ -3772,9 +3801,9 @@ genEndFunction (iCode *ic)
         stackparmbytes += getSize (arg->sym->type);
     }
 
-  bool a_free = retsize != 1;
-  bool x_free = retsize < 2 || retsize > 4;
-  bool y_free = retsize < 3 || retsize > 4;
+  bool a_free = !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0;
+  bool x_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[XL_IDX] < 0 && aopRet (sym->type)->regs[XH_IDX] < 0);
+  bool y_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[YL_IDX] < 0 && aopRet (sym->type)->regs[YH_IDX] < 0);
 
   /* adjust the stack for the function */
   if (sym->stack)
@@ -3898,19 +3927,12 @@ genReturn (const iCode *ic)
     {
     case 0:
       break;
-    case 1:
-      cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
-      break;
-    case 2:
-      genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
-      break;
     case 3:
-      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented 24-bit return in function with extended stack access.");
-      genMove (ASMOP_XYL, left->aop, TRUE, TRUE, TRUE);
-      break;
     case 4:
-      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented long long return in function with extended stack access.");
-      genMove (ASMOP_XY, left->aop, TRUE, TRUE, TRUE);
+      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented 24-Bit/32-Bit return in function with extended stack access.");
+    case 1:
+    case 2:
+      genMove (aopRet (currFunc->type), left->aop, true, true, true);
       break;
     default:
       wassertl (size > 4, "Return not implemented for return value of this size.");

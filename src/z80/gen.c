@@ -247,7 +247,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_hlbc, asmop_zero, asmop_one, asmop_mone, asmop_return, asmop_z88dk_fastcall_arg;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_dehl, asmop_hlde, asmop_hlbc, asmop_zero, asmop_one, asmop_mone, asmop_z88dk_fastcall_arg;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -261,11 +261,12 @@ static struct asmop *const ASMOP_HL = &asmop_hl;
 static struct asmop *const ASMOP_DE = &asmop_de;
 static struct asmop *const ASMOP_BC = &asmop_bc;
 static struct asmop *const ASMOP_IY = &asmop_iy;
+static struct asmop *const ASMOP_DEHL = &asmop_dehl;
+static struct asmop *const ASMOP_HLDE = &asmop_hlde;
 static struct asmop *const ASMOP_HLBC = &asmop_hlbc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
-static struct asmop *const ASMOP_RETURN = &asmop_return;
 static struct asmop *const ASMOP_Z88DK_FASTCALL_ARG = &asmop_z88dk_fastcall_arg;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
@@ -301,6 +302,8 @@ z80_init_asmops (void)
   z80_init_reg_asmop(&asmop_bc, (const signed char[]){C_IDX, B_IDX, -1});
   z80_init_reg_asmop(&asmop_de, (const signed char[]){E_IDX, D_IDX, -1});
   z80_init_reg_asmop(&asmop_hl, (const signed char[]){L_IDX, H_IDX, -1});
+  z80_init_reg_asmop(&asmop_dehl, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
+  z80_init_reg_asmop(&asmop_hlde, (const signed char[]){E_IDX, D_IDX, L_IDX, H_IDX, -1});
   z80_init_reg_asmop(&asmop_iy, (const signed char[]){IYL_IDX, IYH_IDX, -1});
   z80_init_reg_asmop(&asmop_hlbc, (const signed char[]){C_IDX, B_IDX, L_IDX, H_IDX, -1});
   
@@ -319,15 +322,6 @@ z80_init_asmops (void)
   asmop_mone.size = 1;
   memset (asmop_mone.regs, -1, 9);
 
-  // Adjust returnregs in isReturned in peep.c accordingly when changing asmop_return here.
-  asmop_return.type = AOP_REG;
-  asmop_return.size = 4;
-  memset (asmop_return.regs, -1, 9);
-  if (IS_GB)
-    z80_init_reg_asmop(&asmop_return, (const signed char[]){E_IDX, D_IDX, L_IDX, H_IDX, -1});
-  else
-    z80_init_reg_asmop(&asmop_return, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
-    
   z80_init_reg_asmop(&asmop_z88dk_fastcall_arg, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
 }
 
@@ -1772,6 +1766,27 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
         fprintf(stderr, "Symbol %s at ic %d.\n", sym->name, ic->key);
       aop->aopu.aop_reg[i] = sym->regs[i];
       aop->regs[sym->regs[i]->rIdx] = i;
+    }
+}
+
+// Get registers containing return type of function.
+static asmop *
+aopRet (const sym_link *ftype)
+{
+  // Adjust returnregs in isReturned in peep.c accordingly when changing asmop_return here.
+
+  int size = getSize (ftype->next);
+  
+  switch (size)
+    {
+    case 1:
+      return (IS_GB ? ASMOP_E : ASMOP_L);
+    case 2:
+      return (IS_GB ? ASMOP_DE : ASMOP_HL);
+    case 4:
+      return (IS_GB ? ASMOP_HLDE : ASMOP_DEHL);   
+    default:
+      return 0;
     }
 }
 
@@ -5500,9 +5515,9 @@ genCall (const iCode *ic)
     {
       bool return_in_reg = SomethingReturned && !bigreturn;
       adjustStack (ic->parmBytes + bigreturn * 2,
-        !IS_TLCS90 && (!return_in_reg || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] > IC_RESULT (ic)->aop->size),
-        !return_in_reg || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] > IC_RESULT (ic)->aop->size) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] > IC_RESULT (ic)->aop->size),
-        !return_in_reg || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] > IC_RESULT (ic)->aop->size) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] > IC_RESULT (ic)->aop->size),
+        !IS_TLCS90 && (!return_in_reg || !aopRet (ftype) || aopRet (ftype)->regs[A_IDX] < 0 || aopRet (ftype)->regs[A_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || !aopRet (ftype) || (aopRet (ftype)->regs[C_IDX] < 0 || aopRet (ftype)->regs[C_IDX] > IC_RESULT (ic)->aop->size) && (aopRet (ftype)->regs[B_IDX] < 0 || aopRet (ftype)->regs[B_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || !aopRet (ftype) || (aopRet (ftype)->regs[L_IDX] < 0 || aopRet (ftype)->regs[L_IDX] > IC_RESULT (ic)->aop->size) && (aopRet (ftype)->regs[H_IDX] < 0 || aopRet (ftype)->regs[H_IDX] > IC_RESULT (ic)->aop->size),
         !IY_RESERVED);
 
       if (regalloc_dry_run)
@@ -5512,7 +5527,7 @@ genCall (const iCode *ic)
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
     {
-      genMove (IC_RESULT (ic)->aop, ASMOP_RETURN, true, true, true);
+      genMove (IC_RESULT (ic)->aop, aopRet (ftype), true, true, true);
 
       freeAsmop (IC_RESULT (ic), 0);
     }
@@ -5771,7 +5786,6 @@ static void
 genEndFunction (iCode *ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  int retsize = getSize (sym->type->next);
   /* __critical __interrupt without an interrupt number is the non-maskable interrupt */
   bool is_nmi = (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC;
 
@@ -5802,9 +5816,9 @@ genEndFunction (iCode *ic)
     }
   else
     adjustStack (_G.stack.offset,
-      !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
-      retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
-      retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize),
+      !IS_TLCS90 && (!aopRet (sym->type)  || aopRet (sym->type)->regs[A_IDX] < 0),
+      !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+      !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
       !IY_RESERVED);
 
   if(!IS_GB && !_G.omitFramePtr)
@@ -5838,12 +5852,12 @@ genEndFunction (iCode *ic)
       wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
       wassertl(regalloc_dry_run || !IFFUNC_ISBANKEDCALL (sym->type), "Unimplemented __banked __z88dk_callee support on callee side");
 
-      if (retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize))
+      if (!aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0 )
         {
           _pop (PAIR_HL);
           adjustStack (stackparmbytes,
-          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
-          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
           false,
           !IY_RESERVED);
           emit2 ("jp (hl)");
@@ -5853,9 +5867,9 @@ genEndFunction (iCode *ic)
         {
           _pop (PAIR_IY);
           adjustStack (stackparmbytes,
-          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
-          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
-          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[L_IDX] < 0 || ASMOP_RETURN->regs[L_IDX] >= retsize) && (ASMOP_RETURN->regs[H_IDX] < 0 || ASMOP_RETURN->regs[H_IDX] >= retsize),
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
           false);
           emit2 ("jp (iy)");
           regalloc_dry_run_cost += 2;
@@ -5914,8 +5928,8 @@ genEndFunction (iCode *ic)
             }
 
           adjustStack (stackparmbytes,
-          !IS_TLCS90 && (retsize == 0 || retsize > 4 || ASMOP_RETURN->regs[A_IDX] < 0 || ASMOP_RETURN->regs[A_IDX] >= retsize),
-          retsize == 0 || retsize > 4 || (ASMOP_RETURN->regs[C_IDX] < 0 || ASMOP_RETURN->regs[C_IDX] >= retsize) && (ASMOP_RETURN->regs[B_IDX] < 0 || ASMOP_RETURN->regs[B_IDX] >= retsize),
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type) < 0),
+          !aopRet (sym->type) || aopRet (sym->type) < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
           false,
           !IY_RESERVED);
           emit2 ("ret");
@@ -5946,7 +5960,7 @@ genEndFunction (iCode *ic)
             {
               symbol *tlbl = newiTempLabel (NULL);
               //restore P/O flag
-              if (retsize > 0 && retsize <= 4 && ASMOP_RETURN->regs[A_IDX] >= 0 && ASMOP_RETURN->regs[A_IDX] < retsize) // Preserve return value in a.
+              if (aopRet (sym->type) && aopRet (sym->type)->regs[A_IDX] >= 0) // Preserve return value in a.
                 {
                   wassert (!IS_GB);
                   emit2 ("ex (sp), hl");
@@ -6100,14 +6114,14 @@ genRet (const iCode *ic)
               fetchPairLong (regpairs[1], IC_LEFT (ic)->aop, 0, offset[1]);
             }
         }
-      else if (IC_LEFT (ic)->aop->type == AOP_REG || IC_LEFT (ic)->aop->type == AOP_STK || IC_LEFT (ic)->aop->type == AOP_LIT || size <= 2)
-        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, size, true, true, true, true);
-      else  if (IS_GB && size == 4 && requiresHL (IC_LEFT (ic)->aop) && aopInReg (ASMOP_RETURN, 0, DE_IDX) && aopInReg (ASMOP_RETURN, 2, HL_IDX))
+      else if ((IC_LEFT (ic)->aop->type == AOP_REG || IC_LEFT (ic)->aop->type == AOP_STK || IC_LEFT (ic)->aop->type == AOP_LIT || size <= 2) && size > 0 /* SDCC supports GCC extension of returning void */)
+        genMove (aopRet (currFunc->type), IC_LEFT (ic)->aop, true, true, true);
+      else  if (IS_GB && size == 4 && requiresHL (IC_LEFT (ic)->aop) && aopInReg (aopRet (currFunc->type), 0, DE_IDX) && aopInReg (aopRet (currFunc->type), 2, HL_IDX))
         {
           fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 0);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 2);
         }
-      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY) && aopInReg (ASMOP_RETURN, 0, HL_IDX) && aopInReg (ASMOP_RETURN, 2, DE_IDX)) // Use ld rr, (nn)
+      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY) && aopInReg (aopRet (currFunc->type), 0, HL_IDX) && aopInReg (aopRet (currFunc->type), 2, DE_IDX)) // Use ld rr, (nn)
         {
           fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 2);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 0);
@@ -6117,22 +6131,22 @@ genRet (const iCode *ic)
           bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.
           for (offset = 0; offset < size; offset++)
             {
-              if (requiresHL (IC_LEFT (ic)->aop) && (ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == H_IDX || ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == L_IDX))
+              if (requiresHL (IC_LEFT (ic)->aop) && (aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == H_IDX || aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == L_IDX))
                 {
                   skipbytes[offset] = true;
                   continue;
                 }
-              cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset, true);
+              cheapMove (aopRet (currFunc->type), offset, IC_LEFT (ic)->aop, offset, true);
             }
           for (offset = 0; offset < size; offset++)
-            if (skipbytes[offset] && offset + 1 < size && ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[offset + 1]->rIdx == H_IDX)
+            if (skipbytes[offset] && offset + 1 < size && aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == L_IDX && aopRet (currFunc->type)->aopu.aop_reg[offset + 1]->rIdx == H_IDX)
               {
                 fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, offset);
                 break;
               }
             else if (skipbytes[offset])
               {
-                cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset, true);
+                cheapMove (aopRet (currFunc->type), offset, IC_LEFT (ic)->aop, offset, true);
               }
         }
     }
@@ -14776,7 +14790,7 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
   else
     {
       _pop (PAIR_HL);
-      genMove (IC_RESULT (ic)->aop, ASMOP_RETURN, true, true, true);
+      genMove (IC_RESULT (ic)->aop, ASMOP_HL, true, true, true);
 
       restoreRegs (0, saved_DE, saved_BC, saved_HL, IC_RESULT (ic));
     }

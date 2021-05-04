@@ -289,7 +289,7 @@ aopOnStack (const asmop *aop, int offset, int size)
 static bool
 aopOnStackNotExt (const asmop *aop, int offset, int size)
 {
-  return (aopOnStack (aop, offset, size) && (aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run));// Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
+  return (aopOnStack (aop, offset, size) && (aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run)); // Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
 }
 
 /*-----------------------------------------------------------------*/
@@ -3560,13 +3560,13 @@ genCall (const iCode *ic)
   /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
 
   /* Special handling of assignment of result value in y when using extended stack. */
-  /*TODO: More efficient, but causes a regressiont est to fail. if (half && !(aopOnStack (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size) && !aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
+  if (half && (IC_RESULT (ic)->aop->type != AOP_STK && IC_RESULT (ic)->aop->type != AOP_REGSTK || !regalloc_dry_run && aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
     {
       genMove (IC_RESULT (ic)->aop, aopRet (ftype), true, true, true);
       pop (ASMOP_Y, 0, 2);
       goto restore;
     }  
-  else*/ if (half)
+  else if (half)
     {
       asmop *result;
       int save_a = 0;

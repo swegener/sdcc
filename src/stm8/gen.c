@@ -3560,13 +3560,13 @@ genCall (const iCode *ic)
   /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
 
   /* Special handling of assignment of result value in y when using extended stack. */
-  if (half && !(aopOnStack (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size) && !aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
+  /*TODO: More efficient, but causes a regressiont est to fail. if (half && !(aopOnStack (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size) && !aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
     {
       genMove (IC_RESULT (ic)->aop, aopRet (ftype), true, true, true);
       pop (ASMOP_Y, 0, 2);
       goto restore;
     }  
-  else if (half)
+  else*/ if (half)
     {
       asmop *result;
       int save_a = 0;

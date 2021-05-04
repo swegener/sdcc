@@ -3819,7 +3819,7 @@ genEndFunction (iCode *ic)
           emit2 ("ret", "");
           return;
         }
-      else if (3 + stackparmbytes <= 255 && options.model == MODEL_LARGE)
+      else if (4 + stackparmbytes <= 255 && options.model == MODEL_LARGE)
         {
           push (ASMOP_A, 0, 1);
           emit2 ("ld", "a, (4, sp)");

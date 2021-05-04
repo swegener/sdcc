@@ -1715,15 +1715,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
      b) has a spill location */
   if (sym->isspilt || sym->nRegs == 0)
     {
-      if (sym->ruonly)
-        {
-          int i;
-          aop = op->aop = sym->aop = newAsmop (AOP_STR);
-          aop->size = getSize (sym->type);
-          for (i = 0; i < 4; i++)
-            aop->aopu.aop_str[i] = ASMOP_RETURN->aopu.aop_reg[i]->name;
-          return;
-        }
+      wassert (!sym->ruonly);
 
       if (sym->accuse)
         {
@@ -2021,6 +2013,17 @@ requiresHL (const asmop * aop)
     default:
       return FALSE;
     }
+}
+
+// Updated the internally cached value for a pair.
+static void
+updatePair (PAIR_ID pairId, int diff)
+{
+  if (_G.pairs[pairId].last_type == AOP_LIT)
+    _G.pairs[pairId].value = (_G.pairs[pairId].value + (unsigned int)diff) & 0xffff;
+  else if (_G.pairs[pairId].last_type == AOP_IMMD || _G.pairs[pairId].last_type == AOP_IY || _G.pairs[pairId].last_type == AOP_HL ||
+    _G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK)
+    _G.pairs[pairId].offset += diff;
 }
 
 static void
@@ -2438,6 +2441,8 @@ setupPairFromSP (PAIR_ID id, int offset)
       regalloc_dry_run_cost++;
       offset -= 2;
     }
+    
+  spillPair (id);
 }
 
 static void
@@ -6196,16 +6201,14 @@ genRet (const iCode *ic)
           sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
           // TODO: find out if offset is okay
           emit2 ("!ldahlsp", sp_offset);
+          spillPair (PAIR_HL);
           regalloc_dry_run_cost += 4;
         }
       else
-        {
-          emit2 ("ld hl, !hashedstr", IC_LEFT (ic)->aop->aopu.aop_dir);
-          regalloc_dry_run_cost += 3;
-        }
+        fetchLitPair (PAIR_HL, IC_LEFT (ic)->aop, 0, true);
       emit2 ("ld bc, !immed%d", size);
       emit2 ("ldir");
-      spillPair (PAIR_HL);
+      updatePair (PAIR_HL, size);
       regalloc_dry_run_cost += 5;
     }
   else
@@ -6215,7 +6218,7 @@ genRet (const iCode *ic)
       emit2 ("inc hl");
       emit2 ("ld b, !*hl");
       regalloc_dry_run_cost += 7;
-      spillPair (PAIR_HL);
+      updatePair (PAIR_HL, 1);
       do
         {
           cheapMove (ASMOP_A, 0, IC_LEFT (ic)->aop, offset++, true);
@@ -8475,6 +8478,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               if (size != 0)
                 {
                   emit2 ("inc hl");
+                  updatePair (PAIR_HL, 1);
                   regalloc_dry_run_cost += 1;
                 }
               offset++;
@@ -8487,7 +8491,6 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               emit2 ("ld e, a");
               regalloc_dry_run_cost += 1;
             }
-          spillPair (PAIR_HL);
           result_in_carry = TRUE;
           goto fix;
         }
@@ -12965,6 +12968,7 @@ genPointerSet (iCode *ic)
       emit2 ("!ldahlsp", sp_offset);
       emit2 ("ld bc, !immedword", size);
       emit2 ("ldir");
+      spillPair (PAIR_HL);
       regalloc_dry_run_cost += 9;
 
       if(!isPairDead (PAIR_HL, ic))

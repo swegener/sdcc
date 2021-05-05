@@ -80,7 +80,11 @@ struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
 
   { 0x0020, 0x00ff, 'R', 2, "JR NZ,%d" },
   { 0x0021, 0x00ff, ' ', 3, "LD HL,%w" },
+#if 1
+  { 0x0022, 0x00ff, ' ', 1, "LD (HL+),A" },
+#else
   { 0x0022, 0x00ff, ' ', 1, "LDI (HL),A" },// unique to GB80
+#endif
   { 0x0023, 0x00ff, ' ', 1, "INC HL" },
   { 0x0024, 0x00ff, ' ', 1, "INC H" },
   { 0x0025, 0x00ff, ' ', 1, "DEC H" },
@@ -89,7 +93,11 @@ struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
 
   { 0x0028, 0x00ff, 'R', 2, "JR Z,%d" },
   { 0x0029, 0x00ff, ' ', 1, "ADD HL,HL" },
+#if 1
+  { 0x002a, 0x00ff, ' ', 1, "LD A,(HL+)" },
+#else
   { 0x002a, 0x00ff, ' ', 1, "LDI A,(HL)" },// unique to GB80
+#endif
   { 0x002b, 0x00ff, ' ', 1, "DEC HL" },
   { 0x002c, 0x00ff, ' ', 1, "INC L" },
   { 0x002d, 0x00ff, ' ', 1, "DEC L" },
@@ -98,7 +106,11 @@ struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
 
   { 0x0030, 0x00ff, 'R', 2, "JR NC,%d" },
   { 0x0031, 0x00ff, ' ', 3, "LD SP,%w" },
+#if 1
+  { 0x0032, 0x00ff, ' ', 1, "LD (HL-),A" },
+#else
   { 0x0032, 0x00ff, ' ', 1, "LDD (HL),A" },  // unique to GB80
+#endif
   { 0x0033, 0x00ff, ' ', 1, "INC SP" },
   { 0x0034, 0x00ff, ' ', 1, "INC (HL)" },
   { 0x0035, 0x00ff, ' ', 1, "DEC (HL)" },
@@ -107,7 +119,11 @@ struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
 
   { 0x0038, 0x00ff, 'R', 2, "JR C,%d" },
   { 0x0039, 0x00ff, ' ', 1, "ADD HL,SP" },
+#if 1
+  { 0x003a, 0x00ff, ' ', 1, "LD A,(HL-)" },
+#else
   { 0x003a, 0x00ff, ' ', 1, "LDD A,(HL)" },  // unique to GB80
+#endif
   { 0x003b, 0x00ff, ' ', 1, "DEC SP" },
   { 0x003c, 0x00ff, ' ', 1, "INC A" },
   { 0x003d, 0x00ff, ' ', 1, "DEC A" },
@@ -283,7 +299,7 @@ struct dis_entry /*DISASS_NAME()*/disass_gb80 []= {
   { 0x00d3, 0x00ff, ' ', 2, "Illegal Op" },  // in/out do not exist on GB80
   { 0x00d4, 0x00ff, 'l', 3, "CALL NC,%w" },
   { 0x00d5, 0x00ff, ' ', 1, "PUSH DE" },
-  { 0x00d6, 0x00ff, ' ', 2, "sub %b" },
+  { 0x00d6, 0x00ff, ' ', 2, "SUB %b" },
   { 0x00d7, 0x00ff, ' ', 1, "RST 10H" },
 
   { 0x00d8, 0x00ff, ' ', 1, "RET C" },

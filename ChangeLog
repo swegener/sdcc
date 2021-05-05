@@ -1,3 +1,8 @@
+2021-05-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/z88dk_callee.c
+	  Adapt test for ds390.
+
 2021-05-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

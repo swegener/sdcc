@@ -13,7 +13,7 @@ unsigned int f2(unsigned int c) __z88dk_callee
 	return c + 1;
 }
 
-unsigned int f3(unsigned char c, unsigned char d) __z88dk_callee __smallc
+unsigned int f3(unsigned char c, unsigned char d) __z88dk_callee __smallc __reentrant
 {
 	return c + d;
 }
@@ -29,7 +29,7 @@ unsigned long int f4(unsigned long int c) __z88dk_callee __reentrant
 
 unsigned char (*p1)(unsigned char) __z88dk_callee;
 unsigned int (*p2)(unsigned int) __z88dk_callee;
-unsigned int (*p3)(unsigned char, unsigned char) __z88dk_callee __smallc;
+unsigned int (*p3)(unsigned char, unsigned char) __z88dk_callee __smallc __reentrant;
 #if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
 unsigned long int (*p4)(unsigned long int) __z88dk_callee;
 #else

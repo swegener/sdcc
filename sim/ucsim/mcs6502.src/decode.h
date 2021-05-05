@@ -28,7 +28,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DECODE_HEADER
 #define DECODE_HEADER
 
-#define NOP instruction_ea
+#define NOP	instruction_ea
+#define BRK	instruction_00
+#define RTI	instruction_40
+#define CLI	instruction_58
+#define SEI	instruction_78
+#define PHP	instruction_08
+#define CLC	instruction_18
+#define PLP	instruction_28
+#define SEC	instruction_38
+#define PHA	instruction_48
+#define PLA	instruction_68
+#define DEY	instruction_88
+#define TYA	instruction_98
+#define TAY	instruction_a8
+#define CLV	instruction_b8
+#define INY	instruction_c8
+#define CLD	instruction_d8
+#define INX	instruction_e8
+#define SED	instruction_f8
+#define TXA	instruction_8a
+#define TXS	instruction_9a
+#define TAX	instruction_aa
+#define TSX	instruction_ba
+#define DEX	instruction_ca
 
 #endif
 

@@ -27,4 +27,73 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mcs6502cl.h"
 
 
+int
+cl_mcs6502::DEY(t_mem code)
+{
+  cY.W(rY-1);
+  if (rY)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rY & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::INY(t_mem code)
+{
+  cY.W(rY+1);
+  if (rY)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rY & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::INX(t_mem code)
+{
+  cX.W(rX+1);
+  if (rX)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rX & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::DEX(t_mem code)
+{
+  cX.W(rX-1);
+  if (rX)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rX & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+
 /* End of mcs6502.src/ialu.cc */

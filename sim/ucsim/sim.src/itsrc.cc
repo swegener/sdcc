@@ -131,8 +131,21 @@ cl_it_src::pending(void)
 }
 
 void
+cl_it_src::request(void)
+{
+  if (!src_cell)
+    return;
+  if (src_value)
+    src_cell->set(src_cell->get() | src_mask);
+  else
+    src_cell->set(src_cell->get() & ~src_mask);
+}
+
+void
 cl_it_src::clear(void)
 {
+  if (!src_cell)
+    return;
   if (clr_bit)
     {
       if (src_value)

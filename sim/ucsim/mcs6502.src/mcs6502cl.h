@@ -38,11 +38,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define rX  (X)
 #define rY  (Y)
 #define rSP (SP)
+#define rS  (SP)
 #define rCC (CC)
 #define rP  (CC)
 #define rF  (CC)
 #define cP  (cCC)
 #define cF  (cCC)
+#define cS  (cSP)
 
 enum {
   mN	= 0x80,
@@ -81,8 +83,7 @@ class cl_mcs6502: public cl_uc
 public:
   u8_t A, X, Y, SP, CC;
   class cl_cell8 cA, cX, cY, cSP, cCC;
-  class cl_dummy_cell brk_e, brk_src;
-  class cl_m6xxx_src *src_irq, *src_nmi;
+  class cl_m6xxx_src *src_irq, *src_nmi, *src_brk;
 public:
   cl_mcs6502(class cl_sim *asim);
   virtual int init(void);
@@ -101,7 +102,33 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  virtual int priority_of(uchar nuof_it) { return nuof_it; }
+  virtual int accept_it(class it_level *il);
+  virtual bool it_enabled(void);
   virtual int NOP(t_mem code);
+  virtual int BRK(t_mem code);
+  virtual int RTI(t_mem code);
+  virtual int CLI(t_mem code);
+  virtual int SEI(t_mem code);
+  virtual int PHP(t_mem code);
+  virtual int CLC(t_mem code);
+  virtual int PLP(t_mem code);
+  virtual int SEC(t_mem code);
+  virtual int PHA(t_mem code);
+  virtual int PLA(t_mem code);
+  virtual int DEY(t_mem code);
+  virtual int TYA(t_mem code);
+  virtual int TAY(t_mem code);
+  virtual int CLV(t_mem code);
+  virtual int INY(t_mem code);
+  virtual int CLD(t_mem code);
+  virtual int INX(t_mem code);
+  virtual int SED(t_mem code);
+  virtual int TXA(t_mem code);
+  virtual int TXS(t_mem code);
+  virtual int TAX(t_mem code);
+  virtual int TSX(t_mem code);
+  virtual int DEX(t_mem code);
 };
 
 

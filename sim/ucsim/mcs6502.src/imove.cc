@@ -27,4 +27,98 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mcs6502cl.h"
 
 
+int
+cl_mcs6502::TYA(t_mem code)
+{
+  cA.W(rY);
+  if (rA)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rA & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::TAY(t_mem code)
+{
+  cY.W(rA);
+  if (rY)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rY & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::TXA(t_mem code)
+{
+  cA.W(rX);
+  if (rA)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rA & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::TXS(t_mem code)
+{
+  cSP.W(rX);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::TAX(t_mem code)
+{
+  cX.W(rA);
+  if (rX)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rX & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::TSX(t_mem code)
+{
+  cX.W(rSP);
+  if (rX)
+    rF&= ~flagZ;
+  else
+    rF|= flagZ;
+  if (rX & 0x80)
+    rF|= flagS;
+  else
+    rF&= ~flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+
 /* End of mcs6502.src/imove.cc */

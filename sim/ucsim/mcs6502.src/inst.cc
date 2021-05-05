@@ -32,4 +32,126 @@ cl_mcs6502::NOP(t_mem code)
   return resGO;
 }
 
+int
+cl_mcs6502::BRK(t_mem code)
+{
+  src_brk->request();
+  cF.W(flagB);
+  return resGO;
+}
+
+int
+cl_mcs6502::RTI(t_mem code)
+{
+  u8_t l, h;
+  rSP++;
+  cF.W(rom->read(0x0100 + rSP));
+  rSP++;
+  l= rom->read(0x0100 + rSP);
+  rSP++;
+  h= rom->read(0x0100 + rSP);
+  vc.rd+= 3;
+  PC= h*256 + l;
+  tick(5);
+  return resGO;
+}
+
+int
+cl_mcs6502::CLI(t_mem code)
+{
+  rF&= ~flagI;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::SEI(t_mem code)
+{
+  rF|= flagI;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::PHP(t_mem code)
+{
+  rom->write(0x0100 + rSP, rF);
+  vc.wr++;
+  rSP--;
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mcs6502::CLC(t_mem code)
+{
+  rF&= ~flagC;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::PLP(t_mem code)
+{
+  rSP++;
+  cF.W(rom->read(0x0100 + rSP));
+  vc.rd++;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_mcs6502::SEC(t_mem code)
+{
+  rF|= flagC;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::PHA(t_mem code)
+{
+  rom->write(0x0100 + rSP, rA);
+  vc.wr++;
+  rSP--;
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mcs6502::PLA(t_mem code)
+{
+  rSP++;
+  cA.W(rom->read(0x0100 + rSP));
+  vc.rd++;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_mcs6502::CLV(t_mem code)
+{
+  rF&= ~flagV;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mcs6502::CLD(t_mem code)
+{
+  rF&= ~flagD;
+  tick(1);
+  return resGO;
+}
+
+
+int
+cl_mcs6502::SED(t_mem code)
+{
+  rF|= flagD;
+  tick(1);
+  return resGO;
+}
+
+
 /* End of mcs6502.src/inst.cc */

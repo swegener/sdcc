@@ -83,6 +83,7 @@ public:
 
   virtual bool enabled(void);
   virtual bool pending(void);
+  virtual void request(void);
   virtual void clear(void);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
@@ -95,7 +96,8 @@ enum irq_nr {
   irq_none= 0,
   irq_nmi= 1,
   irq_firq= 2,
-  irq_irq= 3
+  irq_irq= 3,
+  irq_brk= 4
 };
 
 class cl_m6xxx_src: public cl_it_src

@@ -36,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PHP	instruction_08
 #define CLC	instruction_18
 #define PLP	instruction_28
-#define SEC	instruction_38
+#define SEc	instruction_38
 #define PHA	instruction_48
 #define PLA	instruction_68
 #define DEY	instruction_88

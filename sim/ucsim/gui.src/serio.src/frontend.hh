@@ -7,7 +7,6 @@
 
 #include <sys/types.h>
 #include <curses.h>
-#include <stdint.h>
 
 #include "config.h"
 

@@ -395,7 +395,7 @@ cl_gb80::disass(t_addr addr)
 
   while (*b)
     {
-      if ((*b == ' ') and first)
+      if ((*b == ' ') && first)
 	{
 	  first= false;
 	  while (work.len() < 6) work.append(' ');

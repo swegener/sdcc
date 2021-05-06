@@ -101,7 +101,7 @@ cl_mcs6502::PLP(t_mem code)
 }
 
 int
-cl_mcs6502::SEC(t_mem code)
+cl_mcs6502::SEc(t_mem code)
 {
   rF|= flagC;
   tick(1);

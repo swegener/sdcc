@@ -1145,15 +1145,19 @@ cl_51core::disass(t_addr addr)
   chars work= chars(), temp= chars();
   const char *b;
   t_mem code= rom->get(addr);
-  struct dis_entry *dt= &(dis_tbl()[code]);
+  struct dis_entry *dt;//= &(dis_tbl()[code]);
   bool first;
+
+  dt= dis_tbl();
+  if (!dt) return NULL;
+  dt= &dt[code];
   
   //p= work;
   work= ""; first= true;
   b= dt->mnemonic;
   while (*b)
     {
-      if ((*b == ' ') and first)
+      if ((*b == ' ') && first)
 	{
 	  first= false;
 	  while (work.len() < 6) work.append(' ');

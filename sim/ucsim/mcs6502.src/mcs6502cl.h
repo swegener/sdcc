@@ -113,7 +113,7 @@ public:
   virtual int PHP(t_mem code);
   virtual int CLC(t_mem code);
   virtual int PLP(t_mem code);
-  virtual int SEC(t_mem code);
+  virtual int SEc(t_mem code);
   virtual int PHA(t_mem code);
   virtual int PLA(t_mem code);
   virtual int DEY(t_mem code);

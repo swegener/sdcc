@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_rxk::cl_rxk(class cl_sim *asim):
   cl_uc(asim)
 {
+  altd= 0;
 }
 
 int
@@ -55,17 +56,29 @@ cl_rxk::init(void)
 
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
   RCV(A);
+  RCV(aA);
   RCV(F);
+  RCV(aF);
   RCV(AF);
+  RCV(aAF);
   RCV(B);
+  RCV(aB);
   RCV(C);
+  RCV(aC);
   RCV(BC);
+  RCV(aBC);
   RCV(D);
+  RCV(aD);
   RCV(E);
+  RCV(aE);
   RCV(DE);
+  RCV(aDE);
   RCV(H);
+  RCV(aH);
   RCV(L);
+  RCV(aL);
   RCV(HL);
+  RCV(aHL);
 
   RCV(IX);
   RCV(IY);
@@ -182,13 +195,13 @@ cl_rxk::dis_tbl(void)
 char *
 cl_rxk::disass(t_addr addr)
 {
-  chars work= chars(), temp= chars();
+  chars work, temp;
   const char *b;
   t_mem code= rom->get(addr);
   struct dis_entry *dt= dis_tbl();//, *dis_e;
   int i;
   bool first;
-  
+  unsigned int h, l;
   if (!dt)
     return NULL;
 
@@ -212,10 +225,21 @@ cl_rxk::disass(t_addr addr)
 	}
       if (b[i] == '%')
 	{
+	  temp= "";
 	  i++;
 	  switch (b[i])
 	    {
+	    case 'w':
+	      l= rom->get(++addr);
+	      h= rom->get(++addr);
+	      temp.format("0x%04x", h*256+l);
+	      break;
+	    case 'b':
+	      l= rom->get(++addr);
+	      temp.format("0x%02x", l);
+	      break;
 	    }
+	  work+= temp;
 	}
       else
 	work+= b[i];
@@ -277,15 +301,16 @@ cl_rxk::exec_inst(void)
     rwas= rom;
   io_prefix= false;
   
-  if ((res= exec_inst_tab(itab)) != resNOT_DONE)
-    return res;
+  if ((res= exec_inst_tab(itab)) == resNOT_DONE)
+    {
+      fetch(&code);
+      res= inst_unknown(code);
+    }
 
-  instPC= PC;
-  if (fetch(&code))
-    return(resBREAKPOINT);
-  tick(1);
-  res= inst_unknown(code);
-  return(res);
+  if (altd)
+    altd--;
+  
+  return res;
 }
 
 

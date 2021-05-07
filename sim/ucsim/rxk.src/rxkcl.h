@@ -83,7 +83,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define raDE (aDE.DE)
 #define raHL (aHL.HL)
 
-  
+enum {
+  flagS = 0x80,
+  flagZ = 0x40,
+  flagL = 0x04,
+  flagV = 0x04,
+  flagC = 0x01
+};
+
 class cl_rxk: public cl_uc  
 {
 public:
@@ -99,11 +106,14 @@ public:
   u16_t rIX, rIY, rSP;
   class cl_cell8 cIP, cIIR, cEIR;
   class cl_cell8 cA, cF, cB, cC, cD, cE, cH, cL;
+  class cl_cell8 caA, caF, caB, caC, caD, caE, caH, caL;
   class cl_cell16 cAF, cBC, cDE, cHL, cIX, cIY, cSP;
+  class cl_cell16 caAF, caBC, caDE, caHL;
   class cl_ras *mem;
   class cl_address_space *ioi, *ioe;
   class cl_address_space *rwas;
   bool io_prefix;
+  int altd;
 public:
   cl_rxk(class cl_sim *asim);
   virtual int init(void);
@@ -122,7 +132,30 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  
+  class cl_cell16 &destAF(void) { return altd?caAF:cAF; }
+  class cl_cell16 &destBC(void) { return altd?caBC:cBC; }
+  class cl_cell16 &destDE(void) { return altd?caDE:cDE; }
+  class cl_cell16 &destHL(void) { return altd?caHL:cHL; }
+  class cl_cell8 &destA(void) { return altd?caA:cA; }
+  class cl_cell8 &destF(void) { return altd?caF:cF; }
+  class cl_cell8 &destB(void) { return altd?caB:cB; }
+  class cl_cell8 &destC(void) { return altd?caC:cC; }
+  class cl_cell8 &destD(void) { return altd?caD:cD; }
+  class cl_cell8 &destE(void) { return altd?caE:cE; }
+  class cl_cell8 &destH(void) { return altd?caH:cH; }
+  class cl_cell8 &destL(void) { return altd?caL:cL; }
+  
+  virtual int ALTD(t_mem code);
+  virtual int IOI(t_mem code);
+  virtual int IOE(t_mem code);
+  
   virtual int NOP(t_mem code);
+  virtual int LD_BC_mn(t_mem code);
+  virtual int INC_BC(t_mem code);
+  virtual int INC_B(t_mem code);
+  virtual int DEC_B(t_mem code);
+  virtual int LD_B_n(t_mem code);
 };
 
 

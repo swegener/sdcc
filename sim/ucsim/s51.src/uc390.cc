@@ -1139,7 +1139,7 @@ cl_uc390::disass (t_addr addr)
   t_addr operand;
   t_mem code;
   uchar dps;
-  bool first;
+  bool first= true;
   
   if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     return cl_51core::disass (addr);

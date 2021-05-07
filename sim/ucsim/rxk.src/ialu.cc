@@ -27,4 +27,46 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "rxkcl.h"
 
 
+int
+cl_rxk::INC_BC(t_mem code)
+{
+  class cl_cell16 &rp= destBC();
+  rp.W(rBC+1);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::INC_B(t_mem code)
+{
+  class cl_cell8 &rb= destB(), &rf= destF();
+  u8_t r, f= rF & ~(flagS|flagZ|flagV), na7, r7;
+  na7= (rB&0x80)^0x80;
+  rb.W(r= rB+1);
+  r7= r&0x80;
+  if (r & 0x80) f|= flagS;
+  if (!r) f|= flagZ;
+  if (na7 & r7) f|= flagV;
+  rf.W(f);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::DEC_B(t_mem code)
+{
+  class cl_cell8 &rb= destB(), &rf= destF();
+  u8_t r, f= rF & ~(flagS|flagZ|flagV), a7, nr7;
+  a7= rB&0x80;
+  rb.W(r= rB-1);
+  nr7= (r&0x80)^0x80;
+  if (r & 0x80) f|= flagS;
+  if (!r) f|= flagZ;
+  if (a7 & nr7) f|= flagV;
+  rf.W(f);
+  tick(1);
+  return resGO;
+}
+
+
 /* End of rxk.src/ialu.cc */

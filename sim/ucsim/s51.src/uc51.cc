@@ -1519,7 +1519,7 @@ cl_51core::baddr_name(t_addr addr, chars *buf)
 
   chars temp;
   if (daddr_name(ma, &temp))
-    buf->appendf("%s.%d", temp, (int)(addr & 7));
+    buf->appendf("%s.%d", temp.c_str(), (int)(addr & 7));
 }
 
 
@@ -1697,15 +1697,13 @@ cl_51core::exec_inst(void)
   t_mem code;
   int res= resGO;
 
-  if ((res= exec_inst_tab(itab51)) != resNOT_DONE)
-    return res;
-
-  instPC= PC;
-  if (fetch(&code))
-    return(resBREAKPOINT);
-  tick(1);
-  res= inst_unknown(code);
-  return(res);
+  if ((res= exec_inst_tab(itab51)) == resNOT_DONE)
+    {
+      fetch(&code);
+      res= inst_unknown(code);
+    }
+  
+  return res;
 }
 
 

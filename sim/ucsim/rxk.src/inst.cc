@@ -27,8 +27,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "rxkcl.h"
 
 int
+cl_rxk::ALTD(t_mem code)
+{
+  altd= 2;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::IOI(t_mem code)
+{
+  io_prefix= true;
+  rwas= ioi;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::IOE(t_mem code)
+{
+  io_prefix= true;
+  rwas= ioe;
+  tick(1);
+  return resGO;
+}
+
+int
 cl_rxk::NOP(t_mem code)
 {
+  tick(1);
   return resGO;
 }
 

@@ -28,7 +28,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DECODE_HEADER
 #define DECODE_HEADER
 
-#define NOP instruction_00
+#define ALTD		instruction_76
+#define IOI		instruction_d3
+#define IOE		instruction_db
+
+#define NOP		instruction_00
+#define LD_BC_mn	instruction_01
+#define INC_BC		instruction_03
+#define INC_B		instruction_04
+#define DEC_B		instruction_05
+#define LD_B_n		instruction_06
 
 #endif
 

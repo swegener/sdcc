@@ -15423,3 +15423,19 @@ genZ80Code (iCode * lic)
   freeTrace (&_G.trace.aops);
 }
 
+bool
+z80IsReturned(const char *what)
+{
+  if (!strcmp(what, "iy"))
+    return (z80IsReturned ("iyl") || z80IsReturned ("iyh"));
+
+  const asmop *retaop = aopRet (currFunc->type);
+
+  if (!retaop)
+    return false;
+  for (int i = 0; i < retaop->size; i++)
+    if (!strcmp(retaop->aopu.aop_reg[i]->name, what))
+      return true;
+  return false;
+}
+

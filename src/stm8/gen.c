@@ -8722,3 +8722,21 @@ genSTM8Code (iCode *lic)
   destroy_line_list ();
 }
 
+bool
+stm8IsReturned(const char *what)
+{
+  if (!strcmp(what, "x"))
+    return (stm8IsReturned ("xl") || stm8IsReturned ("xh"));
+  else if (!strcmp(what, "y"))
+    return (stm8IsReturned ("yl") || stm8IsReturned ("yh"));
+
+  const asmop *retaop = aopRet (currFunc->type);
+
+  if (!retaop)
+    return false;
+  for (int i = 0; i < retaop->size; i++)
+    if (!strcmp(retaop->aopu.bytes[i].byteu.reg->name, what))
+      return true;
+  return false;
+}
+

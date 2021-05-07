@@ -1,3 +1,13 @@
+2021-05-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.h,
+	  src/stm8/gen.c,
+	  src/stm8/peep.c,
+	  src/z80/gen.h,
+	  src/z80/gen.c,
+	  src/z80/peep.c:
+	  Deduplicate return value handling in peephole optimizer vs code generation.
+
 2021-05-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/z88dk_callee.c

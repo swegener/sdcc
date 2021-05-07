@@ -72,64 +72,6 @@ unvisitLines (lineNode *pl)
 #define AOP(op) op->aop
 #define AOP_SIZE(op) AOP(op)->size
 
-static bool
-isReturned(const char *what)
-{
-  symbol *sym;
-  sym_link *sym_lnk;
-  int size;
-  lineNode *l;
-
-  if(strncmp(what, "iy", 2) == 0)
-    return FALSE;
-  if(strlen(what) != 1)
-    return TRUE;
-
-  l = _G.head;
-  do
-  {
-    l = l->next;
-  } while(l->isComment || l->ic == NULL || l->ic->op != FUNCTION);
-
-  sym = OP_SYMBOL(IC_LEFT(l->ic));
-
-  if(sym && IS_DECL(sym->type))
-    {
-      // Find size of return value.
-      specifier *spec;
-      if(sym->type->select.d.dcl_type != FUNCTION)
-        NOTUSEDERROR();
-      spec = &(sym->etype->select.s);
-      if(spec->noun == V_VOID || spec->noun == V_INT && spec->b_longlong) // long long is not returned via registers for the Z80-related ports
-        size = 0;
-      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
-        size = 1;
-      else if(spec->noun == V_INT && !(spec->b_long))
-        size = 2;
-      else
-        size = 4;
-
-      // Check for returned pointer.
-      sym_lnk = sym->type;
-      while (sym_lnk && !IS_PTR (sym_lnk))
-        sym_lnk = sym_lnk->next;
-      if(IS_PTR(sym_lnk))
-        size = 2;
-    }
-  else
-    {
-      NOTUSEDERROR();
-      size = 4;
-    }
-    
-  const char *returnregs = IS_GB ? "hlde" : "dehl";
-
-  for(int i = 0; i <= size; i++)
-    if(*what == returnregs[3 - i])
-      return true;
-  return false;
-}
-
 /*-----------------------------------------------------------------*/
 /* incLabelJmpToCount - increment counter "jmpToCount" in entry    */
 /* of the list labelHash                                           */
@@ -244,6 +186,27 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
     return TRUE;
 
   return FALSE;
+}
+
+static bool
+z80IsParmInCall(sym_link *ftype, const char *what)
+{
+  const value *args = FUNC_ARGS (ftype);
+
+  if (IFFUNC_ISZ88DK_FASTCALL (ftype) && args) // Has one register argument of size up to 32 bit.
+    {
+      const unsigned int size = getSize (args->type);
+      wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
+      if (strchr(what, 'l') && size >= 1)
+        return true;
+      if (strchr(what, 'h') && size >= 2)
+        return true;
+      if (strchr(what, 'e') && size >= 3)
+        return true;
+      if (strchr(what, 'd') && size >= 4)
+        return true;
+    }
+  return false;
 }
 
 /* Check if the flag implies reading what. */
@@ -407,24 +370,7 @@ z80MightRead(const lineNode *pl, const char *what)
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
       if (f)
-      {
-        const value *args = FUNC_ARGS (f->type);
-
-        if (IFFUNC_ISZ88DK_FASTCALL (f->type) && args) // Has one register argument of size up to 32 bit.
-          {
-            const unsigned int size = getSize (args->type);
-            wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
-            if (strchr(what, 'l') && size >= 1)
-              return TRUE;
-            if (strchr(what, 'h') && size >= 2)
-              return TRUE;
-            if (strchr(what, 'e') && size >= 3)
-              return TRUE;
-            if (strchr(what, 'd') && size >= 4)
-              return TRUE;
-          }
-        return FALSE;
-      }
+        return z80IsParmInCall(f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
         return z80MightBeParmInCallFromCurrentFunction(what);
     }
@@ -433,7 +379,7 @@ z80MightRead(const lineNode *pl, const char *what)
     return(strcmp(what, "sp") == 0);
 
   if(ISINST(pl->line, "ret")) // --reserve-regs-iy uses ret in code gen for calls through function pointers
-    return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what)) || strcmp(what, "sp") == 0;
+    return(IY_RESERVED ? z80IsReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : z80IsReturned(what)) || strcmp(what, "sp") == 0;
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l") || strcmp(what, "sp") == 0);

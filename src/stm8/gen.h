@@ -21,6 +21,8 @@
 #ifndef STM8GEN_H
 #define STM8GEN_H 1
 
+#include "ralloc.h"
+
 typedef enum
 {
   AOP_INVALID,
@@ -81,6 +83,7 @@ asmop;
 
 void genSTM8Code (iCode *);
 void stm8_emitDebuggerSymbol (const char *);
+bool stm8IsReturned(const char *what);
 
 extern bool stm8_assignment_optimal;
 extern long int stm8_call_stack_size;

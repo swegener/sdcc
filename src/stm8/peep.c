@@ -4,6 +4,7 @@
 #include "SDCCgen.h"
 
 #include "peep.h"
+#include "gen.h"
 
 #define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
@@ -641,66 +642,6 @@ static bool argCont(const char *arg, char what)
 }
 
 static bool
-isReturned(const char *what)
-{
-  symbol *sym;
-  sym_link *sym_lnk;
-  int size;
-  lineNode *l;
-
-  l = _G.head;
-  do
-  {
-    l = l->next;
-  } while(l->isComment || l->ic == NULL || l->ic->op != FUNCTION);
-
-  sym = OP_SYMBOL(IC_LEFT(l->ic));
-
-  if(sym && IS_DECL(sym->type))
-    {
-      // Find size of return value.
-      specifier *spec;
-      if(sym->type->select.d.dcl_type != FUNCTION)
-        NOTUSEDERROR();
-      spec = &(sym->etype->select.s);
-      if(spec->noun == V_VOID)
-        size = 0;
-      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
-        size = 1;
-      else if(spec->noun == V_INT && !(spec->b_long))
-        size = 2;
-      else if(spec->noun == V_INT && spec->b_long || spec->noun == V_FLOAT)
-        size = 4;
-      else // long long is not returned in registers.
-        size = 0;
-
-      // Check for returned pointer.
-      sym_lnk = sym->type;
-      while (sym_lnk && !IS_PTR (sym_lnk))
-        sym_lnk = sym_lnk->next;
-      if(IS_PTR(sym_lnk))
-        size = IS_FUNCPTR(sym_lnk) ? FUNCPTRSIZE : GPTRSIZE;
-    }
-  else
-    {
-      NOTUSEDERROR();
-      return TRUE;
-    }
-
-  switch(*what)
-    {
-    case 'a':
-      return(size == 1);
-    case 'x':
-      return(size > 1);
-    case 'y':
-      return(size > 2);
-    default:
-      return FALSE;
-    }
-}
-
-static bool
 stm8MightReadFlag(const lineNode *pl, const char *what)
 {
   if (strcmp (what, "c") && strcmp (what, "n") && strcmp (what, "z"))
@@ -855,7 +796,7 @@ stm8MightRead(const lineNode *pl, const char *what)
     }
 
   if(ISINST(pl->line, "ret") || ISINST(pl->line, "retf"))
-    return(isReturned(what));
+    return(stm8IsReturned(what));
 
   return FALSE;
 }

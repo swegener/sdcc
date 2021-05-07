@@ -204,6 +204,13 @@ cl_cmd_arg::as_string(void)
 bool
 cl_cmd_arg::as_bit(class cl_uc *uc)
 {
+  if (interpreted_as_string)
+    {
+      interpreted_as_string= false;
+      if (value.string.string)
+        free(value.string.string);
+    }
+
   return(get_bit_address(uc,
                          &(value.bit.mem),
                          &(value.bit.mem_address),

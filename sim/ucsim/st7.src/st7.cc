@@ -347,6 +347,7 @@ cl_st7::disass(t_addr addr)
 {
   chars work, temp;
   const char *b;
+  t_addr operand;
   int len = 0;
   int immed_offset = 0;
   bool first= true;
@@ -372,66 +373,45 @@ cl_st7::disass(t_addr addr)
           b++;
           switch (*(b++))
             {
-            //case 's': // s    signed byte immediate
-            //  sprintf(temp, "#%d", (char)rom->get(addr+immed_offset));
-            //  ++immed_offset;
-            //  break;
-            //case 'e': // e    extended 24bit immediate operand
-            //  sprintf(temp, "#0x%06lx",
-            //     (ulong)((rom->get(addr+immed_offset)<<16) |
-            //            (rom->get(addr+immed_offset+1)<<8) |
-            //            (rom->get(addr+immed_offset+2))) );
-            //  ++immed_offset;
-            //  ++immed_offset;
-            //  ++immed_offset;
-            //  break;
-            //case 'w': // w    word immediate operand
-            //  sprintf(temp, "#0x%04x",
-            //     (uint)((rom->get(addr+immed_offset)<<8) |
-            //            (rom->get(addr+immed_offset+1))) );
-            //  ++immed_offset;
-            //  ++immed_offset;
-            //  break;
             case 'b': // b    byte immediate operand
-              temp.format("#0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("#0x%02x", rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'd': // d    short direct addressing
-              temp.format("$0x%02x", (uint)rom->get(addr+immed_offset));
+              operand= rom->get(addr+immed_offset);
+              temp.format("$0x%02x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               break;
             case 'x': // x    long direct
-              temp.format("$0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+              operand= (rom->get(addr+immed_offset)<<8) |
+                       (rom->get(addr+immed_offset+1));
+              temp.format("$0x%04x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               break;
-	    //case '3': // 3    24bit index offset
-            //  sprintf(temp, "0x%06lx",
-            //     (ulong)((rom->get(addr+immed_offset)<<16) |
-            //            (rom->get(addr+immed_offset+1)<<8) |
-            //            (rom->get(addr+immed_offset+2))) );
-            //  ++immed_offset;
-            //  ++immed_offset;
-            //  ++immed_offset;
-            // break;
             case '2': // 2    word index offset
-              temp.format("0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+              // Assumption: the word offset address is the address of a
+              // fixed table and the index register selects an entry.
+              operand= (rom->get(addr+immed_offset)<<8) |
+                       (rom->get(addr+immed_offset+1));
+              temp.format("0x%04x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               break;
             case '1': // b    byte index offset
-              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
+              // Assumption: the index register points to a struct/record
+              // and the byte offset selects an entry.
+              temp.format("0x%02x", rom->get(addr+immed_offset));
               ++immed_offset;
               break;
-            case 'p': // b    byte index offset
+            case 'p': // p    pc relative
 	      {
-		int i= (int)(addr+immed_offset+1
-			     +(char)rom->get(addr+immed_offset)); 
-		temp.format("0x%04x", i&0xffff);
+		operand= ((addr+immed_offset+1 + (i8_t)rom->get(addr+immed_offset))) & 0xffff;
+		temp.format("0x%04x", operand);
+		addr_name(operand, rom, &temp);
 		++immed_offset;
 		break;
 	      }

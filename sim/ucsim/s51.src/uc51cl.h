@@ -119,7 +119,7 @@ public:
   virtual t_addr bit_address(class cl_memory *mem,
 			     t_addr mem_address,
 			     int bit_number);
-  virtual void   daddr_name(t_addr addr, chars *buf);
+  virtual bool   daddr_name(t_addr addr, chars *buf);
   virtual void   baddr_name(t_addr addr, chars *buf);
   
   virtual void   reset(void);

@@ -49,7 +49,7 @@ DIFF_OPTS += -I '[[:upper:]][[:alpha:]]\{2\} [[:upper:]][[:alpha:]]\{2\} .[[:dig
 define run-sim =
 	$(SIM) -R 0 $(SIM_ARGS) $(1) \
 		$(if $(filter %.cmd, $+), \
-			-e '$(patsubst %, exec "%";, $(filter %.cmd, $+))', \
+			$(foreach file, $(filter %.cmd, $+), -e 'exec "$(file)"'), \
 			$(if $(findstring -e, $(1)), , -g)) \
 		$(filter %.ihx, $+) \
 		> 'out/$@' 2>&1 < /dev/null
@@ -106,16 +106,19 @@ POSTCOMPILE = cp $*.d.tmp $*.d \
 %.hex:	%.ihx
 	$(PACKIHX) '$<' >'$@'
 
+# Build rules assuming an sdcc tool-chain. Override in per-target
+# test-conf.mk to use something else. Ideally pre-build tests and
+# ship the .ihx - we are NOT testing tool-chains!
 %.ihx:	%.c
 	$(MAKEDEPEND)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) --out-fmt-ihx -o '$@' '$<'
 	$(POSTCOMPILE)
 
 %.rel:	%.asm
-	$(AS) $(ASFLAGS) $@ $<
+	$(AS) $(ASFLAGS) '$@' '$<'
 
 %.ihx:	%.rel
-	$(LD) $(LINKFLAGS) -i $@ $<
+	$(LD) $(LINKFLAGS) -i '$@' '$<'
 
 
 include $(wildcard *.d)

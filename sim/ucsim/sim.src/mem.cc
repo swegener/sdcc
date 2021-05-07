@@ -240,9 +240,9 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
   bool bitmode = (smart == 2 || (smart && bitnr_high >= 0));
 
-  t_index var_i;
-  class cl_var *var = NULL;
-  class cl_var *var_next = NULL;
+  cl_vars_iterator vi(uc->vars);
+  const class cl_var *var = NULL;
+  const class cl_var *var_next = NULL;
 
   int state = 0;
 
@@ -276,34 +276,28 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               // Find the first var for this location.
               //fprintf(stderr, "Find first var for %s -> %s[0x%04x][%d:%d]\n", this->get_name(), this->get_name(), start, bitnr_high, bitnr_low);
-              if (uc->vars->by_addr.search(this, start, var_i))
+             var = vi.first(this, start);
+             while (var)
                 {
-                  while (var_i < uc->vars->by_addr.count &&
-                         (var = uc->vars->by_addr.at(var_i)) &&
-                         var->get_mem() == this && var->get_addr() == start)
-                    {
-                      // If _any_ var for this location names bits we output in bitmode
-                      // regardless of whether the named bits are in the requested range.
-                      if (var->bitnr_high >= 0)
-                        bitmode = true;
+                  // If _any_ var for this location names bits we output in bitmode
+                  // regardless of whether the named bits are in the requested range.
+                  if (var->bitnr_high >= 0)
+                    bitmode = true;
 
-                      // If the var names bits then we skip it unless all the bits are
-                      // contained within the requested range.
-                      if (bitnr_high < 0 || var->bitnr_high < 0 || (var->bitnr_high <= bitnr_high && var->bitnr_low >= bitnr_low))
-                        break;
+                  // If the var names bits then we skip it unless all the bits are
+                  // contained within the requested range.
+                  if (bitnr_high < 0 || var->bitnr_high < 0 || (var->bitnr_high <= bitnr_high && var->bitnr_low >= bitnr_low))
+                    break;
 
-                      //fprintf(stderr, "    skip %s -> %s[0x%04x][%d:%d]\n", var->get_name(), var->mem->get_name(), var->addr, var->bitnr_high, var->bitnr_low);
-                      var_i++;
-                    }
+                  //fprintf(stderr, "    skip %s -> %s[0x%04x][%d:%d]\n", var->get_name(), var->mem->get_name(), var->addr, var->bitnr_high, var->bitnr_low);
+                  var = vi.next();
                 }
             }
 
           //if (var_i < uc->vars->by_addr.count && var)
             //fprintf(stderr, "state = %d, %s -> %s[0x%04x][%d:%d]\n", state, var->get_name(), var->mem->get_name(), var->addr, var->bitnr_high, var->bitnr_low);
 
-          if (var_i < uc->vars->by_addr.count &&
-              var &&
-              var->get_mem() == this && var->get_addr() == start &&
+          if (var &&
               (var->bitnr_high < 0 ||
 	       (state < 2 && ((var->bitnr_high == bitnr_high && var->bitnr_low == bitnr_low) ||
                               (bitnr_high < 0 && var->bitnr_high == width - 1 && var->bitnr_low == 0))) ||
@@ -323,9 +317,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
                 con->dd_printf(" %s:%*s", var->get_name(), label_width - strlen(var->get_name()) + (smart == 2 ? 5 : 0), "");
 
               // Find the next relevant var.
-              while (++var_i < uc->vars->by_addr.count &&
-                     (var_next = uc->vars->by_addr.at(var_i)) &&
-                     var_next->get_mem() == this && var_next->get_addr() == start)
+              while ((var_next = vi.next()))
                 {
                   // If _any_ var for this location names bits we output in bitmode
                   // regardless of whether the named bits are in the requested range.
@@ -342,9 +334,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
               //if (var_i < uc->vars->by_addr.count && var_next)
                   //fprintf(stderr, "    next  is %s -> %s[0x%04x][%d:%d]\n", var_next->get_name(), var_next->mem->get_name(), var_next->addr, var_next->bitnr_high, var_next->bitnr_low);
 
-              if (var_i < uc->vars->by_addr.count &&
-                  var_next &&
-                  var_next->get_mem() == this && var_next->get_addr() == start)
+              if (var_next)
                 {
                   // If it aliases the previous we do not need to output data now.
                   if ((var_next->bitnr_high == var->bitnr_high && var_next->bitnr_low == var->bitnr_low) ||
@@ -417,11 +407,9 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
               state = 2;
 
               // Only advance if there is no more to say about this location.
-              if (var_i < uc->vars->by_addr.count &&
-                  var_next &&
-                  var_next->get_mem() == this && var_next->get_addr() == start)
+              if (var_next)
                 var = var_next;
-	      else
+              else
                 {
                   start += step;
                   dump_finished= start;
@@ -451,8 +439,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
         {
           if (smart && n)
             {
-              if (uc->vars->by_addr.search(this, start+n*step, var_i) &&
-                  (var = uc->vars->by_addr.at(var_i)))
+              if ((var = vi.first(this, start+n*step)))
                 break;
             }
           con->dd_printf(" ");

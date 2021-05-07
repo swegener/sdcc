@@ -1136,6 +1136,7 @@ cl_uc390::disass (t_addr addr)
 {
   chars work= chars(), temp= chars();
   const char *b;
+  t_addr operand;
   t_mem code;
   uchar dps;
   bool first;
@@ -1166,17 +1167,19 @@ cl_uc390::disass (t_addr addr)
               //          (((code >> 5) & 0x07) * 256 +
               //          rom->get (addr + 1)));
 
-              temp.format(/*"%06lx"*/rom->addr_format,
-			  (addr & 0xf80000L) |
-			  (((code >> 5) & 0x07) * (256 * 256) +
-			   (rom->get (addr + 1) * 256) +
-			   rom->get (addr + 2)));
+	      operand= (addr & 0xf80000L) |
+		       (((code >> 5) & 0x07) * (256 * 256) +
+		        (rom->get (addr + 1) * 256) +
+		        rom->get (addr + 2));
+              temp.format(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
               break;
             case 'l': // long address
-              temp.format("%06lx",
-			  rom->get (addr + 1) * (256*256L) +
-			  rom->get (addr + 2) * 256 +
-			  rom->get (addr + 3));
+	      operand= rom->get (addr + 1) * (256*256L) +
+		       rom->get (addr + 2) * 256 +
+		       rom->get (addr + 3);
+              temp.format(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
               break;
             case 'a': // addr8 (direct address) at 2nd byte
 	      daddr_name(rom->get(addr+1), &temp);
@@ -1191,20 +1194,27 @@ cl_uc390::disass (t_addr addr)
 		break;
 	      }
             case 'r': // rel8 address at 2nd byte
-              temp.format("%04x",
-			  int (addr + 2 + (signed char) (rom->get (addr + 1))));
+	      operand= (u16_t)(addr + 2 + (i8_t)(rom->get(addr + 1)));
+              temp.format(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
               break;
             case 'R': // rel8 address at 3rd byte
-              temp.format("%04x",
-			  int (addr + 3 + (signed char) (rom->get (addr + 2))));
+	      operand= (u16_t)(addr + 3 + (i8_t)(rom->get(addr + 2)));
+              temp.format(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
               break;
             case 'd': // data8 at 2nd byte
-              temp.format("%02x", (int)rom->get (addr + 1));
+              temp.format("0x%02x", (int)rom->get (addr + 1));
               break;
             case 'D': // data8 at 3rd byte
-              temp.format("%02x", (int)rom->get (addr + 2));
+              temp.format("0x%02x", (int)rom->get (addr + 2));
               break;
             case 'i': // inc/dec dptr
+              // N.B. The direction depends on DPS at the time the instruction is
+              // executed NOT the time we disassemble it. This is only going to
+              // be guaranteed correct when disassembling on break.
+              // The correct assembler mnemonic here is INC even if it decrements
+              // when executed!
               dps = sfr->get(DPS);
               temp.format(((dps & 0x01) ? (dps & 0x80) : (dps & 0x40)) ? "DEC" : "INC");
               break;

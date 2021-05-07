@@ -396,9 +396,13 @@ public:
   virtual int inst_branch(t_addr addr);
   virtual bool is_call(t_addr addr);
   virtual int longest_inst(void);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, chars *buf);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr, chars *buf);
-  virtual bool addr_name(t_addr addr, class cl_address_space *as, int bitnr_high, int bitnr_low, chars *buf);
+  virtual const class cl_var *addr_name(t_addr addr, class cl_memory *mem, int bitnr_high, int bitnr_low, chars *buf, const class cl_var *context = 0);
+  const class cl_var *addr_name(t_addr addr, class cl_memory *mem, int bitnr, chars *buf, const class cl_var *context = 0) {
+    return addr_name(addr, mem, bitnr, bitnr, buf, context);
+  }
+  const class cl_var *addr_name(t_addr addr, class cl_memory *mem, chars *buf) {
+    return addr_name(addr, mem, -1, -1, buf);
+  }
   virtual bool symbol2address(char *sym,
 			      class cl_memory **mem,
 			      t_addr *addr);

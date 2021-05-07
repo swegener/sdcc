@@ -1,0 +1,57 @@
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var __interrupt_vect rom[0x20]
+var __sdcc_external_startup rom[0x1f]
+var __sdcc_program_startup rom[0x11]
+var __sdcc_gs_init_startup rom[0x12]
+var __sdcc_init_data rom[0x12]
+var _main rom[0x1d]
+dc 0x0000 0x0020 
+ ? 0x000 0000 nop[0K
+ ? 0x001 2601 clear  1[0K
+ ? 0x002 5702 mov    a, #2[0K
+ ? 0x003 5001 add    #1[0K
+ ? 0x004 54fe and    #254[0K
+ ? 0x005 0102 mov    [2], a[0K
+ ? 0x006 701f call   #31[0K
+ ? 0x007 6012 goto   #18[0K
+ ? 0x008 0000 nop[0K
+ ? 0x009 0000 nop[0K
+ ? 0x00a 0000 nop[0K
+ ? 0x00b 0000 nop[0K
+ ? 0x00c 0000 nop[0K
+ ? 0x00d 0000 nop[0K
+ ? 0x00e 0000 nop[0K
+ ? 0x00f 0000 nop[0K
+ ? 0x010 007b reti[0K
+
+   0x011 <__sdcc_program_startup>:
+ ? 0x011 601d goto   #29[0K
+
+   0x012 <__sdcc_gs_init_startup>:
+   0x012 <__sdcc_init_data>:
+ ? 0x012 5702 mov    a, #2[0K
+ ? 0x013 1700 mov    0, a[0K
+ ? 0x014 5702 mov    a, #2[0K
+ ? 0x015 5000 add    #0[0K
+ ? 0x016 2f00 cneqsn 0[0K
+ ? 0x017 601c goto   #28[0K
+ ? 0x018 5700 mov    a, #0[0K
+ ? 0x019 0700 idxm   0, a[0K
+ ? 0x01a 2400 inc    0[0K
+ ? 0x01b 6014 goto   #20[0K
+ ? 0x01c 6011 goto   #17[0K
+
+   0x01d <_main>:
+ ? 0x01d 601d goto   #29[0K
+ ? 0x01e 007a ret[0K
+
+   0x01f <__sdcc_external_startup>:
+ ? 0x01f 0200 ret    #0[0K
+
+   0x020 <__interrupt_vect>:
+ ? 0x020 007a ret[0K
+Loading from test.ihx
+25 words read from test.ihx

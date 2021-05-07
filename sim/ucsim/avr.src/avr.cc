@@ -212,9 +212,10 @@ cl_avr::dis_tbl(void)
 char *
 cl_avr::disass(t_addr addr)
 {
-  chars work= chars();//, temp[20];
+  chars work, temp;
   const char *b;
   uint code, data= 0;
+  t_addr operand;
   int i;
   bool first;
   
@@ -242,30 +243,29 @@ cl_avr::disass(t_addr addr)
       if (*b == '%')
 	{
 	  b++;
-	  chars temp= chars();
 	  temp= "";
 	  switch (*(b++))
 	    {
 	    case 'd': // Rd   .... ...d dddd ....  0<=d<=31
-	      if (!addr_name(data= (code&0x01f0)>>4, ram, &temp))
-		temp.format("r%d", data);
+	      temp.format("r%d", data);
+	      addr_name(data= (code&0x01f0)>>4, ram, &temp);
 	      break;
 	    case 'D': // Rd   .... .... dddd ....  16<=d<=31
-	      if (!addr_name(data= 16+((code&0xf0)>>4), ram, &temp))
-		temp.format("r%d", data);
+	      temp.format("r%d", data);
+	     addr_name(data= 16+((code&0xf0)>>4), ram, &temp);
 	      break;
 	    case 'K': // K    .... KKKK .... KKKK  0<=K<=255
 	      temp.appendf("%d", ((code&0xf00)>>4)|(code&0xf));
 	      break;
 	    case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
-	      if (!addr_name(data= ((code&0x0200)>>5)|(code&0x000f),
-			     ram, &temp))
-		temp.format("r%d", data);
+	      temp.format("r%d", data);
+	      addr_name(data= ((code&0x0200)>>5)|(code&0x000f),
+			ram, &temp);
 	      break;
 	    case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
-	      if (!addr_name(data= 24+(2*((code&0x0030)>>4)),
-			     ram, &temp))
-		temp.format("r%d", data);
+	      temp.format("r%d", data);
+	      addr_name(data= 24+(2*((code&0x0030)>>4)),
+			ram, &temp);
 	      break;
 	    case '6': // K    .... .... KK.. KKKK  0<=K<=63
 	      temp.format("%d", ((code&0xc0)>>2)|(code&0xf));
@@ -281,39 +281,45 @@ cl_avr::disass(t_addr addr)
 		int k= (code&0x3f8)>>3;
 		if (code&0x200)
 		  k|= -128;
-		temp.format("0x%06x", k+1+(signed int)addr);
+		k+= 1 + (signed int)addr;
+		temp.format("0x%06x", k);
+		addr_name(k, rom, &temp);
 		break;
 	      }
 	    case 'A': // k    .... ...k kkkk ...k  0<=k<=64K
 	              //      kkkk kkkk kkkk kkkk  0<=k<=4M
-	      temp.format("0x%06x",
-			  (((code&0x1f0)>>3)|(code&1))*0x10000+
-			  (uint)rom->get(addr+1));
+	      operand= (((code&0x1f0)>>3)|(code&1))*0x10000+
+		       (uint)rom->get(addr+1);
+	      temp.format("0x%06x", operand);
+	      addr_name(operand, rom, &temp);
 	      break;
 	    case 'P': // P    .... .... pppp p...  0<=P<=31
 	      data= (code&0xf8)>>3;
-	      if (!addr_name(data+0x20, ram, &temp))
-		temp.format("%d", data);
+	      temp.format("%d", data);
+	      addr_name(data+0x20, ram, &temp);
 	      break;
 	    case 'p': // P    .... .PP. .... PPPP  0<=P<=63
 	      data= ((code&0x600)>>5)|(code&0xf);
-	      if (!addr_name(data+0x20, ram, &temp))
-		temp.format("%d", data);
+	      temp.format("%d", data);
+	      addr_name(data+0x20, ram, &temp);
 	      break;
 	    case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63
 	      temp.format("%d",
 			  ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
 	      break;
 	    case 'R': // k    SRAM address on second word 0<=k<=65535
-	      temp.format("0x%06x", (uint)rom->get(addr+1));
+	      operand= rom->get(addr+1);
+	      temp.format("0x%06x", operand);
+	      addr_name(operand, ram, &temp);
 	      break;
 	    case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
 	      {
 		int k= code&0xfff;
 		if (code&0x800)
 		  k|= -4096;
-		temp.format("0x%06x",
-			    (int)rom->validate_address(k+1+(signed int)addr));
+		k= rom->validate_address(k+1+(signed int)addr);
+		temp.format("0x%06x", k);
+		addr_name(k, rom, &temp);
 		break;
 	      }
 	    default:

@@ -1144,6 +1144,7 @@ cl_51core::disass(t_addr addr)
 {
   chars work= chars(), temp= chars();
   const char *b;
+  t_addr operand;
   t_mem code= rom->get(addr);
   struct dis_entry *dt;//= &(dis_tbl()[code]);
   bool first;
@@ -1169,15 +1170,16 @@ cl_51core::disass(t_addr addr)
 	  switch (*(b++))
 	    {
 	    case 'A': // absolute address
-	      temp.appendf("%04x",
-			   int((addr&0xf800)|
-			       (((code>>5)&0x07)*256 +
-				rom->get(addr+1))));
+	      operand= (addr&0xf800)|
+		       (((code>>5)&0x07)*256 +
+			rom->get(addr+1));
+	      temp.appendf(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
 	      break;
 	    case 'l': // long address
-	      temp.appendf("%04x",
-			   int(rom->get(addr+1)*256 +
-			       rom->get(addr+2)));
+	      operand= rom->get(addr+1)*256 + rom->get(addr+2);
+	      temp.appendf(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
 	      break;
 	    case 'a': // addr8 (direct address) at 2nd byte
 	      daddr_name(rom->get(addr+1), &temp);
@@ -1192,21 +1194,22 @@ cl_51core::disass(t_addr addr)
 		break;
 	      }
 	    case 'r': // rel8 address at 2nd byte
-	      temp.appendf("%04x",
-			   int(addr+2+(signed char)(rom->get(addr+1))));
+	      operand= (u16_t)(addr+2 + (i8_t)rom->get(addr+1));
+	      temp.appendf(rom->addr_format, operand);
       break;
 	    case 'R': // rel8 address at 3rd byte
-	      temp.appendf("%04x",
-			   int(addr+3+(signed char)(rom->get(addr+2))));
+	      operand= (u16_t)(addr+3 + (i8_t)rom->get(addr+2));
+	      temp.appendf(rom->addr_format, operand);
+	      addr_name(operand, rom, &temp);
 	      break;
 	    case 'd': // data8 at 2nd byte
-	      temp.appendf("%02x", (int)rom->get(addr+1));
+	      temp.appendf("0x%02x", (int)rom->get(addr+1));
 	      break;
 	    case 'D': // data8 at 3rd byte
-	      temp.appendf("%02x", (int)rom->get(addr+2));
+	      temp.appendf("0x%02x", (int)rom->get(addr+2));
 	      break;
 	    case '6': // data16 at 2nd(H)-3rd(L) byte
-	      temp.appendf("%04x",
+	      temp.appendf("0x%04x",
 			   int(rom->get(addr+1)*256 +
 			       rom->get(addr+2)));
 	      break;
@@ -1457,40 +1460,42 @@ cl_51core::bit_address(class cl_memory *mem,
 
 /* Get name of directly addressed iram/sfr cell */
 
-void
+bool
 cl_51core::daddr_name(t_addr addr, chars *buf)
 {
   if (!buf)
-    return;
+    return false;
+
+  buf->format("0x%02x", addr);
 
   if (addr < 128)
     {
       // register?
       if (addr_name(addr, regs, buf))
 	{
-	  return;
+	  return true;
 	}
       // variale?
       if (addr_name(addr, iram, buf))
 	{
-	  return;
+	  return true;
 	}
     }
   else
     {
       // dptr?
-      if (addr_name(addr-0x82, dptr, buf))
+      if (dptr && addr_name(addr-0x82, dptr, buf))
 	{
-	  return;
+	  return true;
 	}
       // sfr?
       if (addr_name(addr, sfr, buf))
 	{
-	  return;
+	  return true;
 	}
     }
-  unsigned int a= addr;
-  buf->format("%02x", a);
+
+  return false;
 }
 
 /* Get name of a bit cell */
@@ -1499,19 +1504,22 @@ void
 cl_51core::baddr_name(t_addr addr, chars *buf)
 {
   t_addr ma;
-  
+
   if (!buf)
     return;
+
+  buf->appendf("0x%02x", addr);
+
   if (addr_name(addr, bits, buf))
     return;
   if (addr < 128)
     ma= 32+(addr/8);
   else
     ma= addr&0xf8;
-  daddr_name(ma, buf);
-  chars c= chars("", "%s.%d", buf, (int)(addr & 7));
-  //strcpy(buf, c.c_str());
-  buf->append(c);
+
+  chars temp;
+  if (daddr_name(ma, &temp))
+    buf->appendf("%s.%d", temp, (int)(addr & 7));
 }
 
 

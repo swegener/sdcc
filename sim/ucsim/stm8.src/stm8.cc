@@ -829,10 +829,12 @@ cl_stm8::get_disasm_info(t_addr addr,
 char *
 cl_stm8::disass(t_addr addr)
 {
+  const class cl_var *context = 0;
   chars work, temp;
   const char *b;
   int len = 0;
   int immed_offset = 0;
+  t_addr operand= 0;
   bool first= true;
 
   work= "";
@@ -853,37 +855,43 @@ cl_stm8::disass(t_addr addr)
 	}
       if (*b == '%')
         {
+
           b++;
           switch (*(b++))
             {
             case 's': // s    signed byte immediate
-              temp.format("#%d", (char)rom->get(addr+immed_offset));
+              temp.format("#%d", (i8_t)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'e': // e    extended 24bit immediate operand
-              temp.format("#0x%06lx",
-			  (ulong)((rom->get(addr+immed_offset)<<16) |
-				  (rom->get(addr+immed_offset+1)<<8) |
-				  (rom->get(addr+immed_offset+2))) );
+	      operand= ((rom->get(addr+immed_offset)<<16) |
+			  (rom->get(addr+immed_offset+1)<<8) |
+			  (rom->get(addr+immed_offset+2)));
+              temp.format("#0x%06lx", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               ++immed_offset;
               break;
             case 'w': // w    word immediate operand
-              temp.format("#0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+	      operand=  ((rom->get(addr+immed_offset)<<8) |
+			 (rom->get(addr+immed_offset+1)));
+              temp.format("#0x%04x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               break;
             case 'b': // b    byte immediate operand
-              temp.format("#0x%02x", (uint)rom->get(addr+immed_offset));
+              operand= (uint)rom->get(addr+immed_offset);
+              temp.format("#0x%02x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               break;
             case 'x': // x    extended addressing
-              temp.format("0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+	      operand= (uint)((rom->get(addr+immed_offset)<<8) |
+			 (rom->get(addr+immed_offset+1)));
+              temp.format("0x%04x", operand);
+              context = addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               break;
@@ -892,35 +900,49 @@ cl_stm8::disass(t_addr addr)
               ++immed_offset;
               break;
             case '3': // 3    24bit index offset
-              temp.format("0x%06lx",
-			  (ulong)((rom->get(addr+immed_offset)<<16) |
-				  (rom->get(addr+immed_offset+1)<<8) |
-				  (rom->get(addr+immed_offset+2))) );
+              // Assumption: the 24bit offset address is the address of a
+              // fixed table and the index register selects an entry.
+	      operand= (ulong)((rom->get(addr+immed_offset)<<16) |
+			  (rom->get(addr+immed_offset+1)<<8) |
+			  (rom->get(addr+immed_offset+2)));
+              temp.format("0x%06lx", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               ++immed_offset;
-             break;
+              break;
             case '2': // 2    word index offset
-              temp.format("0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+              // Assumption: the word offset address is the address of a
+              // fixed table and the index register selects an entry.
+	      operand= (uint)((rom->get(addr+immed_offset)<<8) |
+			 (rom->get(addr+immed_offset+1)));
+              temp.format("0x%04x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               ++immed_offset;
               break;
             case '1': // b    byte index offset
-              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
+              // Assumption: the index register points to a struct/record
+              // and the byte offset selects an entry.
+              operand= (uint)rom->get(addr+immed_offset);
+              temp.format("0x%02x", operand);
+              addr_name(operand, rom, &temp);
               ++immed_offset;
               break;
-            case 'p': // b    byte index offset
-	      {
-		long int base;
-		i8_t offs;
-		base= addr+immed_offset+1;
-		offs= rom->get(addr+immed_offset);
-		long int res= base+offs;
-		temp.format("0x%04lx", res);
-		++immed_offset;
-	      }
+            case 'p': // p    pc relative
+              operand = (addr+immed_offset+1 + (i8_t)rom->get(addr+immed_offset)) & 0xffff;
+              temp.format("0x%04lx", operand);
+              addr_name(operand, rom, &temp);
+              ++immed_offset;
+              break;
+            case 'B': // B    bit number
+              {
+                uint bit = (rom->get(addr+1) & 0xf) >> 1;
+                temp.format("%u", bit);
+                // N.B. The address comes before the bit so operand has already
+                // been set to the address when we get here.
+                addr_name(operand, rom, bit, bit, &temp, context);
+              }
               break;
             default:
 	      temp= "?";

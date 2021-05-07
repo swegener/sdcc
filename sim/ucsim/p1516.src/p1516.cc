@@ -289,6 +289,7 @@ cl_p1516::disass(t_addr addr)
 	    case 'A': // CALL
 	      data= (code & 0x07ffffff);
 	      temp.format("0x%x", data);
+	      addr_name(data, rom, &temp);
 	      break;
 	    default:
 	      temp= "?";

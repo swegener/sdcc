@@ -19,8 +19,7 @@ IX= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 IY= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 SP= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 aAF= 0x00-0x00  aBC= 0x00-0x00  aDE= 0x00-0x00  aHL= 0x00-0x00  
- ? 0x0000 08 uc::disass() unimplemented
-[0K
+ ? 0x0000 08 -- UNKNOWN/INVALID[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0fffff  1048576 rom_chip (8,%02x,0x%05lx)

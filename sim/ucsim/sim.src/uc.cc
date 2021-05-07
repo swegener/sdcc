@@ -1838,7 +1838,19 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
   if (!rom)
     return 0;
 
-  t_mem code= rom->get(addr);
+  cl_vars_iterator vi(vars);
+  const class cl_var *var = NULL;
+  if ((var = vi.first(rom, addr)))
+    {
+      len+= con->dd_printf("\n");
+
+      do {
+        len+= con->dd_cprintf("answer", "   ");
+        len+= con->dd_cprintf("dump_address", rom->addr_format, addr);
+        len+= con->dd_cprintf("dump_label", " <%s>:\n", var->get_name());
+      } while ((var = vi.next()));
+    }
+
   b= fbrk_at(addr);
   dis= disass(addr);
   if (b)
@@ -1848,7 +1860,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
   len+= con->dd_cprintf("answer", "%c ", inst_at(addr)?' ':'?');
   len+= con->dd_cprintf("dump_address", rom->addr_format, addr);
   len+= con->dd_printf(" ");
-  len+= con->dd_cprintf("dump_number", rom->data_format, code);
+  len+= con->dd_cprintf("dump_number", rom->data_format, rom->get(addr));
   l= inst_length(addr);
   for (i= 1; i < l; i++)
     {
@@ -1956,46 +1968,79 @@ cl_uc::longest_inst(void)
   return(max);
 }
 
-bool
-cl_uc::addr_name(t_addr addr, class cl_address_space *as, int bitnr_high, int bitnr_low, chars *buf)
+const class cl_var *
+cl_uc::addr_name(t_addr addr, class cl_memory *mem, int bitnr_high, int bitnr_low, chars *buf, const class cl_var *context)
 {
   t_index i;
-  
-  if (!as)
-    return false;
-  if (vars->by_addr.search(as, addr, bitnr_high, bitnr_low, i))
+  const cl_var *var = NULL;
+
+  if (!mem)
+    return NULL;
+
+  if (vars->by_addr.search(mem, addr, bitnr_high, bitnr_low, i))
+    var = vars->by_addr.at(i);
+  else if (vars->by_addr.search(mem, addr, mem->width - 1, 0, i))
+    var = vars->by_addr.at(i);
+  else if (bitnr_high >= 0 && vars->by_addr.search(mem, addr, -1, -1, i))
+    var = vars->by_addr.at(i);
+  else if (mem->is_address_space())
     {
-      *buf= (vars->by_addr.at(i)->get_name());
-      return true;
+      cl_address_decoder *ad = ((cl_address_space *)mem)->get_decoder_of(addr);
+      if (ad)
+        {
+          mem = ad->memchip;
+          addr = ad->as_to_chip(addr);
+
+          if (vars->by_addr.search(mem, addr, bitnr_high, bitnr_low, i))
+            var = vars->by_addr.at(i);
+          else if (vars->by_addr.search(mem, addr, mem->width - 1, 0, i))
+            var = vars->by_addr.at(i);
+          else if (bitnr_high >= 0 && vars->by_addr.search(mem, addr, -1, -1, i))
+            var = vars->by_addr.at(i);
+        }
     }
-  return false;
-}
 
-bool
-cl_uc::addr_name(t_addr addr, class cl_address_space *as, int bitnr, chars *buf)
-{
-  bool ret;
-
-  if (!as)
-    return false;
-  if (!(ret = addr_name(addr, as, bitnr, bitnr, buf)))
-    buf->format("%02lx.%d", (unsigned long)addr, bitnr);
-  return ret;
-}
-
-bool
-cl_uc::addr_name(t_addr addr, class cl_address_space *as, chars *buf)
-{
-  bool ret;
-
-  if (!as)
-    return false;
-  if (!(ret = addr_name(addr, as, as->width - 1, 0, buf)) &&
-      !(ret = addr_name(addr, as, -1, -1, buf)))
+  if (var)
     {
-      buf->format("%02lx", (unsigned long)addr);
+      const char *name = var->get_name();
+
+      // If there is a context var and its name prefixes the var for this
+      // addr we strip the prefix off.
+      size_t len;
+      if (context && (len = strlen(context->get_name())) &&
+          !strncmp(name, context->get_name(), len) &&
+          (name[len] == '\0' || name[len] == '_'))
+        {
+          if (name[len] == '\0')
+            {
+              // Same as context, nothing more to add
+              return var;
+            }
+          else if (name[len] == '_')
+            {
+              // We don't need the prefix - we already had the context
+              buf->appendf(" <%s", &name[len + 1]);
+            }
+        }
+      else
+        {
+          // It's all significant, nothing to do with context
+          buf->appendf(" <%s", name);
+        }
+
+      if (bitnr_high >= 0 &&
+          (var->bitnr_high != bitnr_high || var->bitnr_low != bitnr_low))
+        {
+          if (bitnr_high == bitnr_low)
+            buf->appendf(".%d", bitnr_high);
+          else
+            buf->appendf("[%d:%d]", bitnr_high, bitnr_low);
+        }
+
+      buf->appendf(">");
     }
-  return ret;
+
+  return var;
 }
 
 bool

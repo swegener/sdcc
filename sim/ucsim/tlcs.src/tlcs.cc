@@ -363,11 +363,11 @@ char *
 cl_tlcs::disass(t_addr addr)
 {
   struct dis_entry *de;
+  t_addr operand;
   u64_t c;
   int i;
   chars s("");
   const char *t;
-  char l[20];
 
   c= 0;
   for (i= 7; i>=0; i--)
@@ -416,17 +416,43 @@ cl_tlcs::disass(t_addr addr)
 	    case 'C': /* cc in 2nd byte */ s+= condname_C(c>>8); break; // without ,
 	    case 'f': /* cc in 4th byte */ s+= condname_cc(c>>24); break; // with ,
 	    case 'F': /* cc in 3rd byte */ s+= condname_cc(c>>16); break; // with ,
-	    case 'n': /*  n in 2nd byte */ snprintf(l,19,"%02x",(int)((c>>8)&0xff));s+= l; break;
-	    case 'N': /*  n in 3rd byte */ snprintf(l,19,"%02x",(int)((c>>16)&0xff));s+= l; break;
-	    case 'o': /*  n in 4th byte */ snprintf(l,19,"%02x",(int)((c>>24)&0xff));s+= l; break;
-	    case 'O': /*  n in 5th byte */ snprintf(l,19,"%02x",(int)((c>>32)&0xff));s+= l; break;
-	    case '1': /*  PC+2+d in 2nd byte */ snprintf(l,19,"0x%04x",(int)(addr+2+i8_t((c>>8)&0xff))); s+= l; break;
-	    case 'd': /*  d in 2nd byte */ snprintf(l,19,"%+d",(int)(i8_t((c>>8)&0xff))); s+= l; break;
-	    case 'D': /* cd in 2,3 byte */ snprintf(l,19,"0x%04x",(int)(addr+3+i16_t((c>>8)&0xffff))); s+= l; break;	      
-	    case 'M': /* mn in 2,3 byte */ snprintf(l,19,"0x%04x",(int)((c>>8)&0xffff)); s+= l; break;
-	    case 'm': /* mn in 3,4 byte */ snprintf(l,19,"0x%04x",(int)((c>>16)&0xffff)); s+= l; break;
-	    case 'X': /* mn in 4,5 byte */ snprintf(l,19,"0x%04x",(int)((c>>24)&0xffff)); s+= l; break;
-	    case 'x': /* mn in 5,6 byte */ snprintf(l,19,"0x%04x",(int)((c>>32)&0xffff)); s+= l; break;
+	    case 'n': /*  n in 2nd byte */ s.appendf("%02x",(int)((c>>8)&0xff)); break;
+	    case 'N': /*  n in 3rd byte */ s.appendf("%02x",(int)((c>>16)&0xff)); break;
+	    case 'o': /*  n in 4th byte */ s.appendf("%02x",(int)((c>>24)&0xff)); break;
+	    case 'O': /*  n in 5th byte */ s.appendf("%02x",(int)((c>>32)&0xff)); break;
+	    case 'd': /*  d in 2nd byte */ s.appendf("%+d",(int)(i8_t((c>>8)&0xff))); break;
+
+	    case '1': /*  PC+2+d in 2nd byte */
+	      operand= (u16_t)(addr+2 + (i8_t)((c>>8)&0xff));
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+	    case 'D': /* cd in 2,3 byte */
+	      operand= (u16_t)(addr+3 + (i16_t)((c>>8)&0xffff));
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+	    case 'M': /* mn in 2,3 byte */
+	      operand= (u16_t)((c>>8)&0xffff);
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+	    case 'm': /* mn in 3,4 byte */
+	      operand= (u16_t)((c>>16)&0xffff);
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+	    case 'X': /* mn in 4,5 byte */
+	      operand= (u16_t)((c>>24)&0xffff);
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+	    case 'x': /* mn in 5,6 byte */
+	      operand= (u16_t)((c>>32)&0xffff);
+	      s.appendf("0x%04x", operand);
+	      addr_name(operand, rom, &s);
+	      break;
+
 	    default: s+= '?'; break;
 	    }
 	}

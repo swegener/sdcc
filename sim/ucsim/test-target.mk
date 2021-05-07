@@ -39,6 +39,7 @@ baseline:	$(BASELINES) always
 
 %-baseline:	% always
 	@echo 'BASELINE $(srcdir)/$<'
+	@test -d '$(srcdir)/$</baseline' || mkdir '$(srcdir)/$</baseline'
 	@cp '$</out'/* '$(srcdir)/$</baseline'/.
 
 clean::	$(CLEAN_TESTS)

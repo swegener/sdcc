@@ -327,6 +327,7 @@ char *
 cl_hc08::disass(t_addr addr)
 {
   chars work, temp;
+  t_addr operand;
   const char *b;
   int len = 0;
   int immed_offset = 0;
@@ -358,9 +359,10 @@ cl_hc08::disass(t_addr addr)
 	      ++immed_offset;
 	      break;
 	    case 'w': // w    word immediate operand
-	      temp.format("#0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+	      operand= ((rom->get(addr+immed_offset)<<8) |
+		       (rom->get(addr+immed_offset+1)));
+	      temp.format("#0x%04x", operand);
+	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      ++immed_offset;
 	      break;
@@ -369,34 +371,42 @@ cl_hc08::disass(t_addr addr)
 	      ++immed_offset;
 	      break;
 	    case 'x': // x    extended addressing
-	      temp.format("0x%04x",
-			  (uint)((rom->get(addr+immed_offset)<<8) |
-				 (rom->get(addr+immed_offset+1))) );
+	      operand= ((rom->get(addr+immed_offset)<<8) |
+		       (rom->get(addr+immed_offset+1)));
+	      temp.format("0x%04x", operand);
+	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      ++immed_offset;
 	      break;
 	    case 'd': // d    direct addressing
-	      temp.format("*0x%02x", (uint)rom->get(addr+immed_offset));
+	      operand= rom->get(addr+immed_offset);
+	      temp.format("*0x%02x", operand);
+	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      break;
 	    case '2': // 2    word index offset
 	      {
-		int i= (uint)((rom->get(addr+immed_offset)<<8) |
+		operand= ((rom->get(addr+immed_offset)<<8) |
 			      (rom->get(addr+immed_offset+1)));
-		temp.format("0x%04x", i & 0xffff);
+		// Assumption: the word offset address is the address of a
+		// fixed table and index register selects an entry.
+		temp.format("0x%04x", operand);
+		addr_name(operand, rom, &temp);
 		++immed_offset;
 		++immed_offset;
 		break;
 	      }		
 	    case '1': // b    byte index offset
+	      // Assumption: the index register points to a struct/record
+	      // and the byte offset selects an entry.
               temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
 	      ++immed_offset;
 	      break;
-	    case 'p': // b    byte index offset
+	    case 'p': // p    pc relative
 	      {
-		int i= addr+immed_offset+1
-		  +(char)rom->get(addr+immed_offset);
-		temp.format("0x%04x", i & 0xffff);
+		operand= (addr+immed_offset+1 + (i8_t)rom->get(addr+immed_offset)) & 0xffff;
+		temp.format("0x%04x", operand);
+		addr_name(operand, rom, &temp);
 		++immed_offset;
 		break;
 	      }

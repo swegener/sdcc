@@ -13,8 +13,7 @@ CC= 11000000
       HINZVC
 IX= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 SP= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
- ? 0x6c75 96 uc::disass() unimplemented
-[0K
+ ? 0x6c75 96 -- UNKNOWN/INVALID[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

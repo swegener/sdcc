@@ -1,0 +1,21 @@
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var init rom[0x0000]
+var main rom[0x0002]
+var forever rom[0x0005]
+dc 0x0000 0x0005
+
+   0x0000 <init>:
+ ? 0x0000 940e 0002 call   0x000002 <main>[0K
+
+   0x0002 <main>:
+ ? 0x0002 2400      eor    r0,r0[0K
+ ? 0x0003 c001      rjmp   0x000005 <forever>[0K
+ ? 0x0004 9403      inc    r0[0K
+
+   0x0005 <forever>:
+ ? 0x0005 cfff      rjmp   0x000005 <forever>[0K
+Loading from test.ihx
+6 words read from test.ihx

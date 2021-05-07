@@ -574,6 +574,7 @@ cl_m6809::disass(t_addr addr)
 		    op16= rom->get(addr++)*256;
 		    op16+= rom->get(addr++);
 		    work.appendf("0x%04x", op16);
+		    addr_name(op16, rom, &work);
 		    break;
 		  }
 		break;
@@ -594,6 +595,7 @@ cl_m6809::disass(t_addr addr)
 		    op16= rom->get(addr++)*256;
 		    op16+= rom->get(addr++);
 		    work.appendf("0x%04x", op16);
+		    addr_name(op16, rom, &work);
 		    break;
 		  }
 		break;
@@ -623,7 +625,9 @@ cl_m6809::disass(t_addr addr)
 		    i16= rom->get(addr++)*256;
 		    i16+= rom->get(addr++);
 		  }
-		work.appendf("0x%04x", addr+i16);
+		i16= (i16 + addr) & 0xffff;
+		work.appendf("0x%04x", i16);
+		addr_name(i16, rom, &work);
 		break;
 	      }
 	    case 'p': case 'P':
@@ -659,6 +663,7 @@ cl_m6809::disass(t_addr addr)
 		op16= op16*256 + rom->get(addr++);
 	      op16= (addr + op16)&0xffff;
 	      work.appendf("0x%04x", op16);
+	      addr_name(op16, rom, &work);
 	      break;
 	    }
 	}

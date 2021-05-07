@@ -49,9 +49,9 @@ class cl_cvar: public cl_base
   cl_cvar(chars iname, class cl_memory_cell *icell, chars adesc, int ibitnr_high= -1, int ibitnr_low= -1);
   virtual int init(void);
   virtual class cl_memory_cell *get_cell(void) const { return cell; }
-  virtual class cl_memory *get_mem() { return NULL; }
-  virtual t_addr get_addr() { return 0; }
-  virtual bool is_mem_var() { return false; }
+  virtual class cl_memory *get_mem() const { return NULL; }
+  virtual t_addr get_addr() const { return 0; }
+  virtual bool is_mem_var() const { return false; }
 
   virtual t_mem write(t_mem val);
   virtual t_mem read();
@@ -68,9 +68,9 @@ protected:
 public:
   cl_var(chars iname, class cl_memory *imem, t_addr iaddr, chars adesc, int ibitnr_high= -1, int ibitnr_low= -1);
   virtual int init(void);
-  virtual class cl_memory *get_mem() { return mem; }
-  virtual t_addr get_addr() { return addr; }
-  virtual bool is_mem_var() { return true; }
+  virtual class cl_memory *get_mem() const { return mem; }
+  virtual t_addr get_addr() const { return addr; }
+  virtual bool is_mem_var() const { return true; }
 
   virtual void print_info(cl_console_base *con) const;
 };
@@ -109,11 +109,11 @@ class cl_var_by_addr_list: public cl_sorted_list
   bool search(class cl_memory *mem, t_addr addr, t_index &index);
   bool search(class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low, t_index &index);
 
+  int compare(const void *key1, const void *key2);
+
  private:
   int compare_addr(class cl_var *var, class cl_memory *mem, t_addr addr);
   int compare_addr_and_bits(class cl_var *var, class cl_memory *mem, t_addr addr, int bitnr_high, int bitnr_low);
-
-  virtual int compare(const void *key1, const void *key2);
 };
 
 struct var_def {
@@ -174,6 +174,19 @@ class cl_var_list: public cl_base
 
 };
 
+class cl_vars_iterator {
+  private:
+    cl_var_list *vars;
+    cl_memory *space_mem, *chip_mem;
+    t_addr space_addr, chip_addr;
+    t_index space_i, chip_i;
+
+  public:
+    cl_vars_iterator(cl_var_list *vars) { this->vars = vars; };
+
+    const cl_var *first(cl_memory *mem, t_addr addr);
+    const cl_var *next(void);
+};
 
 #endif
 

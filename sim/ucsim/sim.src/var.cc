@@ -432,4 +432,80 @@ cl_var_list::read(chars name)
   return 0;
 }
 
+const cl_var *
+cl_vars_iterator::first(cl_memory *mem, t_addr addr)
+{
+  const cl_var *space_var = NULL;
+  space_mem = mem;
+  space_addr = addr;
+
+
+  if (vars->by_addr.search(space_mem, space_addr, space_i))
+    space_var = vars->by_addr.at(space_i);
+
+  const cl_var *chip_var = NULL;
+  chip_mem = NULL;
+
+  cl_address_decoder *ad;
+  if (space_mem->is_address_space() &&
+      (ad = ((cl_address_space *)space_mem)->get_decoder_of(space_addr)))
+    {
+      chip_mem = ad->memchip;
+      chip_addr = ad->as_to_chip(space_addr);
+
+      if (vars->by_addr.search(chip_mem, chip_addr, chip_i))
+        chip_var = vars->by_addr.at(chip_i);
+    }
+
+  if (chip_var && (!space_var || vars->by_addr.compare(chip_var, space_var) < 0))
+    {
+      chip_i++;
+      return chip_var;
+    }
+
+  space_i++;
+  return space_var;
+}
+
+const cl_var *
+cl_vars_iterator::next(void)
+{
+  const cl_var *space_var = NULL;
+  const cl_var *chip_var = NULL;
+
+  if (space_i >= 0 && space_i < vars->by_addr.count)
+    {
+      space_var = vars->by_addr.at(space_i);
+      if (space_var->get_mem() != space_mem || space_var->get_addr() != space_addr)
+        {
+          space_i = -1;
+          space_var = NULL;
+        }
+    }
+
+  if (chip_i >= 0 && chip_i < vars->by_addr.count)
+    {
+      chip_var = vars->by_addr.at(chip_i);
+      if (chip_var->get_mem() != chip_mem || chip_var->get_addr() != chip_addr)
+        {
+          chip_i = -1;
+          chip_var = NULL;
+        }
+    }
+
+  if (chip_var && (!space_var || vars->by_addr.compare(chip_var, space_var) < 0))
+    {
+      chip_i++;
+      return chip_var;
+    }
+
+  if (space_var)
+    {
+      space_i++;
+      return space_var;
+    }
+
+  return NULL;
+}
+
 /* End of sim.src/var.cc */

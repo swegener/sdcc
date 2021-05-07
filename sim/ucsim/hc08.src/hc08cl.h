@@ -40,9 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_hc08: public cl_uc
 {
 public:
-  class cl_memory *ram;
-  class cl_memory *rom;
-  class cl_address_space *regs8, *regs16;
+  class cl_address_space *ram, *regs8, *regs16;
   struct t_regs regs;
   t_addr sp_limit;
 public:

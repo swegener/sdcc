@@ -5928,8 +5928,8 @@ genEndFunction (iCode *ic)
             }
 
           adjustStack (stackparmbytes,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type) < 0),
-          !aopRet (sym->type) || aopRet (sym->type) < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
           false,
           !IY_RESERVED);
           emit2 ("ret");

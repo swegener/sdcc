@@ -1,4 +1,9 @@
-2021-05-06 Philipp Klaus Krause <pkk AT spth.de>
+2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a bug in handling of return values in bc.
+
+2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.h,
 	  src/stm8/gen.c,

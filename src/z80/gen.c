@@ -6037,7 +6037,8 @@ genRet (const iCode *ic)
   if (size <= 4)
     {
       /* TODO: get this working with floats */
-      if (IC_LEFT (ic)->aop->type == AOP_LIT && size == 4 && !IS_FLOAT (IC_LEFT (ic)->aop->aopu.aop_lit->type))
+      if (IC_LEFT (ic)->aop->type == AOP_LIT && size == 4 && !IS_FLOAT (IC_LEFT (ic)->aop->aopu.aop_lit->type) &&
+        (aopRet (currFunc->type) == ASMOP_DEHL || aopRet (currFunc->type) == ASMOP_HLDE))
         {
           /* if we have to use two register pairs
              we can reuse values, this is also a prototype
@@ -6057,7 +6058,7 @@ genRet (const iCode *ic)
           lit>>=8;
           value[3] = lit&0xff;
 
-          if(IS_GB)
+          if(aopRet (currFunc->type) == ASMOP_HLDE)
             {
               regpairs[0] = PAIR_DE;
               regpairs[1] = PAIR_HL;
@@ -6114,41 +6115,8 @@ genRet (const iCode *ic)
               fetchPairLong (regpairs[1], IC_LEFT (ic)->aop, 0, offset[1]);
             }
         }
-      else if ((IC_LEFT (ic)->aop->type == AOP_REG || IC_LEFT (ic)->aop->type == AOP_STK || IC_LEFT (ic)->aop->type == AOP_LIT || size <= 2) && size > 0 /* SDCC supports GCC extension of returning void */)
+      else if (size > 0) // SDCC supports GCC extension of returning void
         genMove (aopRet (currFunc->type), IC_LEFT (ic)->aop, true, true, true);
-      else  if (IS_GB && size == 4 && requiresHL (IC_LEFT (ic)->aop) && aopInReg (aopRet (currFunc->type), 0, DE_IDX) && aopInReg (aopRet (currFunc->type), 2, HL_IDX))
-        {
-          fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 0);
-          fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 2);
-        }
-      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY) && aopInReg (aopRet (currFunc->type), 0, HL_IDX) && aopInReg (aopRet (currFunc->type), 2, DE_IDX)) // Use ld rr, (nn)
-        {
-          fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 2);
-          fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 0);
-        }
-      else
-        {
-          bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.
-          for (offset = 0; offset < size; offset++)
-            {
-              if (requiresHL (IC_LEFT (ic)->aop) && (aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == H_IDX || aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == L_IDX))
-                {
-                  skipbytes[offset] = true;
-                  continue;
-                }
-              cheapMove (aopRet (currFunc->type), offset, IC_LEFT (ic)->aop, offset, true);
-            }
-          for (offset = 0; offset < size; offset++)
-            if (skipbytes[offset] && offset + 1 < size && aopRet (currFunc->type)->aopu.aop_reg[offset]->rIdx == L_IDX && aopRet (currFunc->type)->aopu.aop_reg[offset + 1]->rIdx == H_IDX)
-              {
-                fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, offset);
-                break;
-              }
-            else if (skipbytes[offset])
-              {
-                cheapMove (aopRet (currFunc->type), offset, IC_LEFT (ic)->aop, offset, true);
-              }
-        }
     }
   else if (IC_LEFT (ic)->aop->type == AOP_LIT)
     {
@@ -13693,7 +13661,7 @@ genCast (const iCode *ic)
   operand *result = IC_RESULT (ic);
   sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
-  int size, offset;
+  int size;
   bool surviving_a = !isRegDead (A_IDX, ic);
   bool pushed_a = FALSE;
 
@@ -13733,26 +13701,30 @@ genCast (const iCode *ic)
       goto release;
     }
 
-  /* So we now know that the size of destination is greater
-     than the size of the source */
-  genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, !surviving_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+  // Now we know that the size of destination is greater than the size of the source
 
   /* now depending on the sign of the destination */
   size = result->aop->size - right->aop->size;
-  offset = right->aop->size - 1;
+  
   /* Unsigned or not an integral type - fill with zeros */
   if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype) || right->aop->type == AOP_CRY)
     {
-      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
-      cheapMove (result->aop, offset, right->aop, offset, !surviving_a);
-      offset++;
-      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
-      bool hl_dead = isPairDead (PAIR_HL, ic) && (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= offset) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= offset);
-      bool de_dead = isPairDead (PAIR_DE, ic) && (result->aop->regs[E_IDX] < 0 || result->aop->regs[E_IDX] >= offset) && (result->aop->regs[D_IDX] < 0 || result->aop->regs[D_IDX] >= offset);
-      genMove_o (result->aop, offset, ASMOP_ZERO, 0, size, !surviving_a, hl_dead, de_dead, true);
+      genMove_o (result->aop, 0, right->aop, 0, right->aop->size, !surviving_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+      surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < right->aop->size);
+      bool hl_dead = isPairDead (PAIR_HL, ic) && (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= right->aop->size) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= right->aop->size);
+      bool de_dead = isPairDead (PAIR_DE, ic) && (result->aop->regs[E_IDX] < 0 || result->aop->regs[E_IDX] >= right->aop->size) && (result->aop->regs[D_IDX] < 0 || result->aop->regs[D_IDX] >= right->aop->size);
+      genMove_o (result->aop, right->aop->size, ASMOP_ZERO, 0, size, !surviving_a, hl_dead, de_dead, true);
     }
   else
     {
+      genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, !surviving_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+      if (result->aop->type == AOP_REG && right->aop->type == AOP_REG && // Overwritten last byte of right operand
+        result->aop->regs[right->aop->aopu.aop_reg[right->aop->size - 1]->rIdx] > 0 && result->aop->regs[right->aop->aopu.aop_reg[right->aop->size - 1]->rIdx] < right->aop->size - 1)
+        {
+          wassert (regalloc_dry_run);
+          regalloc_dry_run_cost += 100;
+        }
+      int offset = right->aop->size - 1;
       surviving_a |= (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset);
       if (surviving_a && !pushed_a)
         _push (PAIR_AF), pushed_a = true;

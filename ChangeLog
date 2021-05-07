@@ -1,6 +1,11 @@
 2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Fix some bugs triggered by return values in other than the conventional registers.
+
+2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix a bug in handling of return values in bc.
 	* device/lib/clean.mk:
 	  Fix clean for r2ka library.

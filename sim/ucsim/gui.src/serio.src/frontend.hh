@@ -56,7 +56,7 @@ private:
   unsigned int ocnt, icnt;
   int line_length;
   
-  uint8_t ohex_buf[16], ihex_buf[16];
+  unsigned char ohex_buf[16], ihex_buf[16];
   int ohex_ptr, ihex_ptr, ihex_high, ihex_val;
 };
 

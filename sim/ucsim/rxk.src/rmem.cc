@@ -60,31 +60,68 @@ cl_ras::log2phy(t_addr log)
 t_mem
 cl_ras::read(t_addr addr)
 {
-  return chip->read(log2phy(addr));
+  if (addr >= size)
+    {
+      err_inv_addr(addr);
+      return dummy->read();
+    }
+  t_addr ph= log2phy(addr);
+  void *slot= chip->get_slot(ph);
+  cella[addr].decode(slot);
+  return cella[addr].read();
 }
 
 t_mem
 cl_ras::get(t_addr addr)
 {
-  return chip->get(log2phy(addr));
+  if (addr >= size)
+    {
+      err_inv_addr(addr);
+      return dummy->get();
+    }
+  t_addr ph= log2phy(addr);
+  void *slot= chip->get_slot(ph);
+  cella[addr].decode(slot);
+  return cella[addr].get();
 }
 
 t_mem
 cl_ras::write(t_addr addr, t_mem val)
 {
-  return chip->write(log2phy(addr), val);
+  if (addr >= size)
+    {
+      err_inv_addr(addr);
+      return dummy->write(val);
+    }
+  t_addr ph= log2phy(addr);
+  void *slot= chip->get_slot(ph);
+  cella[addr].decode(slot);
+  return cella[addr].write(val);
 }
 
 void
 cl_ras::set(t_addr addr, t_mem val)
 {
-  chip->set(log2phy(addr), val);
+  if (addr >= size)
+    {
+      err_inv_addr(addr);
+      dummy->set(val);
+    }
+  t_addr ph= log2phy(addr);
+  void *slot= chip->get_slot(ph);
+  cella[addr].decode(slot);
+  cella[addr].set(val);
 }
 
 void
 cl_ras::download(t_addr addr, t_mem val)
 {
-  chip->set(log2phy(addr), val);
+  if (addr >= chip->get_size())
+    {
+      err_inv_addr(addr);
+      dummy->set(val);
+    }
+  chip->set(addr, val);
 }
 
 

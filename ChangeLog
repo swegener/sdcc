@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix a bug in handling of return values in bc.
+	* device/lib/clean.mk:
+	  Fix clean for r2ka library.
 
 2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3792,8 +3792,9 @@ genEndFunction (iCode *ic)
         debugFile->writeEndFunction (currFunc, ic, 0);
       return;
   }
-  
-  int stackparmbytes = 0;
+
+  const bool bigreturn = (getSize (sym->type->next) > 4) || IS_STRUCT (sym->type->next);
+  int stackparmbytes = bigreturn * 2;
   for (value *arg = FUNC_ARGS(sym->type); arg; arg = arg->next)
     {
       wassert (arg->sym);

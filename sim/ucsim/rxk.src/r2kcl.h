@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (imove.cc)
+ * Simulator of microcontrollers (r2kcl.h)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -23,27 +23,22 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
+/*@1@*/
+
+#ifndef R2KCL_HEADER
+#define R2KCL_HEADER
 
 #include "rxkcl.h"
 
 
-int
-cl_rxk::ld_dd_mn(class cl_cell16 &dd)
+class cl_r2k: public cl_rxk
 {
-  u8_t l, h;
-  l= fetch();
-  h= fetch();
-  dd.W(h*256+l);
-  tick(4);
-  return resGO;
-}
+ public:
+  cl_r2k(class cl_sim *asim);
+  virtual const char *id_string(void);
+};
 
-int
-cl_rxk::ld_r_n(class cl_cell8 &r)
-{
-  r.W(fetch());
-  tick(3);
-  return resGO;
-}
 
-/* End of rxk.src/imove.cc */
+#endif
+
+/* End of rxk.src/r2kcl.h */

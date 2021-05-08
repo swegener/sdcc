@@ -28,21 +28,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 int
-cl_rxk::INC_BC(t_mem code)
+cl_rxk::inc_ss(class cl_cell16 &rp, u16_t op)
 {
-  class cl_cell16 &rp= destBC();
-  rp.W(rBC+1);
+  rp.W(op+1);
   tick(1);
   return resGO;
 }
 
 int
-cl_rxk::INC_B(t_mem code)
+cl_rxk::inc_r(class cl_cell8 &cr, u8_t op)
 {
-  class cl_cell8 &rb= destB(), &rf= destF();
+  class cl_cell8 &rf= destF();
   u8_t r, f= rF & ~(flagS|flagZ|flagV), na7, r7;
-  na7= (rB&0x80)^0x80;
-  rb.W(r= rB+1);
+  na7= (op&0x80)^0x80;
+  cr.W(r= op+1);
   r7= r&0x80;
   if (r & 0x80) f|= flagS;
   if (!r) f|= flagZ;
@@ -53,17 +52,36 @@ cl_rxk::INC_B(t_mem code)
 }
 
 int
-cl_rxk::DEC_B(t_mem code)
+cl_rxk::dec_ss(class cl_cell16 &rp, u16_t op)
 {
-  class cl_cell8 &rb= destB(), &rf= destF();
+  rp.W(op-1);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::dec_r(class cl_cell8 &cr, u8_t op)
+{
+  class cl_cell8 &rf= destF();
   u8_t r, f= rF & ~(flagS|flagZ|flagV), a7, nr7;
-  a7= rB&0x80;
-  rb.W(r= rB-1);
+  a7= op&0x80;
+  cr.W(r= op-1);
   nr7= (r&0x80)^0x80;
   if (r & 0x80) f|= flagS;
   if (!r) f|= flagZ;
   if (a7 & nr7) f|= flagV;
   rf.W(f);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::RLCA(t_mem code)
+{
+  class cl_cell8 &a= destA(), &f= destF();
+  u8_t a7= rA&0x80;
+  a.W((rA<<1) | (a7?1:0));
+  f.W((rF & ~flagC) | (a7?flagC:0));
   tick(1);
   return resGO;
 }

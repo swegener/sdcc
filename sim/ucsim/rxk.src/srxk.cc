@@ -36,7 +36,8 @@ int
 main(int argc, char *argv[])
 {
   class cl_sim *sim;
-  
+
+  cpus= cpus_rxk;
   application= new cl_app();
   application->set_name("srxk");
   application->init(argc, argv);

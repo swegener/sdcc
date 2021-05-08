@@ -50,7 +50,8 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= simrxk.o rxk.o glob.o rmem.o \
-		  inst.o ialu.o ibranch.o imove.o
+		  inst.o ialu.o ibranch.o imove.o \
+		  r2k.o r3k.o r3ka.o r4k.o r5k.o r6k.o
 
 OBJECTS_EXE	= srxk.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (imove.cc)
+ * Simulator of microcontrollers (r3k.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -23,27 +23,21 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
+/*@1@*/
 
-#include "rxkcl.h"
+#include "r3kcl.h"
 
 
-int
-cl_rxk::ld_dd_mn(class cl_cell16 &dd)
+cl_r3k::cl_r3k(class cl_sim *asim):
+  cl_r2k(asim)
 {
-  u8_t l, h;
-  l= fetch();
-  h= fetch();
-  dd.W(h*256+l);
-  tick(4);
-  return resGO;
 }
 
-int
-cl_rxk::ld_r_n(class cl_cell8 &r)
+const char *
+cl_r3k::id_string(void)
 {
-  r.W(fetch());
-  tick(3);
-  return resGO;
+  return "R3K";
 }
 
-/* End of rxk.src/imove.cc */
+
+/* End of rxk.src/r3k.cc */

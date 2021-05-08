@@ -31,11 +31,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "simcl.h"
 
 
+extern struct cpu_entry cpus_rxk[];
+
 class cl_simrxk: public cl_sim
 {
 public:
   cl_simrxk(class cl_app *the_app);
-
   virtual class cl_uc *mk_controller(void);
 };
 

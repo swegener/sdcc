@@ -1,3 +1,9 @@
+2021-05-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3230.c:
+	  Fix bug #3230.
+
 2021-05-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

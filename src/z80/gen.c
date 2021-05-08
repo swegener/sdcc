@@ -5804,7 +5804,7 @@ genEndFunction (iCode *ic)
     {
       wassert (arg->sym);
       int argsize = getSize (arg->sym->type);
-      if (FUNC_ISSMALLC (sym->type)) // SmallC calling convention passes 8-bit stack arguments as 16 bit.
+      if (argsize == 1 && FUNC_ISSMALLC (sym->type)) // SmallC calling convention passes 8-bit stack arguments as 16 bit.
         argsize++;
       if (!SPEC_REGPARM (arg->etype))
         stackparmbytes += argsize;

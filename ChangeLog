@@ -1,5 +1,10 @@
 2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
+	* doc/sdccman.lyx:
+	  Put all the documentation required by Annex J.3, "Implementation-defined behaviour", of the C standard in one place.
+
+2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/stm8/gen.c:
 	  Improve stack adjustment.

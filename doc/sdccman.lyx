@@ -9647,6 +9647,256 @@ SDCC supports named address spaces.
  Other parts of the standard are not supported.
 \end_layout
 
+\begin_layout Subsection
+Implementation-defined behaviour
+\end_layout
+
+\begin_layout Subsubsection
+Translation
+\end_layout
+
+\begin_layout Itemize
+Diagnostics are output to stderr, in the format <filename>:<line-number>:
+ <warning|error> <diagnostic-number>: <diagnostic-description>
+\end_layout
+
+\begin_layout Itemize
+Nonempty sequences of white-space are retained in translation phase 3.
+\end_layout
+
+\begin_layout Subsubsection
+Environment
+\end_layout
+
+\begin_layout Itemize
+See SDCC source (and your own code if you use a custom crt0 for a target
+ that supports it) for any information on the envrionment.
+\end_layout
+
+\begin_layout Subsubsection
+Identifiers
+\end_layout
+
+\begin_layout Itemize
+See the compiler and assembler source for information on characters that
+ may appear in identifiers and on the number of significant inital characters.
+\end_layout
+
+\begin_layout Subsubsection
+Characters
+\end_layout
+
+\begin_layout Itemize
+There are 8 bits in a byte.
+\end_layout
+
+\begin_layout Itemize
+Values of members of the execution character set: TODO.
+\end_layout
+
+\begin_layout Itemize
+Values of members of the execution character set for escape sequences: TODO.
+\end_layout
+
+\begin_layout Itemize
+Value of char with something weird stored in it: TODO.
+\end_layout
+
+\begin_layout Itemize
+unsigned char has the same range, representation and behaviour as 
+\begin_inset Quotes sld
+\end_inset
+
+plain
+\begin_inset Quotes srd
+\end_inset
+
+ char.
+\end_layout
+
+\begin_layout Itemize
+See the SDCC source for further information on character sets.
+\end_layout
+
+\begin_layout Subsubsection
+Integers
+\end_layout
+
+\begin_layout Itemize
+There are no extended integer types.
+\end_layout
+
+\begin_layout Subsubsection
+Floating point
+\end_layout
+
+\begin_layout Itemize
+See the implementation (soft float library) for any information on floating
+ point.
+\end_layout
+
+\begin_layout Subsubsection
+Arrays and Pointers
+\end_layout
+
+\begin_layout Itemize
+For the result of converting between pointers and integers see the SDCC
+ source code.
+\end_layout
+
+\begin_layout Itemize
+For the size of the result of subtracting two pointers to elements of the
+ same array see the SDCC source code.
+\end_layout
+
+\begin_layout Subsubsection
+Hints
+\end_layout
+
+\begin_layout Itemize
+The extend to which suggestions made by register are effective depends on
+ the target.
+\end_layout
+
+\begin_layout Itemize
+SDCC will inline functions if and only if they are declared using inline
+ and do not have variable arguments.
+\end_layout
+
+\begin_layout Subsubsection
+Structures, unions, enumerations and bit-fields
+\end_layout
+
+\begin_layout Itemize
+A plain int bit-field is treated as an unsigned int bit-field.
+\end_layout
+
+\begin_layout Itemize
+There are no allowed bit-field types other than _Bool, signed int and unsigned
+ int.
+\end_layout
+
+\begin_layout Itemize
+Atomic types are not permitted for bit-fields.
+\end_layout
+
+\begin_layout Itemize
+If a bit-fields does not fit into the same byte as the previous bit-fields,
+ it starts on the next byte.
+\end_layout
+
+\begin_layout Itemize
+bit-fields are allocated in the same order as they appear in the source.
+\end_layout
+
+\begin_layout Itemize
+Non-bit-field members of structures are aligned on byte boundaries (i.e.
+ there are no padding bytes).
+\end_layout
+
+\begin_layout Itemize
+For the integer types compatible with enum types see the SDCC source code.
+\end_layout
+
+\begin_layout Subsubsection
+Qualifiers
+\end_layout
+
+\begin_layout Itemize
+SDCC shall preserve all volatile reads and writes, but doesn not guarantee
+ them to be atomic (except for atomic types and volatile sig_atomic_t).
+\end_layout
+
+\begin_layout Subsubsection
+Preprocessing directives
+\end_layout
+
+\begin_layout Itemize
+See the preprocessor source for information on preprocessing directives.
+\end_layout
+
+\begin_layout Subsubsection
+Library functions
+\end_layout
+
+\begin_layout Itemize
+See the respective library headers for the library functions available.
+\end_layout
+
+\begin_layout Itemize
+See assert.h and library source for the format of the diagnostic printed
+ by the assert macro.
+\end_layout
+
+\begin_layout Itemize
+There is no fegetexceptflag function.
+\end_layout
+
+\begin_layout Itemize
+There is no feraiseexcept function.
+\end_layout
+
+\begin_layout Itemize
+There is no setlocale function.
+\end_layout
+
+\begin_layout Itemize
+There is no FLT_EVAL_METHOD macro.
+\end_layout
+
+\begin_layout Itemize
+There is no DEC_EVAL_METHOD macro.
+\end_layout
+
+\begin_layout Itemize
+There are no non-required domain errors for mathematics functions.
+\end_layout
+
+\begin_layout Itemize
+See library source for the values returned by mathematical functions on
+ domain error and pole error (and anything else on mathematical functions
+ and floating type encodings).
+\end_layout
+
+\begin_layout Itemize
+See library headers for the null-pointer constant to which NUL expands.
+\end_layout
+
+\begin_layout Itemize
+See library headers and source for anything else about the library.
+\end_layout
+
+\begin_layout Subsubsection
+Architecture
+\end_layout
+
+\begin_layout Itemize
+See the respective library headers for the values or expressions for macros
+ specified in float.h, limits.h, stdint.h.
+\end_layout
+
+\begin_layout Itemize
+Multithreading is not supported.
+\end_layout
+
+\begin_layout Itemize
+The number of bytes in any object is the minimum allowed (except for some
+ padding bits on bit-fields), byte order depends on the target.
+\end_layout
+
+\begin_layout Itemize
+No extended alignments are supported.
+\end_layout
+
+\begin_layout Itemize
+There are no valid alignments other than those returned by _Alingof.
+\end_layout
+
+\begin_layout Itemize
+sizeof always returns the smalles value allowed assuming an 8-bit char.
+ _Alignof always returns 0.
+\end_layout
+
 \begin_layout Section
 Compiling
 \end_layout

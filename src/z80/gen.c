@@ -5810,7 +5810,15 @@ genEndFunction (iCode *ic)
         stackparmbytes += argsize;
     }
 
-  if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
+  int poststackadjust = IFFUNC_ISZ88DK_CALLEE(sym->type) ? stackparmbytes : 0;
+  /*if (poststackadjust && // Try to merge both stack adjustments. Would require picking return address from stack., e.g via Rabbit ld hl d(sp).
+    _G.omitFramePtr &&
+    !_G.calleeSaves.pushedDE && !_G.calleeSaves.pushedBC &&
+    !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCRITICAL (sym->type))
+    {
+      poststackadjust += _G.stack.offset;
+    }
+  else*/ if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
     {
       emit2 ("ld sp, ix");
       cost2 (2, 10, 7, 4, 0, 6, 2);
@@ -5846,98 +5854,6 @@ genEndFunction (iCode *ic)
   if (options.profile)
     {
       emit2 ("!profileexit");
-    }
-
-  if (IFFUNC_ISZ88DK_CALLEE(sym->type) && stackparmbytes)
-    {
-      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
-      wassertl(regalloc_dry_run || !IFFUNC_ISBANKEDCALL (sym->type), "Unimplemented __banked __z88dk_callee support on callee side");
-
-      if (!aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0 )
-        {
-          _pop (PAIR_HL);
-          adjustStack (stackparmbytes,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-          false,
-          !IY_RESERVED);
-          emit2 ("jp (hl)");
-          regalloc_dry_run_cost += 2;
-        }
-      else if (!IS_GB && !IY_RESERVED)
-        {
-          _pop (PAIR_IY);
-          adjustStack (stackparmbytes,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-          !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
-          false);
-          emit2 ("jp (iy)");
-          regalloc_dry_run_cost += 2;
-        }
-      else // Do it the hard way: Copy return address on stack before stack pointer adjustment.
-        {
-          if (stackparmbytes == 1)
-            {
-              wassert (stackparmbytes == 1);
-              emit2 ("push hl");
-              emit2 ("push de");
-              emit2 ("ld hl, !immedword", 4);
-              emit2 ("add hl, sp");
-              emit2 ("ld e, (hl)");
-              emit2 ("inc hl");
-              emit2 ("ld d, (hl)");
-              emit2 ("ld (hl), e");
-              emit2 ("inc hl");
-              emit2 ("ld (hl), d");
-              emit2 ("pop de");
-              emit2 ("pop hl");
-              regalloc_dry_run_cost += 14;
-            }
-          else if (IS_GB)
-            {
-              emit2 ("push hl");
-              emit2 ("push de");
-              emit2 ("!ldahlsp", 4);
-              emit2 ("ld e, (hl)");
-              emit2 ("inc hl");
-              emit2 ("ld d, (hl)");
-              emit2 ("ld hl, !immedword", 4 + stackparmbytes);
-              emit2 ("add hl, sp");
-              emit2 ("ld (hl), e");
-              emit2 ("inc hl");
-              emit2 ("ld (hl), d");
-              emit2 ("pop de");
-              emit2 ("pop hl");
-              regalloc_dry_run_cost += 16;
-            }
-          else
-            {
-              wassert (!IS_GB);
-              wassert (stackparmbytes != 1); // Avoid overwriting return address and hl.
-              emit2 ("ex (sp), hl");
-              emit2 ("push de");
-              emit2 ("ex de, hl");
-              emit2 ("ld hl, !immedword", 2 + stackparmbytes);
-              emit2 ("add hl, sp");
-              emit2 ("ld (hl), e");
-              emit2 ("inc hl");
-              emit2 ("ld (hl), d");
-              emit2 ("pop de");
-              emit2 ("ex (sp), hl");
-              regalloc_dry_run_cost += 12;
-            }
-
-          adjustStack (stackparmbytes,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-          false,
-          !IY_RESERVED);
-          emit2 ("ret");
-          regalloc_dry_run_cost++;
-        }
-        
-      goto done;
     }
 
   /* if this is an interrupt service routine
@@ -5977,6 +5893,98 @@ genEndFunction (iCode *ic)
               genLine.lineCurr->isLabel = 1;
             }
         }
+    }
+
+  if (poststackadjust)
+    {
+      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
+      wassertl(regalloc_dry_run || !IFFUNC_ISBANKEDCALL (sym->type), "Unimplemented __banked __z88dk_callee support on callee side");
+      wassertl(regalloc_dry_run || !IFFUNC_HASVARARGS (sym->type), "__z88dk_callee function may to have variable arguments");
+
+      if (!aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0 )
+        {
+          _pop (PAIR_HL);
+          adjustStack (poststackadjust,
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          false,
+          !IY_RESERVED);
+          emit2 ("jp (hl)");
+          regalloc_dry_run_cost += 2;
+        }
+      else if (!IS_GB && !IY_RESERVED)
+        {
+          _pop (PAIR_IY);
+          adjustStack (poststackadjust,
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
+          false);
+          emit2 ("jp (iy)");
+          regalloc_dry_run_cost += 2;
+        }
+      else // Do it the hard way: Copy return address on stack before stack pointer adjustment.
+        {
+          if (poststackadjust == 1)
+            {
+              emit2 ("push hl");
+              emit2 ("push de");
+              emit2 ("ld hl, !immedword", 4);
+              emit2 ("add hl, sp");
+              emit2 ("ld e, (hl)");
+              emit2 ("inc hl");
+              emit2 ("ld d, (hl)");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("pop hl");
+              regalloc_dry_run_cost += 14;
+            }
+          else if (IS_GB)
+            {
+              emit2 ("push hl");
+              emit2 ("push de");
+              emit2 ("!ldahlsp", 4);
+              emit2 ("ld e, (hl)");
+              emit2 ("inc hl");
+              emit2 ("ld d, (hl)");
+              emit2 ("ld hl, !immedword", 4 +  poststackadjust);
+              emit2 ("add hl, sp");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("pop hl");
+              regalloc_dry_run_cost += 16;
+            }
+          else
+            {
+              wassert (!IS_GB);
+              wassert (stackparmbytes != 1); // Avoid overwriting return address and hl.
+              emit2 ("ex (sp), hl");
+              emit2 ("push de");
+              emit2 ("ex de, hl");
+              emit2 ("ld hl, !immedword", 2 +  poststackadjust);
+              emit2 ("add hl, sp");
+              emit2 ("ld (hl), e");
+              emit2 ("inc hl");
+              emit2 ("ld (hl), d");
+              emit2 ("pop de");
+              emit2 ("ex (sp), hl");
+              regalloc_dry_run_cost += 12;
+            }
+
+          adjustStack ( poststackadjust,
+          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
+          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          false,
+          !IY_RESERVED);
+          emit2 ("ret");
+          regalloc_dry_run_cost++;
+        }
+        
+      goto done;
     }
 
   if (options.debug && currFunc)

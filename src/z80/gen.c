@@ -4159,38 +4159,88 @@ getDataSize (operand * op)
 /* adjustStack - Adjust the stack pointer by n bytes.                       */
 /*--------------------------------------------------------------------------*/
 static void
-adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
+adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool iy_free)
 {
   if(n != 0)
     emitDebug("; adjustStack by %d", n);
   _G.stack.pushed -= n;
 
-  if (IS_TLCS90 && abs(n) > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) * 2: 1))
+  int loop_bytes, loop_cycles;
+  if (abs(n) > 0 && (IS_RAB || IS_GB)) // Assume sequence of add sp, #d
+    {
+      loop_bytes = (abs(n) / 127 + 1) * 2;
+      loop_cycles = (abs(n) / 127 + 1) * (IS_RAB ? 4 : 16);
+    }
+  else if (n > 0 && (IS_Z80 || IS_Z80N || optimize.codeSize) && // Assume sequence of pop rr
+    (!IS_TLCS90 && af_free || bc_free || de_free || hl_free || IS_TLCS90 && iy_free)) 
+    {
+      loop_bytes = n / 2 + n % 2;
+      if (IS_RAB)
+        loop_cycles = n / 2 * 7 + n % 2 * 2;
+      else if (IS_GB)
+        loop_cycles = n / 2 * 12 + n % 2 * 8;
+      else // Z80
+        loop_cycles = n / 2 * 10 + n % 2 * 6;
+    }
+  else // Assume sequence of inc / dec sp
+    {
+      loop_bytes = abs(n);
+      if (IS_RAB)
+        loop_cycles = abs(n) * 2;
+      else if (IS_GB)
+        loop_cycles = abs(n) * 8;
+      else // Z80
+        loop_cycles = abs(n) * 6;
+    }
+
+  if (IS_TLCS90 && abs(n) > (optimize.codeSize ? 2 + (bc_free || de_free || hl_free || iy_free || n < 0) * 2 : 1))
     {
       emit2 ("add sp, !immed%d", n);
       cost (3, 6);
       n -= n;
     }
-  else if (abs(n) > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : (optimize.codeSize ? 8 : 5)) && hl_free)
+  else if ((optimize.codeSpeed ?
+    (loop_cycles >= (IS_RAB ? 10 : IS_GB ? 28 : 27)) :
+    (loop_bytes >= 5)) &&
+    hl_free)
     {
-      spillCached ();
       emit2 ("ld hl, !immed%d", n);
       emit2 ("add hl, sp");
       emit2 ("ld sp, hl");
+      spillPair (PAIR_HL);
       cost2 (5, 27, 20, 10, 28, 18, 4);
       regalloc_dry_run_cost += 5;
       n -= n;
     }
-  else if (!IS_GB && abs(n) > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : 8) && iy_free)
+  else if ((optimize.codeSpeed ?
+    (loop_cycles >= (IS_RAB ? 14 : 35)) :
+    (loop_bytes >= 7)) &&
+    hl_free)
     {
-      spillCached ();
+      emit2 ("ex de, hl");
+      emit2 ("ld hl, !immed%d", n);
+      emit2 ("add hl, sp");
+      emit2 ("ld sp, hl");
+      emit2 ("ex de, hl");
+      spillPair (PAIR_DE);
+      cost2 (7, 35, 26, 14, 0, 22, 6);
+      regalloc_dry_run_cost += 5;
+      n -= n;
+    }
+  else if ((optimize.codeSpeed ?
+    (loop_cycles >= (IS_RAB ? 16 : 39)) :
+    (loop_bytes >= (IS_TLCS90 ? 7 : 8))) &&
+    iy_free)
+    {
       emit2 ("ld iy, !immed%d", n);
       emit2 ("add iy, sp");
       emit2 ("ld sp, iy");
+      spillPair (PAIR_IY);
+      cost2 (IS_TLCS90 ? 7 : 8, 39, 26, 16, 0, 20, 8);
       regalloc_dry_run_cost += 8;
       n -= n;
     }
-  else if (abs(n) > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : 8) && bc_free)
+  else if (loop_bytes >= 9 && bc_free)
     {
       emit2 ("ld c, l");
       emit2 ("ld b, h");
@@ -4219,7 +4269,8 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
           n -= d;
         }
       // on sm83 pop is smaller and faster, but that makes detection of unitialized memory harder
-      else if (!IS_GB && n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+      // On TLCS-90 pop af messes up interrupts (unless we have a valid value for f on the stack from previous push af).
+      else if (!IS_GB && !IS_TLCS90 && n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop af");
           cost2 (1, 10, 9, 7, 12, 10, 3);
@@ -4234,6 +4285,12 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
       else if (!IS_GB && n >= 2 && bc_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop bc");
+          cost2 (1, 10, 9, 7, 12, 10, 3);
+          n -= 2;
+        }
+      else if (!IS_GB && n >= 2 && de_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
+        {
+          emit2 ("pop de");
           cost2 (1, 10, 9, 7, 12, 10, 3);
           n -= 2;
         }
@@ -5383,7 +5440,7 @@ genCall (const iCode *ic)
 
       if (isLitWord (IC_LEFT (ic)->aop))
         {
-          adjustStack (prestackadjust, false, false, false, false);
+          adjustStack (prestackadjust, false, false, false, false, false);
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
@@ -5391,7 +5448,7 @@ genCall (const iCode *ic)
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, false, false, false);
+          adjustStack (prestackadjust, false, false, false, false, false);
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           regalloc_dry_run_cost += 3;
         }
@@ -5399,7 +5456,7 @@ genCall (const iCode *ic)
         {
           spillPair (PAIR_IY);
           fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, false, false, false);
+          adjustStack (prestackadjust, false, false, false, false, false);
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;
         }
@@ -5467,7 +5524,7 @@ genCall (const iCode *ic)
         }
       else
         {
-          adjustStack (prestackadjust, false, false, false, false);
+          adjustStack (prestackadjust, false, false, false, false, false);
 
           if (IS_LITERAL (etype))
             {
@@ -5515,8 +5572,9 @@ genCall (const iCode *ic)
     {
       bool return_in_reg = SomethingReturned && !bigreturn;
       adjustStack (ic->parmBytes + bigreturn * 2,
-        !IS_TLCS90 && (!return_in_reg || !aopRet (ftype) || aopRet (ftype)->regs[A_IDX] < 0 || aopRet (ftype)->regs[A_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || !aopRet (ftype) || aopRet (ftype)->regs[A_IDX] < 0 || aopRet (ftype)->regs[A_IDX] > IC_RESULT (ic)->aop->size,
         !return_in_reg || !aopRet (ftype) || (aopRet (ftype)->regs[C_IDX] < 0 || aopRet (ftype)->regs[C_IDX] > IC_RESULT (ic)->aop->size) && (aopRet (ftype)->regs[B_IDX] < 0 || aopRet (ftype)->regs[B_IDX] > IC_RESULT (ic)->aop->size),
+        !return_in_reg || !aopRet (ftype) || (aopRet (ftype)->regs[E_IDX] < 0 || aopRet (ftype)->regs[E_IDX] > IC_RESULT (ic)->aop->size) && (aopRet (ftype)->regs[D_IDX] < 0 || aopRet (ftype)->regs[D_IDX] > IC_RESULT (ic)->aop->size),
         !return_in_reg || !aopRet (ftype) || (aopRet (ftype)->regs[L_IDX] < 0 || aopRet (ftype)->regs[L_IDX] > IC_RESULT (ic)->aop->size) && (aopRet (ftype)->regs[H_IDX] < 0 || aopRet (ftype)->regs[H_IDX] > IC_RESULT (ic)->aop->size),
         !IY_RESERVED);
 
@@ -5764,7 +5822,7 @@ genFunction (const iCode * ic)
               regalloc_dry_run_cost += 4;
             }
           else
-            adjustStack (-sym->stack, !IS_TLCS90, TRUE, !IFFUNC_ISZ88DK_FASTCALL (ftype), !IY_RESERVED);
+            adjustStack (-sym->stack, !IS_TLCS90, true, false, !IFFUNC_ISZ88DK_FASTCALL (ftype), !IY_RESERVED);
         }
       _G.stack.pushed = 0;
     }
@@ -5788,6 +5846,10 @@ genEndFunction (iCode *ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   /* __critical __interrupt without an interrupt number is the non-maskable interrupt */
   bool is_nmi = (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC;
+  bool bc_free = !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0;
+  bool de_free = !aopRet (sym->type) || aopRet (sym->type)->regs[E_IDX] < 0 && aopRet (sym->type)->regs[D_IDX] < 0;
+  bool hl_free = !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0;
+  bool iy_free = !IY_RESERVED && (!aopRet (sym->type) || aopRet (sym->type)->regs[IYL_IDX] < 0 && aopRet (sym->type)->regs[IYH_IDX] < 0);
 
   wassert (!regalloc_dry_run);
   //wassertl (!_G.stack.pushed, "Unbalanced stack.");
@@ -5811,24 +5873,38 @@ genEndFunction (iCode *ic)
     }
 
   int poststackadjust = IFFUNC_ISZ88DK_CALLEE(sym->type) ? stackparmbytes : 0;
-  /*if (poststackadjust && // Try to merge both stack adjustments. Would require picking return address from stack., e.g via Rabbit ld hl d(sp).
+
+  if (poststackadjust && // Try to merge both stack adjustments.
     _G.omitFramePtr &&
+    (IS_RAB && _G.stack.offset <= 255 || IS_TLCS90 && _G.stack.offset <= 127) &&
+    (hl_free || iy_free) && 
     !_G.calleeSaves.pushedDE && !_G.calleeSaves.pushedBC &&
     !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCRITICAL (sym->type))
     {
-      poststackadjust += _G.stack.offset;
+      emit2 (hl_free ? "ld hl, %d (sp)" : "ld iy, %d (sp)", _G.stack.offset);
+      regalloc_dry_run_cost += 2 + !hl_free;
+      adjustStack (_G.stack.offset + 2 + poststackadjust,
+      !aopRet (sym->type)  || aopRet (sym->type)->regs[A_IDX] < 0,
+      bc_free,
+      de_free,
+      false,
+      iy_free && hl_free);
+      emit2 (hl_free ? "jp (hl)" : "jp (iy)");
+      regalloc_dry_run_cost += 2;
+      goto done;
     }
-  else*/ if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
+  else if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
     {
       emit2 ("ld sp, ix");
       cost2 (2, 10, 7, 4, 0, 6, 2);
     }
   else
     adjustStack (_G.stack.offset,
-      !IS_TLCS90 && (!aopRet (sym->type)  || aopRet (sym->type)->regs[A_IDX] < 0),
-      !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-      !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
-      !IY_RESERVED);
+      !aopRet (sym->type)  || aopRet (sym->type)->regs[A_IDX] < 0,
+      bc_free,
+      de_free,
+      hl_free,
+      iy_free);
 
   if(!IS_GB && !_G.omitFramePtr)
     {
@@ -5897,32 +5973,32 @@ genEndFunction (iCode *ic)
 
   if (poststackadjust)
     {
-      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
       wassertl(regalloc_dry_run || !IFFUNC_ISBANKEDCALL (sym->type), "Unimplemented __banked __z88dk_callee support on callee side");
       wassertl(regalloc_dry_run || !IFFUNC_HASVARARGS (sym->type), "__z88dk_callee function may to have variable arguments");
 
-      if (!aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0 )
+      if (hl_free && !IFFUNC_ISISR (sym->type))
         {
           _pop (PAIR_HL);
           adjustStack (poststackadjust,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-          false,
-          !IY_RESERVED);
+          !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0, bc_free, de_free, false, iy_free);
           emit2 ("jp (hl)");
-          regalloc_dry_run_cost += 2;
+          regalloc_dry_run_cost++;
+          goto done;
         }
-      else if (!IS_GB && !IY_RESERVED)
+      else if (!IS_GB && iy_free && !!IFFUNC_ISISR (sym->type))
         {
           _pop (PAIR_IY);
-          adjustStack (poststackadjust,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
-          !aopRet (sym->type) || aopRet (sym->type)->regs[L_IDX] < 0 && aopRet (sym->type)->regs[H_IDX] < 0,
-          false);
+          adjustStack (poststackadjust, !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0, bc_free, de_free, hl_free, false);
           emit2 ("jp (iy)");
           regalloc_dry_run_cost += 2;
+          goto done;
         }
+      else if (bc_free || de_free)
+       {
+         _pop (bc_free ? PAIR_BC : PAIR_DE);
+         adjustStack (poststackadjust, !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0, false, bc_free && de_free, false, false);
+         _push (bc_free ? PAIR_BC : PAIR_DE);
+       }
       else // Do it the hard way: Copy return address on stack before stack pointer adjustment.
         {
           if (poststackadjust == 1)
@@ -5975,16 +6051,13 @@ genEndFunction (iCode *ic)
               regalloc_dry_run_cost += 12;
             }
 
-          adjustStack ( poststackadjust,
-          !IS_TLCS90 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0),
-          !aopRet (sym->type) || aopRet (sym->type)->regs[C_IDX] < 0 && aopRet (sym->type)->regs[B_IDX] < 0,
+          adjustStack (poststackadjust,
+          !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0,
+          bc_free,
+          de_free,
           false,
-          !IY_RESERVED);
-          emit2 ("ret");
-          regalloc_dry_run_cost++;
+          iy_free);
         }
-        
-      goto done;
     }
 
   if (options.debug && currFunc)

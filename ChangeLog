@@ -1,5 +1,10 @@
 2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Improve stack adjustment.
+
+2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3231.c:
 	  Fix bug #3231.

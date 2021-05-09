@@ -3802,68 +3802,70 @@ genEndFunction (iCode *ic)
         stackparmbytes += getSize (arg->sym->type);
     }
 
+  int poststackadjust = IFFUNC_ISZ88DK_CALLEE(sym->type) ? stackparmbytes : 0;
+
   bool a_free = !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0;
   bool x_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[XL_IDX] < 0 && aopRet (sym->type)->regs[XH_IDX] < 0);
   bool y_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[YL_IDX] < 0 && aopRet (sym->type)->regs[YH_IDX] < 0);
 
   /* adjust the stack for the function */
-  if (sym->stack)
+  if (poststackadjust > 1 && x_free && options.model != MODEL_LARGE &&
+    sym->stack < 255 - 1 &&
+    !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCRITICAL (sym->type))
+    {
+      emit2 ("ldw", "x, (%d, sp)", sym->stack+ 1);
+      cost (2, 2);
+      adjustStack (sym->stack + 2 + poststackadjust, a_free, x_free, y_free);
+      emit2 ("jp", "(x)");
+      cost (1, 1);
+      return;
+    }
+  else if (sym->stack)
     adjustStack (sym->stack, a_free, x_free, y_free);
 
   wassertl (!G.stack.pushed, "Unbalanced stack.");
 
-  if (IFFUNC_ISZ88DK_CALLEE(sym->type) && stackparmbytes)
+  if (poststackadjust)
     {
-      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee __interrupt support on callee side");
-      wassertl(regalloc_dry_run || !IFFUNC_ISISR (sym->type), "Unimplemented __z88dk_callee large model support on callee side");
-
-      if (x_free && options.model != MODEL_LARGE)
+      if (x_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type))
         {
           pop (ASMOP_X, 0, 2);
-          adjustStack (stackparmbytes, a_free, false, y_free);
+          adjustStack (poststackadjust, a_free, false, y_free);
           if (IFFUNC_ISCRITICAL (sym->type))
             genEndCritical (NULL);
           emit2 ("jp", "(x)");
           cost (1, 1);
           return;
         }
-      else if (y_free && options.model != MODEL_LARGE)
+      else if (y_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type))
         {
           pop (ASMOP_Y, 0, 2);
-          adjustStack (stackparmbytes, a_free, x_free, false);
+          adjustStack (poststackadjust, a_free, x_free, false);
           if (IFFUNC_ISCRITICAL (sym->type))
             genEndCritical (NULL);
           emit2 ("jp", "(y)");
           cost (2, 1);
           return;
         }
-      else if (3 + stackparmbytes <= 255 && options.model != MODEL_LARGE)
+      else if (3 + poststackadjust <= 255 && options.model != MODEL_LARGE)
         {
           push (ASMOP_X, 0, 2);
           emit2 ("ldw", "x, (3, sp)");
-          emit2 ("ldw", "(%d, sp), x", 3 + stackparmbytes);
+          emit2 ("ldw", "(%d, sp), x", 3 + poststackadjust);
           pop (ASMOP_X, 0, 2);
-          adjustStack (stackparmbytes, a_free, x_free, y_free);
-          if (IFFUNC_ISCRITICAL (sym->type))
-            genEndCritical (NULL);
-          emit2 ("ret", "");
-          return;
+          adjustStack (poststackadjust, a_free, x_free, y_free);
         }
-      else if (4 + stackparmbytes <= 255 && options.model == MODEL_LARGE)
+      else if (4 + poststackadjust <= 255 && options.model == MODEL_LARGE)
         {
           push (ASMOP_A, 0, 1);
           emit2 ("ld", "a, (4, sp)");
-          emit2 ("ld", "(%d, sp), a", 4 + stackparmbytes);
+          emit2 ("ld", "(%d, sp), a", 4 + poststackadjust);
           emit2 ("ld", "a, (3, sp)");
-          emit2 ("ld", "(%d, sp), a", 3 + stackparmbytes);
+          emit2 ("ld", "(%d, sp), a", 3 + poststackadjust);
           emit2 ("ld", "a, (2, sp)");
-          emit2 ("ld", "(%d, sp), a", 2 + stackparmbytes);
+          emit2 ("ld", "(%d, sp), a", 2 + poststackadjust);
           pop (ASMOP_A, 0, 1);
-          adjustStack (stackparmbytes, a_free, x_free, y_free);
-          if (IFFUNC_ISCRITICAL (sym->type))
-            genEndCritical (NULL);
-          emit2 ("retf", "");
-          return;
+          adjustStack (poststackadjust, a_free, x_free, y_free);
         }
       else
         {

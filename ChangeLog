@@ -1,6 +1,7 @@
 2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/gen.c:
+	* src/z80/gen.c,
+	  src/stm8/gen.c:
 	  Improve stack adjustment.
 
 2021-05-09 Philipp Klaus Krause <pkk AT spth.de>

@@ -213,5 +213,35 @@ cl_m6800::exec_inst(void)
   return(res);
 }
 
+class cl_cell8 &
+cl_m6800::idx(void)
+{
+  t_addr a= fetch();
+  a+= rX;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_m6800::ext(void)
+{
+  t_addr a;
+  u8_t h, l;
+  h= fetch();
+  l= fetch();
+  a= h*256 + l;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  tick(2);
+  return *c;
+}
+
+class cl_cell8 &
+cl_m6800::dir(void)
+{
+  t_addr a= fetch();
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  return *c;
+}
 
 /* End of m6800.src/m6800.cc */

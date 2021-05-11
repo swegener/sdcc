@@ -36,9 +36,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CLV   instruction_0a
 #define SEV   instruction_0b
 #define CLC   instruction_0c
-#define SEC   instruction_0d
+#define SEc   instruction_0d
 #define CLI   instruction_0e
 #define SEI   instruction_0f
+
+#define SBA   instruction_10
+#define CBA   instruction_11
+#define TAB   instruction_16
+#define TBA   instruction_17
+#define DAA   instruction_19
+#define ABA   instruction_1b
+
+#define TSX   instruction_30
+#define INS   instruction_31
+#define PULA  instruction_32
+#define PULB  instruction_33
+#define DES   instruction_34
+#define TXS   instruction_35
+#define PSHA  instruction_36
+#define PSHB  instruction_37
+#define RTS   instruction_39
+
+#define NEGA  instruction_40
+#define COMA  instruction_43
+#define LSRA  instruction_44
+#define RORA  instruction_46
+#define ASRA  instruction_47
+#define ASLA  instruction_48
+#define ROLA  instruction_49
+#define DECA  instruction_4a
+#define INCA  instruction_4c
+#define TSTA  instruction_4d
+#define CLRA  instruction_4f
+
+#define NEGB  instruction_50
+#define COMB  instruction_53
+#define LSRB  instruction_54
+#define RORB  instruction_56
+#define ASRB  instruction_57
+#define ASLB  instruction_58
+#define ROLB  instruction_59
+#define DECB  instruction_5a
+#define INCB  instruction_5c
+#define TSTB  instruction_5d
+#define CLRB  instruction_5f
 
 #endif
 

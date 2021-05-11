@@ -14,7 +14,6 @@ RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 STRIP		= @STRIP@
 MAKEDEP         = @MAKEDEP@
-SREC_CAT	= @SREC_CAT@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@

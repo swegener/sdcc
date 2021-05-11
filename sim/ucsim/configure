@@ -680,7 +680,6 @@ build_vendor
 build_cpu
 build
 LIBTOOL
-SREC_CAT
 AR
 STRIP
 RANLIB
@@ -696,6 +695,7 @@ LDFLAGS
 CXXFLAGS
 CXX
 enable_serio
+enable_pblaze_port
 enable_rxk_port
 enable_mcs6502_port
 enable_m6800_port
@@ -787,6 +787,7 @@ enable_m6809_port
 enable_m6800_port
 enable_mcs6502_port
 enable_rxk_port
+enable_pblaze_port
 enable_serio
 enable_statistic
 enable_shared
@@ -1464,6 +1465,7 @@ Optional Features:
   --enable-m6800-port     compile simulator for m6800
   --enable-mcs6502-port     compile simulator for mcs6502
   --enable-rxk-port     compile simulator for Rabbit rXk
+  --enable-plaze-port   compile simulator for Xilinx PicoBlaze
   --enable-serio          compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -3004,6 +3006,15 @@ else
   enable_rxk_port="yes"
 fi
 
+# Check whether --enable-pblaze-port was given.
+if test "${enable_pblaze_port+set}" = set; then :
+  enableval=$enable_pblaze_port; if test $enable_pblaze_port  != "yes"; then
+    enable_pblaze_port="no"
+fi
+else
+  enable_pblaze_port="no"
+fi
+
 # Check whether --enable-serio was given.
 if test "${enable_serio+set}" = set; then :
   enableval=$enable_serio; if test $enable_serio != "no"; then
@@ -3012,6 +3023,7 @@ fi
 else
   enable_serio="no"
 fi
+
 
 
 
@@ -4092,98 +4104,6 @@ esac
   fi
 else
   AR="$ac_cv_prog_AR"
-fi
-
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}srec_cat", so it can be a program name with args.
-set dummy ${ac_tool_prefix}srec_cat; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_SREC_CAT+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$SREC_CAT"; then
-  ac_cv_prog_SREC_CAT="$SREC_CAT" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_SREC_CAT="${ac_tool_prefix}srec_cat"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-SREC_CAT=$ac_cv_prog_SREC_CAT
-if test -n "$SREC_CAT"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SREC_CAT" >&5
-$as_echo "$SREC_CAT" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_prog_SREC_CAT"; then
-  ac_ct_SREC_CAT=$SREC_CAT
-  # Extract the first word of "srec_cat", so it can be a program name with args.
-set dummy srec_cat; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_ac_ct_SREC_CAT+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_SREC_CAT"; then
-  ac_cv_prog_ac_ct_SREC_CAT="$ac_ct_SREC_CAT" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_SREC_CAT="srec_cat"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_SREC_CAT=$ac_cv_prog_ac_ct_SREC_CAT
-if test -n "$ac_ct_SREC_CAT"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_SREC_CAT" >&5
-$as_echo "$ac_ct_SREC_CAT" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_ct_SREC_CAT" = x; then
-    SREC_CAT=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    SREC_CAT=$ac_ct_SREC_CAT
-  fi
-else
-  SREC_CAT="$ac_cv_prog_SREC_CAT"
 fi
 
 
@@ -16363,9 +16283,9 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 # Checking for header files.
 # ===========================================================================
 
-if test -d /stuff/include; then
-  CPPFLAGS="$CPPFLAGS -I/stuff/include"
-fi
+#if test -d /stuff/include; then
+#  CPPFLAGS="$CPPFLAGS -I/stuff/include"
+#fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ANSI C header files" >&5
@@ -16893,11 +16813,6 @@ fi
 
 
 cat >>confdefs.h <<_ACEOF
-#define FD_HEADER_OK ${ucsim_cv_header_ok}
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
 #define HEADER_FD ${ucsim_cv_fd}
 _ACEOF
 
@@ -17374,48 +17289,27 @@ $as_echo "#define GNU_GETCWD 1" >>confdefs.h
 
 fi
 
-
-#'
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for type of length pointer parameter of accept" >&5
-$as_echo_n "checking for type of length pointer parameter of accept... " >&6; }
-if ${ucsim_cv_accept_length_type+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_save_CPPFLAGS="$CPPFLAGS"
-    ucsim_cv_accept_length_type=no
-    for ac_val in int size_t socklen_t; do
-      CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include ${ucsim_cv_socket}
-int
-main ()
-{
-struct sockaddr a; $ac_val len; accept (0, &a, &len);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ucsim_cv_accept_length_type=$ac_val; break
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-    done
-    CPPFLAGS="$ac_save_CPPFLAGS"
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ucsim_cv_accept_length_type" >&5
-$as_echo "$ucsim_cv_accept_length_type" >&6; }
-  if test "$ucsim_cv_accept_length_type" != no; then
-
-cat >>confdefs.h <<_ACEOF
-#define ACCEPT_SOCKLEN_T $ucsim_cv_accept_length_type
-_ACEOF
-
-  fi
-
-
+#AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
+# [AC_CACHE_CHECK([for type of length pointer parameter of accept],
+#   ucsim_cv_accept_length_type,
+#   [ac_save_CPPFLAGS="$CPPFLAGS"
+#    ucsim_cv_accept_length_type=no
+#    for ac_val in int size_t socklen_t; do
+#      CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
+#      AC_TRY_COMPILE([#include <sys/types.h>
+#        [struct sockaddr a; $ac_val len; accept (0, &a, &len);],
+#        [ucsim_cv_accept_length_type=$ac_val; break])
+#    done
+#    CPPFLAGS="$ac_save_CPPFLAGS"])
+#  if test "$ucsim_cv_accept_length_type" != no; then
+#    AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $ucsim_cv_accept_length_type,
+#      [Define to be the type of length parameter of accept (without the \*').])
+#  fi
+# ]
+#)
+##'
+#
+#ucsim_ACCEPT_LENGTH_T
 
 # Macro definitions
 ###################
@@ -18257,7 +18151,7 @@ _ACEOF
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile hc08.src/Makefile hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile m6800.src/Makefile m6800.src/test/Makefile mcs6502.src/Makefile mcs6502.src/test/Makefile rxk.src/Makefile rxk.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile hc08.src/Makefile hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile m6800.src/Makefile m6800.src/test/Makefile mcs6502.src/Makefile mcs6502.src/test/Makefile rxk.src/Makefile rxk.src/test/Makefile pblaze.src/Makefile pblaze.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19360,6 +19254,8 @@ do
     "mcs6502.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES mcs6502.src/test/Makefile" ;;
     "rxk.src/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/Makefile" ;;
     "rxk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/test/Makefile" ;;
+    "pblaze.src/Makefile") CONFIG_FILES="$CONFIG_FILES pblaze.src/Makefile" ;;
+    "pblaze.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES pblaze.src/test/Makefile" ;;
     "p1516.src/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/Makefile" ;;
     "p1516.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/test/Makefile" ;;
     "pdk.src/Makefile") CONFIG_FILES="$CONFIG_FILES pdk.src/Makefile" ;;

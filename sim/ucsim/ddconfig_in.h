@@ -4,13 +4,13 @@
 #define DDCONFIG_HEADER
 
 /* Define to be the type of length parameter of accept (without the \*'). */
-#undef ACCEPT_SOCKLEN_T
+//#undef ACCEPT_SOCKLEN_T
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
 /* XXX */
-#undef FD_HEADER_OK
+//#undef FD_HEADER_OK
 
 /* XXX */
 #undef FD_NEED_SELECT_H

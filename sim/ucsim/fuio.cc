@@ -32,17 +32,14 @@ void deb(const char *format, ...)
   return;
   if (dd==NULL)
     {
-      dd= mk_io(/*"/dev/pts/2", "w"*/"", "");
+      dd= mk_io("", "");
       dd->file_id= open("/dev/pts/4", O_WRONLY);
-      //dd->init();
     }
   va_list ap;
   va_start(ap, format);
-  //dd->vprintf(format, ap);
-  //vdprintf(dd->file_id, format, ap);
   {
     char *buf= vformat_string(format, ap);
-    /*dd->*/write(dd->file_id, buf, strlen(buf));
+    write(dd->file_id, buf, strlen(buf));
     free(buf);
   }
   va_end(ap);
@@ -73,19 +70,12 @@ cl_io::close(void)
       restore_attributes();
       shutdown(file_id, 2/*SHUT_RDWR*/);
     }
-  /*
-  if (file_f)
-    {
-      restore_attributes();
-      i= fclose(file_f);
-    }
-    else*/ if (file_id >= 0)
+  if (file_id >= 0)
     {
       restore_attributes();
       i= ::close(file_id);
     }
 
-  //file_f= NULL;
   file_id= -1;
   own= false;
   file_name= 0;
@@ -101,7 +91,7 @@ cl_io::~cl_io(void)
   restore_attributes();
   if (echo_of != NULL)
     echo_of->echo(NULL);
-  if (/*file_f*/file_id>=0)
+  if (file_id>=0)
     {
       if (own)
 	close();
@@ -302,13 +292,13 @@ mk_io(const char *fn, const char *mode)
 }
 
 class cl_f *
-cp_io(/*FILE *f*/int file_id, const char *mode)
+cp_io(int file_id, const char *mode)
 {
   class cl_io *io;
 
   io= new cl_io();
-  if (/*f*/file_id>=0)
-    io->use_opened(/*fileno(f)*/file_id, mode);
+  if (file_id>=0)
+    io->use_opened(file_id, mode);
   return io;
 }
 
@@ -329,12 +319,9 @@ srv_accept(class cl_f *listen_io,
 	   class cl_f **fin, class cl_f **fout)
 {
   class cl_io *io;
-  //ACCEPT_SOCKLEN_T size;
-  //struct sockaddr_in sock_addr;
   int new_sock;
 
-  //size= sizeof(struct sockaddr);
-  new_sock= accept(listen_io->file_id, /*(struct sockaddr *)sock_addr*/NULL, /*&size*/NULL);
+  new_sock= accept(listen_io->file_id, NULL, NULL);
   
   if (fin)
     {

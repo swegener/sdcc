@@ -20,6 +20,7 @@ enable_m6809_port   = @enable_m6809_port@
 enable_m6800_port   = @enable_m6800_port@
 enable_mcs6502_port = @enable_mcs6502_port@
 enable_rxk_port	    = @enable_rxk_port@
+enable_pblaze_port  = @enable_pblaze_port@
 
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
@@ -129,15 +130,21 @@ else
 RXK      =
 endif
 
+ifeq ($(enable_pblaze_port),yes)
+PBLAZE      	= pblaze.src
+else
+PBLAZE	=
+endif
+
 PKGS		= $(S51) $(S390) \
 		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
 		  $(TLCS) \
 		  $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
-		  $(M6809) $(M6800) $(MCS6502) $(RXK) \
+		  $(M6809) $(M6800) $(MCS6502) $(RXK) $(PBLAZE) \
 		  doc
 
 PKGS_ALL	= cmd.src sim.src gui.src \
 		  s51.src avr.src z80.src tlcs.src xa.src \
 		  hc08.src stm8.src st7.src pdk.src p1516.src \
-		  m6809.src m6800.src mcs6502.src rxk.src \
+		  m6809.src m6800.src mcs6502.src rxk.src pblaze.src \
 		  doc

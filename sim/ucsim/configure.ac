@@ -172,6 +172,12 @@ if test $enable_rxk_port  != "no"; then
     enable_rxk_port="yes"
 fi,
 enable_rxk_port="yes")
+AC_ARG_ENABLE(pblaze-port,
+[  --enable-plaze-port   compile simulator for Xilinx PicoBlaze],
+if test $enable_pblaze_port  != "yes"; then
+    enable_pblaze_port="no"
+fi,
+enable_pblaze_port="no")
 AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -200,6 +206,7 @@ AC_SUBST(enable_m6809_port)
 AC_SUBST(enable_m6800_port)
 AC_SUBST(enable_mcs6502_port)
 AC_SUBST(enable_rxk_port)
+AC_SUBST(enable_pblaze_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -221,7 +228,7 @@ dnl AC_LANG_CPLUSPLUS
 
 AC_CHECK_TOOL(STRIP, strip)
 AC_CHECK_TOOL(AR, ar)
-AC_CHECK_TOOL(SREC_CAT, srec_cat)
+dnl AC_CHECK_TOOL(SREC_CAT, srec_cat)
 
 AC_LIBTOOL_DLOPEN
 dnl AC_LIBTOOL_WIN32_DLL
@@ -240,9 +247,9 @@ AC_LANG_CPLUSPLUS
 # Checking for header files.
 # ===========================================================================
 
-if test -d /stuff/include; then
-  CPPFLAGS="$CPPFLAGS -I/stuff/include"
-fi
+#if test -d /stuff/include; then
+#  CPPFLAGS="$CPPFLAGS -I/stuff/include"
+#fi
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
@@ -338,7 +345,7 @@ else
 AC_DEFINE(FD_NEED_WINSOCK2_H, 0, [XXX])
 fi
 
-AC_DEFINE_UNQUOTED(FD_HEADER_OK, ${ucsim_cv_header_ok}, [XXX])
+dnl AC_DEFINE_UNQUOTED(FD_HEADER_OK, ${ucsim_cv_header_ok}, [XXX])
 AC_DEFINE_UNQUOTED(HEADER_FD, ${ucsim_cv_fd}, [XXX])
 
 
@@ -455,28 +462,27 @@ if test "$ucsim_cv_getcwd" = "yes"; then
   AC_DEFINE(GNU_GETCWD, 1, [XXX])
 fi
 
-AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
- [AC_CACHE_CHECK([for type of length pointer parameter of accept],
-   ucsim_cv_accept_length_type,
-   [ac_save_CPPFLAGS="$CPPFLAGS"
-    ucsim_cv_accept_length_type=no
-    for ac_val in int size_t socklen_t; do
-      CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
-      AC_TRY_COMPILE([#include <sys/types.h>
-#include ${ucsim_cv_socket}],
-        [struct sockaddr a; $ac_val len; accept (0, &a, &len);],
-        [ucsim_cv_accept_length_type=$ac_val; break])
-    done
-    CPPFLAGS="$ac_save_CPPFLAGS"])
-  if test "$ucsim_cv_accept_length_type" != no; then
-    AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $ucsim_cv_accept_length_type,
-      [Define to be the type of length parameter of accept (without the \*').])
-  fi
- ]
-)
-#'
-
-ucsim_ACCEPT_LENGTH_T
+#AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
+# [AC_CACHE_CHECK([for type of length pointer parameter of accept],
+#   ucsim_cv_accept_length_type,
+#   [ac_save_CPPFLAGS="$CPPFLAGS"
+#    ucsim_cv_accept_length_type=no
+#    for ac_val in int size_t socklen_t; do
+#      CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
+#      AC_TRY_COMPILE([#include <sys/types.h>
+#        [struct sockaddr a; $ac_val len; accept (0, &a, &len);],
+#        [ucsim_cv_accept_length_type=$ac_val; break])
+#    done
+#    CPPFLAGS="$ac_save_CPPFLAGS"])
+#  if test "$ucsim_cv_accept_length_type" != no; then
+#    AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $ucsim_cv_accept_length_type,
+#      [Define to be the type of length parameter of accept (without the \*').])
+#  fi
+# ]
+#)
+##'
+#
+#ucsim_ACCEPT_LENGTH_T
 
 # Macro definitions
 ###################
@@ -748,6 +754,7 @@ m6809.src/Makefile   m6809.src/test/Makefile
 m6800.src/Makefile   m6800.src/test/Makefile
 mcs6502.src/Makefile mcs6502.src/test/Makefile
 rxk.src/Makefile     rxk.src/test/Makefile
+pblaze.src/Makefile  pblaze.src/test/Makefile
 p1516.src/Makefile   p1516.src/test/Makefile
 pdk.src/Makefile     pdk.src/test/Makefile
 s51.src/Makefile     s51.src/test/Makefile

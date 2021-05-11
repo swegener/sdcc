@@ -75,6 +75,23 @@ cl_rxk::dec_r(class cl_cell8 &cr, u8_t op)
   return resGO;
 }
 
+/*
+     C <-- 7..<-...0 <--+
+        |               |
+        +---------------+
+ */
+int
+cl_rxk::rot8left(class cl_cell8 &dest, u8_t op)
+{
+  class cl_cell8 &f= destF();
+  u8_t a7;
+  a7= op&0x80;
+  dest.W((op<<1) | (a7?1:0));
+  f.W((rF & ~flagC) | (a7?flagC:0));
+  tick(1);
+  return resGO;
+}
+/*
 int
 cl_rxk::RLCA(t_mem code)
 {
@@ -85,6 +102,6 @@ cl_rxk::RLCA(t_mem code)
   tick(1);
   return resGO;
 }
-
+*/
 
 /* End of rxk.src/ialu.cc */

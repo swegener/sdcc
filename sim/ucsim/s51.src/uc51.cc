@@ -28,18 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "ddconfig.h"
 
 #include <stdio.h>
-//#include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-//#include <fcntl.h>
-//#include <errno.h>
-//#include <sys/types.h>
-//#include <sys/time.h>
-//#if FD_HEADER_OK
-//# include HEADER_FD
-//#endif
 #include <string.h>
-//#include "i_string.h"
 
 // prj
 #include "utils.h"

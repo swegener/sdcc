@@ -44,6 +44,46 @@ struct dis_entry disass_m6800[]=
     { 0x0d, 0xff, ' ', 1, "SEC" },
     { 0x0e, 0xff, ' ', 1, "CLI" },
     { 0x0f, 0xff, ' ', 1, "SEI" },
+
+    { 0x10, 0xff, ' ', 1, "SBA" },
+    { 0x11, 0xff, ' ', 1, "CBA" },
+    { 0x16, 0xff, ' ', 1, "TAB" },
+    { 0x17, 0xff, ' ', 1, "TBA" },
+    { 0x19, 0xff, ' ', 1, "DAA" },
+    { 0x1b, 0xff, ' ', 1, "ABA" },
+
+    { 0x30, 0xff, ' ', 1, "TSX" },
+    { 0x31, 0xff, ' ', 1, "INS" },
+    { 0x32, 0xff, ' ', 1, "PUL A" },
+    { 0x33, 0xff, ' ', 1, "PUL B" },
+    { 0x34, 0xff, ' ', 1, "DES" },
+    { 0x35, 0xff, ' ', 1, "TXS" },
+    { 0x36, 0xff, ' ', 1, "PSH A" },
+    { 0x37, 0xff, ' ', 1, "PSH B" },
+    { 0x39, 0xff, ' ', 1, "RTS" },
+
+    { 0x40, 0xff, ' ', 1, "NEG A" },
+    { 0x43, 0xff, ' ', 1, "COM A" },
+    { 0x44, 0xff, ' ', 1, "LSR A" },
+    { 0x46, 0xff, ' ', 1, "ROR A" },
+    { 0x47, 0xff, ' ', 1, "ASR A" },
+    { 0x48, 0xff, ' ', 1, "ASL A" },
+    { 0x49, 0xff, ' ', 1, "ROL A" },
+    { 0x4a, 0xff, ' ', 1, "DEC A" },
+    { 0x4c, 0xff, ' ', 1, "INC A" },
+    { 0x4f, 0xff, ' ', 1, "CLR A" },
+    
+    { 0x50, 0xff, ' ', 1, "NEG B" },
+    { 0x53, 0xff, ' ', 1, "COM B" },
+    { 0x54, 0xff, ' ', 1, "LSR B" },
+    { 0x56, 0xff, ' ', 1, "ROR B" },
+    { 0x57, 0xff, ' ', 1, "ASR B" },
+    { 0x58, 0xff, ' ', 1, "ASL B" },
+    { 0x59, 0xff, ' ', 1, "ROL B" },
+    { 0x5a, 0xff, ' ', 1, "DEC B" },
+    { 0x5c, 0xff, ' ', 1, "INC B" },
+    { 0x5f, 0xff, ' ', 1, "CLR B" },
+    
     { 0, 0, 0, 0, 0, 0 }
   };
 

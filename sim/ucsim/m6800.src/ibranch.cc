@@ -27,4 +27,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "m6800cl.h"
 
 
+int
+cl_m6800::RTS(t_mem code)
+{
+  u8_t h, l;
+  rSP--;
+  h= rom->read(rSP);
+  cSP.W(rSP-1);
+  l= rom->read(rSP);
+  PC= h*256 + l;
+  tick(4);
+  return resGO;
+}
+
+
 /* End of m6800.src/ibranch.cc */

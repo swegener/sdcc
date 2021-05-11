@@ -77,7 +77,8 @@ static char *_hc08_keywords[] =
 
 void hc08_assignRegisters (ebbIndex *);
 
-static int regParmFlg = 0;      /* determine if we can register a parameter */
+static int regParmFlg;      /* determine if we can register a parameter */
+static struct sym_link *regParmFuncType;
 
 static void
 _hc08_init (void)
@@ -97,11 +98,15 @@ static void
 _hc08_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
+  regParmFuncType = funcType;
 }
 
 static int
 _hc08_regparm (sym_link * l, bool reentrant)
 {
+  if (IFFUNC_HASVARARGS (regParmFuncType))
+    return 0;
+
   int size = getSize(l);
 
   /* If they fit completely, the first two bytes of parameters can go */

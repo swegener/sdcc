@@ -3379,7 +3379,7 @@ processFuncArgs (symbol *func)
       /* mark it as a register parameter if
          the function does not have VA_ARG
          and as port dictates */
-      if (!IFFUNC_HASVARARGS (funcType) && (argreg = (*port->reg_parm) (val->type, FUNC_ISREENT (funcType))))
+      if (argreg = (*port->reg_parm) (val->type, FUNC_ISREENT (funcType)))
         {
           SPEC_REGPARM (val->etype) = 1;
           SPEC_ARGREG (val->etype) = argreg;

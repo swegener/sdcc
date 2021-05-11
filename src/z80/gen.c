@@ -1769,7 +1769,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
     }
 }
 
-// Get registers containing return type of function.
+// Get asmop for registers containing the return type of function
+// Returns 0 is the function does not have a return value or it is not returned in registers.
 static asmop *
 aopRet (const sym_link *ftype)
 {

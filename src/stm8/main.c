@@ -54,6 +54,17 @@ enum
   P_CONSTSEG,
 };
 
+static struct
+{
+  // Determine if we can put parameters in registers
+  struct
+  {
+    int n;
+    struct sym_link *ftype;
+  } regparam;
+}
+_G;
+
 static int
 stm8_do_pragma (int id, const char *name, const char *cp)
 {
@@ -158,14 +169,19 @@ stm8_init (void)
 }
 
 static void
-stm8_reset_regparm (struct sym_link *funcType)
+stm8_reset_regparm (struct sym_link *ftype)
 {
+  _G.regparam.n = 0;
+  _G.regparam.ftype = ftype;
 }
 
 static int
-stm8_reg_parm (sym_link * l, bool reentrant)
+stm8_reg_parm (sym_link *l, bool reentrant)
 {
-  return FALSE;
+  if (IFFUNC_HASVARARGS (_G.regparam.ftype))
+    return false;
+
+  return false;
 }
 
 static bool

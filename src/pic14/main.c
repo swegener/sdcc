@@ -69,7 +69,7 @@ static char *_pic14_keywords[] =
 };
 
 static int regParmFlg = 0;  /* determine if we can register a parameter */
-
+static struct sym_link *regParmFuncType;
 
 /** $1 is always the basename.
     $2 is always the output file.
@@ -100,11 +100,15 @@ static void
 _pic14_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
+  regParmFuncType = funcType;
 }
 
 static int
 _pic14_regparm (sym_link * l, bool reentrant)
 {
+  if (IFFUNC_HASVARARGS (regParmFuncType))
+    return 0;
+
 /* for this processor it is simple
   can pass only the first parameter in a register */
   //if (regParmFlg)

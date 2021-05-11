@@ -97,6 +97,7 @@ static builtins __ds390_builtins[] = {
 void ds390_assignRegisters (ebbIndex * ebbi);
 
 static int regParmFlg = 0;      /* determine if we can register a parameter */
+static struct sym_link *regParmFuncType;
 
 static void
 _ds390_init (void)
@@ -108,11 +109,15 @@ static void
 _ds390_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
+  regParmFuncType = funcType;
 }
 
 static int
 _ds390_regparm (sym_link * l, bool reentrant)
 {
+  if (IFFUNC_HASVARARGS (regParmFuncType))
+    return 0;
+
     if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
         return 0;
     if (options.parms_in_bank1 == 0) {

@@ -124,9 +124,12 @@ ASM_TYPE;
 static struct
 {
   ASM_TYPE asmType;
-  /* determine if we can register a parameter */
-  int regParams;
-  bool z88dk_fastcall;
+  // Determine if we can put parameters in registers
+  struct
+  {
+    int n;
+    struct sym_link *ftype;
+  } regparam;
 }
 _G;
 
@@ -274,27 +277,30 @@ _z80n_init (void)
 }
 
 static void
-_reset_regparm (struct sym_link *funcType)
+_reset_regparm (struct sym_link *ftype)
 {
-  _G.regParams = 0;
-  _G.z88dk_fastcall = IFFUNC_ISZ88DK_FASTCALL (funcType);
-  if (_G.z88dk_fastcall && IFFUNC_HASVARARGS (funcType))
+  _G.regparam.n = 0;
+  _G.regparam.ftype = ftype;
+  if (IFFUNC_ISZ88DK_FASTCALL (ftype) && IFFUNC_HASVARARGS (ftype))
     werror (E_Z88DK_FASTCALL_PARAMETERS);
 }
 
 static int
 _reg_parm (sym_link *l, bool reentrant)
 {
-  if (_G.z88dk_fastcall)
+  if (IFFUNC_HASVARARGS (_G.regparam.ftype))
+    return false;
+
+  if (IFFUNC_ISZ88DK_FASTCALL (_G.regparam.ftype))
     {
-      if (_G.regParams)
+      if (_G.regparam.n)
         werror (E_Z88DK_FASTCALL_PARAMETERS);
       if (getSize (l) > 4)
         werror (E_Z88DK_FASTCALL_PARAMETER);
-      _G.regParams++;
-      return TRUE;
+      _G.regparam.n++;
+      return true;
     }
- return FALSE;
+ return false;
 }
 
 enum

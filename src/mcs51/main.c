@@ -90,6 +90,7 @@ void mcs51_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;      /* determine if we can register a parameter     */
 static int regBitParmFlg = 0;   /* determine if we can register a bit parameter */
+static struct sym_link *regParmFuncType;
 
 static void
 _mcs51_init (void)
@@ -102,11 +103,15 @@ _mcs51_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
   regBitParmFlg = 0;
+  regParmFuncType = funcType;
 }
 
 static int
 _mcs51_regparm (sym_link * l, bool reentrant)
 {
+  if (IFFUNC_HASVARARGS (regParmFuncType))
+    return 0;
+
   if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
     {
       /* bit parameters go to b0 thru b7 */

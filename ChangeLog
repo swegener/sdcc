@@ -1,3 +1,8 @@
+2021-05-11 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-3231.c:
+	  Disable __critical test for host.
+
 2021-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

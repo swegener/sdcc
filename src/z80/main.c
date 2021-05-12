@@ -288,19 +288,17 @@ _reset_regparm (struct sym_link *ftype)
 static int
 _reg_parm (sym_link *l, bool reentrant)
 {
-  if (IFFUNC_HASVARARGS (_G.regparam.ftype))
-    return false;
-
   if (IFFUNC_ISZ88DK_FASTCALL (_G.regparam.ftype))
     {
       if (_G.regparam.n)
         werror (E_Z88DK_FASTCALL_PARAMETERS);
       if (getSize (l) > 4)
         werror (E_Z88DK_FASTCALL_PARAMETER);
-      _G.regparam.n++;
-      return true;
     }
- return false;
+
+  bool is_regarg = z80IsRegArg(_G.regparam.ftype, ++_G.regparam.n, 0);
+
+  return (is_regarg ? _G.regparam.n : 0);
 }
 
 enum

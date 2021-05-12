@@ -191,21 +191,12 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
 static bool
 z80IsParmInCall(sym_link *ftype, const char *what)
 {
-  const value *args = FUNC_ARGS (ftype);
+  const value *args;
+  int i;
 
-  if (IFFUNC_ISZ88DK_FASTCALL (ftype) && args) // Has one register argument of size up to 32 bit.
-    {
-      const unsigned int size = getSize (args->type);
-      wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
-      if (strchr(what, 'l') && size >= 1)
-        return true;
-      if (strchr(what, 'h') && size >= 2)
-        return true;
-      if (strchr(what, 'e') && size >= 3)
-        return true;
-      if (strchr(what, 'd') && size >= 4)
-        return true;
-    }
+  for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
+    if (z80IsRegArg(ftype, i, what))
+      return true;
   return false;
 }
 

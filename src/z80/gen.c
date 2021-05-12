@@ -247,7 +247,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_dehl, asmop_hlde, asmop_hlbc, asmop_zero, asmop_one, asmop_mone, asmop_z88dk_fastcall_arg;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_dehl, asmop_hlde, asmop_hlbc, asmop_zero, asmop_one, asmop_mone;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -267,7 +267,6 @@ static struct asmop *const ASMOP_HLBC = &asmop_hlbc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
-static struct asmop *const ASMOP_Z88DK_FASTCALL_ARG = &asmop_z88dk_fastcall_arg;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
 
@@ -321,8 +320,6 @@ z80_init_asmops (void)
   asmop_mone.aopu.aop_lit = constVal ("-1");
   asmop_mone.size = 1;
   memset (asmop_mone.regs, -1, 9);
-
-  z80_init_reg_asmop(&asmop_z88dk_fastcall_arg, (const signed char[]){L_IDX, H_IDX, E_IDX, D_IDX, -1});
 }
 
 static bool regalloc_dry_run;
@@ -1789,6 +1786,37 @@ aopRet (const sym_link *ftype)
     default:
       return 0;
     }
+}
+
+// Get asmop for registers containing a parameter
+// Returns 0 is the parameter is passed on the stack
+static asmop *
+aopArg (sym_link *ftype, int i)
+{
+  if (IFFUNC_HASVARARGS (ftype))
+    return false;
+
+  if (IFFUNC_ISZ88DK_FASTCALL (ftype))
+    {
+      if (i != 1)
+        return false;
+        
+      int size = getSize (FUNC_ARGS(ftype)->type);
+
+      switch (size)
+        {
+        case 1:
+          return ASMOP_L;
+        case 2:
+          return ASMOP_HL;
+        case 4:
+          return ASMOP_DEHL;
+        default:
+          return 0;
+        }
+    }
+
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -5262,55 +5290,46 @@ static void genSend (const iCode *ic)
 
   wassertl (ic->next->op == CALL || ic->next->op == PCALL, "Sending register parameter for missing call");
   wassertl (!IS_GB, "Register parameters are not supported in gbz80 port");
+  
+  int n_regparams = 1;
 
-  if (_G.saves.saved == FALSE && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+  /* Caller saves, and this is the first iPush. */
+  /* Scan ahead until we find the function that we are pushing parameters to.
+     Count the number of addSets on the way to figure out what registers
+     are used in the send set.
+   */
+  const iCode *walk;
+  for (walk = ic->next; walk; walk = walk->next)
     {
-      /* Caller saves, and this is the first iPush. */
-      /* Scan ahead until we find the function that we are pushing parameters to.
-         Count the number of addSets on the way to figure out what registers
-         are used in the send set.
-       */
-      int nAddSets = 0;
-      iCode *walk = ic->next;
-
-      while (walk)
-        {
-          if (walk->op == SEND)
-            {
-              nAddSets++;
-            }
-          else if (walk->op == CALL || walk->op == PCALL)
-            {
-              /* Found it. */
-              break;
-            }
-          else
-            {
-              /* Keep looking. */
-            }
-          walk = walk->next;
-        }
-      _saveRegsForCall (walk, FALSE);
+      if (walk->op == SEND)
+        n_regparams++;
+      else if (walk->op == CALL || walk->op == PCALL)
+        break;
     }
 
+  if (_G.saves.saved == FALSE && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
+    _saveRegsForCall (walk, FALSE);
+    
+  asmop *argreg = aopArg (walk->op == CALL ? operandType (IC_LEFT (walk)) : operandType (IC_LEFT (walk))->next, n_regparams);
+  
+  wassert (argreg);
+
   for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
-    if (bitVectBitValue (ic->rSurv, ASMOP_Z88DK_FASTCALL_ARG->aopu.aop_reg[i]->rIdx))
+    if (bitVectBitValue (ic->rSurv, argreg->aopu.aop_reg[i]->rIdx))
       {
         regalloc_dry_run_cost += 100;
         wassert (regalloc_dry_run);
       }
 
-  genMove_o (ASMOP_Z88DK_FASTCALL_ARG, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
+  genMove (argreg, IC_LEFT (ic)->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   
   for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
     if (!regalloc_dry_run)
-      z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_Z88DK_FASTCALL_ARG->aopu.aop_reg[i]->rIdx] = true;
+      z80_regs_used_as_parms_in_calls_from_current_function[argreg->aopu.aop_reg[i]->rIdx] = true;
 
   freeAsmop (IC_LEFT (ic), NULL);
 }
 
-/** Emit the code for a call statement
- */
 static void
 genCall (const iCode *ic)
 {
@@ -13855,8 +13874,10 @@ genReceive (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
   aopOp (result, ic, FALSE, FALSE);
+  
+  wassert (currFunc && ic->argreg);
 
-  genMove (result->aop, ASMOP_Z88DK_FASTCALL_ARG, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  genMove (result->aop, aopArg (currFunc->type, ic->argreg), true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   freeAsmop (IC_RESULT (ic), NULL);
 }
@@ -15478,6 +15499,7 @@ genZ80Code (iCode * lic)
   freeTrace (&_G.trace.aops);
 }
 
+// Check if what is returned by the curent function.
 bool
 z80IsReturned(const char *what)
 {
@@ -15492,5 +15514,28 @@ z80IsReturned(const char *what)
     if (!strcmp(retaop->aopu.aop_reg[i]->name, what))
       return true;
   return false;
+}
+
+// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
+// If what is 0, just check if hte ith argument is in registers.
+bool
+z80IsRegArg(struct sym_link *ftype, int i, const char *what)
+{
+  if (what && !strcmp(what, "iy"))
+    return (z80IsRegArg (ftype, i, "iyl") || z80IsRegArg (ftype, i, "iyh"));
+
+  const asmop *argaop = aopArg (ftype, i);
+
+  if (!argaop)
+    return false;
+    
+  if (!what)
+    return true;
+    
+  for (int i = 0; i < argaop->size; i++)
+    if (!strcmp(argaop->aopu.aop_reg[i]->name, what))
+      return true;
+
+  return false; 
 }
 

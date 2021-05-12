@@ -5487,7 +5487,7 @@ genCall (const iCode *ic)
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
-      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && !z80IsParmInCall (ftype, "l") && !z80IsParmInCall (ftype, "h"))
+      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && hl_free_pre_call)
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, 0);
@@ -5503,23 +5503,32 @@ genCall (const iCode *ic)
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;
         }
-      else if (!z80IsParmInCall (ftype, "c") && !z80IsParmInCall (ftype, "b")) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
+      else if (bc_free_pre_call) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
+          symbol *tlbl = 0;
           if (aopInReg (IC_LEFT (ic)->aop, 0, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, C_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, C_IDX))
             {
-              regalloc_dry_run_cost += 100;
-              wassertl (regalloc_dry_run, "Unimplemented function pointer in bc");
+              if (!de_free_pre_call)
+                {
+                  regalloc_dry_run_cost += 100;
+                  wassertl (regalloc_dry_run, "Unimplemented function pointer in bc with unavailable de, hl and iy");
+                }
+              if (!regalloc_dry_run)
+                {
+                  tlbl = newiTempLabel (NULL);
+                  emit2 ("ld de, !immed!tlabel", labelKey2num (tlbl->key));
+                  emit2 ("push de");
+                }
             }
-          symbol *tlbl = 0;
-          if (!regalloc_dry_run)
+          else if (!regalloc_dry_run)
             {
               tlbl = newiTempLabel (NULL);
               emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
               emit2 ("push bc");
-              regalloc_dry_run_cost += 4;
             }
+          regalloc_dry_run_cost += 4;
           fetchPairLong (PAIR_BC, IC_LEFT (ic)->aop, 0, 0);
           emit2 ("push bc");
           emit2 ("ret");

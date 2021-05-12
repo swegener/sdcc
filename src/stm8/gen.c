@@ -1192,6 +1192,17 @@ aopRet (const sym_link *ftype)
     }
 }
 
+// Get asmop for registers containing a parameter
+// Returns 0 is the parameter is passed on the stack
+static asmop *
+aopArg (sym_link *ftype, int i)
+{
+  if (IFFUNC_HASVARARGS (ftype))
+    return 0;
+
+  return 0;
+}
+
 static void
 push (const asmop *op, int offset, int size)
 {
@@ -3366,10 +3377,22 @@ genCall (const iCode *ic)
           cost (180, 180);
         }
 
-      emit2 ("ldw", "x, sp");
-      emit2 ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
-      cost (2 + 4, 1 + 2);
-      push (ASMOP_X, 0, 2);
+      if (!stm8IsParmInCall(ftype, "x"))
+        {
+          emit2 ("ldw", "x, sp");
+          emit2 ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
+          cost (1 + 3, 1 + 2);
+          push (ASMOP_X, 0, 2);
+        }
+      else if (!stm8IsParmInCall(ftype, "y"))
+        {
+          emit2 ("ldw", "y, sp");
+          emit2 ("addw", "y, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
+          cost (2 + 4, 1 + 2);
+          push (ASMOP_Y, 0, 2);
+        }
+      else
+        wassertl (0, "Big return value require free x or y, but both are used for register parameters.");
 
       freeAsmop (IC_RESULT (ic));
     }
@@ -3458,21 +3481,40 @@ genCall (const iCode *ic)
 
           if (aopInReg (left->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX))
             push (left->aop, 0, 2);
-          else if (aopOnStackNotExt (left->aop, 0, 2) && !(aopInReg (left->aop, 2, XL_IDX) || aopInReg (left->aop, 2, XH_IDX)) ||
-            aopInReg (left->aop, 2, A_IDX))
+          else if ((aopOnStackNotExt (left->aop, 0, 2) && !(aopInReg (left->aop, 2, XL_IDX) || aopInReg (left->aop, 2, XH_IDX)) || aopInReg (left->aop, 2, A_IDX)) &&
+            !stm8IsParmInCall(ftype, "x"))
             {
               genMove (ASMOP_X, left->aop, !aopInReg (left->aop, 2, A_IDX), true, false);
               push (ASMOP_X, 0, 2);
             }
-          else
+          else if (!stm8IsParmInCall(ftype, "a"))
             {
               cheapMove (ASMOP_A, 0, left->aop, 0, false);
               push (ASMOP_A, 0, 1);
               cheapMove (ASMOP_A, 0, left->aop, 1, false);
               push (ASMOP_A, 0, 1);
             }
-          cheapMove (ASMOP_A, 0, left->aop, 2, false);
-          push (ASMOP_A, 0, 1);
+          else
+            wassert (0);
+          if (!stm8IsParmInCall(ftype, "a"))
+            {
+              cheapMove (ASMOP_A, 0, left->aop, 2, false);
+              push (ASMOP_A, 0, 1);
+            }
+          else if (!stm8IsParmInCall(ftype, "xl"))
+            {
+              cheapMove (ASMOP_X, 0, left->aop, 2, true);
+              push (ASMOP_X, 0, 2);
+              adjustStack (1, false, false, false);
+            }
+          else if (!stm8IsParmInCall(ftype, "yl"))
+            {
+              cheapMove (ASMOP_Y, 0, left->aop, 2, true);
+              push (ASMOP_Y, 0, 2);
+              adjustStack (1, false, false, false);
+            }
+          else
+            wassert (0);
           emit2("retf", "");
           cost (1, 5);
 
@@ -8740,6 +8782,43 @@ stm8IsReturned(const char *what)
     return false;
   for (int i = 0; i < retaop->size; i++)
     if (!strcmp(retaop->aopu.bytes[i].byteu.reg->name, what))
+      return true;
+  return false;
+}
+
+// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
+// If what is 0, just check if hte ith argument is in registers.
+bool
+stm8IsRegArg(struct sym_link *ftype, int i, const char *what)
+{
+  if (what && !strcmp(what, "x"))
+    return (stm8IsRegArg (ftype, i, "xl") || stm8IsRegArg (ftype, i, "yl"));
+  else if (what && !strcmp(what, "y"))
+    return (stm8IsRegArg (ftype, i, "yl") || stm8IsRegArg (ftype, i, "yh"));
+ 
+  const asmop *argaop = aopArg (ftype, i);
+
+  if (!argaop)
+    return false;
+    
+  if (!what)
+    return true;
+    
+  for (int i = 0; i < argaop->size; i++)
+    if (!strcmp(argaop->aopu.bytes[i].byteu.reg->name, what))
+      return true;
+
+  return false; 
+}
+
+bool
+stm8IsParmInCall(sym_link *ftype, const char *what)
+{
+  const value *args;
+  int i;
+
+  for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
+    if (stm8IsRegArg(ftype, i, what))
       return true;
   return false;
 }

@@ -1794,7 +1794,7 @@ static asmop *
 aopArg (sym_link *ftype, int i)
 {
   if (IFFUNC_HASVARARGS (ftype))
-    return false;
+    return 0;
 
   if (IFFUNC_ISZ88DK_FASTCALL (ftype))
     {

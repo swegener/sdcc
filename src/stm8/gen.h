@@ -83,7 +83,15 @@ asmop;
 
 void genSTM8Code (iCode *);
 void stm8_emitDebuggerSymbol (const char *);
+
 bool stm8IsReturned(const char *what);
+
+// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
+// If what is 0, just check if hte ith argument is in registers.
+bool stm8IsRegArg(struct sym_link *ftype, int i, const char *what);
+
+// Check if what is part of the any argument (counting from 1) to a function of type ftype.
+bool stm8IsParmInCall(sym_link *ftype, const char *what);
 
 extern bool stm8_assignment_optimal;
 extern long int stm8_call_stack_size;

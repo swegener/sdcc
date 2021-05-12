@@ -1,5 +1,12 @@
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/stm8/gen.h,
+	  src/stm8/main.c:
+	  Infrastructure for register parameters.
+
+2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/gen.h,
 	  src/z80/main.c,

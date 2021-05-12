@@ -178,10 +178,9 @@ stm8_reset_regparm (struct sym_link *ftype)
 static int
 stm8_reg_parm (sym_link *l, bool reentrant)
 {
-  if (IFFUNC_HASVARARGS (_G.regparam.ftype))
-    return false;
+  bool is_regarg = stm8IsRegArg(_G.regparam.ftype, ++_G.regparam.n, 0);
 
-  return false;
+  return (is_regarg ? _G.regparam.n : 0);
 }
 
 static bool

@@ -6,6 +6,8 @@
 	  Infrastructure for register parameters.
 	* src/SDCCast.c:
 	  Fix register parameters for printf->puts optimization.
+	* src/z80/peep.c:
+	  Fix bug #3234.
 
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 

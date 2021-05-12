@@ -13204,7 +13204,7 @@ genPointerSet (iCode *ic)
         pairId = getPairId (result->aop);
       else
         {
-          if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId && result->aop->type != AOP_REG)
+          if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId)
             {
               _push (pairId);
               pushed_pair = true;
@@ -13282,17 +13282,14 @@ genPointerSet (iCode *ic)
               _G.pairs[pairId].offset++;
             }
         }
-      /* Restore operand partially in HL. */
-      if (!isPairDead (pairId, ic) && result->aop->type == AOP_REG)
-        {
-          while(last_offset --> 0)
-            {
-              emit2 ("dec %s", _pairs[pairId].name);
-              regalloc_dry_run_cost += 1;
-              _G.pairs[pairId].offset--;
-            }
-          commitPair (result->aop, pairId, ic, FALSE);
-        }
+      /* Restore operand in pair. */
+      if (!isPairDead (pairId, ic) && getPairId (result->aop) == pairId)
+        while(last_offset --> 0)
+          {
+            emit2 ("dec %s", _pairs[pairId].name);
+            regalloc_dry_run_cost += 1;
+            _G.pairs[pairId].offset--;
+          }
     }
 release:
   if (pushed_pair)

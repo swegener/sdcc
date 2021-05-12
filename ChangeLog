@@ -4,6 +4,8 @@
 	  src/stm8/gen.h,
 	  src/stm8/main.c:
 	  Infrastructure for register parameters.
+	* src/SDCCast.c:
+	  Fix register parameters for printf->puts optimization.
 
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3229,6 +3229,8 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
         ((char *)(dbuf_get_buf (&dbuf)))[strlength - 2] = 0;
 
         parm->opval.val = stringToSymbol (rawStrVal (dbuf_get_buf (&dbuf), strlength - 1));
+        SPEC_REGPARM (parms->etype) = SPEC_REGPARM (FUNC_ARGS (puts_sym->type)->etype);
+        SPEC_ARGREG (parms->etype) = SPEC_ARGREG (FUNC_ARGS (puts_sym->type)->etype);
 	dbuf_destroy (&dbuf);
 
         freeStringSymbol (strsym);

@@ -5287,9 +5287,6 @@ isInHome (void)
 static void genSend (const iCode *ic)
 {
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-
-  wassertl (ic->next->op == CALL || ic->next->op == PCALL, "Sending register parameter for missing call");
-  wassertl (!IS_GB, "Register parameters are not supported in gbz80 port");
   
   int n_regparams = 1;
 

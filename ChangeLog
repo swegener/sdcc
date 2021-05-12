@@ -7,6 +7,11 @@
 	  Infrastructure for non-__z88dk_fastcall register arguments.
 	* src/stm8/gen.c:
 	  Fix bug #3233.
+	* src/SDCCast.c,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h:
+	  Fix handling of register parameters of not-really-builtin memcpy.
 
 2021-05-11 Philipp Klaus Krause <pkk AT spth.de>
 

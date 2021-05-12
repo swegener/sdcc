@@ -4049,7 +4049,8 @@ sym_link *charType;
 sym_link *floatType;
 sym_link *fixed16x16Type;
 
-symbol *memcpy_builtin;
+symbol *builtin_memcpy;
+symbol *nonbuiltin_memcpy;
 
 static const char *
 _mangleFunctionName (const char *in)
@@ -4495,15 +4496,19 @@ initBuiltIns ()
     }
 
   /* initialize memcpy symbol for struct assignment */
-  memcpy_builtin = findSym (SymbolTab, NULL, "__builtin_memcpy");
-  /* if there is no __builtin_memcpy, use __memcpy instead of an actual builtin */
-  if (!memcpy_builtin)
+  builtin_memcpy = findSym (SymbolTab, NULL, "__builtin_memcpy");
+  nonbuiltin_memcpy = findSym (SymbolTab, NULL, "__memcpy");
+
+  if (!nonbuiltin_memcpy)
     {
       const char *argTypeStrs[] = {"vg*", "Cvg*", "Ui"};
-      memcpy_builtin = funcOfTypeVarg ("__memcpy", "vg*", 3, argTypeStrs);
-      FUNC_ISBUILTIN (memcpy_builtin->type) = 0;
-      FUNC_ISREENT (memcpy_builtin->type) = options.stackAuto;
+      nonbuiltin_memcpy = funcOfTypeVarg ("__memcpy", "vg*", 3, argTypeStrs);
+      FUNC_ISBUILTIN (nonbuiltin_memcpy->type) = 0;
+      FUNC_ISREENT (nonbuiltin_memcpy->type) = options.stackAuto;
     }
+  /* if there is no __builtin_memcpy, use __memcpy instead of an actual builtin */
+  if (!builtin_memcpy)
+    builtin_memcpy = nonbuiltin_memcpy;
 }
 
 sym_link *

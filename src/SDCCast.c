@@ -3356,9 +3356,9 @@ rewriteStructAssignment (ast *tree)
   copyAstLoc (params, tree);
 
   /* create call to the appropriate memcpy function */
-  ast *memcpy_ast = newAst_VALUE (symbolVal (memcpy_builtin));
-  copyAstLoc (memcpy_ast, tree);
-  ast *call = newNode (CALL, memcpy_ast, params);
+  ast *ast_memcpy = newAst_VALUE (symbolVal (builtin_memcpy));
+  copyAstLoc (ast_memcpy, tree);
+  ast *call = newNode (CALL, ast_memcpy, params);
   copyAstLoc (call, tree);
 
   /* assemble the result expression depending on side effects */

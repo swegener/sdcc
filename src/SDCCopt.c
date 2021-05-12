@@ -1035,12 +1035,21 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
 convert:
   /* Convert parameter passings from SEND to PUSH. */
   stack = 0;
-  for (icc = ic; icc->op != CALL; icc = icc->next)
+  struct value *args;
+  for (icc = ic, args = FUNC_ARGS (nonbuiltin_memcpy->type); icc->op != CALL; icc = icc->next, args = args->next)
     {
+      wassert (args);
       icc->builtinSEND = 0;
-      icc->op = IPUSH;
-      icc->parmPush = 1;
-      stack += getSize (operandType (IC_LEFT (icc)));
+      if (IS_REGPARM (args->etype))
+        {
+          icc->argreg = SPEC_ARGREG (args->etype);
+        }
+      else
+        {
+          icc->op = IPUSH;
+          icc->parmPush = 1;
+          stack += getSize (operandType (IC_LEFT (icc)));
+        }
     }
   icc->parmBytes = stack;
 

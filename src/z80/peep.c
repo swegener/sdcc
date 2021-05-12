@@ -359,8 +359,8 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "reti") || ISINST(pl->line, "retn"))
     return(strcmp(what, "sp") == 0);
 
-  if(ISINST(pl->line, "ret")) // --reserve-regs-iy uses ret in code gen for calls through function pointers
-    return(IY_RESERVED ? z80IsReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : z80IsReturned(what)) || strcmp(what, "sp") == 0;
+  if(ISINST(pl->line, "ret")) // --reserve-regs-iy and the gbz80 port use ret in code gen for calls through function pointers
+    return((IY_RESERVED || IS_GB) ? z80IsReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : z80IsReturned(what)) || strcmp(what, "sp") == 0;
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l") || strcmp(what, "sp") == 0);

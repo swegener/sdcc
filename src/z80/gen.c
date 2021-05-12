@@ -5506,7 +5506,7 @@ genCall (const iCode *ic)
       else if (bc_free_pre_call) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (!prestackadjust);
-          wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
+          wassert (IY_RESERVED || IS_GB); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           symbol *tlbl = 0;
           if (aopInReg (IC_LEFT (ic)->aop, 0, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, C_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, C_IDX))
             {

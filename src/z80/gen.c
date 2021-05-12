@@ -5356,6 +5356,10 @@ genCall (const iCode *ic)
   const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
                        IS_TRUE_SYMOP (IC_RESULT (ic));
 
+  bool hl_free_pre_call = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h");
+  bool de_free_pre_call = !z80IsParmInCall(ftype, "e") && !z80IsParmInCall(ftype, "d");
+  bool bc_free_pre_call = !z80IsParmInCall(ftype, "c") && !z80IsParmInCall(ftype, "b");
+
   aopOp (IC_LEFT (ic), ic, false, false);
   if (SomethingReturned && !bigreturn)
     aopOp (IC_RESULT (ic), ic, false, false);
@@ -5365,9 +5369,9 @@ genCall (const iCode *ic)
       PAIR_ID pair;
       int fp_offset, sp_offset;
 
-      if (ic->op == PCALL && IS_GB)
+      if (ic->op == PCALL && IS_GB || !hl_free_pre_call)
         _push (PAIR_HL);
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+      aopOp (IC_RESULT (ic), ic, false, false);
       wassert (IC_RESULT (ic)->aop->type == AOP_STK || IC_RESULT (ic)->aop->type == AOP_EXSTK);
       fp_offset =
         IC_RESULT (ic)->aop->aopu.aop_stk + (IC_RESULT (ic)->aop->aopu.aop_stk >
@@ -5385,20 +5389,34 @@ genCall (const iCode *ic)
           emit2 ("add %s, sp", _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IY ? 6 : 4);
         }
-      if (ic->op == PCALL && IS_GB)
+      if (ic->op == PCALL && IS_GB || !hl_free_pre_call)
         {
-          emit2 ("ld e, l");
-          emit2 ("ld d, h");
-          regalloc_dry_run_cost += 2;
-          _pop (PAIR_HL);
-          pair = PAIR_DE;
+          if (de_free_pre_call)
+            {
+              emit2 ("ld e, l");
+              emit2 ("ld d, h");
+              regalloc_dry_run_cost += 2;
+              _pop (PAIR_HL);
+              pair = PAIR_DE;
+            }
+          else
+            {
+              wassert (bc_free_pre_call);
+              emit2 ("ld c, l");
+              emit2 ("ld b, h");
+              regalloc_dry_run_cost += 2;
+              _pop (PAIR_HL);
+              pair = PAIR_BC;             
+            }
         }
       emit2 ("push %s", _pairs[pair].name);
       regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
       if (!regalloc_dry_run)
         _G.stack.pushed += 2;
-      freeAsmop (IC_RESULT (ic), NULL);
+      freeAsmop (IC_RESULT (ic), 0);
+      hl_free_pre_call = false;
     }
+
   // Check if we can do tail call optimization.
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
     (!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, IS_GB ? E_IDX : L_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, IS_GB ? DE_IDX : HL_IDX)) &&
@@ -5465,7 +5483,7 @@ genCall (const iCode *ic)
 
       if (isLitWord (IC_LEFT (ic)->aop))
         {
-          adjustStack (prestackadjust, false, false, false, false, false);
+          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
@@ -5473,7 +5491,7 @@ genCall (const iCode *ic)
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, false, false, false, false);
+          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, false, false);
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           regalloc_dry_run_cost += 3;
         }
@@ -5481,7 +5499,7 @@ genCall (const iCode *ic)
         {
           spillPair (PAIR_IY);
           fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, false, false, false, false);
+          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;
         }
@@ -5553,7 +5571,7 @@ genCall (const iCode *ic)
         }
       else
         {
-          adjustStack (prestackadjust, false, false, false, false, false);
+          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
 
           if (IS_LITERAL (etype))
             {

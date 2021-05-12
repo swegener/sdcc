@@ -5521,19 +5521,24 @@ genCall (const iCode *ic)
                 {
                   tlbl = newiTempLabel (NULL);
                   emit2 ("ld de, !immed!tlabel", labelKey2num (tlbl->key));
-                  emit2 ("push de");
+                  _push (PAIR_DE);
                 }
             }
           else if (!regalloc_dry_run)
             {
-              tlbl = newiTempLabel (NULL);
-              emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
-              emit2 ("push bc");
+              if (!regalloc_dry_run)
+                {
+                  tlbl = newiTempLabel (NULL);
+                  emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
+                  _push (PAIR_BC);
+                }
             }
-          regalloc_dry_run_cost += 4;
+          regalloc_dry_run_cost += 3;
           genMove (ASMOP_BC, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, de_free_pre_call);
           emit2 ("push bc");
           emit2 ("ret");
+          if (!regalloc_dry_run)
+            _G.stack.pushed -= 2;
           regalloc_dry_run_cost += 2;
           if (tlbl)
             emitLabel (tlbl);

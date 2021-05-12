@@ -182,10 +182,12 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
     return TRUE;
   if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
     return TRUE;
+  if (strchr(what, 'a') && z80_regs_used_as_parms_in_calls_from_current_function[A_IDX])
+    return true;
   if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
-    return TRUE;
+    return true;
 
-  return FALSE;
+  return false;
 }
 
 /* Check if the flag implies reading what. */

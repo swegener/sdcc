@@ -4193,6 +4193,8 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
   if(n != 0)
     emitDebug("; adjustStack by %d", n);
   _G.stack.pushed -= n;
+  
+  iy_free &= !IS_GB;
 
   int loop_bytes, loop_cycles;
   if (abs(n) > 0 && (IS_RAB || IS_GB)) // Assume sequence of add sp, #d
@@ -5529,7 +5531,7 @@ genCall (const iCode *ic)
               emit2 ("push bc");
             }
           regalloc_dry_run_cost += 4;
-          fetchPairLong (PAIR_BC, IC_LEFT (ic)->aop, 0, 0);
+          genMove (ASMOP_BC, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, de_free_pre_call);
           emit2 ("push bc");
           emit2 ("ret");
           regalloc_dry_run_cost += 2;

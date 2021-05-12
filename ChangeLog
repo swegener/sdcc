@@ -1,7 +1,7 @@
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
-	  Fix handling of register parameter in a.
+	  Fixesfor register parameter in a, l or hl.
 
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 

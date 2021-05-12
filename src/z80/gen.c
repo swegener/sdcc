@@ -5326,7 +5326,7 @@ static void genSend (const iCode *ic)
               break;
           }
 
-  genMove (argreg, IC_LEFT (ic)->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  genMove (argreg, IC_LEFT (ic)->aop, isRegDead (A_IDX, ic) || !isRegDead (A_IDX, walk), isPairDead (PAIR_HL, ic) || !isPairDead (PAIR_HL, walk), isPairDead (PAIR_DE, ic) || !isPairDead (PAIR_DE, walk));
   
   for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
     if (!regalloc_dry_run)
@@ -6986,7 +6986,7 @@ genPlus (iCode * ic)
       setupToPreserveCarry (IC_RESULT (ic)->aop, leftop, rightop);
     }
   // But if we don't actually want to use hl for the addition, it can make sense to setup an op to use cheaper hl instead of iy.
-  if (size == 1 && !aopInReg(leftop, 0, H_IDX) && !aopInReg(leftop, 0, L_IDX) && isPairDead (PAIR_HL, ic))
+  if (size == 1 && !aopInReg(leftop, 0, H_IDX) && !aopInReg(leftop, 0, L_IDX) && !aopInReg(rightop, 0, H_IDX) && !aopInReg(rightop, 0, L_IDX) && isPairDead (PAIR_HL, ic))
     {
       if (couldDestroyCarry (IC_RESULT (ic)->aop) &&
         (IC_RESULT (ic)->aop == leftop || IC_RESULT (ic)->aop == rightop))

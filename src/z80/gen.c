@@ -1800,10 +1800,10 @@ aopArg (sym_link *ftype, int i)
     {
       if (i != 1)
         return false;
-        
-      int size = getSize (FUNC_ARGS(ftype)->type);
 
-      switch (size)
+      wassert (FUNC_ARGS(ftype));
+
+      switch (getSize (FUNC_ARGS(ftype)->type))
         {
         case 1:
           return ASMOP_L;
@@ -5307,16 +5307,24 @@ static void genSend (const iCode *ic)
   if (_G.saves.saved == FALSE && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
     _saveRegsForCall (walk, FALSE);
     
-  asmop *argreg = aopArg (walk->op == CALL ? operandType (IC_LEFT (walk)) : operandType (IC_LEFT (walk))->next, n_regparams);
+  asmop *argreg = aopArg (IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk)), n_regparams);
   
   wassert (argreg);
 
-  for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
-    if (bitVectBitValue (ic->rSurv, argreg->aopu.aop_reg[i]->rIdx))
-      {
-        regalloc_dry_run_cost += 100;
-        wassert (regalloc_dry_run);
-      }
+  // The register argument shall not overwrite a still-needed (i.e. as further parameter or function for the call) value.
+  for (int i = 0; i < argreg->size; i++)
+    if (!isRegDead (argreg->aopu.aop_reg[i]->rIdx, ic))
+      for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
+          {
+            if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
+              {
+                regalloc_dry_run_cost += 200;
+                wassert (regalloc_dry_run);
+              }
+
+            if (walk->op == CALL || walk->op == PCALL)
+              break;
+          }
 
   genMove (argreg, IC_LEFT (ic)->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   
@@ -5461,7 +5469,7 @@ genCall (const iCode *ic)
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
-      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && !IFFUNC_ISZ88DK_FASTCALL (ftype))
+      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && !z80IsParmInCall (ftype, "l") && !z80IsParmInCall (ftype, "h"))
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, 0);
@@ -5469,7 +5477,7 @@ genCall (const iCode *ic)
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           regalloc_dry_run_cost += 3;
         }
-      else if (!IS_GB && !IY_RESERVED)
+      else if (!IS_GB && !IY_RESERVED && !z80IsParmInCall (ftype, "iy"))
         {
           spillPair (PAIR_IY);
           fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
@@ -5477,7 +5485,7 @@ genCall (const iCode *ic)
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;
         }
-      else // Use bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
+      else if (!z80IsParmInCall (ftype, "c") && !z80IsParmInCall (ftype, "b")) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
@@ -5500,6 +5508,10 @@ genCall (const iCode *ic)
           regalloc_dry_run_cost += 2;
           if (tlbl)
             emitLabel (tlbl);
+        }
+      else
+        {
+          wassert (0);
         }
     }
   else
@@ -15534,5 +15546,17 @@ z80IsRegArg(struct sym_link *ftype, int i, const char *what)
       return true;
 
   return false; 
+}
+
+bool
+z80IsParmInCall(sym_link *ftype, const char *what)
+{
+  const value *args;
+  int i;
+
+  for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
+    if (z80IsRegArg(ftype, i, what))
+      return true;
+  return false;
 }
 

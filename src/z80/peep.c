@@ -188,18 +188,6 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
   return FALSE;
 }
 
-static bool
-z80IsParmInCall(sym_link *ftype, const char *what)
-{
-  const value *args;
-  int i;
-
-  for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
-    if (z80IsRegArg(ftype, i, what))
-      return true;
-  return false;
-}
-
 /* Check if the flag implies reading what. */
 static bool
 z80MightReadFlagCondition(const char *cond, const char *what)

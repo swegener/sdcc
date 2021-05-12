@@ -6917,7 +6917,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // div can be cheaper than a sequence of shifts.
+  // div can be cheaper than a sequence of shifts. Keep the decision here consistent with handling of funcDivFlagSafe in SDCCralloc.hpp!
   if (!sign && shCount < 8 &&
     (shCount > 3 + !a_free * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
     shCount * 2 > 4 + !a_free * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
@@ -6934,7 +6934,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // divw can be cheaper than a sequence of shifts.
+  // divw can be cheaper than a sequence of shifts. Keep the decision here consistent with handling of funcDivFlagSafe in SDCCralloc.hpp!
   if (!sign && size == 2 && shCount > 5 && regDead (Y_IDX, ic) && aopInReg (shiftop, 0, X_IDX))
     {
       emit2 ("ldw", "y, #0x%04x", 1 << shCount);

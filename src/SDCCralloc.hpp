@@ -364,7 +364,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
         if (currFunc)
           currFunc->funcDivFlagSafe &= !(ic->op == INLINEASM || ic->op == '/' || ic->op == '%' || ic->op == PCALL ||
             ic->op == CALL && (IS_OP_LITERAL (IC_LEFT (ic)) || !OP_SYMBOL(IC_LEFT (ic))->funcDivFlagSafe) ||
-            ic->op == RIGHT_OP && IS_OP_LITERAL (IC_RIGHT (ic))); // Right shift might be implemented using division.
+            ic->op == RIGHT_OP && IS_OP_LITERAL (IC_RIGHT (ic)) && ulFromVal (OP_VALUE_CONST (IC_RIGHT (ic))) > 2); // Right shift might be implemented using division when shifting by more than 2.
 
 #ifdef DEBUG_SEGV
         default_constructor_of_cfg_node_called = false;

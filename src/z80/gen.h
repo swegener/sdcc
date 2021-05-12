@@ -83,12 +83,15 @@ asmop;
 void genZ80Code (iCode *);
 void z80_emitDebuggerSymbol (const char *);
 
-// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
-// If what is 0, just check if hte ith argument is in registers.
+
 bool z80IsReturned(const char *what);
 
-
+// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
+// If what is 0, just check if hte ith argument is in registers.
 bool z80IsRegArg(struct sym_link *ftype, int i, const char *what);
+
+// Check if what is part of the any argument (counting from 1) to a function of type ftype.
+bool z80IsParmInCall(sym_link *ftype, const char *what);
 
 extern bool z80_assignment_optimal;
 extern bool should_omit_frame_ptr;

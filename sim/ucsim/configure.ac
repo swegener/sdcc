@@ -65,11 +65,11 @@ if test $enable_ds390_port != "no"; then
 fi,
 enable_ds390_port="yes")
 AC_ARG_ENABLE(avr-port,
-[  --enable-avr-port       compile simulator for AVR],
+[  --disable-avr-port      do not compile simulator for AVR],
 if test $enable_avr_port != "no"; then
     enable_avr_port="yes"
 fi,
-enable_avr_port="no")
+enable_avr_port="yes")
 AC_ARG_ENABLE(z80-port,
 [  --disable-z80-port      do not compile simulator for z80],
 if test $enable_z80_port != "no"; then
@@ -101,7 +101,7 @@ if test $enable_r3ka_port != "no"; then
 fi,
 enable_r3ka_port="yes")
 AC_ARG_ENABLE(tlcs-port,
-[  --disable-tlcs-port    do not compile simulator for TLCS],
+[  --disable-tlcs-port     do not compile simulator for TLCS],
 if test $enable_tlcs_port != "no"; then
     enable_tlcs_port="yes"
 fi,
@@ -119,11 +119,11 @@ if test $enable_s08_port != "no"; then
 fi,
 enable_s08_port="yes")
 AC_ARG_ENABLE(xa-port,
-[  --enable-xa-port        compile simulator for xa],
+[  --disable-xa-port       do not compile simulator for xa],
 if test $enable_xa_port != "no"; then
     enable_xa_port="yes"
 fi,
-enable_xa_port="no")
+enable_xa_port="yes")
 AC_ARG_ENABLE(stm8-port,
 [  --disable-stm8-port     do not compile simulator for stm8],
 if test $enable_stm8_port != "no"; then
@@ -137,53 +137,53 @@ if test $enable_pdk_port != "no"; then
 fi,
 enable_pdk_port="yes")
 AC_ARG_ENABLE(st7-port,
-[  --enable-st7-port       compile simulator for st7],
+[  --disable-st7-port      do not compile simulator for st7],
 if test $enable_st7_port  != "no"; then
     enable_st7_port="yes"
 fi,
-enable_st7_port="no")
+enable_st7_port="yes")
 AC_ARG_ENABLE(p1516-port,
-[  --enable-p1516-port     compile simulator for p1516],
+[  --disable-p1516-port    do not compile simulator for p1516],
 if test $enable_p1516_port  != "no"; then
     enable_p1516_port="yes"
 fi,
 enable_p1516_port="yes")
 AC_ARG_ENABLE(m6809-port,
-[  --enable-m6809-port     compile simulator for m6809],
+[  --disable-m6809-port    do not compile simulator for m6809],
 if test $enable_m6809_port  != "no"; then
     enable_m6809_port="yes"
 fi,
 enable_m6809_port="yes")
 AC_ARG_ENABLE(m6800-port,
-[  --enable-m6800-port     compile simulator for m6800],
+[  --disable-m6800-port    do not compile simulator for m6800],
 if test $enable_m6800_port  != "no"; then
     enable_m6800_port="yes"
 fi,
 enable_m6800_port="yes")
 AC_ARG_ENABLE(mcs6502-port,
-[  --enable-mcs6502-port     compile simulator for mcs6502],
+[  --disable-mcs6502-port  do not compile simulator for mcs6502],
 if test $enable_mcs6502_port  != "no"; then
     enable_mcs6502_port="yes"
 fi,
 enable_mcs6502_port="yes")
 AC_ARG_ENABLE(rxk-port,
-[  --enable-rxk-port     compile simulator for Rabbit rXk],
+[  --disable-rxk-port      do not compile simulator for Rabbit rXk],
 if test $enable_rxk_port  != "no"; then
     enable_rxk_port="yes"
 fi,
 enable_rxk_port="yes")
 AC_ARG_ENABLE(pblaze-port,
-[  --enable-plaze-port   compile simulator for Xilinx PicoBlaze],
+[  --enable-plaze-port     compile simulator for Xilinx PicoBlaze],
 if test $enable_pblaze_port  != "yes"; then
     enable_pblaze_port="no"
 fi,
 enable_pblaze_port="no")
 AC_ARG_ENABLE(serio,
-[  --enable-serio          compile serio GUI tool (needs curses)],
+[  --disable-serio         do not compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
     enable_serio="yes"
 fi,
-enable_serio="no")
+enable_serio="yes")
 AC_SUBST(enable_ucsim)
 AC_SUBST(enable_dlso)
 AC_SUBST(enable_mcs51_port)
@@ -367,19 +367,6 @@ DL="")
 AC_SUBST(dl_ok)
 AC_SUBST(DL)
 
-#AC_CHECK_LIB(panel,panel_above,
-#panel_ok="yes"
-#curses_ok="yes"
-#CURSES_LIBS="-lpanel -lcurses"
-#,
-#panel_ok="no"
-#AC_CHECK_LIB(curses,nl,
-#curses_ok="yes"
-#CURSES_LIBS="-lcurses"
-#,
-#curses_ok="no")
-#,
-#-lcurses)
 CURSES_LIBS=""
 if test $curses_h_ok != yes; then
   panel_ok="no"
@@ -413,54 +400,54 @@ AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
 
 AC_CHECK_FUNCS(vasprintf)
-AC_CHECK_FUNCS(strdup)
+dnl AC_CHECK_FUNCS(strdup)
 dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
 AC_CHECK_FUNCS(yylex)
 
-AC_CACHE_CHECK(whether scanf knows %a, ucsim_cv_scanf_a,
-[echo "a b" >conftest.data
-AC_TRY_RUN([
-#include <stdio.h>
-void main(void)
-{
-  FILE *f;
-  char *a;
-  int  i;
-  if ((f= fopen("conftest.data", "r")) == NULL)
-    exit(1);
-  i= fscanf(f, " %a[a-z] ", &a);
-  fclose(f);
-  if (i == 0)
-    exit(2);
-  if (i == 1)
-    exit(0);
-  exit(3);
-}],
-ucsim_cv_scanf_a="yes",
-ucsim_cv_scanf_a="no",
-ucsim_cv_scanf_a="unknown")
-])
-if test "$ucsim_cv_scanf_a" = "yes"; then
-  AC_DEFINE(SCANF_A, 1, [XXX])
-fi
+# AC_CACHE_CHECK(whether scanf knows %a, ucsim_cv_scanf_a,
+# [echo "a b" >conftest.data
+# AC_TRY_RUN([
+# #include <stdio.h>
+# void main(void)
+# {
+#   FILE *f;
+#   char *a;
+#   int  i;
+#   if ((f= fopen("conftest.data", "r")) == NULL)
+#     exit(1);
+#   i= fscanf(f, " %a[a-z] ", &a);
+#   fclose(f);
+#   if (i == 0)
+#     exit(2);
+#   if (i == 1)
+#     exit(0);
+#   exit(3);
+# }],
+# ucsim_cv_scanf_a="yes",
+# ucsim_cv_scanf_a="no",
+# ucsim_cv_scanf_a="unknown")
+# ])
+# if test "$ucsim_cv_scanf_a" = "yes"; then
+#   AC_DEFINE(SCANF_A, 1, [XXX])
+# fi
 
-AC_CACHE_CHECK(whether getcwd is GNUish, ucsim_cv_getcwd,
-[AC_TRY_RUN([
-#include <unistd.h>
-void main(void)
-{
-  if ((getcwd(NULL, 0)) == NULL)
-    exit(1);
-  exit(0);
-}],
-ucsim_cv_getcwd="yes",
-ucsim_cv_getcwd="no",
-ucsim_cv_getcwd="unknown")
-])
-if test "$ucsim_cv_getcwd" = "yes"; then
-  AC_DEFINE(GNU_GETCWD, 1, [XXX])
-fi
+# AC_CACHE_CHECK(whether getcwd is GNUish, ucsim_cv_getcwd,
+# [AC_TRY_RUN([
+# #include <unistd.h>
+# void main(void)
+# {
+#   if ((getcwd(NULL, 0)) == NULL)
+#     exit(1);
+#   exit(0);
+# }],
+# ucsim_cv_getcwd="yes",
+# ucsim_cv_getcwd="no",
+# ucsim_cv_getcwd="unknown")
+# ])
+# if test "$ucsim_cv_getcwd" = "yes"; then
+#   AC_DEFINE(GNU_GETCWD, 1, [XXX])
+# fi
 
 #AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
 # [AC_CACHE_CHECK([for type of length pointer parameter of accept],

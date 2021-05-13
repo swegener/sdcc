@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -f Makefile ] && make distclean
+[ -f Makefile ] && ./distclean.sh
 
 TARGET=linux
 

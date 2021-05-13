@@ -1447,26 +1447,26 @@ Optional Features:
   --enable-dlso           compile dynamically loadable shared libraries
   --disable-mcs51-port    do not compile simulator for mcs51
   --disable-ds390-port    do not compile simulator for ds390
-  --enable-avr-port       compile simulator for AVR
+  --disable-avr-port      do not compile simulator for AVR
   --disable-z80-port      do not compile simulator for z80
   --disable-z180-port     do not compile simulator for z180
   --disable-gbz80-port    do not compile simulator for gbz80
   --disable-r2k-port      do not compile simulator for r2k
   --disable-r3ka-port     do not compile simulator for r3ka
-  --disable-tlcs-port    do not compile simulator for TLCS
+  --disable-tlcs-port     do not compile simulator for TLCS
   --disable-hc08-port     do not compile simulator for hc08
   --disable-s08-port      do not compile simulator for s08
-  --enable-xa-port        compile simulator for xa
+  --disable-xa-port       do not compile simulator for xa
   --disable-stm8-port     do not compile simulator for stm8
   --disable-pdk-port      do not compile simulator for pdk
-  --enable-st7-port       compile simulator for st7
-  --enable-p1516-port     compile simulator for p1516
-  --enable-m6809-port     compile simulator for m6809
-  --enable-m6800-port     compile simulator for m6800
-  --enable-mcs6502-port     compile simulator for mcs6502
-  --enable-rxk-port     compile simulator for Rabbit rXk
-  --enable-plaze-port   compile simulator for Xilinx PicoBlaze
-  --enable-serio          compile serio GUI tool (needs curses)
+  --disable-st7-port      do not compile simulator for st7
+  --disable-p1516-port    do not compile simulator for p1516
+  --disable-m6809-port    do not compile simulator for m6809
+  --disable-m6800-port    do not compile simulator for m6800
+  --disable-mcs6502-port  do not compile simulator for mcs6502
+  --disable-rxk-port      do not compile simulator for Rabbit rXk
+  --enable-plaze-port     compile simulator for Xilinx PicoBlaze
+  --disable-serio         do not compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
@@ -2850,7 +2850,7 @@ if test "${enable_avr_port+set}" = set; then :
     enable_avr_port="yes"
 fi
 else
-  enable_avr_port="no"
+  enable_avr_port="yes"
 fi
 
 # Check whether --enable-z80-port was given.
@@ -2931,7 +2931,7 @@ if test "${enable_xa_port+set}" = set; then :
     enable_xa_port="yes"
 fi
 else
-  enable_xa_port="no"
+  enable_xa_port="yes"
 fi
 
 # Check whether --enable-stm8-port was given.
@@ -2958,7 +2958,7 @@ if test "${enable_st7_port+set}" = set; then :
     enable_st7_port="yes"
 fi
 else
-  enable_st7_port="no"
+  enable_st7_port="yes"
 fi
 
 # Check whether --enable-p1516-port was given.
@@ -3021,7 +3021,7 @@ if test "${enable_serio+set}" = set; then :
     enable_serio="yes"
 fi
 else
-  enable_serio="no"
+  enable_serio="yes"
 fi
 
 
@@ -17007,19 +17007,6 @@ fi
 
 
 
-#AC_CHECK_LIB(panel,panel_above,
-#panel_ok="yes"
-#curses_ok="yes"
-#CURSES_LIBS="-lpanel -lcurses"
-#,
-#panel_ok="no"
-#AC_CHECK_LIB(curses,nl,
-#curses_ok="yes"
-#CURSES_LIBS="-lcurses"
-#,
-#curses_ok="no")
-#,
-#-lcurses)
 CURSES_LIBS=""
 if test $curses_h_ok != yes; then
   panel_ok="no"
@@ -17180,17 +17167,6 @@ _ACEOF
 fi
 done
 
-for ac_func in strdup
-do :
-  ac_fn_cxx_check_func "$LINENO" "strdup" "ac_cv_func_strdup"
-if test "x$ac_cv_func_strdup" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_STRDUP 1
-_ACEOF
-
-fi
-done
-
 for ac_func in yylex
 do :
   ac_fn_cxx_check_func "$LINENO" "yylex" "ac_cv_func_yylex"
@@ -17203,91 +17179,49 @@ fi
 done
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether scanf knows %a" >&5
-$as_echo_n "checking whether scanf knows %a... " >&6; }
-if ${ucsim_cv_scanf_a+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  echo "a b" >conftest.data
-if test "$cross_compiling" = yes; then :
-  ucsim_cv_scanf_a="unknown"
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+# AC_CACHE_CHECK(whether scanf knows %a, ucsim_cv_scanf_a,
+# [echo "a b" >conftest.data
+# AC_TRY_RUN([
+# #include <stdio.h>
+# void main(void)
+# {
+#   FILE *f;
+#   char *a;
+#   int  i;
+#   if ((f= fopen("conftest.data", "r")) == NULL)
+#     exit(1);
+#   i= fscanf(f, " %a[a-z] ", &a);
+#   fclose(f);
+#   if (i == 0)
+#     exit(2);
+#   if (i == 1)
+#     exit(0);
+#   exit(3);
+# }],
+# ucsim_cv_scanf_a="yes",
+# ucsim_cv_scanf_a="no",
+# ucsim_cv_scanf_a="unknown")
+# ])
+# if test "$ucsim_cv_scanf_a" = "yes"; then
+#   AC_DEFINE(SCANF_A, 1, [XXX])
+# fi
 
-#include <stdio.h>
-void main(void)
-{
-  FILE *f;
-  char *a;
-  int  i;
-  if ((f= fopen("conftest.data", "r")) == NULL)
-    exit(1);
-  i= fscanf(f, " %a[a-z] ", &a);
-  fclose(f);
-  if (i == 0)
-    exit(2);
-  if (i == 1)
-    exit(0);
-  exit(3);
-}
-_ACEOF
-if ac_fn_cxx_try_run "$LINENO"; then :
-  ucsim_cv_scanf_a="yes"
-else
-  ucsim_cv_scanf_a="no"
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ucsim_cv_scanf_a" >&5
-$as_echo "$ucsim_cv_scanf_a" >&6; }
-if test "$ucsim_cv_scanf_a" = "yes"; then
-
-$as_echo "#define SCANF_A 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether getcwd is GNUish" >&5
-$as_echo_n "checking whether getcwd is GNUish... " >&6; }
-if ${ucsim_cv_getcwd+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test "$cross_compiling" = yes; then :
-  ucsim_cv_getcwd="unknown"
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <unistd.h>
-void main(void)
-{
-  if ((getcwd(NULL, 0)) == NULL)
-    exit(1);
-  exit(0);
-}
-_ACEOF
-if ac_fn_cxx_try_run "$LINENO"; then :
-  ucsim_cv_getcwd="yes"
-else
-  ucsim_cv_getcwd="no"
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ucsim_cv_getcwd" >&5
-$as_echo "$ucsim_cv_getcwd" >&6; }
-if test "$ucsim_cv_getcwd" = "yes"; then
-
-$as_echo "#define GNU_GETCWD 1" >>confdefs.h
-
-fi
+# AC_CACHE_CHECK(whether getcwd is GNUish, ucsim_cv_getcwd,
+# [AC_TRY_RUN([
+# #include <unistd.h>
+# void main(void)
+# {
+#   if ((getcwd(NULL, 0)) == NULL)
+#     exit(1);
+#   exit(0);
+# }],
+# ucsim_cv_getcwd="yes",
+# ucsim_cv_getcwd="no",
+# ucsim_cv_getcwd="unknown")
+# ])
+# if test "$ucsim_cv_getcwd" = "yes"; then
+#   AC_DEFINE(GNU_GETCWD, 1, [XXX])
+# fi
 
 #AC_DEFUN([ucsim_ACCEPT_LENGTH_T],
 # [AC_CACHE_CHECK([for type of length pointer parameter of accept],

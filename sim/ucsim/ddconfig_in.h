@@ -25,7 +25,7 @@
 #undef FD_NEED_WINSOCK2_H
 
 /* XXX */
-#undef GNU_GETCWD
+//#undef GNU_GETCWD
 
 /* XXX */
 #undef HAVE_CURSES_H
@@ -74,7 +74,7 @@
 #undef HAVE_STDLIB_H
 
 /* Define to 1 if you have the `strdup' function. */
-#undef HAVE_STRDUP
+//#undef HAVE_STRDUP
 
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
@@ -151,7 +151,7 @@
 #undef RETSIGTYPE
 
 /* XXX */
-#undef SCANF_A
+//#undef SCANF_A
 
 /* The size of `char', as computed by sizeof. */
 #undef SIZEOF_CHAR

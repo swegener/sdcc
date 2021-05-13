@@ -30,10 +30,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 cl_m6800::sub(class cl_cell8 &dest, u8_t op, bool c)
 {
+  u8_t orgc= rF&flagC;
   u8_t f= CC & ~(flagN|flagZ|flagV|flagC);
   u8_t a= dest.read(), b= op, r;
   u8_t a7, b7, r7, na7, nb7, nr7;
   r= a-b;
+  if (c && orgc) r--;
   a7= a&0x80; na7= a7^0x80;
   b7= b&0x80; nb7= b7^0x80;
   r7= r&0x80; nr7= r7^0x80;
@@ -69,10 +71,12 @@ cl_m6800::cmp(u8_t op1, u8_t op2)
 int
 cl_m6800::add(class cl_cell8 &dest, u8_t op, bool c)
 {
+  u8_t orgc= rF&flagC;
   u8_t f= CC & ~(flagN|flagZ|flagV|flagC|flagH);
   u8_t a= dest.read(), b= op, r;
   u8_t a7, b7, r7, na7, nb7, nr7;
   r= a+b;
+  if (c && orgc) r++;
   a7= a&0x80; na7= a7^0x80;
   b7= b&0x80; nb7= b7^0x80;
   r7= r&0x80; nr7= r7^0x80;
@@ -116,6 +120,7 @@ cl_m6800::com(class cl_cell8 &dest)
   return resGO;
 }
 
+// cc_out[VBIT] = left[0];
 int
 cl_m6800::lsr(class cl_cell8 &dest)
 {
@@ -129,6 +134,7 @@ cl_m6800::lsr(class cl_cell8 &dest)
   return resGO;
 }
 
+// cc_out[VBIT] = left[0] ^ cc[CBIT];
 int
 cl_m6800::ror(class cl_cell8 &dest)
 {
@@ -140,12 +146,14 @@ cl_m6800::ror(class cl_cell8 &dest)
   dest.W(op);
   if (!op) f|= flagZ;
   if (op^0x80) f|= flagN;
-  if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
+  //if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
+  if ((f&flagC) ^ c) f|= flagV;
   cCC.W(f);
   tick(1);
   return resGO;
 }
 
+// cc_out[VBIT] = left[0] ^ left[7];
 int
 cl_m6800::asr(class cl_cell8 &dest)
 {
@@ -163,6 +171,7 @@ cl_m6800::asr(class cl_cell8 &dest)
   return resGO;
 }
 
+// cc_out[VBIT] = left[7] ^ left[6];
 int
 cl_m6800::asl(class cl_cell8 &dest)
 {
@@ -180,6 +189,7 @@ cl_m6800::asl(class cl_cell8 &dest)
   return resGO;
 }
 
+// cc_out[VBIT] = left[7] ^ left[6];
 int
 cl_m6800::rol(class cl_cell8 &dest)
 {
@@ -236,6 +246,71 @@ cl_m6800::tst(u8_t op)
   return resGO;
 }
 
+int
+cl_m6800::And(class cl_cell8 &dest, u8_t op)
+{
+  u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
+  a&= op;
+  if (!a) f|= flagZ;
+  if (a&0x80) f|= flagN;
+  dest.W(a);
+  cCC.W(f);
+  return resGO;
+}
+
+int
+cl_m6800::bit(u8_t op1, u8_t op2)
+{
+  u8_t a= op1, f= rF & ~(flagV|flagN|flagZ);
+  a&= op2;
+  if (!a) f|= flagZ;
+  if (a&0x80) f|= flagN;
+  cCC.W(f);
+  return resGO;
+}
+
+int
+cl_m6800::eor(class cl_cell8 &dest, u8_t op)
+{
+  u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
+  a^= op;
+  if (!a) f|= flagZ;
+  if (a&0x80) f|= flagN;
+  dest.W(a);
+  cCC.W(f);
+  return resGO;
+}
+
+int
+cl_m6800::Or(class cl_cell8 &dest, u8_t op)
+{
+  u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
+  a|= op;
+  if (!a) f|= flagZ;
+  if (a&0x80) f|= flagN;
+  dest.W(a);
+  cCC.W(f);
+  return resGO;
+}
+
+int
+cl_m6800::cpx(u16_t op)
+{
+  u32_t r;
+  u16_t r2;
+  u8_t f= rF & ~(flagN|flagZ|flagV);
+  op= ~op+1;
+  r= rX+op;
+  r2= (rX&0x7fff) + (op&0x7fff);
+  if (r&0x8000) f|= flagN;
+  if (!(r&0xffff)) f|= flagZ;
+  r&= ~0xffff;
+  r2&= ~0x7fff;
+  if ((r && !r2) ||
+      (!r && r2)) f|= flagV;
+  cCC.W(f);
+  return resGO;
+}
 
 int
 cl_m6800::INX(t_mem code)

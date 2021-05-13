@@ -28,15 +28,59 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 int
+cl_m6800::call(t_addr a)
+{
+  u8_t h= PC>>8, l= PC;
+  rom->write(rSP, h);
+  rSP--;
+  rom->write(rSP, l);
+  cSP.W(rSP-1);
+  PC= a;
+  vc.wr+= 2;
+  tick(6);
+  return resGO;
+}
+
+int
 cl_m6800::RTS(t_mem code)
 {
   u8_t h, l;
-  rSP--;
+  rSP++;
   h= rom->read(rSP);
-  cSP.W(rSP-1);
+  cSP.W(rSP+1);
   l= rom->read(rSP);
   PC= h*256 + l;
+  vc.rd+= 2;
   tick(4);
+  return resGO;
+}
+
+int
+cl_m6800::branch(t_addr a, bool cond)
+{
+  if (cond)
+    PC= a&0xffff;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_m6800::JMPi(t_mem code)
+{
+  t_addr a= fetch();
+  a+= rX;
+  PC= a;
+  tick(2);
+  return resGO;
+}
+
+int
+cl_m6800::JMPe(t_mem code)
+{
+  u8_t h, l;
+  h= fetch();
+  l= fetch();
+  PC= h*256 + l;
   return resGO;
 }
 

@@ -6413,6 +6413,19 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
   if (shCount > (size * 8))
     shCount = size * 8;
 
+  if (size == 2 && shCount < 16 && shCount >= 13 && regDead (A_IDX, ic) && regDead (X_IDX, ic))
+    {
+      cheapMove (ASMOP_A, 0, left->aop, 0, false);
+      emit3w (A_CLRW, ASMOP_X, 0);
+      for (int i = shCount; i < 16; i++)
+        {
+          emit3 (A_SRL, ASMOP_A, 0);
+          emit3w (A_RRCW, ASMOP_X, 0);
+        }
+      genMove(result->aop, ASMOP_X, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      goto release;
+    }
+
   if (shCount >= (size * 8))
     {
       genMove(result->aop, ASMOP_ZERO, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));

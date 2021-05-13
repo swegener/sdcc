@@ -1,3 +1,10 @@
+2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClrange.c:
+	  Improve handling of register parameters.
+	* src/stm8/gen.c:
+	  Improve code generation for shift by slightly-less-than-a-multiple-of-8.
+
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

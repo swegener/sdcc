@@ -673,8 +673,8 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
                       ic->rlive = bitVectSetBit (ic->rlive, IC_LEFT(ic)->key);
                       findNextUse (ebbs[i], ic->next, IC_LEFT(ic));
 
-                      /* if this is a send extend the LR to the call */
-                      if (ic->op == SEND)
+                      // If this is a send extend the LR to the call. For new register allocator we want this for builtin send only.
+                      if (ic->op == SEND && !((TARGET_Z80_LIKE || TARGET_PDK_LIKE || TARGET_IS_STM8) && !ic->builtinSEND))
                         {
                           iCode *lic;
                           for (lic = ic; lic; lic = lic->next)

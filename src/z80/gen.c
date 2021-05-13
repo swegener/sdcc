@@ -3985,11 +3985,25 @@ skip_byte:
         }
       else if (aopRS (result) && aopOnStack (source, soffset + i, 1) && !aopOnStack (result, roffset + i, 1))
         {
-          if (requiresHL (source) && source->type != AOP_REG && !hl_free)
-            _push (PAIR_HL);
-          cheapMove (result, roffset + i, source, soffset + i, a_free);
-          if (requiresHL (source) && source->type != AOP_REG && !hl_free)
-            _pop (PAIR_HL);
+          if (requiresHL (source) && !hl_free && (aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, H_IDX)))
+            {
+              if (!a_free)
+                _push (PAIR_AF);
+              _push (PAIR_HL);
+              cheapMove (ASMOP_A, 0, source, soffset + i, true);
+              _pop (PAIR_HL);
+              cheapMove (result, roffset + i, ASMOP_A, 0, true);
+              if (!a_free)
+                _pop (PAIR_AF);
+            }
+          else
+            {
+              if (requiresHL (source) && !hl_free)
+                _push (PAIR_HL);
+              cheapMove (result, roffset + i, source, soffset + i, a_free);
+              if (requiresHL (source) && source->type != AOP_REG && !hl_free)
+                _pop (PAIR_HL);
+              }
           assigned[i] = true;
           size--;
           i++;

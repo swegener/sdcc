@@ -1796,14 +1796,15 @@ aopArg (sym_link *ftype, int i)
   if (IFFUNC_HASVARARGS (ftype))
     return 0;
 
+  value *args = FUNC_ARGS(ftype);
+  wassert (args);
+
   if (IFFUNC_ISZ88DK_FASTCALL (ftype))
     {
       if (i != 1)
         return false;
 
-      wassert (FUNC_ARGS(ftype));
-
-      switch (getSize (FUNC_ARGS(ftype)->type))
+      switch (getSize (args->type))
         {
         case 1:
           return ASMOP_L;
@@ -5292,26 +5293,20 @@ static void genSend (const iCode *ic)
 {
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   
-  int n_regparams = 1;
-
   /* Caller saves, and this is the first iPush. */
-  /* Scan ahead until we find the function that we are pushing parameters to.
-     Count the number of addSets on the way to figure out what registers
-     are used in the send set.
-   */
+  // Scan ahead until we find the function that we are pushing parameters to.
   const iCode *walk;
   for (walk = ic->next; walk; walk = walk->next)
     {
-      if (walk->op == SEND)
-        n_regparams++;
-      else if (walk->op == CALL || walk->op == PCALL)
+      if (walk->op == CALL || walk->op == PCALL)
         break;
     }
 
   if (_G.saves.saved == FALSE && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
     _saveRegsForCall (walk, FALSE);
-    
-  asmop *argreg = aopArg (IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk)), n_regparams);
+
+  sym_link *ftype = IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk));
+  asmop *argreg = aopArg (ftype, ic->argreg);
   
   wassert (argreg);
 
@@ -5330,7 +5325,20 @@ static void genSend (const iCode *ic)
               break;
           }
 
-  genMove (argreg, IC_LEFT (ic)->aop, isRegDead (A_IDX, ic) || !isRegDead (A_IDX, walk), isPairDead (PAIR_HL, ic) || !isPairDead (PAIR_HL, walk), isPairDead (PAIR_DE, ic) || !isPairDead (PAIR_DE, walk));
+  bool a_dead = isRegDead (A_IDX, ic) || !isRegDead (A_IDX, walk);
+  bool hl_dead = isPairDead (PAIR_HL, ic) || !isPairDead (PAIR_HL, walk);
+  bool de_dead = isPairDead (PAIR_DE, ic) || !isPairDead (PAIR_DE, walk);
+  
+  for (iCode *walk2 = ic->prev; walk2 && walk2->op == SEND; walk2 = walk2->prev)
+    {
+      asmop *warg = aopArg (ftype, walk2->argreg);
+      wassert (warg);
+      a_dead &= (warg->regs[A_IDX] < 0);
+      hl_dead &= (warg->regs[L_IDX] < 0 && warg->regs[H_IDX] < 0);
+      de_dead &= (warg->regs[E_IDX] < 0 && warg->regs[D_IDX] < 0);
+    }
+
+  genMove (argreg, IC_LEFT (ic)->aop, a_dead, hl_dead, de_dead);
   
   for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
     if (!regalloc_dry_run)

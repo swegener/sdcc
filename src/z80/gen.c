@@ -5325,9 +5325,9 @@ static void genSend (const iCode *ic)
               break;
           }
 
-  bool a_dead = isRegDead (A_IDX, ic) || !isRegDead (A_IDX, walk);
-  bool hl_dead = isPairDead (PAIR_HL, ic) || !isPairDead (PAIR_HL, walk);
-  bool de_dead = isPairDead (PAIR_DE, ic) || !isPairDead (PAIR_DE, walk);
+  bool a_dead = isRegDead (A_IDX, ic);
+  bool hl_dead = isPairDead (PAIR_HL, ic);
+  bool de_dead = isPairDead (PAIR_DE, ic);
   
   for (iCode *walk2 = ic->prev; walk2 && walk2->op == SEND; walk2 = walk2->prev)
     {

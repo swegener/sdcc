@@ -8411,7 +8411,74 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genDummyRead - generate code for dummy read of volatiles        */
+/* genReceive - generate code for receiving a register parameter.  */
+/*-----------------------------------------------------------------*/
+static void
+genReceive (const iCode *ic)
+{
+  operand *result = IC_RESULT (ic);
+  aopOp (result, ic);
+  
+  wassert (currFunc && ic->argreg);
+
+  genMove (result->aop, aopArg (currFunc->type, ic->argreg), regDead(A_IDX, ic), regDead(X_IDX, ic), regDead(Y_IDX, ic));
+
+  freeAsmop (result);
+}
+
+/*-----------------------------------------------------------------*/
+/* genSend - generate code for sending a register parameter.       */
+/*-----------------------------------------------------------------*/
+static void
+genSend (const iCode *ic)
+{ 
+  aopOp (IC_LEFT (ic), ic);
+
+  int n_regparams = 1;
+
+  /* Caller saves, and this is the first iPush. */
+  /* Scan ahead until we find the function that we are pushing parameters to.
+     Count the number of addSets on the way to figure out what registers
+     are used in the send set.
+   */
+  const iCode *walk;
+  for (walk = ic->next; walk; walk = walk->next)
+    {
+      if (walk->op == SEND)
+        n_regparams++;
+      else if (walk->op == CALL || walk->op == PCALL)
+        break;
+    }
+
+  if (!G.saved  && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+    saveRegsForCall (walk);
+
+  asmop *argreg = aopArg (IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk)), n_regparams);
+
+  wassert (argreg);
+
+  // The register argument shall not overwrite a still-needed (i.e. as further parameter or function for the call) value.
+  for (int i = 0; i < argreg->size; i++)
+    if (!regDead (argreg->aopu.bytes[i].byteu.reg->rIdx, ic))
+      for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
+          {
+            if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
+              {
+                cost (500, 500);
+                wassert (regalloc_dry_run);
+              }
+
+            if (walk->op == CALL || walk->op == PCALL)
+              break;
+          }
+
+  genMove (argreg, IC_LEFT (ic)->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+  freeAsmop (IC_LEFT (ic));
+}
+
+/*-----------------------------------------------------------------*/
+/* genDummyRead - generate code for dummy read of volatiles.       */
 /*-----------------------------------------------------------------*/
 static void
 genDummyRead (const iCode *ic)
@@ -8663,8 +8730,11 @@ genSTM8iCode (iCode *ic)
       break;
 
     case RECEIVE:
+      genReceive (ic);
+      break;
+      
     case SEND:
-      wassertl (0, "Unimplemented iCode");
+      genSend (ic);
       break;
 
     case DUMMY_READ_VOLATILE:

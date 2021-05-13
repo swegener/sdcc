@@ -1,5 +1,10 @@
 2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Infrastructure for register parameters.
+
+2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCClrange.c:
 	  Improve handling of register parameters.
 	* src/stm8/gen.c:

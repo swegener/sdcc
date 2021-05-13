@@ -13919,7 +13919,7 @@ genReceive (const iCode *ic)
   
   wassert (currFunc && ic->argreg);
 
-  genMove (result->aop, aopArg (currFunc->type, ic->argreg), true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  genMove (result->aop, aopArg (currFunc->type, ic->argreg), isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   freeAsmop (IC_RESULT (ic), NULL);
 }

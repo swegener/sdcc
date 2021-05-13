@@ -4,6 +4,9 @@
 	  Improve handling of register parameters.
 	* src/stm8/gen.c:
 	  Improve code generation for shift by slightly-less-than-a-multiple-of-8.
+	* src/z80/gen.c,
+	  src/z80/ralloc.c:
+	  Increase some regalloc_dry_run_cost penalties to avoid invalid allocation even when all alternatives result in expensive spilling.
 
 2021-05-12 Philipp Klaus Krause <pkk AT spth.de>
 

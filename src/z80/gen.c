@@ -13919,7 +13919,28 @@ genReceive (const iCode *ic)
   
   wassert (currFunc && ic->argreg);
 
-  genMove (result->aop, aopArg (currFunc->type, ic->argreg), isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  bool dead_regs[IYH_IDX + 1];
+  
+  for (int i = 0; i <= IYH_IDX; i++)
+    dead_regs[i] = isRegDead (i, ic);
+
+  for(iCode *nic = ic->next; nic && nic->op == RECEIVE; nic = nic->next)
+    {
+      asmop *narg = aopArg (currFunc->type, nic->argreg);
+      wassert (narg);
+      for (int i = 0; i < narg->size; i++)
+        dead_regs[narg->aopu.aop_reg[i]->rIdx] = false;
+    }
+    
+  if (result->aop->type == AOP_REG)
+    for (int i = 0; i < result->aop->size; i++)
+      if (!dead_regs[result->aop->aopu.aop_reg[i]->rIdx])
+        {
+          regalloc_dry_run_cost += 500;
+          wassert (regalloc_dry_run);
+        }
+
+  genMove (result->aop, aopArg (currFunc->type, ic->argreg), dead_regs[A_IDX], dead_regs[L_IDX] && dead_regs[H_IDX], dead_regs[E_IDX] && dead_regs[D_IDX]);
 
   freeAsmop (IC_RESULT (ic), NULL);
 }

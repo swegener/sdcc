@@ -8420,8 +8420,29 @@ genReceive (const iCode *ic)
   aopOp (result, ic);
   
   wassert (currFunc && ic->argreg);
+  
+  bool dead_regs[YH_IDX + 1];
+  
+  for (int i = 0; i <= YH_IDX; i++)
+    dead_regs[i] = regDead (i, ic);
 
-  genMove (result->aop, aopArg (currFunc->type, ic->argreg), regDead(A_IDX, ic), regDead(X_IDX, ic), regDead(Y_IDX, ic));
+  for(iCode *nic = ic->next; nic && nic->op == RECEIVE; nic = nic->next)
+    {
+      asmop *narg = aopArg (currFunc->type, nic->argreg);
+      wassert (narg);
+      for (int i = 0; i < narg->size; i++)
+        dead_regs[narg->aopu.bytes[i].byteu.reg->rIdx] = false;
+    }
+    
+  if (result->aop->type == AOP_REG || result->aop->type == AOP_REGSTK)
+    for (int i = 0; i < result->aop->size; i++)
+      if (!dead_regs[result->aop->aopu.bytes[i].byteu.reg->rIdx])
+        {
+          cost (500, 500);
+          wassert (regalloc_dry_run);
+        }
+
+  genMove (result->aop, aopArg (currFunc->type, ic->argreg), dead_regs[A_IDX], dead_regs[XL_IDX] && dead_regs[XH_IDX], dead_regs[YL_IDX] && dead_regs[YH_IDX]);
 
   freeAsmop (result);
 }

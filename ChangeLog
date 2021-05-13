@@ -1,5 +1,11 @@
 2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/stm8/gen.c:
+	  Fix handling of multiple register parameters.
+
+2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c:
 	  Infrastructure for register parameters.
 

@@ -3,6 +3,10 @@
 	* src/z80/gen.c,
 	  src/stm8/gen.c:
 	  Fix code generation bugs triggered by register arguments.
+	* src/stm8/ralloc2.cc:
+	  Fix cost function for register parameters.
+	* src/z80/ralloc2.cc:
+	  Fix cost function for byte and bit access.
 
 2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 

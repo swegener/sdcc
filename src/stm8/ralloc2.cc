@@ -385,11 +385,11 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case ADDRESS_OF:
     case JUMPTABLE:
     case CAST:
-    /*case RECEIVE:
-    case SEND:*/
+    case RECEIVE:
+    case SEND:
     case DUMMY_READ_VOLATILE:
-    /*case CRITICAL:
-    case ENDCRITICAL:*/
+    case CRITICAL:
+    case ENDCRITICAL:
     case SWAP:
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);

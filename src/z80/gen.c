@@ -5295,8 +5295,8 @@ static void genSend (const iCode *ic)
         break;
     }
 
-  if (_G.saves.saved == FALSE && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
-    _saveRegsForCall (walk, FALSE);
+  if (!_G.saves.saved && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
+    _saveRegsForCall (walk, false);
 
   sym_link *ftype = IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk));
   asmop *argreg = aopArg (ftype, ic->argreg);
@@ -5314,7 +5314,7 @@ static void genSend (const iCode *ic)
                 wassert (regalloc_dry_run);
               }
 
-            if (walk->op == CALL || walk->op == PCALL)
+            if (walk2->op == CALL || walk2->op == PCALL)
               break;
           }
 

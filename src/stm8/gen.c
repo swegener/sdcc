@@ -3537,8 +3537,10 @@ genCall (const iCode *ic)
                 emit2 (jump ? "jp" : "call", "%s", left->aop->aopu.immd);
               cost (3, jump ? 1 : 4);
             }
-          else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.
+          else if ((aopInReg (left->aop, 0, Y_IDX) || stm8IsParmInCall(ftype, "x")) && !stm8IsParmInCall(ftype, "y")) // Faster than going through x.
             {
+              genMove (ASMOP_Y, left->aop, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), true);
+
               adjustStack (prestackadjust, true, true, false);
 
               emit2 (jump ? "jp" : "call", "(y)");
@@ -3546,7 +3548,13 @@ genCall (const iCode *ic)
             }
           else
             {
-              genMove (ASMOP_X, left->aop, true, true, true);
+              if (stm8IsParmInCall(ftype, "x"))
+                {
+                  cost (500, 500);
+                  wassert (regalloc_dry_run);
+                }
+
+              genMove (ASMOP_X, left->aop, !stm8IsParmInCall(ftype, "a"), true, !stm8IsParmInCall(ftype, "y"));
 
               adjustStack (prestackadjust, true, false, true);
           
@@ -8418,6 +8426,8 @@ genReceive (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
   aopOp (result, ic);
+
+  D (emit2 ("; genReceive", ""));
   
   wassert (currFunc && ic->argreg);
   
@@ -8452,10 +8462,10 @@ genReceive (const iCode *ic)
 /*-----------------------------------------------------------------*/
 static void
 genSend (const iCode *ic)
-{ 
-  aopOp (IC_LEFT (ic), ic);
+{
+  D (emit2 ("; genSend", ""));
 
-  int n_regparams = 1;
+  aopOp (IC_LEFT (ic), ic);
 
   /* Caller saves, and this is the first iPush. */
   /* Scan ahead until we find the function that we are pushing parameters to.
@@ -8465,16 +8475,15 @@ genSend (const iCode *ic)
   const iCode *walk;
   for (walk = ic->next; walk; walk = walk->next)
     {
-      if (walk->op == SEND)
-        n_regparams++;
-      else if (walk->op == CALL || walk->op == PCALL)
+      if (walk->op == CALL || walk->op == PCALL)
         break;
     }
 
-  if (!G.saved  && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+  if (!G.saved && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
     saveRegsForCall (walk);
 
-  asmop *argreg = aopArg (IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk)), n_regparams);
+  sym_link *ftype = IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk));
+  asmop *argreg = aopArg (ftype, ic->argreg);
 
   wassert (argreg);
 
@@ -8482,18 +8491,31 @@ genSend (const iCode *ic)
   for (int i = 0; i < argreg->size; i++)
     if (!regDead (argreg->aopu.bytes[i].byteu.reg->rIdx, ic))
       for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
-          {
-            if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
-              {
-                cost (500, 500);
-                wassert (regalloc_dry_run);
-              }
+        {
+          if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
+            {
+              cost (500, 500);
+              wassert (regalloc_dry_run);
+            }
 
-            if (walk->op == CALL || walk->op == PCALL)
-              break;
-          }
+          if (walk2->op == CALL || walk2->op == PCALL)
+            break;
+        }
 
-  genMove (argreg, IC_LEFT (ic)->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  bool a_dead = regDead (A_IDX, ic);
+  bool x_dead = regDead (X_IDX, ic);
+  bool y_dead = regDead (Y_IDX, ic);
+  
+  for (iCode *walk2 = ic->prev; walk2 && walk2->op == SEND; walk2 = walk2->prev)
+    {
+      asmop *warg = aopArg (ftype, walk2->argreg);
+      wassert (warg);
+      a_dead &= (warg->regs[A_IDX] < 0);
+      x_dead &= (warg->regs[XL_IDX] < 0 && warg->regs[XH_IDX] < 0);
+      y_dead &= (warg->regs[YL_IDX] < 0 && warg->regs[YH_IDX] < 0);
+    }
+    
+  genMove (argreg, IC_LEFT (ic)->aop, a_dead, x_dead, y_dead);
 
   freeAsmop (IC_LEFT (ic));
 }

@@ -1296,6 +1296,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case AND_OP:
     case OR_OP:
     case GETHBIT:
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:

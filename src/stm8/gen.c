@@ -8436,7 +8436,7 @@ genReceive (const iCode *ic)
     
   if (result->aop->type == AOP_REG || result->aop->type == AOP_REGSTK)
     for (int i = 0; i < result->aop->size; i++)
-      if (!dead_regs[result->aop->aopu.bytes[i].byteu.reg->rIdx])
+      if (result->aop->aopu.bytes[i].in_reg && !dead_regs[result->aop->aopu.bytes[i].byteu.reg->rIdx])
         {
           cost (500, 500);
           wassert (regalloc_dry_run);

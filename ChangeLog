@@ -1,5 +1,11 @@
 2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/stm8/gen.c:
+	  Fix code generation bugs triggered by register arguments.
+
+2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve tail calloptimization.
 

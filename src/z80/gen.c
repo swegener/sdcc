@@ -4371,27 +4371,6 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
   wassert(!n);
 }
 
-/*-----------------------------------------------------------------*/
-/* movLeft2Result - move byte from left to result                  */
-/*-----------------------------------------------------------------*/
-static void
-movLeft2Result (operand *left, int offl, operand *result, int offr, int sign)
-{
-  if (!sameRegs (left->aop, result->aop) || (offl != offr))
-    {
-      if (!sign)
-        cheapMove (result->aop, offr, left->aop, offl, true);
-      else
-        {
-          if (getDataSize (left) == offl + 1)
-            {
-              cheapMove (ASMOP_A, 0, left->aop, offl, true);
-              cheapMove (result->aop, offr, ASMOP_A, 0, true);
-            }
-        }
-    }
-}
-
 /** Put Acc into a register set
  */
 static void
@@ -11408,9 +11387,9 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
           if (shCount)
             shiftL1Left2Result (left, 0, result, 1, shCount, ic);
           else
-            movLeft2Result (left, LSB, result, MSB16, 0);
+            cheapMove (result->aop, 1, left->aop, 0, isRegDead (A_IDX, ic));
         }
-      cheapMove (result->aop, 0, ASMOP_ZERO, 0, true);
+      cheapMove (result->aop, 0, ASMOP_ZERO, 0, isRegDead (A_IDX, ic));
     }
   /*  0 <= shCount <= 7 */
   else
@@ -11806,13 +11785,9 @@ genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int 
     {
       shCount -= 8;
       if (shCount)
-        {
-          shiftR1Left2Result (left, MSB16, result, LSB, shCount, sign);
-        }
+        shiftR1Left2Result (left, MSB16, result, LSB, shCount, sign);
       else
-        {
-          movLeft2Result (left, MSB16, result, LSB, sign);
-        }
+        cheapMove (result->aop, 0, left->aop, 1, isRegDead (A_IDX, ic));
       if (sign)
         {
           /* Sign extend the result */

@@ -1,4 +1,9 @@
-2021-05-13 Philipp Klaus Krause <pkk AT spth.de>
+2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve tail calloptimization.
+
+2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix a bug in handling of register parameters to function calls via pointer.

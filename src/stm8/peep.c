@@ -665,6 +665,12 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
 }
 
 static bool
+stm8MightBeParmInCallFromCurrentFunction(const char *what)
+{
+  return false;
+}
+
+static bool
 stm8MightRead(const lineNode *pl, const char *what)
 {
   char extra = 0;
@@ -784,6 +790,15 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "xor")))
           return TRUE;
 
+      if (ISINST (pl->line, "call") || ISINST (pl->line, "callr") || ISINST (pl->line, "callf"))
+        {
+          const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+          if (f)
+            return stm8IsParmInCall(f->type, what);
+          else // Fallback needed for calls through function pointers and for calls to literal addresses.
+            return stm8MightBeParmInCallFromCurrentFunction(what);
+        } 
+
       if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw"))
         {
           char buf[64], *p;
@@ -795,8 +810,11 @@ stm8MightRead(const lineNode *pl, const char *what)
         }
     }
 
-  if(ISINST(pl->line, "ret") || ISINST(pl->line, "retf"))
+  if(ISINST(pl->line, "ret"))
     return(stm8IsReturned(what));
+
+  if(ISINST(pl->line, "retf")) // Large model uses retf for calls via function pointers
+    return(stm8IsReturned(what) || stm8MightBeParmInCallFromCurrentFunction(what));
 
   return FALSE;
 }

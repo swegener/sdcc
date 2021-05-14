@@ -7,6 +7,8 @@
 	  Fix cost function for register parameters.
 	* src/z80/ralloc2.cc:
 	  Fix cost function for byte and bit access.
+	* src/stm8/peep.c:
+	  Register parameter support infrastructure.
 
 2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 

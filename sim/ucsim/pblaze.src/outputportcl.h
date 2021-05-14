@@ -41,7 +41,7 @@ typedef map<int, list<struct output> > output_map;
 class cl_output_port: public cl_hw
 {
   public:
-    TYPE_UBYTE value;
+    u8_t value;
     output_map outputs;
 
     cl_output_port(class cl_uc *auc);

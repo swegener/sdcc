@@ -32,12 +32,18 @@
 #define FLAGS_GET_C (sfr->get(FLAGS) & bmC)
 #define FLAGS_GET_Z (sfr->get(FLAGS) & bmZ)
 #define FLAGS_GET_I (sfr->get(FLAGS) & bmI)
-
+/*
 #define FLAGS_SET(flag_value, bit_position) \
   if (flag_value) \
     sfr->set_bit1(FLAGS, bit_position); \
   else \
     sfr->set_bit0(FLAGS, bit_position);
+*/
+#define FLAGS_SET(flag_value, bit_position) \
+  if (flag_value) \
+    sfr->write(FLAGS, sfr->read(FLAGS) | bit_position);	\
+  else \
+    sfr->write(FLAGS, sfr->read(FLAGS) & ~bit_position);
 #define FLAGS_SET_C(flag_value) FLAGS_SET(flag_value, bmC)
 #define FLAGS_SET_Z(flag_value) FLAGS_SET(flag_value, bmZ)
 #define FLAGS_SET_I(flag_value) FLAGS_SET(flag_value, bmI)

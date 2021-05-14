@@ -28,7 +28,7 @@
 
 /* returns true if stack overflows */
 bool
-cl_pblaze::stack_push(TYPE_UDWORD value) {
+cl_pblaze::stack_push(u32_t value) {
   cl_memory_cell *sp = sfr->get_cell(SP);
   int sp_value = sp->get();
 
@@ -45,7 +45,7 @@ cl_pblaze::stack_push(TYPE_UDWORD value) {
 
 /* returns true if stack underflows */
 bool
-cl_pblaze::stack_pop(TYPE_UDWORD *value) {
+cl_pblaze::stack_pop(u32_t *value) {
   cl_memory_cell *sp = sfr->get_cell(SP);
   int sp_value = sp->get();
 

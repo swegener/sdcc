@@ -39,7 +39,7 @@ typedef map<int, input_tick_map> input_port_map;
 class cl_input_port: public cl_hw
 {
   public:
-    TYPE_UBYTE value;
+    u8_t value;
     bool value_set;
     input_port_map inputs;
 

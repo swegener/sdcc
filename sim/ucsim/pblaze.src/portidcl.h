@@ -32,7 +32,7 @@
 class cl_port_id: public cl_hw
 {
   public:
-    TYPE_UBYTE value;
+    u8_t value;
 
     cl_port_id(class cl_uc *auc);
     /*virtual int init(void);*/

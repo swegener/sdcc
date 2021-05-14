@@ -49,7 +49,7 @@ public:
  unsigned int rom_size;
  unsigned int stack_size;
  unsigned int interrupt_vector;
- TYPE_UBYTE hw_constant;
+ u8_t hw_constant;
  int active_regbank;
 
 public:
@@ -67,7 +67,7 @@ public:
   class cl_input_port *input_port;
 
 public:
-  cl_pblaze(int cpu_type, class cl_sim *asim);
+  cl_pblaze(struct cpu_entry *cputype, class cl_sim *asim);
   virtual ~cl_pblaze(void);
   virtual int init(void);
   virtual const char *id_string(void);

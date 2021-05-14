@@ -284,8 +284,8 @@ struct name_entry bit_tab[] =
 
 struct cpu_entry cpus_pblaze[] =
 {
-  {"KCPSM3", CPU_PBLAZE_3, 0},
-  {"KCPSM6", CPU_PBLAZE_6, 0},
+  {"KCPSM3", CPU_PBLAZE_3, CPU_CMOS, "PiciBlaze 3", "cmos" },
+  {"KCPSM6", CPU_PBLAZE_6, CPU_CMOS, "PiciBlaze 6", "cmos" },
 
-  {NULL, 0, 0}
+  {NULL, CPU_NONE, 0, NULL, NULL}
 };

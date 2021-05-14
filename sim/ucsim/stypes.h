@@ -158,6 +158,10 @@ enum cpu_type {
   CPU_HCS08     = 0x0002,
   CPU_ALL_HC08  = (CPU_HC08|CPU_HCS08),
 
+  CPU_PBLAZE_3	= 0x0001,
+  CPU_PBLAZE_6	= 0x0002,
+  CPU_ALL_PBLAZE= (CPU_PBLAZE_3|CPU_PBLAZE_6),
+
   CPU_STM8S		= 0x0001,		// S and AF family
   CPU_STM8AF		= 0x0001,
   CPU_STM8SAF		= 0x0001,
@@ -253,6 +257,7 @@ enum mem_class
   MEM_SFR,
   MEM_DUMMY,
   MEM_IXRAM,
+  MEM_STACK,
   MEM_TYPES
 };
 
@@ -260,6 +265,8 @@ enum mem_class
 #define MEM_XRAM_ID	"xram"
 #define MEM_IXRAM_ID	"ixram"
 #define MEM_IRAM_ID	"iram"
+#define MEM_STACK_ID	"stack"
+#define MEM_ROM_ID	"rom"
 
 // States of simulator
 enum sim_state {

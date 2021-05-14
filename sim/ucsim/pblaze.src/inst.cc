@@ -81,7 +81,7 @@ cl_pblaze::inst_add(uint code, int operands)
   application->debug("ADD\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
+  u8_t operand;
   int result;
 
   if (operands == REG_CONSTANT) {
@@ -116,7 +116,7 @@ cl_pblaze::inst_addcy(uint code, int operands)
   application->debug("ADDCY\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
+  u8_t operand;
   int result;
 
   if (operands == REG_CONSTANT) {
@@ -138,10 +138,10 @@ cl_pblaze::inst_addcy(uint code, int operands)
   result = result % 256;
 
   //zero flag
-  if (type == CPU_PBLAZE_3) {
+  if (type->type == CPU_PBLAZE_3) {
     FLAGS_SET_Z(result == 0);
   }
-  else if (type == CPU_PBLAZE_6) {
+  else if (type->type == CPU_PBLAZE_6) {
     FLAGS_SET_Z(FLAGS_GET_Z && (result == 0));
   }
 
@@ -156,7 +156,7 @@ cl_pblaze::inst_and(uint code, int operands)
   application->debug("AND\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
+  u8_t operand;
   int result;
 
   if (operands == REG_CONSTANT) {
@@ -243,7 +243,7 @@ cl_pblaze::inst_call(uint code, int inst, int operands)
     if (stack_push(PC-1)) {
       fprintf(stderr, "Call stack overflow.\n");
 
-      if (type == CPU_PBLAZE_6)
+      if (type->type == CPU_PBLAZE_6)
         reset();
       //return (resERROR);
     }
@@ -258,8 +258,8 @@ cl_pblaze::inst_compare(uint code, int operands)
 {
   application->debug("COMPARE\n");
 
-  TYPE_UBYTE operand1 = get_register(code, true)->get();
-  TYPE_UBYTE operand2;
+  u8_t operand1 = get_register(code, true)->get();
+  u8_t operand2;
 
   if (operands == REG_CONSTANT) {
       operand2 = get_constant(code);
@@ -283,8 +283,8 @@ cl_pblaze::inst_comparecy(uint code, int operands)
 {
   application->debug("COMPARECY\n");
 
-  TYPE_UBYTE operand1 = get_register(code, true)->get();
-  TYPE_UBYTE operand2;
+  u8_t operand1 = get_register(code, true)->get();
+  u8_t operand2;
 
   if (operands == REG_CONSTANT) {
       operand2 = get_constant(code);
@@ -309,7 +309,7 @@ cl_pblaze::inst_fetch(uint code, int operands)
   application->debug("FETCH\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE addr;
+  u8_t addr;
 
   if (operands == REG_ADDRESS6) {
     addr = get_constant(code) & 0x3f; // only bits 5..0 are used for addressing
@@ -485,11 +485,11 @@ cl_pblaze::inst_load_return(uint code, int operands)
     cl_memory_cell *r1 = get_register(code, true);
     r1->set(get_constant(code));
 
-    TYPE_UDWORD addr;
+    u32_t addr;
     if (stack_pop(&addr)) {
       fprintf(stderr, "Call stack underflow.\n");
 
-      if (type == CPU_PBLAZE_6)
+      if (type->type == CPU_PBLAZE_6)
         reset();
 
       //return (resERROR);
@@ -510,8 +510,8 @@ cl_pblaze::inst_or(uint code, int operands)
   application->debug("OR\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
-  TYPE_UBYTE result;
+  u8_t operand;
+  u8_t result;
 
   if (operands == REG_CONSTANT) {
     operand = get_constant(code);
@@ -567,8 +567,8 @@ cl_pblaze::inst_outputk(uint code, int operands)
 {
   application->debug("OUTPUTK\n");
 
-  TYPE_UBYTE constant;
-  TYPE_UBYTE port;
+  u8_t constant;
+  u8_t port;
 
   if (operands == CONSTANT_PORT) {
     constant = (code & 0x00ff0) >> 8;
@@ -633,11 +633,11 @@ cl_pblaze::inst_return(uint code, int inst)
   }
 
   if (jump) {
-    TYPE_UDWORD addr;
+    u32_t addr;
     if (stack_pop(&addr)) {
       fprintf(stderr, "Call stack underflow.\n");
 
-      if (type == CPU_PBLAZE_6)
+      if (type->type == CPU_PBLAZE_6)
         reset();
 
       //return (resERROR);
@@ -651,11 +651,11 @@ cl_pblaze::inst_return(uint code, int inst)
 int
 cl_pblaze::inst_returni(bool interrupt_enable)
 {
-  TYPE_UDWORD addr;
+  u32_t addr;
   if (stack_pop(&addr)) {
     fprintf(stderr, "Call stack underflow.\n");
 
-    if (type == CPU_PBLAZE_6)
+    if (type->type == CPU_PBLAZE_6)
       reset();
 
     //return (resERROR);
@@ -675,10 +675,10 @@ cl_pblaze::inst_rl(uint code, int operands)
   application->debug("RL\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE value = r1->get();
-  TYPE_UBYTE result;
+  u8_t value = r1->get();
+  u8_t result;
 
-  result = (value << 1) || (value >> 7);
+  result = (value << 1) /*||*/ | (value >> 7);
   r1->set(result);
 
   FLAGS_SET_C(value & 0x80);
@@ -693,8 +693,8 @@ cl_pblaze::inst_rr(uint code, int operands)
   application->debug("RR\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE value = r1->get();
-  TYPE_UBYTE result;
+  u8_t value = r1->get();
+  u8_t result;
 
   result = (value >> 1) | (value << 7);
   r1->set(result);
@@ -709,8 +709,8 @@ int
 cl_pblaze::inst_sl(uint code, int inst)
 {
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE value = r1->get();
-  TYPE_UBYTE result;
+  u8_t value = r1->get();
+  u8_t result;
 
   result = (value << 1);
 
@@ -744,8 +744,8 @@ int
 cl_pblaze::inst_sr(uint code, int inst)
 {
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE value = r1->get();
-  TYPE_UBYTE result;
+  u8_t value = r1->get();
+  u8_t result;
 
   result = (value >> 1);
 
@@ -808,7 +808,7 @@ cl_pblaze::inst_store(uint code, int operands)
   application->debug("STORE\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE addr;
+  u8_t addr;
 
   if (operands == REG_ADDRESS6) {
     addr = get_constant(code) & 0x3f; // only bits 5..0 are used for addressing
@@ -835,7 +835,7 @@ cl_pblaze::inst_sub(uint code, int operands)
   application->debug("SUB\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
+  u8_t operand;
   int result;
 
   if (operands == REG_CONSTANT) {
@@ -870,7 +870,7 @@ cl_pblaze::inst_subcy(uint code, int operands)
   application->debug("SUBCY\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
+  u8_t operand;
   int result;
 
   if (operands == REG_CONSTANT) {
@@ -892,10 +892,10 @@ cl_pblaze::inst_subcy(uint code, int operands)
   result = result % 256;
 
   //zero flag
-  if (type == CPU_PBLAZE_3) {
+  if (type->type == CPU_PBLAZE_3) {
     FLAGS_SET_Z(result == 0);
   }
-  else if (type == CPU_PBLAZE_6) {
+  else if (type->type == CPU_PBLAZE_6) {
     FLAGS_SET_Z(FLAGS_GET_Z && (result == 0));
   }
 
@@ -910,8 +910,8 @@ cl_pblaze::inst_test(uint code, int operands)
   application->debug("TEST\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
-  TYPE_UBYTE result;
+  u8_t operand;
+  u8_t result;
 
   if (operands == REG_CONSTANT) {
       operand = get_constant(code);
@@ -948,8 +948,8 @@ cl_pblaze::inst_testcy(uint code, int operands)
   application->debug("TESTCY\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
-  TYPE_UBYTE result;
+  u8_t operand;
+  u8_t result;
 
   if (operands == REG_CONSTANT) {
       operand = get_constant(code);
@@ -986,8 +986,8 @@ cl_pblaze::inst_xor(uint code, int operands)
   application->debug("XOR\n");
 
   cl_memory_cell *r1 = get_register(code, true);
-  TYPE_UBYTE operand;
-  TYPE_UBYTE result;
+  u8_t operand;
+  u8_t result;
 
   if (operands == REG_CONSTANT) {
       operand = get_constant(code);

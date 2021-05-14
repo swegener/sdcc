@@ -56,5 +56,5 @@ cl_simpblaze::mk_controller(void)
       return(NULL);
   }
 
-  return(new cl_pblaze(cpus_pblaze[i].type, this));
+  return(new cl_pblaze(&cpus_pblaze[i], this));
 }

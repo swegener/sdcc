@@ -65,10 +65,10 @@ using namespace std;
  * Base type of PicoBlaze controllers
  */
 
-cl_pblaze::cl_pblaze(int cpu_type, class cl_sim *asim):
+cl_pblaze::cl_pblaze(struct cpu_entry *cputype, class cl_sim *asim):
   cl_uc(asim)
 {
-  type = cpu_type;
+  type = cputype;
 }
 
 cl_pblaze::~cl_pblaze(void) {
@@ -121,7 +121,7 @@ const char *
 cl_pblaze::id_string(void)
 {
   int i = 0;
-  while ((cpus_pblaze[i].type != 0) && (type != cpus_pblaze[i].type))
+  while ((cpus_pblaze[i].type != 0) && (type->type != cpus_pblaze[i].type))
     i++;
 
   return(cpus_pblaze[i].type_str);
@@ -190,8 +190,8 @@ cl_pblaze::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  // rom chip init
-  chip = new cl_memory_chip("sfr_chip", 0x22, 8);
+  // sfr chip init
+  chip = new cl_chip8("sfr_chip", 0x22, 8);
   chip->init();
   memchips->add(chip);
   ad = new cl_address_decoder(as = address_space(MEM_SFR_ID), chip, 0, 0x21, 0);
@@ -200,7 +200,7 @@ cl_pblaze::make_memories(void)
   ad->activate(0);
 
   // rom chip init
-  chip = new cl_memory_chip("rom_chip", rom_size, 18);
+  chip = new cl_chip32("rom_chip", rom_size, 18);
   chip->init();
   memchips->add(chip);
   ad = new cl_address_decoder(as = address_space(MEM_ROM_ID), chip, 0, rom_size-1, 0);
@@ -209,7 +209,7 @@ cl_pblaze::make_memories(void)
   ad->activate(0);
 
   // ram chip init
-  chip= new cl_memory_chip("ram_chip", ram_size, 8);
+  chip= new cl_chip8("ram_chip", ram_size, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as = address_space(MEM_IRAM_ID), chip, 0, ram_size-1, 0);
@@ -218,7 +218,7 @@ cl_pblaze::make_memories(void)
   ad->activate(0);
 
   // stack chip
-  chip = new cl_memory_chip("stack_chip", stack_size, 12);
+  chip = new cl_chip8("stack_chip", stack_size, 12);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as = address_space(MEM_STACK_ID), chip, 0, stack_size-1, 0);
@@ -235,7 +235,7 @@ cl_pblaze::build_cmdset(class cl_cmdset *cmdset)
   class cl_super_cmd *super_cmd;
 
   cl_uc::build_cmdset(cmdset);
-
+  /*
   cmdset->add(cmd= new cl_dc_cmd("dc", DD_TRUE,
 "dc [start [stop]]  Dump ROM",
 "long help of dc"));
@@ -255,13 +255,13 @@ cl_pblaze::build_cmdset(class cl_cmdset *cmdset)
 "ds [start [stop]]  Dump SFR",
 "long help of ds"));
   cmd->init();
+  */
 
-
-  cmdset->add(cmd= new cl_pbstate_cmd("pbstate", DD_TRUE,
-"pbstate [\"file\"]   Prints PicoBlaze state to std output or specified file",
-"long help of pbstate"));
+  cmdset->add(cmd= new cl_pbstate_cmd("pbstate", 0));//DD_TRUE,
+	      //"pbstate [\"file\"]   Prints PicoBlaze state to std output or specified file",
+	      //"long help of pbstate"));
   cmd->init();
-
+  
 
   { // import
     super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("import"));
@@ -272,29 +272,30 @@ cl_pblaze::build_cmdset(class cl_cmdset *cmdset)
       inner_cmd_set->init();
     }
 
-    inner_cmd_set->add(cmd= new cl_import_pbstate_cmd("pbstate", 0,
-"import pbstate \"file\" Loads Picoblaze state from xml file",
-"long help of import pbstate"));
+    inner_cmd_set->add(cmd= new cl_import_pbstate_cmd("pbstate", 0));//,
+    //"import pbstate \"file\" Loads Picoblaze state from xml file",
+    //"long help of import pbstate"));
     cmd->add_name("pbstate");
     cmd->init();
 
-    inner_cmd_set->add(cmd= new cl_import_interrupts_cmd("interrupts", 0,
-"import interrupts \"file\" Loads interrupts from xml file",
-"long help of import interrupts"));
+    inner_cmd_set->add(cmd= new cl_import_interrupts_cmd("interrupts", 0));//,
+    //"import interrupts \"file\" Loads interrupts from xml file",
+    //"long help of import interrupts"));
     cmd->add_name("interrupts");
     cmd->init();
 
-    inner_cmd_set->add(cmd= new cl_import_input_cmd("input", 0,
-"import input \"file\" Loads input from xml file",
-"long help of import input"));
+    inner_cmd_set->add(cmd= new cl_import_input_cmd("input", 0));//,
+    //"import input \"file\" Loads input from xml file",
+    //"long help of import input"));
     cmd->add_name("input");
     cmd->init();
-  }
-  if (!super_cmd) {
-    cmdset->add(cmd= new cl_super_cmd("import", 0,
-"import subcommand  Import, see `import' command for more help",
-"long help of import", inner_cmd_set));
-    cmd->init();
+    
+    if (!super_cmd) {
+      cmdset->add(cmd= new cl_super_cmd("import", 0, inner_cmd_set));//,
+      //"import subcommand  Import, see `import' command for more help",
+      //"long help of import", inner_cmd_set));
+      cmd->init();
+    }
   }
 
   // print output
@@ -305,9 +306,9 @@ cl_pblaze::build_cmdset(class cl_cmdset *cmdset)
     inner_cmd_set= new cl_cmdset();
     inner_cmd_set->init();
   }
-    inner_cmd_set->add(cmd= new cl_get_output_cmd("output", 0,
-"get output [\"file\"] Prints realized outputs of PicoBlaze",
-"long help of get output"));
+  inner_cmd_set->add(cmd= new cl_get_output_cmd("output", 0));//,
+  //"get output [\"file\"] Prints realized outputs of PicoBlaze",
+  //"long help of get output"));
     cmd->add_name("output");
     cmd->init();
 }
@@ -386,7 +387,7 @@ cl_pblaze::get_disasm_info(t_addr addr,
 
   i = 0;
 
-  dis_entry_pblaze * disass_pblaze = (type == CPU_PBLAZE_3 ? disass_pblaze3 : disass_pblaze6);
+  dis_entry_pblaze * disass_pblaze = (type->type == CPU_PBLAZE_3 ? disass_pblaze3 : disass_pblaze6);
   while ((code & disass_pblaze[i].mask) != disass_pblaze[i].code && disass_pblaze[i].instruction != BAD_OPCODE)
     i++;
 
@@ -515,14 +516,14 @@ cl_pblaze::disass(t_addr addr, const char *sep)
 void
 cl_pblaze::print_regs(class cl_console_base *con)
 {
-  if (type == CPU_PBLAZE_6)
+  if (type->type == CPU_PBLAZE_6)
     con->dd_printf("Regbank A\n");
 
   for (int i=0; i<16; i++) {
     con->dd_printf("S%x= 0x%02x %3d %c\n",i, sfr->get(i), sfr->get(i), isprint(sfr->get(i))?sfr->get(i):'.');
   }
 
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     con->dd_printf("Regbank B\n");
 
     for (int i=16; i<32; i++) {
@@ -530,7 +531,7 @@ cl_pblaze::print_regs(class cl_console_base *con)
     }
   }
 
-  if (type == CPU_PBLAZE_6)
+  if (type->type == CPU_PBLAZE_6)
     con->dd_printf("Active regbank= %c\n", active_regbank == REGISTER_BANK_A ? 'A' : 'B');
 
   con->dd_printf("PC= 0x%06x\n", PC);
@@ -584,14 +585,14 @@ cl_pblaze::print_state(class cl_console_base *con, char *file_name)
 
 	// REGISTERS
   TiXmlElement * registers = new TiXmlElement( "registers" );
-	if (type == CPU_PBLAZE_6) {
+	if (type->type == CPU_PBLAZE_6) {
     registers->SetAttribute("activeRegbank", active_regbank == REGISTER_BANK_A ? "A" : "B");
   }
 	root->LinkEndChild( registers );
 
   // REGBANK A
   element = new TiXmlElement( "regbank" );
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     element->SetAttribute("name", "A");
   }
 	written = 0;
@@ -602,7 +603,7 @@ cl_pblaze::print_state(class cl_console_base *con, char *file_name)
 	registers->LinkEndChild( element );
 
   // REGBANK B
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     element = new TiXmlElement( "regbank" );
       element->SetAttribute("name", "B");
     written = 0;
@@ -615,7 +616,7 @@ cl_pblaze::print_state(class cl_console_base *con, char *file_name)
 
   // PC
   element = new TiXmlElement( "pc" );
-  snprintf(buffer, buffer_size - 1, "%x", PC);
+  snprintf(buffer, buffer_size - 1, "%x", AU(PC));
   text = new TiXmlText(buffer);
   element->LinkEndChild( text );
   registers->LinkEndChild( element );
@@ -676,7 +677,7 @@ cl_pblaze::print_state(class cl_console_base *con, char *file_name)
     written += snprintf(buffer + written, buffer_size - written - 1, "%02x", stack->get(i));
   written += snprintf(buffer + written, buffer_size - written - 1, "\n");
 
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     written += snprintf(buffer + written, buffer_size - written - 1, "ACTIVE_REGBANK:%s\n", active_regbank == REGISTER_BANK_A ? "A" : "B");
   }
 
@@ -685,7 +686,7 @@ cl_pblaze::print_state(class cl_console_base *con, char *file_name)
     written += snprintf(buffer + written, buffer_size - written - 1, "%02x", sfr->get(i));
   written += snprintf(buffer + written, buffer_size - written - 1, "\n");
 
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     written += snprintf(buffer + written, buffer_size - written - 1, "REGBANK_B:");
     for (unsigned int i = 16; i<32; i++)
       written += snprintf(buffer + written, buffer_size - written - 1, "%02x", sfr->get(i));
@@ -775,7 +776,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
   TiXmlElement *registers = root->FirstChildElement("registers");
 
   // active regbank
-	if (type == CPU_PBLAZE_6) {
+	if (type->type == CPU_PBLAZE_6) {
     const char *ar = registers->Attribute("activeRegbank"); //, active_regbank == REGISTER_BANK_A ? "A" : "B");
     if (strcmp(ar, "A") == 0) { // TODO lower/upper case
       active_regbank = REGISTER_BANK_A;
@@ -789,7 +790,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
   element = registers->FirstChildElement("regbank");
   {
     int addr = S0;
-    if (type == CPU_PBLAZE_6) {
+    if (type->type == CPU_PBLAZE_6) {
       const char *n = element->Attribute("name");
       if (strcmp(n, "B") == 0) {
         addr = S0b;
@@ -804,7 +805,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
   }
 
   // secong register bank (only for kcpsm6)
-  if (type == CPU_PBLAZE_6) {
+  if (type->type == CPU_PBLAZE_6) {
     int addr = S0b;
     element = element->NextSiblingElement("regbank");
     const char *n = element->Attribute("name");
@@ -885,7 +886,7 @@ cl_pblaze::exec_inst(void)
   tick(1);
 
   int i = 0;
-  dis_entry_pblaze * disass_pblaze = (type == CPU_PBLAZE_3 ? disass_pblaze3 : disass_pblaze6);
+  dis_entry_pblaze * disass_pblaze = (type->type == CPU_PBLAZE_3 ? disass_pblaze3 : disass_pblaze6);
   while (((code & disass_pblaze[i].mask) != disass_pblaze[i].code) && disass_pblaze[i].instruction != BAD_OPCODE) {
     i++;
   }
@@ -1006,7 +1007,7 @@ cl_pblaze::do_interrupt(void)
 
   if (interrupt->interrupt_request) {
     printf("%g sec (%ld clks): Accepting interrupt, PC= 0x%06x\n",
-                          get_rtime(), ticks->ticks, PC);
+	   get_rtime(), ticks->ticks, AU(PC));
 
     tick(1);
 
@@ -1019,9 +1020,9 @@ cl_pblaze::do_interrupt(void)
 
     int res = resERROR;
 
-    if (type == CPU_PBLAZE_3)
+    if (type->type == CPU_PBLAZE_3)
       res = inst_call(0x30000 /* isntruction call */ | (interrupt_vector & 0x003ff) /* masked interrupt vector */, CALL, ADDRESS10);
-    else if (type == CPU_PBLAZE_6)
+    else if (type->type == CPU_PBLAZE_6)
       res = inst_call(0x20000 /* isntruction call */ | (interrupt_vector & 0x00fff) /* masked interrupt vector */, CALL, ADDRESS12);
 
 
@@ -1478,15 +1479,15 @@ cl_pblaze::init_uc_parameters(void)
   ram_size = 64;
   interrupt_vector = 0x3ff;
 
-  if (type == CPU_PBLAZE_3)
+  if (type->type == CPU_PBLAZE_3)
     stack_size = 31;
-  else if (type == CPU_PBLAZE_6)
+  else if (type->type == CPU_PBLAZE_6)
     stack_size = 30;
 
   // ram size
   cl_option * opt = sim->app->options->get_option("pblaze_ram_size");
   if (opt != NULL) {
-    if (type == CPU_PBLAZE_6) {
+    if (type->type == CPU_PBLAZE_6) {
       long size = -1;
       opt->get_value(&size);
 
@@ -1508,7 +1509,7 @@ cl_pblaze::init_uc_parameters(void)
   // rom size
   opt = sim->app->options->get_option("pblaze_rom_size");
   if (opt != NULL) {
-    if (type == CPU_PBLAZE_6) {
+    if (type->type == CPU_PBLAZE_6) {
       long size = -1;
       opt->get_value(&size);
 
@@ -1530,7 +1531,7 @@ cl_pblaze::init_uc_parameters(void)
   // interrupt vector
   opt = sim->app->options->get_option("pblaze_interrupt_vector");
   if (opt != NULL) {
-    if (type == CPU_PBLAZE_6) {
+    if (type->type == CPU_PBLAZE_6) {
       long iv = -1;
       opt->get_value(&iv);
 
@@ -1552,7 +1553,7 @@ cl_pblaze::init_uc_parameters(void)
   // built-in hardware constant
   opt = sim->app->options->get_option("pblaze_hw_const");
   if (opt != NULL) {
-    if (type == CPU_PBLAZE_6) {
+    if (type->type == CPU_PBLAZE_6) {
       long value = -1;
       opt->get_value(&value);
 

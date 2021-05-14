@@ -19,5 +19,5 @@
  */
 
 
-virtual bool stack_push(TYPE_UDWORD value);
-virtual bool stack_pop(TYPE_UDWORD *value);
+virtual bool stack_push(u32_t value);
+virtual bool stack_pop(u32_t *value);

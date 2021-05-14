@@ -49,8 +49,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= apppblaze.o \
-		  tinyxml.o \
+OBJECTS_SHARED	= tinyxml.o \
 		  tinystr.o \
 		  tinyxmlerror.o \
 		  tinyxmlparser.o \
@@ -65,6 +64,8 @@ OBJECTS_SHARED	= apppblaze.o \
 		  simpblaze.o pblaze.o
 OBJECTS_EXE	= spblaze.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# apppblaze.o
 
 PBLAZEASM		=
 

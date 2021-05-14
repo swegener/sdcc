@@ -5382,6 +5382,7 @@ genCall (const iCode *ic)
   const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
                        IS_TRUE_SYMOP (IC_RESULT (ic));
 
+  bool a_free_pre_call = !z80IsParmInCall(ftype, "a");
   bool hl_free_pre_call = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h");
   bool de_free_pre_call = !z80IsParmInCall(ftype, "e") && !z80IsParmInCall(ftype, "d");
   bool bc_free_pre_call = !z80IsParmInCall(ftype, "c") && !z80IsParmInCall(ftype, "b");
@@ -5509,23 +5510,23 @@ genCall (const iCode *ic)
 
       if (isLitWord (IC_LEFT (ic)->aop))
         {
-          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
+          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
       else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && hl_free_pre_call)
         {
           spillPair (PAIR_HL);
-          fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, false, false);
+          genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call);
+          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, false, false);
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           regalloc_dry_run_cost += 3;
         }
       else if (!IS_GB && !IY_RESERVED && !z80IsParmInCall (ftype, "iy"))
         {
           spillPair (PAIR_IY);
-          fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
-          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
+          genMove (ASMOP_IY, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call);
+          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;
         }

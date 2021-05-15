@@ -3400,7 +3400,8 @@ genCall (const iCode *ic)
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
     (!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, X_IDX)) &&
     !ic->parmBytes && !ic->localEscapeAlive &&
-    !IFFUNC_ISZ88DK_CALLEE (currFunc->type))
+    !IFFUNC_ISZ88DK_CALLEE (currFunc->type) &&
+    !(ic->op == PCALL && aopOnStack (left->aop, 0, left->aop->size)))
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
 

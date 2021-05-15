@@ -265,7 +265,7 @@ void color_stack_var(const var_t v, SI_t &SI, int start, int *ssize)
   
   SI[v].color = start;
 
-  const int sloc = (port->stack.direction > 0) ? start : -start - size ;
+  const int sloc = (port->stack.direction > 0) ? start : -start - size;
   symbol *const ssym = (sym->isspilt && sym->usl.spillLoc) ? sym->usl.spillLoc : sym;
 
   SPEC_STAK(ssym->etype) = ssym->stack = sloc;

@@ -3,6 +3,10 @@
 	* src/SDCCsymt.c,
 	  support/regression/tests/bug2084206.c:
 	  Function pointer size fix.
+	* src/stm8/gen.c:
+	  Tail-call optimization fix.
+	* src/stm8/peep.c:
+	  Peephole optimizer fix for register arguments.
 
 2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -667,7 +667,7 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
 static bool
 stm8MightBeParmInCallFromCurrentFunction(const char *what)
 {
-  return false;
+  return true; // Todo: Make this more accurate for optimization (e.g. the same way as z80 does here).
 }
 
 static bool
@@ -792,7 +792,7 @@ stm8MightRead(const lineNode *pl, const char *what)
 
       if (ISINST (pl->line, "call") || ISINST (pl->line, "callr") || ISINST (pl->line, "callf"))
         {
-          const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+          const symbol *f = findSym (SymbolTab, 0, pl->line + (ISINST (pl->line, "call") ? 6 : 7));
           if (f)
             return stm8IsParmInCall(f->type, what);
           else // Fallback needed for calls through function pointers and for calls to literal addresses.

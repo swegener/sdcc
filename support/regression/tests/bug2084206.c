@@ -36,12 +36,16 @@ void testBug(void)
 #ifndef __SDCC_pdk14 // Lack of memory - see RFE # 613.
 #ifndef __SDCC_pdk15 // TODO: Decide on support for casts between object and function pointers for pdk!
 #ifndef __SDCC_pic16
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // STM8 large model has sizeof(void *) < size of function pointers.
+#if !defined __SDCC_mcs51 // At least some MCS-51 models have sizeof(void *) > size of function pointers.
 	void* ptr = testBug;
 	mydata.f = testBug;
 	ASSERT (varargs(1, mydata.f) == (long)ptr);
 	ASSERT (varargs(1, mydata.f) == (long)(void*)testBug);
 	ASSERT (varargs(2, (funp_t)mydata.f) == (long)mydata.f);
 	ASSERT (varargs(2, (void (*)(void))mydata.f) == (long)mydata.f);
+#endif
+#endif
 #endif
 #endif
 #endif

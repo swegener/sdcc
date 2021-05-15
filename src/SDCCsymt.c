@@ -1118,10 +1118,11 @@ getSize (sym_link * p)
     case CPOINTER:
       if (!IS_FUNCPTR(p))
         return (FARPTRSIZE);
+    case GPOINTER:
+      if (!IS_FUNCPTR(p))
+        return (GPTRSIZE);
     case FUNCTION:
       return (IFFUNC_ISBANKEDCALL (p) ? BFUNCPTRSIZE : FUNCPTRSIZE);
-    case GPOINTER:
-      return (GPTRSIZE);
 
     default:
       return 0;

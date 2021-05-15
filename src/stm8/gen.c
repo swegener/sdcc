@@ -8428,9 +8428,11 @@ genReceive (const iCode *ic)
   aopOp (result, ic);
 
   D (emit2 ("; genReceive", ""));
-  
-  wassert (currFunc && ic->argreg);
-  
+
+  wassert (currFunc);
+  wassert (ic->argreg);
+  wassert (aopArg (currFunc->type, ic->argreg));
+
   bool dead_regs[YH_IDX + 1];
   
   for (int i = 0; i <= YH_IDX; i++)

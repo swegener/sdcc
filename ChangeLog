@@ -7,6 +7,8 @@
 	  Tail-call optimization fix.
 	* src/stm8/peep.c:
 	  Peephole optimizer fix for register arguments.
+	* src/SDCCast.c:
+	  Fix line numbers for ast dump of strcpy->memcpy optimization.
 
 2021-05-14 Philipp Klaus Krause <pkk AT spth.de>
 

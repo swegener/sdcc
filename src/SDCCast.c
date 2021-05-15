@@ -3280,8 +3280,10 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
         return;
 
       ast *lengthparm = newAst_VALUE (valCastLiteral (newIntLink(), strlength, strlength));
+      lengthparm->lineno = parm->lineno;
       decorateType (lengthparm, RESULT_TYPE_NONE);
       ast *node = newAst_OP (PARAM);
+      node->lineno = parm->lineno;
 
       node->left = newNode (CAST, newAst_LINK (copyLinkChain (FUNC_ARGS(memcpy_sym->type)->type)), parm);
       node->left->values.cast.implicitCast = 1;

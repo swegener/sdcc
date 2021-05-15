@@ -3274,7 +3274,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       if (strlength < minlength)
         return;
 
-      symbol *memcpy_sym = findSym (SymbolTab, NULL, !strcmp(funcname, "__builtin_strcpy") ? "__builtin_memcpy" : "memcpy");
+      symbol *memcpy_sym = findSym (SymbolTab, NULL, !strcmp(funcname, "__builtin_strcpy") ? "__builtin_memcpy" : "__memcpy");
 
       if(!memcpy_sym)
         return;
@@ -3294,7 +3294,14 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       node->right = lengthparm;
       node->decorated = 1;
       parms->right = node;
+
       func->opval.val->sym = memcpy_sym;
+      SPEC_REGPARM (parms->left->etype) = SPEC_REGPARM (FUNC_ARGS (memcpy_sym->type)->etype);
+      SPEC_ARGREG (parms->left->etype) = SPEC_ARGREG (FUNC_ARGS (memcpy_sym->type)->etype);
+      SPEC_REGPARM (parms->right->left->etype) = SPEC_REGPARM (FUNC_ARGS (memcpy_sym->type)->next->etype);
+      SPEC_ARGREG (parms->right->left->etype) = SPEC_ARGREG (FUNC_ARGS (memcpy_sym->type)->next->etype);
+      SPEC_REGPARM (parms->right->right->etype) = SPEC_REGPARM (FUNC_ARGS (memcpy_sym->type)->next->next->etype);
+      SPEC_ARGREG (parms->right->right->etype) = SPEC_ARGREG (FUNC_ARGS (memcpy_sym->type)->next->next->etype);
     }
 }
 

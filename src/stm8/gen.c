@@ -3488,7 +3488,7 @@ genCall (const iCode *ic)
               genMove (ASMOP_X, left->aop, !aopInReg (left->aop, 2, A_IDX), true, false);
               push (ASMOP_X, 0, 2);
             }
-          else if (!stm8IsParmInCall(ftype, "a"))
+          else if (!stm8IsParmInCall(ftype, "a") && left->aop->regs[A_IDX] < 1)
             {
               cheapMove (ASMOP_A, 0, left->aop, 0, false);
               push (ASMOP_A, 0, 1);
@@ -3496,7 +3496,10 @@ genCall (const iCode *ic)
               push (ASMOP_A, 0, 1);
             }
           else
-            wassert (0);
+            {
+              cost (500, 500);
+              wassert (regalloc_dry_run);
+            }
           if (!stm8IsParmInCall(ftype, "a"))
             {
               cheapMove (ASMOP_A, 0, left->aop, 2, false);

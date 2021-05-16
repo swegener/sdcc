@@ -3,6 +3,8 @@
 	* src/SDCCsalloc.hpp,
 	  support/regression/tests/bug-3238.c:
 	  Fix bug #3238.
+	* src/stm8/gen.c:
+	  Fix a register parameter issue in code generation for function pointers in large model.
 
 2021-05-15 Philipp Klaus Krause <pkk AT spth.de>
 

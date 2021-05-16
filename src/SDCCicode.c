@@ -575,7 +575,7 @@ newiCode (int op, operand *left, operand *right)
   IC_RIGHT (ic) = right;
   ic->inlined = inlinedActive;
 
-  // Err on the save side for now, settign this to false later is up to later analysis.
+  // Err on the save side for now, setting this to false later is up to later analysis.
   ic->localEscapeAlive = true;
 
   return ic;

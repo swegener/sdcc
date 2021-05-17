@@ -412,7 +412,7 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_IMMD)
     {
-      wassertl_bt (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
+      wassertl_bt (offset < (2 + (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (currFunc->type))), "Immediate operand out of range");
       if (offset == 0)
         SNPRINTF (buffer, sizeof(buffer), "#<(%s+%d)", aop->aopu.immd, aop->aopu.immd_off);
       else
@@ -3592,10 +3592,11 @@ genCall (const iCode *ic)
 
           if (aopInReg (left->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX))
             push (left->aop, 0, 2);
-          else if ((aopOnStackNotExt (left->aop, 0, 2) && !(aopInReg (left->aop, 2, XL_IDX) || aopInReg (left->aop, 2, XH_IDX)) || aopInReg (left->aop, 2, A_IDX)) &&
+          else if ((aopOnStackNotExt (left->aop, 0, 2) || !stm8IsParmInCall(ftype, "y")) &&
+            !aopInReg (left->aop, 2, XL_IDX) && !aopInReg (left->aop, 2, XH_IDX) &&
             !stm8IsParmInCall(ftype, "x"))
             {
-              genMove (ASMOP_X, left->aop, !aopInReg (left->aop, 2, A_IDX), true, false);
+              genMove (ASMOP_X, left->aop, !aopInReg (left->aop, 2, A_IDX), true, !stm8IsParmInCall(ftype, "y"));
               push (ASMOP_X, 0, 2);
             }
           else if (!stm8IsParmInCall(ftype, "a") && left->aop->regs[A_IDX] < 1)
@@ -3604,6 +3605,11 @@ genCall (const iCode *ic)
               push (ASMOP_A, 0, 1);
               cheapMove (ASMOP_A, 0, left->aop, 1, false);
               push (ASMOP_A, 0, 1);
+            }
+          else if (aopOnStackNotExt (left->aop, 1, 1) && !stm8IsParmInCall(ftype, "y"))
+            {
+              genMove (ASMOP_Y, left->aop, false, false, true);
+              push (ASMOP_Y, 0, 2);
             }
           else
             {
@@ -3996,7 +4002,7 @@ genEndFunction (iCode *ic)
 
   if (poststackadjust)
     {
-      if (x_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type))
+      if (x_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCOSMIC (sym->type))
         {
           pop (ASMOP_X, 0, 2);
           adjustStack (poststackadjust, a_free, false, y_free);
@@ -4006,7 +4012,7 @@ genEndFunction (iCode *ic)
           cost (1, 1);
           return;
         }
-      else if (y_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type))
+      else if (y_free && options.model != MODEL_LARGE && !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCOSMIC (sym->type))
         {
           pop (ASMOP_Y, 0, 2);
           adjustStack (poststackadjust, a_free, x_free, false);
@@ -4016,7 +4022,7 @@ genEndFunction (iCode *ic)
           cost (2, 1);
           return;
         }
-      else if (3 + poststackadjust <= 255 && options.model != MODEL_LARGE)
+      else if (3 + poststackadjust <= 255 && options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (sym->type))
         {
           push (ASMOP_X, 0, 2);
           emit2 ("ldw", "x, (3, sp)");
@@ -4024,16 +4030,22 @@ genEndFunction (iCode *ic)
           pop (ASMOP_X, 0, 2);
           adjustStack (poststackadjust, a_free, x_free, y_free);
         }
-      else if (4 + poststackadjust <= 255 && options.model == MODEL_LARGE)
+      else if (4 + poststackadjust <= 255 && (options.model == MODEL_LARGE ||IFFUNC_ISCOSMIC (sym->type) ))
         {
-          push (ASMOP_A, 0, 1);
-          emit2 ("ld", "a, (4, sp)");
-          emit2 ("ld", "(%d, sp), a", 4 + poststackadjust);
-          emit2 ("ld", "a, (3, sp)");
-          emit2 ("ld", "(%d, sp), a", 3 + poststackadjust);
-          emit2 ("ld", "a, (2, sp)");
-          emit2 ("ld", "(%d, sp), a", 2 + poststackadjust);
-          pop (ASMOP_A, 0, 1);
+          bool pushed_a = false;
+          if (!a_free)
+            {
+              push (ASMOP_A, 0, 1);
+              pushed_a = true;
+            }
+          emit2 ("ld", "a, (%d, sp)", 3 + pushed_a);
+          emit2 ("ld", "(%d, sp), a", 3 + pushed_a + poststackadjust);
+          emit2 ("ld", "a, (%d, sp)", 2 + pushed_a);
+          emit2 ("ld", "(%d, sp), a", 2 + pushed_a + poststackadjust);
+          emit2 ("ld", "a, (%d, sp)", 1 + pushed_a);
+          emit2 ("ld", "(%d, sp), a", 1 + pushed_a + poststackadjust);
+          if (pushed_a)
+            pop (ASMOP_A, 0, 1);
           adjustStack (poststackadjust, a_free, x_free, y_free);
         }
       else

@@ -1305,6 +1305,13 @@ aopArg (sym_link *ftype, int i)
   return 0;
 }
 
+// Return true, iff ftype cleans up stack parameters.
+static bool
+isFuncCalleeStackCleanup (sym_link *ftype)
+{
+  return (IFFUNC_ISZ88DK_CALLEE (ftype));
+}
+
 static void
 push (const asmop *op, int offset, int size)
 {
@@ -3449,7 +3456,6 @@ genCall (const iCode *ic)
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
   int prestackadjust = 0;
   bool tailjump = false;
-  const bool z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
 
   D (emit2 ("; genCall", ""));
 
@@ -3502,7 +3508,7 @@ genCall (const iCode *ic)
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
     (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.bytes[0].byteu.reg->rIdx) && (IC_RESULT (ic)->aop->size < 2 || IC_RESULT (ic)->aop->size <= 2 && aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.bytes[1].byteu.reg->rIdx))) &&
     !ic->parmBytes &&
-    !IFFUNC_ISZ88DK_CALLEE (currFunc->type) &&
+    !isFuncCalleeStackCleanup (currFunc->type) &&
     !ic->localEscapeAlive &&
     !(ic->op == PCALL && aopOnStack (left->aop, 0, left->aop->size)) &&
     !(options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (currFunc->type) && IFFUNC_ISCOSMIC (ftype))) // __cosmic uses 24 bits for return address on stack frame. Can only optimize tail call to __cosmic callee, if caller also uses 24 bits.
@@ -3704,7 +3710,7 @@ genCall (const iCode *ic)
       const bool a_free = !aopRet (ftype) || aopRet (ftype)->regs[A_IDX] < 0;
       const bool x_free = !aopRet (ftype) || (aopRet (ftype)->regs[XL_IDX] < 0 && aopRet (ftype)->regs[XH_IDX] < 0);
       const bool y_free = !aopRet (ftype) || (aopRet (ftype)->regs[YL_IDX] < 0 && aopRet (ftype)->regs[YH_IDX] < 0);
-      if (IFFUNC_ISNORETURN (ftype) || z88dk_callee)
+      if (IFFUNC_ISNORETURN (ftype) || isFuncCalleeStackCleanup (ftype))
         {
           G.stack.pushed -= ic->parmBytes + bigreturn * 2;
           updateCFA ();
@@ -3965,7 +3971,7 @@ genEndFunction (iCode *ic)
         stackparmbytes += getSize (arg->sym->type);
     }
 
-  int poststackadjust = IFFUNC_ISZ88DK_CALLEE(sym->type) ? stackparmbytes : 0;
+  int poststackadjust = isFuncCalleeStackCleanup (sym->type) ? stackparmbytes : 0;
 
   bool a_free = !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0;
   bool x_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[XL_IDX] < 0 && aopRet (sym->type)->regs[XH_IDX] < 0);

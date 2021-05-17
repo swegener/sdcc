@@ -1820,6 +1820,13 @@ aopArg (sym_link *ftype, int i)
   return 0;
 }
 
+// Return true, iff ftype cleans up stack parameters.
+static bool
+isFuncCalleeStackCleanup (sym_link *ftype)
+{
+  return (IFFUNC_ISZ88DK_CALLEE (ftype));
+}
+
 /*-----------------------------------------------------------------*/
 /* freeAsmop - free up the asmop given to an operand               */
 /*----------------------------------------------------------------*/
@@ -5350,8 +5357,6 @@ genCall (const iCode *ic)
   int prestackadjust = 0;
   bool tailjump = false;
 
-  const bool z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
-
   for (i = 0; i < IYH_IDX + 1; i++)
     z80_regs_preserved_in_calls_from_current_function[i] |= ftype->funcAttrs.preserved_regs[i];
 
@@ -5431,7 +5436,7 @@ genCall (const iCode *ic)
       (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
       IC_RESULT (ic)->aop->size <= 4) &&
     !ic->parmBytes && !ic->localEscapeAlive && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) && (_G.omitFramePtr || IS_GB) &&
-    !IFFUNC_ISZ88DK_CALLEE (currFunc->type))
+    !isFuncCalleeStackCleanup (currFunc->type))
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
 
@@ -5630,7 +5635,7 @@ genCall (const iCode *ic)
   _G.saves.saved = false;
 
   /* adjust the stack for parameters if required */
-  if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (ftype) || z88dk_callee))
+  if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (ftype) || isFuncCalleeStackCleanup (ftype)))
     {
       if (!regalloc_dry_run)
         {
@@ -5942,7 +5947,7 @@ genEndFunction (iCode *ic)
         stackparmbytes += argsize;
     }
 
-  int poststackadjust = IFFUNC_ISZ88DK_CALLEE(sym->type) ? stackparmbytes : 0;
+  int poststackadjust = isFuncCalleeStackCleanup (sym->type) ? stackparmbytes : 0;
 
   if (poststackadjust && // Try to merge both stack adjustments.
     _G.omitFramePtr &&
@@ -5982,7 +5987,7 @@ genEndFunction (iCode *ic)
       regalloc_dry_run_cost += 2;
     }
 
-  wassertl(regalloc_dry_run || !(IFFUNC_ISZ88DK_CALLEE(sym->type) && (_G.calleeSaves.pushedDE || _G.calleeSaves.pushedBC)), "Unimplemented __z88dk_callee support for calle-saved bc/de on callee side");
+  wassertl(regalloc_dry_run || !(isFuncCalleeStackCleanup (sym->type) && (_G.calleeSaves.pushedDE || _G.calleeSaves.pushedBC)), "Unimplemented __z88dk_callee support for calle-saved bc/de on callee side");
   if (_G.calleeSaves.pushedDE)
     {
       emit2 ("pop de");

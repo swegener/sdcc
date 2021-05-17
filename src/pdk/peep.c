@@ -140,13 +140,11 @@ findLabel (const lineNode *pl)
 
   /* 3. search lineNode with label definition and return it */
   for (cpl = _G.head; cpl; cpl = cpl->next)
-    {
-      if (   cpl->isLabel
-          && strncmp (p, cpl->line, strlen(p)) == 0)
-        {
-          return cpl;
-        }
-    }
+    if (cpl->isLabel &&
+      strncmp (p, cpl->line, strlen(p)) == 0 &&
+      cpl->line[strlen(p)] == ':')
+        return cpl;
+
   return NULL;
 }
 

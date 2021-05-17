@@ -7352,8 +7352,8 @@ genPlus (iCode * ic)
               _push (PAIR_AF);
             }
           // Avoid overwriting still-needed operand in h or l.
-          else if (i + 1 < size && requiresHL (IC_RESULT (ic)->aop) && (IC_RESULT (ic)->aop->type == AOP_EXSTK || IC_RESULT (ic)->aop->type == AOP_PAIRPTR) &&
-            (!isPairDead(PAIR_HL, ic) || IC_LEFT(ic)->aop->regs[L_IDX] > i || IC_LEFT(ic)->aop->regs[H_IDX] > i || IC_RIGHT(ic)->aop->regs[L_IDX] > i || IC_RIGHT(ic)->aop->regs[H_IDX] > i))
+          else if (requiresHL (IC_RESULT (ic)->aop) && IC_RESULT (ic)->aop->type != AOP_REG && (IC_RESULT (ic)->aop->type == AOP_EXSTK || IS_GB || IC_RESULT (ic)->aop->type == AOP_PAIRPTR) &&
+            (!isPairDead(PAIR_HL, ic) || i + 1 < size && IC_LEFT(ic)->aop->regs[L_IDX] > i || i + 1 < size && IC_LEFT(ic)->aop->regs[H_IDX] > i || i + 1 < size && IC_RIGHT(ic)->aop->regs[L_IDX] > i || i + 1 < size && IC_RIGHT(ic)->aop->regs[H_IDX] > i))
             {
               _push (PAIR_HL);
               cheapMove (IC_RESULT (ic)->aop, i, ASMOP_A, 0, true);

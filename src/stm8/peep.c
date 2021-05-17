@@ -601,13 +601,11 @@ findLabel (const lineNode *pl)
 
   /* 3. search lineNode with label definition and return it */
   for (cpl = _G.head; cpl; cpl = cpl->next)
-    {
-      if (   cpl->isLabel
-          && strncmp (p, cpl->line, strlen(p)) == 0)
-        {
-          return cpl;
-        }
-    }
+    if (cpl->isLabel &&
+      strncmp (p, cpl->line, strlen(p)) == 0 &&
+      cpl->line[strlen(p)] == ':')
+        return cpl;
+
   return NULL;
 }
 
@@ -808,7 +806,7 @@ stm8MightRead(const lineNode *pl, const char *what)
         return stm8IsParmInCall(f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
         return stm8MightBeParmInCallFromCurrentFunction(what);
-    } 
+    }
 
   if(ISINST(pl->line, "ret"))
     return(stm8IsReturned(what));

@@ -344,9 +344,9 @@ FBYNAME (labelIsUncondJump)
     {
       if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
         {
-          if (strncmp(pl->line, label, len) == 0)
+          if (strncmp(pl->line, label, len) == 0 && pl->line[len] == ':')
             {
-              found = TRUE;
+              found = true;
               break; /* Found Label */
             }
           if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||
@@ -365,9 +365,9 @@ FBYNAME (labelIsUncondJump)
         {
           if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
             {
-              if (strncmp(pl->line, label, len) == 0)
+              if (strncmp(pl->line, label, len) == 0 && pl->line[len] == ':')
                 {
-                  found = TRUE;
+                  found = true;
                   break; /* Found Label */
                 }
               if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||

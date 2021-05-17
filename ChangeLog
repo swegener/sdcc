@@ -1,5 +1,20 @@
 2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c,
+	  src/pdk/peep.c,
+	  src/stm8/peep.c,
+	  src/z80/gen.c,
+	  src/z80/peep.c,
+	  support/regression/tests/bug-3239.c:
+	  Fix bugs #3235, 3239.
+
+2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a code generation bug in hl handling.
+
+2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c,
 	  src/z80/gen.c:
 	  Refactor __z88dk_callee support to allow other calling conventions to use callee stack cleanup.

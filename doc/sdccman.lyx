@@ -44207,7 +44207,7 @@ The STM8 port
 \end_layout
 
 \begin_layout Subsection
-Calling convention
+Calling conventions
 \end_layout
 
 \begin_layout Standard
@@ -44215,11 +44215,64 @@ Arguments are passed on the stack right-to-left.
  Return values are in a (8 bit), x (16 bit), xyl (24 bit), xy (32 bit) or
  use a hidden extra pointer parameter pointing to the location (anything
  wider than 32 bit).
- There is one other calling convention supported, which can be specified
- using the keyword __z88dk_callee.
+ There is another calling convention supported, which can be specified using
+ the keyword __z88dk_callee.
  For __z88dk_callee, parameters are passed on the stack, but the stack is
  not adjusted for the parameters after the call (thus the callee has to
  do this instead).
+\end_layout
+
+\begin_layout Subsubsection
+Raisonance calling convention
+\end_layout
+
+\begin_layout Standard
+For compability with the Raisonance STM8 compiler, the __raisonance calling
+ convention is supported.
+ If the first parameter is 8 or 16 bits, it is passed in a or x.
+ If the first parameter is 8 bits, and the second 16 bits, the second is
+ passed in x.
+ If the first parameter is 16 bits, and the second is 8 bits, the second
+ is passed in a.
+ All other parameters are passed on the stack.
+ If the return value is 8 bits, it is passed in a.
+ If it is 16 bits, it is passed in x.
+ Raisonance passes larger return values in peudoregisters, which is not
+ supported by SDCC.
+\end_layout
+
+\begin_layout Subsubsection
+IAR calling convention
+\end_layout
+
+\begin_layout Standard
+For compability with the IAR STM8 compiler, the __iar calling convention
+ is supported.
+ The first 8-bit parameter is passed in a, the first 16-bit parameter in
+ x, the second 16-bit parameter in y.
+ Further parameters of up to 32 bits are passed in pseudoregisters, which
+ is not supported by SDCC.
+ All other parameters are passed on the stack.
+ If the return value is 8 bits, it is passed in a.
+ If it is 16 bits, it is passed in x.
+ IAR passes larger return values in peudoregisters, which is not supported
+ in SDCC.
+\end_layout
+
+\begin_layout Subsubsection
+Cosmic calling convention
+\end_layout
+
+\begin_layout Standard
+For compability with the Cosmic STM8 compiler, the __cosmic calling convention
+ is supported.
+ If the first parameter is 8 or 16 bits, it is passed in a or x.
+ If the return value is 8 bits, it is passed in a.
+ If it is 16 bits, it is passed in x.
+ Cosmic passes larger return values in peudoregisters, which is not supported
+ by SDCC.
+ Even for the medium memory model, __cosmic functions use a 24-bit return
+ address in their stack frame, and are called using callf.
 \end_layout
 
 \begin_layout Section

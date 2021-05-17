@@ -107,7 +107,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -2177,6 +2177,15 @@ function_attributes
                      }
    |  SMALLC         {  $$ = newLink (SPECIFIER);
                         FUNC_ISSMALLC($$) = 1;
+                     }
+   |  RAISONANCE     {  $$ = newLink (SPECIFIER);
+                        FUNC_ISRAISONANCE($$) = 1;
+                     }
+   |  IAR            {  $$ = newLink (SPECIFIER);
+                        FUNC_ISIAR($$) = 1;
+                     }
+   |  COSMIC         {  $$ = newLink (SPECIFIER);
+                        FUNC_ISCOSMIC($$) = 1;
                      }
    |  Z88DK_FASTCALL {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_FASTCALL($$) = 1;

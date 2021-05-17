@@ -273,7 +273,10 @@ typedef struct sym_link
     unsigned rbank:1;               /* seperate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
     unsigned noreturn:1;            /* promised not to return               */
-    unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
+    unsigned smallc:1;              /* Small-C calling convention: Parameters on stack are passed left-to-right */
+    unsigned raisonance:1;          /* Raisonance calling convention for STM8 */
+    unsigned iar:1;                 /* IAR calling convention */
+    unsigned cosmic:1;              /* Cosmic calling convention */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
     unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
@@ -459,6 +462,12 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
 #define FUNC_ISSMALLC(x) (x->funcAttrs.smallc)
 #define IFFUNC_ISSMALLC(x) (IS_FUNC(x) && FUNC_ISSMALLC(x))
+#define FUNC_ISRAISONANCE(x) (x->funcAttrs.raisonance)
+#define IFFUNC_ISRAISONANCE(x) (IS_FUNC(x) && FUNC_ISRAISONANCE(x))
+#define FUNC_ISIAR(x) (x->funcAttrs.iar)
+#define IFFUNC_ISIAR(x) (IS_FUNC(x) && FUNC_ISIAR(x))
+#define FUNC_ISCOSMIC(x) (x->funcAttrs.cosmic)
+#define IFFUNC_ISCOSMIC(x) (IS_FUNC(x) && FUNC_ISCOSMIC(x))
 #define FUNC_ISZ88DK_FASTCALL(x) (x->funcAttrs.z88dk_fastcall)
 #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
 #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)

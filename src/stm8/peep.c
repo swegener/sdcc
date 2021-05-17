@@ -790,15 +790,6 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "xor")))
           return TRUE;
 
-      if (ISINST (pl->line, "call") || ISINST (pl->line, "callr") || ISINST (pl->line, "callf"))
-        {
-          const symbol *f = findSym (SymbolTab, 0, pl->line + (ISINST (pl->line, "call") ? 6 : 7));
-          if (f)
-            return stm8IsParmInCall(f->type, what);
-          else // Fallback needed for calls through function pointers and for calls to literal addresses.
-            return stm8MightBeParmInCallFromCurrentFunction(what);
-        } 
-
       if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw"))
         {
           char buf[64], *p;
@@ -809,6 +800,15 @@ stm8MightRead(const lineNode *pl, const char *what)
             return TRUE;
         }
     }
+
+  if (ISINST (pl->line, "call") || ISINST (pl->line, "callr") || ISINST (pl->line, "callf"))
+    {
+      const symbol *f = findSym (SymbolTab, 0, pl->line + (ISINST (pl->line, "call") ? 6 : 7));
+      if (f)
+        return stm8IsParmInCall(f->type, what);
+      else // Fallback needed for calls through function pointers and for calls to literal addresses.
+        return stm8MightBeParmInCallFromCurrentFunction(what);
+    } 
 
   if(ISINST(pl->line, "ret"))
     return(stm8IsReturned(what));

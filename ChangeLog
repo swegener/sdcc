@@ -1,3 +1,17 @@
+2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.h,
+	  src/stm8/gen.c,
+	  src/stm8/main.c,
+	  src/stm8/peep.c,
+	  support/regression/tests/stm8-conventions.c:
+	  Support calling conventions of Raisonance, IAR and Cosmic compilers for STM8.
+
 2021-05-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsalloc.hpp,

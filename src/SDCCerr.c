@@ -595,6 +595,14 @@ struct
      "digit separators require ISO C23 or later", 0 },
   { E_INVALID_LANG_OVERRIDE, ERROR_LEVEL_ERROR,
      "argument to option -x is not a valid file type override", 0},
+  { E_RAISONANCE_LARGE_RETURN, ERROR_LEVEL_ERROR,
+     "return values larger than 16 bits are not supported for Raisonance calling convention", 0},
+  { E_IAR_LARGE_RETURN, ERROR_LEVEL_ERROR,
+     "return values larger than 16 bits are not supported for IAR calling convention", 0},
+  { E_IAR_PSEUDOPARM, ERROR_LEVEL_ERROR,
+     "IAR function call with parameter in pseudoregister", 0},
+  { E_COSMIC_LARGE_RETURN, ERROR_LEVEL_ERROR,
+     "return values larger than 16 bits are not supported for Cosmic calling convention", 0},
 };
 
 /* -------------------------------------------------------------------------------

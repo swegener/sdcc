@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   gen.c - code generator for STM8.
 
-  Copyright (C) 2012 - 2020, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2012 - 2021, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -1173,10 +1173,22 @@ aopOp (operand *op, const iCode *ic)
 // Get asmop for registers containing the return type of function
 // Returns 0 is the function does not have a return value or it is not returned in registers.
 static asmop *
-aopRet (const sym_link *ftype)
+aopRet (sym_link *ftype)
 {
   int size = getSize (ftype->next);
-  
+
+  // Raisonance passes return values larger than 16 bits in pseudoregisters.
+  if (IFFUNC_ISRAISONANCE (ftype) && size > 2)
+    werror (E_RAISONANCE_LARGE_RETURN);
+
+  // IAR passes return values larger than 16 bits in pseudoregisters.
+  if (IFFUNC_ISIAR (ftype) && size > 2)
+    werror (E_IAR_LARGE_RETURN);
+
+  // Cosmic passes return values larger than 16 bits in pseudoregisters.
+  if (IFFUNC_ISCOSMIC (ftype) && size > 2)
+    werror (E_COSMIC_LARGE_RETURN);
+
   switch (size)
     {
     case 1:
@@ -1197,8 +1209,98 @@ aopRet (const sym_link *ftype)
 static asmop *
 aopArg (sym_link *ftype, int i)
 {
+  // Calling convention for variable arguments not documented in Raisonance C compiler manual. Needs reverse-engineering.
+  wassertl (!IFFUNC_ISRAISONANCE (ftype) || !IFFUNC_HASVARARGS (ftype), "Unimplemented support for variable arguments in Raisonance calling convention.");
+  // Calling convention for variable arguments not documented in IAR C/C++ development guide. Needs reverse-engineering.
+  wassertl (!IFFUNC_ISIAR (ftype) || !IFFUNC_HASVARARGS (ftype), "Unimplemented support for variable arguments in IAR calling convention.");
+
+  value *args = FUNC_ARGS(ftype);
+  wassert (args);
+
   if (IFFUNC_HASVARARGS (ftype))
     return 0;
+
+  // Raisonance calling convention.
+  if (IFFUNC_ISRAISONANCE (ftype))
+    {
+      int j;
+      value *arg;
+
+      for (j = 1, arg = args; j < i; j++, arg = arg->next)
+        wassert (arg);
+
+      if (i == 1 && getSize (arg->type) == 2)
+        return ASMOP_X;
+
+      if (i == 1 && getSize (arg->type) == 1)
+        return ASMOP_A;
+
+      if (i == 2 && aopArg (ftype, 1) == ASMOP_X && getSize (arg->type) == 1)
+        return ASMOP_A;
+
+      if (i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 2)
+        return ASMOP_X;
+
+      return 0;
+    }
+    
+  // IAR calling convention.
+  if (IFFUNC_ISIAR (ftype))
+    {
+      int j, num_1_byte_args, num_2_byte_args;
+      value *arg;
+
+      num_1_byte_args = 0;
+      num_2_byte_args = 0;
+      bool stackarg = false;
+      for (j = 1, arg = args; j < i; j++, arg = arg->next)
+        {
+          wassert (arg);
+          num_1_byte_args += (getSize (arg->type) == 1);
+          num_2_byte_args += (getSize (arg->type) == 2);
+          stackarg |= (getSize (arg->type) > 4 || num_1_byte_args > 1 || num_2_byte_args > 2);
+        }
+
+      // IAR passes the first two 24-bit / 32-bit arguments in pseudoregisters.
+      if ((getSize (arg->type) == 3 || getSize (arg->type) == 4))
+        werror (E_IAR_PSEUDOPARM);
+
+      if (getSize (arg->type) == 1)
+        {
+          if (num_1_byte_args > 0)
+            werror (E_IAR_PSEUDOPARM);
+          else if (stackarg)
+            wassertl (0, "Unimplemented stack argument before register argument for IAR calling convention.");
+          else
+            return ASMOP_A;
+        }
+
+      if (getSize (arg->type) == 2)
+        {
+          if (num_2_byte_args > 1)
+            werror (E_IAR_PSEUDOPARM);
+          else if (stackarg)
+            wassertl (0, "Unimplemented stack argument before register argument for IAR calling convention.");
+          else if (num_2_byte_args)
+            return ASMOP_Y;
+          else
+            return ASMOP_X;
+        }
+
+      return 0;
+    }
+    
+  // Cosmic calling convention.
+  if (IFFUNC_ISCOSMIC (ftype))
+    {
+      if (i == 1 && getSize (args->type) == 1)
+        return ASMOP_A;
+
+      if (i == 1 && getSize (args->type) == 2)
+        return ASMOP_X;
+
+      return 0;
+    }
 
   return 0;
 }
@@ -3451,7 +3553,7 @@ genCall (const iCode *ic)
 
   if (ic->op == PCALL)
     {
-      if (options.model == MODEL_LARGE && left->aop->type == AOP_DIR)
+      if ((options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (ftype)) && left->aop->type == AOP_DIR)
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
@@ -3460,7 +3562,7 @@ genCall (const iCode *ic)
           emit2 (jump ? "jpf" : "callf", "[%s]", left->aop->aopu.aop_dir);
           cost (4, jump ? 6 : 8);
         }
-      else if (options.model == MODEL_LARGE)
+      else if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (ftype))
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
@@ -3571,7 +3673,7 @@ genCall (const iCode *ic)
     {
       adjustStack (prestackadjust, true, true, true);
 
-      if (options.model == MODEL_LARGE)
+      if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (ftype))
         {
           if (IS_LITERAL (etype))
             emit2 (jump ? "jpf" : "callf", "0x%06X", ulFromVal (OP_VALUE (left)));
@@ -3820,6 +3922,10 @@ genFunction (iCode *ic)
   bigreturn = (getSize (ftype->next) > 4);
   G.stack.param_offset += bigreturn * 2;
 
+  // Cosmic stack frame always uses 14-bit return address.
+  if (IFFUNC_ISCOSMIC (ftype) && options.model != MODEL_LARGE)
+    G.stack.param_offset++;
+
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, &stm8_regs[SP_IDX], 1);
 
@@ -3946,7 +4052,7 @@ genEndFunction (iCode *ic)
       if (options.debug && currFunc && !regalloc_dry_run)
         debugFile->writeEndFunction (currFunc, ic, 1);
 
-      if (options.model == MODEL_LARGE)
+      if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (currFunc->type))
         {
           emit2 ("retf", "");
           cost (1, 5);

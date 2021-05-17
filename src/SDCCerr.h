@@ -297,6 +297,7 @@ enum {
   E_IAR_LARGE_RETURN            = 267, /* large return value not supported for IAR calling convention */
   E_IAR_PSEUDOPARM              = 268, /* IAR function call with parameter in pseudoregister */
   E_COSMIC_LARGE_RETURN         = 269, /* large return value not supported for Cosmic calling convention */
+  E_MULTIPLE_CALLINGCONVENTIONS = 270, /* multiple incompatible calling conventions */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

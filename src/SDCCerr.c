@@ -603,6 +603,8 @@ struct
      "IAR function call with parameter in pseudoregister", 0},
   { E_COSMIC_LARGE_RETURN, ERROR_LEVEL_ERROR,
      "return values larger than 16 bits are not supported for Cosmic calling convention", 0},
+  { E_MULTIPLE_CALLINGCONVENTIONS, ERROR_LEVEL_ERROR,
+     "multiple incompatible calling conventions for '%s'", 0},
 };
 
 /* -------------------------------------------------------------------------------

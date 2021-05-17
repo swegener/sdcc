@@ -835,7 +835,15 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_REGBANK (dest) |= FUNC_REGBANK (src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
   FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
+  if (FUNC_ISRAISONANCE (dest) && (FUNC_ISIAR (src) || FUNC_ISCOSMIC (src) || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_ISIAR (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISCOSMIC (src) || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_ISCOSMIC (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_ISZ88DK_CALLEE (src) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (dest) || FUNC_ISCOSMIC (dest)))
+    werror (E_MULTIPLE_CALLINGCONVENTIONS, name);
   FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
+  FUNC_ISRAISONANCE (dest) |= FUNC_ISRAISONANCE (src);
+  FUNC_ISIAR (dest) |= FUNC_ISIAR (src);
+  FUNC_ISCOSMIC (dest) |= FUNC_ISCOSMIC (src);
   FUNC_ISZ88DK_FASTCALL (dest) |= FUNC_ISZ88DK_FASTCALL (src);
   FUNC_ISZ88DK_CALLEE (dest) |= FUNC_ISZ88DK_CALLEE (src);
   for (i = 0; i < 9; i++)

@@ -6,6 +6,7 @@
 	  src/SDCCerr.c,
 	  src/SDCCerr.h,
 	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
 	  src/stm8/gen.c,
 	  src/stm8/main.c,
 	  src/stm8/peep.c,

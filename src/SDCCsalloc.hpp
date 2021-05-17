@@ -144,6 +144,7 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     {
       G[i].ic->localEscapeAlive = false;
+      G[i].ic->parmEscapeAlive = false;
 
       for(unsigned int j = 0; j < boost::num_vertices(scon); j++)
         {
@@ -217,6 +218,10 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
   // Ugly hack: Regparms.
   for(sym = static_cast<symbol *>(setFirstItem(istack->syms)), j = boost::num_vertices(scon); sym; sym = static_cast<symbol *>(setNextItem(istack->syms)))
     {
+      if (sym->_isparm && !IS_REGPARM(sym->etype) && sym->addrtaken)
+        for(unsigned int i = 0; i < boost::num_vertices(G); i++)
+          G[i].ic->parmEscapeAlive = true;
+      
       if(!sym->_isparm || !IS_REGPARM(sym->etype) || !sym->onStack || !sym->allocreq)
         continue;
       

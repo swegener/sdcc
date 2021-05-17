@@ -577,6 +577,7 @@ newiCode (int op, operand *left, operand *right)
 
   // Err on the save side for now, setting this to false later is up to later analysis.
   ic->localEscapeAlive = true;
+  ic->parmEscapeAlive = true;
 
   return ic;
 }

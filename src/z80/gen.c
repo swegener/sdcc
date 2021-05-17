@@ -5431,7 +5431,6 @@ genCall (const iCode *ic)
       (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
       IC_RESULT (ic)->aop->size <= 4) &&
     !ic->parmBytes && !ic->localEscapeAlive && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) && (_G.omitFramePtr || IS_GB) &&
-    (ic->op != PCALL || !IFFUNC_ISZ88DK_FASTCALL (ftype)) &&
     !IFFUNC_ISZ88DK_CALLEE (currFunc->type))
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.

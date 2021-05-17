@@ -3500,9 +3500,10 @@ genCall (const iCode *ic)
     }
   // Check if we can do tail call optimization.
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
-    (!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, X_IDX)) &&
-    !ic->parmBytes && !ic->localEscapeAlive &&
+    (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.bytes[0].byteu.reg->rIdx) && (IC_RESULT (ic)->aop->size < 2 || IC_RESULT (ic)->aop->size <= 2 && aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.bytes[1].byteu.reg->rIdx))) &&
+    !ic->parmBytes &&
     !IFFUNC_ISZ88DK_CALLEE (currFunc->type) &&
+    !ic->localEscapeAlive &&
     !(ic->op == PCALL && aopOnStack (left->aop, 0, left->aop->size)) &&
     !(options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (currFunc->type) && IFFUNC_ISCOSMIC (ftype))) // __cosmic uses 24 bits for return address on stack frame. Can only optimize tail call to __cosmic callee, if caller also uses 24 bits.
     {

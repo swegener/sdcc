@@ -1,5 +1,15 @@
 2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCicode.h,
+	  src/SDCCicode.c,
+	  src/SDCCsalloc.hpp,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  support/regression/tests/bug-3240.c:
+	  Tail call optimization fixes for register parameters.
+
+2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* doc/sdccman.lyx,
 	  src/SDCC.lex,
 	  src/SDCC.y,

@@ -1824,6 +1824,19 @@ aopArg (sym_link *ftype, int i)
 static bool
 isFuncCalleeStackCleanup (sym_link *ftype)
 {
+  const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
+  int stackparmbytes = bigreturn * 2;
+  for (value *arg = FUNC_ARGS(ftype); arg && !FUNC_HASVARARGS(ftype); arg = arg->next)
+    {
+      int argsize = getSize (arg->type);
+      if (argsize == 1 && FUNC_ISSMALLC (ftype)) // SmallC calling convention passes 8-bit stack arguments as 16 bit.
+        argsize++;
+      if (!SPEC_REGPARM (arg->etype))
+        stackparmbytes += argsize;
+    }
+  if (!stackparmbytes)
+    return false;
+
   return (IFFUNC_ISZ88DK_CALLEE (ftype));
 }
 

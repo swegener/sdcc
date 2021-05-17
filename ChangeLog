@@ -1,5 +1,11 @@
 2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Tail call optimization for functions with no stack parameters.
+
+2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCpeeph.c,
 	  src/pdk/peep.c,
 	  src/stm8/peep.c,

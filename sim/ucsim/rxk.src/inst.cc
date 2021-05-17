@@ -59,4 +59,21 @@ cl_rxk::NOP(t_mem code)
   return resGO;
 }
 
+int
+cl_rxk::SCF(t_mem code)
+{
+  destF().W(destF().R() | flagC);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::CCF(t_mem code)
+{
+  destF().W(destF().R() ^ flagC);
+  tick(1);
+  return resGO;
+}
+
+
 /* End of m6800.src/inst.cc */

@@ -50,7 +50,7 @@ COMMAND_DO_WORK_UC(cl_import_pbstate_cmd)
     ((cl_pblaze *) uc)->load_state(con, fname);
   }
   else {
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help.c_str());
   }
 
   return(0);
@@ -79,7 +79,7 @@ COMMAND_DO_WORK_UC(cl_import_interrupts_cmd)
     ((cl_pblaze *) uc)->read_interrupt_file();
   }
   else {
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help.c_str());
   }
 
   return(0);
@@ -107,7 +107,7 @@ COMMAND_DO_WORK_UC(cl_import_input_cmd)
     ((cl_pblaze *) uc)->read_input_file();
   }
   else {
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    con->dd_printf("%s\n", short_help.c_str());
   }
 
   return(0);

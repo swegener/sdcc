@@ -46,4 +46,79 @@ cl_rxk::ld_r_n(class cl_cell8 &r)
   return resGO;
 }
 
+int
+cl_rxk::ld_hl_r(u8_t op)
+{
+  class cl_cell8 &c= dest8HL();
+  c.W(op);
+  vc.wr++;
+  tick(5);
+  return resGO;
+}
+
+int
+cl_rxk::ld_r_hl(class cl_cell8 &destr)
+{
+  u8_t v= read8(rHL);
+  destr.W(v);
+  tick(4);
+  return resGO;
+}
+
+
+int
+cl_rxk::LD_BC_A(t_mem code)
+{
+  class cl_cell8 &c= dest8BC();
+  c.W(rA);
+  vc.wr++;
+  tick(6);
+  return resGO;
+}
+
+int
+cl_rxk::LD_DE_A(t_mem code)
+{
+  class cl_cell8 &c= dest8DE();
+  c.W(rA);
+  vc.wr++;
+  tick(6);
+  return resGO;
+}
+
+int
+cl_rxk::LD_MN_A(t_mem code)
+{
+  class cl_cell8 &c= dest8mn();
+  c.W(rA);
+  vc.wr++;
+  tick(7);
+  return resGO;
+}
+
+int
+cl_rxk::LD_A_BC(t_mem code)
+{
+  destA().W(read8(rBC));
+  tick(5);
+  return resGO;
+}
+
+int
+cl_rxk::LD_A_DE(t_mem code)
+{
+  destA().W(read8(rDE));
+  tick(5);
+  return resGO;
+}
+
+int
+cl_rxk::LD_A_MN(t_mem code)
+{
+  destA().W(read8(fetch16()));
+  tick(6);
+  return resGO;
+}
+
+
 /* End of rxk.src/imove.cc */

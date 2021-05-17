@@ -171,7 +171,6 @@ class cl_var_list: public cl_base
   int get_max_name_len(void) { return max_name_len; }
 
   virtual t_mem read(chars name);
-
 };
 
 class cl_vars_iterator {
@@ -186,6 +185,9 @@ class cl_vars_iterator {
 
     const cl_var *first(cl_memory *mem, t_addr addr);
     const cl_var *next(void);
+
+  private:
+    int compare_bits(const class cl_var *var1, const class cl_var *var2);
 };
 
 #endif

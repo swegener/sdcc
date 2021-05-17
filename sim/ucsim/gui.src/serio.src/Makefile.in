@@ -99,7 +99,7 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 serialview$(EXEEXT): $(OBJECTS)
-	$(CXX) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
+	$(CXX) -o $@ $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS)  $(CPPFLAGS) -c $< -o $@

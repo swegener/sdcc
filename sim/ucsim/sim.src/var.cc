@@ -432,6 +432,24 @@ cl_var_list::read(chars name)
   return 0;
 }
 
+int
+cl_vars_iterator::compare_bits(const class cl_var *var1, const class cl_var *var2)
+{
+  int ret;
+
+  if ((!(ret = (var1->bitnr_high < 0
+               ? (var2->bitnr_high < 0 ? 0 : -1)
+               : (var2->bitnr_high < 0
+                  ? 1
+                  : var2->bitnr_high - var1->bitnr_high)))))
+    ret = (var1->bitnr_low < 0
+           ? (var2->bitnr_low < 0 ? 0 : -1)
+           : (var2->bitnr_low < 0
+              ? 1
+              : var1->bitnr_low - var2->bitnr_low));
+
+  return ret;
+}
 const cl_var *
 cl_vars_iterator::first(cl_memory *mem, t_addr addr)
 {
@@ -457,7 +475,7 @@ cl_vars_iterator::first(cl_memory *mem, t_addr addr)
         chip_var = vars->by_addr.at(chip_i);
     }
 
-  if (chip_var && (!space_var || vars->by_addr.compare(chip_var, space_var) < 0))
+  if (chip_var && (!space_var || compare_bits(chip_var, space_var) < 0))
     {
       chip_i++;
       return chip_var;
@@ -493,7 +511,7 @@ cl_vars_iterator::next(void)
         }
     }
 
-  if (chip_var && (!space_var || vars->by_addr.compare(chip_var, space_var) < 0))
+  if (chip_var && (!space_var || compare_bits(chip_var, space_var) < 0))
     {
       chip_i++;
       return chip_var;

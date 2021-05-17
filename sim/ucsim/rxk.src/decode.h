@@ -67,6 +67,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_H_n		instruction_26
 #define LD_L_n		instruction_2e
 #define RLCA		instruction_07
+#define RLA		instruction_17
+#define RRCA		instruction_0f
+#define RRA		instruction_1f
+#define LD_BC_A		instruction_02
+#define LD_DE_A		instruction_12
+#define LD_HL_A		instruction_77
+#define LD_HL_B		instruction_70
+#define LD_HL_C		instruction_71
+#define LD_HL_D		instruction_72
+#define LD_HL_E		instruction_73
+#define LD_HL_H		instruction_74
+#define LD_HL_L		instruction_75
+#define LD_MN_A		instruction_32
+#define LD_A_BC		instruction_0a
+#define LD_A_DE		instruction_1a
+#define LD_A_MN		instruction_3a
+#define LD_A_HL		instruction_7e
+#define LD_B_HL		instruction_46
+#define LD_C_HL		instruction_4e
+#define LD_D_HL		instruction_56
+#define LD_E_HL		instruction_5e
+#define LD_H_HL		instruction_66
+#define LD_L_HL		instruction_6e
+#define SCF		instruction_37
+#define CPL		instruction_2f
+#define CCF		instruction_3f
 
 #endif
 

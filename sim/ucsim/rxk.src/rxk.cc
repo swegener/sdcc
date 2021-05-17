@@ -313,6 +313,61 @@ cl_rxk::exec_inst(void)
   return res;
 }
 
+u8_t
+cl_rxk::op8_BC(void)
+{
+  u8_t v= rom->read(rBC);
+  vc.rd++;
+  return v;
+}
+
+u8_t
+cl_rxk::op8_DE(void)
+{
+  u8_t v= rom->read(rDE);
+  vc.rd++;
+  return v;
+}
+
+
+u8_t
+cl_rxk::op8_HL(void)
+{
+  u8_t v= rom->read(rHL);
+  vc.rd++;
+  return v;
+}
+
+u16_t
+cl_rxk::op16_BC(void)
+{
+  u8_t l, h;
+  l= rom->read(rBC);
+  h= rom->read(rBC+1);
+  vc.rd+= 2;
+  return h*256+l;
+}
+
+u16_t
+cl_rxk::op16_DE(void)
+{
+  u8_t l, h;
+  l= rom->read(rDE);
+  h= rom->read(rDE+1);
+  vc.rd+= 2;
+  return h*256+l;
+}
+
+u16_t
+cl_rxk::op16_HL(void)
+{
+  u8_t l, h;
+  l= rom->read(rHL);
+  h= rom->read(rHL+1);
+  vc.rd+= 2;
+  return h*256+l;
+}
+
 
 /*
  * CPU peripheral: MMU functions

@@ -173,7 +173,7 @@ if test $enable_rxk_port  != "no"; then
 fi,
 enable_rxk_port="yes")
 AC_ARG_ENABLE(pblaze-port,
-[  --enable-plaze-port     compile simulator for Xilinx PicoBlaze],
+[  --enable-pblaze-port    compile simulator for Xilinx PicoBlaze],
 if test $enable_pblaze_port  != "yes"; then
     enable_pblaze_port="no"
 fi,

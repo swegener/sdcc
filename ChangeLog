@@ -12,6 +12,8 @@
 	  src/stm8/peep.c,
 	  support/regression/tests/stm8-conventions.c:
 	  Support calling conventions of Raisonance, IAR and Cosmic compilers for STM8.
+	* support/regression/tests/bug2084206.c:
+	  Disable test that relies on size of void * being the same as function pointer for ds390.
 
 2021-05-16 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -26,18 +26,18 @@ set mem rom[0x1000].7 1
 set mem rom[0x1001][6:5] 0b11
 
 # Vars can be set...
-set mem rom 0x2000 0xff
-var test rom[0x2000]
+set mem rom 0x1100 0xff
+var test rom[0x1100]
 info var test
 
 # ...and changed...
-var test rom[0x2000][3:0]
+var test rom[0x1100][3:0]
 info var test
-var test rom[0x2000][5:4]
+var test rom[0x1100][5:4]
 info var test
-var test rom[0x2000][7:6]
+var test rom[0x1100][7:6]
 info var test
-var test rom[0x2000][6:2]
+var test rom[0x1100][6:2]
 info var test
 
 # ...and deleted

@@ -333,7 +333,7 @@ dc 0x8000 0x082a4
    0x082a1 <forever>:
  ? 0x082a1 8f             wfi[0K
  ? 0x082a2 cc 82 a1       jp     0x82a1 <forever>[0K
-Loading from /mhome/staff/drdani/prj/ucsim/main/stm8.src/test/symdis/xconnect.ihx
-697 words read from /mhome/staff/drdani/prj/ucsim/main/stm8.src/test/symdis/xconnect.ihx
+Loading from /extra/drdani/prj/ucsim/main/stm8.src/test/symdis/xconnect.ihx
+697 words read from /extra/drdani/prj/ucsim/main/stm8.src/test/symdis/xconnect.ihx
 Loading from xconnect.ihx
 697 words read from xconnect.ihx

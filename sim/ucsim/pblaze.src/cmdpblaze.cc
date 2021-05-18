@@ -40,7 +40,7 @@ COMMAND_DO_WORK_UC(cl_pbstate_cmd)
 CMDHELP(cl_pbstate_cmd,
 	"pbstate [\"file\"]",
 	"Prints PicoBlaze state to std output or specified file",
-	"long help of pbstate");
+	"long help of pbstate")
 
 COMMAND_DO_WORK_UC(cl_import_pbstate_cmd)
 {
@@ -59,7 +59,7 @@ COMMAND_DO_WORK_UC(cl_import_pbstate_cmd)
 CMDHELP(cl_import_pbstate_cmd,
 	"pbstate \"file\"",
 	"Loads Picoblaze state from xml file",
-	"long help of import pbstate");
+	"long help of import pbstate")
 
 
 COMMAND_DO_WORK_UC(cl_import_interrupts_cmd)
@@ -88,7 +88,7 @@ COMMAND_DO_WORK_UC(cl_import_interrupts_cmd)
 CMDHELP(cl_import_interrupts_cmd,
 	"interrupts \"file\"",
 	"Loads interrupts from xml file",
-	"long help of import interrupts");
+	"long help of import interrupts")
 
 
 COMMAND_DO_WORK_UC(cl_import_input_cmd)
@@ -116,7 +116,7 @@ COMMAND_DO_WORK_UC(cl_import_input_cmd)
 CMDHELP(cl_import_input_cmd,
 	"input \"file\"",
 	"Loads input from xml file",
-	"long help of import input");
+	"long help of import input")
 
 
 COMMAND_DO_WORK_UC(cl_get_output_cmd)
@@ -134,4 +134,4 @@ COMMAND_DO_WORK_UC(cl_get_output_cmd)
 CMDHELP(cl_get_output_cmd,
 	"output [\"file\"]",
 	"Prints realized outputs of PicoBlaze",
-	"long help of get output");
+	"long help of get output")

@@ -1157,7 +1157,7 @@ cl_pblaze::pblaze_read_hex_file(const char *nam)
 
       // skip unnecesary characters (white space etc)
       if (fscanf(f, "%*[ \n\r\t]"))
-        ; // if statement only for prevent warning during compilation
+        {} // if statement only for prevent warning during compilation
     }
   }
 
@@ -1419,7 +1419,7 @@ cl_pblaze::read_input_file(void)
         int length = strlen(input);
 
         while (start < length) {
-          int value;
+          t_mem value;
           sscanf(input + start, "%2x", &value);
 
           // if tick is specified, only first value is loaded

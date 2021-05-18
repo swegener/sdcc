@@ -40,25 +40,25 @@ set mem rom[0x1001][6:5] 0b11
 0x01001[6:5]                           0b-11----- 0x03 '.'   3
 
 # Vars can be set...
-set mem rom 0x2000 0xff
-0x02000                      ff .
-var test rom[0x2000]
+set mem rom 0x1100 0xff
+0x01100                      ff .
+var test rom[0x1100]
 info var test
-test rom[0x02000] = 0xff,255U,255
+test rom[0x01100] = 0xff,255U,255
 
 # ...and changed...
-var test rom[0x2000][3:0]
+var test rom[0x1100][3:0]
 info var test
-test rom[0x02000][3:0] = 0b1111,15U,15
-var test rom[0x2000][5:4]
+test rom[0x01100][3:0] = 0b1111,15U,15
+var test rom[0x1100][5:4]
 info var test
-test rom[0x02000][5:4] = 0b11,48U,48,'0'
-var test rom[0x2000][7:6]
+test rom[0x01100][5:4] = 0b11,48U,48,'0'
+var test rom[0x1100][7:6]
 info var test
-test rom[0x02000][7:6] = 0b11,192U,192
-var test rom[0x2000][6:2]
+test rom[0x01100][7:6] = 0b11,192U,192
+var test rom[0x1100][6:2]
 info var test
-test rom[0x02000][6:2] = 0b11111,124U,124,'|'
+test rom[0x01100][6:2] = 0b11111,124U,124,'|'
 
 # ...and deleted
 rmvar test

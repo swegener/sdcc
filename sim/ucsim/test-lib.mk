@@ -47,7 +47,7 @@ DIFF_OPTS += -I '[[:upper:]][[:alpha:]]\{2\} [[:upper:]][[:alpha:]]\{2\} .[[:dig
 # If there are no %.cmd prequisites and -e does not appear anywhere
 # in the sim args "-e run" is passed to the simulator.
 define run-sim =
-	$(SIM) -R 0 $(SIM_ARGS) $(1) \
+	-$(SIM) -R 0 $(SIM_ARGS) $(1) \
 		$(if $(filter %.cmd, $+), \
 			$(foreach file, $(filter %.cmd, $+), -e 'exec "$(file)"'), \
 			$(if $(findstring -e, $(1)), , -g)) \

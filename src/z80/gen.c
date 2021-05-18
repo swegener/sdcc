@@ -1220,7 +1220,7 @@ spillPairReg (const char *regname)
       switch (*regname)
         {
         case 'h':
-        case 'l':
+        case 'l':emit2("; spillPairReg hl");
           spillPair (PAIR_HL);
           break;
         case 'd':
@@ -2549,7 +2549,7 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
 
     case AOP_HL:
       wassertl (pairId == PAIR_HL, "AOP_HL must be in HL");
-
+emit2(";setupPair HL");
       fetchLitPair (pairId, aop, offset, true);
       _G.pairs[pairId].offset = offset;
       break;
@@ -3142,6 +3142,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
           if (!regalloc_dry_run)
             aopPut (to, aopGet (from, from_offset, false), to_offset);
           regalloc_dry_run_cost += 1 + (IS_TLCS90 && !a) + index;
+          spillPairReg (to->aopu.aop_reg[to_offset]->name);
           return;
         }
 #if 0 // Might destroy carry. Would also mess up interrupts on TLCS-90.
@@ -3161,6 +3162,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       if (!regalloc_dry_run)
         emit2 ("ld %s, %d (ix)", aopGet (to, to_offset, false), - _G.stack.pushed - _G.stack.offset + aopInReg (from, from_offset, IYH_IDX));
       regalloc_dry_run_cost += 3;
+      spillPairReg (to->aopu.aop_reg[to_offset]->name);
       _pop(PAIR_IY);
       return;
     }
@@ -3283,6 +3285,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     {
       if (!regalloc_dry_run)
         aopPut (to, aopGet (from, from_offset, false), to_offset);
+      if (to->type == AOP_REG)
+        spillPairReg (to->aopu.aop_reg[to_offset]->name);
 
       regalloc_dry_run_cost += ld_cost (to, 0, from_offset < from->size ? from : ASMOP_ZERO, from_offset);
     }
@@ -7601,12 +7605,14 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           _G.preserveCarry = !!size;
           continue;
         }
+        
+      bool l_dead = !(!isRegDead (L_IDX, ic) || left->regs[L_IDX] > offset || right->regs[L_IDX] > offset || result->regs[L_IDX] >= 0 && result->regs[L_IDX] < offset);
+      bool h_dead = !(!isRegDead (H_IDX, ic) || left->regs[H_IDX] > offset || right->regs[H_IDX] > offset || result->regs[H_IDX] >= 0 && result->regs[H_IDX] < offset);
+      bool hl_dead = l_dead && h_dead;
+      bool pushed_hl = false;
 
       if (right->type == AOP_SFR) // Right operand needs to go through a
         {
-          bool l_dead = !(!isRegDead (L_IDX, ic) || left->regs[L_IDX] > offset || result->regs[L_IDX] >= 0 && result->regs[L_IDX] < offset);
-          bool h_dead = !(!isRegDead (L_IDX, ic) || left->regs[L_IDX] > offset || result->regs[L_IDX] >= 0 && result->regs[L_IDX] < offset);
-
           asmop *tmpaop;
 
           if (aopInReg (left, offset, H_IDX))
@@ -7619,9 +7625,11 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
             tmpaop = ASMOP_L;
 
           bool tmpaop_dead = aopInReg (tmpaop, 0, L_IDX) ? l_dead : h_dead;
-          
           if (!tmpaop_dead)
-            _push (PAIR_HL);
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+            }
 
           if (aopInReg (left, offset, A_IDX))
             cheapMove (tmpaop, 0, right, offset, false);
@@ -7631,12 +7639,15 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               cheapMove (ASMOP_A, 0, left, offset, true);
             }
           emit3_o (offset ? A_SBC : A_SUB, ASMOP_A, 0, tmpaop, 0);
-
-          if (!tmpaop_dead)
-            _pop (PAIR_HL);
         }
       else if (right->type != AOP_LIT)
         {
+          if ((requiresHL (left) && left->type != AOP_REG || requiresHL (right) && right->type != AOP_REG) && !hl_dead)
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+            }
+
           if (!offset)
             {
               if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && aopInReg (right, offset, A_IDX))
@@ -7647,6 +7658,11 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
                     emit3 (A_XOR, ASMOP_A, ASMOP_A);
                   else
                     cheapMove (ASMOP_A, 0, left, offset, true);
+                  if ((aopInReg (right, offset, L_IDX) || aopInReg (right, offset, H_IDX)) && pushed_hl)
+                    {
+                      _pop (PAIR_HL);
+                      pushed_hl = false;
+                    }
                   emit3_o (A_SUB, ASMOP_A, 0, right, offset);
                 }
             }
@@ -7658,11 +7674,22 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           else
             {
               cheapMove (ASMOP_A, 0, left, offset, true);
+              if ((aopInReg (right, offset, L_IDX) || aopInReg (right, offset, H_IDX)) && pushed_hl)
+                {
+                  _pop (PAIR_HL);
+                  pushed_hl = false;
+                }
               emit3_o (A_SBC, ASMOP_A, 0, right, offset);
             }
         }
       else
         {
+          if (requiresHL (left) && left->type != AOP_REG && !hl_dead)
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+            }
+
           cheapMove (ASMOP_A, 0, left, offset, true);
 
           /* first add without previous c */
@@ -7680,9 +7707,19 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           else
             emit2 ("adc a, !immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
         }
+      if (pushed_hl)
+        _pop (PAIR_HL);
       size--;
       _G.preserveCarry = !!size;
       cheapMove (result, offset++, ASMOP_A, 0, true);
+
+      if ((left->type == AOP_PAIRPTR && left->aopu.aop_pairId == PAIR_HL || right->type == AOP_PAIRPTR && right->aopu.aop_pairId == PAIR_HL) &&
+        size &&
+        (aopInReg (result, offset, L_IDX) || aopInReg (result, offset, H_IDX)))
+        {
+          regalloc_dry_run_cost += 500;
+          wassert (regalloc_dry_run);
+        }
     }
 
   if (IC_RESULT (ic)->aop->size == 3 && left->size == 3 && !sameRegs (result, left))

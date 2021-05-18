@@ -3,6 +3,8 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3242.c:
 	  Fix bug #3242.
+	* doc/sdccman.lyx:
+	  Fix some typos.
 
 2021-05-17 Philipp Klaus Krause <pkk AT spth.de>
 

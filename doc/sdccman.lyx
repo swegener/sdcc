@@ -7937,8 +7937,8 @@ Documentation
 \end_layout
 
 \begin_layout Standard
-Currently reading the document in pdf format is recommended, as for unknown
- reason the hyperlinks are working there whereas in the html version they
+Currently reading the document in PDF format is recommended, as for unknown
+ reason the hyperlinks are working there whereas in the HTML version they
  are not
 \begin_inset Foot
 status collapsed
@@ -7953,7 +7953,7 @@ If you should know why please drop us a note
 \begin_inset Newline newline
 \end_inset
 
-You'll find the pdf version
+You'll find the PDF version
 \begin_inset Index idx
 status collapsed
 
@@ -8795,7 +8795,7 @@ sdcc - The Compiler
 \end_layout
 
 \begin_layout Standard
-This is the actual compiler, it in turn uses the c-preprocessor and invokes
+This is the actual compiler, it in turn uses the C-preprocessor and invokes
  the assembler and linkage editor.
 \end_layout
 
@@ -9648,7 +9648,7 @@ SDCC supports named address spaces.
 \end_layout
 
 \begin_layout Subsection
-Implementation-defined behaviour
+Implementation-defined behavior
 \end_layout
 
 \begin_layout Subsubsection
@@ -9670,7 +9670,7 @@ Environment
 
 \begin_layout Itemize
 See SDCC source (and your own code if you use a custom crt0 for a target
- that supports it) for any information on the envrionment.
+ that supports it) for any information on the environment.
 \end_layout
 
 \begin_layout Subsubsection
@@ -9679,7 +9679,7 @@ Identifiers
 
 \begin_layout Itemize
 See the compiler and assembler source for information on characters that
- may appear in identifiers and on the number of significant inital characters.
+ may appear in identifiers and on the number of significant initial characters.
 \end_layout
 
 \begin_layout Subsubsection
@@ -9703,7 +9703,7 @@ Value of char with something weird stored in it: TODO.
 \end_layout
 
 \begin_layout Itemize
-unsigned char has the same range, representation and behaviour as 
+unsigned char has the same range, representation and behavior as 
 \begin_inset Quotes sld
 \end_inset
 
@@ -9803,7 +9803,7 @@ Qualifiers
 \end_layout
 
 \begin_layout Itemize
-SDCC shall preserve all volatile reads and writes, but doesn not guarantee
+SDCC shall preserve all volatile reads and writes, but does not guarantee
  them to be atomic (except for atomic types and volatile sig_atomic_t).
 \end_layout
 
@@ -9859,7 +9859,7 @@ See library source for the values returned by mathematical functions on
 \end_layout
 
 \begin_layout Itemize
-See library headers for the null-pointer constant to which NUL expands.
+See library headers for the null-pointer constant to which NULL expands.
 \end_layout
 
 \begin_layout Itemize
@@ -9889,11 +9889,11 @@ No extended alignments are supported.
 \end_layout
 
 \begin_layout Itemize
-There are no valid alignments other than those returned by _Alingof.
+There are no valid alignments other than those returned by _Alignof.
 \end_layout
 
 \begin_layout Itemize
-sizeof always returns the smalles value allowed assuming an 8-bit char.
+sizeof always returns the smallest value allowed assuming an 8-bit char.
  _Alignof always returns 0.
 \end_layout
 
@@ -44036,7 +44036,7 @@ SDCC has three rabbit-supporting ports: r2k for the Rabbit 2000, r2ka for
  a subset of the Rabbit 3000A instruction set.
  Code from the r2k backend will work on Rabbit 2000 to 3000A and code from
  the r2ka backend will work on Rabbit 2000A to 3000A.
- In some hardware confgurations (see below), code from the r2ka backend
+ In some hardware configurations (see below), code from the r2ka backend
  will work on the Rabbit 2000.
  Typically, code from the r3ka backend will be faster and smaller than code
  from the r2ka backend, and code from the r2ka backend will be faster and
@@ -44117,7 +44117,7 @@ By default, all parameters are passed on the stack, right-to-left.
 \begin_layout Standard
 There are three other calling conventions supported, which can be specified
  using the keywords __smallc, __z88dk_fastcall (not on GBZ80) and __z88dk_callee.
- They are primarily intended for compability with libraries written for
+ They are primarily intended for compatibility with libraries written for
  other compilers.
  For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
  which is passed the same way as the return value.
@@ -44227,8 +44227,11 @@ Raisonance calling convention
 \end_layout
 
 \begin_layout Standard
-For compability with the Raisonance STM8 compiler, the __raisonance calling
- convention is supported.
+For compatibility with the 
+\lang british
+Raisonance
+\lang english
+ STM8 compiler, the __raisonance calling convention is supported.
  If the first parameter is 8 or 16 bits, it is passed in a or x.
  If the first parameter is 8 bits, and the second 16 bits, the second is
  passed in x.
@@ -44237,7 +44240,7 @@ For compability with the Raisonance STM8 compiler, the __raisonance calling
  All other parameters are passed on the stack.
  If the return value is 8 bits, it is passed in a.
  If it is 16 bits, it is passed in x.
- Raisonance passes larger return values in peudoregisters, which is not
+ Raisonance passes larger return values in pseudoregisters, which is not
  supported by SDCC.
 \end_layout
 
@@ -44246,7 +44249,7 @@ IAR calling convention
 \end_layout
 
 \begin_layout Standard
-For compability with the IAR STM8 compiler, the __iar calling convention
+For compatibility with the IAR STM8 compiler, the __iar calling convention
  is supported.
  The first 8-bit parameter is passed in a, the first 16-bit parameter in
  x, the second 16-bit parameter in y.
@@ -44255,7 +44258,7 @@ For compability with the IAR STM8 compiler, the __iar calling convention
  All other parameters are passed on the stack.
  If the return value is 8 bits, it is passed in a.
  If it is 16 bits, it is passed in x.
- IAR passes larger return values in peudoregisters, which is not supported
+ IAR passes larger return values in pseudoregisters, which is not supported
  in SDCC.
 \end_layout
 
@@ -44264,12 +44267,12 @@ Cosmic calling convention
 \end_layout
 
 \begin_layout Standard
-For compability with the Cosmic STM8 compiler, the __cosmic calling convention
+For compatibility with the Cosmic STM8 compiler, the __cosmic calling convention
  is supported.
  If the first parameter is 8 or 16 bits, it is passed in a or x.
  If the return value is 8 bits, it is passed in a.
  If it is 16 bits, it is passed in x.
- Cosmic passes larger return values in peudoregisters, which is not supported
+ Cosmic passes larger return values in pseudoregisters, which is not supported
  by SDCC.
  Even for the medium memory model, __cosmic functions use a 24-bit return
  address in their stack frame, and are called using callf.
@@ -44665,8 +44668,8 @@ Make local functions static, as non static functions require code page selection
 \begin_inset Newline newline
 \end_inset
 
-Due to the way sdcc handles functions, place called functions prior to calling
- functions in the file wherever possible: Otherwise sdcc will insert unnecessary
+Due to the way SDCC handles functions, place called functions prior to calling
+ functions in the file wherever possible: Otherwise SDCC will insert unnecessary
  pagesel directives around the call, believing that the called function
  is externally defined.
 \end_layout

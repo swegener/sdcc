@@ -540,6 +540,11 @@ regTypeNum (void)
           iCode *dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs));
           if (!dic || dic->op != CALL && dic->op != PCALL)
             continue;
+          if (IS_STRUCT (sym->type)) // We found an unused return value of struct or union type.
+            {
+              z80SpillThis (sym);
+              continue;
+            }
         }
 
       D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
@@ -859,7 +864,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   /* this routine will mark the a symbol as used in one
      instruction use only && if the defintion is local
      (ie. within the basic block) && has only one definition &&
-     that definiion is either a return value from a
+     that definition is either a return value from a
      function or does not contain any variables in
      far space */
   uses = bitVectCopy (OP_USES (op));

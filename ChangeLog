@@ -1,3 +1,8 @@
+2021-05-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Partial fix for bug #3054.
+
 2021-05-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

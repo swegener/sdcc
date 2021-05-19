@@ -33,7 +33,7 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// char __fslt (float a, float b)
+// _Bool __fslt (float a, float b)
 static void dummy(void) __naked
 {
 	__asm
@@ -105,7 +105,7 @@ union float_long
   };
 
 /* compare two floats */
-char __fslt (float a1, float a2)
+_Bool __fslt (float a1, float a2)
 {
   volatile union float_long fl1, fl2;
 
@@ -127,3 +127,4 @@ char __fslt (float a1, float a2)
 }
 
 #endif
+

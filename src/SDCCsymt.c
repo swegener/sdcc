@@ -4054,7 +4054,6 @@ symbol *fp16x16conv[2][5][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
 symbol *rlrr[2][4][2];
 
-sym_link *charType;
 sym_link *floatType;
 sym_link *fixed16x16Type;
 
@@ -4287,15 +4286,16 @@ initCSupport (void)
 
   floatType = newFloatLink ();
   fixed16x16Type = newFixed16x16Link ();
-  charType = (options.signed_char) ? SCHARTYPE : UCHARTYPE;
+  sym_link *boolType = newLink (SPECIFIER); SPEC_NOUN (boolType) = V_BOOL; // Can't use newBoolLink, as it might give us a __bit.
+  sym_link *charType = (options.signed_char) ? SCHARTYPE : UCHARTYPE;
 
   fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
   fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);
   fsmul = funcOfType ("__fsmul", floatType, floatType, 2, options.float_rent);
   fsdiv = funcOfType ("__fsdiv", floatType, floatType, 2, options.float_rent);
-  fseq = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
-  fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
-  fslt = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
+  fseq = funcOfType ("__fseq", boolType, floatType, 2, options.float_rent);
+  fsneq = funcOfType ("__fsneq", boolType, floatType, 2, options.float_rent);
+  fslt = funcOfType ("__fslt", boolType, floatType, 2, options.float_rent);
 
   fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
   fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);

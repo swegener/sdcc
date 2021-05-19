@@ -2,6 +2,14 @@
 
 	* src/z80/gen.c:
 	  Partial fix for bug #3054.
+	  
+	* device/include/float.h,
+	  device/include/pic16/float.h,
+	  device/lib/_fseq.c,
+	  device/lib/_fslt.c,
+	  device/lib/_fsneq.c,
+	  src/SDCCsymt.c:
+	  Make floating-point comparison support routines return _Bool.
 
 2021-05-18 Philipp Klaus Krause <pkk AT spth.de>
 

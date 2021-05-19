@@ -73,10 +73,10 @@ float __fssub (float, float) _FS_REENTRANT;
 float __fsmul (float, float) _FS_REENTRANT;
 float __fsdiv (float, float) _FS_REENTRANT;
 
-char __fslt (float, float) _FS_REENTRANT;
-char __fseq (float, float) _FS_REENTRANT;
-char __fsneq (float, float) _FS_REENTRANT;
-char __fsgt (float, float) _FS_REENTRANT;
+_Bool __fslt (float, float) _FS_REENTRANT;
+_Bool __fseq (float, float) _FS_REENTRANT;
+_Bool __fsneq (float, float) _FS_REENTRANT;
+_Bool __fsgt (float, float) _FS_REENTRANT;
 
 #endif
 

@@ -33,7 +33,7 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// char __fseq (float a, float b)
+// _Bool __fseq (float a, float b)
 static void dummy(void) __naked
 {
 	__asm
@@ -79,7 +79,7 @@ union float_long
   };
 
 /* compare two floats */
-char
+_Bool
 __fseq (float a1, float a2)
 {
   volatile union float_long fl1, fl2;
@@ -96,3 +96,4 @@ __fseq (float a1, float a2)
 }
 
 #endif
+

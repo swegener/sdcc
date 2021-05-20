@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (@@F@@)
+ * Simulator of microcontrollers (motorola.src/ciacl.h)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef M6809_SERIALCL_HEADER
-#define M6809_SERIALCL_HEADER
+#ifndef CIACL_HEADER
+#define CIACL_HEADER
 
 //#include "fiocl.h"
 //#include "stypes.h"
@@ -47,14 +47,14 @@ enum acia_cfg
 
 class cl_serial_listener;
 
-class cl_serial: public cl_serial_hw
+class cl_cia: public cl_serial_hw
 {
  protected:
   t_addr base;
   class cl_memory_cell *regs[2];
   int div;
   int mcnt;
-  class cl_m6809_src_base *is_r, *is_t;
+  class cl_it_src *is_r, *is_t;
   class cl_memory_cell *r_cr;         // Copy of written CR value
   class cl_memory_cell *r_sr;         // Simulated SR value
   u8_t  s_in;         // Serial channel input reg
@@ -69,8 +69,8 @@ class cl_serial: public cl_serial_hw
   bool  ren;          // Receiving is enabled
   bool  ten;          // Transmitter is enabled
  public:
-  cl_serial(class cl_uc *auc, int aid, t_addr abase);
-  virtual ~cl_serial(void);
+  cl_cia(class cl_uc *auc, int aid, t_addr abase);
+  virtual ~cl_cia(void);
   virtual int init(void);
   virtual int cfg_size(void) { return 11; }
   virtual const char *cfg_help(t_addr addr);
@@ -104,4 +104,4 @@ class cl_serial: public cl_serial_hw
 
 #endif
 
-/* End of m6809.src/serialcl.h */
+/* End of motorola.src/ciacl.h */

@@ -27,6 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "globals.h"
 #include "utils.h"
 
+#include "itsrccl.h"
+
 #include "irqcl.h"
 
 
@@ -35,26 +37,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_irq_hw::cl_irq_hw(class cl_uc *auc):
   cl_hw(auc, HW_INTERRUPT, 0, "irq")
 {
-  muc= (class cl_mcs6502 *)auc;
+  muc= (class cl_m6800 *)auc;
 }
 
 int
 cl_irq_hw::init()
 {
-  class cl_var *v;
+  //class cl_var *v;
 
   cl_hw::init();
-  uc->vars->add(v= new cl_var("NMI", cfg, m65_nmi, "NMI request/clear"));
-  v->init();
-  uc->vars->add(v= new cl_var("IRQ", cfg, m65_irq, "IRQ request/clear"));
-  v->init();
-  uc->vars->add(v= new cl_var("BRK", cfg, m65_brk, "BRK request/clear"));
-  v->init();
-
-  cfg_cell(m65_nmi_en)->set(1);
-  cfg_cell(m65_brk_en)->set(1);
 
   return 0;
+}
+
+const char *
+cl_irq_hw::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case m68_nmi_en	: return "NMI enable (RO)";
+    case m68_nmi	: return "NMI request/clear (RW)";
+    case m68_irq_en	: return "IRQ enable (RO)";
+    case m68_irq	: return "IRQ request/clear (RW)";
+    case m68_swi_en	: return "SWI enable (RW)";
+    case m68_swi	: return "SWI request/clear (RW)";
+    }
+  return cl_hw::cfg_help(addr);
 }
 
 void
@@ -95,4 +103,4 @@ cl_irq_hw::print_info(class cl_console_base *con)
 }
 
 
-/* End of mcs6502.src/irq.cc */
+/* End of m6800.src/irq.cc */

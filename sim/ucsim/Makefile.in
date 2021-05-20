@@ -23,7 +23,7 @@ all: checkconf #libs apps
 	$(MAKE) libs
 	$(MAKE) apps
 
-libs: main_all cmd_src_all sim_src_all gui_src_all
+libs: main_all cmd_src_all sim_src_all gui_src_all motorola_src_all
 
 main_all:
 	$(MAKE) -f main.mk all
@@ -36,6 +36,9 @@ sim_src_all:
 
 gui_src_all:
 	$(MAKE) -C gui.src gui.src
+
+motorola_src_all:
+	$(MAKE) -C motorola.src motorola.src
 
 
 apps: $(PKGS) main_app

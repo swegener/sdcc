@@ -39,6 +39,7 @@
 
 // sim
 #include "simcl.h"
+#include "dregcl.h"
 
 //cmd
 #include "cmd_uccl.h"
@@ -147,6 +148,12 @@ cl_pblaze::get_mem_size(enum mem_class type)
 void
 cl_pblaze::mk_hw_elements(void)
 {
+  class cl_hw *h;
+  cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+  
   hws->add(interrupt = new cl_interrupt(this));
   interrupt->init();
 
@@ -418,98 +425,78 @@ cl_pblaze::get_disasm_info(t_addr addr,
   return b;
 }
 
-const char *
-cl_pblaze::disass(t_addr addr, const char *sep)
+char *
+cl_pblaze::disass(t_addr addr)
 {
-  char work[256], temp[20];
+  chars work, temp;
   const char *b;
-  char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
-
-  p= work;
+  bool first= true;
+  
+  work= "";
 
   b = get_disasm_info(addr, &len, NULL, &immed_offset);
 
-  if (b == NULL) {
-    buf= (char*)malloc(30);
-    strcpy(buf, "UNKNOWN/INVALID");
-    return(buf);
-  }
+  if (b == NULL)
+    {
+      return strdup("UNKNOWN/INVALID");
+    }
 
   while (*b)
     {
+      if ((*b == ' ') && first)
+	{
+	  first= false;
+	  while (work.len() < 6) work.append(' ');
+	}
       if (*b == '%')
         {
           b++;
+	  temp= "";
           switch (*(b++))
             {
             case 'a': // 10b address
-              sprintf(temp, "0x%x", (rom->get(addr) & 0x3ff));
+              temp.format("0x%x", (rom->get(addr) & 0x3ff));
               break;
             case 'A': // 12b address
-              sprintf(temp, "0x%x", (rom->get(addr) & 0xfff));
+              temp.format("0x%x", (rom->get(addr) & 0xfff));
               break;
             case 'k': // immediate value (constant)
-              sprintf(temp, "0x%x", (rom->get(addr) & 0xff));
+              temp.format("0x%x", (rom->get(addr) & 0xff));
               break;
             case 'K': // immediate value (constant)
-              sprintf(temp, "0x%x", (rom->get(addr) & 0xff0) >> 4);
+              temp.format("0x%x", (rom->get(addr) & 0xff0) >> 4);
               break;
             case 'm': // 6b address to RAM
-              sprintf(temp, "0x%x", (rom->get(addr) & 0x3f));
+              temp.format("0x%x", (rom->get(addr) & 0x3f));
               break;
             case 'M': // 8b address to RAM
-              sprintf(temp, "0x%x", (rom->get(addr) & 0xff));
+              temp.format("0x%x", (rom->get(addr) & 0xff));
               break;
             case 'p': // 8b port number
-              sprintf(temp, "%d", (rom->get(addr) & 0xff));
+              temp.format("%d", (rom->get(addr) & 0xff));
               break;
             case 'P': // 4b port number
-              sprintf(temp, "%d", (rom->get(addr) & 0xf));
+              temp.format("%d", (rom->get(addr) & 0xf));
               break;
             case 'r': // register as first operand
-              sprintf(temp, "s%x", (rom->get(addr) & 0xf00) >> 8);
+              temp.format("s%x", (rom->get(addr) & 0xf00) >> 8);
               break;
             case 's': // register as second operand
-              sprintf(temp, "s%x", (rom->get(addr) & 0xf0) >> 4);
+              temp.format("s%x", (rom->get(addr) & 0xf0) >> 4);
               break;
             default:
-              strcpy(temp, "?");
+              temp= "?";
               break;
             }
-          t= temp;
-          while (*t)
-            *(p++)= *(t++);
+	  work+= temp;
         }
       else
-        *(p++)= *(b++);
+	work+= *(b++);
     }
-  *p= '\0';
 
-  p= strchr(work, ' ');
-  if (!p)
-    {
-      buf= strdup(work);
-      return(buf);
-    }
-  if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
-  else
-    buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, t= buf; *p != ' '; p++, t++)
-    *t= *p;
-  p++;
-  *t= '\0';
-  if (sep == NULL)
-    {
-      while (strlen(buf) < 6)
-        strcat(buf, " ");
-    }
-  else
-    strcat(buf, sep);
-  strcat(buf, p);
-  return(buf);
+  return(strdup(work.c_str()));
 }
 
 

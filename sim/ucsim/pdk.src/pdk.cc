@@ -317,7 +317,7 @@ char *cl_pdk::disass(t_addr addr)
 	  switch (*(b++))
 	    {
 	    case 'k':  // k    immediate addressing
-	      temp.format("#%u", code);
+	      temp.format("#0x%x", code);
 	      break;
 	    case 'm':  // m    memory addressing
 	      if (*b == 'n') {
@@ -336,7 +336,7 @@ char *cl_pdk::disass(t_addr addr)
 		}
 		++b;
 	      }
-	      temp.format("%u", code);
+	      temp.format("0x%x", code);
 	      break;
 	    case 'i':  // i    IO addressing
 	      // TODO: Maybe add pretty printing.
@@ -357,7 +357,7 @@ char *cl_pdk::disass(t_addr addr)
 		
 		++b;
 	      }
-	      temp.format("[%u]", code);
+	      temp.format("[0x%x]", code);
 	      break;
 	    case 'n':  // n    N-bit addressing
 	      uint n;
@@ -374,7 +374,7 @@ char *cl_pdk::disass(t_addr addr)
 	      default:
 		n= 0;//__builtin_unreachable();
 	      }
-	      temp.format("#%u", n);
+	      temp.format("#0x%x", n);
 	      break;
 	    default:
 	      temp= "%?";

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (@@F@@)
+ * Simulator of microcontrollers (motorola.src/cia.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -29,12 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim
 #include "argcl.h"
+#include "itsrccl.h"
 
-// local
-#include "m6809cl.h"
-#include "irqcl.h"
-
-#include "serialcl.h"
+#include "ciacl.h"
 
 enum reg_idx
   {
@@ -45,18 +42,18 @@ enum reg_idx
    dr = 1, 
   };
 
-cl_serial::cl_serial(class cl_uc *auc, int aid, t_addr abase):
+cl_cia::cl_cia(class cl_uc *auc, int aid, t_addr abase):
   cl_serial_hw(auc, aid, "uart")
 {
   base= abase;
 }
 
-cl_serial::~cl_serial(void)
+cl_cia::~cl_cia(void)
 {
 }
 
 int
-cl_serial::init(void)
+cl_cia::init(void)
 {
   int i;
   
@@ -80,7 +77,7 @@ cl_serial::init(void)
   r_sr->set(0);//regs[sr]->set(0);
   show_readable(false);
   show_writable(true);
-  cfg_set(acia_cfg_req, 'i');
+  //cfg_set(acia_cfg_req, 'i');
   
   cl_var *v;
   chars pn= chars("", "uart%d_", id);
@@ -96,24 +93,32 @@ cl_serial::init(void)
 			      cfg_help(acia_cfg_req)));
   v->init();
   
-  is_t= new cl_m6809_slave_src(uc,
-			       r_cr, 0x60, 0x20,
-			       r_sr, 2,
-			       pn+"tx");
+  is_t= new cl_it_src(uc, 1,
+		      r_cr, 0x60, //0x20,
+		      r_sr, 2,
+		      0, false, false,
+		      pn+"tx",
+		      0);
+  is_t->set_ie_value(0x20);
   is_t->init();
+  is_t->set_parent(uc->search_it_src('i'));
   uc->it_sources->add(is_t);
-  is_r= new cl_m6809_slave_src(uc,
-			       r_cr, 0x80, 0x80,
-			       r_sr, 1,
-			       pn+"rx");
+  is_r= new cl_it_src(uc, 2,
+		      r_cr, 0x80, //0x80,
+		      r_sr, 1,
+		      0, false, false,
+		      pn+"rx",
+		      0);
   is_r->init();
+  is_r->set_ie_value(0x80);
+  is_r->set_parent(uc->search_it_src('i'));
   uc->it_sources->add(is_r);
   
   return(0);
 }
 
 const char *
-cl_serial::cfg_help(t_addr addr)
+cl_cia::cfg_help(t_addr addr)
 {
   switch (addr)
     {
@@ -130,7 +135,7 @@ cl_serial::cfg_help(t_addr addr)
 }
 
 t_mem
-cl_serial::read(class cl_memory_cell *cell)
+cl_cia::read(class cl_memory_cell *cell)
 {
   if (cell == regs[dr])
     {
@@ -145,7 +150,7 @@ cl_serial::read(class cl_memory_cell *cell)
 }
 
 void
-cl_serial::write(class cl_memory_cell *cell, t_mem *val)
+cl_cia::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (conf(cell, val))
     return;
@@ -174,7 +179,7 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 }
 
 t_mem
-cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+cl_cia::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
   if (addr < serconf_common)
     return cl_serial_hw::conf_op(cell, addr, val);
@@ -200,8 +205,10 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case acia_cfg_req:
       if (val)
 	{
-	  is_r->set_pass_to(*val);
-	  is_t->set_pass_to(*val);
+	  //is_r->set_pass_to(*val);
+	  //is_t->set_pass_to(*val);
+	  is_r->set_parent(uc->search_it_src(*val));
+	  is_t->set_parent(uc->search_it_src(*val));
 	}
       break;
       
@@ -221,7 +228,7 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 }
 
 void
-cl_serial::set_cmd(class cl_cmdline *cmdline,
+cl_cia::set_cmd(class cl_cmdline *cmdline,
 				class cl_console_base *con)
 {
   class cl_cmd_arg *params[2]= {
@@ -250,7 +257,7 @@ cl_serial::set_cmd(class cl_cmdline *cmdline,
 }
 
 int
-cl_serial::tick(int cycles)
+cl_cia::tick(int cycles)
 {
   char c;
 
@@ -315,7 +322,7 @@ cl_serial::tick(int cycles)
 }
 
 void
-cl_serial::start_send()
+cl_cia::start_send()
 {
   if (ten)
     {
@@ -328,7 +335,7 @@ cl_serial::start_send()
 }
 
 void
-cl_serial::restart_send()
+cl_cia::restart_send()
 {
   if (ten)
     {
@@ -341,14 +348,14 @@ cl_serial::restart_send()
 }
 
 void
-cl_serial::finish_send()
+cl_cia::finish_send()
 {
   show_writable(true);
   show_tx_complete(true);
 }
 
 void
-cl_serial::received()
+cl_cia::received()
 {
   set_dr(s_in);
   cfg_write(serconf_received, s_in);
@@ -356,21 +363,21 @@ cl_serial::received()
 }
 
 void
-cl_serial::reset(void)
+cl_cia::reset(void)
 {
   show_writable(true);
   show_readable(false);
 }
 
 void
-cl_serial::happen(class cl_hw *where, enum hw_event he,
+cl_cia::happen(class cl_hw *where, enum hw_event he,
 		  void *params)
 {
 }
 
 
 void
-cl_serial::pick_div()
+cl_cia::pick_div()
 {
   switch (r_cr->get() & 0x03)
     {
@@ -383,7 +390,7 @@ cl_serial::pick_div()
 }
 
 void
-cl_serial::pick_ctrl()
+cl_cia::pick_ctrl()
 {
   switch ((r_cr->get() >> 2) & 7)
     {
@@ -403,7 +410,7 @@ cl_serial::pick_ctrl()
 
 
 void
-cl_serial::show_writable(bool val)
+cl_cia::show_writable(bool val)
 {
   // TDRE: Transmit Data Register Empty: sr.1
   if (val)
@@ -414,7 +421,7 @@ cl_serial::show_writable(bool val)
 }
 
 void
-cl_serial::show_readable(bool val)
+cl_cia::show_readable(bool val)
 {
   // RDRF: Receive Data Register Full (sr.0)
   if (val)
@@ -425,24 +432,24 @@ cl_serial::show_readable(bool val)
 }
 
 void
-cl_serial::show_tx_complete(bool val)
+cl_cia::show_tx_complete(bool val)
 {
   show_writable(val);
 }
 
 void
-cl_serial::show_idle(bool val)
+cl_cia::show_idle(bool val)
 {
 }
 
 void
-cl_serial::set_dr(t_mem val)
+cl_cia::set_dr(t_mem val)
 {
   regs[dr]->set(val);
 }
 
 void
-cl_serial::set_sr_irq(void)
+cl_cia::set_sr_irq(void)
 {
   bool t= false, r= false;
   u8_t c= r_cr->get(), s= r_sr->get();
@@ -455,7 +462,7 @@ cl_serial::set_sr_irq(void)
 }
 
 void
-cl_serial::print_info(class cl_console_base *con)
+cl_cia::print_info(class cl_console_base *con)
 {
   u8_t u8= r_sr->get();//regs[sr]->get();
   con->dd_printf("%s[%d] at 0x%06x %s\n", id_string, id, base, on?"on ":"off");
@@ -489,4 +496,4 @@ cl_serial::print_info(class cl_console_base *con)
   //print_cfg_info(con);
 }
 
-/* End of m6809.src/serial.cc */
+/* End of motorola.src/cia.cc */

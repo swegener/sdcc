@@ -1268,8 +1268,9 @@ cl_uc::read_hex_file(cl_f *f)
   uchar sum ;     // checksum
   uchar chk ;     // check
   int  i;
-  bool ok, get_low= 1;
-  uchar low= 0, high;
+  bool ok;
+  int get_low= 0;
+  uchar lows[4]= { 0, 0, 0, 0 };
 
   if (!rom)
     {
@@ -1321,18 +1322,35 @@ cl_uc::read_hex_file(cl_f *f)
 			    }
 			  else if (rom->width <= 16)
 			    {
-			      if (get_low)
+			      switch (get_low)
 				{
-				  low= rec[i];
-				  get_low= 0;
-				}
-			      else
-				{
-				  high= rec[i];
-				  set_rom(base+addr, (high*256)+low);
+				case 0: lows[0]= rec[i]; get_low++; break;
+				case 1: lows[1]= rec[i];
+				  set_rom(base+addr, (lows[1]*256)+lows[0]);
 				  addr++;
 				  written++;
-				  get_low= 1;
+				  get_low= 0;
+				  break;
+				}
+			    }
+			  else if (rom->width <= 32)
+			    {
+			      switch (get_low)
+				{
+				case 0: lows[0]= rec[i]; get_low++; break;
+				case 1: lows[1]= rec[i]; get_low++; break;
+				case 2: lows[2]= rec[i]; get_low++; break;
+				case 3: lows[3]= rec[i];
+				  set_rom(base+addr,
+					  (lows[3]<<24)+
+					  (lows[2]<<16)+
+					  (lows[1]<<8)+
+					  (lows[0]));
+				  get_low= 0;
+				  lows[3]= lows[2]= lows[1]= lows[0]= 0;
+				  addr++;
+				  written++;
+				  break;
 				}
 			    }
 			}
@@ -1348,21 +1366,28 @@ cl_uc::read_hex_file(cl_f *f)
 		    }
 		  else
 		    if (rtyp != 1)
-		      /*application->debug*/fprintf(stderr, "Unknown record type %d(0x%x)\n",
-					 rtyp, rtyp);
+		      fprintf(stderr, "Unknown record type %d(0x%x)\n",
+			      rtyp, rtyp);
 		}
 	      else
-		/*application->debug*/fprintf(stderr, "Checksum error (%x instead of %x) in "
-				   "record %ld.\n", chk, sum, recnum);
+		fprintf(stderr, "Checksum error (%x instead of %x) in "
+			"record %ld.\n", chk, sum, recnum);
 	    }
 	  else
-	    /*application->debug*/fprintf(stderr, "Read error in record %ld.\n", recnum);
+	    fprintf(stderr, "Read error in record %ld.\n", recnum);
 	}
     }
-  if (rom->width > 8 &&
-      !get_low)
-    rom->set(addr, low);
-
+  if (rom->width > 8)
+    {
+      for (i= get_low; i<4; i++)
+	lows[i]= 0;
+      rom->set(addr,
+	       (lows[3]<<24)+
+	       (lows[2]<<16)+
+	       (lows[1]<<8)+
+	       (lows[0]));
+    }
+  
   analyze(0);
   return(written);
 }
@@ -2568,6 +2593,15 @@ cl_uc::save_hist()
   hist->put();
 }
 
+int
+cl_uc::inst_unknown(t_mem code)
+{
+  //PC--;
+  class cl_error_unknown_code *e= new cl_error_unknown_code(this);
+  error(e);
+  return(resGO);
+}
+
 
 /*
  * Interrupt processing
@@ -2585,6 +2619,13 @@ cl_uc::do_interrupt(void)
   for (i= 0; i < it_sources->count; i++)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
+      is->pass_over();
+    }
+  for (i= 0; i < it_sources->count; i++)
+    {
+      class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
+      if (is->is_slave())
+	continue;
       if (!is->is_nmi())
 	{
 	  if (!is_en)
@@ -2627,16 +2668,27 @@ cl_uc::accept_it(class it_level *il)
   return resGO;
 }
 
-int
-cl_uc::inst_unknown(t_mem code)
+class cl_it_src *
+cl_uc::search_it_src(int cid_or_nr)
 {
-  //PC--;
-  class cl_error_unknown_code *e= new cl_error_unknown_code(this);
-  error(e);
-  return(resGO);
+  class cl_it_src *it;
+  int i;
+  for (i= 0; i<it_sources->get_count(); i++)
+    {
+      it= (class cl_it_src *)(it_sources->at(i));
+      if (it &&
+	  (
+	   (it->cid != 0 && it->cid == cid_or_nr) ||
+	   (it->cid != 0 && toupper(it->cid) == toupper(cid_or_nr)) ||
+	   (it->nuof == cid_or_nr)
+	   )
+	  )
+	return it;
+    }
+  return NULL;
 }
 
-
+  
 /*
  * Time related functions
  */

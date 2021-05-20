@@ -2,12 +2,20 @@ uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+Warning: "6850" is dereferencing a non-existent string option: ?
+Warning: "6850" is dereferencing a non-existent string option: ?
 ucsim version 0.6-pre69
 Type of microcontroller: M6800
-Controller has 3 hardware element(s).
+Controller has 9 hardware element(s).
    on simif[0]
   off vcd[0]
    on dreg[0]
+   on irq[0]
+   on uart[0]
+   on uart[1]
+   on pia[0]
+   on pia[1]
+   on dport[0]
 A= 0x00   0   +0 .  B= 0x00   0   +0 .  
 CC= 11000000
       HINZVC

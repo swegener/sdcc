@@ -732,6 +732,7 @@ AC_OUTPUT(Makefile
 main.mk:main_in.mk
 packages.mk:packages_in.mk
 cmd.src/Makefile
+motorola.src/Makefile
 
 sim.src/Makefile   sim.src/test/Makefile
 

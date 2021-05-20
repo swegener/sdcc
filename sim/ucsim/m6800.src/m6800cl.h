@@ -83,6 +83,16 @@ enum {
 #define ifHI	(!ifLS)
 #define ifA	(true)
 
+
+// Vectors
+enum {
+  IRQ_AT	= 0xfff8,
+  SWI_AT	= 0xfffa,
+  NMI_AT	= 0xfffc,
+  RESET_AT	= 0xfffe,
+};
+
+
 /*
  * Base of M6800 processor
  */
@@ -94,6 +104,7 @@ public:
   u16_t IX, SP;
   class cl_cell8 cA, cB, cCC;
   class cl_cell16 cIX, cSP;
+  class cl_it_src *src_irq, *src_nmi, *src_swi;
 public:
   cl_m6800(class cl_sim *asim);
   virtual int init(void);

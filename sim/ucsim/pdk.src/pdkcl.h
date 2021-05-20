@@ -76,7 +76,7 @@ public:
 #include "instcl.h"
 };
 
-
+/*
 class cl_pdk_cpu: public cl_hw
 {
  protected:
@@ -90,7 +90,7 @@ class cl_pdk_cpu: public cl_hw
   virtual t_mem read(class cl_memory_cell *cell);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 };
-
+*/
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (piacl.h)
+ * Simulator of microcontrollers (motorola.srcpiacl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -77,7 +77,7 @@ public:
   class cl_memory_cell *incb;
   class cl_memory_cell *rs[4];
   int prev_ca1, prev_ca2, prev_cb1, prev_cb2;
-  class cl_m6xxx_src *is_ca1, *is_ca2, *is_cb1, *is_cb2;
+  class cl_it_src *is_ca1, *is_ca2, *is_cb1, *is_cb2;
  public:
   cl_pia(class cl_uc *auc, int aid);
   cl_pia(class cl_uc *auc, int aid, t_addr the_addr);
@@ -108,4 +108,4 @@ public:
 
 #endif
 
-/* End of m6898.src/piacl.h */
+/* End of motorola.src/piacl.h */

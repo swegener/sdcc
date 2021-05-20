@@ -35,48 +35,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /* CPU interrupt handling */
 
-class cl_m6xxx_src *
-cl_m6809_src_base::get_parent(void)
-{
-  class cl_m6809 *muc= (class cl_m6809 *)(application->get_uc());
-  switch (pass_to)
-    {
-    case irq_nmi:
-      return muc->src_nmi;
-      break;
-    case irq_firq:
-      return muc->src_firq;
-      break;
-    case irq_irq:
-      return muc->src_irq;
-      break;
-    default:
-      return NULL;
-    }
-  return NULL;
-}
-
-bool
-cl_m6809_irq_src::enabled(void)
-{
-  if (!ie_cell)
-    return false;
-  t_mem e= ie_cell->get();
-  e&= ie_mask;
-  return e == 0;
-}
-
-bool
-cl_m6809_slave_src::enabled(void)
-{
-  if (!ie_cell)
-    return false;
-  t_mem e= ie_cell->get();
-  e&= ie_mask;
-  return e == ie_value;
-}
-
-
 /*
  * peripheral to handle CPU interrupts
  */
@@ -124,7 +82,7 @@ cl_m6809_irq::cfg_help(t_addr addr)
     case cpu_irq_en	: return "IRQ enable (RO)";
     case cpu_irq	: return "IRQ request/clear (RW)";
     case cpu_firq_en	: return "FIRQ enable (RO)";
-    case cpu_firq	: return "FIRQ request (RW)";
+    case cpu_firq	: return "FIRQ request/clear (RW)";
     }
   return cl_hw::cfg_help(addr);
 }
@@ -177,10 +135,10 @@ cl_m6809_irq::print_info(class cl_console_base *con)
   con->dd_printf("  Handler  ISR    En  Pr Req Act Name\n");
   for (i= 0; i < uc->it_sources->count; i++)
     {
-      class cl_m6809_src_base *is=
-	(class cl_m6809_src_base *)(uc->it_sources->at(i));
-      class cl_m6xxx_src *pa= is->get_parent();
-      class cl_m6xxx_src *isp= (pa)?pa:is;
+      class cl_it_src *is=
+	(class cl_it_src *)(uc->it_sources->at(i));
+      class cl_it_src *pa= is->get_parent();
+      class cl_it_src *isp= (pa)?pa:is;
       t_addr a= uc->rom->get(isp->addr) * 256 + uc->rom->get(isp->addr+1);
       con->dd_printf("  [0x%04x] 0x%04x", AU(isp->addr), a);
       con->dd_printf(" %-3s", (is->enabled())?"en":"dis");

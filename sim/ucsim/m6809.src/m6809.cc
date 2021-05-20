@@ -32,10 +32,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 
 #include "dregcl.h"
+#include "ciacl.h"
+#include "piacl.h"
 
 #include "glob.h"
-#include "serialcl.h"
-#include "piacl.h"
 #include "irqcl.h"
 
 #include "m6809cl.h"
@@ -147,49 +147,51 @@ cl_m6809::mk_hw_elements(void)
   add_hw(h= new cl_m6809_irq(this));
   h->init();
 
-  src_irq= new cl_m6809_irq_src(this,
-				irq_irq,
-				regs8->get_cell(3), flagI,
-				h->cfg_cell(cpu_irq), 1,
-				0xfff8,
-				"Interrupt request",
-				0,
-				flagE,
-				flagI,
-				irq_none);
+  src_irq= new cl_it_src(this,
+			 irq_irq,
+			 regs8->get_cell(3), flagI,
+			 h->cfg_cell(cpu_irq), 1,
+			 IRQ_AT,
+			 false,
+			 true,
+			 "Interrupt request",
+			 0);
+  src_irq->set_cid('i');
+  src_irq->set_ie_value(0);
   src_irq->init();
   it_sources->add(src_irq);
   
-  src_firq= new cl_m6809_irq_src(this,
-				 irq_firq,
-				 regs8->get_cell(3), flagF,
-				 h->cfg_cell(cpu_firq), 1,
-				 0xfff6,
-				 "Fast interrupt request",
-				 0,
-				 0,
-				 flagI|flagF,
-				 irq_none);
+  src_firq= new cl_it_src(this,
+			  irq_firq,
+			  regs8->get_cell(3), flagF,
+			  h->cfg_cell(cpu_firq), 1,
+			  FIRQ_AT,
+			  false,
+			  true,
+			  "Fast interrupt request",
+			  0);
+  src_firq->set_cid('f');
   src_firq->init();
   it_sources->add(src_firq);
   
-  src_nmi= new cl_m6809_src_base(this,
-				 irq_nmi,
-				 h->cfg_cell(cpu_nmi_en), 1,
-				 h->cfg_cell(cpu_nmi), 1,
-				 0xfffc,
-				 "Non-maskable interrupt request",
-				 0,
-				 flagE,
-				 flagI|flagF,
-				 irq_none);
+  src_nmi= new cl_it_src(this,
+			 irq_nmi,
+			 h->cfg_cell(cpu_nmi_en), 1,
+			 h->cfg_cell(cpu_nmi), 1,
+			 NMI_AT,
+			 false,
+			 true,
+			 "Non-maskable interrupt request",
+			 0);
+  src_nmi->set_cid('n');
+  src_nmi->set_nmi(true);
   src_nmi->init();
   it_sources->add(src_nmi);
   
-  add_hw(h= new cl_serial(this, 0, 0xc000));
+  add_hw(h= new cl_cia(this, 0, 0xc000));
   h->init();
 
-  add_hw(h= new cl_serial(this, 1, 0xc008));
+  add_hw(h= new cl_cia(this, 1, 0xc008));
   h->init();
 
   class cl_pia *p0, *p1;
@@ -2367,28 +2369,29 @@ cl_m6809::exec_inst(void)
 int
 cl_m6809::accept_it(class it_level *il)
 {
-  //class cl_m6809_src_base *org= NULL;
-  class cl_m6809_src_base *is= (class cl_m6809_src_base *)(il->source);
-  class cl_m6809_src_base *parent= NULL;
-
+  class cl_it_src *is= il->source;
+  //class cl_m6809_src_base *parent= NULL;
+  /*
   if (is)
     {
-      if ((parent= (cl_m6809_src_base*)is->get_parent()) != NULL)
+      if ((parent= is->get_parent()) != NULL)
 	{
-	  //org= is;
 	  is= parent;
 	  il->source= is;
 	}
     }
-  
+  */
   tick(3);
   reg.CC&= ~flagE;
-  reg.CC|= is->Evalue;
-  
+  if (is == src_irq || is == src_nmi)
+    reg.CC|= flagE;//is->Evalue;
+    
   if (!cwai)
     push_regs(true);
   cwai= false;
-  reg.CC|= is->IFvalue;
+  reg.CC|= flagI;//is->IFvalue;
+  if (is == src_firq || is == src_nmi)
+    reg.CC|= flagF;
   
   t_addr a= rom->read(is->addr) * 256 + rom->read(is->addr+1);
   tick(2);

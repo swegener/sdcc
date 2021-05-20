@@ -103,33 +103,38 @@ cl_mcs6502::mk_hw_elements(void)
   add_hw(h= new cl_irq_hw(this));
   h->init();
 
-  src_irq= new cl_irq(this,
-		      irq_irq,
-		      &cCC, flagI,
-		      h->cfg_cell(m65_irq), 1,
-		      IRQ_AT,
-		      "Interrupt request",
-		      0);
+  src_irq= new cl_it_src(this,
+			 irq_irq,
+			 &cCC, flagI,
+			 h->cfg_cell(m65_irq), 1,
+			 IRQ_AT, false, true,
+			 "Interrupt request",
+			 0);
+  src_irq->set_cid('i');
+  src_irq->set_ie_value(0);
   src_irq->init();
   it_sources->add(src_irq);
   
-  src_nmi= new cl_nmi(this,
-		      irq_nmi,
-		      h->cfg_cell(m65_nmi_en), 1,
-		      h->cfg_cell(m65_nmi), 1,
-		      NMI_AT,
-		      "Non-maskable interrupt request",
-		      0);
+  src_nmi= new cl_it_src(this,
+			 irq_nmi,
+			 h->cfg_cell(m65_nmi_en), 1,
+			 h->cfg_cell(m65_nmi), 1,
+			 NMI_AT, false, true,
+			 "Non-maskable interrupt request",
+			 0);
+  src_nmi->set_cid('n');
+  src_nmi->set_nmi(true);
   src_nmi->init();
   it_sources->add(src_nmi);
   
-  src_brk= new cl_BRK(this,
-		      irq_brk,
-		      h->cfg_cell(m65_brk_en), 1,
-		      h->cfg_cell(m65_brk), 1,
-		      IRQ_AT,
-		      "BRK",
-		      0);
+  src_brk= new cl_it_src(this,
+			 irq_brk,
+			 h->cfg_cell(m65_brk_en), 1,
+			 h->cfg_cell(m65_brk), 1,
+			 IRQ_AT, false, true,
+			 "BRK",
+			 0);
+  src_brk->set_cid('b');
   src_brk->init();
   it_sources->add(src_brk);
 }
@@ -249,19 +254,8 @@ cl_mcs6502::exec_inst(void)
 int
 cl_mcs6502::accept_it(class it_level *il)
 {
-  class cl_m6xxx_src *is= (class cl_m6xxx_src *)(il->source);
-  class cl_m6xxx_src *parent= NULL;
+  class cl_it_src *is= il->source;
 
-  if (is)
-    {
-      if ((parent= (cl_m6xxx_src*)is->get_parent()) != NULL)
-	{
-	  //org= is;
-	  is= parent;
-	  il->source= is;
-	}
-    }
-  
   tick(2);
 
   rom->write(0x0100 + rSP, (PC>>8)&0xff);

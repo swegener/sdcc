@@ -83,7 +83,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000045 sec, rate=0.069719
+Host usage: 0.000034 sec, rate=0.092304
 
 # Remove the probe from every second bit.
 # Removing probes while started is ok - we just stop logging changes.
@@ -107,6 +107,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000036 sec, rate=0.086803
+Host usage: 0.000025 sec, rate=0.124830
 Loading from test.ihx
 111 words read from test.ihx

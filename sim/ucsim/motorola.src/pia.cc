@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (pia.cc)
+ * Simulator of microcontrollers (motorola.src/pia.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -31,9 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // cmd
 #include "argcl.h"
 
-// local
-#include "m6809cl.h"
-#include "irqcl.h"
+// sim
+#include "itsrccl.h"
 
 #include "piacl.h"
 
@@ -114,29 +113,45 @@ cl_pia::init(void)
   uc->vars->add(pn + "cb1_req", cfg, cfg_cb1_req, 7, 0, cfg_help(cfg_cb1_req));
   uc->vars->add(pn + "cb2_req", cfg, cfg_cb2_req, 7, 0, cfg_help(cfg_cb2_req));
 
-  is_ca1= new cl_m6809_slave_src(uc,
-				 cra, 1, 1,
-				 cra, 0x80,
-				 pn+"CA1");
+  is_ca1= new cl_it_src(uc, 1,
+			cra, 1, //1,
+			cra, 0x80,
+			0, false, false,
+			pn+"CA1",
+			0);
   is_ca1->init();
+  is_ca1->set_ie_value(1);
+  is_ca1->set_parent(uc->search_it_src('i'));
   uc->it_sources->add(is_ca1);
-  is_ca2= new cl_m6809_slave_src(uc,
-				 cra, 0x28, 0x08,
-				 cra, 0x40,
-				 pn+"CA2");
+  is_ca2= new cl_it_src(uc, 2,
+			cra, 0x28, //0x08,
+			cra, 0x40,
+			0, false, false,
+			pn+"CA2",
+			0);
   is_ca2->init();
+  is_ca2->set_ie_value(0x08);
+  is_ca2->set_parent(uc->search_it_src('i'));
   uc->it_sources->add(is_ca2);
-  is_cb1= new cl_m6809_slave_src(uc,
-				 crb, 1, 1,
-				 crb, 0x80,
-				 pn+"CB1");
+  is_cb1= new cl_it_src(uc, 3,
+			crb, 1, //1,
+			crb, 0x80,
+			0, false, false,
+			pn+"CB1",
+			0);
   is_cb1->init();
+  is_cb1->set_ie_value(1);
+  is_cb1->set_parent(uc->search_it_src('i'));
   uc->it_sources->add(is_cb1);
-  is_cb2= new cl_m6809_slave_src(uc,
-				 crb, 0x28, 0x08,
-				 crb, 0x40,
-				 pn+"CB2");
+  is_cb2= new cl_it_src(uc, 4,
+			crb, 0x28, //0x08,
+			crb, 0x40,
+			0, false, false,
+			pn+"CB2",
+			0);
   is_cb2->init();
+  is_cb2->set_parent(uc->search_it_src('i'));
+  is_cb2->set_ie_value(0x08);
   uc->it_sources->add(is_cb2);
   
   return(0);
@@ -345,22 +360,26 @@ cl_pia::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case cfg_ca1_req	:
       if (val)
 	if (is_ca1)
-	  is_ca1->set_pass_to(*val);
+	  //is_ca1->set_pass_to(*val);
+	  is_ca1->set_parent(uc->search_it_src(*val));
       break;
     case cfg_ca2_req	:
       if (val)
 	if (is_ca2)
-	  is_ca2->set_pass_to(*val);
+	  //is_ca2->set_pass_to(*val);
+	  is_ca2->set_parent(uc->search_it_src(*val));
       break;
     case cfg_cb1_req	:
       if (val)
 	if (is_cb1)
-	  is_cb1->set_pass_to(*val);
+	  //is_cb1->set_pass_to(*val);
+	  is_cb1->set_parent(uc->search_it_src(*val));
       break;
     case cfg_cb2_req	:
       if (val)
 	if (is_cb2)
-	  is_cb2->set_pass_to(*val);
+	  //is_cb2->set_pass_to(*val);
+	  is_cb2->set_parent(uc->search_it_src(*val));
       break;
     case cfg_ddra	: r= ddra; break;
     case cfg_ora	: r= ora; break;
@@ -660,4 +679,4 @@ cl_pia::print_info(class cl_console_base *con)
   //print_cfg_info(con);
 }
 
-/* End of m6809.src/pia.cc */
+/* End of motorola.src/pia.cc */

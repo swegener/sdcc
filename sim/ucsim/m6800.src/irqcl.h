@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (irqcl.h)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,49 +23,33 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
-/*@1@*/
 
-#ifndef IRQ_HEADER
-#define IRQ_HEADER
-
-#include "hwcl.h"
 #include "itsrccl.h"
 
+#include "m6800cl.h"
 
-enum cpu_cfg
+enum irq_cfg
   {
-   cpu_nmi_en	= 0,
-   cpu_nmi	= 1,
-   cpu_irq_en	= 2,
-   cpu_irq	= 3,
-   cpu_firq_en	= 4,
-   cpu_firq	= 5,
-   cpu_nr	= 6
+    m68_nmi_en	= 0,
+    m68_nmi	= 1,
+    m68_irq_en	= 2,
+    m68_irq	= 3,
+    m68_swi_en	= 4,
+    m68_swi	= 5,
+    m68_nr	= 6
   };
 
-enum {
-  FIRQ_AT	= 0xfff6,
-  IRQ_AT	= 0xfff8,
-  NMI_AT	= 0xfffc
-};
-
-
-// Interrupt peripheral
-class cl_m6809_irq: public cl_hw
+class cl_irq_hw: public cl_hw
 {
-public:
-  class cl_m6809 *muc;
-public:
-  cl_m6809_irq(class cl_uc *auc);
+ public:
+  class cl_m6800 *muc;
+ public:
+  cl_irq_hw(class cl_uc *auc);
   virtual int init(void);
-  virtual int cfg_size(void) { return cpu_nr; }
+  virtual int cfg_size(void) { return m68_nr; }
   virtual const char *cfg_help(t_addr addr);
-  virtual void reset(void);
-  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual void print_info(class cl_console_base *con);  
 };
 
 
-#endif
-
-/* End of m6809.src/irqcl.h */
+/* End of m6800.src/irqcl.h */

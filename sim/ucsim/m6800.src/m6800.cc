@@ -32,8 +32,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 
 #include "dregcl.h"
+#include "ciacl.h"
+#include "piacl.h"
 
 #include "glob.h"
+#include "irqcl.h"
 
 #include "m6800cl.h"
 
@@ -96,6 +99,150 @@ cl_m6800::mk_hw_elements(void)
 
   add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
+
+  add_hw(h= new cl_irq_hw(this));
+  h->init();
+
+  src_irq= new cl_it_src(this,
+			 irq_irq,
+			 &cCC, flagI,
+			 h->cfg_cell(m68_irq), 1,
+			 IRQ_AT,
+			 true,
+			 true,
+			 "Interrupt request",
+			 0);
+  src_irq->set_cid('i');
+  src_irq->init();
+  src_irq->set_ie_value(0);
+  it_sources->add(src_irq);
+  
+  src_nmi= new cl_it_src(this,
+			 irq_nmi,
+			 h->cfg_cell(m68_nmi_en), 1,
+			 h->cfg_cell(m68_nmi), 1,
+			 NMI_AT,
+			 true,
+			 true,
+			 "Non-maskable interrupt request",
+			 0);
+  src_nmi->set_cid('n');
+  src_nmi->init();
+  it_sources->add(src_nmi);
+  
+  src_swi= new cl_it_src(this,
+			 irq_swi,
+			 h->cfg_cell(m68_swi_en), 1,
+			 h->cfg_cell(m68_swi), 1,
+			 SWI_AT,
+			 true,
+			 true,
+			 "SWI",
+			 0);
+  src_swi->set_cid('s');
+  src_swi->init();
+  it_sources->add(src_swi);
+  
+  add_hw(h= new cl_cia(this, 0, 0xc000));
+  h->init();
+
+  add_hw(h= new cl_cia(this, 1, 0xc008));
+  h->init();
+
+  class cl_pia *p0, *p1;
+  
+  add_hw(p0= new cl_pia(this, 0, 0xc010));
+  p0->init();
+  add_hw(p1= new cl_pia(this, 1, 0xc020));
+  p1->init();
+
+  class cl_port_ui *d;
+  add_hw(d= new cl_port_ui(this, 0, "dport"));
+  d->init();
+
+  class cl_port_data pd;
+  pd.init();
+  pd.set_name("P0A");
+  pd.cell_dir= p0->ddra;
+  pd.cell_p  = p0->ora;
+  pd.cell_in = p0->ina;
+  pd.keyset  = keysets[0];
+  pd.basx    = 1;
+  pd.basy    = 5;
+  d->add_port(&pd, 0);
+
+  pd.set_name("P0B");
+  pd.cell_dir= p0->ddrb;
+  pd.cell_p  = p0->orb;
+  pd.cell_in = p0->inb;
+  pd.keyset  = keysets[1];
+  pd.basx    = 20;
+  pd.basy    = 5;
+  d->add_port(&pd, 1);
+
+  pd.set_name("P0CA");
+  pd.cell_dir= p0->ddca;
+  pd.cell_p  = p0->oca;
+  pd.cell_in = p0->inca;
+  pd.cell_dir= p0->ddca;
+  pd.keyset  = keysets[2];
+  pd.basx    = 40;
+  pd.basy    = 5;
+  pd.width   = 2;
+  d->add_port(&pd, 2);
+
+  pd.set_name("P0CB");
+  pd.cell_dir= p0->ddcb;
+  pd.cell_p  = p0->ocb;
+  pd.cell_in = p0->incb;
+  pd.cell_dir= p0->ddcb;
+  pd.keyset  = keysets[3];
+  pd.basx    = 54;
+  pd.basy    = 5;
+  pd.width   = 2;
+  d->add_port(&pd, 3);
+
+  // Port #1
+  pd.init();
+  pd.set_name("P1A");
+  pd.cell_dir= p1->ddra;
+  pd.cell_p  = p1->ora;
+  pd.cell_in = p1->ina;
+  pd.keyset  = keysets[4];
+  pd.basx    = 1;
+  pd.basy    = 11;
+  d->add_port(&pd, 4);
+
+  pd.set_name("P1B");
+  pd.cell_dir= p1->ddrb;
+  pd.cell_p  = p1->orb;
+  pd.cell_in = p1->inb;
+  pd.keyset  = keysets[5];
+  pd.basx    = 20;
+  pd.basy    = 11;
+  d->add_port(&pd, 5);
+
+  pd.set_name("P1CA");
+  pd.cell_dir= p1->ddca;
+  pd.cell_p  = p1->oca;
+  pd.cell_in = p1->inca;
+  pd.cell_dir= p1->ddca;
+  pd.keyset  = keysets[6];
+  pd.basx    = 40;
+  pd.basy    = 11;
+  pd.width   = 2;
+  d->add_port(&pd, 6);
+
+  pd.set_name("P1CB");
+  pd.cell_dir= p1->ddcb;
+  pd.cell_p  = p1->ocb;
+  pd.cell_in = p1->incb;
+  pd.cell_dir= p1->ddcb;
+  pd.keyset  = keysets[7];
+  pd.basx    = 54;
+  pd.basy    = 11;
+  pd.width   = 2;
+  d->add_port(&pd, 7);
 }
 
 void

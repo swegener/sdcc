@@ -87,7 +87,7 @@ public:
   bool cwai;
 public:
   class cl_address_space *rom;
-  class cl_m6809_src_base *src_irq, *src_firq, *src_nmi;
+  class cl_it_src *src_irq, *src_firq, *src_nmi;
 protected:
   u8_t *reg8_ptr[8];
   u16_t *reg16_ptr[8];

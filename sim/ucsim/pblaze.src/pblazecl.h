@@ -88,7 +88,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
   virtual void print_state(class cl_console_base *con, char *file_name);
   virtual void load_state(class cl_console_base *con, char *file_name);

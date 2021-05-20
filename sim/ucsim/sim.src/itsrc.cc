@@ -59,6 +59,7 @@ cl_it_src::cl_it_src(cl_uc  *Iuc,
   uc= Iuc;
   poll_priority= apoll_priority;
   nuof     = Inuof;
+  cid      = 0;
   ie_cell  = Iie_cell;
   ie_mask  = Iie_mask;
   ie_value = Iie_mask;
@@ -73,6 +74,7 @@ cl_it_src::cl_it_src(cl_uc  *Iuc,
   else
     set_name("unknown");
   active= true;
+  parent= NULL;
 }
 
 cl_it_src::~cl_it_src(void) {}
@@ -107,6 +109,19 @@ void
 cl_it_src::deactivate(void)
 {
   set_active_status(false);
+}
+
+void
+cl_it_src::pass_over(void)
+{
+  if (is_slave())
+    {
+      if (pending() && enabled())
+	{
+	  parent->request();
+	  clear();
+	}
+    }
 }
 
 
@@ -172,22 +187,18 @@ cl_it_src::write(class cl_memory_cell *cell, t_mem *val)
       //printf("ITSRC src=%x\n", *val);
       srcv= *val;
     }
-  ier= iev&ie_mask;
-  srcr= srcv&src_mask;
-  /*
-  printf("%2d iev =%x & %x = %x\n", nuof, iev, ie_mask, ier);
-  printf("%2d srcv=%x & %x = %x\n", nuof, srcv, src_mask, srcr);
-  printf("%2d ie=%s src=%s req=%s\n", nuof,
-	 ier?"true":"false",
-	 srcr?"true":"false",
-	 (ier&&srcr)?"TRUE":"FALSE");
-  */
-  if (ier)
+  ier= (iev&ie_mask) == ie_value;
+  srcr= (srcv&src_mask) == src_value;
+
+  if (!is_slave())
     {
-      if (srcr)
+      if (ier)
 	{
-	  //printf("%2d IRQ\n", nuof);
-	  uc->irq= true;
+	  if (srcr)
+	    {
+	      //printf("%2d IRQ\n", nuof);
+	      uc->irq= true;
+	    }
 	}
     }
 }
@@ -227,22 +238,6 @@ cl_irqs::compare(const void *key1, const void *key2)
   else if (k1 < k2)
     return(-1);
   return(1);
-}
-
-
-/*
- * Specialized source
- */
-
-void
-cl_m6xxx_src::set_pass_to(t_mem value)
-{
-  if (value == 'f')
-    pass_to= irq_firq;
-  else if (value == 'n')
-    pass_to= irq_nmi;
-  else
-    pass_to= irq_irq;
 }
 
 

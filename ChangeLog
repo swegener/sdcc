@@ -3,6 +3,9 @@
 	* support/regression/Makefile.in,
 	  support/regression/ports/ucz180-resiy:
 	  Test z180 port with --reserve-regs-iy.
+	* sdcc/support/regression/ports/ucz80/spec.mk,
+	  sdcc/support/regression/ports/ucr3ka/spec.mk:
+	  Drop --profile option, so we get better coverage of tail call optimization.
 
 2021-05-20 Philipp Klaus Krause <pkk AT spth.de>
 

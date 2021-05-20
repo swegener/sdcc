@@ -2393,6 +2393,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       const bool a_dead = a_dead_global &&
         (!aopRS (result) || (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] < 0)) &&
         (!aopRS (source) || source->regs[A_IDX] <= i);
+      // don't use clrw for literal loads that can be done with ldw more efficiently
+      const bool dont_use_clrw = (x_dead || y_dead) && (source->type == AOP_LIT) && (size == 2) && ((i + 1) < size) && !aopIsLitVal (source, soffset + i, 2, 0x00);
 
       if (i + 1 < size && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopIsLitVal (source, soffset + i, 2, 0x0000))
         {
@@ -2408,13 +2410,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             }
           i += 2;
         }
-      else if (x_dead && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, XL_IDX) || aopInReg (result, roffset + i, XH_IDX)))
+      else if (x_dead && !dont_use_clrw && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, XL_IDX) || aopInReg (result, roffset + i, XH_IDX)))
         {
           emit3w (A_CLRW, ASMOP_X, 0);
           clr_x = true;
           i++;
         }
-      else if (y_dead && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, YL_IDX) || aopInReg (result, roffset + i, YH_IDX)))
+      else if (y_dead && !dont_use_clrw && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, YL_IDX) || aopInReg (result, roffset + i, YH_IDX)))
         {
           emit3w (A_CLRW, ASMOP_Y, 0);
           clr_y = true;

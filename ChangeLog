@@ -1,8 +1,12 @@
+2021-05-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improvements for handling of literal values in wide registers: patch #388 by Visenri.
+
 2021-05-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Partial fix for bug #3054.
-	  
 	* device/include/float.h,
 	  device/include/pic16/float.h,
 	  device/lib/_fseq.c,

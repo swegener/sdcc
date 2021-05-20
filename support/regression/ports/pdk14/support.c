@@ -1,6 +1,11 @@
+__sfr __at 0x3f sif;
+
 void
 _putchar(unsigned char c)
 {
+  sif= 'p';
+  sif= c;
+  return;
   c;
 #ifndef __SDCC_STACK_AUTO
   __asm
@@ -26,6 +31,8 @@ _initEmu(void)
 void
 _exitEmu(void)
 {
+  sif= 's';
+  return;
   __asm
     stopsys
   __endasm;

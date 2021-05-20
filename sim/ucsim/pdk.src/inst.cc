@@ -58,11 +58,11 @@ int cl_pdk::get_mem(unsigned int addr) {
 }
 
 unsigned char cl_pdk::get_io(t_addr addr) {
-  return regs8->get(addr);
+  return regs8->read(addr);
 }
 
 void cl_pdk::store_io(t_addr addr, unsigned char value) {
-  regs8->set(addr, value);
+  regs8->write(addr, value);
   if (get_SP() > sp_max)
     sp_max = get_SP();
 }

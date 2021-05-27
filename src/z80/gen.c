@@ -8462,6 +8462,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
   unsigned long long lit = 0ull;
   bool result_in_carry = FALSE;
   int a_always_byte = -1;
+  bool started = false;
 
   /* if left & right are bit variables */
   if (left->aop->type == AOP_CRY && right->aop->type == AOP_CRY)
@@ -8743,6 +8744,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           emit2 ("sbc hl, %s", _pairs[getPartPairId (right->aop, offset)].name);
           regalloc_dry_run_cost += 2;
           spillPair (PAIR_HL);
+          started = true;
           size -= 2;
           offset += 2;
         }
@@ -8755,6 +8757,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           if (size > 1)
             {
               emit3_o (A_CP, ASMOP_A, 0, right->aop, offset);
+              started = true;
               a_always_byte = byteOfVal (left->aop->aopu.aop_lit, offset);
             }
           else
@@ -8774,7 +8777,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
             (getPartPairId (right->aop, offset) == PAIR_DE || getPartPairId (right->aop, offset) == PAIR_BC))
             {
               genMove_o (ASMOP_HL, 0, left->aop, offset, 2, isRegDead (A_IDX, ic), true, false, !offset);
-              if (!offset)
+              if (!started)
                 {
                   emit2 ("cp a, a");
                   regalloc_dry_run_cost++;
@@ -8782,6 +8785,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               emit2 ("sbc hl, %s", _pairs[getPartPairId (right->aop, offset)].name);
               regalloc_dry_run_cost += 2;
               spillPair (PAIR_HL);
+              started = true;
               size -= 2;
               offset += 2;
             }
@@ -8792,7 +8796,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
             {
               genMove_o (ASMOP_DE, 0, right->aop, offset, 2, isRegDead (A_IDX, ic), getPartPairId (left->aop, offset) != PAIR_HL, true, !offset);
               genMove_o (ASMOP_HL, 0, left->aop, offset, 2, isRegDead (A_IDX, ic), true, false, !offset);
-              if (!offset)
+              if (!started)
                 {
                   emit2 ("cp a, a");
                   regalloc_dry_run_cost++;
@@ -8800,6 +8804,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               emit2 ("sbc hl, de");
               regalloc_dry_run_cost += 2;
               spillPair (PAIR_HL);
+              started = true;
               size -= 2;
               offset += 2;
             }
@@ -8808,7 +8813,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               if (!left_already_in_a)
                 cheapMove (ASMOP_A, 0, left->aop, offset, true);
               a_always_byte = -1;
-              emit3_o (offset ? A_SBC : A_SUB, ASMOP_A, 0, right->aop, offset);
+              emit3_o (started ? A_SBC : A_SUB, ASMOP_A, 0, right->aop, offset);
+              started = true;
               size--;
               offset++;
             }

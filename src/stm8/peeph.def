@@ -323,299 +323,40 @@ replace restart {
 
 replace restart {
 	ld	a, %1
-	or	a, #0x01
+	or	a, #%2
 	ld	%1, a
 } by {
-	bset	%2, #0
-	; peephole 18-0 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+	bset	%1, #%3
+	; peephole 18 replaced ld-or-ld by bset.
+} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleSetBit' %2 8 %3)
 
 replace restart {
 	ld	a, %1
-	or	a, #0x02
+	and	a, #%2
 	ld	%1, a
 } by {
-	bset	%2, #1
-	; peephole 18-1 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x04
-	ld	%1, a
-} by {
-	bset	%2, #2
-	; peephole 18-2 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x08
-	ld	%1, a
-} by {
-	bset	%2, #3
-	; peephole 18-3 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x10
-	ld	%1, a
-} by {
-	bset	%2, #4
-	; peephole 18-4 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1, %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x20
-	ld	%1, a
-} by {
-	bset	%2, #5
-	; peephole 18-5 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x40
-	ld	%1, a
-} by {
-	bset	%2, #6
-	; peephole 18-6 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	or	a, #0x80
-	ld	%1, a
-} by {
-	bset	%2, #7
-	; peephole 18-7 replaced or by bset.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xfe
-	ld	%1, a
-} by {
-	bres	%2, #0
-	; peephole 19-0 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xfd
-	ld	%1, a
-} by {
-	bres	%2, #1
-	; peephole 19-1 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xfb
-	ld	%1, a
-} by {
-	bres	%2, #2
-	; peephole 19-2 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xf7
-	ld	%1, a
-} by {
-	bres	%2, #3
-	; peephole 19-3 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xef
-	ld	%1, a
-} by {
-	bres	%2, #4
-	; peephole 19-4 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xdf
-	ld	%1, a
-} by {
-	bres	%2, #5
-	; peephole 19-5 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0xbf
-	ld	%1, a
-} by {
-	bres	%2, #6
-	; peephole 19-6 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	and	a, #0x7f
-	ld	%1, a
-} by {
-	bres	%2, #7
-	; peephole 19-7 replaced and by bres.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+	bres	%1, #%3
+	; peephole 19 replaced ld-and-ld by bres.
+} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleResetBit' %2 8 %3)
 
 replace restart {
 	ldw	%1, #%2
 	ld	a, (%1)
-	xor	a, #0x01
+	xor	a, #%3
 	ld	(%1), a
 } by {
-	bcpl	%2, #0
-	; peephole 20-0 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x02
-	ld	(%1), a
-} by {
-	bcpl	%2, #1
-	; peephole 20-1 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x04
-	ld	(%1), a
-} by {
-	bcpl	%2, #2
-	; peephole 20-2 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x08
-	ld	(%1), a
-} by {
-	bcpl	%2, #3
-	; peephole 20-3 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x10
-	ld	(%1), a
-} by {
-	bcpl	%2, #4
-	; peephole 20-4 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x20
-	ld	(%1), a
-} by {
-	bcpl	%2, #5
-	; peephole 20-5 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x40
-	ld	(%1), a
-} by {
-	bcpl	%2, #6
-	; peephole 20-6 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #0x80
-	ld	(%1), a
-} by {
-	bcpl	%2, #7
-	; peephole 20-7 replaced xor by bcpl.
-} if notUsed(%1), notUsed('a')
+	bcpl	%2, #%4
+	; peephole 20 replaced ldw-ld-xor-ld by bcpl.
+} if notUsed(%1 'a' 'n' 'z'), immdInRange(0 7 'singleSetBit' %3 8 %4)
 
 replace restart {
 	ld	a, %1
-	xor	a, #0x01
+	xor	a, #%2
 	ld	%1, a
 } by {
-	bcpl	%2, #0
-	; peephole 21-0 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x02
-	ld	%1, a
-} by {
-	bcpl	%2, #1
-	; peephole 21-1 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x04
-	ld	%1, a
-} by {
-	bcpl	%2, #2
-	; peephole 21-2 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x08
-	ld	%1, a
-} by {
-	bcpl	%2, #3
-	; peephole 21-3 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x10
-	ld	%1, a
-} by {
-	bcpl	%2, #4
-	; peephole 21-4 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1, %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x20
-	ld	%1, a
-} by {
-	bcpl	%2, #5
-	; peephole 21-5 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x40
-	ld	%1, a
-} by {
-	bcpl	%2, #6
-	; peephole 21-6 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ld	a, %1
-	xor	a, #0x80
-	ld	%1, a
-} by {
-	bcpl	%2, #7
-	; peephole 21-7 replaced xor by bcpl.
-} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+	bcpl	%1, #%3
+	; peephole 21 replaced ld-xor-ld by bcpl.
+} if notUsed('a' 'n' 'z'), operandsLiteral(%1), isImmdBitMask(%2 8 %3)
 
 replace restart {
 	rlc	a

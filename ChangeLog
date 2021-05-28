@@ -4,6 +4,8 @@
 	  Test from patch #373 by Visenri.
 	* src/SDCCpeeph.c:
 	  Peephole optimizer helper function refactoring, from patch #362 by Visenri.
+	* src/stm8/peeph.def:
+	  Peephole rule refactoring, from patch #361 by Basil Hussain.
 
 2021-05-27 Philipp Klaus Krause <pkk AT spth.de>
 

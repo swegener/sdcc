@@ -356,7 +356,7 @@ replace restart {
 } by {
 	bcpl	%1, #%3
 	; peephole 21 replaced ld-xor-ld by bcpl.
-} if notUsed('a' 'n' 'z'), operandsLiteral(%1), isImmdBitMask(%2 8 %3)
+} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleResetBit' %2 8 %3)
 
 replace restart {
 	rlc	a

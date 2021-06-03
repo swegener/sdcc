@@ -605,6 +605,8 @@ struct
      "return values larger than 16 bits are not supported for Cosmic calling convention", 0},
   { E_MULTIPLE_CALLINGCONVENTIONS, ERROR_LEVEL_ERROR,
      "multiple incompatible calling conventions for '%s'", 0},
+  { W_SFR_ADDRESS, ERROR_LEVEL_WARNING,
+     "unsupported address of __sfr taken", 0},
 };
 
 /* -------------------------------------------------------------------------------

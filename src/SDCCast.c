@@ -3849,6 +3849,11 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of bit variable");
           goto errorTreeReturn;
         }
+        
+      if ((TARGET_Z80_LIKE || TARGET_PDK_LIKE) && SPEC_SCLS (LETYPE (tree)) == S_SFR)
+        {
+          werror (W_SFR_ADDRESS);
+        }
 
       if (LETYPE (tree) && SPEC_SCLS (tree->left->etype) == S_REGISTER)
         {

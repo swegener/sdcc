@@ -609,6 +609,173 @@ replace restart {
 } if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleResetBit' %2 8 %3)
 
 replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	cpl	a
+	and	a, #%3
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, #%2
+	ld	a, (%1)
+	xor	a, #%3
+	ld	(%1), a
+	; peephole 300a replaced 'cpl-and-and-or' by 'xor' v1.
+} if operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %5)
+  
+replace restart {
+	ld	a, (%2, sp)
+	ldw	%1, sp
+	addw	%1, #%5
+	cpl	a
+	and	a, #%3
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, sp
+	addw	%1, #%5
+	ld	a, (%2, sp)
+	xor	a, #%3
+	ld	(%2, sp), a
+	; peephole 300b replaced 'cpl-and-and-or' by 'xor' v2, with addw.
+} if operandsLiteral(%3 %4 %2 %5), immdInRange(0 0 '^' %2 %5 %8), immdInRange(0xFF 0xFF '^' %3 %4 %9)
+
+replace restart {
+	ld	a, (%2, sp)
+	ldw	%1, sp
+	incw	%1
+	cpl	a
+	and	a, #%3
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, sp
+	incw	%1
+	ld	a, (%2, sp)
+	xor	a, #%3
+	ld	(%2, sp), a
+	; peephole 300c replaced 'cpl-and-and-or' by 'xor' v3, with incw.
+} if operandsLiteral(%3 %4 %2), immdInRange(0 0 '^' %2 1 %8), immdInRange(0xFF 0xFF '^' %3 %4 %9)
+
+replace restart {
+	ld	a, (%2, sp)
+	ldw	%1, sp
+	incw	%1
+	incw	%1
+	cpl	a
+	and	a, #%3
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, sp
+	incw	%1
+	incw	%1
+	ld	a, (%2, sp)
+	xor	a, #%3
+	ld	(%2, sp), a
+	; peephole 300d replaced 'cpl-and-and-or' by 'xor' v4, with 2 incw.
+} if operandsLiteral(%3 %4 %2), immdInRange(0 0 '^' %2 2 %8), immdInRange(0xFF 0xFF '^' %3 %4 %9)
+
+// OR, XOR
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #%3
+	%10	a, #%5
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, #%2
+	ld	a, (%1)
+	%10	a, #%5
+	ld	(%1), a
+	; peephole 310 replaced 'and-%10-and-or' by '%10'.
+} if same(%10 'or' 'xor'), operandsLiteral(%3 %4 %5), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(0 255 '&' %3 %5 %7), immdInRange(0 0 '^' %5 %7 %8)
+
+
+// COMBINED ANDS
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #%3
+	push	a
+	ld	a, (%1)
+	and	a, #%4
+	or	a, (1, sp)
+	ld	(%1), a
+	pop	a
+} by {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #%6
+	ld	(%1), a
+	; peephole 320 replaced 'and-and-or' by 'combined and'.
+} if operandsLiteral(%3 %4), immdInRange(0 255 '|' %3 %4 %6)
+
+
+// XOR, OR, AND convert to direct load
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	%4	a, #%3
+	ld	(%1), a
+} by {
+	ld	a, %10
+	%4	a, #%3
+	ld	%10, a
+	; peephole 330x replaced 'ldw-ld-%4-ld' by 'ld-%4-ld direct' ('%2' -> '%10').
+} if same(%4 'xor' 'or' 'and'), notUsed(%1), removeParentheses(%2 %10)
+
+// XOR, OR, AND - stack version
+replace restart {
+	ldw	%1, sp
+	addw	%1, #%2
+	ld	a, (%1)
+	%4	a, #%3
+	ld	(%1), a
+} by {
+	ld	a, (%2, sp)
+	%4	a, #%3
+	ld	(%2, sp), a
+	; peephole 330c replaced 'ldw-addw-ld-%4-ld' by 'ld-%4-ld sp indexed'.
+} if same(%4 'xor' 'or' 'and'), operandsLiteral(%2), immdInRange(0 0xFF '+' %2 0 %6), notUsed(%1)
+
+// Used when assigning a bitfield with more than 1 bit
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	%8	a, #%3
+	%9	a, #%4
+	ld	(%1), a
+} by {
+	ld	a, %10
+	%8	a, #%3
+	%9	a, #%4
+	ld	%10, a
+	; peephole 340x exchanged 'ldw-ld-%8-%9-ld' by 'ld-%8-%9-ld direct' ('%2' -> '%10').
+} if same(%1 'x' 'y'), same(%8 'or' 'and'), same(%9 'or' 'and'), notUsed(%1), removeParentheses(%2 %10)
+
+replace restart {
 	rlc	a
 	xor	a, #0x01
 } by {

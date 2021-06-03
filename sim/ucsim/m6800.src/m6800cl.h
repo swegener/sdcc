@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
+#include "itsrccl.h"
 #include "decode.h"
 
 
@@ -105,6 +106,7 @@ public:
   class cl_cell8 cA, cB, cCC;
   class cl_cell16 cIX, cSP;
   class cl_it_src *src_irq, *src_nmi, *src_swi;
+  bool wai;
 public:
   cl_m6800(class cl_sim *asim);
   virtual int init(void);
@@ -120,10 +122,16 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual char *disass(t_addr addr);
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
-
+  
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  virtual int priority_of(uchar nuof_it) { return nuof_it; }
+  virtual int accept_it(class it_level *il);
+  virtual bool it_enabled(void) { return true; }
+  virtual void push_regs(void);
+  virtual void pull_regs(void);
+  
   virtual class cl_cell8 &idx(void);
   virtual class cl_cell8 &ext(void);
   virtual class cl_cell8 &dir(void);
@@ -214,6 +222,10 @@ public:
   virtual int PSHB(t_mem code);
   virtual int RTS(t_mem code);
 
+  virtual int RTI(t_mem code);
+  virtual int WAI(t_mem code);
+  virtual int SWI(t_mem code);
+  
   virtual int NEGA(t_mem code) { return neg(cA); }
   virtual int COMA(t_mem code) { return com(cA); }
   virtual int LSRA(t_mem code) { return lsr(cA); }

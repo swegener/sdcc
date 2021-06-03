@@ -33,4 +33,31 @@ cl_m6800::NOP(t_mem code)
   return resGO;
 }
 
+int
+cl_m6800::RTI(t_mem code)
+{
+  pull_regs();
+  tick(2);
+  return resGO;
+}
+
+int
+cl_m6800::WAI(t_mem code)
+{
+  push_regs();
+  wai= true;
+  state= stIDLE;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_m6800::SWI(t_mem code)
+{
+  src_swi->request();
+  tick(4);
+  return resGO;
+}
+
+
 /* End of m6800.src/inst.cc */

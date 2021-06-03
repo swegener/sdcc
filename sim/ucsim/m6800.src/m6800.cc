@@ -65,6 +65,8 @@ cl_m6800::init(void)
   class cl_memory_operator *op= new cl_cc_operator(&cCC);
   cCC.append_operator(op);
 
+  wai= false;
+  
   return 0;
 }
 
@@ -143,17 +145,17 @@ cl_m6800::mk_hw_elements(void)
   src_swi->init();
   it_sources->add(src_swi);
   
-  add_hw(h= new cl_cia(this, 0, 0xc000));
+  add_hw(h= new cl_cia(this, 0, 0x8000));
   h->init();
 
-  add_hw(h= new cl_cia(this, 1, 0xc008));
+  add_hw(h= new cl_cia(this, 1, 0x8008));
   h->init();
 
   class cl_pia *p0, *p1;
   
-  add_hw(p0= new cl_pia(this, 0, 0xc010));
+  add_hw(p0= new cl_pia(this, 0, 0x8010));
   p0->init();
-  add_hw(p1= new cl_pia(this, 1, 0xc020));
+  add_hw(p1= new cl_pia(this, 1, 0x8020));
   p1->init();
 
   class cl_port_ui *d;
@@ -412,6 +414,57 @@ cl_m6800::exec_inst(void)
   tick(1);
   res= inst_unknown(code);
   return(res);
+}
+
+int
+cl_m6800::accept_it(class it_level *il)
+{
+  class cl_it_src *is= il->source;
+
+  if (!wai)
+    push_regs();
+  wai= false;
+  
+  if ((is == src_irq) ||
+      (is == src_swi))
+    rCC|= flagI;
+  
+  t_addr a= read_addr(rom, is->addr);
+  PC= a;
+  
+  is->clear();
+  it_levels->push(il);
+  
+  return resGO;
+}
+
+void
+cl_m6800::push_regs(void)
+{
+  rom->write(rSP--, PC&0xff);
+  rom->write(rSP--, PC>>8);
+  rom->write(rSP--, rIX&0xff);
+  rom->write(rSP--, rIX>>8);
+  rom->write(rSP--, rA);
+  rom->write(rSP--, rB);
+  rom->write(rSP--, rCC);
+  tick(7);
+}
+
+void
+cl_m6800::pull_regs(void)
+{
+  u8_t l, h;
+  rCC= rom->read(++rSP);
+  rB= rom->read(++rSP);
+  rA= rom->read(++rSP);
+  l= rom->read(++rSP);
+  h= rom->read(++rSP);
+  rIX= h*256+l;
+  l= rom->read(++rSP);
+  h= rom->read(++rSP);
+  PC= h*256+l;
+  tick(7);
 }
 
 class cl_cell8 &

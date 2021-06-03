@@ -73,6 +73,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PSHB  instruction_37
 #define RTS   instruction_39
 
+#define RTI   instruction_3b
+#define WAI   instruction_3e
+#define SWI   instruction_3f
+
 #define NEGA  instruction_40
 #define COMA  instruction_43
 #define LSRA  instruction_44

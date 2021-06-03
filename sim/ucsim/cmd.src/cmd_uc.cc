@@ -39,6 +39,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmd_uccl.h"
 
 
+static struct id_element cpu_states[]= {
+  { stGO,	"OK" },
+  { stIDLE,	"Idle" },
+  { stPD,	"PowerDown" },
+  { 0, 0 }
+};
+
 /*
  * Command: state
  *----------------------------------------------------------------------------

@@ -78,6 +78,10 @@ struct dis_entry disass_m6800[]=
     { 0x37, 0xff, ' ', 1, "PSH B" },
     { 0x39, 0xff, ' ', 1, "RTS" },
 
+    { 0x3b, 0xff, ' ', 1, "RTI" },
+    { 0x3e, 0xff, ' ', 1, "WAI" },
+    { 0x3f, 0xff, ' ', 1, "SWI" },
+
     { 0x40, 0xff, ' ', 1, "NEG A" },
     { 0x43, 0xff, ' ', 1, "COM A" },
     { 0x44, 0xff, ' ', 1, "LSR A" },

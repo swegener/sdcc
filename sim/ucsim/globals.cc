@@ -39,32 +39,6 @@ class cl_app *application;
 /* Delimiters to split up command line */
 char delimiters[]= " ,;\t\r\n";
 
-struct id_element mem_ids[]= {
-  { MEM_ROM  , "ROM  " },
-  { MEM_XRAM , "XRAM " },
-  { MEM_IRAM , "IRAM " },
-  { MEM_SFR  , "SFR  " },
-  { MEM_IXRAM, "IXRAM" },
-  { MEM_DUMMY, "DUMMY" },
-  { 0, 0 }
-};
-
-struct id_element mem_classes[]= {
-  { MEM_ROM  , "rom" },
-  { MEM_XRAM , "xram" },
-  { MEM_IRAM , "iram" },
-  { MEM_SFR  , "sfr" },
-  { MEM_IXRAM, "ixram" },
-  { MEM_DUMMY, "dummy" },
-  { 0, 0 }
-};
-
-struct id_element cpu_states[]= {
-  { stGO,	"OK" },
-  { stIDLE,	"Idle" },
-  { stPD,	"PowerDown" },
-  { 0, 0 }
-};
 
 struct id_element error_type_names[]= {
   { err_unknown,	"unclassified" },

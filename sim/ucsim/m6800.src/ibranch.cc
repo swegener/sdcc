@@ -31,9 +31,9 @@ int
 cl_m6800::call(t_addr a)
 {
   u8_t h= PC>>8, l= PC;
-  rom->write(rSP, h);
-  rSP--;
   rom->write(rSP, l);
+  rSP--;
+  rom->write(rSP, h);
   cSP.W(rSP-1);
   PC= a;
   vc.wr+= 2;

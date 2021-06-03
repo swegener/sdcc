@@ -8,7 +8,7 @@
 	  support/regression/tests/z80n-push-nn.c:
 	  Disable tests that fail due to known bug #3243.
 	* src/stm8/peeph.def:
-	  Rule pack 1 from patch #362 by Visenri.
+	  Rule packs 1, 5, 6 from patch #362 by Visenri.
 
 2021-05-31 Philipp Klaus Krause <pkk AT spth.de>
 

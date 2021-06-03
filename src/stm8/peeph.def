@@ -992,6 +992,303 @@ replace restart {
 	; peephole 51 used inc to get #1 into a.
 } if notUsedFrom(%2 'a')
 
+// Do operations directly on stack, leave 'a' as it was, load into 'a' may be removed by dead load optimizations
+replace restart {
+	ld	a, (%1, sp)
+	%5	a
+	ld	(%2, sp), a
+} by {
+	%5	(%1, sp)
+	ld	a, (%1, sp)
+	; peephole 610 optimized direct operation in stack (%5).
+}if same(%5 'swap' 'clr' 'dec' 'inc' 'neg' 'cpl'), immdInRange(0 0 '-' %1 %2 %7), notVolatile(%1)
+
+// Leave constant in 'a' before loop
+replace restart {
+%3:
+	ld	a,	%1
+	%4	a,	#%2
+	jr%5	%3
+} by {
+%3:
+	ld	a,	#%2
+%6:
+	%4	a,	%1
+	jr%5	%6
+	; peephole 620x moved 'ld' outside of loop: '%4-jr%5' ('%1').
+} if same(%4 'cp' 'bcp'), same(%5 'ne' 'eq'), operandsLitOrSym(%1), notUsed('a'), notUsedFrom(%3 'a'), newLabel(%6), labelRefCountChange(%3 -1)
+
+// Change AND to BCP to enable other rules using bcp
+replace restart {
+	and	a, #%1
+} by {
+	bcp	a, #%1
+	; peephole 500 replaced 'and' by 'bcp'.
+} if operandsLiteral(%1), immdInRange(0 255 '+' 0 %1 %2), notUsed('a')
+
+// SRL - BCP, only using Z
+replace restart {
+	srl	a
+	bcp	a, #%1
+} by {
+	bcp	a, #%2
+	; peephole 510 replaced 'srl-bcp' (%1) by 'bcp' (%2).
+} if operandsLiteral(%1), immdInRange(2 255 '*' %1 2 %2), notUsed('a' 'n' 'c')
+
+// SWAP - BCP, only using Z
+replace restart {
+	swap	a
+	bcp	a, #%1
+} by {
+	bcp	a, #%2
+	; peephole 511 replaced 'swap-bcp' (%1) by 'bcp' (%2).
+} if operandsLiteral(%1), immdInRange(0 255 'swap' %1 8 %2), notUsed('a' 'n' 'c')
+
+// SRL - AND - CP to AND - CP
+replace restart {
+	srl	a
+	and	a, #%1
+	cp	a, #%2
+} by {
+	and	a, #%3
+	cp	a, #%4
+	; peephole 512 replaced 'srl-and-cp' (%1 %2) by 'and-cp' (%3 %4).
+} if operandsLiteral(%1 %2), immdInRange(2 255 '*' %1 2 %3), immdInRange(2 255 '*' %2 2 %4), notUsed('a')
+  
+// SWAP - AND - CP to AND - CP
+replace restart {
+	swap	a
+	and	a, #%1
+	cp	a, #%2
+} by {
+	and	a, #%3
+	cp	a, #%4
+	; peephole 513 replaced 'swap-and-cp' (%1 %2) by 'and-cp' (%3 %4).
+} if operandsLiteral(%1 %2), immdInRange(0 255 'swap' %1 8 %3), immdInRange(0 255 'swap' %2 8 %4), notUsed('a')
+
+// Direct load into a - should be one of the last ones
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+} by {
+	ld	a, %10
+	; peephole 630x replaced 'ldw-ld' by 'ld direct' ('%2' -> '%10').
+} if same(%1 'x' 'y'), notUsed(%1), removeParentheses(%2 %10)
+
+// Use index register if already loaded with same address
+replace restart {
+	ldw	%1, #(%2)
+	ld	a, %2
+} by {
+	ldw	%1, #(%2)
+	ld	a, (%1)
+	; peephole 631 replaced 'ldw-ld' by 'ldw-ld' with index register (%1).
+}
+
+// Dead addw / incw
+replace restart {
+	addw	%1, %2
+} by {
+	; peephole 640 removed dead addw into %1 from %2.
+} if same(%1 'x' 'y'), notVolatile(%2), notUsed(%1), notUsed('n' 'z' 'c')
+
+replace restart {
+	addw	%1, (%2, sp)
+} by {
+	; peephole 641 removed dead addw into %1 from (%2, sp).
+} if notUsed(%1), notUsed('n' 'z' 'c')
+
+replace restart {
+	incw	%1
+} by {
+	; peephole 642 removed dead incw %1.
+} if notUsed(%1), notUsed('n' 'z')
+
+// Redundant jr
+replace restart {
+	jr%1	%2
+%2:
+} by {
+%2:
+	; peephole 650 removed redundant relative jump 'jr%1'.
+} if labelRefCountChange(%2 -1)
+
+// Swap optimizations x>>4 + x<<4
+replace restart {
+	ld	a, (%1, sp)
+	swap	a
+	and	a, #%3
+	ld	(%2, sp), a
+	ld	a, (%1, sp)
+	swap	a
+	and	a, #%4
+	%5	a, (%2, sp)
+} by {
+	ld	a, (%1, sp)
+	swap	a
+	push	a
+	and	a, #%3
+	ld	(%7, sp), a
+	pop	a
+	; peephole 660a optimized swap (v1).
+} if same(%5 'or' 'add'), operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(0 255 '+' %2 1 %7)
+
+replace restart {
+	ld	(%1, sp), a
+	swap	a
+	and	a, #%3
+	ld	(%2, sp), a
+	ld	a, (%1, sp)
+	swap	a
+	and	a, #%4
+	%5	a, (%2, sp)
+} by {
+	ld	(%1, sp), a
+	swap	a
+	push	a
+	and	a, #%3
+	ld	(%7, sp), a
+	pop	a
+	; peephole 660b optimized swap (v2).
+} if same(%5 'or' 'add'), operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(0 255 '+' %2 1 %7)
+
+replace restart {
+	ld	a, (%1, sp)
+	swap	a
+	and	a, #%3	
+	ld	xl, a
+	ld	a, (%1, sp)
+	swap	a
+	and	a, #%4
+	pushw	x
+	%5	a, (%2, sp)
+	popw	x
+} by {
+	ld	a, (%1, sp)
+	swap	a
+	; peephole 660c optimized swap (v3).
+} if same(%5 'or' 'add'), operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(2 2 '+' %2 0 %7), notUsed('x')
+
+// Optimizations of stack restore, less size but more cycles
+// No CC flags need to be checked because neither of these instructions modify them
+replace restart {
+	addw	sp, #%1
+} by {
+	pop	a
+	; peephole 670 replaced 'addw sp, #1' by 'pop a'
+} if optimizeFor('code-size'), operandsLiteral(%1), immdInRange(1 1 '+' 0 %1 %2), notUsed('a')
+
+replace restart {
+	addw	sp, #%1
+} by {
+	popw	x
+	; peephole 671 replaced 'addw sp, #2' by 'popw x'
+} if optimizeFor('code-size'), operandsLiteral(%1), immdInRange(2 2 '+' 0 %1 %2), notUsed('x')
+
+//----- Very seldom found optimizations
+
+// Remove operations in stack that will be immediately out of scope
+// 'ld(w)' followed by 'addw sp' and 'ret(tf)'
+// No need to check src operand of 'ld(w)', It must be 'a', 'x' or 'y' when loading into stack.
+// No need to check 're%3' for 'ret' and 'retf', those are the only instructions starting with 're'
+replace restart {
+	l%1	(%4, sp), %2
+	addw	sp, #%5
+	re%3
+} by {
+	; peephole 680 removed dead l%1 into stack variable %4 (%6).
+	addw	sp, #%5
+	re%3
+} if same(%1 'd' 'dw'), operandsLiteral(%5), immdInRange(-100000 0 '-' %4 %5 %6)
+
+// struct.bit == 1 AND-DEC-JRNE to BCP-JREQ
+replace restart {
+	and	a, #%1
+	dec	a
+	jrne	%2
+} by {
+	bcp	a, #%1
+	jreq	%2
+	; peephole j520 replaced 'and-dec-jrne' by 'bcp-jreq'.
+} if operandsLiteral(%1), immdInRange(1 1 '+' 0 %1 %2), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%2 'a' 'n' 'z' 'c')
+
+// !(struct.bit == 1) AND-DEC-JREQ to BCP-JRNE
+replace restart {
+	and	a, #%1
+	dec	a
+	jreq	%2
+} by {
+	bcp	a, #%1
+	jrne	%2
+	; peephole j521 replaced 'and-dec-jreq' by 'bcp-jrne'.
+} if operandsLiteral(%1), immdInRange(1 1 '+' 0 %1 %2), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%2 'a' 'n' 'z' 'c')
+
+// jreq to btjf
+replace restart {
+	ld	a, %1
+	bcp	a, #%2
+	jreq	%3
+} by {
+	btjf	%1, #%4, %3
+	; peephole j530x replaced 'ld-bcp-jreq' by 'btjf' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%2), immdInRange(0 7 'singleSetBit' %2 8 %4), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%3 'a' 'n' 'z' 'c')
+
+// jrne to btjt
+replace restart {
+	ld	a,	%1
+	bcp	a,	#%2
+	jrne	%3
+} by {
+	btjt	%1, #%4, %3
+	; peephole j531x replaced 'ld-bcp-jrne' by 'btjt' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%2), immdInRange(0 7 'singleSetBit' %2 8 %4), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%3 'a' 'n' 'z' 'c')
+
+
+// REPLACE LD + SRL + JRC WITH BTJT
+// 3/4 cycles, 6 bytes versus 2/3 cycles, 5 bytes
+replace restart {
+	ld	a, %1
+	srl	a
+	jrc	%2
+} by {
+	btjt	%1, #0, %2
+	; peephole j540x replaced 'ld-srl-jrc' by 'btjt' ('%1').
+} if operandsLitOrSym(%1), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%2 'a' 'n' 'z' 'c')
+
+// REPLACE LD + SRL + JRNC WITH BTJF
+// 3/4 cycles, 6 bytes versus 2/3 cycles, 5 bytes  
+replace restart {
+	ld	a, %1
+	srl	a
+	jrnc	%2
+} by {
+	btjf	%1, #0, %2
+	; peephole j541x replaced 'ld-srl-jrnc' by 'btjf' ('%1').
+} if operandsLitOrSym(%1), notUsed('a' 'n' 'z' 'c'), notUsedFrom(%2 'a' 'n' 'z' 'c')
+
+// To check bit 7, jrpl and jrmi are as efficient as btxx (same size and cycles), and less conditions need to be checked.
+// jreq to jrpl
+replace restart {
+	ld	a, %1
+	bcp	a, #%2
+	jreq	%3
+} by {
+	ld	a, %1
+	jrpl	%3
+	; peephole j550 replaced 'ld-bcp-jreq' by 'ld-jrpl'.
+} if operandsLiteral(%2), immdInRange(0x80 0x80 '+' %2 0 %4), notUsed('n' 'z'), notUsedFrom(%3 'n' 'z')
+
+// jrne to jrmi
+replace restart {
+	ld	a, %1
+	bcp	a, #%2
+	jrne	%3
+} by {
+	ld	a, %1
+	jrmi	%3
+	; peephole j551 replaced 'ld-bcp-jrne' by 'ld-jrmi'.
+} if operandsLiteral(%2), immdInRange(0x80 0x80 '+' %2 0 %4), notUsed('n' 'z'), notUsedFrom(%3 'n' 'z')
+
 replace {
 	jp	%5
 	ret

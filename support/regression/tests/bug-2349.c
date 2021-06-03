@@ -40,7 +40,7 @@ typedef long (*subfunc_t)(void *pa, void *pb);
 
 subfunc_t dosub(subfunc_t f)
 {
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   if (f == subchar)
     return subint;
   else if (f == subint)
@@ -56,11 +56,13 @@ subfunc_t dosub(subfunc_t f)
 
 void testBug(void)
 {
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   ASSERT (dosub(subchar) == subint);
   ASSERT (dosub(subint) == sublong);
   ASSERT (dosub(sublong) == subchar);
   ASSERT (dosub(addlong) == NULL);
   ASSERT (dosub(NULL) == addlong);
+#endif
 #endif
 }

@@ -14,6 +14,7 @@ typedef void (*fp)(void);
 
 void testFptrCastOld(void)
 {
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
   /* old functionality */
   fp tab1[2] = {a, 0};
   ASSERT(tab1[0] == a);
@@ -29,10 +30,12 @@ void testFptrCastOld(void)
   ASSERT(sizeof(void *) < sizeof(fp) || ((fp)tab5[0]) == a);
   void * tab6[2] = {&a, 0};
   ASSERT(sizeof(void *) < sizeof(fp) || ((fp)tab6[0]) == a);
+#endif
 }
 
 void testFptrCastNew(void)
 {
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
   /* new functionality */
   void * tab1[2] = {(void*)a, 0};
   ASSERT(sizeof(void *) < sizeof(fp) || ((fp)tab1[0]) == a);
@@ -42,4 +45,5 @@ void testFptrCastNew(void)
   ASSERT(sizeof(char *) < sizeof(fp) || ((fp)tab3[0]) == a);
   char * tab4[2] = {(char*)&a, 0};
   ASSERT(sizeof(char *) < sizeof(fp) || ((fp)tab4[0]) == a);
+#endif
 }

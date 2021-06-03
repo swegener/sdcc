@@ -31,6 +31,7 @@ struct
 
 void testBug (void)
 {
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
   ASSERT (testS.fpa[0] (5) == 7);
   ASSERT (testS.fpa[1] (9) == 3);
@@ -51,5 +52,6 @@ void testBug (void)
   ASSERT (testS.fpa[0] (5) == 10);
   ASSERT (testS.fpa[1] (9) == 11);
   ASSERT (testS.fpb (5) == -1);
+#endif
 #endif
 }

@@ -77,7 +77,7 @@ enum {
 #define ifEQ	(rF&mZ)
 #define ifNE	(!(rF&mZ))
 #define ifLT	( ((rF&mV)?1:0) ^ ((rF&mV)?1:0) )
-#define ifLE	( (rF&mZ) | (((rF&mV)?mZ:0) ^ ((rF&mV)?mZ:0)) )
+#define ifLE	( (rF&mZ) | (((rF&mN)?mZ:0) ^ ((rF&mV)?mZ:0)) )
 #define ifGE	(!ifLT)
 #define ifGT	(!ifLE)
 #define ifLS	( ((rF&mC)?mZ:0) | (rF&mZ) )

@@ -2520,6 +2520,14 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           val_x = -1;
           i += 2;
         }
+      else if (i + 1 < size && aopInReg (result, roffset + i, XH_IDX) && aopInReg (result, roffset + i + 1, XL_IDX) && source->type == AOP_DIR && soffset + i + 1 < source->size)
+        {
+          emit2 ("ldw", "x, %s", aopGet2 (source, soffset + i));
+          cost (3, 2);
+          emit3w (A_SWAPW, ASMOP_X, 0);
+          val_x = -1;
+          i += 2;
+        }
       else if (i + 1 < size && aopInReg (result, roffset + i, Y_IDX) && (source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           emit2 ("ldw", "y, %s", aopGet2 (source, soffset + i));

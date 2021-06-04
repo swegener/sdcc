@@ -1816,6 +1816,22 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           size -= 2;
           i += 2;
         }
+      else if (i < n - 1 && !assigned[i] && !assigned[i + 1] &&
+        (aopInReg (source, soffset + i, XH_IDX) && aopInReg (source, soffset + i + 1, XL_IDX) && x_dead || aopInReg (source, soffset + i, YH_IDX) && aopInReg (source, soffset + i + 1, YL_IDX) && y_dead) &&
+        aopOnStack (result, roffset + i, 2))
+        {
+          wassert_bt (size >= 2);
+
+          bool y = aopInReg (source, soffset + i, YH_IDX);
+          emit3w (A_SWAPW, y ? ASMOP_Y : ASMOP_X, 0);
+          emit2 ("ldw", y ? "%s, y" : "%s, x", aopGet2 (result, roffset + i));
+          cost (2, 2);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          regsize -= 2;
+          size -= 2;
+          i += 2;
+        }
       else if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
         {
           wassert_bt (size >= 1);
@@ -1825,7 +1841,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           emit3_o (A_LD, result, roffset + i, ASMOP_A, 0);
           if (!aopInReg (source, soffset + i, A_IDX))
             swap_from_a (source->aopu.bytes[soffset + i].byteu.reg->rIdx);
-          assigned[i] = TRUE;
+          assigned[i] = true;
           regsize--;
           size--;
           i++;
@@ -2233,10 +2249,30 @@ skip_byte:
           wassert_bt (size >= 2);
           emit2 ("ldw", aopInReg (result, roffset + i, X_IDX) ? "x, %s" : "y, %s", aopGet2 (source, soffset + i));
           cost (2, 2);
-          assigned[i] = TRUE;
-          assigned[i + 1] = TRUE;
+          assigned[i] = true;
+          assigned[i + 1] = true;
           if (aopInReg (result, roffset + i, X_IDX))
-            x_free = FALSE;
+            x_free = false;
+          else
+            y_free = false;
+          size -= 2;
+          i += 2;
+        }
+      else if (i < n - 1 &&
+        (aopInReg (result, roffset + i, XH_IDX) && aopInReg (result, roffset + i + 1, XL_IDX) || aopInReg (result, roffset + i, YH_IDX) && aopInReg (result, roffset + i + 1, YL_IDX)) &&
+        aopOnStackNotExt (source, soffset + i, 2))
+        {
+          bool y = aopInReg (result, roffset + i, YH_IDX);
+          wassert_bt (size >= 2);
+          emit2 ("ldw", y ? "y, %s" : "x, %s", aopGet2 (source, soffset + i));
+          cost (2, 2);
+          emit3w (A_SWAPW, y ? ASMOP_Y : ASMOP_X, 0);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          if (y)
+            y_free = false;
+          else
+            x_free = false;
           size -= 2;
           i += 2;
         }
@@ -2249,7 +2285,7 @@ skip_byte:
           emit3w (A_LDW, ASMOP_X, ASMOP_Y);
           emit2 ("ldw", "x, (0x%x, x)", (unsigned)eoffset);
           cost (2 + (eoffset > 255), 2);
-          x_free = FALSE;
+          x_free = false;
           size -= 2;
           i += 2;
         }

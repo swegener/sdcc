@@ -11154,7 +11154,7 @@ genSwap (iCode * ic)
           idxarray[0] = result->aop->aopu.aop_reg[1]->rIdx;
           idxarray[1] = result->aop->aopu.aop_reg[0]->rIdx;
           idxarray[2] = -1;
-          z80_init_reg_asmop(&swapped_result_aop, idxarray);
+          z80_init_reg_asmop (&swapped_result_aop, idxarray);
           genMove (&swapped_result_aop, left->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           break;
         }

@@ -130,12 +130,13 @@ static const char *asminstnames[] =
   "xor"
 };
 
-static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_xyl, asmop_zero, asmop_one, asmop_mone;
+static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_xyl, asmop_yx, asmop_zero, asmop_one, asmop_mone;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_X = &asmop_x;
 static struct asmop *const ASMOP_Y = &asmop_y;
 static struct asmop *const ASMOP_XY = &asmop_xy;
 static struct asmop *const ASMOP_XYL = &asmop_xyl;
+static struct asmop *const ASMOP_YX = &asmop_yx;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
@@ -165,6 +166,7 @@ stm8_init_asmops (void)
   stm8_init_reg_asmop(&asmop_y, (const signed char[]){YL_IDX, YH_IDX, -1});
   stm8_init_reg_asmop(&asmop_xy, (const signed char[]){XL_IDX, XH_IDX, YL_IDX, YH_IDX, -1});
   stm8_init_reg_asmop(&asmop_xyl, (const signed char[]){XL_IDX, XH_IDX, YL_IDX, -1});
+  stm8_init_reg_asmop(&asmop_yx, (const signed char[]){YL_IDX, YH_IDX, XL_IDX, XH_IDX, -1});
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
@@ -6500,6 +6502,134 @@ release:
 }
 
 /*------------------------------------------------------------------*/
+/* genSwap - swap nibbles or bytes                                  */
+/*------------------------------------------------------------------*/
+static void
+genSwap (const iCode *ic)
+{
+  operand *left, *result;
+
+  D (emit2 ("; genSwap", ""));
+
+  aopOp (left = IC_LEFT (ic), ic);
+  aopOp (result = IC_RESULT (ic), ic);
+
+  asmop swapped_aop;
+
+  wassert (left->aop->size == result->aop->size);
+
+  switch (left->aop->size)
+    {
+    case 1:
+      if (aopSame (result->aop, 0, left->aop, 0, 1) &&
+        (aopOnStack (result->aop, 0, 1) || result->aop->type == AOP_DIR))
+        emit3 (A_SWAP, result->aop, 0);
+      else
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0, 1);
+
+          cheapMove (ASMOP_A, 0, left->aop, 0, false);
+          emit3 (A_SWAP, ASMOP_A, 0);
+          cheapMove (result->aop, 0, ASMOP_A, 0, false);
+  
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
+      break;
+    case 2:
+      if (result->aop->type == AOP_REG) // Let genMove handle all the coalescing, swapw, exg, rlwa, etc).
+        {
+          signed char idxarray[3];
+          idxarray[0] = result->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[1] = result->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[2] = -1;
+          stm8_init_reg_asmop (&swapped_aop, idxarray);
+          genMove (&swapped_aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+        }
+      else if (left->aop->type == AOP_REG)
+        {
+          signed char idxarray[3];
+          idxarray[0] = left->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[1] = left->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[2] = -1;
+          stm8_init_reg_asmop (&swapped_aop, idxarray);
+          genMove (result->aop, &swapped_aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+        }
+      else
+        {
+          if (!regDead (X_IDX, ic))
+            push (ASMOP_X, 0, 2);
+
+          genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), true, regDead (Y_IDX, ic));
+          emit3w (A_SWAPW, ASMOP_X, 0);
+          genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), true, regDead (Y_IDX, ic));
+
+          if (!regDead (X_IDX, ic) && (result->aop->regs[XL_IDX] >= 0 || result->aop->regs[XH_IDX] >= 0))
+            {
+              cost (300, 300);
+              wassertl (regalloc_dry_run, "Swap result partially in non-dead x not implemented.");
+            }
+
+          if (!regDead (X_IDX, ic))
+            pop (ASMOP_X, 0, 2);
+        }
+      break;
+    case 4:
+      if (result->aop->type == AOP_REG) // Let genMove handle all the coalescing, swapw, exg, rlwa, etc).
+        {
+          signed char idxarray[5];
+          idxarray[0] = result->aop->aopu.bytes[2].byteu.reg->rIdx;
+          idxarray[1] = result->aop->aopu.bytes[3].byteu.reg->rIdx;
+          idxarray[2] = result->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[3] = result->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[4] = -1;
+          stm8_init_reg_asmop (&swapped_aop, idxarray);
+          genMove (&swapped_aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+        }
+      else if (left->aop->type == AOP_REG)
+        {
+          signed char idxarray[5];
+          idxarray[0] = left->aop->aopu.bytes[2].byteu.reg->rIdx;
+          idxarray[1] = left->aop->aopu.bytes[3].byteu.reg->rIdx;
+          idxarray[2] = left->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[3] = left->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[4] = -1;
+          stm8_init_reg_asmop (&swapped_aop, idxarray);
+          genMove (result->aop, &swapped_aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+        }
+      else
+        {
+          if (!regDead (X_IDX, ic))
+            push (ASMOP_X, 0, 2);
+          if (!regDead (Y_IDX, ic))
+            push (ASMOP_Y, 0, 2);
+
+          genMove (ASMOP_XY, left->aop, regDead (A_IDX, ic), true, true);
+          genMove (result->aop, ASMOP_YX, regDead (A_IDX, ic), true, true);
+ 
+          if (!regDead (X_IDX, ic) && (result->aop->regs[XL_IDX] >= 0 || result->aop->regs[XH_IDX] >= 0) ||
+            !regDead (Y_IDX, ic) && (result->aop->regs[YL_IDX] >= 0 || result->aop->regs[YH_IDX] >= 0))
+            {
+              cost (300, 300);
+              wassertl (regalloc_dry_run, "Swap result partially in non-dead x/y not implemented.");
+            }
+
+          if (!regDead (Y_IDX, ic))
+            pop (ASMOP_Y, 0, 2);
+          if (!regDead (X_IDX, ic))
+            pop (ASMOP_X, 0, 2);
+        }
+      break;
+    default:
+      wassertl (0, "Unsupported swap size.");
+    }
+
+  freeAsmop (left);
+  freeAsmop (result);
+}
+
+/*------------------------------------------------------------------*/
 /* init_shiftop - find a good place to shift in                     */
 /*------------------------------------------------------------------*/
 static void 
@@ -8923,6 +9053,10 @@ genSTM8iCode (iCode *ic)
 
     case GETABIT:
       genGetABit (ic, ifxForOp (IC_RESULT (ic), ic));
+      break;
+      
+    case SWAP:
+      genSwap (ic);
       break;
 
     case LEFT_OP:

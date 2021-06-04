@@ -1,3 +1,9 @@
+2021-06-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Swap support, inspired by patch #363 by Visenri.
+
 2021-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2349.c,

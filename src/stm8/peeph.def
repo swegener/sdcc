@@ -1159,6 +1159,23 @@ replace restart {
 	; peephole 51 used inc to get #1 into a.
 } if notUsedFrom(%2 'a')
 
+// Unneeded sub-cp
+replace restart {
+	ld	a, %1
+	%2	a, #%3
+} by {
+	ld	a, %1
+	; peephole 600a removed unneeded %2 v1
+} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('c')
+
+replace restart {
+	ld	%1, a
+	%2	a, #%3
+} by {
+	ld	%1, a
+	; peephole 600b removed unneeded %2 v2
+} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('c')
+
 // Do operations directly on stack, leave 'a' as it was, load into 'a' may be removed by dead load optimizations
 replace restart {
 	ld	a, (%1, sp)

@@ -649,10 +649,10 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
      return (pl->line[5] == 'c');
 
   if (!strcmp (what, "n"))
-    return (ISINST (pl->line, "jrmi") || ISINST (pl->line, "jrpl") || ISINST (pl->line, "jrsge") || ISINST (pl->line, "jrsgte") || ISINST (pl->line, "jrsle") || ISINST (pl->line, "jrslt"));
+    return (ISINST (pl->line, "jrmi") || ISINST (pl->line, "jrpl") || ISINST (pl->line, "jrsge") || ISINST (pl->line, "jrsgt") || ISINST (pl->line, "jrsle") || ISINST (pl->line, "jrslt"));
 
   if (!strcmp (what, "z"))
-    return (ISINST (pl->line, "jreq") || ISINST (pl->line, "jrne") || ISINST (pl->line, "jrsgte") || ISINST (pl->line, "jrsle"));
+    return (ISINST (pl->line, "jreq") || ISINST (pl->line, "jrne") || ISINST (pl->line, "jrsgt") || ISINST (pl->line, "jrsle"));
 
   if (!strcmp (what, "c"))
     return (ISINST (pl->line, "jrc") || ISINST (pl->line, "jrnc") || ISINST (pl->line, "jruge") || ISINST (pl->line, "jrugt") || ISINST (pl->line, "jrule") || ISINST (pl->line, "jrult") ||

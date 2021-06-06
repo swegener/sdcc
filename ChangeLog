@@ -1,3 +1,9 @@
+2021-06-04 Visenri
+	* src/stm8/peep.c,
+	  Fixed typo regarding instruction 'jrsgt'.
+	* src/stm8/peeph.def:
+	  Added rules 600a & 600b from patch #362 that were failing because of the 'jrsgt' typo.
+
 2021-06-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

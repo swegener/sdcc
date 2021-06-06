@@ -1301,44 +1301,6 @@ replace restart {
 replace restart {
 	ld	a, (%1, sp)
 	swap	a
-	and	a, #%3
-	ld	(%2, sp), a
-	ld	a, (%1, sp)
-	swap	a
-	and	a, #%4
-	%5	a, (%2, sp)
-} by {
-	ld	a, (%1, sp)
-	swap	a
-	push	a
-	and	a, #%3
-	ld	(%7, sp), a
-	pop	a
-	; peephole 660a optimized swap (v1).
-} if same(%5 'or' 'add'), operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(0 255 '+' %2 1 %7)
-
-replace restart {
-	ld	(%1, sp), a
-	swap	a
-	and	a, #%3
-	ld	(%2, sp), a
-	ld	a, (%1, sp)
-	swap	a
-	and	a, #%4
-	%5	a, (%2, sp)
-} by {
-	ld	(%1, sp), a
-	swap	a
-	push	a
-	and	a, #%3
-	ld	(%7, sp), a
-	pop	a
-	; peephole 660b optimized swap (v2).
-} if same(%5 'or' 'add'), operandsLiteral(%3 %4), immdInRange(0xFF 0xFF '^' %3 %4 %6), immdInRange(0 255 '+' %2 1 %7)
-
-replace restart {
-	ld	a, (%1, sp)
-	swap	a
 	and	a, #%3	
 	ld	xl, a
 	ld	a, (%1, sp)

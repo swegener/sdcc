@@ -1,3 +1,9 @@
+2021-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Rotate support, inspired by patch #363 by Visenri.
+
 2021-06-07 Visenri
 	* src/stm8/peeph.def:
 	  Removed unused rules 660a & 660b because of patches applied in r12420 (SWAP implementation).

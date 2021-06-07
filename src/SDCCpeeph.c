@@ -2080,7 +2080,7 @@ stringMatchesOperator (const char * str, const char *op)
 /*-----------------------------------------------------------------*/
 FBYNAME (immdInRange)
 {
-  char r[64], operator[8];
+  char r[64], operator[24];
   const char *op;
   long i, j, k, h, low, high, left_l, right_l, order;
 
@@ -2111,7 +2111,7 @@ FBYNAME (immdInRange)
               return immdError ("bad upper bound", r, cmdLine);
             break;
           case 2: // operator
-            if (sscanf (r, "%s", operator) != 1)
+            if (sscanf (r, "%23s", operator) != 1)
               return immdError ("bad operator", r, cmdLine);
             break;
           case 3: // left operand

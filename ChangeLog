@@ -1,3 +1,7 @@
+2021-06-08 Visenri
+	* src/SDCCpeeph.c:
+	  Fixed buffer overflow in operand string in "immdInRange" function.
+	  
 2021-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

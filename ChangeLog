@@ -1,7 +1,8 @@
 2021-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,
-	  src/stm8/gen.c:
+	  src/stm8/gen.c,
+	  src/stm8/ralloc2.cc:
 	  Rotate support, inspired by patch #363 by Visenri.
 
 2021-06-07 Visenri

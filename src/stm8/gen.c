@@ -6553,7 +6553,7 @@ genRotate (const iCode *ic)
 {
   operand *left, *result;
 
-  D (emit2 ("; genRoate", ""));
+  D (emit2 ("; genRotate", ""));
 
   aopOp (left = IC_LEFT (ic), ic);
   aopOp (result = IC_RESULT (ic), ic);
@@ -6586,12 +6586,12 @@ genRotate (const iCode *ic)
           if (!regDead (A_IDX, ic))
             push (ASMOP_A, 0, 1);
           cheapMove (ASMOP_A, 0, left->aop, 0, false);
-          if (rlc)
+          if (rlc) // 3 bytes, 2 cycles.
             {
               emit3 (A_SLL, ASMOP_A, 0);
               emit3 (A_ADC, ASMOP_A, ASMOP_ZERO);
             }
-          else if (!aopInReg (left->aop, 0, 1) && aopOnStack (left->aop, 0, 1)) // 4 bytes, 3 cycles.
+          else if (aopOnStack (left->aop, 0, 1) || (!aopInReg (left->aop, 0, A_IDX) && left->aop->type == AOP_REG)) // 3 or 4 bytes, 3 cycles.
             {
               emit3 (A_SRL, ASMOP_A, 0); // Get lowest bit into carry
               cheapMove (ASMOP_A, 0, left->aop, 0, false);

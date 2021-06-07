@@ -10695,40 +10695,6 @@ genGetWord (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
-/*-----------------------------------------------------------------*/
-static void
-genGetHbit (const iCode * ic)
-{
-  operand *left, *result;
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-
-  aopOp (left, ic, FALSE, FALSE);
-  aopOp (result, ic, TRUE, FALSE);
-
-  /* get the highest order byte into a */
-  cheapMove (ASMOP_A, 0, left->aop, left->aop->size - 1, true);
-
-  if (result->aop->type == AOP_CRY)
-    {
-      emit3 (A_RL, ASMOP_A, 0);
-      outBitC (result);
-    }
-  else
-    {
-      emit3 (A_RLCA, 0, 0);
-      emit2 ("and a, !one");
-      regalloc_dry_run_cost += 2;
-      outAcc (result);
-    }
-
-
-  freeAsmop (left, NULL);
-  freeAsmop (result, NULL);
-}
-
-/*-----------------------------------------------------------------*/
 /* genGetAbit - generates code get a single bit                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -15389,8 +15355,7 @@ genZ80iCode (iCode * ic)
       break;
 
     case GETHBIT:
-      emitDebug ("; genGetHbit");
-      genGetHbit (ic);
+      wassert (0);
       break;
 
     case GETABIT:

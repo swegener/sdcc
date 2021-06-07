@@ -4,6 +4,10 @@
 	  src/stm8/gen.c,
 	  src/stm8/ralloc2.cc:
 	  Rotate support, inspired by patch #363 by Visenri.
+	* src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/ralloc2.cc:
+	  Remove redundant z80 GETHBIT support.
 
 2021-06-07 Visenri
 	* src/stm8/peeph.def:

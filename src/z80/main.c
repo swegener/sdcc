@@ -925,16 +925,15 @@ hasExtBitOp (int op, int size)
   switch (op)
     {
     case GETABIT:
-    case GETHBIT:
     case GETBYTE:
     case GETWORD:
     case RLC:
     case RRC:
-      return TRUE;
+      return true;
     case SWAP:
       return size <= 4;
     }
-  return FALSE;
+  return false;
 }
 
 /* Indicate the expense of an access to an output storage class */

@@ -706,7 +706,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       ic->op != '>' &&
       ic->op != CALL &&
       ic->op != PCALL &&
-      ic->op != GETHBIT &&
       !((ic->op == LEFT_OP || ic->op == RIGHT_OP) && IS_OP_LITERAL(right)))
     {
       //std::cout << "First use: Dropping at " << i << ", " << ic->key << "(" << int(ic->op) << "\n";
@@ -1295,7 +1294,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case EQ_OP:
     case AND_OP:
     case OR_OP:
-    case GETHBIT:
     case GETABIT:
     case GETBYTE:
     case GETWORD:

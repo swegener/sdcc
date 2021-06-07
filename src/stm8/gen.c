@@ -1182,7 +1182,7 @@ aopOp (operand *op, const iCode *ic)
 }
 
 // Get asmop for registers containing the return type of function
-// Returns 0 is the function does not have a return value or it is not returned in registers.
+// Returns 0 if the function does not have a return value or it is not returned in registers.
 static asmop *
 aopRet (sym_link *ftype)
 {
@@ -1216,7 +1216,7 @@ aopRet (sym_link *ftype)
 }
 
 // Get asmop for registers containing a parameter
-// Returns 0 is the parameter is passed on the stack
+// Returns 0 if the parameter is passed on the stack
 static asmop *
 aopArg (sym_link *ftype, int i)
 {

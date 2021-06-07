@@ -145,6 +145,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
   class cl_commander_base *cmd= app->get_commander();
   class cl_option *o= app->options->get_option("quit");
   bool q_opt= false;
+  unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
 
   if (o)
     o->get_value(&q_opt);
@@ -241,7 +242,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  }
          break;
 	case resSTEP:
-	  cmd->frozen_console->dd_printf("\n");
+	  cmd->frozen_console->dd_printf("stepped %ld ticks\n", dt);
 	  uc->print_regs(cmd->frozen_console);
 	  break;
 	case resERROR:
@@ -258,7 +259,6 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  break;
 	}
       cmd->frozen_console->dd_cprintf("answer", "F 0x%06x\n", AU(uc->PC)); // for sdcdb
-      unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
       if ((reason != resSTEP) ||
 	  (steps_done > 1))
 	{

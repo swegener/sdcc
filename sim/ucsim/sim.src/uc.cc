@@ -1854,6 +1854,7 @@ int
 cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
 {
   char *dis;
+  chars cdis, comment;
   class cl_brk *b;
   int i, l, len= 0;
   class cl_option *o= sim->app->options->get_option("black_and_white");
@@ -1877,7 +1878,8 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
     }
 
   b= fbrk_at(addr);
-  dis= disass(addr);
+  dis= disassc(addr, &comment);
+  cdis= dis;
   if (b)
     len+= con->dd_cprintf("answer", "%c", (b->perm == brkFIX)?'F':'D');
   else
@@ -1901,7 +1903,11 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
 	len+= con->dd_printf(" "), j--;
       i++;
     }
-  len+= con->dd_cprintf("dump_char", " %s", dis);
+  if (comment.nempty())
+    while (cdis.len() < 20) cdis.append(' ');
+  len+= con->dd_cprintf("dump_char", " %s", cdis.c_str());
+  if (comment.nempty())
+    len+= con->dd_cprintf("comment", " %s", comment.c_str());
   if (nl)
     {
       if (!bw)

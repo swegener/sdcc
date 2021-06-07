@@ -74,6 +74,11 @@ static int uc_yy_input(char *buf, int max_size);
   return PTOK_NUMBER;
 }
 
+$[0-9a-fA-F]+ {
+  yylval.number= strtol(&yytext[1], 0, 16);
+  return PTOK_NUMBER;
+}
+
 [a-zA-Z_][0-9a-zA-Z_]*	return(uc_yy_check_id(yytext));
 
 '.*' {

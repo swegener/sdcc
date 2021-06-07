@@ -361,26 +361,26 @@ cl_hc08::disass(t_addr addr)
 	    case 'w': // w    word immediate operand
 	      operand= ((rom->get(addr+immed_offset)<<8) |
 		       (rom->get(addr+immed_offset+1)));
-	      temp.format("#0x%04x", operand);
+	      temp.format("#$%04x", operand);
 	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      ++immed_offset;
 	      break;
 	    case 'b': // b    byte immediate operand
-	      temp.format("#0x%02x", (uint)rom->get(addr+immed_offset));
+	      temp.format("#$%02x", (uint)rom->get(addr+immed_offset));
 	      ++immed_offset;
 	      break;
 	    case 'x': // x    extended addressing
 	      operand= ((rom->get(addr+immed_offset)<<8) |
 		       (rom->get(addr+immed_offset+1)));
-	      temp.format("0x%04x", operand);
+	      temp.format("$%04x", operand);
 	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      ++immed_offset;
 	      break;
 	    case 'd': // d    direct addressing
 	      operand= rom->get(addr+immed_offset);
-	      temp.format("*0x%02x", operand);
+	      temp.format("*$%02x", operand);
 	      addr_name(operand, rom, &temp);
 	      ++immed_offset;
 	      break;
@@ -390,7 +390,7 @@ cl_hc08::disass(t_addr addr)
 			      (rom->get(addr+immed_offset+1)));
 		// Assumption: the word offset address is the address of a
 		// fixed table and index register selects an entry.
-		temp.format("0x%04x", operand);
+		temp.format("$%04x", operand);
 		addr_name(operand, rom, &temp);
 		++immed_offset;
 		++immed_offset;
@@ -399,13 +399,13 @@ cl_hc08::disass(t_addr addr)
 	    case '1': // b    byte index offset
 	      // Assumption: the index register points to a struct/record
 	      // and the byte offset selects an entry.
-              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("$%02x", (uint)rom->get(addr+immed_offset));
 	      ++immed_offset;
 	      break;
 	    case 'p': // p    pc relative
 	      {
 		operand= (addr+immed_offset+1 + (i8_t)rom->get(addr+immed_offset)) & 0xffff;
-		temp.format("0x%04x", operand);
+		temp.format("$%04x", operand);
 		addr_name(operand, rom, &temp);
 		++immed_offset;
 		break;
@@ -428,9 +428,9 @@ void
 cl_hc08::print_regs(class cl_console_base *con)
 {
   con->dd_color("answer");
-  con->dd_printf("V--HINZC  Flags= 0x%02x %3d %c  ",
+  con->dd_printf("V--HINZC  Flags= $%02x %3d %c  ",
 		 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
-  con->dd_printf("A= 0x%02x %3d %c\n",
+  con->dd_printf("A= $%02x %3d %c\n",
 		 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
   con->dd_printf("%c--%c%c%c%c%c  ",
 		 (regs.P&BIT_V)?'1':'0',
@@ -439,14 +439,14 @@ cl_hc08::print_regs(class cl_console_base *con)
 		 (regs.P&BIT_N)?'1':'0',
 		 (regs.P&BIT_Z)?'1':'0',
 		 (regs.P&BIT_C)?'1':'0');
-  con->dd_printf("    H= 0x%02x %3d %c  ",
+  con->dd_printf("    H= $%02x %3d %c  ",
 		 regs.H, regs.H, isprint(regs.H)?regs.H:'.');
-  con->dd_printf("X= 0x%02x %3d %c\n",
+  con->dd_printf("X= $%02x %3d %c\n",
 		 regs.X, regs.X, isprint(regs.X)?regs.X:'.');
-  con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c",
+  con->dd_printf("SP= $%04x [SP+1]= %02x %3d %c",
                  regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
                  isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.');
-  con->dd_printf("  Limit= 0x%04x\n", AU(sp_limit));
+  con->dd_printf("  Limit= $%04x\n", AU(sp_limit));
   
   print_disass(PC, con);
 }

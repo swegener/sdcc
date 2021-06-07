@@ -9,11 +9,11 @@ Controller has 4 hardware element(s).
   off vcd[0]
    on dreg[0]
    on irq[0]
-A= 0x00   0   +0 .  X= 0x00   0   +0 .  Y= 0x00   0   +0 .  
+A= $00   0   +0 .  X= $00   0   +0 .  Y= $00   0   +0 .  
 P= 00100100
    NV BDIZC
 S= 0x0100 95 aa 82 ca 6c 49 ae 90 ....lI..
- ? 0xf719 bd -- UNKNOWN/INVALID[0K
+ ? 0xf719 bd e0 7e LDA    $7ee0,X       ; [$7ee0]=$68[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

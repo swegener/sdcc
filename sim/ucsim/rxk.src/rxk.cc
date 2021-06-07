@@ -193,7 +193,7 @@ cl_rxk::dis_tbl(void)
 }
 
 char *
-cl_rxk::disass(t_addr addr)
+cl_rxk::disassc(t_addr addr, chars *comment)
 {
   chars work, temp;
   const char *b;
@@ -232,14 +232,15 @@ cl_rxk::disass(t_addr addr)
 	    case 'w':
 	      l= rom->get(++addr);
 	      h= rom->get(++addr);
-	      temp.format("0x%04x", h*256+l);
+	      work.appendf("0x%04x", h*256+l);
 	      break;
 	    case 'b':
 	      l= rom->get(++addr);
-	      temp.format("0x%02x", l);
+	      work.appendf("0x%02x", l);
 	      break;
 	    }
-	  work+= temp;
+	  if (comment && temp.nempty())
+	    comment->append(temp);
 	}
       else
 	work+= b[i];

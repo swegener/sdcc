@@ -280,7 +280,7 @@ cl_m6800::dis_tbl(void)
 }
 
 char *
-cl_m6800::disass(t_addr addr)
+cl_m6800::disassc(t_addr addr, chars *comment)
 {
   chars work= chars(), temp= chars();
   const char *b;
@@ -321,46 +321,51 @@ cl_m6800::disass(t_addr addr)
 	    case 'x': case 'X': // indexed
 	      h= rom->read(addr+1);
 	      a= rX+h;
-	      temp.format("0x%02x,X", h);
+	      work.appendf("$%02x,X", h);
+	      //add_spaces(&work, 20);
 	      if (b[i]=='x')
-		temp.appendf(" [0x%04x]=0x%02x", a, rom->read(a));
+		temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
 	      else
-		temp.appendf(" [0x%04x]=0x%04x", a, read_addr(rom, a));
+		temp.appendf("; [$%04x]=$%04x", a, read_addr(rom, a));
 	      break;
 	    case 'e': case 'E': // extended
 	      h= rom->read(addr+1);
 	      l= rom->read(addr+2);
 	      a= h*256 + l;
-	      temp.format("0x%04x", a);
+	      work.appendf("$%04x", a);
+	      //add_spaces(&work, 20);
 	      if (b[i]=='e')
-		temp.appendf(" [0x%04x]=0x%02x", a, rom->read(a));
+		temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
 	      else
-		temp.appendf(" [0x%04x]=0x%04x", a,
+		temp.appendf("; [$%04x]=$%04x", a,
 			     read_addr(rom, a));
 	      break;
 	    case 'd': case 'D': // direct
 	      h= a= rom->read(addr+1);
-	      temp.format("0x00%02x", h);
+	      work.appendf("$00%02x", h);
+	      //add_spaces(&work, 20);
 	      if (b[i]=='d')
-		temp.appendf(" [0x%04x]=0x%02x", a, rom->read(a));
+		temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
 	      else
-		temp.appendf(" [0x%04x]=0x%04x", a,
+	        temp.appendf("; [$%04x]=$%04x", a,
 			     read_addr(rom, a));
 	      break;
 	    case 'b': // immediate 8 bit
-	      temp.format("#0x%02x",
-			  rom->read(addr+1));
+	      work.appendf("#$%02x",
+			   rom->read(addr+1));
 	      break;
 	    case 'B': // immediate 16 bit
-	      temp.format("#0x%04x",
-			  read_addr(rom, addr+1));
+	      work.appendf("#$%04x",
+			   read_addr(rom, addr+1));
 	      break;
 	    case 'r': // relative
-	      temp.format("0x%04x",
-			  (addr+2+(i8_t)(rom->read(addr+1))) & 0xffff );
+	      work.appendf("$%04x",
+			   (addr+2+(i8_t)(rom->read(addr+1))) & 0xffff );
 	      break;
 	    }
-	  work+= temp;
+	  //work+= temp;
+	  if (comment && temp.nempty())
+	    comment->append(temp);
 	}
       else
 	work+= b[i];
@@ -382,8 +387,8 @@ void
 cl_m6800::print_regs(class cl_console_base *con)
 {
   con->dd_color("answer");
-  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
-  con->dd_printf("B= 0x%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
+  con->dd_printf("A= $%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("B= $%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
   con->dd_printf("\n");
   con->dd_printf("CC= "); con->print_bin(CC, 8); con->dd_printf("\n");
   con->dd_printf("      HINZVC\n");
@@ -402,17 +407,12 @@ cl_m6800::print_regs(class cl_console_base *con)
 int
 cl_m6800::exec_inst(void)
 {
-  t_mem code;
   int res= resGO;
 
   if ((res= exec_inst_tab(itab)) != resNOT_DONE)
     return res;
 
-  instPC= PC;
-  if (fetch(&code))
-    return(resBREAKPOINT);
-  tick(1);
-  res= inst_unknown(code);
+  inst_unknown(rom->read(instPC));
   return(res);
 }
 

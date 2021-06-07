@@ -43,23 +43,23 @@ cl_mcs6502::BRK(t_mem code)
 int
 cl_mcs6502::RTI(t_mem code)
 {
-  u8_t l, h;
-  rSP++;
+  //u8_t l, h;
+  cSP.W(rSP+1);
   cF.W(rom->read(0x0100 + rSP));
-  rSP++;
+  vc.rd+= 1;
+  /*cSP.W(rSP+1);
   l= rom->read(0x0100 + rSP);
-  rSP++;
-  h= rom->read(0x0100 + rSP);
-  vc.rd+= 3;
-  PC= h*256 + l;
-  tick(5);
+  cSP.W(rSP+1);
+  h= rom->read(0x0100 + rSP);*/
+  PC= pop_addr();//h*256 + l;
+  tick(3);
   return resGO;
 }
 
 int
 cl_mcs6502::CLI(t_mem code)
 {
-  rF&= ~flagI;
+  cF.W(rF&= ~flagI);
   tick(1);
   return resGO;
 }
@@ -67,7 +67,7 @@ cl_mcs6502::CLI(t_mem code)
 int
 cl_mcs6502::SEI(t_mem code)
 {
-  rF|= flagI;
+  cF.W(rF|= flagI);
   tick(1);
   return resGO;
 }
@@ -77,7 +77,7 @@ cl_mcs6502::PHP(t_mem code)
 {
   rom->write(0x0100 + rSP, rF);
   vc.wr++;
-  rSP--;
+  cSP.W(rSP-1);
   tick(2);
   return resGO;
 }
@@ -85,7 +85,7 @@ cl_mcs6502::PHP(t_mem code)
 int
 cl_mcs6502::CLC(t_mem code)
 {
-  rF&= ~flagC;
+  cF.W(rF&= ~flagC);
   tick(1);
   return resGO;
 }
@@ -93,7 +93,7 @@ cl_mcs6502::CLC(t_mem code)
 int
 cl_mcs6502::PLP(t_mem code)
 {
-  rSP++;
+  cSP.W(rSP+1);
   cF.W(rom->read(0x0100 + rSP));
   vc.rd++;
   tick(3);
@@ -103,7 +103,7 @@ cl_mcs6502::PLP(t_mem code)
 int
 cl_mcs6502::SEc(t_mem code)
 {
-  rF|= flagC;
+  cF.W(rF|= flagC);
   tick(1);
   return resGO;
 }
@@ -113,7 +113,7 @@ cl_mcs6502::PHA(t_mem code)
 {
   rom->write(0x0100 + rSP, rA);
   vc.wr++;
-  rSP--;
+  cSP.W(rSP-1);
   tick(2);
   return resGO;
 }
@@ -121,7 +121,7 @@ cl_mcs6502::PHA(t_mem code)
 int
 cl_mcs6502::PLA(t_mem code)
 {
-  rSP++;
+  cSP.W(rSP+1);
   cA.W(rom->read(0x0100 + rSP));
   vc.rd++;
   tick(3);
@@ -131,7 +131,7 @@ cl_mcs6502::PLA(t_mem code)
 int
 cl_mcs6502::CLV(t_mem code)
 {
-  rF&= ~flagV;
+  cF.W(rF&= ~flagV);
   tick(1);
   return resGO;
 }
@@ -139,7 +139,7 @@ cl_mcs6502::CLV(t_mem code)
 int
 cl_mcs6502::CLD(t_mem code)
 {
-  rF&= ~flagD;
+  cF.W(rF&= ~flagD);
   tick(1);
   return resGO;
 }
@@ -148,7 +148,7 @@ cl_mcs6502::CLD(t_mem code)
 int
 cl_mcs6502::SED(t_mem code)
 {
-  rF|= flagD;
+  cF.W(rF|= flagD);
   tick(1);
   return resGO;
 }

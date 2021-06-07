@@ -693,6 +693,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	set_option_s("color_dump_address", "blue:bwhite");
 	set_option_s("color_dump_number", "bblack:bwhite");
 	set_option_s("color_dump_char", "black:bwhite");
+	set_option_s("color_comment", "magenta:bwhite");
 	set_option_s("color_error", "red:bwhite");
 	set_option_s("color_ui_mkey", "green:bwhite");
 	set_option_s("color_ui_mitem", "bblack:bwhite");
@@ -1101,6 +1102,11 @@ cl_app::mk_options(void)
 					      "Text color in dump"));
   o->init();
   o->set_value("green:black");
+
+  options->new_option(o= new cl_string_option(this, "color_comment",
+					      "Comment color in disassembly"));
+  o->init();
+  o->set_value("magenta:black");
   
   options->new_option(o= new cl_string_option(this, "color_error",
 					      "Text color in error messages"));

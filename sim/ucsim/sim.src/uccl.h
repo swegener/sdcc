@@ -389,6 +389,7 @@ public:
   
   // disassembling and symbol recognition
   virtual char *disass(t_addr addr);
+  virtual char *disassc(t_addr addr, chars *comment= NULL) { return disass(addr); }
   virtual struct dis_entry *dis_tbl(void);
   virtual int print_disass(t_addr addr, class cl_console_base *con, bool nl);
   virtual int print_disass(t_addr addr, class cl_console_base *con);

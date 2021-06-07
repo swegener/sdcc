@@ -238,6 +238,7 @@ CMDHELP(cl_step_cmd,
 	"step [number[unit]]",
 	"Step",
 	"long help of step")
+
 /*
  * Command: next
  *----------------------------------------------------------------------------
@@ -526,8 +527,24 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 CMDHELP(cl_expression_cmd,
 	"expression [/format] expr",
 	"Evaluate the expression and print result",
-	"Parameter of the command is interpreted as an expression, the value evaluated\n"
-	"and the result is printed.")
+	"Parameter of the command is interpreted as an expression,\n"
+	"the value evaluated and the result is printed.\n"
+	"Optional format specifier can be used to specify output format,\n"
+	"for example printig 0xa5f can be formatted as:\n"
+	" /x hexadecimal, without prefix: 5fa\n"
+	" /X hexadecimal with 0x prefix: 0x5fa\n"
+	" /$ hexadecimal with $ prefix: $5fa\n"
+	" /0 hexadecimal with 0x prefix, leading zeros to length 8: 0x00000a5f\n"
+	" /d signed 32 bit decimal (default): 2655\n"
+	" /o octal: 5137\n"
+	" /u unsigned 32 bit decimal: 2655\n"
+	" /b 32 bit binary without prefix: 00000000000000000000101001011111\n"
+	" /B C style boolean value with 1|0: 1\n"
+	" /L logical boolean value with T|F: T\n"
+	" /c ascii character in C style escape: \'\\5137\'\n"
+	"If more format characters are specified then result is printed in all\n"
+	"requested format.\n"
+	)
 
 
 /*

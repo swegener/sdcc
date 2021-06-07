@@ -30,6 +30,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 instruction_wrapper_fn itab[256];
 
+/*	Formats
+	x (ind,X)
+	y (ind),Y
+	a abs
+	z zpg
+	X zpg,X
+	Y zpg,Y
+	i abs,X
+	p abs.Y
+	r rel
+	# imm8
+*/
+
 // code mask branch len mn call tick
 struct dis_entry disass_mcs6502[]=
   {
@@ -57,6 +70,154 @@ struct dis_entry disass_mcs6502[]=
     { 0xaa, 0xff, ' ', 1, "TAX" },
     { 0xba, 0xff, ' ', 1, "TSX" },
     { 0xca, 0xff, ' ', 1, "DEX" },
+
+    { 0x01, 0xff, ' ', 2, "ORA %x" },
+    { 0x11, 0xff, ' ', 2, "ORA %y" },
+    { 0x05, 0xff, ' ', 2, "ORA %z" },
+    { 0x15, 0xff, ' ', 2, "ORA %X" },
+    { 0x09, 0xff, ' ', 2, "ORA %#" },
+    { 0x19, 0xff, ' ', 3, "ORA %p" },
+    { 0x0d, 0xff, ' ', 3, "ORA %a" },
+    { 0x1d, 0xff, ' ', 3, "ORA %i" },
+
+    { 0x21, 0xff, ' ', 2, "AND %x" },
+    { 0x31, 0xff, ' ', 2, "AND %y" },
+    { 0x25, 0xff, ' ', 2, "AND %z" },
+    { 0x35, 0xff, ' ', 2, "AND %X" },
+    { 0x29, 0xff, ' ', 2, "AND %#" },
+    { 0x39, 0xff, ' ', 3, "AND %p" },
+    { 0x2d, 0xff, ' ', 3, "AND %a" },
+    { 0x3d, 0xff, ' ', 3, "AND %i" },
+
+    { 0x41, 0xff, ' ', 2, "EOR %x" },
+    { 0x51, 0xff, ' ', 2, "EOR %y" },
+    { 0x45, 0xff, ' ', 2, "EOR %z" },
+    { 0x55, 0xff, ' ', 2, "EOR %X" },
+    { 0x49, 0xff, ' ', 2, "EOR %#" },
+    { 0x59, 0xff, ' ', 3, "EOR %p" },
+    { 0x4d, 0xff, ' ', 3, "EOR %a" },
+    { 0x5d, 0xff, ' ', 3, "EOR %i" },
+
+    { 0x61, 0xff, ' ', 2, "ADC %x" },
+    { 0x71, 0xff, ' ', 2, "ADC %y" },
+    { 0x65, 0xff, ' ', 2, "ADC %z" },
+    { 0x75, 0xff, ' ', 2, "ADC %X" },
+    { 0x69, 0xff, ' ', 2, "ADC %#" },
+    { 0x79, 0xff, ' ', 3, "ADC %p" },
+    { 0x6d, 0xff, ' ', 3, "ADC %a" },
+    { 0x7d, 0xff, ' ', 3, "ADC %i" },
+
+    { 0x81, 0xff, ' ', 2, "STA %x" },
+    { 0x91, 0xff, ' ', 2, "STA %y" },
+    { 0x85, 0xff, ' ', 2, "STA %z" },
+    { 0x95, 0xff, ' ', 2, "STA %X" },
+    { 0x99, 0xff, ' ', 3, "STA %p" },
+    { 0x8d, 0xff, ' ', 3, "STA %a" },
+    { 0x9d, 0xff, ' ', 3, "STA %i" },
+
+    { 0xa1, 0xff, ' ', 2, "LDA %x" },
+    { 0xb1, 0xff, ' ', 2, "LDA %y" },
+    { 0xa5, 0xff, ' ', 2, "LDA %z" },
+    { 0xb5, 0xff, ' ', 2, "LDA %X" },
+    { 0xa9, 0xff, ' ', 2, "LDA %#" },
+    { 0xb9, 0xff, ' ', 3, "LDA %p" },
+    { 0xad, 0xff, ' ', 3, "LDA %a" },
+    { 0xbd, 0xff, ' ', 3, "LDA %i" },
+
+    { 0xc1, 0xff, ' ', 2, "CMP %x" },
+    { 0xd1, 0xff, ' ', 2, "CMP %y" },
+    { 0xc5, 0xff, ' ', 2, "CMP %z" },
+    { 0xd5, 0xff, ' ', 2, "CMP %X" },
+    { 0xc9, 0xff, ' ', 2, "CMP %#" },
+    { 0xd9, 0xff, ' ', 3, "CMP %p" },
+    { 0xcd, 0xff, ' ', 3, "CMP %a" },
+    { 0xdd, 0xff, ' ', 3, "CMP %i" },
+
+    { 0xe1, 0xff, ' ', 2, "SBC %x" },
+    { 0xf1, 0xff, ' ', 2, "SBC %y" },
+    { 0xe5, 0xff, ' ', 2, "SBC %z" },
+    { 0xf5, 0xff, ' ', 2, "SBC %X" },
+    { 0xe9, 0xff, ' ', 2, "SBC %#" },
+    { 0xf9, 0xff, ' ', 3, "SBC %p" },
+    { 0xed, 0xff, ' ', 3, "SBC %a" },
+    { 0xfd, 0xff, ' ', 3, "SBC %i" },
+
+    { 0x84, 0xff, ' ', 2, "STY %z" },
+    { 0x94, 0xff, ' ', 2, "STY %X" },
+    { 0x8c, 0xff, ' ', 3, "STY %a" },
+    { 0x86, 0xff, ' ', 2, "STX %z" },
+    { 0x96, 0xff, ' ', 2, "STX %Y" },
+    { 0x8e, 0xff, ' ', 3, "STX %a" },
+
+    { 0xa0, 0xff, ' ', 2, "LDY %#" },
+    { 0xa4, 0xff, ' ', 2, "LDY %z" },
+    { 0xb4, 0xff, ' ', 2, "LDY %X" },
+    { 0xac, 0xff, ' ', 3, "LDY %a" },
+    { 0xbc, 0xff, ' ', 3, "LDY %i" },
+    { 0xa2, 0xff, ' ', 2, "LDX %#" },
+    { 0xa6, 0xff, ' ', 2, "LDX %z" },
+    { 0xb6, 0xff, ' ', 2, "LDX %Y" },
+    { 0xae, 0xff, ' ', 3, "LDX %a" },
+    { 0xbe, 0xff, ' ', 3, "LDX %p" },
+
+    { 0xc0, 0xff, ' ', 2, "CPY %#" },
+    { 0xc4, 0xff, ' ', 2, "CPY %z" },
+    { 0xcc, 0xff, ' ', 3, "CPY %a" },
+    { 0xe0, 0xff, ' ', 2, "CPX %#" },
+    { 0xe4, 0xff, ' ', 2, "CPX %z" },
+    { 0xec, 0xff, ' ', 3, "CPX %a" },
+
+    { 0xe6, 0xff, ' ', 2, "INC %z" },
+    { 0xf6, 0xff, ' ', 2, "INC %X" },
+    { 0xee, 0xff, ' ', 3, "INC %a" },
+    { 0xfe, 0xff, ' ', 3, "INC %i" },
+    { 0xc6, 0xff, ' ', 2, "DEC %z" },
+    { 0xd6, 0xff, ' ', 2, "DEC %X" },
+    { 0xce, 0xff, ' ', 3, "DEC %a" },
+    { 0xde, 0xff, ' ', 3, "DEC %i" },
+
+    { 0x06, 0xff, ' ', 2, "ASL %z" },
+    { 0x16, 0xff, ' ', 2, "ASL %X" },
+    { 0x0a, 0xff, ' ', 2, "ASL A" },
+    { 0x0e, 0xff, ' ', 3, "ASL %a" },
+    { 0x1e, 0xff, ' ', 3, "ASL %i" },
+
+    { 0x46, 0xff, ' ', 2, "LSR %z" },
+    { 0x56, 0xff, ' ', 2, "LSR %X" },
+    { 0x4a, 0xff, ' ', 2, "LSR A" },
+    { 0x4e, 0xff, ' ', 3, "LSR %a" },
+    { 0x5e, 0xff, ' ', 3, "LSR %i" },
+
+    { 0x26, 0xff, ' ', 2, "ROL %z" },
+    { 0x36, 0xff, ' ', 2, "ROL %X" },
+    { 0x2a, 0xff, ' ', 2, "ROL A" },
+    { 0x2e, 0xff, ' ', 3, "ROL %a" },
+    { 0x3e, 0xff, ' ', 3, "ROL %i" },
+
+    { 0x66, 0xff, ' ', 2, "ROR %z" },
+    { 0x76, 0xff, ' ', 2, "ROR %X" },
+    { 0x6a, 0xff, ' ', 2, "ROR A" },
+    { 0x6e, 0xff, ' ', 3, "ROR %a" },
+    { 0x7e, 0xff, ' ', 3, "ROR %i" },
+
+    { 0x24, 0xff, ' ', 2, "BIT %z" },
+    { 0x2c, 0xff, ' ', 3, "BIT %a" },
+
+    { 0x4c, 0xff, ' ', 3, "JMP %j" },
+    { 0x6c, 0xff, ' ', 3, "JMP %J" },
+    
+    { 0x20, 0xff, ' ', 3, "JSR %j" },
+    { 0x60, 0xff, ' ', 3, "RTS" },
+
+    { 0x10, 0xff, ' ', 2, "BPL %r" },
+    { 0x30, 0xff, ' ', 2, "BMI %r" },
+    { 0x50, 0xff, ' ', 2, "BVC %r" },
+    { 0x70, 0xff, ' ', 2, "BVS %r" },
+    { 0x90, 0xff, ' ', 2, "BCC %r" },
+    { 0xb0, 0xff, ' ', 2, "BCS %r" },
+    { 0xd0, 0xff, ' ', 2, "BNE %r" },
+    { 0xf0, 0xff, ' ', 2, "BEQ %r" },
+    
     { 0, 0, 0, 0, 0, 0 }
   };
 

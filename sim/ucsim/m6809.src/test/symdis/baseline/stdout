@@ -11,11 +11,11 @@ dc 0x0000 0x0008
  ? 0x0000 0e 02          JMP    [0K
 
    0x0002 <main>:
- ? 0x0002 86 00          LDA    #0x00[0K
- ? 0x0004 27 02          BEQ    0x0008 <forever>[0K
- ? 0x0006 86 01          LDA    #0x01[0K
+ ? 0x0002 86 00          LDA    #$00[0K
+ ? 0x0004 27 02          BEQ    $0008 <forever>[0K
+ ? 0x0006 86 01          LDA    #$01[0K
 
    0x0008 <forever>:
- ? 0x0008 20 fe          BRA    0x0008 <forever>[0K
+ ? 0x0008 20 fe          BRA    $0008 <forever>[0K
 Loading from test.ihx
 10 words read from test.ihx

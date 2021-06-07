@@ -172,7 +172,7 @@ cl_mcs6502::dis_tbl(void)
 }
 
 char *
-cl_mcs6502::disass(t_addr addr)
+cl_mcs6502::disassc(t_addr addr, chars *comment)
 {
   chars work= chars(), temp= chars();
   const char *b;
@@ -180,6 +180,8 @@ cl_mcs6502::disass(t_addr addr)
   struct dis_entry *dt= dis_tbl();//, *dis_e;
   int i;
   bool first;
+  u8_t h, l;
+  u16_t a;
   
   if (!dt)
     return NULL;
@@ -205,9 +207,89 @@ cl_mcs6502::disass(t_addr addr)
       if (b[i] == '%')
 	{
 	  i++;
+	  temp= "";
 	  switch (b[i])
 	    {
+	    case 'x': // (ind,X)
+	      l= rom->read(addr+1);
+	      work.appendf("($%02x,X)", l);
+	      l+= rX;
+	      a= read_addr(rom, l);
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'y': // (ind),Y
+	      l= rom->read(addr+1);
+	      work.appendf("($%02x),Y", l);
+	      a= read_addr(rom, l) + rY;
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'a': // abs
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+l;
+	      work.appendf("$%04x", a);
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'j': // JMP abs
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+1;
+	      work.appendf("$%04x", a);
+	      break;
+	    case 'J': // JMP (ind)
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+1;
+	      work.appendf("($%04x)", a);
+	      temp.appendf("; [$%04x]=$%04x", a, read_addr(rom, a));
+	      break;
+	    case 'z': // zpg
+	      l= rom->read(addr+1);
+	      work.appendf("$%04x", a= l);
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'X': // zpg.X
+	      l= rom->read(addr+1);
+	      work.appendf("$%04x,X", l);
+	      l+= rX;
+	      a= l;
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'Y': // zpg.Y
+	      l= rom->read(addr+1);
+	      work.appendf("$%04x,Y", l);
+	      l+= rY;
+	      a= l;
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'i': // abs,X
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+l;
+	      work.appendf("$%04x,X", a);
+	      a+= rX;
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'p': // abs,Y
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+l;
+	      work.appendf("$%04x,Y", a);
+	      a+= rY;
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;
+	    case 'r': // rel
+	      l= rom->read(addr+1);
+	      a= PC + (i8_t)l + 2;
+	      work.appendf("$%04x", a);
+	      break;
+	    case '#': // imm8
+	      l= rom->read(addr+1);
+	      work.appendf("#$%02x", l);
+	      break;
 	    }
+	  if (comment && temp.nempty())
+	    comment->append(temp);
 	}
       else
 	work+= b[i];
@@ -216,13 +298,132 @@ cl_mcs6502::disass(t_addr addr)
   return(strdup(work.c_str()));
 }
 
+t_addr
+cl_mcs6502::read_addr(class cl_memory *m, t_addr start_addr)
+{
+  u8_t h, l;
+  l= m->read(start_addr);
+  h= m->read(start_addr+1);
+  return h*256+l;
+}
+
+class cl_cell8 &
+cl_mcs6502::imm8(void)
+{
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(PC);
+  fetch();
+  tick(1);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::zpg(void)
+{
+  u8_t a= fetch();
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd++;
+  tick(2);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::zpgX(void)
+{
+  u16_t a= fetch() + rX;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd++;
+  tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::zpgY(void)
+{
+  u16_t a= fetch() + rY;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd++;
+  tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::abs(void)
+{
+  u16_t a= i16();
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd++;
+  tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::absX(void)
+{
+  u16_t a1= i16();
+  u16_t a2= a1 + rX;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a2);
+  vc.rd++;
+  tick(3);
+  if ((a1&0xff00) != (a2&0xff00))
+    tick(1);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::absY(void)
+{
+  u16_t a1= i16();
+  u16_t a2= a1 + rY;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a2);
+  vc.rd++;
+  tick(3);
+  if ((a1&0xff00) != (a2&0xff00))
+    tick(1);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::ind(void)
+{
+  u16_t a= i16();
+  a= read_addr(rom, a);
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd+= 3;
+  tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::indX(void)
+{
+  u8_t a0= fetch() + rX;
+  u16_t a= read_addr(rom, a0);
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd+= 3;
+  tick(5);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mcs6502::indY(void)
+{
+  u16_t a1= read_addr(rom, fetch());
+  u16_t a2= a1 + rY;
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a2);
+  vc.rd+= 3;
+  tick(4);
+  if ((a1&0xff00) != (a2&0xff00))
+    tick(1);
+  return *c;
+}
+
 void
 cl_mcs6502::print_regs(class cl_console_base *con)
 {
   con->dd_color("answer");
-  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
-  con->dd_printf("X= 0x%02x %3d %+4d %c  ", X, X, (i8_t)X, isprint(X)?X:'.');
-  con->dd_printf("Y= 0x%02x %3d %+4d %c  ", Y, Y, (i8_t)Y, isprint(Y)?Y:'.');
+  con->dd_printf("A= $%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("X= $%02x %3d %+4d %c  ", X, X, (i8_t)X, isprint(X)?X:'.');
+  con->dd_printf("Y= $%02x %3d %+4d %c  ", Y, Y, (i8_t)Y, isprint(Y)?Y:'.');
   con->dd_printf("\n");
   con->dd_printf("P= "); con->print_bin(CC, 8); con->dd_printf("\n");
   con->dd_printf("   NV BDIZC\n");
@@ -237,18 +438,13 @@ cl_mcs6502::print_regs(class cl_console_base *con)
 int
 cl_mcs6502::exec_inst(void)
 {
-  t_mem code;
-  int res= resGO;
+  int res;
 
   if ((res= exec_inst_tab(itab)) != resNOT_DONE)
     return res;
 
-  instPC= PC;
-  if (fetch(&code))
-    return(resBREAKPOINT);
-  tick(1);
-  res= inst_unknown(code);
-  return(res);
+  inst_unknown(rom->read(instPC));
+  return(resINV_INST);
 }
 
 int
@@ -258,14 +454,11 @@ cl_mcs6502::accept_it(class it_level *il)
 
   tick(2);
 
-  rom->write(0x0100 + rSP, (PC>>8)&0xff);
-  rSP--;
-  rom->write(0x0100 + rSP, (PC)&0xff);
-  rSP--;
+  push_addr(PC);
   rom->write(0x0100 + rSP, rF);
-  rSP--;
-  tick(3);
-  vc.wr+= 3;
+  cSP.W(rSP-1);
+  tick(1);
+  vc.wr++;
   
   t_addr a= read_addr(rom, is->addr);
   tick(2);
@@ -283,6 +476,30 @@ bool
 cl_mcs6502::it_enabled(void)
 {
   return !(rF & flagI);
+}
+
+void
+cl_mcs6502::push_addr(t_addr a)
+{
+  rom->write(0x0100 + rSP, (a>>8));
+  cSP.W(rSP-1);
+  rom->write(0x0100 + rSP, (a));
+  cSP.W(rSP-1);
+  tick(2);
+  vc.wr+= 2;
+}
+
+t_addr
+cl_mcs6502::pop_addr(void)
+{
+  u8_t h, l;
+  cSP.W(rSP+1);
+  l= rom->read(0x0100 + rSP);
+  cSP.W(rSP+1);
+  h= rom->read(0x0100 + rSP);
+  tick(2);
+  vc.rd+= 2;
+  return h*256+l;
 }
 
 

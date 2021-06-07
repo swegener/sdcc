@@ -431,7 +431,7 @@ cl_m6809::disass_indexed(t_addr *addr, chars *work, int siz)
 	  if ((idx & 0x10) == 0)
 	    work->append("??");
 	  else
-	    w.format("0x%04x", u16);
+	    w.format("$%04x", u16);
 	  break;
 	default:
 	  work->append("??");
@@ -455,11 +455,11 @@ cl_m6809::disass_immediate(t_addr *addr, chars *work, int siz)
   //work+= 'm';
   u8_t op8= rom->get(a++);
   if (siz==1)
-    work->appendf("#0x%02x", op8);
+    work->appendf("#$%02x", op8);
   else
     {
       u16_t op16= op8*256 + rom->get(a++);
-      work->appendf("#0x%04x", op16);
+      work->appendf("#$%04x", op16);
     }
   *addr= a;
 }
@@ -565,7 +565,7 @@ cl_m6809::disass(t_addr addr)
 		  case 0x10: // direct
 		    //work+= 'd';
 		    op8= rom->get(addr++);
-		    work.appendf("DP:0x%02x", op8);
+		    work.appendf("DP:$%02x", op8);
 		    break;
 		  case 0x20: // index
 		    //work+= 'i';
@@ -575,7 +575,7 @@ cl_m6809::disass(t_addr addr)
 		    //work+= 'e';
 		    op16= rom->get(addr++)*256;
 		    op16+= rom->get(addr++);
-		    work.appendf("0x%04x", op16);
+		    work.appendf("$%04x", op16);
 		    addr_name(op16, rom, &work);
 		    break;
 		  }
@@ -588,7 +588,7 @@ cl_m6809::disass(t_addr addr)
 		  {
 		  case 0x10: // direct
 		    op8= rom->get(addr++);
-		    work.appendf("DP:0x%02x", op8);
+		    work.appendf("DP:$%02x", op8);
 		    break;
 		  case 0x20: // indexed
 		    disass_indexed(&addr, &work, 1/*siz*/);
@@ -596,7 +596,7 @@ cl_m6809::disass(t_addr addr)
 		  case 0x30: // extended
 		    op16= rom->get(addr++)*256;
 		    op16+= rom->get(addr++);
-		    work.appendf("0x%04x", op16);
+		    work.appendf("$%04x", op16);
 		    addr_name(op16, rom, &work);
 		    break;
 		  }
@@ -628,7 +628,7 @@ cl_m6809::disass(t_addr addr)
 		    i16+= rom->get(addr++);
 		  }
 		i16= (i16 + addr) & 0xffff;
-		work.appendf("0x%04x", i16);
+		work.appendf("$%04x", i16);
 		addr_name(i16, rom, &work);
 		break;
 	      }
@@ -664,7 +664,7 @@ cl_m6809::disass(t_addr addr)
 	      if (b[j]=='E')
 		op16= op16*256 + rom->get(addr++);
 	      op16= (addr + op16)&0xffff;
-	      work.appendf("0x%04x", op16);
+	      work.appendf("$%04x", op16);
 	      addr_name(op16, rom, &work);
 	      break;
 	    }
@@ -682,13 +682,13 @@ void
 cl_m6809::print_regs(class cl_console_base *con)
 {
   con->dd_color("answer");
-  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
-  con->dd_printf("B= 0x%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
-  con->dd_printf("D= 0x%04x %5d %+6d\n", D, D, (i16_t)D);
+  con->dd_printf("A= $%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("B= $%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
+  con->dd_printf("D= $%04x %5d %+6d\n", D, D, (i16_t)D);
   con->dd_printf("CC= "); con->print_bin(reg.CC, 8); con->dd_printf("\n");
   con->dd_printf("    EFHINZVC\n");
 
-  con->dd_printf("DP= 0x%02x\n", reg.DP);
+  con->dd_printf("DP= $%02x\n", reg.DP);
 
   con->dd_printf("X= ");
   rom->dump(0, reg.X, reg.X+7, 8, con);

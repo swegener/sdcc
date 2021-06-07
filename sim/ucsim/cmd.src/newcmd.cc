@@ -233,6 +233,7 @@ cl_console_base::print_expr_result(t_mem val, const char *fmt)
 	    {
 	    case 'x': con->dd_printf("%x\n", MU(v)); break;
 	    case 'X': con->dd_printf("0x%x\n", MU(v)); break;
+	    case '$': con->dd_printf("$%x\n", MU(v)); break;
 	    case '0': con->dd_printf("0x%08x\n", MU32(v)); break;
 	    case 'd': con->dd_printf("%d\n", MI(v)); break;
 	    case 'o': con->dd_printf("%o\n", MU(v)); break;

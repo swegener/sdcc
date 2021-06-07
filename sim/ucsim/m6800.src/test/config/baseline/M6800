@@ -16,12 +16,12 @@ Controller has 9 hardware element(s).
    on pia[0]
    on pia[1]
    on dport[0]
-A= 0x00   0   +0 .  B= 0x00   0   +0 .  
+A= $00   0   +0 .  B= $00   0   +0 .  
 CC= 11000000
       HINZVC
 IX= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 SP= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
- ? 0x6c75 96 4d    LDA    A,0x004d [0x004d]=0xd3[0K
+ ? 0x6c75 96 4d    LDA    A,$004d       ; [$004d]=$d3[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

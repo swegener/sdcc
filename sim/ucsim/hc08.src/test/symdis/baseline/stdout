@@ -9,28 +9,28 @@ var _main rom[0x8026]
 dc 0x8000 0x8028
 
    0x8000 <__sdcc_gs_init_startup>:
- ? 0x8000 45 80 00    ldhx   #0x8000 <__sdcc_gs_init_startup>[0K
+ ? 0x8000 45 80 00    ldhx   #$8000 <__sdcc_gs_init_startup>[0K
  ? 0x8003 94          txs[0K
- ? 0x8004 cd 80 29    jsr    0x8029[0K
- ? 0x8007 27 03       beq    0x800c <__sdcc_init_data>[0K
- ? 0x8009 cc 80 21    jmp    0x8021 <__sdcc_program_startup>[0K
+ ? 0x8004 cd 80 29    jsr    $8029[0K
+ ? 0x8007 27 03       beq    $800c <__sdcc_init_data>[0K
+ ? 0x8009 cc 80 21    jmp    $8021 <__sdcc_program_startup>[0K
 
    0x800c <__sdcc_init_data>:
- ? 0x800c 45 00 00    ldhx   #0x0000[0K
- ? 0x800f 65 00 00    cphx   #0x0000[0K
- ? 0x8012 27 0a       beq    0x801e[0K
- ? 0x8014 d6 80 2b    lda    0x802b,x[0K
- ? 0x8017 d7 00 82    sta    0x0082,x[0K
+ ? 0x800c 45 00 00    ldhx   #$0000[0K
+ ? 0x800f 65 00 00    cphx   #$0000[0K
+ ? 0x8012 27 0a       beq    $801e[0K
+ ? 0x8014 d6 80 2b    lda    $802b,x[0K
+ ? 0x8017 d7 00 82    sta    $0082,x[0K
  ? 0x801a af 01       aix    #1[0K
- ? 0x801c 20 f1       bra    0x800f[0K
- ? 0x801e cc 80 21    jmp    0x8021 <__sdcc_program_startup>[0K
+ ? 0x801c 20 f1       bra    $800f[0K
+ ? 0x801e cc 80 21    jmp    $8021 <__sdcc_program_startup>[0K
 
    0x8021 <__sdcc_program_startup>:
- ? 0x8021 cd 80 26    jsr    0x8026 <_main>[0K
- ? 0x8024 20 fe       bra    0x8024[0K
+ ? 0x8021 cd 80 26    jsr    $8026 <_main>[0K
+ ? 0x8024 20 fe       bra    $8024[0K
 
    0x8026 <_main>:
- ? 0x8026 20 fe       bra    0x8026 <_main>[0K
+ ? 0x8026 20 fe       bra    $8026 <_main>[0K
  ? 0x8028 81          rts[0K
 Loading from test.ihx
 45 words read from test.ihx

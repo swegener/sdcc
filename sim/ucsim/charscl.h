@@ -58,6 +58,7 @@ public:
   bool is_null()const { return !chars_string; }
   chars &uppercase(void);
   int len() const { return chars_length; }
+  int length() const { return chars_length; }
   void start_parse(void) const { start_parse(0); }
   void start_parse(int at) const { pars_pos= at; }
   chars token(const char *delims) const;

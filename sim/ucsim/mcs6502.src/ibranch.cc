@@ -27,4 +27,58 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mcs6502cl.h"
 
 
+int
+cl_mcs6502::JMPa(t_mem code)
+{
+  u16_t a= i16();
+  PC= a;
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mcs6502::JMPi(t_mem code)
+{
+  u16_t a= i16();
+  a= read_addr(rom, a);
+  PC= a;
+  vc.rd+= 2;
+  tick(4);
+  return resGO;
+}
+
+int
+cl_mcs6502::JSR(t_mem code)
+{
+  u16_t a= i16();
+  push_addr(PC);
+  PC= a;
+  return resGO;
+}
+
+int
+cl_mcs6502::RTS(t_mem code)
+{
+  PC= pop_addr();
+  tick(3);
+  return resGO;
+}
+
+int
+cl_mcs6502::branch(bool cond)
+{
+  i8_t rel= fetch();
+  u16_t a= PC+rel;
+  if (cond)
+    {
+      if ((PC&0xff00) != (a&0xff00))
+	tick(1);
+      PC= a;
+      tick(1);
+    }
+  tick(1);
+  return resGO;
+}
+
+
 /* End of mcs6502.src/ibranch.cc */

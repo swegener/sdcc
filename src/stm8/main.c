@@ -373,8 +373,8 @@ hasExtBitOp (int op, int size)
 {
   return (op == GETABIT ||
     op == SWAP && (size <= 2 || size == 4) ||
-    op == RLC && size == 1 ||
-    op == RRC && size == 1);
+    op == RLC && size <= 2 ||
+    op == RRC && size <= 2);
 }
 
 static const char *

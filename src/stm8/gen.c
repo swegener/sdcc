@@ -6565,7 +6565,7 @@ genRotate (const iCode *ic)
   switch (left->aop->size)
     {
     case 1:
-      if (aopSame (result->aop, 0, left->aop, 0, 1) && left->aop->type == AOP_DIR)
+      if (aopSame (result->aop, 0, left->aop, 0, 1) && left->aop->type == AOP_DIR) // Use bccm
         {
           emit3 (rlc ? A_SLL : A_SRL, left->aop, 0);
           emit2 ("bccm", rlc ? "%s, #0" : "%s, #7", aopGet (left->aop, 0));
@@ -6617,6 +6617,70 @@ genRotate (const iCode *ic)
           cheapMove (result->aop, 0, ASMOP_A, 0, false);
           if (!regDead (A_IDX, ic))
             pop (ASMOP_A, 0, 1);
+        }
+      break;
+    case 2:
+      if (rlc && aopSame (result->aop, 0, left->aop, 0, 2) && left->aop->type == AOP_DIR)  // Use bccm
+        {
+          emit3_o (A_SLL, left->aop, 0, 0, 0);
+          emit3_o (A_RLC, left->aop, 1, 0, 0);
+          emit2 ("bccm", "%s, #0", aopGet (left->aop, 0));
+          cost (4, 1);
+        }
+      else if (!rlc && aopSame (result->aop, 0, left->aop, 0, 2) && left->aop->type == AOP_DIR)  // Use bccm
+        {
+          emit3_o (A_SLL, left->aop, 1, 0, 0);
+          emit3_o (A_RLC, left->aop, 0, 0, 0);
+          emit2 ("bccm", "%s, #7", aopGet (left->aop, 1));
+          cost (4, 1);
+        }
+      else
+        {
+          bool use_y = (aopSame (result->aop, 0, left->aop, 0, 2) && aopInReg (left->aop, Y_IDX, 0) ||
+            aopInReg (result->aop, Y_IDX, 0) && !regDead (X_IDX, ic) ||
+            aopInReg (result->aop, Y_IDX, 0) && aopInReg (left->aop, X_IDX, 0));
+          if (!use_y && !regDead (X_IDX, ic))
+            push (ASMOP_X, 0, 2);
+          asmop *rotaop = use_y ? ASMOP_Y : ASMOP_X;
+          genMove (rotaop, left->aop, regDead (A_IDX, ic), !use_y || regDead (X_IDX, ic), use_y || regDead (Y_IDX, ic));
+          if (regDead (A_IDX, ic))
+            {
+              if (!(aopInReg (left->aop, rlc, A_IDX) && aopInReg (left->aop, !rlc, rlc ? (use_y ? YL_IDX : XL_IDX) : (use_y ? YH_IDX : XH_IDX))))
+                cheapMove (ASMOP_A, 0, rotaop, rlc, false);
+              emit3 (rlc ? A_SLL : A_SRL, ASMOP_A, 0);
+              emit3w (rlc ? A_RLCW : A_RRCW, rotaop, 0);
+            }
+          else if (regDead (use_y ? X_IDX : Y_IDX, ic))
+            {
+              if (!aopInReg (left->aop, 0, use_y ? X_IDX : Y_IDX))
+                {
+                  emit2 ("ldw", use_y ? "x, y" : "y, x");
+                  cost (1 + !use_y, 1);
+                }
+              emit3w (rlc ? A_SLLW : A_SRLW, use_y ? ASMOP_X : ASMOP_Y, 0);
+              emit3w (rlc ? A_RLCW : A_RRCW, rotaop, 0);
+            }
+          else
+            {
+              emit3w (rlc ? A_SLLW : A_SRLW, rotaop, 0);
+              symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
+              if (!regalloc_dry_run)
+                emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
+              if (rlc)
+                emit2 ("incw", aopGet2 (rotaop, 0));
+              else
+                emit2 ("addw", "%s, #0x8000", aopGet2 (rotaop, 0));
+              cost (3 + !rlc * 2 + use_y * 2, 2 + !rlc);
+              emitLabel (tlbl);
+            }
+          if ((result->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0 || result->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0) && !regDead (use_y ? Y_IDX : X_IDX, ic))
+            {
+              cost (300, 300);
+              wassertl (regalloc_dry_run, "Unimplemented roatate with result partially in non-dead x.");
+            }
+          genMove (result->aop, rotaop, regDead (A_IDX, ic), !use_y || regDead (X_IDX, ic), use_y || regDead (Y_IDX, ic));
+          if (!use_y && !regDead (X_IDX, ic))
+            pop (ASMOP_X, 0, 2);
         }
       break;
     default:

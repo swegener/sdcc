@@ -1939,7 +1939,6 @@ boolCast (iCode * ic, set * cseSet)
     case NE_OP:
     case AND_OP:
     case OR_OP:
-    case GETHBIT:
     case GETABIT:
       break;
     case BITWISEAND:
@@ -2105,7 +2104,6 @@ static int isSignedOp (iCode *ic)
     case NE_OP:
     case RRC:
     case RLC:
-    case GETHBIT:
     case GETABIT:
     case GETBYTE:
     case GETWORD:

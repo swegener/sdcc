@@ -11,7 +11,12 @@
 	  src/pic16/main.c,
 	  src/pic16/ralloc.c,
 	  src/port.h,
-	  src/z80/gen.c:
+	  src/z80/gen.c,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCcse.c,
+	  src/SDCCicode.c,
+	  src/SDCClospre.cc:
 	  Remove infrastructure for obsolete GETHBIT.
 
 2021-06-08 Philipp Klaus Krause <pkk AT spth.de>

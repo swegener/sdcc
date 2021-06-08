@@ -80,7 +80,6 @@ iCodeTable codeTable[] = {
   {'~', "~", picGenericOne, NULL},
   {RRC, "rrc", picGenericOne, NULL},
   {RLC, "rlc", picGenericOne, NULL},
-  {GETHBIT, "ghbit", picGenericOne, NULL},
   {GETABIT, "gabit", picGenericOne, NULL},
   {GETBYTE, "gbyte", picGenericOne, NULL},
   {GETWORD, "gword", picGenericOne, NULL},
@@ -1522,10 +1521,6 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
     case GETWORD:
       retval = operandFromLit (((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >>
                                 (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) & 0xFFFF));
-      break;
-
-    case GETHBIT:
-      retval = operandFromLit (((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >> ((getSize (let) * 8) - 1)) & 1);
       break;
 
     case UNARYMINUS:
@@ -4499,7 +4494,6 @@ ast2iCode (ast * tree, int lvl)
       return geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op, tree->ftype);
 
     case '!':
-    case GETHBIT:
       {
         operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op, tree->ftype);
         return op;

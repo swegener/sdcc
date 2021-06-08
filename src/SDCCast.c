@@ -74,7 +74,6 @@ static ast *createIvalCharPtr (ast *, sym_link *, ast *, ast *);
 static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeSWAP (ast *);
-ast *optimizeGetHbit (ast *, RESULT_TYPE);
 ast *optimizeGetAbit (ast *, RESULT_TYPE);
 ast *optimizeGetByte (ast *, RESULT_TYPE);
 ast *optimizeGetWord (ast *, RESULT_TYPE);
@@ -2197,7 +2196,6 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case '!':
     case RRC:
     case RLC:
-    case GETHBIT:
     case SWAP:
       if (IS_AST_SYM_VALUE (pbody->left) && isSymbolEqual (AST_SYMBOL (pbody->left), sym))
         return FALSE;
@@ -2751,7 +2749,6 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
     case '~':
     case LEFT_OP:
     case LABEL:
-    case GETHBIT:
     case GETABIT:
     case GETBYTE:
     case GETWORD:
@@ -3796,12 +3793,6 @@ decorateType (ast *tree, RESULT_TYPE resultType)
               tree->right = decorateType (newAst_VALUE (constBoolVal (litval & 1)), resultType);
             }
 
-          /* see if this is a GETHBIT operation if yes
-             then return that */
-          otree = optimizeGetHbit (tree, resultType);
-          if (otree != tree)
-            return decorateType (otree, RESULT_TYPE_NONE);
-
           /* see if this is a GETABIT operation if yes
              then return that */
           otree = optimizeGetAbit (tree, resultType);
@@ -4615,7 +4606,6 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       TETYPE (tree) = LETYPE (tree);
       return tree;
 
-    case GETHBIT:
     case GETABIT:
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       return tree;
@@ -6466,40 +6456,6 @@ isBitAndPow2 (ast * tree)
 }
 
 /*-----------------------------------------------------------------*/
-/* optimizeGetHbit - get highest order bit of the expression       */
-/*-----------------------------------------------------------------*/
-ast *
-optimizeGetHbit (ast * tree, RESULT_TYPE resultType)
-{
-  unsigned int bit, msb;
-  ast *expr;
-
-  expr = isShiftRightLitVal_BitAndLitVal (tree);
-  if (expr)
-    {
-      if ((AST_ULONG_VALUE (tree->right) != 1) ||
-          ((bit = AST_ULONG_VALUE (tree->left->right)) != (msb = (bitsForType (TTYPE (expr)) - 1))))
-        expr = NULL;
-    }
-  if (!expr && (resultType == RESULT_TYPE_BOOL))
-    {
-      int bit = isBitAndPow2 (tree);
-      expr = tree->left;
-      msb = bitsForType (TTYPE (expr)) - 1;
-      if ((bit < 0) || (bit != (int) msb))
-        expr = NULL;
-    }
-  if (!expr || IS_BOOLEAN (TTYPE (expr)))
-    return tree;
-
-  /* make sure the port supports GETHBIT */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETHBIT, getSize (TTYPE (expr))))
-    return tree;
-
-  return decorateType (newNode (GETHBIT, expr, NULL), resultType);
-}
-
-/*-----------------------------------------------------------------*/
 /* optimizeGetAbit - get a single bit of the expression            */
 /*-----------------------------------------------------------------*/
 ast *
@@ -8138,13 +8094,6 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     case SWAP:
       fprintf (outfile, "SWAP (%p) type (", tree);
-      printTypeChain (tree->ftype, outfile);
-      fprintf (outfile, ")\n");
-      ast_print (tree->left, outfile, indent + 2);
-      return;
-
-    case GETHBIT:
-      fprintf (outfile, "GETHBIT (%p) type (", tree);
       printTypeChain (tree->ftype, outfile);
       fprintf (outfile, ")\n");
       ast_print (tree->left, outfile, indent + 2);

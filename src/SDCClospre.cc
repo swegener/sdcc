@@ -90,7 +90,6 @@ candidate_expression (const iCode *const ic, int lkey)
     ic->op != RRC &&
     ic->op != RLC &&
     ic->op != GETABIT &&
-    ic->op != GETHBIT &&
     ic->op != LEFT_OP &&
     ic->op != RIGHT_OP &&
     !(ic->op == '=' && !POINTER_SET(ic) && !(IS_ITEMP(IC_RIGHT(ic)) /*&& IC_RIGHT(ic)->key > lkey*/)) &&

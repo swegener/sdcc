@@ -8660,33 +8660,71 @@ genRLC (iCode * ic)
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
 static void
-genGetHbit (iCode * ic)
+genGetAbit (iCode * ic)
 {
   operand *left, *result;
 
-  D (emitcode (";", "genGetHbit"));
+  D (emitcode (";", "genGetAbit"));
 
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
   aopOp (left, ic, FALSE, FALSE);
+  aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, AOP_USESDPTR (left));
 
-  /* get the highest order byte into a */
-  MOVA (aopGet (left, AOP_SIZE (left) - 1, FALSE, FALSE, NULL));
+  int shCount = (int) ulFromVal (IC_RIGHT (ic)->aop->aopu.aop_lit);
+
+  /* get byte into a */
+  MOVA (aopGet (left, shCount / 8, FALSE, FALSE, NULL));
+  shCount %= 8;
+
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      emitcode ("rlc", "a");
+      if ((shCount) == 7)
+        emitcode ("rlc", "a");
+      else if ((shCount) == 0)
+        emitcode ("rrc", "a");
+      else
+        emitcode ("mov", "c,acc[%d]", shCount);
       outBitC (result);
     }
   else
     {
-      emitcode ("rl", "a");
-      emitcode ("anl", "a,#0x01");
+      switch (shCount)
+        {
+        case 2:
+          emitcode ("rr", "a");
+          //fallthrough
+        case 1:
+          emitcode ("rr", "a");
+          //fallthrough
+        case 0:
+          emitcode ("anl", "a,#0x01");
+          break;
+        case 3:
+        case 5:
+          emitcode ("mov", "c,acc[%d]", shCount);
+          emitcode ("clr", "a");
+          emitcode ("rlc", "a");
+          break;
+        case 4:
+          emitcode ("swap", "a");
+          emitcode ("anl", "a,#0x01");
+          break;
+        case 6:
+          emitcode ("rl", "a");
+          //fallthrough
+        case 7:
+          emitcode ("rl", "a");
+          emitcode ("anl", "a,#0x01");
+          break;
+        }
       outAcc (result);
     }
 
 
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (IC_RIGHT (ic), NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
 }
 
@@ -14326,8 +14364,8 @@ gen390Code (iCode * lic)
           genRLC (ic);
           break;
 
-        case GETHBIT:
-          genGetHbit (ic);
+        case GETABIT:
+          genGetAbit (ic);
           break;
 
         case LEFT_OP:

@@ -5077,39 +5077,6 @@ genGetABit (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
-/*-----------------------------------------------------------------*/
-static void
-genGetHbit (iCode * ic)
-{
-  operand *left, *result;
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
-
-  FENTRY;
-  DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  /* get the highest order byte into a */
-  MOVA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE, FALSE));
-  if (AOP_TYPE (result) == AOP_CRY)
-    {
-      pic14_emitcode ("rlc", "a");
-      pic14_outBitC (result);
-    }
-  else
-    {
-      pic14_emitcode ("rl", "a");
-      pic14_emitcode ("anl", "a,#0x01");
-      pic14_outAcc (result);
-    }
-
-
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
-}
-
-/*-----------------------------------------------------------------*/
 /* AccLsh - shift left accumulator by known count                  */
 /* MARK: pic14 always rotates through CARRY!                       */
 /*-----------------------------------------------------------------*/
@@ -7891,10 +7858,6 @@ genpic14Code (iCode * lic)
 
         case GETABIT:
           genGetABit (ic);
-          break;
-
-        case GETHBIT:
-          genGetHbit (ic);
           break;
 
         case LEFT_OP:

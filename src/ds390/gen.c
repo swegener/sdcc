@@ -8657,7 +8657,7 @@ genRLC (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
+/* genGetAbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
 static void
 genGetAbit (iCode * ic)

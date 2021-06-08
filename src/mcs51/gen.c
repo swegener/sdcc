@@ -12272,10 +12272,6 @@ gen51Code (iCode * lic)
           genRLC (ic);
           break;
 
-        case GETHBIT:
-          assert (0);
-          break;
-
         case GETABIT:
           genGetAbit (ic);
           break;

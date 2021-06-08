@@ -15354,10 +15354,6 @@ genZ80iCode (iCode * ic)
       genRLC (ic);
       break;
 
-    case GETHBIT:
-      wassert (0);
-      break;
-
     case GETABIT:
       emitDebug ("; genGetAbit");
       genGetAbit (ic);

@@ -7228,42 +7228,6 @@ genRLC (iCode * ic)
   pic16_freeAsmop (result, NULL, ic, TRUE);
 }
 
-
-/* gpasm can get the highest order bit with HIGH/UPPER
- * so the following probably is not needed -- VR */
-
-/*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
-/*-----------------------------------------------------------------*/
-static void
-genGetHbit (iCode * ic)
-{
-  operand *left, *result;
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-  pic16_aopOp (left, ic, FALSE);
-  pic16_aopOp (result, ic, FALSE);
-
-  DEBUGpic16_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  /* get the highest order byte into a */
-  MOVA (pic16_aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE, FALSE));
-  if (AOP_TYPE (result) == AOP_CRY)
-    {
-      pic16_emitcode ("rlc", "a");
-      pic16_outBitC (result);
-    }
-  else
-    {
-      pic16_emitcode ("rl", "a");
-      pic16_emitcode ("anl", "a,#0x01");
-      pic16_outAcc (result);
-    }
-
-
-  pic16_freeAsmop (left, NULL, ic, TRUE);
-  pic16_freeAsmop (result, NULL, ic, TRUE);
-}
-
 static void
 genGetABit (iCode * ic)
 {
@@ -11496,10 +11460,6 @@ genpic16Code (iCode * lic)
 
         case GETABIT:
           genGetABit (ic);
-          break;
-
-        case GETHBIT:
-          genGetHbit (ic);
           break;
 
         case LEFT_OP:

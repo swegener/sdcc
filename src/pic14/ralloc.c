@@ -247,7 +247,6 @@ decodeOp (unsigned int op)
         case GET_VALUE_AT_ADDRESS:      return "GET_VALUE_AT_ADDRESS";
         case SPIL:                      return "SPIL";
         case UNSPIL:                    return "UNSPIL";
-        case GETHBIT:                   return "GETHBIT";
         case BITWISEAND:                return "BITWISEAND";
         case UNARYMINUS:                return "UNARYMINUS";
         case IPUSH:                     return "IPUSH";

@@ -10624,10 +10624,6 @@ genhc08iCode (iCode *ic)
       genRLC (ic);
       break;
 
-    case GETHBIT:
-      wassertl (0, "Unimplemented iCode");
-      break;
-
     case GETABIT:
       genGetAbit (ic);
       break;

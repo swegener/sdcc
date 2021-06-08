@@ -1,5 +1,21 @@
 2021-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* doc/sdccman.lyx,
+	  src/ds390/gen.c,
+	  src/hc08/gen.c,
+	  src/mcs51/gen.c,
+	  src/pic14/gen.c,
+	  src/pic14/main.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/gen.c,
+	  src/pic16/main.c,
+	  src/pic16/ralloc.c,
+	  src/port.h,
+	  src/z80/gen.c:
+	  Remove infrastructure for obsolete GETHBIT.
+
+2021-06-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/ds390/gen.c,
 	  src/ds390/main.c:
 	  Support GETABIT instead of GETHBIT.

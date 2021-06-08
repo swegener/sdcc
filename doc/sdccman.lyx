@@ -64359,17 +64359,7 @@ Endianness
 \end_layout
 
 \begin_layout Subsection
-Highest Order Bit
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Highest Order Bit
-\end_layout
-
-\end_inset
-
- / Any Order Bit
+Getting a Bit
 \begin_inset Index idx
 status collapsed
 
@@ -69781,7 +69771,7 @@ iCode
 \size footnotesize
 Figure II 
 \begin_inset Tabular
-<lyxtabular version="3" rows="39" columns="4">
+<lyxtabular version="3" rows="38" columns="4">
 <features islongtable="true" headBottomDL="true" longtabularalignment="center">
 <column alignment="block" valignment="top" width="13col%">
 <column alignment="left" valignment="top" width="13col%">
@@ -70024,52 +70014,6 @@ Rotate left with carry
 
 \size footnotesize
 IC_RESULT = (IC_LEFT << (sizeof(LC_LEFT)*8-1) ) | (IC_LEFT >> 1);
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-GETHBIT
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-IC_LEFT() IC_RESULT()
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-Get the highest order bit of IC_LEFT
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-IC_RESULT = (IC_LEFT >> (sizeof(IC_LEFT)*8 -1));
 \end_layout
 
 \end_inset

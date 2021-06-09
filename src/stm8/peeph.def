@@ -1202,6 +1202,17 @@ replace restart {
 	; peephole 620x moved 'ld' outside of loop: '%4-jr%5' ('%1').
 } if same(%4 'cp' 'bcp'), same(%5 'ne' 'eq'), operandsLitOrSym(%1), notUsed('a'), notUsedFrom(%3 'a'), newLabel(%6), labelRefCountChange(%3 -1)
 
+// Save 1 byte if 'a' is not used.
+// Same rule with literal value case is not needed because:
+//  ld followed by tnz is generated
+//  redundant tnz is removed by another rule
+replace restart {
+	tnz	_%1
+} by {
+	ld	a, _%1
+	; peephole 625a changed tnz by ld
+} if notUsed('a')
+
 // Change AND to BCP to enable other rules using bcp
 replace restart {
 	and	a, #%1

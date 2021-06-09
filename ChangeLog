@@ -1,3 +1,8 @@
+2021-06-09 Visenri
+
+	* src/stm8/peeph.def:
+	  STM8 - Added missing rule 625a from my pack #6 from patch #362, fixed tabs/spaces.
+
 2021-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx,

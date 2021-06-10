@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define RXKCL_HEADER
 
 #include "uccl.h"
-#include "memcl.h"
+#include "rmemcl.h"
 #include "decode.h"
 
 
@@ -132,6 +132,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  virtual int inst_unknown(t_mem code);
   
   class cl_cell16 &destAF(void) { return altd?caAF:cAF; }
   class cl_cell16 &destBC(void) { return altd?caBC:cBC; }

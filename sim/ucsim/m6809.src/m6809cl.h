@@ -57,9 +57,9 @@ struct reg_t {
   u8_t CC;
 };
 
-#define A (reg.acc.a8.rA)
-#define B (reg.acc.a8.rB)
-#define D (reg.acc.rD)
+#define A  (reg.acc.a8.rA)
+#define B  (reg.acc.a8.rB)
+#define D  (reg.acc.rD)
 
 enum flags
   {

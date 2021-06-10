@@ -158,6 +158,10 @@ enum cpu_type {
   CPU_HCS08     = 0x0002,
   CPU_ALL_HC08  = (CPU_HC08|CPU_HCS08),
 
+  CPU_HC11      = 0x0004,
+  CPU_HC12      = 0x0008,
+  CPU_ALL_HC12  = (CPU_HC11|CPU_HC12),
+  
   CPU_PBLAZE_3	= 0x0001,
   CPU_PBLAZE_6	= 0x0002,
   CPU_ALL_PBLAZE= (CPU_PBLAZE_3|CPU_PBLAZE_6),
@@ -294,6 +298,7 @@ enum inst_result {
   resBREAKPOINT	= 104,	/* Fetch Breakpoint */
   resUSER	= 105,	/* Stopped by user */
   resINV_INST	= 106,	/* Invalid instruction */
+  resINST_INV	= 106,	/* Invalid instruction */
   resBITADDR	= 107,	/* Bit address is uninterpretable */
   resERROR	= 108,	/* Error happened during instruction exec */
   resSTEP	= 109,	/* Step command done, no more exex needed */

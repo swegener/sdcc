@@ -314,6 +314,13 @@ cl_rxk::exec_inst(void)
   return res;
 }
 
+int
+cl_rxk::inst_unknown(t_mem code)
+{
+  cl_uc::inst_unknown(code);
+  return resINV_INST;
+}
+
 u8_t
 cl_rxk::op8_BC(void)
 {

@@ -1388,7 +1388,7 @@ cl_uc::read_hex_file(cl_f *f)
 	       (lows[0]));
     }
   
-  analyze(0);
+  //analyze(0);
   return(written);
 }
 

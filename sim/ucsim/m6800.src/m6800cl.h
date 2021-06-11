@@ -142,8 +142,10 @@ public:
 
   virtual int clock_per_cycle(void) { return 1; }
   virtual struct dis_entry *dis_tbl(void);
+  virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
+  virtual void analyze(t_addr addr);
   
   virtual void print_regs(class cl_console_base *con);
 

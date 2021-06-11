@@ -539,6 +539,7 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
 {
   t_addr start, realstart;
   int offset= -1, dir, lines= 20;
+  bool run_analyze= false;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
@@ -546,22 +547,30 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
 
   start= disass_last_stop;
   if (params[0] == 0) ;
-  else if (cmdline->syntax_match(uc, ADDRESS)) {
-    start= params[0]->value.address;
-  }
-  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
-    start= params[0]->value.address;
-    offset= params[1]->value.number;
-  }
-  else if (cmdline->syntax_match(uc, ADDRESS NUMBER NUMBER)) {
-    start= params[0]->value.address;
-    offset= params[1]->value.number;
-    lines= params[2]->value.number;
-  }
   else
     {
-      syntax_error(con);
-      return(false);
+      char *s= (char*)(cmdline->tokens->at(0));
+      if (s && *s && (s[0]=='+'))
+	{
+	  run_analyze= true;
+	}
+      if (cmdline->syntax_match(uc, ADDRESS)) {
+	start= params[0]->value.address;
+      }
+      else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
+	start= params[0]->value.address;
+	offset= params[1]->value.number;
+      }
+      else if (cmdline->syntax_match(uc, ADDRESS NUMBER NUMBER)) {
+	start= params[0]->value.address;
+	offset= params[1]->value.number;
+	lines= params[2]->value.number;
+      }
+      else
+	{
+	  syntax_error(con);
+	  return(false);
+	}
     }
 
   if (lines < 1)
@@ -569,6 +578,8 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
       con->dd_printf("Error: wrong `lines' parameter\n");
       return(false);
     }
+  if (run_analyze)
+    uc->analyze(start);
   if (!uc->there_is_inst())
     return(false);
   realstart= start;

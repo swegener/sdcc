@@ -279,27 +279,36 @@ cl_m6800::dis_tbl(void)
   return(disass_m6800);
 }
 
+struct dis_entry *
+cl_m6800::get_dis_entry(t_addr addr)
+{
+  struct dis_entry *dt= dis_tbl();//, *dis_e;
+  int i= 0;
+  t_mem code= rom->get(addr);
+
+  if (dt == NULL)
+    return NULL;
+  while (((code & dt[i].mask) != dt[i].code) &&
+	 dt[i].mnemonic)
+    i++;
+  return &dt[i];
+}
+
 char *
 cl_m6800::disassc(t_addr addr, chars *comment)
 {
   chars work= chars(), temp= chars();
   const char *b;
-  t_mem code= rom->get(addr);
-  struct dis_entry *dt= dis_tbl();//, *dis_e;
+  //t_mem code= rom->get(addr);
+  struct dis_entry *dis_e;
   int i;
   bool first;
   
-  if (!dt)
+  if ((dis_e= get_dis_entry(addr)) == NULL)
     return NULL;
-
-  i= 0;
-  while (((code & dt[i].mask) != dt[i].code) &&
-	 dt[i].mnemonic)
-    i++;
-  //dis_e= &dt[i];
-  if (dt[i].mnemonic == NULL)
+  if (dis_e->mnemonic == NULL)
     return strdup("-- UNKNOWN/INVALID");
-  b= dt[i].mnemonic;
+  b= dis_e->mnemonic;
 
   first= true;
   work= "";
@@ -372,6 +381,49 @@ cl_m6800::disassc(t_addr addr, chars *comment)
     }
 
   return(strdup(work.c_str()));
+}
+
+void
+cl_m6800::analyze(t_addr addr)
+{
+  struct dis_entry *di;
+  t_addr pa, ta;
+  
+  di= get_dis_entry(addr);
+  while (!inst_at(addr) && di && (di->mnemonic!=NULL))
+    {
+      pa= addr;
+      set_inst_at(addr);
+      switch (di->branch)
+	{
+	case 'r': // jump rel
+	  {
+	    i8_t r= rom->read(addr+1);
+	    ta= addr+2+r;
+	    addr= ta;
+	  }
+	  break;
+	case 's': // SWI
+	  ta= read_addr(rom, SWI_AT);
+	  analyze(ta);
+	  break;
+	case 'E': // call extended
+	  ta= read_addr(rom, addr+1);
+	  analyze(ta);
+	  break;
+	case 'e': // jump extended
+	  addr= read_addr(rom, addr+1);
+	  break;
+	case '_':
+	  return;
+	default:
+	  addr= rom->validate_address(addr+di->length);
+	  break;
+	}
+      if (pa == addr)
+	return;
+      di= get_dis_entry(addr);
+    }
 }
 
 t_addr

@@ -146,17 +146,17 @@ $(top_builddir)/sz80.so: $(OBJECTS_SHARED)
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 
-$(top_builddir)/libcmd.a:
-	$(MAKE) -C $(top_builddir)/cmd.src all
+$(top_builddir)/libcmd.a: $(top_srcdir)/cmd.src
+	$(MAKE) -C $(top_srcdir)/cmd.src all
 
-$(top_builddir)/libguiucsim.a:
-	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib
+$(top_builddir)/libguiucsim.a: $(top_srcdir)/gui.src
+	$(MAKE) -C $(top_srcdir)/gui.src checkconf ucsim_lib
 
-$(top_builddir)/libsim.a:
-	$(MAKE) -C $(top_builddir)/sim.src all
+$(top_builddir)/libsim.a: $(top_srcdir)/sim.src
+	$(MAKE) -C $(top_srcdir)/sim.src all
 
-$(top_builddir)/libucsimutil.a:
-	$(MAKE) -C $(top_builddir) -f main.mk
+$(top_builddir)/libucsimutil.a: $(top_srcdir)
+	$(MAKE) -C $(top_srcdir) -f main.mk
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

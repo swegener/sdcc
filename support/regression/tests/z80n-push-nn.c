@@ -47,9 +47,8 @@ memcpy_p g(void)
 
 void testBug3032(void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
     x = 0x7531;
     ASSERT (f() == 0x8765);
     ASSERT (g() == &memcpy);
-#endif
 }
+

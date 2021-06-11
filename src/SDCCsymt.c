@@ -1130,7 +1130,9 @@ getSize (sym_link * p)
       if (!IS_FUNCPTR(p))
         return (GPTRSIZE);
     case FUNCTION:
-      return (IFFUNC_ISBANKEDCALL (p) ? BFUNCPTRSIZE : FUNCPTRSIZE);
+      if (IS_FUNCPTR(p))
+        return ((IFFUNC_ISBANKEDCALL (p->next) || TARGET_IS_STM8 && IFFUNC_ISCOSMIC (p->next)) ? BFUNCPTRSIZE : FUNCPTRSIZE);
+      return ((IFFUNC_ISBANKEDCALL (p) || TARGET_IS_STM8 && IFFUNC_ISCOSMIC (p)) ? BFUNCPTRSIZE : FUNCPTRSIZE);
 
     default:
       return 0;
@@ -3573,6 +3575,14 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                 }
               if (IFFUNC_ISBANKEDCALL (type))
                 dbuf_append_str (dbuf, " __banked");
+              if (IFFUNC_ISSMALLC (type))
+                dbuf_append_str (dbuf, " __smallc");
+              if (IFFUNC_ISRAISONANCE (type))
+                dbuf_append_str (dbuf, " __raisonance");
+              if (IFFUNC_ISIAR (type))
+                dbuf_append_str (dbuf, " __iar");
+              if (IFFUNC_ISCOSMIC (type))
+                dbuf_append_str (dbuf, " __cosmic");
               if (IFFUNC_ISZ88DK_CALLEE (type))
                 dbuf_append_str (dbuf, " __z88dk_callee");
               if (IFFUNC_ISZ88DK_FASTCALL (type))

@@ -160,13 +160,11 @@ void testRange(void)
 
 void testPointerCompare(void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
 	int i;
 	fptr = &testPointerCompare;
 	iptr = &i;
 	ASSERT(iptr == &i);
 	ASSERT(fptr == &testPointerCompare);
-#endif
 }
 
 

@@ -48,7 +48,6 @@ char         * gp2 = (char __pdata *)0x0002;
 
 void testPtrs(void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_HUGE)) // Bug #3243
 #ifndef __SDCC_pic16
 #if defined (__SDCC_MODEL_HUGE)
 	char __code  * cp2 = (char __code *)0x0002;
@@ -103,6 +102,5 @@ void testPtrs(void)
 	ASSERT (eq(cp1, fp1));
 #endif
 	ASSERT (smaller(pp1, gp2));
-#endif
 #endif
 }

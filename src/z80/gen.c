@@ -2549,7 +2549,7 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
 
     case AOP_HL:
       wassertl (pairId == PAIR_HL, "AOP_HL must be in HL");
-emit2(";setupPair HL");
+
       fetchLitPair (pairId, aop, offset, true);
       _G.pairs[pairId].offset = offset;
       break;

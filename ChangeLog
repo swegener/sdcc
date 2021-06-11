@@ -1,3 +1,19 @@
+2021-06-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  src/stm8/gen.c,
+	  src/stm8/main.c,
+	  src/stm8/peep.c,
+	  support/regression/tests/bug-3251.c,
+	  support/regression/tests/bug-2349.c,
+	  support/regression/tests/bug-2455.c,
+	  support/regression/tests/bug-3244.c,
+	  support/regression/tests/compare.c,
+	  support/regression/tests/fptr_cast_array_init.c,
+	  support/regression/tests/genptrs.c,
+	  support/regression/tests/z80n-push-nn.c:
+	  Fix bugs #3251, #3243.
+
 2021-06-09 Visenri
 
 	* src/stm8/peeph.def:

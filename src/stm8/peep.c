@@ -669,6 +669,12 @@ stm8MightBeParmInCallFromCurrentFunction(const char *what)
 }
 
 static bool
+stm8MightBeParmInPCallFromCurrentFunction(const char *what)
+{
+  return true; // Todo: Make this more accurate for optimization (e.g. the same way as z80 does here).
+}
+
+static bool
 stm8MightRead(const lineNode *pl, const char *what)
 {
   char extra = 0;
@@ -808,11 +814,11 @@ stm8MightRead(const lineNode *pl, const char *what)
         return stm8MightBeParmInCallFromCurrentFunction(what);
     }
 
-  if(ISINST(pl->line, "ret"))
-    return(stm8IsReturned(what));
+  if(ISINST(pl->line, "ret")) // IAR calling convention uses ret for some calls via pointers
+    return(stm8IsReturned(what) || stm8MightBeParmInPCallFromCurrentFunction(what));
 
   if(ISINST(pl->line, "retf")) // Large model uses retf for calls via function pointers
-    return(stm8IsReturned(what) || stm8MightBeParmInCallFromCurrentFunction(what));
+    return(stm8IsReturned(what) || stm8MightBeParmInPCallFromCurrentFunction(what));
 
   return FALSE;
 }

@@ -1,5 +1,5 @@
 /*
-   bug-3240.c. A bug in z80 code generation on comparisons with 0x00 loer bytes.
+   bug-3240.c. A bug in z80 code generation on comparisons with 0x00 lower bytes.
  */
  
 #include <testfwk.h>

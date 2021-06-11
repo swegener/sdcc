@@ -467,7 +467,7 @@ PORT stm8_port =
     2,                          /* far ptr */
     2,                          /* generic ptr */
     2,                          /* func ptr */
-    0,                          /* banked func ptr */
+    3,                          /* banked func ptr */
     1,                          /* bit */
     4,                          /* float */
   },

@@ -416,7 +416,6 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_IMMD)
     {
-      wassertl_bt (offset < (2 + (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (currFunc->type))), "Immediate operand out of range");
       if (offset == 0)
         SNPRINTF (buffer, sizeof(buffer), "#<(%s+%d)", aop->aopu.immd, aop->aopu.immd_off);
       else
@@ -3770,20 +3769,49 @@ genCall (const iCode *ic)
               emit2 (jump ? "jp" : "call", "(y)");
               cost (2,jump ? 1 : 4);
             }
-          else
+          else if (!stm8IsParmInCall(ftype, "x"))
             {
-              if (stm8IsParmInCall(ftype, "x"))
-                {
-                  cost (500, 500);
-                  wassert (regalloc_dry_run);
-                }
-
               genMove (ASMOP_X, left->aop, !stm8IsParmInCall(ftype, "a"), true, !stm8IsParmInCall(ftype, "y"));
 
               adjustStack (prestackadjust, true, false, true);
           
               emit2 (jump ? "jp" : "call", "(x)");
               cost (1, jump ? 1 : 4);
+            }
+          else
+            {
+              if (stm8IsParmInCall(ftype, "a"))
+                {
+                  cost (500, 500);
+                  wassert (regalloc_dry_run);
+                }
+
+              adjustStack (prestackadjust, left->aop->regs[A_IDX] < 0, left->aop->regs[XL_IDX] < 0 && left->aop->regs[XH_IDX] < 0, left->aop->regs[YL_IDX] < 0 && left->aop->regs[YH_IDX] < 0);
+                
+              symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+
+              if (!jump)
+                {
+                  if (!regalloc_dry_run)
+                    {
+                      emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
+                      emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
+                    }
+                  G.stack.pushed += 2;
+                  cost (4, 2);
+                }
+
+              cheapMove (ASMOP_A, 0, left->aop, 0, false);
+              push (ASMOP_A, 0, 1);
+              cheapMove (ASMOP_A, 0, left->aop, 1, false);
+              push (ASMOP_A, 0, 1);
+              emit2 ("ret", "");
+              cost (1, 4);
+
+              G.stack.pushed -= 2 * (2 - jump);
+
+              if (!jump)
+                emitLabel (tlbl);
             }
         }
     }
@@ -9432,7 +9460,7 @@ bool
 stm8IsRegArg(struct sym_link *ftype, int i, const char *what)
 {
   if (what && !strcmp(what, "x"))
-    return (stm8IsRegArg (ftype, i, "xl") || stm8IsRegArg (ftype, i, "yl"));
+    return (stm8IsRegArg (ftype, i, "xl") || stm8IsRegArg (ftype, i, "xh"));
   else if (what && !strcmp(what, "y"))
     return (stm8IsRegArg (ftype, i, "yl") || stm8IsRegArg (ftype, i, "yh"));
  

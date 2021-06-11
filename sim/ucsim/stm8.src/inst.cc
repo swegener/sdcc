@@ -1493,8 +1493,8 @@ cl_stm8::inst_tnz(t_mem code, unsigned char prefix)
       (code==0x3d || code==0x6d) &&
       (prefix!=0x90))
     tick(3);
-  if (code==0x5d)
-    tick(1);
+  //if (code==0x5d)
+  //tick(1);
    return(resGO);
 }
 

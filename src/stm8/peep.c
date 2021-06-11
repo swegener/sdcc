@@ -31,6 +31,9 @@ static struct
   lineNode *head;
 } _G;
 
+extern bool stm8_regs_used_as_parms_in_calls_from_current_function[YH_IDX + 1];
+extern bool stm8_regs_used_as_parms_in_pcalls_from_current_function[YH_IDX + 1];
+
 /*----------------------------------------------------------------------------*/
 /* strNextCharBlock - Returns the next block of chars (after spaces, comma)   */
 /* Leading spaces and Current block are skipped and search stops at next block*/
@@ -665,13 +668,39 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
 static bool
 stm8MightBeParmInCallFromCurrentFunction(const char *what)
 {
-  return true; // Todo: Make this more accurate for optimization (e.g. the same way as z80 does here).
+  if (!strcmp(what, "a"))
+    return stm8_regs_used_as_parms_in_calls_from_current_function[A_IDX];
+    
+  if ((!strcmp(what, "x") || !strcmp(what, "xl")) && stm8_regs_used_as_parms_in_calls_from_current_function[XL_IDX])
+    return true;
+  if ((!strcmp(what, "x") || !strcmp(what, "xh")) && stm8_regs_used_as_parms_in_calls_from_current_function[XH_IDX])
+    return true;
+
+  if ((!strcmp(what, "y") || !strcmp(what, "yl")) && stm8_regs_used_as_parms_in_calls_from_current_function[YL_IDX])
+    return true;
+  if ((!strcmp(what, "yx") || !strcmp(what, "yh")) && stm8_regs_used_as_parms_in_calls_from_current_function[YH_IDX])
+    return true;
+
+  return false;
 }
 
 static bool
 stm8MightBeParmInPCallFromCurrentFunction(const char *what)
 {
-  return true; // Todo: Make this more accurate for optimization (e.g. the same way as z80 does here).
+  if (!strcmp(what, "a"))
+    return stm8_regs_used_as_parms_in_pcalls_from_current_function[A_IDX];
+
+  if ((!strcmp(what, "x") || !strcmp(what, "xl")) && stm8_regs_used_as_parms_in_pcalls_from_current_function[XL_IDX])
+    return true;
+  if ((!strcmp(what, "x") || !strcmp(what, "xh")) && stm8_regs_used_as_parms_in_pcalls_from_current_function[XH_IDX])
+    return true;
+
+  if ((!strcmp(what, "y") || !strcmp(what, "yl")) && stm8_regs_used_as_parms_in_pcalls_from_current_function[YL_IDX])
+    return true;
+  if ((!strcmp(what, "yx") || !strcmp(what, "yh")) && stm8_regs_used_as_parms_in_pcalls_from_current_function[YH_IDX])
+    return true;
+
+  return false;
 }
 
 static bool

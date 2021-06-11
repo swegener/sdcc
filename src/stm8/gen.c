@@ -130,6 +130,9 @@ static const char *asminstnames[] =
   "xor"
 };
 
+bool stm8_regs_used_as_parms_in_calls_from_current_function[YH_IDX + 1];
+bool stm8_regs_used_as_parms_in_pcalls_from_current_function[YH_IDX + 1];
+
 static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_xyl, asmop_yx, asmop_zero, asmop_one, asmop_mone;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_X = &asmop_x;
@@ -9055,6 +9058,10 @@ genSend (const iCode *ic)
     
   genMove (argreg, IC_LEFT (ic)->aop, a_dead, x_dead, y_dead);
 
+  for (int i = 0; i < argreg->size; i++)
+    if (!regalloc_dry_run)
+       ((walk->op == PCALL) ? stm8_regs_used_as_parms_in_pcalls_from_current_function : stm8_regs_used_as_parms_in_calls_from_current_function)[argreg->aopu.bytes[i].byteu.reg->rIdx] = true;
+
   freeAsmop (IC_LEFT (ic));
 }
 
@@ -9377,6 +9384,9 @@ genSTM8Code (iCode *lic)
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
+
+  memset(stm8_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (YH_IDX + 1));
+  memset(stm8_regs_used_as_parms_in_pcalls_from_current_function, 0, sizeof(bool) * (YH_IDX + 1));
 
   for (ic = lic; ic; ic = ic->next)
     {

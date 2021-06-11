@@ -1,5 +1,11 @@
 2021-06-11 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/stm8/peep.c:
+	  Implement register parameter tracking for peephole optimizer to fix code size regression caused by bugfix in previous commit.
+
+2021-06-11 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCsymt.c,
 	  src/stm8/gen.c,
 	  src/stm8/main.c,

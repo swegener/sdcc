@@ -8396,18 +8396,18 @@ genPointerSet (iCode *ic)
             }
           else
             {
-              emit2 ("ld", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
-              cost (2, 1);
               if (!i)
                 {
-                  emit2 ("and", use_y ? "a, (y)" : "a, (x)");
+                  emit2 ("ld", use_y ? "a, (y)" : "a, (x)");
                   cost (1 + use_y, 1);
                 }
               else
                 {
-                  emit2 ("and", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
+                  emit2 ("ld", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
                   cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
                 }
+              emit2 ("and", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
+              cost (2, 1);
             }
           if (bval)
             {
@@ -8435,18 +8435,19 @@ genPointerSet (iCode *ic)
           cost (2, 1);
           push (ASMOP_A, 0, 1);
           pushed_a++;
-          emit2 ("ld", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
-          cost (2, 1);
           if (!i)
             {
-              emit2 ("and", use_y ? "a, (y)" : "a, (x)", i);
+              emit2 ("ld", use_y ? "a, (y)" : "a, (x)");
               cost (1 + use_y, 1);
             }
           else
             {
-              emit2 ("and", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
+              emit2 ("ld", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
               cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
             }
+          emit2 ("and", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
+          cost (2, 1);
+          
           emit2 ("or", "a, (1, sp)");
           cost (2, 1);
         }

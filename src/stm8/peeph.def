@@ -219,9 +219,9 @@ replace restart {
 replace restart {
 	ldw %1, sp
 	addw    %1, #%2
-	ld  a, (%1)
+	ld	a, (%1)
 } by {
-	ld  a, (%2, sp)
+	ld	a, (%2, sp)
 	; peephole 10f moved addition to sp to storage instruction.
 } if notUsed(%1), notUsed('c'), operandsLiteral(%2), immdInRange(0 255 '+' 0 %2 %9)
 
@@ -240,7 +240,7 @@ replace restart {
 	incw	x
 	ld	a, (%1)
 } by {
-	ld  a, (2, sp)
+	ld	a, (2, sp)
 	; peephole 10h moved increments to sp into storage instruction.
 } if notUsed(%1)
 
@@ -369,7 +369,7 @@ replace restart {
 	; peephole 130 combined 'and-and' (%1, %2) into 'and' (%3).
 } if operandsLiteral(%1 %2), immdInRange(0 255 '&' %1 %2 %3)
 
-// Remove unneeded AND before CPL-AND with same operand
+// Remove unneeded AND before CPL-AND with same operand or when the second AND operand is a subset of the first AND bits
 replace restart {
 	and	a, #%1
 	cpl	a
@@ -378,7 +378,7 @@ replace restart {
 	; peephole 131 removed unneeded 'and' before 'cpl-and'.
 	cpl a
 	and a, #%2
-} if operandsLiteral(%1 %2), immdInRange(0 0 '^' %1 %2 %3)
+} if operandsLiteral(%1 %2), immdInRange(0 255 '&' %1 %2 %3), immdInRange(0 0 '^' %2 %3 %4)
 
 // Combine AND in AND-OR / XOR-AND
 replace restart {
@@ -413,8 +413,8 @@ replace restart {
 	rlc	a
 	s%3	a
 } by {
-	xor	a, #%1
 	and	a, #%1
+	xor	a, #%1
 	s%3	a
 	; peephole 140 replaced 'and-sub-clr-rlc-s%3' to reverse A0 bit by 'xor-and-s%3'.
 } if same(%3 'rl' 'll'), operandsLiteral(%1 %2), immdInRange(0 0 '^' %1 %2 %4), immdInRange(0 0 '^' %1 1 %5)
@@ -426,8 +426,8 @@ replace restart {
 	clr	a
 	rlc	a
 } by {
-	xor	a, #%1
 	and	a, #%1
+	xor	a, #%1
 	; peephole 141 replaced 'and-sub-clr-rlc' to reverse A0 bit by 'xor-and'.
 } if operandsLiteral(%1 %2), immdInRange(0 0 '^' %1 %2 %4), immdInRange(0 0 '^' %1 1 %5), notUsed('c')
   
@@ -470,8 +470,8 @@ replace restart {
 
 // copy reversed bit to carry (xor-and)
 replace restart {
-	xor	a, #%1
 	and	a, #%1
+	xor	a, #%1
 	srl	a
 } by {
 	and	a, #%1
@@ -504,12 +504,12 @@ replace restart {
 // SRL - XOR - AND - SLL, not using carry later
 replace restart {
 	srl	a
-	xor	a, #%1
 	and	a, #%2
+	xor	a, #%1
 	sll	a
 } by {
-	xor	a, #%3
 	and	a, #%5
+	xor	a, #%3
 	; peephole 160 replaced 'srl-xor-and-sll' (%1, %2) by 'xor-and' (%3, %5).
 } if operandsLiteral(%1 %2), immdInRange(2 255 '*' %1 2 %3), immdInRange(2 255 '*' %2 2 %4), immdInRange(0 255 '|' %4 1 %5), notUsed('c')
 
@@ -520,8 +520,8 @@ replace restart {
 	and	a, #%2
 	sll	a
 } by {
-	xor a, #%4
 	and a, #%5
+	xor a, #%4
 	; peephole 161 replaced 'srl-cpl-and-sll' (%2) by 'xor-and' (%4, %5).
 } if operandsLiteral(%2), immdInRange(2 255 '*' %2 2 %4), immdInRange(0 255 '|' %4 1 %5), notUsed('c')
 
@@ -560,6 +560,72 @@ replace restart {
 	; peephole 180 replaced comparison operation using '%6' with comparison operation using 'a'
 } if operandsLiteral(%2 %3), immdInRange(0 127 '+' 0 %3 %4), immdInRange(0 127 '+' 0 %2 %5), notUsed(%6)
 
+// Value |= (1 << X)
+replace restart {
+	ld	a, %1
+	or	a, #%3
+	ld	%1, a
+} by {
+	bset	%1, #%4
+	; peephole 202x replaced 'or' by 'bset' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%3), immdInRange(0 7 'singleSetBit' %3 8 %4), notUsed('a' 'n' 'z')
+
+// Value |= (1 << X)
+replace restart {
+	ldw	%2, #%1
+	ld	a, (%2)
+	or	a, #%3
+	ld	(%2), a
+} by {
+	ldw	%2, #%1
+	bset	%10, #%4
+	; peephole 203x replaced 'or' by 'bset' (index register) ('%1' -> '%10').
+} if operandsLiteral(%3), immdInRange(0 7 'singleSetBit' %3 8 %4), notUsed('a' 'n' 'z'), removeParentheses(%1 %10)
+
+// Value &= ~(1 << X)
+replace restart {
+	ld	a, %1
+	and	a, #%3
+	ld	%1, a
+} by {
+	bres	%1, #%4
+	; peephole 204x replaced 'and' by 'bres' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%3), immdInRange(0 7 'singleResetBit' %3 8 %4), notUsed('a' 'n' 'z')
+
+// Value &= ~(1 << X)
+replace restart {
+	ldw	%2, #%1
+	ld	a, (%2)
+	and	a, #%3
+	ld	(%2), a
+} by {
+	ldw	%2, #%1
+	bres	%10, #%4
+	; peephole 205x replaced 'and' by 'bres' (index register) ('%1' -> '%10').
+} if operandsLiteral(%3), immdInRange(0 7 'singleResetBit' %3 8 %4), notUsed('a' 'n' 'z'), removeParentheses(%1 %10)
+
+// Value ^= (1 << X)
+replace restart {
+	ld	a, %1
+	xor	a, #%3
+	ld	%1, a
+} by {
+	bcpl	%1, #%4
+	; peephole 210x replaced 'xor' by 'bcpl' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%3), immdInRange(0 7 'singleSetBit' %3 8 %4), notUsed('a' 'n' 'z')
+  
+//*** XOR special cases
+// bccm to bcpl
+replace restart {
+	ld	a, %1
+	and	a, #%3
+	sub	a, #%3
+	bccm	%1, #%4
+} by {
+	bcpl	%1, #%4
+	; peephole 220x replaced 'and-sub-bccm' by 'bcpl' ('%1').
+} if operandsLitOrSym(%1), operandsLiteral(%3), immdInRange(0 7 'singleSetBit' %3 8 %5), immdInRange(0 0 '-' %4 %5 %6), notUsed('a' 'n' 'z')
+
 replace restart {
 	ld	a, %1
 	or	a, #0x80
@@ -570,43 +636,6 @@ replace restart {
 	rrc	%1
 	; peephole 17 set msb in carry instead of a.
 } if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh'), notUsed('c'), notVolatile(%1)
-
-replace restart {
-	ld	a, %1
-	or	a, #%2
-	ld	%1, a
-} by {
-	bset	%1, #%3
-	; peephole 18 replaced ld-or-ld by bset.
-} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleSetBit' %2 8 %3)
-
-replace restart {
-	ld	a, %1
-	and	a, #%2
-	ld	%1, a
-} by {
-	bres	%1, #%3
-	; peephole 19 replaced ld-and-ld by bres.
-} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleResetBit' %2 8 %3)
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	xor	a, #%3
-	ld	(%1), a
-} by {
-	bcpl	%2, #%4
-	; peephole 20 replaced ldw-ld-xor-ld by bcpl.
-} if notUsed(%1 'a' 'n' 'z'), immdInRange(0 7 'singleSetBit' %3 8 %4)
-
-replace restart {
-	ld	a, %1
-	xor	a, #%2
-	ld	%1, a
-} by {
-	bcpl	%1, #%3
-	; peephole 21 replaced ld-xor-ld by bcpl.
-} if notUsed('a' 'n' 'z'), operandsLiteral(%1), immdInRange(0 7 'singleResetBit' %2 8 %3)
 
 replace restart {
 	ldw	%1, #%2
@@ -1445,6 +1474,28 @@ replace restart {
 	jrmi	%3
 	; peephole j551 replaced 'ld-bcp-jrne' by 'ld-jrmi'.
 } if operandsLiteral(%2), immdInRange(0x80 0x80 '+' %2 0 %4), notUsed('n' 'z'), notUsedFrom(%3 'n' 'z')
+
+// SRL - AND - DEC to AND - CP
+replace restart {
+	srl	a
+	and	a, #%1
+	dec	a
+} by {
+	and	a, #%3
+	cp	a, #2
+	; peephole 515 replaced 'srl-and-dec' (%1) by 'and-cp' (%3 2).
+} if operandsLiteral(%1), immdInRange(2 255 '*' %1 2 %3), notUsed('a' 'c')
+  
+// SWAP - AND - DEC to AND - CP
+replace restart {
+	swap	a
+	and	a, #%1
+	dec	a
+} by {
+	and	a, #%3
+	cp	a, #16
+	; peephole 516 replaced 'swap-and-dec' (%1) by 'and-cp' (%3 16).
+} if operandsLiteral(%1), immdInRange(0 255 'swap' %1 8 %3), notUsed('a' 'c')
 
 replace {
 	jp	%5

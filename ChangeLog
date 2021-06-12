@@ -1,3 +1,17 @@
+2021-06-13 Visenri
+
+	* src/stm8/gen.c,
+	  src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  STM8 - Multiple improvements regarding peephole rules & argCont function.
+	  Modified code generation (genPointerSet) to allow optimizations without reordering rules for ld-and (120) from pack 1 (#362).
+	  Implemented some improvements in peep.c (argCont) to avoid false 'x' positives, a tiny step towards #290.
+	  Fixed double spaces in rules 10f & 10h (that were messing notUsed logic).
+	  Replaced rules 18, 19, 20 & 21 by 202x, 203x, 204x 205x, 210x &220x making use of new "operandsLitOrSym".
+	  Expanded rule 131 scope.
+	  Modified rules (140, 141, 150, 160, 161) to work without needing rule 121 from pack 1 (#362).
+	  Added new rules 515 & 516, similar to 512 & 513 when comparison is done with 'dec' instead of 'cp'.
+
 2021-06-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

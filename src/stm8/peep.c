@@ -630,8 +630,10 @@ static bool argCont(const char *arg, char what)
   if (arg[0] == '#')
     return FALSE;
 
-  if (arg[0] == '(' && arg[1] == '0' && (tolower(arg[2])) == 'x') 
-    arg += 3; // Skip hex prefix to avoid false x positive.
+  if (arg[0] == '(') 
+    arg++;
+  if (arg[0] == '0' && (tolower(arg[1])) == 'x') 
+    arg += 2; // Skip hex prefix to avoid false x positive.
 
   if (strlen(arg) == 0)
     return FALSE;

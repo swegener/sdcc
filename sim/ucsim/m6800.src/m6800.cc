@@ -396,11 +396,18 @@ cl_m6800::analyze(t_addr addr)
       set_inst_at(addr);
       switch (di->branch)
 	{
-	case 'r': // jump rel
+	case 'r': // uncond jump rel
 	  {
 	    i8_t r= rom->read(addr+1);
 	    ta= addr+2+r;
 	    addr= ta;
+	  }
+	  break;
+	case 'R': // conditional jump rel
+	  {
+	    i8_t r= rom->read(addr+1);
+	    ta= addr+2+r;
+	    analyze(ta);
 	  }
 	  break;
 	case 's': // SWI

@@ -1,0 +1,52 @@
+uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# There are four banks of registers available. Which bank is
+# currently in use is selected via two bits in sfr[0xd0]
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02lx)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02lx)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
+  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
+  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+
+# The bank switcher should have an operator on sfr[0xd0]
+memory cell sfr[0xd0]
+sfr[0xd0] sfr_0000d0
+cell data=0x5599a50ece40/8 mask=ff flags=0
+  decoded to sfr_chip[80]
+Operators:
+
+# Define the control bits
+var bank sfr[0xd0][4:3]
+
+# Now the current bank is 0 and we have a set of registers
+dump regs 0 7
+0x0Segmentation fault

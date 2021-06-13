@@ -143,20 +143,9 @@ endif
 $(top_builddir)/spblaze.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/spblaze.so
 
-otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
-
-
-$(top_builddir)/libcmd.a: $(top_srcdir)/cmd.src
-	$(MAKE) -C $(top_srcdir)/cmd.src all
-
-$(top_builddir)/libguiucsim.a: $(top_srcdir)/gui.src
-	$(MAKE) -C $(top_srcdir)/gui.src checkconf ucsim_lib
-
-$(top_builddir)/libsim.a: $(top_srcdir)/sim.src
-	$(MAKE) -C $(top_srcdir)/sim.src all
-
-$(top_builddir)/libucsimutil.a: $(top_srcdir)
-	$(MAKE) -C $(top_srcdir) -f main.mk
+otherlibs:
+	$(MAKE) -C $(top_builddir)/cmd.src all
+	$(MAKE) -C $(top_builddir)/sim.src all
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

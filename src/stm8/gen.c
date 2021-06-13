@@ -3627,7 +3627,7 @@ genCall (const iCode *ic)
 
           if (nic->op == LABEL)
             ;
-          else if (nic->op == GOTO) // We dont have ebbi here, so we cant jsut use eBBWithEntryLabel (ebbi, ic->label). Search manually.
+          else if (nic->op == GOTO) // We dont have ebbi here, so we can't just use eBBWithEntryLabel (ebbi, ic->label). Search manually.
             targetlabel = IC_LABEL (nic);
           else if (nic->op == RETURN && (!IC_LEFT (nic) || SomethingReturned && IC_RESULT (ic)->key == IC_LEFT (nic)->key))
             targetlabel = returnLabel;
@@ -3861,82 +3861,93 @@ genCall (const iCode *ic)
     }
 
 
-  const bool half = stm8_extend_stack && SomethingReturned && (aopRet (ftype)->regs[YL_IDX] >= 0 || aopRet (ftype)->regs[YH_IDX] >= 0);
+  const bool result_in_frameptr = stm8_extend_stack && SomethingReturned && !bigreturn && (aopRet (ftype)->regs[YL_IDX] >= 0 || aopRet (ftype)->regs[YH_IDX] >= 0);
 
-  /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
+  asmop *result = IC_RESULT (ic)->aop;
 
-  /* Special handling of assignment of result value in y when using extended stack. */
-  if (half && (IC_RESULT (ic)->aop->type != AOP_STK && IC_RESULT (ic)->aop->type != AOP_REGSTK || !regalloc_dry_run && aopOnStackNotExt (IC_RESULT (ic)->aop, 0, IC_RESULT (ic)->aop->size)))
+  if (result_in_frameptr)
     {
-      genMove (IC_RESULT (ic)->aop, aopRet (ftype), true, true, true);
-      pop (ASMOP_Y, 0, 2);
-      goto restore;
-    }  
-  else if (half)
-    {
-      asmop *result;
-      int save_a = 0;
-      
-      wassert (regalloc_dry_run || aopRet (ftype) == ASMOP_XY || aopRet (ftype) == ASMOP_XYL); // Implementation assumes a 24-Bit or 32-Bit return value in XY.
+      bool result_in_extstk = (result->type == AOP_STK || result->type == AOP_REGSTK) && !(!regalloc_dry_run && aopOnStackNotExt (result, 0, result->size));
 
-      result = IC_RESULT (ic)->aop;
+      if (result->size == 1 && aopInReg (result, 0, XL_IDX) && aopInReg (aopRet (ftype), 0, YL_IDX) ||
+        result->size == 2 && aopInReg (aopRet (ftype), 0, Y_IDX) && result_in_extstk)
+        {
+          pop (ASMOP_X, 0, 2);
+          emit2 ("exgw", "x, y");
+          cost (1, 1);
+          genMove (result, ASMOP_X, true, true, !stm8_extend_stack);
+        }
+      else if (!result_in_extstk)
+        {
+          genMove (result, aopRet (ftype), true, true, true);
+          pop (ASMOP_Y, 0, 2);
+        }
+      else if (result->size == 1)
+        {
+          genMove (ASMOP_A, aopRet (ftype), true, true, true);
+          pop (ASMOP_Y, 0, 2);
+          genMove (result, ASMOP_A, true, true, !stm8_extend_stack);
+        }
+      else if (result->size == 2)
+        {
+          genMove (ASMOP_X, aopRet (ftype), true, true, true);
+          pop (ASMOP_Y, 0, 2);
+          genMove (result, ASMOP_X, true, true, !stm8_extend_stack);
+        }
+      else
+        {
+          push (ASMOP_Y, 0, 2);
 
-      push (ASMOP_Y, 0, 2);
-      emit2 ("ldw", "y, (3, sp)");
-      cost (2, 2);
+          // Restore frame pointer
+          emit2 ("ldw", "y, (3, sp)");
+          cost (2, 2);
 
-      emit2 ("ld", "a, (2, sp)");
-      cost (2, 1);
-      if (IC_RESULT (ic)->aop->size > 2)
-        cheapMove (IC_RESULT (ic)->aop, 2, ASMOP_A, 0, TRUE);
-      if (result->size > 2)
-        if (aopRS (result) && aopRS (ASMOP_A) &&
-          result->aopu.bytes[2].in_reg && ASMOP_A->aopu.bytes[0].in_reg &&
-          result->aopu.bytes[2].byteu.reg == ASMOP_A->aopu.bytes[0].byteu.reg)
+          for(int i = 0; i < result->size; i++)
             {
-              push (ASMOP_A, 0, 1);
-              save_a = 1;
+              bool a_dead = (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= i);
+
+              if (result->aopu.bytes[i].in_reg &&
+                !aopInReg (result, i, YL_IDX) && !aopInReg (result, i, YH_IDX) &&
+                aopRet (ftype)->regs[result->aopu.bytes[i].byteu.reg->rIdx] > i && aopRet (ftype)->regs[result->aopu.bytes[i].byteu.reg->rIdx] < result->size)
+                {
+                  cost (300, 300);
+                  wassert (regalloc_dry_run);
+                }
+
+              if (aopInReg (aopRet (ftype), i, YL_IDX) || aopInReg (aopRet (ftype), i, YH_IDX))
+                {
+                  if (!a_dead)
+                    push (ASMOP_A, 0, 1);
+                  emit2 ("ld", "a, (%d, sp)", 1 + !a_dead + aopInReg (aopRet (ftype), i, YL_IDX));
+                  cost (2, 1);
+                  cheapMove (result, i, ASMOP_A, 0, true);
+                  if (!a_dead)
+                    pop (ASMOP_A, 0, 1);
+                }
+              else
+                cheapMove (result, i, aopRet (ftype), i, !a_dead);
             }
 
-      if (save_a)
-        emit2 ("ld", "a, (2, sp)");
-      else
-        emit2 ("ld", "a, (1, sp)");
-      cost (2, 1);
-      if (IC_RESULT (ic)->aop->size > 3)
-        cheapMove (IC_RESULT (ic)->aop, 3, ASMOP_A, 0, TRUE);
-      if (save_a)
-        {
-          pop (ASMOP_A, 0, 1);
-          save_a = 0;
+          adjustStack (4, aopRet (ftype)->regs[A_IDX] < 0, aopRet (ftype)->regs[XL_IDX] < 0 && aopRet (ftype)->regs[XH_IDX] < 0, false);
         }
 
-      adjustStack (4, FALSE, FALSE, FALSE);
-
-      if (IC_RESULT (ic)->aop->regs[XL_IDX] >= 2 || IC_RESULT (ic)->aop->regs[XH_IDX] >= 2)
-        {
-          wassert (regalloc_dry_run);
-          cost (180, 180);
-        }
+      goto restore;
     }
-  else if (stm8_extend_stack)
+
+  if (stm8_extend_stack)
     pop (ASMOP_Y, 0, 2);
 
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
     {
-      int size;
-
-      size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
-
       wassert (getSize (ftype->next) >= 1 && getSize (ftype->next) <= 4);
-
-      genMove_o (IC_RESULT (ic)->aop, 0, aopRet (ftype), 0, size, TRUE, TRUE, !stm8_extend_stack);
-
-      freeAsmop (IC_RESULT (ic));
+      genMove (result, aopRet (ftype), true, true, !stm8_extend_stack);
     }
 
 restore:
+  if (SomethingReturned && !bigreturn)
+    freeAsmop (IC_RESULT (ic));
+
   // Restore regs.
   if (!regDead (Y_IDX, ic) && !stm8_extend_stack)
     if (regDead (YH_IDX, ic))

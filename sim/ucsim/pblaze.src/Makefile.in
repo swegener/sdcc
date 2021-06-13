@@ -77,7 +77,7 @@ dlso_ok		= @dlso_ok@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs pblaze.src tests
+all: checkconf otherlibs pblaze.src
 
 tests: $(TEST_OBJ)
 
@@ -127,10 +127,13 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-pblaze.src: spblaze$(EXEEXT)  shared_lib
+pblaze.src: spblaze$(EXEEXT) shared_lib
 
-spblaze$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $(OBJECTS) $(LIBS)
+spblaze$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+
+ucsim_spblaze$(EXEEXT): spblaze$(EXEEXT)
+	cp $< $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/spblaze.so
@@ -143,9 +146,19 @@ endif
 $(top_builddir)/spblaze.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/spblaze.so
 
-otherlibs:
+otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+
+$(top_builddir)/libcmd.a:
 	$(MAKE) -C $(top_builddir)/cmd.src all
+
+$(top_builddir)/libguiucsim.a:
+	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib
+
+$(top_builddir)/libsim.a:
 	$(MAKE) -C $(top_builddir)/sim.src all
+
+$(top_builddir)/libucsimutil.a:
+	$(MAKE) -C $(top_builddir) -f main.mk
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

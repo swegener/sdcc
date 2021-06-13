@@ -67,8 +67,8 @@ struct dis_entry_pblaze disass_pblaze3[]= {
   { 0x06000, 0x3f0c0, ' ', 1, "FETCH %r, %m", FETCH,        REG_ADDRESS6 },        // 0 0 0 1 1 0 x x x x 0 0 s s s s s s
   { 0x07000, 0x3f00f, ' ', 1, "FETCH %r,(%s)", FETCH,        REG_REG },        // 0 0 0 1 1 1 x x x x y y y y 0 0 0 0
 
-  { 0x05000, 0x3f00f, ' ', 1, "INPUT %r,(%s)", INPUT,        REG_REG },        // 0 0 0 1 0 1 x x x x y y y y 0 0 0 0
-  { 0x04000, 0x3f000, ' ', 1, "INPUT %r,%p", INPUT,        REG_PORT },        // 0 0 0 1 0 0 x x x x p p p p p p p p
+  { 0x05000, 0x3f00f, ' ', 1, "INPUT %r,(%s)", IINPUT,        REG_REG },        // 0 0 0 1 0 1 x x x x y y y y 0 0 0 0
+  { 0x04000, 0x3f000, ' ', 1, "INPUT %r,%p", IINPUT,        REG_PORT },        // 0 0 0 1 0 0 x x x x p p p p p p p p
 
   { 0x34000, 0x3fc00, ' ', 1, "JUMP %a", JUMP,        ADDRESS10 },            // 1 1 0 1 0 0 0 0 a a a a a a a a a a
   { 0x35800, 0x3fc00, ' ', 1, "JUMP C %a", JUMP_C,        ADDRESS10 },        // 1 1 0 1 0 1 1 0 a a a a a a a a a a
@@ -152,8 +152,8 @@ struct dis_entry_pblaze disass_pblaze6[]= {
 
   { 0x14080, 0x3f0ff, ' ', 1, "HWBUILD %r", HWBUILD,        REG },
 
-  { 0x08000, 0x3f00f, ' ', 1, "INPUT %r,(%s)", INPUT,        REG_REG },
-  { 0x09000, 0x3f000, ' ', 1, "INPUT %r,%p", INPUT,        REG_PORT },
+  { 0x08000, 0x3f00f, ' ', 1, "INPUT %r,(%s)", IINPUT,        REG_REG },
+  { 0x09000, 0x3f000, ' ', 1, "INPUT %r,%p", IINPUT,        REG_PORT },
 
   { 0x22000, 0x3f000, ' ', 1, "JUMP %A", JUMP,        ADDRESS12 },
   { 0x32000, 0x3f000, ' ', 1, "JUMP Z %A", JUMP_Z,        ADDRESS12 },

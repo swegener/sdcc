@@ -903,7 +903,7 @@ cl_pblaze::exec_inst(void)
           return (inst_fetch(code, instruction.operands));
         case HWBUILD:
           return (inst_hwbuild(code, instruction.operands));
-        case INPUT:
+        case IINPUT:
           return (inst_input(code, instruction.operands));
         case JUMP:
         case JUMP_AT:

@@ -53,11 +53,11 @@
 #include "cmd_showcl.h"
 #include "cmd_getcl.h"
 #include "cmd_setcl.h"
-#ifdef _WIN32
-#include "newcmdwin32cl.h"
-#else
+//#ifdef _WIN32
+//#include "newcmdwin32cl.h"
+//#else
 #include "newcmdposixcl.h"
-#endif
+//#endif
 
 /* XXX */
 #define PORTVERSION "0.2.0"

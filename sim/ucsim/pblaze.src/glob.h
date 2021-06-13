@@ -49,7 +49,7 @@ enum instructions_pblaze {
     ENABLE_INTERRUPT,
     FETCH,
     HWBUILD,
-    INPUT,
+    IINPUT,
     JUMP,
     JUMP_C,
     JUMP_NC,

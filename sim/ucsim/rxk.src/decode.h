@@ -93,6 +93,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SCF		instruction_37
 #define CPL		instruction_2f
 #define CCF		instruction_3f
+#define EX_AF_aAF	instruction_08
+#define ADD_HL_BC	instruction_09
+#define ADD_HL_DE	instruction_19
+#define ADD_HL_HL	instruction_29
+#define ADD_HL_SP	instruction_39
+#define DJNZ		instruction_10
+#define JR		instruction_18
+#define JR_NZ		instruction_20
+#define JR_Z		instruction_28
+#define JR_NC		instruction_30
+#define JR_C		instruction_38
+#define ADD_SP_d	instruction_27
 
 #endif
 

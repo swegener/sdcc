@@ -27,4 +27,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "rxkcl.h"
 
 
+int
+cl_rxk::DJNZ(t_mem code)
+{
+  u8_t v= rB - 1;
+  i8_t r= fetch();
+  destB().W(v);
+  if (v)
+    PC+= r;
+  tick(4);
+  return resGO;
+}
+
+int
+cl_rxk::JR(t_mem code)
+{
+  i8_t r= fetch();
+  PC+= r;
+  tick(4);
+  return resGO;
+}
+
+int
+cl_rxk::jr_cc(bool cond)
+{
+  i8_t r= fetch();
+  if (cond)
+    PC+= r;
+  tick(4);
+  return resGO;
+}
+
+
 /* End of rxk.src/ibranch.cc */

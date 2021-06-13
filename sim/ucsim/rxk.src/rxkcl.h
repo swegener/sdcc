@@ -186,7 +186,9 @@ public:
   virtual int rot9left(class cl_cell8 &dest, u8_t op);
   virtual int rot8right(class cl_cell8 &dest, u8_t op);
   virtual int rot9right(class cl_cell8 &dest, u8_t op);
-
+  virtual int add_hl_ss(u16_t op);
+  virtual int jr_cc(bool cond);
+  
   virtual int ALTD(t_mem code);
   virtual int IOI(t_mem code);
   virtual int IOE(t_mem code);
@@ -252,6 +254,18 @@ public:
   virtual int SCF(t_mem code);
   virtual int CPL(t_mem code);
   virtual int CCF(t_mem code);
+  virtual int EX_AF_aAF(t_mem code);
+  virtual int ADD_HL_BC(t_mem code) { return add_hl_ss(rBC); }
+  virtual int ADD_HL_DE(t_mem code) { return add_hl_ss(rDE); }
+  virtual int ADD_HL_HL(t_mem code) { return add_hl_ss(rHL); }
+  virtual int ADD_HL_SP(t_mem code) { return add_hl_ss(rSP); }
+  virtual int DJNZ(t_mem code);
+  virtual int JR(t_mem code);
+  virtual int JR_NZ(t_mem code) { return jr_cc(!(rF&flagZ)); }
+  virtual int JR_Z (t_mem code) { return jr_cc( (rF&flagZ)); }
+  virtual int JR_NC(t_mem code) { return jr_cc(!(rF&flagC)); }
+  virtual int JR_C (t_mem code) { return jr_cc( (rF&flagC)); }
+  virtual int ADD_SP_d(t_mem code);
 };
 
 

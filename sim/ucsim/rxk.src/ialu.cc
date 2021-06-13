@@ -151,5 +151,37 @@ cl_rxk::CPL(t_mem code)
   return resGO;
 }
 
+int
+cl_rxk::add_hl_ss(u16_t op)
+{
+  class cl_cell16 &hl= destHL();
+  class cl_cell8 &f= destF();
+  u8_t forg= f.R();
+  u32_t res= rHL + op;
+  hl.W(res);
+  if (res > 0xffff)
+    f.W(forg|= flagC);
+  else
+    f.W(forg|=~flagC);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_rxk::ADD_SP_d(t_mem code)
+{
+  i8_t d= fetch();
+  u32_t res= rSP+d;
+  class cl_cell8 &f= destF();
+  u8_t forg= f.R();
+  cSP.W(res);
+  if (res > 0xffff)
+    f.W(forg|= flagC);
+  else
+    f.W(forg&= ~flagC);
+  tick(3);
+  return resGO;
+}
+
 
 /* End of rxk.src/ialu.cc */

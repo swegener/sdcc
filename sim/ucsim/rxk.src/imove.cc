@@ -120,5 +120,15 @@ cl_rxk::LD_A_MN(t_mem code)
   return resGO;
 }
 
+int
+cl_rxk::EX_AF_aAF(t_mem code)
+{
+  u16_t temp= rAF;
+  cAF.W(raAF);
+  caAF.W(temp);
+  tick(1);
+  return resGO;
+}
+
 
 /* End of rxk.src/imove.cc */

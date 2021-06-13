@@ -103,6 +103,18 @@ struct dis_entry disass_rxk[]=
     { 0x37, 0xff, ' ', 1, "SCF" },
     { 0x2f, 0xff, ' ', 1, "CPL" },
     { 0x3f, 0xff, ' ', 1, "CCF" },
+    { 0x08, 0xff, ' ', 1, "EX AF,AF'" }, // '
+    { 0x09, 0xff, ' ', 1, "ADD HL,BC" },
+    { 0x19, 0xff, ' ', 1, "ADD HL,DE" },
+    { 0x29, 0xff, ' ', 1, "ADD HL,HL" },
+    { 0x39, 0xff, ' ', 1, "ADD HL,SP" },
+    { 0x10, 0xff, ' ', 2, "DJNZ %r" },
+    { 0x18, 0xff, ' ', 2, "JR %r" },
+    { 0x20, 0xff, ' ', 2, "JR NZ,%r" },
+    { 0x28, 0xff, ' ', 2, "JR Z,%r" },
+    { 0x30, 0xff, ' ', 2, "JR NC,%r" },
+    { 0x38, 0xff, ' ', 2, "JR C,%r" },
+    { 0x27, 0xff, ' ', 2, "ADD SP,%d" },
     
     { 0, 0, 0, 0, 0, 0 }
   };

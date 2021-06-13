@@ -229,14 +229,27 @@ cl_rxk::disassc(t_addr addr, chars *comment)
 	  i++;
 	  switch (b[i])
 	    {
-	    case 'w':
+	    case 'w': // 16 bit unsigned
 	      l= rom->get(++addr);
 	      h= rom->get(++addr);
 	      work.appendf("0x%04x", h*256+l);
 	      break;
-	    case 'b':
+	    case 'b': // 8 bit unsigned
 	      l= rom->get(++addr);
 	      work.appendf("0x%02x", l);
+	      break;
+	    case 'd': // 8 bit signed
+	      {
+		i8_t r= rom->read(++addr);
+		work.appendf("%d", r);
+	      }
+	      break;
+	    case 'r': // 8 bit relative jump
+	      {
+		i8_t r= rom->get(++addr);
+		t_addr a= addr + 1 + r;
+		work.appendf("0x%04x", AU16(a));
+	      }
 	      break;
 	    }
 	  if (comment && temp.nempty())

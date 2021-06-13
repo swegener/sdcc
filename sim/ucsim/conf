@@ -58,7 +58,9 @@ case $TARGET in
 	    --enable-p1516-port \
 	    --enable-m6809-port \
 	    --enable-m6800-port \
+	    --enable-m68hc12-port \
 	    --enable-mcs6502-port \
+	    --enable-rxk-port \
 	    --enable-pblaze-port
 	    "$@"
 	#--enable-ucsim
@@ -87,7 +89,9 @@ case $TARGET in
 	    --enable-p1516-port \
 	    --enable-m6809-port \
 	    --enable-m6800-port \
+	    --enable-m68hc12-port \
 	    --enable-mcs6502-port \
+	    --enable-rxk-port \
 	    --enable-pblaze-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim
@@ -110,7 +114,9 @@ case $TARGET in
 	    --enable-p1516-port \
 	    --enable-m6809-port \
 	    --enable-m6800-port \
+	    --enable-m68hc12-port \
 	    --enable-mcs6502-port \
+	    --enable-rxk-port \
 	    --enable-pblaze-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim

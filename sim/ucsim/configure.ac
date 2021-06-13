@@ -154,18 +154,21 @@ if test $enable_m6809_port  != "no"; then
     enable_m6809_port="yes"
 fi,
 enable_m6809_port="yes")
+
 AC_ARG_ENABLE(m6800-port,
-[  --disable-m6800-port    do not compile simulator for m6800],
+[  --enable-m6800-port     compile simulator for m6800],
 if test $enable_m6800_port  != "no"; then
     enable_m6800_port="yes"
 fi,
-enable_m6800_port="yes")
+enable_m6800_port="no")
+
 AC_ARG_ENABLE(m68hc12-port,
-[  --disable-m68hc12-port  do not compile simulator for m68hc12],
+[  --enable-m68hc12-port   compile simulator for m68hc12],
 if test $enable_m68hc12_port  != "no"; then
     enable_m68hc12_port="yes"
 fi,
-enable_m68hc12_port="yes")
+enable_m68hc12_port="no")
+
 AC_ARG_ENABLE(mcs6502-port,
 [  --disable-mcs6502-port  do not compile simulator for mcs6502],
 if test $enable_mcs6502_port  != "no"; then

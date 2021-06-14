@@ -3591,14 +3591,20 @@ genCall (const iCode *ic)
           cost (180, 180);
         }
 
-      if (!stm8IsParmInCall(ftype, "x"))
+      if (stm8_extend_stack && !stm8IsParmInCall(ftype, "y") && ic->op != PCALL && optimize.codeSpeed) // 6 bytes, 4 cycles.
+        {
+          emit2 ("addw", "y, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.size - 256 + G.stack.pushed);
+          cost (4, 2);
+          push (ASMOP_Y, 0, 2);
+        }
+      else if (!stm8IsParmInCall(ftype, "x")) // 5 bytes, 5 cycles.
         {
           emit2 ("ldw", "x, sp");
           emit2 ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
           cost (1 + 3, 1 + 2);
           push (ASMOP_X, 0, 2);
         }
-      else if (!stm8IsParmInCall(ftype, "y"))
+      else if (!stm8IsParmInCall(ftype, "y")) // 8 bytes, 6 cycles.
         {
           emit2 ("ldw", "y, sp");
           emit2 ("addw", "y, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
@@ -3606,7 +3612,7 @@ genCall (const iCode *ic)
           push (ASMOP_Y, 0, 2);
         }
       else
-        wassertl (0, "Big return value require free x or y, but both are used for register parameters.");
+        wassertl (0, "Big return value requires free x or y, but both are used for register parameters.");
 
       freeAsmop (IC_RESULT (ic));
     }

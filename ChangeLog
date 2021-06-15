@@ -2,6 +2,8 @@
 
 	* src/SDCCast.c:
 	  Report type of _Generic match error.
+	* device/include/stdckdint.h:
+	  Checked integer arithmetic for most types (needs bug #3254 and #3255 fixed to really work).
 
 2021-06-14 Philipp Klaus Krause <pkk AT spth.de>
 

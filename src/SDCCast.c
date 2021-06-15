@@ -5445,6 +5445,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         if (!found_expr)
           {
             werror (E_NO_MATCH_IN_GENERIC);
+            printTypeChain (type, stderr);
+            fprintf (stderr, "\n");
             goto errorTreeReturn;
           }
         

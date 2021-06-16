@@ -4,6 +4,8 @@
 	  src/stm8/peeph.def,
 	  support/regression/tests/z88dk_callee.c:
 	  Improve tail call optimization for __z88dk_callee functions.
+	* tests/stm8-conventions.c:
+	  Enable test that had been disabled due to now-fixed bug #3239.
 
 2021-06-15 Philipp Klaus Krause <pkk AT spth.de>
 

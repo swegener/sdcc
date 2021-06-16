@@ -842,7 +842,7 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (f)
         return stm8IsParmInCall(f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
-        return stm8MightBeParmInCallFromCurrentFunction(what);
+        return (stm8MightBeParmInCallFromCurrentFunction(what) || stm8MightBeParmInPCallFromCurrentFunction(what));
     }
 
   if(ISINST(pl->line, "ret")) // IAR calling convention uses ret for some calls via pointers

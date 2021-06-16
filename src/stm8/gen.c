@@ -3618,14 +3618,29 @@ genCall (const iCode *ic)
     }
   // Check if we can do tail call optimization.
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
-    (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.bytes[0].byteu.reg->rIdx) && (IC_RESULT (ic)->aop->size < 2 || IC_RESULT (ic)->aop->size <= 2 && aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.bytes[1].byteu.reg->rIdx))) &&
-    !ic->parmBytes &&
-    !isFuncCalleeStackCleanup (currFunc->type) &&
+    (!SomethingReturned ||
+      aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.bytes[0].byteu.reg->rIdx) &&
+        (IC_RESULT (ic)->aop->size < 2 || IC_RESULT (ic)->aop->size <= 2 && aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.bytes[1].byteu.reg->rIdx))) &&
+    !ic->parmBytes && !bigreturn &&
+    (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype) && !optimize.codeSize && ic->op == CALL) &&
     !ic->localEscapeAlive &&
     !(ic->op == PCALL && aopOnStack (left->aop, 0, left->aop->size)) &&
     !(options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (currFunc->type) && IFFUNC_ISCOSMIC (ftype))) // __cosmic uses 24 bits for return address on stack frame. Can only optimize tail call to __cosmic callee, if caller also uses 24 bits.
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
+
+      if (isFuncCalleeStackCleanup (currFunc->type))
+        {
+           const bool caller_bigreturn = currFunc->type->next && (getSize (currFunc->type->next) > 4) || IS_STRUCT (currFunc->type->next);
+           int caller_stackparmbytes = caller_bigreturn * 2;
+           for (value *caller_arg = FUNC_ARGS(currFunc->type); caller_arg; caller_arg = caller_arg->next)
+             {
+               wassert (caller_arg->sym);
+               if (!SPEC_REGPARM (caller_arg->etype))
+                 caller_stackparmbytes += getSize (caller_arg->sym->type);
+             }
+           prestackadjust += caller_stackparmbytes;
+        }
 
       for (const iCode *nic = ic->next; nic && --limit;)
         {
@@ -3641,8 +3656,16 @@ genCall (const iCode *ic)
             {
               if (OP_SYMBOL (IC_LEFT (nic))->stack <= (optimize.codeSize ? 250 : 510))
                 {
-                  prestackadjust = OP_SYMBOL (IC_LEFT (nic))->stack;
-                  tailjump = true;
+                  if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust > 250)
+                    {
+                      prestackadjust = 0;
+                      tailjump = false;
+                    }
+                  else
+                    {
+                      prestackadjust += OP_SYMBOL (IC_LEFT (nic))->stack;
+                      tailjump = true;
+                    }
                 }
               break;
             }
@@ -3826,6 +3849,15 @@ genCall (const iCode *ic)
     }
   else
     {
+      if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust) // Copy return value into correct location on stack for tail call optimization.
+        {
+          wassert (options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype));
+          bool use_y = stm8IsParmInCall(ftype, "x");
+          emit2 ("ldw", use_y ? "y, (%d, sp)" : "x, (%d, sp)", G.stack.pushed + currFunc->stack + 1);
+          emit2 ("ldw", use_y ? "(%d, sp), y" : "(%d, sp), x", prestackadjust + 1);
+          cost (4, 4);
+        }
+
       adjustStack (prestackadjust, true, true, true);
 
       if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (ftype))

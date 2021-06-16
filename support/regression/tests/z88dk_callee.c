@@ -46,7 +46,7 @@ void g0(void)
 void g1(int i) __z88dk_callee
 {
 	j = i;
-	g0(); // Tail call optimization should not done here, as it would skip stack cleanup.
+	g0(); // Tail call optimization needs to do extra work here, to avoid skipping stack cleanup.
 }
 
 void

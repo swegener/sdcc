@@ -1502,7 +1502,7 @@ replace {
 	ret
 } by {
 	jp	%5
-	; peephole 52 removed unused ret.
+	; peephole 52 removed unreachable ret.
 }
 
 replace {
@@ -1510,25 +1510,39 @@ replace {
 	retf
 } by {
 	jpf	%5
-	; peephole 52a removed unused retf.
+	; peephole 52a removed unreachable retf.
 }
 
-replace {
+replace restart {
 	jp	%5
 	addw	sp, %1
-	ret
 } by {
 	jp	%5
-	; peephole 53 removed unused ret.
+	; peephole 53 removed unreachable addw.
 }
 
-replace {
+replace restart {
 	jpf	%5
 	addw	sp, %1
-	retf
 } by {
 	jpf	%5
-	; peephole 53a removed unused retf.
+	; peephole 53a removed unreachable addw.
+}
+
+replace restart {
+	jp	%5
+	ldw	%1, (%2, sp)
+} by {
+	jp	%5
+	; peephole 54 removed unreachable ldw.
+}
+
+replace restart {
+	jp	%5
+	jp	(%1)
+} by {
+	jp	%5
+	; peephole 55 removed unreachable jp (%1).
 }
 
 replace restart {

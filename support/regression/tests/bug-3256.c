@@ -5,14 +5,18 @@
 
 #include <testfwk.h>
 
-int (*volatile twocharargptr)(char, char) __raisonance;
+#ifndef __SDCC_stm8
+#define __raisonance
+#endif
+
+int (*volatile twocharargptr)(char, char) __raisonance __reentrant;
 
 int f(void)
 {
 	(*twocharargptr)(23, 42);
 }
 
-int twochararg(char a, char b) __raisonance
+int twochararg(char a, char b) __raisonance __reentrant
 {
 	return a + b;
 }

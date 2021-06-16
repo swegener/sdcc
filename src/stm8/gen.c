@@ -3658,7 +3658,7 @@ genCall (const iCode *ic)
                 if (!isFuncCalleeStackCleanup (currFunc->type) || prestackadjust <= 250)
                   {
                     prestackadjust += OP_SYMBOL (IC_LEFT (nic))->stack;
-                    tailjump = true;
+                    tailjump = true;emit2(";B", "tailjump %d prestackadjust %d", tailjump, prestackadjust);
                     break;
                   }
               prestackadjust = 0;
@@ -3675,20 +3675,15 @@ genCall (const iCode *ic)
               const iCode *nnic = 0;
               for (nnic = nic->next; nnic; nnic = nnic->next)
                 if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
-                  {
-                    prestackadjust = 0;
-                    break;
-                  }
+                  break;
               if (!nnic)
                 for (nnic = nic->prev; nnic; nnic = nnic->prev)
                   if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
-                    {
-                      prestackadjust = 0;
-                      break;
-                    }
+                    break;
               if (!nnic)
                 {
                   prestackadjust = 0;
+                  tailjump = false;
                   break;
                 }
 
@@ -3856,7 +3851,7 @@ genCall (const iCode *ic)
     }
   else
     {
-      if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust) // Copy return value into correct location on stack for tail call optimization.
+      if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
         {
           wassert (options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype));
           bool use_y = stm8IsParmInCall(ftype, "x");

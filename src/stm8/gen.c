@@ -3655,35 +3655,42 @@ genCall (const iCode *ic)
           else if (nic->op == ENDFUNCTION)
             {
               if (OP_SYMBOL (IC_LEFT (nic))->stack <= (optimize.codeSize ? 250 : 510))
-                {
-                  if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust > 250)
-                    {
-                      prestackadjust = 0;
-                      tailjump = false;
-                    }
-                  else
-                    {
-                      prestackadjust += OP_SYMBOL (IC_LEFT (nic))->stack;
-                      tailjump = true;
-                    }
-                }
+                if (!isFuncCalleeStackCleanup (currFunc->type) || prestackadjust <= 250)
+                  {
+                    prestackadjust += OP_SYMBOL (IC_LEFT (nic))->stack;
+                    tailjump = true;
+                    break;
+                  }
+              prestackadjust = 0;
               break;
             }
           else
-            break;
+            {
+              prestackadjust = 0;
+              break;
+            }
 
           if (targetlabel)
             {
               const iCode *nnic = 0;
               for (nnic = nic->next; nnic; nnic = nnic->next)
                 if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
-                  break;
+                  {
+                    prestackadjust = 0;
+                    break;
+                  }
               if (!nnic)
                 for (nnic = nic->prev; nnic; nnic = nnic->prev)
                   if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
-                    break;
+                    {
+                      prestackadjust = 0;
+                      break;
+                    }
               if (!nnic)
-                break;
+                {
+                  prestackadjust = 0;
+                  break;
+                }
 
               nic = nnic;
             }
@@ -4168,7 +4175,8 @@ genEndFunction (iCode *ic)
   bool y_free = !aopRet (sym->type) || (aopRet (sym->type)->regs[YL_IDX] < 0 && aopRet (sym->type)->regs[YH_IDX] < 0);
 
   /* adjust the stack for the function */
-  if (poststackadjust > 1 && x_free && options.model != MODEL_LARGE &&
+  if (poststackadjust > 1 && x_free &&
+    options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (sym->type) &&
     sym->stack < 255 - 1 &&
     !IFFUNC_ISISR (sym->type) && !IFFUNC_ISCRITICAL (sym->type))
     {
@@ -4214,7 +4222,7 @@ genEndFunction (iCode *ic)
           pop (ASMOP_X, 0, 2);
           adjustStack (poststackadjust, a_free, x_free, y_free);
         }
-      else if (4 + poststackadjust <= 255 && (options.model == MODEL_LARGE ||IFFUNC_ISCOSMIC (sym->type) ))
+      else if (4 + poststackadjust <= 255 && (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (sym->type) ))
         {
           bool pushed_a = false;
           if (!a_free)

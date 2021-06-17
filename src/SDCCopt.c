@@ -2598,6 +2598,16 @@ optimize:
                       OP_USES (IC_RIGHT (uic)) = bitVectSetBit (OP_USES (IC_RIGHT (uic)), uic->key);
                     }
                 }
+              if (skipuic && skipuic->op == '=' &&
+                  compareType (operandType (IC_RESULT (skipuic)), operandType (IC_RIGHT (skipuic))) != 1)
+                {
+                  /* Because of the type change, this assignment  */
+                  /* is now really a cast, so make it official.   */
+                  /* Later optimizeCastCast() will decide if this */
+                  /* is safe to remove completely. */
+                  skipuic->op = CAST;
+                  IC_LEFT (skipuic) = operandFromLink (copyLinkChain (operandType (IC_RESULT (skipuic))));
+                }
               change++;
             }
         }

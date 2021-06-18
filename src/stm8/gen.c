@@ -3658,7 +3658,7 @@ genCall (const iCode *ic)
                 if (!isFuncCalleeStackCleanup (currFunc->type) || prestackadjust <= 250)
                   {
                     prestackadjust += OP_SYMBOL (IC_LEFT (nic))->stack;
-                    tailjump = true;emit2(";B", "tailjump %d prestackadjust %d", tailjump, prestackadjust);
+                    tailjump = true;
                     break;
                   }
               prestackadjust = 0;
@@ -3855,7 +3855,7 @@ genCall (const iCode *ic)
         {
           wassert (options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype));
           bool use_y = stm8IsParmInCall(ftype, "x");
-          emit2 ("ldw", use_y ? "y, (%d, sp)" : "x, (%d, sp)", G.stack.pushed + currFunc->stack + 1);
+          emit2 ("ldw", use_y ? "y, (%d, sp)" : "x, (%d, sp)", G.stack.pushed + 1);
           emit2 ("ldw", use_y ? "(%d, sp), y" : "(%d, sp), x", prestackadjust + 1);
           cost (4, 4);
         }

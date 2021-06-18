@@ -1,3 +1,9 @@
+2021-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/peeph.def:
+	  Fix bug #3258.
+
 2021-06-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (optimizeOpWidth): fix bug #3236

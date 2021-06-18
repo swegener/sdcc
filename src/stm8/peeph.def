@@ -1531,6 +1531,22 @@ replace restart {
 
 replace restart {
 	jp	%5
+	popw	%1
+} by {
+	jp	%5
+	; peephole 53b removed unreachable popw.
+}
+
+replace restart {
+	jpf	%5
+	popw	%1
+} by {
+	jpf	%5
+	; peephole 53c removed unreachable popw.
+}
+
+replace restart {
+	jp	%5
 	ldw	%1, (%2, sp)
 } by {
 	jp	%5

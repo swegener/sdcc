@@ -85,7 +85,7 @@ cl_vcd_var::~cl_vcd_var(void)
 t_mem
 cl_vcd_var::write(t_mem val)
 {
-  if (vcd->is_running() && (val & bitmask) != (cell->get() & bitmask))
+  if (vcd->is_running() /*&& (val & bitmask) != (cell->get() & bitmask)*/)
     vcd->report(this, val);
 
   return cl_memory_operator::write(val);
@@ -644,7 +644,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                             fprintf(fd, "%s", uc->vars->by_addr.at(i)->get_name());
                           else
                             {
-                              fprintf(fd, "%s[", (as ? as->get_name() : "?"));
+                              fprintf(fd, "%s_0x%08x[", (as ? as->get_name() : "?"), AU(addr));
                               fprintf(fd, (as ? as->addr_format : "0x06x"), addr);
                               fprintf(fd, "]");
                             }

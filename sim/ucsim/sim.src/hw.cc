@@ -94,6 +94,8 @@ cl_hw::init(void)
 
       for (i= 0; i < cfg_size(); i++)
         {
+	  class cl_memory_cell *c= cfg->get_cell(i);
+	  c->decode(&(c->def_data));
           cfg->register_hw(i, this, false);
         }
     }

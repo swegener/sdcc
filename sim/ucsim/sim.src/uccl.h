@@ -348,6 +348,8 @@ public:
   
   // execution
   virtual t_mem fetch(void);
+  virtual u8_t fetch8(void) { return (u8_t)fetch(); }
+  virtual i8_t fetchi8(void) { return (i8_t)fetch(); }
   virtual bool fetch(t_mem *code);
   virtual int do_inst(int step);
   virtual void pre_inst(void);

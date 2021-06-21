@@ -170,7 +170,7 @@ test-ucgbz80:
 test-ucr2k:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucr2k
-	
+
 # Helper rule for testing the r2ka port only(use uCsim simulator)
 test-ucr2ka:
 	$(MAKE) test-common
@@ -220,7 +220,7 @@ test-tlcs90:
 test-ez80-z80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ez80-z80
-	
+
 # Helper rule for testing the z80n port only(use uCsim simulator)
 test-ucz80n:
 	$(MAKE) test-common
@@ -340,8 +340,8 @@ $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.
-port-results: $(PORT_RESULTS)
-	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/collate-results.py $(PORT)
+$(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS)
+	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
 
 port-fwklib: $(EXTRAS) $(FWKLIB)
 
@@ -357,7 +357,8 @@ test-port:
 	# recurse: force vpath to re-read the $(CASES_DIR)
 	$(MAKE) port-dirs PORT=$(PORT)
 	$(MAKE) port-fwklib PORT=$(PORT)
-	$(MAKE) port-results PORT=$(PORT)
+	$(MAKE) $(RESULTS_DIR)/$(PORT).sum PORT=$(PORT)
+	cat $(RESULTS_DIR)/$(PORT).sum
 
 # Begin rules that process each iteration generated from the source
 # test
@@ -392,7 +393,7 @@ $(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(CASES_DIR)/stamp
 # BeginGeneric rules
 
 clean:
-	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
+	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc __pycache__
 	for i in $(CLEAN_PORTS); do \
 	  $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \
 	done

@@ -1,3 +1,12 @@
+2021-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peep.c (doPushScan): added param instr,
+	  added removeDeadPushPop()
+	* src/mcs51/peeph.def: moved rules 301-302 to 302-303, added rule 301
+	* support/regression/Makefile.in: introduced results/*.sum
+	* support/regression/tests/wchar.c: subdivided in several cases to allow
+	  testing on mcs51-small, char16 still doesn't fit in memory though
+
 2021-06-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCopt.c (optimizeOpWidth):

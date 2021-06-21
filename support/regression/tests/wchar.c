@@ -1,4 +1,5 @@
 /* Tests wide character conversion functions.
+test: wcharnorestart, wcharstringnorestart, wcharrestart, char16restart, char32restart
  */
 #include <testfwk.h>
 
@@ -24,10 +25,13 @@ _Static_assert(WEOF <= WINT_MAX, "WEOF out of wint_t range");
 #endif
 #endif
 
+#define TEST_{test}
+
+#ifdef TEST_wcharnorestart
 static void
-testwcharnorestart(void)
+wcharnorestart(void)
 {
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !defined(__SDCC_pdk14) // Not enough memory
 #if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 	wchar_t w;
 	char c[MB_LEN_MAX];
@@ -50,11 +54,13 @@ testwcharnorestart(void)
 #endif
 #endif
 }
+#endif
 
+#ifdef TEST_wcharstringnorestart
 static void
-testwcharstringnorestart(void)
+wcharstringnorestart(void)
 {
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Not enough memory
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Not enough memory
 	wchar_t wcs1[5] = L"Test";
 	wchar_t wcs2[5];
 	char mbs[5 * MB_LEN_MAX];
@@ -85,12 +91,14 @@ testwcharstringnorestart(void)
 	ASSERT(!wcscmp(L"Te", wcs2));
 #endif
 }
+#endif
 
+#ifdef TEST_wcharrestart
 static void
-testwcharrestart(void)
+wcharrestart(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 	static mbstate_t ps;
 	wchar_t w;
 	char c[MB_LEN_MAX];
@@ -111,9 +119,11 @@ testwcharrestart(void)
 #endif
 #endif
 }
+#endif
 
+#ifdef TEST_char16restart
 static void
-testchar16restart(void)
+char16restart(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
@@ -148,12 +158,14 @@ testchar16restart(void)
 #endif
 #endif
 }
+#endif
 
+#ifdef TEST_char32restart
 static void
-testchar32restart(void)
+char32restart(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 	static mbstate_t ps;
 	char32_t c32[2];
 	char c[MB_LEN_MAX];
@@ -166,4 +178,10 @@ testchar32restart(void)
 #endif
 #endif
 }
+#endif
 
+static void
+testwchar(void)
+{
+	{test}();
+}

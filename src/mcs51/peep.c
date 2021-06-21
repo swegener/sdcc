@@ -551,7 +551,7 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
 /* - recursion in case of conditional branches                     */
 /*-----------------------------------------------------------------*/
 static bool
-doPushScan (lineNode **pl, const char *pReg)
+doPushScan (lineNode **pl, const char *pReg, const char *instr)
 {
 #if 0
   lineNode *pushPl = NULL;
@@ -560,7 +560,7 @@ doPushScan (lineNode **pl, const char *pReg)
 
   for (;; *pl = (*pl)->next)
     {
-      switch (scan4op (pl, pReg, "push", &plConditional))
+      switch (scan4op (pl, pReg, instr, &plConditional))
         {
           case S4O_FOUNDOPCODE:
             /* this is what we're looking for */
@@ -656,7 +656,7 @@ removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
       ; There must not be in area 1:
       ;    - read or write access of ar0
       ;    - "acall", "lcall", "pop", "ret", "reti" or "jmp @a+dptr" opcodes
-      ;    - "push" opcode, which doesn't push ar0 
+      ;    - "push" opcode, which doesn't push ar0
       ;    - inline assembly
       ;    - a jump in or out of area 1 (see checkLabelRef())
 
@@ -678,7 +678,7 @@ removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
 
   /* area 1 */
   pushPl = currPl->next;
-  if (!doPushScan (&pushPl, pReg))
+  if (!doPushScan (&pushPl, pReg, "push"))
     return FALSE;
 
   if (!checkLabelRef())
@@ -701,15 +701,72 @@ removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
   else
     {
       /* replace 'push ar0' by comment */
-      #define STR ";\tPeephole\tpush %s removed"
-      int size = sizeof(STR) + 2;
+      #define STR ";\tPeephole\t%s %s removed"
+      int size = sizeof(STR) + 6;
 
       pushPl->line = Safe_alloc (size);
-      SNPRINTF (pushPl->line, size, STR, pReg);
+      SNPRINTF (pushPl->line, size, STR, "push", pReg);
       pushPl->isComment = TRUE;
     }
 
   /* 'pop ar0' will be removed by peephole framework after returning TRUE */
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* removeDeadPushPop - remove push/pop pair if possible            */
+/*-----------------------------------------------------------------*/
+static bool
+removeDeadPushPop (const char *pReg, lineNode *currPl, lineNode *head)
+{
+  lineNode *popPl;
+
+  /* A push/pop pair can be removed, if these criteria are met
+     (ar0 is just an example here, ar0...ar7 are possible):
+
+     push ar0
+
+      ; There must not be in area 1:
+      ;    - write access of ar0
+      ;    - "acall", "lcall", "pop", "ret", "reti" or "jmp @a+dptr" opcodes
+      ;    - "push" opcode, which doesn't push ar0
+      ;    - inline assembly
+      ;    - a jump in or out of area 1 (see checkLabelRef())
+
+      ; area 1 must be terminated by a:
+     pop ar0
+
+      ; An "acall", "lcall" (not callee save), "ret" (not PCALL with
+      ; callee save), "reti" or write access of r0 terminate
+      ; the search, and the "pop/push ar0" can safely be removed.
+  */
+
+  popPl = currPl->next;
+  if (!doPushScan (&popPl, pReg, "pop"))
+    return FALSE;
+
+  if (!checkLabelRef())
+    return FALSE;
+
+  /* Success! */
+  if (options.noPeepComments)
+    {
+      /* remove popPl from list */
+      popPl->prev->next = popPl->next;
+      popPl->next->prev = popPl->prev;
+    }
+  else
+    {
+      /* replace 'push ar0' by comment */
+      #define STR ";\tPeephole\t%s %s removed"
+      int size = sizeof(STR) + 6;
+
+      popPl->line = Safe_alloc (size);
+      SNPRINTF (popPl->line, size, STR, "pop", pReg);
+      popPl->isComment = TRUE;
+    }
+
+  /* 'push ar0' will be removed by peephole framework after returning TRUE */
   return TRUE;
 }
 
@@ -762,8 +819,10 @@ mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
 
   if (strncmp (currPl->line, "pop", 3) == 0)
     return removeDeadPopPush (pReg, currPl, head);
-  else if (   strncmp (currPl->line, "mov", 3) == 0
-           && (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
+  else if (strncmp (currPl->line, "push", 4) == 0)
+    return removeDeadPushPop (pReg, currPl, head);
+  else if (strncmp (currPl->line, "mov", 3) == 0 &&
+           (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
     return removeDeadMove (pReg, currPl);
   else
     {

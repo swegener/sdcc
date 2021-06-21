@@ -5028,16 +5028,22 @@ replace restart {
 	;	Peephole 300	pop ar%1 removed
 } if deadMove(%1)
 
+replace restart {
+	push	ar%1
+} by {
+	;	Peephole 301	push ar%1 removed
+} if deadMove(%1)
+
 replace {
 	mov	r%1,%2
 } by {
-	;	Peephole 301	mov r%1,%2 removed
+	;	Peephole 302	mov r%1,%2 removed
 } if notVolatile(%2), deadMove(%1)
 
 replace {
 	mov	ar%1,%2
 } by {
-	;	Peephole 302	mov ar%1,%2 removed
+	;	Peephole 303	mov ar%1,%2 removed
 } if notVolatile(%2), deadMove(%1)
 
 

@@ -115,6 +115,21 @@ struct dis_entry disass_rxk[]=
     { 0x30, 0xff, ' ', 2, "JR NC,%r" },
     { 0x38, 0xff, ' ', 2, "JR C,%r" },
     { 0x27, 0xff, ' ', 2, "ADD SP,%d" },
+    { 0x34, 0xff, ' ', 1, "INC (HL)" },
+    { 0x35, 0xff, ' ', 1, "DEC (HL)" },
+    { 0x36, 0xff, ' ', 2, "LD (HL),%d" },
+    { 0x47, 0xff, ' ', 1, "LD B,A" },
+    { 0x4f, 0xff, ' ', 1, "LD C,A" },
+    { 0x57, 0xff, ' ', 1, "LD D,A" },
+    { 0x5b, 0xff, ' ', 1, "LD E,E" },
+    { 0x5f, 0xff, ' ', 1, "LD E,A" },
+    { 0x6f, 0xff, ' ', 1, "LD L,A" },
+    { 0x78, 0xff, ' ', 1, "LD A,B" },
+    { 0x79, 0xff, ' ', 1, "LD A,C" },
+    { 0x7a, 0xff, ' ', 1, "LD A,D" },
+    { 0x7b, 0xff, ' ', 1, "LD A,E" },
+    { 0x7c, 0xff, ' ', 1, "LD A,H" },
+    { 0x7d, 0xff, ' ', 1, "LD A,L" },
     
     { 0, 0, 0, 0, 0, 0 }
   };

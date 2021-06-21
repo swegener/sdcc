@@ -36,6 +36,8 @@ class cl_r5k: public cl_r4k
  public:
   cl_r5k(class cl_sim *asim);
   virtual const char *id_string(void);
+
+  virtual void tick5p1(int n) { tick(n+1); }
 };
 
 

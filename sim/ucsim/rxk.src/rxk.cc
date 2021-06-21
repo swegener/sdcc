@@ -161,6 +161,7 @@ cl_rxk::make_memories(void)
   as->init();
   address_spaces->add(as);
 
+  /*
   chip= new cl_chip8("ioi_chip", 0x10000, 8);
   chip->init();
   memchips->add(chip);
@@ -169,7 +170,8 @@ cl_rxk::make_memories(void)
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
-
+  */
+  
   ioe= as= new cl_address_space("ioe", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);

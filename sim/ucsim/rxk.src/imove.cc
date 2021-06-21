@@ -34,7 +34,7 @@ cl_rxk::ld_dd_mn(class cl_cell16 &dd)
   l= fetch();
   h= fetch();
   dd.W(h*256+l);
-  tick(4);
+  tick(5);
   return resGO;
 }
 
@@ -47,9 +47,9 @@ cl_rxk::ld_r_n(class cl_cell8 &r)
 }
 
 int
-cl_rxk::ld_hl_r(u8_t op)
+cl_rxk::ld_ihl_r(u8_t op)
 {
-  class cl_cell8 &c= dest8HL();
+  class cl_cell8 &c= dest8iHL();
   c.W(op);
   vc.wr++;
   tick(5);
@@ -57,7 +57,7 @@ cl_rxk::ld_hl_r(u8_t op)
 }
 
 int
-cl_rxk::ld_r_hl(class cl_cell8 &destr)
+cl_rxk::ld_r_ihl(class cl_cell8 &destr)
 {
   u8_t v= read8(rHL);
   destr.W(v);
@@ -65,11 +65,19 @@ cl_rxk::ld_r_hl(class cl_cell8 &destr)
   return resGO;
 }
 
+int
+cl_rxk::ld_r_g(class cl_cell8 &destr, u8_t op)
+{
+  destr.W(op);
+  tick(1);
+  return resGO;
+}
+
 
 int
-cl_rxk::LD_BC_A(t_mem code)
+cl_rxk::LD_iBC_A(t_mem code)
 {
-  class cl_cell8 &c= dest8BC();
+  class cl_cell8 &c= dest8iBC();
   c.W(rA);
   vc.wr++;
   tick(6);
@@ -77,9 +85,9 @@ cl_rxk::LD_BC_A(t_mem code)
 }
 
 int
-cl_rxk::LD_DE_A(t_mem code)
+cl_rxk::LD_iDE_A(t_mem code)
 {
-  class cl_cell8 &c= dest8DE();
+  class cl_cell8 &c= dest8iDE();
   c.W(rA);
   vc.wr++;
   tick(6);
@@ -87,17 +95,17 @@ cl_rxk::LD_DE_A(t_mem code)
 }
 
 int
-cl_rxk::LD_MN_A(t_mem code)
+cl_rxk::LD_iMN_A(t_mem code)
 {
-  class cl_cell8 &c= dest8mn();
+  class cl_cell8 &c= dest8imn();
   c.W(rA);
   vc.wr++;
-  tick(7);
+  tick(9);
   return resGO;
 }
 
 int
-cl_rxk::LD_A_BC(t_mem code)
+cl_rxk::LD_A_iBC(t_mem code)
 {
   destA().W(read8(rBC));
   tick(5);
@@ -105,7 +113,7 @@ cl_rxk::LD_A_BC(t_mem code)
 }
 
 int
-cl_rxk::LD_A_DE(t_mem code)
+cl_rxk::LD_A_iDE(t_mem code)
 {
   destA().W(read8(rDE));
   tick(5);
@@ -113,10 +121,10 @@ cl_rxk::LD_A_DE(t_mem code)
 }
 
 int
-cl_rxk::LD_A_MN(t_mem code)
+cl_rxk::LD_A_iMN(t_mem code)
 {
   destA().W(read8(fetch16()));
-  tick(6);
+  tick(8);
   return resGO;
 }
 

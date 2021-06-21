@@ -144,6 +144,21 @@ cl_rxk::rot9right(class cl_cell8 &dest, u8_t op)
 }
 
 int
+cl_rxk::Xor(class cl_cell8 &dest, u8_t op)
+{
+  class cl_cell8 &f= destF();
+  u8_t forg= f.R() & ~(flagS|flagZ|flagL|flagC);
+  u8_t res= dest.R() ^ op;
+  dest.W(res);
+  if (res & 0x80) forg|= flagS;
+  if (!res) forg|= flagZ;
+  if (res&0xf0) forg|= flagL;
+  f.W(forg);
+  tick(1);
+  return resGO;
+}
+
+int
 cl_rxk::CPL(t_mem code)
 {
   destA().W(~rA);
@@ -180,6 +195,44 @@ cl_rxk::ADD_SP_d(t_mem code)
   else
     f.W(forg&= ~flagC);
   tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::inc_i8(t_addr addr)
+{
+  class cl_cell8 &f= destF();
+  u8_t forg= f.R() & ~(flagS|flagZ|flagV);
+  class cl_memory_cell *dest= rwas->get_cell(addr);
+  u8_t org= dest->R();
+  u8_t res= org+1;
+  if (res & 0x80) forg|= flagS;
+  if (!res) forg|= flagZ;
+  if (!(org&0x80) && (res&0x80)) forg|= flagV;
+  f.W(forg);
+  dest->W(res);
+  vc.rd++;
+  vc.wr++;
+  tick(7);
+  return resGO;
+}
+
+int
+cl_rxk::dec_i8(t_addr addr)
+{
+  class cl_cell8 &f= destF();
+  u8_t forg= f.R() & ~(flagS|flagZ|flagV);
+  class cl_memory_cell *dest= rwas->get_cell(addr);
+  u8_t org= dest->R();
+  u8_t res= org-1;
+  if (res & 0x80) forg|= flagS;
+  if (!res) forg|= flagZ;
+  if (org&res&0x80) forg|= flagV;
+  f.W(forg);
+  dest->W(res);
+  vc.rd++;
+  vc.wr++;
+  tick(7);
   return resGO;
 }
 

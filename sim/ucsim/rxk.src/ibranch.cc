@@ -35,7 +35,7 @@ cl_rxk::DJNZ(t_mem code)
   destB().W(v);
   if (v)
     PC+= r;
-  tick(4);
+  tick5p1(4);
   return resGO;
 }
 
@@ -44,7 +44,7 @@ cl_rxk::JR(t_mem code)
 {
   i8_t r= fetch();
   PC+= r;
-  tick(4);
+  tick5p1(4);
   return resGO;
 }
 
@@ -54,7 +54,7 @@ cl_rxk::jr_cc(bool cond)
   i8_t r= fetch();
   if (cond)
     PC+= r;
-  tick(4);
+  tick5p1(4);
   return resGO;
 }
 

@@ -64,7 +64,7 @@ TEST_OBJ	=
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs m6800.src m6800lib
+all: checkconf otherlibs m6800.src
 
 
 # Compiling and installing everything and runing test
@@ -118,7 +118,7 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-m6800.src: $(top_builddir)/libm6800.a sm6800$(EXEEXT) ucsim_m6800$(EXEEXT) shared_lib
+m6800.src: sm6800$(EXEEXT) ucsim_m6800$(EXEEXT) shared_lib m6800lib
 
 sm6800$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@

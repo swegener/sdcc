@@ -23,7 +23,7 @@ all: checkconf #libs apps
 	$(MAKE) libs
 	$(MAKE) apps
 
-libs: main_all cmd_src_all sim_src_all gui_src_all motorola_src_all
+libs: main_all cmd_src_all sim_src_all gui_src_all motorola_src_all m6800lib
 
 main_all:
 	$(MAKE) -f main.mk all
@@ -39,6 +39,9 @@ gui_src_all:
 
 motorola_src_all:
 	$(MAKE) -C motorola.src motorola.src
+
+m6800lib:
+	$(MAKE) -C m6800.src m6800lib
 
 
 apps: $(PKGS) main_app

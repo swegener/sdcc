@@ -155,7 +155,7 @@ $(top_builddir)/libmotorola.a:
 	$(MAKE) -C $(top_builddir)/motorola.src all
 
 $(top_builddir)/libm6800.a:
-	$(MAKE) -C $(top_builddir)/m6800.src all
+	$(MAKE) -C $(top_builddir)/m6800.src m6800lib
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

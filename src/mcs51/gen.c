@@ -1712,6 +1712,13 @@ aopPut (operand * result, const char *s, int offset)
 
     case AOP_R0:
     case AOP_R1:
+      /* Get source in A before inc/dec of r0/r1 */
+      /* in case source needed different offset  */
+      if (aop->paged || *s == '@')
+        {
+          MOVA (s);
+        }
+        
       while (offset > aop->coff)
         {
           aop->coff++;
@@ -1726,12 +1733,12 @@ aopPut (operand * result, const char *s, int offset)
 
       if (aop->paged)
         {
-          MOVA (s);
+          /* source already in A */
           emitcode ("movx", "@%s,a", aop->aopu.aop_ptr->name);
         }
       else if (*s == '@')
         {
-          MOVA (s);
+          /* source already in A */
           emitcode ("mov", "@%s,a", aop->aopu.aop_ptr->name);
         }
       else if (EQ (s, "r0") || EQ (s, "r1") || EQ (s, "r2") || EQ (s, "r3") ||
@@ -8395,10 +8402,12 @@ genSwap (iCode * ic)
       else if (operandsEqu (left, result))
         {
           char *reg = "a";
+          const char *src;
           bool pushedB = FALSE, leftInB = FALSE;
 
-          MOVA (aopGet (left, 0, FALSE, FALSE));
-          if (aopGetUsesAcc (left, 1) || aopGetUsesAcc (result, 0))
+          src = aopGet (left, 0, FALSE, FALSE);
+          MOVA (src);
+          if (aopGetUsesAcc (left, 1) || aopGetUsesAcc (result, 0) || aopPutUsesAcc (result, src, 0))
             {
               pushedB = pushB ();
               emitcode ("mov", "b,a");

@@ -1,3 +1,8 @@
+2021-06-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (aopPut, genSwap): fix bug #3188
+	* support/regression/tests/rotate2.c: reenable mcs51 stack-auto tests
+
 2021-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peep.c (doPushScan): added param instr,

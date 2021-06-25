@@ -9065,7 +9065,7 @@ genlshFixed (operand *result, operand *left, int shCount)
           shiftL1Left2Result (left, LSB, result, full_bytes, shCount);
         }
     }
-  for (b = LSB; b < full_bytes; b++)
+  for (b = LSB; b < full_bytes && b < size; b++)
     aopPut (result, zero, b);
   return;
 }

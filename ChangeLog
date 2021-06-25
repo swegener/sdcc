@@ -1,3 +1,7 @@
+2021-06-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genlshFixed): fix bug #3072
+
 2021-06-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (aopPut, genSwap): fix bug #3188

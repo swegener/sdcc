@@ -6757,6 +6757,10 @@ optimizeSWAP (ast * root)
 
       if (AST_ULONG_VALUE (root->right->right) != (getSize (TTYPE (root->left->left)) * 4))
         return root;
+      
+      /* cannot have side effects or volatility */
+      if (hasSEFcalls (root))
+        return root;
 
       /* make sure the port supports SWAP */
       if (port->hasExtBitOp && !port->hasExtBitOp (SWAP, getSize (TTYPE (root->left->left))))

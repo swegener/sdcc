@@ -1,3 +1,7 @@
+2021-06-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (optimizeSWAP): fix bug #3218
+
 2021-06-26 Visenri
 	* support/regression/tests/bug2686159.c:
 	  Added support for pdk in test bug2686159.

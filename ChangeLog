@@ -1,3 +1,8 @@
+2021-06-28 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCglue.c:
+	  Fix bug #3253: patch by Oleg Endo
+
 2021-06-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

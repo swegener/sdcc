@@ -4080,6 +4080,7 @@ genFunction (iCode *ic)
 
   if (IFFUNC_ISNAKED(ftype))
   {
+      updateCFA(); //ensure function has at least 1 CFA record
       emit2(";", "naked function: no prologue.");
       return;
   }

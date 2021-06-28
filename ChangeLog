@@ -1,3 +1,7 @@
+2021-06-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/stm8/gen.c (genFunction): possible fix for bug #3199
+
 2021-06-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (optimizeSWAP): fix bug #3218

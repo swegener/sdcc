@@ -152,6 +152,7 @@ static char *stm8_keywords[] = {
   "raisonance",
   "iar",
   "cosmic",
+  "sdccnewcall",
   "z88dk_callee",
   NULL
 };

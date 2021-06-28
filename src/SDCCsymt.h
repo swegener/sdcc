@@ -277,6 +277,7 @@ typedef struct sym_link
     unsigned raisonance:1;          /* Raisonance calling convention for STM8 */
     unsigned iar:1;                 /* IAR calling convention */
     unsigned cosmic:1;              /* Cosmic calling convention */
+    unsigned sdccnewcall:1;         /* Experimental new calling convention */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
     unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
@@ -468,6 +469,8 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISIAR(x) (IS_FUNC(x) && FUNC_ISIAR(x))
 #define FUNC_ISCOSMIC(x) (x->funcAttrs.cosmic)
 #define IFFUNC_ISCOSMIC(x) (IS_FUNC(x) && FUNC_ISCOSMIC(x))
+#define FUNC_ISSDCCNEWCALL(x) (x->funcAttrs.sdccnewcall)
+#define IFFUNC_ISSDCCNEWCALL(x) (IS_FUNC(x) && FUNC_ISSDCCNEWCALL(x))
 #define FUNC_ISZ88DK_FASTCALL(x) (x->funcAttrs.z88dk_fastcall)
 #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
 #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)

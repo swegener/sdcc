@@ -1181,13 +1181,20 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
 
   // Can load immediate values directly into (hl).
   if(!strcmp(dst, "(hl)") && src[0] == '#')
-    return TRUE;
+    return true;
 
-  // Can load hl into sp
-  if(!strcmp(dst, "sp") && !strcmp(src, "hl"))
-    return TRUE;
+  // Can load between hl / ix / iy and sp.
+  if(!strcmp(dst, "sp") && (!strcmp(src, "hl") || !strcmp(src, "ix") || !strcmp(src, "iy")) ||
+    (!strcmp(dst, "hl") || !strcmp(dst, "ix") || !strcmp(dst, "iy")) && !strcmp(src, "sp"))
+    return true;
 
-  return FALSE;
+  // Rabbit can load between iy and hl.
+  if (IS_RAB &&
+    (!strcmp(dst, "hl") && (!strcmp(src, "ix") || !strcmp(src, "iy")) ||
+    (!strcmp(dst, "ix") || !strcmp(dst, "iy")) && !strcmp(src, "hl")))
+    return true;
+
+  return false;
 }
 
 static const char *

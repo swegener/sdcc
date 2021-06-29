@@ -1,3 +1,14 @@
+2021-06-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/pdk/ralloc.c,
+	  src/stm8/main.c,
+	  src/stm8/ralloc.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/ralloc.c:
+	  Fix initialization of asmops for use of aopArg in _reg_parm.
+
 2021-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genPcall): fix bug #2994

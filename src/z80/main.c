@@ -190,6 +190,11 @@ static builtins _z80_builtins[] = {
   {NULL, NULL, 0, {NULL}}
 };
 
+extern reg_info gbz80_regs[];
+extern reg_info z80_regs[];
+extern void z80_init_asmops (void);
+extern reg_info *regsZ80;
+
 static void
 _z80_init (void)
 {
@@ -203,6 +208,9 @@ _z80_init (void)
       asm_addTree (&_asxxxx_z80);
       break;
     }
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -218,6 +226,9 @@ _z180_init (void)
       asm_addTree (&_asxxxx_z80);
       break;
     }
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -225,6 +236,9 @@ _r2k_init (void)
 {
   z80_opts.sub = SUB_R2K;
   asm_addTree (&_asxxxx_r2k);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -232,6 +246,9 @@ _r2ka_init (void)
 {
   z80_opts.sub = SUB_R2KA;
   asm_addTree (&_asxxxx_r2k);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -239,12 +256,18 @@ _r3ka_init (void)
 {
   z80_opts.sub = SUB_R3KA;
   asm_addTree (&_asxxxx_r2k);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
 _gbz80_init (void)
 {
   z80_opts.sub = SUB_GBZ80;
+
+  regsZ80 = gbz80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -252,6 +275,9 @@ _tlcs90_init (void)
 {
   z80_opts.sub = SUB_TLCS90;
   asm_addTree (&_asxxxx_z80);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -267,6 +293,9 @@ _ez80_z80_init (void)
       asm_addTree (&_asxxxx_z80);
       break;
     }
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void
@@ -274,6 +303,9 @@ _z80n_init (void)
 {
   z80_opts.sub = SUB_Z80N;
   asm_addTree (&_asxxxx_z80);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
 }
 
 static void

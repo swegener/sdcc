@@ -166,10 +166,14 @@ stm8_genAssemblerEnd (FILE *of)
     }
 }
 
+extern void stm8_init_asmops (void);
+
 static void
 stm8_init (void)
 {
   asm_addTree (&asm_asxxxx_mapping);
+
+  stm8_init_asmops ();
 }
 
 static void

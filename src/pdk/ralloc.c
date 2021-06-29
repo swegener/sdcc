@@ -723,8 +723,6 @@ pdk_assignRegisters (ebbIndex *ebbi)
   int count = ebbi->count;
   iCode *ic;
 
-  pdk_init_asmops();
-
   transformPointerSet (ebbs, count);
 
   /* change assignments this will remove some

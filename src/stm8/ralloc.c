@@ -746,8 +746,6 @@ stm8RegFix (eBBlock ** ebbs, int count)
     }
 }
 
-void stm8_init_asmops (void);
-
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
@@ -757,8 +755,6 @@ stm8_assignRegisters (ebbIndex *ebbi)
   eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   iCode *ic;
-
-  stm8_init_asmops();
 
   transformPointerSet (ebbs, count);
 

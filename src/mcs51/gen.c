@@ -3387,7 +3387,9 @@ genPcall (iCode * ic)
 
   D (emitcode (";", "genPcall"));
 
-  dtype = operandType (IC_LEFT (ic))->next;
+  dtype = operandType (IC_LEFT (ic));
+  if (IS_FUNCPTR (dtype))
+    dtype = dtype->next;
   etype = getSpec (dtype);
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)

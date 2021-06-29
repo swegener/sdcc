@@ -1,3 +1,8 @@
+2021-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genPcall): fix bug #2994
+	* support/regression/tests/bug-2993.c: reenable for mcs51-huge
+
 2021-06-28 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCglue.c:

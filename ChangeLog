@@ -1,3 +1,9 @@
+2021-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Assignment to / from global variables with non-free hl.
+
 2021-06-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/main.c,

@@ -4106,7 +4106,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (i + 1 < size && IS_GB && result->type != AOP_REG && requiresHL (result) && source->type == AOP_REG && requiresHL (source) && de_dead_global && hl_dead_global) // word through de is cheaper than direct byte-by-byte, since it requires fewer updates of hl.
+      else if (i + 1 < size && IS_GB && result->type != AOP_REG && requiresHL (result) && source->type == AOP_REG && requiresHL (source) && // word through de is cheaper than direct byte-by-byte, since it requires fewer updates of hl.
+        de_dead_global && hl_dead_global && source->regs[L_IDX] <= i + 1 && source->regs[H_IDX] <= i + 1)
         {
           cheapMove (ASMOP_E, 0, source, i, a_dead);
           cheapMove (ASMOP_D, 0, source, i + 1, a_dead);
@@ -4148,9 +4149,14 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           zeroed_a = true;
         }
 
-      if (result->type == AOP_HL && a_dead_global && (!hl_dead_global || source->regs[L_IDX] != -1 || source->regs[H_IDX] != -1) && source->regs[A_IDX] <= i)
+      if (result->type == AOP_HL && a_dead_global && (!hl_dead_global || source->regs[L_IDX] >= i || source->regs[H_IDX] >= i) && source->regs[A_IDX] <= i)
         {
-          if (!aopIsLitVal (source, soffset + i, 1, 0x00) || !zeroed_a)
+          if (source->type == AOP_HL)
+            {
+              emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, FALSE));
+              regalloc_dry_run_cost += 3;
+            }
+          else if (!aopIsLitVal (source, soffset + i, 1, 0x00) || !zeroed_a)
             {
               cheapMove (ASMOP_A, 0, source, soffset + i, true);
               zeroed_a = aopIsLitVal (source, soffset + i, 1, 0x00);
@@ -13736,7 +13742,7 @@ genAssign (const iCode *ic)
               goto release;
             }
         }
-      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK || result->aop->type == AOP_IY || result->aop->type == AOP_HL) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || right->aop->type == AOP_IY))
+      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK || result->aop->type == AOP_IY || result->aop->type == AOP_HL) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || right->aop->type == AOP_IY || right->aop->type == AOP_HL))
         genMove (result->aop, right->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
       else
         while (size--)

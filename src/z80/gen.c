@@ -5458,10 +5458,26 @@ genCall (const iCode *ic)
       (IC_RESULT (ic)->aop->size <= 2 || aopInReg (IC_RESULT (ic)->aop, 2, aopRet (ftype)->aopu.aop_reg[2]->rIdx)) &&
       (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
       IC_RESULT (ic)->aop->size <= 4) &&
-    !ic->parmBytes && !ic->localEscapeAlive && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) && (_G.omitFramePtr || IS_GB) &&
-    !isFuncCalleeStackCleanup (currFunc->type))
+    !ic->parmBytes &&
+    (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8*/) &&
+    !ic->localEscapeAlive &&
+    !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) &&
+    (_G.omitFramePtr || IS_GB))
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
+
+      if (isFuncCalleeStackCleanup (currFunc->type))
+        {
+           const bool caller_bigreturn = currFunc->type->next && (getSize (currFunc->type->next) > 4) || IS_STRUCT (currFunc->type->next);
+           int caller_stackparmbytes = caller_bigreturn * 2;
+           for (value *caller_arg = FUNC_ARGS(currFunc->type); caller_arg; caller_arg = caller_arg->next)
+             {
+               wassert (caller_arg->sym);
+               if (!SPEC_REGPARM (caller_arg->etype))
+                 caller_stackparmbytes += getSize (caller_arg->sym->type);
+             }
+           prestackadjust += caller_stackparmbytes;
+        }
 
       for (const iCode *nic = ic->next; nic && --limit;)
         {
@@ -5479,11 +5495,16 @@ genCall (const iCode *ic)
                 {
                   prestackadjust = OP_SYMBOL (IC_LEFT (nic))->stack;
                   tailjump = true;
+                  break;
                 }
+              prestackadjust = 0;
               break;
             }
           else
-            break;
+            {
+              prestackadjust = 0;
+              break;
+            }
 
           if (targetlabel)
             {
@@ -5496,7 +5517,11 @@ genCall (const iCode *ic)
                   if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
                     break;
               if (!nnic)
-                break;
+                {
+                  prestackadjust = 0;
+                  tailjump = false;
+                  break;
+                }
 
               nic = nnic;
             }
@@ -5622,6 +5647,12 @@ genCall (const iCode *ic)
         }
       else
         {
+          if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
+            {
+              wassert (0);
+              /* todo: implement */
+            }
+
           adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
 
           if (IS_LITERAL (etype))

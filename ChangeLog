@@ -1,5 +1,11 @@
 2021-06-30 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Improve tail call optimization.
+
+2021-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Assignment to / from global variables with non-free hl.

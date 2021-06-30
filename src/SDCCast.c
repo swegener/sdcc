@@ -7384,25 +7384,21 @@ expandInlineFuncs (ast * tree, ast * block)
             werror (E_TOO_MANY_PARMS);
 
           /* Handle the return type */
-          if (!IS_VOID (func->type->next))
-            {
-              /* Generate return symbol coma statement;                   */
-              /* ...                                                      */
-              /* {{inline_function_code}}, retsym                         */
-
-              tree->opval.op = ',';
-              if (IFFUNC_ISCRITICAL (func->type))
-                inlinetree = newNode (CRITICAL, inlinetree, NULL);
-              tree->left = inlinetree;
+          /* Generate return symbol coma statement;                   */
+          /* ...                                                      */
+          /* {{inline_function_code}}, retsym                         */
+          tree->opval.op = ',';
+          if (IFFUNC_ISCRITICAL (func->type))
+            inlinetree = newNode (CRITICAL, inlinetree, NULL);
+          tree->left = inlinetree;
+          if (retsym)
               tree->right = newAst_VALUE (symbolVal (retsym));
-            }
           else
             {
-              tree->opval.op = NULLOP;
-              if (IFFUNC_ISCRITICAL (func->type))
-                inlinetree = newNode (CRITICAL, inlinetree, NULL);
-              tree->left = NULL;
-              tree->right = inlinetree;
+              /* create a literal void if the return type is void */
+              value * voidval = valFromType (newVoidLink ());
+              SPEC_SCLS (voidval->type) = S_LITERAL;
+              tree->right = newAst_VALUE (voidval);
             }
           inlineState.retsym = retsym;
 

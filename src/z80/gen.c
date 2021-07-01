@@ -5603,6 +5603,44 @@ genCall (const iCode *ic)
           if (tlbl)
             emitLabel (tlbl);
         }
+      else if (de_free_pre_call) // Try de.
+        {
+          wassert (!prestackadjust);
+          wassert (IY_RESERVED || IS_GB); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
+          symbol *tlbl = 0;
+          if (aopInReg (IC_LEFT (ic)->aop, 0, D_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, E_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, D_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, E_IDX))
+            {
+              if (!bc_free_pre_call)
+                {
+                  regalloc_dry_run_cost += 500;
+                  wassertl (regalloc_dry_run, "Unimplemented function pointer in de with unavailable bc, hl and iy");
+                }
+              if (!regalloc_dry_run)
+                {
+                  tlbl = newiTempLabel (NULL);
+                  emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
+                  _push (PAIR_BC);
+                }
+            }
+          else if (!regalloc_dry_run)
+            {
+              if (!regalloc_dry_run)
+                {
+                  tlbl = newiTempLabel (NULL);
+                  emit2 ("ld de, !immed!tlabel", labelKey2num (tlbl->key));
+                  _push (PAIR_DE);
+                }
+            }
+          regalloc_dry_run_cost += 3;
+          genMove (ASMOP_DE, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, true);
+          emit2 ("push de");
+          emit2 ("ret");
+          if (!regalloc_dry_run)
+            _G.stack.pushed -= 2;
+          regalloc_dry_run_cost += 2;
+          if (tlbl)
+            emitLabel (tlbl);
+        }
       else
         {
           wassert (0);

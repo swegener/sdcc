@@ -1,3 +1,8 @@
+2021-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Function pointer call for --reserve-regs-iy when hl and bc are in use for register arguments.
+
 2021-06-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (expandInlineFuncs): fix bug #3175

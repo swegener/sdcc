@@ -5459,7 +5459,7 @@ genCall (const iCode *ic)
       (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
       IC_RESULT (ic)->aop->size <= 4) &&
     !ic->parmBytes &&
-    (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8*/) &&
+    (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8 - for z80 and r3ka this will be slower and bigger than without tail call optimization, but it saves RAM */) &&
     !ic->localEscapeAlive &&
     !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) &&
     (_G.omitFramePtr || IS_GB))

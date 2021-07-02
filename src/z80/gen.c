@@ -4203,9 +4203,17 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             {
               if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
                 {
-                  _push (PAIR_HL);
-                  cheapMove (result, roffset + i, ASMOP_A, 0, true);
-                  _pop (PAIR_HL);
+                  if (result->type == AOP_HL)
+                    {
+                      emit2 ("ld !mems, a", aopGetLitWordLong (result, roffset + i, FALSE));
+                      regalloc_dry_run_cost += 3;
+                    }
+                  else
+                    {
+                      _push (PAIR_HL);
+                      cheapMove (result, roffset + i, ASMOP_A, 0, true);
+                      _pop (PAIR_HL);
+                    }
                 }
               else
                 cheapMove (result, roffset + i, ASMOP_A, 0, true);

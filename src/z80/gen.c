@@ -4179,7 +4179,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           if ((requiresHL (result) && result->type != AOP_REG || requiresHL (source) && source->type != AOP_REG) && !hl_dead)
             {
               via_a = aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, H_IDX);
-              if (via_a)
+              if (via_a && !a_dead)
                 _push (PAIR_AF);
               _push (PAIR_HL);
               pushed_hl = true;
@@ -4192,12 +4192,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               if (requiresHL (result) && result->type != AOP_REG && !hl_dead)
                 {
                   _push (PAIR_HL);
-                  cheapMove (result, roffset + i, ASMOP_A, 0, a_dead_global);
+                  cheapMove (result, roffset + i, ASMOP_A, 0, true);
                   _pop (PAIR_HL);
                 }
               else
-                cheapMove (result, roffset + i, ASMOP_A, 0, a_dead_global);
-              _pop (PAIR_AF);
+                cheapMove (result, roffset + i, ASMOP_A, 0, true);
+              if (!a_dead)
+                _pop (PAIR_AF);
             }
           zeroed_a = false;
         }

@@ -1,7 +1,7 @@
 2021-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve handling of dead a in genMove_o fallback.
+	  Improve handling genMove_o fallback.
 
 2021-07-01 Philipp Klaus Krause <pkk AT spth.de>
 

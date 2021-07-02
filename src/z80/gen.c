@@ -4107,7 +4107,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           continue;
         }
       else if (i + 1 < size && IS_GB && result->type != AOP_REG && requiresHL (result) && source->type == AOP_REG && requiresHL (source) && // word through de is cheaper than direct byte-by-byte, since it requires fewer updates of hl.
-        de_dead_global && hl_dead_global && source->regs[L_IDX] <= i + 1 && source->regs[H_IDX] <= i + 1)
+        de_dead_global && source->regs[E_IDX] <= i + 1 && source->regs[D_IDX] <= i + 1 &&
+        hl_dead_global && source->regs[L_IDX] <= i + 1 && source->regs[H_IDX] <= i + 1)
         {
           cheapMove (ASMOP_E, 0, source, i, a_dead);
           cheapMove (ASMOP_D, 0, source, i + 1, a_dead);
@@ -4176,15 +4177,26 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           bool pushed_hl = false;
           bool via_a = false;
+          bool premoved_a = false;
           if ((requiresHL (result) && result->type != AOP_REG || requiresHL (source) && source->type != AOP_REG) && !hl_dead)
             {
               via_a = aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, H_IDX);
               if (via_a && !a_dead)
                 _push (PAIR_AF);
-              _push (PAIR_HL);
-              pushed_hl = true;
+              if (via_a && source->type == AOP_HL)
+                {
+                  emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, FALSE));
+                  regalloc_dry_run_cost += 3;
+                  premoved_a = true;
+                }
+              else
+                {
+                  _push (PAIR_HL);
+                  pushed_hl = true;
+                }
             }
-          cheapMove (via_a ? ASMOP_A : result, via_a ? 0 : (roffset + i), source, soffset + i, via_a || a_dead);
+          if (!premoved_a)
+            cheapMove (via_a ? ASMOP_A : result, via_a ? 0 : (roffset + i), source, soffset + i, via_a || a_dead);
           if (pushed_hl)
             _pop (PAIR_HL);
           if (via_a)

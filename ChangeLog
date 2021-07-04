@@ -1,3 +1,8 @@
+2021-07-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClospre.hpp: fix bug #3166
+	* support/regression/tests/bug-3166.c: enable test
+
 2021-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

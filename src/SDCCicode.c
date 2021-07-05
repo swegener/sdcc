@@ -1412,7 +1412,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make
          sense here. Shifting by a negative number is impossible. */
-      retval = operandFromValue (valRecastLitVal (type, valShift (OP_VALUE (left), OP_VALUE (right), 0)));
+      retval = operandFromValue (valRecastLitVal (type, valShift (OP_VALUE (left), OP_VALUE (right), 0, true)));
       break;
     case EQ_OP:
       if (IS_FLOAT (let) || IS_FLOAT (ret))
@@ -2174,7 +2174,7 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
 
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
-    return operandFromValue (valMult (OP_VALUE (left), OP_VALUE (right)));
+    return operandFromValue (valMult (OP_VALUE (left), OP_VALUE (right), true));
 
   if (IS_LITERAL (retype))
     {
@@ -2306,7 +2306,7 @@ geniCodeModulus (operand * left, operand * right, RESULT_TYPE resultType)
 
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
-    return operandFromValue (valMod (OP_VALUE (left), OP_VALUE (right)));
+    return operandFromValue (valMod (OP_VALUE (left), OP_VALUE (right), true));
 
   resType = usualBinaryConversions (&left, &right, resultType, '%');
 
@@ -2335,7 +2335,7 @@ geniCodePtrPtrSubtract (operand * left, operand * right)
   /* if they are both literals then */
   if (IS_LITERAL (letype) && IS_LITERAL (retype))
     {
-      result = operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right)));
+      result = operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right), true));
       goto subtractExit;
     }
 
@@ -2370,7 +2370,7 @@ geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
 
   /* if they are both literal then we know the result */
   if (IS_LITERAL (letype) && IS_LITERAL (retype) && left->isLiteral && right->isLiteral)
-    return operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right)));
+    return operandFromValue (valMinus (OP_VALUE (left), OP_VALUE (right), true));
 
   /* if left is an array or pointer */
   if (IS_PTR (ltype) || IS_ARRAY (ltype))
@@ -2482,8 +2482,8 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
     {
       value *scaledRight = valFromType (rtype);
       if (IS_PTR (ltype))
-        scaledRight = valMult (scaledRight, valueFromLit (getSize (ltype->next)));
-      return operandFromValue (valPlus (valFromType (ltype), scaledRight));
+        scaledRight = valMult (scaledRight, valueFromLit (getSize (ltype->next)), true);
+      return operandFromValue (valPlus (valFromType (ltype), scaledRight, true));
     }
 
   ic = newiCode ('+', left, right);

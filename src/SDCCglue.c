@@ -235,7 +235,7 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
                       werrorfl (tsym->fileDef, tsym->lineDef, W_EXCESS_INITIALIZERS, "scalar", tsym->name);
                     }
                   ival = newNode ('=', newAst_VALUE (symbolVal (tsym)),
-                                  decorateType (resolveSymbols (list2expr (tsym->ival)), RESULT_TYPE_NONE));
+                                  decorateType (resolveSymbols (list2expr (tsym->ival)), RESULT_TYPE_NONE, true));
                 }
               if (ival)
                 {
@@ -317,7 +317,7 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
                       werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", sym->name);
                     }
                   ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-                                  decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
+                                  decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE, true));
                 }
               codeOutBuf = &statsg->oBuf;
 
@@ -1803,7 +1803,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
       else
         {
           ast *ast = newAst_VALUE (constVal("0"));
-          ast = decorateType (ast, RESULT_TYPE_NONE);
+          ast = decorateType (ast, RESULT_TYPE_NONE, true);
           ilist = newiList(INIT_NODE, ast);
         }
     }

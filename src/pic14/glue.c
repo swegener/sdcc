@@ -1987,7 +1987,7 @@ pic14_printIval (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s *oB
       else
         {
           ast *ast = newAst_VALUE (constVal ("0"));
-          ast = decorateType (ast, RESULT_TYPE_NONE);
+          ast = decorateType (ast, RESULT_TYPE_NONE, true);
           ilist = newiList (INIT_NODE, ast);
         }
       DBG_ILIST ("ilist substituted", ilist);

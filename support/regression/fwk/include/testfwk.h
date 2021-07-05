@@ -51,7 +51,7 @@ void __printf(const char *szFormat, ...);
 #endif
 
 #if defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
-# define __data
+//# define __data // data is implemented for pdk
 # define __idata
 # define __pdata
 # define __xdata

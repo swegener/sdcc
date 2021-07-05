@@ -129,7 +129,7 @@ convertIListToConstList (initList * src, literalList ** lList, int size)
           return FALSE;
         }
 
-      if (!IS_AST_LIT_VALUE (decorateType (resolveSymbols (iLoop->init.node), RESULT_TYPE_NONE)))
+      if (!IS_AST_LIT_VALUE (decorateType (resolveSymbols (iLoop->init.node), RESULT_TYPE_NONE, true)))
         {
           return FALSE;
         }
@@ -318,7 +318,7 @@ resolveIvalSym (initList *ilist, sym_link *type)
     {
       if (ilist->type == INIT_NODE)
         {
-          ilist->init.node = decorateType (resolveSymbols (ilist->init.node), is_ptr ? RESULT_TYPE_INT : resultType);
+          ilist->init.node = decorateType (resolveSymbols (ilist->init.node), is_ptr ? RESULT_TYPE_INT : resultType, true);
         }
       else if (ilist->type == INIT_DEEP)
         {
@@ -1479,19 +1479,24 @@ constCharVal (unsigned char v)
 /* constBoolVal - converts a BOOL constant to value                */
 /*-----------------------------------------------------------------*/
 value *
-constBoolVal (bool v)
+constBoolVal (bool v, bool reduceType)
 {
-  value *val = newValue ();     /* alloc space for value   */
-
-  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
-  SPEC_SCLS (val->type) = S_LITERAL;
-  SPEC_CONST (val->type) = 1;
-
-  SPEC_NOUN (val->type) = (bit) ? V_BIT : V_BOOL;
-
-  SPEC_CVAL (val->type).v_uint = (unsigned int) v;
-
-  return val;
+  if (reduceType)
+    {
+      value *val = newValue ();     /* alloc space for value   */
+      val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
+      SPEC_SCLS (val->type) = S_LITERAL;
+      SPEC_CONST (val->type) = 1;
+    
+      SPEC_NOUN (val->type) = (bit) ? V_BIT : V_BOOL;
+    
+      SPEC_CVAL (val->type).v_uint = (unsigned int) v;
+      return val;
+    }
+  else
+    {
+      return constIntVal (v ? "1" : "0");
+    }
 }
 
 // TODO: Move this function to SDCCutil?
@@ -2291,7 +2296,7 @@ fixed16x16FromDouble (double value)
 /* valUnaryPM - does the unary +/- operation on a constant          */
 /*------------------------------------------------------------------*/
 value *
-valUnaryPM (value * val)
+valUnaryPM (value * val, bool reduceType)
 {
   /* depending on type */
   if (SPEC_NOUN (val->etype) == V_FLOAT)
@@ -2325,7 +2330,8 @@ valUnaryPM (value * val)
           SPEC_USIGN (val->etype) = 0;
           SPEC_NOUN (val->etype) = V_INT;
         }
-      return cheapestVal (val);
+      if (reduceType)
+        return cheapestVal (val);
     }
   return val;
 }
@@ -2334,7 +2340,7 @@ valUnaryPM (value * val)
 /* valueComplement - complements a constant                         */
 /*------------------------------------------------------------------*/
 value *
-valComplement (value * val)
+valComplement (value * val, bool reduceType)
 {
   /* depending on type */
   if (SPEC_LONGLONG (val->etype))
@@ -2364,7 +2370,8 @@ valComplement (value * val)
           SPEC_USIGN (val->etype) = 0;
           SPEC_NOUN (val->etype) = V_INT;
         }
-      return cheapestVal (val);
+      if (reduceType)
+        return cheapestVal (val);
     }
   return val;
 }
@@ -2373,7 +2380,7 @@ valComplement (value * val)
 /* valueNot - complements a constant                                */
 /*------------------------------------------------------------------*/
 value *
-valNot (value * val)
+valNot (value * val, bool reduceType)
 {
   /* depending on type */
   if (SPEC_LONGLONG (val->etype))
@@ -2398,12 +2405,22 @@ valNot (value * val)
         SPEC_CVAL (val->etype).v_int = !SPEC_CVAL (val->etype).v_int;
 
     }
+    
   /* ANSI: result type is int, value is 0 or 1 */
-  /* sdcc will hold this in an 'unsigned char' */
-  SPEC_USIGN (val->etype) = 1;
+  /* If reduction is allowed SDCC will hold this in an 'unsigned char' */
+  if (reduceType)
+    {
+      SPEC_USIGN (val->etype) = 1;
+      SPEC_NOUN (val->etype) = V_CHAR;
+    }
+  else
+    {
+      SPEC_USIGN (val->etype) = 0;
+      SPEC_NOUN (val->etype) = V_INT;
+    }
   SPEC_LONG (val->etype) = 0;
   SPEC_LONGLONG (val->type) = 0;
-  SPEC_NOUN (val->etype) = V_CHAR;
+
   return val;
 }
 
@@ -2411,7 +2428,7 @@ valNot (value * val)
 /* valMult - multiply constants                                     */
 /*------------------------------------------------------------------*/
 value *
-valMult (value * lval, value * rval)
+valMult (value * lval, value * rval, bool reduceType)
 {
   value *val;
 
@@ -2446,14 +2463,15 @@ valMult (value * lval, value * rval)
       if (l != (TYPE_TARGET_INT) l)
         werror (W_INT_OVL);
     }
-  return cheapestVal (val);
+
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valDiv  - Divide   constants                                     */
 /*------------------------------------------------------------------*/
 value *
-valDiv (value * lval, value * rval)
+valDiv (value * lval, value * rval, bool reduceType)
 {
   value *val;
 
@@ -2493,14 +2511,14 @@ valDiv (value * lval, value * rval)
       else
         SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) ulFromVal (lval) / (TYPE_TARGET_INT) ulFromVal (rval);
     }
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valMod  - Modulus  constants                                     */
 /*------------------------------------------------------------------*/
 value *
-valMod (value * lval, value * rval)
+valMod (value * lval, value * rval, bool reduceType)
 {
   value *val;
 
@@ -2536,14 +2554,14 @@ valMod (value * lval, value * rval)
       else
         SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) ulFromVal (lval) % (TYPE_TARGET_INT) ulFromVal (rval);
     }
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valPlus - Addition constants                                     */
 /*------------------------------------------------------------------*/
 value *
-valPlus (value * lval, value * rval)
+valPlus (value * lval, value * rval, bool reduceType)
 {
   value *val;
 
@@ -2580,14 +2598,14 @@ valPlus (value * lval, value * rval)
       else
         SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) ulFromVal (lval) + (TYPE_TARGET_INT) ulFromVal (rval);
     }
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valMinus - Addition constants                                    */
 /*------------------------------------------------------------------*/
 value *
-valMinus (value * lval, value * rval)
+valMinus (value * lval, value * rval, bool reduceType)
 {
   value *val;
 
@@ -2624,14 +2642,14 @@ valMinus (value * lval, value * rval)
       else
         SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) ulFromVal (lval) - (TYPE_TARGET_INT) ulFromVal (rval);
     }
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valShift - Shift left or right                                   */
 /*------------------------------------------------------------------*/
 value *
-valShift (value * lval, value * rval, int lr)
+valShift (value * lval, value * rval, int lr, bool reduceType)
 {
   value *val;
 
@@ -2695,14 +2713,14 @@ valShift (value * lval, value * rval, int lr)
             (TYPE_TARGET_INT) ulFromVal (lval) >> (TYPE_TARGET_ULONG) ulFromVal (rval);
         }
     }
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valCompare - Compares two literal                                */
 /*------------------------------------------------------------------*/
 value *
-valCompare (value * lval, value * rval, int ctype)
+valCompare (value * lval, value * rval, int ctype, bool reduceType)
 {
   value *val;
 
@@ -2710,9 +2728,18 @@ valCompare (value * lval, value * rval, int ctype)
   val = newValue ();
   val->type = val->etype = newCharLink ();
   val->type->xclass = SPECIFIER;
-  SPEC_NOUN (val->type) = V_CHAR;       /* type is char */
-  SPEC_USIGN (val->type) = 1;
   SPEC_SCLS (val->type) = S_LITERAL;    /* will remain literal */
+  
+  if (reduceType)
+    {
+      SPEC_NOUN (val->type) = V_CHAR;       /* type is char */
+      SPEC_USIGN (val->type) = 1;
+    }
+  else
+    {
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 0;
+    }
 
   switch (ctype)
     {
@@ -2811,7 +2838,7 @@ valCompare (value * lval, value * rval, int ctype)
 /* valBitwise - Bitwise operation                                   */
 /*------------------------------------------------------------------*/
 value *
-valBitwise (value * lval, value * rval, int op)
+valBitwise (value * lval, value * rval, int op, bool reduceType)
 {
   value *val;
 
@@ -2897,14 +2924,14 @@ valBitwise (value * lval, value * rval, int op)
       break;
     }
 
-  return cheapestVal (val);
+  return reduceType ? cheapestVal (val) : val;
 }
 
 /*------------------------------------------------------------------*/
 /* valAndOr   - Generates code for and / or operation               */
 /*------------------------------------------------------------------*/
 value *
-valLogicAndOr (value * lval, value * rval, int op)
+valLogicAndOr (value * lval, value * rval, int op, bool reduceType)
 {
   value *val;
 
@@ -2913,7 +2940,14 @@ valLogicAndOr (value * lval, value * rval, int op)
   val->type = val->etype = newCharLink ();
   val->type->xclass = SPECIFIER;
   SPEC_SCLS (val->type) = S_LITERAL;    /* will remain literal */
-  SPEC_USIGN (val->type) = 1;
+  
+  if (reduceType)
+      SPEC_USIGN (val->type) = 1;
+  else
+    {
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 0;
+    }
 
   switch (op)
     {

@@ -1,3 +1,19 @@
+2021-07-05 Erik Petrich Visenri
+    * src/pic14/glue.c
+      src/pic16/glue.c
+      src/SDCCast.c
+      src/SDCCast.h
+      src/SDCCglue.c
+      src/SDCCicode.c
+      src/SDCCval.c
+      src/SDCCval.h
+      Implemented partial support for conditional type reduction (patch #392), for now only used by SIZEOF.
+      OR - XOR type reduction optimization (patch #392).
+    * support/regression/fwk/include/testfwk.h
+      support/regression/tests/sizeof.c
+      Removed empty definition of __data for pdk from testfwk.h.
+      Added tests for SIZEOF operator.
+      
 2021-07-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClospre.hpp: fix bug #3166

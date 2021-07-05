@@ -213,7 +213,7 @@ ast *argAst (ast *);
 ast *resolveSymbols (ast *);
 void CodePtrPointsToConst (sym_link * t);
 void checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit, bool orgIsNullPtrConstant);
-ast *decorateType (ast *, RESULT_TYPE);
+ast *decorateType (ast *, RESULT_TYPE, bool reduceTypeAllowed);
 ast *createWhile (symbol *, symbol *, symbol *, ast *, ast *);
 ast *createIf (ast *, ast *, ast *);
 ast *createDo (symbol *, symbol *, symbol *, ast *, ast *);

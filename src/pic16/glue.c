@@ -382,7 +382,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
       return valCastLiteral(toType, 0.0, 0);
   }
 
-  expr = decorateType(resolveSymbols( list2expr (ilist) ), FALSE);
+  expr = decorateType(resolveSymbols( list2expr (ilist) ), FALSE, true);
 //  expr = list2expr( ilist );
 
   if (!expr)
@@ -1179,7 +1179,7 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
       else
         {
           ast *ast = newAst_VALUE (constVal("0"));
-          ast = decorateType (ast, RESULT_TYPE_NONE);
+          ast = decorateType (ast, RESULT_TYPE_NONE, true);
           ilist = newiList(INIT_NODE, ast);
         }
     }

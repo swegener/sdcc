@@ -284,6 +284,7 @@
 #define DW_CFA_advance_loc (1 << 6)
 #define DW_CFA_offset (2 << 6)
 #define DW_CFA_restore (3 << 6)
+#define DW_CFA_nop 0x00
 #define DW_CFA_set_loc 0x01
 #define DW_CFA_advance_loc1 0x02
 #define DW_CFA_advance_loc2 0x03
@@ -298,7 +299,6 @@
 #define DW_CFA_def_cfa 0x0c
 #define DW_CFA_def_cfa_register 0x0d
 #define DW_CFA_def_cfa_offset 0x0e
-#define DW_CFA_nop 0x0f
 #define DW_CFA_lo_user 0x1c
 #define DW_CFA_hi_user 0x3f
 

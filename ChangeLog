@@ -1,3 +1,13 @@
+2021-07-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCdwarf2.h: fix incorrect DW_CFA_nop value
+	* src/SDCCdwarf2.c (dwWriteTags): fix problem with excess
+	  end-of-sibling-chain markers at end of compilation unit
+	* src/SDCCdwarf2.c (dwWriteAbbrevs): write abbreviations in
+	  numerical order rather than hash table order
+	* src/SDCCdwarf2.c (dwGenCFIins,dwWriteFDE): keep start of
+	  CIE and FDE entries 32-bit aligned
+
 2021-07-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

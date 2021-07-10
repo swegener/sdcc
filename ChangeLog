@@ -1,3 +1,7 @@
+2021-07-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCdwarf2.c (dwWriteFrames): fix bug #3161
+
 2021-07-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCdwarf2.h: fix incorrect DW_CFA_nop value

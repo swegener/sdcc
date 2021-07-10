@@ -2116,9 +2116,11 @@ dwWriteFrames (void)
   dwlocregion * lrp;
 
   int id = 0;
-  cfip = dwCFIRoot;
-  while (cfip)
+  for (cfip = dwCFIRoot; cfip; cfip = cfip->next)
     {
+      if (!cfip->startLabel || !cfip->endLabel)
+        continue;
+        
       fp.startLabel=cfip->startLabel;
       fp.endLabel=cfip->endLabel;
 
@@ -2154,8 +2156,6 @@ dwWriteFrames (void)
         Safe_free(op);
         op = next;
       }
-
-      cfip = cfip->next;
     }
 }
 

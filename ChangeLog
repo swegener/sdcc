@@ -1,6 +1,7 @@
 2021-07-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bug-3141.c: reenable for mcs51
+	* src/SDCCsymt.c (promoteAnonStructs): fix bug #3086
 
 2021-07-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

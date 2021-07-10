@@ -1765,8 +1765,7 @@ promoteAnonStructs (int su, structdef * sdef)
   int base;
 
   tofield = &sdef->fields;
-  field = sdef->fields;
-  while (field)
+  for (field = sdef->fields; field; field = nextfield)
     {
       nextfield = field->next;
       if (!*field->name && IS_STRUCT (field->type))
@@ -1811,7 +1810,6 @@ promoteAnonStructs (int su, structdef * sdef)
         }
       else
         tofield = &field->next;
-      field = nextfield;
     }
 }
 

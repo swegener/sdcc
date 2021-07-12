@@ -1,3 +1,8 @@
+2021-07-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (copyAst): fix bug #3264
+	* support/regression/tests/inline.c: add test for bug #3264
+
 2021-07-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/valdiags/tests/struct.c: add test for bug #3086

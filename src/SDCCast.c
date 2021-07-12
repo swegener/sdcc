@@ -254,6 +254,7 @@ copyAst (ast * src)
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
   dest->inlined = src->inlined;
+  dest->initMode = src->initMode;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));

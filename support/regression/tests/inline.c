@@ -263,6 +263,26 @@ bug_2295 (void)
   ASSERT (z == 1);
 }
 
+/*--------------
+    bug 3264
+    A const parameter of an inline function inside another inline function
+    would lose its initMode flag, resulting in an error about an attempt
+    to assign a value to a const variable.
+*/
+static inline int f_3264 (const int x) {
+  return x;
+}
+
+static inline void g_3264 (void) {
+  f_3264 (0);
+}
+
+void bug_3264 (void)
+{
+  g_3264 ();
+}
+
+
 /*--------------*/
 #endif
 

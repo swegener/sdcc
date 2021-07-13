@@ -5095,6 +5095,7 @@ genMinusDec (iCode * ic)
       int emitTlbl;
       int labelRange;
       const char *l;
+      unsigned int offset;
 
       /* If the next instruction is a goto and the goto target
        * is <= 5 instructions previous to this, we can generate
@@ -5127,7 +5128,8 @@ genMinusDec (iCode * ic)
         }
       l = aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE, NULL);
       emitcode ("dec", "%s", l);
-      if (size > 2)
+
+      for (offset=2; offset<size; offset++)
         {
           if (EQ (l, "acc"))
             {
@@ -5142,26 +5144,10 @@ genMinusDec (iCode * ic)
             {
               emitcode ("cjne", "a,%s,!tlabel", l, labelKey2num (tlbl->key));
             }
-          l = aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE, NULL);
+          l = aopGet (IC_RESULT (ic), offset, FALSE, FALSE, NULL);
           emitcode ("dec", "%s", l);
         }
-      if (size > 3)
-        {
-          if (EQ (l, "acc"))
-            {
-              emitcode ("jnz", "!tlabel", labelKey2num (tlbl->key));
-            }
-          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
-                   AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR || IS_AOP_PREG (IC_RESULT (ic)))
-            {
-              emitcode ("cjne", "%s,#!constbyte,!tlabel", l, 0xff, labelKey2num (tlbl->key));
-            }
-          else
-            {
-              emitcode ("cjne", "a,%s,!tlabel", l, labelKey2num (tlbl->key));
-            }
-          emitcode ("dec", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE, NULL));
-        }
+
       if (emitTlbl)
         {
           emitLabel (tlbl);

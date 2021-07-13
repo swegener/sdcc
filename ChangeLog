@@ -1,3 +1,8 @@
+2021-07-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genMinusDec),
+	* src/ds390/gen.c (genMinusDec): partial fix for bug #3246
+
 2021-07-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (copyAst): fix bug #3264

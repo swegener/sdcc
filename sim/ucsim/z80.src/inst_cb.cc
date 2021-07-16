@@ -340,32 +340,40 @@ cl_z80::inst_cb_srl(t_mem code)
 int
 cl_z80::inst_cb_bit(t_mem code)
 {
-#define bit_bitnum ((code >> 3) & 7)
+  u8_t bit_bitnum= ((code >> 3) & 7);
 
   switch(code & 7) {
     case 0x0: // BIT x,B
-      bit_byte(regs.bc.h, bit_bitnum); break;
+      bit_byte(regs.bc.h, bit_bitnum);
+      break;
     case 0x1: // BIT x,C
-      bit_byte(regs.bc.l, bit_bitnum); break;
+      bit_byte(regs.bc.l, bit_bitnum);
+      break;
     case 0x2: // BIT x,D
-      bit_byte(regs.de.h, bit_bitnum); break;
+      bit_byte(regs.de.h, bit_bitnum);
+      break;
     case 0x3: // BIT x,E
-      bit_byte(regs.de.l, bit_bitnum); break;
+      bit_byte(regs.de.l, bit_bitnum);
+      break;
     case 0x4: // BIT x,H
-      bit_byte(regs.hl.h, bit_bitnum); break;
+      bit_byte(regs.hl.h, bit_bitnum);
+      break;
     case 0x5: // BIT x,L
-      bit_byte(regs.hl.l, bit_bitnum); break;
+      bit_byte(regs.hl.l, bit_bitnum);
+      break;
     case 0x6: // BIT x,(HL)
-      { unsigned char tmp;
+      {
+	unsigned char tmp;
         tmp = get1(regs.HL);
         bit_byte(tmp, bit_bitnum);
         store1(regs.HL, tmp);
 	vc.rd++;
 	vc.wr++;
+	break;
       }
-    break;
     case 0x7: // BIT x,A
-      bit_byte(regs.raf.A, bit_bitnum); break;
+      bit_byte(regs.raf.A, bit_bitnum);
+      break;
     break;
   }
   return(resGO);

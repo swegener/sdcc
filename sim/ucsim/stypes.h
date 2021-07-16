@@ -299,6 +299,7 @@ enum inst_result {
   resUSER	= 105,	/* Stopped by user */
   resINV_INST	= 106,	/* Invalid instruction */
   resINST_INV	= 106,	/* Invalid instruction */
+  resINV	= 106,	/* Invalid instruction */
   resBITADDR	= 107,	/* Bit address is uninterpretable */
   resERROR	= 108,	/* Error happened during instruction exec */
   resSTEP	= 109,	/* Step command done, no more exex needed */

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (r3kcl.h)
+ * Simulator of microcontrollers (edwrap.h)
  *
  * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
  * 
@@ -25,20 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef R3KCL_HEADER
-#define R3KCL_HEADER
+#ifndef EDWRAP_HEADER
+#define EDWRAP_HEADER
 
-#include "r2kcl.h"
+#include "iwrap.h"
 
-
-class cl_r3k: public cl_r2k
-{
- public:
-  cl_r3k(class cl_sim *asim);
-  virtual const char *id_string(void);
-};
-
+extern void fill_ed_wrappers(instruction_wrapper_fn itab[]);
 
 #endif
 
-/* End of rxk.src/r3kcl.h */
+/* End of rxk.src/edwrap.h */

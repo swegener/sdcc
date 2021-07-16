@@ -500,25 +500,25 @@ cl_z80::disass(t_addr addr)
           switch (*(b++))
             {
             case 'd': // jump relative target, signed? byte immediate operand
-              temp.format("#%d", (signed char)(rom->get(addr+immed_offset)));
+              temp.format("%d", (signed char)(rom->get(addr+immed_offset)));
               ++immed_offset;
               break;
             case 'w': // word immediate operand, little endian
-              temp.format("#0x%04x",
+              temp.format("0x%04x",
 			  (uint)((rom->get(addr+immed_offset)) |
 				 (rom->get(addr+immed_offset+1)<<8)) );
               ++immed_offset;
               ++immed_offset;
               break;
             case 'W': // word immediate operand, big endian
-              temp.format("#0x%04x",
+              temp.format("0x%04x",
 			  (uint)((rom->get(addr+immed_offset)<<8) |
 				 (rom->get(addr+immed_offset+1))) );
               ++immed_offset;
               ++immed_offset;
               break;
             case 'b': // byte immediate operand
-              temp.format("#0x%02x", (uint)rom->get(addr+immed_offset));
+              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             default:

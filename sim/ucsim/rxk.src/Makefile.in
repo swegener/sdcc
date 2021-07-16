@@ -1,7 +1,7 @@
 #
 # uCsim rxk.src/Makefile
 #
-# (c) Drotos Daniel, Talker Bt. 1997
+# (c) Drotos Daniel, Talker Bt. 2020,2021
 #
 
 STARTYEAR	= 1997
@@ -49,10 +49,11 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= simrxk.o rxk.o glob.o rmem.o \
+OBJECTS_SHARED	= simrxk.o rxk.o rmem.o \
+		  glob.o gp0m3.o gpedm3.o gpddm3.o \
 		  inst.o ialu.o ibranch.o imove.o \
 		  r2k.o r3k.o r3ka.o r4k.o r5k.o r6k.o \
-		  r4kwrap.o
+		  r4kwrap.o ddwrap.o edwrap.o
 
 OBJECTS_EXE	= srxk.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (decode.h)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -37,6 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_DE_mn	instruction_11
 #define LD_HL_mn	instruction_21
 #define LD_SP_mn	instruction_31
+#define LD_imn_HL	instruction_22
+#define LD_HL_imn	instruction_2a
 #define INC_BC		instruction_03
 #define INC_DE		instruction_13
 #define INC_HL		instruction_23
@@ -114,12 +116,75 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_E_E		instruction_5b
 #define LD_E_A		instruction_5f
 #define LD_L_A		instruction_6f
+#define LD_H_A		instruction_67
 #define LD_A_B		instruction_78
 #define LD_A_C		instruction_79
 #define LD_A_D		instruction_7a
 #define LD_A_E		instruction_7b
 #define LD_A_H		instruction_7c
 #define LD_A_L		instruction_7d
+#define XOR_A		instruction_af
+#define OR_A		instruction_b7
+#define RET_NZ		instruction_c0
+#define RET_Z		instruction_c8
+#define RET		instruction_c9
+#define RET_NC		instruction_d0
+#define RET_C		instruction_d8
+#define RET_LZ		instruction_e0
+#define RET_LO		instruction_e8
+#define RET_P		instruction_f0
+#define RET_M		instruction_f8
+#define POP_AF		instruction_f1
+#define POP_BC		instruction_c1
+#define POP_DE		instruction_d1
+#define POP_HL		instruction_e1
+#define JP_NZ_mn	instruction_c2
+#define JP_Z_mn		instruction_ca
+#define JP_NC_mn	instruction_d2
+#define JP_C_mn		instruction_da
+#define JP_LZ_mn	instruction_e2
+#define JP_LO_mn	instruction_ea
+#define JP_P_mn		instruction_f2
+#define JP_M_mn		instruction_fa
+#define JP_mn		instruction_c3
+#define LD_HL_iSPn	instruction_c4
+#define PUSH_AF		instruction_f5
+#define PUSH_BC		instruction_c5
+#define PUSH_DE		instruction_d5
+#define PUSH_HL		instruction_e5
+#define ADD_A_n		instruction_c6
+#define LJP		instruction_c7
+#define BOOL_HL		instruction_cc
+#define CALL_mn		instruction_cd
+#define ADC_A_n		instruction_ce
+#define LCALL_lmn	instruction_cf
+#define LD_iSPn_HL	instruction_d4
+#define SUB_A_n		instruction_d6
+#define RST_10		instruction_d7
+#define RST_18		instruction_df
+#define RST_20		instruction_e7
+#define RST_28		instruction_ef
+#define RST_38		instruction_ff
+#define EXX		instruction_d9
+#define AND_HL_DE	instruction_dc
+#define OR_HL_DE	instruction_ec
+#define SBC_A_n		instruction_de
+#define EX_aDE_HL	instruction_e3
+#define EX_DE_HL	instruction_eb
+#define LD_HL_iIXd	instruction_e4
+#define LD_iIXd_HL	instruction_f4
+#define AND_n		instruction_e6
+#define JP_HL		instruction_e9
+#define XOR_n		instruction_ee
+#define RL_DE		instruction_f3
+#define OR_n		instruction_f6
+#define MUL		instruction_f7
+#define LD_SP_HL	instruction_f9
+#define RR_DE		instruction_fb
+#define RR_HL		instruction_fc
+#define CP_n		instruction_fe
+
+#define PAGE_CB		instruction_cb
 
 #endif
 

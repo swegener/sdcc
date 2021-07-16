@@ -389,6 +389,10 @@ cl_r2k::inst_rst(t_mem code)
     break;
     case 0xEF: // RST 28H
       //PC = 0x28;
+      /*push2(PC+2);
+      PC = iir + 0x28 * 2;
+      vc.wr+= 2;
+      break;*/
       switch (regs.raf.A) {
         case 0:
           return(resBREAKPOINT);

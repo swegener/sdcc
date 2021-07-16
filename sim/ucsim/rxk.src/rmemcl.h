@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (@@F@@)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2021,2021 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -39,11 +39,14 @@ class cl_ras: public cl_address_space
   cl_ras(chars id, class cl_memory_chip *achip);
  public:
   virtual t_addr log2phy(t_addr log);
+  virtual t_addr px2phy(u32_t px);
   virtual t_mem read(t_addr addr);
+  virtual t_mem phread(t_addr phaddr) { return phget(phaddr); }
   virtual t_mem get(t_addr addr);
+  virtual t_mem phget(t_addr phaddr);
   virtual t_mem write(t_addr addr, t_mem val);
   virtual void set(t_addr addr, t_mem val);
-  virtual void download(t_addr addr, t_mem val);
+  virtual void download(t_addr phaddr, t_mem val);
 };
 
 #endif

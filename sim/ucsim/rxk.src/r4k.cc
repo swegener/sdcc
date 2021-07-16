@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (r4k.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "r4kwrap.h"
 #include "glob.h"
+#include "gp0m3.h"
 
 #include "r4kcl.h"
 
@@ -46,6 +47,22 @@ int
 cl_r4k::init(void)
 {
   cl_r3ka::init();
+#define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
+  RCV(J);
+  RCV(K);
+  RCV(JK);
+  RCV(aJ);
+  RCV(aK);
+  RCV(aJK);
+  RCV(PW);
+  RCV(PX);
+  RCV(PY);
+  RCV(PZ);
+  RCV(aPW);
+  RCV(aPX);
+  RCV(aPY);
+  RCV(aPZ);
+#undef RCV
   //mode2k();
   return 0;
 }
@@ -69,6 +86,38 @@ cl_r4k::make_cpu_hw(void)
 {
   add_hw(cpu= new cl_r4k_cpu(this));
   cpu->init();
+}
+
+struct dis_entry *
+cl_r4k::dis_entry(t_addr addr)
+{
+  u8_t code= rom->get(addr);
+  int i;
+  struct dis_entry *dt= disass_rxk;
+  i= 0;
+  while (((code & dt[i].mask) != dt[i].code) &&
+	 dt[i].mnemonic)
+    i++;
+  if (dt[i].mnemonic != NULL)
+    return &dt[i];
+
+  if (edmr & 0xc0)
+    {
+      // mode: 4k
+    }
+  else
+    {
+      // mode: 3k
+      dt= disass_p0m3;
+      i= 0;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+    }
+  
+  return &dt[i];
 }
 
 void
@@ -111,6 +160,9 @@ cl_r4k::print_regs(class cl_console_base *con)
   con->dd_printf("IY= ");
   rom->dump(0, rIY, rIY+7, 8, con);
   con->dd_color("answer");
+  con->dd_printf("JK= ");
+  rom->dump(0, rJK, rJK+7, 8, con);
+  con->dd_color("answer");
   con->dd_printf("SP= ");
   rom->dump(0, rSP, rSP+7, 8, con);
   con->dd_color("answer");
@@ -119,6 +171,7 @@ cl_r4k::print_regs(class cl_console_base *con)
   con->dd_printf("aBC= 0x%02x-0x%02x  ", raB, raC);
   con->dd_printf("aDE= 0x%02x-0x%02x  ", raD, raE);
   con->dd_printf("aHL= 0x%02x-0x%02x  ", raH, raL);
+  con->dd_printf("aJK= 0x%02x-0x%02x  ", raJ, raK);
   con->dd_printf("\n");
   
   print_disass(PC, con);
@@ -149,6 +202,7 @@ cl_r4k::mode3k(void)
   itab[0x6b]= instruction_wrapper_6b;
   itab[0x6c]= instruction_wrapper_6c;
   itab[0x80]= instruction_wrapper_80;
+  itab[0x88]= instruction_wrapper_88;
   itab[0x90]= instruction_wrapper_90;
 
   itab[0x45]= instruction_wrapper_45;
@@ -259,6 +313,7 @@ cl_r4k::mode4k(void)
   itab[0x6b]= instruction_wrapper_4knone;
   itab[0x6c]= instruction_wrapper_4knone;
   itab[0x80]= instruction_wrapper_4knone;
+  itab[0x88]= instruction_wrapper_4knone;
   itab[0x90]= instruction_wrapper_4knone;
   
   itab[0x45]= instruction_wrapper_4k45;
@@ -381,9 +436,9 @@ cl_r4k_cpu::write(class cl_memory_cell *cell, t_mem *val)
   if (cell == edmr)
     {
       if (*val & 0xc0)
-	r4uc->mode3k();
-      else
 	r4uc->mode4k();
+      else
+	r4uc->mode3k();
     }
 }
 
@@ -405,5 +460,20 @@ cl_r4k_cpu::print_info(class cl_console_base *con)
   cl_rxk_cpu::print_info(con);
   con->dd_printf("EDMR    : 0x%02x\n", edmr->read());
 }
+
+int
+cl_r4k::EXX(t_mem code)
+{
+  u16_t t;
+
+  cl_rxk::EXX(code);
+  
+  t= rJK;
+  cBC.W(raJK);
+  caJK.W(t);
+
+  return resGO;
+}
+
 
 /* End of rxk.src/r4k.cc */

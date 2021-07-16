@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (r3kcl.h)
+ * Simulator of microcontrollers (dpedm3.h)
  *
  * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
  * 
@@ -25,20 +25,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef R3KCL_HEADER
-#define R3KCL_HEADER
+#ifndef DPEDM3_HEADER
+#define DPEDM3_HEADER
 
-#include "r2kcl.h"
+#define LD_EIR_A	instruction_ed_47
+#define LD_IIR_A	instruction_ed_4f
+#define LD_A_EIR	instruction_ed_57
+#define LD_A_IIR	instruction_ed_5f
+#define LDI		instruction_ed_a0
+#define LDD		instruction_ed_a8
+#define EXX_iSP_HL	instruction_ed_54
+#define LD_BC_imn	instruction_ed_4b
+#define LD_DE_imn	instruction_ed_5b
+#define LD_HL_imn_ped	instruction_ed_6b
+#define LD_SP_imn	instruction_ed_7b
 
-
-class cl_r3k: public cl_r2k
-{
- public:
-  cl_r3k(class cl_sim *asim);
-  virtual const char *id_string(void);
-};
-
+#define SBC_HL_BC	instruction_ed_42
+#define SBC_HL_DE	instruction_ed_52
+#define SBC_HL_HL	instruction_ed_62
+#define SBC_HL_SP	instruction_ed_72
+#define ADC_HL_BC	instruction_ed_4a
+#define ADC_HL_DE	instruction_ed_5a
+#define ADC_HL_HL	instruction_ed_6a
+#define ADC_HL_SP	instruction_ed_7a
 
 #endif
 
-/* End of rxk.src/r3kcl.h */
+/* End of rxk.src/dpedm3.h */

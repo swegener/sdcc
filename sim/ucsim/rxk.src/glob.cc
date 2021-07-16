@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (glob.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -29,6 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 instruction_wrapper_fn itab[256];
+instruction_wrapper_fn itab_dd[256];
+instruction_wrapper_fn itab_ed[256];
+instruction_wrapper_fn itab_fd[256];
 
 /* 
 %d - signed compl.,byte jump 
@@ -47,6 +50,8 @@ struct dis_entry disass_rxk[]=
     { 0x11, 0xff, ' ', 3, "LD DE,%w" },
     { 0x21, 0xff, ' ', 3, "LD HL,%w" },
     { 0x31, 0xff, ' ', 3, "LD SP,%w" },
+    { 0x22, 0xff, ' ', 3, "LD (%w),HL" },
+    { 0x2a, 0xff, ' ', 3, "LD HL,(%w)" },
     { 0x03, 0xff, ' ', 1, "INC BC" },
     { 0x13, 0xff, ' ', 1, "INC DE" },
     { 0x23, 0xff, ' ', 1, "INC HL" },
@@ -114,22 +119,83 @@ struct dis_entry disass_rxk[]=
     { 0x28, 0xff, ' ', 2, "JR Z,%r" },
     { 0x30, 0xff, ' ', 2, "JR NC,%r" },
     { 0x38, 0xff, ' ', 2, "JR C,%r" },
-    { 0x27, 0xff, ' ', 2, "ADD SP,%d" },
+    { 0x27, 0xff, ' ', 2, "ADD SP,%b" },
     { 0x34, 0xff, ' ', 1, "INC (HL)" },
     { 0x35, 0xff, ' ', 1, "DEC (HL)" },
-    { 0x36, 0xff, ' ', 2, "LD (HL),%d" },
+    { 0x36, 0xff, ' ', 2, "LD (HL),%b" },
     { 0x47, 0xff, ' ', 1, "LD B,A" },
     { 0x4f, 0xff, ' ', 1, "LD C,A" },
     { 0x57, 0xff, ' ', 1, "LD D,A" },
     { 0x5b, 0xff, ' ', 1, "LD E,E" },
     { 0x5f, 0xff, ' ', 1, "LD E,A" },
     { 0x6f, 0xff, ' ', 1, "LD L,A" },
+    { 0x67, 0xff, ' ', 1, "LD H,A" },
     { 0x78, 0xff, ' ', 1, "LD A,B" },
     { 0x79, 0xff, ' ', 1, "LD A,C" },
     { 0x7a, 0xff, ' ', 1, "LD A,D" },
     { 0x7b, 0xff, ' ', 1, "LD A,E" },
     { 0x7c, 0xff, ' ', 1, "LD A,H" },
     { 0x7d, 0xff, ' ', 1, "LD A,L" },
+    { 0xaf, 0xff, ' ', 1, "XOR A" },
+    { 0xb7, 0xff, ' ', 1, "OR A" },
+    { 0xc0, 0xff, ' ', 1, "RET NZ" },
+    { 0xc8, 0xff, ' ', 1, "RET Z" },
+    { 0xc9, 0xff, ' ', 1, "RET" },
+    { 0xd0, 0xff, ' ', 1, "RET NC" },
+    { 0xd8, 0xff, ' ', 1, "RET C" },
+    { 0xe0, 0xff, ' ', 1, "RET LZ" },
+    { 0xe8, 0xff, ' ', 1, "RET LO" },
+    { 0xf0, 0xff, ' ', 1, "RET P" },
+    { 0xf8, 0xff, ' ', 1, "RET M" },
+    { 0xf1, 0xff, ' ', 1, "POP AF" },
+    { 0xc1, 0xff, ' ', 1, "POP BC" },
+    { 0xd1, 0xff, ' ', 1, "POP DE" },
+    { 0xe1, 0xff, ' ', 1, "POP HL" },
+    { 0xc2, 0xff, ' ', 3, "JP NZ,%w" },
+    { 0xca, 0xff, ' ', 3, "JP Z,%w" },
+    { 0xd2, 0xff, ' ', 3, "JP NC,%w" },
+    { 0xda, 0xff, ' ', 3, "JP C,%w" },
+    { 0xe2, 0xff, ' ', 3, "JP LZ,%w" },
+    { 0xea, 0xff, ' ', 3, "JP LO,%w" },
+    { 0xf2, 0xff, ' ', 3, "JP P,%w" },
+    { 0xfa, 0xff, ' ', 3, "JP M,%w" },
+    { 0xc3, 0xff, ' ', 3, "JP %w" },
+    { 0xc4, 0xff, ' ', 2, "LD HL,(SP+%b)" },
+    { 0xf5, 0xff, ' ', 1, "PUSH AF" },
+    { 0xc5, 0xff, ' ', 1, "PUSH BC" },
+    { 0xd5, 0xff, ' ', 1, "PUSH DE" },
+    { 0xe5, 0xff, ' ', 1, "PUSH HL" },
+    { 0xc6, 0xff, ' ', 2, "ADD A,%b" },
+    { 0xc7, 0xff, ' ', 4, "LJP %l" },
+    { 0xcc, 0xff, ' ', 1, "BOOL HL" },
+    { 0xcd, 0xff, ' ', 3, "CALL %w" },
+    { 0xce, 0xff, ' ', 2, "ADC A,%b" },
+    { 0xcf, 0xff, ' ', 4, "LCALL %l" },
+    { 0xd4, 0xff, ' ', 2, "LD (SP+%b),HL" },
+    { 0xd6, 0xff, ' ', 2, "SUB A,%b" },
+    { 0xd7, 0xff, ' ', 1, "RST 10" },
+    { 0xdf, 0xff, ' ', 1, "RST 18" },
+    { 0xe7, 0xff, ' ', 1, "RST 20" },
+    { 0xef, 0xff, ' ', 1, "RST 28" },
+    { 0xff, 0xff, ' ', 1, "RST 38" },
+    { 0xd9, 0xff, ' ', 1, "EXX" },
+    { 0xdc, 0xff, ' ', 1, "AND HL,DE" },
+    { 0xec, 0xff, ' ', 1, "OR HL,DE" },
+    { 0xde, 0xff, ' ', 2, "SBC A,%b" },
+    { 0xe3, 0xff, ' ', 1, "EX DE',HL" }, // '
+    { 0xeb, 0xff, ' ', 1, "EX DE,HL" },
+    { 0xe4, 0xff, ' ', 2, "LD HL,(IX%d)" },
+    { 0xf4, 0xff, ' ', 2, "LD (IX%d),HL" },
+    { 0xe6, 0xff, ' ', 2, "AND A,%b" },
+    { 0xe9, 0xff, ' ', 1, "JP HL" },
+    { 0xee, 0xff, ' ', 2, "XOR %b" },
+    { 0xf3, 0xff, ' ', 1, "RL DE" },
+    { 0xf6, 0xff, ' ', 2, "OR %b" },
+    { 0xf7, 0xff, ' ', 1, "MUL" },
+    { 0xf9, 0xff, ' ', 1, "LD SP,HL" },
+    { 0xfb, 0xff, ' ', 1, "RR DE" },
+    { 0xfc, 0xff, ' ', 1, "RR HL" },
+    { 0xfe, 0xff, ' ', 2, "CP A,%b" },
     
     { 0, 0, 0, 0, 0, 0 }
   };

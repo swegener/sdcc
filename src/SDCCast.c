@@ -3403,6 +3403,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
   int parmNumber;
   sym_link *p;
   RESULT_TYPE resultTypeProp;
+  static int findingAddressOf=0;
 
   if (!tree)
     return tree;
@@ -3519,6 +3520,12 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
     if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BOOL) && reduceTypeAllowed)
       dtl = decorateType (tree->left, RESULT_TYPE_IFX, reduceTypeAllowed);
+    else if ((tree->opval.op == '&') && (!tree->right))
+      {
+        findingAddressOf = 1;
+        dtl = decorateType (tree->left, resultTypeProp, reduceTypeAllowed);
+        findingAddressOf = 0;
+      }
     else
       dtl = decorateType (tree->left, resultTypeProp, reduceTypeAllowed);
 
@@ -3622,7 +3629,9 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         {
           int arrayIndex = (int) ulFromVal (valFromType (RETYPE (tree)));
           int arraySize = DCL_ELEM (LTYPE (tree));
-          if (arraySize && arrayIndex >= arraySize)
+          int arrayLimit = findingAddressOf ? arraySize+1 : arraySize;
+          
+          if (arraySize && arrayIndex >= arrayLimit)
             {
               werrorfl (tree->filename, tree->lineno, W_IDX_OUT_OF_BOUNDS, arrayIndex, arraySize);
             }

@@ -1,3 +1,7 @@
+2021-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fix bug #2546
+
 2021-07-16 Visenri
 
     * src/SDCC.lex

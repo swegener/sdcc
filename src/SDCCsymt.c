@@ -1053,6 +1053,25 @@ newBoolLink ()
 }
 
 /*------------------------------------------------------------------*/
+/* newPtrDiffLink() - creates a ptrdiff type                        */
+/*------------------------------------------------------------------*/
+sym_link *
+newPtrDiffLink ()
+{
+  if (GPTRSIZE <= INTSIZE)
+    return newIntLink ();
+  else if (GPTRSIZE <= LONGSIZE)
+    return newLongLink ();
+  else if (GPTRSIZE <= LONGLONGSIZE)
+    return newLongLongLink();
+  else
+    {
+      assert (0);
+      return NULL;
+    }
+}
+
+/*------------------------------------------------------------------*/
 /* newVoidLink() - creates an void type                             */
 /*------------------------------------------------------------------*/
 sym_link *
@@ -2310,7 +2329,9 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   /* shift operators have the important type in the left operand */
   if (op == LEFT_OP || op == RIGHT_OP)
     rType = copyLinkChain(type1);
-
+  /* If difference between pointers or arrays then the result is a ptrdiff */
+  else if ((op == '-') && (IS_PTR (type1) || IS_ARRAY (type1)) && (IS_PTR (type2) || IS_ARRAY (type2)))
+    rType = newPtrDiffLink();
   /* if one of them is a pointer or array then that prevails */
   else if (IS_PTR (type1) || IS_ARRAY (type1))
     rType = copyLinkChain (type1);

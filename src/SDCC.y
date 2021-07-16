@@ -242,6 +242,9 @@ unary_expr
    | ALIGNOF '(' type_name ')'{ $$ = newAst_VALUE (alignofOp ($3)); }
    | TYPEOF unary_expr        { $$ = newNode (TYPEOF, NULL, $2); }
    | OFFSETOF '(' type_name ',' offsetof_member_designator ')' { $$ = offsetofOp($3, $5); }
+   | RLC unary_expr           { $$ = newNode (RLC, $2, NULL); }
+   | RRC unary_expr           { $$ = newNode (RRC, $2, NULL); }
+   | SWAP unary_expr          { $$ = newNode (SWAP, $2, NULL); }
    ;
 
 unary_operator

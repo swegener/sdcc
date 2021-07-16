@@ -1,3 +1,19 @@
+2021-07-16 Visenri
+
+    * src/SDCC.lex
+      src/SDCC.y
+      Added builtins: "__builtin_rlc", "__builtin_rrc" & "__builtin_swap".
+      These functions will allow swap and rotate operations with volatile variables.
+    * src/SDCCast.c
+      src/SDCCsymt.c
+      src/SDCCsymt.h
+      src/SDCCval.c
+      src/SDCCval.h
+      Support for conditional type reduction (patch #392) for optimized values to 0.
+      Fixed size calculation for ptrdiff type.
+      Fixed int promotion for shift operations: using only left operand.
+      Added checks for side effects or volatility in optimizeRRCRLC (like optimizeSWAP, bug #3218)
+
 2021-07-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genMinusDec),

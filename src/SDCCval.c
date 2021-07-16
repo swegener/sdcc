@@ -2558,6 +2558,56 @@ valMod (value * lval, value * rval, bool reduceType)
 }
 
 /*------------------------------------------------------------------*/
+/* valZeroResult - constant zero with type from two values          */
+/*------------------------------------------------------------------*/
+value *
+valZeroResultFromOp (sym_link * type1, sym_link * type2, int op, bool reduceType)
+{
+  value *val;
+
+  /* create a new value */
+  val = newValue ();
+  val->type = computeType (type1, type2, RESULT_TYPE_INT, op);
+  val->etype = getSpec (val->type);
+  // If type reduction is not allowed, make sure we get integer promotion for smaller types
+  if(!reduceType && IS_INTEGRAL (val->etype) && bitsForType (val->etype) < INTSIZE * 8)
+    {
+      SPEC_NOUN (val->etype) = V_INT;
+      SPEC_USIGN (val->etype) = 0;
+    }
+  SPEC_SCLS (val->etype) = S_LITERAL;
+
+  if (!IS_SPEC (val->type))
+    SPEC_CVAL (val->etype).v_ulong = 0;
+  else if (IS_FLOAT (val->type))
+    SPEC_CVAL (val->type).v_float = 0;
+  else if (IS_FIXED16X16 (val->type))
+    SPEC_CVAL (val->type).v_fixed16x16 = 0;
+  else if (SPEC_LONGLONG (val->type))
+    {
+      if (SPEC_USIGN (val->type))
+        SPEC_CVAL (val->type).v_ulonglong = 0;
+      else
+        SPEC_CVAL (val->type).v_longlong = 0;
+    }
+  else if (SPEC_LONG (val->type))
+    {
+      if (SPEC_USIGN (val->type))
+        SPEC_CVAL (val->type).v_ulong = 0;
+      else
+        SPEC_CVAL (val->type).v_long = 0;
+    }
+  else
+    {
+      if (SPEC_USIGN (val->type))
+        SPEC_CVAL (val->type).v_uint = 0;
+      else
+        SPEC_CVAL (val->type).v_int = 0;
+    }
+  return reduceType ? cheapestVal (val) : val;
+}
+
+/*------------------------------------------------------------------*/
 /* valPlus - Addition constants                                     */
 /*------------------------------------------------------------------*/
 value *

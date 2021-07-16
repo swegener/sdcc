@@ -144,6 +144,7 @@ value *valNot (value *, bool reduceType);
 value *valMult (value *, value *, bool reduceType);
 value *valDiv (value *, value *, bool reduceType);
 value *valMod (value *, value *, bool reduceType);
+value *valZeroResultFromOp (sym_link * type1, sym_link * type2, int op, bool reduceType);
 value *valPlus (value *, value *, bool reduceType);
 value *valMinus (value *, value *, bool reduceType);
 value *valShift (value *, value *, int, bool reduceType);

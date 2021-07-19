@@ -577,7 +577,7 @@ addDecl (symbol * sym, int type, sym_link * p)
   // if there is a function in this type chain
   if (p && funcInChain (sym->type))
     {
-      processFuncArgs (sym);
+      processFuncArgs (sym, NULL);
     }
 
   return;
@@ -3336,41 +3336,54 @@ cdbStructBlock (int block)
 void
 processFuncPtrArgs (sym_link * funcType)
 {
-  value *val = FUNC_ARGS (funcType);
-
-  /* if it is void then remove parameters */
-  if (val && IS_VOID (val->type))
-    {
-      FUNC_ARGS (funcType) = NULL;
-      return;
-    }
+  processFuncArgs (NULL, funcType);
 }
 
 /*-----------------------------------------------------------------*/
 /* processFuncArgs - does some processing with function args       */
+/*                                                                 */
+/*   Leave func NULL if processing a type rather than a symbol     */
 /*-----------------------------------------------------------------*/
 void
-processFuncArgs (symbol *func)
+processFuncArgs (symbol *func, sym_link *funcType)
 {
   value *val;
   int pNum = 1;
-  sym_link *funcType = func->type;
+  char *funcName = NULL;
+  int funcCdef = 0;
+  
+  if (func && !funcType)
+    funcType = func->type;
+  if (func)
+    {
+      funcCdef = func->cdef;
+      funcName = func->name;
+    }
+  else
+    {
+      funcCdef = 0;
+      funcName = "unnamed function type";
+    }
 
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
-    fprintf (stderr, "SDCCsymt.c:processFuncArgs(%s)\n", func->name);
+    fprintf (stderr, "SDCCsymt.c:processFuncArgs(%s)\n", funcName);
 
   /* find the function declaration within the type */
   while (funcType && !IS_FUNC (funcType))
     funcType = funcType->next;
 
+  /* Nothing to do if no function type found */
+  if (!funcType)
+    return;
+
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */
-  if (IFFUNC_HASVARARGS (funcType) || (options.stackAuto && !func->cdef))
+  if (IFFUNC_HASVARARGS (funcType) || (options.stackAuto && !funcCdef))
     FUNC_ISREENT (funcType) = 1;
 
   /* check if this function is defined as calleeSaves
      then mark it as such */
-  FUNC_CALLEESAVES (funcType) = inCalleeSaveList (func->name);
+  FUNC_CALLEESAVES (funcType) = inCalleeSaveList (funcName);
 
   /* loop thru all the arguments   */
   val = FUNC_ARGS (funcType);
@@ -3395,10 +3408,10 @@ processFuncArgs (symbol *func)
       if (val->sym && val->sym->name)
         for (value *val2 = val->next; val2; val2 = val2->next)
           if (val2->sym && val2->sym->name && !strcmp (val->sym->name, val2->sym->name))
-            werror (E_DUPLICATE_PARAMTER_NAME, val->sym->name, func->name);
+            werror (E_DUPLICATE_PARAMTER_NAME, val->sym->name, funcName);
 
       dbuf_init (&dbuf, 128);
-      dbuf_printf (&dbuf, "%s parameter %d", func->name, pNum);
+      dbuf_printf (&dbuf, "%s parameter %d", funcName, pNum);
       checkTypeSanity (val->etype, dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
 
@@ -3433,7 +3446,7 @@ processFuncArgs (symbol *func)
     }
 
   /* if this is an internal generated function call */
-  if (func->cdef)
+  if (funcCdef)
     {
       /* ignore --stack-auto for this one, we don't know how it is compiled */
       /* simply trust on --int-long-reent or --float-reent */

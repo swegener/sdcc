@@ -1,3 +1,10 @@
+2021-07-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (processFuncPtrArgs,processFuncArgs),
+	* src/SDCCsymt.h,
+	* src/SDCCmem.c (allocVariables): fix bug #3260
+	* support/regression/tests/bug-3260.c: added test
+
 2021-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fix bug #2546

@@ -712,7 +712,7 @@ sym_link *structElemType (sym_link *, value *);
 symbol *getStructElement (structdef *, symbol *);
 sym_link *computeType (sym_link *, sym_link *, RESULT_TYPE, int);
 void processFuncPtrArgs (sym_link *);
-void processFuncArgs (symbol *);
+void processFuncArgs (symbol *, sym_link *);
 int isSymbolEqual (const symbol *, const symbol *);
 int powof2 (TYPE_TARGET_ULONG);
 void dbuf_printTypeChain (sym_link *, struct dbuf_s *);

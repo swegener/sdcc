@@ -3463,6 +3463,10 @@ processFuncArgs (symbol *func, sym_link *funcType)
         return;
     }
 
+  /* Don't create parameter symbols without a function symbol */
+  if (!func)
+    return;
+
   val = FUNC_ARGS (funcType);
   pNum = 1;
   while (val)

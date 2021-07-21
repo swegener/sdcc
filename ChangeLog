@@ -1,3 +1,7 @@
+2021-07-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (processFuncArgs): minor correction to #3260 bug fix
+
 2021-07-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (processFuncPtrArgs,processFuncArgs),

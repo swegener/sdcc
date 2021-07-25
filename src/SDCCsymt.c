@@ -2180,6 +2180,29 @@ cleanUpLevel (bucket ** table, long level)
     }
 }
 
+/*------------------------------------------------------------------*/
+/* leaveBlockScope - mark items in SymbolTab from a particular      */
+/*                   block as out-of-scope                          */
+/*------------------------------------------------------------------*/
+void
+leaveBlockScope (int block)
+{
+  int i;
+  bucket *chain;
+
+  /* go thru the entire  table  */
+  for (i = 0; i < 256; i++)
+    {
+      for (chain = SymbolTab[i]; chain; chain = chain->next)
+        {
+          if (chain->block == block)
+            {
+              ((symbol *)chain->sym)->isinscope = 0;
+            }
+        }
+    }
+}
+
 symbol *
 getAddrspace (sym_link *type)
 {

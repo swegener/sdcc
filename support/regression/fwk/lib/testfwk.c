@@ -29,7 +29,7 @@ extern void _exitEmu(void);
 int __numTests = 0;
 static int __numFailures = 0;
 
-#if BROKEN_DIV_MOD
+#if BROKEN_DIV_MOD && !defined(TARGET_VERY_LOW_MEMORY)
 static int
 __div(int num, int denom)
 {
@@ -68,6 +68,44 @@ __prints (const char *s)
     }
 }
 
+#ifdef TARGET_VERY_LOW_MEMORY
+static void
+__printNibble (unsigned char c)
+{
+  c &= 0x0F;
+  if (c <= 9 )
+    c += '0';
+  else
+    c += 'A' - 10;
+  _putchar(c);
+}
+void
+__printd (int n)
+{
+  unsigned char chr;
+  #define SWAP_BYTE(x)  ((x) >> 4 | (x) << 4)
+
+  if (0 > n)
+    {
+      n = -n;
+      _putchar('-');
+    }
+  _putchar('x');
+
+  // This seems to be the most efficient way to do it for PDK (both in RAM & ROM)
+  chr = n >> 8;
+  chr = SWAP_BYTE(chr);
+  __printNibble(chr);
+  chr = SWAP_BYTE(chr);
+  __printNibble(chr);
+
+  chr = n & 0xFF;
+  chr = SWAP_BYTE(chr);
+  __printNibble(chr);
+  chr = SWAP_BYTE(chr);
+  __printNibble(chr);
+}
+#else
 void
 __printd (int n)
 {
@@ -125,6 +163,7 @@ __printu (unsigned int n)
       __prints(p);
     }
 }
+#endif
 
 #ifndef NO_VARARGS
 void
@@ -236,6 +275,8 @@ main (void)
   __printd(__numTests);
   _putchar('/');
   __printd(__numCases);
+
+  #ifndef TARGET_VERY_LOW_MEMORY
   __prints(": ");
   __printd(__numFailures);
   __prints(" failed of ");
@@ -243,6 +284,9 @@ main (void)
   __prints(" tests in ");
   __printd(__numCases);
   __prints(" cases.\n");
+  #else
+  _putchar('\n');
+  #endif
 
   _exitEmu();
 

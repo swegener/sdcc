@@ -1,5 +1,15 @@
 2021/07/26 Visenri
 
+    * support/regression/fwk/include/testfwk.h
+      support/regression/fwk/lib/testfwk.c
+      Lightweight version of test framework (testfwk) [#393].
+      Added new macro to indicate we are targeting a very low memory device: TARGET_VERY_LOW_MEMORY.
+      Added macros to easy the check of all pdk variants with 1 or 2 checks [#394].
+      Different implementation of __printd with hex output (for TARGET_VERY_LOW_MEMORY).
+      Skipped some strings in "Summary" output to save memory (for TARGET_VERY_LOW_MEMORY).
+
+2021/07/26 Visenri
+
     * support/regression/collate-results.py
       support/regression/compact-results.py
       Added processing for the stack overflow message from simulator.

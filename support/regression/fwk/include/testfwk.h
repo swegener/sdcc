@@ -1,6 +1,31 @@
 #ifndef __TESTFWK_H
 #define __TESTFWK_H   1
 
+// This is used to avoid repeating the same checks over and over again, also much easier to maintain.
+#if defined(__SDCC_pdk13)
+  #define SDCC_PDK 13
+#elif defined(__SDCC_pdk14)
+  #define SDCC_PDK 14
+#elif defined(__SDCC_pdk15)
+  #define SDCC_PDK 15
+#elif defined(__SDCC_pdk16)
+  #define SDCC_PDK 16
+#endif
+
+// This macro allows easy check for multiple devices: SDCC_PDK_BITS(<=13), SDCC_PDK_BITS(>=14)
+#ifdef SDCC_PDK
+  #define SDCC_PDK_BITS(cond) (SDCC_PDK cond)
+#else
+  #define SDCC_PDK_BITS(cond) 0 // Always 0 (false) for other backends
+#endif
+
+// Enable low memory mode for small devices.
+#if SDCC_PDK_BITS(<=14)
+  #define TARGET_VERY_LOW_MEMORY
+  #undef NO_VARARGS
+  #define NO_VARARGS
+#endif
+
 extern int __numTests;
 extern const int __numCases;
 
@@ -50,7 +75,7 @@ void __printf(const char *szFormat, ...);
 #define __z88dk_fastcall
 #endif
 
-#if defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#if defined(SDCC_PDK)
 //# define __data // data is implemented for pdk
 # define __idata
 # define __pdata
@@ -84,7 +109,9 @@ void __printf(const char *szFormat, ...);
 void __fail (__code const char *szMsg, __code const char *szCond, __code const char *szFile, int line);
 void __prints (const char *s);
 void __printd (int n);
+#ifndef TARGET_VERY_LOW_MEMORY
 void __printu (unsigned int n);
+#endif
 __code const char *__getSuiteName (void);
 void __runSuite (void);
 

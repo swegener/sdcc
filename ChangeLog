@@ -1,5 +1,15 @@
 2021/07/26 Visenri
 
+    * support/regression/Makefile.in
+      support/regression/ports/pdk13
+      support/regression/ports/pdk13/spec.mk
+      support/regression/ports/pdk13/support.c
+      support/regression/ports/pdk13/uCsim.cmd
+      Added infrastructure to test pdk13.
+      It is in the filter-out list to avoid automatic test, because many tests still need some work to be passed/skipped [#394].
+
+2021/07/26 Visenri
+
     * support/regression/fwk/include/testfwk.h
       support/regression/fwk/lib/testfwk.c
       Lightweight version of test framework (testfwk) [#393].

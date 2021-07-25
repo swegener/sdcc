@@ -1,5 +1,16 @@
 2021/07/26 Visenri
 
+    * support/regression/collate-results.py
+      support/regression/compact-results.py
+      Added processing for the stack overflow message from simulator.
+      Added new check to reset state machine and name with "Simulation started" string
+      Added checks to validate the name after "--- Running", because sometimes we get garbage, because of caotic program behavior (due to stack overflow or wrong code).
+      Added the possibility to parse hex values instead of decimal [#393].
+      Better output in case of a catastrophic failure ("--- Summary" not found).
+      Fixed wrong regular expression to find ".ihx" file.
+
+2021/07/26 Visenri
+
     * sdas/aspdk13/pdk13mch.c
       sdas/aspdk13/pdk13pst.c
       sdas/aspdk14/pdk14mch.c

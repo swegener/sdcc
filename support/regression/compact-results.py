@@ -7,6 +7,19 @@ import string
 through stdin and summarises the total number of failures, test
 points, and test cases."""
 
+# Function to parse numbers
+def number_from_string(str_value):
+  if str_value.find("x") != -1:
+    return int(str_value.replace("0x", "").replace("x", ""), 16);
+  else:
+    return int(str_value)
+    
+def running_name_valid(name):
+  if (name != "") and (name.find(" ") == -1) and (name.find("/") != -1):
+    return True
+  else:
+    return False
+
 # Read in everything
 if sys.version_info[0]<3:
     safe_stdin = sys.stdin
@@ -14,25 +27,32 @@ else:
     safe_stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="latin-1")
 lines = safe_stdin.readlines()
 
-found = False
+summary_found = False
 for line in lines:
     if (re.search(r'^--- Summary:', line)):
-        found = True
+        summary_found = True
         break
 
-if not found:
+outname = sys.argv[1]
+# Create lines not present in simulation log
+if not summary_found:
     fp = open(sys.argv[1], "w")
-    fp.write("--- Running: %s\n" % sys.argv[1])
-    fp.write("--- Summary: 1/0/0: 1 failed of 0 tests in 0 cases.\n")
+    fp.write("- Added by compact-results script: %s\n" % sys.argv[1])    
+    m = re.match(r'^(.*).out', outname)
+    if (m):
+      outname = m.group(1)
+    fp.write("--- Running: %s\n" % outname)
+    fp.write("--- Summary: 1/0/0: 1 failed of 0 tests in 0 cases.\n")  
     fp.close()
 
 # Init the running totals
-failures = 0
+failures = 0 if summary_found else 1
 cases = 0
 tests = 0
 bytes = 0
 ticks = 0
 invalid = 0
+stack_overflow = 0
 
 # hack for valdiag
 name = ""
@@ -42,32 +62,42 @@ for line in lines:
     # --- Running: gen/ucz80/longor/longor
     m = re.match(r'^--- Running: (.*)$', line)
     if (m):
-        name = m.group(1)
-
-    # in case the test program crashes before the "--- Running" message
-    m = re.match(r'^[0-9]+ words read from (.*)\.ihx$',line)
+        #take the name only if not a whitespace, this happens if simulator stops when calling to print the name (stack overflow)
+        stripped_name = m.group(1).strip()
+        if running_name_valid(stripped_name):
+          name = stripped_name
+        
+    # In case the test program crashes before the "--- Running" message
+    m = re.match(r'^[0-9]+ words read from (.*).ihx', line)
     if (m):
         name = m.group(1)
-
-    base = name
-    m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', name)
+        
+    safe_name = name if name != "" else outname
+        
+    # Get base name from name
+    base = safe_name 
+    m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', base)
     if (m):
         base = m.group(3)
-
+  
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
         try:
-            (summary, data, rest) = re.split(r':', line)
+            if line.count(':') == 1:
+              (summary, data) = re.split(r':', line)
+            else:
+              (summary, data, rest) = re.split(r':', line)
+            
             (nfailures, ntests, ncases) = re.split(r'/', data)
-            tests = tests + float(ntests)
-            cases = cases + float(ncases)
+            tests = tests + number_from_string(ntests)
+            cases = cases + number_from_string(ncases)
         except ValueError:
             print("Bad summary line:", line)
             nfailures = '1'
-        failures = failures + float(nfailures)
-        if (float(nfailures)):
-            print("Failure: %s" % name)
+        failures = failures + number_from_string(nfailures)
+        if (number_from_string(nfailures)):
+            print("Failure: %s" % safe_name)
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
@@ -83,7 +113,13 @@ for line in lines:
     # Stop at 0x000228: (106) Invalid instruction 0x00fd
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):
         invalid += 1;
-        print("Invalid instruction: %s" % name)
+        print("Invalid instruction: %s" % safe_name)
+        
+    # Stop at 0xXXXXXX: (103) Stack overflow
+    if (re.search(r'Stack overflow', line)):
+        stack_overflow += 1
+        print("Stack overflow: %s" % safe_name)
+    
 
 print("%-35.35s" % base, end=' ')
 

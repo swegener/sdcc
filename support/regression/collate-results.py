@@ -7,6 +7,13 @@ import sys, re, io
 through stdin and summarises the total number of failures, test
 points, and test cases."""
 
+# Function to parse numbers
+def number_from_string(str_value):
+  if str_value.find("x") != -1:
+    return int(str_value.replace("0x", "").replace("x", ""), 16);
+  else:
+    return int(str_value)
+
 # Read in everything
 if sys.version_info[0]<3:
     safe_stdin = sys.stdin
@@ -21,6 +28,7 @@ tests = 0
 bytes = 0
 ticks = 0
 invalid = 0
+stack_overflow = 0
 halt = 0
 unmatch = 0
 flag = 0
@@ -31,13 +39,22 @@ exlist = ["bug663539"]
 name = ""
 
 for line in lines:
+  
+    m = re.match(r'^Simulation started,', line)
+    if (m):
+        flag = 0
+        name = ""
+    
     # --- Running: gen/ucz80/longor/longor
     m = re.match(r'^--- Running: (.*)$', line)
     if (m):
-        name = m.group(1)
+        #take the name only if not a whitespace, this happens if simulator stops when calling to print the name (stack overflow)
+        stripped_name = m.group(1).strip()
+        if stripped_name != "":
+          name = stripped_name
 
     # in case the test program crashes before the "--- Running" message
-    m = re.match(r'^[0-9]+ words read from (.*)\.ihx$',line)
+    m = re.match(r'^[0-9]+ words read from (.*).ihx', line)
     if (m):
         name = m.group(1)
 
@@ -45,16 +62,20 @@ for line in lines:
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
         try:
-            (summary, data, rest) = re.split(r':', line)
+            if line.count(':') == 1:
+              (summary, data) = re.split(r':', line)
+            else:
+              (summary, data, rest) = re.split(r':', line)
+            
             (nfailures, ntests, ncases) = re.split(r'/', data)
-            failures = failures + int(nfailures)
-            tests = tests + int(ntests)
-            cases = cases + int(ncases)
+            failures = failures + number_from_string(nfailures)
+            tests = tests + number_from_string(ntests)
+            cases = cases + number_from_string(ncases)
         except ValueError:
             print("Parsing error at ", name)
             print("Bad summary line: ", line)
             nfailures = '1'
-        if (int(nfailures)):
+        if (number_from_string(nfailures)):
             messagelog.append("Failure: %s" % name)
         flag = 1 
 
@@ -81,6 +102,11 @@ for line in lines:
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):
         invalid += 1
         messagelog.append("Invalid instruction: %s" % name)
+    
+    # Stop at 0xXXXXXX: (103) Stack overflow
+    if (re.search(r'Stack overflow', line)):
+        stack_overflow += 1
+        messagelog.append("Stack overflow: %s" % name)
 
     # HALT instruction 
     if (re.search(r'HALT instruction', line) or re.search(r'Halt instruction', line) or re.search(r'halt instruction', line)):
@@ -92,6 +118,7 @@ for line in lines:
     if (m):
       name = line.split()[-1]
       name = '.'.join(name.split('.')[0:-1])
+    
 
 if (len(sys.argv) > 1):
     print("Summary for '%s':" % sys.argv[1], end=' ')
@@ -99,6 +126,8 @@ if (unmatch > 0):
     print("%d abnormal stops (" % unmatch, end=' ')
     if (invalid > 0):
         print("%d invalid instructions," % invalid, end=' ')
+    if (stack_overflow > 0):
+        print("%d Stack overflows," % stack_overflow, end=' ')
     if (halt > 0):
         print("%d HALT instructions," % halt, end=' ')
     print("),", end=' ')

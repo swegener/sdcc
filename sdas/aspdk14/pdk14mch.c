@@ -44,10 +44,11 @@ char    *dsft   = "asm";
 VOID
 machine(struct mne *mp)
 {
-        a_uint op;
+        a_uint op, opWithFlags;
         int combine;
 
-        op = mp->m_valu;
+        opWithFlags = mp->m_valu;
+        op = opWithFlags & PDK_OPCODE_MASK;
         combine = 0;
 
         /* Default instructions are only used for A -> K instructions.
@@ -61,7 +62,7 @@ machine(struct mne *mp)
                 struct inst aio = {0x01C0, 0x3F};
                 struct inst ma = {0x0B80, 0x7F};
                 struct inst am = {0x0F80, 0x7F};
-                emov(def, ioa, aio, ma, am);
+                emov(opWithFlags, def, ioa, aio, ma, am);
                 break;
         }
 
@@ -122,7 +123,7 @@ machine(struct mne *mp)
                 struct inst ma = {0x0A00 | combine, 0x7F};
                 struct inst am = {0x0E00 | combine, 0x7F};
                 struct inst ioa = {0x00C0, 0x3F};
-                ebit(def, ma, am, mp->m_type == S_XOR ? &ioa : NULL);
+                ebit(opWithFlags, def, ma, am, mp->m_type == S_XOR ? &ioa : NULL);
                 break;
         }
 
@@ -141,7 +142,7 @@ machine(struct mne *mp)
         case S_SET0: {
                 struct inst io = {0x1C00 | combine, 0x3F};
                 struct inst m = {0x2400 | combine, 0x3F};
-                ebitn(io, m, /*N offset*/6);
+                ebitn(opWithFlags, io, m, /*N offset*/6);
                 break;
         }
 
@@ -161,7 +162,7 @@ machine(struct mne *mp)
         case S_T0SN: {
                 struct inst io = {0x1800 | combine, 0x3F};
                 struct inst m = {0x2000 | combine, 0x3F};
-                ebitn(io, m, /*N offset*/6);
+                ebitn(opWithFlags, io, m, /*N offset*/6);
                 break;
         }
 
@@ -221,7 +222,7 @@ machine(struct mne *mp)
 
         case S_SWAPC:
               def.mask = 0x3F;
-              eswapc(def, /*N offset*/6);
+              eswapc(op, def, /*N offset*/6);
               break;
 
         case S_COMP:

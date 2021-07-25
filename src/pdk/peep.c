@@ -173,7 +173,7 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
   if (ISINST (pl->line, "push") && argIs (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
     return true;
 
-  if (ISINST (pl->line, "t0sn") || ISINST (pl->line, "t1sn"))
+  if (ISINST (pl->line, "t0sn.io") || ISINST (pl->line, "t1sn.io"))
     return argIs(strchr (pl->line, ','), what);
 
   if(ISINST (pl->line, "addc") ||
@@ -206,7 +206,8 @@ pdkMightRead(const lineNode *pl, const char *what)
   if (ISINST(pl->line, "ret"))
     return isReturned(what);
 
-  if (ISINST(pl->line, "mov"))
+  if (ISINST(pl->line, "mov") ||
+    ISINST(pl->line, "mov.io"))
     return argIs (strchr (pl->line, ','), what);
 
   if (ISINST (pl->line, "push") && argIs (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
@@ -222,7 +223,8 @@ pdkMightRead(const lineNode *pl, const char *what)
   if (ISINST(pl->line, "idxm"))
     return argIs (pl->line + 4, what) || argIs (strchr (pl->line, ','), what);
   if (ISINST (pl->line, "ceqsn") ||
-    ISINST (pl->line, "cneqsn"))
+    ISINST (pl->line, "cneqsn") ||
+    ISINST (pl->line, "xor.io"))
     return argIs (pl->line + 6, what) || argIs (strchr (pl->line, ','), what);
 
   // One-operand instructions
@@ -275,12 +277,17 @@ stm8SurelyWritesFlag(const lineNode *pl, const char *what)
     ISINST (pl->line, "neg") ||
     ISINST (pl->line, "not") ||
     ISINST (pl->line, "or") ||
-    ISINST (pl->line, "xor"))
+    ISINST (pl->line, "xor") ||
+    ISINST (pl->line, "xor.io"))
       return !strcmp(what, "z");
 
   // mov writes z when the destination is a and hte source not an immediate only.
-  if (ISINST (pl->line, "mov") && !strcmp(what, "z") && pl->line[4] == 'a' && pl->line[5] == ',' && !strchr(pl->line, '#'))
-    return true;
+  if (!strcmp(what, "z") && !strchr(pl->line, '#'))
+    {
+      if ( (ISINST (pl->line, "mov") && pl->line[4] == 'a' && pl->line[5] == ',') ||
+         (ISINST (pl->line, "mov.io") && pl->line[7] == 'a' && pl->line[8] == ','))
+        return true;
+    }
 
   return false;
 }
@@ -293,6 +300,8 @@ pdkSurelyWrites(const lineNode *pl, const char *what)
 
   if (ISINST(pl->line, "mov") || ISINST(pl->line, "idxm"))
     return argIs (pl->line + 4, what);
+  if (ISINST(pl->line, "mov.io"))
+    return argIs (pl->line + 7, what);
 
   if (ISINST (pl->line, "pop") && argIs (pl->line + 4, "af") || ISINST (pl->line, "popaf"))
     return !strcmp(what, "a");
@@ -327,6 +336,7 @@ pdkCondJump(const lineNode *pl)
 {
   return (ISINST(pl->line, "ceqsn") || ISINST(pl->line, "cneqsn") ||
     ISINST(pl->line, "t0sn") || ISINST(pl->line, "t1sn") ||
+    ISINST(pl->line, "t0sn.io") || ISINST(pl->line, "t1sn.io") ||
     ISINST(pl->line, "izsn") || ISINST(pl->line, "dzsn"));
 }
 

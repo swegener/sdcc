@@ -50,18 +50,20 @@ static VOID outpdka(struct inst inst) {
         outpdkaw(inst, e);
 }
 
-VOID emov(struct inst def,
+VOID emov(a_uint op,
+          struct inst def,
           struct inst ioa,
           struct inst aio,
           struct inst ma,
           struct inst am) {
+        bool ioAdr = op & PDK_OPCODE_ADR_IO;
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, ioAdr);
         comma(1);
-        int t1 = addr(&e1);
+        int t1 = addr(&e1, ioAdr);
 
         if (t == S_IO && t1 == S_A) {
                 outpdkaw(ioa, e);
@@ -86,9 +88,9 @@ VOID eidxm(struct inst am, struct inst ma) {
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, false);
         comma(1);
-        int t1 = addr(&e1);
+        int t1 = addr(&e1, false);
 
         if (t == S_A && t1 == S_M) {
                 outpdkrm(am, e1);
@@ -106,9 +108,9 @@ VOID earith(struct inst def,
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, false);
         comma(1);
-        int t1 = addr(&e1);
+        int t1 = addr(&e1, false);
 
         if (t == S_M && t1 == S_A) {
                 outpdkrm(ma, e);
@@ -128,12 +130,12 @@ VOID earithc(struct inst ma,
              struct inst a) {
         struct expr e;
         clrexpr(&e);
-        int t = more() ? addr(&e) : S_A;
+        int t = more() ? addr(&e, false) : S_A;
 
         if (comma(0)) {
                 struct expr e1;
                 clrexpr(&e1);
-                int t1 = addr(&e1);
+                int t1 = addr(&e1, false);
                 if (t == S_M && t1 == S_A) {
                         outpdkrm(ma, e);
                 } else
@@ -155,7 +157,7 @@ VOID eshift(struct inst a,
             struct inst m) {
         struct expr e;
         clrexpr(&e);
-        int t = more() ? addr(&e) : S_A;
+        int t = more() ? addr(&e, false) : S_A;
 
         if (t == S_A) {
                 outpdka(a);
@@ -166,15 +168,17 @@ VOID eshift(struct inst a,
                 aerr();
 }
 
-VOID ebit(struct inst def,
+VOID ebit(a_uint op,
+          struct inst def,
           struct inst ma,
           struct inst am,
           struct inst *ioa) {
+        bool ioAdr = op & PDK_OPCODE_ADR_IO;
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e), t1 = 0;
+        int t = addr(&e, ioAdr), t1 = 0;
 
         if (!more()) {
                 if (t == S_K) {
@@ -187,7 +191,7 @@ VOID ebit(struct inst def,
                         aerr();
         } else {
                 comma(1);
-                t1 = addr(&e1);
+                t1 = addr(&e1, ioAdr);
         }
 
         if (t == S_M && t1 == S_A) {
@@ -208,7 +212,7 @@ VOID ebit(struct inst def,
 VOID enot(struct inst def, struct inst m) {
         struct expr e;
         clrexpr(&e);
-        int t = more() ? addr(&e) : S_A;
+        int t = more() ? addr(&e, false) : S_A;
 
         if (t == S_M) {
                 outpdkrm(m, e);
@@ -218,12 +222,13 @@ VOID enot(struct inst def, struct inst m) {
                 aerr();
 }
 
-VOID ebitn(struct inst io, struct inst m, int offset) {
+VOID ebitn(a_uint op, struct inst io, struct inst m, int offset) {
+        bool ioAdr = op & PDK_OPCODE_ADR_IO;
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, ioAdr);
         comma(1);
         if (pdkbit(&e1) != S_K)
                 aerr();
@@ -243,10 +248,10 @@ VOID ebitn(struct inst io, struct inst m, int offset) {
 VOID eskip(struct inst def, struct inst m) {
         struct expr e;
         clrexpr(&e);
-        int t = addr(&e);
+        int t = addr(&e, false);
         if (t == S_A) {
                 comma(1);
-                t = addr(&e);
+                t = addr(&e, false);
         }
 
         if (t == S_M) {
@@ -267,7 +272,7 @@ VOID eret(struct inst def, struct inst k) {
         if (more()) {
                 struct expr e;
                 clrexpr(&e);
-                if (addr(&e) != S_K)
+                if (addr(&e, false) != S_K)
                         aerr();
                 outpdkrm(k, e);
         } else
@@ -277,7 +282,7 @@ VOID eret(struct inst def, struct inst k) {
 VOID eone(struct inst m) {
         struct expr e;
         clrexpr(&e);
-        if (addr(&e) != S_M)
+        if (addr(&e, false) != S_M)
                 aerr();
 
         outpdkrm(m, e);
@@ -287,10 +292,10 @@ VOID exch(struct inst m) {
         struct expr e;
         clrexpr(&e);
 
-        int t = addr(&e);
+        int t = addr(&e, false);
         if (t == S_A) {
                 comma(1);
-                t = addr(&e);
+                t = addr(&e, false);
         }
 
         if (t != S_M)
@@ -314,18 +319,19 @@ VOID eopta(struct inst def) {
         if (more()) {
                 struct expr e;
                 clrexpr(&e);
-                if (addr(&e) != S_A)
+                if (addr(&e, false) != S_A)
                         aerr();
         }
         outpdka(def);
 }
 
-VOID eswapc(struct inst iok, int offset) {
+VOID eswapc(a_uint op, struct inst iok, int offset) {
+        bool ioAdr = op & PDK_OPCODE_ADR_IO;
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, ioAdr);
         comma(1);
         int t1 = pdkbit(&e1);
 
@@ -341,9 +347,9 @@ VOID espec(struct inst am, struct inst ma) {
         clrexpr(&e);
         clrexpr(&e1);
 
-        int t = addr(&e);
+        int t = addr(&e, false);
         comma(1);
-        int t1 = addr(&e1);
+        int t1 = addr(&e1, false);
 
         if (t == S_A && t1 == S_M) {
                 outpdkrm(am, e1);

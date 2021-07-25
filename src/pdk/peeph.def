@@ -1,7 +1,7 @@
 // peeph.def - PDK peephole rules
 
 replace restart {
-	mov	%1, %2
+	mo%3	%1, %2
 } by {
 	; peephole 0 removed dead load into %1 from %2.
 } if notUsed(%1), notVolatile(%1), notVolatile(%2)
@@ -13,10 +13,10 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	mov	%1, a
-	mov	a, %1
+	mo%3	%1, a
+	mo%3	a, %1
 } by {
-	mov	%1, a
+	mo%3	%1, a
 	; peephole 2 removed redundant load from %1 into a.
 } if notVolatile(%1)
 
@@ -29,7 +29,7 @@ replace restart {
 
 
 replace restart {
-	mov	a, #%1
+	mo%3	a, #%1
 	ret
 } by {
 	; peephole 4 moved load to ret.
@@ -44,11 +44,11 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
-	mov	a, #0x00
+	mo%3	a, #0x00
 	slc	a
 	and	a, #0x01
 } by {
-	mov	a, #0x00
+	mo%3	a, #0x00
 	slc	a
 	; peephole 6 removed redundant and.
 }

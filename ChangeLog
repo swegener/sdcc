@@ -1,5 +1,26 @@
 2021/07/26 Visenri
 
+    * sdas/aspdk13/pdk13mch.c
+      sdas/aspdk13/pdk13pst.c
+      sdas/aspdk14/pdk14mch.c
+      sdas/aspdk14/pdk14pst.c
+      sdas/aspdk15/pdk15mch.c
+      sdas/aspdk15/pdk15pst.c
+      sdas/aspdk16/pdk16mch.c
+      sdas/aspdk16/pdk16pst.c
+      sdas/aspdk/pdk.h
+      sdas/aspdk/pdkadr.c
+      sdas/aspdk/pdkmch.c
+      Added assembler support for new pdk .io mnemonics (bug #3259).
+
+    * src/pdk/gen.c
+      src/pdk/main.c
+      src/pdk/peep.c
+      src/pdk/peeph.def
+      Updated compiler generated assembly and rules according to new pdk .io mnemonics
+
+2021/07/26 Visenri
+
     * sim/ucsim/pdk.src/inst.cc
     * sim/ucsim/pdk.src/instcl.h
     * sim/ucsim/sim.src/sim.cc

@@ -44,7 +44,7 @@ char    *dsft   = "asm";
 VOID
 machine(struct mne *mp)
 {
-        a_uint op;
+        a_uint op, opWithFlags;
         int combine;
 
         /* Set the target in case it was not automatically
@@ -52,7 +52,8 @@ machine(struct mne *mp)
          */
         set_sdas_target (TARGET_ID_PDK13);
 
-        op = mp->m_valu;
+        opWithFlags = mp->m_valu;
+        op = opWithFlags & PDK_OPCODE_MASK;
         combine = 0;
 
         /* Default instructions are only used for A -> K instructions.
@@ -66,7 +67,7 @@ machine(struct mne *mp)
                 struct inst aio = {0x00A0, 0x1F};
                 struct inst ma = {0x05C0, 0x3F};
                 struct inst am = {0x07C0, 0x3F};
-                emov(def, ioa, aio, ma, am);
+                emov(opWithFlags, def, ioa, aio, ma, am);
                 break;
         }
 
@@ -127,7 +128,7 @@ machine(struct mne *mp)
                 struct inst ma = {0x0500 | combine, 0x3F};
                 struct inst am = {0x0700 | combine, 0x3F};
                 struct inst ioa = {0x0060, 0x1F};
-                ebit(def, ma, am, mp->m_type == S_XOR ? &ioa : NULL);
+                ebit(opWithFlags, def, ma, am, mp->m_type == S_XOR ? &ioa : NULL);
                 break;
         }
 
@@ -143,14 +144,14 @@ machine(struct mne *mp)
         case S_SET1: {
                 struct inst io = {0x0F00, 0x1F};
                 struct inst m = {0x0310, 0x0F};
-                ebitn(io, m, /*N offset*/5);
+                ebitn(opWithFlags, io, m, /*N offset*/5);
                 break;
         }
 
         case S_SET0: {
                 struct inst io = {0x0E00, 0x1F};
                 struct inst m = {0x0300, 0x0F};
-                ebitn(io, m, /*N offset*/5);
+                ebitn(opWithFlags, io, m, /*N offset*/5);
                 break;
         }
 
@@ -164,14 +165,14 @@ machine(struct mne *mp)
         case S_T1SN: {
                 struct inst io = {0x0D00, 0x1F};
                 struct inst m = {0x0210, 0x0F};
-                ebitn(io, m, /*N offset*/5);
+                ebitn(opWithFlags, io, m, /*N offset*/5);
                 break;
         }
 
         case S_T0SN: {
                 struct inst io = {0x0C00, 0x1F};
                 struct inst m = {0x0200, 0x0F};
-                ebitn(io, m, /*N offset*/5);
+                ebitn(opWithFlags, io, m, /*N offset*/5);
                 break;
         }
 

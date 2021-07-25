@@ -30,6 +30,7 @@
 
 /* Contains common functionality for the pdk architecture. */
 
+#include <stdbool.h>
 /*
  * Instructions.
  */
@@ -106,6 +107,9 @@
 #define S_M    33
 #define S_IO   34
 
+#define PDK_OPCODE_ADR_IO 0x80000000
+#define PDK_OPCODE_MASK     0xFFFFFF
+
 struct inst {
         a_uint op;    /* opcode of instruction */
         a_uint mask;  /* mask of parameter for instruction */
@@ -114,7 +118,8 @@ struct inst {
 #ifdef OTHERSYSTEM
 
 /* Codegen functions to emit instructions. */
-extern VOID emov(struct inst def,
+extern VOID emov(a_uint op,
+          struct inst def,
           struct inst ioa,
           struct inst aio,
           struct inst ma,
@@ -123,9 +128,9 @@ extern VOID eidxm(struct inst am, struct inst ma);
 extern VOID earith(struct inst def, struct inst ma, struct inst am);
 extern VOID earithc(struct inst ma, struct inst am, struct inst m, struct inst a);
 extern VOID eshift(struct inst a, struct inst m);
-extern VOID ebit(struct inst def, struct inst ma, struct inst am, struct inst *ioa);
+extern VOID ebit(a_uint op, struct inst def, struct inst ma, struct inst am, struct inst *ioa);
 extern VOID enot(struct inst def, struct inst m);
-extern VOID ebitn(struct inst io, struct inst m, int offset);
+extern VOID ebitn(a_uint op, struct inst io, struct inst m, int offset);
 extern VOID eskip(struct inst def, struct inst m);
 extern VOID ezsn(struct inst def, struct inst m);
 extern VOID eret(struct inst def, struct inst k);
@@ -133,10 +138,10 @@ extern VOID eone(struct inst m);
 extern VOID exch(struct inst m);
 extern VOID epupo(struct inst def);
 extern VOID eopta(struct inst def);
-extern VOID eswapc(struct inst iok, int offset);
+extern VOID eswapc(a_uint op, struct inst iok, int offset);
 extern VOID espec(struct inst am, struct inst ma);
 
-extern int addr(struct expr *esp);
+extern int addr(struct expr *esp, bool ioAdr);
 extern int pdkbit(struct expr *esp);
 
 /* Addressing parsing */

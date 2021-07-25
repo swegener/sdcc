@@ -34,7 +34,7 @@
 
 /*  Classify argument as to address mode */
 int
-addr(struct expr *esp)
+addr(struct expr *esp, bool ioAdr)
 {
         int c = getnb(), c1;
 
@@ -70,16 +70,20 @@ addr(struct expr *esp)
         fallback:
                 unget(c);
 
-                /* Memory address */
                 expr(esp, 0);
-                esp->e_mode = S_M;
-
-                /* If there is no area information, assume that we have in
-                fact parsed an IO register variable - since any other constant
-                would have been prefixed by a '#'. */
-                if (!esp->e_flag && !esp->e_base.e_ap)
-                        esp->e_mode = S_IO;
+                /* Memory spaces */
+                if (ioAdr)
+                  esp->e_mode = S_IO;
+                else
+                  esp->e_mode = S_M;
         }
+        
+        if(pass == 2 && esp->e_mode == S_IO && !ioAdr)
+          {
+            warnBanner();
+            fprintf(stderr,
+                    "Forced IO address space for instruction without .io\n");
+          }
 
         return (esp->e_mode);
 }

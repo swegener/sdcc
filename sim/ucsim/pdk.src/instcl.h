@@ -4,7 +4,7 @@ int get_mem(unsigned int addr);
 unsigned char add_to(unsigned char initial, int value, bool carry = false);
 unsigned char sub_to(unsigned char initial, int value, bool carry = false);
 unsigned char get_io(t_addr addr);
-void store_io(t_addr addr, unsigned char value);
+int store_io(t_addr addr, int value);
 unsigned char get_SP();
 unsigned char get_flags();
 void set_flags(unsigned char flags);

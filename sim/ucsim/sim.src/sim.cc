@@ -188,12 +188,15 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
   if (!(state & SIM_GO) &&
       cmd->frozen_console)
     {
+      fflush(stdout); // Needed to make sure we get the right simulator output order
+      
       if (reason == resUSER &&
 	  cmd->frozen_console->input_avail())
 	cmd->frozen_console->read_line();
       cmd->frozen_console->un_redirect();
       cmd->frozen_console->dd_color("debug");
-      cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", AU(uc->PC), reason);
+      // Stop message should start with a newline, to avoid mixing this line with previous output from simulated program
+      cmd->frozen_console->dd_printf("\nStop at 0x%06x: (%d) ", AU(uc->PC), reason);
       switch (reason)
 	{
 	case resHALT:

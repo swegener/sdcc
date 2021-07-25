@@ -1,3 +1,12 @@
+2021/07/26 Visenri
+
+    * sim/ucsim/pdk.src/inst.cc
+    * sim/ucsim/pdk.src/instcl.h
+    * sim/ucsim/sim.src/sim.cc
+      Added support for stack overflow detection.
+      Fixed wrong order of output to stdout when program is stopped.
+      Added newline to make sure we get a separate line for the "Stop"
+
 2021-07-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y,

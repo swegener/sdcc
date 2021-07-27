@@ -1,5 +1,10 @@
 2021/07/28 Visenri
 
+    * sim/ucsim/pdk.src/inst.cc
+    Fix bug in pdk15 simulation (introduced in [r12557]).
+    
+2021/07/28 Visenri
+
     * support/regression/compact-results.py
       Fix parsing of test name.
       

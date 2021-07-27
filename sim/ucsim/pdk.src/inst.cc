@@ -814,7 +814,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
 }
 
 int cl_pdk::execute_pdk15(unsigned int code) {
-  int write_result;
+  int write_result = resGO;
   if (code == 0x0000) {
     // nop
   } else if (CODE_MASK(0x0200, 0xFF)) {

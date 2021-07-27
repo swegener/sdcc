@@ -15,7 +15,7 @@ def number_from_string(str_value):
     return int(str_value)
     
 def running_name_valid(name):
-  if (name != "") and (name.find(" ") == -1) and (name.find("/") != -1):
+  if (name != "") and (name.find(" ") == -1) and ((name.find("/") != -1) or re.match(r'^(.*).c$', name)):
     return True
   else:
     return False
@@ -33,7 +33,11 @@ for line in lines:
         summary_found = True
         break
 
-outname = sys.argv[1]
+
+outname = ""
+if len(sys.argv) > 1:
+  outname = sys.argv[1]
+
 # Create lines not present in simulation log
 if not summary_found:
     fp = open(sys.argv[1], "w")

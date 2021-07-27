@@ -3341,9 +3341,8 @@ genGetByte (const iCode *ic)
   aopOp (right, ic);
   aopOp (result, ic);
 
-  int offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
-  
-  cheapMove (ASMOP_A, 0, left->aop, offset, regDead (A_IDX, ic), regDead (P_IDX, ic), true);
+  int offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;  
+  genMove_o (result->aop, 0, left->aop, offset, 1, regDead (A_IDX, ic), regDead (P_IDX, ic));
 
   freeAsmop (result);
   freeAsmop (right);

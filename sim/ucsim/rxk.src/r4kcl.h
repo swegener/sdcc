@@ -42,7 +42,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_r4k: public cl_r3ka
 {
 public:
-  u8_t edmr;
   RP(JK,JK,J,K);
   RP(aJK,JK,J,K);
   u32_t rPW, rPX, rPY, rPZ;

@@ -29,8 +29,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 struct dis_entry disass_pedm3a[]=
   {
+    { 0x66, 0xff, ' ', 2, "PUSH SU" },
+    { 0x6e, 0xff, ' ', 2, "POP SU" },
+    { 0x6f, 0xff, ' ', 2, "SETUSR" },
+    { 0x7d, 0xff, ' ', 2, "SURES" },
+    { 0x7f, 0xff, ' ', 2, "RDMODE" },
+    { 0x75, 0xff, ' ', 2, "SYSCALL" },
+    { 0x98, 0xff, ' ', 2, "LDDSR" },
+    { 0x90, 0xff, ' ', 2, "LDISR" },
     { 0xd8, 0xff, ' ', 2, "LSDDR" },
     { 0xd0, 0xff, ' ', 2, "LSIDR" },
+    { 0xf8, 0xff, ' ', 2, "LSDR" },
+    { 0xf0, 0xff, ' ', 2, "LSIR" },
+    { 0xc0, 0xff, ' ', 2, "UMA" },
+    { 0xc8, 0xff, ' ', 2, "UMS" },
 
     { 0, 0, 0, 0, 0, 0 }
   };

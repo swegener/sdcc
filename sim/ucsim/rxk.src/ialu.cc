@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
 #include "rxkcl.h"
+#include "r3kacl.h"
 
 
 /*
@@ -911,6 +912,48 @@ cl_rxk::MUL(t_mem code)
   cHL.W((res>>16)&0xffff);
   cBC.W(res);
   tick(11);
+  return resGO;
+}
+
+
+/*
+ *                                                    R3000A,R4000,R5000
+ */
+
+int
+cl_r3ka::UMx(bool add)
+{
+  u32_t v1, v2;
+
+  tick(7);
+  do
+  {
+    v1= rom->read(rIX);
+    vc.rd++;
+    v2= rom->read(rIY);
+    vc.rd++;
+    v2= v2*rDE;
+    v2+= raDE;
+    if (rF & flagC) v2++;
+    if (add)
+      v1+= v2;
+    else
+      v1-= v2;
+
+    rom->write(rHL, v1);
+    vc.wr++;
+    caDE.W(v1>>8);
+    u8_t f= rF & ~flagC;
+    if (v1>>24) f|= flagC;
+    cF.W(f);
+
+    cBC.W(rBC-1);
+    cIX.W(rIX+1);
+    cIY.W(rIY+1);
+    cHL.W(rHL+1);
+    tick(8);
+  }
+  while (rBC);
   return resGO;
 }
 

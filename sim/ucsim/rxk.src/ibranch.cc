@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "appcl.h"
 
 #include "rxkcl.h"
+#include "r3kacl.h"
 
 
 int
@@ -184,6 +185,24 @@ cl_rxk::RETI(t_mem code)
   PC= h*256+l;
   cIP.W(x);
   tick(11);
+  return resGO;
+}
+
+
+/*
+ *                                                    R3000A,R4000,R5000
+ */
+
+int
+cl_r3ka::SYSCALL(t_mem code)
+{
+  cSP.W(rSP-1);
+  rom->write(rSP, PC>>8);
+  cSP.W(rSP-1);
+  rom->write(rSP, PC);
+  PC= rIIR * 256 + 0x60;
+  vc.wr+= 2;
+  tick5p3(9);
   return resGO;
 }
 

@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
 #include "rxkcl.h"
+#include "r3kacl.h"
+
 
 int
 cl_rxk::ALTD(t_mem code)
@@ -203,5 +205,55 @@ cl_rxk::PAGE_DD_CB(t_mem code)
     }
   return resGO;
 }
+
+
+/*
+ *                                                    R3000A,R4000,R5000
+ */
+
+int
+cl_r3ka::SETUSR(t_mem code)
+{
+  u8_t v= rSU << 2;
+  v|= 1;
+  atomic= true;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r3ka::SURES(t_mem code)
+{
+  u8_t v= ((rSU >> 2) /*& 0x3f*/) | ((rSU << 6) /*& 0xc0*/);
+  cSU.W(v);
+  atomic= true;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r3ka::RDMODE(t_mem code)
+{
+  u8_t v= rF & ~flagC;
+  if (rSU & 1) v|= flagC;
+  cF.W(v);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r3ka::instruction_5b(t_mem code)
+{
+  ld_r_g(destE(), rE);
+  if (!altd)
+    {
+      if ((edmr&1) && (rSU&1))
+	{
+	  // TODO: set System Violation interrupt flag
+	}
+    }
+  return resGO;
+}
+
 
 /* End of m6800.src/inst.cc */

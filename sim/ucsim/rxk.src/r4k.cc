@@ -80,7 +80,7 @@ void
 cl_r4k::reset(void)
 {
   cl_r3ka::reset();
-  edmr= 0;
+  //edmr= 0;
   mode3k();  
 }
 

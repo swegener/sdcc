@@ -662,8 +662,31 @@ cl_rxk::LD_iHLd_HL(t_mem code)
 
 
 /*
- * Rabbit 3000A,4000,5000
+ *                                                Rabbit 3000A,4000,5000
  */
+
+int
+cl_r3ka::LDxSR(int dif)
+{
+  int t= 7;
+  if (rwas == ioi)
+    t+= 1;
+  else if (rwas == ioe)
+    t+= 2;
+  tick(5);
+  do
+    {
+      rwas->write(rDE, rom->read(rHL));
+      vc.rd++;
+      vc.wr++;
+      cBC.W(rBC-1);
+      cHL.W(rHL+dif);
+      tick(t);
+    }
+  while (rBC != 0);
+  cF.W(rF & ~flagV);
+  return resGO;
+}
 
 int
 cl_r3ka::LSxDR(int dif)
@@ -685,6 +708,52 @@ cl_r3ka::LSxDR(int dif)
     }
   while (rBC != 0);
   cF.W(rF & ~flagV);
+  return resGO;
+}
+
+int
+cl_r3ka::LSxR(int dif)
+{
+  int t= 7;
+  if (rwas == ioi)
+    t+= 1;
+  else if (rwas == ioe)
+    t+= 2;
+  tick(5);
+  do
+    {
+      rom->write(rDE, rwas->read(rHL));
+      vc.rd++;
+      vc.wr++;
+      cBC.W(rBC-1);
+      cDE.W(rDE+dif);
+      cHL.W(rHL+dif);
+      tick(t);
+    }
+  while (rBC != 0);
+  cF.W(rF & ~flagV);
+  return resGO;
+}
+
+int
+cl_r3ka::PUSH_SU(t_mem code)
+{
+  cSP.W(rSP-1);
+  rom->write(rSP, rSU);
+  vc.wr++;
+  tick5p1(8);
+  atomic= true;
+  return resGO;
+}
+
+int
+cl_r3ka::POP_SU(t_mem code)
+{
+  cSU.W(rom->read(rSP));
+  cSP.W(rSP+1);
+  vc.rd++;
+  atomic= true;
+  tick5p1(8);
   return resGO;
 }
 

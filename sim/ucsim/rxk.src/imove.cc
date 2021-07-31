@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
 #include "rxkcl.h"
+#include "r4kcl.h"
 
 
 int
@@ -107,9 +108,10 @@ int
 cl_rxk::pop_zz(class cl_cell16 &dest)
 {
   u8_t l, h;
-  l= rom->read(rSP++);
-  h= rom->read(rSP++);
-  cSP.W(rSP);
+  l= rom->read(rSP);
+  cSP.W(rSP+1);
+  h= rom->read(rSP);
+  cSP.W(rSP+1);
   dest.W(h*256+l);
   vc.rd+= 2;
   tick(6);
@@ -150,6 +152,30 @@ cl_rxk::ld_d_i(int dif)
     cF.W(rF & ~flagV);
   else
     cF.W(rF | flagV);
+  return resGO;
+}
+
+int
+cl_rxk::LDxR(int dif)
+{
+  int t= 7;
+  if (rwas == ioi)
+    t+= 1;
+  else if (rwas == ioe)
+    t+= 2;
+  tick(5);
+  do
+    {
+      rwas->write(rDE, rom->read(rHL));
+      vc.rd++;
+      vc.wr++;
+      cBC.W(rBC-1);
+      cDE.W(rDE+dif);
+      cHL.W(rHL+dif);
+      tick(t);
+    }
+  while (rBC != 0);
+  cF.W(rF & ~flagV);
   return resGO;
 }
 
@@ -267,8 +293,10 @@ cl_rxk::LD_HL_iSPn(t_mem code)
 {
   class cl_cell16 &dest= destHL();
   u8_t n= fetch(), l, h;
-  l= rom->read(rSP+n);
-  h= rom->read(rSP+n+1);
+  u16_t addr= rSP+n;
+  l= rom->read(addr);
+  addr++;
+  h= rom->read(addr);
   dest.W(h*256+l);
   vc.rd+= 2;
   tick5p1(8);
@@ -280,7 +308,7 @@ cl_rxk::LD_HL_iIXd(t_mem code)
 {
   i8_t d= fetch();
   class cl_cell16 &dhl= destHL();
-  t_addr a= (rIX+d)&0xffff;
+  u16_t a= rIX+d;
   u8_t h, l;
   l= rwas->read(a);
   h= rwas->read(a+1);
@@ -294,7 +322,7 @@ int
 cl_rxk::LD_iIXd_HL(t_mem code)
 {
   i8_t d= fetch();
-  t_addr a= (rIX+d)&0xffff;
+  u16_t a= rIX+d;
   rwas->write(a, rL);
   rwas->write(a+1, rH);
   vc.wr+= 2;
@@ -306,8 +334,10 @@ int
 cl_rxk::LD_iSPn_HL(t_mem code)
 {
   u8_t n= fetch();
-  rom->write(rSP+n, rL);
-  rom->write(rSP+n+1, rH);
+  u16_t addr= rSP+n;
+  rom->write(addr, rL);
+  addr++;
+  rom->write(addr, rH);
   vc.wr+= 2;
   tick5p1(10);
   return resGO;
@@ -370,9 +400,10 @@ int
 cl_rxk::POP_IR(t_mem code)
 {
   u8_t h, l;
-  l= rom->read(rSP++);
-  h= rom->read(rSP++);
-  cSP.W(rSP);
+  l= rom->read(rSP);
+  cSP.W(rSP+1);
+  h= rom->read(rSP);
+  cSP.W(rSP+1);
   vc.rd+= 2;
   cIR->write(h*256+l);
   tick(8);
@@ -386,9 +417,10 @@ cl_rxk::PUSH_IR(t_mem code)
   u8_t h, l;
   h= v>>8;
   l= v;
-  rom->write(--rSP, h);
-  rom->write(--rSP, l);
-  cSP.W(rSP);
+  cSP.W(rSP-1);
+  rom->write(rSP, h);
+  cSP.W(rSP-1);
+  rom->write(rSP, l);
   vc.wr+= 2;
   tick5p1(11);
   return resGO;
@@ -406,8 +438,10 @@ int
 cl_rxk::LD_IR_iSPn(t_mem code)
 {
   u8_t n= fetch(), h, l;
-  l= rom->read(rSP+n);
-  h= rom->read(rSP+n+1);
+  u16_t addr= rSP+n;
+  l= rom->read(addr);
+  addr++;
+  h= rom->read(addr);
   vc.rd+= 2;
   cIR->write(h*256+l);
   tick5p1(10);
@@ -419,8 +453,10 @@ cl_rxk::LD_iSPn_IR(t_mem code)
 {
   u16_t v= cIR->get();
   u8_t n= fetch();
-  rom->write(rSP+n, v>>8);
-  rom->write(rSP+n+1, v);
+  u16_t addr= rSP+n;
+  rom->write(addr, v);
+  addr++;
+  rom->write(addr, v>>8);
   vc.wr+= 2;
   tick5p1(12);
   return resGO;
@@ -471,5 +507,201 @@ cl_rxk::EXX_iSP_HL(t_mem code)
   return resGO;
 }
 
+int
+cl_rxk::ld_add_BC_DE(class cl_cell16 &dest, u16_t src)
+{
+  dest.W(src);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::ld_imn_ss(u16_t src)
+{
+  u8_t l, h;
+  l= fetch();
+  h= fetch();
+  u16_t a= h*256+l;
+  l= src;
+  h= src>>8;
+  rwas->write(a, l);
+  a++;
+  rwas->write(a, h);
+  vc.wr+= 2;
+  tick(14);
+  return resGO;
+}
+
+int
+cl_rxk::ldp_irp_rp(u16_t addr, u16_t src)
+{
+  t_addr a= ((u32_t)rA << 16) + addr;
+  mem->phwrite(a, src&0xff);
+  addr++;
+  a= ((u32_t)rA << 16) + addr; // LDP wraps around 64k page boundary
+  mem->phwrite(a, (src>>8)&0xff);
+  vc.wr+= 2;
+  tick(11);
+  return resGO;
+}
+
+int
+cl_rxk::ldp_rp_irp(class cl_cell16 &dest, u16_t addr)
+{
+  t_addr a= ((u32_t)rA >> 16) + addr;
+  u8_t l= mem->phread(a);
+  addr++;
+  a= ((u32_t)rA >> 16) + addr;
+  u8_t h= mem->phread(a);
+  dest.W(h*256+l);
+  vc.rd+= 2;
+  tick(9);
+  return resGO;
+}
+
+int
+cl_rxk::LD_XPC_A(t_mem code)
+{
+  cXPC.W(rA);
+  atomic= true;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::LD_A_XPC(t_mem code)
+{
+  destA().W(rXPC);
+  atomic= true;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::PUSH_IP(t_mem code)
+{
+  cSP.W(rSP-1);
+  rom->write(rSP, rIP);
+  vc.wr++;
+  tick5p1(8);
+  return resGO;
+}
+
+int
+cl_rxk::POP_IP(t_mem code)
+{
+  cIP.W(rom->read(rSP));
+  cSP.W(rSP+1);
+  vc.rd++;
+  tick(6);
+  atomic= true;
+  return resGO;
+}
+
+int
+cl_rxk::LD_imn_IR(t_mem code)
+{
+  u8_t h, l;
+  l= fetch();
+  h= fetch();
+  u16_t addr= h*256+l;
+  u16_t v= cIR->get();
+  h= v>>8;
+  l= v;
+  rwas->write(addr, l);
+  addr++;
+  rwas->write(addr, h);
+  vc.wr+= 2;
+  tick(14);
+  return resGO;
+}
+
+int
+cl_rxk::LD_IR_imn(t_mem code)
+{
+  u8_t h, l;
+  l= fetch();
+  h= fetch();
+  u16_t addr= h*256+l;
+  l= rwas->read(addr);
+  addr++;
+  h= rwas->read(addr);
+  cIR->write(h*256+l);
+  vc.rd+= 2;
+  tick(12);
+  return resGO;
+}
+
+int
+cl_rxk::LD_HL_IR(t_mem code)
+{
+  destHL().W(cIR->get());
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::LD_IR_HL(t_mem code)
+{
+  cIR->write(rHL);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::LD_iHLd_HL(t_mem code)
+{
+  i8_t d= fetch();
+  u16_t addr= rHL+d;
+  rwas->write(addr, rL);
+  addr++;
+  rwas->write(addr, rH);
+  tick5p1(12);
+  return resGO;
+}
+
+
+/*
+ * Rabbit 3000A,4000,5000
+ */
+
+int
+cl_r3ka::LSxDR(int dif)
+{
+  int t= 7;
+  if (rwas == ioi)
+    t+= 1;
+  else if (rwas == ioe)
+    t+= 2;
+  tick(5);
+  do
+    {
+      rom->write(rDE, rwas->read(rHL));
+      vc.rd++;
+      vc.wr++;
+      cBC.W(rBC-1);
+      cDE.W(rDE+dif);
+      tick(t);
+    }
+  while (rBC != 0);
+  cF.W(rF & ~flagV);
+  return resGO;
+}
+
+
+/*
+ *                                                     Rabbit 4000, 5000
+ */
+
+int
+cl_r4k::LD_A_iIRA(t_mem code)
+{
+  class cl_cell8 &a= destA();
+  u16_t addr= cIR->get() + rA;
+  a.W(rwas->read(addr));
+  vc.rd++;
+  tick5p1(7);
+  return resGO;
+}
 
 /* End of rxk.src/imove.cc */

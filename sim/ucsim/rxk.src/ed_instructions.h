@@ -165,14 +165,14 @@ virtual int instruction_ed_ca(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_cb(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_cc(t_mem code) { return resNOT_DONE; }
 
-virtual int instruction_ed_d0(t_mem code) { return resNOT_DONE; }
+virtual int instruction_ed_d0(t_mem code) { return resINV; }
 virtual int instruction_ed_d1(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_d2(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_d3(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_d4(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_d5(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_d6(t_mem code) { return resNOT_DONE; }
-virtual int instruction_ed_d8(t_mem code) { return resNOT_DONE; }
+virtual int instruction_ed_d8(t_mem code) { return resINV; }
 virtual int instruction_ed_d9(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_da(t_mem code) { return resNOT_DONE; }
 virtual int instruction_ed_db(t_mem code) { return resNOT_DONE; }

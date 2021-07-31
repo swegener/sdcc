@@ -475,6 +475,27 @@ cl_r2k::disass(t_addr addr)
 }
 
 
+static FILE *log_file= NULL;
+static unsigned int cyc= 0;
+
+void
+cl_r2k::save_hist()
+{
+  cl_z80::save_hist();
+  if (juj&2)
+    {
+      if (log_file==NULL && PC==0x16) log_file= fopen("log.txt","w");
+      if (log_file!=NULL) {
+	fprintf(log_file, "%6u %06x ", cyc, AU(PC));
+	fprintf(log_file, "%02x %02x ", regs.raf.A, (regs.raf.F)&0xc1);
+	fprintf(log_file, "%04x %04x %04x ", regs.BC, regs.DE, regs.HL);
+	fprintf(log_file, "%04x %04x %04x ", regs.IX, regs.IY, regs.SP);
+	fprintf(log_file, "\n");
+	cyc++;
+      }
+    }
+}
+
 void
 cl_r2k::print_regs(class cl_console_base *con)
 {

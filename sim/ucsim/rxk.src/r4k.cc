@@ -34,6 +34,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "r4kwrap.h"
 #include "glob.h"
 #include "gp0m3.h"
+#include "gpddm3.h"
+#include "gpddm4.h"
+#include "gpedm3.h"
 
 #include "r4kcl.h"
 
@@ -93,8 +96,47 @@ cl_r4k::dis_entry(t_addr addr)
 {
   u8_t code= rom->get(addr);
   int i;
-  struct dis_entry *dt= disass_rxk;
+  struct dis_entry *dt;
   i= 0;
+  
+  if (code == 0xed)
+    {
+      dt= disass_pedm3;
+      code= rom->get(addr+1);
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+      return NULL;
+    }
+  if ((code & 0xdd) == 0xdd)
+    {
+      if (code == 0xdd)
+	{
+	  cIR= &cIX;
+	}
+      else
+	{
+	  cIR= &cIY;
+	}
+      code= rom->get(addr+1);
+      dt= disass_pddm3;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+      dt= disass_pddm4;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+      return NULL;
+    }
+
+  dt= disass_rxk;
   while (((code & dt[i].mask) != dt[i].code) &&
 	 dt[i].mnemonic)
     i++;
@@ -143,7 +185,7 @@ cl_r4k::print_regs(class cl_console_base *con)
   con->dd_printf("                  SZxxxVxC\n");
 
   con->dd_printf("XPC= 0x%02x IP= 0x%02x IIR= 0x%02x EIR= 0x%02x\n",
-		 mem->xpc, rIP, rIIR, rEIR);
+		 mem->get_xpc(), rIP, rIIR, rEIR);
   
   con->dd_printf("BC= ");
   rom->dump(0, rBC, rBC+7, 8, con);

@@ -33,6 +33,13 @@ cl_ras::cl_ras(chars id, class cl_memory_chip *achip):
   chip= achip;
 }
 
+int
+cl_ras::init(void)
+{
+  cl_address_space::init();
+  return 0;
+}
+
 t_addr
 cl_ras::log2phy(t_addr log)
 {
@@ -75,9 +82,6 @@ cl_ras::read(t_addr addr)
       err_inv_addr(addr);
       return dummy->read();
     }
-  t_addr ph= log2phy(addr);
-  void *slot= chip->get_slot(ph);
-  cella[addr].decode(slot);
   return cella[addr].read();
 }
 
@@ -89,9 +93,6 @@ cl_ras::get(t_addr addr)
       err_inv_addr(addr);
       return dummy->get();
     }
-  t_addr ph= log2phy(addr);
-  void *slot= chip->get_slot(ph);
-  cella[addr].decode(slot);
   return cella[addr].get();
 }
 
@@ -115,9 +116,6 @@ cl_ras::write(t_addr addr, t_mem val)
       err_inv_addr(addr);
       return dummy->write(val);
     }
-  t_addr ph= log2phy(addr);
-  void *slot= chip->get_slot(ph);
-  cella[addr].decode(slot);
   return cella[addr].write(val);
 }
 
@@ -129,10 +127,19 @@ cl_ras::set(t_addr addr, t_mem val)
       err_inv_addr(addr);
       dummy->set(val);
     }
-  t_addr ph= log2phy(addr);
-  void *slot= chip->get_slot(ph);
-  cella[addr].decode(slot);
   cella[addr].set(val);
+}
+
+void
+cl_ras::phset(t_addr phaddr, t_mem val)
+{
+  if (phaddr >- chip->get_size())
+    {
+      err_inv_addr(phaddr);
+      dummy->set(val);
+    }
+  u8_t *slot= (u8_t*)(chip->get_slot(phaddr));
+  *slot= val;
 }
 
 void
@@ -146,5 +153,45 @@ cl_ras::download(t_addr phaddr, t_mem val)
   chip->set(phaddr, val);
 }
 
+
+void
+cl_ras::re_decode(void)
+{
+  t_addr a;
+  for (a= 0; a < get_size(); a++)
+    {
+      t_addr ph= log2phy(a);
+      void *slot= chip->get_slot(ph);
+      cella[a].decode(slot);
+    }
+}
+
+void
+cl_ras::set_xpc(u8_t val)
+{
+  xpc= val;
+  re_decode();
+}
+
+void
+cl_ras::set_segsize(u8_t val)
+{
+  segsize= val;
+  re_decode();
+}
+
+void
+cl_ras::set_dataseg(u8_t val)
+{
+  dataseg= val;
+  re_decode();
+}
+
+void
+cl_ras::set_stackseg(u8_t val)
+{
+  stackseg= val;
+  re_decode();
+}
 
 /* End of rxk.src/rmem.cc */

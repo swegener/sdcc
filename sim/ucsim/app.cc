@@ -57,6 +57,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmdlexcl.h"
 
 bool jaj= false;
+int juj= 0;
 
 
 /*

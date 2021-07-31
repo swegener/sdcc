@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef R3KACL_HEADER
 #define R3KACL_HEADER
 
+#include "dpedm3a.h"
+
 #include "r3kcl.h"
 
 
@@ -36,6 +38,13 @@ class cl_r3ka: public cl_r3k
  public:
   cl_r3ka(class cl_sim *asim);
   virtual const char *id_string(void);
+
+  virtual struct dis_entry *dis_entry(t_addr addr);
+
+  virtual int LSxDR(int dif);
+
+  virtual int LSDDR(t_mem code) { return LSxDR(-1); }
+  virtual int LSIDR(t_mem code) { return LSxDR(+1); }
 };
 
 

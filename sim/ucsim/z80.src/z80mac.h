@@ -321,7 +321,7 @@
 }
 
 #define bit_byte(reg, _bitnum) {                                        \
-   regs.raf.F &= ~(BIT_N |BIT_P |BIT_A |BIT_Z |BIT_S);  /* clear these */   \
+    regs.raf.F &= ~(BIT_N |BIT_P |BIT_A |BIT_Z /*|BIT_S*/);  /* clear these */ \
    regs.raf.F |= BIT_A;                                                     \
    if (!(reg & (1 << (_bitnum))))                                       \
      regs.raf.F |= BIT_Z;                                                   \

@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (r5kcl.h)
+ * Simulator of microcontrollers (gpedm3a.cc)
  *
- * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,27 +25,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef R5KCL_HEADER
-#define R5KCL_HEADER
+#include "gpedm3a.h"
 
-#include "r4kcl.h"
+struct dis_entry disass_pedm3a[]=
+  {
+    { 0xd8, 0xff, ' ', 2, "LSDDR" },
+    { 0xd0, 0xff, ' ', 2, "LSIDR" },
 
-
-class cl_r5k: public cl_r4k
-{
- public:
-  cl_r5k(class cl_sim *asim);
-  virtual const char *id_string(void);
-
-  virtual void tick5p1(int n) { tick(n+1); }
-  virtual void tick5p2(int n) { tick(n+2); }
-  virtual void tick5p3(int n) { tick(n+3); }
-  virtual void tick5p9(int n) { tick(n+9); }
-  virtual void tick5m1(int n) { tick(n  ); }
-  virtual void tick5m2(int n) { tick(n  ); }
-};
-
-
-#endif
-
-/* End of rxk.src/r5kcl.h */
+    { 0, 0, 0, 0, 0, 0 }
+  };
+  
+/* End of rxk.src/gpedm3a.cc */

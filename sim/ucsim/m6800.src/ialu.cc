@@ -100,7 +100,7 @@ cl_m6800::neg(class cl_cell8 &dest)
   dest.W(op);
   if (op&0x80) f|= flagN;
   if (!op) f|= flagZ; else f|= flagC;
-  if (op == 0x80) f|= flagV;
+  if ((u8_t)op == 0x80) f|= flagV;
   cCC.W(f);
   tick(1);
   return resGO;
@@ -145,7 +145,7 @@ cl_m6800::ror(class cl_cell8 &dest)
   if (c) op|= 0x80;
   dest.W(op);
   if (!op) f|= flagZ;
-  if (op^0x80) f|= flagN;
+  if (op&0x80) f|= flagN;
   //if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
   if ((f&flagC) ^ c) f|= flagV;
   cCC.W(f);
@@ -164,7 +164,7 @@ cl_m6800::asr(class cl_cell8 &dest)
   op>>= 1;
   dest.W(op);
   if (!op) f|= flagZ;
-  if (op^0x80) f|= flagN;
+  if (op&0x80) f|= flagN;
   if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
   cCC.W(f);
   tick(1);
@@ -182,7 +182,7 @@ cl_m6800::asl(class cl_cell8 &dest)
   op<<= 1;
   dest.W(op);
   if (!op) f|= flagZ;
-  if (op^0x80) f|= flagN;
+  if (op&0x80) f|= flagN;
   if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
   cCC.W(f);
   tick(1);
@@ -200,7 +200,7 @@ cl_m6800::rol(class cl_cell8 &dest)
   if (c) op|= 1;
   dest.W(op);
   if (!op) f|= flagZ;
-  if (op^0x80) f|= flagN;
+  if (op&0x80) f|= flagN;
   if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
   cCC.W(f);
   tick(1);

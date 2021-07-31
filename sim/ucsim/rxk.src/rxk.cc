@@ -116,8 +116,8 @@ cl_rxk::init(void)
 #undef RCV
 
   XPC= new cl_cell8(8);
-  reg_cell_var(XPC, &(mem->xpc),
-	       "XPC", "MMU register: XPC");
+  reg_cell_var(XPC, mem->aof_xpc(),
+  	       "XPC", "MMU register: XPC");
 
   cIR= &cIX;
   
@@ -137,10 +137,10 @@ cl_rxk::reset(void)
   cl_uc::reset();
 
   // MMU reset
-  mem->dataseg= 0;
-  mem->segsize= 0xff;
-  mem->stackseg= 0;
-  mem->xpc= 0;
+  mem->set_dataseg(0);
+  mem->set_segsize(0xff);
+  mem->set_stackseg(0);
+  mem->set_xpc(0);
 
   rIP= 0xff;
   rIIR= 0;
@@ -180,7 +180,7 @@ cl_rxk::make_memories(void)
   class cl_address_space *as;
   class cl_address_decoder *ad;
 
-  chip= new cl_chip8("rom_chip", 0x100000, 8);
+  chip= new cl_chip8("rom_chip", 0x100000, 8, 0);
   chip->init();
   memchips->add(chip);
 
@@ -548,6 +548,28 @@ cl_rxk::inst_length(t_addr addr)
   return dt->length;
 }
 
+
+static FILE *log_file= NULL;
+static unsigned int cyc= 0;
+
+void
+cl_rxk::save_hist()
+{
+  cl_uc::save_hist();
+  if (juj&2)
+    {
+      if (log_file==NULL && PC==0x16) log_file= fopen("log.txt","w");
+      if (log_file!=NULL) {
+	fprintf(log_file, "%6u %06x ", cyc, AU(PC));
+	fprintf(log_file, "%02x %02x ", rA, rF&0xc1);
+	fprintf(log_file, "%04x %04x %04x ", rBC, rDE, rHL);
+	fprintf(log_file, "%04x %04x %04x ", rIX, rIY, rSP);
+	fprintf(log_file, "\n");
+	cyc++;
+      }
+    }
+}
+
 void
 cl_rxk::print_regs(class cl_console_base *con)
 {
@@ -596,7 +618,7 @@ cl_rxk::print_regs(class cl_console_base *con)
   con->dd_printf("                  SZxxxVxC\n");
 
   con->dd_printf("XPC= 0x%02x IP= 0x%02x IIR= 0x%02x EIR= 0x%02x\n",
-		 mem->xpc, rIP, rIIR, rEIR);
+		 mem->get_xpc(), rIP, rIIR, rEIR);
   
   con->dd_printf("BC= ");
   rom->dump(0, rBC, rBC+7, 8, con);
@@ -666,7 +688,8 @@ cl_rxk::exec_inst(void)
       altd= false;
     }
   prefix= false;
-
+  atomic= false;
+  
   instPC= PC;
   if (fetch(&code))
     return resBREAKPOINT;
@@ -784,11 +807,11 @@ cl_rxk_cpu::init(void)
   dataseg = (cl_cell8*)ruc->ioi->get_cell(0x12);
   segsize = (cl_cell8*)ruc->ioi->get_cell(0x13);
 
-  uc->reg_cell_var(stackseg, &(ruc->mem->stackseg),
+  uc->reg_cell_var(stackseg, ruc->mem->aof_stackseg(),
 		   "STACKSEG", "MMU register: STACKSEG");
-  uc->reg_cell_var(dataseg, &(ruc->mem->dataseg),
+  uc->reg_cell_var(dataseg, ruc->mem->aof_dataseg(),
 		   "DATASEG", "MMU register: DATASEG");
-  uc->reg_cell_var(segsize, &(ruc->mem->segsize),
+  uc->reg_cell_var(segsize, ruc->mem->aof_segsize(),
 		   "SEGSIZE", "MMU register: SEGSIZE");
 
   return 0;

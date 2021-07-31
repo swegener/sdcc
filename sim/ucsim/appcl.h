@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern bool jaj;
+extern int juj;
 
 /* Options */
 /*

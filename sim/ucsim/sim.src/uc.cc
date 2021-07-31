@@ -2593,9 +2593,16 @@ cl_uc::post_inst(void)
 }
 
 
+static FILE *pc_dump= NULL;
+
 void
 cl_uc::save_hist()
 {
+  if (juj & 1)
+    {
+      if (pc_dump==NULL) pc_dump= fopen("addr.txt","w");
+      if (pc_dump!=NULL) {fprintf(pc_dump,"0x%06x\n",AU(PC));fflush(pc_dump);}
+    }
   hist->put();
 }
 

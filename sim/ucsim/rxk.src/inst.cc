@@ -96,6 +96,27 @@ cl_rxk::EXX(t_mem code)
 }
 
 int
+cl_rxk::ipset(u8_t n)
+{
+  u8_t v= rIP << 2;
+  v|= (n&3);
+  cIP.W(v);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::IPRES(t_mem code)
+{
+  u8_t v= (rIP >> 2) & 0x3f;
+  u8_t l= rIP << 6;
+  cIP.W(v|l);
+  tick(3);
+  return resGO;
+}
+
+
+int
 cl_rxk::PAGE_CB(t_mem code)
 {
   u8_t x, y, z;

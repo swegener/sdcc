@@ -157,13 +157,19 @@ COMMAND_DO_WORK_APP(cl_jaj_cmd)
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-
+  int i;
+  
   if (params[0] != NULL)
     {
-      int i= params[0]->i_value;
+      i= params[0]->i_value;
       jaj= i?true:false;
     }
-  con->dd_printf("%d\n", jaj);
+  if (params[1] != NULL)
+    {
+      i= params[1]->i_value;
+      juj= i;
+    }
+  con->dd_printf("%d %d\n", jaj, juj);
   return(false);
 }
 

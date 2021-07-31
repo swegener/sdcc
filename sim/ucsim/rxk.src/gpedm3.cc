@@ -35,11 +35,39 @@ struct dis_entry disass_pedm3[]=
     { 0x5f, 0xff, ' ', 2, "LD A,IIR" },
     { 0xa0, 0xff, ' ', 2, "LDI" },
     { 0xa8, 0xff, ' ', 2, "LDD" },
+    { 0xb8, 0xff, ' ', 2, "LDDR" },
+    { 0xb0, 0xff, ' ', 2, "LDIR" },
     { 0x54, 0xff, ' ', 2, "EXX (SP),HL" },
     { 0x4b, 0xff, ' ', 4, "LD BC,(%w)" },
     { 0x5b, 0xff, ' ', 4, "LD DE,(%w)" },
     { 0x6b, 0xff, ' ', 4, "LD HL,(%w)" },
     { 0x7b, 0xff, ' ', 4, "LD SP,(%w)" },
+    { 0x49, 0xff, ' ', 2, "LD BC',BC" }, // '
+    { 0x59, 0xff, ' ', 2, "LD DE',BC" }, // '
+    { 0x69, 0xff, ' ', 2, "LD HL',BC" }, // '
+    { 0x41, 0xff, ' ', 2, "LD BC',DE" }, // '
+    { 0x51, 0xff, ' ', 2, "LD DE',DE" }, // '
+    { 0x61, 0xff, ' ', 2, "LD HL',DE" }, // '
+    { 0x43, 0xff, ' ', 4, "LD (%w),BC" },
+    { 0x53, 0xff, ' ', 4, "LD (%w),DE" },
+    { 0x63, 0xff, ' ', 4, "LD (%w),HL" },
+    { 0x73, 0xff, ' ', 4, "LD (%w),SP" },
+    { 0x44, 0xff, ' ', 2, "NEG" },
+    { 0x45, 0xff, ' ', 2, "LRET" },
+    { 0x46, 0xff, ' ', 2, "IPSET 0" },
+    { 0x56, 0xff, ' ', 2, "IPSET 1" },
+    { 0x4e, 0xff, ' ', 2, "IPSET 2" },
+    { 0x5e, 0xff, ' ', 2, "IPSET 3" },
+    { 0x4d, 0xff, ' ', 2, "RETI" },
+    { 0x5d, 0xff, ' ', 2, "IPRES" },
+    { 0x64, 0xff, ' ', 2, "LDP (HL),HL" },
+    { 0x65, 0xff, ' ', 4, "LDP (%w),HL" },
+    { 0x6c, 0xff, ' ', 2, "LDP HL,(HL)" },
+    { 0x6d, 0xff, ' ', 4, "LDP HL,(%w)" },
+    { 0x67, 0xff, ' ', 2, "LD XPC,A" },
+    { 0x77, 0xff, ' ', 2, "LD A,XPC" },
+    { 0x76, 0xff, ' ', 2, "PUSH IP" },
+    { 0x7e, 0xff, ' ', 2, "POP IP" },
     
     { 0x42, 0xff, ' ', 2, "SBC HL,BC" },
     { 0x52, 0xff, ' ', 2, "SBC HL,DE" },

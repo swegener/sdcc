@@ -45,10 +45,12 @@ public:
   virtual t_addr px2phy(u32_t px);
   virtual t_mem read(t_addr addr);
   virtual t_mem phread(t_addr phaddr) { return phget(phaddr); }
+  virtual t_mem pxread(t_addr pxaddr);
   virtual t_mem get(t_addr addr);
   virtual t_mem phget(t_addr phaddr);
   virtual t_mem write(t_addr addr, t_mem val);
   virtual t_mem phwrite(t_addr phaddr, t_mem val) { set(phaddr, val); return val; }
+  virtual t_mem pxwrite(t_addr pxaddr, t_mem val);
   virtual void set(t_addr addr, t_mem val);
   virtual void phset(t_addr phaddr, t_mem val);
   virtual void download(t_addr phaddr, t_mem val);

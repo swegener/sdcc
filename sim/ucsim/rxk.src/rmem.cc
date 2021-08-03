@@ -86,6 +86,14 @@ cl_ras::read(t_addr addr)
 }
 
 t_mem
+cl_ras::pxread(t_addr pxaddr)
+{
+  if ((pxaddr & 0xffff0000) == 0xffff0000)
+    return read(pxaddr & 0xffff);
+  return phread(pxaddr);
+}
+
+t_mem
 cl_ras::get(t_addr addr)
 {
   if (addr >= size)
@@ -117,6 +125,14 @@ cl_ras::write(t_addr addr, t_mem val)
       return dummy->write(val);
     }
   return cella[addr].write(val);
+}
+
+t_mem
+cl_ras::pxwrite(t_addr pxaddr, t_mem val)
+{
+  if ((pxaddr & 0xffff0000) == 0xffff0000)
+    return write(pxaddr & 0xffff, val);
+  return phwrite(pxaddr, val);
 }
 
 void

@@ -29,7 +29,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define R4KCL_HEADER
 
 #include "r3kacl.h"
+#include "dp0m4.h"
 #include "dpddm4.h"
+
+
+extern inline u32_t px8(u32_t px, u8_t offset);
+extern inline u32_t px8se(u32_t px, u8_t offset);
+extern inline u32_t px16(u32_t px, u16_t offset);
+extern inline u32_t px16se(u32_t px, u16_t offset);
 
 #define rJ  (JK.r.J)
 #define rK  (JK.r.K)
@@ -59,7 +66,8 @@ public:
   virtual void make_cpu_hw(void);
 
   virtual struct dis_entry *dis_entry(t_addr addr);
-
+  virtual struct dis_entry *dis_6d_entry(t_addr addr);
+  
   virtual void print_regs(class cl_console_base *con);
 
   virtual void mode3k(void);
@@ -69,6 +77,9 @@ public:
   
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);
+
+  // Starter of page 6D
+  virtual int PAGE_4K6D(t_mem code);
 };
 
 class cl_r4k_cpu: public cl_rxk_cpu

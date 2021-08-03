@@ -35,10 +35,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "gp0m3.h"
 #include "gpddm3.h"
+#include "gpedm3a.h"
 #include "gpddm4.h"
 #include "gpedm3.h"
 
 #include "r4kcl.h"
+
+
+inline u32_t
+px8(u32_t px, u8_t offset)
+{
+  bool log= ((px & 0xffff0000) == 0xffff0000);
+  px+= offset;
+  if (log) px|= 0xffff0000;
+  return px;
+}
+
+inline u32_t
+px8se(u32_t px, u8_t offset)
+{
+  bool log= ((px & 0xffff0000) == 0xffff0000);
+  i32_t o= (i8_t)offset;
+  px+= o;
+  if (log) px|= 0xffff0000;
+  return px;
+}
+
+inline u32_t
+px16(u32_t px, u16_t offset)
+{
+  bool log= ((px & 0xffff0000) == 0xffff0000);
+  px+= offset;
+  if (log) px|= 0xffff0000;
+  return px;
+}
+
+inline u32_t
+px16se(u32_t px, u16_t offset)
+{
+  bool log= ((px & 0xffff0000) == 0xffff0000);
+  i32_t o= (i16_t)offset;
+  px+= o;
+  if (log) px|= 0xffff0000;
+  return px;
+}
 
 
 cl_r4k::cl_r4k(class cl_sim *asim):
@@ -97,17 +137,27 @@ cl_r4k::dis_entry(t_addr addr)
   u8_t code= rom->get(addr);
   int i;
   struct dis_entry *dt;
-  i= 0;
   
   if (code == 0xed)
     {
-      dt= disass_pedm3;
       code= rom->get(addr+1);
+      
+      dt= disass_pedm3;
+      i= 0;
       while (((code & dt[i].mask) != dt[i].code) &&
 	     dt[i].mnemonic)
 	i++;
       if (dt[i].mnemonic != NULL)
 	return &dt[i];
+      
+      dt= disass_pedm3a;
+      i= 0;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+      
       return NULL;
     }
   if ((code & 0xdd) == 0xdd)
@@ -122,12 +172,14 @@ cl_r4k::dis_entry(t_addr addr)
 	}
       code= rom->get(addr+1);
       dt= disass_pddm3;
+      i= 0;
       while (((code & dt[i].mask) != dt[i].code) &&
 	     dt[i].mnemonic)
 	i++;
       if (dt[i].mnemonic != NULL)
 	return &dt[i];
       dt= disass_pddm4;
+      i= 0;
       while (((code & dt[i].mask) != dt[i].code) &&
 	     dt[i].mnemonic)
 	i++;
@@ -136,7 +188,14 @@ cl_r4k::dis_entry(t_addr addr)
       return NULL;
     }
 
+  if ((code == 0x6d) && (edmr & 0xc0))
+    {
+      // 6d page exists in 4k mode only!
+      return dis_6d_entry(addr);
+    }
+  
   dt= disass_rxk;
+  i= 0;
   while (((code & dt[i].mask) != dt[i].code) &&
 	 dt[i].mnemonic)
     i++;
@@ -160,6 +219,99 @@ cl_r4k::dis_entry(t_addr addr)
     }
   
   return &dt[i];
+}
+
+struct dis_entry disass_6d[]= {
+  /* 0 */ { 0, 0, 0, 0, 0, NULL },
+  /* 1 */ { 0x6d, 0xff, ' ', 2, "LD L,L" },
+  /* 2 */ { 0x7f, 0xff, ' ', 2, "LD A,A" },
+  /* 3 */ { 0, 0, 0, 0, 0, 0 }
+};
+char mnemo[100];
+
+struct dis_entry *
+cl_r4k::dis_6d_entry(t_addr addr)
+{
+  u8_t h, l, code= rom->get(addr+1);
+  chars op, idx, offset;
+  
+  if (code == 0x6d)
+    return &disass_6d[1];
+  if (code == 0x7f)
+    return &disass_6d[2];
+  
+  h= code >> 4;
+  l= code & 15;
+  if ((l == 0xd) || (l == 0xf))
+    return &disass_6d[3];
+
+  disass_6d[0].length= 2;
+  switch (h&3)
+    {
+    case 0: idx= "PW"; break;
+    case 1: idx= "PX"; break;
+    case 2: idx= "PY"; break;
+    case 3: idx= "PZ"; break;
+    }
+  switch (h&0xc)
+    {
+    case 0x0:
+      if (l<=3)
+	op= "BC";
+      else
+	op= "PW";
+      break;
+    case 0x4:
+      if (l<=3)
+	op= "DE";
+      else
+	op= "PX";
+      break;
+    case 0x8: if (l<=3) op= "IX"; else op= "PY"; break;
+    case 0xc: if (l<=3) op= "IY"; else op= "PZ"; break;
+    }
+  switch (l&6)
+    {
+    case 0:
+      {
+	u8_t d= rom->get(addr+2);
+	disass_6d[0].length= 3;
+	if (l&1)
+	  offset.format("+%u", d);
+	else
+	  {
+	    i8_t io= d;
+	    //offset= (io<0)?"-":"+";
+	    offset.format("%+d", io);
+	  }
+	break;
+      }
+    case 2: offset= "+HL"; break;
+    case 3: offset= (l&1)?"IY":"IX"; break;
+    case 6: offset= "";
+    }
+
+  chars mn= "LD ";
+  if (l&4)
+    {
+      mn+= op+","+idx+offset;
+    }
+  else
+    {
+      if (l&1)
+	{
+	  mn+= "(";
+	  mn+= idx+offset+"),"+op;
+	}
+      else
+	{
+	  mn+= op+",("+idx+offset+")";
+	}
+    }
+  strcpy(mnemo, mn.c_str());
+  disass_6d[0].mnemonic= mnemo;
+  
+  return &disass_6d[0];
 }
 
 void
@@ -514,6 +666,111 @@ cl_r4k::EXX(t_mem code)
   cBC.W(raJK);
   caJK.W(t);
 
+  return resGO;
+}
+
+int
+cl_r4k::PAGE_4K6D(t_mem code)
+{
+  u8_t h, l;
+  class cl_memory_cell *op, *idx;
+  t_addr addr;
+  
+  code= fetch();
+  if (code == 0x6d)
+    return ld_r_g(destL(), rL);
+  if (code == 0x7f)
+    return ld_r_g(destA(), rA);
+  
+  h= code>>4;
+  l= code&0xf;
+  if ((l == 0xd) || (l == 0xf))
+    return resINV;
+  
+  switch (h&3)
+    {
+    case 0: idx= &cPW; break;
+    case 1: idx= &cPX; break;
+    case 2: idx= &cPY; break;
+    case 3: idx= &cPZ; break;
+    }
+  switch (h&0xc)
+    {
+    case 0x0:
+      if (l<=3)
+	op= (l&1)?(&cBC):&destBC();
+      else
+	op= &cPW;
+      break;
+    case 0x4:
+      if (l<=3)
+	op= (l&1)?(&cDE):&destDE();
+      else
+	op= &cPX;
+      break;
+    case 0x8: if (l<=3) op= &cIX; else op= &cPY; break;
+    case 0xc: if (l<=3) op= &cIY; else op= &cPZ; break;
+    }
+  addr= idx->get();
+  switch (l&6)
+    {
+    case 0:
+      {
+	u8_t d= fetch();
+	if (l&1)
+	  {
+	    u8_t offset= d;
+	    addr= px8(addr, offset);
+	  }
+	else
+	  {
+	    i8_t offset= d;
+	    addr= px8se(addr, offset);
+	  }
+	break;
+      }
+    case 2: addr= px16(addr, rHL); break;
+    case 4: addr= px16(addr, (l&1)?rIY:rIX); break;
+    case 6: break;
+    }
+
+  if (l&4)
+    {
+      // reg->reg
+      op->W(addr);
+    }
+  else
+    {
+      // mem rd/wr
+      u32_t v;
+      if (l&1)
+	{
+	  v= op->get();
+	  // Write
+	  mem->pxwrite(addr, v); addr++; v>>= 8; vc.wr++;
+	  mem->pxwrite(addr, v); addr++; v>>= 8; vc.wr++;
+	  if (op->get_width() > 16)
+	    {
+	      mem->pxwrite(addr, v); addr++; v>>= 8; vc.wr++;
+	      mem->pxwrite(addr, v); addr++; v>>= 8; vc.wr++;
+	    }
+	}
+      else
+	{
+	  // Read
+	  u8_t b;
+	  v= 0;
+	  b= mem->pxread(addr); addr++; v= (v<<8)|b; vc.rd++;
+	  b= mem->pxread(addr); addr++; v= (v<<8)|b; vc.rd++;
+	  if (op->get_width() > 16)
+	    {
+	      b= mem->pxread(addr); addr++; v= (v<<8)|b; vc.rd++;
+	      b= mem->pxread(addr); addr++; v= (v<<8)|b; vc.rd++;
+	    }
+	  op->W(v);
+	}
+    }
+  
   return resGO;
 }
 

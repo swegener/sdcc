@@ -353,6 +353,7 @@ newLink (SYM_LINK_CLASS select)
   p = Safe_alloc (sizeof (sym_link));
   p->xclass = select;
   p->funcAttrs.z88dk_params_offset = 0;
+  FUNC_SDCCCALL (p) = -1;
 
   return p;
 }
@@ -835,10 +836,10 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_REGBANK (dest) |= FUNC_REGBANK (src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
   FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
-  if (FUNC_ISRAISONANCE (dest) && (FUNC_ISIAR (src) || FUNC_ISCOSMIC (src) || FUNC_ISSDCCNEWCALL (src) || FUNC_ISZ88DK_CALLEE (src)) ||
-    FUNC_ISIAR (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISCOSMIC (src) || FUNC_ISSDCCNEWCALL (src) || FUNC_ISZ88DK_CALLEE (src)) ||
-    FUNC_ISCOSMIC (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISSDCCNEWCALL (src) || FUNC_ISZ88DK_CALLEE (src)) ||
-    FUNC_ISSDCCNEWCALL (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISCOSMIC (src)) || // __sdcc_newcall can be combined with __z88dk_callee.
+  if (FUNC_ISRAISONANCE (dest) && (FUNC_ISIAR (src) || FUNC_ISCOSMIC (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_ISIAR (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISCOSMIC (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_ISCOSMIC (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
+    FUNC_SDCCCALL (dest) >= 0 && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISCOSMIC (src)) || // __sdcccall can be combined with __z88dk_callee.
     FUNC_ISZ88DK_CALLEE (src) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (dest) || FUNC_ISCOSMIC (dest)))
     werror (E_MULTIPLE_CALLINGCONVENTIONS, name);
   FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
@@ -3135,6 +3136,10 @@ checkFunction (symbol * sym, symbol * csym)
       FUNC_ISNORETURN (sym->type) = 1;
     }
 
+  /* If no ABI version specified, use port default */
+  if (FUNC_SDCCCALL (sym->type) < 0)
+    FUNC_SDCCCALL (sym->type) = options.sdcccall;
+
   /* make sure the type is complete and sane */
   checkTypeSanity (sym->etype, sym->name);
 
@@ -3374,7 +3379,7 @@ processFuncArgs (symbol *func, sym_link *funcType)
   int pNum = 1;
   char *funcName = NULL;
   int funcCdef = 0;
-  
+
   if (func && !funcType)
     funcType = func->type;
   if (func)
@@ -3407,6 +3412,10 @@ processFuncArgs (symbol *func, sym_link *funcType)
   /* check if this function is defined as calleeSaves
      then mark it as such */
   FUNC_CALLEESAVES (funcType) = inCalleeSaveList (funcName);
+
+  /* If no ABI version specified, use port default */
+  if (FUNC_SDCCCALL (funcType) < 0)
+    FUNC_SDCCCALL (funcType) = options.sdcccall;
 
   /* loop thru all the arguments   */
   val = FUNC_ARGS (funcType);

@@ -877,6 +877,7 @@ PORT mcs51_port =
     1                           // No fancy alignments supported.
   },
   { _mcs51_genExtraAreas, NULL },
+  0,                            // ABI revision
   {
     +1,         /* direction (+1 = stack grows up) */
     0,          /* bank_overhead (switch between register banks) */

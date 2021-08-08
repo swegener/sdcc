@@ -107,7 +107,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCNEWCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -1319,6 +1319,8 @@ function_declarator
           FUNC_HASVARARGS(funcType) = IS_VARG($4);
           FUNC_ARGS(funcType) = reverseVal($4);
 
+          FUNC_SDCCCALL(funcType) = -1;
+
           /* nest level was incremented to take care of the parms  */
           leaveBlockScope (currBlockno);
           NestLevel -= LEVEL_UNIT;
@@ -2193,8 +2195,9 @@ function_attributes
    |  COSMIC         {  $$ = newLink (SPECIFIER);
                         FUNC_ISCOSMIC($$) = 1;
                      }
-   |  SDCCNEWCALL    {  $$ = newLink (SPECIFIER);
-                        FUNC_ISSDCCNEWCALL($$) = 1;
+   |  SDCCCALL '('constant_expr ')'
+                     {  $$ = newLink (SPECIFIER);
+                        FUNC_SDCCCALL($$) = ulFromVal(constExprValue ($3, true));
                      }
    |  Z88DK_FASTCALL {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_FASTCALL($$) = 1;
@@ -2204,7 +2207,7 @@ function_attributes
                      }
    |  Z88DK_PARAMS_OFFSET '(' constant_expr ')' 
                      {
-                        value *offset_v = constExprValue ($3, TRUE);
+                        value *offset_v = constExprValue ($3, true);
                         int    offset = 0;
                         $$ = newLink(SPECIFIER);
                         if  ( offset_v ) 

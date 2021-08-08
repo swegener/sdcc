@@ -247,7 +247,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_dehl, asmop_hlde, asmop_hlbc, asmop_zero, asmop_one, asmop_mone;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_iy, asmop_dehl, asmop_hlde, asmop_hlbc, asmop_debc, asmop_zero, asmop_one, asmop_mone;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -264,6 +264,7 @@ static struct asmop *const ASMOP_IY = &asmop_iy;
 static struct asmop *const ASMOP_DEHL = &asmop_dehl;
 static struct asmop *const ASMOP_HLDE = &asmop_hlde;
 static struct asmop *const ASMOP_HLBC = &asmop_hlbc;
+static struct asmop *const ASMOP_DEBC = &asmop_debc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
@@ -305,6 +306,7 @@ z80_init_asmops (void)
   z80_init_reg_asmop(&asmop_hlde, (const signed char[]){E_IDX, D_IDX, L_IDX, H_IDX, -1});
   z80_init_reg_asmop(&asmop_iy, (const signed char[]){IYL_IDX, IYH_IDX, -1});
   z80_init_reg_asmop(&asmop_hlbc, (const signed char[]){C_IDX, B_IDX, L_IDX, H_IDX, -1});
+  z80_init_reg_asmop(&asmop_debc, (const signed char[]){C_IDX, B_IDX, E_IDX, D_IDX, -1});
   
   asmop_zero.type = AOP_LIT;
   asmop_zero.aopu.aop_lit = constVal ("0");
@@ -1769,20 +1771,42 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 // Get asmop for registers containing the return type of function
 // Returns 0 if the function does not have a return value or it is not returned in registers.
 static asmop *
-aopRet (const sym_link *ftype)
+aopRet (sym_link *ftype)
 {
+  wassert (IS_FUNC (ftype));
+
   // Adjust returnregs in isReturned in peep.c accordingly when changing asmop_return here.
 
   int size = getSize (ftype->next);
-  
+
+  if (FUNC_SDCCCALL (ftype) == 0 || FUNC_ISSMALLC (ftype) || FUNC_ISZ88DK_FASTCALL (ftype))
+    switch (size)
+      {
+      case 1:
+        return (IS_GB ? ASMOP_E : ASMOP_L);
+      case 2:
+        return (IS_GB ? ASMOP_DE : ASMOP_HL);
+      case 4:
+        return (IS_GB ? ASMOP_HLDE : ASMOP_DEHL);   
+      default:
+        return 0;
+      }
+
+  wassert (FUNC_SDCCCALL (ftype) > 0);
+
   switch (size)
     {
     case 1:
-      return (IS_GB ? ASMOP_E : ASMOP_L);
+      return (ASMOP_A);
     case 2:
-      return (IS_GB ? ASMOP_DE : ASMOP_HL);
+      if (IS_RAB || IS_TLCS90 || IS_EZ80_Z80)
+        return ASMOP_HL;
+      else if (IS_GB)
+        return ASMOP_BC;
+      else
+        return ASMOP_DE;
     case 4:
-      return (IS_GB ? ASMOP_HLDE : ASMOP_DEHL);   
+      return (IS_GB ? ASMOP_DEBC : ASMOP_HLDE);   
     default:
       return 0;
     }
@@ -1793,13 +1817,15 @@ aopRet (const sym_link *ftype)
 static asmop *
 aopArg (sym_link *ftype, int i)
 {
+  wassert (IS_FUNC (ftype));
+
   if (IFFUNC_HASVARARGS (ftype))
     return 0;
 
   value *args = FUNC_ARGS(ftype);
   wassert (args);
 
-  if (IFFUNC_ISZ88DK_FASTCALL (ftype))
+  if (FUNC_ISZ88DK_FASTCALL (ftype))
     {
       if (i != 1)
         return false;
@@ -1816,6 +1842,55 @@ aopArg (sym_link *ftype, int i)
           return 0;
         }
     }
+    
+  // Old SDCC calling convention.
+  if (FUNC_SDCCCALL (ftype) == 0 || FUNC_ISSMALLC (ftype))
+    return 0;
+
+  wassert (FUNC_SDCCCALL (ftype) > 0);
+
+  if (!FUNC_HASVARARGS (ftype))
+    {
+      int j;
+      value *arg;
+
+      for (j = 1, arg = args; j < i; j++, arg = arg->next)
+        wassert (arg);
+
+      if (i == 1 && getSize (arg->type) == 1)
+        return ASMOP_A;
+      if (i == 1 && getSize (arg->type) == 2)
+        return (IS_GB ? ASMOP_DE : ASMOP_HL);
+      if (i == 1 && getSize (arg->type) == 4)
+        return (IS_GB ? ASMOP_DEBC : ASMOP_HLDE);
+
+      if (IS_GB && i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 1)
+        return ASMOP_E;
+      if (IS_GB && i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 2)
+        return ASMOP_DE;
+  
+      if (IS_GB && i == 2 && aopArg (ftype, 1) == ASMOP_DE && getSize (arg->type) == 1)
+        return ASMOP_A;
+      if (IS_GB && i == 2 && aopArg (ftype, 1) == ASMOP_DE && getSize (arg->type) == 2)
+        return ASMOP_BC;
+
+      if (!IS_GB && i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 1)
+        return ASMOP_L;
+
+      if ((IS_Z80 || IS_Z180 || IS_Z80N) && i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 2)
+        return ASMOP_DE;
+      if ((IS_Z80 || IS_Z180 || IS_Z80N) && i == 2 && aopArg (ftype, 1) == ASMOP_HL && getSize (arg->type) == 2)
+        return ASMOP_DE;
+
+      if ((IS_RAB || IS_TLCS90 || IS_EZ80_Z80) && i == 2 && aopArg (ftype, 1) == ASMOP_A && getSize (arg->type) == 2)
+        return ASMOP_HL;
+      if ((IS_RAB || IS_TLCS90 || IS_EZ80_Z80) && i == 2 && aopArg (ftype, 1) == ASMOP_HL && getSize (arg->type) == 1)
+        return ASMOP_A;
+      if ((IS_RAB || IS_TLCS90 || IS_EZ80_Z80) && i == 2 && aopArg (ftype, 1) == ASMOP_HLDE && getSize (arg->type) == 1)
+        return ASMOP_A;
+
+      return 0;
+    }
 
   return 0;
 }
@@ -1824,6 +1899,9 @@ aopArg (sym_link *ftype, int i)
 static bool
 isFuncCalleeStackCleanup (sym_link *ftype)
 {
+  wassert (IS_FUNC (ftype));
+
+  const bool farg = !FUNC_HASVARARGS (ftype) && FUNC_ARGS (ftype) && IS_FLOAT (FUNC_ARGS (ftype)->type); 
   const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
   int stackparmbytes = bigreturn * 2;
   for (value *arg = FUNC_ARGS(ftype); arg && !FUNC_HASVARARGS(ftype); arg = arg->next)
@@ -1837,7 +1915,28 @@ isFuncCalleeStackCleanup (sym_link *ftype)
   if (!stackparmbytes)
     return false;
 
-  return (IFFUNC_ISZ88DK_CALLEE (ftype));
+  if (IFFUNC_ISZ88DK_CALLEE (ftype))
+    return true;
+
+  if (FUNC_SDCCCALL (ftype) == 0 || FUNC_ISSMALLC (ftype))
+    return false;
+
+  if (IFFUNC_ISBANKEDCALL (ftype))
+    return false;
+
+  if (FUNC_HASVARARGS (ftype))
+    return false;
+
+  // Callee cleans up stack for all non-vararg functions on gbz80.
+  if (IS_GB)
+    return true;
+
+  // Callee cleans up stack if return value has at most 16 bits or the return value is float and there is a first agrument of type float.
+  if (!ftype->next || getSize (ftype->next) <= 2)
+    return true;
+  else if (IS_FLOAT (ftype->next) && FUNC_ARGS(ftype) && IS_FLOAT(FUNC_ARGS(ftype)->etype))
+    return true;
+  return false;
 }
 
 /*-----------------------------------------------------------------*/

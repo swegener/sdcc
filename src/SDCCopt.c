@@ -1074,37 +1074,56 @@ convert:
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* convconvention - handle calling convention                      */
+/*-----------------------------------------------------------------*/
 static void
-convsmallc (iCode *ic, eBBlock *ebp)
+convconvention (iCode *ic, eBBlock *ebp)
 {
   iCode *icc, *icp, *ico = NULL;
 
   assert (ic->op == CALL || ic->op == PCALL);
 
-  for (icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev)
-    ic = icc;
-  icp = icc;
+  sym_link *ftype = operandType (IC_LEFT (ic));
+  if (ic->op == PCALL)
+    ftype =ftype->next;
 
-  /* Reverse parameters. */
-  for (icc = ic; icc->op != CALL && icc->op != PCALL; icc = icc->next)
+  // Small-C passed stack parameters left-to-right.
+  if (FUNC_ISSMALLC (ftype))
     {
-      if (icc->next->op != CALL && icc->next->op != PCALL)
-        icc->prev = icc->next;
-      else
-        icc->prev = icp;
+      for (icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev)
+        ic = icc;
+      icp = icc;
+
+      /* Reverse parameters. */
+      for (icc = ic; icc->op != CALL && icc->op != PCALL; icc = icc->next)
+        {
+          if (icc->next->op != CALL && icc->next->op != PCALL)
+            icc->prev = icc->next;
+          else
+            icc->prev = icp;
+        }
+      if (icc != ic)
+        {
+          if (icp)
+            icp->next = icc->prev;
+          else
+            ebp->sch = icc->prev;
+          icc->prev = ic;
+        }
+      for (; icc != icp; ico = icc, icc = icc->prev)
+        {
+          if (icc->op != CALL && icc->op != PCALL)
+            icc->next = ico;
+        }
     }
-  if (icc != ic)
+  else if (FUNC_ISRAISONANCE (ftype) || FUNC_ISIAR (ftype) || FUNC_ISCOSMIC (ftype) || FUNC_ISZ88DK_FASTCALL (ftype))
+    ;
+  else // SDCC calling convention
     {
-      if (icp)
-        icp->next = icc->prev;
-      else
-        ebp->sch = icc->prev;
-      icc->prev = ic;
-    }
-  for (; icc != icp; ico = icc, icc = icc->prev)
-    {
-      if (icc->op != CALL && icc->op != PCALL)
-        icc->next = ico;
+      // Use default ABI version if no ABI version is explicitly requested.
+      if (FUNC_SDCCCALL (ftype) < 0)
+        FUNC_SDCCCALL (ftype) = options.sdcccall;
     }
 }
 
@@ -1256,10 +1275,9 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               convbuiltin (ic, ebbs[i]);
             }
-          if ((ic->op == CALL  && IFFUNC_ISSMALLC (operandType (IC_LEFT (ic)))) ||
-              (ic->op == PCALL && IFFUNC_ISSMALLC (operandType (IC_LEFT (ic))->next)))
+          if (ic->op == CALL || ic->op == PCALL)
             {
-              convsmallc (ic, ebbs[i]);
+              convconvention (ic, ebbs[i]);
             }
         }
     }

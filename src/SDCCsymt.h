@@ -273,11 +273,11 @@ typedef struct sym_link
     unsigned rbank:1;               /* seperate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
     unsigned noreturn:1;            /* promised not to return               */
+    signed sdcccall;                /* ABI version used                     */
     unsigned smallc:1;              /* Small-C calling convention: Parameters on stack are passed left-to-right */
     unsigned raisonance:1;          /* Raisonance calling convention for STM8 */
-    unsigned iar:1;                 /* IAR calling convention */
-    unsigned cosmic:1;              /* Cosmic calling convention */
-    unsigned sdccnewcall:1;         /* Experimental new calling convention */
+    unsigned iar:1;                 /* IAR calling convention               */
+    unsigned cosmic:1;              /* Cosmic calling convention            */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
     unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
@@ -434,6 +434,7 @@ extern sym_link *validateLink (sym_link * l,
 #define FUNC_ISISR(x) (x->funcAttrs.intrtn)
 #define IFFUNC_ISISR(x) (IS_FUNC(x) && FUNC_ISISR(x))
 #define FUNC_INTNO(x) (x->funcAttrs.intno)
+#define FUNC_SDCCCALL(x) (x->funcAttrs.sdcccall)
 #define FUNC_REGBANK(x) (x->funcAttrs.regbank)
 #define FUNC_HASSTACKPARM(x) (x->funcAttrs.hasStackParms)
 #define FUNC_ISINLINE(x) (x->funcAttrs.inlinereq)
@@ -469,8 +470,6 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISIAR(x) (IS_FUNC(x) && FUNC_ISIAR(x))
 #define FUNC_ISCOSMIC(x) (x->funcAttrs.cosmic)
 #define IFFUNC_ISCOSMIC(x) (IS_FUNC(x) && FUNC_ISCOSMIC(x))
-#define FUNC_ISSDCCNEWCALL(x) (x->funcAttrs.sdccnewcall)
-#define IFFUNC_ISSDCCNEWCALL(x) (IS_FUNC(x) && FUNC_ISSDCCNEWCALL(x))
 #define FUNC_ISZ88DK_FASTCALL(x) (x->funcAttrs.z88dk_fastcall)
 #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
 #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)

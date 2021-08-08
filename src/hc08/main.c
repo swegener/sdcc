@@ -841,6 +841,7 @@ PORT hc08_port =
   },
   { _hc08_genExtraAreas,
     NULL },
+  0,                      // ABI revision
   {
     -1,         /* direction (-1 = stack grows down) */
     0,          /* bank_overhead (switch between register banks) */
@@ -986,6 +987,7 @@ PORT s08_port =
   },
   { _hc08_genExtraAreas,
     NULL },
+  0,
   {
     -1,         /* direction (-1 = stack grows down) */
     0,          /* bank_overhead (switch between register banks) */

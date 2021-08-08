@@ -1363,6 +1363,7 @@ PORT pic16_port =
     NULL,       /* genExtraAreaDeclaration */
     NULL        /* genExatrAreaLinkOptions */
   },
+  0,            /* ABI revision */
   {
     /* stack related information */
     -1,         /* -1 stack grows downwards, +1 upwards */

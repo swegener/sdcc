@@ -328,6 +328,7 @@ struct options
     int max_allocs_per_node;    /* Maximum number of allocations / combinations considered at each node in the tree-decomposition based algorithms */
     bool noOptsdccInAsm;        /* Do not emit .optsdcc in asm */
     bool oldralloc;             /* Use old register allocator */
+    int sdcccall;               /* ABI version */
   };
 
 /* forward definition for variables accessed globally */

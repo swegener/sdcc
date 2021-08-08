@@ -247,6 +247,9 @@ typedef struct
   }
   extraAreas;
 
+  /* Default ABI version */
+  unsigned sdcccall;
+
   /* stack related information */
   struct
   {

@@ -201,7 +201,7 @@ static void checkCurrFile (const char *s);
 "__raisonance"          { count (); TKEYWORD (RAISONANCE); }
 "__iar"                 { count (); TKEYWORD (IAR); }
 "__cosmic"              { count (); TKEYWORD (COSMIC); }
-"__sdccnewcall"         { count (); TKEYWORD (SDCCNEWCALL); }
+"__sdcccall"            { count (); return SDCCCALL; }
 "__preserves_regs"      { count (); return PRESERVES_REGS; }
 "__z88dk_fastcall"      { count (); TKEYWORD (Z88DK_FASTCALL); }
 "__z88dk_callee"        { count (); TKEYWORD (Z88DK_CALLEE); }

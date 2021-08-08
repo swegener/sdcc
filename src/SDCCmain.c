@@ -648,6 +648,7 @@ setDefaultOptions (void)
   options.out_fmt = 0;
   options.dump_graphs = 0;
   options.dependencyFileOpt = 0;
+  options.sdcccall = port->sdcccall;
 
   /* now for the optimizations */
   /* turn on the everything */
@@ -2168,6 +2169,16 @@ preProcess (char **envp)
 
       if (options.all_callee_saves)
         addSet(&preArgvSet, Safe_strdup("-D__SDCC_ALL_CALLEE_SAVES"));
+
+
+      /* set macro for ABI (calling convention) version */
+      {
+        struct dbuf_s dbuf;
+
+        dbuf_init (&dbuf, 32);
+        dbuf_printf (&dbuf, "-D__SDCCCALL=%d", options.sdcccall);
+        addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+      }
 
       /* add SDCC version number */
       {

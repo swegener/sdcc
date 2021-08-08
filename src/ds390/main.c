@@ -1066,6 +1066,7 @@ PORT ds390_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
+  0,                            // ABI revision
   { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
   { -1, FALSE },
@@ -1404,6 +1405,7 @@ PORT tininative_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
+  0,                            // ABI revision
   { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
   { -1, FALSE },
@@ -1659,6 +1661,7 @@ PORT ds400_port =
     1
   },
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
+  0,                            // ABI revision
   { +1, 1, 4, 1, 1, 0, 0 },
   { -1, FALSE },
   { ds390_emitDebuggerSymbol },

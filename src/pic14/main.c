@@ -423,6 +423,7 @@ PORT pic_port =
     1                       // No fancy alignments supported.
   },
   { NULL, NULL },
+  0,                        // ABI revision
   {
     +1, 1, 4, 1, 1, 0, 0
   },

@@ -318,6 +318,7 @@ PORT pdk13_port =
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },
+  0,                            /* ABI revision */
   {                             /* stack information */
      +1,                        /* direction: stack grows up */
      0,
@@ -484,6 +485,7 @@ PORT pdk14_port =
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },
+  0,                            /* ABI revision */
   {                             /* stack information */
      +1,                        /* direction: stack grows up */
      0,
@@ -650,6 +652,7 @@ PORT pdk15_port =
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },
+  0,                            /* ABI revision */
   {                             /* stack information */
      +1,                        /* direction: stack grows up */
      0,

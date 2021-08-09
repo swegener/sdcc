@@ -1,5 +1,12 @@
 2021-07-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/main.c,
+	  doc/sdccman.lyx:
+	  .version:
+	  Enable new calling convention for gbz80.
+
+2021-07-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCC.lex,
 	  src/SDCC.y,
 	  src/SDCCglobl.h,

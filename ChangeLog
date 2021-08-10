@@ -1,7 +1,7 @@
 2021-07-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c:
-	  Fix buffer overflow.
+	  Fix buffer overflow reported in patch #397 by Arnout Engelen .
 
 2021-07-08 Philipp Klaus Krause <pkk AT spth.de>
 

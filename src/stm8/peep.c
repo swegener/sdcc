@@ -827,7 +827,9 @@ stm8MightRead(const lineNode *pl, const char *what)
 
       if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw"))
         {
-          char buf[64], *p;
+          char buf[128], *p;
+          if (strlen (pl->line) >= 128) // Avoid buffer overflow, err on safe side.
+            return TRUE;
           strcpy (buf, pl->line);
           if (!!(p = strstr (buf, "0x")) || !!(p = strstr (buf, "0X")))
             p[0] = p[1] = ' ';

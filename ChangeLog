@@ -1,3 +1,9 @@
+2021-07-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  support/valdiag/tests/callingconvention.c:
+	  Diagnostics for conflicting calling conventions.
+
 2021-07-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c:

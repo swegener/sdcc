@@ -2569,7 +2569,7 @@ compareFuncType (sym_link * dest, sym_link * src)
   value *checkValue;
   int argCnt = 0;
   int i;
-
+printf("compareFuncType - sdccall %d %d\n", FUNC_SDCCCALL (dest), FUNC_SDCCCALL (src));
   /* if not type then some kind of error */
   if (!dest || !src)
     return 0;
@@ -2600,6 +2600,9 @@ compareFuncType (sym_link * dest, sym_link * src)
 
   if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src) ||
     IFFUNC_ISZ88DK_CALLEE (dest) != IFFUNC_ISZ88DK_CALLEE (src))
+    return 0;
+
+  if (FUNC_SDCCCALL (dest) != FUNC_SDCCCALL (src))
     return 0;
 
   for (i = 0; i < 9; i++)
@@ -2856,6 +2859,19 @@ compareTypeExact (sym_link * dest, sym_link * src, long level)
                     return 0;
                   if (IFFUNC_ISNAKED (dest) != IFFUNC_ISNAKED (src))
                     return 0;
+
+                  if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src))
+                    return 0;
+                  if (IFFUNC_ISRAISONANCE (dest) != IFFUNC_ISRAISONANCE (src))
+                    return 0;
+                  if (IFFUNC_ISCOSMIC (dest) != IFFUNC_ISCOSMIC (src))
+                    return 0;
+                  if (IFFUNC_ISIAR (dest) != IFFUNC_ISIAR (src))
+                    return 0;
+                  if (FUNC_SDCCCALL (dest) >= 0 && FUNC_SDCCCALL (src) >= 0 &&
+                    FUNC_SDCCCALL (dest) != FUNC_SDCCCALL (src))
+                    return 0;
+
 #if 0
                   if (IFFUNC_ISREENT (dest) != IFFUNC_ISREENT (src) && argCnt > 1)
                     return 0;
@@ -3656,6 +3672,8 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                 dbuf_append_str (dbuf, " __z88dk_callee");
               if (IFFUNC_ISZ88DK_FASTCALL (type))
                 dbuf_append_str (dbuf, " __z88dk_fastcall");
+              if (FUNC_SDCCCALL (type) >= 0 && FUNC_SDCCCALL (type) != options.sdcccall)
+                dbuf_append_str (dbuf, FUNC_SDCCCALL (type) ? " __sdcccall(0)" : " __sdcccall(1)");
               for (unsigned char i = 0; i < 9; i++)
                   if (type->funcAttrs.preserved_regs[i])
                   {

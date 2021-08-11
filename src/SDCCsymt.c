@@ -2569,7 +2569,7 @@ compareFuncType (sym_link * dest, sym_link * src)
   value *checkValue;
   int argCnt = 0;
   int i;
-printf("compareFuncType - sdccall %d %d\n", FUNC_SDCCCALL (dest), FUNC_SDCCCALL (src));
+
   /* if not type then some kind of error */
   if (!dest || !src)
     return 0;

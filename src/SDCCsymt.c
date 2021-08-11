@@ -2602,7 +2602,8 @@ compareFuncType (sym_link * dest, sym_link * src)
     IFFUNC_ISZ88DK_CALLEE (dest) != IFFUNC_ISZ88DK_CALLEE (src))
     return 0;
 
-  if (FUNC_SDCCCALL (dest) != FUNC_SDCCCALL (src))
+  if (FUNC_SDCCCALL (dest) >= 0 && FUNC_SDCCCALL (src) >= 0 &&
+    FUNC_SDCCCALL (dest) != FUNC_SDCCCALL (src))
     return 0;
 
   for (i = 0; i < 9; i++)

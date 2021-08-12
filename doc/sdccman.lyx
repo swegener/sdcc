@@ -44287,15 +44287,50 @@ Calling conventions
 \end_layout
 
 \begin_layout Standard
+By default, the SDCC calling convention, version 0 is used.
+ Using the option –sdcccall 1, the default can be changed to version 1.
+\end_layout
+
+\begin_layout Standard
 Arguments are passed on the stack right-to-left.
  Return values are in a (8 bit), x (16 bit), xyl (24 bit), xy (32 bit) or
  use a hidden extra pointer parameter pointing to the location (anything
  wider than 32 bit).
- There is another calling convention supported, which can be specified using
- the keyword __z88dk_callee.
- For __z88dk_callee, parameters are passed on the stack, but the stack is
- not adjusted for the parameters after the call (thus the callee has to
- do this instead).
+\end_layout
+
+\begin_layout Subsubsection
+SDCC calling convention, version 1
+\end_layout
+
+\begin_layout Standard
+For functions that have variable arguments, all parameters are passed on
+ the stack.
+ For other functions, if the first parameter has 8 or 16 bits, it is passed
+ in a or x.
+ If the first parameter has 8 bits, and the second has 16 bits, the second
+ is passed in x.
+ If the first parameter has 16 bits, and the second has 8 bits, the second
+ is passed in a.
+ All other parameters are passed on the stack.
+ If __z88dk_callee is specified, the stack is always adjusted by the callee.
+ Otherwise, for the large memory model, the stack is always adjusted by
+ the caller.
+ For the medium memory model the stack is adjusted by the caller, with the
+ following exceptions: functions that do not have variable arguments and
+ return void or a type of at most 16 bits, or have both a first parameter
+ of type float and a return value of type float.
+\end_layout
+
+\begin_layout Subsubsection
+SDCC calling convention, version 0
+\end_layout
+
+\begin_layout Standard
+For compability with functions written for older versions of SDCC, the __sdcccal
+l(0) calling convention is supported.
+ All parameters are passed on the stack.
+ The stack is the stack is not adjusted for the parameters after the call
+ (thus the callee has to do this instead), unless __z88dk_callee is specified.
 \end_layout
 
 \begin_layout Subsubsection

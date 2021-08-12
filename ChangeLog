@@ -1,22 +1,28 @@
-2021-07-11 Philipp Klaus Krause <pkk AT spth.de>
+2021-08-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  doc/sdccman.lyx:
+	  Enable new calling convention for stm8.
+
+2021-08-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,
 	  support/valdiag/tests/callingconvention.c:
 	  Diagnostics for conflicting calling conventions.
 
-2021-07-10 Philipp Klaus Krause <pkk AT spth.de>
+2021-08-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c:
 	  Fix buffer overflow reported in patch #397 by Arnout Engelen .
 
-2021-07-08 Philipp Klaus Krause <pkk AT spth.de>
+2021-08-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c,
 	  doc/sdccman.lyx:
 	  .version:
 	  Enable new calling convention for gbz80.
 
-2021-07-08 Philipp Klaus Krause <pkk AT spth.de>
+2021-08-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,
 	  src/SDCC.y,

@@ -1,3 +1,7 @@
+2021-08-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (valCastLiteral): possibly fix bug #3273
+
 2021-08-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

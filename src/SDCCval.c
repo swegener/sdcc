@@ -3024,6 +3024,8 @@ valCastLiteral (sym_link * dtype, double fval, TYPE_TARGET_ULONGLONG llval)
 
   if (!dtype)
     return NULL;
+  if ((fval > 0x7ffffffful) || (-fval > 0x7ffffffful))
+    l = (unsigned long)llval;
 
   val = newValue ();
   if (dtype)

@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "rxkcl.h"
 #include "r3kacl.h"
+#include "r4kcl.h"
 
 
 int
@@ -203,6 +204,18 @@ cl_r3ka::SYSCALL(t_mem code)
   PC= rIIR * 256 + 0x60;
   vc.wr+= 2;
   tick5p3(9);
+  return resGO;
+}
+
+int
+cl_r4k::DWJNZ(t_mem code)
+{
+  i8_t e= fetch();
+  u16_t v= rBC-1;
+  destBC().W(v);
+  if (v)
+    PC= (PC + e) & 0xffff;
+  tick5p1(6);
   return resGO;
 }
 

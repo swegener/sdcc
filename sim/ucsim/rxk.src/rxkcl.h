@@ -195,23 +195,31 @@ public:
   u16_t op16_BC(void);
   u16_t op16_DE(void);
   u16_t op16_HL(void);
-  void write8(t_addr a, u8_t v) { vc.wr++; rom->write(a, v); }
-  void write8io(t_addr a, u8_t v) { vc.wr++; rwas->write(a, v); }
-  void write16(t_addr a, u16_t v) { vc.wr+=2;
+  void write8(u16_t a, u8_t v) { vc.wr++; rom->write(a, v); }
+  void write8io(u16_t a, u8_t v) { vc.wr++; rwas->write(a, v); }
+  void write16(u16_t a, u16_t v) { vc.wr+=2;
     rom->write(a, v); rom->write(a+1, v>>8);
   }
-  void write16io(t_addr a, u16_t v) { vc.wr+=2;
+  void write16io(u16_t a, u16_t v) { vc.wr+=2;
     rwas->write(a, v); rwas->write(a+1, v>>8);
   }
-  u8_t read8(t_addr a) { vc.rd++; return rom->read(a); }
-  u8_t read8io(t_addr a) { vc.rd++; return rwas->read(a); }
-  u16_t read16(t_addr a) { u8_t l, h; vc.rd+=2;
+  u8_t read8(u16_t a) { vc.rd++; return rom->read(a); }
+  u8_t read8io(u16_t a) { vc.rd++; return rwas->read(a); }
+  u16_t read16(u16_t a) { u8_t l, h; vc.rd+=2;
     l= rom->read(a); h= rom->read(a+1);
     return h*256+l;
   }
-  u16_t read16io(t_addr a) { u8_t l, h; vc.rd+=2;
+  u16_t read16io(u16_t a) { u8_t l, h; vc.rd+=2;
     l= rwas->read(a); h= rwas->read(a+1);
     return h*256+l;
+  }
+  u32_t read32(u16_t a) { u16_t l, h; vc.rd+=4;
+    l= read16(a); h= read16(a+2);
+    return (h<<16)+l;
+  }
+  u32_t read32io(u16_t a) { u16_t l, h; vc.rd+=4;
+    l= read16io(a); h= read16io(a+2);
+    return (h<<16)+l;
   }
   u16_t fetch16(void) { u8_t l, h;
     l= fetch(); h= fetch();
@@ -281,6 +289,7 @@ public:
   virtual int and16(class cl_cell16 &dest,
 		    u16_t op1, u16_t op2);			// 0f,1t,0r,0w
   virtual int cp8(u8_t op1, u8_t op2);				// 0f,3t,0r,0w
+  virtual int cp16(u16_t op1, u16_t op2);			// 0f,4t,0r,0w
   
   virtual int jr_cc(bool cond);
   virtual int ret_f(bool f);					// 0f,7t,2r,0w

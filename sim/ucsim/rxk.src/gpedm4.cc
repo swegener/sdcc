@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (gpedm4.cc)
  *
- * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,27 +25,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#include "gpedm4.h"
 
-#include "stypes.h"
-#include "iwrap.h"
+struct dis_entry disass_pedm4[]=
+  {
+    { 0x00, 0xff, ' ', 3, "CBM %b" },
+    { 0x01, 0xff, ' ', 2, "LD PW,(HTR+HL)" },
+    { 0x11, 0xff, ' ', 2, "LD PX,(HTR+HL)" },
+    { 0x21, 0xff, ' ', 2, "LD PY,(HTR+HL)" },
+    { 0x31, 0xff, ' ', 2, "LD PZ,(HTR+HL)" },
+    { 0x02, 0xff, ' ', 2, "SBOX A" },
+    { 0x12, 0xff, ' ', 2, "IBOX A" },
+    { 0x10, 0xff, ' ', 3, "DWJNZ %r" },
+    { 0x48, 0xff, ' ', 2, "CP HL,DE" },
+    { 0x4c, 0xff, ' ', 2, "TEST BC" },
 
-
-extern instruction_wrapper_fn itab[256];
-extern instruction_wrapper_fn itab_dd[256];
-extern instruction_wrapper_fn itab_ed[256];
-extern instruction_wrapper_fn itab_fd[256];
-extern instruction_wrapper_fn itab_7f[256];
-
-extern u8_t sbox_tab[256];
-extern u8_t ibox_tab[256];
-
-extern struct dis_entry disass_rxk[];
-
-extern void init_sbox();
-
-
-#endif
-
-/* End of rxk.src/glob.h */
+    { 0, 0, 0, 0, 0, 0 }
+  };
+  
+/* End of rxk.src/gpedm4.cc */

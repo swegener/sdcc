@@ -34,6 +34,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // meaning of 4k mode follows
 
 #define PAGE_4K6D	instruction_4k6d
+#define PAGE_4K7F	instruction_4k7f
+
+#define RL_HL		instruction_4k42
+#define RL_BC		instruction_4k62
+#define SUB_HL_JK	instruction_4k45
+#define SUB_HL_DE	instruction_4k55
+#define TEST_HL		instruction_4k4c
 
 #endif
 

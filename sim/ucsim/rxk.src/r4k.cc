@@ -32,12 +32,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 
 #include "r4kwrap.h"
+#include "7fwrap.h"
 #include "glob.h"
 #include "gp0m3.h"
+#include "gp0m4.h"
 #include "gpddm3.h"
 #include "gpedm3a.h"
 #include "gpddm4.h"
 #include "gpedm3.h"
+#include "gpedm4.h"
 
 #include "r4kcl.h"
 
@@ -105,8 +108,10 @@ cl_r4k::init(void)
   RCV(aPX);
   RCV(aPY);
   RCV(aPZ);
+  RCV(HTR);
 #undef RCV
   //mode2k();
+  fill_7f_wrappers(itab_7f);
   return 0;
 }
 
@@ -131,6 +136,8 @@ cl_r4k::make_cpu_hw(void)
   cpu->init();
 }
 
+static struct dis_entry de7f;
+
 struct dis_entry *
 cl_r4k::dis_entry(t_addr addr)
 {
@@ -151,6 +158,14 @@ cl_r4k::dis_entry(t_addr addr)
 	return &dt[i];
       
       dt= disass_pedm3a;
+      i= 0;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
+      
+      dt= disass_pedm4;
       i= 0;
       while (((code & dt[i].mask) != dt[i].code) &&
 	     dt[i].mnemonic)
@@ -193,6 +208,39 @@ cl_r4k::dis_entry(t_addr addr)
       // 6d page exists in 4k mode only!
       return dis_6d_entry(addr);
     }
+
+  if ((code == 0x7f) && (edmr & 0xc0))
+    {
+      // 7f page is special in 4k mode
+      code= rom->get(addr+1);
+      if ((code <= 0x3f) || (code >= 0xc0))
+	return NULL;
+      if ((code >= 0x40) && (code <= 0x6f))
+	{
+	  if ((code & 0x0f) == 0x06)
+	    return NULL;
+	  if ((code & 0x0f) == 0x0e)
+	    return NULL;
+	}
+      if ((code & 0xf0) == 0x70)
+	{
+	  if ((code == 0x7e) || (code <= 0x77))
+	    return NULL;
+	}
+      // pick from standard page0 table
+      dt= disass_p0m3;
+      i= 0;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	{
+	  memcpy(&de7f, &dt[i], sizeof(struct dis_entry));
+	  de7f.length++;
+	  return &de7f;
+	}
+      return NULL;
+    }
   
   dt= disass_rxk;
   i= 0;
@@ -205,6 +253,13 @@ cl_r4k::dis_entry(t_addr addr)
   if (edmr & 0xc0)
     {
       // mode: 4k
+      dt= disass_p0m4;
+      i= 0;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic != NULL)
+	return &dt[i];
     }
   else
     {
@@ -218,7 +273,7 @@ cl_r4k::dis_entry(t_addr addr)
 	return &dt[i];
     }
   
-  return &dt[i];
+  return NULL;
 }
 
 struct dis_entry disass_6d[]= {
@@ -670,10 +725,17 @@ cl_r4k::EXX(t_mem code)
 }
 
 int
+cl_r4k::PAGE_4K7F(t_mem code)
+{
+  code= fetch();
+  return itab_7f[code](this, code);
+}
+
+int
 cl_r4k::PAGE_4K6D(t_mem code)
 {
   u8_t h, l;
-  class cl_memory_cell *op, *idx;
+  class cl_memory_cell *op= &cPX, *idx;
   t_addr addr;
   
   code= fetch();

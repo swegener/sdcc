@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 struct dis_entry disass_pddm4[]=
   {
     { 0x06, 0xff, ' ', 2, "LD A,(%I+A)" },
+    { 0x4c, 0xff, ' ', 2, "TEST %I" },
     
     { 0, 0, 0, 0, 0, 0 }
   };

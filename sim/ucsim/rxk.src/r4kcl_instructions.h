@@ -1,3 +1,4 @@
+virtual int instruction_4k42(t_mem code) { return resNOT_DONE; }
 virtual int instruction_4k45(t_mem code) { return resNOT_DONE; }
 virtual int instruction_4k48(t_mem code) { return resNOT_DONE; }
 virtual int instruction_4k4c(t_mem code) { return resNOT_DONE; }

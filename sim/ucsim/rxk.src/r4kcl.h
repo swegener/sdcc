@@ -38,13 +38,17 @@ extern inline u32_t px8se(u32_t px, u8_t offset);
 extern inline u32_t px16(u32_t px, u16_t offset);
 extern inline u32_t px16se(u32_t px, u16_t offset);
 
-#define rJ  (JK.r.J)
-#define rK  (JK.r.K)
-#define rJK (JK.JK)
+#define rJ	(JK.r.J)
+#define rK	(JK.r.K)
+#define rJK	(JK.JK)
+#define rJKHL	(((u32_t)JK.JK<<16)+HL.HL)
+#define rBCDE	(((u32_t)BC.BC<<16)+DE.DE)
 
-#define raJ  (aJK.r.J)
-#define raK  (aJK.r.K)
-#define raJK (aJK.JK)
+#define raJ	(aJK.r.J)
+#define raK	(aJK.r.K)
+#define raJK	(aJK.JK)
+#define raJKHL	(((u32_t)aJK.JK<<16)+aHL.HL)
+#define raBCDE	(((u32_t)aBC.BC<<16)+aDE.DE)
 
 class cl_r4k: public cl_r3ka
 {
@@ -53,10 +57,12 @@ public:
   RP(aJK,JK,J,K);
   u32_t rPW, rPX, rPY, rPZ;
   u32_t raPW, raPX, raPY, raPZ;
+  u8_t rHTR;
   class cl_cell8 cJ, caJ, cK, caK;
   class cl_cell16 cJK, caJK;
   class cl_cell32 cPW, cPX, cPY, cPZ;
   class cl_cell32 caPW, caPX, caPY, caPZ;
+  class cl_cell8 cHTR;
  public:
   cl_r4k(class cl_sim *asim);
   virtual int init();
@@ -70,16 +76,46 @@ public:
   
   virtual void print_regs(class cl_console_base *con);
 
+  // move
+  virtual int ld_pd_ihtr_hl(class cl_cell32 &dest);
+  
+  // arith
+  virtual int subhl(class cl_cell16 &dest, u16_t op);
+  virtual int test8(u8_t op);					// 0f,2t,0w,0r
+  virtual int test16(u16_t op);					// 0f,2t,0w,0r
+  virtual int test32(u32_t op);					// 0f,2t,0w,0r
+  
   virtual void mode3k(void);
   virtual void mode4k(void);
 
   virtual int EXX(t_mem code);
+
+  // Page 0, m4 mode
+  virtual int RL_HL(t_mem code) { return rot17left(destHL(), rHL); }
+  virtual int RL_BC(t_mem code) { return rot17left(destBC(), rBC); }
+  virtual int SUB_HL_JK(t_mem code) { return subhl(destHL(), rJK); }
+  virtual int SUB_HL_DE(t_mem code) { return subhl(destHL(), rDE); }
+  virtual int TEST_HL(t_mem code) { return test16(rHL); }
+  
+  // Page ED, m4 mode
+  virtual int CBM_N(t_mem code);
+  virtual int LD_PW_iHTR_HL(t_mem code) { return ld_pd_ihtr_hl(cPW); }
+  virtual int LD_PX_iHTR_HL(t_mem code) { return ld_pd_ihtr_hl(cPX); }
+  virtual int LD_PY_iHTR_HL(t_mem code) { return ld_pd_ihtr_hl(cPY); }
+  virtual int LD_PZ_iHTR_HL(t_mem code) { return ld_pd_ihtr_hl(cPZ); }
+  virtual int SBOX_A(t_mem code);
+  virtual int IBOX_A(t_mem code);
+  virtual int DWJNZ(t_mem code);
+  virtual int CP_HL_DE(t_mem code) { return cp16(rHL, rDE); }
+  virtual int TEST_BC(t_mem code) { tick(2); return test16(rBC); }
   
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);
-
-  // Starter of page 6D
+  virtual int TEST_IR(t_mem code) { tick(2); return test16(cIR->get()); }
+  
+  // Starter of extra pages
   virtual int PAGE_4K6D(t_mem code);
+  virtual int PAGE_4K7F(t_mem code);
 };
 
 class cl_r4k_cpu: public cl_rxk_cpu

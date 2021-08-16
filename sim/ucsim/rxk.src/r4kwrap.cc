@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 int instruction_wrapper_4knone(class cl_uc *uc, t_mem code) { return resINV_INST; }
 
+int instruction_wrapper_4k42(class cl_uc *uc, t_mem code) { return ((class cl_r4k *)uc)->instruction_4k45(code); }
 int instruction_wrapper_4k45(class cl_uc *uc, t_mem code) { return ((class cl_r4k *)uc)->instruction_4k45(code); }
 int instruction_wrapper_4k48(class cl_uc *uc, t_mem code) { return ((class cl_r4k *)uc)->instruction_4k48(code); }
 int instruction_wrapper_4k4c(class cl_uc *uc, t_mem code) { return ((class cl_r4k *)uc)->instruction_4k4c(code); }

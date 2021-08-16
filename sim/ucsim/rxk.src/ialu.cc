@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "rxkcl.h"
 #include "r3kacl.h"
+#include "r4kcl.h"
 
 
 /*
@@ -889,6 +890,20 @@ cl_rxk::cp8(u8_t op1, u8_t op2)
 }
 
 int
+cl_rxk::cp16(u16_t op1, u16_t op2)
+{
+  class cl_cell8 &f= destF();
+  u8_t forg= rF & ~flagAll;
+  u16_t res= op1-op2;
+  if (op1<op2) forg|= (flagS|flagC);
+  if (op1==op2) forg|= flagZ;
+  if ( 0x8000 & ( (res&op1&~op2) | (~res&~op1&op2) ) ) forg|= flagV;
+  f.W(forg);
+  tick(3);
+  return resGO;
+}
+
+int
 cl_rxk::ADD_SP_d(t_mem code)
 {
   i8_t d= fetch();
@@ -954,6 +969,57 @@ cl_r3ka::UMx(bool add)
     tick(8);
   }
   while (rBC);
+  return resGO;
+}
+
+int
+cl_r4k::subhl(class cl_cell16 &dest, u16_t op)
+{
+  i32_t v, o;
+  u8_t forg= rF & ~flagC;
+  v= rHL;
+  o= op;
+  v= v - o;
+  if (v & 0xffff0000) forg|= flagC;
+  destF().W(forg);
+  dest.W(v);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_r4k::test8(u8_t op)
+{
+  u8_t forg= rF & ~flagAll;
+  if (!op) forg|= flagZ;
+  if (op & 0x80) forg|= flagS;
+  if (op & 0xf0) forg|= flagL;
+  destF().W(forg);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_r4k::test16(u16_t op)
+{
+  u8_t forg= rF & ~flagAll;
+  if (!op) forg|= flagZ;
+  if (op & 0x8000) forg|= flagS;
+  if (op & 0xf000) forg|= flagL;
+  destF().W(forg);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_r4k::test32(u32_t op)
+{
+  u8_t forg= rF & ~flagAll;
+  if (!op) forg|= flagZ;
+  if (op & 0x80000000) forg|= flagS;
+  if (op & 0xf0000000) forg|= flagL;
+  destF().W(forg);
+  tick(1);
   return resGO;
 }
 

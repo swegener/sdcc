@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define DPDDM4_HEADER
 
 #define LD_A_iIRA	instruction_dd_06
+#define TEST_IR		instruction_dd_4c
 
 #endif
 

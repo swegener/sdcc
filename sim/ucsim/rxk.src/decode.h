@@ -116,6 +116,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_E_E		instruction_5b
 #define LD_E_A		instruction_5f
 #define LD_L_A		instruction_6f
+#define LD_L_L		instruction_6d
 #define LD_H_A		instruction_67
 #define LD_A_B		instruction_78
 #define LD_A_C		instruction_79
@@ -123,6 +124,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_A_E		instruction_7b
 #define LD_A_H		instruction_7c
 #define LD_A_L		instruction_7d
+#define LD_A_A		instruction_7f
 #define XOR_A		instruction_af
 #define OR_A		instruction_b7
 #define RET_NZ		instruction_c0

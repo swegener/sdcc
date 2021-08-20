@@ -818,5 +818,20 @@ cl_r4k::IBOX_A(t_mem code)
   return resGO;
 }
 
+int
+cl_r4k::PUSH_MN(t_mem code)
+{
+  u8_t m, n;
+  n= fetch();
+  m= fetch();
+  cSP.W(rSP-1);
+  rom->write(rSP, m);
+  cSP.W(rSP-1);
+  rom->write(rSP, n);
+  vc.wr+= 2;
+  tick5p1(14);
+  return resGO;
+}
+
 
 /* End of rxk.src/imove.cc */

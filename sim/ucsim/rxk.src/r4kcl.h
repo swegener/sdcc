@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "r3kacl.h"
 #include "dp0m4.h"
+#include "dpedm4.h"
 #include "dpddm4.h"
 
 
@@ -68,7 +69,8 @@ public:
 
   virtual struct dis_entry *dis_entry(t_addr addr);
   virtual struct dis_entry *dis_6d_entry(t_addr addr);
-  
+  virtual int longest_inst(void) { return 6; }
+
   virtual void print_regs(class cl_console_base *con);
 
   // move
@@ -79,6 +81,12 @@ public:
   virtual int test8(u8_t op);					// 0f,2t,0w,0r
   virtual int test16(u16_t op);					// 0f,2t,0w,0r
   virtual int test32(u32_t op);					// 0f,2t,0w,0r
+  virtual int flag_cc_hl(t_mem code);				// 0f,4t,0w,0r
+  
+  // brach
+  virtual int lljp_cx(t_mem code);				// 4f,14t,0w,0r
+  virtual int lljp_cc(t_mem code);				// 4f,14t,0w,0r
+  virtual int jre_cx_cc(bool cond);				// 2f,9t,0w,0r
   
   virtual void mode3k(void);
   virtual void mode4k(void);
@@ -103,6 +111,31 @@ public:
   virtual int DWJNZ(t_mem code);
   virtual int CP_HL_DE(t_mem code) { return cp16(rHL, rDE); }
   virtual int TEST_BC(t_mem code) { tick(2); return test16(rBC); }
+  virtual int LLJP_GT_LXPC_MN(t_mem code)  { return lljp_cx(code); }
+  virtual int LLJP_GTU_LXPC_MN(t_mem code) { return lljp_cx(code); }
+  virtual int LLJP_LT_LXPC_MN(t_mem code)  { return lljp_cx(code); }
+  virtual int LLJP_V_LXPC_MN(t_mem code)   { return lljp_cx(code); }
+  virtual int LLJP_NZ_LXPC_MN(t_mem code)  { return lljp_cc(code); }
+  virtual int LLJP_Z_LXPC_MN(t_mem code)   { return lljp_cc(code); }
+  virtual int LLJP_NC_LXPC_MN(t_mem code)  { return lljp_cc(code); }
+  virtual int LLJP_C_LXPC_MN(t_mem code)   { return lljp_cc(code); }
+  virtual int PUSH_MN(t_mem code);
+  virtual int JRE_GT_EE(t_mem code)  { return jre_cx_cc(cond_GT(rF)); }
+  virtual int JRE_LT_EE(t_mem code)  { return jre_cx_cc(cond_LT(rF)); }
+  virtual int JRE_GTU_EE(t_mem code) { return jre_cx_cc(cond_GTU(rF)); }
+  virtual int JRE_V_EE(t_mem code)   { return jre_cx_cc(rF&flagV); }
+  virtual int JRE_NZ_EE(t_mem code)  { return jre_cx_cc(!(rF&flagZ)); }
+  virtual int JRE_Z_EE(t_mem code)   { return jre_cx_cc(rF&flagZ); }
+  virtual int JRE_NC_EE(t_mem code)  { return jre_cx_cc(!(rF&flagC)); }
+  virtual int JRE_C_EE(t_mem code)   { return jre_cx_cc(rF&flagC); }
+  virtual int FLAG_NZ_HL(t_mem code) { return flag_cc_hl(code); }
+  virtual int FLAG_Z_HL(t_mem code)   { return flag_cc_hl(code); }
+  virtual int FLAG_NC_HL(t_mem code)  { return flag_cc_hl(code); }
+  virtual int FLAG_C_HL(t_mem code)   { return flag_cc_hl(code); }
+  virtual int FLAG_GT_HL(t_mem code)  { return flag_cc_hl(code); }
+  virtual int FLAG_LT_HL(t_mem code)  { return flag_cc_hl(code); }
+  virtual int FLAG_GTU_HL(t_mem code) { return flag_cc_hl(code); }
+  virtual int FLAG_V_HL(t_mem code)   { return flag_cc_hl(code); }
   
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);

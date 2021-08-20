@@ -297,7 +297,8 @@ cl_rxk::disassc(t_addr addr, chars *comment)
   int i;
   bool first;
   unsigned int x, h, l;
-
+  //t_addr start_at= addr;
+  
   if (code == 0xcb)
     return disassc_cb(addr, comment);
   
@@ -361,6 +362,16 @@ cl_rxk::disassc(t_addr addr, chars *comment)
 		work.appendf("0x%04x", AU16(a));
 	      }
 	      break;
+	    case 'R': // 16 bit signed PC relative
+	      {
+		u8_t el, eh;
+		el= rom->get(++addr);
+		eh= rom->get(++addr);
+		i16_t ee= eh*256+el;
+		t_addr a= (addr+1 + ee) & 0xffff;
+		work.appendf("0x%04x", a);
+		break;
+	      }
 	    case 'I':
 	      work.appendf("%s", nIR);
 	      break;
@@ -370,6 +381,14 @@ cl_rxk::disassc(t_addr addr, chars *comment)
 	      else
 		work.append("IY");
 	      break;
+	    case 'X': // LXPC 0 1 2 3 xpl xph
+	      {
+		u16_t x;
+		x= rom->read(addr+4) * 256;
+		x+= rom->read(addr+3);
+		work.appendf("0x%03x", x);
+		break;
+	      }
 	    }
 	  if (comment && temp.nempty())
 	    comment->append(temp);

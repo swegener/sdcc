@@ -1023,5 +1023,33 @@ cl_r4k::test32(u32_t op)
   return resGO;
 }
 
+int
+cl_r4k::flag_cc_hl(t_mem code)
+{
+  bool cond;
+  if ((code & 0x60) == 0x40)
+    {
+      switch ((code >> 3) & 3)
+	{
+	case 0: cond= !(rF & flagZ); break;
+	case 1: cond= rF & flagZ; break;
+	case 2: cond= !(rF & flagC); break;
+	case 3: cond= rF & flagC; break;
+	}
+    }
+  else if ((code & 0x60) == 0x20)
+    {
+      switch ((code >> 3) & 3)
+	{
+	case 0: cond= cond_GT(rF); break;
+	case 1: cond= cond_LT(rF); break;
+	case 2: cond= cond_GTU(rF); break;
+	case 3: cond= rF & flagV; break;
+	}
+    }
+  cHL.W(cond?1:0);
+  tick(3);
+  return resGO;
+}
 
 /* End of rxk.src/ialu.cc */

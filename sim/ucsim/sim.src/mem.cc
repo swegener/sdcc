@@ -1929,7 +1929,14 @@ cl_memory_chip::is_slot(/*t_mem*/void *data_ptr)
     return -1;
   if (p > &(a[alloc_size-1]))
     return -2;
-  return p - &(a[0]);
+  t_addr i= p - a;
+  if (width <= 8)
+    return i;
+  if (width <= 16)
+    return i/2;
+  if (width <= 32)
+    return i/4;
+  return i;
 }
 /*
 t_mem

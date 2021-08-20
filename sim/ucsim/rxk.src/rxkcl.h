@@ -40,53 +40,48 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base of RXK processor
  */
 
-#ifdef WORDS_BIGENDIAN
-#define RP(N,N16,NH,NL) union			\
-		      {				\
-			u16_t N16;		\
-			struct {		\
-			  u8_t NH;		\
-			  u8_t NL;		\
-			} r;			\
-  } N
-#else
-#define RP(N,N16,NH,NL) union			\
-		      {				\
-			u16_t N16;		\
-			struct {		\
-			  u8_t NL;		\
-			  u8_t NH;		\
-			} r;			\
-  } N
-#endif
 
 #define rA (AF.r.A)
 #define rF (AF.r.F)
-#define rB (BC.r.B)
-#define rC (BC.r.C)
-#define rD (DE.r.D)
-#define rE (DE.r.E)
-#define rH (HL.r.H)
-#define rL (HL.r.L)
 #define rAF (AF.AF)
-#define rBC (BC.BC)
-#define rDE (DE.DE)
-#define rHL (HL.HL)
 #define rXPC (mem->get_xpc())
 #define cXPC (*XPC)
 
+#define rBCDE (BCDE.BCDE)
+#define rBC   (BCDE.r32.r16h.BC)
+#define rDE   (BCDE.r32.r16l.DE)
+#define rB    (BCDE.r32.r16h.r.B)
+#define rC    (BCDE.r32.r16h.r.C)
+#define rD    (BCDE.r32.r16l.r.D)
+#define rE    (BCDE.r32.r16l.r.E)
+
+#define rJKHL (JKHL.JKHL)
+#define rJK   (JKHL.r32.r16h.JK)
+#define rHL   (JKHL.r32.r16l.HL)
+#define rJ    (JKHL.r32.r16h.r.J)
+#define rK    (JKHL.r32.r16h.r.K)
+#define rH    (JKHL.r32.r16l.r.H)
+#define rL    (JKHL.r32.r16l.r.L)
+
 #define raA (aAF.r.A)
 #define raF (aAF.r.F)
-#define raB (aBC.r.B)
-#define raC (aBC.r.C)
-#define raD (aDE.r.D)
-#define raE (aDE.r.E)
-#define raH (aHL.r.H)
-#define raL (aHL.r.L)
 #define raAF (aAF.AF)
-#define raBC (aBC.BC)
-#define raDE (aDE.DE)
-#define raHL (aHL.HL)
+
+#define raBCDE (aBCDE.BCDE)
+#define raBC   (aBCDE.r32.r16h.BC)
+#define raDE   (aBCDE.r32.r16l.DE)
+#define raB    (aBCDE.r32.r16h.r.B)
+#define raC    (aBCDE.r32.r16h.r.C)
+#define raD    (aBCDE.r32.r16l.r.D)
+#define raE    (aBCDE.r32.r16l.r.E)
+
+#define raJKHL (aJKHL.JKHL)
+#define raJK   (aJKHL.r32.r16h.JK)
+#define raHL   (aJKHL.r32.r16l.HL)
+#define raJ    (aJKHL.r32.r16h.r.J)
+#define raK    (aJKHL.r32.r16h.r.K)
+#define raH    (aJKHL.r32.r16l.r.H)
+#define raL    (aJKHL.r32.r16l.r.L)
 
 enum {
   flagS = 0x80,
@@ -112,13 +107,15 @@ class cl_rxk: public cl_rxk_base
 {
 public:
   RP(AF,AF,A,F);
-  RP(BC,BC,B,C);
-  RP(DE,DE,D,E);
-  RP(HL,HL,H,L);
   RP(aAF,AF,A,F);
   RP(aBC,BC,B,C);
   RP(aDE,DE,D,E);
   RP(aHL,HL,H,L);
+  R32(BCDE,BCDE,BC,DE,B,C,D,E);
+  R32(JKHL,JKHL,JK,HL,J,K,H,L);
+  R32(aBCDE,BCDE,BC,DE,B,C,D,E);
+  R32(aJKHL,JKHL,JK,HL,J,K,H,L);
+  class cl_cell32 cBCDE, caBCDE;
   u8_t rIP, rIIR, rEIR;
   u16_t rIX, rIY, rSP;
   class cl_cell8 cIP, cIIR, cEIR;
@@ -143,7 +140,8 @@ public:
   virtual void mk_hw_elements(void);
   virtual void make_cpu_hw(void);
   virtual void make_memories(void);
-
+  virtual t_addr chip_size() { return 0x100000; }
+  
   virtual int clock_per_cycle(void) { return 1; }
   //virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *dis_entry(t_addr addr);
@@ -682,13 +680,14 @@ class cl_rxk_cpu: public cl_hw
 {
 protected:
   class cl_rxk *ruc;
-  class cl_cell8 *segsize, *dataseg, *stackseg;
+  class cl_memory_cell *segsize, *dataseg, *stackseg;
 public:
   cl_rxk_cpu(class cl_uc *auc);
   virtual int init(void);
   //virtual int cfg_size() { return rxk_cpu_nuof; }
   virtual const char *cfg_help(t_addr addr);
   
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
   //virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
   virtual void print_info(class cl_console_base *con);

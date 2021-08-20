@@ -94,6 +94,10 @@ cl_r4k::init(void)
 {
   cl_r3ka::init();
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
+  RCV(BCDE);
+  RCV(JKHL);
+  RCV(aBCDE);
+  RCV(aJKHL);
   RCV(J);
   RCV(K);
   RCV(JK);
@@ -112,6 +116,12 @@ cl_r4k::init(void)
 #undef RCV
   //mode2k();
   fill_7f_wrappers(itab_7f);
+
+  LXPC= new cl_cell16(12);
+  reg_cell_var(LXPC, mem->aof_lxpc(),
+  	       "LXPC", "MMU register: LXPC");
+  cpu->register_cell(LXPC);
+  
   return 0;
 }
 
@@ -391,7 +401,7 @@ cl_r4k::print_regs(class cl_console_base *con)
   con->dd_color("answer");
   con->dd_printf("                  SZxxxVxC\n");
 
-  con->dd_printf("XPC= 0x%02x IP= 0x%02x IIR= 0x%02x EIR= 0x%02x\n",
+  con->dd_printf("XPC= 0x%03x IP= 0x%02x IIR= 0x%02x EIR= 0x%02x\n",
 		 mem->get_xpc(), rIP, rIIR, rEIR);
   
   con->dd_printf("BC= ");
@@ -416,13 +426,24 @@ cl_r4k::print_regs(class cl_console_base *con)
   rom->dump(0, rSP, rSP+7, 8, con);
   con->dd_color("answer");
 
-  con->dd_printf("aAF= 0x%02x-0x%02x  ", raA, raF);
-  con->dd_printf("aBC= 0x%02x-0x%02x  ", raB, raC);
-  con->dd_printf("aDE= 0x%02x-0x%02x  ", raD, raE);
-  con->dd_printf("aHL= 0x%02x-0x%02x  ", raH, raL);
-  con->dd_printf("aJK= 0x%02x-0x%02x  ", raJ, raK);
+  con->dd_printf("aAF= 0x%02x-%02x  ", raA, raF);
+  con->dd_printf("aBC= 0x%02x-%02x  ", raB, raC);
+  con->dd_printf("aDE= 0x%02x-%02x  ", raD, raE);
+  con->dd_printf("aHL= 0x%02x-%02x  ", raH, raL);
+  con->dd_printf("aJK= 0x%02x-%02x  ", raJ, raK);
   con->dd_printf("\n");
-  
+
+  con->dd_printf(" PW= 0x%04x-%04x  ", rPW>>16, rPW&0xffff);
+  con->dd_printf(" PX= 0x%04x-%04x  ", rPX>>16, rPX&0xffff);
+  con->dd_printf(" PY= 0x%04x-%04x  ", rPY>>16, rPY&0xffff);
+  con->dd_printf(" PZ= 0x%04x-%04x  ", rPZ>>16, rPZ&0xffff);
+  con->dd_printf("\n");
+  con->dd_printf("aPW= 0x%04x-%04x  ", raPW>>16, raPW&0xffff);
+  con->dd_printf("aPX= 0x%04x-%04x  ", raPX>>16, raPX&0xffff);
+  con->dd_printf("aPY= 0x%04x-%04x  ", raPY>>16, raPY&0xffff);
+  con->dd_printf("aPZ= 0x%04x-%04x  ", raPZ>>16, raPZ&0xffff);
+  con->dd_printf("\n");
+    
   print_disass(PC, con);
 }
 
@@ -648,68 +669,6 @@ cl_r4k::mode4k(void)
   itab[0xbf]= instruction_wrapper_4kbf;
 }
 
-
-/*
- * CPU peripheral for r4k
- */
-
-cl_r4k_cpu::cl_r4k_cpu(class cl_uc *auc):
-  cl_rxk_cpu(auc)
-{
-  r4uc= (class cl_r4k *)auc;
-  edmr= new cl_cell8();
-}
-
-int
-cl_r4k_cpu::init(void)
-{
-  cl_rxk_cpu::init();
-
-  uc->reg_cell_var(edmr, &(r4uc->edmr),
-		   "EDMR", "Enable dual-mode register");
-  edmr->add_hw(this);
-  return 0;
-}
-
-t_mem
-cl_r4k_cpu::read(class cl_memory_cell *cell)
-{
-  if (cell == edmr)
-    return edmr->get();
-  return cell->get();
-}
-
-void
-cl_r4k_cpu::write(class cl_memory_cell *cell, t_mem *val)
-{
-  if (cell == edmr)
-    {
-      if (*val & 0xc0)
-	r4uc->mode4k();
-      else
-	r4uc->mode3k();
-    }
-}
-
-const char *
-cl_r4k_cpu::cfg_help(t_addr addr)
-{
-  switch (addr)
-    {
-      //case rxk_cpu_xpc: return "MMU register: XPC";
-      //case rxk_cpu_nuof: return "";
-    }
-  return "Not used";
-}
-
-
-void
-cl_r4k_cpu::print_info(class cl_console_base *con)
-{
-  cl_rxk_cpu::print_info(con);
-  con->dd_printf("EDMR    : 0x%02x\n", edmr->read());
-}
-
 int
 cl_r4k::EXX(t_mem code)
 {
@@ -834,6 +793,130 @@ cl_r4k::PAGE_4K6D(t_mem code)
     }
   
   return resGO;
+}
+
+
+/*
+ * CPU peripheral for r4k
+ */
+
+cl_r4k_cpu::cl_r4k_cpu(class cl_uc *auc):
+  cl_rxk_cpu(auc)
+{
+  r4uc= (class cl_r4k *)auc;
+  edmr= new cl_cell8();
+}
+
+int
+cl_r4k_cpu::init(void)
+{
+  cl_rxk_cpu::init();
+
+  uc->reg_cell_var(edmr, &(r4uc->edmr),
+		   "EDMR", "Enable dual-mode register");
+  edmr->add_hw(this);
+
+  stacksegl= register_cell(ruc->ioi, 0x1a,
+			   "STACKSEGL", "MMU register STACKSEGL");
+  stacksegh= register_cell(ruc->ioi, 0x1b,
+			   "STACKSEGH", "MMU register STACKSEGH");
+  datasegl= register_cell(ruc->ioi, 0x1e,
+			  "DATASEGL", "MMU register DATASEGL");
+  datasegh= register_cell(ruc->ioi, 0x1f,
+			  "DATASEGH", "MMU register DATASEGH");
+  return 0;
+}
+
+t_mem
+cl_r4k_cpu::read(class cl_memory_cell *cell)
+{
+  if (cell == edmr)
+    return edmr->get();
+  return cell->get();
+}
+
+void
+cl_r4k_cpu::write(class cl_memory_cell *cell, t_mem *val)
+{
+  if (cell == edmr)
+    {
+      if (*val & 0xc0)
+	r4uc->mode4k();
+      else
+	r4uc->mode3k();
+    }
+  
+  if (cell == dataseg)
+    {
+      (*val)&= 0xff;
+      datasegl->set(*val);
+      ruc->mem->set_dataseg(datasegh->read() * 256 + *val);
+    }
+  else if (cell == datasegl)
+    {
+      (*val)&= 0xff;
+      dataseg->set(*val);
+      ruc->mem->set_dataseg(datasegh->read() * 256 + *val);
+    }
+  else if (cell == datasegh)
+    {
+      (*val)&= 0x0f;
+      ruc->mem->set_dataseg((*val) * 256 + datasegl->read());
+    }
+  
+  else if (cell == stackseg)
+    {
+      (*val)&= 0xff;
+      stacksegl->set(*val);
+      ruc->mem->set_stackseg(stacksegh->read() * 256 + *val);
+    }
+  else if (cell == stacksegl)
+    {
+      (*val)&= 0xff;
+      stackseg->set(*val);
+      ruc->mem->set_stackseg(stacksegh->read() * 256 + *val);
+    }
+  else if (cell == stacksegh)
+    {
+      (*val)&= 0x0f;
+      ruc->mem->set_stackseg((*val) * 256 + stacksegl->read());
+    }
+
+  else if (cell == segsize)
+    {
+      (*val)&= 0xff;
+      ruc->mem->set_segsize(*val);
+    }
+
+  else if (cell == ruc->XPC)
+    {
+      (*val)&= 0xff;
+      ruc->mem->set_xpc(*val);
+    }
+  else if (cell == r4uc->LXPC)
+    {
+      (*val)&= 0xfff;
+      ruc->mem->set_lxpc(*val);
+    }
+}
+
+const char *
+cl_r4k_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+      //case rxk_cpu_xpc: return "MMU register: XPC";
+      //case rxk_cpu_nuof: return "";
+    }
+  return "Not used";
+}
+
+
+void
+cl_r4k_cpu::print_info(class cl_console_base *con)
+{
+  cl_rxk_cpu::print_info(con);
+  con->dd_printf("EDMR    : 0x%02x\n", edmr->read());
 }
 
 

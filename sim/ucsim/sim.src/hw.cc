@@ -222,6 +222,27 @@ cl_hw::register_cell(class cl_address_space *mem, t_addr addr)
 }
 
 class cl_memory_cell *
+cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
+		     chars vname, chars vdesc)
+{
+  if (mem)
+    mem->register_hw(addr, this, false);
+  else
+    printf("regcell JAJ no mem\n");
+  class cl_memory_cell *c= mem->get_cell(addr);
+  if (c)
+    {
+      if (vname.nempty())
+	{
+	  class cl_cvar *v;
+	  uc->vars->add(v= new cl_cvar(vname, c, vdesc));
+	  v->init();
+	}
+    }
+  return c;
+}
+
+class cl_memory_cell *
 cl_hw::register_cell(class cl_memory_cell *cell)
 {
   if (cell)

@@ -1,5 +1,12 @@
 2021-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/main.c,
+	  doc/sdccman.lyx,
+	  .version:
+	  Enable new calling convention for z80, z180, z80n.
+
+2021-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Do not use some aspects of new calling convention for banked functions.
 

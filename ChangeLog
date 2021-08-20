@@ -1,3 +1,8 @@
+2021-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Do not use some aspects of new calling convention for banked functions.
+
 2021-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

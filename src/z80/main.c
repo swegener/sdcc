@@ -160,7 +160,6 @@ static char *_keywordsgb[] = {
   "_naked",
   "critical",
   "interrupt",
-  "sdccoldcall",
   "z88dk_callee",
   "smallc",
   NULL
@@ -173,7 +172,6 @@ static char *_keywordstlcs90[] = {
   "_naked",
   "critical",
   "interrupt",
-  "sdccoldcall",
   "z88dk_fastcall",
   "z88dk_callee",
   "smallc",

@@ -3,7 +3,7 @@
 	* src/z80/main.c,
 	  doc/sdccman.lyx,
 	  .version:
-	  Enable new calling convention for z80, z180, z80n.
+	  Enable new calling convention for z80, z180, z80n, r2k, r2ka, r3ka, tlcs90, ez80_z80.
 
 2021-08-20 Philipp Klaus Krause <pkk AT spth.de>
 

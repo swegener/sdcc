@@ -1931,7 +1931,7 @@ isFuncCalleeStackCleanup (sym_link *ftype)
   if (IS_GB)
     return true;
 
-  // Callee cleans up stack if return value has at most 16 bits or the return value is float and there is a first agrument of type float.
+  // Callee cleans up stack if return value has at most 16 bits or the return value is float and there is a first argument of type float.
   if (!ftype->next || getSize (ftype->next) <= 2)
     return true;
   else if (IS_FLOAT (ftype->next) && farg)

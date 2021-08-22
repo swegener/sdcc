@@ -1,3 +1,11 @@
+2021-08-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pic16/libsdcc/float/fseq.c,
+	  device/lib/pic16/libsdcc/float/fsgt.c,
+	  device/lib/pic16/libsdcc/float/fslt.c,
+	  device/lib/pic16/libsdcc/float/fsneq.c:
+	  Fix bug #3274.
+
 2021-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c,

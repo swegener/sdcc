@@ -140,7 +140,7 @@ struct dis_entry disass_p0m3[]=
     { 0xbe, 0xff, ' ', 1, "CP A,(HL)" },
     { 0xbf, 0xff, ' ', 1, "CP A,A" },
 
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
   
 /* End of rxk.src/gp0m3.cc */

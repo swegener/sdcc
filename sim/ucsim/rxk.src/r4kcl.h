@@ -58,6 +58,7 @@ public:
   class cl_cell32 caJKHL, caPW, caPX, caPY, caPZ;
   class cl_cell8 cHTR;
   class cl_cell16 *LXPC;
+  class cl_cell32 *cIRR, *caIRR;
  public:
   cl_r4k(class cl_sim *asim);
   virtual int init();
@@ -70,11 +71,17 @@ public:
   virtual struct dis_entry *dis_entry(t_addr addr);
   virtual struct dis_entry *dis_6d_entry(t_addr addr);
   virtual int longest_inst(void) { return 6; }
-
+  virtual void disass_irr(chars *work, bool dd);
+  
+  virtual void select_IRR(bool dd);
+  virtual class cl_cell32 *destIRR(void) { return altd?caIRR:cIRR; }
+  
   virtual void print_regs(class cl_console_base *con);
 
   // move
   virtual int ld_pd_ihtr_hl(class cl_cell32 &dest);
+  virtual int ld_irr_iird(class cl_cell16 &ir);			// 1f,14t,0w,4r
+  virtual int ld_iird_irr(class cl_cell16 &ir);			// 1f,19t,4w,0r
   
   // arith
   virtual int subhl(class cl_cell16 &dest, u16_t op);
@@ -140,6 +147,36 @@ public:
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);
   virtual int TEST_IR(t_mem code) { tick(2); return test16(cIR->get()); }
+  virtual int LD_IRR_iHL(t_mem code);
+  virtual int LD_IRR_iIXd(t_mem code) { return ld_irr_iird(cIX); }
+  virtual int LD_IRR_iIYd(t_mem code) { return ld_irr_iird(cIY); }
+  virtual int LD_IRR_iSPn(t_mem code);
+  virtual int LD_iHL_IRR(t_mem code);
+  virtual int LD_iIXd_IRR(t_mem code) { return ld_iird_irr(cIX); }
+  virtual int LD_iIYd_IRR(t_mem code) { return ld_iird_irr(cIY); }
+  virtual int LD_iSPn_IRR(t_mem code);
+  virtual int NEG_IRR(t_mem coed) { return sub32(0, cIRR->get(),
+						 *cIRR, false); }
+  virtual int POP_IRR(t_mem code);
+  virtual int PUSH_IRR(t_mem code);
+  virtual int RL_1_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
+							       cIRR->get(),
+							       1); }
+  virtual int RL_2_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
+							       cIRR->get(),
+							       2); }
+  virtual int RL_4_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
+							       cIRR->get(),
+							       4); }
+  virtual int RLC_1_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
+								cIRR->get(),
+								1); }
+  virtual int RLC_2_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
+								cIRR->get(),
+								2); }
+  virtual int RLC_4_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
+								cIRR->get(),
+								4); }
   
   // Starter of extra pages
   virtual int PAGE_4K6D(t_mem code);

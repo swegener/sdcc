@@ -65,7 +65,7 @@ struct dis_entry disass_pedm4[]=
     { 0xac, 0xff, ' ', 2, "FLAG GTU,HL" },
     { 0xbc, 0xff, ' ', 2, "FLAG V,HL" },
 
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
   
 /* End of rxk.src/gpedm4.cc */

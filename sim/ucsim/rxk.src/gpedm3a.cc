@@ -44,7 +44,7 @@ struct dis_entry disass_pedm3a[]=
     { 0xc0, 0xff, ' ', 2, "UMA" },
     { 0xc8, 0xff, ' ', 2, "UMS" },
 
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
   
 /* End of rxk.src/gpedm3a.cc */

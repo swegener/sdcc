@@ -90,7 +90,7 @@ struct dis_entry disass_pddm3[]=
 
     { 0xe9, 0xff, ' ', 2, "JP (%I)" },
 
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
   
 /* End of rxk.src/gpddm3.cc */

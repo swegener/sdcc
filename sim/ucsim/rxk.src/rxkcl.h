@@ -156,7 +156,8 @@ public:
   virtual char *disassc_dd_cb(t_addr addr, chars *comment= NULL);
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 4; }
-
+  virtual void disass_irr(chars *work, bool dd) {}
+  
   virtual void save_hist();
   virtual void print_regs(class cl_console_base *con);
 
@@ -171,6 +172,7 @@ public:
   virtual void tick5p9(int n) { tick(n); }
   virtual void tick5m1(int n) { tick(n+2); }
   virtual void tick5m2(int n) { tick(n+2); }
+  virtual void select_IRR(bool dd) {}
   
   class cl_cell16 &destAF(void) { return altd?caAF:cAF; }
   class cl_cell16 &destBC(void) { return altd?caBC:cBC; }
@@ -255,9 +257,11 @@ public:
   virtual int dec_r(class cl_cell8 &cr, u8_t op);
   virtual int rot8left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rlc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
+  virtual int rot32left(class cl_cell32 &dest, u32_t op, int nr);//0f,2t,0r,0w
   virtual int rot9left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rl(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot17left(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
+  virtual int rot33left(class cl_cell32 &dest, u32_t op, int nr);//0f,2t,0r,0w
   virtual int rot8right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rrc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot9right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
@@ -281,6 +285,7 @@ public:
   virtual int add8(u8_t op2, bool cy);				// 0f,4t,0r,0w
   virtual int sub8(u8_t op2, bool cy);				// 0f,4t,0r,0w
   virtual int sub16(u16_t op2, bool cy);			// 0f,4t,0r,0w
+  virtual int sub32(u32_t op1, u32_t op2, class cl_cell32 &cRes, bool cy);
   
   virtual int inc_i8(t_addr addr);
   virtual int dec_i8(t_addr addr);

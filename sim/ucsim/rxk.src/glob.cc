@@ -205,7 +205,7 @@ struct dis_entry disass_rxk[]=
     { 0xfc, 0xff, ' ', 1, "RR HL" },
     { 0xfe, 0xff, ' ', 2, "CP A,%b" },
     
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
 
 

@@ -78,7 +78,7 @@ struct dis_entry disass_pedm3[]=
     { 0x6a, 0xff, ' ', 2, "ADC HL,HL" },
     { 0x7a, 0xff, ' ', 2, "ADC HL,SP" },
 
-    { 0, 0, 0, 0, 0, 0 }
+    { 0, 0, 0, 0, 0, 0, 0 }
   };
   
 /* End of rxk.src/gpedm3.cc */

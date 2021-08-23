@@ -803,6 +803,39 @@ cl_r4k::ld_pd_ihtr_hl(class cl_cell32 &dest)
 }
 
 int
+cl_r4k::ld_irr_iird(class cl_cell16 &ir)
+{
+  u32_t v= 0;
+  u16_t a= ir.get();
+  i8_t d= fetch();
+  a+= d;
+  v= (v>>8) + rwas->read(a++);
+  v= (v>>8) + rwas->read(a++);
+  v= (v>>8) + rwas->read(a++);
+  v= (v>>8) + rwas->read(a);
+  vc.rd+= 4;
+  destIRR()->W(v);
+  tick5p1(14);
+  return resGO;
+}
+
+int
+cl_r4k::ld_iird_irr(class cl_cell16 &ir)
+{
+  u32_t v= cIRR->get();
+  u16_t a= ir.get();
+  i8_t d= fetch();
+  a+= d;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a  , v);
+  vc.wr+= 4;
+  tick5p1(18);
+  return resGO;
+}
+
+int
 cl_r4k::SBOX_A(t_mem code)
 {
   destA().W(sbox_tab[rA]);
@@ -830,6 +863,98 @@ cl_r4k::PUSH_MN(t_mem code)
   rom->write(rSP, n);
   vc.wr+= 2;
   tick5p1(14);
+  return resGO;
+}
+
+int
+cl_r4k::LD_IRR_iHL(t_mem code)
+{
+  u32_t v= 0;
+  u16_t a= rHL;
+  v+= rwas->read(a++);
+  v+= rwas->read(a++) << 8;
+  v+= rwas->read(a++) << 16;
+  v+= rwas->read(a  ) << 24;
+  vc.rd+= 4;
+  destIRR()->W(v);
+  tick(13);
+  return resGO;
+}
+
+int
+cl_r4k::LD_iHL_IRR(t_mem code)
+{
+  u32_t v= cIRR->get();
+  u16_t a= rHL;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a  , v);
+  vc.wr+= 4;
+  tick(17);
+  return resGO;
+}
+
+int
+cl_r4k::LD_IRR_iSPn(t_mem code)
+{
+  u32_t v= 0;
+  u16_t a= rSP;
+  u8_t n= fetch();
+  a+= n;
+  v+= rwas->read(a++);
+  v+= rwas->read(a++) << 8;
+  v+= rwas->read(a++) << 16;
+  v+= rwas->read(a  ) << 24;
+  vc.rd+= 4;
+  destIRR()->W(v);
+  tick5p1(14);
+  return resGO;
+}
+
+int
+cl_r4k::LD_iSPn_IRR(t_mem code)
+{
+  u32_t v= cIRR->get();
+  u16_t a= rSP;
+  u8_t n= fetch();
+  a+= n;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a++, v); v>>= 8;
+  rwas->write(a  , v);
+  vc.wr+= 4;
+  tick5p1(18);
+  return resGO;
+}
+
+int
+cl_r4k::POP_IRR(t_mem code)
+{
+  u32_t v= 0;
+  u16_t a= rSP;
+  v+= rom->read(a++);
+  v+= rom->read(a++) << 8;
+  v+= rom->read(a++) << 16;
+  v+= rom->read(a++) << 24;
+  cSP.W(a);
+  destIRR()->W(v);
+  tick(12);
+  return resGO;
+}
+
+int
+cl_r4k::PUSH_IRR(t_mem code)
+{
+  u32_t v= cIRR->get();
+  u16_t a= rSP;
+  rom->write(--a, v>>24);
+  rom->write(--a, v>>16);
+  rom->write(--a, v>>8 );
+  rom->write(--a, v    );
+  cSP.W(a);
+  vc.wr+= 4;
+  tick5p1(17);
   return resGO;
 }
 

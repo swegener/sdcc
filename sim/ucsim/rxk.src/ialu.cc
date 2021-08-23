@@ -216,6 +216,35 @@ cl_rxk::rlc(class cl_cell8 &dest, u8_t op)
 
 
 /*
+     C <-- 31..<-...0 <--+
+         |               |
+         +---------------+
+ */
+int
+cl_rxk::rot32left(class cl_cell32 &dest, u32_t op, int nr)
+{
+  u32_t cf;
+  while (nr)
+    {
+      cf= op & 0x8000000;
+      op<<= 1;
+      if (cf) op|= 1;
+      nr--;
+    }
+  class cl_cell8 &f= destF();
+  u8_t forg= rF & ~flagAll;
+  if (op & 0x8000000) forg|= flagS;
+  if (!op) forg|= flagZ;
+  if (op & 0xf0000000) forg|= flagL;
+  if (cf) forg|= flagC;
+  f.W(forg);
+  dest.W(op);
+  tick(1);
+  return resGO;
+}
+
+
+/*
      C <-- 7..<-...0 <--+
      |                  |
      +------------------+
@@ -269,6 +298,36 @@ cl_rxk::rot17left(class cl_cell16 &dest, u16_t op)
   if (!res) forg|= flagZ;
   if (res & 0xf000) forg|= flagL;
   f.W(forg);
+  tick(1);
+  return resGO;
+}
+
+/*
+     C <-- 31..<-...0 <--+
+     |                   |
+     +-------------------+
+ */
+int
+cl_rxk::rot33left(class cl_cell32 &dest, u32_t op, int nr)
+{
+  class cl_cell8 &f= destF();
+  u8_t forg= rF;
+  bool cf= forg & flagC;;
+  while (nr)
+    {
+      bool msb= op & 0x80000000;
+      op<<= 1;
+      if (cf) op|= 1;
+      cf= msb;
+      nr--;
+    }
+  forg&= ~flagAll;
+  if (cf) forg|= flagC;
+  if (!op) forg|= flagZ;
+  if (op & 0x80000000) forg|= flagS;
+  if (op & 0xf0000000) forg|= flagL;
+  f.W(forg);
+  dest.W(op);
   tick(1);
   return resGO;
 }
@@ -870,6 +929,33 @@ cl_rxk::sub16(u16_t op2, bool cy)
   if (!(res & 0xffff)) forg|= flagZ;
   if (res & 0x8000) forg|= flagS;
   hl.W(res);
+  f.W(forg);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_rxk::sub32(u32_t op1, u32_t op2, class cl_cell32 &cRes, bool cy)
+{
+  class cl_cell8 &f= destF();
+  u32_t v1= op1;
+  u8_t forg;
+  u32_t res;
+  u32_t a31, b31, r31, na31, nb31, nr31;
+  i32_t o2= op2;
+  i32_t r= op1-o2;
+  if (cy && (rF&flagC)) r--;
+  res= r;
+  forg= rF & ~(flagZ|flagS|flagV);
+  a31=  v1&0x80000000; na31= a31^0x80000000;
+  b31= op2&0x80000000; nb31= b31^0x80000000;
+  r31= res&0x80000000; nr31= r31^0x80000000;
+  if ((a31&nb31&nr31) | (na31&b31&r31)) forg|= flagV;
+  if (op1<op2) forg|= flagC;
+  if ((op1>op2) || (!cy && (op1==op2))) forg&= ~flagC;
+  if (!res) forg|= flagZ;
+  if (res & 0x80000000) forg|= flagS;
+  cRes.W(res);
   f.W(forg);
   tick(3);
   return resGO;

@@ -644,7 +644,7 @@ cl_pia::print_info(class cl_console_base *con)
        if ((ca&0x38) == 0x30) con->dd_printf("Output 0               ");
   else if ((ca&0x38) == 0x38) con->dd_printf("Output 1               ");
   else if ((ca&0x38) == 0x20) con->dd_printf("Read strobe, A1 restore");
-  else if ((ca&0x08) == 0x28) con->dd_printf("Read strobe,  E restore");
+  else if ((ca&0x38) == 0x28) con->dd_printf("Read strobe,  E restore");
   else                        con->dd_printf("Input                  ");
   con->dd_printf("\n");
   
@@ -671,8 +671,8 @@ cl_pia::print_info(class cl_console_base *con)
   con->dd_printf(" ModB2 ");
        if ((cb&0x38) == 0x30) con->dd_printf("Output 0                ");
   else if ((cb&0x38) == 0x38) con->dd_printf("Output 1                ");
-  else if ((cb&0x08) == 0x20) con->dd_printf("Write strobe, A1 restore");
-  else if ((cb&0x08) == 0x28) con->dd_printf("Write strobe,  E restore");
+  else if ((cb&0x38) == 0x20) con->dd_printf("Write strobe, A1 restore");
+  else if ((cb&0x38) == 0x28) con->dd_printf("Write strobe,  E restore");
   else                        con->dd_printf("Input                   ");
   con->dd_printf("\n");
 

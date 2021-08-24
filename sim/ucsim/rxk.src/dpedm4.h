@@ -63,6 +63,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define FLAG_LT_HL	instruction_ed_b4
 #define FLAG_GTU_HL	instruction_ed_ac
 #define FLAG_V_HL	instruction_ed_bc
+#define CALL_iHL	instruction_ed_ea
+#define LLRET		instruction_ed_8b
 
 #endif
 

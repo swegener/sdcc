@@ -64,6 +64,8 @@ struct dis_entry disass_pedm4[]=
     { 0xb4, 0xff, ' ', 2, "FLAG LT,HL" },
     { 0xac, 0xff, ' ', 2, "FLAG GTU,HL" },
     { 0xbc, 0xff, ' ', 2, "FLAG V,HL" },
+    { 0xea, 0xff, ' ', 2, "CALL (HL)" },
+    { 0x8b, 0xff, ' ', 2, "LLRET" },
 
     { 0, 0, 0, 0, 0, 0, 0 }
   };

@@ -55,6 +55,7 @@ struct dis_entry disass_pddm3[]=
 
     { 0xe1, 0xff, ' ', 2, "POP %I" },
     { 0xe5, 0xff, ' ', 2, "PUSH %I" },
+    { 0xe3, 0xff, ' ', 2, "EX (SP),%I" },
 
     { 0x77, 0xff, ' ', 3, "LD (%I%d),A" },
     { 0x70, 0xff, ' ', 3, "LD (%I%d),B" },

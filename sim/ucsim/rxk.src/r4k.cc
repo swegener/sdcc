@@ -45,7 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "r4kcl.h"
 
 
-inline u32_t
+u32_t
 px8(u32_t px, u8_t offset)
 {
   bool log= ((px & 0xffff0000) == 0xffff0000);
@@ -54,7 +54,7 @@ px8(u32_t px, u8_t offset)
   return px;
 }
 
-inline u32_t
+u32_t
 px8se(u32_t px, u8_t offset)
 {
   bool log= ((px & 0xffff0000) == 0xffff0000);
@@ -64,7 +64,7 @@ px8se(u32_t px, u8_t offset)
   return px;
 }
 
-inline u32_t
+u32_t
 px16(u32_t px, u16_t offset)
 {
   bool log= ((px & 0xffff0000) == 0xffff0000);
@@ -73,7 +73,7 @@ px16(u32_t px, u16_t offset)
   return px;
 }
 
-inline u32_t
+u32_t
 px16se(u32_t px, u16_t offset)
 {
   bool log= ((px & 0xffff0000) == 0xffff0000);
@@ -384,6 +384,12 @@ void
 cl_r4k::disass_irr(chars *work, bool dd)
 {
   work->appendf("%s", dd?"BCDE":"JKHL");
+}
+
+void
+cl_r4k::disass_irrl(chars *work, bool dd)
+{
+  work->appendf("%s", dd?"DE":"HL");
 }
 
 void

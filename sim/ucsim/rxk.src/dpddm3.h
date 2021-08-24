@@ -54,6 +54,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define POP_IR		instruction_dd_e1
 #define PUSH_IR		instruction_dd_e5
+#define EX_iSP_IR	instruction_dd_e3
 
 #define LD_iIRd_A	instruction_dd_77
 #define LD_iIRd_B	instruction_dd_70

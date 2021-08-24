@@ -379,6 +379,9 @@ cl_rxk::disassc(t_addr addr, chars *comment)
 	    case '3':
 	      disass_irr(&work, dd);
 	      break;
+	    case 'n':
+	      disass_irrl(&work, dd);
+	      break;
 	    case 'J':
 	      if (cIR == &cIX)
 		work.append("HL");

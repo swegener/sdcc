@@ -137,14 +137,14 @@ cl_rxk::PAGE_CB(t_mem code)
 	}
       switch (y)
 	{
-	case 0: return rlc(*destR(z), rR(z));
-	case 1: return rrc(*destR(z), rR(z));
-	case 2: return rl (*destR(z), rR(z));
-	case 3: return rr (*destR(z), rR(z));
-	case 4: return sla(*destR(z), rR(z));
-	case 5: return sra(*destR(z), rR(z));
+	case 0: return rlc (*destR(z), rR(z));
+	case 1: return rrc (*destR(z), rR(z));
+	case 2: return rl  (*destR(z), rR(z));
+	case 3: return rr  (*destR(z), rR(z));
+	case 4: return sla8(*destR(z), rR(z));
+	case 5: return sra8(*destR(z), rR(z));
 	case 6: return resINV_INST;
-	case 7: return srl(*destR(z), rR(z));
+	case 7: return srl8(*destR(z), rR(z));
 	}
       break;
     case 1: // BIT y,r
@@ -183,14 +183,14 @@ cl_rxk::PAGE_DD_CB(t_mem code)
     case 0:
       switch (y)
 	{
-	case 0: return rlc(dest, dest.get());
-	case 1: return rrc(dest, dest.get());
-	case 2: return rl (dest, dest.get());
-	case 3: return rr (dest, dest.get());
-	case 4: return sla(dest, dest.get());
-	case 5: return sra(dest, dest.get());
+	case 0: return rlc (dest, dest.get());
+	case 1: return rrc (dest, dest.get());
+	case 2: return rl  (dest, dest.get());
+	case 3: return rr  (dest, dest.get());
+	case 4: return sla8(dest, dest.get());
+	case 5: return sra8(dest, dest.get());
 	case 6: return resINV_INST;
-	case 7: return srl(dest, dest.get());
+	case 7: return srl8(dest, dest.get());
 	}
       break;
     case 1:

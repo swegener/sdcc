@@ -89,7 +89,10 @@ enum {
   flagL = 0x04,
   flagV = 0x04,
   flagC = 0x01,
-  flagAll= flagS|flagZ|flagL|flagC
+  flagAll = flagS|flagZ|flagL|flagC,
+  flagsAll= flagS|flagZ|flagL|flagC,
+  allFlag = flagS|flagZ|flagL|flagC,
+  allFlags= flagS|flagZ|flagL|flagC
 };
 
 #define cond_GT(f)	( !(( ((f) ^ ((f)<<5)) | ((f)<<1)) & 0x80) )
@@ -157,6 +160,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 4; }
   virtual void disass_irr(chars *work, bool dd) {}
+  virtual void disass_irrl(chars *work, bool dd) {}
   
   virtual void save_hist();
   virtual void print_regs(class cl_console_base *con);
@@ -257,19 +261,24 @@ public:
   virtual int dec_r(class cl_cell8 &cr, u8_t op);
   virtual int rot8left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rlc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
-  virtual int rot32left(class cl_cell32 &dest, u32_t op, int nr);//0f,2t,0r,0w
+  virtual int rot32left(class cl_cell32 &dest, u32_t op, int nr);//0f,4t,0r,0w
   virtual int rot9left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rl(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot17left(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
-  virtual int rot33left(class cl_cell32 &dest, u32_t op, int nr);//0f,2t,0r,0w
+  virtual int rot33left(class cl_cell32 &dest, u32_t op, int nr);//0f,4t,0r,0w
   virtual int rot8right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
+  virtual int rot32right(class cl_cell32 &dest, u32_t op,int nr);//0f,4t,0r,0w
   virtual int rrc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot9right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rr(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot17right(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
-  virtual int sla(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
-  virtual int sra(class cl_cell8 &dest, i8_t op);		// 0f,4t,0r,0w
-  virtual int srl(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
+  virtual int rot33right(class cl_cell32 &dest, u32_t op,int nr);//0f,4t,0r,0w
+  virtual int sla8(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
+  virtual int sla32(class cl_cell32 &dest, u32_t op, int nr);	// 0f,4t,0r,0w
+  virtual int sra8(class cl_cell8 &dest, i8_t op);		// 0f,4t,0r,0w
+  virtual int sra32(class cl_cell32 &dest, i32_t op, int nr);	// 0f,4t,0r,0w
+  virtual int srl8(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
+  virtual int srl32(class cl_cell32 &dest, u32_t op, int nr);	// 0f,4t,0r,0w
   virtual int bit_r(u8_t b, u8_t op);				// 0f,4t,0r,0w
   virtual int bit_iHL(u8_t b);					// 0f,7t,1r,0w
   virtual int bit_iIRd(u8_t b, i8_t d);				// 0f,10t,1r,0w
@@ -648,6 +657,7 @@ public:
   virtual int OR_IR_DE(t_mem code);
   virtual int POP_IR(t_mem code);
   virtual int PUSH_IR(t_mem code);
+  virtual int EX_iSP_IR(t_mem code);
   virtual int LD_iIRd_A(t_mem code) { return ld_iIRd_r(rA); }
   virtual int LD_iIRd_B(t_mem code) { return ld_iIRd_r(rB); }
   virtual int LD_iIRd_C(t_mem code) { return ld_iIRd_r(rC); }

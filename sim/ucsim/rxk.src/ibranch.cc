@@ -309,5 +309,48 @@ cl_r4k::jre_cx_cc(bool cond)
   return resGO;
 }
 
+int
+cl_r4k::CALL_iIR(t_mem code)
+{
+  u16_t a= rSP;
+  rom->write(--a, PC>>8);
+  rom->write(--a, PC);
+  vc.wr+= 2;
+  cSP.W(a);
+  PC= cIR->get();
+  tick5p1(11);
+  return resGO;
+}
+
+int
+cl_r4k::CALL_iHL(t_mem code)
+{
+  u16_t a= rSP;
+  rom->write(--a, PC>>8);
+  rom->write(--a, PC);
+  vc.wr+= 2;
+  cSP.W(a);
+  PC= rHL;
+  tick5p1(11);
+  return resGO;
+}
+
+int
+cl_r4k::LLRET(t_mem code)
+{
+  u16_t h= 0, l= 0;
+  u16_t a= rSP;
+  l= rom->read(a++);
+  l+= rom->read(a++)*256;
+  h= rom->read(a++);
+  h+= rom->read(a++)*256;
+  vc.rd+= 4;
+  cSP.W(a);
+  PC= l;
+  LXPC->write(h);
+  tick(13);
+  return resGO;
+}
+
 
 /* End of rxk.src/ibranch.cc */

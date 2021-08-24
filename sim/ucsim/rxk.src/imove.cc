@@ -428,6 +428,20 @@ cl_rxk::PUSH_IR(t_mem code)
 }
 
 int
+cl_rxk::EX_iSP_IR(t_mem code)
+{
+  u16_t temp;
+  temp= rom->read(rSP+1) * 256 + rom->read(rSP);
+  vc.rd+= 2;
+  rom->write(rSP, cIR->get());
+  rom->write(rSP+1, cIR->get()>>8);
+  vc.wr+= 2;
+  cIR->write(temp);
+  tick(14);
+  return resGO;
+}
+
+int
 cl_rxk::LD_SP_IR(t_mem code)
 {
   cSP.W(cIR->get());
@@ -953,6 +967,200 @@ cl_r4k::PUSH_IRR(t_mem code)
   rom->write(--a, v>>8 );
   rom->write(--a, v    );
   cSP.W(a);
+  vc.wr+= 4;
+  tick5p1(17);
+  return resGO;
+}
+
+int
+cl_r4k::LDF_IRR_iLMN(t_mem code)
+{
+  u32_t v= 0;
+  t_addr a= fetch();
+  a<<= 8; a+= fetch();
+  a<<= 8; a+= fetch();
+  v+= rom->read(a); a= (a+1)&0xffffff;
+  v<<= 8; v+= rom->read(a); a= (a+1)&0xffffff;
+  v<<= 8; v+= rom->read(a); a= (a+1)&0xffffff;
+  v<<= 8; v+= rom->read(a);
+  vc.rd+= 4;
+  destIRR()->write(v);
+  tick(18);
+  return resGO;
+}
+
+int
+cl_r4k::LDF_iLMN_IRR(t_mem code)
+{
+  u32_t v= cIRR->get();
+  t_addr a= fetch();
+  a<<= 8; a+= fetch();
+  a<<= 8; a+= fetch();
+  rom->write(a++, v>>24); a&= 0xffffff;
+  rom->write(a++, v>>16); a&= 0xffffff;
+  rom->write(a++, v>>8 ); a&= 0xffffff;
+  rom->write(a  , v    );
+  vc.wr+= 4;
+  tick(22);
+  return resGO;
+}
+
+int
+cl_r4k::ld_irr_ips_hl(t_mem code)
+{
+  class cl_cell32 *ps= &cPW;
+  switch (code & 0x30)
+    {
+    case 0x00: ps= &cPW; break;
+    case 0x10: ps= &cPX; break;
+    case 0x20: ps= &cPY; break;
+    case 0x30: ps= &cPZ; break;
+    }
+  u32_t p= ps->get();
+  u32_t v   = mem->pxread(px16se(p, rHL+0));
+  v<<= 8; v+= mem->pxread(px16se(p, rHL+1));
+  v<<= 8; v+= mem->pxread(px16se(p, rHL+2));
+  v<<= 8; v+= mem->pxread(px16se(p, rHL+3));
+  vc.rd+= 4;
+  destIRR()->write(v);
+  tick5p1(13);
+  return resGO;
+}
+
+
+int
+cl_r4k::ld_irr_ips_d(t_mem code)
+{
+  class cl_cell32 *ps= &cPW;
+  switch (code & 0x30)
+    {
+    case 0x00: ps= &cPW; break;
+    case 0x10: ps= &cPX; break;
+    case 0x20: ps= &cPY; break;
+    case 0x30: ps= &cPZ; break;
+    }
+  u32_t p= ps->get();
+  u8_t d= fetch();
+  u32_t v   = mem->pxread(px8se(p, d)+0);
+  v<<= 8; v+= mem->pxread(px8se(p, d)+1);
+  v<<= 8; v+= mem->pxread(px8se(p, d)+2);
+  v<<= 8; v+= mem->pxread(px8se(p, d)+3);
+  vc.rd+= 4;
+  destIRR()->write(v);
+  tick5p1(13);
+  return resGO;
+}
+
+int
+cl_r4k::ld_ips_hl_irr(t_mem code)
+{
+  class cl_cell32 *ps= &cPW;
+  switch (code & 0x30)
+    {
+    case 0x00: ps= &cPW; break;
+    case 0x10: ps= &cPX; break;
+    case 0x20: ps= &cPY; break;
+    case 0x30: ps= &cPZ; break;
+    }
+  u32_t p= ps->get();
+  u32_t v= cIRR->get();
+  mem->pxwrite(px16se(p, rHL+0), v);
+  mem->pxwrite(px16se(p, rHL+1), v>>8);
+  mem->pxwrite(px16se(p, rHL+2), v>>16);
+  mem->pxwrite(px16se(p, rHL+3), v>>24);
+  vc.wr+= 4;
+  tick5p1(17);
+  return resGO;
+}
+
+int
+cl_r4k::ld_ips_d_irr(t_mem code)
+{
+  class cl_cell32 *ps= &cPW;
+  switch (code & 0x30)
+    {
+    case 0x00: ps= &cPW; break;
+    case 0x10: ps= &cPX; break;
+    case 0x20: ps= &cPY; break;
+    case 0x30: ps= &cPZ; break;
+    }
+  u32_t p= ps->get();
+  u32_t v= cIRR->get();
+  u8_t d= fetch();
+  mem->pxwrite(px16se(p, d)+0, v);
+  mem->pxwrite(px16se(p, d)+1, v>>8);
+  mem->pxwrite(px16se(p, d)+2, v>>16);
+  mem->pxwrite(px16se(p, d)+3, v>>24);
+  vc.wr+= 4;
+  tick5p1(18);
+  return resGO;
+}
+
+int
+cl_r4k::ldl_px_ir(t_mem code)
+{
+  switch (code & 0x30)
+    {
+    case 0x00: destPW().W(0xffff0000+cIR->get()); break;
+    case 0x10: destPX().W(0xffff0000+cIR->get()); break;
+    case 0x20: destPY().W(0xffff0000+cIR->get()); break;
+    case 0x30: destPZ().W(0xffff0000+cIR->get()); break;
+    }
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::ldl_px_irrl(t_mem code)
+{
+  switch (code & 0x30)
+    {
+    case 0x00: destPW().W(0xffff0000|cIRR->get()); break;
+    case 0x10: destPX().W(0xffff0000|cIRR->get()); break;
+    case 0x20: destPY().W(0xffff0000|cIRR->get()); break;
+    case 0x30: destPZ().W(0xffff0000|cIRR->get()); break;
+    }
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::ld_px_irr(t_mem code)
+{
+  switch (code & 0x30)
+    {
+    case 0x00: cPW.W(cIRR->get()); break;
+    case 0x10: cPX.W(cIRR->get()); break;
+    case 0x20: cPY.W(cIRR->get()); break;
+    case 0x30: cPZ.W(cIRR->get()); break;
+    }
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::ld_irr_px(t_mem code)
+{
+  switch (code & 0x30)
+    {
+    case 0x00: destIRR()->W(rPW); break;
+    case 0x10: destIRR()->W(rPX); break;
+    case 0x20: destIRR()->W(rPY); break;
+    case 0x30: destIRR()->W(rPZ); break;
+    }
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::LD_iSP_HL_IRR(t_mem code)
+{
+  u16_t a= rSP + rHL;
+  u32_t v= cIRR->get();
+  mem->write(a++, v); v>>= 8;
+  mem->write(a++, v); v>>= 8;
+  mem->write(a++, v); v>>= 8;
+  mem->write(a  , v);
   vc.wr+= 4;
   tick5p1(17);
   return resGO;

@@ -34,10 +34,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "dpddm4.h"
 
 
-extern inline u32_t px8(u32_t px, u8_t offset);
-extern inline u32_t px8se(u32_t px, u8_t offset);
-extern inline u32_t px16(u32_t px, u16_t offset);
-extern inline u32_t px16se(u32_t px, u16_t offset);
+extern u32_t px8(u32_t px, u8_t offset);
+extern u32_t px8se(u32_t px, u8_t offset);
+extern u32_t px16(u32_t px, u16_t offset);
+extern u32_t px16se(u32_t px, u16_t offset);
 
 //#define raJ	(aJK.r.J)
 //#define raK	(aJK.r.K)
@@ -72,9 +72,14 @@ public:
   virtual struct dis_entry *dis_6d_entry(t_addr addr);
   virtual int longest_inst(void) { return 6; }
   virtual void disass_irr(chars *work, bool dd);
+  virtual void disass_irrl(chars *work, bool dd);
   
   virtual void select_IRR(bool dd);
   virtual class cl_cell32 *destIRR(void) { return altd?caIRR:cIRR; }
+  virtual class cl_cell32 &destPW(void) { return altd?caPW:cPW; }
+  virtual class cl_cell32 &destPX(void) { return altd?caPX:cPX; }
+  virtual class cl_cell32 &destPY(void) { return altd?caPY:cPY; }
+  virtual class cl_cell32 &destPZ(void) { return altd?caPZ:cPZ; }
   
   virtual void print_regs(class cl_console_base *con);
 
@@ -82,6 +87,14 @@ public:
   virtual int ld_pd_ihtr_hl(class cl_cell32 &dest);
   virtual int ld_irr_iird(class cl_cell16 &ir);			// 1f,14t,0w,4r
   virtual int ld_iird_irr(class cl_cell16 &ir);			// 1f,19t,4w,0r
+  virtual int ld_irr_ips_hl(t_mem code);			// 0f,14t,4r,0w
+  virtual int ld_irr_ips_d(t_mem code);				// 1f,14t,4r,0w
+  virtual int ld_ips_hl_irr(t_mem code);			// 0f,18t,0r,4w
+  virtual int ld_ips_d_irr(t_mem code);				// 1f,19t,0r,4w
+  virtual int ldl_px_ir(t_mem code);				// 0f,4t,0r,0w
+  virtual int ldl_px_irrl(t_mem code);				// 0f,4t,0r,0w
+  virtual int ld_px_irr(t_mem code);				// 0f,4t,0r,0w
+  virtual int ld_irr_px(t_mem code);				// 0f,4t,0r,0w
   
   // arith
   virtual int subhl(class cl_cell16 &dest, u16_t op);
@@ -143,6 +156,8 @@ public:
   virtual int FLAG_LT_HL(t_mem code)  { return flag_cc_hl(code); }
   virtual int FLAG_GTU_HL(t_mem code) { return flag_cc_hl(code); }
   virtual int FLAG_V_HL(t_mem code)   { return flag_cc_hl(code); }
+  virtual int CALL_iHL(t_mem code);
+  virtual int LLRET(t_mem code);
   
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);
@@ -159,24 +174,107 @@ public:
 						 *cIRR, false); }
   virtual int POP_IRR(t_mem code);
   virtual int PUSH_IRR(t_mem code);
-  virtual int RL_1_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
-							       cIRR->get(),
-							       1); }
-  virtual int RL_2_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
-							       cIRR->get(),
-							       2); }
-  virtual int RL_4_IRR(t_mem code) { tick(2); return rot33left(*destIRR(),
-							       cIRR->get(),
-							       4); }
-  virtual int RLC_1_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
-								cIRR->get(),
-								1); }
-  virtual int RLC_2_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
-								cIRR->get(),
-								2); }
-  virtual int RLC_4_IRR(t_mem code) { tick(2); return rot32left(*destIRR(),
-								cIRR->get(),
-								4); }
+  virtual int RL_1_IRR(t_mem code) { return rot33left(*destIRR(),
+						      cIRR->get(),
+						      1); }
+  virtual int RL_2_IRR(t_mem code) { return rot33left(*destIRR(),
+						      cIRR->get(),
+						      2); }
+  virtual int RL_4_IRR(t_mem code) { return rot33left(*destIRR(),
+						      cIRR->get(),
+						      4); }
+  virtual int RLC_1_IRR(t_mem code) { return rot32left(*destIRR(),
+						       cIRR->get(),
+						       1); }
+  virtual int RLC_2_IRR(t_mem code) { return rot32left(*destIRR(),
+						       cIRR->get(),
+						       2); }
+  virtual int RLC_4_IRR(t_mem code) { return rot32left(*destIRR(),
+						       cIRR->get(),
+						       4); }
+  virtual int RLC_8_IRR(t_mem code);
+  virtual int RLB_A_IRR(t_mem code);
+  virtual int SLA_1_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 1); }
+  virtual int SLA_2_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 2); }
+  virtual int SLA_4_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 4); }
+  virtual int SLL_1_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 1); }
+  virtual int SLL_2_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 2); }
+  virtual int SLL_4_IRR(t_mem code) { return sla32(*destIRR(), cIRR->get(), 4); }
+  virtual int TEST_IRR(t_mem code) { tick(2); return test32(cIRR->get()); }
+  virtual int RR_1_IRR(t_mem code) { return rot33right(*destIRR(),
+						       cIRR->get(),
+						       1); }
+  virtual int RR_2_IRR(t_mem code) { return rot33right(*destIRR(),
+						       cIRR->get(),
+						       2); }
+  virtual int RR_4_IRR(t_mem code) { return rot33right(*destIRR(),
+						       cIRR->get(),
+						       4); }
+  virtual int RRC_1_IRR(t_mem code) { return rot32right(*destIRR(),
+							cIRR->get(),
+							1); }
+  virtual int RRC_2_IRR(t_mem code) { return rot32right(*destIRR(),
+							cIRR->get(),
+							2); }
+  virtual int RRC_4_IRR(t_mem code) { return rot32right(*destIRR(),
+							cIRR->get(),
+							4); }
+  virtual int RRC_8_IRR(t_mem code);
+  virtual int RRB_A_IRR(t_mem code);
+  virtual int SRA_1_IRR(t_mem code) { return sra32(*destIRR(),
+						   cIRR->get(),
+						   1); }
+  virtual int SRA_2_IRR(t_mem code) { return sra32(*destIRR(),
+						   cIRR->get(),
+						   2); }
+  virtual int SRA_4_IRR(t_mem code) { return sra32(*destIRR(),
+						   cIRR->get(),
+						   4); }
+  virtual int SRL_1_IRR(t_mem code) { return srl32(*destIRR(),
+						   cIRR->get(),
+						   1); }
+  virtual int SRL_2_IRR(t_mem code) { return srl32(*destIRR(),
+						   cIRR->get(),
+						   2); }
+  virtual int SRL_4_IRR(t_mem code) { return srl32(*destIRR(),
+						   cIRR->get(),
+						   4); }
+  virtual int LDF_IRR_iLMN(t_mem code);
+  virtual int LDF_iLMN_IRR(t_mem code);
+  virtual int LD_IRR_iPW_HL(t_mem code) { return ld_irr_ips_hl(code); }
+  virtual int LD_IRR_iPX_HL(t_mem code) { return ld_irr_ips_hl(code); }
+  virtual int LD_IRR_iPY_HL(t_mem code) { return ld_irr_ips_hl(code); }
+  virtual int LD_IRR_iPZ_HL(t_mem code) { return ld_irr_ips_hl(code); }
+  virtual int LD_iPW_HL_IRR(t_mem code) { return ld_ips_hl_irr(code); }
+  virtual int LD_iPX_HL_IRR(t_mem code) { return ld_ips_hl_irr(code); }
+  virtual int LD_iPY_HL_IRR(t_mem code) { return ld_ips_hl_irr(code); }
+  virtual int LD_iPZ_HL_IRR(t_mem code) { return ld_ips_hl_irr(code); }
+  virtual int LD_IRR_iPW_D(t_mem code) { return ld_irr_ips_d(code); }
+  virtual int LD_IRR_iPX_D(t_mem code) { return ld_irr_ips_d(code); }
+  virtual int LD_IRR_iPY_D(t_mem code) { return ld_irr_ips_d(code); }
+  virtual int LD_IRR_iPZ_D(t_mem code) { return ld_irr_ips_d(code); }
+  virtual int LD_iPW_D_IRR(t_mem code) { return ld_ips_d_irr(code); }
+  virtual int LD_iPX_D_IRR(t_mem code) { return ld_ips_d_irr(code); }
+  virtual int LD_iPY_D_IRR(t_mem code) { return ld_ips_d_irr(code); }
+  virtual int LD_iPZ_D_IRR(t_mem code) { return ld_ips_d_irr(code); }
+  virtual int LDL_PW_IR(t_mem code) { return ldl_px_ir(code); }
+  virtual int LDL_PX_IR(t_mem code) { return ldl_px_ir(code); }
+  virtual int LDL_PY_IR(t_mem code) { return ldl_px_ir(code); }
+  virtual int LDL_PZ_IR(t_mem code) { return ldl_px_ir(code); }
+  virtual int LD_PW_IRR(t_mem code) { return ld_px_irr(code); }
+  virtual int LD_PX_IRR(t_mem code) { return ld_px_irr(code); }
+  virtual int LD_PY_IRR(t_mem code) { return ld_px_irr(code); }
+  virtual int LD_PZ_IRR(t_mem code) { return ld_px_irr(code); }
+  virtual int LDL_PW_IRRL(t_mem code) { return ldl_px_irrl(code); }
+  virtual int LDL_PX_IRRL(t_mem code) { return ldl_px_irrl(code); }
+  virtual int LDL_PY_IRRL(t_mem code) { return ldl_px_irrl(code); }
+  virtual int LDL_PZ_IRRL(t_mem code) { return ldl_px_irrl(code); }
+  virtual int LD_IRR_PW(t_mem code) { return ld_irr_px(code); }
+  virtual int LD_IRR_PX(t_mem code) { return ld_irr_px(code); }
+  virtual int LD_IRR_PY(t_mem code) { return ld_irr_px(code); }
+  virtual int LD_IRR_PZ(t_mem code) { return ld_irr_px(code); }
+  virtual int LD_iSP_HL_IRR(t_mem code);
+  virtual int CALL_iIR(t_mem code);
   
   // Starter of extra pages
   virtual int PAGE_4K6D(t_mem code);

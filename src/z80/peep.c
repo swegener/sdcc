@@ -458,6 +458,12 @@ z80MightRead(const lineNode *pl, const char *what)
             return(true);
           arg += 3;
         }
+      else if(!strncmp(arg, "iy", 2) && *(arg + 2) == ',')
+        {
+          if(!strcmp(what, "iy"))
+            return(true);
+          arg += 3;
+        }
       return(argCont(arg, what));
     }
 

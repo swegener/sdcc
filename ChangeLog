@@ -1,3 +1,10 @@
+2021-08-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/valdiag/valdiag.py:
+	  Fix typo that disable some regression testing for gbz80.
+	* src/z80/gen.c:
+	  Fix __z88dk_fastcall stack cleanup.
+
 2021-08-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

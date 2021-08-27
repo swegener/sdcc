@@ -145,7 +145,7 @@ testmodes = {
         "compiler":sdcc,
         "port":"gbz80",
         "extra-defines": {
-            "__zhas_sdcccall":"1"
+            "__has_sdcccall":"1"
         }
     },
     "tlcs90":{
@@ -178,7 +178,7 @@ testmodes = {
         "port":"stm8",
         "extra-defines": {
             "__has_raisonance":"1",
-            "__zhas_sdcccall":"1"
+            "__has_sdcccall":"1"
         }
     },
     "pdk13":{

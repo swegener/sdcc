@@ -1,6 +1,5 @@
 
-#if defined(__SDCC_gbz80) && 0
-#define has_sdcccall 1
+#if defined(__SDCC) && defined(__has_sdcccall)
 #define SDCCCALL0  __sdcccall(0)
 #define SDCCCALL1  __sdcccall(1)
 #else

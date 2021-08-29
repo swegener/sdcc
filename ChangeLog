@@ -1,3 +1,8 @@
+2021-08-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/valdiag/tests/callingconvention.c:
+	  Fix ___sdcccall diagnostics test.
+
 2021-08-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/valdiag/valdiag.py:

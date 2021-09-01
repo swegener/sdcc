@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "rxkcl.h"
 #include "r3kacl.h"
+#include "r4kcl.h"
 
 
 int
@@ -252,6 +253,42 @@ cl_r3ka::instruction_5b(t_mem code)
 	  // TODO: set System Violation interrupt flag
 	}
     }
+  return resGO;
+}
+
+int
+cl_r4k::SETUSRP(t_mem code)
+{
+  u8_t n, m;
+  rSU&= 0xfc;
+  rSU|= 0x01;
+  cSU.W(rSU);
+  n= fetch();
+  m= fetch();
+  u16_t a= rSP;
+  rom->write(--a, m);
+  rom->write(--a, n);
+  cSP.W(rSP);
+  tick5p1(14);
+  atomic= true;
+  return resGO;
+}
+
+int
+cl_r4k::SETSYSP(t_mem code)
+{
+  cSU.W((rSU>>2) | (rSU<<6));
+  u8_t tl, th, n, m;
+  n= fetch();
+  m= fetch();
+  u16_t a= rSP;
+  tl= rom->read(a++);
+  th= rom->read(a++);
+  vc.rd+= 2;
+  cSP.W(rSP);
+  atomic= true;
+  if ((th!=m) && (tl!=n))
+    return resERROR;
   return resGO;
 }
 

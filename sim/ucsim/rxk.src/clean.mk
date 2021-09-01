@@ -7,6 +7,7 @@ clean:
 	rm -f .[a-z]*~
 	rm -f srxk$(EXEEXT) srxk.exe
 	rm -f ucsim_rxk$(EXEEXT) ucsim_rxk.exe
+	rm -f gen_insts gen_wrap
 	$(MAKE) -C test -f clean.mk clean
 
 

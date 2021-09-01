@@ -714,7 +714,7 @@ int
 cl_r4k::PAGE_4K6D(t_mem code)
 {
   u8_t h, l;
-  class cl_memory_cell *op= &cPX, *idx;
+  class cl_memory_cell *op= &cPX, *idx= &cPW;
   t_addr addr;
   
   code= fetch();

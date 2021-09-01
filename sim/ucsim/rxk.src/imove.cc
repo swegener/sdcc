@@ -1166,5 +1166,33 @@ cl_r4k::LD_iSP_HL_IRR(t_mem code)
   return resGO;
 }
 
+int
+cl_r4k::EXP(t_mem code)
+{
+  u32_t temp;
+  temp= rPW; cPW.W(raPW); caPW.W(temp);
+  temp= rPX; cPX.W(raPX); caPX.W(temp);
+  temp= rPY; cPY.W(raPY); caPY.W(temp);
+  temp= rPZ; cPZ.W(raPZ); caPZ.W(temp);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::LD_HTR_A(t_mem code)
+{
+  cHTR.W(rA);
+  tick(3);
+  return resGO;
+}
+
+int
+cl_r4k::LD_A_HTR(t_mem code)
+{
+  cA.W(rHTR);
+  tick(3);
+  return resGO;
+}
+
 
 /* End of rxk.src/imove.cc */

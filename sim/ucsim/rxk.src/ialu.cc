@@ -358,7 +358,7 @@ cl_rxk::rot32right(class cl_cell32 &dest, u32_t op, int nr)
 {
   class cl_cell8 &f= destF();
   u8_t forg;
-  bool cf;
+  bool cf= false;
   while (nr)
     {
       cf= op & 1;
@@ -556,7 +556,7 @@ cl_rxk::sra32(class cl_cell32 &dest, i32_t op, int nr)
 {
   class cl_cell8 &f= destF();
   i8_t forg= rF & ~flagAll;
-  u32_t cf;
+  bool cf= false;
   while (nr)
     {
       cf= op & 1;
@@ -599,7 +599,7 @@ cl_rxk::srl32(class cl_cell32 &dest, u32_t op, int nr)
 {
   class cl_cell8 &f= destF();
   u8_t forg= rF & ~flagAll;
-  u32_t cf;
+  bool cf= false;
   while (nr)
     {
       cf= op & 1;

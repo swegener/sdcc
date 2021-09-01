@@ -352,5 +352,50 @@ cl_r4k::LLRET(t_mem code)
   return resGO;
 }
 
+int
+cl_r4k::FSYSCALL(t_mem code)
+{
+  u16_t a= rSP;
+  rom->write(--a, PC>>8);
+  rom->write(--a, PC);
+  rom->write(--a, rSU);
+  cSP.W(a);
+  vc.wr+= 3;
+  PC= rIIR*256+0x60;
+  cSU.W(rSU<<2);
+  tick5p1(14);
+  destF().W(rF|flagC);
+  return resGO;
+}
+
+int
+cl_r4k::SYSRET(t_mem code)
+{
+  u16_t a= rSP, v;
+  cSU.W(rom->read(a++));
+  v= rom->read(a++);
+  v+= rom->read(a++)*256;
+  vc.rd+= 3;
+  cSP.W(a);
+  tick(11);
+  PC= v;
+  return resGO;
+}
+
+int
+cl_r4k::LLCALL_iJKHL(t_mem code)
+{
+  u16_t a= rSP, x= LXPC->get();
+  rom->write(--a, x>>8);
+  rom->write(--a, x);
+  rom->write(--a, PC>>8);
+  rom->write(--a, PC);
+  PC= rHL;
+  LXPC->W(rJK);
+  cSP.W(a);
+  tick5p1(18);
+  return resGO;
+}
+
 
 /* End of rxk.src/ibranch.cc */

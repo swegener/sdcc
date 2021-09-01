@@ -48,8 +48,8 @@ check_multies()
 int
 main(int argc, char *argv[])
 {
-  single_in= cp_io(0, "r");
-  single_out= cp_io(1, "w");
+  single_in= cp_io(0, (const char *)"r");
+  single_out= cp_io(1, (const char *)"w");
   single_in->raw();
   single_out->raw();
   

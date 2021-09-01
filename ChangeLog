@@ -1,3 +1,8 @@
+2021-09-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix comparison with left operand lower word in hl, upper word in de, right operand on stack.
+
 2021-08-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/valdiag/tests/callingconvention.c:

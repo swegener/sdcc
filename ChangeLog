@@ -2,6 +2,8 @@
 
 	* device/include/stdlib.h:
 	  C23 sized memory deallocation.
+	* sdas/asz80/z80pst.c:
+	  incbin support, patch by bbbbbr.
 
 2021-09-01 Philipp Klaus Krause <pkk AT spth.de>
 

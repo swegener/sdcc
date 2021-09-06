@@ -195,13 +195,13 @@ stm8_reg_parm (sym_link *l, bool reentrant)
 static bool
 stm8_parseOptions (int *pargc, char **argv, int *i)
 {
-  if (!strcmp (argv[*i], "--out-fmt-elf"))
+  if (!strncmp (argv[*i], OPTION_ELF, sizeof (OPTION_ELF) - 1))
   {
     options.out_fmt = 'E';
     debugFile = &dwarf2DebugFile;
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 static void

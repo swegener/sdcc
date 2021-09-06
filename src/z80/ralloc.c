@@ -436,9 +436,6 @@ verifyRegsAssigned (operand *op, iCode *ic)
   if (sym->regs[0])
     return;
 
-  // Don't warn for new allocator, since this is now used by default.
-  if (options.oldralloc)
-    werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->prereqv ? sym->prereqv->name : sym->name);
   z80SpillThis (sym);
 }
 

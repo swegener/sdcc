@@ -1,3 +1,9 @@
+2021-09-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/z80/ralloc.c:
+	  Minor optiomn handling cleanup.
+
 2021-09-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdlib.h:

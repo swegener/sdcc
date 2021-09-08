@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  strcpy.s
 ;
-;  Copyright (C) 2016, Philipp Klaus Krause
+;  Copyright (C) 2016-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,25 +31,25 @@
 	.area CODE
 
 _strcpy:
+	pushw	x
 
-	ldw	y, (0x04, sp)
-	ldw	x, (0x06, sp)
+	ldw	y, (0x06, sp)
 
 loop:
-	ld	a, (x)
-	ld	(y), a
+	ld	a, (y)
+	ld	(x), a
 	jreq	end
-	ld	a, (1, x)
-	ld	(1, y), a
+	ld	a, (1, y)
+	ld	(1, x), a
 	jreq	end
-	ld	a, (2, x)
-	ld	(2, y), a
+	ld	a, (2, y)
+	ld	(2, x), a
 	jreq	end
-	addw	x, #3
 	addw	y, #3
+	addw	x, #3
 	jra	loop
 
 end:
-	ldw	x, (0x04, sp)
+	popw	x
 	retf
 

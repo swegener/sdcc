@@ -1,7 +1,44 @@
 2021-09-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* .version,
+	  ChangeLog,
+	  device/lib/_memset.c,
+	  device/lib/gbz80/abs.s,
+	  device/lib/gbz80/atomic_flag_test_and_set.s,
+	  device/lib/gbz80/div.s,
+	  device/lib/gbz80/memcpy.s,
+	  device/lib/gbz80/mul.s,
+	  device/lib/gbz80/setjmp.s,
+	  device/lib/gbz80/strlen.s,
+	  device/lib/stm8/__mulsint2slong.s,
+	  device/lib/stm8/_divsint.s,
+	  device/lib/stm8/_modsint.s,
+	  device/lib/stm8/_mulint.s,
+	  device/lib/stm8/atomic_flag_test_and_set.s,
+	  device/lib/stm8/memcpy.s,
+	  device/lib/stm8/setjmp.s,
+	  device/lib/stm8/strcmp.s,
+	  device/lib/stm8/strcpy.s,
+	  device/lib/stm8-large/__mulsint2slong.s,
+	  device/lib/stm8-large/_divsint.s,
+	  device/lib/stm8-large/_modsint.s,
+	  device/lib/stm8-large/_mulint.s,
+	  device/lib/stm8-large/atomic_flag_test_and_set.s,
+	  device/lib/stm8-large/memcpy.s,
+	  device/lib/stm8-large/setjmp.s,
+	  device/lib/stm8-large/strcmp.s,
+	  device/lib/stm8-large/strcpy.s,
+	  doc/sdccman.lyx,
+	  src/stm8/main.c,
+	  src/z80/main.c,
+	  support/regression/ports/ucgbz80/spec.mk,
+	  support/regression/tests/sdcccall.c:
+	 __sdcccall(1) convention as default for stm8 and gbz80 picked from breaktheworld branch.
+
+2021-09-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c:
-	  Improve handling of callee-cleanup of stack parameters.
+	  Improve callee-cleanup of stack parameters.
 
 2021-09-06 Philipp Klaus Krause <pkk AT spth.de>
 

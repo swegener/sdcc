@@ -507,7 +507,7 @@ PORT stm8_port =
     1                           /* No fancy alignments supported. */
   },
   { stm8_genExtraArea, NULL },
-  0,                            /* ABI revision */
+  1,                            /* default ABI revision */
   {                             /* stack information */
     -1,                         /* stack grows down */
      0,

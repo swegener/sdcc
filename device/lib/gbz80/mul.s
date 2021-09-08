@@ -3,6 +3,7 @@
 ;
 ;  Copyright (C) 2000, Michael Hope
 ;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
+;  Copyright (c) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -37,37 +38,25 @@
 .globl	__muluchar
 .globl	__mulint
 
-; operands have different sign
+; operands with different sign
 
 __mulsuchar:
-        ldhl    sp,#2+1
-        ld      b, #0
+	ld	c, a
+	ld	b, #0
 
-        ld      a,(hl-)
-        ld      e,a
-        ld      c,(hl)
         jr      signexte
 
 __muluschar:
-        ldhl    sp,#2
-        ld      b, #0
+	ld	c, e
+	ld	b, #0
+	ld	e, a
 
-        ld      a,(hl+)
-        ld      e,a
-        ld      c,(hl)
         jr      signexte
 
 __mulschar:
-        ldhl    sp,#2
+	; Sign-extend before going in.
+	ld	c,a
 
-        ld      a,(hl+)
-        ld      e,a
-        ld      l,(hl)
-
-        ;; Need to sign extend before going in.
-        ld      c,l
-
-        ld      a,l
         rla
         sbc     a,a
         ld      b,a
@@ -80,35 +69,13 @@ signexte:
         jp      .mul16
 
 __muluchar:
-        ldhl    sp,#2
+	ld	c, a
 
-        ld      a,(hl+)
-        ld      e,a
-        ld      c,(hl)
-
-        ;; Clear the top
-        xor     a
-        ld      d,a
-        ld      b,a
-
-        jp      .mul16
+	; Clear the top
+	ld	d, #0
+	ld	b, d
 
 __mulint:
-        ldhl    sp,#2
-
-        ld      a,(hl+)
-        ld      e,a
-        ld      a,(hl+)
-        ld      d,a
-        ld      a,(hl+)
-        ld      h,(hl)
-        ld      l,a
-
-        ;; Parameters:
-        ;;      HL, DE (left, right irrelivent)
-        ld      b,h
-        ld      c,l
-
         ;; 16-bit multiplication
         ;;
         ;; Entry conditions
@@ -116,7 +83,7 @@ __mulint:
         ;;   DE = multiplier
         ;;
         ;; Exit conditions
-        ;;   DE = less significant word of product
+        ;;   BC = less significant word of product
         ;;
         ;; Register used: AF,BC,DE,HL
 .mul16:
@@ -144,9 +111,9 @@ __mulint:
         dec     b
         jr      NZ,1$
 
-        ;; Return in DE
-        ld      e,l
-        ld      d,h
+        ;; Return in bc
+        ld      c,l
+        ld      b,h
 
         ret
 

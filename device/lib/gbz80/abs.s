@@ -2,6 +2,7 @@
 ;  abs.s
 ;
 ;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (c) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,17 +32,16 @@
 	.globl _abs
 
 _abs::
-	pop	hl
-	pop	de
-	push	de
-	bit	7, d
-	jr	Z, 10$
-	ld	a, e
+	ld	c, e
+	ld	b, d
+	bit	7, b
+	ret	Z
+	ld	a, c
 	cpl
-	ld	e, a
-	ld	a, d
+	ld	c, a
+	ld	a, b
 	cpl
-	ld	d, a
-	inc	de
-10$:
-	jp	(hl)
+	ld	b, a
+	inc	bc
+	ret
+

@@ -2669,6 +2669,15 @@ status collapsed
 -oldralloc has been removed for the z80-related backends.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.10, the default calling convention switched from __sdccall(0) to __sdccall(
+1) for stm8 and gbz80.
+\end_layout
+
+\begin_layout Itemize
+In 4.1.10, support for –profile has been removed for gbz80.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -44223,9 +44232,9 @@ SM83 calling conventions
 \end_layout
 
 \begin_layout Standard
-The current default is the SDCC calling convention, version 0.
- Using the command-line option –sdcccall 1, the default can be changed to
- version 1.
+The current default is the SDCC calling convention, version 1.
+ Using the command-line option –sdcccall 0, the default can be changed to
+ version 0.
 \end_layout
 
 \begin_layout Subsubsection
@@ -44390,8 +44399,8 @@ Calling conventions
 \end_layout
 
 \begin_layout Standard
-By default, the SDCC calling convention, version 0 is used.
- Using the option –sdcccall 1, the default can be changed to version 1.
+By default, the SDCC calling convention, version 1 is used.
+ Using the option –sdcccall 0, the default can be changed to version 0.
 \end_layout
 
 \begin_layout Standard
@@ -44473,7 +44482,7 @@ For compatibility with the IAR STM8 compiler, the __iar calling convention
  If the return value is 8 bits, it is passed in a.
  If it is 16 bits, it is passed in x.
  IAR passes larger return values in pseudoregisters, which is not supported
- in SDCC.
+ by SDCC.
 \end_layout
 
 \begin_layout Subsubsection

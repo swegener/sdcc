@@ -6009,7 +6009,7 @@ genFunction (const iCode * ic)
         }
     }
 
-  if (options.profile)
+  if (!IS_GB && options.profile)
     {
       emit2 ("!profileenter");
     }

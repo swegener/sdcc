@@ -1760,7 +1760,7 @@ PORT gbz80_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* default ABI revision */
   { -1, 0, 0, 2, 0, 4, 0 },
   { -1, FALSE },
   { z80_emitDebuggerSymbol },

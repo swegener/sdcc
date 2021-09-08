@@ -2,6 +2,7 @@
 ;  memcpy.s
 ;
 ;  Copyright (C) 2018, Benedikt Freisen
+;  Copyright (C) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -38,28 +39,29 @@
 
 ___memcpy:
 _memcpy:
-	ldw	y, (4, sp)
-	ldw	x, (6, sp)
+	pushw	x
+
+	ldw	y, (6, sp)
 
 	srl	(8, sp)
 	rrc	(9, sp)
 	jrnc	n_x0
-	ld	a, (x)
-	ld	(y), a
-	incw	x
+	ld	a, (y)
+	ld	(x), a
 	incw	y
+	incw	x
 n_x0:
 	srl	(8, sp)
 	rrc	(9, sp)
 	jrnc	n_00
-	ld	a, (x)
-	ld	(y), a
-	incw	x
+	ld	a, (y)
+	ld	(x), a
 	incw	y
-	ld	a, (x)
-	ld	(y), a
 	incw	x
+	ld	a, (y)
+	ld	(x), a
 	incw	y
+	incw	x
 n_00:
 	tnz	(9, sp)
 	jrne	loop_ent
@@ -68,17 +70,17 @@ n_00:
 	jra	loop_ent
 
 loop:
-	addw	x, #4
 	addw	y, #4
+	addw	x, #4
 loop_ent:
-	ld	a, (x)
-	ld	(y), a
-	ld	a, (1, x)
-	ld	(1, y), a
-	ld	a, (2, x)
-	ld	(2, y), a
-	ld	a, (3, x)
-	ld	(3, y), a
+	ld	a, (y)
+	ld	(x), a
+	ld	a, (1, y)
+	ld	(1, x), a
+	ld	a, (2, y)
+	ld	(2, x), a
+	ld	a, (3, y)
+	ld	(3, x), a
 
 	dec	(9, sp)
 	jrne	loop
@@ -86,6 +88,6 @@ loop_ent:
 	jrpl	loop
 
 end:
-	ldw	x, (4, sp)
+	popw	x
 	retf
 

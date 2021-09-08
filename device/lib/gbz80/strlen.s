@@ -2,6 +2,7 @@
 ;  strlen.s
 ;
 ;  Copyright (C) 2020, Tony Pavlov
+;  Copyright (c) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,14 +32,12 @@
 	.globl	_strlen
 
 _strlen::
-	ldhl	sp, #2
-	ld	a, (hl+)
-	ld	h, (hl)
-	ld	l, a
-.strlen::
-	ld	de, #0
-1$:	ld	a, (hl+)
+	ld	l, e
+	ld	h, d
+	ld	bc, #0
+loop:	ld	a, (hl+)
 	or	a
 	ret	Z
-	inc	de
-	jr      1$
+	inc	bc
+	jr      loop
+

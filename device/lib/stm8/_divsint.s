@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  _divsint.s
 ;
-;  Copyright (C) 2014, Philipp Klaus Krause
+;  Copyright (C) 2014-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,9 +31,8 @@
 	.area CODE
 
 __divsint:
-	ldw	x, (#3, sp)
 	ld	a, xh
-	ldw	y, (#5, sp)
+	ldw	y, (#3, sp)
 	jrpl	y_nonnegative
 	cpl	a
 	negw	y
@@ -47,5 +46,7 @@ x_nonnegative:
 	jrpl	return_nonnegative
 	negw	x
 return_nonnegative:
-	ret
+	popw	y
+	addw	sp, #2
+	jp	(y)
 

@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  strcmp.s
 ;
-;  Copyright (C) 2016, Philipp Klaus Krause
+;  Copyright (C) 2016-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -30,10 +30,11 @@
 
 	.area CODE
 
+; int strcmp (const char *s1, const char *s2)
 _strcmp:
 
-	ldw	y, (3, sp)
-	ldw	x, (5, sp)
+	exgw	x, y
+	ldw	x, (3, sp)
 
 loop:
 	ld	a, (y)
@@ -64,14 +65,18 @@ null:
 	tnz	(x)
 	jrne	less
 	clrw	x
-	ret
+	jra	end
 
 diff:
 	jrult less
 	ldw	x, #1
-	ret
+	jra	end
 
 less:
 	ldw	x, #-1
-	ret
+
+end:
+	popw	y
+	addw	sp, #2
+	jp	(y)
 

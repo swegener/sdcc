@@ -1,8 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  memcpy.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
-;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
+;  Copyright (c) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -34,37 +33,43 @@
 
 _memcpy::
 ___memcpy::
-	ldhl	sp, #7
-	ld	a, (hl-)
-	ld	d, a
-	ld	a, (hl-)
-	ld	e, a
-	or	a, d
-	jr	Z, 190$
-	push	bc
-	ld	a, (hl-)
-	ld	b, a
-	ld	a, (hl-)
-	ld	c, a
-	ld	a, (hl-)
-	ld	l, (hl)
-	ld	h, a
-	inc	d
-	inc	e
-	jr	110$
-100$:
-	ld	a, (bc)
-	inc	bc
-	ld	(hl+), a
-110$:
-	dec	e
-	jr	nz, 100$
-	dec	d
-	jr	nz, 100$
+	push	de
+
+	ldhl	sp, #4
+	ld	a, (hl)
+	ld	(hl), e
+
+	ldhl	sp, #0
+	ld	(hl), a
+
+	ldhl	sp, #5
+	ld	a, (hl)
+	ld	(hl), d
+
+	ldhl	sp, #1
+	ld	(hl), a	
+
+	ld	l, c
+	ld	h, b
+
 	pop	bc
-190$:
-	ldhl	sp, #2
+
+	inc	b
+	inc	c
+	jr	test
+
+loop:
 	ld	a, (hl+)
-	ld	e, a
-	ld	d, (hl)
-	ret
+	ld	(de), a
+	inc	de
+test:
+	dec	c
+	jr	nz, loop
+	dec	b
+	jr	nz, loop
+
+end:
+	pop	hl
+	pop	bc
+	jp	(hl)
+

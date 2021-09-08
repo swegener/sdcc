@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  strcmp.s
 ;
-;  Copyright (C) 2016, Philipp Klaus Krause
+;  Copyright (C) 2016-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -32,8 +32,8 @@
 
 _strcmp:
 
-	ldw	y, (4, sp)
-	ldw	x, (6, sp)
+	exgw	x, y
+	ldw	x, (4, sp)
 
 loop:
 	ld	a, (y)

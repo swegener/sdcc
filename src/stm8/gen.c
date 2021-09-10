@@ -3652,7 +3652,7 @@ genCall (const iCode *ic)
     !ic->parmBytes && !bigreturn &&
     (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype) && !optimize.codeSize && ic->op == CALL) &&
     !ic->localEscapeAlive &&
-    !(ic->op == PCALL && aopOnStack (left->aop, 0, left->aop->size)) &&
+    !(ic->op == PCALL && (left->aop->type == AOP_STK || left->aop->type == AOP_REGSTK)) && // Avoid destroying the pointer that we need to call
     !(options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (currFunc->type) && IFFUNC_ISCOSMIC (ftype))) // __cosmic uses 24 bits for return address on stack frame. Can only optimize tail call to __cosmic callee, if caller also uses 24 bits.
     {
       int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.

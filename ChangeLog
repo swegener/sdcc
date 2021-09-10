@@ -1,3 +1,8 @@
+2021-09-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix bug #3279.
+
 2021-09-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version,

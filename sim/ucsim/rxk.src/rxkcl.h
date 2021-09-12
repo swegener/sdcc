@@ -175,6 +175,7 @@ public:
   virtual void tick5p2(int n) { tick(n); }
   virtual void tick5p3(int n) { tick(n); }
   virtual void tick5p9(int n) { tick(n); }
+  virtual void tick5p12(int n) { tick(n); }
   virtual void tick5m1(int n) { tick(n+2); }
   virtual void tick5m2(int n) { tick(n+2); }
   virtual void select_IRR(bool dd) {}

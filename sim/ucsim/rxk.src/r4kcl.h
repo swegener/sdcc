@@ -119,6 +119,7 @@ public:
   virtual int lljp_cc(t_mem code);				// 4f,14t,0w,0r
   virtual int jre_cx_cc(bool cond);				// 2f,9t,0w,0r
   virtual int jr_cx_e(bool cond);				// 1f,4t,0w,0r
+  virtual int jp_cx_mn(bool cond);				// 2f,7t,0w,0r
   
   virtual void mode3k(void);
   virtual void mode4k(void);
@@ -185,7 +186,20 @@ public:
   virtual int JR_LT_e(t_mem code) { return jr_cx_e(cond_LT(rF)); }
   virtual int JR_GTU_e(t_mem code) { return jr_cx_e(cond_GTU(rF)); }
   virtual int JR_V_e(t_mem code) { return jr_cx_e(cond_V(rF)); }
-
+  virtual int JP_GT_mn(t_mem code) { return jp_cx_mn(cond_GT(rF)); }
+  virtual int JP_LT_mn(t_mem code) { return jp_cx_mn(cond_LT(rF)); }
+  virtual int JP_GTU_mn(t_mem code) { return jp_cx_mn(cond_GTU(rF)); }
+  virtual int JP_V_mn(t_mem code) { return jp_cx_mn(cond_V(rF)); }
+  virtual int LD_BCDE_d(t_mem code);
+  virtual int LD_JKHL_d(t_mem code);
+  virtual int MULU(t_mem code);
+  virtual int LD_JK_mn(t_mem code);
+  virtual int LD_DE_HL(t_mem code);
+  virtual int EX_BC_HL(t_mem code);
+  virtual int EX_JKHL_BCDE(t_mem code);
+  virtual int EX_JK_HL(t_mem code);
+  virtual int CLR_HL(t_mem code);
+  
   // Page ED, m4 mode
   virtual int CBM_N(t_mem code);
   virtual int LD_PW_iHTR_HL(t_mem code) { return ld_pd_ihtr_hl(cPW); }

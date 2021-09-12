@@ -1397,5 +1397,15 @@ cl_r4k::CP_HL_D(t_mem code)
   return cp16(rHL, d16);
 }
 
+int
+cl_r4k::MULU(t_mem code)
+{
+  u32_t v= rBC * rDE;
+  cBC.W(v);
+  cHL.W(v>>16);
+  tick(11);
+  return resGO;
+}
+
 
 /* End of rxk.src/ialu.cc */

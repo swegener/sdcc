@@ -88,6 +88,19 @@ struct dis_entry disass_p0m4[]=
     { 0xb0, 0xff, ' ', 2, "JR LT,%r" },
     { 0xa8, 0xff, ' ', 2, "JR GTU,%r" },
     { 0xb8, 0xff, ' ', 2, "JR V,%r" },
+    { 0xa2, 0xff, ' ', 3, "JR GT,%w" },
+    { 0xb2, 0xff, ' ', 3, "JR LT,%w" },
+    { 0xaa, 0xff, ' ', 3, "JR GTU,%w" },
+    { 0xba, 0xff, ' ', 3, "JR V,%w" },
+    { 0xa3, 0xff, ' ', 2, "LD BCDE,%d" },
+    { 0xa4, 0xff, ' ', 2, "LD JKHL,%d" },
+    { 0xa7, 0xff, ' ', 1, "MULU" },
+    { 0xa9, 0xff, ' ', 3, "LD JK,%w" },
+    { 0xb1, 0xff, ' ', 1, "LD DE,HL" },
+    { 0xb3, 0xff, ' ', 1, "EX BC,HL" },
+    { 0xb4, 0xff, ' ', 1, "EX JKHL,BCDE" },
+    { 0xb9, 0xff, ' ', 1, "EX JK,HL" },
+    { 0xbf, 0xff, ' ', 1, "CLR HL" },
     
     { 0, 0, 0, 0, 0, 0, 0 }
   };

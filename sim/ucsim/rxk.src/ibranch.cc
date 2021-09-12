@@ -460,5 +460,16 @@ cl_r4k::jr_cx_e(bool cond)
   return resGO;
 }
 
+int
+cl_r4k::jp_cx_mn(bool cond)
+{
+  u16_t mn= fetch();
+  mn+= fetch()*256;
+  if (cond)
+    PC= mn;
+  tick(6);
+  return resGO;
+}
+
 
 /* End of rxk.src/ibranch.cc */

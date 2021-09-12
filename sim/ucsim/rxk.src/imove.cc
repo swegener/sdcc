@@ -1054,6 +1054,18 @@ cl_r4k::LDF_ilmn_A(t_mem code)
 }
 
 int
+cl_r4k::LDF_A_ilmn(t_mem code)
+{
+  u32_t a= fetch();
+  a+= fetch()*256;
+  a+= fetch()*256*256;
+  u8_t v= mem->phread(a);
+  destA().W(v);
+  tick(10);
+  return resGO;
+}
+
+int
 cl_r4k::ld_irr_ips_hl(t_mem code)
 {
   class cl_cell32 *ps= &cPW;
@@ -1323,6 +1335,19 @@ cl_r4k::LD_imn_JK(t_mem code)
 }
 
 int
+cl_r4k::LD_JK_imn(t_mem code)
+{
+  u16_t a= fetch(), v;
+  a+= fetch()*256;
+  v= rwas->read(a);
+  v+= rwas->read(++a)*256;
+  destJK().W(v);
+  vc.rd+= 2;
+  tick(10);
+  return resGO;
+}
+
+int
 cl_r4k::ld_a_ipshl(u32_t ps)
 {
   u32_t a= px16se(ps, rHL);
@@ -1365,5 +1390,24 @@ cl_r4k::ld_ipsd_a(u32_t ps)
   tick5p1(7);
   return resGO;
 }
+
+int
+cl_r4k::LD_LXPC_HL(t_mem code)
+{
+  LXPC->W(rHL);
+  atomic= true;
+  tick(1);
+  return resGO;
+}
+
+int
+cl_r4k::LD_HL_LXPC(t_mem code)
+{
+  destHL().W(rXPC);
+  atomic= true;
+  tick(1);
+  return resGO;
+}
+
 
 /* End of rxk.src/imove.cc */

@@ -61,7 +61,9 @@ struct dis_entry disass_p0m4[]=
     { 0xb6, 0xff, ' ', 2, "LD (PZ%d),HL" },
     { 0x87, 0xff, ' ', 5, "LLJP %w,%w" },
     { 0x89, 0xff, ' ', 3, "LD (%w),JK" },
+    { 0x99, 0xff, ' ', 3, "LD JK,(%w)" },
     { 0x8a, 0xff, ' ', 4, "LDF (%l),A" },
+    { 0x9a, 0xff, ' ', 4, "LDF A,(%l)" },
     { 0x8b, 0xff, ' ', 1, "LD A,(PW+HL)" },
     { 0x9b, 0xff, ' ', 1, "LD A,(PX+HL)" },
     { 0xab, 0xff, ' ', 1, "LD A,(PY+HL)" },
@@ -79,6 +81,13 @@ struct dis_entry disass_p0m4[]=
     { 0xad, 0xff, ' ', 1, "LD (PY%d),A" },
     { 0xbd, 0xff, ' ', 1, "LD (PZ%d),A" },
     { 0x8f, 0xff, ' ', 5, "LLCALL %w,%w" },
+    { 0x97, 0xff, ' ', 1, "LD LXPC,HL" },
+    { 0x9f, 0xff, ' ', 1, "LD HL,LXPC" },
+    { 0x98, 0xff, ' ', 3, "JRE %R" },
+    { 0xa0, 0xff, ' ', 2, "JR GT,%r" },
+    { 0xb0, 0xff, ' ', 2, "JR LT,%r" },
+    { 0xa8, 0xff, ' ', 2, "JR GTU,%r" },
+    { 0xb8, 0xff, ' ', 2, "JR V,%r" },
     
     { 0, 0, 0, 0, 0, 0, 0 }
   };

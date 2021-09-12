@@ -98,7 +98,8 @@ enum {
 #define cond_GT(f)	( !(( ((f) ^ ((f)<<5)) | ((f)<<1)) & 0x80) )
 #define cond_GTU(f)	( !((f)&flagC) && !((f)&flagZ) )
 #define cond_LT(f)	( ((f) ^ ((f)<<5)) & 0x80 )
-#define cond_LTU(f)	( (f)&flagC) )
+#define cond_LTU(f)	( (f)&flagC )
+#define cond_V(f)	( (f)&flagV )
 
 #define CPU ((class cl_rxk_cpu *)cpu)
 

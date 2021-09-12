@@ -69,7 +69,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_iPZd_HL	instruction_4kb6
 #define LLJP_lxpcmn	instruction_4k87
 #define LD_imn_JK	instruction_4k89
+#define LD_JK_imn	instruction_4k99
 #define LDF_ilmn_A	instruction_4k8a
+#define LDF_A_ilmn	instruction_4k9a
 #define LD_A_iPWHL	instruction_4k8b
 #define LD_A_iPXHL	instruction_4k9b
 #define LD_A_iPYHL	instruction_4kab
@@ -87,6 +89,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_iPYd_A	instruction_4kae
 #define LD_iPZd_A	instruction_4kbe
 #define LLCALL_lxpcmn	instruction_4k8f
+#define LD_LXPC_HL	instruction_4k97
+#define LD_HL_LXPC	instruction_4k9f
+#define JRE_ee		instruction_4k98
+#define JR_GT_e		instruction_4ka0
+#define JR_LT_e		instruction_4kb0
+#define JR_GTU_e	instruction_4ka8
+#define JR_V_e		instruction_4kb8
 
 #endif
 

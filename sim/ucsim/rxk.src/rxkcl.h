@@ -249,6 +249,7 @@ public:
   virtual int LDxR(int dif);					// 0f,6t,1r,1w
   virtual int ld_iIRd_r(u8_t op);				// 1f,10t,0r,1w
   virtual int ld_r_iIRd(class cl_cell8 &op);			// 1f,9t,1r,0w
+  virtual int ld_hl_op(u16_t op);				// 0f,2t,0r,0w
   virtual int ld_dd_imn(class cl_cell16 &dest);			// 2f,13t,2r,0w
   virtual int ld_add_BC_DE(class cl_cell16 &dest, u16_t src);	// 0f,4t,0r,0w
   virtual int ld_imn_ss(u16_t src);				// 2f,15t,0r,2w
@@ -261,12 +262,14 @@ public:
   virtual int dec_r(class cl_cell8 &cr, u8_t op);
   virtual int rot8left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rlc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
+  virtual int rot16left(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
   virtual int rot32left(class cl_cell32 &dest, u32_t op, int nr);//0f,4t,0r,0w
   virtual int rot9left(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
   virtual int rl(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot17left(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
   virtual int rot33left(class cl_cell32 &dest, u32_t op, int nr);//0f,4t,0r,0w
   virtual int rot8right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
+  virtual int rot16right(class cl_cell16 &dest, u16_t op);	// 0f,1t,0r,0w
   virtual int rot32right(class cl_cell32 &dest, u32_t op,int nr);//0f,4t,0r,0w
   virtual int rrc(class cl_cell8 &dest, u8_t op);		// 0f,4t,0r,0w
   virtual int rot9right(class cl_cell8 &dest, u8_t op);		// 0f,1t,0r,0w
@@ -300,6 +303,7 @@ public:
   virtual int dec_i8(t_addr addr);
   virtual int add_ir_xy(u16_t op);				// 0f,4t,0r,0r
   virtual int xor8(class cl_cell8 &dest, u8_t op1, u8_t op2);	// 0f,1t,0r,0w
+  virtual int xor16(class cl_cell16 &dest, u16_t op1,u16_t op2);// 0f,4t,0r,0w
   virtual int or8(class cl_cell8 &dest, u8_t op1, u8_t op2);	// 0f,1t,0r,0w
   virtual int or16(class cl_cell16 &dest,
 		    u16_t op1, u16_t op2);			// 0f,1t,0r,0w

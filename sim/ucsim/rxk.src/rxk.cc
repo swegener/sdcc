@@ -396,6 +396,15 @@ cl_rxk::disassc(t_addr addr, chars *comment)
 		work.appendf("0x%03x", x);
 		break;
 	      }
+	    case 'x': // 32 bit unsigned
+	      {
+		u32_t n, m, l, h;
+		n= rom->get(++addr);
+		m= rom->get(++addr);
+		l= rom->get(++addr);
+		h= rom->get(++addr);
+		work.appendf("0x%08x", (h<<24)+(l<<16)+(m<<8)+n);
+	      }
 	    }
 	  if (comment && temp.nempty())
 	    comment->append(temp);

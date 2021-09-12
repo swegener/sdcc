@@ -363,6 +363,7 @@ public:
   virtual int LD_IRR_PZ(t_mem code) { return ld_irr_px(code); }
   virtual int LD_iSP_HL_IRR(t_mem code);
   virtual int CALL_iIR(t_mem code);
+  virtual int LD_IRR_iSP_HL(t_mem code);
   
   // Starter of extra pages
   virtual int PAGE_4K6D(t_mem code);

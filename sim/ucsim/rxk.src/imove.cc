@@ -1492,5 +1492,19 @@ cl_r4k::CLR_HL(t_mem code)
   return resGO;
 }
 
+int
+cl_r4k::LD_IRR_iSP_HL(t_mem code)
+{
+  u32_t v;
+  u16_t a= rSP+rHL;
+  v= rom->read(a++);
+  v+= rom->read(a++)*256;
+  v+= rom->read(a++)*256*256;
+  v+= rom->read(a)*256*256*256;
+  destIRR()->W(v);
+  tick5p1(13);
+  return resGO;
+}
+
 
 /* End of rxk.src/imove.cc */

@@ -107,6 +107,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD_IRR_PZ	instruction_dd_fd
 #define LD_iSP_HL_IRR	instruction_dd_ff
 #define CALL_iIR	instruction_dd_ea
+#define LD_IRR_iSP_HL	instruction_dd_fe
 
 #endif
 

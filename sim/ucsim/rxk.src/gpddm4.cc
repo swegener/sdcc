@@ -108,6 +108,7 @@ struct dis_entry disass_pddm4[]=
     { 0xfd, 0xff, ' ', 2, "LD %3,PZ" },
     { 0xff, 0xff, ' ', 2, "LD (SP+HL),%3" },
     { 0xea, 0xff, ' ', 2, "CALL (%I)" },
+    { 0xfe, 0xff, ' ', 2, "LD %3,(SP+HL)" },
 
     { 0, 0, 0, 0, 0, 0, 0 }
   };

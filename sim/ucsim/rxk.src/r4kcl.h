@@ -86,6 +86,9 @@ public:
   
   virtual void print_regs(class cl_console_base *con);
 
+  virtual int convc_pp(class cl_cell32 &pp);
+  virtual int convd_pp(class cl_cell32 &pp);
+  
   // move
   virtual int ld_pd_ihtr_hl(class cl_cell32 &dest);
   virtual int ld_irr_iird(class cl_cell16 &ir);			// 1f,14t,0w,4r
@@ -106,6 +109,20 @@ public:
   virtual int ld_ipshl_a(u32_t ps);				// 0f,7t,0r,1w
   virtual int ld_a_ipsd(u32_t ps);				// 1f,6t,1r,0w
   virtual int ld_ipsd_a(u32_t ps);				// 1f,8t,0r,1w
+  virtual int ldl_pd_ispn(class cl_cell32 &pd);			// 1f,11t,2r,0w
+  virtual int ld_pd_ispn(class cl_cell32 &pd);			// 1f,15t,4r,0w
+  virtual int ld_ispn_ps(u32_t ps);				// 1f,19t,0r,4w
+  virtual int ld_hl_ipsbc(u32_t ps);				// 0f,10t,2r,0w
+  virtual int ld_ipdbc_hl(u32_t pd);				// 0f,12t,0r,2w
+  virtual int ldf_pd_ilmn(class cl_cell32 &pd);			// 3f,19t,4r,0w
+  virtual int ldf_ilmn_ps(u32_t ps);				// 3f,23t,0r,4w
+  virtual int ldf_rr_ilmn(class cl_cell16 &rr);			// 3f,15t,2r,0w
+  virtual int ldf_ilmn_rr(u16_t rr);				// 3f,17t,0r,2w
+  virtual int ld_pd_klmn(class cl_cell32 &pd);			// 4f,12t,0r,0w
+  virtual int ldl_pd_mn(class cl_cell32 &pd);			// 2f,8t,0r,0w
+  virtual int copy(int dir);					// 0f,5t,xr,xw
+  virtual int pop_pd(class cl_cell32 &pd);			// 0f,13t,4r,0w
+  virtual int push_ps(u32_t ps);				// 0f,18t,0r,4w
   
   // arith
   virtual int subhl(class cl_cell16 &dest, u16_t op);
@@ -246,6 +263,77 @@ public:
   virtual int SETUSRP(t_mem code);
   virtual int SETSYSP(t_mem code);
   virtual int LLCALL_iJKHL(t_mem code);
+  virtual int LDL_PW_iSPn(t_mem code) { return ldl_pd_ispn(destPW()); }
+  virtual int LDL_PX_iSPn(t_mem code) { return ldl_pd_ispn(destPX()); }
+  virtual int LDL_PY_iSPn(t_mem code) { return ldl_pd_ispn(destPY()); }
+  virtual int LDL_PZ_iSPn(t_mem code) { return ldl_pd_ispn(destPZ()); }
+  virtual int LD_PW_iSPn(t_mem code) { return ld_pd_ispn(cPW); }
+  virtual int LD_PX_iSPn(t_mem code) { return ld_pd_ispn(cPX); }
+  virtual int LD_PY_iSPn(t_mem code) { return ld_pd_ispn(cPY); }
+  virtual int LD_PZ_iSPn(t_mem code) { return ld_pd_ispn(cPZ); }
+  virtual int LD_iSPn_PW(t_mem code) { return ld_ispn_ps(rPW); }
+  virtual int LD_iSPn_PX(t_mem code) { return ld_ispn_ps(rPX); }
+  virtual int LD_iSPn_PY(t_mem code) { return ld_ispn_ps(rPY); }
+  virtual int LD_iSPn_PZ(t_mem code) { return ld_ispn_ps(rPZ); }
+  virtual int LD_HL_iPWBC(t_mem code) { return ld_hl_ipsbc(rPW); }
+  virtual int LD_HL_iPXBC(t_mem code) { return ld_hl_ipsbc(rPX); }
+  virtual int LD_HL_iPYBC(t_mem code) { return ld_hl_ipsbc(rPY); }
+  virtual int LD_HL_iPZBC(t_mem code) { return ld_hl_ipsbc(rPZ); }
+  virtual int LD_iPWBC_HL(t_mem code) { return ld_ipdbc_hl(rPW); }
+  virtual int LD_iPXBC_HL(t_mem code) { return ld_ipdbc_hl(rPX); }
+  virtual int LD_iPYBC_HL(t_mem code) { return ld_ipdbc_hl(rPY); }
+  virtual int LD_iPZBC_HL(t_mem code) { return ld_ipdbc_hl(rPZ); }
+  virtual int LDF_PW_ilmn(t_mem code) { return ldf_pd_ilmn(destPW()); }
+  virtual int LDF_PX_ilmn(t_mem code) { return ldf_pd_ilmn(destPX()); }
+  virtual int LDF_PY_ilmn(t_mem code) { return ldf_pd_ilmn(destPY()); }
+  virtual int LDF_PZ_ilmn(t_mem code) { return ldf_pd_ilmn(destPZ()); }
+  virtual int LDF_ilmn_PW(t_mem code) { return ldf_ilmn_ps(rPW); }
+  virtual int LDF_ilmn_PX(t_mem code) { return ldf_ilmn_ps(rPX); }
+  virtual int LDF_ilmn_PY(t_mem code) { return ldf_ilmn_ps(rPY); }
+  virtual int LDF_ilmn_PZ(t_mem code) { return ldf_ilmn_ps(rPZ); }
+  virtual int LDF_BC_ilmn(t_mem code) { return ldf_rr_ilmn(destBC()); }
+  virtual int LDF_DE_ilmn(t_mem code) { return ldf_rr_ilmn(destDE()); }
+  virtual int LDF_IX_ilmn(t_mem code) { return ldf_rr_ilmn(cIX); }
+  virtual int LDF_IY_ilmn(t_mem code) { return ldf_rr_ilmn(cIY); }
+  virtual int LDF_ilmn_BC(t_mem code) { return ldf_ilmn_rr(rBC); }
+  virtual int LDF_ilmn_DE(t_mem code) { return ldf_ilmn_rr(rDE); }
+  virtual int LDF_ilmn_IX(t_mem code) { return ldf_ilmn_rr(rIX); }
+  virtual int LDF_ilmn_IY(t_mem code) { return ldf_ilmn_rr(rIY); }
+  virtual int LD_PW_klmn(t_mem code) { return ld_pd_klmn(cPW); }
+  virtual int LD_PX_klmn(t_mem code) { return ld_pd_klmn(cPX); }
+  virtual int LD_PY_klmn(t_mem code) { return ld_pd_klmn(cPY); }
+  virtual int LD_PZ_klmn(t_mem code) { return ld_pd_klmn(cPZ); }
+  virtual int LDL_PW_mn(t_mem code) { return ldl_pd_mn(destPW()); }
+  virtual int LDL_PX_mn(t_mem code) { return ldl_pd_mn(destPX()); }
+  virtual int LDL_PY_mn(t_mem code) { return ldl_pd_mn(destPY()); }
+  virtual int LDL_PZ_mn(t_mem code) { return ldl_pd_mn(destPZ()); }
+  virtual int CONVC_PW(t_mem code) { return convc_pp(cPW); }
+  virtual int CONVC_PX(t_mem code) { return convc_pp(cPX); }
+  virtual int CONVC_PY(t_mem code) { return convc_pp(cPY); }
+  virtual int CONVC_PZ(t_mem code) { return convc_pp(cPZ); }
+  virtual int CONVD_PW(t_mem code) { return convd_pp(cPW); }
+  virtual int CONVD_PX(t_mem code) { return convd_pp(cPX); }
+  virtual int CONVD_PY(t_mem code) { return convd_pp(cPY); }
+  virtual int CONVD_PZ(t_mem code) { return convd_pp(cPZ); }
+  virtual int CP_JKHL_BCDE(t_mem code) { return cp32(rJKHL, rBCDE); }
+  virtual int EX_aBC_HL(t_mem code);
+  virtual int EX_aJK_HL(t_mem code);
+  virtual int COPY(t_mem code) { return copy(+1); }
+  virtual int COPYR(t_mem code) { return copy(-1); }
+  virtual int POP_PW(t_mem code) { return pop_pd(destPW()); }
+  virtual int POP_PX(t_mem code) { return pop_pd(destPX()); }
+  virtual int POP_PY(t_mem code) { return pop_pd(destPY()); }
+  virtual int POP_PZ(t_mem code) { return pop_pd(destPZ()); }
+  virtual int PUSH_PW(t_mem code) { return push_ps(rPW); }
+  virtual int PUSH_PX(t_mem code) { return push_ps(rPX); }
+  virtual int PUSH_PY(t_mem code) { return push_ps(rPY); }
+  virtual int PUSH_PZ(t_mem code) { return push_ps(rPZ); }
+  virtual int ADD_JKHL_BCDE(t_mem code);
+  virtual int SUB_JKHL_BCDE(t_mem code);
+  virtual int AND_JKHL_BCDE(t_mem code);
+  virtual int OR_JKHL_BCDE(t_mem code);
+  virtual int XOR_JKHL_BCDE(t_mem code);
+  virtual int LD_HL_iSPHL(t_mem code);
   
   // Page DD/FD
   virtual int LD_A_iIRA(t_mem code);

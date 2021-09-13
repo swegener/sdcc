@@ -292,5 +292,21 @@ cl_r4k::SETSYSP(t_mem code)
   return resGO;
 }
 
+int
+cl_r4k::convc_pp(class cl_cell32 &pp)
+{
+  pp.W(mem->log2phy(pp.read()));
+  tick(7);
+  return resGO;
+}
+
+int
+cl_r4k::convd_pp(class cl_cell32 &pp)
+{
+  pp.W(mem->log2phy(pp.read()));
+  tick(7);
+  return resGO;
+}
+
 
 /* End of m6800.src/inst.cc */

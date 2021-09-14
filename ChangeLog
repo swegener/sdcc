@@ -1,3 +1,8 @@
+2021-09-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Fix a peephole optimizer bug in the handling of SM83 / Z80N swap instruction, part of bug #3280.
+
 2021-09-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

@@ -1,5 +1,12 @@
 2021-09-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  doc/sdccman.lyx,
+	  .version:
+	  Use Z80N Core 2.0 shift instructions.
+
+2021-09-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve single byte rotation.
 

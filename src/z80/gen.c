@@ -10724,7 +10724,8 @@ genRRC (const iCode * ic)
   if (size == 1)
     {
       asmop *rotaop = ASMOP_A;
-      if (result->aop->type == AOP_REG && !aopInReg (result->aop, 0, IYL_IDX) && !aopInReg (result->aop, 0, IYH_IDX) && !aopInReg (left->aop, 0, A_IDX))
+      if (result->aop->type == AOP_REG && !aopInReg (result->aop, 0, IYL_IDX) && !aopInReg (result->aop, 0, IYH_IDX) && !aopInReg (left->aop, 0, A_IDX) ||
+        result->aop->type == AOP_STK && aopSame (result->aop, 0, left->aop, 0, 1))
         rotaop = result->aop;
 
       if (aopInReg (rotaop, 0, A_IDX) && !isRegDead (A_IDX, ic))
@@ -10813,7 +10814,7 @@ genRLC (const iCode * ic)
     {
       asmop *rotaop = ASMOP_A;
       if (result->aop->type == AOP_REG && !aopInReg (result->aop, 0, IYL_IDX) && !aopInReg (result->aop, 0, IYH_IDX) && !aopInReg (left->aop, 0, A_IDX) ||
-        result->aop->type == AOP_STK && aopSame (result, 0, left, 0, 1))
+        result->aop->type == AOP_STK && aopSame (result->aop, 0, left->aop, 0, 1))
         rotaop = result->aop;
 
       if (aopInReg (rotaop, 0, A_IDX) && !isRegDead (A_IDX, ic))
@@ -11724,6 +11725,7 @@ genLeftShift (const iCode *ic)
   int shiftcount = 0;
   int byteshift = 0;
   bool started;
+  bool save_a_outer = false;
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
@@ -11748,6 +11750,17 @@ genLeftShift (const iCode *ic)
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
 
+  if (IS_Z80N && result->aop->size == 2 &&
+    (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX) && isRegDead (PAIR_DE, ic)) &&
+    aopInReg (right->aop, 0, B_IDX))
+    {
+      shiftop = ASMOP_DE;
+      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 ("bsla de, b");
+      regalloc_dry_run_cost += 2;
+      goto end;
+    }
+
   if (right->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, right->aop->aopu.aop_reg[0]->rIdx) && right->aop->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (left->aop, result->aop) || left->aop->type != AOP_REG) &&
     (result->aop->type != AOP_REG ||
     result->aop->aopu.aop_reg[0]->rIdx != right->aop->aopu.aop_reg[0]->rIdx &&
@@ -11769,7 +11782,7 @@ genLeftShift (const iCode *ic)
       countreg = A_IDX;
     }
 
-  bool save_a_outer = (!isRegDead (A_IDX, ic) && countreg == A_IDX && !(shift_by_lit && shiftcount == 1));
+  save_a_outer = (!isRegDead (A_IDX, ic) && countreg == A_IDX && !(shift_by_lit && shiftcount == 1));
   
   if(save_a_outer)
       _push (PAIR_AF);
@@ -12166,6 +12179,17 @@ genRightShift (const iCode * ic)
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
+
+  if (IS_Z80N && result->aop->size == 2 &&
+    (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX) && isRegDead (PAIR_DE, ic)) &&
+    aopInReg (right->aop, 0, B_IDX))
+    {
+      shiftop = ASMOP_DE;
+      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 (is_signed ? "bsra de, b" : "bsrl de, b");
+      regalloc_dry_run_cost += 2;
+      goto end;
+    }
 
   if (right->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, right->aop->aopu.aop_reg[0]->rIdx) && right->aop->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (left->aop, result->aop) || left->aop->type != AOP_REG) &&
     (result->aop->type != AOP_REG ||

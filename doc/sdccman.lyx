@@ -2678,6 +2678,11 @@ In 4.1.10, the default calling convention switched from __sdccall(0) to __sdccal
 In 4.1.10, support for –profile has been removed for gbz80.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.11, the minimum Z80N Core version for the z80n port has been raised
+ from 1.0 to 2.0.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

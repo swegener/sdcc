@@ -589,7 +589,8 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST)
     return(true);
 
-  if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right))
+  if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right) ||
+    (ic->op == RRC || ic->op == RLC) && getSize(operandType(result)) == 1)
     return(true);
 
   // Can use non-destructive cp on == and < (> might swap operands).

@@ -1,3 +1,8 @@
+2021-09-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve single byte rotation.
+
 2021-09-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

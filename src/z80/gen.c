@@ -10707,7 +10707,7 @@ static void
 genRRC (const iCode * ic)
 {
   operand *left, *result;
-  bool pushed_a = !isRegDead (A_IDX, ic);
+  bool pushed_a = false;
   /* rotate right with carry */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
@@ -10720,17 +10720,32 @@ genRRC (const iCode * ic)
 
   int size = result->aop->size;
   int offset = size - 1;
-  if (size == 0)
+
+  if (size == 1)
     {
-      /* special case for 1 byte */
-      _moveA (aopGet (left->aop, 0, false));
-      emit3_o (A_RRCA, 0, 0, 0, 0);
-      aopPut (result->aop, "a", 0);
+      asmop *rotaop = ASMOP_A;
+      if (result->aop->type == AOP_REG && !aopInReg (result->aop, 0, IYL_IDX) && !aopInReg (result->aop, 0, IYH_IDX) && !aopInReg (left->aop, 0, A_IDX))
+        rotaop = result->aop;
+
+      if (aopInReg (rotaop, 0, A_IDX) && !isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
+ 
+      cheapMove (rotaop, 0, left->aop, 0, isRegDead (A_IDX, ic) || pushed_a);
+      emit3 (aopInReg (rotaop, 0, A_IDX) ? A_RRCA : A_RRC, aopInReg (rotaop, 0, A_IDX) ? 0 : rotaop, 0);
+      cheapMove (result->aop, 0, rotaop, 0, isRegDead (A_IDX, ic) || pushed_a);
     }
   else if (left->aop->type == AOP_REG || result->aop->type == AOP_STK ||
            result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
            result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
     {
+      if (!isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
       if (left->aop->type != AOP_REG && !operandsEqu (result, left))
         {
           /* always prefer register operations */
@@ -10753,6 +10768,11 @@ genRRC (const iCode * ic)
     }
   else
     {
+      if (!isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
       while (offset >= 0)
         {
           _moveA (aopGet (left->aop, offset, false));
@@ -10779,7 +10799,7 @@ static void
 genRLC (const iCode * ic)
 {
   operand *left, *result;
-  bool pushed_a = !isRegDead (A_IDX, ic);
+  bool pushed_a = false;
   /* rotate left with carry */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
@@ -10787,21 +10807,34 @@ genRLC (const iCode * ic)
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
 
-  if (pushed_a)
-    _push (PAIR_AF);
-
   int size = result->aop->size;
-  if (size == 0)
+
+  if (size == 1)
     {
-      /* special case for 1 byte */
-      _moveA (aopGet (left->aop, 0, false));
-      emit3_o (A_RLCA, 0, 0, 0, 0);
-      aopPut (result->aop, "a", 0);
+      asmop *rotaop = ASMOP_A;
+      if (result->aop->type == AOP_REG && !aopInReg (result->aop, 0, IYL_IDX) && !aopInReg (result->aop, 0, IYH_IDX) && !aopInReg (left->aop, 0, A_IDX) ||
+        result->aop->type == AOP_STK && aopSame (result, 0, left, 0, 1))
+        rotaop = result->aop;
+
+      if (aopInReg (rotaop, 0, A_IDX) && !isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
+ 
+      cheapMove (rotaop, 0, left->aop, 0, isRegDead (A_IDX, ic) || pushed_a);
+      emit3 (aopInReg (rotaop, 0, A_IDX) ? A_RLCA : A_RLC, aopInReg (rotaop, 0, A_IDX) ? 0 : rotaop, 0);
+      cheapMove (result->aop, 0, rotaop, 0, isRegDead (A_IDX, ic) || pushed_a);
     }
   else if (left->aop->type == AOP_REG || result->aop->type == AOP_STK ||
            result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
            result->aop->type == AOP_EXSTK || result->aop->type == AOP_REG)
     {
+      if (!isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
       if (left->aop->type != AOP_REG && !operandsEqu (result, left))
         {
           /* always prefer register operations */
@@ -10824,6 +10857,12 @@ genRLC (const iCode * ic)
     }
   else
     {
+      if (!isRegDead (A_IDX, ic))
+      {
+        _push (PAIR_AF);
+        pushed_a = true;
+      }
+
       for (int offset = 0; offset < size; ++offset)
         {
           _moveA (aopGet (left->aop, offset, false));

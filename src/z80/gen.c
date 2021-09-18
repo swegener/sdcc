@@ -3237,7 +3237,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
 
       if (!index ||
         // eZ80 can assign between any byte of an index register and any non-hl register.
-        IS_EZ80_Z80 && !aopInReg (to, to_offset, L_IDX) && !aopInReg (to, to_offset, H_IDX) && !aopInReg (from, from_offset, L_IDX) && !aopInReg (from, from_offset, H_IDX))
+        (IS_EZ80_Z80 || IS_Z80N) && !aopInReg (to, to_offset, L_IDX) && !aopInReg (to, to_offset, H_IDX) && !aopInReg (from, from_offset, L_IDX) && !aopInReg (from, from_offset, H_IDX))
         {
           bool a = aopInReg (to, to_offset, A_IDX) || aopInReg (from, from_offset, A_IDX);
           if (!regalloc_dry_run)
@@ -6718,7 +6718,7 @@ genPlusIncr (const iCode *ic)
 
   /* if increment 16 bits in register */
   if (sameRegs (IC_LEFT (ic)->aop, IC_RESULT (ic)->aop) && size > 1 && icount == 1
-    && (IS_EZ80_Z80 || size == 2 && getPairId (IC_RESULT (ic)->aop) != PAIR_INVALID || size >= 2 && !aopInReg (IC_RESULT (ic)->aop, 0, IYL_IDX) && !aopInReg (IC_RESULT (ic)->aop, 0, IYH_IDX) && !aopInReg (IC_RESULT (ic)->aop, 1, IYL_IDX) && !aopInReg (IC_RESULT (ic)->aop, 1, IYH_IDX)))
+    && ((IS_EZ80_Z80 || IS_Z80N) || size == 2 && getPairId (IC_RESULT (ic)->aop) != PAIR_INVALID || size >= 2 && !aopInReg (IC_RESULT (ic)->aop, 0, IYL_IDX) && !aopInReg (IC_RESULT (ic)->aop, 0, IYH_IDX) && !aopInReg (IC_RESULT (ic)->aop, 1, IYL_IDX) && !aopInReg (IC_RESULT (ic)->aop, 1, IYH_IDX)))
     {
       int offset = 0;
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
@@ -7506,7 +7506,7 @@ genPlus (iCode * ic)
         (i < leftop->size &&
         leftop->type == AOP_REG && IC_RESULT (ic)->aop->type == AOP_REG &&
         leftop->aopu.aop_reg[i]->rIdx == IC_RESULT (ic)->aop->aopu.aop_reg[i]->rIdx &&
-        (IS_EZ80_Z80 || leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX) ||
+        ((IS_EZ80_Z80 || IS_Z80N) || leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX) ||
         leftop->type == AOP_STK && leftop == IC_RESULT (ic)->aop ||
         leftop->type == AOP_PAIRPTR && leftop->aopu.aop_pairId == PAIR_HL))
         {
@@ -7520,7 +7520,7 @@ genPlus (iCode * ic)
         }
       else
         {
-          if (!IS_EZ80_Z80 && (aopInReg (rightop, i, IYL_IDX) || aopInReg (rightop, i, IYH_IDX)))
+          if (!IS_EZ80_Z80 && !IS_Z80N && (aopInReg (rightop, i, IYL_IDX) || aopInReg (rightop, i, IYH_IDX)))
             if (!premoved && !aopInReg (leftop, i, IYL_IDX) && !aopInReg (leftop, i, IYL_IDX))
               {
                 operand *t = IC_RIGHT (ic);
@@ -9205,7 +9205,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
   /* Non-destructive compare */
   if (aopInReg (left->aop, 0, A_IDX) && !isRegDead (A_IDX, ic) &&
     (right->aop->type == AOP_LIT ||
-    right->aop->type == AOP_REG && (IS_EZ80_Z80 || right->aop->aopu.aop_reg[offset]->rIdx != IYL_IDX && right->aop->aopu.aop_reg[offset]->rIdx != IYH_IDX) ||
+    right->aop->type == AOP_REG && (IS_EZ80_Z80 || IS_Z80N || right->aop->aopu.aop_reg[offset]->rIdx != IYL_IDX && right->aop->aopu.aop_reg[offset]->rIdx != IYH_IDX) ||
     right->aop->type == AOP_STK))
     {
       bool pushed_hl = false;
@@ -10355,7 +10355,7 @@ genOr (const iCode * ic, iCode * ifx)
         }
 
       if (aopInReg (right->aop, i, A_IDX) || right->aop->type == AOP_SFR ||
-        !IS_EZ80_Z80 && (aopInReg (right->aop, i, IYL_IDX) || aopInReg (right->aop, i, IYH_IDX)))
+        !IS_EZ80_Z80 && !IS_Z80N && (aopInReg (right->aop, i, IYL_IDX) || aopInReg (right->aop, i, IYH_IDX)))
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true);
 
@@ -10826,6 +10826,13 @@ genRLC (const iCode * ic)
       cheapMove (rotaop, 0, left->aop, 0, isRegDead (A_IDX, ic) || pushed_a);
       emit3 (aopInReg (rotaop, 0, A_IDX) ? A_RLCA : A_RLC, aopInReg (rotaop, 0, A_IDX) ? 0 : rotaop, 0);
       cheapMove (result->aop, 0, rotaop, 0, isRegDead (A_IDX, ic) || pushed_a);
+    }
+  else if (IS_Z80N && size == 2 && aopInReg (result->aop, 0, DE_IDX) && isRegDead (B_IDX, ic))
+    {
+      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 ("ld b, !immedbyte", 1);
+      emit2 ("brlc de, b");
+      regalloc_dry_run_cost += 4;
     }
   else if (left->aop->type == AOP_REG || result->aop->type == AOP_STK ||
            result->aop->type == AOP_HL || result->aop->type == AOP_IY ||
@@ -11641,8 +11648,16 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
 
   wassert (size == 2);
 
-  /* if shCount >= 8 */
-  if (shCount >= 8)
+  if (IS_Z80N &&
+    aopInReg (result->aop, 0, DE_IDX) && isRegDead (B_IDX, ic) &&
+    shCount > 2 && shCount != 8) // Only worth it when shifting by more than 2 (we can get a cheap path using add hl, hl in shiftL2Left2Result (left, result, shCount, ic)).
+    {
+      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 ("ld b, !immedbyte", shCount);
+      emit2 ("bsla de, b");
+      regalloc_dry_run_cost += 4;
+    }
+  else if (shCount >= 8)
     {
       shCount -= 8;
       if (size > 1)
@@ -11654,18 +11669,8 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
         }
       cheapMove (result->aop, 0, ASMOP_ZERO, 0, isRegDead (A_IDX, ic));
     }
-  /*  0 <= shCount <= 7 */
   else
-    {
-      if (size == 1)
-        {
-          wassert (0);
-        }
-      else
-        {
-          shiftL2Left2Result (left, result, shCount, ic);
-        }
-    }
+    shiftL2Left2Result (left, result, shCount, ic);
 }
 
 /*------------------------------------------------------------------*/
@@ -11750,16 +11755,8 @@ genLeftShift (const iCode *ic)
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
 
-  if (IS_Z80N && result->aop->size == 2 &&
-    (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX) && isRegDead (PAIR_DE, ic)) &&
-    aopInReg (right->aop, 0, B_IDX))
-    {
-      shiftop = ASMOP_DE;
-      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
-      emit2 ("bsla de, b");
-      regalloc_dry_run_cost += 2;
-      goto end;
-    }
+  bool z80n_de = ((result->aop->size == 2 && (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX)) ||
+      result->aop->size == 1 && (aopInReg (result->aop, 0, D_IDX) || aopInReg (left->aop, 0, D_IDX)))) && isRegDead (PAIR_DE, ic);
 
   if (right->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, right->aop->aopu.aop_reg[0]->rIdx) && right->aop->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (left->aop, result->aop) || left->aop->type != AOP_REG) &&
     (result->aop->type != AOP_REG ||
@@ -11775,11 +11772,23 @@ genLeftShift (const iCode *ic)
     countreg = B_IDX;
   else if (isRegDead (C_IDX, ic) && result->aop->regs[C_IDX] < 0 && left->aop->regs[C_IDX] < 0)
     countreg = C_IDX;
+  else if (IS_Z80N && z80n_de && aopInReg (right->aop, 0, B_IDX))
+    countreg = B_IDX;
   else
     {
       wassert (regalloc_dry_run);
       regalloc_dry_run_cost += 500;
       countreg = A_IDX;
+    }
+
+  if (IS_Z80N && z80n_de && (aopInReg (right->aop, 0, B_IDX) || countreg == B_IDX))
+    {
+      shiftop = result->aop->size == 2 ? ASMOP_DE : ASMOP_E;
+      cheapMove (ASMOP_B, 0, right->aop, 0, isRegDead (A_IDX, ic));
+      genMove (shiftop, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 ("bsla de, b");
+      regalloc_dry_run_cost += 2;
+      goto end;
     }
 
   save_a_outer = (!isRegDead (A_IDX, ic) && countreg == A_IDX && !(shift_by_lit && shiftcount == 1));
@@ -12053,10 +12062,18 @@ shiftR1Left2Result (operand *left, int offl, operand *result, int offr, int shCo
 /* genrshTwo - right shift two bytes by known amount               */
 /*-----------------------------------------------------------------*/
 static void
-genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int sign)
+genrshTwo (const iCode *ic, operand *result, operand *left, int shCount, int sign)
 {
-  /* if shCount >= 8 */
-  if (shCount >= 8)
+  if (IS_Z80N &&
+    aopInReg (result->aop, 0, DE_IDX) && isRegDead (B_IDX, ic) &&
+    shCount != 8)
+    {
+      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 ("ld b, !immedbyte", shCount);
+      emit2 (sign ? "bsra de, b" : "bsrl de, b");
+      regalloc_dry_run_cost += 4;
+    }
+  else if (shCount >= 8)
     {
       shCount -= 8;
       if (shCount)
@@ -12074,7 +12091,6 @@ genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int 
       else
         cheapMove (result->aop, 1, ASMOP_ZERO, 0, true);
     }
-  /*  0 <= shCount <= 7 */
   else
     shiftR2Left2Result (ic, left, LSB, result, LSB, shCount, sign);
 }
@@ -12179,18 +12195,7 @@ genRightShift (const iCode * ic)
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
-
-  if (IS_Z80N && result->aop->size == 2 &&
-    (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX) && isRegDead (PAIR_DE, ic)) &&
-    aopInReg (right->aop, 0, B_IDX))
-    {
-      shiftop = ASMOP_DE;
-      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
-      emit2 (is_signed ? "bsra de, b" : "bsrl de, b");
-      regalloc_dry_run_cost += 2;
-      goto end;
-    }
-
+    
   if (right->aop->type == AOP_REG && !bitVectBitValue (ic->rSurv, right->aop->aopu.aop_reg[0]->rIdx) && right->aop->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (left->aop, result->aop) || left->aop->type != AOP_REG) &&
     (result->aop->type != AOP_REG ||
     result->aop->aopu.aop_reg[0]->rIdx != right->aop->aopu.aop_reg[0]->rIdx &&
@@ -12207,6 +12212,19 @@ genRightShift (const iCode * ic)
     countreg = B_IDX;
   else
     countreg = A_IDX;
+
+  if (IS_Z80N && isRegDead (PAIR_DE, ic) &&
+    (result->aop->size == 2 && (aopInReg (result->aop, 0, DE_IDX) || aopInReg (left->aop, 0, DE_IDX)) ||
+      result->aop->size == 1 && (aopInReg (result->aop, 0, D_IDX) || aopInReg (left->aop, 0, D_IDX))) &&
+    (aopInReg (right->aop, 0, B_IDX) || countreg == B_IDX))
+    {
+      shiftop = result->aop->size == 2 ? ASMOP_DE : ASMOP_D;
+      cheapMove (ASMOP_B, 0, right->aop, 0, isRegDead (A_IDX, ic));
+      genMove (shiftop, left->aop, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), true);
+      emit2 (is_signed ? "bsra de, b" : "bsrl de, b");
+      regalloc_dry_run_cost += 2;
+      goto end;
+    }
 
   if (!shift_by_lit)
     cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, right->aop, 0, true);

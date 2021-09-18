@@ -318,6 +318,14 @@ z80MightReadFlag(const lineNode *pl, const char *what)
   if(IS_RAB && (ISINST(pl->line, "ioi") || ISINST(pl->line, "ioe")))
     return(false);
 
+  if(IS_Z80N &&
+    (ISINST(pl->line, "bsla") ||
+    ISINST(pl->line, "bsra") ||
+    ISINST(pl->line, "bsrl") ||
+    ISINST(pl->line, "bsrf") ||
+    ISINST(pl->line, "brlc")))
+    return(false);
+
   return true;
 }
 
@@ -600,6 +608,14 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if (IS_GB && (ISINST(pl->line, "lda") || ISINST(pl->line, "ldhl")))
     return(!strcmp(what, "sp"));
+
+  if(IS_Z80N &&
+    (ISINST(pl->line, "bsla") ||
+    ISINST(pl->line, "bsra") ||
+    ISINST(pl->line, "bsrl") ||
+    ISINST(pl->line, "bsrf") ||
+    ISINST(pl->line, "brlc")))
+    return(strchr("bde", *what));
 
   /* TODO: Can we know anything about rst? */
   if(ISINST(pl->line, "rst"))
@@ -1563,6 +1579,14 @@ int z80instructionSize(lineNode *pl)
     return(3);
 
   if((IS_GB || IS_Z80N) && ISINST(pl->line, "swap"))
+    return(2);
+
+  if(IS_Z80N &&
+    (ISINST(pl->line, "bsla") ||
+    ISINST(pl->line, "bsra") ||
+    ISINST(pl->line, "bsrl") ||
+    ISINST(pl->line, "bsrf") ||
+    ISINST(pl->line, "brlc")))
     return(2);
 
   if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))

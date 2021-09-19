@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= pdk
+
 STARTYEAR	= 2019
 
 SHELL		= /bin/sh
@@ -50,36 +53,44 @@ VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o port.o \
 		  inst.o \
-		  simpdk.o pdk.o
-OBJECTS_EXE	= spdk.o
+		  sim$(TN).o $(TN).o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
-STM8ASM		= 
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
+STM8ASM		= 
 #TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 #		  test_arith.hex
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs pdk.src
+all: checkconf otherlibs $(TN).src
 
 tests: $(TEST_OBJ)
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) spdk$(EXEEXT) $(DESTDIR)$(bindir)/`echo spdk|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo spdk|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo spdk|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -119,21 +130,28 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-pdk.src: spdk$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-spdk$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+$(LEN): s$(TN)$(EXEEXT)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/spdk.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No pdk shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/spdk.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/spdk.so
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/s$(TN).so
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 

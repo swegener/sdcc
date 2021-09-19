@@ -4,7 +4,7 @@
 
 TARGET=linux
 
-PREFIX="${HOME}/local"
+PREFIX="${HOME}/dani"
 DD_HOSTS="p4 anb anb1 render mms box mazsola v3"
 PERF_FLAG=""
 OPT_FLAG="-O2"
@@ -45,23 +45,10 @@ export CFLAGS="-g $OPT_FLAG $PERF_FLAG"
 case $TARGET in
     linux|l)
 	if echo $DD_HOSTS|grep $(hostname) >/dev/null 2>&1 ; then
-	    export PREFIX='/usr/local'
+	    :
 	fi
 	./configure --prefix=${PREFIX} \
 	    --disable-dlso \
-	    --enable-serio \
-	    --enable-avr-port \
-	    --enable-z80-port \
-	    --enable-xa-port \
-	    --enable-stm8-port \
-	    --enable-st7-port \
-	    --enable-p1516-port \
-	    --enable-m6809-port \
-	    --enable-m6800-port \
-	    --enable-m68hc12-port \
-	    --enable-mcs6502-port \
-	    --enable-rxk-port \
-	    --enable-pblaze-port
 	    "$@"
 	#--enable-ucsim
 	;;
@@ -75,24 +62,10 @@ case $TARGET in
 	    export CXX=i686-w64-mingw32-g++
 	    export HOST_OPT='--host=i686-w64-mingw32'
 	    export LDFLAGS='-static-libgcc -static-libstdc++'
-	    export PREFIX='/usr/local'
 	fi
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
 	    --disable-dlso \
-	    --disable-serio \
-	    --enable-avr-port \
-	    --enable-z80-port \
-	    --enable-xa-port \
-	    --enable-stm8-port \
-	    --enable-st7-port \
-	    --enable-p1516-port \
-	    --enable-m6809-port \
-	    --enable-m6800-port \
-	    --enable-m68hc12-port \
-	    --enable-mcs6502-port \
-	    --enable-rxk-port \
-	    --enable-pblaze-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
@@ -101,23 +74,9 @@ case $TARGET in
 	export CXX=x86_64-w64-mingw32-g++
 	export HOST_OPT='--host=x86_64-w64-mingw32'
 	export LDFLAGS='-static-libgcc -static-libstdc++'
-	export PREFIX='/usr/local'
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
 	    --disable-dlso \
-	    --disable-serio \
-	    --enable-avr-port \
-	    --enable-z80-port \
-	    --enable-xa-port \
-	    --enable-stm8-port \
-	    --enable-st7-port \
-	    --enable-p1516-port \
-	    --enable-m6809-port \
-	    --enable-m6800-port \
-	    --enable-m68hc12-port \
-	    --enable-mcs6502-port \
-	    --enable-rxk-port \
-	    --enable-pblaze-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;

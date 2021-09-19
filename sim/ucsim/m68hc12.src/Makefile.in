@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= m68hc12
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -50,10 +53,15 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o simm68hc12.o m68hc11.o m68hc12.o
+OBJECTS_SHARED	= glob.o sim$(TN).o m68hc11.o $(TN).o
 
-OBJECTS_EXE	= sm68hc12.o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -64,21 +72,24 @@ TEST_OBJ	=
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs m68hc12.src
+all: checkconf otherlibs $(TN).src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) sm68hc12$(EXEEXT) $(DESTDIR)$(bindir)/`echo sm68hc12|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sm68hc12|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/sm68hc12
-	rm -f $(DESTDIR)$(bindir)/`echo sm68hc12|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -118,23 +129,27 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-m68hc12.src: sm68hc12$(EXEEXT) ucsim_m68hc12$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-sm68hc12$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-ucsim_m68hc12$(EXEEXT): sm68hc12$(EXEEXT)
+$(LEN): $(SEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/sm68hc12.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No M68HC12 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/sm68hc12.so: $(OBJECTS_SHARED)
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a

@@ -1,4 +1,4 @@
-uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -40,7 +40,7 @@ Address decoders:
 # The bank switcher should have an operator on sfr[0xd0]
 memory cell sfr[0xd0]
 sfr[0xd0] sfr_0000d0
-cell data=0x5599a50ece40/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[80]
 Operators:
 

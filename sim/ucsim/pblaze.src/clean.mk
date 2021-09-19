@@ -4,7 +4,9 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f spblaze$(EXEEXT) spblaze.exe ucsim_spblaze.exe
+	rm -f spblaze spblaze.exe
+	rm -f ucsim_pblaze ucsim_pblaze.exe
+	rm -f ucsim_spblaze ucsim_spblaze.exe
 
 
 # Deleting all files created by configuring or building the program

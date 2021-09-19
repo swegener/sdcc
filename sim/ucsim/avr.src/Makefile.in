@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= avr
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -50,11 +53,16 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o \
-		  simavr.o avr.o port.o \
+		  sim$(TN).o $(TN).o port.o \
 		  inst.o bit_inst.o jump_inst.o move_inst.o logic_inst.o \
 		  arith_inst.o
-OBJECTS_EXE	= savr.o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -66,21 +74,24 @@ TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs avr.src
+all: checkconf otherlibs $(TN).src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) savr$(EXEEXT) $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/savr
-	rm -f $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -120,23 +131,27 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-avr.src: savr$(EXEEXT) ucsim_avr$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-savr$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-ucsim_avr$(EXEEXT): savr$(EXEEXT)
+$(LEN): $(SEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/savr.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No AVR shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/savr.so: $(OBJECTS_SHARED)
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a

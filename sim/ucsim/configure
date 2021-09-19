@@ -3023,11 +3023,11 @@ fi
 
 # Check whether --enable-pblaze-port was given.
 if test "${enable_pblaze_port+set}" = set; then :
-  enableval=$enable_pblaze_port; if test $enable_pblaze_port  != "yes"; then
+  enableval=$enable_pblaze_port; if test $enable_pblaze_port  != "no"; then
     enable_pblaze_port="yes"
 fi
 else
-  enable_pblaze_port="no"
+  enable_pblaze_port="yes"
 fi
 
 # Check whether --enable-serio was given.

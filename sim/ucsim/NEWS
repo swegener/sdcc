@@ -1,3 +1,8 @@
+0.7
+
+- New simulators: PicoBlaze, MCS6502, MC6800, MC68HC12
+
+
 0.6
 
 - New commands: "memory info" (same as "info memory"), "get error"
@@ -13,7 +18,7 @@
 
 - More operators for expressions
 
-- New simulators: TLCS90, Padauk
+- New simulators: TLCS90, Padauk, M6809
 
 - VCD output
 

@@ -1,4 +1,4 @@
-uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -11,19 +11,19 @@ var _main rom[0x008e]
 dc 0x0000 0x00090
 
    0x00000 <__interrupt_vect>:
-   0x00000 02 00 03 75 LJMP   0x00375[0K
+ ? 0x00000 02 00 03 75 LJMP   0x00375[0K
  ? 0x00004 00          NOP[0K
  ? 0x00005 aa 75       MOV    R2,0x75[0K
  ? 0x00007 00          NOP[0K
  ? 0x00008 55 75       ANL    A,0x75[0K
  ? 0x0000a 9d          SUBB   A,R5[0K
  ? 0x0000b 06          INC    @R0[0K
-   0x0000c 75 00 aa    MOV    0x00 <R0>,#0xaa[0K
-   0x0000f 75 00 55    MOV    0x00 <R0>,#0x55[0K
-   0x00012 75 c6 90    MOV    0xc6 <MCON>,#0x90[0K
-   0x00015 75 00 00    MOV    0x00 <R0>,#0x00[0K
-   0x00018 75 00 00    MOV    0x00 <R0>,#0x00[0K
-   0x0001b 02 00 00 23 LJMP   0x00023 <__sdcc_gsinit_startup>[0K
+ ? 0x0000c 75 00 aa    MOV    0x00 <R0>,#0xaa[0K
+ ? 0x0000f 75 00 55    MOV    0x00 <R0>,#0x55[0K
+ ? 0x00012 75 c6 90    MOV    0xc6 <MCON>,#0x90[0K
+ ? 0x00015 75 00 00    MOV    0x00 <R0>,#0x00[0K
+ ? 0x00018 75 00 00    MOV    0x00 <R0>,#0x00[0K
+ ? 0x0001b 02 00 00 23 LJMP   0x00023 <__sdcc_gsinit_startup>[0K
 
    0x0001f <__sdcc_program_startup>:
  ? 0x0001f 02 00 00 8e LJMP   0x0008e <_main>[0K

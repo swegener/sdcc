@@ -5,6 +5,9 @@
 #
 #
 
+# tool name
+TN		= tlcs
+
 STARTYEAR	= 2016
 
 SHELL		= /bin/sh
@@ -51,11 +54,16 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o \
-		  simtlcs.o tlcs.o \
+		  sim$(TN).o $(TN).o \
 		  inst_block.o inst_cpu_others.o inst_rot_sh.o \
 		  inst_jump.o inst_move.o inst_arith.o inst_bit.o
-OBJECTS_EXE	= stlcs.o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -63,21 +71,24 @@ dlso_ok		= @dlso_ok@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs tlcs.src
+all: checkconf otherlibs $(TN).src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) stlcs$(EXEEXT) $(DESTDIR)$(bindir)/`echo stlcs|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo stlcs|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/stlcs
-	rm -f $(DESTDIR)$(bindir)/`echo stlcs|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -115,20 +126,27 @@ include $(srcdir)/clean.mk
 
 # My rules
 # --------
-tlcs.src: stlcs$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-stlcs$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+$(LEN): $(SEN)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/stlcs.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No TLCS shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/stlcs.so: $(OBJECTS_SHARED)
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a

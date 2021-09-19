@@ -15,9 +15,9 @@ ifeq ($(SIM), sim)
 			) \
 		)
 else ifeq ($(SIM), s51)
-	SIM := $(abs_top_builddir)/$(SIM).src/$(SIM)
+	SIM := $(abs_top_builddir)/$(SIM).src/ucsim_51
 else
-	SIM := $(abs_top_builddir)/$(SIM).src/s$(SIM)
+	SIM := $(abs_top_builddir)/$(SIM).src/ucsim_$(SIM)
 endif
 
 

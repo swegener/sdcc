@@ -1,4 +1,4 @@
-uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -11,37 +11,37 @@ dump sfr 0xe9 0xef
 # All cells should have hw operators attached
 memory cell sfr 0xe9
 sfr[0xe9] sfr_0000e9
-cell data=0x5635fe08ba59/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[105]
 Operators:
 memory cell sfr 0xea
 sfr[0xea] sfr_0000ea
-cell data=0x5635fe08ba5a/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[106]
 Operators:
 memory cell sfr 0xeb
 sfr[0xeb] sfr_0000eb
-cell data=0x5635fe08ba5b/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[107]
 Operators:
 memory cell sfr 0xec
 sfr[0xec] sfr_0000ec
-cell data=0x5635fe08ba5c/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[108]
 Operators:
 memory cell sfr 0xed
 sfr[0xed] sfr_0000ed
-cell data=0x5635fe08ba5d/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[109]
 Operators:
 memory cell sfr 0xee
 sfr[0xee] sfr_0000ee
-cell data=0x5635fe08ba5e/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[110]
 Operators:
 memory cell sfr 0xef
 sfr[0xef] sfr_0000ef
-cell data=0x5635fe08ba5f/8 mask=ff flags=0
+cell width=8 mask=ff flags=0
   decoded to sfr_chip[111]
 Operators:
 

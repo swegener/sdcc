@@ -3,7 +3,8 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f sz80$(EXEEXT) sz80.exe
+	rm -f sz80 sz80.exe
+	rm -f ucsim_z80 ucsim_z80.exe
 	$(MAKE) -C test -f clean.mk clean
 
 

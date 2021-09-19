@@ -24,7 +24,7 @@
     This command stops read records when it detects an "END" record which is
     normally the last record. This command has two equivalent forms <b>download</b>
     and <b>dl</b>.
-    <pre>$ <font color="#118811">s51 -V</font>
+    <pre>$ <font color="#118811">ucsim_51 -V</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -56,7 +56,7 @@ under certain conditions; type `show c' for details.
       the memory region to be filled. </p>
     <p><b>data</b> parameter specifies the data which is used to fill the memory
       region. </p>
-    <pre>$ <font color="#118811">s51</font> 
+    <pre>$ <font color="#118811">ucsim_51</font> 
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -81,7 +81,7 @@ under certain conditions; type `show c' for details.
     <p><b>where</b> command do case unsensitive search while <b>Where</b>
       command is for case sensitive search. </p>
     <p>Search is done in whole memory and all matches are dumped out. </p>
-    <pre>$ <font color="#118811">s51</font>
+    <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -106,7 +106,7 @@ under certain conditions; type `show c' for details.
       shorter than specified length (default is 100) will not be listed.
       Searched value is 0 (zero) by default but other can be specified as the
       last parameter. </p>
-    <pre>$ <font color="#118811">s51</font>
+    <pre>$ <font color="#118811">ucsim_51</font>
 uCsim 0.6-pre55, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -151,8 +151,8 @@ under certain conditions; type `show c' for details.
           createaddressspace|caddressspace|caddrspace|caspace|createaddrspace|createaspace
           <i>id startaddr size</i></h4>
       </a> This command should never be used. It defines an address space, names
-      it as <b>id</b>, sets its starting address and size. Simulator programs (<b>s51</b>,
-      <b>savr</b>, etc.) define necessary address spaces for themself, so this
+      it as <b>id</b>, sets its starting address and size. Simulator programs (<b>ucsim_51</b>,
+      <b>ucsim_avr</b>, etc.) define necessary address spaces for themself, so this
       command is not needed.
       <hr> <a name="memory_createaddressdecoder">
         <h4>memory
@@ -164,7 +164,7 @@ under certain conditions; type `show c' for details.
       parameter is name of the memory chip and the second <b>begin</b>
       parameter is the (start of the) chip address where the area is mapped to.
       <p>Address space will be split if a "middle" are is mapped: </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -208,7 +208,7 @@ Address decoders:
  2 xram 0x07d1 0xffff -&gt; xram_chip 0x07d1 activated
 0&gt; 
 </pre> It is easy to share chip area between address spaces:
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it

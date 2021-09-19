@@ -3,7 +3,8 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f spdk$(EXEEXT) spdk.exe
+	rm -f spdk spdk.exe
+	rm -f ucsim_pdk ucsim_pdk.exe
 	$(MAKE) -C test -f clean.mk clean
 
 

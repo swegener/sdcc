@@ -1,0 +1,71 @@
+uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+ucsim version 0.6-pre71
+Type of microcontroller: KCPSM6 fpga
+Controller has 7 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+  off irq[0]
+   on port_id[0]
+   on output_port[0]
+   on input_port[0]
+Regbank A
+S0= 0x08   8 .
+S1= 0x70 112 p
+S2= 0xd4 212 .
+S3= 0xb2 178 .
+S4= 0x8a 138 .
+S5= 0x29  41 )
+S6= 0x54  84 T
+S7= 0x48  72 H
+S8= 0x9a 154 .
+S9= 0x0a  10 .
+Sa= 0xbc 188 .
+Sb= 0xd5 213 .
+Sc= 0x0e  14 .
+Sd= 0x18  24 .
+Se= 0xa8 168 .
+Sf= 0x44  68 D
+Regbank B
+S10= 0xac 172 .
+S11= 0x5b  91 [
+S12= 0xf3 243 .
+S13= 0x8e 142 .
+S14= 0x4c  76 L
+S15= 0xd7 215 .
+S16= 0x2d  45 -
+S17= 0x9b 155 .
+S18= 0x09   9 .
+S19= 0x42  66 B
+S1a= 0xe5 229 .
+S1b= 0x06   6 .
+S1c= 0xc4 196 .
+S1d= 0x33  51 3
+S1e= 0xaf 175 .
+S1f= 0xcd 205 .
+Active regbank= A
+PC= 0x000000
+SP= 0x000000
+C= 0, Z= 0, I= 0
+ ? 0x000 19e7f SUB    se,0x7f[0K
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
+  0x000000-0x000021       34 sfr_chip (8,%02x,0x%02lx)
+  0x000000-0x0003ff     1024 rom_chip (18,%05x,0x%03lx)
+  0x000000-0x00003f       64 ram_chip (8,%02x,0x%02lx)
+  0x000000-0x00001d       30 stack_chip (12,%03x,0x%02lx)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
+  0x000000-0x000021       34 sfr (8,%02x,0x%02lx)
+  0x000000-0x0003ff     1024 rom (18,%05x,0x%03lx)
+  0x000000-0x00003f       64 iram (8,%02x,0x%02lx)
+  0x000000-0x00001d       30 stack (12,%03x,0x%02lx)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  sfr 0x00 0x21 -> sfr_chip 0x00 activated
+  rom 0x000 0x3ff -> rom_chip 0x000 activated
+  iram 0x00 0x3f -> ram_chip 0x00 activated
+  stack 0x00 0x1d -> stack_chip 0x00 activated

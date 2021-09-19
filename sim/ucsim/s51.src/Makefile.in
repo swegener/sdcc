@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= 51
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -54,14 +57,19 @@ VPATH           = @srcdir@
 
 EXEEXT		= @EXEEXT@
 
-OBJECTS_SHARED	= glob.o sim51.o \
+OBJECTS_SHARED	= glob.o sim$(TN).o \
 		  inc.o jmp.o mov.o logic.o arith.o bit.o \
 		  timer0.o timer1.o timer2.o serial.o port.o interrupt.o \
 		  wdt.o pca.o mdu.o \
 		  uc51.o uc52.o uc51r.o uc89c51r.o uc251.o uc517.o \
 		  uc390.o uc390hw.o uc521.o uc88x.o uc320.o uc380.o
-OBJECTS_EXE	= s51.o 
+OBJECTS_EXE	= s$(TN).o 
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -69,20 +77,24 @@ dlso_ok		= @dlso_ok@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs s51.src
+all: checkconf otherlibs s$(TN).src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) s51$(EXEEXT) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -126,20 +138,27 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .rel
 
-s51.src: s51$(EXEEXT) shared_lib
+s$(TN).src: $(SEN) $(LEN) shared_lib
 
-s51$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+$(LEN): s$(TN)$(EXEEXT)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/s51.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No 51 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/s51.so: $(OBJECTS_SHARED)
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a

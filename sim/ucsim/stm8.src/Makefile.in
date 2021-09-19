@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= stm8
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -51,36 +54,44 @@ VPATH           = @srcdir@
 OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o port.o clk.o \
 		  uid.o bl.o flash.o \
 		  inst.o \
-		  simstm8.o stm8.o
-OBJECTS_EXE	= sstm8.o
+		  sim$(TN).o $(TN).o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
-STM8ASM		= 
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
+STM8ASM		= 
 #TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 #		  test_arith.hex
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs stm8.src
+all: checkconf otherlibs $(TN).src
 
 tests: $(TEST_OBJ)
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) sstm8$(EXEEXT) $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -120,21 +131,28 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-stm8.src: sstm8$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-sstm8$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+$(LEN): s$(TN)$(EXEEXT)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/sstm8.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No stm8 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/sstm8.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/sstm8.so
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/s$(TN).so
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 

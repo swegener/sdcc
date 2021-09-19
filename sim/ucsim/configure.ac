@@ -183,10 +183,10 @@ fi,
 enable_rxk_port="yes")
 AC_ARG_ENABLE(pblaze-port,
 [  --disable-pblaze-port   do not compile simulator for Xilinx PicoBlaze],
-if test $enable_pblaze_port  != "yes"; then
+if test $enable_pblaze_port  != "no"; then
     enable_pblaze_port="yes"
 fi,
-enable_pblaze_port="no")
+enable_pblaze_port="yes")
 AC_ARG_ENABLE(serio,
 [  --disable-serio         do not compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then

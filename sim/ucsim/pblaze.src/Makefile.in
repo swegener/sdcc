@@ -5,6 +5,9 @@
 # (c) Simek Jiri, 2012
 #
 
+# tool name
+TN		= pblaze
+
 STARTYEAR	= 2012
 
 SHELL		= /bin/sh
@@ -19,6 +22,8 @@ MAKEDEP         = @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
@@ -28,7 +33,6 @@ CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
-
 EXEEXT          = @EXEEXT@
 
 LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
@@ -49,57 +53,59 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= tinyxml.o \
-		  tinystr.o \
-		  tinyxmlerror.o \
-		  tinyxmlparser.o \
-		  glob.o \
-		  cmdpblaze.o \
-		  inst.o \
-		  stack.o \
-		  interrupt.o \
-		  portid.o \
-		  inputport.o \
-		  outputport.o \
-		  simpblaze.o pblaze.o
-OBJECTS_EXE	= spblaze.o
+OBJECTS_SHARED	= tinyxml.o tinystr.o tinyxmlerror.o tinyxmlparser.o \
+		  sim$(TN).o $(TN).o cmd$(TN).o \
+		  glob.o inst.o stack.o interrupt.o \
+		  portid.o inputport.o outputport.o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
-# apppblaze.o
-
-PBLAZEASM		=
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
+PBLAZEASM		=
 #TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 #		  test_arith.hex
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs pblaze.src
+all: checkconf otherlibs $(TN).src
 
 tests: $(TEST_OBJ)
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) spblaze$(EXEEXT) $(DESTDIR)$(bindir)/spblaze$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/spblaze$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/spblaze$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
 # --------------------
 check: test
 
+.PHONY:	test baseline
 test:
+	@$(MAKE) --no-print-directory -C test
+
+baseline:
+	@$(MAKE) --no-print-directory -C test baseline
 
 
 # Performing installation test
@@ -127,24 +133,28 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-pblaze.src: spblaze$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-spblaze$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-ucsim_spblaze$(EXEEXT): spblaze$(EXEEXT)
+$(LEN): $(SEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/spblaze.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No spblaze shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No s$(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/spblaze.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/spblaze.so
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 
@@ -161,7 +171,10 @@ $(top_builddir)/libucsimutil.a:
 	$(MAKE) -C $(top_builddir) -f main.mk
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
 	$(PBLAZEASM) -l $< -o $@ -e $<.lst
@@ -174,5 +187,5 @@ checkconf:
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-# End of pblaze.src/Makefile.in
+# End of $(TN).src/Makefile.in
 

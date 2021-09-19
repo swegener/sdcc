@@ -482,8 +482,8 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
   con->dd_printf(as->addr_format, a);
   con->dd_printf("] %s\n", uc->cell_name(c).c_str());
 
-  con->dd_printf("cell data=%p/%d mask=%x flags=%x\n",
-		 c->get_data(),
+  con->dd_printf("cell width=%d mask=%x flags=%x\n",
+		 //c->get_data(),
 		 MU(c->get_width()),
 		 MU(c->get_mask()),
 		 MU(c->get_flags()));

@@ -26,7 +26,7 @@
       simulation will be started afterwards. It means that if there is a
       breakpoint at start address then it will not be hit. See following
       example: </p>
-    <pre>$ <font color="#118811">./s51</font>
+    <pre>$ <font color="#118811">./ucsim_51</font>
 ucsim 0.2.38-pre1, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -46,7 +46,7 @@ F 0x000020
       <h3>stop</h3>
     </a> This command stops the simulation, it freezes the CPU and all the
     peripherals.
-    <pre>$ <font color="#118811">s51 remoansi.hex</font>
+    <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -73,7 +73,7 @@ Simulation started
     <p>The optional parameter can be used to specify number of instructions to
       execute. Note that breakpoints will stop the execution after the first
       instruction. </p>
-    <pre>$ <font color="#118811">s51 remoansi.hex</font>
+    <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -120,7 +120,7 @@ under certain conditions; type `show c' for details.
     will never reached. It can be a dangerous situation because the execution
     started by the <b>next</b> command can not be stopped interactively. But it
     can be stopped by other breakpoints.
-    <pre>$ <font color="#118811">s51 remoansi.hex</font>
+    <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -150,7 +150,7 @@ under certain conditions; type `show c' for details.
       <h3>pc [address]</h3>
     </a> Using this command without any parameter it simply dumps out
     instruction pointed by the PC. Specify address if you want to set the PC.
-    <pre>$ s51
+    <pre>$ ucsim_51
 S51 0.1.5, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 S51 comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it

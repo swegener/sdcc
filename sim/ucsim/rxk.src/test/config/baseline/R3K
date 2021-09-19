@@ -1,8 +1,8 @@
-uCsim 0.6-pre69, Copyright (C) 1997 Daniel Drotos.
+uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version 0.6-pre69
+ucsim version 0.6-pre71
 Type of microcontroller: R3K
 Controller has 4 hardware element(s).
    on cpu[0]
@@ -12,14 +12,14 @@ Controller has 4 hardware element(s).
 A= 0x00   0 .  F= 00000000 0x00   0 .
                   SZxxxVxC
 XPC= 0x00 IP= 0xff IIR= 0x00 EIR= 0x00
-BC= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
-DE= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
-HL= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
-IX= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
-IY= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
-SP= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
+BC= 0x0000 00 00 00 00 00 00 00 00 ........
+DE= 0x0000 00 00 00 00 00 00 00 00 ........
+HL= 0x0000 00 00 00 00 00 00 00 00 ........
+IX= 0x0000 00 00 00 00 00 00 00 00 ........
+IY= 0x0000 00 00 00 00 00 00 00 00 ........
+SP= 0x0000 00 00 00 00 00 00 00 00 ........
 aAF= 0x00-0x00  aBC= 0x00-0x00  aDE= 0x00-0x00  aHL= 0x00-0x00  
- ? 0x0000 08       -- UNKNOWN/INVALID[0K
+ ? 0x0000 00          NOP[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0fffff  1048576 rom_chip (8,%02x,0x%05lx)

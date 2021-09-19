@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 2020,2021
 #
 
+# tool name
+TN		= rxk
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -49,7 +52,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= simrxk.o rxk.o rmem.o \
+OBJECTS_SHARED	= sim$(TN).o $(TN).o rmem.o \
 		  glob.o gp0m3.o gp0m4.o \
 		  gpedm3.o gpedm3a.o gpedm4.o \
 		  gpddm3.o gpddm4.o \
@@ -57,8 +60,13 @@ OBJECTS_SHARED	= simrxk.o rxk.o rmem.o \
 		  r2k.o r3k.o r3ka.o r4k.o r5k.o r6k.o \
 		  r4kwrap.o ddwrap.o edwrap.o 7fwrap.o
 
-OBJECTS_EXE	= srxk.o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -69,21 +77,24 @@ TEST_OBJ	=
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs rxk.src
+all: checkconf otherlibs $(TN).src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) srxk$(EXEEXT) $(DESTDIR)$(bindir)/`echo srxk|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo srxk|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/srxk
-	rm -f $(DESTDIR)$(bindir)/`echo srxk|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -123,23 +134,27 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-rxk.src: srxk$(EXEEXT) ucsim_rxk$(EXEEXT) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-srxk$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-ucsim_rxk$(EXEEXT): srxk$(EXEEXT)
+$(LEN): $(SEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/srxk.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No RXK shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/srxk.so: $(OBJECTS_SHARED)
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a

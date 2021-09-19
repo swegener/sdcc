@@ -15,14 +15,14 @@
       connections. </p>
     <p>To run <i>&#956;Csim</i> in the background you have to use <a href="invoke.html#Zoption">-Z</a>
       option for the simulator: </p>
-    <pre><font color="blue">pigmy$</font> s51 -Z 5555 foo.hex
-</pre> In this case s51 runs in foreground in your command interpreters point of
+    <pre><font color="blue">pigmy$</font> ucsim_51 -Z 5555 foo.hex
+</pre> In this case ucsim_51 runs in foreground in your command interpreters point of
     view. Of course you can run the program really in the background:
-    <pre><font color="blue">pigmy$</font> s51 -Z 5555 foo.hex &amp;
+    <pre><font color="blue">pigmy$</font> ucsim_51 -Z 5555 foo.hex &amp;
 </pre> The parameter of the <a href="invoke.html#Zoption">-Z</a> option is a
     port number. This can be number of any unused port of your machine. If the
     specified port is already occupied then following message appears:
-    <pre><font color="blue">pigmy$</font> s51 -Z 5555
+    <pre><font color="blue">pigmy$</font> ucsim_51 -Z 5555
 <font color="red">bind: Address already in use</font>
 </pre> In this case you have to use an other number.
     <p>Let's suppose you have found a free port number and the simulator listens
@@ -65,7 +65,7 @@ under certain conditions; type `show c' for details.
     this you must explicitly ask the simulator to open a console on the standard
     input/output. You can do this using <a href="invoke.html#coption">-c</a>
     option and specify the actual terminal as parameter for it:
-    <pre><font color="blue">pigmy$</font> s51 -Z 5555 foo.hex -c /dev/tty
+    <pre><font color="blue">pigmy$</font> ucsim_51 -Z 5555 foo.hex -c /dev/tty
 </pre>
     <hr>
   </body>

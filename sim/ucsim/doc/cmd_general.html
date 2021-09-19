@@ -87,7 +87,7 @@ long help of timer run
       In this case <a href="#kill">kill</a> command can be used to terminate
       the simulator. See for more information about <a href="mulcons.html">using
         multiple consoles</a>. </p>
-    <pre>$ <font color="#118811">s51</font>
+    <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -108,7 +108,7 @@ $ </pre>
 get opt
 quit
 conf
-drdani@emma:~$ <font color="#118811">s51</font>
+drdani@emma:~$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -227,7 +227,7 @@ Error: non-classified [on/ON]
         memory</a> or <a href="cmd_dump.html#ds">ds</a> can be used as well.
       <p>Parameters are interpreted as SFR names or addresses and values of
         addressed locations are dumped out. </p>
-      <pre>$ <font color="#118811">s51 </font>
+      <pre>$ <font color="#118811">ucsim_51 </font>
 ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -248,7 +248,7 @@ Warning: Invalid address 256
         option</b> you can get actual value of these options. If you use this
       command without parameter you get list of all options known by the
       program. In this way you can figure out which options can be used.
-      <pre>$ <font color="#118811">s51 -V</font>
+      <pre>$ <font color="#118811">ucsim_51 -V</font>
 ucsim 0.5.0, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -276,7 +276,7 @@ under certain conditions; type `show c' for details.
         default value when a new instance of a console is created: </p>
       <pre>$ <font color="#118811">cat /tmp/x</font>
 get opt debug
-$ <font color="#118811">s51</font>
+$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -317,7 +317,7 @@ under certain conditions; type `show c' for details.
         boolean type of option interpreted as follows: if first character of the
         value is one of <tt>1</tt>, <tt>t</tt>, <tt>T</tt>, <tt>y</tt>, <tt>Y</tt>
         then value will be TRUE otherwise it will be FALSE. </p>
-      <pre>$ <font color="#118811">s51 -V</font>
+      <pre>$ <font color="#118811">ucsim_51 -V</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -381,7 +381,7 @@ Ambiguous option name, use number instead
       addressable.
       <p>Second parameter interpreted as 1 if it is not zero. </p>
       <p>Modified memory location is dumped out. </p>
-      <pre>$ <font color="#118811">s51 </font>
+      <pre>$ <font color="#118811">ucsim_51 </font>
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -459,7 +459,7 @@ Simulation: stopped
     <h3><a name="reset">reset</a></h3>
     Reset command. It resets the microcontroller. It has same effect as active
     signal on the RST pin.
-    <pre>$ <font color="#118811">s51 -V remoansi.hex</font>
+    <pre>$ <font color="#118811">ucsim_51 -V remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -540,7 +540,7 @@ Num Type       Disp Hit   Cnt   Address  What
       This subcommand prints out full register set of the CPU. Output of this
       command depends of type of CPU.
       <h5>Registers of MCS51 family</h5>
-      <pre>$ <font color="#118811">s51 remoansi.hex</font> 
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font> 
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -651,7 +651,7 @@ SP= 0x00ff [SP+1]= 00   0 .
       <p>Output format of this command depends on CPU family and type of the CPU
         too because requested unit can be different in different type of
         controller even in the same CPU family. </p>
-      <pre>$ <font color="#118811">s51 -t 51</font>
+      <pre>$ <font color="#118811">ucsim_51 -t 51</font>
 ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -682,7 +682,7 @@ Receiver OFF RB8=0 irq=0
 Transmitter TB8=0 irq=0
 0&gt; 
 </pre> Timer #2 differs a little bit from other timers of MCS51:
-      <pre>$ <font color="#118811">s51 -t 52</font>
+      <pre>$ <font color="#118811">ucsim_51 -t 52</font>
 ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -695,12 +695,12 @@ timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
 </pre>
       <hr>
       <!-- 
-      <h4><a name="info_stack">info stack</a></h4>      This command prints out information about data stored in the CPU's stack      and operations which put them there.      <pre>$ <font color="#118811">s51 ~/remo.hex</font>uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.This is free software, and you are welcome to redistribute itunder certain conditions; type `show c' for details.55470 words read from /home/staff/drdani/remo.hex0&gt; <font color="#118811">set opt irq_stop true</font>0&gt; <font color="#118811">r</font>Simulation started, PC=0x000000Stop at 0x000023: (2) InterruptF 0x0000230&gt; <font color="#118811">i s</font>OP   SP before-after   L DATA/ADDR   INSTRUCTION
+      <h4><a name="info_stack">info stack</a></h4>      This command prints out information about data stored in the CPU's stack      and operations which put them there.      <pre>$ <font color="#118811">ucsim_51 ~/remo.hex</font>uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.This is free software, and you are welcome to redistribute itunder certain conditions; type `show c' for details.55470 words read from /home/staff/drdani/remo.hex0&gt; <font color="#118811">set opt irq_stop true</font>0&gt; <font color="#118811">r</font>Simulation started, PC=0x000000Stop at 0x000023: (2) InterruptF 0x0000230&gt; <font color="#118811">i s</font>OP   SP before-after   L DATA/ADDR   INSTRUCTION
 call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,36740&gt; </pre> First column shows the operation which can be <b>call</b> or <b>push</b>      or <b>intr</b> (interrupt call). Next column contains value of the SP      register before and after the operation. Column "L" shows size of the      data, and the next column the data itself. Note, that for call operations      (call, and intr) the <b>called</b> address is printed, not the pushed      one! Last column is the instruction which has been executed when the      operation occurred.<hr>-->
       <h4><a name="info_memory">info memory</a></h4>
       This command shows information about <a href="memory.html">memory system</a>:
       chips, address spaces and address decoders.
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it

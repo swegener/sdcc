@@ -3,7 +3,8 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f sstm8$(EXEEXT) sstm8.exe
+	rm -f sstm8 sstm8.exe
+	rm -f ucsim_stm8 ucsim_stm8.exe
 	$(MAKE) -C test -f clean.mk clean
 
 

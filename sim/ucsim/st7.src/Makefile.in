@@ -4,6 +4,9 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+# tool name
+TN		= st7
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -52,11 +55,16 @@ VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o \
 		  inst.o \
-		  simst7.o st7.o
-OBJECTS_EXE	= sst7.o
+		  sim$(TN).o $(TN).o
+OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
 ST7ASM		= 
+
+# short/long exe and lib name
+SEN		= s$(TN)$(EXEEXT)
+LEN		= ucsim_$(TN)$(EXEEXT)
+SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
@@ -66,22 +74,26 @@ dlso_ok		= @dlso_ok@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs st7.src tests
+all: checkconf otherlibs $(TN).src tests
 
 tests: $(TEST_OBJ)
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) sst7$(EXEEXT) $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
+install: all installdirs install_shared_lib
+	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
 # Performing self-test
@@ -121,21 +133,28 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-st7.src: sst7$(EXEEXT)  shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib
 
-sst7$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+$(LEN): s$(TN)$(EXEEXT)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/sst7.so
+shared_lib: $(top_builddir)/$(SONAME)
+install_shared_lib: shared_lib
+	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No st7 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+install_shared_lib:
 endif
 
-$(top_builddir)/sst7.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/sst7.so
+$(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/s$(TN).so
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 
@@ -152,7 +171,7 @@ $(top_builddir)/libucsimutil.a:
 	$(MAKE) -C $(top_builddir) -f main.mk
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
 	$(ST7ASM) -l $< -o $@ -e $<.lst

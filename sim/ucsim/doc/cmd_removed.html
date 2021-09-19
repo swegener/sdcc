@@ -22,7 +22,7 @@
       <p>Forth parameter is optional and it specifies the hit number. It is
         1 by default.
       </p>
-      <pre>$ <font color="#118811">s51 remoansi.hex</font>
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -95,7 +95,7 @@ F 1(1) 000006 wi
           hardware</a> instead!!</font>
       <p>Dump out ports. This command shows actual value of ports.
       </p>
-      <pre>$ <font color="#118811">s51 remoansi.hex</font> 
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font> 
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -132,7 +132,7 @@ Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
       Print out SFR. This command can be used to get value of all or some
       SFRs. If you do not specify any parameter the <b>ds</b> command simply
       dumps out full SFR area 16 bytes per line.
-      <pre>$ <font color="#118811">s51 remoansi.hex</font> 
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font> 
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -169,14 +169,14 @@ under certain conditions; type `show c' for details.
       <p>Note that different type of controllers can implement different
         registers:
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 &gt; <font color="#118811">ds rcap2l</font>
 &gt; <font color="#118811">q</font>
-$ <font color="#118811">s51 -t 52</font>
+$ <font color="#118811">ucsim_51 -t 52</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -196,7 +196,7 @@ RCAP2L 00   0 .
       or SFR which contains the bit and bit number within the byte separated
       by a dot. If the requested bit is in an SFR the address of the
       register can be specified by its name.
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -247,7 +247,7 @@ Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
         breakpoints. It means that if there is a breakpoint at start address
         then it will not be hit.
       </p>
-      <pre>$ <font color="#118811">s51 remoansi.hex</font>
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -299,7 +299,7 @@ commands for description of disassembled form.-->
         <tt>\0</tt>, and <tt>\0xxx</tt> where <tt>xxx</tt> is an octadecimal
         number of the code of the character.
       </p>
-      <pre>$ <font color="#118811">s51 remoansi.hex</font>
+      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -348,7 +348,7 @@ F 00019c
         options known by the program. In this way you can figure out which
         options can be used.
       </p>
-      <pre>$ <font color="#118811">s51 -V</font>
+      <pre>$ <font color="#118811">ucsim_51 -V</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -396,7 +396,7 @@ stopit FALSE Stop if interrupt accepted.
         <tt>T</tt>, <tt>y</tt>, <tt>Y</tt> then value will be TRUE otherwise
         it will be FALSE.
       </p>
-      <pre>$ <font color="#118811">s51 -V</font>
+      <pre>$ <font color="#118811">ucsim_51 -V</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -419,7 +419,7 @@ debug TRUE Debug messages appears on this console.
       <p>Write data into internal RAM area. First parameter specifies start
         address of memory area to set and other parameters are data to set.
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -456,7 +456,7 @@ Bad data 0xi
         first parameter (<b>start</b> address) can be specified by name of SFR
         not by address only.
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -474,7 +474,7 @@ under certain conditions; type `show c' for details.
         be specified. If first character of data parameter is <tt>0</tt> it
         means <i>zero</i> otherwise it means <i>one</i>.
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -509,7 +509,7 @@ Port2 11111111 0xff 255 .    Port3 11110111 0xf7 247 .
         read back value of the port can be false. First parameter must be
         number of the port between 0 and 3.
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -542,7 +542,7 @@ Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
       <p>Fill command. It can be used to fill up an area of internal RAM with a
         specified data.
       </p>
-      <pre>$ <font color="#118811">s51</font>
+      <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it

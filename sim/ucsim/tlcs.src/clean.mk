@@ -7,7 +7,8 @@
 clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
-	rm -f stlcs$(EXEEXT) stlcs.exe
+	rm -f stlcs stlcs.exe
+	rm -f ucsim_tlcs ucsim_tlcs.exe
 	$(MAKE) -C test -f clean.mk clean
 
 

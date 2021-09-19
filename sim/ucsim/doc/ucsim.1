@@ -1,44 +1,87 @@
 .TH UCSIM 1
+
 .SH NAME
 uCsim \- Micro\-controller simulator
+
 .SH SYNOPSIS
-.B s51|sz80|savr|sxa|shc08|spdk|sst7|sstm8|stlc|sp1516|sm6809
-.BR \-t cpu_type
-.BR \-X freq[k|M]
-.BR \-R seed
-.BR \-C cfg_file
-.BR \-e command
-.BR \-c file
-.BR \-Z portnum
-.BR \-k portnum
-.BR \-s file
-.BR \-S options
-.BR \-I options
-.BR \-p prompt
-.BR \-P
-.BR \-o colors
-.BR \-l
-.BR \-b
-.BR \-B
-.BR \-g
-.BR \-G
-.BR \-a nr
-.BR \-w
-.BR \-V
-.BR \-v
-.BR \-H
-.BR \-h
+.B ucsim_51
+.br
+.B ucsim_xa
+.br
+.B ucsim_z80
+.br
+.B ucsim_tlc
+.br
+.B ucsim_rxk
+.br
+.B ucsim_avr
+.br
+.B ucsim_pdk
+.br
+.B ucsim_st7
+.br
+.B ucsim_stm8
+.br
+.B ucsim_p1516
+.br
+.B ucsim_hc08
+.br
+.B ucsim_m6800
+.br
+.B ucsim_m6809
+.br
+.B ucsim_m68hc12
+.br
+.B ucsim_mcs6502
+.br
+.B ucsim_plaze
+.br
+.RS
+.B \-t cpu_type
+.B \-X freq[k|M]
+.B \-R seed
+.B \-C cfg_file
+.B \-e command
+.B \-c file
+.B \-Z portnum
+.B \-k portnum
+.B \-s file
+.B \-S options
+.B \-I options
+.B \-p prompt
+.B \-P
+.B \-o colors
+.B \-l
+.B \-b
+.B \-B
+.B \-g
+.B \-G
+.B \-a nr
+.B \-w
+.B \-V
+.B \-v
+.B \-H
+.B \-h
+.RE
+
 .SH DESCRIPTION
-.I s51
-command is used to simulate MCS51 controller family.
-.I sz80
-command is Z80 simulator.
-.PP
+uCsim is a microcontroller, microprocessor simulator for several
+processor familes. It can be started as
+.B ucsim_XXXX
+command, where XXXX specifies the simulated processor type. Eg.
+.I ucsim_51
+starts Intel MCS51 microcontroller simulator,
+.I ucsim_z80
+starts Zilog Z80 microprocessor simulator, etc.
+
+.SH OPTIONS
+
 .B Options of the command
+
 .TP
 .B \-t cpu_type
 Specifies type of the controller. Use \-H to list possible values.
-.PP
+
 .TP
 .B \-X freq[k|M]
 XTAL frequency in Hz, Use
@@ -46,46 +89,46 @@ XTAL frequency in Hz, Use
 or
 .I M
 suffix to specify frequency in kHz or MHz.
-.PP
+
 .TP
 .B \-R seed
 Set the random number generator seed.
-.PP
+
 .TP
 .B \-C file
 Read initial commands from
 .I file
 and execute them.
-.PP
+
 .TP
 .B \-e command
 Execute
 .I command
 at program startup (before config file).
-.PP
+
 .TP
 .B \-c file
 Open command console on
 .I file
 (use \- for std in/out).
-.PP
+
 .TP
 .B \-Z portnum
 Use
 .I localhost:portnum
 for command console.
-.PP
+
 .TP
 .B \-k portnum
 Use
 .I localhost:portnum
 for serial I/O.
-.PP
+
 .TP
 .B \-s file
 Connect serial interface uart0 to
 .I file
-.PP
+
 .TP
 .B \-S options
 .I options
@@ -108,7 +151,7 @@ Use localhost:nr as server for serial input.
 .br
 .I oport=nr
 Use localhost:nr as server for serial onput.
-.PP
+
 .TP
 .B \-I options
 .I options
@@ -126,7 +169,7 @@ specify output file for IO.
 .TP
 .B \-p prompt
 Specify string for prompt.
-.PP
+
 .TP
 .B \-P
 Prompt is a null ('\\0') character.
@@ -136,7 +179,7 @@ Prompt is a null ('\\0') character.
 List of color specification: what=colspec,... where colspec is :
 separated list of color options e.g.: prompt=b:white:black (bold white
 on black).
-.PP
+
 .TP
 .B \-l
 Use colors of the light theme (default is dark).
@@ -144,49 +187,53 @@ Use colors of the light theme (default is dark).
 .TP
 .B \-b
 Black & white (non-color) console.
-.PP
+
 .TP
 .B \-B
 Beep on breakpoints.
-.PP
+
 .TP
 .B \-g
 Go, start simulation.
-.PP
+
 .TP
 .B \-G
 Go, start simulation, quit on stop.
-.PP
+
 .TP
 .B \-a nr
 Specify size of variable space (default=256).
-.PP
+
 .TP
 .B \-w
 Writable flash.
-.PP
+
 .TP
 .B \-V
 Verbose mode.
-.PP
+
 .TP
 .B \-v
 Print out version number and quit.
-.PP
+
 .TP
 .B \-H
 Print out types of known CPUs and quit.
-.PP
+
 .TP
 .B \-h
 Print out this help and quit.
+
 .SH EXAMPLES
 None yet.
+
 .SH "SEE ALSO"
 sdcc(1), sdcdb(1).
+
 .SH BUGS
 Probably many.
-.SH AUTHORS
+
+.SH AUTHORS, CONTRIBUTORS
 Daniel Drotos,
 Gunar Holm,
 Sandeep Dutta,
@@ -204,3 +251,11 @@ Alexis Pavlov,
 Davine Zanni,
 Anton Persson,
 Nicolas Lesser
+Mike Jagdis
+Jiri Simek
+Zbynek Krivka
+Vaclav Peroutka
+Valentin Dudouyt
+Erik Petrich
+Leland Morrison
+Johan Knol

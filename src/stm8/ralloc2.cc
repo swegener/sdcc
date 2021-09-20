@@ -242,55 +242,30 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
 template <class G_t, class I_t>
 static bool operand_sane(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
-#if 0
-  int v, byteregs[8];   // Todo: Change this when sdcc supports variables larger than 8 bytes.
-  unsigned short int size;
-
-  if(!o || !IS_SYMOP(o))
+  // stm8 code generation is very flexible, and can handle nearly anything (including variables where some bytes are spilt, while others are not).
+  // The only thing it can't handle is variables where some bytes are rematerialized, while others are not.
+  if(!o || !IS_SYMOP(o) || !OP_SYMBOL_CONST(o)->remat)
     return(true);
- 
+
   operand_map_t::const_iterator oi, oi_end;
   boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key);
   
   if(oi == oi_end)
     return(true);
   
-  // Ensure: Fully in registers or fully in mem.
-  if(a.local.find(oi->second) != a.local.end())
+  // In registers.
+  if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
     {
       while(++oi != oi_end)
-        if(a.local.find(oi->second) == a.local.end())
+        if(!std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
   else
     {
        while(++oi != oi_end)
-        if(a.local.find(oi->second) != a.local.end())
+        if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
-
-  boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key);
-  v = oi->second;
-  byteregs[I[v].byte] = a.global[v];
-  size = 1;
-  while(++oi != oi_end)
-    {
-      v = oi->second;
-      byteregs[I[v].byte] = a.global[v];
-      size++;
-    }
-
-  if (byteregs[0] == -1)
-    return(true);
-
-  // Ensure: 8 bit only in A, 16 bit only in X or Y.
-  if (size == 1)
-    return(byteregs[0] == A_IDX);
-  if (size == 2)
-    return(byteregs[0] == XL_IDX && byteregs[1] == XH_IDX || byteregs[0] == YL_IDX && byteregs[1] == YH_IDX);
-  if (size > 2)
-    return(false);
-#endif
 
   return(true);
 }

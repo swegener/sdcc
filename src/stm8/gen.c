@@ -8680,9 +8680,11 @@ genIfx (const iCode *ic)
           cost (2, 0);
         }
     }
-  else if (cond->aop->type == AOP_IMMD)
+  else if (cond->aop->type == AOP_IMMD || cond->aop->type == AOP_STL) // An AOP_IMMD or AOP_STL points to something valid, so it is not a null pointer.
     {
-      // An AOP_IMMD points to something valid, so it is not a null pointer. Just fall through to the unconditional jump generated below.
+      if (IC_TRUE (ic))
+        emitJP (IC_TRUE (ic), 1.0f);
+      goto release;
     }
   else
     {
@@ -8706,6 +8708,7 @@ genIfx (const iCode *ic)
       emitLabel (tlbl);
     }
 
+release:
   freeAsmop (cond);
 }
 

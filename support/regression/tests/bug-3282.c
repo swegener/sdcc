@@ -1,5 +1,5 @@
 /*
-   bug-3235.c. On stm8, the register allocator decided that one byte of a stack-pointer-relative address
+   bug-3282.c. On stm8, the register allocator decided that one byte of a stack-pointer-relative address
    should be rematerialized, and the other stored in a register. stm8 code generation can't handle that yet.
  */
 

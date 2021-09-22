@@ -734,6 +734,15 @@ replace restart {
 
 replace restart {
 	ld	%4, #%1
+	ld	l, %3 (%4)
+} by {
+	; common peephole 55l used hl instead of %4.
+	ld	hl, #%1 + %3
+	ld	l, (hl)
+} if notUsed(%4 'h')
+
+replace restart {
+	ld	%4, #%1
 	ld	h, %3 (%4)
 } by {
 	; common peephole 55 used hl instead of %4.

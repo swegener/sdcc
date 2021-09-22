@@ -2,6 +2,10 @@
 
 	* support/regression/tests/bug-3282.c:
 	  Test for bug #3282.
+	* src/z80/gen.c,
+	  src/z80/peeph.def,
+	  support/regression/tests/bug-3283.c:
+	  Fix bug #3283.
 
 2021-09-20 Philipp Klaus Krause <pkk AT spth.de>
 

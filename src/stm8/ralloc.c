@@ -366,8 +366,11 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
     IS_SYMOP (IC_LEFT (dic)) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_LEFT (dic)) == OP_SYMBOL (IC_RESULT (ic)))
     ;
   // Optimize out short-lived extra temporary.
-  else if ((dic->op == '~' || dic->op == CAST || dic->op == UNARYMINUS ||
-    (dic->op == '^' || dic->op == '|' || dic->op == BITWISEAND || dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == '+' || dic->op == '-') && IS_OP_LITERAL (IC_RIGHT (dic))) &&
+  else if ((dic->op == CAST ||
+    dic->op == UNARYMINUS || dic->op == '+' || dic->op == '-' || dic->op == '*' || dic->op == '%' ||
+    dic->op == '~' || dic->op == '^' || dic->op == '|' || dic->op == BITWISEAND ||
+    dic->op == LEFT_OP || dic->op == RIGHT_OP ||
+    dic->op == RRC || dic->op == RLC || dic->op == SWAP || dic->op == GETABIT) &&
     dic->next == ic && IS_ITEMP (IC_RESULT (ic)))
     ;
   /* Otherwise, for now eliminate 8-bit temporary variables only.

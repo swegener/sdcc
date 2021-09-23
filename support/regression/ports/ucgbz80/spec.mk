@@ -7,15 +7,15 @@ EMU_PORT_FLAG=-tlr35902
 
 # path to uCsim
 ifdef SDCC_BIN_PATH
-  UCZ80C = $(SDCC_BIN_PATH)/sz80$(EXEEXT)
+  UCZ80C = $(SDCC_BIN_PATH)/ucsim_z80$(EXEEXT)
 
   AS_Z80C = $(SDCC_BIN_PATH)/sdasgb$(EXEEXT)
 else
   ifdef UCSIM_DIR
-    SZ80A = $(UCSIM_DIR)/z80.src/sz80$(EXEEXT)
+    SZ80A = $(UCSIM_DIR)/z80.src/ucsim_z80$(EXEEXT)
   else
-    SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
-    SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
+    SZ80A = $(top_builddir)/sim/ucsim/z80.src/ucsim_z80$(EXEEXT)
+    SZ80B = $(top_builddir)/bin/ucsim_z80$(EXEEXT)
   endif
 
   EMU = $(WINE) $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)

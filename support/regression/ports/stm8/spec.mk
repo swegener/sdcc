@@ -5,15 +5,15 @@ SIM_TIMEOUT = 45
 
 # path to uCsim
 ifdef SDCC_BIN_PATH
-  UCSTM8C = $(SDCC_BIN_PATH)/sstm8$(EXEEXT)
+  UCSTM8C = $(SDCC_BIN_PATH)/ucsim_stm8$(EXEEXT)
 
   AS_STM8C = $(SDCC_BIN_PATH)/sdasstm8$(EXEEXT)
 else
   ifdef UCSIM_DIR
-    UCSTM8A = $(UCSIM_DIR)/stm8.src/sstm8$(EXEEXT)
+    UCSTM8A = $(UCSIM_DIR)/stm8.src/ucsim_stm8$(EXEEXT)
   else
-    UCSTM8A = $(top_builddir)/sim/ucsim/stm8.src/sstm8$(EXEEXT)
-    UCSTM8B = $(top_builddir)/bin/sstm8$(EXEEXT)
+    UCSTM8A = $(top_builddir)/sim/ucsim/stm8.src/ucsim_stm8$(EXEEXT)
+    UCSTM8B = $(top_builddir)/bin/ucsim_stm8$(EXEEXT)
   endif
 
   EMU = $(WINE) $(shell if [ -f $(UCSTM8A) ]; then echo $(UCSTM8A); else echo $(UCSTM8B); fi)

@@ -5,15 +5,15 @@ SIM_TIMEOUT = 40
 
 # path to uCsim
 ifdef SDCC_BIN_PATH
-  UCTLCS90C = $(SDCC_BIN_PATH)/stlcs$(EXEEXT)
+  UCTLCS90C = $(SDCC_BIN_PATH)/ucsim_tlcs$(EXEEXT)
 
   AS_TLCS90C = $(SDCC_BIN_PATH)/sdastlcs90$(EXEEXT)
 else
   ifdef UCSIM_DIR
-    UCTLCS90A = $(UCSIM_DIR)/tlcs.src/stlcs$(EXEEXT)
+    UCTLCS90A = $(UCSIM_DIR)/tlcs.src/ucsim_tlcs$(EXEEXT)
   else
-    UCTLCS90A = $(top_builddir)/sim/ucsim/tlcs.src/stlcs$(EXEEXT)
-    UCTLCS90B = $(top_builddir)/bin/stlcs$(EXEEXT)
+    UCTLCS90A = $(top_builddir)/sim/ucsim/tlcs.src/ucsim_tlcs$(EXEEXT)
+    UCTLCS90B = $(top_builddir)/bin/ucsim_tlcs$(EXEEXT)
   endif
 
   EMU = $(WINE) $(shell if [ -f $(UCTLCS90A) ]; then echo $(UCTLCS90A); else echo $(UCTLCS90B); fi)

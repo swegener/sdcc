@@ -9,7 +9,7 @@ replace restart {
 replace restart {
 	ld	a, (%2, sp)
 } by {
-	; peephole 0a removed dead load into a from %2.
+	; peephole 0a removed dead load into a from (%2, sp).
 } if notUsed('a'), notUsed('n'), notUsed('z')
 
 replace restart {
@@ -1194,16 +1194,16 @@ replace restart {
 	%2	a, #%3
 } by {
 	ld	a, %1
-	; peephole 600a removed unneeded %2 v1
-} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('c')
+	; peephole 600a removed unneeded %2 a, #%3
+} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('v' 'c')
 
 replace restart {
 	ld	%1, a
 	%2	a, #%3
 } by {
 	ld	%1, a
-	; peephole 600b removed unneeded %2 v2
-} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('c')
+	; peephole 600b removed unneeded %2 a, #%3
+} if same(%2 'cp' 'sub'), operandsLiteral(%3), immdInRange(0 0 '+' 0 %3 %4), notUsed('v' 'c')
 
 // Do operations directly on stack, leave 'a' as it was, load into 'a' may be removed by dead load optimizations
 replace restart {
@@ -2196,7 +2196,7 @@ replace {
 %5:
 } by {
 	.byte 0xbc
-	; peephole jrf11 used ldf opcode to jump over 3-byte instruction.
+	; peephole jrf11 used ldf opcode to jump over 3-byte instructions.
 %1:
 	clrw	x
 	ldw	(%2, sp), x

@@ -77,9 +77,8 @@ right_nonneg:
 	mul	x, a
 	addw	x, (3, sp)
 	ldw	(3, sp), x
-	ld	a, (2, sp)
-	adc	a, #0
-	ld	(2, sp), a
+	jrnc	skip_m1
+	inc	(2, sp)
 skip_m1:
 
 	ld	a, (5+1, sp)
@@ -88,9 +87,8 @@ skip_m1:
 	mul	x, a
 	addw	x, (3, sp)
 	ldw	(3, sp), x
-	ld	a, (2, sp)
-	adc	a, #0
-	ld	(2, sp), a
+	jrnc	skip_m2
+	inc	(2, sp)
 skip_m2:
 
 	; Handle signed result

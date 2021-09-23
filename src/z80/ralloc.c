@@ -630,7 +630,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   if (!IS_ITEMP (IC_RIGHT (ic)) || OP_SYMBOL (IC_RIGHT (ic))->isind || OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
     return 0;
-  
+
   /* Avoid having multiple named address spaces in one iCode. */
   if (IS_SYMOP (IC_RESULT (ic)) && SPEC_ADDRSPACE (OP_SYMBOL (IC_RESULT (ic))->etype))
     return 0;

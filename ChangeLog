@@ -2,6 +2,14 @@
 
 	* src/stm8/ralloc.c:
 	  Optimize out some redundant temporaries early.
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def,
+	  src/stm8/gen.c:
+	  Fix handling of v flag.
+	* device/lib/_fs2ulong.c,
+	  device/lib/_fsmul.c,
+	  device/lib/stm8/__mulsint2slong.s:
+	  Minor improvements in float support.
 
 2021-09-22 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -5503,19 +5503,19 @@ branchInstCmp (int opcode, int sign, bool negated)
   return "brn";
 }
 
-/*------------------------------------------------------------------*/
-/* genCmp :- greater or less than (and maybe with equal) comparison */
-/* Handles cases where the decision can be made based on top bytes. */
-/*------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
+/* genCmpTnz :- greater or less than (and maybe with equal) comparison */
+/* Handles cases where the decision can be made using tnz(w).          */
+/*---------------------------------------------------------------------*/
 static int
-genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
+genCmpTnz (operand *left, operand *right, operand *result, const iCode *ic)
 {
   sym_link *letype, *retype;
   int sign, opcode;
   int size;
   int ret = 0;
 
-  D (emit2 ("; genCmpTop", ""));
+  D (emit2 ("; genCmpTnz", ""));
 
   if (left->aop->type != AOP_LIT && right->aop->type != AOP_LIT)
     return 0;
@@ -5675,7 +5675,7 @@ genCmp (const iCode *ic, iCode *ifx)
     exchange = TRUE;
 
   /* Right operand is a special literal */
-  if ((special = genCmpTop(left, right, result, ic)) > 0)
+  if ((special = genCmpTnz(left, right, result, ic)) > 0)
     goto _genCmp_1;
 
   /* Cannot do multibyte signed comparison, except for 2-byte using cpw */
@@ -5699,7 +5699,8 @@ genCmp (const iCode *ic, iCode *ifx)
     (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK) &&
     aopInReg (left->aop, 0, A_IDX))
     emit3 (A_CP, ASMOP_A, right->aop);
-  else if (size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK))
+  else if (size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK) &&
+    !(aopIsLitVal (right->aop, 0, 1, 0) && opcode != '<' && opcode != LE_OP && (aopInReg (left->aop, 1, A_IDX) || regDead (A_IDX, ic) && (aopOnStack(left->aop, 1, 1) || left->aop->type == AOP_DIR)))) // Do not use cpw here if cp in generic codegen is cheaper.
     {
       if (aopInReg (left->aop, 0, Y_IDX) && right->aop->type == AOP_STK)
         {
@@ -5751,11 +5752,14 @@ genCmp (const iCode *ic, iCode *ifx)
           const asmop *right_stacked = NULL;
           int right_offset;
 
-          if (!started && aopIsLitVal (right->aop, i, 2, 0) && (i + 1 < size)) // Skip over trailing 0x0000.
+          if (!started && opcode != '<' && opcode != LE_OP && aopIsLitVal (right->aop, i, 2, 0) && (i + 2 < size)) // Skip over trailing 0x0000.
             {
               i++;
               continue;
             }
+          else if (!started && opcode != '<' && opcode != LE_OP && aopIsLitVal (right->aop, i, 2, 0) && (i + 2 < size) && // Skip over trailing 0x00.
+            (aopInReg (left->aop, 1, A_IDX) || regDead (A_IDX, ic) && (aopOnStack(left->aop, 1, 1) || left->aop->type == AOP_DIR)))
+            continue;
 
           if (!started && (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) && !aopOnStack(right->aop, i, 2)) &&
             (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, i, 2)))

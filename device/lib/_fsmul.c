@@ -240,7 +240,7 @@ union float_long
 /* multiply two floats */
 float __fsmul (float a1, float a2) {
   volatile union float_long fl1, fl2;
-  volatile unsigned long result;
+  unsigned long result;
   int exp;
   char sign;
 

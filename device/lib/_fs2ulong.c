@@ -103,8 +103,8 @@ unsigned long
 __fs2ulong (float a1)
 {
   volatile union float_long fl1;
-  volatile int exp;
-  volatile long l;
+  int exp;
+  long l;
   
   fl1.f = a1;
   

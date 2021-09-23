@@ -653,6 +653,9 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
   if (ISINST (pl->line, "push"))
      return (pl->line[5] == 'c');
 
+  if (!strcmp (what, "v"))
+    return (ISINST (pl->line, "jrnv") || ISINST (pl->line, "jrsge") || ISINST (pl->line, "jrsgt") || ISINST (pl->line, "jrsle") || ISINST (pl->line, "jrslt") || ISINST (pl->line, "jrv"));
+
   if (!strcmp (what, "n"))
     return (ISINST (pl->line, "jrmi") || ISINST (pl->line, "jrpl") || ISINST (pl->line, "jrsge") || ISINST (pl->line, "jrsgt") || ISINST (pl->line, "jrsle") || ISINST (pl->line, "jrslt"));
 
@@ -872,6 +875,23 @@ stm8CondJump(const lineNode *pl)
 static bool
 stm8SurelyWritesFlag(const lineNode *pl, const char *what)
 {
+  if (!strcmp (what, "v") || !strcmp (what, "c"))
+    {        
+      if (ISINST (pl->line, "addw") && !strcmp (pl->line + 5, "sp"))
+        return false;
+      if (ISINST (pl->line, "sub") && !strcmp (pl->line + 4, "sp"))
+        return false;
+
+      if (ISINST (pl->line, "adc") ||
+        STARTSINST (pl->line, "add") || // add, addw
+        STARTSINST (pl->line, "cp") || // cp, cpw, cpl, cplw
+        STARTSINST (pl->line, "div") || // div, divw
+        STARTSINST (pl->line, "neg") || // neg, negw
+        ISINST (pl->line, "sbc") ||
+        STARTSINST (pl->line, "sub")) // sub, subw
+        return true;
+    }
+
   if (!strcmp (what, "n") || !strcmp (what, "z"))
     {
       if (ISINST (pl->line, "addw") && !strcmp (pl->line + 5, "sp"))
@@ -904,20 +924,11 @@ stm8SurelyWritesFlag(const lineNode *pl, const char *what)
         return false;
       return true;
     }
-  else if (!strcmp (what, "c"))
-    {        
-      if (ISINST (pl->line, "addw") && !strcmp (pl->line + 5, "sp"))
-        return false;
-      if (ISINST (pl->line, "sub") && !strcmp (pl->line + 4, "sp"))
-        return false;
-        
-      if (ISINST (pl->line, "adc") ||
-        STARTSINST (pl->line, "add") || // add, addw
-        STARTSINST (pl->line, "btj") || // btjt, btjf
+
+  if (!strcmp (what, "c"))
+    {
+      if (STARTSINST (pl->line, "btj") || // btjt, btjf
         ISINST (pl->line, "ccf") ||
-        STARTSINST (pl->line, "cp") || // cp, cpw, cpl, cplw
-        STARTSINST (pl->line, "div") || // div, divw
-        STARTSINST (pl->line, "neg") || // neg, negw
         ISINST (pl->line, "rcf") ||
         STARTSINST (pl->line, "rlc") || // rlc, rlcw
         STARTSINST (pl->line, "rrc") || // rrc, rrcw

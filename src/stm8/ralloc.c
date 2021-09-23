@@ -361,14 +361,21 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
         }
     }
 
-  /* For now eliminate 8-bit temporary variables only.
+  // Can do wide shift by 1 in place.
+  if ((dic->op == LEFT_OP || dic->op == RIGHT_OP) && IS_OP_LITERAL (IC_RIGHT (dic)) && operandLitValue (IC_RIGHT (dic))  == 1 &&
+    IS_SYMOP (IC_LEFT (dic)) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_LEFT (dic)) == OP_SYMBOL (IC_RESULT (ic)))
+    ;
+  // Optimize out short-lived extra temporary.
+  else if ((dic->op == '~' || dic->op == CAST || dic->op == UNARYMINUS ||
+    (dic->op == '^' || dic->op == '|' || dic->op == BITWISEAND || dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == '+' || dic->op == '-') && IS_OP_LITERAL (IC_RIGHT (dic))) &&
+    dic->next == ic && IS_ITEMP (IC_RESULT (ic)))
+    ;
+  /* Otherwise, for now eliminate 8-bit temporary variables only.
      The STM8 instructions operating directly on memory
      operands are 8-bit, so the most benefit is in 8-bit
      operations. On the other hand, supporting wider
-     operations well in codegen is also more effort. */
-  if (bitsForType (operandType (IC_RESULT (dic))) > 8 &&
-    !((dic->op == LEFT_OP || dic->op == RIGHT_OP) && IS_OP_LITERAL (IC_RIGHT (dic)) && operandLitValue (IC_RIGHT (dic))  == 1 && // Can do wide shift by 1 in place.
-      IS_SYMOP (IC_LEFT (dic)) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_LEFT (dic)) == OP_SYMBOL (IC_RESULT (ic))))
+     operations well in codegen is also more effort. */ 
+  else if (bitsForType (operandType (IC_RESULT (dic))) > 8)
     return 0;
 
   /* if the result is on stack or iaccess then it must be

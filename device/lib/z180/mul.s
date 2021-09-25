@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  mulchar.s
+;  mul.s
 ;
-;  Copyright (C) 2017, Philipp Klaus Krause
+;  Copyright (C) 2017-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -34,17 +34,10 @@
 .globl	__mulint
 
 __mulint:
-        pop     af
-        pop     bc
-        pop     de
-        push    de
-        push    bc
-        push    af
-
 	;; 16-bit multiplication
 	;;
 	;; Entry conditions
-	;; bc = multiplicand
+	;; hl = multiplicand
 	;; de = multiplier
 	;;
 	;; Exit conditions
@@ -54,20 +47,20 @@ __mulint:
 
 __mul16::
 
-	; Swap lower bytes while also copying them into hl
-	ld	l, c
-	ld	h, e
-	ld	e, l
-	ld	c, h
+	; Swap lower bytes while also copying them.
+	ld	c, e
+	ld	b, h
+	ld	h, d
+	ld	d, l
 
 	mlt	bc
-	mlt	de
 	mlt	hl
+	mlt	de
 
 	ld	a, c
-	add	a, e
-	add	a, h
-	ld	h, a
+	add	a, l
+	add	a, d
+	ld	d, a
 
         ret
 

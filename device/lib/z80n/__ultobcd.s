@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __ultobcd.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020-2021, Sergey Belyashov
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -35,39 +35,39 @@
 ; bcd[] will contain BCD value.
 ;
 ___ultobcd:
+	pop	af
+	pop	bc
+	push	af
+	push	bc
 	push	ix
 	ld	ix, #0
 	add	ix, sp
+	ld	sp, ix
+;
 	ld	bc, #0x2000
 ;
 ;--- begin speed optimization
 ;
-	ld	l, 4 (ix)
-	ld	h, 5 (ix)
-	ld	e, 6 (ix)
-	ld	d, 7 (ix)
-	ld	a, e
-	or	a, d
+	ld	a, l
+	or	a, h
 	jr	NZ, 101$
 ;high 2 bytes are zero
 	ld	b, #0x10
 	ex	de, hl
 101$:
-	ld	a, d
+	ld	a, h
 	or	a, a
 	jr	NZ, 102$
 ;high byte is zero
-	ld	d, e
-	ld	e, h
 	ld	h, l
+	ld	l, d
+	ld	d, e
 	ld	a, #-8
 	add	a, b
 	ld	b, a
 102$:
-	ld	4 (ix), l
-	ld	5 (ix), h
-	ld	6 (ix), e
-	ld	7 (ix), d
+	push	hl
+	push	de
 ;
 ;--- end speed optimization
 ;
@@ -78,10 +78,10 @@ ___ultobcd:
 ; CDEHL - future BCD value
 ; B - bits count (32)
 103$:
-	sla	4 (ix)
-	rl	5 (ix)
-	rl	6 (ix)
-	rl	7 (ix)
+	sla	-4 (ix)
+	rl	-3 (ix)
+	rl	-2 (ix)
+	rl	-1 (ix)
 	ld	a, l
 	adc	a, a
 	daa
@@ -106,8 +106,9 @@ ___ultobcd:
 ;
 	ld	b, l
 	ld	a, h
-	ld	l, 8 (ix)
-	ld	h, 9 (ix)
+	ld	sp, ix
+	pop	ix
+	pop	hl
 	ld	(hl), b
 	inc	hl
 	ld	(hl), a
@@ -118,5 +119,4 @@ ___ultobcd:
 	inc	hl
 	ld	(hl), c
 ;
-	pop	ix
 	ret

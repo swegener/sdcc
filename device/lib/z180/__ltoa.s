@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __ltoa.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020-2021, Sergey Belyashov
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -38,16 +38,17 @@ ___ltoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	8(ix) - string
-;	10(ix) - radix
+	push	hl
+;	push	de
 ;
-	ld	e, 4 (ix)
-	ld	d, 5 (ix)
-	bit	7, 7 (ix)
+;	HLDE, -4 (ix) - value
+;	4 (ix) - string
+;	6 (ix) - radix
+;
+	bit	7, h
 	jr	Z, ___ultoa_de
 ;positive/negative numbers are supported only for radix=10
-	ld	a, 10 (ix)
+	ld	a, 6 (ix)
 	cp	a, #10
 	jr	NZ, ___ultoa_de
 ;add minus sign to result and inverse value
@@ -56,17 +57,17 @@ ___ltoa::
 	sbc	hl, de
 	ex	de, hl
 	ld	hl, #0
-	ld	c, 6 (ix)
-	ld	b, 7 (ix)
+	ld	c, -2 (ix)
+	ld	b, -1 (ix)
 	sbc	hl, bc
-	ld	6 (ix), l
-	ld	7 (ix), h
-	ld	l, 8 (ix)
-	ld	h, 9 (ix)
+	ld	-2 (ix), l
+	ld	-1 (ix), h
+	ld	l, 4 (ix)
+	ld	h, 5 (ix)
 	ld	(hl), #0x2D	;minus symbol
 	inc	hl
-	ld	8 (ix), l
-	ld	9 (ix), h
+	ld	4 (ix), l
+	ld	5 (ix), h
 	jr	___ultoa_dehl
 ;
 ;void __uitoa(unsigned int value, char *string, unsigned char radix);
@@ -76,29 +77,29 @@ ___ultoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	8(ix) - string
-;	10(ix) - radix
+	push	hl
+;	push	de
 ;
-	ld	e, 4 (ix)
-	ld	d, 5 (ix)
+;	HLDE, -4 (ix) - value
+;	4 (ix) - string
+;	6 (ix) - radix
 ;
 ___ultoa_de:
-	ld	l, 8 (ix)
-	ld	h, 9 (ix)
+	ld	l, 4 (ix)
+	ld	h, 5 (ix)
 ;
 ___ultoa_dehl:
 	ld	a, e
 	or	a, d
-	or	a, 6 (ix)
-	or	a, 7 (ix)
+	or	a, -2 (ix)
+	or	a, -1 (ix)
 	jr	NZ, 100$
 ;
 	ld	(hl), #0x30
 	inc	hl
 	jp	190$
 100$:
-	ld	a, 10 (ix)
+	ld	a, 6 (ix)
 	cp	a, #10		;most popular radix
 	jr	NZ, 110$
 ;
@@ -112,17 +113,12 @@ ___ultoa_dehl:
 	ld	sp, hl
 	push	bc
 	push	hl
-	ld	c, 6 (ix)
-	ld	b, 7 (ix)
-	push	bc
-	push	de
+	ld	l, -2 (ix)
+	ld	h, -1 (ix)
 	call	___ultobcd
-	ld	hl, #6
-	add	hl, sp
-	ld	sp, hl
 	pop	de		;DE - pointer to string
-	inc	hl
-	inc	hl		;HL - pointer to BCD value
+	ld	hl, #0
+	add	hl, sp		;HL - pointer to BCD value
 	ld	b, #5		;number of bytes in BCD value
 	ld	a, #0x30	;ASCII code of '0'
 103$:
@@ -167,8 +163,8 @@ ___ultoa_dehl:
 	ld	a, e
 	ld	b, c
 125$:
-	srl	7 (ix)
-	rr	6 (ix)
+	srl	-1 (ix)
+	rr	-2 (ix)
 	rr	d
 	rr	e
 	srl	b
@@ -184,8 +180,8 @@ ___ultoa_dehl:
 	inc	hl
 	ld	a, e
 	or	a, d
-	or	a, 6 (ix)
-	or	a, 7 (ix)
+	or	a, -2 (ix)
+	or	a, -1 (ix)
 	jr	NZ, 120$
 	jr	190$
 ;
@@ -197,11 +193,11 @@ ___ultoa_dehl:
 	ex	de, hl
 	ld	c, e
 	ld	b, d
-	ld	e, 6 (ix)
-	ld	d, 7 (ix)
+	ld	e, -2 (ix)
+	ld	d, -1 (ix)
 160$:
 	push	bc
-	ld	c, 10 (ix)
+	ld	c, 6 (ix)
 	call	___divu32_8
 	pop	bc
 	add	a, #0x30
@@ -225,12 +221,16 @@ ___ultoa_dehl:
 ;-------- finish string and reverse order
 190$:
 	ld	(hl), #0
-	ld	e, 8 (ix)
-	ld	d, 9 (ix)
+	ld	e, 4 (ix)
+	ld	d, 5 (ix)
 	call	___strreverse_reg
 	ld	sp, ix
 	pop	ix
-	ret
+	pop	hl
+	inc	sp
+	inc	sp
+	inc	sp
+	jp	(hl)
 ;
 ;in: DEHL - divident, C - divisor
 ;out: DEHL - quotient, A - remainder

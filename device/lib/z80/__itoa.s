@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __itoa.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020-2021, Sergey Belyashov
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -38,29 +38,29 @@ ___itoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	6(ix) - string
-;	8(ix) - radix
+	push	de
 ;
-	ld	e, 4 (ix)
-	ld	d, 5 (ix)
+;	HL - value
+;	DE - string
+;	4 (ix) - radix
+;
+	ex	de, hl
 	bit	7, d
 	jr	Z, ___uitoa_de
 ;positive/negative numbers are supported only for radix=10
-	ld	a, 8 (ix)
+	ld	a, 4 (ix)
 	cp	a, #10
 	jr	NZ, ___uitoa_de
-;add minus sign to result and inverse value
+;add minus sign to result and inverse value (Carry Flag is 0 here)
 	ld	hl, #0
-	or	a, a
 	sbc	hl, de
 	ex	de, hl
-	ld	l, 6 (ix)
-	ld	h, 7 (ix)
+	ld	l, -2 (ix)
+	ld	h, -1 (ix)
 	ld	(hl), #0x2D	;minus symbol
 	inc	hl
-	ld	6 (ix), l
-	ld	7 (ix), h
+	ld	-2 (ix), l
+	ld	-1 (ix), h
 	jr	___uitoa_dehl
 ;
 ;void __uitoa(unsigned int value, char *string, unsigned char radix);
@@ -70,18 +70,19 @@ ___uitoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	6(ix) - string
-;	8(ix) - radix
+	push	de
 ;
-	ld	e, 4 (ix)
-	ld	d, 5 (ix)
+;	HL - value
+;	DE - string
+;	4 (ix) - radix
+;
+	ex	de, hl
 ;
 ___uitoa_de:
-	ld	l, 6 (ix)
-	ld	h, 7 (ix)
+	ld	l, -2 (ix)
+	ld	h, -1 (ix)
 ;
-___uitoa_dehl:
+___uitoa_dehl:		;DE - value, HL - string, 6 (ix) - radix
 	ld	a, e
 	or	a, d
 	jr	NZ, 100$
@@ -90,7 +91,7 @@ ___uitoa_dehl:
 	inc	hl
 	jp	190$
 100$:
-	ld	a, 8 (ix)
+	ld	a, 4 (ix)
 	cp	a, #10		;most popular radix
 	jr	NZ, 110$
 ;
@@ -102,16 +103,12 @@ ___uitoa_dehl:
 	ld	hl, #-4
 	add	hl, sp
 	ld	sp, hl
-	push	bc
 	push	hl
-	push	de
-	call	___uitobcd
-	ld	hl, #4
-	add	hl, sp
-	ld	sp, hl
+	push	bc		;BC - pointer to string
+	ex	de, hl
+	call	___uitobcd	;HL - value, DE - pointer to BCD value
 	pop	de		;DE - pointer to string
-	inc	hl
-	inc	hl		;HL - pointer to BCD value
+	pop	hl		;HL - pointer to BCD value
 	ld	b, #3		;number of bytes in BCD value
 	ld	a, #0x30	;ASCII code of '0'
 103$:
@@ -183,7 +180,7 @@ ___uitoa_dehl:
 150$:
 	ex	de, hl
 160$:
-	ld	c, 8 (ix)
+	ld	c, 4 (ix)
 	call	___divu16_8
 	add	a, #0x30
 	cp	a, #0x3A
@@ -193,22 +190,24 @@ ___uitoa_dehl:
 	ld	(de), a
 	inc	de
 	ld	a, l
-	or	h
+	or	a, h
 	jr	NZ, 160$
 	ex	de, hl
 ;	jr	190$
 ;
 ;---------------------------
 ;
-;-------- finish string and reverse order
+;-------- finish string and reverse its order
 190$:
 	ld	(hl), #0
-	ld	e, 6 (ix)
-	ld	d, 7 (ix)
+	ld	e, -2 (ix)
+	ld	d, -1 (ix)
 	call	___strreverse_reg
 	ld	sp, ix
 	pop	ix
-	ret
+	pop	hl
+	inc	sp
+	jp	(hl)
 ;
 ;
 ;in: HL - divident, C - divisor

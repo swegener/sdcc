@@ -2683,6 +2683,15 @@ In 4.1.11, the minimum Z80N Core version for the z80n port has been raised
  from 1.0 to 2.0.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.12, the default calling convention switched from __sdccall(0) to __sdccall(
+1) for z80, z180 and z80n.
+\end_layout
+
+\begin_layout Itemize
+In 4.1.12, support for –profile has been removed for z80, z180, z80n.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -44111,15 +44120,15 @@ Z80, Z180 and Z80N calling conventions
 \end_layout
 
 \begin_layout Standard
-The current default is the SDCC calling convention, version 0.
- Using the command-line option –sdcccall 1, the default can be changed to
- version 1.
+The current default is the SDCC calling convention, version 1.
+ Using the command-line option –sdcccall 0, the default can be changed to
+ version 0.
  There are three other calling conventions supported, which can be specified
- using the keywords __sdcccall(1), __smallc, __z88dk_fastcall and __z88dk_callee.
+ using the keywords __smallc, __z88dk_fastcall and __z88dk_callee.
  They are primarily intended for compatibility with libraries written for
  other compilers.
  For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
- which is passed the same way as the return value.
+ which is passed the same way as the return value of __sdcccall(0).
  For __z88dk_callee, parameters are passed on the stack, but the stack is
  not adjusted for the parameters after the call (thus the callee has to
  do this instead).

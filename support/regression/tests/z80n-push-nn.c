@@ -20,6 +20,7 @@ int f(void) __naked
 	ld	h, (hl)
 	ld	l, a
 	add	hl, de
+	ex	de, hl
 	ret
 ;
 	.db	#>_x, #<_x
@@ -30,7 +31,7 @@ memcpy_p g(void) __naked
 {
     __asm
 	push	#_memcpy
-	pop	hl
+	pop	de
 	ret
     __endasm;
 }

@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __strreverse.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020-2021, Sergey Belyashov
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -34,12 +34,7 @@
 ;void __reverse(char *beg, char *end);
 ;
 ___strreverse::
-	pop	bc
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	push	bc
+	ex	de, hl
 ;
 ;in: HL - pointer to end of string (null symbol), DE - pointer to start of string
 ;

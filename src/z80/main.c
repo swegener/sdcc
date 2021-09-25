@@ -1114,7 +1114,7 @@ PORT z80_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
   { -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1243,7 +1243,7 @@ PORT z180_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
   { -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -2147,7 +2147,7 @@ PORT z80n_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
   { -1, FALSE },
   { z80_emitDebuggerSymbol },

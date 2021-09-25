@@ -6023,7 +6023,7 @@ genFunction (const iCode * ic)
         }
     }
 
-  if (!IS_GB && options.profile)
+  if (!IS_GB && !IS_Z80 && !IS_Z180 && !IS_Z80N && options.profile)
     {
       emit2 ("!profileenter");
     }
@@ -6230,7 +6230,7 @@ genEndFunction (iCode *ic)
       _G.calleeSaves.pushedBC = FALSE;
     }
 
-  if (options.profile)
+  if (!IS_GB && !IS_Z80 && !IS_Z180 && !IS_Z80N && options.profile)
     {
       emit2 ("!profileexit");
     }

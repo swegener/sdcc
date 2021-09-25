@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __uitobcd.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020-2021, Sergey Belyashov
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -35,15 +35,11 @@
 ; bcd[] will contain BCD value.
 ;
 ___uitobcd:
-	push	ix
-	ld	ix, #0
-	add	ix, sp
+	push	de
 ;
 	ld	bc, #0x1000
 	ld	d, c
 	ld	e, c
-	ld	l, 4 (ix)
-	ld	h, 5 (ix)
 ;
 ;--- begin speed optimization
 ;
@@ -75,13 +71,11 @@ ___uitobcd:
 	ld	c, a
 	djnz	100$
 ;
-	ld	l, 6 (ix)
-	ld	h, 7 (ix)
+	pop	hl
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
 	inc	hl
 	ld	(hl), c
 ;
-	pop	ix
 	ret

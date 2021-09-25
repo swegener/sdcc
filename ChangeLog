@@ -1,3 +1,17 @@
+2021-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c,
+	  src/z80/gen.c,
+	  doc/sdccman.lyx,
+	  device/lib/z80,
+	  device/lib/z180,
+	  device/lib/z80n,
+	  device/lib/_memset.c,
+	  support/regression/ports/*/spec.mk,
+	  support/regression/tests/z80n-push-nn.c,
+	  .version:
+	  __sdcccall(1) convention as default for z80, z80n and z180 picked from breaktheworld branch.
+
 2021-09-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc.c:
@@ -89,7 +103,7 @@
 	  src/z80/main.c,
 	  support/regression/ports/ucgbz80/spec.mk,
 	  support/regression/tests/sdcccall.c:
-	 __sdcccall(1) convention as default for stm8 and gbz80 picked from breaktheworld branch.
+	  __sdcccall(1) convention as default for stm8 and gbz80 picked from breaktheworld branch.
 
 2021-09-08 Philipp Klaus Krause <pkk AT spth.de>
 

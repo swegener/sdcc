@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  setjmp.s
 ;
-;  Copyright (C) 2011-2014, Philipp Klaus Krause
+;  Copyright (C) 2011-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,9 +31,10 @@
 	.globl ___setjmp
 
 ___setjmp:
-	pop	hl
+	push	hl
 	pop	iy
-	push	af
+
+	pop	hl
 	push	hl
 
 	; Store return address.
@@ -55,16 +56,16 @@ ___setjmp:
 	ld	5(iy), h
 
 	; Return 0.
-	ld	l, a
-	ld	h, a
+	ld	e, a
+	ld	d, a
 	ret
 
 .globl _longjmp
 
 _longjmp:
 	pop	af
+	push	hl
 	pop	iy
-	pop	de
 
 	; Ensure that return value is non-zero.
 	ld	a, e
@@ -85,11 +86,8 @@ jump:
 	ld	sp, hl
 	pop	hl
 
-	; Move return value into hl.
-	ex	de, hl
-
 	; Jump.
-	ld	c, 0(iy)
-	ld	b, 1(iy)
-	push	bc
-	ret
+	ld	l, 0(iy)
+	ld	h, 1(iy)
+	jp	(hl)
+

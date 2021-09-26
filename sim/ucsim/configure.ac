@@ -163,11 +163,11 @@ fi,
 enable_m6800_port="yes")
 
 AC_ARG_ENABLE(m68hc12-port,
-[  --disable-m68hc12-port  do not compile simulator for m68hc12],
+[  --enable-m68hc12-port   compile simulator for m68hc12],
 if test $enable_m68hc12_port  != "no"; then
     enable_m68hc12_port="yes"
 fi,
-enable_m68hc12_port="yes")
+enable_m68hc12_port="no")
 
 AC_ARG_ENABLE(mcs6502-port,
 [  --disable-mcs6502-port  do not compile simulator for mcs6502],

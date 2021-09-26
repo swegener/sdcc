@@ -48,8 +48,9 @@ case $TARGET in
 	    :
 	fi
 	./configure --prefix=${PREFIX} \
-	    --disable-dlso \
-	    "$@"
+		    --disable-dlso \
+		    --enable-m68hc12-port \
+		    "$@"
 	#--enable-ucsim
 	;;
     mingw|win|w)
@@ -65,8 +66,9 @@ case $TARGET in
 	fi
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-	    --disable-dlso \
-	    $HOST_OPT "$@"
+		    --disable-dlso \
+		    --enable-m68hc12-port \
+		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
     w64)
@@ -76,8 +78,9 @@ case $TARGET in
 	export LDFLAGS='-static-libgcc -static-libstdc++'
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-	    --disable-dlso \
-	    $HOST_OPT "$@"
+		    --disable-dlso \
+		    --enable-m68hc12-port \
+		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
     *)

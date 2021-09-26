@@ -1,3 +1,10 @@
+2021-09-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/__mulsint2slong.s,
+	  src/z80/main.c,
+	  device/lib/z80/Makefile.in:
+	  int x int -> long multiplication support routine for z80.
+
 2021-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c,

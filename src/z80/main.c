@@ -1116,7 +1116,10 @@ PORT z80_port =
   { NULL, NULL },
   1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    true,                       /* use support routine for int x int -> long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */

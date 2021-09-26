@@ -35,20 +35,8 @@
 
 .area _CODE
 
-; 8x8->16 multiplication, takes arguments in e, h, returns result in hl. d has to be 0 before call. Preserves a and d.
-u_16_16_mul_8_8:
-	ld	l, d
-	ld      b, #8
-muluchar_rrx_s_loop:
-        add     hl, hl
-        jr      nc, muluchar_rrx_s_noadd
-        add     hl, de
-muluchar_rrx_s_noadd:
-        djnz    muluchar_rrx_s_loop
-	ret
-
 ___mulsint2slong:
-	; Use lowest bit of c to rememebr if results needs to be negated. Use b to cache #0.
+	; Use lowest bit of c to remember if result needs to be negated. Use b to cache #0.
 	ld	bc, #0
 
 	bit	#7, l
@@ -97,58 +85,24 @@ de_nonneg:
 
 ; 16x16->32 multiplication
 ___muluint2ulong:
-	; Setup iy for stack access.
-	ld	iy, #0
-	add	iy, sp
-
-	; Put parameters on the stack.
-	push	de
-	push	hl
-
-	; Now -4(iy) is l, -3 (iy) is h, -2(iy) is e, -1(iy) is d.
-
-	; Need one 32-bit local variable on stack.
-
-	ld	c, e
-	ld	e, d
-	ld	d, #0
-
-	; Multiplication of upper bytes
-	call	u_16_16_mul_8_8
-	push	hl
-
-	; Multiplication of lower bytes
-	ld	e, -4(iy)
-	ld	h, c
-	call	u_16_16_mul_8_8
-	push	hl
-
-	; Mixed multiplications - add them together, add them to the result.
-	ld	e, -3(iy)
-	ld	h, c
-	call	u_16_16_mul_8_8
 	ld	c, l
 	ld	a, h
-	ld	e, -4(iy)
-	ld	h, -1(iy)
-	call	u_16_16_mul_8_8
-	ld	b, a
-	add	hl, bc
-	ld	d, -5(iy)
-	jr	NC, forward1
-	inc	d
-forward1:
-	ld	c, -7(iy)
-	ld	b, -6(iy)
-	add	hl, bc
-	jr	NC, forward2
-	inc	d
-forward2:
-	ld	e, h
-	ld	h, l
-	ld	l, -8(iy)
-	ex	de, hl
 
-	ld	sp, iy
+	ld	iy, #0
+	ld	hl, #0
+	ld	b, #16
+loop:
+	add	iy, iy
+	adc	hl, hl
+	rl	c
+	rla
+	jr	NC, skip
+	add	iy, de
+	jr	NC, skip
+	inc	hl
+skip:
+	djnz	loop
+	push	iy
+	pop	de
 	ret
 

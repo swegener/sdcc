@@ -1,3 +1,8 @@
+2021-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/z80/__mulsint2slong.s:
+	  Improve int x int -> long multiplication for z80.
+
 2021-09-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/__mulsint2slong.s,

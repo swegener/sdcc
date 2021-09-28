@@ -85,17 +85,11 @@ de_nonneg:
 
 ; 16x16->32 multiplication
 ___muluint2ulong:
-	ld	c, l
-	ld	a, h
-
 	ld	iy, #0
-	ld	hl, #0
 	ld	b, #16
 loop:
 	add	iy, iy
 	adc	hl, hl
-	rl	c
-	rla
 	jr	NC, skip
 	add	iy, de
 	jr	NC, skip

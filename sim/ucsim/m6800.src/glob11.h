@@ -40,4 +40,4 @@ extern struct cpu_entry cpus_hc11[];
 
 #endif
 
-/* End of m68hc12.src/glob11.h */
+/* End of m6800.src/glob11.h */

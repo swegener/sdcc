@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 
 #include "m6800cl.h"
+#include "d11p0.h"
 
 
 #define rY   (IY)
@@ -76,12 +77,24 @@ public:
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
 
+  // ALU
+  virtual int sub16(class cl_cell16 &dest, u16_t op, bool c);
+
+  // hc11 specific insts on Page0 
   virtual int TEST(t_mem code);
   virtual int IDIV(t_mem code);
   virtual int FDIV(t_mem code);
+  virtual int LSRD(t_mem code);
+  virtual int ASLD(t_mem code);
+  virtual int BRN(t_mem code);
+  virtual int PULX(t_mem code);
+  virtual int ABX(t_mem code);
+  virtual int PSHX(t_mem code);
+  virtual int MUL(t_mem code);
+  virtual int SUBDi(t_mem code) { return sub16(cD, i16(), false); }
 };
 
 
 #endif
 
-/* End of m68hc12.src/m68hc11cl.h */
+/* End of m6800.src/m68hc11cl.h */

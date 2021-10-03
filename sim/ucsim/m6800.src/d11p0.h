@@ -33,8 +33,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TEST	instruction_00
 #define IDIV	instruction_02
 #define FDIV	instruction_03
+#define LSRD	instruction_04
+#define ASLD	instruction_05
+#define BRN	instruction_21
+#define PULX	instruction_38
+#define ABX	instruction_3a
+#define PSHX	instruction_3c
+#define MUL	instruction_3d
+#define SUBDi	instruction_83
 
 
 #endif
 
-/* End of m68hc12.src/d11p0.h */
+/* End of m6800.src/d11p0.h */

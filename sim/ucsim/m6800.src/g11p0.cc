@@ -35,8 +35,16 @@ struct dis_entry disass11p0[]= {
   { 0x00, 0xff, ' ', 1, "TEST" },
   { 0x02, 0xff, ' ', 1, "IDIV" },
   { 0x03, 0xff, ' ', 1, "FDIV" },
+  { 0x04, 0xff, ' ', 1, "LSRD" },
+  { 0x05, 0xff, ' ', 1, "ASLD" },
+  { 0x21, 0xff, 'R', 2, "BRN %r" },
+  { 0x38, 0xff, ' ', 1, "PULX" },
+  { 0x3a, 0xff, ' ', 1, "ABX" },
+  { 0x3c, 0xff, ' ', 1, "PSHX" },
+  { 0x3d, 0xff, ' ', 1, "MUL" },
+  { 0x83, 0xff, ' ', 3, "SUBD %B" },
   
   { 0, 0, 0, 0, 0, 0 }
 };
 
-/* End of m68hc12.src/g11p0.cc */
+/* End of m6800.src/g11p0.cc */

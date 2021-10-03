@@ -44,15 +44,15 @@ instruction_wrapper_fn itab18[256];
 
 int8_t p0ticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
-  /* 0 */ 0, 2, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
+  /* 0 */ 0, 2,40,40, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
   /* 1 */ 2, 2, 0, 0, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 0, 0,
-  /* 2 */ 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  /* 3 */ 3, 3, 4, 4, 3, 3, 3, 3, 0, 5, 0,12, 0, 0,14,14,
+  /* 2 */ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+  /* 3 */ 3, 3, 4, 4, 3, 3, 3, 3, 5, 5, 3,12, 4, 3,14,14,
   /* 4 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
   /* 5 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
   /* 6 */ 6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,
   /* 7 */ 6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,
-  /* 8 */ 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 3, 0,
+  /* 8 */ 2, 2, 2, 4, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 3, 0,
   /* 9 */ 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 5, 0, 4, 4,
   /* a */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
   /* b */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
@@ -271,9 +271,63 @@ cl_m68hc11::disassc(t_addr addr, chars *comment)
 }
 
 
+/* 
+ * OTHER instructions
+ */
+
 int
 CL11::TEST(t_mem code)
 {
+  return resGO;
+}
+
+
+/*
+ * MOVE instructions
+ */
+
+int
+CL11::PULX(t_mem code)
+{
+  u8_t h, l;
+  h= rom->read(++rSP);
+  l= rom->read(++rSP);
+  cSP.W(rSP);
+  cX.W(h*256+l);
+  vc.rd+= 2;
+  return resGO;
+}
+
+
+int
+CL11::PSHX(t_mem code)
+{
+  rom->write(rSP--, rX);
+  rom->write(rSP--, rX>>8);
+  cSP.W(rSP);
+  vc.wr+= 2;
+  return resGO;
+}
+
+
+/*
+ * ALU instructions
+ */
+
+int
+CL11::sub16(class cl_cell16 &dest, u16_t op, bool c)
+{
+  u8_t orgc= rF&flagC;
+  u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
+  u16_t a= dest.R(), b= op, r;
+  r= a-b;
+  if (c && orgc) r--;
+  if (r&0x8000) f|= flagN;
+  if (!r) f|= flagZ;
+  if (( (~a&b)|(b&r)|(r&~a) ) & 0x8000) f|= flagC;
+  if (( (a&~b&~r)|(~a&b&r) ) & 0x8000) f|= flagV;
+  dest.W(r);
+  cF.W(f);
   return resGO;
 }
 
@@ -296,7 +350,6 @@ CL11::IDIV(t_mem code)
     }
   if (!q) f|= flagZ;
   cF.W(f);
-  tick(40);
   return resGO;
 }
 
@@ -321,9 +374,68 @@ CL11::FDIV(t_mem code)
     }
   if (!q) f|= flagZ;
   cF.W(f);
-  tick(40);
   return resGO;
 }
 
 
-/* End of m68hc12.src/m68hc11.cc */
+int
+CL11::LSRD(t_mem code)
+{
+  u8_t newc= rB&1;
+  u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
+  cD.W(rD>>1);
+  if (!rD) f|= flagZ;
+  if (newc) f|= (flagC|flagV);
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::ASLD(t_mem code)
+{
+  u8_t newc= rA&0x80;
+  u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
+  cD.W(rD<<1);
+  if (!rD) f|= flagZ;
+  if (newc) f|= flagC;
+  if (rA&0x80) f|= flagN;
+  if ((f ^ (f<<3)) & flagN) f|= flagV;
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::ABX(t_mem code)
+{
+  cX.W(rX+rB);
+  return resGO;
+}
+
+
+int
+CL11::MUL(t_mem code)
+{
+  u8_t f= rF & ~flagC;
+  u16_t r= rA * rB;
+  cD.W(r);
+  if (rB & 0x80) f|= flagC;
+  cF.W(f);
+  return resGO;
+}
+
+
+/*
+ * BRANCH instructions
+ */
+
+int
+CL11::BRN(t_mem code)
+{
+  fetch();
+  return resGO;
+}
+  
+
+/* End of m6800.src/m68hc11.cc */

@@ -36,4 +36,4 @@ extern struct dis_entry disass_m6800[];
 
 #endif
 
-/* End of m6809.src/glob.h */
+/* End of m6800.src/glob.h */

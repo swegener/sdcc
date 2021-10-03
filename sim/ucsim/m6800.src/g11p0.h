@@ -40,4 +40,4 @@ extern struct dis_entry disass11p0[];
 
 #endif
 
-/* End of m68hc12.src/g11p0.h */
+/* End of m6800.src/g11p0.h */

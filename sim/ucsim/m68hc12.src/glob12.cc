@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (m68hc11cl.h)
+ * Simulator of microcontrollers (glob12.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,40 +25,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef M68HC11CL_HEADER
-#define M68HC11CL_HEADER
+#include <stdio.h>
 
-#include "uccl.h"
-#include "memcl.h"
-
-#include "m6800cl.h"
+#include "glob12.h"
 
 
-#define rY   (IY)
-#define rIY  (IY)
+struct dis_entry disass12[]= {
 
-#define cY   (cIY)
-
-
-/*
- * Base of M68HC11 processor
- */
-
-class cl_m68hc11: public cl_m6800
-{
- public:
-  u16_t IY;
-  class cl_cell16 cIY, cD;
-public:
-  cl_m68hc11(class cl_sim *asim);
-  virtual int init(void);
-  virtual const char *id_string(void);
-  virtual void reset(void);
-  virtual void print_regs(class cl_console_base *con);
-    
-  virtual int clock_per_cycle(void) { return 1; }
+  { 0, 0, 0, 0, 0, 0 }
 };
 
-#endif
-
-/* End of m68hc12.src/m68hc11cl.h */
+/* End of m68hc12.src/glob12.cc */

@@ -6,7 +6,9 @@ clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
 	rm -f sm6800$(EXEEXT) sm6800.exe
+	rm -f sm68hc11$(EXEEXT) sm68hc11.exe
 	rm -f ucsim_m6800$(EXEEXT) ucsim_m6800.exe
+	rm -f ucsim_m68hc11$(EXEEXT) ucsim_m68hc11.exe
 	$(MAKE) -C test -f clean.mk clean
 
 

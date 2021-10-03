@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (m68hc12cl.h)
+ * Simulator of microcontrollers (m68hc11cl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,32 +25,63 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef M68HC12CL_HEADER
-#define M68HC12CL_HEADER
+#ifndef M68HC11CL_HEADER
+#define M68HC11CL_HEADER
 
 #include "uccl.h"
 #include "memcl.h"
 
-#include "m68hc11cl.h"
+#include "m6800cl.h"
 
-/*
- * Base of M68HC12 processor
- */
-#define CL12 cl_m68hc12
 
-class cl_m68hc12: public cl_m68hcbase
+#define rY   (IY)
+#define rIY  (IY)
+
+#define cY   (cIY)
+
+
+extern instruction_wrapper_fn itab18[256];
+extern int8_t p0ticks11[256];
+
+class cl_m68hcbase: public cl_m6800
 {
 public:
-  cl_m68hc12(class cl_sim *asim);
+  u16_t IY;
+  class cl_cell16 cIY, cD;
+public:
+  cl_m68hcbase(class cl_sim *asim): cl_m6800(asim) {}
+  virtual int init(void);
+public:
+  virtual int clock_per_cycle(void) { return 1; }
+  virtual void print_regs(class cl_console_base *con);
+public:
+#include "hc18.h"
+};  
+
+
+/*
+ * Base of M68HC11 processor
+ */
+#define CL11 cl_m68hc11
+
+class cl_m68hc11: public cl_m68hcbase
+{
+public:
+  cl_m68hc11(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
   virtual void reset(void);
 
-  virtual struct dis_entry *dis_tbl(void);
+  virtual int8_t *tick_tab(t_mem code);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
+
+  virtual int TEST(t_mem code);
+  virtual int IDIV(t_mem code);
+  virtual int FDIV(t_mem code);
 };
+
 
 #endif
 
-/* End of m68hc12.src/m68hc12cl.h */
+/* End of m68hc12.src/m68hc11cl.h */

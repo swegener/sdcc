@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (m68hc12cl.h)
+ * Simulator of microcontrollers (simm68hc11cl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,32 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef M68HC12CL_HEADER
-#define M68HC12CL_HEADER
+#ifndef SIMM68HC11CL_HEADER
+#define SIMM68HC11CL_HEADER
 
-#include "uccl.h"
-#include "memcl.h"
+#include "simcl.h"
 
-#include "m68hc11cl.h"
 
-/*
- * Base of M68HC12 processor
- */
-#define CL12 cl_m68hc12
-
-class cl_m68hc12: public cl_m68hcbase
+class cl_simm68hc11: public cl_sim
 {
 public:
-  cl_m68hc12(class cl_sim *asim);
-  virtual int init(void);
-  virtual const char *id_string(void);
-  virtual void reset(void);
+  cl_simm68hc11(class cl_app *the_app);
 
-  virtual struct dis_entry *dis_tbl(void);
-  virtual struct dis_entry *get_dis_entry(t_addr addr);
-  virtual char *disassc(t_addr addr, chars *comment=NULL);
+  virtual class cl_uc *mk_controller(void);
 };
+
 
 #endif
 
-/* End of m68hc12.src/m68hc12cl.h */
+/* End of m6800.src/simm68hc11cl.h */

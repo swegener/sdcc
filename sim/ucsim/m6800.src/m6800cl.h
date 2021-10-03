@@ -34,7 +34,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 #include "itsrccl.h"
 #include "decode.h"
+#include "iwrap.h"
 
+
+extern instruction_wrapper_fn itab[256];
 
 struct acc_t {
   union {
@@ -50,15 +53,30 @@ struct acc_t {
     } a8;
   } DAB;
 };
-  
+
+struct cc_t {
+  union {
+    u16_t cc16;
+    struct {
+#ifdef WORDS_BIGENDIAN
+      u8_t cch;
+      u8_t ccl;
+#else
+      u8_t ccl;
+      u8_t cch;
+#endif
+    } cc8;
+  } cc16;
+};
+
 #define rA  (acc.DAB.a8.Ar)
 #define A   (acc.DAB.a8.Ar)
 #define rB  (acc.DAB.a8.Br)
 #define B   (acc.DAB.a8.Br)
 #define rD  (acc.DAB.Dr)
 #define D   (acc.DAB.Dr)
-#define rCC (CC)
-#define rF  (CC)
+#define rCC (CC.cc16.cc8.ccl)
+#define rF  (CC.cc16.cc8.ccl)
 #define rIX (IX)
 #define rX  (IX)
 #define rSP (SP)
@@ -114,6 +132,8 @@ enum {
   RESET_AT	= 0xfffe,
 };
 
+extern int8_t p0ticks[256];
+
 
 /*
  * Base of M6800 processor
@@ -123,7 +143,7 @@ class cl_m6800: public cl_uc
 {
 public:
   struct acc_t acc;
-  u8_t CC;
+  struct cc_t CC;
   u16_t IX, SP;
   class cl_cell8 cA, cB, cCC;
   class cl_cell16 cIX, cSP;
@@ -140,6 +160,7 @@ public:
   virtual void make_cpu_hw(void);
   virtual void make_memories(void);
 
+  virtual int8_t *tick_tab(t_mem code) { return p0ticks; }
   virtual int clock_per_cycle(void) { return 1; }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
@@ -153,8 +174,8 @@ public:
   virtual int priority_of(uchar nuof_it) { return nuof_it; }
   virtual int accept_it(class it_level *il);
   virtual bool it_enabled(void) { return true; }
-  virtual void push_regs(void);
-  virtual void pull_regs(void);
+  virtual void push_regs(bool inst_part);
+  virtual void pull_regs(bool inst_part);
   
   virtual class cl_cell8 &idx(void);
   virtual class cl_cell8 &ext(void);

@@ -37,7 +37,6 @@ cl_m6800::call(t_addr a)
   cSP.W(rSP-1);
   PC= a;
   vc.wr+= 2;
-  tick(6);
   return resGO;
 }
 
@@ -51,7 +50,6 @@ cl_m6800::RTS(t_mem code)
   l= rom->read(rSP);
   PC= h*256 + l;
   vc.rd+= 2;
-  tick(4);
   return resGO;
 }
 
@@ -60,7 +58,6 @@ cl_m6800::branch(t_addr a, bool cond)
 {
   if (cond)
     PC= a&0xffff;
-  tick(3);
   return resGO;
 }
 
@@ -70,7 +67,6 @@ cl_m6800::JMPi(t_mem code)
   t_addr a= fetch();
   a+= rX;
   PC= a;
-  tick(2);
   return resGO;
 }
 

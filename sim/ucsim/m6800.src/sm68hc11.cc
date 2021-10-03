@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (m68hc12cl.h)
+ * Simulator of microcontrollers (sm68hc11.cc)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,32 +25,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef M68HC12CL_HEADER
-#define M68HC12CL_HEADER
+// prj
+#include "globals.h"
 
-#include "uccl.h"
-#include "memcl.h"
+// local
+#include "glob11.h"
+#include "simm68hc11cl.h"
 
-#include "m68hc11cl.h"
 
-/*
- * Base of M68HC12 processor
- */
-#define CL12 cl_m68hc12
-
-class cl_m68hc12: public cl_m68hcbase
+int
+main(int argc, char *argv[])
 {
-public:
-  cl_m68hc12(class cl_sim *asim);
-  virtual int init(void);
-  virtual const char *id_string(void);
-  virtual void reset(void);
+  class cl_sim *sim;
 
-  virtual struct dis_entry *dis_tbl(void);
-  virtual struct dis_entry *get_dis_entry(t_addr addr);
-  virtual char *disassc(t_addr addr, chars *comment=NULL);
-};
+  cpus= cpus_hc11;
+  application= new cl_app();
+  application->set_name("sm68hc11");
+  application->init(argc, argv);
+  sim= new cl_simm68hc11(application);
+  if (sim->init())
+    sim->state|= SIM_QUIT;
+  application->set_simulator(sim);
+  //sim->main();
+  application->run();
+  application->done();
+  delete application;
+  return(0);
+}
 
-#endif
-
-/* End of m68hc12.src/m68hc12cl.h */
+/* End of m6800.src/sm68hc11.cc */

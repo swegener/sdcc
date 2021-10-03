@@ -41,6 +41,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "m6800cl.h"
 
 
+instruction_wrapper_fn itab[256];
+
+int8_t p0ticks[256]= {
+  /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
+  /* 0 */ 0, 2, 0, 0, 0, 0, 2, 2, 4, 4, 2, 2, 2, 2, 2, 2,
+  /* 1 */ 2, 2, 0, 0, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 0, 0,
+  /* 2 */ 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  /* 3 */ 4, 4, 4, 4, 4, 4, 4, 4, 0, 5, 0,10, 0, 0, 9,12,
+  /* 4 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
+  /* 5 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
+  /* 6 */ 7, 0, 0, 7, 7, 0, 7, 7, 7, 7, 7, 0, 7, 7, 4, 7,
+  /* 7 */ 6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,
+  /* 8 */ 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 3, 8, 3, 0,
+  /* 9 */ 3, 3, 3, 0, 3, 3, 3, 4, 3, 3, 3, 3, 4, 0, 4, 5,
+  /* a */ 5, 5, 5, 0, 5, 5, 5, 6, 5, 5, 5, 5, 6, 8, 6, 7,
+  /* b */ 4, 4, 4, 0, 4, 4, 4, 5, 4, 4, 4, 4, 5, 9, 5, 6,
+  /* c */ 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 0, 0, 3, 0,
+  /* d */ 3, 3, 3, 0, 3, 3, 3, 4, 3, 3, 3, 3, 0, 0, 4, 5,
+  /* e */ 5, 5, 5, 0, 5, 5, 5, 6, 5, 5, 5, 5, 0, 0, 6, 7,
+  /* f */ 4, 4, 4, 0, 4, 4, 4, 5, 4, 4, 4, 4, 0, 0, 5, 6
+};
+
 cl_m6800::cl_m6800(class cl_sim *asim):
   cl_uc(asim)
 {
@@ -81,7 +103,7 @@ cl_m6800::reset(void)
 {
   cl_uc::reset();
 
-  CC= 0xc0;
+  cCC.W(0xc0);
   PC= rom->read(0xfffe)*256 + rom->read(0xffff);
   tick(6);
 }
@@ -449,7 +471,7 @@ cl_m6800::print_regs(class cl_console_base *con)
   con->dd_printf("A= $%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
   con->dd_printf("B= $%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
   con->dd_printf("\n");
-  con->dd_printf("CC= "); con->print_bin(CC, 8); con->dd_printf("\n");
+  con->dd_printf("CC= "); con->print_bin(rF, 8); con->dd_printf("\n");
   con->dd_printf("      HINZVC\n");
 
   con->dd_printf("IX= ");
@@ -481,7 +503,7 @@ cl_m6800::accept_it(class it_level *il)
   class cl_it_src *is= il->source;
 
   if (!wai)
-    push_regs();
+      push_regs(false);
   wai= false;
   
   if ((is == src_irq) ||
@@ -498,7 +520,7 @@ cl_m6800::accept_it(class it_level *il)
 }
 
 void
-cl_m6800::push_regs(void)
+cl_m6800::push_regs(bool inst_part)
 {
   rom->write(rSP--, PC&0xff);
   rom->write(rSP--, PC>>8);
@@ -507,11 +529,12 @@ cl_m6800::push_regs(void)
   rom->write(rSP--, rA);
   rom->write(rSP--, rB);
   rom->write(rSP--, rCC);
-  tick(7);
+  if (!inst_part)
+    tick(7);
 }
 
 void
-cl_m6800::pull_regs(void)
+cl_m6800::pull_regs(bool inst_part)
 {
   u8_t l, h;
   rCC= rom->read(++rSP);
@@ -523,7 +546,8 @@ cl_m6800::pull_regs(void)
   l= rom->read(++rSP);
   h= rom->read(++rSP);
   PC= h*256+l;
-  tick(7);
+  if (!inst_part)
+    tick(7);
 }
 
 class cl_cell8 &
@@ -532,7 +556,6 @@ cl_m6800::idx(void)
   t_addr a= fetch();
   a+= rX;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
-  tick(3);
   return *c;
 }
 
@@ -545,7 +568,6 @@ cl_m6800::ext(void)
   l= fetch();
   a= h*256 + l;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
-  tick(2);
   return *c;
 }
 

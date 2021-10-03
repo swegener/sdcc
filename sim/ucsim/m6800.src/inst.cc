@@ -29,25 +29,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 cl_m6800::NOP(t_mem code)
 {
-  tick(1);
   return resGO;
 }
 
 int
 cl_m6800::RTI(t_mem code)
 {
-  pull_regs();
-  tick(2);
+  pull_regs(true);
   return resGO;
 }
 
 int
 cl_m6800::WAI(t_mem code)
 {
-  push_regs();
+  push_regs(true);
   wai= true;
   state= stIDLE;
-  tick(1);
   return resGO;
 }
 
@@ -55,7 +52,6 @@ int
 cl_m6800::SWI(t_mem code)
 {
   src_swi->request();
-  tick(4);
   return resGO;
 }
 

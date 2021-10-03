@@ -1,5 +1,8 @@
 #include "iwrap.h"
 
+int instruction_wrapper_invalid(class cl_uc *uc, t_mem code) { return resINV; }
+int instruction_wrapper_go(class cl_uc *uc, t_mem code) { return resGO; }
+
 int instruction_wrapper_00(class cl_uc *uc, t_mem code) { return uc->instruction_00(code); }
 int instruction_wrapper_01(class cl_uc *uc, t_mem code) { return uc->instruction_01(code); }
 int instruction_wrapper_02(class cl_uc *uc, t_mem code) { return uc->instruction_02(code); }

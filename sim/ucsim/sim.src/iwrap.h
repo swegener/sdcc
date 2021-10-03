@@ -3,6 +3,8 @@
 
 #include "uccl.h"
 
+extern int instruction_wrapper_invalid(class cl_uc *uc, t_mem code);
+extern int instruction_wrapper_go(class cl_uc *uc, t_mem code);
 
 extern int instruction_wrapper_00(class cl_uc *uc, t_mem code);
 extern int instruction_wrapper_00(class cl_uc *uc, t_mem code);

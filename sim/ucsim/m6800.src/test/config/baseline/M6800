@@ -17,7 +17,7 @@ Controller has 9 hardware element(s).
    on pia[1]
    on dport[0]
 A= $00   0   +0 .  B= $00   0   +0 .  
-CC= 11000000
+CC= 00000000
       HINZVC
 IX= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH
 SP= 0x0000 08 70 d4 b2 8a 29 54 48 .p...)TH

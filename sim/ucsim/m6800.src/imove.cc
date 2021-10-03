@@ -34,7 +34,6 @@ cl_m6800::clr(class cl_cell8 &dest)
   dest.W(0);
   f|= flagZ;
   cCC.W(f);
-  tick(1);
   return resGO;
 }
 
@@ -89,7 +88,6 @@ int
 cl_m6800::TAP(t_mem code)
 {
   cF.W(rA);
-  tick(1);
   return resGO;
 }
 
@@ -97,7 +95,6 @@ int
 cl_m6800::TPA(t_mem code)
 {
   cA.W(rF);
-  tick(1);
   return resGO;
 }
 
@@ -127,7 +124,6 @@ int
 cl_m6800::TSX(t_mem code)
 {
   cIX.W(rSP+1);
-  tick(3);
   return resGO;
 }
 
@@ -137,7 +133,6 @@ cl_m6800::PULA(t_mem code)
   cSP.W(rSP+1);
   cA.W(rom->read(rSP));
   vc.rd++;
-  tick(3);
   return resGO;
 }
 
@@ -147,7 +142,6 @@ cl_m6800::PULB(t_mem code)
   cSP.W(rSP+1);
   cB.W(rom->read(rSP));
   vc.rd++;
-  tick(3);
   return resGO;
 }
 
@@ -155,7 +149,6 @@ int
 cl_m6800::TXS(t_mem code)
 {
   cSP.W(rIX-1);
-  tick(3);
   return resGO;
 }
 
@@ -165,7 +158,6 @@ cl_m6800::PSHA(t_mem code)
   rom->write(rSP, rA);
   cSP.W(rSP-1);
   vc.wr++;
-  tick(3);
   return resGO;
 }
 
@@ -175,7 +167,6 @@ cl_m6800::PSHB(t_mem code)
   rom->write(rSP, rB);
   cSP.W(rSP-1);
   vc.wr++;
-  tick(3);
   return resGO;
 }
 

@@ -29,10 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define GLOB_HEADER
 
 #include "stypes.h"
-#include "iwrap.h"
 
-
-extern instruction_wrapper_fn itab[256];
 
 extern struct dis_entry disass_m6800[];
 

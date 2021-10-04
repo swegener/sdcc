@@ -350,7 +350,7 @@ cl_m6800::disassc(t_addr addr, chars *comment)
 	  switch (b[i])
 	    {
 	    case 'x': case 'X': // indexed
-	      h= rom->read(addr+1);
+	      h= rom->read(++addr);
 	      a= rX+h;
 	      work.appendf("$%02x,X", h);
 	      //add_spaces(&work, 20);
@@ -360,8 +360,8 @@ cl_m6800::disassc(t_addr addr, chars *comment)
 		temp.appendf("; [$%04x]=$%04x", a, read_addr(rom, a));
 	      break;
 	    case 'e': case 'E': // extended
-	      h= rom->read(addr+1);
-	      l= rom->read(addr+2);
+	      h= rom->read(++addr);
+	      l= rom->read(++addr);
 	      a= h*256 + l;
 	      work.appendf("$%04x", a);
 	      //add_spaces(&work, 20);
@@ -372,7 +372,7 @@ cl_m6800::disassc(t_addr addr, chars *comment)
 			     read_addr(rom, a));
 	      break;
 	    case 'd': case 'D': // direct
-	      h= a= rom->read(addr+1);
+	      h= a= rom->read(++addr);
 	      work.appendf("$00%02x", h);
 	      //add_spaces(&work, 20);
 	      if (b[i]=='d')
@@ -383,15 +383,16 @@ cl_m6800::disassc(t_addr addr, chars *comment)
 	      break;
 	    case 'b': // immediate 8 bit
 	      work.appendf("#$%02x",
-			   rom->read(addr+1));
+			   rom->read(++addr));
 	      break;
 	    case 'B': // immediate 16 bit
 	      work.appendf("#$%04x",
-			   read_addr(rom, addr+1));
+			   read_addr(rom, ++addr));
 	      break;
 	    case 'r': // relative
 	      work.appendf("$%04x",
 			   (addr+2+(i8_t)(rom->read(addr+1))) & 0xffff );
+	      addr++;
 	      break;
 	    }
 	  //work+= temp;
@@ -410,8 +411,10 @@ cl_m6800::analyze(t_addr addr)
 {
   struct dis_entry *di;
   t_addr pa, ta;
+  int l;
   
   di= get_dis_entry(addr);
+  l= di->length;
   while (!inst_at(addr) && di && (di->mnemonic!=NULL))
     {
       pa= addr;
@@ -420,15 +423,15 @@ cl_m6800::analyze(t_addr addr)
 	{
 	case 'r': // uncond jump rel
 	  {
-	    i8_t r= rom->read(addr+1);
-	    ta= addr+2+r;
+	    i8_t r= rom->read(addr+l-1); // last byte of inst
+	    ta= addr+l+r;
 	    addr= ta;
 	  }
 	  break;
 	case 'R': // conditional jump rel
 	  {
-	    i8_t r= rom->read(addr+1);
-	    ta= addr+2+r;
+	    i8_t r= rom->read(addr+l-1); // last byte of inst
+	    ta= addr+l+r;
 	    analyze(ta);
 	  }
 	  break;
@@ -438,6 +441,10 @@ cl_m6800::analyze(t_addr addr)
 	  break;
 	case 'E': // call extended
 	  ta= read_addr(rom, addr+1);
+	  analyze(ta);
+	  break;
+	case 'd': // call direct
+	  ta= rom->read(addr+1);
 	  analyze(ta);
 	  break;
 	case 'e': // jump extended
@@ -453,6 +460,15 @@ cl_m6800::analyze(t_addr addr)
 	return;
       di= get_dis_entry(addr);
     }
+}
+
+int
+cl_m6800::inst_length(t_addr addr)
+{
+  struct dis_entry *di= get_dis_entry(addr);
+  if (di && di->mnemonic)
+    return di->length;
+  return 1;
 }
 
 t_addr

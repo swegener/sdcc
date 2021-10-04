@@ -75,11 +75,23 @@ public:
 
   virtual int8_t *tick_tab(t_mem code);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
-  virtual char *disassc(t_addr addr, chars *comment=NULL);
+  //virtual char *disassc(t_addr addr, chars *comment=NULL);
+  virtual int longest_inst(void) { return 6; }
 
+  // MOVE
+  virtual int ldd16(u16_t op);
+  virtual int std16(t_addr addr);
+  
   // ALU
   virtual int sub16(class cl_cell16 &dest, u16_t op, bool c);
-
+  virtual int add16(class cl_cell16 &dest, u16_t op, bool c);
+  virtual int bset(class cl_cell8 &dest);
+  virtual int bclr(class cl_cell8 &dest);
+  
+  // BRANCH
+  virtual int brset(u8_t op);
+  virtual int brclr(u8_t op);
+  
   // hc11 specific insts on Page0 
   virtual int TEST(t_mem code);
   virtual int IDIV(t_mem code);
@@ -91,7 +103,32 @@ public:
   virtual int ABX(t_mem code);
   virtual int PSHX(t_mem code);
   virtual int MUL(t_mem code);
-  virtual int SUBDi(t_mem code) { return sub16(cD, i16(), false); }
+  virtual int SUBD16(t_mem code) { return sub16(cD, i16(), false); }
+  virtual int SUBDd(t_mem code) { return sub16(cD, dop16(), false); }
+  virtual int SUBDi(t_mem code) { return sub16(cD, iop16(), false); }
+  virtual int SUBDe(t_mem code) { return sub16(cD, eop16(), false); }
+  virtual int XGDX(t_mem code);
+  virtual int JSRd(t_mem code) { return call(daddr()); }
+  virtual int ADDD16(t_mem code) { return add16(cD, i16(), false); }
+  virtual int ADDDd(t_mem code) { return add16(cD, dop16(), false); }
+  virtual int ADDDi(t_mem code) { return add16(cD, iop16(), false); }
+  virtual int ADDDe(t_mem code) { return add16(cD, eop16(), false); }
+  virtual int LDD16(t_mem code) { return ldd16(i16()); }
+  virtual int LDDd(t_mem code) { return ldd16(dop16()); }
+  virtual int LDDi(t_mem code) { return ldd16(iop16()); }
+  virtual int LDDe(t_mem code) { return ldd16(eop16()); }
+  virtual int STOP(t_mem code);
+  virtual int STDd(t_mem code) { return std16(daddr()); }
+  virtual int STDi(t_mem code) { return std16(iaddr()); }
+  virtual int STDe(t_mem code) { return std16(eaddr()); }
+  virtual int BRSETd(t_mem code) { return brset(dop()); }
+  virtual int BRSETi(t_mem code) { return brset(iop()); }
+  virtual int BRCLRd(t_mem code) { return brclr(dop()); }
+  virtual int BRCLRi(t_mem code) { return brclr(iop()); }
+  virtual int BSETd(t_mem code) { return bset(ddst()); }
+  virtual int BSETi(t_mem code) { return bset(idst()); }
+  virtual int BCLRd(t_mem code) { return bclr(ddst()); }
+  virtual int BCLRi(t_mem code) { return bclr(idst()); }
 };
 
 

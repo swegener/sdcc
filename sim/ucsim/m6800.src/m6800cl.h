@@ -167,6 +167,8 @@ public:
   virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
   virtual void analyze(t_addr addr);
+  virtual int inst_length(t_addr addr);
+  virtual int longest_inst(void) { return 4; }
   
   virtual void print_regs(class cl_console_base *con);
 

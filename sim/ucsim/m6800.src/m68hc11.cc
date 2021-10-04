@@ -45,21 +45,21 @@ instruction_wrapper_fn itab18[256];
 int8_t p0ticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 2,40,40, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
-  /* 1 */ 2, 2, 0, 0, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 0, 0,
+  /* 1 */ 2, 2, 6, 6, 6, 6, 2, 2, 0, 2, 0, 2, 7, 7, 7, 7,
   /* 2 */ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   /* 3 */ 3, 3, 4, 4, 3, 3, 3, 3, 5, 5, 3,12, 4, 3,14,14,
   /* 4 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
   /* 5 */ 2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2,
   /* 6 */ 6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,
   /* 7 */ 6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,
-  /* 8 */ 2, 2, 2, 4, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 3, 0,
-  /* 9 */ 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 5, 0, 4, 4,
-  /* a */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
-  /* b */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
-  /* c */ 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 0, 0, 3, 0,
-  /* d */ 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 4, 4,
-  /* e */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 5, 5,
-  /* f */ 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 5, 5
+  /* 8 */ 2, 2, 2, 4, 2, 2, 2, 0, 2, 2, 2, 2, 4, 6, 3, 3,
+  /* 9 */ 3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 4, 4,
+  /* a */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
+  /* b */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
+  /* c */ 2, 2, 2, 4, 2, 2, 2, 0, 2, 2, 2, 2, 3, 0, 3, 2,
+  /* d */ 3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4,
+  /* e */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+  /* f */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
 
@@ -180,7 +180,7 @@ cl_m68hc11::get_dis_entry(t_addr addr)
 
   return &dt[i];
 }
-
+/*
 char *
 cl_m68hc11::disassc(t_addr addr, chars *comment)
 {
@@ -269,7 +269,7 @@ cl_m68hc11::disassc(t_addr addr, chars *comment)
 
   return(strdup(work.c_str()));
 }
-
+*/
 
 /* 
  * OTHER instructions
@@ -282,9 +282,44 @@ CL11::TEST(t_mem code)
 }
 
 
+int
+CL11::STOP(t_mem code)
+{
+  if (!(rF & flagS))
+    state= stIDLE;
+  return resGO;
+}
+
+
 /*
  * MOVE instructions
  */
+
+int
+CL11::ldd16(u16_t op)
+{
+  u8_t f= rF & ~(flagN|flagZ);
+  cD.W(op);
+  if (!op) f|= flagZ;
+  if (op & 0x8000) f|= flagN;
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::std16(t_addr addr)
+{
+  u8_t f= rF & ~(flagN|flagZ);
+  rom->write(addr, rA);
+  rom->write(u16_t(addr+1), rB);
+  vc.wr+= 2;
+  if (!rD) f|= flagZ;
+  if (rD & 0x8000) f|= flagN;
+  cF.W(f);
+  return resGO;
+}
+
 
 int
 CL11::PULX(t_mem code)
@@ -310,6 +345,16 @@ CL11::PSHX(t_mem code)
 }
 
 
+int
+CL11::XGDX(t_mem code)
+{
+  u16_t t= rD;
+  cD.W(rX);
+  cX.W(t);
+  return resGO;
+}
+
+
 /*
  * ALU instructions
  */
@@ -327,6 +372,54 @@ CL11::sub16(class cl_cell16 &dest, u16_t op, bool c)
   if (( (~a&b)|(b&r)|(r&~a) ) & 0x8000) f|= flagC;
   if (( (a&~b&~r)|(~a&b&r) ) & 0x8000) f|= flagV;
   dest.W(r);
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::add16(class cl_cell16 &dest, u16_t op, bool c)
+{
+  u8_t orgc= rF&flagC;
+  u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
+  u16_t a= dest.R(), b= op, r;
+  r= a+b;
+  if (c && orgc) r++;
+  if (r&0x8000) f|= flagN;
+  if (!r) f|= flagZ;
+  if (( (a&b)|(b&~r)|(~r&a) ) & 0x8000) f|= flagC;
+  if (( (a&b&~r)|(~a&~b&r) ) & 0x8000) f|= flagV;
+  dest.W(r);
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::bset(class cl_cell8 &dest)
+{
+  u8_t m= fetch();
+  u8_t r= dest.R();
+  u8_t f= rF & ~(flagN|flagZ);
+  r|= m;
+  dest.W(r);
+  if (!r) f|= flagZ;
+  if (r & 0x80) f|= flagN;
+  cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::bclr(class cl_cell8 &dest)
+{
+  u8_t m= fetch();
+  u8_t r= dest.R();
+  u8_t f= rF & ~(flagN|flagZ|flagV);
+  r&= ~m;
+  dest.W(r);
+  if (!r) f|= flagZ;
+  if (r & 0x80) f|= flagN;
   cF.W(f);
   return resGO;
 }
@@ -429,6 +522,28 @@ CL11::MUL(t_mem code)
 /*
  * BRANCH instructions
  */
+
+int
+CL11::brset(u8_t op)
+{
+  u8_t m= fetch();
+  i8_t r= fetch();
+  if ((~op & m) == 0)
+    branch(PC+r, true);
+  return resGO;
+}
+
+
+int
+CL11::brclr(u8_t op)
+{
+  u8_t m= fetch();
+  i8_t r= fetch();
+  if ((op & m) == 0)
+    branch(PC+r, true);
+  return resGO;
+}
+
 
 int
 CL11::BRN(t_mem code)

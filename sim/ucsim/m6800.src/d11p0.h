@@ -40,7 +40,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ABX	instruction_3a
 #define PSHX	instruction_3c
 #define MUL	instruction_3d
-#define SUBDi	instruction_83
+#define SUBD16	instruction_83
+#define SUBDd	instruction_93
+#define SUBDi	instruction_a3
+#define SUBDe	instruction_b3
+#define XGDX	instruction_8f
+#define JSRd	instruction_9d
+#define ADDD16	instruction_c3
+#define ADDDd	instruction_d3
+#define ADDDi	instruction_e3
+#define ADDDe	instruction_f3
+#define LDD16	instruction_cc
+#define LDDd	instruction_dc
+#define LDDi	instruction_ec
+#define LDDe	instruction_fc
+#define STOP	instruction_cf
+#define STDd	instruction_dd
+#define STDi	instruction_ed
+#define STDe	instruction_fd
+#define BRSETd	instruction_12
+#define BRSETi	instruction_1e
+#define BRCLRd	instruction_13
+#define BRCLRi	instruction_1f
+#define BSETd	instruction_14
+#define BSETi	instruction_1c
+#define BCLRd	instruction_15
+#define BCLRi	instruction_1d
 
 
 #endif

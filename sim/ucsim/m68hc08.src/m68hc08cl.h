@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (hc08cl.h)
+ * Simulator of microcontrollers (m68hc08cl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  *
@@ -96,4 +96,4 @@ public:
 
 #endif
 
-/* End of hc08.src/hc08cl.h */
+/* End of hc08.src/m68hc08cl.h */

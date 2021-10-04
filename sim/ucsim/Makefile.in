@@ -9,7 +9,6 @@ STARTYEAR	= 1997
 SHELL		= /bin/sh
 
 include packages.mk
-#PKGS		= cmd.src sim.src gui.src s51.src avr.src z80.src pdk.src doc
 
 VPATH		= @srcdir@
 srcdir		= @srcdir@

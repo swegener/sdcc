@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (simhc08.cc)
+ * Simulator of microcontrollers (simm68hc08.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -31,16 +31,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "globals.h"
 
 // local
-#include "simhc08cl.h"
-#include "hc08cl.h"
+#include "simm68hc08cl.h"
+#include "m68hc08cl.h"
 
 
-cl_simhc08::cl_simhc08(class cl_app *the_app):
+cl_simm68hc08::cl_simm68hc08(class cl_app *the_app):
   cl_sim(the_app)
 {}
 
 class cl_uc *
-cl_simhc08::mk_controller(void)
+cl_simm68hc08::mk_controller(void)
 {
   int i;
   const char *typ= 0;
@@ -75,4 +75,4 @@ cl_simhc08::mk_controller(void)
 }
 
 
-/* End of hc08.src/simhc08.cc */
+/* End of hc08.src/simm68hc08.cc */

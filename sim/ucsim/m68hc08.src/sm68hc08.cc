@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (simhc08cl.h)
+ * Simulator of microcontrollers (sm68hc08.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,21 +25,34 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef SIMHC08CL_HEADER
-#define SIMHC08CL_HEADER
+// prj
+#include "globals.h"
 
-#include "simcl.h"
+// sim.src
+//#include "appcl.h"
+
+// local
+#include "simm68hc08cl.h"
 
 
-class cl_simhc08: public cl_sim
+int
+main(int argc, char *argv[])
 {
-public:
-  cl_simhc08(class cl_app *the_app);
+  class cl_sim *sim;
 
-  virtual class cl_uc *mk_controller(void);
-};
+  cpus= cpus_hc08;
+  application= new cl_app();
+  application->set_name("shc08");
+  application->init(argc, argv);
+  sim= new cl_simm68hc08(application);
+  if (sim->init())
+    sim->state|= SIM_QUIT;
+  application->set_simulator(sim);
+  application->run();
+  application->done();
+  delete application;
+  return(0);
+}
 
 
-#endif
-
-/* End of hc08.src/simhc08cl.h */
+/* End of hc08.src/sm68hc08.cc */

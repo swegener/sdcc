@@ -10,7 +10,7 @@ enable_r2k_port     = @enable_r2k_port@
 enable_r3ka_port    = @enable_r3ka_port@
 enable_tlcs_port    = @enable_tlcs_port@
 enable_xa_port      = @enable_xa_port@
-enable_hc08_port    = @enable_hc08_port@
+enable_m68hc08_port = @enable_m68hc08_port@
 enable_s08_port     = @enable_s08_port@
 enable_stm8_port    = @enable_stm8_port@
 enable_st7_port     = @enable_st7_port@
@@ -67,13 +67,13 @@ else
 TLCS		=
 endif
 
-ifeq ($(enable_hc08_port),yes)
-SHC08		= hc08.src
+ifeq ($(enable_m68hc08_port),yes)
+SM68HC08	= m68hc08.src
 else
 ifeq ($(enable_s08_port),yes)
-SS08		= hc08.src
+SS08		= m68hc08.src
 else
-SHC08		=
+SM68HC08	=
 endif
 endif
 
@@ -146,13 +146,13 @@ endif
 PKGS		= $(S51) $(S390) \
 		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
 		  $(TLCS) \
-		  $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
+		  $(SM68HC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
 		  $(M6809) $(M6800) $(M68HC12) $(MCS6502) $(RXK) $(PBLAZE) \
 		  doc
 
 PKGS_ALL	= cmd.src sim.src gui.src motorola.src \
 		  s51.src avr.src z80.src tlcs.src xa.src \
-		  hc08.src stm8.src st7.src pdk.src p1516.src \
+		  m68hc08.src stm8.src st7.src pdk.src p1516.src \
 		  m6809.src m6800.src m68hc12.src mcs6502.src \
 		  rxk.src pblaze.src \
 		  doc

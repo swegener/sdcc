@@ -5,7 +5,8 @@
 #
 
 # tool name
-TN		= hc08
+TN		= m68hc08
+OLD		= hc08
 
 STARTYEAR	= 1997
 
@@ -53,9 +54,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o \
-		  inst.o \
-		  sim$(TN).o $(TN).o
+OBJECTS_SHARED	= glob.o inst.o sim$(TN).o $(TN).o
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
@@ -63,6 +62,8 @@ OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 SEN		= s$(TN)$(EXEEXT)
 LEN		= ucsim_$(TN)$(EXEEXT)
 SONAME		= libucsim_$(TN).so
+SOLD		= s$(OLD)$(EXEEXT)
+LOLD		= ucsim_$(OLD)$(EXEEXT)
 
 HC08ASM		= 
 
@@ -86,6 +87,10 @@ install: all installdirs install_shared_lib
 	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
+	$(INSTALL) $(SOLD) $(DESTDIR)$(bindir)/$(SOLD)
+	$(STRIP) $(DESTDIR)$(bindir)/$(SOLD)
+	$(INSTALL) $(LOLD) $(DESTDIR)$(bindir)/$(LOLD)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LOLD)
 
 
 # Deleting all the installed files
@@ -133,12 +138,20 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: $(SEN) $(LEN) shared_lib
+$(TN).src: $(SEN) $(LEN) shared_lib olds
 
 $(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-$(LEN): s$(TN)$(EXEEXT)
+$(LEN): $(SEN)
+	cp $< $@
+
+olds: $(SOLD) $(LOLD)
+
+$(SOLD): $(SEN)
+	cp $< $@
+
+$(LOLD): $(LEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)

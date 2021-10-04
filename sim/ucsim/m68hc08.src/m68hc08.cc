@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (hc08.cc)
+ * Simulator of microcontrollers (m68hc08.cc)
  *
  * some hc08 code base from Karl Bongers karl@turbobit.com
  *
@@ -44,7 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "dregcl.h"
 
 // local
-#include "hc08cl.h"
+#include "m68hc08cl.h"
 #include "glob.h"
 //#include "regshc08.h"
 #include "hc08mac.h"
@@ -769,4 +769,4 @@ cl_hc08_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 }
 
 
-/* End of hc08.src/hc08.cc */
+/* End of hc08.src/m68hc08.cc */

@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <stdlib.h>
 
 // local
-#include "hc08cl.h"
+#include "m68hc08cl.h"
 //#include "regshc08.h"
 #include "hc08mac.h"
 

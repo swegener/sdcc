@@ -106,12 +106,12 @@ if test $enable_tlcs_port != "no"; then
     enable_tlcs_port="yes"
 fi,
 enable_tlcs_port="yes")
-AC_ARG_ENABLE(hc08-port,
-[  --disable-hc08-port     do not compile simulator for hc08],
-if test $enable_hc08_port != "no"; then
-    enable_hc08_port="yes"
+AC_ARG_ENABLE(m68hc08-port,
+[  --disable-m68hc08-port  do not compile simulator for m68hc08],
+if test $enable_m68hc08_port != "no"; then
+    enable_m68hc08_port="yes"
 fi,
-enable_hc08_port="yes")
+enable_m68hc08_port="yes")
 AC_ARG_ENABLE(s08-port,
 [  --disable-s08-port      do not compile simulator for s08],
 if test $enable_s08_port != "no"; then
@@ -204,7 +204,7 @@ AC_SUBST(enable_gbz80_port)
 AC_SUBST(enable_r2k_port)
 AC_SUBST(enable_r3ka_port)
 AC_SUBST(enable_tlcs_port)
-AC_SUBST(enable_hc08_port)
+AC_SUBST(enable_m68hc08_port)
 AC_SUBST(enable_s08_port)
 AC_SUBST(enable_xa_port)
 AC_SUBST(enable_stm8_port)
@@ -747,7 +747,7 @@ motorola.src/Makefile
 sim.src/Makefile   sim.src/test/Makefile
 
 avr.src/Makefile     avr.src/test/Makefile
-hc08.src/Makefile    hc08.src/test/Makefile
+m68hc08.src/Makefile m68hc08.src/test/Makefile
 m6809.src/Makefile   m6809.src/test/Makefile
 m6800.src/Makefile   m6800.src/test/Makefile
 m68hc12.src/Makefile m68hc12.src/test/Makefile

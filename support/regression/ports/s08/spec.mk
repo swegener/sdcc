@@ -12,9 +12,9 @@ ifdef SDCC_BIN_PATH
   AS_HC08C = $(SDCC_BIN_PATH)/sdas6808$(EXEEXT)
 else
   ifdef UCSIM_DIR
-    UCHC08A = $(UCSIM_DIR)/hc08.src/ucsim_hc08$(EXEEXT)
+    UCHC08A = $(UCSIM_DIR)/m68hc08.src/ucsim_hc08$(EXEEXT)
   else
-    UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/ucsim_hc08$(EXEEXT)
+    UCHC08A = $(top_builddir)/sim/ucsim/m68hc08.src/ucsim_hc08$(EXEEXT)
     UCHC08B = $(top_builddir)/bin/ucsim_hc08$(EXEEXT)
   endif
 

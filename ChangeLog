@@ -1,3 +1,10 @@
+2021-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Minor code cleanup.
+	* device/lib/_strchr.c:
+	  Fix strchr handling of c outside of char range.
+
 2021-09-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/z80/__mulsint2slong.s:

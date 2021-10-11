@@ -4319,7 +4319,7 @@ static void
 genReturn (const iCode *ic)
 {
   operand *left = IC_LEFT (ic);
-  int size, i;
+  int size;
   bool stacked = FALSE;
 
   D (emit2 ("; genReturn", ""));
@@ -4348,7 +4348,7 @@ genReturn (const iCode *ic)
     default:
       wassertl (size > 4, "Return not implemented for return value of this size.");
 
-      for(i = 0; i < size; i++)
+      for(int i = 0; i < size; i++)
         if (aopInReg (left->aop, i, XL_IDX) || aopInReg (left->aop, i, XH_IDX))
           {
             push (ASMOP_X, 0, 2);
@@ -4374,7 +4374,7 @@ genReturn (const iCode *ic)
         }
 
       // Clear a first.
-      for(i = 0; i < size; i++)
+      for(int i = 0; i < size; i++)
         if (aopInReg (left->aop, i, A_IDX))
           {
             emit2 ("ld", "(#%d, x), a", size - 1 - i);
@@ -4382,7 +4382,7 @@ genReturn (const iCode *ic)
             break;
           }
 
-      for(i = 0; i < size;)
+      for(int i = 0; i < size;)
         {
           if (aopInReg (left->aop, i, Y_IDX) || size > 2 && left->aop->regs[YL_IDX] < i && left->aop->regs[YH_IDX] < i && (aopOnStackNotExt (left->aop, i, 2) || left->aop->type == AOP_LIT))
             {
@@ -4421,7 +4421,7 @@ genReturn (const iCode *ic)
                 }
               i++;
             }
-          else
+          else // a, already stored early.
             i++;
         }
 

@@ -1,3 +1,8 @@
+2021-10-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve wide left shift by literal.
+
 2021-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

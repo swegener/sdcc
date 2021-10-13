@@ -21,7 +21,7 @@ replace restart {
 replace restart {
 	ldw	%1, (%2, sp)
 } by {
-	; peephole 0wa removed dead load into %1 from %2.
+	; peephole 0wa removed dead load into %1 from (%2, sp).
 } if notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {

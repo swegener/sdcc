@@ -7308,6 +7308,32 @@ genLeftShift (const iCode *ic)
 
   size = result->aop->size;
 
+  if (skip_bytes + 2 == size && right->aop->type == AOP_LIT &&
+    (iterations <= 3 || iterations == 7) &&
+    (aopInReg (shiftop, skip_bytes, X_IDX) || aopInReg (shiftop, skip_bytes, Y_IDX)))
+    {
+      bool a_free = regDead (A_IDX, ic) && shiftop->regs[A_IDX] < 0;
+      if (iterations <= 3)
+        {
+          for(int i = 0; i < iterations; i++)
+            emit3w_o (A_SLLW, shiftop, skip_bytes, 0, 0);
+          goto postshift;
+        }
+      wassert (iterations == 7);
+      if (!a_free)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = true;
+        }
+      bool y = aopInReg (shiftop, skip_bytes, Y_IDX);
+      emit2 ("clr", "a");
+      emit2 ("rlwa", y ? "y" : "x");
+      emit2 ("srl", "a");
+      emit2 ("rrcw", y ? "y" : "x");
+      cost (4 + y * 2, 5);
+      goto postshift;
+    }
+
   for (i = 0; i < size; i++)
     {
       if (aopRS (shiftop) && (!aopInReg (shiftop, i, A_IDX) || aopInReg (right->aop, 0, A_IDX)) && shiftop->aopu.bytes[i].in_reg &&

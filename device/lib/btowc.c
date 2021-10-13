@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    btowc.c - convert a single-byte character to a wide character
 
-   Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
+   Copyright (C) 2016-2021, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -34,8 +34,9 @@ _Static_assert(EOF & 0x80, "Invalid EOF");
 
 wint_t btowc(int c)
 {
-	if(c & 0x80)
+	char d = (unsigned char)c;
+	if(d & 0x80)
 		return WEOF;
-	return c;
+	return d;
 }
 

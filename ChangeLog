@@ -1,5 +1,10 @@
 2021-10-13 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/btowc.c:
+	  Fix btowc handling of int values that are valid characters when cast to unsigned char.
+
+2021-10-13 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c:
 	  Improve wide left shift by literal.
 

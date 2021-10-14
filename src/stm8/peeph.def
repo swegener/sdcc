@@ -963,10 +963,26 @@ replace restart {
 
 replace restart {
 	ldw	(%1, sp), x
-	tnz	(%1, sp)
+	tnzw	(%1, sp)
 } by {
 	ldw	(%1, sp), x
-	; peephole 31c removed redundant tnz.
+	; peephole 31c removed redundant tnzw.
+}
+
+replace restart {
+	dec	(%1, %2)
+	tnz	(%1, %2)
+} by {
+	dec	(%1, %2)
+	; peephole 31d removed redundant tnz.
+}
+
+replace restart {
+	inc	(%1, %2)
+	tnz	(%1, %2)
+} by {
+	dec	(%1, %2)
+	; peephole 31e removed redundant tnz.
 }
 
 replace restart {

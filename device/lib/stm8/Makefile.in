@@ -18,7 +18,9 @@ STM8_FLOAT = $(COMMON_FLOAT)
 
 STM8_INT = _mulschar.c _divschar.c _modschar.c
 
-STM8_LONG =
+STM8_LONG = \
+  _divulong.c \
+  _modulong.c
 
 STM8_LONGLONG = $(COMMON_LONGLONG) \
   _rrulonglong.c \
@@ -44,7 +46,7 @@ STM8_SDCC = $(COMMON_SDCC) \
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = setjmp.rel _mulint.rel __mulsint2slong.rel _divsint.rel _modsint.rel _mullong.rel _divulong.rel _modulong.rel _divslong.rel _modslong.rel _fast_long_neg.rel heap.rel strcpy.rel strcmp.rel memcpy.rel atomic_flag_test_and_set.rel
+OBJ = setjmp.rel _mulint.rel __mulsint2slong.rel _divsint.rel _modsint.rel _mullong.rel _divslong.rel _modslong.rel _fast_long_neg.rel heap.rel strcpy.rel strcmp.rel memcpy.rel atomic_flag_test_and_set.rel
 
 LIB = stm8.lib
 CC = $(SCC)

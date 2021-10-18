@@ -858,60 +858,20 @@ replace restart {
 }
 
 replace restart {
-	and	a, %1
+	%3	a, %1
 	tnz	a
 } by {
-	and	a, %1
+	%3	a, %1
 	; peephole 23 removed redundant tnz.
-}
+} if same(%3 'and' 'or' 'xor' 'add' 'adc' 'sub' 'sbc')
 
 replace restart {
-	or	a, %1
-	tnz	a
+	%3	(%1, %2)
+	tnz	(%1, %2)
 } by {
-	or	a, %1
+	%3	(%1, %2)
 	; peephole 24 removed redundant tnz.
-}
-
-replace restart {
-	xor	a, %1
-	tnz	a
-} by {
-	xor	a, %1
-	; peephole 25 removed redundant tnz.
-}
-
-replace restart {
-	add	a, %1
-	tnz	a
-} by {
-	add	a, %1
-	; peephole 26 removed redundant tnz.
-}
-
-replace restart {
-	adc	a, %1
-	tnz	a
-} by {
-	adc	a, %1
-	; peephole 27 removed redundant tnz.
-}
-
-replace restart {
-	sub	a, %1
-	tnz	a
-} by {
-	sub	a, %1
-	; peephole 28 removed redundant tnz.
-}
-
-replace restart {
-	sbc	a, %1
-	tnz	a
-} by {
-	sbc	a, %1
-	; peephole 29 removed redundant tnz.
-}
+} if same(%3 'neg' 'cpl' 'inc' 'dec' 'sll' 'srl' 'sra' 'rlc' 'rrc')
 
 replace restart {
 	ld	a, %1
@@ -967,22 +927,6 @@ replace restart {
 } by {
 	ldw	(%1, sp), x
 	; peephole 31c removed redundant tnzw.
-}
-
-replace restart {
-	dec	(%1, %2)
-	tnz	(%1, %2)
-} by {
-	dec	(%1, %2)
-	; peephole 31d removed redundant tnz.
-}
-
-replace restart {
-	inc	(%1, %2)
-	tnz	(%1, %2)
-} by {
-	dec	(%1, %2)
-	; peephole 31e removed redundant tnz.
 }
 
 replace restart {

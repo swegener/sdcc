@@ -1,3 +1,8 @@
+2021-10-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Peephole rule refactoring inspired by fix to a bug found by roybaer.
+
 2021-10-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/stm8/_divulong.s,

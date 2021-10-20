@@ -1031,7 +1031,7 @@ emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
 static void
 emit3_o (enum asminst inst, asmop *op1, int offset1, asmop *op2, int offset2)
 {
-  unsigned char cost;
+  unsigned int cost;
 
   regalloc_dry_run_cost += emit3Cost (inst, op1, offset1, op2, offset2);
   if (regalloc_dry_run)
@@ -13111,7 +13111,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
         {
           litval = (int) ulFromVal (right->aop->aopu.aop_lit);
           emit2 (litval & 1 ? "set %d, !mems" : "res %d, !mems", bstr, _pairs[pair].name);
-          regalloc_dry_run_cost = (pair == PAIR_IX || pair == PAIR_IY) ? 4 : 2;
+          regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 4 : 2;
           return;
         }
       else if (right->aop->type == AOP_LIT)

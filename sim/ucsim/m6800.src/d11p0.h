@@ -36,15 +36,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LSRD	instruction_04
 #define ASLD	instruction_05
 #define BRN	instruction_21
-#define PULX	instruction_38
-#define ABX	instruction_3a
-#define PSHX	instruction_3c
+#define PULxy	instruction_38
+#define ABxy	instruction_3a
+#define PSHxy	instruction_3c
 #define MUL	instruction_3d
 #define SUBD16	instruction_83
 #define SUBDd	instruction_93
-#define SUBDi	instruction_a3
+#define SUBDxy	instruction_a3
 #define SUBDe	instruction_b3
-#define XGDX	instruction_8f
+#define XGDxy	instruction_8f
 #define JSRd	instruction_9d
 #define ADDD16	instruction_c3
 #define ADDDd	instruction_d3
@@ -66,6 +66,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define BSETi	instruction_1c
 #define BCLRd	instruction_15
 #define BCLRi	instruction_1d
+
+#define PAGE18	instruction_18
+#define PAGE1A	instruction_1a
+#define PAGECD	instruction_cd
 
 
 #endif

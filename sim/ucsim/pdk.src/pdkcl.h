@@ -84,7 +84,7 @@ class cl_pdk_cpu: public cl_hw
  public:
   cl_pdk_cpu(class cl_uc *auc);
   virtual int init(void);
-  virtual int cfg_size(void) { return 2; }
+  virtual unsigned int cfg_size(void) { return 2; }
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem read(class cl_memory_cell *cell);

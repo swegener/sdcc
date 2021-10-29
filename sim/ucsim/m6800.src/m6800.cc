@@ -63,6 +63,30 @@ int8_t p0ticks[256]= {
   /* f */ 4, 4, 4, 0, 4, 4, 4, 5, 4, 4, 4, 4, 0, 0, 5, 6
 };
 
+void
+cl_mop16::a(u16_t iaddr)
+{
+  addr= iaddr++;
+  h= as->get_cell(addr);
+  l= as->get_cell(iaddr);
+}
+
+void
+cl_mop16::r(u16_t iaddr)
+{
+  addr= iaddr++;
+  l= as->get_cell(addr);
+  h= as->get_cell(iaddr);
+}
+
+void
+cl_mop16::set_uc(class cl_uc *iuc)
+{
+  uc= iuc;;
+  as= uc->rom;
+}
+
+
 cl_m6800::cl_m6800(class cl_sim *asim):
   cl_uc(asim)
 {
@@ -72,6 +96,8 @@ int
 cl_m6800::init(void)
 {
   cl_uc::init();
+  mop16.init();
+  mop16.set_uc(this);
   fill_def_wrappers(itab);
   
   xtal= 1000000;
@@ -88,6 +114,8 @@ cl_m6800::init(void)
   cCC.append_operator(op);
 
   wai= false;
+  cI= &cIX;
+  cIX.name= "X";
   
   return 0;
 }
@@ -325,13 +353,18 @@ cl_m6800::disassc(t_addr addr, chars *comment)
   struct dis_entry *dis_e;
   int i;
   bool first;
-  
+
+  cI= &cX;
   if ((dis_e= get_dis_entry(addr)) == NULL)
     return NULL;
   if (dis_e->mnemonic == NULL)
     return strdup("-- UNKNOWN/INVALID");
   b= dis_e->mnemonic;
-
+  u8_t code= rom->read(addr);
+  if (code == 0x18) { addr++; }
+  if (code == 0x1a) { addr++; }
+  if (code == 0xcd) { addr++; }
+  
   first= true;
   work= "";
   for (i=0; b[i]; i++)
@@ -351,8 +384,8 @@ cl_m6800::disassc(t_addr addr, chars *comment)
 	    {
 	    case 'x': case 'X': // indexed
 	      h= rom->read(++addr);
-	      a= rX+h;
-	      work.appendf("$%02x,X", h);
+	      a= cI->get()+h;
+	      work.appendf("$%02x,%s", h, cI->name.c_str());
 	      //add_spaces(&work, 20);
 	      if (b[i]=='x')
 		temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
@@ -505,8 +538,11 @@ int
 cl_m6800::exec_inst(void)
 {
   int res= resGO;
-
-  if ((res= exec_inst_tab(itab)) != resNOT_DONE)
+  
+  cI= &cIX;
+  res= exec_inst_tab(itab);
+  post_inst();
+  if (res != resNOT_DONE)
     return res;
 
   inst_unknown(rom->read(instPC));
@@ -566,16 +602,17 @@ cl_m6800::pull_regs(bool inst_part)
     tick(7);
 }
 
-class cl_cell8 &
+class cl_memory_cell &
 cl_m6800::idx(void)
 {
-  t_addr a= fetch();
-  a+= rX;
+  u16_t a= cI->get();
+  u8_t r= fetch();
+  a+= r;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
-  return *c;
+  return *c;//= rom->get_cell(a);
 }
 
-class cl_cell8 &
+class cl_memory_cell &
 cl_m6800::ext(void)
 {
   t_addr a;
@@ -587,7 +624,7 @@ cl_m6800::ext(void)
   return *c;
 }
 
-class cl_cell8 &
+class cl_memory_cell &
 cl_m6800::dir(void)
 {
   t_addr a= fetch();
@@ -622,8 +659,9 @@ cl_m6800::dop16(void)
 t_addr
 cl_m6800::iaddr(void)
 {
-  t_addr a= fetch();
-  a+= rX;
+  u16_t a= cI->get();
+  u8_t r= fetch();
+  a+= r;
   return a;
 }
 
@@ -649,7 +687,7 @@ t_addr
 cl_m6800::raddr(void)
 {
   i8_t a= fetch();
-  return PC+a;
+  return (PC+a)&0xffff;
 }
 
 /* End of m6800.src/m6800.cc */

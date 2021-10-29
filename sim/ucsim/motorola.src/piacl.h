@@ -82,7 +82,7 @@ public:
   cl_pia(class cl_uc *auc, int aid);
   cl_pia(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
-  virtual int cfg_size(void) { return 21; }
+  virtual unsigned int cfg_size(void) { return 21; }
   virtual const char *cfg_help(t_addr addr);
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
 

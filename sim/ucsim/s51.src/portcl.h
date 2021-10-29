@@ -56,7 +56,7 @@ public:
   cl_port(class cl_uc *auc, int aid);
   cl_port(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
-  virtual int cfg_size(void) { return 4; }
+  virtual unsigned int cfg_size(void) { return 4; }
   virtual const char *cfg_help(t_addr addr);
   
   virtual t_mem read(class cl_memory_cell *cell);

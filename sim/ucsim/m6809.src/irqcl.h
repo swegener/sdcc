@@ -58,7 +58,7 @@ public:
 public:
   cl_m6809_irq(class cl_uc *auc);
   virtual int init(void);
-  virtual int cfg_size(void) { return cpu_nr; }
+  virtual unsigned int cfg_size(void) { return cpu_nr; }
   virtual const char *cfg_help(t_addr addr);
   virtual void reset(void);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);

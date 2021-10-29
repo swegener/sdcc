@@ -30,6 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 //typedef int8_t TYPE_BYTE;
 //typedef uint8_t TYPE_UBYTE;
 //typedef int16_t TYPE_WORD;
@@ -50,7 +57,7 @@ typedef unsigned TYPE_DWORD u32_t;
 typedef   signed TYPE_QWORD i64_t;
 typedef unsigned TYPE_QWORD u64_t;
 
-typedef i64_t		t_addr;		/* 64 bit max */
+typedef i64_t		t_addr;		/* 32 bit max */
 typedef u32_t		t_mem;		/* 32 bit max */
 typedef i32_t		t_smem;		/* signed 32 bit memory */
 

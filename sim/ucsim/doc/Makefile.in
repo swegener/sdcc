@@ -41,14 +41,16 @@ install: all installdirs
 	cp $(srcdir)/*.html $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.svg $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.jpg $(DESTDIR)$(docdir)
-	cp $(srcdir)/*.fig $(DESTDIR)$(docdir)
 	cp $(srcdir)/ucsim.1 $(DESTDIR)$(man1dir)
+	cp $(srcdir)/serialview.1 $(DESTDIR)$(man1dir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
 	rm -rf $(DESTDIR)$(docdir)
+	rm -rf $(DESTDIR)$(man1dir)/ucsim.1
+	rm -rf $(DESTDIR)$(man1dir)/serialview.1
 
 
 # Performing self-test

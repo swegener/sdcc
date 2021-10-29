@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 int
-cl_m6800::clr(class cl_cell8 &dest)
+cl_m6800::clr(class cl_memory_cell &dest)
 {
   u8_t f= rF & ~(flagN|flagV|flagC);
   dest.W(0);
@@ -38,7 +38,7 @@ cl_m6800::clr(class cl_cell8 &dest)
 }
 
 int
-cl_m6800::lda(class cl_cell8 &dest, u8_t op)
+cl_m6800::lda(class cl_memory_cell &dest, u8_t op)
 {
   u8_t f= rF & ~(flagN|flagV|flagC);
   dest.W(op);
@@ -49,7 +49,7 @@ cl_m6800::lda(class cl_cell8 &dest, u8_t op)
 }
 
 int
-cl_m6800::sta(class cl_cell8 &dest, u8_t op)
+cl_m6800::sta(class cl_memory_cell &dest, u8_t op)
 {
   u8_t f= rF & ~(flagN|flagV|flagC);
   dest.W(op);

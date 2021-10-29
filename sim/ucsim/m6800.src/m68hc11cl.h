@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "m6800cl.h"
 #include "d11p0.h"
+#include "d11p18.h"
 
 
 #define rY   (IY)
@@ -43,12 +44,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 extern instruction_wrapper_fn itab18[256];
 extern int8_t p0ticks11[256];
+extern int8_t p18ticks11[256];
 
 class cl_m68hcbase: public cl_m6800
 {
 public:
   u16_t IY;
-  class cl_cell16 cIY, cD;
+  class cl_cell16 cD;
+  class cl_idx16 cIY;
 public:
   cl_m68hcbase(class cl_sim *asim): cl_m6800(asim) {}
   virtual int init(void);
@@ -74,6 +77,7 @@ public:
   virtual void reset(void);
 
   virtual int8_t *tick_tab(t_mem code);
+  virtual int tickt(t_mem code);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   //virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual int longest_inst(void) { return 6; }
@@ -85,8 +89,9 @@ public:
   // ALU
   virtual int sub16(class cl_cell16 &dest, u16_t op, bool c);
   virtual int add16(class cl_cell16 &dest, u16_t op, bool c);
-  virtual int bset(class cl_cell8 &dest);
-  virtual int bclr(class cl_cell8 &dest);
+  virtual int bset(class cl_memory_cell &dest);
+  virtual int bclr(class cl_memory_cell &dest);
+  virtual int cp16(class cl_cell16 &dest, u16_t op);
   
   // BRANCH
   virtual int brset(u8_t op);
@@ -99,15 +104,15 @@ public:
   virtual int LSRD(t_mem code);
   virtual int ASLD(t_mem code);
   virtual int BRN(t_mem code);
-  virtual int PULX(t_mem code);
-  virtual int ABX(t_mem code);
-  virtual int PSHX(t_mem code);
+  virtual int PULxy(t_mem code);
+  virtual int ABxy(t_mem code);
+  virtual int PSHxy(t_mem code);
   virtual int MUL(t_mem code);
   virtual int SUBD16(t_mem code) { return sub16(cD, i16(), false); }
   virtual int SUBDd(t_mem code) { return sub16(cD, dop16(), false); }
-  virtual int SUBDi(t_mem code) { return sub16(cD, iop16(), false); }
+  virtual int SUBDxy(t_mem code) { return sub16(cD, iop16(), false); }
   virtual int SUBDe(t_mem code) { return sub16(cD, eop16(), false); }
-  virtual int XGDX(t_mem code);
+  virtual int XGDxy(t_mem code);
   virtual int JSRd(t_mem code) { return call(daddr()); }
   virtual int ADDD16(t_mem code) { return add16(cD, i16(), false); }
   virtual int ADDDd(t_mem code) { return add16(cD, dop16(), false); }
@@ -129,6 +134,27 @@ public:
   virtual int BSETi(t_mem code) { return bset(idst()); }
   virtual int BCLRd(t_mem code) { return bclr(ddst()); }
   virtual int BCLRi(t_mem code) { return bclr(idst()); }
+
+  virtual int PAGE18(t_mem code);
+  virtual int PAGE1A(t_mem code);
+  virtual int PAGECD(t_mem code);
+  
+  // Page 0x18
+  virtual int INY(t_mem code);
+  virtual int DEY(t_mem code);
+  virtual int TSY(t_mem code);
+  virtual int TYS(t_mem code);
+  virtual int CPY16(t_mem code) { return cp16(cY, i16()); }
+  virtual int CPYd(t_mem code) { return cp16(cY, dop16()); }
+  virtual int CPYi(t_mem code) { return cp16(cY, iop16()); }
+  virtual int CPYe(t_mem code) { return cp16(cY, eop16()); }
+  virtual int LDY16(t_mem code) { return ldsx(cY, i16()); }
+  virtual int LDYd(t_mem code) { return ldsx(cY, dop16()); }
+  virtual int LDYi(t_mem code) { return ldsx(cY, iop16()); }
+  virtual int LDYe(t_mem code) { return ldsx(cY, eop16()); }
+  virtual int STYd(t_mem code) { return stsx(daddr(), rY); }
+  virtual int STYi(t_mem code) { return stsx(iaddr(), rY); }
+  virtual int STYe(t_mem code) { return stsx(eaddr(), rY); }
 };
 
 

@@ -179,7 +179,7 @@ class cl_console_base: public cl_base
   virtual void set_prompt(char *p);
   
   virtual bool input_active(void) const;
-  //virtual bool accept_last(void) { return /*is_tty() ? DD_TRUE : DD_FALSE;*/flags&CONS_INTERACTIVE; }
+  //virtual bool accept_last(void) { return /*is_tty() ? true : false;*/flags&CONS_INTERACTIVE; }
   virtual bool prevent_quit(void) { return (prev_quit>=0)?prev_quit:true; }
   
  private:

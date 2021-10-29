@@ -33,22 +33,40 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "m68hc11cl.h"
 
+#define CL12 cl_m68hc12
+
+class CL12;
+
+typedef int (*hcwrapper_fn)(class CL12 *uc, t_mem code);
+
+
 /*
  * Base of M68HC12 processor
  */
-#define CL12 cl_m68hc12
 
 class cl_m68hc12: public cl_m68hcbase
 {
+public:
+  i8_t post_inc_dec;
+  class cl_cell16 *post_idx_reg;
+  class cl_wrap *hc12wrap;
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
   virtual void reset(void);
 
+  virtual int proba(int,t_mem);
+  virtual int prob1(int,t_mem) {return 1;}
+
   virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
+  virtual int longest_inst(void) { return 6; }
+
+  virtual void post_inst(void);
+  virtual i16_t s8_16(u8_t op);
+  virtual t_addr naddr(void);
 };
 
 #endif

@@ -148,7 +148,7 @@ PKGS		= $(S51) $(S390) \
 		  $(TLCS) \
 		  $(SM68HC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
 		  $(M6809) $(M6800) $(M68HC12) $(MCS6502) $(RXK) $(PBLAZE) \
-		  doc
+		  doc gui.src
 
 PKGS_ALL	= cmd.src sim.src gui.src motorola.src \
 		  s51.src avr.src z80.src tlcs.src xa.src \

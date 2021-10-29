@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 
-#include "glob11.h"
+#include "g11p0.h"
 
 // code, mask, branch, len, mnem, iscall, ticks
 struct dis_entry disass11p0[]= {
@@ -36,22 +36,22 @@ struct dis_entry disass11p0[]= {
   { 0x02, 0xff, ' ', 1, "IDIV" },
   { 0x03, 0xff, ' ', 1, "FDIV" },
   { 0x04, 0xff, ' ', 1, "LSRD" },
-  { 0x05, 0xff, ' ', 1, "ASLD" },
+  { 0x05, 0xff, ' ', 1, "ASL D" },
   { 0x21, 0xff, 'R', 2, "BRN %r" },
   { 0x38, 0xff, ' ', 1, "PULX" },
   { 0x3a, 0xff, ' ', 1, "ABX" },
   { 0x3c, 0xff, ' ', 1, "PSHX" },
   { 0x3d, 0xff, ' ', 1, "MUL" },
-  { 0x83, 0xff, ' ', 3, "SUBD %B" },
-  { 0x93, 0xff, ' ', 2, "SUBD %D" },
-  { 0xa3, 0xff, ' ', 2, "SUBD %X" },
-  { 0xb3, 0xff, ' ', 3, "SUBD %E" },
+  { 0x83, 0xff, ' ', 3, "SUB D,%B" },
+  { 0x93, 0xff, ' ', 2, "SUB D,%D" },
+  { 0xa3, 0xff, ' ', 2, "SUB D,%X" },
+  { 0xb3, 0xff, ' ', 3, "SUB D,%E" },
   { 0x8f, 0xff, ' ', 1, "XGDX" },
   { 0x9d, 0xff, 'd', 2, "JSR %d" },
-  { 0xc3, 0xff, ' ', 3, "ADDD %B" },
-  { 0xd3, 0xff, ' ', 2, "ADDD %D" },
-  { 0xe3, 0xff, ' ', 2, "ADDD %X" },
-  { 0xf3, 0xff, ' ', 3, "ADDD %E" },
+  { 0xc3, 0xff, ' ', 3, "ADD D,%B" },
+  { 0xd3, 0xff, ' ', 2, "ADD D,%D" },
+  { 0xe3, 0xff, ' ', 2, "ADD D,%X" },
+  { 0xf3, 0xff, ' ', 3, "ADD D,%E" },
   { 0xcc, 0xff, ' ', 3, "LDD %B" },
   { 0xdc, 0xff, ' ', 2, "LDD %D" },
   { 0xec, 0xff, ' ', 2, "LDD %X" },
@@ -64,10 +64,10 @@ struct dis_entry disass11p0[]= {
   { 0x1e, 0xff, 'R', 4, "BRSET %x,%b,%r" },
   { 0x13, 0xff, 'R', 4, "BRCLR %d,%b,%r" },
   { 0x1f, 0xff, 'R', 4, "BRCLR %x,%b,%r" },
-  { 0x14, 0xff, ' ', 3, "BRSET %d,%b" },
-  { 0x1c, 0xff, ' ', 3, "BRSET %x,%b" },
-  { 0x15, 0xff, ' ', 3, "BRCLR %d,%b" },
-  { 0x1d, 0xff, ' ', 3, "BRCLR %x,%b" },
+  { 0x14, 0xff, ' ', 3, "BSET %d,%b" },
+  { 0x1c, 0xff, ' ', 3, "BSET %x,%b" },
+  { 0x15, 0xff, ' ', 3, "BCLR %d,%b" },
+  { 0x1d, 0xff, ' ', 3, "BCLR %x,%b" },
   
   { 0, 0, 0, 0, 0, 0 }
 };

@@ -243,28 +243,28 @@ cl_pblaze::build_cmdset(class cl_cmdset *cmdset)
 
   cl_uc::build_cmdset(cmdset);
   /*
-  cmdset->add(cmd= new cl_dc_cmd("dc", DD_TRUE,
+  cmdset->add(cmd= new cl_dc_cmd("dc", true,
 "dc [start [stop]]  Dump ROM",
 "long help of dc"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_di_cmd("di", DD_TRUE,
+  cmdset->add(cmd= new cl_di_cmd("di", true,
 "di [start [stop]]  Dump Internal RAM",
 "long help of di"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dx_cmd("dx", DD_TRUE,
+  cmdset->add(cmd= new cl_dx_cmd("dx", true,
 "dx [start [stop]]  Dump External RAM",
 "long help of dx"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_ds_cmd("ds", DD_TRUE,
+  cmdset->add(cmd= new cl_ds_cmd("ds", true,
 "ds [start [stop]]  Dump SFR",
 "long help of ds"));
   cmd->init();
   */
 
-  cmdset->add(cmd= new cl_pbstate_cmd("pbstate", 0));//DD_TRUE,
+  cmdset->add(cmd= new cl_pbstate_cmd("pbstate", 0));//true,
 	      //"pbstate [\"file\"]   Prints PicoBlaze state to std output or specified file",
 	      //"long help of pbstate"));
   cmd->init();
@@ -1057,7 +1057,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
   char s2[3];
   long l= 0;
 
-  *ok= DD_FALSE;
+  *ok= false;
   while (bytes)
     {
       if (fscanf(f, "%2c", &s2[0]) == EOF)
@@ -1066,7 +1066,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
       l= l*256 + strtol(s2, NULL, 16);
       bytes--;
     }
-  *ok= DD_TRUE;
+  *ok= true;
   return(l);
 }
 
@@ -1076,7 +1076,7 @@ ReadPblazeRomHex(FILE *f, bool *ok)
   char rec[6];
   long l= 0;
 
-  *ok= DD_FALSE;
+  *ok= false;
 
   // read 5 character representim one record (one instruction) in rom
   if (fscanf(f, "%5c", rec) == EOF)
@@ -1085,7 +1085,7 @@ ReadPblazeRomHex(FILE *f, bool *ok)
   rec[5]= '\0';
   l= strtol(rec, NULL, 16);
 
-  *ok= DD_TRUE;
+  *ok= true;
   return(l);
 }
 
@@ -1111,7 +1111,7 @@ cl_pblaze::pblaze_read_hex_file(const char *nam)
   FILE *f;
   uint  addr= 0;  // address
   long written= 0, record = 0;
-  bool ok = DD_TRUE;
+  bool ok = true;
 
   if (!rom)
     {
@@ -1200,7 +1200,7 @@ cl_pblaze::std_read_hex_file(const char *nam)
       }
 
   //memset(inst_map, '\0', sizeof(inst_map));
-  ok= DD_TRUE;
+  ok= true;
   while (ok &&
          rtyp != 1)
     {

@@ -30,6 +30,7 @@ cl_f *dd= NULL;
 void deb(const char *format, ...)
 {
   return;
+  /*
   if (dd==NULL)
     {
       dd= mk_io("", "");
@@ -43,6 +44,7 @@ void deb(const char *format, ...)
     free(buf);
   }
   va_end(ap);
+  */
 }
 
 

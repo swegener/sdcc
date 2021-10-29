@@ -27,7 +27,7 @@ public:
   virtual bool get_cell_flag(t_addr //addr
 			     , int //flag
 			     )
-  { return(DD_FALSE); }
+  { return(false); }
   virtual void set_cell_flag(t_addr addr, bool set_to, int flag) {}
 
   virtual t_mem read(t_addr addr);

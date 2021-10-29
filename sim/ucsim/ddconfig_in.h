@@ -70,6 +70,9 @@
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
+/* Define to 1 if you have the <cstdint.h> header file. */
+#undef HAVE_CSTDINT_H
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
@@ -241,8 +244,4 @@
 /* XXX */
 #undef _M_
 
-/* ucsim custom defines */
-#define DD_TRUE     1
-#define DD_FALSE    0
-#define NIL         0
 #endif /* DDCONFIG_HEADER */

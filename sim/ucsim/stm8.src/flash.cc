@@ -66,7 +66,7 @@ cl_flash_as::cl_flash_as(const char *id, t_addr astart, t_addr asize):
   decoders= new cl_decoder_list(2, 2, false);
   cella= (class cl_memory_cell *)malloc(size * sizeof(class cl_memory_cell));
   //cell->init();
-  int i;
+  t_addr i;
   for (i= 0; i < size; i++)
     {
       void *p= &(cella[i]);

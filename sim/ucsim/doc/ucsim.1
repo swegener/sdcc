@@ -24,11 +24,13 @@ uCsim \- Micro\-controller simulator
 .br
 .B ucsim_p1516
 .br
-.B ucsim_m68hc08
-.br
 .B ucsim_m6800
 .br
 .B ucsim_m6809
+.br
+.B ucsim_m68hc08
+.br
+.B ucsim_m68hc11
 .br
 .B ucsim_mcs6502
 .br
@@ -120,12 +122,13 @@ for command console.
 .B \-k portnum
 Use
 .I localhost:portnum
-for serial I/O.
+for serial I/O. This option is obsolete, use \-S instead.
 
 .TP
 .B \-s file
 Connect serial interface uart0 to
 .I file
+This option is obsolete, use \-S instead.
 
 .TP
 .B \-S options
@@ -153,7 +156,8 @@ Use localhost:nr as server for serial onput.
 .TP
 .B \-I options
 .I options
-is a comma separated list of options according to simulator interface. Known options are:
+is a comma separated list of options according to simulator
+interface. Known options are:
 .br
 .I if=memory[address]
 turn on interface on given memory location.
@@ -164,6 +168,7 @@ specify input file for IO.
 .I out=file
 specify output file for IO.
 .PP
+
 .TP
 .B \-p prompt
 Specify string for prompt.
@@ -172,6 +177,7 @@ Specify string for prompt.
 .B \-P
 Prompt is a null ('\\0') character.
 .PP
+
 .TP
 .B \-o colors
 List of color specification: what=colspec,... where colspec is :
@@ -182,6 +188,7 @@ on black).
 .B \-l
 Use colors of the light theme (default is dark).
 .PP
+
 .TP
 .B \-b
 Black & white (non-color) console.
@@ -226,7 +233,7 @@ Print out this help and quit.
 None yet.
 
 .SH "SEE ALSO"
-sdcc(1), sdcdb(1).
+sdcc(1), sdcdb(1), serialview(1).
 
 .SH BUGS
 Probably many.
@@ -248,12 +255,12 @@ Kalr Bongers,
 Alexis Pavlov,
 Davine Zanni,
 Anton Persson,
-Nicolas Lesser
-Mike Jagdis
-Jiri Simek
-Zbynek Krivka
-Vaclav Peroutka
-Valentin Dudouyt
-Erik Petrich
-Leland Morrison
-Johan Knol
+Nicolas Lesser,
+Mike Jagdis,
+Jiri Simek,
+Zbynek Krivka,
+Vaclav Peroutka,
+Valentin Dudouyt,
+Erik Petrich,
+Leland Morrison,
+Johan Knol.

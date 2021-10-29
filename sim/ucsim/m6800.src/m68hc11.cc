@@ -32,9 +32,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 
 #include "dregcl.h"
-#include "glob.h"
-#include "glob11.h"
 #include "g11p0.h"
+#include "g11p18.h"
+#include "g11p1a.h"
+#include "g11pcd.h"
 #include "wraps.h"
 
 #include "m68hc11cl.h"
@@ -62,6 +63,66 @@ int8_t p0ticks11[256]= {
   /* f */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
+int8_t p18ticks11[256]= {
+  /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
+  /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0,
+  /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8,
+  /* 2 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 3 */ 4, 0, 0, 0, 0, 4, 0, 0, 6, 0, 4, 0, 5, 0, 0, 0,
+  /* 4 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 5 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 6 */ 7, 0, 0, 7, 7, 0, 7, 7, 7, 7, 7, 0, 7, 7, 4, 7,
+  /* 7 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 8 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 4,
+  /* 9 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0,
+  /* a */ 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 6, 6,
+  /* b */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0,
+  /* c */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0,
+  /* d */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5,
+  /* e */ 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 5, 6,
+  /* f */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6
+};
+
+int8_t pcdticks11[256]= {
+  /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
+  /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 2 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 3 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 4 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 5 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 6 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 7 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 8 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 9 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* a */ 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0,
+  /* b */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* c */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* d */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* e */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6,
+  /* f */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+int8_t p1aticks11[256]= {
+  /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
+  /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 2 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 3 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 4 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 5 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 6 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 7 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 8 */ 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* 9 */ 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* a */ 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0,
+  /* b */ 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* c */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* d */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  /* e */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0,
+  /* f */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0
+};
+
 
 int
 cl_m68hcbase::init(void)
@@ -73,8 +134,22 @@ cl_m68hcbase::init(void)
   RCV(D);
 #undef RCV
 
-  fill_def_18_wrappers(itab18);
+  cIY.name= "Y";
   
+  fill_def_18_wrappers(itab18);
+  // un-wrap some codes, where m6800 version is capable to handle
+  // indexing with IY
+#define UW(code) itab18[0x ## code ]= instruction_wrapper_ ## code
+  UW(38); UW(3a); UW(3c);
+  UW(60); UW(63); UW(64); UW(66); UW(67); UW(68);
+  UW(69); UW(6a); UW(6c); UW(6d); UW(6e); UW(6f);
+  UW(8f);
+  UW(a0); UW(a1); UW(a2); UW(a3); UW(a4); UW(a5); UW(a6); UW(a7); 
+  UW(a8); UW(a9); UW(aa); UW(ab);         UW(ad); UW(ae); UW(af); 
+  UW(e0); UW(e1); UW(e2); UW(e3); UW(e4); UW(e5); UW(e6); UW(e7); 
+  UW(e8); UW(e9); UW(ea); UW(eb); UW(ec); UW(ed);
+  UW(1c); UW(1d); UW(1e); UW(1f);
+#undef UW
   return 0;
 }
 
@@ -138,12 +213,28 @@ int8_t *
 CL11::tick_tab(t_mem code)
 {
   if (code == 0x18)
-    ;
+    return p18ticks11;
   else if (code == 0x1a)
-    ;
+    return p1aticks11;
   else if (code == 0xcd)
-    ;
+    return pcdticks11;
   return p0ticks11;
+}
+
+int
+CL11::tickt(t_mem code)
+{
+  int8_t *tt= tick_tab(code);
+  if ((code == 0x18) ||
+      (code == 0x1a) ||
+      (code == 0xcd))
+    code= rom->read(PC);
+  if (tt == NULL)
+    return tick(1);
+  int t= tt[code];
+  if (t)
+    return tick(t);
+  return 0;
 }
 
 
@@ -162,6 +253,48 @@ cl_m68hc11::get_dis_entry(t_addr addr)
   int i= 0;
   t_mem code= rom->get(addr);
 
+  if (code == 0x18)
+    {
+      cI= &cY;
+      i= 0;
+      code= rom->get(addr+1);
+      dt= disass11p18;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic)
+	return &dt[i];
+      return &dt[i];
+    }
+  
+  if (code == 0xcd)
+    {
+      cI= &cY;
+      i= 0;
+      code= rom->get(addr+1);
+      dt= disass11pcd;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic)
+	return &dt[i];
+      return &dt[i];
+    }
+  
+  if (code == 0x1a)
+    {
+      cI= &cX;
+      i= 0;
+      code= rom->get(addr+1);
+      dt= disass11p1a;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      if (dt[i].mnemonic)
+	return &dt[i];
+      return &dt[i];
+    }
+  
   if (dt == NULL)
     return NULL;
   while (((code & dt[i].mask) != dt[i].code) &&
@@ -271,6 +404,50 @@ cl_m68hc11::disassc(t_addr addr, chars *comment)
 }
 */
 
+int
+CL11::PAGE18(t_mem code)
+{
+  cI= &cIY;
+  code= fetch();
+  return itab18[code](this, code);
+}
+
+int
+CL11::PAGE1A(t_mem code)
+{
+  cI= &cX;
+  code= fetch();
+  switch (code)
+    {
+    case 0x83: return cp16(cD, i16()); break;
+    case 0x93: return cp16(cD, dop16()); break;
+    case 0xa3: return cp16(cD, iop16()); break;
+    case 0xb3: return cp16(cD, eop16()); break;
+
+    case 0xad: return cp16(cY, iop16()); break;
+    case 0xee: return ldsx(cY, iop16()); break;
+    case 0xef: return stsx(iaddr(), rY); break;
+    }
+  return resINV;
+}
+
+int
+CL11::PAGECD(t_mem code)
+{
+  cI= &cY;
+  code= fetch();
+  switch (code)
+    {
+    case 0xa3: return cp16(cD, iop16()); break;
+
+    case 0xad: return cp16(cX, iop16()); break;
+    case 0xee: return ldsx(cX, iop16()); break;
+    case 0xef: return stsx(iaddr(), rX); break;
+    }
+  return resINV;
+}
+
+
 /* 
  * OTHER instructions
  */
@@ -322,23 +499,24 @@ CL11::std16(t_addr addr)
 
 
 int
-CL11::PULX(t_mem code)
+CL11::PULxy(t_mem code)
 {
   u8_t h, l;
   h= rom->read(++rSP);
   l= rom->read(++rSP);
   cSP.W(rSP);
-  cX.W(h*256+l);
+  cI->W(h*256+l);
   vc.rd+= 2;
   return resGO;
 }
 
 
 int
-CL11::PSHX(t_mem code)
+CL11::PSHxy(t_mem code)
 {
-  rom->write(rSP--, rX);
-  rom->write(rSP--, rX>>8);
+  u16_t r= cI->get();
+  rom->write(rSP--, r);
+  rom->write(rSP--, r>>8);
   cSP.W(rSP);
   vc.wr+= 2;
   return resGO;
@@ -346,11 +524,27 @@ CL11::PSHX(t_mem code)
 
 
 int
-CL11::XGDX(t_mem code)
+CL11::XGDxy(t_mem code)
 {
   u16_t t= rD;
-  cD.W(rX);
-  cX.W(t);
+  cD.W(cI->get());
+  cI->W(t);
+  return resGO;
+}
+
+
+int
+CL11::TSY(t_mem code)
+{
+  cIY.W(rSP+1);
+  return resGO;
+}
+
+
+int
+CL11::TYS(t_mem code)
+{
+  cSP.W(rIY-1);
   return resGO;
 }
 
@@ -396,7 +590,7 @@ CL11::add16(class cl_cell16 &dest, u16_t op, bool c)
 
 
 int
-CL11::bset(class cl_cell8 &dest)
+CL11::bset(class cl_memory_cell &dest)
 {
   u8_t m= fetch();
   u8_t r= dest.R();
@@ -411,7 +605,7 @@ CL11::bset(class cl_cell8 &dest)
 
 
 int
-CL11::bclr(class cl_cell8 &dest)
+CL11::bclr(class cl_memory_cell &dest)
 {
   u8_t m= fetch();
   u8_t r= dest.R();
@@ -421,6 +615,21 @@ CL11::bclr(class cl_cell8 &dest)
   if (!r) f|= flagZ;
   if (r & 0x80) f|= flagN;
   cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::cp16(class cl_cell16 &dest, u16_t op)
+{
+  u16_t a= dest.get(), b= op, r;
+  u8_t f= rF & ~(flagC|flagN|flagZ|flagV);
+  r= a-b;
+  if (r&0x8000) f|= flagN;
+  if (!r) f|= flagZ;
+  if (( (a&~b&~r)|(~a&b&r) ) & 0x8000) f|= flagV;
+  if (( (~a&b)|(b&r)|(~a&r) ) & 0x8000) f|= flagC;
+  cCC.W(f);
   return resGO;
 }
 
@@ -500,9 +709,9 @@ CL11::ASLD(t_mem code)
 
 
 int
-CL11::ABX(t_mem code)
+CL11::ABxy(t_mem code)
 {
-  cX.W(rX+rB);
+  cI->W(rX+rB);
   return resGO;
 }
 
@@ -515,6 +724,32 @@ CL11::MUL(t_mem code)
   cD.W(r);
   if (rB & 0x80) f|= flagC;
   cF.W(f);
+  return resGO;
+}
+
+
+int
+CL11::INY(t_mem code)
+{
+  if (++rY)
+    rF&= ~mZ;
+  else
+    rF|= mZ;
+  cY.W(rY);
+  cF.W(rF);
+  return resGO;
+}
+
+
+int
+CL11::DEY(t_mem code)
+{
+  if (--rY)
+    rF&= ~mZ;
+  else
+    rF|= mZ;
+  cY.W(rY);
+  cF.W(rF);
   return resGO;
 }
 

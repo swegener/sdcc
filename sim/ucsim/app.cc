@@ -300,7 +300,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   int i, c;
   char opts[100], *cp, *subopts, *value;
   char *cpu_type= NULL;
-  bool /*s_done= DD_FALSE,*/ k_done= false;
+  bool /*s_done= false,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
   strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blBR:_");

@@ -47,7 +47,7 @@ class cl_porto: public cl_hw
   cl_porto(class cl_uc *auc, t_addr the_addr, const char *aname);
   virtual int init(void);
   virtual void reset(void);
-  virtual int cfg_size(void) { return 1; }
+  virtual unsigned int cfg_size(void) { return 1; }
   //virtual const char *cfg_help(t_addr addr);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
@@ -65,7 +65,7 @@ public:
   cl_porti(class cl_uc *auc, t_addr the_addr, const char *aname);
 public:
   virtual int init(void);
-  virtual int cfg_size(void) { return 1; }
+  virtual unsigned int cfg_size(void) { return 1; }
   virtual const char *cfg_help(t_addr addr);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);

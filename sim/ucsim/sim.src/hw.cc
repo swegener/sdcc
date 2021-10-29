@@ -76,7 +76,7 @@ cl_hw::init(void)
 {
   chars n(id_string);
   char s[100];
-  int i;
+  t_addr a;
 
   on= true;
   
@@ -92,11 +92,11 @@ cl_hw::init(void)
       cfg->hidden= true;
       uc->address_spaces->add(cfg);
 
-      for (i= 0; i < cfg_size(); i++)
+      for (a= 0; a < cfg_size(); a++)
         {
-	  class cl_memory_cell *c= cfg->get_cell(i);
+	  class cl_memory_cell *c= cfg->get_cell(a);
 	  c->decode(&(c->def_data));
-          cfg->register_hw(i, this, false);
+          cfg->register_hw(a, this, false);
         }
     }
 

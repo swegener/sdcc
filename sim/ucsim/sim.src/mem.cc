@@ -596,7 +596,7 @@ cl_memory::dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 	      sum+= c;
 	      c= start_line & 0xff;
 	      sum+= c;
-	      int i;
+	      unsigned int i;
 	      for (i= 0; i < a-start_line; i++)
 		{
 		  c= read(start_line + i);
@@ -1382,7 +1382,7 @@ cl_address_space::cl_address_space(const char *id,
   else if (awidth <= 16)
     cell= &c16;
   //cell->init();
-  int i;
+  unsigned int i;
   for (i= 0; i < size; i++)
     {
       void *p1= &(cella[i]);
@@ -1397,7 +1397,7 @@ cl_address_space::cl_address_space(const char *id,
 cl_address_space::~cl_address_space(void)
 {
   delete decoders;
-  int i;
+  unsigned int i;
   for (i= 0; i < size; i++)
     {
       cella[i].~cl_memory_cell();
@@ -1568,7 +1568,7 @@ cl_address_space::set_cell_flag(t_addr start_addr, t_addr end_addr, bool set_to,
 class cl_memory_cell *
 cl_address_space::search_cell(enum cell_flag flag, bool value, t_addr *addr)
 {
-  int i;
+  unsigned int i;
 
   for (i= 0; i < size; i++)
     {
@@ -1898,7 +1898,7 @@ int
 cl_memory_chip::init(void)
 {
   cl_memory::init();
-  int i;
+  t_addr i;
   if (array_is_mine)
     {
       for (i= 0; i < size; i++)

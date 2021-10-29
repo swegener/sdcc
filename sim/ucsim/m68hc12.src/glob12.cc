@@ -30,9 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob12.h"
 
 
-struct dis_entry disass12[]= {
+struct dis_entry disass12p0[257];
 
-  { 0, 0, 0, 0, 0, 0 }
-};
 
 /* End of m68hc12.src/glob12.cc */

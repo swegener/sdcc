@@ -46,7 +46,7 @@ class cl_irq_hw: public cl_hw
  public:
   cl_irq_hw(class cl_uc *auc);
   virtual int init(void);
-  virtual int cfg_size(void) { return m68_nr; }
+  virtual unsigned int cfg_size(void) { return m68_nr; }
   virtual const char *cfg_help(t_addr addr);
   virtual void print_info(class cl_console_base *con);  
 };

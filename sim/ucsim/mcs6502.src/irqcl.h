@@ -50,7 +50,7 @@ class cl_irq_hw: public cl_hw
  public:
   cl_irq_hw(class cl_uc *auc);
   virtual int init(void);
-  virtual int cfg_size(void) { return m65_nr; }
+  virtual unsigned int cfg_size(void) { return m65_nr; }
   virtual void print_info(class cl_console_base *con);  
 };
 

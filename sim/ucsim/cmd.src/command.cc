@@ -359,7 +359,7 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
   if (*dot == '\0')
     {
       aname= 0;
-      con->dd_printf("Uncomplete array\n");
+      con->dd_printf("Incomplete array\n");
     }
   else
     {
@@ -374,7 +374,7 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
           *(p++)= '\0';
           if (strlen(dot) == 0)
             {
-              con->dd_printf("Uncomplete array index\n");
+              con->dd_printf("Incomplete array index\n");
               delete aname;
             }
           else

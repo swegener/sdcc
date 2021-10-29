@@ -1247,7 +1247,7 @@ cl_51core::disass(t_addr addr)
 void
 cl_51core::print_regs(class cl_console_base *con)
 {
-  t_addr start, stop;
+  int start, stop;
   t_mem data;
   u16_t dp;
 

@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 AC_INIT
 AC_CONFIG_SRCDIR(.version)
-AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
+AC_CONFIG_HEADERS([ddconfig.h:ddconfig_in.h])
 
 AC_PROG_AWK
 
@@ -240,19 +240,19 @@ AC_CHECK_TOOL(STRIP, strip)
 AC_CHECK_TOOL(AR, ar)
 dnl AC_CHECK_TOOL(SREC_CAT, srec_cat)
 
-AC_LIBTOOL_DLOPEN
-dnl AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+dnl AC_LIBTOOL_DLOPEN
+dnl dnl AC_LIBTOOL_WIN32_DLL
+dnl AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
-AC_PROG_LEX
+AC_PROG_LEX(noyywrap)
 if test ${LEX} = "flex"; then
         AC_DEFINE(HAVE_FLEX, 1, [XXX])
 fi
 AC_PROG_YACC
 
 
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 # Checking for header files.
 # ===========================================================================
@@ -261,11 +261,14 @@ AC_LANG_CPLUSPLUS
 #  CPPFLAGS="$CPPFLAGS -I/stuff/include"
 #fi
 
-AC_HEADER_STDC
+dnl AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(termios.h)
+AC_CHECK_HEADERS(inttypes.h)
+AC_CHECK_HEADERS(cstdint.h)
+AC_CHECK_HEADERS(stdint.h)
 
 AC_CHECK_HEADER(curses.h,
   AC_DEFINE(HAVE_CURSES_H, 1, [XXX])
@@ -604,7 +607,7 @@ AC_SUBST(dlso_ok)
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 
-AC_TYPE_SIGNAL
+dnl AC_TYPE_SIGNAL
 if test "$cross_compiling" = "no"; then
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -713,12 +716,8 @@ AC_DEFINE_UNQUOTED(SPEC_QWORD, [$SPEC_QWORD], [XXX])
 
 AH_TOP([#ifndef DDCONFIG_HEADER
 #define DDCONFIG_HEADER])
-AH_BOTTOM([/* ucsim custom defines */
-#define DD_TRUE     1
-#define DD_FALSE    0
-#define NIL         0
-#endif /* DDCONFIG_HEADER */])
-
+AH_BOTTOM([#endif])
+	
 if echo $TYPE_DWORD|grep short >/dev/null; then
     A="h"
 elif echo $TYPE_DWORD|grep long >/dev/null; then
@@ -738,7 +737,7 @@ AC_DEFINE_UNQUOTED(_M_, "${M}", [XXX])
 # Generating output files
 # ===========================================================================
 
-AC_OUTPUT(Makefile
+AC_CONFIG_FILES(Makefile
 main.mk:main_in.mk
 packages.mk:packages_in.mk
 cmd.src/Makefile
@@ -768,6 +767,7 @@ gui.src/serio.src/Makefile
 
 doc/Makefile
 )
+AC_OUTPUT
 
 #gui.src/portmon.src/Makefile
 

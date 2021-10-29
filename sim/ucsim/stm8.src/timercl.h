@@ -42,7 +42,7 @@ class cl_tim: public cl_hw
  protected:
   struct
   {
-    int
+    unsigned int
     // register indexes
     cr1, // control 1
       cr2, // control 2 (used in Master/Slave timers only, all except SAF 235)
@@ -102,7 +102,7 @@ class cl_tim: public cl_hw
  public:
   cl_tim(class cl_uc *auc, int aid, t_addr abase);
   virtual int init(void);
-  virtual int cfg_size(void) { return stm8_tim_nuof_cfg; }
+  virtual unsigned int cfg_size(void) { return stm8_tim_nuof_cfg; }
   virtual const char *cfg_help(t_addr addr);
  
   virtual int tick(int cycles);

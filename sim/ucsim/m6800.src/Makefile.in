@@ -56,7 +56,7 @@ OBJECTS_SHARED	= sim$(TN).o $(TN).o glob.o irq.o \
 		  inst.o ialu.o ibranch.o imove.o
 
 OBJECTS_SHARED11= $(OBJECTS_SHARED) simm68hc11.o m68hc11.o \
-		  wraps.o glob11.o g11p0.o
+		  wraps.o glob11.o g11p0.o g11p18.o g11pcd.o g11p1a.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

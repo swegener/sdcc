@@ -72,7 +72,7 @@ class cl_cia: public cl_serial_hw
   cl_cia(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_cia(void);
   virtual int init(void);
-  virtual int cfg_size(void) { return 11; }
+  virtual unsigned int cfg_size(void) { return 11; }
   virtual const char *cfg_help(t_addr addr);
 
   virtual t_mem read(class cl_memory_cell *cell);

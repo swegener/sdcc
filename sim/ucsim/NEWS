@@ -1,9 +1,9 @@
 0.7
 
-- New simulators: PicoBlaze, MCS6502, MC6800, MC68HC12
-
 
 0.6
+
+- New simulators: PicoBlaze, MCS6502, MC6800, MC68HC12
 
 - New commands: "memory info" (same as "info memory"), "get error"
   (same as "show error").

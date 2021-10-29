@@ -51,7 +51,7 @@ cl_ras::init(void)
 t_addr
 cl_ras::log2phy(t_addr log)
 {
-  u8_t x, y;
+  t_addr x, y;
   x= segsize>>4;
   y= segsize&0xf;
   if (log >= 0xe000)

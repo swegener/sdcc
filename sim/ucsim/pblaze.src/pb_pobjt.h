@@ -30,12 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
-#ifndef MyTypesHeader
-#define DD_TRUE	 1
-#define DD_FALSE 0
-//#define bool	 int
-#endif
-
 typedef int	t_index;
 typedef int	(*match_func)(void *, const void *);
 typedef void	(*iterator_func)(void *, void *);

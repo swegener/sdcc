@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 int
-cl_m6800::sub(class cl_cell8 &dest, u8_t op, bool c)
+cl_m6800::sub(class cl_memory_cell &dest, u8_t op, bool c)
 {
   u8_t orgc= rF&flagC;
   u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
@@ -46,6 +46,18 @@ cl_m6800::sub(class cl_cell8 &dest, u8_t op, bool c)
   dest.W(r);
   cCC.W(f);
   return resGO;
+}
+
+int
+cl_m6800::sub(class cl_memory_cell &dest, u8_t op)
+{
+  return sub(dest, op, false);
+}
+
+int
+cl_m6800::sbc(class cl_memory_cell &dest, u8_t op)
+{
+  return sub(dest, op, true);
 }
 
 int
@@ -67,7 +79,7 @@ cl_m6800::cmp(u8_t op1, u8_t op2)
 }
 
 int
-cl_m6800::add(class cl_cell8 &dest, u8_t op, bool c)
+cl_m6800::add(class cl_memory_cell &dest, u8_t op, bool c)
 {
   u8_t orgc= rF&flagC;
   u8_t f= rF & ~(flagN|flagZ|flagV|flagC|flagH);
@@ -89,7 +101,19 @@ cl_m6800::add(class cl_cell8 &dest, u8_t op, bool c)
 }
 
 int
-cl_m6800::neg(class cl_cell8 &dest)
+cl_m6800::add(class cl_memory_cell &dest, u8_t op)
+{
+  return add(dest, op, false);
+}
+
+int
+cl_m6800::adc(class cl_memory_cell &dest, u8_t op)
+{
+  return add(dest, op, true);
+}
+
+int
+cl_m6800::neg(class cl_memory_cell &dest)
 {
   i8_t op= dest.R();
   u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
@@ -103,7 +127,7 @@ cl_m6800::neg(class cl_cell8 &dest)
 }
 
 int
-cl_m6800::com(class cl_cell8 &dest)
+cl_m6800::com(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f= rF & ~(flagN|flagZ|flagV);
   op= ~op;
@@ -117,7 +141,7 @@ cl_m6800::com(class cl_cell8 &dest)
 
 // cc_out[VBIT] = left[0];
 int
-cl_m6800::lsr(class cl_cell8 &dest)
+cl_m6800::lsr(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f= rF & ~(flagN|flagZ|flagV|flagC);
   if (op&1) f|= flagC|flagV;
@@ -130,7 +154,7 @@ cl_m6800::lsr(class cl_cell8 &dest)
 
 // cc_out[VBIT] = left[0] ^ cc[CBIT];
 int
-cl_m6800::ror(class cl_cell8 &dest)
+cl_m6800::ror(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f, c= rF&flagC;
   f= rF & ~(flagN|flagZ|flagV|flagC);
@@ -148,7 +172,7 @@ cl_m6800::ror(class cl_cell8 &dest)
 
 // cc_out[VBIT] = left[0] ^ left[7];
 int
-cl_m6800::asr(class cl_cell8 &dest)
+cl_m6800::asr(class cl_memory_cell &dest)
 {
   i8_t op= dest.R();
   u8_t f;
@@ -165,7 +189,7 @@ cl_m6800::asr(class cl_cell8 &dest)
 
 // cc_out[VBIT] = left[7] ^ left[6];
 int
-cl_m6800::asl(class cl_cell8 &dest)
+cl_m6800::asl(class cl_memory_cell &dest)
 {
   i8_t op= dest.R();
   u8_t f;
@@ -182,7 +206,7 @@ cl_m6800::asl(class cl_cell8 &dest)
 
 // cc_out[VBIT] = left[7] ^ left[6];
 int
-cl_m6800::rol(class cl_cell8 &dest)
+cl_m6800::rol(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f, c= rF&flagC;
   f= rF & ~(flagN|flagZ|flagV|flagC);
@@ -198,7 +222,7 @@ cl_m6800::rol(class cl_cell8 &dest)
 }
 
 int
-cl_m6800::dec(class cl_cell8 &dest)
+cl_m6800::dec(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f= rF & ~(flagN|flagZ|flagV);
   op--;
@@ -211,7 +235,7 @@ cl_m6800::dec(class cl_cell8 &dest)
 }
 
 int
-cl_m6800::inc(class cl_cell8 &dest)
+cl_m6800::inc(class cl_memory_cell &dest)
 {
   u8_t op= dest.R(), f= rF & ~(flagN|flagZ|flagV);
   op++;
@@ -234,7 +258,7 @@ cl_m6800::tst(u8_t op)
 }
 
 int
-cl_m6800::And(class cl_cell8 &dest, u8_t op)
+cl_m6800::And(class cl_memory_cell &dest, u8_t op)
 {
   u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
   a&= op;
@@ -257,7 +281,7 @@ cl_m6800::bit(u8_t op1, u8_t op2)
 }
 
 int
-cl_m6800::eor(class cl_cell8 &dest, u8_t op)
+cl_m6800::eor(class cl_memory_cell &dest, u8_t op)
 {
   u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
   a^= op;
@@ -269,7 +293,7 @@ cl_m6800::eor(class cl_cell8 &dest, u8_t op)
 }
 
 int
-cl_m6800::Or(class cl_cell8 &dest, u8_t op)
+cl_m6800::Or(class cl_memory_cell &dest, u8_t op)
 {
   u8_t a= dest.R(), f= rF & ~(flagV|flagN|flagZ);
   a|= op;
@@ -284,14 +308,14 @@ int
 cl_m6800::cpx(u16_t op)
 {
   u32_t r;
-  u16_t r2;
+  u16_t x= rX, r2;
   u8_t f= rF & ~(flagN|flagZ|flagV);
   op= ~op+1;
-  r= rX+op;
-  r2= (rX&0x7fff) + (op&0x7fff);
+  r= x+op;
+  r2= (x&0x7fff) + (op&0x7fff);
   if (r&0x8000) f|= flagN;
   if (!(r&0xffff)) f|= flagZ;
-  r&= ~0xffff;
+  r &= ~0xffff;
   r2&= ~0x7fff;
   if ((r && !r2) ||
       (!r && r2)) f|= flagV;
@@ -306,6 +330,8 @@ cl_m6800::INX(t_mem code)
     rF&= ~mZ;
   else
     rF|= mZ;
+  cX.W(rX);
+  cF.W(rF);
   return resGO;
 }
 
@@ -316,6 +342,8 @@ cl_m6800::DEX(t_mem code)
     rF&= ~mZ;
   else
     rF|= mZ;
+  cX.W(rX);
+  cF.W(rF);
   return resGO;
 }
 

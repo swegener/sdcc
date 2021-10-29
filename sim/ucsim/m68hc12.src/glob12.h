@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "iwrap.h"
 
 
-extern struct dis_entry disass12[];
+extern struct dis_entry disass12p0[257];
 
 
 #endif

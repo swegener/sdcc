@@ -34,15 +34,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "dregcl.h"
 
 #include "wraps.h"
+#include "hcwrapcl.h"
 #include "glob12.h"
 #include "m68hc12cl.h"
+
+class cl_m68hc12 *uc;
+
+int
+cl_m68hc12::proba(int i, t_mem code)
+{
+  return i;
+}
+
 
 
 cl_m68hc12::cl_m68hc12(class cl_sim *asim):
   cl_m68hcbase(asim)
 {
+  hc12wrap= new cl_12wrap();
+  hc12wrap->init();
 }
-
 
 int
 cl_m68hc12::init(void)
@@ -76,7 +87,7 @@ cl_m68hc12::reset(void)
 struct dis_entry *
 cl_m68hc12::dis_tbl(void)
 {
-  return disass12;
+  return disass12p0;
 }
 
 
@@ -183,6 +194,148 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
     }
 
   return(strdup(work.c_str()));
+}
+
+
+void
+CL12::post_inst(void)
+{
+  if (post_inc_dec)
+    post_idx_reg->W(post_idx_reg->R() + post_inc_dec);
+}
+
+i16_t
+CL12::s8_16(u8_t op)
+{
+  if (op&0x80)
+    return 0xff00 | op;
+  return op;
+}
+
+t_addr
+CL12::naddr(void)
+{
+  u8_t p= fetch(), h, l;
+  i16_t offset= 0;
+  u16_t ival= 0, a= 0;
+
+  if ((p & 0x20) == 0)
+    {
+      // 1. rr0n nnnn n5,r rr={X,Y,SP,CP}
+      switch (p & 0xc0)
+	{
+	case 0x00: ival= rX; break;
+	case 0x40: ival= rY; break;
+	case 0x80: ival= rSP; break;
+	case 0xc0: ival= PC&0xffff; break;
+	}
+      offset= p&0x1f;
+      if (p&0x10) offset|= 0xffe0;
+      return ival+offset;
+    }
+  
+  else if ((p&0xe7) == 0xe7)
+    {
+      // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
+      switch (p & 0x18)
+	{
+	case 0x00: ival= rX; break;
+	case 0x10: ival= rY; break;
+	case 0x08: ival= rSP; break;
+	case 0x18: ival= PC&0xffff; break;
+	}
+      offset= rD;
+      a= ival+offset;
+      return read_addr(rom, a);
+    }
+  
+  else if ((p&0xe7) == 0xe3)
+    {
+      // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
+      switch (p & 0x18)
+	{
+	case 0x00: ival= rX; break;
+	case 0x10: ival= rY; break;
+	case 0x08: ival= rSP; break;
+	case 0x18: ival= PC&0xffff; break;
+	}
+      h= fetch();
+      l= fetch();
+      offset= h*256+l;
+      a= ival+offset;
+      return read_addr(rom, a);
+    }
+  
+  else if ((p&0xc0) != 0xc0)
+    {
+      // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
+      switch (p & 0xc0)
+	{
+	case 0x00: ival= rX; post_idx_reg= &cX; break;
+	case 0x40: ival= rY; post_idx_reg= &cY; break;
+	case 0x80: ival= rSP; post_idx_reg= &cSP; break;
+	}
+      i8_t n= p&0xf;
+      if (n&0x08) n|= 0xf0;
+      if (p&0x10)
+	{
+	  // post +-
+	  post_inc_dec= n;
+	}
+      else
+	{
+	  // pre +-
+	  post_idx_reg->W(ival= (post_idx_reg->R() + n));
+	}
+      return ival;
+    }
+  
+  else if ((p&0xe4) == 0xe0)
+    {
+      // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
+      switch (p & 0x18)
+	{
+	case 0x00: ival= rX; break;
+	case 0x10: ival= rY; break;
+	case 0x08: ival= rSP; break;
+	case 0x18: ival= PC&0xffff; break;
+	}
+      if ((p&0x02) == 0x00)
+	{
+	  // 9 bit
+	  offset= fetch();
+	  if (p&0x01) offset|= 0xff00;
+	}
+      else
+	{
+	  // 16 bit
+	  h= fetch();
+	  l= fetch();
+	  offset= h*256+l;
+	}
+      return ival+offset;
+    }
+  
+  else // if ((p&0xe4) == 0xe4)
+    {
+      // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
+      switch (p & 0x18)
+	{
+	case 0x00: ival= rX; break;
+	case 0x10: ival= rY; break;
+	case 0x08: ival= rSP; break;
+	case 0x18: ival= PC&0xffff; break;
+	}
+      switch (p&0x03)
+	{
+	case 0x00: offset= s8_16(rA); break;
+	case 0x01: offset= s8_16(rB); break;
+	case 0x02: offset= rD; break;
+	}
+      return ival+offset;
+    }
+  
+  return a;
 }
 
 

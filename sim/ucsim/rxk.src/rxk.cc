@@ -926,7 +926,7 @@ void
 cl_rxk_cpu::print_info(class cl_console_base *con)
 {
   u8_t ss= ruc->mem->get_segsize();
-  u8_t x, y;
+  t_addr x, y;
   x= ss>>4;
   y= ss&0x0f;
   con->dd_color("answer");

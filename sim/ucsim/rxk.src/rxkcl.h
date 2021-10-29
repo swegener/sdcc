@@ -712,7 +712,7 @@ protected:
 public:
   cl_rxk_cpu(class cl_uc *auc);
   virtual int init(void);
-  //virtual int cfg_size() { return rxk_cpu_nuof; }
+  //virtual unsigned int cfg_size() { return rxk_cpu_nuof; }
   virtual const char *cfg_help(t_addr addr);
   
   virtual void write(class cl_memory_cell *cell, t_mem *val);

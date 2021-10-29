@@ -51,7 +51,7 @@ cl_memloc::write(class cl_mem *mem, t_addr addr, t_mem *val)
 /*cl_memloc_coll::cl_memloc_coll(void):
   cl_sorted_list(2, 2)
 {
-  Duplicates= DD_FALSE;
+  Duplicates= false;
 }*/
 
 /*const void *
@@ -728,13 +728,13 @@ cl_m::search_next(bool case_sensitive, t_mem *array, int len, t_addr *addr)
     a= *addr;
   
   if (a+len > size)
-    return(DD_FALSE);
+    return(false);
 
-  found= DD_FALSE;
+  found= false;
   while (!found &&
 	 a+len <= size)
     {
-      bool match= DD_TRUE;
+      bool match= true;
       for (i= 0; i < len && match; i++)
 	{
 	  t_mem d1, d2;
@@ -834,7 +834,7 @@ cl_m::set_brk(t_addr addr, class cl_brk *brk)
       e= 'R';
       break;
     case brkNONE:
-      set_cell_flag(addr, DD_TRUE, CELL_FETCH_BRK);
+      set_cell_flag(addr, true, CELL_FETCH_BRK);
       return;
       break;
     default: e= '.'; break;	  
@@ -915,7 +915,7 @@ cl_m::del_brk(t_addr addr, class cl_brk *brk)
       e= 'R';
       break;
     case brkNONE:
-      set_cell_flag(addr, DD_FALSE, CELL_FETCH_BRK);
+      set_cell_flag(addr, false, CELL_FETCH_BRK);
       return;
       break;
     default: e= '.'; break;

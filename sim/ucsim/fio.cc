@@ -777,8 +777,7 @@ cl_f::process(char c)
 	  echo_cursor_restore();
 	}
     }
-  else if (//(k == 127) || /*DEL*/
-	   (k == TU_DEL))
+  else if (k == TU_DEL)
     {
       if (line[cursor] != 0)
 	{

@@ -436,6 +436,6 @@ int main(int argc, char **argv)
   delete fobj;
   delete view;
   delete sig;
-  delete string;
+  delete[] string;
   return(0);
 }

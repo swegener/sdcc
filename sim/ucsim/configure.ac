@@ -506,7 +506,7 @@ AC_DEFUN([sdcc_IS_SUNPRO],
 # For example: sdcc_VALID_OPT(-fPIC)
 
 AC_DEFUN([sdcc_IS_VALID_OPTION],
-[arg1=`echo $1 | sed -e"s/^-*//" -e"s/-/_/"`
+[arg1=`echo $1 | sed -e"s/^-*//" -e"s/-/_/g"`
 ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
 sdcc_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
 AC_CACHE_CHECK(whether _AC_LANG accepts $1, sdcc_cv_[]_AC_LANG_ABBREV[]_$arg1,
@@ -535,6 +535,7 @@ if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_sizeof_long_long=4
 fi
 
+
 # Checking whether byte ordering is bigendian
 # --------------------------------------------------------
 AC_C_BIGENDIAN
@@ -558,9 +559,9 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
 
   sdcc_IS_VALID_OPTION(-ggdb)
   sdcc_IS_VALID_OPTION(-gstabs)
-  if test "$ucsim_cv_cxx_gstabs" = "yes"; then
+  if test "$sdcc_cv_cxx_gstabs" = "yes"; then
     gopt="-gstabs+ -g3"
-  elif test "$ucsim_cv_cxx_ggdb" = "yes"; then
+  elif test "$sdcc_cv_cxx_ggdb" = "yes"; then
     gopt="-ggdb -g3"
   else
     gopt="-g"
@@ -572,12 +573,17 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
   fi
 
   sdcc_IS_VALID_OPTION(-pipe)
-  if test "$ucsim_cv_cxx_pipe" = "yes"; then
+  if test "$sdcc_cv_cxx_pipe" = "yes"; then
     CXXFLAGS="$CXXFLAGS -pipe"
   fi
-
+  
   MAKEDEP="$CXX $ucsim_cv_MM"
   WALL_FLAG="-Wall"
+
+  sdcc_IS_VALID_OPTION(-Wno-overloaded-virtual)
+  if test "$sdcc_cv_cxx_Wno_overloaded_virtual" = "yes"; then
+      WALL_FLAG="$WALL_FLAG -Wno-overloaded-virtual"
+  fi
 else
   sdcc_IS_SUNPRO
   if test "$sdcc_cv_cxx_compiler_sunpro" = "yes"; then

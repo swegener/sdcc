@@ -70,7 +70,7 @@ cl_flash_as::cl_flash_as(const char *id, t_addr astart, t_addr asize):
   for (i= 0; i < size; i++)
     {
       void *p= &(cella[i]);
-      memcpy(p, cell, sizeof(class cl_memory_cell));
+      memcpy(p, (void*)cell, sizeof(class cl_memory_cell));
       cella[i].init();
     }
   dummy= new cl_dummy_cell(8);

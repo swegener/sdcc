@@ -26,8 +26,8 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir) -I$(srcdir) \
                   -I$(top_srcdir)/$(SIMDIR) \
 		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
-CFLAGS          = @CFLAGS@ -I$(top_builddir) @WALL_FLAG@
-CXXFLAGS        = @CXXFLAGS@ -I$(top_builddir) @WALL_FLAG@
+CFLAGS          = @WALL_FLAG@ @CFLAGS@ -I$(top_builddir)
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ -I$(top_builddir)
 WINSOCK_AVAIL   = @WINSOCK_AVAIL@
 LDFLAGS		= @LDFLAGS@
 

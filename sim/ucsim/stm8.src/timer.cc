@@ -197,7 +197,7 @@ cl_tim::read(class cl_memory_cell *cell)
   a-= base;
 
   if (a == idx.pscrl)
-    v= prescaler_preload && 0xff;
+    v= prescaler_preload & 0xff;
   else if (a == idx.pscrh)
     v= (prescaler_preload >> 8) & 0xff;
     

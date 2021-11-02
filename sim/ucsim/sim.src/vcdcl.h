@@ -58,7 +58,7 @@ class cl_vcd: public cl_hw
 
   int tick(int cycles);
 
-  void report(struct cl_vcd_var *var, t_mem v);
+  void report(class cl_vcd_var *var, t_mem v);
   void print_info(class cl_console_base *con);
 
  private:

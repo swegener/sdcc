@@ -454,7 +454,7 @@ cl_cia::set_sr_irq(void)
   bool t= false, r= false;
   u8_t c= r_cr->get(), s= r_sr->get();
   t= ((c & 0x60) == 0x20) && (s & 2);
-  r= (c & 0x80) && (s && 1);
+  r= (c & 0x80) && (s & 1);
   s&= 0x7f;
   if (r || t)
     s|= 0x80;

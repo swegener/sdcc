@@ -483,7 +483,8 @@ noi2sym (char *filename)
   char read = ' ';
   // no$gmb's implementation is limited to 32 character labels
   // we can safely throw away the rest
-  char label[33];
+  #define SYM_FILE_NAME_LEN_MAX 32
+  char label[SYM_FILE_NAME_LEN_MAX + 1];
   // 0x + 6 digit hex number
   // -> 65536 rom banks is the maximum homebrew cartrideges support (TPP1)
   char value[9];
@@ -539,7 +540,7 @@ noi2sym (char *filename)
       if (strncmp(value, "DEF ", 4) == 0)
         {
           // read label
-          for (i = 0; i < 32; ++i)
+          for (i = 0; i < (SYM_FILE_NAME_LEN_MAX - 1); ++i)
             {
               label[i] = read;
               if ((read = fgetc(noi)) == EOF || read == '\r' || read == '\n' || read == ' ')
@@ -573,7 +574,7 @@ noi2sym (char *filename)
           // we successfully read label and value
 
           // but filter out some invalid symbols
-          if (strcmp(label, ".__.ABS.") != 0 && strncmp(label, "l__", 3) != 0)
+          if (strcmp(label, ".__.ABS.") != 0)
             fprintf (sym, "%02X:%04X %s\n", (unsigned int)(strtoul(value, NULL, 0)>>16), (unsigned int)strtoul(value, NULL, 0)&0xFFFF, label);
         }
       else

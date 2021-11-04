@@ -1,3 +1,8 @@
+2021-11-04 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* support/makebin/makebin.c:
+	  Fix buffer overflow, patch #400 by bbbbbr.
+
 2021-10-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/makebin/makebin.c:

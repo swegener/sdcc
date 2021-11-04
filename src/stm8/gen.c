@@ -2140,7 +2140,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     const int ih = result->regs[XH_IDX] - roffset;
     const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, YL_IDX));
     const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, YH_IDX));
-    if (source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0 &&
+    if (source->regs[XL_IDX] < soffset && source->regs[XH_IDX] < soffset &&
       (assign_l && assign_h || assign_l && xh_dead && ih < 0 || assign_h && xl_dead && il < 0))
     {
       emit3w (A_LDW, ASMOP_X, ASMOP_Y);
@@ -2165,7 +2165,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     const int ih = result->regs[YH_IDX] - roffset;
     const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
     const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
-    if (source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0 &&
+    if (source->regs[YL_IDX] < soffset && source->regs[YH_IDX] < soffset &&
       (assign_l && assign_h || assign_l && yh_dead && ih < 0 || assign_h && yl_dead && il < 0))
     {
       if(x_dead && assign_l && assign_h)

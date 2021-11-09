@@ -178,39 +178,40 @@ ULE (C or Z) = 1 Result (unsigned) is <= 0
 #define	S_BIT	91
 #define	S_SET	92
 #define	S_RES	93
+#define	S_TSET	94
 
-#define	S_AND	94
-#define	S_CP	95
-#define	S_OR	96
-#define	S_XOR	97
+#define	S_AND	95
+#define	S_CP	96
+#define	S_OR	97
+#define	S_XOR	98
 
 // must be ordered!
-#define	S_RLC	98
-#define	S_RRC	99
-#define	S_RL	100
-#define	S_RR	101
-#define	S_SLA	102
-#define	S_SRA	103
-#define	S_SLL	104
-#define	S_SRL	105
+#define	S_RLC	99
+#define	S_RRC	100
+#define	S_RL	101
+#define	S_RR	102
+#define	S_SLA	103
+#define	S_SRA	104
+#define	S_SLL	105
+#define	S_SRL	106
 
-#define	S_LDI	106
-#define	S_LDIR	107
-#define	S_LDD	108
-#define	S_LDDR	109
-#define	S_CPI	110
-#define	S_CPIR	111
-#define	S_CPD	112
-#define	S_CPDR	113
+#define	S_LDI	107
+#define	S_LDIR	108
+#define	S_LDD	109
+#define	S_LDDR	110
+#define	S_CPI	111
+#define	S_CPIR	112
+#define	S_CPD	113
+#define	S_CPDR	114
 
-#define	S_LDAR	114
+#define	S_LDAR	115
 
-#define	S_LDW	115
+#define	S_LDW	116
 
-#define	S_RLD	116
-#define	S_RRD	117
+#define	S_RLD	117
+#define	S_RRD	118
 
-#define S_CALLR 118
+#define S_CALLR 119
 
 // .t90
 #define	S_CPU	123

@@ -178,6 +178,7 @@ struct  mne     mne[] = {
     {   NULL,   "bit",          S_BIT,          0,      0xA8    },
     {   NULL,   "res",          S_RES,          0,      0xB0    },
     {   NULL,   "set",          S_SET,          0,      0xB8    },
+    {   NULL,   "tset",         S_TSET,         0,      0x18    },
 
 
     {   NULL,   "rld",          S_RLD,          0,      0x10    },

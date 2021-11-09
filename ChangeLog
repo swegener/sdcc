@@ -1,3 +1,14 @@
+2021-11-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdatomic.h,
+	  device/lib/tlcs90/atomic_flag_test_and_set.s,
+	  device/lib/atomic_flag_clear.c:
+	  Improve atomic_flag using TLCS-90 test-and-set instruction.
+	* sdas/astlcs90/t90.h,
+	  sdas/astlcs90/t90mch.c,
+	  sdas/astlcs90/t90pst.c:
+	  Support tset.
+
 2021-11-04 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:

@@ -12378,7 +12378,7 @@ end:
 
 /*-----------------------------------------------------------------*/
 /* unpackMaskA - generate masking code for unpacking last byte     */
-/* of bitfiled. And mask for unsigned, sign extension for signed.  */
+/* of bitfield. And mask for unsigned, sign extension for signed.  */
 /*-----------------------------------------------------------------*/
 static void
 unpackMaskA(sym_link *type, int len)

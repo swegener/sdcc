@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  atomic_flag_test_and_set.s
 ;
-;  Copyright (C) 2020, Philipp Klaus Krause
+;  Copyright (C) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -32,10 +32,10 @@
 
 _atomic_flag_test_and_set:
 	ld	hl, 2 (sp)
-	xor a, a
-	srl	(hl)
-	ccf
-	rla
+	xor	a, a
+	tset	0, (hl)
 	ld	l, a
+	ret	Z
+	inc	l
 	ret
 

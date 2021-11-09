@@ -1002,6 +1002,7 @@ machine(struct mne *mp)
     case S_BIT:
     case S_RES:
     case S_SET:
+    case S_TSET:
       t1 = addr(&e1);
       v1 = (int) e1.e_addr;
       comma(1);

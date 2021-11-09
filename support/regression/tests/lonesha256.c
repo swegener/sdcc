@@ -2,7 +2,7 @@
    sha256.c
    sha256 hash function (once gave wrong result on gbz80)
 
-   Test uses implementation from lonesha256.
+   Test uses the implementation from lonesha256.
 */
 
 #include <testfwk.h>

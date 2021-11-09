@@ -1,5 +1,10 @@
 2021-11-09 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/tinyaes.c:
+	  AES regression test.
+
+2021-11-09 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/include/stdatomic.h,
 	  device/lib/tlcs90/atomic_flag_test_and_set.s,
 	  device/lib/atomic_flag_clear.c:

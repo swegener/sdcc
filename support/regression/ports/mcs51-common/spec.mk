@@ -1,7 +1,7 @@
 # Common regression test specification for the mcs51 targets running with uCsim
 
 # simulation timeout in seconds
-SIM_TIMEOUT = 80
+SIM_TIMEOUT = 800
 
 # path to uCsim
 ifdef SDCC_BIN_PATH

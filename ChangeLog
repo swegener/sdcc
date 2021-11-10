@@ -1,5 +1,10 @@
 2021-11-10 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/atomic_flag_clear.c:
+	  Fix handling of atomic_flag with clear state 1.
+
+2021-11-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/ralloc.c,
 	  src/stm8/gen.c:
 	  Improve rematerialization of stack addresses.

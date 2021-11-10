@@ -1002,7 +1002,7 @@ aopForRemat (symbol *sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop;
-  int val = 0;
+  long val = 0;
 
   wassert_bt (ic);
 
@@ -1012,18 +1012,18 @@ aopForRemat (symbol *sym)
         {
           if (isOperandLiteral (IC_RIGHT (ic)))
             {
-              val += (int) operandLitValue (IC_RIGHT (ic));
+              val += (long) operandLitValue (IC_RIGHT (ic));
               ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
             }
           else
             {
-              val += (int) operandLitValue (IC_LEFT (ic));
+              val += (long) operandLitValue (IC_LEFT (ic));
               ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
             }
         }
       else if (ic->op == '-')
         {
-          val -= (int) operandLitValue (IC_RIGHT (ic));
+          val -= (long) operandLitValue (IC_RIGHT (ic));
           ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
         }
       else if (IS_CAST_ICODE (ic))
@@ -1032,7 +1032,7 @@ aopForRemat (symbol *sym)
         }
       else if (ic->op == ADDRESS_OF)
         {
-          val += (int) operandLitValue (IC_RIGHT (ic));
+          val += (long) operandLitValue (IC_RIGHT (ic));
           break;
         }
       else
@@ -7997,7 +7997,7 @@ genPointerGet (const iCode *ic)
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
   int size, i;
-  unsigned offset;
+  long offset;
   bool use_y;
   bool pushed_x = false;
   bool pushed_a = false;
@@ -8022,8 +8022,7 @@ genPointerGet (const iCode *ic)
 
   size = result->aop->size;
 
-  // todo: What if right operand is negative?
-  offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
+  offset = operandLitValue (IC_RIGHT(ic));
 
   // Long pointer indirect long addressing mode is useful only in one very specific case:
   if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && regDead (A_IDX, ic))

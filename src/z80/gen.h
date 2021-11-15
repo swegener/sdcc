@@ -36,6 +36,8 @@ typedef enum
   AOP_STK,
   /* Is an immediate value */
   AOP_IMMD,
+  /* Is an address on the stack */
+  AOP_STL,
   /* Is a string (?) */
   AOP_STR,
   /* Is in the carry register */
@@ -71,7 +73,7 @@ typedef struct asmop
     reg_info *aop_reg[4];       /* array of registers */
     char *aop_dir;              /* if direct  */
     char *aop_immd;             /* if immediate others are implied */
-    int aop_stk;                /* stack offset when AOP_STK */
+    int aop_stk;                /* stack offset when AOP_STK or AOP_STL*/
     const char *aop_str[4];     /* just a string array containing the location */
     int aop_pairId;             /* The pair ID */
   }

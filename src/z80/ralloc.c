@@ -1011,7 +1011,7 @@ packRegisters (eBBlock * ebp)
       /* if this is an itemp & result of a address of a true sym
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
-          IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) /* The receiving of the paramter isnot accounted for in DEFS */ &&
+          IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) /* The receiving of the parameter is not accounted for in DEFS */ &&
           IS_TRUE_SYMOP (IC_LEFT (ic)) && !OP_SYMBOL (IC_LEFT (ic))->onStack)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
@@ -1023,7 +1023,7 @@ packRegisters (eBBlock * ebp)
       /* if straight assignment then carry remat flag if this is the
          only definition */
       if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat &&
-        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the paramter isnot accounted for in DEFS */
+        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the parameter is not accounted for in DEFS */
         !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
@@ -1034,7 +1034,7 @@ packRegisters (eBBlock * ebp)
          cast is remat, then we can remat this cast as well */
       if (ic->op == CAST &&
           IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat &&
-          !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the paramter isnot accounted for in DEFS */
+          !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the parameter is not accounted for in DEFS */
           !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));

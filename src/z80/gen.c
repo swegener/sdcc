@@ -2329,7 +2329,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
 
   if (aop->type == AOP_STL && !offset)
     {
-      if (pairId != PAIR_HL && pairId != PAIR_DE)
+      if (pairId != PAIR_HL && pairId != PAIR_DE || IS_GB && pairId == PAIR_DE)
         UNIMPLEMENTED;
 
       if (pairId == PAIR_DE)
@@ -4286,7 +4286,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (source->type == AOP_STL && !i && size == 2 && getPairId_o(result, roffset) == PAIR_DE) // For result in de, we don't need hl dead.
+      else if (!IS_GB && source->type == AOP_STL && !i && size == 2 && getPairId_o(result, roffset) == PAIR_DE) // For result in de, we don't need hl dead.
         {
           if (!hl_dead_global)
             {
@@ -4310,10 +4310,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       else if (source->type == AOP_STL)
         {
           if (i || soffset || !hl_dead_global)
-            {
-              cost (1000, 1000);
-              wassert_bt (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
           if (!f_dead)
             _push (PAIR_AF);
           emit2 ("ld hl, !immed%d", spOffset (source->aopu.aop_stk));

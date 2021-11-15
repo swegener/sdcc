@@ -2327,7 +2327,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
 {
   emitDebug (";fetchPairLong");
 
-  if (aop->type == AOP_STL)
+  if (aop->type == AOP_STL && !offset)
     {
       if (pairId != PAIR_HL && pairId != PAIR_DE)
         UNIMPLEMENTED;
@@ -2340,6 +2340,16 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         emit2 ("ex de, hl");
       regalloc_dry_run_cost += 4 + 2 * (pairId != PAIR_HL);
       spillPair (pairId);
+      return;
+    }
+  else if (aop->type == AOP_STL && offset >= 2)
+    {
+      fetchLitPair (pairId, ASMOP_ZERO, 0, true);
+      return;
+    }
+  else if (aop->type == AOP_STL)
+    {
+      UNIMPLEMENTED;
       return;
     }
 
@@ -3270,8 +3280,10 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
         }
 
       _push (PAIR_HL);
+      _push (PAIR_AF); // Preserve f
       emit2 ("ld hl, !immed%d", spOffset(from->aopu.aop_stk));
       emit2 ("add hl, sp");
+      _pop (PAIR_AF);
       regalloc_dry_run_cost += 4;
       spillPair (PAIR_HL);
       cheapMove (to, to_offset, ASMOP_HL, from_offset, a_dead);
@@ -4263,10 +4275,14 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else if (source->type == AOP_STL && !(soffset + i) && getPairId_o(result, roffset) == PAIR_IY)
         {
+          if (!f_dead)
+            _push (PAIR_AF);
           emit2 ("ld iy, !immed%d", spOffset (source->aopu.aop_stk));
           emit2 ("add iy, sp");
+          if (!f_dead)
+            _pop (PAIR_AF);
           spillPair (PAIR_IY);
-          regalloc_dry_run_cost += 6;
+          regalloc_dry_run_cost += 6 + 2 * !f_dead;
           i += 2;
           continue;
         }
@@ -4277,10 +4293,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               emit2 ("ex de, hl");
               regalloc_dry_run_cost++;
             }
+          else
+            spillPair (PAIR_HL);
+          if (!f_dead)
+            _push (PAIR_AF);
           emit2 ("ld hl, !immed%d", spOffset (source->aopu.aop_stk));
           emit2 ("add hl, sp");
+          if (!f_dead)
+            _pop (PAIR_AF);
           emit2 ("ex de, hl");
-          regalloc_dry_run_cost += 5;
+          regalloc_dry_run_cost += 5 + 2 * !f_dead;;
           spillPair (PAIR_DE);
           i += 2;
           continue;
@@ -4292,9 +4314,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               cost (1000, 1000);
               wassert_bt (regalloc_dry_run);
             }
+          if (!f_dead)
+            _push (PAIR_AF);
           emit2 ("ld hl, !immed%d", spOffset (source->aopu.aop_stk));
           emit2 ("add hl, sp");
-          regalloc_dry_run_cost += 4;
+          if (!f_dead)
+            _pop (PAIR_AF);
+          regalloc_dry_run_cost += 4 + 2 * !f_dead;;
           spillPair (PAIR_HL);
           genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead_global, true, de_dead_global, iy_dead_global, f_dead);
           i += 2;
@@ -9490,7 +9516,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
       _push (pair);
       while (size--)
         {
-          cheapMove (pair == PAIR_BC ? ASMOP_BC : (pair == PAIR_DE ? ASMOP_DE : ASMOP_HL), 0, left->aop, 0, true);
+          cheapMove (pair == PAIR_BC ? ASMOP_BC : (pair == PAIR_DE ? ASMOP_DE : ASMOP_HL), 0, left->aop, offset, true);
           cheapMove (ASMOP_A, 0, right->aop, offset, true);
           emit2 ("sub a,%s", _pairs[pair].l);
           regalloc_dry_run_cost += 1;
@@ -10701,7 +10727,7 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
             pushed_a = true;
           }
 
-        if (aopInReg (right_aop, i, A_IDX))
+        if (aopInReg (right_aop, i, A_IDX) && left_aop->type != AOP_STL)
           {
             if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
               _push (PAIR_HL);
@@ -10709,6 +10735,8 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
             if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
               _pop (PAIR_HL);
           }
+        else if (right_aop->type == AOP_STL)
+          UNIMPLEMENTED;
         else
           {
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
@@ -15585,7 +15613,10 @@ genZ80iCode (iCode * ic)
      this has already been generated then
      do nothing */
   if (resultRemat (ic) || ic->generated)
-    return;
+    {
+      emitDebug ("; skipping iCode since result will be rematerialized");
+      return;
+    }
 
   /* depending on the operation */
   switch (ic->op)

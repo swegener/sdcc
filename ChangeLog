@@ -1,7 +1,7 @@
 2021-11-16 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:
-	  Preparations for the rematerialization of stack locations.
+	  Rematerialization of stack locations.
 
 2021-11-15 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 

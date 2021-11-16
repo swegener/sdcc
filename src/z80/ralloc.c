@@ -1012,7 +1012,7 @@ packRegisters (eBBlock * ebp)
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
           IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) /* The receiving of the parameter is not accounted for in DEFS */ &&
-          IS_TRUE_SYMOP (IC_LEFT (ic)) && !OP_SYMBOL (IC_LEFT (ic))->onStack)
+          IS_TRUE_SYMOP (IC_LEFT (ic)))
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;

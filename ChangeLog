@@ -1,5 +1,15 @@
 2021-11-16 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
+	* src/SDCCglobl.h,
+	  src/SDCCmain.c,
+	  src/z80/gen.c,
+	  src/z80/mappings.i,
+	  doc/sdccman.lyx,
+	  .version:
+	  Remove profiling support.
+
+2021-11-16 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
 	* src/z80/gen.c:
 	  Rematerialization of stack locations.
 

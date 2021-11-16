@@ -276,7 +276,6 @@ struct options
     int noRegParams;            /* Disable passing some parameters in registers */
     int verbose;                /* Show what the compiler is doing */
     int lessPedantic;           /* disable some warnings */
-    int profile;                /* Turn on extra profiling information */
     int omitFramePtr;           /* Turn off the frame pointer. */
     int useAccelerator;         /* use ds390 Arithmetic Accelerator */
     int noiv;                   /* do not generate irq vector table entries */

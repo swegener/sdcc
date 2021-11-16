@@ -37,14 +37,6 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     },
     { "adjustsp", "add sp, #-%d" },
     { "fileprelude", "" },
-    { "profileenter",
-      "ld a, #3\n"
-      "rst\t0x08"
-    },
-    { "profileexit",
-      "ld a, #4\n"
-      "rst\t0x08"
-    },
     { "here", "." },
     { NULL, NULL }
 };
@@ -102,14 +94,6 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
       "pop\taf"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
-    { "profileenter",
-      "ld a,#3\n"
-      "rst\t0x08"
-    },
-    { "profileexit",
-      "ld a,#4\n"
-      "rst\t0x08"
-    },
     { "here", "." },
     { NULL, NULL }
 };
@@ -167,14 +151,6 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
       "pop\taf"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
-    { "profileenter",
-      "ld a,#3\n"
-      "rst\t0x28"
-    },
-    { "profileexit",
-      "ld a,#4\n"
-      "rst\t0x28"
-    },
     { NULL, NULL }
 };
 
@@ -456,14 +432,6 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
       "pop\taf"
     },
     { "adjustsp", "lda sp, (sp%+d)" },
-    { "profileenter",
-      "ld a,3\n"
-      "rst\t$08"
-    },
-    { "profileexit",
-      "ld a,4\n"
-      "rst\t$08"
-    },
     { NULL, NULL }
 };
 static const ASM_MAPPING _gas_gb_mapping[] = {
@@ -503,14 +471,6 @@ static const ASM_MAPPING _gas_gb_mapping[] = {
     },
     { "adjustsp", "lda\tsp, -%d (sp)" },
     { "fileprelude", "" },
-    { "profileenter",
-                "ld\ta, #3\n"
-                "rst\t0x08"
-    },
-    { "profileexit",
-                "ld\ta, #4\n"
-                "rst\t0x08"
-    },
     { NULL, NULL }
 };
 
@@ -573,14 +533,6 @@ static const ASM_MAPPING _gas_z80_mapping[] = {
 		"pop\taf"
     },
     { "adjustsp", "lda\tsp,-%d (sp)" },
-    { "profileenter",
-                "ld\ta, #3\n"
-                "rst\t0x08"
-    },
-    { "profileexit",
-                "ld\ta, #4\n"
-                "rst\t0x08"
-    },
     { NULL, NULL }
 };
 

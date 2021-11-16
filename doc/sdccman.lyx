@@ -2692,6 +2692,10 @@ In 4.1.12, the default calling convention switched from __sdccall(0) to __sdccal
 In 4.1.12, support for –profile has been removed for z80, z180, z80n.
 \end_layout
 
+\begin_layout Itemize
+In 4.1.13, support for –profile has been removed.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

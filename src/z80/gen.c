@@ -6165,11 +6165,6 @@ genFunction (const iCode * ic)
         }
     }
 
-  if (!IS_GB && !IS_Z80 && !IS_Z180 && !IS_Z80N && options.profile)
-    {
-      emit2 ("!profileenter");
-    }
-
   if (z80_opts.calleeSavesBC)
     {
       bcInUse = TRUE;
@@ -6370,11 +6365,6 @@ genEndFunction (iCode *ic)
       emit2 ("pop bc");
       regalloc_dry_run_cost++;
       _G.calleeSaves.pushedBC = FALSE;
-    }
-
-  if (!IS_GB && !IS_Z80 && !IS_Z180 && !IS_Z80N && options.profile)
-    {
-      emit2 ("!profileexit");
     }
 
   /* if this is an interrupt service routine

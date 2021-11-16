@@ -218,7 +218,6 @@ static const OPTION optionsTable[] = {
   {0,   "--float-reent", &options.float_rent, "Use reentrant calls on the float support functions"},
   {0,   "--xram-movc", &options.xram_movc, "Use movc instead of movx to read xram (xdata)"},
   {0,   OPTION_CALLEE_SAVES, &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers instead of the caller", CLAT_SET},
-  {0,   "--profile", &options.profile, "On supported ports, generate extra profiling information"},
   {0,   "--fomit-frame-pointer", &options.omitFramePtr, "Leave out the frame pointer."},
   {0,   "--all-callee-saves", &options.all_callee_saves, "callee will always save registers used"},
   {0,   "--stack-probe", &options.stack_probe, "insert call to function __stack_probe at each function prologue"},

@@ -2329,8 +2329,24 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
 
   if (aop->type == AOP_STL && !offset)
     {
-      if (pairId != PAIR_HL && pairId != PAIR_DE || IS_GB && pairId == PAIR_DE)
-        UNIMPLEMENTED;
+      if (IS_GB && pairId == PAIR_DE || pairId == PAIR_BC)
+        {
+          _push (PAIR_HL);
+          emit2 ("ld hl, !immed%d", spOffset(aop->aopu.aop_stk));
+          emit2 ("add hl, sp");
+          emit2 ("ld %s, l", _pairs[pairId].l);
+          emit2 ("ld %s, h", _pairs[pairId].h);
+          regalloc_dry_run_cost += 6;
+          _pop (PAIR_HL);
+          return;
+        }
+      else if (pairId == PAIR_IY)
+        {
+          emit2 ("ld iy, !immed%d", spOffset(aop->aopu.aop_stk));
+          emit2 ("add iy, sp");
+          regalloc_dry_run_cost += 6;
+          return;
+        }
 
       if (pairId == PAIR_DE)
         emit2 ("ex de, hl");
@@ -4265,7 +4281,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       bool hl_dead = hl_dead_global && source->regs[L_IDX] <= i && source->regs[H_IDX] <= i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= i) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= i);
       bool iy_dead = iy_dead_global && source->regs[IYL_IDX] <= i && source->regs[IYH_IDX] <= i && (result->regs[IYL_IDX] < 0 || result->regs[IYL_IDX] >= i) && (result->regs[IYH_IDX] < 0 || result->regs[IYH_IDX] >= i);
 
-      if (IS_EZ80_Z80 && source->type == AOP_STL && !(soffset + i) && getPairId_o(result, roffset) != PAIR_INVALID &&
+      if (source->type == AOP_STL && (soffset + i) >= 2)
+        {
+          genMove_o (result, roffset + i, ASMOP_ZERO, 0, size - i, a_dead, hl_dead, false, iy_dead, f_dead);
+          return;
+        }
+      else if (IS_EZ80_Z80 && source->type == AOP_STL && !(soffset + i) && getPairId_o(result, roffset) != PAIR_INVALID &&
         !_G.omitFramePtr && abs(fpOffset (source->aopu.aop_stk)) <= 127)
         {
           emit2 ("lea %s, ix, !immed%d", _pairs[getPairId_o(result, roffset)].name, fpOffset (source->aopu.aop_stk));
@@ -4286,9 +4307,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
-      else if (!IS_GB && source->type == AOP_STL && !i && size == 2 && getPairId_o(result, roffset) == PAIR_DE) // For result in de, we don't need hl dead.
+      else if (!IS_GB && source->type == AOP_STL && !(soffset + i) && size == 2 && getPairId_o(result, roffset) == PAIR_DE) // For result in de, we don't need hl dead.
         {
-          if (!hl_dead_global)
+          if (!hl_dead)
             {
               emit2 ("ex de, hl");
               regalloc_dry_run_cost++;
@@ -4309,7 +4330,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else if (source->type == AOP_STL)
         {
-          if (i || soffset || !hl_dead_global)
+          if (i || soffset || !hl_dead)
             UNIMPLEMENTED;
           if (!f_dead)
             _push (PAIR_AF);
@@ -4319,7 +4340,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             _pop (PAIR_AF);
           regalloc_dry_run_cost += 4 + 2 * !f_dead;;
           spillPair (PAIR_HL);
-          genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead_global, true, de_dead_global, iy_dead_global, f_dead);
+          genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead, true, de_dead_global, iy_dead, f_dead);
           i += 2;
           continue;
         }
@@ -7036,7 +7057,7 @@ genPlus (iCode * ic)
      if left requires ACC or right is already
      in ACC */
   if ((IC_LEFT (ic)->aop->type == AOP_LIT) || (AOP_NEEDSACC (IC_RIGHT (ic))) || aopInReg (IC_RIGHT (ic)->aop, 0, A_IDX) ||
-    IC_LEFT (ic)->aop->type == AOP_STK && IC_RIGHT (ic)->aop->type == AOP_STL)
+    IC_LEFT (ic)->aop->regs[A_IDX] < 0 && IC_RIGHT (ic)->aop->type == AOP_STL)
     {
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
@@ -7378,9 +7399,39 @@ genPlus (iCode * ic)
         leftop->regs[E_IDX] <= i && leftop->regs[D_IDX] <= i &&
         rightop->regs[E_IDX] <= i && rightop->regs[D_IDX] <= i &&
         (IC_RESULT (ic)->aop->regs[E_IDX] < 0 || IC_RESULT (ic)->aop->regs[E_IDX] >= i) && (IC_RESULT (ic)->aop->regs[D_IDX] < 0 || IC_RESULT (ic)->aop->regs[D_IDX] >= i);
-     
+      const bool hl_dead = isPairDead (PAIR_HL, ic) &&
+        leftop->regs[L_IDX] <= i && leftop->regs[H_IDX] <= i &&
+        rightop->regs[L_IDX] <= i && rightop->regs[H_IDX] <= i &&
+        (IC_RESULT (ic)->aop->regs[L_IDX] < 0 || IC_RESULT (ic)->aop->regs[L_IDX] >= i) && (IC_RESULT (ic)->aop->regs[H_IDX] < 0 || IC_RESULT (ic)->aop->regs[H_IDX] >= i);
+
+      // Rematerialization of addresses on the stack.
+      if (leftop->type == AOP_STL && !i && rightop->type == AOP_LIT && hl_dead)
+        {
+          emit2 ("ld hl, !immed%d", spOffset (leftop->aopu.aop_stk) + (ulFromVal (rightop->aopu.aop_lit) & 0xffff));
+          emit2 ("add hl, sp");
+          spillPair (PAIR_HL);
+          regalloc_dry_run_cost += 4;
+          started = true;
+          genMove_o (IC_RESULT (ic)->aop, 0, ASMOP_HL, 0, 2, true, true, de_dead, false, i + 2 == size);
+          i += 2;
+          continue;
+        }
+      else if (leftop->type == AOP_STL && !i && (getPairId (rightop) == PAIR_BC || getPairId (rightop) == PAIR_DE || de_dead))
+        {
+          PAIR_ID pair = getPairId (rightop);
+          if (pair != PAIR_BC)
+            pair = PAIR_DE;
+          genMove (pair == PAIR_BC ? ASMOP_BC : ASMOP_DE, rightop, true, true, de_dead, false);
+          genMove (ASMOP_HL, leftop, true, true, de_dead && pair != PAIR_DE, false);
+          emit2 ("add hl, %s", _pairs[pair].name);
+          regalloc_dry_run_cost++;
+          started = true;
+          genMove_o (IC_RESULT (ic)->aop, 0, ASMOP_HL, 0, 2, true, true, de_dead, false, i + 2 == size);
+          i += 2;
+          continue;
+        }
       // Addition of interleaved pairs.
-      if ((!premoved || i) && leftop->size - i >= 2 && rightop->size - i >= 2 &&
+      else if ((!premoved || i) && leftop->size - i >= 2 && rightop->size - i >= 2 &&
         (aopInReg (IC_RESULT (ic)->aop, i, HL_IDX) || aopInReg (IC_RESULT (ic)->aop, i, IY_IDX) && !started))
         {
           const bool iy = aopInReg (IC_RESULT (ic)->aop, i, IY_IDX);
@@ -7663,7 +7714,16 @@ genPlus (iCode * ic)
               }
             else // Can't handle both sides in iy.
               UNIMPLEMENTED;
-          
+
+          if (rightop->type == AOP_STL && i < 2) // can't handle rematerialized stack location on the right.
+            {
+              operand *t = IC_RIGHT (ic);
+              IC_RIGHT (ic) = IC_LEFT (ic);
+              IC_LEFT (ic) = t;
+              leftop = IC_LEFT (ic)->aop;
+              rightop = IC_RIGHT (ic)->aop;
+            }
+
           if (!premoved)
             cheapMove (ASMOP_A, 0, leftop, i, true);
           else
@@ -7677,7 +7737,7 @@ genPlus (iCode * ic)
               emit3 (aopIsLitVal (rightop, i, 1, 1) ? A_INC : A_DEC, ASMOP_A, 0);
               started = TRUE;
             }
-          else if (rightop->type == AOP_STL)
+          else if (rightop->type == AOP_STL && i < 2)
             UNIMPLEMENTED;
           else
             {

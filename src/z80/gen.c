@@ -4290,6 +4290,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         !_G.omitFramePtr && abs(fpOffset (source->aopu.aop_stk)) <= 127)
         {
           emit2 ("lea %s, ix, !immed%d", _pairs[getPairId_o(result, roffset)].name, fpOffset (source->aopu.aop_stk));
+          spillPair (getPairId_o(result, roffset));
           regalloc_dry_run_cost += 3;
           i += 2;
           continue;
@@ -7416,7 +7417,7 @@ genPlus (iCode * ic)
           i += 2;
           continue;
         }
-      else if (leftop->type == AOP_STL && !i && (getPairId (rightop) == PAIR_BC || getPairId (rightop) == PAIR_DE || de_dead))
+      else if (leftop->type == AOP_STL && !i && hl_dead && (getPairId (rightop) == PAIR_BC || getPairId (rightop) == PAIR_DE || de_dead))
         {
           PAIR_ID pair = getPairId (rightop);
           if (pair != PAIR_BC)
@@ -7714,8 +7715,7 @@ genPlus (iCode * ic)
               }
             else // Can't handle both sides in iy.
               UNIMPLEMENTED;
-
-          if (rightop->type == AOP_STL && i < 2) // can't handle rematerialized stack location on the right.
+          else if (rightop->type == AOP_STL && i < 2) // can't handle rematerialized stack location on the right.
             {
               operand *t = IC_RIGHT (ic);
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -12974,8 +12974,8 @@ genPointerGet (const iCode *ic)
       if (left->aop->type == AOP_IMMD)
         {
           emit2 ("ld %s, %s", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval, TRUE));
-          spillPair (pair);
           regalloc_dry_run_cost += 3;
+          spillPair (pair);
           rightval = 0;
         }
       else if (pair == PAIR_HL && rightval > 2 && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE)) // Cheaper than moving to hl followed by offset adjustment.
@@ -12983,6 +12983,7 @@ genPointerGet (const iCode *ic)
           emit2 ("ld hl, !immed%d", rightval);
           emit2 ("add hl, %s", _pairs[getPairId (left->aop)].name);
           regalloc_dry_run_cost += 4;
+          spillPair (pair);
           rightval = 0;
         }
       else if (pair == PAIR_HL && left->aop->type == AOP_STL)
@@ -12990,6 +12991,7 @@ genPointerGet (const iCode *ic)
           emit2 ("ld hl, !immed%d", spOffset (left->aop->aopu.aop_stk) + rightval);
           emit2 ("add hl, sp");
           regalloc_dry_run_cost += 4;
+          spillPair (pair);
           rightval = 0;
         }
       else

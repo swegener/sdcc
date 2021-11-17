@@ -233,13 +233,13 @@ cl_mcs6502::disassc(t_addr addr, chars *comment)
 	    case 'j': // JMP abs
 	      l= rom->read(addr+1);
 	      h= rom->read(addr+2);
-	      a= h*256+1;
+	      a= h*256+l;
 	      work.appendf("$%04x", a);
 	      break;
 	    case 'J': // JMP (ind)
 	      l= rom->read(addr+1);
 	      h= rom->read(addr+2);
-	      a= h*256+1;
+	      a= h*256+l;
 	      work.appendf("($%04x)", a);
 	      temp.appendf("; [$%04x]=$%04x", a, read_addr(rom, a));
 	      break;

@@ -327,18 +327,35 @@ z80_init_asmops (void)
 }
 
 static bool regalloc_dry_run;
-static unsigned int regalloc_dry_run_cost;
+static unsigned int regalloc_dry_run_cost; // Legacy: cost counted in bytes only (i.e. states have been ignored for corresponding instructions).
+static unsigned int regalloc_dry_run_cost_bytes;
+static unsigned int regalloc_dry_run_cost_states;
 
 static void
-cost(unsigned int bytes, unsigned int cycles)
+cost(unsigned int bytes, unsigned int states)
 {
-  regalloc_dry_run_cost += bytes;
+  regalloc_dry_run_cost_bytes += bytes;
+  regalloc_dry_run_cost_states += states;
 }
 
 static void
-cost2(unsigned int bytes, unsigned int z80_states, unsigned int z180_states, unsigned int r2k_clocks, unsigned int cycles_gbz80, unsigned int tlcs90_states, unsigned int ez80_z80_cycles)
+cost2(unsigned int bytes, unsigned int z80_states /* also z80n */, unsigned int z180_states, unsigned int r2k_clocks, unsigned int gbz80_cycles, unsigned int tlcs90_states, unsigned int ez80_z80_cycles)
 {
-  regalloc_dry_run_cost += bytes;
+  regalloc_dry_run_cost_bytes += bytes;
+  if (IS_Z80 || IS_Z80N)
+    regalloc_dry_run_cost_states += z80_states;
+  else if (IS_Z180)
+    regalloc_dry_run_cost_states += z180_states;
+  else if (IS_R2K || IS_R2KA || IS_R3KA)
+    regalloc_dry_run_cost_states += r2k_clocks;
+  else if (IS_GB)
+    regalloc_dry_run_cost_states += gbz80_cycles;
+  else if(IS_TLCS90)
+    regalloc_dry_run_cost_states += tlcs90_states;
+  else if(IS_EZ80_Z80)
+    regalloc_dry_run_cost_states += ez80_z80_cycles;
+  else
+    wassert (0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -928,62 +945,125 @@ ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
   return (8);                   // Fallback
 }
 
-static unsigned char
+static void
 op8_cost (const asmop *op, int offset)
 {
   switch (op->type)
     {
     case AOP_REG:
-      // eZ80 
-      if (op->aopu.aop_reg[offset]->rIdx == IYL_IDX || op->aopu.aop_reg[offset]->rIdx == IYH_IDX)
-        return (2);
+      if (op->aopu.aop_reg[offset]->rIdx == IYL_IDX || op->aopu.aop_reg[offset]->rIdx == IYH_IDX) // eZ80
+        {
+          cost (2, 2);
+          return;
+        }
     case AOP_DUMMY:
-      return (1);
+      cost2 (1, 4, 4, 2, 4, 4, 1);
+      return;
     case AOP_IMMD:
     case AOP_LIT:
-      return (2);
+      cost2 (2, 7, 6, 4, 8, 4, 2);
+      return;
     case AOP_STK:
-      return (3);
+      if (true/*!IS_GB TODO: enable this condition! it currently causes a regtest failure, ie.e. exposes an exisiting codgen bug*/)
+        {
+          cost2 (3, 19, 15, 9, 0, 10, 4);
+          return;
+        }
+      cost (1, 8); // add hl, sp
     case AOP_HL:
-      return (4);
+      cost2 (3 + 1, 10 + 7, 9 + 6, 6 + 5, 12 + 8, 6 + 6, 3 + 2);
+      return;
     case AOP_IY:               /* 4 from ld iy, #... */
     case AOP_EXSTK:            /* 4 from ld iy, #... */
-      return (7);
+      cost2 (4 + 3, 12 + 19, 12 + 15, 8 + 9, 0 + 0, 6 + 10, 4 + 4);
+      return;
     case AOP_PAIRPTR:
       if (op->aopu.aop_pairId == PAIR_HL)
-        return (1);
+        cost2 (1, 7, 6, 5, 8, 6, 2);
       if (op->aopu.aop_pairId == PAIR_IY || op->aopu.aop_pairId == PAIR_IX)
-        return (3);
+        cost2 (3, 19, 15, 9, 0, 10, 4);
+      return;
     default:
       printf ("op8_cost op: %d\n", (int) (op->type));
       wassert (0);
     }
-  return (8);                   // Fallback
 }
 
-static unsigned char
+static void
+incdec_cost (const asmop *op, int offset)
+{
+  switch (op->type)
+    {
+    case AOP_REG:
+      if (op->aopu.aop_reg[offset]->rIdx == IYL_IDX || op->aopu.aop_reg[offset]->rIdx == IYH_IDX) // eZ80
+        {
+          cost (2, 2);
+          return;
+        }
+    case AOP_DUMMY:
+      cost2 (1, 4, 4, 2, 4, 2, 2);
+      return;
+    case AOP_STK:
+      if (!IS_GB)
+        {
+          cost2 (3, 23, 18, 12, 0, 12, 6);
+          return;
+        }
+      cost (1, 8); // add hl, sp
+    case AOP_HL:
+      cost2 (3 + 1, 10 + 11, 9 + 10, 6 + 8, 12 + 12, 6 + 8, 3 + 5);
+      return;
+    case AOP_IY:               /* 4 from ld iy, #... */
+    case AOP_EXSTK:            /* 4 from ld iy, #... */
+      cost2 (4 + 3, 14 + 23, 12 + 18, 8 + 12, 0 + 0, 6 + 12, 4 + 6);
+      return;
+    case AOP_PAIRPTR:
+      if (op->aopu.aop_pairId == PAIR_HL)
+        {
+          cost2 (1, 11, 10, 8, 12, 8, 5);
+          return;
+        }
+      if (op->aopu.aop_pairId == PAIR_IY || op->aopu.aop_pairId == PAIR_IX)
+        {
+          cost2 (3, 23, 18, 12, 0, 12, 6);
+          return;
+        }
+    default:
+      printf ("op8_cost op: %d\n", (int) (op->type));
+      wassert (0);
+    }
+}
+
+static void
 bit8_cost (const asmop *op)
 {
   switch (op->type)
     {
     case AOP_REG:
     case AOP_DUMMY:
-      return (2);
+      cost2 (2, 8, 7, 4, 8, 4, 2);
+      return;
     case AOP_STK:
-      return (4);
-    case AOP_HL:
-      return (5);
+      if (!IS_GB)
+        {
+          cost2 (4, 23, 19, 13, 0, 12, 7);
+          return;
+        }
+      cost (1, 8); // add hl, sp
+    case AOP_HL:               /* 3 from ld hl, #... */
+      cost2 (3 + 2, 10 + 15, 9 + 13, 6 + 10, 12 + 16, 6 + 8, 3 + 5);
+      return;
     case AOP_IY:               /* 4 from ld iy, #... */
     case AOP_EXSTK:            /* 4 from ld iy, #... */
-      return (8);
+      cost2 (4 + 4, 14 + 23, 12 + 19, 8 + 13, 0 + 0, 6 + 12, 4 + 7);
+      return;
     default:
       printf ("bit8_cost op: %d\n", (int) (op->type));
       wassert (0);
     }
-  return (8);                   //Fallback
 }
 
-static unsigned char
+static void
 emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, int offset2)
 {
   if (op2 && offset2 >= op2->size)
@@ -996,13 +1076,18 @@ emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
     case A_RLCA:
     case A_RRA:
     case A_RRCA:
-      return (1);
+      cost2 (1, 4, 3, 2, 4, 2, 1);
+      return;
     case A_NEG:
+      cost2 (2, 8, 6, 4, 0, 2, 2);
+      return;
     case A_RLD:
     case A_RRD:
-      return(2);
+      cost2 (2, 18, 16, 0, 0, 12, 5);
+      return;
     case A_LD:
-      return (ld_cost (op1, offset1, op2, offset2));
+      regalloc_dry_run_cost += ld_cost (op1, offset1, op2, offset2);
+      return;
     case A_ADD:
     case A_ADC:
     case A_AND:
@@ -1011,10 +1096,12 @@ emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
     case A_SBC:
     case A_SUB:
     case A_XOR:
-      return (op8_cost (op2, offset2));
+      op8_cost (op2, offset2);
+      return;
     case A_DEC:
     case A_INC:
-      return (op8_cost (op1, offset1));
+      incdec_cost (op1, offset1);
+      return;
     case A_RL:
     case A_RLC:
     case A_RR:
@@ -1023,23 +1110,26 @@ emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
     case A_SRA:
     case A_SRL:
     case A_SWAP:
-      return (bit8_cost (op1));
+      bit8_cost (op1);
+      return;
     default:
       wassertl (0, "Tried get cost for unknown instruction");
     }
-  return (0);
 }
 
 static void
 emit3_o (enum asminst inst, asmop *op1, int offset1, asmop *op2, int offset2)
 {
-  unsigned int cost;
+  unsigned int cost, bytecost, statecost;
 
-  regalloc_dry_run_cost += emit3Cost (inst, op1, offset1, op2, offset2);
+  emit3Cost (inst, op1, offset1, op2, offset2);
+
   if (regalloc_dry_run)
     return;
 
   cost = regalloc_dry_run_cost;
+  bytecost = regalloc_dry_run_cost_bytes;
+  statecost = regalloc_dry_run_cost_states;
   if (!op1)
     emit2 ("%s", asminstnames[inst]);
   else if (!op2)
@@ -1053,6 +1143,8 @@ emit3_o (enum asminst inst, asmop *op1, int offset1, asmop *op2, int offset2)
     }
 
   regalloc_dry_run_cost = cost;
+  regalloc_dry_run_cost_bytes = bytecost;
+  regalloc_dry_run_cost_states = statecost;
   //emitDebug(";emit3_o cost: %d total so far: %d", (int)emit3Cost(inst, op1, offset1, op2, offset2), (int)cost);
 }
 
@@ -13827,7 +13919,7 @@ genIfx (iCode *ic, iCode *popIc)
           emit2 ("bit 0, %s", aopGet (cond->aop, 0, FALSE));
           genIfxJump (ic, "nz");
         }
-      regalloc_dry_run_cost += bit8_cost (cond->aop);
+      bit8_cost (cond->aop); // todo: fix, bit has different cost!
 
       goto release;
     }
@@ -15944,8 +16036,10 @@ genZ80iCode (iCode * ic)
 float
 dryZ80iCode (iCode * ic)
 {
-  regalloc_dry_run = TRUE;
+  regalloc_dry_run = true;
   regalloc_dry_run_cost = 0;
+  regalloc_dry_run_cost_bytes = 0;
+  regalloc_dry_run_cost_states = 0;
 
   initGenLineElement ();
   _G.omitFramePtr = should_omit_frame_ptr;
@@ -15961,7 +16055,7 @@ dryZ80iCode (iCode * ic)
       spillPair (pairId);
   }
 
-  return (regalloc_dry_run_cost);
+  return (regalloc_dry_run_cost + regalloc_dry_run_cost_bytes);
 }
 
 #ifdef DEBUG_DRY_COST
@@ -15988,7 +16082,7 @@ genZ80Code (iCode * lic)
 
   iCode *ic;
   int cln = 0;
-  regalloc_dry_run = FALSE;
+  regalloc_dry_run = false;
 
   initGenLineElement ();
 
@@ -16003,7 +16097,7 @@ genZ80Code (iCode * lic)
     }
 
   for (ic = lic; ic; ic = ic->next)
-    ic->generated = FALSE;
+    ic->generated = false;
 
   /* Generate Code for all instructions */
   for (ic = lic; ic; ic = ic->next)
@@ -16023,10 +16117,12 @@ genZ80Code (iCode * lic)
           dbuf_free (iLine);
         }
       regalloc_dry_run_cost = 0;
+      regalloc_dry_run_cost_bytes = 0;
+      regalloc_dry_run_cost_states = 0;
       genZ80iCode (ic);
 
 #ifdef DEBUG_DRY_COST
-      emit2 ("; iCode %d total cost: %d\n", ic->key, regalloc_dry_run_cost);
+      emit2 ("; iCode %d total cost: %d %d %d\n", ic->key, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);
 #endif
     }
 

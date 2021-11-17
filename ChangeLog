@@ -1,3 +1,12 @@
+2021-11-17 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Infrastructure for optimization for code speed.
+	* support/regression/ports/ez80-z80/spec.mk,
+	  support/regression/ports/ucr2k/spec.mk,
+	  support/regression/ports/ucr2ka/spec.mk:
+	  Do not use no-longer-existing --profile in regtests.
+
 2021-11-16 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/SDCCglobl.h,

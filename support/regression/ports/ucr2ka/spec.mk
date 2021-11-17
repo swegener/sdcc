@@ -32,7 +32,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mr2ka --less-pedantic --profile
+SDCCFLAGS += -mr2ka --less-pedantic
 LINKFLAGS += r2ka.lib
 
 OBJEXT = .rel

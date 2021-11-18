@@ -1,3 +1,8 @@
+2021-11-18 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c:
+	  Fix bug #3296.
+
 2021-11-17 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:

@@ -24,6 +24,8 @@
 /* Use the D macro for basic (unobtrusive) debugging messages */
 #define D(x) do if (options.verboseAsm) { x; } while (0)
 
+#define UNIMPLEMENTED do {wassertl (regalloc_dry_run, "Unimplemented"); cost (500, 500);} while(0)
+
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_bytes;
 static unsigned int regalloc_dry_run_cost_cycles;
@@ -4611,7 +4613,7 @@ genPlus (const iCode *ic)
           i += 2;
         }
       // Special case for rematerializing sums
-      else if (!started && i == size - 2 &&
+      else if (!started && !i &&
         (leftop->type == AOP_STL && (rightop->type == AOP_LIT || rightop->type == AOP_DIR || aopOnStackNotExt (rightop, i, 2)) || rightop->type == AOP_STL && (leftop->type == AOP_LIT || leftop->type == AOP_DIR || aopOnStackNotExt (leftop, i, 2))) &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX) || x_free || y_free || result->aop->regs[XL_IDX] < 0 && result->aop->regs[XH_IDX] < 0))
         {
@@ -4824,30 +4826,33 @@ genPlus (const iCode *ic)
           i += 2;
         }
       // Fallback for rematerialization
-      else if (!started && (leftop->type == AOP_STL || rightop->type == AOP_STL) && x_free && leftop->regs[XL_IDX] < 0 && leftop->regs[XH_IDX] < 0)
+      else if (!started && (leftop->type == AOP_STL || rightop->type == AOP_STL) &&
+        (x_free || result->aop->regs[XL_IDX] < 0 && result->aop->regs[XH_IDX] < 0) &&
+        leftop->regs[XL_IDX] < 0 && leftop->regs[XH_IDX] < 0)
         {
+          if (!x_free)
+            push (ASMOP_X, 0, 2);
           genMove_o (ASMOP_X, 0, rightop, i, 2, a_free, true, y_free);
           push (ASMOP_X, 0, 2);
           genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, true, y_free);
           emit2 ("addw", "x, (1, sp)");
           cost (3, 2);
-          genMove_o (result->aop, 0, ASMOP_X, 0, 2, a_free, true, y_free);
-          adjustStack (2, false, false, false);
+          genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, true, y_free);
+          adjustStack (2, a_free && result->aop->regs[A_IDX] < 0, result->aop->regs[XL_IDX] < 0 && result->aop->regs[XH_IDX] < 0, false);
+          if (!x_free)
+            pop (ASMOP_X, 0, 2);
           started = true;
           i += 2;
         }
       else if (leftop->type == AOP_STL || rightop->type == AOP_STL)
         {
-          cost (1000, 1000);
-          wassert (regalloc_dry_run);
+          UNIMPLEMENTED;
           break;
         }
       else if (aopInReg (rightop, i, A_IDX)) //todo: Implement handling of right operands that can't be directly added to a.
         {
-          if (!regalloc_dry_run)
-            wassertl (0, "Unimplemented addition operand.");
-          cost (180, 180);
-          i++;
+          UNIMPLEMENTED;
+          break;
         }
       else
         {

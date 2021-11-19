@@ -13625,7 +13625,7 @@ genPointerSet (iCode *ic)
 
   if (IS_GB && size == 1 && result->aop->type == AOP_LIT && (((unsigned long)operandLitValue (result) & 0xff00) == 0xff00) && (isRegDead (A_IDX, ic) || aopInReg (right->aop, 0, A_IDX)) && !isBitvar) // SM83 has special instructions for address range 0xff00 - 0xffff.
     {
-      cheapMove (ASMOP_A, 0, result->aop, 0, isRegDead (A_IDX, ic));
+      cheapMove (ASMOP_A, 0, right->aop, 0, isRegDead (A_IDX, ic));
       emit2 ("ldh !mems, a", aopGetLitWordLong (result->aop, 0, true));
       cost (2, 12);
       goto release;

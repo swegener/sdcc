@@ -14079,6 +14079,20 @@ genAssign (const iCode *ic)
   size = result->aop->size;
   offset = 0;
 
+  // SM83 has special instruction for access to addresses 0xff00 to 0xffff, so use them here, when possible
+  if (IS_GB && size == 1 && aopInReg (result->aop, 0, A_IDX) && right->aop->type == AOP_HL && SPEC_ABSA (OP_SYM_ETYPE (right)) && (SPEC_ADDR (OP_SYM_ETYPE (right)) & 0xff00) == 0xff00)
+    {
+      emit2 ("ldh a, !mems", right->aop->aopu.aop_dir);
+      cost (2, 12);
+      goto release;
+    }
+  else if (IS_GB && size == 1 && aopInReg (right->aop, 0, A_IDX) && result->aop->type == AOP_HL && SPEC_ABSA (OP_SYM_ETYPE (result)) && (SPEC_ADDR (OP_SYM_ETYPE (result)) & 0xff00) == 0xff00)
+    {
+      emit2 ("ldh (#%x), a", result->aop->aopu.aop_dir);
+      cost (2, 12);
+      goto release;
+    }
+
   if (isPair (result->aop) && getPairId (result->aop) != PAIR_IY ||
     isPair (right->aop) && result->aop->type == AOP_IY && size == 2)
     genMove (result->aop, right->aop, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);

@@ -1,3 +1,8 @@
+2021-11-19 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Use SM83 ldh in code generation.
+
 2021-11-18 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:

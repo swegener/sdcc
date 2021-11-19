@@ -12847,28 +12847,33 @@ genPointerGet (const iCode *ic)
   wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
   rightval = (int)operandLitValue (right);
   rightval_in_range = (rightval >= -128 && rightval + size - 1 < 127);
-  if (IS_GB)
-    wassert (!rightval);
 
   if (IS_GB && left->aop->type == AOP_STK) // Try to avoid (hl) to hl copy, which requires 3 instructions and free a.
     pair = PAIR_DE;
   if ((IS_GB || IY_RESERVED) && requiresHL (result->aop) && size > 1 && result->aop->type != AOP_REG)
     pair = PAIR_DE;
 
-  if (left->aop->type == AOP_IMMD && size == 1 && aopInReg (result->aop, 0, A_IDX) && !IS_BITVAR (retype))
+  if (IS_GB && size == 1 && left->aop->type == AOP_LIT && (((unsigned long)(operandLitValue (left) + rightval) & 0xff00) == 0xff00) && isRegDead (A_IDX, ic) && !IS_BITVAR (retype)) // SM83 has special instructions for address range 0xff00 - 0xffff.
     {
-      emit2 ("ld a, !mems", aopGetLitWordLong (left->aop, rightval, TRUE));
+      emit2 ("ldh a, !mems", aopGetLitWordLong (left->aop, rightval, true));
+      cost (2, 12);
+      cheapMove (result->aop, 0, ASMOP_A, 0, true);
+      goto release;
+    }
+  if ((left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && size == 1 && aopInReg (result->aop, 0, A_IDX) && !IS_BITVAR (retype))
+    {
+      emit2 ("ld a, !mems", aopGetLitWordLong (left->aop, rightval, true));
       regalloc_dry_run_cost += 3;
       goto release;
     }
-  else if (!IS_GB && left->aop->type == AOP_IMMD && isPair (result->aop) && !IS_BITVAR (retype))
+  else if (!IS_GB && (left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && isPair (result->aop) && !IS_BITVAR (retype))
     {
       PAIR_ID pair = getPairId (result->aop);
       emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval, TRUE));
       regalloc_dry_run_cost += (pair == PAIR_HL ? 3 : 4);
       goto release;
     }
-  else if (!IS_GB && left->aop->type == AOP_IMMD && getPartPairId (result->aop, 0) != PAIR_INVALID && getPartPairId (result->aop, 2) != PAIR_INVALID)
+  else if (!IS_GB && (left->aop->type == AOP_IMMD) && getPartPairId (result->aop, 0) != PAIR_INVALID && getPartPairId (result->aop, 2) != PAIR_INVALID)
     {
       PAIR_ID pair;
       pair = getPartPairId (result->aop, 0);
@@ -12886,6 +12891,9 @@ genPointerGet (const iCode *ic)
       genMove (result->aop, &saop, !surviving_a, isPairDead(PAIR_HL, ic), isPairDead(PAIR_DE, ic), isPairDead(PAIR_IY, ic));
       goto release;
     }
+
+  if (IS_GB)
+    wassert (!rightval);
 
   if (isPair (left->aop) && size == 1 && !IS_BITVAR (retype) && !rightval)
     {
@@ -13614,6 +13622,14 @@ genPointerSet (iCode *ic)
 
   isBitvar = IS_BITVAR (retype) || IS_BITVAR (letype);
   emitDebug ("; isBitvar = %d", isBitvar);
+
+  if (IS_GB && size == 1 && result->aop->type == AOP_LIT && (((unsigned long)operandLitValue (result) & 0xff00) == 0xff00) && (isRegDead (A_IDX, ic) || aopInReg (right->aop, 0, A_IDX)) && !isBitvar) // SM83 has special instructions for address range 0xff00 - 0xffff.
+    {
+      cheapMove (ASMOP_A, 0, result->aop, 0, isRegDead (A_IDX, ic));
+      emit2 ("ldh !mems, a", aopGetLitWordLong (result->aop, 0, true));
+      cost (2, 12);
+      goto release;
+    }
 
   /* Handle the exceptions first */
   if (isPair (result->aop) && size == 1 && !isBitvar)

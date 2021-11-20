@@ -1,3 +1,8 @@
+2021-11-20 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix bug-3129 z80 on FreeBSD 13 regression.
+
 2021-11-19 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:

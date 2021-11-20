@@ -7274,7 +7274,7 @@ genPlus (iCode * ic)
     }
 
   // Handle AOP_EXSTK conflict with hl here, since setupToPreserveCarry() would cause problems otherwise.
-  if (IC_RESULT (ic)->aop->type == AOP_EXSTK && (getPairId (IC_LEFT (ic)->aop) == PAIR_HL || getPairId (IC_RIGHT (ic)->aop) == PAIR_HL) &&
+  if (IC_RESULT (ic)->aop->type == AOP_EXSTK && size <= 2 && (getPairId (IC_LEFT (ic)->aop) == PAIR_HL || getPairId (IC_RIGHT (ic)->aop) == PAIR_HL) &&
     (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && isPairDead (PAIR_HL, ic))
     {
       PAIR_ID extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
@@ -7450,7 +7450,8 @@ genPlus (iCode * ic)
 
   // Avoid overwriting operand in h or l when setupToPreserveCarry () loads hl - only necessary if carry is actually used during addition.
   premoved = FALSE;
-  if (size > 1 && !(size == 2 && isPair (leftop) && (rightop->type == AOP_LIT || rightop->type == AOP_IY)))
+  if (size > 1 &&
+    !(size == 2 && isPair (leftop) && (rightop->type == AOP_LIT || rightop->type == AOP_IY)) && !(size == 2 && leftop->type == AOP_STL && isPairDead (PAIR_HL, ic))) // No need to setup if a single 16 bit addition is sufficient below.
     {
       if (!couldDestroyCarry (leftop) && (couldDestroyCarry (rightop) || couldDestroyCarry (IC_RESULT (ic)->aop)))
         {
@@ -7488,7 +7489,7 @@ genPlus (iCode * ic)
         (IC_RESULT (ic)->aop->regs[L_IDX] < 0 || IC_RESULT (ic)->aop->regs[L_IDX] >= i) && (IC_RESULT (ic)->aop->regs[H_IDX] < 0 || IC_RESULT (ic)->aop->regs[H_IDX] >= i);
 
       // Rematerialization of addresses on the stack.
-      if (leftop->type == AOP_STL && !i && rightop->type == AOP_LIT && hl_dead)
+      if (leftop->type == AOP_STL && !i && i + 1 < size && rightop->type == AOP_LIT && hl_dead)
         {
           emit2 ("ld hl, !immed%d", spOffset (leftop->aopu.aop_stk) + (ulFromVal (rightop->aopu.aop_lit) & 0xffff));
           emit2 ("add hl, sp");
@@ -7499,16 +7500,21 @@ genPlus (iCode * ic)
           i += 2;
           continue;
         }
-      else if (leftop->type == AOP_STL && !i && hl_dead && (getPairId (rightop) == PAIR_BC || getPairId (rightop) == PAIR_DE || de_dead))
+      else if (leftop->type == AOP_STL && !i && i + 1 < size && hl_dead && (size <= 2 || leftop->type != AOP_EXSTK /* (hl) would be pointed to result, overwritten by addition here */))
         {
           PAIR_ID pair = getPairId (rightop);
           if (pair != PAIR_BC)
             pair = PAIR_DE;
+          if (pair == PAIR_DE && !de_dead)
+            _push (PAIR_DE);
           genMove (pair == PAIR_BC ? ASMOP_BC : ASMOP_DE, rightop, true, true, de_dead, false);
           genMove (ASMOP_HL, leftop, true, true, de_dead && pair != PAIR_DE, false);
           emit2 ("add hl, %s", _pairs[pair].name);
+          spillPair (pair);
           regalloc_dry_run_cost++;
           started = true;
+          if (pair == PAIR_DE && !de_dead)
+            _pop (PAIR_DE);
           genMove_o (IC_RESULT (ic)->aop, 0, ASMOP_HL, 0, 2, true, true, de_dead, false, i + 2 == size);
           i += 2;
           continue;
@@ -7806,7 +7812,9 @@ genPlus (iCode * ic)
               rightop = IC_RIGHT (ic)->aop;
             }
 
-          if (!premoved)
+          if (aopInReg (rightop, i, A_IDX) && !aopInReg (leftop, i, A_IDX)) // Make sure we don't overwrite the other operand.
+            UNIMPLEMENTED;
+          else if (!premoved)
             cheapMove (ASMOP_A, 0, leftop, i, true);
           else
             premoved = FALSE;
@@ -7860,6 +7868,8 @@ genPlus (iCode * ic)
   for (size = 1; size >= 0; size--)
     if (cached[size] != -1)
       {
+        if (IC_RESULT (ic)->aop->regs[A_IDX] >= 0 && IC_RESULT (ic)->aop->regs[A_IDX] != size) // Don't overwrite still-needed a below.
+          UNIMPLEMENTED;
         _pop (PAIR_AF);
         cheapMove (IC_RESULT (ic)->aop, cached[size], ASMOP_A, 0, true);
       }

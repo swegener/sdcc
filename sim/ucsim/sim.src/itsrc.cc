@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <stdlib.h>
 //#include "i_string.h"
 
+#include "globals.h"
+
 #include "itsrccl.h"
 //#include "pobjcl.h"
 //#include "stypes.h"
@@ -179,12 +181,10 @@ cl_it_src::write(class cl_memory_cell *cell, t_mem *val)
   
   if (cell == ie_cell)
     {
-      //printf("ITSRC ie=%x\n", *val);
       iev= *val;
     }
   if (cell == src_cell)
     {
-      //printf("ITSRC src=%x\n", *val);
       srcv= *val;
     }
   ier= (iev&ie_mask) == ie_value;
@@ -196,7 +196,6 @@ cl_it_src::write(class cl_memory_cell *cell, t_mem *val)
 	{
 	  if (srcr)
 	    {
-	      //printf("%2d IRQ\n", nuof);
 	      uc->irq= true;
 	    }
 	}

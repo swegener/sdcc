@@ -177,7 +177,7 @@ cl_mcs6502::sbc(class cl_cell8 &op)
   u8_t f= rF & ~(flagC|flagZ|flagV|flagN);
   
   res= rA-Op-1+C;
-  if ( ((res^rA)&0x80) && !((rA^Op)&0x80) ) f|= flagV;
+  if (0x80&( (res&Op&~rA) | (~res&~Op&rA) )) f|= flagV;
   if (res < 0x100) f|= flagC;
   if (!(res & 0xff)) f|= flagZ;
   if (res & 0x80) f|= flagN;

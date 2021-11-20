@@ -84,6 +84,7 @@ public:
   u8_t A, X, Y, SP, CC;
   class cl_cell8 cA, cX, cY, cSP, cCC;
   class cl_it_src *src_irq, *src_nmi, *src_brk;
+  bool set_b;
 public:
   cl_mcs6502(class cl_sim *asim);
   virtual int init(void);
@@ -340,7 +341,7 @@ class cl_cc_operator: public cl_memory_operator
 {
 public:
   cl_cc_operator(class cl_memory_cell *acell): cl_memory_operator(acell) {}
-  virtual t_mem write(t_mem val) { return val|= 0x20; }
+  virtual t_mem write(t_mem val) { return val/*|= 0x20*/; }
 };
 
 

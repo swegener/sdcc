@@ -63,6 +63,8 @@ cl_mcs6502::init(void)
   class cl_memory_operator *op= new cl_cc_operator(&cCC);
   cCC.append_operator(op);
 
+  for (int i= 0; i<=0xffff; i++) rom->set(i,0);
+  
   return 0;
 }
 
@@ -78,8 +80,10 @@ cl_mcs6502::reset(void)
 {
   cl_uc::reset();
 
-  CC= 0x20 | flagI;
+  CC= 0x00 | flagI;
   PC= read_addr(rom, RESET_AT);
+  rSP= 0xfd;
+  
   tick(7);
 }
 
@@ -131,11 +135,12 @@ cl_mcs6502::mk_hw_elements(void)
 			 irq_brk,
 			 h->cfg_cell(m65_brk_en), 1,
 			 h->cfg_cell(m65_brk), 1,
-			 IRQ_AT, false, true,
+			 IRQ_AT, true, true,
 			 "BRK",
 			 0);
   src_brk->set_cid('b');
   src_brk->init();
+  src_brk->set_nmi(true);
   it_sources->add(src_brk);
 }
 
@@ -280,7 +285,7 @@ cl_mcs6502::disassc(t_addr addr, chars *comment)
 	      break;
 	    case 'r': // rel
 	      l= rom->read(addr+1);
-	      a= PC + (i8_t)l + 2;
+	      a= addr + (i8_t)l + 2;
 	      work.appendf("$%04x", a);
 	      break;
 	    case '#': // imm8
@@ -433,6 +438,28 @@ cl_mcs6502::print_regs(class cl_console_base *con)
   con->dd_color("answer");
   
   print_disass(PC, con);
+  /*
+  con->dd_printf(" ? 0x%04x ", PC);
+  {
+    int i, j, code= rom->read(PC), l= inst_length(PC);
+    struct dis_entry *dt= dis_tbl();
+    for (i=0;i<3;i++)
+      if (i<l)
+	con->dd_printf("%02x ",rom->get(PC+i));
+      else
+	con->dd_printf("   ");
+    i= 0;
+    while (((code & dt[i].mask) != dt[i].code) &&
+	   dt[i].mnemonic)
+      i++;
+    if (dt[i].mnemonic)
+      {
+	for (j=0;j<3;j++)
+	  con->dd_printf("%c", dt[i].mnemonic[j]);
+      }
+  }
+  con->dd_printf("\n");
+  */
 }
 
 int
@@ -440,6 +467,7 @@ cl_mcs6502::exec_inst(void)
 {
   int res;
 
+  set_b= false;
   if ((res= exec_inst_tab(itab)) != resNOT_DONE)
     return res;
 
@@ -453,9 +481,10 @@ cl_mcs6502::accept_it(class it_level *il)
   class cl_it_src *is= il->source;
 
   tick(2);
-
   push_addr(PC);
-  rom->write(0x0100 + rSP, rF);
+  rom->write(0x0100 + rSP, rF|0x20);
+  if (set_b)
+    rF&= ~flagB;
   cSP.W(rSP-1);
   tick(1);
   vc.wr++;

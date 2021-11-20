@@ -50,8 +50,9 @@ cl_mcs6502::JMPi(t_mem code)
 int
 cl_mcs6502::JSR(t_mem code)
 {
-  u16_t a= i16();
+  u16_t a= fetch(); // low
   push_addr(PC);
+  a+= (fetch()*256); // high
   PC= a;
   return resGO;
 }
@@ -59,7 +60,7 @@ cl_mcs6502::JSR(t_mem code)
 int
 cl_mcs6502::RTS(t_mem code)
 {
-  PC= pop_addr();
+  PC= pop_addr()+1;
   tick(3);
   return resGO;
 }

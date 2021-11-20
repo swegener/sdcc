@@ -24,6 +24,8 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
+#include "globals.h"
+
 #include "mcs6502cl.h"
 
 int
@@ -35,23 +37,36 @@ cl_mcs6502::NOP(t_mem code)
 int
 cl_mcs6502::BRK(t_mem code)
 {
+  set_b= true;
+  fetch();
+  cF.W(rF|flagB);
   src_brk->request();
-  cF.W(flagB);
   return resGO;
 }
 
 int
 cl_mcs6502::RTI(t_mem code)
 {
-  //u8_t l, h;
+  u8_t f;
   cSP.W(rSP+1);
-  cF.W(rom->read(0x0100 + rSP));
+  f= rom->read(0x0100 + rSP);
+  f&= ~(0x20|flagB);
+  cF.W(f);
   vc.rd+= 1;
   /*cSP.W(rSP+1);
   l= rom->read(0x0100 + rSP);
   cSP.W(rSP+1);
   h= rom->read(0x0100 + rSP);*/
   PC= pop_addr();//h*256 + l;
+  {
+    class it_level *il= (class it_level *)(it_levels->top());
+    if (il &&
+	il->level >= 0)
+      {
+	il= (class it_level *)(it_levels->pop());
+	delete il;
+      }
+  }
   tick(3);
   return resGO;
 }
@@ -75,7 +90,8 @@ cl_mcs6502::SEI(t_mem code)
 int
 cl_mcs6502::PHP(t_mem code)
 {
-  rom->write(0x0100 + rSP, rF);
+  u8_t v= rF|0x20|flagB;
+  rom->write(0x0100 + rSP, v);
   vc.wr++;
   cSP.W(rSP-1);
   tick(2);
@@ -94,7 +110,9 @@ int
 cl_mcs6502::PLP(t_mem code)
 {
   cSP.W(rSP+1);
-  cF.W(rom->read(0x0100 + rSP));
+  u8_t v= rom->read(0x0100 + rSP);
+  v&= ~(0x20|flagB);
+  cF.W(v);
   vc.rd++;
   tick(3);
   return resGO;
@@ -123,6 +141,10 @@ cl_mcs6502::PLA(t_mem code)
 {
   cSP.W(rSP+1);
   cA.W(rom->read(0x0100 + rSP));
+  u8_t f= rF & ~(flagN|flagZ);
+  if (!rA) f|= flagZ;
+  if (rA&0x80) f|= flagN;
+  cF.W(f);
   vc.rd++;
   tick(3);
   return resGO;

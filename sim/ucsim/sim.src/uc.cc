@@ -315,12 +315,10 @@ cl_omf_rec::read(cl_f *f)
     return false;
   c= g(f);
   l= c;
-  //printf("l=%02x\n", c);
   if (f->eof())
     return false;
   c= g(f);
   h= c;
-  //printf("h=%02x\n", c);
   if (f->eof())
     return false;
   len= h*256+l-1;
@@ -345,7 +343,7 @@ cl_exec_hist::cl_exec_hist(class cl_uc *auc):
   cl_base()
 {
   uc= auc;
-  len= 101;
+  len= 10001;
   hist= (struct t_hist_elem*)malloc(sizeof(struct t_hist_elem) * len);
   t= h= 0;
 }
@@ -403,11 +401,9 @@ cl_exec_hist::list(class cl_console_base *con, bool inc, int nr)
   //s%= len;
   ta= (t+1)%len;
 
-  //con->dd_printf("%d,%d,ta=%d,s=%d\n", t, h, ta,s);
   p= inc?s:h;
   do
     {
-      //con->dd_printf("[%3d] ", p);
       if (!uc)
 	{
 	  l= con->dd_cprintf("dump_address", "0x%06x", AU(hist[p].addr));
@@ -1190,7 +1186,6 @@ ReadInt(cl_f *f, bool *ok, int bytes)
 void
 cl_uc::set_rom(t_addr addr, t_mem val)
 {
-  //printf("rom[%06lx]=%02x\n", addr, val);
   t_addr size= rom->get_size();
   if (addr < size)
     {
@@ -1200,23 +1195,19 @@ cl_uc::set_rom(t_addr addr, t_mem val)
   t_addr bank, caddr;
   bank= addr / size;
   caddr= addr % size;
-  //printf("getting decoder of %ld/%lx\n", bank, caddr);
   class cl_banker *d= (class cl_banker *)(rom->get_decoder_of(caddr));
   if (d)
     {
       if (!d->is_banker())
 	{
-	  //printf("cell at %lx has no banker\n", caddr);
 	  return;
 	}
-      //printf("setting %ld/rom[%lx]=%x\n", bank, caddr, val);
       d->switch_to(bank, NULL);
       rom->download(caddr, val);
       d->activate(NULL);
     }
   else
     {
-      //printf("no decoder at %lx\n", caddr);
     }
 }
 
@@ -1285,25 +1276,28 @@ cl_uc::read_hex_file(cl_f *f)
 	 rtyp != 1)
     {
       while (((c= /*getc(f)*/f->get_c()) != ':') &&
-	     (/*c != EOF*/!f->eof())) /*printf("search_record=%c\n",c)*/;
+	     (/*c != EOF*/!f->eof()));
       if (c != ':')
-	{fprintf(stderr, ": not found\n");break;}
+	{
+	  fprintf(stderr, ": not found\n");
+	  break;
+	}
       recnum++;
-      dnum= ReadInt(f, &ok, 1);//printf("%ld:dnum=%02x ",recnum,dnum);
+      dnum= ReadInt(f, &ok, 1);
       chk = dnum;
-      addr= ReadInt(f, &ok, 2);//printf("%ld:addr=%04x ",recnum,addr);
+      addr= ReadInt(f, &ok, 2);
       chk+= (addr & 0xff);
       chk+= ((addr >> 8) & 0xff);
-      rtyp= ReadInt(f, &ok, 1);//printf("%ld:rtyp=%02x ",recnum,rtyp);
+      rtyp= ReadInt(f, &ok, 1);
       chk+= rtyp;
       for (i= 0; ok && (i < dnum); i++)
 	{
-	  rec[i]= ReadInt(f, &ok, 1);//printf("%02x",rec[i]);
+	  rec[i]= ReadInt(f, &ok, 1);
 	  chk+= rec[i];
 	}
       if (ok)
 	{
-	  sum= ReadInt(f, &ok, 1);//printf(" %ld:sum=%02x\n",recnum,sum);
+	  sum= ReadInt(f, &ok, 1);
 	  if (ok)
 	    {
 	      if (((sum + chk) & 0xff) == 0)
@@ -1357,11 +1351,9 @@ cl_uc::read_hex_file(cl_f *f)
 		    }
 		  else if (rtyp == 4)
 		    {
-		      //printf("hex record type=4\n");
 		      if (dnum >= 2)
 			{
 			  base= (rec[0]*256+rec[1]) << 16;
-			  //printf("hex base=%x\n", base);
 			}
 		    }
 		  else
@@ -1478,7 +1470,6 @@ cl_uc::read_cdb_file(cl_f *f)
   ln= f->get_s();
   while (!ln.empty())
     {
-      //printf("CBD LN=%s\n",ln.c_str());
       lc= ln.c_str();
       if (lc[0] == 'F')
 	{
@@ -2119,7 +2110,6 @@ cl_uc::get_name_entry(struct name_entry tabl[], char *name)
 	 (!(tabl[i].cpu_type & type->type) ||
 	 (strcmp(tabl[i].name, name) != 0)))
     {
-      //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);
       i++;
     }
   if (tabl[i].name != NULL)
@@ -2231,7 +2221,6 @@ cl_uc::address_space_added(class cl_address_space *as)
 void
 cl_uc::error(class cl_error *error)
 {
-  //printf("error adding: %s...\n", error->get_class()->get_name());
   errors->add(error);
   if ((error->inst= inst_exec))
     error->PC= instPC;
@@ -2246,7 +2235,6 @@ cl_uc::check_errors(void)
 
   if (c)
     {
-      //printf("error list: %d items\n", errors->count);
       for (i= 0; i < errors->count; i++)
 	{
 	  class cl_error *error= (class cl_error *)(errors->at(i));
@@ -2536,7 +2524,6 @@ cl_uc::do_inst(int step)
       if ((res == resGO) &&
 	  1/*irq*/)
 	{
-	  //printf("DO INTERRUPT PC=%lx\n", PC);
 	  int r= do_interrupt();
 	  if (r != resGO)
 	    res= r;
@@ -2614,7 +2601,11 @@ cl_uc::save_hist()
   if (juj & 1)
     {
       if (pc_dump==NULL) pc_dump= fopen("addr.txt","w");
-      if (pc_dump!=NULL) {fprintf(pc_dump,"0x%06x\n",AU(PC));fflush(pc_dump);}
+      if (pc_dump!=NULL)
+	{
+	  fprintf(pc_dump,"0x%06x\n",AU(PC));
+	  fflush(pc_dump);
+	}
     }
   hist->put();
 }
@@ -2641,7 +2632,6 @@ cl_uc::do_interrupt(void)
   class it_level *il= (class it_level *)(it_levels->top()), *IL= 0;
 
   irq= false;
-  //printf("Checking IRQs...\n");
   for (i= 0; i < it_sources->count; i++)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
@@ -2651,11 +2641,15 @@ cl_uc::do_interrupt(void)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
       if (is->is_slave())
-	continue;
+	{
+	  continue;
+	}
       if (!is->is_nmi())
 	{
 	  if (!is_en)
-	    continue;
+	    {
+	      continue;
+	    }
 	}
       bool A= is->is_active();
       bool E= is->enabled();
@@ -2667,9 +2661,13 @@ cl_uc::do_interrupt(void)
 	  irq= true;
 	  if (il &&
 	      il->level >= 0)
-	    ap= il->level;
+	    {
+	      ap= il->level;
+	    }
 	  else
-	    ap= priority_main();
+	    {
+	      ap= priority_main();
+	    }
 	  if (ap >= pr)
 	    {
 	      continue;

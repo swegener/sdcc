@@ -253,6 +253,15 @@ test-pdk15-stack-auto:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=pdk15-stack-auto
 
+# Helper rule for testing the m6502 port only(use sim65 simulator)
+test-m6502:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=m6502
+
+test-uc6502:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=uc6502
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) test-common

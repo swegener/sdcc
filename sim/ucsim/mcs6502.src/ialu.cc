@@ -138,10 +138,11 @@ cl_mcs6502::adc(class cl_cell8 &op)
   u8_t Op= op.R(), f, oA= rA;
   u16_t res;
   u8_t C= (rF&flagC)?1:0;
-  f= rF & ~(flagZ|flagC|flagN|flagV);
+  f= rF & ~(flagZ|flagC|flagN);
 
   if (!(rF & flagD))
     {
+      f&= ~flagV;
       res= rA + Op + C;
       cA.W(res);
       if (!rA) f|= flagZ;
@@ -151,18 +152,30 @@ cl_mcs6502::adc(class cl_cell8 &op)
     }
   else
     {
-      u8_t ah, al;
-      al= (rA & 0xf) + (Op & 0xf) + C;
-      ah= (rA >> 4) + (Op >> 4) + ((al>15)?1:0);
-      if (al > 9) al+= 6;
-      if ((rA + Op + C) & 0xff) f|= flagZ;
-
-      if (ah & 8) f|= flagN;
-      if ( (((ah << 4) ^ rA) & 0x80) && !((rA ^ Op) & 0x80))  f|= flagV;
-
-      if (ah > 9) ah+= 6;
-      if (ah > 15) f|= flagC;
-      cA.W((ah << 4) | (al & 0xf));
+      int opint= ((Op & 0xf0) >> 4) * 10;
+      opint+= (Op & 0x0f);
+      int accint= ((oA & 0xf0) >> 4) * 10;
+      accint+= (oA & 0x0f);
+      int sum= opint + accint + C;
+      if (sum > 99)
+	{
+	  f|= flagC;
+	  sum-= 100;
+	}
+      else
+	{
+	  f&= ~flagC;
+	}
+      u8_t resA= 0;
+      if (sum >= 0 && sum < 100)
+	{
+	  int tens= sum/10;
+	  int units= sum%10;
+	  resA= ((u8_t)tens << 4 | (u8_t)units);
+	}
+      cA.W(resA);
+      if (!resA) f|= flagZ;
+      if (resA&0x80) f|= flagN;
     }
   cF.W(f);
   return resGO;
@@ -174,23 +187,42 @@ cl_mcs6502::sbc(class cl_cell8 &op)
   u8_t Op= op.R();
   u16_t res;
   u8_t C= (rF&flagC)?1:0;
-  u8_t f= rF & ~(flagC|flagZ|flagV|flagN);
+  u8_t f= rF & ~(flagC|flagZ|flagN);
   
-  res= rA-Op-1+C;
-  if (0x80&( (res&Op&~rA) | (~res&~Op&rA) )) f|= flagV;
-  if (res < 0x100) f|= flagC;
-  if (!(res & 0xff)) f|= flagZ;
-  if (res & 0x80) f|= flagN;
   if (!(rF & flagD))
-    cA.W(res);
+    {
+      f&= ~flagV;
+      res= rA-Op-1+C;
+      if (0x80&( (res&Op&~rA) | (~res&~Op&rA) )) f|= flagV;
+      if (res < 0x100) f|= flagC;
+      if (!(res & 0xff)) f|= flagZ;
+      if (res & 0x80) f|= flagN;
+      cA.W(res);
+    }
   else
     {
-      u8_t ah, al;
-      al= (rA&0xf)-(Op&0xf)-1+C;
-      if (al&16) al-= 6;
-      ah= (rA>>4)-(Op>>4)-(al&16);
-      if (ah&16) ah-= 6;
-      cA.W( ((ah&0xf)<<4)|(al&0xf) );
+      int opint= ((Op & 0xf0) >> 4) * 10;
+      opint+= (Op & 0x0f);
+      int accint= ((rA & 0xf0) >> 4) * 10;
+      accint+= (rA & 0x0f);
+      int res= accint - opint - (C?0:1);
+      if (res < 0)
+	{
+	  f&= ~flagC;
+	  res+= 100;
+	}
+      else
+	f|= flagC;
+      u8_t resA= 0;
+      if (res >= 0 && res < 100)
+	{
+	  int tens= res / 10;
+	  int units= res % 10;
+	  resA= ((u8_t)tens << 4 | (u8_t)units);
+	}
+      if (!resA) f|= flagZ;
+      if (resA&0x80) f|= flagN;
+      cA.W(resA);
     }
   cF.W(f);
   return resGO;

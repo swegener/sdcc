@@ -178,25 +178,25 @@ struct dis_entry disass_mcs6502[]=
 
     { 0x06, 0xff, ' ', 2, "ASL %z" },
     { 0x16, 0xff, ' ', 2, "ASL %X" },
-    { 0x0a, 0xff, ' ', 2, "ASL A" },
+    { 0x0a, 0xff, ' ', 1, "ASL A" },
     { 0x0e, 0xff, ' ', 3, "ASL %a" },
     { 0x1e, 0xff, ' ', 3, "ASL %i" },
 
     { 0x46, 0xff, ' ', 2, "LSR %z" },
     { 0x56, 0xff, ' ', 2, "LSR %X" },
-    { 0x4a, 0xff, ' ', 2, "LSR A" },
+    { 0x4a, 0xff, ' ', 1, "LSR A" },
     { 0x4e, 0xff, ' ', 3, "LSR %a" },
     { 0x5e, 0xff, ' ', 3, "LSR %i" },
 
     { 0x26, 0xff, ' ', 2, "ROL %z" },
     { 0x36, 0xff, ' ', 2, "ROL %X" },
-    { 0x2a, 0xff, ' ', 2, "ROL A" },
+    { 0x2a, 0xff, ' ', 1, "ROL A" },
     { 0x2e, 0xff, ' ', 3, "ROL %a" },
     { 0x3e, 0xff, ' ', 3, "ROL %i" },
 
     { 0x66, 0xff, ' ', 2, "ROR %z" },
     { 0x76, 0xff, ' ', 2, "ROR %X" },
-    { 0x6a, 0xff, ' ', 2, "ROR A" },
+    { 0x6a, 0xff, ' ', 1, "ROR A" },
     { 0x6e, 0xff, ' ', 3, "ROR %a" },
     { 0x7e, 0xff, ' ', 3, "ROR %i" },
 

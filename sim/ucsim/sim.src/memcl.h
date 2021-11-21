@@ -314,6 +314,7 @@ class cl_bit_cell8: public cl_memory_cell
 {
  public:
   cl_bit_cell8(uchar awidth): cl_memory_cell(awidth) {}
+  cl_bit_cell8(): cl_memory_cell(8) {}
   virtual t_mem d();
   virtual void d(t_mem v);
 };
@@ -393,7 +394,9 @@ class cl_address_space: public cl_memory
  public:
   cl_address_space(const char *id, t_addr astart, t_addr asize, int awidth);
   virtual ~cl_address_space(void);
-
+  virtual int init(void);
+  virtual class cl_memory_cell *cell_template();
+  
   virtual bool is_address_space(void) { return(true); }
 
   virtual t_mem read(t_addr addr);

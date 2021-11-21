@@ -1367,31 +1367,46 @@ cl_address_space::cl_address_space(const char *id,
 				   t_addr astart, t_addr asize, int awidth):
   cl_memory(id, asize, awidth)
 {
-  class cl_bit_cell8 bc8(awidth);
-  class cl_cell8 c8(awidth);
-  class cl_cell16 c16(awidth);
-  class cl_cell32 c32(awidth);
-  class cl_memory_cell *cell= &c32;
   start_address= astart;
   decoders= new cl_decoder_list(2, 2, false);
   cella= (class cl_memory_cell *)malloc(size * sizeof(class cl_memory_cell));
-  if (awidth == 1)
-    cell= &bc8;
-  else if (awidth <= 8)
-    cell= &c8;
-  else if (awidth <= 16)
-    cell= &c16;
-  //cell->init();
+  dummy= new cl_dummy_cell(awidth);
+  dummy->init();
+}
+
+int
+cl_address_space::init(void)
+{
+  cl_memory::init();
+  class cl_memory_cell *cell= cell_template();
   unsigned int i;
   for (i= 0; i < size; i++)
     {
       void *p1= &(cella[i]);
       void *p2= cell;
-      memcpy(p1, p2, sizeof(c32));
+      memcpy(p1, p2, sizeof(class cl_cell32));
       cella[i].init();
     }
-  dummy= new cl_dummy_cell(awidth);
-  dummy->init();
+  return 0;
+}
+
+static class cl_bit_cell8 bc8_tmpl;
+static class cl_cell8 c8_tmpl;
+static class cl_cell16 c16_tmpl;
+static class cl_cell32 c32_tmpl;
+
+class cl_memory_cell *
+cl_address_space::cell_template()
+{
+  class cl_memory_cell *cell= &c32_tmpl;
+  if (width == 1)
+    cell= &bc8_tmpl;
+  else if (width <= 8)
+    cell= &c8_tmpl;
+  else if (width <= 16)
+    cell= &c16_tmpl;
+  if (cell) cell->set_width(width);
+  return cell;
 }
 
 cl_address_space::~cl_address_space(void)

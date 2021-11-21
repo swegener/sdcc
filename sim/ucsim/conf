@@ -16,7 +16,7 @@ while [ -n "$1" ]; do
 	    PERF_FLAG="-pg"
 	    ;;
 	-d)
-	    OPT_FLAG="-O0"
+	    OPT_FLAG="-O0 -DDEVEL"
 	    ;;
 	-c)
 	    COMP="yes"

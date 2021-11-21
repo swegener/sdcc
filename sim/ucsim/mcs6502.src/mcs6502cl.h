@@ -73,7 +73,27 @@ enum {
   RESET_AT	= 0xfffc,
   IRQ_AT	= 0xfffe
 };
-  
+
+
+class cl_c65: public cl_cell8
+{
+#ifdef DEVEL
+  virtual t_mem read(void);
+  virtual t_mem get(void);
+  virtual t_mem write(t_mem val);
+  virtual t_mem set(t_mem val);
+#endif
+};
+
+class cl_as65: public cl_address_space
+{
+public:
+  cl_as65(const char *id, t_addr astart, t_addr asize, int awidth):
+    cl_address_space(id, astart, asize, awidth) {}
+  virtual class cl_memory_cell *cell_template();
+};
+
+
 /*
  * Base of MCS6502 processor
  */
@@ -81,8 +101,8 @@ enum {
 class cl_mcs6502: public cl_uc  
 {
 public:
-  u8_t A, X, Y, SP, CC;
-  class cl_cell8 cA, cX, cY, cSP, cCC;
+  u8_t A, X, Y, SP, CC, i8d;
+  class cl_cell8 cA, cX, cY, cSP, cCC, ci8;
   class cl_it_src *src_irq, *src_nmi, *src_brk;
   bool set_b;
 public:
@@ -124,6 +144,7 @@ public:
   // write operands
   virtual class cl_cell8 &dstzpg(void) { vc.wr++; return zpg(); }
   virtual class cl_cell8 &dstzpgX(void) { vc.wr++; return zpgX(); }
+  virtual class cl_cell8 &dstzpgY(void) { vc.wr++; return zpgY(); }
   virtual class cl_cell8 &dstabs(void) { vc.wr++; return abs(); }
   virtual class cl_cell8 &dstabsX(void) { vc.wr++; return absX(); }
   virtual class cl_cell8 &dstabsY(void) { vc.wr++; return absY(); }
@@ -140,7 +161,7 @@ public:
   virtual class cl_cell8 &rmwind(void) { vc.rd++;vc.wr++;tick(1); return ind(); }
   virtual class cl_cell8 &rmwindX(void) { vc.rd++;vc.wr++;tick(1); return indX(); }
   virtual class cl_cell8 &rmwindY(void) { vc.rd++;vc.wr++;tick(1); return indY(); }
-  virtual u8_t i8(void) { return fetch(); }
+  //virtual u8_t i8(void) { return fetch(); }
   virtual u16_t i16(void) { u8_t h, l; l=fetch(); h= fetch(); return h*256+l; }
 
   virtual int NOP(t_mem code);
@@ -259,7 +280,7 @@ public:
   virtual int STYzx(t_mem code) { return st(rY, dstzpgX()); }
   virtual int STYa (t_mem code) { return st(rY, dstabs()); }
   virtual int STXz (t_mem code) { return st(rX, dstzpg()); }
-  virtual int STXzy(t_mem code) { return st(rX, dstzpgX()); }
+  virtual int STXzy(t_mem code) { return st(rX, dstzpgY()); }
   virtual int STXa (t_mem code) { return st(rX, dstabs()); }
 
   virtual int ld(class cl_cell8 &reg, class cl_cell8 &op);

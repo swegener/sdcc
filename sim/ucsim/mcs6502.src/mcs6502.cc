@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "appcl.h"
 #include "globals.h"
 #include "utils.h"
 
@@ -38,6 +39,79 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "mcs6502cl.h"
 
+
+static class cl_console_base *c;
+static u16_t dbg_a;
+
+static int
+con()
+{
+  if (!jaj) return 0;
+  c= application->get_commander()->frozen_console;
+  return c!=NULL;
+}
+
+int
+ccn(class cl_memory_cell *c)
+{
+  if (!jaj) return 0;
+  cl_address_space *rom= application->sim->uc->rom;
+  t_addr a;
+  if (!rom) return 0;
+  if (!rom->is_owned(c, &a)) return 0;
+  dbg_a= a;
+  return con();
+}
+
+static cl_c65 c65_tmpl;
+
+class cl_memory_cell *
+cl_as65::cell_template()
+{
+  return &c65_tmpl;
+}
+
+#ifdef DEVEL
+t_mem
+cl_c65::read(void)
+{
+  t_mem v= cl_cell8::read();
+  if (ccn(this)) c->dd_printf("R[%04x]-> %02x\n", dbg_a, u8_t(v));
+  return v;
+}
+#endif
+
+#ifdef DEVEL
+t_mem
+cl_c65::get(void)
+{
+  t_mem v= cl_cell8::get();
+  if (ccn(this)) c->dd_printf("R[%04x]-> %02x\n", dbg_a, u8_t(v));
+  return v;
+}
+#endif
+
+#ifdef DEVEL
+t_mem
+cl_c65::write(t_mem val)
+{
+  t_mem v= cl_cell8::get();
+  if (ccn(this)) c->dd_printf("W[%04x] %02x <- %02x\n", dbg_a, u8_t(v), u8_t(val));
+  v= cl_cell8::write(val);
+  return v;
+}
+#endif
+
+#ifdef DEVEL
+t_mem
+cl_c65::set(t_mem val)
+{
+  t_mem v= cl_cell8::get();
+  if (ccn(this)) c->dd_printf("W[%04x] %02x <- %02x\n", dbg_a, u8_t(v), u8_t(val));
+  v= cl_cell8::set(val);
+  return v;
+}
+#endif
 
 cl_mcs6502::cl_mcs6502(class cl_sim *asim):
   cl_uc(asim)
@@ -59,6 +133,7 @@ cl_mcs6502::init(void)
   RCV(SP);
   RCV(P);
 #undef RCV
+  ci8.decode(&i8d);
   
   class cl_memory_operator *op= new cl_cc_operator(&cCC);
   cCC.append_operator(op);
@@ -156,7 +231,7 @@ cl_mcs6502::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
   
-  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
+  rom= as= new cl_as65("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
 
@@ -315,10 +390,10 @@ cl_mcs6502::read_addr(class cl_memory *m, t_addr start_addr)
 class cl_cell8 &
 cl_mcs6502::imm8(void)
 {
-  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(PC);
-  fetch();
+  //class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(PC);
+  i8d= fetch();
   tick(1);
-  return *c;
+  return ci8;
 }
 
 class cl_cell8 &
@@ -334,7 +409,7 @@ cl_mcs6502::zpg(void)
 class cl_cell8 &
 cl_mcs6502::zpgX(void)
 {
-  u16_t a= fetch() + rX;
+  u8_t a= fetch() + rX;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
   vc.rd++;
   tick(3);
@@ -344,7 +419,7 @@ cl_mcs6502::zpgX(void)
 class cl_cell8 &
 cl_mcs6502::zpgY(void)
 {
-  u16_t a= fetch() + rY;
+  u8_t a= fetch() + rY;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
   vc.rd++;
   tick(3);
@@ -425,6 +500,8 @@ cl_mcs6502::indY(void)
 void
 cl_mcs6502::print_regs(class cl_console_base *con)
 {
+  int ojaj= jaj;
+  jaj= 0;
   con->dd_color("answer");
   con->dd_printf("A= $%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
   con->dd_printf("X= $%02x %3d %+4d %c  ", X, X, (i8_t)X, isprint(X)?X:'.');
@@ -437,29 +514,32 @@ cl_mcs6502::print_regs(class cl_console_base *con)
   rom->dump(0, 0x100+SP, 0x100+SP+7, 8, con);
   con->dd_color("answer");
   
-  print_disass(PC, con);
-  /*
-  con->dd_printf(" ? 0x%04x ", PC);
-  {
-    int i, j, code= rom->read(PC), l= inst_length(PC);
-    struct dis_entry *dt= dis_tbl();
-    for (i=0;i<3;i++)
-      if (i<l)
-	con->dd_printf("%02x ",rom->get(PC+i));
-      else
-	con->dd_printf("   ");
-    i= 0;
-    while (((code & dt[i].mask) != dt[i].code) &&
-	   dt[i].mnemonic)
-      i++;
-    if (dt[i].mnemonic)
+  if (!ojaj)
+    print_disass(PC, con);
+  else
+    {
+      con->dd_printf(" ? 0x%04x ", PC);
       {
-	for (j=0;j<3;j++)
-	  con->dd_printf("%c", dt[i].mnemonic[j]);
+	int i, j, code= rom->read(PC), l= inst_length(PC);
+	struct dis_entry *dt= dis_tbl();
+	for (i=0;i<3;i++)
+	  if (i<l)
+	    con->dd_printf("%02x ",rom->get(PC+i));
+	  else
+	    con->dd_printf("   ");
+	i= 0;
+	while (((code & dt[i].mask) != dt[i].code) &&
+	       dt[i].mnemonic)
+	  i++;
+	if (dt[i].mnemonic)
+	  {
+	    for (j=0;j<3;j++)
+	      con->dd_printf("%c", dt[i].mnemonic[j]);
+	  }
       }
-  }
-  con->dd_printf("\n");
-  */
+      con->dd_printf("\n");
+    }
+  jaj= ojaj;
 }
 
 int

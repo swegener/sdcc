@@ -38,7 +38,7 @@ int
 cl_mcs6502::BRK(t_mem code)
 {
   set_b= true;
-  fetch();
+  PC= (PC+1)&0xffff;//fetch();
   cF.W(rF|flagB);
   src_brk->request();
   return resGO;

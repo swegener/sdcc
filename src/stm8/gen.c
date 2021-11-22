@@ -7556,6 +7556,58 @@ release:
   freeAsmop (result);
 }
 
+/*-----------------------------------------------------------------*/
+/* genGetByte - generates code to get a single byte                */
+/*-----------------------------------------------------------------*/
+static void
+genGetByte (const iCode *ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  D (emit2 ("; genGetByte", ""));
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
+
+  offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
+  genMove_o (result->aop, 0, left->aop, offset, 1, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+  freeAsmop (result);
+  freeAsmop (right);
+  freeAsmop (left);
+}
+
+/*-----------------------------------------------------------------*/
+/* genGetWord - generates code to get a 16-bit word                */
+/*-----------------------------------------------------------------*/
+static void
+genGetWord (const iCode *ic)
+{
+  operand *left, *right, *result;
+  int offset;
+
+  D (emit2 ("; genGetWord", ""));
+
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
+
+  offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
+  genMove_o (result->aop, 0, left->aop, offset, 2, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+  freeAsmop (result);
+  freeAsmop (right);
+  freeAsmop (left);
+}
+
 /*------------------------------------------------------------------*/
 /* genRightShiftLiteral - right shifting by known count             */
 /*------------------------------------------------------------------*/
@@ -9409,7 +9461,15 @@ genSTM8iCode (iCode *ic)
     case GETABIT:
       genGetABit (ic, ifxForOp (IC_RESULT (ic), ic));
       break;
-      
+
+    case GETBYTE:
+      genGetByte (ic);
+      break;
+
+    case GETWORD:
+      genGetWord (ic);
+      break;
+
     case SWAP:
       genSwap (ic);
       break;

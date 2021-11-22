@@ -259,8 +259,13 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
       const var_t right = var_from_operand (symbol_to_sindex, IC_RIGHT(G[i].ic));
 
       if(left >= 0 && !boost::edge (result, left, scon).second)
-        scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only =
-          !(TARGET_PDK_LIKE && G[i].ic->op == GET_VALUE_AT_ADDRESS && getSize(scon[result].sym->type) > 2); // Padauk still needs pointer read operand, since pointer read of more than 2 bytes is broken into multiple support routine calls.
+        {
+          scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only = true;
+          if (TARGET_PDK_LIKE && G[i].ic->op == GET_VALUE_AT_ADDRESS && getSize(scon[result].sym->type) > 2) // Padauk still needs pointer read operand, since pointer read of more than 2 bytes is broken into multiple support routine calls.
+            scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only = false;
+          if (TARGET_IS_STM8 && (G[i].ic->op == RIGHT_OP || G[i].ic->op == LEFT_OP) && IS_OP_LITERAL(IC_RIGHT(G[i].ic)) && ulFromVal (OP_VALUE_CONST (IC_RIGHT(G[i].ic))) >= 6) // Byte shifting in shift by constant might fail for partially spilt variables. Currently only the stm8 register allocator might partially spill variables.
+            scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only = false;
+        }
       if(right >= 0 && !boost::edge (result, right, scon).second)
         scon[(boost::add_edge(result, right, scon)).first].alignment_conflict_only = true;
     }

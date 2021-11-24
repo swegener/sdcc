@@ -9,7 +9,7 @@ memory cell sfr[0xd0]
 var bank sfr[0xd0][4:3]
 
 # Now the current bank is 0 and we have a set of registers
-dump regs 0 7
+#dump regs 0 7
 
 # Note that the R<n> vars are defined on the "regs" space
 info var R3
@@ -28,7 +28,7 @@ set mem iram_chip 0x18 0x30 0x31 0x32 0x33 0x34 0x35 0x36 0x37
 
 # Now when we dump the regs we can see the label on the
 # current bank of the underlying chip as well
-dump regs 0 7
+#dump regs 0 7
 
 # Change to bank 1
 set mem bank 1
@@ -39,15 +39,15 @@ info mem
 # If we dump regs again we still see the R<n> labels because
 # they are on the address space however "bank0" has changed
 # to "bank1" because they are on the underlying chip.
-dump regs 0 7
+#dump regs 0 7
 
 # Repeat for banks 2 and 3
 set mem bank 2
 info mem
-dump regs 0 7
+#dump regs 0 7
 set mem bank 3
 info mem
-dump regs 0 7
+#dump regs 0 7
 
 # And finally check that the registers follow the bank switching correctly
 set mem bank 0

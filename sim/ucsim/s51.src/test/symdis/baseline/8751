@@ -1,4 +1,4 @@
-uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
+uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -78,5 +78,5 @@ dc 0x0000 0x00067
    0x0064 <__sdcc_external_startup>:
  ? 0x0064 75 82 00 MOV    0x82 <DPL>,#0x00[0K
  ? 0x0067 22       RET[0K
-Loading from test-8751.ihx
-104 words read from test-8751.ihx
+Loading from [ELIDED]
+104 words read from [ELIDED]

@@ -1,4 +1,4 @@
-uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
+uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -12,7 +12,7 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
-  File:       (none)
+  File: [ELIDED]
   Mode:       output
   Time scale: auto set on start
   Start time: 0.000000000000000 s
@@ -27,8 +27,8 @@ break 0x800c
 Breakpoint 1 at 0x00800c: F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0 (cond="")
 run
 Simulation started, PC=0x008000
-Loading from test.ihx
-111 words read from test.ihx
+Loading from [ELIDED]
+111 words read from [ELIDED]
 
 Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -37,7 +37,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 5 ticks (6.250e-07 sec)
-Host usage: 0.000006 sec, rate=0.100825
+Host usage: [ELIDED]
 
 # Set up a vcd to monitor the bit changes in loc1 and the value of loc2.
 set hw vcd output "out/test.vcd"
@@ -58,7 +58,7 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File:       out/test.vcd
+  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000625000000 s
@@ -87,7 +87,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000033 sec, rate=0.094980
+Host usage: [ELIDED]
 
 # Remove the probe from every second bit.
 # Removing probes while started is ok - we just stop logging changes.
@@ -112,4 +112,4 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
-Host usage: 0.000026 sec, rate=0.120250
+Host usage: [ELIDED]

@@ -1,4 +1,4 @@
-uCsim 0.6-pre71, Copyright (C) 1997 Daniel Drotos.
+uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -97,5 +97,47 @@ dump bank
 # Contents should be 0x00 0x01
 dump sfr 0x82 0x83
 0x82 sfr_curr:            00 01 ..
-dump dptr 0x00 0x01
-0x0Segmentation fault
+#dump dptr 0x00 0x01
+
+# Check all the other banks
+set mem bank 1
+0x92[2:0] bank:                     0b-----001 0x01 '.'   1
+dump sfr 0x82 0x83
+0x82 sfr_curr:            02 03 ..
+#dump dptr 0x00 0x01
+
+set mem bank 2
+0x92[2:0] bank:                     0b-----010 0x02 '.'   2
+dump sfr 0x82 0x83
+0x82 sfr_curr:            04 05 ..
+#dump dptr 0x00 0x01
+
+set mem bank 3
+0x92[2:0] bank:                     0b-----011 0x03 '.'   3
+dump sfr 0x82 0x83
+0x82 sfr_curr:            06 07 ..
+#dump dptr 0x00 0x01
+
+set mem bank 4
+0x92[2:0] bank:                     0b-----100 0x04 '.'   4
+dump sfr 0x82 0x83
+0x82 sfr_curr:            08 09 ..
+#dump dptr 0x00 0x01
+
+set mem bank 5
+0x92[2:0] bank:                     0b-----101 0x05 '.'   5
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0a 0b ..
+#dump dptr 0x00 0x01
+
+set mem bank 6
+0x92[2:0] bank:                     0b-----110 0x06 '.'   6
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0c 0d ..
+#dump dptr 0x00 0x01
+
+set mem bank 7
+0x92[2:0] bank:                     0b-----111 0x07 '.'   7
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0e 0f ..
+#dump dptr 0x00 0x01

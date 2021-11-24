@@ -29,17 +29,18 @@ LDFLAGS ?=
 # is running parallel jobs.
 DIFF_COLOUR ?= $(if $(findstring --jobserver, $(MAKEFLAGS)),always,auto)
 
-# Options to diff to be used when comparing outputs to baselines. This is
-# mainly used to ignore things that are expected to change. Test makefiles
-# may added to this for specific cases.
-DIFF_OPTS += -I '^uCsim [^,]*, Copyright '
-DIFF_OPTS += -I '^ucsim version '
-DIFF_OPTS += -I '^Loading from '
-DIFF_OPTS += -I ' words read from '
-DIFF_OPTS += -I ' File: '
-DIFF_OPTS += -I '^Simulated [[:digit:]]\+ ticks '
-DIFF_OPTS += -I '^Host usage: '
-DIFF_OPTS += -I '[[:upper:]][[:alpha:]]\{2\} [[:upper:]][[:alpha:]]\{2\} .[[:digit:]] [[:digit:]]\{2\}:[[:digit:]]\{2\}:[[:digit:]]\{2\} [[:digit:]]\{4\}'
+# Things that are expected to change are elided in the output. We don't
+# care when comparing to baselines and we don't want to have to deal with
+# these changes when merging or rebasing.
+# N.B. These are sed arguments using extended regexps (sed -E)
+ELIDE += -e 's/^(uCsim )[^,]*(, Copyright \(C\) )[[:digit:]]+(-[[:digit:]]+)?/\1[ELIDED]\2[ELIDED]/'
+ELIDE += -e 's/^(ucsim version ).*/\1[ELIDED]/'
+ELIDE += -e 's/^(Loading from ).*/\1[ELIDED]/'
+ELIDE += -e 's/( words read from ).*/\1[ELIDED]/'
+ELIDE += -e 's/( File: ).*/\1[ELIDED]/'
+ELIDE += -e 's/^(Simulated )[[:digit:]]\+( ticks )/\1[ELIDED]\2/'
+ELIDE += -e 's/^(Host usage: ).*/\1[ELIDED]/'
+ELIDE += -e 's/([[:upper:]][[:alpha:]]{2} [[:upper:]][[:alpha:]]{2} .[[:digit:]] [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2} [[:digit:]]{4})/[ELIDED]/'
 
 
 # $(call run-sim,<sim args>)
@@ -55,7 +56,9 @@ define run-sim =
 			$(foreach file, $(filter %.cmd, $+), -e 'exec "$(file)"'), \
 			$(if $(findstring -e, $(1)), , -g)) \
 		$(filter %.ihx, $+) \
-		> 'out/$@' 2>&1 < /dev/null
+		2>&1 < /dev/null \
+		| sed -E $(ELIDE) \
+		> 'out/$@'
 endef
 
 

@@ -338,7 +338,10 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
                 {
                   // If it aliases the previous we do not need to output data now.
                   if ((var_next->bitnr_high == var->bitnr_high && var_next->bitnr_low == var->bitnr_low) ||
-                      (state == 1 && var->bitnr_high < 0 && var_next->bitnr_high == width - 1 && var_next->bitnr_low == 0))
+                      (state == 1 &&
+                       (var->bitnr_high < 0 &&
+                        ((var_next->bitnr_high == width - 1 && var_next->bitnr_low == 0) ||
+                         (bitnr_high >= 0 && var_next->bitnr_high == bitnr_high && var_next->bitnr_low >= bitnr_low)))))
                     {
                       con->dd_printf("\n");
                       if (lines > 0)

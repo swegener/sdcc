@@ -88,6 +88,18 @@ dump 0x1004[6:4]
 dump 0x1004[5:3]
 dump 0x1004[7:2]
 
+# If the first label was qualified due to a request for a bit
+# range subsequent labels may be considered identical even if
+# they aren't strictly identical.
+var some_bits test0[5:3]
+d some_bits
+var more_bits test0[6:2]
+d some_bits
+var less_bits test0.4
+d some_bits
+d less_bits
+d more_bits
+
 # Finally the expression evaluater handles bits in the same way
 rom[0x1000]
 rom[0x1000].7

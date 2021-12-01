@@ -522,6 +522,7 @@ public:
 };
 
 extern class cl_memory_chip *new_chip(const char *id,
+				      int asize,
 				      int awidth,
 				      int initial= -1);
 

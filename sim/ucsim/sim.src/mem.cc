@@ -2082,7 +2082,7 @@ cl_chip32::d(t_addr addr, t_mem v)
 }
 
 class cl_memory_chip *
-new_chip(const char *id, int awidth, int initial)
+new_chip(const char *id, int asize, int awidth, int initial)
 {
   class cl_memory_chip *c= 0;
   
@@ -2092,11 +2092,11 @@ new_chip(const char *id, int awidth, int initial)
     awidth= 32;
 
   if (awidth <= 8)
-    c= new cl_chip8(id, awidth, initial);
+    c= new cl_chip8(id, asize, awidth, initial);
   else if (awidth <= 16)
-    c= new cl_chip16(id, awidth, initial);
+    c= new cl_chip16(id, asize, awidth, initial);
   else
-    c= new cl_chip32(id, awidth, initial);
+    c= new cl_chip32(id, asize, awidth, initial);
 
   if (c)
     c->init();

@@ -905,7 +905,7 @@ cl_vcd::print_info(class cl_console_base *con)
           else if (timescale >= 1e9)
             con->dd_printf("  Time scale: %.0f ns\n", timescale * 1e-9);
           else if (timescale >= 1e6)
-            con->dd_printf("  Time scale: %.0 us\n", timescale * 1e-6);
+            con->dd_printf("  Time scale: %.0f us\n", timescale * 1e-6);
           else
             con->dd_printf("  Time scale: %.0f ms\n", timescale * 1e-3);
         }

@@ -911,8 +911,8 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
   }
 
   {
-    class cl_super_cmd *mem_create;
-    class cl_cmdset *mem_create_cset;
+    class cl_super_cmd *mem_create, *mem_remove;
+    class cl_cmdset *mem_create_cset, *mem_remove_cset;
     super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("memory"));
     if (super_cmd)
       cset= super_cmd->get_subcommands();
@@ -984,6 +984,24 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
       cmd->init();
       set_memory_help(cmd);
     }
+
+    mem_remove= (class cl_super_cmd *)cset->get_cmd("remove");
+    if (mem_remove)
+      mem_remove_cset= mem_remove->get_subcommands();
+    else {
+      mem_remove_cset= new cl_cmdset();
+      mem_remove_cset->init();
+    }
+    
+    mem_remove_cset->add(cmd= new cl_memory_remove_chip_cmd("chip", 0));
+    cmd->init();
+
+    if (!mem_remove)
+      cset->add(mem_remove= new cl_super_cmd("remove", 0, mem_remove_cset));
+    mem_remove->init();
+    mem_remove->add_name("del");
+    mem_remove->add_name("rm");
+    set_memory_remove_help(mem_remove);
   }
 
   super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("history"));
@@ -1137,6 +1155,40 @@ cl_uc::memory(const char *id)
 	return(m);
     }
   return(0);
+}
+
+void
+cl_uc::remove_chip(class cl_memory *chip)
+{
+  class cl_address_space *as;
+  class cl_address_decoder *ad;
+  int i, j;
+  t_index idx;
+  i= memchips->index_of(chip, &idx);
+  if (!i)
+    return;
+  for (i= 0; i < address_spaces->get_count(); i++)
+    {
+      as= (class cl_address_space *)(address_spaces->at(i));
+      j= 0;
+      while (j < as->decoders->get_count())
+	{
+	  for (j= 0; j < as->decoders->get_count(); j++)
+	    {
+	      t_addr as_start, as_end;
+	      ad= (class cl_address_decoder *)(as->decoders->at(j));
+	      as_start= ad->as_begin;
+	      as_end= ad->as_end;
+	      if (ad->memchip == chip)
+		{
+		  as->undecode_area(NULL, as_start, as_end, NULL);
+		  break;
+		}
+	    }
+	}
+    }
+  memchips->disconn(chip);
+  delete chip;
 }
 
 

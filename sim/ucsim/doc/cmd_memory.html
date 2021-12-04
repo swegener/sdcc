@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
     <title>Memory manipulation commands of &#956;Csim</title>
   </head>
-  <body bgcolor="white">
+  <body style="           background-color: white;">
     <h2>Memory manipulation commands of &#956;Csim</h2>
     Every command which changes content of ROM area such as <b><a href="#dl">dl</a></b>
     or <b><a href="cmd_general#set_memory">set memory</a></b> deletes result of
@@ -136,34 +136,45 @@ under certain conditions; type `show c' for details.
       system</a> including <a href="memory.html#chip">chips</a>, <a href="memory.html#address_space">address
       spaces</a> and <a href="memory.html#address_decoder">address decoders</a>.
     <p>Subcommands are: </p>
-    <p>memory <a href="#memory_createchip">createchip</a> <br>
-      memory <a href="#memory_createaddressspace">createaddressspace</a> <br>
-      memory <a href="#memory_createaddressdecoder">createaddressdecoder</a> <br>
-      memory <a href="#memory_info">info</a> </p>
-    <blockquote> <a name="memory_createchip">
-        <h4>memory createchip|cchip <i>id size cellsize</i></h4>
+    <p><a href="#memory_create">memory create</a><br>
+      memory remove<br>
+      <a href="#memory_info">memory info</a><br>
+      memory cell</p>
+    <a name="memory_create">
+      <h3>memory create</h3>
+    </a>
+    <p>This set of commands can be used to create new memory objects. It
+      requires a subcommand, which can be:</p>
+    <p><a href="#memory_create_chip">memory create chip</a><br>
+      <a href="#memory_create_addressspace">memory create addressspace</a><br>
+      <a href="#memory_create_addressdecoder">memory create addressdecoder</a><br>
+      <a href="#memory_create_banker">memory create banker</a><br>
+      <a href="#memory_create_bank">memory create bank</a><br>
+      <a href="#memory_create_bander">memory create bander</a></p>
+    <p><a name="memory_createchip"></a></p>
+    <blockquote><a name="memory_createchip"> </a><a name="memory_create_chip">
+        <h4>memory create chip <i>id size cellsize</i></h4>
       </a> This command creates a chip (array of storage elements). <b>id</b>
       must be a unique name which will be used to identify the chip in other
       commands. <b>size</b> is number of storage elements, <b>cellsize</b> is
       number of bits stored in one element.
-      <hr> <a name="memory_createaddressspace">
-        <h4>memory
-          createaddressspace|caddressspace|caddrspace|caspace|createaddrspace|createaspace
-          <i>id startaddr size</i></h4>
+      <hr> <a name="memory_create_addressspace">
+        <h4>memory create as|addressspace|addr|addrs|addrspace|aspace <i>id
+            startaddr size</i></h4>
       </a> This command should never be used. It defines an address space, names
       it as <b>id</b>, sets its starting address and size. Simulator programs (<b>ucsim_51</b>,
-      <b>ucsim_avr</b>, etc.) define necessary address spaces for themself, so this
-      command is not needed.
-      <hr> <a name="memory_createaddressdecoder">
-        <h4>memory
-          createaddressdecoder|caddrdecoder|caddressdecoder|cadecoder|createaddrdecoder|createadecoder
-          <i>addressspace begin end chip begin</i></h4>
+      <b>ucsim_avr</b>, etc.) define necessary address spaces for themself, so
+      this command is not needed.
+      <hr> <a name="memory_create_addressdecoder">
+        <h4>memory create
+          ad|addrdec|addrdecoder|addressdec|addressdecoder|adec|adecoder <i>addressspace
+            begin end chip begin</i></h4>
       </a> Address decoder maps a part of the address space to a chip area. <b>addressspace</b>
       parameter is name of the address space, <b>begin</b> and <b>end</b>
       specify address range of the address space to be mapped. <b>chip</b>
       parameter is name of the memory chip and the second <b>begin</b>
       parameter is the (start of the) chip address where the area is mapped to.
-      <p>Address space will be split if a "middle" are is mapped: </p>
+      <p>Address space will be split if a "middle" area is mapped: </p>
       <pre>$ <font color="#118811">ucsim_51</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -237,13 +248,52 @@ Address decoders:
 171
 0&gt; 
 </pre>
-      <hr> </blockquote>
-    <a name="memory_info">
-      <h4>memory info</h4>
+      <hr> <a name="memory_create_banker">
+        <h4>memory create banker <i>switcher_addressspace switcher_address
+            switcher_mask banked_addressspace start end</i></h4>
+      </a>This command creates a "banker", which is a controllable dynamic
+      address decoder. This means that some part of an address space can be
+      mapped to different chips and the actual map is controlled by a memory
+      location.<br>
+      This command specifies the range of the address space and the control.<br>
+      Following parameters specify the controller:<br>
+      <ul>
+        <li><b>switcher_addressspace</b> address space where the controller
+          memory location is.</li>
+        <li><b>switcher_address</b> address of the controller.</li>
+        <li><b>switcher_mask</b> mask of the bits which select a chip. This
+          parameter specifies, how many banks will be used, so how many chips
+          will be needed. </li>
+      </ul>
+      Following parameters specify the address space and range which is covered
+      by this address decoder:<br>
+      <ul>
+        <li><b>banked_asddressspace</b> name of the address space which will be
+          banked.</li>
+        <li><b>start</b> start address of the area, and</li>
+        <li><b>end</b> and address of the area which will be banked.</li>
+      </ul>
+      <hr> <a name="memory_create_bank">
+        <h4>memory create bank <i>addressspace begin bank_nr chip begin</i></h4>
+      </a> Bank.
+      <hr> <a name="memory_create_bander">
+        <h4>memory create bander <i>addressspace begin end chip begin
+            bits_per_chip [distance]</i></h4>
+      </a> Bander. </blockquote>
+    <hr> <a name="memory_remove">
+      <h3>memory remove|rm|del</h3>
+    </a> This set of commands can be used to remove some memory object. It
+    requires a subcommand, which can be:
+    <p><a href="#memory_remove_chip">memory remove chip</a> </p>
+    <blockquote> <a name="memory_remove_chip">
+        <h4>memory remove chip <i>id</i></h4>
+      </a> </blockquote>
+    <hr> <a name="memory_info">
+      <h3>memory info</h3>
     </a> This command is same as <a href="cmd_general.html#info_memory">info
       memory</a>.
     <hr> <a name="var">
-      <h4>var name [memory addr]</h4>
+      <h3>var name [memory addr]</h3>
     </a> This command assigns a name to a memory location. This name can be used
     in <a href="cmd_general.html#expression">expression</a>s as variable. If
     memory is not specified, next yet unnamed location will be used from a
@@ -268,9 +318,8 @@ vname rom[0x002d] = 73d4d3c4
 other rom[0x002d] = 73d4d3c4
 0&gt;
     </pre>
-
     <hr> <a name="var">
-      <h4>rmvar name</h4>
+      <h3>rmvar name</h3>
     </a> This command removes a variable.
     <pre>0&gt; <font color="#118811">rmvar abc</font>
 No such variable

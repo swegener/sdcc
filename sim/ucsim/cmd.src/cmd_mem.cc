@@ -512,4 +512,52 @@ CMDHELP(cl_memory_cell_cmd,
 	"Information about a memory cell",
 	"long help of memory cell")
 
+
+
+void
+set_memory_remove_help(class cl_cmd *cmd)
+{
+  cmd->set_help("memory remove subcommand",
+		"Set of commands to remove memory objects",
+		"Long of memory remove");
+}
+
+
+COMMAND_DO_WORK_UC(cl_memory_remove_chip_cmd)
+{
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
+  class cl_memory *chip;
+
+  if (cmdline->syntax_match(uc, MEMORY)) {
+    chip= params[0]->value.memory.memory;
+  }
+  else
+    syntax_error(con);
+
+  if (!chip)
+    con->dd_printf("Wrong id\n");
+  else if (!chip->is_chip())
+    con->dd_printf("Not chip\n");
+  else
+    {
+      /*
+      class cl_memory *mem= new_chip(memid, size, width);
+      uc->memchips->add(mem);
+      mem->set_uc(uc);
+      */
+      uc->remove_chip(chip);
+    }
+  return(false);
+}
+
+CMDHELP(cl_memory_remove_chip_cmd,
+	"memory remove chip id",
+	"Delete a memory chip",
+	"long help of memory remove chip")
+
+
+
 /* End of cmd.src/cmd_mem.cc */

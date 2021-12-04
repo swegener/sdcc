@@ -56,6 +56,11 @@ COMMAND_ON(uc,cl_memory_create_bank_cmd);
 COMMAND_ON(uc,cl_memory_cell_cmd);
 
 
+extern void set_memory_remove_help(class cl_cmd *cmd);
+
+// MEMORY REMOVE CHIP
+COMMAND_ON(uc,cl_memory_remove_chip_cmd);
+
 #endif
 
 /* End of cmd.src/cmd_memcl.h */

@@ -302,7 +302,8 @@ public:
   virtual class cl_address_space *address_space(class cl_memory_cell *cell);
   virtual class cl_address_space *address_space(class cl_memory_cell *cell, t_addr *addr);
   virtual class cl_memory *memory(const char *id);
-
+  virtual void remove_chip(class cl_memory *chip);
+  
   // file handling
   virtual void set_rom(t_addr addr, t_mem val);
   virtual long read_hex_file(const char *nam);

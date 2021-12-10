@@ -442,8 +442,8 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\asm\default\features.h"
   SetOutPath "$INSTDIR\include\asm\ds390"
   File "${DEV_ROOT}\include\asm\ds390\features.h"
-  SetOutPath "$INSTDIR\include\asm\gbz80"
-  File "${DEV_ROOT}\include\asm\gbz80\features.h"
+  SetOutPath "$INSTDIR\include\asm\sm83"
+  File "${DEV_ROOT}\include\asm\sm83\features.h"
   SetOutPath "$INSTDIR\include\asm\mcs51"
   File "${DEV_ROOT}\include\asm\mcs51\features.h"
   SetOutPath "$INSTDIR\include\asm\pic14"
@@ -498,10 +498,10 @@ ${Section} "SDCC DS400 library" SEC07
   File "${DEV_ROOT}\lib\ds400\*.*"
 ${SectionEnd}
 
-${Section} "SDCC GBZ80 library" SEC08
+${Section} "SDCC SM83 library" SEC08
   SectionIn 1 2
-  SetOutPath "$INSTDIR\lib\gbz80"
-  File "${DEV_ROOT}\lib\gbz80\*.*"
+  SetOutPath "$INSTDIR\lib\sm83"
+  File "${DEV_ROOT}\lib\sm83\*.*"
 ${SectionEnd}
 
 ${Section} "SDCC Z180 library" SEC09
@@ -620,9 +620,9 @@ ${Section} "SDCC library sources" SEC25
   File "${DEV_ROOT}\lib\src\ds400\*.c"
 #  File "${DEV_ROOT}\lib\src\ds400\Makefile"
 
-  SetOutPath "$INSTDIR\lib\src\gbz80"
-  File "${DEV_ROOT}\lib\src\gbz80\*.s"
-#  File "${DEV_ROOT}\lib\src\gbz80\Makefile"
+  SetOutPath "$INSTDIR\lib\src\sm83"
+  File "${DEV_ROOT}\lib\src\sm83\*.s"
+#  File "${DEV_ROOT}\lib\src\sm83\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\z80"
   File "${DEV_ROOT}\lib\src\z80\*.s"
@@ -879,7 +879,7 @@ LangString DESC_SEC04 ${LANG_ENGLISH} "SDCC documentation"
 LangString DESC_SEC05 ${LANG_ENGLISH} "SDCC include files"
 LangString DESC_SEC06 ${LANG_ENGLISH} "SDCC DS390 library"
 LangString DESC_SEC07 ${LANG_ENGLISH} "SDCC DS400 library"
-LangString DESC_SEC08 ${LANG_ENGLISH} "SDCC GBZ80 library"
+LangString DESC_SEC08 ${LANG_ENGLISH} "SDCC SM83 library"
 LangString DESC_SEC09 ${LANG_ENGLISH} "SDCC Z180 library"
 LangString DESC_SEC10 ${LANG_ENGLISH} "SDCC Rabbit 2000 library"
 LangString DESC_SEC11 ${LANG_ENGLISH} "SDCC Rabbit 3000A library"
@@ -1052,10 +1052,10 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\z180\README"
   Delete "$INSTDIR\lib\src\z180\Makefile"
 
-  Delete "$INSTDIR\lib\src\gbz80\*.s"
-  Delete "$INSTDIR\lib\src\gbz80\gbz80.lib"
-  Delete "$INSTDIR\lib\src\gbz80\README"
-  Delete "$INSTDIR\lib\src\gbz80\Makefile"
+  Delete "$INSTDIR\lib\src\sm83\*.s"
+  Delete "$INSTDIR\lib\src\sm83\sm83.lib"
+  Delete "$INSTDIR\lib\src\sm83\README"
+  Delete "$INSTDIR\lib\src\sm83\Makefile"
 
   Delete "$INSTDIR\lib\src\r2k\*.s"
   
@@ -1147,8 +1147,8 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
   Delete "$INSTDIR\lib\large-stack-auto\*.lib"
 
-  Delete "$INSTDIR\lib\gbz80\*.rel"
-  Delete "$INSTDIR\lib\gbz80\*.lib"
+  Delete "$INSTDIR\lib\sm83\*.rel"
+  Delete "$INSTDIR\lib\sm83\*.lib"
 
   Delete "$INSTDIR\lib\ds390\*.lib"
 
@@ -1174,7 +1174,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\pic16\*.h"
   Delete "$INSTDIR\include\asm\pic14\*.h"
   Delete "$INSTDIR\include\asm\mcs51\*.h"
-  Delete "$INSTDIR\include\asm\gbz80\*.h"
+  Delete "$INSTDIR\include\asm\sm83\*.h"
   Delete "$INSTDIR\include\asm\ds390\*.h"
   Delete "$INSTDIR\include\asm\stm8\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
@@ -1255,7 +1255,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\mcs51"
   RMDir "$INSTDIR\lib\src\z80"
   RMDir "$INSTDIR\lib\src\z180"
-  RMDir "$INSTDIR\lib\src\gbz80"
+  RMDir "$INSTDIR\lib\src\sm83"
   RMDir "$INSTDIR\lib\src\r2k"
   RMDir "$INSTDIR\lib\src\r2ka"
   RMDir "$INSTDIR\lib\src\r3ka"
@@ -1291,7 +1291,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\large"
   RMDir "$INSTDIR\lib\small-stack-auto"
   RMDir "$INSTDIR\lib\large-stack-auto"
-  RMDir "$INSTDIR\lib\gbz80"
+  RMDir "$INSTDIR\lib\sm83"
   RMDir "$INSTDIR\lib\ds390"
   RMDir "$INSTDIR\lib\ds400"
   RMDir "$INSTDIR\lib\hc08"
@@ -1315,7 +1315,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm\pic14"
   RMDir "$INSTDIR\non-free\include\asm\pic14"
   RMDir "$INSTDIR\include\asm\mcs51"
-  RMDir "$INSTDIR\include\asm\gbz80"
+  RMDir "$INSTDIR\include\asm\sm83"
   RMDir "$INSTDIR\include\asm\ds390"
   RMDir "$INSTDIR\include\asm\stm8"
   RMDir "$INSTDIR\include\asm\default"

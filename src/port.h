@@ -11,7 +11,7 @@
 #include "dbuf.h"
 
 #define TARGET_ID_MCS51    1
-#define TARGET_ID_GBZ80    2
+#define TARGET_ID_SM83     2
 #define TARGET_ID_Z80      3
 #define TARGET_ID_AVR      4
 #define TARGET_ID_DS390    5
@@ -47,7 +47,7 @@
 #define TARGET_IS_R2K      (port->id == TARGET_ID_R2K)
 #define TARGET_IS_R2KA     (port->id == TARGET_ID_R2KA)
 #define TARGET_IS_R3KA     (port->id == TARGET_ID_R3KA)
-#define TARGET_IS_GBZ80    (port->id == TARGET_ID_GBZ80)
+#define TARGET_IS_SM83     (port->id == TARGET_ID_SM83)
 #define TARGET_IS_TLCS90   (port->id == TARGET_ID_TLCS90)
 #define TARGET_IS_EZ80_Z80 (port->id == TARGET_ID_EZ80_Z80)
 #define TARGET_IS_Z80N     (port->id == TARGET_ID_Z80N)
@@ -60,7 +60,7 @@
 #define TARGET_IS_PDK16    (port->id == TARGET_ID_PDK16)
 
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
-#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80 || TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA || TARGET_IS_TLCS90 || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N)
+#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_SM83 || TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA || TARGET_IS_TLCS90 || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N)
 #define TARGET_IS_RABBIT   (TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA)
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08 || TARGET_IS_S08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
@@ -442,8 +442,8 @@ extern PORT r2ka_port; // Rabbit 2000A, 2000C, 2000C, 3000
 #if !OPT_DISABLE_R3KA
 extern PORT r3ka_port; // Rabbit 3000A
 #endif
-#if !OPT_DISABLE_GBZ80
-extern PORT gbz80_port;
+#if !OPT_DISABLE_SM83
+extern PORT sm83_port;
 #endif
 #if !OPT_DISABLE_TLCS90
 extern PORT tlcs90_port;

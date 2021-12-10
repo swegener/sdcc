@@ -332,8 +332,8 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_R3KA
   &r3ka_port,
 #endif
-#if !OPT_DISABLE_GBZ80
-  &gbz80_port,
+#if !OPT_DISABLE_SM83
+  &sm83_port,
 #endif
 #if !OPT_DISABLE_TLCS90
   &tlcs90_port,
@@ -1717,7 +1717,7 @@ linkEdit (char **envp)
             fprintf (lnkfile, "-M\n");
         }
 
-      if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */
+      if (!TARGET_Z80_LIKE)   /* Not for the z80 and related */
         {
           /* if iram size specified */
           if (options.iram_size)
@@ -1749,7 +1749,7 @@ linkEdit (char **envp)
     if (segName) { Safe_free (segName); } \
   }
 
-      if (!TARGET_Z80_LIKE)   /* Not for the z80, z180, gbz80 */
+      if (!TARGET_Z80_LIKE)   /* Not for the z80 and related */
         {
 
           /* code segment start */
@@ -1793,7 +1793,7 @@ linkEdit (char **envp)
               werror (W_DEPRECATED_OPTION, "--stack-loc");
             }
         }
-      else                      /* For the z80, z180, gbz80 */
+      else                      /* For the z80 and related */
         {
           WRITE_SEG_LOC ("_CODE", options.code_loc);
           WRITE_SEG_LOC ("_DATA", options.data_loc);

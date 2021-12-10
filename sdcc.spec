@@ -20,8 +20,8 @@ SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 (formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
-HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
-Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
+HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
+Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
 Work is in progress on supporting the Microchip PIC16 and PIC18 and the
 Padauk PDK13 targets.
@@ -38,8 +38,8 @@ SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 (formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
-HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
-Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
+HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
+Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
 Work is in progress on supporting the Microchip PIC16 and PIC18 and the
 Padauk PDK13 targets.
@@ -55,8 +55,8 @@ SDCC is a free open source, retargettable, optimizing Standard C compiler
 suite that targets a growing list of processors including the Intel
 MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 (formerly Dallas) DS80C390 variants, NXP (formerly Freescale/Motorola)
-HC08 based (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80,
-Rabbit 2000/3000, Rabbit 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
+HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
+Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
 Work is in progress on supporting the Microchip PIC16 and PIC18 and the
 Padauk PDK13 targets.

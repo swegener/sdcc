@@ -42,8 +42,8 @@
 #elif defined(__SDCC_tlcs90)
 #include <asm/tlcs90/features.h>
 
-#elif defined(__SDCC_gbz80)
-#include <asm/gbz80/features.h>
+#elif defined(__SDCC_sm83)
+#include <asm/sm83/features.h>
 
 #elif defined(__SDCC_mcs51)
 #include <asm/mcs51/features.h>

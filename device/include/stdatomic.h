@@ -10,7 +10,7 @@ _Bool atomic_flag_test_and_set(volatile atomic_flag *object);
 
 void atomic_flag_clear(volatile atomic_flag *object);
 
-#elif defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
+#elif defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_sm83) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
 
 #define ATOMIC_FLAG_INIT {1}
 _Bool atomic_flag_test_and_set(volatile atomic_flag *object);

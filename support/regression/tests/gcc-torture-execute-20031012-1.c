@@ -25,7 +25,7 @@
 
 static void foo ()
 {
-#if !defined (__SDCC_gbz80) && !defined (__SDCC_mcs51) && !defined (__SDCC_stm8) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15)
+#if !defined (__SDCC_sm83) && !defined (__SDCC_mcs51) && !defined (__SDCC_stm8) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15)
     char a[ARRAY_SIZE]; /* Too big for mcs51 and gbz80 and stm8 and pdk14. */
     a[0]=0;
     memset( &a[0], 0xCD, STRLEN );

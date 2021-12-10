@@ -263,13 +263,13 @@ status collapsed
 \end_inset
 
 , etc.), Dallas DS80C390 variants, NXP (formerly Freescale/Motorola) HC08
- based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, eZ80 in Z80 mode, gbz80,
+ based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, eZ80 in Z80 mode, SM83,
  Rabbit 2000/3000, Rabbit 3000A 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Z80, Z180, GBZ80, Rabbit 2000/3000, Rabbit 3000A CPU
+Z80, Z180, SM83, Rabbit 2000/3000, Rabbit 3000A CPU
 \end_layout
 
 \end_inset
@@ -2671,7 +2671,7 @@ status collapsed
 
 \begin_layout Itemize
 In 4.1.10, the default calling convention switched from __sdccall(0) to __sdccall(
-1) for stm8 and gbz80.
+1) for stm8 and sm83.
 \end_layout
 
 \begin_layout Itemize
@@ -2694,6 +2694,10 @@ In 4.1.12, support for –profile has been removed for z80, z180, z80n.
 
 \begin_layout Itemize
 In 4.1.13, support for –profile has been removed.
+\end_layout
+
+\begin_layout Itemize
+In 4.1.14, the gbz80 port was renamed to sm83.
 \end_layout
 
 \begin_layout Section
@@ -3117,7 +3121,7 @@ status collapsed
 
 \end_inset
 
--disable-gbz80-port Excludes the Game Boy gbz80 port
+-disable-sm83-port Excludes the SM83 port
 \end_layout
 
 \begin_layout Labeling
@@ -11341,12 +11345,12 @@ status collapsed
 \labelwidthstring 00.00.0000
 
 \series bold
--mgbz80
+-msm83
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
--mgbz80
+-msm83
 \end_layout
 
 \end_inset
@@ -11355,10 +11359,10 @@ status collapsed
 \series default
  Generate code for the Sharp SM83
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-gbz80 (GameBoy Z80)
+sm83 (GameBoy Z80)
 \end_layout
 
 \end_inset
@@ -17811,7 +17815,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Options common to all z80-related ports (z80, z180, r2k, r3ka, gbz80, tlcs90,
+Options common to all z80-related ports (z80, z180, r2k, r3ka, sm83, tlcs90,
  ez80_z80)
 \end_layout
 
@@ -18237,7 +18241,7 @@ Never omit the frame pointer.
 \end_layout
 
 \begin_layout Subsection
-GBZ80 Options
+SM83 Options
 \begin_inset Index idx
 status collapsed
 
@@ -18249,10 +18253,10 @@ Options GBZ80
 
 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-GBZ80
+SM83
 \end_layout
 
 \end_inset
@@ -25758,7 +25762,7 @@ Interrupt handler can be interrupted by interrupts of higher priority only
 \end_layout
 
 \begin_layout Subsection
-GBZ80 and TLCS-90 Interrupt Service Routines
+SM83 and TLCS-90 Interrupt Service Routines
 \end_layout
 
 \begin_layout Standard
@@ -43943,12 +43947,12 @@ Z80
 \end_inset
 
 , Z180, eZ80 in Z80 mode, Rabbit 2000, Rabbit 2000A, Rabbit 3000A and LR35902,
- the Sharp SM83 (used .e.g in the Nintendo GameBoy) gbz80
+ the Sharp SM83 (used .e.g in the Nintendo GameBoy) sm83
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-gbz80 (GameBoy Z80)
+sm83 (GameBoy Z80)
 \end_layout
 
 \end_inset
@@ -44148,7 +44152,7 @@ This calling convention can be chosen for individual function via __sdcccall(0).
  All parameters are passed on the stack, right-to-left.
  8-bit return values are passed in l, 16-bit values in hl, 32-bit values
  in dehl.
- Except for the GBZ80, where 8-bit values are passed in e, 16-bit values
+ Except for the SM83, where 8-bit values are passed in e, 16-bit values
  in de, 32-bit values in hlde.
  Larger return values are passed in memory in a location specified by the
  caller through a hidden pointer argument.

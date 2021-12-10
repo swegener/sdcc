@@ -32,7 +32,7 @@ void atomic_flag_clear(volatile atomic_flag *object)
 {
 #if defined(__SDCC_tlcs90) || defined(__SDCC_mcs51)
 	object->flag = 0;
-#elif defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
+#elif defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_sm83) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
 	object->flag = 1;
 #else
 #error Support for atomic_flag not implemented

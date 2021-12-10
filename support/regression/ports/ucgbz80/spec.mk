@@ -1,4 +1,4 @@
-# Regression test specification for the gbz80 target running with uCsim
+# Regression test specification for the sm83 target running with uCsim
 
 # simulation timeout in seconds
 SIM_TIMEOUT = 40
@@ -24,7 +24,7 @@ else
 
 ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
-  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/gbz80
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/sm83
 endif
 endif
 
@@ -32,8 +32,8 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mgbz80 --less-pedantic
-LINKFLAGS += gbz80.lib
+SDCCFLAGS += -msm83 --less-pedantic
+LINKFLAGS += sm83.lib
 
 OBJEXT = .rel
 BINEXT = .ihx

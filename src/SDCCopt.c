@@ -3001,7 +3001,7 @@ offsetFoldUse (eBBlock **ebbs, int count)
   iCode *ic;
   iCode *uic;
 
-  if (!(TARGET_Z80_LIKE && !TARGET_IS_GBZ80) && !TARGET_IS_STM8) // All z80-related targets except gbz80 support non-zero right operand. stm8 also supports it.
+  if (!(TARGET_Z80_LIKE && !TARGET_IS_SM83) && !TARGET_IS_STM8) // All z80-related targets except sm83 support non-zero right operand. stm8 also supports it.
     return;
 
   for (i = 0; i < count; i++)

@@ -1,4 +1,4 @@
-# libc/gbz80 Makefile
+# libc/sm83 Makefile
 
 VPATH  = @srcdir@
 srcdir = @srcdir@
@@ -6,11 +6,11 @@ top_builddir = @top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mgbz80 --max-allocs-per-node 25000
+SCC = $(top_builddir)/bin/sdcc -msm83 --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdasgb
 
 # override PORTDIR defined by super (parent) makefile
-override PORTDIR = ../build/gbz80
+override PORTDIR = ../build/sm83
 
 include $(srcdir)/../incl.mk
 
@@ -47,7 +47,7 @@ OBJ = div.rel mul.rel memcpy.rel abs.rel \
       __initrleblock.rel heap.rel __sdcc_call_hl.rel \
       setjmp.rel atomic_flag_test_and_set.rel strlen.rel
 
-LIB = gbz80.lib
+LIB = sm83.lib
 CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
@@ -60,7 +60,7 @@ $(PORTDIR)/crt0.rel: crt0.rel
 	cp crt0.rel $(PORTDIR)/crt0.rel
 
 Makefile: $(srcdir)/Makefile.in
-	cd $(top_builddir); ./config.status device/lib/gbz80/Makefile
+	cd $(top_builddir); ./config.status device/lib/sm83/Makefile
 
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
 	rm -f $@

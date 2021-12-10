@@ -141,9 +141,9 @@ testmodes = {
             "__has_z88dk_fastcall":"1"
         }
     },
-    "gbz80":{
+    "sm83":{
         "compiler":sdcc,
-        "port":"gbz80",
+        "port":"sm83",
         "extra-defines": {
             "__has_sdcccall":"1"
         }

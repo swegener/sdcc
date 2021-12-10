@@ -1,5 +1,5 @@
 /** @file z80/z80.h
-    Common definitions between the z80 and gbz80 parts.
+    Common definitions for the the z80-related ports.
 */
 #include "common.h"
 #include "ralloc.h"
@@ -14,7 +14,7 @@ typedef enum
     SUB_R2K,
     SUB_R2KA,
     SUB_R3KA,
-    SUB_GBZ80,
+    SUB_SM83,
     SUB_TLCS90,
     SUB_EZ80_Z80,
     SUB_Z80N
@@ -42,14 +42,14 @@ extern Z80_OPTS z80_opts;
 #define IS_R2KA (z80_opts.sub == SUB_R2KA)
 #define IS_R3KA (z80_opts.sub == SUB_R3KA)
 #define IS_RAB (IS_R2K || IS_R2KA || IS_R3KA)
-#define IS_GB (z80_opts.sub == SUB_GBZ80)
+#define IS_SM83 (z80_opts.sub == SUB_SM83)
 #define IS_TLCS90 (z80_opts.sub == SUB_TLCS90)
 #define IS_EZ80_Z80 (z80_opts.sub == SUB_EZ80_Z80)
 #define IS_Z80N (z80_opts.sub == SUB_Z80N)
 
 #define IY_RESERVED (z80_opts.reserveIY)
 
-#define OPTRALLOC_IY !(IY_RESERVED || IS_GB)
+#define OPTRALLOC_IY !(IY_RESERVED || IS_SM83)
 
 enum
   {

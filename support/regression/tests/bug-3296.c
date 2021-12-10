@@ -29,7 +29,7 @@ static inline int16_t both_negative_mask(int16_t x,int16_t y)
   return (x & y) >> 15;
 }
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_gbz80) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pdk16) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_sm83) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pdk16) // Lack of memory
 void poly_S3_inv(poly *r, const poly *a)
 {
   poly f, g, v, w;

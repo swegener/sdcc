@@ -7,13 +7,12 @@
 
 #include <testfwk.h>
 
-#if (defined(__SDCC_stm8) || defined(__SDCC_gbz80))
+#if (defined(__SDCC_stm8) || defined(__SDCC_sm83) || defined(__SDCC_z80) || defined(__SDCC_z80n) || defined(__SDCC_z180))
 #define SDCCCALL __sdcccall({version})
 #else
 #define SDCCCALL
 #endif
 
-#ifdef __SDCC_stm8
 {typeret} f({typearg} i) SDCCCALL
 {
 	return ++i;
@@ -38,17 +37,14 @@
 {
 	return f(i);
 }
-#endif
 
 void
 testCallingConvention(void)
 {
-#ifdef __SDCC_stm8
   ASSERT(f(23) == ({typeret})24);
   ASSERT(g(23, 1001u) == ({typeret})1024ul);
   ASSERT(h(23, 1001u, 10000000000ul) == ({typeret})10000001024ull);
   ASSERT(f_wrap_default(23) == ({typeret})24);
   ASSERT(f_wrap_explicit(23) == ({typeret})24);
-#endif
 }
 

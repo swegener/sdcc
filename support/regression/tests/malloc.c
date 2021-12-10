@@ -150,7 +150,7 @@ testMalloc (void)
   LOG (("p1 == NULL when out of memory\n"));
 #endif
 
-#if !defined(PORT_HOST) && !defined(__SDCC_gbz80) && !defined(__SDCC_z80)
+#if !defined(PORT_HOST) && !defined(__SDCC_sm83) && !defined(__SDCC_z80)
   p1 = malloc (2000);
   ASSERT (p1 == NULL);
   LOG (("p1 == NULL when out of memory\n"));

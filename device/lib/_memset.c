@@ -121,7 +121,7 @@ __naked
     ret
   __endasm;
 }
-#elif !defined (_SDCC_NO_ASM_LIB_FUNCS) && defined(__SDCC_gbz80)
+#elif !defined (_SDCC_NO_ASM_LIB_FUNCS) && defined(__SDCC_sm83)
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS      
 #error Unimplemented broken string function
 #endif  

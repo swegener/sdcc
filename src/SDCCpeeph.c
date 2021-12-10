@@ -764,9 +764,9 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
         return global_not_volatile;
       if (strstr (var, "(iy"))
         return global_not_volatile;
-      // gbz80 specific ldh can be volatile
+      // am83-specific ldh can be volatile
       // but HRAM doesn't have to be volatile
-      if (TARGET_ID_GBZ80 && strstr (var, "(c)"))
+      if (TARGET_ID_SM83 && strstr (var, "(c)"))
         return global_not_volatile;
     }
 

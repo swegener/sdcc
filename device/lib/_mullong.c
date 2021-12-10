@@ -698,12 +698,13 @@ _mullong (long a, long b)
 
         return t.l;
 }
-#elif defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_r2ka) || defined(__SDCC_r3k) || defined(__SDCC_r3ka)
+#elif defined(__SDCC_z80) || defined(__SDCC_sm83) || defined(__SDCC_r2ka) || defined(__SDCC_r3k) || defined(__SDCC_r3ka)
 /* 32x32->32 multiplication to be used
    if 16x16->16 is faster than three 8x8->16.
    2009, by M.Bodrato ( http://bodrato.it/ )
 
-   z80 and gbz80 don't have any hardware multiplication, not even 8x8.
+   z80 and sm83 don't have any hardware multiplication, not even 8x8.
+   software 16x16 is neqrly as efficient as software 8x8 there.
    r2k(a) and r3k(a) have 16x16 hardware multiplication,
    but on r2k it is affected by a hardware bug, and not used by sdcc.
  */

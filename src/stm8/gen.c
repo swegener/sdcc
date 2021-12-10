@@ -6963,11 +6963,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
   bool all_in_reg = TRUE;
 
   shiftop->size = size;
-  shiftop->regs[A_IDX] = -1;
-  shiftop->regs[XL_IDX] = -1;
-  shiftop->regs[XH_IDX] = -1;
-  shiftop->regs[YL_IDX] = -1;
-  shiftop->regs[YH_IDX] = -1;
+  memset (shiftop->regs, -1, sizeof(shiftop->regs));
 
   for (i = 0; i < size;)
     {

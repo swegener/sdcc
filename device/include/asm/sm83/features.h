@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   features.h - GBZ80 specific features.
+   features.h - SM83 specific features.
 
    Copyright (C) 2001, Michael Hope
 
@@ -26,8 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDC51_ASM_GBZ80_FEATURES_H
-#define __SDC51_ASM_GBZ80_FEATURES_H   1
+#ifndef __SDC51_ASM_SM83_FEATURES_H
+#define __SDC51_ASM_SM83_FEATURES_H   1
 
 #define _REENTRANT
 #define _CODE
@@ -38,3 +38,4 @@
 #define _SDCC_Z80_STYLE_LIB_OPT		1
 
 #endif
+

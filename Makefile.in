@@ -57,7 +57,7 @@ ifeq ($(OPT_DISABLE_TLCS90), 0)
 SDCC_AS        += sdas/astlcs90
 endif
 
-ifeq ($(OPT_DISABLE_GBZ80), 0)
+ifeq ($(OPT_DISABLE_SM83), 0)
 SDCC_AS        += sdas/asgb
 SDCC_LD        += sdcc-ldgb
 endif

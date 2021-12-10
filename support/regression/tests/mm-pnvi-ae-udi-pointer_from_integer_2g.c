@@ -32,7 +32,7 @@ PERFORMANCE OF THIS SOFTWARE.
 #define ADDRESS_PFI_2G 42
 #elif defined (__SDCC_pdk14)
 #define ADDRESS_PFI_2G 0x17fc
-#elif defined (__SDCC_gbz80)
+#elif defined (__SDCC_sm83)
 #define ADDRESS_PFI_2G 0xdff8
 #else
 #define ADDRESS_PFI_2G 0

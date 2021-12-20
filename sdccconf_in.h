@@ -49,9 +49,6 @@
 /* Define to 1 if you have the <machine/endian.h> header file. */
 #undef HAVE_MACHINE_ENDIAN_H
 
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
 /* Define to 1 if you have the `mkstemp' function. */
 #undef HAVE_MKSTEMP
 
@@ -60,6 +57,9 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
@@ -122,9 +122,6 @@
 #undef OPT_DISABLE_EZ80_Z80
 
 /* XXX */
-#undef OPT_DISABLE_GBZ80
-
-/* XXX */
 #undef OPT_DISABLE_HC08
 
 /* XXX */
@@ -174,6 +171,9 @@
 
 /* XXX */
 #undef OPT_DISABLE_SDCPP
+
+/* XXX */
+#undef OPT_DISABLE_SM83
 
 /* XXX */
 #undef OPT_DISABLE_STM8
@@ -268,7 +268,9 @@
 /* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
 
 /* XXX */
@@ -325,7 +327,8 @@
 # endif
 #endif
 
-/* Define to 1 if type `char' is unsigned and you are not using gcc.  */
+/* Define to 1 if type `char' is unsigned and your compiler does not
+   predefine this macro.  */
 #ifndef __CHAR_UNSIGNED__
 # undef __CHAR_UNSIGNED__
 #endif

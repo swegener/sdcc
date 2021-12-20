@@ -1,3 +1,8 @@
+2021-12-20 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* sdccconf_in.h:
+	  Fix bug #3297.
+
 2021-12-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* .version,

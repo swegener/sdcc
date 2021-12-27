@@ -1,3 +1,9 @@
+2021-12-27 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/*/__sdcc_bcall.s,
+	  support/regression/tests/banked.c:
+	  Fix bug # 3298.
+
 2021-12-20 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* sdccconf_in.h:

@@ -1,4 +1,5 @@
-/** banked.c
+/* banked.c
+   returntype: char, int, long
 */
 #include <testfwk.h>
 
@@ -8,10 +9,10 @@
 
 static unsigned char bank;
 #ifdef DO_CHECK
-unsigned c_ab(unsigned a, unsigned b) __banked;
-unsigned f_ab(unsigned a) __banked __z88dk_fastcall;
-unsigned c_51(unsigned a, unsigned b) __banked;
-unsigned f_51(unsigned a) __banked __z88dk_fastcall;
+{returntype} c_ab(unsigned a, unsigned b) __banked;
+{returntype} f_ab(unsigned a) __banked __z88dk_fastcall;
+{returntype} c_51(unsigned a, unsigned b) __banked;
+{returntype} f_51(unsigned a) __banked __z88dk_fastcall;
 #endif
 
 void
@@ -19,13 +20,13 @@ testBanked(void)
 {
     ASSERT (bank == 0);
 #ifdef DO_CHECK
-    ASSERT (c_ab(0x0e, 0x4) == 0xabe4);
+    ASSERT (c_ab(0x0e, 0x4) == ({returntype})0xabe4);
     ASSERT (bank == 0);
-    ASSERT (f_ab(0x4e) == 0xab4e);
+    ASSERT (f_ab(0x4e) == ({returntype})0xab4e);
     ASSERT (bank == 0);
-    ASSERT (c_51(0x02, 0xd) == 0x51d2);
+    ASSERT (c_51(0x02, 0xd) == ({returntype})0x51d2);
     ASSERT (bank == 0);
-    ASSERT (f_51(0x2d) == 0x2d51);
+    ASSERT (f_51(0x2d) == ({returntype})0x2d51);
     ASSERT (bank == 0);
 #endif
 }
@@ -49,20 +50,20 @@ get_bank::
     __endasm;
 }
 #pragma bank 0xab
-unsigned c_ab(unsigned a, unsigned b) __banked
+{returntype} c_ab(unsigned a, unsigned b) __banked
 {
   return bank * 0x100 + a * 16 + b;
 }
-unsigned f_ab(unsigned a) __banked __z88dk_fastcall
+{returntype} f_ab(unsigned a) __banked __z88dk_fastcall
 {
   return bank * 0x100 + a;
 }
 #pragma bank 0x51
-unsigned c_51(unsigned a, unsigned b) __banked
+{returntype} c_51(unsigned a, unsigned b) __banked
 {
   return bank * 0x100 + b * 16 + a;
 }
-unsigned f_51(unsigned a) __banked __z88dk_fastcall
+{returntype} f_51(unsigned a) __banked __z88dk_fastcall
 {
   return bank + a * 0x100;
 }

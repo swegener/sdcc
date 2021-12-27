@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  __sdcc_bcall.s
 ;
-;  Copyright (C) 2011, Maarten Brock, 2015 Philipp Klaus Krause
+;  Copyright (C) 2011, Maarten Brock, 2015-2021 Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -90,8 +90,12 @@ ___sdcc_bcall_ehl::
 	inc	sp
 	call	___sdcc_bjump_ehl
 	dec	sp
+	pop	bc
+	push	af
+	ld	a, b
+	call	set_bank
 	pop	af
-	jp	set_bank
+	ret
 ;
 ___sdcc_bjump_ehl:
 	ld	a, e

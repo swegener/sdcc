@@ -23510,8 +23510,8 @@ Binary constants
 \end_layout
 
 \begin_layout Standard
-SDCC supports the use of binary constants, such as 0b01100010.
- This feature is only enabled when the compiler is invoked using 
+SDCC supports the use of C23 binary constants, such as 0b01100010 when the
+ compiler is invoked using 
 \begin_inset Flex Code
 status open
 
@@ -23521,7 +23521,17 @@ status open
 
 \end_inset
 
-.
+, even when the corresponding 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-cxx
+\end_layout
+
+\end_inset
+
+, does not.
 \end_layout
 
 \begin_layout Subsection
@@ -44361,6 +44371,27 @@ Usually, Z80-based systems (except for the SM83 and TLCS-90) have separate
  side-effects.
  For such systems, the option –allow-unsafe-reads can be used to enable
  some extra optimizations that rely on this.
+\end_layout
+
+\begin_layout Subsection
+Z80 banked calls
+\end_layout
+
+\begin_layout Standard
+Banked calls are supported via __banked.
+ Banked calls are done via a trampoline (__sdcc_bcall if --legacy-banking
+ us specified, __sdcc_bcall_abc for z88dk_fastcall, __sdcc_bcall_ehl for
+ other calls).
+ Default trampolines are provided in the library.
+ The default trampolines calls user supplied helper functions set_bank and
+ get_bank that set the current bank to the value inr egister a, or return
+ the current bank in register a.
+\end_layout
+
+\begin_layout Standard
+For banked functions, the calling convention is slightly different: the
+ stack is always cleared up by the caller.
+ Unless __z88dk_fastcall is used, all parameters are passed on the stack.
 \end_layout
 
 \begin_layout Section

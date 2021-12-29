@@ -108,7 +108,7 @@ struct dis_entry disass_m6809[]=
    { 0x6e, 0xff, ' ', 1, "JMP %j"	, 0, 0 },
    { 0x7e, 0xff, ' ', 1, "JMP %J"	, 0, 0 },
    
-   { 0x1e, 0xff, ' ', 1, "XCG %r"	, 0, 0 },
+   { 0x1e, 0xff, ' ', 1, "EXG %r"	, 0, 0 },
    { 0x1f, 0xff, ' ', 1, "TFR %r"	, 0, 0 },
    
    { 0x89, 0xcf, ' ', 1, "ADCA %u"	, 0, 0 },

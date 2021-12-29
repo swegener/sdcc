@@ -529,7 +529,7 @@ COMMAND_DO_WORK_UC(cl_memory_remove_chip_cmd)
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-  class cl_memory *chip;
+  class cl_memory *chip= 0;
 
   if (cmdline->syntax_match(uc, MEMORY)) {
     chip= params[0]->value.memory.memory;

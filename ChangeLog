@@ -1,3 +1,11 @@
+2022-01-02 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx,
+	  doc/sm83-arguments.svg,
+	  doc/stm8-arguments.svg,
+	  doc/z80-arguments.svg:
+	  Improve calling convention documentation.
+
 2021-12-28 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:

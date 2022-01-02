@@ -44154,23 +44154,6 @@ The current default is the SDCC calling convention, version 1.
 \end_layout
 
 \begin_layout Subsubsection
-Z80 SDCC calling convention, version 0
-\end_layout
-
-\begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(0).
- All parameters are passed on the stack, right-to-left.
- 8-bit return values are passed in l, 16-bit values in hl, 32-bit values
- in dehl.
- Except for the SM83, where 8-bit values are passed in e, 16-bit values
- in de, 32-bit values in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
- Unless __z88dk_callee is used, all stack parameters are cleaned up by the
- caller.
-\end_layout
-
-\begin_layout Subsubsection
 Z80 SDCC calling convention, version 1
 \end_layout
 
@@ -44190,6 +44173,15 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename z80-arguments.svg
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For Functions that do not have variable arguments: The first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in hl.
@@ -44202,6 +44194,23 @@ For Functions that do not have variable arguments: The first parameter is
  do not have variable arguments and return void or a type of at most 16
  bits, or have both a first parameter of type float and a return value of
  type float.
+\end_layout
+
+\begin_layout Subsubsection
+Z80 SDCC calling convention, version 0
+\end_layout
+
+\begin_layout Standard
+This calling convention can be chosen for individual function via __sdcccall(0).
+ All parameters are passed on the stack, right-to-left.
+ 8-bit return values are passed in l, 16-bit values in hl, 32-bit values
+ in dehl.
+ Except for the SM83, where 8-bit values are passed in e, 16-bit values
+ in de, 32-bit values in hlde.
+ Larger return values are passed in memory in a location specified by the
+ caller through a hidden pointer argument.
+ Unless __z88dk_callee is used, all stack parameters are cleaned up by the
+ caller.
 \end_layout
 
 \begin_layout Subsection
@@ -44244,6 +44253,15 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename r3ka-arguments.svg
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For Functions that do not have variable arguments: The first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in hl.
@@ -44270,22 +44288,6 @@ The current default is the SDCC calling convention, version 1.
 \end_layout
 
 \begin_layout Subsubsection
-SM83 SDCC calling convention, version 0
-\end_layout
-
-\begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(0).
- 8-bit return values are passed in e, 16-bit values in de, 32-bit values
- in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
- All parameters are passed on the stack.
- The stack is not adjusted for the parameters by the callee (thus the caller
- has to do this instead), unless __z88dk_callee is specified.
- __sdcccall(0) can be combined with __z88dk_callee.
-\end_layout
-
-\begin_layout Subsubsection
 SM83 SDCC calling convention, version 1
 \end_layout
 
@@ -44308,6 +44310,15 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename sm83-arguments.svg
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 For Functions that do not have variable arguments: The first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in de.
@@ -44319,6 +44330,22 @@ For Functions that do not have variable arguments: The first parameter is
  passed in bc; all other parameters are passed on the stack, right-to-left.
  The stack is adjusted by the callee (thus explicitly specifying __z88dk_callee
  does not make a difference).
+\end_layout
+
+\begin_layout Subsubsection
+SM83 SDCC calling convention, version 0
+\end_layout
+
+\begin_layout Standard
+This calling convention can be chosen for individual function via __sdcccall(0).
+ 8-bit return values are passed in e, 16-bit values in de, 32-bit values
+ in hlde.
+ Larger return values are passed in memory in a location specified by the
+ caller through a hidden pointer argument.
+ All parameters are passed on the stack.
+ The stack is not adjusted for the parameters by the callee (thus the caller
+ has to do this instead), unless __z88dk_callee is specified.
+ __sdcccall(0) can be combined with __z88dk_callee.
 \end_layout
 
 \begin_layout Subsection
@@ -44465,6 +44492,15 @@ Arguments are passed on the stack right-to-left.
 
 \begin_layout Subsubsection
 SDCC calling convention, version 1
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename stm8-arguments.svg
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

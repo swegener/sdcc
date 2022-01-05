@@ -686,7 +686,7 @@ replace restart {
 	pop	%1
 	push	%1
 } by {
-	; common peephole 50a eleminated dead pop/push pair.
+	; common peephole 50a eleminated dead pop/push %1 pair.
 } if notUsed(%1)
 
 replace restart {

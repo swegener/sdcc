@@ -1,3 +1,8 @@
+2022-01-05 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3295.
+
 2022-01-02 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx,

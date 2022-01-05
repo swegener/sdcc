@@ -964,7 +964,7 @@ op8_cost (const asmop *op, int offset)
       cost2 (2, 7, 6, 4, 8, 4, 2);
       return;
     case AOP_STK:
-      if (true/*!IS_SM83 TODO: enable this condition! it currently causes a regtest failure, ie.e. exposes an exisiting codegen bug*/)
+      if (!IS_SM83)
         {
           cost2 (3, 19, 15, 9, 0, 10, 4);
           return;
@@ -10878,10 +10878,10 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
 
         if (aopInReg (right_aop, i, A_IDX) && left_aop->type != AOP_STL)
           {
-            if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
+            if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
               _push (PAIR_HL);
             emit3_o (A_XOR, ASMOP_A, 0, left_aop, i);
-            if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
+            if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
               _pop (PAIR_HL);
           }
         else if (right_aop->type == AOP_STL)

@@ -84,8 +84,8 @@
 #define IX              5
 #define IY              6
 
-#define IIR             0x47
-#define EIR             0x4F
+#define EIR             0x47
+#define IIR             0x4f
 #define IP              0x76
 
 #define BCDE            1

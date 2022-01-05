@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix bug #3295.
+	* sdas/asrab/rab.h:
+	  Fix bug #3261.
 
 2022-01-02 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 

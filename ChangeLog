@@ -1,3 +1,9 @@
+2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
+    * src/hc08/gen.c,
+      src/hc08/main.c,
+      src/hc08/ralloc.c:
+      replace TRUE/FALSE with true/false.
+      
 2022-01-05 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:

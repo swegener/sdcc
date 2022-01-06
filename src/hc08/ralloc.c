@@ -795,13 +795,13 @@ regTypeNum (eBBlock *ebbs)
           if (sym->ruonly || sym->accuse)
             {
               if (IS_AGGREGATE (sym->type) || sym->isptr)
-                sym->type = aggrToPtr (sym->type, FALSE);
+                sym->type = aggrToPtr (sym->type, false);
               continue;
             }
 
           /* if not then we require registers */
           sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) ?
-                        getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
+                        getSize (sym->type = aggrToPtr (sym->type, false)) :
                         getSize (sym->type));
 
           if (sym->nRegs > 8)
@@ -1100,11 +1100,11 @@ findAssignToSym (operand * op, iCode * ic)
     return NULL;
 
   /* if the symbol is volatile then we should not */
-  if (isOperandVolatile (IC_RIGHT (dic), TRUE))
+  if (isOperandVolatile (IC_RIGHT (dic), true))
     return NULL;
-  /* XXX TODO --- should we be passing FALSE to isOperandVolatile()?
+  /* XXX TODO --- should we be passing false to isOperandVolatile()?
      What does it mean for an iTemp to be volatile, anyway? Passing
-     TRUE is more cautious but may prevent possible optimizations */
+     true is more cautious but may prevent possible optimizations */
 
   /* if the symbol is in far space then we should not */
   /* if (isOperandInFarSpace (IC_RIGHT (dic)))
@@ -1156,7 +1156,7 @@ reassignAliasedSym (eBBlock *ebp, iCode *assignment, iCode *use, operand *op)
 
   /* update the sym's liverange */
   if ( OP_LIVETO(op) < ic->seq )
-    setToRange(op, ic->seq, FALSE);
+    setToRange(op, ic->seq, false);
 
   /* remove the assignment iCode now that its result is unused */
   remiCodeFromeBBlock (ebp, assignment);
@@ -1299,11 +1299,11 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
      is one byte */
 #if 0
   if (POINTER_SET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), false)))
     return NULL;
 
   if (POINTER_GET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), false)))
     return NULL;
 #endif
 
@@ -1320,11 +1320,11 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
          is one byte */
 #if 0
       if (POINTER_SET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), false)))
         return NULL;
 
       if (POINTER_GET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), false)))
         return NULL;
 #endif
       /* if address of & the result is remat then okay */
@@ -1388,9 +1388,9 @@ isBitwiseOptimizable (iCode * ic)
   */
   if (IS_LITERAL(rtype) ||
       (IS_BITVAR (ltype) && IN_BITSPACE (SPEC_OCLS (ltype))))
-    return TRUE;
+    return true;
   else
-    return FALSE;
+    return false;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1401,9 +1401,9 @@ bool isCommutativeOp2(unsigned int op)
 {
   if (op == '+' || op == '*' || op == EQ_OP ||
       op == '^' || op == '|' || op == BITWISEAND)
-    return TRUE;
+    return true;
   else
-    return FALSE;
+    return false;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1413,34 +1413,34 @@ bool isCommutativeOp2(unsigned int op)
 bool operandUsesAcc2(operand *op)
 {
   if (!op)
-    return FALSE;
+    return false;
 
   if (IS_SYMOP(op)) {
     symbol *sym = OP_SYMBOL(op);
     memmap *symspace;
 
     if (sym->accuse)
-      return TRUE;  /* duh! */
+      return true;  /* duh! */
 
     if (IS_ITEMP(op))
       {
         if (SPIL_LOC(op)) {
           sym = SPIL_LOC(op);  /* if spilled, look at spill location */
         } else {
-          return FALSE;  /* more checks? */
+          return false;  /* more checks? */
         }
       }
 
     symspace = SPEC_OCLS(sym->etype);
 
     if (IN_BITSPACE(symspace))
-      return TRUE;  /* fetching bit vars uses the accumulator */
+      return true;  /* fetching bit vars uses the accumulator */
 
     if (IN_FARSPACE(symspace) || IN_CODESPACE(symspace))
-      return TRUE;  /* fetched via accumulator and dptr */
+      return true;  /* fetched via accumulator and dptr */
   }
 
-  return FALSE;
+  return false;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2138,7 +2138,7 @@ hc08_oldralloc (ebbIndex * ebbi)
 
   /* liveranges probably changed by register packing
      so we compute them again */
-  recomputeLiveRanges (ebbs, count, FALSE);
+  recomputeLiveRanges (ebbs, count, false);
 
   if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
@@ -2346,7 +2346,7 @@ hc08_ralloc (ebbIndex * ebbi)
 
   /* liveranges probably changed by register packing
      so we compute them again */
-  recomputeLiveRanges (ebbs, count, FALSE);
+  recomputeLiveRanges (ebbs, count, false);
 
   if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);

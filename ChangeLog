@@ -1,3 +1,7 @@
+2022-01-06 Gabriele Gorla <gorlik@yahoo.com>
+    * support/regression/ports/uc6502/spec.mk:
+    Rename m6502 port to mos6502.
+
 2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
     * sdas/as6500/clean.mk,
       sdas/as6500/Makefile.in,

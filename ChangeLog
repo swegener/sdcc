@@ -1,4 +1,13 @@
 2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
+    * sdas/as6500/clean.mk,
+      sdas/as6500/Makefile.in,
+      sdas/as6500/r6500.h,
+      sdas/as6500/r65adr.c,
+      sdas/as6500/r65mch.c,
+      sdas/as6500/r65pst.c:
+      Add as6500 in preparation of mos6502 port merge.
+
+2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
     * src/hc08/gen.c,
       src/hc08/main.c,
       src/hc08/ralloc.c:

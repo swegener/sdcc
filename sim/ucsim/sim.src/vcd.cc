@@ -774,6 +774,7 @@ cl_vcd::report(class cl_vcd_var *var, t_mem v)
         putc((v & (1U << i)) ? '1' : '0', fd);
       fprintf(fd, " %c\n", var->var_id);
     }
+  fflush(NULL);
 }
 
 int

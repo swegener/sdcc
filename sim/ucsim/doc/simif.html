@@ -3,23 +3,6 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-2">
     <title>&#956;Csim: Simulator interface</title>
-    <link rel="force-svg" href="http://berjon.com/blog/2009/07/force-svg.html">
-    <script type="application/javascript">(function()
-{
-  function ForceSVGInHTML()
-  {
-    window.removeEventListener("load", ForceSVGInHTML, true);
-    var svgs = document.getElementsByTagName("svg");
-    for (var i = 0; i < svgs.length; i++) {
-      var svg = svgs[i];
-      var div = document.createElement("div");
-      div.appendChild(svg.cloneNode(true));
-      var dom = (new DOMParser()).parseFromString(div.innerHTML, "application/xml");
-      svg.parentNode.replaceChild(document.importNode(dom.documentElement, true), svg);
-    }
-  }
-  window.addEventListener("load", ForceSVGInHTML, true);
-})();</script>
   </head>
   <body>
     <h1>Simulator interface</h1>

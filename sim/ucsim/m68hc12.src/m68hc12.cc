@@ -61,6 +61,9 @@ cl_m68hc12::init(void)
   int i;
   
   cl_m68hcbase::init();
+#define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
+  RCV(TMP2);
+  RCV(TMP3);
   
   xtal= 8000000;
 
@@ -81,6 +84,34 @@ void
 cl_m68hc12::reset(void)
 {
   cl_m68hcbase::reset();
+}
+
+void
+cl_m68hc12::make_memories(void)
+{
+  class cl_address_space *as;
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+  
+  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  chip= new cl_chip8("rom_chip", 0x400000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_m68hc12::make_cpu_hw(void)
+{
+  add_hw(cpu= new cl_hc12_cpu(this));
+  cpu->init();
 }
 
 
@@ -338,5 +369,96 @@ CL12::naddr(void)
   return a;
 }
 
+
+void
+cl_m68hc12::print_regs(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("A= $%02x %3d %+4d %c  ", rA, rA, (i8_t)rA, isprint(rA)?rA:'.');
+  con->dd_printf("B= $%02x %3d %+4d %c  ", rB, rB, (i8_t)rB, isprint(rB)?rB:'.');
+  con->dd_printf("   D= $%04x %5d %+5d ", rD, rD, (i16_t)rD);
+  con->dd_printf("\n");
+  con->dd_printf("CC= "); con->print_bin(rF, 8);
+  con->dd_printf("                          TMP2= $%04x %5d %+5d",
+		 rTMP2, rTMP2, rTMP2);
+  con->dd_printf("\n");
+  con->dd_printf("      HINZVC");
+  con->dd_printf("                          TMP3= $%04x %5d %+5d",
+		 rTMP3, rTMP3, rTMP3);
+  con->dd_printf("\n");
+
+  con->dd_printf("IX= ");
+  rom->dump(0, IX, IX+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("IY= ");
+  rom->dump(0, IY, IY+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("SP= ");
+  rom->dump(0, SP, SP+7, 8, con);
+  con->dd_color("answer");
+  
+  print_disass(PC, con);
+}
+
+
+/*
+ * CPU peripheral for HC12 cpu
+ */
+
+cl_hc12_cpu::cl_hc12_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_CPU, 0, "cpu")
+{
+  muc= (class cl_m68hc12 *)auc;
+}
+
+int
+cl_hc12_cpu::init(void)
+{
+  class cl_cvar *v;
+  cl_hw::init();
+  
+  ppage= register_cell(muc->rom, 0x0035);
+  dpage= register_cell(muc->rom, 0x0034);
+  epage= register_cell(muc->rom, 0x0036);
+  windef= register_cell(muc->rom, 0x0037);
+
+  uc->vars->add(v= new cl_var("PPAGE", muc->rom, 0x0035,
+			      "Program page register"));
+  v->init();
+  uc->vars->add(v= new cl_var("DPAGE", muc->rom, 0x0034,
+			      "Data page register"));
+  v->init();
+  uc->vars->add(v= new cl_var("EPAGE", muc->rom, 0x0036,
+			      "Extra page register"));
+  v->init();
+  uc->vars->add(v= new cl_var("WINDEF", muc->rom, 0x0037,
+			      "Window definition register"));
+  v->init();
+  return 0;
+}
+
+void
+cl_hc12_cpu::reset(void)
+{
+  ppage->write(0);
+  dpage->write(0);
+  epage->write(0);
+  windef->write(0);
+}
+
+void
+cl_hc12_cpu::print_info(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("PPAGE= $%02x\n", ppage->read());
+  con->dd_printf("DPAGE= $%02x\n", dpage->read());
+  con->dd_printf("EPAGE= $%02x\n", epage->read());
+  u8_t w= windef->read();
+  con->dd_printf("PWEN= %d\n", (w&0x40)?1:0);
+  con->dd_printf("DWEN= %d\n", (w&0x80)?1:0);
+  con->dd_printf("EWEN= %d\n", (w&0x20)?1:0);
+}
 
 /* End of m68hc12.src/m68hc12.cc */

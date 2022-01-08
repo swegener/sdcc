@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   atomic_flag_clear.c
+   _mulint.c - routine for (unsigned) int (16 bit) multiplication
 
-   Philipp Klaus Krause, pkk@spth.de 2020
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,16 +26,35 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <stdatomic.h>
 
-void atomic_flag_clear(volatile atomic_flag *object)
+// Little-endian
+union uu {
+	struct { unsigned char lo,hi ;} s;
+        unsigned int t;
+};
+
+int
+_mulint (int a, int b)
 {
-#if defined(__SDCC_tlcs90) || defined(__SDCC_mcs51)
-	object->flag = 0;
-#elif defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_sm83) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_mos6502) || defined(__SDCC_mos65c02)
-	object->flag = 1;
+#if !defined(__SDCC_STACK_AUTO) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_ds390))	// still needed for large
+	union uu __xdata *x;
+	union uu __xdata *y;
+	union uu t;
+        x = (union uu __xdata *)&a;
+        y = (union uu __xdata *)&b;
 #else
-#error Support for atomic_flag not implemented
+	register union uu *x;
+	register union uu *y;
+	union uu t;
+        x = (union uu *)&a;
+        y = (union uu *)&b;
 #endif
+
+  // sdcc is bad at handling union accesses. So we use (unsigned char)a instead of x->s.lo here.
+  t.t = (unsigned char)a * (unsigned char)b;
+  t.s.hi += ((unsigned char)a * y->s.hi) + (x->s.hi * (unsigned char)b);
+
+  return t.t;
 }
 
+#undef _MULINT_ASM

@@ -1,4 +1,25 @@
+2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/device/lib/mos65c02/Makefile.in,
+      sdcc/device/lib/mos65c02/atomic_flag_test_and_set.c,
+      sdcc/device/lib/mos65c02/_setjmp.c,
+      sdcc/device/lib/mos65c02/_ret.c,
+      sdcc/device/lib/mos65c02/_mulint.c,
+      sdcc/device/lib/mos6502/Makefile.in,
+      sdcc/device/lib/mos6502/crt0.s,
+      sdcc/device/lib/mos6502/atomic_flag_test_and_set.c,
+      sdcc/device/lib/mos6502/_setjmp.c,
+      sdcc/device/lib/mos6502/_rrulonglong.c,
+      sdcc/device/lib/mos6502/_rrslonglong.c,
+      sdcc/device/lib/mos6502/_ret.c,
+      sdcc/device/lib/mos6502/_mulint.c,
+      sdcc/device/lib/malloc.c,
+      sdcc/device/lib/atomic_flag_clear.c,
+      sdcc/device/lib/clean.mk:
+      Add mos6502 and mos65c02 library code.
+
 2022-01-06 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/device/include/string.h,
       sdcc/device/include/stdlib.h,
       sdcc/device/include/stdatomic.h,
@@ -7,10 +28,12 @@
       Add mos6502 to standard includes.
 
 2022-01-06 Gabriele Gorla <gorlik@yahoo.com>
+
     * support/regression/ports/uc6502/spec.mk:
       Rename m6502 port to mos6502.
 
 2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdas/as6500/clean.mk,
       sdas/as6500/Makefile.in,
       sdas/as6500/r6500.h,
@@ -20,6 +43,7 @@
       Add as6500 in preparation of mos6502 port merge.
 
 2022-01-05 Gabriele Gorla <gorlik@yahoo.com>
+
     * src/hc08/gen.c,
       src/hc08/main.c,
       src/hc08/ralloc.c:

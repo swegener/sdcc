@@ -94,6 +94,11 @@ void __printf(const char *szFormat, ...);
 # define __pdata __data
 #endif
 
+#if defined(__SDCC_mos6502) || defined(__SDCC_mos65c02)
+# define __idata __data
+# define __pdata __data
+#endif
+
 #if defined(__SDCC_pic14)
 # define __idata __data
 # define __xdata __data

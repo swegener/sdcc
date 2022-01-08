@@ -173,6 +173,24 @@ testmodes = {
             "__has_reentrant":"1"
         }
     },
+    "mos6502":{
+        "compiler":sdcc,
+        "port":"mos6502",
+        "extra-defines": {
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
+    },
+    "mos65c02":{
+        "compiler":sdcc,
+        "port":"mos65c02",
+        "extra-defines": {
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
+    },
     "stm8":{
         "compiler":sdcc,
         "port":"stm8",

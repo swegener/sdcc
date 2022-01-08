@@ -1,5 +1,15 @@
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/support/valdiag/valdiag.py,
+      sdcc/support/valdiag/Makefile.in,
+      sdcc/support/regression/ports/mos6502/support.c,
+      sdcc/support/regression/ports/mos6502/spec.mk,
+      sdcc/support/regression/fwk/include/testfwk.h,
+      sdcc/support/regression/Makefile.in:
+      Add regression to mos6502 port.
+
+2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/device/lib/mos65c02/Makefile.in,
       sdcc/device/lib/mos65c02/atomic_flag_test_and_set.c,
       sdcc/device/lib/mos65c02/_setjmp.c,

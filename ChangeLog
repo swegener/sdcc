@@ -1,5 +1,19 @@
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/ralloc2.cc,
+      sdcc/src/mos6502/ralloc.h,
+      sdcc/src/mos6502/ralloc.c,
+      sdcc/src/mos6502/peeph.def,
+      sdcc/src/mos6502/main.h,
+      sdcc/src/mos6502/main.c,
+      sdcc/src/mos6502/m6502.h,
+      sdcc/src/mos6502/gen.h,
+      sdcc/src/mos6502/gen.c,
+      sdcc/src/mos6502/Makefile.in:
+      Add mos6502 port code generation.
+
+2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/support/valdiag/valdiag.py,
       sdcc/support/valdiag/Makefile.in,
       sdcc/support/regression/ports/mos6502/support.c,

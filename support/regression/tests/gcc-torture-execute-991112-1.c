@@ -24,7 +24,7 @@ int rl_character_len (int c, int pos)
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mcs51) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) && !defined (__SDCC_ds390) && !defined (__SDCC_mcs51) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15)
   int (*x)(int, int) = rl_character_len;
   if (x('a', 1) != 1)
     ASSERT (0);

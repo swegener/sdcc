@@ -15,7 +15,7 @@ unsigned int f2(unsigned int c) __z88dk_fastcall
 	return c + 1;
 }
 
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02)
 unsigned long int f4(unsigned long int c) __z88dk_fastcall
 #else
 unsigned long int f4(unsigned long int c) __z88dk_fastcall __reentrant
@@ -26,7 +26,7 @@ unsigned long int f4(unsigned long int c) __z88dk_fastcall __reentrant
 
 unsigned char (*p1)(unsigned char) __z88dk_fastcall;
 unsigned int (*p2)(unsigned int) __z88dk_fastcall;
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02)
 unsigned long int (*p4)(unsigned long int) __z88dk_fastcall;
 #else
 unsigned long int (*p4)(unsigned long int) __z88dk_fastcall __reentrant;

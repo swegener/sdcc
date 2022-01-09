@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined(PORT_HOST) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_sm83) && !defined(__SDCC_stm8) && !defined(__SDCC_tlcs90) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(PORT_HOST) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) && !defined(__SDCC_sm83) && !defined(__SDCC_stm8) && !defined(__SDCC_tlcs90) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 
 #define UCHAR	unsigned char
 

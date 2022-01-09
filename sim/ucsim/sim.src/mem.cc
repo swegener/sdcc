@@ -471,6 +471,9 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
         break;
     }
 
+  if (dump_finished >= hva)
+    dump_finished= lva;
+
   return(dump_finished);
 }
 
@@ -520,7 +523,12 @@ cl_memory::dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
     }
   if (last != '\n')
     f->write_str("\n");
-  return dump_finished= a;
+
+  dump_finished= a;
+  if (dump_finished >= hva)
+    dump_finished= lva;
+
+  return dump_finished;
 }
 
 t_addr
@@ -545,7 +553,12 @@ cl_memory::dump_b(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 	}
       d= read(++a);
     }
-  return dump_finished= a;
+
+  dump_finished= a;
+  if (dump_finished >= hva)
+    dump_finished= lva;
+
+  return dump_finished;
 }
 
 t_addr
@@ -614,7 +627,12 @@ cl_memory::dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 	}
     }
   f->write_str(":00000001FF\r\n");
-  return dump_finished= a;
+
+  dump_finished= a;
+  if (dump_finished >= hva)
+    dump_finished= lva;
+
+  return dump_finished;
 }
 
 bool

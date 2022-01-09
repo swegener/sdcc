@@ -14,8 +14,8 @@ top_srcdir	= @top_srcdir@
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I. -I$(top_builddir)
 #		  -I$(top_builddir)/cmd.src -I$(top_builddir)/sim.src
-CFLAGS          = @CFLAGS@ @WALL_FLAG@
-CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
+CFLAGS          = @WALL_FLAG@ @CFLAGS@
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@
 
 LIBS		= @CURSES_LIBS@ @LIBS@
 

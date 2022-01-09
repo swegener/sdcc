@@ -313,7 +313,7 @@ FBYNAME (labelIsReturnOnly)
     ;
 
   retInst = "ret";
-  if (TARGET_HC08_LIKE)
+  if (TARGET_HC08_LIKE || TARGET_MOS6502_LIKE)
     retInst = "rts";
   if (strcmp(p, retInst) == 0)
     return TRUE;
@@ -397,7 +397,7 @@ FBYNAME (labelIsUncondJump)
       jpInst = "ljmp";
       jpInst2 = "sjmp";
     }
-  else if (TARGET_HC08_LIKE)
+  else if (TARGET_HC08_LIKE || TARGET_MOS6502_LIKE)
     {
       jpInst = "jmp";
       jpInst2 = "bra";
@@ -1168,12 +1168,12 @@ FBYNAME (notUsed)
   set *operands = setFromConditionArgs (cmdLine, vars);
 
   if (!operands)
-  {
-    fprintf (stderr,
+    {
+      fprintf (stderr,
              "*** internal error: notUsed peephole restriction"
              " requires operand(s): %s\n", cmdLine);
-    return FALSE;
-  }
+      return FALSE;
+    }
 
   what = setFirstItem (operands);
   for (ret = TRUE; ret && what != NULL; what = setNextItem (operands))
@@ -1217,7 +1217,7 @@ FBYNAME (notUsedFrom)
     deleteSet(&operands);
     return false;
   }
-  
+
   operands = reverseSet(operands);
 
   label = setFirstItem (operands);

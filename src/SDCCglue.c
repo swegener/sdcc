@@ -1490,6 +1490,10 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
           _printPointerType (oBuf, name, size);
           dbuf_printf (oBuf, "\n");
         }
+      else if (TARGET_MOS6502_LIKE && FUNCPTRSIZE == 2)
+        {
+          dbuf_printf (oBuf, "\t.dw (%s-1)\n", name); // take back one for RTS (TODO: elsewhere?)
+        }
       else if (port->use_dw_for_init)
         {
           dbuf_tprintf (oBuf, "\t!dws\n", name);

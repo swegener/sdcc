@@ -28,6 +28,11 @@ SDCC_AS        += sdas/as6808
 SDCC_LD        += sdcc-ld6808
 endif
 
+ifneq ($(OPT_DISABLE_MOS6502)$(OPT_DISABLE_MOS65C02), 11)
+SDCC_AS        += sdas/as6500
+SDCC_LD        += sdcc-ld6808
+endif
+
 ifeq ($(OPT_DISABLE_STM8), 0)
 SDCC_AS        += sdas/asstm8
 SDCC_LD        += sdcc-ldstm8

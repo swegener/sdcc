@@ -667,6 +667,8 @@ OPT_DISABLE_PACKIHX
 OPT_DISABLE_DEVICE_LIB
 OPT_DISABLE_UCSIM
 OPT_DISABLE_AVR
+OPT_DISABLE_MOS65C02
+OPT_DISABLE_MOS6502
 OPT_DISABLE_PDK16
 OPT_DISABLE_PDK15
 OPT_DISABLE_PDK14
@@ -811,6 +813,8 @@ enable_pdk13_port
 enable_pdk14_port
 enable_pdk15_port
 enable_pdk16_port
+enable_mos6502_port
+enable_mos65c02_port
 enable_ucsim
 enable_device_lib
 enable_packihx
@@ -1497,6 +1501,8 @@ Optional Features:
   --disable-pdk14-port    Excludes the PDK14 port
   --disable-pdk15-port    Excludes the PDK15 port
   --enable-pdk16-port     Includes the PDK16 port
+  --disable-mos6502-port  Excludes the MOS6502 port
+  --enable-mos65c02-port  Includes the MOS65C02 port
   --disable-ucsim         Disables configuring and building of ucsim
   --disable-device-lib    Disables building device libraries
   --disable-packihx       Disables building packihx
@@ -8559,6 +8565,56 @@ printf "%s\n" "#define OPT_DISABLE_PDK16 $OPT_DISABLE_PDK16" >>confdefs.h
   fi
 
 
+  # Check whether --enable-mos6502-port was given.
+if test ${enable_mos6502_port+y}
+then :
+  enableval=$enable_mos6502_port;
+fi
+
+
+  if test "$enable_mos6502_port" = "no"; then
+    OPT_DISABLE_MOS6502=1
+  else
+    enable_mos6502_port="yes"
+    OPT_DISABLE_MOS6502=0
+  fi
+
+
+printf "%s\n" "#define OPT_DISABLE_MOS6502 $OPT_DISABLE_MOS6502" >>confdefs.h
+
+
+
+  echo mos6502 >>ports.all
+  if test $OPT_DISABLE_MOS6502 = 0; then
+    echo mos6502 >>ports.build
+  fi
+
+
+  # Check whether --enable-mos65c02-port was given.
+if test ${enable_mos65c02_port+y}
+then :
+  enableval=$enable_mos65c02_port;
+fi
+
+
+  if test "$enable_mos65c02_port" = "yes"; then
+    OPT_DISABLE_MOS65C02=0
+  else
+    enable_mos65c02_port="no"
+    OPT_DISABLE_MOS65C02=1
+  fi
+
+
+printf "%s\n" "#define OPT_DISABLE_MOS65C02 $OPT_DISABLE_MOS65C02" >>confdefs.h
+
+
+
+  echo mos6502 >>ports.all
+  if test $OPT_DISABLE_MOS65C02 = 0; then
+    echo mos6502 >>ports.build
+  fi
+
+
 # Unsupported targets
 ####AC_DO_PORT_ENABLER(avr,   avr,   AVR,   [Includes the AVR port (disabled by default)])
 OPT_DISABLE_AVR=1
@@ -9120,6 +9176,13 @@ if test $OPT_DISABLE_HC08 = 0 || test $OPT_DISABLE_S08 = 0; then
   ac_config_files="$ac_config_files src/hc08/Makefile sdas/as6808/Makefile"
 
   test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/hc08/Makefile device/lib/s08/Makefile"
+
+fi
+
+if test $OPT_DISABLE_MOS6502 = 0 || test $OPT_DISABLE_MOS65C02 = 0; then
+  ac_config_files="$ac_config_files src/mos6502/Makefile sdas/as6500/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/mos6502/Makefile device/lib/mos65c02/Makefile"
 
 fi
 
@@ -9932,6 +9995,10 @@ do
     "sdas/as6808/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as6808/Makefile" ;;
     "device/lib/hc08/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/hc08/Makefile" ;;
     "device/lib/s08/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/s08/Makefile" ;;
+    "src/mos6502/Makefile") CONFIG_FILES="$CONFIG_FILES src/mos6502/Makefile" ;;
+    "sdas/as6500/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as6500/Makefile" ;;
+    "device/lib/mos6502/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mos6502/Makefile" ;;
+    "device/lib/mos65c02/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mos65c02/Makefile" ;;
     "src/mcs51/Makefile") CONFIG_FILES="$CONFIG_FILES src/mcs51/Makefile" ;;
     "sdas/as8051/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as8051/Makefile" ;;
     "device/lib/mcs51/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mcs51/Makefile" ;;
@@ -10970,6 +11037,8 @@ sdcc ${VERSION} is now configured for
     pdk14               ${enable_pdk14_port}
     pdk15               ${enable_pdk15_port}
     pdk16               ${enable_pdk16_port}
+    mos6502		${enable_mos6502_port}
+    mos65c02		${enable_mos65c02_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
@@ -11047,6 +11116,8 @@ sdcc ${VERSION} is now configured for
     pdk14               ${enable_pdk14_port}
     pdk15               ${enable_pdk15_port}
     pdk16               ${enable_pdk16_port}
+    mos6502		${enable_mos6502_port}
+    mos65c02		${enable_mos65c02_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}

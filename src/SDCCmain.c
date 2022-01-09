@@ -380,6 +380,12 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_PDK15
   &pdk15_port,
 #endif
+#if !OPT_DISABLE_MOS6502
+  &mos6502_port,
+#endif
+#if !OPT_DISABLE_MOS65C02
+  &mos65c02_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -1706,7 +1712,7 @@ linkEdit (char **envp)
           exit (EXIT_FAILURE);
         }
 
-      if (TARGET_Z80_LIKE)
+      if (TARGET_Z80_LIKE||TARGET_MOS6502_LIKE)
         {
           fprintf (lnkfile, "-mjwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
         }
@@ -1786,7 +1792,7 @@ linkEdit (char **envp)
           WRITE_SEG_LOC (BIT_NAME, 0);
 
           /* stack start */
-          if ((options.stack_loc) && (options.stack_loc < 0x100) && TARGET_MCS51_LIKE)
+          if ((options.stack_loc) && (options.stack_loc < 0x100) && TARGET_MCS51_LIKE && !TARGET_MOS6502_LIKE)
             {
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
               /* with the disappearance of --no-pack-iram I don't think this is ever valid anymore */

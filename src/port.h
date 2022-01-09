@@ -32,6 +32,8 @@
 #define TARGET_ID_PDK16    22
 #define TARGET_ID_Z80N     23
 #define TARGET_ID_R2KA     24
+#define TARGET_ID_MOS6502  25
+#define TARGET_ID_MOS65C02 26
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -58,6 +60,8 @@
 #define TARGET_IS_PDK14    (port->id == TARGET_ID_PDK14)
 #define TARGET_IS_PDK15    (port->id == TARGET_ID_PDK15)
 #define TARGET_IS_PDK16    (port->id == TARGET_ID_PDK16)
+#define TARGET_IS_MOS6502  (port->id == TARGET_ID_MOS6502)
+#define TARGET_IS_MOS65C02 (port->id == TARGET_ID_MOS65C02)
 
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
 #define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_SM83 || TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA || TARGET_IS_TLCS90 || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N)
@@ -65,6 +69,7 @@
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08 || TARGET_IS_S08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
 #define TARGET_PDK_LIKE    (TARGET_IS_PDK13 || TARGET_IS_PDK14 || TARGET_IS_PDK15 || TARGET_IS_PDK16)
+#define TARGET_MOS6502_LIKE  (TARGET_IS_MOS6502 || TARGET_IS_MOS65C02)
 
 /* is using sdas / sdld assembler / linker */
 #define IS_SDASLD          (TARGET_Z80_LIKE || TARGET_MCS51_LIKE || TARGET_HC08_LIKE)
@@ -489,6 +494,12 @@ extern PORT pdk14_port;
 #endif
 #if !OPT_DISABLE_PDK15
 extern PORT pdk15_port;
+#endif
+#if !OPT_DISABLE_MOS6502
+extern PORT mos6502_port;
+#endif
+#if !OPT_DISABLE_MOS65C02
+extern PORT mos65c02_port;
 #endif
 
 #endif /* PORT_INCLUDE */

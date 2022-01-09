@@ -1,4 +1,37 @@
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+    * sdcc/src/SDCCsymt.c,
+      sdcc/src/SDCCpeeph.c,
+      sdcc/src/SDCCmain.c,
+      sdcc/src/SDCCicode.c,
+      sdcc/src/SDCCglue.c,
+      sdcc/src/port.h,
+      sdcc/src/clean.mk,
+      sdcc/Makefile.in,
+      sdcc/device/lib/Makefile.in,
+      sdcc/device/include/Makefile.in,
+      sdcc/configure.ac,
+      sdcc/configure:
+      Enable the mos6502 port.
+
+2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+    * sdcc/support/regression/tests/z88dk_callee.c,
+      sdcc/support/regression/tests/z88dk.c,
+      sdcc/support/regression/tests/gcc-torture-execute-strlen-4.c,
+      sdcc/support/regression/tests/gcc-torture-execute-func-ptr-1.c,
+      sdcc/support/regression/tests/gcc-torture-execute-9911112-1.c,
+      sdcc/support/regression/tests/gcc-torture-execute-930702-1.c,
+      sdcc/support/regression/tests/gcc-torture-execute-921208-1.c,
+      sdcc/support/regression/tests/gcc-torture-execute-20000412-2.c,
+      sdcc/support/regression/tests/critical.c,
+      sdcc/support/regression/tests/bug3379723.c,
+      sdcc/support/regression/tests/bug3167.c,
+      sdcc/support/regression/tests/bug2855.c,
+      sdcc/support/regression/tests/bug2767.c,
+      sdcc/support/regression/tests/bug2663.c,
+      sdcc/support/regression/tests/bug2305.c:
+      Disable tests not relevant for the mos6502 port.
+
+2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/ralloc2.cc,
       sdcc/src/mos6502/ralloc.h,

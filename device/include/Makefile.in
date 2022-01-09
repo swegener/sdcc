@@ -128,7 +128,7 @@ installcheck:
 # ---------------------------------
 installdirs:
 	mkdir -p $(sdcc_includedir)
-	for target in mcs51 ds390 ds400 pic14 pic16 z180 rab hc08; \
+	for target in mcs51 ds390 ds400 pic14 pic16 z180 rab hc08 mos6502; \
 	do \
 	  if [ -d $(srcdir)/$${target} ]; \
 	  then \

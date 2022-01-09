@@ -12,6 +12,13 @@ run
 set hw vcd start
 set hw vcd break
 
+# The VCD data starts at time 0 which will, by default, align
+# with the current simulator time. We can adjust that by setting
+# starttime. This can be done before or after starting the vcd,
+# even part way through. Here we push the vcd 750 ns into the
+# future.
+set hw vcd starttime 750 ns
+
 # Make sure what it is going to do is what we asked.
 conf
 info hw vcd

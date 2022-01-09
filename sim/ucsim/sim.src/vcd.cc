@@ -25,10 +25,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 // prj
 #include "utils.h"
@@ -39,6 +45,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "vcdcl.h"
 
+
+#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE)
+
+#  if !defined(HAVE__EXIT)
+static void _exit(int status) { exit(status); }
+#  endif
+
+#  if !defined(O_CLOEXEC)
+#    define O_CLOEXEC 0
+#  endif
+
+#  if !defined(HAVE_DUP3)
+static int dup3(int oldfd, int newfd, int flags) { return dup2(oldfd, newfd); }
+#  endif
+
+#  if !defined(HAVE_PIPE2)
+static int pipe2(int pipefd[2], int flags) { return pipe(pipfd); }
+#  endif
+
+#endif
 
 class cl_vcd_var: public cl_memory_operator
 {
@@ -102,6 +128,7 @@ cl_vcd::cl_vcd(class cl_uc *auc, int aid, chars aid_string):
   starttime= 0;
   timescale= 0;
   event= 0;
+  pausetime= -1;
   state= -1;
   started= false;
   paused= false;
@@ -227,6 +254,90 @@ cl_vcd::del_var(class cl_console_base *con, class cl_memory *m, t_addr a, int bi
       return;
     }
   del_var(con, ((cl_address_space*)m)->get_cell(a), bitnr_low, bitnr_high);
+}
+
+FILE *
+cl_vcd::open_vcd(class cl_console_base *con)
+{
+  if (state != -1)
+    {
+      if (filename)
+        {
+          if ((fd= fopen(filename, "re")) == NULL)
+            con->dd_printf("%s: %s\n", filename, strerror(errno));
+        }
+      else
+        con->dd_printf("No file specified\n");
+    }
+  else if (filename && filename[0] != '|')
+    {
+      if ((fd= fopen(filename, "we")) == NULL)
+        con->dd_printf("%s: %s\n", filename, strerror(errno));
+    }
+  else
+    {
+#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE)
+      int p[2];
+      pid_t pid;
+
+      if (!pipe2(p, O_CLOEXEC))
+        {
+          if ((pid = fork()) > 0)
+            {
+              // Parent
+              if (!(fd = fdopen(p[1], "we")))
+                {
+                  close(p[1]);
+                  con->dd_printf("fdopen: %s\n", strerror(errno));
+                }
+              close(p[0]);
+
+              // Reap the intermediate child. The real child is no longer
+              // under our control.
+              waitpid(pid, NULL, 0);
+            }
+          else if (pid == 0)
+            {
+              // Child
+              // Double fork to break the parent-child relationship
+              if (fork() != 0)
+                _exit(0);
+
+              dup2(p[0], 0);
+              close(p[0]);
+              close(p[1]);
+
+              const char *cmd = filename;
+              if (!cmd)
+                cmd = "shmidcat | gtkwave -v -I > /dev/null 2>&1";
+              else if (cmd[0] == '|')
+                cmd++;
+
+              execl("/bin/sh", "sh", "-c", cmd, NULL);
+              perror("execl");
+              _exit(1);
+            }
+          else
+            {
+              con->dd_printf("fork: %s\n", strerror(errno));
+              close(p[0]);
+              close(p[1]);
+            }
+        }
+      else
+        con->dd_printf("pipe: %s\n", strerror(errno));
+#else
+      con->dd_printf("Piped output (e.g. to gtkwave) is not supported on this platform\n");
+#endif
+    }
+
+  return fd;
+}
+
+void
+cl_vcd::close_vcd(void)
+{
+  fclose(fd);
 }
 
 bool
@@ -498,25 +609,40 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
           return;
         }
     }
-  else if (cmdline->syntax_match(uc, STRING NUMBER STRING)) // TIMESCALE
+  else if (cmdline->syntax_match(uc, STRING NUMBER STRING)) // TIMESCALE, PAUSETIME, STARTTIME
     {
       char *p1= params[0]->value.string.string;
       if (p1 && *p1 &&
-          (strcmp(p1, "timescale") == 0))
+          (strcmp(p1, "timescale") == 0 ||
+           strcmp(p1, "pausetime") == 0 ||
+           strcmp(p1, "starttime") == 0))
         {
+          double time = params[1]->value.number;
           char *p2= params[2]->value.string.string;
           if (!strcmp(p2, "fs"))
-            timescale = params[1]->value.number * 1e15;
+            time /= 1e15;
           else if (!strcmp(p2, "ps"))
-            timescale = params[1]->value.number * 1e12;
+            time /= 1e12;
           else if (!strcmp(p2, "ns"))
-            timescale = params[1]->value.number * 1e9;
+            time /= 1e9;
           else if (!strcmp(p2, "us"))
-            timescale = params[1]->value.number * 1e6;
+            time /= 1e6;
           else if (!strcmp(p2, "ms"))
-            timescale = params[1]->value.number * 1e3;
+            time /= 1e3;
           else
             con->dd_printf("Units must be ms, us, ns, ps or fs\n");
+          if (p1[0] == 't')
+            timescale = time;
+          else if (p1[0] == 'p')
+            pausetime = time;
+          else if (!started)
+            starttime = time;
+          else
+            {
+              event = event - starttime;
+              starttime = uc->get_rtime() + time;
+              event += starttime;
+            }
           return;
         }
     }
@@ -538,24 +664,26 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
         }
       if (p1 && *p1)
         {
-          if (!p2 || !*p2)
-            {
-              con->dd_printf("Name missing\n");
-              return;
-            }
           if (strstr(p1, "mod") == p1)
             {
-              modul= chars(p2);
+              if (p2 && *p2)
+                modul= chars(p2);
+              else
+                con->dd_printf("Name missing\n");
               return;
             }
-          if ((strcmp(p1, "output") == 0) ||
-              (strcmp(p1, "file") == 0) ||
-              (strcmp(p1, "input") == 0))
+          if ((strstr(p1, "out") == p1) ||
+              (strstr(p1, "file") == p1) ||
+              (strstr(p1, "in") == p1))
             {
               if (filename)
                 free(filename);
-              filename = strdup(p2);
+              filename = NULL;
               state = (!strcmp(p1, "input") ? 0 : -1);
+              if (!state && (!p2 || !*p2))
+                con->dd_printf("Name missing\n");
+              else if (p2 && *p2)
+                filename = strdup(p2);
               return;
             }
         }
@@ -565,35 +693,35 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
       char *p1= params[0]->value.string.string;
       if (p1 && *p1)
         {
-          if ((strstr(p1, "re") == p1) ||
-              (strcmp(p1, "start") == 0))
+          if ((strstr(p1, "out") == p1) ||
+              (strstr(p1, "file") == p1) ||
+              (strstr(p1, "view") == p1))
+            {
+              if (filename)
+                free(filename);
+              filename = NULL;
+              state = -1;
+              return;
+            }
+          if (strstr(p1, "re") == p1 ||
+              strcmp(p1, "start") == 0 ||
+              (paused && strstr(p1, "paus") == p1))
             {
               if (!started)
                 {
-                  if (!filename)
-                    {
-                      con->dd_printf("No file specified\n");
-                      return;
-                    }
+                  if ((fd= open_vcd(con)) == NULL)
+                    return;
+
                   if (state != -1)
                     {
-                      if ((fd= fopen(filename, "r")) == NULL)
-                        {
-                          con->dd_printf("File open error\n");
-                          return;
-                        }
-
                       if (!parse_header(con))
                         return;
+
+                      starttime = -starttime;
+                      event = starttime;
                     }
                   else
                     {
-                      if ((fd= fopen(filename, "w")) == NULL)
-                        {
-                          con->dd_printf("File open error\n");
-                          return;
-                        }
-
                       if (!timescale)
                         {
                           timescale = 1e3;
@@ -657,26 +785,52 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                           fprintf(fd, " $end\n");
                         }
 
-                      fputs("$upscope $end\n$enddefinitions $end\n$dumpvars\n", fd);
-
-                      event = uc->get_rtime();
-                      for (class cl_vcd_var *var = vars; var; var = var->next_var)
-                        report(var, var->cell->get());
-                      event = 0.0;
-                      fputs("$end\n", fd);
+                      fputs("$upscope $end\n$enddefinitions $end\n", fd);
                     }
                 }
 
               if (!started || paused)
                 {
-                  double now = uc->get_rtime();
-                  starttime += now;
-                  event += now;
+                  if (paused)
+                    con->dd_printf("Unpaused\n");
+                  if (state == -1)
+                    {
+                      double now = uc->get_rtime();
+                      if (!started)
+                        starttime = now;
+                      else if (pausetime >= 0)
+                        {
+                          starttime = now - (event - starttime);
+                          if (starttime >= now)
+                            starttime = now;
+                        }
+                      fprintf(fd, "#%.0f\n", (now - starttime) * timescale);
+                      if (started)
+                        {
+                          if (pausetime < 0)
+                            fprintf(fd, "$comment Unpaused $end\n$dumpon\n");
+                          else
+                            fprintf(fd, "$comment Unpaused. Real duration was %.15f seconds $end\n$dumpon\n", now - event);
+                        }
+                      else
+                        fprintf(fd, "$dumpvars\n");
+                      event = now;
+                      for (class cl_vcd_var *var = vars; var; var = var->next_var)
+                        report(var, var->cell->get());
+                      fprintf(fd, "$end\n");
+                      if (!filename || filename[0] == '|') fflush(fd);
+                    }
+                  else
+                    {
+                      double now = uc->get_rtime();
+                      starttime = now - starttime;
+                      event = now - event;
+                    }
                 }
 
               started = true;
               paused = false;
-              if (state >= 0)
+              if (state >= 0 || !filename || filename[0] == '|')
                 on = true;
 
               return;
@@ -685,23 +839,38 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             {
               if (started)
                 {
-                  if (paused)
+                  paused = true;
+
+                  if (state != -1 || pausetime < 0)
+                    con->dd_printf("Paused\n");
+                  else
+                    con->dd_printf("Paused (pause limit %.15f s)\n", pausetime);
+
+                  if (state == -1)
                     {
-                      con->dd_printf("Unpaused\n");
-                      double now = uc->get_rtime();
-                      starttime += now;
-                      event += now;
-                      paused = false;
-                      if (state >= 0)
-                        on = true;
+                      event = uc->get_rtime();
+                      fprintf(fd, "#%.0f\n$comment Paused $end\n$dumpoff\n", (event - starttime) * timescale);
+                      for (class cl_vcd_var *var = vars; var; var = var->next_var)
+                        {
+                          if (var->bitnr_low == var->bitnr_high)
+                            fprintf(fd, "x%c\n", var->var_id);
+                          else
+                            {
+                              putc('b', fd);
+                              for (int i = var->bitnr_high; i >= var->bitnr_low; i--)
+                                putc('x', fd);
+                              fprintf(fd, " %c\n", var->var_id);
+                            }
+                        }
+                      fprintf(fd, "$end\n");
+                      if (!filename || filename[0] == '|') fflush(fd);
+                      on = ((!filename || filename[0] == '|') || pausetime >= 0);
                     }
                   else
                     {
-                      con->dd_printf("Paused\n");
                       double now = uc->get_rtime();
-                      starttime -= now;
-                      event -= now;
-                      paused = true;
+                      starttime = now - starttime;
+                      event = now - event;
                       on = false;
                     }
                 }
@@ -713,11 +882,16 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             {
               if (started)
                 {
+                  if (fd)
+                    {
+                      if (state == -1)
+                        fprintf(fd, "#%.0f\n", (uc->get_rtime() - starttime) * timescale);
+                      close_vcd();
+                    }
+                  fd= NULL;
                   on = false;
                   starttime = 0.0;
-                  if (fd)
-                    fclose(fd);
-                  fd= NULL;
+                  event = 0.0;
                   if (state != -1)
                     clear_vars();
                   else if (!vars)
@@ -742,6 +916,8 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 
     con->dd_printf("set hardware vcd[id] add memory address [ [bit_high] bit_low]\n");
     con->dd_printf("set hardware vcd[id] del[ete] memory address [ [bit_high] bit_low]\n");
+    con->dd_printf("set hardware vcd[id] timescale n [ms|us|ns|ps|fs]\n");
+    con->dd_printf("set hardware vcd[id] starttime n [ms|us|ns|ps|fs]\n");
     con->dd_printf("set hardware vcd[id] input \"vcd_file_name\"\n");
     con->dd_printf("set hardware vcd[id] output|file \"vcd_file_name\"\n");
     con->dd_printf("set hardware vcd[id] mod[ule] module_name\n");
@@ -760,7 +936,7 @@ cl_vcd::report(class cl_vcd_var *var, t_mem v)
   if (event != now)
     {
       event = now;
-      fprintf(fd, "#%.0f\n", event * timescale);
+      fprintf(fd, "#%.0f\n", (event - starttime) * timescale);
     }
 
   if (var->bitnr_low == var->bitnr_high)
@@ -774,16 +950,34 @@ cl_vcd::report(class cl_vcd_var *var, t_mem v)
         putc((v & (1U << i)) ? '1' : '0', fd);
       fprintf(fd, " %c\n", var->var_id);
     }
-  fflush(NULL);
+
+  if (!filename || filename[0] == '|') fflush(fd);
 }
 
 int
 cl_vcd::tick(int cycles)
 {
-  if (state == -1 || !fd || !started || paused)
+  if (!fd || !started)
     return 0;
 
   double now = uc->get_rtime();
+
+  if (state == -1)
+    {
+      if (!filename || filename[0] == '|')
+        {
+          fprintf(fd, "#%.0f\n", (now - starttime) * timescale);
+          fflush(fd);
+        }
+      if (pausetime >= 0 && now - event >= pausetime)
+        {
+          printf("now %.15f event %.15f pausetime %.15f\n", now, event, pausetime);
+          event = now;
+          on = false;
+        }
+      return 0;
+    }
+  
   bool event_occurred = false;
 
   while (event - now <= 0.000000000000001)
@@ -796,6 +990,8 @@ cl_vcd::tick(int cycles)
               if (word[0] == '#')
                 {
                   event = starttime + timescale * strtod(&word[1], NULL);
+                  if (event - now <= 0.000000000000001)
+                    continue;
                   break;
                 }
               else if (word[0] == 'b' || word[0] == 'B')
@@ -914,7 +1110,10 @@ cl_vcd::print_info(class cl_console_base *con)
 
   con->dd_printf("  Start time: %.15f s\n", starttime);
   con->dd_printf("  %s event: %.15f s\n", (state != -1 ? "Next" : "Last"), event);
-  con->dd_printf("  Simul time: %.15f s\n", uc->get_rtime());
+  con->dd_printf("  Pause time: ");
+  if (pausetime >= 0)
+    con->dd_printf("%.15f s", pausetime);
+  con->dd_printf("\n  Simul time: %.15f s\n", uc->get_rtime());
 
   con->dd_printf("  Variables:\n");
   con->dd_printf("    Address           Symbol\n");

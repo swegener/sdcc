@@ -412,6 +412,8 @@ AC_SUBST(panel_ok)
 AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
 
+AC_FUNC_FORK
+AC_CHECK_FUNCS(_exit dup2 dup3 pipe pipe2)
 AC_CHECK_FUNCS(vasprintf)
 dnl AC_CHECK_FUNCS(strdup)
 dnl AC_CHECK_FUNCS(getline)

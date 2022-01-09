@@ -17,6 +17,7 @@ vcd[0] value change dump
   Time scale: auto set on start
   Start time: 0.000000000000000 s
   Last event: 0.000000000000000 s
+  Pause time: 
   Simul time: 0.000000000000000 s
   Variables:
     Address           Symbol
@@ -63,6 +64,7 @@ vcd[0] value change dump
   Time scale: 1 ns
   Start time: 0.000000625000000 s
   Last event: 0.000000625000000 s
+  Pause time: 
   Simul time: 0.000000625000000 s
   Variables:
     Address           Symbol
@@ -113,3 +115,6 @@ F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 25 ticks (3.125e-06 sec)
 Host usage: [ELIDED]
+
+# Don't forget to close the vcd properly!
+set hw vcd stop

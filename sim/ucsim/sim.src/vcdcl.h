@@ -40,7 +40,7 @@ class cl_vcd: public cl_hw
   char *filename;
   FILE *fd;
   class cl_vcd_var *vars;
-  double starttime, timescale, event;
+  double starttime, timescale, event, pausetime;
   int state;
   bool started, paused, dobreak;
   chars modul;
@@ -71,6 +71,9 @@ class cl_vcd: public cl_hw
   void add_var(class cl_console_base *con, class cl_memory *m, t_addr a, int bitnr_low, int bitnr_high);
   void del_var(class cl_console_base *con, class cl_memory_cell *cell, int bitnr_low, int bitnr_high);
   void del_var(class cl_console_base *con, class cl_memory *m, t_addr a, int bitnr_low, int bitnr_high);
+
+  FILE *open_vcd(class cl_console_base *con);
+  void close_vcd(void);
 
   bool read_word(unsigned int i);
   void clear_vars(void);

@@ -23,6 +23,14 @@
           <pre>
           0&gt; <font color="#118811">set hw vcd[0] output "name.vcd"</font>
           </pre>
+          <p>Alternatively specify no, or an empty, output file or use the
+          "view" command and the simulator will attempt to invoke
+          <a href="http://gtkwave.sourceforge.net/">gtkwave</a>
+          directly.</p>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] output ""</font>
+          0&gt; <font color="#118811">set hw vcd[0] view</font>
+          </pre>
         </li>
 
         <li>Add locations to dump<br>
@@ -70,6 +78,19 @@
           0&gt; <font color="#118811">set hw vcd[0] pause</font>
           0&gt; <font color="#118811">set hw vcd[0] restart</font>
           </pre>
+          <p>While the vcd is paused no changes are recorded in the
+          output and values will show as unknown when the VCD is viewed
+          by something such as
+	  <a href="http://gtkwave.sourceforge.net/">gtkwave</a>.</p>
+	  <p>If you set pausetime <em>before</em> pausing the vcd
+	  then the time recorded as unknown will be limited to the
+	  specified time (rounded up to the next tick) and time beyond
+	  that will simply not exist as far as the VCD is concerned.
+	  This may be used to compress pause gaps in the VCD for the
+	  sake of viewers which are not able to do this themselves.</p>
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] pausetime 300 ns</font>
+          </pre>
         </li>
 
         <li>Stop recording and close the VCD file<br>
@@ -92,6 +113,19 @@
           <pre>
           0&gt; <font color="#118811">set hw vcd[0] input "name.vcd"</font>
           </pre>
+        </li>
+
+        <li>Adjust the base time<br>
+          By default time 0 in the VCD file corresponds to the simulator time
+          when the vcd is started. You can adjust this by setting the start time
+          of the vcd. For instance, to move the VCD events 750 ns into the future
+          you would use
+          <pre>
+          0&gt; <font color="#118811">set hw vcd[0] starttime 750 ns</font>
+          </pre>
+          <p>This can be done at any time, regardless of whether the vcd is started,
+	  paused or even part way through.</p>
+          <br>
         </li>
 
         <li>Start the replay<br>

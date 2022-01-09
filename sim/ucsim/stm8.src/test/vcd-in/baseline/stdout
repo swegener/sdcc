@@ -30,6 +30,13 @@ set hw vcd start
 set hw vcd break
 Break on events enabled
 
+# The VCD data starts at time 0 which will, by default, align
+# with the current simulator time. We can adjust that by setting
+# starttime. This can be done before or after starting the vcd,
+# even part way through. Here we push the vcd 750 ns into the
+# future.
+set hw vcd starttime 750 ns
+
 # Make sure what it is going to do is what we asked.
 conf
 ucsim version [ELIDED]
@@ -68,8 +75,9 @@ vcd[0] value change dump
   Mode:       input
   Break:      enabled
   Time scale: 1 ns
-  Start time: 0.000000625000000 s
+  Start time: 0.000001375000000 s
   Next event: 0.000001375000000 s
+  Pause time: 
   Simul time: 0.000000625000000 s
   Variables:
     Address           Symbol

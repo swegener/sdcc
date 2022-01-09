@@ -42,3 +42,6 @@ set hw vcd add loc1.3
 
 # Run the second loop and stop when we hit the breakpoint again.
 cont
+
+# Don't forget to close the vcd properly!
+set hw vcd stop

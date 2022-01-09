@@ -1,3 +1,8 @@
+2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/ralloc.c:
+      Remove oldralloc dead code.
+
 2022-01-09 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* device/lib/pic16/Makefile.in,
@@ -16,6 +21,7 @@
 	  Fix makebin path.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/SDCCsymt.c,
       sdcc/src/SDCCpeeph.c,
       sdcc/src/SDCCmain.c,
@@ -31,6 +37,7 @@
       Enable the mos6502 port.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/support/regression/tests/z88dk_callee.c,
       sdcc/support/regression/tests/z88dk.c,
       sdcc/support/regression/tests/gcc-torture-execute-strlen-4.c,

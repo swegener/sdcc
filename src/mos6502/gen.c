@@ -744,7 +744,7 @@ adjustX (int n)
 static char *
 aopName (asmop * aop)
 {
-  static char buffer[256];
+  static char buffer[262];
   char *buf = buffer;
 
   if (!aop)
@@ -1035,7 +1035,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
     case YX_IDX:
       if (aop->type == AOP_SOF) // TODO: will fail assemble
         {
-          int offset = (_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1);
+	  //     int offset = (_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1);
         }
       if (aop->type == AOP_DIR || aop->type == AOP_EXT)
         {
@@ -1525,7 +1525,6 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   bool needpula = false;
   reg_info *reg = NULL;
   bool keepreg = false;
-  bool afree;
 
   wassert (srcaop && dstaop);
 
@@ -1579,32 +1578,25 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
     }
 
   // TODO: pick reg based on if can load op?
-  // TODO: afree sucks, need stack
   if (!reg)
     {
       reg = getFreeByteReg();
       if (reg == NULL)
         {
-          afree = m6502_reg_a->isFree;
-          pushReg (m6502_reg_a, true);
-          needpula = true;
+	  pushReg (m6502_reg_a, true);
+	  needpula = true;
           reg = m6502_reg_a;
         }
-      else
-        afree = reg->isFree;
     }
-  else
-    afree = reg->isFree;
 
   loadRegFromAop (reg, srcaop, srcofs);
   storeRegToAop (reg, dstaop, dstofs);
 
   if (!keepreg)
     pullOrFreeReg (reg, needpula);
-
-  //reg->isFree = afree;
 }
 
+#if 0
 /*--------------------------------------------------------------------------*/
 /* forceStackedAop - Reserve space on the stack for asmop aop; when         */
 /*                   freeAsmop is called with aop, the stacked data will    */
@@ -1658,6 +1650,7 @@ forceStackedAop (asmop * aop, bool copyOrig)
   if (needpula) loadRegTemp(reg, true);
   return newaop;
 }
+#endif
 
 /*--------------------------------------------------------------------------*/
 /* accopWithMisc - Emit accumulator modifying instruction accop with the    */
@@ -4365,7 +4358,7 @@ genFunction (iCode * ic)
   sym_link *ftype;
   iCode *ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
   int stackAdjust = sym->stack;
-  int accIsFree = sym->recvSize == 0;
+  //  int accIsFree = sym->recvSize == 0;
 
   _G.stackPushes = 0;
   /* create the function header */
@@ -4433,8 +4426,8 @@ genFunction (iCode * ic)
               reg_info *reg = m6502_aop_pass[ofs + (ric->argreg - 1)]->aopu.aop_reg[0];
 	      D (emitcode (";     pushreg", "ofs=%d", ofs));
               pushReg (reg, true);
-              if (reg->rIdx == A_IDX)
-                accIsFree = 1;
+	      //              if (reg->rIdx == A_IDX)
+	      //                accIsFree = 1;
               stackAdjust--;
             }
           genLine.lineElement.ic = ic;
@@ -9418,7 +9411,7 @@ static void
 genAddrOf (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  asmop *aopr;
+  //  asmop *aopr;
   int size, offset;
   bool needpullx, needpully;
   struct dbuf_s dbuf;
@@ -9426,7 +9419,7 @@ genAddrOf (iCode * ic)
   D (emitcode (";     genAddrOf", ""));
 
   aopOp (IC_RESULT (ic), ic, false);
-  aopr = AOP (IC_RESULT (ic));
+  //  aopr = AOP (IC_RESULT (ic));
 
   /* if the operand is on the stack then we
      need to get the stack offset of this

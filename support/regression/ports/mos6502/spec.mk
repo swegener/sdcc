@@ -6,6 +6,7 @@ SIM_TIMEOUT = 30
 
 # path to sim65
 EMU = $(WINE) sim65 -c -v -x $(SIM_CYCLES)
+MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
 ifdef SDCC_BIN_PATH
   AS = $(SDCC_BIN_PATH)/sdas6500$(EXEEXT)
 else
@@ -55,7 +56,7 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 # run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	makebin -s 65536 $< $*.rom
+	$(MAKEBIN) -s 65536 $< $*.rom
 	printf 'sim65\2\0\0\0\2\0\2' > $*.bin
 	dd status=none if=$*.rom bs=512 count=126 skip=1 >> $*.bin
 	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $*.bin > $@ \

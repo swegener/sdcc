@@ -12,6 +12,8 @@
 	  device/lib/pic16/missing,
 	  device/lib/pic16/startup/Makefile.in:
 	  Update pic16 library build infrastructure (fixes a configuration time warning).
+	* support/regression/ports/mos6502/spec.mk:
+	  Fix makebin path.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
     * sdcc/src/SDCCsymt.c,

@@ -68,7 +68,9 @@ cl_timer1::print_info(class cl_console_base *con)
   //int tmod= cell_tmod->get();
   int on;
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
-
+  class cl_memory_cell *iec= NULL;
+  u8_t ier= 0;
+  
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
 		 256*cell_th->get()+cell_tl->get());
   //int mode= (tmod & (bmM11|bmM01)) >> 4;
@@ -81,9 +83,11 @@ cl_timer1::print_info(class cl_console_base *con)
     }
   else
     on= cell_tcon->get() & mask_TR;
+  if (sfr) iec= sfr->get_cell(IE);
+  if (iec) ier= iec->get();
   con->dd_printf(" %s", on?"ON":"OFF");
   con->dd_printf(" irq=%c", (cell_tcon->get()&mask_TF)?'1':'0');
-  con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET1)?"en":"dis"));
+  con->dd_printf(" %s", (ier&bmET1)?"en":"dis");
   con->dd_printf(" prio=%d", uc->priority_of(bmPT1));
   con->dd_printf("\n");
   //print_cfg_info(con);

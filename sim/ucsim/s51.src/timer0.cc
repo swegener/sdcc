@@ -423,9 +423,13 @@ cl_timer0::print_info(class cl_console_base *con)
     }
   else
     on= TR;
+  class cl_memory_cell *iec= NULL;
+  if (sfr) iec= sfr->get_cell(IE);
+  u8_t ier= 0;
+  if (iec) ier= iec->get();
   con->dd_printf(" %s", on?"ON":"OFF");
   con->dd_printf(" irq=%c", (cell_tcon->get()&mask_TF)?'1':'0');
-  con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET0)?"en":"dis"));
+  con->dd_printf(" %s", (ier&bmET0)?"en":"dis");
   con->dd_printf(" prio=%d", uc->priority_of(bmPT0));
   con->dd_printf("\n");
   //print_cfg_info(con);

@@ -382,7 +382,9 @@ void
 cl_timer2::print_info(class cl_console_base *con)
 {
   int t2con= cell_tcon->get();
-
+  class cl_memory_cell *iec= sfr?(sfr->get_cell(IE)):NULL;
+  u8_t ier= iec?(iec->get()):0;
+  
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
 		 256*cell_th->get()+cell_tl->get());
   if (RCLK || TCLK)
@@ -400,7 +402,7 @@ cl_timer2::print_info(class cl_console_base *con)
   con->dd_printf(" %s", (C_T)?"counter":"timer");
   con->dd_printf(" %s", (TR)?"ON":"OFF");
   con->dd_printf(" irq=%c", (t2con&bmTF2)?'1':'0');
-  con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET2)?"en":"dis"));
+  con->dd_printf(" %s", (ier&bmET2)?"en":"dis");
   con->dd_printf(" prio=%d", uc->priority_of(bmPT2));
   con->dd_printf("\n");
   //print_cfg_info(con);

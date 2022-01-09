@@ -1,3 +1,18 @@
+2022-01-09 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/pic16/Makefile.in,
+	  device/lib/pic16/aclocal.m4,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/configure.ac,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/missing,
+	  device/lib/pic16/startup/Makefile.in:
+	  Update pic16 library build infrastructure (fixes a configuration time warning).
+
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
     * sdcc/src/SDCCsymt.c,
       sdcc/src/SDCCpeeph.c,

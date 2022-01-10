@@ -105,7 +105,7 @@ hc08_regWithIdx (int idx)
 }
 
 /*-----------------------------------------------------------------*/
-/* hc08_freeReg - frees a register                                      */
+/* hc08_freeReg - frees a register                                 */
 /*-----------------------------------------------------------------*/
 void
 hc08_freeReg (reg_info * reg)
@@ -1208,162 +1208,6 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   return changes;
 }
 
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* packRegsForOneuse : - will reduce some registers for single Use */
-/*-----------------------------------------------------------------*/
-static iCode *
-packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
-{
-  bitVect *uses;
-  iCode *dic, *sic;
-
-  /* if returning a literal then do nothing */
-  if (!IS_SYMOP (op))
-    return NULL;
-
-  /* only up to 2 bytes */
-  if (getSize (operandType (op)) > (fReturnSizeHC08 - 2))
-    return NULL;
-
-  return NULL;
-
-  if (ic->op != SEND && //RETURN
-      ic->op != SEND &&
-      !POINTER_SET (ic) &&
-      !POINTER_GET (ic))
-    return NULL;
-
-  if (ic->op == SEND && ic->argreg != 1)
-    return NULL;
-
-  /* this routine will mark the symbol as used in one
-     instruction use only && if the definition is local
-     (ie. within the basic block) && has only one definition &&
-     that definition is either a return value from a
-     function or does not contain any variables in
-     far space */
-  uses = bitVectCopy (OP_USES (op));
-  bitVectUnSetBit (uses, ic->key);      /* take away this iCode */
-  if (!bitVectIsZero (uses))    /* has other uses */
-    return NULL;
-
-  /* if it has only one definition */
-  if (bitVectnBitsOn (OP_DEFS (op)) > 1)
-    return NULL;                /* has more than one definition */
-
-  /* get that definition */
-  if (!(dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (op)))))
-    return NULL;
-
-  /* if that only usage is a cast */
-  if (dic->op == CAST)
-    {
-      /* to a bigger type */
-      if (getSize(OP_SYM_TYPE(IC_RESULT(dic))) > getSize(OP_SYM_TYPE(IC_RIGHT(dic))))
-        {
-          /* then we can not, since we cannot predict the usage of b & acc */
-          return NULL;
-        }
-    }
-
-  /* found the definition now check if it is local */
-  if (dic->seq < ebp->fSeq || dic->seq > ebp->lSeq)
-    return NULL;                /* non-local */
-
-  /* now check if it is the return from a function call */
-  if (dic->op == CALL || dic->op == PCALL)
-    {
-      if (ic->op != SEND && ic->op != RETURN &&
-          !POINTER_SET(ic) && !POINTER_GET(ic))
-        {
-          OP_SYMBOL (op)->ruonly = 1;
-          return dic;
-        }
-      dic = dic->next;
-    }
-
-
-//  /* otherwise check that the definition does
-//     not contain any symbols in far space */
-//  if (isOperandInFarSpace (IC_LEFT (dic)) ||
-//      isOperandInFarSpace (IC_RIGHT (dic)) ||
-//      IS_OP_RUONLY (IC_LEFT (ic)) ||
-//      IS_OP_RUONLY (IC_RIGHT (ic)))
-//    {
-//      return NULL;
-//    }
-
-  /* if pointer set then make sure the pointer
-     is one byte */
-#if 0
-  if (POINTER_SET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), false)))
-    return NULL;
-
-  if (POINTER_GET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), false)))
-    return NULL;
-#endif
-
-  sic = dic;
-
-  /* make sure the intervening instructions
-     don't have anything in far space */
-  for (dic = dic->next; dic && dic != ic && sic != ic; dic = dic->next)
-    {
-      /* if there is an intervening function call then no */
-      if (dic->op == CALL || dic->op == PCALL)
-        return NULL;
-      /* if pointer set then make sure the pointer
-         is one byte */
-#if 0
-      if (POINTER_SET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), false)))
-        return NULL;
-
-      if (POINTER_GET (dic) &&
-          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), false)))
-        return NULL;
-#endif
-      /* if address of & the result is remat then okay */
-      if (dic->op == ADDRESS_OF &&
-          OP_SYMBOL (IC_RESULT (dic))->remat)
-        continue;
-
-      /* if operand has size of three or more & this
-         operation is a '*','/' or '%' then 'b' may
-         cause a problem */
-#if 0
-      if ((dic->op == '%' || dic->op == '/' || dic->op == '*') &&
-          getSize (operandType (op)) >= 3)
-        return NULL;
-#endif
-
-      /* if left or right or result is in far space */
-//      if (isOperandInFarSpace (IC_LEFT (dic)) ||
-//        isOperandInFarSpace (IC_RIGHT (dic)) ||
-//        isOperandInFarSpace (IC_RESULT (dic)) ||
-//        IS_OP_RUONLY (IC_LEFT (dic)) ||
-//        IS_OP_RUONLY (IC_RIGHT (dic)) ||
-//        IS_OP_RUONLY (IC_RESULT (dic)))
-//      {
-//        return NULL;
-//      }
-//      /* if left or right or result is on stack */
-//     if (isOperandOnStack(IC_LEFT(dic)) ||
-//        isOperandOnStack(IC_RIGHT(dic)) ||
-//        isOperandOnStack(IC_RESULT(dic))) {
-//      return NULL;
-//     }
-    }
-
-  OP_SYMBOL (op)->ruonly = 1;
-  return sic;
-}
-#endif
-
 /*-----------------------------------------------------------------*/
 /* isBitwiseOptimizable - requirements of JEAN LOUIS VERN          */
 /*-----------------------------------------------------------------*/
@@ -1391,56 +1235,6 @@ isBitwiseOptimizable (iCode * ic)
     return true;
   else
     return false;
-}
-
-/*-----------------------------------------------------------------*/
-/* isCommutativeOp - tests whether this op cares what order its    */
-/*                   operands are in                               */
-/*-----------------------------------------------------------------*/
-bool isCommutativeOp2(unsigned int op)
-{
-  if (op == '+' || op == '*' || op == EQ_OP ||
-      op == '^' || op == '|' || op == BITWISEAND)
-    return true;
-  else
-    return false;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandUsesAcc2 - determines whether the code generated for this */
-/*                  operand will have to use the accumulator       */
-/*-----------------------------------------------------------------*/
-bool operandUsesAcc2(operand *op)
-{
-  if (!op)
-    return false;
-
-  if (IS_SYMOP(op)) {
-    symbol *sym = OP_SYMBOL(op);
-    memmap *symspace;
-
-    if (sym->accuse)
-      return true;  /* duh! */
-
-    if (IS_ITEMP(op))
-      {
-        if (SPIL_LOC(op)) {
-          sym = SPIL_LOC(op);  /* if spilled, look at spill location */
-        } else {
-          return false;  /* more checks? */
-        }
-      }
-
-    symspace = SPEC_OCLS(sym->etype);
-
-    if (IN_BITSPACE(symspace))
-      return true;  /* fetching bit vars uses the accumulator */
-
-    if (IN_FARSPACE(symspace) || IN_CODESPACE(symspace))
-      return true;  /* fetched via accumulator and dptr */
-  }
-
-  return false;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2316,6 +2110,7 @@ serialRegMark (eBBlock ** ebbs, int count)
         }
     }
 }
+
 /*-----------------------------------------------------------------*/
 /* New register allocator                                          */
 /*-----------------------------------------------------------------*/

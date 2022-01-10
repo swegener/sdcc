@@ -62,7 +62,6 @@ int m6502_ptrRegReq;             /* one byte pointer register required */
 /* 6502 registers */
 reg_info regsm6502[] =
 {
-
   {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
   {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
   {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
@@ -72,6 +71,7 @@ reg_info regsm6502[] =
   {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
   {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
 };
+
 int m6502_nRegs = 7;
 
 reg_info *m6502_reg_a;
@@ -102,7 +102,7 @@ m6502_regWithIdx (int idx)
 }
 
 /*-----------------------------------------------------------------*/
-/* m6502_freeReg - frees a register                                      */
+/* m6502_freeReg - frees a register                                */
 /*-----------------------------------------------------------------*/
 void
 m6502_freeReg (reg_info * reg)
@@ -151,7 +151,7 @@ m6502_freeReg (reg_info * reg)
 
 
 /*-----------------------------------------------------------------*/
-/* m6502_useReg - marks a register  as used                         */
+/* m6502_useReg - marks a register  as used                        */
 /*-----------------------------------------------------------------*/
 void
 m6502_useReg (reg_info * reg)
@@ -192,7 +192,7 @@ m6502_useReg (reg_info * reg)
 }
 
 /*-----------------------------------------------------------------*/
-/* m6502_dirtyReg - marks a register as dirty                       */
+/* m6502_dirtyReg - marks a register as dirty                      */
 /*-----------------------------------------------------------------*/
 void
 m6502_dirtyReg (reg_info * reg, bool freereg)
@@ -427,8 +427,8 @@ updateRegUsage (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* deassignLRs - check the live to and if they have registers & are */
-/*               not spilt then free up the registers              */
+/* deassignLRs - check the live to and if they have registers &    */
+/*               are not spilt then free up the registers          */
 /*-----------------------------------------------------------------*/
 static void
 deassignLRs (iCode * ic, eBBlock * ebp)
@@ -968,55 +968,6 @@ isBitwiseOptimizable (iCode * ic)
     return false;
 }
 
-/*-----------------------------------------------------------------*/
-/* isCommutativeOp - tests whether this op cares what order its    */
-/*                   operands are in                               */
-/*-----------------------------------------------------------------*/
-bool m6502_isCommutativeOp2(unsigned int op)
-{
-  if (op == '+' || op == '*' || op == EQ_OP ||
-      op == '^' || op == '|' || op == BITWISEAND)
-    return true;
-  else
-    return false;
-}
-
-/*-----------------------------------------------------------------*/
-/* operandUsesAcc2 - determines whether the code generated for this */
-/*                  operand will have to use the accumulator       */
-/*-----------------------------------------------------------------*/
-bool m6502_operandUsesAcc2(operand *op)
-{
-  if (!op)
-    return false;
-
-  if (IS_SYMOP(op)) {
-    symbol *sym = OP_SYMBOL(op);
-    memmap *symspace;
-
-    if (sym->accuse)
-      return true;  /* duh! */
-
-    if (IS_ITEMP(op))
-      {
-        if (SPIL_LOC(op)) {
-          sym = SPIL_LOC(op);  /* if spilled, look at spill location */
-        } else {
-          return false;  /* more checks? */
-        }
-      }
-
-    symspace = SPEC_OCLS(sym->etype);
-
-    if (IN_BITSPACE(symspace))
-      return true;  /* fetching bit vars uses the accumulator */
-
-    if (IN_FARSPACE(symspace) || IN_CODESPACE(symspace))
-      return true;  /* fetched via accumulator and dptr */
-  }
-
-  return false;
-}
 
 /*-----------------------------------------------------------------*/
 /* packForPush - heuristics to reduce iCode for pushing            */

@@ -4,7 +4,7 @@
  */
 
 #ifdef TEST1
-#if !defined(__SDCC_stm8) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_tlcs90) && !defined(__SDCC_sm83) 
+#if !defined(__SDCC_stm8) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) && !defined(__SDCC_tlcs90) && !defined(__SDCC_sm83) 
 __sfr __at 0x1234 x; /* IGNORE */
 
 unsigned char *foo(void)

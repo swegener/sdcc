@@ -29,8 +29,8 @@ else
   DEV_NULL ?= /dev/null
 endif
 
-SDCCFLAGS += --less-pedantic
-LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib liblonglong.lib
+SDCCFLAGS += --debug --less-pedantic
+LINKFLAGS += --debug mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib liblonglong.lib
 
 OBJEXT = .rel
 BINEXT = .ihx

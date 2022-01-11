@@ -319,7 +319,7 @@ cl_vcd::open_vcd(class cl_console_base *con)
               else if (cmd[0] == '|')
                 cmd++;
 
-              execl("/bin/sh", "sh", "-c", cmd, NULL);
+              execl("/bin/sh", "sh", "-c", cmd, (char*)NULL);
               perror("execl");
               _exit(1);
             }

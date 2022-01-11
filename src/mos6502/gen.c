@@ -3048,7 +3048,7 @@ isAddrSafe(operand* op, reg_info* reg)
   return false;
 }
 
-static int aopPreparePushedY = 0;
+static int aopPrepareStoreTemp = 0;
 static int aopPreparePreserveFlags = 0;
 
 // TODO: make sure this is called before/after aopAdrStr if indexing might be used
@@ -3068,14 +3068,20 @@ aopAdrPrepare (asmop * aop, int loffset)
         // can we get stack pointer?
         if (m6502_reg_x->isFree) {
           doTSX();
-        // try another way [BASEPTR],y
+          aopPrepareStoreTemp=0;
         } else {
-          aopPreparePushedY = storeRegTemp(m6502_reg_y, false);
-          // TODO: wtf?
-          DD( emitcode("", ";ofs=%d base=%d tsx=%d push=%d stk=%d", _G.stackOfs, _G.baseStackPushes, _G.tsxStackPushes, _G.stackPushes, aop->aopu.aop_stk) );
+#if 0
+          // code for lda [BASEPTR],y 
+          aopPrepareStoreTemp = storeRegTemp(m6502_reg_y, false);
+	  // FIXME: offset is wrong
+          DD( emitcode("", ";ofs=%d base=%d tsx=%d push=%d stk=%d loffset=%d", _G.stackOfs, _G.baseStackPushes, _G.tsxStackPushes, _G.stackPushes, aop->aopu.aop_stk, loffset) );
           loadRegFromConst(m6502_reg_y, _G.stackOfs + _G.baseStackPushes + aop->aopu.aop_stk + loffset + 1);
 	  // ORIG: loadRegFromConst(m6502_reg_y, _G.stackOfs - _G.baseStackPushes + aop->aopu.aop_stk + loffset + 1);
           m6502_reg_y->aop = &tsxaop;
+#else
+	  aopPrepareStoreTemp = storeRegTemp(m6502_reg_x, true);
+          doTSX();
+#endif
           aopPreparePreserveFlags = 1; // TODO: also need to make sure flags are needed by caller
         }
       }
@@ -3094,13 +3100,18 @@ aopAdrUnprepare (asmop * aop, int loffset)
       if (regalloc_dry_run) {
         return;
       } else {
-        if (aopPreparePushedY) {
+        if (aopPrepareStoreTemp) {
           if (aopPreparePreserveFlags) emitcode("php", ""); // TODO: sucks
+#if 0
           loadRegTemp(m6502_reg_y, true);
-          if (aopPreparePreserveFlags) emitcode("plp", ""); // TODO: sucks
-          if (aopPreparePreserveFlags) aopPreparePreserveFlags += 2;
           m6502_dirtyReg(m6502_reg_y, false);
-          aopPreparePushedY = 0;
+#else
+	  loadRegTemp(m6502_reg_x, true);
+#endif
+	  if (aopPreparePreserveFlags) emitcode("plp", ""); // TODO: sucks
+	  //	  if (aopPreparePreserveFlags) regalloc_dry_run_cost += 2;
+	  aopPreparePreserveFlags = 0;
+	  aopPrepareStoreTemp = 0;
         }
       }
     }
@@ -3183,7 +3194,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
           // hc08's tsx returns +1, ours returns +0
           //DD( emitcode( "", "; %d + %d + %d + %d + 1", _G.stackOfs, _G.tsxStackPushes, aop->aopu.aop_stk, offset ));
           xofs = STACK_TOP + _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1;
-          sprintf (s, "%d,x", xofs);
+          sprintf (s, "0x%x,x", xofs);
           rs = Safe_calloc (1, strlen (s) + 1);
           strcpy (rs, s);
           return rs;
@@ -8486,7 +8497,8 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   // TODO: really do we need this?
   asmop *newaop = newAsmop (AOP_DIR);
   newaop->aopu.aop_dir = Safe_calloc (1, 8+1);
-  sprintf(newaop->aopu.aop_dir, "__TEMP+%d", _G.tempOfs);
+  sprintf(newaop->aopu.aop_dir, "(__TEMP+%d)", _G.tempOfs);
+  D (emitcode ("",";     preparePointer: %s", newaop->aopu.aop_dir));
   newaop->size = 2;
   
   /* The rematerialized offset may have a "#" prefix; skip over it */
@@ -9512,7 +9524,7 @@ genAssignLit (operand * result, operand * right)
   int offset,offset2;
   int dups,multiples;
   bool needpula = false;
-  bool canUseHX = true;
+  bool canUseYX = true;
   int remaining;
 
   DD (emitcode (";     genAssignLit", ""));
@@ -9542,12 +9554,13 @@ genAssignLit (operand * result, operand * right)
       value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
     }
 
-  if ((AOP_TYPE (result) != AOP_DIR ) && IS_MOS6502)
-    canUseHX = false;
+
+  if ((AOP_TYPE (result) != AOP_DIR ))
+    canUseYX = false;
     
-  if (canUseHX)
+  if (canUseYX)
     {
-      /* Assign words that are already in HX */
+      /* Assign words that are already in YX */
       for (offset=size-2; offset>=0; offset -= 2)
         {
           if (assigned[offset] || assigned[offset+1])
@@ -9562,9 +9575,9 @@ genAssignLit (operand * result, operand * right)
     }
 
   if (!(m6502_reg_y->isDead && m6502_reg_x->isDead))
-    canUseHX = false;
+    canUseYX = false;
 
-  if (canUseHX && (size>=2))
+  if (canUseYX && (size>=2))
     {
       /* Assign whatever reamains to be assigned */
       for (offset=size-2; offset>=0; offset -= 2)

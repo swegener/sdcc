@@ -14,10 +14,12 @@ ifeq ($(SIM), sim)
 				$(wildcard $(abs_top_builddir)/$(p).src/s$(p)) $(wildcard $(abs_top_builddir)/$(p).src/$(p)) \
 			) \
 		)
-else ifeq ($(SIM), s51)
+else
+ifeq ($(SIM), s51)
 	SIM := $(abs_top_builddir)/$(SIM).src/ucsim_51
 else
 	SIM := $(abs_top_builddir)/$(SIM).src/ucsim_$(SIM)
+endif
 endif
 
 

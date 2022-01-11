@@ -1,3 +1,8 @@
+2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
+      Fix gcc-torture-execute-990128-1 regression failure.
+
 2022-01-11 Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
 
     * sdcc/support/regression/ports/mcs51-common/spec.mk:
@@ -7,12 +12,12 @@
 
     * sdcc/src/mos6502/gen.c:
       Fix bug #3304.
-      
+
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
       Fix bug1115321 regression failure.
-      
+
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
@@ -23,22 +28,22 @@
     * sdcc/src/mos6502/ralloc.c,
       sdcc/src/hc08/ralloc.c:
       Remove more dead code.
-      
+
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/support/valdiag/tests/bug-2798.c:
       Exclude test for mos6502 port (no support for __sfr).
-      
+
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
       Fix several compiler warnings.
-      
+
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
       Fix several compiler warnings.
-      
+
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/ralloc.c:

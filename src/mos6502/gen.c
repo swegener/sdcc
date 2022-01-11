@@ -8599,8 +8599,6 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   char * rematOffset = NULL;
   sym_link *retype = getSpec (operandType (result));
   bool needpulla = false;
-  bool needpully = false;
-  bool needpullx = false;
   // TODO? bool vol = false;
 
   if ((size = getSize (operandType (result))) > 1)
@@ -8652,14 +8650,14 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
 
   D (emitcode ("", ";     genPointerGet (%s)", aopName(AOP(left)), litOffset, rematOffset ));
   
-  needpulla = pushRegIfSurv (m6502_reg_a);
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
   
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   if (AOP_TYPE (left) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size)
   {
     // and we're storing to the pointer itself, copy onto stack first
     if (sameRegs(AOP(left), AOP(result)) ) {
-      bool pullh = storeRegTempIfSurv (m6502_reg_y);
+      bool pully = storeRegTempIfSurv (m6502_reg_y);
       // push the values
       for (int i=size-1; i>=0; i--) {
         loadRegFromConst(m6502_reg_y, litOffset + i);
@@ -8673,7 +8671,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
         if (i != 0) pullReg(m6502_reg_a);
         storeRegToAop (m6502_reg_a, AOP (result), i);
       }
-      if (pullh) loadRegTemp(m6502_reg_y, true);
+      if (pully) loadRegTemp(m6502_reg_y, true);
     // use [aa,x] or [aa],y if only 1 byte and offset is known
     } else if (size == 1 && litOffset == 0 && m6502_reg_x->isLitConst && m6502_reg_x->litConst == 0) {
       // [aa,x] x == 0
@@ -8682,7 +8680,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
       storeRegToAop (m6502_reg_a, AOP (result), 0);
     } else {
       // otherwise use [aa],y
-      bool pullh = storeRegTempIfSurv (m6502_reg_y);
+      bool pully = storeRegTempIfSurv (m6502_reg_y);
       if (IS_AOP_XA(AOP(result))) {
         // reverse order so A is last
         for (int i=size-1; i>=0; i--) {
@@ -8700,7 +8698,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
           storeRegToAop (m6502_reg_a, AOP (result), i);
         }
       }
-      if (pullh) loadRegTemp(m6502_reg_y, true);
+      if (pully) loadRegTemp(m6502_reg_y, true);
     }
     goto release;
   }
@@ -8806,9 +8804,7 @@ release:
     }
 
 //  emitcode("php", "");//TODO
-  pullOrFreeReg (m6502_reg_y, needpully);
-  pullOrFreeReg (m6502_reg_x, needpullx);
-  pullOrFreeReg (m6502_reg_a, needpulla);
+  loadOrFreeRegTemp (m6502_reg_a, needpulla);
 //  emitcode("plp", "");
   regalloc_dry_run_cost += 2;
 
@@ -9254,7 +9250,7 @@ genPointerSet (iCode * ic, iCode * pi)
   aopOp (right, ic, false);
   size = AOP_SIZE (right);
 
-  D (emitcode ("", ";     genPointerSet (%s)", aopName(AOP(right)), litOffset, rematOffset ));
+  D (emitcode ("", ";     genPointerSet (%s), litoffset=%d, rematoffset=%d", aopName(AOP(right)), litOffset, rematOffset ));
 
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location
@@ -9262,7 +9258,7 @@ genPointerSet (iCode * ic, iCode * pi)
       && AOP_TYPE (result) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size
       && !sameRegs(AOP(right), AOP(result)) ) {
   
-    needpulla = pushRegIfSurv (m6502_reg_a);
+    needpulla = storeRegTempIfSurv (m6502_reg_a);
     if (size == 1 && litOffset == 0 && m6502_reg_x->isLitConst && m6502_reg_x->litConst == 0) {
       // use [aa,x] if only 1 byte and offset is 0
       loadRegFromAop (m6502_reg_a, AOP (right), 0);
@@ -9292,7 +9288,7 @@ genPointerSet (iCode * ic, iCode * pi)
     goto release;
   }
 
-  needpulla = pushRegIfSurv (m6502_reg_a);
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
   needpullx = storeRegTempIfSurv (m6502_reg_x);
   needpully = storeRegTempIfSurv (m6502_reg_y);
   
@@ -9378,7 +9374,7 @@ release:
 
   loadOrFreeRegTemp (m6502_reg_y, needpully);
   loadOrFreeRegTemp (m6502_reg_x, needpullx);
-  pullOrFreeReg (m6502_reg_a, needpulla);
+  loadOrFreeRegTemp (m6502_reg_a, needpulla);
 }
 
 // TODO: genIfx sometimes does a cmp #0 but has flags already, peephole might fix

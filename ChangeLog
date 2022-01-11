@@ -1,6 +1,11 @@
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Fix bug #3304.
+      
+2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Fix bug1115321 regression failure.
       
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>

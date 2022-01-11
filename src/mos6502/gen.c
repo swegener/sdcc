@@ -8496,8 +8496,8 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
 {
   // TODO: really do we need this?
   asmop *newaop = newAsmop (AOP_DIR);
-  newaop->aopu.aop_dir = Safe_calloc (1, 8+1);
-  sprintf(newaop->aopu.aop_dir, "(__TEMP+%d)", _G.tempOfs);
+  newaop->aopu.aop_dir = Safe_calloc (1, 10+4);
+  snprintf(newaop->aopu.aop_dir, 14, "(__TEMP+%d)", _G.tempOfs);
   D (emitcode ("",";     preparePointer: %s", newaop->aopu.aop_dir));
   newaop->size = 2;
   

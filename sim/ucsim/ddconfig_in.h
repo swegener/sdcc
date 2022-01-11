@@ -49,6 +49,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
@@ -131,6 +134,9 @@
 
 /* Define to 1 if you have the `pipe2' function. */
 #undef HAVE_PIPE2
+
+/* Define to 1 if you have the `waitpid' function. */
+#undef HAVE_WAITPID
 
 /* Define to 1 if you have the `vasprintf' function. */
 #undef HAVE_VASPRINTF

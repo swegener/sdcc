@@ -269,7 +269,8 @@ AC_CHECK_HEADERS(termios.h)
 AC_CHECK_HEADERS(inttypes.h)
 AC_CHECK_HEADERS(cstdint.h)
 AC_CHECK_HEADERS(stdint.h)
-
+AC_CHECK_HEADERS(sys/wait.h)
+		     
 AC_CHECK_HEADER(curses.h,
   AC_DEFINE(HAVE_CURSES_H, 1, [XXX])
   curses_h_ok=yes,
@@ -413,7 +414,7 @@ AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
 
 AC_FUNC_FORK
-AC_CHECK_FUNCS(_exit dup2 dup3 pipe pipe2)
+AC_CHECK_FUNCS(_exit dup2 dup3 pipe pipe2 waitpid)
 AC_CHECK_FUNCS(vasprintf)
 dnl AC_CHECK_FUNCS(strdup)
 dnl AC_CHECK_FUNCS(getline)

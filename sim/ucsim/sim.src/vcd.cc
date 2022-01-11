@@ -25,9 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include "ddconfig.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 #include <errno.h>
 #include <fcntl.h>
 #include <math.h>
@@ -46,7 +50,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "vcdcl.h"
 
 
-#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE)
+#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE) && defined(HAVE_WAITPID)
 
 #  if !defined(HAVE__EXIT)
 static void _exit(int status) { exit(status); }
@@ -276,7 +280,7 @@ cl_vcd::open_vcd(class cl_console_base *con)
     }
   else
     {
-#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE)
+#if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE) && defined(HAVE_WAITPID)
       int p[2];
       pid_t pid;
 

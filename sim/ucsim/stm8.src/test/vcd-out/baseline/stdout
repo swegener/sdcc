@@ -37,7 +37,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
-Simulated 5 ticks (6.250e-07 sec)
+Simulated 5 ticks [ELIDED]
 Host usage: [ELIDED]
 
 # Set up a vcd to monitor the bit changes in loc1 and the value of loc2.
@@ -88,7 +88,7 @@ V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
-Simulated 25 ticks (3.125e-06 sec)
+Simulated 25 ticks [ELIDED]
 Host usage: [ELIDED]
 
 # Remove the probe from every second bit.
@@ -113,7 +113,7 @@ V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
-Simulated 25 ticks (3.125e-06 sec)
+Simulated 25 ticks [ELIDED]
 Host usage: [ELIDED]
 
 # Don't forget to close the vcd properly!

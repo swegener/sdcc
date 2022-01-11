@@ -21,7 +21,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 5 ticks (6.250e-07 sec)
+Simulated 5 ticks [ELIDED]
 Host usage: [ELIDED]
 
 # Start the vcd (we set the input file via the Makefile) and
@@ -103,7 +103,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -118,7 +118,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -133,7 +133,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -148,7 +148,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -163,7 +163,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -178,7 +178,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                01    .
@@ -193,7 +193,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                01    .
@@ -208,7 +208,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                01    .
@@ -223,7 +223,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
 timer #0("time") ON: 1.75e-06 sec (14 clks)
@@ -339,7 +339,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                02    .
@@ -354,7 +354,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
 timer #0("time") ON: 2.5e-06 sec (20 clks)
@@ -373,7 +373,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                06    .
@@ -388,7 +388,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                04    .
@@ -403,7 +403,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                04    .
@@ -418,7 +418,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                0c    .
@@ -433,7 +433,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                08    .
@@ -448,7 +448,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                08    .
@@ -463,7 +463,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                18    .
@@ -478,7 +478,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                10    .
@@ -493,7 +493,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                10    .
@@ -508,7 +508,7 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c cc 80 0c       jp     0x800c[0K
 F 0x00800c
-Simulated 1 ticks (1.250e-07 sec)
+Simulated 1 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                30    0

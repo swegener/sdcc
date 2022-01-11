@@ -142,8 +142,8 @@ dc 0x8000 0x082a4
  ? 0x080d5 86             pop    CC[0K
  ? 0x080d6 9b             sim[0K
  ? 0x080d7 72 17 50 13    bres   0x5013,#3[0K
- ? 0x080db 35 0a 00 23    mov    0x0a00,#0x23 <vuart_rx_state>[0K
- ? 0x080df 35 ff 00 25    mov    0xff00,#0x25 <vuart_rx_bit>[0K
+ ? 0x080db 35 0a 00 23    mov    0x0023 <vuart_rx_state>,#0x0a[0K
+ ? 0x080df 35 ff 00 25    mov    0x0025 <vuart_rx_bit>,#0xff[0K
  ? 0x080e3 72 00 53 00 0c btjt   0x5300,#0,0x80f4[0K
  ? 0x080e8 72 1a 50 c7    bset   0x50c7 <CLK_PCKENR1>,#5 <TIM2>[0K
  ? 0x080ec 72 10 53 00    bset   0x5300,#0[0K
@@ -185,7 +185,7 @@ dc 0x8000 0x082a4
  ? 0x08136 ae 00 0f       ldw    X,#0x000f[0K
  ? 0x08139 cf 00 3c       ldw    0x003c <vuart_tx_r>,X[0K
  ? 0x0813c c7 00 22       ld     0x0022 <vuart_tx>,A[0K
- ? 0x0813f 35 08 00 21    mov    0x0800,#0x21 <vuart_tx_state>[0K
+ ? 0x0813f 35 08 00 21    mov    0x0021 <vuart_tx_state>,#0x08[0K
  ? 0x08143 20 0e          jra    0x8153 <rx>[0K
 
    0x08145 <tx_idle>:
@@ -266,9 +266,9 @@ dc 0x8000 0x082a4
  ? 0x081da 81             ret[0K
 
    0x081db <_boot>:
- ? 0x081db 35 00 50 c6    mov    0x0050,#0xc6[0K
- ? 0x081df 35 00 50 c7    mov    0x0050,#0xc7[0K
- ? 0x081e3 35 00 50 ca    mov    0x0050,#0xca[0K
+ ? 0x081db 35 00 50 c6    mov    0x50c6,#0x00[0K
+ ? 0x081df 35 00 50 c7    mov    0x50c7 <CLK_PCKENR1>,#0x00[0K
+ ? 0x081e3 35 00 50 ca    mov    0x50ca,#0x00[0K
  ? 0x081e7 ae 00 08       ldw    X,#0x0008[0K
  ? 0x081ea 27 07          jreq   0x81f3[0K
  ? 0x081ec 72 4f 00 35    clr    (0x0035,X)[0K
@@ -292,17 +292,17 @@ dc 0x8000 0x082a4
  ? 0x08218 a4 f3          and    A,#0xf3[0K
  ? 0x0821a aa 0c          or     A,#0x0c[0K
  ? 0x0821c c7 7f 73       ld     0x7f73,A[0K
- ? 0x0821f 35 20 52 34    mov    0x2052,#0x34[0K
- ? 0x08223 35 2c 52 35    mov    0x2c52,#0x35[0K
- ? 0x08227 35 00 52 36    mov    0x0052,#0x36 <uart1_tx_w>[0K
- ? 0x0822b 35 0b 52 33    mov    0x0b52,#0x33[0K
- ? 0x0822f 35 08 52 32    mov    0x0852,#0x32[0K
+ ? 0x0821f 35 20 52 34    mov    0x5234,#0x20[0K
+ ? 0x08223 35 2c 52 35    mov    0x5235,#0x2c[0K
+ ? 0x08227 35 00 52 36    mov    0x5236,#0x00[0K
+ ? 0x0822b 35 0b 52 33    mov    0x5233,#0x0b[0K
+ ? 0x0822f 35 08 52 32    mov    0x5232,#0x08[0K
  ? 0x08233 72 16 50 c7    bset   0x50c7 <CLK_PCKENR1>,#3 <UART1>[0K
  ? 0x08237 72 1b 52 34    bres   0x5234,#5[0K
- ? 0x0823b 35 0f 00 3c    mov    0x0f00,#0x3c <vuart_tx_r>[0K
- ? 0x0823f 35 0f 00 3a    mov    0x0f00,#0x3a <vuart_tx_w>[0K
- ? 0x08243 35 ff 00 21    mov    0xff00,#0x21 <vuart_tx_state>[0K
- ? 0x08247 35 ff 00 23    mov    0xff00,#0x23 <vuart_rx_state>[0K
+ ? 0x0823b 35 0f 00 3c    mov    0x003c <vuart_tx_r>,#0x0f[0K
+ ? 0x0823f 35 0f 00 3a    mov    0x003a <vuart_tx_w>,#0x0f[0K
+ ? 0x08243 35 ff 00 21    mov    0x0021 <vuart_tx_state>,#0xff[0K
+ ? 0x08247 35 ff 00 23    mov    0x0023 <vuart_rx_state>,#0xff[0K
  ? 0x0824b 72 14 50 11    bset   0x5011 <pd_ddr>,#2[0K
  ? 0x0824f 72 14 50 12    bset   0x5012,#2[0K
  ? 0x08253 72 15 50 13    bres   0x5013,#2[0K
@@ -314,9 +314,9 @@ dc 0x8000 0x082a4
  ? 0x0826a a4 fc          and    A,#0xfc[0K
  ? 0x0826c aa 02          or     A,#0x02[0K
  ? 0x0826e c7 50 a1       ld     0x50a1,A[0K
- ? 0x08271 35 00 53 0e    mov    0x0053,#0x0e[0K
- ? 0x08275 35 00 53 0f    mov    0x0053,#0x0f[0K
- ? 0x08279 35 8b 53 10    mov    0x8b53,#0x10[0K
+ ? 0x08271 35 00 53 0e    mov    0x530e,#0x00[0K
+ ? 0x08275 35 00 53 0f    mov    0x530f,#0x00[0K
+ ? 0x08279 35 8b 53 10    mov    0x5310,#0x8b[0K
  ? 0x0827d 72 15 53 00    bres   0x5300,#2[0K
  ? 0x08281 72 10 53 03    bset   0x5303,#0[0K
  ? 0x08285 a6 48          ld     A,#0x48[0K

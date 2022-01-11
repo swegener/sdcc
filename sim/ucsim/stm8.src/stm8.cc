@@ -721,7 +721,6 @@ cl_stm8::get_disasm_info(t_addr addr,
   const char *b = NULL;
   uint code;
   int len = 0;
-  int immed_n = 0;
   int i;
   int start_addr = addr;
   struct dis_entry *dis_e;
@@ -808,11 +807,8 @@ cl_stm8::get_disasm_info(t_addr addr,
     *ret_branch = dis_e->branch;
   }
 
-  if (immed_offset) {
-    if (immed_n > 0)
-         *immed_offset = immed_n;
-    else *immed_offset = (addr - start_addr);
-  }
+  if (immed_offset)
+    *immed_offset = (addr - start_addr);
 
   if (len == 0)
     len = 1;
@@ -846,6 +842,7 @@ cl_stm8::disass(t_addr addr)
       return strdup("UNKNOWN/INVALID");
     }
 
+  int operand_n = 0;
   while (*b)
     {
       if ((*b == ' ') && first)
@@ -888,16 +885,31 @@ cl_stm8::disass(t_addr addr)
               ++immed_offset;
               break;
             case 'x': // x    extended addressing
-	      operand= (uint)((rom->get(addr+immed_offset)<<8) |
-			 (rom->get(addr+immed_offset+1)));
+              if (rom->get(addr) == 0x35) // mov %x,%b - mov $8000,#$ff is 35 ff 80 00
+                operand= (uint)((rom->get(addr+immed_offset+1)<<8) |
+                           (rom->get(addr+immed_offset+2)));
+              else if (rom->get(addr) == 0x55 && operand_n == 0) // mov %x,%x - mov $8000,$9fff is 9f ff 80 00
+                operand= (uint)((rom->get(addr+immed_offset+2)<<8) |
+                           (rom->get(addr+immed_offset+3)));
+              else
+                {
+                  operand= (uint)((rom->get(addr+immed_offset)<<8) |
+                             (rom->get(addr+immed_offset+1)));
+                  ++immed_offset;
+                  ++immed_offset;
+                }
               temp.format("0x%04x", operand);
               context = addr_name(operand, rom, &temp);
-              ++immed_offset;
-              ++immed_offset;
               break;
             case 'd': // d    direct addressing
-              temp.format("0x%02x", (uint)rom->get(addr+immed_offset));
-              ++immed_offset;
+              if (rom->get(addr) == 0x45 && operand_n == 0) // mov %d,%d - mov $80,$10 is 45 10 80
+                  operand= (uint)rom->get(addr+immed_offset+1);
+              else
+                {
+                  operand= (uint)rom->get(addr+immed_offset);
+                  ++immed_offset;
+                }
+              temp.format("0x%02x", operand);
               break;
             case '3': // 3    24bit index offset
               // Assumption: the 24bit offset address is the address of a
@@ -951,7 +963,11 @@ cl_stm8::disass(t_addr addr)
 	  work+= temp;
         }
       else
-        work+= *(b++);
+        {
+          if (*b == ',')
+            operand_n++;
+          work+= *(b++);
+        }
     }
 
   return strdup(work.c_str());

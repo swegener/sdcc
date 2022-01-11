@@ -51,7 +51,6 @@ static bool pushRegIfUsed (reg_info *reg);
 static void pullOrFreeReg (reg_info * reg, bool needpull);
 
 static char *zero = "#0x00";
-//static char *one = "#0x01";
 
 static char *TEMPFMT = "*(__TEMP+%d)";
 static char *TEMPFMT_IND = "[__TEMP+%d]";
@@ -191,7 +190,6 @@ m6502_emitDebuggerSymbol (const char *debugSym)
   emitcode ("", "%s ==.", debugSym);
   genLine.lineElement.isDebug = 0;
 }
-
 
 /*--------------------------------------------------------------------------*/
 /* transferRegReg - Transfer from register(s) sreg to register(s) dreg. If  */
@@ -348,8 +346,8 @@ updateCFA (void)
 // TODO: free, or dead?
 
 static bool
-storeRegTemp (reg_info * reg, bool always) {
-
+storeRegTemp (reg_info * reg, bool always)
+{
   DD (emitcode ("", "; storeRegTemp(%s) %d", reg ? reg->name : "-", always));
 
   if (reg->isFree && !always)
@@ -390,8 +388,8 @@ storeRegTemp (reg_info * reg, bool always) {
 }
 
 static void
-loadRegTemp (reg_info * reg, bool always) {
-
+loadRegTemp (reg_info * reg, bool always)
+{
   // pop off stack, unused
   if (reg == NULL) {
     _G.tempOfs--;
@@ -786,7 +784,9 @@ aopName (asmop * aop)
 #endif
 
 // can we BIT aop ?
-bool canBitOp(const operand* aop) {
+static bool 
+canBitOp (const operand* aop)
+{
   switch (AOP_TYPE(aop)) {
     // bit aa, bit aaaa
     case AOP_DIR:
@@ -938,7 +938,9 @@ forceload:
 }
 
 // get any free 8-bit register
-static reg_info* getFreeByteReg() {
+static reg_info*
+getFreeByteReg()
+{
   if (m6502_reg_a->isFree)
     return m6502_reg_a;
   else if (m6502_reg_x->isFree)
@@ -948,8 +950,11 @@ static reg_info* getFreeByteReg() {
   else
     return NULL;
 }
+
 // TODO: move more to this one?
-static reg_info* getDeadByteReg() {
+static reg_info*
+getDeadByteReg()
+{
   if (m6502_reg_a->isDead)
     return m6502_reg_a;
   else if (m6502_reg_x->isDead)
@@ -1005,6 +1010,8 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         transferRegReg (reg, aop->aopu.aop_reg[loffset], false);
       else
         {
+          DD (emitcode ("", ";     storeRegToAop: A", ""));
+
           // TODO: i think this does not assemble?
           aopAdrPrepare(aop, loffset);
           emitcode ("sta", "%s", aopAdrStr (aop, loffset, false));
@@ -1421,7 +1428,8 @@ storeImmToAop (char *c, asmop * aop, int loffset)
     }
 }
 
-static void signExtendA() 
+static void
+signExtendA()
 {
       emitcode ("asl", "a");
       emitcode ("lda", "!zero");
@@ -2333,14 +2341,15 @@ static void saveBasePtr() {
   storeRegTemp (m6502_reg_x, true); // TODO: only when used?
   // TODO: if X is free should we call doTSX() to mark X=S?
   doTSX();
-  //emitcode ("tsx", "");
   emitcode ("stx", BASEPTR);
   _G.baseStackPushes = _G.stackPushes;
   regalloc_dry_run_cost += 2;
   loadRegTemp (m6502_reg_x, true);
 }
 
-static void restoreBasePtr() {
+static void
+restoreBasePtr()
+{
   // we recompute with saveBasePtr() after each jsr
 }
 
@@ -3021,8 +3030,9 @@ aopOpExtToIdx(asmop * result, asmop *left, asmop *right)
 }
 
 // is it safe to aopAdrStr?
-static bool isAddrSafe(operand* op, reg_info* reg) {
-
+static bool
+isAddrSafe(operand* op, reg_info* reg)
+{
   switch (AOP(op)->type) 
   {
     case AOP_IMMD:	// #nn
@@ -4769,8 +4779,6 @@ genPlus (iCode * ic)
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
     }
-
-
 
   /* if I can do an increment instead
      of add then GOOD for ME */
@@ -7468,9 +7476,9 @@ genLeftShift (iCode * ic)
 
   if (!countreg) // TODO
     {
+      emitcode ("; count is not a register", "");
 #if 0
       // FIXME
-      emitcode ("; count is not a register", "");
       storeRegTemp (m6502_reg_a, true);
 //      pushReg (m6502_reg_a, false);
       loadRegFromAop (m6502_reg_a, AOP (right), 0);
@@ -8519,6 +8527,9 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   // need to do pointer math?
   if (!rematOfs && offset >= 0 && offset <= 255-4)
     {
+      prepTempOfs = _G.tempOfs;
+      _G.tempOfs += 2;
+
       // just copy, we can add the remaining offset to Y later
       transferAopAop(AOP(left), 0, newaop, 0);
       transferAopAop(AOP(left), 1, newaop, 1);
@@ -8536,18 +8547,25 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
       emitcode ("sta", TEMPFMT, _G.tempOfs+1);
       regalloc_dry_run_cost += 9;
       pullOrFreeReg (m6502_reg_a, needpulla);
+
+      prepTempOfs = _G.tempOfs;
+      _G.tempOfs += 2;
     }
     
   Safe_free (newaop->aopu.aop_dir);
   Safe_free (newaop);
-  prepTempOfs = _G.tempOfs;
-  _G.tempOfs += 2;
+  // prepTempOfs = _G.tempOfs;
+  //_G.tempOfs += 2;
+  D (emitcode ("",";     preparePointer: prepoff=%d  G.off=%d", prepTempOfs, _G.tempOfs));
+
   wassertl (_G.tempOfs <= NUM_TEMP_REGS, "preparePointer(): overflow");
   return prepTempOfs;
 }
 
 static void unpreparePointer()
 {
+  D (emitcode ("",";     unpreparePointer: prepoff=%d  G.off=%d", prepTempOfs, _G.tempOfs));
+
   if (prepTempOfs >= 0)
     {
       _G.tempOfs -= 2;
@@ -9862,6 +9880,7 @@ genCast (iCode * ic)
         (AOP_TYPE (right) == AOP_IMMD || IS_MOS65C02 && AOP_TYPE (right) == AOP_EXT) &&
         (AOP_TYPE (result) == AOP_DIR || IS_MOS65C02 && AOP_TYPE (result) == AOP_EXT))
         {
+          // FIXME: the above exception for 65C02 is likely incorrect
           loadRegFromAop (m6502_reg_yx, AOP (right), offset);
           storeRegToAop (m6502_reg_yx, AOP (result), offset);
           offset += 2;
@@ -9946,7 +9965,9 @@ genReceive (iCode * ic)
 }
 
 // support routine for genDummyRead
-static void dummyRead(iCode* ic, operand* op, reg_info* reg) {
+static void
+dummyRead (iCode* ic, operand* op, reg_info* reg)
+{
   if (op && IS_SYMOP (op))
     {
       aopOp (op, ic, false);

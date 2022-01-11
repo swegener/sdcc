@@ -60,12 +60,14 @@ static void _exit(int status) { exit(status); }
 #    define O_CLOEXEC 0
 #  endif
 
+/*
 #  if !defined(HAVE_DUP3)
 static int dup3(int oldfd, int newfd, int flags) { return dup2(oldfd, newfd); }
 #  endif
+*/
 
 #  if !defined(HAVE_PIPE2)
-static int pipe2(int pipefd[2], int flags) { return pipe(pipfd); }
+static int pipe2(int pipefd[2], int flags) { return pipe(pipefd); }
 #  endif
 
 #endif

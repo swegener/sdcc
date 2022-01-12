@@ -1,5 +1,10 @@
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/support/regression/tests/reentrant.c:
+      Add reentrant function regression test.
+
+2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/gen.c:
       Fix gcc-torture-execute-990128-1 regression failure.
 

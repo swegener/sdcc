@@ -1,6 +1,11 @@
+2022-01-13 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/support/regression/tests/reentrant.c:
+      Reduce recursion depth to fit into mcs51 stack.
+
 2022-01-12 Gabriele Gorla <gorlik@yahoo.com>
 
-    * sdcc/support/regression/tests/main.c:
+    * sdcc/src/mos6502/main.c:
       Fix library names.
 
 2022-01-12 Gabriele Gorla <gorlik@yahoo.com>

@@ -38,10 +38,10 @@ void
 testReent(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
-  ASSERT(sum(13) == 91);
+  ASSERT(sum(9) == 45);
   ASSERT(fact(5) == 120);
   ASSERT(div2n(128, 7) == 1);
-  ASSERT(fib(9) == 34);
+  ASSERT(fib(7) == 13);
 #endif
 }
 

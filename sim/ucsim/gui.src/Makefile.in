@@ -17,10 +17,11 @@ top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
+PICOPT		= @PICOPT@
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_builddir) -I$(top_srcdir) \
 		  -I$(top_srcdir)/sim.src -I$(top_srcdir)/cmd.src
 CFLAGS          = @WALL_FLAG@ @CFLAGS@
-CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ $(PICOPT)
 
 LIBS		= @LIBS@ @CURSES_LIBS@ -L$(top_builddir)
 

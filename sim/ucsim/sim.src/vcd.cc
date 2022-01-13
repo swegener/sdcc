@@ -792,6 +792,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                         }
 
                       fputs("$upscope $end\n$enddefinitions $end\n", fd);
+                      if (!filename || filename[0] == '|') fflush(fd);
                     }
                 }
 
@@ -957,7 +958,7 @@ cl_vcd::report(class cl_vcd_var *var, t_mem v)
       fprintf(fd, " %c\n", var->var_id);
     }
 
-  if (!filename || filename[0] == '|') fflush(fd);
+  fflush(fd);
 }
 
 int

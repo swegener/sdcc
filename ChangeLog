@@ -1,4 +1,9 @@
-2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
+2022-01-12 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/support/regression/tests/main.c:
+      Fix library names.
+
+2022-01-12 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/support/regression/tests/reentrant.c:
       Add reentrant function regression test.
@@ -38,11 +43,6 @@
 
     * sdcc/support/valdiag/tests/bug-2798.c:
       Exclude test for mos6502 port (no support for __sfr).
-
-2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
-
-    * sdcc/src/mos6502/gen.c:
-      Fix several compiler warnings.
 
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 

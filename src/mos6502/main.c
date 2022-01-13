@@ -639,8 +639,8 @@ static const char *_asmCmd[] =
 };
 
 static const char *const _crt[] = { "crt0.rel", NULL, };
-static const char * const _libs_m6502[] = { "m6502", NULL, };
-static const char * const _libs_m65c02[] = { "m65c02", NULL, };
+static const char * const _libs_m6502[] = { "mos6502", NULL, };
+static const char * const _libs_m65c02[] = { "mos65c02", NULL, };
 
 /* Globals */
 PORT mos6502_port =

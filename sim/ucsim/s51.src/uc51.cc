@@ -876,7 +876,7 @@ cl_51core::make_address_spaces(void)
 void
 cl_51core::make_chips(void)
 {
-  rom_chip= new cl_chip8("rom_chip", 0x10000, 8, 0/*, 0xff*/);
+  rom_chip= new cl_chip8("rom_chip", 0x10000, 8, 0xff);
   rom_chip->init();
   memchips->add(rom_chip);
   

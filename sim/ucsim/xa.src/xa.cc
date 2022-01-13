@@ -420,7 +420,7 @@ cl_xa::get_bit_name(short addr)
   a= offset+a/8;
 
   chars buf= "";
-  if (!addr_name(a, sfr, bitnr, &buf))
+  if (!addr_name(a, sfr, bitnr, &buf, NULL))
     buf= chars("", "0x%03x", addr);
   return buf;
 }

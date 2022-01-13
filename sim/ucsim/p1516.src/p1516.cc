@@ -211,15 +211,12 @@ cl_p1516::dis_tbl(void)
 }
 
 char *
-cl_p1516::disass(t_addr addr)
+cl_p1516::disassc(t_addr addr, chars *comment)
 {
   chars work= chars(), temp= chars();
   const char *b;
   t_mem code, data= 0;
   int i;
-
-  //work= "";
-  //p= (char*)work;
 
   code= rom->get(addr);
   
@@ -260,49 +257,62 @@ cl_p1516::disass(t_addr addr)
 	    {
 	    case 'd': // Rd
 	      data= (code & 0x00f00000)>>20;
-	      temp.format("r%d", data);
+	      work.appendf("r%d", data);
 	      break;
 	    case 'a': // Ra
 	      data= (code & 0x000f0000)>>16;
-	      temp.format("r%d", data);
+	      work.appendf("r%d", data);
+	      break;
+	    case 'R': // Ra in LD, ST
+	      data= (code & 0x000f0000)>>16;
+	      work.appendf("r%d", data);
+	      if (comment)
+		{
+		  chars n= "";
+		  addr_name(R[data], rom, &n);
+		  comment->format("; [%08x%s]= %08x",
+				  R[data],
+				  n.c_str(),
+				  rom->get(R[data]));
+		}
 	      break;
 	    case 'b': // Rb
 	      data= (code & 0x0000f000)>>12;
-	      temp.format("r%d", data);
+	      work.appendf("r%d", data);
 	      break;
 	    case '0': // LDL0
 	      data= (code & 0x0000ffff);
-	      temp.format("0x0000%04x", data);
+	      work.appendf("0x0000%04x", data);
+	      addr_name(data, rom, &work);
 	      break;
-	    case 'O': // LDL0
+	    case 'O': // LDL0 -> jump
 	      data= (code & 0x0000ffff);
-	      temp.format("0x%04x", data);
+	      work.appendf("0x%04x", data);
+	      addr_name(data, rom, &work);
 	      break;
 	    case 'l': // LDL
 	      data= (code & 0x0000ffff);
-	      temp.format("0x....%04x", data);
+	      work.appendf("0x....%04x", data);
 	      break;
 	    case 'h': // LDH
 	      data= (code & 0x0000ffff);
-	      temp.format("0x%04x....", data);
+	      work.appendf("0x%04x....", data);
 	      break;
 	    case 'A': // CALL
 	      data= (code & 0x07ffffff);
-	      temp.format("0x%x", data);
-	      addr_name(data, rom, &temp);
+	      work.appendf("0x%x", data);
+	      addr_name(data, rom, &work);
 	      break;
 	    default:
 	      temp= "?";
 	      break;
 	    }
-	  //t= temp;
-	  //while (*t) *(p++)= *(t++);
-	  work+= temp;
+	  if (comment && temp.nempty())
+	    comment->append(temp);
 	}
       else
 	work.append(*(b++));
     }
-  //*p= '\0';
 
   return strdup(work.c_str());
 }

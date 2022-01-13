@@ -1947,7 +1947,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con, bool nl)
       i++;
     }
   if (comment.nempty())
-    while (cdis.len() < 20) cdis.append(' ');
+    while (cdis.len() < 25) cdis.append(' ');
   len+= con->dd_cprintf("dump_char", " %s", cdis.c_str());
   if (comment.nempty())
     len+= con->dd_cprintf("comment", " %s", comment.c_str());
@@ -2043,7 +2043,12 @@ cl_uc::longest_inst(void)
 }
 
 const class cl_var *
-cl_uc::addr_name(t_addr addr, class cl_memory *mem, int bitnr_high, int bitnr_low, chars *buf, const class cl_var *context)
+cl_uc::addr_name(t_addr addr,
+		 class cl_memory *mem,
+		 int bitnr_high,
+		 int bitnr_low,
+		 chars *buf,
+		 const class cl_var *context)
 {
   t_index i;
   const cl_var *var = NULL;
@@ -2093,25 +2098,29 @@ cl_uc::addr_name(t_addr addr, class cl_memory *mem, int bitnr_high, int bitnr_lo
           else if (name[len] == '_')
             {
               // We don't need the prefix - we already had the context
-              buf->appendf(" <%s", &name[len + 1]);
+              if (buf) buf->appendf(" <%s", &name[len + 1]);
             }
         }
       else
         {
           // It's all significant, nothing to do with context
-          buf->appendf(" <%s", name);
+          if (buf) buf->appendf(" <%s", name);
         }
 
       if (bitnr_high >= 0 &&
           (var->bitnr_high != bitnr_high || var->bitnr_low != bitnr_low))
         {
           if (bitnr_high == bitnr_low)
-            buf->appendf(".%d", bitnr_high);
+            {
+	      if (buf) buf->appendf(".%d", bitnr_high);
+	    }
           else
-            buf->appendf("[%d:%d]", bitnr_high, bitnr_low);
+            {
+	      if (buf) buf->appendf("[%d:%d]", bitnr_high, bitnr_low);
+	    }
         }
 
-      buf->appendf(">");
+      if (buf) buf->appendf(">");
     }
 
   return var;

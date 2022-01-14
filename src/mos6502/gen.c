@@ -3255,6 +3255,8 @@ asmopToBool (asmop *aop, bool resultInA)
   int offset = size - 1;
   sym_link *type;
 
+  D (emitcode ("", "; asmopToBool resultinA %s",resultInA?"yes":"no"));
+
   wassert (aop);
   type = operandType (AOP_OP (aop));
   isFloat = IS_FLOAT (type);
@@ -3359,6 +3361,8 @@ asmopToBool (asmop *aop, bool resultInA)
       break;
     case AOP_DIR:
     case AOP_EXT:
+        D (emitcode ("", "; asmopToBool - AOP_DIR || AOP_EXT"));
+
       if (!resultInA && (size == 1) && !IS_AOP_A (aop) && !m6502_reg_a->isFree && m6502_reg_x->isFree)
         {
           loadRegFromAop (m6502_reg_x, aop, 0);
@@ -3405,13 +3409,11 @@ asmopToBool (asmop *aop, bool resultInA)
             }
           else
             {
-              reg_info* freereg = getFreeByteReg();
-              if (freereg != NULL) {
-                loadRegFromAop (freereg, aop, 0);
-              } else {
-		// FIXME
-                emitcode ("bit2", "%s", aopAdrStr (aop, 0, false));
-              }
+              bool needpulla;
+              D (emitcode ("", "; asmopToBool - loadreg"));
+              needpulla = storeRegTempIfUsed (m6502_reg_a);
+              loadRegFromAop (m6502_reg_a, aop, 0);
+              loadRegTempNoFlags(m6502_reg_a,needpulla);
               regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD) ? 2 : 3);
             }
           break;
@@ -9420,16 +9422,19 @@ genIfx (iCode * ic, iCode * popIc)
     }
 
   /* evaluate the operand */
-  if (AOP_TYPE (cond) != AOP_CRY)
+  if (AOP_TYPE (cond) != AOP_CRY) {
+    D (emitcode (";     genIfx", "!AOP_CRY"));
     asmopToBool (AOP (cond), false);
+  }
   /* the result is now in the z flag bit */
   freeAsmop (cond, NULL, ic, true);
 
   /* if there was something to be popped then do it */
   if (popIc)
-    genIpop (popIc);
+      genIpop (popIc);
 
 // TODO: redundant bne/beq 
+  D (emitcode (";     genIfx", "call jump"));
   genIfxJump (ic, "a");
 
   ic->generated = 1;

@@ -52,8 +52,8 @@
 __sdcc_gs_init_startup:
         ldx     #0xff
         txs
-        ldx     #0x01         ; MSB of stack ptr
-        stx     __BASEPTR+1
+;        ldx     #0x01         ; MSB of stack ptr
+;        stx     __BASEPTR+1
         jsr     __sdcc_external_startup
         beq     __sdcc_init_data
         jmp     __sdcc_program_startup

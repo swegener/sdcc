@@ -2341,6 +2341,7 @@ static void doTSX() {
 
 // TODO: make these subroutines
 static void saveBasePtr() {
+#if 0
   storeRegTemp (m6502_reg_x, true); // TODO: only when used?
   // TODO: if X is free should we call doTSX() to mark X=S?
   doTSX();
@@ -2348,6 +2349,7 @@ static void saveBasePtr() {
   _G.baseStackPushes = _G.stackPushes;
   regalloc_dry_run_cost += 2;
   loadRegTemp (m6502_reg_x, true);
+#endif
 }
 
 static void
@@ -3203,7 +3205,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
           return rs;
         // did we get base ptr in Y?
         } else if (m6502_reg_y->aop == &tsxaop) {
-          return "[__BASEPTR],y";
+          return "ERROR [__BASEPTR],y";
         } else {
           regalloc_dry_run_cost += 999;
 //          loadRegFromConst(m6502_reg_x, offset);

@@ -1,5 +1,10 @@
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/gen.c:
+      Let storeConstToAop use X and Y as well.
+
+2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/ralloc.h,
       sdcc/src/mos6502/gen.c:
       Refactor genAssignLit and remove old defines.

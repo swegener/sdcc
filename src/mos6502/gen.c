@@ -1308,14 +1308,12 @@ storeConstToAop (int c, asmop * aop, int loffset)
       return;
     }
 
-  /* If the value needed is already in A or X, just store it */
+  /* If the value needed is already in A, X or Y just store it */
   if (m6502_reg_a->isLitConst && m6502_reg_a->litConst == c)
     {
       storeRegToAop (m6502_reg_a, aop, loffset);
       return;
     }
-    /*
-    TODO: can do this except for X <-> Y
   if (m6502_reg_x->isLitConst && m6502_reg_x->litConst == c)
     {
       storeRegToAop (m6502_reg_x, aop, loffset);
@@ -1326,7 +1324,6 @@ storeConstToAop (int c, asmop * aop, int loffset)
       storeRegToAop (m6502_reg_y, aop, loffset);
       return;
     }
-    */
 
   switch (aop->type)
     {
@@ -1362,6 +1359,12 @@ storeConstToAop (int c, asmop * aop, int loffset)
           loadRegFromConst (m6502_reg_x, c);
           storeRegToAop (m6502_reg_x, aop, loffset);
           m6502_freeReg (m6502_reg_x);
+        }
+      else if (m6502_reg_y->isFree)
+        {
+          loadRegFromConst (m6502_reg_y, c);
+          storeRegToAop (m6502_reg_y, aop, loffset);
+          m6502_freeReg (m6502_reg_y);
         }
       else
         {

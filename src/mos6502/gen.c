@@ -3551,8 +3551,8 @@ genCopy (operand * result, operand * source)
     }
 
   // TODO?
-  if (IS_MOS6502 && (size > 2))
-    aopOpExtToIdx (AOP (result), NULL, AOP (source));
+  //  if (IS_MOS6502 && (size > 2))
+  //    aopOpExtToIdx (AOP (result), NULL, AOP (source));
 
   /* general case */
   // TODO: sucks for copying registers
@@ -4995,10 +4995,10 @@ genMinus (iCode * ic)
           loadRegFromAop (m6502_reg_a, leftOp, offset);
           if (carry)
             emitcode("sec", "");
-          emitcode ("sbc", TEMPFMT, _G.tempOfs--);
+          emitcode ("sbc", TEMPFMT, --_G.tempOfs);
           m6502_dirtyReg (m6502_reg_a, false);
           regalloc_dry_run_cost += 3;
-          loadRegTemp (m6502_reg_a, true);
+          //  loadRegTemp (m6502_reg_a, true);
         }
       else
         {
@@ -9515,13 +9515,8 @@ genAssignLit (operand * result, operand * right)
 {
   char assigned[8];
   unsigned char value[sizeof(assigned)];
-  char dup[sizeof(assigned)];
   int size;
   int offset,offset2;
-  int dups,multiples;
-  bool needpula = false;
-  bool canUseYX = true;
-  int remaining;
 
   DD (emitcode (";     genAssignLit", ""));
 
@@ -9546,120 +9541,29 @@ genAssignLit (operand * result, operand * right)
   for (offset=0; offset<size; offset++)
     {
       assigned[offset] = 0;
-      dup[offset] = 0;
       value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
     }
 
-
-  if ((AOP_TYPE (result) != AOP_DIR ))
-    canUseYX = false;
-    
-  if (canUseYX)
-    {
-      /* Assign words that are already in YX */
-      for (offset=size-2; offset>=0; offset -= 2)
-        {
-          if (assigned[offset] || assigned[offset+1])
-            continue;
-          if (m6502_reg_yx->isLitConst && m6502_reg_yx->litConst == ((value[offset+1] << 8) + value[offset]))
-            {
-              storeRegToAop (m6502_reg_yx, AOP (result), offset);
-              assigned[offset] = 1;
-              assigned[offset+1] = 1;
-            }
-        }
-    }
-
-  if (!(m6502_reg_y->isDead && m6502_reg_x->isDead))
-    canUseYX = false;
-
-  if (canUseYX && (size>=2))
-    {
-      /* Assign whatever reamains to be assigned */
-      for (offset=size-2; offset>=0; offset -= 2)
-        {
-          if (assigned[offset] && assigned[offset+1])
-            continue;
-          loadRegFromConst (m6502_reg_yx, (value[offset+1] << 8) + value[offset]);
-          storeRegToAop (m6502_reg_yx, AOP (result), offset);
-          assigned[offset] = 1;
-          assigned[offset+1] = 1;
-        }
-      return true;
-    }
-
-  remaining = size;
   for (offset=0; offset<size; offset++)
-    remaining -= assigned[offset];
-  if (!remaining)
-    return true;
-
-  if (remaining > 2)
-    aopOpExtToIdx (AOP (result), NULL, NULL);
-  
-  /* Assign bytes that are already in A and/or X */
-  for (offset=size-1; offset>=0; offset--)
-    {
-      if (assigned[offset])
-        continue;
-      if ((m6502_reg_a->isLitConst && m6502_reg_a->litConst == value[offset]) ||
-          (m6502_reg_x->isLitConst && m6502_reg_x->litConst == value[offset]))
-        {
-          storeConstToAop (value[offset], AOP (result), offset);
-          assigned[offset] = 1;
-        }
-    }
-
-  /* Consider bytes that appear multiple times */
-  multiples = 0;
-  for (offset=size-1; offset>=0; offset--)
-    {
-      if (assigned[offset] || dup[offset])
-        continue;
-      dups = 0;
-      for (offset2=offset-1; offset2>=0; offset2--)
-        if (value[offset2] == value[offset])
-          {
-            dup[offset] = 1;
-            dups++;
-          }
-      if (dups)
-        multiples += (dups+1);
-    }
-
-  /* Assign bytes that appear multiple times if the register cost */
-  /* isn't too high. */
-  if (multiples > 2 || (multiples && !m6502_reg_a->isDead))
-    {
-      needpula = pushRegIfSurv (m6502_reg_a);
-      for (offset=size-1; offset>=0; offset--)
-        {
-          if (assigned[offset])
-            continue;
-          if (dup[offset])
-            {
-              loadRegFromConst (m6502_reg_a, value[offset]);
-              for (offset2=offset; offset2>=0; offset2--)
-                if (!assigned[offset2] && value[offset2] == value[offset])
-                  {
-                    storeRegToAop (m6502_reg_a, AOP (result), offset2);
-                    assigned[offset2] = 1;
-                  }
-              m6502_freeReg (m6502_reg_a);
-            }
-        }
-    }
-    
-  /* Assign whatever remains to be assigned */
-  for (offset=size-1; offset>=0; offset--)
     {
       if (assigned[offset])
         continue;
       storeConstToAop (value[offset], AOP (result), offset);
+      assigned[offset] = 1;
+      // look for duplicates  
+      if ((AOP_TYPE (result) != AOP_DIR ))
+        {
+          for(offset2=offset+1; offset2<size; offset2++)
+            {
+              if(value[offset]==value[offset2])
+                {
+                  storeConstToAop (value[offset], AOP (result), offset2);
+                  assigned[offset2] = 1;
+                }
+            }
+        }
     }
 
-  if (needpula)
-    pullReg (m6502_reg_a);
   return true;
 }
 

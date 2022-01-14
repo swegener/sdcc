@@ -1,3 +1,9 @@
+2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/ralloc.h,
+      sdcc/src/mos6502/gen.c:
+      Refactor genAssignLit and remove old defines.
+
 2022-01-13 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/support/regression/tests/reentrant.c:

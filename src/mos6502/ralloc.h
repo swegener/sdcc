@@ -38,8 +38,6 @@ enum
     SP_IDX
   };
 
-//#define YX_IDX  HX_IDX
-
 #define REG_PTR 0x01
 #define REG_GPR 0x02
 #define REG_CND 0x04
@@ -52,7 +50,6 @@ enum
 #define M6502MASK_Y 0x04
 #define M6502MASK_REV 0x08
 #define M6502MASK_XA (M6502MASK_X | M6502MASK_A)
-//#define M6502MASK_HX (M6502MASK_Y | M6502MASK_X)
 #define M6502MASK_YX (M6502MASK_Y | M6502MASK_X)
 #define M6502MASK_AX (M6502MASK_REV | M6502MASK_X | M6502MASK_A)
     
@@ -72,6 +69,7 @@ typedef struct reg_info
     int litConst;		/* last literal constant */
   }
 reg_info;
+
 extern reg_info regsm6502[];
 extern reg_info *m6502_reg_a;
 extern reg_info *m6502_reg_x;
@@ -79,9 +77,6 @@ extern reg_info *m6502_reg_y;
 extern reg_info *m6502_reg_yx;
 extern reg_info *m6502_reg_xa;
 extern reg_info *m6502_reg_sp;
-
-//#define m6502_reg_y   m6502_reg_h
-//#define m6502_reg_yx  m6502_reg_hx
 
 reg_info *m6502_regWithIdx (int);
 void m6502_useReg (reg_info * reg);

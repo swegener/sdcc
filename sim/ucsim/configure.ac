@@ -169,12 +169,12 @@ if test $enable_m68hc12_port  != "no"; then
 fi,
 enable_m68hc12_port="no")
 
-AC_ARG_ENABLE(mcs6502-port,
-[  --disable-mcs6502-port  do not compile simulator for mcs6502],
-if test $enable_mcs6502_port  != "no"; then
-    enable_mcs6502_port="yes"
+AC_ARG_ENABLE(mos6502-port,
+[  --disable-mos6502-port  do not compile simulator for mos6502],
+if test $enable_mos6502_port  != "no"; then
+    enable_mos6502_port="yes"
 fi,
-enable_mcs6502_port="yes")
+enable_mos6502_port="yes")
 AC_ARG_ENABLE(rxk-port,
 [  --disable-rxk-port      do not compile simulator for Rabbit rXk],
 if test $enable_rxk_port  != "no"; then
@@ -214,7 +214,7 @@ AC_SUBST(enable_p1516_port)
 AC_SUBST(enable_m6809_port)
 AC_SUBST(enable_m6800_port)
 AC_SUBST(enable_m68hc12_port)
-AC_SUBST(enable_mcs6502_port)
+AC_SUBST(enable_mos6502_port)
 AC_SUBST(enable_rxk_port)
 AC_SUBST(enable_pblaze_port)
 AC_SUBST(enable_serio)
@@ -748,7 +748,7 @@ m68hc08.src/Makefile m68hc08.src/test/Makefile
 m6809.src/Makefile   m6809.src/test/Makefile
 m6800.src/Makefile   m6800.src/test/Makefile
 m68hc12.src/Makefile m68hc12.src/test/Makefile
-mcs6502.src/Makefile mcs6502.src/test/Makefile
+mos6502.src/Makefile mos6502.src/test/Makefile
 rxk.src/Makefile     rxk.src/test/Makefile
 pblaze.src/Makefile  pblaze.src/test/Makefile
 p1516.src/Makefile   p1516.src/test/Makefile

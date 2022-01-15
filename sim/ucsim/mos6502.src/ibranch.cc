@@ -26,11 +26,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "appcl.h"
 
-#include "mcs6502cl.h"
+#include "mos6502cl.h"
 
 
 int
-cl_mcs6502::JMPa(t_mem code)
+cl_mos6502::JMPa(t_mem code)
 {
   u16_t a= i16();
   PC= a;
@@ -39,7 +39,7 @@ cl_mcs6502::JMPa(t_mem code)
 }
 
 int
-cl_mcs6502::JMPi(t_mem code)
+cl_mos6502::JMPi(t_mem code)
 {
   u16_t a= i16();
   a= read_addr(rom, a);
@@ -50,7 +50,7 @@ cl_mcs6502::JMPi(t_mem code)
 }
 
 int
-cl_mcs6502::JSR(t_mem code)
+cl_mos6502::JSR(t_mem code)
 {
   u16_t a= fetch(); // low
   t_addr pc= PC;
@@ -65,7 +65,7 @@ cl_mcs6502::JSR(t_mem code)
 }
 
 int
-cl_mcs6502::RTS(t_mem code)
+cl_mos6502::RTS(t_mem code)
 {
   t_addr spbef= rSP;
   PC= pop_addr()+1;
@@ -77,7 +77,7 @@ cl_mcs6502::RTS(t_mem code)
 }
 
 int
-cl_mcs6502::branch(bool cond)
+cl_mos6502::branch(bool cond)
 {
   i8_t rel;
   u16_t a;
@@ -100,4 +100,4 @@ cl_mcs6502::branch(bool cond)
 }
 
 
-/* End of mcs6502.src/ibranch.cc */
+/* End of mos6502.src/ibranch.cc */

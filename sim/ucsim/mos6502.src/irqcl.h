@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (simmcs6502cl.h)
+ * Simulator of microcontrollers (irqcl.h)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,23 +23,38 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
-/*@1@*/
 
-#ifndef SIMMCS6502CL_HEADER
-#define SIMMCS6502CL_HEADER
+#ifndef IRQCL_HEADER
+#define IRQCL_HEADER
 
-#include "simcl.h"
+#include "hwcl.h"
 
+#include "mos6502cl.h"
 
-class cl_simmcs6502: public cl_sim
+enum irq_cfg
+  {
+    m65_nmi_en	= 0,
+    m65_nmi	= 1,
+    m65_irq_en	= 2,
+    m65_irq	= 3,
+    m65_brk_en	= 4,
+    m65_brk	= 5,
+    m65_nr	= 6
+  };
+
+// IRQ peripheral
+class cl_irq_hw: public cl_hw
 {
-public:
-  cl_simmcs6502(class cl_app *the_app);
-
-  virtual class cl_uc *mk_controller(void);
+ public:
+  class cl_mos6502 *muc;
+ public:
+  cl_irq_hw(class cl_uc *auc);
+  virtual int init(void);
+  virtual unsigned int cfg_size(void) { return m65_nr; }
+  virtual void print_info(class cl_console_base *con);  
 };
 
 
 #endif
 
-/* End of mcs6502.src/simmcs6502cl.h */
+/* End of mos6502.src/irqcl.h */

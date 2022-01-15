@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (mcs6502.cc)
+ * Simulator of microcontrollers (mos6502.cc)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "irqcl.h"
 
-#include "mcs6502cl.h"
+#include "mos6502cl.h"
 
 
 static class cl_console_base *c;
@@ -113,13 +113,13 @@ cl_c65::set(t_mem val)
 }
 #endif
 
-cl_mcs6502::cl_mcs6502(class cl_sim *asim):
+cl_mos6502::cl_mos6502(class cl_sim *asim):
   cl_uc(asim)
 {
 }
 
 int
-cl_mcs6502::init(void)
+cl_mos6502::init(void)
 {
   cl_uc::init();
   fill_def_wrappers(itab);
@@ -145,13 +145,13 @@ cl_mcs6502::init(void)
 
 
 const char *
-cl_mcs6502::id_string(void)
+cl_mos6502::id_string(void)
 {
-  return "MCS6502";
+  return "MOS6502";
 }
 
 void
-cl_mcs6502::reset(void)
+cl_mos6502::reset(void)
 {
   cl_uc::reset();
 
@@ -164,13 +164,13 @@ cl_mcs6502::reset(void)
 
   
 void
-cl_mcs6502::set_PC(t_addr addr)
+cl_mos6502::set_PC(t_addr addr)
 {
   PC= addr;
 }
 
 void
-cl_mcs6502::mk_hw_elements(void)
+cl_mos6502::mk_hw_elements(void)
 {
   class cl_hw *h;
   
@@ -220,12 +220,12 @@ cl_mcs6502::mk_hw_elements(void)
 }
 
 void
-cl_mcs6502::make_cpu_hw(void)
+cl_mos6502::make_cpu_hw(void)
 {
 }
 
 void
-cl_mcs6502::make_memories(void)
+cl_mos6502::make_memories(void)
 {
   class cl_address_space *as;
   class cl_address_decoder *ad;
@@ -246,13 +246,13 @@ cl_mcs6502::make_memories(void)
 }
 
 struct dis_entry *
-cl_mcs6502::dis_tbl(void)
+cl_mos6502::dis_tbl(void)
 {
-  return(disass_mcs6502);
+  return(disass_mos6502);
 }
 
 char *
-cl_mcs6502::disassc(t_addr addr, chars *comment)
+cl_mos6502::disassc(t_addr addr, chars *comment)
 {
   chars work= chars(), temp= chars();
   const char *b;
@@ -379,7 +379,7 @@ cl_mcs6502::disassc(t_addr addr, chars *comment)
 }
 
 t_addr
-cl_mcs6502::read_addr(class cl_memory *m, t_addr start_addr)
+cl_mos6502::read_addr(class cl_memory *m, t_addr start_addr)
 {
   u8_t h, l;
   l= m->read(start_addr);
@@ -388,7 +388,7 @@ cl_mcs6502::read_addr(class cl_memory *m, t_addr start_addr)
 }
 
 class cl_cell8 &
-cl_mcs6502::imm8(void)
+cl_mos6502::imm8(void)
 {
   //class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(PC);
   i8d= fetch();
@@ -397,7 +397,7 @@ cl_mcs6502::imm8(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::zpg(void)
+cl_mos6502::zpg(void)
 {
   u8_t a= fetch();
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
@@ -407,7 +407,7 @@ cl_mcs6502::zpg(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::zpgX(void)
+cl_mos6502::zpgX(void)
 {
   u8_t a= fetch() + rX;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
@@ -417,7 +417,7 @@ cl_mcs6502::zpgX(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::zpgY(void)
+cl_mos6502::zpgY(void)
 {
   u8_t a= fetch() + rY;
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
@@ -427,7 +427,7 @@ cl_mcs6502::zpgY(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::abs(void)
+cl_mos6502::abs(void)
 {
   u16_t a= i16();
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
@@ -437,7 +437,7 @@ cl_mcs6502::abs(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::absX(void)
+cl_mos6502::absX(void)
 {
   u16_t a1= i16();
   u16_t a2= a1 + rX;
@@ -450,7 +450,7 @@ cl_mcs6502::absX(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::absY(void)
+cl_mos6502::absY(void)
 {
   u16_t a1= i16();
   u16_t a2= a1 + rY;
@@ -463,7 +463,7 @@ cl_mcs6502::absY(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::ind(void)
+cl_mos6502::ind(void)
 {
   u16_t a= i16();
   a= read_addr(rom, a);
@@ -474,7 +474,7 @@ cl_mcs6502::ind(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::indX(void)
+cl_mos6502::indX(void)
 {
   u8_t a0= fetch() + rX;
   u16_t a= read_addr(rom, a0);
@@ -485,7 +485,7 @@ cl_mcs6502::indX(void)
 }
 
 class cl_cell8 &
-cl_mcs6502::indY(void)
+cl_mos6502::indY(void)
 {
   u16_t a1= read_addr(rom, fetch());
   u16_t a2= a1 + rY;
@@ -498,7 +498,7 @@ cl_mcs6502::indY(void)
 }
 
 void
-cl_mcs6502::print_regs(class cl_console_base *con)
+cl_mos6502::print_regs(class cl_console_base *con)
 {
   int ojaj= jaj;
   jaj= 0;
@@ -543,7 +543,7 @@ cl_mcs6502::print_regs(class cl_console_base *con)
 }
 
 int
-cl_mcs6502::exec_inst(void)
+cl_mos6502::exec_inst(void)
 {
   int res;
 
@@ -556,7 +556,7 @@ cl_mcs6502::exec_inst(void)
 }
 
 int
-cl_mcs6502::accept_it(class it_level *il)
+cl_mos6502::accept_it(class it_level *il)
 {
   class cl_it_src *is= il->source;
 
@@ -582,13 +582,13 @@ cl_mcs6502::accept_it(class it_level *il)
 }
 
 bool
-cl_mcs6502::it_enabled(void)
+cl_mos6502::it_enabled(void)
 {
   return !(rF & flagI);
 }
 
 void
-cl_mcs6502::push_addr(t_addr a)
+cl_mos6502::push_addr(t_addr a)
 {
   rom->write(0x0100 + rSP, (a>>8));
   cSP.W(rSP-1);
@@ -599,7 +599,7 @@ cl_mcs6502::push_addr(t_addr a)
 }
 
 t_addr
-cl_mcs6502::pop_addr(void)
+cl_mos6502::pop_addr(void)
 {
   u8_t h, l;
   cSP.W(rSP+1);
@@ -612,7 +612,7 @@ cl_mcs6502::pop_addr(void)
 }
 
 void
-cl_mcs6502::stack_check_overflow(class cl_stack_op *op)
+cl_mos6502::stack_check_overflow(class cl_stack_op *op)
 {
   if (op)
     {
@@ -631,4 +631,4 @@ cl_mcs6502::stack_check_overflow(class cl_stack_op *op)
 }
 
 
-/* End of mcs6502.src/mcs6502.cc */
+/* End of mos6502.src/mos6502.cc */

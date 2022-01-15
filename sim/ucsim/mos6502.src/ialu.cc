@@ -24,11 +24,11 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
-#include "mcs6502cl.h"
+#include "mos6502cl.h"
 
 
 int
-cl_mcs6502::INY(t_mem code)
+cl_mos6502::INY(t_mem code)
 {
   cY.W(rY+1);
   rF&= ~(flagZ|flagS);
@@ -40,7 +40,7 @@ cl_mcs6502::INY(t_mem code)
 }
 
 int
-cl_mcs6502::INX(t_mem code)
+cl_mos6502::INX(t_mem code)
 {
   cX.W(rX+1);
   rF&= ~(flagZ|flagS);
@@ -52,7 +52,7 @@ cl_mcs6502::INX(t_mem code)
 }
 
 int
-cl_mcs6502::inc(class cl_cell8 &op)
+cl_mos6502::inc(class cl_cell8 &op)
 {
   u8_t v;
   op.W(v= op.R()+1);
@@ -64,7 +64,7 @@ cl_mcs6502::inc(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::DEY(t_mem code)
+cl_mos6502::DEY(t_mem code)
 {
   cY.W(rY-1);
   rF&= ~(flagZ|flagS);
@@ -76,7 +76,7 @@ cl_mcs6502::DEY(t_mem code)
 }
 
 int
-cl_mcs6502::DEX(t_mem code)
+cl_mos6502::DEX(t_mem code)
 {
   cX.W(rX-1);
   rF&= ~(flagZ|flagS);
@@ -88,7 +88,7 @@ cl_mcs6502::DEX(t_mem code)
 }
 
 int
-cl_mcs6502::dec(class cl_cell8 &op)
+cl_mos6502::dec(class cl_cell8 &op)
 {
   u8_t v;
   op.W(v= op.R()-1);
@@ -100,7 +100,7 @@ cl_mcs6502::dec(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::ora(class cl_cell8 &op)
+cl_mos6502::ora(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagS);
   cA.W(rA | op.R());
@@ -111,7 +111,7 @@ cl_mcs6502::ora(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::And(class cl_cell8 &op)
+cl_mos6502::And(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagS);
   cA.W(rA & op.R());
@@ -122,7 +122,7 @@ cl_mcs6502::And(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::eor(class cl_cell8 &op)
+cl_mos6502::eor(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagS);
   cA.W(rA ^ op.R());
@@ -133,7 +133,7 @@ cl_mcs6502::eor(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::adc(class cl_cell8 &op)
+cl_mos6502::adc(class cl_cell8 &op)
 {
   u8_t Op= op.R(), f, oA= rA;
   u16_t res;
@@ -182,7 +182,7 @@ cl_mcs6502::adc(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::sbc(class cl_cell8 &op)
+cl_mos6502::sbc(class cl_cell8 &op)
 {
   u8_t Op= op.R();
   u16_t res;
@@ -229,7 +229,7 @@ cl_mcs6502::sbc(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::cmp(class cl_cell8 &op1, class cl_cell8 &op2)
+cl_mos6502::cmp(class cl_cell8 &op1, class cl_cell8 &op2)
 {
   u16_t res= op1.R() - op2.R();
   u8_t f= rF & ~(flagZ|flagN|flagC);
@@ -241,7 +241,7 @@ cl_mcs6502::cmp(class cl_cell8 &op1, class cl_cell8 &op2)
 }
 
 int
-cl_mcs6502::asl(class cl_cell8 &op)
+cl_mos6502::asl(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagN|flagC);
   u8_t v= op.R();
@@ -254,7 +254,7 @@ cl_mcs6502::asl(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::lsr(class cl_cell8 &op)
+cl_mos6502::lsr(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagN|flagC);
   u8_t v= op.R();
@@ -266,7 +266,7 @@ cl_mcs6502::lsr(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::rol(class cl_cell8 &op)
+cl_mos6502::rol(class cl_cell8 &op)
 {
   u8_t C= (rF&flagC)?1:0;
   u8_t f= rF & ~(flagZ|flagN|flagC);
@@ -281,7 +281,7 @@ cl_mcs6502::rol(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::ror(class cl_cell8 &op)
+cl_mos6502::ror(class cl_cell8 &op)
 {
   u8_t C= (rF&flagC)?0x80:0;
   u8_t f= rF & ~(flagZ|flagN|flagC);
@@ -296,7 +296,7 @@ cl_mcs6502::ror(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::bit(class cl_cell8 &op)
+cl_mos6502::bit(class cl_cell8 &op)
 {
   u8_t v= op.R();
   u8_t f= rF & ~(flagZ|flagN|flagV);
@@ -308,4 +308,4 @@ cl_mcs6502::bit(class cl_cell8 &op)
 }
 
 
-/* End of mcs6502.src/ialu.cc */
+/* End of mos6502.src/ialu.cc */

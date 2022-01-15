@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (simmcs6502.cc)
+ * Simulator of microcontrollers (glob.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,20 +25,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-// local
-#include "simmcs6502cl.h"
-#include "mcs6502cl.h"
+#ifndef GLOB_HEADER
+#define GLOB_HEADER
+
+#include "stypes.h"
+#include "iwrap.h"
 
 
-cl_simmcs6502::cl_simmcs6502(class cl_app *the_app):
-  cl_sim(the_app)
-{}
+extern instruction_wrapper_fn itab[256];
 
-class cl_uc *
-cl_simmcs6502::mk_controller(void)
-{
-  return(new cl_mcs6502(this));
-}
+extern struct dis_entry disass_mos6502[];
 
 
-/* End of mcs6502.src/simmcs6502.cc */
+#endif
+
+/* End of mos6502.src/glob.h */

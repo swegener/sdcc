@@ -688,7 +688,7 @@ CXX
 enable_serio
 enable_pblaze_port
 enable_rxk_port
-enable_mcs6502_port
+enable_mos6502_port
 enable_m68hc12_port
 enable_m6800_port
 enable_m6809_port
@@ -778,7 +778,7 @@ enable_p1516_port
 enable_m6809_port
 enable_m6800_port
 enable_m68hc12_port
-enable_mcs6502_port
+enable_mos6502_port
 enable_rxk_port
 enable_pblaze_port
 enable_serio
@@ -1441,7 +1441,7 @@ Optional Features:
   --disable-m6809-port    do not compile simulator for m6809
   --disable-m6800-port    do not compile simulator for m6800
   --enable-m68hc12-port   compile simulator for m68hc12
-  --disable-mcs6502-port  do not compile simulator for mcs6502
+  --disable-mos6502-port  do not compile simulator for mos6502
   --disable-rxk-port      do not compile simulator for Rabbit rXk
   --disable-pblaze-port   do not compile simulator for Xilinx PicoBlaze
   --disable-serio         do not compile serio GUI tool (needs curses)
@@ -3456,14 +3456,14 @@ else $as_nop
 fi
 
 
-# Check whether --enable-mcs6502-port was given.
-if test ${enable_mcs6502_port+y}
+# Check whether --enable-mos6502-port was given.
+if test ${enable_mos6502_port+y}
 then :
-  enableval=$enable_mcs6502_port; if test $enable_mcs6502_port  != "no"; then
-    enable_mcs6502_port="yes"
+  enableval=$enable_mos6502_port; if test $enable_mos6502_port  != "no"; then
+    enable_mos6502_port="yes"
 fi
 else $as_nop
-  enable_mcs6502_port="yes"
+  enable_mos6502_port="yes"
 fi
 
 # Check whether --enable-rxk-port was given.
@@ -7859,7 +7859,7 @@ printf "%s\n" "#define _M_ \"${M}\"" >>confdefs.h
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile motorola.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile m68hc08.src/Makefile m68hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile m6800.src/Makefile m6800.src/test/Makefile m68hc12.src/Makefile m68hc12.src/test/Makefile mcs6502.src/Makefile mcs6502.src/test/Makefile rxk.src/Makefile rxk.src/test/Makefile pblaze.src/Makefile pblaze.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile motorola.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile m68hc08.src/Makefile m68hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile m6800.src/Makefile m6800.src/test/Makefile m68hc12.src/Makefile m68hc12.src/test/Makefile mos6502.src/Makefile mos6502.src/test/Makefile rxk.src/Makefile rxk.src/test/Makefile pblaze.src/Makefile pblaze.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8566,8 +8566,8 @@ do
     "m6800.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m6800.src/test/Makefile" ;;
     "m68hc12.src/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc12.src/Makefile" ;;
     "m68hc12.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc12.src/test/Makefile" ;;
-    "mcs6502.src/Makefile") CONFIG_FILES="$CONFIG_FILES mcs6502.src/Makefile" ;;
-    "mcs6502.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES mcs6502.src/test/Makefile" ;;
+    "mos6502.src/Makefile") CONFIG_FILES="$CONFIG_FILES mos6502.src/Makefile" ;;
+    "mos6502.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES mos6502.src/test/Makefile" ;;
     "rxk.src/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/Makefile" ;;
     "rxk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/test/Makefile" ;;
     "pblaze.src/Makefile") CONFIG_FILES="$CONFIG_FILES pblaze.src/Makefile" ;;

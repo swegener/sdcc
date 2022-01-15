@@ -3,7 +3,7 @@ uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 ucsim version [ELIDED]
-Type of microcontroller: MCS6502
+Type of microcontroller: MOS6502
 Controller has 4 hardware element(s).
    on simif[0]
   off vcd[0]

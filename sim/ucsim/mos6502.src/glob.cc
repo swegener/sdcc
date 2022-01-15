@@ -44,7 +44,7 @@ instruction_wrapper_fn itab[256];
 */
 
 // code mask branch len mn call tick
-struct dis_entry disass_mcs6502[]=
+struct dis_entry disass_mos6502[]=
   {
     { 0xea, 0xff, ' ', 1, "NOP" },
     { 0x00, 0xff, ' ', 1, "BRK" },
@@ -221,4 +221,4 @@ struct dis_entry disass_mcs6502[]=
     { 0, 0, 0, 0, 0, 0 }
   };
 
-/* End of mcs6502.src/glob.cc */
+/* End of mos6502.src/glob.cc */

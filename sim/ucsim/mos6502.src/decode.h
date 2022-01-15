@@ -202,4 +202,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #endif
 
-/* End of mcs6502.src/decode.h */
+/* End of mos6502.src/decode.h */

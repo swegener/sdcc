@@ -26,16 +26,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "globals.h"
 
-#include "mcs6502cl.h"
+#include "mos6502cl.h"
 
 int
-cl_mcs6502::NOP(t_mem code)
+cl_mos6502::NOP(t_mem code)
 {
   return resGO;
 }
 
 int
-cl_mcs6502::BRK(t_mem code)
+cl_mos6502::BRK(t_mem code)
 {
   set_b= true;
   PC= (PC+1)&0xffff;//fetch();
@@ -45,7 +45,7 @@ cl_mcs6502::BRK(t_mem code)
 }
 
 int
-cl_mcs6502::RTI(t_mem code)
+cl_mos6502::RTI(t_mem code)
 {
   u8_t f;
   cSP.W(rSP+1);
@@ -72,7 +72,7 @@ cl_mcs6502::RTI(t_mem code)
 }
 
 int
-cl_mcs6502::CLI(t_mem code)
+cl_mos6502::CLI(t_mem code)
 {
   cF.W(rF&= ~flagI);
   tick(1);
@@ -80,7 +80,7 @@ cl_mcs6502::CLI(t_mem code)
 }
 
 int
-cl_mcs6502::SEI(t_mem code)
+cl_mos6502::SEI(t_mem code)
 {
   cF.W(rF|= flagI);
   tick(1);
@@ -88,7 +88,7 @@ cl_mcs6502::SEI(t_mem code)
 }
 
 int
-cl_mcs6502::PHP(t_mem code)
+cl_mos6502::PHP(t_mem code)
 {
   u8_t v= rF|0x20|flagB;
   rom->write(0x0100 + rSP, v);
@@ -103,7 +103,7 @@ cl_mcs6502::PHP(t_mem code)
 }
 
 int
-cl_mcs6502::CLC(t_mem code)
+cl_mos6502::CLC(t_mem code)
 {
   cF.W(rF&= ~flagC);
   tick(1);
@@ -111,7 +111,7 @@ cl_mcs6502::CLC(t_mem code)
 }
 
 int
-cl_mcs6502::PLP(t_mem code)
+cl_mos6502::PLP(t_mem code)
 {
   t_addr spbef= rSP;
   cSP.W(rSP+1);
@@ -127,7 +127,7 @@ cl_mcs6502::PLP(t_mem code)
 }
 
 int
-cl_mcs6502::SEc(t_mem code)
+cl_mos6502::SEc(t_mem code)
 {
   cF.W(rF|= flagC);
   tick(1);
@@ -135,7 +135,7 @@ cl_mcs6502::SEc(t_mem code)
 }
 
 int
-cl_mcs6502::PHA(t_mem code)
+cl_mos6502::PHA(t_mem code)
 {
   rom->write(0x0100 + rSP, rA);
   vc.wr++;
@@ -149,7 +149,7 @@ cl_mcs6502::PHA(t_mem code)
 }
 
 int
-cl_mcs6502::PLA(t_mem code)
+cl_mos6502::PLA(t_mem code)
 {
   t_addr spbef= rSP;
   cSP.W(rSP+1);
@@ -167,7 +167,7 @@ cl_mcs6502::PLA(t_mem code)
 }
 
 int
-cl_mcs6502::CLV(t_mem code)
+cl_mos6502::CLV(t_mem code)
 {
   cF.W(rF&= ~flagV);
   tick(1);
@@ -175,7 +175,7 @@ cl_mcs6502::CLV(t_mem code)
 }
 
 int
-cl_mcs6502::CLD(t_mem code)
+cl_mos6502::CLD(t_mem code)
 {
   cF.W(rF&= ~flagD);
   tick(1);
@@ -184,7 +184,7 @@ cl_mcs6502::CLD(t_mem code)
 
 
 int
-cl_mcs6502::SED(t_mem code)
+cl_mos6502::SED(t_mem code)
 {
   cF.W(rF|= flagD);
   tick(1);
@@ -192,4 +192,4 @@ cl_mcs6502::SED(t_mem code)
 }
 
 
-/* End of mcs6502.src/inst.cc */
+/* End of mos6502.src/inst.cc */

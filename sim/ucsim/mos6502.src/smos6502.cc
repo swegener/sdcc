@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (smcs6502.cc)
+ * Simulator of microcontrollers (smos6502.cc)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "globals.h"
 
 // local
-#include "simmcs6502cl.h"
+#include "simmos6502cl.h"
 
 
 int
@@ -38,9 +38,9 @@ main(int argc, char *argv[])
   class cl_sim *sim;
   
   application= new cl_app();
-  application->set_name("smcs6502");
+  application->set_name("smos6502");
   application->init(argc, argv);
-  sim= new cl_simmcs6502(application);
+  sim= new cl_simmos6502(application);
   if (sim->init())
     sim->state|= SIM_QUIT;
   application->set_simulator(sim);
@@ -51,4 +51,4 @@ main(int argc, char *argv[])
   return(0);
 }
 
-/* End of mcs6502.src/smcs6502.cc */
+/* End of mos6502.src/smos6502.cc */

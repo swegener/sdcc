@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_irq_hw::cl_irq_hw(class cl_uc *auc):
   cl_hw(auc, HW_INTERRUPT, 0, "irq")
 {
-  muc= (class cl_mcs6502 *)auc;
+  muc= (class cl_mos6502 *)auc;
 }
 
 int
@@ -95,4 +95,4 @@ cl_irq_hw::print_info(class cl_console_base *con)
 }
 
 
-/* End of mcs6502.src/irq.cc */
+/* End of mos6502.src/irq.cc */

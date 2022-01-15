@@ -1,11 +1,13 @@
-# mcs6502.src/clean.mk
+# mos6502.src/clean.mk
 
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
+	rm -f smos6502$(EXEEXT) smos6502.exe
 	rm -f smcs6502$(EXEEXT) smcs6502.exe
+	rm -f ucsim_mos6502$(EXEEXT) ucsim_mos6502.exe
 	rm -f ucsim_mcs6502$(EXEEXT) ucsim_mcs6502.exe
 	$(MAKE) -C test -f clean.mk clean
 
@@ -29,4 +31,4 @@ mostlyclean: clean
 # -----------------------------------------------------------------------
 realclean: distclean
 
-# End of mcs6502.src/clean.mk
+# End of mos6502.src/clean.mk

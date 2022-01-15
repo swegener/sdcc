@@ -24,11 +24,11 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 
-#include "mcs6502cl.h"
+#include "mos6502cl.h"
 
 
 int
-cl_mcs6502::TYA(t_mem code)
+cl_mos6502::TYA(t_mem code)
 {
   cA.W(rY);
   if (rA)
@@ -45,7 +45,7 @@ cl_mcs6502::TYA(t_mem code)
 }
 
 int
-cl_mcs6502::TAY(t_mem code)
+cl_mos6502::TAY(t_mem code)
 {
   cY.W(rA);
   if (rY)
@@ -62,7 +62,7 @@ cl_mcs6502::TAY(t_mem code)
 }
 
 int
-cl_mcs6502::TXA(t_mem code)
+cl_mos6502::TXA(t_mem code)
 {
   cA.W(rX);
   if (rA)
@@ -79,7 +79,7 @@ cl_mcs6502::TXA(t_mem code)
 }
 
 int
-cl_mcs6502::TXS(t_mem code)
+cl_mos6502::TXS(t_mem code)
 {
   cSP.W(rX);
   tick(1);
@@ -87,7 +87,7 @@ cl_mcs6502::TXS(t_mem code)
 }
 
 int
-cl_mcs6502::TAX(t_mem code)
+cl_mos6502::TAX(t_mem code)
 {
   cX.W(rA);
   if (rX)
@@ -104,7 +104,7 @@ cl_mcs6502::TAX(t_mem code)
 }
 
 int
-cl_mcs6502::TSX(t_mem code)
+cl_mos6502::TSX(t_mem code)
 {
   cX.W(rSP);
   if (rX)
@@ -121,21 +121,21 @@ cl_mcs6502::TSX(t_mem code)
 }
 
 int
-cl_mcs6502::st(u8_t reg, class cl_cell8 &op)
+cl_mos6502::st(u8_t reg, class cl_cell8 &op)
 {
   op.W(reg);
   return resGO;
 }
 
 int
-cl_mcs6502::sta(class cl_cell8 &op)
+cl_mos6502::sta(class cl_cell8 &op)
 {
   op.W(rA);
   return resGO;
 }
 
 int
-cl_mcs6502::lda(class cl_cell8 &op)
+cl_mos6502::lda(class cl_cell8 &op)
 {
   u8_t f= rF & ~(flagZ|flagN);
   cA.W(op.R());
@@ -146,7 +146,7 @@ cl_mcs6502::lda(class cl_cell8 &op)
 }
 
 int
-cl_mcs6502::ld(class cl_cell8 &reg, class cl_cell8 &op)
+cl_mos6502::ld(class cl_cell8 &reg, class cl_cell8 &op)
 {
   u8_t v, f= rF & ~(flagZ|flagN);
   reg.W(v= op.R());
@@ -156,4 +156,4 @@ cl_mcs6502::ld(class cl_cell8 &reg, class cl_cell8 &op)
   return resGO;
 }
 
-/* End of mcs6502.src/imove.cc */
+/* End of mos6502.src/imove.cc */

@@ -1,11 +1,11 @@
 #
-# uCsim mcs6502.src/Makefile
+# uCsim mos6502.src/Makefile
 #
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
 # tool name
-TN		= mcs6502
+TN		= mos6502
 
 STARTYEAR	= 1997
 
@@ -61,12 +61,14 @@ OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 # short/long exe and lib name
 SEN		= s$(TN)$(EXEEXT)
 LEN		= ucsim_$(TN)$(EXEEXT)
+LENOLD		= ucsim_mcs6502$(EXEEXT)
+
 SONAME		= libucsim_$(TN).so
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
-MCS6502ASM	=
+MOS6502ASM	=
 TEST_OBJ	= 
 
 
@@ -81,7 +83,9 @@ install: all installdirs install_shared_lib
 	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
+	$(INSTALL) $(LENOLD) $(DESTDIR)$(bindir)/$(LENOLD)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
+	$(STRIP) $(DESTDIR)$(bindir)/$(LENOLD)
 
 
 # Deleting all the installed files
@@ -89,6 +93,7 @@ install: all installdirs install_shared_lib
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(SEN)
 	rm -f $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(bindir)/$(LENOLD)
 	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 
@@ -129,12 +134,15 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: $(SEN) $(LEN) shared_lib
+$(TN).src: $(SEN) $(LEN) $(LENOLD) shared_lib
 
 $(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-$(LEN): s$(TN)$(EXEEXT)
+$(LEN): $(SEN)
+	cp $< $@
+
+$(LENOLD): $(SEN)
 	cp $< $@
 
 ifeq ($(dlso_ok),yes)
@@ -170,7 +178,7 @@ $(top_builddir)/libucsimutil.a:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
-	$(MCS6502ASM) -l $< -o $@ -e $<.lst
+	$(MOS6502ASM) -l $< -o $@ -e $<.lst
 
 
 # Remaking configuration
@@ -180,4 +188,4 @@ checkconf:
 	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-# End of mcs6502.src/Makefile.in
+# End of mos6502.src/Makefile.in

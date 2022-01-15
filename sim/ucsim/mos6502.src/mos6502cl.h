@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (mcs6502cl.h)
+ * Simulator of microcontrollers (mos6502cl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef MCS6502CL_HEADER
-#define MCS6502CL_HEADER
+#ifndef MOS6502CL_HEADER
+#define MOS6502CL_HEADER
 
 #include "uccl.h"
 #include "memcl.h"
@@ -95,10 +95,10 @@ public:
 
 
 /*
- * Base of MCS6502 processor
+ * Base of MOS6502 processor
  */
 
-class cl_mcs6502: public cl_uc  
+class cl_mos6502: public cl_uc  
 {
 public:
   u8_t A, X, Y, SP, CC, i8d;
@@ -106,7 +106,7 @@ public:
   class cl_it_src *src_irq, *src_nmi, *src_brk;
   bool set_b;
 public:
-  cl_mcs6502(class cl_sim *asim);
+  cl_mos6502(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
   virtual void reset(void);
@@ -369,4 +369,4 @@ public:
 
 #endif
 
-/* End of mcs6502.src/mcs6502.cc */
+/* End of mos6502.src/mos6502.cc */

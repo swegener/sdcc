@@ -1,3 +1,7 @@
+2022-01-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug-3129.c: partial fix for bug #3309
+
 2022-01-15 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/support/regression/tests/reentrant.c:

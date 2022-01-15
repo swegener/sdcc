@@ -260,7 +260,7 @@ bool recolor(void)  __reentrant
 static node_t testperm[MAX_N];
 
 /* Recursively generate permutations for isomorphism test. */
-bool permtest(node_t i)
+bool permtest(node_t i) __reentrant
 {
 	node_t j;
 
@@ -294,7 +294,7 @@ bool permtest(node_t i)
 	return(false);
 }
 
-int cmp(const void *l, const void *r)
+int cmp(const void *l, const void *r) __reentrant
 {
 	return *((node_t*)r) - *((node_t *)l);
 }
@@ -463,11 +463,9 @@ const char stdcbench_name_version_string[] = "stdcbench 0.6";
 void
 testBug(void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug 3309
 #if !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Bug 3309
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) // Lack of memory
 	c90lib_lnlc();
-#endif
 #endif
 #endif
 }

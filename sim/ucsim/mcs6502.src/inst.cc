@@ -93,7 +93,11 @@ cl_mcs6502::PHP(t_mem code)
   u8_t v= rF|0x20|flagB;
   rom->write(0x0100 + rSP, v);
   vc.wr++;
+  t_addr spbef= rSP;
   cSP.W(rSP-1);
+  class cl_stack_push *op= new cl_stack_push(instPC, v, spbef, rSP);
+  op->init();
+  stack_write(op);
   tick(2);
   return resGO;
 }
@@ -109,9 +113,13 @@ cl_mcs6502::CLC(t_mem code)
 int
 cl_mcs6502::PLP(t_mem code)
 {
+  t_addr spbef= rSP;
   cSP.W(rSP+1);
   u8_t v= rom->read(0x0100 + rSP);
   v&= ~(0x20|flagB);
+  class cl_stack_pop *op= new cl_stack_pop(instPC, v, spbef, rSP);
+  op->init();
+  stack_read(op);
   cF.W(v);
   vc.rd++;
   tick(3);
@@ -131,7 +139,11 @@ cl_mcs6502::PHA(t_mem code)
 {
   rom->write(0x0100 + rSP, rA);
   vc.wr++;
+  t_addr spbef= rSP;
   cSP.W(rSP-1);
+  class cl_stack_push *op= new cl_stack_push(instPC, rA, spbef, rSP);
+  op->init();
+  stack_write(op);
   tick(2);
   return resGO;
 }
@@ -139,8 +151,12 @@ cl_mcs6502::PHA(t_mem code)
 int
 cl_mcs6502::PLA(t_mem code)
 {
+  t_addr spbef= rSP;
   cSP.W(rSP+1);
   cA.W(rom->read(0x0100 + rSP));
+  class cl_stack_pop *op= new cl_stack_pop(instPC, rA, spbef, rSP);
+  op->init();
+  stack_read(op);
   u8_t f= rF & ~(flagN|flagZ);
   if (!rA) f|= flagZ;
   if (rA&0x80) f|= flagN;

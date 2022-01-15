@@ -353,6 +353,21 @@ class cl_cell32: public cl_memory_cell
   virtual void dl(t_mem v);
 };
 
+class cl_mc32: public cl_cell32
+{
+public:
+  cl_mc32(uchar awidth): cl_cell32(awidth)
+  {
+    data= &def_data;
+    flags&= ~CELL_NON_DECODED;
+  }
+  cl_mc32(): cl_cell32(32)
+  {
+    data= &def_data;
+    flags&= ~CELL_NON_DECODED;
+  }
+};
+
 class cl_bit_cell32: public cl_memory_cell
 {
  public:

@@ -113,9 +113,10 @@ cl_app::run(void)
   double input_last_checked= 0;
   class cl_option *o= options->get_option("go");
   bool g_opt= false;
-  unsigned int cyc= 0;
+  //unsigned int cyc= 0, period= 10000;
   enum run_states rs= rs_config;
-    
+
+  cperiod.set(1000000);
   while (!done)
     {
       if ((rs == rs_config) &&
@@ -151,7 +152,7 @@ cl_app::run(void)
 	    sim->start(0, 0);
 	  rs= rs_run;
 	}
-      ++cyc;
+      ccyc.set(ccyc.get()+1);
       if (!sim)
 	{
 	  commander->wait_input();
@@ -161,9 +162,9 @@ cl_app::run(void)
         {
           if (sim->state & SIM_GO)
             {
-	      if (cyc - input_last_checked > 10000)
+	      if (ccyc.get() - input_last_checked > cperiod.get())
 		{
-		  input_last_checked= cyc;
+		  input_last_checked= ccyc.get();
 		  if (sim->uc)
 		    sim->uc->touch();
 		  if (commander->input_avail())

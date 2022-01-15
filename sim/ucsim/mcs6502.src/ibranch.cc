@@ -54,8 +54,12 @@ cl_mcs6502::JSR(t_mem code)
 {
   u16_t a= fetch(); // low
   t_addr pc= PC;
+  t_addr spbef= rSP;
   a+= (fetch()*256); // high
   push_addr(pc);
+  class cl_stack_call *op= new cl_stack_call(instPC, a, PC, spbef, rSP);
+  op->init();
+  stack_write(op);
   PC= a;
   return resGO;
 }
@@ -63,7 +67,11 @@ cl_mcs6502::JSR(t_mem code)
 int
 cl_mcs6502::RTS(t_mem code)
 {
+  t_addr spbef= rSP;
   PC= pop_addr()+1;
+  class cl_stack_ret *op= new cl_stack_ret(instPC, PC, spbef, rSP);
+  op->init();
+  stack_read(op);
   tick(3);
   return resGO;
 }

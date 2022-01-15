@@ -129,6 +129,7 @@ public:
   virtual bool it_enabled(void);
   virtual void push_addr(t_addr a);
   virtual t_addr pop_addr(void);
+  virtual void stack_check_overflow(class cl_stack_op *op);
   
   virtual class cl_cell8 &imm8(void);
   // read operands

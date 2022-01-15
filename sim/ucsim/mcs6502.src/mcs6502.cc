@@ -611,5 +611,24 @@ cl_mcs6502::pop_addr(void)
   return h*256+l;
 }
 
+void
+cl_mcs6502::stack_check_overflow(class cl_stack_op *op)
+{
+  if (op)
+    {
+      if (op->get_op() & stack_write_operation)
+	{
+	  u8_t a= op->get_before();
+	  if (rSP > a)
+	    {
+	      class cl_error_stack_overflow *e=
+		new cl_error_stack_overflow(op);
+	      e->init();
+	      error(e);
+	    }
+	}
+    }
+}
+
 
 /* End of mcs6502.src/mcs6502.cc */

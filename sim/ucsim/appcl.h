@@ -93,6 +93,7 @@ public:
   int going;
   long expr_result;
   chars startup_command;
+  class cl_mc32 cperiod, ccyc;
   
 public:
   cl_app(void);

@@ -57,7 +57,7 @@ static char *TEMPFMT_IND = "[__TEMP+%d]";
 static char *TEMPFMT_IY = "[__TEMP+%d],y";
 //static char *TEMPFMT_IX = "[(__TEMP+%d),x]";
 
-static char *BASEPTR = "*(__BASEPTR)";
+//static char *BASEPTR = "*(__BASEPTR)";
 
 const int STACK_TOP = 0x100;
 
@@ -673,13 +673,13 @@ static void
 adjustStack (int n)
 {
   _G.stackPushes -= n;
-  if (n <= -14 || n >= 14) {
+  if (n <= -8 || n >= 8) {
     // TODO: too big, consider subroutine
     storeRegTemp(m6502_reg_xa, true);
     emitcode ("tsx", "");
     emitcode ("txa", "");
     emitcode ("clc", "");
-    emitcode ("adc", "!immedbyte", n);
+    emitcode ("adc", "!immedbyte", n&0xff);
     emitcode ("tax", "");
     emitcode ("txs", "");
     n = 0;
@@ -705,23 +705,13 @@ adjustStack (int n)
 }
 
 /*--------------------------------------------------------------------------*/
-/* adjustX - Adjust the X register by n bytes.                              */
+/* smallAdjustX - Adjust the X register by n bytes if possible.                              */
 /*--------------------------------------------------------------------------*/
-static void
-adjustX (int n)
+static int
+smallAdjustX (int n)
 {
-  if (n <= -14 || n >= 14) {
-    // TODO: too big, consider subroutine
-//    storeRegTemp(m6502_reg_xa, false);
-    storeRegTemp(m6502_reg_a, false);
-    emitcode ("txa", "");
-    emitcode ("clc", "");
-    emitcode ("adc", "!immedbyte", n);
-    emitcode ("tax", "");
-    n = 0;
-    regalloc_dry_run_cost += 6;
-//   loadRegTemp(m6502_reg_xa, false);
-    loadRegTemp(m6502_reg_a, false);
+  if (n <= -4 || n >= 4) {
+    return n;
   }
   while (n < 0) {
     emitcode ("dex", "");      /* 1 byte,  2 cycles */
@@ -733,6 +723,7 @@ adjustX (int n)
     regalloc_dry_run_cost++;
     n--;
   }
+  return 0;
 }
 
 #if DD(1) -1 == 0
@@ -9449,7 +9440,7 @@ genAddrOf (iCode * ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   //  asmop *aopr;
   int size, offset;
-  bool needpullx, needpully;
+  bool needpulla, needpullx;
   struct dbuf_s dbuf;
 
   D (emitcode (";     genAddrOf", ""));
@@ -9462,35 +9453,28 @@ genAddrOf (iCode * ic)
      variable */
   if (sym->onStack)
     {
+      needpulla = pushRegIfSurv (m6502_reg_a);
       needpullx = pushRegIfSurv (m6502_reg_x);
-      needpully = pushRegIfSurv (m6502_reg_y);
       /* if it has an offset then we need to compute it */
       offset = _G.stackOfs + _G.stackPushes + sym->stack + 1;
-      m6502_useReg (m6502_reg_yx);
+      m6502_useReg (m6502_reg_xa);
       emitcode ("tsx", "");
       m6502_dirtyReg (m6502_reg_x, false);
-      loadRegFromConst(m6502_reg_y, 0x01); // stack top = 0x100
-      regalloc_dry_run_cost++;
-      adjustX(offset);
-      storeRegToFullAop (m6502_reg_yx, AOP (IC_RESULT (ic)), false);
-      pullOrFreeReg (m6502_reg_y, needpully);
+      offset=smallAdjustX(offset);
+      emitcode ("txa", "");
+      if (offset) {
+          emitcode ("clc", "");
+          emitcode ("adc", "!immedbyte", offset&0xff);
+          regalloc_dry_run_cost+=2;
+      }
+      loadRegFromConst(m6502_reg_x, 0x01); // stack top = 0x100
+      storeRegToFullAop (m6502_reg_xa, AOP (IC_RESULT (ic)), false);
       pullOrFreeReg (m6502_reg_x, needpullx);
+      pullOrFreeReg (m6502_reg_a, needpulla);
+      regalloc_dry_run_cost+=2;
       goto release;
     }
-/*
-// FIXME: figure out what to do with this
-  if (IS_AOP_YX (aopr) || aopr->type == AOP_DIR ||
-      (IS_S08 && aopr->type != AOP_REG))
-    {
-      needpullx = pushRegIfSurv (hc08_reg_x);
-      needpully = pushRegIfSurv (hc08_reg_y);
-      loadRegFromImm (hc08_reg_yx, sym->rname);
-      storeRegToFullAop (hc08_reg_yx, AOP (IC_RESULT (ic)), false);
-      pullOrFreeReg (hc08_reg_y, needpully);
-      pullOrFreeReg (hc08_reg_x, needpullx);
-      goto release;
-    }
-*/
+
   /* object not on stack then we need the name */
   size = AOP_SIZE (IC_RESULT (ic));
   offset = 0;

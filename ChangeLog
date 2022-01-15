@@ -1,6 +1,11 @@
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Imporve genAddrOf.
+
+2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Fix gcc-torture-execute-981001-1 regression failure.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>

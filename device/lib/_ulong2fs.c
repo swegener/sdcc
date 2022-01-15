@@ -73,6 +73,7 @@ long2fs_doit:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
+/* (c)2022:      fix sdcc bug #3276 -- Benedikt Freisen */
 
 union float_long
   {
@@ -88,6 +89,11 @@ float __ulong2fs (unsigned long a )
   if (!a)
     {
       return 0.0;
+    }
+
+  if (a == 0xfffffffful)
+    {
+      return 4294967296.0f;
     }
 
   while (a < HIDDEN)

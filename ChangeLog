@@ -1,3 +1,10 @@
+2022-01-15 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/lib/_fs2ulong.c,
+	  device/lib/_ulong2fs.c,
+	  support/regression/tests/bug-3276.c:
+	  Fix bug #3276.
+
 2022-01-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bug-3129.c: partial fix for bug #3309

@@ -8546,8 +8546,9 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
     }
   else
     {
-      bool needpulla = true; // TODO? usedA ? pushRegIfUsed(m6502_reg_a) : pushRegIfSurv(m6502_reg_a);
-      pushReg(m6502_reg_a, false);
+//      bool needpulla = true;
+//      pushReg(m6502_reg_a, false);
+      bool needpulla = pushRegIfUsed(m6502_reg_a);
       loadRegFromAop(m6502_reg_a, AOP(left), 0);
       emitcode ("clc", "");
       emitcode ("adc", "#<(%s+%d)", rematOfs, offset);

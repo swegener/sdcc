@@ -28,6 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "simmos6502cl.h"
 #include "mos6502cl.h"
+#include "mos6510cl.h"
+#include "mos65c02cl.h"
+#include "mos65ce02cl.h"
+#include "glob.h"
 
 
 cl_simmos6502::cl_simmos6502(class cl_app *the_app):
@@ -37,7 +41,39 @@ cl_simmos6502::cl_simmos6502(class cl_app *the_app):
 class cl_uc *
 cl_simmos6502::mk_controller(void)
 {
-  return(new cl_mos6502(this));
+  int i;
+  const char *typ= 0;
+  class cl_optref type_option(this);
+
+  type_option.init();
+  type_option.use("cpu_type");
+  i= 0;
+  if ((typ= type_option.get_value(typ)) == 0)
+    typ= "6502";
+  while ((cpus_6502[i].type_str != NULL) &&
+	 (strcasecmp(typ, cpus_6502[i].type_str) != 0))
+    i++;
+  if (cpus_6502[i].type_str == NULL)
+    {
+      fprintf(stderr, "Unknown processor type. "
+	      "Use -H option to see known types.\n");
+      return(NULL);
+    }
+  switch (cpus_6502[i].type)
+    {
+    case CPU_6502:
+      return(new cl_mos6502(this));
+    case CPU_6510:
+      return(new cl_mos6510(this));
+    case CPU_65C02:
+      return(new cl_mos65c02(this));
+    case CPU_65CE02:
+      return(new cl_mos65ce02(this));
+    default:
+      fprintf(stderr, "Unknown processor type\n");
+      return NULL;
+    }
+  return NULL;
 }
 
 

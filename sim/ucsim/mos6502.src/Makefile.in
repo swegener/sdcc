@@ -53,7 +53,8 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= sim$(TN).o $(TN).o glob.o irq.o \
-		  inst.o ialu.o ibranch.o imove.o
+		  inst.o ialu.o ibranch.o imove.o \
+		  mos65c02.o mos6510.o mos65ce02.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

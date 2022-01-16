@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (smos6502.cc)
+ * Simulator of microcontrollers (mos6510cl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,32 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-// prj
-#include "globals.h"
+#ifndef MOS6510CL_HEADER
+#define MOS6510CL_HEADER
 
-// local
-#include "simmos6502cl.h"
-#include "glob.h"
+#include "mos6502cl.h"
 
 
-int
-main(int argc, char *argv[])
+class cl_mos6510: public cl_mos6502
 {
-  class cl_sim *sim;
+ public:
+  cl_mos6510(class cl_sim *asim);
+  virtual int init(void);
+  virtual const char *id_string(void);
+};
 
-  cpus= cpus_6502;
-  application= new cl_app();
-  application->set_name("smos6502");
-  application->init(argc, argv);
-  sim= new cl_simmos6502(application);
-  if (sim->init())
-    sim->state|= SIM_QUIT;
-  application->set_simulator(sim);
-  //sim->main();
-  application->run();
-  application->done();
-  delete application;
-  return(0);
-}
 
-/* End of mos6502.src/smos6502.cc */
+#endif
+
+/* End of mos6502.src/mos6510cl.cc */

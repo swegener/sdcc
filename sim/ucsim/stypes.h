@@ -240,6 +240,20 @@ enum cpu_type {
   CPU_ST7       = 0x0001,
   CPU_ALL_ST7   = (CPU_ST7),
 
+  // MOS6502 and variants
+  CPU_6502	= 0x0001,	// NMOS
+  CPU_6502C	= 0x0002,	// 6502 + HALT pin
+  CPU_6510	= 0x0004,	// 6502 + integrated port
+  CPU_8500	= 0x0008,	// 6510 CMOS
+  CPU_8502	= 0x0010,	// 8500 2 MHz
+  CPU_7501	= 0x0020,	// 6502 HMOS-1
+  CPU_8501	= 0x0040,	// 6502 HMOS-2
+
+  // 6502 based, but not 100% compatible
+  CPU_65C02	= 0x0100,	// extended inst.set
+  CPU_65SC02	= 0x0200,      	// 65C02 variant, different inst.set
+  CPU_65CE02	= 0x0400,	// exension of 65C02
+  
   // technology
   CPU_CMOS	= 0x0001,
   CPU_HMOS	= 0x0002,

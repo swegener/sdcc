@@ -26,10 +26,10 @@
 -------------------------------------------------------------------------*/
 
 /* Use the D macro for basic (unobtrusive) debugging messages */
-#define D(x) do if (1||options.verboseAsm) { x; } while (0)
+#define D(x) do if (options.verboseAsm) { x; } while (0)
 /* Use the DD macro for detailed debugging messages */
-//#define DD(x)
-#define DD(x) x
+#define DD(x)
+//#define DD(x) x
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -691,6 +691,7 @@ adjustStack (int n)
     regalloc_dry_run_cost++;
     n++;
   }
+
   // TODO: what if A not used?
   if (n > 0) {
     storeRegTemp(m6502_reg_a, true);
@@ -1808,7 +1809,7 @@ static void
 rmwWithAop (char *rmwop, asmop * aop, int loffset)
 {
   bool needpull = false;
-  emitcode ("; rmwWithAop", "");
+  D(emitcode ("; rmwWithAop", ""));
 
   if (aop->stacked && aop->stk_aop[loffset])
     {
@@ -1841,7 +1842,7 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
       break;
     case AOP_SOF:
       {
-	 emitcode ("; rmwWithAop AOP_SOF", "");
+	 DD(emitcode ("; rmwWithAop AOP_SOF", ""));
         // TODO: does anything but A make sense here?
         reg_info * reg = getFreeByteReg();
         if (!reg) reg = m6502_reg_a;
@@ -1849,7 +1850,7 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
         offset += _G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + 1;
 	//    if ((offset > 0xff) || (offset < 0))
           {
-	    emitcode ("; rmwWithAop large offset ", "");
+	    DD(emitcode ("; rmwWithAop large offset ", ""));
             /* Unfortunately, the rmw class of instructions only support a */
             /* single byte stack pointer offset and we need two. */
             needpull = pushRegIfUsed (reg);
@@ -1863,7 +1864,7 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
         /* If the offset is small enough, fall through to default case */
       }
     default:
-      emitcode ("; rmwWithAop small offset ", "");
+      DD(emitcode ("; rmwWithAop small offset ", ""));
       // TODO: [aa],y dosn't work with inc/dec
       emitcode (rmwop, "%s ;type %d", aopAdrStr (aop, loffset, false), aop->type);
       regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD) ? 2 : 3);
@@ -7442,10 +7443,10 @@ genLeftShift (iCode * ic)
   if(countreg)
     {
       countreg->isFree = false;
-      emitcode(";load countreg", "");
+      DD(emitcode(";load countreg", ""));
       loadRegFromAop (countreg, AOP (right), 0);
     } else {
-      emitcode ("; count is not a register", "");
+      DD(emitcode ("; count is not a register", ""));
       storeRegTemp (m6502_reg_a, true);
       loadRegFromAop (m6502_reg_a, AOP (right), 0);
       pushReg (m6502_reg_a, true);
@@ -7485,7 +7486,7 @@ genLeftShift (iCode * ic)
 
   if (!countreg) // TODO
     {
-      emitcode ("; count is not a register", "");
+      DD(emitcode ("; count is not a register", ""));
 #if 0
       // FIXME
       storeRegTemp (m6502_reg_a, true);
@@ -7564,7 +7565,7 @@ genLeftShift (iCode * ic)
     emitLabel (tlbl1);
 
   if (!countreg) {
-    emitcode("; pull null (1) ", "" );
+    DD(emitcode("; pull null (1) ", "" ));
     pullNull (1);
   }
 
@@ -8647,7 +8648,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
 
   decodePointerOffset (right, &litOffset, &rematOffset);
 
-  D (emitcode ("", ";     genPointerGet (%s)", aopName(AOP(left)), litOffset, rematOffset ));
+  DD (emitcode ("", ";     genPointerGet (%s)", aopName(AOP(left)), litOffset, rematOffset ));
   
   needpulla = storeRegTempIfSurv (m6502_reg_a);
   
@@ -9249,7 +9250,7 @@ genPointerSet (iCode * ic, iCode * pi)
   aopOp (right, ic, false);
   size = AOP_SIZE (right);
 
-  D (emitcode ("", ";     genPointerSet (%s), litoffset=%d, rematoffset=%d", aopName(AOP(right)), litOffset, rematOffset ));
+  DD (emitcode ("", ";     genPointerSet (%s), litoffset=%d, rematoffset=%s", aopName(AOP(right)), litOffset, rematOffset ));
 
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location

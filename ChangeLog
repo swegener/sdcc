@@ -1,6 +1,11 @@
 2022-01-17 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Refactor dry_run_cost computation.
+
+2022-01-17 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Improve debug messages.
 
 2022-01-17 Gabriele Gorla <gorlik@yahoo.com>

@@ -1,6 +1,11 @@
 2022-01-16 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Correct dry_run_cost for several code paths.
+
+2022-01-16 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Disable verbose debugging in the generated assembly.
 
 2022-01-15 Gabriele Gorla <gorlik@yahoo.com>

@@ -2566,14 +2566,9 @@ cl_uc::do_inst(int step)
 	  if (res == resINV_INST)
 	    /* backup to start of instruction */
 	    PC = PCsave;
-	  
-	  post_inst();
 	}
-      else
-	{
-	  post_inst();
-	  tick(1);
-	}
+
+      post_inst();
 
       if ((res == resGO) && (PC == PCsave) && stop_selfjump)
 	{
@@ -2582,7 +2577,7 @@ cl_uc::do_inst(int step)
 	  break;
 	}
       
-      if ((res == resGO) &&
+      if ((res == resGO || res == resNOT_DONE) &&
 	  1/*irq*/)
 	{
 	  int r= do_interrupt();
@@ -2598,7 +2593,7 @@ cl_uc::do_inst(int step)
 	  res= resBREAKPOINT;
 	}
     }
-  if (res != resGO)
+  if (res != resGO && res != resNOT_DONE)
     sim->stop(res);
   return(res);
 }

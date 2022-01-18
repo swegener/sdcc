@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>Interrupted div</title>
+<script>
+    function toggle(id) {
+        var obj = document.getElementById(id);
+        if (obj.style.display === 'none')
+            obj.style.display = 'block';
+        else
+            obj.style.display = 'none';
+    }
+</script>
+
+<style>
+    .pipetrace { margin: 1em 0; }
+    .pipetrace, .pipetrace td { border: 1px solid black; border-collapse: collapse; padding: 0 0.2em; white-space: nowrap; }
+    .pipetrace thead { background-color: #d2d2d2; position: sticky; top: 0; }
+    .pipetrace thead th { border: none; box-shadow: inset -1px -1px #000; }
+    .pipetrace tr:nth-child(even) { background-color: #f2f2f2; }
+    .pipetrace td { min-width: 1.6em; }
+    .pipetrace td.instr:before { content: ""; }
+    .pipetrace td.instr { width: 9.5em; }
+    .pipetrace td.Sbus:before { content: " S₀"; }
+    .pipetrace td.Sfetch:before { content: " S₁"; }
+    .pipetrace td.Sraw:before { content: " S₂"; }
+    .pipetrace td:before { content: attr(class); }
+    .pipetrace td.D { background-color: lawngreen; }
+    .pipetrace td.E { background-color: navajowhite; }
+    .pipetrace td.Sbus { background-color: red; }
+    .pipetrace td.Sfetch { background-color: red; }
+    .pipetrace td.Sraw { background-color: red; }
+    .pipetrace td.X, .pipetrace td.Flushed { background-color: red; }
+    .pipetrace td span:after { content: attr(class); }
+    .pipetrace td span { padding: 0 0.2em; margin: 0 0 0 0.1em; }
+    .pipetrace td span.FS { background-color: lightgrey; }
+    .pipetrace td span.F { background-color: lightskyblue; }
+    #pipetrace_legend { border: none; background-color: white; position: fixed; bottom: 0; right: 0; }
+    #pipetrace_legend tr:first-of-type { font-weight: bold; }
+    #pipetrace_legend td { text-align: center; }
+    #pipetrace_legend td.defn { text-align: left; }
+    #pipetrace_legend td.defn:before { content: ""; }
+</style>
+</head>
+
+<body onload="toggle('pipetrace_legend')">
+
+<h1>Interrupted div</h1>
+
+<table id="pipetrace_legend" class="pipetrace">
+    <tr><td colspan="2">Legend</td></tr>
+    <tr><td class="D" /><td class="defn">Decode</td></tr>
+    <tr><td class="E" /><td class="defn">Execute</td></tr>
+    <tr><td><span class="F" /></td><td class="defn">Fetch</td></tr>
+    <tr><td class="X" /><td class="defn">Flush</td></tr>
+    <tr><td><span class="FS" /></td><td class="defn">Fetch Stall - space in prefetch buffer but bus busy</td></tr>
+    <tr><td class="Sbus" /><td class="defn">Decode Stall - bus busy</td></tr>
+    <tr><td class="Sfetch" /><td class="defn">Decode Stall - insufficient data in prefetch buffer</td></tr>
+    <tr><td class="Sraw" /><td class="defn">Decode Stall - read after write</td></tr>
+</table>
+
+<p>(Not currently implemented.)</p>
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td>0x08201</td><td class="instr">div    X,A</td><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th>
+    </thead>
+</table>
+</a>
+
+</body>
+</html>

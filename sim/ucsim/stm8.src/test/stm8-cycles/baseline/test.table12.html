@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>PM0044 5.4.4 Pipeline stalled, table 12</title>
+<script>
+    function toggle(id) {
+        var obj = document.getElementById(id);
+        if (obj.style.display === 'none')
+            obj.style.display = 'block';
+        else
+            obj.style.display = 'none';
+    }
+</script>
+
+<style>
+    .pipetrace { margin: 1em 0; }
+    .pipetrace, .pipetrace td { border: 1px solid black; border-collapse: collapse; padding: 0 0.2em; white-space: nowrap; }
+    .pipetrace thead { background-color: #d2d2d2; position: sticky; top: 0; }
+    .pipetrace thead th { border: none; box-shadow: inset -1px -1px #000; }
+    .pipetrace tr:nth-child(even) { background-color: #f2f2f2; }
+    .pipetrace td { min-width: 1.6em; }
+    .pipetrace td.instr:before { content: ""; }
+    .pipetrace td.instr { width: 9.5em; }
+    .pipetrace td.Sbus:before { content: " S₀"; }
+    .pipetrace td.Sfetch:before { content: " S₁"; }
+    .pipetrace td.Sraw:before { content: " S₂"; }
+    .pipetrace td:before { content: attr(class); }
+    .pipetrace td.D { background-color: lawngreen; }
+    .pipetrace td.E { background-color: navajowhite; }
+    .pipetrace td.Sbus { background-color: red; }
+    .pipetrace td.Sfetch { background-color: red; }
+    .pipetrace td.Sraw { background-color: red; }
+    .pipetrace td.X, .pipetrace td.Flushed { background-color: red; }
+    .pipetrace td span:after { content: attr(class); }
+    .pipetrace td span { padding: 0 0.2em; margin: 0 0 0 0.1em; }
+    .pipetrace td span.FS { background-color: lightgrey; }
+    .pipetrace td span.F { background-color: lightskyblue; }
+    #pipetrace_legend { border: none; background-color: white; position: fixed; bottom: 0; right: 0; }
+    #pipetrace_legend tr:first-of-type { font-weight: bold; }
+    #pipetrace_legend td { text-align: center; }
+    #pipetrace_legend td.defn { text-align: left; }
+    #pipetrace_legend td.defn:before { content: ""; }
+</style>
+</head>
+
+<body onload="toggle('pipetrace_legend')">
+
+<h1>PM0044 5.4.4 Pipeline stalled, table 12</h1>
+
+<table id="pipetrace_legend" class="pipetrace">
+    <tr><td colspan="2">Legend</td></tr>
+    <tr><td class="D" /><td class="defn">Decode</td></tr>
+    <tr><td class="E" /><td class="defn">Execute</td></tr>
+    <tr><td><span class="F" /></td><td class="defn">Fetch</td></tr>
+    <tr><td class="X" /><td class="defn">Flush</td></tr>
+    <tr><td><span class="FS" /></td><td class="defn">Fetch Stall - space in prefetch buffer but bus busy</td></tr>
+    <tr><td class="Sbus" /><td class="defn">Decode Stall - bus busy</td></tr>
+    <tr><td class="Sfetch" /><td class="defn">Decode Stall - insufficient data in prefetch buffer</td></tr>
+    <tr><td class="Sraw" /><td class="defn">Decode Stall - read after write</td></tr>
+</table>
+
+<h2>Errata</h2>
+<ul>
+<li>Table 12 shows the BTJT as taking 1 decode, 2 execute cycles but the
+    later documention for the instruction implies the second execution
+    cycle is only used if the branch is taken - and this isn't.
+    </li>
+<li>Table 12 has a jump in time (cycles) from 4 straight to 7.
+    </li>
+<li>The last instruction is shown one cycle early in table 12. The decode stall
+    should line up with the execution cycle of the previous instruction
+    as the description above the table says.
+    </li>
+</ul>
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x080e0</td><td class="instr">sub    SP,#0x14</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080e2</td><td class="instr">ld     A,#0x14</td><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080e4</td><td class="instr">btjt   0x0010,#5,0x80f8</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080e9</td><td class="instr">inc    A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080ea</td><td class="instr">btjf   0x0020,#3,0x80f8</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E X"></td><td class=" E" /></tr>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x080f8</td><td class="instr">incw   Y</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080fa</td><td class="instr">ld     A,(X)</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D Sraw"><span class="F" /></td><td class=" D"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th><th class="n">9</th><th class="n">10</th><th class="n">11</th><th class="n">12</th>
+    </thead>
+</table>
+</a>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>PM0044 5.4.1 Optimized pipeline example - execution from flash, table 6</title>
+<script>
+    function toggle(id) {
+        var obj = document.getElementById(id);
+        if (obj.style.display === 'none')
+            obj.style.display = 'block';
+        else
+            obj.style.display = 'none';
+    }
+</script>
+
+<style>
+    .pipetrace { margin: 1em 0; }
+    .pipetrace, .pipetrace td { border: 1px solid black; border-collapse: collapse; padding: 0 0.2em; white-space: nowrap; }
+    .pipetrace thead { background-color: #d2d2d2; position: sticky; top: 0; }
+    .pipetrace thead th { border: none; box-shadow: inset -1px -1px #000; }
+    .pipetrace tr:nth-child(even) { background-color: #f2f2f2; }
+    .pipetrace td { min-width: 1.6em; }
+    .pipetrace td.instr:before { content: ""; }
+    .pipetrace td.instr { width: 9.5em; }
+    .pipetrace td.Sbus:before { content: " S₀"; }
+    .pipetrace td.Sfetch:before { content: " S₁"; }
+    .pipetrace td.Sraw:before { content: " S₂"; }
+    .pipetrace td:before { content: attr(class); }
+    .pipetrace td.D { background-color: lawngreen; }
+    .pipetrace td.E { background-color: navajowhite; }
+    .pipetrace td.Sbus { background-color: red; }
+    .pipetrace td.Sfetch { background-color: red; }
+    .pipetrace td.Sraw { background-color: red; }
+    .pipetrace td.X, .pipetrace td.Flushed { background-color: red; }
+    .pipetrace td span:after { content: attr(class); }
+    .pipetrace td span { padding: 0 0.2em; margin: 0 0 0 0.1em; }
+    .pipetrace td span.FS { background-color: lightgrey; }
+    .pipetrace td span.F { background-color: lightskyblue; }
+    #pipetrace_legend { border: none; background-color: white; position: fixed; bottom: 0; right: 0; }
+    #pipetrace_legend tr:first-of-type { font-weight: bold; }
+    #pipetrace_legend td { text-align: center; }
+    #pipetrace_legend td.defn { text-align: left; }
+    #pipetrace_legend td.defn:before { content: ""; }
+</style>
+</head>
+
+<body onload="toggle('pipetrace_legend')">
+
+<h1>PM0044 5.4.1 Optimized pipeline example - execution from flash, table 6</h1>
+
+<table id="pipetrace_legend" class="pipetrace">
+    <tr><td colspan="2">Legend</td></tr>
+    <tr><td class="D" /><td class="defn">Decode</td></tr>
+    <tr><td class="E" /><td class="defn">Execute</td></tr>
+    <tr><td><span class="F" /></td><td class="defn">Fetch</td></tr>
+    <tr><td class="X" /><td class="defn">Flush</td></tr>
+    <tr><td><span class="FS" /></td><td class="defn">Fetch Stall - space in prefetch buffer but bus busy</td></tr>
+    <tr><td class="Sbus" /><td class="defn">Decode Stall - bus busy</td></tr>
+    <tr><td class="Sfetch" /><td class="defn">Decode Stall - insufficient data in prefetch buffer</td></tr>
+    <tr><td class="Sraw" /><td class="defn">Decode Stall - read after write</td></tr>
+</table>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08098</td><td class="instr">neg    A</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08099</td><td class="instr">xor    A,0x10</td><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0809b</td><td class="instr">ld     A,#0x14</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0809d</td><td class="instr">sub    A,0x1000</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080a0</td><td class="instr">inc    A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E" /></tr>
+        <tr><td>0x080a1</td><td class="instr">ld     XL,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E" /></tr>
+        <tr><td>0x080a2</td><td class="instr">srl    A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E" /></tr>
+        <tr><td>0x080a3</td><td class="instr">swap   A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080a4</td><td class="instr">sla    0x15</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E" /></tr>
+        <tr><td>0x080a6</td><td class="instr">cp     A,#0xfe</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080a8</td><td class="instr">mov    0x0100,#0x0b</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x080ac</td><td class="instr">mov    0x0101,#0x16</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th><th class="n">9</th><th class="n">10</th><th class="n">11</th><th class="n">12</th><th class="n">13</th><th class="n">14</th>
+    </thead>
+</table>
+</a>
+
+</body>
+</html>

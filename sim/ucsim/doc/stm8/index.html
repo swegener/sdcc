@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB" lang="en-GB">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <title>Features of the STM8 Simulator</title>
+</head>
+
+<body>
+  <h1>Features of the STM8 Simulator</h1>
+
+
+  <h2>Cycle Counts</h2>
+
+  Instruction timings are correct and take into account pipeline overlaps
+  and stall cycles. The only known exceptions are HALT, WFI and WFE which
+  are either not yet implemented or, in the case of HALT, only partially
+  and minimally implemented.
+
+  <h3>Notes on Documention</h3>
+
+  <h4>PM0044 Section 5.3 Pipelined execution examples</h4>
+      <p>There are some errors in these tables. See the trace outputs in the
+      <a href="#exanal">Example Analyses</a> section below for details.</p>
+
+  <h4>PM0044 Section 7.4 Instruction Set</h4>
+      <p>The cycle counts shown for instructions in PM0044 section 7 are one less
+          than the actual counts because the first decode cycle of an instruction
+          normally overlaps with the last execution cycle of the preceeding
+          instruction.</p>
+
+
+  <h3>Stall Cycle Detection</h3>
+
+  <p>Error/warning event reporting of stall cycles is available should timings
+  be important in your application.
+      <pre>0&gt; <font color="#118811">show error</font>
+  Error: non-classified [on/ON]
+    [...]
+    Error: stm8 [off/OFF]
+      Warning: pipeline [unset/OFF]
+        Warning: decode_stall [unset/OFF]
+        Warning: fetch_stall [unset/OFF]
+    [...]</pre>
+
+  <p>These are off by default but may be enabled as required either as a group:
+      <pre>0&gt; <font color="#118811">set error pipeline</font></pre>
+  or individually:
+      <pre>0&gt; <font color="#118811">set error decode_stall on</font>
+0&gt; <font color="#118811">set error fetch_stall on</font></pre>
+  </p>
+
+
+  <h3>Cycle and Pipeline Analysis</h3>
+
+  <p>The simulator is able to generate detailed analyses of execution showing timings
+  for each instruction executed including pipeline overlaps and stalls. This is controlled
+  via the <em>pipetrace</em> feature of the STM8 CPU module. The output is in the form
+  of a self-contained HTML document that can be opened with a browser or imported into
+  other application documentation.</p>
+
+  <p>To generate a pipeline analysis:</p>
+
+  <ul>
+      <li>Set the title for the next pipetrace to be opened.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace title "..."</font></pre>
+      </li>
+
+      <li>Replace the embedded default styling with a stylesheet link to the given URL.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace style "<i>url</i>"</font></pre>
+      </li>
+
+      <li>Open the given file, write the header (including title and stylesheet) and
+          continue writing the pipeline analysis as instructions are executed.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace start "<i>path</i>"</font></pre>
+      </li>
+
+      <li>Set folding of the analysis on (the default) or off. Folding causes the cycle
+          count to be reset to zero (moving the output back to the left) after every
+          pipeline flush (i.e. after every branch, jump or call). It is recommended you
+          leave this on unless you have <em>very</em> wide paper or are single stepping
+          and annotating the analysis between steps.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace fold [on|off]</font></pre>
+      </li>
+
+      <li>Pause writing the pipeline analysis. The output file remains open but nothing
+          will be written to as instructions are executed.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace pause</font></pre>
+      </li>
+
+      <li>Insert the given text into the current pipeline analysis. The text is
+          inserted verbatim and may contain HTML markup. If the output is not
+          paused the cycle count for the analysis is set back to zero so that the
+          next instruction output will be moved back to the left (the first cycle
+          after the inserted text does however overlap the last cycle before the
+          inserted text as normal).
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace data "<i>text</i>"</font></pre>
+      </li>
+
+      <li>Resume a paused pipeline analysis. Instruction execution will update the
+          analysis output again. Resuming a paused analysis resets the cycle count
+          to zero so that the next instruction output is moved back to the left.
+          (The next cycle may or may not overlap the last cycle before the pause
+          depending on whether or not any instructions were executed while the
+          output was paused.)
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace resume</font></pre>
+      </li>
+
+      <li>Stop the pipeline analysis and close the output file. No further analysis will
+          occur until a new analysis file is started.
+          <pre>0&gt; <font color="#118811">set hw cpu pipetrace stop</font></pre>
+      </li>
+  </ul>
+
+  <a name="exanal"></a>
+  <h3>Example Analyses</h3>
+
+  <h4>Documented Examples</h4>
+
+  <p>These are taken from the examples in ST's &ldquo;PM0044 Programming Manual&rdquo;
+  section &ldquo;5.3 Pipelined execution examples&rdquo; and are generated by
+  the test <a href="../../stm8.src/test/stm8-cycles">ucsim/stm8.src/test/stm8-cycles</a>
+  using the &ldquo;pipetrace&rdquo;functionality described above.</p>
+
+  <p>Note that there are some errors in the examples in section 5.3. These are noted in
+  the output below and the differences confirmed on HW.</p>
+
+  <ul>
+    <li><a href="test.table3.html">
+        PM0044 5.4 Table 3. Example with exact number of cycles
+        </a>
+    <li><a href="test.table6.html">
+        PM0044 5.4.1 Table 8. Optimized pipeline example - execution from Flash
+        </a>
+    <li><a href="test.table8.html">
+        PM0044 5.4.2 Table 6. Optimized pipeline example - execution from RAM
+        </a>
+    <li><a href="test.table10.html">
+        PM0044 5.4.3 Table 10. Pipeline with Call/Jump
+        </a>
+    <li><a href="test.table12.html">
+        PM0044 5.4.4 Table 12. Example of stalled pipeline
+        </a>
+  </ul>
+
+  <h4>Additional Examples</h4>
+
+  <p>The DIV instruction is special in that it takes a variable number of cycles and
+  is interruptible.</p>
+
+  <ul>
+    <li><a href="test.div.html">
+        Examples of DIV execution
+        </a>
+    <li><a href="test.int_div.html">
+        Examples of interrupted DIV execution
+        </a> (not currently implemented)
+  </ul>
+
+  <p>Other instructions, each run individually starting from an empty pipeline and
+  showing the overlap with the following instruction.</p>
+
+  <ul>
+    <li><a href="test.instrs.html">
+        Examples of individual instruction execution
+        </a>
+  </ul>
+
+  <h3>Hardware Cycle Counting</h3>
+
+  <p>Actual cycle counts may be obtained from hardware for comparison using a combination
+  of <a href="https://stm8-binutils-gdb.sourceforge.io">stm8-gdb</a>, openocd and an STLink
+  or other openocd/SWIM compatible debugger. Set the master and CPU clocks to be equivalent
+  and use one of the target's timers to count cycles.</p>
+  <p>For instance:</p>
+  <blockquote><pre>
+$ openocd -f interface/stlink.cfg -f target/stm8s003.cfg &amp;
+$ stm8-gdb
+[...]
+(gdb) target extended-remote :3333
+
+
+(gdb) set $DM_CSR2 = 0x7f99
+(gdb) set $DM_ENFCTR = 0x7f9a
+
+(gdb) set $CLK_CKDIVR  = 0x50c6
+(gdb) set $CLK_PCKENR1 = 0x50c7
+
+(gdb) set $TIM2_CR1  = 0x5300
+(gdb) set $TIM2_EGR  = 0x5306
+(gdb) set $TIM2_CNTRH = 0x530c
+(gdb) set $TIM2_CNTRL = 0x530d
+(gdb) set $TIM2_PSCR = 0x530e
+
+
+(gdb) define cycles
+    dont-repeat
+
+    # Freeze TIM2 when CPU is stalled by DM
+    set {unsigned char}$DM_ENFCTR = 0xfd
+
+    # Set HSIDIV = 0, CPUDIV = 0
+    set {unsigned char}$CLK_CKDIVR = 0x00
+    # Set TIM2 prescalar to 0 so f_CK_CNT matches f_MASTER (and hence f_CPU)
+    set {unsigned char}$TIM2_PSCR = 0x00
+
+    # Clear count and update config
+    set {unsigned char}$TIM2_EGR = 1
+    set {unsigned char}$TIM2_CNTRH = 0xff
+    set {unsigned char}$TIM2_CNTRL = 0xff
+
+    # Enable counter
+    set {unsigned char}$TIM2_CR1  = 0x01
+    # Enable clock gate
+    set {unsigned char}$CLK_PCKENR1 = 0x20
+
+    # Set PC
+    # N.B. Do not attempt to flush the decoder by writing to DM_CSR2. It upsets
+    # openocd which is then unable to set breakpoints.
+    set $pc = $arg0
+    #set {unsigned char}$DM_CSR2 = 0x81
+
+    # Set a HW breakpoint, run, then clear
+    monitor bp $arg1 1 hw
+    cont
+    monitor rbp $arg1
+
+    set $_tmp = {unsigned short}$TIM2_CNTR
+    disass/r $arg0,$arg1
+    printf "%u cycles\n", $_tmp
+end
+
+(gdb) document cycles
+Set PC to the first address, set a HW break at the second address,
+run and report how many cycles (as reported by $TIM2_CNTR) it took.
+The target is assumed to be halted initially.
+end
+
+(gdb) monitor reset halt
+target halted due to debug-request, pc: 0x00008000
+(gdb) x/3i 0x811c
+   0x811c:      ldw X,#0xfc00 ;0xfc00
+   0x811f:      ld A,#0x80 ;0x80
+   0x8121:      div X,A
+(gdb) cycles 0x811c 0x8122
+target halted due to debug-request, pc: 0x00008000
+breakpoint set at 0x00008122
+
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x00008122 in ?? ()
+Dump of assembler code from 0x811c to 0x8122:
+   0x0000811c:  ae fc 00        ldw X,#0xfc00 ;0xfc00
+   0x0000811f:  a6 80   ld A,#0x80 ;0x80
+   0x00008121:  62      div X,A
+End of assembler dump.
+14 cycles
+  </pre></blockquote>
+
+  <p>Don't forget that there will be an initial pipeline fetch cycle
+  before the first instruction can be decoded, there may be stall
+  cycles, multiple instructions (mostly) overlap by one cycle (which is
+  assumed in the timings given by PM0044), and you may have interrupts
+  that should be disabled.</p>
+
+</body>
+</html>

@@ -59,6 +59,28 @@ public:
   class cl_it_src *trap_src;
   class cl_flash *flash_ctrl;
   t_addr sp_limit;
+
+  char *pipetrace_title, *pipetrace_style, *pipetrace_file;
+  FILE *pipetrace_fd;
+  bool pipetrace_in_table, pipetrace_running, pipetrace_fold;
+  unsigned int pipetrace_ticks, pipetrace_max_ticks;
+private:
+  int div_cycle;
+  u32_t dividend, divisor, quotient;
+  int pipeline_index, pipeline_bytes;
+  struct
+    {
+      bool instr, program, data, regs, flush;
+    } pipeline_busy;
+  void pipeline_flush(bool need_exec);
+
+  void pipetrace_instr_start(t_addr addr);
+  void pipetrace_instr_end(void);
+  void pipetrace_tick(const char *aux);
+  void pipetrace_type(const char *event);
+public:
+  void pipetrace_end_table(void);
+
 public:
   cl_stm8(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
@@ -77,7 +99,10 @@ public:
   virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
 
+  virtual int tick(int cycles_cpu);
   virtual int exec_inst(void);
+  virtual t_mem fetch(void);
+  virtual bool fetch(t_mem *code);
 
   virtual const char *get_disasm_info(t_addr addr,
                                       int *ret_len,
@@ -113,11 +138,50 @@ class cl_stm8_cpu: public cl_hw
   cl_stm8_cpu(class cl_uc *auc);
   virtual int init(void);
   virtual unsigned int cfg_size(void) { return 2; }
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem read(class cl_memory_cell *cell);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual const char *cfg_help(t_addr addr);
+};
+
+
+#include "errorcl.h"
+
+class cl_error_stm8: public cl_error
+{
+public:
+  cl_error_stm8(void);
+};
+
+class cl_error_stm8_pipeline: public cl_error_stm8
+{
+public:
+  cl_error_stm8_pipeline(void);
+};
+
+class cl_error_stm8_pipeline_decode_stall: public cl_error_stm8_pipeline
+{
+public:
+  cl_error_stm8_pipeline_decode_stall(void);
+
+  virtual void print(class cl_commander_base *c);
+};
+
+class cl_error_stm8_pipeline_fetch_stall: public cl_error_stm8_pipeline
+{
+public:
+  cl_error_stm8_pipeline_fetch_stall(void);
+
+  virtual void print(class cl_commander_base *c);
+};
+
+class cl_stm8_error_registry: public cl_error_registry
+{
+public:
+  cl_stm8_error_registry(void);
 };
 
 

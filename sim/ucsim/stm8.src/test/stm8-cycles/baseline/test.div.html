@@ -1,0 +1,473 @@
+<html>
+<head>
+<title>DIV tests - available ST docs simply say '2-17 cycles'</title>
+<script>
+    function toggle(id) {
+        var obj = document.getElementById(id);
+        if (obj.style.display === 'none')
+            obj.style.display = 'block';
+        else
+            obj.style.display = 'none';
+    }
+</script>
+
+<style>
+    .pipetrace { margin: 1em 0; }
+    .pipetrace, .pipetrace td { border: 1px solid black; border-collapse: collapse; padding: 0 0.2em; white-space: nowrap; }
+    .pipetrace thead { background-color: #d2d2d2; position: sticky; top: 0; }
+    .pipetrace thead th { border: none; box-shadow: inset -1px -1px #000; }
+    .pipetrace tr:nth-child(even) { background-color: #f2f2f2; }
+    .pipetrace td { min-width: 1.6em; }
+    .pipetrace td.instr:before { content: ""; }
+    .pipetrace td.instr { width: 9.5em; }
+    .pipetrace td.Sbus:before { content: " S₀"; }
+    .pipetrace td.Sfetch:before { content: " S₁"; }
+    .pipetrace td.Sraw:before { content: " S₂"; }
+    .pipetrace td:before { content: attr(class); }
+    .pipetrace td.D { background-color: lawngreen; }
+    .pipetrace td.E { background-color: navajowhite; }
+    .pipetrace td.Sbus { background-color: red; }
+    .pipetrace td.Sfetch { background-color: red; }
+    .pipetrace td.Sraw { background-color: red; }
+    .pipetrace td.X, .pipetrace td.Flushed { background-color: red; }
+    .pipetrace td span:after { content: attr(class); }
+    .pipetrace td span { padding: 0 0.2em; margin: 0 0 0 0.1em; }
+    .pipetrace td span.FS { background-color: lightgrey; }
+    .pipetrace td span.F { background-color: lightskyblue; }
+    #pipetrace_legend { border: none; background-color: white; position: fixed; bottom: 0; right: 0; }
+    #pipetrace_legend tr:first-of-type { font-weight: bold; }
+    #pipetrace_legend td { text-align: center; }
+    #pipetrace_legend td.defn { text-align: left; }
+    #pipetrace_legend td.defn:before { content: ""; }
+</style>
+</head>
+
+<body onload="toggle('pipetrace_legend')">
+
+<h1>DIV tests - available ST docs simply say '2-17 cycles'</h1>
+
+<table id="pipetrace_legend" class="pipetrace">
+    <tr><td colspan="2">Legend</td></tr>
+    <tr><td class="D" /><td class="defn">Decode</td></tr>
+    <tr><td class="E" /><td class="defn">Execute</td></tr>
+    <tr><td><span class="F" /></td><td class="defn">Fetch</td></tr>
+    <tr><td class="X" /><td class="defn">Flush</td></tr>
+    <tr><td><span class="FS" /></td><td class="defn">Fetch Stall - space in prefetch buffer but bus busy</td></tr>
+    <tr><td class="Sbus" /><td class="defn">Decode Stall - bus busy</td></tr>
+    <tr><td class="Sfetch" /><td class="defn">Decode Stall - insufficient data in prefetch buffer</td></tr>
+    <tr><td class="Sraw" /><td class="defn">Decode Stall - read after write</td></tr>
+</table>
+
+<p>The stated cycle count would seem to imply binary long division and
+   this is how the STM8 emulator in ucsim currently treats div for.
+   cycle counting. However the cycles measured on actual hardware
+   suggest this is not correct.
+</p>
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08100</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08103</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08105</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08108</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0810b</td><td class="instr">ld     A,#0x40</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0810d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08110</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08113</td><td class="instr">ld     A,#0x20</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08115</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08118</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0811b</td><td class="instr">ld     A,#0x10</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0811d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08120</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08123</td><td class="instr">ld     A,#0x08</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08125</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08128</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0812b</td><td class="instr">ld     A,#0x04</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0812d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08130</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08133</td><td class="instr">ld     A,#0x02</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08135</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08138</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0813b</td><td class="instr">ld     A,#0x01</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0813d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08140</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08143</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08145</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08148</td><td class="instr">ldw    X,#0x4000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0814b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0814d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08150</td><td class="instr">ldw    X,#0x2000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08153</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08155</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08158</td><td class="instr">ldw    X,#0x1000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0815b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0815d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08160</td><td class="instr">ldw    X,#0x0800</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08163</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08165</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08168</td><td class="instr">ldw    X,#0x0400</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0816b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0816d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08170</td><td class="instr">ldw    X,#0x0200</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08173</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08175</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08178</td><td class="instr">ldw    X,#0x0100</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0817b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0817d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08180</td><td class="instr">ldw    X,#0x0080</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08183</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08185</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08188</td><td class="instr">ldw    X,#0x0040</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0818b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0818d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08190</td><td class="instr">ldw    X,#0x0020</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08193</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x08195</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x08198</td><td class="instr">ldw    X,#0x0010</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0819b</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x0819d</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081a0</td><td class="instr">ldw    X,#0x0008</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081a3</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081a5</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081a8</td><td class="instr">ldw    X,#0x0004</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081ab</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081ad</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081b0</td><td class="instr">ldw    X,#0x0002</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081b3</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081b5</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081b8</td><td class="instr">ldw    X,#0x0001</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081bb</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081bd</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081c0</td><td class="instr">ldw    X,#0x0000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081c3</td><td class="instr">ld     A,#0x80</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081c5</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081c8</td><td class="instr">ldw    X,#0x003f</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081cb</td><td class="instr">ld     A,#0x08</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081cd</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th><th class="n">9</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081d0</td><td class="instr">ldw    X,#0x0040</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081d3</td><td class="instr">ld     A,#0x08</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081d5</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081d8</td><td class="instr">ldw    X,#0x0041</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081db</td><td class="instr">ld     A,#0x08</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081dd</td><td class="instr">div    X,A</td><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th>
+    </thead>
+</table>
+</a>
+
+<a title="Click for legend">
+<table class="pipetrace" onclick="toggle('pipetrace_legend')">
+    <tbody>
+        <tr><td /><td class="Flushed" /></tr>
+        <tr><td>0x081e0</td><td class="instr">ldw    X,#0x8000</td><td class=""><span class="F" /></td><td class=" D"><span class="F" /></td><td class=" E"><span class="F" /></td><td class=" E" /></tr>
+        <tr><td>0x081e3</td><td class="instr">ldw    Y,#0x0001</td><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E"></td><td class=" E" /></tr>
+        <tr><td>0x081e7</td><td class="instr">divw   X,Y</td><td class="" /><td class="" /><td class="" /><td class="" /><td class="" /><td class=" D"><span class="F" /></td><td class=" E"></td><td class=" E"></td><td class=" E" /></tr>
+    </tbody>
+    <thead>
+        <tr><th>Address</th><th>Instruction</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th><th class="n">7</th><th class="n">8</th><th class="n">9</th>
+    </thead>
+</table>
+</a>
+
+</body>
+</html>

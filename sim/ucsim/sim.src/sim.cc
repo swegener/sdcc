@@ -257,6 +257,9 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	case resSELFJUMP:
 	  cmd->frozen_console->dd_printf("Jump to itself\n");
 	  break;
+        case resNOT_DONE:
+          cmd->frozen_console->dd_printf("Instruction is still executing\n");
+          break;
 	default:
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
 	  break;

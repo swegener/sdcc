@@ -1,0 +1,285 @@
+replace restart {
+	pla
+	pha
+	lda	%1
+} by {
+	; Peephole 1a	- removed redundant pla/pha
+	lda	%1
+}
+
+replace restart {
+	pla
+	pha
+    %1
+} by {
+	; Peephole 1b	- removed redundant pla/pha
+	%1
+}  if same(%1 'txa' 'tya')
+
+
+replace restart {
+	%1
+	lda %2
+} by {
+	; Peephole 2a - removed unused txa/tya
+	lda %2
+} if same(%1 'txa' 'tya')
+
+replace restart {
+	%1
+	ldx	%2
+} by {
+	; Peephole 2b - removed unused tax/inx/tsx
+	ldx	%2
+} if same(%1 'tax' 'inx' 'tsx')
+
+replace restart {
+	tax
+	tsx
+} by {
+	; Peephole 2c - removed unused tax
+	tsx
+}
+
+replace restart {
+	tsx
+	tax
+} by {
+	; Peephole 2d - removed unused tsx
+	tax
+}
+
+replace restart {
+	%1
+	ldy	%2
+} by {
+	; Peephole 2e - removed unused tay/iny
+	ldy	%2
+} if same(%1 'tay' 'iny')
+
+replace restart {
+	tax
+	txa
+} by {
+	; Peephole 2f - removed unused txa
+	tax
+}
+
+replace restart {
+	tay
+	tya
+} by {
+	; Peephole 2g - removed unused txa
+	tay
+}
+
+replace restart {
+	lda	%1
+	cmp #0x00
+} by {
+	; Peephole 3a	- eliminated redundant cmp #0x00
+	lda	%1
+}
+
+replace restart {
+	pla
+	cmp #0x00
+} by {
+	; Peephole 3b	- eliminated redundant cmp #0x00
+	pla
+}
+
+replace restart {
+	ldx	%1
+	cpx #0x00
+} by {
+	; Peephole 3c	- eliminated redundant cpx #0x00
+	ldx %1
+}
+
+replace restart {
+	ldy	%1
+	cpy #0x00
+} by {
+	; Peephole 3d	- eliminated redundant cpy #0x00
+	ldy %1
+}
+
+replace restart {
+	lda %2
+	%1 a
+	sta %2
+} by {
+	; Peephole 4a - removed redundant sta
+	%1  %2
+    lda %2
+} if same(%1 'asl' 'rol' 'ror')
+
+replace restart {
+    lda %4
+	%1 %2
+	lda	%3
+} by {
+	; Peephole 4b - removed redundant lda (followed by asl/rol/ror)
+	%1 %2
+	lda	%3
+} if same(%1 'asl' 'rol' 'ror'), notSame(%2 'a')
+
+replace restart {
+    lda %4
+	%1 %2
+	lda	%3
+} by {
+	; Peephole 4c - removed redundant lda (followed by inc/dec/and/or/xor)
+	%1 %2
+	lda	%3
+} if same(%1 'inc' 'dec' 'and' 'eor' 'ora')
+
+replace restart {
+    lda %4
+	%1 %2
+	lda	%3
+} by {
+	; Peephole 4d - removed redundant lda (followed by ldx/ldy/stx/sty/cpx/cpy)
+	%1 %2
+	lda	%3
+} if same(%1 'ldx' 'ldy' 'stx' 'sty' 'cpx' 'cpy')
+
+replace restart {
+    lda %3
+	%1
+	lda	%2
+} by {
+	; Peephole 4e - removed redundant lda (followed by inx/iny/dex/dey)
+	%1 
+	lda	%2
+} if same(%1 'inx' 'iny' 'dex' 'dey')
+
+//replace {
+//    lda %3
+//	%1
+//	lda	%2
+//} by {
+//	; Peephole 4c - removed redundant lda
+//	%1
+//	lda	%2
+//} if notSame(%1 'tax' 'tay')
+
+replace restart {
+	bne	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5a	- eliminated jmp
+	beq	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	beq	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5b	- eliminated jmp
+	bne	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bcc	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5c	- eliminated jmp
+	bcs	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bcs	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5d	- eliminated jmp
+	bcc	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bpl	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5e	- eliminated jmp
+	bmi	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bmi	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5f	- eliminated jmp
+	bpl	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bvc	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5g	- eliminated jmp
+	bvs	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	bvs	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 5h	- eliminated jmp
+	bvc	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	jmp	%5
+} by {
+	; Peephole 6a  - replaced jmp to rts with rts
+	rts
+} if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+// check if all are necessary
+replace restart {
+        %1 %2
+%2:
+} by {
+        ; Peephole 7   - eliminated branch
+%2:
+} if same(%1 'bne' 'beq' 'bcc' 'bcs' 'bvc' 'bvs' 'bpl' 'bmi'), labelRefCountChange(%2 -1)
+
+replace restart {
+        %1 %2
+        %1 %3
+} by {
+    ; Peephole 8   - eliminated unused load
+    %1  %3
+} if same(%1 'lda' 'ldx' 'ldy'), notVolatile(%2)
+
+// should be one of the last peepholes
+replace restart {
+%1:
+} by {
+	; Peephole 500    removed redundant label %1
+} if labelRefCount(%1 0)
+
+replace restart {
+    jsr %1
+    rts
+} by {
+	; Peephole 501 did tail call optimization.
+    jmp %1
+} if optimizeReturn()

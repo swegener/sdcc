@@ -1,5 +1,10 @@
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/peep.def:
+      Initial MOS6502 peephole rules.
+
+2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/gen.c:
       Fix out of range branch in genCmpEQorNE.
 

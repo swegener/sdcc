@@ -536,25 +536,25 @@ pushReg (reg_info * reg, bool freereg)
     case X_IDX:
       if (IS_MOS65C02) {
         emit6502op ("phx", "");
+        _G.stackPushes++;
       } else {
-        storeRegTemp (m6502_reg_a, false);
-        emit6502op ("txa", "");
-        emit6502op ("pha", "");
-        loadRegTemp (m6502_reg_a, false);
+        bool needpulla= storeRegTemp (m6502_reg_a, false);
+        transferRegReg (m6502_reg_x, m6502_reg_a, false);
+        pushReg (m6502_reg_a, true);
+        loadOrFreeRegTemp (m6502_reg_a, needpulla);
       }
-      _G.stackPushes++;
       updateCFA ();
       break;
     case Y_IDX:
       if (IS_MOS65C02) {
         emit6502op ("phy", "");
+        _G.stackPushes++;
       } else {
-        storeRegTemp (m6502_reg_a, false);
-        emit6502op ("tya", "");
-        emit6502op ("pha", "");
-        loadRegTemp (m6502_reg_a, false);
+        bool needpulla = storeRegTemp (m6502_reg_a, false);
+        transferRegReg (m6502_reg_y, m6502_reg_a, true);
+        pushReg (m6502_reg_a, true);
+        loadOrFreeRegTemp (m6502_reg_a, needpulla);
       }
-      _G.stackPushes++;
       updateCFA ();
       break;
     // little-endian order
@@ -595,27 +595,27 @@ pullReg (reg_info * reg)
     case X_IDX:
       if (IS_MOS65C02) {
         emit6502op ("plx", "");
+        _G.stackPushes--;
       } else {
 	//  storeRegTemp (m6502_reg_a, true);
-        emit6502op ("pla", "");
-        emit6502op ("tax", "");
+          pullReg (m6502_reg_a);
+          transferRegReg (m6502_reg_a, m6502_reg_x, true);
 	// loadRegTemp (m6502_reg_a, true);
         m6502_dirtyReg(m6502_reg_a, false);
       }
-      _G.stackPushes--;
       updateCFA ();
       break;
     case Y_IDX:
       if (IS_MOS65C02) {
         emit6502op ("ply", "");
+        _G.stackPushes--;
       } else {
 	//	storeRegTemp (m6502_reg_a, true);
-        emit6502op ("pla", "");
-        emit6502op ("tay", "");
+        pullReg (m6502_reg_a);
+        transferRegReg (m6502_reg_a, m6502_reg_y, true);
 	//	loadRegTemp (m6502_reg_a, true);
         m6502_dirtyReg(m6502_reg_a, false);
       }
-      _G.stackPushes--;
       updateCFA ();
       break;
     // little-endian order

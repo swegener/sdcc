@@ -596,5 +596,101 @@ colopt2ansiseq(char *opt)
   return r;
 }
 
+double
+strtoscale(const char *scale, const char **units)
+{
+  double d = 1.0;
+  const char *u;
+
+  if (!units)
+    units = &u;
+
+  *units = &scale[0];
+
+  if (scale[0])
+    {
+      *units = &scale[1];
+      switch (scale[0])
+        {
+          case 'f':
+            d = 1 / 1000000000000000.0;
+            break;
+          case 'p':
+            d = 1 / 1000000000000.0;
+            break;
+          case 'n':
+            d = 1 / 1000000000.0;
+            break;
+          case 'u':
+            d = 1 / 1000000.0;
+            break;
+          case 'm':
+            d = 1 / 1000.0;
+            break;
+          default:
+            if (!strncmp(scale, "µ", sizeof("µ") - 1))
+              {
+                d = 1 / 1000000.0;
+                *units = &scale[sizeof("µ")];
+              }
+            else
+              {
+                if (scale[1] != 'i')
+                  {
+                    switch (scale[0])
+                      {
+                        case 'k':
+                          d = 1000.0;
+                          break;
+                        case 'M':
+                          d = 1000000.0;
+                          break;
+                        case 'G':
+                          d = 1000000000.0;
+                          break;
+                        case 'T':
+                          d = 1000000000000.0;
+                          break;
+                        case 'P':
+                          d = 1000000000000000.0;
+                          break;
+                        default:
+                          *units = &scale[0];
+                          break;
+                      }
+                  }
+                else
+                  {
+                    *units = &scale[2];
+                    switch (scale[0])
+                      {
+                        case 'k':
+                          d = 1024.0;
+                          break;
+                        case 'M':
+                          d = 1024.0 * 1024.0;
+                          break;
+                        case 'G':
+                          d = 1024.0 * 1024.0 * 1024.0;
+                          break;
+                        case 'T':
+                          d = 1024.0 * 1024.0 * 1024.0 * 1024.0;
+                          break;
+                        case 'P':
+                          d = 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+                          break;
+                        default:
+                          *units = &scale[0];
+                          break;
+                      }
+                  }
+              }
+            break;
+        }
+    }
+
+  return d;
+}
+
 
 /* End of utils.cc */

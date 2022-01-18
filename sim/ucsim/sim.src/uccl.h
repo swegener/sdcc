@@ -47,24 +47,34 @@ typedef int (*instruction_wrapper_fn)(class cl_uc *uc, t_mem code);
 
 /* Counter to count clock ticks */
 
-#define TICK_RUN	0x01
-#define TICK_INISR	0x02
-#define TICK_IDLE	0x03
+enum ticker_type {
+   TICK_ANY = 0,
+   TICK_INISR,
+   TICK_IDLE,
+   TICK_HALT
+};
 
 class cl_ticker: public cl_base
 {
-public:
+private:
+  enum ticker_type type;
+  double rtime;
   unsigned long ticks;
-  int options; // see TICK_XXX above
+public:
   int dir;
-  //char *name;
+  bool run, user;
 
-  cl_ticker(int adir, int in_isr, const char *aname);
+  cl_ticker(int adir, enum ticker_type type, const char *aname, bool auser = true);
   virtual ~cl_ticker(void);
-  
-  virtual int tick(int nr);
-  virtual double get_rtime(double xtal);
-  virtual void dump(int nr, double xtal, class cl_console_base *con);
+
+  enum ticker_type get_type(void) { return type; }
+  double get_ticks(void) { return ticks; }
+  double get_rtime(void) { return rtime; }
+
+  void set(int nr, double time) { ticks = nr; rtime = time; }
+
+  void tick(int nr, double time);
+  void dump(int nr, class cl_console_base *con);
 };
 
 
@@ -226,6 +236,9 @@ public:
 
 class cl_uc: public cl_base
 {
+private:
+  double xtal;			// Clock speed
+  double xtal_tick;		// Length of a clock tick in seconds
 public:
   struct cpu_entry *type;
   //enum cpu_type type;			// CPU family
@@ -240,8 +253,8 @@ public:
   class cl_ticker *ticks;	// Nr of XTAL clocks
   class cl_ticker *isr_ticks;	// Time in ISRs
   class cl_ticker *idle_ticks;	// Time in idle mode
+  class cl_ticker *halt_ticks;	// Time in power down mode
   class cl_list *counters;	// User definable timers (tickers)
-  double xtal;			// Clock speed
   struct vcounter_t vc;		// Virtual clk counter
   bool stop_selfjump;		// Whether it should stop on selfjump
   
@@ -285,7 +298,11 @@ public:
   virtual void reg_cell_var(class cl_memory_cell *cell,
 			    void *store,
 			    chars vname, chars vdesc);
-  
+
+  double get_xtal(void) { return xtal; }
+  double get_xtal_tick(void) { return xtal_tick; }
+  void set_xtal(double freq) { xtal= freq; xtal_tick = 1 / freq; }
+
   // making objects
   virtual void make_memories(void);
   virtual void make_variables(void);
@@ -344,7 +361,6 @@ public:
   virtual void add_counter(class cl_ticker *ticker, const char *nam);
   virtual void del_counter(int nr);
   virtual void del_counter(const char *nam);
-  virtual double get_rtime(void);
   virtual unsigned long clocks_of_time(double t);
   virtual int clock_per_cycle(void);
   virtual void touch(void);

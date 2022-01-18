@@ -371,7 +371,7 @@ cl_pblaze::inst_input(uint code, int operands)
   }
 
   cl_memory_cell *r1 = get_register(code, true);
-  r1->set(input_port->get_input(port, ticks->ticks / clock_per_cycle()));
+  r1->set(input_port->get_input(port, ticks->get_ticks() / clock_per_cycle()));
 
   input_port->value = r1->get();
   port_id->value = port;
@@ -554,7 +554,7 @@ cl_pblaze::inst_output(uint code, int operands)
   }
   t_mem value = r1->get();
   application->dd_printf("Output on port %d: %2x %3d %c\n", port, value, value, isprint(value) ? value : '.');
-  output_port->add_output(port, ticks->ticks / clock_per_cycle(), value);
+  output_port->add_output(port, ticks->get_ticks() / clock_per_cycle(), value);
 
   output_port->value = value;
   port_id->value = port;
@@ -580,7 +580,7 @@ cl_pblaze::inst_outputk(uint code, int operands)
   }
 
   application->dd_printf("Output on port %d: %2x %3d %c\n", port, constant, constant, isprint(constant) ? constant : '.');
-  output_port->add_output(port, ticks->ticks / clock_per_cycle(), constant);
+  output_port->add_output(port, ticks->get_ticks() / clock_per_cycle(), constant);
 
   output_port->value = constant;
   port_id->value = port;

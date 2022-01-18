@@ -96,7 +96,7 @@ cl_pblaze::init(void)
 
   cl_uc::init(); /* Memories now exist */
 
-  xtal = 8000000;
+  set_xtal(8000000);
 
   // loading file with interrupts
   read_interrupt_file();
@@ -989,12 +989,12 @@ cl_pblaze::do_interrupt(void)
     return(resGO);
 
   // check in stored interrupts, if at actual cycle irq is set
-  if (find(stored_interrupts.begin(), stored_interrupts.end(), ticks->ticks / clock_per_cycle()) != stored_interrupts.end())
+  if (find(stored_interrupts.begin(), stored_interrupts.end(), ticks->get_ticks() / clock_per_cycle()) != stored_interrupts.end())
     interrupt->interrupt_request = true;
 
   if (interrupt->interrupt_request) {
     printf("%g sec (%ld clks): Accepting interrupt, PC= 0x%06x\n",
-	   get_rtime(), ticks->ticks, AU(PC));
+	   ticks->get_rtime(), (long int)(ticks->get_ticks()), AU(PC));
 
     tick(1);
 

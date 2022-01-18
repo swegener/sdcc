@@ -65,7 +65,7 @@ cl_m68hc12::init(void)
   RCV(TMP2);
   RCV(TMP3);
   
-  xtal= 8000000;
+  set_xtal(8000000);
 
   for (i= 0; i<=255; i++)
     itab[i]= instruction_wrapper_invalid;

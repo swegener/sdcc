@@ -191,7 +191,7 @@ cl_m68hc11::init(void)
 {
   cl_m68hcbase::init();
   
-  xtal= 8000000;
+  set_xtal(8000000);
   
   return 0;
 }

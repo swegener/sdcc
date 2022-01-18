@@ -1847,7 +1847,7 @@ cl_51core::do_interrupt(void)
 	  is->clear();
 	  sim->app->get_commander()->
 	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
-			  get_rtime(), ticks->ticks, object_name(is), PC);
+			  ticks->get_rtime(), ticks->get_ticks(), object_name(is), PC);
 	  IL= new it_level(pr, is->addr, PC, is);
 	  return(accept_it(IL));
 	}
@@ -1929,7 +1929,7 @@ cl_51core::idle_pd(void)
       if (state != stIDLE)
 	sim->app->get_commander()->
 	  debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
-		get_rtime(), ticks->ticks, PC, pcon);
+		ticks->get_rtime(), ticks->get_ticks(), PC, pcon);
       state= stIDLE;
       //was_reti= 1;
     }
@@ -1938,7 +1938,7 @@ cl_51core::idle_pd(void)
       if (state != stPD)
 	sim->app->get_commander()->
 	  debug("%g sec (%d clks): CPU in PowerDown mode\n",
-			get_rtime(), ticks->ticks);
+			ticks->get_rtime(), ticks->get_ticks());
       state= stPD;
     }
   return(resGO);

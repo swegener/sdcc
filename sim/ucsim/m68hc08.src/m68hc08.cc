@@ -74,7 +74,7 @@ cl_hc08::init(void)
 {
   cl_uc::init(); /* Memories now exist */
 
-  xtal = 8000000;
+  set_xtal(8000000);
 
   //rom= address_space(MEM_ROM_ID);
 //  ram= mem(MEM_XRAM);

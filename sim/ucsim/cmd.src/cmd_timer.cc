@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "i_string.h"
 
 // sim
+#include "utils.h"
 #include "simcl.h"
 
 // local
@@ -63,7 +64,7 @@ COMMAND_DO_WORK_UC(cl_timer_cmd)
   
   if (!params[0])
     {
-      con->dd_printf("Timer id is missing.");
+      con->dd_printf("Timer id is missing.\n");
       return(false);
     }
   if (params[0]->as_number())
@@ -103,11 +104,8 @@ CMDHELP(cl_timer_cmd,
 COMMAND_DO_WORK_UC(cl_timer_add_cmd)
   //add(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
 {
-  class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
-  long dir= +1, in_isr= 0;
+  enum ticker_type type = TICK_ANY;
+  long dir= +1;
 
   if (cl_timer_cmd::do_work(uc, cmdline, con))
     return(false);
@@ -123,22 +121,38 @@ COMMAND_DO_WORK_UC(cl_timer_add_cmd)
   if (cmdline->nuof_params() > 0)
     {
       if (cmdline->syntax_match(uc, NUMBER))
-	dir= params[0]->value.number;
+        dir= cmdline->param(0)->value.number;
       else if (cmdline->syntax_match(uc, NUMBER NUMBER))
-	{
-	  dir= params[0]->value.number;
-	  in_isr= params[1]->value.number;
-	}
+        {
+          dir= cmdline->param(0)->value.number;
+          if (cmdline->param(1)->value.number)
+            type = TICK_INISR;
+        }
+      else if (cmdline->syntax_match(uc, NUMBER STRING))
+        {
+          dir= cmdline->param(0)->value.number;
+          if (!strcmp(cmdline->param(1)->value.string.string, "isr"))
+            type = TICK_INISR;
+          else if (!strcmp(cmdline->param(1)->value.string.string, "idle"))
+            type = TICK_IDLE;
+          else if (!strcmp(cmdline->param(1)->value.string.string, "halt"))
+            type = TICK_HALT;
+        }
+      else
+        {
+          con->dd_printf("Error: Wrong parameters\n");
+          return(false);
+        }
     }
 
   if (!as_nr)
     {
-      ticker= new cl_ticker(dir, in_isr, id_str);
+      ticker= new cl_ticker(dir, type, id_str);
       uc->add_counter(ticker, id_str);
     }
   else
     {
-      ticker= new cl_ticker(dir, in_isr, 0);
+      ticker= new cl_ticker(dir, type, 0);
       uc->add_counter(ticker, id_nr);
     }
 
@@ -146,7 +160,7 @@ COMMAND_DO_WORK_UC(cl_timer_add_cmd)
 }
 
 CMDHELP(cl_timer_add_cmd,
-	"timer add id [direction [in_isr]]",
+	"timer add id [direction [isr|idle|halt]]",
 	"Create a clock counter (timer)",
 	"log help of timer add")
 
@@ -167,6 +181,11 @@ COMMAND_DO_WORK_UC(cl_timer_delete_cmd)
 	con->dd_printf("Timer \"%s\" does not exist\n", id_str.c_str());
       else
 	con->dd_printf("Timer %d does not exist\n", id_nr);
+      return(false);
+    }
+  if (!ticker->user)
+    {
+      con->dd_printf("Timer is not user and cannot be deleted\n");
       return(false);
     }
   if (!as_nr)
@@ -199,17 +218,14 @@ COMMAND_DO_WORK_UC(cl_timer_get_cmd)
   else
     ticker= 0;
   if (ticker)
-    ticker->dump(id_nr, uc->xtal, con);
+    ticker->dump(id_nr, con);
   else
     {
-      uc->ticks->dump(0, uc->xtal, con);
-      uc->isr_ticks->dump(0, uc->xtal, con);
-      uc->idle_ticks->dump(0, uc->xtal, con);
       for (id_nr= 0; id_nr < uc->counters->count; id_nr++)
 	{
 	  ticker= uc->get_counter(id_nr);
 	  if (ticker)
-	    ticker->dump(id_nr, uc->xtal, con);
+	    ticker->dump(id_nr, con);
 	}
     }
 
@@ -240,7 +256,7 @@ COMMAND_DO_WORK_UC(cl_timer_run_cmd)
 	con->dd_printf("Timer %d does not exist\n", id_nr);
       return(0);
     }
-  ticker->options|= TICK_RUN;
+  ticker->run = true;
 
   return(false);
 }
@@ -270,7 +286,7 @@ COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
 	con->dd_printf("Timer %d does not exist\n", id_nr);
       return(false);
     }
-  ticker->options&= ~TICK_RUN;
+  ticker->run = false;
 
   return(false);
 }
@@ -303,25 +319,43 @@ COMMAND_DO_WORK_UC(cl_timer_value_cmd)
 	con->dd_printf("Error: Timer %d does not exist\n", id_nr);
       return(false);
     }
-  if (cmdline->param(0) == NULL)
+  if (cmdline->nuof_params() > 0)
     {
-      con->dd_printf("Error: Value is missing\n");
-      return(false);
+      if (cmdline->syntax_match(uc, NUMBER))
+        {
+          long ticks= cmdline->param(0)->value.number;
+          ticker->set(ticks, ticks * uc->get_xtal_tick());
+        }
+      else if (cmdline->syntax_match(uc, NUMBER STRING))
+        {
+          const char *units;
+          double time = (double)cmdline->param(0)->value.number * strtoscale(cmdline->param(1)->value.string.string, &units);
+          if (units[0] != '\0' && units[0] != 's')
+            con->dd_printf("Expected units to be in seconds not \"%s\"\n", cmdline->param(1)->value.string.string);
+          else
+            ticker->set(time / uc->get_xtal_tick(), time);
+        }
+      else if (cmdline->syntax_match(uc, NUMBER NUMBER STRING))
+        {
+          const char *units;
+          double time = (double)cmdline->param(1)->value.number * strtoscale(cmdline->param(2)->value.string.string, &units);
+          if (units[0] != '\0' && units[0] != 's')
+            con->dd_printf("Expected units to be in seconds not \"%s\"\n", cmdline->param(1)->value.string.string);
+          else
+            ticker->set(cmdline->param(0)->value.number, time);
+        }
+      else
+        con->dd_printf("Error: Wrong parameters\n");
     }
-  long val;
-  if (!cmdline->param(0)->get_ivalue(&val))
-    {
-      con->dd_printf("Error: Wrong parameter\n");
-      return(false);
-    }
-  ticker->ticks= val;
+  else
+    ticker->dump(id_nr, con);
 
   return(false);
 }
 
 CMDHELP(cl_timer_value_cmd,
-	"timer set id value",
-	"Set a timer value",
+	"timer set id [ticks] [time [muµnp]sec]",
+	"Set a timer",
 	"long help of timer set")
 
 /* End of cmd.src/cmd_timer.cc */

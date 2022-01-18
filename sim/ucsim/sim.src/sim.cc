@@ -134,7 +134,7 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
       app->get_commander()->update_active();
     }
   if (uc)
-    start_tick= uc->ticks->ticks;
+    start_tick= uc->ticks->get_ticks();
   steps_done= 0;
   steps_todo= steps_to_do;
 }
@@ -145,7 +145,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
   class cl_commander_base *cmd= app->get_commander();
   class cl_option *o= app->options->get_option("quit");
   bool q_opt= false;
-  unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
+  unsigned long dt= uc?(uc->ticks->get_ticks() - start_tick):0;
 
   if (o)
     o->get_value(&q_opt);
@@ -270,10 +270,10 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	{
 	  cmd->frozen_console->dd_printf("Simulated %lu ticks (%.3e sec)\n",
 					 dt,
-					 dt*(1/uc->xtal));
+					 dt*(1/uc->get_xtal()));
 	  cmd->frozen_console->dd_printf("Host usage: %f sec, rate=%f\n",
 					 stop_at - start_at,
-					 (dt*(1/uc->xtal)) / (stop_at - start_at));
+					 (dt*(1/uc->get_xtal())) / (stop_at - start_at));
 	}
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->set_flag(CONS_FROZEN, false);

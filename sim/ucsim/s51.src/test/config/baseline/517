@@ -33,7 +33,7 @@ SP 0x07 -> 48 54 29 8a b2 d4 70 08
    DPTR5= 0xf1cb @DPTR5= 0x9b 155 .
    DPTR6= 0xbaa3 @DPTR6= 0x29  41 )
    DPTR7= 0xf5dd @DPTR7= 0x42  66 B
- ? 0x0000 00       NOP[0K
+ ? 0x0000 ff       MOV    R7,A[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

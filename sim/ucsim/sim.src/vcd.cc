@@ -646,7 +646,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
           else
             {
               event = event - starttime;
-              starttime = uc->get_rtime() + time;
+              starttime = uc->ticks->get_rtime() + time;
               event += starttime;
             }
           return;
@@ -731,9 +731,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                       if (!timescale)
                         {
                           timescale = 1e3;
-                          while (timescale * 1.0 / uc->xtal < 1.0)
+                          while (timescale * 1.0 / uc->get_xtal() < 1.0)
                             timescale *= 1000.0;
-                          if (fmod(timescale * 1.0 / uc->xtal, 1.0) > 0.0)
+                          if (fmod(timescale * 1.0 / uc->get_xtal(), 1.0) > 0.0)
                             timescale *= 1000.0;
                         }
 
@@ -802,7 +802,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     con->dd_printf("Unpaused\n");
                   if (state == -1)
                     {
-                      double now = uc->get_rtime();
+                      double now = uc->ticks->get_rtime();
                       if (!started)
                         starttime = now;
                       else if (pausetime >= 0)
@@ -829,7 +829,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     }
                   else
                     {
-                      double now = uc->get_rtime();
+                      double now = uc->ticks->get_rtime();
                       starttime = now - starttime;
                       event = now - event;
                     }
@@ -855,7 +855,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 
                   if (state == -1)
                     {
-                      event = uc->get_rtime();
+                      event = uc->ticks->get_rtime();
                       fprintf(fd, "#%.0f\n$comment Paused $end\n$dumpoff\n", (event - starttime) * timescale);
                       for (class cl_vcd_var *var = vars; var; var = var->next_var)
                         {
@@ -875,7 +875,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     }
                   else
                     {
-                      double now = uc->get_rtime();
+                      double now = uc->ticks->get_rtime();
                       starttime = now - starttime;
                       event = now - event;
                       on = false;
@@ -892,7 +892,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                   if (fd)
                     {
                       if (state == -1)
-                        fprintf(fd, "#%.0f\n", (uc->get_rtime() - starttime) * timescale);
+                        fprintf(fd, "#%.0f\n", (uc->ticks->get_rtime() - starttime) * timescale);
                       close_vcd();
                     }
                   fd= NULL;
@@ -939,7 +939,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 void
 cl_vcd::report(class cl_vcd_var *var, t_mem v)
 {
-  double now = uc->get_rtime();
+  double now = uc->ticks->get_rtime();
   if (event != now)
     {
       event = now;
@@ -967,7 +967,7 @@ cl_vcd::tick(int cycles)
   if (!fd || !started)
     return 0;
 
-  double now = uc->get_rtime();
+  double now = uc->ticks->get_rtime();
 
   if (state == -1)
     {
@@ -1120,7 +1120,7 @@ cl_vcd::print_info(class cl_console_base *con)
   con->dd_printf("  Pause time: ");
   if (pausetime >= 0)
     con->dd_printf("%.15f s", pausetime);
-  con->dd_printf("\n  Simul time: %.15f s\n", uc->get_rtime());
+  con->dd_printf("\n  Simul time: %.15f s\n", uc->ticks->get_rtime());
 
   con->dd_printf("  Variables:\n");
   con->dd_printf("    Address           Symbol\n");

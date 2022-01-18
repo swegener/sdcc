@@ -226,9 +226,10 @@ F 0x00800c
 Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
-timer #0("time") ON: 3.25e-06 sec (26 clks)
-timer #0("isr") ON,ISR: 0 sec (0 clks)
-timer #0("idle") ON,ISR: 0 sec (0 clks)
+timer #1("time") ON 0.000003250000000 sec (26 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
 dump rom 0 1
 0x00000 loc1:                18    .
 0x00001 loc2:                04    .
@@ -326,9 +327,10 @@ Controller has 24 hardware element(s).
    on tim4[4]
    on flash[0]
 timer get
-timer #0("time") ON: 4.125e-06 sec (33 clks)
-timer #0("isr") ON,ISR: 0 sec (0 clks)
-timer #0("idle") ON,ISR: 0 sec (0 clks)
+timer #1("time") ON 0.000004125000000 sec (33 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
 
 cont
 Simulation started, PC=0x00800c
@@ -357,9 +359,10 @@ F 0x00800c
 Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
-timer #0("time") ON: 4.75e-06 sec (38 clks)
-timer #0("isr") ON,ISR: 0 sec (0 clks)
-timer #0("idle") ON,ISR: 0 sec (0 clks)
+timer #1("time") ON 0.000004750000000 sec (38 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
 dump rom 0 1
 0x00000 loc1:                20     
 0x00001 loc2:                06    .

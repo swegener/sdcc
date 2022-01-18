@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef UTILS_HEADER
 #define UTILS_HEADER
 
+#include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -68,6 +69,7 @@ extern bool is_cdb_file(class cl_f *f);
 
 extern chars colopt2ansiseq(char *opt);
 
+extern double strtoscale(const char *s, const char **units = 0);
 
 #endif
 

@@ -452,7 +452,7 @@ cl_hw::draw_state_time(bool force)
 	io->dd_cprintf("ui_stop", "%s", "Stop");
       cache_run= n;
     }
-  unsigned int t= (unsigned int)(uc->get_rtime()) * 1000;
+  unsigned int t= (unsigned int)(uc->ticks->get_rtime()) * 1000;
   if ((t != cache_time) ||
       force)
     {

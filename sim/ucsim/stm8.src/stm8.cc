@@ -82,7 +82,7 @@ cl_stm8::init(void)
   cl_uc::init(); /* Memories now exist */
   sp_limit= 0x1500;
 
-  xtal = 8000000;
+  set_xtal(8000000);
 
   pipetrace_file = NULL;
   pipetrace_fd = NULL;

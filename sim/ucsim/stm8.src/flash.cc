@@ -120,7 +120,7 @@ cl_flash::tick(int cycles)
 {
   if (state & fs_busy)
     {
-      double now= uc->get_rtime();
+      double now= uc->ticks->get_rtime();
       double elapsed= (now - start_time) * 10e6;
 
       if ((state == fs_pre_erase) &&
@@ -495,7 +495,7 @@ cl_flash::start_program(enum stm8_flash_state start_state)
 {
   uc->sim->app->debug("FLASH start prg %d\n", start_state);
   state= start_state;
-  start_time= uc->get_rtime();
+  start_time= uc->ticks->get_rtime();
 }
 
 const char *

@@ -78,7 +78,7 @@ cl_rxk::init(void)
   fill_dd_wrappers(itab_dd);
   fill_ed_wrappers(itab_ed);
   
-  xtal= 1000000;
+  set_xtal(1000000);
 
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
   RCV(A);

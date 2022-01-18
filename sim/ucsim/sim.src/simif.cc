@@ -797,28 +797,28 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       break;
     case simif_xtal: // xtal frequ
       if (val)
-	uc->xtal= *val;
-      cell->set(uc->xtal);
+	uc->set_xtal(*val);
+      cell->set(uc->get_xtal());
       break;
     case simif_ticks: // tick counter
       if (val)
 	*val= cell->get();
-      cell->set(uc->ticks->ticks);
+      cell->set(uc->ticks->get_ticks());
       break;
     case simif_isr_ticks: // isr tick counter
       if (val)
 	*val= cell->get();
-      cell->set(uc->isr_ticks->ticks);
+      cell->set(uc->isr_ticks->get_ticks());
       break;
     case simif_idle_ticks: // idle tick counter
       if (val)
 	*val= cell->get();
-      cell->set(uc->idle_ticks->ticks);
+      cell->set(uc->idle_ticks->get_ticks());
       break;
     case simif_real_time: // real time in msec
       if (val)
 	*val= cell->get();
-      cell->set(uc->get_rtime() * 1000);
+      cell->set(uc->ticks->get_rtime() * 1000);
       break;
     case simif_vclk: // virtual clock
       if (val)

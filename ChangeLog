@@ -1,6 +1,11 @@
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Fix AX->XA bug in loadRegFromAop.
+
+2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Improve pusReg/PullReg.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>

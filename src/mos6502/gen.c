@@ -931,9 +931,9 @@ forceload:
       else if (IS_AOP_AX (aop))
         {
           emitComment(DDEBUG, "   * AX->XA");
-          pushReg (m6502_reg_a, false);
+          storeRegTemp (m6502_reg_a, true);
           transferRegReg (m6502_reg_x, m6502_reg_a, false);
-          pullReg (m6502_reg_x);
+          loadRegTemp (m6502_reg_x, true);
         }
       else
         {

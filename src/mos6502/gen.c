@@ -3362,7 +3362,6 @@ asmopToBool (asmop *aop, bool resultInA)
               needpulla = storeRegTempIfUsed (m6502_reg_a);
               loadRegFromAop (m6502_reg_a, aop, 0);
               loadRegTempNoFlags(m6502_reg_a,needpulla);
-              regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD) ? 2 : 3);
             }
           break;
         }
@@ -5447,11 +5446,16 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
             }
           if (size)
             {
+              symbol *tmp_label = safeNewiTempLabel (NULL);;
               if (!tlbl_NE)
                 tlbl_NE = safeNewiTempLabel (NULL);
               if (!needpulla && !ifx)
                 needpulla = pushRegIfSurv (m6502_reg_a);
-              emitBranch ("bne", tlbl_NE);
+
+              emitBranch ("beq", tmp_label);
+              emitBranch ("jmp", tlbl_NE);
+              safeEmitLabel (tmp_label);
+
               pullOrFreeReg (m6502_reg_a, needpulla);
               needpulla = false;
             }

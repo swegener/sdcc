@@ -6,6 +6,7 @@ var loc2 rom[0x0001]
 # first test loop.
 break 0x800c
 run
+clear 0x800c
 
 # Start the vcd (we set the input file via the Makefile) and
 # have it stop execution each time an event occurs.
@@ -15,9 +16,9 @@ set hw vcd break
 # The VCD data starts at time 0 which will, by default, align
 # with the current simulator time. We can adjust that by setting
 # starttime. This can be done before or after starting the vcd,
-# even part way through. Here we push the vcd 750 ns into the
+# even part way through. Here we push the vcd 5 µs into the
 # future.
-set hw vcd starttime 750 ns
+set hw vcd starttime 5 us
 
 # Make sure what it is going to do is what we asked.
 conf

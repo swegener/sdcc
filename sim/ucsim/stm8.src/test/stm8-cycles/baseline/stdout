@@ -84,12 +84,12 @@ V-IHINZC  Flags= 0x2b  43 +  A= 0x20  32
 SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x1500
 F? 0x00100 20 02          jra    0x0104[0K
 F 0x000100
-Simulated 131 ticks [ELIDED]
+Simulated 130 ticks [ELIDED]
 Host usage: [ELIDED]
 
 step
 
-Stop at 0x000104: (109) stepped 5 ticks
+Stop at 0x000104: (109) stepped 6 ticks
 V-IHINZC  Flags= 0x2b  43 +  A= 0x20  32  
 0-101011  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x1500

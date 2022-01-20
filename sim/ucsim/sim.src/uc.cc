@@ -2523,13 +2523,12 @@ cl_uc::fetch(void)
  */
 
 bool
-cl_uc::fetch(t_mem *code)
+cl_uc::do_brk(void)
 {
   class cl_brk *brk;
   int idx;
+  bool ret= false;
 
-  if (!code)
-    return(0);
   if ((sim->state & SIM_GO) &&
       rom &&
       (sim->steps_done > 0))
@@ -2540,11 +2539,22 @@ cl_uc::fetch(t_mem *code)
 	    {
 	      if (brk->perm == brkDYNAMIC)
 		fbrk->del_bp(PC);
-	      return(1);
+	      ret= true;
 	    }
     }
-  *code= fetch();
-  return(0);
+
+  return ret;
+}
+
+bool
+cl_uc::fetch(t_mem *code)
+{
+  bool ret = do_brk();
+
+  if (!ret)
+    *code= fetch();
+
+  return ret;
 }
 
 int

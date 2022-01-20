@@ -82,8 +82,6 @@ cl_stm8::init(void)
   cl_uc::init(); /* Memories now exist */
   sp_limit= 0x1500;
 
-  set_xtal(8000000);
-
   pipetrace_file = NULL;
   pipetrace_fd = NULL;
   pipetrace_fold = true;
@@ -293,8 +291,8 @@ cl_stm8::mk_hw_elements(void)
   
   if (type->type == CPU_STM8S)
     {
-      add_hw(h= new cl_clk_saf(this));
-      h->init();
+      add_hw(clk= new cl_clk_saf(this));
+      clk->init();
       if (type->subtype & (DEV_STM8S003|
 			   DEV_STM8S007|
 			   DEV_STM8S103|
@@ -329,8 +327,8 @@ cl_stm8::mk_hw_elements(void)
     }
   if (type->type == CPU_STM8L)
     {
-      add_hw(h= new cl_clk_all(this));
-      h->init();
+      add_hw(clk= new cl_clk_all(this));
+      clk->init();
       add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
       h->init();
       if (type->subtype & (DEV_STM8AL3xE|
@@ -354,8 +352,8 @@ cl_stm8::mk_hw_elements(void)
     }
   if (type->type == CPU_STM8L101)
     {
-      add_hw(h= new cl_clk_l101(this));
-      h->init();
+      add_hw(clk= new cl_clk_l101(this));
+      clk->init();
       add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
       h->init();
     }
@@ -1017,6 +1015,29 @@ cl_stm8::print_regs(class cl_console_base *con)
  * Execution
  */
 
+// There are three clocks derived from each other. f_OSC is
+// the oscillator frequency. This is then scaled down to give
+// the master clock, f_MASTER, which is the clock used to drive
+// the hardware elements. This, in turn, is further scaled down
+// to give the CPU clock, f_CPU, which is used to drive the CPU.
+// Only some variants of STM8 support both scaling factors and
+// both factors and f_OSC can be changed programmatically.
+
+int
+cl_stm8::clock_per_cycle(void)
+{
+  return clk->clock_per_cycle();
+}
+
+int
+cl_stm8::tick_hw(int cycles_cpu)
+{
+  if (state != stPD)
+    cl_uc::tick_hw(cycles_cpu * clock_per_cycle());
+
+  return 0;
+}
+
 int
 cl_stm8::tick(int cycles_cpu)
 {
@@ -1108,6 +1129,9 @@ cl_stm8::exec_inst(void)
 
   instPC= PC;
 
+  if (do_brk())
+    return(resBREAKPOINT);
+
   if (!div_cycle)
     {
       pipetrace_instr_end();
@@ -1121,8 +1145,7 @@ cl_stm8::exec_inst(void)
       pipetrace_type("D");
     }
 
-  if (fetch(&code))
-    return(resBREAKPOINT);
+  code = fetch();
 
   if (!div_cycle)
     pipeline_busy.instr = false;

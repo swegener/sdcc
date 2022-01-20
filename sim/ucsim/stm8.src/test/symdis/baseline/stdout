@@ -45,22 +45,22 @@ var UART1_SR_TC       rom[0x5230].6
 var UART1_SR_RXNE     rom[0x5230].5
 
 dump rom[0x00] 0x3d
-0x00000                      08                      .
-0x00001 uart1_tx_buf:        70 d4 b2 8a 29 54 48 9a p...)TH.
-0x00009                      0a bc d5 0e 18 a8 44 ac ......D.
-0x00011                      5b f3 8e 4c d7 2d 9b 09 [..L.-..
-0x00019                      42 e5 06 c4 33 af cd a3 B...3...
-0x00021 vuart_tx_state:      84                      .
-0x00022 vuart_tx:            7f                      .
-0x00023 vuart_rx_state:      2d                      -
-0x00024 vuart_rx:            ad                      .
-0x00025 vuart_rx_bit:        d4                      .
-0x00026 vuart_tx_buf:        76 47 de 32 1c ec 4a c4 vG.2..J.
-0x0002e                      30 f6 20 23 85 6c fb b2 0. #.l..
-0x00036 uart1_tx_w:          07 04                   ..
-0x00038 uart1_tx_r:          f4 ec                   ..
-0x0003a vuart_tx_w:          0b b9                   ..
-0x0003c vuart_tx_r:          20 ba                    .
+0x00000                       08                      .
+0x00001 uart1_tx_buf:         70 d4 b2 8a 29 54 48 9a p...)TH.
+0x00009                       0a bc d5 0e 18 a8 44 ac ......D.
+0x00011                       5b f3 8e 4c d7 2d 9b 09 [..L.-..
+0x00019                       42 e5 06 c4 33 af cd a3 B...3...
+0x00021 vuart_tx_state:       84                      .
+0x00022 vuart_tx:             7f                      .
+0x00023 vuart_rx_state:       2d                      -
+0x00024 vuart_rx:             ad                      .
+0x00025 vuart_rx_bit:         d4                      .
+0x00026 vuart_tx_buf:         76 47 de 32 1c ec 4a c4 vG.2..J.
+0x0002e                       30 f6 20 23 85 6c fb b2 0. #.l..
+0x00036 uart1_tx_w:           07 04                   ..
+0x00038 uart1_tx_r:           f4 ec                   ..
+0x0003a vuart_tx_w:           0b b9                   ..
+0x0003c vuart_tx_r:           20 ba                    .
 dc 0x8000 0x082a4 
 
    0x08000 <__interrupt_vect>:
@@ -266,9 +266,9 @@ dc 0x8000 0x082a4
  ? 0x081da 81             ret[0K
 
    0x081db <_boot>:
- ? 0x081db 35 00 50 c6    mov    0x50c6,#0x00[0K
+ ? 0x081db 35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
  ? 0x081df 35 00 50 c7    mov    0x50c7 <CLK_PCKENR1>,#0x00[0K
- ? 0x081e3 35 00 50 ca    mov    0x50ca,#0x00[0K
+ ? 0x081e3 35 00 50 ca    mov    0x50ca <CLK_PCKENR2>,#0x00[0K
  ? 0x081e7 ae 00 08       ldw    X,#0x0008[0K
  ? 0x081ea 27 07          jreq   0x81f3[0K
  ? 0x081ec 72 4f 00 35    clr    (0x0035,X)[0K

@@ -26,16 +26,16 @@ vcd[0] value change dump
 
 # For ticks (500 ns) of changing data
 set mem rom[0x100] 0
-0x00100                      00 .
+0x00100                       00 .
 tick
 set mem rom[0x100] 1
-0x00100                      01 .
+0x00100                       01 .
 tick
 set mem rom[0x100] 2
-0x00100                      02 .
+0x00100                       02 .
 tick
 set mem rom[0x100] 3
-0x00100                      03 .
+0x00100                       03 .
 tick
 
 # Now pause for 8 ticks (1000 ns).
@@ -50,9 +50,9 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000000375000000 s
+  Last event: 0.000001500000000 s
   Pause time: 
-  Simul time: 0.000000500000000 s
+  Simul time: 0.000002000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -67,35 +67,35 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000000500000000 s
+  Last event: 0.000002000000000 s
   Pause time: 
-  Simul time: 0.000000500000000 s
+  Simul time: 0.000002000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
 set mem rom[0x100] 4
-0x00100                      04 .
+0x00100                       04 .
 tick
 set mem rom[0x100] 5
-0x00100                      05 .
+0x00100                       05 .
 tick
 set mem rom[0x100] 6
-0x00100                      06 .
+0x00100                       06 .
 tick
 set mem rom[0x100] 7
-0x00100                      07 .
+0x00100                       07 .
 tick
 set mem rom[0x100] 8
-0x00100                      08 .
+0x00100                       08 .
 tick
 set mem rom[0x100] 9
-0x00100                      09 .
+0x00100                       09 .
 tick
 set mem rom[0x100] 10
-0x00100                      0a .
+0x00100                       0a .
 tick
 set mem rom[0x100] 11
-0x00100                      0b .
+0x00100                       0b .
 tick
 
 # Resume. States are updated to current values and recording resumes.
@@ -108,9 +108,9 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000000500000000 s
+  Last event: 0.000002000000000 s
   Pause time: 
-  Simul time: 0.000001500000000 s
+  Simul time: 0.000006000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -125,23 +125,23 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000001500000000 s
+  Last event: 0.000006000000000 s
   Pause time: 
-  Simul time: 0.000001500000000 s
+  Simul time: 0.000006000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
 set mem rom[0x100] 12
-0x00100                      0c .
+0x00100                       0c .
 tick
 set mem rom[0x100] 13
-0x00100                      0d .
+0x00100                       0d .
 tick
 set mem rom[0x100] 14
-0x00100                      0e .
+0x00100                       0e .
 tick
 set mem rom[0x100] 15
-0x00100                      0f .
+0x00100                       0f .
 tick
 
 # Pause again for 8 ticks (1000 ns) but this time limit the pause duration
@@ -156,9 +156,9 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000001875000000 s
+  Last event: 0.000007500000000 s
   Pause time: 
-  Simul time: 0.000002000000000 s
+  Simul time: 0.000008000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -174,9 +174,9 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000002000000000 s
+  Last event: 0.000008000000000 s
   Pause time: 0.000000300000000 s
-  Simul time: 0.000002000000000 s
+  Simul time: 0.000008000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -203,14 +203,14 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
    on tim4[4]
    on flash[0]
 set mem rom[0x100] 16
-0x00100                      10 .
+0x00100                       10 .
 tick
 conf
 ucsim version [ELIDED]
@@ -218,7 +218,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -234,14 +234,14 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
    on tim4[4]
    on flash[0]
 set mem rom[0x100] 17
-0x00100                      11 .
+0x00100                       11 .
 tick
 conf
 ucsim version [ELIDED]
@@ -249,7 +249,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-   on vcd[0]
+  off vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -265,14 +265,14 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
    on tim4[4]
    on flash[0]
 set mem rom[0x100] 18
-0x00100                      12 .
+0x00100                       12 .
 tick
 conf
 ucsim version [ELIDED]
@@ -296,14 +296,14 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
    on tim4[4]
    on flash[0]
 set mem rom[0x100] 19
-0x00100                      13 .
+0x00100                       13 .
 tick
 conf
 ucsim version [ELIDED]
@@ -327,23 +327,23 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
    on tim4[4]
    on flash[0]
 set mem rom[0x100] 20
-0x00100                      14 .
+0x00100                       14 .
 tick
 set mem rom[0x100] 21
-0x00100                      15 .
+0x00100                       15 .
 tick
 set mem rom[0x100] 22
-0x00100                      16 .
+0x00100                       16 .
 tick
 set mem rom[0x100] 23
-0x00100                      17 .
+0x00100                       17 .
 tick
 
 # Resume again. The recorded gap is limited by the pausetime. Sadly there
@@ -359,9 +359,9 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000002375000000 s
+  Last event: 0.000008500000000 s
   Pause time: 0.000000300000000 s
-  Simul time: 0.000003000000000 s
+  Simul time: 0.000012000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -375,21 +375,21 @@ vcd[0] value change dump
   File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000000625000000 s
-  Last event: 0.000003000000000 s
+  Start time: 0.000003500000000 s
+  Last event: 0.000012000000000 s
   Pause time: 0.000000300000000 s
-  Simul time: 0.000003000000000 s
+  Simul time: 0.000012000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
 set mem rom[0x100] 24
-0x00100                      18 .
+0x00100                       18 .
 tick
 set mem rom[0x100] 25
-0x00100                      19 .
+0x00100                       19 .
 tick
 set mem rom[0x100] 26
-0x00100                      1a .
+0x00100                       1a .
 tick
 
 # That's all folks!
@@ -401,10 +401,10 @@ vcd[0] value change dump
   File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000000625000000 s
-  Last event: 0.000003250000000 s
+  Start time: 0.000003500000000 s
+  Last event: 0.000013000000000 s
   Pause time: 0.000000300000000 s
-  Simul time: 0.000003375000000 s
+  Simul time: 0.000013500000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
@@ -420,8 +420,8 @@ vcd[0] value change dump
   Start time: 0.000000000000000 s
   Last event: 0.000000000000000 s
   Pause time: 0.000000300000000 s
-  Simul time: 0.000003375000000 s
+  Simul time: 0.000013500000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
-now 0.000002375000000 event 0.000002000000000 pausetime 0.000000300000000
+now 0.000008500000000 event 0.000008000000000 pausetime 0.000000300000000

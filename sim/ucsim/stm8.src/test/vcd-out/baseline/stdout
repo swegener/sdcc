@@ -62,10 +62,10 @@ vcd[0] value change dump
   File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000001000000000 s
-  Last event: 0.000001000000000 s
+  Start time: 0.000004000000000 s
+  Last event: 0.000004000000000 s
   Pause time: 
-  Simul time: 0.000001000000000 s
+  Simul time: 0.000004000000000 s
   Variables:
     Address           Symbol
     rom[0x00000].0    loc1.0
@@ -88,7 +88,7 @@ V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
-Simulated 50 ticks [ELIDED]
+Simulated 49 ticks [ELIDED]
 Host usage: [ELIDED]
 
 # Remove the probe from every second bit.

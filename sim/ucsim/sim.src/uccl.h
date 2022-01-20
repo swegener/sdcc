@@ -366,6 +366,7 @@ public:
   virtual void touch(void);
   
   // execution
+  virtual bool do_brk(void);
   virtual t_mem fetch(void);
   virtual u8_t fetch8(void) { return (u8_t)fetch(); }
   virtual i8_t fetchi8(void) { return (i8_t)fetch(); }

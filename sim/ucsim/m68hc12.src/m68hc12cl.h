@@ -45,6 +45,9 @@ typedef int (*hcwrapper_fn)(class CL12 *uc, t_mem code);
 
 /*
  * Base of M68HC12 processor
+ *
+ * uc -> m6800         -> m68hcbase   -> m68hc12
+ *       A,B,CC,X,SP      D,Y
  */
 
 class cl_m68hc12: public cl_m68hcbase
@@ -69,13 +72,19 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
+  virtual void disass_xb(t_addr *addr, chars *work, chars *comment);
   virtual int longest_inst(void) { return 6; }
 
+  virtual int exec_inst(void);
   virtual void post_inst(void);
-  virtual i16_t s8_16(u8_t op);
-  virtual t_addr naddr(void);
+  virtual i16_t s8_16(u8_t op); // sex 8->16
+  virtual t_addr naddr(t_addr *addr); // xb -> post_inc_dec,post_idx_reg
 
+  virtual u8_t xbop8();
+  
   virtual void print_regs(class cl_console_base *con);
+
+  
 };
 
 

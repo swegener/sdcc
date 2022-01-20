@@ -55,6 +55,7 @@ public:
     *flash_chip; // max 128k
   //class cl_memory *rom;
   struct t_regs regs;
+  class cl_clk *clk;
   class cl_itc *itc;
   class cl_it_src *trap_src;
   class cl_flash *flash_ctrl;
@@ -99,6 +100,8 @@ public:
   virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
 
+  virtual int clock_per_cycle(void);
+  virtual int tick_hw(int cycles_cpu);
   virtual int tick(int cycles_cpu);
   virtual int exec_inst(void);
   virtual t_mem fetch(void);

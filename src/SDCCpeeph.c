@@ -315,8 +315,17 @@ FBYNAME (labelIsReturnOnly)
   retInst = "ret";
   if (TARGET_HC08_LIKE || TARGET_MOS6502_LIKE)
     retInst = "rts";
-  if (strcmp(p, retInst) == 0)
+
+  if (strncmp(p, retInst,strlen(retInst)) != 0)
+    return FALSE;
+
+  p+=strlen(retInst);
+  while(*p && ISCHARSPACE(*p))
+    p++;
+
+  if(*p==0 || *p==';')
     return TRUE;
+
   return FALSE;
 }
 
@@ -764,7 +773,7 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
         return global_not_volatile;
       if (strstr (var, "(iy"))
         return global_not_volatile;
-      // am83-specific ldh can be volatile
+      // sm83-specific ldh can be volatile
       // but HRAM doesn't have to be volatile
       if (TARGET_ID_SM83 && strstr (var, "(c)"))
         return global_not_volatile;
@@ -2847,6 +2856,8 @@ matchLine (char *s, const char *d, hTab ** vars)
       /* skip white space in both */
       while (ISCHARSPACE(*s))
           s++;
+      if(*s==';') break;
+      
       while (ISCHARSPACE(*d))
           d++;
 
@@ -2871,20 +2882,9 @@ matchLine (char *s, const char *d, hTab ** vars)
           while (ISCHARDIGIT (*d))
             d++;
         }
-      else if (ISCHARSPACE (*s) && ISCHARSPACE (*d)) /* whitespace sequences match any whitespace sequences */
-        {
-          while (ISCHARSPACE (*s))
-            s++;
-          while (ISCHARSPACE (*d))
-            d++;
-        }
-      else if (*s == ',' && *d == ',') /* Allow comman to match comma followed by whitespace */
+      else if (*s == ',' && *d == ',') /* Allow comma to match comma followed by whitespace */
         {
           s++, d++;
-          while (ISCHARSPACE (*s))
-            s++;
-          while (ISCHARSPACE (*d))
-            d++;
         }
       else if (*s && *d) /* they should be an exact match otherwise */
         {
@@ -2897,6 +2897,11 @@ matchLine (char *s, const char *d, hTab ** vars)
   if (*s)
     while (ISCHARSPACE (*s))
       s++;
+
+  /* skip trailing comments as well*/
+  if(*s==';')
+   while (*s)
+     s++;
 
   if (*d)
     while (ISCHARSPACE (*d))

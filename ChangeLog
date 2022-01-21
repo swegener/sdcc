@@ -1,5 +1,10 @@
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/main.c:
+      Cleanup m6502opcodedata.
+
+2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/SDCCpeeph.c:
       Allow peephole rules to match asm lines with comments.
 

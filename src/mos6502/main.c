@@ -384,9 +384,7 @@ m6502opcodedata;
 #define M6502OP_INH 3
 #define M6502OP_JMP 4
 #define M6502OP_BR 5
-//#define M6502OP_BTB 6
-//#define M6502OP_BSC 7
-//#define M6502OP_CBEQ 9
+#define M6502OP_BBR 6
 
 /* These must be kept sorted by opcode name */
 static m6502opcodedata m6502opcodeDataTable[] =
@@ -395,61 +393,31 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"adc",   M6502OP_STD},
     {"and",   M6502OP_STD},
     {"asl",   M6502OP_RMW},
-    //    {"asla",  M6502OP_INH},
-    //    {"asr",   M6502OP_RMW},
-    //    {"asra",  M6502OP_INH},
-    //    {"asrx",  M6502OP_INH},
+    {"bbr",   M6502OP_BBR,}, // Rockwell and WDC only
+    {"bbs",   M6502OP_BBR,}, // Rockwell and WDC only
     {"bcc",   M6502OP_BR,},
-    //    {"bclr",  M6502OP_BSC},
     {"bcs",   M6502OP_BR},
     {"beq",   M6502OP_BR},
-    //    {"bge",   M6502OP_BR},
-    //    {"bgt",   M6502OP_BR},
-    //    {"bhcc",  M6502OP_BR},
-    //    {"bhcs",  M6502OP_BR},
-    //    {"bhi",   M6502OP_BR},
-    //    {"bhs",   M6502OP_BR},
-    //    {"bih",   M6502OP_BR},
-    //    {"bil",   M6502OP_BR},
     {"bit",   M6502OP_STD},
-    //    {"ble",   M6502OP_BR},
-    //    {"blo",   M6502OP_BR},
-    //    {"bls",   M6502OP_BR},
-    //    {"blt",   M6502OP_BR},
-    //    {"bmc",   M6502OP_BR},
     {"bmi",   M6502OP_BR},
-    //    {"bms",   M6502OP_BR},
     {"bne",   M6502OP_BR},
     {"bpl",   M6502OP_BR},
     {"brk",   M6502OP_INH},
     {"bvc",   M6502OP_BR},
     {"bvs",   M6502OP_BR},
-    {"bra",   M6502OP_BR},
-    //    {"brclr", M6502OP_BTB},
-    //    {"brn",   M6502OP_BR},
-    //    {"brset", M6502OP_BTB},
-    //    {"bset",  M6502OP_BSC},
-    //    {"bsr",   M6502OP_BR},
+    {"bra",   M6502OP_BR}, // 65C02 only
     {"clc",   M6502OP_INH},
     {"cld",   M6502OP_INH},
     {"cli",   M6502OP_INH},
     {"clv",   M6502OP_INH},
     {"cmp",   M6502OP_STD},
-    //    {"com",   M6502OP_RMW},
-    //    {"coma",  M6502OP_INH},
-    //    {"comx",  M6502OP_INH},
     {"cpx",   M6502OP_STD},
     {"cpy",   M6502OP_STD},
-    //    {"dbnza", M6502OP_BR},
-    //    {"dbnzx", M6502OP_BR},
     {"dec",   M6502OP_RMW},
-    //    {"deca",  M6502OP_INH},
     {"dex",   M6502OP_INH},
     {"dey",   M6502OP_INH},
-    //    {"div",   M6502OP_INH},
     {"eor",   M6502OP_STD},
     {"inc",   M6502OP_RMW},
-    //    {"inca",  M6502OP_INH},
     {"inx",   M6502OP_INH},
     {"iny",   M6502OP_INH},
     {"jmp",   M6502OP_JMP},
@@ -457,51 +425,41 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"lda",   M6502OP_STD},
     {"ldx",   M6502OP_STD},
     {"ldy",   M6502OP_STD},
-    //    {"lsl",   M6502OP_RMW},
-    //    {"lsla",  M6502OP_INH},
     {"lsr",   M6502OP_RMW},
-    //    {"lsra",  M6502OP_INH},
-    //    {"neg",   M6502OP_RMW},
-    //    {"nega",  M6502OP_INH},
     {"nop",   M6502OP_INH},
-    //    {"nsa",   M6502OP_INH},
     {"ora",   M6502OP_STD},
     {"pha",   M6502OP_INH},
     {"php",   M6502OP_INH},
-    {"phy",   M6502OP_INH},
-    {"phx",   M6502OP_INH},
+    {"phy",   M6502OP_INH}, // 65C02 only
+    {"phx",   M6502OP_INH}, // 65C02 only
     {"pla",   M6502OP_INH},
     {"plp",   M6502OP_INH},
-    {"ply",   M6502OP_INH},
-    {"plx",   M6502OP_INH},
+    {"ply",   M6502OP_INH}, // 65C02 only
+    {"plx",   M6502OP_INH}, // 65C02 only
+    {"rmb",   M6502OP_STD}, // Rockwell and WDC only
     {"rol",   M6502OP_RMW},
-    //    {"rola",  M6502OP_INH},
     {"ror",   M6502OP_RMW},
-    //    {"rora",  M6502OP_INH},
-    //    {"rsp",   M6502OP_INH},
     {"rti",   M6502OP_INH},
     {"rts",   M6502OP_INH},
     {"sbc",   M6502OP_STD},
     {"sec",   M6502OP_INH},
     {"sed",   M6502OP_INH},
     {"sei",   M6502OP_INH},
+    {"smb",   M6502OP_STD}, // Rockwell and WDC only
     {"sta",   M6502OP_STD},
+    {"stp",   M6502OP_INH}, // WDC only
     {"stx",   M6502OP_STD},
     {"sty",   M6502OP_STD},
-    {"stz",   M6502OP_STD},
-    //    {"swi",   M6502OP_INH},
-    //    {"tap",   M6502OP_INH},
+    {"stz",   M6502OP_STD}, // 65C02 only
     {"tax",   M6502OP_INH},
     {"tay",   M6502OP_INH},
-    //    {"tpa",   M6502OP_INH},
-    //    {"tst",   M6502OP_RMW},
-    //    {"tsta",  M6502OP_INH},
-    //    {"tstx",  M6502OP_INH},
+    {"trb",   M6502OP_STD}, // 65C02 only
+    {"tsb",   M6502OP_STD}, // 65C02 only
     {"tsx",   M6502OP_INH},
     {"txa",   M6502OP_INH},
     {"txs",   M6502OP_INH},
     {"tya",   M6502OP_INH},
-    //    {"wait",  M6502OP_INH}
+    {"wai",   M6502OP_INH}  // WDC only
   };
 
 static int
@@ -537,11 +495,12 @@ m6502_instructionSize(const char *inst, const char *op1, const char *op2)
       case M6502OP_INH: /* Inherent addressing mode */
         return 1;
         
-	//      case M6502OP_BSC: /* Bit set/clear direct addressing mode */
       case M6502OP_BR:  /* Branch (1 byte signed offset) */
-	//      case M6502OP_IM1: /* 1 byte immediate addressing mode */
         return 2;
         
+      case M6502OP_BBR:  /* Branch on bit (1 byte signed offset) */
+        return 3;
+
       case M6502OP_RMW: /* read/modify/write instructions */
         if (!strcmp(op1, "a"))  /* accumulator */
           return 1;

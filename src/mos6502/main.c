@@ -504,17 +504,22 @@ m6502_instructionSize(const char *inst, const char *op1, const char *op2)
       case M6502OP_RMW: /* read/modify/write instructions */
         if (!strcmp(op1, "a"))  /* accumulator */
           return 1;
-	// FIXME: detect zero page
+     	if (op1[0] == '*') /* Zero page */
+    	  return 2;
         return 3;  /* absolute */
-	
+        
       case M6502OP_STD: /* standard instruction */
-	if (op1[0] == '#') /* Immediate addressing mode */
-	  return 2;
-	//        FIXME: detect zero page  /* Direct addressing mode */
-	//              return 2;
+        if (op1[0] == '#') /* Immediate addressing mode */
+	      return 2;
+        if (op1[0] == '*') /* Zero page */
+	      return 2;
+        if (op1[0] == '[') /* indirect */
+          return 2;
 	return 3; /* Otherwise, must be extended addressing mode */
+	    
       case M6502OP_JMP:
         return 3;
+
       default:
       //   assert(0);
         return 3;

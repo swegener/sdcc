@@ -549,14 +549,21 @@ m6502_asmLineNodeFromLineNode (lineNode *ln)
     }
   *op = '\0';
 
-  if (*p == ';' || *p == ':' || *p == '=')
+  if (*p == ':' || *p == '=')
     return aln;
 
   while (*p && isspace(*p)) p++;
   if (*p == '=')
     return aln;
 
-  for (op = op1, opsize=1; *p && *p != ','; p++)
+  if(*p==';') {
+    op1[0]=0;
+    op2[0]=0;
+    aln->size = m6502_instructionSize(inst, op1, op2);
+    return aln;
+  }
+
+  for (op = op1, opsize=1; *p && *p != ',' && *p != ';'; p++)
     {
       if (!isspace(*p) && opsize < sizeof(op1))
         *op++ = tolower(*p), opsize++;
@@ -564,7 +571,14 @@ m6502_asmLineNodeFromLineNode (lineNode *ln)
   *op = '\0';
 
   if (*p == ',') p++;
-  for (op = op2, opsize=1; *p && *p != ','; p++)
+  if (*p == ';') {
+    op2[0]=0;
+    aln->size = m6502_instructionSize(inst, op1, op2);
+    return aln;
+  }
+
+  
+  for (op = op2, opsize=1; *p && *p != ',' && *p != ';' ; p++)
     {
       if (!isspace(*p) && opsize < sizeof(op2))
         *op++ = tolower(*p), opsize++;

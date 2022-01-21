@@ -1,5 +1,10 @@
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/gen.c:
+      Add instruction cost as asm comments.
+
+2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/main.c:
       Correctly compute instruction distance when asm lines contain comments.
 

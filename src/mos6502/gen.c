@@ -8,7 +8,7 @@
   Copyright (C) 2003, Erik Petrich
   Hacked for the MOS6502:
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
-  Copyright (C) 2021, Gabriele Gorla
+  Copyright (C) 2021-2022, Gabriele Gorla
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -133,7 +133,7 @@ emitComment (enum debug_level level, const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  if (level==ALWAYS || (options.verboseAsm && level<DLEV) )
+  if (level==ALWAYS || (options.verboseAsm && level<=DLEV) )
       va_emitcode (";", fmt, ap);
   va_end (ap);
 }
@@ -144,6 +144,7 @@ emitComment (enum debug_level level, const char *fmt, ...)
 void
 emit6502op (const char *inst, const char *fmt, ...)
 {
+  static char verboseFmt[512];
   va_list ap;
   int isize = 0;
 
@@ -176,10 +177,12 @@ emit6502op (const char *inst, const char *fmt, ...)
   regalloc_dry_run_cost += isize;
 
   va_start (ap, fmt);
-  va_emitcode (inst, fmt, ap);
+  snprintf(verboseFmt, 512, "%s \t; cost=%d", fmt, isize);
+  if (options.verboseAsm)
+    va_emitcode (inst, verboseFmt, ap);
+  else
+    va_emitcode (inst, fmt, ap);
   va_end (ap);
-
-  emitComment (DDEBUG,"  isize=%d", isize);
 }
 
 static void

@@ -371,101 +371,140 @@ newAsmLineNode (void)
   return aln;
 }
 
-typedef struct m6502opcodedata
-  {
-    char name[6];
-    char adrmode;
-    /* info for registers used and/or modified by an instruction will be added here */
-  }
-m6502opcodedata;
-
-#define M6502OP_STD 1
-#define M6502OP_RMW 2
-#define M6502OP_INH 3
-#define M6502OP_JMP 4
-#define M6502OP_BR 5
-#define M6502OP_BBR 6
-
 /* These must be kept sorted by opcode name */
 static m6502opcodedata m6502opcodeDataTable[] =
   {
-    {".db",   M6502OP_INH}, /* used by the code generator only in the jump table */
-    {"adc",   M6502OP_STD},
-    {"and",   M6502OP_STD},
-    {"asl",   M6502OP_RMW},
-    {"bbr",   M6502OP_BBR,}, // Rockwell and WDC only
-    {"bbs",   M6502OP_BBR,}, // Rockwell and WDC only
-    {"bcc",   M6502OP_BR,},
-    {"bcs",   M6502OP_BR},
-    {"beq",   M6502OP_BR},
-    {"bit",   M6502OP_STD},
-    {"bmi",   M6502OP_BR},
-    {"bne",   M6502OP_BR},
-    {"bpl",   M6502OP_BR},
-    {"brk",   M6502OP_INH},
-    {"bvc",   M6502OP_BR},
-    {"bvs",   M6502OP_BR},
-    {"bra",   M6502OP_BR}, // 65C02 only
-    {"clc",   M6502OP_INH},
-    {"cld",   M6502OP_INH},
-    {"cli",   M6502OP_INH},
-    {"clv",   M6502OP_INH},
-    {"cmp",   M6502OP_STD},
-    {"cpx",   M6502OP_STD},
-    {"cpy",   M6502OP_STD},
-    {"dec",   M6502OP_RMW},
-    {"dex",   M6502OP_INH},
-    {"dey",   M6502OP_INH},
-    {"eor",   M6502OP_STD},
-    {"inc",   M6502OP_RMW},
-    {"inx",   M6502OP_INH},
-    {"iny",   M6502OP_INH},
-    {"jmp",   M6502OP_JMP},
-    {"jsr",   M6502OP_JMP},
-    {"lda",   M6502OP_STD},
-    {"ldx",   M6502OP_STD},
-    {"ldy",   M6502OP_STD},
-    {"lsr",   M6502OP_RMW},
-    {"nop",   M6502OP_INH},
-    {"ora",   M6502OP_STD},
-    {"pha",   M6502OP_INH},
-    {"php",   M6502OP_INH},
-    {"phy",   M6502OP_INH}, // 65C02 only
-    {"phx",   M6502OP_INH}, // 65C02 only
-    {"pla",   M6502OP_INH},
-    {"plp",   M6502OP_INH},
-    {"ply",   M6502OP_INH}, // 65C02 only
-    {"plx",   M6502OP_INH}, // 65C02 only
-    {"rmb",   M6502OP_STD}, // Rockwell and WDC only
-    {"rol",   M6502OP_RMW},
-    {"ror",   M6502OP_RMW},
-    {"rti",   M6502OP_INH},
-    {"rts",   M6502OP_INH},
-    {"sbc",   M6502OP_STD},
-    {"sec",   M6502OP_INH},
-    {"sed",   M6502OP_INH},
-    {"sei",   M6502OP_INH},
-    {"smb",   M6502OP_STD}, // Rockwell and WDC only
-    {"sta",   M6502OP_STD},
-    {"stp",   M6502OP_INH}, // WDC only
-    {"stx",   M6502OP_STD},
-    {"sty",   M6502OP_STD},
-    {"stz",   M6502OP_STD}, // 65C02 only
-    {"tax",   M6502OP_INH},
-    {"tay",   M6502OP_INH},
-    {"trb",   M6502OP_STD}, // 65C02 only
-    {"tsb",   M6502OP_STD}, // 65C02 only
-    {"tsx",   M6502OP_INH},
-    {"txa",   M6502OP_INH},
-    {"txs",   M6502OP_INH},
-    {"tya",   M6502OP_INH},
-    {"wai",   M6502OP_INH}  // WDC only
+    {".db",   M6502OP_INH, 0,     0 }, /* used by the code generator only in the jump table */
+    {"adc",   M6502OP_REG, A_IDX, 0xc3 },
+    {"and",   M6502OP_REG, A_IDX, 0x82 },
+    {"asl",   M6502OP_RMW, 0,     0x83 },
+    {"bbr",   M6502OP_BBR, 0,     0 }, // Rockwell and WDC only
+    {"bbs",   M6502OP_BBR, 0,     0 }, // Rockwell and WDC only
+    {"bcc",   M6502OP_BR,  0,     0 },
+    {"bcs",   M6502OP_BR,  0,     0 },
+    {"beq",   M6502OP_BR,  0,     0 },
+    {"bit",   M6502OP_REG, 0,     0xc2 },
+    {"bmi",   M6502OP_BR,  0,     0 },
+    {"bne",   M6502OP_BR,  0,     0 },
+    {"bpl",   M6502OP_BR,  0,     0 },
+    {"brk",   M6502OP_INH, 0,     0 },
+    {"bvc",   M6502OP_BR,  0,     0 },
+    {"bvs",   M6502OP_BR,  0,     0 },
+    {"bra",   M6502OP_BR,  0,     0 }, // 65C02 only
+    {"clc",   M6502OP_INH, 0,     0x01 },
+    {"cld",   M6502OP_INH, 0,     0x80 },
+    {"cli",   M6502OP_INH, 0,     0x04 },
+    {"clv",   M6502OP_INH, 0,     0x40 },
+    {"cmp",   M6502OP_REG, 0,     0xc3 },
+    {"cpx",   M6502OP_REG, 0,     0xc3 },
+    {"cpy",   M6502OP_REG, 0,     0xc3 },
+    {"dec",   M6502OP_RMW, 0,     0x82 },
+    {"dex",   M6502OP_IDD, X_IDX, 0x82 },
+    {"dey",   M6502OP_IDD, Y_IDX, 0x82 },
+    {"eor",   M6502OP_REG, A_IDX, 0x82 },
+    {"inc",   M6502OP_RMW, 0,     0x82 },
+    {"inx",   M6502OP_IDI, X_IDX, 0x82 },
+    {"iny",   M6502OP_IDI, Y_IDX, 0x82 },
+    {"jmp",   M6502OP_JMP, 0,     0 },
+    {"jsr",   M6502OP_JMP, 0,     0 },
+    {"lda",   M6502OP_LD , A_IDX, 0x82 },
+    {"ldx",   M6502OP_LD , X_IDX, 0x82 },
+    {"ldy",   M6502OP_LD , Y_IDX, 0x82 },
+    {"lsr",   M6502OP_RMW, 0,     0x83 },
+    {"nop",   M6502OP_INH, 0,     0 },
+    {"ora",   M6502OP_REG, A_IDX, 0x82 },
+    {"pha",   M6502OP_SPH, 0,     0 },
+    {"php",   M6502OP_SPH, 0,     0 },
+    {"phy",   M6502OP_SPH, 0,     0 }, // 65C02 only
+    {"phx",   M6502OP_SPH, 0,     0 }, // 65C02 only
+    {"pla",   M6502OP_SPL, A_IDX, 0x82 },
+    {"plp",   M6502OP_SPL, 0,     0xdf },
+    {"ply",   M6502OP_SPL, Y_IDX, 0x82 }, // 65C02 only
+    {"plx",   M6502OP_SPL, X_IDX, 0x82 }, // 65C02 only
+    {"rmb",   M6502OP_REG, 0,     0 }, // Rockwell and WDC only
+    {"rol",   M6502OP_RMW, 0,     0x83 },
+    {"ror",   M6502OP_RMW, 0,     0x83 },
+    {"rti",   M6502OP_INH, 0,     0xdf },
+    {"rts",   M6502OP_INH, 0,     0 },
+    {"sbc",   M6502OP_REG, A_IDX, 0xc3 },
+    {"sec",   M6502OP_INH, 0,     0x01 },
+    {"sed",   M6502OP_INH, 0,     0x08 },
+    {"sei",   M6502OP_INH, 0,     0x04 },
+    {"smb",   M6502OP_REG, 0,     0 }, // Rockwell and WDC only
+    {"sta",   M6502OP_ST , 0,     0 },
+    {"stp",   M6502OP_INH, 0,     0 }, // WDC only
+    {"stx",   M6502OP_ST , 0,     0 },
+    {"sty",   M6502OP_ST , 0,     0 },
+    {"stz",   M6502OP_ST , 0,     0 }, // 65C02 only
+    {"tax",   M6502OP_INH, X_IDX, 0x82 },
+    {"tay",   M6502OP_INH, Y_IDX, 0x82 },
+    {"trb",   M6502OP_REG, 0,     0 }, // 65C02 only
+    {"tsb",   M6502OP_REG, 0,     0 }, // 65C02 only
+    {"tsx",   M6502OP_INH, X_IDX, 0x82 },
+    {"txa",   M6502OP_INH, A_IDX, 0x82 },
+    {"txs",   M6502OP_INH, 0,     0 },
+    {"tya",   M6502OP_INH, A_IDX, 0x82 },
+    {"wai",   M6502OP_INH, 0,     0 }  // WDC only
   };
 
 static int
 m6502_opcodeCompare (const void *key, const void *member)
 {
   return strcmp((const char *)key, ((m6502opcodedata *)member)->name);
+}
+
+
+const m6502opcodedata *m6502_getOpcodeData(const char *inst)
+{
+  
+  return   bsearch (inst, m6502opcodeDataTable,
+                    sizeof(m6502opcodeDataTable)/sizeof(m6502opcodedata),
+                    sizeof(m6502opcodedata), m6502_opcodeCompare);
+}
+
+int
+m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
+{
+  switch (opcode->type)
+    {
+      case M6502OP_INH: /* Inherent addressing mode */
+      case M6502OP_SPH:
+      case M6502OP_SPL:
+      case M6502OP_IDD:
+      case M6502OP_IDI:
+        return 1;
+        
+      case M6502OP_BR:  /* Branch (1 byte signed offset) */
+        return 2;
+        
+      case M6502OP_BBR:  /* Branch on bit (1 byte signed offset) */
+        return 3;
+
+      case M6502OP_RMW: /* read/modify/write instructions */
+        if (!strcmp(arg, "a"))  /* accumulator */
+          return 1;
+     	if (arg[0] == '*') /* Zero page */
+    	  return 2;
+        return 3;  /* absolute */
+        
+      case M6502OP_REG: /* standard instruction */
+      case M6502OP_LD:
+      case M6502OP_ST:
+        if (arg[0] == '#') /* Immediate addressing mode */
+	      return 2;
+        if (arg[0] == '*') /* Zero page */
+	      return 2;
+        if (arg[0] == '[') /* indirect */
+          return 2;
+	return 3; /* Otherwise, must be extended addressing mode */
+	    
+      case M6502OP_JMP:
+        return 3;
+
+      default:
+         werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "unknown instruction type in m6502_opcodeSize");
+         return 3;
+    }
 }
 
 /*--------------------------------------------------------------------*/
@@ -477,53 +516,14 @@ m6502_opcodeCompare (const void *key, const void *member)
 static int
 m6502_instructionSize(const char *inst, const char *op1, const char *op2)
 {
-  m6502opcodedata *opcode;
-  //  int size;
-  //  long offset;
-  //  char * endnum = NULL;
-  
-  opcode = bsearch (inst, m6502opcodeDataTable,
-                    sizeof(m6502opcodeDataTable)/sizeof(m6502opcodedata),
-                    sizeof(m6502opcodedata), m6502_opcodeCompare);
+  const m6502opcodedata *opcode = m6502_getOpcodeData(inst);
 
   if (!opcode)
     return 999;
 
   //  printf("op: %s - %s - %s\n",inst,op1, op2);
-  switch (opcode->adrmode)
-    {
-      case M6502OP_INH: /* Inherent addressing mode */
-        return 1;
-        
-      case M6502OP_BR:  /* Branch (1 byte signed offset) */
-        return 2;
-        
-      case M6502OP_BBR:  /* Branch on bit (1 byte signed offset) */
-        return 3;
 
-      case M6502OP_RMW: /* read/modify/write instructions */
-        if (!strcmp(op1, "a"))  /* accumulator */
-          return 1;
-     	if (op1[0] == '*') /* Zero page */
-    	  return 2;
-        return 3;  /* absolute */
-        
-      case M6502OP_STD: /* standard instruction */
-        if (op1[0] == '#') /* Immediate addressing mode */
-	      return 2;
-        if (op1[0] == '*') /* Zero page */
-	      return 2;
-        if (op1[0] == '[') /* indirect */
-          return 2;
-	return 3; /* Otherwise, must be extended addressing mode */
-	    
-      case M6502OP_JMP:
-        return 3;
-
-      default:
-      //   assert(0);
-        return 3;
-    }
+  return m6502_opcodeSize(opcode, op1);
 }
 
 

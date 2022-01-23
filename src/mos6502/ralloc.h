@@ -70,6 +70,30 @@ typedef struct reg_info
   }
 reg_info;
 
+#define M6502OP_REG 1
+#define M6502OP_LD  2
+#define M6502OP_ST  3
+#define M6502OP_RMW 4
+#define M6502OP_INH 5
+#define M6502OP_SPH 6
+#define M6502OP_SPL 7
+#define M6502OP_JMP 8
+#define M6502OP_BR  9
+#define M6502OP_BBR 10
+#define M6502OP_IDD 11
+#define M6502OP_IDI 12
+
+/* opcode table */
+typedef struct m6502opcodedata
+  {
+    char name[6];
+    char type;
+    int  dest;
+    unsigned char flags;
+    /* info for registers used and/or modified by an instruction will be added here */
+  }
+m6502opcodedata;
+
 extern reg_info regsm6502[];
 extern reg_info *m6502_reg_a;
 extern reg_info *m6502_reg_x;
@@ -85,5 +109,8 @@ void m6502_dirtyReg (reg_info * reg, bool freereg);
 bitVect *m6502_rUmaskForOp (operand * op);
 
 iCode *m6502_ralloc2_cc(ebbIndex *ebbi);
+
+const m6502opcodedata *m6502_getOpcodeData(const char *inst);
+int m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg);
 
 #endif

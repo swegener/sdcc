@@ -1,4 +1,11 @@
-2022-01-21 Gabriele Gorla <gorlik@yahoo.com>
+2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c,
+      sdcc/src/mos6502/ralloc.c,
+      sdcc/src/mos6502/ralloc.h:
+      Update opcode table and unified opcode size code.
+
+2022-01-22 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
       Use code gen functions instead of raw assembly when possible.

@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
    P89LPC925.h - Register Declarations for NXP  P89LPC924 and P89LPC925
-   (Based on datasheet Rev. 03 — 15 December 2004)
+   (Based on datasheet Rev. 03 - 15 December 2004)
 
    Copyright (C) 2007, Jesus Calvino-Fraga / jesusc at ece.ubc.ca
 

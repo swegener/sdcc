@@ -20,7 +20,7 @@ Copyright (c) 2005 Omar Espinosa--e-mail: opiedrahita2003 AT yahoo.com.
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-(Spanish-Español)
+(Spanish)
 Archivo encabezador para el ucontrolador Philips P89LPC932.
 Derechos de copy (DC) 2005.  OMAR ESPINOSA P.  E-mail: opiedrahita2003 AT yahoo.com
 Uso libre
@@ -179,7 +179,7 @@ __sbit __at (0xAA)    IEN0_2;
 __sbit __at (0xA9)    IEN0_1;
 __sbit __at (0xA8)    IEN0_0;
 
-#define  EA	IEN0_7
+#define  EA     IEN0_7
 #define  EWDRT  IEN0_6
 #define  EBO    IEN0_5
 #define  ES     IEN0_4  // alternatively "ESR"

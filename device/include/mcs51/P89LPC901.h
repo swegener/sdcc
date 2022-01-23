@@ -20,7 +20,7 @@ Copyright (c) 2005 Omar Espinosa--e-mail: opiedrahita2003 AT yahoo.com.
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-(Spanish-Español)
+(Spanish)
 Archivo encabezador para el ucontrolador Philips P89LPC901.
 Derechos de copy (DC) 2005.  OMAR ESPINOSA P.  E-mail: opiedrahita2003 AT yahoo.com
 Uso libre

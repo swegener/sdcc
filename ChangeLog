@@ -1,5 +1,18 @@
 2022-01-23 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* device/include/mcs51/P89LPC901.h,
+	  device/include/mcs51/P89LPC922.h,
+	  device/include/mcs51/P89LPC925.h,
+	  device/include/mcs51/P89LPC932.h,
+	  device/include/mcs51/P89c51RD2.h,
+	  device/include/mcs51/cc1110.h,
+	  device/include/mcs51/cc2430.h,
+	  device/include/mcs51/cc2530.h,
+	  device/include/mcs51/uPSD33xx.h:
+	  Fix bug #3300, namely encoding issues in various headers.
+
+2022-01-23 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* src/SDCCmain.c:
 	  Implement CLI option --include.
 

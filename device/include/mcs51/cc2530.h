@@ -343,16 +343,16 @@ SFRX(USBFRML,    0x620C); // Current Frame Number (Low Byte)
 SFRX(USBFRMH,    0x620D); // Current Frame Number (High Byte)
 SFRX(USBINDEX,   0x620E); // Current-Endpoint Index Register
 SFRX(USBCTRL,    0x620F); // USB Control Register
-SFRX(USBMAXI,    0x6210); // Max. Packet Size for IN Endpoint{1–5}
+SFRX(USBMAXI,    0x6210); // Max. Packet Size for IN Endpoint{1-5}
 SFRX(USBCS0,     0x6211); // EP0 Control and Status (USBINDEX = 0)
-SFRX(USBCSIL,    0x6211); // IN EP{1–5} Control and Status, Low
-SFRX(USBCSIH,    0x6212); // IN EP{1–5} Control and Status, High
-SFRX(USBMAXO,    0x6213); // Max. Packet Size for OUT EP{1–5}
-SFRX(USBCSOL,    0x6214); // OUT EP{1–5} Control and Status, Low
-SFRX(USBCSOH,    0x6215); // OUT EP{1–5} Control and Status, High
+SFRX(USBCSIL,    0x6211); // IN EP{1-5} Control and Status, Low
+SFRX(USBCSIH,    0x6212); // IN EP{1-5} Control and Status, High
+SFRX(USBMAXO,    0x6213); // Max. Packet Size for OUT EP{1-5}
+SFRX(USBCSOL,    0x6214); // OUT EP{1-5} Control and Status, Low
+SFRX(USBCSOH,    0x6215); // OUT EP{1-5} Control and Status, High
 SFRX(USBCNT0,    0x6216); // Number of Received Bytes in EP0 FIFO (USBINDEX = 0)
-SFRX(USBCNTL,    0x6216); // Number of Bytes in EP{1–5} OUT FIFO, Low
-SFRX(USBCNTH,    0x6217); // Number of Bytes in EP{1–5} OUT FIFO, High
+SFRX(USBCNTL,    0x6216); // Number of Bytes in EP{1-5} OUT FIFO, Low
+SFRX(USBCNTH,    0x6217); // Number of Bytes in EP{1-5} OUT FIFO, High
 SFRX(USBF0,      0x6220); // Endpoint-0 FIFO
 SFRX(USBF1,      0x6222); // Endpoint-1 FIFO
 SFRX(USBF2,      0x6224); // Endpoint-2 FIFO

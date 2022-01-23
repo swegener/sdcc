@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -473,11 +473,11 @@ SFR(B, 0xF0); // B Register
 SFRX(PSD_DATAIN_A,    PSD_CSIOP+0x00);   // MCU I/O Mode Port A Data In Register
                                          //   reads 0 if pin is log.0, 1 if pin is log. 1
                                          //   READ only
-SFRX(PSD_DATAOUT_A,   PSD_CSIOP+0x04);   // MCU I/O Mode Port A Data Out Register 
-                                         //   write 0 to set pin to log. 0, 1 to set pin to log. 1 
+SFRX(PSD_DATAOUT_A,   PSD_CSIOP+0x04);   // MCU I/O Mode Port A Data Out Register
+                                         //   write 0 to set pin to log. 0, 1 to set pin to log. 1
                                          //   read back written value
                                          //   reset default = 00
-SFRX(PSD_DIRECTION_A, PSD_CSIOP+0x06);   // MCU I/O Mode Port A Direction Register 
+SFRX(PSD_DIRECTION_A, PSD_CSIOP+0x06);   // MCU I/O Mode Port A Direction Register
                                          //   write 1 to set pin as output, 0 to set pin as input
                                          //   read back written value
                                          //   reset default = 00
@@ -490,13 +490,13 @@ SFRX(PSD_CONTROL_A,   PSD_CSIOP+0x02);   // Selects MCU I/O or Latched Address O
                                          //   read back written value
                                          //   reset default = 00
 SFRX(PSD_OUTENABLE_A, PSD_CSIOP+0x0C);   // Read state of Output Enable Logic on each I/O port driver of Port A
-                                         //   1 - driver output is enabled, 0 - driver is off (high impedance)  
+                                         //   1 - driver output is enabled, 0 - driver is off (high impedance)
                                          //   READ only
 
                                          // -- for comment on individual registers, see above Port A
 SFRX(PSD_DATAIN_B,    PSD_CSIOP+0x01);   // MCU I/O Mode Port B Data In Register
-SFRX(PSD_DATAOUT_B,   PSD_CSIOP+0x05);   // MCU I/O Mode Port B Data Out Register 
-SFRX(PSD_DIRECTION_B, PSD_CSIOP+0x07);   // MCU I/O Mode Port B Direction Register 
+SFRX(PSD_DATAOUT_B,   PSD_CSIOP+0x05);   // MCU I/O Mode Port B Data Out Register
+SFRX(PSD_DIRECTION_B, PSD_CSIOP+0x07);   // MCU I/O Mode Port B Direction Register
 SFRX(PSD_DRIVE_B,     PSD_CSIOP+0x09);   // Select Open Drain or High Slew Rate for port B
                                          // PB0-PB3: standard/High Slew Rate, PB4-PB7: standard/Open Drain
 SFRX(PSD_CONTROL_B,   PSD_CSIOP+0x03);   // Selects MCU I/O or Latched Address Out mode for port B
@@ -505,16 +505,16 @@ SFRX(PSD_OUTENABLE_B, PSD_CSIOP+0x0D);   // Read state of Output Enable Logic on
                                          // -- for comment on individual registers, see above Port A
                                          // only pins PC2, PC3, PC4, PC7 available; other bits in registers are undefined
 SFRX(PSD_DATAIN_C,    PSD_CSIOP+0x10);   // MCU I/O Mode Port C Data In Register
-SFRX(PSD_DATAOUT_C,   PSD_CSIOP+0x12);   // MCU I/O Mode Port C Data Out Register 
-SFRX(PSD_DIRECTION_C, PSD_CSIOP+0x14);   // MCU I/O Mode Port C Direction Register 
+SFRX(PSD_DATAOUT_C,   PSD_CSIOP+0x12);   // MCU I/O Mode Port C Data Out Register
+SFRX(PSD_DIRECTION_C, PSD_CSIOP+0x14);   // MCU I/O Mode Port C Direction Register
 SFRX(PSD_DRIVE_C,     PSD_CSIOP+0x16);   // Select Open Drain for port C
 SFRX(PSD_OUTENABLE_C, PSD_CSIOP+0x1A);   // Read state of Output Enable Logic on each I/O port driver of Port C
 
                                          // -- for comment on individual registers, see above Port A
                                          // only pins PD1, PD2 available (PD2 not available on 52-pin package); other bits in registers are undefined
 SFRX(PSD_DATAIN_D,    PSD_CSIOP+0x11);   // MCU I/O Mode Port D Data In Register
-SFRX(PSD_DATAOUT_D,   PSD_CSIOP+0x13);   // MCU I/O Mode Port D Data Out Register 
-SFRX(PSD_DIRECTION_D, PSD_CSIOP+0x15);   // MCU I/O Mode Port D Direction Register 
+SFRX(PSD_DATAOUT_D,   PSD_CSIOP+0x13);   // MCU I/O Mode Port D Data Out Register
+SFRX(PSD_DIRECTION_D, PSD_CSIOP+0x15);   // MCU I/O Mode Port D Direction Register
 SFRX(PSD_DRIVE_D,     PSD_CSIOP+0x17);   // Select High Slew Rate for port D
 SFRX(PSD_OUTENABLE_D, PSD_CSIOP+0x1B);   // Read state of Output Enable Logic on each I/O port driver of Port D
 
@@ -525,7 +525,7 @@ SFRX(PSD_IMC_C,       PSD_CSIOP+0x18);   // Read to obtain logic state of Input 
                                          //   only pins PC2, PC3, PC4, PC7 available; other bits in register are undefined
 SFRX(PSD_OMC_AB,      PSD_CSIOP+0x20);   // Read logic state of macrocells AB. Write to load macrocell AB flip-flops.
 SFRX(PSD_OMC_BC,      PSD_CSIOP+0x21);   // Read logic state of macrocells BC. Write to load macrocell BC flip-flops.
-SFRX(PSD_OMCMASK_AB,  PSD_CSIOP+0x22);   // Write to set mask for macrocell AB. 
+SFRX(PSD_OMCMASK_AB,  PSD_CSIOP+0x22);   // Write to set mask for macrocell AB.
                                          //    1 blocks READs/WRITEs of OMF, 0 will pass OMF value
                                          //    Read back written value.
 SFRX(PSD_OMCMASK_BC,  PSD_CSIOP+0x23);   // Write to set mask for macrocell BC.
@@ -570,11 +570,11 @@ SFRX(PSD_ALTPROTECT,  PSD_CSIOP+0xC2);   // -- Secondary Flash Memory Protection
 SFRX(PSD_PAGE,        PSD_CSIOP+0xE0);   // -- Memory Page Register
 
 SFRX(PSD_VM,          PSD_CSIOP+0xE2);   // -- Memory Mapping Register
-                                         //   Places PSD Module memories into 8032 Program Address Space 
+                                         //   Places PSD Module memories into 8032 Program Address Space
                                          //   and/or 8032 XDATA Address Space
-                                         //   Default value of bits 0 to 4 is loaded from Non-Volatile 
-                                         //   setting as specified from PSDsoft Express upon any reset 
-                                         //   or power-up condition. The default value of these bits 
+                                         //   Default value of bits 0 to 4 is loaded from Non-Volatile
+                                         //   setting as specified from PSDsoft Express upon any reset
+                                         //   or power-up condition. The default value of these bits
                                          //   can be overridden by 8032 at run-time.
 #define PSD_VM_SRAM_CODE       0x01      // 0 - SRAM not accessible as CODE (/PSEN) memory, 1 - SRAM accessible as CODE memory
 #define PSD_VM_ALT_CODE        0x02      // 0 - secondary FLASH not accessible as CODE (/PSEN) memory, 1 - secondary FLASH accessible as CODE memory

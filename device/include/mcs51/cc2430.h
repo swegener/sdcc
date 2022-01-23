@@ -73,7 +73,7 @@ SFR(U0CSR,    0x86); // USART 0 Control and Status
 SFR(PCON,     0x87); // Power Mode Control
 SFR(TCON,     0x88); // Interrupt Flags
    SBIT(IT0,      0x88, 0); // reserved (must always be set to 1)
-   SBIT(RFERRIF,  0x88, 1); // RFERR – RF TX/RX FIFO interrupt flag
+   SBIT(RFERRIF,  0x88, 1); // RFERR - RF TX/RX FIFO interrupt flag
    SBIT(IT1,      0x88, 2); // reserved (must always be set to 1)
    SBIT(URX0IF,   0x88, 3); // USART0 RX Interrupt Flag
    SBIT(ADCIF,    0x88, 5); // ADC Interrupt Flag

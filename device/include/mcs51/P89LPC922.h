@@ -20,7 +20,7 @@ Copyright (c) 2005 Omar Espinosa--e-mail: opiedrahita2003 AT yahoo.com.
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-(Spanish-Español)
+(Spanish)
 Archivo encabezador para el ucontrolador Philips P89LPC922.
 Derechos de copy (DC) 2005.  OMAR ESPINOSA P.  E-mail: opiedrahita2003 AT yahoo.com
 Uso libre
@@ -239,7 +239,7 @@ __sbit __at (0x85) P0_5    ;
 __sbit __at (0x86) P0_6    ;
 __sbit __at (0x87) P0_7    ;
 
-#define	KB7   P0_7   // alternatively "T1"
+#define KB7   P0_7   // alternatively "T1"
 #define T1    P0_7
 #define KB6   P0_6   // alternatively "CMP_1"
 #define CMP_1 P0_6

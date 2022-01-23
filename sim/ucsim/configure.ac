@@ -162,6 +162,13 @@ if test $enable_m6800_port  != "no"; then
 fi,
 enable_m6800_port="yes")
 
+AC_ARG_ENABLE(m68hc11-port,
+[  --disable-m68hc11-port  do not compile simulator for m68hc11],
+if test $enable_m68hc11_port  != "no"; then
+    enable_m68hc11_port="yes"
+fi,
+enable_m68hc11_port="yes")
+
 AC_ARG_ENABLE(m68hc12-port,
 [  --enable-m68hc12-port   compile simulator for m68hc12],
 if test $enable_m68hc12_port  != "no"; then
@@ -213,6 +220,7 @@ AC_SUBST(enable_pdk_port)
 AC_SUBST(enable_p1516_port)
 AC_SUBST(enable_m6809_port)
 AC_SUBST(enable_m6800_port)
+AC_SUBST(enable_m68hc11_port)
 AC_SUBST(enable_m68hc12_port)
 AC_SUBST(enable_mos6502_port)
 AC_SUBST(enable_rxk_port)
@@ -747,6 +755,7 @@ avr.src/Makefile     avr.src/test/Makefile
 m68hc08.src/Makefile m68hc08.src/test/Makefile
 m6809.src/Makefile   m6809.src/test/Makefile
 m6800.src/Makefile   m6800.src/test/Makefile
+m68hc11.src/Makefile m68hc11.src/test/Makefile
 m68hc12.src/Makefile m68hc12.src/test/Makefile
 mos6502.src/Makefile mos6502.src/test/Makefile
 rxk.src/Makefile     rxk.src/test/Makefile

@@ -161,6 +161,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_DUMP_AST             "--dump-ast"
 #define OPTION_DUMP_I_CODE          "--dump-i-code"
 #define OPTION_DUMP_GRAPHS          "--dump-graphs"
+#define OPTION_INCLUDE              "--include"
 
 #define OPTION_SMALL_MODEL          "--model-small"
 #define OPTION_MEDIUM_MODEL         "--model-medium"
@@ -180,6 +181,7 @@ static const OPTION optionsTable[] = {
   {'U', NULL, NULL, "Undefine macro as in -Umacro"},
   {'M', NULL, NULL, "Preprocessor option"},
   {'W', NULL, NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)"},
+  {0,   OPTION_INCLUDE, NULL, "Pre-include a file during pre-processing"},
   {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
   {'c', "--compile-only", &options.cc_only, "Compile and assemble, but do not link"},
   {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
@@ -1314,6 +1316,13 @@ parseCmdLine (int argc, char **argv)
               if (options.peepReturn == 0)
                   options.peepReturn = -1;
               options.debug = 1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_INCLUDE) == 0)
+            {
+              addSet (&preArgvSet, Safe_strdup ("-include"));
+              addSet (&preArgvSet, getStringArg (OPTION_INCLUDE, argv, &i, argc));
               continue;
             }
 

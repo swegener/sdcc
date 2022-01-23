@@ -63,6 +63,7 @@ const int STACK_TOP = 0x100;
 
 unsigned fReturnSizeM6502 = 4;   /* shared with ralloc.c */
 
+#define OPT_SPEED
 
 static struct
 {
@@ -124,6 +125,9 @@ static void updateiTempRegisterUse (operand * op);
 static bool regalloc_dry_run;
 static unsigned char regalloc_dry_run_cost;
 
+/*-----------------------------------------------------------------*/
+/* idxToReg - returns the reg_info pointer from the register index */
+/*-----------------------------------------------------------------*/
 static reg_info * 
 idxToReg(int idx)
 {
@@ -149,7 +153,79 @@ idxToReg(int idx)
 }
 
 /*-----------------------------------------------------------------*/
-/* emitComment - emits comments and debug messages                        */
+/* m6502_opcodeCycles - returns the cycle count for the instruction */
+/*-----------------------------------------------------------------*/
+int
+m6502_opcodeCycles(const m6502opcodedata *opcode, const char *arg)
+{
+  int lastpos;
+
+  lastpos=(*arg)?strlen(arg)-1:0;
+
+  switch (opcode->type)
+    {
+      case M6502OP_INH: /* Inherent addressing mode */
+      case M6502OP_IDD:
+      case M6502OP_IDI:
+      case M6502OP_BR:  /* Branch (1 byte signed offset) */
+        if(opcode->name[0]=='r'&&opcode->name[1]=='t') // rti and rts
+          return 6;
+        return 2;
+      case M6502OP_SPH:
+        return 3;
+      case M6502OP_SPL:
+        return 4;
+      case M6502OP_BBR:  /* Branch on bit (1 byte signed offset) */
+        return 3;
+      case M6502OP_RMW: /* read/modify/write instructions */
+        if (!strcmp(arg, "a"))  /* accumulator */
+          return 2;
+     	if (arg[0] == '*') /* Zero page */
+    	  return 5;
+        if(lastpos>2 && arg[lastpos-1]!=',' && arg[lastpos]=='x' )
+          return 7;
+        return 6;  /* absolute */
+        
+      case M6502OP_REG: /* standard instruction */
+      case M6502OP_LD:
+        if (arg[0] == '#') /* Immediate addressing mode */
+	      return 2;
+        if (arg[0] == '*') { /* Zero page */
+          if(arg[lastpos]=='x' || arg[lastpos]=='y')
+            return 4;	
+          return 3;
+        }
+        if (arg[0] == '[') { /* indirect */
+          if(arg[lastpos]==']')
+            return 6;
+          return 5;
+        }
+	return 4; /* Otherwise, must be extended addressing mode */
+
+      case M6502OP_ST:
+        if (arg[0] == '*') { /* Zero page */
+          if(arg[lastpos]=='x' || arg[lastpos]=='y')
+            return 4;	
+          return 3;
+        }
+        if (arg[0] == '[')  /* indirect */
+            return 6;
+        if(arg[lastpos]=='x' || arg[lastpos]=='y')
+          return 5;	
+        return 4;
+
+      case M6502OP_JMP:
+        if(opcode->name[1]=='s') return 6;
+        if(arg[0]=='[') return 5;
+        return 3;
+      default:
+         werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "unknown instruction type in m6502_opcodeSize");
+        return 3;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* emitComment - emits comments and debug messages                 */
 /*-----------------------------------------------------------------*/
 void
 emitComment (enum debug_level level, const char *fmt, ...)
@@ -163,7 +239,7 @@ emitComment (enum debug_level level, const char *fmt, ...)
 }
 
 /*-----------------------------------------------------------------*/
-/* emit6502op - emits opcopdes and updates cost                    */
+/* emit6502op - emits opcopdes, updates cost and register state    */
 /*-----------------------------------------------------------------*/
 void
 emit6502op (const char *inst, const char *fmt, ...)
@@ -171,6 +247,8 @@ emit6502op (const char *inst, const char *fmt, ...)
   static char verboseFmt[512];
   va_list ap;
   int isize = 0;
+  int cycles = 0;
+  int cost = 0;
 
   const m6502opcodedata *opcode = m6502_getOpcodeData(inst);
 
@@ -180,43 +258,49 @@ emit6502op (const char *inst, const char *fmt, ...)
   if(opcode)  {
 
     isize = m6502_opcodeSize(opcode, fmt);
+    cycles = m6502_opcodeCycles(opcode, fmt);
 
     // mark the destination register dirty
-    // load, transfer and inc/dec index are handled in the
-    // instruction generator
+    // load and transfer are handled in the instruction generator
     switch (opcode->type) {
-      case M6502OP_REG:
+      case M6502OP_REG: // target is accumulator
         m6502_dirtyReg (idxToReg(opcode->dest), false);
         break;
-      case M6502OP_RMW:
+      case M6502OP_RMW: // target is accumulator
         if (!strcmp(fmt, "a")) m6502_dirtyReg (m6502_reg_a, false);
         break;
-      case M6502OP_SPL:
+      case M6502OP_SPL: // stack pull
         _G.stackPushes--;
         break;
-      case M6502OP_SPH:
+      case M6502OP_SPH: // stack push
         _G.stackPushes++;
         break;
-      case M6502OP_IDD:
+      case M6502OP_IDD: // index decrement
         if(idxToReg(opcode->dest)->isLitConst)
           idxToReg(opcode->dest)->litConst--;
         break;
-      case M6502OP_IDI:
+      case M6502OP_IDI: // index increment
         if(idxToReg(opcode->dest)->isLitConst)
           idxToReg(opcode->dest)->litConst++;
         break;
     }
-
-  // adjust the stack counter
   } else {
     emitComment(ALWAYS,"unkwnon opcode %s",inst);
     isize=10;
     //werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL opcode in emit6502op");
   }
-  regalloc_dry_run_cost += isize;
+
+#ifdef OPT_SPEED
+  cost = 4 * isize + 2 * cycles;
+  if (opcode && opcode->type== M6502OP_BR) cost++;
+#else
+  cost = 1 * isize + 0 * cycles;
+#endif
+
+  regalloc_dry_run_cost += cost;
 
   va_start (ap, fmt);
-  snprintf(verboseFmt, 512, "%s \t; cost=%d", fmt, isize);
+  snprintf(verboseFmt, 512, "%s \t; isize=%d  cycles=%d  cost=%d", fmt, isize, cycles, cost);
   if (options.verboseAsm)
     va_emitcode (inst, verboseFmt, ap);
   else

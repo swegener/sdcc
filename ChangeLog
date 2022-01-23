@@ -1,6 +1,11 @@
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Add cycle based cost calculation.
+
+2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Implement a few missing codegen paths.
 
 2022-01-23 Benedikt Freisen <b.freisen AT gmx.net>

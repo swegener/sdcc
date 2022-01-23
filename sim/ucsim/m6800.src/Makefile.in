@@ -55,14 +55,14 @@ VPATH           = @srcdir@
 OBJECTS_SHARED	= sim$(TN).o $(TN).o glob.o irq.o \
 		  inst.o ialu.o ibranch.o imove.o
 
-OBJECTS_SHARED11= $(OBJECTS_SHARED) simm68hc11.o m68hc11.o \
-		  wraps.o glob11.o g11p0.o g11p18.o g11pcd.o g11p1a.o
+#OBJECTS_SHARED11= $(OBJECTS_SHARED) simm68hc11.o m68hc11.o \
+#		  wraps.o glob11.o g11p0.o g11p18.o g11pcd.o g11p1a.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
-OBJECTS_EXE11	= sm68hc11.o
-OBJECTS11	= $(OBJECTS_SHARED11) $(OBJECTS_EXE11)
+#OBJECTS_EXE11	= sm68hc11.o
+#BJECTS11	= $(OBJECTS_SHARED11) $(OBJECTS_EXE11)
 
 # short/long exe and lib name
 SEN		= s$(TN)$(EXEEXT)
@@ -92,10 +92,11 @@ install: all installdirs install_shared_lib
 	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
-	$(INSTALL) $(SEN11) $(DESTDIR)$(bindir)/$(SEN11)
-	$(STRIP) $(DESTDIR)$(bindir)/$(SEN11)
-	$(INSTALL) $(LEN11) $(DESTDIR)$(bindir)/$(LEN11)
-	$(STRIP) $(DESTDIR)$(bindir)/$(LEN11)
+
+#	$(INSTALL) $(SEN11) $(DESTDIR)$(bindir)/$(SEN11)
+#	$(STRIP) $(DESTDIR)$(bindir)/$(SEN11)
+#	$(INSTALL) $(LEN11) $(DESTDIR)$(bindir)/$(LEN11)
+#	$(STRIP) $(DESTDIR)$(bindir)/$(LEN11)
 
 
 # Deleting all the installed files
@@ -146,32 +147,25 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: $(SEN) $(LEN) shared_lib $(TN)lib $(SEN11) $(LEN11)
+$(TN).src: $(SEN) $(LEN) shared_lib $(TN)lib
 
 $(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-$(SEN11): $(OBJECTS11) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS11) $(LIBS) -o $@
-
 $(LEN): $(SEN)
-	cp $< $@
-
-$(LEN11): $(SEN11)
 	cp $< $@
 
 $(TN)lib: $(top_builddir)/lib$(TN).a
 
-$(top_builddir)/lib$(TN).a: $(OBJECTS_SHARED11)
-	$(AR) -rc $@ $(OBJECTS_SHARED11)
+$(top_builddir)/lib$(TN).a: $(OBJECTS_SHARED)
+	$(AR) -rc $@ $(OBJECTS_SHARED)
 	$(RANLIB) $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/$(SONAME) $(top_builddir)/$(SONAME11)
+shared_lib: $(top_builddir)/$(SONAME)
 install_shared_lib: shared_lib
 	test -d $(DESTDIR)$(libdir) || $(INSTALL) -d $(DESTDIR)$(libdir)
 	$(INSTALL) $(top_builddir)/$(SONAME) $(DESTDIR)$(libdir)/$(SONAME)
-	$(INSTALL) $(top_builddir)/$(SONAME11) $(DESTDIR)$(libdir)/$(SONAME11)
 else
 shared_lib:
 	@$(top_srcdir)/mkecho $(top_builddir) "No $(TN) shared lib made."
@@ -181,9 +175,6 @@ endif
 
 $(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
-
-$(top_builddir)/$(SONAME11): $(OBJECTS_SHARED11)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED11) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a
 

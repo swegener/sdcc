@@ -1,11 +1,11 @@
 #
-# uCsim m68hc12.src/Makefile
+# uCsim m68hc11.src/Makefile
 #
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
 # tool name
-TN		= m68hc12
+TN		= m68hc11
 
 STARTYEAR	= 1997
 
@@ -27,7 +27,7 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
 		  -I$(top_srcdir)/gui.src -I$(top_srcdir)/motorola.src \
-		  -I$(top_srcdir)/m6800.src -I$(top_srcdir)/m68hc11.src
+		  -I$(top_srcdir)/m6800.src
 CFLAGS          = @WALL_FLAG@ @CFLAGS@
 CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@
 LDFLAGS         = @LDFLAGS@
@@ -35,7 +35,7 @@ PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 EXEEXT		= @EXEEXT@
 
-LIBS		= -L$(top_builddir) -lm68hc11 -lm6800 -lmotorola -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
+LIBS		= -L$(top_builddir) -lm6800 -lmotorola -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
 DL		= @DL@
 dl_ok		= @dl_ok@
 
@@ -54,8 +54,8 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= sim$(TN).o $(TN).o \
-		  glob.o glob12.o \
-		  hcwrap.o
+		  glob11.o g11p0.o g11p18.o g11pcd.o g11p1a.o \
+		  wraps.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
@@ -68,7 +68,7 @@ SONAME		= libucsim_$(TN).so
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
-M68HC12ASM	=
+M68HC11ASM	=
 TEST_OBJ	= 
 
 
@@ -131,26 +131,19 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: preped_headers $(SEN) $(LEN) shared_lib
-
-preped_headers: $(srcdir)/wfills.h $(srcdir)/wdecls.h $(srcdir)/wdefs.h
-
-$(srcdir)/wfills.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -E $< |sed '/^#/d'|sed 's/\"NL\"/\n/g'|grep '^ *virtual' >$@
-
-$(srcdir)/wdecls.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -E $< |sed '/^#/d'|sed 's/\"NL\"/\n/g'|grep '^ *extern' >$@
-
-$(srcdir)/wdefs.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -E $< |sed '/^#/d'|sed 's/\"NL\"/\n/g'|grep '^ *int' >$@
-
-hcwrap.o: $(srcdir)/hcwrap.cc $(srcdir)/hcwrapcl.h $(srcdir)/wfills.h $(srcdir)/wdecls.h $(srcdir)/wdefs.h $(srcdir)/m68hc12cl.h
+$(TN).src: $(SEN) $(LEN) shared_lib $(TN)lib
 
 $(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 $(LEN): $(SEN)
 	cp $< $@
+
+$(TN)lib: $(top_builddir)/lib$(TN).a
+
+$(top_builddir)/lib$(TN).a: $(OBJECTS_SHARED)
+	$(AR) -rc $@ $(OBJECTS_SHARED)
+	$(RANLIB) $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/$(SONAME)
@@ -167,7 +160,7 @@ endif
 $(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
-otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a $(top_builddir)/libm68hc11.a
+otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a
 
 $(top_builddir)/libcmd.a:
 	$(MAKE) -C $(top_builddir)/cmd.src all
@@ -187,14 +180,11 @@ $(top_builddir)/libmotorola.a:
 $(top_builddir)/libm6800.a:
 	$(MAKE) -C $(top_builddir)/m6800.src m6800lib
 
-$(top_builddir)/libm68hc11.a:
-	$(MAKE) -C $(top_builddir)/m68hc11.src m68hc11lib
-
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
-	$(M68HC12ASM) -l $< -o $@ -e $<.lst
+	$(M68HC11ASM) -l $< -o $@ -e $<.lst
 
 
 # Remaking configuration
@@ -204,4 +194,4 @@ checkconf:
 	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-# End of m68hc12.src/Makefile.in
+# End of m68hc11.src/Makefile.in

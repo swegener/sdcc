@@ -1,5 +1,10 @@
 2022-01-21 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/gen.c:
+      Use code gen functions instead of raw assembly when possible.
+
+2022-01-21 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/peep.def:
       Improved 6502 peephole rules.
 

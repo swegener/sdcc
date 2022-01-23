@@ -50,6 +50,7 @@ static void transferAopAop (asmop * srcaop, int srcofs, asmop * dstaop, int dsto
 static void adjustStack (int n);
 static bool pushRegIfUsed (reg_info *reg);
 static void pullOrFreeReg (reg_info * reg, bool needpull);
+static void accopWithString (char *accop, char *param);
 
 static char *IMMDFMT = "#0x%02x";
 static char *TEMPFMT = "*(__TEMP+%d)";
@@ -155,7 +156,7 @@ emit6502op (const char *inst, const char *fmt, ...)
 
   if(inst[0]!=';' && fmt) 
     {
-      // this is approximately cost for code size
+      // this is approximately the cost for code size
       switch(fmt[0])
         {
           case 0:    // implied
@@ -265,7 +266,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   if (!dreg)
     return;
 
-  /* But it's definately an error if there's no source. */
+  /* But it's definitely an error if there's no source. */
   if (!sreg)
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL sreg in transferRegReg");
@@ -335,11 +336,11 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
       switch (srcidx)
         {
         case XA_IDX:           /* XA to YX */
-          pushReg (m6502_reg_a, false);
-          emit6502op ("txa", "");
-          emit6502op ("tay", "");
-          pullReg (m6502_reg_a); // TODO: kill register?
-          emit6502op ("tax", "");
+          pushReg (m6502_reg_a, true);
+          transferRegReg (m6502_reg_x, m6502_reg_a, true);
+          transferRegReg (m6502_reg_a, m6502_reg_y, true);
+          pullReg (m6502_reg_a);
+          transferRegReg (m6502_reg_a, m6502_reg_x, true);
           break;
         default:
           error = 1;
@@ -349,11 +350,11 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
       switch (srcidx)
         {
         case YX_IDX:           /* YX to XA */
-          emit6502op ("txa", "");
-          pushReg (m6502_reg_a, false);
-          emit6502op ("tya", "");
-          emit6502op ("tax", "");
-          pullReg (m6502_reg_a); // TODO: kill register?
+          transferRegReg (m6502_reg_x, m6502_reg_a, true);
+          pushReg (m6502_reg_a, true);
+          transferRegReg (m6502_reg_y, m6502_reg_a, true);
+          transferRegReg (m6502_reg_a, m6502_reg_x, true);
+          pullReg (m6502_reg_a);
           break;
         default:
           error = 1;
@@ -365,16 +366,18 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
 
   wassertl (!error, "bad combo in transferRegReg");
 
+  m6502_dirtyReg (dreg, false);
+  m6502_useReg (dreg);
+
+  dreg->isLitConst = sreg->isLitConst;
+  dreg->litConst = sreg->litConst;
+//  dreg->aop = sreg->aop;
+//  dreg->aopofs = sreg->aopofs;
+
+
   if (freesrc)
     m6502_freeReg (sreg);
 
-  //dreg->aop = sreg->aop;
-  //dreg->aopofs = sreg->aopofs;
-  m6502_dirtyReg (dreg, false);
-  dreg->isFree = false;
-  dreg->isLitConst = sreg->isLitConst;
-  dreg->litConst = sreg->litConst;
-  m6502_useReg (dreg);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -601,10 +604,9 @@ pullReg (reg_info * reg)
         _G.stackPushes--;
       } else {
 	//  storeRegTemp (m6502_reg_a, true);
-          pullReg (m6502_reg_a);
-          transferRegReg (m6502_reg_a, m6502_reg_x, true);
+        pullReg (m6502_reg_a);
+        transferRegReg (m6502_reg_a, m6502_reg_x, true);
 	// loadRegTemp (m6502_reg_a, true);
-        m6502_dirtyReg(m6502_reg_a, false);
       }
       updateCFA ();
       break;
@@ -617,7 +619,6 @@ pullReg (reg_info * reg)
         pullReg (m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_y, true);
 	//	loadRegTemp (m6502_reg_a, true);
-        m6502_dirtyReg(m6502_reg_a, false);
       }
       updateCFA ();
       break;
@@ -717,13 +718,16 @@ adjustStack (int n)
     n++;
   }
 
-  // TODO: what if A not used?
   if (n > 0) {
+    // TODO: what if A not used?
+    //    bool needpulla=storeRegTempIfUsed (m6502_reg_a);
+    // A is incorrectly marked free and makes many regression fail
     storeRegTemp(m6502_reg_a, true);
     while (n > 0) {
       emit6502op ("pla", "");      /* 1 byte,  2 cycles */
       n--;
     }
+    //   loadOrFreeRegTemp (m6502_reg_a, needpulla);
     loadRegTemp(m6502_reg_a, true);
   }
   updateCFA ();
@@ -940,6 +944,7 @@ forceload:
         }
       else
         {
+          emitComment (DDEBUG, "XA");
           loadRegFromAop (m6502_reg_a, aop, loffset);
           loadRegFromAop (m6502_reg_x, aop, loffset + 1);
         }
@@ -1052,6 +1057,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
     case YX_IDX:
       if (aop->type == AOP_SOF) // TODO: will fail assemble
         {
+          //     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "storeRegToAop: aop->type == AOP_SOF");
 	  //     int offset = (_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1);
         }
       if (aop->type == AOP_DIR || aop->type == AOP_EXT)
@@ -1123,7 +1129,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
     if ((!m6502_reg_x->aop || !m6502_reg_y->aop) && m6502_reg_yx->aop)
       {
         m6502_reg_yx->aop = NULL;
-        emitComment (DDEBUG, "  marking hx stale");
+        emitComment (DDEBUG, "  marking yx stale");
       }
     if ((!m6502_reg_x->aop || !m6502_reg_a->aop) && m6502_reg_xa->aop)
       {
@@ -1264,6 +1270,10 @@ loadRegFromConst (reg_info * reg, int c)
 static void
 loadRegFromImm (reg_info * reg, char * c)
 {
+  if(!c) {
+     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "loadRegFromImm called with a null arg pointer");
+  }
+
   if (*c == '#')
     c++;
   switch (reg->rIdx)
@@ -1431,11 +1441,10 @@ storeImmToAop (char *c, asmop * aop, int loffset)
 static void
 signExtendA()
 {
-      emit6502op ("asl", "a");
-      emit6502op ("lda", "#0x00");
-      emit6502op ("adc", "#0xff");
-      emit6502op ("eor", "#0xff");
-      m6502_dirtyReg (m6502_reg_a, false);
+      accopWithString ("asl", "a");
+      loadRegFromConst (m6502_reg_a, 0);
+      accopWithString ("adc", "#0xff");
+      accopWithString ("eor", "#0xff");
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1725,31 +1734,32 @@ rmwWithReg (char *rmwop, reg_info * reg)
     {
       if (!strcmp(rmwop, "inc")) {
         if (IS_MOS65C02) {
-          emit6502op (rmwop, "a");
+          accopWithString (rmwop, "a");
         } else {
           emit6502op ("clc", "");
-          emit6502op ("adc", "#0x01");
+          accopWithString ("adc", "#0x01");
         }
       } else if (!strcmp(rmwop, "dec")) {
         if (IS_MOS65C02) {
-          emit6502op (rmwop, "a");
+          accopWithString (rmwop, "a");
         } else {
           emit6502op ("sec", "");
-          emit6502op ("sbc", "#0x01");
+          accopWithString ("sbc", "#0x01");
         }
       } else if (!strcmp(rmwop, "com")) {
-        emit6502op ("eor", "#0xff");
+        accopWithString ("eor", "#0xff");
       } else if (!strcmp(rmwop, "neg")) {
-        emit6502op ("eor", "#0xff");
+        accopWithString ("eor", "#0xff");
         emit6502op ("clc", "");
-        emit6502op ("adc", "#0x01");
+        accopWithString ("adc", "#0x01");
       } else if (!strcmp(rmwop, "asr")) {
         accopWithString ("cmp", "#0x80");
-        emit6502op ("ror", "a");
+        accopWithString ("ror", "a");
       } else if (!strcmp(rmwop, "bit")) { // TODO???
+        // werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "rmwWithReg: rmwop==\"bit\"");
         accopWithString ("cmp", "#0x00");
       } else {
-        emit6502op (rmwop, "a");
+        accopWithString (rmwop, "a");
       }
     }
   else if (reg->rIdx == X_IDX)
@@ -1890,9 +1900,7 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
         {
           storeRegTemp (m6502_reg_x, true);
           storeRegTemp (m6502_reg_y, true);
-          // TODO: we reload this, so can't do it
-          //loadRegFromConst(m6502_reg_y, offset);
-          emit6502op ("ldy", IMMDFMT, offset);
+          loadRegFromConst(m6502_reg_y, offset);
           emit6502op ("lda", TEMPFMT_IY, _G.tempOfs - 2);
           // TODO: isDead?
           loadRegTemp (m6502_reg_y->isFree ? NULL : m6502_reg_y, true);
@@ -1912,9 +1920,12 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
           emit6502op ("adc", "#>(%s+%d)", rematOfs, offset);
           emit6502op ("sta", TEMPFMT, _G.tempOfs+1);
           emit6502op ("sty", TEMPFMT, _G.tempOfs+2);
-          emit6502op ("ldy", "#0x00");
+          loadRegFromConst(m6502_reg_y, 0);
           emit6502op ("lda", TEMPFMT_IY, _G.tempOfs+0);
-          emit6502op ("ldy", TEMPFMT, _G.tempOfs+2); // TODO: if free only
+          if (!m6502_reg_y->isFree) {
+            emit6502op ("ldy", TEMPFMT, _G.tempOfs+2);
+            m6502_dirtyReg (m6502_reg_y, false);
+          }
         }
       m6502_dirtyReg (reg, false);
       break;
@@ -2036,8 +2047,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           storeRegTemp (m6502_reg_x, true);
           storeRegTemp (m6502_reg_y, true);
           // TODO: we reload this, so can't do it
-          //loadRegFromConst(m6502_reg_y, offset);
-          emit6502op ("ldy", IMMDFMT, offset);
+          loadRegFromConst(m6502_reg_y, offset);
           emit6502op ("sta", TEMPFMT_IY, _G.tempOfs - 2);
           loadRegTemp (m6502_reg_y->isFree ? NULL : m6502_reg_y, true);
           loadRegTemp (m6502_reg_x->isFree ? NULL : m6502_reg_x, true);
@@ -2171,7 +2181,7 @@ newAsmop (short type)
 
 
 /*-----------------------------------------------------------------*/
-/* operandConflictsWithHX - true if operand in h and/or x register */
+/* operandConflictsWithYX - true if operand in h and/or x register */
 /*-----------------------------------------------------------------*/
 static bool
 operandConflictsWithYX (operand *op)
@@ -2297,7 +2307,8 @@ tsxUseful(iCode *ic)
   return uses >= 1;
 }
 
-static void doTSX() {
+static void doTSX()
+{
   // already did TSX
   if (m6502_reg_x->aop == &tsxaop)
     return;
@@ -2309,7 +2320,8 @@ static void doTSX() {
 }
 
 // TODO: make these subroutines
-static void saveBasePtr() {
+static void saveBasePtr()
+{
 #if 0
   storeRegTemp (m6502_reg_x, true); // TODO: only when used?
   // TODO: if X is free should we call doTSX() to mark X=S?
@@ -3238,7 +3250,7 @@ asmopToBool (asmop *aop, bool resultInA)
       else if (IS_AOP_A(aop))
         {
           // FIXME: should this be CMP #0?
-          emit6502op ("ora", "#0x00");
+          accopWithString ("ora", "#0x00");
         }
       else if (IS_AOP_X(aop))
         {
@@ -3327,7 +3339,7 @@ asmopToBool (asmop *aop, bool resultInA)
       loadRegFromAop (m6502_reg_a, aop, offset--);
       if (isFloat)
         {
-          emit6502op ("and", "#0x7F");      //clear sign bit
+          accopWithString ("and", "#0x7F");      //clear sign bit
         }
       while (--size)
         accopWithAop ("ora", aop, offset--);
@@ -3395,7 +3407,7 @@ asmopToBool (asmop *aop, bool resultInA)
           loadRegFromAop (m6502_reg_a, aop, offset--);
           if (isFloat)
             {
-              emit6502op ("and", "#0x7F");
+              accopWithString ("and", "#0x7F");
             }
           while (--size)
             accopWithAop ("ora", aop, offset--);
@@ -3531,7 +3543,7 @@ genNot (iCode * ic)
   needpulla = pushRegIfSurv (m6502_reg_a);
   asmopToBool (AOP (IC_LEFT (ic)), true);
 
-  emit6502op ("eor", "#0x01");
+  accopWithString ("eor", "#0x01");
   storeRegToFullAop (m6502_reg_a, AOP (IC_RESULT (ic)), false);
   pullOrFreeReg (m6502_reg_a, needpulla);
 
@@ -3641,7 +3653,7 @@ genUminusFloat (operand * op, operand * result)
 
   needpula = pushRegIfSurv (m6502_reg_a);
   loadRegFromAop (m6502_reg_a, AOP (op), offset);
-  emit6502op ("eor", "#0x80");
+  accopWithString ("eor", "#0x80");
   m6502_useReg (m6502_reg_a);
   storeRegToAop (m6502_reg_a, AOP (result), offset);
   pullOrFreeReg (m6502_reg_a, needpula);
@@ -4661,6 +4673,8 @@ genPlusIncr (iCode * ic)
   if (!aopCanIncDec (AOP (result)))
     return false;
 
+  emitComment (DDEBUG, "   genPlusIncr", "");
+
   aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
   if (size > 1)
@@ -4767,9 +4781,8 @@ genPlus (iCode * ic)
         pullReg (m6502_reg_a);
       else
         loadRegFromAop (m6502_reg_a, leftOp, offset);
-      if (clc) {
+      if (clc)
         emit6502op ("clc", "");
-        }
       if (!mayskip || AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT || (byteOfVal (AOP (IC_RIGHT (ic))->aopu.aop_lit, offset) != 0x00) )
         {
           accopWithAop ("adc", rightOp, offset);
@@ -4842,6 +4855,8 @@ genMinusDec (iCode * ic)
   // TODO: can inc blah,x
   if (!aopCanIncDec (AOP (result)))
     return false;
+
+  emitComment (DDEBUG, "     genMinusDec");
 
   aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
@@ -4918,7 +4933,7 @@ genMinus (iCode * ic)
       accopWithAop ("sbc", leftOp, offset);
       accopWithString ("eor", "#0xff");
       emit6502op("clc", "");
-      emit6502op("adc", "#0x01");
+      accopWithString ("adc", "#0x01");
       storeRegToAop (m6502_reg_a, AOP (IC_RESULT (ic)), offset++);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;
@@ -5300,6 +5315,8 @@ genCmp (iCode * ic, iCode * ifx)
       needpulla = pushRegIfSurv (m6502_reg_a);
       while (size--)
         {
+          emitComment (DDEBUG, "   GenCmp - size counter = %d", size);
+
           if (AOP_TYPE (right) == AOP_REG && AOP(right)->aopu.aop_reg[offset]->rIdx == A_IDX)
             {
               storeRegTemp(m6502_reg_a, true); //TODO: false?
@@ -5307,8 +5324,7 @@ genCmp (iCode * ic, iCode * ifx)
               if (!strcmp(sub, "sub")) {
                 emit6502op ("sec", "");
                 emit6502op ("sbc", TEMPFMT, _G.tempOfs - 1);
-              } else {
-                // FIXME: 6502 has no sub             
+              } else {         
                 emit6502op (sub, TEMPFMT, _G.tempOfs - 1);
               }
               loadRegTemp(m6502_reg_a, true);
@@ -5363,7 +5379,7 @@ genCmp (iCode * ic, iCode * ifx)
       loadRegFromConst (m6502_reg_a, 0);
       emitBranch ("bra", tlbl2);
       safeEmitLabel (tlbl1);
-      m6502_dirtyReg (m6502_reg_a, false);
+//      m6502_dirtyReg (m6502_reg_a, false);
       loadRegFromConst (m6502_reg_a, 1);
       safeEmitLabel (tlbl2);
       m6502_dirtyReg (m6502_reg_a, false);
@@ -5507,11 +5523,11 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           emitBranch ("beq", tlbl_EQ);
           if (tlbl_NE)
             emitLabel (tlbl_NE);
-          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a, false);
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_EQ);
-          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a, false);
           loadRegFromConst (m6502_reg_a, 1);
         }
       else
@@ -5522,7 +5538,7 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_NE);
-          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a, false);
           loadRegFromConst (m6502_reg_a, 1);
         }
 
@@ -5610,13 +5626,13 @@ genAndOp (iCode * ic)
   loadRegFromConst (m6502_reg_a, 1);
   emitBranch ("bra", tlbl);
   safeEmitLabel (tlbl0);
-  m6502_dirtyReg (m6502_reg_a, false);
+//  m6502_dirtyReg (m6502_reg_a, false);
   loadRegFromConst (m6502_reg_a, 0);
   safeEmitLabel (tlbl);
   m6502_dirtyReg (m6502_reg_a, false);
 
-  m6502_useReg (m6502_reg_a);
-  m6502_freeReg (m6502_reg_a);
+//  m6502_useReg (m6502_reg_a);
+//  m6502_freeReg (m6502_reg_a);
 
   storeRegToFullAop (m6502_reg_a, AOP (result), false);
   pullOrFreeReg(m6502_reg_a, needpulla);
@@ -5657,13 +5673,13 @@ genOrOp (iCode * ic)
   loadRegFromConst (m6502_reg_a, 0);
   emitBranch ("bra", tlbl);
   safeEmitLabel (tlbl0);
-  m6502_dirtyReg (m6502_reg_a, false);
+//  m6502_dirtyReg (m6502_reg_a, false);
   loadRegFromConst (m6502_reg_a, 1);
   safeEmitLabel (tlbl);
   m6502_dirtyReg (m6502_reg_a, false);
 
-  m6502_useReg (m6502_reg_a);
-  m6502_freeReg (m6502_reg_a);
+//  m6502_useReg (m6502_reg_a);
+//  m6502_freeReg (m6502_reg_a);
 
   storeRegToFullAop (m6502_reg_a, AOP (result), false);
   pullOrFreeReg(m6502_reg_a, needpulla);
@@ -5804,7 +5820,7 @@ genAnd (iCode * ic, iCode * ifx)
         }
 
       pullReg (m6502_reg_a);
-      emit6502op ("ora", "#0x00");
+      accopWithString ("ora", "#0x00");
 
       pullOrFreeReg (m6502_reg_a, needpulla);
 
@@ -6061,7 +6077,7 @@ genOr (iCode * ic, iCode * ifx)
         }
 
       loadRegTemp (m6502_reg_a, true);
-      emit6502op ("ora", "#0x00");
+      accopWithString ("ora", "#0x00");
 
       pullOrFreeRegNoFlags (m6502_reg_a, needpulla);
 
@@ -6237,7 +6253,7 @@ genXor (iCode * ic, iCode * ifx)
           loadRegFromAop (m6502_reg_a, AOP (left), offset);
           if (AOP_TYPE (right) == AOP_LIT && ((ullFromVal (AOP (right)->aopu.aop_lit) >> (offset * 8)) & 0xff) == 0)
             {
-              emit6502op ("ora", "#0x00");
+              accopWithString ("ora", "#0x00");
             }
           else
             accopWithAop ("eor", AOP (right), offset);
@@ -6495,9 +6511,8 @@ genRRC (iCode * ic)
   /* now we need to put the carry into the
      highest order byte of the result */
   offset = AOP_SIZE (result) - 1;
-  emit6502op ("lda", "#0x00");
-  emit6502op ("ror", "a");
-  m6502_dirtyReg (m6502_reg_a, false);
+  loadRegFromConst(m6502_reg_a, 0);
+  accopWithString ("ror", "a");
   if (resultInA)
     {
       // FIXME
@@ -6573,9 +6588,8 @@ genRLC (iCode * ic)
   /* now we need to put the carry into the
      lowest order byte of the result */
   offset = 0;
-  emit6502op ("lda", "#0x00");
-  emit6502op ("rol", "a");
-  m6502_dirtyReg (m6502_reg_a, false);
+  loadRegFromConst(m6502_reg_a, 0);
+  accopWithString ("rol", "a");
   if (resultInA)
     {
       // FIXME
@@ -6619,7 +6633,7 @@ AccLsh (int shCount)
       return;
     case 7:
       accopWithString ("ror", "a");
-      accopWithString ("lda", "#0x00");
+      loadRegFromConst(m6502_reg_a, 0);
       accopWithString ("ror", "a");
       /* total: 3 cycles, 3 bytes */
       return;
@@ -6645,7 +6659,7 @@ AccSRsh (int shCount)
   if (shCount == 7)
     {
       accopWithString ("rol", "a");
-      accopWithString ("lda", "#0x00");
+      loadRegFromConst(m6502_reg_a, 0);
       accopWithString ("adc", "#0xff");
       accopWithString ("eor", "#0xff");
       return;
@@ -6688,7 +6702,7 @@ AccRsh (int shCount, bool sign)
       return;
     case 7:
       accopWithString ("rol", "a");
-      accopWithString ("lda", "#0x00");
+      loadRegFromConst(m6502_reg_a, 0);
       accopWithString ("rol", "a");
       /* total: 3 cycles, 4 bytes */
       return;

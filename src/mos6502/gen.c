@@ -3207,13 +3207,25 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
           strcpy (rs, s);
           return rs;
         // did we get base ptr in Y?
-        } else if (m6502_reg_y->aop == &tsxaop) {
-          return "ERROR [__BASEPTR],y";
+        } else {
+          // FIXME: should X be saved?
+          doTSX();
+          xofs = STACK_TOP + _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1;
+          sprintf (s, "0x%x,x", xofs);
+          rs = Safe_calloc (1, strlen (s) + 1);
+          strcpy (rs, s);
+          return rs;
+
+        } 
+#if 0
+else if (m6502_reg_y->aop == &tsxaop) {
+          return "[__BASEPTR],y";
         } else {
           regalloc_dry_run_cost += 999;
 //          loadRegFromConst(m6502_reg_x, offset);
           return "ERROR [__BASEPTR],y"; // TODO: is base ptr or Y loaded?
         }
+#endif
       }
     case AOP_IDX:
       xofs = offset; /* For now, assume hx points to the base address of operand */
@@ -3221,7 +3233,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       storeRegTemp(m6502_reg_yx, true);
       if (m6502_reg_y->aop == &tsxaop) {
         loadRegFromConst(m6502_reg_y, offset);
-        return "[__TEMP],y"; // TODO: what if != 0 tempOfs?
+        return "ERROR [__TEMP],y"; // TODO: what if != 0 tempOfs?
       } else
         return "ERROR"; // TODO: error
     }
@@ -3419,12 +3431,21 @@ asmopToBool (asmop *aop, bool resultInA)
           else
             {
 	      // FIXME
+#if 0
               tlbl = safeNewiTempLabel (NULL);
               emitcode ("bit3", "%s", aopAdrStr (aop, 0, false));
               emitcode ("bne", "%05d$", safeLabelKey2num (tlbl->key));
               emitcode ("bit4", "%s", aopAdrStr (aop, 1, false));
               regalloc_dry_run_cost += 4;
               safeEmitLabel (tlbl);
+#endif
+              storeRegTemp (m6502_reg_a, true);
+              emit6502op ("lda", aopAdrStr (aop, 0, false));
+              emit6502op ("ora", aopAdrStr (aop, 1, false));
+              emit6502op ("php", "" );
+              loadRegTemp (m6502_reg_a, true);
+              emit6502op ("plp", "" );
+
               break;
             }
         }
@@ -7879,6 +7900,12 @@ genRightShift (iCode * ic)
     {
       countreg->isFree = false;
       loadRegFromAop (countreg, AOP (right), 0);
+    } else {
+      emitComment (DDEBUG, "  count is not a register");
+      storeRegTemp (m6502_reg_a, true);
+      loadRegFromAop (m6502_reg_a, AOP (right), 0);
+      pushReg (m6502_reg_a, true);
+      loadRegTemp (m6502_reg_a, true);
     }
 
   /* now move the left to the result if they are not the
@@ -7915,15 +7942,14 @@ genRightShift (iCode * ic)
 
   if (!countreg) // TODO
     {
-      // FIXME
-      pushReg (m6502_reg_a, false);
-      pushReg (m6502_reg_a, true);
-      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      emitcode ("sta15", "2,s");
-      regalloc_dry_run_cost += 3;
+      storeRegTemp (m6502_reg_a, true);
+// put the counter on the stack earlier
+//      loadRegFromAop (m6502_reg_a, AOP (right), 0);
       pullReg (m6502_reg_a);
-      emitcode ("tst16 1,s", "#0x00");
-      regalloc_dry_run_cost += 4;
+      pushReg (m6502_reg_a, true);
+      emit6502op("php", "" );
+      loadRegTemp (m6502_reg_a, true);
+      emit6502op("plp", "" );
     }
   else
     {
@@ -7961,7 +7987,14 @@ genRightShift (iCode * ic)
       }
       // FIXME
       if (!countreg) {
-        emit6502op ("dbnz17 1,s", "%05d$", safeLabelKey2num (tlbl->key));
+        bool needpullx = storeRegTemp (m6502_reg_x, false);
+	emit6502op("tsx", "" );
+	emit6502op("dec", "0x101,x" );
+	emit6502op("php", "" );
+        loadRegTemp (m6502_reg_x, needpullx);
+	emit6502op("plp", "" );
+        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
+//        emit6502op ("dbnz17 1,s", "%05d$", safeLabelKey2num (tlbl->key));
     }
 
   safeEmitLabel (tlbl1);

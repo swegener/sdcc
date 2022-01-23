@@ -862,6 +862,31 @@ adjustStack (int n)
   updateCFA ();
 }
 
+/*------------------------------------------------------------------*/
+/* swapXA - swap hi and low bytes ox XA                             */
+/*------------------------------------------------------------------*/
+static void
+swapXA ()
+{
+  bool litA;
+  int val;
+  litA=m6502_reg_a->isLitConst;
+  val=m6502_reg_a->litConst;
+
+  storeRegTemp (m6502_reg_a, true);
+  transferRegReg (m6502_reg_x, m6502_reg_a, false);
+  loadRegTemp (m6502_reg_x, true);
+
+  if(litA) {
+    m6502_reg_x->isLitConst=true;
+    m6502_reg_x->litConst=val;
+    if( (m6502_reg_x->isLitConst) && (m6502_reg_a->isLitConst) ) {
+          m6502_reg_xa->isLitConst=true;
+          m6502_reg_xa->litConst=(m6502_reg_x->litConst<<8)|m6502_reg_a->litConst;
+    }
+  }
+}
+
 /*--------------------------------------------------------------------------*/
 /* smallAdjustX - Adjust the X register by n bytes if possible.                              */
 /*--------------------------------------------------------------------------*/
@@ -4213,9 +4238,7 @@ genSend (set *sendSet)
         {
           /* If the parameters' register assignment is exactly backwards */
           /* from what is needed, then swap the registers. */
-          storeRegTemp(m6502_reg_a, true);
-          transferRegReg (m6502_reg_x, m6502_reg_a, false);
-          loadRegTemp(m6502_reg_x, true);
+          swapXA();
         }
       else if (IS_AOP_A (AOP (IC_LEFT (send2))))
         {
@@ -7542,10 +7565,7 @@ genLeftShift (iCode * ic)
     loadRegFromAop (m6502_reg_yx, AOP (left), 0);
   else if (IS_AOP_AX (AOP (result)) && IS_AOP_XA (AOP (left)) || IS_AOP_XA (AOP (result)) && IS_AOP_AX (AOP (left)))
     {
-      // TODO ???
-      pushReg (m6502_reg_x, true);
-      transferRegReg (m6502_reg_a, m6502_reg_x, true);
-      pullReg (m6502_reg_a);
+      swapXA();
     }
   else if (!sameRegs (AOP (left), aopResult))
     {
@@ -8001,10 +8021,7 @@ genRightShift (iCode * ic)
     }
   else if (IS_AOP_AX (AOP (result)) && IS_AOP_XA (AOP (left)) || IS_AOP_XA (AOP (result)) && IS_AOP_AX (AOP (left)))
     {
-      // TODO: swap function
-      storeRegTemp (m6502_reg_x, true);
-      transferRegReg (m6502_reg_a, m6502_reg_x, true);
-      loadRegTemp (m6502_reg_a, true);
+      swapXA();
     }
   else if (!sameRegs (AOP (left), aopResult))
     {

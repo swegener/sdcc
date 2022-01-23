@@ -1,6 +1,11 @@
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Add swapAX function.
+
+2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Add cycle based cost calculation.
 
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>

@@ -1,3 +1,6 @@
+# We don't want auto-generated labels in the output.
+set option analyzer false
+
 step
 
 # The pipelined examples from PM0044 5.4 are run with fold-on-flush off

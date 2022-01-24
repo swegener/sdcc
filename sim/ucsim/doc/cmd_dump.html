@@ -30,8 +30,10 @@
         <dt><b>/s</b> - string</dt>
           <dd>Dumps a single, null terminated string starting at <b>start</b>.</dd>
       </dl>
-      If no <b>format</b> is given dump uses a "smart" mode. This is like the
-      hexadecimal format except that where labels (vars that name an address)
+      If no <b>format</b> is given dump uses a "smart" mode. This will disassemble
+      where the <a href="analyzer.html"> code analyzer</a> has identified executable
+      code otherwise it is similar to
+      the hexadecimal format except that where labels (vars that name an address)
       are found they are shown between the address and data and where HW
       registers (vars that name an address AND specify the full bit range)
       are found that address is shown on a line of its own and the data is
@@ -177,23 +179,12 @@ F 0x000515
       determined by the simulated processor.<br>
       <hr> <a name="dump_bit">
         <h4>dump <i>bit_name...</i></h4>
-      </a> If the simulated controller supports addressable bits (such as MCS51
-      does) this command can be used to print out values of bit(s). <a href="syntax.html#bit_param">Any
+      </a>This command can be used to print out values of bit(s). <a href="syntax.html#bit_param">Any
         form of bit address</a> can be used as parameter:
-      <pre>0&gt; <font color="#118811">dump ac p1.2 0x21</font>
-     PSW.6 0xd0 00 0
-      P1.2 0x90 ff 1
-    0x24.1 0x24 24 0
-0&gt; 
-</pre> Please note, that this command can not be used, if there is no address
-      space called <b>sfr</b>.
-      <pre>$ <font color="#118811">sz80</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-0&gt; dump 0.0
-No memory specified. Use "info memory" for available memories
+      <pre>0&gt; <font color="#118811">dump AC P1.2 0x21</font>
+0xd6      AC:                       0b0 0x00 '.'   0
+0x90.2                              0b-----1-- 0x01 '.'   1
+0x24.1                              0b------0- 0x00 '.'   0
 0&gt; 
 </pre> </blockquote>
     <hr> <a name="dch">

@@ -48,7 +48,7 @@ struct dis_entry disass_mos6502[]=
   {
     { 0xea, 0xff, ' ', 1, "NOP" },
     { 0x00, 0xff, ' ', 1, "BRK" },
-    { 0x40, 0xff, ' ', 1, "RTI" },
+    { 0x40, 0xff, 'x', 1, "RTI" },
     { 0x58, 0xff, ' ', 1, "CLI" },
     { 0x78, 0xff, ' ', 1, "SEI" },
     { 0x08, 0xff, ' ', 1, "PHP" },
@@ -203,20 +203,20 @@ struct dis_entry disass_mos6502[]=
     { 0x24, 0xff, ' ', 2, "BIT %z" },
     { 0x2c, 0xff, ' ', 3, "BIT %a" },
 
-    { 0x4c, 0xff, ' ', 3, "JMP %j" },
-    { 0x6c, 0xff, ' ', 3, "JMP %J" },
+    { 0x4c, 0xff, 'j', 3, "JMP %j" },
+    { 0x6c, 0xff, 'x', 3, "JMP %J" },
     
-    { 0x20, 0xff, ' ', 3, "JSR %j" },
-    { 0x60, 0xff, ' ', 1, "RTS" },
+    { 0x20, 0xff, 's', 3, "JSR %j" },
+    { 0x60, 0xff, 'x', 1, "RTS" },
 
-    { 0x10, 0xff, ' ', 2, "BPL %r" },
-    { 0x30, 0xff, ' ', 2, "BMI %r" },
-    { 0x50, 0xff, ' ', 2, "BVC %r" },
-    { 0x70, 0xff, ' ', 2, "BVS %r" },
-    { 0x90, 0xff, ' ', 2, "BCC %r" },
-    { 0xb0, 0xff, ' ', 2, "BCS %r" },
-    { 0xd0, 0xff, ' ', 2, "BNE %r" },
-    { 0xf0, 0xff, ' ', 2, "BEQ %r" },
+    { 0x10, 0xff, 'b', 2, "BPL %r" },
+    { 0x30, 0xff, 'b', 2, "BMI %r" },
+    { 0x50, 0xff, 'b', 2, "BVC %r" },
+    { 0x70, 0xff, 'b', 2, "BVS %r" },
+    { 0x90, 0xff, 'b', 2, "BCC %r" },
+    { 0xb0, 0xff, 'b', 2, "BCS %r" },
+    { 0xd0, 0xff, 'b', 2, "BNE %r" },
+    { 0xf0, 0xff, 'b', 2, "BEQ %r" },
     
     { 0, 0, 0, 0, 0, 0 }
   };

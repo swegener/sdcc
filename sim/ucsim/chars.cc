@@ -314,6 +314,19 @@ chars::uppercase(void)
   return *this;
 }
 
+chars &
+chars::subst(const char *what, char with)
+{
+  if (!dynamic)
+    allocate_string(chars_string);
+
+  for (int i= 0; i < chars_length; i++)
+    if (strchr(what, chars_string[i]))
+      chars_string[i] = with;
+
+  return *this;
+}
+
 // Assignment operators
 chars &
 chars::operator=(const char *s)

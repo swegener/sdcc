@@ -312,6 +312,26 @@ cl_var_by_addr_list::search(class cl_memory *mem, t_addr addr, int bitnr_high, i
   return(res);
 }
 
+size_t
+cl_var_list::get_max_name_len(void)
+{
+  if (!max_name_len_known)
+    {
+      max_name_len = 0;
+
+      for (t_index i = 0; i < by_name.count; i++)
+        {
+          size_t l = strlen(by_name.at(i)->get_name());
+          if (l > max_name_len)
+            max_name_len = l;
+        }
+
+      max_name_len_known = true;
+    }
+
+  return max_name_len;
+}
+
 bool
 cl_var_list::del(const char *name)
 {
@@ -324,6 +344,9 @@ cl_var_list::del(const char *name)
 
       by_addr.disconn(var);
       by_name.disconn_at(name_i);
+      delete var;
+
+      max_name_len_known = false;
     }
 
   return found;
@@ -336,14 +359,52 @@ cl_var_list::add(class cl_cvar *item)
 
   if (!del(name))
     {
-      int l = strlen(name);
+      size_t l = strlen(name);
       if (l > max_name_len)
         max_name_len = l;
+    }
+  else
+    {
+      // We're replacing with the same name so we still know the max length really
+      max_name_len_known = true;
     }
 
   by_name.add(item);
   if (item->is_mem_var())
-    by_addr.add(item);
+    {
+      class cl_var *var = static_cast<class cl_var *>(item);
+
+      // If analyze put a variable at this location in the past it is no
+      // longer needed and can be removed.
+      t_index i;
+      if (by_addr.search(var->get_mem(), var->get_addr(), var->bitnr_high, var->bitnr_low, i))
+        {
+          class cl_var *v;
+          while (i < by_addr.count && (v = by_addr.at(i)) &&
+                 v->get_mem() == var->get_mem() && v->get_addr() == var->get_addr() &&
+                 v->bitnr_high == var->bitnr_high && v->bitnr_low == var->bitnr_low)
+            {
+              if (*(v->get_name()) == '.')
+                {
+                  by_addr.disconn_at(i);
+                  by_name.disconn(v);
+
+                  if (strlen(v->get_name()) == max_name_len &&
+                      strlen(item->get_name()) < max_name_len)
+                    max_name_len_known = false;
+
+                  delete v;
+
+                  // There should be at most 1.
+                  break;
+                }
+
+                i++;
+            }
+        }
+
+      by_addr.add(item);
+    }
 
   return item;
 }

@@ -203,7 +203,7 @@ info reg
 @R1 01 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
    DPTR= 0x0000 @DPTR= 0x95 149 .
- ? 0x0000 ff       MOV    R7,A[0K
+0x0000  ? ff       MOV    R7,A[0K
 set mem bank 1
 0xd0[4:3] bank:                     0b---01--- 0x01 '.'   1
 info reg
@@ -213,7 +213,7 @@ info reg
 @R1 21 !  PSW= 0x08 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
    DPTR= 0x0000 @DPTR= 0x95 149 .
- ? 0x0000 ff       MOV    R7,A[0K
+0x0000  ? ff       MOV    R7,A[0K
 set mem bank 2
 0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
 info reg
@@ -223,7 +223,7 @@ info reg
 @R1 84 .  PSW= 0x10 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
    DPTR= 0x0000 @DPTR= 0x95 149 .
- ? 0x0000 ff       MOV    R7,A[0K
+0x0000  ? ff       MOV    R7,A[0K
 set mem bank 3
 0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
 info reg
@@ -233,5 +233,5 @@ info reg
 @R1 23 #  PSW= 0x18 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
    DPTR= 0x0000 @DPTR= 0x95 149 .
- ? 0x0000 ff       MOV    R7,A[0K
+0x0000  ? ff       MOV    R7,A[0K
   00. bank_switcher

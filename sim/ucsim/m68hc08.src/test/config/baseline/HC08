@@ -12,7 +12,7 @@ Controller has 4 hardware element(s).
 V--HINZC  Flags= $60  96 `  A= $00   0 .
 0--00000      H= $00   0 .  X= $00   0 .
 SP= $00ff [SP+1]= 00   0 .  Limit= $7000
- ? 0x6c75 00 00 00    brset  #0,*$00,$6c78[0K
+0x6c75  ? 00 00 00    brset  #0,*$00,$6c78[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

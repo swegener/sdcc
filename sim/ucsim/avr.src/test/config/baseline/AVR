@@ -14,7 +14,7 @@ Controller has 4 hardware element(s).
 ITHSVNZC  SREG= 0x1b  27 .
 00011011  SP  = 0x0027ad
 X= 0x4420 [X]= 0x00   0 .  Y= 0x8d7d [Y]= 0x00   0 .  Z= 0x49b9 [Z]= 0x00   0 .
- ? 0x0000 8a08      std    Y+16,r0[0K
+0x0000  ? 8a08      std    Y+16,r0[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (16,%04x,0x%04lx)

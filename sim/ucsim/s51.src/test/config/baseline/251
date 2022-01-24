@@ -28,7 +28,7 @@ Controller has 16 hardware element(s).
 SP 0x07 -> 48 54 29 8a b2 d4 70 08
   *DPTR0= 0xb053 @DPTR0= 0x94 148 .
    DPTR1= 0xe0f8 @DPTR1= 0x4f  79 O
- ? 0x0000 ff       MOV    R7,A[0K
+0x0000  ? ff       MOV    R7,A[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

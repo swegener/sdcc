@@ -10,7 +10,9 @@ Stop at 0x008004: (109) stepped 3 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08004 35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
+
+0x08004    <.reset>:
+0x08004    35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
 F 0x008004
 timer get
 timer #1("time") ON 0.000001500000000 sec (3 clks)
@@ -37,7 +39,7 @@ Stop at 0x008008: (109) stepped 2 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08008 35 08 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x08[0K
+0x08008    35 08 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x08[0K
 F 0x008008
 timer get
 timer #1("time") ON 0.000002500000000 sec (5 clks)
@@ -64,7 +66,7 @@ Stop at 0x00800c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0800c 35 10 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x10[0K
+0x0800c    35 10 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x10[0K
 F 0x00800c
 timer get
 timer #1("time") ON 0.000002562500000 sec (6 clks)
@@ -91,7 +93,7 @@ Stop at 0x008010: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08010 35 18 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x18[0K
+0x08010    35 18 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x18[0K
 F 0x008010
 timer get
 timer #1("time") ON 0.000002687500000 sec (7 clks)
@@ -118,7 +120,7 @@ Stop at 0x008014: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08014 35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
+0x08014    35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
 F 0x008014
 timer get
 timer #1("time") ON 0.000002937500000 sec (8 clks)
@@ -145,7 +147,7 @@ Stop at 0x008018: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08018 35 01 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x01[0K
+0x08018    35 01 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x01[0K
 F 0x008018
 timer get
 timer #1("time") ON 0.000003437500000 sec (9 clks)
@@ -172,7 +174,7 @@ Stop at 0x00801c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0801c 35 02 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x02[0K
+0x0801c    35 02 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x02[0K
 F 0x00801c
 timer get
 timer #1("time") ON 0.000003500000000 sec (10 clks)
@@ -199,7 +201,7 @@ Stop at 0x008020: (109) stepped 2 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08020 35 03 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x03[0K
+0x08020    35 03 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x03[0K
 F 0x008020
 timer get
 timer #1("time") ON 0.000003625000000 sec (12 clks)
@@ -226,7 +228,7 @@ Stop at 0x008024: (109) stepped 4 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08024 35 04 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x04[0K
+0x08024    35 04 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x04[0K
 F 0x008024
 timer get
 timer #1("time") ON 0.000003875000000 sec (16 clks)
@@ -253,7 +255,7 @@ Stop at 0x008028: (109) stepped 8 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08028 35 05 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x05[0K
+0x08028    35 05 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x05[0K
 F 0x008028
 timer get
 timer #1("time") ON 0.000004375000000 sec (24 clks)
@@ -280,7 +282,7 @@ Stop at 0x00802c: (109) stepped 16 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0802c 35 06 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x06[0K
+0x0802c    35 06 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x06[0K
 F 0x00802c
 timer get
 timer #1("time") ON 0.000005375000000 sec (40 clks)
@@ -307,7 +309,7 @@ Stop at 0x008030: (109) stepped 32 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08030 35 07 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x07[0K
+0x08030    35 07 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x07[0K
 F 0x008030
 timer get
 timer #1("time") ON 0.000007375000000 sec (72 clks)
@@ -334,7 +336,7 @@ Stop at 0x008034: (109) stepped 64 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08034 72 16 48 05    bset   0x4805,#3[0K
+0x08034    72 16 48 05    bset   0x4805,#3[0K
 F 0x008034
 timer get
 timer #1("time") ON 0.000011375000000 sec (136 clks)
@@ -362,7 +364,7 @@ Stop at 0x008049: (109) stepped 1152 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08049 35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
+0x08049    35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
 F 0x008049
 Simulated 1152 ticks [ELIDED]
 Host usage: [ELIDED]
@@ -392,7 +394,7 @@ Stop at 0x00804d: (109) stepped 128 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0804d 35 08 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x08[0K
+0x0804d    35 08 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x08[0K
 F 0x00804d
 timer get
 timer #1("time") ON 0.003067375000000 sec (1416 clks)
@@ -419,7 +421,7 @@ Stop at 0x008051: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08051 35 10 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x10[0K
+0x08051    35 10 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x10[0K
 F 0x008051
 timer get
 timer #1("time") ON 0.003075187500000 sec (1417 clks)
@@ -446,7 +448,7 @@ Stop at 0x008055: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08055 35 18 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x18[0K
+0x08055    35 18 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x18[0K
 F 0x008055
 timer get
 timer #1("time") ON 0.003083000000000 sec (1418 clks)
@@ -473,7 +475,7 @@ Stop at 0x008059: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08059 35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
+0x08059    35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
 F 0x008059
 timer get
 timer #1("time") ON 0.003090812500000 sec (1419 clks)
@@ -500,7 +502,7 @@ Stop at 0x00805d: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0805d 35 01 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x01[0K
+0x0805d    35 01 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x01[0K
 F 0x00805d
 timer get
 timer #1("time") ON 0.003098625000000 sec (1420 clks)
@@ -527,7 +529,7 @@ Stop at 0x008061: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08061 35 02 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x02[0K
+0x08061    35 02 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x02[0K
 F 0x008061
 timer get
 timer #1("time") ON 0.003106437500000 sec (1421 clks)
@@ -554,7 +556,7 @@ Stop at 0x008065: (109) stepped 2 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08065 35 03 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x03[0K
+0x08065    35 03 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x03[0K
 F 0x008065
 timer get
 timer #1("time") ON 0.003122062500000 sec (1423 clks)
@@ -581,7 +583,7 @@ Stop at 0x008069: (109) stepped 4 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08069 35 04 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x04[0K
+0x08069    35 04 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x04[0K
 F 0x008069
 timer get
 timer #1("time") ON 0.003153312500000 sec (1427 clks)
@@ -608,7 +610,7 @@ Stop at 0x00806d: (109) stepped 8 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x0806d 35 05 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x05[0K
+0x0806d    35 05 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x05[0K
 F 0x00806d
 timer get
 timer #1("time") ON 0.003215812500000 sec (1435 clks)
@@ -635,7 +637,7 @@ Stop at 0x008071: (109) stepped 16 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08071 35 06 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x06[0K
+0x08071    35 06 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x06[0K
 F 0x008071
 timer get
 timer #1("time") ON 0.003340812500000 sec (1451 clks)
@@ -662,7 +664,7 @@ Stop at 0x008075: (109) stepped 32 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08075 35 07 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x07[0K
+0x08075    35 07 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x07[0K
 F 0x008075
 timer get
 timer #1("time") ON 0.003590812500000 sec (1483 clks)
@@ -689,7 +691,7 @@ Stop at 0x008079: (109) stepped 64 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08079 00 00          neg    (0x00,SP)[0K
+0x08079    00 00          neg    (0x00,SP)[0K
 F 0x008079
 timer get
 timer #1("time") ON 0.004090812500000 sec (1547 clks)

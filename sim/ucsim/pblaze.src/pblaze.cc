@@ -839,6 +839,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
 int
 cl_pblaze::do_inst(int step)
 {
+  t_addr PCsave = PC;
   int result = resGO;
 
   if (step < 0)
@@ -850,7 +851,13 @@ cl_pblaze::do_inst(int step)
       result = exec_inst();
       post_inst();
 
-      if (result == resGO) {
+      if (result == resINV_INST)
+        /* backup to start of instruction */
+        PC = PCsave;
+      else if (result == resGO) {
+          if (!inst_at(PCsave))
+            analyze(PCsave);
+
           int res;
           if ((res = do_interrupt()) != resGO)
             result = res;
@@ -1098,10 +1105,14 @@ cl_pblaze::read_hex_file(const char *nam)
     opt->get_value(&value);
   }
 
+  long ret;
   if (value)
-    return pblaze_read_hex_file(nam);
+    ret = pblaze_read_hex_file(nam);
   else
-    return std_read_hex_file(nam);
+    ret = std_read_hex_file(nam);
+
+  analyze_init();
+  return ret;
 }
 
 
@@ -1157,7 +1168,6 @@ cl_pblaze::pblaze_read_hex_file(const char *nam)
   if (nam)
     fclose(f);
   application->debug("%ld records have been read\n", written);
-  analyze(0);
   return(written);
 }
 
@@ -1300,7 +1310,6 @@ cl_pblaze::std_read_hex_file(const char *nam)
   if (nam)
     fclose(f);
   application->debug("%ld records have been read\n", recnum);
-  analyze(0);
   return(written);
 }
 

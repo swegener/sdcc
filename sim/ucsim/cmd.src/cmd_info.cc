@@ -249,12 +249,8 @@ COMMAND_DO_WORK_UC(cl_info_var_cmd)
   for (i= 0; i < uc->vars->by_name.count; i++)
     {
       v= uc->vars->by_name.at(i);
-      if ((s == NULL) ||
-	  (
-	   //(strstr(v->mem->get_name(), s) != NULL) ||
-	   (strstr(v->get_name(), s) != NULL)
-	   )
-	  )
+      if ((s == NULL && *(v->get_name()) != '.') ||
+          (s != NULL && strstr(v->get_name(), s) != NULL))
       v->print_info(con);
     }
   return 0;

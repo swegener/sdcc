@@ -11,7 +11,7 @@ Controller has 3 hardware element(s).
 A= 0x00(  0)
 Flag= 0x00(  0)  
 SP= 0x00(  0)
- ? 0x000 0000 nop[0K
+0x000  ? 0000 nop[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x000fff     4096 rom_chip (16,%04x,0x%03lx)

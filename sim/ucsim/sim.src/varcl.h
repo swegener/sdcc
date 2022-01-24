@@ -130,14 +130,15 @@ struct var_def {
 class cl_var_list: public cl_base
 {
  private:
-  int max_name_len;
+  size_t max_name_len;
+  bool max_name_len_known;
 
  public:
   class cl_var_by_name_list by_name;
   class cl_var_by_addr_list by_addr;
 
  public:
-  cl_var_list() {max_name_len = 0;}
+  cl_var_list() { max_name_len = 0; max_name_len_known = true; }
 
   /*! \brief Add the given cl_var replacing any that already exist with the same name.
    */
@@ -168,7 +169,7 @@ class cl_var_list: public cl_base
   
   /*! \brief Return the length of the longest var name.
    */
-  int get_max_name_len(void) { return max_name_len; }
+  size_t get_max_name_len(void);
 
   virtual t_mem read(chars name);
 };

@@ -97,6 +97,8 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
+  virtual void analyze_start(void);
+  virtual void analyze(t_addr addr);
   virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
 

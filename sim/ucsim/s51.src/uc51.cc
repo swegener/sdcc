@@ -1187,7 +1187,8 @@ cl_51core::disass(t_addr addr)
 	    case 'r': // rel8 address at 2nd byte
 	      operand= (u16_t)(addr+2 + (i8_t)rom->get(addr+1));
 	      temp.appendf(rom->addr_format, operand);
-      break;
+	      addr_name(operand, rom, &temp);
+	      break;
 	    case 'R': // rel8 address at 3rd byte
 	      operand= (u16_t)(addr+3 + (i8_t)rom->get(addr+2));
 	      temp.appendf(rom->addr_format, operand);
@@ -1593,46 +1594,41 @@ cl_51core::analyze(t_addr addr)
 	  a= (addr & 0xf800)|
 	    ((rom->get(addr+1)&0x07)*256+
 	     rom->get(addr+2));
-	  analyze(a);
-	  addr= addr+tabl->length;
+	  analyze_jump(addr, a, 's');
 	  break;
 	case 'A': // ajmp
 	  a= (addr & 0xf800)|
 	    (((rom->get(addr)>>5) & 0x07)*256 + rom->get(addr+1));
-	  addr= a;
-	  break;
+	  analyze_jump(addr, a, 'j');
+	  return;
 	case 'l': // lcall
 	  a= rom->get(addr+1)*256 + rom->get(addr+2);
-	  analyze(a);
-	  addr= addr+tabl->length;
+	  analyze_jump(addr, a, 's');
 	  break;
 	case 'L': // ljmp
 	  a= rom->get(addr+1)*256 + rom->get(addr+2);
-	  addr= a;
-	  break;
+	  analyze_jump(addr, a, 'j');
+	  return;
 	case 'r': // reljmp (2nd byte)
 	  a= rom->validate_address(addr+2+(signed char)(rom->get(addr+1)));
-	  analyze(a);
-	  addr= addr+tabl->length;
+	  analyze_jump(addr, a, 'j');
 	  break;
 	case 'R': // reljmp (3rd byte)
-	  analyze(rom->validate_address(addr+3+(signed char)(rom->get(addr+2))));
-	  addr= addr+tabl->length;
+	  a= rom->validate_address(addr+3+(signed char)(rom->get(addr+2)));
+	  analyze_jump(addr, a, 'j');
 	  break;
 	case 's': // sjmp
 	  {
-	    signed char target;
-	    target= rom->get(addr+1);
-	    addr+= 2;
-	    addr= rom->validate_address(addr+target);
-	    break;
+	    a= rom->validate_address(addr+(signed char)(rom->get(addr+1)));
+	    analyze_jump(addr, a, 'j');
+	    return;
 	  }
 	case '_':
 	  return;
 	default:
-	  addr= rom->validate_address(addr+tabl->length);
-	  break;
+	  return;
 	}
+      addr= rom->validate_address(addr+tabl->length);
       code= rom->get(addr);
       tabl= &(dis_tbl()[code]);
     }
@@ -1760,6 +1756,8 @@ cl_51core::do_inst(int step)
 	  pre_inst();
 	  PCsave= PC;
 	  result= exec_inst();
+	  if (result == resGO && !inst_at(PCsave))
+            analyze(PCsave);
 	  post_inst();
 	}
       else

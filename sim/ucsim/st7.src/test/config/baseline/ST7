@@ -12,7 +12,7 @@ Controller has 4 hardware element(s).
 ---HINZC  Flags= 0x00   0 .  A= 0x00   0 .
 ---00000  X= 0x00   0     .  Y= 0x00   0 .
 SP= 0x017f [SP+1]= 02   2 .  Limit= 0x0000
- ? 0x0000 08 70 d4       btjt   $0x70,#4,0xffd7[0K
+0x0000  ? 08 70 d4       btjt   $0x70,#4,0xffd7[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)

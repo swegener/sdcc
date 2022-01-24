@@ -12,7 +12,7 @@ ZNHC---  Flags= 0x00   0 .  A= 0x00   0 .
 00000000
 BC= 0x0000 [BC]= 00   0 .  DE= 0x0000 [DE]= 00   0 .  HL= 0x0000 [HL]= 00   0 .
 SP= 0x0000 [SP]= 00   0 .
- ? 0x0000 00          NOP[0K
+0x0000  ? 00          NOP[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
 Address spaces:

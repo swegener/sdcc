@@ -97,8 +97,6 @@ enum {
   flagZ	= 0x04,
   mN	= 0x08,
   flagN	= 0x08,
-  mS	= 0x08,
-  flagS	= 0x08,
   mI	= 0x10,
   flagI	= 0x10,
   mH	= 0x20,
@@ -189,13 +187,15 @@ public:
   virtual void mk_hw_elements(void);
   virtual void make_cpu_hw(void);
   virtual void make_memories(void);
-
+  virtual void setup_ccr(void);
+  
   virtual int8_t *tick_tab(t_mem code) { return p0ticks; }
   virtual int clock_per_cycle(void) { return 1; }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
+  virtual void analyze_start(void);
   virtual void analyze(t_addr addr);
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 4; }

@@ -134,7 +134,7 @@ cl_m6800::com(class cl_memory_cell &dest)
   dest.W(op);
   f|= flagC;
   if (!op) f|= flagZ;
-  if (op&0x80) f|= flagS;
+  if (op&0x80) f|= flagN;
   cCC.W(f);
   return resGO;
 }
@@ -409,9 +409,9 @@ cl_m6800::DAA(t_mem code)
 	rF|= flagC;
       rA= i;
     }
-  rF&= ~(flagZ|flagS);
+  rF&= ~(flagZ|flagN);
   if (rA&0x80)
-    rF|= flagS;
+    rF|= flagN;
   if (!rA)
     rF|= flagZ;
   cF.W(rF);

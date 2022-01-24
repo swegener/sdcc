@@ -170,7 +170,7 @@ cl_cmdline::split(void)
               else
                 split_out_array(dot, param_str);
             }
-	  else if ((dot= strchr(param_str, '.')) != NULL)
+	  else if ((dot= strchr(param_str, '.')) != NULL && dot != param_str)
 	    split_out_bit(dot, param_str);
 	  else if (param_str[0] == '0' && param_str[1] == 'b')
             {

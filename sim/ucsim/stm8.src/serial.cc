@@ -102,19 +102,19 @@ cl_serial::init(void)
 					regs[cr2], 0x80,
 					regs[sr], 0x80,
 					0x8008+txit*4, false, false,
-					chars("", "usart%d transmit register empty", id), 20*10+1));
+					chars("", "USART%d_TXE", id), 20*10+1));
   is->init();
   uc->it_sources->add(is= new cl_it_src(uc, txit,
 					regs[cr2], 0x40,
 					regs[sr], 0x40,
 					0x8008+txit*4, false, false,
-					chars("", "usart%d transmit complete", id), 20*10+2));
+					chars("", "USART%d_TC", id), 20*10+2));
   is->init();
   uc->it_sources->add(is= new cl_it_src(uc, rxit,
 					regs[cr2], 0x20,
 					regs[sr], 0x20,
 					0x8008+rxit*4, false, false,
-					chars("", "usart%d receive", id), 20*10+3));
+					chars("", "USART%d_RX", id), 20*10+3));
   is->init();
 
   sr_read= false;

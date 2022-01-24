@@ -39,9 +39,24 @@ class CL12;
 
 typedef int (*hcwrapper_fn)(class CL12 *uc, t_mem code);
 
+enum {
+  flagS	= 0x80,
+  flagX	= 0x40
+};
 
 #define rTMP2 (TMP2)
 #define rTMP3 (TMP3)
+
+/*
+ * Special handling of CCR
+ */
+
+class cl_ccr: public cl_cell8
+{
+public:
+  virtual t_mem write(t_mem val);
+};
+
 
 /*
  * Base of M68HC12 processor
@@ -53,8 +68,8 @@ typedef int (*hcwrapper_fn)(class CL12 *uc, t_mem code);
 class cl_m68hc12: public cl_m68hcbase
 {
 public:
-  i8_t post_inc_dec;
-  class cl_cell16 *post_idx_reg;
+  //i8_t post_inc_dec;
+  //class cl_cell16 *post_idx_reg;
   class cl_wrap *hc12wrap;
   u16_t TMP2, TMP3;
   class cl_cell16 cTMP2, cTMP3;
@@ -64,6 +79,7 @@ public:
   virtual const char *id_string(void);
   virtual void reset(void);
   virtual void make_memories(void);
+  virtual void setup_ccr(void) {}
   virtual void make_cpu_hw(void);
   
   virtual int proba(int,t_mem);

@@ -248,6 +248,16 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
   while ((step>0)?(start < stop):(start > stop))
     {
+      if (smart && step > 0 && this == uc->rom && uc->inst_at(start))
+        {
+          uc->print_disass(start, con, true);
+          start += uc->inst_length(start);
+          dump_finished = start;
+          if (lines > 0 && --lines == 0)
+            break;
+          continue;
+        }
+
       int n;
 
       con->dd_color("dump_address");
@@ -442,7 +452,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
         {
           if (smart && n)
             {
-              if ((var = vi.first(this, start+n*step)))
+              if (uc->inst_at(start+n*step) || (var = vi.first(this, start+n*step)))
                 break;
             }
           con->dd_printf(" ");

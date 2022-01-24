@@ -462,7 +462,7 @@ CL11::TEST(t_mem code)
 int
 CL11::STOP(t_mem code)
 {
-  if (!(rF & flagS))
+  if (!(rF & flagN))
     state= stIDLE;
   return resGO;
 }

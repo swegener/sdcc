@@ -25,7 +25,9 @@ vcd[0] value change dump
 # Run the initialization code and stop when we reach the
 # first test loop.
 break 0x800c
-Breakpoint 1 at 0x00800c: F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0 (cond="")
+Breakpoint 1 at 0x00800c: 
+0x0800c    <.loop$0>:
+0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0 (cond="")
 run
 Simulation started, PC=0x008000
 Loading from [ELIDED]
@@ -35,7 +37,9 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+
+0x0800c    <.loop$0>:
+0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 8 ticks [ELIDED]
 Host usage: [ELIDED]
@@ -86,7 +90,9 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+
+0x0800c    <.loop$0>:
+0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 49 ticks [ELIDED]
 Host usage: [ELIDED]
@@ -111,7 +117,9 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-F? 0x0800c 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+
+0x0800c    <.loop$0>:
+0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0[0K
 F 0x00800c
 Simulated 49 ticks [ELIDED]
 Host usage: [ELIDED]

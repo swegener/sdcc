@@ -105,6 +105,8 @@ public:
   virtual int clock_per_cycle(void) { return 1; }
   
   virtual struct dis_entry *dis_tbl(void);
+  virtual void analyze_start(void);
+  virtual void analyze(t_addr addr);
   virtual void disass_indexed(t_addr *addr, chars *work, int siz);
   virtual void disass_immediate(t_addr *addr, chars *work, int siz);
   virtual char *disass(t_addr addr);

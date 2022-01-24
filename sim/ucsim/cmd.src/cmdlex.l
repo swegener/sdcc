@@ -79,7 +79,7 @@ $[0-9a-fA-F]+ {
   return PTOK_NUMBER;
 }
 
-[a-zA-Z_][0-9a-zA-Z_]*	return(uc_yy_check_id(yytext));
+\.?[a-zA-Z_][0-9a-zA-Z_]*($[0-9]+)?	return(uc_yy_check_id(yytext));
 
 '.*' {
   char *s, *p;

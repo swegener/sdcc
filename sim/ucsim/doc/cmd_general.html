@@ -5,6 +5,13 @@
   </head>
   <body style="  background-color: white;">
     <h2>General commands of <i>&#956;Csim</i></h2>
+    <h3><a name="analyze">analyze [<i>addr</i>]</a></h3>
+    <p>Runs the <a href="analyzer.html">analyzer</a> to identify code.
+    If an address is given it is taken as the starting point and the results
+    added to any existing analysis. If no address is given or a file is loaded
+    into memory using the <a href="cmd_memory.html#file">file,load</a> command
+    any existing analysis is cleared and a new one created using all the known
+    hardware vectors as starting points.</p>
     <h3><a name="conf">conf</a></h3>
     Conf command can be used to display different kind of information about <i>&#956;Csim</i>.
     It can be followed by a subcommand:

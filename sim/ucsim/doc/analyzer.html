@@ -4,29 +4,56 @@
     <title>&mu;Csim: Code Analyzer</title>
   </head>
   <body bgcolor="white">
+
     <h1>Code analyser</h1>
-    Code
-    analyser analyses the code of the simulated program and tries to
-    figure out which address contains valid instruction. <br>
-    <br>
-    Analyser starts
-    analysing of the code with address 0 which always must contain an
-    instruction because reset of the device sets zero into program
-    counter. So, analyser marks address 0 that it contains an
-    instruction. Then it marks the address of the next instruction and so
-    on. If the analyser finds a <i>jump</i> instruction it continues with
-    destination address of the <i>jump</i> instruction. If it finds a
-    <i>call</i> instruction, it recursively analyses destination address
-    as well as next instruction follows the <i>call</i> one.<br>
-    <br>
-    Analysator
-    stops if it finds an address which is already marked or if it finds a
-    <i>return</i> instruction or an indirect <i>jump</i> which is
-    impossible to follow. All these mean that it is impossible to discover
-    all instructions of the program.
-    <p>This problem is solved in very simple way. If the
-      execution reaches an unmarked address, the analyser is called to
-      analyse the code starting at actual address pointed by the PC.</p>
+
+    <p>The code analyser analyses the memory of the simulated microprocessor and
+    tries to figure out which address contains valid instruction.</p>
+
+    <p>The analyser starts from the known hardware vectors (reset, IRQs etc.)
+    and follows the possible execution paths through jumps, branches and
+    calls marking data as code and adding variables as necessary. Execution
+    paths that are indirect, indexed or otherwise computed are not followed
+    initially but will be analyzed when, or if, execution reaches them.</p>
+
+    <p>If code is known to exist elsewhere in memory and is not reachable
+    without being run explicitly (such as by the "<code>run <i>addr</i></code>"
+    command) you can use "<code>analyze <i>addr</i></code>" to ask the analyzer
+    to look there. This is not persistent however. Whenever data is loaded
+    or "<code>analyze</code>" run with no <i>addr</i> argument all the analyzer
+    state is reset and recreated from the known vectors so any explicit
+    "<code>analyze <i>addr</i></code>" needs to be rerun if required.</p>
+
+    <p>Variables created by the analyzer always start with a dot. Such variables
+    cannot be created by the "<code>var</code>" command and are not listed by
+    "<code>info var</code>" (although can be using "<code>info var .</code>") but
+    otherwise work like any other variable with one exception. If you create
+    a new variable for the exact same memory location the analyzer's variable
+    will be silently removed.</p>
+
+    <pre>0&gt; <font color="#118811">dump .loop$21</font>
+
+0x081f8    &lt;.loop$21&gt;:
+0x081f8    d6 81 da       ld     A,(0x81da &lt;.bit0_isset$19&gt;,X)
+0x081fb    d7 00 3d       ld     (0x003d,X),A
+0x081fe    5a             decw   X
+0x081ff    26 f7          jrne   0x81f8 &lt;.loop$21&gt;
+
+0&gt; <font color="#118811">var copy_data .loop$21</font>
+
+0&gt; <font color="#118811">dump .loop$21</font>
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+
+0&gt; <font color="#118811">dump copy_data</font>
+
+0x081f8    &lt;copy_data&gt;:
+0x081f8    d6 81 da       ld     A,(0x81da &lt;.bit0_isset$19&gt;,X)
+0x081fb    d7 00 3d       ld     (0x003d,X),A
+0x081fe    5a             decw   X
+0x081ff    26 f7          jrne   0x81f8 &lt;copy_data&gt;
+</pre>
+
     <hr>
   </body>
 </html>

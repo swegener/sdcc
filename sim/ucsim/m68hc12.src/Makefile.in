@@ -146,7 +146,7 @@ $(srcdir)/wdefs.h: $(srcdir)/decode.h $(srcdir)/gen.h
 
 hcwrap.o: $(srcdir)/hcwrap.cc $(srcdir)/hcwrapcl.h $(srcdir)/wfills.h $(srcdir)/wdecls.h $(srcdir)/wdefs.h $(srcdir)/m68hc12cl.h
 
-$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a
+$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a $(top_builddir)/libmotorola.a $(top_builddir)/libm6800.a $(top_builddir)/libm68hc11.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 $(LEN): $(SEN)

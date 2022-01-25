@@ -24,9 +24,9 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="4"
-     inkscape:cx="121.375"
-     inkscape:cy="18.5"
-     inkscape:window-width="2560"
+     inkscape:cx="92.875"
+     inkscape:cy="19.75"
+     inkscape:window-width="1920"
      inkscape:window-height="1029"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -317,14 +317,14 @@
     <text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:1.25;font-family:cmr10;-inkscape-font-specification:cmr10;stroke-width:0.264583"
-       x="27.287186"
-       y="17.251234"
+       x="27.058029"
+       y="9.5999069"
        id="text10771-0-2"><tspan
          sodipodi:role="line"
          id="tspan10769-4-7"
          style="stroke-width:0.264583"
-         x="27.287186"
-         y="17.251234">16</tspan></text>
+         x="27.058029"
+         y="9.5999069">16</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:1.25;font-family:cmr10;-inkscape-font-specification:cmr10;stroke-width:0.264583"
@@ -350,14 +350,14 @@
     <text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:1.25;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.264583"
-       x="36.015694"
-       y="18.897318"
+       x="35.954826"
+       y="10.965276"
        id="text14515-8"><tspan
          sodipodi:role="line"
          id="tspan14513-4"
          style="stroke-width:0.264583"
-         x="36.015694"
-         y="18.897318">de</tspan></text>
+         x="35.954826"
+         y="10.965276">de</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:1.25;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.264583"
@@ -394,14 +394,14 @@
     <text
        xml:space="preserve"
        style="font-size:3.52777px;line-height:1.25;font-family:cmr10;-inkscape-font-specification:cmr10;stroke-width:0.264583"
-       x="33.854259"
-       y="10.977946"
+       x="33.85146"
+       y="19.069057"
        id="text20619"><tspan
          sodipodi:role="line"
          id="tspan20617"
          style="stroke-width:0.264583"
-         x="33.854259"
-         y="10.977946">Stack</tspan></text>
+         x="33.85146"
+         y="19.069057">Stack</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23113)"
        d="M 22,10 H 33"
@@ -442,11 +442,6 @@
        style="fill:none;stroke:#000000;stroke-width:0.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23113-4-06)"
        d="M 43,3 54,9"
        id="path21768-3-5"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23113-4-0)"
-       d="M 22,18 33,11"
-       id="path21768-3-8"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23113-4-0-2)"

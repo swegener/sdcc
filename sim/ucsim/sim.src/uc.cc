@@ -1740,7 +1740,7 @@ cl_uc::analyze(t_addr addr)
 {
   set_inst_at(addr);
 
-  // If we jumped we should make sure its labelled. However we don't know if the
+  // If we jumped we should make sure its labeled. However we don't know if the
   // target has a valid instruction and only a microprocessor specific analyze
   // implemetation can follow the execution path. So we tell a white lie.
   bool was_inst = inst_at(PC);
@@ -1756,7 +1756,7 @@ cl_uc::analyze(t_addr addr)
 void
 cl_uc::analyze_jump(t_addr addr, t_addr target, char type, unsigned int bit)
 {
-  // If the target isn't already labelled we'll create one ourselves.
+  // If the target isn't already labeled we'll create one ourselves.
   t_index var_i;
   if (!vars->by_addr.search(rom, target, -1, -1, var_i) &&
       !vars->by_addr.search(rom, target, rom->width, 0, var_i))
@@ -1927,7 +1927,7 @@ cl_uc::get_hw(enum hw_cath cath, int *idx)
   for (; i < hws->count; i++)
     {
       hw= (class cl_hw *)(hws->at(i));
-      if (hw->cathegory == cath)
+      if (hw->category == cath)
 	break;
     }
   if (i >= hws->count)

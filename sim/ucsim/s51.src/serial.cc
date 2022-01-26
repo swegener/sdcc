@@ -96,7 +96,7 @@ cl_serial::init(void)
 void
 cl_serial::new_hw_added(class cl_hw *new_hw)
 {
-  if (new_hw->cathegory == HW_TIMER &&
+  if (new_hw->category == HW_TIMER &&
       new_hw->id == 2)
     {
       there_is_t2= true;
@@ -363,7 +363,7 @@ cl_serial::reset(void)
 void
 cl_serial::happen(class cl_hw *where, enum hw_event he, void *params)
 {
-  if (where->cathegory == HW_TIMER)
+  if (where->category == HW_TIMER)
     {
       if (where->id == 1)
 	{

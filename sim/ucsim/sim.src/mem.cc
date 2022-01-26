@@ -801,7 +801,7 @@ cl_hw_operator::read(enum hw_cath skip)
   bool use= false;
 
   if (hw &&
-      hw->cathegory != skip)
+      hw->category != skip)
     use= true, d1= hw->read(cell);
 
   if (next_operator)

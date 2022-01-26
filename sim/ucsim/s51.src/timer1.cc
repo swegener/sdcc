@@ -42,12 +42,6 @@ cl_timer1::init(void)
   return(0);
 }*/
 
-/*void
-cl_timer1::added(class cl_hw *new_hw)
-{
-  if (new_hw->cathegory == HW_UART)
-    hws_to_inform->add(new_hw);
-}*/
 
 int
 cl_timer1::do_mode3(int cycles)

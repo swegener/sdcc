@@ -32,7 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /* Address of SFR registers */
 
 #define ACC	0xe0 /* Accumulator */
-#define B	0xf0 /* B register (scondary accumulator) */
+#define B	0xf0 /* B register (secondary accumulator) */
 #define PSW	0xd0 /* Program Status Word */
 #define SP	0x81 /* Stack Pointer */
 #define DPL	0x82 /* Data Pointer Low byte */
@@ -44,7 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define P1	0x90 /* Port #1 */
 #define P2	0xa0 /* Port #2 */
 #define P3	0xb0 /* Port #3 */
-#define IP	0xb8 /* Intrrupt Priority */
+#define IP	0xb8 /* Interrupt Priority */
 #define IE	0xa8 /* Interrupt Enable */
 #define TMOD	0x89 /* Timer MODe */
 #define TCON	0x88 /* Timer CONtrol */

@@ -143,7 +143,7 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 }
 
 CMDHELP(cl_info_hw_cmd,
-	"info hardware cathegory",
+	"info hardware category",
 	"Status of hardware elements of the CPU",
 	"long help of info hardware")
 

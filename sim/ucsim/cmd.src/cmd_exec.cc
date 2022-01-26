@@ -530,7 +530,7 @@ CMDHELP(cl_expression_cmd,
 	"Parameter of the command is interpreted as an expression,\n"
 	"the value evaluated and the result is printed.\n"
 	"Optional format specifier can be used to specify output format,\n"
-	"for example printig 0xa5f can be formatted as:\n"
+	"for example printing 0xa5f can be formatted as:\n"
 	" /x hexadecimal, without prefix: 5fa\n"
 	" /X hexadecimal with 0x prefix: 0x5fa\n"
 	" /$ hexadecimal with $ prefix: $5fa\n"

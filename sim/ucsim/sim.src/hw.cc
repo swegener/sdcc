@@ -48,7 +48,7 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_strin
 {
   flags= HWF_INSIDE;
   uc= auc;
-  cathegory= cath;
+  category= cath;
   id= aid;
   if (aid_string &&
       *aid_string)
@@ -624,9 +624,9 @@ cl_partner_hw::cl_partner_hw(class cl_uc *auc, enum hw_cath cath, int aid):
   cl_base()
 {
   uc= auc;
-  cathegory= cath;
+  category= cath;
   id= aid;
-  partner= uc->get_hw(cathegory, id, 0);
+  partner= uc->get_hw(category, id, 0);
 }
 
 class cl_hw *
@@ -638,7 +638,7 @@ cl_partner_hw::get_partner(void)
 void
 cl_partner_hw::refresh(void)
 {
-  class cl_hw *hw= uc->get_hw(cathegory, id, 0);
+  class cl_hw *hw= uc->get_hw(category, id, 0);
 
   if (!hw)
     return;
@@ -661,7 +661,7 @@ cl_partner_hw::refresh(class cl_hw *new_hw)
 {
   if (!new_hw)
     return;
-  if (cathegory == new_hw->cathegory &&
+  if (category == new_hw->category &&
       id == new_hw->id)
     {
       if (partner)

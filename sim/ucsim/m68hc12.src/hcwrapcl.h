@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "m68hc12cl.h"
 
+#define _NONE
 #define _A_B		uc->cA,uc->rB
 #define _A_i8		uc->cA,uc->i8()
 #define _A_dop		uc->cA,uc->dop()

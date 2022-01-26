@@ -53,7 +53,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= sim$(TN).o $(TN).o \
+OBJECTS_SHARED	= sim$(TN).o $(TN).o imov.o \
 		  glob.o glob12.o \
 		  hcwrap.o
 

@@ -188,7 +188,7 @@ const TiXmlEncoding TIXML_DEFAULT_ENCODING = TIXML_ENCODING_UNKNOWN;
 							Comment (leaf)
 							Unknown (leaf)
 
-	A Decleration contains: Attributes (not on tree)
+	A Declaration contains: Attributes (not on tree)
 	@endverbatim
 */
 class TiXmlBase

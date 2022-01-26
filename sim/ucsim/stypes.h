@@ -325,7 +325,7 @@ enum inst_result {
   resERROR	= 108,	/* Error happened during instruction exec */
   resSTEP	= 109,	/* Step command done, no more exex needed */
   resSIMIF	= 110,	/* Stopped by simulated prog itself through sim interface */
-  resNOT_DONE	= 111,	/* Intruction has not simulated */
+  resNOT_DONE	= 111,	/* Instruction has not simulated */
   resEVENTBREAK = 112,  /* Event breakpoint */
   resSELFJUMP	= 113,  /* Jump to itself */
 };

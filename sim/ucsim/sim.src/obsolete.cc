@@ -1137,7 +1137,7 @@ cl_registered_cell::read(enum hw_cath skip)
   if (nuof_hws)
     for (i= 0; i < nuof_hws; i++)
       {
-	if ((skip & hardwares[i]->cathegory) == 0)
+	if ((skip & hardwares[i]->category) == 0)
 	  d= hardwares[i]->read(this);
 	;
       }

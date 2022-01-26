@@ -164,7 +164,7 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 }
 
 CMDHELP(cl_set_hw_cmd,
-	"set hardware cathegory params...",
+	"set hardware category params...",
 	"Set parameters of specified hardware element",
 	"long help of set hardware")
 

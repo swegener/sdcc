@@ -92,6 +92,24 @@ cl_m68hc12::init(void)
 
   for (i= 0; i<=255; i++)
     itab[i]= instruction_wrapper_invalid;
+
+  tex_cells[0]= &cA;
+  tex_cells[1]= &cB;
+  tex_cells[2]= &cCC;
+  tex_cells[3]= &cTMP3;
+  tex_cells[4]= &cD;
+  tex_cells[5]= &cX;
+  tex_cells[6]= &cY;
+  tex_cells[7]= &cSP;
+
+  tex_names[0]= "A";
+  tex_names[1]= "B";
+  tex_names[2]= "CCR";
+  tex_names[3]= "TMP3";
+  tex_names[4]= "D";
+  tex_names[5]= "X";
+  tex_names[6]= "Y";
+  tex_names[7]= "SP";
   
   return 0;
 }
@@ -247,6 +265,8 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 		addr= a;
 		break;
 	      }
+	    case 'T': // TFR/EXG
+	      disass_b7(&a, &work, comment);
 	    }
 	  //work+= temp;
 	  if (comment && temp.nempty())
@@ -402,6 +422,28 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
       comment->appendf("%04x]=%02x", a, rom->read(a));
     }
   *addr= aof_xb;
+}
+
+void
+CL12::disass_b7(t_addr *addr, chars *work, chars *comment)
+{
+  (*addr)++;
+  u8_t pb= rom->read(*addr);
+  if (pb & 0x08)
+    work->append("TFR/EXG INVALID");
+  else
+    {
+      if (!(pb & 0x80))
+	work->append("TFR");
+      else
+	work->append("EXG");
+      while (work->len() < 6) work->append(' ');
+      u8_t ls= pb&7, ms= (pb>>4)&7;
+      const char *nd= (ms==3)?("TEMP2"):(tex_names[ms]);
+      work->appendf("%s", nd);
+      work->append(",");
+      work->appendf("%s", tex_names[ls]);
+    }
 }
 
 

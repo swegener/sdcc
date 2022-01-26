@@ -67,7 +67,7 @@ class cl_hw: public cl_guiobj
  public:
   int flags;
   class cl_uc *uc;
-  enum hw_cath cathegory;
+  enum hw_cath category;
   int id;
   const char *id_string;
   bool on;
@@ -143,7 +143,7 @@ class cl_partner_hw: public cl_base
 {
  protected:
   class cl_uc *uc;
-  enum hw_cath cathegory;
+  enum hw_cath category;
   int id;
   class cl_hw *partner;
  public:

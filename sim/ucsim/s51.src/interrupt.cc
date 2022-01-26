@@ -127,7 +127,7 @@ cl_interrupt::happen(class cl_hw *where, enum hw_event he, void *params)
 {
   struct ev_port_changed *ep= (struct ev_port_changed *)params;
 
-  if (where->cathegory == HW_PORT &&
+  if (where->category == HW_PORT &&
       he == EV_PORT_CHANGED &&
       ep->id == 3)
     {

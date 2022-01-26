@@ -73,6 +73,8 @@ public:
   class cl_wrap *hc12wrap;
   u16_t TMP2, TMP3;
   class cl_cell16 cTMP2, cTMP3;
+  class cl_memory_cell *tex_cells[7];
+  const char *tex_names[7];
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
@@ -89,6 +91,7 @@ public:
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual void disass_xb(t_addr *addr, chars *work, chars *comment);
+  virtual void disass_b7(t_addr *addr, chars *work, chars *comment);
   virtual int longest_inst(void) { return 6; }
 
   virtual int exec_inst(void);
@@ -100,7 +103,7 @@ public:
   
   virtual void print_regs(class cl_console_base *con);
 
-  
+  virtual int exec_b7(void);
 };
 
 

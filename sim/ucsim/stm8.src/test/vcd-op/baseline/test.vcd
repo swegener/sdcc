@@ -6,7 +6,7 @@ $version
 $end
 $timescale 1ns $end
 $scope module ucsim_vcd_0 $end
-$var wire 8 ! rom_0x00000100[0x00100] $end
+$var wire 8 ! rom_0x00100 $end
 $upscope $end
 $enddefinitions $end
 #0

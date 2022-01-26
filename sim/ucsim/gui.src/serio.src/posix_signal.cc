@@ -5,7 +5,7 @@
  * Last edited on 01th Oct 19999                                              *
  ******************************************************************************/
 /*
- * A quick note, fscking linux, none of this would be neccessary if
+ * A quick note, fscking linux, none of this would be necessary if
  * linux contained support for sighold, sigrelse, sigignore and sigpause.
  *
  */

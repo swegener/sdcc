@@ -114,11 +114,11 @@ P2    11111111 0xff 255 .    P3    11111111 0xff 255 .
 Pin2  11111111 0xff 255 .    Pin3  11111111 0xff 255 .
 Port2 11111111 0xff 255 .    Port3 11111111 0xff 255 .
 &gt; </pre>
-      First lines on the list (labelled with Px) are value of SFRs which are
-      internal latch registers. Second lines (labelled with Pinx) are outputs
+      First lines on the list (labeled with Px) are value of SFRs which are
+      internal latch registers. Second lines (labeled with Pinx) are outputs
       of external devices connected to port pins of the
       microcontroller. These values can be set by you using <a href="#sp"><b>sp</b></a>
-      command. Third lines (labelled with Portx)
+      command. Third lines (labeled with Portx)
       show actual values can be measured on pins of the device. These values
       are calculated with following pseudo formula:
       <p><tt>Portx= Px AND Pinx</tt>
@@ -275,14 +275,14 @@ impossible to execute.
 <dd>Invalid address used in an instruction. For example indirectaddress is bigger then 127 in 51 type of controller. Execution can be
 continued but result will be undefined.
 <dt>3
-<dd>Stack overflow. Execution can be continued but result will beundefined.
+<dd>Stack overflow. Execution can be continued but result will be undefined.
 <dt>4
 <dd>Breakpoint has been reached.
 <dt>5
 <dd>Interrupt accepted. It only stops the execution if <b>stopit</b>
 option is set to TRUE. See <a href="#sopt">sopt</a> command.
 </dl>
-After this diagnostic message the simulator prints out intruction atthe PC in disassembled form. See <a href="#dis"><b>dis</b></a>
+After this diagnostic message the simulator prints out instruction at the PC in disassembled form. See <a href="#dis"><b>dis</b></a>
 commands for description of disassembled form.-->
       <a name="wi">
         <h3>wi,Wi string</h3>

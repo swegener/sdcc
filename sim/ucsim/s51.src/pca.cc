@@ -323,7 +323,7 @@ cl_pca::happen(class cl_hw *where, enum hw_event he, void *params)
   struct ev_port_changed *ep= (struct ev_port_changed *)params;
   uchar bmCEX[5]= {bmCEX0, bmCEX1, bmCEX2, bmCEX3, bmCEX4};
 
-  if (where->cathegory == HW_PORT &&
+  if (where->category == HW_PORT &&
       he == EV_PORT_CHANGED &&
       ep->id == 1)
     {
@@ -343,7 +343,7 @@ cl_pca::happen(class cl_hw *where, enum hw_event he, void *params)
 	    cex_pos[i]= true;
 	}
     }
-  else if (where->cathegory == HW_TIMER &&
+  else if (where->category == HW_TIMER &&
 	   he == EV_OVERFLOW &&
 	   where->id == 0)
     {

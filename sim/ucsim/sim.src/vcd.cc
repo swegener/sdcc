@@ -774,13 +774,13 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                                 }
                             }
 
-                          if (uc->vars->by_addr.search(as, addr, -1, -1, i))
+                          if (uc->vars->by_addr.search(as, addr, -1, -1, i) ||
+                              uc->vars->by_addr.search(as, addr, var->cell->get_width() - 1, 0, i))
                             fprintf(fd, "%s", uc->vars->by_addr.at(i)->get_name());
                           else
                             {
-                              fprintf(fd, "%s_0x%08x[", (as ? as->get_name() : "?"), AU(addr));
+                              fprintf(fd, "%s_", (as ? as->get_name() : "?"));
                               fprintf(fd, (as ? as->addr_format : "0x06x"), addr);
-                              fprintf(fd, "]");
                             }
 
                           if (var->bitnr_high == var->bitnr_low)
@@ -978,7 +978,6 @@ cl_vcd::tick(int cycles)
         }
       if (pausetime >= 0 && now - event >= pausetime)
         {
-          printf("now %.15f event %.15f pausetime %.15f\n", now, event, pausetime);
           event = now;
           on = false;
         }
@@ -1036,7 +1035,10 @@ cl_vcd::tick(int cycles)
                 {
                   if (var->var_id == id)
                     {
+                      unsigned long ticks = uc->ticks->get_ticks();
+                      uc->ticks->set(ticks, event);
                       var->cell->write((var->cell->get() & (~var->bitmask)) | ((value << var->bitnr_low) & var->bitmask));
+                      uc->ticks->set(ticks, now);
                       event_occurred = true;
                       break;
                     }
@@ -1147,7 +1149,8 @@ cl_vcd::print_info(class cl_console_base *con)
         con->dd_printf("%s\n", uc->vars->by_addr.at(i)->get_name());
       else
         {
-          if (uc->vars->by_addr.search(as, a, -1, -1, i))
+          if (uc->vars->by_addr.search(as, a, -1, -1, i) ||
+              uc->vars->by_addr.search(as, a, var->cell->get_width() - 1, 0, i))
             {
               const char *cname = uc->vars->by_addr.at(i)->get_name();
               con->dd_printf("%s", cname);

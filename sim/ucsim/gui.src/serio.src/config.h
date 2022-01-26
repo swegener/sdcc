@@ -1,6 +1,6 @@
 /******************************************************************************
  * to emulate the serial input and output of an 8051 controller               *
- * config.h - general defintions                                              *
+ * config.h - general definitions                                              *
  ******************************************************************************/
 #ifndef CONFIG_HEADER
 #define CONFIG_HEADER

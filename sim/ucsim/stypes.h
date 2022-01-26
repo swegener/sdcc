@@ -101,7 +101,7 @@ struct dis_entry
 {
   /*uint64_t*/long long code, mask; // max 8 byte of code
   char  branch;
-  uchar length;
+  i8_t length;
   const char *mnemonic;
   bool is_call;
   uchar ticks;

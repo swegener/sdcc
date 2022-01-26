@@ -195,7 +195,7 @@ m6502_useReg (reg_info * reg)
 /* m6502_dirtyReg - marks a register as dirty                      */
 /*-----------------------------------------------------------------*/
 void
-m6502_dirtyReg (reg_info * reg, bool freereg)
+m6502_dirtyReg (reg_info * reg)
 {
   reg->aop = NULL;
 
@@ -240,8 +240,8 @@ m6502_dirtyReg (reg_info * reg, bool freereg)
       default:
         break;
     }
-  if (freereg)
-    m6502_freeReg(reg);
+//  if (freereg)
+//    m6502_freeReg(reg);
 }
 
 /*-----------------------------------------------------------------*/

@@ -105,7 +105,7 @@ extern reg_info *m6502_reg_sp;
 reg_info *m6502_regWithIdx (int);
 void m6502_useReg (reg_info * reg);
 void m6502_freeReg (reg_info * reg);
-void m6502_dirtyReg (reg_info * reg, bool freereg);
+void m6502_dirtyReg (reg_info * reg);
 bitVect *m6502_rUmaskForOp (operand * op);
 
 iCode *m6502_ralloc2_cc(ebbIndex *ebbi);

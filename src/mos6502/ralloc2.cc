@@ -115,7 +115,7 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
   if (oi2 == oi_end)
     return(true);
   
-  // Register combinations code generation cannot handle yet (AH, XH, HA).
+  // Register combinations code generation cannot handle yet (AY, XY, YA).
   if(std::binary_search(a.local.begin(), a.local.end(), oi->second) && std::binary_search(a.local.begin(), a.local.end(), oi2->second))
     {
       const reg_t l = a.global[oi->second];
@@ -166,7 +166,7 @@ static bool operand_is_ax(const operand *o, const assignment &a, unsigned short 
   if (oi2 == oi_end)
     return(false);
   
-  // Register combinations code generation cannot handle yet (AX, AH, XH, HA).
+  // Register combinations code generation cannot handle yet (AX, AY, XY, YA).
   if(std::binary_search(a.local.begin(), a.local.end(), oi->second) && std::binary_search(a.local.begin(), a.local.end(), oi2->second))
     {
       const reg_t l = a.global[oi->second];

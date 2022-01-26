@@ -1,4 +1,12 @@
-2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
+2022-01-25 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c,
+      sdcc/src/mos6502/ralloc.c,
+      sdcc/src/mos6502/ralloc.h,
+      sdcc/src/mos6502/ralloc2.c:
+      Make m6502_dirtyReg take only one parameter.
+
+2022-01-25 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
       Refactor verbose assembler debug code.

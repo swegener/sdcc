@@ -263,6 +263,7 @@ regInfoStr()
 
   return outstr;
 }
+
 /*-----------------------------------------------------------------*/
 /* emit6502op - emits opcopdes, updates cost and register state    */
 /*-----------------------------------------------------------------*/
@@ -289,10 +290,10 @@ emit6502op (const char *inst, const char *fmt, ...)
     // load and transfer are handled in the instruction generator
     switch (opcode->type) {
       case M6502OP_REG: // target is accumulator
-        m6502_dirtyReg (m6502_regWithIdx(opcode->dest), false);
+        m6502_dirtyReg (m6502_regWithIdx(opcode->dest));
         break;
       case M6502OP_RMW: // target is accumulator
-        if (!strcmp(fmt, "a")) m6502_dirtyReg (m6502_reg_a, false);
+        if (!strcmp(fmt, "a")) m6502_dirtyReg (m6502_reg_a);
         break;
       case M6502OP_SPL: // stack pull
         _G.stackPushes--;
@@ -316,7 +317,7 @@ emit6502op (const char *inst, const char *fmt, ...)
   }
 
 #ifdef OPT_SPEED
-  cost = 4 * isize + 2 * cycles;
+  cost = 2 * isize + 2 * cycles;
   if (opcode && opcode->type== M6502OP_BR) cost++;
 #else
   cost = 1 * isize + 0 * cycles;
@@ -546,7 +547,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
     dreg->isLitConst = sreg->isLitConst;
     dreg->litConst = sreg->litConst;
   } else {
-    m6502_dirtyReg (dreg, false);
+    m6502_dirtyReg (dreg);
   }
 //  dreg->aop = sreg->aop;
 //  dreg->aopofs = sreg->aopofs;
@@ -621,7 +622,7 @@ loadRegTemp (reg_info * reg, bool always)
   if (reg->isFree && !always) {
     // assume we clobbered it
     if (!always)
-      m6502_dirtyReg (reg, false);
+      m6502_dirtyReg (reg);
     return;
   }
     
@@ -650,7 +651,7 @@ loadRegTemp (reg_info * reg, bool always)
   }
   // TODO: should use stack to preserve state
   m6502_useReg (reg);
-  m6502_dirtyReg (reg, false);
+  m6502_dirtyReg (reg);
 }
 
 // TODO: note that needpull has diff. semantics than loadRegTemp()
@@ -807,7 +808,7 @@ pullReg (reg_info * reg)
       break;
     }
   m6502_useReg (reg);
-  m6502_dirtyReg (reg, false);
+  m6502_dirtyReg (reg);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1116,7 +1117,7 @@ forceload:
           const char *l = aopAdrStr (aop, loffset, false);
           emit6502op (regidx == A_IDX ? "lda" : regidx == X_IDX ? "ldx" : "ldy", l);
           aopAdrUnprepare(aop, loffset);
-          m6502_dirtyReg (reg, false);
+          m6502_dirtyReg (reg);
         }
       break;
 
@@ -1448,7 +1449,7 @@ loadRegFromConst (reg_info * reg, int c)
       return;
     }
 
-  m6502_dirtyReg (reg, false);
+  m6502_dirtyReg (reg);
   reg->isLitConst = 1;
   reg->litConst = c;
   if (reg->rIdx == YX_IDX)
@@ -1505,7 +1506,7 @@ loadRegFromImm (reg_info * reg, char * c)
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "Bad rIdx in loadRegFromConst");
       return;
     }
-  m6502_dirtyReg (reg, false);
+  m6502_dirtyReg (reg);
   m6502_useReg (reg);
 }
 
@@ -1997,7 +1998,7 @@ rmwWithReg (char *rmwop, reg_info * reg)
       wassertl(0, "rmwWithReg()");
     }
   // always dirty dest. register
-  //  m6502_dirtyReg (reg, false);
+  //  m6502_dirtyReg (reg);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -2126,10 +2127,10 @@ loadRegIndexed (reg_info * reg, int offset, char * rematOfs)
           emit6502op ("lda", TEMPFMT_IY, _G.tempOfs+0);
           if (!m6502_reg_y->isFree) {
             emit6502op ("ldy", TEMPFMT, _G.tempOfs+2);
-            m6502_dirtyReg (m6502_reg_y, false);
+            m6502_dirtyReg (m6502_reg_y);
           }
         }
-      m6502_dirtyReg (reg, false);
+      m6502_dirtyReg (reg);
       break;
     case X_IDX:
     case Y_IDX:	
@@ -2193,7 +2194,7 @@ loadRegIndexed2 (reg_info * reg, int offset)
           loadRegFromConst(m6502_reg_y, offset);
           emit6502op ("lda", TEMPFMT_IY, prepTempOfs);
         }
-      m6502_dirtyReg (reg, false);
+      m6502_dirtyReg (reg);
       break;
     case X_IDX:
     case Y_IDX:	
@@ -2279,7 +2280,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           emit6502op ("sta", TEMPFMT_IY, _G.tempOfs+0); // [aa],y
           emit6502op ("ldy", TEMPFMT, _G.tempOfs+2); // TODO: if free only
         }
-      m6502_dirtyReg (reg, false);
+      m6502_dirtyReg (reg);
       break;
     case X_IDX:
       needpula = pushRegIfUsed (m6502_reg_a);
@@ -2515,7 +2516,7 @@ static void doTSX()
     return;
   // put stack pointer in X
   emit6502op ("tsx", "");
-  m6502_dirtyReg (m6502_reg_x, false);
+  m6502_dirtyReg (m6502_reg_x);
   m6502_reg_x->aop = &tsxaop;
   _G.tsxStackPushes = _G.stackPushes;
 }
@@ -3656,7 +3657,7 @@ asmopToBool (asmop *aop, bool resultInA)
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl1);
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 1);
         }
       else
@@ -3665,7 +3666,7 @@ asmopToBool (asmop *aop, bool resultInA)
           loadRegFromConst (m6502_reg_a, 1);
         }
       safeEmitLabel (tlbl);
-      m6502_dirtyReg (m6502_reg_a, false);
+      m6502_dirtyReg (m6502_reg_a);
       m6502_useReg (m6502_reg_a);
     }
 }
@@ -3966,7 +3967,7 @@ genUminus (iCode * ic)
 	  // FIXME
           emitcode ("sbc1","%d,s", (result0 == m6502_reg_a || (result0 && result0 == left1)) ? 2 : 1);
           regalloc_dry_run_cost += 3;
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
         }
       else
         {
@@ -4373,9 +4374,10 @@ genCall (iCode * ic)
                               OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
     }
 
-  m6502_dirtyReg (m6502_reg_a, false);
-  m6502_dirtyReg (m6502_reg_yx, false);
-  
+  m6502_dirtyReg (m6502_reg_a);
+  m6502_dirtyReg (m6502_reg_x);
+  m6502_dirtyReg (m6502_reg_y);
+
   /* do we need to recompute the base ptr? */
   if (_G.funcHasBasePtr) {
     saveBasePtr();
@@ -4480,8 +4482,9 @@ genPcall (iCode * ic)
       emit6502op ("jsr", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
     }
 
-  m6502_dirtyReg (m6502_reg_a, false);
-  m6502_dirtyReg (m6502_reg_yx, false);
+  m6502_dirtyReg (m6502_reg_a);
+  m6502_dirtyReg (m6502_reg_x);
+  m6502_dirtyReg (m6502_reg_y);
 
   /* do we need to recompute the base ptr? */
   if (_G.funcHasBasePtr) {
@@ -5610,10 +5613,10 @@ genCmp (iCode * ic, iCode * ifx)
       loadRegFromConst (m6502_reg_a, 0);
       emitBranch ("bra", tlbl2);
       safeEmitLabel (tlbl1);
-//      m6502_dirtyReg (m6502_reg_a, false);
+//      m6502_dirtyReg (m6502_reg_a);
       loadRegFromConst (m6502_reg_a, 1);
       safeEmitLabel (tlbl2);
-      m6502_dirtyReg (m6502_reg_a, false);
+      m6502_dirtyReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), false);
       pullOrFreeReg (m6502_reg_a, needpulla);
       freeAsmop (result, NULL, ic, true);
@@ -5754,11 +5757,11 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           emitBranch ("beq", tlbl_EQ);
           if (tlbl_NE)
             emitLabel (tlbl_NE);
-//          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_EQ);
-//          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 1);
         }
       else
@@ -5769,12 +5772,12 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_NE);
-//          m6502_dirtyReg (m6502_reg_a, false);
+//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 1);
         }
 
       safeEmitLabel (tlbl);
-      m6502_dirtyReg (m6502_reg_a, false);
+      m6502_dirtyReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), false);
       pullOrFreeReg (m6502_reg_a, needpulla);
       freeAsmop (result, NULL, ic, true);
@@ -5857,10 +5860,10 @@ genAndOp (iCode * ic)
   loadRegFromConst (m6502_reg_a, 1);
   emitBranch ("bra", tlbl);
   safeEmitLabel (tlbl0);
-//  m6502_dirtyReg (m6502_reg_a, false);
+//  m6502_dirtyReg (m6502_reg_a);
   loadRegFromConst (m6502_reg_a, 0);
   safeEmitLabel (tlbl);
-  m6502_dirtyReg (m6502_reg_a, false);
+  m6502_dirtyReg (m6502_reg_a);
 
 //  m6502_useReg (m6502_reg_a);
 //  m6502_freeReg (m6502_reg_a);
@@ -5904,10 +5907,10 @@ genOrOp (iCode * ic)
   loadRegFromConst (m6502_reg_a, 0);
   emitBranch ("bra", tlbl);
   safeEmitLabel (tlbl0);
-//  m6502_dirtyReg (m6502_reg_a, false);
+//  m6502_dirtyReg (m6502_reg_a);
   loadRegFromConst (m6502_reg_a, 1);
   safeEmitLabel (tlbl);
-  m6502_dirtyReg (m6502_reg_a, false);
+  m6502_dirtyReg (m6502_reg_a);
 
 //  m6502_useReg (m6502_reg_a);
 //  m6502_freeReg (m6502_reg_a);
@@ -6750,7 +6753,7 @@ genRRC (iCode * ic)
       emitcode ("ora10", "1,s");
       pullNull (1);
       regalloc_dry_run_cost += 3;
-      m6502_dirtyReg (m6502_reg_a, false);
+      m6502_dirtyReg (m6502_reg_a);
       needpula = false;
     }
   else
@@ -6827,7 +6830,7 @@ genRLC (iCode * ic)
       emitcode ("ora11", "1,s");
       pullNull (1);
       regalloc_dry_run_cost += 3;
-      m6502_dirtyReg (m6502_reg_a, false);
+      m6502_dirtyReg (m6502_reg_a);
       needpula = false;
     }
   else
@@ -8862,7 +8865,8 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
               m6502_useReg (m6502_reg_a);
               emitcode ("aix", "#%d", size);
               regalloc_dry_run_cost += 2;
-              m6502_dirtyReg (m6502_reg_yx, false);
+              m6502_dirtyReg (m6502_reg_x);
+              m6502_dirtyReg (m6502_reg_y);
               m6502_freeReg (m6502_reg_x);
               storeRegToAop (m6502_reg_yx, AOP (IC_RESULT (pi)), 0);
               pi->generated = 1;
@@ -8924,7 +8928,8 @@ release:
       // FIXME
       emitcode ("aix", "#%d", size);
       regalloc_dry_run_cost += 2;
-      m6502_dirtyReg (m6502_reg_yx, false);
+      m6502_dirtyReg (m6502_reg_x);
+      m6502_dirtyReg (m6502_reg_y);
       aopOp (IC_RESULT (pi), pi, false);
       storeRegToAop (m6502_reg_yx, AOP (IC_RESULT (pi)), 0);
       if (ifx && AOP_TYPE (IC_RESULT (pi)) != AOP_REG)
@@ -9006,7 +9011,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
             {
               emit6502op ("ora", IMMDFMT, litval);
             }
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           storeRegIndexed (m6502_reg_a, litOffset, rematOffset);
 
           pullOrFreeReg (m6502_reg_a, needpulla);
@@ -9077,7 +9082,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
             {
               emit6502op ("ora", IMMDFMT, litval);
             }
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
           pullOrFreeReg (m6502_reg_a, needpulla);
           return;
@@ -9191,7 +9196,7 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
             {
               emit6502op ("ora", IMMDFMT, litval);
             }
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           storeRegToAop (m6502_reg_a, derefaop, 0);
 
           pullOrFreeReg (m6502_reg_a, needpulla);
@@ -9247,9 +9252,9 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
             {
               emit6502op ("ora", IMMDFMT, litval);
             }
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           storeRegToAop (m6502_reg_a, derefaop, offset);
-          m6502_dirtyReg (m6502_reg_a, false);
+          m6502_dirtyReg (m6502_reg_a);
           pullOrFreeReg (m6502_reg_a, needpulla);
           goto release;
         }
@@ -9475,7 +9480,8 @@ release:
       aopOp (IC_RESULT (pi), pi, false);
       emitcode ("aix", "#%d", size);
       regalloc_dry_run_cost += 2;
-      m6502_dirtyReg (m6502_reg_yx, false);
+      m6502_dirtyReg (m6502_reg_x);
+      m6502_dirtyReg (m6502_reg_y);
       storeRegToAop (m6502_reg_yx, AOP (IC_RESULT (pi)), 0);
       freeAsmop (IC_RESULT (pi), NULL, pi, true);
       pi->generated = 1;
@@ -9570,7 +9576,7 @@ genAddrOf (iCode * ic)
       offset = _G.stackOfs + _G.stackPushes + sym->stack + 1;
       m6502_useReg (m6502_reg_xa);
       emit6502op ("tsx", "");
-      m6502_dirtyReg (m6502_reg_x, false);
+      m6502_dirtyReg (m6502_reg_x);
       offset=smallAdjustX(offset);
       transferRegReg (m6502_reg_x, m6502_reg_a, true);
       if (offset) {
@@ -9743,8 +9749,12 @@ genJumpTab (iCode * ic)
       if (needpulla) pullReg(m6502_reg_a);
       emit6502op ("jmp", TEMPFMT_IND, _G.tempOfs);
 
-      m6502_dirtyReg (m6502_reg_a, true);
-      m6502_dirtyReg (m6502_reg_yx, true);
+      m6502_dirtyReg (m6502_reg_a);
+      m6502_dirtyReg (m6502_reg_x);
+      m6502_dirtyReg (m6502_reg_y);
+      m6502_freeReg (m6502_reg_a);
+      m6502_freeReg (m6502_reg_x);
+      m6502_freeReg (m6502_reg_y);
     }
 
   /* now generate the jump labels */
@@ -10028,7 +10038,7 @@ genCritical (iCode * ic)
 
   if (IC_RESULT (ic)) {
     emit6502op ("plp", "");
-    m6502_dirtyReg (m6502_reg_a, false);
+    m6502_dirtyReg (m6502_reg_a);
     storeRegToAop (m6502_reg_a, AOP (IC_RESULT (ic)), 0);
   }
 
@@ -10398,9 +10408,9 @@ genm6502Code (iCode *lic)
 
   regalloc_dry_run = false;
 
-  m6502_dirtyReg (m6502_reg_a, false);
-  m6502_dirtyReg (m6502_reg_y, false);
-  m6502_dirtyReg (m6502_reg_x, false);
+  m6502_dirtyReg (m6502_reg_a);
+  m6502_dirtyReg (m6502_reg_y);
+  m6502_dirtyReg (m6502_reg_x);
   _G.tempOfs = 0;
 
   /* print the allocation information */

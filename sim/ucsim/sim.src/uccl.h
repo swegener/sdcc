@@ -68,7 +68,7 @@ public:
   virtual ~cl_ticker(void);
 
   enum ticker_type get_type(void) { return type; }
-  double get_ticks(void) { return ticks; }
+  unsigned long get_ticks(void) { return ticks; }
   double get_rtime(void) { return rtime; }
 
   void set(int nr, double time) { ticks = nr; rtime = time; }

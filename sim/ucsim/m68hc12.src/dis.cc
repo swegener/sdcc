@@ -294,7 +294,6 @@ CL12::inst_length(t_addr addr)
       int l= -(di->length);
       u16_t a= (u16_t)addr+l-1;
       u8_t p= rom->read(a);
-      printf("XB:[%04x]=%02x\n",a,p);
       if ((p & 0x20) == 0)
 	{
 	  // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}

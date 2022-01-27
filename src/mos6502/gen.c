@@ -59,6 +59,7 @@ static void adjustStack (int n);
 static bool pushRegIfUsed (reg_info *reg);
 static void pullOrFreeReg (reg_info * reg, bool needpull);
 
+
 static char *IMMDFMT = "#0x%02x";
 static char *TEMPFMT = "*(__TEMP+%d)";
 static char *TEMPFMT_IND = "[__TEMP+%d]";
@@ -7585,6 +7586,7 @@ genLeftShift (iCode * ic)
   char *shift;
   asmop *aopResult;
   reg_info *countreg = NULL;
+  int count_offset = 0;
 
   emitComment (TRACEGEN, __func__);
 
@@ -7633,10 +7635,11 @@ genLeftShift (iCode * ic)
       loadRegFromAop (countreg, AOP (right), 0);
     } else {
       emitComment (TRACEGEN|VVDBG, "  count is not a register");
-      storeRegTemp (m6502_reg_a, true);
-      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      pushReg (m6502_reg_a, true);
-      loadRegTemp (m6502_reg_a, true);
+      bool needpully = pushRegIfUsed (m6502_reg_y);
+      loadRegFromAop (m6502_reg_y, AOP (right), 0);
+      count_offset=_G.tempOfs;
+      storeRegTemp (m6502_reg_y, true);
+      pullOrFreeReg(m6502_reg_y, needpully);
     }
 
   /* now move the left to the result if they are not the
@@ -7665,30 +7668,7 @@ genLeftShift (iCode * ic)
   offset = 0;
   tlbl1 = safeNewiTempLabel (NULL);
 
-  if (!countreg) // TODO
-    {
-      emitComment (TRACEGEN|VVDBG, "  count is not a register");
-#if 0
-      // FIXME
-      storeRegTemp (m6502_reg_a, true);
-//      pushReg (m6502_reg_a, false);
-      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      pushReg (m6502_reg_a, true);
-	emitcode("php", "" );
-      loadRegTemp (m6502_reg_a, true);
-	emitcode("plp", "" );
-     // emitcode ("sta12", "2,s"); // FIXME: is this needed?
-      regalloc_dry_run_cost += 3;
-//      pullReg (m6502_reg_a);
-#endif
-      storeRegTemp (m6502_reg_a, true);
-      pullReg (m6502_reg_a);
-      pushReg (m6502_reg_a, true);
-      emit6502op("php", "" );
-      loadRegTemp (m6502_reg_a, true);
-      emit6502op("plp", "" );
-    }
-  else
+  if (countreg)
     {
       // TODO: can combine these with load of count reg?
       if (countreg == m6502_reg_a)
@@ -7697,9 +7677,14 @@ genLeftShift (iCode * ic)
         emit6502op("cpx", "#0x00");
       if (countreg == m6502_reg_y)
         emit6502op("cpy", "#0x00");
+      emitBranch ("beq", tlbl1);
+    }
+  else
+    {
+      emit6502op ("dec", TEMPFMT, count_offset);
+      emitBranch ("bmi", tlbl1);
     }
 
-  emitBranch ("beq", tlbl1);
   safeEmitLabel (tlbl);
 
   shift = "asl";
@@ -7708,35 +7693,20 @@ genLeftShift (iCode * ic)
       rmwWithAop (shift, AOP (result), offset);
       shift = "rol";
     }
-      if (countreg == m6502_reg_a) {
-	emit6502op("sec", "" );
-	emit6502op("sbc", "#0x01" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      if (countreg == m6502_reg_x) {
-	emit6502op("dex", "" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      if (countreg == m6502_reg_y) {
-	emit6502op("dey", "");
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      // FIXME
-      if (!countreg) {
-        bool needpullx = storeRegTemp (m6502_reg_x, false);
-	emit6502op("tsx", "" );
-	emit6502op("dec", "0x101,x" );
-	emit6502op("php", "" );
-        loadRegTemp (m6502_reg_x, needpullx);
-	emit6502op("plp", "" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
+
+  if (countreg) {
+      rmwWithReg("dec", countreg);
+      emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
+  } else {
+      emit6502op("dec", TEMPFMT, count_offset );
+      emit6502op("bpl", "%05d$", safeLabelKey2num (tlbl->key));
     }
 
   safeEmitLabel (tlbl1);
 
   if (!countreg) {
     emitComment (TRACEGEN|VVDBG, "  pull null (1) ");
-    pullNull (1);
+    _G.tempOfs--;
   }
 
   freeAsmop (result, NULL, ic, true);
@@ -8027,6 +7997,7 @@ genRightShift (iCode * ic)
   bool sign;
   asmop *aopResult;
   reg_info *countreg = NULL;
+  int count_offset=0;
 
   emitComment (TRACEGEN, __func__);
 
@@ -8086,10 +8057,11 @@ genRightShift (iCode * ic)
       loadRegFromAop (countreg, AOP (right), 0);
     } else {
       emitComment (TRACEGEN|VVDBG, "  count is not a register");
-      storeRegTemp (m6502_reg_a, true);
-      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      pushReg (m6502_reg_a, true);
-      loadRegTemp (m6502_reg_a, true);
+      bool needpully = pushRegIfUsed (m6502_reg_y);
+      loadRegFromAop (m6502_reg_y, AOP (right), 0);
+      count_offset=_G.tempOfs;
+      storeRegTemp (m6502_reg_y, true);
+      pullOrFreeReg(m6502_reg_y, needpully);
     }
 
   /* now move the left to the result if they are not the
@@ -8121,18 +8093,7 @@ genRightShift (iCode * ic)
   offset = 0;
   tlbl1 = safeNewiTempLabel (NULL);
 
-  if (!countreg) // TODO
-    {
-      storeRegTemp (m6502_reg_a, true);
-// put the counter on the stack earlier
-//      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      pullReg (m6502_reg_a);
-      pushReg (m6502_reg_a, true);
-      emit6502op("php", "" );
-      loadRegTemp (m6502_reg_a, true);
-      emit6502op("plp", "" );
-    }
-  else
+  if (countreg) // TODO
     {
       // TODO: combine with load index?
       if (countreg == m6502_reg_a)
@@ -8141,9 +8102,14 @@ genRightShift (iCode * ic)
         emit6502op("cpx", "#0x00");
       if (countreg == m6502_reg_y)
         emit6502op("cpy", "#0x00");
+      emitBranch ("beq", tlbl1);
+    }
+  else
+    {
+      emit6502op ("dec", TEMPFMT, count_offset);
+      emitBranch ("bmi", tlbl1);
     }
 
-  emitBranch ("beq", tlbl1);
   safeEmitLabel (tlbl);
 
   shift = sign ? "asr" : "lsr";
@@ -8153,35 +8119,18 @@ genRightShift (iCode * ic)
       shift = "ror";
     }
 
-      if (countreg == m6502_reg_a) {
-	emit6502op("sec", "" );
-	emit6502op("sbc", "#0x01");
+  if (countreg) {
+      rmwWithReg("dec", countreg);
         emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      if (countreg == m6502_reg_x) {
-	emit6502op("dex", "" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      if (countreg == m6502_reg_y) {
-	emit6502op("dey", "" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-      }
-      // FIXME
-      if (!countreg) {
-        bool needpullx = storeRegTemp (m6502_reg_x, false);
-	emit6502op("tsx", "" );
-	emit6502op("dec", "0x101,x" );
-	emit6502op("php", "" );
-        loadRegTemp (m6502_reg_x, needpullx);
-	emit6502op("plp", "" );
-        emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
-//        emit6502op ("dbnz17 1,s", "%05d$", safeLabelKey2num (tlbl->key));
+  } else {
+      emit6502op("dec", TEMPFMT, count_offset );
+      emit6502op("bpl", "%05d$", safeLabelKey2num (tlbl->key));
     }
 
   safeEmitLabel (tlbl1);
 
-  if (!countreg)
-    pullNull (1);
+  if (!countreg) 
+    _G.tempOfs--;
 
   freeAsmop (result, NULL, ic, true);
   freeAsmop (right, NULL, ic, true);

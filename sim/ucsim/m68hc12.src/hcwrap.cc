@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 int wrap_INV(class CL12 *uc, t_mem code) { return resINV; }
+int wrap_TRAP(class CL12 *uc, t_mem code) { return uc->trap(code); }
 
 cl_wrap::cl_wrap():
   cl_base()
@@ -45,6 +46,14 @@ cl_wrap::cl_wrap():
       disass12p0[i].mnemonic= "";
       disass12p0[i].is_call= false;
       disass12p0[i].ticks= 1;
+
+      disass12p18[i].code= (i<=255)?i:0;
+      disass12p18[i].mask= 0xff;
+      disass12p18[i].branch= ' ';
+      disass12p18[i].length= 1;
+      disass12p18[i].mnemonic= "";
+      disass12p18[i].is_call= false;
+      disass12p18[i].ticks= 1;
     }
 }
 
@@ -55,6 +64,7 @@ cl_wrap::set_disass(int page, int code, const char *mnemo, char branch, int len)
   switch (page)
     {
     case 0: tab= disass12p0; break;
+    case 0x18: tab= disass12p18; break;
     }
   if (tab == NULL)
     return;
@@ -62,6 +72,20 @@ cl_wrap::set_disass(int page, int code, const char *mnemo, char branch, int len)
   tab[code].branch= branch;
   tab[code].length= len;
   tab[code].mnemonic= mnemo;
+}
+
+void
+cl_wrap::set_ticks(int page, int code, int ticks)
+{
+  int *tab= NULL;
+  switch (page)
+    {
+    case 0: tab= ticks12p0; break;
+    case 0x18: tab= ticks12p18; break;
+    }
+  if (tab == NULL)
+    return ;
+  tab[code]= ticks;
 }
 
 

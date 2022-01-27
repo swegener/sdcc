@@ -104,7 +104,7 @@ class cl_error: public cl_base
 protected:
   class cl_error_class *classification;
 public:
-  bool inst;	// Occured during instruction execution
+  bool inst;	// Occurred during instruction execution
   t_addr PC;	// Address of the instruction
 public:
   cl_error(void);

@@ -1742,7 +1742,7 @@ cl_uc::analyze(t_addr addr)
 
   // If we jumped we should make sure its labeled. However we don't know if the
   // target has a valid instruction and only a microprocessor specific analyze
-  // implemetation can follow the execution path. So we tell a white lie.
+  // implementation can follow the execution path. So we tell a white lie.
   bool was_inst = inst_at(PC);
   set_inst_at(PC);
 
@@ -1811,7 +1811,7 @@ cl_uc::analyze_jump(t_addr addr, t_addr target, char type, unsigned int bit)
  *
  * `inst_at' is checking if the specified address is in instruction
  * map and `set_inst_at' marks the address in the map and
- * `del_inst_at' deletes the mark. `there_is_inst' cheks if there is
+ * `del_inst_at' deletes the mark. `there_is_inst' checks if there is
  * any mark in the map
  */
 
@@ -2440,7 +2440,7 @@ cl_uc::check_errors(void)
 		con= c->frozen_console;
 	      if (con)
 		{
-		  con->dd_printf("Erronouse instruction: ");
+		  con->dd_printf("Erroneous instruction: ");
 		  print_disass(error->PC, con);
 		}
 	    }

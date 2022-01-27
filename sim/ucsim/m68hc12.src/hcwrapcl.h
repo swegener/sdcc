@@ -28,25 +28,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef HCWRAPCL_HEADER
 #define HCWRAPCL_HEADER
 
+#include "glob12.h"
 #include "m68hc12cl.h"
 
 #define _NONE
-#define _A_B		uc->cA,uc->rB
+#define _A_B		uc->cA,uc->acc.DAB.a8.Br
 #define _A_i8		uc->cA,uc->i8()
 #define _A_dop		uc->cA,uc->dop()
 #define _A_eop		uc->cA,uc->eop()
 #define _A_xbop8	uc->cA,uc->xbop8()
 
 extern int wrap_INV(class CL12 *uc, t_mem code);
-
+extern int wrap_TRAP(class CL12 *uc, t_mem code);
 
 class cl_wrap: public cl_base
 {
 public:
-  hcwrapper_fn page0[256];
+  hcwrapper_fn page0[256], page0x18[256];
 public:
   cl_wrap();
   virtual void set_disass(int page, int code, const char *mnemo, char branch, int len);
+  virtual void set_ticks(int page, int code, int ticks);
   virtual int init()
   {
     fill_0_00();
@@ -305,6 +307,276 @@ public:
     fill_0_fd();
     fill_0_fe();
     fill_0_ff();
+
+    fill_0x18_00();
+    fill_0x18_01();
+    fill_0x18_02();
+    fill_0x18_03();
+    fill_0x18_04();
+    fill_0x18_05();
+    fill_0x18_06();
+    fill_0x18_07();
+    fill_0x18_08();
+    fill_0x18_09();
+    fill_0x18_0a();
+    fill_0x18_0b();
+    fill_0x18_0c();
+    fill_0x18_0d();
+    fill_0x18_0e();
+    fill_0x18_0f();
+    fill_0x18_10();
+    fill_0x18_11();
+    fill_0x18_12();
+    fill_0x18_13();
+    fill_0x18_14();
+    fill_0x18_15();
+    fill_0x18_16();
+    fill_0x18_17();
+    fill_0x18_18();
+    fill_0x18_19();
+    fill_0x18_1a();
+    fill_0x18_1b();
+    fill_0x18_1c();
+    fill_0x18_1d();
+    fill_0x18_1e();
+    fill_0x18_1f();
+    fill_0x18_20();
+    fill_0x18_21();
+    fill_0x18_22();
+    fill_0x18_23();
+    fill_0x18_24();
+    fill_0x18_25();
+    fill_0x18_26();
+    fill_0x18_27();
+    fill_0x18_28();
+    fill_0x18_29();
+    fill_0x18_2a();
+    fill_0x18_2b();
+    fill_0x18_2c();
+    fill_0x18_2d();
+    fill_0x18_2e();
+    fill_0x18_2f();
+    fill_0x18_30();
+    fill_0x18_31();
+    fill_0x18_32();
+    fill_0x18_33();
+    fill_0x18_34();
+    fill_0x18_35();
+    fill_0x18_36();
+    fill_0x18_37();
+    fill_0x18_38();
+    fill_0x18_39();
+    fill_0x18_3a();
+    fill_0x18_3b();
+    fill_0x18_3c();
+    fill_0x18_3d();
+    fill_0x18_3e();
+    fill_0x18_3f();
+    fill_0x18_40();
+    fill_0x18_41();
+    fill_0x18_42();
+    fill_0x18_43();
+    fill_0x18_44();
+    fill_0x18_45();
+    fill_0x18_46();
+    fill_0x18_47();
+    fill_0x18_48();
+    fill_0x18_49();
+    fill_0x18_4a();
+    fill_0x18_4b();
+    fill_0x18_4c();
+    fill_0x18_4d();
+    fill_0x18_4e();
+    fill_0x18_4f();
+    fill_0x18_50();
+    fill_0x18_51();
+    fill_0x18_52();
+    fill_0x18_53();
+    fill_0x18_54();
+    fill_0x18_55();
+    fill_0x18_56();
+    fill_0x18_57();
+    fill_0x18_58();
+    fill_0x18_59();
+    fill_0x18_5a();
+    fill_0x18_5b();
+    fill_0x18_5c();
+    fill_0x18_5d();
+    fill_0x18_5e();
+    fill_0x18_5f();
+    fill_0x18_60();
+    fill_0x18_61();
+    fill_0x18_62();
+    fill_0x18_63();
+    fill_0x18_64();
+    fill_0x18_65();
+    fill_0x18_66();
+    fill_0x18_67();
+    fill_0x18_68();
+    fill_0x18_69();
+    fill_0x18_6a();
+    fill_0x18_6b();
+    fill_0x18_6c();
+    fill_0x18_6d();
+    fill_0x18_6e();
+    fill_0x18_6f();
+    fill_0x18_70();
+    fill_0x18_71();
+    fill_0x18_72();
+    fill_0x18_73();
+    fill_0x18_74();
+    fill_0x18_75();
+    fill_0x18_76();
+    fill_0x18_77();
+    fill_0x18_78();
+    fill_0x18_79();
+    fill_0x18_7a();
+    fill_0x18_7b();
+    fill_0x18_7c();
+    fill_0x18_7d();
+    fill_0x18_7e();
+    fill_0x18_7f();
+    fill_0x18_80();
+    fill_0x18_81();
+    fill_0x18_82();
+    fill_0x18_83();
+    fill_0x18_84();
+    fill_0x18_85();
+    fill_0x18_86();
+    fill_0x18_87();
+    fill_0x18_88();
+    fill_0x18_89();
+    fill_0x18_8a();
+    fill_0x18_8b();
+    fill_0x18_8c();
+    fill_0x18_8d();
+    fill_0x18_8e();
+    fill_0x18_8f();
+    fill_0x18_90();
+    fill_0x18_91();
+    fill_0x18_92();
+    fill_0x18_93();
+    fill_0x18_94();
+    fill_0x18_95();
+    fill_0x18_96();
+    fill_0x18_97();
+    fill_0x18_98();
+    fill_0x18_99();
+    fill_0x18_9a();
+    fill_0x18_9b();
+    fill_0x18_9c();
+    fill_0x18_9d();
+    fill_0x18_9e();
+    fill_0x18_9f();
+    fill_0x18_a0();
+    fill_0x18_a1();
+    fill_0x18_a2();
+    fill_0x18_a3();
+    fill_0x18_a4();
+    fill_0x18_a5();
+    fill_0x18_a6();
+    fill_0x18_a7();
+    fill_0x18_a8();
+    fill_0x18_a9();
+    fill_0x18_aa();
+    fill_0x18_ab();
+    fill_0x18_ac();
+    fill_0x18_ad();
+    fill_0x18_ae();
+    fill_0x18_af();
+    fill_0x18_b0();
+    fill_0x18_b1();
+    fill_0x18_b2();
+    fill_0x18_b3();
+    fill_0x18_b4();
+    fill_0x18_b5();
+    fill_0x18_b6();
+    fill_0x18_b7();
+    fill_0x18_b8();
+    fill_0x18_b9();
+    fill_0x18_ba();
+    fill_0x18_bb();
+    fill_0x18_bc();
+    fill_0x18_bd();
+    fill_0x18_be();
+    fill_0x18_bf();
+    fill_0x18_c0();
+    fill_0x18_c1();
+    fill_0x18_c2();
+    fill_0x18_c3();
+    fill_0x18_c4();
+    fill_0x18_c5();
+    fill_0x18_c6();
+    fill_0x18_c7();
+    fill_0x18_c8();
+    fill_0x18_c9();
+    fill_0x18_ca();
+    fill_0x18_cb();
+    fill_0x18_cc();
+    fill_0x18_cd();
+    fill_0x18_ce();
+    fill_0x18_cf();
+    fill_0x18_d0();
+    fill_0x18_d1();
+    fill_0x18_d2();
+    fill_0x18_d3();
+    fill_0x18_d4();
+    fill_0x18_d5();
+    fill_0x18_d6();
+    fill_0x18_d7();
+    fill_0x18_d8();
+    fill_0x18_d9();
+    fill_0x18_da();
+    fill_0x18_db();
+    fill_0x18_dc();
+    fill_0x18_dd();
+    fill_0x18_de();
+    fill_0x18_df();
+    fill_0x18_e0();
+    fill_0x18_e1();
+    fill_0x18_e2();
+    fill_0x18_e3();
+    fill_0x18_e4();
+    fill_0x18_e5();
+    fill_0x18_e6();
+    fill_0x18_e7();
+    fill_0x18_e8();
+    fill_0x18_e9();
+    fill_0x18_ea();
+    fill_0x18_eb();
+    fill_0x18_ec();
+    fill_0x18_ed();
+    fill_0x18_ee();
+    fill_0x18_ef();
+    fill_0x18_f0();
+    fill_0x18_f1();
+    fill_0x18_f2();
+    fill_0x18_f3();
+    fill_0x18_f4();
+    fill_0x18_f5();
+    fill_0x18_f6();
+    fill_0x18_f7();
+    fill_0x18_f8();
+    fill_0x18_f9();
+    fill_0x18_fa();
+    fill_0x18_fb();
+    fill_0x18_fc();
+    fill_0x18_fd();
+    fill_0x18_fe();
+    fill_0x18_ff();
+
+    {
+      int i;
+      chars s;
+      for (i= 0; i<256; i++)
+	{
+	  s.format("TRAP $%02x", i);
+	  disass12p18[i].code= i;
+	  disass12p18[i].branch= ' ';
+	  disass12p18[i].length= 2;
+	  disass12p18[i].mnemonic= strdup(s.c_str());
+	}
+    }
     return 0;
   }
   virtual void fill_0_00() { page0[0x00]= wrap_INV; }
@@ -563,6 +835,263 @@ public:
   virtual void fill_0_fd() { page0[0xfd]= wrap_INV; }
   virtual void fill_0_fe() { page0[0xfe]= wrap_INV; }
   virtual void fill_0_ff() { page0[0xff]= wrap_INV; }
+
+  virtual void fill_0x18_00() { page0x18[0x00]= wrap_TRAP; }
+  virtual void fill_0x18_01() { page0x18[0x01]= wrap_TRAP; }
+  virtual void fill_0x18_02() { page0x18[0x02]= wrap_TRAP; }
+  virtual void fill_0x18_03() { page0x18[0x03]= wrap_TRAP; }
+  virtual void fill_0x18_04() { page0x18[0x04]= wrap_TRAP; }
+  virtual void fill_0x18_05() { page0x18[0x05]= wrap_TRAP; }
+  virtual void fill_0x18_06() { page0x18[0x06]= wrap_TRAP; }
+  virtual void fill_0x18_07() { page0x18[0x07]= wrap_TRAP; }
+  virtual void fill_0x18_08() { page0x18[0x08]= wrap_TRAP; }
+  virtual void fill_0x18_09() { page0x18[0x09]= wrap_TRAP; }
+  virtual void fill_0x18_0a() { page0x18[0x0a]= wrap_TRAP; }
+  virtual void fill_0x18_0b() { page0x18[0x0b]= wrap_TRAP; }
+  virtual void fill_0x18_0c() { page0x18[0x0c]= wrap_TRAP; }
+  virtual void fill_0x18_0d() { page0x18[0x0d]= wrap_TRAP; }
+  virtual void fill_0x18_0e() { page0x18[0x0e]= wrap_TRAP; }
+  virtual void fill_0x18_0f() { page0x18[0x0f]= wrap_TRAP; }
+  virtual void fill_0x18_10() { page0x18[0x10]= wrap_TRAP; }
+  virtual void fill_0x18_11() { page0x18[0x11]= wrap_TRAP; }
+  virtual void fill_0x18_12() { page0x18[0x12]= wrap_TRAP; }
+  virtual void fill_0x18_13() { page0x18[0x13]= wrap_TRAP; }
+  virtual void fill_0x18_14() { page0x18[0x14]= wrap_TRAP; }
+  virtual void fill_0x18_15() { page0x18[0x15]= wrap_TRAP; }
+  virtual void fill_0x18_16() { page0x18[0x16]= wrap_TRAP; }
+  virtual void fill_0x18_17() { page0x18[0x17]= wrap_TRAP; }
+  virtual void fill_0x18_18() { page0x18[0x18]= wrap_TRAP; }
+  virtual void fill_0x18_19() { page0x18[0x19]= wrap_TRAP; }
+  virtual void fill_0x18_1a() { page0x18[0x1a]= wrap_TRAP; }
+  virtual void fill_0x18_1b() { page0x18[0x1b]= wrap_TRAP; }
+  virtual void fill_0x18_1c() { page0x18[0x1c]= wrap_TRAP; }
+  virtual void fill_0x18_1d() { page0x18[0x1d]= wrap_TRAP; }
+  virtual void fill_0x18_1e() { page0x18[0x1e]= wrap_TRAP; }
+  virtual void fill_0x18_1f() { page0x18[0x1f]= wrap_TRAP; }
+  virtual void fill_0x18_20() { page0x18[0x20]= wrap_TRAP; }
+  virtual void fill_0x18_21() { page0x18[0x21]= wrap_TRAP; }
+  virtual void fill_0x18_22() { page0x18[0x22]= wrap_TRAP; }
+  virtual void fill_0x18_23() { page0x18[0x23]= wrap_TRAP; }
+  virtual void fill_0x18_24() { page0x18[0x24]= wrap_TRAP; }
+  virtual void fill_0x18_25() { page0x18[0x25]= wrap_TRAP; }
+  virtual void fill_0x18_26() { page0x18[0x26]= wrap_TRAP; }
+  virtual void fill_0x18_27() { page0x18[0x27]= wrap_TRAP; }
+  virtual void fill_0x18_28() { page0x18[0x28]= wrap_TRAP; }
+  virtual void fill_0x18_29() { page0x18[0x29]= wrap_TRAP; }
+  virtual void fill_0x18_2a() { page0x18[0x2a]= wrap_TRAP; }
+  virtual void fill_0x18_2b() { page0x18[0x2b]= wrap_TRAP; }
+  virtual void fill_0x18_2c() { page0x18[0x2c]= wrap_TRAP; }
+  virtual void fill_0x18_2d() { page0x18[0x2d]= wrap_TRAP; }
+  virtual void fill_0x18_2e() { page0x18[0x2e]= wrap_TRAP; }
+  virtual void fill_0x18_2f() { page0x18[0x2f]= wrap_TRAP; }
+  virtual void fill_0x18_30() { page0x18[0x30]= wrap_TRAP; }
+  virtual void fill_0x18_31() { page0x18[0x31]= wrap_TRAP; }
+  virtual void fill_0x18_32() { page0x18[0x32]= wrap_TRAP; }
+  virtual void fill_0x18_33() { page0x18[0x33]= wrap_TRAP; }
+  virtual void fill_0x18_34() { page0x18[0x34]= wrap_TRAP; }
+  virtual void fill_0x18_35() { page0x18[0x35]= wrap_TRAP; }
+  virtual void fill_0x18_36() { page0x18[0x36]= wrap_TRAP; }
+  virtual void fill_0x18_37() { page0x18[0x37]= wrap_TRAP; }
+  virtual void fill_0x18_38() { page0x18[0x38]= wrap_TRAP; }
+  virtual void fill_0x18_39() { page0x18[0x39]= wrap_TRAP; }
+  virtual void fill_0x18_3a() { page0x18[0x3a]= wrap_TRAP; }
+  virtual void fill_0x18_3b() { page0x18[0x3b]= wrap_TRAP; }
+  virtual void fill_0x18_3c() { page0x18[0x3c]= wrap_TRAP; }
+  virtual void fill_0x18_3d() { page0x18[0x3d]= wrap_TRAP; }
+  virtual void fill_0x18_3e() { page0x18[0x3e]= wrap_TRAP; }
+  virtual void fill_0x18_3f() { page0x18[0x3f]= wrap_TRAP; }
+  virtual void fill_0x18_40() { page0x18[0x40]= wrap_TRAP; }
+  virtual void fill_0x18_41() { page0x18[0x41]= wrap_TRAP; }
+  virtual void fill_0x18_42() { page0x18[0x42]= wrap_TRAP; }
+  virtual void fill_0x18_43() { page0x18[0x43]= wrap_TRAP; }
+  virtual void fill_0x18_44() { page0x18[0x44]= wrap_TRAP; }
+  virtual void fill_0x18_45() { page0x18[0x45]= wrap_TRAP; }
+  virtual void fill_0x18_46() { page0x18[0x46]= wrap_TRAP; }
+  virtual void fill_0x18_47() { page0x18[0x47]= wrap_TRAP; }
+  virtual void fill_0x18_48() { page0x18[0x48]= wrap_TRAP; }
+  virtual void fill_0x18_49() { page0x18[0x49]= wrap_TRAP; }
+  virtual void fill_0x18_4a() { page0x18[0x4a]= wrap_TRAP; }
+  virtual void fill_0x18_4b() { page0x18[0x4b]= wrap_TRAP; }
+  virtual void fill_0x18_4c() { page0x18[0x4c]= wrap_TRAP; }
+  virtual void fill_0x18_4d() { page0x18[0x4d]= wrap_TRAP; }
+  virtual void fill_0x18_4e() { page0x18[0x4e]= wrap_TRAP; }
+  virtual void fill_0x18_4f() { page0x18[0x4f]= wrap_TRAP; }
+  virtual void fill_0x18_50() { page0x18[0x50]= wrap_TRAP; }
+  virtual void fill_0x18_51() { page0x18[0x51]= wrap_TRAP; }
+  virtual void fill_0x18_52() { page0x18[0x52]= wrap_TRAP; }
+  virtual void fill_0x18_53() { page0x18[0x53]= wrap_TRAP; }
+  virtual void fill_0x18_54() { page0x18[0x54]= wrap_TRAP; }
+  virtual void fill_0x18_55() { page0x18[0x55]= wrap_TRAP; }
+  virtual void fill_0x18_56() { page0x18[0x56]= wrap_TRAP; }
+  virtual void fill_0x18_57() { page0x18[0x57]= wrap_TRAP; }
+  virtual void fill_0x18_58() { page0x18[0x58]= wrap_TRAP; }
+  virtual void fill_0x18_59() { page0x18[0x59]= wrap_TRAP; }
+  virtual void fill_0x18_5a() { page0x18[0x5a]= wrap_TRAP; }
+  virtual void fill_0x18_5b() { page0x18[0x5b]= wrap_TRAP; }
+  virtual void fill_0x18_5c() { page0x18[0x5c]= wrap_TRAP; }
+  virtual void fill_0x18_5d() { page0x18[0x5d]= wrap_TRAP; }
+  virtual void fill_0x18_5e() { page0x18[0x5e]= wrap_TRAP; }
+  virtual void fill_0x18_5f() { page0x18[0x5f]= wrap_TRAP; }
+  virtual void fill_0x18_60() { page0x18[0x60]= wrap_TRAP; }
+  virtual void fill_0x18_61() { page0x18[0x61]= wrap_TRAP; }
+  virtual void fill_0x18_62() { page0x18[0x62]= wrap_TRAP; }
+  virtual void fill_0x18_63() { page0x18[0x63]= wrap_TRAP; }
+  virtual void fill_0x18_64() { page0x18[0x64]= wrap_TRAP; }
+  virtual void fill_0x18_65() { page0x18[0x65]= wrap_TRAP; }
+  virtual void fill_0x18_66() { page0x18[0x66]= wrap_TRAP; }
+  virtual void fill_0x18_67() { page0x18[0x67]= wrap_TRAP; }
+  virtual void fill_0x18_68() { page0x18[0x68]= wrap_TRAP; }
+  virtual void fill_0x18_69() { page0x18[0x69]= wrap_TRAP; }
+  virtual void fill_0x18_6a() { page0x18[0x6a]= wrap_TRAP; }
+  virtual void fill_0x18_6b() { page0x18[0x6b]= wrap_TRAP; }
+  virtual void fill_0x18_6c() { page0x18[0x6c]= wrap_TRAP; }
+  virtual void fill_0x18_6d() { page0x18[0x6d]= wrap_TRAP; }
+  virtual void fill_0x18_6e() { page0x18[0x6e]= wrap_TRAP; }
+  virtual void fill_0x18_6f() { page0x18[0x6f]= wrap_TRAP; }
+  virtual void fill_0x18_70() { page0x18[0x70]= wrap_TRAP; }
+  virtual void fill_0x18_71() { page0x18[0x71]= wrap_TRAP; }
+  virtual void fill_0x18_72() { page0x18[0x72]= wrap_TRAP; }
+  virtual void fill_0x18_73() { page0x18[0x73]= wrap_TRAP; }
+  virtual void fill_0x18_74() { page0x18[0x74]= wrap_TRAP; }
+  virtual void fill_0x18_75() { page0x18[0x75]= wrap_TRAP; }
+  virtual void fill_0x18_76() { page0x18[0x76]= wrap_TRAP; }
+  virtual void fill_0x18_77() { page0x18[0x77]= wrap_TRAP; }
+  virtual void fill_0x18_78() { page0x18[0x78]= wrap_TRAP; }
+  virtual void fill_0x18_79() { page0x18[0x79]= wrap_TRAP; }
+  virtual void fill_0x18_7a() { page0x18[0x7a]= wrap_TRAP; }
+  virtual void fill_0x18_7b() { page0x18[0x7b]= wrap_TRAP; }
+  virtual void fill_0x18_7c() { page0x18[0x7c]= wrap_TRAP; }
+  virtual void fill_0x18_7d() { page0x18[0x7d]= wrap_TRAP; }
+  virtual void fill_0x18_7e() { page0x18[0x7e]= wrap_TRAP; }
+  virtual void fill_0x18_7f() { page0x18[0x7f]= wrap_TRAP; }
+  virtual void fill_0x18_80() { page0x18[0x80]= wrap_TRAP; }
+  virtual void fill_0x18_81() { page0x18[0x81]= wrap_TRAP; }
+  virtual void fill_0x18_82() { page0x18[0x82]= wrap_TRAP; }
+  virtual void fill_0x18_83() { page0x18[0x83]= wrap_TRAP; }
+  virtual void fill_0x18_84() { page0x18[0x84]= wrap_TRAP; }
+  virtual void fill_0x18_85() { page0x18[0x85]= wrap_TRAP; }
+  virtual void fill_0x18_86() { page0x18[0x86]= wrap_TRAP; }
+  virtual void fill_0x18_87() { page0x18[0x87]= wrap_TRAP; }
+  virtual void fill_0x18_88() { page0x18[0x88]= wrap_TRAP; }
+  virtual void fill_0x18_89() { page0x18[0x89]= wrap_TRAP; }
+  virtual void fill_0x18_8a() { page0x18[0x8a]= wrap_TRAP; }
+  virtual void fill_0x18_8b() { page0x18[0x8b]= wrap_TRAP; }
+  virtual void fill_0x18_8c() { page0x18[0x8c]= wrap_TRAP; }
+  virtual void fill_0x18_8d() { page0x18[0x8d]= wrap_TRAP; }
+  virtual void fill_0x18_8e() { page0x18[0x8e]= wrap_TRAP; }
+  virtual void fill_0x18_8f() { page0x18[0x8f]= wrap_TRAP; }
+  virtual void fill_0x18_90() { page0x18[0x90]= wrap_TRAP; }
+  virtual void fill_0x18_91() { page0x18[0x91]= wrap_TRAP; }
+  virtual void fill_0x18_92() { page0x18[0x92]= wrap_TRAP; }
+  virtual void fill_0x18_93() { page0x18[0x93]= wrap_TRAP; }
+  virtual void fill_0x18_94() { page0x18[0x94]= wrap_TRAP; }
+  virtual void fill_0x18_95() { page0x18[0x95]= wrap_TRAP; }
+  virtual void fill_0x18_96() { page0x18[0x96]= wrap_TRAP; }
+  virtual void fill_0x18_97() { page0x18[0x97]= wrap_TRAP; }
+  virtual void fill_0x18_98() { page0x18[0x98]= wrap_TRAP; }
+  virtual void fill_0x18_99() { page0x18[0x99]= wrap_TRAP; }
+  virtual void fill_0x18_9a() { page0x18[0x9a]= wrap_TRAP; }
+  virtual void fill_0x18_9b() { page0x18[0x9b]= wrap_TRAP; }
+  virtual void fill_0x18_9c() { page0x18[0x9c]= wrap_TRAP; }
+  virtual void fill_0x18_9d() { page0x18[0x9d]= wrap_TRAP; }
+  virtual void fill_0x18_9e() { page0x18[0x9e]= wrap_TRAP; }
+  virtual void fill_0x18_9f() { page0x18[0x9f]= wrap_TRAP; }
+  virtual void fill_0x18_a0() { page0x18[0xa0]= wrap_TRAP; }
+  virtual void fill_0x18_a1() { page0x18[0xa1]= wrap_TRAP; }
+  virtual void fill_0x18_a2() { page0x18[0xa2]= wrap_TRAP; }
+  virtual void fill_0x18_a3() { page0x18[0xa3]= wrap_TRAP; }
+  virtual void fill_0x18_a4() { page0x18[0xa4]= wrap_TRAP; }
+  virtual void fill_0x18_a5() { page0x18[0xa5]= wrap_TRAP; }
+  virtual void fill_0x18_a6() { page0x18[0xa6]= wrap_TRAP; }
+  virtual void fill_0x18_a7() { page0x18[0xa7]= wrap_TRAP; }
+  virtual void fill_0x18_a8() { page0x18[0xa8]= wrap_TRAP; }
+  virtual void fill_0x18_a9() { page0x18[0xa9]= wrap_TRAP; }
+  virtual void fill_0x18_aa() { page0x18[0xaa]= wrap_TRAP; }
+  virtual void fill_0x18_ab() { page0x18[0xab]= wrap_TRAP; }
+  virtual void fill_0x18_ac() { page0x18[0xac]= wrap_TRAP; }
+  virtual void fill_0x18_ad() { page0x18[0xad]= wrap_TRAP; }
+  virtual void fill_0x18_ae() { page0x18[0xae]= wrap_TRAP; }
+  virtual void fill_0x18_af() { page0x18[0xaf]= wrap_TRAP; }
+  virtual void fill_0x18_b0() { page0x18[0xb0]= wrap_TRAP; }
+  virtual void fill_0x18_b1() { page0x18[0xb1]= wrap_TRAP; }
+  virtual void fill_0x18_b2() { page0x18[0xb2]= wrap_TRAP; }
+  virtual void fill_0x18_b3() { page0x18[0xb3]= wrap_TRAP; }
+  virtual void fill_0x18_b4() { page0x18[0xb4]= wrap_TRAP; }
+  virtual void fill_0x18_b5() { page0x18[0xb5]= wrap_TRAP; }
+  virtual void fill_0x18_b6() { page0x18[0xb6]= wrap_TRAP; }
+  virtual void fill_0x18_b7() { page0x18[0xb7]= wrap_TRAP; }
+  virtual void fill_0x18_b8() { page0x18[0xb8]= wrap_TRAP; }
+  virtual void fill_0x18_b9() { page0x18[0xb9]= wrap_TRAP; }
+  virtual void fill_0x18_ba() { page0x18[0xba]= wrap_TRAP; }
+  virtual void fill_0x18_bb() { page0x18[0xbb]= wrap_TRAP; }
+  virtual void fill_0x18_bc() { page0x18[0xbc]= wrap_TRAP; }
+  virtual void fill_0x18_bd() { page0x18[0xbd]= wrap_TRAP; }
+  virtual void fill_0x18_be() { page0x18[0xbe]= wrap_TRAP; }
+  virtual void fill_0x18_bf() { page0x18[0xbf]= wrap_TRAP; }
+  virtual void fill_0x18_c0() { page0x18[0xc0]= wrap_TRAP; }
+  virtual void fill_0x18_c1() { page0x18[0xc1]= wrap_TRAP; }
+  virtual void fill_0x18_c2() { page0x18[0xc2]= wrap_TRAP; }
+  virtual void fill_0x18_c3() { page0x18[0xc3]= wrap_TRAP; }
+  virtual void fill_0x18_c4() { page0x18[0xc4]= wrap_TRAP; }
+  virtual void fill_0x18_c5() { page0x18[0xc5]= wrap_TRAP; }
+  virtual void fill_0x18_c6() { page0x18[0xc6]= wrap_TRAP; }
+  virtual void fill_0x18_c7() { page0x18[0xc7]= wrap_TRAP; }
+  virtual void fill_0x18_c8() { page0x18[0xc8]= wrap_TRAP; }
+  virtual void fill_0x18_c9() { page0x18[0xc9]= wrap_TRAP; }
+  virtual void fill_0x18_ca() { page0x18[0xca]= wrap_TRAP; }
+  virtual void fill_0x18_cb() { page0x18[0xcb]= wrap_TRAP; }
+  virtual void fill_0x18_cc() { page0x18[0xcc]= wrap_TRAP; }
+  virtual void fill_0x18_cd() { page0x18[0xcd]= wrap_TRAP; }
+  virtual void fill_0x18_ce() { page0x18[0xce]= wrap_TRAP; }
+  virtual void fill_0x18_cf() { page0x18[0xcf]= wrap_TRAP; }
+  virtual void fill_0x18_d0() { page0x18[0xd0]= wrap_TRAP; }
+  virtual void fill_0x18_d1() { page0x18[0xd1]= wrap_TRAP; }
+  virtual void fill_0x18_d2() { page0x18[0xd2]= wrap_TRAP; }
+  virtual void fill_0x18_d3() { page0x18[0xd3]= wrap_TRAP; }
+  virtual void fill_0x18_d4() { page0x18[0xd4]= wrap_TRAP; }
+  virtual void fill_0x18_d5() { page0x18[0xd5]= wrap_TRAP; }
+  virtual void fill_0x18_d6() { page0x18[0xd6]= wrap_TRAP; }
+  virtual void fill_0x18_d7() { page0x18[0xd7]= wrap_TRAP; }
+  virtual void fill_0x18_d8() { page0x18[0xd8]= wrap_TRAP; }
+  virtual void fill_0x18_d9() { page0x18[0xd9]= wrap_TRAP; }
+  virtual void fill_0x18_da() { page0x18[0xda]= wrap_TRAP; }
+  virtual void fill_0x18_db() { page0x18[0xdb]= wrap_TRAP; }
+  virtual void fill_0x18_dc() { page0x18[0xdc]= wrap_TRAP; }
+  virtual void fill_0x18_dd() { page0x18[0xdd]= wrap_TRAP; }
+  virtual void fill_0x18_de() { page0x18[0xde]= wrap_TRAP; }
+  virtual void fill_0x18_df() { page0x18[0xdf]= wrap_TRAP; }
+  virtual void fill_0x18_e0() { page0x18[0xe0]= wrap_TRAP; }
+  virtual void fill_0x18_e1() { page0x18[0xe1]= wrap_TRAP; }
+  virtual void fill_0x18_e2() { page0x18[0xe2]= wrap_TRAP; }
+  virtual void fill_0x18_e3() { page0x18[0xe3]= wrap_TRAP; }
+  virtual void fill_0x18_e4() { page0x18[0xe4]= wrap_TRAP; }
+  virtual void fill_0x18_e5() { page0x18[0xe5]= wrap_TRAP; }
+  virtual void fill_0x18_e6() { page0x18[0xe6]= wrap_TRAP; }
+  virtual void fill_0x18_e7() { page0x18[0xe7]= wrap_TRAP; }
+  virtual void fill_0x18_e8() { page0x18[0xe8]= wrap_TRAP; }
+  virtual void fill_0x18_e9() { page0x18[0xe9]= wrap_TRAP; }
+  virtual void fill_0x18_ea() { page0x18[0xea]= wrap_TRAP; }
+  virtual void fill_0x18_eb() { page0x18[0xeb]= wrap_TRAP; }
+  virtual void fill_0x18_ec() { page0x18[0xec]= wrap_TRAP; }
+  virtual void fill_0x18_ed() { page0x18[0xed]= wrap_TRAP; }
+  virtual void fill_0x18_ee() { page0x18[0xee]= wrap_TRAP; }
+  virtual void fill_0x18_ef() { page0x18[0xef]= wrap_TRAP; }
+  virtual void fill_0x18_f0() { page0x18[0xf0]= wrap_TRAP; }
+  virtual void fill_0x18_f1() { page0x18[0xf1]= wrap_TRAP; }
+  virtual void fill_0x18_f2() { page0x18[0xf2]= wrap_TRAP; }
+  virtual void fill_0x18_f3() { page0x18[0xf3]= wrap_TRAP; }
+  virtual void fill_0x18_f4() { page0x18[0xf4]= wrap_TRAP; }
+  virtual void fill_0x18_f5() { page0x18[0xf5]= wrap_TRAP; }
+  virtual void fill_0x18_f6() { page0x18[0xf6]= wrap_TRAP; }
+  virtual void fill_0x18_f7() { page0x18[0xf7]= wrap_TRAP; }
+  virtual void fill_0x18_f8() { page0x18[0xf8]= wrap_TRAP; }
+  virtual void fill_0x18_f9() { page0x18[0xf9]= wrap_TRAP; }
+  virtual void fill_0x18_fa() { page0x18[0xfa]= wrap_TRAP; }
+  virtual void fill_0x18_fb() { page0x18[0xfb]= wrap_TRAP; }
+  virtual void fill_0x18_fc() { page0x18[0xfc]= wrap_TRAP; }
+  virtual void fill_0x18_fd() { page0x18[0xfd]= wrap_TRAP; }
+  virtual void fill_0x18_fe() { page0x18[0xfe]= wrap_TRAP; }
+  virtual void fill_0x18_ff() { page0x18[0xff]= wrap_TRAP; }
 };
 
 #include "wdecls.h"

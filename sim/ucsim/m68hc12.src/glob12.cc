@@ -31,6 +31,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 struct dis_entry disass12p0[257];
+struct dis_entry disass12p18[257];
+
+int ticks12p0[256];
+int ticks12p18[256];
 
 
 /* End of m68hc12.src/glob12.cc */

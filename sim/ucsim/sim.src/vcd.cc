@@ -1016,7 +1016,7 @@ cl_vcd::tick(int cycles)
             }
           else if (state == 1 || word[0] == '1' || word[0] == '0')
             {
-              // ID for preceeding value or bit followed by ID
+              // ID for preceding value or bit followed by ID
               char id;
               if (word[0] == '1')
                 {
@@ -1048,7 +1048,7 @@ cl_vcd::tick(int cycles)
             }
           else if (state == 2)
             {
-              // ID for preceeding value
+              // ID for preceding value
               // Unsupported
               state = 0;
             }

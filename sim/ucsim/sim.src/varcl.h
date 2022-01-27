@@ -152,7 +152,7 @@ class cl_var_list: public cl_base
    */
   class cl_cvar *add(chars name, const char *cellname, int bitnr_high, int bitnr_low, chars desc);
 
-  /*! \brief Create and add (or replace) a var labelling a cell.
+  /*! \brief Create and add (or replace) a var labeling a cell.
    */
   class cl_cvar *add(chars name, class cl_memory *mem, t_addr addr, chars desc) {
     return add(name, mem, addr, -1, -1, desc);

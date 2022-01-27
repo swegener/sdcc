@@ -16,7 +16,7 @@ static void yyerror (const char *msg);
 %token PTOK_LEFT_BRACKET PTOK_RIGHT_BRACKET
 %token PTOK_DOT PTOK_AMPERSAND PTOK_PIPE PTOK_CIRCUM
 %token PTOK_PERCENT PTOK_TILDE PTOK_QUESTION PTOK_COLON PTOK_EXCLAMATION
-%token PTOK_LESS PTOK_GREATHER PTOK_COMMA
+%token PTOK_LESS PTOK_GREATER PTOK_COMMA
 
 %token PTOK_AND_OP PTOK_OR_OP
 %token PTOK_INC_OP PTOK_DEC_OP
@@ -296,7 +296,7 @@ shift_expr
 relational_expr
 : shift_expr { $$= $1; }
 | relational_expr PTOK_LESS shift_expr { $$= ($1 < $3)?1:0; }
-| relational_expr PTOK_GREATHER shift_expr { $$= ($1 > $3)?1:0; }
+| relational_expr PTOK_GREATER shift_expr { $$= ($1 > $3)?1:0; }
 | relational_expr PTOK_LE_OP shift_expr { $$= ($1 <= $3)?1:0; }
 | relational_expr PTOK_GE_OP shift_expr { $$= ($1 >= $3)?1:0; }
 ;

@@ -50,7 +50,7 @@ enum error_type {
   err_warning  = 0x04
 };
 
-// table of dissassembled instructions
+// table of disassembled instructions
 struct dis_entry
 {
   uint  code, mask;
@@ -140,7 +140,7 @@ enum mem_class
 #define resGO		0	/* OK, go on */
 #define resWDTRESET	1	/* Reseted by WDT */
 #define resINTERRUPT	2	/* Interrupt accepted */
-#define resSTOP		100	/* Stop if result greather then this */
+#define resSTOP		100	/* Stop if result greater then this */
 #define resHALT		101	/* Serious error, halt CPU */
 #define resINV_ADDR	102	/* Invalid indirect address */
 #define resSTACK_OV	103	/* Stack overflow */
@@ -201,7 +201,7 @@ enum brk_event
 //};
 
 /* Interrupt levels */
-//#define IT_NO		-1 /* not in interroupt service */
+//#define IT_NO		-1 /* not in interrupt service */
 #define IT_LOW		1 /* low level interrupt service */
 #define IT_HIGH		2 /* service of high priority interrupt */
 

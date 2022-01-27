@@ -76,7 +76,7 @@ public:
   virtual bool can_removed(class cl_stack_op *op);
 };
 
-/* Call of a subrutine, must match with RET */
+/* Call of a subroutine, must match with RET */
 class cl_stack_call: public cl_stack_op
 {
 protected:

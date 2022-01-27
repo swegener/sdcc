@@ -57,7 +57,7 @@ static int uc_yy_input(char *buf, int max_size);
 "?"			return(PTOK_QUESTION);
 ":"			return(PTOK_COLON);
 "<"			return(PTOK_LESS);
-">"			return(PTOK_GREATHER);
+">"			return(PTOK_GREATER);
 "!"			return(PTOK_EXCLAMATION);
 ","			return(PTOK_COMMA);
 

@@ -115,7 +115,7 @@ XOR,
 
 extern const char *op_mnemonic_str[];
 
-/* this classifies the operands and is used in the dissassembly
+/* this classifies the operands and is used in the disassembly
    to print the operands.  Its also used in the simulation to characterize
    the op-code function.
  */   
@@ -190,7 +190,7 @@ enum op_operands {
   IIREG
 };
 
-// table of dissassembled instructions
+// table of disassembled instructions
 struct xa_dis_entry
 {
   uint is1byte; /* only grab 1 byte for table lookup(most are 2 bytes) */

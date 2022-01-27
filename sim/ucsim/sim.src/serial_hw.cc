@@ -370,7 +370,7 @@ cl_serial_hw::proc_input(void)
 		  if (run && !input_avail)
 		    {
 		      input= esc, input_avail= true;
-		      io->dd_printf("^%c enterted.\n", 'a'+esc-1);
+		      io->dd_printf("^%c entered.\n", 'a'+esc-1);
 		    }
 		  else
 		    io->dd_printf("Control menu exited.\n");

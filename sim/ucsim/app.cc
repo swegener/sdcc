@@ -403,7 +403,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	    XTAL*= 1e6;
 	  if (XTAL == 0)
 	    {
-	      fprintf(stderr, "Xtal frequency must be greather than 0\n");
+	      fprintf(stderr, "Xtal frequency must be greater than 0\n");
 	      exit(1);
 	    }
 	  if (!options->set_value("xtal", this, XTAL))

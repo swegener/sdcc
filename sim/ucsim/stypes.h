@@ -96,7 +96,7 @@ enum error_type {
   err_warning  = 0x04
 };
 
-// table of dissassembled instructions
+// table of disassembled instructions
 struct dis_entry
 {
   /*uint64_t*/long long code, mask; // max 8 byte of code
@@ -252,7 +252,7 @@ enum cpu_type {
   // 6502 based, but not 100% compatible
   CPU_65C02	= 0x0100,	// extended inst.set
   CPU_65SC02	= 0x0200,      	// 65C02 variant, different inst.set
-  CPU_65CE02	= 0x0400,	// exension of 65C02
+  CPU_65CE02	= 0x0400,	// extension of 65C02
   
   // technology
   CPU_CMOS	= 0x0001,
@@ -312,7 +312,7 @@ enum inst_result {
   resGO		= 0,	/* OK, go on */
   resWDTRESET	= 1,	/* Reseted by WDT */
   resINTERRUPT	= 2,	/* Interrupt accepted */
-  resSTOP	= 100,	/* Stop if result greather then this */
+  resSTOP	= 100,	/* Stop if result greater then this */
   resHALT	= 101,	/* Serious error, halt CPU */
   resINV_ADDR	= 102,	/* Invalid indirect address */
   resSTACK_OV	= 103,	/* Stack overflow */
@@ -363,7 +363,7 @@ enum brk_event
 
 /* Interrupt levels */
 enum intr_levels {
-//IT_NO		= -1, /* not in interroupt service */
+//IT_NO		= -1, /* not in interrupt service */
   IT_LOW	= 1, /* low level interrupt service */
   IT_HIGH	= 2 /* service of high priority interrupt */
 };

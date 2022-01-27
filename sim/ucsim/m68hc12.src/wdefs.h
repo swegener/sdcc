@@ -3,3 +3,4 @@
  int wrap_0_a9(class CL12 *uc, t_mem code) { return uc-> adc ( _A_xbop8 ); } 
  int wrap_0_b9(class CL12 *uc, t_mem code) { return uc-> adc ( _A_eop ); } 
  int wrap_0_b7(class CL12 *uc, t_mem code) { return uc-> exec_b7 ( _NONE ); } 
+ int wrap_0x18_06(class CL12 *uc, t_mem code) { return uc-> add ( _A_B ); } 

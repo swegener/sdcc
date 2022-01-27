@@ -1159,7 +1159,7 @@ cl_pblaze::pblaze_read_hex_file(const char *nam)
     }
   }
 
-  // if read wasn't ok and not at the and of file, read error has occured
+  // if read wasn't ok and not at the and of file, read error has occurred
   if (!ok && getc(f) != EOF)
   {
       application->debug("Read error in record %ld.\n", written);

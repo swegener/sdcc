@@ -39,12 +39,21 @@ cl_m68hc12::dis_tbl(void)
 struct dis_entry *
 cl_m68hc12::get_dis_entry(t_addr addr)
 {
-  struct dis_entry *dt= dis_tbl();//, *dis_e;
+  struct dis_entry *dt;
   int i= 0;
   t_mem code= rom->get(addr);
 
-  if (dt == NULL)
-    return NULL;
+  if (code == 0x18)
+    {
+      code= rom->get(addr+1);
+      dt= disass12p18;
+      while (((code & dt[i].mask) != dt[i].code) &&
+	     dt[i].mnemonic)
+	i++;
+      return &dt[i];
+    }
+  
+  dt= disass12p0;
   while (((code & dt[i].mask) != dt[i].code) &&
 	 dt[i].mnemonic)
     i++;

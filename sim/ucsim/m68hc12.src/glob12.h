@@ -36,6 +36,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern struct dis_entry disass12p0[257];
+extern struct dis_entry disass12p18[257];
+
+extern int ticks12p0[256];
+extern int ticks12p18[256];
 
 
 #endif

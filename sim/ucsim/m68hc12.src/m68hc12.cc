@@ -167,6 +167,8 @@ CL12::exec_inst(void)
   code= fetch();
   if (code==0x18)
     {
+      code= fetch();
+      fn= hc12wrap->page0x18[code];
     }
   else
     {
@@ -399,6 +401,14 @@ CL12::xbop8()
   u16_t a= naddr(NULL);
   return rom->read(a);
 }
+
+int
+CL12::trap(t_mem code)
+{
+  // TODO
+  return resGO;
+}
+
 
 void
 cl_m68hc12::print_regs(class cl_console_base *con)

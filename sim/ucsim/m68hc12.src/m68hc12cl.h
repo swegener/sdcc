@@ -73,8 +73,8 @@ public:
   class cl_wrap *hc12wrap;
   u16_t TMP2, TMP3;
   class cl_cell16 cTMP2, cTMP3;
-  class cl_memory_cell *tex_cells[7];
-  const char *tex_names[7];
+  class cl_memory_cell *tex_cells[8];
+  const char *tex_names[8];
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
@@ -105,6 +105,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_b7(void);
+  virtual int trap(t_mem code);
 };
 
 

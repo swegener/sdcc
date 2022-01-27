@@ -255,7 +255,7 @@ const char *copying=
 "signed it.  However, nothing else grants you permission to modify or\n"
 "distribute the Program or its derivative works.  These actions are\n"
 "prohibited by law if you do not accept this License.  Therefore, by\n"
-"odifying or distributing the Program (or any work based on the\n"
+"modifying or distributing the Program (or any work based on the\n"
 "Program), you indicate your acceptance of this License to do so, and\n"
 "all its terms and conditions for copying, distributing or modifying\n"
 "the Program or works based on it.\n"

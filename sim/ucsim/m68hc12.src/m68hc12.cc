@@ -402,6 +402,24 @@ CL12::xbop8()
   return rom->read(a);
 }
 
+u16_t
+CL12::xbop16()
+{
+  u16_t a= naddr(NULL);
+  u8_t h, l;
+  h= rom->read(a);
+  l= rom->read(a+1);
+  return h*256+l;
+}
+
+class cl_memory_cell &
+CL12::xb(void)
+{
+  t_addr a= naddr(NULL);
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  return *c;
+}
+
 int
 CL12::trap(t_mem code)
 {

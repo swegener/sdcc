@@ -32,11 +32,81 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "m68hc12cl.h"
 
 #define _NONE
+#define _A		uc->cA
+#define _B		uc->cB
+#define _D		uc->cD
+#define _d		uc->ddst()
+#define _e		uc->edst()
+#define _xb		uc->xbdst()
+
+#define _Aop		uc->acc.DAB.a8.Ar
+#define _Bop		uc->acc.DAB.a8.Br
+#define _Dop		uc->acc.DAB.Dr
+#define _dop		uc->dop()
+#define _eop		uc->eop()
+#define _xbop8		uc->xbop8()
+
 #define _A_B		uc->cA,uc->acc.DAB.a8.Br
+
 #define _A_i8		uc->cA,uc->i8()
 #define _A_dop		uc->cA,uc->dop()
 #define _A_eop		uc->cA,uc->eop()
 #define _A_xbop8	uc->cA,uc->xbop8()
+
+#define _Aop_i8		uc->acc.DAB.a8.Ar,uc->i8()
+#define _Aop_dop	uc->acc.DAB.a8.Ar,uc->dop()
+#define _Aop_eop	uc->acc.DAB.a8.Ar,uc->eop()
+#define _Aop_xbop8	uc->acc.DAB.a8.Ar,uc->xbop8()
+
+#define _B_i8		uc->cB,uc->i8()
+#define _B_dop		uc->cB,uc->dop()
+#define _B_eop		uc->cB,uc->eop()
+#define _B_xbop8	uc->cB,uc->xbop8()
+
+#define _Bop_i8		uc->acc.DAB.a8.Br,uc->i8()
+#define _Bop_dop	uc->acc.DAB.a8.Br,uc->dop()
+#define _Bop_eop	uc->acc.DAB.a8.Br,uc->eop()
+#define _Bop_xbop8	uc->acc.DAB.a8.Br,uc->xbop8()
+
+#define _D_i16		uc->cD,uc->i16()
+#define _D_dop16	uc->cD,uc->dop16()
+#define _D_eop16	uc->cD,uc->eop16()
+#define _D_xbop16	uc->cD,uc->xbop16()
+
+#define _Dop_i16	uc->acc.DAB.Dr,uc->i16()
+#define _Dop_dop16	uc->acc.DAB.Dr,uc->dop16()
+#define _Dop_eop16	uc->acc.DAB.Dr,uc->eop16()
+#define _Dop_xbop16	uc->acc.DAB.Dr,uc->xbop16()
+
+#define _X_i16		uc->cIX,uc->i16()
+#define _X_dop16	uc->cIX,uc->dop16()
+#define _X_eop16	uc->cIX,uc->eop16()
+#define _X_xbop16	uc->cIX,uc->xbop16()
+
+#define _Xop_i16	uc->IX,uc->i16()
+#define _Xop_dop16	uc->IX,uc->dop16()
+#define _Xop_eop16	uc->IX,uc->eop16()
+#define _Xop_xbop16	uc->IX,uc->xbop16()
+
+#define _Y_i16		uc->cIY,uc->i16()
+#define _Y_dop16	uc->cIY,uc->dop16()
+#define _Y_eop16	uc->cIY,uc->eop16()
+#define _Y_xbop16	uc->cIY,uc->xbop16()
+
+#define _Yop_i16	uc->IY,uc->i16()
+#define _Yop_dop16	uc->IY,uc->dop16()
+#define _Yop_eop16	uc->IY,uc->eop16()
+#define _Yop_xbop16	uc->IY,uc->xbop16()
+
+#define _S_i16		uc->cSP,uc->i16()
+#define _S_dop16	uc->cSP,uc->dop16()
+#define _S_eop16	uc->cSP,uc->eop16()
+#define _S_xbop16	uc->cSP,uc->xbop16()
+
+#define _Sop_i16	uc->SP,uc->i16()
+#define _Sop_dop16	uc->SP,uc->dop16()
+#define _Sop_eop16	uc->SP,uc->eop16()
+#define _Sop_xbop16	uc->SP,uc->xbop16()
 
 extern int wrap_INV(class CL12 *uc, t_mem code);
 extern int wrap_TRAP(class CL12 *uc, t_mem code);

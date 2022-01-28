@@ -122,6 +122,40 @@ replace restart {
 
 replace restart {
 	lda	%2
+	sta	%2
+} by {
+	; Peephole 4sta - removed redundant sta
+	lda	%2
+}
+
+replace restart {
+	lda	%1
+	pla
+} by {
+	; Peephole 4lda - removed dead lda
+	pla
+}
+
+replace restart {
+	ldx	%2
+	stx	%2
+} by {
+	; Peephole 4stx - removed redundant sta
+	ldx	%2
+}
+
+replace restart {
+	ldy	%2
+	sty	%2
+} by {
+	; Peephole 4sty - removed redundant sta
+	ldy	%2
+}
+
+
+
+replace restart {
+	lda	%2
 	%1 	a
 	sta	%2
 } by {

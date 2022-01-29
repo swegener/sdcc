@@ -49,7 +49,7 @@ enum debug_messages {
   DEBUG_ALL=0x7fffffff
 };
 
-#define DBG_MSG (TRACEGEN|REGOPS|REGALLOC|TRACE_STACK)
+#define DBG_MSG (REGALLOC)
 //#define DBG_MSG (DEBUG_ALL/*|VVDBG*/)
 //#define DBG_MSG ((DEBUG_ALL|VVDBG)&~COST)
 
@@ -62,7 +62,6 @@ static bool storeRegTemp (reg_info * reg, bool always);
 static void loadRegTemp (reg_info * reg, bool always);
 static void transferAopAop (asmop * srcaop, int srcofs, asmop * dstaop, int dstofs);
 static void adjustStack (int n);
-
 
 static char *IMMDFMT = "#0x%02x";
 static char *TEMPFMT = "*(__TEMP+%d)";
@@ -136,7 +135,7 @@ static void updateiTempRegisterUse (operand * op);
 #define AOP_OP(aop) aop->op
 
 static bool regalloc_dry_run;
-static unsigned char regalloc_dry_run_cost;
+static unsigned int regalloc_dry_run_cost;
 
 /*------------------------------------------------------------------*/
 /* m6502_opcodeCycles - returns the cycle count for the instruction */
@@ -793,10 +792,10 @@ pullReg (reg_info * reg)
       if (IS_MOS65C02) {
         emit6502op ("plx", "");
       } else {
-	//  storeRegTemp (m6502_reg_a, true);
+//	bool needpulla = storeRegTempIfUsed (m6502_reg_a);
         pullReg (m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_x, true);
-	// loadRegTemp (m6502_reg_a, true);
+//	loadOrFreeRegTemp (m6502_reg_a, needpulla);
       }
       updateCFA ();
       break;
@@ -804,10 +803,10 @@ pullReg (reg_info * reg)
       if (IS_MOS65C02) {
         emit6502op ("ply", "");
       } else {
-	//	storeRegTemp (m6502_reg_a, true);
+//	bool needpulla = storeRegTempIfUsed (m6502_reg_a);
         pullReg (m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_y, true);
-	//	loadRegTemp (m6502_reg_a, true);
+//	loadOrFreeRegTemp (m6502_reg_a, needpulla);
       }
       updateCFA ();
       break;
@@ -1982,11 +1981,11 @@ rmwWithReg (char *rmwop, reg_info * reg)
       } else if (!strcmp(rmwop, "dec")) {
         emit6502op ("dex", "");
       } else {
-        pushReg (m6502_reg_a, false);
+        bool needpulla = pushRegIfUsed (m6502_reg_a);
         transferRegReg (m6502_reg_x, m6502_reg_a, true);
         rmwWithReg (rmwop, m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_x, true);
-        pullReg (m6502_reg_a);
+        pullOrFreeReg (m6502_reg_a, needpulla);
       }
     }
   else if (reg->rIdx == Y_IDX)
@@ -1996,11 +1995,11 @@ rmwWithReg (char *rmwop, reg_info * reg)
       } else if (!strcmp(rmwop, "dec")) {
         emit6502op ("dey", "");
       } else {
-        pushReg (m6502_reg_a, false);
+        bool needpulla = pushRegIfUsed (m6502_reg_a);
         transferRegReg (m6502_reg_y, m6502_reg_a, true);
         rmwWithReg (rmwop, m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_y, true);
-        pullReg (m6502_reg_a);
+        pullOrFreeReg (m6502_reg_a, needpulla);
       }
     }
   else
@@ -7725,7 +7724,7 @@ genLeftShift (iCode * ic)
 
   if (!countreg) {
     emitComment (TRACEGEN|VVDBG, "  pull null (1) ");
-    _G.tempOfs--;
+    loadRegTemp(NULL, true);;
   }
 
   freeAsmop (result, NULL, ic, true);
@@ -8150,7 +8149,7 @@ genRightShift (iCode * ic)
   safeEmitLabel (tlbl1);
 
   if (!countreg) 
-    _G.tempOfs--;
+    loadRegTemp(NULL, true);
 
   freeAsmop (result, NULL, ic, true);
   freeAsmop (right, NULL, ic, true);
@@ -10349,7 +10348,7 @@ init_aop_pass(void)
   m6502_aop_pass[7]->aopu.aop_dir = "___SDCC_m6502_ret7";
 }
 
-unsigned char
+unsigned int
 drym6502iCode (iCode *ic)
 {
   regalloc_dry_run = true;
@@ -10438,7 +10437,7 @@ genm6502Code (iCode *lic)
           regsSurv[2] = (bitVectBitValue (ic->rSurv, X_IDX)) ? 'x' : '-';
           regsSurv[3] = 0;
           iLine = printILine (ic);
-          emitcode ("", "; [%s] ic:%d: %s", regsSurv, ic->seq, printILine (ic));
+          emitComment (ALWAYS, " [%s] ic:%d: %s", regsSurv, ic->seq, printILine (ic));
           dbuf_free (iLine);
         }
 

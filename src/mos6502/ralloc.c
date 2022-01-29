@@ -1508,11 +1508,12 @@ serialRegMark (eBBlock ** ebbs, int count)
         }
     }
 }
+
 /*-----------------------------------------------------------------*/
-/* New register allocator                                          */
+/* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
 void
-m6502_ralloc (ebbIndex * ebbi)
+m6502_assignRegisters (ebbIndex *ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -1599,14 +1600,5 @@ m6502_ralloc (ebbIndex * ebbi)
   freeAllRegs ();
 
   return;
-}
-
-/*-----------------------------------------------------------------*/
-/* assignRegisters - assigns registers to each live range as need  */
-/*-----------------------------------------------------------------*/
-void
-m6502_assignRegisters (ebbIndex * ebbi)
-{
-    m6502_ralloc (ebbi);
 }
 

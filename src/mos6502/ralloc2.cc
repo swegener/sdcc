@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
+// An optimal, polynomial-time register allocator.
 
 //#define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
 //#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
@@ -28,7 +30,7 @@ extern "C"
 {
   #include "ralloc.h"
   #include "gen.h"
-  unsigned char drym6502iCode (iCode *ic);
+  unsigned int drym6502iCode (iCode *ic);
   bool m6502_assignment_optimal;
 }
 
@@ -432,6 +434,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   float c;
 
   wassert (TARGET_IS_MOS6502 || TARGET_IS_MOS65C02);
+  wassert(ic);
 
   if(!inst_sane(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
@@ -488,12 +491,16 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case NE_OP:
     case AND_OP:
     case OR_OP:
+    case RLC:
+    case RRC:
     case GETABIT:
     case GETBYTE:
     case GETWORD:
+    case SWAP:
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:
+//    case SET_VALUE_AT_ADDRESS:
     case '=':
     case IFX:
     case ADDRESS_OF:
@@ -504,7 +511,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case DUMMY_READ_VOLATILE:
     case CRITICAL:
     case ENDCRITICAL:
-    case SWAP:
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
       c = drym6502iCode(ic);

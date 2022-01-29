@@ -104,7 +104,7 @@ static void updateiTempRegisterUse (operand * op);
 #define AOP_OP(aop) aop->op
 
 static bool regalloc_dry_run;
-static unsigned char regalloc_dry_run_cost;
+static unsigned int regalloc_dry_run_cost;
 
 static void
 emitBranch (char *branchop, symbol * tlbl)
@@ -126,7 +126,6 @@ hc08_emitDebuggerSymbol (const char *debugSym)
   genLine.lineElement.isDebug = 0;
 }
 
-
 /*--------------------------------------------------------------------------*/
 /* transferRegReg - Transfer from register(s) sreg to register(s) dreg. If  */
 /*                  freesrc is true, sreg is marked free and available for  */
@@ -143,7 +142,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   if (!dreg)
     return;
 
-  /* But it's definately an error if there's no source. */
+  /* But it's definitely an error if there's no source. */
   if (!sreg)
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL sreg in transferRegReg");
@@ -10739,7 +10738,7 @@ init_aop_pass(void)
   hc08_aop_pass[7]->aopu.aop_dir = "___SDCC_hc08_ret7";
 }
 
-unsigned char
+float
 dryhc08iCode (iCode *ic)
 {
   regalloc_dry_run = true;

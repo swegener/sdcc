@@ -1,5 +1,11 @@
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/hc08/gen.c,
+      sdcc/src/hc08/ralloc2.cc:
+      Fix a overflow bug in dry run cost calculation.
+    
+2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/gen.c,
       sdcc/src/mos6502/ralloc.c,
       sdcc/src/mos6502/ralloc2.cc:

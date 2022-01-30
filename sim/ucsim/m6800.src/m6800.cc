@@ -90,6 +90,10 @@ cl_mop16::set_uc(class cl_uc *iuc)
 cl_m6800::cl_m6800(class cl_sim *asim):
   cl_uc(asim)
 {
+  IRQ_AT	= 0xfff8;
+  SWI_AT	= 0xfffa;
+  NMI_AT	= 0xfffc;
+  RESET_AT	= 0xfffe;
 }
 
 int
@@ -131,7 +135,7 @@ cl_m6800::reset(void)
   cl_uc::reset();
 
   cCC.W(0xc0);
-  PC= rom->read(0xfffe)*256 + rom->read(0xffff);
+  PC= read_addr(rom, RESET_AT);
   tick(6);
 }
   
@@ -622,11 +626,11 @@ cl_m6800::pull_regs(bool inst_part)
   rCC= rom->read(++rSP);
   rB= rom->read(++rSP);
   rA= rom->read(++rSP);
-  l= rom->read(++rSP);
   h= rom->read(++rSP);
+  l= rom->read(++rSP);
   rIX= h*256+l;
-  l= rom->read(++rSP);
   h= rom->read(++rSP);
+  l= rom->read(++rSP);
   PC= h*256+l;
   if (!inst_part)
     tick(7);

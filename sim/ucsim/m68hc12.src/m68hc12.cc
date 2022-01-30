@@ -72,6 +72,13 @@ cl_m68hc12::proba(int i, t_mem code)
 cl_m68hc12::cl_m68hc12(class cl_sim *asim):
   cl_m68hcbase(asim)
 {
+  IRQ_AT	= 0xfff2;
+  XIRQ_AT	= 0xfff4;
+  SWI_AT	= 0xfff6;
+  TRAP_AT	= 0xfff8;
+  COP_AT	= 0xfffa;
+  CMR_AT	= 0xfffc;
+  RESET_AT	= 0xfffe;
   class cl_ccr c;
   memcpy((void*)&cCC, (void*)&c, sizeof(class cl_cell8));
   hc12wrap= new cl_12wrap();
@@ -153,8 +160,9 @@ cl_m68hc12::make_memories(void)
 void
 cl_m68hc12::make_cpu_hw(void)
 {
-  add_hw(cpu= new cl_hc12_cpu(this));
-  cpu->init();
+  add_hw(cpu12= new cl_hc12_cpu(this));
+  cpu12->init();
+  cpu= cpu12;
 }
 
 int
@@ -202,10 +210,42 @@ CL12::s8_16(u8_t op)
   return op;
 }
 
-t_addr
-CL12::naddr(t_addr *addr /* of xb */)
+int
+CL12::xb_type(u8_t p)
 {
-  u8_t p, h, l;
+  if ((p & 0x20) == 0)
+    // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
+    return 1;
+  if ((p&0xe7) == 0xe7)
+    // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
+    return 6;
+  if ((p&0xe7) == 0xe3)
+    // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
+    return 5;
+  if ((p&0xc0) != 0xc0)
+    // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
+    return 3;
+  if ((p&0xe4) == 0xe0)
+    // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
+    return 2;
+  // if ((p&0xe4) == 0xe4)
+  // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
+  return 4;
+}
+
+bool
+CL12::xb_indirect(u8_t p)
+{
+  if ((p & 0x20) == 0) return false;
+  if ((p&0xe7) == 0xe7) return true;
+  if ((p&0xe7) == 0xe3) return true;
+  return false;
+}
+
+t_addr
+CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
+{
+  u8_t p, h, l, n;
   i16_t offset= 0;
   u16_t ival= 0, a= 0;
   //i8_t post_inc_dec= 0;
@@ -219,9 +259,9 @@ CL12::naddr(t_addr *addr /* of xb */)
   else
     p= fetch();
   
-  if ((p & 0x20) == 0)
+  switch (xb_type(p))
     {
-      // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
+    case 1: // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
       switch (p & 0xc0)
 	{
 	case 0x00: ival= rX; break;
@@ -237,11 +277,9 @@ CL12::naddr(t_addr *addr /* of xb */)
       offset= p&0x1f;
       if (p&0x10) offset|= 0xffe0;
       return ival+offset;
-    }
-  
-  else if ((p&0xe7) == 0xe7)
-    {
-      // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
+      break;
+      
+    case 6: // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
       switch (p & 0x18)
 	{
 	case 0x00: ival= rX; break;
@@ -256,12 +294,12 @@ CL12::naddr(t_addr *addr /* of xb */)
 	}
       offset= rD;
       a= ival+offset;
+      if (pg)
+	*pg= rom->read(a+2);
       return read_addr(rom, a);
-    }
+      break;
   
-  else if ((p&0xe7) == 0xe3)
-    {
-      // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
+    case 5: // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
       switch (p & 0x18)
 	{
 	case 0x00: ival= rX; break;
@@ -288,19 +326,19 @@ CL12::naddr(t_addr *addr /* of xb */)
 	}
       offset= h*256+l;
       a= ival+offset;
+      if (pg)
+	*pg= rom->read(a+2);
       return read_addr(rom, a);
-    }
+      break;
   
-  else if ((p&0xc0) != 0xc0)
-    {
-      // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
+    case 3: // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
       switch (p & 0xc0)
 	{
 	case 0x00: ival= rX; post_idx_reg= &cX; break;
 	case 0x40: ival= rY; post_idx_reg= &cY; break;
 	case 0x80: ival= rSP; post_idx_reg= &cSP; break;
 	}
-      i8_t n= p&0xf;
+      n= p&0xf;
       if (n&0x08) n|= 0xf0;
       if (p&0x10)
 	{
@@ -319,11 +357,9 @@ CL12::naddr(t_addr *addr /* of xb */)
 	    post_idx_reg->W(ival);
 	}
       return ival;
-    }
-  
-  else if ((p&0xe4) == 0xe0)
-    {
-      // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
+      break;
+      
+    case 2:  // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
       switch (p & 0x18)
 	{
 	case 0x00: ival= rX; break;
@@ -366,11 +402,9 @@ CL12::naddr(t_addr *addr /* of xb */)
 	  offset= h*256+l;
 	}
       return ival+offset;
-    }
+      break;
   
-  else // if ((p&0xe4) == 0xe4)
-    {
-      // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
+    default: // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
       switch (p & 0x18)
 	{
 	case 0x00: ival= rX; break;
@@ -390,6 +424,7 @@ CL12::naddr(t_addr *addr /* of xb */)
 	case 0x02: offset= rD; break;
 	}
       return ival+offset;
+      break;
     }
   
   return a;
@@ -398,14 +433,14 @@ CL12::naddr(t_addr *addr /* of xb */)
 u8_t
 CL12::xbop8()
 {
-  u16_t a= naddr(NULL);
+  u16_t a= naddr(NULL, NULL);
   return rom->read(a);
 }
 
 u16_t
 CL12::xbop16()
 {
-  u16_t a= naddr(NULL);
+  u16_t a= naddr(NULL, NULL);
   u8_t h, l;
   h= rom->read(a);
   l= rom->read(a+1);
@@ -415,15 +450,48 @@ CL12::xbop16()
 class cl_memory_cell &
 CL12::xb(void)
 {
-  t_addr a= naddr(NULL);
+  t_addr a= naddr(NULL, NULL);
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
   return *c;
+}
+
+void
+CL12::push_regs(bool inst_part)
+{
+  rom->write(--rSP, PC&0xff);
+  rom->write(--rSP, PC>>8);
+  rom->write(--rSP, rIY&0xff);
+  rom->write(--rSP, rIY>>8);
+  rom->write(--rSP, rIX&0xff);
+  rom->write(--rSP, rIX>>8);
+  rom->write(--rSP, rA);
+  rom->write(--rSP, rB);
+  rom->write(--rSP, rCC);
+}
+
+void
+CL12::pull_regs(bool inst_part)
+{
+  u8_t l, h;
+  rCC= rom->read(rSP++);
+  rB= rom->read(rSP++);
+  rA= rom->read(rSP++);
+  h= rom->read(rSP++);
+  l= rom->read(rSP++);
+  rIX= h*256+l;
+  h= rom->read(rSP++);
+  l= rom->read(rSP++);
+  rIY= h*256+l;
+  h= rom->read(rSP++);
+  l= rom->read(rSP++);
+  PC= h*256+l;
 }
 
 int
 CL12::trap(t_mem code)
 {
-  // TODO
+  push_regs(true);
+  PC= read_addr(rom, TRAP_AT);
   return resGO;
 }
 
@@ -518,5 +586,12 @@ cl_hc12_cpu::print_info(class cl_console_base *con)
   con->dd_printf("DWEN= %d\n", (w&0x80)?1:0);
   con->dd_printf("EWEN= %d\n", (w&0x20)?1:0);
 }
+
+t_mem
+cl_hc12_cpu::ppage_write(u8_t val)
+{
+  return ppage->write(val);
+}
+
 
 /* End of m68hc12.src/m68hc12.cc */

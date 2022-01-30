@@ -166,7 +166,7 @@ const char *rr_names[4]= { "X", "Y", "SP", "PC" };
 void
 CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 {
-  u8_t p, h, l;
+  u8_t p, h, l, n;
   int rr= -1;
   i16_t offset= 0;
   t_addr aof_xb= *addr;
@@ -175,35 +175,29 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
   p= rom->read(aof_xb);
   (*addr)++;
   
-  if ((p & 0x20) == 0)
+  switch (xb_type(p))
     {
-      // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
+    case 1: // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
       rr= (p>>6)&3;
       offset= p&0x1f;
       if (p&0x10) offset|= 0xffe0;
       if (offset)
 	work->appendf("%+d,", offset);
       work->appendf("%s", rr_names[rr]);
-    }
+      break;
   
-  else if ((p&0xe7) == 0xe7)
-    {
-      // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
+    case 6: // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
       work->appendf("[D,%s]", rr_names[(p&0x18)>>3]);
-    }
+      break;
   
-  else if ((p&0xe7) == 0xe3)
-    {
-      // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
+    case 5: // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
       h= rom->read(aof_xb+1);
       l= rom->read(aof_xb+2);
       work->appendf("[$%04x,%s]", h*256+l,rr_names[(p&0x18)>>3]);
-    }
+      break;
 
-  else if ((p&0xc0) != 0xc0)
-    {
-      // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
-      i8_t n= p&0xf;
+    case 3: // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
+      n= p&0xf;
       if (n&0x08) n|= 0xf0;
       if (p&0x10)
 	{
@@ -221,11 +215,9 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 			(n<0)?'-':'+',
 			rr_names[(p&0xc0)>>6]);
 	}
-    }
+      break;
   
-  else if ((p&0xe4) == 0xe0)
-    {
-      // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
+    case 2: // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
       if ((p&0x02) == 0x00)
 	{
 	  // 9 bit
@@ -240,11 +232,9 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 	  offset= h*256+l;
 	}
       work->appendf("$%+d,%s", offset, rr_names[(p&0x18)>>3]);
-    }
+      break;
   
-  else // if ((p&0xe4) == 0xe4)
-    {
-      // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
+    default: // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
       switch (p&0x03)
 	{
 	case 0x00: work->append("A,"); break;
@@ -252,9 +242,10 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 	case 0x02: work->append("D,"); break;
 	}
       work->appendf("%s", rr_names[(p&0x18)>>3]);
+      break;
     }
 
-  a= naddr(&aof_xb);
+  a= naddr(&aof_xb, NULL);
   if (comment)
     {
       bool b= false;
@@ -265,7 +256,9 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 	comment->appendf("%+d", offset), b= true;
       if (b)
 	comment->append("=");
-      comment->appendf("%04x]=%02x %02x", a, rom->read(a), rom->read(a+1));
+      comment->appendf("%04x]=%02x %02x %02x",
+		       a,
+		       rom->read(a), rom->read(a+1), rom->read(a+2));
     }
   *addr= aof_xb;
 }

@@ -122,14 +122,6 @@ enum {
 #define ifA	(true)
 
 
-// Vectors
-enum {
-  IRQ_AT	= 0xfff8,
-  SWI_AT	= 0xfffa,
-  NMI_AT	= 0xfffc,
-  RESET_AT	= 0xfffe,
-};
-
 extern int8_t p0ticks[256];
 
 class cl_idx16: public cl_cell16
@@ -177,6 +169,7 @@ public:
   class cl_idx16 *cI;
   class cl_mop16 mop16;
   bool wai;
+  u16_t IRQ_AT, SWI_AT, NMI_AT, RESET_AT;
 public:
   cl_m6800(class cl_sim *asim);
   virtual int init(void);

@@ -71,5 +71,32 @@ CL12::cp16(u16_t op1, u16_t op2)
   return resGO;
 }
 
+int
+CL12::lsr16(class cl_memory_cell &dest)
+{
+  u16_t op= dest.R(), f= rF & ~(flagN|flagZ|flagV|flagC);
+  if (op&1) f|= flagC|flagV;
+  op>>= 1;
+  dest.W(op);
+  if (!op) f|= flagZ;
+  cCC.W(f);
+  return resGO;
+}
+
+int
+CL12::asl16(class cl_memory_cell &dest)
+{
+  u16_t op= dest.R();
+  u8_t f;
+  f= rF & ~(flagN|flagZ|flagV|flagC);
+  if (op&0x8000) f|= flagC;
+  op<<= 1;
+  dest.W(op);
+  if (!op) f|= flagZ;
+  if (op&0x8000) f|= flagN;
+  if (((f&flagN)?1:0) ^ ((f&flagC)?1:0)) f|= flagV;
+  cCC.W(f);
+  return resGO;
+}
 
 /* End of m68hc12.src/ialu.cc */

@@ -160,6 +160,57 @@ DEC(0, d7,	tst	, _Bop	 	, "TSTB"	, ' ', 1	, 1)
 DEC(0, e7,	tst	, _xbop8 	, "TST %p"	, ' ', -2	, 0x55322)
 DEC(0, f7,	tst	, _eop	 	, "TST %e"	, ' ', 3	, 3)
 
+DEC(0, 40,	neg	, _A	 	, "NEGA"	, ' ', 1	, 1)
+DEC(0, 50,	neg	, _B	 	, "NEGB"	, ' ', 1	, 1)
+DEC(0, 60,	neg	, _xb	 	, "NEG %p"	, ' ', -2	, 0x66433)
+DEC(0, 70,	neg	, _e	 	, "NEG %e"	, ' ', 3	, 3)
+
+DEC(0, 41,	com	, _A	 	, "COMA"	, ' ', 1	, 1)
+DEC(0, 51,	com	, _B	 	, "COMB"	, ' ', 1	, 1)
+DEC(0, 61,	com	, _xb	 	, "COM %p"	, ' ', -2	, 0x66433)
+DEC(0, 71,	com	, _e	 	, "COM %e"	, ' ', 3	, 3)
+
+DEC(0, 42,	inc	, _A	 	, "INCA"	, ' ', 1	, 1)
+DEC(0, 52,	inc	, _B	 	, "INCB"	, ' ', 1	, 1)
+DEC(0, 62,	inc	, _xb	 	, "INC %p"	, ' ', -2	, 0x66433)
+DEC(0, 72,	inc	, _e	 	, "INC %e"	, ' ', 3	, 3)
+
+DEC(0, 43,	dec	, _A	 	, "DECA"	, ' ', 1	, 1)
+DEC(0, 53,	dec	, _B	 	, "DECB"	, ' ', 1	, 1)
+DEC(0, 63,	dec	, _xb	 	, "DEC %p"	, ' ', -2	, 0x66433)
+DEC(0, 73,	dec	, _e	 	, "DEC %e"	, ' ', 3	, 3)
+
+DEC(0, 44,	lsr	, _A	 	, "LSRA"	, ' ', 1	, 1)
+DEC(0, 54,	lsr	, _B	 	, "LSRB"	, ' ', 1	, 1)
+DEC(0, 64,	lsr	, _xb	 	, "LSR %p"	, ' ', -2	, 0x66433)
+DEC(0, 74,	lsr	, _e	 	, "LSR %e"	, ' ', 3	, 3)
+
+DEC(0, 45,	rol	, _A	 	, "ROLA"	, ' ', 1	, 1)
+DEC(0, 55,	rol	, _B	 	, "ROLB"	, ' ', 1	, 1)
+DEC(0, 65,	rol	, _xb	 	, "ROL %p"	, ' ', -2	, 0x66433)
+DEC(0, 75,	rol	, _e	 	, "ROL %e"	, ' ', 3	, 3)
+
+DEC(0, 46,	ror	, _A	 	, "RORA"	, ' ', 1	, 1)
+DEC(0, 56,	ror	, _B	 	, "RORB"	, ' ', 1	, 1)
+DEC(0, 66,	ror	, _xb	 	, "ROR %p"	, ' ', -2	, 0x66433)
+DEC(0, 76,	ror	, _e	 	, "ROR %e"	, ' ', 3	, 3)
+
+DEC(0, 47,	asr	, _A	 	, "ASRA"	, ' ', 1	, 1)
+DEC(0, 57,	asr	, _B	 	, "ASRB"	, ' ', 1	, 1)
+DEC(0, 67,	asr	, _xb	 	, "ASR %p"	, ' ', -2	, 0x66433)
+DEC(0, 77,	asr	, _e	 	, "ASR %e"	, ' ', 3	, 3)
+
+DEC(0, 48,	asl	, _A	 	, "ASLA"	, ' ', 1	, 1)
+DEC(0, 58,	asl	, _B	 	, "ASLB"	, ' ', 1	, 1)
+DEC(0, 68,	asl	, _xb	 	, "ASL %p"	, ' ', -2	, 0x66433)
+DEC(0, 78,	asl	, _e	 	, "ASL %e"	, ' ', 3	, 3)
+
+DEC(0, 49,	lsr16	, _D		, "LSRD"	, ' ', 1	, 1)
+DEC(0, 59,	asl16	, _D		, "LSLD"	, ' ', 1	, 1)
+
+DEC(0, 4a,	call_e	, _NONE		, "CALL $ep$"	, ' ', 4	, 7)
+DEC(0, 4b,	call_id	, _NONE		, "CALL $ip$"	, ' ', -2	, 0xaa988)
+
 DEC(0, a7,	NOP	, 0xa7		, "NOP"		, ' ', 1	, 1)
 
 DEC(0, b7,	exec_b7	, _NONE		, "%T"		, ' ', 2	, 0)

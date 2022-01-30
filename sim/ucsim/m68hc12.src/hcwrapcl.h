@@ -645,6 +645,7 @@ public:
 	  disass12p18[i].branch= ' ';
 	  disass12p18[i].length= 2;
 	  disass12p18[i].mnemonic= strdup(s.c_str());
+	  ticks12p18[i]= 11;
 	}
     }
     return 0;

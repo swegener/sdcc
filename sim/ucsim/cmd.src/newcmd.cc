@@ -926,19 +926,11 @@ int
 cl_commander_base::debug(const char *format, ...)
 {
   va_list ap;
-  int i, ret= 0;
 
-  for (i= 0; i < cons->count; i++)
-    {
-      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if (c->get_flag(CONS_DEBUG))
-        {
-          va_start(ap, format);
-          ret= c->cmd_do_cprint("debug", format, ap);
-          va_end(ap);
-        }
-    }
-  return(ret);
+  va_start(ap, format);
+  int ret = debug(format, ap);
+  va_end(ap);
+  return ret;
 }
 
 int
@@ -949,9 +941,12 @@ cl_commander_base::debug(const char *format, va_list ap)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if (c->get_flag(CONS_DEBUG))
+      if (c->get_flag(CONS_DEBUG) && !c->get_flag(CONS_INACTIVE))
         {
-          ret= c->cmd_do_cprint("debug", format, ap);
+          va_list aq;
+          va_copy(aq, ap);
+          ret= c->cmd_do_cprint("debug", format, aq);
+          va_end(aq);
         }
     }
   return(ret);

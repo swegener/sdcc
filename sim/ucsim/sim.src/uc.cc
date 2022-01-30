@@ -2504,6 +2504,8 @@ cl_uc::tick(int cycles)
   int i, clocks= cycles * clock_per_cycle();
   double time = clocks * xtal_tick;
 
+  tick_hw(cycles);
+
   // increase time
   class it_level *il= (class it_level *)(it_levels->top());
   for (i= 0; i < counters->count; i++)
@@ -2519,7 +2521,6 @@ cl_uc::tick(int cycles)
         }
     }
 
-  tick_hw(cycles);
   return(0);
 }
 

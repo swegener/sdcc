@@ -734,10 +734,10 @@ pushReg (reg_info * reg, bool freereg)
       if (IS_MOS65C02) {
         emit6502op ("phx", "");
       } else {
-        bool needpulla= storeRegTempIfUsed (m6502_reg_a);
+        bool needloada = storeRegTempIfUsed (m6502_reg_a);
         transferRegReg (m6502_reg_x, m6502_reg_a, false);
         pushReg (m6502_reg_a, true);
-        loadOrFreeRegTemp (m6502_reg_a, needpulla);
+        loadOrFreeRegTemp (m6502_reg_a, needloada);
       }
       updateCFA ();
       break;
@@ -745,10 +745,10 @@ pushReg (reg_info * reg, bool freereg)
       if (IS_MOS65C02) {
         emit6502op ("phy", "");
       } else {
-        bool needpulla = storeRegTempIfUsed (m6502_reg_a);
+        bool needloada = storeRegTempIfUsed (m6502_reg_a);
         transferRegReg (m6502_reg_y, m6502_reg_a, true);
         pushReg (m6502_reg_a, true);
-        loadOrFreeRegTemp (m6502_reg_a, needpulla);
+        loadOrFreeRegTemp (m6502_reg_a, needloada);
       }
       updateCFA ();
       break;
@@ -770,8 +770,6 @@ pushReg (reg_info * reg, bool freereg)
   //return -_G.stackOfs - _G.stackPushes;
 }
 
-static bool pushRegIfUsed (reg_info *reg);
-
 /*--------------------------------------------------------------------------*/
 /* pullReg - Pull register reg off the stack.                               */
 /*--------------------------------------------------------------------------*/
@@ -792,10 +790,11 @@ pullReg (reg_info * reg)
       if (IS_MOS65C02) {
         emit6502op ("plx", "");
       } else {
-//	bool needpulla = storeRegTempIfUsed (m6502_reg_a);
+        // FIXME: saving A makes regression fail
+//	bool needloada = storeRegTempIfUsed (m6502_reg_a);
         pullReg (m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_x, true);
-//	loadOrFreeRegTemp (m6502_reg_a, needpulla);
+//	loadOrFreeRegTemp (m6502_reg_a, needloada);
       }
       updateCFA ();
       break;
@@ -803,10 +802,11 @@ pullReg (reg_info * reg)
       if (IS_MOS65C02) {
         emit6502op ("ply", "");
       } else {
-//	bool needpulla = storeRegTempIfUsed (m6502_reg_a);
+        // FIXME: saving A makes regression fail
+//	bool needloada = storeRegTempIfUsed (m6502_reg_a);
         pullReg (m6502_reg_a);
         transferRegReg (m6502_reg_a, m6502_reg_y, true);
-//	loadOrFreeRegTemp (m6502_reg_a, needpulla);
+//	loadOrFreeRegTemp (m6502_reg_a, needloada);
       }
       updateCFA ();
       break;
@@ -911,15 +911,14 @@ adjustStack (int n)
   }
 
   if (n > 0) {
-    // TODO: what if A not used?
-    //    bool needpulla=storeRegTempIfUsed (m6502_reg_a);
-    // A is incorrectly marked free and makes many regression fail
+    // FIXME: A is incorrectly marked free and makes many regression fail
+    //    bool needloada=storeRegTempIfUsed (m6502_reg_a);
     storeRegTemp(m6502_reg_a, true);
     while (n > 0) {
       emit6502op ("pla", "");      /* 1 byte,  2 cycles */
       n--;
     }
-    //   loadOrFreeRegTemp (m6502_reg_a, needpulla);
+    //   loadOrFreeRegTemp (m6502_reg_a, needloada);
     loadRegTemp(m6502_reg_a, true);
   }
   updateCFA ();
@@ -1120,10 +1119,10 @@ forceload:
       // no such thing as stx aa,x
       else if (aop->type == AOP_SOF && regidx != A_IDX)
         {
-          pushReg(m6502_reg_a, false);
+          bool needloada = storeRegTempIfUsed(m6502_reg_a);
           loadRegFromAop(m6502_reg_a, aop, loffset);
           transferRegReg(m6502_reg_a, reg, false);
-          pullReg(m6502_reg_a);
+          loadOrFreeRegTemp(m6502_reg_a,needloada);
           break;
         }
       else
@@ -1300,12 +1299,12 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         }
       else
         {
-          bool needpulx;
+          bool needloadx;
           storeRegToAop (m6502_reg_x, aop, loffset);
-          needpulx = pushRegIfUsed (m6502_reg_x);
+          needloadx = storeRegTempIfUsed (m6502_reg_x);
           transferRegReg (m6502_reg_y, m6502_reg_x, false);
           storeRegToAop (m6502_reg_x, aop, loffset + 1);
-          pullOrFreeReg (m6502_reg_x, needpulx);
+          loadOrFreeRegTemp (m6502_reg_x, needloadx);
         }
       break;
     case XA_IDX:
@@ -3599,11 +3598,11 @@ asmopToBool (asmop *aop, bool resultInA)
             }
           else
             {
-              bool needpulla;
+              bool needloada;
               emitComment (TRACE_AOP|VVDBG, "asmopToBool - loadreg");
-              needpulla = storeRegTempIfUsed (m6502_reg_a);
+              needloada = storeRegTempIfUsed (m6502_reg_a);
               loadRegFromAop (m6502_reg_a, aop, 0);
-              loadRegTempNoFlags(m6502_reg_a,needpulla);
+              loadRegTempNoFlags(m6502_reg_a,needloada);
             }
           break;
         }
@@ -3628,14 +3627,14 @@ asmopToBool (asmop *aop, bool resultInA)
               safeEmitLabel (tlbl);
 #endif
               emitComment(TRACE_AOP|VVDBG, "  asmopToBool default case");
-              bool needpulla = storeRegTempIfUsed (m6502_reg_a);
-              bool needpullx = storeRegTempIfUsed (m6502_reg_x);
-              m6502_reg_x->isFree=true;
+              bool needloada = storeRegTempIfUsed (m6502_reg_a);
+              bool needloadx = storeRegTempIfUsed (m6502_reg_x);
+              m6502_freeReg(m6502_reg_x);
               emit6502op ("lda", aopAdrStr (aop, 0, false));
               emit6502op ("ora", aopAdrStr (aop, 1, false));
               emit6502op ("php", "" );
-              loadOrFreeRegTemp (m6502_reg_x, needpullx);
-              loadOrFreeRegTemp (m6502_reg_a, needpulla);
+              loadOrFreeRegTemp (m6502_reg_x, needloadx);
+              loadOrFreeRegTemp (m6502_reg_a, needloada);
               emit6502op ("plp", "" );
 
               break;
@@ -5464,7 +5463,7 @@ genCmp (iCode * ic, iCode * ifx)
   unsigned long long lit = 0ull;
   char *sub;
   symbol *jlbl = NULL;
-  bool needpulla = false;
+  bool needloada = false;
 
   emitComment (TRACEGEN, __func__);
 
@@ -5564,14 +5563,14 @@ genCmp (iCode * ic, iCode * ifx)
                 }
             }
         }
-      needpulla = pushRegIfSurv (m6502_reg_a);
+      needloada = storeRegTempIfSurv (m6502_reg_a);
       while (size--)
         {
           emitComment (TRACEGEN|VVDBG, "   GenCmp - size counter = %d", size);
 
           if (AOP_TYPE (right) == AOP_REG && AOP(right)->aopu.aop_reg[offset]->rIdx == A_IDX)
             {
-              storeRegTemp(m6502_reg_a, true); //TODO: false?
+              storeRegTemp(m6502_reg_a, true);
               loadRegFromAop (m6502_reg_a, AOP (left), offset);
               if (!strcmp(sub, "sub")) {
                 emit6502op ("sec", "");
@@ -5579,7 +5578,7 @@ genCmp (iCode * ic, iCode * ifx)
               } else {         
                 emit6502op (sub, TEMPFMT, _G.tempOfs - 1);
               }
-              loadRegTemp(NULL, true);
+              loadRegTemp(m6502_reg_a, true);
             }
           else
             {
@@ -5604,17 +5603,17 @@ genCmp (iCode * ic, iCode * ifx)
       symbol *tlbl = safeNewiTempLabel (NULL);
       char *inst;
 
+      if(needloada) 
+          loadRegTempNoFlags(m6502_reg_a, needloada);
+      else
+          m6502_freeReg(m6502_reg_a);
+
       freeAsmop (result, NULL, ic, true);
-      // TODO: we can pull here if checking carry or overflow
 
       inst = branchInstCmp (opcode, sign);
       emitBranch (inst, tlbl);
-      // FIXME FIXME: adding cost to this one makes code size regress significantly
-      if (needpulla) emitcode("pla", ""); // if check N or Z, we need to pull after flag check
-//      if (needpulla) emit6502op("pla", ""); // if check N or Z, we need to pull after flag check
       emitBranch ("jmp", jlbl);
       safeEmitLabel (tlbl);
-      pullOrFreeReg (m6502_reg_a, needpulla); // if check N or Z, we need to pull after flag check
 
       /* mark the icode as generated */
       ifx->generated = 1;
@@ -5624,19 +5623,18 @@ genCmp (iCode * ic, iCode * ifx)
       symbol *tlbl1 = safeNewiTempLabel (NULL);
       symbol *tlbl2 = safeNewiTempLabel (NULL);
 
-      if (!needpulla)
-        needpulla = pushRegIfSurv (m6502_reg_a);
+      if (!needloada)
+        needloada = storeRegTempIfSurv (m6502_reg_a);
 
       emitBranch (branchInstCmp (opcode, sign), tlbl1);
       loadRegFromConst (m6502_reg_a, 0);
       emitBranch ("bra", tlbl2);
       safeEmitLabel (tlbl1);
-//      m6502_dirtyReg (m6502_reg_a);
       loadRegFromConst (m6502_reg_a, 1);
       safeEmitLabel (tlbl2);
       m6502_dirtyReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), false);
-      pullOrFreeReg (m6502_reg_a, needpulla);
+      loadOrFreeRegTemp (m6502_reg_a, needloada);
       freeAsmop (result, NULL, ic, true);
     }
 }
@@ -5653,7 +5651,7 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
   symbol *jlbl = NULL;
   symbol *tlbl_NE = NULL;
   symbol *tlbl_EQ = NULL;
-  bool needpulla = false;
+  bool needloada = false;
 
   emitComment (TRACEGEN, __func__);
 
@@ -5708,27 +5706,29 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
             // TODO? why do we push when we could cpx?
               if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
                 {
-                  needpulla = storeRegTemp (m6502_reg_a, true); // TODO: always?
+                  // TODO: always?
+                  needloada = storeRegTemp (m6502_reg_a, true); 
+//                  needloada = storeRegTempIfUsed (m6502_reg_a);
                   loadRegFromAop (m6502_reg_a, AOP (left), offset);
                 }
               accopWithAop ("cmp", AOP (right), offset);
-              loadRegTempNoFlags (m6502_reg_a, needpulla);
-              needpulla = false;
+              loadRegTempNoFlags (m6502_reg_a, needloada);
+              needloada = false;
             }
           if (size)
             {
               symbol *tmp_label = safeNewiTempLabel (NULL);;
               if (!tlbl_NE)
                 tlbl_NE = safeNewiTempLabel (NULL);
-              if (!needpulla && !ifx)
-                needpulla = pushRegIfSurv (m6502_reg_a);
+              if (!needloada && !ifx)
+                needloada = storeRegTempIfSurv (m6502_reg_a);
 
               emitBranch ("beq", tmp_label);
               emitBranch ("jmp", tlbl_NE);
               safeEmitLabel (tmp_label);
 
-              pullOrFreeReg (m6502_reg_a, needpulla);
-              needpulla = false;
+              loadOrFreeRegTemp (m6502_reg_a, needloada);
+              needloada = false;
             }
           offset++;
           }
@@ -5766,8 +5766,8 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
     {
       symbol *tlbl = safeNewiTempLabel (NULL);
 
-      if (!needpulla)
-        needpulla = pushRegIfSurv (m6502_reg_a);
+      if (!needloada)
+        needloada = storeRegTempIfSurv (m6502_reg_a);
       if (opcode == EQ_OP)
         {
           if (!tlbl_EQ)
@@ -5775,11 +5775,9 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           emitBranch ("beq", tlbl_EQ);
           if (tlbl_NE)
             emitLabel (tlbl_NE);
-//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_EQ);
-//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 1);
         }
       else
@@ -5790,14 +5788,13 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           loadRegFromConst (m6502_reg_a, 0);
           emitBranch ("bra", tlbl);
           safeEmitLabel (tlbl_NE);
-//          m6502_dirtyReg (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, 1);
         }
 
       safeEmitLabel (tlbl);
       m6502_dirtyReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), false);
-      pullOrFreeReg (m6502_reg_a, needpulla);
+      loadOrFreeRegTemp (m6502_reg_a, needloada);
       freeAsmop (result, NULL, ic, true);
     }
 }
@@ -7438,12 +7435,10 @@ shiftLLong (operand * left, operand * result, int offr)
 static void
 genlshFour (operand * result, operand * left, int shCount)
 {
-  int size;
-
   emitComment (TRACEGEN, __func__);
   emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
-  size = AOP_SIZE (result);
+  if(AOP_SIZE (result)!=4) abort();
 
   /* TODO: deal with the &result == &left case */
 
@@ -7486,32 +7481,21 @@ genlshFour (operand * result, operand * left, int shCount)
     {
       /* lower order three bytes goes to higher order  three bytes */
       shCount -= 8;
-      if (size == 2)
+      if (shCount == 0)
         {
-          if (shCount)
-            shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-          else
-            movLeft2Result (left, LSB, result, MSB16, 0);
-        }
+          movLeft2Result (left, MSB24, result, MSB32, 0);
+          movLeft2Result (left, MSB16, result, MSB24, 0);
+          movLeft2Result (left, LSB, result, MSB16, 0);
+          storeConstToAop (0, AOP (result), LSB);
+       }
+      else if (shCount == 1)
+        shiftLLong (left, result, MSB16);
       else
         {
-          /* size = 4 */
-          if (shCount == 0)
-            {
-              movLeft2Result (left, MSB24, result, MSB32, 0);
-              movLeft2Result (left, MSB16, result, MSB24, 0);
-              movLeft2Result (left, LSB, result, MSB16, 0);
-              storeConstToAop (0, AOP (result), LSB);
-            }
-          else if (shCount == 1)
-            shiftLLong (left, result, MSB16);
-          else
-            {
-              shiftL2Left2Result (left, MSB16, result, MSB24, shCount);
-              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-              shiftRLeftOrResult (left, LSB, result, MSB24, 8 - shCount);
-              storeConstToAop (0, AOP (result), LSB);
-            }
+          shiftL2Left2Result (left, MSB16, result, MSB24, shCount);
+          shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+          shiftRLeftOrResult (left, LSB, result, MSB24, 8 - shCount);
+          storeConstToAop (0, AOP (result), LSB);
         }
     }
 
@@ -7552,7 +7536,6 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
   aopOp (left, ic, false);
   aopOp (result, ic, false);
 
-//  size = getSize (operandType (result));
   size = AOP_SIZE (result);
 
 #if VIEW_SIZE
@@ -10348,7 +10331,7 @@ init_aop_pass(void)
   m6502_aop_pass[7]->aopu.aop_dir = "___SDCC_m6502_ret7";
 }
 
-unsigned int
+float
 drym6502iCode (iCode *ic)
 {
   regalloc_dry_run = true;

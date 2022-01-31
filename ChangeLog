@@ -1,6 +1,11 @@
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Improve memory shift operations.
+      
+2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Improve register shift operations.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>

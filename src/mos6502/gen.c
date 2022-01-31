@@ -7316,11 +7316,10 @@ genlshTwo (operand * result, operand * left, int shCount)
 static void
 shiftLLong (operand * left, operand * result, int offr)
 {
-  bool needpula; // = false;
-  bool needpulx = false;
+  bool needpulla = false;
+  bool needloadx = false;
 
-  needpula = pushRegIfUsed (m6502_reg_a);
-  //  needpulx = pushRegIfUsed (m6502_reg_x);
+  needpulla = pushRegIfUsed (m6502_reg_a);
 
   switch(offr) {
   case LSB:
@@ -7338,7 +7337,7 @@ shiftLLong (operand * left, operand * result, int offr)
     storeRegToAop (m6502_reg_a, AOP (result), 3);
     break;
   case MSB16:
-    needpulx = pushRegIfUsed (m6502_reg_x);
+    needloadx = storeRegTempIfUsed (m6502_reg_x);
     loadRegFromAop (m6502_reg_a, AOP (left), 0);
     rmwWithReg ("asl", m6502_reg_a);
     loadRegFromAop (m6502_reg_x, AOP (left), 1);
@@ -7354,27 +7353,8 @@ shiftLLong (operand * left, operand * result, int offr)
     break;
   }
     
-  /*  if (offr == LSB)
-    {
-      storeRegToAop (m6502_reg_xa, AOP (result), offr);
-      loadRegFromAop (m6502_reg_xa, AOP (left), MSB24);
-      rmwWithReg ("rol", m6502_reg_a);
-      rmwWithReg ("rol", m6502_reg_x);
-      storeRegToAop (m6502_reg_xa, AOP (result), offr + 2);
-    }
-  else if (offr == MSB16)
-    {
-      storeRegToAop (m6502_reg_a, AOP (result), offr);
-      loadRegFromAop (m6502_reg_a, AOP (left), MSB24);
-      storeRegToAop (m6502_reg_x, AOP (result), offr + 1);
-      rmwWithReg ("rol", m6502_reg_a);
-      storeRegToAop (m6502_reg_a, AOP (result), offr + 2);
-      storeConstToAop (0, AOP (result), 0);
-    }
-  */
-  
-  pullOrFreeReg (m6502_reg_x, needpulx);
-  pullOrFreeReg (m6502_reg_a, needpula);
+  loadOrFreeRegTemp (m6502_reg_x, needloadx);
+  pullOrFreeReg (m6502_reg_a, needpulla);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7447,24 +7427,26 @@ genlshFour (operand * result, operand * left, int shCount)
         }
     }
 
-
-  /*  else if (shCount <= 2)
+  /* 1 <= shCount <= 2 */
+    else if (shCount <= 2)
     {
       shiftLLong (left, result, LSB);
       if (shCount == 2)
         shiftLLong (result, result, LSB);
-	} */
-  /* 3 <= shCount <= 7, optimize */
+	} 
   else
     {
-      shiftLLong (left, result, 0);	
+  /* 3 <= shCount <= 7, optimize */
+#if 1
+      shiftLLong (left, result, LSB);	
       while(--shCount)
-	shiftLLong (result , result, 0);	
-
-      /* 1 <= shCount <= 7 */ 
-      //      shiftL2Left2Result (left, MSB24, result, MSB24, shCount);
-      //      shiftRLeftOrResult (left, MSB16, result, MSB24, 8 - shCount);
-      //      shiftL2Left2Result (left, LSB, result, LSB, shCount);
+        shiftLLong (result , result, LSB);	
+#else
+      // FIXME: bug 2825
+      shiftL2Left2Result (left, MSB24, result, MSB24, shCount);
+      shiftRLeftOrResult (left, MSB16, result, MSB24, 8 - shCount);
+      shiftL2Left2Result (left, LSB, result, LSB, shCount);
+#endif
     }
 }
 
@@ -7670,6 +7652,7 @@ genrshOne (operand * result, operand * left, int shCount, int sign)
 {
   bool needpulla;
   emitComment (TRACEGEN, __func__);
+  if (shCount==0) return;
   needpulla = pushRegIfSurv (m6502_reg_a);
   loadRegFromAop (m6502_reg_a, AOP (left), 0);
   AccRsh (shCount, sign);
@@ -7723,54 +7706,66 @@ genrshTwo (operand * result, operand * left, int shCount, int sign)
 static void
 shiftRLong (operand * left, int offl, operand * result, int sign)
 {
-  bool needpula = pushRegIfSurv (m6502_reg_a);
-  bool needpulx = pushRegIfSurv (m6502_reg_x);
+  bool needpulla = pushRegIfSurv (m6502_reg_a);
+  bool needloadx = false;
 
-  if (offl == LSB)
+  switch(offl)
     {
-      loadRegFromAop (m6502_reg_xa, AOP (left), MSB24);
-      if (sign) {
-        rmwWithReg ("asr", m6502_reg_x); // TODO
-      } else {
-        rmwWithReg ("lsr", m6502_reg_x);
-      }
-      rmwWithReg ("ror", m6502_reg_a);
-      storeRegToAop (m6502_reg_xa, AOP (result), MSB24);
-      loadRegFromAop (m6502_reg_xa, AOP (left), LSB);
-    }
-  else if (offl == MSB16)
-    {
-      loadRegFromAop (m6502_reg_a, AOP (left), MSB32);
-      if (sign) {
-        emit6502op ("cmp", "#0x80");
-        rmwWithReg ("ror", m6502_reg_a); // TODO
-      }
-      else
+    case LSB:
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      if(sign)
+        {
+          emit6502op("cmp","#0x80");
+          rmwWithReg ("ror", m6502_reg_a);
+        }
+      else 
         rmwWithReg ("lsr", m6502_reg_a);
-      loadRegFromAop (m6502_reg_x, AOP (left), MSB24);
-      storeRegToAop (m6502_reg_a, AOP (result), MSB24);
-      loadRegFromAop (m6502_reg_a, AOP (left), MSB16);
+
+      storeRegToAop (m6502_reg_a, AOP (result), 3);
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      loadRegFromAop (m6502_reg_a, AOP (left), 1);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      loadRegFromAop (m6502_reg_a, AOP (left), 0);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      break;
+    case MSB16:
+      needloadx = storeRegTempIfSurv (m6502_reg_x);
+
+      loadRegFromConst(m6502_reg_x,0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      if(sign) {
+          symbol *tlbl = safeNewiTempLabel (NULL);
+          emit6502op("clc","");
+          emit6502op("bpl","%05d$", safeLabelKey2num (tlbl->key));
+          emit6502op("sec","");
+          loadRegFromConst(m6502_reg_x,0xff);
+          safeEmitLabel(tlbl);
+          rmwWithReg ("ror", m6502_reg_a);
+      } else {
+          rmwWithReg ("lsr", m6502_reg_a);
+      }
+      storeRegToAop (m6502_reg_x, AOP (result), 3);    
+
+      loadRegFromAop (m6502_reg_x, AOP (left), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      transferRegReg(m6502_reg_x, m6502_reg_a, true);
+      rmwWithReg ("ror", m6502_reg_a);
+
+      loadRegFromAop (m6502_reg_x, AOP (left), 1);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      transferRegReg(m6502_reg_x, m6502_reg_a, true);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      break;
+ //   default:
+      // error
     }
-
-  rmwWithReg ("ror", m6502_reg_x);
-  rmwWithReg ("ror", m6502_reg_a);
-  storeRegToAop (m6502_reg_xa, AOP (result), LSB);
-
-  if (offl == MSB16)
-    {
-      if (sign)
-        {
-          loadRegFromAop (m6502_reg_a, AOP (left), MSB24);
-          storeRegSignToUpperAop (m6502_reg_a, AOP (result), MSB32, sign);
-        }
-      else
-        {
-          storeConstToAop (0, AOP (result), MSB32);
-        }
-    }
-
-  pullOrFreeReg (m6502_reg_x, needpulx);
-  pullOrFreeReg (m6502_reg_a, needpula);
+  loadOrFreeRegTemp (m6502_reg_x, needloadx);
+  pullOrFreeReg (m6502_reg_a, needpulla);
 }
 
 /*-----------------------------------------------------------------*/

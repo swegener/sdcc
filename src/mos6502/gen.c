@@ -102,6 +102,8 @@ static void aopAdrPrepare (asmop * aop, int loffset);
 static const char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 static void aopAdrUnprepare (asmop * aop, int loffset);
 static void updateiTempRegisterUse (operand * op);
+static void rmwWithReg (char *rmwop, reg_info * reg);
+
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
@@ -410,6 +412,34 @@ emitBranch (char *branchop, symbol * tlbl)
       branchop = "jmp";
     emit6502op (branchop, "%05d$", safeLabelKey2num (tlbl->key));
   }  
+}
+
+/*--------------------------------------------------------------------------*/
+/* smallAdjustReg - Adjust register by n bytes if possible.                              */
+/*--------------------------------------------------------------------------*/
+static int
+smallAdjustReg (reg_info *reg, int n)
+{
+  int regidx = reg->rIdx;
+
+  emitComment (REGOPS, __func__ );
+
+  if( (regidx!=X_IDX) && (regidx!=Y_IDX) )
+    return n;  
+  
+  if (n <= -4 || n >= 4) {
+    return n;
+  }
+
+  while (n < 0) {
+    rmwWithReg ("dec", reg); /* 1 byte,  2 cycles */
+    n++;
+  }
+  while (n > 0) {
+    rmwWithReg ("inc", reg); /* 1 byte,  2 cycles */
+    n--;
+  }
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -950,28 +980,6 @@ swapXA ()
           m6502_reg_xa->litConst=(m6502_reg_x->litConst<<8)|m6502_reg_a->litConst;
     }
   }
-}
-
-/*--------------------------------------------------------------------------*/
-/* smallAdjustX - Adjust the X register by n bytes if possible.                              */
-/*--------------------------------------------------------------------------*/
-static int
-smallAdjustX (int n)
-{
-  emitComment (REGOPS, __func__ );
-
-  if (n <= -4 || n >= 4) {
-    return n;
-  }
-  while (n < 0) {
-    emit6502op ("dex", "");      /* 1 byte,  2 cycles */
-    n++;
-  }
-  while (n > 0) {
-    emit6502op ("inx", "");      /* 1 byte,  2 cycles */
-    n--;
-  }
-  return 0;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -2819,15 +2827,16 @@ sameRegs (asmop * aop1, asmop * aop2)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopCanIncDec - asmop is EXT or DIR                              */
+/* aopCanIncDec - asmop is EXT or DIR or X/Y                            */
 /*-----------------------------------------------------------------*/
 static bool
 aopCanIncDec (asmop * aop)
 {
   switch (aop->type) {
+    case AOP_REG:
+      if(aop->aopu.aop_reg[0]->rIdx == A_IDX) return false;
     case AOP_DIR:
     case AOP_EXT:
-    case AOP_REG:
       return true;
   }
   return false;
@@ -4921,7 +4930,7 @@ genPlusIncr (iCode * ic)
 
   emitComment (TRACEGEN|VVDBG, "  icount = %d, sameRegs=%d", icount, sameRegs (AOP (left), AOP (result)));
 
-  if ((icount > 255) || (icount < 0))
+  if (icount > 255)
     return false;
 
   if (!sameRegs (AOP (left), AOP (result)))
@@ -4932,6 +4941,14 @@ genPlusIncr (iCode * ic)
     return false;
 
   emitComment (TRACEGEN|VVDBG, "   genPlusIncr");
+
+  if (size==1 && AOP(result)->type==AOP_REG) {
+    // if it's in a 8-bit register try to do small adjust
+    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount)==0) return true;   
+  }
+
+  if(icount < 0 )
+    return false;
 
   aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
@@ -4947,7 +4964,7 @@ genPlusIncr (iCode * ic)
     }
   else
     {
-      if (!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)))
+     if (!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)))
         needpula = pushRegIfUsed (m6502_reg_a);
       else
         needpula = false;
@@ -5099,11 +5116,7 @@ genMinusDec (iCode * ic)
     return false;
     
   icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-  // TODO: we should be able to dex/dey
   // TODO: genPlusIncr has a lot more, can merge?
-
-  if ((icount > 1) || (icount < 0))
-    return false;
 
   if (!sameRegs (AOP (left), AOP (result)))
     return false;
@@ -5113,6 +5126,13 @@ genMinusDec (iCode * ic)
 
   // TODO: can inc blah,x
   if (!aopCanIncDec (AOP (result)))
+    return false;
+
+  // do dex/dey and inx/iny if icount is negative
+  if(!smallAdjustReg(AOP(result)->aopu.aop_reg[0],-icount))
+      return true;
+
+  if ((icount > 1) || (icount < 0))
     return false;
 
   emitComment (TRACEGEN|VVDBG, "     genMinusDec");
@@ -5188,11 +5208,11 @@ genMinus (iCode * ic)
     {
       loadRegFromAop (m6502_reg_a, rightOp, offset);
       emit6502op("sec", "");
-      accopWithAop ("sbc", leftOp, offset);
-      emit6502op ("eor", "#0xff");
-      emit6502op("clc", "");
-      emit6502op ("adc", "#0x01");
-      storeRegToAop (m6502_reg_a, AOP (IC_RESULT (ic)), offset++);
+      storeRegTemp(m6502_reg_a,true);
+      accopWithAop ("lda", rightOp, offset);
+      emit6502op("sbc", TEMPFMT,  _G.tempOfs-1);
+      loadRegTemp(NULL, true);
+      storeRegToAop (m6502_reg_a, AOP (IC_RESULT (ic)), offset);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;
     }
@@ -9518,7 +9538,7 @@ genAddrOf (iCode * ic)
       m6502_useReg (m6502_reg_xa);
       emit6502op ("tsx", "");
       m6502_dirtyReg (m6502_reg_x);
-      offset=smallAdjustX(offset);
+      offset=smallAdjustReg(m6502_reg_x, offset);
       transferRegReg (m6502_reg_x, m6502_reg_a, true);
       if (offset) {
           emit6502op ("clc", "");

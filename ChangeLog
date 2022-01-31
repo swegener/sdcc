@@ -1,6 +1,11 @@
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      storeRegIndexed improvements.
+
+2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       Special case X->Y and Y->X whith literal values.
 
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>

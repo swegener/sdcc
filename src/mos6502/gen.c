@@ -2263,35 +2263,37 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           emit6502op ("sta", TEMPFMT_IY, _G.tempOfs - 2);
           // FIXME: changing this to isDead makes regression fail
           loadRegTemp (m6502_reg_y->isFree ? NULL : m6502_reg_y, true);
-          loadRegTemp (m6502_reg_x->isFree ? NULL : m6502_reg_x, true);
+          loadRegTemp (NULL, true); // x is not clobbered
         }
       else
         {
           // add remat + offset + YX
-          // TODO: use tempOfs
-          // TODO: what if regs in use?
-          // TODO: offset
-          emit6502op ("pha", "");
+          int ptrOfs;
+          bool needloady;
+
+          pushReg(m6502_reg_a, false);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
           emit6502op ("clc", "");
           if (rematOfs)
             emit6502op ("adc", "#<(%s+%d)", rematOfs, offset);
           else
             emit6502op ("adc", "#<(%d)", offset);
-          emit6502op ("sta", TEMPFMT, _G.tempOfs+0);
+          ptrOfs=_G.tempOfs;
+          storeRegTemp (m6502_reg_a, true);
           transferRegReg (m6502_reg_y, m6502_reg_a, true);
           if (rematOfs)
             emit6502op ("adc", "#>(%s+%d)", rematOfs, offset);
           else
             emit6502op ("adc", "#<(%d)", offset);
-          emit6502op ("sta", TEMPFMT, _G.tempOfs+1);
-          emit6502op ("sty", TEMPFMT, _G.tempOfs+2);
-          emit6502op ("ldy", "#0x00");
-          emit6502op ("pla", "");
-          emit6502op ("sta", TEMPFMT_IY, _G.tempOfs+0); // [aa],y
-          emit6502op ("ldy", TEMPFMT, _G.tempOfs+2); // TODO: if free only
+          storeRegTemp (m6502_reg_a, true);
+          needloady = storeRegTempIfSurv (m6502_reg_y);
+          loadRegFromConst(m6502_reg_y, 0);
+          pullReg(m6502_reg_a);
+          emit6502op ("sta", TEMPFMT_IY, ptrOfs); // [aa],y
+          loadOrFreeRegTemp(m6502_reg_y, needloady);
+          loadRegTemp(NULL, true);
+          loadRegTemp(NULL, true);
         }
-      m6502_dirtyReg (reg);
       break;
     case X_IDX:
       needpula = pushRegIfUsed (m6502_reg_a);
@@ -5183,7 +5185,6 @@ genMinus (iCode * ic)
   if (IS_AOP_A (rightOp))
     {
       loadRegFromAop (m6502_reg_a, rightOp, offset);
-      // TODO: optimize?
       emit6502op("sec", "");
       accopWithAop ("sbc", leftOp, offset);
       emit6502op ("eor", "#0xff");

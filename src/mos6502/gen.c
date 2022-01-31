@@ -482,12 +482,13 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
           emit6502op ("tay", "");
           break;
         case X_IDX:            /* X to Y */
-          if(m6502_reg_a->isFree) {
+          if(m6502_reg_x->isLitConst) {
+            emit6502op ("ldy", IMMDFMT, m6502_reg_x->litConst);
+          } else if(m6502_reg_a->isFree) {
           emit6502op ("txa", "");
           emit6502op ("tay", "");
           } else {
             storeRegTemp (m6502_reg_x, true);
-            m6502_reg_x->isFree=true;
             loadRegTemp (m6502_reg_y, true);
           }
           break;
@@ -502,12 +503,13 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
           emit6502op ("tax", "");
           break;
         case Y_IDX:            /* Y to X */
-          if(m6502_reg_a->isFree) {
+          if(m6502_reg_y->isLitConst) {
+            emit6502op ("ldx", IMMDFMT, m6502_reg_y->litConst);
+          } else if(m6502_reg_a->isFree) {
           emit6502op ("tya", "");
           emit6502op ("tax", "");
           } else {
             storeRegTemp (m6502_reg_y, true);
-            m6502_reg_y->isFree=true;
             loadRegTemp (m6502_reg_x, true);
           }
           break;
@@ -906,7 +908,7 @@ adjustStack (int n)
     loadRegTemp(m6502_reg_xa, true);
   }
   while (n < 0) {
-    emit6502op ("pha", "");      /* 1 byte,  2 cycles */
+    emit6502op ("pha", "");      /* 1 byte,  3 cycles */
     n++;
   }
 
@@ -915,7 +917,7 @@ adjustStack (int n)
     //    bool needloada=storeRegTempIfUsed (m6502_reg_a);
     storeRegTemp(m6502_reg_a, true);
     while (n > 0) {
-      emit6502op ("pla", "");      /* 1 byte,  2 cycles */
+      emit6502op ("pla", "");      /* 1 byte,  4 cycles */
       n--;
     }
     //   loadOrFreeRegTemp (m6502_reg_a, needloada);
@@ -2259,6 +2261,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           storeRegTemp (m6502_reg_y, true);
           loadRegFromConst(m6502_reg_y, offset);
           emit6502op ("sta", TEMPFMT_IY, _G.tempOfs - 2);
+          // FIXME: changing this to isDead makes regression fail
           loadRegTemp (m6502_reg_y->isFree ? NULL : m6502_reg_y, true);
           loadRegTemp (m6502_reg_x->isFree ? NULL : m6502_reg_x, true);
         }
@@ -4925,7 +4928,7 @@ genPlusIncr (iCode * ic)
   if (!aopCanIncDec (AOP (result)))
     return false;
 
-  emitComment (TRACEGEN|VVDBG, "   genPlusIncr", "");
+  emitComment (TRACEGEN|VVDBG, "   genPlusIncr");
 
   aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
@@ -4936,7 +4939,7 @@ genPlusIncr (iCode * ic)
     {
       needpula = false;
       rmwWithAop ("inc", AOP (result), 0);
-      if (1 < size)
+      if (size > 1)
         emitBranch ("bne", tlbl);
     }
   else
@@ -4951,7 +4954,7 @@ genPlusIncr (iCode * ic)
       m6502_useReg (m6502_reg_a);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
       m6502_freeReg (m6502_reg_a);
-      if (1 < size)
+      if (size > 1)
         emitBranch ("bcc", tlbl);
     }
   for (offset = 1; offset < size; offset++)
@@ -6021,6 +6024,7 @@ genAnd (iCode * ic, iCode * ifx)
 
   emitComment (TRACEGEN|VVDBG, "  lit=%04x bitpos=%d", lit, bitpos );
   
+#if 0
   if (IS_MOS65C02 && ifx && AOP_TYPE (result) == AOP_CRY && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_DIR && bitpos >= 0)
     {
       symbol *tlbl = NULL;
@@ -6047,6 +6051,7 @@ genAnd (iCode * ic, iCode * ifx)
       ifx->generated = true;
       goto release;
     }
+#endif
 
 /* TODO
   if (AOP_TYPE (result) == AOP_CRY && size > 1 && (isOperandVolatile (left, false) || isOperandVolatile (right, false)))
@@ -6868,8 +6873,6 @@ AccLsh (int shCount)
 
   shCount &= 0x0007;            // shCount : 0..7
 
-  /* Shift counts of 4 and 5 are currently optimized for code size.        */
-  /* Falling through to the unrolled loop would be optimal for code speed. */
   /* For shift counts of 6 and 7, the unrolled loop is never optimal.      */
   switch (shCount)
     {
@@ -6878,18 +6881,18 @@ AccLsh (int shCount)
       emit6502op ("ror", "a");
       emit6502op ("ror", "a");
       emit6502op ("and", "#0xc0");
-      /* total: 5 cycles, 5 bytes */
+      /* total: 8 cycles, 5 bytes */
       return;
     case 7:
       emit6502op ("ror", "a");
       loadRegFromConst(m6502_reg_a, 0);
       emit6502op ("ror", "a");
-      /* total: 3 cycles, 3 bytes */
+      /* total: 6 cycles, 4 bytes */
       return;
     }
 
-  /* lsla is only 1 cycle and byte, so an unrolled loop is often  */
-  /* the fastest (shCount<6) and shortest (shCount<4).            */
+  /* asl a is 2 cycles and 1 byte, so an unrolled loop is the   */
+  /* fastest and shortest (shCount<6).                            */
   for (i = 0; i < shCount; i++)
     emit6502op ("asl", "a");
 }
@@ -6937,8 +6940,6 @@ AccRsh (int shCount, bool sign)
 
   shCount &= 0x0007;            // shCount : 0..7
 
-  /* Shift counts of 4 and 5 are currently optimized for code size.        */
-  /* Falling through to the unrolled loop would be optimal for code speed. */
   /* For shift counts of 6 and 7, the unrolled loop is never optimal.      */
   switch (shCount)
     {
@@ -6947,18 +6948,18 @@ AccRsh (int shCount, bool sign)
       emit6502op ("rol", "a");
       emit6502op ("rol", "a");
       emit6502op ("and", "#0x03");
-      /* total: 5 cycles, 5 bytes */
+      /* total: 8 cycles, 5 bytes */
       return;
     case 7:
       emit6502op ("rol", "a");
       loadRegFromConst(m6502_reg_a, 0);
       emit6502op ("rol", "a");
-      /* total: 3 cycles, 4 bytes */
+      /* total: 6 cycles, 4 bytes */
       return;
     }
 
-  /* lsra is only 1 cycle and byte, so an unrolled loop is often  */
-  /* the fastest (shCount<6) and shortest (shCount<4).            */
+  /* lsra is 2 cycles and 1 byte, so an unrolled loop is the      */
+  /* the fastest and shortest (shCount<6).            */
   for (i = 0; i < shCount; i++)
     emit6502op ("lsr", "a");
 }
@@ -7314,13 +7315,9 @@ genlshOne (operand * result, operand * left, int shCount)
 static void
 genlshTwo (operand * result, operand * left, int shCount)
 {
-  int size;
   bool needpulla, needpullx;
 
   emitComment (TRACEGEN, __func__);
-
-
-  size = getDataSize (result);
 
   /* if shCount >= 8 */
   if (shCount >= 8)
@@ -7328,12 +7325,9 @@ genlshTwo (operand * result, operand * left, int shCount)
       shCount -= 8;
       // TODO
       needpulla = pushRegIfSurv (m6502_reg_a);
-      if (size > 1)
-        {
           loadRegFromAop (m6502_reg_a, AOP (left), 0);
           AccLsh (shCount);
           storeRegToAop (m6502_reg_a, AOP (result), 1);
-        }
       storeConstToAop (0, AOP (result), LSB);
       pullOrFreeReg (m6502_reg_a, needpulla);
     }
@@ -7365,9 +7359,6 @@ genlshTwo (operand * result, operand * left, int shCount)
 static void
 shiftLLong (operand * left, operand * result, int offr)
 {
-//  char *l;
-//  int size = AOP_SIZE (result);
-
   bool needpula; // = false;
   bool needpulx = false;
 
@@ -7375,7 +7366,7 @@ shiftLLong (operand * left, operand * result, int offr)
   //  needpulx = pushRegIfUsed (m6502_reg_x);
 
   switch(offr) {
-  case 0:
+  case LSB:
     loadRegFromAop (m6502_reg_a, AOP (left), 0);
     rmwWithReg ("asl", m6502_reg_a);
     storeRegToAop (m6502_reg_a, AOP (result), 0);
@@ -7389,7 +7380,7 @@ shiftLLong (operand * left, operand * result, int offr)
     rmwWithReg ("rol", m6502_reg_a);
     storeRegToAop (m6502_reg_a, AOP (result), 3);
     break;
-  case 1:
+  case MSB16:
     needpulx = pushRegIfUsed (m6502_reg_x);
     loadRegFromAop (m6502_reg_a, AOP (left), 0);
     rmwWithReg ("asl", m6502_reg_a);
@@ -7857,12 +7848,7 @@ genrshFour (operand * result, operand * left, int shCount, int sign)
     }
   else if (shCount >= 8)
     {
-      if (shCount == 1) //TODO ?????
-        {
-          shiftRLong (left, MSB16, result, sign);
-          return;
-        }
-      else if (shCount == 8)
+      if (shCount == 8)
         {
           needpulla = storeRegTempIfSurv (m6502_reg_a);
           transferAopAop (AOP (left), 1, AOP (result), 0);

@@ -1,6 +1,11 @@
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
     * sdcc/src/mos6502/gen.c:
+      Enable inc/dec on register targets.
+
+2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/src/mos6502/gen.c:
       storeRegIndexed improvements.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>

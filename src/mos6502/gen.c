@@ -2827,6 +2827,7 @@ aopCanIncDec (asmop * aop)
   switch (aop->type) {
     case AOP_DIR:
     case AOP_EXT:
+    case AOP_REG:
       return true;
   }
   return false;
@@ -4962,6 +4963,7 @@ genPlusIncr (iCode * ic)
   for (offset = 1; offset < size; offset++)
     {
       rmwWithAop ("inc", AOP (result), offset);
+      if(AOP(result)->type==AOP_REG) m6502_dirtyReg(AOP(result)->aopu.aop_reg[offset]);
       if ((offset + 1) < size)
         emitBranch ("bne", tlbl);
     }

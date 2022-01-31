@@ -2850,7 +2850,7 @@ aopCanShift (asmop * aop)
 {
   switch (aop->type) {
     case AOP_REG:
-      return aop->size == 1 && aop->aopu.aop_reg[0] == A_IDX;
+      return ((aop->size == 1) && (aop->aopu.aop_reg[0]->rIdx == A_IDX));
     case AOP_DIR:
     case AOP_EXT:
       return true;
@@ -6939,7 +6939,19 @@ AccSRsh (int shCount)
       emit6502op ("eor", "#0xff");
       return;
     }
-
+  if (shCount == 6) {
+      symbol *tlbl = safeNewiTempLabel (NULL);
+      emit6502op ("ora", "#0x3f");
+      emit6502op ("sec", "");
+      emit6502op ("bmi", "%05d$", safeLabelKey2num (tlbl->key));
+      emit6502op ("and", "#0xc0");
+      emit6502op ("clc", "");
+      safeEmitLabel(tlbl);
+      emit6502op ("rol", "a");
+      emit6502op ("rol", "a");
+      emit6502op ("rol", "a");
+      return;
+  }
   // TODO: optimize? (asr?)
   for (i = 0; i < shCount; i++) {
     emit6502op ("cmp", "#0x80");
@@ -7005,33 +7017,34 @@ XAccLsh (int shCount)
       loadRegFromConst (m6502_reg_a, 0);
       return;
     }
-    
-  storeRegTemp(m6502_reg_x, true);
 
   /* if we can beat 2n cycles or bytes for some special case, do it here */
-  if (0) switch (shCount)
+  switch (shCount)
     {
     case 7:
+      storeRegTemp(m6502_reg_x, true);
       emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
       rmwWithReg ("ror", m6502_reg_a);
       transferRegReg (m6502_reg_a, m6502_reg_x, false);
       loadRegFromConst (m6502_reg_a, 0);
       rmwWithReg ("ror", m6502_reg_a);
+      loadRegTemp(NULL, true);
       return;
-
+    case 0:
+      return;
     default:
-      ;
-    }
-
   /* lsla/rolx is only 2 cycles and bytes, so an unrolled loop is often  */
   /* the fastest and shortest.                                           */
+      storeRegTemp(m6502_reg_x, true);
+
   for (i = 0; i < shCount; i++)
     {
       rmwWithReg ("asl", m6502_reg_a);
       emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
     }
-
   loadRegTemp(m6502_reg_x, true);
+
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -7040,74 +7053,52 @@ XAccLsh (int shCount)
 static void
 XAccSRsh (int shCount)
 {
+  symbol *tlbl;
   int i;
 
   shCount &= 0x000f;            // shCount : 0..7
 
-  storeRegTemp(m6502_reg_x, true);
-
   /* if we can beat 2n cycles or bytes for some special case, do it here */
-  if (0) switch (shCount) // TODO
+  switch (shCount) // TODO
     {
     case 15:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   lslx       1  1        bcde fgh0  ijkl mnop   a
-       **   clra       1  1        bcde fgh0  0000 0000   a
-       **   rola       1  1        bcde fgh0  0000 000a   0
-       **   nega       1  1        bcde fgh0  aaaa aaaa   a
-       **   tax        1  1        aaaa aaaa  aaaa aaaa   a
-       ** total: 5 cycles, 5 bytes
-       */
-      rmwWithReg ("asl", m6502_reg_x);
-      loadRegFromConst (m6502_reg_a, 0);
-      rmwWithReg ("rol", m6502_reg_a);
-      rmwWithReg ("neg", m6502_reg_a);
-      transferRegReg (m6502_reg_a, m6502_reg_x, false);
-      return;
-
     case 14:
     case 13:
     case 12:
     case 11:
     case 10:
     case 9:
-    case 8:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   txa        1  1        abcd efgh  abcd efgh   ?
-       **   (AccSRsh) <8 <8        abcd efgh  LSBresult   ?
-       **   lsla       1  1        abcd efgh  ???? ????   a
-       **   clrx       1  1        0000 0000  ???? ????   a
-       **   rolx       1  1        0000 000a  ???? ????   0
-       **   negx       1  1        aaaa aaaa  ???? ????   a
-       **   rora       1  1        aaaa aaaa  LSBresult   0
-       ** total: n-2 cycles, n-2 bytes (beats 2n cycles, 2n bytes (for n>=8))
-       */
       transferRegReg (m6502_reg_x, m6502_reg_a, false);
-      AccSRsh (shCount - 8);
-      rmwWithReg ("asl", m6502_reg_a);
       loadRegFromConst (m6502_reg_x, 0);
-      rmwWithReg ("rol", m6502_reg_x);
-      rmwWithReg ("neg", m6502_reg_x);
-      rmwWithReg ("ror", m6502_reg_a);
-      return;
+      AccSRsh (shCount - 8);
+      tlbl = safeNewiTempLabel (NULL);
+      emit6502op ("bpl", "%05d$", safeLabelKey2num (tlbl->key));
+      loadRegFromConst (m6502_reg_x, 0xff);
+      safeEmitLabel(tlbl);
+      break;
+    case 8:
+      transferRegReg (m6502_reg_x, m6502_reg_a, false);
+      loadRegFromConst (m6502_reg_x, 0);
+      emit6502op("cmp","#0x00");
+      tlbl = safeNewiTempLabel (NULL);
+      emit6502op ("bpl", "%05d$", safeLabelKey2num (tlbl->key));
+      loadRegFromConst (m6502_reg_x, 0xff);
+      safeEmitLabel(tlbl);
+      break;
 
     default:
-      ;
+      /* asrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
+      /* the fastest and shortest.                                           */
+      storeRegTemp(m6502_reg_x, true);
+      for (i = 0; i < shCount; i++)
+        {
+          // TODO: this is so bad
+          emit6502op ("cpx", "#0x80");
+          emit6502op ("ror", TEMPFMT, _G.tempOfs - 1);
+          rmwWithReg ("ror", m6502_reg_a);
+        }
+      loadRegTemp(m6502_reg_x, true);
     }
-
-  /* asrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
-  /* the fastest and shortest.                                           */
-  for (i = 0; i < shCount; i++)
-    {
-      // TODO: this is so bad
-      emit6502op ("cpx", "#0x80");
-      emit6502op ("ror", TEMPFMT, _G.tempOfs - 1);
-      rmwWithReg ("ror", m6502_reg_a);
-    }
-
-  loadRegTemp(m6502_reg_x, true);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7126,100 +7117,43 @@ XAccRsh (int shCount, bool sign)
 
   shCount &= 0x000f;            // shCount : 0..f
 
-  storeRegTemp(m6502_reg_x, true);
-
   /* if we can beat 2n cycles or bytes for some special case, do it here */
-  if (0) switch (shCount) // TODO
-    {
+ switch (shCount)
+   {
     case 15:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   clra       1  1        abcd efgh  0000 0000   a
-       **   lslx       1  1        bcde fgh0  0000 0000   a
-       **   rola       1  1        bcde fgh0  0000 000a   0
-       **   clrx       1  1        0000 0000  0000 000a   0
-       ** total: 4 cycles, 4 bytes
-       */
-      loadRegFromConst (m6502_reg_x, 0);
-      rmwWithReg ("asl", m6502_reg_x);
-      rmwWithReg ("rol", m6502_reg_a);
-      loadRegFromConst (m6502_reg_a, 0);
-      return;
-
     case 14:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   clra       1  1        abcd efgh  0000 0000   a
-       **   lslx       1  1        bcde fgh0  0000 0000   a
-       **   rola       1  1        bcde fgh0  0000 000a   0
-       **   lslx       1  1        cdef gh00  0000 000a   b
-       **   rola       1  1        cdef gh00  0000 00ab   0
-       **   clrx       1  1        0000 0000  0000 00ab   0
-       ** total: 6 cycles, 6 bytes
-       */
-      loadRegFromConst (m6502_reg_x, 0);
-      rmwWithReg ("asl", m6502_reg_x);
-      rmwWithReg ("rol", m6502_reg_a);
-      rmwWithReg ("asl", m6502_reg_x);
-      rmwWithReg ("rol", m6502_reg_a);
-      loadRegFromConst (m6502_reg_a, 0);
-      return;
-
     case 13:
     case 12:
     case 11:
     case 10:
     case 9:
     case 8:
-      transferRegReg (m6502_reg_x, m6502_reg_a, false);
+      transferRegReg(m6502_reg_x, m6502_reg_a, true);
       AccRsh (shCount - 8, false);
       loadRegFromConst (m6502_reg_x, 0);
-      return;
-
+      break;
     case 7:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   lsla       1  1        abcd efgh  jklm nop0   i
-       **   txa        1  1        abcd efgh  abcd efgh   i
-       **   rola       1  1        abcd efgh  bcde fghi   a
-       **   clrx       1  1        0000 0000  bcde fghi   a
-       **   rolx       1  1        0000 000a  bcde fghi   0
-       ** total: 5 cycles, 5 bytes (beats 14 cycles, 14 bytes)
-       */
-      rmwWithReg ("asl", m6502_reg_a);
-      transferRegReg (m6502_reg_x, m6502_reg_a, false);
+      storeRegTemp(m6502_reg_x, true);
       rmwWithReg ("rol", m6502_reg_a);
-      loadRegFromConst (m6502_reg_x, 0);
-      rmwWithReg ("rol", m6502_reg_x);
-      return;
-    case 6:
-      /*          bytes  cycles     reg x      reg a   carry
-       **                          abcd efgh  ijkl mnop   ?
-       **   lsla       1  1        abcd efgh  jklm nop0   i
-       **   rolx       1  1        bcde fghi  jklm nop0   a
-       **   rola       1  1        bcde fghi  klmn op0a   j
-       **   rolx       1  1        cdef ghij  klmn op0a   b
-       **   rola       1  1        cdef ghij  lmno p0ab   k
-       **   and #3     2  2        cdef ghij  0000 00ab   k
-       **   psha       1  2        cdef ghij  0000 00ab   k
-       **   txa        1  1        cdef ghij  cdef ghij   k
-       **   pula       1  2        0000 00ab  cdef ghij   k
-       ** total: 12 cycles, 10 bytes (beats 12 bytes)
-       */
+      emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
+      loadRegFromConst (m6502_reg_a, 0);
+      rmwWithReg ("rol", m6502_reg_a);
+      transferRegReg(m6502_reg_a, m6502_reg_x, true);
+      loadRegTemp(m6502_reg_a, true);
+      break;
+    case 0:
+      break;
     default:
-      ;
-    }
-
-  /* lsrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
-  /* the fastest and shortest.                                           */
-  for (i = 0; i < shCount; i++)
-    {
-      emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
-      rmwWithReg ("ror", m6502_reg_a);
-    }
-    
-  loadRegTemp(m6502_reg_x, true);
-
+      /* lsrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
+      /* the fastest and shortest.                                           */
+      storeRegTemp(m6502_reg_x, true);
+      for (i = 0; i < shCount; i++)
+        {
+          emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
+          rmwWithReg ("ror", m6502_reg_a);
+        }
+      loadRegTemp(m6502_reg_x, true);
+  }
 }
 
 

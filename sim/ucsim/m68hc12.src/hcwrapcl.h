@@ -35,9 +35,42 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _A		uc->cA
 #define _B		uc->cB
 #define _D		uc->cD
+
 #define _d		uc->ddst()
+#define _d_Aop		uc->ddst(),uc->acc.DAB.a8.Ar
+#define _d_Bop		uc->ddst(),uc->acc.DAB.a8.Br
+#define _d_i8		uc->ddst(),uc->i8()
+#define _d_i8n		uc->ddst(),~(uc->i8())
+
+#define _da		uc->daddr()
+#define _da_Dop		uc->daddr(),uc->acc.DAB.Dr
+#define _da_Xop		uc->daddr(),uc->IX
+#define _da_Yop		uc->daddr(),uc->IY
+#define _da_Sop		uc->daddr(),uc->SP
+
 #define _e		uc->edst()
+#define _e_Aop		uc->edst(),uc->acc.DAB.a8.Ar
+#define _e_Bop		uc->edst(),uc->acc.DAB.a8.Br
+#define _e_i8		uc->edst(),uc->i8()
+#define _e_i8n		uc->edst(),~(uc->i8())
+
+#define _ea		uc->eaddr()
+#define _ea_Dop		uc->eaddr(),uc->acc.DAB.Dr
+#define _ea_Xop		uc->eaddr(),uc->IX
+#define _ea_Yop		uc->eaddr(),uc->IY
+#define _ea_Sop		uc->eaddr(),uc->SP
+
 #define _xb		uc->xbdst()
+#define _xb_Aop		uc->xbdst(),uc->acc.DAB.a8.Ar
+#define _xb_Bop		uc->xbdst(),uc->acc.DAB.a8.Br
+#define _xb_i8		uc->xbdst(),uc->i8()
+#define _xb_i8n		uc->xbdst(),~(uc->i8())
+
+#define _xba		uc->xbaddr()
+#define _xba_Dop	uc->xbaddr(),uc->acc.DAB.Dr
+#define _xba_Xop	uc->xbaddr(),uc->IX
+#define _xba_Yop	uc->xbaddr(),uc->IY
+#define _xba_Sop	uc->xbaddr(),uc->SP
 
 #define _Aop		uc->acc.DAB.a8.Ar
 #define _Bop		uc->acc.DAB.a8.Br

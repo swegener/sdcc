@@ -75,5 +75,73 @@ CL12::call_id(void)
   return resGO;
 }
 
+int
+CL12::brset(class cl_memory_cell &m)
+{
+  u8_t mask= fetch();
+  i8_t r= fetch();
+  if ((~(m.R()) & mask) == 0)
+    {
+      PC+= r;
+      PC&= 0xffff;
+    }
+  return resGO;
+}
+
+int
+CL12::brset_d(void)
+{
+  class cl_memory_cell &m= dir();
+  return brset(m);  
+}
+
+int
+CL12::brset_id(void)
+{
+  class cl_memory_cell &m= xb();
+  return brset(m);
+}
+
+int
+CL12::brset_e(void)
+{
+  class cl_memory_cell &m= ext();
+  return brset(m);
+}
+
+int
+CL12::brclr(class cl_memory_cell &m)
+{
+  u8_t mask= fetch();
+  i8_t r= fetch();
+  if (((m.R()) & mask) == 0)
+    {
+      PC+= r;
+      PC&= 0xffff;
+    }
+  return resGO;
+}
+
+int
+CL12::brclr_d(void)
+{
+  class cl_memory_cell &m= dir();
+  return brclr(m);  
+}
+
+int
+CL12::brclr_id(void)
+{
+  class cl_memory_cell &m= xb();
+  return brclr(m);
+}
+
+int
+CL12::brclr_e(void)
+{
+  class cl_memory_cell &m= ext();
+  return brclr(m);
+}
+
 
 /* ENd of m68hc12.src/ibranch.cc */

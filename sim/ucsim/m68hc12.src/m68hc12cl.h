@@ -108,7 +108,7 @@ public:
   virtual u16_t xbop16();
   virtual class cl_memory_cell &xb(void);
   virtual class cl_memory_cell &xbdst(void) { vc.rd++; vc.wr++; return xb(); }
-  
+  virtual t_addr xbaddr(void) { return naddr(NULL, NULL); }
   virtual void print_regs(class cl_console_base *con);
 
   virtual void push_regs(bool inst_part);
@@ -129,6 +129,14 @@ public:
   // BRANCH
   virtual int call_e(void);
   virtual int call_id(void);
+  virtual int brset(class cl_memory_cell &m);
+  virtual int brset_d(void);
+  virtual int brset_id(void);
+  virtual int brset_e(void);
+  virtual int brclr(class cl_memory_cell &m);
+  virtual int brclr_d(void);
+  virtual int brclr_id(void);
+  virtual int brclr_e(void);
   
   // OTHER
   

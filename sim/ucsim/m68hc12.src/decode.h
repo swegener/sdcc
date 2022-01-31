@@ -211,6 +211,46 @@ DEC(0, 59,	asl16	, _D		, "LSLD"	, ' ', 1	, 1)
 DEC(0, 4a,	call_e	, _NONE		, "CALL $ep$"	, ' ', 4	, 7)
 DEC(0, 4b,	call_id	, _NONE		, "CALL $ip$"	, ' ', -2	, 0xaa988)
 
+DEC(0, 5a,	sta	, _d_Aop 	, "STAA %d"	, ' ', 2	, 2)
+DEC(0, 6a,	sta	, _xb_Aop	, "STAA %p"	, ' ', -2	, 0x55332)
+DEC(0, 7a,	sta	, _e_Aop 	, "STAA %e"	, ' ', 3	, 3)
+
+DEC(0, 5b,	sta	, _d_Bop 	, "STAB %d"	, ' ', 2	, 2)
+DEC(0, 6b,	sta	, _xb_Bop	, "STAB %p"	, ' ', -2	, 0x55332)
+DEC(0, 7b,	sta	, _e_Bop 	, "STAB %e"	, ' ', 3	, 3)
+
+DEC(0, 5c,	stsx	, _da_Dop 	, "STD %d"	, ' ', 2	, 2)
+DEC(0, 6c,	stsx	, _xba_Dop	, "STD %p"	, ' ', -2	, 0x55332)
+DEC(0, 7c,	stsx	, _ea_Dop 	, "STD %e"	, ' ', 3	, 3)
+
+DEC(0, 5e,	stsx	, _da_Xop 	, "STX %d"	, ' ', 2	, 2)
+DEC(0, 6e,	stsx	, _xba_Xop	, "STX %p"	, ' ', -2	, 0x55332)
+DEC(0, 7e,	stsx	, _ea_Xop 	, "STX %e"	, ' ', 3	, 3)
+
+DEC(0, 5d,	stsx	, _da_Yop 	, "STY %d"	, ' ', 2	, 2)
+DEC(0, 6d,	stsx	, _xba_Yop	, "STY %p"	, ' ', -2	, 0x55332)
+DEC(0, 7d,	stsx	, _ea_Yop 	, "STY %e"	, ' ', 3	, 3)
+
+DEC(0, 5f,	stsx	, _da_Sop 	, "STS %d"	, ' ', 2	, 2)
+DEC(0, 6f,	stsx	, _xba_Sop	, "STS %p"	, ' ', -2	, 0x55332)
+DEC(0, 7f,	stsx	, _ea_Sop 	, "STS %e"	, ' ', 3	, 3)
+
+DEC(0, 4c,	Or	, _d_i8		, "BSET %d,%b"	, ' ', 3	, 4)
+DEC(0, 0c,	Or	, _xb_i8	, "BSET %p,%b"	, ' ', -4	, 4)
+DEC(0, 1c,	Or	, _e_i8		, "BSET %e,%b"	, ' ', 4	, 4)
+
+DEC(0, 4d,	And	, _d_i8n	, "BCLR %d,%b"	, ' ', 3	, 4)
+DEC(0, 0d,	And	, _xb_i8n	, "BCLR %p,%b"	, ' ', -4	, 4)
+DEC(0, 1d,	And	, _e_i8n	, "BCLR %e,%b"	, ' ', 4	, 4)
+
+DEC(0, 4e,	brset_d	, _NONE		, "BRSET %d,%b,%r", ' ', 4	, 5)
+DEC(0, 0e,	brset_id, _NONE		, "BRSET %p,%b,%r", ' ', -4	, 5)
+DEC(0, 1e,	brset_e	, _NONE		, "BRSET %e,%b,%r", ' ', 5	, 5)
+
+DEC(0, 4f,	brclr_d	, _NONE		, "BRCLR %d,%b,%r", ' ', 4	, 5)
+DEC(0, 0f,	brclr_id, _NONE		, "BRCLR %p,%b,%r", ' ', -4	, 5)
+DEC(0, 1f,	brclr_e	, _NONE		, "BRCLR %e,%b,%r", ' ', 5	, 5)
+
 DEC(0, a7,	NOP	, 0xa7		, "NOP"		, ' ', 1	, 1)
 
 DEC(0, b7,	exec_b7	, _NONE		, "%T"		, ' ', 2	, 0)

@@ -2,6 +2,8 @@
 
 	* support/regression/Makefile.in:
 	  Do not run mos6502 and mcs51-xstack-auto tests for all target, since they have extra dependencies.
+	* support/regression/ports/*/spec.mk:
+	  Increase some timeouts in hope of making the bug-3129 regression test pass on that slow PPC Mac in the compile farm.
 
 2022-01-31 Gabriele Gorla <gorlik@yahoo.com>
 

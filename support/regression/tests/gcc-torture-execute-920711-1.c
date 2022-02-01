@@ -16,7 +16,7 @@ f(long a)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && (__GNUC__ < 5)) && !defined(__POWERPC__)
+#if !(defined (__GNUC__) && (__GNUC__ <= 6)) && !defined(__POWERPC__)
   if(f (0x80000000L) == 0)
     ASSERT(0);
   return;

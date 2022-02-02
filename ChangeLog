@@ -1,5 +1,12 @@
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* src/SDCCdwarf2.c,
+	  src/SDCCutil.c,
+	  src/SDCCutil.h:
+	  Add string escaping to dwWriteString.
+
+2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* sdas/asxxsrc/asmain.c:
 	  Fix bug #2970 via trivial patch by David Grayson.
 

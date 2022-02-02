@@ -331,9 +331,9 @@ dwSizeofSLEB128 (int value)
 static void
 dwWriteString (const char * string, const char * comment)
 {
-  /* FIXME: need to safely handle nonalphanumeric data in string */
-  
-  tfprintf (dwarf2FilePtr, "\t!ascii\n", string);
+  char * escaped = string_escape (string);
+  tfprintf (dwarf2FilePtr, "\t!ascii\n", escaped);
+  Safe_free (escaped);
   dwWriteByte (NULL, 0, comment);
 }
 

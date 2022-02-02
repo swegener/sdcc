@@ -39,6 +39,11 @@ hTab *populateStringHash (const char **pin);
  */
 char *shell_escape (const char *str);
 
+/** Escape string for string constants.
+ *  Returns dynamically allocated string, which should be free-ed.
+ */
+char *string_escape (const char *str);
+
 /** Prints elements of the set to the file, each element on new line
  */
 void fputStrSet (FILE * fp, set * list);

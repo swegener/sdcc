@@ -233,6 +233,42 @@ shell_escape (const char *str)
 #endif
 }
 
+
+/** Escape string for string constants.
+    Returns dynamically allocated string, which should be free-ed.
+    TODO: Maybe handle other non-printable characters.
+*/
+char *
+string_escape (const char *str)
+{
+  struct dbuf_s dbuf;
+
+  dbuf_init (&dbuf, 128);
+
+  while (*str)
+    {
+      switch (*str)
+        {
+        case '\\': case '"':
+          dbuf_append_char (&dbuf, '\\');
+          dbuf_append_char (&dbuf, *str);
+          break;
+
+        case '\n':
+          dbuf_append_str (&dbuf, "\\n");
+          break;
+
+        default:
+          dbuf_append_char (&dbuf, *str);
+          break;
+        }
+      ++str;
+    }
+
+  return dbuf_detach_c_str (&dbuf);
+}
+
+
 /** Prints elements of the set to the file, each element on new line
 */
 void

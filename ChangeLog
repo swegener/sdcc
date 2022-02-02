@@ -1,5 +1,10 @@
 2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* sdas/asxxsrc/asxxxx.h:
+	  Raise NCPS to 256 like in upstream ASXXXX. (workaround for bug-3277)
+
+2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* support/makebin/makebin.c:
 	  Improve SMS/GG defaults and allow to define an offset that's skipped for the rom.
 

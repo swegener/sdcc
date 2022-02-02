@@ -56,6 +56,8 @@
  *      - add DS80C390 flat mode support.
  * 10-Nov-07 borutr:
  *      - change a_id from [NCPS] to pointer
+ * 02-Feb-22 basxto/bbbbbr:
+ *      - raise NCPS to 256 like in upstream
  */
 
 /*
@@ -198,7 +200,7 @@
 #define LFTERM      '('         /* Left expression delimeter */
 #define RTTERM      ')'         /* Right expression delimeter */
 
-#define NCPS        80          /* Characters per symbol */
+#define NCPS        256         /* Characters per symbol */
 #define ASXHUGE     1000        /* A huge number */
 #define NERR        3           /* Errors per line */
 #define NINPUT      1024        /* Input buffer size */

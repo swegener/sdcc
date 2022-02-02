@@ -38,13 +38,14 @@
 
 enum debug_messages {
   ALWAYS=0x01, 
-  TRACEGEN=0x02,
-  DEEPTRACE=0x04,
-  COST=0x08,
-  REGALLOC=0x10,
-  REGOPS=0x20,
-  TRACE_AOP=0x40,
-  TRACE_STACK=0x80,
+  VASM=0x02,
+  TRACEGEN=0x04,
+  DEEPTRACE=0x08,
+  COST=0x10,
+  REGALLOC=0x20,
+  REGOPS=0x40,
+  TRACE_AOP=0x80,
+  TRACE_STACK=0x100,
   VVDBG=0x80000000,
   DEBUG_ALL=0x7fffffff
 };
@@ -54,28 +55,13 @@ enum debug_messages {
 //#define DBG_MSG ((DEBUG_ALL|VVDBG)&~COST)
 
 extern int allocInfo;
-static void pushReg (reg_info * reg, bool freereg);
-static void pullReg (reg_info * reg);
-static bool pushRegIfUsed (reg_info *reg);
-static void pullOrFreeReg (reg_info * reg, bool needpull);
-static bool storeRegTemp (reg_info * reg, bool always);
-static void loadRegTemp (reg_info * reg, bool always);
-static void transferAopAop (asmop * srcaop, int srcofs, asmop * dstaop, int dstofs);
-static void adjustStack (int n);
-
-static char *IMMDFMT = "#0x%02x";
-static char *TEMPFMT = "*(__TEMP+%d)";
-static char *TEMPFMT_IND = "[__TEMP+%d]";
-static char *TEMPFMT_IY = "[__TEMP+%d],y";
-//static char *TEMPFMT_IX = "[(__TEMP+%d),x]";
-
-//static char *BASEPTR = "*(__BASEPTR)";
-
-const int STACK_TOP = 0x100;
-
 unsigned fReturnSizeM6502 = 4;   /* shared with ralloc.c */
 
-#define OPT_SPEED
+static bool regalloc_dry_run;
+static unsigned int regalloc_dry_run_cost_bytes;
+static unsigned int regalloc_dry_run_cost_cycles;
+//static unsigned int regalloc_dry_run_cycle_scale = 1;
+
 
 static struct
 {
@@ -89,20 +75,42 @@ static struct
 }
 _G;
 
-static asmop *m6502_aop_pass[8];
-static asmop tsxaop;
-
 extern int m6502_ptrRegReq;
 extern int m6502_nRegs;
 extern struct dbuf_s *codeOutBuf;
-static bool operandsEqu (operand * op1, operand * op2);
+
+static void pushReg (reg_info * reg, bool freereg);
+static void pullReg (reg_info * reg);
+static bool pushRegIfUsed (reg_info *reg);
+static void pullOrFreeReg (reg_info * reg, bool needpull);
+static void adjustStack (int n);
+
+static bool storeRegTemp (reg_info * reg, bool always);
+static void loadRegTemp (reg_info * reg, bool always);
 static void loadRegFromConst (reg_info * reg, int c);
+
+static void transferAopAop (asmop * srcaop, int srcofs, asmop * dstaop, int dstofs);
+static bool operandsEqu (operand * op1, operand * op2);
 static asmop *newAsmop (short type);
 static void aopAdrPrepare (asmop * aop, int loffset);
 static const char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 static void aopAdrUnprepare (asmop * aop, int loffset);
 static void updateiTempRegisterUse (operand * op);
 static void rmwWithReg (char *rmwop, reg_info * reg);
+
+static asmop *m6502_aop_pass[8];
+static asmop tsxaop;
+
+static char *IMMDFMT = "#0x%02x";
+static char *TEMPFMT = "*(__TEMP+%d)";
+static char *TEMPFMT_IND = "[__TEMP+%d]";
+static char *TEMPFMT_IY = "[__TEMP+%d],y";
+//static char *TEMPFMT_IX = "[(__TEMP+%d),x]";
+
+//static char *BASEPTR = "*(__BASEPTR)";
+
+const int STACK_TOP = 0x100;
+
 
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
@@ -135,9 +143,6 @@ static void rmwWithReg (char *rmwop, reg_info * reg);
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
 #define AOP_OP(aop) aop->op
-
-static bool regalloc_dry_run;
-static unsigned int regalloc_dry_run_cost;
 
 /*------------------------------------------------------------------*/
 /* m6502_opcodeCycles - returns the cycle count for the instruction */
@@ -221,11 +226,13 @@ emitComment (unsigned int level, const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  if (level==ALWAYS) print=true;
-  else if ( level&DBG_MSG ) {
+
+  if ( level&DBG_MSG ) {
      if(!(level&VVDBG)) print=true;
      else if(DBG_MSG&VVDBG) print=true; 
   }
+  if (level==VASM && options.verboseAsm) print=true;
+  if (level==ALWAYS) print=true;
 
   if(print) va_emitcode (";", fmt, ap);
   va_end (ap);
@@ -322,14 +329,9 @@ emit6502op (const char *inst, const char *fmt, ...)
     //werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL opcode in emit6502op");
   }
 
-#ifdef OPT_SPEED
-  cost = 2 * isize + 2 * cycles;
-  if (opcode && opcode->type== M6502OP_BR) cost++;
-#else
-  cost = 1 * isize + 0 * cycles;
-#endif
-
-  regalloc_dry_run_cost += cost;
+  regalloc_dry_run_cost_bytes += isize;
+  regalloc_dry_run_cost_cycles += 2 * cycles;
+  if (opcode && opcode->type== M6502OP_BR) regalloc_dry_run_cost_cycles++;
 
   va_start (ap, fmt);
   if (options.verboseAsm) {
@@ -1579,10 +1581,10 @@ storeConstToAop (int c, asmop * aop, int loffset)
       // TODO: same for 6502?
       if (!c && IS_MOS65C02 && !(aop->op && isOperandVolatile (aop->op, false)))
         {
+	  // FIXME: unimplemented
           aopAdrPrepare(aop, loffset);
           emitcode ("stz", "%s", aopAdrStr (aop, loffset, false));
           aopAdrUnprepare(aop, loffset);
-          regalloc_dry_run_cost += aop->type == AOP_DIR ? 2 : 3;
           break;
         }
     default:
@@ -1638,10 +1640,10 @@ storeImmToAop (char *c, asmop * aop, int loffset)
       /* destination is volatile to avoid the read side-effect. */
       if (!strcmp (c, "#0x00") && IS_MOS65C02 && !(aop->op && isOperandVolatile (aop->op, false)))
         {
+	  // FIXME: unimplemented
           aopAdrPrepare(aop, loffset);
           emitcode ("stz", "%s", aopAdrStr (aop, loffset, false));
           aopAdrUnprepare(aop, loffset);
-          regalloc_dry_run_cost += 2;
           break;
         }
     default:
@@ -3423,7 +3425,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 else if (m6502_reg_y->aop == &tsxaop) {
           return "[__BASEPTR],y";
         } else {
-          regalloc_dry_run_cost += 999;
+	  // FIXME: unimplemented
 //          loadRegFromConst(m6502_reg_x, offset);
           return "ERROR [__BASEPTR],y"; // TODO: is base ptr or Y loaded?
         }
@@ -3632,13 +3634,12 @@ asmopToBool (asmop *aop, bool resultInA)
             }
           else
             {
-	      // FIXME
 #if 0
+              // FIXME: unimplemented
               tlbl = safeNewiTempLabel (NULL);
               emitcode ("bit3", "%s", aopAdrStr (aop, 0, false));
               emitcode ("bne", "%05d$", safeLabelKey2num (tlbl->key));
               emitcode ("bit4", "%s", aopAdrStr (aop, 1, false));
-              regalloc_dry_run_cost += 4;
               safeEmitLabel (tlbl);
 #endif
               emitComment(TRACE_AOP|VVDBG, "  asmopToBool default case");
@@ -3994,9 +3995,8 @@ genUminus (iCode * ic)
       loadRegFromConst (m6502_reg_a, 0);
       if (left1 == m6502_reg_a)
         {
-	  // FIXME
+	  // FIXME: unimplemented
           emitcode ("sbc1","%d,s", (result0 == m6502_reg_a || (result0 && result0 == left1)) ? 2 : 1);
-          regalloc_dry_run_cost += 3;
           m6502_dirtyReg (m6502_reg_a);
         }
       else
@@ -5718,7 +5718,11 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
         }
     }
 
-  size = max (AOP_SIZE (left), AOP_SIZE (right));
+  if(AOP_TYPE (left) == AOP_REG)
+  emitComment (TRACEGEN|VVDBG, "   genCmpEQorNE left is reg: %s",AOP (left)->aopu.aop_reg[offset]->name);
+  else
+  emitComment (TRACEGEN|VVDBG, "   genCmpEQorNE left is not not a reg");
+
 // TODO: could clobber A if reg = XA?
     {
       offset = 0;
@@ -6057,9 +6061,8 @@ genAnd (iCode * ic, iCode * ifx)
       tlbl = safeNewiTempLabel (NULL);
       if (IC_TRUE (ifx))
         {
-	  // FIXME
+	  // FIXME: unimplemented
           emitcode ("brclr", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
-          regalloc_dry_run_cost += 3;
           emitBranch ("jmp", IC_TRUE (ifx));
           safeEmitLabel (tlbl);
           if (IC_FALSE (ifx))
@@ -6067,10 +6070,9 @@ genAnd (iCode * ic, iCode * ifx)
         }
       else
         {
-	  // fixme
+	  // FIXME: unimplemented
           if (!regalloc_dry_run)
             emitcode ("brset", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
-          regalloc_dry_run_cost += 3;
           emitBranch ("jmp", IC_FALSE (ifx));
           safeEmitLabel (tlbl);
         }
@@ -6091,11 +6093,11 @@ genAnd (iCode * ic, iCode * ifx)
       offset = 0;
       while (size--)
         {
+	  // FIXME: unimplemented
           loadRegFromAop (m6502_reg_a, AOP (left), offset);
           accopWithAop ("and", AOP (right), offset);
           emitcode ("ora", "1,s");
           emitcode ("sta", "1,s");
-          regalloc_dry_run_cost += 6;
           offset++;
         }
 
@@ -6235,10 +6237,9 @@ genAnd (iCode * ic, iCode * ifx)
       litinv = (~lit) & (((unsigned int) 0xffffffff) >> (8 * (4 - size)));
       if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && (AOP_TYPE (left) == AOP_DIR) && isLiteralBit (litinv))
         {
-	  // FIXME
+	  // FIXME: unimplemented
           bitpos = isLiteralBit (litinv) - 1;
           emitcode ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
-          regalloc_dry_run_cost += 2;
           goto release;
         }
     }
@@ -6348,11 +6349,11 @@ genOr (iCode * ic, iCode * ifx)
       offset = 0;
       while (size--)
         {
+	  // FIXME: unimplemented
           loadRegFromAop (m6502_reg_a, AOP (left), offset);
           accopWithAop ("ora", AOP (right), offset);
           emitcode ("ora", "1,s"); // TODO :P
           emitcode ("sta", "1,s");
-          regalloc_dry_run_cost += 6;
           offset++;
         }
 
@@ -6425,10 +6426,9 @@ genOr (iCode * ic, iCode * ifx)
   if (IS_MOS65C02 && sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       (AOP_TYPE (right) == AOP_LIT) && isLiteralBit (lit) && (AOP_TYPE (left) == AOP_DIR))
     {
-      // FIXME
+      // FIXME: unimplemented
       int bitpos = isLiteralBit (lit) - 1;
       emitcode ("bset", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
-      regalloc_dry_run_cost += 2;
       goto release;
     }
 
@@ -6795,10 +6795,9 @@ genRRC (iCode * ic)
   emit6502op ("ror", "a");
   if (resultInA)
     {
-      // FIXME
+      // FIXME: unimplemented
       emitcode ("ora10", "1,s");
       pullNull (1);
-      regalloc_dry_run_cost += 3;
       m6502_dirtyReg (m6502_reg_a);
       needpula = false;
     }
@@ -6872,10 +6871,9 @@ genRLC (iCode * ic)
   emit6502op ("rol", "a");
   if (resultInA)
     {
-      // FIXME
+      // FIXME: unimplemented
       emitcode ("ora11", "1,s");
       pullNull (1);
-      regalloc_dry_run_cost += 3;
       m6502_dirtyReg (m6502_reg_a);
       needpula = false;
     }
@@ -8213,11 +8211,10 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
           /* signed bitfield */
           symbol *tlbl = safeNewiTempLabel (NULL);
 
-	  // FIXME
+	  // FIXME: unimplemented
           emitcode ("bit12", IMMDFMT, 1 << (rlen - 1));
           emitcode ("beq", "%05d$", safeLabelKey2num (tlbl->key));
           emitcode ("ora", IMMDFMT, (unsigned char) (0xff << rlen));
-         regalloc_dry_run_cost += 6;
           safeEmitLabel (tlbl);
         }
       storeRegToAop (m6502_reg_a, AOP (result), offset++);
@@ -8309,10 +8306,9 @@ genUnpackBitsImmed (operand * left, operand *right, operand * result, iCode * ic
         {
           symbol *tlbl = safeNewiTempLabel (NULL);
 
-	  // FIXME
+	  // FIXME: unimplemented
           loadRegFromConst (m6502_reg_a, 0);
           emitcode ("brclr", "#%d,%s,%05d$", bstr, aopAdrStr (derefaop, 0, false), safeLabelKey2num ((tlbl->key)));
-          regalloc_dry_run_cost += 3;
           if (SPEC_USIGN (etype))
             rmwWithReg ("inc", m6502_reg_a);
           else
@@ -8552,9 +8548,23 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   tempRematOfs = rematOfs;
   prepSwapAY = false;
 
+  if(right) {
+  emitComment (TRACEGEN|VVDBG, "      preparePointer AOP_TYPE(right)==AOP_REG: %s", (AOP_TYPE(right) == AOP_REG)?"yes":"no");
+  emitComment (TRACEGEN|VVDBG, "      preparePointer AOP_SIZE(right)=%d", AOP_SIZE(right));
+}
+  if(left) {
+  emitComment (TRACEGEN|VVDBG, "      preparePointer AOP_TYPE(left)==AOP_REG: %s", (AOP_TYPE(left) == AOP_REG)?"yes":"no");
+  emitComment (TRACEGEN|VVDBG, "      preparePointer AOP_SIZE(left)=%d", AOP_SIZE(left));
+//  emitComment (TRACEGEN|VVDBG, "      preparePointer (%s, off=%d, remat=%s) tempOfs %d", aopName(AOP(left)), offset, rematOfs, _G.tempOfs);
+}
+  
+#if 1
+  // FIXME: this code sometimes improperly detects 8-bit offsets
+  // FIXME FIXME: this is a great optimization opportunity
   // 8-bit absolute offset? (remat+offset,y)
   // TODO: better way than checking register?
-  if (rematOfs && AOP_TYPE(left) == AOP_REG && (AOP_SIZE(left) < 2 || AOP(left)->aopu.aop_reg[1]->isLitConst && AOP(left)->aopu.aop_reg[1]->litConst == 0))
+  if (rematOfs && AOP_TYPE(left) == AOP_REG 
+      && (AOP_SIZE(left) == 1 || AOP(left)->aopu.aop_reg[1]->isLitConst && AOP(left)->aopu.aop_reg[1]->litConst == 0))
     {
       emitComment (TRACEGEN|VVDBG, "        preparePointer: 8-bit offset");
       // TODO: what if Y is right and AX is pointer?
@@ -8572,6 +8582,7 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
       }
       return (prepTempOfs = -1);
     }
+#endif
 
   // need to do pointer math?
   if (!rematOfs && offset >= 0 && offset <= 255-4)
@@ -8759,11 +8770,10 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
             }
           else
             {
-	      // FIXME
+              // FIXME: unimplemented
               loadRegIndexed2 (m6502_reg_a, litOffset);
               m6502_useReg (m6502_reg_a);
               emitcode ("aix", "#%d", size);
-              regalloc_dry_run_cost += 2;
               m6502_dirtyReg (m6502_reg_x);
               m6502_dirtyReg (m6502_reg_y);
               m6502_freeReg (m6502_reg_x);
@@ -8824,9 +8834,8 @@ release:
 
   if (pi && !pi->generated)
     {
-      // FIXME
+      // FIXME: unimplemented
       emitcode ("aix", "#%d", size);
-      regalloc_dry_run_cost += 2;
       m6502_dirtyReg (m6502_reg_x);
       m6502_dirtyReg (m6502_reg_y);
       aopOp (IC_RESULT (pi), pi, false);
@@ -8836,7 +8845,6 @@ release:
           /* Ensure Z/NZ flag is correct since storeRegToAop() */
           /* disrupts the flag bits when storing to memory. */
           emitcode ("tsta", "");
-          regalloc_dry_run_cost++;
         }
       freeAsmop (IC_RESULT (pi), NULL, pi, true);
       pi->generated = 1;
@@ -8945,9 +8953,8 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
     {
       if (!litOffset && !rematOffset && AOP (right)->type == AOP_DIR)
         {
-	  // FIXME
+	  // FIXME: unimplemented
           emitcode ("mov", "%s,x+", aopAdrStr (AOP (right), offset, false));
-          regalloc_dry_run_cost += 2;
           litOffset--;
         }
       else
@@ -8997,11 +9004,10 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       emit6502op ("and", IMMDFMT, (~mask) & 0xff);
       pushReg (m6502_reg_a, true);
 
-      // FIXME
+      // FIXME: unimplemented
       loadRegIndexed(m6502_reg_a, litOffset+offset, rematOffset);
       emitcode ("and", IMMDFMT, mask);
       emitcode ("ora19", "1,s");
-      regalloc_dry_run_cost += 5;
       storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
       pullReg (m6502_reg_a);
     }
@@ -9047,26 +9053,23 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
       if (AOP_TYPE (right) == AOP_LIT)
         {
           litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
-
+	  // FIXME: unimplemented
           emitcode ((litval & 1) ? "bset" : "bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
-          regalloc_dry_run_cost += 2;
         }
       else
         {
           symbol *tlbl1 = safeNewiTempLabel (NULL);
           symbol *tlbl2 = safeNewiTempLabel (NULL);
 
-	  // FIXME
+	  // FIXME: unimplemented
           needpulla = pushRegIfSurv (m6502_reg_a);
           loadRegFromAop (m6502_reg_a, AOP (right), 0);
           emit6502op ("lsr", "a");
           emitBranch ("bcs", tlbl1);
           emitcode ("bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
-          regalloc_dry_run_cost += 2;
           emitBranch ("bra", tlbl2);
           safeEmitLabel (tlbl1);
           emitcode ("bset", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
-          regalloc_dry_run_cost += 2;
           safeEmitLabel (tlbl2);
           pullOrFreeReg (m6502_reg_a, needpulla);
         }
@@ -9376,10 +9379,9 @@ release:
 
   if (pi)
     {
-      // FIXME
+      // FIXME: unimplemented
       aopOp (IC_RESULT (pi), pi, false);
       emitcode ("aix", "#%d", size);
-      regalloc_dry_run_cost += 2;
       m6502_dirtyReg (m6502_reg_x);
       m6502_dirtyReg (m6502_reg_y);
       storeRegToAop (m6502_reg_yx, AOP (IC_RESULT (pi)), 0);
@@ -9663,13 +9665,13 @@ genJumpTab (iCode * ic)
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
     {
       emitcode (".db", "%05d$", labelKey2num (jtab->key));
-      regalloc_dry_run_cost++;
+      regalloc_dry_run_cost_bytes++;
     }
   safeEmitLabel (jtabhi);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
     {
       emitcode (".db", ">%05d$", labelKey2num (jtab->key));
-      regalloc_dry_run_cost++;
+      regalloc_dry_run_cost_bytes++;
     }
 }
 
@@ -9990,25 +9992,36 @@ updateiTempRegisterUse (operand * op)
     }
 }
 
-/*---------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 /* genm6502iCode - generate code for M6502 based controllers for a single iCode instruction */
-/*---------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 static void
 genm6502iCode (iCode *ic)
-{
-  /* if the result is marked as
-     spilt and rematerializable or code for
-     this has already been generated then
-     do nothing */
-  if (resultRemat (ic) || ic->generated)
-    return;
-
   {
     int i;
     reg_info *reg;
 
     initGenLineElement ();
     genLine.lineElement.ic = ic;
+
+#if 0
+  if (!regalloc_dry_run)
+    printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, G.stack.pushed);
+#endif
+
+  if (resultRemat (ic))
+    {
+      if (!regalloc_dry_run)
+        emitComment(TRACEGEN, "skipping iCode since result will be rematerialized");
+      return;
+    }
+
+  if (ic->generated)
+    {
+      if (!regalloc_dry_run)
+        emitComment(TRACEGEN, "skipping generated iCode");
+      return;
+    }
 
     for (i = A_IDX; i <= XA_IDX; i++)
       {
@@ -10046,7 +10059,6 @@ genm6502iCode (iCode *ic)
           }
         else
           m6502_regWithIdx (i)->isDead = true;
-      }
       }
 
   /* depending on the operation */
@@ -10284,7 +10296,8 @@ float
 drym6502iCode (iCode *ic)
 {
   regalloc_dry_run = true;
-  regalloc_dry_run_cost = 0;
+  regalloc_dry_run_cost_bytes = 0;
+  regalloc_dry_run_cost_cycles = 0;
 
   init_aop_pass();
   
@@ -10293,12 +10306,20 @@ drym6502iCode (iCode *ic)
   destroy_line_list ();
   /*freeTrace (&_G.trace.aops);*/
 
-  return (regalloc_dry_run_cost);
+  wassert (regalloc_dry_run);
+
+  int byte_cost_weight = 2;
+  if(optimize.codeSize) byte_cost_weight*=2;
+  if(!optimize.codeSpeed) byte_cost_weight*=4;
+
+//   return (2* (float)regalloc_dry_run_cost_bytes + (float)regalloc_dry_run_cost_cycles* ic->count);
+
+  return ((float)regalloc_dry_run_cost_bytes * byte_cost_weight + (float)regalloc_dry_run_cost_cycles * ic->count);
 }
 
-/*-----------------------------------------------------------------*/
-/* genm6502Code - generate code for M6502 based controllers          */
-/*-----------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
+/* genm6502Code - generate code for M6502 based controllers            */
+/*---------------------------------------------------------------------*/
 void
 genm6502Code (iCode *lic)
 {
@@ -10318,9 +10339,7 @@ genm6502Code (iCode *lic)
     printAllocInfo (currFunc, codeOutBuf);
   /* if debug information required */
   if (options.debug && currFunc && !regalloc_dry_run)
-    {
       debugFile->writeFunction (currFunc, lic);
-    }
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
@@ -10339,9 +10358,7 @@ genm6502Code (iCode *lic)
       if (ic->level != clevel || ic->block != cblock)
         {
           if (options.debug)
-            {
               debugFile->writeScope (ic);
-            }
           clevel = ic->level;
           cblock = ic->block;
         }
@@ -10349,15 +10366,16 @@ genm6502Code (iCode *lic)
       if (ic->lineno && cln != ic->lineno)
         {
           if (options.debug)
-            {
               debugFile->writeCLine (ic);
-            }
+
           if (!options.noCcodeInAsm)
-            {
-              emitcode ("", ";%s:%d: %s", ic->filename, ic->lineno, printCLine (ic->filename, ic->lineno));
-            }
+            emitComment (ALWAYS, "%s: %d: %s", ic->filename, ic->lineno, printCLine (ic->filename, ic->lineno));
           cln = ic->lineno;
         }
+
+      regalloc_dry_run_cost_bytes = 0;
+      regalloc_dry_run_cost_cycles = 0;
+
       if (options.iCodeInAsm)
         {
           char regsSurv[4];
@@ -10372,10 +10390,8 @@ genm6502Code (iCode *lic)
           dbuf_free (iLine);
         }
 
-      regalloc_dry_run_cost = 0;
       genm6502iCode(ic);
-      if (options.verboseAsm)
-        emitcode (";", "iCode %d (key %d) total cost: %d\n", ic->seq, ic->key, (int) regalloc_dry_run_cost);
+      emitComment (TRACEGEN, "Cost for generated ic %d : (%d, %d)", ic->key, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_cycles);
 
       // TODO: should be asserts?
 /*
@@ -10397,7 +10413,6 @@ genm6502Code (iCode *lic)
 
   if (options.debug)
     debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
-
 
   /* now we are ready to call the
      peep hole optimizer */

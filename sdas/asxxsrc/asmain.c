@@ -1963,7 +1963,8 @@ afile(char *fn, char *ft, int wf)
 
         afilex(fn, ft);
 
-        if ((fp = fopen(afntmp, wf?"w":"r")) == NULL) {
+        /* open file -- use "b" flag to write LF line endings on all host platforms */
+        if ((fp = fopen(afntmp, wf?"wb":"r")) == NULL) {
             fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afntmp);
             asexit(ER_FATAL);
         }

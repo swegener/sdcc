@@ -1,3 +1,8 @@
+2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* support/makebin/makebin.c:
+	  Improve SMS/GG defaults and allow to define an offset that's skipped for the rom.
+
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCdwarf2.c,

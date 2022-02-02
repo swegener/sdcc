@@ -1,5 +1,10 @@
 2022-02-01 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/src/mos6502/gen.c:
+      Fix several bugs in the code generator.
+
+2022-02-01 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/device/lib/mos6502/__memcpy.c,
       sdcc/device/lib/mos6502/_mulint.s,
       sdcc/device/lib/mos6502/_mullong.s,

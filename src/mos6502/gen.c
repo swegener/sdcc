@@ -2195,7 +2195,7 @@ loadRegIndexed2 (reg_info * reg, int offset)
   if (offset & 0x8000)
     offset = 0x10000 - offset;
 
-  emitComment (REGOPS, "      loadRegIndexed (%s, %d)", reg->name, offset);
+  emitComment (REGOPS, "      loadRegIndexed2 (%s, %d)", reg->name, offset);
 
 // TODO: mostly awful
   switch (reg->rIdx)
@@ -5192,7 +5192,7 @@ genMinus (iCode * ic)
   if (genMinusDec (ic) == true)
     goto release;
 
-  emitComment (TRACEGEN|VVDBG, "    - Can't Dec");
+  emitComment (TRACEGEN|VVDBG, "    genMinus - Can't Dec");
   aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   size = getDataSize (IC_RESULT (ic));
@@ -5202,20 +5202,19 @@ genMinus (iCode * ic)
   rightOp = AOP (IC_RIGHT (ic));
   offset = 0;
 
-  needpulla = pushRegIfSurv (m6502_reg_a);
-
   if (IS_AOP_A (rightOp))
     {
-      loadRegFromAop (m6502_reg_a, rightOp, offset);
-      emit6502op("sec", "");
-      storeRegTemp(m6502_reg_a,true);
-      accopWithAop ("lda", rightOp, offset);
-      emit6502op("sbc", TEMPFMT,  _G.tempOfs-1);
-      loadRegTemp(NULL, true);
+      // op - a = neg(a - op) = not(a - op) + 1 = not(a - op - 1)
+      needpulla = pushRegIfSurv (m6502_reg_a);
+      emit6502op("clc", "");
+      accopWithAop ("sbc", leftOp, offset);
+      emit6502op("eor", "#0xff");
       storeRegToAop (m6502_reg_a, AOP (IC_RESULT (ic)), offset);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;
     }
+
+  needpulla = pushRegIfSurv (m6502_reg_a);
 
   if (size > 1 && (IS_AOP_AX (AOP (IC_LEFT (ic))) || IS_AOP_AX (AOP (IC_RIGHT (ic)))))
     {
@@ -5543,15 +5542,15 @@ genCmp (iCode * ic, iCode * ifx)
 
   emitComment (TRACEGEN|VVDBG, "      genCmp", "(%s, size %d, sign %d)", nameCmp (opcode), size, sign);
   
-  if (size == 1 && IS_AOP_X (AOP (left)) && isAddrSafe(left, m6502_reg_x) )
+  if (!sign && size == 1 && IS_AOP_X (AOP (left)) && isAddrSafe(right, m6502_reg_x) )
     {
       accopWithAop ("cpx", AOP (right), offset);
     }
-  else if (size == 1 && IS_AOP_Y (AOP (left)) && isAddrSafe(left, m6502_reg_y) )
+  else if (!sign && size == 1 && IS_AOP_Y (AOP (left)) && isAddrSafe(right, m6502_reg_y) )
     {
       accopWithAop ("cpy", AOP (right), offset);
     }
-  else if (size == 1 && IS_AOP_A (AOP (left)) && isAddrSafe(left, m6502_reg_a))
+  else if (!sign && size == 1 && IS_AOP_A (AOP (left)) && isAddrSafe(right, m6502_reg_a))
     {
       accopWithAop ("cmp", AOP (right), offset);
     }
@@ -5559,6 +5558,7 @@ genCmp (iCode * ic, iCode * ifx)
     {
       offset = 0;
       // need V flag for signed compare
+      // FIXME: is this covered above?
       if (size == 1 && sign == 0)
         sub = "cmp";
       else
@@ -5604,7 +5604,7 @@ genCmp (iCode * ic, iCode * ifx)
               } else {         
                 emit6502op (sub, TEMPFMT, _G.tempOfs - 1);
               }
-              loadRegTemp(m6502_reg_a, true);
+              loadRegTemp(NULL, true);
             }
           else
             {
@@ -5671,23 +5671,22 @@ genCmp (iCode * ic, iCode * ifx)
 static void
 genCmpEQorNE (iCode * ic, iCode * ifx)
 {
-  operand *left, *right, *result;
+  operand *result = IC_RESULT (ic);
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
   int opcode;
-  int size, offset = 0;
+  int size;
   symbol *jlbl = NULL;
   symbol *tlbl_NE = NULL;
   symbol *tlbl_EQ = NULL;
   bool needloada = false;
+  int offset = 0;
 
   emitComment (TRACEGEN, __func__);
 
   opcode = ic->op;
 
-  emitComment (TRACEGEN|VVDBG, "      genCmpEQorNE", "(%s)", nameCmp (opcode));
-
-  result = IC_RESULT (ic);
-  left = IC_LEFT (ic);
-  right = IC_RIGHT (ic);
+  emitComment (TRACEGEN|VVDBG, "      genCmpEQorNE (%s)", nameCmp (opcode));
 
   /* assign the amsops */
   aopOp (left, ic, false);
@@ -5702,6 +5701,8 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
       right = temp;
       opcode = exchangedCmp (opcode);
     }
+
+  size = max (AOP_SIZE (left), AOP_SIZE (right));
 
   if (ifx)
     {
@@ -5723,12 +5724,14 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
       offset = 0;
       while (size--)
         {
-          if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == X_IDX && isAddrSafe(left, m6502_reg_x))
+          if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == X_IDX && isAddrSafe(right, m6502_reg_x))
             accopWithAop ("cpx", AOP (right), offset);
-          else if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == Y_IDX && isAddrSafe(left, m6502_reg_y))
+          else if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == Y_IDX && isAddrSafe(right, m6502_reg_y))
             accopWithAop ("cpy", AOP (right), offset);
           else
             {
+              emitComment (TRACEGEN|VVDBG, "      genCmpEQorNE can't cpx or cpy");
+
             // TODO? why do we push when we could cpx?
               if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
                 {
@@ -8529,6 +8532,7 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   asmop *newaop = newAsmop (AOP_DIR);
   newaop->aopu.aop_dir = Safe_calloc (1, 10+4);
   snprintf(newaop->aopu.aop_dir, 14, "(__TEMP+%d)", _G.tempOfs);
+
   emitComment (TRACEGEN|VVDBG, "      preparePointer: %s", newaop->aopu.aop_dir);
   newaop->size = 2;
   
@@ -8543,7 +8547,7 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   if (offset & 0x8000)
     offset = 0x10000 - offset;
 
-  emitComment (TRACEGEN|VVDBG, "      preparePointer (%s, %d, %s) temp %d", aopName(AOP(left)), offset, rematOfs, _G.tempOfs);
+  emitComment (TRACEGEN|VVDBG, "      preparePointer (%s, off=%d, remat=%s) tempOfs %d", aopName(AOP(left)), offset, rematOfs, _G.tempOfs);
 
   tempRematOfs = rematOfs;
   prepSwapAY = false;
@@ -8552,16 +8556,18 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
   // TODO: better way than checking register?
   if (rematOfs && AOP_TYPE(left) == AOP_REG && (AOP_SIZE(left) < 2 || AOP(left)->aopu.aop_reg[1]->isLitConst && AOP(left)->aopu.aop_reg[1]->litConst == 0))
     {
+      emitComment (TRACEGEN|VVDBG, "        preparePointer: 8-bit offset");
       // TODO: what if Y is right and AX is pointer?
       prepSwapAY = right && AOP(left)->aopu.aop_reg[0] == m6502_reg_a && AOP_TYPE(right) == AOP_REG && IS_AOP_WITH_Y(AOP(right));
       if (prepSwapAY) {
         // swap A and Y
-        emitComment (TRACEGEN|VVDBG, "  swap A and Y");
+        emitComment (TRACEGEN|VVDBG, "        preparePointer: swap A and Y");
         storeRegTemp(m6502_reg_a, true);
         transferRegReg(m6502_reg_y, m6502_reg_a, true);
         loadRegTemp(m6502_reg_y, true);
       } else {
         // transfer lower byte of offset to Y
+        // FIXME: should allow offset in X as well
         transferRegReg(AOP(left)->aopu.aop_reg[0], m6502_reg_y, true);
       }
       return (prepTempOfs = -1);
@@ -8679,13 +8685,16 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
 
   decodePointerOffset (right, &litOffset, &rematOffset);
 
-  emitComment (TRACEGEN|VVDBG, "      genPointerGet (%s)", aopName(AOP(left)), litOffset, rematOffset );
+  emitComment (TRACEGEN|VVDBG, "      genPointerGet (%s) loff=%d rmoff=%s", aopName(AOP(left)), litOffset, rematOffset );
   
   needpulla = storeRegTempIfSurv (m6502_reg_a);
+  //FIXME: should free reg here
   
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   if (AOP_TYPE (left) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size)
   {
+  emitComment (TRACEGEN|VVDBG, "      genPointerGet - shortcut (already in zp)");
+
     // and we're storing to the pointer itself, copy onto stack first
     if (sameRegs(AOP(left), AOP(result)) ) {
       bool pully = storeRegTempIfSurv (m6502_reg_y);
@@ -8736,6 +8745,7 @@ genPointerGet (iCode * ic, iCode * pi, iCode * ifx)
   
   if (AOP_TYPE (result) == AOP_REG)
     {
+      emitComment (TRACEGEN|VVDBG, "      genPointerGet - result is reg: %s", AOP(result)->aopu.aop_reg[0]->name );
       if (pi)
         aopOp (IC_RESULT (pi), pi, false);
 
@@ -9649,6 +9659,7 @@ genJumpTab (iCode * ic)
 
   /* now generate the jump labels */
   safeEmitLabel (jtablo);
+  // FIXME: add this to gen6502op
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
     {
       emitcode (".db", "%05d$", labelKey2num (jtab->key));
@@ -10036,7 +10047,7 @@ genm6502iCode (iCode *ic)
         else
           m6502_regWithIdx (i)->isDead = true;
       }
-  }
+      }
 
   /* depending on the operation */
   switch (ic->op)
@@ -10292,10 +10303,9 @@ void
 genm6502Code (iCode *lic)
 {
   iCode *ic;
-  int cln = 0;
   int clevel = 0;
   int cblock = 0;
-
+  int cln = 0;
   regalloc_dry_run = false;
 
   m6502_dirtyReg (m6502_reg_a);

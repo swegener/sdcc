@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _mulint.s - routine for multiplication of 16 bit (unsigned) int
+;   _strcmp.s - standard C library function
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
+;   Copyright (C) 1998, Ullrich von Bassewitz
 ;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
@@ -27,26 +27,29 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _mulint
+	.module _strcmp
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __mulint_PARM_2
-	.globl __mulint
+	.globl _strcmp_PARM_2
+	.globl _strcmp
 
 ;--------------------------------------------------------
 ; overlayable items in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_mulint_tmp:
-	.ds 1
+_str1:
+	.ds 2
+_str2:
+	.ds 2
+
 
 ;--------------------------------------------------------
 ; function parameters
 ;--------------------------------------------------------
 	.area XSEG
-__mulint_PARM_2:
+_strcmp_PARM_2:
 	.ds 2
 
 ;--------------------------------------------------------
@@ -54,33 +57,33 @@ __mulint_PARM_2:
 ;--------------------------------------------------------
 	.area CSEG
 
-__mulint:
-	sta	*___SDCC_m6502_ret0
-	stx	*___SDCC_m6502_ret1
+_strcmp:
+	sta	*_str1+0
+	stx	*_str1+1
+	lda	_strcmp_PARM_2+0
+	sta	*_str2+0
+	ldx	_strcmp_PARM_2+1
+	stx	*_str2+1
 
-	lda	#0
-	sta	*_mulint_tmp
-	ldy	#16
-
-	lsr	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-next_bit:
-	bcc	skip
-	clc
-	adc	__mulint_PARM_2+0
+	ldy	#0
+loop:
+	lda	[*_str1],y
+	cmp	[*_str2],y
+	bne	L1
 	tax
-	lda	__mulint_PARM_2+1
-	adc	*_mulint_tmp
-	sta	*_mulint_tmp
+	beq	end
+	iny
+	bne	loop
+	inc	*_str1+1
+	inc	*_str2+1
+	bne	loop
+L1:
+	bcs	L2
+	ldx	#0xFF
 	txa
-skip:
-	ror	*_mulint_tmp
-	ror	a
-	ror	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-	dey
-	bne	next_bit
-
-	lda	*___SDCC_m6502_ret0
-	ldx	*___SDCC_m6502_ret1
+	rts
+L2:
+	ldx	#0x01
+	txa
+end:
 	rts

@@ -1,3 +1,14 @@
+2022-02-01 Gabriele Gorla <gorlik@yahoo.com>
+
+    * sdcc/device/lib/mos6502/__memcpy.c,
+      sdcc/device/lib/mos6502/_mulint.s,
+      sdcc/device/lib/mos6502/_mullong.s,
+      sdcc/device/lib/mos6502/_divuint.s,
+      sdcc/device/lib/mos6502/_divulong.s,
+      sdcc/device/lib/mos6502/_strcmp.s,
+      sdcc/device/lib/mos6502/_strcpy.s:
+      Implement additional library functions in assembly.
+
 2022-02-01 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* support/regression/Makefile.in:

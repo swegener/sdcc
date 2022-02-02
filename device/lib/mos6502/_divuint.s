@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _mulint.s - routine for multiplication of 16 bit (unsigned) int
+;   _divuint.s - routine for division of 16 bit unsigned int
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
+;   Copyright (C) 1998, Ullrich von Bassewitz
 ;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
@@ -27,26 +27,19 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _mulint
+	.module _divuint
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __mulint_PARM_2
-	.globl __mulint
-
-;--------------------------------------------------------
-; overlayable items in zero page
-;--------------------------------------------------------
-	.area	OSEG    (PAG, OVR)
-_mulint_tmp:
-	.ds 1
+	.globl __divuint_PARM_2
+	.globl __divuint
 
 ;--------------------------------------------------------
 ; function parameters
 ;--------------------------------------------------------
 	.area XSEG
-__mulint_PARM_2:
+__divuint_PARM_2:
 	.ds 2
 
 ;--------------------------------------------------------
@@ -54,33 +47,57 @@ __mulint_PARM_2:
 ;--------------------------------------------------------
 	.area CSEG
 
-__mulint:
-	sta	*___SDCC_m6502_ret0
-	stx	*___SDCC_m6502_ret1
+__divuint:
+	sta	*___SDCC_m6502_ret0+0
+	stx	*___SDCC_m6502_ret0+1
 
 	lda	#0
-	sta	*_mulint_tmp
+	sta	*___SDCC_m6502_ret2+1
 	ldy	#16
-
-	lsr	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
+;	ldx	__divuint_PARM_2+1
+;	beq	div16x8
 next_bit:
-	bcc	skip
-	clc
-	adc	__mulint_PARM_2+0
+	asl	*___SDCC_m6502_ret0+0
+	rol	*___SDCC_m6502_ret0+1
+	rol	a
+	rol	*___SDCC_m6502_ret2+1
+
 	tax
-	lda	__mulint_PARM_2+1
-	adc	*_mulint_tmp
-	sta	*_mulint_tmp
+	cmp	__divuint_PARM_2+0
+	lda	*___SDCC_m6502_ret2+1
+	sbc	__divuint_PARM_2+1
+	bcc	L1
+	sta	*___SDCC_m6502_ret2+1
 	txa
-skip:
-	ror	*_mulint_tmp
-	ror	a
-	ror	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
+	sbc	__divuint_PARM_2+0
+	tax
+	inc	*___SDCC_m6502_ret0+0
+L1:
+	txa
 	dey
 	bne	next_bit
+	sta	*___SDCC_m6502_ret2+0
 
-	lda	*___SDCC_m6502_ret0
-	ldx	*___SDCC_m6502_ret1
+	lda	*___SDCC_m6502_ret0+0
+	ldx	*___SDCC_m6502_ret0+1
 	rts
+
+;div16x8:
+;LL0:
+;	asl	*___SDCC_m6502_ret0+0
+;	rol	*___SDCC_m6502_ret0+1
+;	rol	a
+;	bcs	LL1
+;	cmp	__divuint_PARM_2+0
+;	bcc	LL2
+;LL1:
+;	sbc	__divuint_PARM_2+0
+;	inc	*___SDCC_m6502_ret0+0
+;LL2:
+;	dey
+;	bne	LL0
+;	sta	*___SDCC_m6502_ret2+0
+;
+;	lda	*___SDCC_m6502_ret0+0
+;	ldx	*___SDCC_m6502_ret0+1
+;	rts

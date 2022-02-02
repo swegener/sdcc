@@ -1,7 +1,8 @@
 ;-------------------------------------------------------------------------
-;   _mulint.s - routine for multiplication of 16 bit (unsigned) int
+;   memcpy.s - standarc C library
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
+;   Copyright (C) 2003, Ullrich von Bassewitz
+;   Copyright (C) 2009, Christian Krueger
 ;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
@@ -27,26 +28,22 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _mulint
+	.module ___memcpy
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __mulint_PARM_2
-	.globl __mulint
-
-;--------------------------------------------------------
-; overlayable items in zero page
-;--------------------------------------------------------
-	.area	OSEG    (PAG, OVR)
-_mulint_tmp:
-	.ds 1
+	.globl ___memcpy_PARM_2
+	.globl ___memcpy_PARM_3
+	.globl ___memcpy
 
 ;--------------------------------------------------------
 ; function parameters
 ;--------------------------------------------------------
 	.area XSEG
-__mulint_PARM_2:
+___memcpy_PARM_2:
+	.ds 2
+___memcpy_PARM_3:
 	.ds 2
 
 ;--------------------------------------------------------
@@ -54,33 +51,41 @@ __mulint_PARM_2:
 ;--------------------------------------------------------
 	.area CSEG
 
-__mulint:
-	sta	*___SDCC_m6502_ret0
-	stx	*___SDCC_m6502_ret1
+___memcpy:
+	sta	*___SDCC_m6502_ret0+0
+	stx	*___SDCC_m6502_ret0+1
+	sta	*___SDCC_m6502_ret2+0
+	stx	*___SDCC_m6502_ret2+1
+	lda	___memcpy_PARM_2+0
+	sta	*___SDCC_m6502_ret4+0
+	lda	___memcpy_PARM_2+1
+	sta	*___SDCC_m6502_ret4+1
 
-	lda	#0
-	sta	*_mulint_tmp
-	ldy	#16
-
-	lsr	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-next_bit:
-	bcc	skip
-	clc
-	adc	__mulint_PARM_2+0
-	tax
-	lda	__mulint_PARM_2+1
-	adc	*_mulint_tmp
-	sta	*_mulint_tmp
-	txa
-skip:
-	ror	*_mulint_tmp
-	ror	a
-	ror	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-	dey
-	bne	next_bit
-
-	lda	*___SDCC_m6502_ret0
-	ldx	*___SDCC_m6502_ret1
+	ldy	#0
+	ldx	___memcpy_PARM_3+1
+	beq	L2
+L1:
+	lda	[*___SDCC_m6502_ret4],y
+	sta	[*___SDCC_m6502_ret2],y
+	iny
+	lda	[*___SDCC_m6502_ret4],y
+	sta	[*___SDCC_m6502_ret2],y
+	iny
+	bne	L1
+	inc	*___SDCC_m6502_ret4+1
+	inc	*___SDCC_m6502_ret2+1
+	dex
+	bne	L1
+L2:
+	ldx	___memcpy_PARM_3+0
+	beq	done
+L3:
+	lda	[*___SDCC_m6502_ret4],y
+	sta	[*___SDCC_m6502_ret2],y
+	iny
+	dex
+	bne	L3
+done:
+	lda	*___SDCC_m6502_ret0+0
+	ldx	*___SDCC_m6502_ret0+1
 	rts

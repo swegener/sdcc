@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _mulint.s - routine for multiplication of 16 bit (unsigned) int
+;   _strcpy.s - standard C library function
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
+;   Copyright (C) 1998, Ullrich von Bassewitz
 ;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
@@ -27,26 +27,29 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _mulint
+	.module _strcpy
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __mulint_PARM_2
-	.globl __mulint
+	.globl _strcpy_PARM_2
+	.globl _strcpy
 
 ;--------------------------------------------------------
 ; overlayable items in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_mulint_tmp:
-	.ds 1
+_src:
+	.ds 2
+_dst:
+	.ds 2
+
 
 ;--------------------------------------------------------
 ; function parameters
 ;--------------------------------------------------------
 	.area XSEG
-__mulint_PARM_2:
+_strcpy_PARM_2:
 	.ds 2
 
 ;--------------------------------------------------------
@@ -54,33 +57,25 @@ __mulint_PARM_2:
 ;--------------------------------------------------------
 	.area CSEG
 
-__mulint:
-	sta	*___SDCC_m6502_ret0
-	stx	*___SDCC_m6502_ret1
+_strcpy:
+	sta	*_dst+0
+	stx	*_dst+1
+	lda	_strcpy_PARM_2+0
+	sta	*_src+0
+	ldx	_strcpy_PARM_2+1
+	stx	*_src+1
 
-	lda	#0
-	sta	*_mulint_tmp
-	ldy	#16
-
-	lsr	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-next_bit:
-	bcc	skip
-	clc
-	adc	__mulint_PARM_2+0
-	tax
-	lda	__mulint_PARM_2+1
-	adc	*_mulint_tmp
-	sta	*_mulint_tmp
-	txa
-skip:
-	ror	*_mulint_tmp
-	ror	a
-	ror	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-	dey
-	bne	next_bit
-
-	lda	*___SDCC_m6502_ret0
-	ldx	*___SDCC_m6502_ret1
+	ldy	#0
+cpy_loop:
+	lda	[*_src],y
+	sta	[*_dst],y
+	beq	end
+	iny
+	bne	cpy_loop
+	inc	*_src+1
+	inc	*_dst+1
+	bne	cpy_loop
+;	jmp	cpy_loop
+end:
+	lda	*_dst+0
 	rts

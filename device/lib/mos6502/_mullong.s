@@ -29,26 +29,32 @@
 
 	.module _mullong
 
+;--------------------------------------------------------
+; exported symbols
+;--------------------------------------------------------
 	.globl __mullong_PARM_2
 	.globl __mullong_PARM_1
 	.globl __mullong
 
+;--------------------------------------------------------
+; overlayable items in zero page
+;--------------------------------------------------------
+	.area	OSEG    (PAG, OVR)
+_mullong_tmp:
+	.ds 3
 
-	.globl ___SDCC_m6502_ret0
-	.globl ___SDCC_m6502_ret1
-	.globl ___SDCC_m6502_ret2
-	.globl ___SDCC_m6502_ret3
-	.globl ___SDCC_m6502_ret4
-	.globl ___SDCC_m6502_ret5
-	.globl ___SDCC_m6502_ret6
-	.globl ___SDCC_m6502_ret7
-
+;--------------------------------------------------------
+; function parameters
+;--------------------------------------------------------
 	.area XSEG
 __mullong_PARM_1:
 	.ds 4
 __mullong_PARM_2:
 	.ds 4
 
+;--------------------------------------------------------
+; code
+;--------------------------------------------------------
 	.area CSEG
 
 __mullong:
@@ -61,37 +67,39 @@ __mullong:
         stx	*___SDCC_m6502_ret1
         ldx	__mullong_PARM_1+0
         stx	*___SDCC_m6502_ret0
+
         lda     #0
-        sta     *___SDCC_m6502_ret7
-        sta     *___SDCC_m6502_ret6
-        sta     *___SDCC_m6502_ret5
+        sta     *_mullong_tmp+2
+        sta     *_mullong_tmp+1
+        sta     *_mullong_tmp+0
+
         ldy     #32
-00001$:
-	lsr     *___SDCC_m6502_ret7
-        ror     *___SDCC_m6502_ret6
-        ror     *___SDCC_m6502_ret5
+next_bit:
+	lsr     *_mullong_tmp+2
+        ror     *_mullong_tmp+1
+        ror     *_mullong_tmp+0
         ror     a
         ror     *___SDCC_m6502_ret3
         ror     *___SDCC_m6502_ret2
         ror     *___SDCC_m6502_ret1
         ror     *___SDCC_m6502_ret0
-        bcc     00002$
+        bcc     skip
         clc
         adc     __mullong_PARM_2+0
         tax
         lda     __mullong_PARM_2+1
-        adc     *___SDCC_m6502_ret5
-        sta     *___SDCC_m6502_ret5
+        adc     *_mullong_tmp+0
+        sta     *_mullong_tmp+0
         lda     __mullong_PARM_2+2
-        adc     *___SDCC_m6502_ret6
-        sta     *___SDCC_m6502_ret6
+        adc     *_mullong_tmp+1
+        sta     *_mullong_tmp+1
         lda     __mullong_PARM_2+3
-        adc     *___SDCC_m6502_ret7
-        sta     *___SDCC_m6502_ret7
+        adc     *_mullong_tmp+2
+        sta     *_mullong_tmp+2
         txa
-00002$:
+skip:
         dey
-        bpl	00001$
+        bpl	next_bit
         ldx	*___SDCC_m6502_ret1
         lda	*___SDCC_m6502_ret0
 	rts

@@ -196,6 +196,22 @@
  int wrap_0_4f(class CL12 *uc, t_mem code) { return uc-> brclr_d ( _NONE ); } 
  int wrap_0_0f(class CL12 *uc, t_mem code) { return uc-> brclr_id ( _NONE ); } 
  int wrap_0_1f(class CL12 *uc, t_mem code) { return uc-> brclr_e ( _NONE ); } 
+ int wrap_0_20(class CL12 *uc, t_mem code) { return uc-> BRA ( 0x20 ); } 
+ int wrap_0_21(class CL12 *uc, t_mem code) { return uc-> BRN ( 0x21 ); } 
+ int wrap_0_22(class CL12 *uc, t_mem code) { return uc-> BHI ( 0x22 ); } 
+ int wrap_0_23(class CL12 *uc, t_mem code) { return uc-> BLS ( 0x23 ); } 
+ int wrap_0_24(class CL12 *uc, t_mem code) { return uc-> BCC ( 0x24 ); } 
+ int wrap_0_25(class CL12 *uc, t_mem code) { return uc-> BCS ( 0x25 ); } 
+ int wrap_0_26(class CL12 *uc, t_mem code) { return uc-> BNE ( 0x26 ); } 
+ int wrap_0_27(class CL12 *uc, t_mem code) { return uc-> BEQ ( 0x27 ); } 
+ int wrap_0_28(class CL12 *uc, t_mem code) { return uc-> BVC ( 0x28 ); } 
+ int wrap_0_29(class CL12 *uc, t_mem code) { return uc-> BVS ( 0x29 ); } 
+ int wrap_0_2a(class CL12 *uc, t_mem code) { return uc-> BPL ( 0x2a ); } 
+ int wrap_0_2b(class CL12 *uc, t_mem code) { return uc-> BMI ( 0x2b ); } 
+ int wrap_0_2c(class CL12 *uc, t_mem code) { return uc-> BGE ( 0x2c ); } 
+ int wrap_0_2d(class CL12 *uc, t_mem code) { return uc-> BLT ( 0x2d ); } 
+ int wrap_0_2e(class CL12 *uc, t_mem code) { return uc-> BGT ( 0x2e ); } 
+ int wrap_0_2f(class CL12 *uc, t_mem code) { return uc-> BLE ( 0x2f ); } 
  int wrap_0_a7(class CL12 *uc, t_mem code) { return uc-> NOP ( 0xa7 ); } 
  int wrap_0_b7(class CL12 *uc, t_mem code) { return uc-> exec_b7 ( _NONE ); } 
  int wrap_0x18_06(class CL12 *uc, t_mem code) { return uc-> add ( _A_B ); } 

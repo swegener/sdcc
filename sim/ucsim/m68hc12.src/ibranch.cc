@@ -143,5 +143,16 @@ CL12::brclr_e(void)
   return brclr(m);
 }
 
+int
+CL12::branch(t_addr a, bool cond)
+{
+  if (cond)
+    {
+      PC= a&0xffff;
+      extra_ticks+= 2;
+    }
+  return resGO;
+}
+
 
 /* ENd of m68hc12.src/ibranch.cc */

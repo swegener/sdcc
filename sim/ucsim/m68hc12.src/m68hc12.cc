@@ -83,6 +83,7 @@ cl_m68hc12::cl_m68hc12(class cl_sim *asim):
   memcpy((void*)&cCC, (void*)&c, sizeof(class cl_cell8));
   hc12wrap= new cl_12wrap();
   hc12wrap->init();
+  extra_ticks= 0;
 }
 
 int
@@ -200,6 +201,8 @@ CL12::post_inst(void)
     post_idx_reg->W(post_idx_reg->R() + post_inc_dec);
   post_inc_dec= 0;
   */
+  if (extra_ticks)
+    tick(extra_ticks), extra_ticks= 0;
 }
 
 i16_t

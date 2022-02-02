@@ -78,6 +78,7 @@ public:
   const char *tex_names[8];
   u16_t XIRQ_AT, COP_AT, TRAP_AT, CMR_AT;
   class cl_hc12_cpu *cpu12;
+  int extra_ticks;
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
@@ -137,7 +138,8 @@ public:
   virtual int brclr_d(void);
   virtual int brclr_id(void);
   virtual int brclr_e(void);
-  
+  virtual int branch(t_addr a, bool cond);
+
   // OTHER
   
 };

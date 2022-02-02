@@ -120,7 +120,7 @@ enum {
 #define ifLS	( ((rF&mC)?mZ:0) | (rF&mZ) )
 #define ifHI	(!ifLS)
 #define ifA	(true)
-
+#define ifN	(false)
 
 extern int8_t p0ticks[256];
 
@@ -271,6 +271,7 @@ public:
   virtual int ABA(t_mem code) { return add(cA, rB, false); }
 
   virtual int BRA(t_mem code) { return branch(raddr(), ifA); }
+  virtual int BRN(t_mem code) { return branch(raddr(), ifN); }
   virtual int BHI(t_mem code) { return branch(raddr(), ifHI); }
   virtual int BLS(t_mem code) { return branch(raddr(), ifLS); }
   virtual int BCC(t_mem code) { return branch(raddr(), ifCC); }

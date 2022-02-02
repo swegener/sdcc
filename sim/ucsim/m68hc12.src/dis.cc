@@ -256,7 +256,7 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 	comment->appendf("%+d", offset), b= true;
       if (b)
 	comment->append("=");
-      comment->appendf("%04x]=%02x %02x %02x",
+      comment->appendf("%04x]=$%02x%02x%02x",
 		       a,
 		       rom->read(a), rom->read(a+1), rom->read(a+2));
     }

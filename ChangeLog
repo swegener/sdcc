@@ -1,5 +1,14 @@
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
+    * sdcc/device/lib/mos6502/Makefile.in:
+      Enable optimization for the library.
+    * sdcc/src/mos6502/gen.c:
+      Commented out code that triggers bug-477927 regression.
+    * sdcc/src/mos6502/peep.def:
+      Add rule to optimize function entry.
+
+2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
+
     * sdcc/src/mos6502/gen.c:
       Implement cost based on both code size and cycles.
 

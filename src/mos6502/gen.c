@@ -8558,8 +8558,9 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
 //  emitComment (TRACEGEN|VVDBG, "      preparePointer (%s, off=%d, remat=%s) tempOfs %d", aopName(AOP(left)), offset, rematOfs, _G.tempOfs);
 }
   
-#if 1
+#if 0
   // FIXME: this code sometimes improperly detects 8-bit offsets
+  // triggers failure on bug-477927 when using zero weight for cycles cost
   // FIXME FIXME: this is a great optimization opportunity
   // 8-bit absolute offset? (remat+offset,y)
   // TODO: better way than checking register?

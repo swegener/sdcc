@@ -611,6 +611,7 @@ cl_uc::init(void)
   class cl_cmdset *cs= sim->app->get_commander()->cmdset;
   build_cmdset(cs);
   irq= false;
+  vcd_break= false;
   reset();
 
   return 0;
@@ -2504,8 +2505,6 @@ cl_uc::tick(int cycles)
   int i, clocks= cycles * clock_per_cycle();
   double time = clocks * xtal_tick;
 
-  tick_hw(cycles);
-
   // increase time
   class it_level *il= (class it_level *)(it_levels->top());
   for (i= 0; i < counters->count; i++)
@@ -2520,6 +2519,8 @@ cl_uc::tick(int cycles)
             t->tick(clocks, time);
         }
     }
+
+  tick_hw(cycles);
 
   return(0);
 }
@@ -2656,6 +2657,11 @@ cl_uc::do_brk(void)
       rom &&
       (sim->steps_done > 0))
     {
+      if (vcd_break)
+        {
+          vcd_break = false;
+          ret= true;
+        }
       if (rom->get_cell_flag(PC, CELL_FETCH_BRK))
 	if ((brk= fbrk->get_bp(PC, &idx)))
 	  if (brk->do_hit())

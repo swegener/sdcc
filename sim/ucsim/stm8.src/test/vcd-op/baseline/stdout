@@ -24,7 +24,7 @@ vcd[0] value change dump
     Address           Symbol
     rom[0x00100]      
 
-# For ticks (500 ns) of changing data
+# Four ticks (500 ns) of changing data
 set mem rom[0x100] 0
 0x00100                       00 .
 tick
@@ -203,7 +203,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -234,7 +234,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -265,7 +265,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -296,7 +296,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -327,7 +327,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -346,10 +346,9 @@ set mem rom[0x100] 23
 0x00100                       17 .
 tick
 
-# Resume again. The recorded gap is limited by the pausetime. Sadly there
-# is no way to skip time in  VCD so the skipped interval is simply lost
-# and the x (time) axis is as if it never happened. There are comments
-# placed in the VCD but it's up to the viewer whether they are shown at all.
+# Resume again. The recorded gap is limited by the pausetime. There are
+# comments placed in the VCD to indicate the real duration but it's up
+# to the viewer whether they are shown at all.
 info hw vcd
 vcd[0] value change dump
   Modul:      ucsim_vcd_0
@@ -359,7 +358,7 @@ vcd[0] value change dump
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000008500000000 s
+  Last event: 0.000008000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000012000000000 s
   Variables:
@@ -375,7 +374,7 @@ vcd[0] value change dump
   File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000003500000000 s
+  Start time: 0.000003700000000 s
   Last event: 0.000012000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000012000000000 s
@@ -401,7 +400,7 @@ vcd[0] value change dump
   File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000003500000000 s
+  Start time: 0.000003700000000 s
   Last event: 0.000013000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000013500000000 s

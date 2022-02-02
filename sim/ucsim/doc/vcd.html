@@ -82,10 +82,9 @@
           output and values will show as unknown when the VCD is viewed
           by something such as
 	  <a href="http://gtkwave.sourceforge.net/">gtkwave</a>.</p>
-	  <p>If you set pausetime <em>before</em> pausing the vcd
-	  then the time recorded as unknown will be limited to the
-	  specified time (rounded up to the next tick) and time beyond
-	  that will simply not exist as far as the VCD is concerned.
+	  <p>If you set pausetime then the time recorded as unknown
+	  will be limited to the specified time and time beyond that
+	  will simply not exist as far as the VCD is concerned.
 	  This may be used to compress pause gaps in the VCD for the
 	  sake of viewers which are not able to do this themselves.</p>
           <pre>
@@ -124,7 +123,9 @@
           0&gt; <font color="#118811">set hw vcd[0] starttime 750 ns</font>
           </pre>
           <p>This can be done at any time, regardless of whether the vcd is started,
-	  paused or even part way through.</p>
+          paused or even part way through.</p>
+          <p>Note that the argument to starttime is the amount to add or subtract
+          from the current start time not an absolute time.</p>
           <br>
         </li>
 

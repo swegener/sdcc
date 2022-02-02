@@ -6,7 +6,7 @@ set hw vcd add rom[0x100]
 set hw vcd start
 info hw vcd
 
-# For ticks (500 ns) of changing data
+# Four ticks (500 ns) of changing data
 set mem rom[0x100] 0
 tick
 set mem rom[0x100] 1
@@ -82,10 +82,9 @@ tick
 set mem rom[0x100] 23
 tick
 
-# Resume again. The recorded gap is limited by the pausetime. Sadly there
-# is no way to skip time in  VCD so the skipped interval is simply lost
-# and the x (time) axis is as if it never happened. There are comments
-# placed in the VCD but it's up to the viewer whether they are shown at all.
+# Resume again. The recorded gap is limited by the pausetime. There are
+# comments placed in the VCD to indicate the real duration but it's up
+# to the viewer whether they are shown at all.
 info hw vcd
 set hw vcd restart
 info hw vcd

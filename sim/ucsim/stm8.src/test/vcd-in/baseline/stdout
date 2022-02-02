@@ -81,7 +81,7 @@ vcd[0] value change dump
   Break:      enabled
   Time scale: 1 ps
   Start time: 0.000009000000000 s
-  Next event: 0.000009000000000 s
+  Next event: 0.000011500000000 s
   Pause time: 
   Simul time: 0.000004000000000 s
   Variables:
@@ -110,7 +110,7 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 11 ticks [ELIDED]
+Simulated 17 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 01    .
@@ -127,10 +127,10 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 6 ticks [ELIDED]
+Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
-0x00000 loc1:                 01    .
+0x00000 loc1:                 03    .
 0x00001 loc2:                 01    .
 
 cont
@@ -148,23 +148,6 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 02    .
-0x00001 loc2:                 01    .
-
-cont
-Simulation started, PC=0x00800c
-
-Stop at 0x00800c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-
-0x0800c    <.loop$0>:
-0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
-F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
-dump rom 0 1
-0x00000 loc1:                 06    .
 0x00001 loc2:                 02    .
 
 cont
@@ -182,6 +165,23 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 04    .
+0x00001 loc2:                 02    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
+
+0x0800c    <.loop$0>:
+0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
+F 0x00800c
+Simulated 2 ticks [ELIDED]
+Host usage: [ELIDED]
+dump rom 0 1
+0x00000 loc1:                 0c    .
 0x00001 loc2:                 03    .
 
 cont
@@ -199,23 +199,6 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 08    .
-0x00001 loc2:                 03    .
-
-cont
-Simulation started, PC=0x00800c
-
-Stop at 0x00800c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-
-0x0800c    <.loop$0>:
-0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
-F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
-dump rom 0 1
-0x00000 loc1:                 18    .
 0x00001 loc2:                 04    .
 
 cont
@@ -233,6 +216,23 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 10    .
+0x00001 loc2:                 04    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
+
+0x0800c    <.loop$0>:
+0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
+F 0x00800c
+Simulated 2 ticks [ELIDED]
+Host usage: [ELIDED]
+dump rom 0 1
+0x00000 loc1:                 30    0
 0x00001 loc2:                 05    .
 
 cont
@@ -249,13 +249,13 @@ F 0x00800c
 Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
-timer #1("time") ON 0.000019500000000 sec (39 clks)
+timer #1("time") ON 0.000020500000000 sec (41 clks)
 timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
 timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
 timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
 dump rom 0 1
 0x00000 loc1:                 20     
-0x00001 loc2:                 05    .
+0x00001 loc2:                 06    .
 
 set hw vcd pause
 Paused
@@ -358,7 +358,7 @@ Controller has 24 hardware element(s).
    on tim4[4]
    on flash[0]
 timer get
-timer #1("time") ON 0.000023500000000 sec (47 clks)
+timer #1("time") ON 0.000024500000000 sec (49 clks)
 timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
 timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
 timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
@@ -377,7 +377,7 @@ F 0x00800c
 Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
-0x00000 loc1:                 60    `
+0x00000 loc1:                 40    @
 0x00001 loc2:                 06    .
 
 cont
@@ -394,29 +394,12 @@ F 0x00800c
 Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 timer get
-timer #1("time") ON 0.000025500000000 sec (51 clks)
+timer #1("time") ON 0.000026500000000 sec (53 clks)
 timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
 timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
 timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
 dump rom 0 1
-0x00000 loc1:                 40    @
-0x00001 loc2:                 07    .
-
-cont
-Simulation started, PC=0x00800c
-
-Stop at 0x00800c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-
-0x0800c    <.loop$0>:
-0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
-F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
-dump rom 0 1
-0x00000 loc1:                 80    .
+0x00000 loc1:                 c0    .
 0x00001 loc2:                 07    .
 
 cont
@@ -485,7 +468,7 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
-0x00001 loc2:                 0a    .
+0x00001 loc2:                 09    .
 
 cont
 Simulation started, PC=0x00800c
@@ -536,7 +519,7 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
-0x00001 loc2:                 0c    .
+0x00001 loc2:                 0b    .
 
 cont
 Simulation started, PC=0x00800c
@@ -570,6 +553,23 @@ Simulated 2 ticks [ELIDED]
 Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 90    .
+0x00001 loc2:                 0d    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
+
+0x0800c    <.loop$0>:
+0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
+F 0x00800c
+Simulated 2 ticks [ELIDED]
+Host usage: [ELIDED]
+dump rom 0 1
+0x00000 loc1:                 80    .
 0x00001 loc2:                 0d    .
 
 # Stop now

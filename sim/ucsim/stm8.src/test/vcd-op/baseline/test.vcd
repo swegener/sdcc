@@ -42,14 +42,14 @@ $comment Paused $end
 $dumpoff
 bxxxxxxxx !
 $end
-#8500
-$comment Unpaused. Real duration was 0.000003500000000 seconds $end
+#8300
+$comment Unpaused. Real duration was 0.000004000000000 seconds $end
 $dumpon
 b00010111 !
 $end
 b00011000 !
-#9000
+#8800
 b00011001 !
-#9500
+#9300
 b00011010 !
-#10000
+#9800

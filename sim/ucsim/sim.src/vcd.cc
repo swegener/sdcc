@@ -44,10 +44,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "utils.h"
 
 // sim
+#include "appcl.h"
 #include "argcl.h"
+#include "simcl.h"
 
 // local
 #include "vcdcl.h"
+
+
+static i64_t ULPs(double d1, double d2)
+{
+  i64_t i1, i2;
+
+  memcpy(&i1, &d1, sizeof(d1));
+  memcpy(&i2, &d2, sizeof(d2));
+
+  if ((i1 < 0) != (i2 < 0))
+    return INT64_MAX;
+
+  return (i1 > i2 ? i1 - i2 : i2 - i1);
+}
 
 
 #if defined(HAVE_WORKING_FORK) && defined(HAVE_DUP2) && defined(HAVE_PIPE) && defined(HAVE_WAITPID)
@@ -315,7 +331,7 @@ cl_vcd::open_vcd(class cl_console_base *con)
 
               const char *cmd = filename;
               if (!cmd)
-                cmd = "shmidcat | gtkwave -v -I > /dev/null 2>&1";
+                cmd = "exec > /dev/null 2>&1; shmidcat | gtkwave -v -I";
               else if (cmd[0] == '|')
                 cmd++;
 
@@ -366,7 +382,8 @@ cl_vcd::parse_header(cl_console_base *con)
         {
           if (token[0] == '#')
             {
-              event = timescale * strtod(&token[1], NULL);
+              event = starttime + timescale * strtod(&token[1], NULL);
+              //uc->sim->app->debug("vcd[%d]: first event at %.15f\n", cl_hw::id, event);
               break;
             }
           else if (!strcmp(token, "$timescale"))
@@ -631,7 +648,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             time /= 1e12;
           else if (!strcmp(p2, "ns"))
             time /= 1e9;
-          else if (!strcmp(p2, "us"))
+          else if (!strcmp(p2, "us") || !strcmp(p2, "µs"))
             time /= 1e6;
           else if (!strcmp(p2, "ms"))
             time /= 1e3;
@@ -640,14 +657,17 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
           if (p1[0] == 't')
             timescale = time;
           else if (p1[0] == 'p')
-            pausetime = time;
-          else if (!started)
-            starttime = time;
+            {
+              pausetime = time;
+              if (state == -1 && started && paused &&
+                  (!filename || filename[0] == '|'))
+                on = (uc->ticks->get_rtime() - event < pausetime);
+            }
           else
             {
-              event = event - starttime;
-              starttime = uc->ticks->get_rtime() + time;
-              event += starttime;
+              starttime += time;
+              event += time;
+              //uc->sim->app->debug("vcd[%d]: event rescheduled to %.15f\n", cl_hw::id, event);
             }
           return;
         }
@@ -722,12 +742,12 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     {
                       if (!parse_header(con))
                         return;
-
-                      starttime = -starttime;
-                      event = starttime;
                     }
                   else
                     {
+                      starttime += uc->ticks->get_rtime();
+                      event += uc->ticks->get_rtime();
+
                       if (!timescale)
                         {
                           timescale = 1e3;
@@ -803,14 +823,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                   if (state == -1)
                     {
                       double now = uc->ticks->get_rtime();
-                      if (!started)
-                        starttime = now;
-                      else if (pausetime >= 0)
-                        {
-                          starttime = now - (event - starttime);
-                          if (starttime >= now)
-                            starttime = now;
-                        }
+                      double d =  now - event;
+                      d = event + (pausetime >= 0 && d > pausetime ? pausetime : d);
+                      starttime = now - (d - starttime);
                       fprintf(fd, "#%.0f\n", (now - starttime) * timescale);
                       if (started)
                         {
@@ -829,9 +844,8 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     }
                   else
                     {
-                      double now = uc->ticks->get_rtime();
-                      starttime = now - starttime;
-                      event = now - event;
+                      starttime = uc->ticks->get_rtime() + starttime;
+                      event = starttime + event;
                     }
                 }
 
@@ -875,9 +889,8 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     }
                   else
                     {
-                      double now = uc->ticks->get_rtime();
-                      starttime = now - starttime;
-                      event = now - event;
+                      event = event - starttime;
+                      starttime = starttime - uc->ticks->get_rtime();
                       on = false;
                     }
                 }
@@ -940,6 +953,8 @@ void
 cl_vcd::report(class cl_vcd_var *var, t_mem v)
 {
   double now = uc->ticks->get_rtime();
+  //uc->sim->app->debug("vcd[%d]: '%c' changed at %.15f\n",
+  //                    cl_hw::id, var->var_id, uc->ticks->get_rtime());
   if (event != now)
     {
       event = now;
@@ -971,32 +986,31 @@ cl_vcd::tick(int cycles)
 
   if (state == -1)
     {
-      if (!filename || filename[0] == '|')
+      if (pausetime >= 0 && now - event >= pausetime)
+        on = false;
+      else if (!filename || filename[0] == '|')
         {
           fprintf(fd, "#%.0f\n", (now - starttime) * timescale);
           fflush(fd);
         }
-      if (pausetime >= 0 && now - event >= pausetime)
-        {
-          event = now;
-          on = false;
-        }
       return 0;
     }
-  
-  bool event_occurred = false;
 
-  while (event - now <= 0.000000000000001)
+  bool event_occurred = false;
+  bool more_data = true;
+
+  while (more_data && event < now && ULPs(now, event) > 100000)
     {
       t_mem value = 0;
-      while (read_word(0U))
+      while ((more_data = read_word(0U)))
         {
           if (state == 0 && word[0] != '1' && word[0] != '0')
             {
               if (word[0] == '#')
                 {
                   event = starttime + timescale * strtod(&word[1], NULL);
-                  if (event - now <= 0.000000000000001)
+                  //uc->sim->app->debug("vcd[%d]: next event at %.15f\n", cl_hw::id, event);
+                  if (event < now && ULPs(now, event) > 100000)
                     continue;
                   break;
                 }
@@ -1037,6 +1051,8 @@ cl_vcd::tick(int cycles)
                     {
                       unsigned long ticks = uc->ticks->get_ticks();
                       uc->ticks->set(ticks, event);
+                      //uc->sim->app->debug("vcd[%d]: set '%c' to 0x%u at %.15f now %.15f isless %s ULPs %u\n",
+                      //                    cl_hw::id, id, (value << var->bitnr_low) & var->bitmask, uc->ticks->get_rtime(), now, ULPs(now, event));
                       var->cell->write((var->cell->get() & (~var->bitmask)) | ((value << var->bitnr_low) & var->bitmask));
                       uc->ticks->set(ticks, now);
                       event_occurred = true;
@@ -1055,18 +1071,8 @@ cl_vcd::tick(int cycles)
         }
     }
 
-  if (event_occurred && dobreak && !uc->fbrk_at(uc->PC))
-    {
-      // If break-on-event is enabled ensure that we are going to
-      // break before the next instruction.
-      class cl_brk *b= new cl_fetch_brk(uc->rom,
-                          uc->make_new_brknr(),
-                          uc->PC, brkDYNAMIC, 1);
-
-      b->init();
-      uc->fbrk->add(b);
-      b->activate();
-    }
+  if (event_occurred && dobreak)
+    uc->vcd_break = true;
 
   return 0;
 }

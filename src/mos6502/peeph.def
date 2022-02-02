@@ -1,4 +1,16 @@
 replace restart {
+        sta	%1
+        stx	%2
+	lda     %1
+	ldx     %2
+} by {
+    ; Peephole 1sta-lda   - eliminated redundant lda/ldx
+        sta	%1
+        stx	%2
+} if notVolatile(%1), notVolatile(%2)
+
+
+replace restart {
         %1	%2
         %1	%3
 } by {
@@ -80,6 +92,22 @@ replace restart {
 	tay
 }
 
+replace restart {
+	ldx %1
+	tax
+} by {
+	; Peephole 2f - removed unused ldx followed by tax
+	tax
+}
+
+replace restart {
+	ldy %1
+	tay
+} by {
+	; Peephole 2g - removed unused ldy followed by tay
+	tay
+}
+
 ////////////////////////////////////////////////////////
 // Remove unnecessary cmp/cpx/cpy #00
 ////////////////////////////////////////////////////////
@@ -116,6 +144,22 @@ replace restart {
 	ldy	%1
 }
 
+replace restart {
+	%1
+	cpx	#0x00
+} by {
+	; Peephole 3e	- eliminated redundant cpx #0x00
+	%1
+} if same(%1 'inx' 'dex' )
+
+replace restart {
+	%1
+	cpy	#0x00
+} by {
+	; Peephole 3f	- eliminated redundant cpy #0x00
+	%1
+} if same(%1 'iny' 'dey' )
+
 ////////////////////////////////////////////////////////
 // 
 ////////////////////////////////////////////////////////
@@ -140,7 +184,7 @@ replace restart {
 	ldx	%2
 	stx	%2
 } by {
-	; Peephole 4stx - removed redundant sta
+	; Peephole 4stx - removed redundant stx
 	ldx	%2
 }
 
@@ -148,7 +192,7 @@ replace restart {
 	ldy	%2
 	sty	%2
 } by {
-	; Peephole 4sty - removed redundant sta
+	; Peephole 4sty - removed redundant sty
 	ldy	%2
 }
 

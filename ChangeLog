@@ -1,3 +1,8 @@
+2022-02-03 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Update documentation.
+
 2022-02-03 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* device/lib/printf_large.c,
@@ -46,11 +51,6 @@
 
 	* support/makebin/makebin.c:
 	  Improve SMS/GG defaults and allow to define an offset that's skipped for the rom.
-
-2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
-
-	* support/scripts/sdcc.ico:
-	  Add a 48x48 pixel icon.
 
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
 

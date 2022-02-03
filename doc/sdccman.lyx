@@ -285,8 +285,9 @@ STM8
 \end_inset
 
 , Padauk PDK14 and PDK15.
- It can be retargeted for other microprocessors, support for Microchip PIC
- and Padauk PDK13 is under development.
+ It can be retargeted for other microprocessors, support for Padauk PDK13
+ and MOS6502 is under development, whereas Microchip PIC is currently unmaintain
+ed.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index idx
@@ -6590,6 +6591,17 @@ Building SDCC
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+SDCC can be built for various host platforms using the instructions provided
+ below.
+ Note that the PIC14 and PIC16 library folders in the source distribution
+ contain Autotools-generated files.
+ These are included for convenience and to avoid introducing Autotools as
+ an additional dependency.
+ They have to be regenerated in case of a version mismatch.
+ Alternatively, the PIC backends can be disabled.
 \end_layout
 
 \begin_layout Subsection

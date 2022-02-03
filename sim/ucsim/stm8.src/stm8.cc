@@ -173,16 +173,16 @@ static const char *puiks= keysets[puik];
 static class cl_port_data pd;
 
 void
-cl_stm8::mk_port(t_addr base, chars n)
+cl_stm8::mk_port(int portnr, chars n)
 {
   class cl_port *p;
-  add_hw(p= new cl_port(this, base, n));
+  add_hw(p= new cl_port(this, portnr, n));
   p->init();
 
   pd.set_name(n);
-  pd.cell_p  = p->cell_p;
-  pd.cell_in = p->cell_in;
-  pd.cell_dir= p->cell_dir;
+  pd.cell_p  = p->cell_odr;
+  pd.cell_in = p->cell_idr;
+  pd.cell_dir= p->cell_ddr;
   pd.keyset  = puiks;
   pd.basx    = puix;
   pd.basy    = puiy;
@@ -211,6 +211,7 @@ void
 cl_stm8::mk_hw_elements(void)
 {
   class cl_hw *h;
+  class cl_it_src *is;
   cl_uc::mk_hw_elements();
   class cl_option *o;
 
@@ -358,21 +359,85 @@ cl_stm8::mk_hw_elements(void)
       h->init();
     }
 
+  int n_ports = 4;
+
+  if (type->type == CPU_STM8S)
+    {
+      switch (type->subtype)
+        {
+          case DEV_STM8AF62_46:
+            n_ports += 3;
+            break;
+
+          case DEV_STM8S005:
+          case DEV_STM8S007:
+          case DEV_STM8S105:
+          case DEV_STM8S207:
+          case DEV_STM8S208:
+          case DEV_STM8AF52:
+            n_ports += 1;
+            break;
+        }
+    }
+  else if (type->type == CPU_STM8L)
+    {
+      if (type->subtype != DEV_STM8L051)
+        n_ports += 2;
+
+      if (type->subtype & (DEV_STM8AL3xE|
+                           DEV_STM8AL3x8|
+                           DEV_STM8L052R|
+                           DEV_STM8L15x8|
+                           DEV_STM8L162))
+        {
+          n_ports += 1;
+
+          if (type->subtype != DEV_STM8L052R)
+            n_ports += 2;
+        }
+    }
+
+  ports= new cl_address_space("ports", 0, n_ports, 8);
+  ports->init();
+  address_spaces->add(ports);
+
+  ports_chip= new cl_chip8("ports_chip", n_ports, 8);
+  ports_chip->init();
+  memchips->add(ports_chip);
+
+  class cl_address_decoder *ad= new cl_address_decoder(ports, ports_chip, 0, n_ports - 1, 0);
+  ad->init();
+  ports->decoders->add(ad);
+  ad->activate(0);
+
   add_hw(itc= new cl_itc(this));
   itc->init();
 
-  {
-    mk_port(0x5000, "pa");
-    mk_port(0x5005, "pb");
-    mk_port(0x500a, "pc");
-    mk_port(0x500f, "pd");
-  }
+  mk_port(0, "pa");
+  mk_port(1, "pb");
+  mk_port(2, "pc");
+  mk_port(3, "pd");
   
   if (type->type == CPU_STM8S)
     {
       // all S and AF
-      mk_port(0x5014, "pe");
-      mk_port(0x5019, "pf");
+      mk_port(4, "pe");
+      mk_port(5, "pf");
+
+      char name[] = "EXTI0";
+      for (int i= 0; i <= 4; i++, name[4]++)
+        {
+          it_sources->add(is= new cl_it_src(this, 3 + i,
+                    itc->exti_sr1, 1 << i,
+                    itc->exti_sr1, 1 << i,
+                    0x8014 + i * 4,
+                    true, // STM8S has no EXTI_SR[12] so port interrupts autoclear and are not ack'd.
+                    false,
+                    strdup(name),
+                    25*10+i));
+          is->init();
+        }
+
       if (type->subtype & (DEV_STM8S005|
 			   DEV_STM8S007|
 			   DEV_STM8S105|
@@ -381,11 +446,11 @@ cl_stm8::mk_hw_elements(void)
 			   DEV_STM8AF52|
 			   DEV_STM8AF62_46))
 	{
-	  mk_port(0x501e, "pg");
+	  mk_port(6, "pg");
 	  if (type->subtype != DEV_STM8AF62_46)
 	    {
-	      mk_port(0x5023, "ph");
-	      mk_port(0x5028, "pi");
+	      mk_port(7, "ph");
+	      mk_port(8, "pi");
 	    }
 	}
       add_hw(h= new cl_rst(this, 0x50b3, 0x1f));
@@ -426,70 +491,173 @@ cl_stm8::mk_hw_elements(void)
 	  h->init();
 	}
     }
-  else if (type->type == CPU_STM8L)
+  else
     {
-      if (type->subtype != DEV_STM8L051)
-	{
-	  mk_port(0x5014, "pe");
-	  mk_port(0x5019, "pf");
-	}
-      if (type->subtype & (DEV_STM8AL3xE|
-			   DEV_STM8AL3x8|
-			   DEV_STM8L052R|
-			   DEV_STM8L15x8|
-			   DEV_STM8L162))
-	{
-	  mk_port(0x501e, "pg");
-	  if (type->subtype != DEV_STM8L052R)
+      char name[] = "EXTI0";
+      for (int i= 0; i <= 7; i++, name[4]++)
+        {
+          it_sources->add(is= new cl_it_src(this, 8 + i,
+                    itc->exti_sr1, 1 << i,
+                    itc->exti_sr1, 1 << i,
+                    0x8028 + i * 4,
+                    false,
+                    false,
+                    strdup(name),
+                    25*10+i));
+          is->init();
+        }
+
+      if (type->type == CPU_STM8L)
+        {
+          if (type->subtype != DEV_STM8L051)
 	    {
-	      mk_port(0x5023, "ph");
-	      mk_port(0x5028, "pi");
+	      mk_port(0x5014, "pe");
+	      mk_port(0x5019, "pf");
+
+              it_sources->add(is= new cl_it_src(this, 5,
+                        itc->exti_sr2, (1 << 3) | (1 << 2),
+                        itc->exti_sr2, (1 << 3) | (1 << 2),
+                        0x801c,
+                        false,
+                        false,
+                        "EXTIE/F/PVD",
+                        25*10+5));
+              is->init();
 	    }
-	}
-      add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
-      h->init();
-      add_hw(h= new cl_tim2_all(this, 2, 0x5250));
-      h->init();
-      add_hw(h= new cl_tim3_all(this, 3, 0x5280));
-      h->init();
-      add_hw(h= new cl_tim4_all(this, 4, 0x52E0));
-      h->init();
-      // all AL
-      if (type->subtype & DEV_STM8AL)
-	{
-	  add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
-	  h->init();
-	}
-      // some L
-      if (type->subtype & (DEV_STM8L052C |
-			   DEV_STM8L052R |
-			   DEV_STM8L15x46 |
-			   DEV_STM8L15x8 |
-			   DEV_STM8L162))
-	{
-	  add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
-	  h->init();
-	}
-      if (type->subtype & (DEV_STM8AL3xE |
-			   DEV_STM8AL3x8 |
-			   DEV_STM8L052R |
-			   DEV_STM8L15x8 |
-			   DEV_STM8L162))
-	{
-	  add_hw(h= new cl_tim5_all(this, 5, 0x5300));
-	  h->init();
-	}
-    }
-  else if (type->type == CPU_STM8L101)
-    {
-      add_hw(h= new cl_rst(this, 0x50b0+1, 0x0f));
-      h->init();
-      add_hw(h= new cl_tim2_l101(this, 2, 0x5250));
-      h->init();
-      add_hw(h= new cl_tim3_l101(this, 2, 0x5280));
-      h->init();
-      add_hw(h= new cl_tim4_l101(this, 4, 0x52E0));
-      h->init();
+
+          if (type->subtype & (DEV_STM8AL3xE|
+			       DEV_STM8AL3x8|
+			       DEV_STM8L052R|
+			       DEV_STM8L15x8|
+			       DEV_STM8L162))
+	    {
+	      mk_port(0x501e, "pg");
+
+              it_sources->add(is= new cl_it_src(this, 6,
+                        itc->exti_sr2, (1 << 4) | (1 << 0),
+                        itc->exti_sr2, (1 << 4) | (1 << 0),
+                        0x8020,
+                        false,
+                        false,
+                        "EXTIB/G",
+                        25*10+6));
+              is->init();
+
+	      if (type->subtype != DEV_STM8L052R)
+	        {
+	          mk_port(0x5023, "ph");
+	          mk_port(0x5028, "pi");
+
+                  it_sources->add(is= new cl_it_src(this, 7,
+                            itc->exti_sr2, (1 << 5) | (1 << 1),
+                            itc->exti_sr2, (1 << 5) | (1 << 1),
+                            0x8024,
+                            false,
+                            false,
+                            "EXTID/H",
+                            25*10+7));
+                  is->init();
+	        }
+              else
+                {
+                  it_sources->add(is= new cl_it_src(this, 7,
+                            itc->exti_sr2, (1 << 1),
+                            itc->exti_sr2, (1 << 1),
+                            0x8024,
+                            false,
+                            false,
+                            "EXTID",
+                            25*10+7));
+                  is->init();
+                }
+	    }
+          else
+            {
+              it_sources->add(is= new cl_it_src(this, 6,
+                        itc->exti_sr2, (1 << 0),
+                        itc->exti_sr2, (1 << 0),
+                        0x8020,
+                        false,
+                        false,
+                        "EXTIB",
+                        25*10+6));
+              is->init();
+
+              it_sources->add(is= new cl_it_src(this, 7,
+                        itc->exti_sr2, (1 << 1),
+                        itc->exti_sr2, (1 << 1),
+                        0x8024,
+                        false,
+                        false,
+                        "EXTID",
+                        25*10+7));
+              is->init();
+            }
+
+          add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
+          h->init();
+          add_hw(h= new cl_tim2_all(this, 2, 0x5250));
+          h->init();
+          add_hw(h= new cl_tim3_all(this, 3, 0x5280));
+          h->init();
+          add_hw(h= new cl_tim4_all(this, 4, 0x52E0));
+          h->init();
+          // all AL
+          if (type->subtype & DEV_STM8AL)
+	    {
+	      add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
+	      h->init();
+	    }
+          // some L
+          if (type->subtype & (DEV_STM8L052C |
+			       DEV_STM8L052R |
+			       DEV_STM8L15x46 |
+			       DEV_STM8L15x8 |
+			       DEV_STM8L162))
+	    {
+	      add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
+	      h->init();
+	    }
+          if (type->subtype & (DEV_STM8AL3xE |
+			       DEV_STM8AL3x8 |
+			       DEV_STM8L052R |
+			       DEV_STM8L15x8 |
+			       DEV_STM8L162))
+	    {
+	      add_hw(h= new cl_tim5_all(this, 5, 0x5300));
+	      h->init();
+	    }
+        }
+      else if (type->type == CPU_STM8L101)
+        {
+          add_hw(h= new cl_rst(this, 0x50b0+1, 0x0f));
+          h->init();
+          add_hw(h= new cl_tim2_l101(this, 2, 0x5250));
+          h->init();
+          add_hw(h= new cl_tim3_l101(this, 2, 0x5280));
+          h->init();
+          add_hw(h= new cl_tim4_l101(this, 4, 0x52E0));
+          h->init();
+
+          it_sources->add(is= new cl_it_src(this, 6,
+                    itc->exti_sr2, (1 << 0),
+                    itc->exti_sr2, (1 << 0),
+                    0x8020,
+                    false,
+                    false,
+                    "EXTIB",
+                    25*10+6));
+          is->init();
+          it_sources->add(is= new cl_it_src(this, 7,
+                    itc->exti_sr2, (1 << 1),
+                    itc->exti_sr2, (1 << 1),
+                    0x8024,
+                    false,
+                    false,
+                    "EXTID",
+                    25*10+7));
+          is->init();
+        }
     }
 
   // UID

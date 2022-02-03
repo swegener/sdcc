@@ -24,7 +24,7 @@ Controller has 27 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-   on rst[0]
+  off rst[0]
    on tim2[2]
    on tim3[3]
    on tim4[4]
@@ -45,11 +45,13 @@ Memory chips:
   0x000000-0x0007ff     2048 boot_chip (8,%02x,0x%03lx)
   0x000000-0x0000ff      256 cpu_chip (8,%02x,0x%02lx)
   0x000000-0x01ffff   131072 flash_chip (8,%02x,0x%05lx)
+  0x000000-0x000008        9 ports_chip (8,%02x,0x%01lx)
 Address spaces:
   0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
   0x000000-0x027fff   163840 rom (8,%02x,0x%05lx)
   0x000000-0x000001        2 regs8 (8,%02x,0x%01lx)
   0x000000-0x000002        3 regs16 (16,%04x,0x%01lx)
+  0x000000-0x000008        9 ports (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x00000 0x017ff -> ram_chip 0x0000 activated
@@ -59,3 +61,4 @@ Address decoders:
   rom 0x06000 0x067ff -> boot_chip 0x000 activated
   rom 0x07f00 0x07fff -> cpu_chip 0x00 activated
   rom 0x08000 0x27fff -> flash_chip 0x00000 activated
+  ports 0x0 0x8 -> ports_chip 0x0 activated

@@ -70,6 +70,7 @@ cl_app::cl_app(void)
   sim= 0;
   in_files= new cl_ustrings(2, 2, "input files");
   options= new cl_options();
+  quiet= false;
 }
 
 cl_app::~cl_app(void)
@@ -209,7 +210,7 @@ static void
 print_help(const char *name)
 {
   printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvPgGwlbB] [-p prompt] [-t CPU] [-X freq[k|M]] [-R seed]\n"
+  printf("Usage: %s [-hHVvPgGwlbBq] [-p prompt] [-t CPU] [-X freq[k|M]] [-R seed]\n"
 	 "       [-C cfg_file] [-c file] [-e command] [-s file] [-S optionlist]\n"
 	 "       [-I if_optionlist] [-o colorlist] [-a nr]\n"
 #ifdef SOCKET_AVAIL
@@ -255,6 +256,7 @@ print_help(const char *name)
      "  -a nr        Specify size of variable space (default=256)\n"
      "  -w           Writable flash\n"
      "  -V           Verbose mode\n"
+     "  -q           Quiet mode\n"
      "  -v           Print out version number and quit\n"
      "  -H           Print out types of known CPUs and quit\n"
      "  -h           Print out this help and quit\n"
@@ -304,7 +306,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= false,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blBR:_");
+  strcpy(opts, "qc:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blBR:_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -328,6 +330,7 @@ cl_app::proc_arguments(int argc, char *argv[])
     switch (c)
       {
       case '_': break;
+      case 'q': quiet= true; break;
       case 'J': jaj= true; break;
       case 'g':
 	if (!options->set_value("go", this, true))

@@ -45,7 +45,9 @@ public:
   class cl_address_space *ram;
   class cl_address_space *regs8;
   class cl_address_space *regs16;
+  class cl_address_space *ports;
   class cl_memory_chip
+    *ports_chip,
     *ram_chip, // max 6k
     *eeprom_chip, // max 2k
     *option_chip, // 128 bytes
@@ -88,7 +90,7 @@ public:
   virtual const char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
-  virtual void mk_port(t_addr base, chars n);
+  virtual void mk_port(int portnr, chars n);
   virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);

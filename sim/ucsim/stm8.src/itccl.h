@@ -39,6 +39,9 @@ class cl_itc: public cl_hw
 {
  public:
   class cl_memory_cell *spr[8];
+  class cl_memory_cell *exti_cr1, *exti_cr2, *exti_cr3, *exti_cr4;
+  class cl_memory_cell *exti_sr1, *exti_sr2;
+  class cl_memory_cell *exti_conf1, *exti_conf2;
  public:
   cl_itc(class cl_uc *auc);
   virtual int init(void);

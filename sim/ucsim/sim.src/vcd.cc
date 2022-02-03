@@ -41,6 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <unistd.h>
 
 // prj
+#include "stypes.h"
 #include "utils.h"
 
 // sim
@@ -60,7 +61,13 @@ static i64_t ULPs(double d1, double d2)
   memcpy(&i2, &d2, sizeof(d2));
 
   if ((i1 < 0) != (i2 < 0))
-    return INT64_MAX;
+    return
+#ifdef INT64_MAX
+      INT64_MAX
+#else
+      ((u64_t)-1)>>1
+#endif
+      ;
 
   return (i1 > i2 ? i1 - i2 : i2 - i1);
 }

@@ -55,7 +55,8 @@ cl_conf_cmd::do_work(class cl_uc *uc,
 {
   int i;
 
-  con->dd_printf("ucsim version %s\n", VERSIONSTR);
+  if (!application->quiet)
+    con->dd_printf("ucsim version %s\n", VERSIONSTR);
   con->dd_printf("Type of microcontroller: %s", uc->id_string());
   if (cpus &&
       uc->type)

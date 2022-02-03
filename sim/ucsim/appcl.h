@@ -94,6 +94,7 @@ public:
   long expr_result;
   chars startup_command;
   class cl_mc32 cperiod, ccyc;
+  bool quiet;
   
 public:
   cl_app(void);

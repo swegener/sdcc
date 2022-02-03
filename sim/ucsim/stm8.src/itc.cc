@@ -40,9 +40,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_itc::cl_itc(class cl_uc *auc):
   cl_hw(auc, HW_INTERRUPT, 0, "itc")
 {
-  int i;
-  for (i= 0; i < 8; i++)
-    spr[i]= 0;
 }
 
 int
@@ -51,11 +48,68 @@ cl_itc::init(void)
   int i;
   cl_hw::init();
   for (i= 0; i < 8; i++)
+    spr[i]= register_cell(uc->rom, 0x7f70+i);
+
+  exti_cr1= uc->rom->get_cell(0x50a0);
+  exti_cr2= uc->rom->get_cell(0x50a1);
+  exti_cr3= uc->rom->get_cell(0x50a2);
+  exti_cr4= uc->rom->get_cell(0x50aa);
+
+  exti_sr1= uc->rom->get_cell(0x50a3);
+  exti_sr2= uc->rom->get_cell(0x50a4);
+
+  exti_conf1= uc->rom->get_cell(0x50a5);
+  exti_conf2= uc->rom->get_cell(0x50ab);
+
+  // Although we set up all registers above not all STM8 variants
+  // use or expose them all. We only add vars for those that are
+  // user-visible on this particular MCU.
+  cl_var *v;
+  char name[] = "ITC_SPR1";
+  char desc[] = "Software priority register 1";
+  for (i= 0; i < 8; i++, name[7]++, desc[27]++)
     {
-      if (spr[i])
-	unregister_cell(spr[i]);
-      spr[i]= register_cell(uc->rom, 0x7f70+i);
+      uc->vars->add(v= new cl_var(name, uc->rom, 0x7f70+i, desc, 7, 0));
+      v->init();
     }
+
+    uc->vars->add(v= new cl_var("EXTI_CR1", uc->rom, 0x50a0,
+                                "External interrupt control register 1", 7, 0));
+    v->init();
+    uc->vars->add(v= new cl_var("EXTI_CR2", uc->rom, 0x50a1,
+                                "External interrupt control register 2", 7, 0));
+    v->init();
+
+    if (uc->type->type == CPU_STM8L ||
+        uc->type->type == CPU_STM8L101)
+      {
+        uc->vars->add(v= new cl_var("EXTI_CR3", uc->rom, 0x50a2,
+                                    "External interrupt control register 3", 7, 0));
+        v->init();
+
+        uc->vars->add(v= new cl_var("EXTI_SR1", uc->rom, 0x50a3,
+                                    "External interrupt status register 1", 7, 0));
+        v->init();
+        uc->vars->add(v= new cl_var("EXTI_SR2", uc->rom, 0x50a4,
+                                    "External interrupt status register 2", 7, 0));
+        v->init();
+
+        uc->vars->add(v= new cl_var("EXTI_CONF", uc->rom, 0x50a5,
+                                    "External interrupt port select register", 7, 0));
+        v->init();
+      }
+
+    if (uc->type->type == CPU_STM8L)
+      {
+        uc->vars->add(v= new cl_var("EXTI_CR4", uc->rom, 0x50aa,
+                                    "External interrupt control register 4", 7, 0));
+        v->init();
+
+        uc->vars->add(v= new cl_var("EXTI_CONF2", uc->rom, 0x50ab,
+                                    "External interrupt port select register 2", 7, 0));
+        v->init();
+      }
+
   return(0);
 }
 
@@ -117,6 +171,16 @@ cl_itc::reset(void)
   int i;
   for (i= 0; i < 8; i++)
     spr[i]->write(0xff);
+
+  // These belong to the ITC but are normally handled in cl_port.
+  exti_cr1->set(0);
+  exti_cr2->set(0);
+  exti_cr3->set(0);
+  exti_cr4->set(0);
+  exti_conf1->set(0);
+  exti_conf2->set(0);
+  exti_sr1->set(0);
+  exti_sr2->set(0);
 }
 
 void

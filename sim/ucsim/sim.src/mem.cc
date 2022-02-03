@@ -785,13 +785,17 @@ cl_hw_operator::read(void)
 {
   t_mem d1= 0, d2= 0;
 
-  if (hw)
-    d1= hw->read(cell);
+  if (hw && !hw->active)
+    {
+      hw->active = true;
+      d1= hw->read(cell);
+      hw->active = false;
+    }
 
   if (next_operator)
     d2= next_operator->read();
 
-  return(hw?d1:d2);
+  return(hw && !hw->active ? d1 : d2);
 }
 
 t_mem
@@ -800,9 +804,13 @@ cl_hw_operator::read(enum hw_cath skip)
   t_mem d1= 0, d2= d1;
   bool use= false;
 
-  if (hw &&
-      hw->category != skip)
-    use= true, d1= hw->read(cell);
+  if (hw && hw->category != skip && !hw->active)
+    {
+      use= true;
+      hw->active= true;
+      d1= hw->read(cell);
+      hw->active= false;
+    }
 
   if (next_operator)
     d2= next_operator->read();
@@ -817,8 +825,13 @@ cl_hw_operator::read(enum hw_cath skip)
 t_mem
 cl_hw_operator::write(t_mem val)
 {
-  if (hw)
-    hw->write(cell, &val);
+  if (hw && !hw->active)
+    {
+      hw->active= true;
+      hw->write(cell, &val);
+      hw->active= false;
+    }
+
   if (next_operator)
     val= next_operator->write(val);
   return val;

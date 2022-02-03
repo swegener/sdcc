@@ -63,6 +63,7 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_strin
   free(s);
   cfg= 0;
   io= 0;
+  active= false;
 }
 
 cl_hw::~cl_hw(void)
@@ -235,7 +236,7 @@ cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
       if (vname.nempty())
 	{
 	  class cl_cvar *v;
-	  uc->vars->add(v= new cl_cvar(vname, c, vdesc));
+	  uc->vars->add(v= new cl_var(vname, mem, addr, vdesc, c->get_width() - 1, 0));
 	  v->init();
 	}
     }

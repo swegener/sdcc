@@ -33,17 +33,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_port: public cl_hw
 {
- public:
-  class cl_memory_cell *cell_p, *cell_in, *cell_dir;
+ private:
   t_addr base;
+  int portnr;
+  t_mem last_idr;
  public:
-  cl_port(class cl_uc *auc, t_addr abase/*, int aid*/, const char *aname);
+  class cl_memory_cell *cell_pins, *cell_odr, *cell_idr, *cell_ddr, *cell_cr1, *cell_cr2;
+ public:
+  cl_port(class cl_uc *auc, int iportnr/*, int aid*/, const char *aname);
   virtual int init(void);
   virtual void reset(void);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
 
   virtual void print_info(class cl_console_base *con);
+
+ private:
+  bool high_bits_are_port_interrupt(const struct state *s);
+  bool low_bits_are_port_interrupt(const struct state *s);
+  bool port_used_for_interrupt(const struct state *s);
+  int port_sensitivity(const struct state *s);
+  void port_interrupt(struct state *s);
+  void port_check_interrupt(struct state *s, t_mem bitmask, int bithigh, int bitlow);
+  void pin_check_interrupt(struct state *s, t_mem exti_cr, int bithigh, int bitlow);
 };
 
 

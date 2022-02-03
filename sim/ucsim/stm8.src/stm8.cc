@@ -1055,6 +1055,8 @@ cl_stm8::analyze_start(void)
                 label.format("%s", ".reset");
               else if (rom->get(addr) == 0x80) // jumps straight to iret
                 label.format("%s", ".isr_unused");
+              else if (is_addr == 0x8004)
+                label.format("%s", ".trap");
               else
                 label.format("%s%lu", ".interrupt", ((unsigned long)is_addr - 0x8008) / 4);
 

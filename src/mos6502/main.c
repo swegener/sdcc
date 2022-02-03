@@ -33,16 +33,27 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-extern char * iComments2;
-extern DEBUGFILE dwarf2DebugFile;
-extern int dwarf2FinalizeFile(FILE *);
-
 #define OPTION_SMALL_MODEL          "--model-small"
 #define OPTION_LARGE_MODEL          "--model-large"
 //#define OPTION_CODE_SEG        "--codeseg"
 //#define OPTION_CONST_SEG       "--constseg"
 //#define OPTION_DATA_SEG        "--dataseg"
 #define OPTION_NO_STD_CRT0     "--no-std-crt0"
+
+extern char * iComments2;
+extern DEBUGFILE dwarf2DebugFile;
+extern int dwarf2FinalizeFile(FILE *);
+
+static OPTION _mos6502_options[] =
+  {
+    {0, OPTION_SMALL_MODEL, NULL, "8-bit address space for data"},
+    {0, OPTION_LARGE_MODEL, NULL, "16-bit address space for data (default)"},
+    //    {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+    //    {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+    //    {0, OPTION_DATA_SEG,        &options.data_seg, "<name> use this name for the data segment", CLAT_STRING},
+    {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "Do not link default crt0.rel"},
+    {0, NULL }
+  };
 
 static char _m6502_defaultRules[] =
 {
@@ -55,17 +66,6 @@ static char _m65c02_defaultRules[] =
 };
 
 MOS6502_OPTS mos6502_opts;
-
-static OPTION _mos6502_options[] =
-  {
-    {0, OPTION_SMALL_MODEL, NULL, "8-bit address space for data"},
-    {0, OPTION_LARGE_MODEL, NULL, "16-bit address space for data (default)"},
-    //    {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
-    //    {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
-    //    {0, OPTION_DATA_SEG,        &options.data_seg, "<name> use this name for the data segment", CLAT_STRING},
-    {0, OPTION_NO_STD_CRT0,     &options.no_std_crt0, "Do not link default crt0.rel"},
-    {0, NULL }
-  };
 
 /* list of key words used by m6502 */
 static char *_keywords[] = {
@@ -836,8 +836,7 @@ PORT mos65c02_port =
     1,                    /* CODE  is read-only */
     1                     // No fancy alignments supported.
   },
-  { _m6502_genExtraAreas,
-    NULL },
+  { _m6502_genExtraAreas, NULL },
   0,                      // ABI revision
   {
     -1,         /* direction (-1 = stack grows down) */
@@ -913,4 +912,3 @@ PORT mos65c02_port =
   3,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
-

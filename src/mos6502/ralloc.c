@@ -26,22 +26,25 @@
 #include "common.h"
 #include "ralloc.h"
 #include "gen.h"
+
 #include "dbuf_string.h"
 
-/*-----------------------------------------------------------------*/
-/* At this point we start getting processor specific although      */
-/* some routines are non-processor specific & can be reused when   */
-/* targetting other processors. The decision for this will have    */
-/* to be made on a routine by routine basis                        */
-/* routines used to pack registers are most definitely not reusable */
-/* since the pack the registers depending strictly on the MCU      */
-/*-----------------------------------------------------------------*/
+/* 6502 registers */
+reg_info regsm6502[] =
+{
+  {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
+  {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
+  {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
+  {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
+  {REG_GPR, XA_IDX,  "xa", M6502MASK_XA, NULL, 0, 1},
 
-extern void genm6502Code (iCode *);
+  {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
+  {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
+};
 
 #define D(x)
 
-/* Global data */
+/** Local static variables */
 static struct
   {
     bitVect *spiltSet;
@@ -56,21 +59,12 @@ static struct
   }
 _G;
 
+extern void genm6502Code (iCode *);
+
 /* Shared with gen.c */
 int m6502_ptrRegReq;             /* one byte pointer register required */
 
-/* 6502 registers */
-reg_info regsm6502[] =
-{
-  {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
-  {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
-  {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
-  {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
-  {REG_GPR, XA_IDX,  "xa", M6502MASK_XA, NULL, 0, 1},
 
-  {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
-  {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
-};
 
 int m6502_nRegs = 7;
 
@@ -938,7 +932,6 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   return changes;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* isBitwiseOptimizable - requirements of JEAN LOUIS VERN          */
 /*-----------------------------------------------------------------*/
@@ -1551,7 +1544,7 @@ m6502_assignRegisters (ebbIndex *ebbi)
   /* and serially allocate registers */
   serialRegMark (ebbs, count);
 
-  /* The new register allocator invokes its magic */
+  /* Invoke optimal register allocator */
   ic = m6502_ralloc2_cc (ebbi);
 
   RegFix (ebbs, count);

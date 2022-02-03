@@ -1,3 +1,13 @@
+2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/src/mos6502/gen.c,
+	  sdcc/src/mos6502/gen.H,
+	  sdcc/src/mos6502/main.c,
+	  sdcc/src/mos6502/ralloc.c,
+	  sdcc/src/mos6502/ralloc.h,
+	  sdcc/src/mos6502/ralloc2.cc:  
+	  Removed dead code and refactored load/stroreRegTemp.
+      
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* support/scripts/sdcc.ico:

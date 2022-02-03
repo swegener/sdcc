@@ -573,12 +573,6 @@ static void extra_ic_generated(iCode *ic)
           ifx->generated = true;
         }
     }
-  if(ic->op == GET_VALUE_AT_ADDRESS)
-    {
-      iCode *inc;
-      if (inc = hasIncm6502 (IC_LEFT (ic), ic,  getSize (operandType (IC_RIGHT (ic)))))
-         inc->generated = true;
-    }
 }
 
 template <class T_t, class G_t, class I_t>

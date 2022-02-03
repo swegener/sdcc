@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  gen.h - header file for code generation for hc(s)08
+  gen.h - header file for code generation for mos6502
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -88,7 +88,6 @@ void m6502_emitDebuggerSymbol (const char *);
 
 extern unsigned fReturnSizeM6502;
 
-iCode *hasIncm6502 (operand *op, const iCode *ic, int osize);
 extern bool m6502_assignment_optimal;
 
 #define NUM_TEMP_REGS 8

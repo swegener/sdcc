@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "m68hc12cl.h"
 
+
 int
 CL12::exec_b7(void)
 {
@@ -84,5 +85,48 @@ CL12::exec_b7(void)
     }
   return resGO;
 }
+
+int
+CL12::psh8(u8_t op)
+{
+  cSP.W(rSP-1);
+  rom->write(rSP, op);
+  vc.wr+= 1;
+  return resGO;
+}
+
+int
+CL12::pul8(class cl_memory_cell &dest)
+{
+  u8_t v;
+  v= rom->read(rSP);
+  cSP.W(rSP+1);
+  dest.W(v);
+  vc.rd+= 1;
+  return resGO;
+}
+
+int
+CL12::psh16(u16_t op)
+{
+  cSP.W(rSP-1);
+  rom->write(rSP, op);
+  cSP.W(rSP-1);
+  rom->write(rSP, op>>8);
+  vc.wr+= 2;
+  return resGO;
+}
+
+int
+CL12::pul16(class cl_memory_cell &dest)
+{
+  u16_t v;
+  v= read_addr(rom, rSP);
+  cSP.W(rSP+2);
+  dest.W(v);
+  vc.rd+= 2;
+  return resGO;
+}
+
 
 /* End of m68hc12.src/imov.cc */

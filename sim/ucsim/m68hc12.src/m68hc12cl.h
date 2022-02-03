@@ -126,7 +126,11 @@ public:
 
   // MOVE
 #define ld16 ldsx
-
+  virtual int psh8(u8_t op);
+  virtual int pul8(class cl_memory_cell &dest);
+  virtual int psh16(u16_t op);
+  virtual int pul16(class cl_memory_cell &dest);
+  
   // BRANCH
   virtual int call_e(void);
   virtual int call_id(void);

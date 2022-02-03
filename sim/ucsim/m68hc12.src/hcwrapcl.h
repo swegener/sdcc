@@ -32,9 +32,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "m68hc12cl.h"
 
 #define _NONE
-#define _A		uc->cA
-#define _B		uc->cB
-#define _D		uc->cD
+#define _cA		uc->cA
+#define _cB		uc->cB
+#define _cD		uc->cD
+#define _cC		uc->cCC
+#define _cX		uc->cIX
+#define _cY		uc->cIY
 
 #define _d		uc->ddst()
 #define _d_Aop		uc->ddst(),uc->acc.DAB.a8.Ar
@@ -75,6 +78,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _Aop		uc->acc.DAB.a8.Ar
 #define _Bop		uc->acc.DAB.a8.Br
 #define _Dop		uc->acc.DAB.Dr
+#define _Cop		uc->CC.cc16.cc8.ccl
+#define _Xop		uc->IX
+#define _Yop		uc->IY
 #define _dop		uc->dop()
 #define _eop		uc->eop()
 #define _xbop8		uc->xbop8()

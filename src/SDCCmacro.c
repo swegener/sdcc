@@ -122,7 +122,7 @@ eval_macros (hTab * pvals, const char *pfrom)
     }
 
 
-  /* If we did something then recursivly expand any expanded macros */
+  /* If we did something then recursively expand any expanded macros */
   if (fdidsomething)
     {
       char *ret = eval_macros (pvals, dbuf_c_str (&dbuf));
@@ -141,14 +141,14 @@ mvsprintf (hTab * pvals, const char *pformat, va_list ap)
 
   dbuf_init (&dbuf, 256);
 
-  /* Recursivly evaluate all the macros in the string */
+  /* Recursively evaluate all the macros in the string */
   p = eval_macros (pvals, pformat);
 
   /* Evaluate all the arguments */
   dbuf_vprintf (&dbuf, p, ap);
   Safe_free (p);
 
-  /* Recursivly evaluate any macros that were used as arguments */
+  /* Recursively evaluate any macros that were used as arguments */
   p = eval_macros (pvals, dbuf_c_str (&dbuf));
   dbuf_destroy (&dbuf);
   return p;

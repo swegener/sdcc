@@ -8735,38 +8735,59 @@ no_mlt:
         }
     }
 
-  i = val;
-  for (int count = 0; count < 16; count++)
+  if (!add_in_hl) 
     {
-      if (count != 0 && active)
-        {
-          if (!add_in_hl)
-            emit2 ("add a, a");
-          else
-            emit2 ("add hl, hl");
-          regalloc_dry_run_cost += 1;
-        }
-      if (i & 0x8000u)
-        {
-          if (active)
-            {
-              if (!add_in_hl)
-                emit2 ("add a, %s", _pairs[pair].l);
-              else
-                emit2 ("add hl, %s", _pairs[pair].name);
-              regalloc_dry_run_cost += 1;
-            }
-          active = TRUE;
-        }
-      i <<= 1;
-    }
+      unsigned long long add, sub;
+      int topbit, nonzero;
 
-  spillPair (PAIR_HL);
+      wassert(!csdOfVal (&topbit, &nonzero, &add, &sub, IC_RIGHT (ic)->aop->aopu.aop_lit, 0xff));
+      
+      // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
+      if (topbit >= 2 && (add & (1ull << topbit)) && (sub & (1ull << (topbit - 2))))
+        {
+          add = (add & ~(1u << topbit)) | (3u << (topbit - 2));
+          sub &= ~(1u << (topbit - 1));
+          topbit--;
+        }
+
+      for (int bit = topbit - 1; bit >= 0; bit--)
+        {
+          emit3 (A_ADD, ASMOP_A, ASMOP_A);
+          if ((add | sub) & (1ull << bit))
+            {
+              emit2 (add & (1ull << bit) ? "add a, %s" : "sub a, %s", _pairs[pair].l);
+              regalloc_dry_run_cost++;
+            }
+        }
+    }
+  else // Don't try to use CSD for hl, since subtraction there is more expensive than addition.
+    {
+      i = val;
+      for (int count = 0; count < 16; count++)
+        {
+          if (count != 0 && active)
+            {
+              emit2 ("add hl, hl");
+              regalloc_dry_run_cost++;
+            }
+          if (i & 0x8000u)
+            {
+              if (active)
+                {
+                  emit2 ("add hl, %s", _pairs[pair].name);
+                  regalloc_dry_run_cost++;
+                }
+              active = true;
+            }
+          i <<= 1;
+        }
+      spillPair (PAIR_HL);
+    }
 
   if (_G.stack.pushedDE)
     {
       _pop (PAIR_DE);
-      _G.stack.pushedDE = FALSE;
+      _G.stack.pushedDE = false;
     }
 
   genMove (IC_RESULT (ic)->aop, add_in_hl ? ASMOP_HL : ASMOP_A, true, add_in_hl || isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true);
@@ -16111,7 +16132,7 @@ dryZ80Code (iCode * lic)
 #endif
 
 /*-------------------------------------------------------------------------------------*/
-/* genZ80Code - generate code for Z80 based controllers for a block of intructions     */
+/* genZ80Code - generate code for Z80 based controllers for a block of instructions    */
 /*-------------------------------------------------------------------------------------*/
 void
 genZ80Code (iCode * lic)

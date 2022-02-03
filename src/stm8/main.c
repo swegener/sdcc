@@ -351,8 +351,8 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
         int topbit, nonzero;
         
 
-        if (floatFromVal (valFromType (test)) < 0 || csdOfVal (&topbit, &nonzero, &add, &sub, valFromType (test)))
-          return FALSE;
+        if (floatFromVal (valFromType (test)) < 0 || csdOfVal (&topbit, &nonzero, &add, &sub, valFromType (test), 0xffff))
+          return false;
 
         int shifts = topbit;
 

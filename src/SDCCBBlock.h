@@ -57,8 +57,8 @@ typedef struct eBBlock
   set *inExprs;                 /* in coming common expressions    */
   set *outExprs;                /* out going common expressions    */
   set *killedExprs;             /* killed common expressions       */
-  bitVect *inDefs;              /* in coming defintions            */
-  bitVect *outDefs;             /* out going defintions            */
+  bitVect *inDefs;              /* in coming definitions           */
+  bitVect *outDefs;             /* out going definitions           */
   bitVect *defSet;              /* symbols defined in block        */
   bitVect *ldefs;               /* local definitions only          */
   bitVect *usesDefs;            /* which definitions are used in this block */

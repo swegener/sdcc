@@ -96,7 +96,7 @@ shell_escape (const char *str)
               if (str > begin)
                 dbuf_append (&dbuf, begin, str - begin);
 
-              /* append additional beckslash */
+              /* append additional backslash */
               ++backshl;
 
               /* special handling if last chars before double quote are backslashes */
@@ -117,7 +117,7 @@ shell_escape (const char *str)
             }
           else if ('%' == *str)
             {
-              /* diseble env. variable expansion */
+              /* disable env. variable expansion */
               /* append the remaining characters */
               if (begin && str > begin)
                 dbuf_append (&dbuf, begin, str - begin);
@@ -319,7 +319,7 @@ processStrSet (set * list, const char *pre, const char *post, char *(*func)(cons
   return new_list;
 }
 
-/** Given a set returns a string containing all of the strings seperated
+/** Given a set returns a string containing all of the strings separated
     by spaces. The returned string is on the heap.
 */
 const char *
@@ -572,7 +572,7 @@ buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3,
                         if (*tmp != '\0')
                           {
                             if (sep)
-                              dbuf_append_char (&dbuf, ' ');    /* seperate it */
+                              dbuf_append_char (&dbuf, ' ');    /* separate it */
                             dbuf_append_str (&dbuf, tmp);
                             tmp++;
                             sep = 1;
@@ -591,7 +591,7 @@ buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3,
           if (par && *par != '\0')
             {
               if (!first && sep)
-                dbuf_append_char (&dbuf, ' ');  /* seperate it */
+                dbuf_append_char (&dbuf, ' ');  /* separate it */
               dbuf_append_str (&dbuf, par);
               sep = 0;
             }
@@ -601,7 +601,7 @@ buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3,
       if (*from != '\0')
         {
           if (!first && sep)
-            dbuf_append_char (&dbuf, ' ');      /* seperate it */
+            dbuf_append_char (&dbuf, ' ');      /* separate it */
           dbuf_append_str (&dbuf, from);
           sep = 0;
         }
@@ -876,7 +876,7 @@ hexEscape (const char **src)
 /*------------------------------------------------------------------*/
 /* universalEscape - process an hex constant of exactly four digits */
 /* return the hex value, throw an error warning for invalid hex     */
-/* adjust src to point at the last proccesed char                   */
+/* adjust src to point at the last processed char                   */
 /*------------------------------------------------------------------*/
 
 unsigned long int
@@ -919,7 +919,7 @@ universalEscape (const char **str, unsigned int n)
 /*------------------------------------------------------------------*/
 /* octalEscape - process an octal constant of max three digits      */
 /* return the octal value, throw a warning for illegal octal        */
-/* adjust src to point at the last proccesed char                   */
+/* adjust src to point at the last processed char                   */
 /*------------------------------------------------------------------*/
 
 unsigned long int
@@ -950,8 +950,8 @@ octalEscape (const char **str)
   Copies source string to a dynamically allocated buffer interpreting
   escape sequences and special characters
 
-  /param src  Buffer containing the source string with escape sequecnes
-  /param size Pointer to loction where the resulting buffer length is written
+  /param src  Buffer containing the source string with escape sequences
+  /param size Pointer to location where the resulting buffer length is written
   /return Dynamically allocated resulting buffer
 */
 

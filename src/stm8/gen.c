@@ -4957,7 +4957,7 @@ genMultLit (const iCode *ic)
     unsigned long long add, sub;
     int topbit, nonzero;
 
-    wassert(!csdOfVal (&topbit, &nonzero, &add, &sub, right->aop->aopu.aop_lit));
+    wassert(!csdOfVal (&topbit, &nonzero, &add, &sub, right->aop->aopu.aop_lit, 0xffff));
 
     // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
     if (topbit >= 2 && (add & (1ull << topbit)) && (sub & (1ull << (topbit - 2))))
@@ -9553,7 +9553,7 @@ drySTM8iCode (iCode *ic)
 }
 
 /*---------------------------------------------------------------------*/
-/* genSTM8Code - generate code for STM8 for a block of intructions     */
+/* genSTM8Code - generate code for STM8 for a block of instructions    */
 /*---------------------------------------------------------------------*/
 void
 genSTM8Code (iCode *lic)

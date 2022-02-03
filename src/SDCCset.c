@@ -192,7 +192,7 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
     {
       /*
        * On the x86 va_list is just a pointer, so due to pass by value
-       * ap is not mofified by the called function.  On the PPC va_list
+       * ap is not modified by the called function.  On the PPC va_list
        * is a pointer to a structure, so ap is modified.  Re-init each time.
        */
       va_start (ap, cond);
@@ -223,7 +223,7 @@ destructItemIf (set ** sset, void (*destructor)(void * item), int (*cond) (void 
     {
       /*
        * On the x86 va_list is just a pointer, so due to pass by value
-       * ap is not mofified by the called function.  On the PPC va_list
+       * ap is not modified by the called function.  On the PPC va_list
        * is a pointer to a structure, so ap is modified.  Re-init each time.
        */
       va_start (ap, cond);

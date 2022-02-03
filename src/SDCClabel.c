@@ -199,7 +199,7 @@ labelIfx (iCode * ic)
             continue;
 
           /* now make sure that this is the only */
-          /* referenece to the _trueLabel        */
+          /* reference to the _trueLabel        */
           if (IC_TRUE (loop) && hTabItemWithKey (labelRef, (IC_TRUE (loop))->key))
             {
               /* we just change the falseLabel */
@@ -415,7 +415,7 @@ labelUnrefLabel (iCode * ic)
           if (hTabItemWithKey (labelRef, (IC_LABEL (loop))->key))
             continue;
 
-          /* else eliminitate this one */
+          /* else eliminate this one */
           loop->prev->next = loop->next;        /* get this out of the chain */
           loop->next->prev = loop->prev;
           change++;

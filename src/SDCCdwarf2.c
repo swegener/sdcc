@@ -1721,7 +1721,7 @@ dwWriteLineNumber (dwline * lp)
               /* ok, we can use a "special" opcode */
               
               /* If the deltaAddr value was symbolic, it can't be part */
-              /* of the "special" opcode, so encode it seperately      */
+              /* of the "special" opcode, so encode it separately      */
               if (!deltaAddrValid)
                 {
                   dwWriteByte (NULL, DW_LNS_advance_pc, NULL);

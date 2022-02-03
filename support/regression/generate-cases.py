@@ -55,7 +55,7 @@ class InstanceGenerator:
         (self.basename, self.ext) = os.path.splitext (self.filename)
 
     def permute(self, basepath, keys, trans = {}):
-        """Permutes across all of the names.  For each value, recursivly creates
+        """Permutes across all of the names.  For each value, recursively creates
         a mangled form of the name, this value, and all the combinations of
         the remaining values.  At the tail of the recursion when one full
         combination is built, generates an instance of the test case from
@@ -69,7 +69,7 @@ class InstanceGenerator:
             T.substitutions = trans
             T.write(basepath + self.ext)
         else:
-            # Pull off this key, then recursivly iterate through the rest.
+            # Pull off this key, then recursively iterate through the rest.
             key = keys[0]
             for part in self.replacements[key]:
                 trans[key] = part

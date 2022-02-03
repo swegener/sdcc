@@ -1,3 +1,27 @@
+2022-02-03 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/printf_large.c,
+	  src/SDCCBBlock.h,
+	  src/SDCCast.c,
+	  src/SDCCdwarf2.c,
+	  src/SDCCicode.c,
+	  src/SDCClabel.c,
+	  src/SDCCloop.c,
+	  src/SDCCmacro.c,
+	  src/SDCCset.c,
+	  src/SDCCutil.c,
+	  src/ds390/ralloc.c,
+	  src/z80/ralloc.c,
+	  support/regression/generate-cases.py:
+	  Fix typos in comments.
+	* src/z80/gen.c,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/stm8/main.c,
+	  src/SDCCval.h,
+	  src/SDCCval.c:
+	  Use CSD representation for multiplication by literal in a.
+
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdcc/src/mos6502/gen.c,

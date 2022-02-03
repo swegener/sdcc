@@ -554,7 +554,7 @@ newOperand ()
 }
 
 /*-----------------------------------------------------------------*/
-/* newiCode - create and return a new iCode entry initialised      */
+/* newiCode - create and return a new iCode entry initialized      */
 /*-----------------------------------------------------------------*/
 iCode *
 newiCode (int op, operand *left, operand *right)
@@ -697,7 +697,7 @@ newiTempLoopHeaderLabel (bool pre)
 
 
 /*-----------------------------------------------------------------*/
-/* initiCode - initialises some iCode related stuff                */
+/* initiCode - initializes some iCode related stuff                */
 /*-----------------------------------------------------------------*/
 void
 initiCode ()
@@ -1435,9 +1435,9 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
           l = (TYPE_TARGET_ULONG) double2ul (operandLitValue (left));
           r = (TYPE_TARGET_ULONG) double2ul (operandLitValue (right));
           /* In order to correctly compare 'signed int' and 'unsigned int' it's
-             neccessary to strip them to 16 bit.
+             necessary to strip them to 16 bit.
              Literals are reduced to their cheapest type, therefore left and
-             right might have different types. It's neccessary to find a
+             right might have different types. It's necessary to find a
              common type: int (used for char too) or long */
           if (!IS_LONG (let) && !IS_LONG (ret))
             {
@@ -2066,7 +2066,7 @@ geniCodeRValue (operand * op, bool force)
 }
 
 /*-----------------------------------------------------------------*/
-/* checkPtrQualifiers - check for lost pointer qualifers           */
+/* checkPtrQualifiers - check for lost pointer qualifiers          */
 /*-----------------------------------------------------------------*/
 static void
 checkPtrQualifiers (sym_link * ltype, sym_link * rtype, int warn_const)
@@ -3336,7 +3336,7 @@ checkTypes (operand * left, operand * right)
      done with the type & not the pointer */
   /* then cast rights type to left */
 
-  /* first check the type for pointer assignement */
+  /* first check the type for pointer assignment */
   if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) && compareType (ltype, rtype) <= 0)
     {
       if (left->aggr2ptr)

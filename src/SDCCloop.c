@@ -349,7 +349,7 @@ isOperandInvariant (operand * op, region * theLoop, set * lInvars)
   int opin = 0;
   /* operand is an invariant if it is a                */
   /*       a. constants .                              */
-  /*       b. that have defintions reaching loop entry */
+  /*       b. that have definitions reaching loop entry */
   /*       c. that are already defined as invariant    */
   /*       d. has no assignments in the loop           */
   if (op)
@@ -550,7 +550,7 @@ loopInvariants (region *theLoop, ebbIndex *ebbi)
               set *lSet = setFromSet (theLoop->regBlocks);
 
               /* if this block does not dominate all exits */
-              /* make sure this defintion is not used anywhere else */
+              /* make sure this definition is not used anywhere else */
               if (!domsAllExits)
                 {
                   if (isOperandGlobal (IC_RESULT (ic)))
@@ -781,7 +781,7 @@ addPostLoopBlock (region * loopReg, ebbIndex * ebbi, iCode * ic)
 
   /* if the number of exits is greater than one then
      we use another trick: we will create an intersection
-     of succesors of the exits, then take those that are not
+     of successors of the exits, then take those that are not
      part of the loop and have dfNumber greater loop entry (eblock),
      insert a new predecessor postLoopBlk before them and add
      a copy of ic in the new block. The postLoopBlk in between

@@ -859,7 +859,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
     return NULL;
 
   /* this routine will mark the a symbol as used in one
-     instruction use only && if the defintion is local
+     instruction use only && if the definition is local
      (ie. within the basic block) && has only one definition &&
      that definition is either a return value from a
      function or does not contain any variables in
@@ -869,7 +869,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (!bitVectIsZero (uses))    /* has other uses */
     return NULL;
 
-  /* if it has only one defintion */
+  /* if it has only one definition */
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
     return NULL;                /* has more than one definition */
 

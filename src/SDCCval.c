@@ -2184,15 +2184,17 @@ ullFromVal (value * val)
 }
 
 /*------------------------------------------------------------------*/
-/* csdOfVal - return 0 if the value can be represented as csd       */
+/* csdOfVal - return 0 if the value can be represented as           */
+/* canonical signed digit. Useful for generating                    */
+/* shift / add / sub code sequences for multiplication by literals. */
 /* topbit  - highest nonzero bit in csd                             */
 /* nonzero - number of nonzero bits in csd                          */
 /* csd_add - positive bits in csd                                   */
 /* csd_sub - negative bits in csd                                   */
 /*------------------------------------------------------------------*/
-int csdOfVal (int *topbit, int *nonzero, unsigned long long *csd_add, unsigned long long *csd_sub, value *val)
+int csdOfVal (int *topbit, int *nonzero, unsigned long long *csd_add, unsigned long long *csd_sub, value *val, unsigned long long mask)
 {
-  unsigned long long binary = ullFromVal (val);
+  unsigned long long binary = ullFromVal (val) & mask;
   bool gamma, theta, a;
   int bit, next;
 
@@ -2827,9 +2829,9 @@ valCompare (value * lval, value * rval, int ctype, bool reduceType)
           l = (TYPE_TARGET_ULONGLONG) ullFromVal (lval);
           r = (TYPE_TARGET_ULONGLONG) ullFromVal (rval);
           /* In order to correctly compare 'signed int' and 'unsigned int' it's
-             neccessary to strip them to 16 bit.
+             necessary to strip them to 16 bit.
              Literals are reduced to their cheapest type, therefore left and
-             right might have different types. It's neccessary to find a
+             right might have different types. It's necessary to find a
              common type: int (used for char too) or long */
           if (!IS_LONGLONG (lval->etype) && !IS_LONGLONG (rval->etype))
             {
@@ -2861,9 +2863,9 @@ valCompare (value * lval, value * rval, int ctype, bool reduceType)
           l = (TYPE_TARGET_ULONGLONG) ullFromVal (lval);
           r = (TYPE_TARGET_ULONGLONG) ullFromVal (rval);
           /* In order to correctly compare 'signed int' and 'unsigned int' it's
-             neccessary to strip them to 16 bit.
+             necessary to strip them to 16 bit.
              Literals are reduced to their cheapest type, therefore left and
-             right might have different types. It's neccessary to find a
+             right might have different types. It's necessary to find a
              common type: int (used for char too) or long */
           if (!IS_LONGLONG (lval->etype) && !IS_LONGLONG (rval->etype))
             {

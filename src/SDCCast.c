@@ -1495,7 +1495,7 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast * rootV
 }
 
 /*-----------------------------------------------------------------*/
-/* initAggregates - initialises aggregate variables with initv     */
+/* initAggregates - initializes aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
 ast *
 initAggregates (symbol *sym, initList *ival, ast *wid)
@@ -1539,7 +1539,7 @@ gatherAutoInit (symbol * autoChain)
       /* if this is a static variable & has an */
       /* initial value the code needs to be lifted */
       /* here to the main portion since they can be */
-      /* initialised only once at the start    */
+      /* initialized only once at the start    */
       if (IS_STATIC (sym->etype) && sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
         {
           symbol *newSym;

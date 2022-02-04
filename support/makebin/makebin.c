@@ -320,7 +320,7 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
     {
       if(o->address_overwrite[i] != 0xFF)
         {
-          rom[0x0100 & o->address_overwrite[i]] = o->address_overwrite[i+1];
+          rom[0x0100 | o->address_overwrite[i]] = o->address_overwrite[i+1];
           // warnings for builds ported from ancient GBDK
           fprintf (stderr, "caution: -yp0x01%02x=0x%02x is outdated", o->address_overwrite[i], o->address_overwrite[i+1]);
           if(o->address_overwrite[i] == 0x43)
@@ -856,12 +856,21 @@ main (int argc, char **argv)
             case 'p':
               // remove "-yp"
               *argv += 3;
+
+              // also support -yp 0x143=0x80
+              if (!(*argv)[0])
+                if (!*++argv)
+                  {
+                    usage ();
+                    return 1;
+                  }
+
               // effectively split string into argv and token
               strtok(*argv, "=");
               token = strtok(NULL, "=");
               for (i = 0; i < 16; i+=2)
                 {
-                  if(gb_opt.address_overwrite[i] == 0xFF)
+                  if (gb_opt.address_overwrite[i] == 0xFF)
                     {
                       gb_opt.address_overwrite[i] = strtoul (*argv, NULL, 0);
                       gb_opt.address_overwrite[i+1] = strtoul (token, NULL, 0);

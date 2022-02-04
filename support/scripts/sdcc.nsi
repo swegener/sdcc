@@ -656,6 +656,10 @@ ${Section} "SDCC library sources" SEC25
   File "${DEV_ROOT}\lib\src\tlcs90\*.s"
 #  File "${DEV_ROOT}\lib\src\tlcs90\Makefile"
 
+  SetOutPath "$INSTDIR\lib\src\mos6502"
+  File "${DEV_ROOT}\lib\src\mos6502\*.s"
+#  File "${DEV_ROOT}\lib\src\mos6502\Makefile"
+
   SetOutPath "$INSTDIR\lib\src\mcs51"
   File "${DEV_ROOT}\lib\src\mcs51\*.asm"
 #  File "${DEV_ROOT}\lib\src\mcs51\Makefile"
@@ -869,6 +873,12 @@ ${Section} "SDCC Rabbit 2000A library" SEC33
   File "${DEV_ROOT}\lib\r2ka\*.*"
 ${SectionEnd}
 
+${Section} "SDCC MOS 6502 library" SEC34
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\mos6502"
+  File "${DEV_ROOT}\lib\mos6502\*.*"
+${SectionEnd}
+
 ;--------------------------------
 ;Descriptions
 
@@ -905,6 +915,8 @@ LangString DESC_SEC29 ${LANG_ENGLISH} "SDCC PDK14 library"
 LangString DESC_SEC30 ${LANG_ENGLISH} "SDCC PDK15 library"
 LangString DESC_SEC31 ${LANG_ENGLISH} "SDCC PDK15 stack-auto library"
 LangString DESC_SEC32 ${LANG_ENGLISH} "SDCC Z80N library"
+LangString DESC_SEC33 ${LANG_ENGLISH} "SDCC Rabbit 2000A library"
+LangString DESC_SEC34 ${LANG_ENGLISH} "SDCC MOS 6502 library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -942,6 +954,8 @@ LangString DESC_SEC32 ${LANG_ENGLISH} "SDCC Z80N library"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC20} $(DESC_SEC30)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC31} $(DESC_SEC31)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC32} $(DESC_SEC32)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC33} $(DESC_SEC33)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC34} $(DESC_SEC34)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
@@ -1096,7 +1110,10 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\tlcs90\tlcs90.lib"
   Delete "$INSTDIR\lib\src\tlcs90\README"
   Delete "$INSTDIR\lib\src\tlcs90\Makefile"
-  
+
+  Delete "$INSTDIR\lib\src\mos6502\*.s"
+  Delete "$INSTDIR\lib\src\mos6502\mos6502.lib"
+ 
   Delete "$INSTDIR\lib\src\z80n\*.s"
   Delete "$INSTDIR\lib\src\z80n\z80n.lib"
   Delete "$INSTDIR\lib\src\z80n\README"
@@ -1167,7 +1184,10 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\tlcs90\*.rel"
   Delete "$INSTDIR\lib\tlcs90\*.lib"
-  
+
+  Delete "$INSTDIR\lib\mos6502\*.rel"
+  Delete "$INSTDIR\lib\mos6502\*.lib"
+
   Delete "$INSTDIR\lib\z80n\*.rel"
   Delete "$INSTDIR\lib\z80n\*.lib"
 

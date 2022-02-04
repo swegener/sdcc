@@ -1,7 +1,8 @@
 2022-02-04 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* support/scripts/sdcc.nsi:
-	  (Un)install sdas6500 assembler, fix left-over mcs51 huge lib after uninstall (bug #2972).
+	  (Un)install sdas6500 assembler, fix left-over mcs51 huge lib after uninstall (bug #2972),
+	  installation options for r2ka and mos6502 libraries.
 
 2022-02-03 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 

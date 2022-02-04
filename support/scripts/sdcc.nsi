@@ -386,6 +386,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdaspdk14.exe"
   File "${SDCC_ROOT}\bin\sdaspdk15.exe"
   File "${SDCC_ROOT}\bin\sdastlcs90.exe"
+  File "${SDCC_ROOT}\bin\sdas6500.exe"
   File "${SDCC_ROOT}\bin\sdld.exe"
   File "${SDCC_ROOT}\bin\sdldgb.exe"
   File "${SDCC_ROOT}\bin\sdld6808.exe"
@@ -1143,6 +1144,8 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\medium\*.lib"
 
   Delete "$INSTDIR\lib\large\*.lib"
+  
+  Delete "$INSTDIR\lib\huge\*.lib"
 
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
   Delete "$INSTDIR\lib\large-stack-auto\*.lib"
@@ -1208,6 +1211,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdaspdk14.exe"
   Delete "$INSTDIR\bin\sdaspdk15.exe"
   Delete "$INSTDIR\bin\sdastlcs90.exe"
+  Delete "$INSTDIR\bin\sdas6500.exe"
   Delete "$INSTDIR\bin\sdld.exe"
   Delete "$INSTDIR\bin\sdldgb.exe"
   Delete "$INSTDIR\bin\sdld6808.exe"
@@ -1289,6 +1293,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\small"
   RMDir "$INSTDIR\lib\medium"
   RMDir "$INSTDIR\lib\large"
+  RMDir "$INSTDIR\lib\huge"
   RMDir "$INSTDIR\lib\small-stack-auto"
   RMDir "$INSTDIR\lib\large-stack-auto"
   RMDir "$INSTDIR\lib\sm83"

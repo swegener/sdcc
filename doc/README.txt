@@ -8,7 +8,7 @@ Intel MCS-51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z80N, Z180, SM83 (e.g. Game Boy),
 Rabbit 2000, Rabbit 2000A/3000, Rabbit 3000A, TLCS-90), STMicroelectronics STM8
 and Padauk PDK14 and PDk15.
-Work is in progress on supporting the Padauk PDK13 target.
+Work is in progress on supporting the Padauk PDK13 and MOS 6502 targets.
 There are unmaintained Microchip PIC16 and PIC18 targets.
 It can be retargeted for other microprocessors.
 

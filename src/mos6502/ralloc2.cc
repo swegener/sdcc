@@ -370,9 +370,7 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
     }
     
   if(ic->op == SEND && ic->builtinSEND)
-    {
-      assign_operands_for_cost(a, *(adjacent_vertices(i, G).first), G, I);
-    }
+    assign_operands_for_cost(a, (unsigned short)*(adjacent_vertices(i, G).first), G, I);
 }
 
 // Check that the operand is either fully in registers or fully in memory.
@@ -646,6 +644,9 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
 
 iCode *m6502_ralloc2_cc(ebbIndex *ebbi)
 {
+  eBBlock **const ebbs = ebbi->bbOrder;
+  const int count = ebbi->count;
+  iCode *ic;
 
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Processing " << currFunc->name << " from " << dstFileName << "\n"; std::cout.flush();
@@ -655,7 +656,7 @@ iCode *m6502_ralloc2_cc(ebbIndex *ebbi)
 
   con_t conflict_graph;
 
-  iCode *ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
+  ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);
@@ -679,6 +680,11 @@ iCode *m6502_ralloc2_cc(ebbIndex *ebbi)
   guessCounts (ic, ebbi);
 
   m6502_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+
+  m6502RegFix (ebbs, count);
+
+  /* do the overlaysegment stuff SDCCmem.c */
+  doOverlays (ebbs, count);
 
   return(ic);
 }

@@ -23,7 +23,6 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include "common.h"
 #include "ralloc.h"
 #include "gen.h"
 
@@ -42,7 +41,12 @@ reg_info regsm6502[] =
   {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
 };
 
-#define D(x)
+/* Flags to turn on debugging code.
+ */
+enum
+{
+  D_ALLOC = 0,
+};
 
 /** Local static variables */
 static struct
@@ -59,6 +63,11 @@ static struct
   }
 _G;
 
+#if 1
+#define D(_a, _s)       if (_a)  { printf _s; fflush(stdout); }
+#else
+#define D(_a, _s)
+#endif
 extern void genm6502Code (iCode *);
 
 /* Shared with gen.c */
@@ -246,10 +255,10 @@ noOverLap (set * itmpStack, symbol * fsym)
 {
   symbol *sym;
 
-  for (sym = setFirstItem (itmpStack); sym;
-       sym = setNextItem (itmpStack))
+  for (sym = setFirstItem (itmpStack); sym; sym = setNextItem (itmpStack))
     {
-        if (bitVectBitValue(sym->clashes,fsym->key)) return 0;
+        if (bitVectBitValue(sym->clashes,fsym->key)) 
+          return 0;
     }
   return 1;
 }
@@ -272,9 +281,9 @@ DEFSETFUNC (isFree)
      this does not have any overlapping live ranges
      with the one currently being assigned and
      the size can be accomodated  */
-  if (sym->isFree &&
-      noOverLap (sym->usl.itmpStack, fsym) &&
-      getSize (sym->type) >= getSize (fsym->type))
+  if (sym->isFree
+      && noOverLap (sym->usl.itmpStack, fsym)
+      && getSize (sym->type) >= getSize (fsym->type))
     {
       *sloc = sym;
       return 1;
@@ -284,7 +293,7 @@ DEFSETFUNC (isFree)
 }
 
 /*-----------------------------------------------------------------*/
-/* createStackSpil - create a location on the stack to spil        */
+/* createStackSpil - create a location somewhere to spill          */
 /*-----------------------------------------------------------------*/
 static symbol *
 createStackSpil (symbol * sym)
@@ -308,6 +317,8 @@ createStackSpil (symbol * sym)
   /* could not then have to create one , this is the hard part
      we need to allocate this on the stack : this is really a
      hack!! but cannot think of anything better at this time */
+
+  D (D_ALLOC, ("createStackSpil: for sym %p %s (old currFunc->stack %ld)\n", sym, sym->name, (long)(currFunc->stack)));
 
   dbuf_init (&dbuf, 128);
   dbuf_printf (&dbuf, "sloc%d", _G.slocNum++);
@@ -352,7 +363,7 @@ createStackSpil (symbol * sym)
   else
     _G.dataExtend += getSize (sloc->type);
 
-  /* add it to the _G.stackSpil set */
+  /* add it to the stackSpil set */
   addSetHead (&_G.stackSpil, sloc);
   sym->usl.spillLoc = sloc;
   sym->stackSpil = 1;
@@ -360,13 +371,15 @@ createStackSpil (symbol * sym)
   /* add it to the set of itempStack set
      of the spill location */
   addSetHead (&sloc->usl.itmpStack, sym);
+
+  D (D_ALLOC, ("createStackSpil: created new %s\n", sloc->name));
   return sym;
 }
 
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-static void
+void
 spillThis (symbol * sym)
 {
   int i;
@@ -531,18 +544,19 @@ m6502_rUmaskForOp (operand * op)
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
 static void
-regTypeNum (eBBlock *ebbs)
+regTypeNum (void)
 {
   symbol *sym;
   int k;
 
   /* for each live range do */
-  for (sym = hTabFirstItem (liveRanges, &k); sym;
-       sym = hTabNextItem (liveRanges, &k))
+  for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
     {
       /* if used zero times then no registers needed */
       if ((sym->liveTo - sym->liveFrom) == 0)
         continue;
+
+      D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
 
       /* if the live range is a temporary */
       if (sym->isitmp)
@@ -561,9 +575,13 @@ regTypeNum (eBBlock *ebbs)
             }
 
           /* if not then we require registers */
-          sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) ?
-                        getSize (sym->type = aggrToPtr (sym->type, false)) :
-                        getSize (sym->type));
+          D (D_ALLOC,
+             ("regTypeNum: isagg %u nRegs %u type %p\n", IS_AGGREGATE (sym->type) || sym->isptr, sym->nRegs, sym->type));
+          sym->nRegs = ((IS_AGGREGATE (sym->type)
+                         || sym->isptr) ? getSize (sym->type = aggrToPtr (sym->type, false)) : getSize (sym->type));
+          D (D_ALLOC, ("regTypeNum: setting nRegs of %s (%p) to %u\n", sym->name, sym, sym->nRegs));
+
+          D (D_ALLOC, ("regTypeNum: setup to assign regs sym %p\n", sym));
 
           if (sym->nRegs > 8)
             {
@@ -579,10 +597,13 @@ regTypeNum (eBBlock *ebbs)
             sym->regType = REG_GPR;
         }
       else
-        /* for the first run we don't provide */
-        /* registers for true symbols we will */
-        /* see how things go                  */
-        sym->nRegs = 0;
+        {
+          /* for the first run we don't provide */
+          /* registers for true symbols we will */
+          /* see how things go                  */
+          D (D_ALLOC, ("regTypeNum: #2 setting num of %p to 0\n", sym));
+          sym->nRegs = 0;
+        }
     }
 }
 
@@ -613,6 +634,26 @@ DEFSETFUNC (deallocStackSpil)
   return 0;
 }
 
+/** Transform weird SDCC handling of writes via pointers
+    into something more sensible. */
+static void
+transformPointerSet (eBBlock **ebbs, int count)
+{
+  /* for all blocks */
+  for (int i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      /* for all instructions do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        if (POINTER_SET (ic))
+          {
+            IC_LEFT (ic) = IC_RESULT (ic);
+            IC_RESULT (ic) = 0;
+            ic->op = SET_VALUE_AT_ADDRESS;
+          }
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */
@@ -622,9 +663,9 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
   iCode *dic, *sic;
 
-  if (!IS_ITEMP (IC_RIGHT (ic)) ||
-      OP_SYMBOL (IC_RIGHT (ic))->isind ||
-      OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
+  if (!IS_ITEMP (IC_RIGHT (ic))
+      || OP_SYMBOL (IC_RIGHT (ic))->isind
+      || OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
     {
       return 0;
     }
@@ -669,9 +710,9 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
       if (dic->op == IFX)
         {
-          if (IS_SYMOP (IC_COND (dic)) &&
-              (IC_COND (dic)->key == IC_RESULT (ic)->key ||
-               IC_COND (dic)->key == IC_RIGHT (ic)->key))
+          if (IS_SYMOP (IC_COND (dic))
+              && (IC_COND (dic)->key == IC_RESULT (ic)->key
+                  || IC_COND (dic)->key == IC_RIGHT (ic)->key))
             {
               dic = NULL;
               break;
@@ -679,32 +720,32 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
         }
       else
         {
-          if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
-              IS_OP_VOLATILE (IC_RESULT (dic)))
+          if (IS_TRUE_SYMOP (IC_RESULT (dic))
+              && IS_OP_VOLATILE (IC_RESULT (dic)))
             {
               dic = NULL;
               break;
             }
 
-          if (IS_SYMOP (IC_RESULT (dic)) &&
-              IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
+          if (IS_SYMOP (IC_RESULT (dic))
+              && IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
             {
               if (POINTER_SET (dic))
                 dic = NULL;
               break;
             }
 
-          if (IS_SYMOP (IC_RIGHT (dic)) &&
-              (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
-               IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
+          if (IS_SYMOP (IC_RIGHT (dic))
+              && (IC_RIGHT (dic)->key == IC_RESULT (ic)->key
+                  || IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
             {
               dic = NULL;
               break;
             }
 
-          if (IS_SYMOP (IC_LEFT (dic)) &&
-              (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
-               IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
+          if (IS_SYMOP (IC_LEFT (dic))
+              && (IC_LEFT (dic)->key == IC_RESULT (ic)->key
+                  || IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
             {
               dic = NULL;
               break;
@@ -1210,7 +1251,7 @@ packPointerOp (iCode * ic, eBBlock ** ebpp)
 
 /*-----------------------------------------------------------------*/
 /* packRegisters - does some transformations to reduce register    */
-/*                   pressure                                      */
+/*                 pressure                                        */
 /*-----------------------------------------------------------------*/
 static void
 packRegisters (eBBlock ** ebpp, int count)
@@ -1226,7 +1267,6 @@ packRegisters (eBBlock ** ebpp, int count)
   do
     {
       change = 0;
-
       /* look for assignments of the form */
       /* iTempNN = TrueSym (someoperation) SomeOperand */
       /*       ....                       */
@@ -1264,8 +1304,9 @@ packRegisters (eBBlock ** ebpp, int count)
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
         }
 
-      /* if straight assignment then carry remat flag if
-         this is the only definition */
+      /* Safe: just propagates the remat flag */
+      /* if straight assignment then carry remat flag if this is the
+         only definition */
       if (ic->op == '=' &&
           !POINTER_SET (ic) &&
           IS_SYMOP (IC_RIGHT (ic)) &&
@@ -1279,7 +1320,7 @@ packRegisters (eBBlock ** ebpp, int count)
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
         }
 
-      /* if cast to a generic pointer & the pointer being
+      /* if cast to a pointer & the pointer being
          cast is remat, then we can remat this cast as well */
       if (ic->op == CAST &&
           IS_SYMOP(IC_RIGHT(ic)) &&
@@ -1299,7 +1340,7 @@ packRegisters (eBBlock ** ebpp, int count)
             }
         }
 
-      /* if this is a +/- operation with a rematerizable
+      /* if this is a +/- operation with a rematerializable
          then mark this as rematerializable as well */
       if ((ic->op == '+' || ic->op == '-') &&
           (IS_SYMOP (IC_LEFT (ic)) &&
@@ -1357,8 +1398,8 @@ packRegisters (eBBlock ** ebpp, int count)
     }
 }
 
-static void
-RegFix (eBBlock ** ebbs, int count)
+void
+m6502RegFix (eBBlock ** ebbs, int count)
 {
   int i;
 
@@ -1396,10 +1437,8 @@ RegFix (eBBlock ** ebbs, int count)
     }
 }
 
-/** Serially allocate registers to the variables.
-    This was the main register allocation function.  It is called after
-    packing.
-    In the new register allocator it only serves to mark variables for the new register allocator.
+/**
+  Mark variables for assignment by the register allocator.
  */
 static void
 serialRegMark (eBBlock ** ebbs, int count)
@@ -1407,14 +1446,16 @@ serialRegMark (eBBlock ** ebbs, int count)
   int i;
   short int max_alloc_bytes = SHRT_MAX; // Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
 
+  D (D_ALLOC, ("serialRegMark for %s, currFunc->stack %d\n", currFunc->name, currFunc->stack));
+
   /* for all blocks */
   for (i = 0; i < count; i++)
     {
       iCode *ic;
 
-      if (ebbs[i]->noPath &&
-          (ebbs[i]->entryLabel != entryLabel &&
-           ebbs[i]->entryLabel != returnLabel))
+      if (ebbs[i]->noPath
+          && (ebbs[i]->entryLabel != entryLabel
+              && ebbs[i]->entryLabel != returnLabel))
         continue;
 
       /* for all instructions do */
@@ -1445,9 +1486,7 @@ serialRegMark (eBBlock ** ebbs, int count)
               ic->op == IPUSH ||
               ic->op == IPOP ||
               (IC_RESULT (ic) && POINTER_SET (ic)))
-            {
               continue;
-            }
 
           /* now we need to allocate registers only for the result */
           if (IC_RESULT (ic))
@@ -1469,6 +1508,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   bitVectBitValue (_G.regAssigned, sym->key) ||
                   sym->liveTo <= ic->seq)
                 {
+                  D (D_ALLOC, ("serialRegMark: won't live long enough.\n"));
                   continue;
                 }
 
@@ -1525,6 +1565,8 @@ m6502_assignRegisters (ebbIndex *ebbi)
   m6502_reg_sp = m6502_regWithIdx(SP_IDX);
   m6502_nRegs = 5;
 
+//  transformPointerSet (ebbs, count);
+
   /* change assignments this will remove some
      live ranges reducing some register pressure */
 
@@ -1539,15 +1581,13 @@ m6502_assignRegisters (ebbIndex *ebbi)
 
   /* first determine for each live range the number of
      registers & the type of registers required for each */
-  regTypeNum (*ebbs);
+  regTypeNum ();
 
-  /* and serially allocate registers */
+  /* Mark variables for assignment by the new allocator */
   serialRegMark (ebbs, count);
 
   /* Invoke optimal register allocator */
   ic = m6502_ralloc2_cc (ebbi);
-
-  RegFix (ebbs, count);
 
   /* if stack was extended then tell the user */
   if (_G.stackExtend)
@@ -1575,9 +1615,6 @@ m6502_assignRegisters (ebbIndex *ebbi)
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
-
-  /* do the overlaysegment stuff SDCCmem.c */
-  doOverlays (ebbs, count);
 
   /* now get back the chain */
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbs, count));

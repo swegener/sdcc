@@ -22,10 +22,11 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include "SDCCicode.h"
-#include "SDCCBBlock.h"
+
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
+
+#include "common.h"
 
 enum
   {
@@ -38,9 +39,12 @@ enum
     SP_IDX
   };
 
-#define REG_PTR 0x01
-#define REG_GPR 0x02
-#define REG_CND 0x04
+enum
+{
+  REG_PTR = 1,
+  REG_GPR = 2,
+  REG_CND = 4,
+};
 
 /* Must preserve the relation M6502MASK_Y > M6502MASK_X > M6502MASK_A  */
 /* so that M6502MASK_REV can be automatically applied when reversing */
@@ -108,9 +112,12 @@ void m6502_freeReg (reg_info * reg);
 void m6502_dirtyReg (reg_info * reg);
 bitVect *m6502_rUmaskForOp (operand * op);
 
-iCode *m6502_ralloc2_cc(ebbIndex *ebbi);
-
 const m6502opcodedata *m6502_getOpcodeData(const char *inst);
 int m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg);
 
+iCode *m6502_ralloc2_cc(ebbIndex *ebbi);
+
+void m6502RegFix (eBBlock **ebbs, int count);
+
 #endif
+

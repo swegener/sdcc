@@ -1,3 +1,12 @@
+2022-02-05 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/src/mos6502/gen.c:
+	  Changed regalloc_dry_run_cost_cycles to float.
+	* sdcc/src/mos6502/ralloc.c,
+	  sdcc/src/mos6502/ralloc.h,
+	  sdcc/src/mos6502/ralloc2.cc:
+	  Initial merge of stm8 and pdk improvements to the register allocator.
+
 2022-02-04 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* support/scripts/sdcc.nsi:
@@ -46,7 +55,7 @@
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/gen.H,
+	  sdcc/src/mos6502/gen.h,
 	  sdcc/src/mos6502/main.c,
 	  sdcc/src/mos6502/ralloc.c,
 	  sdcc/src/mos6502/ralloc.h,

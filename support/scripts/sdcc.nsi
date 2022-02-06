@@ -1033,6 +1033,8 @@ ${Section} Uninstall SECUNINSTALL
 
   RMDir "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
 
+  Delete "$INSTDIR\lib\src\huge\Makefile"
+
   Delete "$INSTDIR\lib\src\large\Makefile"
 
   Delete "$INSTDIR\lib\src\medium\Makefile"
@@ -1073,7 +1075,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\sm83\Makefile"
 
   Delete "$INSTDIR\lib\src\r2k\*.s"
-  
+
   Delete "$INSTDIR\lib\src\r2ka\*.s"
 
   Delete "$INSTDIR\lib\src\r3ka\*.s"
@@ -1113,7 +1115,8 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\src\mos6502\*.s"
   Delete "$INSTDIR\lib\src\mos6502\mos6502.lib"
- 
+  Delete "$INSTDIR\lib\src\mos6502\Makefile"
+
   Delete "$INSTDIR\lib\src\z80n\*.s"
   Delete "$INSTDIR\lib\src\z80n\z80n.lib"
   Delete "$INSTDIR\lib\src\z80n\README"
@@ -1149,7 +1152,7 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\r2ka\*.rel"
   Delete "$INSTDIR\lib\r2ka\*.lib"
-  
+
   Delete "$INSTDIR\lib\r3ka\*.rel"
   Delete "$INSTDIR\lib\r3ka\*.lib"
 
@@ -1161,7 +1164,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\medium\*.lib"
 
   Delete "$INSTDIR\lib\large\*.lib"
-  
+
   Delete "$INSTDIR\lib\huge\*.lib"
 
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
@@ -1276,6 +1279,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\small"
   RMDir "$INSTDIR\lib\src\medium"
   RMDir "$INSTDIR\lib\src\large"
+  RMDir "$INSTDIR\lib\src\huge"
   RMDir "$INSTDIR\lib\src\mcs51"
   RMDir "$INSTDIR\lib\src\z80"
   RMDir "$INSTDIR\lib\src\z180"
@@ -1296,6 +1300,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\pdk15"
   RMDir "$INSTDIR\lib\src\pdk15-stack-auto"
   RMDir "$INSTDIR\lib\src\tlcs90"
+  RMDir "$INSTDIR\lib\src\mos6502"
   RMDir "$INSTDIR\lib\src\z80n"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
@@ -1328,6 +1333,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\pdk15"
   RMDir "$INSTDIR\lib\pdk15-stack-auto"
   RMDir "$INSTDIR\lib\tlcs90"
+  RMDir "$INSTDIR\lib\mos6502"
   RMDir "$INSTDIR\lib\z80n"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"

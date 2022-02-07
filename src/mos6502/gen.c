@@ -9547,10 +9547,11 @@ genPointerSet (iCode * ic)
     goto release;
   }
 
-#if 1
+#if 0
+    // FIXME FIXME: bug-3129 segfaults when optimizing for size
     // try absolute indexed
     // TODO: can do absolute indexed when AOP_SIZE(result)==1  (even when not REG)
-#if 1
+#if 0
     // abs,x or abs,y with index in register or memory
   if (rematOffset 
       && ( AOP_SIZE(result)==1

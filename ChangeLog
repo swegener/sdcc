@@ -1,5 +1,7 @@
 2022-02-06 Gabriele Gorla <gorlik@yahoo.com>
 
+	* sdcc/src/hc08/gen.c:
+	  Removed useless offset increment.
 	* sdcc/src/mos6502/gen.c:
 	  Track temp reg literal values across store/load.
 

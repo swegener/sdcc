@@ -55,6 +55,11 @@ static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_bytes;
 static float regalloc_dry_run_cost_cycles;
 
+struct attr_t {
+  bool isLiteral;
+  unsigned char literalValue;
+};
+
 static struct
 {
   int stackOfs;
@@ -64,6 +69,7 @@ static struct
 //  int baseStackPushes;
   set *sendSet;
   int tempOfs;
+  struct attr_t tempAttr[NUM_TEMP_REGS];
 }
 _G;
 
@@ -654,6 +660,12 @@ storeRegTemp (reg_info * reg, bool freereg)
   emitComment (REGOPS, "  storeRegTemp(%s) %s", reg ? reg->name : "-", freereg?"free":"");
 
   int regidx = reg->rIdx;
+
+  if(regidx<=Y_IDX) {
+    _G.tempAttr[_G.tempOfs].isLiteral=reg->isLitConst;
+    _G.tempAttr[_G.tempOfs].literalValue=reg->litConst;
+  }
+
   switch (regidx) {
     case A_IDX:
       emit6502op ("sta", TEMPFMT, _G.tempOfs++);
@@ -719,9 +731,21 @@ loadRegTemp (reg_info * reg)
       wassertl (0, "loadRegTemp()");
       break;
   }
+
   // TODO: should use stack to preserve state
   m6502_useReg (reg);
-  m6502_dirtyReg (reg);
+  if(regidx<=Y_IDX) {
+    reg->isLitConst=_G.tempAttr[_G.tempOfs].isLiteral;
+    reg->litConst=_G.tempAttr[_G.tempOfs].literalValue;
+  } else {
+    // FIXME: should be able to figure out from the two registers
+    reg->isLitConst=false;
+  }
+
+  reg->aop = NULL;
+
+ // if(!reg->isLitConst)  
+ //  m6502_dirtyReg (reg);
 }
 
 // TODO: note that needpull has diff. semantics than loadRegTemp()
@@ -765,6 +789,12 @@ loadOrFreeRegTemp (reg_info * reg, bool needpull)
     loadRegTemp (reg);
   else
     m6502_freeReg (reg);
+}
+
+static void
+dirtyRegTemp (int temp_reg_idx)
+{
+  _G.tempAttr[temp_reg_idx].isLiteral=false;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -7010,6 +7040,7 @@ XAccLsh (int shCount)
     case 7:
       storeRegTemp(m6502_reg_x, true);
       emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
+      dirtyRegTemp(_G.tempOfs - 1);
       rmwWithReg ("ror", m6502_reg_a);
       transferRegReg (m6502_reg_a, m6502_reg_x, false);
       loadRegFromConst (m6502_reg_a, 0);
@@ -7027,6 +7058,7 @@ XAccLsh (int shCount)
     {
       rmwWithReg ("asl", m6502_reg_a);
       emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
+      dirtyRegTemp(_G.tempOfs - 1);
     }
   loadRegTemp(m6502_reg_x);
 
@@ -7081,6 +7113,7 @@ XAccSRsh (int shCount)
           // TODO: this is so bad
           emit6502op ("cpx", "#0x80");
           emit6502op ("ror", TEMPFMT, _G.tempOfs - 1);
+          dirtyRegTemp(_G.tempOfs - 1);
           rmwWithReg ("ror", m6502_reg_a);
         }
       loadRegTemp(m6502_reg_x);
@@ -7122,6 +7155,7 @@ XAccRsh (int shCount, bool sign)
       storeRegTemp(m6502_reg_x, true);
       rmwWithReg ("rol", m6502_reg_a);
       emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
+      dirtyRegTemp(_G.tempOfs - 1);
       loadRegFromConst (m6502_reg_a, 0);
       rmwWithReg ("rol", m6502_reg_a);
       transferRegReg(m6502_reg_a, m6502_reg_x, true);
@@ -7136,6 +7170,7 @@ XAccRsh (int shCount, bool sign)
       for (i = 0; i < shCount; i++)
         {
           emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
+          dirtyRegTemp(_G.tempOfs - 1);
           rmwWithReg ("ror", m6502_reg_a);
         }
       loadRegTemp(m6502_reg_x);
@@ -7601,6 +7636,8 @@ genLeftShift (iCode * ic)
   else
     {
       emit6502op ("dec", TEMPFMT, count_offset);
+      // FIXME: could keep it literal
+      dirtyRegTemp(_G.tempOfs - 1);
       emitBranch ("bmi", tlbl1);
     }
 
@@ -7618,6 +7655,8 @@ genLeftShift (iCode * ic)
       emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
   } else {
       emit6502op("dec", TEMPFMT, count_offset );
+      // FIXME: could keep it literal
+      dirtyRegTemp(_G.tempOfs - 1);
       emit6502op("bpl", "%05d$", safeLabelKey2num (tlbl->key));
     }
 
@@ -8036,6 +8075,8 @@ genRightShift (iCode * ic)
   else
     {
       emit6502op ("dec", TEMPFMT, count_offset);
+      // could keep it literal
+      dirtyRegTemp(_G.tempOfs - 1);
       emitBranch ("bmi", tlbl1);
     }
 
@@ -8053,6 +8094,8 @@ genRightShift (iCode * ic)
         emit6502op("bne", "%05d$", safeLabelKey2num (tlbl->key));
   } else {
       emit6502op("dec", TEMPFMT, count_offset );
+      // FIXME: could keep it literal
+      dirtyRegTemp(_G.tempOfs - 1);
       emit6502op("bpl", "%05d$", safeLabelKey2num (tlbl->key));
     }
 

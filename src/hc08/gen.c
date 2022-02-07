@@ -4683,7 +4683,7 @@ genMinus (iCode * ic)
       loadRegFromAop (hc08_reg_a, rightOp, offset);
       accopWithAop (sub, leftOp, offset);
       accopWithMisc ("nega", "");
-      storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), offset++);
+      storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), offset);
       pullOrFreeReg (hc08_reg_a, needpulla);
       goto release;
     }

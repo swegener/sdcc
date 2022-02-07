@@ -8857,7 +8857,7 @@ genPointerGet (iCode * ic, iCode * ifx)
       goto release;
   }
 
-#if 0  
+#if 1  
 {
   // general case
   bool needloady = storeRegTempIfSurv(m6502_reg_y);
@@ -8883,10 +8883,10 @@ genPointerGet (iCode * ic, iCode * ifx)
           if(size>2) emitcode("ERROR"," size=%d", size);
             if (IS_AOP_YX (AOP (IC_RESULT (ic))))
             {
-          loadRegFromConst(m6502_reg_y, 1);
+              loadRegFromConst(m6502_reg_y, 0);
           emit6502op("lda", TEMPFMT_IY, tIdx);
           transferRegReg(m6502_reg_a, m6502_reg_x, true);
-          loadRegFromConst(m6502_reg_y, 0);
+              loadRegFromConst(m6502_reg_y, 1);
           emit6502op("lda", TEMPFMT_IY, tIdx);
           transferRegReg(m6502_reg_a, m6502_reg_y, true);
             }

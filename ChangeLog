@@ -1,3 +1,8 @@
+2022-02-07 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/src/mos6502/gen.c:
+	  Additional improvements to genPointerGet and genPointerSet.
+
 2022-02-06 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdcc/src/mos6502/gen.c:

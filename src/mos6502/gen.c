@@ -5029,9 +5029,7 @@ genPlusIncr (iCode * ic)
       loadRegFromAop (m6502_reg_a, AOP (result), 0);
       emit6502op("clc", "");
       accopWithAop ("adc", AOP (IC_RIGHT (ic)), 0);
-      m6502_useReg (m6502_reg_a);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
-      m6502_freeReg (m6502_reg_a);
       if (size > 1)
         emitBranch ("bcc", tlbl);
     }
@@ -8738,9 +8736,9 @@ genPointerGet (iCode * ic, iCode * ifx)
   emitComment (TRACEGEN|VVDBG, "      genPointerGet (%s) size=%d loff=%d rmoff=%s", 
                aopName(AOP(left)), size, litOffset, rematOffset );  
   
-  needpulla = storeRegTempIfSurv (m6502_reg_a);
   
-  if (AOP_TYPE (left) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size) {
+  if (AOP_TYPE (left) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size) 
+  {
     // pointer is already in zero page & 8-bit offset
     emitComment (TRACEGEN|VVDBG, "      genPointerGet - pointer already in zp");
     bool needloady = storeRegTempIfSurv(m6502_reg_y);
@@ -8748,7 +8746,8 @@ genPointerGet (iCode * ic, iCode * ifx)
 #if 0
     // seem to make perf worse
     if (size == 1 && litOffset == 0 
-          && ( /*m6502_reg_x->isDead || */ (m6502_reg_x->isLitConst && m6502_reg_x->litConst == 0) ) ) {
+          && ( /*m6502_reg_x->isDead || */ (m6502_reg_x->isLitConst && m6502_reg_x->litConst == 0) ) ) 
+      {
       // [aa,x] x == 0
       loadRegFromConst(m6502_reg_x,0);
       emit6502op ("lda", "[%s,x]", aopAdrStr ( AOP(left), 0, true ) );
@@ -8760,6 +8759,7 @@ genPointerGet (iCode * ic, iCode * ifx)
     if (sameRegs(AOP(left), AOP(result)) ) {
       // pointer and destination is the same - need avoid overwriting
       emitComment (TRACEGEN|VVDBG, "        genPointerGet - sameregs");
+      needpulla = storeRegTempIfSurv (m6502_reg_a);
       for (int i=size-1; i>=0; i--) {
         loadRegFromConst(m6502_reg_y, litOffset + i);
         emit6502op ("lda", "[*%s],y", AOP(left)->aopu.aop_dir);
@@ -8786,6 +8786,7 @@ genPointerGet (iCode * ic, iCode * ifx)
         }
       } else {
         // forward order
+        if (!IS_AOP_WITH_A(AOP(result))) needpulla = storeRegTempIfSurv (m6502_reg_a);
         for (int i=0; i<size; i++) {
           loadRegFromConst(m6502_reg_y, litOffset + i);
           emit6502op ("lda", "[%s],y", aopAdrStr ( AOP(left), 0, true ) );
@@ -8793,14 +8794,25 @@ genPointerGet (iCode * ic, iCode * ifx)
         }
       }
     }
+    loadOrFreeRegTemp (m6502_reg_a, needpulla);
     loadOrFreeRegTemp(m6502_reg_y, needloady);
     goto release;
   }
   
   // try absolute indexed
+#if 0
+  // allow index to be in memory
+  if (rematOffset 
+      && ( AOP_SIZE(left)==1
+          || ( AOP_TYPE(left) == AOP_REG && AOP(left)->aopu.aop_reg[1]->isLitConst ) ) )
+#else
+  // index can only be a register
   if (rematOffset && AOP_TYPE(left) == AOP_REG && 
-      (AOP_SIZE(left) == 1|| AOP(left)->aopu.aop_reg[1]->isLitConst /* && AOP(left)->aopu.aop_reg[1]->litConst == 0 */ )) {
+      (AOP_SIZE(left) == 1|| AOP(left)->aopu.aop_reg[1]->isLitConst ))
+#endif
+{
       emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
+#if 0
       // FIXME: should add ldx abs,y and ldy abs,x
       if(AOP(left)->aopu.aop_reg[0]->rIdx==X_IDX) {
         // already in X
@@ -8815,12 +8827,87 @@ genPointerGet (iCode * ic, iCode * ifx)
         loadOrFreeRegTemp(m6502_reg_y, needloady);
       }
       storeRegToAop (m6502_reg_a, AOP (result), 0);
+#else
+         unsigned int hi_offset=0;
+         char *dst_reg;
+         char idx_reg;
+
+         if(AOP_SIZE(left)==2)
+             hi_offset=(AOP(left)->aopu.aop_reg[1]->litConst)<<8;
+
+         if(AOP_TYPE(left)==AOP_REG) {
+           switch(AOP(left)->aopu.aop_reg[0]->rIdx) {
+             case X_IDX: idx_reg='x'; break;
+             case Y_IDX: idx_reg='y'; break;
+             case A_IDX: idx_reg='A'; break;
+             default: idx_reg='E'; break;
+           }
+         } else {
+           idx_reg='M';
+         }
+ 
+         if(AOP_TYPE(result)==AOP_REG) {
+           switch(AOP(result)->aopu.aop_reg[0]->rIdx) {
+             case A_IDX: dst_reg="lda"; break;
+             case X_IDX: dst_reg="ldx"; break;
+             case Y_IDX: dst_reg="ldy"; break;
+             default: dst_reg="ERROR"; break;
+           }
+         } else {
+           dst_reg="MEM";
+         }
+
+         // FIXME: bug-477927
+ //        if(idx_reg=='A') goto skip;
+
+         bool px = false;
+         bool py = false;
+         bool pa = false;
+
+         if(idx_reg=='A' || idx_reg=='M') {
+           if(dst_reg[2]=='y') {
+             px = storeRegTempIfSurv(m6502_reg_x);
+             loadRegFromAop(m6502_reg_x, AOP(left), 0 );
+             idx_reg='x';
+           } else if(dst_reg[2]=='x') {
+             py = storeRegTempIfSurv(m6502_reg_y);
+             loadRegFromAop(m6502_reg_y, AOP(left), 0 );
+             idx_reg='y';
+           } else {
+             // FIXME: should check for a free reg to avoid saving if possible
+             py = storeRegTempIfSurv(m6502_reg_y);
+             loadRegFromAop(m6502_reg_y, AOP(left), 0 );
+             idx_reg='y';
+           }
+           
+         }
+
+         if(dst_reg[2] == idx_reg || dst_reg[0]=='M') {
+//             loadRegFromAop (m6502_reg_a, AOP (right), 0);
+//             dst_reg="lda";
+             pa = storeRegTempIfSurv(m6502_reg_a);
+             emit6502op("lda", "(%s+%d+0x%04x),%c",
+                         rematOffset, litOffset, hi_offset, idx_reg );
+
+            storeRegToAop (m6502_reg_a, AOP (result), 0);
+            loadOrFreeRegTemp(m6502_reg_a,pa);
+         } else {
+           emit6502op(dst_reg, "(%s+%d+0x%04x),%c",
+                     rematOffset, litOffset, hi_offset, idx_reg );
+         }
+
+
+       loadOrFreeRegTemp(m6502_reg_x,px);
+       loadOrFreeRegTemp(m6502_reg_y,py);
+#endif
+      loadOrFreeRegTemp (m6502_reg_a, needpulla);
       goto release;
   }
  
   // indirect with a 8-bit offset
   if ( !rematOffset && litOffset>=0 && litOffset<=256-size) {
       emitComment (TRACEGEN|VVDBG,"   %s - indirect with 8-bit offset", __func__);
+      needpulla = storeRegTempIfSurv (m6502_reg_a);
       bool needloady = storeRegTempIfSurv(m6502_reg_y);
       tIdx = _G.tempOfs;
       if(AOP_TYPE(left) == AOP_REG) {
@@ -8854,12 +8941,14 @@ genPointerGet (iCode * ic, iCode * ifx)
       loadRegTemp(NULL);
       loadRegTemp(NULL);
       loadOrFreeRegTemp(m6502_reg_y, needloady);
+      loadOrFreeRegTemp (m6502_reg_a, needpulla);
       goto release;
   }
 
 #if 1  
 {
   // general case
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
   bool needloady = storeRegTempIfSurv(m6502_reg_y);
   bool savea = false;
   if(IS_AOP_AX(AOP(left))) {
@@ -8925,6 +9014,7 @@ genPointerGet (iCode * ic, iCode * ifx)
   loadRegTemp(NULL);
   loadRegTemp(NULL);
   loadOrFreeRegTemp(m6502_reg_y, needloady);
+  loadOrFreeRegTemp (m6502_reg_a, needpulla);
   goto release;
 }
 
@@ -8988,6 +9078,7 @@ genPointerGet (iCode * ic, iCode * ifx)
     }
     
   unpreparePointer();
+  loadOrFreeRegTemp (m6502_reg_a, needpulla);
 #endif
 
 release:
@@ -8996,7 +9087,7 @@ release:
   freeAsmop (result, NULL, ic, true);
 
 //  emit6502op("php", "");//TODO
-  loadOrFreeRegTemp (m6502_reg_a, needpulla);
+//  loadOrFreeRegTemp (m6502_reg_a, needpulla);
 //  emit6502op("plp", "");
 
   if (ifx && !ifx->generated)
@@ -9404,13 +9495,21 @@ genPointerSet (iCode * ic)
           return;
     }
 
+  aopOp (right, ic, false);
+  //aopOp (left, ic, false);
+
+  size = AOP_SIZE (right);
 
   decodePointerOffset (left, &litOffset, &rematOffset);
 
-  aopOp (right, ic, false);
-  size = AOP_SIZE (right);
+  emitComment (TRACEGEN|VVDBG,"   %s -   res: %s ", __func__, aopName(AOP(result)));
+//  emitComment (TRACEGEN|VVDBG,"   %s -  left: %s ", __func__, aopName(AOP(left)));
+  emitComment (TRACEGEN|VVDBG,"   %s - right: %s ", __func__, aopName(AOP(right)));
 
-  emitComment (TRACEGEN|VVDBG, "      genPointerSet (%s), litoffset=%d, rematoffset=%s", aopName(AOP(right)), litOffset, rematOffset );
+  emitComment (TRACEGEN|VVDBG, "      genPointerSet (%s), size=%d, litoffset=%d, rematoffset=%s", 
+               aopName(AOP(right)), size, litOffset, rematOffset );
+
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
 
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location
@@ -9418,12 +9517,15 @@ genPointerSet (iCode * ic)
       && AOP_TYPE (result) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size
       && !sameRegs(AOP(right), AOP(result)) ) {
   
-    needpulla = storeRegTempIfSurv (m6502_reg_a);
+#if 0
     if (size == 1 && litOffset == 0 && m6502_reg_x->isLitConst && m6502_reg_x->litConst == 0) {
       // use [aa,x] if only 1 byte and offset is 0
       loadRegFromAop (m6502_reg_a, AOP (right), 0);
       emit6502op ("sta", "[%s,x]", aopAdrStr ( AOP(result), 0, true ) );
-    } else {
+    } 
+    else
+#endif
+    {
       // otherwise use [aa],y
       needpully = storeRegTempIfUsed (m6502_reg_y);
       if (IS_AOP_AX(AOP(right))) {
@@ -9445,7 +9547,91 @@ genPointerSet (iCode * ic)
     goto release;
   }
 
-  needpulla = storeRegTempIfSurv (m6502_reg_a);
+#if 1
+    // try absolute indexed
+    // TODO: can do absolute indexed when AOP_SIZE(result)==1  (even when not REG)
+#if 1
+    // abs,x or abs,y with index in register or memory
+  if (rematOffset 
+      && ( AOP_SIZE(result)==1
+           || ( AOP_TYPE(result) == AOP_REG && AOP(result)->aopu.aop_reg[1]->isLitConst ) ) )
+#else
+    // abs,x or abs,y with index in register
+  if (rematOffset && ( AOP_TYPE(result)== AOP_REG
+           && ( AOP_SIZE(result) == 1 || AOP(result)->aopu.aop_reg[1]->isLitConst ) ) )
+#endif
+      {
+      emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
+      emitComment(TRACEGEN|VVDBG," reg : %d  size:%d", AOP(right)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(right) );
+
+         emitcode(";","AOP TYPE(result)=%d",AOP_TYPE (result));
+         emitcode(";","AOP(right) reg=%d",AOP(right)->aopu.aop_reg[0]->rIdx);
+         unsigned int hi_offset=0;
+         char *src_reg;
+         char idx_reg;
+
+         if(AOP_SIZE(result)==2)
+             hi_offset=(AOP(result)->aopu.aop_reg[1]->litConst)<<8;
+
+         if(AOP_TYPE(result)==AOP_REG) {
+           switch(AOP(result)->aopu.aop_reg[0]->rIdx) {
+             case X_IDX: idx_reg='x'; break;
+             case Y_IDX: idx_reg='y'; break;
+             case A_IDX: idx_reg='A'; break;
+             default: idx_reg='E'; break;
+           }
+         } else {
+           idx_reg='M';
+         }
+
+         if(AOP_TYPE(right)==AOP_REG) {
+           switch(AOP(right)->aopu.aop_reg[0]->rIdx) {
+             case A_IDX: src_reg="sta"; break;
+             case X_IDX: src_reg="stx"; break;
+             case Y_IDX: src_reg="sty"; break;
+             default: src_reg="ERROR"; break;
+           }
+         } else {
+           src_reg="MEM";
+         }
+
+         // FIXME: bug-477927, bug2740884
+         if(idx_reg=='A') goto skip;
+
+         bool px = false;
+         bool py = false;
+
+         if(idx_reg=='A' || idx_reg=='M') {
+           if(src_reg[2]!='y') {
+             py = storeRegTempIfUsed(m6502_reg_y);
+//             transferRegReg(m6502_reg_a, m6502_reg_y, false);
+             loadRegFromAop(m6502_reg_y, AOP(result), 0 );
+             idx_reg='y';
+           } else if(src_reg[2]!='x') {
+             px = storeRegTempIfUsed(m6502_reg_x);
+//             transferRegReg(m6502_reg_a, m6502_reg_x, false);
+             loadRegFromAop(m6502_reg_x, AOP(result), 0 );
+             idx_reg='x';
+           }
+         }
+
+         if(src_reg[0]=='M') {
+             loadRegFromAop (m6502_reg_a, AOP (right), 0);
+             src_reg="sta";
+         }
+
+         emit6502op(src_reg, "(%s+%d+0x%04x),%c",
+                     rematOffset, litOffset, hi_offset, idx_reg );
+
+       loadOrFreeRegTemp(m6502_reg_x,px);
+       loadOrFreeRegTemp(m6502_reg_y,py);
+
+       goto release;
+     } 
+skip:
+#endif
+
+//  needpulla = storeRegTempIfSurv (m6502_reg_a);
   needpullx = storeRegTempIfSurv (m6502_reg_x);
   needpully = storeRegTempIfSurv (m6502_reg_y);
 

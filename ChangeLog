@@ -1,3 +1,18 @@
+2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdcc/device/include/mcs51/p89lpc9321.h,
+	  sdcc/device/include/mcs51/p89lpc9331.h,
+	  sdcc/device/include/mcs51/p89lpc9351.h:
+	  Switch from Windows 1252 to UTF-8.
+	* sdcc/sdas/as6500/r65pst.c,
+	  sdcc/support/regression/tests/bitfields-dead-loop.c,
+	  sdcc/support/regression/tests/bitfields-bits1.c,
+	  sdcc/support/regression/tests/bitfields-checks.c,
+	  sdcc/support/sdbinutils/binutils/bfdtest2.c,
+	  sdcc/device/include/mcs51/w7100.h,
+	  sdcc/device/include/mcs51/at89c51id2.h:
+	  Switch from mixed CRLF/LF to LF.
+
 2022-02-08 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* configure,

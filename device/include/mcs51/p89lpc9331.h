@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
    p89lpc9331.h - Register Declarations for NXP  the P89LPC9331/P89LPC9341
-   (Based on user manual (UM10308_3) Rev. 03 — 17 June 2009)
+   (Based on user manual (UM10308_3) Rev. 03 - 17 June 2009)
 
    Copyright (C) 2009, Jesus Calvino-Fraga / jesusc at ece.ubc.ca
 

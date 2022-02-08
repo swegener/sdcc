@@ -709,15 +709,23 @@ loadRegTemp (reg_info * reg)
   }
     
   int regidx = reg->rIdx;
+  if(regidx<=Y_IDX) {
+    _G.tempOfs--;
+    if(_G.tempAttr[_G.tempOfs].isLiteral) {
+      loadRegFromConst(reg, _G.tempAttr[_G.tempOfs].literalValue);
+      return;
+    }
+  }
+   
   switch (regidx) {
     case A_IDX:
-      emit6502op ("lda", TEMPFMT, --_G.tempOfs);
+      emit6502op ("lda", TEMPFMT, _G.tempOfs);
       break;
     case X_IDX:
-      emit6502op ("ldx", TEMPFMT, --_G.tempOfs);
+      emit6502op ("ldx", TEMPFMT, _G.tempOfs);
       break;
     case Y_IDX:
-      emit6502op ("ldy", TEMPFMT, --_G.tempOfs);
+      emit6502op ("ldy", TEMPFMT, _G.tempOfs);
       break;
     case YX_IDX:
       loadRegTemp(m6502_reg_y);
@@ -732,20 +740,10 @@ loadRegTemp (reg_info * reg)
       break;
   }
 
-  // TODO: should use stack to preserve state
+// FIXME: figure out if register pairs are literals
+
   m6502_useReg (reg);
-  if(regidx<=Y_IDX) {
-    reg->isLitConst=_G.tempAttr[_G.tempOfs].isLiteral;
-    reg->litConst=_G.tempAttr[_G.tempOfs].literalValue;
-  } else {
-    // FIXME: should be able to figure out from the two registers
-    reg->isLitConst=false;
-  }
-
-  reg->aop = NULL;
-
- // if(!reg->isLitConst)  
- //  m6502_dirtyReg (reg);
+  m6502_dirtyReg (reg);
 }
 
 // TODO: note that needpull has diff. semantics than loadRegTemp()
@@ -9563,10 +9561,10 @@ genPointerSet (iCode * ic)
 #endif
       {
       emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
-      emitComment(TRACEGEN|VVDBG," reg : %d  size:%d", AOP(right)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(right) );
+      emitComment(TRACEGEN|VVDBG," reg : %d  size:%d", AOP(result)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(result) );
 
          emitcode(";","AOP TYPE(result)=%d",AOP_TYPE (result));
-         emitcode(";","AOP(right) reg=%d",AOP(right)->aopu.aop_reg[0]->rIdx);
+         emitcode(";","AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
          unsigned int hi_offset=0;
          char *src_reg;
          char idx_reg;

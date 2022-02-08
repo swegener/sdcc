@@ -87,7 +87,7 @@ CL12::exec_b7(void)
 }
 
 int
-CL12::psh8(u8_t op)
+CL12::i_psh8(u8_t op)
 {
   cSP.W(rSP-1);
   rom->write(rSP, op);
@@ -96,7 +96,7 @@ CL12::psh8(u8_t op)
 }
 
 int
-CL12::pul8(class cl_memory_cell &dest)
+CL12::i_pul8(class cl_memory_cell &dest)
 {
   u8_t v;
   v= rom->read(rSP);
@@ -107,7 +107,7 @@ CL12::pul8(class cl_memory_cell &dest)
 }
 
 int
-CL12::psh16(u16_t op)
+CL12::i_psh16(u16_t op)
 {
   cSP.W(rSP-1);
   rom->write(rSP, op);
@@ -118,7 +118,7 @@ CL12::psh16(u16_t op)
 }
 
 int
-CL12::pul16(class cl_memory_cell &dest)
+CL12::i_pul16(class cl_memory_cell &dest)
 {
   u16_t v;
   v= read_addr(rom, rSP);

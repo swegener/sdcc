@@ -1,8 +1,8 @@
-# 1 "decode.h"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "decode.h"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "/usr/include/stdc-predef.h" 1 3 4
-# 1 "<command-line>" 2
+# 0 "<command-line>" 2
 # 1 "decode.h"
 # 1 "gen.h" 1
 # 2 "decode.h" 2
@@ -275,18 +275,18 @@ int wrap_0_2d(class CL12 *uc, t_mem code) { return uc-> BLT ( 0x2d ); }
 int wrap_0_2e(class CL12 *uc, t_mem code) { return uc-> BGT ( 0x2e ); }
 int wrap_0_2f(class CL12 *uc, t_mem code) { return uc-> BLE ( 0x2f ); }
 
-int wrap_0_30(class CL12 *uc, t_mem code) { return uc-> pul16 ( _cX ); }
-int wrap_0_31(class CL12 *uc, t_mem code) { return uc-> pul16 ( _cY ); }
-int wrap_0_32(class CL12 *uc, t_mem code) { return uc-> pul8 ( _cA ); }
-int wrap_0_33(class CL12 *uc, t_mem code) { return uc-> pul8 ( _cB ); }
-int wrap_0_34(class CL12 *uc, t_mem code) { return uc-> psh16 ( _Xop ); }
-int wrap_0_35(class CL12 *uc, t_mem code) { return uc-> psh16 ( _Yop ); }
-int wrap_0_36(class CL12 *uc, t_mem code) { return uc-> psh8 ( _Aop ); }
-int wrap_0_37(class CL12 *uc, t_mem code) { return uc-> psh8 ( _Bop ); }
-int wrap_0_38(class CL12 *uc, t_mem code) { return uc-> pul8 ( _cC ); }
-int wrap_0_39(class CL12 *uc, t_mem code) { return uc-> psh8 ( _Cop ); }
-int wrap_0_3a(class CL12 *uc, t_mem code) { return uc-> pul16 ( _cD ); }
-int wrap_0_3b(class CL12 *uc, t_mem code) { return uc-> psh16 ( _Dop ); }
+int wrap_0_30(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cX ); }
+int wrap_0_31(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cY ); }
+int wrap_0_32(class CL12 *uc, t_mem code) { return uc-> i_pul8 ( _cA ); }
+int wrap_0_33(class CL12 *uc, t_mem code) { return uc-> i_pul8 ( _cB ); }
+int wrap_0_34(class CL12 *uc, t_mem code) { return uc-> i_psh16 ( _Xop ); }
+int wrap_0_35(class CL12 *uc, t_mem code) { return uc-> i_psh16 ( _Yop ); }
+int wrap_0_36(class CL12 *uc, t_mem code) { return uc-> i_psh8 ( _Aop ); }
+int wrap_0_37(class CL12 *uc, t_mem code) { return uc-> i_psh8 ( _Bop ); }
+int wrap_0_38(class CL12 *uc, t_mem code) { return uc-> i_pul8 ( _cC ); }
+int wrap_0_39(class CL12 *uc, t_mem code) { return uc-> i_psh8 ( _Cop ); }
+int wrap_0_3a(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cD ); }
+int wrap_0_3b(class CL12 *uc, t_mem code) { return uc-> i_psh16 ( _Dop ); }
 
 int wrap_0_a7(class CL12 *uc, t_mem code) { return uc-> NOP ( 0xa7 ); }
 

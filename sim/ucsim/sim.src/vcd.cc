@@ -89,9 +89,9 @@ static int dup3(int oldfd, int newfd, int flags) { return dup2(oldfd, newfd); }
 #  endif
 */
 
-#  if !defined(HAVE_PIPE2)
+#if !defined(HAVE_PIPE2) || defined(__CYGWIN__)
 static int pipe2(int pipefd[2], int flags) { return pipe(pipefd); }
-#  endif
+#endif
 
 #endif
 

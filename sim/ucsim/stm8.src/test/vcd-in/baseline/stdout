@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -14,8 +14,6 @@ Breakpoint 1 at 0x00800c:
 0x0800c F  cc 80 0c       jp     0x800c <.loop$0> (cond="")
 run
 Simulation started, PC=0x008000
-Loading from [ELIDED]
-15 words read from [ELIDED]
 
 Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -44,7 +42,6 @@ set hw vcd starttime 5 us
 
 # Make sure what it is going to do is what we asked.
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -76,7 +73,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       input
   Break:      enabled
   Time scale: 1 ps
@@ -260,7 +256,6 @@ dump rom 0 1
 set hw vcd pause
 Paused
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -330,7 +325,6 @@ F 0x00800c
 set hw vcd pause
 Unpaused
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -575,7 +569,6 @@ dump rom 0 1
 # Stop now
 set hw vcd stop
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]

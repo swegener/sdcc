@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -365,7 +365,3 @@ dc 0x8000 0x082a4
 0x082a1    <forever>:
 0x082a1    8f             wfi[0K
 0x082a2    cc 82 a1       jp     0x82a1 <forever>[0K
-Loading from [ELIDED]
-697 words read from [ELIDED]
-Loading from [ELIDED]
-697 words read from [ELIDED]

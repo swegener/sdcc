@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -196,5 +196,3 @@ dc 0x0100 0x0210
 0x020c  ? 01 00 00    LD     BC,0x0000[0K
 0x020f  ? 78          LD     A,B[0K
 0x0210  ? b1          OR     C[0K
-Loading from [ELIDED]
-65 words read from [ELIDED]

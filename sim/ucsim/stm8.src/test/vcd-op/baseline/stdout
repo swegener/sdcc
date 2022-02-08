@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -13,7 +13,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -46,7 +45,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -63,7 +61,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -104,7 +101,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -121,7 +117,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -152,7 +147,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -170,7 +164,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -182,7 +175,6 @@ vcd[0] value change dump
     rom[0x00100]      
 # vcd[0] should be clocked (on) until we have exceeded the pause limit.
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -213,7 +205,6 @@ set mem rom[0x100] 16
 0x00100                       10 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -244,7 +235,6 @@ set mem rom[0x100] 17
 0x00100                       11 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -275,7 +265,6 @@ set mem rom[0x100] 18
 0x00100                       12 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -306,7 +295,6 @@ set mem rom[0x100] 19
 0x00100                       13 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -354,7 +342,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -371,7 +358,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000003700000000 s
@@ -397,7 +383,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000003700000000 s
@@ -413,7 +398,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s

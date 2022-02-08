@@ -174,12 +174,13 @@ cl_console_base::welcome(void)
 {
   if (!(flags & CONS_NOWELCOME))
     {
-      dd_printf("uCsim%s, Copyright (C) 1997 Daniel Drotos.\n"
+      dd_printf("uCsim%s, Copyright (C) %s Daniel Drotos.\n"
         "uCsim comes with ABSOLUTELY NO WARRANTY; for details type "
         "`show w'.\n"
         "This is free software, and you are welcome to redistribute it\n"
         "under certain conditions; type `show c' for details.\n",
-		(application->quiet)?"":(" " VERSIONSTR)
+		(application->quiet)?"":(" " VERSIONSTR),
+		(application->quiet)?"":"1997"
 		);
     }
 }

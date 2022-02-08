@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -12,7 +12,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: auto set on start
   Start time: 0.000000000000000 s
@@ -30,8 +29,6 @@ Breakpoint 1 at 0x00800c:
 0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0 (cond="")
 run
 Simulation started, PC=0x008000
-Loading from [ELIDED]
-111 words read from [ELIDED]
 
 Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -63,7 +60,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000004000000000 s

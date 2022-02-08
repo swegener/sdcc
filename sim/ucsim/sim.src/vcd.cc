@@ -90,9 +90,7 @@ static int dup3(int oldfd, int newfd, int flags) { return dup2(oldfd, newfd); }
 #  endif
 */
 
-#if !defined(HAVE_PIPE2) || defined(__CYGWIN__)
-static int pipe2(int pipefd[2], int flags) { return pipe(pipefd); }
-#endif
+static int spipe2(int pipefd[2], int flags) { return pipe(pipefd); }
 
 #endif
 
@@ -310,7 +308,7 @@ cl_vcd::open_vcd(class cl_console_base *con)
       int p[2];
       pid_t pid;
 
-      if (!pipe2(p, O_CLOEXEC))
+      if (!spipe2(p, O_CLOEXEC))
         {
           if ((pid = fork()) > 0)
             {
@@ -767,6 +765,8 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 
                       // generate vcd file header
                       time_t now = time(NULL);
+		      if (application->quiet)
+			now= (time_t)0;
                       fprintf(fd, "$date\n\t%s$end\n$version\n\tucsim\n$end\n$timescale ", ctime(&now));
                       if (timescale >= 1e15)
                         fprintf(fd, "%.0ffs", timescale * 1e-15);

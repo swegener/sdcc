@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -6,8 +6,6 @@ under certain conditions; type `show c' for details.
 set option analyzer false
 
 step
-Loading from [ELIDED]
-3667 words read from [ELIDED]
 
 Stop at 0x008088: (109) stepped 3 ticks
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .

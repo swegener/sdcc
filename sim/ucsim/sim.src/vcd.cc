@@ -43,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 #include "stypes.h"
 #include "utils.h"
+#include "globals.h"
 
 // sim
 #include "appcl.h"
@@ -1091,7 +1092,8 @@ cl_vcd::print_info(class cl_console_base *con)
   con->dd_printf("  Modul:      %s\n", modul.c_str());
   con->dd_printf("  Started:    %s\n", (started ? "YES" : "no"));
   con->dd_printf("  Paused:     %s\n", (paused ? "YES" : "no"));
-  con->dd_printf("  File:       %s\n", (filename ? filename : "(none)"));
+  if (!application->quiet)
+    con->dd_printf("  File:       %s\n", (filename ? filename : "(none)"));
 
   if (state != -1)
     {

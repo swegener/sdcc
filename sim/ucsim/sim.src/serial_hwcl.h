@@ -63,6 +63,7 @@ class cl_serial_hw: public cl_hw
   class cl_optref *serial_port_option;
   class cl_optref *serial_iport_option;
   class cl_optref *serial_oport_option;
+  class cl_optref *serial_ifirst_option;
   class cl_serial_listener *listener;
   //class cl_hw_io *io;
   char input;

@@ -493,6 +493,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	{
 	  char *iname= NULL, *oname= NULL;
 	  int uart=0, port=0, iport= 0, oport= 0;
+	  bool ifirst= false;
 	  subopts= optarg;
 	  while (*subopts != '\0')
 	    {
@@ -504,6 +505,8 @@ cl_app::proc_arguments(int argc, char *argv[])
 		    exit(1);
 		  }
 		  iname= value;
+		  if (oname == NULL)
+		    ifirst= true;
 		  break;
 		case SOPT_OUT:
 		  if (value == NULL) {
@@ -514,6 +517,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 		  break;
 		case SOPT_UART: case SOPT_USART:
 		  uart= strtol(value, 0, 0);
+		  ifirst= false;
+		  iname= oname= NULL;
+		  port= iport= oport= 0;
 		  break;
 		case SOPT_PORT:
 		  port= strtol(value, 0, 0);
@@ -539,6 +545,18 @@ cl_app::proc_arguments(int argc, char *argv[])
 	    {
 	      char *s, *h;
 	      class cl_option *o;
+	      s= format_string("serial%d_ifirst", uart);
+	      if ((o= options->get_option(s)) == NULL)
+		{
+		  h= format_string("Open input file for uart%d first", uart);
+		  o= new cl_bool_option(this, s, h);
+		  o->init();
+		  o->hide();
+		  options->add(o);
+		  free(h);
+		}
+	      options->set_value(s, this, ifirst);
+	      free(s);
 	      if (iname)
 		{
 		  s= format_string("serial%d_in_file", uart);

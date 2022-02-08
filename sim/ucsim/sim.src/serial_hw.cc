@@ -53,6 +53,7 @@ cl_serial_hw::~cl_serial_hw(void)
 {
   delete serial_in_file_option;
   delete serial_out_file_option;
+  delete serial_ifirst_option;
   delete io;
 }
 
@@ -75,6 +76,11 @@ cl_serial_hw::init(void)
   serial_out_file_option= new cl_optref(this);
   serial_out_file_option->init();
   serial_out_file_option->use(s);
+  free(s);
+  s= format_string("serial%d_ifirst", id);
+  serial_ifirst_option= new cl_optref(this);
+  serial_ifirst_option->init();
+  serial_ifirst_option->use(s);
   free(s);
 
   s= format_string("serial%d_port", id);
@@ -144,32 +150,65 @@ cl_serial_hw::init(void)
 
   const char *f_serial_in = serial_in_file_option->get_value("");
   const char *f_serial_out= serial_out_file_option->get_value("");
+  bool ifirst= false;
+  ifirst= serial_ifirst_option->get_value(ifirst);
   class cl_f *fi, *fo;
-  if (f_serial_in && *f_serial_in)
-    {
-      if (f_serial_in[0] == '\001')
-	fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
-      else
-	fi= mk_io(f_serial_in, "r");
-      if (!fi->tty)
-	fprintf(stderr, "Warning: serial input interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fi= 0;//mk_io(chars(""), chars(""));
-  if (f_serial_out && *f_serial_out)
-    {
-      if (f_serial_out[0] == '\001')
-	fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
-      else
-	fo= mk_io(chars(f_serial_out), "w");
-      if (!fo->tty)
-	fprintf(stderr, "Warning: serial output interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fo= 0;//mk_io(chars(""), chars(""));
 
+  if (ifirst)
+    {
+      if (f_serial_in && *f_serial_in)
+	{
+	  if (f_serial_in[0] == '\001')
+	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
+	  else
+	    fi= mk_io(f_serial_in, "r");
+	  if (!fi->tty)
+	    fprintf(stderr, "Warning: serial input interface connected to a "
+		    "non-terminal file.\n");
+	}
+      else
+	fi= 0;//mk_io(chars(""), chars(""));
+      if (f_serial_out && *f_serial_out)
+	{
+	  if (f_serial_out[0] == '\001')
+	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
+	  else
+	    fo= mk_io(chars(f_serial_out), "w");
+	  if (!fo->tty)
+	    fprintf(stderr, "Warning: serial output interface connected to a "
+		    "non-terminal file.\n");
+	}
+      else
+	fo= 0;//mk_io(chars(""), chars(""));
+    }
+  else
+    {
+      if (f_serial_out && *f_serial_out)
+	{
+	  if (f_serial_out[0] == '\001')
+	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
+	  else
+	    fo= mk_io(chars(f_serial_out), "w");
+	  if (!fo->tty)
+	    fprintf(stderr, "Warning: serial output interface connected to a "
+		    "non-terminal file.\n");
+	}
+      else
+	fo= 0;//mk_io(chars(""), chars(""));
+      if (f_serial_in && *f_serial_in)
+	{
+	  if (f_serial_in[0] == '\001')
+	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
+	  else
+	    fi= mk_io(f_serial_in, "r");
+	  if (!fi->tty)
+	    fprintf(stderr, "Warning: serial input interface connected to a "
+		    "non-terminal file.\n");
+	}
+      else
+	fi= 0;//mk_io(chars(""), chars(""));
+    }
+  
   io->replace_files(true, fi, fo);
   
   if (fi)

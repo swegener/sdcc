@@ -2,8 +2,6 @@ uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-Warning: "6850" is dereferencing a non-existent string option: ?
-Warning: "6850" is dereferencing a non-existent string option: ?
 ucsim version [ELIDED]
 Type of microcontroller: M6800
 Controller has 9 hardware element(s).

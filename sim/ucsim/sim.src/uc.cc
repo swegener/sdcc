@@ -1662,29 +1662,37 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
   
   if (!f)
     {
-      if (con) con->dd_printf("no loadable file found\n");
+      if (con)
+	con->dd_printf("no loadable file found (%s)\n", nam.c_str());
+      else
+	printf("no loadable file found (%s)\n", nam.c_str());
       return 0;
     }
-  /*if (con) con->dd_*/printf("Loading from %s\n", f->get_file_name());
+  if (!application->quiet)
+    printf("Loading from %s\n", f->get_file_name());
   if (is_asc_file(f))
     {
       l= read_asc_file(f);
-      printf("%ld words read from %s\n", l, f->get_fname());
+      if (!application->quiet)
+	printf("%ld words read from %s\n", l, f->get_fname());
     }
   if (is_hex_file(f))
     {
       l= read_hex_file(f);
-      printf("%ld words read from %s\n", l, f->get_fname());
+      if (!application->quiet)
+	printf("%ld words read from %s\n", l, f->get_fname());
     }
   else if (is_omf_file(f))
     {
       l= read_omf_file(f);
-      printf("%ld words read from %s\n", l, f->get_fname());
+      if (!application->quiet)
+	printf("%ld words read from %s\n", l, f->get_fname());
     }
   else if (is_cdb_file(f))
     {
       l= read_cdb_file(f);
-      printf("%ld symbols read from %s\n", l, f->get_fname());
+      if (!application->quiet)
+	printf("%ld symbols read from %s\n", l, f->get_fname());
     }
   if (strcmp(nam, f->get_fname()) != 0)
     {
@@ -1694,7 +1702,8 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
       if (c->opened())
 	{
 	  l= read_cdb_file(c);
-	  printf("%ld symbols read from %s\n", l, c->get_fname());
+	  if (!application->quiet)
+	    printf("%ld symbols read from %s\n", l, c->get_fname());
 	}
       delete c;
     }

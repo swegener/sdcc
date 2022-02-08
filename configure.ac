@@ -1,14 +1,15 @@
 #!/bin/sh
 
-AC_PREREQ(2.60)
-AC_INIT(.version)
+AC_PREREQ([2.71])
+AC_INIT
+AC_CONFIG_SRCDIR([.version])
 AC_CONFIG_SRCDIR([Makefile.in])
 
 # Determine the host and build type.
 # ===========================================================================
 AC_CANONICAL_HOST
 
-AC_CONFIG_HEADER([sdccconf.h:sdccconf_in.h sdas/linksrc/asxxxx_config.h])
+AC_CONFIG_HEADERS([sdccconf.h:sdccconf_in.h sdas/linksrc/asxxxx_config.h])
 
 AC_PROG_AWK
 
@@ -76,7 +77,7 @@ AC_DEFUN([SDCC_REQUIRE_PROG],
 SDCC_REQUIRE_PROG($YACC, bison)
 SDCC_REQUIRE_PROG($LEX, flex)
 
-AC_LANG_C
+AC_LANG([C])
 
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
 AC_CHECK_HEADERS(uchar.h)
@@ -87,7 +88,7 @@ AC_CHECK_HEADERS(boost/graph/adjacency_list.hpp,,AC_MSG_ERROR([[boost library no
 AC_LANG_POP([C++])
 
 AC_ARG_WITH([ccache],
-    AC_HELP_STRING([--without-ccache], [do not use ccache even if available]),
+    AS_HELP_STRING([--without-ccache],[do not use ccache even if available]),
     [], [])
 case x${with_ccache-yes} in
     xyes) AC_CHECK_PROG([CCACHE], [ccache], [ccache], []) ;;
@@ -432,7 +433,19 @@ fi
 
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
-AC_TYPE_SIGNAL
+m4_warn([obsolete],
+[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -681,7 +694,7 @@ AH_BOTTOM([#endif /* SDCCCONF_HEADER */])
 #   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. DOC
 #   $3 help string
 AC_DEFUN([AC_DO_ENABLER], [
-  AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], $3))
+  AC_ARG_ENABLE($1, AS_HELP_STRING([--enable-$1],[$3]))
 
   if test "[$]enable_$1" = "yes"; then
     OPT_ENABLE_$2=1
@@ -698,7 +711,7 @@ AC_DEFUN([AC_DO_ENABLER], [
 #   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. UCSIM
 #   $3 help string
 AC_DEFUN([AC_DO_DISABLER], [
-  AC_ARG_ENABLE($1, AC_HELP_STRING([--disable-$1], $3))
+  AC_ARG_ENABLE($1, AS_HELP_STRING([--disable-$1],[$3]))
 
   dnl the '-' in 'device-lib' needs special handling,
   dnl because the variable is 'enable_device_lib'
@@ -721,7 +734,7 @@ AC_DEFUN([AC_DO_DISABLER], [
 #   $4 help string
 AC_DEFUN([AC_DO_PORT], [
   AC_ARG_ENABLE($1-port,
-                AC_HELP_STRING([--disable-$1-port], $4))
+                AS_HELP_STRING([--disable-$1-port],[$4]))
 
   if test "[$]enable_$1_port" = "no"; then
     OPT_DISABLE_$3=1
@@ -746,7 +759,7 @@ AC_DEFUN([AC_DO_PORT], [
 #   $4 help string
 AC_DEFUN([AC_DO_PORT_ENABLER], [
   AC_ARG_ENABLE($1-port,
-                AC_HELP_STRING([--enable-$1-port], $4))
+                AS_HELP_STRING([--enable-$1-port],[$4]))
 
   if test "[$]enable_$1_port" = "yes"; then
     OPT_DISABLE_$3=0
@@ -1039,8 +1052,8 @@ sdcc ${VERSION} is now configured for
     pdk14               ${enable_pdk14_port}
     pdk15               ${enable_pdk15_port}
     pdk16               ${enable_pdk16_port}
-    mos6502		${enable_mos6502_port}
-    mos65c02		${enable_mos65c02_port}
+    mos6502             ${enable_mos6502_port}
+    mos65c02            ${enable_mos65c02_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}

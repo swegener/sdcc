@@ -1,3 +1,9 @@
+2022-02-08 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* configure,
+	  configure.ac:
+	  Fix alignment of 6502 and 65c02 port in configure output.
+
 2022-02-08 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdcc/src/mos6502/gen.c:

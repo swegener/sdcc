@@ -3150,6 +3150,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 # Determine the host and build type.
 # ===========================================================================
 
@@ -11037,8 +11038,8 @@ sdcc ${VERSION} is now configured for
     pdk14               ${enable_pdk14_port}
     pdk15               ${enable_pdk15_port}
     pdk16               ${enable_pdk16_port}
-    mos6502		${enable_mos6502_port}
-    mos65c02		${enable_mos65c02_port}
+    mos6502             ${enable_mos6502_port}
+    mos65c02            ${enable_mos65c02_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
@@ -11116,8 +11117,8 @@ sdcc ${VERSION} is now configured for
     pdk14               ${enable_pdk14_port}
     pdk15               ${enable_pdk15_port}
     pdk16               ${enable_pdk16_port}
-    mos6502		${enable_mos6502_port}
-    mos65c02		${enable_mos65c02_port}
+    mos6502             ${enable_mos6502_port}
+    mos65c02            ${enable_mos65c02_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}

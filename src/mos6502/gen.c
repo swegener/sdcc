@@ -9507,7 +9507,7 @@ genPointerSet (iCode * ic)
   emitComment (TRACEGEN|VVDBG, "      genPointerSet (%s), size=%d, litoffset=%d, rematoffset=%s", 
                aopName(AOP(right)), size, litOffset, rematOffset );
 
-  needpulla = storeRegTempIfSurv (m6502_reg_a);
+//  needpulla = storeRegTempIfSurv (m6502_reg_a);
 
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location
@@ -9524,6 +9524,7 @@ genPointerSet (iCode * ic)
     else
 #endif
     {
+      needpulla = storeRegTempIfSurv (m6502_reg_a);
       // otherwise use [aa],y
       needpully = storeRegTempIfUsed (m6502_reg_y);
       if (IS_AOP_AX(AOP(right))) {
@@ -9545,32 +9546,39 @@ genPointerSet (iCode * ic)
     goto release;
   }
 
-#if 0
-    // FIXME FIXME: bug-3129 segfaults when optimizing for size
-    // try absolute indexed
-    // TODO: can do absolute indexed when AOP_SIZE(result)==1  (even when not REG)
-#if 0
+#if 1
+#if 1
     // abs,x or abs,y with index in register or memory
   if (rematOffset 
       && ( AOP_SIZE(result)==1
            || ( AOP_TYPE(result) == AOP_REG && AOP(result)->aopu.aop_reg[1]->isLitConst ) ) )
 #else
     // abs,x or abs,y with index in register
-  if (rematOffset && ( AOP_TYPE(result)== AOP_REG
-           && ( AOP_SIZE(result) == 1 || AOP(result)->aopu.aop_reg[1]->isLitConst ) ) )
+  if (rematOffset && AOP_TYPE(result)== AOP_REG
+           && ( AOP_SIZE(result) == 1 || AOP(result)->aopu.aop_reg[1]->isLitConst ) )
 #endif
       {
       emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
       emitComment(TRACEGEN|VVDBG," reg : %d  size:%d", AOP(result)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(result) );
 
-         emitcode(";","AOP TYPE(result)=%d",AOP_TYPE (result));
-         emitcode(";","AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
+      emitComment (TRACEGEN|VVDBG,"AOP TYPE(result)=%d",AOP_TYPE (result));
+      emitComment (TRACEGEN|VVDBG,"AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
          unsigned int hi_offset=0;
-         char *src_reg;
+         bool src_reg_is_y = false;
          char idx_reg;
+         bool px = false;
+         bool py = false;
+         bool pa = false;
+
+         pa=pushRegIfSurv(m6502_reg_a);
+
 
          if(AOP_SIZE(result)==2)
              hi_offset=(AOP(result)->aopu.aop_reg[1]->litConst)<<8;
+
+//  if ( ( AOP_TYPE(result) == AOP_REG && AOP(result)->aopu.aop_reg[0]->isLitConst ) )
+//	emitcode("ERROR","");
+
 
          if(AOP_TYPE(result)==AOP_REG) {
            switch(AOP(result)->aopu.aop_reg[0]->rIdx) {
@@ -9583,45 +9591,28 @@ genPointerSet (iCode * ic)
            idx_reg='M';
          }
 
-         if(AOP_TYPE(right)==AOP_REG) {
-           switch(AOP(right)->aopu.aop_reg[0]->rIdx) {
-             case A_IDX: src_reg="sta"; break;
-             case X_IDX: src_reg="stx"; break;
-             case Y_IDX: src_reg="sty"; break;
-             default: src_reg="ERROR"; break;
-           }
-         } else {
-           src_reg="MEM";
-         }
-
-         // FIXME: bug-477927, bug2740884
-         if(idx_reg=='A') goto skip;
-
-         bool px = false;
-         bool py = false;
+         if(AOP_TYPE(right)==AOP_REG 
+            && AOP(right)->aopu.aop_reg[0]->rIdx == Y_IDX ) 
+               src_reg_is_y = true;
 
          if(idx_reg=='A' || idx_reg=='M') {
-           if(src_reg[2]!='y') {
-             py = storeRegTempIfUsed(m6502_reg_y);
-//             transferRegReg(m6502_reg_a, m6502_reg_y, false);
-             loadRegFromAop(m6502_reg_y, AOP(result), 0 );
-             idx_reg='y';
-           } else if(src_reg[2]!='x') {
-             px = storeRegTempIfUsed(m6502_reg_x);
-//             transferRegReg(m6502_reg_a, m6502_reg_x, false);
+           if(src_reg_is_y) {
+             px = storeRegTempIfSurv(m6502_reg_x);
              loadRegFromAop(m6502_reg_x, AOP(result), 0 );
              idx_reg='x';
+           } else {
+             py = storeRegTempIfSurv(m6502_reg_y);
+             loadRegFromAop(m6502_reg_y, AOP(result), 0 );
+             idx_reg='y';
            }
          }
 
-         if(src_reg[0]=='M') {
              loadRegFromAop (m6502_reg_a, AOP (right), 0);
-             src_reg="sta";
-         }
 
-         emit6502op(src_reg, "(%s+%d+0x%04x),%c",
+         emit6502op("sta", "(%s+%d+0x%04x),%c",
                      rematOffset, litOffset, hi_offset, idx_reg );
 
+       pullOrFreeReg(m6502_reg_a, pa);
        loadOrFreeRegTemp(m6502_reg_x,px);
        loadOrFreeRegTemp(m6502_reg_y,py);
 
@@ -9630,7 +9621,7 @@ genPointerSet (iCode * ic)
 skip:
 #endif
 
-//  needpulla = storeRegTempIfSurv (m6502_reg_a);
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
   needpullx = storeRegTempIfSurv (m6502_reg_x);
   needpully = storeRegTempIfSurv (m6502_reg_y);
 

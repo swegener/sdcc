@@ -36,6 +36,24 @@ replace restart {
 	%1
 }  if same(%1 'txa' 'tya')
 
+
+replace restart {
+	php
+	%1 %2
+	plp
+} by {
+	; Peephole stack 3 - removed redundant php/plp around a store
+	%1 %2
+}  if same(%1 'sta' 'stx' 'sty' )
+
+
+replace restart {
+	php
+	plp
+} by {
+	; Peephole stack 4 - removed redundant php/plp
+}
+
 replace restart {
 	%1
 	lda	%2

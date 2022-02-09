@@ -2,6 +2,8 @@
 
 	* sdcc/src/mos6502/gen.c:
 	  Fix corner cases in genPointerSet.
+  	* sdcc/src/mos6502/gen.c:
+  	  Add peephole rules to remove redundnat php/plp.
 
 2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

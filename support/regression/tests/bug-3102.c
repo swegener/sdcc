@@ -4,6 +4,10 @@
  
 #include <testfwk.h>
 
+#ifdef __SDCC
+#pragma disable_warning 85
+#endif
+
 static unsigned char Flag[10];
 static unsigned char Object[10];
 

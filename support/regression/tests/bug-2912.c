@@ -4,6 +4,10 @@
 
 #include <testfwk.h>
 
+#ifdef __SDCC
+#pragma disable_warning 85
+#endif
+
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // lack of memory
 float y, z;
 

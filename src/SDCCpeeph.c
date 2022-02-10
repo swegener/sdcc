@@ -2807,6 +2807,7 @@ bindVar (int key, char **s, hTab ** vtab)
          !ISCHARSPACE (*vvx) &&
          *vvx != '\n' &&
          *vvx != ':' &&
+         *vvx != ';' &&
          *vvx != ')')
     {
       char ubb = 0;
@@ -2882,7 +2883,7 @@ matchLine (char *s, const char *d, hTab ** vars)
           while (ISCHARDIGIT (*d))
             d++;
         }
-      else if (*s == ',' && *d == ',') /* Allow comma to match comma followed by whitespace */
+      else if (*s == ',' && *d == ',') /* Allow comma to match comma */
         {
           s++, d++;
         }

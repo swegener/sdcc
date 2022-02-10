@@ -128,6 +128,12 @@
 #undef OPT_DISABLE_MCS51
 
 /* XXX */
+#undef OPT_DISABLE_MOS6502
+
+/* XXX */
+#undef OPT_DISABLE_MOS65C02
+
+/* XXX */
 #undef OPT_DISABLE_NON_FREE
 
 /* XXX */

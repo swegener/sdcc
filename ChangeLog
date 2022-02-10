@@ -7,6 +7,8 @@
 	* tests/bug-2912.c,
 	  tests/bug-3102.c:
 	  Disable warning about intentionally unused parameter in test.
+	* sdccconf_in.h:
+	  Regenerate file via autoheader, fixes bug #3316.
 
 2022-02-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

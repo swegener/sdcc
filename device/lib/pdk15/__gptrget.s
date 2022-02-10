@@ -31,7 +31,7 @@
 
 __gptrget::
 	sub	a, #0x80
-	t1sn	f, c
+	t1sn.io	f, c
 	goto	code
 
 	; Pointer to RAM
@@ -43,7 +43,7 @@ code:
 	; Put pointer on stack
 	xch	a, p
 	push	af	; Put lower byte of pointer on stack.
-	mov	a, sp
+	mov.io	a, sp
 	add	a, #-1
 	xch	a, p
 	idxm	p, a	; Put upper byte of pointer on stack.

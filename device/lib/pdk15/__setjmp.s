@@ -37,7 +37,7 @@ _longjmp_PARM_2::
 	.area   CODE
 
 ___setjmp::
-	mov	a, sp
+	mov.io	a, sp
 	add	a, #-1
 	mov	p, a
 	idxm	a, p
@@ -55,7 +55,7 @@ ___setjmp::
 	idxm	p, a
 
 	inc	p
-	mov	a, sp
+	mov.io	a, sp
 	idxm	p, a
 	clear	p
 	ret	#0
@@ -66,7 +66,7 @@ _longjmp::
 	mov	p, a
 	idxm	a, p
 	add	a, #-2
-	mov	sp, a
+	mov.io	sp, a
 
 	dec	p
 	dec	p
@@ -76,7 +76,7 @@ _longjmp::
 	idxm	a, p
 
 	xch	a, p
-	mov	a, sp
+	mov.io	a, sp
 	add	a, #-1
 	xch	a, p
 	idxm	p, a

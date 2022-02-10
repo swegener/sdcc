@@ -30,7 +30,7 @@
 
 ___setjmp::
 	; Get return address
-	mov	a, sp
+	mov.io	a, sp
 	add	a, #-1
 	mov	p, a
 	idxm	a, p
@@ -54,7 +54,7 @@ ___setjmp::
 
 	; Store stack pointer to buffer
 	inc	p
-	mov	a, sp
+	mov.io	a, sp
 	idxm	p, a
 
 	; Return 0
@@ -63,7 +63,7 @@ ___setjmp::
 
 _longjmp::
 	; Push return value onto top of old stack (adding padding bytes)
-	mov	a, sp
+	mov.io	a, sp
 	add	a, #-6
 	mov	p, a
 	idxm	a, p
@@ -109,7 +109,7 @@ _longjmp::
 	; Switch to new stack
 	inc	p
 	mov	a, p
-	mov	sp, a
+	mov.io	sp, a
 
 	; Get return value from stack
 	mov	p, a

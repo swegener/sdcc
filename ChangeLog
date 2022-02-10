@@ -1,3 +1,13 @@
+2022-02-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/pdk*/__gptrget.s,
+	  device/lib/pdk*/__gptrget2.s,
+	  device/lib/pdk*/__setjmp.s:
+	  Get rid of some warnings by changing old-style pdk io assembler to new style.
+	* tests/bug-2912.c,
+	  tests/bug-3102.c:
+	  Disable warning about intentionally unused parameter in test.
+
 2022-02-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (leaveBlockScope): fix bug #3289

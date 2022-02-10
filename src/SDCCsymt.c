@@ -2198,7 +2198,15 @@ leaveBlockScope (int block)
         {
           if (chain->block == block)
             {
-              ((symbol *)chain->sym)->isinscope = 0;
+              symbol *sym = (symbol *)chain->sym;
+              
+              /* Temporary fix for bug #3289 - leave enums in scope. */
+              /* This is also buggy but compatible with 4.1.0 and    */
+              /* earlier behavior and less likely to trigger errors. */
+              if (sym->etype && SPEC_ENUM(sym->etype))
+                continue;
+              /* Everything else, mark as out of scope. */
+              sym->isinscope = 0;
             }
         }
     }

@@ -45,6 +45,7 @@ enum debug_messages {
 };
 
 #define DBG_MSG (REGALLOC)
+//#define DBG_MSG (REGALLOC|TRACEGEN|COST)
 //#define DBG_MSG (DEBUG_ALL/*|VVDBG*/)
 //#define DBG_MSG ((DEBUG_ALL|VVDBG)&~COST)
 
@@ -982,13 +983,14 @@ adjustStack (int n)
   if (n > 0) {
     // FIXME: A is incorrectly marked free and makes many regression fail
     //    bool needloada=storeRegTempIfUsed (m6502_reg_a);
+    bool needloada = true;
     storeRegTemp(m6502_reg_a, true);
+    
     while (n > 0) {
       emit6502op ("pla", "");      /* 1 byte,  4 cycles */
       n--;
     }
-    //   loadOrFreeRegTemp (m6502_reg_a, needloada);
-    loadRegTemp(m6502_reg_a);
+    loadOrFreeRegTemp(m6502_reg_a, needloada);
   }
   updateCFA ();
 }
@@ -999,24 +1001,26 @@ adjustStack (int n)
 static void
 swapXA ()
 {
-  bool litA;
-  int val;
-  litA=m6502_reg_a->isLitConst;
-  val=m6502_reg_a->litConst;
   emitComment (REGOPS, __func__ );
 
-  storeRegTemp (m6502_reg_a, false);
-  transferRegReg (m6502_reg_x, m6502_reg_a, false);
-  loadRegTemp (m6502_reg_x);
-
-  if(litA) {
-    m6502_reg_x->isLitConst=true;
-    m6502_reg_x->litConst=val;
-    if( m6502_reg_a->isLitConst ) {
-          m6502_reg_xa->isLitConst=true;
-          m6502_reg_xa->litConst=(m6502_reg_x->litConst<<8)|m6502_reg_a->litConst;
-    }
+  if(m6502_reg_a->isLitConst) {
+    unsigned char t=m6502_reg_a->litConst;
+    transferRegReg(m6502_reg_x, m6502_reg_a, true);
+    loadRegFromConst(m6502_reg_a,t);
+  } else if(m6502_reg_x->isLitConst) {
+    unsigned char t=m6502_reg_x->litConst;
+    transferRegReg(m6502_reg_a, m6502_reg_x, true);
+    loadRegFromConst(m6502_reg_a,t);
+  } else {
+    storeRegTemp (m6502_reg_a, false);
+    transferRegReg (m6502_reg_x, m6502_reg_a, false);
+    loadRegTemp (m6502_reg_x);
   }
+
+  if(m6502_reg_a->isLitConst && m6502_reg_x->isLitConst) {
+     m6502_reg_xa->isLitConst=true;
+     m6502_reg_xa->litConst=(m6502_reg_x->litConst<<8)|m6502_reg_a->litConst;
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -2267,20 +2271,16 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
           int ptrOfs;
           bool needloady;
 
+          if(!rematOfs) rematOfs="0";
+
           pushReg(m6502_reg_a, false);
+          ptrOfs=_G.tempOfs;
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
           emit6502op ("clc", "");
-          if (rematOfs)
-            emit6502op ("adc", "#<(%s+%d)", rematOfs, offset);
-          else
-            emit6502op ("adc", "#<(%d)", offset);
-          ptrOfs=_G.tempOfs;
+          emit6502op ("adc", "#<(%s+%d)", rematOfs, offset);
           storeRegTemp (m6502_reg_a, true);
           transferRegReg (m6502_reg_y, m6502_reg_a, true);
-          if (rematOfs)
-            emit6502op ("adc", "#>(%s+%d)", rematOfs, offset);
-          else
-            emit6502op ("adc", "#<(%d)", offset);
+          emit6502op ("adc", "#>(%s+%d)", rematOfs, offset);
           storeRegTemp (m6502_reg_a, true);
           needloady = storeRegTempIfSurv (m6502_reg_y);
           loadRegFromConst(m6502_reg_y, 0);
@@ -4849,7 +4849,6 @@ static void
 genLabel (iCode * ic)
 {
   int i;
-  reg_info *reg;
 
   emitComment (TRACEGEN, __func__);
   emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
@@ -4857,16 +4856,10 @@ genLabel (iCode * ic)
 
   /* For the high level labels we cannot depend on any */
   /* register's contents. Amnesia time.                */
-  for (i = A_IDX; i <= XA_IDX; i++)
-    {
-      reg = m6502_regWithIdx (i);
-      if (reg)
-        {
-          reg->aop = NULL;
-          reg->isLitConst = 0;
+  for (i = A_IDX; i <= XA_IDX; i++) {
+      m6502_dirtyReg (m6502_regWithIdx (i));
+      m6502_useReg (m6502_regWithIdx (i));
         }
-    }
-
   /* special case never generate */
   if (IC_LABEL (ic) == entryLabel)
     return;
@@ -4875,7 +4868,6 @@ genLabel (iCode * ic)
     debugFile->writeLabel (IC_LABEL (ic), ic);
 
   emitLabel (IC_LABEL (ic));
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -8517,7 +8509,7 @@ preparePointer (operand* left, int offset, char* rematOfs, operand* right)
 //  emitComment (TRACEGEN|VVDBG, "      preparePointer (%s, off=%d, remat=%s) tempOfs %d", aopName(AOP(left)), offset, rematOfs, _G.tempOfs);
 }
   
-#if 0
+#if 1
   // FIXME: this code sometimes improperly detects 8-bit offsets
   // triggers failure on bug-477927 when using zero weight for cycles cost
   // FIXME FIXME: this is a great optimization opportunity
@@ -9300,7 +9292,7 @@ genPointerSet (iCode * ic)
   bool needpulla = false;
   bool needpullx = false;
   bool needpully = false;
-  bool vol = false;
+//  bool vol = false;
   int litOffset = 0;
   char *rematOffset = NULL;
 

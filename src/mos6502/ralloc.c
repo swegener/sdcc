@@ -634,6 +634,7 @@ DEFSETFUNC (deallocStackSpil)
   return 0;
 }
 
+#if 0
 /** Transform weird SDCC handling of writes via pointers
     into something more sensible. */
 static void
@@ -654,6 +655,7 @@ transformPointerSet (eBBlock **ebbs, int count)
           }
     }
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */

@@ -2318,6 +2318,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
     }
 }
 
+#if 0
 /*--------------------------------------------------------------------------*/
 /* storeRegIndexed2 - Store a register using indexed addressing mode.        */
 /*                   NOTE: offset is physical (not logical)                 */
@@ -2374,7 +2375,7 @@ storeRegIndexed2 (reg_info * reg, int offset)
       wassert (0);
     }
 }
-
+#endif
 
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
@@ -9451,7 +9452,8 @@ genPointerSet (iCode * ic)
   /* if bit then pack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
     {
-      int ptrofs = preparePointer (result, litOffset, rematOffset, right);
+      //int ptrofs =
+      preparePointer (result, litOffset, rematOffset, right);
       genPackBits (result, left, (IS_BITVAR (retype) ? retype : letype), right);
       unpreparePointer();
       goto release;

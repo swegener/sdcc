@@ -1,3 +1,9 @@
+2022-02-10 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/src/mos6502/gen.c,
+	  sdcc/src/mos6502/ralloc.c:
+	  Fix all warnings.
+
 2022-02-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* device/lib/pdk*/__gptrget.s,

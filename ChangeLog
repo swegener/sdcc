@@ -1,3 +1,8 @@
+2022-02-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/pdk14/__setjmp.s:
+	  Fix typo (bug #3318).
+
 2022-02-10 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdcc/src/mos6502/gen.c,

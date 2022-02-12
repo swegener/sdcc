@@ -1,3 +1,8 @@
+2022-02-12 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* support/valdiag/Makefile.in:
+	  Skip not-built-by-default 65c02 port in valdiag testing.
+
 2022-02-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* device/lib/pdk14/__setjmp.s:

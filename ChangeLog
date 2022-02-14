@@ -3,6 +3,8 @@
 	* sdcc/src/mos6502/gen.c,
 	  sdcc/src/SDCCglue.c:
 	  Removed hack that assigned function pointers entry address-1.
+	* sdcc/src/mos6502/main.c:
+	  Changed default output to ihx.
 
 2022-02-12 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 

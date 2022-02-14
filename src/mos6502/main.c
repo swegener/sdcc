@@ -183,10 +183,11 @@ _m6502_setDefaultOptions (void)
   options.data_loc = 0x20;	/* zero page */
   options.xdata_loc = 0x8000;   /* 0 means immediately following data */
   options.stack_loc = 0x1ff;
-  options.out_fmt = 's';        /* use motorola S19 output */
 
   options.omitFramePtr = 1;     /* no frame pointer (we use SP */
                                 /* offsets instead)            */
+
+  options.out_fmt = 'i';        /* Default output format is ihx */
 }
 
 static const char *

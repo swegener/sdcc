@@ -1,5 +1,10 @@
 2022-02-13 Gabriele Gorla <gorlik@yahoo.com>
 
+	* sdcc/src/mos6502/gen.c:
+	  Avoid generating illegal 6502 instructions in a few corner cases.
+
+2022-02-13 Gabriele Gorla <gorlik@yahoo.com>
+
 	* sdcc/src/mos6502/gen.c,
 	  sdcc/src/SDCCglue.c:
 	  Removed hack that assigned function pointers entry address-1.

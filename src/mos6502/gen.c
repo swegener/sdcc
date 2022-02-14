@@ -8049,6 +8049,19 @@ decodePointerOffset (operand * opOffset, int * litOffset, char ** rematOffset)
     wassertl (0, "Pointer get/set with non-constant offset");
 }
 
+// does a BIT A with a constant, even for non-65C02
+// TODO: lookup table for each new const?
+void bitAConst(int val)
+{
+  wassertl (val >= 0 && val <= 0xff, "bitAConst()");
+  if (IS_MOS65C02) {
+    emit6502op ("bit", IMMDFMT, val);
+  } else {
+    storeRegTemp (m6502_reg_a, true);
+    emit6502op ("and", IMMDFMT, val);
+    loadRegTempNoFlags (m6502_reg_a, true);
+  }
+}
 
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
@@ -8118,7 +8131,8 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
           symbol *tlbl = safeNewiTempLabel (NULL);
 
 	  // FIXME
-          emitcode ("bit11", IMMDFMT, 1 << (blen - 1));
+          // emitcode ("bit11", IMMDFMT, 1 << (blen - 1));
+          bitAConst(1 << (blen - 1));
           emitcode ("beq", "%05d$", safeLabelKey2num (tlbl->key));
           emitcode ("ora", IMMDFMT, (unsigned char) (0xff << blen));
           safeEmitLabel (tlbl);
@@ -8154,7 +8168,8 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
           symbol *tlbl = safeNewiTempLabel (NULL);
 
 	  // FIXME: unimplemented
-          emitcode ("bit12", IMMDFMT, 1 << (rlen - 1));
+          // emitcode ("bit12", IMMDFMT, 1 << (rlen - 1));
+          bitAConst(1 << (rlen - 1));
           emitcode ("beq", "%05d$", safeLabelKey2num (tlbl->key));
           emitcode ("ora", IMMDFMT, (unsigned char) (0xff << rlen));
           safeEmitLabel (tlbl);
@@ -8186,20 +8201,6 @@ finish:
   pullOrFreeReg (m6502_reg_y, needpully);
   pullOrFreeReg (m6502_reg_x, needpullx);
   pullOrFreeReg (m6502_reg_a, needpulla);
-}
-
-// does a BIT A with a constant, even for non-65C02
-// TODO: lookup table for each new const?
-void bitAConst(int val)
-{
-  wassertl (val >= 0 && val <= 0xff, "bitAConst()");
-  if (IS_MOS65C02) {
-    emit6502op ("bit", IMMDFMT, val);
-  } else {
-    storeRegTemp (m6502_reg_a, true);
-    emit6502op ("and", IMMDFMT, val);
-    loadRegTempNoFlags (m6502_reg_a, true);
-  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -8790,7 +8791,6 @@ genPointerGet (iCode * ic, iCode * ifx)
                      rematOffset, litOffset, hi_offset, idx_reg );
          }
 
-
        loadOrFreeRegTemp(m6502_reg_x,px);
        loadOrFreeRegTemp(m6502_reg_y,py);
       loadOrFreeRegTemp (m6502_reg_a, needpulla);
@@ -8853,8 +8853,8 @@ genPointerGet (iCode * ic, iCode * ifx)
   emit6502op ("adc", "#<(%s+%d)", rematOffset, litOffset);
   storeRegTemp(m6502_reg_a, true);
   if(savea) transferRegReg(m6502_reg_y, m6502_reg_a, true);
-  else 
-  loadRegFromAop(m6502_reg_a, AOP(left), 1);
+  else loadRegFromAop(m6502_reg_a, AOP(left), 1);
+
   emit6502op ("adc", "#>(%s+%d)", rematOffset, litOffset);
   storeRegTemp(m6502_reg_a, true);
 
@@ -9059,7 +9059,12 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       // FIXME: unimplemented
       loadRegIndexed(m6502_reg_a, litOffset+offset, rematOffset);
       emitcode ("and", IMMDFMT, mask);
-      emitcode ("ora19", "1,s");
+//      emitcode ("ora19", "1,s");
+      storeRegTemp(m6502_reg_a, true);
+      emit6502op("pla","");
+      emit6502op("pha","");
+      emit6502op("ora", TEMPFMT, _G.tempOfs-1);
+      loadRegTemp(NULL);
       storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
       pullReg (m6502_reg_a);
     }

@@ -1,4 +1,11 @@
-2022-02-12 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+2022-02-14 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* .version,
+	  doc/INSTALL.txt,
+	  sdcc.spec:
+	  Preparations for 4.2.0.
+
+2022-02-14 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* support/regression/tests/bug-3289.c:
 	  Test for recently-fixed bug #3289.

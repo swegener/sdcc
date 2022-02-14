@@ -8,11 +8,11 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       4.1.0
+Version:       4.2.0
 Release:       2
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
-Packager:      Maarten Brock <sourceforge.brock AT dse.nl>
+Packager:      Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -23,9 +23,9 @@ MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
 Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
-Work is in progress on supporting the Microchip PIC16 and PIC18 and the
-Padauk PDK13 targets.
-It can be retargeted for other microprocessors.
+Work is in progress on supportine the Padauk PDK13 and MOS 6502 targets.
+There is unmaintained support for the Microchip PIC16 and PIC18.
+SDCC can be retargeted for other microprocessors.
 
 %package common
 License:       GPL, LGPL
@@ -41,9 +41,9 @@ MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
 Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
-Work is in progress on supporting the Microchip PIC16 and PIC18 and the
-Padauk PDK13 targets.
-It can be retargeted for other microprocessors.
+Work is in progress on supportine the Padauk PDK13 and MOS 6502 targets.
+There is unmaintained support for the Microchip PIC16 and PIC18.
+SDCC can be retargeted for other microprocessors.
 
 %package doc
 License:       GPL
@@ -58,9 +58,9 @@ MCS51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 HC08 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, SM83,
 Rabbit 2000 / 2000A / 3000A, TLCS-90, eZ80 in Z80 mode, Z80N), the STM8
 and the Padauk PDK14 and PDK15.
-Work is in progress on supporting the Microchip PIC16 and PIC18 and the
-Padauk PDK13 targets.
-It can be retargeted for other microprocessors.
+Work is in progress on supportine the Padauk PDK13 and MOS 6502 targets.
+There is unmaintained support for the Microchip PIC16 and PIC18.
+SDCC can be retargeted for other microprocessors.
 
 %prep
 %setup -n sdcc
@@ -98,6 +98,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
+* Mon Feb 14 2022 - krauseph AT informatik.uni-freiburg.de
+- version updated to 4.2.0
 * Sat Feb 20 2021 - pkk AT spth.de
 - version updated to 4.0.0
 * Sat Jan 18 2020 - pkk AT spth.de

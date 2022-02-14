@@ -2579,7 +2579,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
       aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1 + 6);
-      sprintf (aop->aopu.aop_immd.aop_immd1, "(%s - 1)", sym->rname); // function pointer; take back one for RTS
+      sprintf (aop->aopu.aop_immd.aop_immd1, "(%s)", sym->rname); // function pointer; take back one for RTS
       aop->size = FARPTRSIZE;
       return aop;
     }
@@ -4107,36 +4107,36 @@ static void
 pushSide (operand *oper, int size, iCode *ic)
 {
   int offset = 0;
-  bool xIsFree = m6502_reg_x->isFree;
+//  bool xIsFree = m6502_reg_x->isFree;
 
-  m6502_useReg (m6502_reg_x);
   aopOp (oper, ic, false);
 
   if (AOP_TYPE (oper) == AOP_REG)
     {
       /* The operand is in registers; we can push them directly */
-      for (offset=size-1; offset>=0; offset--) 
-        {
-          pushReg (AOP (oper)->aopu.aop_reg[offset], true);
-        }
+      storeRegTemp(AOP (oper)->aopu.aop_reg[0], true);      
+      storeRegTemp(AOP (oper)->aopu.aop_reg[1], true); 
     }
   else
     {
       // push A if not free
       // TODO: consider other regs for 65C02
-      bool needloada = storeRegTempIfUsed(m6502_reg_a);
+      bool needloada = pushRegIfUsed(m6502_reg_a);
+      bool needloadx = false;
+      if(AOP_TYPE(oper)==AOP_SOF) needloadx=pushRegIfUsed(m6502_reg_x);
       /* A is free, so piecewise load operand into a and push A */
-      for (offset=size-1; offset>=0; offset--) 
+      for (offset=0; offset<size; offset++) 
         {
           loadRegFromAop (m6502_reg_a, AOP (oper), offset);
-          pushReg (m6502_reg_a, true);
+          storeRegTemp (m6502_reg_a, true);
         }
-      loadOrFreeRegTemp(m6502_reg_a, needloada);
+      pullOrFreeReg(m6502_reg_x, needloadx);
+      pullOrFreeReg(m6502_reg_a, needloada);
     }
 
   freeAsmop (oper, NULL, ic, true);
-  if (xIsFree)
-    m6502_freeReg (m6502_reg_x);
+//  if (xIsFree)
+//    m6502_freeReg (m6502_reg_x);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4435,8 +4435,6 @@ genPcall (iCode * ic)
 {
   sym_link *dtype;
   sym_link *etype;
-  symbol *rlbl = safeNewiTempLabel (NULL);
-  symbol *tlbl = safeNewiTempLabel (NULL);
   iCode * sendic;
 
   emitComment (TRACEGEN, __func__);
@@ -4458,24 +4456,9 @@ genPcall (iCode * ic)
   
   if (!IS_LITERAL (etype))
     {
-      /* push the return address on to the stack */
-      emitBranch ("jsr", tlbl);
-      emitBranch ("bra", rlbl);
-      safeEmitLabel (tlbl);
-      _G.stackPushes += 2;          /* account for the bsr return address now on stack */
       updateCFA ();
-      /* now push the function address */
+      /* compute the function address */
       pushSide (IC_LEFT (ic), FARPTRSIZE, ic); // -1 is baked into initialization
-
-      /* load into TEMP0-1 */
-      /*
-      asmop *tempaop = newAsmop (AOP_DIR);
-      tempaop->size = 2;
-      tempaop->aopu.aop_dir = "__TEMP";
-      transferAopAop( AOP(IC_LEFT(ic)), 0, tempaop, 0 );
-      transferAopAop( AOP(IC_LEFT(ic)), 1, tempaop, 1 );
-      _G.tempOfs += 2;
-      */
     }
 
   /* if send set is not empty then assign */
@@ -4488,12 +4471,19 @@ genPcall (iCode * ic)
   /* make the call */
   if (!IS_LITERAL (etype))
     {
-      emit6502op("rts", "");
-      //emitcode("jmp", "[__TEMP]");
-      //_G.tempOfs -= 2;
+#if 0
+      emit6502op("jsr","__sdcc_indirect_jsr");
+#else
+      symbol *rlbl = safeNewiTempLabel (NULL);
+      symbol *tlbl = safeNewiTempLabel (NULL);
 
+      emitBranch ("jsr", tlbl);
+      emitBranch ("bra", rlbl);
+      safeEmitLabel (tlbl);
+      emit6502op("jmp", "[__TEMP]");
       safeEmitLabel (rlbl);
-      _G.stackPushes -= 4;          /* account for rts here & in called function */
+#endif
+      _G.tempOfs -= 2;
       updateCFA ();
     }
   else

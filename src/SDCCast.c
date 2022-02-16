@@ -2871,8 +2871,32 @@ gatherImplicitVariables (ast * tree, ast * block)
       tree->opval.val->etype = tree->opval.val->sym->etype;
     }
 
-  gatherImplicitVariables (tree->left, block);
-  gatherImplicitVariables (tree->right, block);
+  /* If entering a block with symbols defined, mark the symbols in-scope */
+  /* before continuing down the tree, and mark them out-of-scope again   */
+  /* on the way back up */ 
+  if (tree->type == EX_OP && tree->opval.op == BLOCK && tree->values.sym)
+    {
+      symbol * sym = tree->values.sym;
+      while (sym)
+        {
+          sym->isinscope = 1;
+          sym = sym->next;
+        }
+      gatherImplicitVariables (tree->left, block);
+      gatherImplicitVariables (tree->right, block);
+      sym = tree->values.sym;
+      while (sym)
+        {
+          sym->isinscope = 0;
+          sym = sym->next;
+        }
+      return tree;
+    }
+  else
+    {
+      gatherImplicitVariables (tree->left, block);
+      gatherImplicitVariables (tree->right, block);
+    }
 }
 
 /*-----------------------------------------------------------------*/

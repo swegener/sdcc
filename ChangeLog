@@ -1,3 +1,19 @@
+2022-02-15 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3322.
+	* support/regression/tests/bug-3320.c:
+	  Test for bug #3320.
+
+2022-02-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (gatherImplicitVariables): fix bug #3320
+
+2022-02-15 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-3322.c:
+	  Test for bug #3322.
+
 2022-02-14 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* .version,

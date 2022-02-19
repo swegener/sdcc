@@ -2890,7 +2890,6 @@ gatherImplicitVariables (ast * tree, ast * block)
           sym->isinscope = 0;
           sym = sym->next;
         }
-      return tree;
     }
   else
     {

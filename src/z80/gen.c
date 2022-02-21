@@ -2655,12 +2655,16 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             }
           else
             {
+              if (pairId == PAIR_HL && (aopInReg (aop, offset, IYL_IDX) || aopInReg (aop, offset, IYH_IDX)))
+                UNIMPLEMENTED;
               if (!aopInReg (aop, offset, _pairs[pairId].l_idx))
                 {
                    if (!regalloc_dry_run)
                      emit2 ("ld %s, %s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
                    regalloc_dry_run_cost += ld_cost (ASMOP_L, 0, aop, offset);
                 }
+              if (pairId == PAIR_HL && (aopInReg (aop, offset + 1, IYL_IDX) || aopInReg (aop, offset + 1, IYH_IDX)))
+                UNIMPLEMENTED;
               if (!aopInReg (aop, offset + 1, _pairs[pairId].h_idx))
                 {
                    if (!regalloc_dry_run)

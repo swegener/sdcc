@@ -1,3 +1,8 @@
+2022-02-21 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3327.
+
 2022-02-19 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/SDCCast.c:

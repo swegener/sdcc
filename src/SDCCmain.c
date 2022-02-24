@@ -1781,7 +1781,11 @@ linkEdit (char **envp)
              the best place for xdata */
           if (options.xdata_loc)
             {
-              WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+	      if(!TARGET_MOS6502_LIKE) {
+		WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+	      } else {
+		WRITE_SEG_LOC ("_DATA", options.xdata_loc);
+	      }
             }
 
           /* pdata/xstack segment start. If zero, the linker

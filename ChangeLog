@@ -2,6 +2,23 @@
 
 	* doc/sdccman.lyx:
 	  Fix a minor documentation issue.
+	  
+2022-02-22 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/src/SDCCmain.c,
+	  sdcc/src/mos6502/main.c,
+	  sdcc/device/lib/mos6502/crt0.s,
+	  sdcc/device/lib/mos6502/_strcpy.s,
+	  sdcc/device/lib/mos6502/_strcmp.s,
+	  sdcc/device/lib/mos6502/_setjmp.c,
+	  sdcc/device/lib/mos6502/_mullong.s,
+	  sdcc/device/lib/mos6502/_mulint.s,
+	  sdcc/device/lib/mos6502/_divulong.s,
+	  sdcc/device/lib/mos6502/_divuint.s,
+	  sdcc/device/lib/mos6502/__memcpy.s,
+	  sdcc/device/lib/mos6502-stack-auto/crt0.s,
+	  sdcc/device/lib/mos6502-stack-auto/_setjmp.c:
+	  Rename linker segments.
 
 2022-02-21 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 

@@ -665,25 +665,25 @@ PORT mos6502_port =
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
   {
-    "XSEG",
-    "STACK",
-    "CSEG    (CODE)",
-    "DSEG    (PAG)",
-    NULL, /* idata */
-    NULL, /* pdata */
-    "XSEG",
-    NULL, /* bit */
-    "RSEG    (ABS)",
-    "GSINIT  (CODE)",
-    "OSEG    (PAG, OVR)",
-    "GSFINAL (CODE)",
-    "HOME    (CODE)",
-    "XISEG",              // initialized xdata
-    "XINIT   (CODE)",     // a code copy of xiseg
-    "CONST   (CODE)",     // const_name - const data (code or not)
-    "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
-    "XABS    (ABS)",      // xabs_name - absolute xdata
-    "IABS    (ABS)",      // iabs_name - absolute data
+    "XSEG",               // xstack_name
+    "STACK",              // istack_name
+    "CODE",               // code
+    "ZP      (PAG)",      // data
+    NULL,                 // idata
+    NULL,                 // pdata
+    "BSS",                // xdata
+    NULL,                 // bit
+    "RSEG    (ABS)",      // reg
+    "GSINIT",             // static initialization
+    "OSEG    (PAG, OVR)", // overlay
+    "GSFINAL",            // gsfinal
+    "_CODE",              // home
+    "DATA",               // initialized xdata
+    "XINIT",              // a code copy of xiseg
+    "RODATA",             // const_name - const data (code or not)
+    "CABS    (ABS)",      // cabs_name - const absolute data (code or not)
+    "DABS    (ABS)",      // xabs_name - absolute xdata
+    NULL,                 // iabs_name - absolute data
     NULL,                 // name of segment for initialized variables
     NULL,                 // name of segment for copies of initialized variables in code space
     NULL,
@@ -811,25 +811,25 @@ PORT mos65c02_port =
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
   {
-    "XSEG",
-    "STACK",
-    "CSEG    (CODE)",
-    "DSEG    (PAG)",
-    NULL, /* idata */
-    NULL, /* pdata */
-    "XSEG",
-    NULL, /* bit */
-    "RSEG    (ABS)",
-    "GSINIT  (CODE)",
-    "OSEG    (PAG, OVR)",
-    "GSFINAL (CODE)",
-    "HOME    (CODE)",
-    "XISEG",              // initialized xdata
-    "XINIT   (CODE)",     // a code copy of xiseg
-    "CONST   (CODE)",     // const_name - const data (code or not)
-    "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
-    "XABS    (ABS)",      // xabs_name - absolute xdata
-    "IABS    (ABS)",      // iabs_name - absolute data
+    "XSEG",               // xstack_name
+    "STACK",              // istack_name
+    "CODE",               // code
+    "ZP      (PAG)",      // data
+    NULL,                 // idata
+    NULL,                 // pdata
+    "BSS",                // xdata
+    NULL,                 // bit
+    "RSEG    (ABS)",      // reg
+    "GSINIT",             // static initialization
+    "OSEG    (PAG, OVR)", // overlay
+    "GSFINAL",            // gsfinal
+    "_CODE",              // home
+    "DATA",               // initialized xdata
+    "XINIT",              // a code copy of xiseg
+    "RODATA",             // const_name - const data (code or not)
+    "CABS    (ABS)",      // cabs_name - const absolute data (code or not)
+    "DABS    (ABS)",      // xabs_name - absolute xdata
+    NULL,                 // iabs_name - absolute data
     NULL,                 // name of segment for initialized variables
     NULL,                 // name of segment for copies of initialized variables in code space
     NULL,

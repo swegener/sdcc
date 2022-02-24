@@ -44542,8 +44542,8 @@ SDCC calling convention, version 0
 For compability with functions written for older versions of SDCC, the __sdcccal
 l(0) calling convention is supported.
  All parameters are passed on the stack.
- The stack is the stack is not adjusted for the parameters after the call
- (thus the callee has to do this instead), unless __z88dk_callee is specified.
+ The stack is not adjusted for the parameters after the call (thus the callee
+ has to do this instead), unless __z88dk_callee is specified.
 \end_layout
 
 \begin_layout Subsubsection

@@ -44009,7 +44009,7 @@ status open
 
 \end_inset
 
- sdcc typically generates much better code for these architectures than
+ SDCC typically generates much better code for these architectures than
  many other compilers.
  A comparison of compilers for these architecture can be found at 
 \begin_inset Flex URL
@@ -44097,7 +44097,7 @@ Rabbit ports
 \end_layout
 
 \begin_layout Standard
-SDCC has three rabbit-supporting ports: r2k for the Rabbit 2000, r2ka for
+SDCC has three Rabbit-supporting ports: r2k for the Rabbit 2000, r2ka for
  the Rabbit 2000A, 2000B, 2000C and 3000, r3ka for the Rabbit 3000A.
  The instruction set of the Rabbit 2000 to Rabbit 3000 is the same, and
  a subset of the Rabbit 3000A instruction set.
@@ -44170,7 +44170,7 @@ Z80 SDCC calling convention, version 1
 \end_layout
 
 \begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(1).
+This calling convention can be chosen per function via __sdcccall(1).
  8-bit return values are passed in a, 16-bit values in de, 32-bit values
  in hlde.
  Larger return values are passed in memory in a location specified by the
@@ -44213,7 +44213,7 @@ Z80 SDCC calling convention, version 0
 \end_layout
 
 \begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(0).
+This calling convention can be chosen per function via __sdcccall(0).
  All parameters are passed on the stack, right-to-left.
  8-bit return values are passed in l, 16-bit values in hl, 32-bit values
  in dehl.
@@ -44230,9 +44230,9 @@ Rabbit 2000, Rabbit 2000A, Rabbit 3000A, eZ80 and TLCS-90 calling conventions
 \end_layout
 
 \begin_layout Standard
-The default is Z80 SDCC calling convention, version 0 as above.
+The default is the Z80 SDCC calling convention, version 0 as described above.
  Using the command-line option –sdcccall 1, the default can be changed to
- version 1 of the Rabbit SDCC calling convnetion.
+ version 1 of the Rabbit SDCC calling convention.
  There are four other calling conventions supported, which can be specified
  using the keywords __smallc, __z88dk_fastcall and __z88dk_callee.
  They are primarily intended for compatibility with libraries written for
@@ -44250,7 +44250,7 @@ Rabbit SDCC calling convention, version 1
 \end_layout
 
 \begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(1).
+This calling convention can be chosen per function via __sdcccall(1).
  8-bit return values are passed in a, 16-bit values in hl, 32-bit values
  in hlde.
  Larger return values are passed in memory in a location specified by the
@@ -44304,7 +44304,7 @@ SM83 SDCC calling convention, version 1
 \end_layout
 
 \begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(1).
+This calling convention can be chosen per function via __sdcccall(1).
 \end_layout
 
 \begin_layout Standard
@@ -44349,7 +44349,7 @@ SM83 SDCC calling convention, version 0
 \end_layout
 
 \begin_layout Standard
-This calling convention can be chosen for individual function via __sdcccall(0).
+This calling convention can be chosen per function via __sdcccall(0).
  8-bit return values are passed in e, 16-bit values in de, 32-bit values
  in hlde.
  Larger return values are passed in memory in a location specified by the
@@ -44423,7 +44423,7 @@ Banked calls are supported via __banked.
  other calls).
  Default trampolines are provided in the library.
  The default trampolines calls user supplied helper functions set_bank and
- get_bank that set the current bank to the value inr egister a, or return
+ get_bank that set the current bank to the value in register a, or return
  the current bank in register a.
 \end_layout
 
@@ -44539,8 +44539,9 @@ SDCC calling convention, version 0
 \end_layout
 
 \begin_layout Standard
-For compability with functions written for older versions of SDCC, the __sdcccal
-l(0) calling convention is supported.
+This calling convention can be chosen per function via __sdcccall(0) (e.g.
+ for compatibility with functions written in assembler for use with older
+ versions of SDCC).
  All parameters are passed on the stack.
  The stack is not adjusted for the parameters after the call (thus the callee
  has to do this instead), unless __z88dk_callee is specified.

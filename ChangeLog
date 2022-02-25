@@ -1,6 +1,11 @@
 2022-02-24 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:
+	  Improve calling convention documentation.
+
+2022-02-24 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx:
 	  Fix a minor documentation issue.
 	  
 2022-02-22 Gabriele Gorla <gorlik@yahoo.com>

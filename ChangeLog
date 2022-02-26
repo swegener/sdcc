@@ -1,3 +1,9 @@
+2022-02-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-3332.c:
+	  Fix bugs #3332 and #3333.
+
 2022-02-24 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:

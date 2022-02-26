@@ -839,9 +839,11 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if (FUNC_ISRAISONANCE (dest) && (FUNC_ISIAR (src) || FUNC_ISCOSMIC (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
     FUNC_ISIAR (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISCOSMIC (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
     FUNC_ISCOSMIC (dest) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_SDCCCALL (src) >= 0 || FUNC_ISZ88DK_CALLEE (src)) ||
-    FUNC_SDCCCALL (dest) >= 0 && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISCOSMIC (src)) || // __sdcccall can be combined with __z88dk_callee.
+    FUNC_SDCCCALL (dest) >= 0 && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (src) || FUNC_ISCOSMIC (src) || FUNC_SDCCCALL (src) >= 0 && FUNC_SDCCCALL (dest) != FUNC_SDCCCALL (src)) || // __sdcccall can be combined with __z88dk_callee.
     FUNC_ISZ88DK_CALLEE (src) && (FUNC_ISRAISONANCE (src) || FUNC_ISIAR (dest) || FUNC_ISCOSMIC (dest)))
     werror (E_MULTIPLE_CALLINGCONVENTIONS, name);
+  if (FUNC_SDCCCALL (dest) == -1)
+    FUNC_SDCCCALL (dest) = FUNC_SDCCCALL (src);
   FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
   FUNC_ISRAISONANCE (dest) |= FUNC_ISRAISONANCE (src);
   FUNC_ISIAR (dest) |= FUNC_ISIAR (src);
@@ -3687,7 +3689,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               if (IFFUNC_ISZ88DK_FASTCALL (type))
                 dbuf_append_str (dbuf, " __z88dk_fastcall");
               if (FUNC_SDCCCALL (type) >= 0 && FUNC_SDCCCALL (type) != options.sdcccall)
-                dbuf_append_str (dbuf, FUNC_SDCCCALL (type) ? " __sdcccall(0)" : " __sdcccall(1)");
+                dbuf_printf (dbuf, " __sdcccall(%d)", FUNC_SDCCCALL (type));
               for (unsigned char i = 0; i < 9; i++)
                   if (type->funcAttrs.preserved_regs[i])
                   {

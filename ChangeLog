@@ -1,5 +1,10 @@
 2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* .version:
+	  Start post-4.2.0 development.
+
+2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* Merge sdcc-next branch to trunk.
 
 2022-03-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>

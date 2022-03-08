@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "simz80cl.h"
+#include "glob.h"
 
 
 int

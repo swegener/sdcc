@@ -400,24 +400,6 @@ struct cpu_entry cpus_51[]=
     {NULL, CPU_NONE, 0, "", ""}
   };
 
-struct cpu_entry cpus_z80[]=
-  {
-    {"Z80"    , CPU_Z80,     0			, ""		, ""},
-
-    {"Z180"   , CPU_Z180,    0			, ""		, ""},
-    {"R2K"    , CPU_R2K,     0			, ""		, ""},
-    {"R3KA"   , CPU_R3KA,    0			, ""		, ""},
-
-    {"GB80"   , CPU_GB80,    0			, ""		, ""},
-    {"LR35902", CPU_LR35902, 0			, ""		, ""},
-
-    {"EZ80"   , CPU_EZ80,    0			, ""		, ""},
-
-    {"Z80N"   , CPU_Z80N,    0                  , ""            , ""},
-    
-    {NULL, CPU_NONE, 0, "", ""}
-  };
-
 struct cpu_entry cpus_hc08[]=
   {
     {"HC08"   , CPU_HC08, 0			, ""		, ""},

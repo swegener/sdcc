@@ -144,7 +144,10 @@ machine(struct mne *mp)
                 }
                 mchtyp = (int) op;
 
-                sprintf(id, "__%s", str);
+                /* GCC 10.2.0 error [-Wformat-overflow=] ? */
+                /* sprintf(id, "__%s", str); */
+                  memcpy(id, "__", 2);
+                  memcpy(&id[2], str, strlen(str)+1);
                 sp = lookup(id);
                 if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
                         err('m');
@@ -153,7 +156,13 @@ machine(struct mne *mp)
                 sp->s_addr = 1;
                 sp->s_flag |= S_ASG;
 
-                sprintf(buff, "%s %s", DS_CPU, str);
+                /* GCC 10.2.0 error [-Wformat-overflow=] ? */
+                /* sprintf(buff, "%s %s", DS_CPU, str); */
+                  t = strlen(DS_CPU);
+                  memcpy(buff, DS_CPU, t);
+                  memcpy(&buff[t], " ", 1);
+                  t1 = strlen(str);
+                  memcpy(&buff[t+1], str, t1+1);
                 cpu = buff;
 
                 sp = lookup("__SFR_BITS");

@@ -1173,6 +1173,7 @@ extern  struct mcrdef * newdef(int code, char *id);
 extern  struct mcrdef * nlookup(char *id);
 
 /* aslex.c */
+extern  VOID            chopcrlf(char *str);
 extern  int             comma(int flag);
 extern  char            endline(void);
 extern  int             get(void);
@@ -1325,6 +1326,7 @@ extern  struct mcrdef * newdef();
 extern  struct mcrdef * nlookup();
 
 /* aslex.c */
+extern  VOID            chopcrlf();
 extern  int             comma();
 extern  char            endline();
 extern  int             get();

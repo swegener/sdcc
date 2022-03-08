@@ -1,7 +1,7 @@
 /* m08pst.c */
 
 /*
- *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *  Copyright (C) 1993-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@ struct  mne     mne[] = {
 
         /* machine */
 
-    {   NULL,   ".setdp",       S_SDP,          0,      0       },
-
         /* system */
 
     {   NULL,   "CON",          S_ATYP,         0,      A_CON   },
@@ -52,8 +50,10 @@ struct  mne     mne[] = {
     {   NULL,   ".title",       S_HEADER,       0,      O_TITLE },
     {   NULL,   ".sbttl",       S_HEADER,       0,      O_SBTTL },
     {   NULL,   ".module",      S_MODUL,        0,      0       },
-    {   NULL,   ".include",     S_INCL,         0,      0       },
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {   NULL,   ".area",        S_AREA,         0,      0       },
+//    {	NULL,	".bank",	S_BANK,		0,	0	},
     {   NULL,   ".org",         S_ORG,          0,      0       },
     {   NULL,   ".radix",       S_RADIX,        0,      0       },
     {   NULL,   ".globl",       S_GLOBL,        0,      0       },
@@ -62,22 +62,34 @@ struct  mne     mne[] = {
     {   NULL,   ".iff",         S_CONDITIONAL,  0,      O_IFF   },
     {   NULL,   ".ift",         S_CONDITIONAL,  0,      O_IFT   },
     {   NULL,   ".iftf",        S_CONDITIONAL,  0,      O_IFTF  },
+//    {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
+//    {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
     {   NULL,   ".ifgt",        S_CONDITIONAL,  0,      O_IFGT  },
     {   NULL,   ".iflt",        S_CONDITIONAL,  0,      O_IFLT  },
     {   NULL,   ".ifge",        S_CONDITIONAL,  0,      O_IFGE  },
     {   NULL,   ".ifle",        S_CONDITIONAL,  0,      O_IFLE  },
     {   NULL,   ".ifeq",        S_CONDITIONAL,  0,      O_IFEQ  },
     {   NULL,   ".ifne",        S_CONDITIONAL,  0,      O_IFNE  },
+//    {	NULL,	".ifb",		S_CONDITIONAL,	0,	O_IFB	},
+//    {	NULL,	".ifnb",	S_CONDITIONAL,	0,	O_IFNB	},
+//    {	NULL,	".ifidn",	S_CONDITIONAL,	0,	O_IFIDN	},
+//    {	NULL,	".ifdif",	S_CONDITIONAL,	0,	O_IFDIF	},
     {   NULL,   ".iif",         S_CONDITIONAL,  0,      O_IIF   },
     {   NULL,   ".iiff",        S_CONDITIONAL,  0,      O_IIFF  },
     {   NULL,   ".iift",        S_CONDITIONAL,  0,      O_IIFT  },
     {   NULL,   ".iiftf",       S_CONDITIONAL,  0,      O_IIFTF },
+//    {	NULL,	".iifdef",	S_CONDITIONAL,	0,	O_IIFDEF},
+//    {	NULL,	".iifndef",	S_CONDITIONAL,	0,	O_IIFNDEF},
     {   NULL,   ".iifgt",       S_CONDITIONAL,  0,      O_IIFGT },
     {   NULL,   ".iiflt",       S_CONDITIONAL,  0,      O_IIFLT },
     {   NULL,   ".iifge",       S_CONDITIONAL,  0,      O_IIFGE },
     {   NULL,   ".iifle",       S_CONDITIONAL,  0,      O_IIFLE },
     {   NULL,   ".iifeq",       S_CONDITIONAL,  0,      O_IIFEQ },
     {   NULL,   ".iifne",       S_CONDITIONAL,  0,      O_IIFNE },
+//    {	NULL,	".iifb",	S_CONDITIONAL,	0,	O_IIFB	},
+//    {	NULL,	".iifnb",	S_CONDITIONAL,	0,	O_IIFNB	},
+//    {	NULL,	".iifidn",	S_CONDITIONAL,	0,	O_IIFIDN},
+//    {	NULL,	".iifdif",	S_CONDITIONAL,	0,	O_IIFDIF},
     {   NULL,   ".else",        S_CONDITIONAL,  0,      O_ELSE  },
     {   NULL,   ".endif",       S_CONDITIONAL,  0,      O_ENDIF },
     {   NULL,   ".list",        S_LISTING,      0,      O_LIST  },
@@ -111,14 +123,27 @@ struct  mne     mne[] = {
     {   NULL,   ".strs",        S_ASCIX,        0,      O_ASCIS },
     {   NULL,   ".strz",        S_ASCIX,        0,      O_ASCIZ },
     {   NULL,   ".fcc",         S_ASCIX,        0,      O_ASCII },
+//    {	NULL,	".define",	S_DEFINE,	0,	O_DEF	},
+//    {	NULL,	".undefine",	S_DEFINE,	0,	O_UNDEF	},
     {   NULL,   ".even",        S_BOUNDARY,     0,      O_EVEN  },
     {   NULL,   ".odd",         S_BOUNDARY,     0,      O_ODD   },
     {   NULL,   ".bndry",       S_BOUNDARY,     0,      O_BNDRY },
+//    {	NULL,	".msg"	,	S_MSG,		0,	0	},
+//    { NULL,   ".assume",      S_ERROR,        0,      0       },
+//    { NULL,   ".error",       S_ERROR,        0,      1       },
+/*    {	NULL,	".msb",		S_MSB,		0,	0	},	*/
+/*    {	NULL,	".lohi",	S_MSB,		0,	O_LOHI	},	*/
+/*    {	NULL,	".hilo",	S_MSB,		0,	O_HILO	},	*/
+/*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
+/*    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},	*/
+/*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
+/*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
+//    {	NULL,	".end",		S_END,		0,	0	},
+
 /* sdas specific */
     {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
 /* end sdas specific */
-//    { NULL,   ".assume",      S_ERROR,        0,      0       },
-//    { NULL,   ".error",       S_ERROR,        0,      1       },
+
         /* Macro Processor */
 
     {   NULL,   ".macro",       S_MACRO,        0,      O_MACRO },
@@ -136,6 +161,10 @@ struct  mne     mne[] = {
     {   NULL,   ".nval",        S_MACRO,        0,      O_NVAL  },
 
     {   NULL,   ".mdelete",     S_MACRO,        0,      O_MDEL  },
+
+	/* Special */
+
+    {   NULL,   ".setdp",       S_SDP,          0,      0       },
 
         /* Machines */
 

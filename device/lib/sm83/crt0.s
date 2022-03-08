@@ -2,6 +2,7 @@
 ;  crt0.s -Generic crt0.s for a GBZ80.
 ;
 ;  Copyright (C) 2000, Michael Hope
+;  Copyright (C) 2021 - 2022, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,7 +32,7 @@
         .area   _HEADER (ABS)
         ;; Reset vector
         .org    0x00
-        reti
+        jp      init
         ;; Used by regression tests
         .org    0x08
         reti
@@ -62,7 +63,7 @@
         reti
 
         .org    0x100
-        jp      init
+        jr      init
 
         .org    0x150
 init:
@@ -78,19 +79,19 @@ init:
         jp      _exit
 
         ;; Ordering of segments for the linker.
-	.area	_HOME
-	.area	_CODE
-	.area	_INITIALIZER
-	.area   _GSINIT
-	.area   _GSFINAL
+        .area	_HOME
+        .area	_CODE
+        .area	_INITIALIZER
+        .area   _GSINIT
+        .area   _GSFINAL
 
-	.area	_DATA
-	.area	_INITIALIZED
-	.area	_BSEG
-	.area   _BSS
-	.area   _HEAP
+        .area	_DATA
+        .area	_INITIALIZED
+        .area	_BSEG
+        .area   _BSS
+        .area   _HEAP
 
-	.area   _CODE
+        .area   _CODE
 __clock::
         ld      a,#2
         rst     0x08
@@ -106,33 +107,33 @@ _exit::
 
         .area   _GSINIT
 gsinit::
-
-	; Default-initialized global variables.
-	ld      hl, #s__DATA
-	xor	a, a
-	ld	bc, #l__DATA
+        ; Default-initialized global variables.
+        ld      de, #s__DATA
+        ld	bc, #l__DATA + 0x0101
+        xor     a, a
+        jr      loop_implicit_compare
 loop_implicit:
-	ld	a, b
-	or	a, c
-	jr	Z, zeroed_data
-	ld	a, (hl+)
-	dec	bc
-	jr	loop_implicit
+        ld	(hl+), a
+loop_implicit_compare:
+        dec     c
+        jr      NZ, loop_implicit
+        dec     b
+        jr      NZ, loop_implicit
 zeroed_data:
-
-	; Explicitly initialized global variables.
-	ld	de, #s__INITIALIZED
-	ld	hl, #s__INITIALIZER
-	ld	bc, #l__INITIALIZER
+        ; Explicitly initialized global variables.
+        ld	de, #s__INITIALIZED
+        ld	hl, #s__INITIALIZER
+        ld	bc, #l__INITIALIZER + 0x0101
+        jr      loop_explicit_compare
 loop_explicit:
-	ld	a, b
-	or	a, c
-	jr	Z, gsinit_next
-	ld	a, (hl+)
-	ld	(de), a
-	inc	de
-	dec	bc
-	jr	loop_explicit
+        ld	a, (hl+)
+        ld	(de), a
+        inc	de
+loop_explicit_compare:
+        dec     c
+        jr      NZ, loop_explicit
+        dec     b
+        jr      NZ, loop_explicit
 
 gsinit_next:
 

@@ -23,8 +23,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c F  cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 8 ticks [ELIDED]
-Host usage: [ELIDED]
 clear 0x800c
 
 # Start the vcd (we set the input file via the Makefile) and
@@ -91,6 +89,8 @@ vcd[0] value change dump
     rom[0x00000].6    loc1.6
     rom[0x00000].7    loc1.7
     rom[0x00001]      loc2
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 
 # Continue until an event stops us then dump the locations
 # that the vcd is driving according to the input file.
@@ -106,8 +106,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 17 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 01    .
 0x00001 loc2:                 00    .
@@ -123,8 +121,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 03    .
 0x00001 loc2:                 01    .
@@ -140,8 +136,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 02    .
 0x00001 loc2:                 02    .
@@ -157,8 +151,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 04    .
 0x00001 loc2:                 02    .
@@ -174,8 +166,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 0c    .
 0x00001 loc2:                 03    .
@@ -191,8 +181,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 08    .
 0x00001 loc2:                 04    .
@@ -208,8 +196,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 10    .
 0x00001 loc2:                 04    .
@@ -225,8 +211,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 30    0
 0x00001 loc2:                 05    .
@@ -242,8 +226,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 timer get
 timer #1("time") ON 0.000020500000000 sec (41 clks)
 timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
@@ -368,8 +350,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 40    @
 0x00001 loc2:                 06    .
@@ -385,8 +365,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 timer get
 timer #1("time") ON 0.000026500000000 sec (53 clks)
 timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
@@ -407,8 +385,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
 0x00001 loc2:                 08    .
@@ -424,8 +400,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 81    .
 0x00001 loc2:                 08    .
@@ -441,8 +415,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 81    .
 0x00001 loc2:                 09    .
@@ -458,8 +430,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
 0x00001 loc2:                 09    .
@@ -475,8 +445,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 84    .
 0x00001 loc2:                 0a    .
@@ -492,8 +460,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 84    .
 0x00001 loc2:                 0b    .
@@ -509,8 +475,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
 0x00001 loc2:                 0b    .
@@ -526,8 +490,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 90    .
 0x00001 loc2:                 0c    .
@@ -543,8 +505,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 90    .
 0x00001 loc2:                 0d    .
@@ -560,8 +520,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0800c    <.loop$0>:
 0x0800c    cc 80 0c       jp     0x800c <.loop$0>[0K
 F 0x00800c
-Simulated 2 ticks [ELIDED]
-Host usage: [ELIDED]
 dump rom 0 1
 0x00000 loc1:                 80    .
 0x00001 loc2:                 0d    .

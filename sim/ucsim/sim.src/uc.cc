@@ -598,6 +598,12 @@ cl_uc::init(void)
   analyzer_option->option->set_value(analyzer);
   vars= new cl_var_list();
   make_variables();
+  // Some app level vars:
+  reg_cell_var(&(application->cperiod), NULL, "cperiod",
+	       "Cycles between input checks");
+  reg_cell_var(&(application->ccyc), NULL, "ccyc",
+	       "Nr of cycles executed during simulation");
+  // Memories
   make_memories();
   if (rom == NULL)
     rom= address_space("rom"/*MEM_ROM_ID*/);
@@ -757,10 +763,8 @@ cl_uc::mk_hw_elements(void)
 {
   class cl_hw *h;
 
-  add_hw(h= new cl_simulator_interface(this));
-  h->init();
-  add_hw(h= new cl_vcd(this, 0, "vcd"));
-  h->init();
+  init_add_hw(h= new cl_simulator_interface(this));
+  init_add_hw(h= new cl_vcd(this, 0, "vcd"));
 }
 
 void
@@ -1210,6 +1214,8 @@ cl_uc::remove_chip(class cl_memory *chip)
     {
       as= (class cl_address_space *)(address_spaces->at(i));
       j= 0;
+      class cl_list bankers;
+      bankers.init();
       while (j < as->decoders->get_count())
 	{
 	  for (j= 0; j < as->decoders->get_count(); j++)
@@ -1223,7 +1229,26 @@ cl_uc::remove_chip(class cl_memory *chip)
 		  as->undecode_area(NULL, as_start, as_end, NULL);
 		  break;
 		}
+	      if (ad->is_banker())
+		{
+		  if (ad->uses_chip(chip))
+		    {
+		      bankers.add(ad);
+		    }
+		}
 	    }
+	}
+      if (bankers.count > 0)
+	{
+	  int i;
+	  for (i= 0; i < bankers.count; i++)
+	    {
+	      class cl_address_decoder *ad;
+	      ad= (class cl_address_decoder *)(bankers.at(i));
+	      as->decoders->disconn(ad);
+	      delete ad;
+	    }
+	  bankers.disconn_all();
 	}
     }
   memchips->disconn(chip);
@@ -1896,6 +1921,8 @@ void
 cl_uc::add_hw(class cl_hw *hw)
 {
   int i;
+  if (!hw)
+    return;
   for (i= 0; i < hws->count; i++)
     {
       class cl_hw *h= (class cl_hw *)(hws->at(i));
@@ -1908,6 +1935,16 @@ cl_uc::add_hw(class cl_hw *hw)
       if (h != hw)
 	h->new_hw_added(hw);
     }  
+}
+
+void
+cl_uc::init_add_hw(class cl_hw *hw)
+{
+  if (hw)
+    {
+      hw->init();
+      add_hw(hw);
+    }
 }
 
 int
@@ -2529,8 +2566,8 @@ cl_uc::tick(int cycles)
         }
     }
 
-  tick_hw(cycles);
-
+  //tick_hw(cycles);
+  inst_ticks+= cycles;
   return(0);
 }
 
@@ -2796,6 +2833,8 @@ cl_uc::exec_inst_tab(instruction_wrapper_fn itab[])
 void
 cl_uc::post_inst(void)
 {
+  tick_hw(inst_ticks);
+  inst_ticks= 0;
   if (errors->count)
     check_errors();
   if (events->count)

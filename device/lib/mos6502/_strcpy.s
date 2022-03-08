@@ -36,22 +36,18 @@
 	.globl _strcpy
 
 ;--------------------------------------------------------
-; overlayable items in zero page
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_src:
-	.ds 2
-_dst:
-	.ds 2
-
-
-;--------------------------------------------------------
-; function parameters
-;--------------------------------------------------------
-	.area BSS
 _strcpy_PARM_2:
 	.ds 2
 
+;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define _src "_strcpy_PARM_2"
+	.define _dst "___SDCC_m6502_ret0"
+	
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -60,10 +56,10 @@ _strcpy_PARM_2:
 _strcpy:
 	sta	*_dst+0
 	stx	*_dst+1
-	lda	_strcpy_PARM_2+0
-	sta	*_src+0
-	ldx	_strcpy_PARM_2+1
-	stx	*_src+1
+;//	lda	_strcpy_PARM_2+0
+;//	sta	*_src+0
+;//	ldx	_strcpy_PARM_2+1
+;//	stx	*_src+1
 
 	ldy	#0
 cpy_loop:

@@ -4,6 +4,7 @@
    Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
 
    (c) 2013 Goethe-Universität Frankfurt
+   (c) 2022 Sebastian 'basxto' Riedel
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -34,8 +35,15 @@
 #undef isspace
 #endif
 
+// ' ' and '\n' are most common; '\t' to '\r' ordered by value
 int isspace (int c)
 {
-  return (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v');
+#if defined ( __SDCC_sm83 ) || defined ( __SDCC_z80 ) ||  defined ( __SDCC_z80n ) ||  defined ( __SDCC_z180 ) ||  defined ( __SDCC_ez80_z80 ) ||  defined ( __SDCC_mos6502 ) 
+  if((c & 0xff00) != 0)
+    return 0;
+  return ((unsigned char)c == ' ' || (unsigned char)c == '\t' || (unsigned char)c == '\n' || (unsigned char)c == '\v' || (unsigned char)c == '\f' || (unsigned char)c == '\r');
+#else
+  return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r');
+#endif
 }
 

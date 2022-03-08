@@ -85,7 +85,7 @@ class cl_hw: public cl_guiobj
   virtual ~cl_hw(void);
 
   virtual int init(void);
-  virtual unsigned int cfg_size(void) { return 0; }
+  virtual unsigned int cfg_size(void) { return 1; }
 
   virtual void new_hw_adding(class cl_hw *new_hw);
   virtual void new_hw_added(class cl_hw *new_hw);

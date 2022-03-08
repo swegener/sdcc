@@ -23,6 +23,11 @@
  */
 
 /*
+ * xerr messages and order fix Copyright (C) 1989-2021  Alan R. Baldwin
+ * from ASxxxx 5.40
+ */
+
+/*
  * Extensions: P. Felber
  */
 
@@ -49,6 +54,18 @@ addr(esp)
 struct expr *esp;
 {
         int c, mode, indx;
+	char *p;
+
+	/* fix order of '<', '>', and '#' */
+	p = ip;
+	if (((c = getnb()) == '<') || (c == '>')) {
+		p = ip-1;
+		if (getnb() == '#') {
+			*p = *(ip-1);
+			*(ip-1) = c;
+		}
+	}
+	ip = p;
 
         if ((c = getnb()) == '#') {
                 expr(esp, 0);
@@ -63,11 +80,11 @@ struct expr *esp;
                 } else
                 if ((indx = admode(R8X)) != 0) {
                         mode = S_R8X;
-                        aerr();
+                        xerr('a', "No I or R.");
                 } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
-                        aerr();
+                        xerr('a', "Registers AF and AF' are invalid.");
                 } else {
                         mode = S_INDM;
                         expr(esp, 0);
@@ -78,7 +95,7 @@ struct expr *esp;
                         esp->e_base.e_ap = NULL;
                 }
                 if ((c = getnb()) != RTIND) {
-                        qerr();
+                        xerr('a', "Missing ')'.");
                 }
         } else {
                 unget(c);
@@ -117,16 +134,33 @@ struct expr *esp;
                                 && ((indx&0xFF)==IX || (indx&0xFF)==IY)) {
                                 esp->e_mode = S_INDR + (indx&0xFF);
                         } else {
-                                aerr();
+                                xerr('a', "Register IX or IY required.");
                         }
                         if ((c = getnb()) != RTIND)
-                                qerr();
+                                xerr('a', "Missing ')'.");
                 } else {
                         unget(c);
                 }
         }
         return (esp->e_mode);
 }
+
+/*
+ * When building a table that has variations of a common
+ * symbol always start with the most complex symbol first.
+ * for example if x, x+, and x++ are in the same table
+ * the order should be x++, x+, and then x.  The search
+ * order is then most to least complex.
+ */
+
+/*
+ * When searching symbol tables that contain characters
+ * not of type LTR16, eg with '-' or '+', always search
+ * the more complex symbol tables first. For example:
+ * searching for x+ will match the first part of x++,
+ * a false match if the table with x+ is searched
+ * before the table with x++.
+ */
 
 /*
  * Enter admode() to search a specific addressing mode table

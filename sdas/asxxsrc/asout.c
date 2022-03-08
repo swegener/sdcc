@@ -1,7 +1,7 @@
 /* asout.c */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -361,7 +361,7 @@ write_rmode(int r, int n)
 /*)Function     VOID    outatxb(i, v)
  *
  *              int     i               number of bytes to process
- *              int     v               assembler data
+ *              a_uint     v               assembler data
  *
  *      The function outatxb() outputs i bytes
  *
@@ -503,7 +503,7 @@ outrxb(int i, struct expr *esp, int r)
                          */
                         if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_PAG0) &&
                            ((n & esp->e_addr) != 0))
-                                err('d');
+                                xerr('d', "Page 0 Address Error.");
 
                         out_lxb(i,esp->e_addr,0);
                         if (oflag) {
@@ -1559,25 +1559,25 @@ out_txb(int i, a_uint v)
 int
 lobyte(a_uint v)
 {
-        return ((int) v&0377);
+	return ((int) (v&0377));
 }
 
 int
 hibyte(a_uint v)
 {
-        return ((int) (v>>8)&0377);
+	return ((int) ((v>>8)&0377));
 }
 
 int
 thrdbyte(a_uint v)
 {
-        return ((int) (v>>16)&0377);
+	return ((int) ((v>>16)&0377));
 }
 
 int
 frthbyte(a_uint v)
 {
-        return ((int) (v>>24)&0377);
+	return ((int) ((v>>24)&0377));
 }
 
 /*

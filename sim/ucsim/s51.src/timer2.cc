@@ -118,8 +118,7 @@ cl_timer2::write(class cl_memory_cell *cell, t_mem *val)
 	mode= T2MODE_BAUDRATE;
       else
 	mode= T2MODE_OFF;
-      if (mode != oldmode)
-	inform_partners(EV_T2_MODE_CHANGED, &n);
+      inform_partners(EV_T2_MODE_CHANGED, &n);
     }
   else if (cell == cell_t2mod)
     {

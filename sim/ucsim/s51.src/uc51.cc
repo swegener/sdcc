@@ -739,13 +739,16 @@ cl_51core::mk_hw_elements(void)
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
-
-  add_hw(h= new cl_timer0(this, 0, "timer0"));
+  
+  h= new cl_timer0(this, 0, "timer0");
   h->init();
-  add_hw(h= new cl_timer1(this, 1, "timer1"));
+  add_hw(h);
+  h= new cl_timer1(this, 1, "timer1");
   h->init();
-  add_hw(h= new cl_serial(this));
+  add_hw(h);
+  h= new cl_serial(this);
   h->init();
+  add_hw(h);
 
   add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
@@ -1137,14 +1140,13 @@ cl_51core::disass(t_addr addr)
   const char *b;
   t_addr operand;
   t_mem code= rom->get(addr);
-  struct dis_entry *dt;//= &(dis_tbl()[code]);
+  struct dis_entry *dt;
   bool first;
 
   dt= dis_tbl();
   if (!dt) return NULL;
   dt= &dt[code];
   
-  //p= work;
   work= ""; first= true;
   b= dt->mnemonic;
   while (*b)
@@ -1214,34 +1216,8 @@ cl_51core::disass(t_addr addr)
       else
 	work+= *(b++);
     }
-  //*p= '\0';
-  /*
-  p= strchr(work, ' ');
-  if (!p)
-    {
-      buf= strdup(work);
-      return(buf);
-    }
-  */
-  /*
-  if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
-  else
-    buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, s= buf; *p != ' '; p++, s++)
-    *s= *p;
-  p++;
-  *s= '\0';
-  if (sep == NULL)
-    {
-      while (strlen(buf) < 6)
-	strcat(buf, " ");
-    }
-  else
-    strcat(buf, sep);
-  strcat(buf, p);
-  */
-  return(/*buf*/strdup(work.c_str()));
+  
+  return(strdup(work.c_str()));
 }
 
 
@@ -1279,7 +1255,7 @@ cl_51core::print_regs(class cl_console_base *con)
   else
     stop= 0;
   con->dd_printf ("SP ", start);
-  con->dd_cprintf("dump_address", iram->addr_format, start);
+  con->dd_cprintf("dump_address", "0x%02x", (u8_t)start);
   con->dd_printf (" ->");
   for (; start >= stop; start--)
     con->dd_cprintf("dump_number", " %02x", iram->get(start));
@@ -1367,7 +1343,7 @@ cl_51core::print_regs(class cl_console_base *con)
 	  f.format("0x%%0%dx",a*2);
 	  data= xram->get(dp);
 	  con->dd_printf("   DPTR= ");
-	  con->dd_printf(/*xram->addr_format*/f.c_str(), dp);
+	  con->dd_printf(f.c_str(), dp);
 	  con->dd_printf(" @DPTR= 0x%02x %3d %c\n",
 			 data, data, isprint(data)?data:'.');
 	}

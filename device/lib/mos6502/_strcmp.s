@@ -36,22 +36,17 @@
 	.globl _strcmp
 
 ;--------------------------------------------------------
-; overlayable items in zero page
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_str1:
-	.ds 2
-_str2:
-	.ds 2
-
-
-;--------------------------------------------------------
-; function parameters
-;--------------------------------------------------------
-	.area BSS
 _strcmp_PARM_2:
 	.ds 2
 
+;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define _str2 "_strcmp_PARM_2"
+	.define _str1 "___SDCC_m6502_ret0"
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -60,10 +55,6 @@ _strcmp_PARM_2:
 _strcmp:
 	sta	*_str1+0
 	stx	*_str1+1
-	lda	_strcmp_PARM_2+0
-	sta	*_str2+0
-	ldx	_strcmp_PARM_2+1
-	stx	*_str2+1
 
 	ldy	#0
 loop:
@@ -80,10 +71,10 @@ loop:
 L1:
 	bcs	L2
 	ldx	#0xFF
-	txa
+;//	txa
 	rts
 L2:
 	ldx	#0x01
-	txa
+;//	txa
 end:
 	rts

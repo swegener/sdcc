@@ -69,6 +69,7 @@ int
 cl_st7::init(void)
 {
   cl_uc::init(); /* Memories now exist */
+  sp_limit= 0;
 
   set_xtal(8000000);
 

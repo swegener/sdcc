@@ -3,6 +3,7 @@
 ;
 ;  Copyright (C) 2020, Sergey Belyashov
 ;  Copyright (c) 2021, Philipp Klaus Krause
+;  Copyright (c) 2022, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -35,13 +36,11 @@ _abs::
 	ld	c, e
 	ld	b, d
 	bit	7, b
-	ret	Z
-	ld	a, c
-	cpl
+	ret	Z ; Return since positive
+	xor	a ; 0
+	sub	e ; 0-e
 	ld	c, a
-	ld	a, b
-	cpl
+	sbc	d ; 0-e-d
+	add	e ; 0-d
 	ld	b, a
-	inc	bc
 	ret
-

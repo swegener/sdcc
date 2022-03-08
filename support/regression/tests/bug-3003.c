@@ -36,7 +36,7 @@ static volatile uint8_t* f(const uint8_t id)
     return result;
 }
 
-#if defined (__SDCC_pdk14) || defined (__SDCC_pdk15) || defined (__SDCC_mcs51) // Lack of memory
+#if defined (__SDCC_pdk14) || defined (__SDCC_pdk15) || defined (__SDCC_mcs51) || defined (__SDCC_STACK_AUTO) // Lack of memory
 #define BUFFERSIZE 20
 #else
 #define BUFFERSIZE 300

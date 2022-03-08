@@ -83,9 +83,9 @@ set mem PC_CR2.5 1
 # So this is our state now
 dump pc_pins PC_ODR PC_IDR PC_DDR PC_CR1 PC_CR2 EXTI_CR1 EXTI_CR2 rom[0x50a3][7:0]
 0x2      pc_pin:                   
-         pc_pins:                   0b01011010 0x5a 'Z'  90
+         pc_pins:                   0b00011001 0x19 '.'  25
 0x0500a      PC_ODR:                    0b00000000 0x00 '.'   0
-0x0500b      PC_IDR:                    0b01011010 0x5a 'Z'  90
+0x0500b      PC_IDR:                    0b00011001 0x19 '.'  25
 0x0500c      PC_DDR:                    0b00000000 0x00 '.'   0
 0x0500d      PC_CR1:                    0b00000000 0x00 '.'   0
 0x0500e      PC_CR2:                    0b00100100 0x24 '$'  36
@@ -126,8 +126,26 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 882 ticks [ELIDED]
-Host usage: [ELIDED]
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x008021: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+
+0x08021    <.EXTI2>:
+0x08021    72 5c 00 00    inc    0x0000[0K
+F 0x008021
+cont
+Simulation started, PC=0x008021
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
 cont
 Simulation started, PC=0x00801c
 
@@ -137,8 +155,6 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 194 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
 
@@ -148,30 +164,6 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 550 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 138 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 278 ticks [ELIDED]
-Host usage: [ELIDED]
 
 # Then on the rising edge
 set mem EXTI_CR1[5:4] 0b01
@@ -179,27 +171,12 @@ set mem EXTI_CR1[5:4] 0b01
 cont
 Simulation started, PC=0x00801c
 
-Stop at 0x00802c: (104) Breakpoint
-V-IHINZC  Flags= 0x22  34 "  A= 0x00   0 .
-0-100010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-
-0x0802c    <.loop$0>:
-0x0802c    cc 80 2c       jp     0x802c <.loop$0>[0K
-F 0x00802c
-Simulated 120 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00802c
-
 Stop at 0x00801c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 154 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
 
@@ -211,8 +188,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0802c    <.loop$0>:
 0x0802c    cc 80 2c       jp     0x802c <.loop$0>[0K
 F 0x00802c
-Simulated 132 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00802c
 
@@ -222,14 +197,23 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 150 ticks [ELIDED]
-Host usage: [ELIDED]
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x008021: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+
+0x08021    <.EXTI2>:
+0x08021    72 5c 00 00    inc    0x0000[0K
+F 0x008021
 
 # Then on the falling edge
 set mem EXTI_CR1[5:4] 0b10
 0x050a0[5:4]                            0b--10---- 0x02 '.'   2
 cont
-Simulation started, PC=0x00801c
+Simulation started, PC=0x008021
 
 Stop at 0x00801c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -237,32 +221,6 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 138 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00802c: (104) Breakpoint
-V-IHINZC  Flags= 0x22  34 "  A= 0x00   0 .
-0-100010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-
-0x0802c    <.loop$0>:
-0x0802c    cc 80 2c       jp     0x802c <.loop$0>[0K
-F 0x00802c
-Simulated 260 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00802c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 158 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
 
@@ -274,8 +232,6 @@ SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x0802c    <.loop$0>:
 0x0802c    cc 80 2c       jp     0x802c <.loop$0>[0K
 F 0x00802c
-Simulated 120 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00802c
 
@@ -285,8 +241,26 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 298 ticks [ELIDED]
-Host usage: [ELIDED]
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x00802c: (104) Breakpoint
+V-IHINZC  Flags= 0x22  34 "  A= 0x00   0 .
+0-100010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
+
+0x0802c    <.loop$0>:
+0x0802c    cc 80 2c       jp     0x802c <.loop$0>[0K
+F 0x00802c
+cont
+Simulation started, PC=0x00802c
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
 
 # The rest as level (0) triggered
 set mem EXTI_CR1[5:4] 0b00
@@ -300,8 +274,6 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 144 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
 
@@ -311,98 +283,8 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 138 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 144 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 144 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x008025: (104) Breakpoint
-V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
-0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x08025    80             iret[0K
-F 0x008025
-Simulated 106 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x008025
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 278 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 576 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 142 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x00801c: (104) Breakpoint
-V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
-0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
-F 0x00801c
-Simulated 288 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x00801c
-
-Stop at 0x008025: (104) Breakpoint
-V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
-0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
-0x08025    80             iret[0K
-F 0x008025
-Simulated 106 ticks [ELIDED]
-Host usage: [ELIDED]
-cont
-Simulation started, PC=0x008025
 
 Stop at 0x008021: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -412,10 +294,17 @@ SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x08021    <.EXTI2>:
 0x08021    72 5c 00 00    inc    0x0000[0K
 F 0x008021
-Simulated 140 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x008021
+
+Stop at 0x008025: (104) Breakpoint
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x08025    80             iret[0K
+F 0x008025
+cont
+Simulation started, PC=0x008025
 
 Stop at 0x00801c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
@@ -423,8 +312,6 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 138 ticks [ELIDED]
-Host usage: [ELIDED]
 cont
 Simulation started, PC=0x00801c
 
@@ -434,5 +321,70 @@ V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
 0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
 F 0x00801c
-Simulated 576 ticks [ELIDED]
-Host usage: [ELIDED]
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x008021: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+
+0x08021    <.EXTI2>:
+0x08021    72 5c 00 00    inc    0x0000[0K
+F 0x008021
+cont
+Simulation started, PC=0x008021
+
+Stop at 0x008021: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+
+0x08021    <.EXTI2>:
+0x08021    72 5c 00 00    inc    0x0000[0K
+F 0x008021
+cont
+Simulation started, PC=0x008021
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x00801c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x0801c    82 00 80 21    int    #0x008021 <.EXTI2>[0K
+F 0x00801c
+cont
+Simulation started, PC=0x00801c
+
+Stop at 0x008025: (104) Breakpoint
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17f6 [SP+1]= 22  34 "  Limit= 0x1500
+0x08025    80             iret[0K
+F 0x008025

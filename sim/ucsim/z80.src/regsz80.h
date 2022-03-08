@@ -97,27 +97,6 @@ struct t_regs
   u8_t R;
 };
 
-/*
-enum {
-  BIT_C=	0x01,  // carry status(out of bit 7)
-  BIT_N=	0x02,  // Not addition: subtract status(1 after subtract).
-  BIT_P=	0x04,  // parity/overflow, 1=even, 0=odd parity.  arith:1=overflow
-  BIT_A=	0x10,  // aux carry status(out of bit 3)
-  BIT_Z=	0x40,  // zero status, 1=zero, 0=nonzero
-  BIT_S=	0x80,  // sign status(value of bit 7)
-  BIT_ALL=	(BIT_C |BIT_N |BIT_P |BIT_A |BIT_Z |BIT_S)  // all bits
-};
-*/
-
-enum {
-  BITPOS_C= 0,    // 1
-  BITPOS_SUB= 1,  // 2H
-  BITPOS_P= 2,    // 4H
-  BITPOS_A= 4,    // 10H
-  BITPOS_Z= 6,    // 40H
-  BITPOS_S= 7    // 80H
-};
-
 #endif
 
 /* End of z80.src/regsz80.h */

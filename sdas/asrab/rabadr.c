@@ -30,6 +30,11 @@
  */
 
 /*
+ * xerr messages and order fix Copyright (C) 1989-2021  Alan R. Baldwin
+ * from ASxxxx 5.40
+ */
+
+/*
  * Extensions: P. Felber
  *
  * Altered by Leland Morrison to support rabbit 2000 
@@ -59,6 +64,18 @@ addr(esp)
 struct expr *esp;
 {
         int c, mode, indx;
+	char *p;
+
+	/* fix order of '<', '>', and '#' */
+	p = ip;
+	if (((c = getnb()) == '<') || (c == '>')) {
+		p = ip-1;
+		if (getnb() == '#') {
+			*p = *(ip-1);
+			*(ip-1) = c;
+		}
+	}
+	ip = p;
 
         if ((c = getnb()) == '#') {
                 expr(esp, 0);
@@ -104,7 +121,7 @@ struct expr *esp;
                  *   flag an error if the closing paren is absent
                  */
                 if ((c = getnb()) != RTIND) {
-                        qerr();
+                        xerr('q', "Missing ')'.");
                 }
         } else {
                 unget(c);
@@ -159,10 +176,10 @@ struct expr *esp;
                         } else if ( (indx&0xFF)==HL ) {
                           esp->e_mode = S_IDHL_OFFSET;
                         } else {
-                                aerr();
+                                xerr('a', "BC, DE, HL, SP, IX, or IY required.");
                         }
                         if ((c = getnb()) != RTIND)
-                                qerr();
+                                xerr('q', "Missing ')'.");
                 } else {
                         unget(c);
                 }

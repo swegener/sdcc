@@ -45,22 +45,22 @@ var UART1_SR_TC       rom[0x5230].6
 var UART1_SR_RXNE     rom[0x5230].5
 
 dump rom[0x00] 0x3d
-0x00000                       08                      .
-0x00001 uart1_tx_buf:         70 d4 b2 8a 29 54 48 9a p...)TH.
-0x00009                       0a bc d5 0e 18 a8 44 ac ......D.
-0x00011                       5b f3 8e 4c d7 2d 9b 09 [..L.-..
-0x00019                       42 e5 06 c4 33 af cd a3 B...3...
+0x00000                       41                      A
+0x00001 uart1_tx_buf:         58 fc c9 8b bc 95 6b 72 X.....kr
+0x00009                       26 6b c5 5e af 85 8c d8 &k.^....
+0x00011                       65 df a8 d9 9f a6 f2 07 e.......
+0x00019                       e9 4a 03 c9 d0 94 31 43 .J....1C
 0x00021 vuart_tx_state:       84                      .
-0x00022 vuart_tx:             7f                      .
-0x00023 vuart_rx_state:       2d                      -
-0x00024 vuart_rx:             ad                      .
-0x00025 vuart_rx_bit:         d4                      .
-0x00026 vuart_tx_buf:         76 47 de 32 1c ec 4a c4 vG.2..J.
-0x0002e                       30 f6 20 23 85 6c fb b2 0. #.l..
-0x00036 uart1_tx_w:           07 04                   ..
-0x00038 uart1_tx_r:           f4 ec                   ..
-0x0003a vuart_tx_w:           0b b9                   ..
-0x0003c vuart_tx_r:           20 ba                    .
+0x00022 vuart_tx:             1d                      .
+0x00023 vuart_rx_state:       b3                      .
+0x00024 vuart_rx:             ea                      .
+0x00025 vuart_rx_bit:         be                      .
+0x00026 vuart_tx_buf:         d3 5d 26 37 cd 24 50 ed .]&7.$P.
+0x0002e                       77 50 41 e7 3e 6a 8f a1 wPA.>j..
+0x00036 uart1_tx_w:           f2 6b                   .k
+0x00038 uart1_tx_r:           f1 48                   .H
+0x0003a vuart_tx_w:           0c 99                   ..
+0x0003c vuart_tx_r:           bb 0c                   ..
 dc 0x8000 0x082a4 
 
 0x08000    <__interrupt_vect>:

@@ -283,11 +283,9 @@ cl_stm8::mk_hw_elements(void)
       o->hide();
     }
   
-  add_hw(h= new cl_dreg(this, 0, "dreg"));
-  h->init();
+  init_add_hw(h= new cl_dreg(this, 0, "dreg"));
 
-  add_hw(d= new cl_port_ui(this, 0, "dport"));
-  d->init();
+  init_add_hw(d= new cl_port_ui(this, 0, "dport"));
   pd.init();
   
   if (type->type == CPU_STM8S)
@@ -686,14 +684,16 @@ cl_stm8::mk_hw_elements(void)
   // FLASH
   if (type->subtype & (DEV_STM8SAF))
     {
-      add_hw(flash_ctrl= new cl_saf_flash(this, 0x505a));
+      flash_ctrl= new cl_saf_flash(this, 0x505a);
       flash_ctrl->init();
+      add_hw(flash_ctrl);
     }
   else if (type->subtype & (DEV_STM8ALL |
 			    DEV_STM8L101))
     {
-      add_hw(flash_ctrl= new cl_l_flash(this, 0x5050));
+      flash_ctrl= new cl_l_flash(this, 0x5050);
       flash_ctrl->init();
+      add_hw(flash_ctrl);
     }
   //add_hw(h= new cl_tim235(this, 3, 0x5320));
   //h->init();
@@ -1386,7 +1386,7 @@ cl_stm8::tick(int cycles_cpu)
               // If the other bus is not busy this is a genuine stall due to running out of fetch data
               else if (!pipeline_busy.program || !pipeline_busy.data)
                 {
-                  error(new cl_error_stm8_pipeline_fetch_stall());
+                  //error(new cl_error_stm8_pipeline_fetch_stall());
                   pipetrace_tick("FS");
                 }
               // Otherwise if both buses are busy there was a flush and the stall is expected
@@ -1402,7 +1402,8 @@ cl_stm8::tick(int cycles_cpu)
         pipetrace_max_ticks = pipetrace_ticks;
     }
 
-  return cl_uc::tick(cycles_cpu);
+  cl_uc::tick(cycles_cpu);
+  return 0;
 }
 
 t_mem
@@ -1415,7 +1416,7 @@ cl_stm8::fetch(void)
           // We have to have a full word before we can use any of it.
           while (pipeline_bytes - (pipeline_index & ~3) < 4)
             {
-              error(new cl_error_stm8_pipeline_decode_stall());
+              //error(new cl_error_stm8_pipeline_decode_stall());
               pipetrace_type("Sfetch");
               tick(1);
               pipetrace_type("D");
@@ -2849,7 +2850,6 @@ cl_stm8_cpu::print_info(class cl_console_base *con)
   con->dd_printf("  Pipetrace folding: %s\n", (stm8->pipetrace_fold ? "on" : "off"));
 
   con->dd_printf("\n");
-  print_cfg_info(con);
 }
 
 

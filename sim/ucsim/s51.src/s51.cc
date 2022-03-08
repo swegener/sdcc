@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "globals.h"
+#include "utils.h"
 
 // sim.src
 //#include "appcl.h"
@@ -48,6 +49,7 @@ main(int argc, char *argv[])
   int retval;
   class cl_sim *sim;
 
+  app_start_at= dnow();
   cpus= cpus_51;
   application= new cl_app();
   application->set_name("s51");

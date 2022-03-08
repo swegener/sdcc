@@ -171,7 +171,6 @@
 #define	S_ADC	69
 #define	S_AND	70
 #define	S_PUSH	72
-#define	S_LDH	73
 
 #define	S_RL	76
 #define	S_RST	77
@@ -182,6 +181,7 @@
 #define S_LDHL	90	/* LDHL SP,offset */
 #define	S_LDA	91
 #define	S_STOP	83
+#define	S_LDH	84
 #define S_TILE	93	/* .TILE pseudo-op */
 
 struct adsym

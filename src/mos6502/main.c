@@ -5,7 +5,7 @@
 
   Hacked for the MOS6502:
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
-  Copyright (C) 2021, Gabriele Gorla
+  Copyright (C) 2021-2022, Gabriele Gorla
 
 
   This program is free software; you can redistribute it and/or modify it
@@ -22,16 +22,12 @@
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
-/*
-    Note that mlh prepended _m6502_ on the static functions.  Makes
-    it easier to set a breakpoint using the debugger.
-*/
 #include "common.h"
+#include "dbuf_string.h"
 #include "m6502.h"
-#include "main.h"
+
 #include "ralloc.h"
 #include "gen.h"
-#include "dbuf_string.h"
 
 #define OPTION_SMALL_MODEL          "--model-small"
 #define OPTION_LARGE_MODEL          "--model-large"
@@ -71,25 +67,18 @@ MOS6502_OPTS mos6502_opts;
 static char *_keywords[] = {
   "at",
   "code",
-  "critical",
   "data",
-  "far",
-  //"idata",
-  "interrupt",
+  "zp",
   "near",
-  //"pdata",
-  "reentrant",
-  //"using",
   "xdata",
-  "_data",
-  "_code",
-  "_generic",
-  "_near",
-  "_xdata",
-  //"_pdata",
-  //"_idata",
-  "_naked",
-  "_overlay",
+  "far",
+//  "overlay",
+//  "using",
+//  "generic",
+  "reentrant",
+  "naked",
+  "interrupt",
+  "critical",
   NULL
 };
 
@@ -181,7 +170,7 @@ _m6502_setDefaultOptions (void)
 {
   options.code_loc = 0x200;
   options.data_loc = 0x20;	/* zero page */
-  options.xdata_loc = 0x8000;   /* 0 means immediately following data */
+  options.xdata_loc = 0x0;      /* 0 means immediately following data */
   options.stack_loc = 0x1ff;
 
   options.omitFramePtr = 1;     /* no frame pointer (we use SP */
@@ -208,11 +197,11 @@ _m6502_genAssemblerPreamble (FILE * of)
     {
       // global variables in zero page
       fprintf (of, "\t.globl __TEMP\n");
-      fprintf (of, "\t.globl __BASEPTR\n");
+      fprintf (of, "\t.globl __DPTR\n");
       
       fprintf (of, "\t.area %s\n",port->mem.data_name);
       fprintf (of, "__TEMP:\t.ds %d\n", NUM_TEMP_REGS);
-      fprintf (of, "__BASEPTR:\t.ds 2\n");
+      fprintf (of, "__DPTR:\t.ds 2\n");
     }
 }
 
@@ -372,6 +361,17 @@ newAsmLineNode (void)
   return aln;
 }
 
+/*
+processor flags
+N 0x80
+V 0x40
+B 0x10
+D 0x08
+I 0x04
+Z 0x02
+C 0x01
+*/
+
 /* These must be kept sorted by opcode name */
 static m6502opcodedata m6502opcodeDataTable[] =
   {
@@ -393,7 +393,7 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"bvs",   M6502OP_BR,  0,     0 },
     {"bra",   M6502OP_BR,  0,     0 }, // 65C02 only
     {"clc",   M6502OP_INH, 0,     0x01 },
-    {"cld",   M6502OP_INH, 0,     0x80 },
+    {"cld",   M6502OP_INH, 0,     0x08 },
     {"cli",   M6502OP_INH, 0,     0x04 },
     {"clv",   M6502OP_INH, 0,     0x40 },
     {"cmp",   M6502OP_REG, 0,     0xc3 },
@@ -686,9 +686,9 @@ PORT mos6502_port =
     NULL,                 // iabs_name - absolute data
     NULL,                 // name of segment for initialized variables
     NULL,                 // name of segment for copies of initialized variables in code space
-    NULL,
-    NULL,
-    1,
+    NULL,                 // default location for auto vars
+    NULL,                 // default location for globl vars
+    1,                    // code space read-only 1=yes
     1                     // No fancy alignments supported.
   },
   { _m6502_genExtraAreas,
@@ -731,28 +731,28 @@ PORT mos6502_port =
   _m6502_init,
   _m6502_parseOptions,
   _mos6502_options,
-  NULL,
+  0,
   _m6502_finaliseOptions,
   _m6502_setDefaultOptions,
   m6502_assignRegisters,
   _m6502_getRegName,
   0,
-  NULL,
+  0,
   _keywords,
   _m6502_genAssemblerPreamble,
   _m6502_genAssemblerEnd,        /* no genAssemblerEnd */
   _m6502_genIVT,
   _m6502_genXINIT,
-  NULL,                         /* genInitStartup */
+  0,                            /* genInitStartup */
   _m6502_reset_regparm,
   _m6502_regparm,
-  NULL,                         /* process_pragma */
-  NULL,                         /* getMangledFunctionName */
+  0,                            /* process_pragma */
+  0,                            /* getMangledFunctionName */
   _hasNativeMulFor,             /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
   true,                         /* use_dw_for_init */
-  true,                         /* little_endian */
+  true,                         /* little endian */
   0,                            /* leave lt */
   0,                            /* leave gt */
   1,                            /* transform <= to ! > */
@@ -780,11 +780,11 @@ PORT mos65c02_port =
     false,                      /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_LARGE,
-    NULL,                       /* model == target */
+    0,                       /* model == target */
   },
   {
     _asmCmd,
-    NULL,
+    0,
     "-plosgffwy",               /* Options with debug */
     "-plosgffw",                /* Options without debug */
     0,
@@ -832,9 +832,9 @@ PORT mos65c02_port =
     NULL,                 // iabs_name - absolute data
     NULL,                 // name of segment for initialized variables
     NULL,                 // name of segment for copies of initialized variables in code space
-    NULL,
-    NULL,
-    1,                    /* CODE  is read-only */
+    NULL,                 // default location for auto vars
+    NULL,                 // default location for globl vars
+    1,                    // code space read-only 1=yes
     1                     // No fancy alignments supported.
   },
   { _m6502_genExtraAreas, NULL },
@@ -876,28 +876,28 @@ PORT mos65c02_port =
   _m65c02_init,
   _m6502_parseOptions,
   _mos6502_options,
-  NULL,
+  0,
   _m6502_finaliseOptions,
   _m6502_setDefaultOptions,
   m6502_assignRegisters,
   _m6502_getRegName,
   0,
-  NULL,
+  0,
   _keywords,
   _m6502_genAssemblerPreamble,
   _m6502_genAssemblerEnd,        /* no genAssemblerEnd */
   _m6502_genIVT,
   _m6502_genXINIT,
-  NULL,                         /* genInitStartup */
+  0,                            /* genInitStartup */
   _m6502_reset_regparm,
   _m6502_regparm,
-  NULL,                         /* process_pragma */
-  NULL,                         /* getMangledFunctionName */
+  0,                            /* process_pragma */
+  0,                            /* getMangledFunctionName */
   _hasNativeMulFor,             /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
   true,                         /* use_dw_for_init */
-  true,                         /* little_endian */
+  true,                         /* little endian */
   0,                            /* leave lt */
   0,                            /* leave gt */
   1,                            /* transform <= to ! > */

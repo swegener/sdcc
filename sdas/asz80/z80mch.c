@@ -794,7 +794,7 @@ struct mne *mp;
                         if ((v1 = admode(CND)) != 0) {
                                 outab(op | (v1<<3));
                         } else {
-                                qerr();
+                                xerr('a', "Require condition code NZ, Z, NC, or C.");
                         }
                 } else {
                         /*
@@ -842,13 +842,13 @@ struct mne *mp;
                         outab(0x8B);
                         break;
                 }
-                aerr();
+                xerr('a', "Only 16-Bit registers except SP.");
                 break;
 
         case S_RST:
                 v1 = (int) absexpr();
                 if (v1 & ~0x38) {
-                        aerr();
+                        xerr('a', "Allowed values: N * 0x08, N = 0 -> 7."); 
                         v1 = 0;
                 }
                 outab(op|v1);
@@ -858,7 +858,7 @@ struct mne *mp;
                 expr(&e1, 0);
                 abscheck(&e1);
                 if (e1.e_addr > 2) {
-                        aerr();
+                        xerr('a', "Values of 0, 1, and 2 are valid.");
                         e1.e_addr = 0;
                 }
                 outab(op);
@@ -884,12 +884,12 @@ struct mne *mp;
                  * bit  b,r
                  */
                 if (genop(0xCB, op, &e2, 0) || t1)
-                        aerr();
+                        xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_RL_UNDOCD:
           if (!allow_undoc)
-            aerr( );
+            xerr('a', "Undocumented instructions not enabled.");
 
         case S_RL:
                 t1 = 0;
@@ -908,7 +908,7 @@ struct mne *mp;
                         t2 = addr(&e2);
                 }
                 if (genop(0xCB, op, &e2, 0) || t1)
-                        aerr();
+                        xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_AND:
@@ -966,7 +966,7 @@ struct mne *mp;
                  * op  a,n      [a,#n]
                  */
                 if (genop(0, op, &e2, 1) || t1)
-                        aerr();
+                        xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_ADD:
@@ -987,7 +987,7 @@ struct mne *mp;
                         }
 
                         if (genop(0, op, &e1, 1))
-                                aerr();
+                                xerr('a', "Invalid Addressing Mode.");
                         break;
                 }
                 if ((t1 == S_R8) && (e1.e_addr == A)) {
@@ -1000,7 +1000,7 @@ struct mne *mp;
                         }
 
                         if (genop(0, op, &e2, 1))
-                                aerr();
+                                xerr('a', "Second argument: Invalid Addressing Mode.");
                         break;
                 }
                 if ((t1 == S_R16) && (t2 == S_R16)) {
@@ -1025,7 +1025,7 @@ struct mne *mp;
                                 break;
                         }
                         if (rf != S_ADD) {
-                                aerr();
+                                xerr('a', "Only valid with ADD.");
                                 break;
                         }
                         /*
@@ -1090,7 +1090,7 @@ struct mne *mp;
                                 break;
                         }
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_LD:
@@ -1212,7 +1212,7 @@ struct mne *mp;
                  */
                 if (mchtyp == X_EZ80 && (t1 == S_R16) && ((t2 == S_IDIX) || (t2 == S_IDIY))) {
                         if (v1 == SP) {
-                                aerr();
+                                xerr('a', "Only BC, DE, HL, IX and IY are allowed.");
                                 break;
                         }
                         if (t2 == S_IDIX) {
@@ -1247,7 +1247,7 @@ struct mne *mp;
                  */
                 if (mchtyp == X_EZ80 && (t2 == S_R16) && ((t1 == S_IDIX) || (t1 == S_IDIY))) {
                         if (v2 == SP) {
-                                aerr();
+                                xerr('a', "Only BC, DE, HL, IX and IY are allowed.");
                                 break;
                         }
                         if (t1 == S_IDIX) {
@@ -1485,7 +1485,7 @@ struct mne *mp;
                   outab ((v1 == A) ? 0x6E : 0x6D);
                   break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_EX:
@@ -1523,7 +1523,7 @@ struct mne *mp;
                         outab(0x08);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_IN:
@@ -1559,7 +1559,7 @@ struct mne *mp;
                                 break;
                         }
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_DEC:
@@ -1619,7 +1619,7 @@ struct mne *mp;
                         outab(op|(v1<<3));
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case S_DJNZ:
@@ -1631,7 +1631,7 @@ struct mne *mp;
                         if ((v1 &= 0xFF) <= 0x03) {
                                 op += (v1+1)<<3;
                         } else {
-                                aerr();
+                                xerr('a', "Condition code required.");
                         }
                         comma(1);
                 }
@@ -1643,7 +1643,7 @@ struct mne *mp;
                 if (mchpcr(&e2)) {
                         v2 = (int) (e2.e_addr - dot.s_addr - 1);
                         if (pass == 2 && ((v2 < -128) || (v2 > 127)))
-                                aerr();
+                                xerr('a', "Branching Range Exceeded.");
                         outab(v2);
                 } else {
                         outrb(&e2, R_PCR);
@@ -1708,7 +1708,7 @@ struct mne *mp;
                         outab(0x98);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case X_UNDOCD:
@@ -1746,7 +1746,7 @@ struct mne *mp;
                         outrb(&e2, 0);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case X_MLT:
@@ -1764,7 +1764,7 @@ struct mne *mp;
                         outab(op | (v1<<4));
                         break;
                 }
-                aerr();
+                xerr('a', "Only BC, DE, HL and SP are allowed.");
                 break;
 
         case X_TST:
@@ -1816,7 +1816,7 @@ struct mne *mp;
                         outrb(&e2, 0);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case X_TSTIO:
@@ -1830,7 +1830,7 @@ struct mne *mp;
                         outrb(&e1, 0);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case X_ZXN_INH2:
@@ -2052,7 +2052,7 @@ struct mne *mp;
 
         default:
                 opcycles = OPCY_ERR;
-                err('o');
+                xerr('o', "Internal Opcode Error.");
                 break;
         }
 

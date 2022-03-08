@@ -65,6 +65,12 @@ cl_r2k::cl_r2k(struct cpu_entry *Itype, class cl_sim *asim):
   cl_z80(Itype, asim), mmu(this)
 {
   type= Itype;
+  BITPOS_C= 0;
+  BITPOS_SUB= 1;
+  BITPOS_P= 2;
+  BITPOS_A= 4;
+  BITPOS_Z= 6;
+  BITPOS_S= 7;
 }
 
 cl_r3ka::cl_r3ka(struct cpu_entry *Itype, class cl_sim *asim):

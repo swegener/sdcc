@@ -1,3 +1,201 @@
+2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge sdcc-next branch to trunk.
+
+2022-03-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peep.c:
+	  Make it compile again.
+
+2022-03-07 Gabriele Gorla <gorlik@yahoo.com>
+
+	* support/regression/tests/bug3475630.c,
+	  support/regression/tests/bug2094505.c:
+	  Adjust tests parameters for stack-auto.
+  	* src/mos6502/gen.c,
+	  src/mos6502/main.c,
+	  src/mos6502/ralloc2.cc:
+  	  Use DPTR instead of YX for indexed addressing.
+
+2022-03-07 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peep.c:
+	  Accept more z80, sm83 and z80n mnemonics for size counting [bugs:#3330].
+
+2022-03-07 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Clear temp register literal values after a label.
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc2.cc:
+	  Add codegen for rotate.
+	  
+2022-03-07 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sim/ucsim/z80.src/inst_gb80.cc:
+	  Add `ld (c), a`.
+	  support/regression/ports/ucgbz80/support.c,
+	  support/regression/ports/ucgbz80/uCsim.cmd:
+	  Reduce size of __put.
+
+2022-03-07 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sim/ucsim/z80.src/gb80.cc,
+	  sim/ucsim/z80.src/inst_cb.cc,
+	  sim/ucsim/z80.src/inst_gb80.cc:
+	  Improve cycle counting.
+
+2022-03-06 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sim/ucsim/z80.src/gb80.cc,
+	  sim/ucsim/z80.src/z80mac.h:
+	  Fix bug #3340 (`pop af` and `and`).
+
+2022-03-06 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h,
+	  src/mos6502/ralloc2.cc:
+	  Prepare for new spillt allocator.
+
+2022-03-06 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph.def:
+	  Remove rlca when sub already sets carry.
+
+2022-03-05 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/SDCCgen.c:
+	  Improve labels in inline assembly and fix bug #2831.
+	  Patch based on patch by Tom Li.
+	* device/lib/_memmove.c,
+	  device/lib/sm83/crt0.s,
+	  device/lib/sm83/memcpy.s,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/peep.c:
+	  Add missing copyright notices.
+
+2022-03-05 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve debug output.
+
+2022-03-04 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c,
+	  src/mos6502/gen.h:
+	  Change asmop.type to enum.
+	* src/mos6502/gen.c:
+	  Remove unused "result" parameter from aopOp().
+	* src/mos6502/gen.c:
+	  Allow AX in genCpl().
+	* src/mos6502/gen.c:
+	  Remove unused parameters in freeAsmop().
+	* src/mos6502/main.c,
+	  src/mos6502/main.h:
+	  Removed unnecessary main.h
+
+2022-03-03 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/sm83/memcpy.s:
+	  Replace redundancy with macros.
+
+2022-03-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph.def:
+	  Disable rule that pessimized some ports.
+
+2022-03-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/main.c:
+	  Add -bo and -ba for z80, apply patch #399.
+
+2022-03-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/sm83/mul.s:
+	  Speed up multiplication algorithm.
+
+2022-03-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/_memset.c,
+	  device/lib/sm83/abs.s,
+	  device/lib/sm83/crt0.s,
+	  device/lib/sm83/memcpy.s,
+	  device/lib/sm83/setjmp.s:
+	  Improve sm83 assembly.
+
+2022-03-01 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asxxsrc/asdata.c,
+	  sdas/asxxsrc/asmain.c,
+	  sdas/asxxsrc/asxxxx.h:
+	  Add -h and hidden -t flags.
+	* sdas/asgb/gbadr.c,
+	  sdas/asgb/gb.h:
+	  Reduce customizations.
+
+2022-03-01 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph.def:
+	  Improve stdlib code through peephole rules.
+
+2022-02-28 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Refactor storeRegToAop()
+
+2022-02-28 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asz80/z80adr.c,
+	  sdas/asz80/z80mch.c:
+	  Merge error messages from upstream ASxxxx 5.40.
+	  Add a few for extensions/custom ports. Part 2.
+
+2022-02-27 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/ralloc.c,
+	  src/mos6502/gen.c:
+	  Remove freeAllRegs()
+  	* src/mos6502/gen.c:
+  	  Fix corner cases in assignResultValue() and genPointerSet()
+  	* support/regression/ports/mos6502/spec.mk
+  	  Removed redundant --out-fmt-ihx command line option
+  	* device/lib/mos6502/_strcpy.s,
+  	  device/lib/mos6502/_strcmp.s,
+  	  device/lib/mos6502/_mullong.s,
+  	  device/lib/mos6502/_mulint.s,
+  	  device/lib/mos6502/_divuint.s,
+  	  device/lib/mos6502/_divulong.s,
+  	  device/lib/mos6502/__memcpy.s:
+  	  Move function parameters to overlay segment.
+  	* device/lib/mos6502/_divsint.s,
+  	  device/lib/mos6502/_divslong.s,
+  	  device/lib/mos6502/_modsint.s,
+  	  device/lib/mos6502/_modslong.s,
+  	  device/lib/mos6502/_moduint.s,
+  	  device/lib/mos6502/_modulong.s,
+  	  device/lib/mos6502/_mulschar.s,
+  	  device/lib/mos6502/_muluchar.s,
+  	  device/lib/mos6502/abs.c:
+  	  Add assembly implementation of divs, mod, mulchar and abs.
+  	* src/mos6502/gen.c:
+	  Add m6502_unimplemented()
+   	* src/mos6502/gen.c:
+   	   Refactopr genCpl() and genPointerSet()
+
+2022-02-26 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/asxxsrc/aslist.c:
+	  Revert changes in slew() which caused regression failures on z80 ports.
+	* src/mos6502/ralloc.c:
+	  Remove dead code from old ralloc.
+
+2022-02-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asgb/gbmch.c:
+	  Add cycle table from upstream.
+
 2022-02-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
@@ -13,28 +211,185 @@
 
 	* doc/sdccman.lyx:
 	  Fix a minor documentation issue.
-	  
+
+2022-02-23 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph.def:
+	  Remove ldi/ldh rules.
+	* src/z80/peeph-sm83.def:
+	  Add ldi/ldh rules.
+
 2022-02-22 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/SDCCmain.c,
-	  sdcc/src/mos6502/main.c,
-	  sdcc/device/lib/mos6502/crt0.s,
-	  sdcc/device/lib/mos6502/_strcpy.s,
-	  sdcc/device/lib/mos6502/_strcmp.s,
-	  sdcc/device/lib/mos6502/_setjmp.c,
-	  sdcc/device/lib/mos6502/_mullong.s,
-	  sdcc/device/lib/mos6502/_mulint.s,
-	  sdcc/device/lib/mos6502/_divulong.s,
-	  sdcc/device/lib/mos6502/_divuint.s,
-	  sdcc/device/lib/mos6502/__memcpy.s,
-	  sdcc/device/lib/mos6502-stack-auto/crt0.s,
-	  sdcc/device/lib/mos6502-stack-auto/_setjmp.c:
+	* sdas/asxxsrc/asxxxx.h,
+	  sdas/asxxsrc/asmain.c,
+	  sdas/as6500/r65pst.c:
+	  Add .error and .message directives.
+	* sdas/asxxsrc/assubr.c,
+	  sdas/asxxsrc/aslex.c,
+	  sdas/asxxsrc/asexpr.c:
+	  More updates from upstream asxxxx 5.40
+
+2022-02-22 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/asxxsrc/asxxxx.h,
+	  sdas/asxxsrc/asmain.c,
+	  sdas/asxxsrc/asexpr.c,
+	  sdas/asxxsrc/asdata.c:
+	  Enable -v option (out of range errors) from upstream asxxxx 5.40.
+	* sdas/asxxsrc/assubr.c,
+	  sdas/asxxsrc/asout.c,
+	  sdas/asxxsrc/asmcro.c,
+	  sdas/asxxsrc/aslex.c:
+	  Change protoypes to ANSI C. Add some detailed error messages.
+	* sdas/asxxsrc/assym.c:
+	  Make area name comparisons case insensitive.
+
+2022-02-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asgb/gbadr.c,
+	  sdas/asgb/gbmch.c,
+	  sdas/asrab/rabadr.c,
+	  sdas/asrab/rabmch.c:
+	  Merge error messages from upstream ASxxxx 5.40.
+	  Add a few for extensions/custom ports.
+
+2022-02-22 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/SDCC.lex,
+	  src/mos6502/main.c:
+	  Add __zp keyword to the mos6502 port.
+	* src/SDCCmain.c,
+	  src/mos6502/main.c,
+	  device/lib/mos6502/crt0.s,
+	  device/lib/mos6502/_strcpy.s,
+	  device/lib/mos6502/_strcmp.s,
+	  device/lib/mos6502/_setjmp.c,
+	  device/lib/mos6502/_mullong.s,
+	  device/lib/mos6502/_mulint.s,
+	  device/lib/mos6502/_divulong.s,
+	  device/lib/mos6502/_divuint.s,
+	  device/lib/mos6502/__memcpy.s,
+	  device/lib/mos6502-stack-auto/crt0.s,
+	  device/lib/mos6502-stack-auto/_setjmp.c:
 	  Rename linker segments.
+	* src/mos6502/gen.h:
+	  Remove unused anonymous enum.
+	* sdas/as6500/r65pst.c:
+	  Prepeare for additional asxxxx upstream merge.
+
+2022-02-22 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/asxxsrc/asxxxx.h,
+	  sdas/asxxsrc/assym.c,
+	  sdas/asxxsrc/assubr.c,
+	  sdas/asxxsrc/asmcro.c,
+	  sdas/asxxsrc/asmain.c,
+	  sdas/asxxsrc/aslist.c,
+	  sdas/asxxsrc/aslex.c,
+	  sdas/asxxsrc/asexpr.c,
+	  sdas/asxxsrc/asdata.c:
+	  Several updates from upstream asxxxx 5.40
+	* sdas/aasz80/z80pst.c:
+	  Use I_CODE in S_INCL entry instead of 0.
+	* sdas/as6500/r65pst.c,
+	  sdas/as6500/r65mch.c,
+	  sdas/as6500/r65adr.c,
+	  sdas/as6500/r6500.h:
+	  Add .incbin, .define, .undefine, .ifdef and .ifndef to the 6502 assembler.
+  	* sdas/as6808/m6808.h,
+	  sdas/as6808/m08pst.c,
+	  sdas/as6808/m08mch.c,
+	  sdas/as6808/m08adr.c:
+	  Add .incbin hc08/s08 assembler.
+  	* sdas/asstm8/stm8pst.c:
+	  Use I_CODE in S_INCL entry instead of 0.
+	  
+2022-02-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph.def:
+	  Add new rules to improve library code.
 
 2022-02-21 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:
 	  Fix bug #3327.
+
+2022-02-20 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve genCpl.
+
+2022-02-20 Gabriele Gorla <gorlik@yahoo.com>
+
+	* support/regression/tests/bp.c,
+	  support/regression/tests/bug-2253.c,
+	  support/regression/tests/bug-3003.c:
+	  Special case __SDCC_STACK_AUTO
+
+2022-02-20 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve genPointerSet. Make comments formatting more consistent.
+	* support/regression/Makefile.in,
+	  support/regression/ports/uc6502-stack-auto/spec.mk,
+	  support/regression/ports/uc6502-stack-auto/support.c,
+	  support/regression/ports/uc6502-stack-auto/uCsim.cmd,
+	  support/regression/ports/uc6502-stack-auto:
+	  Add regression for mos6502-stack-auto target.
+
+2022-02-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/gen.c:
+	  Improve stack cleaning before jp (hl) on sm83.
+
+2022-02-19 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Replace assembly with generic code in a few places.
+
+2022-02-19 Gabriele Gorla <gorlik@yahoo.com>
+
+	* device/lib/mos6502/Makefile.in,
+	  device/lib/mos6502/__sdcc_indirect_jsr.s,
+	  device/lib/mos6502-stack-auto/Makefile.in,
+	  device/lib/mos6502-stack-auto/__sdcc_indirect_jsr.s,
+	  src/mos6502/gen.c:
+	  Add runtime support for indirect jsr.
+	* src/mos6502/peeph.def:
+	  Refactored rules and improved asm inline comments.
+	* src/mos6502/gen.c:
+	  Changed return type for smallAdjustReg().
+
+2022-02-19 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdcc/devicel/lib/mos6502/crt0.s:
+	  Remove incorrect loading of the second memset parameter.
+  	* support/regression/ports/u6502/spec.mk:
+	  Remove redundant --out-fmt-ihx parameter.
+  	* device/lib/mos6502-stack-auto/Makefile.in,
+  	  device/lib/mos6502-stack-auto/crt0.s,
+  	  device/lib/mos6502-stack-auto/atomic_flasg_test_and_set.c,
+  	  device/lib/mos6502-stack-auto/_setjmp.c,
+  	  device/lib/mos6502-stack-auto/_rrulonglong.c,
+  	  device/lib/mos6502-stack-auto/_rrslonglong.c,
+  	  device/lib/mos6502-stack-auto/_ret.c,
+  	  device/lib/mos6502-stack-auto/,
+  	  device/lib/Makefile.in,
+  	  device/lib/clean.mk,
+  	  sdcc/configure.ac,
+  	  sdcc/configure.ac:  	  
+ 	  Add mos6502 stack auto target.
+  	* src/mos6502/main.c:
+	  Correct flags affected by cld.
+	  
+2022-02-19 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/sm83/memcpy.s,
+	  device/lib/_memset.c:
+	  Switch to GBDK-2020's algorithm with partial loop unrolling.
+	* device/lib/_memmove.c:
+	  On sm83 call memcpy where possible.
 
 2022-02-19 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
@@ -51,6 +406,16 @@
 2022-02-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (gatherImplicitVariables): fix bug #3320
+
+2022-02-16 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/isspace.c,
+	  device/lib/isxdigit.c:
+	  Check high and low byte separately for some targets, also sort compares by frequency and int value.
+	* device/lib/sm83/memcpy.s,
+	  device/lib/_memset.c,
+	  device/lib/gets.c:
+	  Optimize sm83 assembly.
 
 2022-02-15 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
@@ -71,15 +436,15 @@
 
 2022-02-13 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Avoid generating illegal 6502 instructions in a few corner cases.
 
 2022-02-13 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/SDCCglue.c:
+	* src/mos6502/gen.c,
+	  src/SDCCglue.c:
 	  Removed hack that assigned function pointers entry address-1.
-	* sdcc/src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Changed default output to ihx.
 
 2022-02-12 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -94,8 +459,8 @@
 
 2022-02-10 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/ralloc.c:
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.c:
 	  Fix all warnings.
 
 2022-02-10 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -116,36 +481,36 @@
 
 2022-02-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  General code cleanup.
-	* sdcc/src/SDCCpeeph.c:
+	* src/SDCCpeeph.c:
 	  Fix bug 3291.
 
 2022-02-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Additional improvements in genPointerGet/genPointerSet.
 
 2022-02-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix corner cases in genPointerSet.
-  	* sdcc/src/mos6502/gen.c:
+  	* src/mos6502/gen.c:
   	  Add peephole rules to remove redundnat php/plp.
 
-2022-02-02 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+2022-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
-	* sdcc/device/include/mcs51/p89lpc9321.h,
-	  sdcc/device/include/mcs51/p89lpc9331.h,
-	  sdcc/device/include/mcs51/p89lpc9351.h:
+	* device/include/mcs51/p89lpc9321.h,
+	  device/include/mcs51/p89lpc9331.h,
+	  device/include/mcs51/p89lpc9351.h:
 	  Switch from Windows 1252 to UTF-8.
-	* sdcc/sdas/as6500/r65pst.c,
-	  sdcc/support/regression/tests/bitfields-dead-loop.c,
-	  sdcc/support/regression/tests/bitfields-bits1.c,
-	  sdcc/support/regression/tests/bitfields-checks.c,
-	  sdcc/support/sdbinutils/binutils/bfdtest2.c,
-	  sdcc/device/include/mcs51/w7100.h,
-	  sdcc/device/include/mcs51/at89c51id2.h:
+	* sdas/as6500/r65pst.c,
+	  support/regression/tests/bitfields-dead-loop.c,
+	  support/regression/tests/bitfields-bits1.c,
+	  support/regression/tests/bitfields-checks.c,
+	  support/sdbinutils/binutils/bfdtest2.c,
+	  device/include/mcs51/w7100.h,
+	  device/include/mcs51/at89c51id2.h:
 	  Switch from mixed CRLF/LF to LF.
 
 2022-02-08 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -156,34 +521,34 @@
 
 2022-02-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Load literal constant instead of temp reg when possible.
 
 2022-02-07 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Workaround bug-3129 failures when optimizing for size.
 
 2022-02-07 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Additional improvements to genPointerGet and genPointerSet.
 
 2022-02-06 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve genPointerGet.
 
 2022-02-06 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/hc08/gen.c:
+	* src/hc08/gen.c:
 	  Removed useless offset increment.
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Track temp reg literal values across store/load.
 
 2022-02-06 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fixed a few corner cases in genPointerGet/genPointerSet.
 
 2022-02-06 Benedikt Freisen <b.freisen AT gmx.net>
@@ -193,11 +558,11 @@
 
 2022-02-05 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Changed regalloc_dry_run_cost_cycles to float.
-	* sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/ralloc.h,
-	  sdcc/src/mos6502/ralloc2.cc:
+	* src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h,
+	  src/mos6502/ralloc2.cc:
 	  Initial merge of stm8 and pdk improvements to the register allocator.
 
 2022-02-04 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -247,12 +612,12 @@
 
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/gen.h,
-	  sdcc/src/mos6502/main.c,
-	  sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/ralloc.h,
-	  sdcc/src/mos6502/ralloc2.cc:  
+	* src/mos6502/gen.c,
+	  src/mos6502/gen.h,
+	  src/mos6502/main.c,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h,
+	  src/mos6502/ralloc2.cc:  
 	  Removed dead code and refactored load/stroreRegTemp.
 
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
@@ -284,32 +649,32 @@
 
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/device/lib/mos6502/Makefile.in:
+	* device/lib/mos6502/Makefile.in:
 	  Enable optimization for the library.
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Commented out code that triggers bug-477927 regression.
-	* sdcc/src/mos6502/peep.def:
+	* src/mos6502/peep.def:
 	  Add rule to optimize function entry.
 
 2022-02-02 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Implement cost based on both code size and cycles.
 
 2022-02-01 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix several bugs in the code generator.
 
 2022-02-01 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/device/lib/mos6502/__memcpy.c,
-	  sdcc/device/lib/mos6502/_mulint.s,
-	  sdcc/device/lib/mos6502/_mullong.s,
-	  sdcc/device/lib/mos6502/_divuint.s,
-	  sdcc/device/lib/mos6502/_divulong.s,
-	  sdcc/device/lib/mos6502/_strcmp.s,
-	  sdcc/device/lib/mos6502/_strcpy.s:
+	* device/lib/mos6502/__memcpy.c,
+	  device/lib/mos6502/_mulint.s,
+	  device/lib/mos6502/_mullong.s,
+	  device/lib/mos6502/_divuint.s,
+	  device/lib/mos6502/_divulong.s,
+	  device/lib/mos6502/_strcmp.s,
+	  device/lib/mos6502/_strcpy.s:
 	  Implement additional library functions in assembly.
 
 2022-02-01 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -324,87 +689,87 @@
 
 2022-01-31 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/device/lib/mos6502/_mulint.c,
-	  sdcc/device/lib/mos6502/_mulint.s,
-	  sdcc/device/lib/mos6502/_mullong.s,
-	  sdcc/device/lib/mos6502/_ret.c:
+	* device/lib/mos6502/_mulint.c,
+	  device/lib/mos6502/_mulint.s,
+	  device/lib/mos6502/_mullong.s,
+	  device/lib/mos6502/_ret.c:
 	  Implement mulint and mullong in assembly.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve memory shift operations.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve register shift operations.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Expand use of inc/dec for literal add/sub operations.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Enable inc/dec on register targets.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  storeRegIndexed improvements.
 
 2022-01-30 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Special case X->Y and Y->X whith literal values.
 
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/ralloc2.cc:
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc2.cc:
 	  General code cleanup.
 
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/hc08/gen.c,
-	  sdcc/src/hc08/ralloc2.cc:
+	* src/hc08/gen.c,
+	  src/hc08/ralloc2.cc:
 	  Fix a overflow bug in dry run cost calculation.
     
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/ralloc2.cc:
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/ralloc2.cc:
 	  Fix a overflow bug in dry run cost calculation.
 
 2022-01-28 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Add new peephole rules.
 
 2022-01-28 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve register transfer operations.
 
 2022-01-26 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improved genLeftShift and genRightShift.
 
 2022-01-25 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/ralloc.h,
-	  sdcc/src/mos6502/ralloc2.c:
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h,
+	  src/mos6502/ralloc2.c:
 	  Make m6502_dirtyReg take only one parameter.
 
 2022-01-25 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Refactor verbose assembler debug code.
 
 2022-01-25 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -414,17 +779,17 @@
 
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Add swapAX function.
 
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Add cycle based cost calculation.
 
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Implement a few missing codegen paths.
 
 2022-01-23 Benedikt Freisen <b.freisen AT gmx.net>
@@ -447,99 +812,99 @@
 
 2022-01-23 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/ralloc.h:
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h:
 	  Update opcode table and unified opcode size code.
 
 2022-01-22 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Use code gen functions instead of raw assembly when possible.
 
 2022-01-21 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/peep.def:
+	* src/mos6502/peep.def:
 	  Improved 6502 peephole rules.
 
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Add instruction cost as asm comments.
 
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Correctly compute instruction distance when asm lines contain comments.
 
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Fix m6502_instructionSize.
 
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Cleanup m6502opcodedata.
 
 2022-01-20 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/SDCCpeeph.c:
+	* src/SDCCpeeph.c:
 	  Allow peephole rules to match asm lines with comments.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/peep.def:
+	* src/mos6502/peep.def:
 	  Initial MOS6502 peephole rules.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix out of range branch in genCmpEQorNE.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix AX->XA bug in loadRegFromAop.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve pusReg/PullReg.
 
 2022-01-18 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve dry_run_cost accuracy.
 
 2022-01-17 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Refactor dry_run_cost computation.
 
 2022-01-17 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve debug messages.
 
 2022-01-17 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Make opcode output more consistent.
 
 2022-01-16 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Correct dry_run_cost for several code paths.
 
 2022-01-16 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Disable verbose debugging in the generated assembly.
 
 2022-01-15 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Imporve preparePointer.
 
 2022-01-15 Benedikt Freisen <b.freisen AT gmx.net>
@@ -555,97 +920,97 @@
 
 2022-01-15 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/regression/tests/reentrant.c:
+	* support/regression/tests/reentrant.c:
 	  Disable failing test for DS390 port.
-	* sdcc/support/regression/tests/bug-3129.c:
+	* support/regression/tests/bug-3129.c:
 	  Disable failing test for MOS6502 port.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Imporve genAddrOf.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix gcc-torture-execute-981001-1 regression failure.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c,
-	  sdcc/device/lib/mos6502/crt0.s:
+	* src/mos6502/gen.c,
+	  device/lib/mos6502/crt0.s:
 	  Remove use of BASEPTR.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Let storeConstToAop use X and Y as well.
 
 2022-01-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/ralloc.h,
-	  sdcc/src/mos6502/gen.c:
+	* src/mos6502/ralloc.h,
+	  src/mos6502/gen.c:
 	  Refactor genAssignLit and remove old defines.
 
 2022-01-13 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/regression/tests/reentrant.c:
+	* support/regression/tests/reentrant.c:
 	  Reduce recursion depth to fit into mcs51 stack.
 
 2022-01-12 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Fix library names.
 
 2022-01-12 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/regression/tests/reentrant.c:
+	* support/regression/tests/reentrant.c:
 	  Add reentrant function regression test.
 
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix gcc-torture-execute-990128-1 regression failure.
 
 2022-01-11 Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
 
-	* sdcc/support/regression/ports/mcs51-common/spec.mk:
+	* support/regression/ports/mcs51-common/spec.mk:
 	  Generate debug info when compile regtest of mcs51 ports.
 
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix bug #3304.
 
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix bug1115321 regression failure.
 
 2022-01-11 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix gcc-torture-execute-pr34456 regression failure.
 
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/hc08/ralloc.c:
+	* src/mos6502/ralloc.c,
+	  src/hc08/ralloc.c:
 	  Remove more dead code.
 
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/valdiag/tests/bug-2798.c:
+	* support/valdiag/tests/bug-2798.c:
 	  Exclude test for mos6502 port (no support for __sfr).
 
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Fix several compiler warnings.
 
 2022-01-09 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/ralloc.c:
+	* src/mos6502/ralloc.c:
 	  Remove oldralloc dead code.
 
 2022-01-09 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
@@ -667,90 +1032,90 @@
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/SDCCsymt.c,
-	  sdcc/src/SDCCpeeph.c,
-	  sdcc/src/SDCCmain.c,
-	  sdcc/src/SDCCicode.c,
-	  sdcc/src/SDCCglue.c,
-	  sdcc/src/port.h,
-	  sdcc/src/clean.mk,
+	* src/SDCCsymt.c,
+	  src/SDCCpeeph.c,
+	  src/SDCCmain.c,
+	  src/SDCCicode.c,
+	  src/SDCCglue.c,
+	  src/port.h,
+	  src/clean.mk,
 	  sdcc/Makefile.in,
-	  sdcc/device/lib/Makefile.in,
-	  sdcc/device/include/Makefile.in,
+	  device/lib/Makefile.in,
+	  device/include/Makefile.in,
 	  sdcc/configure.ac,
 	  sdcc/configure:
 	  Enable the mos6502 port.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/regression/tests/z88dk_callee.c,
-	  sdcc/support/regression/tests/z88dk.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-strlen-4.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-func-ptr-1.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-9911112-1.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-930702-1.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-921208-1.c,
-	  sdcc/support/regression/tests/gcc-torture-execute-20000412-2.c,
-	  sdcc/support/regression/tests/critical.c,
-	  sdcc/support/regression/tests/bug3379723.c,
-	  sdcc/support/regression/tests/bug3167.c,
-	  sdcc/support/regression/tests/bug2855.c,
-	  sdcc/support/regression/tests/bug2767.c,
-	  sdcc/support/regression/tests/bug2663.c,
-	  sdcc/support/regression/tests/bug2305.c:
+	* support/regression/tests/z88dk_callee.c,
+	  support/regression/tests/z88dk.c,
+	  support/regression/tests/gcc-torture-execute-strlen-4.c,
+	  support/regression/tests/gcc-torture-execute-func-ptr-1.c,
+	  support/regression/tests/gcc-torture-execute-9911112-1.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/gcc-torture-execute-921208-1.c,
+	  support/regression/tests/gcc-torture-execute-20000412-2.c,
+	  support/regression/tests/critical.c,
+	  support/regression/tests/bug3379723.c,
+	  support/regression/tests/bug3167.c,
+	  support/regression/tests/bug2855.c,
+	  support/regression/tests/bug2767.c,
+	  support/regression/tests/bug2663.c,
+	  support/regression/tests/bug2305.c:
 	  Disable tests not relevant for the mos6502 port.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/src/mos6502/ralloc2.cc,
-	  sdcc/src/mos6502/ralloc.h,
-	  sdcc/src/mos6502/ralloc.c,
-	  sdcc/src/mos6502/peeph.def,
-	  sdcc/src/mos6502/main.h,
-	  sdcc/src/mos6502/main.c,
-	  sdcc/src/mos6502/m6502.h,
-	  sdcc/src/mos6502/gen.h,
-	  sdcc/src/mos6502/gen.c,
-	  sdcc/src/mos6502/Makefile.in:
+	* src/mos6502/ralloc2.cc,
+	  src/mos6502/ralloc.h,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/peeph.def,
+	  src/mos6502/main.h,
+	  src/mos6502/main.c,
+	  src/mos6502/m6502.h,
+	  src/mos6502/gen.h,
+	  src/mos6502/gen.c,
+	  src/mos6502/Makefile.in:
 	  Add mos6502 port code generation.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/support/valdiag/valdiag.py,
-	  sdcc/support/valdiag/Makefile.in,
-	  sdcc/support/regression/ports/mos6502/support.c,
-	  sdcc/support/regression/ports/mos6502/spec.mk,
-	  sdcc/support/regression/fwk/include/testfwk.h,
-	  sdcc/support/regression/Makefile.in:
+	* support/valdiag/valdiag.py,
+	  support/valdiag/Makefile.in,
+	  support/regression/ports/mos6502/support.c,
+	  support/regression/ports/mos6502/spec.mk,
+	  support/regression/fwk/include/testfwk.h,
+	  support/regression/Makefile.in:
 	  Add regression to mos6502 port.
 
 2022-01-08 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/device/lib/mos65c02/Makefile.in,
-	  sdcc/device/lib/mos65c02/atomic_flag_test_and_set.c,
-	  sdcc/device/lib/mos65c02/_setjmp.c,
-	  sdcc/device/lib/mos65c02/_ret.c,
-	  sdcc/device/lib/mos65c02/_mulint.c,
-	  sdcc/device/lib/mos6502/Makefile.in,
-	  sdcc/device/lib/mos6502/crt0.s,
-	  sdcc/device/lib/mos6502/atomic_flag_test_and_set.c,
-	  sdcc/device/lib/mos6502/_setjmp.c,
-	  sdcc/device/lib/mos6502/_rrulonglong.c,
-	  sdcc/device/lib/mos6502/_rrslonglong.c,
-	  sdcc/device/lib/mos6502/_ret.c,
-	  sdcc/device/lib/mos6502/_mulint.c,
-	  sdcc/device/lib/malloc.c,
-	  sdcc/device/lib/atomic_flag_clear.c,
-	  sdcc/device/lib/clean.mk:
+	* device/lib/mos65c02/Makefile.in,
+	  device/lib/mos65c02/atomic_flag_test_and_set.c,
+	  device/lib/mos65c02/_setjmp.c,
+	  device/lib/mos65c02/_ret.c,
+	  device/lib/mos65c02/_mulint.c,
+	  device/lib/mos6502/Makefile.in,
+	  device/lib/mos6502/crt0.s,
+	  device/lib/mos6502/atomic_flag_test_and_set.c,
+	  device/lib/mos6502/_setjmp.c,
+	  device/lib/mos6502/_rrulonglong.c,
+	  device/lib/mos6502/_rrslonglong.c,
+	  device/lib/mos6502/_ret.c,
+	  device/lib/mos6502/_mulint.c,
+	  device/lib/malloc.c,
+	  device/lib/atomic_flag_clear.c,
+	  device/lib/clean.mk:
 	  Add mos6502 and mos65c02 library code.
 
 2022-01-06 Gabriele Gorla <gorlik@yahoo.com>
 
-	* sdcc/device/include/string.h,
-	  sdcc/device/include/stdlib.h,
-	  sdcc/device/include/stdatomic.h,
-	  sdcc/device/include/stdarg.h,
-	  sdcc/device/include/setjmp.h:
+	* device/include/string.h,
+	  device/include/stdlib.h,
+	  device/include/stdatomic.h,
+	  device/include/stdarg.h,
+	  device/include/setjmp.h:
 	  Add mos6502 to standard includes.
 
 2022-01-06 Gabriele Gorla <gorlik@yahoo.com>
@@ -1694,8 +2059,8 @@
 	* support/regression/Makefile.in,
 	  support/regression/ports/ucz180-resiy:
 	  Test z180 port with --reserve-regs-iy.
-	* sdcc/support/regression/ports/ucz80/spec.mk,
-	  sdcc/support/regression/ports/ucr3ka/spec.mk:
+	* support/regression/ports/ucz80/spec.mk,
+	  support/regression/ports/ucr3ka/spec.mk:
 	  Drop --profile option, so we get better coverage of tail call optimization.
 
 2021-05-20 Philipp Klaus Krause <pkk AT spth.de>
@@ -2064,8 +2429,8 @@
 
 2021-04-22 Philipp Klaus Krause <pkk AT spth.de>
 
-	* sdcc/support/regression/tests/setjmp.c,
-	  sdcc/support/regression/tests/loop.c:
+	* support/regression/tests/setjmp.c,
+	  support/regression/tests/loop.c:
 	  Skip tests that fail due to broken FreeBSD 13 setjmp.
 	* support/regression/tests/gcc-torture-execute-20040409-?.c:
 	  Skip tests that fail due to broken clang.
@@ -5446,7 +5811,7 @@
 
 2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
 
-	* sdcc/device/lib/pic14/libsdcc/idata.c:
+	* device/lib/pic14/libsdcc/idata.c:
 	  Fix missing extern declaration of main.
 
 2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
@@ -5638,7 +6003,7 @@
 	  sdcc/device/lib/pic14/missing,
 	  sdcc/install-sh,
 	  sdcc/sim/ucsim/ddconfig_in.h,
-	  sdcc/support/sdbinutils/bfd/doc/bfdver.texi:
+	  support/sdbinutils/bfd/doc/bfdver.texi:
 	  Fix pic14 library out-of-tree build.
 	* device/lib/pic14/configure.ac,
 	  device/lib/pic14/configure:

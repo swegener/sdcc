@@ -21,6 +21,7 @@ class cl_io: public cl_f
   virtual int close(void);
   virtual void changed(void);
   virtual int check_dev(void);
+  virtual bool writable(void);
 
   virtual void prepare_terminal();
   virtual void save_attributes();

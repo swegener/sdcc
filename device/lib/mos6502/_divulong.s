@@ -34,95 +34,103 @@
 ;--------------------------------------------------------
 	.globl __divulong_PARM_2
 	.globl __divulong_PARM_1
+	.globl __divslong_PARM_2
+	.globl __divslong_PARM_1
+	.globl __modulong_PARM_2
+	.globl __modulong_PARM_1
+	.globl __modslong_PARM_2
+	.globl __modslong_PARM_1
 	.globl __divulong
-	.globl ___udiv32
+	.globl ___udivmod32
 
 ;--------------------------------------------------------
-; overlayable items in zero page
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_divulong_tmp:
-	.ds 4
-
-;--------------------------------------------------------
-; function parameters
-;--------------------------------------------------------
-	.area BSS
 __divulong_PARM_1:
+__divslong_PARM_1:
+__modulong_PARM_1:
+__modslong_PARM_1:
 	.ds 4
 __divulong_PARM_2:
+__divslong_PARM_2:
+__modulong_PARM_2:
+__modslong_PARM_2:
 	.ds 4
 
+;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define res0 "__divulong_PARM_1+0"
+	.define res1 "__divulong_PARM_1+1"
+	.define res2 "___SDCC_m6502_ret2"
+	.define res3 "___SDCC_m6502_ret3"
+	.define den  "__divulong_PARM_2"
+	.define rem  "___SDCC_m6502_ret4"
+	.define s1  "___SDCC_m6502_ret0"
+	.define s2  "___SDCC_m6502_ret1"
+	
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
 __divulong:
+	jsr	___udivmod32
+	lda	*res0
+	ldx	*res1
+	rts
+
+___udivmod32:
         ldx	__divulong_PARM_1+3
-        stx	*___SDCC_m6502_ret0+3
+        stx	*res3
         ldx	__divulong_PARM_1+2
-        stx	*___SDCC_m6502_ret0+2
-        ldx	__divulong_PARM_1+1
-        stx	*___SDCC_m6502_ret0+1
-        ldx	__divulong_PARM_1+0
-        stx	*___SDCC_m6502_ret0+0
+        stx	*res2
 
-        ldx	__divulong_PARM_2+3
-        stx	*___SDCC_m6502_ret4+3
-        ldx	__divulong_PARM_2+2
-        stx	*___SDCC_m6502_ret4+2
-        ldx	__divulong_PARM_2+1
-        stx	*___SDCC_m6502_ret4+1
-        ldx	__divulong_PARM_2+0
-        stx	*___SDCC_m6502_ret4+0
-
-___udiv32:
 	lda     #0
-        sta     *_divulong_tmp+0
-        sta     *_divulong_tmp+1
-        sta     *_divulong_tmp+2
-        sta     *_divulong_tmp+3
+        sta     *rem+0
+        sta     *rem+1
+        sta     *rem+2
+        sta     *rem+3
         ldy     #32
 L0:
-	asl     *___SDCC_m6502_ret0+0
-        rol     *___SDCC_m6502_ret0+1
-        rol     *___SDCC_m6502_ret0+2
-        rol     *___SDCC_m6502_ret0+3
+	asl     *res0
+        rol     *res1
+        rol     *res2
+        rol     *res3
         rol     a
-        rol     *_divulong_tmp+1
-        rol     *_divulong_tmp+2
-        rol     *_divulong_tmp+3
+        rol     *rem+1
+        rol     *rem+2
+        rol     *rem+3
 
 ; Do a subtraction. we do not have enough space to store the intermediate
 ; result, so we may have to do the subtraction twice.
         tax
-        cmp     *___SDCC_m6502_ret4+0
-        lda     *_divulong_tmp+1
-        sbc     *___SDCC_m6502_ret4+1
-        lda     *_divulong_tmp+2
-        sbc     *___SDCC_m6502_ret4+2
-        lda     *_divulong_tmp+3
-        sbc     *___SDCC_m6502_ret4+3
+        cmp     *den+0
+        lda     *rem+1
+        sbc     *den+1
+        lda     *rem+2
+        sbc     *den+2
+        lda     *rem+3
+        sbc     *den+3
         bcc     L1
 
 ; Overflow, do the subtraction again, this time store the result
-        sta     *_divulong_tmp+3	; We have the high byte already
+        sta     *rem+3	; We have the high byte already
         txa
-        sbc     *___SDCC_m6502_ret4+0	; byte 0
+        sbc     *den+0	; byte 0
         tax
-        lda     *_divulong_tmp+1
-        sbc     *___SDCC_m6502_ret4+1
-        sta     *_divulong_tmp+1	; byte 1
-        lda     *_divulong_tmp+2
-        sbc     *___SDCC_m6502_ret4+2
-        sta     *_divulong_tmp+2 	; byte 2
-        inc     *___SDCC_m6502_ret0+0	; Set result bit
+        lda     *rem+1
+        sbc     *den+1
+        sta     *rem+1	; byte 1
+        lda     *rem+2
+        sbc     *den+2
+        sta     *rem+2 	; byte 2
+        inc     *res0	; Set result bit
 L1:
 	txa
         dey
         bne     L0
-        sta     *_divulong_tmp+0
-	lda	*___SDCC_m6502_ret0+0
-	ldx	*___SDCC_m6502_ret0+1
+        sta     *rem+0
         rts
+

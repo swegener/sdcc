@@ -1281,13 +1281,13 @@ cl_uc390::print_regs (class cl_console_base *con)
       /* SA: 10 bit stack */
       start = (sfr->get (R51_ESP) & 3) * 256 + sfr->get (SP);
       con->dd_printf ("SP10 ", start);
-      ixram->dump (start, start - 7, 8, con/*->get_fout()*/);
+      ixram->dump (start, start - 7, 8, con);
     }
   else
     {
       start = sfr->get (SP);
       con->dd_printf ("SP ", start);
-      iram->dump (start, start - 7, 8, con/*->get_fout()*/);
+      iram->dump (start, start - 7, 8, con);
     }
 
   print_disass (PC, con);

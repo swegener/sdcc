@@ -189,6 +189,24 @@ cl_io::check_dev(void)
   return 0;
 }
 
+
+bool
+cl_io::writable(void)
+{
+  struct timeval tv= { 0, 0 };
+  fd_set s;
+  int i;
+  FD_ZERO(&s);
+  FD_SET(file_id, &s);
+  i= select(file_id+1, NULL, &s, NULL, &tv);
+  if (i >= 0)
+    {
+      return FD_ISSET(file_id, &s);
+    }
+  return false;
+}
+
+
 void
 cl_io::prepare_terminal()
 {
@@ -404,5 +422,7 @@ sigpipe_off()
   sa.sa_handler= SIG_IGN;
   sigaction(SIGPIPE, &sa, NULL);
 }
+
+unsigned int cperiod_value() { return 1000000; }
 
 /* End of fuio.cc */

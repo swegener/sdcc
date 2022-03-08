@@ -1,7 +1,7 @@
 /* assubr.c */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
  *              VOID    qerr()
  *              VOID    rerr()
  *              char *  geterr()
+ *		VOID	xerr()
  *
  *      assubr.c contains the local array of *error[]
  */
@@ -45,7 +46,30 @@
  *
  *              int     c               error type character
  *
- *      The function err() logs the error code character
+ *	The legacy function err() reports errors using
+ *	the default error descriptions by calling xerr()
+ *	with a NULL string.
+  *
+ *	functions called:
+ *		VOID	xerr()		assubr.c
+ *
+ *	side effects:
+ *		The error code may be inserted into the
+ *		error code array eb[].
+ */
+
+VOID
+err(int c)
+{
+	xerr(c, NULL);
+}
+
+/*)Function	VOID	xerr(c, str)
+ *
+ *		int	c		error type character
+ *		char *	str		the error message string
+ *
+ *	The function xerr() logs the error code character
  *      suppressing duplicate errors.  If the error code
  *      is 'q' then the parse of the current assembler-source
  *      text line is terminated.
@@ -56,17 +80,20 @@
  *      global variables:
  *              int     aserr           error counter
  *              char    eb[]            array of generated error codes
+ *		char *	ex[]		array of error string pointers
  *
  *      functions called:
  *              VOID    longjmp()       c_library
  *
  *      side effects:
  *              The error code may be inserted into the
- *              error code array eb[] or the parse terminated.
+ *		error code array eb[], a pointer to the
+ *		optional error message inserted into the
+ *		array ex[], or the parse terminated.
  */
 
 VOID
-err(int c)
+xerr(int c, char *str)
 {
         char *p;
 
@@ -76,6 +103,7 @@ err(int c)
                 if (*p++ == c)
                         return;
         if (p < &eb[NERR]) {
+		ex[(int) (p-eb)] = str;
                 *p++ = c;
                 ep = p;
         }
@@ -104,30 +132,33 @@ err(int c)
  *              int     getlnm()        assubr.c
  *
  *      side effects:
- *              none
+ *		Error strings output to stderr.
  */
 
 VOID
-diag()
+diag(void)
 {
         char *p,*errstr;
+	FILE *fp;
 
+	fp = stderr;
         if (eb != ep) {
                 p = eb;
                 if (!is_sdas()) {
-                        fprintf(stderr, "?ASxxxx-Error-<");
+			fprintf(fp, "?ASxxxx-Error-<");
                         while (p < ep) {
-                                fprintf(stderr, "%c", *p++);
+				fprintf(fp, "%c", *p);
+				p++;
                         }
-                        fprintf(stderr, "> in line ");
-                        fprintf(stderr, "%d", getlnm());
-                        fprintf(stderr, " of %s\n", afn);
-                        p = eb;
+			fprintf(fp, "> in line ");
+			fprintf(fp, "%d", getlnm());
+			fprintf(fp, " of %s\n", afn);
                 }
+                p = eb;
                 while (p < ep) {
-                        if ((errstr = geterr(*p++)) != NULL) {
+                        if ((errstr = geterr(*p)) != NULL) {
                                 if (!is_sdas()) {
-                                        fprintf(stderr, "              %s\n", errstr);
+                                        fprintf(fp, "              %s\n", errstr);
                                 } else {
                                         /* Modified to conform to gcc error standard, M. Hope, 7 Feb 98. */
                                         fprintf(stderr, "%s:", afn);
@@ -135,6 +166,7 @@ diag()
                                         fprintf(stderr, " %s\n", errstr);
                                 }
                         }
+			p++;
                 }
         }
 }
@@ -200,7 +232,7 @@ warnBanner(void)
  * Note an 'r' error.
  */
 VOID
-rerr()
+rerr(void)
 {
         err('r');
 }
@@ -209,7 +241,7 @@ rerr()
  * Note an 'a' error.
  */
 VOID
-aerr()
+aerr(void)
 {
         err('a');
 }
@@ -218,26 +250,33 @@ aerr()
  * Note a 'q' error.
  */
 VOID
-qerr()
+qerr(void)
 {
         err('q');
 }
 
 /*
- * ASxxxx assembler errors
+ * Default ASxxxx assembler errors
  */
 char *errors[] = {
         "<.> use \". = . + <arg>\" not \". = <arg>\"",
         "<a> machine specific addressing or addressing mode error",
-        "<b> direct page boundary error",
+	"<b> address / direct page boundary error",
+	"<c> .bndry offset error",
         "<d> direct page addressing error",
-        "<i> .include file error or an .if/.endif mismatch",
-        "<m> multiple definitions error",
+	"<e> .error/.assume programmed error",
+	"<i> .include/.incbin file error or an .if/.endif mismatch",
+	"<k> numerical conversion error",
+	"<m> multiple definitions error or macro recursion error",
+	"<n> .endm, .mexit, or .narg outside of a macro",
         "<o> .org in REL area or directive / mnemonic error",
         "<p> phase error: label location changing between passes 2 and 3",
         "<q> missing or improper operators, terminators, or delimiters",
         "<r> relocation error",
+	"<s> string substitution / recursion error",
         "<u> undefined symbol encountered during assembly",
+	"<v> out of range signed / unsigned value",
+	"<z> divide by zero or mod of zero error",
         NULL
 };
 
@@ -264,8 +303,7 @@ char *errors[] = {
  *              error code string is returned.
  */
 char *
-geterr(c)
-int c;
+geterr(int c)
 {
         int i;
 
@@ -277,3 +315,5 @@ int c;
         sprintf(erb, "<e> %.*s", (int) (sizeof(erb)-5), ib);
         return(erb);
 }
+
+

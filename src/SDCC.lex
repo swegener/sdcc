@@ -170,6 +170,7 @@ static void checkCurrFile (const char *s);
 "short"                 { count (); return SD_SHORT; }
 "signed"                { count (); return SIGNED; }
 "sizeof"                { count (); return SIZEOF; }
+"__zp"                  { count (); TKEYWORD (DATA); }
 "alignof"               { count (); TKEYWORD2X (ALIGNOF); }
 "_Alignof"              { count (); return ALIGNOF; }
 "__builtin_offsetof"    { count (); return OFFSETOF; }

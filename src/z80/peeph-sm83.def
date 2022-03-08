@@ -2,7 +2,7 @@
 //
 //
 // (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
-// (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2021
+// (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2022
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -369,6 +369,56 @@ replace {
 	cp	a
 	push	af
 } if operandsLiteral(%2), immdInRange(0xC0 0xC0 '+' %2 0 %x3), notUsed('f')
+
+replace restart {
+	inc	hl
+	ld	a, (hl-)
+	or	a, (hl)
+} by {
+	ld	a, (hl+)
+	or	a, (hl)
+	; sm83 peephole 20 reversed ld and or.
+} if notUsed('hl')
+
+replace restart {
+%1:
+	ld	a, (hl+)
+	ld	%3, a
+	ld	a, (%6)
+	inc	%6
+	sub	a, %3
+	ld	%4, a
+	jp	NZ, %2
+	or	a,%3
+	jp	NZ, %1
+%2:
+} by {
+%1:
+	ld	a, (hl+)
+	ld	%3, a
+	ld	a, (%6)
+	inc	%6
+	sub	a, %3
+	jp	NZ, %2
+	cp	a,%3
+	jp	NZ, %1
+%2:
+	; sm83 peephole 21 sped up loop body.
+	ld	%4, a
+} if canSplitReg(%6 %9 %10), operandsNotRelated(%3 %6 'hl'), operandsNotRelated(%3 %6 'hl'), notSame(%3 %4), labelRefCount(%2 1)
+
+replace restart {
+	ld	(hl+), a
+	ld	(hl), %1
+	ld	a, (hl-)
+	or	a, (hl)
+} by {
+	ld	(hl+), a
+	ld	(hl), %1
+	; sm83 peephole 22 remove unnecessary load back
+	or	a, %1
+	dec	hl
+}
 
 replace {
 	pop	%1

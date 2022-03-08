@@ -1,7 +1,7 @@
 /* aslex.c */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@
  *      analysis routines for the assembler.
  *
  *      aslex.c contains the following functions:
+ *		VOID	chopcrlf()
  *              int     comma()
  *              char    endline()
  *              int     get()
@@ -53,6 +54,8 @@
  *              VOID    getst()
  *              int     more()
  *              int     nxtline()
+ *		int	replace()
+ *		VOID	scanline()
  *              VOID    unget()
  *
  *      aslex.c contains no local/static variables
@@ -215,9 +218,7 @@ getst(char *id, int c)
  */
 
 VOID
-getdstr(str, slen)
-char * str;
-int slen;
+getdstr(char *str, int slen)
 {
         char *p;
         int c, d;
@@ -492,8 +493,8 @@ getmap(int d)
  *
  *      called functions:
  *              int     getnb()         aslex.c
- *              VOID    qerr()          assubr.c
  *              VOID    unget()         aslex.c
+ *		VOID	xerr()		assubr.c
  *
  *      side effects:
  *              assembler-source text line pointer updated
@@ -506,7 +507,7 @@ comma(int flag)
 
         if ((c = getnb()) != ',') {
                 if (flag) {
-                        qerr();
+			xerr('q', "Expected a ','.");
                 } else {
                         unget(c);
                 }
@@ -558,8 +559,10 @@ comma(int flag)
  *              int     dbuf_getline()
  *              const char * dbuf_c_str()
  *              int     dbuf_append_str()
- *              int     fclose()        c-library
+ *		VOID	chopcrlf()	aslex.c
+ *		int	fclose()	c_library
  *              char *  fgetm()         asmcro.c
+ *		VOID	scanline()	aslex.c
  *              char *  strcpy()        c_library
  *
  *      side effects:
@@ -642,6 +645,7 @@ comma(int flag)
  *      of the assembler.
  *
  *      Macros are recreated during each pass of the assembler.
+ *
  */
 
 int
@@ -786,20 +790,234 @@ loop:   if (asmc == NULL) return(0);
                 break;
         }
         ib = (char *)dbuf_c_str (&dbuf_ib);
-
-        /* remove the trailing NL */
-        if (len > 0 && '\n' == ib[len - 1])
-          {
-            --len;
-            if (len > 0 && '\r' == ib[len - 1])
-              --len;
-            dbuf_set_length (&dbuf_ib, len);
-            ib = (char *)dbuf_c_str (&dbuf_ib);
-          }
-
+	chopcrlf(ib);
         dbuf_append_str (&dbuf_ic, ib);
         ic = (char *)dbuf_c_str (&dbuf_ic);
+	scanline();
         return(1);
+}
+
+
+/*)Function	VOID	scanline()
+ *
+ *	The function scanline() scans the assembler-source text line
+ *	for a valid substitutable string.  The only valid targets
+ *	for substitution strings are strings beginning with a
+ *	LETTER and containing any combination of DIGITS and LETTERS.
+ *	If a valid target is found then the function replace() is
+ *	called to search the ".define" substitution list.  If there
+ *	is some string substitution error (or error caused by a
+ *	runaway recursion in replace) then scanline() returns a
+ *	value of 1 else 0 is returned.
+ *
+ *	If the assembler mnemonic .define, .undefine, .ifdef, or .ifndef
+ *	is found then the function exits.
+ *
+ *	local variables:
+ *		int	c		temporary character value
+ *		char	id[]		a string of maximum length NINPUT
+ *
+ *	global variables:
+ *		char	ctype[]		a character array which defines the
+ *					type of character being processed.
+ *					The index is the character
+ *					being processed.
+ *		int	flevel		IF-ELSE-ENDIF level
+ *		char	ib[]		assembler-source text line
+ *		char *	ip		pointer into the assembler-source text line
+ *
+ *	called functions:
+ *		int	endline()	aslex.c
+ *		int	getid()		aslex.c
+ *		int	unget()		aslex.c
+ *		int	replace()	aslex.c
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		The assembler-source text line may be updated
+ *		and a substitution made for the string id[].
+ */
+
+VOID
+scanline(void)
+{
+	int c;
+	char id[NINPUT];
+
+	if (flevel)
+		return;
+
+	ip = ib;
+	while ((c = endline()) != 0) {
+		if (ctype[c] & DIGIT) {
+			while (ctype[c] & (LETTER|DIGIT)) c = get();
+			unget(c);
+		} else
+		if (ctype[c] & LETTER) {
+			getid(id, c);
+			if (symeq(id, ".define", 1)) {
+				break;
+			} else
+			if (symeq(id, ".undefine", 1)) {
+				break;
+			} else
+			if (symeq(id, ".ifdef", 1)) {
+				break;
+			} else
+			if (symeq(id, ".ifndef", 1)) {
+				break;
+			} else
+			if (symeq(id, ".iifdef", 1)) {
+				break;
+			} else
+			if (symeq(id, ".iifndef", 1)) {
+				break;
+			} else
+			if (symeq(id, ".if", 1) || symeq(id, ".iif", 1)) {
+				comma(0);
+				getid(id, getnb());
+				if (symeq(id, "def", 1)) {
+					break;
+				} else
+				if (symeq(id, "ndef", 1)) {
+					break;
+				}
+			}
+			if (replace(id)) {
+				err('s');
+				break;
+			}
+		}
+	}
+}
+
+
+/*)Function	int	replace(id)
+ *
+ *		char *	id		a pointer to a string of
+ *					maximum length NINPUT
+ *
+ *	The function replace() scans the .define substitution list
+ *	for a match to the string id[].  After the substitution is made
+ *	to the assembler-source text line the current character position,
+ *	ip, is set to the beginning of the substitution string.  The
+ *	function replace() returns a non-zero value if a substitutuion
+ *	error is made else zero is returned.
+ *
+ *	If the -bb option was specified and a listing file is open then
+ *	the current assembler-source text line is listed before the
+ *	substitution is made.  
+ *
+ *	local variables:
+ *		char *	p		pointer to beginning of id
+ *		char	str[]		temporary string
+ *		char *	frmt		temporary listing format specifier
+ *		struct def *dp		pointer to .define definitions
+ *
+ *	global variables:
+ *		int	a_bytes		T line addressing size
+ *		int	bflag		list source before substitution flag
+ *		int	cfile		current input file number
+ *		char	ctype[]		a character array which defines the
+ *					type of character being processed.
+ *					The index is the character
+ *					being processed.
+ *		char	ib[]		assembler-source text line
+ *		char *	ip		pointer into the assembler-source text line
+ *		FILE *	lfp		list output file handle
+ *		int	line		current assembler source line number
+ *		int	lmode		listing mode
+ *		int	lnlist		LIST-NLIST state
+ *		int	pass		assembler pass number
+ *		int	pflag		paging flag
+ *		int	srcline		source file line number
+ *		int	uflag		-u, disable .list/.nlist processing
+ *		int	zflag		case sensitivity flag
+ *
+ *	called functions:
+ *		int	fprintf()	c_library
+ *		int	getlnm()	assubr.c
+ *		VOID	slew()		aslist.c
+ *		char *	strcat()	c_library
+ *		char *	strcpy()	c_library
+ *		int	strlen()	c_library
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		The assembler-source text line may be updated
+ *		and a substitution made for the string id[].
+ */
+
+int
+replace(char *id)
+{
+	char *p;
+	char str[NINPUT*2];
+	char *frmt;
+	struct def *dp;
+
+	/*
+	 * Check for .define substitution
+	 */
+	dp = defp;
+	while (dp) {
+		if (dp->d_dflag && symeq(id, dp->d_id, zflag)) {
+			if ((pass == 2) && (bflag == 2)) {
+				if (lfp == NULL || lmode == NLIST) {
+					;
+				} else
+				if ((lnlist & LIST_SRC) || (uflag == 1)) {
+					/*
+					 * Get Correct Line Number
+					 */
+					line = getlnm();
+
+					/*
+					 * Move to next line.
+					 */
+					slew(lfp, !pflag && ((lnlist & LIST_PAG) || (uflag == 1)));
+
+					/*
+					 * Source listing only option.
+					 */
+					switch(a_bytes) {
+					default:
+					case 2: frmt = "  %24s%5u %s\n"; break;
+					case 3:
+					case 4: frmt = "  %32s%5u %s\n"; break;
+					}
+					fprintf(lfp, frmt, "", line, ib);
+				}
+			}
+			/*
+			 * Verify string space is available
+			 */
+			if ((strlen(ib) - strlen(id) + strlen(dp->d_define)) > (NINPUT*2 - 1)) {
+				return(1);
+			}
+			/*
+			 * Beginning of Substitutable string
+			 */
+			p  = ip - strlen(id);
+			/*
+			 * Make a copy of the string from the end of the
+			 * substitutable string to the end of the line.
+			 */
+			strcpy(str, ip);
+			/*
+			 * Replace the substitutable string
+			 * with the new string and append
+			 * the tail of the original string.
+			 */
+			*p = 0;
+			strcat(ib, dp->d_define);
+			strcat(ib, str);
+			ip = p;
+			return(0);
+		}
+		dp = dp->d_dp;
+	}
+	return(0);
 }
 
 
@@ -841,6 +1059,7 @@ getlnm()
         }
         return(line);
 }
+
 
 /*)Function     int     more()
  *
@@ -905,3 +1124,41 @@ endline(void)
         c = getnb();
         return( (c == '\0' || c == ';') ? 0 : c );
 }
+
+/*)Function	VOID	chopcrlf(str)
+ *
+ *		char	*str		string to chop
+ *
+ *	The function chopcrlf() removes
+ *	LF, CR, LF/CR, or CR/LF from str.
+ *
+ *	local variables:
+ *		char *	p		temporary string pointer
+ *		char	c		temporary character
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		All CR and LF characters removed.
+ */
+
+VOID
+chopcrlf(char *str)
+{
+	char *p;
+	char c;
+
+	p = str;
+	do {
+		c = *p++ = *str++;
+		if ((c == '\r') || (c == '\n')) {
+			p--;
+		}
+	} while (c != 0);
+}
+
+

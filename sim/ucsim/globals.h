@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "appcl.h"
 
 extern class cl_app *application;
+extern double app_start_at;
 
 extern char delimiters[];
 

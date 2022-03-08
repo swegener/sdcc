@@ -71,6 +71,8 @@ cl_app::cl_app(void)
   in_files= new cl_ustrings(2, 2, "input files");
   options= new cl_options();
   quiet= false;
+  if (app_start_at == 0)
+    app_start_at= dnow();
 }
 
 cl_app::~cl_app(void)
@@ -117,7 +119,7 @@ cl_app::run(void)
   //unsigned int cyc= 0, period= 10000;
   enum run_states rs= rs_config;
 
-  cperiod.set(1000000);
+  cperiod.set(cperiod_value());
   while (!done)
     {
       if ((rs == rs_config) &&
@@ -235,9 +237,10 @@ print_help(const char *name)
      "                  uart=nr   number of uart (default=0)\n"
      "                  in=file   serial input will be read from file named `file'\n"
      "                  out=file  serial output will be written to `file'\n"
-     "                  port=nr   Use localhost:nr as server for serial line\n"
-     "                  iport=nr  Use localhost:nr as server for serial input\n"
-     "                  oport=nr  Use localhost:nr as server for serial output\n"
+     "                  port=nr   use localhost:nr as server for serial line\n"
+     "                  iport=nr  use localhost:nr as server for serial input\n"
+     "                  oport=nr  use localhost:nr as server for serial output\n"
+     "                  raw       perform non-interactive communication even on tty\n"
      "  -I options   `options' is a comma separated list of options according to\n"
      "               simulator interface. Known options are:\n"
      "                 if=memory[address]  turn on interface on given memory location\n"
@@ -270,7 +273,9 @@ enum {
   SOPT_USART,
   SOPT_PORT,
   SOPT_IPORT,
-  SOPT_OPORT
+  SOPT_OPORT,
+  SOPT_RAW,
+  SOPT_ERROR
 };
 
 static const char *S_opts[]= {
@@ -281,6 +286,7 @@ static const char *S_opts[]= {
   /*[SOPT_PORT]=*/	"port",
   /*[SOPT_IPORT]=*/	"iport",
   /*[SOPT_OPORT]=*/	"oport",
+  /*[SOPT_RAW]=*/	"raw",
   NULL
 };
 
@@ -360,7 +366,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	startup_command+= chars("\n");
 	break;
       case 'R':
-        srand(atoi(optarg));
+        srnd(atoi(optarg));
         break;
 #ifdef SOCKET_AVAIL
       case 'Z': case 'r':
@@ -492,27 +498,33 @@ cl_app::proc_arguments(int argc, char *argv[])
       case 'S':
 	{
 	  char *iname= NULL, *oname= NULL;
-	  int uart=0, port=0, iport= 0, oport= 0;
-	  bool ifirst= false;
+	  int uart=0, port=0, iport= 0, oport= 0, so;
+	  bool ifirst= false, raw= false;
 	  subopts= optarg;
 	  while (*subopts != '\0')
 	    {
-	      switch (get_sub_opt(&subopts, S_opts, &value))
+	      so= get_sub_opt(&subopts, S_opts, &value);
+	      if (so != SOPT_RAW)
 		{
+		  if ((value == NULL) ||
+		      (*value == 0))
+		    so= SOPT_ERROR;
+		}
+	      switch (so)
+		{
+		case SOPT_ERROR:
+		  fprintf(stderr, "No value for -S suboption\n");
+		  exit(1);
+		  break;
+		case SOPT_RAW:
+		  raw= 1;
+		  break;
 		case SOPT_IN:
-		  if (value == NULL) {
-		    fprintf(stderr, "No value for -S in\n");
-		    exit(1);
-		  }
 		  iname= value;
 		  if (oname == NULL)
 		    ifirst= true;
 		  break;
 		case SOPT_OUT:
-		  if (value == NULL) {
-		    fprintf(stderr, "No value for -S out\n");
-		    exit(1);
-		  }
 		  oname= value;
 		  break;
 		case SOPT_UART: case SOPT_USART:
@@ -545,6 +557,18 @@ cl_app::proc_arguments(int argc, char *argv[])
 	    {
 	      char *s, *h;
 	      class cl_option *o;
+	      s= format_string("serial%d_raw", uart);
+	      if ((o= options->get_option(s)) == NULL)
+		{
+		  h= format_string("Use raw communication on uart%d files", uart);
+		  o= new cl_bool_option(this, s, h);
+		  o->init();
+		  o->hide();
+		  options->add(o);
+		  free(h);
+		}
+	      options->set_value(s, this, raw);
+	      free(s);
 	      s= format_string("serial%d_ifirst", uart);
 	      if ((o= options->get_option(s)) == NULL)
 		{

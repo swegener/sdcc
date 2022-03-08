@@ -15,6 +15,7 @@ do
     make -C $pkg -f clean.mk distclean
     test -L ${pkg}/dtest && rm -f ${pkg}/dtest
 done
+
 echo "Make clean of example directory..."
 make -C example clean
 echo "Make clean of test directory..."

@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -51,10 +51,12 @@
  *      assym.c contains the following functions:
  *              VOID    allglob()
  *              area *  alookup()
+ *		def *	dlookup()
  *              int     hash()
  *              sym *   lookup()
  *              mne *   mlookup()
  *              char *  new()
+ *		sym *	slookup()
  *              char *  strsto()
  *              int     symeq()
  *              VOID    syminit()
@@ -174,11 +176,47 @@ alookup(char *id)
                 /*
                  * JLH: case insensitive lookup always
                  */
-                if(symeq(id, ap->a_id, 0))
+                if(symeq(id, ap->a_id, 1))
                         return (ap);
                 ap = ap->a_ap;
         }
         return(NULL);
+}
+
+/*)Function	def *	dlookup(id)
+ *
+ *		char *	id		definition name string
+ *
+ *	The function dlookup() searches the definition list for a
+ *	match with id.  If the definition is defined then a pointer
+ *	to this definition is returned else a NULL is returned.
+ *
+ *	local variables:
+ *		def *	dp		pointer to a def structure
+ *
+ *	global variables:
+ *		def *	defp		pointer to a def structure
+ *
+ *	functions called:
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		none
+ */
+
+struct def *
+dlookup(char *id)
+{
+	struct def *dp;
+
+	dp = defp;
+	while (dp) {
+		if (symeq(id, dp->d_id, zflag)) {
+			break;
+		}
+		dp = dp->d_dp;
+	}
+	return(dp);
 }
 
 /*)Function     mne *   mlookup(id)
@@ -221,6 +259,47 @@ mlookup(char *id)
                 mp = mp->m_mp;
         }
         return (NULL);
+}
+
+/*)Function	sym *	slookup(id)
+ *
+ *		char *	id		symbol name string
+ *
+ *	The function slookup() searches the symbol hash tables for
+ *	a symbol name match returning a pointer to the sym structure
+ *	else it returns a NULL.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		sym *	sp		pointer to a sym structure
+ *
+ *	global varaibles:
+ *		sym *	symhash[]	array of pointers to NHASH
+ *					linked symbol lists
+ *		int	zflag		disable symbol case sensitivity
+ *
+ *	functions called:
+ *		int	hash()		assym.c
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		none
+ */
+
+struct sym *
+slookup(char *id)
+{
+	struct sym *sp;
+	int h;
+
+	h = hash(id, zflag);
+	sp = symhash[h];
+	while (sp) {
+		if(symeq(id, sp->s_id, zflag))
+			return (sp);
+		sp = sp->s_sp;
+	}
+	return (NULL);
 }
 
 /*)Function     sym *   lookup(id)

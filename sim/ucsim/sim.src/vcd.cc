@@ -767,7 +767,11 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                       time_t now = time(NULL);
 		      if (application->quiet)
 			now= (time_t)0;
-                      fprintf(fd, "$date\n\t%s$end\n$version\n\tucsim\n$end\n$timescale ", ctime(&now));
+		      if (application->quiet)
+			fprintf(fd, "$date\n\tDate is omitted in quiet mode\n$end\n");
+		      else
+			fprintf(fd, "$date\n\t%s$end\n", ctime(&now));
+		      fprintf(fd, "$version\n\tucsim\n$end\n$timescale ");
                       if (timescale >= 1e15)
                         fprintf(fd, "%.0ffs", timescale * 1e-15);
                       else if (timescale >= 1e12)

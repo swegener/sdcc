@@ -39,5 +39,5 @@ loop:	ld	a, (hl+)
 	or	a
 	ret	Z
 	inc	bc
-	jr      loop
+	jr	loop
 

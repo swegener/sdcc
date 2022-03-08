@@ -299,15 +299,18 @@ cl_serial::tick(int cycles)
       s_tr_bit-= _bits;
     }
   if ((_bmREN) &&
-      io->get_fin() &&
+      //io->get_fin() &&
       !s_receiving)
     {
       if (cfg_get(serconf_check_often))
 	{
-	  if (io->input_avail())
-	    io->proc_input(0);
+	  if (io->get_fin())
+	    {
+	      if (io->input_avail())
+		io->proc_input(0);
+	    }
 	}
-      if (/*fin->*/input_avail/*()*/)
+      if (input_avail)
 	{
 	  s_receiving= true;
 	  s_rec_bit= 0;
@@ -317,16 +320,13 @@ cl_serial::tick(int cycles)
   if (s_receiving &&
       (s_rec_bit >= _bits))
     {
-      //if (fin->read(&c, 1) == 1)
-	{
-	  c= input;
-	  uc->sim->app->debug("UART%d received %d,%c\n", id,
-			      c,isprint(c)?c:' ');
-	  input_avail= false;
-	  s_in= c;
-	  sbuf->set(s_in);
-	  received(c);
-	}
+      c= input;
+      uc->sim->app->debug("UART%d received %d,%c\n", id,
+			  c,isprint(c)?c:' ');
+      input_avail= false;
+      s_in= c;
+      sbuf->set(s_in);
+      received(c);
       s_receiving= false;
       s_rec_bit-= _bits;
     }

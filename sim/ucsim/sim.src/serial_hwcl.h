@@ -47,8 +47,8 @@ enum serial_cfg {
 
 class cl_serial_io: public cl_hw_io
 {
- public:
- cl_serial_io(class cl_hw *ihw):
+public:
+  cl_serial_io(class cl_hw *ihw):
   cl_hw_io(ihw)
   {}
   //virtual bool prevent_quit(void) { return true; }
@@ -57,19 +57,21 @@ class cl_serial_io: public cl_hw_io
 
 class cl_serial_hw: public cl_hw
 {
- protected:
+  friend class cl_serial_listener;
+protected:
   class cl_optref *serial_in_file_option;
   class cl_optref *serial_out_file_option;
   class cl_optref *serial_port_option;
   class cl_optref *serial_iport_option;
   class cl_optref *serial_oport_option;
   class cl_optref *serial_ifirst_option;
+  class cl_optref *serial_raw_option;
   class cl_serial_listener *listener;
   //class cl_hw_io *io;
   char input;
   bool input_avail;
   char menu;
- public:
+public:
   cl_serial_hw(class cl_uc *auc, int aid, chars aid_string);
   virtual ~cl_serial_hw(void);
   virtual int init(void);
@@ -80,6 +82,8 @@ class cl_serial_hw: public cl_hw
 
   virtual void make_io(void);
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
+  virtual void new_i(class cl_f *f_in);
+  virtual void new_o(class cl_f *f_out);
   virtual bool proc_input(void);
   virtual void refresh_display(bool force) {}
   virtual void draw_state_time(bool force) {}

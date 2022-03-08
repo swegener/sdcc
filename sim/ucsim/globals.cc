@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // No other global variable should exists!
 class cl_app *application;
+double app_start_at= 0;
 
 
 /* Delimiters to split up command line */

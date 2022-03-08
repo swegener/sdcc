@@ -2,6 +2,7 @@
   main.c - Z80 specific definitions.
 
   Michael Hope <michaelh@juju.net.nz> 2001
+  Copyright (C) 2021, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -84,6 +85,8 @@ Z80_OPTS z80_opts;
 static OPTION _z80_options[] = {
   {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
   {0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)"},
+  {0, OPTION_BO,              NULL, "<num> use code bank <num>"},
+  {0, OPTION_BA,              NULL, "<num> use data bank <num>"},
   {0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm/gas)"},
   {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
   {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
@@ -580,7 +583,7 @@ _parseOptions (int *pargc, char **argv, int *i)
 {
   if (argv[*i][0] == '-')
     {
-      if (IS_SM83)
+      if (IS_SM83 || IS_Z80)
         {
           if (!strncmp (argv[*i], OPTION_BO, sizeof (OPTION_BO) - 1))
             {

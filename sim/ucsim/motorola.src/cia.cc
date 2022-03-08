@@ -289,13 +289,16 @@ cl_cia::tick(int cycles)
 	finish_send();
     }
   if ((ren) &&
-      io->get_fin() &&
+      //io->get_fin() &&
       !s_receiving)
     {
       if (cfg_get(serconf_check_often))
 	{
-	  if (io->input_avail())
-	    io->proc_input(0);
+	  if (io->get_fin())
+	    {
+	      if (io->input_avail())
+		io->proc_input(0);
+	    }
 	}
       if (input_avail)
 	{

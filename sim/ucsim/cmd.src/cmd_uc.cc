@@ -88,6 +88,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 		 AU(uc->sp_max), AU(uc->sp_avg));
   con->dd_printf("Simulation: %s\n",
 		 (uc->sim->state & SIM_GO)?"running":"stopped");
+  con->dd_printf("Runtime: %f sec\n", dnow()-app_start_at);
   return(0);
 }
 

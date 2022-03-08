@@ -31,6 +31,8 @@ clk[0] at 0x0050c0
   f_CPU:    2000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008008: (109) stepped 2 ticks
@@ -58,6 +60,8 @@ clk[0] at 0x0050c0
   f_CPU:    16000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00800c: (109) stepped 1 ticks
@@ -85,6 +89,8 @@ clk[0] at 0x0050c0
   f_CPU:    8000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008010: (109) stepped 1 ticks
@@ -112,6 +118,8 @@ clk[0] at 0x0050c0
   f_CPU:    4000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008014: (109) stepped 1 ticks
@@ -139,6 +147,8 @@ clk[0] at 0x0050c0
   f_CPU:    2000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008018: (109) stepped 1 ticks
@@ -166,6 +176,8 @@ clk[0] at 0x0050c0
   f_CPU:    16000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00801c: (109) stepped 1 ticks
@@ -193,6 +205,8 @@ clk[0] at 0x0050c0
   f_CPU:    8000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008020: (109) stepped 2 ticks
@@ -220,6 +234,8 @@ clk[0] at 0x0050c0
   f_CPU:    4000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008024: (109) stepped 4 ticks
@@ -247,6 +263,8 @@ clk[0] at 0x0050c0
   f_CPU:    2000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008028: (109) stepped 8 ticks
@@ -274,6 +292,8 @@ clk[0] at 0x0050c0
   f_CPU:    1000000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00802c: (109) stepped 16 ticks
@@ -301,6 +321,8 @@ clk[0] at 0x0050c0
   f_CPU:    500000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008030: (109) stepped 32 ticks
@@ -328,6 +350,8 @@ clk[0] at 0x0050c0
   f_CPU:    250000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008034: (109) stepped 64 ticks
@@ -355,6 +379,8 @@ clk[0] at 0x0050c0
   f_CPU:    125000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 
 step 5
 
@@ -364,8 +390,6 @@ V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
 0x08049    35 00 50 c6    mov    0x50c6 <CLK_CKDIVR>,#0x00[0K
 F 0x008049
-Simulated 1152 ticks [ELIDED]
-Host usage: [ELIDED]
 
 timer get
 timer #1("time") ON 0.002067375000000 sec (1288 clks)
@@ -386,6 +410,8 @@ clk[0] at 0x0050c0
   f_CPU:    1000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00804d: (109) stepped 128 ticks
@@ -413,6 +439,8 @@ clk[0] at 0x0050c0
   f_CPU:    128000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008051: (109) stepped 1 ticks
@@ -440,6 +468,8 @@ clk[0] at 0x0050c0
   f_CPU:    128000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008055: (109) stepped 1 ticks
@@ -467,6 +497,8 @@ clk[0] at 0x0050c0
   f_CPU:    128000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008059: (109) stepped 1 ticks
@@ -494,6 +526,8 @@ clk[0] at 0x0050c0
   f_CPU:    128000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00805d: (109) stepped 1 ticks
@@ -521,6 +555,8 @@ clk[0] at 0x0050c0
   f_CPU:    128000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008061: (109) stepped 1 ticks
@@ -548,6 +584,8 @@ clk[0] at 0x0050c0
   f_CPU:    64000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008065: (109) stepped 2 ticks
@@ -575,6 +613,8 @@ clk[0] at 0x0050c0
   f_CPU:    32000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008069: (109) stepped 4 ticks
@@ -602,6 +642,8 @@ clk[0] at 0x0050c0
   f_CPU:    16000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x00806d: (109) stepped 8 ticks
@@ -629,6 +671,8 @@ clk[0] at 0x0050c0
   f_CPU:    8000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008071: (109) stepped 16 ticks
@@ -656,6 +700,8 @@ clk[0] at 0x0050c0
   f_CPU:    4000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008075: (109) stepped 32 ticks
@@ -683,6 +729,8 @@ clk[0] at 0x0050c0
   f_CPU:    2000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 step
 
 Stop at 0x008079: (109) stepped 64 ticks
@@ -710,3 +758,5 @@ clk[0] at 0x0050c0
   f_CPU:    1000 Hz
   PCKENR1:  0xff
   PCKENR2:  0xff
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)

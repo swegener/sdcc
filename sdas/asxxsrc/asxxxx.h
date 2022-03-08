@@ -68,6 +68,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include <time.h>
 
 /*
  * Local Definitions
@@ -536,6 +537,8 @@ struct  sym
 #define   O_IFF      1          /* .iff */
 #define   O_IFT      2          /* .ift */
 #define   O_IFTF     3          /* .iftf */
+#define	  O_IFDEF    4		/* .ifdef */
+#define	  O_IFNDEF   5		/* .ifndef */
 #define   O_IFGT     6          /* .ifgt (BGP) */
 #define   O_IFLT     7          /* .iflt (BGP) */
 #define   O_IFGE     8          /* .ifge (BGP) */
@@ -568,15 +571,26 @@ struct  sym
 #define   O_2BYTE    2          /* .word, .dw, .fdb */
 #define   O_3BYTE    3          /* .3byte */
 #define   O_4BYTE    4          /* .4byte */
-#define S_BLK           19      /* .blkb or .blkw */
+#define	S_BLK		19	/* .blkb, .blkw, .blk3, .blk4, .ds, .rmb, .rs */
+/*	  O_1BYTE    1	*/	/* .blkb, .ds, .rmb, .rs */
+/*	  O_2BYTE    2	*/	/* .blkw */
+/*	  O_3BYTE    3	*/	/* .blk3 */
+/*	  O_4BYTE    4	*/	/* .blk4 */
 #define S_ASCIX         20      /* .ascii, .ascis, .asciz, .str, .strs, .strz */
 #define   O_ASCII    0          /* .ascii */
 #define   O_ASCIS    1          /* .ascis */
 #define   O_ASCIZ    2          /* .asciz */
+#define	S_DEFINE	21	/* .define, .undefine */
+#define	  O_DEF      0		/* .define */
+#define	  O_UNDEF    1		/* .undefine */
 #define S_BOUNDARY      22      /* .even, .odd */
 #define   O_EVEN     0          /* .even */
 #define   O_ODD      1          /* .odd */
 #define   O_BNDRY    2          /* .bndry */
+#define	S_MSG		23	/* .msg */
+#define	S_ERROR		24	/* .assume, .error */
+#define	  O_ASSUME   0		/* .assume */
+#define	  O_ERROR    1		/* .error */
 #define S_BITS          26      /* .8bit, .16bit, .24bit, .32bit */
 /*        O_1BYTE    1  */      /* .8bit */
 /*        O_2BYTE    2  */      /* .16bit */
@@ -883,12 +897,12 @@ extern  int     aserr;          /*      ASxxxx error counter
                                  */
 extern  jmp_buf jump_env;       /*      compiler dependent structure
                                  *      used by setjmp() and longjmp()
+				 */
+extern  struct  asmf    *asmc;  /*      Pointer to the current
+                                 *      source input structure
                                  */
 extern  struct  asmf    *asmp;  /*      The pointer to the first assembler
                                  *      source file structure of a linked list
-                                 */
-extern  struct  asmf    *asmc;  /*      Pointer to the current
-                                 *      source input structure
                                  */
 extern  struct  asmf    *asmi;  /*      Queued pointer to an include file
                                  *      source input structure
@@ -955,6 +969,8 @@ extern  int     page;           /*      current page number
                                  */
 extern  int     lop;            /*      current line number on page
                                  */
+extern	time_t	curtim;		/*	pointer to the current time string
+				 */
 extern  int     pass;           /*      assembler pass number
                                  */
 extern  int     aflag;          /*      -a, make all symbols global flag
@@ -968,7 +984,7 @@ extern  int     fflag;          /*      -f(f), relocations flagged flag
 extern  int     gflag;          /*      -g, make undefined symbols global flag
                                  */
 #if NOICE
-extern  int     jflag;          /*      -j, generate debug information flag
+extern	int	jflag;		/*	-j, enable NoICE Debug Symbols
                                  */
 #endif
 
@@ -982,8 +998,12 @@ extern  int     pflag;          /*      -p, disable listing pagination
                                  */
 extern  int     sflag;          /*      -s, generate symbol table flag
                                  */
+extern  int     tflag;          /*      -t, output diagnostic parameters from assembler
+                                */
 extern  int     uflag;          /*      -u, disable .list/.nlist processing flag
                                  */
+extern	int	vflag;		/*	-v, enable out of range signed / unsigned errors
+				 */
 extern  int     wflag;          /*      -w, enable wide listing format
                                  */
 extern  int     xflag;          /*      -x, listing radix flag
@@ -1027,6 +1047,8 @@ extern  struct  area    *areap; /*      pointer to an area structure
                                  */
 extern  struct  area    area[]; /*      array of 1 area
                                  */
+extern	struct	def	*defp;	/*	pointer to a def structure
+				 */
 extern  struct  sym     sym[];  /*      array of 1 symbol
                                  */
 extern  struct  sym     *symp;  /*      pointer to a symbol structure
@@ -1042,6 +1064,8 @@ extern  char    *ep;            /*      pointer into error list
                                  */
 extern  char    eb[NERR];       /*      array of generated error codes
                                  */
+extern	char	*ex[NERR];	/*	array of error string pointers
+				 */
 extern  char    *ip;            /*      pointer into the assembler-source
                                  *      text line in ib[]
                                  */
@@ -1130,7 +1154,7 @@ extern  int             fndidx(char *str);
 extern  int             intsiz(void);
 extern  VOID            newdot(struct area *nap);
 extern  VOID            phase(struct area *ap, a_uint a);
-extern  VOID            usage(int n);
+extern  VOID            usage(void);
 
 /* asmcro.c */
 extern  char *          fgetm(char *ptr, int len, FILE *fp);
@@ -1161,15 +1185,19 @@ extern  int             getlnm(void);
 extern  VOID            getst(char *id, int c);
 extern  int             more(void);
 extern  int             nxtline(void);
+extern	int		replace(char *id);
+extern	VOID		scanline(void);
 extern  VOID            unget(int c);
 
 /* assym.c */
 extern  VOID            allglob(void);
 extern  struct  area *  alookup(char *id);
+extern	struct	def *	dlookup(char *id);
 extern  int             hash(const char *p, int flag);
 extern  struct  sym *   lookup(const char *id);
 extern  struct  mne *   mlookup(char *id);
 extern  char *          new(unsigned int n);
+extern	struct	sym *	slookup(char *id);
 extern  char *          strsto(const char *str);
 extern  int             symeq(const char *p1, const char *p2, int flag);
 extern  VOID            syminit(void);
@@ -1179,6 +1207,7 @@ extern  VOID            symglob(void);
 extern  VOID            aerr(void);
 extern  VOID            diag(void);
 extern  VOID            err(int c);
+extern	VOID		xerr(int c, char *str);
 extern  char *          geterr(int c);
 extern  VOID            qerr(void);
 extern  VOID            rerr(void);

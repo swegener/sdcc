@@ -44,9 +44,9 @@ gets (char *s)
             {
               putchar ('\b');
               putchar (' ');
-	      putchar ('\b');
-	      --s;
-	      --count;
+              putchar ('\b');
+              --s;
+              --count;
             }
           break;
 

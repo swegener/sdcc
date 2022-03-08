@@ -552,14 +552,21 @@ cl_commander::init(void)
     {
       class cl_f *i= NULL, *o;
       if (Config && *Config)
-	i= mk_io(Config, "r");
-      o= cp_io(fileno(stderr), "w");
-      con= new cl_console(/*fc*/i, /*stderr*/o, app);
-      con->set_flag(CONS_NOWELCOME|CONS_ECHO, true);
-      //exec_on(con, Config);
-      config_console= con;
-      con->set_startup(app->startup_command);
-      add_console(con);
+	{
+	  i= mk_io(Config, "r");
+	  if (i->file_id < 0)
+	    fprintf(stderr, "Error opening cfg file: %s\n", Config);
+	  else
+	    {
+	      o= cp_io(fileno(stderr), "w");
+	      con= new cl_console(/*fc*/i, /*stderr*/o, app);
+	      con->set_flag(CONS_NOWELCOME|CONS_ECHO, true);
+	      //exec_on(con, Config);
+	      config_console= con;
+	      con->set_startup(app->startup_command);
+	      add_console(con);
+	    }
+	}
     }
   return(0);
 }

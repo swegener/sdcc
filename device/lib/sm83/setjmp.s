@@ -2,7 +2,7 @@
 ;  setjmp.s
 ;
 ;  Copyright (C) 2011-2021, Philipp Klaus Krause
-;  Copyright (C) 2021, Sebastian 'basxto' Riedel (sdcc@basxto.de)
+;  Copyright (C) 2021-2022, Sebastian 'basxto' Riedel (sdcc@basxto.de)
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -32,29 +32,32 @@
 	.globl ___setjmp
 
 ___setjmp:
-	; Load return address into bc.
-	pop	bc
-	push	bc
 
-	; Load env into hl, sp-2 into de
-	ldhl	sp, #2
-	ld	a, l
-	ld	l, e
-	ld	e, a
+	ldhl sp, #0
+
+	; Load return address into bc.
+	ld	a, (hl+)
+	ld	c, a
+	ld	a, (hl+)
+	ld	b, a
+
+	; Load env into hl, sp+2 into de
 	ld	a, h
 	ld	h, d
 	ld	d, a
 
+	ld	a, l
+	ld	l, e
+
+	; Store stack pointer.
+	ld	(hl+), a
+	ld	a, d
+	ld	(hl+), a
+
 	; Store return address.
 	ld	a, c
 	ld	(hl+), a
-	ld	a, b
-	ld	(hl+), a
-
-	; Store stack pointer.
-	ld	a, e
-	ld	(hl+), a
-	ld	(hl), d
+	ld	(hl), b
 
 	; Return 0.
 	ld	bc, #0
@@ -63,32 +66,30 @@ ___setjmp:
 .globl _longjmp
 
 _longjmp:
-	ld	l, e
-	ld	h, d
-
 	; Ensure that return value is non-zero.
 	ld	a, c
 	or	a, b
 	jr	NZ, 0001$
 	inc	bc
-0001$:
 
-	; Get return address.
-	ld	a, (hl+)
-	ld	e, a
-	ld	a, (hl+)
-	ld	d, a
+0001$:
 	; Get stack pointer.
-	ld	a, (hl+)
-	ld	h, (hl)
+	ld	a, (de)
 	ld	l, a
+	inc	de
+	ld	a, (de)
+	ld	h, a
+	inc	de
 
 	; Restore stack pointer.
 	ld	sp, hl
 
-	; Set return address.
+	; Get return address.
 	ld	l, e
 	ld	h, d
+	ld	a, (hl+)
+	ld	h, (hl)
+	ld	l, a
 
 	; Return value is in bc.
 

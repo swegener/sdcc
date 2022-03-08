@@ -880,6 +880,7 @@ if test $OPT_DISABLE_MOS6502 = 0 || test $OPT_DISABLE_MOS65C02 = 0; then
   AC_CONFIG_FILES([src/mos6502/Makefile
                    sdas/as6500/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mos6502/Makefile
+                                                       device/lib/mos6502-stack-auto/Makefile
                                                        device/lib/mos65c02/Makefile])
 fi
 

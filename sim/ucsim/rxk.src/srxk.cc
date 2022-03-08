@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "globals.h"
+#include "utils.h"
 
 // local
 #include "glob.h"
@@ -38,6 +39,7 @@ main(int argc, char *argv[])
 {
   class cl_sim *sim;
 
+  app_start_at= dnow();
   init_sbox();
   cpus= cpus_rxk;
   application= new cl_app();

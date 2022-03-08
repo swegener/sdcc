@@ -100,7 +100,11 @@ cl_hw::init(void)
           cfg->register_hw(a, this, false);
         }
     }
-
+  if (cfg_size() > 0)
+    {
+      chars pn("", "%s%d_on", id_string, id);
+      uc->vars->add(pn, cfg, 0, cfg_help(0));
+    }
   cache_run= -1;
   cache_time= 0;
   return 0;
@@ -165,6 +169,15 @@ cl_hw::conf(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
+  if (addr == 0)
+    {
+      if (val)
+	{
+	  on= *val;
+	}
+      else
+	cell->set(on?1:0);
+    }
   return cell->get();
 }
 
@@ -203,6 +216,8 @@ cl_hw::cfg_read(t_addr addr)
 const char *
 cl_hw::cfg_help(t_addr addr)
 {
+  if (addr == 0)
+    return "Turn ticking of this peripheral on/off (bool, RW)";
   return "N/A";
 }
 

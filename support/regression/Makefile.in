@@ -70,7 +70,7 @@ GENERATE_CASES = $(srcdir)/generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out .svn mos6502 mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out .svn mos6502 mos6502-stack-auto mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -181,6 +181,14 @@ test-ucr3ka:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucr3ka
 
+test-ucrxk2:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ucrxk2
+
+test-ucrxk2a:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ucrxk2a
+
 test-ucrxk3a:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucrxk3a
@@ -262,6 +270,11 @@ test-mos6502:
 test-uc6502:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=uc6502
+
+# Helper rule for testing the mos6502-stack-auto port only(use uCsim simulator)
+test-uc6502-stack-auto:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=uc6502-stack-auto
 
 ### Helper rule for testing the host cc only
 test-host:

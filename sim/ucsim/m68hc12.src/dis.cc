@@ -66,7 +66,7 @@ cl_m68hc12::get_dis_entry(t_addr addr)
 char *
 cl_m68hc12::disassc(t_addr addr, chars *comment)
 {
-  chars work= chars(), temp= chars();
+  chars work= chars(), temp= chars(), fmt= chars();
   const char *b;
   //t_mem code= rom->get(addr);
   struct dis_entry *dis_e;
@@ -87,6 +87,39 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	{
 	  first= false;
 	  while (work.len() < 6) work.append(' ');
+	}
+      if (b[i] == '\'')
+	{
+	  fmt= "";
+	  i++;
+	  while (b[i] && (b[i]!='\''))
+	    fmt.append(b[i++]);
+	  if (!b[i]) i--;
+	  if (fmt.empty())
+	    work.append("'");
+	  if (strcmp(fmt.c_str(), "ep") == 0)
+	    {
+	      u8_t h, l, p;
+	      h= rom->read(addr+1);
+	      l= rom->read(addr+2);
+	      p= rom->read(addr+3);
+	      work.appendf("$%04x", h*256+l);
+	      work.append(",");
+	      work.appendf("$%02x", p);
+	    }
+	  if (strcmp(fmt.c_str(), "ip") == 0)
+	    {
+	      t_addr a= addr+1;
+	      u8_t xb= rom->read(a);
+	      disass_xb(&a, &work, comment);
+	      if (!xb_indirect(xb))
+		{
+		  u8_t p= rom->read(a);
+		  work.append(",");
+		  work.appendf("$%02x", p);
+		}
+	    }
+	  continue;
 	}
       if (b[i] == '%')
 	{
@@ -296,37 +329,42 @@ CL12::inst_length(t_addr addr)
       int l= -(di->length);
       u16_t a= (u16_t)addr+l-1;
       u8_t p= rom->read(a);
+      int corr= 0;
+      if ((di->code == 0x4b)
+	  &&
+	  (!xb_indirect(p)))
+	corr= 1;
       if ((p & 0x20) == 0)
 	{
 	  // 1. rr0n nnnn n5,r rr={X,Y,SP,PC}
-	  return l;
+	  return l+corr;
 	}
       else if ((p&0xe7) == 0xe7)
 	{
 	  // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
-	  return l;
+	  return l+corr;
 	}
       else if ((p&0xe7) == 0xe3)
 	{
 	  // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
-	  return l+2;
+	  return l+2+corr;
 	}
       else if ((p&0xc0) != 0xc0)
 	{
 	  // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
-	  return l;
+	  return l+corr;
 	}
       else if ((p&0xe4) == 0xe0)
 	{
 	  // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
 	  if ((p & 0x02) == 0)
-	    return l+1;
-	  return l+2;
+	    return l+1+corr;
+	  return l+2+corr;
 	}
       else // if ((p&0xe4) == 0xe4)
 	{
 	  // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
-	  return l;
+	  return l+corr;
 	}
     }
   return 1;

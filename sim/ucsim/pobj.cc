@@ -265,6 +265,17 @@ cl_event::~cl_event(void)
  * Initializing a collection
  */
 
+cl_list::cl_list(void):
+  cl_base()
+{
+  count= 0;
+  Items= 0;
+  Limit= 0;
+  Delta= 10;
+  set_limit(10);
+  set_name("List");
+}
+
 cl_list::cl_list(t_index alimit, t_index adelta, const char *aname):
   cl_base()
 {

@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "globals.h"
+#include "utils.h"
 
 // local
 #include "simm6809cl.h"
@@ -36,7 +37,8 @@ int
 main(int argc, char *argv[])
 {
   class cl_sim *sim;
-  
+
+  app_start_at= dnow();
   application= new cl_app();
   application->set_name("sm6809");
   application->init(argc, argv);

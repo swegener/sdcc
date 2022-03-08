@@ -1,7 +1,7 @@
 /* m08mch.c */
 
 /*
- *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *  Copyright (C) 1993-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,22 +25,22 @@
 #include "asxxxx.h"
 #include "m6808.h"
 
-char    *cpu    = "Motorola 68HC(S)08";
-char    *dsft   = "asm";
+char	*cpu	= "Motorola 68HC(S)08 / 68(HC)05";
+char	*dsft	= "asm";
 
 /*
  * Opcode Cycle Definitions
  */
-#define OPCY_SDP        ((char) (0xFF))
-#define OPCY_ERR        ((char) (0xFE))
-#define OPCY_CPU        ((char) (0xFD))
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+#define	OPCY_CPU	((char)	(0xFD))
 
 
-/*      OPCY_NONE       ((char) (0x80)) */
-/*      OPCY_MASK       ((char) (0x7F)) */
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
 
-#define UN      ((char) (OPCY_NONE | 0x00))
-#define P2      ((char) (OPCY_NONE | 0x01))
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
 
 
 /*
@@ -197,8 +197,8 @@ static char *s08Page[2] = {
 };
 
 
-static int mchtyp;
-
+int mchtyp;
+struct area *zpg;
 
 /*
  * Process a machine op.
@@ -207,208 +207,203 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-        int op, t1, t2, type;
-        struct expr e1, e2, e3;
+	int op, t1, t2, type;
+	struct expr e1, e2, e3;
         a_uint espv;
-        struct area *espa;
-        char id[NCPS];
-        int c, v1;
+	char id[NCPS];
+	int c, v1;
 
-        clrexpr(&e1);
-        clrexpr(&e2);
-        clrexpr(&e3);
-        op = (int) mp->m_valu;
-        type = mp->m_type;
-        switch (type) {
+	clrexpr(&e1);
+	clrexpr(&e2);
+	clrexpr(&e3);
+	op = (int) mp->m_valu;
+	type = mp->m_type;
+	switch (type) {
 
-        case S_SDP:
-                opcycles = OPCY_SDP;
-                espa = NULL;
-                if (more()) {
-                        expr(&e1, 0);
-                        if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
-                                if (e1.e_addr) {
-                                        err('b');
-                                }
-                        }
-                        if ((c = getnb()) == ',') {
-                                getid(id, -1);
-                                espa = alookup(id);
-                                if (espa == NULL) {
-                                        err('u');
-                                }
-                        } else {
-                                unget(c);
-                        }
-                }
-                if (espa) {
-                        outdp(espa, &e1, 0);
-                } else {
-                        outdp(dot.s_area, &e1, 0);
-                }
-                lmode = SLIST;
-                break;
+	case S_SDP:
+		opcycles = OPCY_SDP;
+		zpg = dot.s_area;
+		if (more()) {
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr) {
+					xerr('b', "Only Page 0 Allowed.");
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
+				}
+			} else {
+				unget(c);
+			}
+		}
+		outdp(zpg, &e1, 0);
+		lmode = SLIST;
+		break;
 
-        case S_CPU:
-                opcycles = OPCY_CPU;
-                mchtyp = op;
-                sym[2].s_addr = op;
-                lmode = SLIST;
-                break;
+	case S_CPU:
+		opcycles = OPCY_CPU;
+		mchtyp = op;
+		sym[2].s_addr = op;
+		lmode = SLIST;
+		break;
 
-        case S_INH8S:
-                if (mchtyp != X_HCS08) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                } /* Fall Through */
-        case S_INH8:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                } /* Fall Through */
-        case S_INH:
-                outab(op);
-                break;
+	case S_INH8S:
+		if (mchtyp != X_HCS08) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HCS08 Instruction.");
+			break;
+		} /* Fall Through */
+	case S_INH8:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		} /* Fall Through */
+	case S_INH:
+		outab(op);
+		break;
 
-        case S_BRA8:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                } /* Fall Through */
-        case S_BRA:
-                expr(&e1, 0);
-                outab(op);
-                if (mchpcr(&e1)) {
-                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
-                        if ((v1 < -128) || (v1 > 127))
-                                aerr();
-                        outab(v1);
-                } else {
-                        outrb(&e1, R_PCR);
-                }
-                if (e1.e_mode != S_USER)
-                        rerr();
-                break;
+	case S_BRA8:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		} /* Fall Through */
+	case S_BRA:
+		expr(&e1, 0);
+		outab(op);
+		if (mchpcr(&e1)) {
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+			if ((v1 < -128) || (v1 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
+		break;
 
-        case S_TYP1:
-                t1 = addr(&e1);
-                if (t1 == S_A) {
-                        outab(op+0x10);
-                        break;
-                }
-                if (t1 == S_X) {
-                        outab(op+0x20);
-                        break;
-                }
-                if (t1 == S_DIR || t1 == S_EXT) {
-                        outab(op);
-                        outrb(&e1, R_PAG0);
-                        break;
-                }
-                if (t1 == S_IX) {
-                        outab(op+0x40);
-                        break;
-                }
-                if (t1 == S_IX1 || t1 == S_IX2) {
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                        break;
-                }
-                if (t1 == S_SP1 || t1 == S_SP2) {
-                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
-                                outab(0x9e);
-                                outab(op+0x30);
-                                outrb(&e1, R_USGN);
-                                break;
-                        }
-                }
-                aerr();
-                break;
+	case S_TYP1:
+		t1 = addr(&e1);
+		if (t1 == S_A) {
+			outab(op+0x10);
+			break;
+		}
+		if (t1 == S_X) {
+			outab(op+0x20);
+			break;
+		}
+		if (t1 == S_DIR || t1 == S_EXT) {
+			outab(op);
+			outrb(&e1, R_PAG0);
+			break;
+		}
+		if (t1 == S_IX) {
+			outab(op+0x40);
+			break;
+		}
+		if (t1 == S_IX1 || t1 == S_IX2) {
+			outab(op+0x30);
+			outrb(&e1, R_USGN);
+			break;
+		}
+		if (t1 == S_SP1 || t1 == S_SP2) {
+			if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+				outab(0x9e);
+				outab(op+0x30);
+				outrb(&e1, R_USGN);
+				break;
+			}
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
-        case S_TYP2:
-                t1 = addr(&e1);
-                if (t1 == S_IMMED) {
-                        if ((op == 0xA7) || (op == 0xAC) ||
-                            (op == 0xAD) || (op == 0xAF))
-                                aerr();
-                        outab(op);
-                        outrb(&e1, 0);
-                        break;
-                }
-                if (t1 == S_DIR) {
-                        outab(op+0x10);
-                        outrb(&e1, R_PAG0);
-                        break;
-                }
-                if (t1 == S_EXT) {
-                        outab(op+0x20);
-                        outrw(&e1, 0);
-                        break;
-                }
-                if (t1 == S_IX) {
-                        outab(op+0x50);
-                        break;
-                }
-                if (t1 == S_IX1) {
-                        outab(op+0x40);
-                        outrb(&e1, R_USGN);
-                        break;
-                }
-                if (t1 == S_IX2) {
-                        outab(op+0x30);
-                        outrw(&e1, 0);
-                        break;
-                }
-                if (t1 == S_SP1) {
-                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
-                                if (op == 0xAC || op == 0xAD)
-                                        aerr();
-                                outab(0x9e);
-                                outab(op+0x40);
-                                outrb(&e1, R_USGN);
-                                break;
-                        }
-                }
-                if (t1 == S_SP2) {
-                        if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
-                                if (op == 0xAC || op == 0xAD)
-                                        aerr();
-                                outab(0x9e);
-                                outab(op+0x30);
-                                outrw(&e1, 0);
-                                break;
-                        }
-                }
-                aerr();
-                break;
+	case S_TYP2:
+		t1 = addr(&e1);
+		if (t1 == S_IMMED) {
+			if ((op == 0xA7) || (op == 0xAC) ||
+			    (op == 0xAD) || (op == 0xAF))
+				aerr();
+			outab(op);
+			outrb(&e1, 0);
+			break;
+		}
+		if (t1 == S_DIR) {
+			outab(op+0x10);
+			outrb(&e1, R_PAG0);
+			break;
+		}
+		if (t1 == S_EXT) {
+			outab(op+0x20);
+			outrw(&e1, 0);
+			break;
+		}
+		if (t1 == S_IX) {
+			outab(op+0x50);
+			break;
+		}
+		if (t1 == S_IX1) {
+			outab(op+0x40);
+			outrb(&e1, R_USGN);
+			break;
+		}
+		if (t1 == S_IX2) {
+			outab(op+0x30);
+			outrw(&e1, 0);
+			break;
+		}
+		if (t1 == S_SP1) {
+			if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+				if (op == 0xAC || op == 0xAD)
+					xerr('a', "Invalid 68HC(S)08 JMP/JSR Addressing Mode.");
+				outab(0x9e);
+				outab(op+0x40);
+				outrb(&e1, R_USGN);
+				break;
+			}
+		}
+		if (t1 == S_SP2) {
+			if ((mchtyp == X_HC08) || (mchtyp == X_HCS08)) {
+				if (op == 0xAC || op == 0xAD)
+					xerr('a', "Invalid 68HC(S)08 JMP/JSR Addressing Mode.");
+				outab(0x9e);
+				outab(op+0x30);
+				outrw(&e1, 0);
+				break;
+			}
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
-        case S_TYP3:
-                t1 = addr(&e1);
+	case S_TYP3:
+		t1 = addr(&e1);
                 espv = e1.e_addr;
-                if (t1 != S_IMMED || espv & ~0x07)
-                        aerr();
-                comma(1);
-                t2 = addr(&e2);
-                if (t2 != S_DIR)
-                        aerr();
+		if (t1 != S_IMMED)
+			xerr('a', "Require Immediate(#) For First Argument.");
+		comma(1);
+		t2 = addr(&e2);
+		if (t2 != S_DIR)
+			xerr('a', "Require Direct Mode For Second Argument.");
                 outab(op + 2*(espv&0x07));
                 outrb(&e2, R_PAG0);
-                break;
+		break;
 
-        case S_TYP4:
-                t1 = addr(&e1);
+	case S_TYP4:
+		t1 = addr(&e1);
                 espv = e1.e_addr;
-                if (t1 != S_IMMED || espv & ~0x07)
-                        aerr();
-                comma(1);
-                t2 = addr(&e2);
-                if (t2 != S_DIR)
-                        aerr();
-                comma(1);
-                expr(&e3, 0);
+		if (t1 != S_IMMED)
+			xerr('a', "Require Immediate(#) For First Argument.");
+		comma(1);
+		t2 = addr(&e2);
+		if (t2 != S_DIR)
+			xerr('a', "Require Direct Mode For Second Argument.");
+		comma(1);
+		expr(&e3, 0);
                 outab(op + 2*(espv&0x07));
                 outrb(&e2, R_PAG0);
                 if (mchpcr(&e3)) {
@@ -423,292 +418,292 @@ struct mne *mp;
                         rerr();
                 break;
 
-        case S_TYPAI:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                if (t1 == S_IMMED) {
-                        outab(op);
-                        if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
-                                v1 = (int) e1.e_addr;
-                                if ((v1 < -128) || (v1 > 127))
-                                        aerr();
-                                outab(v1);
-                        } else {
-                                outrb(&e1, 0);
-                        }
-                        break;
-                }
-                aerr();
-                break;
+	case S_TYPAI:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		if (t1 == S_IMMED) {
+			outab(op);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				v1 = (int) e1.e_addr;
+				if ((v1 < -128) || (v1 > 127))
+					xerr('a', "Branching Range Exceeded.");
+				outab(v1);
+			} else {
+				outrb(&e1, 0);
+			}
+			break;
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
-        case S_TYPHX:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                if (t1 == S_IMMED) {
-                        if (op == 0x25)
-                                aerr();
-                        outab(op);
-                        outrw(&e1, 0);
-                        break;
-                }
-                if (mchtyp == X_HCS08) {
-                        if (t1 == S_EXT) {
-                                switch (op) {
-                                default:
-                                case 0x25:      outab(0x96);    break;
-                                case 0x45:      outab(0x32);    break;
-                                case 0x65:      outab(0x3E);    break;
-                                }
-                                outrw(&e1, 0);
-                                break;
-                        }
-                        if ((t1 == S_SP1) || (t1 == S_SP2)) {
-                                outab(0x9E);
-                                switch (op) {
-                                default:
-                                case 0x25:      outab(0xFF);    break;
-                                case 0x45:      outab(0xFE);    break;
-                                case 0x65:      outab(0xF3);    break;
-                                }
-                                outrb(&e1, R_USGN);
-                                break;
-                        }
-                        if ((t1 == S_IX) && (op == 0x45)) {
-                                outab(0x9E);
-                                outab(0xAE);
-                                break;
-                        }
-                        if ((t1 == S_IX1) && (op == 0x45)) {
-                                outab(0x9E);
-                                outab(0xCE);
-                                outrb(&e1, R_USGN);
-                                break;
-                        }
-                        if ((t1 == S_IX2) && (op == 0x45)) {
-                                outab(0x9E);
-                                outab(0xBE);
-                                outrw(&e1, 0);
-                                break;
-                        }
-                } else {
-                        if (t1 == S_EXT) {
-                                t1 = S_DIR;
-                        }
-                }
-                if (t1 == S_DIR) {
-                        outab(op | 0x10);
-                        outrb(&e1, R_PAG0);
-                        break;
-                }
-                aerr();
-                break;
+	case S_TYPHX:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		if (t1 == S_IMMED) {
+			if (op == 0x25)
+				aerr();
+			outab(op);
+			outrw(&e1, 0);
+			break;
+		}
+		if (mchtyp == X_HCS08) {
+			if (t1 == S_EXT) {
+				switch (op) {
+				default:
+				case 0x25:	outab(0x96);	break;
+				case 0x45:	outab(0x32);	break;
+				case 0x65:	outab(0x3E);	break;
+				}	
+				outrw(&e1, 0);
+				break;
+			}
+			if ((t1 == S_SP1) || (t1 == S_SP2)) {
+				outab(0x9E);
+				switch (op) {
+				default:
+				case 0x25:	outab(0xFF);	break;
+				case 0x45:	outab(0xFE);	break;
+				case 0x65:	outab(0xF3);	break;
+				}
+				outrb(&e1, R_USGN);
+				break;
+			}
+			if ((t1 == S_IX) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xAE);
+				break;
+			}
+			if ((t1 == S_IX1) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xCE);
+				outrb(&e1, R_USGN);
+				break;
+			}
+			if ((t1 == S_IX2) && (op == 0x45)) {
+				outab(0x9E);
+				outab(0xBE);
+				outrw(&e1, 0);
+				break;
+			}
+		} else {
+			if (t1 == S_EXT) {
+				t1 = S_DIR;
+			}
+		}
+		if (t1 == S_DIR) {
+			outab(op | 0x10);
+			outrb(&e1, R_PAG0);
+			break;
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
-        case S_CBEQ:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                comma(1);
-                expr(&e2, 0);
-                if (t1 == S_IMMED) {
-                        outab(op);
-                        outrb(&e1, 0);
-                } else
-                if (t1 == S_DIR || t1 == S_EXT) {
-                        outab(op);
-                        outrb(&e1, R_PAG0);
-                } else
-                if (t1 == S_IXP) {
-                        outab(op+0x40);
-                } else
-                if (t1 == S_IX1P || t1 == S_IX2P) {
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                } else
-                if (t1 == S_SP1 || t1 == S_SP2) {
-                        outab(0x9E);
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                } else {
-                        aerr();
-                        break;
-                }
-                if (mchpcr(&e2)) {
-                        v1 = (int) (e2.e_addr - dot.s_addr - 1);
-                        if ((v1 < -128) || (v1 > 127))
-                                aerr();
-                        outab(v1);
-                } else {
-                        outrb(&e2, R_PCR);
-                }
-                if (e2.e_mode != S_USER)
-                        rerr();
-                break;
+	case S_CBEQ:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		comma(1);
+		expr(&e2, 0);
+		if (t1 == S_IMMED) {
+			outab(op);
+			outrb(&e1, 0);
+		} else
+		if (t1 == S_DIR || t1 == S_EXT) {
+			outab(op);
+			outrb(&e1, R_PAG0);
+		} else
+		if (t1 == S_IXP) {
+			outab(op+0x40);
+		} else
+		if (t1 == S_IX1P || t1 == S_IX2P) {
+			outab(op+0x30);
+			outrb(&e1, R_USGN);
+		} else
+		if (t1 == S_SP1 || t1 == S_SP2) {
+			outab(0x9E);
+			outab(op+0x30);
+			outrb(&e1, R_USGN);
+		} else {
+			xerr('a', "Invalid Addressing Mode.");
+			break;
+		}
+		if (mchpcr(&e2)) {
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
+			if ((v1 < -128) || (v1 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v1);
+		} else {
+			outrb(&e2, R_PCR);
+		}
+		if (e2.e_mode != S_USER)
+			rerr();
+		break;
 
-        case S_CQAX:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                if (t1 != S_IMMED)
-                        aerr();
-                comma(1);
-                expr(&e2, 0);
-                outab(op);
-                outrb(&e1, 0);
-                if (mchpcr(&e2)) {
-                        v1 = (int) (e2.e_addr - dot.s_addr - 1);
-                        if ((v1 < -128) || (v1 > 127))
-                                aerr();
-                        outab(v1);
-                } else {
-                        outrb(&e2, R_PCR);
-                }
-                if (e2.e_mode != S_USER)
-                        rerr();
-                break;
+	case S_CQAX:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		if (t1 != S_IMMED)
+			xerr('a', "Immediate(#) First Argument Required.");
+		comma(1);
+		expr(&e2, 0);
+		outab(op);
+		outrb(&e1, 0);
+		if (mchpcr(&e2)) {
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
+			if ((v1 < -128) || (v1 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v1);
+		} else {
+			outrb(&e2, R_PCR);
+		}
+		if (e2.e_mode != S_USER)
+			rerr();
+		break;
 
-        case S_DBNZ:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                comma(1);
-                expr(&e2, 0);
-                if (t1 == S_DIR || t1 == S_EXT) {
-                        outab(op);
-                        outrb(&e1, R_PAG0);
-                } else
-                if (t1 == S_IX) {
-                        outab(op+0x40);
-                } else
-                if (t1 == S_IX1 || t1 == S_IX2) {
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                } else
-                if (t1 == S_SP1 || t1 == S_SP2) {
-                        outab(0x9E);
-                        outab(op+0x30);
-                        outrb(&e1, R_USGN);
-                } else {
-                        aerr();
-                        break;
-                }
-                if (mchpcr(&e2)) {
-                        v1 = (int) (e2.e_addr - dot.s_addr - 1);
-                        if ((v1 < -128) || (v1 > 127))
-                                aerr();
-                        outab(v1);
-                } else {
-                        outrb(&e2, R_PCR);
-                }
-                if (e2.e_mode != S_USER)
-                        rerr();
-                break;
+	case S_DBNZ:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		comma(1);
+		expr(&e2, 0);
+		if (t1 == S_DIR || t1 == S_EXT) {
+			outab(op);
+			outrb(&e1, R_PAG0);
+		} else
+		if (t1 == S_IX) {
+			outab(op+0x40);
+		} else
+		if (t1 == S_IX1 || t1 == S_IX2) {
+			outab(op+0x30);
+			outrb(&e1, R_USGN);
+		} else
+		if (t1 == S_SP1 || t1 == S_SP2) {
+			outab(0x9E);
+			outab(op+0x30);
+			outrb(&e1, R_USGN);
+		} else {
+			xerr('a', "Invalid Addressing Mode.");
+			break;
+		}
+		if (mchpcr(&e2)) {
+			v1 = (int) (e2.e_addr - dot.s_addr - 1);
+			if ((v1 < -128) || (v1 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v1);
+		} else {
+			outrb(&e2, R_PCR);
+		}
+		if (e2.e_mode != S_USER)
+			rerr();
+		break;
 
-        case S_DZAX:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                expr(&e1, 0);
-                outab(op);
-                if (mchpcr(&e1)) {
-                        v1 = (int) (e1.e_addr - dot.s_addr - 1);
-                        if ((v1 < -128) || (v1 > 127))
-                                aerr();
-                        outab(v1);
-                } else {
-                        outrb(&e1, R_PCR);
-                }
-                if (e1.e_mode != S_USER)
-                        rerr();
-                break;
+	case S_DZAX:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		expr(&e1, 0);
+		outab(op);
+		if (mchpcr(&e1)) {
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+			if ((v1 < -128) || (v1 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
+		break;
 
-        case S_MOV:
-                if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
-                        opcycles = OPCY_ERR;
-                        err('o');
-                        break;
-                }
-                t1 = addr(&e1);
-                if (t1 == S_IX1P || t1 == S_IX2P) {
-                        outab(op+0x10);
-                        outrb(&e1, R_PAG0);
-                        break;
-                }
-                comma(1);
-                t2 = addr(&e2);
-                if (t1 == S_IMMED) {
-                        if (t2 == S_DIR || t2 == S_EXT) {
-                                outab(op+0x20);
-                                outrb(&e1, 0);
-                                outrb(&e2, R_PAG0);
-                                break;
-                        }
-                }
-                if (t1 == S_DIR || t1 == S_EXT) {
-                        if (t2 == S_DIR || t2 == S_EXT) {
-                                outab(op);
-                                outrb(&e1, R_PAG0);
-                                outrb(&e2, R_PAG0);
-                                break;
-                        }
-                }
-                if (t1 == S_IXP) {
-                        if (t2 == S_DIR || t2 == S_EXT) {
-                                outab(op+0x30);
-                                outrb(&e2, R_PAG0);
-                                break;
-                        }
-                }
-                aerr();
-                break;
+	case S_MOV:
+		if ((mchtyp != X_HC08) && (mchtyp != X_HCS08)) {
+			opcycles = OPCY_ERR;
+			xerr('o', "A 68HC(S)08 Instruction.");
+			break;
+		}
+		t1 = addr(&e1);
+		if (t1 == S_IX1P || t1 == S_IX2P) {
+			outab(op+0x10);
+			outrb(&e1, R_PAG0);
+			break;
+		}
+		comma(1);
+		t2 = addr(&e2);
+		if (t1 == S_IMMED) {
+			if (t2 == S_DIR || t2 == S_EXT) {
+				outab(op+0x20);
+				outrb(&e1, 0);
+				outrb(&e2, R_PAG0);
+				break;
+			}
+		}
+		if (t1 == S_DIR || t1 == S_EXT) {
+			if (t2 == S_DIR || t2 == S_EXT) {
+				outab(op);
+				outrb(&e1, R_PAG0);
+				outrb(&e2, R_PAG0);
+				break;
+			}
+		}
+		if (t1 == S_IXP) {
+			if (t2 == S_DIR || t2 == S_EXT) {
+				outab(op+0x30);
+				outrb(&e2, R_PAG0);
+				break;
+			}
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
+	default:
+		opcycles = OPCY_ERR;
+		err('o');
+		xerr('o', "Internal Opcode Error.");
+		break;
+	}
 
-        default:
-                opcycles = OPCY_ERR;
-                err('o');
-                break;
-        }
-
-        if (opcycles == OPCY_NONE) {
-                switch (mchtyp) {
-                case X_HC08:            /* 68HC08 */
-                        opcycles = m08pg1[cb[0] & 0xFF];
-                        if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
-                                opcycles = m08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
-                        }
-                        break;
-                case X_HCS08:           /* 68HCS08 */
-                        opcycles = s08pg1[cb[0] & 0xFF];
-                        if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
-                                opcycles = s08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
-                        }
-                        break;
-                case X_6805:            /* 6805 */
-                        opcycles = m05cyc[cb[0] & 0xFF];
-                        break;
-                case X_HC05:            /* 146805 */
-                        opcycles = mcmcyc[cb[0] & 0xFF];
-                        break;
-                }
-        }
+	if (opcycles == OPCY_NONE) {
+		switch (mchtyp) {
+		case X_HC08:		/* 68HC08 */
+			opcycles = m08pg1[cb[0] & 0xFF];
+			if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+				opcycles = m08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+			}
+			break;
+		case X_HCS08:		/* 68HCS08 */
+			opcycles = s08pg1[cb[0] & 0xFF];
+			if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+				opcycles = s08Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+			}
+			break;
+		case X_6805:		/* 6805 */
+			opcycles = m05cyc[cb[0] & 0xFF];
+			break;
+		case X_HC05:		/* 146805 */
+			opcycles = mcmcyc[cb[0] & 0xFF];
+			break;
+		}
+	}
 }
 
 /*
@@ -718,22 +713,22 @@ int
 mchpcr(esp)
 struct expr *esp;
 {
-        if (esp->e_base.e_ap == dot.s_area) {
-                return(1);
-        }
-        if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-                /*
-                 * Absolute Destination
-                 *
-                 * Use the global symbol '.__.ABS.'
-                 * of value zero and force the assembler
-                 * to use this absolute constant as the
-                 * base value for the relocation.
-                 */
-                esp->e_flag = 1;
-                esp->e_base.e_sp = &sym[1];
-        }
-        return(0);
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
 }
 
 /*
@@ -742,13 +737,16 @@ struct expr *esp;
 VOID
 minit()
 {
-        /*
-         * Byte Order
-         */
-        hilo = 1;
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
 
-        if (pass == 0) {
-                mchtyp = X_HC08;
-                sym[2].s_addr = X_HC08;
-        }
+	/*
+	 * Zero Page
+	 */
+	zpg = NULL;
+
+	mchtyp = X_HC08;
+	sym[2].s_addr = X_HC08;
 }

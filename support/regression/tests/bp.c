@@ -28,7 +28,7 @@ spoil(int a)
 #define BELOW_MEM_SIZE       10
 #define BELOW_MEM_TEST_SIZE   7
 
-#elif defined(__SDCC_mcs51) || defined(__SDCC_pic16) || defined(__SDCC_pdk15)
+#elif defined(__SDCC_mcs51) || defined(__SDCC_pic16) || defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)
 
 // test devices with much less
 #define ABOVE_MEM_SIZE       30

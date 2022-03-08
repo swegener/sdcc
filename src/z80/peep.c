@@ -2,6 +2,7 @@
   peep.c - source file for peephole optimizer helper functions
 
   Written By - Philipp Klaus Krause
+  Copyright (C) 2020, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -1104,7 +1105,7 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
-  // P/V and L/V (rarbbits) are the same flag
+  // P/V and L/V (rabbits) are the same flag
   if(!strcmp(what, "vf") || !strcmp(what, "lf"))
     what = "pf";
 
@@ -1404,7 +1405,7 @@ int z80instructionSize(lineNode *pl)
       return(2);
     }
   // load from/to 0xffXX addresses
-  if(IS_SM83 && (ISINST(pl->line, "ldh")))
+  if(IS_SM83 && (ISINST(pl->line, "ldh") || ISINST(pl->line, "in") || ISINST(pl->line, "out")))
     {
       if(!STRNCASECMP(pl->line, "(c)", 3))
         return(1);
@@ -1468,6 +1469,17 @@ int z80instructionSize(lineNode *pl)
         return(2);
       return(1);
     }
+  /* 8 bit arithmetic, shorthand for a */
+  if(!op2start &&
+     (ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sub") || ISINST(pl->line, "sbc") ||
+      ISINST(pl->line, "cp")  || ISINST(pl->line, "and") || ISINST(pl->line, "or")  || ISINST(pl->line, "xor")))
+    {
+      if(argCont(op1start, "(ix)") || argCont(op1start, "(iy)"))
+        return(3);
+      if(op1start[0] == '#')
+        return(2);
+      return(1);
+    }
 
   if(ISINST(pl->line, "rlca") || ISINST(pl->line, "rla") || ISINST(pl->line, "rrca") || ISINST(pl->line, "rra"))
     return(1);
@@ -1528,6 +1540,10 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "call"))
     return(3);
 
+  /* Alias for ld a, (hl+)/(hld) etc */
+  if(IS_SM83 && (ISINST(pl->line, "ldi") || ISINST(pl->line, "ldd")))
+    return (1);
+
   if(ISINST(pl->line, "ldi") || ISINST(pl->line, "ldd") || ISINST(pl->line, "cpi") || ISINST(pl->line, "cpd"))
     return(2);
 
@@ -1535,15 +1551,23 @@ int z80instructionSize(lineNode *pl)
     return(2);
 
   if(ISINST(pl->line, "daa") || ISINST(pl->line, "cpl")  || ISINST(pl->line, "ccf") || ISINST(pl->line, "scf") ||
-     ISINST(pl->line, "nop") || ISINST(pl->line, "halt") || ISINST(pl->line,  "ei") || ISINST(pl->line, "di")  ||
-     (IS_SM83 && ISINST(pl->line, "stop")))
+     ISINST(pl->line, "nop") || ISINST(pl->line, "halt") || ISINST(pl->line,  "ei") || ISINST(pl->line, "di"))
     return(1);
+  
+  /* We always emit 2B stop due to hardware bugs*/
+  if (IS_SM83 && ISINST(pl->line, "stop"))
+    return(2);
 
   if(ISINST(pl->line, "im"))
     return(2);
 
-  if(ISINST(pl->line, "in") || ISINST(pl->line, "out") || ISINST(pl->line, "ot"))
-    return(2);
+  if(ISINST(pl->line, "in") || ISINST(pl->line, "out") || ISINST(pl->line, "ot") ||
+     ISINST(pl->line, "ini") || ISINST(pl->line, "inir") || ISINST(pl->line, "ind") ||
+     ISINST(pl->line, "indr") || ISINST(pl->line, "outi") || ISINST(pl->line, "otir") ||
+     ISINST(pl->line, "outd") || ISINST(pl->line, "otdr"))
+    {
+      return(2);
+    }
 
   if((IS_Z180 || IS_EZ80_Z80) && (ISINST(pl->line, "in0") || ISINST(pl->line, "out0")))
     return(3);
@@ -1560,7 +1584,7 @@ int z80instructionSize(lineNode *pl)
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(1);
 
-  if(ISINST(pl->line, "lddr") || ISINST(pl->line, "ldir"))
+  if(ISINST(pl->line, "lddr") || ISINST(pl->line, "ldir") || ISINST(pl->line, "cpir") || ISINST(pl->line, "cpdr"))
     return(2);
 
   if(IS_R3KA &&
@@ -1579,6 +1603,11 @@ int z80instructionSize(lineNode *pl)
     return(3);
 
   if((IS_SM83 || IS_Z80N) && ISINST(pl->line, "swap"))
+    return(2);
+
+  if(IS_Z80N && (ISINST(pl->line, "swapnib") || ISINST(pl->line, "mirror") || ISINST(pl->line, "mul") ||
+     ISINST(pl->line, "outinb") || ISINST(pl->line, "ldix") || ISINST(pl->line, "ldirx") ||
+     ISINST(pl->line, "lddx") || ISINST(pl->line, "lddrx") || ISINST(pl->line, "ldpirx")))
     return(2);
 
   if(IS_Z80N &&
@@ -1601,6 +1630,27 @@ int z80instructionSize(lineNode *pl)
       int i, j;
       for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);
       return(i * 2);
+    }
+  
+  if(IS_SM83 && ISINST(pl->line, ".tile"))
+    {
+      const char *value;
+      int i;
+      // skip directive
+      for (value = pl->line; *value && !isspace (*value); ++value);
+      // skip space
+      for (; *value && isspace (*value); ++value);
+      // just part of the syntax
+      if(*value == '^')
+        ++value;
+      // delimiter can be freely chosen
+      char delimiter = *(value++);
+      for (i = 0; *value && *value != delimiter; ++value, ++i);
+      // has to end with delimiter
+      // 8 characters per 2B tile
+      if (*value == delimiter && i%8 == 0)
+        return i/4;
+      
     }
 
   /* If the instruction is unrecognized, we shouldn't try to optimize.  */

@@ -996,6 +996,8 @@ cl_commander_base::exec_on(class cl_console_base *cons, char *file_name)
   dummy= fopen(file_name, "r");
   if (dummy)
     oped= true, fclose(dummy);
+  else
+    fprintf(stderr, "Error opening file: %s\n", file_name);
   if (!cons || !oped)
     return 0;
 

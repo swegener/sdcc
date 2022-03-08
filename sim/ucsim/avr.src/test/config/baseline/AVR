@@ -8,12 +8,12 @@ Controller has 4 hardware element(s).
   off vcd[0]
    on dreg[0]
    on port[0]
-0x0000 cc b7 87 44 5c fd 44 8a 3a de 87 58 a1 8f ca ce ...D\.D.:..X....
-0x0010 a8 8f 15 fe db 79 ac fe 2b 85 20 44 7d 8d b9 49 .....y..+. D}..I
-ITHSVNZC  SREG= 0x1b  27 .
-00011011  SP  = 0x0027ad
-X= 0x4420 [X]= 0x00   0 .  Y= 0x8d7d [Y]= 0x00   0 .  Z= 0x49b9 [Z]= 0x00   0 .
-0x0000  ? 8a08      std    Y+16,r0[0K
+0x0000 04 17 b7 70 1f 72 63 12 15 a3 e0 33 71 c1 1c a7 ...p.rc....3q...
+0x0010 75 32 21 90 a5 fe dd 77 d5 15 d7 f1 0c 59 ad 86 u2!....w.....Y..
+ITHSVNZC  SREG= 0xbf 191 .
+10111111  SP  = 0x001df3
+X= 0xf1d7 [X]= 0x00   0 .  Y= 0x590c [Y]= 0x00   0 .  Z= 0x86ad [Z]= 0x00   0 .
+0x0000  ? 5a41      subi   r0,161[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x00ffff    65536 rom_chip (16,%04x,0x%04lx)

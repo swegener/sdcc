@@ -179,6 +179,7 @@ class cl_f: public cl_base
 
   virtual int check_dev(void)= 0;
   virtual int read_dev(int *buf, int max);
+  virtual bool writable(void)= 0;
   virtual int write(const char *buf, int count);
   virtual int write_str(const char *s);
   virtual int vprintf(const char *format, va_list ap);
@@ -231,6 +232,7 @@ extern bool check_inputs(class cl_list *active, class cl_list *avail);
 
 extern void msleep(int msec);
 extern void loop_delay();
+extern unsigned int cperiod_value();
 
 extern const char *fio_type_name(enum file_type t);
 extern void  sigpipe_off();

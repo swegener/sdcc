@@ -91,7 +91,7 @@ char* my_strncpy ( char *dst, const char *src, size_t n, char terminator )
 char fs_read_directory_block ( FS_MZDIR *dir, unsigned int block )
 {
     char            res;
-#if defined(__SDCC_mcs51)
+#if defined(__SDCC_mcs51) || defined (__SDCC_STACK_AUTO)
     static __xdata FS_MZ_BLDIR     bl_dir;
 #else
     FS_MZ_BLDIR     bl_dir;

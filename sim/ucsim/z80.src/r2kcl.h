@@ -70,6 +70,12 @@ public:
   //class cl_memory *ram;
   //class cl_memory *rom;
   //struct t_regs regs;  
+  int BITPOS_C;
+  int BITPOS_SUB;
+  int BITPOS_P;
+  int BITPOS_A;
+  int BITPOS_Z;
+  int BITPOS_S;
   
   rabbit_mmu   mmu;
 
@@ -83,7 +89,7 @@ public:
   /* see Rabbit Family of Microprocessors: Instruction Reference Manual */
   /*   019-0098 * 090409-L */
   
-
+  
 public:
   cl_r2k(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);

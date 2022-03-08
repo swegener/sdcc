@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "globals.h"
+#include "utils.h"
 
 // local
 #include "simmos6502cl.h"
@@ -38,6 +39,7 @@ main(int argc, char *argv[])
 {
   class cl_sim *sim;
 
+  app_start_at= dnow();
   cpus= cpus_6502;
   application= new cl_app();
   application->set_name("smos6502");

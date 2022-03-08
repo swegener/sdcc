@@ -37,20 +37,22 @@
 	.globl __mullong
 
 ;--------------------------------------------------------
-; overlayable items in zero page
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_mullong_tmp:
-	.ds 3
-
-;--------------------------------------------------------
-; function parameters
-;--------------------------------------------------------
-	.area BSS
 __mullong_PARM_1:
 	.ds 4
 __mullong_PARM_2:
 	.ds 4
+
+;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define tmp  "___SDCC_m6502_ret4"
+	.define res0 "__mullong_PARM_1+0"
+	.define res1 "__mullong_PARM_1+1"
+	.define res2 "___SDCC_m6502_ret2"
+	.define res3 "___SDCC_m6502_ret3"
 
 ;--------------------------------------------------------
 ; code
@@ -59,47 +61,47 @@ __mullong_PARM_2:
 
 __mullong:
 
-        ldx	__mullong_PARM_1+3
-        stx	*___SDCC_m6502_ret3
-        ldx	__mullong_PARM_1+2
-        stx	*___SDCC_m6502_ret2
-        ldx	__mullong_PARM_1+1
-        stx	*___SDCC_m6502_ret1
-        ldx	__mullong_PARM_1+0
-        stx	*___SDCC_m6502_ret0
+        ldx	*__mullong_PARM_1+3
+        stx	*res3
+        ldx	*__mullong_PARM_1+2
+        stx	*res2
+;        ldx	*__mullong_PARM_1+1
+;        stx	*res1
+;        ldx	*__mullong_PARM_1+0
+;        stx	*res0
 
         lda     #0
-        sta     *_mullong_tmp+2
-        sta     *_mullong_tmp+1
-        sta     *_mullong_tmp+0
+        sta     *tmp+2
+        sta     *tmp+1
+        sta     *tmp+0
 
         ldy     #32
 next_bit:
-	lsr     *_mullong_tmp+2
-        ror     *_mullong_tmp+1
-        ror     *_mullong_tmp+0
+	lsr     *tmp+2
+        ror     *tmp+1
+        ror     *tmp+0
         ror     a
-        ror     *___SDCC_m6502_ret3
-        ror     *___SDCC_m6502_ret2
-        ror     *___SDCC_m6502_ret1
-        ror     *___SDCC_m6502_ret0
+        ror     *res3
+        ror     *res2
+        ror     *res1
+        ror     *res0
         bcc     skip
         clc
-        adc     __mullong_PARM_2+0
+        adc     *__mullong_PARM_2+0
         tax
-        lda     __mullong_PARM_2+1
-        adc     *_mullong_tmp+0
-        sta     *_mullong_tmp+0
-        lda     __mullong_PARM_2+2
-        adc     *_mullong_tmp+1
-        sta     *_mullong_tmp+1
-        lda     __mullong_PARM_2+3
-        adc     *_mullong_tmp+2
-        sta     *_mullong_tmp+2
+        lda     *__mullong_PARM_2+1
+        adc     *tmp+0
+        sta     *tmp+0
+        lda     *__mullong_PARM_2+2
+        adc     *tmp+1
+        sta     *tmp+1
+        lda     *__mullong_PARM_2+3
+        adc     *tmp+2
+        sta     *tmp+2
         txa
 skip:
         dey
         bpl	next_bit
-        ldx	*___SDCC_m6502_ret1
-        lda	*___SDCC_m6502_ret0
+        ldx	*res1
+        lda	*res0
 	rts

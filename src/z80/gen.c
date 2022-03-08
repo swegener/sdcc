@@ -5,6 +5,7 @@
   Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
   Copyright (C) 2011-2021, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2021-2022, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -6433,7 +6434,7 @@ genEndFunction (iCode *ic)
       de_free,
       false,
       iy_free && hl_free);
-      emit2 (hl_free ? "jp (hl)" : "jp (iy)");
+      emit2 (hl_free ? "!jphl" : "jp (iy)");
       regalloc_dry_run_cost += 2;
       goto done;
     }
@@ -6518,9 +6519,26 @@ genEndFunction (iCode *ic)
       if (hl_free && !IFFUNC_ISISR (sym->type))
         {
           _pop (PAIR_HL);
-          adjustStack (poststackadjust,
-          !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0, bc_free, de_free, false, iy_free);
-          emit2 ("jp (hl)");
+          // Parameters should be initialized, so reading them should be fine
+          // we also exactly know which registers we can trash
+          if (IS_SM83 && poststackadjust == 2 && (!aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0))
+            { // return >8bit
+              // This has priority since it shows notUsed that A is free
+              // notUsed can't make assumptions about jp (hl)
+              emit2 ("pop af");
+              cost2 (1, 10, 9, 7, 12, 10, 3);
+            }
+          else if (IS_SM83 && poststackadjust == 2 && bc_free)
+            { // 8bit return
+              emit2 ("pop bc");
+              cost2 (1, 10, 9, 7, 12, 10, 3);
+            }
+          else
+            {
+              adjustStack (poststackadjust,
+              !aopRet (sym->type) || aopRet (sym->type)->regs[A_IDX] < 0, bc_free, de_free, false, iy_free);
+            }
+          emit2 ("!jphl");
           regalloc_dry_run_cost++;
           goto done;
         }

@@ -263,6 +263,8 @@ cl_var_by_addr_list::search(class cl_memory *mem, t_addr addr, t_index &index)
   t_index h  = count - 1;
   bool    res= false;
 
+  if (!mem)
+    return false;
   while (l <= h)
     {
       t_index i= (l + h) >> 1;
@@ -291,6 +293,8 @@ cl_var_by_addr_list::search(class cl_memory *mem, t_addr addr, int bitnr_high, i
   t_index h  = count - 1;
   bool    res= false;
 
+  if (!mem)
+    return false;
   while (l <= h)
     {
       t_index i= (l + h) >> 1;

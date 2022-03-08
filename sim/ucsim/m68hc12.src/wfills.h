@@ -215,8 +215,8 @@ virtual void fill_0_78() { page0[0x78 ]= wrap_0_78; set_disass(0, 0x78, "ASL %e"
 virtual void fill_0_49() { page0[0x49 ]= wrap_0_49; set_disass(0, 0x49, "LSRD", ' ', 1); set_ticks(0, 0x49, 1); }
 virtual void fill_0_59() { page0[0x59 ]= wrap_0_59; set_disass(0, 0x59, "LSLD", ' ', 1); set_ticks(0, 0x59, 1); }
 
-virtual void fill_0_4a() { page0[0x4a ]= wrap_0_4a; set_disass(0, 0x4a, "CALL $ep$", ' ', 4); set_ticks(0, 0x4a, 7); }
-virtual void fill_0_4b() { page0[0x4b ]= wrap_0_4b; set_disass(0, 0x4b, "CALL $ip$", ' ', -2); set_ticks(0, 0x4b, 0xaa988); }
+virtual void fill_0_4a() { page0[0x4a ]= wrap_0_4a; set_disass(0, 0x4a, "CALL 'ep'", ' ', 4); set_ticks(0, 0x4a, 7); }
+virtual void fill_0_4b() { page0[0x4b ]= wrap_0_4b; set_disass(0, 0x4b, "CALL 'ip'", ' ', -2); set_ticks(0, 0x4b, 0xaa988); }
 
 virtual void fill_0_5a() { page0[0x5a ]= wrap_0_5a; set_disass(0, 0x5a, "STAA %d", ' ', 2); set_ticks(0, 0x5a, 2); }
 virtual void fill_0_6a() { page0[0x6a ]= wrap_0_6a; set_disass(0, 0x6a, "STAA %p", ' ', -2); set_ticks(0, 0x6a, 0x55332); }

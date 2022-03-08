@@ -9183,7 +9183,7 @@ fi
 if test $OPT_DISABLE_MOS6502 = 0 || test $OPT_DISABLE_MOS65C02 = 0; then
   ac_config_files="$ac_config_files src/mos6502/Makefile sdas/as6500/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/mos6502/Makefile device/lib/mos65c02/Makefile"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/mos6502/Makefile device/lib/mos6502-stack-auto/Makefile device/lib/mos65c02/Makefile"
 
 fi
 
@@ -9999,6 +9999,7 @@ do
     "src/mos6502/Makefile") CONFIG_FILES="$CONFIG_FILES src/mos6502/Makefile" ;;
     "sdas/as6500/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as6500/Makefile" ;;
     "device/lib/mos6502/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mos6502/Makefile" ;;
+    "device/lib/mos6502-stack-auto/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mos6502-stack-auto/Makefile" ;;
     "device/lib/mos65c02/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/mos65c02/Makefile" ;;
     "src/mcs51/Makefile") CONFIG_FILES="$CONFIG_FILES src/mcs51/Makefile" ;;
     "sdas/as8051/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as8051/Makefile" ;;

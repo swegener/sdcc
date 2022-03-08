@@ -121,6 +121,7 @@ protected:
   t_index	   Delta;
 
 public:
+  cl_list(void);
   cl_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_list(void);
 

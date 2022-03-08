@@ -8,11 +8,11 @@ Controller has 4 hardware element(s).
    on simif[0]
   off vcd[0]
    on cpu[0]
-SZ-A-PNC  Flags= 0x00   0 .  A= 0x00   0 .
-00-x-0x0
-BC= 0x0000 [BC]= 08   8 .  DE= 0x0000 [DE]= 08   8 .  HL= 0x0000 [HL]= 08   8 .
-IX= 0x0000 [IX]= 08   8 .  IY= 0x0000 [IY]= 08   8 .  SP= 0x0000 [SP]= 08   8 .
-0x00000  ? 08          EX     AF,AF'[0K
+SZ-A-PNC  Flags= 0xff 255 .  A= 0xff 255 .
+11-x-1x1
+BC= 0x0000 [BC]= 41  65 A  DE= 0x0000 [DE]= 41  65 A  HL= 0x0000 [HL]= 41  65 A
+IX= 0x0000 [IX]= 41  65 A  IY= 0x0000 [IY]= 41  65 A  SP= 0xffff [SP]= 00   0 .
+0x00000  ? 41          LD     B,C[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0fffff  1048576 rom_chip (8,%02x,0x%05lx)

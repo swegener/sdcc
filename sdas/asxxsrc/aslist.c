@@ -187,6 +187,11 @@ list(void)
         }
 
         /*
+         * Get Correct Line Number
+         */
+        line = srcline;
+
+        /*
          * Internal Listing
          */
         listing = lnlist;
@@ -230,10 +235,6 @@ list(void)
                 outchk(ASXHUGE,ASXHUGE);
         }
 
-        /*
-         * Get Correct Line Number
-         */
-        line = srcline;
 
         /*
          * Move to next line.
@@ -781,11 +782,30 @@ VOID
 slew(FILE *fp, int flag)
 {
         char *frmt;
+	char np[132];
+	char tp[132];
+	int n;
 
         if (lop++ >= NLPP) {
                 if (flag) {
-                        fprintf(fp, "\fASxxxx Assembler %s  (%s), page %u.\n",
-                                VERSION, cpu, ++page);
+			/*
+			 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 *ASxxxx Assembler Vxx.xx  (Motorola 6809)                                Page 1
+			 */
+			sprintf(tp, "ASxxxx Assembler %s  (%s)", VERSION, cpu);
+			sprintf(np, "Page %u", ++page);
+		 	/*
+			 * Total string length is 78 characters.
+			 */
+			n = 78 - strlen(tp) - strlen(np);
+			/*
+			 * Output string.
+			 */
+			fprintf(fp, "\f%s%*s%s\n", tp, n, " " ,np);
+			/*
+			 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 *Hexadecimal [16-Bits]                                 Sun Sep 15 17:22:25 2013
+			 */
                         switch(xflag) {
                         default:
                         case 0: frmt = "Hexadecimal [%d-Bits]\n"; break;

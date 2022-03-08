@@ -22,6 +22,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 
 # Four ticks (500 ns) of changing data
 set mem rom[0x100] 0
@@ -54,6 +56,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd pause
 Paused
 info hw vcd
@@ -70,6 +74,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 4
 0x00100                       04 .
 tick
@@ -110,6 +116,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd restart
 Unpaused
 info hw vcd
@@ -126,6 +134,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 12
 0x00100                       0c .
 tick
@@ -156,6 +166,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd pausetime 300 ns
 set hw vcd pause
 Paused (pause limit 0.000000300000000 s)
@@ -173,6 +185,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 # vcd[0] should be clocked (on) until we have exceeded the pause limit.
 conf
 Type of microcontroller: STM8 S,AF 208
@@ -209,7 +223,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -239,7 +253,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -269,7 +283,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -299,7 +313,7 @@ Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -351,6 +365,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd restart
 Unpaused
 info hw vcd
@@ -367,6 +383,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 24
 0x00100                       18 .
 tick
@@ -392,6 +410,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd stop
 info hw vcd
 vcd[0] value change dump
@@ -407,3 +427,5 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)

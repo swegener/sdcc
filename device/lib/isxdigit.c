@@ -4,6 +4,7 @@
    Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
 
    (c) 2013 Goethe-Universität Frankfurt
+   (c) 2022 Sebastian 'basxto' Riedel
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -32,6 +33,12 @@
 
 int isxdigit (int c)
 {
+#if defined ( __SDCC_sm83 ) || defined ( __SDCC_z80 ) ||  defined ( __SDCC_z80n ) ||  defined ( __SDCC_z180 ) ||  defined ( __SDCC_ez80_z80 ) ||  defined ( __SDCC_mos6502 ) 
+  if((c & 0xff00) != 0)
+    return 0;
+  return ((unsigned char)c >= '0' && (unsigned char)c <= '9' || (unsigned char)c >= 'a' && (unsigned char)c <= 'f' || (unsigned char)c >= 'A' && (unsigned char)c <= 'F');
+#else
   return (c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F');
+#endif
 }
 

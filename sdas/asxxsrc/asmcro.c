@@ -1,7 +1,7 @@
 /* asmcro.c */
 
 /*
- *  Copyright (C) 2010  Alan R. Baldwin
+ *  Copyright (C) 2010-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@
  *              a_uint  absexpr()       asexpr.c
  *              VOID    clrexpr()       asexpr.c
  *              int     comma()         aslex.c
+ *		VOID	err()		assubr.c
  *              VOID    getdarg()       asmcro.c
  *              int     getid()         aslex.c
  *              int     getdlm()        aslex.c
@@ -108,6 +109,7 @@
  *              mcrdef *newdef()        asmcro.c
  *              VOID    qerr()          assubr.c
  *              VOID    unget()         aslex.c
+ *		VOID	xerr()		assubr.c
  *
  *      side effects:
  *              Macro directives processed and
@@ -148,7 +150,7 @@ int code;
                 if (more()) {
                         getid(id, getnb());
                 } else {
-                        qerr();
+			xerr('q', ".macro requires at least one argument.");
                 }
                 np = newdef(code, id);
                 /*
@@ -249,7 +251,7 @@ int code;
                                 rptcnt = 0;
                         }
                 } else {
-                        err('o');
+			xerr('o', ".rept requires a repeat count.");
                         rptcnt = 0;
                 }
                 np->rptcnt = rptcnt;
@@ -257,7 +259,7 @@ int code;
 
         case O_ENDM:
                 if (asmc->objtyp != T_MACRO) {
-                        err('n');
+			xerr('n', ".endm found without matching .macro.");
                 } else {
                         lmode = NLIST;
                 }
@@ -269,7 +271,7 @@ int code;
                         nfp->npexit = 1;
                         nfp->lstptr = nfp->np->endlst;
                 } else {
-                        err('n');
+			xerr('n', ".mexit found outside of a macro.");
                 }
                 break;
 
@@ -296,7 +298,7 @@ int code;
                 nfp = (struct macrofp *) asmc->fp;
                 np = nfp->np;
                 if (asmc->objtyp != T_MACRO) {
-                        err('n');
+			xerr('n', ".narg found outside of a macro.");
                         break;
                 } else
                 if (np->type != O_MACRO) {
@@ -364,7 +366,7 @@ int code;
                                 }
                         }
                         if (more() && comma(0) && !more()) {
-                                qerr();
+				xerr('q', "Expecting argument after ','.");
                         }
                 }
                 break;
@@ -478,8 +480,7 @@ int code;
  */
 
 VOID
-getdarg(np)
-struct mcrdef * np;
+getdarg(struct mcrdef *np)
 {
         struct strlst *str;
         char id[NCPS];
@@ -556,8 +557,7 @@ struct mcrdef * np;
  */
 
 VOID
-getxarg(np)
-struct mcrdef * np;
+getxarg(struct mcrdef *np)
 {
         struct strlst *str;
         char id[NCPS];
@@ -635,8 +635,7 @@ struct mcrdef * np;
  */
 
 VOID
-getxstr(id)
-char *id;
+getxstr(char *id)
 {
         char *p;
         int c, dc;
@@ -953,10 +952,10 @@ char *id;
  *              mcrdef *np      pointer to macro structure
  *
  *      global variables:
- *              char *  ib              string buffer containing
+ *		char	ib[]		string buffer containing
  *                                      assembler-source text line for processing
  *              char *  ip              pointer into the assembler-source
- *                                      text line in ib
+ *					text line in ib[]
  *              int     flevel          current IF-ELSE-ENDIF level
  *              int     tlevel          current IF-ELSE-ENDIF level index
  *              int     lnlist          current LIST-NLIST flags
@@ -974,10 +973,7 @@ char *id;
  */
 
 char *
-fgetm(ptr, len, fp)
-char *ptr;
-int len;
-FILE *fp;
+fgetm(char *ptr, int len, FILE *fp)
 {
         struct macrofp *nfp;
         struct mcrdef *np;

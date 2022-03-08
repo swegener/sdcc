@@ -36,10 +36,16 @@ int cl_gb80::inst_cb(void) {
   u8_t  result;
   t_mem       code;
   
-  if ( (peek1( ) & 0xf8) != 0x30 )
+  if ( (peek1( ) & 0xf8) != 0x30 ) {
+    // (hl) has to be rounded, but not for bit
+    if ((peek1( ) & 0x7) == 0x6)
+      if (peek1( ) < 0x50 || peek1( ) >= 0x80)
+        tick(1);
     return cl_z80::inst_cb( );
+  }
   
   code = fetch1();
+  tick(7);
   
   /* perform SWAP instead of slia */
   switch(code) {
@@ -51,6 +57,7 @@ int cl_gb80::inst_cb(void) {
   case 0x35: result = regs.hl.l = swap_nibbles(regs.hl.l); break; /* l */
   case 0x36: /* SWAP (HL) */
     {
+      tick(8);
       result = swap_nibbles(get1(regs.HL));
       store1(regs.HL, result);
       vc.rd++;
@@ -70,6 +77,7 @@ int cl_gb80::inst_st_sp_abs(t_mem code) {
     u16_t addr = fetch2( );
     store2( addr, regs.SP );
     vc.wr+= 2;
+    tick(19);
     return(resGO);
   }
   
@@ -78,6 +86,7 @@ int cl_gb80::inst_st_sp_abs(t_mem code) {
 
 int cl_gb80::inst_stop0    (t_mem code) {
   // TODO: change to wait for a signal for simulated hardware
+  tick(3);//can be 7 sometimes
   return resHALT;
 }
 
@@ -86,11 +95,13 @@ int cl_gb80::inst_ldi   (t_mem code) {
     store1( regs.HL, regs.raf.A );
     regs.HL ++;
     vc.wr++;
+    tick(7);
     return resGO;
   } else if (code == 0x2A) {
     regs.raf.A = get1( regs.HL );
     regs.HL ++;
     vc.rd++;
+    tick(7);
     return resGO;
   }
   
@@ -102,11 +113,13 @@ int cl_gb80::inst_ldd   (t_mem code) {
     store1( regs.HL, regs.raf.A );
     regs.HL --;
     vc.wr++;
+    tick(7);
     return resGO;
   } else if (code == 0x3A) {
     regs.raf.A = get1( regs.HL );
     regs.HL --;
     vc.rd++;
+    tick(7);
     return resGO;
   }
   
@@ -114,15 +127,24 @@ int cl_gb80::inst_ldd   (t_mem code) {
 }
 
 int cl_gb80::inst_ldh   (t_mem code) {
-  u16_t addr = 0xFF00 + fetch1( );
+  u16_t addr = 0xFF00;
+
+  if (code & 0x2) {
+    addr += regs.bc.l;
+  } else {
+    addr += fetch1( );
+    tick(4);
+  }
   
-  if (code == 0xE0) {
+  if ((code & 0xFD) == 0xE0) {
     store1( addr, regs.raf.A );
     vc.wr++;
+    tick(7);
     return resGO;
-  } else if (code == 0xF0) {
+  } else if ((code & 0xFD) == 0xF0) {
     regs.raf.A = get1( addr );
     vc.rd++;
+    tick(7);
     return resGO;
   }
   
@@ -132,6 +154,7 @@ int cl_gb80::inst_ldh   (t_mem code) {
 int cl_gb80::inst_reti  (t_mem code) {
   /* enable interrupts */
   cl_z80::inst_ei(0xFB);
+  tick(12);
   
   /* pop2(PC); */
   PC=get2(regs.SP);
@@ -154,6 +177,7 @@ int cl_gb80::inst_add_sp_d(t_mem code) {
   
   regs.SP = (regs.SP + d) & 0xffff;
 
+  tick(15);
   return(resGO);
 }
 
@@ -162,10 +186,12 @@ int cl_gb80::inst_ld16  (t_mem code) {
   if (code == 0xEA) {
     store1( addr, regs.raf.A );
     vc.wr++;
+    tick(15);
     return resGO;
   } else if (code == 0xFA) {
     regs.raf.A = get1( addr );
     vc.rd++;
+    tick(15);
     return resGO;
   }
   
@@ -184,6 +210,7 @@ int cl_gb80::inst_ldhl_sp (t_mem code) {
     regs.raf.F |= BIT_C;
   
   regs.HL = (regs.SP + d) & 0xffff;
+  tick(11);
   return resGO;
 }
 

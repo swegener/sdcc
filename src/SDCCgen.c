@@ -2,6 +2,7 @@
   SDCCgen.c - source files for target code generation common functions
 
   Copyright (C) 2012, Borut Razem
+  Copyright (C) 2022, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -230,13 +231,17 @@ genInline (iCode * ic)
           break;
 
         case ':':
-          /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && !inLiteral && !inLiteralString && (isspace ((unsigned char) bp[1])))
+          /* Add \n for labels, not dirs such as c:\mydir, not local direct assignment =: */
+          if (!inComment && !inLiteral && !inLiteralString && (isspace ((unsigned char) bp[1])) && (*(bp-1) != '='))
             {
               ++bp;
               *bp = '\0';
               ++bp;
+              /* Don't emit leading whitespaces */
+              while (isspace (*begin))
+                ++begin;
               emitcode (begin, NULL);
+              genLine.lineCurr->isLabel = 1;
               begin = bp;
             }
           else

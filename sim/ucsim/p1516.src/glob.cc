@@ -42,6 +42,7 @@ struct dis_entry disass_p1516[]=
    { 0x00000000, 0x0f000000, ' ', 1, "nop", false },
    { 0x01000000, 0x0f000000, ' ', 1, "ld    %d:=mem[%R]", false },
    { 0x02000000, 0x0f000000, ' ', 1, "st    mem[%R]:=%d", false },
+   { 0x03fe0000, 0x0fff0000, ' ', 1, "ret", false },
    { 0x03000000, 0x0f000000, ' ', 1, "mov   %d:=%a", false },
    { 0x04000000, 0x0f000000, ' ', 1, "ldl0  %d:=%0", false },
    { 0x05000000, 0x0f000000, ' ', 1, "ldl   %d:=%l", false },

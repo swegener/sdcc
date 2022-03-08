@@ -443,6 +443,17 @@ cl_optref::cl_optref(class cl_base *the_owner, class cl_option *new_option)
     }
 }
 
+cl_optref::cl_optref(class cl_base *the_owner, const char *to_use)
+{
+  owner= the_owner;
+  option= application->options->get_option(to_use);
+  if (option)
+    {
+      option->new_reference(this);
+      set_name(option->get_name());
+    }
+}
+
 cl_optref::~cl_optref(void)
 {
   if (option)
@@ -556,6 +567,15 @@ cl_optref::get_value(bool)
     }
 }
 
+bool
+cl_optref::get_value(bool *val)
+{
+  if (!option)
+    return false;
+  option->get_value(val);
+  return false;
+}
+
 char *
 cl_optref::get_value(const char *)
 {
@@ -599,6 +619,15 @@ cl_optref::get_value(long)
       option->get_value(&l);
       return(l);
     }
+}
+
+bool
+cl_optref::get_value(long *val)
+{
+  if (!option)
+    return false;
+  option->get_value(val);
+  return true;
 }
 
 double

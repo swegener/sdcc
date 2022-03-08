@@ -91,7 +91,7 @@ public:
 
   virtual bool is_chip(void) { return(false); }
   virtual bool is_address_space(void) { return(false); }
-
+  
   virtual void err_inv_addr(t_addr addr);
   virtual void err_non_decoded(t_addr addr);
 
@@ -561,6 +561,7 @@ public:
   virtual int init(void);
   virtual bool is_banker() { return false; }
   virtual bool is_bander() { return false; }
+  virtual bool uses_chip(class cl_memory *chip) { return chip==memchip; }
 
   virtual bool activate(class cl_console_base *con);
 
@@ -594,6 +595,7 @@ class cl_banker: public cl_address_decoder
   int bank;
   class cl_address_decoder **banks;
   int shift_by, shift2_by;
+  class cl_memory_operator *op1, *op2;
  public:
   cl_banker(class cl_address_space *the_banker_as,
 	    t_addr the_banker_addr,
@@ -622,6 +624,7 @@ class cl_banker: public cl_address_decoder
   virtual t_mem actual_bank();
   virtual bool activate(class cl_console_base *con);
   virtual bool switch_to(int bank_nr, class cl_console_base *con);
+  virtual bool uses_chip(class cl_memory *chip);
   
   virtual void print_info(const char *pre, class cl_console_base *con);
 };

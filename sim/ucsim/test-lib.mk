@@ -56,9 +56,7 @@ define run-sim =
 			$(foreach file, $(filter %.cmd, $+), -e 'exec "$(file)"'), \
 			$(if $(findstring -e, $(1)), , -g)) \
 		$(filter %.ihx, $+) \
-		2>&1 < /dev/null \
-		| sed -E $(ELIDE) \
-		> 'out/$@'; \
+		2>&1 < /dev/null > 'out/$@'; \
 	for file in out/*.vcd; do [ -r "$$file" ] && sed -E -i $(ELIDE) "$$file"; done
 endef
 

@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -72,11 +72,11 @@ jmp_buf jump_env;       /*      compiler dependent structure
  *              char    afn[FILSPC];    File Name
  *      };
  */
-struct  asmf    *asmp;  /*      The pointer to the first assembler
-                         *      source file structure of a linked list
-                         */
 struct  asmf    *asmc;  /*      Pointer to the current
                          *      source input structure
+                         */
+struct  asmf    *asmp;  /*      The pointer to the first assembler
+                         *      source file structure of a linked list
                          */
 struct  asmf    *asmi;  /*      Queued pointer to an include file
                          *      source input structure
@@ -214,6 +214,8 @@ int     page;           /*      current page number
                          */
 int     lop;            /*      current line number on page
                          */
+time_t	curtim;		/*	pointer to the current time string
+			 */
 int     pass;           /*      assembler pass number
                          */
 int     aflag;          /*      -a, make all symbols global flag
@@ -226,7 +228,7 @@ int     fflag;          /*      -f(f), relocations flagged flag
                          */
 int     gflag;          /*      -g, make undefined symbols global flag
                          */
-int     jflag;          /*      -j, generate debug information flag
+int	jflag;		/*	-j, enable NoICE Debug Symbols
                          */
 int     lflag;          /*      -l, generate listing flag
                          */
@@ -238,7 +240,11 @@ int     pflag;          /*      -p, disable listing pagination
                          */
 int     sflag;          /*      -s, generate symbol table flag
                          */
+int     tflag;          /*      -t, output diagnostic parameters from assembler
+                         */
 int     uflag;          /*      -u, disable .list/.nlist processing flag
+                         */
+int     vflag;          /*      -v, enable out of range signed / unsigned errors
                          */
 int     wflag;          /*      -w, enable wide listing format
                          */
@@ -272,6 +278,8 @@ char    *ep;            /*      pointer into error list
                          */
 char    eb[NERR];       /*      array of generated error codes
                          */
+char	*ex[NERR];	/*	array of error string pointers
+			 */
 char    *ip;            /*      pointer into the assembler-source
                          *      text line in ib[]
                          */
@@ -407,6 +415,28 @@ struct  area    area[] = {
 
 struct  area    *areap; /*      pointer to an area structure
                          */
+/*
+ *	The def structure is used by the .define assembler
+ *	directive to define a substitution string for a
+ *	single word.  The def structure contains the
+ *	string being defined, the string to substitute
+ *	for the defined string, and a link to the next
+ *	def structure.  The defined string is a sequence
+ *	of characters not containing any white space
+ *	(i.e. NO SPACEs or TABs).  The substitution string
+ *	may contain SPACES and/or TABs.
+ *
+ *	struct def
+ *	{
+ *		struct def	*d_dp;		link to next define
+ *		char		*d_id;		defined string
+ *		char		*d_define;	string to substitute for defined string
+ *		int		d_dflag;	(1) .defined / (0) .undefined
+ *	};
+ *
+ *	Pointer to a def structure
+ */
+struct	def	*defp = NULL;
 
 FILE    *lfp;           /*      list output file handle
                          */
@@ -500,3 +530,4 @@ char    ccase[256] = {
         '\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
         '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377'
 };
+

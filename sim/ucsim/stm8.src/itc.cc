@@ -126,6 +126,9 @@ cl_itc::new_hw_added(class cl_hw *new_hw)
 t_mem
 cl_itc::read(class cl_memory_cell *cell)
 {
+  if (conf(cell, NULL))
+    return cell->get();
+  
   return cell->get();
 }
 
@@ -133,6 +136,10 @@ void
 cl_itc::write(class cl_memory_cell *cell, t_mem *val)
 {
   t_addr a;
+
+  if (conf(cell, val))
+    return;
+  
   if (uc->rom->is_owned(cell, &a) &&
       (a >= 0x7f70) &&
       (a <  0x7f70+8))

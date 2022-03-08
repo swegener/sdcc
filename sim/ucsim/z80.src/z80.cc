@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 //#include "pobjcl.h"
 #include "globals.h"
+#include "utils.h"
 
 // sim
 //#include "simcl.h"
@@ -87,11 +88,19 @@ cl_z80::init(void)
     ram->set((t_addr) i, 0);
   }
   sp_limit= 0xf000;
+  iblock= false;
   
+  return(0);
+}
+
+void
+cl_z80::reset(void)
+{
+  regs.SP= 0xffff;
+  regs.AF= 0xffff;
   IFF1= false;
   IFF2= false;
-
-  return(0);
+  imode= 0;
 }
 
 const char *
@@ -183,7 +192,7 @@ cl_z80::make_memories(void)
   outputs->decoders->add(ad);
   address_spaces->add(outputs);
   
-  regs8= new cl_address_space("regs8", 0, 16, 8);
+  regs8= new cl_address_space("regs8", 0, 18, 8);
   regs8->init();
   regs8->get_cell(0)->decode((t_mem*)&regs.raf.A);
   regs8->get_cell(1)->decode((t_mem*)&regs.raf.F);
@@ -203,6 +212,9 @@ cl_z80::make_memories(void)
   regs8->get_cell(14)->decode((t_mem*)&regs.a_hl.h);
   regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.l);
 
+  regs8->get_cell(16)->decode((t_mem*)&regs.R);
+  regs8->get_cell(17)->decode((t_mem*)&regs.iv);
+  
   regs16= new cl_address_space("regs16", 0, 11, 16);
   regs16->init();
 
@@ -223,45 +235,54 @@ cl_z80::make_memories(void)
 
   vars->add("A", regs8, 0, 7, 0, "Accumulator");
   vars->add("F", regs8, 1, 7, 0, "Flags");
+  /*
+  flag bit positions are family dependent
   vars->add("F_C", regs8, 1, BITPOS_C, BITPOS_C, "Carry");
   vars->add("F_SUB", regs8, 1, BITPOS_SUB, BITPOS_SUB, "");
   vars->add("F_P", regs8, 1, BITPOS_P, BITPOS_P, "");
   vars->add("F_A", regs8, 1, BITPOS_A, BITPOS_A, "");
   vars->add("F_Z", regs8, 1, BITPOS_Z, BITPOS_Z, "Zero");
   vars->add("F_S", regs8, 1, BITPOS_S, BITPOS_S, "");
-  vars->add("B", regs8, 2, 7, 0, "");
-  vars->add("C", regs8, 3, 7, 0, "");
-  vars->add("D", regs8, 4, 7, 0, "");
-  vars->add("E", regs8, 5, 7, 0, "");
-  vars->add("H", regs8, 6, 7, 0, "");
-  vars->add("L", regs8, 7, 7, 0, "");
+  */
+  vars->add("B", regs8, 2, 7, 0, "B register");
+  vars->add("C", regs8, 3, 7, 0, "C register");
+  vars->add("D", regs8, 4, 7, 0, "D register");
+  vars->add("E", regs8, 5, 7, 0, "E register");
+  vars->add("H", regs8, 6, 7, 0, "H register");
+  vars->add("L", regs8, 7, 7, 0, "L register");
 
   vars->add("ALT_A", regs8, 8, 7, 0, "Alt Accumulator");
   vars->add("ALT_F", regs8, 9, 7, 0, "Alt Flags");
+  /*
+  flag bit positions are family dependent
   vars->add("ALT_F_C", regs8, 9, BITPOS_C, BITPOS_C, "Carry");
   vars->add("ALT_F_SUB", regs8, 9, BITPOS_SUB, BITPOS_SUB, "");
   vars->add("ALT_F_P", regs8, 9, BITPOS_P, BITPOS_P, "");
   vars->add("ALT_F_A", regs8, 9, BITPOS_A, BITPOS_A, "");
   vars->add("ALT_F_Z", regs8, 9, BITPOS_Z, BITPOS_Z, "Zero");
   vars->add("ALT_F_S", regs8, 9, BITPOS_S, BITPOS_S, "");
-  vars->add("ALT_B", regs8, 10, 7, 0, "");
-  vars->add("ALT_C", regs8, 11, 7, 0, "");
-  vars->add("ALT_D", regs8, 12, 7, 0, "");
-  vars->add("ALT_E", regs8, 13, 7, 0, "");
-  vars->add("ALT_H", regs8, 14, 7, 0, "");
-  vars->add("ALT_L", regs8, 15, 7, 0, "");
+  */
+  vars->add("ALT_B", regs8, 10, 7, 0, "Alt B register");
+  vars->add("ALT_C", regs8, 11, 7, 0, "Alt C register");
+  vars->add("ALT_D", regs8, 12, 7, 0, "Alt D register");
+  vars->add("ALT_E", regs8, 13, 7, 0, "Alt E register");
+  vars->add("ALT_H", regs8, 14, 7, 0, "Alt H register");
+  vars->add("ALT_L", regs8, 15, 7, 0, "Alt L register");
 
   vars->add("AF", regs16, 0, 15, 0, "Accumulator/Flags");
-  vars->add("BC", regs16, 1, 15, 0, "");
-  vars->add("DE", regs16, 2, 15, 0, "");
-  vars->add("HL", regs16, 3, 15, 0, "");
-  vars->add("IX", regs16, 4, 15, 0, "");
-  vars->add("IY", regs16, 5, 15, 0, "");
-  vars->add("SP", regs16, 6, 15, 0, "");
+  vars->add("BC", regs16, 1, 15, 0, "BC register pair");
+  vars->add("DE", regs16, 2, 15, 0, "DE register pair");
+  vars->add("HL", regs16, 3, 15, 0, "HL register pair");
+  vars->add("IX", regs16, 4, 15, 0, "IX register");
+  vars->add("IY", regs16, 5, 15, 0, "IY register");
+  vars->add("SP", regs16, 6, 15, 0, "Stack Pointer");
   vars->add("ALT_AF", regs16, 7, 15, 0, "Alt Accumulator/Flags");
-  vars->add("ALT_BC", regs16, 8, 15, 0, "");
-  vars->add("ALT_DE", regs16, 9, 15, 0, "");
-  vars->add("ALT_HL", regs16, 10, 15, 0, "");
+  vars->add("ALT_BC", regs16, 8, 15, 0, "Alt BC register pair");
+  vars->add("ALT_DE", regs16, 9, 15, 0, "Alt DE register pair");
+  vars->add("ALT_HL", regs16, 10, 15, 0, "Alt HL register pair");
+
+  vars->add("R", regs8, 16, "R register");
+  vars->add("I", regs8, 17, "I register");
 }
 
 
@@ -543,13 +564,7 @@ cl_z80::print_regs(class cl_console_base *con)
                  regs.raf.F, regs.raf.F, isprint(regs.raf.F)?regs.raf.F:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
                  regs.raf.A, regs.raf.A, isprint(regs.raf.A)?regs.raf.A:'.');
-  con->dd_printf("%c%c-%c-%c%c%c\n",
-                 (regs.raf.F&BIT_S)?'1':'0',
-                 (regs.raf.F&BIT_Z)?'1':'0',
-                 (regs.raf.F&BIT_A)?'1':'0',
-                 (regs.raf.F&BIT_P)?'1':'0',
-                 (regs.raf.F&BIT_N)?'1':'0',
-                 (regs.raf.F&BIT_C)?'1':'0');
+  con->dd_printf("%s\n", cbin(regs.raf.F, 8).c_str());
   con->dd_printf("BC= 0x%04x [BC]= %02x %3d %c  ",
                  regs.BC, ram->get(regs.BC), ram->get(regs.BC),
                  isprint(ram->get(regs.BC))?ram->get(regs.BC):'.');
@@ -565,10 +580,28 @@ cl_z80::print_regs(class cl_console_base *con)
   con->dd_printf("IY= 0x%04x [IY]= %02x %3d %c  ",
                  regs.IY, ram->get(regs.IY), ram->get(regs.IY),
                  isprint(ram->get(regs.IY))?ram->get(regs.IY):'.');
-  con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
+  con->dd_printf("AF= 0x%04x [AF]= %02x %3d %c\n",
+                 regs.AF, ram->get(regs.AF), ram->get(regs.AF),
+                 isprint(ram->get(regs.AF))?ram->get(regs.AF):'.');
+  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
+  
+  /*con->dd_printf("SP= 0x%04x ",
                  regs.SP, ram->get(regs.SP), ram->get(regs.SP),
                  isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
-  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
+  */
+  int i;
+  con->dd_cprintf("answer", "SP= ");
+  con->dd_cprintf("dump_address", "0x%04x ->", regs.SP);
+  for (i= 0; i < 2*12; i+= 2)
+    {
+      t_addr al, ah;
+      al= (regs.SP+i)&0xffff;
+      ah= (al+1)&0xffff;
+      con->dd_cprintf("dump_number", " %02x%02x",
+		      (u8_t)(ram->read(al)),
+		      (u8_t)(ram->read(ah)));
+    }
+  con->dd_printf("\n");
   
   print_disass(PC, con);
 }
@@ -587,7 +620,9 @@ cl_z80::exec_inst(void)
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);
-
+  inc_R();
+  iblock= false;
+  
   switch (code)
     {
     case 0x00: return(inst_nop(code));
@@ -957,6 +992,21 @@ cl_z80::inst_ldix(t_mem code)
   return resGO;
 }
 
+void
+cl_z80::inc_R()
+{
+  u8_t r7= regs.R&0x7f;
+  r7= (r7+1)&0x7f;
+  regs.R= (regs.R&0x80)|r7;
+}
+
+// set undocumented flags 3 (x), and 5 (y)
+void
+cl_z80::xy(u8_t v)
+{
+  regs.raf.F= (regs.raf.F & ~(0x28)) | (v & 0x28);
+}
+
 // Z80N
 int
 cl_z80::inst_lddx(t_mem code)
@@ -1083,6 +1133,7 @@ cl_z80::stack_check_overflow(class cl_stack_op *op)
 cl_z80_cpu::cl_z80_cpu(class cl_uc *auc):
   cl_hw(auc, HW_CPU, 0, "cpu")
 {
+  zuc= (class cl_z80 *)auc;
 }
 
 int
@@ -1125,6 +1176,16 @@ cl_z80_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case z80cpu_nuof: break;
     }
   return cell->get();
+}
+
+void
+cl_z80_cpu::print_info(class cl_console_base *con)
+{
+  con->dd_printf("R= 0x%02x\n", zuc->regs.R);
+  con->dd_printf("I= 0x%02x\n", zuc->regs.iv);
+  con->dd_printf("IFF1= %d IFF2= %d\n",
+		 (zuc->IFF1)?1:0,
+		 (zuc->IFF2)?1:0);
 }
 
 

@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 /* Reduce array size for ports that can't handle large local variables */
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_STACK_AUTO)
  #define ARRAYSIZE 255
 #else
  #define ARRAYSIZE 2

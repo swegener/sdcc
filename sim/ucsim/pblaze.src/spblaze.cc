@@ -22,6 +22,7 @@
 // prj
 #include "appcl.h"
 #include "globals.h"
+#include "utils.h"
 
 // sim.src
 //#include "apppblazecl.h"
@@ -36,6 +37,7 @@ main(int argc, char *argv[])
 {
   class cl_sim *sim;
 
+  app_start_at= dnow();
   cpus= cpus_pblaze;
   application= new cl_app();
   application->init(argc, argv);

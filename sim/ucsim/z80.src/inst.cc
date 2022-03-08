@@ -740,7 +740,11 @@ cl_z80::inst_djnz(t_mem code)
 int
 cl_z80::inst_rra(t_mem code)
 {
-  rr_byte(regs.raf.A);
+  u8_t newc= (regs.raf.A & 1)?BIT_C:0;
+  u8_t orgc= (regs.raf.F & BIT_C)?0x80:0;
+  regs.raf.A= (regs.raf.A>>1)|orgc;  
+  regs.raf.F&= ~(BIT_N|BIT_H|BIT_C);
+  regs.raf.F|= newc;
   tick(3);
   return(resGO);
 }
@@ -748,7 +752,11 @@ cl_z80::inst_rra(t_mem code)
 int
 cl_z80::inst_rla(t_mem code)
 {
-  rl_byte(regs.raf.A);
+  u8_t orgc= (regs.raf.F&BIT_C)?1:0;
+  u8_t newc= (regs.raf.A&0x80)?BIT_C:0;
+  regs.raf.A= (regs.raf.A<<1)|orgc;
+  regs.raf.F&= ~(BIT_H|BIT_C|BIT_N);
+  regs.raf.F|= newc;
   tick(3);
   return(resGO);
 }
@@ -1739,6 +1747,8 @@ int
 cl_z80::inst_di(t_mem code)
 {
   /* disable interrupts */
+  IFF1= IFF2= false;
+  iblock= true;
   tick(3);
   return(resGO);
 }
@@ -1747,6 +1757,8 @@ int
 cl_z80::inst_ei(t_mem code)
 {
   /* enable interrupts */
+  IFF1= IFF2= true;
+  iblock= true;
   tick(3);
   return(resGO);
 }

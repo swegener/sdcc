@@ -52,7 +52,7 @@ var bank sfr[0xd0][4:3]
 
 # Note that the R<n> vars are defined on the "regs" space
 info var R3
-R3 regs[0x3][7:0] = 0b10110010,178U,178
+R3 regs[0x3][7:0] = 0b11001001,201U,201
 
 # Let's label the banks in the underlying chip
 var bank0 iram_chip[0x00]
@@ -202,7 +202,7 @@ info reg
 @R0 00 .  ACC= 0x00   0 .  B= 0x00
 @R1 01 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x95 149 .
+   DPTR= 0x0000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 1
 0xd0[4:3] bank:                     0b---01--- 0x01 '.'   1
@@ -212,26 +212,26 @@ info reg
 @R0 20    ACC= 0x00   0 .  B= 0x00
 @R1 21 !  PSW= 0x08 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x95 149 .
+   DPTR= 0x0000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 2
 0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
 info reg
      R0 R1 R2 R3 R4 R5 R6 R7
      20 21 22 23 24 25 26 27
-@R0 a3 .  ACC= 0x00   0 .  B= 0x00
+@R0 43 C  ACC= 0x00   0 .  B= 0x00
 @R1 84 .  PSW= 0x10 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x95 149 .
+   DPTR= 0x0000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 3
 0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
 info reg
      R0 R1 R2 R3 R4 R5 R6 R7
      30 31 32 33 34 35 36 37
-@R0 20    ACC= 0x00   0 .  B= 0x00
-@R1 23 #  PSW= 0x18 CY=0 AC=0 OV=0 P=0
+@R0 41 A  ACC= 0x00   0 .  B= 0x00
+@R1 e7 .  PSW= 0x18 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x95 149 .
+   DPTR= 0x0000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
   00. bank_switcher

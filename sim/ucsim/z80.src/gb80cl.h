@@ -85,6 +85,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  virtual void xy(u8_t v) {}
 
   virtual const char *get_disasm_info(t_addr addr,
                         int *ret_len,

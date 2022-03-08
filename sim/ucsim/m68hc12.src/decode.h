@@ -208,8 +208,8 @@ DEC(0, 78,	asl	, _e	 	, "ASL %e"	, ' ', 3	, 3)
 DEC(0, 49,	lsr16	, _cD		, "LSRD"	, ' ', 1	, 1)
 DEC(0, 59,	asl16	, _cD		, "LSLD"	, ' ', 1	, 1)
 
-DEC(0, 4a,	call_e	, _NONE		, "CALL $ep$"	, ' ', 4	, 7)
-DEC(0, 4b,	call_id	, _NONE		, "CALL $ip$"	, ' ', -2	, 0xaa988)
+DEC(0, 4a,	call_e	, _NONE		, "CALL 'ep'"	, ' ', 4	, 7)
+DEC(0, 4b,	call_id	, _NONE		, "CALL 'ip'"	, ' ', -2	, 0xaa988)
 
 DEC(0, 5a,	sta	, _d_Aop 	, "STAA %d"	, ' ', 2	, 2)
 DEC(0, 6a,	sta	, _xb_Aop	, "STAA %p"	, ' ', -2	, 0x55332)

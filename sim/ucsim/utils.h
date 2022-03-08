@@ -71,6 +71,10 @@ extern chars colopt2ansiseq(char *opt);
 
 extern double strtoscale(const char *s, const char **units = 0);
 
+extern void srnd(unsigned int seed);
+extern unsigned int urnd(void);
+
+
 #endif
 
 /* End of utils.h */

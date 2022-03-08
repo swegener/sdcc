@@ -38,54 +38,58 @@
 	.globl ___memcpy
 
 ;--------------------------------------------------------
-; function parameters
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
-	.area BSS
+	.area	OSEG    (PAG, OVR)
 ___memcpy_PARM_2:
 	.ds 2
 ___memcpy_PARM_3:
 	.ds 2
 
 ;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define save  "___SDCC_m6502_ret0"
+	.define dst   "___SDCC_m6502_ret2"
+	.define src   "___memcpy_PARM_2"
+	.define count "___memcpy_PARM_3"
+	
+;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
 ___memcpy:
-	sta	*___SDCC_m6502_ret0+0
-	stx	*___SDCC_m6502_ret0+1
-	sta	*___SDCC_m6502_ret2+0
-	stx	*___SDCC_m6502_ret2+1
-	lda	___memcpy_PARM_2+0
-	sta	*___SDCC_m6502_ret4+0
-	lda	___memcpy_PARM_2+1
-	sta	*___SDCC_m6502_ret4+1
+	sta	*save+0
+	stx	*save+1
+	sta	*dst+0
+	stx	*dst+1
 
 	ldy	#0
-	ldx	___memcpy_PARM_3+1
+	ldx	*count+1
 	beq	L2
 L1:
-	lda	[*___SDCC_m6502_ret4],y
-	sta	[*___SDCC_m6502_ret2],y
+	lda	[*src],y
+	sta	[*dst],y
 	iny
-	lda	[*___SDCC_m6502_ret4],y
-	sta	[*___SDCC_m6502_ret2],y
+	lda	[*src],y
+	sta	[*dst],y
 	iny
 	bne	L1
-	inc	*___SDCC_m6502_ret4+1
-	inc	*___SDCC_m6502_ret2+1
+	inc	*src+1
+	inc	*dst+1
 	dex
 	bne	L1
 L2:
-	ldx	___memcpy_PARM_3+0
+	ldx	*count+0
 	beq	done
 L3:
-	lda	[*___SDCC_m6502_ret4],y
-	sta	[*___SDCC_m6502_ret2],y
+	lda	[*src],y
+	sta	[*dst],y
 	iny
 	dex
 	bne	L3
 done:
-	lda	*___SDCC_m6502_ret0+0
-	ldx	*___SDCC_m6502_ret0+1
+	lda	*save+0
+	ldx	*save+1
 	rts

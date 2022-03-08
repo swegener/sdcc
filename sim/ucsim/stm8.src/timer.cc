@@ -183,11 +183,13 @@ cl_tim::happen(class cl_hw *where, enum hw_event he,
 t_mem
 cl_tim::read(class cl_memory_cell *cell)
 {
-  t_mem v= cell->get();
+  t_mem v;
   t_addr a;
   
   if (conf(cell, NULL))
-    return v;
+    return cell->get();
+
+  v= cell->get();
   if (!uc->rom->is_owned(cell, &a))
     return v;
   if ((a < base) ||
@@ -220,9 +222,6 @@ cl_tim::write(class cl_memory_cell *cell, t_mem *val)
   if (conf(cell, val))
     return;
   
-  if (conf(cell, NULL))
-    return;
-
   *val&= 0xff;
   if (!uc->rom->is_owned(cell, &a))
     return;  

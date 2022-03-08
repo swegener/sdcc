@@ -267,6 +267,7 @@ public:
   class cl_ticker *idle_ticks;	// Time in idle mode
   class cl_ticker *halt_ticks;	// Time in power down mode
   class cl_list *counters;	// User definable timers (tickers)
+  int inst_ticks;		// Ticks of an instruction
   struct vcounter_t vc;		// Virtual clk counter
   bool stop_selfjump;		// Whether it should stop on selfjump
   bool analyzer;		// Whether the code analyzer is enabled
@@ -359,6 +360,7 @@ public:
 
   // manipulating hw elements
   virtual void add_hw(class cl_hw *hw);
+  virtual void init_add_hw(class cl_hw *hw);
   virtual int nuof_hws(void);
   virtual class cl_hw *get_hw(int idx);
   virtual class cl_hw *get_hw(enum hw_cath cath, int *idx);

@@ -60,94 +60,70 @@ cl_serial_hw::~cl_serial_hw(void)
 int
 cl_serial_hw::init(void)
 {
-  char *s;
-
+  chars cs;
+  bool raw= false;
+  
   cl_hw::init();
 
   make_io();
   input_avail= false;
   
-  s= format_string("serial%d_in_file", id);
-  serial_in_file_option= new cl_optref(this);
-  serial_in_file_option->init();
-  serial_in_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_out_file", id);
-  serial_out_file_option= new cl_optref(this);
-  serial_out_file_option->init();
-  serial_out_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_ifirst", id);
-  serial_ifirst_option= new cl_optref(this);
-  serial_ifirst_option->init();
-  serial_ifirst_option->use(s);
-  free(s);
+  cs.format("serial%d_in_file", id);
+  serial_in_file_option= new cl_optref(this, cs.c_str());
+  cs.format("serial%d_out_file", id);
+  serial_out_file_option= new cl_optref(this, cs.c_str());
+  cs.format("serial%d_ifirst", id);
+  serial_ifirst_option= new cl_optref(this, cs.c_str());
+  cs.format("serial%d_raw", id);
+  serial_raw_option= new cl_optref(this, cs.c_str());
+  serial_raw_option->get_value(&raw);
+  
+  cs.format("serial%d_port", id);
+  serial_port_option= new cl_optref(this, cs.c_str());
 
-  s= format_string("serial%d_port", id);
-  serial_port_option= new cl_optref(this);
-  serial_port_option->init();
-  class cl_option *o= serial_port_option->use(s);
-  free(s);
-
-  int port= -1;
-  if (o)
+  long port= -1;
+  if (serial_port_option->get_value(&port))
     {
-      port= serial_port_option->get_value((long)0);
-      if (port < 0)
-        {}
+      if (port < 0) {}
+      if (port > 0)
+	{
+	  listener= new cl_serial_listener(port, application, this, sl_io);
+	  listener->init();
+	  class cl_commander_base *c= application->get_commander();
+	  c->add_console(listener);
+	}
     }
-  if (port > 0)
-    {
-      listener= new cl_serial_listener(port, application, this, sl_io);
-      listener->init();
-      class cl_commander_base *c= application->get_commander();
-      c->add_console(listener);
-    }
-
-  o= NULL;
-  s= format_string("serial%d_iport", id);
-  serial_iport_option= new cl_optref(this);
-  serial_iport_option->init();
-  o= serial_iport_option->use(s);
-  free(s);
-
+  
+  cs.format("serial%d_iport", id);
+  serial_iport_option= new cl_optref(this, cs.c_str());
   port= -1;
-  if (o)
+  if (serial_iport_option->get_value(&port))
     {
-      port= serial_iport_option->get_value((long)0);
-      if (port < 0)
-        {}
-    }
-  if (port > 0)
-    {
-      listener= new cl_serial_listener(port, application, this, sl_i);
-      listener->init();
-      class cl_commander_base *c= application->get_commander();
-      c->add_console(listener);
+      if (port < 0) {}
+      if (port > 0)
+	{
+	  listener= new cl_serial_listener(port, application, this, sl_i);
+	  listener->init();
+	  class cl_commander_base *c= application->get_commander();
+	  c->add_console(listener);
+	}
     }
 
-  o= NULL;
-  s= format_string("serial%d_oport", id);
-  serial_oport_option= new cl_optref(this);
-  serial_oport_option->init();
-  o= serial_oport_option->use(s);
-  free(s);
-
+  cs.format("serial%d_oport", id);
+  serial_oport_option= new cl_optref(this, cs.c_str());
   port= -1;
-  if (o)
+  if (serial_oport_option->get_value(&port))
     {
-      port= serial_oport_option->get_value((long)0);
-      if (port < 0)
-        {}
+      if (port < 0) {}
+      if (port > 0)
+	{
+	  listener= new cl_serial_listener(port, application, this, sl_o);
+	  listener->init();
+	  class cl_commander_base *c= application->get_commander();
+	  c->add_console(listener);
+	}
     }
-  if (port > 0)
-    {
-      listener= new cl_serial_listener(port, application, this, sl_o);
-      listener->init();
-      class cl_commander_base *c= application->get_commander();
-      c->add_console(listener);
-    }
-
+  
   const char *f_serial_in = serial_in_file_option->get_value("");
   const char *f_serial_out= serial_out_file_option->get_value("");
   bool ifirst= false;
@@ -162,24 +138,24 @@ cl_serial_hw::init(void)
 	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
 	  else
 	    fi= mk_io(f_serial_in, "r");
-	  if (!fi->tty)
+	  if (!fi->tty && !raw)
 	    fprintf(stderr, "Warning: serial input interface connected to a "
 		    "non-terminal file.\n");
 	}
       else
-	fi= 0;//mk_io(chars(""), chars(""));
+	fi= 0;
       if (f_serial_out && *f_serial_out)
 	{
 	  if (f_serial_out[0] == '\001')
 	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
 	  else
 	    fo= mk_io(chars(f_serial_out), "w");
-	  if (!fo->tty)
+	  if (!fo->tty && !raw)
 	    fprintf(stderr, "Warning: serial output interface connected to a "
 		    "non-terminal file.\n");
 	}
       else
-	fo= 0;//mk_io(chars(""), chars(""));
+	fo= 0;
     }
   else
     {
@@ -189,31 +165,32 @@ cl_serial_hw::init(void)
 	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
 	  else
 	    fo= mk_io(chars(f_serial_out), "w");
-	  if (!fo->tty)
+	  if (!fo->tty && !raw)
 	    fprintf(stderr, "Warning: serial output interface connected to a "
 		    "non-terminal file.\n");
 	}
       else
-	fo= 0;//mk_io(chars(""), chars(""));
+	fo= 0;
       if (f_serial_in && *f_serial_in)
 	{
 	  if (f_serial_in[0] == '\001')
 	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
 	  else
 	    fi= mk_io(f_serial_in, "r");
-	  if (!fi->tty)
+	  if (!fi->tty && !raw)
 	    fprintf(stderr, "Warning: serial input interface connected to a "
 		    "non-terminal file.\n");
 	}
       else
-	fi= 0;//mk_io(chars(""), chars(""));
+	fi= 0;
     }
   
   io->replace_files(true, fi, fo);
   
   if (fi)
     {
-      fi->interactive(NULL);
+      if (!raw)
+	fi->interactive(NULL);
       fi->raw();
       fi->echo(NULL);
     }
@@ -242,7 +219,7 @@ cl_serial_hw::cfg_help(t_addr addr)
   switch (addr)
     {
     case serconf_on:
-      return "Turn simulation of UART on or off (bool, RW)";
+      return "Turn ticking of UART on/off (bool, RW)";
     case serconf_check_often:
       return "Check input file at every cycle (bool, RW)";
     case serconf_escape:
@@ -310,13 +287,54 @@ cl_serial_hw::make_io()
 void
 cl_serial_hw::new_io(class cl_f *f_in, class cl_f *f_out)
 {
-  char esc= (char)cfg_get(serconf_escape);
-  cl_hw::new_io(f_in, f_out);
-  if (io)
-    io->dd_printf("%s[%d] terminal display, press ^%c to access control menu\n",
-		  id_string, id,
-		  'a'+esc-1);
+  bool raw= false;
+
+  serial_raw_option->get_value(&raw);
+  make_io();
+  if (!io)
+    return;
+  new_o(f_out);
+  new_i(f_in);
+}
+
+void
+cl_serial_hw::new_i(class cl_f *f_in)
+{
+  bool raw= false;
+
+  serial_raw_option->get_value(&raw);
+  io->replace_files(true, f_in, io->get_fout());
+  if (!f_in)
+    return;
+  if (!raw)
+    f_in->interactive(NULL);
+  f_in->set_telnet(!raw);
+  f_in->raw();
+  if (f_in->tty)
+    {
+      char esc= (char)cfg_get(serconf_escape);
+      io->tu_reset();
+      io->dd_printf("%s[%d] terminal display, press ^%c to access control menu\n",
+		    id_string, id,
+		    'a'+esc-1);
+    }
   menu= 0;
+}
+
+void
+cl_serial_hw::new_o(class cl_f *f_out)
+{
+  bool raw= false;
+
+  serial_raw_option->get_value(&raw);
+  io->replace_files(true, io->get_fin(), f_out);
+  if (!f_out)
+    return;
+  f_out->set_telnet(!raw);
+  if (!raw)
+    {
+      io->tu_reset();
+    }
 }
 
 bool
@@ -331,7 +349,7 @@ cl_serial_hw::proc_input(void)
 
   fin= io->get_fin();
   fout= io->get_fout();
-  
+
   if (fin->eof())
     {
       if (fout &&
@@ -508,17 +526,17 @@ int
 cl_serial_listener::proc_input(class cl_cmdset *cmdset)
 {
   class cl_f *i, *o;
+  bool raw= false;
 
+  serial_hw->serial_raw_option->get_value(&raw);
   switch (sl_for)
     {
     case sl_io:
       srv_accept(fin, &i, &o);
-      i->set_telnet(true);
       serial_hw->new_io(i, o);
       break;
     case sl_i:
       srv_accept(fin, &i, NULL);
-      i->set_telnet(true);
       serial_hw->new_i(i);
       break;
     case sl_o:

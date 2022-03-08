@@ -36,18 +36,16 @@
 	.globl __mulint
 
 ;--------------------------------------------------------
-; overlayable items in zero page
+; overlayable function paramters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-_mulint_tmp:
-	.ds 1
-
-;--------------------------------------------------------
-; function parameters
-;--------------------------------------------------------
-	.area BSS
 __mulint_PARM_2:
 	.ds 2
+
+;--------------------------------------------------------
+; local aliases
+;--------------------------------------------------------
+	.define tmp "___SDCC_m6502_ret2"
 
 ;--------------------------------------------------------
 ; code
@@ -57,24 +55,22 @@ __mulint_PARM_2:
 __mulint:
 	sta	*___SDCC_m6502_ret0
 	stx	*___SDCC_m6502_ret1
-
 	lda	#0
-	sta	*_mulint_tmp
+	sta	*tmp
 	ldy	#16
-
 	lsr	*___SDCC_m6502_ret1
 	ror	*___SDCC_m6502_ret0
 next_bit:
 	bcc	skip
 	clc
-	adc	__mulint_PARM_2+0
+	adc	*__mulint_PARM_2+0
 	tax
-	lda	__mulint_PARM_2+1
-	adc	*_mulint_tmp
-	sta	*_mulint_tmp
+	lda	*__mulint_PARM_2+1
+	adc	*tmp
+	sta	*tmp
 	txa
 skip:
-	ror	*_mulint_tmp
+	ror	*tmp
 	ror	a
 	ror	*___SDCC_m6502_ret1
 	ror	*___SDCC_m6502_ret0

@@ -50,7 +50,7 @@
  *              int     main(argc, argv)
  *              VOID    asexit(n)
  *              VOID    asmbl()
- *              VOID    equate()
+ *              VOID    equate(id, e1, equtype)
  *              FILE *  afile(fn, ft, wf)
  *              int     fndidx(str)
  *              int     intsiz()
@@ -187,6 +187,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     c               character from argument string
  *              int     i               argument loop counter
  *              area *  ap              pointer to area structure
+ *		def *	dp		pointer to def structure
  *
  *      global variables:
  *              int     aflag           -a, make all symbols global flag
@@ -204,6 +205,8 @@ search_path_fopen(const char *filename, const char *mode)
  *              int *   cp              pointer to assembler output array cb[]
  *              int *   cpt             pointer to assembler relocation type
  *                                      output array cbt[]
+ *		time_t	curtim		current time string pointer
+ *		def *	defp		pointer to a def structure
  *              char    eb[]            array of generated error codes
  *              char *  ep              pointer into error list array eb[]
  *              int     fflag           -f(f), relocations flagged flag
@@ -279,6 +282,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              char *  strcpy()        c_library
  *              VOID    symglob()       assym.c
  *              VOID    syminit()       assym.c
+ *		time_t	time()		c_library
  *              VOID    usage()         asmain.c
  *
  *      side effects:
@@ -297,16 +301,22 @@ main(int argc, char *argv[])
         char *q;
         int c, i;
         struct area *ap;
-
-        if (intsiz() < 4) {
-                fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
-                exit(ER_FATAL);
-        }
+	struct def *dp;
 
         /* sdas specific */
         /* sdas initialization */
         sdas_init(argv[0]);
         /* end sdas specific */
+
+	if (argc == 1) {
+		usage();
+		exit(ER_NONE);
+	}
+
+        if (intsiz() < 4) {
+                fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
+                exit(ER_FATAL);
+        }
 
         if (!is_sdas())
                 fprintf(stdout, "\n");
@@ -316,15 +326,80 @@ main(int argc, char *argv[])
         for (i=1; i<argc; ++i) {
                 p = argv[i];
                 if (*p == '-') {
-                        if (asmc != NULL)
-                                usage(ER_FATAL);
+                        if (asmc != NULL) {
+                                usage();
+				fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
+                                asexit(ER_FATAL);
+                        }
                         ++p;
                         while ((c = *p++) != 0) {
                                 switch(c) {
+				/*
+				 * -h   Show the help list
+				 */
+				case 'h':
+				case 'H':
+					usage();
+					exit(ER_NONE);
+					break;
 
-                                case 'a':
-                                case 'A':
-                                        ++aflag;
+//                                case 'i':
+                                /* TODO: collides with new Insert assembler line */
+                                case 'I':
+                                        search_path_append(p);
+                                        while (*p)
+                                                ++p;
+                                        break;
+
+				/*
+				 * Output:
+				 *   -l   Create list   file/outfile[.lst]
+				 *   -o   Create object file/outfile[.rel]
+				 *   -s   Create symbol file/outfile[.sym]
+				 */
+                                case 'l':
+                                case 'L':
+                                        ++lflag;
+                                        break;
+
+                                case 'o':
+                                case 'O':
+                                        ++oflag;
+                                        break;
+
+                                case 's':
+                                case 'S':
+                                        ++sflag;
+                                        break;
+
+				/*
+				 * Listing:
+				 *   -d   Decimal listing
+				 *   -q   Octal   listing
+				 *   -x   Hex     listing (default)
+				 *   -b   Display .define substitutions in listing
+				 *   -bb  and display without .define substitutions
+				 *   -c   Disable instruction cycle count in listing
+				 *   -f   Flag relocatable references by  `   in listing file
+				 *   -ff  Flag relocatable references by mode in listing file
+				 *   -k   Disable error output to listing file
+				 *   -p   Disable automatic listing pagination
+				 *   -u   Disable .list/.nlist processing
+				 *   -w   Wide listing format for symbol table
+				 */
+                                case 'd':
+                                case 'D':
+                                        xflag = 2;
+                                        break;
+
+                                case 'q':
+                                case 'Q':
+                                        xflag = 1;
+                                        break;
+
+                                case 'x':
+                                case 'X':
+                                        xflag = 0;
                                         break;
 
                                 case 'b':
@@ -337,51 +412,9 @@ main(int argc, char *argv[])
                                         cflag = 1;      /* Cycle counts in listing */
                                         break;
 
-                                case 'g':
-                                case 'G':
-                                        ++gflag;
-                                        break;
-
-                                case 'i':
-                                case 'I':
-                                        search_path_append(p);
-                                        while (*p)
-                                                ++p;
-                                        break;
-
-#if NOICE
-                                case 'j':               /* NoICE Debug  JLH */
-                                case 'J':
-                                        ++jflag;
-                                        ++oflag;        /* force object */
-                                        break;
-#endif
-
-#if SDCDB
-                                case 'y':               /* SDCC Debug */
-                                case 'Y':
-                                        ++yflag;
-                                        break;
-#endif
-
-                                case 'l':
-                                case 'L':
-                                        ++lflag;
-                                        break;
-
-                                case 'n':
-                                case 'N':
-                                        nflag = 1;
-                                        break;
-
-                                case 'o':
-                                case 'O':
-                                        ++oflag;
-                                        break;
-
-                                case 's':
-                                case 'S':
-                                        ++sflag;
+                                case 'f':
+                                case 'F':
+                                        ++fflag;
                                         break;
 
                                 case 'p':
@@ -399,33 +432,80 @@ main(int argc, char *argv[])
                                         ++wflag;
                                         break;
 
+				/*
+				 * Assembly Processing Options:",
+				 *   -v   Enable out of range signed / unsigned errors
+				 */
+				case 'v':
+				case 'V':
+					++vflag;
+					break;
+
+				/*
+				 * Symbol Options:
+				 *   -a   All user symbols made global
+				 *   -g   Undefined symbols made global
+				 *   -z   Disable case sensitivity for symbols
+				 */
+                                case 'a':
+                                case 'A':
+                                        ++aflag;
+                                        break;
+
+                                case 'g':
+                                case 'G':
+                                        ++gflag;
+                                        break;
+
+                                case 'n':
+                                case 'N':
+                                        nflag = 1;
+                                        break;
+
                                 case 'z':
                                 case 'Z':
                                         ++zflag;
                                         break;
 
-                                case 'x':
-                                case 'X':
-                                        xflag = 0;
+				/*
+				 * Debug Options:
+				 *   -j   Enable NoICE Debug Symbols
+				 *   -y   Enable SDCC  Debug Symbols
+				 */
+#if NOICE
+                                case 'j':               /* NoICE Debug  JLH */
+                                case 'J':
+                                        ++jflag;
+                                        ++oflag;        /* force object */
                                         break;
+#endif
 
-                                case 'q':
-                                case 'Q':
-                                        xflag = 1;
+#if SDCDB
+                                case 'y':               /* SDCC Debug */
+                                case 'Y':
+                                        ++yflag;
                                         break;
+#endif
 
-                                case 'd':
-                                case 'D':
-                                        xflag = 2;
-                                        break;
+				/*
+				 * Unlisted Options:
+				 *   -r   list line numbers in .hst help file
+				 *   -rr  list line numbers of NON listed lines
+				 *   -t   show internal block allocations
+				 */
 
-                                case 'f':
-                                case 'F':
-                                        ++fflag;
-                                        break;
+				case 't':
+				case 'T':
+					++tflag;
+					break;
 
+                                /*
+                                        * Unknown Options:
+                                        */
                                 default:
-                                        usage(ER_FATAL);
+                                        fprintf(stderr, "?ASxxxx-Warning-Unkown option -%c ignored\n", c);
+                                        //usage(ER_FATAL);
+                                        break;
                                 }
                         }
                 } else {
@@ -433,8 +513,11 @@ main(int argc, char *argv[])
                                 q = p;
                                 if (++i < argc) {
                                         p = argv[i];
-                                        if (*p == '-')
-                                                usage(ER_FATAL);
+                                        if (*p == '-') {
+                                                usage();
+                                                fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
+                                                asexit(ER_FATAL);
+                                        }
                                 }
                                 asmp = (struct asmf *)
                                                 new (sizeof (struct asmf));
@@ -455,8 +538,11 @@ main(int argc, char *argv[])
                         asmc->afp = afp;
                 }
         }
-        if (asmp == NULL)
-                usage(ER_WARNING);
+        if (asmp == NULL) {
+                usage();
+                fprintf(stderr, "?ASxxxx-Error-Missing input file(s)\n");
+                asexit(ER_FATAL);
+        }
         if (lflag)
                 lfp = afile(q, "lst", 1);
         /* sdas specific */
@@ -470,6 +556,7 @@ main(int argc, char *argv[])
                 tfp = afile(q, "sym", 1);
         exprmasks(2);
         syminit();
+	curtim = time(NULL);
         for (pass=0; pass<3; ++pass) {
                 aserr = 0;
                 if (gflag && pass == 1)
@@ -478,6 +565,11 @@ main(int argc, char *argv[])
                         allglob();
                 if (oflag && pass == 2)
                         outgsd();
+		dp = defp;
+		while (dp) {
+			dp->d_dflag = 0;
+			dp = dp->d_dp;
+		}
                 flevel = 0;
                 tlevel = 0;
                 lnlist = LIST_NORM;
@@ -496,14 +588,14 @@ main(int argc, char *argv[])
                 asmline = 0;
                 incline = 0;
                 asmc = asmp;
+                strcpy(afn, asmc->afn);
+                afp = asmc->afp;
                 while (asmc) {
                         if (asmc->fp)
                                 rewind(asmc->fp);
                         asmc = asmc->next;
                 }
                 asmc = asmp;
-                strcpy(afn, asmc->afn);
-                afp = asmc->afp;
                 ap = areap;
                 while (ap) {
                         ap->a_fuzz = 0;
@@ -597,9 +689,14 @@ intsiz(void)
  *              FILE *  lfp             list output file handle
  *              FILE *  ofp             relocation output file handle
  *              FILE *  tfp             symbol table output file handle
+ *		FILE *	stdout		standard output handle
+ *		int	maxinc		maximum include file level
+ *		int	maxmcr		maximum macro expansion level
+ *		int	mcrblk		macro allocation in 1K blocks
  *
  *      functions called:
  *              int     fclose()        c_library
+ *		int	fprintf()	c_library
  *              VOID    exit()          c_library
  *
  *      side effects:
@@ -634,6 +731,15 @@ asexit(int i)
                 remove(relFile);
         }
         /* end sdas specific */
+
+	if (tflag) {
+		fprintf(stderr, "?ASxxxx-Info-maxinc(include file level)    = %3d\n", maxinc);
+		fprintf(stderr, "?ASxxxx-Info-maxmcr(macro expansion level) = %3d\n", maxmcr);
+		//fprintf(stderr, "?ASxxxx-Info-asmblk(1K Byte Allocations)   = %3d\n", asmblk);
+		fprintf(stderr, "?ASxxxx-Info-mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
+		fprintf(stderr, "\n");
+	}
+
         exit(i);
 }
 
@@ -654,6 +760,7 @@ asexit(int i)
  *              int     c               character from assembler-source
  *                                      text line
  *              area *  ap              pointer to an area structure
+ *		def *	dp		pointer to a  definition structure
  *              expr    e1              expression structure
  *              char    id[]            id string
  *              char    opt[]           options string
@@ -703,6 +810,7 @@ asexit(int i)
  *      functions called:
  *              a_uint  absexpr()       asexpr.c
  *              area *  alookup()       assym.c
+ *		def *	dlookup()	assym.c
  *              VOID    clrexpr()       asexpr.c
  *              int     digit()         asexpr.c
  *              char    endline()       aslex.c
@@ -710,6 +818,7 @@ asexit(int i)
  *              VOID    err()           assubr.c
  *              VOID    expr()          asexpr.c
  *              FILE *  fopen()         c_library
+ *		int	fseek()		c_library
  *              int     get()           aslex.c
  *              VOID    getid()         aslex.c
  *              int     getmap()        aslex.c
@@ -747,6 +856,7 @@ asmbl(void)
         struct tsym *tp;
         int c;
         struct area  *ap;
+	struct def *dp;
         struct expr e1;
         char id[NCPS];
         char equ[NCPS];
@@ -812,48 +922,34 @@ loop:
                 if (c != '$' || get() != ':')
                         qerr();
 
-                tp = symp->s_tsym;
-                if (pass == 0) {
-                        while (tp) {
-                                if (n == tp->t_num) {
-                                        tp->t_flg |= S_MDF;
-                                        break;
-                                }
-                                tp = tp->t_lnk;
-                        }
-                        if (tp == NULL) {
-                                tp=(struct tsym *) new (sizeof(struct tsym));
-                                tp->t_lnk = symp->s_tsym;
-                                tp->t_num = n;
-                                tp->t_flg = 0;
-                                tp->t_area = dot.s_area;
-                                tp->t_addr = dot.s_addr;
-                                symp->s_tsym = tp;
-                        }
-                } else {
-                        while (tp) {
-                                if (n == tp->t_num) {
-                                        break;
-                                }
-                                tp = tp->t_lnk;
-                        }
-                        if (tp) {
-                                if (pass == 1) {
-                                        fuzz = tp->t_addr - dot.s_addr;
-                                        tp->t_area = dot.s_area;
-                                        tp->t_addr = dot.s_addr;
-                                } else {
-                                        phase(tp->t_area, tp->t_addr);
-                                        if (tp->t_flg & S_MDF)
-                                                err('m');
-                                }
-                        } else {
-                                err('u');
-                        }
-                }
-                lmode = ALIST;
-                goto loop;
-        }
+		tp = symp->s_tsym;
+		while (tp) {
+			if (n == tp->t_num) {
+				if (pass == 0) {
+					tp->t_flg |= S_MDF;
+				}
+				break;
+			}
+			tp = tp->t_lnk;
+		}
+		if (tp == NULL) {
+			tp=(struct tsym *) new (sizeof(struct tsym));
+			tp->t_area = dot.s_area;
+			tp->t_addr = dot.s_addr;
+			tp->t_lnk = symp->s_tsym;
+			tp->t_num = n;
+			tp->t_flg = 0;
+			symp->s_tsym = tp;
+		}
+		if (tp->t_flg & S_MDF)
+			err('m');
+		phase(tp->t_area, tp->t_addr);
+		fuzz = tp->t_addr - dot.s_addr;
+		tp->t_area = dot.s_area;
+		tp->t_addr = dot.s_addr;
+		lmode = ALIST;
+		goto loop;
+	}
         /*
          * If the first character is a letter then assume a label,
          * symbol, assembler directive, or assembler mnemonic is
@@ -1035,7 +1131,23 @@ loop:
                                         case O_IFLE:    n = (((v_sint) n) <= 0);        break;
                                         }
                                         break;
-
+				case O_IFDEF:	/* .if def,.... */
+				case O_IFNDEF:	/* .if ndef,.... */
+					getid(id, -1);
+					if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
+						n = 1;
+					} else
+					if ((sp = slookup(id)) != NULL) {
+						n = (sp->s_type == S_USER) ? 1 : 0;
+					} else {
+						n = 0;
+					}
+					switch (mp->m_valu) {
+					default:
+					case O_IFDEF:	n = (((v_sint) n) != 0);	break;
+					case O_IFNDEF:	n = (((v_sint) n) == 0);	break;
+					}
+					break;
                                 case O_IFF:     /* .if f */
                                 case O_IFT:     /* .if t */
                                 case O_IFTF:    /* .if tf */
@@ -1447,8 +1559,7 @@ loop:
                          * Open File
                          */
                         if ((fp = fopen(fn, "rb")) == NULL) {
-                                //xerr('i', "File not found.");
-                                err('i');
+				xerr('i', "File not found.");
                                 break;
                         }
                         /*
@@ -1456,8 +1567,7 @@ loop:
                          */
                         fseek(fp, skp, SEEK_SET);
                         if (fread(&c, 1, 1, fp) != 1) {
-                                //xerr('i', "Offset past End-Of-File.");
-                                err('i');
+				xerr('i', "Offset past End-Of-File.");
                                 break;
                         }
                         fseek(fp, skp, SEEK_SET);
@@ -1479,7 +1589,7 @@ loop:
                         break;
 
 		default:
-                        err('i');
+			xerr('i', "Internal ___PST.C Error.");
 			break;
                 }
                 break;
@@ -1762,6 +1872,61 @@ loop:
                 }
                 break;
 
+	case S_DEFINE:
+		/*
+		 * Extract the .(un)define key word.
+		 */
+		getid(id, -1);
+
+		switch(mp->m_valu) {
+		case O_DEF:
+			/*
+			 * Extract the substitution string
+			 */
+			comma(0);
+			*opt = 0;
+			if (more()) {
+				getdstr(opt, NCPS);
+			}
+			/*
+			 * Verify the definition or
+			 * add a new definition.
+			 */
+			dp = dlookup(id);
+			if (dp) {
+				if (!symeq(opt, dp->d_define, zflag)) {
+					if (dp->d_dflag) {
+						err('m');
+					}
+					dp->d_define = strsto(opt);
+				}
+				dp->d_dflag = 1;
+			} else {
+				dp = (struct def *) new (sizeof(struct def));
+				dp->d_dp = defp;
+				dp->d_id = strsto(id);
+				dp->d_define = strsto(opt);
+				dp->d_dflag = 1;
+				defp = dp;
+			}
+			break;
+
+		case O_UNDEF:
+			/*
+			 * Find and undefine the definition.
+			 */
+			dp = dlookup(id);
+			if (dp) {
+				dp->d_dflag = 0;
+			}
+			break;
+
+		default:
+			break;
+		}
+		lmode = SLIST;
+		break;
+
         case S_BOUNDARY:
                 switch(mp->m_valu) {
                 case O_EVEN:
@@ -1791,6 +1956,30 @@ loop:
                         break;
                 }
                 break;
+
+	case S_MSG:
+		lmode = SLIST;
+		/*
+		 * Print the .msg message
+		 */
+		getdstr(fn, FILSPC+FILSPC);
+		if (pass == 2) {
+			printf("%s\n", fn);
+		}
+		break;
+
+	case S_ERROR:
+		clrexpr(&e1);
+		if (more()) {
+			expr(&e1, 0);
+		}
+		if (e1.e_addr != 0) {
+			err('e');
+		}
+		lmode = ELIST;
+//		eqt_area = NULL;
+		laddr = e1.e_addr;
+		break;
 
         case S_MACRO:
                 lmode = SLIST;
@@ -1960,12 +2149,30 @@ FILE *
 afile(char *fn, char *ft, int wf)
 {
         FILE *fp;
+	char *frmt;
 
         afilex(fn, ft);
 
+	/*
+	 * Select (Binary) Read/Write
+	 */
+	switch(wf) {
+	default:
+	case 0:	frmt = "r";	break;
         /* open file -- use "b" flag to write LF line endings on all host platforms */
-        if ((fp = fopen(afntmp, wf?"wb":"r")) == NULL) {
-            fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afntmp);
+	/* this is currently set to match old sdas behavior */
+	case 1:	frmt = "wb";	break;
+#ifdef	DECUS
+	case 2:	frmt = "rn";	break;
+	case 3:	frmt = "wn";	break;
+#else
+	case 2:	frmt = "rb";	break;
+	case 3:	frmt = "wb";	break;
+#endif
+	}
+
+	if ((fp = fopen(afntmp, frmt)) == NULL) {
+	    fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afntmp);
             asexit(ER_FATAL);
         }
 
@@ -2205,42 +2412,50 @@ phase(struct area *ap, a_uint a)
 }
 
 char *usetxt[] = {
-        "Usage: [-Options] file",
-        "Usage: [-Options] outfile file1 [file2 file3 ...]",
+	"Usage: [-Options] [-Option with arg] file",
+	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
+	"  -h   or NO ARGUMENTS  Show this help list",
+	"Input:",
+        "  -I   Add the named directory to the include file",
+        "       search path.  This option may be used more than once.",
+        "       Directories are searched in the order given.",
+	"Output:",
+	"  -l   Create list   file/outfile[.lst]",
+	"  -o   Create object file/outfile[.rel]",
+	"  -s   Create symbol file/outfile[.sym]",
+	"Listing:",
         "  -d   Decimal listing",
         "  -q   Octal   listing",
         "  -x   Hex     listing (default)",
-        "  -g   Undefined symbols made global",
-        "  -n   Don't resolve global assigned value symbols",
-        "  -a   All user symbols made global",
         "  -b   Display .define substitutions in listing",
         "  -bb  and display without .define substitutions",
         "  -c   Disable instruction cycle count in listing",
+        "  -f   Flag relocatable references by  `   in listing file",
+        "  -ff  Flag relocatable references by mode in listing file",
+        "  -p   Disable automatic listing pagination",
+        "  -u   Disable .list/.nlist processing",
+        "  -w   Wide listing format for symbol table",
+	"Assembly:",
+	"  -v   Enable out of range signed / unsigned errors",
+	"Symbols:",
+        "  -a   All user symbols made global",
+        "  -g   Undefined symbols made global",
+        "  -n   Don't resolve global assigned value symbols",
+        "  -z   Disable case sensitivity for symbols",
+#if (NOICE || SDCDB)
+	"Debugging:",
 #if NOICE
         "  -j   Enable NoICE Debug Symbols",
 #endif
 #if SDCDB
         "  -y   Enable SDCC  Debug Symbols",
 #endif
-        "  -l   Create list   file/outfile[.lst]",
-        "  -o   Create object file/outfile[.rel]",
-        "  -s   Create symbol file/outfile[.sym]",
-        "  -p   Disable automatic listing pagination",
-        "  -u   Disable .list/.nlist processing",
-        "  -w   Wide listing format for symbol table",
-        "  -z   Disable case sensitivity for symbols",
-        "  -f   Flag relocatable references by  `   in listing file",
-        "  -ff  Flag relocatable references by mode in listing file",
-        "  -I   Add the named directory to the include file",
-        "       search path.  This option may be used more than once.",
-        "       Directories are searched in the order given.",
+#endif
         "",
         NULL
 };
 
-/*)Function     VOID    usage(n)
- *
- *              int     n               exit code
+/*)Function     VOID    usage()
  *
  *      The function usage() outputs to the stderr device the
  *      assembler name and version and a list of valid assembler options.
@@ -2254,22 +2469,22 @@ char *usetxt[] = {
  *              char *  usetxt[]        array of string pointers
  *
  *      functions called:
- *              VOID    asexit()        asmain.c
  *              int     fprintf()       c_library
  *
  *      side effects:
- *              program is terminated
+ *              none
  */
 
 VOID
-usage(int n)
+usage()
 {
         char   **dp;
 
         fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
         fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
         fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
-        for (dp = usetxt; *dp; dp++)
+	for (dp = usetxt; *dp; dp++) {
                 fprintf(stderr, "%s\n", *dp);
-        asexit(n);
+	}
 }
+

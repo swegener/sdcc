@@ -199,6 +199,7 @@ endif
 
 ifeq ($(OPT_DISABLE_MOS6502), 0)
 TARGETS        += model-mos6502
+TARGETS        += model-mos6502-stack-auto
 endif
 
 ifeq ($(OPT_DISABLE_MOS65C02), 0)
@@ -427,6 +428,11 @@ objects-hc08:
 model-mos6502:
 	if grep '^mos6502$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mmos6502" PORT=mos6502 objects-mos6502; \
+	fi
+
+model-mos6502-stack-auto:
+	if grep '^mos6502$$' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-mmos6502 --stack-auto" PORT=mos6502-stack-auto objects-mos6502; \
 	fi
 
 model-mos65c02:

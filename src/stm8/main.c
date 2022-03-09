@@ -327,6 +327,9 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   int result_size = IS_SYMOP (IC_RESULT (ic)) ? getSize (OP_SYM_TYPE (IC_RESULT(ic))) : 4;
   sym_link *test = NULL;
 
+  if (IS_BITINT (OP_SYM_TYPE (IC_RESULT(ic))) && SPEC_BITINTWIDTH (OP_SYM_TYPE (IC_RESULT(ic))) % 8)
+    return false;
+
   if (IS_LITERAL (left))
     test = left;
   else if (IS_LITERAL (right))
@@ -476,6 +479,7 @@ PORT stm8_port =
     3,                          /* banked func ptr */
     1,                          /* bit */
     4,                          /* float */
+    64,                         /* Supports bit-precise types up to _BitInt (64) */
   },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */

@@ -2265,6 +2265,16 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32
 
+      /* set macro for BITINT_MAXWIDTH  - an implementation detail, users should only use BITINT_MAXWIDTH from limits.h */
+      if (options.intlong_rent)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 48);
+          dbuf_printf (&dbuf, "-D__SDCC_BITINT_MAXWIDTH=%u", port->s.bitint_maxwidth);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
+
       /* standard include path */
       if (!options.nostdinc)
         {

@@ -974,11 +974,9 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
             }
         }
       break;
-    case 8:
-      printIvalVal (oBuf, val, 8, true); // TODO: Print value as comment. Does dbuf_printf support long long even on MSVC?
-      break;
     default:
-      wassertl (0, "Attempting to initialize integer of non-handled size.");
+      printIvalVal (oBuf, val, getSize (type), true);
+      break;
     }
 }
 

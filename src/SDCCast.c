@@ -539,7 +539,7 @@ isAstEqual (ast * t1, ast * t2)
 /* resolveSymbols - resolve symbols from the symbol table          */
 /*-----------------------------------------------------------------*/
 ast *
-resolveSymbols (ast * tree)
+resolveSymbols (ast *tree)
 {
   /* walk the entire tree and check for values */
   /* with symbols if we find one then replace  */
@@ -2663,7 +2663,7 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
     {
     case RESULT_TYPE_NONE:
       /* if thing smaller than int must be promoted to int */
-      if (!promote || getSize (tree->etype) >= INTSIZE)
+      if (!promote || getSize (tree->etype) >= INTSIZE || IS_BITINT (tree->etype))
         /* promotion not necessary or already an int */
         return tree;
       /* char and bits: promote to int */
@@ -2703,12 +2703,12 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
       break;
     case RESULT_TYPE_IFX:
     case RESULT_TYPE_OTHER:
-      if (!promote ||
+      if (!promote || IS_BITINT (tree->etype) ||
           /* return type is ifx, long, float: promote char to int */
           getSize (tree->etype) >= INTSIZE)
         return tree;
       newLink = newIntLink ();
-      upCasted = TRUE;
+      upCasted = true;
       break;
     default:
       return tree;
@@ -4744,7 +4744,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       if(!reduceTypeAllowed)
         {
           TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), NULL, resultType, tree->opval.op));
-          if(IS_INTEGRAL (TETYPE (tree)) && bitsForType (TETYPE (tree)) < INTSIZE * 8)
+          if(IS_INTEGRAL (TETYPE (tree)) && bitsForType (TETYPE (tree)) < INTSIZE * 8 && !IS_BITINT (TETYPE (tree)))
             {
               // Promote to int for smaller types
               SPEC_NOUN (TETYPE (tree)) = V_INT;
@@ -7895,7 +7895,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
       if (IS_LITERAL (tree->opval.val->etype))
         {
           fprintf (outfile, "CONSTANT (%p) value = ", tree);
-          if (SPEC_LONGLONG (tree->opval.val->etype))
+          if (SPEC_LONGLONG (tree->opval.val->etype) || IS_BITINT (tree->opval.val->etype))
             {
               unsigned long long ull = ullFromVal (tree->opval.val);
 

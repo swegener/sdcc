@@ -98,7 +98,7 @@ bool uselessDecl = TRUE;
 %token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
 %token NONBANKED BANKED SHADOWREGS SD_WPARAM
-%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
+%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT SD_BITINT
 %token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY TRAP
@@ -585,6 +585,12 @@ type_specifier
    | SD_BOOL   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BOOL;
+                  ignoreTypedefType = 1;
+               }
+   | SD_BITINT '(' constant_expr ')'  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_BITINT;
+                  SPEC_BITINTWIDTH($$) = (unsigned int) ulFromVal(constExprValue($3, TRUE));
                   ignoreTypedefType = 1;
                }
    | struct_or_union_specifier  {

@@ -1,7 +1,54 @@
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge _BitInt branch.
+
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/bitintbitfield.c:
+	  Fix signed bit-precise bit-fields.
+
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/stm8/gen.c,
+	  support/regression/tests/bitint.c,
+	  support/regression/tests/bitintarith.c:
+	  Multiplicative operators for bit-precise integers.
+
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  src/stm8/main.c:
+	  Improve diagnostics for unimplemented bit-precise operators.
+
 2022-03-08 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:
 	  Fir corner cases in genPointerSet() and genPointerGet().
+
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  src/SDCCval.c,
+	  support/regression/tests/bitint.c,
+	  support/regression/tests/bitintarith.c,
+	  src/stm8/gen.c:
+	  Various _BitInt fixes.
+
+2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  src/SDCCsymt.c,
+	  src/SDCCval.c:
+	  Fix casts for bit-precise types.
+	* src/stm8/gen.c:
+	  Fix return of types with odd size greater than 4.
+	* support/regression/tests/bitint.c,
+	  support/regression/tests/bitintarith.c:
+	  Somethings already work for _BitInt, so we can test them!
 
 2022-03-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -19,6 +66,34 @@
 	* sdas/as8xcxxx/ds8mch.c,
 	  sdas/asxxsrc/asxxxx.h:
 	  Fix ASxxxx warnings by merging with upstream for [bugs:#3347].
+
+2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCval.c,
+	  src/stm8/main.c,
+	  src/SDCCglue.c,
+	  src/SDCCast.c,
+	  src/SDCCsymt.h,
+	  src/stm8/gen.c:
+	  Infrastructure for bit-precise integer literals.
+
+2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/limits.h,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCmain.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/port.h:
+	  Infrastructure for bit-precise integers.
 
 2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
 

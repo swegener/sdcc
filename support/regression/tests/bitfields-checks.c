@@ -7,7 +7,7 @@
 #pragma disable_warning 88
 
 // Disable for ds390: bug #3211
-// Absolute addressing has some issues for pdk. And if those are fixed, there might be  alack of memory, still.
+// Absolute addressing has some issues for pdk. And if those are fixed, there might be a lack of memory, still.
 // mcs51 creates invalid assembler. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.
 #if defined(__SDCC_ds390) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15) || defined(__SDCC_mcs51)
 #define DUMMY_CASE

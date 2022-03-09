@@ -108,6 +108,7 @@ structdef;
 typedef enum
 {
   V_INT = 1,
+  V_BITINT,
   V_FLOAT,
   V_FIXED16X16,
   V_BOOL,
@@ -115,9 +116,10 @@ typedef enum
   V_VOID,
   V_STRUCT,
   V_LABEL,
-  V_BIT,
   V_BITFIELD,
   V_BBITFIELD,
+  V_BITINTBITFIELD,
+  V_BIT,
   V_SBIT,
   V_DOUBLE
 }
@@ -180,6 +182,7 @@ typedef struct specifier
   unsigned b_isenum:1;              /* is an enumerated type      */
   unsigned b_bitUnnamed:1;          /* is an unnamed bit-field    */
   unsigned b_needspar:1;            /* has to be a parameter      */
+  unsigned bitintwidth;             /* width of bit-precise type  */
   unsigned _bitStart;               /* bit start position         */
   unsigned _bitLength;              /* bit length                 */
   unsigned _addr;                   /* address of symbol          */
@@ -500,6 +503,7 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_ADDR(x) validateLink(x, "SPEC_ADDR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._addr
 #define SPEC_STAK(x) validateLink(x, "SPEC_STAK", #x, SPECIFIER, __FILE__, __LINE__)->select.s._stack
 #define SPEC_CVAL(x) validateLink(x, "SPEC_CVAL", #x, SPECIFIER, __FILE__, __LINE__)->select.s.const_val
+#define SPEC_BITINTWIDTH(x) validateLink(x, "SPEC_BITINTWIDTH", #x, SPECIFIER, __FILE__, __LINE__)->select.s.bitintwidth
 #define SPEC_BSTR(x) validateLink(x, "SPEC_BSTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
 #define SPEC_BLEN(x) validateLink(x, "SPEC_BLEN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitLength
 #define SPEC_BUNNAMED(x) validateLink(x, "SPEC_BUNNAMED", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_bitUnnamed
@@ -563,20 +567,25 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_BOOL(x)       (IS_SPEC(x) && x->select.s.noun == V_BOOL)
+#define IS_BITINT(x)     (IS_SPEC(x) && x->select.s.noun == V_BITINT)
 #define IS_CHAR(x)       (IS_SPEC(x) && x->select.s.noun == V_CHAR)
 #define IS_EXTERN(x)     (IS_SPEC(x) && x->select.s.b_extern)
 #define IS_VOLATILE(x)   (isVolatile (x))
-#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT       || \
-                                         x->select.s.noun == V_BOOL      || \
-                                         x->select.s.noun == V_CHAR      || \
-                                         x->select.s.noun == V_BITFIELD  || \
-                                         x->select.s.noun == V_BBITFIELD || \
-                                         x->select.s.noun == V_BIT       || \
+#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT            || \
+                                         x->select.s.noun == V_BITINT         || \
+                                         x->select.s.noun == V_BOOL           || \
+                                         x->select.s.noun == V_CHAR           || \
+                                         x->select.s.noun == V_BITFIELD       || \
+                                         x->select.s.noun == V_BBITFIELD      || \
+                                         x->select.s.noun == V_BITINTBITFIELD || \
+                                         x->select.s.noun == V_BIT            || \
                                          x->select.s.noun == V_SBIT ))
-#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD  || \
-                                         x->select.s.noun == V_BBITFIELD ))
+#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD       || \
+                                         x->select.s.noun == V_BBITFIELD      || \
+                                         x->select.s.noun == V_BITINTBITFIELD ))
 #define IS_BITVAR(x)     (IS_SPEC(x) && (x->select.s.noun == V_BITFIELD  || \
                                          x->select.s.noun == V_BBITFIELD || \
+                                         x->select.s.noun == V_BITINTBITFIELD || \
                                          x->select.s.noun == V_BIT       || \
                                          x->select.s.noun == V_SBIT ))
 #define IS_BIT(x)        (IS_SPEC(x) && (x->select.s.noun == V_BIT       || \
@@ -695,6 +704,7 @@ unsigned int bitsForType (sym_link *);
 sym_link *newIntLink ();
 sym_link *newCharLink ();
 sym_link *newLongLink ();
+sym_link *newLongLongLink ();
 sym_link *newBoolLink ();
 sym_link *newPtrDiffLink ();
 sym_link *newVoidLink ();

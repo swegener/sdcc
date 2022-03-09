@@ -201,6 +201,7 @@ typedef struct
     int banked_funcptr_size;
     int bit_size;
     int float_size;
+    unsigned bitint_maxwidth;        // BITINT_MAXWIDTH - maximum size in bits
   }
   s;
 

@@ -65,5 +65,9 @@
 #define ULLONG_MAX  18446744073709551615ULL
 #endif
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 200300L
+#define BITINT_MAXWIDTH __SDCC_BITINT_MAXWIDTH
+#endif
+
 #endif
 

@@ -2,6 +2,8 @@
 
 	* src/mos6502/peeph.def:
 	  Add rules for redundant stores after loads.
+	* device/lib/mos6502/crt0.s
+	  Use ZP for memcpy and memset parameters.
 
 2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
 

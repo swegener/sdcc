@@ -1,3 +1,8 @@
+2022-03-08 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/peeph.def:
+	  Minor peephole optimizations.
+
 2022-03-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/as8xcxxx/ds8mch.c,

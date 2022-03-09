@@ -3,6 +3,22 @@
 ////////////////////////////////////////////////////////
 
 replace restart {
+	sta	%1
+	stx	%2
+	lda	%1
+	sta	%3
+	lda	%2
+	sta	%4
+} by {
+	sta	%1
+	stx	%2
+    ; Peephole Function Entry  - eliminated unnecessary lda
+	sta	%3
+    ; Peephole Function Entry  - eliminated unnecessary lda
+	stx	%4
+}
+
+replace restart {
         sta	%1
         stx	%2
 	lda     %1
@@ -150,11 +166,11 @@ replace restart {
 
 replace restart {
 	lda	%1
-	pla
+	%2
 } by {
 	; Peephole load 11 - removed dead lda
-	pla
-}
+	%2
+} if same(%2 'txa' 'tya' 'pla' )
 
 replace restart {
 	lda	%4

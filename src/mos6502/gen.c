@@ -786,7 +786,7 @@ storeRegTemp (reg_info * reg, bool freereg)
       storeRegTemp (m6502_reg_x, freereg);
       break;
     default:
-      emitcode("ERROR", "bad reg in storeRegTemp()");
+      emitcode("ERROR", "bad reg %02x in storeRegTemp()", regidx);
       break;
   }
 
@@ -5128,6 +5128,9 @@ genPlus (iCode * ic)
   if (genPlusIncr (ic) == true)
     goto release;
 
+  emitComment (TRACEGEN|VVDBG, "    %s - Can't Inc", __func__);
+
+
   aopOpExtToIdx (AOP (result), AOP (left), AOP (right));
 
   size = getDataSize (result);
@@ -5136,6 +5139,30 @@ genPlus (iCode * ic)
   rightOp = AOP (right);
 
   offset = 0;
+
+  // FIXME: should make this more general
+  if ( size==2 && AOP_TYPE (right) == AOP_LIT 
+       && operandLitValue (right) >= 0
+       && operandLitValue (right) <= 255
+       && sameRegs(AOP(result),AOP(left))
+       && AOP_TYPE(result) != AOP_SOF ) {
+        symbol *skipInc = safeNewiTempLabel (NULL);
+    needpulla = pushRegIfSurv (m6502_reg_a);
+        emit6502op ("clc", "");
+    loadRegFromAop (m6502_reg_a, AOP(left), 0);
+    accopWithAop ("adc", AOP(right), 0);
+    storeRegToAop (m6502_reg_a, AOP (result), 0);
+        emitBranch ("bcc", skipInc);
+    rmwWithAop ("inc", AOP(result), 1);
+    if(IS_AOP_WITH_X(AOP(result)))
+       m6502_dirtyReg(m6502_reg_x);
+    if(IS_AOP_WITH_Y(AOP(result)))
+       m6502_dirtyReg(m6502_reg_y);
+        safeEmitLabel (skipInc);
+    pullOrFreeReg (m6502_reg_a, needpulla);
+        goto release;
+     }
+
   needpulla = pushRegIfSurv (m6502_reg_a);
 
   if(size > 1 && IS_AOP_AX (AOP (left)))
@@ -5270,7 +5297,7 @@ genMinus (iCode * ic)
 
   bool carry = true;
   int size, offset = 0;
-  bool needpulla;
+  bool needpulla = false;
   bool earlystore = false;
   bool delayedstore = false;
 
@@ -5291,7 +5318,7 @@ genMinus (iCode * ic)
   if (genMinusDec (ic) == true)
     goto release;
 
-  emitComment (TRACEGEN|VVDBG, "    genMinus - Can't Dec");
+  emitComment (TRACEGEN|VVDBG, "    %s - Can't Dec", __func__);
   aopOpExtToIdx (AOP (result), AOP (left), AOP (right));
 
   size = getDataSize (result);
@@ -5300,6 +5327,30 @@ genMinus (iCode * ic)
   leftOp = AOP (left);
   rightOp = AOP (right);
   offset = 0;
+
+  if ( size==2 && AOP_TYPE (right) == AOP_LIT 
+       && operandLitValue (right) >= 0
+       && operandLitValue (right) <= 255
+       && sameRegs(AOP(result),AOP(left))
+       && AOP_TYPE(result) != AOP_SOF ) {
+    symbol *skipDec = safeNewiTempLabel (NULL);
+
+    needpulla = pushRegIfSurv (m6502_reg_a);
+    emit6502op ("sec", "");
+    loadRegFromAop (m6502_reg_a, AOP(left), 0);
+    accopWithAop ("sbc", AOP(right), 0);
+    storeRegToAop (m6502_reg_a, AOP (result), 0);
+    emitBranch ("bcs", skipDec);
+    rmwWithAop ("dec", AOP(result), 1);
+    if(IS_AOP_WITH_X(AOP(result)))
+       m6502_dirtyReg(m6502_reg_x);
+    if(IS_AOP_WITH_Y(AOP(result)))
+       m6502_dirtyReg(m6502_reg_y);
+    safeEmitLabel (skipDec);
+    pullOrFreeReg (m6502_reg_a, needpulla);
+    goto release;
+  }
+
 
   if (IS_AOP_A (rightOp))
     {

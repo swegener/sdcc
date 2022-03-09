@@ -2,6 +2,8 @@
 
 	* src/mos6502/peeph.def:
 	  Minor peephole optimizations.
+	* src/mos6502/gen.c:
+	  Special case 16b left and 8bit right in genPlus and genMinus.
 
 2022-03-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

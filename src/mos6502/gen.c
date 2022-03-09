@@ -104,6 +104,7 @@ static void aopAdrUnprepare (asmop * aop, int loffset);
 static void updateiTempRegisterUse (operand * op);
 static void rmwWithReg (char *rmwop, reg_info * reg);
 static void doTSX(void);
+static char * aopName (asmop * aop);
 
 static asmop *m6502_aop_pass[8];
 static asmop tsxaop;
@@ -295,8 +296,6 @@ regInfoStr()
 
   return outstr;
 }
-
-static char * aopName (asmop * aop);
 
 /**************************************************************************
  * Returns operand information in the passed string
@@ -613,6 +612,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   /* But it's definitely an error if there's no source. */
   if (!sreg)
     {
+ //     emitcode("ERROR","%s: src reg is null", __func__);
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL sreg in transferRegReg");
       return;
     }
@@ -4701,10 +4701,18 @@ genFunction (iCode * ic)
   genLine.lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
 
-  // FIXME: make sure registers used for parameters are marked in use
+  if(ric && ric->argreg) {
+    m6502_useReg(m6502_reg_a);
+    m6502_reg_a->isDead=0;
+    // FIXME: check if X is a parameter
+    m6502_useReg(m6502_reg_x);
+    m6502_reg_x->isDead=0;
+  }
 
   _G.stackOfs = 0;
   _G.stackPushes = 0;
+  _G.tsxStackPushes = 0;
+
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, m6502_reg_sp, 0);
 
@@ -5144,24 +5152,26 @@ genPlus (iCode * ic)
   if ( size==2 && AOP_TYPE (right) == AOP_LIT 
        && operandLitValue (right) >= 0
        && operandLitValue (right) <= 255
-       && sameRegs(AOP(result),AOP(left))
        && AOP_TYPE(result) != AOP_SOF ) {
-        symbol *skipInc = safeNewiTempLabel (NULL);
-    needpulla = pushRegIfSurv (m6502_reg_a);
-        emit6502op ("clc", "");
-    loadRegFromAop (m6502_reg_a, AOP(left), 0);
-    accopWithAop ("adc", AOP(right), 0);
-    storeRegToAop (m6502_reg_a, AOP (result), 0);
-        emitBranch ("bcc", skipInc);
-    rmwWithAop ("inc", AOP(result), 1);
-    if(IS_AOP_WITH_X(AOP(result)))
-       m6502_dirtyReg(m6502_reg_x);
-    if(IS_AOP_WITH_Y(AOP(result)))
-       m6502_dirtyReg(m6502_reg_y);
-        safeEmitLabel (skipInc);
-    pullOrFreeReg (m6502_reg_a, needpulla);
-        goto release;
-     }
+
+    if (sameRegs(AOP(result),AOP(left))) {
+      symbol *skipInc = safeNewiTempLabel (NULL);
+      needpulla = pushRegIfSurv (m6502_reg_a);
+      emit6502op ("clc", "");
+      loadRegFromAop (m6502_reg_a, AOP(left), 0);
+      accopWithAop ("adc", AOP(right), 0);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      emitBranch ("bcc", skipInc);
+      rmwWithAop ("inc", AOP(result), 1);
+      if(IS_AOP_WITH_X(AOP(result)))
+         m6502_dirtyReg(m6502_reg_x);
+      if(IS_AOP_WITH_Y(AOP(result)))
+         m6502_dirtyReg(m6502_reg_y);
+      safeEmitLabel (skipInc);
+      pullOrFreeReg (m6502_reg_a, needpulla);
+      goto release;
+    } 
+  }
 
   needpulla = pushRegIfSurv (m6502_reg_a);
 
@@ -8708,7 +8718,7 @@ genPointerGet (iCode * ic, iCode * ifx)
   if (AOP_TYPE (left) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size) 
   {
     // pointer is already in zero page & 8-bit offset
-    emitComment (TRACEGEN|VVDBG, "      genPointerGet - pointer already in zp");
+    emitComment (TRACEGEN|VVDBG, "      %s - pointer already in zp", __func__);
     bool needloady = storeRegTempIfSurv(m6502_reg_y);
 
 #if 0
@@ -8726,7 +8736,7 @@ genPointerGet (iCode * ic, iCode * ifx)
 
     if (sameRegs(AOP(left), AOP(result)) ) {
       // pointer and destination is the same - need avoid overwriting
-      emitComment (TRACEGEN|VVDBG, "        genPointerGet - sameregs");
+      emitComment (TRACEGEN|VVDBG, "        %s - sameregs", __func__);
       needpulla = storeRegTempIfSurv (m6502_reg_a);
       for (int i=size-1; i>=0; i--) {
         loadRegFromConst(m6502_reg_y, litOffset + i);
@@ -8747,6 +8757,7 @@ genPointerGet (iCode * ic, iCode * ifx)
       // otherwise use [aa],y
       if (IS_AOP_XA(AOP(result))) {
         // reverse order so A is last
+        emitComment (TRACEGEN|VVDBG, "        %s: dest XA", __func__);
         for (int i=size-1; i>=0; i--) {
           loadRegFromConst(m6502_reg_y, litOffset + i);
           emit6502op ("lda", "[%s],y", aopAdrStr ( AOP(left), 0, true ) );
@@ -8754,6 +8765,7 @@ genPointerGet (iCode * ic, iCode * ifx)
         }
       } else {
         // forward order
+        emitComment (TRACEGEN|VVDBG, "        %s: dest generic", __func__);
         if (!IS_AOP_WITH_A(AOP(result))) needpulla = storeRegTempIfSurv (m6502_reg_a);
         for (int i=0; i<size; i++) {
           loadRegFromConst(m6502_reg_y, litOffset + i);
@@ -8851,10 +8863,13 @@ genPointerGet (iCode * ic, iCode * ifx)
       goto release;
   }
  
-      
   needpulla = storeRegTempIfSurv (m6502_reg_a);
   bool needloady = storeRegTempIfSurv(m6502_reg_y);
+  bool needloadx = storeRegTempIfSurv(m6502_reg_x);
+
   int yoff = setupDPTR(left, litOffset, rematOffset, false);
+
+  emitComment (TRACEGEN|VVDBG, "        %s: generic path", __func__);
 
   if (IS_AOP_XA (AOP (result)))
             {
@@ -8870,7 +8885,8 @@ genPointerGet (iCode * ic, iCode * ifx)
           storeRegToAop (m6502_reg_a, AOP (result), offset);
         }
   }
-  loadOrFreeRegTemp(m6502_reg_y, needloady);
+  loadOrFreeRegTemp (m6502_reg_x, needloadx);
+  loadOrFreeRegTemp (m6502_reg_y, needloady);
   loadOrFreeRegTemp (m6502_reg_a, needpulla);
 
 release:
@@ -9423,14 +9439,18 @@ genPointerSet (iCode * ic)
 
   // general case
   emitComment (TRACEGEN|VVDBG,"   %s - general case ", __func__);
-  int aloc, xloc;
+  int aloc, xloc, yloc;
   deadA = m6502_reg_a->isDead;
 
   aloc = _G.tempOfs;
-  needpulla = storeRegTempIfUsed (m6502_reg_a);
+  if(IS_AOP_WITH_A(AOP(right))) needpulla = storeRegTempIfUsed (m6502_reg_a);
+  else needpulla = storeRegTempIfSurv (m6502_reg_a);
   xloc = _G.tempOfs;
-  needpullx = storeRegTempIfSurv (m6502_reg_x);
-  needpully = storeRegTempIfSurv (m6502_reg_y);
+  if(IS_AOP_WITH_X(AOP(right))) needpullx = storeRegTempIfUsed (m6502_reg_x);
+  else needpullx = storeRegTempIfSurv (m6502_reg_x);
+  yloc = _G.tempOfs;
+  if(IS_AOP_WITH_Y(AOP(right))) needpully = storeRegTempIfUsed (m6502_reg_y);
+  else needpully = storeRegTempIfSurv (m6502_reg_y);
 
   /* if bit then pack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
@@ -9451,18 +9471,21 @@ genPointerSet (iCode * ic)
   }
 #endif
 
-  int yoff = setupDPTR(result, litOffset, rematOffset, false);
-  if(IS_AOP_WITH_A (AOP(right))) {
+    int yoff = setupDPTR(result, litOffset, rematOffset, false);
+    if(IS_AOP_WITH_A (AOP(right))) {
           loadRegTempAt(m6502_reg_a, aloc);
     } 
-  if(IS_AOP_WITH_X (AOP(right))) {
-    if(needpullx) loadRegTempAt(m6502_reg_x, xloc);
-            }
+    if(IS_AOP_WITH_X (AOP(right))) {
+      if(needpullx) loadRegTempAt(m6502_reg_x, xloc);
+    }
+    if(IS_AOP_WITH_Y (AOP(right))) {
+      if(needpully) loadRegTempAt(m6502_reg_y, yloc);
+    }
 
     for (offset=0; offset<size; offset++) {
       loadRegFromAop (m6502_reg_a, AOP (right), offset);
-    loadRegFromConst(m6502_reg_y, yoff + offset);
-    emit6502op("sta", INDFMT_IY, "__DPTR");
+      loadRegFromConst(m6502_reg_y, yoff + offset);
+      emit6502op("sta", INDFMT_IY, "__DPTR");
     }
 
 release:
@@ -9564,7 +9587,8 @@ genAddrOf (iCode * ic)
       needpullx = pushRegIfSurv (m6502_reg_x);
       /* if it has an offset then we need to compute it */
       offset = _G.stackOfs + _G.stackPushes + sym->stack + 1;
-      m6502_useReg (m6502_reg_xa);
+//      doTSX();
+//      m6502_useReg (m6502_reg_xa);
       emit6502op ("tsx", "");
       m6502_dirtyReg (m6502_reg_x);
       if(smallAdjustReg(m6502_reg_x, offset)) offset=0;
@@ -10454,6 +10478,7 @@ genm6502Code (iCode *lic)
 
   init_aop_pass();
 
+  /* Generate Code for all instructions */
   for (ic = lic; ic; ic = ic->next)
     {
       initGenLineElement ();

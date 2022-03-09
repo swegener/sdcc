@@ -1,3 +1,8 @@
+2022-03-08 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Fir corner cases in genPointerSet() and genPointerGet().
+
 2022-03-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: fixed bug #3343

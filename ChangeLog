@@ -1,3 +1,8 @@
+2022-03-09 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/peeph.def:
+	  Add rules for redundant stores after loads.
+
 2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge _BitInt branch.
@@ -24,10 +29,10 @@
 	  src/stm8/main.c:
 	  Improve diagnostics for unimplemented bit-precise operators.
 
-2022-03-08 Gabriele Gorla <gorlik@yahoo.com>
+2022-03-09 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:
-	  Fir corner cases in genPointerSet() and genPointerGet().
+	  Fix corner cases in genPointerSet() and genPointerGet().
 
 2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
 

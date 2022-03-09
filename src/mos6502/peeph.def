@@ -347,7 +347,7 @@ replace restart {
 	cmp	#0x00
 } by {
 	lda	%1,%2
-	; Peephole 3a1	- eliminated unnecessary cmp #0x00
+	; Peephole cmp 2 - eliminated unnecessary cmp #0x00
 }
 
 replace restart {
@@ -355,7 +355,7 @@ replace restart {
 	cmp	#0x00
 } by {
 	%1
-	; Peephole cmp 2 - eliminated unnecessary cmp #0x00
+	; Peephole cmp 3 - eliminated unnecessary cmp #0x00
 } if same(%1 'pla' 'txa' 'tya' )
 
 replace restart {
@@ -363,7 +363,7 @@ replace restart {
 	cpx	#0x00
 } by {
 	ldx	%1
-	; Peephole cmp 3 - eliminated unnecessary cpx #0x00
+	; Peephole cmp 4 - eliminated unnecessary cpx #0x00
 }
 
 replace restart {
@@ -371,7 +371,7 @@ replace restart {
 	cpy	#0x00
 } by {
 	ldy	%1
-	; Peephole cmp 4 - eliminated unnecessary cpy #0x00
+	; Peephole cmp 5 - eliminated unnecessary cpy #0x00
 }
 
 replace restart {
@@ -379,7 +379,7 @@ replace restart {
 	cpx	#0x00
 } by {
 	%1
-	; Peephole cmp 5 - eliminated unnecessary cpx #0x00
+	; Peephole cmp 6 - eliminated unnecessary cpx #0x00
 } if same(%1 'inx' 'dex' 'tax' )
 
 replace restart {
@@ -387,7 +387,7 @@ replace restart {
 	cpy	#0x00
 } by {
 	%1
-	; Peephole cmp 6 - eliminated unnecessary cpy #0x00
+	; Peephole cmp 7 - eliminated unnecessary cpy #0x00
 } if same(%1 'iny' 'dey' 'tay' )
 
 ////////////////////////////////////////////////////////
@@ -403,32 +403,60 @@ replace restart {
 } if notVolatile(%2)
 
 replace restart {
-	ldx	%2
-	stx	%2
+	lda	%2
+	%1
+	sta	%2
 } by {
-	ldx	%2
-	; Peephole store 2 - removed redundant stx
-} if notVolatile(%2)
-
-replace restart {
-	ldy	%2
-	sty	%2
-} by {
-	ldy	%2
-	; Peephole store 3 - removed redundant sty
-} if notVolatile(%2)
+	lda	%2
+	%1
+	; Peephole store 2 - removed redundant sta
+} if notSame(%1 'pla' 'txa' 'tya'), notVolatile(%2)
 
 replace restart {
 	lda	%2
 	%1 	a
 	sta	%2
 } by {
-	; Peephole store 4 - removed redundant sta
+	; Peephole store 3 - removed redundant sta
 	%1	%2
 	lda	%2
 } if same(%1 'asl' 'rol' 'ror'), notVolatile(%2)
 
+replace restart {
+	ldx	%2
+	stx	%2
+} by {
+	ldx	%2
+	; Peephole store 4 - removed redundant stx
+} if notVolatile(%2)
 
+replace restart {
+	ldx	%2
+	%1
+	stx	%2
+} by {
+	ldx	%2
+	%1
+	; Peephole store 5 - removed redundant stx
+} if notSame(%1 'tax' 'inx' 'dex'), notVolatile(%2)
+
+replace restart {
+	ldy	%2
+	sty	%2
+} by {
+	ldy	%2
+	; Peephole store 6 - removed redundant sty
+} if notVolatile(%2)
+
+replace restart {
+	ldy	%2
+	%1
+	sty	%2
+} by {
+	ldy	%2
+	%1
+	; Peephole store 7 - removed redundant sty
+} if notSame(%1 'tay' 'iny' 'dey'), notVolatile(%2)
 
 ////////////////////////////////////////////////////////
 // Replace jmp with branch

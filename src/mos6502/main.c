@@ -82,7 +82,6 @@ static char *_keywords[] = {
   NULL
 };
 
-
 void m6502_assignRegisters (ebbIndex *);
 
 static int regParmFlg;      /* determine if we can register a parameter */
@@ -384,7 +383,7 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"bcc",   M6502OP_BR,  0,     0 },
     {"bcs",   M6502OP_BR,  0,     0 },
     {"beq",   M6502OP_BR,  0,     0 },
-    {"bit",   M6502OP_REG, 0,     0xc2 },
+    {"bit",   M6502OP_CMP, 0,     0xc2 },
     {"bmi",   M6502OP_BR,  0,     0 },
     {"bne",   M6502OP_BR,  0,     0 },
     {"bpl",   M6502OP_BR,  0,     0 },
@@ -396,9 +395,9 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"cld",   M6502OP_INH, 0,     0x08 },
     {"cli",   M6502OP_INH, 0,     0x04 },
     {"clv",   M6502OP_INH, 0,     0x40 },
-    {"cmp",   M6502OP_REG, 0,     0xc3 },
-    {"cpx",   M6502OP_REG, 0,     0xc3 },
-    {"cpy",   M6502OP_REG, 0,     0xc3 },
+    {"cmp",   M6502OP_CMP, 0,     0xc3 },
+    {"cpx",   M6502OP_CMP, 0,     0xc3 },
+    {"cpy",   M6502OP_CMP, 0,     0xc3 },
     {"dec",   M6502OP_RMW, 0,     0x82 },
     {"dex",   M6502OP_IDD, X_IDX, 0x82 },
     {"dey",   M6502OP_IDD, Y_IDX, 0x82 },
@@ -489,6 +488,7 @@ m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
         return 3;  /* absolute */
         
       case M6502OP_REG: /* standard instruction */
+      case M6502OP_CMP:
       case M6502OP_LD:
       case M6502OP_ST:
         if (arg[0] == '#') /* Immediate addressing mode */

@@ -87,6 +87,7 @@ typedef struct reg_info
 #define M6502OP_BBR 10
 #define M6502OP_IDD 11
 #define M6502OP_IDI 12
+#define M6502OP_CMP 13
 
 /* opcode table */
 typedef struct m6502opcodedata

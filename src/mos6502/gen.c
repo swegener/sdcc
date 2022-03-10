@@ -194,6 +194,7 @@ m6502_opcodeCycles(const m6502opcodedata *opcode, const char *arg)
         return 6;  /* absolute */
         
       case M6502OP_REG: /* standard instruction */
+      case M6502OP_CMP:
       case M6502OP_LD:
         if (arg[0] == '#') /* Immediate addressing mode */
 	      return 2;
@@ -377,7 +378,7 @@ emit6502op (const char *inst, const char *fmt, ...)
     reg_info *dst_reg = m6502_regWithIdx(opcode->dest);
 
     // mark the destination register dirty as necessary
-    // load and transfer are handled in the instruction generator
+    // transfers are handled in the instruction generator
     switch (opcode->type) {
       case M6502OP_LD:
         if(fmt[0]!='#' || !isdigit(fmt[1]))
@@ -403,6 +404,8 @@ emit6502op (const char *inst, const char *fmt, ...)
           }
 #endif
         m6502_dirtyReg (m6502_regWithIdx(opcode->dest));
+        break;
+      case M6502OP_CMP:
         break;
       case M6502OP_RMW: // target is accumulator
         if (!strcmp(fmt, "a")) m6502_dirtyReg (m6502_reg_a);
@@ -3892,7 +3895,7 @@ genCpl (iCode * ic)
         rmwWithReg ("com", m6502_reg_a);
             }
           else
-      if(IS_AOP_YX(AOP(IC_LEFT (ic))) && IS_AOP_YX(AOP(IC_RESULT (ic)))) {
+      if(IS_AOP_YX(AOP(left)) && IS_AOP_YX(AOP(result))) {
         bool pa = pushRegIfSurv(m6502_reg_a);
         transferRegReg(m6502_reg_y, m6502_reg_a, true);
         rmwWithReg ("com", m6502_reg_a);
@@ -3903,7 +3906,7 @@ genCpl (iCode * ic)
         pullOrFreeReg(m6502_reg_a, pa);
         }
       else 
-      if(IS_AOP_YX(AOP(IC_LEFT (ic))) && IS_AOP_XA(AOP(IC_RESULT (ic)))) {
+      if(IS_AOP_YX(AOP(left)) && IS_AOP_XA(AOP(result))) {
         transferRegReg(m6502_reg_x, m6502_reg_a, true);
         rmwWithReg ("com", m6502_reg_a);
         pushReg(m6502_reg_a, true);
@@ -3913,7 +3916,7 @@ genCpl (iCode * ic)
         pullReg(m6502_reg_a);
       } 
       else
-      if(IS_AOP_YX(AOP(IC_LEFT (ic))) && IS_AOP_AX(AOP(IC_RESULT (ic)))) {
+      if(IS_AOP_YX(AOP(left)) && IS_AOP_AX(AOP(result))) {
         transferRegReg(m6502_reg_x, m6502_reg_a, true);
         rmwWithReg ("com", m6502_reg_a);
         transferRegReg(m6502_reg_a, m6502_reg_x, true);
@@ -3921,7 +3924,7 @@ genCpl (iCode * ic)
         rmwWithReg ("com", m6502_reg_a);
       } 
       else
-      if(IS_AOP_XA(AOP(IC_LEFT (ic))) && IS_AOP_YX(AOP(IC_RESULT (ic)))) {
+      if(IS_AOP_XA(AOP(left)) && IS_AOP_YX(AOP(result))) {
         pushReg(m6502_reg_a, true);
         transferRegReg(m6502_reg_x, m6502_reg_a, true);
         rmwWithReg ("com", m6502_reg_a);
@@ -3931,7 +3934,7 @@ genCpl (iCode * ic)
         transferRegReg(m6502_reg_a, m6502_reg_x, true);
       } 
       else 
-      if(IS_AOP_AX(AOP(IC_LEFT (ic))) && IS_AOP_YX(AOP(IC_RESULT (ic)))) {
+      if(IS_AOP_AX(AOP(left)) && IS_AOP_YX(AOP(result))) {
         rmwWithReg ("com", m6502_reg_a);
         transferRegReg(m6502_reg_a, m6502_reg_y, true);
         transferRegReg(m6502_reg_x, m6502_reg_a, true);
@@ -9568,7 +9571,6 @@ genAddrOf (iCode * ic)
 {
   operand *result = IC_RESULT (ic);
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  //  asmop *aopr;
   int size, offset;
   bool needpulla, needpullx;
   struct dbuf_s dbuf;
@@ -9576,7 +9578,6 @@ genAddrOf (iCode * ic)
   emitComment (TRACEGEN, __func__);
 
   aopOp (result, ic);
-  //  aopr = AOP (result);
 
   /* if the operand is on the stack then we
      need to get the stack offset of this
@@ -10075,21 +10076,18 @@ genCritical (iCode * ic)
 static void
 genEndCritical (iCode * ic)
 {
+  operand *right  = IC_RIGHT (ic);
   emitComment (TRACEGEN, __func__);
 
-  if (IC_RIGHT (ic))
+  if (right)
     {
-      aopOp (IC_RIGHT (ic), ic);
-      loadRegFromAop (m6502_reg_a, AOP (IC_RIGHT (ic)), 0);
+      aopOp (right, ic);
+      loadRegFromAop (m6502_reg_a, AOP (right), 0);
       emit6502op ("pha", "");
-      emit6502op ("plp", "");
       m6502_freeReg (m6502_reg_a);
-      freeAsmop (IC_RIGHT (ic), NULL);
+      freeAsmop (right, NULL);
     }
-  else
-    {
-      emit6502op ("plp", "");
-    }
+  emit6502op ("plp", "");
 }
 
 static void

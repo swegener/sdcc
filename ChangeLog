@@ -1,3 +1,15 @@
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* Merge _BitInt branch.
+
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  support/regression/tests/bitint.c:
+	  Bit-precise types and bit-fields thereof for z80-related (except sm83, which only gets support up to a width of 8 bits for now).
+
 2022-03-09 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c,
@@ -20,17 +32,17 @@
 	* device/lib/mos6502/crt0.s:
 	  Use ZP for memcpy and memset parameters.
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
 	  support/regression/tests/bitintbitfield.c:
 	  Fix signed bit-precise bit-fields.
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCopt.c,
 	  src/SDCCsymt.h,
@@ -40,7 +52,7 @@
 	  support/regression/tests/bitintarith.c:
 	  Multiplicative operators for bit-precise integers.
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCopt.c,
 	  src/stm8/main.c:
@@ -51,7 +63,7 @@
 	* src/mos6502/gen.c:
 	  Fix corner cases in genPointerSet() and genPointerGet().
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
 	  src/SDCCval.c,
@@ -60,7 +72,7 @@
 	  src/stm8/gen.c:
 	  Various _BitInt fixes.
 
-2022-03-09 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
 	  src/SDCCsymt.c,
@@ -89,7 +101,7 @@
 	  sdas/asxxsrc/asxxxx.h:
 	  Fix ASxxxx warnings by merging with upstream for [bugs:#3347].
 
-2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-08 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCC.lex,
 	  src/SDCCerr.c,
@@ -103,7 +115,7 @@
 	  src/stm8/gen.c:
 	  Infrastructure for bit-precise integer literals.
 
-2022-03-08 Philipp Klaus Krause <pkk AT spth.de>
+2022-03-08 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* device/include/limits.h,
 	  src/SDCC.lex,

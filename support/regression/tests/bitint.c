@@ -33,13 +33,17 @@ void testBitInt(void)
 	ASSERT(f() == (bitinttype)42);
 	ASSERT(g(0) == (bitinttype)1);
 
+#if __SDCC_BITINT_MAXWIDTH >= 4 // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 	ASSERT(_Generic((_BitInt(4))(4) + (_BitInt(6))(6), default: 1, _BitInt(6): 0) == 0); // _BitInt does not promote to int, even when narrower than int.
 	//BUG! SDCC makes 6 char instead of int! ASSERT(_Generic((_BitInt(4))(4) + 6, default: 1, int: 0) == 0); // But it does promote to int when the other operand is int.
 	//BUG! SDCC makes 6 char instead of int! ASSERT(_Generic((_BitInt(CHAR_BIT * sizeof(int)))(4) + 6, default: 1, int: 0) == 0); // Even when both are the same size.
 
 	ASSERT(_Generic((_BitInt(4))(4) + (_BitInt(6))(300), default: 1, _BitInt(6): 0) == 0); // _BitInt does not promote to int, even when narrower than int.
 	ASSERT(_Generic((_BitInt(4))(4) + 300, default: 1, int: 0) == 0); // But it does promote to int when the other operand is int.
+#if __SDCC_BITINT_MAXWIDTH >= 32 // 32 should work on most platforms, including hosts with 32-bit int // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 	ASSERT(_Generic((_BitInt(CHAR_BIT * sizeof(int)))(4) + 300, default: 1, int: 0) == 0); // Even when both are the same size.
+#endif
+#endif
 	
 	bitinttype b = 1;
 	ASSERT(_Generic(++b, default: 1, bitinttype: 0) == 0); // ++a is not the same a += 1, but a += (bitinttype)1.

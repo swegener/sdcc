@@ -44171,8 +44171,8 @@ Z80 SDCC calling convention, version 1
 
 \begin_layout Standard
 This calling convention can be chosen per function via __sdcccall(1).
- 8-bit return values are passed in a, 16-bit values in de, 32-bit values
- in hlde.
+ 8-bit return values are passed in a, 16-bit values in de, 24-bit values
+ in lde, 32-bit values in hlde.
  Larger return values are passed in memory in a location specified by the
  caller through a hidden pointer argument.
 \end_layout
@@ -44215,8 +44215,8 @@ Z80 SDCC calling convention, version 0
 \begin_layout Standard
 This calling convention can be chosen per function via __sdcccall(0).
  All parameters are passed on the stack, right-to-left.
- 8-bit return values are passed in l, 16-bit values in hl, 32-bit values
- in dehl.
+ 8-bit return values are passed in l, 16-bit values in hl, 24-bit values
+ in enhl, 32-bit values in dehl.
  Except for the SM83, where 8-bit values are passed in e, 16-bit values
  in de, 32-bit values in hlde.
  Larger return values are passed in memory in a location specified by the
@@ -44251,8 +44251,8 @@ Rabbit SDCC calling convention, version 1
 
 \begin_layout Standard
 This calling convention can be chosen per function via __sdcccall(1).
- 8-bit return values are passed in a, 16-bit values in hl, 32-bit values
- in hlde.
+ 8-bit return values are passed in a, 16-bit values in hl, 24-bit values
+ in lde, 32-bit values in hlde.
  Larger return values are passed in memory in a location specified by the
  caller through a hidden pointer argument.
 \end_layout

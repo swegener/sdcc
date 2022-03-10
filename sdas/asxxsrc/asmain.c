@@ -1131,6 +1131,22 @@ loop:
                                         case O_IFLE:    n = (((v_sint) n) <= 0);        break;
                                         }
                                         break;
+				case O_IFB:	/* .if b,.... */
+				case O_IFNB:	/* .if nb,.... */
+					n = comma(0) ? 0 : 1;
+					if (n) {
+						getxstr(id);
+						if (*id == '\0') {
+							n = 0;
+						}
+						comma(0);
+					}
+					switch (mp->m_valu) {
+					default:
+					case O_IFB:	n = (((v_sint) n) == 0);	break;
+					case O_IFNB:	n = (((v_sint) n) != 0);	break;
+					}
+					break;
 				case O_IFDEF:	/* .if def,.... */
 				case O_IFNDEF:	/* .if ndef,.... */
 					getid(id, -1);
@@ -1146,6 +1162,17 @@ loop:
 					default:
 					case O_IFDEF:	n = (((v_sint) n) != 0);	break;
 					case O_IFNDEF:	n = (((v_sint) n) == 0);	break;
+					}
+					break;
+				case O_IFIDN:	/* .if idn,.... */
+				case O_IFDIF:	/* .if dif,.... */
+					getxstr(id);
+					getxstr(equ);
+					n = symeq(id, equ, zflag);
+					switch (mp->m_valu) {
+					default:
+					case O_IFIDN:	n = (((v_sint) n) != 0);	break;
+					case O_IFDIF:	n = (((v_sint) n) == 0);	break;
 					}
 					break;
                                 case O_IFF:     /* .if f */
@@ -1305,6 +1332,53 @@ loop:
                                 case O_IIFLE:   n = (((v_sint) n) <= 0);        break;
                                 }
                                 break;
+
+			case O_IIFB:	/* .iif b,.... */
+			case O_IIFNB:	/* .iif nb,.... */
+				n = comma(0) ? 0 : 1;
+				if (n) {
+					getxstr(id);
+					if (*id == '\0') {
+						n = 0;
+					}
+					comma(0);
+				}
+				switch (mp->m_valu) {
+				default:
+				case O_IIFB:	n = (((v_sint) n) == 0);	break;
+				case O_IIFNB:	n = (((v_sint) n) != 0);	break;
+				}
+				break;
+
+			case O_IIFDEF:	/* .iif def,.... */
+			case O_IIFNDEF:	/* .iif ndef,.... */
+				getid(id, -1);
+				if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
+					n = 1;
+				} else
+				if ((sp = slookup(id)) != NULL) {
+					n = (sp->s_type == S_USER) ? 1 : 0;
+				} else {
+					n = 0;
+				}
+				switch (mp->m_valu) {
+				default:
+				case O_IIFDEF:	n = (((v_sint) n) != 0);	break;
+				case O_IIFNDEF:	n = (((v_sint) n) == 0);	break;
+				}
+				break;
+
+			case O_IIFIDN:	/* .iif idn,.... */
+			case O_IIFDIF:	/* .iif dif,.... */
+				getxstr(id);
+				getxstr(equ);
+				n = symeq(id, equ, zflag);
+				switch (mp->m_valu) {
+				default:
+				case O_IIFIDN:	n = (((v_sint) n) != 0);	break;
+				case O_IIFDIF:	n = (((v_sint) n) == 0);	break;
+				}
+				break;
 
                         default:
                                 n = 0;

@@ -1,3 +1,11 @@
+2022-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asxxsrc/asmain.c,
+	  sdas/asxxsrc/asxxxx.h:
+	  Merge all kinds of .if directives from upstream ASxxxx.
+	* sdas/asgb/gbpst.c:
+	  Enable in sm83 for testing.
+
 2022-03-09 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/peeph.def:

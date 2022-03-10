@@ -545,17 +545,27 @@ struct  sym
 #define   O_IFLE     9          /* .ifle (BGP) */
 #define   O_IFEQ     10         /* .ifeq (BGP) */
 #define   O_IFNE     11         /* .ifne (BGP) */
+#define	  O_IFB      12         /* .ifb */
+#define	  O_IFNB     13	        /* .ifnb */
+#define	  O_IFIDN    14         /* .ifidn */
+#define	  O_IFDIF    15         /* .ifdif */
 #define   O_IFEND    20         /* end of .if conditionals */
 #define   O_IIF      20         /* .iif */
 #define   O_IIFF     21         /* .iiff */
 #define   O_IIFT     22         /* .iift */
 #define   O_IIFTF    23         /* .iiftf */
+#define	  O_IIFDEF   24	        /* .iifdef */
+#define	  O_IIFNDEF  25	        /* .iifndef */
 #define   O_IIFGT    26         /* .iifgt */
 #define   O_IIFLT    27         /* .iiflt */
 #define   O_IIFGE    28         /* .iifge */
 #define   O_IIFLE    29         /* .iifle */
 #define   O_IIFEQ    30         /* .iifeq */
 #define   O_IIFNE    31         /* .iifne */
+#define	  O_IIFB     32	        /* .iifb */
+#define	  O_IIFNB    33	        /* .iifnb */
+#define	  O_IIFIDN   34	        /* .iifidn */
+#define	  O_IIFDIF   35	        /* .iifdif */
 #define   O_IIFEND   40         /* end of .iif conditionals */
 #define   O_ELSE     40         /* .else */
 #define   O_ENDIF    41         /* .endif */

@@ -7077,7 +7077,11 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
 
   D (emit2 ("; genLeftShiftLiteral", ""));
 
-  size = getSize (operandType (result));
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  size = getSize (resulttype);
 
   aopOp (left, ic);
   aopOp (result, ic);
@@ -7085,7 +7089,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
   if (shCount > (size * 8))
     shCount = size * 8;
 
-  if (size == 2 && shCount < 16 && shCount >= 13 && regDead (A_IDX, ic) && regDead (X_IDX, ic))
+  if (size == 2 && !maskedtopbyte && shCount < 16 && shCount >= 13 && regDead (A_IDX, ic) && regDead (X_IDX, ic))
     {
       cheapMove (ASMOP_A, 0, left->aop, 0, false);
       emit3w (A_CLRW, ASMOP_X, 0);
@@ -7195,6 +7199,11 @@ swap:
         }
       while (shCount--)
         emit3 (A_SLL, ASMOP_A, 0);
+      if (maskedtopbyte)
+        {
+          emit2 ("and", "a, #0x%02x", topbytemask);
+          cost (2, 1);
+        }
       swap_from_a (shiftop->aopu.bytes[0].byteu.reg->rIdx);
       genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;
@@ -7206,6 +7215,13 @@ mul:
       cost (2, 1);
       emit2 ("mul", aopInReg (shiftop, 0, YL_IDX) ? "y, a" : "x, a");
       cost (4, 1 + aopInReg (shiftop, 0, YL_IDX));
+      if (maskedtopbyte)
+        {
+          cheapMove (ASMOP_A, 0, shiftop, result->aop->size - 1, false);
+          emit2 ("and", "a, #0x%02x", topbytemask);
+          cost (2, 1);
+          cheapMove (shiftop, result->aop->size - 1, ASMOP_A, 0, false);
+        }
       if (!regDead (A_IDX, ic))
         pop (ASMOP_A, 0, 1);
       genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -7244,7 +7260,21 @@ std:
             i++;
           }
       }
- 
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!regDead (A_IDX, ic) || shiftop->regs[A_IDX] >= 0 && shiftop->regs[A_IDX] != result->aop->size - 1)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, shiftop, result->aop->size - 1, false);
+      emit2 ("and", "a, #0x%02x", topbytemask);
+      cost (2, 1);
+      cheapMove (shiftop, result->aop->size - 1, ASMOP_A, 0, false);
+      if (pushed_a)
+        pop (ASMOP_A, 0, 1);
+    }
 
   genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
@@ -7471,6 +7501,26 @@ postshift:
         pop (ASMOP_A, 0, 1);
       genMove (result->aop, shiftop, false, regDead (X_IDX, ic), regDead (Y_IDX, ic));
     } 
+
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] != result->aop->size - 1)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, result->aop, result->aop->size - 1, false);
+      emit2 ("and", "a, #0x%02x", topbytemask);
+      cost (2, 1);
+      cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, false);
+      if (pushed_a)
+        pop (ASMOP_A, 0, 1);
+    }
 
   freeAsmop (left);
   freeAsmop (result);

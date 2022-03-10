@@ -7472,6 +7472,18 @@ genPlus (iCode * ic)
                   emit2 ("add hl, de");
                   regalloc_dry_run_cost += 1;
 
+                  if (maskedtopbyte)
+                    {
+                      if (!isRegDead (A_IDX, ic))
+                        _push (PAIR_AF);
+                      emit2 ("ld a, h");
+                      emit2 ("and a, #0x%02x", topbytemask);
+                      emit2 ("ld h, a");
+                      regalloc_dry_run_cost += 4;
+                      if (!isRegDead (A_IDX, ic))
+                        _pop (PAIR_AF);
+                    }
+
                   if (!isPairDead (PAIR_DE, ic))
                     _pop (PAIR_DE);
                 }
@@ -11628,6 +11640,26 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
         }
     }
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!isRegDead (A_IDX, ic) || shiftaop->regs[A_IDX] >= 0 && shiftaop->regs[A_IDX] != result->aop->size - 1)
+        {
+          _push (PAIR_AF);
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, shiftaop, result->aop->size - 1, true);
+      emit2 ("and a, #0x%02x", topbytemask);
+      cost (1, 1);
+      cheapMove (shiftaop, result->aop->size - 1, ASMOP_A, 0, true);
+      if (pushed_a)
+        _pop (PAIR_AF);
+    }
+
   if (shiftaop != result->aop)
     {
       if (isPair (result->aop))
@@ -11979,6 +12011,27 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
       if (!isRegDead (A_IDX, ic))
         _pop (PAIR_AF);
     }
+
+
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!isRegDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] != result->aop->size - 1)
+        {
+          _push (PAIR_AF);
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, result->aop, result->aop->size - 1, true);
+      emit2 ("and a, #0x%02x", topbytemask);
+      cost (1, 1);
+      cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, true);
+      if (pushed_a)
+        _pop (PAIR_AF);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -12286,6 +12339,26 @@ genLeftShift (const iCode *ic)
 end:
   if (!shift_by_lit && requiresHL (shiftop)) // Shift by 0 skips over hl adjustments.
     spillPair (PAIR_HL);
+
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!isRegDead (A_IDX, ic) || shiftop->regs[A_IDX] >= 0 && shiftop->regs[A_IDX] != result->aop->size - 1)
+        {
+          _push (PAIR_AF);
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, shiftop, result->aop->size - 1, true);
+      emit2 ("and a, #0x%02x", topbytemask);
+      cost (1, 1);
+      cheapMove (shiftop, result->aop->size - 1, ASMOP_A, 0, true);
+      if (pushed_a)
+        _pop (PAIR_AF);
+    }
 
   genMove_o (result->aop, 0, shiftop, 0, result->aop->size, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), true, true);
 
@@ -14556,7 +14629,7 @@ genCast (const iCode *ic)
         (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
 
       if (!isRegDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] != result->aop->size - 1)
-        UNIMPLEMENTED;
+        _push (PAIR_AF), pushed_a = true;
       genMove (result->aop, right->aop, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic));
       cheapMove (ASMOP_A, 0, result->aop, result->aop->size - 1, true);
       emit2 ("and a, #0x%02x", topbytemask);

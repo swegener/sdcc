@@ -51,9 +51,9 @@ isReturned(const char *what)
       spec = &(sym->etype->select.s);
       if(spec->noun == V_VOID)
         size = 0;
-      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
+      else if(spec->noun == V_CHAR || spec->noun == V_BOOL || spec->noun == V_BITINT && SPEC_BITINTWIDTH(sym->etype) <= 8)
         size = 1;
-      else if(spec->noun == V_INT && !(spec->b_long))
+      else if(spec->noun == V_INT && !(spec->b_long) || spec->noun == V_BITINT && SPEC_BITINTWIDTH(sym->etype) <= 16)
         size = 2;
       else
         size = 4;

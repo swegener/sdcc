@@ -1,7 +1,30 @@
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* Merge _BitInt branch.
+
 2022-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/SDCCpeeph.c:
 	  Calculate size of general ASxxx directives, apply [patches:428].
+
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCmain.c
+	  src/pdk/gen.c
+	  src/pdk/main.c
+	  src/pdk/peep.c
+	  Support for bit-precise integer types on pdk.
+	* src/stm8/gen.c,
+	  src/stm8/main.c,
+	  src/z80/gen.c,
+	  support/regression/tests/bitintarith.c:
+	  Fix left shift of bit-precise integer types.
+
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/z80/gen.c,
+	  src/z80/main.c:
+	  Support for bit-precise integer types on sm83 up to a width of 16.
 
 2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

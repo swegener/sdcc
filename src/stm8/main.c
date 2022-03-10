@@ -479,7 +479,7 @@ PORT stm8_port =
     3,                          /* banked func ptr */
     1,                          /* bit */
     4,                          /* float */
-    64,                         /* Supports bit-precise types up to _BitInt (64) */
+    64,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */

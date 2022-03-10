@@ -1466,6 +1466,10 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 {
   int size = result_aop->size;
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
   bool started = false;
   bool pushed_a = false;
   bool pushed_p = false;
@@ -1479,7 +1483,9 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 
   for (int i = 0; i < size; i++)
     {
-      if (!started && right_aop->type == AOP_LIT && aopIsLitVal (right_aop, i, 1, 0x00))
+      bool maskedbyte = maskedtopbyte && (i + 1 == size);
+
+      if (!started && !maskedbyte && right_aop->type == AOP_LIT && aopIsLitVal (right_aop, i, 1, 0x00))
         {
           cheapMove (result_aop, i, left_aop, i, regDead (A_IDX, ic), true, true);
           if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)
@@ -1489,7 +1495,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             }
           continue;
         }
-      else if (!started && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00) &&
+      else if (!started && !maskedbyte && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00) &&
         (right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
         {
           emit2 ("neg", "%s", aopGet (right_aop, i));
@@ -1498,7 +1504,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           continue;
         }
       else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
-        !started && i + 1 == size && aopInReg (left_aop, i, A_IDX) &&
+        !started && !maskedbyte && i + 1 == size && aopInReg (left_aop, i, A_IDX) &&
         (right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
         {
           emit2 ("nadd", "%s, a", aopGet (right_aop, i));
@@ -1506,7 +1512,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
           continue;
         }
-      else if (!started && aopIsLitVal (right_aop, i, 1, 0x01) &&
+      else if (!started && !maskedbyte && aopIsLitVal (right_aop, i, 1, 0x01) &&
         (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && aopSame (left_aop, i, result_aop, i, 1))
         {
           emit2 ("dec", "%s", aopGet (left_aop, i));
@@ -1514,7 +1520,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
           continue;
         }
-      else if (!started && i + 1 == size && aopIsLitVal (right_aop, i, 1, 0xff) &&
+      else if (!started && !maskedbyte && i + 1 == size && aopIsLitVal (right_aop, i, 1, 0xff) &&
         (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && aopSame (left_aop, i, result_aop, i, 1))
         {
           emit2 ("inc", "%s", aopGet (left_aop, i));
@@ -1522,7 +1528,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
           continue;
         }
-      else if (started && (left_aop->type == AOP_DIR || left_aop->type == AOP_REGDIR || left_aop->type == AOP_REG) && aopIsLitVal (right_aop, i, 1, 0x00) && aopSame (left_aop, i, result_aop, i, 1))
+      else if (started && !maskedbyte && (left_aop->type == AOP_DIR || left_aop->type == AOP_REGDIR || left_aop->type == AOP_REG) && aopIsLitVal (right_aop, i, 1, 0x00) && aopSame (left_aop, i, result_aop, i, 1))
         {
           emit2 ("subc", "%s", aopGet (left_aop, i));
           cost (1, 1);
@@ -1643,6 +1649,13 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
               started = true;
             }
         }
+
+      if (maskedbyte)
+        {
+          emit2 ("and", "a, #0x%02x", topbytemask);
+          cost (2, 1);
+        }
+
       if (i + 1 < size && aopInReg (result_aop, i, P_IDX) && (left_aop->type == AOP_STK || right_aop->type == AOP_STK))
         {
           if (!pushed_a)
@@ -2168,6 +2181,10 @@ genPlus (const iCode *ic)
   aopOp (right, ic);
   aopOp (result, ic);
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
   int size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
@@ -2194,30 +2211,32 @@ genPlus (const iCode *ic)
 
   for (int i = 0; i < size; i++)
     {
+       bool maskedbyte = maskedtopbyte && (i + 1 == size);
+
        if (aopInReg (left->aop, i, P_IDX) || aopInReg (right->aop, i, P_IDX))
          p_dead = true;
 
-       if (!started && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x01) && aopSame (left->aop, i, result->aop, i, 1))
+       if (!started && !maskedbyte && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x01) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("inc", "%s", aopGet (left->aop, i));
           cost (1, 1);
           started = true;
           continue;
         }
-       else if (!started && !moved_to_a && i + 1 == size && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0xff) && aopSame (left->aop, i, result->aop, i, 1))
+       else if (!started && !maskedbyte && !moved_to_a && i + 1 == size && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0xff) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("dec", "%s", aopGet (left->aop, i));
           cost (1, 1);
           started = true;
           continue;
         }
-      else if (started && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x00) && aopSame (left->aop, i, result->aop, i, 1))
+      else if (started && !maskedbyte && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x00) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("addc", "%s", aopGet (left->aop, i));
           cost (1, 1);
           continue;
         }
-      else if (!started && !moved_to_a && right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 1, 0x00))
+      else if (!started && !maskedbyte && !moved_to_a && right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 1, 0x00))
         {
           cheapMove (result->aop, i, left->aop, i, regDead (A_IDX, ic), p_dead, true);
           if (aopInReg (result->aop, i, A_IDX) && i + 1 < size)
@@ -2234,7 +2253,7 @@ genPlus (const iCode *ic)
           pushed_a = true;
         }
 
-      if (!moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && right->aop->type != AOP_STK && aopSame (left->aop, i, result->aop, i, 1))
+      if (!moved_to_a && !maskedbyte && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && right->aop->type != AOP_STK && aopSame (left->aop, i, result->aop, i, 1))
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true, p_dead && !aopInReg (left->aop, i, P_IDX), !started);
           emit2 (started ? "addc" : "add", "%s, a", aopGet (left->aop, i));
@@ -2318,6 +2337,13 @@ genPlus (const iCode *ic)
               started = true;
             }
         }
+
+      if (maskedbyte)
+        {
+          emit2 ("and", "a, #0x%02x", topbytemask);
+          cost (2, 1);
+        }
+
       if (i + 1 < size && aopInReg (result->aop, i, P_IDX) && (left->aop->type == AOP_STK || right->aop->type == AOP_STK))
         {
           if (!pushed_a)
@@ -3580,6 +3606,26 @@ genLeftShift (const iCode *ic)
     }
 
 release:
+
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+  if (maskedtopbyte)
+    {
+      bool pushed_a = false;
+      if (!regDead (A_IDX, ic) || size > 1 && aopInReg (result->aop, 0, A_IDX))
+        {
+          pushAF ();
+          pushed_a = true;
+        }
+      cheapMove (ASMOP_A, 0, result->aop, result->aop->size - 1, true, false, true);
+      emit2 ("and", "a, #0x%02x", topbytemask);
+      cost (1, 1);
+      cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, true, false, true);
+      if (pushed_a)
+        popAF ();
+    }
 
   if (pushed_p)
     popPF (regDead (A_IDX, ic));
@@ -4858,6 +4904,41 @@ genCast (const iCode *ic)
 
   bool pushed_a = false;
 
+  // Cast to _BitInt can require mask of top byte.
+  if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
+    {
+      aopOp (right, ic);
+      aopOp (result, ic);
+
+      unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+        (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+
+      if (!regDead (A_IDX, ic))
+        {
+          pushAF ();
+          pushed_a = true;
+        }
+      genMove (result->aop, right->aop, true, regDead (P_IDX, ic));
+      cheapMove (ASMOP_A, 0, result->aop, result->aop->size - 1, true, false, true);
+      emit2 ("and", "a, #0x%02x", topbytemask);
+      cost (2, 1);
+      if (!SPEC_USIGN (resulttype)) // Sign-extend
+        {
+          symbol *const tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          emit2 ("ceqsn", "a, #0x%02x", 0x80 >> (8 - SPEC_BITINTWIDTH (resulttype) % 8));
+          emit2 ("nop", "");
+          emit2 ("t0sn.io", "f, c");
+          if (tlbl)
+            emit2 ("goto", "!tlabel", labelKey2num (tlbl->key));
+          emit2 ("or", "a, #0x%02x", ~topbytemask & 0xff);
+          cost (5, 5);
+          emitLabel (tlbl);
+        }
+      cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, true, false, true);
+
+      goto release;
+    }
+
   if ((getSize (resulttype) <= getSize (righttype) || !IS_SPEC (righttype) || (SPEC_USIGN (righttype) || IS_BOOLEAN (righttype))) &&
     (!IS_BOOLEAN (resulttype) || IS_BOOLEAN (righttype)))
     {
@@ -4935,6 +5016,7 @@ genCast (const iCode *ic)
         popAF ();
     }
 
+release:
   if (pushed_a)
     popAF ();
 

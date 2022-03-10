@@ -1,3 +1,8 @@
+2022-03-10 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/SDCCpeeph.c:
+	  Calculate size of general ASxxx directives, apply [patches:428].
+
 2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.

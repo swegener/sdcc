@@ -23544,6 +23544,17 @@ status open
 \end_inset
 
 , does not.
+ Note: 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+xx
+\end_layout
+
+\end_inset
+
+ is a placeholder for the desired version of the C standard.
 \end_layout
 
 \begin_layout Subsection
@@ -23563,6 +23574,17 @@ status open
 \end_inset
 
 .
+ Note: 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+xx
+\end_layout
+
+\end_inset
+
+ is a placeholder for the desired version of the C standard.
 \end_layout
 
 \begin_layout Subsection
@@ -23606,6 +23628,17 @@ status open
 
  can result in failing programs when arguments to vararg functions are explicitl
 y cast.
+ Note: 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+xx
+\end_layout
+
+\end_inset
+
+ is a placeholder for the desired version of the C standard.
 \end_layout
 
 \begin_layout Section

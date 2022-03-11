@@ -1,5 +1,10 @@
 2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/pdk/main.c:
+	  Limit _BitInt size to 16 for pdk (temporarily, until a stack parameter passing issue is fixed).
+
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* Merge _BitInt branch.
 
 2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>

@@ -473,9 +473,12 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
 bool _ds390_nativeMulCheck(iCode *ic, sym_link *left, sym_link *right)
 {
-    return
-      getSize (left) == 1 && getSize (right) == 1 ||
-      options.useAccelerator && getSize (left) == 2 && getSize (right) == 2;
+  if (IS_BITINT (OP_SYM_TYPE (IC_RESULT(ic))) && SPEC_BITINTWIDTH (OP_SYM_TYPE (IC_RESULT(ic))) % 8)
+    return false;
+
+  return
+    getSize (left) == 1 && getSize (right) == 1 ||
+    options.useAccelerator && getSize (left) == 2 && getSize (right) == 2;
 }
 
 /* Indicate which extended bit operations this port supports */
@@ -1628,8 +1631,8 @@ PORT ds400_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 0 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */

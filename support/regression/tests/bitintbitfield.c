@@ -24,6 +24,12 @@ struct {
   _BitInt(4) b4 : 4;
   unsigned int b : 1;
 } bf = {-2, 2, 1};
+
+struct {
+  unsigned _BitInt(3) b2 : 2;
+  unsigned _BitInt(4) b3 : 3;
+  unsigned _BitInt(4) b4 : 4;
+} ubf2 = {2, 2, 5};
 #endif
 
 void testBitIntBitField(void)
@@ -40,6 +46,15 @@ void testBitIntBitField(void)
 	ASSERT (bf.b3 == -2);
 	ASSERT (bf.b4 == 2);
 	ASSERT (bf.b == 1);
+
+	ASSERT (ubf2.b2 == 2);
+	ASSERT (ubf2.b3 == 2);
+	ASSERT (ubf2.b4 == 5);
+
+	ubf2.b3 = 7;
+	ASSERT (ubf2.b2 == 2);
+	ASSERT (ubf2.b3 == 7);
+	ASSERT (ubf2.b4 == 5);
 #endif
 }
 

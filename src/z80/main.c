@@ -1348,7 +1348,7 @@ PORT r2k_port =
     z80canJoinRegs,
     z80canSplitReg,
   },
-  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, BitInt (in bits) */
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4, 64 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */

@@ -2328,6 +2328,10 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
 
   etype2 = type2 ? getSpec (type2) : type1;
 
+#if 0
+  printf("computeType "); printTypeChain (type1, 0); printf (" "); printTypeChain (type2, 0); printf ("\n"); 
+#endif
+
   /* Conditional operator has some special type conversion rules */
   if (op == ':')
     {
@@ -2426,20 +2430,35 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   else if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
     rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ? copyLinkChain (type1) : copyLinkChain (type2);
 
-  /* if only one of them is a bit variable then the other one prevails */
+  /* otherwise if only one of them is a bit variable then the other one prevails
+     exceptions for _BitInt apply */
   else if (IS_BITVAR (etype1) && !IS_BITVAR (etype2))
     {
-      rType = copyLinkChain (type2);
-      /* bitfield can have up to 16 bits */
-      if (getSize (etype1) > 1)
-        SPEC_NOUN (getSpec (rType)) = V_INT;
+      if (SPEC_NOUN (etype1) == V_BITINTBITFIELD && SPEC_BITINTWIDTH(etype1) > bitsForType (type2))
+        {
+          rType = copyLinkChain (type1);
+        }
+      else
+        {
+          rType = copyLinkChain (type2);
+          /* int bitfield can have up to 16 bits */
+          if (getSize (etype1) > 1)
+            SPEC_NOUN (getSpec (rType)) = V_INT;
+        }
     }
   else if (IS_BITVAR (etype2) && !IS_BITVAR (etype1))
     {
-      rType = copyLinkChain (type1);
-      /* bitfield can have up to 16 bits */
-      if (getSize (etype2) > 1)
-        SPEC_NOUN (getSpec (rType)) = V_INT;
+    if (SPEC_NOUN (etype2) == V_BITINTBITFIELD && SPEC_BITINTWIDTH(etype2) > bitsForType (type1))
+        {
+          rType = copyLinkChain (type2);
+        }
+      else
+        {
+           rType = copyLinkChain (type1);
+           /* int bitfield can have up to 16 bits */
+           if (getSize (etype2) > 1)
+            SPEC_NOUN (getSpec (rType)) = V_INT;
+        }
     }
 
   else if (bitsForType (type1) > bitsForType (type2))
@@ -2495,6 +2514,10 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
           SPEC_SCLS (reType) = 0;
           SPEC_USIGN (reType) = 0;
           return rType;
+        }
+      else if (SPEC_NOUN (reType) == V_BITINTBITFIELD) // _BitInt(N) bit-field promotes to _BitInt(N).
+        {
+          SPEC_NOUN (reType) = V_BITINT ;
         }
       else if (IS_BITFIELD (reType))
         {
@@ -2820,11 +2843,10 @@ compareType (sym_link *dest, sym_link *src)
 
   if (SPEC_NOUN (dest) == V_BITINT && SPEC_NOUN (src) == V_BITINT)
     {
-      if (SPEC_BITINTWIDTH (dest) == SPEC_BITINTWIDTH (src))
-        return 1;
-      if (SPEC_USIGN (dest) != SPEC_USIGN (src))
-        return -2;
-      return -1;
+      if (SPEC_BITINTWIDTH (dest) != SPEC_BITINTWIDTH (src) ||
+        SPEC_USIGN (dest) && !SPEC_USIGN (src) && SPEC_BITINTWIDTH (dest) % 8) // Cast from sgined to unsigned type cannot be omitted, since it requires masking top bits.
+        return -1;
+      return (SPEC_USIGN (dest) == SPEC_USIGN (src) ? 1 : -2);
     }
 
   /* it is a specifier */

@@ -1,7 +1,37 @@
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* Merge _BitInt branch.
+
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCval.c,
+	  src/z80/gen.c:
+	  support/regression/tests/widebitintbitfield.c:
+	  Fixes for bit-precise bit-fields.
+
 2022-03-11 Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
 
 	* src/pdk/gen.c:
 	  Fix compile by gcc 9.4.0: label must be on statement
+	  
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCglue.c,
+	  src/SDCCsymt.c,
+	  src/SDCCval.c,
+	  support/regression/tests/bitint.c,
+	  support/regression/tests/bitintbitfield.c:
+	  Fix issues in casts between bitprecise types of different sign.
+
+2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/ds390/main.c,
+	  src/hc08/main.c,
+	  src/mcs51/main.c,
+	  src/pic14/main.c,
+	  src/pic16/main.c:
+	  Explicitly state _BitInt non-support.
 
 2022-03-10 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -12844,10 +12844,9 @@ genUnpackBits (operand * result, int pair, const iCode *ic)
 
   /* TODO: what if pair == PAIR_DE ? */
   if (getPairId (result->aop) == PAIR_HL ||
-      result->aop->type == AOP_REG && rsize >= 2 && (result->aop->aopu.aop_reg[0]->rIdx == L_IDX
+      result->aop->type == AOP_REG && rsize == 2 && (result->aop->aopu.aop_reg[0]->rIdx == L_IDX
           || result->aop->aopu.aop_reg[0]->rIdx == H_IDX))
     {
-      wassertl (rsize == 2, "HL must be of size 2");
       emit2 ("!ldahli");
       if (result->aop->type != AOP_REG || result->aop->aopu.aop_reg[0]->rIdx != H_IDX)
         {
@@ -13133,7 +13132,7 @@ genPointerGet (const iCode *ic)
     }
 
   /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_SM83 && !IS_R2K && !IS_R2KA && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
+  if (!IS_SM83 && !IS_R2K && !IS_R2KA && !IS_BITVAR (retype) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 

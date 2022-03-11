@@ -361,6 +361,9 @@ oclsExpense (struct memmap *oclass)
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
+  if (IS_BITINT (OP_SYM_TYPE (IC_RESULT(ic))) && SPEC_BITINTWIDTH (OP_SYM_TYPE (IC_RESULT(ic))) % 8)
+    return false;
+
   return getSize (left) == 1 && getSize (right) == 1;
 }
 
@@ -845,8 +848,8 @@ PORT mcs51_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 0 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {

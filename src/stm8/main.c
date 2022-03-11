@@ -465,7 +465,7 @@ PORT stm8_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  /* Sizes */
   {
     1,                          /* char */
     2,                          /* short */

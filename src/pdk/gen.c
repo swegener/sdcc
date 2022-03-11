@@ -1759,8 +1759,6 @@ genIpush (const iCode *ic)
   if (!ic->parmPush)
     wassertl (0, "Encountered an unsupported spill push.");
 
-  wassertl (left->aop->size == 1 || !(left->aop->size % 2), "Unimplemented operand size for parameter push");
-
   if (left->aop->type == AOP_DUMMY)
     adjustStack (left->aop->size + (left->aop->size % 2), regDead (A_IDX, ic), regDead(P_IDX, ic));
   else if (left->aop->size == 1)
@@ -1769,7 +1767,7 @@ genIpush (const iCode *ic)
       pushAF();
     }
   else
-    push (left->aop, 0, left->aop->size);
+    push (left->aop, 0, left->aop->size + left->aop->size % 2);
 
   freeAsmop (IC_LEFT (ic));
 }

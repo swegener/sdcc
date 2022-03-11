@@ -4,6 +4,24 @@
 
 2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/mcs51/gen.c:
+	  Basic _BitInt support for mcs51.
+
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  support/regression/tests/bitint.c,
+	  support/regression/tests/widebitintbitfield.c:
+	  Fix cast from signed integer type to wider unsigned bit-precise type.
+
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* Merge _BitInt branch.
+
+2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/SDCCsymt.c,
 	  src/SDCCval.c,
 	  src/z80/gen.c:

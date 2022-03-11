@@ -34,7 +34,6 @@ void testWideBitIntBitField(void)
   ASSERT (bf2.bw == 2);
   ASSERT (bf2.b4 == 2);
   ASSERT (bf2.bw_1 == 5);
-
 #endif
 }
 

@@ -14621,12 +14621,12 @@ genCast (const iCode *ic)
       wassertl (0, "Tried to cast to a bit");
     }
 
+  unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+   (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+
   // Cast to _BitInt can require mask of top byte.
   if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
     {
-      unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
-        (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
-
       if (!isRegDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] != result->aop->size - 1)
         _push (PAIR_AF), pushed_a = true;
       genMove (result->aop, right->aop, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic));
@@ -14688,6 +14688,7 @@ genCast (const iCode *ic)
     }
   else
     {
+      bool maskedtopbyte = IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && SPEC_USIGN (resulttype);
       genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, !surviving_a, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic), true);
       bool de_dead = isPairDead (PAIR_DE, ic) && (result->aop->regs[E_IDX] < 0 || result->aop->regs[E_IDX] >= right->aop->size) && (result->aop->regs[D_IDX] < 0 || result->aop->regs[D_IDX] >= right->aop->size);
       bool iy_dead = isPairDead (PAIR_DE, ic) && (result->aop->regs[IYL_IDX] < 0 || result->aop->regs[IYL_IDX] >= right->aop->size) && (result->aop->regs[IYH_IDX] < 0 || result->aop->regs[IYH_IDX] >= right->aop->size);
@@ -14712,7 +14713,7 @@ genCast (const iCode *ic)
       /* we need to extend the sign */
       emit3 (A_RLCA, 0, 0);
 
-      if (!IS_SM83 && isPairDead (PAIR_HL, ic) && size == 2 && /* writing AOP_HL is so cheap, it is not worth the 2-byte sbc hl, hl here */
+      if (!IS_SM83 && !maskedtopbyte && isPairDead (PAIR_HL, ic) && size == 2 && /* writing AOP_HL is so cheap, it is not worth the 2-byte sbc hl, hl here */
         (aopInReg (result->aop, offset, HL_IDX) || result->aop->type == AOP_IY || (IS_RAB || IS_TLCS90 || IS_EZ80_Z80) && result->aop->type == AOP_STK))
         {
           emit2 ("sbc hl, hl");
@@ -14724,7 +14725,14 @@ genCast (const iCode *ic)
         {
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
           while (size--)
-            cheapMove (result->aop, offset++, ASMOP_A, 0, true);
+            {
+              if (!size && maskedtopbyte) // For casts from signed integers to wider unsigned _BitInt
+                {
+                  emit2 ("and a, #0x%02x", topbytemask);
+                  regalloc_dry_run_cost += 2;
+                }
+              cheapMove (result->aop, offset++, ASMOP_A, 0, true);
+            }
         }
     }
 

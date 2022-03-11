@@ -4903,15 +4903,14 @@ genCast (const iCode *ic)
   righttype = operandType (right);
 
   bool pushed_a = false;
+  unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
 
   // Cast to _BitInt can require mask of top byte.
   if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
     {
       aopOp (right, ic);
       aopOp (result, ic);
-
-      unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
-        (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
 
       if (!regDead (A_IDX, ic))
         {
@@ -4995,6 +4994,8 @@ genCast (const iCode *ic)
     }
   else // Cast to signed type
     {
+      bool maskedtopbyte = IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && SPEC_USIGN (resulttype);
+
       genMove_o (result->aop, 0, right->aop, 0, right->aop->size, regDead (A_IDX, ic), regDead (P_IDX, ic));
 
       int size = result->aop->size - right->aop->size;
@@ -5010,7 +5011,14 @@ genCast (const iCode *ic)
       cost (3, 3);
 
       while (size--)
-        cheapMove (result->aop, offset++, ASMOP_A, 0, true, regDead (P_IDX, ic), true);
+        {
+          if (!size && maskedtopbyte) // For casts from signed integers to wider unsigned _BitInt
+            {
+              emit2 ("and", "a, #0x%02x", topbytemask);
+              cost (2, 1);
+            }
+          cheapMove (result->aop, offset++, ASMOP_A, 0, true, regDead (P_IDX, ic), true);
+        }
 
       if (!regDead (A_IDX, ic) || aopInReg (result->aop, 0, A_IDX))
         popAF ();

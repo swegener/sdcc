@@ -9023,14 +9023,14 @@ genCast (const iCode *ic)
   resulttype = operandType (result);
   righttype = operandType (right);
 
+  unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+
   // Cast to _BitInt can require mask of top byte.
   if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
     {
       aopOp (right, ic);
       aopOp (result, ic);
-
-      unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
-        (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
 
       if (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] != result->aop->size - 1)
         UNIMPLEMENTED;
@@ -9165,14 +9165,15 @@ genCast (const iCode *ic)
     }
   else // Cast to signed type
     {
-      bool pushed_a = FALSE;
+      bool pushed_a = false;
+      bool masktopbyte = IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && SPEC_USIGN (resulttype);
 
       genMove_o (result->aop, 0, right->aop, 0, right->aop->size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
       size = result->aop->size - right->aop->size;
       offset = right->aop->size;
 
-      if (size == 2 && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX)) &&
+      if (size == 2 && !masktopbyte && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX)) &&
         (aopInReg (result->aop, right->aop->size - 1, XH_IDX) || aopInReg (result->aop, right->aop->size - 1, YH_IDX) || aopInReg (result->aop, right->aop->size - 1, A_IDX) || aopOnStack (result->aop, right->aop->size - 1, 1) || result->aop->type == AOP_DIR))
         {
           symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
@@ -9202,7 +9203,6 @@ genCast (const iCode *ic)
 
       cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, FALSE);
       emit3 (A_RLC, ASMOP_A, 0);
-     
 
       if (size == 2 && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX))) // Faster when just setting 16-bit reg.
         {
@@ -9224,6 +9224,12 @@ genCast (const iCode *ic)
       emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
       while (size--)
         {
+          if (!size && masktopbyte) // Cast signed int to wider unsigned _BitInt must zero top bits.
+            {
+              emit2 ("and", "a, #0x%02x", topbytemask);
+              cost (2, 1);
+            }
+
           if (size && aopInReg (result->aop, offset, A_IDX))
             {
               push (ASMOP_A, 0, 1);

@@ -4810,6 +4810,11 @@ genPlus (iCode * ic)
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
   /* if literal, literal on the right or
      if left requires ACC or right is already
      in ACC */
@@ -4852,7 +4857,7 @@ genPlus (iCode * ic)
 
   /* if I can do an increment instead
      of add then GOOD for ME */
-  if (genPlusIncr (ic) == TRUE)
+  if (!maskedtopbyte && genPlusIncr (ic) == TRUE)
     goto release;
 
   size = getDataSize (IC_RESULT (ic));
@@ -4862,7 +4867,7 @@ genPlus (iCode * ic)
 
   /* if this is an add for an array access
      at a 256 byte boundary */
-  if (2 == size
+  if (2 == size && !maskedtopbyte
       && AOP_TYPE (op) == AOP_IMMD
       && IS_SYMOP (op)
       && IS_SPEC (OP_SYM_ETYPE (op)) && SPEC_ABSA (OP_SYM_ETYPE (op)) && (SPEC_ADDR (OP_SYM_ETYPE (op)) & 0xff) == 0)
@@ -4919,6 +4924,8 @@ genPlus (iCode * ic)
               MOVA (aopGet (rightOp, offset, FALSE, FALSE));
               emitcode (add, "a,%s", aopGet (leftOp, offset, FALSE, FALSE));
             }
+          if (!size && maskedtopbyte)
+            emitcode ("anl", "a,#!constbyte", topbytemask);
           aopPut (IC_RESULT (ic), "a", offset);
           add = "addc";         /* further adds must propagate carry */
         }
@@ -5127,6 +5134,11 @@ genMinus (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
+  
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+   (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
 
   /* special cases :- */
   /* if both left & right are in bit space */
@@ -5138,7 +5150,7 @@ genMinus (iCode * ic)
 
   /* if I can do a decrement instead
      of subtract then GOOD for ME */
-  if (genMinusDec (ic) == TRUE)
+  if (!maskedtopbyte && genMinusDec (ic) == TRUE)
     goto release;
 
   size = getDataSize (IC_RESULT (ic));
@@ -5171,6 +5183,8 @@ genMinus (iCode * ic)
                 {
                   emitcode ("addc", "a,#!constbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0ffll));
                 }
+              if (!size && maskedtopbyte)
+                emitcode ("anl", "a,#!constbyte", topbytemask);
               aopPut (IC_RESULT (ic), "a", offset++);
             }
           else
@@ -5230,7 +5244,9 @@ genMinus (iCode * ic)
                 CLRC;
               emitcode ("subb", "a,%s", aopGet (rightOp, offset, FALSE, FALSE));
             }
-
+            
+          if (!size && maskedtopbyte)
+            emitcode ("anl", "a,#!constbyte", topbytemask);
           aopPut (IC_RESULT (ic), "a", offset++);
         }
     }
@@ -9109,6 +9125,11 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
   aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
 
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
 #if VIEW_SIZE
   emitcode ("; shift left ", "result %d, left %d", size, AOP_SIZE (left));
 #endif
@@ -9125,6 +9146,12 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
     default:
       genlshAny (result, left, shCount);
       break;
+    }
+  if (maskedtopbyte)
+    {
+      MOVA (aopGet (result, AOP_SIZE (result) - 1, FALSE, FALSE));
+      emitcode ("anl", "a,#!constbyte", topbytemask);
+      aopPut (result, "a", AOP_SIZE (result) - 1);
     }
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
@@ -9146,6 +9173,11 @@ genLeftShift (iCode * ic)
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
+
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
 
   aopOp (right, ic, FALSE);
 
@@ -9240,7 +9272,15 @@ genLeftShift (iCode * ic)
   emitLabel (tlbl1);
   emitcode ("djnz", "b,!tlabel", labelKey2num (tlbl->key));
   popB (pushedB);
+
 release:
+  if (maskedtopbyte)
+    {
+      MOVA (aopGet (result, AOP_SIZE (result) - 1, FALSE, FALSE));
+      emitcode ("anl", "a,#!constbyte", topbytemask);
+      aopPut (result, "a", AOP_SIZE (result) - 1);
+    }
+
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
 }
@@ -11582,6 +11622,9 @@ genCast (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
+  unsigned topbytemask = (IS_BITINT (ctype) && (SPEC_BITINTWIDTH (ctype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (ctype) % 8)) : 0xff;
+
   right_boolean = IS_BOOLEAN (rtype) || IS_BITFIELD (rtype) &&  SPEC_BLEN (getSpec (rtype)) == 1;
 
   /* if the result is a bit (and not a bitfield) */
@@ -11594,8 +11637,10 @@ genCast (iCode * ic)
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
+      bool masktopbyte = IS_BITINT (ctype) && (SPEC_BITINTWIDTH (ctype) % 8) && bitsForType (ctype) < bitsForType (rtype);
+
       /* if they are in the same place */
-      if (sameRegs (AOP (right), AOP (result)))
+      if (!masktopbyte && sameRegs (AOP (right), AOP (result)))
         goto release;
 
       /* if they are in different places then copy */
@@ -11603,7 +11648,21 @@ genCast (iCode * ic)
       offset = 0;
       while (size--)
         {
-          aopPut (result, aopGet (right, offset, FALSE, FALSE), offset);
+          if (!size && masktopbyte)
+            {
+              MOVA (aopGet (right, offset, FALSE, FALSE));
+              emitcode ("anl", "a,#!constbyte", topbytemask);
+              if (!SPEC_USIGN (ctype)) // Sign-extend
+                {
+                  symbol *tlbl = newiTempLabel (0);
+                  emitcode ("jnb", "acc.%d,!tlabel", (int)(SPEC_BITINTWIDTH (ctype) % 8 - 1), labelKey2num (tlbl->key));
+                  emitcode ("orl", "a,#!constbyte", ~topbytemask & 0xff);
+                  emitLabel (tlbl);
+                }
+              aopPut (result, "a", offset);
+            }
+          else
+            aopPut (result, aopGet (right, offset, FALSE, FALSE), offset);
           offset++;
         }
       goto release;
@@ -11717,12 +11776,18 @@ genCast (iCode * ic)
     }
   else
     {
+      bool masktopbyte = IS_BITINT (ctype) && (SPEC_BITINTWIDTH (ctype) % 8) && SPEC_USIGN (ctype);
+
       /* we need to extend the sign :{ */
       MOVA (aopGet (right, AOP_SIZE (right) - 1, FALSE, FALSE));
       emitcode ("rlc", "a");
       emitcode ("subb", "a,acc");
       while (size--)
-        aopPut (result, "a", offset++);
+        {
+          if (!size && masktopbyte)
+            emitcode ("anl", "a,#!constbyte", topbytemask);
+          aopPut (result, "a", offset++);
+        }
     }
 
   /* we are done hurray !!!! */

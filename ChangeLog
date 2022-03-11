@@ -2,6 +2,7 @@
 
 	* src/SDCCglue.c:
 	  Make assembly comments more consistent.
+	* src/
 
 2022-03-10 Benedikt Freisen <b.freisen AT gmx.net>
 

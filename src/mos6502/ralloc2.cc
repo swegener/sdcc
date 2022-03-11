@@ -1,6 +1,6 @@
-// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
+// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2013
 //
-// (c) 2012 Goethe-Universität Frankfurt
+// (c) 2010 - 2013 Goethe-Universität Frankfurt
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
+// An optimal, polynomial-time register allocator.
 
 //#define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
 //#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
@@ -33,6 +35,7 @@ extern "C"
 #define REG_A 0
 #define REG_X 1
 #define REG_Y 2
+
 
 template <class I_t>
 static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
@@ -443,17 +446,19 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     return(std::numeric_limits<float>::infinity());
 
 #if 0
-  std::cout << "Calculating at cost at ic " << ic->key << " for: ";
-  for(unsigned int i = 0; i < boost::num_vertices(I); i++)
-  {
-  	std::cout << "(" << i << ", " << int(a.global[i]) << ") ";
-  }
+  std::cout << "Calculating at cost at ic " << ic->key << ", op " << ic->op << " for: ";
+  print_assignment(a);
   std::cout << "\n";
   std::cout.flush();
 #endif
 
   if(ic->generated)
+    {
+#if 0
+  std::cout << "Skipping, already generated.\n";
+#endif
     return(0.0f);
+    }
 
   if(!XAinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
@@ -469,6 +474,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case LABEL:
     case GOTO:
     case INLINEASM:
+#if 0
+  std::cout << "Skipping, indepent from assignment.\n";
+#endif
       return(0.0f);
     case '!':
     case '~':
@@ -518,6 +526,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       set_surviving_regs(a, i, G, I);
       c = drym6502iCode(ic);
       ic->generated = false;
+#if 0
+      std::cout << "Got cost " << c << "\n";
+#endif
       return(c);
     default:
       return(0.0f);

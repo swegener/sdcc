@@ -1,3 +1,8 @@
+2022-03-10 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/SDCCglue.c:
+	  Make assembly comments more consistent.
+
 2022-03-10 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx:

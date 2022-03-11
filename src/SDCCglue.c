@@ -2444,7 +2444,8 @@ glue (void)
 
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, ";%s ram data\n", mcs51_like ? " internal" : "");
+  if(!TARGET_MOS6502_LIKE)  fprintf (asmFile, ";%s ram data\n", mcs51_like ? " internal" : "");
+  else fprintf (asmFile, "; ZP ram data\n");
   fprintf (asmFile, "%s", iComments2);
   dbuf_write_and_destroy (&data->oBuf, asmFile);
 
@@ -2533,10 +2534,10 @@ glue (void)
     }
 
   /* copy external ram data */
-  if (xdata && mcs51_like)
+  if (xdata && (mcs51_like || TARGET_MOS6502_LIKE ))
     {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; external ram data\n");
+      fprintf (asmFile, "; uninitialized external ram data\n");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&xdata->oBuf, asmFile);
     }
@@ -2554,7 +2555,7 @@ glue (void)
   if (xidata)
     {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; external initialized ram data\n");
+      fprintf (asmFile, "; initialized external ram data\n");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&xidata->oBuf, asmFile);
     }

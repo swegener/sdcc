@@ -3605,7 +3605,7 @@ genLeftShift (const iCode *ic)
       G.p.type = AOP_INVALID;
     }
 
-release:
+ release: ;
 
   sym_link *resulttype = operandType (IC_RESULT (ic));
   unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?

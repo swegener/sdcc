@@ -1,3 +1,8 @@
+2022-03-11 Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
+
+	* src/pdk/gen.c:
+	  Fix compile by gcc 9.4.0: label must be on statement
+
 2022-03-10 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/SDCCglue.c:

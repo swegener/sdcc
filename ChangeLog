@@ -1,4 +1,7 @@
+2022-03-12 Gabriele Gorla <gorlik@yahoo.com>
 
+	* src/mod6502/gen.c:
+	  Small genCast() improvements.
 
 2022-03-12 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
@@ -69,7 +72,9 @@
 
 	* src/SDCCglue.c:
 	  Make assembly comments more consistent.
-	* src/
+	* src/mos6502/main.c,
+	  src/mos6502/ralloc2.cc:
+	  Refactor to make files more similar to stm8 port.
 
 2022-03-10 Benedikt Freisen <b.freisen AT gmx.net>
 

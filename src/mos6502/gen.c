@@ -1511,7 +1511,6 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         needpullx = storeRegTempIfUsed(m6502_reg_x);
         doTSX();
         emit6502op ("sta", aopAdrStr (aop, loffset, false));
-        emitComment (TRACE_AOP|VVDBG, "offset 0x%x", xofs);
 
 //        emit6502op ("sta", "0x%x,x", xofs);
         loadOrFreeRegTemp(m6502_reg_x, needpullx);
@@ -1974,7 +1973,7 @@ storeRegToFullAop (reg_info *reg, asmop *aop, bool isSigned)
         {
           storeRegToAop (reg, aop, 0);
           if(aop->type!=AOP_SOF) {
-          storeRegSignToUpperAop (m6502_reg_x, aop, 2, isSigned);
+            storeRegSignToUpperAop (m6502_reg_x, aop, 2, isSigned);
           } else {
             loadRegFromAop(m6502_reg_a, aop, 1);
             storeRegSignToUpperAop (m6502_reg_a, aop, 2, isSigned);
@@ -9812,6 +9811,7 @@ genCast (iCode * ic)
 
   aopOp (right, ic);
   aopOp (result, ic);
+  printIC(ic);
 
   emitComment (TRACEGEN|VVDBG, "      genCast - size %d -> %d", right?AOP_SIZE(right):0, result?AOP_SIZE(result):0);
 
@@ -9833,6 +9833,25 @@ genCast (iCode * ic)
     }
 
   signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (rtype) && IS_SPEC (rtype) && !SPEC_USIGN (rtype);
+
+#if 0
+  if(AOP_TYPE (right)==AOP_REG) {
+    if(IS_AOP_A(AOP(right))) {
+        storeRegToFullAop (m6502_reg_a, AOP (result), signExtend);
+    } else
+    if(IS_AOP_X(AOP(right))) {
+        storeRegToFullAop (m6502_reg_x, AOP (result), signExtend);
+    } else
+    if(IS_AOP_Y(AOP(right))) {
+        storeRegToFullAop (m6502_reg_y, AOP (result), signExtend);
+    } else
+#endif
+    if(IS_AOP_XA(AOP(right))) {
+        storeRegToFullAop (m6502_reg_xa, AOP (result), signExtend);
+        goto release;
+    }
+//    goto release;
+//  }
 
   /* If the result is 2 bytes and in registers, we have to be careful */
   /* to make sure the registers are not overwritten prematurely. */
@@ -9949,8 +9968,6 @@ genCast (iCode * ic)
 
   if (save_a)
     pullReg(m6502_reg_a);
-
-  /* we are done hurray !!!! */
 
 release:
   freeAsmop (right, NULL);

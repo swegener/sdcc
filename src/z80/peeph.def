@@ -1174,10 +1174,18 @@ replace restart {
 
 replace restart {
 	jp	%1
+%1:
+} by {
+   ; common peephole 85a eliminated jump.
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	%1
 %2:
 %1:
 } by {
-   ; common peephole 85 eliminated jump.
+   ; common peephole 85b eliminated jump.
 %2:
 %1:
 } if labelRefCountChange(%1 -1)

@@ -22,7 +22,7 @@ volatile char c = 1;
 void testBitIntArith(void)
 {
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
-#if {width} <= 40 || !defined (__SDCC_pdk14) // Lack of memory
+#if ({width} <= 40 || !defined (__SDCC_pdk14)) && ({width} <= 48 || !defined (__SDCC_pdk15)) // Lack of memory
 
 	a = -1, b = 1;
 	ASSERT(a + b == 0);

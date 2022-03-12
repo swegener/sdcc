@@ -1,3 +1,9 @@
+2022-03-12 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* support/regression/tests/bitintarith.c,
+	  src/pdk/main.c:
+	  Disable a test that failed on pdk15 for wide _BitInt due to lack of memory, reenable 64-_BitInt support for pdk.
+
 2022-03-12 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mod6502/gen.c:

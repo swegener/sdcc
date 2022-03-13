@@ -41,8 +41,13 @@ volatile float gf[32];
 
 void foo (int n)
 {
+#if defined(__SDCC_STACK_AUTO)
+  static double DECLARE(d);
+  static float DECLARE(f);
+#else
   double DECLARE(d);
   float DECLARE(f);
+#endif
   volatile double *pd;
   volatile float *pf;
   int i;

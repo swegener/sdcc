@@ -1,3 +1,8 @@
+2022-03-12 Gabriele Gorla <gorlik@yahoo.com>
+
+	* support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Make large local allocation static when compiling with --stack-auto.
+
 2022-03-13 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/as6500/r65pst.c,

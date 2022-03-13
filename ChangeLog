@@ -1,3 +1,19 @@
+2022-03-13 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/as6500/r65pst.c,
+	  sdas/as6808/m08pst.c,
+	  sdas/as8051/i51pst.c,
+	  sdas/as8xcxxx/ds8pst.c,
+	  sdas/aspdk13/pdk13pst.c,
+	  sdas/aspdk14/pdk14pst.c,
+	  sdas/aspdk15/pdk15pst.c,
+	  sdas/aspdk16/pdk16pst.c,
+	  sdas/asrab/rabpst.c,
+	  sdas/asstm8/stm8pst.c,
+	  sdas/astlcs90/t90pst.c,
+	  sdas/asz80/z80pst.c:
+	  Enable new mnemonics on all ports.
+
 2022-03-12 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* support/regression/tests/bitintarith.c,

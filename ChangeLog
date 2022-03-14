@@ -1,3 +1,8 @@
+2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
+
+	* support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Make stack-auto exception only for mos6502 port. Enable test for S08 and HC08.
+
 2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* support/regression/tests/bitintarith.c:

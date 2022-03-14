@@ -11,7 +11,7 @@
 
 /* This generates too much code for a mcs51, hc08, pdk14 and pdk15 */
 /* pic14: Not enough data memory */
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 
 /* Macros to emit "L Nxx R" for each octal number xx between 000 and 037.  */
 #define OP1(L, N, R, I, J) L N##I##J R
@@ -41,7 +41,7 @@ volatile float gf[32];
 
 void foo (int n)
 {
-#if defined(__SDCC_STACK_AUTO)
+#if defined(__SDCC_STACK_AUTO) && ( defined (__SDCC_mos6502) || defined (__SDCC_mos65c02) )
   static double DECLARE(d);
   static float DECLARE(f);
 #else
@@ -68,7 +68,7 @@ void foo (int n)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   int i;
 
   for (i = 0; i < 32; i++)

@@ -81,12 +81,13 @@ void testBitIntArith(void)
 	ASSERT((ua & ub) == ((ubitinttype)(23) & (ubitinttype)(-42)));
 	ASSERT((ua | ub) == ((ubitinttype)(23) | (ubitinttype)(-42)));
 	ASSERT((ua ^ ub) == ((ubitinttype)(23) ^ (ubitinttype)(-42)));
-#endif
 
+	// Test increment / decrement and it wraparound for unsigned _BitInt.
 	ua = 1;
 	ASSERT(--ua == 0);
 	ASSERT(--ua == (ubitinttype)0xffffffffffffffffull);
 	ASSERT(++ua == 0);
+#endif
 #endif
 #endif
 }

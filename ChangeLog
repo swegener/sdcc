@@ -1,5 +1,10 @@
 2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* support/regression/tests/bitintarith.c:
+	  Disable part of test for pdk14 to not run out of code memory.
+
+2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/SDCCval.c:
 	  Use unsigned long long to represent bit-field values at compile time.
 	* src/mcs51/main.c:

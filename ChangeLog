@@ -2,6 +2,7 @@
 
 	* src/mod6502/gen.c:
 	  Make regInfoStr display SP relative values when appropriate.
+	  Additional improvements to genAddrOf().
 
 2022-03-13 Gabriele Gorla <gorlik@yahoo.com>
 

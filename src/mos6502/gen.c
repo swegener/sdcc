@@ -431,10 +431,14 @@ emit6502op (const char *inst, const char *fmt, ...)
       case M6502OP_IDD: // index decrement
         if(dst_reg->isLitConst)
           dst_reg->litConst--;
+        if(dst_reg->aop==&tsxaop)
+          _G.tsxStackPushes++;
         break;
       case M6502OP_IDI: // index increment
         if(dst_reg->isLitConst)
           dst_reg->litConst++;
+        if(dst_reg->aop==&tsxaop)
+          _G.tsxStackPushes--;
         break;
       case M6502OP_BR: // add penalty for taken branches
         // this assumes:
@@ -3460,11 +3464,12 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       if (regalloc_dry_run) {
         return "1,x"; // fake result, not needed
       } else {
-        // did we get stack pointer in X?
-           if (m6502_reg_x->aop != &tsxaop) {
-             // FIXME: should X be saved?
+          // FIXME FIXME: force emit of TSX to avoid offset < 0x100
+          // this is a workaround for the assembler incorrectly
+          // generating ZP,x instead of ABS,x 
+          if((_G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1)<0)
+            m6502_dirtyReg(m6502_reg_x);
              doTSX();
-          }
           // hc08's tsx returns +1, ours returns +0
           //DD( emitcode( "", "; %d + %d + %d + %d + 1", _G.stackOfs, _G.tsxStackPushes, aop->aopu.aop_stk, offset ));
           xofs = STACK_TOP + _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1;
@@ -9598,19 +9603,22 @@ genAddrOf (iCode * ic)
       needpulla = pushRegIfSurv (m6502_reg_a);
       needpullx = pushRegIfSurv (m6502_reg_x);
       /* if it has an offset then we need to compute it */
-      offset = _G.stackOfs + _G.stackPushes + sym->stack + 1;
-//      doTSX();
-//      m6502_useReg (m6502_reg_xa);
-      emit6502op ("tsx", "");
-      m6502_dirtyReg (m6502_reg_x);
-      if(smallAdjustReg(m6502_reg_x, offset)) offset=0;
+      doTSX();
+      offset = _G.stackOfs + _G.tsxStackPushes + _G.stackPushes + sym->stack + 1;
+      if(smallAdjustReg(m6502_reg_x, offset))
+        offset=0;
       transferRegReg (m6502_reg_x, m6502_reg_a, true);
       if (offset) {
           emit6502op ("clc", "");
           emit6502op ("adc", IMMDFMT, offset&0xff);
       }
-      loadRegFromConst(m6502_reg_x, 0x01); // stack top = 0x100
-      storeRegToFullAop (m6502_reg_xa, AOP (result), false);
+      if(IS_AOP_XA(AOP(result))) {
+        loadRegFromConst(m6502_reg_x, 0x01); // stack top = 0x100
+      } else {
+        storeRegToAop (m6502_reg_a, AOP (result), 0);
+        loadRegFromConst(m6502_reg_a, 0x01); // stack top = 0x100
+        storeRegToAop (m6502_reg_a, AOP (result), 1);
+      }
       pullOrFreeReg (m6502_reg_x, needpullx);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;

@@ -10556,7 +10556,7 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
   int rlen = 0;                 /* remaining bitfield length */
   unsigned blen;                /* bitfield length */
   unsigned bstr;                /* bitfield starting bit within byte */
-  int litval;                   /* source literal value (if AOP_LIT) */
+  unsigned long long  litval;   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
 
   D (emitcode (";", "genPackBits"));
@@ -10573,7 +10573,7 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
         {
           /* Case with a bitfield length <8 and literal source
            */
-          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+          litval = ullFromVal (AOP (right)->aopu.aop_lit);
           litval <<= bstr;
           litval &= (~mask) & 0xff;
           emitPtrByteGet (rname, p_type, FALSE);
@@ -10643,7 +10643,7 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
         {
           /* Case with partial byte and literal source
            */
-          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+          litval = ullFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen - rlen);
           litval &= (~mask) & 0xff;
           emitPtrByteGet (rname, p_type, FALSE);

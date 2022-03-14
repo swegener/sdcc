@@ -3,7 +3,7 @@
 	* src/SDCCval.c:
 	  Use unsigned long long to represent bit-field values at compile time.
 	* src/mcs51/main.c:
-	  Enable _BitInt for mcs51 up to 32 bit.
+	  Enable _BitInt for mcs51.
 	* support/regression/tests/bitintarith.c,
 	  support/regression/tests/bug-3355.c:
 	  Test for bug #3355 (disabled for now).

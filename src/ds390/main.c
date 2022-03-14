@@ -1035,8 +1035,8 @@ PORT ds390_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, bit, float */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 16 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
@@ -1375,8 +1375,8 @@ PORT tininative_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
-  { 1, 2, 2, 4, 8, 1, 3, 3, 3, 3, 1, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
+  { 1, 2, 2, 4, 8, 1, 3, 3, 3, 3, 1, 4, 16 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
@@ -1632,7 +1632,7 @@ PORT ds400_port =
     NULL,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 0 },
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 16 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */

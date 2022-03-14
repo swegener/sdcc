@@ -7,6 +7,9 @@
 	* support/regression/tests/bitintarith.c,
 	  support/regression/tests/bug-3355.c:
 	  Test for bug #3355 (disabled for now).
+	* src/ds390/main.c,
+	  src/ds390/gen.c:
+	  _bitInt up to 16 bits for ds390.
 
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -2448,7 +2448,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
     }
   else if (IS_BITVAR (etype2) && !IS_BITVAR (etype1))
     {
-    if (SPEC_NOUN (etype2) == V_BITINTBITFIELD && SPEC_BITINTWIDTH(etype2) > bitsForType (type1))
+      if (SPEC_NOUN (etype2) == V_BITINTBITFIELD && SPEC_BITINTWIDTH(etype2) > bitsForType (type1))
         {
           rType = copyLinkChain (type2);
         }

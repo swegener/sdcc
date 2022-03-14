@@ -1,3 +1,8 @@
+2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCval.c:
+	  Use unsigned long long to represent bit-field values at compile time.
+
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mod6502/gen.c:

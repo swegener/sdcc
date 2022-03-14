@@ -71,10 +71,12 @@ void testBitIntArith(void)
 	ASSERT(ua % ub == (ubitinttype)(23) % (ubitinttype)(-42));
 	ASSERT(ua / ub == (ubitinttype)(23) / (ubitinttype)(-42));
 
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) // Bug #3355
 	ASSERT((a < b) == ((bitinttype)(23) < (bitinttype)(-42)));
 	ASSERT((a <= b) == ((bitinttype)(23) <= (bitinttype)(-42)));
 	ASSERT((ua < ub) == ((ubitinttype)(23) < (ubitinttype)(-42)));
 	ASSERT((ua <= ub) == ((ubitinttype)(23) <= (ubitinttype)(-42)));
+#endif
 
 	ASSERT((ua & ub) == ((ubitinttype)(23) & (ubitinttype)(-42)));
 	ASSERT((ua | ub) == ((ubitinttype)(23) | (ubitinttype)(-42)));

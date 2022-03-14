@@ -8047,7 +8047,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
     }
 
   /* if I can do an decrement instead of subtract then GOOD for ME */
-  if (genMinusDec (ic, result, left, right) == TRUE)
+  if (!maskedtopbyte && genMinusDec (ic, result, left, right) == TRUE)
     return;
 
   size = getDataSize (IC_RESULT (ic));

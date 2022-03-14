@@ -83,6 +83,10 @@ void testBitIntArith(void)
 	ASSERT((ua ^ ub) == ((ubitinttype)(23) ^ (ubitinttype)(-42)));
 #endif
 
+	ua = 1;
+	ASSERT(--ua == 0);
+	ASSERT(--ua == (ubitinttype)0xffffffffffffffffull);
+	ASSERT(++ua == 0);
 #endif
 #endif
 }

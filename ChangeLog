@@ -10,6 +10,9 @@
 	* src/ds390/main.c,
 	  src/ds390/gen.c:
 	  _BitInt for ds390.
+	* src/z80/gen.c,
+	  support/regression/tests/bitintarith.c:
+	  Fix a z80 _BitInt decrement issue.
 
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 

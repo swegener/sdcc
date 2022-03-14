@@ -32,5 +32,8 @@ void testAssert (void)
 {
   assert (i);
   assert (i - 42);
+#ifdef __SDCC // SDCC assert is always C23-compliant
+  assert ((0, 1)); // C23 requires C23 to be implemented as variadic macro, allowing the use of the comma operator inside the argument.
+#endif
 }
 

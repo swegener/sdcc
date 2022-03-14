@@ -3,6 +3,9 @@
 	* src/z80/main.c,
 	  src/z80/gen.c:
 	  Enable _BitInt for sm83 up to 64 bits.
+	* device/include/assert.h,
+	  support/regression/tests/assert.c:
+	  C23-compliant assert, RFE #780.
 
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 

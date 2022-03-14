@@ -9554,14 +9554,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
           genlshTwo (result, left, shCount);
           break;
 
-        case 1:
-        case 4:
-        case 8:
-          genlshFixed (result, left, shCount);
-          break;
-
         default:
-          werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
+          genlshFixed (result, left, shCount);
           break;
         }
     }

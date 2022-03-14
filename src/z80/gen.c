@@ -4610,22 +4610,6 @@ genMove (asmop *result, asmop *source, bool a_dead, bool hl_dead, bool de_dead, 
   genMove_o (result, 0, source, 0, result->size, a_dead, hl_dead, de_dead, iy_dead, true);
 }
 
-/*-----------------------------------------------------------------*/
-/* getDataSize - get the operand data size                         */
-/*-----------------------------------------------------------------*/
-static int
-getDataSize (operand * op)
-{
-  int size;
-  size = op->aop->size;
-  if (size == 3)
-    {
-      /* pointer */
-      wassertl (!IS_SM83, "Somehow got a three byte data pointer");
-    }
-  return size;
-}
-
 /*--------------------------------------------------------------------------*/
 /* adjustStack - Adjust the stack pointer by n bytes.                       */
 /*--------------------------------------------------------------------------*/
@@ -4801,7 +4785,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
 static void
 outAcc (operand * result)
 {
-  int size = getDataSize (result);
+  int size = result->aop->size;
   if (size)
     {
       cheapMove (result->aop, 0, ASMOP_A, 0, true);
@@ -6876,7 +6860,7 @@ static bool
 genPlusIncr (const iCode *ic)
 {
   unsigned int icount;
-  unsigned int size = getDataSize (IC_RESULT (ic));
+  unsigned int size = IC_RESULT (ic)->aop->size;
   PAIR_ID resultId = getPairId (IC_RESULT (ic)->aop);
 
   /* will try to generate an increment */
@@ -7212,7 +7196,7 @@ genPlus (iCode * ic)
   if (!maskedtopbyte && genPlusIncr (ic))
     goto release;
 
-  size = getDataSize (IC_RESULT (ic));
+  size = IC_RESULT (ic)->aop->size;
 
   /* Special case when left and right are constant */
   if (!maskedtopbyte && isPair (IC_RESULT (ic)->aop))
@@ -7407,7 +7391,7 @@ genPlus (iCode * ic)
      * If left or right are in bc then the loss is small - trap later
      * If the result is in bc then the loss is also small
    */
-  if (IS_SM83)
+  if (!maskedtopbyte && IS_SM83)
     {
       if (IC_LEFT (ic)->aop->type == AOP_STK || IC_RIGHT (ic)->aop->type == AOP_STK || IC_RESULT (ic)->aop->type == AOP_STK)
         {
@@ -7950,7 +7934,7 @@ static bool
 genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
 {
   unsigned int icount;
-  unsigned int size = getDataSize (IC_RESULT (ic));
+  unsigned int size = IC_RESULT (ic)->aop->size;
 
   /* will try to generate a decrement */
   /* if the right side is not a literal we cannot */
@@ -7961,9 +7945,6 @@ genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
      is greater than 4 then it is not worth it */
   if ((icount = (unsigned int) ulFromVal (right->aopu.aop_lit)) > 2)
     return false;
-
-  size = getDataSize (IC_RESULT (ic));
-
   /* if decrement 16 bits in register */
   if (sameRegs (left, result) && (size > 1) && isPair (result))
     {
@@ -8050,7 +8031,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
   if (!maskedtopbyte && genMinusDec (ic, result, left, right) == TRUE)
     return;
 
-  size = getDataSize (IC_RESULT (ic));
+  size = IC_RESULT (ic)->aop->size;
 
   if (right->type == AOP_LIT)
     {
@@ -8059,7 +8040,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
     }
 
   /* Same logic as genPlus */
-  if (IS_SM83)
+  if (!maskedtopbyte && IS_SM83)
     {
       if (left->type == AOP_STK || right->type == AOP_STK || result->type == AOP_STK)
         {

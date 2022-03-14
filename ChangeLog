@@ -1,3 +1,9 @@
+2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/z80/main.c,
+	  src/z80/gen.c:
+	  Enable _BitInt for sm83 up to 64 bits.
+
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 
 	* support/regression/tests/gcc-torture-execute-20021120-1.c:

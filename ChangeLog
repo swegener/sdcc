@@ -2,6 +2,10 @@
 
 	* support/regression/tests/bitintarith.c:
 	  Disable part of test for pdk14 to not run out of code memory.
+	* src/z80/gen.c,
+	  support/regression/tests/bitintbitfield.c,
+	  support/regression/tests/widebitintbitfield.c:
+	  Fix write to wide bit-field on z80.
 
 2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

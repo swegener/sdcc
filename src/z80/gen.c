@@ -13530,7 +13530,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
   int rlen = 0;                 /* remaining bit-field length */
   unsigned blen;                /* bit-field length */
   unsigned bstr;                /* bit-field starting bit within byte */
-  int litval;                   /* source literal value (if AOP_LIT) */
+  unsigned long long litval;    /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
   int extraPair;                /* a tempory register */
   bool needPopExtra = 0;        /* need to restore original value of temp reg */
@@ -13548,7 +13548,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
 
       if (right->aop->type == AOP_LIT && blen == 1 && (pair == PAIR_HL || pair == PAIR_IX || pair == PAIR_IY))
         {
-          litval = (int) ulFromVal (right->aop->aopu.aop_lit);
+          litval = ullFromVal (right->aop->aopu.aop_lit);
           emit2 (litval & 1 ? "set %d, !mems" : "res %d, !mems", bstr, _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 4 : 2;
           return;
@@ -13663,7 +13663,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
       if (right->aop->type == AOP_LIT)
         {
           /* Case with partial byte and literal source */
-          litval = (int) ulFromVal (right->aop->aopu.aop_lit);
+          litval = ullFromVal (right->aop->aopu.aop_lit);
           litval >>= (blen - rlen);
           litval &= (~mask) & 0xff;
 

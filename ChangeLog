@@ -1,4 +1,9 @@
-2022-03-12 Gabriele Gorla <gorlik@yahoo.com>
+2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mod6502/gen.c:
+	  Make regInfoStr display SP relative values when appropriate.
+
+2022-03-13 Gabriele Gorla <gorlik@yahoo.com>
 
 	* support/regression/tests/gcc-torture-execute-20021120-1.c:
 	  Make large local allocation static when compiling with --stack-auto.

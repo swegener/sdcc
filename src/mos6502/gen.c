@@ -268,27 +268,39 @@ regInfoStr()
   static char outstr[30];
   char regstring[3][10];
 
-  if(m6502_reg_a->isLitConst) snprintf(regstring[0],10,"A:%c%c:%02x",
+  if(m6502_reg_a->isLitConst) snprintf(regstring[0],10,"A:%c%c:#%02x ",
                 (m6502_reg_a->isFree)?'-':'U',
                 (m6502_reg_a->isDead)?'-':'L',
                 m6502_reg_a->litConst );
-  else snprintf(regstring[0],10,"A:%c%c:??",
+  else   if(m6502_reg_a->aop == &tsxaop) snprintf(regstring[0],10,"A:%c%c:S%+-3d",
+                (m6502_reg_a->isFree)?'-':'U',
+                (m6502_reg_a->isDead)?'-':'L',
+                _G.tsxStackPushes - _G.stackPushes );
+  else snprintf(regstring[0],10,"A:%c%c:??? ",
                 (m6502_reg_a->isFree)?'-':'U',
                 (m6502_reg_a->isDead)?'-':'L');
 
-  if(m6502_reg_x->isLitConst) snprintf(regstring[1],10,"X:%c%c:%02x",
+  if(m6502_reg_x->isLitConst) snprintf(regstring[1],10,"X:%c%c:#%02x ",
                 (m6502_reg_x->isFree)?'-':'U',
                 (m6502_reg_x->isDead)?'-':'L',
                 m6502_reg_x->litConst );
-  else snprintf(regstring[1],10,"X:%c%c:??",
+  else   if(m6502_reg_x->aop == &tsxaop) snprintf(regstring[1],10,"X:%c%c:S%+-3d",
+                (m6502_reg_x->isFree)?'-':'U',
+                (m6502_reg_x->isDead)?'-':'L',
+                _G.tsxStackPushes - _G.stackPushes );
+  else snprintf(regstring[1],10,"X:%c%c:??? ",
                 (m6502_reg_x->isFree)?'-':'U',
                 (m6502_reg_x->isDead)?'-':'L');
 
-  if(m6502_reg_y->isLitConst) snprintf(regstring[2],10,"Y:%c%c:%02x",
+  if(m6502_reg_y->isLitConst) snprintf(regstring[2],10,"Y:%c%c:#%02x ",
                 (m6502_reg_y->isFree)?'-':'U',
                 (m6502_reg_y->isDead)?'-':'L',
                 m6502_reg_y->litConst );
-  else snprintf(regstring[2],10,"Y:%c%c:??",
+  else   if(m6502_reg_y->aop == &tsxaop) snprintf(regstring[2],10,"Y:%c%c:S%+-3d",
+                (m6502_reg_y->isFree)?'-':'U',
+                (m6502_reg_y->isDead)?'-':'L',
+                _G.tsxStackPushes - _G.stackPushes );
+  else snprintf(regstring[2],10,"A:%c%c:??? ",
                 (m6502_reg_y->isFree)?'-':'U',
                 (m6502_reg_y->isDead)?'-':'L');
 
@@ -4833,7 +4845,7 @@ genEndFunction (iCode * ic)
     restoreBasePtr();
 
   if(_G.stackPushes)
-    emitcode("ERROR","_G.stackPushes=%d in genEndFunction");
+    emitcode("ERROR","_G.stackPushes=%d in genEndFunction", _G.stackPushes);
 
   if (sym->stack)
     {

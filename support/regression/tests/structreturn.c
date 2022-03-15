@@ -5,6 +5,7 @@
  */
 #include <testfwk.h>
 
+#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
 struct s
 {
 	{type} a;
@@ -55,12 +56,15 @@ int h2(void)
 {
 	return g().a + 1; // Access to member of returned struct
 }
+#endif
 
 void testRet (void)
 {
+#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
 	ASSERT (g1() == 3);
 	ASSERT (g2() == 3);
 	ASSERT (h1() == 2);
 	ASSERT (h2() == 2);
+#endif
 }
 

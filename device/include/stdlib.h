@@ -118,6 +118,27 @@ int abs(int j);
 #endif
 long int labs(long int j);
 
+typedef struct
+{
+	int quot;
+	int rem;
+} div_t;
+typedef struct
+{
+	long int quot;
+	long int rem;
+} ldiv_t;
+typedef struct
+{
+	long long int quot;
+	long long int rem;
+} lldiv_t;
+#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
+div_t div(int numer, int denom);
+ldiv_t ldiv(long int numer, long int denom);
+lldiv_t lldiv(long long int numer, long long int denom);
+#endif
+
 /* C99 Multibyte/wide character conversion functions (ISO C11 7.22.7) */
 #if __STDC_VERSION__ >= 199901L
 int mblen(const char *s, size_t n);

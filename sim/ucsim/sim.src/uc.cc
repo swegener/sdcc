@@ -2523,11 +2523,13 @@ int
 cl_uc::tick_hw(int cycles)
 {
   class cl_hw *hw;
+  int c= cycles;
   int i;//, cpc= clock_per_cycle();
 
   // tick hws
-  while (cycles-- > 0)
+  while (c-- > 0)
     {
+      //printf("31 c=%d\n",c);
       for (i= 0; i < hws->count; i++)
         {
           hw= (class cl_hw *)(hws->at(i));
@@ -2752,14 +2754,14 @@ cl_uc::do_inst(int step)
 	  pre_inst();
 	  PCsave = PC;
 	  res= exec_inst();
-
 	  if (res == resINV_INST)
 	    /* backup to start of instruction */
 	    PC = PCsave;
 	  else if (res == resGO && !inst_at(PCsave) && analyzer)
-            analyze(PCsave);
+	    {
+	      analyze(PCsave);
+	    }
 	}
-
       post_inst();
 
       if ((res == resGO) && (PC == PCsave) && stop_selfjump)
@@ -2796,6 +2798,7 @@ cl_uc::pre_inst(void)
   inst_exec= true;
   events->disconn_all();
   vc.inst++;
+  inst_ticks= 0;
 }
 
 int
@@ -2834,7 +2837,6 @@ void
 cl_uc::post_inst(void)
 {
   tick_hw(inst_ticks);
-  inst_ticks= 0;
   if (errors->count)
     check_errors();
   if (events->count)

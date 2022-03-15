@@ -5765,7 +5765,7 @@ genCall (const iCode *ic)
 
   _saveRegsForCall (ic, FALSE);
 
-  const bool bigreturn = (getSize (ftype->next) > 4); // Return value of big type or returning struct or union.
+  const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next); // Return value of big type or returning struct or union.
   const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
                        IS_TRUE_SYMOP (IC_RESULT (ic));
 
@@ -6315,7 +6315,7 @@ genFunction (const iCode * ic)
   /* adjust the stack for the function */
 //  _G.stack.last = sym->stack;
 
-  bigreturn = (getSize (ftype->next) > 4);
+  bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
   _G.stack.param_offset += bigreturn * 2;
 
   stackParm = FALSE;
@@ -6664,7 +6664,7 @@ genRet (const iCode *ic)
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   size = IC_LEFT (ic)->aop->size;
 
-  if (size <= 4)
+  if (size <= 4 && !IS_STRUCT (operandType (IC_LEFT (ic))))
     {
       /* TODO: get this working with floats */
       if (IC_LEFT (ic)->aop->type == AOP_LIT && size == 4 && !IS_FLOAT (IC_LEFT (ic)->aop->aopu.aop_lit->type) &&

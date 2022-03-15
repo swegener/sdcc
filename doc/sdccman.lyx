@@ -44206,8 +44206,9 @@ Z80 SDCC calling convention, version 1
 This calling convention can be chosen per function via __sdcccall(1).
  8-bit return values are passed in a, 16-bit values in de, 24-bit values
  in lde, 32-bit values in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
 \end_layout
 
 \begin_layout Standard
@@ -44252,8 +44253,9 @@ This calling convention can be chosen per function via __sdcccall(0).
  in enhl, 32-bit values in dehl.
  Except for the SM83, where 8-bit values are passed in e, 16-bit values
  in de, 32-bit values in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
  Unless __z88dk_callee is used, all stack parameters are cleaned up by the
  caller.
 \end_layout
@@ -44286,8 +44288,9 @@ Rabbit SDCC calling convention, version 1
 This calling convention can be chosen per function via __sdcccall(1).
  8-bit return values are passed in a, 16-bit values in hl, 24-bit values
  in lde, 32-bit values in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
 \end_layout
 
 \begin_layout Standard
@@ -44343,8 +44346,9 @@ This calling convention can be chosen per function via __sdcccall(1).
 \begin_layout Standard
 8-bit return values are passed in a, 16-bit values in bc, 32-bit values
  in debc.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
 \end_layout
 
 \begin_layout Standard
@@ -44385,8 +44389,9 @@ SM83 SDCC calling convention, version 0
 This calling convention can be chosen per function via __sdcccall(0).
  8-bit return values are passed in e, 16-bit values in de, 32-bit values
  in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
  All parameters are passed on the stack.
  The stack is not adjusted for the parameters by the callee (thus the caller
  has to do this instead), unless __z88dk_callee is specified.
@@ -44403,8 +44408,9 @@ Functions declared as __smallc are called using the Small-C calling convention
  as 2 bytes, with the value in the lower byte).
  8-bit return values are passed in a, 16-bit values in de, 32-bit values
  in hlde.
- Larger return values are passed in memory in a location specified by the
- caller through a hidden pointer argument.
+ Larger return values (as well as struct and union independent of their
+ size) are passed in memory in a location specified by the caller through
+ a hidden pointer argument.
  This way assembler routines originally written for Small-C or code generated
  by Small-C can be called from SDCC.
  Currently variable arguments are not yet supported (neither on the caller
@@ -44532,7 +44538,7 @@ By default, the SDCC calling convention, version 1 is used.
 Arguments are passed on the stack right-to-left.
  Return values are in a (8 bit), x (16 bit), xyl (24 bit), xy (32 bit) or
  use a hidden extra pointer parameter pointing to the location (anything
- wider than 32 bit).
+ wider than 32 bit, and all struct / union).
 \end_layout
 
 \begin_layout Subsubsection

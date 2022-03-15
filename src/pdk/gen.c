@@ -2043,7 +2043,7 @@ genReturn (const iCode *ic)
 
   wassertl (currFunc, "return iCode outside of function");
 
-  if (left->aop->size > 2)
+  if (left->aop->size > 2 || IS_STRUCT (operandType (left)))
     {
       if (left->aop->type == AOP_STK)
         {

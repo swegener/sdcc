@@ -1,5 +1,14 @@
 2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/pdk/gen.c,
+	  src/z80/gen.c,
+	  src/SDCCsymt.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/structreturn.c:
+	  struct / union return support for pdk and z80 and related.
+
+2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/SDCCcse.c,
 	  src/SDCCicode.c,
 	  src/SDCCicode.h,

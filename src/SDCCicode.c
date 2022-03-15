@@ -3564,7 +3564,6 @@ operand *
 geniCodeCall (operand * left, ast * parms, int lvl)
 {
   iCode *ic;
-  operand *result;
   sym_link *type, *etype;
   sym_link *ftype;
   int stack = 0;
@@ -3647,14 +3646,27 @@ geniCodeCall (operand * left, ast * parms, int lvl)
   type = copyLinkChain (ftype->next);
   etype = getSpec (type);
   SPEC_EXTR (etype) = 0;
-  IC_RESULT (ic) = result = newiTempOperand (type, 1);
 
   ADDTOCHAIN (ic);
 
   /* stack adjustment after call */
   ic->parmBytes = stack;
 
-  return result;
+  if (!IS_STRUCT (type))
+    {
+      IC_RESULT (ic) = newiTempOperand (type, 1);
+      return IC_RESULT (ic);
+    }
+  else
+    {
+      symbol *sym = newSymbol (genSymName (ic->level), 1);
+      sym->type = copyLinkChain (type);
+      sym->etype = getSpec (sym->type);
+      SPEC_SCLS (sym->etype) = S_AUTO;
+      allocVariables (sym);
+      IC_RESULT (ic) = operandFromSymbol (sym, false);
+      return (operandFromSymbol (sym, true));
+    }
 }
 
 /*-----------------------------------------------------------------*/

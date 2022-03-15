@@ -8893,7 +8893,7 @@ genAddrOf (const iCode *ic)
 
   wassert (result);
   wassert (left);
-  wassert (IS_TRUE_SYMOP (left));
+  wassert (IS_SYMOP (left));
   wassert (right && IS_OP_LITERAL (IC_RIGHT (ic)));
 
   sym = OP_SYMBOL_CONST (left);

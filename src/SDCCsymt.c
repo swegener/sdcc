@@ -3243,7 +3243,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if ((TARGET_IS_MCS51 || TARGET_IS_DS390) && IS_AGGREGATE (sym->type->next))
+  if (TARGET_IS_MCS51 && IS_AGGREGATE (sym->type->next))
     {
       werrorfl (sym->fileDef, sym->lineDef, E_FUNC_AGGR, sym->name);
       return 0;

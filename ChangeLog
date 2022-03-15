@@ -2,7 +2,7 @@
 
 	* src/SDCCsymt.c,
 	  support/regression/tests/structreturn.c:
-	  Enable struct / union return for hc08, s08, mos6502.
+	  Enable struct / union return for hc08, s08, mos6502, ds390.
 
 2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

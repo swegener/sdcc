@@ -28,12 +28,14 @@ void testStaticAssert2X (void)
 #endif
 }
 
+int a[] = {1, 0};
+
 void testAssert (void)
 {
   assert (i);
   assert (i - 42);
 #ifdef __SDCC // SDCC assert is always C23-compliant
-  assert ((0, 1)); // C23 requires C23 to be implemented as variadic macro, allowing the use of the comma operator inside the argument.
+  assert (a[1, 0]); // C23 requires C23 to be implemented as variadic macro, which is meant for the use of compound literals in the argument. But the easiest way to test that is by using a comma operator not surrounded by ().
 #endif
 }
 

@@ -1,3 +1,8 @@
+2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* device/include/assert.h:
+	  Improve test for assert C23-compliance.
+
 2022-03-15 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:

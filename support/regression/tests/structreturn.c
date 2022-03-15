@@ -3,7 +3,7 @@
  */
 #include <testfwk.h>
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6501) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // struct / union return not yet implemented 
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) // struct / union return not yet implemented 
 struct s
 {
 	int a;
@@ -58,7 +58,7 @@ int h2(void)
 
 void testRet (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6501) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // struct / union return not yet implemented 
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) // struct / union return not yet implemented 
 	ASSERT (g1() == 3);
 	ASSERT (g2() == 3);
 	ASSERT (h1() == 2);

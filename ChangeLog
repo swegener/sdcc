@@ -4,7 +4,7 @@
 	  device/lib/lldiv.c:
 	  Fix pdk heap corruption on returning large struct.
 	* src/stm8/gen.c:
-	  Fix accesses beyond end of array.
+	  Fixes for large struct return.
 
 2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

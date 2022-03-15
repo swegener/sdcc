@@ -3648,23 +3648,25 @@ genCall (const iCode *ic)
           cost (180, 180);
         }
 
+      int stk = getSize (ftype->next) <= 8 ? IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk : (IC_RESULT (ic)->aop->aopu.bytes[0].byteu.stk - (getSize (ftype->next) - 1));
+
       if (stm8_extend_stack && !stm8IsParmInCall(ftype, "y") && ic->op != PCALL && optimize.codeSpeed) // 6 bytes, 4 cycles.
         {
-          emit2 ("addw", "y, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.size - 256 + G.stack.pushed);
+          emit2 ("addw", "y, #%d", stk + G.stack.size - 256 + G.stack.pushed);
           cost (4, 2);
           push (ASMOP_Y, 0, 2);
         }
       else if (!stm8IsParmInCall(ftype, "x")) // 5 bytes, 5 cycles.
         {
           emit2 ("ldw", "x, sp");
-          emit2 ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
+          emit2 ("addw", "x, #%d", stk + G.stack.pushed);
           cost (1 + 3, 1 + 2);
           push (ASMOP_X, 0, 2);
         }
       else if (!stm8IsParmInCall(ftype, "y")) // 8 bytes, 6 cycles.
         {
           emit2 ("ldw", "y, sp");
-          emit2 ("addw", "y, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
+          emit2 ("addw", "y, #%d", stk + G.stack.pushed);
           cost (2 + 4, 1 + 2);
           push (ASMOP_Y, 0, 2);
         }
@@ -4180,7 +4182,7 @@ genFunction (iCode *ic)
       cost (6, 3);
     }
 
-  bigreturn = (getSize (ftype->next) > 4);
+  bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
   G.stack.param_offset += bigreturn * 2;
 
   // Cosmic stack frame always uses 24-bit return address.

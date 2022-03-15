@@ -1,3 +1,8 @@
+2022-03-15 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  genPlusInc(), genMinusDec() and genlshTwo() improvements.
+	  
 2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/z80/main.c,
@@ -39,7 +44,7 @@
 
 2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
 
-	* src/mod6502/gen.c:
+	* src/mos6502/gen.c:
 	  Make regInfoStr display SP relative values when appropriate.
 	  Additional improvements to genAddrOf().
 

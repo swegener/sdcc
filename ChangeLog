@@ -1,3 +1,13 @@
+2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* device/lib/div.c,
+	  device/lib/ldiv.c,
+	  device/lib/lldiv.c,
+	  support/regression/tests/div.c,
+	  device/lib/Makefile.in,
+	  device/lib/*/Makefile.in:
+	  Division functions, RFE #167.
+
 2022-03-15 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* device/include/gcc_attr.h:

@@ -53,6 +53,9 @@ PDK14_SDCC = $(COMMON_SDCC) \
   _memmove.c \
   __memcpy.c \
   memcpy.c \
+  div.c \
+  ldiv.c \
+  lldiv.c \
   sprintf.c \
   vprintf.c
 

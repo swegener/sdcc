@@ -33,6 +33,9 @@ Z80_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
   _startup.c \
+  div.c \
+  ldiv.c \
+  lldiv.c \
   sprintf.c \
   vprintf.c \
   _strcmp.c \

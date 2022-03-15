@@ -39,6 +39,9 @@ STM8_SDCC = $(COMMON_SDCC) \
   _startup.c \
   _strlen.c \
   _memmove.c \
+  div.c \
+  ldiv.c \
+  lldiv.c \
   sprintf.c \
   vprintf.c \
   atomic_flag_clear.c

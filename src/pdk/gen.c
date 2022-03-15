@@ -344,7 +344,7 @@ aopForSym (const iCode *ic, symbol *sym)
       aop = newAsmop (AOP_STK);
       aop->size = getSize (sym->type);
       int base = sym->stack + (sym->stack < 0 ? G.stack.param_offset : 0);
-      for (int offset = 0; offset < aop->size; offset++)
+      for (int offset = 0; offset < aop->size && offset < 8; offset++)
         aop->aopu.bytes[offset].byteu.stk = base + offset;
     }
   /* sfr */
@@ -803,7 +803,8 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
     {
       if (!p_dead)
         pushPF (true);
-      pointPStack(source->aopu.bytes[soffset].byteu.stk, true, f_dead);
+      int stk = soffset < 8 ? source->aopu.bytes[soffset].byteu.stk : source->aopu.bytes[0].byteu.stk + soffset;
+      pointPStack(stk, true, f_dead);
       emit2 ("idxm", "a, p");
       cost (1, 2);
       if (!p_dead)

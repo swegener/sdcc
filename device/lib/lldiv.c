@@ -30,7 +30,6 @@
 
 #ifndef __SDCC_mcs51
 #ifndef __SDCC_ds390 // segfault
-#ifndef __SDCC_pdk15 // segfault for --stack-auto
 lldiv_t lldiv(long long int numer, long long int denom)
 {
 	lldiv_t ret;
@@ -38,7 +37,6 @@ lldiv_t lldiv(long long int numer, long long int denom)
 	ret.rem = numer % denom;
 	return(ret);
 }
-#endif
 #endif
 #endif
 

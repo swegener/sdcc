@@ -276,12 +276,15 @@ aopOnStack (const asmop *aop, int offset, int size)
     return (FALSE);
 
   if (offset + size > aop->size)
-    return (FALSE);
+    return (false);
+
+  if (aop->size > 8)
+    return (true);
 
   // Fully on stack?
   for (i = offset; i < offset + size; i++)
     if (aop->aopu.bytes[i].in_reg)
-      return (FALSE);
+      return (false);
 
   // Consecutive?
   stk_base = aop->aopu.bytes[offset].byteu.stk;
@@ -298,7 +301,10 @@ aopOnStack (const asmop *aop, int offset, int size)
 static bool
 aopOnStackNotExt (const asmop *aop, int offset, int size)
 {
-  return (aopOnStack (aop, offset, size) && (aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run)); // Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
+  if (!aopOnStack (aop, offset, size))
+    return (false);
+  int stk = offset < 8 ? aop->aopu.bytes[offset].byteu.stk : aop->aopu.bytes[0].byteu.stk - offset;
+  return (aopOnStack (aop, offset, size) && (stk + G.stack.pushed <= 255 || regalloc_dry_run)); // Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
 }
 
 /*-----------------------------------------------------------------*/
@@ -312,14 +318,22 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
       if (offset1 >= aop1->size || offset2 >= aop2->size)
         return (false);
 
-      if (aopRS (aop1) && aopRS (aop2) && // Same register
-        aop1->aopu.bytes[offset1].in_reg && aop2->aopu.bytes[offset2].in_reg &&
+      if (aopRS (aop1) && aopRS (aop2)) // Same register
+        {
+          bool in_reg1 = offset1 < 8 && aop1->aopu.bytes[offset1].in_reg;
+          bool in_reg2 = offset2 < 8 && aop2->aopu.bytes[offset2].in_reg;
+          if (in_reg1 && in_reg2 &&
         aop1->aopu.bytes[offset1].byteu.reg == aop2->aopu.bytes[offset2].byteu.reg)
         continue;
+        }
 
-      if (aopOnStack (aop1, offset1, 1) && aopOnStack (aop2, offset2, 1) && // Same stack location
-        aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
-        continue;
+      if (aopOnStack (aop1, offset1, 1) && aopOnStack (aop2, offset2, 1)) // Same stack location
+        {
+          int stk1 = offset1 < 8 ? aop1->aopu.bytes[offset1].byteu.stk : aop1->aopu.bytes[0].byteu.stk - offset1;
+          int stk2 = offset2 < 8 ? aop2->aopu.bytes[offset2].byteu.stk : aop2->aopu.bytes[0].byteu.stk - offset2;
+          if (stk1 == stk2)
+            continue;
+        }
 
       if (aop1->type == AOP_LIT && aop2->type == AOP_LIT &&
         byteOfVal (aop1->aopu.aop_lit, offset1) == byteOfVal (aop2->aopu.aop_lit, offset2))
@@ -396,18 +410,18 @@ aopGet(const asmop *aop, int offset)
   if (offset >= aop->size)
     return ("#0x00");
 
-  if (aopRS (aop) && aop->aopu.bytes[offset].in_reg)
+  if (aopRS (aop) && offset < 8 && aop->aopu.bytes[offset].in_reg)
     return (aop->aopu.bytes[offset].byteu.reg->name);
 
-  if (aopRS (aop) && !aop->aopu.bytes[offset].in_reg)
+  if (aopRS (aop) && (offset >= 8 || !aop->aopu.bytes[offset].in_reg))
     {
-      long int soffset = aop->aopu.bytes[offset].byteu.stk + G.stack.pushed;
+      long int soffset = (offset < 8 ? aop->aopu.bytes[offset].byteu.stk : aop->aopu.bytes[0].byteu.stk - offset) + G.stack.pushed;
       
       wassert (soffset < (1 << 16) && soffset >= 0);
 
       if (soffset > 255)
         {
-          long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + G.stack.size - 256l;
+          long int eoffset = (long int)(offset < 8 ? aop->aopu.bytes[offset].byteu.stk : aop->aopu.bytes[0].byteu.stk - offset) + G.stack.size - 256l;
 
           wassertl_bt (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl_bt (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
@@ -622,8 +636,8 @@ ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
       op2type = op2->type;
     }
 
-  r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
-  r2Idx = ((aopRS (op2) && op2->aopu.bytes[offset2].in_reg)) ? op2->aopu.bytes[offset2].byteu.reg->rIdx : -1;
+  r1Idx = ((aopRS (op1) && offset1 < 8 && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
+  r2Idx = ((aopRS (op2) && offset2 < 8 && op2->aopu.bytes[offset2].in_reg)) ? op2->aopu.bytes[offset2].byteu.reg->rIdx : -1;
 
   if (offset2 >= op2->size)
     op2type = AOP_LIT;
@@ -983,7 +997,7 @@ aopForSym (const iCode *ic, symbol *sym)
         base = 0;
       }
 
-      for(offset = 0; offset < aop->size; offset++)
+      for(offset = 0; offset < aop->size && offset < 8; offset++)
         aop->aopu.bytes[offset].byteu.stk = base + aop->size - offset;
     }
   else
@@ -1771,7 +1785,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   wassertl_bt (aopRS (result), "Invalid result type.");
 
   size = n;
-  for (i = 0, regsize = 0; i < n; i++)
+  for (i = 0, regsize = 0; i < n && soffset + i < 8; i++)
     regsize += source->aopu.bytes[soffset + i].in_reg;
 
   a_dead |= (result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + n);
@@ -1784,7 +1798,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
   // Do nothing for coalesced bytes.
   for (i = 0; i < n; i++)
-    if (result->aopu.bytes[roffset + i].in_reg && source->aopu.bytes[soffset + i].in_reg && result->aopu.bytes[roffset + i].byteu.reg == source->aopu.bytes[soffset + i].byteu.reg)
+    if (roffset + i < 8 && soffset + i < 8 && result->aopu.bytes[roffset + i].in_reg && source->aopu.bytes[soffset + i].in_reg && result->aopu.bytes[roffset + i].byteu.reg == source->aopu.bytes[soffset + i].byteu.reg)
       {
         assigned[i] = true;
         regsize--;

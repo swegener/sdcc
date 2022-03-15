@@ -521,7 +521,7 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
                     ip = NULL;
                   /* Finally, create initializer and insert it*/
                   val = valCastLiteral (operandType (op), 0.0, 0);
-                  newic = newiCode ('=', NULL, operandFromValue (val));
+                  newic = newiCode ('=', NULL, operandFromValue (val, false));
                   IC_RESULT (newic) = operandFromOperand (op);
                   IC_RESULT (newic)->isaddr = 0;
                   OP_DEFS (IC_RESULT (newic)) = OP_DEFS (op) = bitVectSetBit (OP_DEFS (op), newic->key);

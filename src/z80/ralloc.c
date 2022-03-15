@@ -1161,7 +1161,7 @@ joinPushes (iCode * lic)
       val = constVal (dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
       SPEC_NOUN (val->type) = V_INT;
-      IC_LEFT (ic) = operandFromValue (val);
+      IC_LEFT (ic) = operandFromValue (val, false);
 
       /* Now remove the second one from the list. */
       ic->next = uic->next;

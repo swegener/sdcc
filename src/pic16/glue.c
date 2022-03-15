@@ -183,7 +183,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                                         sym->implicit = 1;
 #endif
 
-                                reg = pic16_allocDirReg( operandFromSymbol( sym ));
+                                reg = pic16_allocDirReg (operandFromSymbol (sym, false));
 
                                 if(reg) {
                                   for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
@@ -238,7 +238,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                                                 sym->implicit = 1;              // mark as implicit
 #endif
                                         if(!sym->ival) {
-                                                reg = pic16_allocDirReg( operandFromSymbol(sym) );
+                                                reg = pic16_allocDirReg (operandFromSymbol (sym, false));
                                                 if(reg) {
                                                         if(checkAddReg(&pic16_fix_udata, reg)) {
                                                                 /* and add to globals list if not exist */
@@ -266,7 +266,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                                         if(IS_AGGREGATE(sym->type)) {
                                                 reg=pic16_allocRegByName(sym->rname, getSize( sym->type ), NULL);
                                         } else {
-                                                reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+                                                reg = pic16_allocDirReg (operandFromSymbol (sym, false));
                                         }
 
                                         {

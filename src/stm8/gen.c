@@ -4351,6 +4351,10 @@ genReturn (const iCode *ic)
   aopOp (left, ic);
   size = left->aop->size;
 
+  // struct and union are always returned via hidden pointer parameter.
+  if (IS_STRUCT (operandType (IC_LEFT (ic))))
+    goto bigreturn;
+
   switch (size)
     {
     case 0:
@@ -4363,7 +4367,7 @@ genReturn (const iCode *ic)
       genMove (aopRet (currFunc->type), left->aop, true, true, true);
       break;
     default:
-      wassertl (size > 4, "Return not implemented for return value of this size.");
+bigreturn:
 
       for(int i = 0; i < size; i++)
         if (aopInReg (left->aop, i, XL_IDX) || aopInReg (left->aop, i, XH_IDX))

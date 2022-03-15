@@ -342,7 +342,7 @@ rematable (symbol * sym, eBBlock * ebp, iCode * ic)
 static int
 notUsedInRemaining (symbol * sym, eBBlock * ebp, iCode * ic)
 {
-  return ((usedInRemaining (operandFromSymbol (sym), ic) ? 0 : 1) && allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
+  return ((usedInRemaining (operandFromSymbol (sym, false), ic) ? 0 : 1) && allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
 }
 
 /*-----------------------------------------------------------------*/
@@ -816,10 +816,10 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
      at the start & end of block respectively */
   if (ssym->blockSpil)
     {
-      iCode *nic = newiCode (IPUSH, operandFromSymbol (ssym), NULL);
+      iCode *nic = newiCode (IPUSH, operandFromSymbol (ssym, false), NULL);
       /* add push to the start of the block */
       addiCodeToeBBlock (ebp, nic, (ebp->sch->op == LABEL ? ebp->sch->next : ebp->sch));
-      nic = newiCode (IPOP, operandFromSymbol (ssym), NULL);
+      nic = newiCode (IPOP, operandFromSymbol (ssym, false), NULL);
       /* add pop to the end of the block */
       addiCodeToeBBlock (ebp, nic, NULL);
     }
@@ -830,11 +830,11 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
   if (ssym->remainSpil)
     {
 
-      iCode *nic = newiCode (IPUSH, operandFromSymbol (ssym), NULL);
+      iCode *nic = newiCode (IPUSH, operandFromSymbol (ssym, false), NULL);
       /* add push just before this instruction */
       addiCodeToeBBlock (ebp, nic, ic);
 
-      nic = newiCode (IPOP, operandFromSymbol (ssym), NULL);
+      nic = newiCode (IPOP, operandFromSymbol (ssym, false), NULL);
       /* add pop to the end of the block */
       addiCodeToeBBlock (ebp, nic, NULL);
     }
@@ -1662,7 +1662,7 @@ fillGaps ()
           if (sym->uptr && sym->dptr == 0 && !sym->ruonly && size < 4 && size > 1)
             {
 
-              if (packRegsDPTRuse (operandFromSymbol (sym)))
+              if (packRegsDPTRuse (operandFromSymbol (sym, false)))
                 {
 
                   /* if this was assigned to registers then */
@@ -1683,7 +1683,7 @@ fillGaps ()
                 }
 
               /* try assigning other dptrs */
-              if (sym->dptr == 0 && packRegsDPTRnuse (operandFromSymbol (sym), 1) && !getenv ("DPTRnDISABLE"))
+              if (sym->dptr == 0 && packRegsDPTRnuse (operandFromSymbol (sym, false), 1) && !getenv ("DPTRnDISABLE"))
                 {
                   /* if this was ssigned to registers then */
                   if (bitVectBitValue (_G.totRegAssigned, sym->key))

@@ -2187,7 +2187,7 @@ pic14_emitRegularMap (memmap *map, bool addPublics, bool arFlag)
           if (!reg)
             {
               DBG_MSG ("allocating register %s", name);
-              allocDirReg (operandFromSymbol (sym));
+              allocDirReg (operandFromSymbol (sym, false));
               reg = dirregWithName (name);
             }
           if (reg && !reg->wasUsed)

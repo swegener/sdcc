@@ -22,7 +22,7 @@ bar (char **p)
   return 0;
 }
 
-#if 0 // Enable when SDCC can return struct
+#if 0 // Enable when SDCC allows struct initialization by foo()
 static struct S
 foo (void)
 {
@@ -44,10 +44,11 @@ foo (void)
 void
 testTortureExecute (void)
 {
-#if 0 // Enable when SDCC can return struct
+#if 0 // Enable when SDCC allows struct initialization by foo()
   struct S s = foo ();
   if (s.c1 != 0)
     ASSERT (0);
   return;
 #endif
 }
+

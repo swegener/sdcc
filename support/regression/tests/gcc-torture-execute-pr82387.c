@@ -6,7 +6,7 @@ pr82387.c from the execute part of the gcc torture tests.
 
 /* PR tree-optimization/82387 */
 
-#if 0 // TODO: Enable when SDCC can return struct!
+#if 0 // TODO: Enable when SDCC accepts the struct initializatio below
 struct A { int b; };
 int f = 1;
 

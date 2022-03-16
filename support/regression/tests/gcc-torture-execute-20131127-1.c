@@ -21,7 +21,7 @@ struct S0 {
 short a = 1;
 
 struct S0 b = { 1 }, c, d, e;
-#if 0 // Enable when SDCC can return struct
+#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
 struct S0 fn1() { return c; }
 
 void fn2 (void)
@@ -34,7 +34,7 @@ void fn2 (void)
 void
 testTortureExecute (void)
 {
-#if 0
+#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
   fn2 ();
   if (a != 0)
     ASSERT (0);

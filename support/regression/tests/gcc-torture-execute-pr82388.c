@@ -6,7 +6,7 @@ pr82388.c from the execute part of the gcc torture tests.
 
 /* PR tree-optimization/82388 */
 
-#if 0 // TODO: Enable when SDCC can return struct!
+#if 0 // TODO: Enable when SDCC can initialize with extra braces
 struct A { int b; int c; int d; } e;
 
 struct A

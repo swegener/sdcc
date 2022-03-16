@@ -2,6 +2,16 @@
 
 	* src/z80/gen.c:
 	  Fix access before array.
+	* support/regression/tests/gcc-torture-execute-20020206-1.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c,
+	  support/regression/tests/gcc-torture-execute-20071210-1.c,
+	  support/regression/tests/gcc-torture-execute-20131127-1.c,
+	  support/regression/tests/gcc-torture-execute-20170401-1.c,
+	  support/regression/tests/gcc-torture-execute-20171008-1.c,
+	  support/regression/tests/gcc-torture-execute-pr60017.c,
+	  support/regression/tests/gcc-torture-execute-pr82387.c,
+	  support/regression/tests/gcc-torture-execute-pr82388.c:
+	  Update reasons why we skip some gcc tests.
 
 2022-03-16 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

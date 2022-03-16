@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when struct can be returned!
+#if 0 // TODO: Enable when sdcc supports compound literals
 struct A {
   unsigned int a, b, c;
 };

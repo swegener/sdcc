@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when struct can be returned!
+#if 0 // TODO: Enable when struct can be returned and sdc accepts the array init with && below.
 /* PR rtl-optimization/34302 */
 
 struct S
@@ -20,7 +20,7 @@ struct S
 foo (int x, int y, int z)
 {
   if (x != 10 || y != 9 || z != 8)
-    abort ();
+    ASSERT (0);
   struct S s = { 1, 2, 3, 4 };
   return s;
 }

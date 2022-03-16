@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when struct can be returned
+#if 0 // TODO: Enable when struct can be passed
 /* Test that sibling call is not used if there is an argument overlap.  */
 
 struct S

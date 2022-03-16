@@ -2014,6 +2014,11 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
 
   emitComment (TRACE_AOP, __func__ );
 
+  if(!srcaop || !dstaop) {
+    if(!srcaop) emitcode("ERROR", "srcaop is null");
+    if(!dstaop) emitcode("ERROR", "dstaop is null");
+    return;
+  }
   wassert (srcaop && dstaop);
 
   /* ignore transfers at the same byte, unless its volatile */
@@ -2524,7 +2529,7 @@ operandOnStack(operand *op)
  *             anticipated stack reference
  *************************************************************************/
 static bool
-tsxUseful(iCode *ic)
+tsxUseful(const iCode *ic)
 {
   operand *right  = IC_RIGHT(ic);
   operand *left   = IC_LEFT(ic);
@@ -2623,7 +2628,7 @@ restoreBasePtr()
  *
  *************************************************************************/
 static asmop *
-aopForSym (iCode * ic, symbol * sym)
+aopForSym (const iCode * ic, symbol * sym)
 {
   asmop *aop;
   memmap *space;
@@ -2933,7 +2938,7 @@ aopCanShift (asmop * aop)
  *
  *************************************************************************/
 static void
-aopOp (operand *op, iCode * ic)
+aopOp (operand *op, const iCode * ic)
 {
   asmop *aop = NULL;
   symbol *sym;
@@ -6920,6 +6925,57 @@ m6502_genInline (iCode * ic)
 }
 
 /**************************************************************************
+ * genGetByte - generates code to get a single byte
+ *************************************************************************/
+static void
+genGetByte (const iCode *ic)
+{
+  operand *left   = IC_LEFT (ic);
+  operand *right  = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+  int offset;
+
+  emitComment (TRACEGEN, __func__);
+
+  aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
+
+  offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
+  transferAopAop(left->aop, offset, result->aop, 0);
+
+  freeAsmop (result, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
+}
+
+/**************************************************************************
+ * genGetWord - generates code to get a 16-bit word
+ *************************************************************************/
+static void
+genGetWord (const iCode *ic)
+{
+  operand *left   = IC_LEFT (ic);
+  operand *right  = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+  int offset;
+
+  emitComment (TRACEGEN, __func__);
+
+  aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
+
+  offset = (int) ulFromVal (right->aop->aopu.aop_lit) / 8;
+  transferAopAop(left->aop, offset, result->aop, 0);
+  transferAopAop(left->aop, offset+1, result->aop, 1);
+
+  freeAsmop (result, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
+}
+
+/**************************************************************************
  * genRRC - rotate right with carry
  *************************************************************************/
 static void
@@ -10401,9 +10457,15 @@ genm6502iCode (iCode *ic)
 
     case SWAP:
     case GETABIT:
-    case GETBYTE:
-    case GETWORD:
       wassertl (0, "Unimplemented iCode");
+      break;
+
+    case GETBYTE:
+      genGetByte(ic);
+      break;
+
+    case GETWORD:
+      genGetWord(ic);
       break;
 
     case LEFT_OP:

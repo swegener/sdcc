@@ -7,6 +7,9 @@
 	  device/lib/mos65c02/Makefile.in,
   	  device/lib/mos6502-stack-auto/Makefinle.in:
 	  Enable div and ldviv for mos6502 and hc08/s08 ports.
+	* src/mos6502/gen.c,
+	  src/mos6502/main.c:
+	  Add support for GETBYTE and GETWORD iCodes.
 
 2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

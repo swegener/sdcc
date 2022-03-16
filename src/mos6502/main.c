@@ -300,8 +300,8 @@ hasExtBitOp (int op, int size)
       //|| (op == SWAP && size <= 2)
       // TODO?
       //|| op == GETABIT
-      //|| op == GETBYTE
-      //|| op == GETWORD
+      || op == GETBYTE
+      || op == GETWORD
      )
     return true;
   else

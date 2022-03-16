@@ -1481,7 +1481,7 @@ constCharacterVal (unsigned long v, char type)
       SPEC_LONG (val->etype) = 1;
       SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
       break;
-    case '8':
+    case '8': // u8 character constant of type char8_t, a typedef for unsigned char.
       if (!options.std_c2x)
         werror (E_U8_CHAR_C2X);
       if (v >= 128)
@@ -1630,14 +1630,22 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  if (s[0] == '"' || s[0] == 'u' && s[1] == '8' && s[2] == '"') // UTF-8 string literal
+  bool explicit_u8 = s[0] == 'u' && s[1] == '8' && s[2] == '"';
+
+  if (s[0] == '"' || explicit_u8) // UTF-8 string literal
     {
+      
       // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 (handling all escape sequences, etc).
       utf_8 = copyStr (s[0] == '"' ? s : s + 2, &utf_8_size);
 
       SPEC_NOUN (val->etype) = V_CHAR;
-      SPEC_USIGN (val->etype) = !options.signed_char;
-      val->etype->select.s.b_implicit_sign = true;
+      if (options.std_c2x && explicit_u8) // In C23, u8-prefixed string literals are of type char8_t *, ad char8_t is a typedef for unsigned char.
+        SPEC_USIGN (val->etype) = true;
+      else
+        {
+          SPEC_USIGN (val->etype) = !options.signed_char;
+          val->etype->select.s.b_implicit_sign = true;
+        }
       SPEC_CVAL (val->etype).v_char = utf_8;
       DCL_ELEM (val->type) = utf_8_size;
     }

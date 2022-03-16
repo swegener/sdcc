@@ -39,6 +39,13 @@
   typedef unsigned int size_t;
 #endif
 
+#if __STDC_VERSION__ >= 201112L // TODO: Replace by exact value from final version of C23 standard.
+#ifndef __CHAR8_T_DEFINED
+#define __CHAR8_T_DEFINED
+  typedef unsigned char char8_t;
+#endif
+#endif
+
 #ifndef __CHAR16_T_DEFINED
 #define __CHAR16_T_DEFINED
   typedef unsigned int char16_t;

@@ -12,6 +12,9 @@
 	  support/regression/tests/gcc-torture-execute-pr82387.c,
 	  support/regression/tests/gcc-torture-execute-pr82388.c:
 	  Update reasons why we skip some gcc tests.
+	* device/include/uchar.h,
+	  src/SDCCval.c:
+	  In C23, u8-prefixed string literals are arrays of char8_t, a typedef for unsigned char. RFE #779.
 
 2022-03-16 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

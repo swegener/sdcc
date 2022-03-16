@@ -3,6 +3,8 @@
 # simulation timeout in seconds
 SIM_TIMEOUT = 40
 
+EMU_PORT_FLAG = -tez80
+
 # path to uCsim
 ifdef SDCC_BIN_PATH
   UCZ80C = $(SDCC_BIN_PATH)/ucsim_z80$(EXEEXT)
@@ -68,7 +70,7 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 # run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) -tez80 $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
+	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true

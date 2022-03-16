@@ -7,6 +7,9 @@ CC_FOR_BUILD = $(CC)
 # simulation timeout in seconds
 SIM_TIMEOUT = 240
 
+EMU_PORT_FLAG = -tds390
+EMU_FLAGS = -S in=$(DEV_NULL),out=-
+
 # path to uCsim
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/ucsim_51$(EXEEXT)
@@ -66,10 +69,9 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 # run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) -tds390 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $(@:.out=.sim) \
+	$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	$(PYTHON) $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
+	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
-
 
 _clean:

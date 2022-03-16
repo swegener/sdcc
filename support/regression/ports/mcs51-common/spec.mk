@@ -3,6 +3,10 @@
 # simulation timeout in seconds
 SIM_TIMEOUT = 80
 
+EMU_PORT_FLAG = -t32
+EMU_FLAGS = -S in=$(DEV_NULL),out=-
+PORT_BASE = mcs51-common
+
 # path to uCsim
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/ucsim_51$(EXEEXT)
@@ -63,9 +67,9 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib $(PORTS_DIR)/mcs51-common/f
 # run simulator with SIM_TIMEOUT seconds timeout
 %.out: %$(BINEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51-common/uCsim.cmd > $(@:.out=.sim) \
+	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $< < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	$(PYTHON) $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
+	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 _clean:

@@ -14,7 +14,7 @@
 # re-run.  Changing one suite causes just that to be run.  Changing
 # one of the library files should cause all to re-run
 
-# Dependancies:
+# Dependencies:
 #   * The sdcc-extra package, available from svn.
 #       o svn co https://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra
 #       o Provides the emulators
@@ -30,7 +30,7 @@
 # Old notes:
 # Starting at the bottom
 # Set of source test suites
-# Each source suite is processesd producing multiple device specific test suites.
+# Each source suite is processed producing multiple device specific test suites.
 # Each device specific test suite is compiled.
 # Each device specific test suite is run, and the output recorded.
 # The output from each device specific test suite derived from a source
@@ -59,7 +59,7 @@ RESULTS_DIR = results
 # under PORTS_DIR.
 PORTS_DIR = $(srcdir)/ports
 
-# Itermediate data directories
+# Intermediate data directories
 # Directory that generated cases and the related object code go.
 CASES_DIR = gen
 

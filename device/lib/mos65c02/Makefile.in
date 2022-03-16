@@ -40,15 +40,17 @@ M6502_LONGLONG = $(COMMON_LONGLONG) \
 M6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
+  __memcpy.c \
+  _heap.c \
+  _memmove.c \
   _spx.c \
   _startup.c \
-  _strlen.c \
   _strcmp.c \
   _strcpy.c \
-  __memcpy.c \
+  _strlen.c \
+  div.c \
+  ldiv.c \
   memcpy.c \
-  _memmove.c \
-  _heap.c \
   sprintf.c \
   vprintf.c \
   atomic_flag_clear.c
@@ -56,7 +58,7 @@ M6502_SDCC = $(COMMON_SDCC) \
 M6502SOURCES = $(addprefix ../,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
 M6502OBJECTS = $(patsubst %.c,%.rel,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
 
-OBJ = _ret.rel _mulint.rel _setjmp.rel atomic_flag_test_and_set.rel
+OBJ = _ret.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
 
 LIB = m65c02.lib
 CC = $(SCC)

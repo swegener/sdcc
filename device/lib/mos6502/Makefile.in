@@ -39,25 +39,27 @@ MOS6502_LONGLONG = $(COMMON_LONGLONG) \
   _rlulonglong.c \
   _rlslonglong.c \
   _mullonglong.c \
-  _divulonglong.c \
   _divslonglong.c \
-  _modulonglong.c \
-  _modslonglong.c
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
 
 MOS6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
+  __memcpy.c \
+  _heap.c \
+  _memmove.c \
   _spx.c \
   _startup.c \
-  sprintf.c \
-  vprintf.c \
   _strcmp.c \
   _strcpy.c \
   _strlen.c \
-  _memmove.c \
-  __memcpy.c \
+  div.c \
+  ldiv.c \
   memcpy.c \
-  _heap.c \
+  sprintf.c \
+  vprintf.c \
   atomic_flag_clear.c
 
 MOS6502SOURCES = $(addprefix ../,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_LONG) $(MOS6502_LONGLONG) $(MOS6502_SDCC))

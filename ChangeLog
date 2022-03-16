@@ -1,3 +1,13 @@
+2022-03-14 Gabriele Gorla <gorlik@yahoo.com>
+
+	* support/regression/tests/div.c,
+	  device/lib/s08/Makefile.in,
+	  device/lib/hc08/Makefile.in,
+	  device/lib/mos6502/Makefile.in,
+	  device/lib/mos65c02/Makefile.in,
+  	  device/lib/mos6502-stack-auto/Makefinle.in:
+	  Enable div and ldviv for mos6502 and hc08/s08 ports.
+
 2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,

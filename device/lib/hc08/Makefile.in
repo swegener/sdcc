@@ -46,6 +46,8 @@ HC08_SDCC = $(COMMON_SDCC) \
   _strlen.c \
   _strcpy.c \
   __memcpy.c \
+  div.c \
+  ldiv.c \
   memcpy.c \
   _memmove.c \
   _heap.c \

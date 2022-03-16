@@ -17,6 +17,7 @@ include $(srcdir)/../incl.mk
 HC08_FLOAT = $(COMMON_FLOAT)
 
 HC08_INT = $(COMMON_INT) \
+  _mulint.c \
   _divsint.c \
   _divuint.c \
   _modsint.c \
@@ -46,6 +47,8 @@ HC08_SDCC = $(COMMON_SDCC) \
   _strcmp.c \
   _strcpy.c \
   __memcpy.c \
+  div.c \
+  ldiv.c \
   memcpy.c \
   _memmove.c \
   _heap.c \
@@ -56,7 +59,7 @@ HC08_SDCC = $(COMMON_SDCC) \
 HC08SOURCES = $(addprefix ../,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_LONGLONG) $(HC08_SDCC))
 HC08OBJECTS = $(patsubst %.c,%.rel,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_LONGLONG) $(HC08_SDCC))
 
-OBJ = _ret.rel _mulint.rel _setjmp.rel atomic_flag_test_and_set.rel
+OBJ = _ret.rel _setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = s08.lib
 CC = $(SCC)

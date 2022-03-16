@@ -1438,9 +1438,7 @@ aopForSym (const iCode * ic, symbol * sym, bool requires_a)
 
   /* if already has one */
   if (sym->aop)
-    {
-      return sym->aop;
-    }
+    return sym->aop;
 
   /* Assign depending on the storage class */
   if (sym->onStack || sym->iaccess)
@@ -1461,6 +1459,7 @@ aopForSym (const iCode * ic, symbol * sym, bool requires_a)
           sym->aop = aop = newAsmop (AOP_STK);
         }
 
+      memset (aop->regs, -1, sizeof(aop->regs));
       aop->size = getSize (sym->type);
       aop->aopu.aop_stk = sym->stack;
       return aop;
@@ -1863,6 +1862,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
   /* must be in a register */
   sym->aop = op->aop = aop = newAsmop (AOP_REG);
   aop->size = sym->nRegs;
+  memset (aop->regs, -1, sizeof(aop->regs));
   for (i = 0; i < sym->nRegs; i++)
     {
       wassertl (sym->regs[i], "Symbol in register, but no register assigned.");
@@ -3818,11 +3818,12 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       }
   
   // Move everything from registers to the stack.
-  for (int i = 0; i < n;)
+  wassert (source->type != AOP_REG || source->size < 8);
+  for (int i = 0; i < n && source->type == AOP_REG;)
     {
-      bool a_free = a_dead && (source->regs[A_IDX] < 0 || assigned[source->regs[A_IDX] - soffset] || i == source->regs[A_IDX] - soffset);
-      bool hl_free = hl_dead && (source->regs[L_IDX] < 0 || assigned[source->regs[L_IDX] - soffset] || i == source->regs[L_IDX] - soffset) && (source->regs[H_IDX] < 0 || assigned[source->regs[H_IDX] - soffset] || i == source->regs[H_IDX] - soffset);
-      bool de_free = de_dead && (source->regs[E_IDX] < 0 || assigned[source->regs[E_IDX] - soffset] || i == source->regs[E_IDX] - soffset) && (source->regs[D_IDX] < 0 || assigned[source->regs[D_IDX] - soffset] || i == source->regs[D_IDX] - soffset);
+      bool a_free = a_dead && (source->regs[A_IDX] < soffset || assigned[source->regs[A_IDX] - soffset] || i == source->regs[A_IDX] - soffset);
+      bool hl_free = hl_dead && (source->regs[L_IDX] < soffset || assigned[source->regs[L_IDX] - soffset] || i == source->regs[L_IDX] - soffset) && (source->regs[H_IDX] < soffset || assigned[source->regs[H_IDX] - soffset] || i == source->regs[H_IDX] - soffset);
+      bool de_free = de_dead && (source->regs[E_IDX] < soffset || assigned[source->regs[E_IDX] - soffset] || i == source->regs[E_IDX] - soffset) && (source->regs[D_IDX] < soffset || assigned[source->regs[D_IDX] - soffset] || i == source->regs[D_IDX] - soffset);
 
       int fp_offset = result->aopu.aop_stk + (result->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + roffset + i;
       int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
@@ -4171,15 +4172,16 @@ skip_byte:
     }
   
   // Last, move everything else from stack to registers.
-  for (int i = 0; i < n;)
+  wassert (result->type != AOP_REG || result->size < 8);
+  for (int i = 0; i < n && result->type == AOP_REG;)
     {
       const int fp_offset = source->aopu.aop_stk + soffset + i + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       const int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
-      bool a_free = a_dead && (result->regs[A_IDX] < 0 || !assigned[result->regs[A_IDX] - roffset]);
-      const bool hl_free = hl_dead && (result->regs[L_IDX] < 0 || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
-      const bool e_free = de_dead && (result->regs[E_IDX] < 0 || !assigned[result->regs[E_IDX] - roffset]);
-      const bool d_free = de_dead && (result->regs[D_IDX] < 0 || !assigned[result->regs[D_IDX] - roffset]);
+      bool a_free = a_dead && (result->regs[A_IDX] < roffset || !assigned[result->regs[A_IDX] - roffset]);
+      const bool hl_free = hl_dead && (result->regs[L_IDX] < roffset || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
+      const bool e_free = de_dead && (result->regs[E_IDX] < roffset || !assigned[result->regs[E_IDX] - roffset]);
+      const bool d_free = de_dead && (result->regs[D_IDX] < roffset || !assigned[result->regs[D_IDX] - roffset]);
       const bool de_free = e_free && d_free;
  
       if (assigned[i])

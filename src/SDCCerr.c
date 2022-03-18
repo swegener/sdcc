@@ -608,7 +608,7 @@ struct
   { W_SFR_ADDRESS, ERROR_LEVEL_WARNING,
      "unsupported address of __sfr taken", 0},
   { E_INVALID_BITINTWIDTH, ERROR_LEVEL_ERROR,
-     "invalid with for bit-precise integer type", 0},
+     "invalid width for bit-precise integer type", 0},
   { W_BITINTCONST_C23, ERROR_LEVEL_WARNING,
      "bit-precise integer constant requires ISO C23 or later", 0},
 };

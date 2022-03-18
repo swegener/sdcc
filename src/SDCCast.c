@@ -942,7 +942,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
       resultType = RESULT_TYPE_NONE;
 
       /* If it's a char, upcast to int. */
-      if (IS_INTEGRAL (ftype) && (getSize (ftype) < (unsigned) INTSIZE))
+      if (IS_INTEGRAL (ftype) && !IS_BITINT (ftype) && (getSize (ftype) < (unsigned) INTSIZE))
         {
           newType = newAst_LINK (INTTYPE);
         }

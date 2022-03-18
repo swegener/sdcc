@@ -1,5 +1,15 @@
 2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* device/include/stdarg.h,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCicode.c,
+	  support/regression/tests/gcc-torture-execute-pr60017.c,
+	  support/regression/tests/bitintvararg.c:
+	  Fixes for bit-precise varargs, bug #3361.
+
+2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/SDCCicode.c,
 	  src/SDCCsymt.c,
 	  src/stm8/gen.c,

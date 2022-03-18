@@ -36,11 +36,17 @@ typedef unsigned char * va_list;
 #define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
 #define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
 
-#elif defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#elif defined(__SDCC_ds390) || defined(__SDCC_ds400)
 
 typedef unsigned char * va_list;
 #define va_start(marker, first) { marker = (va_list)&first; }
 #define va_arg(marker, type)    *((type *)(marker -= sizeof(type)))
+
+#elif defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+
+typedef unsigned char * va_list;
+#define va_start(marker, first) { marker = (va_list)&first; }
+#define va_arg(marker, type)    *((type *)(marker -= (sizeof(type) + sizeof(type) % 2)))
 
 #elif defined(__SDCC_USE_XSTACK)
 

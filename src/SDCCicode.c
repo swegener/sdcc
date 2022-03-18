@@ -2977,7 +2977,7 @@ setOClass (sym_link * ptr, sym_link * spec)
 /* geniCodeDerefPtr - dereference pointer with '*'                 */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeDerefPtr (operand * op, int lvl)
+geniCodeDerefPtr (operand *op, int lvl)
 {
   sym_link *rtype, *retype;
   sym_link *optype = operandType (op);
@@ -3029,7 +3029,7 @@ geniCodeDerefPtr (operand * op, int lvl)
   op->isGptr = IS_GENPTR (optype);
 
   op->isaddr = (IS_PTR (rtype) ||
-                IS_STRUCT (rtype) || IS_INT (rtype) || IS_BOOL (rtype) || IS_CHAR (rtype) || IS_FLOAT (rtype) || IS_FIXED (rtype));
+                IS_STRUCT (rtype) || IS_INT (rtype) || IS_BITINT (rtype) || IS_BOOL (rtype) || IS_CHAR (rtype) || IS_FLOAT (rtype) || IS_FIXED (rtype));
 
   if (!isLvaluereq (lvl))
     op = geniCodeRValue (op, TRUE);

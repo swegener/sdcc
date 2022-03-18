@@ -6,8 +6,9 @@
 	  src/z80/gen.c,
 	  support/regression/tests/bug-3359.c,
 	  support/regression/tests/structparam.c,
-	  .version:
-	  Fix bug #3359 and implement struct / union parameters for stm8, z80 and related, RFE #23.
+	  .version,
+	  doc/sdccman.lyx:
+	  Fix bug #3359 and implement struct / union parameters for stm8, z80 and related (and for pdk with --stack-auto), RFE #23.
 
 2022-03-16 Gabriele Gorla <gorlik@yahoo.com>
 

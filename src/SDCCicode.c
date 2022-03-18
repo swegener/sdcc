@@ -3521,6 +3521,9 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
       /* now decide whether to push or assign */
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
         {
+          bool is_structparm = IS_STRUCT (argVals->type);
+          if (is_structparm)
+            werror (E_STRUCT_AS_ARG, argVals->name); // TODO: Rewrite as call to __builtin_memcpy!
           /* assign */
           operand *top = operandFromValue (argVals, true);
           /* clear useDef and other bitVectors */

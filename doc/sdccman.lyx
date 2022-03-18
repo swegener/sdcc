@@ -44235,6 +44235,8 @@ For Functions that do not have variable arguments: The first parameter is
  If the first parameter is in a, and the second has 8 bits, it is passed
  in l; if the first is passed in a or hl, and the second has 16 bits, it
  is passed in de; all other parameters are passed on the stack, right-to-left.
+ Independent of their size, struct / union parameters and all following
+ parameters are always passed on the stack.
  If __z88dk_callee is not used, after the call, the stack parameters are
  cleaned up by the caller, with the following exceptions: functions that
  do not have variable arguments and return void or a type of at most 16
@@ -44318,6 +44320,8 @@ For Functions that do not have variable arguments: The first parameter is
  in l; if the first is in hl or hlde, and the second has 8 bits, it is passed
  in a; if the first is in a, and the second has 16 bits, it is passed in
  hl; all other parameters are passed on the stack, right-to-left.
+ Independent of their size, struct / union parameters and all following
+ parameters are always passed on the stack.
  If __z88dk_callee is not used, after the call, the stack parameters are
  cleaned up by the caller, with the following exceptions: functions that
  do not have variable arguments and return void or a type of at most 16
@@ -44377,6 +44381,8 @@ For Functions that do not have variable arguments: The first parameter is
  in a; if the first is passed in a, and the second has 16 bits, it is passed
  in bc; if the first is passed in de, and the second has 16 bits, it is
  passed in bc; all other parameters are passed on the stack, right-to-left.
+ Independent of their size, struct / union parameters and all following
+ parameters are always passed on the stack.
  The stack is adjusted by the callee (thus explicitly specifying __z88dk_callee
  does not make a difference).
 \end_layout
@@ -44564,6 +44570,8 @@ For functions that have variable arguments, all parameters are passed on
  If the first parameter has 16 bits, and the second has 8 bits, the second
  is passed in a.
  All other parameters are passed on the stack.
+ Independent of their size, struct / union parameters and all following
+ parameters are always passed on the stack.
  If __z88dk_callee is specified, the stack is always adjusted by the callee.
  Otherwise, for the large memory model, the stack is always adjusted by
  the caller.

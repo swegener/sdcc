@@ -6,7 +6,8 @@
 
 #include <testfwk.h>
 
-#if defined(__SDCC_stm8) || defined(__SDCC_z80) || defined(__SDCC_sm83) || defined(__SDCC_r3ka) // Many ports don't support struct parameters yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 struct s
 {
 	{type} a;
@@ -29,7 +30,8 @@ struct s
 
 void testParam (void)
 {
-#if defined(__SDCC_stm8) || defined(__SDCC_z80) || defined(__SDCC_sm83) || defined(__SDCC_r3ka) // Many ports don't support struct parameters yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 	ASSERT (g(23, 42) == 23 + 42);
 #endif
 }

@@ -4325,7 +4325,7 @@ ast2iCode (ast * tree, int lvl)
     seqPoint = tree->seqPoint;
 
   if (tree->type == EX_VALUE)
-    return operandFromValue (tree->opval.val, true);
+    return operandFromValue (tree->opval.val, false);
 
   if (tree->type == EX_LINK)
     return operandFromLink (tree->opval.lnk);
@@ -4385,7 +4385,7 @@ ast2iCode (ast * tree, int lvl)
         }
       else
         {
-          right = operandFromAst (tree->right, lvl, tree->opval.op != RETURN);
+          right = operandFromAst (tree->right, lvl, tree->opval.op != RETURN && tree->opval.op != IPUSH);
         }
     }
 

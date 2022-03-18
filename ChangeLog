@@ -1,8 +1,13 @@
 2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
-	* src/SDCCsymt.c,
-	  src/stm8/gen.c:
-	  Preparations for struct / union parameters.
+	* src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  support/regression/tests/bug-3359.c,
+	  support/regression/tests/structparam.c,
+	  .version:
+	  Fix bug #3359 and implement struct / union parameters for stm8, z80 and related, RFE #23.
 
 2022-03-16 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -3134,8 +3134,8 @@ inCalleeSaveList (char *s)
 value *
 aggregateToPointer (value *val)
 {
-  // SDCC doesn't support struct / union parameters yet.
-  if (IS_STRUCT (val->type))
+  // SDCC support struct / union parameters for stm8 and z80-related only. Todo: make it work for all ports!
+  if (!(TARGET_IS_STM8 || TARGET_Z80_LIKE) && IS_STRUCT (val->type))
     {
       werror (E_STRUCT_AS_ARG, val->name);
       return 0;

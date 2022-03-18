@@ -3,6 +3,7 @@
     type: int, long
 
  */
+
 #include <testfwk.h>
 
 #ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct

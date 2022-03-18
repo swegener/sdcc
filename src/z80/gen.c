@@ -1934,8 +1934,8 @@ aopArg (sym_link *ftype, int i)
 
   if (FUNC_ISZ88DK_FASTCALL (ftype))
     {
-      if (i != 1)
-        return false;
+      if (i != 1 || IS_STRUCT (args->type))
+        return 0;
 
       switch (getSize (args->type))
         {
@@ -1950,7 +1950,7 @@ aopArg (sym_link *ftype, int i)
         }
     }
     
-  // Old SDCC calling convention.
+  // Old SDCC calling convention: Pass everything on the stack.
   if (FUNC_SDCCCALL (ftype) == 0 || FUNC_ISSMALLC (ftype) || IFFUNC_ISBANKEDCALL (ftype))
     return 0;
 
@@ -1963,6 +1963,9 @@ aopArg (sym_link *ftype, int i)
 
       for (j = 1, arg = args; j < i; j++, arg = arg->next)
         wassert (arg);
+
+      if (IS_STRUCT (arg->type))
+        return 0;
 
       if (i == 1 && getSize (arg->type) == 1)
         return ASMOP_A;

@@ -1058,7 +1058,8 @@ aopForRemat (symbol *sym)
   if (OP_SYMBOL (IC_LEFT (ic))->onStack)
     {
       aop = newAsmop (AOP_STL);
-      aop->aopu.stk_off = (long)(OP_SYMBOL (IC_LEFT (ic))->stack) + 1 + val;
+      long int base = (long)(OP_SYMBOL (IC_LEFT (ic))->stack) + (OP_SYMBOL (IC_LEFT (ic))->stack > 0 ? G.stack.param_offset : 0);
+      aop->aopu.stk_off = base + 1 + val;
     }
   else
     {

@@ -1274,6 +1274,8 @@ aopArg (sym_link *ftype, int i)
           stackarg |= (getSize (arg->type) > 4 || num_1_byte_args > 1 || num_2_byte_args > 2);
         }
 
+      wassertl (!IS_STRUCT (arg->type), "Unimplemented struct parameter for IAR calling convention"); // Todo: Implement!
+
       // IAR passes the first two 24-bit / 32-bit arguments in pseudoregisters.
       if ((getSize (arg->type) == 3 || getSize (arg->type) == 4))
         werror (E_IAR_PSEUDOPARM);
@@ -1306,6 +1308,8 @@ aopArg (sym_link *ftype, int i)
   // Cosmic calling convention.
   if (FUNC_ISCOSMIC (ftype))
     {
+      wassertl (!IS_STRUCT (args->type), "Unimplemented struct parameter for Cosmic calling convention"); // Todo: Implement!
+
       if (i == 1 && getSize (args->type) == 1)
         return ASMOP_A;
 
@@ -1323,6 +1327,11 @@ aopArg (sym_link *ftype, int i)
 
       for (j = 1, arg = args; j < i; j++, arg = arg->next)
         wassert (arg);
+
+      wassertl (!IS_STRUCT (arg->type) || !FUNC_ISRAISONANCE (ftype), "Unimplemented struct parameter for IAR calling convention"); // Todo: Implement!
+
+      if (IS_STRUCT (arg->type))
+        return 0;
 
       if (i == 1 && getSize (arg->type) == 2)
         return ASMOP_X;

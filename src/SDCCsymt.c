@@ -3132,17 +3132,17 @@ inCalleeSaveList (char *s)
 /*                         argument to a pointer to that type.     */
 /*-----------------------------------------------------------------*/
 value *
-aggregateToPointer (value * val)
+aggregateToPointer (value *val)
 {
-  if (IS_AGGREGATE (val->type))
+  // SDCC doesn't support struct / union parameters yet.
+  if (IS_STRUCT (val->type))
     {
-      /* if this is a structure */
-      if (IS_STRUCT (val->type))
-        {
-          werror (E_STRUCT_AS_ARG, val->name);
-          return NULL;
-        }
-
+      werror (E_STRUCT_AS_ARG, val->name);
+      return 0;
+    }
+        
+  if (IS_ARRAY (val->type))
+    {
       /* change to a pointer depending on the */
       /* storage class specified        */
       switch (SPEC_SCLS (val->etype))

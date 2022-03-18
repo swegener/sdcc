@@ -1,3 +1,9 @@
+2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c,
+	  src/stm8/gen.c:
+	  Preparations for struct / union parameters.
+
 2022-03-16 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:

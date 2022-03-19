@@ -954,12 +954,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
           resultType = RESULT_TYPE_GPTR;
         }
 
-      if (IS_STRUCT (ftype))
-        {
-          werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
-          return 1;
-        }
-
       if (IS_ARRAY (ftype))
         {
           newType = newAst_LINK (copyLinkChain (ftype));

@@ -40,7 +40,7 @@ used with authentic Microchip devices" which makes them incompatible
 with the GPL. Pic device libraries and header files are located at
 non-free/lib and non-free/include directories respectively. Sdcc should
 be run with the --use-non-free command line option in order to include
-non-free header files and libraries.
+the potentially non-free header files and libraries.
 
 However: Many think that the Microchip requirement is not legally enforceable,
 arguing that the header files only contain noncopyrightable facts.

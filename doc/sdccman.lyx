@@ -1203,6 +1203,17 @@ makebin:
 zlib/libpng License
 \end_layout
 
+\begin_layout Itemize
+pic libraries in device/non-free:
+\begin_inset Newline newline
+\end_inset
+
+Microchip Technology Inc claims to have copyrights on this, and their term
+ are non-free.
+ However, a more comon opinion is that Microchip Technology Inc is just
+ claiming a copyright on uncopyrightable facts.
+\end_layout
+
 \end_deeper
 \begin_layout Itemize
 libraries:

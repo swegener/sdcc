@@ -20,6 +20,10 @@
 	  src/z80/gen.c,
 	  src/z80/ralloc.c:
 	  Remove remains of support for unused IPOP.
+	* doc/README.txt,
+	  doc/sdccman.lyx,
+	  LICENSE:
+	  Make it a bit easier to read about the license situation.
 
 2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

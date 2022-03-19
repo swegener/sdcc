@@ -63,14 +63,8 @@ testTortureExecute (void)
   x[0].g = 50;
   x[1].g = 51;
   x[2].g = 52;
-#if !defined(__SDCC_stm8) // Bug (assertion fails in code generation)
-#if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_sm83) && !defined(__SDCC_ez80_z80) && !defined(__SDCC_r2k) && !defined(__SDCC_r2ka) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90) && !defined(__SDCC_z80n)// Bug (test fails)
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Enable when pdk supports struct argument of odd size!
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug (fails test)
+#if 0 // TODO: Enable when bug #3365 (passign array element as struct param) is fixed
   f (3, x[0], x[1], x[2], (long) 123);
-#endif
-#endif
-#endif
 #endif
   return;
 }

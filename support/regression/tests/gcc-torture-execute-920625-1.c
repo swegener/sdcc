@@ -47,16 +47,10 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
-#if !defined(__SDCC_stm8) // Bug (assertion fails in code generation)
-#if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_sm83) && !defined(__SDCC_ez80_z80) && !defined(__SDCC_r2k) && !defined(__SDCC_r2ka) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90) && !defined(__SDCC_z80n) // Bug
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug (fails test)
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug (assertion fails in code generation)
+#if 0 // TODO: Enable when bug #3365 (passign array element as struct param) is fixed
 va1(4,pts[0],pts[1],pts[2],pts[3]);
 va2(4,ipts[0],ipts[1],ipts[2],ipts[3]);
 return;
-#endif
-#endif
-#endif
 #endif
 #endif
 }

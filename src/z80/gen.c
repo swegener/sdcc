@@ -5681,15 +5681,15 @@ genPointerPush (const iCode *ic)
   if (!isRegDead (HL_IDX, ic) && !isRegDead (DE_IDX, ic) || !isRegDead (A_IDX, ic))
     UNIMPLEMENTED;
 
-  bool swap = !isRegDead (HL_IDX, ic);
+  bool swap_de = !isRegDead (HL_IDX, ic);
 
-  if (swap)
+  if (swap_de)
     {
       emit2 ("ex de, hl");
       regalloc_dry_run_cost++;
     }
 
-  genMove (ASMOP_HL, IC_LEFT (ic)->aop, true, true, swap ? false : isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+  genMove (ASMOP_HL, IC_LEFT (ic)->aop, true, true, swap_de ? false : isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
 
   int size = getSize (operandType (IC_LEFT (ic))->next);
   for(int i = 1; i < size; i++)
@@ -5709,7 +5709,7 @@ genPointerPush (const iCode *ic)
         _G.stack.pushed++;
     }
 
-  if (swap)
+  if (swap_de)
     {
       emit2 ("ex de, hl");
       regalloc_dry_run_cost++;

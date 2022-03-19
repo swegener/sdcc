@@ -12,7 +12,9 @@ va-arg-4.c from the execute part of the gcc torture tests.
 typedef struct {
   char a[32];
 } big;
-#if 0 // TODO: enable when SDCC can pass struct
+
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 void
 f (big x, char *s, ...)
 {
@@ -30,10 +32,12 @@ f (big x, char *s, ...)
   va_end (ap);
 }
 #endif
+
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
   static big x = { "abc" };
 
   f (x, "", 42, 'x', 0);

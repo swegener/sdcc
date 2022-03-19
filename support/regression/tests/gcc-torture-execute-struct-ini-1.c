@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0
+#if 0 // TODO: Enable when SDCC allows brace omission in struct initialization!
 struct S
 {
   char f1;
@@ -21,7 +21,7 @@ struct S object = {'X', 8, 9};
 void
 testTortureExecute (void)
 {
-#if 0
+#if 0 // TODO: Enable when SDCC allows brace omission in struct initialization!
   if (object.f1 != 'X' || object.f2[0] != 8 || object.f2[1] != 9)
     ASSERT (0);
   return;

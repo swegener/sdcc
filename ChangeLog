@@ -5,6 +5,12 @@
 	  support/regression/tests/gcc-torture-execute-strct-stdarg-1.c,
 	  support/regression/tests/gcc-torture-execute-strct-varg-1.c:
 	  Basic support for struct varargs.
+	* support/regression/tests/gcc-torture-execute-20040707-1.c,
+	  support/regression/tests/gcc-torture-execute-pr71700.c,
+	  support/regression/tests/gcc-torture-execute-struct-ini-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-4.c:
+	  Enable some GCC tests that pass due to recent improvements in struct / union support.
 
 2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

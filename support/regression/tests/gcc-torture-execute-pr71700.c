@@ -21,7 +21,7 @@ struct S d;
 void
 testTortureExecute (void)
 {
-#if 0 // Enable when SDCC assigns to struct
+#if 0 // TODO: Enable when SDCC supports struct initalization by assignment!
   struct S e = c[0];
   d = e;
   if (d.f1 != 0)

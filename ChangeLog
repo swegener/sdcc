@@ -1,5 +1,25 @@
 2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/SDCC.y,
+	  src/SDCCcse.c,
+	  src/SDCCicode.c,
+	  src/SDCCicode.h,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  support/regression/tests/gcc-torture-execute-20021118-1.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c,
+	  support/regression/tests/gcc-torture-execute-20180131-1.c,
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
+	  support/regression/tests/gcc-torture-execute-struct-ret-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-4.c,
+	  support/regression/tests/structparam.c:
+	  Rewrite struct parameter support to fix bug #3365.
+
+2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/SDCCast.c,
 	  support/regression/tests/gcc-torture-execute-920625-1.c,
 	  support/regression/tests/gcc-torture-execute-strct-stdarg-1.c,

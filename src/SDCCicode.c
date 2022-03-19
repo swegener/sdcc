@@ -59,6 +59,7 @@ static operand *geniCodeCast (sym_link *, operand *, bool);
 #define PRINTFUNC(x) void x (struct dbuf_s *dbuf, iCode *ic, char *s)
 /* forward definition of ic print functions */
 PRINTFUNC (picGetValueAtAddr);
+PRINTFUNC (picPushValueAtAddr);
 PRINTFUNC (picSetValueAtAddr);
 PRINTFUNC (picAddrOf);
 PRINTFUNC (picGeneric);
@@ -85,6 +86,7 @@ iCodeTable codeTable[] = {
   {GETWORD, "gword", picGenericOne, NULL},
   {UNARYMINUS, "-", picGenericOne, NULL},
   {IPUSH, "push", picGenericOne, NULL},
+  {IPUSH_VALUE_AT_ADDRESS, "push", picPushValueAtAddr, NULL},
   {IPOP, "pop", picGenericOne, NULL},
   {CALL, "call", picGenericOne, NULL},
   {PCALL, "pcall", picGenericOne, NULL},
@@ -287,6 +289,20 @@ PRINTFUNC (picGetValueAtAddr)
   dbuf_append_char (dbuf, '\t');
   dbuf_printOperand (IC_RESULT (ic), dbuf);
   dbuf_append_str (dbuf, " = ");
+  dbuf_append_str (dbuf, "@[");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  if (IC_RIGHT (ic))
+    {
+      dbuf_append_str (dbuf, " + ");
+      dbuf_printOperand (IC_RIGHT (ic), dbuf);
+    }
+  dbuf_append_str (dbuf, "]\n");
+}
+
+PRINTFUNC (picPushValueAtAddr)
+{
+  dbuf_append_char (dbuf, '\t');
+  dbuf_append_str (dbuf, "push ");
   dbuf_append_str (dbuf, "@[");
   dbuf_printOperand (IC_LEFT (ic), dbuf);
   if (IC_RIGHT (ic))
@@ -3518,10 +3534,10 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
     }
   else
     {
+      bool is_structparm = IS_STRUCT (parms->ftype);
       /* now decide whether to push or assign */
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
         {
-          bool is_structparm = IS_STRUCT (argVals->type);
           if (is_structparm)
             werror (E_STRUCT_AS_ARG, argVals->name); // TODO: Rewrite as call to __builtin_memcpy!
           /* assign */
@@ -3532,14 +3548,21 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
         }
       else
         {
-          sym_link *p;
-          if (argVals && (*iArg >= 0))
+          sym_link *p = operandType (pval);
+          if (is_structparm)
             {
-              pval = checkTypes (operandFromValue (argVals, true), pval);
+              sym_link *ptr = newLink (DECLARATOR);
+              DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec(operandType(pval))));
+              ptr->next = copyLinkChain (operandType(pval));
+              setOperandType (pval, ptr);
             }
-          p = operandType (pval);
+          if (argVals && (*iArg >= 0))
+            pval = checkTypes (operandFromValue (argVals, false), pval);
           /* push */
-          ic = newiCode (IPUSH, pval, NULL);
+          if (is_structparm)
+            ic = newiCode (IPUSH_VALUE_AT_ADDRESS , pval, operandFromLit (0));
+          else
+            ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
           /* update the stack adjustment */
           *stack += getSize (IS_ARRAY (p) ? aggrToPtr (p, FALSE) : p);
@@ -4328,7 +4351,7 @@ ast2iCode (ast * tree, int lvl)
     seqPoint = tree->seqPoint;
 
   if (tree->type == EX_VALUE)
-    return operandFromValue (tree->opval.val, false);
+    return operandFromValue (tree->opval.val, true);
 
   if (tree->type == EX_LINK)
     return operandFromLink (tree->opval.lnk);
@@ -4388,7 +4411,7 @@ ast2iCode (ast * tree, int lvl)
         }
       else
         {
-          right = operandFromAst (tree->right, lvl, tree->opval.op != RETURN && tree->opval.op != IPUSH);
+          right = operandFromAst (tree->right, lvl, tree->opval.op != RETURN);
         }
     }
 

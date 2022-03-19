@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 /* PR rtl-optimization/84071 */
 /* Reported by Wilco <wilco@gcc.gnu.org> */
 
@@ -14,8 +16,7 @@ typedef union
   int x;
 } U;
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
-  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
 int f(int x, int y, int z, int a, U u);
 
 int f(int x, int y, int z, int a, U u)
@@ -27,8 +28,7 @@ int f(int x, int y, int z, int a, U u)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
-  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
   U u = { .ss = -1 };
 
   if (f (0, 0, 0, 0, u) != (1 << sizeof (short) * 8))

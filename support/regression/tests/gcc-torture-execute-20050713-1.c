@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
-  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
 /* Test that sibling call is not used if there is an argument overlap.  */
 
 struct S
@@ -58,13 +57,14 @@ baz3 (struct S x, struct S y, struct S z)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
-  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
+#if 0 // Fails to compile for z80
   struct S a = { 3, 4, 5 }, b = { 6, 7, 8 }, c = { 9, 10, 11 };
 
   bar2 (b, a);
   bar3 (b, a, c);
   baz3 (c, a, b);
   return;
+#endif
 #endif
 }

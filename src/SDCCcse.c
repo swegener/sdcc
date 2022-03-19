@@ -2074,6 +2074,7 @@ static int isSignedOp (iCode *ic)
     case '~':
     case UNARYMINUS:
     case IPUSH:
+    case IPUSH_VALUE_AT_ADDRESS:
     case IPOP:
     case CALL:
     case PCALL:

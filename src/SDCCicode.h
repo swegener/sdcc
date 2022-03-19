@@ -230,6 +230,7 @@ iCodeTable;
 
 #define SKIP_IC(x)   (x->op == PCALL        ||    \
                       x->op == IPUSH        ||    \
+                      x->op == IPUSH_VALUE_AT_ADDRESS || \
                       x->op == IPOP         ||    \
                       x->op == JUMPTABLE    ||    \
                       x->op == RECEIVE      ||    \

@@ -3619,6 +3619,49 @@ genIpush (const iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (const iCode *ic)
+{
+  iCode *walk;
+
+  D (emit2 ("; genPointerPush", ""));
+
+  // Like in genIpush above.
+  for (walk = ic->next; walk->op != CALL && walk->op != PCALL; walk = walk->next);
+  if (!G.saved  && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+    saveRegsForCall (walk);
+
+  /* then do the push */
+  aopOp (IC_LEFT (ic), ic);
+
+  wassertl (IC_RIGHT (ic), "IPUSH_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
+
+  int offset = operandLitValue (IC_RIGHT(ic));
+
+  if (!regDead (A_IDX, ic) || !regDead (X_IDX, ic) && !aopInReg (IC_LEFT (ic)->aop, 0, X_IDX) && !regDead (Y_IDX, ic) && !aopInReg (IC_LEFT (ic)->aop, 0, Y_IDX))
+    UNIMPLEMENTED;
+
+  bool use_y = !aopInReg (IC_LEFT (ic)->aop, 0, X_IDX) && (aopInReg (IC_LEFT (ic)->aop, 0, Y_IDX) || !regDead (X_IDX, ic));
+
+  genMove (use_y ? ASMOP_Y : ASMOP_X, IC_LEFT (ic)->aop, true, true, regDead (Y_IDX, ic));
+
+  int size = getSize (operandType (IC_LEFT (ic))->next);
+  for(int i = 0; i < size; i++)
+    {
+      int o = size - 1 - i + offset;
+
+      emit2 ("ld", "a, (%d, %s)", o, use_y ? "y" : "x");
+      cost (2 + use_y, 1);
+      push (ASMOP_A, 0, 1);
+    }
+
+  freeAsmop (IC_LEFT (ic));
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -8179,7 +8222,7 @@ genPointerGet (const iCode *ic)
     D (emit2 ("; Dummy read", ""));
 
   wassertl (right, "GET_VALUE_AT_ADDRESS without right operand");
-  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
+  wassertl (IS_OP_LITERAL (right), "GET_VALUE_AT_ADDRESS with non-literal right operand");
 
   size = result->aop->size;
 
@@ -9512,6 +9555,10 @@ genSTM8iCode (iCode *ic)
 
     case IPUSH:
       genIpush (ic);
+      break;
+
+   case IPUSH_VALUE_AT_ADDRESS:
+      genPointerPush (ic);
       break;
 
     case CALL:

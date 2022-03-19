@@ -5637,6 +5637,87 @@ release:
   freeAsmop (IC_LEFT (ic), NULL);
 }
 
+/*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (const iCode *ic)
+{
+   /* Scan ahead until we find the function that we are pushing parameters to.
+     Count the number of addSets on the way to figure out what registers
+     are used in the send set.
+   */
+  int nAddSets = 0;
+  iCode *walk = ic->next;
+
+  while (walk)
+    {
+      if (walk->op == SEND && !_G.saves.saved && !regalloc_dry_run)
+        nAddSets++;
+      else if (walk->op == CALL || walk->op == PCALL)
+        break; // Found it.
+
+      walk = walk->next; // Keep looking.
+    }
+  if (!regalloc_dry_run && !_G.saves.saved && !regalloc_dry_run) /* Cost is counted at CALL or PCALL instead */
+    _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
+
+  sym_link *ftype = operandType (IC_LEFT (walk));
+  if (walk->op == PCALL)
+    ftype = ftype->next;
+  const bool smallc = IFFUNC_ISSMALLC (ftype);
+
+  /* then do the push */
+  aopOp (IC_LEFT (ic), ic, false, false);
+
+  wassertl (IC_RIGHT (ic), "IPUSH_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
+
+  int offset = operandLitValue (IC_RIGHT(ic));
+
+  wassert (!offset);
+  wassert (!smallc);
+
+  if (!isRegDead (HL_IDX, ic) && !isRegDead (DE_IDX, ic) || !isRegDead (A_IDX, ic))
+    UNIMPLEMENTED;
+
+  bool swap = !isRegDead (HL_IDX, ic);
+
+  if (swap)
+    {
+      emit2 ("ex de, hl");
+      regalloc_dry_run_cost++;
+    }
+
+  genMove (ASMOP_HL, IC_LEFT (ic)->aop, true, true, swap ? false : isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+
+  int size = getSize (operandType (IC_LEFT (ic))->next);
+  for(int i = 1; i < size; i++)
+    {
+      emit2 ("inc hl");
+      regalloc_dry_run_cost++;
+    }
+
+  for(int i = 0; i < size; i++)
+    {
+      emit2 ("ld a, (hl)");
+      emit2 ("dec hl");
+      emit2 ("push af");
+      emit2 ("inc sp");
+      regalloc_dry_run_cost += 4;
+      if (!regalloc_dry_run)
+        _G.stack.pushed++;
+    }
+
+  if (swap)
+    {
+      emit2 ("ex de, hl");
+      regalloc_dry_run_cost++;
+    }
+
+  freeAsmop (IC_LEFT (ic), 0);
+}
+
 /* This is quite unfortunate */
 static void
 setArea (int inHome)
@@ -15967,6 +16048,11 @@ genZ80iCode (iCode * ic)
     case IPUSH:
       emitDebug ("; genIpush");
       genIpush (ic);
+      break;
+
+    case IPUSH_VALUE_AT_ADDRESS:
+      emitDebug ("; genPointerPush");
+      genPointerPush (ic);
       break;
 
     case CALL:

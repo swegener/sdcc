@@ -1774,6 +1774,23 @@ genIpush (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (const iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+
+  aopOp (left, ic);
+
+  D (emit2 ("; genPointerPush", ""));
+
+  wassertl (0, "Unimplemented pointer push");
+
+  freeAsmop (IC_LEFT (ic));
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -5148,6 +5165,10 @@ genPdkiCode (iCode *ic)
 
     case IPUSH:
       genIpush (ic);
+      break;
+
+    case IPUSH_VALUE_AT_ADDRESS:
+      genPointerPush (ic);
       break;
 
     case CALL:

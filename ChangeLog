@@ -11,6 +11,15 @@
 	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
 	  support/regression/tests/gcc-torture-execute-va-arg-4.c:
 	  Enable some GCC tests that pass due to recent improvements in struct / union support.
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.c,
+	  src/pdk/gen.c,
+	  src/pdk/ralloc.c,
+	  src/stm8/gen.c,
+	  src/stm8/ralloc.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c:
+	  Remove remains of support for unused IPOP.
 
 2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

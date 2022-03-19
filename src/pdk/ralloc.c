@@ -573,16 +573,13 @@ serialRegMark (eBBlock **ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if (ic->op == IPOP)
-            wassert (0);
-
           /* if result is present && is a true symbol */
           if (IC_RESULT (ic) && ic->op != IFX && IS_TRUE_SYMOP (IC_RESULT (ic)))
             OP_SYMBOL (IC_RESULT (ic))->allocreq++;
 
           /* some don't need registers, since there is no result. */
           if (SKIP_IC2 (ic) ||
-              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == SET_VALUE_AT_ADDRESS)
+              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == SET_VALUE_AT_ADDRESS)
             continue;
 
           /* now we need to allocate registers only for the result */

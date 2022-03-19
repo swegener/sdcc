@@ -4367,34 +4367,6 @@ release:
 }
 
 /**************************************************************************
- * genIpop - recover the registers: can happen only for spilling
- *
- *************************************************************************/
-static void
-genIpop (iCode * ic)
-{
-  operand *left   = IC_LEFT (ic);
-  int size, offset;
-
-  emitComment (TRACEGEN, __func__);
-
-  /* if the temp was not pushed then */
-  if (OP_SYMBOL (left)->isspilt)
-    return;
-
-  aopOp (left, ic);
-  size = AOP_SIZE (left);
-  offset = size - 1;
-  while (size--)
-    {
-      pullReg (m6502_reg_a);
-      storeRegToAop (m6502_reg_a, AOP (left), offset--);
-    }
-
-  freeAsmop (left, NULL);
-}
-
-/**************************************************************************
  * genSend - gen code for SEND
  *
  *************************************************************************/
@@ -9799,9 +9771,6 @@ genIfx (iCode * ic, iCode * popIc)
       unsigned long long lit = ullFromVal (AOP (cond)->aopu.aop_lit);
       freeAsmop (cond, NULL);
 
-      /* if there was something to be popped then do it */
-      if (popIc)
-        genIpop (popIc);
       if (lit)
         {
           if (IC_TRUE (ic))
@@ -9823,10 +9792,6 @@ genIfx (iCode * ic, iCode * popIc)
   }
   /* the result is now in the z flag bit */
   freeAsmop (cond, NULL);
-
-  /* if there was something to be popped then do it */
-  if (popIc)
-      genIpop (popIc);
 
 // TODO: redundant bne/beq 
   emitComment (TRACEGEN|VVDBG, "      genIfx - call jump");
@@ -10499,19 +10464,6 @@ genm6502iCode (iCode *ic)
     case IPUSH:
           genIpush (ic);
           break;
-
-    case IPOP:
-      /* IPOP happens only when trying to restore a
-         spilt live range, if there is an ifx statement
-         following this pop then the if statement might
-         be using some of the registers being popped which
-         would destroy the contents of the register so
-         we need to check for this condition and handle it */
-      if (ic->next && ic->next->op == IFX && regsInCommon (left, IC_COND (ic->next)))
-        genIfx (ic->next, ic);
-      else
-        genIpop (ic);
-      break;
 
     case CALL:
       genCall (ic);

@@ -5637,41 +5637,6 @@ release:
   freeAsmop (IC_LEFT (ic), NULL);
 }
 
-/*-----------------------------------------------------------------*/
-/* genIpop - recover the registers: can happen only for spilling   */
-/*-----------------------------------------------------------------*/
-static void
-genIpop (const iCode * ic)
-{
-  int size, offset;
-
-  wassert (!regalloc_dry_run);
-
-  /* if the temp was not pushed then */
-  if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
-    return;
-
-  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-  size = IC_LEFT (ic)->aop->size;
-  offset = (size - 1);
-  if (isPair (IC_LEFT (ic)->aop))
-    {
-      emit2 ("pop %s", getPairName (IC_LEFT (ic)->aop));
-    }
-  else
-    {
-      while (size--)
-        {
-          emit2 ("dec sp");
-          emit2 ("pop hl");
-          spillPair (PAIR_HL);
-          aopPut (IC_LEFT (ic)->aop, "l", offset--);
-        }
-    }
-
-  freeAsmop (IC_LEFT (ic), NULL);
-}
-
 /* This is quite unfortunate */
 static void
 setArea (int inHome)
@@ -14115,10 +14080,6 @@ genIfx (iCode *ic, iCode *popIc)
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL);
 
-  /* if there was something to be popped then do it */
-  if (popIc)
-    genIpop (popIc);
-
   /* if the condition is  a bit variable */
   if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
     genIfxJump (ic, SPIL_LOC (cond)->rname);
@@ -16008,25 +15969,6 @@ genZ80iCode (iCode * ic)
       genIpush (ic);
       break;
 
-    case IPOP:
-      /* IPOP happens only when trying to restore a
-         spilt live range, if there is an ifx statement
-         following this pop then the if statement might
-         be using some of the registers being popped which
-         would destroy the contents of the register so
-         we need to check for this condition and handle it */
-      if (ic->next && ic->next->op == IFX && regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
-        {
-          emitDebug ("; genIfx");
-          genIfx (ic->next, ic);
-        }
-      else
-        {
-          emitDebug ("; genIpop");
-          genIpop (ic);
-        }
-      break;
-
     case CALL:
     case PCALL:
       emitDebug ("; genCall");
@@ -16255,7 +16197,7 @@ genZ80iCode (iCode * ic)
       break;
 
     default:
-      ;
+      wassertl (0, "Unknown iCode");
     }
 }
 

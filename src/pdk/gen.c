@@ -5150,10 +5150,6 @@ genPdkiCode (iCode *ic)
       genIpush (ic);
       break;
 
-    case IPOP:
-      wassertl (0, "Unimplemented iCode");
-      break;
-
     case CALL:
     case PCALL:
       genCall (ic);

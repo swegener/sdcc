@@ -1282,11 +1282,6 @@ serialRegMark (eBBlock ** ebbs, int count)
         {
           updateRegUsage(ic);
 
-          /* if this is an ipop that means some live
-             range will have to be assigned again */
-          if (ic->op == IPOP)
-              reassignLR (IC_LEFT (ic));
-
           /* if result is present && is a true symbol */
           if (IC_RESULT (ic) && ic->op != IFX &&
               IS_TRUE_SYMOP (IC_RESULT (ic)))
@@ -1303,7 +1298,6 @@ serialRegMark (eBBlock ** ebbs, int count)
               ic->op == JUMPTABLE ||
               ic->op == IFX ||
               ic->op == IPUSH ||
-              ic->op == IPOP ||
               (IC_RESULT (ic) && POINTER_SET (ic)))
               continue;
 

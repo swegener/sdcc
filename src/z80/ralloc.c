@@ -359,13 +359,6 @@ deassignLRs (iCode *ic, eBBlock *ebp)
       if (!bitVectBitValue (_G.regAssigned, sym->key))
         continue;
 
-      /* special case check if this is an IFX &
-         the privious one was a pop and the
-         previous one was not spilt then keep track
-         of the symbol */
-      if (ic->op == IFX && ic->prev && ic->prev->op == IPOP && !ic->prev->parmPush && !OP_SYMBOL (IC_LEFT (ic->prev))->isspilt)
-        psym = OP_SYMBOL (IC_LEFT (ic->prev));
-
       D (D_ALLOC, ("deassignLRs: in loop on sym %p nregs %u\n", sym, sym->nRegs));
 
       if (sym->nRegs)
@@ -1197,14 +1190,6 @@ serialRegMark (eBBlock ** ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          /* if this is an ipop that means some live
-             range will have to be assigned again */
-          if (ic->op == IPOP)
-            {
-              wassert (0);
-              reassignLR (IC_LEFT (ic));
-            }
-
           /* if result is present && is a true symbol */
           if (IC_RESULT (ic) && ic->op != IFX && IS_TRUE_SYMOP (IC_RESULT (ic)))
             {
@@ -1217,7 +1202,7 @@ serialRegMark (eBBlock ** ebbs, int count)
 
           /* some don't need registers */
           if (SKIP_IC2 (ic) ||
-              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || (IC_RESULT (ic) && POINTER_SET (ic)))
+              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || (IC_RESULT (ic) && POINTER_SET (ic)))
             {
               continue;
             }

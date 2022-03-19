@@ -631,16 +631,13 @@ serialRegMark (eBBlock ** ebbs, int count)
               stm8_call_stack_size = ic->parmBytes + 5 + 2 * (getSize (ftype->next) > 4);
             }
 
-          if (ic->op == IPOP)
-            wassert (0);
-
           /* if result is present && is a true symbol */
           if (IC_RESULT (ic) && ic->op != IFX && IS_TRUE_SYMOP (IC_RESULT (ic)))
             OP_SYMBOL (IC_RESULT (ic))->allocreq++;
 
           /* some don't need registers, since there is no result. */
           if (SKIP_IC2 (ic) ||
-              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == IPOP || ic->op == SET_VALUE_AT_ADDRESS)
+              ic->op == JUMPTABLE || ic->op == IFX || ic->op == IPUSH || ic->op == SET_VALUE_AT_ADDRESS)
             continue;
 
           /* now we need to allocate registers only for the result */

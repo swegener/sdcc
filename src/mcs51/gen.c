@@ -11922,7 +11922,7 @@ genReceive (iCode * ic)
             }
           else
             {
-              if (getTempRegs (tempRegs, size, ic))
+              if (getTempRegs (tempRegs, size, ic) && size <= 4 /* Workaround for issue: For size >= 4, getTempRegs will give us regs in use for param, making us overwrite param bytes still needed */)
                 {
                   for (offset = 0; offset < size; offset++)
                     emitcode ("mov", "%s,%s", tempRegs[offset]->name, fReturn[offset]);

@@ -1,5 +1,10 @@
 2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/mcs51/gen.c:
+	  Fix bug #3364.
+
+2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* device/include/stdarg.h,
 	  src/SDCCast.c,
 	  src/SDCCerr.c,

@@ -1285,7 +1285,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case '|':
     case BITWISEAND:
     case IPUSH:
-    //case IPOP:
+    case IPUSH_VALUE_AT_ADDRESS:
     case CALL:
     case PCALL:
     case RETURN:

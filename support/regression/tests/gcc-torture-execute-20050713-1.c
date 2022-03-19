@@ -58,13 +58,11 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
-#if !defined(__SDCC_tlcs90) && !defined(__SDCC_ez80_z80) // Bug #3367 Fails to compile / fails
   struct S a = { 3, 4, 5 }, b = { 6, 7, 8 }, c = { 9, 10, 11 };
 
   bar2 (b, a);
   bar3 (b, a, c);
   baz3 (c, a, b);
   return;
-#endif
 #endif
 }

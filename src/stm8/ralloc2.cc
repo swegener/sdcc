@@ -333,7 +333,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case '|':
     case BITWISEAND:
     case IPUSH:
-    //case IPOP:
+    case IPUSH_VALUE_AT_ADDRESS:
     case CALL:
     case PCALL:
     case RETURN:
@@ -486,7 +486,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
   assignment_optimal = true;
   tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac, &assignment_optimal);
 
-  const assignment &winner = *(T[find_root(T)].assignments.begin());
+  /*const*/ assignment &winner = *(T[find_root(T)].assignments.begin());
 
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Winner: ";

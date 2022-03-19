@@ -4,6 +4,22 @@
 	  Fix bug #3364.
 	* support/regression/tests/bitintvararg.c:
 	  Enable test for widths, for which it passes.
+	* support/regression/tests/gcc-torture-execute-bswap-2.c:
+	  Remove GCC test that requires int to be at least 32 bits wide.
+	* support/regression/tests/gcc-torture-execute-20020215-1.c,
+	  support/regression/tests/gcc-torture-execute-20020810-1.c,
+	  support/regression/tests/gcc-torture-execute-20021010-2.c,
+	  support/regression/tests/gcc-torture-execute-20021118-1.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c,
+	  support/regression/tests/gcc-torture-execute-20170401-1.c,
+	  support/regression/tests/gcc-torture-execute-20180131-1.c,
+	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/gcc-torture-execute-restrict-1.c,
+	  support/regression/tests/gcc-torture-execute-strct-stdarg-1.c,
+	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
+	  support/regression/tests/gcc-torture-execute-struct-ret-1.c:
+	  Enable some GCC tests that pass due to recent improvements in struct / union support.
 
 2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

@@ -21,7 +21,7 @@
    find_dummy_reload would return (reg:SI 1) for the subreg reload,
    despite that not being a valid register.  */
 
-#if 0 // TODO: Enable when struct can be passed and returned!
+#if 0 // Todo: enable when compound literals are supported!
 struct s
 {
   short i1;
@@ -39,7 +39,7 @@ struct s foo (struct s s)
 void
 testTortureExecute (void)
 {
-#if 0
+#if 0 // Todo: enable when compound literals are supported!
   struct s s = foo ((struct s) { 1000, 2000L, 3000 });
   if (s.i1 != 1000 || s.i2 != 2001L || s.i3 != 3000)
     ASSERT (0);

@@ -8,7 +8,8 @@ strct-varg-1.c from the execute part of the gcc torture tests.
 
 struct s { int x, y; };
 
-#if 0 // TODO: enable when SDCC supports passing struct arguments!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 f (int attr, ...)
 {
   struct s va_values;
@@ -38,7 +39,7 @@ f (int attr, ...)
 void
 testTortureExecute (void)
 {
-#if 0 // TODO: enable when SDCC supports passing struct arguments!
+#if 0 // Todo: enable when struct parmeters are supported!
   struct s a, b;
 
   a.x = 0xaaaa;

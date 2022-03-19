@@ -15,7 +15,8 @@ struct tiny
   char g;
 };
 
-#if 0 // TODO: enable when SDCC supports passing struct arguments!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 f (int n, ...)
 {
   struct tiny x;
@@ -49,7 +50,7 @@ f (int n, ...)
 void
 testTortureExecute (void)
 {
-#if 0 // TODO: enable when SDCC supports passing struct arguments!
+#if 0 // Todo: enable when struct parmeters are supported!
   struct tiny x[3];
   x[0].c = 10;
   x[1].c = 11;

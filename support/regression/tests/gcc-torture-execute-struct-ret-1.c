@@ -4,12 +4,15 @@ struct-ret-1.c from the execute part of the gcc torture tests.
 
 #include <testfwk.h>
 
+#pragma disable_warning 93
+
 #include <stdio.h>
 #include <string.h>
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 char out[100];
-#if 0 // TODO: Eable when SDCC can pass and return struct!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parmeters are supported!
+
 typedef struct { double d; int i[3]; } B;
 typedef struct { char c[33],c1; } X;
 
@@ -53,7 +56,8 @@ X (*fp) (B, char, double, B) = &f;
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parmeters are supported!
   X Xr;
   char tmp[100];
 
@@ -62,8 +66,9 @@ testTortureExecute (void)
   Xr.c[0] = Xr.c1 = '\0';
   Xr = (*fp) (B1, c2, d3, B2);
   if (strcmp (tmp, out))
-    abort ();
+    ASSERT (0);
 
-  exit (0);
+  return;
+#endif
 #endif
 }

@@ -8,7 +8,8 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when struct passing is supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 struct s { int f[4]; };
 
 int foo (struct s s, int x1, int x2, int x3, int x4, int x5, int x6, int x7)
@@ -20,7 +21,7 @@ int foo (struct s s, int x1, int x2, int x3, int x4, int x5, int x6, int x7)
 void
 testTortureExecute (void)
 {
-#if 0
+#if 0 // Todo: enable when brace omission in struct initialization is supported!
   struct s s = { 1, 2, 3, 4 };
 
   if (foo (s, 100, 200, 300, 400, 500, 600, 700) != 704)
@@ -28,3 +29,4 @@ testTortureExecute (void)
   return;
 #endif
 }
+

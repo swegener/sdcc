@@ -14,7 +14,7 @@ typedef struct
 {
   int i, dummy;
 } A;
-#if 0 // TODO: Enable when SDCC can return struct!
+#if 0 // TODO: Enable when compound literals are supported
 inline A foo (const A* p, const A* q)
 {
   return (A){p->i+q->i};
@@ -30,7 +30,7 @@ void bar (A* __restrict__ p)
 void
 testTortureExecute (void)
 {
-#if 0
+#if 0 // TODO: Enable when compound literals are supported
   A a={1};
   bar(&a);
   return 0;

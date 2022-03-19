@@ -14,7 +14,8 @@ typedef union
   int x;
 } U;
 
-#if 0 // Enable when SDCC cann pass struct / union
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 int f(int x, int y, int z, int a, U u);
 
 int f(int x, int y, int z, int a, U u)
@@ -26,7 +27,8 @@ int f(int x, int y, int z, int a, U u)
 void
 testTortureExecute (void)
 {
-#if 0 // Enable when SDCC cann pass struct / union
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
   U u = { .ss = -1 };
 
   if (f (0, 0, 0, 0, u) != (1 << sizeof (short) * 8))

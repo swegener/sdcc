@@ -4,18 +4,21 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 struct assembly_operand
 {
   int type, value, symtype, symflags, marker;
 };
 
 struct assembly_operand to_input, from_input;
-#if 0 // Enabe when SDCC can pass struct
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
 void
 assemblez_1 (int internal_number, struct assembly_operand o1)
 {
   if (o1.type != from_input.type)
-    __builtin_abort ();
+    ASSERT (0);
 }
 
 void
@@ -41,7 +44,8 @@ testTortureExecute (void)
   from_input.symtype = 7;
   from_input.symflags = 8;
   from_input.marker = 9;
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && \
+  (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parmeters are supported!
   t0 (to_input, from_input);
 #endif
   return;

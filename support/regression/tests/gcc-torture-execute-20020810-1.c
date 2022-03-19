@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: enable when support for struct is complete!
+#if 0 // TODO: enable when support for struct initialization is complete!
 /* PR target/7559
    This testcase was miscompiled on x86-64, because classify_argument
    wrongly computed the offset of nested structure fields.  */

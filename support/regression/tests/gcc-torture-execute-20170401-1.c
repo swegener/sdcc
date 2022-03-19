@@ -24,7 +24,7 @@ static void fetch(struct source *p)
 {
     p->length = 128;
 }
-#if 0 // Enable when sdcc accepts truct initialization as below "struct packed_ushort rv = next(&s);"
+#if 0 // Enable when sdcc accepts struct initialization as below "struct packed_ushort rv = next(&s);"
 static struct packed_ushort next(struct source *p)
 {
     struct packed_ushort rv;

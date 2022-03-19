@@ -31,7 +31,7 @@ IOGBounds global_saveRect = { 75, 175, 75, 175 };
 void
 testTortureExecute (void)
 {
-#if 0 // TODO: enable when support for struct is complete!
+#if 0 // TODO: enable when support for struct initialization is complete!
   unsigned int *vramPtr;
   int width;
   IOGBounds saveRect = global_saveRect;

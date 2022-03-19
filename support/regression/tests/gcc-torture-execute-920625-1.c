@@ -47,7 +47,7 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
-#if 0 //Bug: fails
+#if 0 // Bug #3367
 va1(4,pts[0],pts[1],pts[2],pts[3]);
 va2(4,ipts[0],ipts[1],ipts[2],ipts[3]);
 return;

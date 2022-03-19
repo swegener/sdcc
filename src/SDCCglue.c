@@ -2124,7 +2124,7 @@ createInterruptVect (struct dbuf_s *vBuf)
 
 char *iComments1 = {
   ";--------------------------------------------------------\n"
-  "; File Created by SDCC : free open source ANSI-C Compiler\n"
+  "; File Created by SDCC : free open source ISO C Compiler \n"
 };
 
 char *iComments2 = {
@@ -2136,7 +2136,7 @@ char *iComments2 = {
 /* initialComments - puts in some initial comments                 */
 /*-----------------------------------------------------------------*/
 void
-initialComments (FILE * afile)
+initialComments (FILE *afile)
 {
   fprintf (afile, "%s", iComments1);
   fprintf (afile, "; Version " SDCC_VERSION_STR " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());

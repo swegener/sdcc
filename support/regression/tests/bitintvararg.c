@@ -46,7 +46,7 @@ void
 testBitIntVarArg(void)
 {
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
-#ifndef __SDCC_mcs51 // Bug
+#if !defined(__SDCC_mcs51) || {width} != 33 // Bug #3363
     int marker = 12;
 
     ASSERT(returnFirstArg(marker, (bitinttype)0xaaaaaaaaaaaaaaaaull, (bitinttype)0x5555555555555555ull) == (bitinttype)0xaaaaaaaaaaaaaaaaull);

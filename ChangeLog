@@ -1,7 +1,9 @@
-2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/mcs51/gen.c:
 	  Fix bug #3364.
+	* support/regression/tests/bitintvararg.c:
+	  Enable test for widths, for which it passes.
 
 2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 

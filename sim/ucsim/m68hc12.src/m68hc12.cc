@@ -133,7 +133,7 @@ void
 cl_m68hc12::reset(void)
 {
   cl_m68hcbase::reset();
-  rCC= 0x80;
+  rCC= flagStop|flagX|flagI;
   //post_inc_dec= 0;
 }
 
@@ -166,13 +166,21 @@ cl_m68hc12::make_cpu_hw(void)
   cpu= cpu12;
 }
 
+void
+CL12::pre_inst(void)
+{
+  cl_m68hcbase::pre_inst();
+  block_irq= false;
+  cI= &cIX;
+}
+
 int
 CL12::exec_inst(void)
 {
-  int res= resGO;
+  int res= resINV;
   t_mem code;
   hcwrapper_fn fn= NULL;
-  cI= &cIX;
+
   code= fetch();
   if (code==0x18)
     {
@@ -184,7 +192,7 @@ CL12::exec_inst(void)
       fn= hc12wrap->page0[code];
     }
   if (fn)
-    fn(this, code);
+    res= fn(this, code);
   post_inst();
   if (res != resNOT_DONE)
     return res;
@@ -279,7 +287,7 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	}
       offset= p&0x1f;
       if (p&0x10) offset|= 0xffe0;
-      return ival+offset;
+      return (u16_t)(ival+offset);
       break;
       
     case 6: // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
@@ -296,10 +304,10 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	  break;
 	}
       offset= rD;
-      a= ival+offset;
+      a= (u16_t)(ival+offset);
       if (pg)
 	*pg= rom->read(a+2);
-      return read_addr(rom, a);
+      return (u16_t)read_addr(rom, a);
       break;
   
     case 5: // 5. 111r r011 [n16,r] rr={X,Y,SP,PC}
@@ -328,10 +336,10 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	  l= fetch();
 	}
       offset= h*256+l;
-      a= ival+offset;
+      a= (u16_t)(ival+offset);
       if (pg)
 	*pg= rom->read(a+2);
-      return read_addr(rom, a);
+      return (u16_t)read_addr(rom, a);
       break;
   
     case 3: // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
@@ -359,7 +367,7 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	  if (!addr)
 	    post_idx_reg->W(ival);
 	}
-      return ival;
+      return (u16_t)ival;
       break;
       
     case 2:  // 2. 111r r0zs n9/16,r rr={X,Y,SP,PC}
@@ -404,7 +412,7 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	    }
 	  offset= h*256+l;
 	}
-      return ival+offset;
+      return (u16_t)(ival+offset);
       break;
   
     default: // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
@@ -426,11 +434,11 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg)
 	case 0x01: offset= s8_16(rB); break;
 	case 0x02: offset= rD; break;
 	}
-      return ival+offset;
+      return (u16_t)(ival+offset);
       break;
     }
   
-  return a;
+  return (u16_t)a;
 }
 
 u8_t

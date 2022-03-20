@@ -154,5 +154,121 @@ CL12::branch(t_addr a, bool cond)
   return resGO;
 }
 
+int
+CL12::jump(t_addr a)
+{
+  PC= a&0xffff;
+  return resGO;
+}
+
+int
+CL12::bsr(void)
+{
+  i8_t r= fetch();
+  u16_t s= rSP;
+  rom->write(--s, PC);
+  rom->write(--s, PC>>8);
+  vc.wr+= 2;
+  cSP.W(s);
+  PC= (PC+r)&0xffff;
+  return resGO;
+}
+
+int
+CL12::jsr(t_addr a)
+{
+  u16_t s= rSP;
+  rom->write(--s, PC);
+  rom->write(--s, PC>>8);
+  vc.wr+= 2;
+  cSP.W(s);
+  PC= (a)&0xffff;
+  return resGO;
+}
+
+int
+CL12::rtc(void)
+{
+  u16_t s= rSP;
+  u8_t p, h, l;
+  p= rom->read(s++);
+  h= rom->read(s++);
+  l= rom->read(s++);
+  cSP.W(s);
+  vc.rd+= 3;
+  cpu12->ppage_write(p);
+  PC= h*256+l;
+  return resGO;
+}
+
+int
+CL12::rts(void)
+{
+  u16_t s= rSP;
+  u8_t h, l;
+  h= rom->read(s++);
+  l= rom->read(s++);
+  cSP.W(s);
+  vc.rd+= 2;
+  PC= h*256+l;
+  return resGO;
+}
+
+int
+CL12::swi(void)
+{
+  u16_t s= rSP;
+  rom->write(--s, PC);
+  rom->write(--s, PC>>8);
+  rom->write(--s, rIY);
+  rom->write(--s, rIY>>8);
+  rom->write(--s, rIX);
+  rom->write(--s, rIX>>8);
+  rom->write(--s, rA);
+  rom->write(--s, rB);
+  rom->write(--s, rF);
+  cF.W(rF|flagI);
+  vc.wr+= 9;
+  cSP.W(s);
+  //swi_src->request();
+  u8_t h= rom->read(SWI_AT);
+  u8_t l= rom->read(SWI_AT+1);
+  PC= h*256+l;
+  return resGO;
+}
+
+int
+CL12::rti(void)
+{
+  u16_t s= rSP;
+  u8_t f, fx, h, l;
+
+  f= rom->read(s++);
+  rF&= ~(flagStop|flagH|flagI|flagN|flagZ|flagV|flagC);
+  fx= f&flagX;
+  f&= ~flagX;
+  rF&= fx;
+  rF|= f;
+  cF.W(f);
+  
+  h= rom->read(s++);
+  l= rom->read(s++);
+  cB.W(h);
+  cA.W(l);
+  h= rom->read(s++);
+  l= rom->read(s++);
+  cX.W(h*256+l);
+  h= rom->read(s++);
+  l= rom->read(s++);
+  cY.W(h*256+l);
+  h= rom->read(s++);
+  l= rom->read(s++);
+  PC= h*256+l;
+
+  cSP.W(s);
+  vc.rd+= 9;
+  return resGO;
+}
+
 
 /* ENd of m68hc12.src/ibranch.cc */

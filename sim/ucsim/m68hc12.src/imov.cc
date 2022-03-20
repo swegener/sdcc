@@ -34,6 +34,7 @@ CL12::exec_b7(void)
   u8_t ls= pb&0x7, ms=(pb>>4)&0x7, ws, wd;
   class cl_memory_cell *cs, *cd;
   u16_t src;
+  
   if (pb & 0x08)
     return resINV;
   cs= tex_cells[ms];
@@ -56,7 +57,7 @@ CL12::exec_b7(void)
       else
 	// 16bit -> 8bit
 	;
-      cd->W(src);
+      //cd->W(src);
     }
   else
     {
@@ -64,14 +65,14 @@ CL12::exec_b7(void)
       if (ws == wd)
 	{
 	  cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
       else if (ws == 8)
 	{
 	  // 0L <-> 8
 	  src&= 0x00ff;
 	  cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
       else
 	{
@@ -80,9 +81,16 @@ CL12::exec_b7(void)
 	    cs->W(0xff00 | (cd->get()));
 	  else
 	    cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
     }
+  if (cd == &cF)
+    {
+      u8_t ox= rF&flagX, nx=src&flagX;
+      src&= ~flagX;
+      src|= (ox|nx);
+    }
+  cd->W(src);
   return resGO;
 }
 

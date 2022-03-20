@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (m68hc12cl.h)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,2022 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -41,8 +41,8 @@ class cl_hc12_cpu;
 typedef int (*hcwrapper_fn)(class CL12 *uc, t_mem code);
 
 enum {
-  flagS	= 0x80,
-  flagX	= 0x40
+  flagStop	= 0x80,
+  flagX		= 0x40
 };
 
 #define rTMP2 (TMP2)
@@ -79,6 +79,7 @@ public:
   u16_t XIRQ_AT, COP_AT, TRAP_AT, CMR_AT;
   class cl_hc12_cpu *cpu12;
   int extra_ticks;
+  bool block_irq;
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
@@ -99,6 +100,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 6; }
 
+  virtual void pre_inst(void);
   virtual int exec_inst(void);
   virtual void post_inst(void);
   virtual i16_t s8_16(u8_t op); // sex 8->16
@@ -123,7 +125,12 @@ public:
   virtual int cp16(u16_t op1, u16_t op2);
   virtual int lsr16(class cl_memory_cell &dest);
   virtual int asl16(class cl_memory_cell &dest);
-
+  virtual int inxy(class cl_memory_cell &dest);
+  virtual int dexy(class cl_memory_cell &dest);
+  virtual int ediv(void);
+  virtual int mul(void);
+  virtual int emul(void);
+  
   // MOVE
 #define ld16 ldsx
   virtual int i_psh8(u8_t op);
@@ -143,9 +150,18 @@ public:
   virtual int brclr_id(void);
   virtual int brclr_e(void);
   virtual int branch(t_addr a, bool cond);
-
-  // OTHER
+  virtual int jump(t_addr a);
+  virtual int bsr(void);
+  virtual int jsr(t_addr a);
+  virtual int rtc(void);
+  virtual int rts(void);
+  virtual int swi(void);
+  virtual int rti(void);
   
+  // OTHER
+  virtual int andcc(u8_t op);
+  virtual int orcc(u8_t op);
+  virtual int lea(class cl_memory_cell &dest);
 };
 
 

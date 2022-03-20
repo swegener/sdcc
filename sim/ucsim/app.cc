@@ -73,6 +73,7 @@ cl_app::cl_app(void)
   quiet= false;
   if (app_start_at == 0)
     app_start_at= dnow();
+  srnd(0);
 }
 
 cl_app::~cl_app(void)

@@ -99,4 +99,83 @@ CL12::asl16(class cl_memory_cell &dest)
   return resGO;
 }
 
+int
+CL12::inxy(class cl_memory_cell &dest)
+{
+  u8_t f= rF & ~flagZ, v;
+  dest.W(v= dest.R()+1);
+  if (!v)
+    f|= flagZ;
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::dexy(class cl_memory_cell &dest)
+{
+  u8_t f= rF & ~flagZ, v;
+  dest.W(v= dest.R()-1);
+  if (!v)
+    f|= flagZ;
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::ediv(void)
+{
+  u32_t op1= (((u32_t)rY)<<16)+rD;
+  u16_t op2= rX;
+  u32_t res, rem;
+  u8_t f= rF & ~(flagN|flagZ|flagV|flagC);
+  if (op2 == 0)
+    f|= flagC;
+  else
+    {
+      res= op1/op2;
+      rem= op1%op2;
+      if (res & 0x8000)
+	f|= flagN;
+      if (res > 0xffff)
+	f|= flagV;
+      res&= 0xffff;
+      if (!res)
+	f|= flagZ;
+    }
+  cY.W(res);
+  cD.W(rem);
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::mul(void)
+{
+  u8_t f= rF&~flagC;
+  rD= rA*rB;
+  if (rB & 0x80)
+    f|= flagC;
+  cD.W(rD);
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::emul(void)
+{
+  u8_t f= rF&~(flagC|flagZ|flagN);
+  u32_t res= rD*rY;
+  if (res & 0x8000)
+    f|= flagC;
+  if (res & 0x80000000)
+    f|= flagN;
+  if (!res)
+    f|= flagZ;
+  cD.W(res);
+  cY.W(res>>16);
+  cF.W(f);
+  return resGO;
+}
+
+
 /* End of m68hc12.src/ialu.cc */

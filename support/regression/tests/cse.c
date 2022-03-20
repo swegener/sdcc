@@ -8,9 +8,9 @@
 /* the linker's help. Pick an address and address space that is  */
 /* likely free based on cpu and compile model. If ABSADDR is     */
 /* left undefined, the tests that needs it will be skipped.      */
-#if defined(SDCC) || defined(__SDCC)
-#  if  defined(SDCC_mcs51) || defined(__SDCC_mcs51)
-#    if defined(SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_LARGE)
+#if defined(__SDCC)
+#  if  defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_LARGE)
 #      define ABSADDRSPACE __xdata
 #      define ABSADDR 0x8000
 #    else
@@ -18,15 +18,15 @@
 #      define ABSADDR 0x70
 #    endif
 #  endif
-#  if defined(SDCC_ds390) || defined(__SDCC_ds390)
+#  if defined(__SDCC_ds390)
 #    define ABSADDRSPACE __xdata
 #    define ABSADDR 0x8000
 #  endif
-#  if defined(SDCC_hc08) || defined(__SDCC_s08)
+#  if defined(__SDCC_s08)
 #    define ABSADDRSPACE __xdata
 #    define ABSADDR 0x7f00
 #  endif
-#  if defined(SDCC_z80) || defined(__SDCC_z80)
+#  if defined(__SDCC_z80) || defined(__SDCC_z80n)
 #    define ABSADDRSPACE __xdata
 #    define ABSADDR 0x7f00
 #  endif

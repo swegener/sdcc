@@ -10,7 +10,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
 struct s { int f[4]; };
 
 int foo (struct s s, int x1, int x2, int x3, int x4, int x5, int x6, int x7)

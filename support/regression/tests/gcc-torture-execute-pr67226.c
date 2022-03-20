@@ -12,7 +12,7 @@ struct assembly_operand
 };
 
 struct assembly_operand to_input, from_input;
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
 void
 assemblez_1 (int internal_number, struct assembly_operand o1)
 {
@@ -43,7 +43,7 @@ testTortureExecute (void)
   from_input.symtype = 7;
   from_input.symflags = 8;
   from_input.marker = 9;
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
   t0 (to_input, from_input);
 #endif
   return;

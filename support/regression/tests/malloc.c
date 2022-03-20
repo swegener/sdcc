@@ -116,7 +116,7 @@ void mallocfree(void)
 	free(c);
 
 	/* Check that we can allocate at least 256 bytes at once. */
-#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka)
+#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_z80n) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka)
 	a = malloc(256);
 	ASSERT(a);
 	free(a);
@@ -150,7 +150,7 @@ testMalloc (void)
   LOG (("p1 == NULL when out of memory\n"));
 #endif
 
-#if !defined(PORT_HOST) && !defined(__SDCC_sm83) && !defined(__SDCC_z80)
+#if !defined(PORT_HOST) && !defined(__SDCC_sm83) && !defined(__SDCC_z80) && !defined(__SDCC_z80n)
   p1 = malloc (2000);
   ASSERT (p1 == NULL);
   LOG (("p1 == NULL when out of memory\n"));

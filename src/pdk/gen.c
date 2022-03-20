@@ -24,6 +24,8 @@
 /* Use the D macro for basic (unobtrusive) debugging messages */
 #define D(x) do if (options.verboseAsm) { x; } while (0)
 
+#define UNIMPLEMENTED do {wassertl (regalloc_dry_run, "Unimplemented"); cost (500, 500);} while(0)
+
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_words;
 static float regalloc_dry_run_cost_cycles;
@@ -765,10 +767,7 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
         }
 
       if (aopInReg (result, roffset, A_IDX) && !f_dead)
-        {
-          cost (200, 200);
-          wassert (regalloc_dry_run);
-        }
+        UNIMPLEMENTED;
 
       if (!a_dead || !f_dead)
         pushAF ();
@@ -1369,10 +1368,7 @@ genXorByte (const asmop *result_aop, const asmop *left_aop, const asmop *right_a
       else if (right_aop->type == AOP_STK || right_aop->type == AOP_STL)
         {
           if (!p_dead || aopInReg (left_aop, i, P_IDX))
-            {
-              cost (100, 100);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
           cheapMove (ASMOP_A, 0, left_aop, i, true, true, true);
           cheapMove (ASMOP_P, 0, right_aop, i, false, true, true);
           emit2 ("xor", "a, p");
@@ -1785,7 +1781,54 @@ genPointerPush (const iCode *ic)
 
   D (emit2 ("; genPointerPush", ""));
 
-  wassertl (0, "Unimplemented pointer push");
+  sym_link *type = operandType (left);
+  int ptype = (IS_PTR (type) && !IS_FUNC (type->next)) ? DCL_TYPE (type) : PTR_TYPE (SPEC_OCLS (getSpec (type)));  if (left->aop->type == AOP_IMMD && ptype == GPOINTER && IS_SYMOP (left) && OP_SYMBOL (left)->remat)
+    ptype = left->aop->aopu.code ? CPOINTER : POINTER;
+  else if (left->aop->type == AOP_STL)
+    ptype = POINTER;
+
+  int size = getSize (type->next);
+
+  if (!regDead(A_IDX, ic) || !regDead(P_IDX, ic) ||
+    size > 0 && (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 0, P_IDX) || aopInReg (left->aop, 1, A_IDX) || aopInReg (left->aop, 1, P_IDX)))
+    UNIMPLEMENTED;
+
+  for (int i = 0; i < size;)
+    {
+      genMove (ASMOP_PA, left->aop, true, true);
+
+      if (i > 2)
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("add", "a, #%d", i);
+          emit2 ("xch", "a, p");
+          emit2 ("addc", "a");
+          cost (4, 4);
+        }
+      else
+        for (int j = 0; j < i; j++)
+          {
+            emit2 ("inc", "p");
+            emit2 ("addc", "a");
+            cost (2, 2);
+          }
+
+      if (i + 1 < size)
+        {
+          emit2 ("call", "__gptrget2");
+          cost (1, (ptype == CPOINTER) ? 32 : 13);
+          G.p.type = AOP_INVALID;
+          push (ASMOP_AP, 0, 2);
+          i += 2;
+        }
+      else
+        {
+          emit2 ("call", "__gptrget");
+          G.p.type = AOP_INVALID;
+          pushAF ();
+          i++;
+        }
+    }
 
   freeAsmop (IC_LEFT (ic));
 }
@@ -2037,7 +2080,7 @@ genEndFunction (iCode *ic)
       cost (1, 1);
     }
 
-  wassertl (!G.stack.pushed, "Unbalanced stack.");
+  //wassertl (!G.stack.pushed, "Unbalanced stack.");
 }
 
 /*-----------------------------------------------------------------*/
@@ -2282,10 +2325,7 @@ genPlus (const iCode *ic)
           if (!regDead (P_IDX, ic) && !pushed_p)
             {
               if (pushed_a)
-                {
-                  cost (200, 200);
-                  wassert (regalloc_dry_run);
-                }
+                UNIMPLEMENTED;
               pushPF (!moved_to_a && !aopInReg (left->aop, i, A_IDX));
               pushed_p = true;
             }
@@ -2321,10 +2361,7 @@ genPlus (const iCode *ic)
           if (!regDead (P_IDX, ic) && !pushed_p)
             {
               if (pushed_a)
-                {
-                  cost (200, 200);
-                  wassert (regalloc_dry_run);
-                }
+                UNIMPLEMENTED;
               pushPF (!aopInReg (left->aop, i, A_IDX) && !aopInReg (right->aop, i, A_IDX) && !moved_to_a);
               pushed_p = true;
             }
@@ -2755,10 +2792,7 @@ genCmp (const iCode *ic, iCode *ifx)
       else
         {
           if (aopInReg (right->aop, i, A_IDX))
-            {
-              cost (100, 100);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
           cheapMove (ASMOP_A, 0, left->aop, i, true, !aopInReg (right->aop, i, P_IDX), !i);
           emit2 (started ? "subc" : "sub", "a, %s", aopGet (right->aop, i));
           cost (1, 1);
@@ -2903,10 +2937,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             if (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i)
               {
                 if (!regDead (P_IDX, ic) || i + 1 < size && aopInReg(left->aop, i + 1, P_IDX))
-                  {
-                    cost (1000, 1000);
-                    wassert (regalloc_dry_run);
-                  }
+                  UNIMPLEMENTED;
                 if (aopInReg (left->aop, i, P_IDX))
                   {
                     emit2 ("mov", "a, p");
@@ -3339,10 +3370,7 @@ genAnd (const iCode *ic, iCode *ifx)
           cost (3, 3);
         }
       else if (right->aop->type == AOP_SFR)
-        {
-          wassert (regalloc_dry_run);
-          cost (100, 100);
-        }
+        UNIMPLEMENTED;
       else
         {
           if (!a_free)
@@ -3785,10 +3813,7 @@ genRightShift (const iCode *ic)
               else
                 {
                   if (size > 1 && aopInReg (result->aop, 0, A_IDX) || !regDead (A_IDX, ic))
-                    {
-                      wassert (regalloc_dry_run);
-                      cost (500, 500);
-                    }
+                    UNIMPLEMENTED;
                    cheapMove (ASMOP_A, 0, result->aop, size - 1, true, true, true);
                    emit2 ("sl", "a");
                    cost (1, 1);
@@ -3821,10 +3846,7 @@ genRightShift (const iCode *ic)
           for(int i = size - 2; i >= 0; i--)
             {
               if (pushed_a && aopInReg (result->aop, i, A_IDX))
-                {
-                  wassert (regalloc_dry_run);
-                  cost (500, 500);
-                }
+                UNIMPLEMENTED;
               if (result->aop->type == AOP_STK)
                 {
                   cheapMove (ASMOP_A, 0, result->aop, i, true, true, false);
@@ -4139,10 +4161,7 @@ genPointerGet (const iCode *ic)
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
         {
           if (i != 0 && aopInReg (ptr_aop, 0, P_IDX) && aopInReg (result->aop, i - 1, P_IDX)) // Would have been overwritten on previous byte.
-            {
-              cost (500, 500);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
 
           emit2 ("idxm", "a, %s", aopGet (ptr_aop, 0));
           cost (1, 2);
@@ -4194,10 +4213,7 @@ genPointerGet (const iCode *ic)
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
         {
           if (i != 0 && (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 1, A_IDX) || aopInReg (result->aop, i - 1, P_IDX))) // Would have been overwritten on previous byte.
-            {
-              cost (500, 500);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
 
           genMove (ASMOP_PA, left->aop, true, true);
           if (i > 2)
@@ -4234,10 +4250,7 @@ genPointerGet (const iCode *ic)
             getBitFieldByte (blen, bstr, !SPEC_USIGN (getSpec (operandType (result))));
 
           if (aopInReg (result->aop, i, P_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
-            {
-              wassert (regalloc_dry_run);
-              cost (200, 200);
-            }
+            UNIMPLEMENTED;
           else if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
             {
               pushAF();
@@ -4439,10 +4452,7 @@ genPointerSet (iCode *ic)
               pushed_a = true;
             }
           if (aopInReg (right->aop, 1, A_IDX))
-            {
-              cost (1000, 1000);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
           ptr_aop = ASMOP_P;
           cheapMove (ASMOP_A, 0, left->aop, 0, true, false, true);
           emit2 ("xch", "a, p");
@@ -4460,10 +4470,7 @@ genPointerSet (iCode *ic)
           ptr_aop = ASMOP_P;
           cheapMove (ptr_aop, 0, left->aop, 0, !aopInReg (right->aop, 0, A_IDX), true, true);
           if (!regDead (P_IDX, ic) || aopInReg (right->aop, 0, P_IDX) || aopInReg (right->aop, 1, P_IDX))
-            {
-              cost (1000, 1000);
-              wassert (regalloc_dry_run);     
-            }
+            UNIMPLEMENTED;
         }
       
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
@@ -4550,10 +4557,7 @@ genPointerSet (iCode *ic)
               else
                 {
                   if (aopInReg (right->aop, i, A_IDX) || aopInReg (right->aop, i, P_IDX) && swapped)
-                    {
-                      cost (100, 100);
-                      wassert (regalloc_dry_run);
-                    }
+                    UNIMPLEMENTED;
                   if (!ptr_aop)
                     {
                       emit2 ("mov", "a, %s+%d", left->aop->aopu.immd, left->aop->aopu.immd_off + i);
@@ -4714,10 +4718,7 @@ genIfx (const iCode *ic)
   aopOp (cond, ic);
 
   if(cond->aop->type == AOP_STK && !regDead (P_IDX, ic))
-    {
-      cost (200, 200);
-      wassert (regalloc_dry_run);
-    }
+    UNIMPLEMENTED;
 
   if ((aopInReg (cond->aop, 0, A_IDX) && aopInReg (cond->aop, 1, P_IDX) ||
     aopInReg (cond->aop, 0, P_IDX) && aopInReg (cond->aop, 1, A_IDX)) &&

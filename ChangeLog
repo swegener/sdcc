@@ -1,3 +1,22 @@
+2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-2368.c,
+	  support/regression/tests/bug-2770.c,
+	  support/regression/tests/bug-3231.c,
+	  support/regression/tests/bug3440327.c,
+	  support/regression/tests/cse.c,
+	  support/regression/tests/gcc-torture-execute-20021118-1.c,
+	  support/regression/tests/gcc-torture-execute-20040707-1.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c,
+	  support/regression/tests/gcc-torture-execute-20180131-1.c,
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/malloc.c,
+	  support/regression/tests/memory.c,
+	  support/regression/tests/preserves_regs.c,
+	  support/regression/tests/structparam.c:
+	  struct parameters for pdk (--stack-auto only).
+
 2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/pdk/ralloc2.cc,

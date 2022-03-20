@@ -1039,40 +1039,12 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
         }
     }
 
-  switch (size)
+  for (unsigned int i = 0; i < size ; i++)
     {
-    case 0:
-      dbuf_tprintf (oBuf, "\n");
-      break;
-
-    case 1:
-      dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
+      dbuf_tprintf (oBuf, "\t!db !constbyte\n", (unsigned)(((unsigned long long)ival >> i * 8) & 0xff));
       bytes_written++;
-      break;
-
-    case 2:
-      if (TARGET_PDK_LIKE && !TARGET_IS_PDK16)
-        {
-          dbuf_tprintf (oBuf, "\t!db !constbyte\n", (ival & 0xff));
-          dbuf_tprintf (oBuf, "\t!db !constbyte\n", ((ival >> 8) & 0xff));
-        }
-      else
-        dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte\n", (ival & 0xff), (ival >> 8) & 0xff);
-      bytes_written += 2;
-      break;
-
-    case 4:
-      dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte, !constbyte, !constbyte\n",
-                    (ival & 0xff), (ival >> 8) & 0xff, (ival >> 16) & 0xff, (ival >> 24) & 0xff);
-      bytes_written += 4;
-      break;
-    default:
-      for (unsigned int i = 0; i < size ; i++)
-        {
-          dbuf_tprintf (oBuf, "\t!db !constbyte\n", (((unsigned long long)ival >> i * 8) & 0xff));
-          bytes_written++;
-        }
     }
+
   *sym = lsym;
   *ilist = lilist;
 

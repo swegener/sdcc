@@ -1,5 +1,10 @@
 2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
+	* src/SDCCglue.c:
+	  Fix bug #3353.
+
+2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
 	* src/pdk/gen.c,
 	  support/regression/tests/bug-2368.c,
 	  support/regression/tests/bug-2770.c,

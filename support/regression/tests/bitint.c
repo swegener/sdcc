@@ -65,7 +65,7 @@ void testBitInt(void)
 #if {width} >= 6
 	b = 0x5aff;
 	unsigned _BitInt(6) b6 = b;
-	ASSERT((unsigned _BitInt(6))((bitinttype)0x5aff) == b6);
+	ASSERT((unsigned _BitInt(6))((bitinttype)0x5aff) == b6); // Bug #3371 - both casts are done at compile time, results were different - left cast done on ast (ok), right on iCode (wrong on FreeBSD13 on aarch64).
 	b = b6;
 	ASSERT((bitinttype)b6 == (bitinttype)(unsigned _BitInt(6))0x5aff);
 #endif

@@ -1,3 +1,9 @@
+2022-03-22 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+
+	* src/SDCCcse.c,
+	  support/regression/tests/bitint.c:
+	  Fix bug #3371.
+
 2022-03-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/asz80/z80mch.c:

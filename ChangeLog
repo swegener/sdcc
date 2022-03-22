@@ -1,3 +1,8 @@
+2022-03-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asz80/z80mch.c:
+	  Fix/add cycles of z80 and z80n.
+
 2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* src/SDCCglue.c:

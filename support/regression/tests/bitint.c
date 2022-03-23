@@ -8,6 +8,12 @@
 
 #include <limits.h>
 
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 
 typedef {sign} _BitInt({width}) bitinttype;
@@ -33,6 +39,7 @@ void testBitInt(void)
 	ASSERT(f() == (bitinttype)42);
 	ASSERT(g(0) == (bitinttype)1);
 
+#ifndef __clang_major__ // clang 11 does not yet support addition of _BitInt of different width
 #if __SDCC_BITINT_MAXWIDTH >= 4 // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 	ASSERT(_Generic((_BitInt(4))(4) + (_BitInt(6))(6), default: 1, _BitInt(6): 0) == 0); // _BitInt does not promote to int, even when narrower than int.
 	//BUG! SDCC makes 6 char instead of int! ASSERT(_Generic((_BitInt(4))(4) + 6, default: 1, int: 0) == 0); // But it does promote to int when the other operand is int.
@@ -42,6 +49,7 @@ void testBitInt(void)
 	ASSERT(_Generic((_BitInt(4))(4) + 300, default: 1, int: 0) == 0); // But it does promote to int when the other operand is int.
 #if __SDCC_BITINT_MAXWIDTH >= 32 // 32 should work on most platforms, including hosts with 32-bit int // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 	ASSERT(_Generic((_BitInt(CHAR_BIT * sizeof(int)))(4) + 300, default: 1, int: 0) == 0); // Even when both are the same size.
+#endif
 #endif
 #endif
 

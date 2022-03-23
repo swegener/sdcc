@@ -8,6 +8,12 @@
 #include <limits.h>
 #include <stdarg.h>
 
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 
 typedef unsigned _BitInt({width}) bitinttype;

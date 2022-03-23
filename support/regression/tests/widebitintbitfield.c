@@ -8,6 +8,12 @@
 
 #include <stdbool.h>
 
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 typedef {sign} _BitInt({width}) bitinttype;
 
@@ -26,6 +32,10 @@ struct {
 
 void testWideBitIntBitField(void)
 {
+  ASSERT (_Generic(bf2.bw, bitinttype: 1, default: 0) == 1);
+  ASSERT (_Generic(bf2.bw_1, bitinttype: 1, default: 0) == 1);
+
+#ifndef __clang_major__ // clang 11 doesn't support == between _BitInt and int
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
   ASSERT (bf.bw == 5);
   ASSERT (bf.b4 == 6);
@@ -39,6 +49,7 @@ void testWideBitIntBitField(void)
   bf2.bw_1 = 0x15;
   ASSERT (bf.bw == 0x2a);
   ASSERT (bf2.bw_1 == 0x15);
+#endif
 #endif
 }
 

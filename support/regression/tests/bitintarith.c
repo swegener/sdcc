@@ -5,6 +5,12 @@
 
 #include <testfwk.h>
 
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 #if {width} <= 40 || !defined (__SDCC_pdk14) // Lack of memory
 
@@ -21,6 +27,7 @@ volatile char c = 1;
 
 void testBitIntArith(void)
 {
+#ifndef __clang_major__ // clang 11 doesn't support == between _BitInt and int
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 #if ({width} <= 40 || !defined (__SDCC_pdk14)) && ({width} <= 48 || !defined (__SDCC_pdk15)) // Lack of memory
 
@@ -87,6 +94,7 @@ void testBitIntArith(void)
 	ASSERT(--ua == 0);
 	ASSERT(--ua == (ubitinttype)0xffffffffffffffffull);
 	ASSERT(++ua == 0);
+#endif
 #endif
 #endif
 #endif

@@ -121,6 +121,13 @@
 #define	S_INDM	57
 
 /*
+ * Undocumented instructions
+ */
+
+#define X_UNDOCD 58
+#define S_RL_UNDOCD  59
+
+/*
  * Instruction types
  */
 #define	S_LD	60
@@ -151,9 +158,6 @@
  * CPU Types
  */
 #define	S_CPU	83
-
-#define S_RL_UNDOCD  85
-#define X_UNDOCD 89
 
 /*
  * Processor Types (S_CPU)

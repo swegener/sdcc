@@ -156,6 +156,16 @@ diag(void)
                 }
                 p = eb;
                 while (p < ep) {
+                        if ((ex[(int) (p-eb)] != NULL) && (*ex[(int) (p-eb)] != 0)) {
+                                if (!is_sdas()) {
+                                        fprintf(fp, "              <%c> %s\n", *p, ex[(int) (p-eb)]);
+                                } else {
+                                        /* Modified to conform to gcc error standard, basxto, 24 Mar '22. */
+                                        fprintf(stderr, "%s:", afn);
+                                        fprintf(stderr, "%d: Error:", getlnm());
+                                        fprintf(stderr, " <%c> %s\n", *p, ex[(int) (p-eb)]);
+                                }
+                        } else
                         if ((errstr = geterr(*p)) != NULL) {
                                 if (!is_sdas()) {
                                         fprintf(fp, "              %s\n", errstr);
@@ -170,6 +180,7 @@ diag(void)
                 }
         }
 }
+
 
 /* sdas specific */
 /*)Function     VOID    warnBanner()

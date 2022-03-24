@@ -33,10 +33,10 @@ struct {
 void testWideBitIntBitField(void)
 {
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
-  //ASSERT (_Generic(bf2.bw, bitinttype: 1, default: 0) == 1);
-  //ASSERT (_Generic(bf2.bw_1, bitinttype: 1, default: 0) == 1);
+#ifndef __clang_major__ // clang 11 doesn't support == between _BitInt and int, and does weird stuff when promoting bit-fields.
+  ASSERT (_Generic(+bf2.bw, bitinttype: 1, default: 0) == 1);
+  ASSERT (_Generic(+bf2.bw_1, bitinttype: 1, default: 0) == 1);
 
-#ifndef __clang_major__ // clang 11 doesn't support == between _BitInt and int
   ASSERT (bf.bw == 5);
   ASSERT (bf.b4 == 6);
   ASSERT (bf.b == false);

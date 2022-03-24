@@ -2650,8 +2650,8 @@ getResultTypeFromType (sym_link * type)
 static ast *
 addCast (ast * tree, RESULT_TYPE resultType, bool promote)
 {
-  sym_link *newLink;
-  bool upCasted = FALSE;
+  sym_link *newlink;
+  bool upCasted = false;
 
   switch (resultType)
     {
@@ -2660,9 +2660,17 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
       if (!promote || getSize (tree->etype) >= INTSIZE || IS_BITINT (tree->etype))
         /* promotion not necessary or already an int */
         return tree;
+      else if (SPEC_NOUN (tree->etype) == V_BITINTBITFIELD) // Promotes to corresponding _BitInt type
+        {
+           newlink = newLink (SPECIFIER);
+           SPEC_NOUN (newlink) = V_BITINT;
+           SPEC_BITINTWIDTH (newlink) = SPEC_BITINTWIDTH (tree->etype);
+           SPEC_USIGN (newlink) = SPEC_USIGN (tree->etype);
+           break;
+        }
       /* char and bits: promote to int */
-      newLink = newIntLink ();
-      upCasted = TRUE;
+      newlink = newIntLink ();
+      upCasted = true;
       break;
     case RESULT_TYPE_BOOL:
       if (!promote ||
@@ -2672,13 +2680,13 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
              hopefully know everything about promotion rules */
           bitsForType (tree->etype) == 1)
         return tree;
-      newLink = newIntLink ();
-      upCasted = TRUE;
+      newlink = newIntLink ();
+      upCasted = true;
       break;
     case RESULT_TYPE_CHAR:
       if (IS_CHAR (tree->etype) || IS_FLOAT (tree->etype) || IS_FIXED (tree->etype))
         return tree;
-      newLink = newCharLink ();
+      newlink = newCharLink ();
       break;
     case RESULT_TYPE_INT:
     case RESULT_TYPE_GPTR:
@@ -2692,8 +2700,8 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
       /* char: promote to int */
       if (!promote || getSize (tree->etype) >= INTSIZE)
         return tree;
-      newLink = newIntLink ();
-      upCasted = TRUE;
+      newlink = newIntLink ();
+      upCasted = true;
       break;
     case RESULT_TYPE_IFX:
     case RESULT_TYPE_OTHER:
@@ -2701,14 +2709,21 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
           /* return type is ifx, long, float: promote char to int */
           getSize (tree->etype) >= INTSIZE)
         return tree;
-      newLink = newIntLink ();
+      else if (SPEC_NOUN (tree->etype) == V_BITINTBITFIELD) // Promotes to corresponding _BitInt type
+        {
+           newlink = newLink (SPECIFIER);
+           SPEC_NOUN (newlink) = V_BITINT;
+           SPEC_BITINTWIDTH (newlink) = SPEC_BITINTWIDTH (tree->etype);
+           break;
+        }
+      newlink = newIntLink ();
       upCasted = true;
       break;
     default:
       return tree;
     }
   tree->decorated = 0;
-  tree = newNode (CAST, newAst_LINK (newLink), tree);
+  tree = newNode (CAST, newAst_LINK (newlink), tree);
   tree->filename = tree->right->filename;
   tree->lineno = tree->right->lineno;
   /* keep unsigned type during cast to smaller type,

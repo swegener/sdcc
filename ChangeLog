@@ -1,6 +1,13 @@
 2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
+	  src/SDCCsymt.c,
+	  support/regression/tests/widebitintbitfield.c:
+	  _BitInt promotion fix.
+
+2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
 	  support/regression/tests/bug-3372.c:
 	  Fix bug #3372.
 	* src/SDCCsymt.c:

@@ -2329,7 +2329,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   etype2 = type2 ? getSpec (type2) : type1;
 
 #if 0
-  printf("computeType "); printTypeChain (type1, 0); printf (" "); printTypeChain (type2, 0); printf ("\n"); 
+  printf("computeType types "); printTypeChain (type1, stdout); printf (" vs. "); printTypeChain (type2, 0);
 #endif
 
   /* Conditional operator has some special type conversion rules */
@@ -2517,7 +2517,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
         }
       else if (SPEC_NOUN (reType) == V_BITINTBITFIELD) // _BitInt(N) bit-field promotes to _BitInt(N).
         {
-          SPEC_NOUN (reType) = V_BITINT ;
+          SPEC_NOUN (reType) = V_BITINT;
         }
       else if (IS_BITFIELD (reType))
         {
@@ -2610,7 +2610,8 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
                              (SPEC_USIGN (etype2) && !(bitsForType (etype2) < bitsForType (reType)) && !IS_CHAR (etype2)) ||    /* if both are 'unsigned char' and not promoted
                                                                                                                                    let the result be unsigned too */
                              (SPEC_USIGN (etype1)
-                              && SPEC_USIGN (etype2) && IS_CHAR (etype1) && IS_CHAR (etype2) && IS_CHAR (reType))))
+                              && SPEC_USIGN (etype2) && IS_CHAR (etype1) && IS_CHAR (etype2) && IS_CHAR (reType))) ||
+                             SPEC_USIGN (etype1) && SPEC_USIGN (etype2) && IS_BITINT (rType)) // unsigned _BitInt stays unsigned.
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;

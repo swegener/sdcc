@@ -1,5 +1,11 @@
 2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* sdas/as8xcxxx/ds8adr.c,
+	  sdas/as8xcxxx/ds8mch.c:
+	  Merge error messages from upstream ASxxxx 5.40.
+
+2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* sdas/as8xcxxx/ds8pst.c,
 	  sdas/aspdk13/pdk13pst.c,
 	  sdas/aspdk14/pdk14pst.c,

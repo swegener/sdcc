@@ -11,6 +11,7 @@
 
 #include <stdarg.h>
 
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported for these ports!
 #if !defined(__SDCC_pdk14) // Lack of memory
 typedef struct{double x,y;}point;
 point pts[]={{1.0,2.0},{3.0,4.0},{5.0,6.0},{7.0,8.0}};
@@ -42,12 +43,13 @@ static int va2(int nargs,...)
   va_end(args);
 }
 #endif
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported for these ports!
 #if !defined(__SDCC_pdk14) // Lack of memory
-#if 0 // Bug #3367
 va1(4,pts[0],pts[1],pts[2],pts[3]);
 va2(4,ipts[0],ipts[1],ipts[2],ipts[3]);
 return;

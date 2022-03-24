@@ -4,6 +4,12 @@
 	  src/SDCCsymt.c,
 	  support/regression/tests/widebitintbitfield.c:
 	  _BitInt promotion fix.
+	* src/SDCCicode.c:
+	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/bug-3368.c:
+	  Fix bug #3368.
+	* support/regression/tests/bug-3235.c:
+	  Test for a bug that was fixd a while ago.
 
 2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -55,6 +61,12 @@
 	  Fix detailed error messages in sdas.
 
 2022-03-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/widebitintbitfield.c:
+	  Temporarily disable new failing _BitInt test.
+	  
+
+2022-03-23 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
 
 	* support/regression/tests/bitint.c,
 	  support/regression/tests/bitintarith.c,

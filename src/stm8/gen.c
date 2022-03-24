@@ -3649,6 +3649,7 @@ genPointerPush (const iCode *ic)
   genMove (use_y ? ASMOP_Y : ASMOP_X, IC_LEFT (ic)->aop, true, true, regDead (Y_IDX, ic));
 
   int size = getSize (operandType (IC_LEFT (ic))->next);
+
   for(int i = 0; i < size; i++)
     {
       int o = size - 1 - i + offset;

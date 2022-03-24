@@ -49,7 +49,7 @@ symbol *entryLabel;             /* function entry  label */
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
 operand *geniCodeAssign (operand *, operand *, int, int);
-static operand *geniCodeArray (operand *, operand *, int);
+static operand *geniCodeArray (operand *, operand *, int, bool noderef);
 static operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *, int);
@@ -2575,7 +2575,7 @@ geniCodeArray2Ptr (operand * op)
 /* geniCodeArray - array access                                    */
 /*-----------------------------------------------------------------*/
 static operand *
-geniCodeArray (operand * left, operand * right, int lvl)
+geniCodeArray (operand * left, operand * right, int lvl, bool noderef)
 {
   iCode *ic;
   operand *size;
@@ -2596,6 +2596,9 @@ geniCodeArray (operand * left, operand * right, int lvl)
         {
           left = geniCodeRValue (left, FALSE);
         }
+
+      if (noderef)
+        return geniCodeAdd (left, right, resultType, lvl);
 
       return geniCodeDerefPtr (geniCodeAdd (left, right, resultType, lvl), lvl);
     }
@@ -3002,7 +3005,7 @@ geniCodeDerefPtr (operand *op, int lvl)
   if (IS_ARRAY (optype))
     {
       // don't worry, this will be optimized out later
-      return geniCodeArray (op, operandFromLit (0), lvl);
+      return geniCodeArray (op, operandFromLit (0), lvl, false);
     }
 
   // just in case someone screws up
@@ -3480,8 +3483,10 @@ geniCodeSEParms (ast *parms, int lvl)
   if (IS_CAST_OP (parms) && IS_PTR (parms->ftype) && IS_ADDRESS_OF_OP (parms->right))
     parms->right->left->lvalue = 1;
 
-  parms->opval.oprnd = geniCodeRValue (ast2iCode (parms, lvl + 1), FALSE);
+  if (parms->type == EX_OP && parms->opval.op == '[' && IS_STRUCT (parms->ftype)) // Do not dereference pointer to struct.
+    parms->opval.op = '+';
 
+  parms->opval.oprnd = geniCodeRValue (ast2iCode (parms, lvl + 1), FALSE);
   parms->type = EX_OPERAND;
   AST_ARGREG (parms) = parms->etype ? SPEC_ARGREG (parms->etype) : SPEC_ARGREG (parms->ftype);
 }
@@ -3534,7 +3539,7 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
     }
   else
     {
-      bool is_structparm = IS_STRUCT (parms->ftype);
+      bool is_structparm = IS_STRUCT (parms->ftype); // struct parameter handling is hackish.
       /* now decide whether to push or assign */
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
         {
@@ -3548,12 +3553,11 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
         }
       else
         {
-          sym_link *p = operandType (pval);
           if (is_structparm)
             {
               sym_link *ptr = newLink (DECLARATOR);
               DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec(operandType(pval))));
-              ptr->next = copyLinkChain (operandType(pval));
+              ptr->next = copyLinkChain (parms->ftype);
               setOperandType (pval, ptr);
             }
           if (argVals && (*iArg >= 0))
@@ -3565,10 +3569,10 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
             ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
           /* update the stack adjustment */
-          *stack += getSize (IS_ARRAY (p) ? aggrToPtr (p, FALSE) : p);
-          if (IFFUNC_ISSMALLC (ftype) && !IS_AGGREGATE (p) && getSize (p) == 1) /* SmallC calling convention passes 8-bit parameters as 16-bit values. */
+          *stack += getSize (IS_ARRAY (parms->ftype) ? aggrToPtr (parms->ftype, false) : parms->ftype);
+          if (IFFUNC_ISSMALLC (ftype) && !IS_AGGREGATE (parms->ftype) && getSize (parms->ftype) == 1) // SmallC calling convention passes 8-bit parameters as 16-bit values.
             (*stack)++;
-          if (TARGET_PDK_LIKE && !IS_AGGREGATE (p) && getSize (p) % 2) /* So does pdk due to stack alignment requirements */
+          if (TARGET_PDK_LIKE && !IS_AGGREGATE (parms->ftype) && getSize (parms->ftype) % 2) // So does pdk due to stack alignment requirements.
             (*stack)++;
           ADDTOCHAIN (ic);
         }
@@ -4427,7 +4431,7 @@ ast2iCode (ast * tree, int lvl)
         right = geniCodeRValue (right, TRUE);
       }
 
-      return geniCodeArray (left, right, lvl);
+      return geniCodeArray (left, right, lvl, false);
 
     case '.':                  /* structure dereference */
       if (IS_PTR (operandType (left)))

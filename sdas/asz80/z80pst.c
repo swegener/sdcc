@@ -51,7 +51,7 @@ struct  mne     mne[] = {
     {   NULL,   ".sbttl",       S_HEADER,       0,      O_SBTTL },
     {   NULL,   ".module",      S_MODUL,        0,      0       },
     {	NULL,	".include",	S_INCL,		0,	I_CODE	},
-    {   NULL,   ".incbin",      S_INCL,         0,      I_BNRY  },
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {   NULL,   ".area",        S_AREA,         0,      0       },
 
     {   NULL,   ".org",         S_ORG,          0,      0       },

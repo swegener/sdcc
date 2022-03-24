@@ -1,5 +1,17 @@
 2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* sdas/as8051/i51adr.c,
+	  sdas/as8051/i51mch.c,
+	  sdas/as8051/i51pst.c:
+	  Merge error messages from upstream ASxxxx 5.40.
+
+2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/asz80/z80.h:
+	  Fix .allow_undocumented for z80 [bugs:#3275].
+
+2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* sdas/asxxsrc/assubr.c:
 	  Fix detailed error messages in sdas.
 

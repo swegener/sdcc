@@ -86,10 +86,10 @@ addr(struct expr *esp)
                                         esp->e_mode = S_AT_ADP;
                                         esp->e_addr = 0;
                                 } else {
-                                        aerr();
+                                        xerr('a', "@A+DPTR and A,@A+PC are the allowed modes.");
                                 }
                         } else
-                                aerr();
+                                xerr('a', "Invalid Addressing Mode.");
                         break;
                 }
 
@@ -108,7 +108,7 @@ addr(struct expr *esp)
                         esp->e_mode = S_DIR;
                 }
                 if (esp->e_addr & ~0xFF)
-                        err('d');
+                        xerr('d', "A Direct Page addressing error.");
         }
         else if (c == '/') {
                 /* Force inverted bit  */

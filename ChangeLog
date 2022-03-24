@@ -1,5 +1,11 @@
 2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/Makefile.in,
+	  support/regression/generate-cases.py:
+	  Regression test infrastructure improvements, picked from patch #430 by Felix Salfelder (felixs).
+
+2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCast.c,
 	  src/SDCCsymt.c,
 	  support/regression/tests/widebitintbitfield.c:
@@ -66,7 +72,7 @@
 	  Temporarily disable new failing _BitInt test.
 	  
 
-2022-03-23 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bitint.c,
 	  support/regression/tests/bitintarith.c,
@@ -75,7 +81,7 @@
 	  support/regression/tests/widebitintbitfield.c:
 	  Enable some tests for bit-precise integers on clang 11 host.
 
-2022-03-22 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCcse.c,
 	  support/regression/tests/bitint.c:
@@ -86,12 +92,12 @@
 	* sdas/asz80/z80mch.c:
 	  Fix/add cycles of z80 and z80n.
 
-2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCglue.c:
 	  Fix bug #3353.
 
-2022-03-20 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
 	  support/regression/tests/bug-2368.c,
@@ -110,7 +116,7 @@
 	  support/regression/tests/structparam.c:
 	  struct parameters for pdk (--stack-auto only).
 
-2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/ralloc2.cc,
 	  src/stm8/ralloc2.cc,
@@ -119,7 +125,7 @@
 	  support/regression/tests/gcc-torture-execute-920625-1.c:
 	  Fix a register allocation issue affecting calls to functions with multiple struct parameters.
 
-2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.y,
 	  src/SDCCcse.c,
@@ -139,7 +145,7 @@
 	  support/regression/tests/structparam.c:
 	  Rewrite struct parameter support to fix bug #3365.
 
-2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
 	  support/regression/tests/gcc-torture-execute-920625-1.c,
@@ -166,7 +172,7 @@
 	  LICENSE:
 	  Make it a bit easier to read about the license situation.
 
-2022-03-19 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/mcs51/gen.c:
 	  Fix bug #3364.
@@ -189,7 +195,7 @@
 	  support/regression/tests/gcc-torture-execute-struct-ret-1.c:
 	  Enable some GCC tests that pass due to recent improvements in struct / union support.
 
-2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stdarg.h,
 	  src/SDCCast.c,
@@ -199,7 +205,7 @@
 	  support/regression/tests/bitintvararg.c:
 	  Fixes for bit-precise varargs, bug #3361.
 
-2022-03-18 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCicode.c,
 	  src/SDCCsymt.c,
@@ -216,7 +222,7 @@
 	* src/mos6502/gen.c:
 	  Refactor genAnd(), genOr() and genXor().
 
-2022-03-16 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-16 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:
 	  Fix access before array.
@@ -234,7 +240,7 @@
 	  src/SDCCval.c:
 	  In C23, u8-prefixed string literals are arrays of char8_t, a typedef for unsigned char. RFE #779.
 
-2022-03-16 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-16 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/Makefile.in,
 	  support/regression/ports/ds390/spec.mk,
@@ -263,7 +269,7 @@
 	  src/mos6502/main.c:
 	  Add support for GETBYTE and GETWORD iCodes.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
 	  device/lib/lldiv.c:
@@ -271,7 +277,7 @@
 	* src/stm8/gen.c:
 	  Fixes for large struct return.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/lib/div.c,
 	  device/lib/ldiv.c,
@@ -286,7 +292,7 @@
 	* device/include/gcc_attr.h:
 	  Compatibility macros for GCC attribute syntax.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
 	  support/regression/tests/structreturn.c:
@@ -294,7 +300,7 @@
 	* device/include/stdlib.h:
 	  Provide prototypes for division functions.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
 	  src/z80/gen.c,
@@ -303,7 +309,7 @@
 	  support/regression/tests/structreturn.c:
 	  struct / union return support for pdk and z80 and related.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCcse.c,
 	  src/SDCCicode.c,
@@ -321,7 +327,7 @@
 	  src/z80/ralloc.c:
 	  struct / union return support for stm8.
 
-2022-03-15 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/assert.h:
 	  Improve test for assert C23-compliance.
@@ -331,7 +337,7 @@
 	* src/mos6502/gen.c:
 	  genPlusInc(), genMinusDec() and genlshTwo() improvements.
 	  
-2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/main.c,
 	  src/z80/gen.c:
@@ -345,7 +351,7 @@
 	* support/regression/tests/gcc-torture-execute-20021120-1.c:
 	  Make stack-auto exception only for mos6502 port. Enable test for S08 and HC08.
 
-2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bitintarith.c:
 	  Disable part of test for pdk14 to not run out of code memory.
@@ -354,7 +360,7 @@
 	  support/regression/tests/widebitintbitfield.c:
 	  Fix write to wide bit-field on z80.
 
-2022-03-14 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCval.c:
 	  Use unsigned long long to represent bit-field values at compile time.
@@ -397,7 +403,7 @@
 	  sdas/asz80/z80pst.c:
 	  Enable new mnemonics on all ports.
 
-2022-03-12 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bitintarith.c,
 	  src/pdk/main.c:
@@ -413,23 +419,23 @@
 	* src/z80/peeph.def:
 	  Eliminate nop jps.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/main.c:
 	  Limit _BitInt size to 16 for pdk (temporarily, until an issue is fixed).
 	* src/pdk/main.c:
 	  Fix handling of parameters of odd size > 2.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/mcs51/gen.c:
 	  Basic _BitInt support for mcs51.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
 	  src/stm8/gen.c,
@@ -438,11 +444,11 @@
 	  support/regression/tests/widebitintbitfield.c:
 	  Fix cast from signed integer type to wider unsigned bit-precise type.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
 	  src/SDCCval.c,
@@ -455,7 +461,7 @@
 	* src/pdk/gen.c:
 	  Fix compile by gcc 9.4.0: label must be on statement
 	  
-2022-03-11 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCglue.c,
 	  src/SDCCsymt.c,
@@ -464,7 +470,7 @@
 	  support/regression/tests/bitintbitfield.c:
 	  Fix issues in casts between bitprecise types of different sign.
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/ds390/main.c,
 	  src/hc08/main.c,
@@ -486,7 +492,7 @@
 	* doc/sdccman.lyx:
 	  Clarify --std-cxx and --std-sdccxx.
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
@@ -495,7 +501,7 @@
 	* src/SDCCpeeph.c:
 	  Calculate size of general ASxxx directives, apply [patches:428].
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCmain.c
 	  src/pdk/gen.c
@@ -508,17 +514,17 @@
 	  support/regression/tests/bitintarith.c:
 	  Fix left shift of bit-precise integer types.
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c,
 	  src/z80/main.c:
 	  Support for bit-precise integer types on sm83 up to a width of 16.
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
-2022-03-10 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx,
 	  src/z80/gen.c,
@@ -548,17 +554,17 @@
 	* device/lib/mos6502/crt0.s:
 	  Use ZP for memcpy and memset parameters.
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge _BitInt branch.
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
 	  support/regression/tests/bitintbitfield.c:
 	  Fix signed bit-precise bit-fields.
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCopt.c,
 	  src/SDCCsymt.h,
@@ -568,7 +574,7 @@
 	  support/regression/tests/bitintarith.c:
 	  Multiplicative operators for bit-precise integers.
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCopt.c,
 	  src/stm8/main.c:
@@ -579,7 +585,7 @@
 	* src/mos6502/gen.c:
 	  Fix corner cases in genPointerSet() and genPointerGet().
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
 	  src/SDCCval.c,
@@ -588,7 +594,7 @@
 	  src/stm8/gen.c:
 	  Various _BitInt fixes.
 
-2022-03-09 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,
 	  src/SDCCsymt.c,
@@ -617,7 +623,7 @@
 	  sdas/asxxsrc/asxxxx.h:
 	  Fix ASxxxx warnings by merging with upstream for [bugs:#3347].
 
-2022-03-08 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.lex,
 	  src/SDCCerr.c,
@@ -631,7 +637,7 @@
 	  src/stm8/gen.c:
 	  Infrastructure for bit-precise integer literals.
 
-2022-03-08 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/limits.h,
 	  src/SDCC.lex,

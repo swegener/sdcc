@@ -433,3 +433,6 @@ clean:
 distclean: clean
 	rm -f $(PORTS_DIR)/host/spec.mk
 	rm -f Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status support/regression/Makefile

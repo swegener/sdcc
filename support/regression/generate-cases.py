@@ -54,16 +54,17 @@ class InstanceGenerator:
         (self.dirname, self.filename) = os.path.split(self.inname)
         (self.basename, self.ext) = os.path.splitext (self.filename)
 
-    def permute(self, basepath, keys, trans = {}):
+    def permute(self, basename, keys, trans = {}):
         """Permutes across all of the names.  For each value, recursively creates
         a mangled form of the name, this value, and all the combinations of
         the remaining values.  At the tail of the recursion when one full
         combination is built, generates an instance of the test case from
         the template."""
+        basepath = os.path.join(outdir, basename)
         if len(keys) == 0:
             # End of the recursion.
             # Set the runtime substitutions.
-            trans['testcase'] = re.sub(r'\\', r'\\\\', basepath)
+            trans['testcase'] = re.sub(r'\\', r'\\\\', basename)
             # Create the instance from the template
             T = TemplateDocument(self.tmpname)
             T.substitutions = trans
@@ -81,7 +82,7 @@ class InstanceGenerator:
                 # The slice operator (keys[1:]) creates a copy of the list missing the
                 # first element.
                 # Can't use '-' as a seperator due to the mcs51 assembler.
-                self.permute(basepath + '_' + key + '_' + part, keys[1:], trans) 
+                self.permute(basename + '_' + key + '_' + part, keys[1:], trans)
 
     def writetemplate(self):
         """Given a template file and a temporary name writes out a verbatim copy
@@ -166,7 +167,7 @@ class InstanceGenerator:
         createdir(outdir)
 
         # Generate
-        self.permute(os.path.join(outdir, self.basename), list(self.replacements.keys()))
+        self.permute(self.basename, list(self.replacements.keys()))
 
         # Remove the temporary file
         os.remove(self.tmpname)

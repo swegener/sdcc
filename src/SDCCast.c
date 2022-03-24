@@ -3535,7 +3535,13 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
     else
       resultTypeProp = RESULT_TYPE_OTHER;
 
-    if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BOOL) && reduceTypeAllowed)
+    if (tree->opval.op == GENERIC) // Preserve type of controlling expression for _Generic (and don't allocate string argument)
+      {
+        ++noAlloc;
+        dtl = decorateType (tree->left, resultTypeProp, false);
+        --noAlloc;
+      }
+    else if ((tree->opval.op == '?') && (resultTypeProp != RESULT_TYPE_BOOL) && reduceTypeAllowed)
       dtl = decorateType (tree->left, RESULT_TYPE_IFX, reduceTypeAllowed);
     else if ((tree->opval.op == '&') && (!tree->right))
       {
@@ -5518,7 +5524,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                 assoc_type = assoc->left->opval.lnk;
                 checkTypeSanity (assoc_type, "_Generic");
 
-                if (compareType (type, assoc->left->opval.lnk) > 0 && !(SPEC_NOUN (type) == V_CHAR && type->select.s.b_implicit_sign != assoc->left->opval.lnk->select.s.b_implicit_sign))
+                if (compareType (type, assoc_type) > 0 && !(SPEC_NOUN (type) == V_CHAR && type->select.s.b_implicit_sign != assoc_type->select.s.b_implicit_sign))
                   {
                     if (found_expr)
                       {

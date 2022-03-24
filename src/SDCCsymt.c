@@ -3871,15 +3871,15 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               break;
 
             case V_BITFIELD:
-              dbuf_printf (dbuf, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              dbuf_printf (dbuf, "int-bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
               break;
 
             case V_BBITFIELD:
-              dbuf_printf (dbuf, "_Boolbitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              dbuf_printf (dbuf, "_Bool-bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
               break;
               
             case V_BITINTBITFIELD:
-              dbuf_printf (dbuf, "_BitIntbitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              dbuf_printf (dbuf, "_BitInt(%d)-bitfield {%d,%d}", SPEC_BITINTWIDTH (type), SPEC_BSTR (type), SPEC_BLEN (type));
               break;
 
             case V_DOUBLE:

@@ -1,3 +1,8 @@
+2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/widebitintbitfield.c:
+	  Disable a test that had been accidentially enabled even for ports where the feature is not supported.
+
 2022-03-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/as8051/i51adr.c,
@@ -15,7 +20,7 @@
 	* sdas/asxxsrc/assubr.c:
 	  Fix detailed error messages in sdas.
 
-2022-03-23 Philipp Klaus Krause <krauseph AT infromatik.uni-freiburg.de>
+2022-03-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bitint.c,
 	  support/regression/tests/bitintarith.c,

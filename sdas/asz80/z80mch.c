@@ -1544,7 +1544,10 @@ struct mne *mp;
                 break;
 
         case X_UNDOCD:
-                ++allow_undoc;
+                if (mchtyp != X_HD64)
+                        ++allow_undoc;
+                else
+                        xerr('a', "HD64180/Z180: Traps on illegal instruction");
                 break;
 
         case S_CPU:

@@ -49,6 +49,9 @@
 # Comment this out for debugging.
 .SILENT:
 
+# delete failed attempts (so make will retry...)
+.DELETE_ON_ERROR:
+
 CC = @CC@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@ -DNO_VARARGS

@@ -2296,6 +2296,7 @@ glue (void)
   /* initial comments */
   initialComments (asmFile);
 
+  // TODO: Move this stuff from here to port-specific genAssemblerPreamble?
   if (TARGET_IS_S08)
     fprintf (asmFile, "\t.cs08\n");
   else if (TARGET_IS_Z180)
@@ -2306,6 +2307,8 @@ glue (void)
     fprintf (asmFile, "\t.ez80\n");
   else if (TARGET_IS_Z80N)
     fprintf (asmFile, "\t.zxn\n");
+  else if (TARGET_IS_Z80 && options.allow_undoc_inst)
+    fprintf (asmFile, "\t.allow_undocumented\n");
 
   /* print module name */
   tfprintf (asmFile, "\t!module\n", moduleName);

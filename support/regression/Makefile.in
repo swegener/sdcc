@@ -93,6 +93,7 @@ MAKE_LIBRARY =
 
 # support VPATH:
 vpath %.c $(CASES_DIR):$(TESTS_DIR)
+vpath %.c.in $(TESTS_DIR)
 
 all: test-ports
 
@@ -125,7 +126,8 @@ test-host2:
 # List of all of the known source test suites.
 # Do not do this for the individual test files, to avoid quadratic complexity.
 ifndef CASES
-ALL_C_TESTS = $(shell find $(TESTS_DIR) -name "*.c")
+ALL_C_TESTS_ = $(shell find $(TESTS_DIR) -name "*.c.in")
+ALL_C_TESTS = $(ALL_C_TESTS_:%.in=%) $(shell find $(TESTS_DIR) -name "*.c")
 ALL_M_TESTS = $(shell find $(TESTS_DIR) -name "*.m4")
 M_CASES = $(ALL_M_TESTS:$(TESTS_DIR)/%.m4=$(CASES_DIR)/%.c)
 endif
@@ -194,6 +196,13 @@ $(CASES_DIR)/%.c: $(TESTS_DIR)/%.m4 $(CASES_DIR)/stamp
 	$(M4) -I $(srcdir)/m4include rtmacros.m4 $< > $@
 
 # Rule to generate the iterations of a test suite off the source suite.
+$(PORT_CASES_DIR)/%/iterations.stamp: %.c.in $(GENERATE_CASES)
+	rm -rf $(dir $@)
+	mkdir -p $(dir $@)
+	$(PYTHON) $(GENERATE_CASES) $< $(dir $@)
+	touch $@
+
+# BUG? also needed to process c files. (from M4 tests)
 $(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
 	rm -rf $(dir $@)
 	mkdir -p $(dir $@)

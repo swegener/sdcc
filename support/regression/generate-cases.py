@@ -53,6 +53,8 @@ class InstanceGenerator:
         self.tmpname = tempfile.mktemp()
         (self.dirname, self.filename) = os.path.split(self.inname)
         (self.basename, self.ext) = os.path.splitext (self.filename)
+        if self.ext == ".in":
+            (self.basename, self.ext) = os.path.splitext (self.filename[:-3])
 
     def permute(self, basename, keys, trans = {}):
         """Permutes across all of the names.  For each value, recursively creates

@@ -1,5 +1,12 @@
 2022-03-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/Makefile.in,
+	  support/regression/generate-cases.py,
+	  support/regression/tests/*.c.in:
+	  Regression test infrastructure improvements, picked from patch #430 by Felix Salfelder (felixs).
+
+2022-03-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* support/regression/Makefile.in:
 	  Regression test infrastructure improvements, picked from patch #430 by Felix Salfelder (felixs).
 

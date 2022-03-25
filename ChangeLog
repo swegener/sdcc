@@ -3,7 +3,9 @@
 	* src/SDCCglobl.h,
 	  src/SDCCglue.c,
 	  src/z80/main.c,
-	  src/z80/z80.h:
+	  src/z80/z80.h,
+	  support/regression/ports/ucz80-undoc,
+	  support/regression/Makefile.in:
 	  Infrastructure for undocumented Z80 instructions.
 
 2022-03-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>

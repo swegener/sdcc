@@ -5,8 +5,9 @@
 	  src/z80/main.c,
 	  src/z80/z80.h,
 	  support/regression/ports/ucz80-undoc,
-	  support/regression/Makefile.in:
-	  Infrastructure for undocumented Z80 instructions.
+	  support/regression/Makefile.in,
+	  src/z80/gen.c:
+	  Support for undocumented Z80 instructions.
 
 2022-03-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

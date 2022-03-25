@@ -1039,6 +1039,9 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '+' ||
     ic->op == '|' ||
+    ic->op == '^' ||
+    ic->op == '~' ||
+    ic->op == BITWISEAND ||
     ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST ||

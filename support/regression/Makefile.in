@@ -13,6 +13,15 @@
 # Only the required suites are run.  Changing sdcc causes all to be
 # re-run.  Changing one suite causes just that to be run.  Changing
 # one of the library files should cause all to re-run
+#
+# Test individual ports using the command
+# $ make test-$port
+# For port=rrz80 port=rrgbz80, tests will use rrz80 and rrgbz80 simulators
+# respectively.
+# mos6502 uses sim65.
+# pic1{4,6} uses gpsim.
+# port=host does not simulate.
+# The others use uCsim.
 
 # Dependencies:
 #   * The sdcc-extra package, available from svn.
@@ -66,14 +75,16 @@ CASES_DIR = gen
 # Script that takes a source test suite and generates the iterations
 GENERATE_CASES = $(srcdir)/generate-cases.py
 
-# Magically generate the list of configured ports to test.
-# Each directory under ports/ is used as a port name.  Each port is tested.
-# Each port must have a spec.mk which describes how to build the object
-# files and how to run the emulator.
-ALL_PORTS = $(filter-out .svn mos6502 mos6502-stack-auto mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(notdir $(wildcard $(PORTS_DIR)/*)))
+# The directories in PORTS_DIR correspond to ports.
+PORTS = $(filter-out .svn, $(notdir $(wildcard $(PORTS_DIR)/*)))
+
+# Generate the list of ports to test. Each port has a spec.mk with build and
+# emulator flags. Some ports are tested by default, these are the tests
+# associated to the "all" target.
+ALL_PORTS = $(filter-out mos6502 mos6502-stack-auto mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(PORTS))
 
 # These  ports will be cleaned with 'make clean'
-CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
+CLEAN_PORTS = $(filter-out mcs51-common, $(PORTS))
 
 MAKE_LIBRARY =
 
@@ -82,210 +93,27 @@ vpath %.c $(CASES_DIR):$(TESTS_DIR)
 
 all: test-ports
 
-# Test all of the ports
+# Test all ports that you normally would want to test,
+# normally a subset of all ports.
 test-ports:
 	$(MAKE) test-common
 	for i in $(ALL_PORTS); do $(MAKE) make_library test-port PORT=$$i; done
 
-# Helper rule for testing the z80 port only (use rrz80 simulator)
-test-rrz80:
+# Helper rule for testing various ports
+${PORTS:%=test-%} : test-%:
 	$(MAKE) test-common
-	$(MAKE) test-port PORT=rrz80
+	$(MAKE) test-port PORT=$*
 
-# Helper rule for testing the z80 port only (use rrgb simulator)
-test-rrgbz80:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=rrgbz80
-
-# Helper rule for testing the mcs51 port only
+# Shorthand for testing the mcs51 port only
 test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-stack-auto test-mcs51-large-stack-auto test-mcs51-xstack-auto
 
-test-mcs51-small:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-small
-
-test-mcs51-medium:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-medium
-
-test-mcs51-large:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-large
-
-test-mcs51-huge:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-huge
-
-test-mcs51-stack-auto:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-stack-auto
-
-test-mcs51-large-stack-auto:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mcs51-large-stack-auto
-
-test-mcs51-xstack-auto:
-	$(MAKE) test-common
-	$(MAKE) make_library test-port PORT=mcs51-xstack-auto
-
-# Helper rule for testing the ds390 port only
-test-ds390:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ds390
-
-# Helper rule for testing the z80 related ports only
+# Shorthand for testing the z80 related ports only
 test-z80: test-ucz80 test-ucz80-undoc test-ucz80-resiy test-ucz180 test-ucz180-resiy test-ucz80n test-ucgbz80 test-ucr2k test-ucr2ka test-ucr3ka test-ez80-z80 test-tlcs90
 
-# Helper rule for testing the z80 port only (use uCsim simulator)
-test-ucz80:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz80
-
-# Helper rule for testing the z80 port with --nmos-z80 only (use uCsim simulator)
-test-ucz80-nmos:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz80-nmos
-
-# Helper rule for testing the z80 port with --reserve-regs-iy only (use uCsim simulator)
-test-ucz80-undoc:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz80-undoc
-
-# Helper rule for testing the z80 port with --reserve-regs-iy only (use uCsim simulator)
-test-ucz80-resiy:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz80-resiy
-
-# Helper rule for testing the z180 port only(use uCsim simulator)
-test-ucz180:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz180
-
-# Helper rule for testing the z180 port with --reserve-regs-iy only (use uCsim simulator)
-test-ucz180-resiy:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz180-resiy
-
-# Helper rule for testing the gb/lr35902 port only(use uCsim simulator)
-test-ucgbz80:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucgbz80
-
-# Helper rule for testing the r2k port only(use uCsim simulator)
-test-ucr2k:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucr2k
-
-# Helper rule for testing the r2ka port only(use uCsim simulator)
-test-ucr2ka:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucr2ka
-
-# Helper rule for testing the r3k port only(use uCsim simulator)
-test-ucr3ka:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucr3ka
-
-test-ucrxk2:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucrxk2
-
-test-ucrxk2a:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucrxk2a
-
-test-ucrxk3a:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucrxk3a
-
-# Helper rule for testing the hc08 port only(use uCsim simulator)
-test-hc08:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=hc08
-
-# Helper rule for testing the s08 port only(use uCsim simulator)
-test-s08:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=s08
-
-# Helper rule for testing the stm8 port only(use uCsim simulator)
-test-stm8:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=stm8
-
-# Helper rule for testing the stm8 port only(use uCsim simulator)
-test-stm8-large:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=stm8-large
-
-# Helper rule for testing the pic16 port only(use gpsim simulator)
-test-pic16:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pic16
-
-# Helper rule for testing the pic14 port only(use gpsim simulator)
-test-pic14:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pic14
-
-# Helper rule for testing the tlcs90 port only(use uCsim simulator)
-test-tlcs90:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=tlcs90
-
-# Helper rule for testing the tlcs90 port only(use uCsim simulator)
-test-ez80-z80:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ez80-z80
-
-# Helper rule for testing the z80n port only(use uCsim simulator)
-test-ucz80n:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=ucz80n
-
-# Helper rule for testing the pdk ports only
+# Shorthand for testing the pdk ports only
 test-pdk: test-pdk14 test-pdk15 test-pdk15-stack-auto
 
-# Helper rule for testing the pdk13 port only(use uCsim simulator)
-test-pdk13:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pdk13
-
-# Helper rule for testing the pdk14 port only(use uCsim simulator)
-test-pdk14:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pdk14
-
-# Helper rule for testing the pdk15 port only(use uCsim simulator)
-test-pdk15:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pdk15
-
-# Helper rule for testing the pdk15 port only(use uCsim simulator)
-test-pdk15-stack-auto:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=pdk15-stack-auto
-
-# Helper rule for testing the mos6502 port only(use sim65 simulator)
-test-mos6502:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=mos6502
-
-# Helper rule for testing the mos6502 port only(use uCsim simulator)
-test-uc6502:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=uc6502
-
-# Helper rule for testing the mos6502-stack-auto port only(use uCsim simulator)
-test-uc6502-stack-auto:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=uc6502-stack-auto
-
-### Helper rule for testing the host cc only
-test-host:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=host
-
+# what is this?
 test-host2:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=host
@@ -441,3 +269,4 @@ distclean: clean
 
 Makefile: $(srcdir)/Makefile.in
 	 cd $(top_builddir); ./config.status support/regression/Makefile
+

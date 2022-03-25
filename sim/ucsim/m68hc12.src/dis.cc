@@ -119,6 +119,42 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 		  work.appendf("$%02x", p);
 		}
 	    }
+	  if (strcmp(fmt.c_str(), "IMID") == 0)
+	    {
+	      t_addr a= (addr+=2);
+	      u8_t h, l, xb= rom->read(a);
+	      addr++;
+	      h= rom->read(addr++);
+	      l= rom->read(addr++);
+	      work.appendf("#$%04x", h*256+l);
+	      work.append(", ");
+	      disass_xb(&a, &work, comment, xb_PC(xb)?2:0);
+	    }
+	  if (strcmp(fmt.c_str(), "EXID") == 0)
+	    {
+	      t_addr aof_xb= (addr+=2), asrc;
+	      u8_t h, l, xb= rom->read(aof_xb);
+	      addr++;
+	      h= rom->read(addr++);
+	      l= rom->read(addr++);
+	      asrc= h*256+l;
+	      work.appendf("$%04x", asrc);
+	      work.append(", ");
+	      comment->appendf(";[%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
+	      disass_xb(&aof_xb, &work, comment, xb_PC(xb)?2:0);
+	    }
+	  if (strcmp(fmt.c_str(), "IDID") == 0)
+	    {
+	      t_addr aof_xbsrc= (addr+=2);
+	      t_addr aof_xbdst= (addr+=1);
+	      u8_t xbsrc, xbdst;
+	      xbsrc= rom->read(aof_xbsrc);
+	      xbdst= rom->read(aof_xbdst);
+	      disass_xb(&aof_xbsrc, &work, comment, xb_PC(xbsrc)?-1:0);
+	      work.append(", ");
+	      disass_xb(&aof_xbdst, &work, comment, xb_PC(xbdst)?1:0);
+	      //comment->appendf(";[%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
+	    }	 
 	  continue;
 	}
       if (b[i] == '%')
@@ -197,9 +233,10 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 const char *rr_names[4]= { "X", "Y", "SP", "PC" };
 
 void
-CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
+CL12::disass_xb(t_addr *addr, chars *work, chars *comment, int corr, u32_t use_PC)
 {
-  u8_t p, h, l, n;
+  u8_t p, h, l;
+  i8_t n;
   int rr= -1;
   i16_t offset= 0;
   t_addr aof_xb= *addr;
@@ -231,7 +268,7 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 
     case 3: // 3. rr1p nnnn n4,+-r+- rr={X,Y,SP}
       n= p&0xf;
-      if (n&0x08) n|= 0xf0;
+      if (n&0x08) n|= 0xf0; else n++;
       if (p&0x10)
 	{
 	  // post +-
@@ -278,7 +315,7 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
       break;
     }
 
-  a= naddr(&aof_xb, NULL);
+  a= naddr(&aof_xb, NULL, use_PC);
   if (comment)
     {
       bool b= false;
@@ -289,8 +326,11 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment)
 	comment->appendf("%+d", offset), b= true;
       if (b)
 	comment->append("=");
-      comment->appendf("%04x]=$%02x%02x%02x",
-		       a,
+      comment->appendf("%04x", a);
+      if (corr)
+	comment->appendf("%+d", corr);
+      a+= corr;
+      comment->appendf("]=$%02x%02x%02x",
 		       rom->read(a), rom->read(a+1), rom->read(a+2));
     }
   *addr= aof_xb;

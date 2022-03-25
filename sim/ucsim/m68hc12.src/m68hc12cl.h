@@ -95,7 +95,7 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual char *disassc(t_addr addr, chars *comment=NULL);
-  virtual void disass_xb(t_addr *addr, chars *work, chars *comment);
+  virtual void disass_xb(t_addr *addr, chars *work, chars *comment, int corr= 0, u32_t use_PC=0);
   virtual void disass_b7(t_addr *addr, chars *work, chars *comment);
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 6; }
@@ -106,7 +106,8 @@ public:
   virtual i16_t s8_16(u8_t op); // sex 8->16
   virtual int xb_type(u8_t p);
   virtual bool xb_indirect(u8_t p);
-  virtual t_addr naddr(t_addr *addr, u8_t *pg);
+  virtual bool xb_PC(u8_t p);
+  virtual t_addr naddr(t_addr *addr, u8_t *pg, u32_t use_PC= 0);
   virtual u8_t xbop8();
   virtual u16_t xbop16();
   virtual class cl_memory_cell &xb(void);
@@ -137,6 +138,9 @@ public:
   virtual int i_pul8(class cl_memory_cell &dest);
   virtual int i_psh16(u16_t op);
   virtual int i_pul16(class cl_memory_cell &dest);
+  virtual int movw_imid(void);
+  virtual int movw_exid(void);
+  virtual int movw_idid(void);
   
   // BRANCH
   virtual int call_e(void);

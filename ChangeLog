@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bitintvararg.c.in:
 	  Disable a test for clang 11.0 host, where it fails.
+	* device/lib/tlcs90/atomic_flag_test_and_set.s:
+	  Bring back previous atomic_flag_test_and_set implementation as comment, explain why it was chosen, and under which circumstances we might want to revert back to it.
 
 2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

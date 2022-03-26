@@ -36,3 +36,28 @@ _atomic_flag_test_and_set:
 	srl	(de)
 	sbc hl, #0
 	ret
+	
+; Previous implementation (which might be needed again in the future, see below)
+;	ld	hl, 2 (sp)
+;	xor	a, a
+;	tset	0, (hl)
+;	ld	l, a
+;	ret	Z
+;	inc	l
+;	ret
+; This implementation used 0 as clear state, 1 as set state,
+; which seems closer to the spirit of atomic_flag. The current
+; implementation fulfills the letter of C standards up to C23.
+; At the time the previous implementation was written, there were
+; proposals for the C standard to allow default-initialization of atomic_flag
+; to the clear state, or allow assignments to and from atomic_flag
+; (with clear being 0, and set being 1). While these proposals were not
+; approved by SC22 WG14 (at least for now), they would have substantially
+; complicated an implementation where set is internally represented as 0.
+; SC22 WG14 might still go the way of one of these proposals in the future.
+; The additional burden on implementations would not be considered undue:
+; e.g. implementations where floating-point zero is not represented as
+; all-zero bytes already have to bear it for floating-point types.
+; On by far platforms today, default-initialization of atomic_flag to clear
+; just works, so the is also a risk of developers expecting it to work.
+

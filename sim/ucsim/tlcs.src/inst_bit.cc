@@ -39,6 +39,7 @@ cl_tlcs::op_tset(u8_t val, u8_t bitnr)
   if ((val & (1 << bitnr)) == 0)
     reg.raf.f|= FLAG_Z;
   val|= (1 << bitnr);
+  tick(4);
   return val;
 }
 

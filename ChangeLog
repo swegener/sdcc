@@ -1,5 +1,13 @@
 2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* sim/ucsim/tlcs.src/inst_arith.cc
+	  sim/ucsim/tlcs.src/inst_bit.cc
+	  sim/ucsim/tlcs.src/inst_jump.cc
+	  sim/ucsim/tlcs.src/tlcs.cc:
+	  Add partial cycle counting.
+
+2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* device/include/stdatomic.h,
 	  device/lib/atomic_flag_clear.c,
 	  device/lib/tlcs90/atomic_flag_test_and_set.s:

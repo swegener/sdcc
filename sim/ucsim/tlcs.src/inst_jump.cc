@@ -36,6 +36,7 @@ cl_tlcs::inst_ret()
 
   exec_ret(PC-1, &pushed_pc);
   PC= pushed_pc;
+  tick(8);
   return resGO;
 }
 
@@ -60,6 +61,7 @@ cl_tlcs::inst_call(t_addr PC_of_inst, u16_t addr)
 {
   exec_call(PC_of_inst, addr, PC);
   PC= addr;
+  tick(8);
   return resGO;
 }
 
@@ -71,6 +73,7 @@ cl_tlcs::inst_djnz_b(i8_t d)
   reg.rbc.b--;
   if (reg.rbc.b != 0)
     PC+= d;
+  tick(8);
   return resGO;
 }
 

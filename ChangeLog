@@ -1,3 +1,8 @@
+2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bitintvararg.c.in:
+	  Fix host test disable condition.
+
 2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* device/lib/tlcs90/abs.s,
@@ -81,7 +86,7 @@
 	  support/regression/tests/bug-3368.c:
 	  Fix bug #3368.
 	* support/regression/tests/bug-3235.c:
-	  Test for a bug that was fixd a while ago.
+	  Test for a bug that was fixed a while ago.
 
 2022-03-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

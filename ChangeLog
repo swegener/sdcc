@@ -1,5 +1,10 @@
 2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/Makefile.in:
+	  Fix an issue in test-host regression test output, fix suggested via chat by Felix Salfelder (felixs).
+
+2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* support/regression/tests/bitintvararg.c.in:
 	  Disable a test for clang 11.0 host, where it fails.
 	* device/lib/tlcs90/atomic_flag_test_and_set.s:

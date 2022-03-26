@@ -104,7 +104,7 @@ test-ports:
 	for i in $(ALL_PORTS); do $(MAKE) make_library test-port PORT=$$i; done
 
 # Helper rule for testing various ports
-${PORTS:%=test-%} : test-%:
+${PORTS:%=test-%} : test-%: test-common
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=$*
 
@@ -213,7 +213,7 @@ $(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
 # iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
-	$(PYTHON) $(srcdir)/compact-results.py $@ < $@
+	$(PYTHON) $(srcdir)/compact-results.py $* < $@
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.

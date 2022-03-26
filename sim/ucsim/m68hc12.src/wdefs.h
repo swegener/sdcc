@@ -321,4 +321,7 @@ int wrap_0_13(class CL12 *uc, t_mem code) { return uc-> emul ( _NONE ); }
 int wrap_0x18_00(class CL12 *uc, t_mem code) { return uc-> movw_imid ( _NONE ); }
 int wrap_0x18_01(class CL12 *uc, t_mem code) { return uc-> movw_exid ( _NONE ); }
 int wrap_0x18_02(class CL12 *uc, t_mem code) { return uc-> movw_idid ( _NONE ); }
+int wrap_0x18_03(class CL12 *uc, t_mem code) { return uc-> movw_imex ( _NONE ); }
+int wrap_0x18_04(class CL12 *uc, t_mem code) { return uc-> movw_exex ( _NONE ); }
+int wrap_0x18_05(class CL12 *uc, t_mem code) { return uc-> movw_idex ( _NONE ); }
 int wrap_0x18_06(class CL12 *uc, t_mem code) { return uc-> add ( _A_B ); }

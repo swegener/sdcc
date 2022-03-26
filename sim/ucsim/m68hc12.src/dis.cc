@@ -140,7 +140,7 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      asrc= h*256+l;
 	      work.appendf("$%04x", asrc);
 	      work.append(", ");
-	      comment->appendf(";[%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
+	      comment->appendf("; [%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
 	      disass_xb(&aof_xb, &work, comment, xb_PC(xb)?2:0);
 	    }
 	  if (strcmp(fmt.c_str(), "IDID") == 0)
@@ -153,8 +153,39 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      disass_xb(&aof_xbsrc, &work, comment, xb_PC(xbsrc)?-1:0);
 	      work.append(", ");
 	      disass_xb(&aof_xbdst, &work, comment, xb_PC(xbdst)?1:0);
-	      //comment->appendf(";[%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
-	    }	 
+	    }
+	  if (strcmp(fmt.c_str(), "IMEX") == 0)
+	    {
+	      u16_t i= read_addr(rom, addr+2);
+	      u16_t e= read_addr(rom, addr+4);
+	      work.appendf("#$%04x", i);
+	      work.append(", ");
+	      work.appendf("$%04x", e);
+	      comment->appendf("; [%04x]=%04x", e, read_addr(rom, e));
+	    }
+	  if (strcmp(fmt.c_str(), "EXEX") == 0)
+	    {
+	      u16_t s= read_addr(rom, addr+2);
+	      u16_t d= read_addr(rom, addr+4);
+	      work.appendf("$%04x", s);
+	      work.append(", ");
+	      work.appendf("$%04x", d);
+	      comment->appendf("; [%04x]=%04x [%04x]=%04x",
+			       s, read_addr(rom, s),
+			       d, read_addr(rom, d));
+	    }
+	  if (strcmp(fmt.c_str(), "IDEX") == 0)
+	    {
+	      t_addr aof_xb= (addr+=2), adst;
+	      u8_t h, l, xb= rom->read(aof_xb);
+	      addr++;
+	      h= rom->read(addr++);
+	      l= rom->read(addr++);
+	      disass_xb(&aof_xb, &work, comment, xb_PC(xb)?-2:0);
+	      work.append(", ");
+	      work.appendf("$%04x", adst= h*256+l);
+	      comment->appendf(" [%04x]=%04x",adst,read_addr(rom,adst));
+	    }
 	  continue;
 	}
       if (b[i] == '%')

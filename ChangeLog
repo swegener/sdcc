@@ -1,3 +1,8 @@
+2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bitintvararg.c.in:
+	  Disable a test for clang 11.0 host, where it fails.
+
 2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sim/ucsim/tlcs.src/inst_arith.cc

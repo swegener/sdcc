@@ -8,8 +8,8 @@
 #include <limits.h>
 #include <stdarg.h>
 
-// clang 11 supports bit-precise types, but deviates a bit from C23.
-#if __clang_major__ == 11
+// clang 11 supports bit-precise types, but deviates a bit from C23. This test fails using clang 11.0.1 on FreeBSd 13.0 (passes using clang 11.1.0 on Debian GNU/Linux).
+#if __clang_major__ == 11 && __clang_minor__ < 1
 #define __SDCC_BITINT_MAXWIDTH 128
 #define _BitInt _ExtInt
 #endif

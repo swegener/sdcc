@@ -1,3 +1,10 @@
+2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/include/stdatomic.h,
+	  device/lib/atomic_flag_clear.c,
+	  device/lib/tlcs90/atomic_flag_test_and_set.s:
+	  Switch to faster atomic test with shift. (8T vs 12T)
+
 2022-03-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/Makefile.in,

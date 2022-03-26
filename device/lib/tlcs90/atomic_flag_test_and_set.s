@@ -31,11 +31,8 @@
 	.globl _atomic_flag_test_and_set
 
 _atomic_flag_test_and_set:
-	ld	hl, 2 (sp)
-	xor	a, a
-	tset	0, (hl)
-	ld	l, a
-	ret	Z
-	inc	l
+	ld	de, 2 (sp)
+	ld l, #1
+	srl	(de)
+	sbc hl, #0
 	ret
-

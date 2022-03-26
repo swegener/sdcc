@@ -33,12 +33,11 @@
 _strcpy:
 	ld	de, 2 (sp)
 	ld	hl, 4 (sp)
-	push	de
-	xor	a, a
+	ld	a, #0
 loop:
 	cp	a, (hl)
 	ldi
 	jr	NZ, loop
-	pop	hl
+	ld	hl, 2 (sp)
 	ret
 

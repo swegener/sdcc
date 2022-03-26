@@ -34,11 +34,9 @@
 
 _strlen:
 	ld	hl, 2 (sp)
-	xor	a, a
-	ld	b, a
-	ld	c, a
+	ld	bc, #0
 	cpir
 	ld	hl, #-1
-	sbc	hl, bc	; C flag still cleared from xor above.
+	sub	hl, bc
 	ret
 

@@ -29,19 +29,27 @@
 	.area   _CODE
 
 	.globl _abs
-
-; 12B; 86T for nonnegative arguments, 78T for negative.
+; 12B; 44T for nonnegative arguments, 40T for negative.
 _abs:
 	ld	de, 2 (sp)
-	xor	a, a
-	ld	l, a
-	ld	h, a
-	sbc	hl, de
+	ld	hl, #0
+	sub	hl, de
 	ret	P
 	ex	de, hl
 	ret
 
-; 14B; 59T for nonegative arguments, 94T for negative:
+; 13B; 46T for nonnegative arguments, 42T for negative.
+;_abs:
+;	ld	de, 2 (sp)
+;	xor	a, a
+;	ld	l, a
+;	ld	h, a
+;	sbc	hl, de
+;	ret	P
+;	ex	de, hl
+;	ret
+
+; 16B; 54T for nonegative arguments, 72T for negative:
 ;_abs:
 ;	pop	de
 ;	pop	hl

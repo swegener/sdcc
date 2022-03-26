@@ -474,20 +474,19 @@ _wd_reset_asm:
 gsinit::
 
 	; Default-initialized global variables.
-        ld      bc, #l__DATA
-        ld      a, b
-        or      a, c
-        jr      Z, zeroed_data
-        ld      hl, #s__DATA
-        ld      (hl), #0x00
-        dec     bc
-        ld      a, b
-        or      a, c
-        jr      Z, zeroed_data
-        ld      e, l
-        ld      d, h
-        inc     de
-        ldir
+	ld	bc, #l__DATA
+	ld	a, b
+	or	a, c
+	jr	Z, zeroed_data
+	ld	hl, #s__DATA
+	ld	(hl), #0x00
+	dec	bc
+	ld	a, b
+	or	a, c
+	jr	Z, zeroed_data
+	ld	de, hl
+	inc	de
+	ldir
 zeroed_data:
 
 	; Explicitly initialized global variables.

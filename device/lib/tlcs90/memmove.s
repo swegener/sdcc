@@ -40,8 +40,7 @@ _memmove:
 	ret	Z
 	ld	de, 4 (sp)
 	push	hl
-	sbc	hl, de		; or above cleared carry.
-	add	hl, de		; same carry as the line before
+	cp	hl, de
 	jr	C, memmove_up
 memmove_down:
 	dec	bc

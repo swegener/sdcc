@@ -32,16 +32,15 @@
 
 _atomic_flag_test_and_set:
 	ld	de, 2 (sp)
-	ld l, #1
+	ld	l, #1
 	srl	(de)
-	sbc hl, #0
+	sbc	hl, #0
 	ret
 	
 ; Previous implementation (which might be needed again in the future, see below)
-;	ld	hl, 2 (sp)
-;	xor	a, a
-;	tset	0, (hl)
-;	ld	l, a
+;	ld	de, 2 (sp)
+;	ld	l, #0
+;	tset	0, (de)
 ;	ret	Z
 ;	inc	l
 ;	ret

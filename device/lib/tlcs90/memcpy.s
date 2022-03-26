@@ -40,9 +40,8 @@ ___memcpy:
 	or	a, b
 	ret	Z
 	ld	de, 4 (sp)
-	push	hl
 	ex	de, hl
 	ldir
-	pop	hl
+	ld	hl, 2 (sp)
 	ret
 

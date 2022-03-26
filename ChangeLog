@@ -1,3 +1,14 @@
+2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* device/lib/tlcs90/abs.s,
+	  device/lib/tlcs90/atomic_flag_test_and_set.s,
+	  device/lib/tlcs90/crt0.s,
+	  device/lib/tlcs90/memcpy.s,
+	  device/lib/tlcs90/memmove.s,
+	  device/lib/tlcs90/strcpy.s,
+	  device/lib/tlcs90/strlen.s:
+	  Optimize handwritten assembly.
+
 2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/Makefile.in:

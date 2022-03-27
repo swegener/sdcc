@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <ctype.h>
+
 #include "glob12.h"
 
 #include "m68hc12cl.h"
@@ -111,7 +113,7 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	    {
 	      t_addr a= addr+1;
 	      u8_t xb= rom->read(a);
-	      disass_xb(&a, &work, comment);
+	      disass_xb(&a, &work, comment, 3);
 	      if (!xb_indirect(xb))
 		{
 		  u8_t p= rom->read(a);
@@ -128,7 +130,17 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      l= rom->read(addr++);
 	      work.appendf("#$%04x", h*256+l);
 	      work.append(", ");
-	      disass_xb(&a, &work, comment, xb_PC(xb)?2:0);
+	      disass_xb(&a, &work, comment, 2, xb_PC(xb)?2:0);
+	    }
+	  if (strcmp(fmt.c_str(), "imid") == 0)
+	    {
+	      t_addr a= (addr+=2);
+	      u8_t h, xb= rom->read(a);
+	      addr++;
+	      h= rom->read(addr++);
+	      work.appendf("#$%02x", h);
+	      work.append(", ");
+	      disass_xb(&a, &work, comment, 1, xb_PC(xb)?1:0);
 	    }
 	  if (strcmp(fmt.c_str(), "EXID") == 0)
 	    {
@@ -141,7 +153,20 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      work.appendf("$%04x", asrc);
 	      work.append(", ");
 	      comment->appendf("; [%04x]=%04x",asrc,rom->read(asrc)*256+rom->read(asrc+1));
-	      disass_xb(&aof_xb, &work, comment, xb_PC(xb)?2:0);
+	      disass_xb(&aof_xb, &work, comment, 2, xb_PC(xb)?2:0);
+	    }
+	  if (strcmp(fmt.c_str(), "exid") == 0)
+	    {
+	      t_addr aof_xb= (addr+=2), asrc;
+	      u8_t h, l, xb= rom->read(aof_xb);
+	      addr++;
+	      h= rom->read(addr++);
+	      l= rom->read(addr++);
+	      asrc= h*256+l;
+	      work.appendf("$%04x", asrc);
+	      work.append(", ");
+	      comment->appendf("; [%04x]=%02x",asrc,rom->read(asrc));
+	      disass_xb(&aof_xb, &work, comment, 1, xb_PC(xb)?2:0);
 	    }
 	  if (strcmp(fmt.c_str(), "IDID") == 0)
 	    {
@@ -150,9 +175,20 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      u8_t xbsrc, xbdst;
 	      xbsrc= rom->read(aof_xbsrc);
 	      xbdst= rom->read(aof_xbdst);
-	      disass_xb(&aof_xbsrc, &work, comment, xb_PC(xbsrc)?-1:0);
+	      disass_xb(&aof_xbsrc, &work, comment, 2, xb_PC(xbsrc)?-1:0);
 	      work.append(", ");
-	      disass_xb(&aof_xbdst, &work, comment, xb_PC(xbdst)?1:0);
+	      disass_xb(&aof_xbdst, &work, comment, 2, xb_PC(xbdst)?1:0);
+	    }
+	  if (strcmp(fmt.c_str(), "idid") == 0)
+	    {
+	      t_addr aof_xbsrc= (addr+=2);
+	      t_addr aof_xbdst= (addr+=1);
+	      u8_t xbsrc, xbdst;
+	      xbsrc= rom->read(aof_xbsrc);
+	      xbdst= rom->read(aof_xbdst);
+	      disass_xb(&aof_xbsrc, &work, comment, 1, xb_PC(xbsrc)?-1:0);
+	      work.append(", ");
+	      disass_xb(&aof_xbdst, &work, comment, 1, xb_PC(xbdst)?1:0);
 	    }
 	  if (strcmp(fmt.c_str(), "IMEX") == 0)
 	    {
@@ -181,7 +217,7 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      addr++;
 	      h= rom->read(addr++);
 	      l= rom->read(addr++);
-	      disass_xb(&aof_xb, &work, comment, xb_PC(xb)?-2:0);
+	      disass_xb(&aof_xb, &work, comment, 2, xb_PC(xb)?-2:0);
 	      work.append(", ");
 	      work.appendf("$%04x", adst= h*256+l);
 	      comment->appendf(" [%04x]=%04x",adst,read_addr(rom,adst));
@@ -240,10 +276,10 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      work.appendf("$%04x",
 			   (addr+2+(i8_t)(rom->read(addr+1))) & 0xffff );
 	      break;
-	    case 'p': // xb postbyte
+	    case 'p': case 'P':// xb postbyte for 8/16 bit operand
 	      {
 		t_addr a= addr+1;
-		disass_xb(&a, &work, comment);
+		disass_xb(&a, &work, comment, isupper(b[i])?2:1);
 		addr= a;
 		break;
 	      }
@@ -264,7 +300,7 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 const char *rr_names[4]= { "X", "Y", "SP", "PC" };
 
 void
-CL12::disass_xb(t_addr *addr, chars *work, chars *comment, int corr, u32_t use_PC)
+CL12::disass_xb(t_addr *addr, chars *work, chars *comment, int len, int corr, u32_t use_PC)
 {
   u8_t p, h, l;
   i8_t n;

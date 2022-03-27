@@ -141,9 +141,9 @@ CL12::ediv(void)
       res&= 0xffff;
       if (!res)
 	f|= flagZ;
+      cY.W(res);
+      cD.W(rem);
     }
-  cY.W(res);
-  cD.W(rem);
   cF.W(f);
   return resGO;
 }

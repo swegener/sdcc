@@ -34,6 +34,7 @@ CL12::exec_b7(void)
   u8_t ls= pb&0x7, ms=(pb>>4)&0x7, ws, wd;
   class cl_memory_cell *cs, *cd;
   u16_t src;
+  
   if (pb & 0x08)
     return resINV;
   cs= tex_cells[ms];
@@ -56,7 +57,7 @@ CL12::exec_b7(void)
       else
 	// 16bit -> 8bit
 	;
-      cd->W(src);
+      //cd->W(src);
     }
   else
     {
@@ -64,14 +65,14 @@ CL12::exec_b7(void)
       if (ws == wd)
 	{
 	  cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
       else if (ws == 8)
 	{
 	  // 0L <-> 8
 	  src&= 0x00ff;
 	  cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
       else
 	{
@@ -80,9 +81,16 @@ CL12::exec_b7(void)
 	    cs->W(0xff00 | (cd->get()));
 	  else
 	    cs->W(cd->get());
-	  cd->W(src);
+	  //cd->W(src);
 	}
     }
+  if (cd == &cF)
+    {
+      u8_t ox= rF&flagX, nx=src&flagX;
+      src&= ~flagX;
+      src|= (ox|nx);
+    }
+  cd->W(src);
   return resGO;
 }
 
@@ -149,6 +157,24 @@ CL12::movw_imid(void)
 }
 
 int
+CL12::movb_imid(void)
+{
+  t_addr aof_xb= PC;
+  u8_t xb= fetch();
+  u8_t i= fetch();
+  int xt= xb_type(xb);
+  if ((xt==1) || (xt==3) || (xt==4))
+    {
+      t_addr a= naddr(&aof_xb, NULL, PC);
+      if (xb_PC(xb))
+	a+= 1;
+      rom->write(a, i);
+      vc.wr+= 1;
+    }
+  return resGO;
+}
+
+int
 CL12::movw_exid(void)
 {
   t_addr aof_xb= PC;
@@ -169,6 +195,29 @@ CL12::movw_exid(void)
       rom->write(a, h);
       rom->write((a+1)&0xffff, l);
       vc.wr+= 2;
+    }
+  return resGO;
+}
+
+int
+CL12::movb_exid(void)
+{
+  t_addr aof_xb= PC;
+  u8_t xb= fetch();
+  u8_t eh= fetch();
+  u8_t el= fetch();
+  int xt= xb_type(xb);
+  if ((xt==1) || (xt==3) || (xt==4))
+    {
+      u8_t v;
+      u16_t ea= eh*256+el;
+      t_addr a= naddr(&aof_xb, NULL, PC);
+      if (xb_PC(xb))
+	a+= 2;
+      v= rom->read(ea);
+      vc.rd++;
+      rom->write(a, v);
+      vc.wr++;
     }
   return resGO;
 }
@@ -198,6 +247,34 @@ CL12::movw_idid(void)
 	  rom->write(adst+1, v);
 	  vc.rd+= 2;
 	  vc.wr+= 2;
+	}
+    }
+  return resGO;
+}
+
+int
+CL12::movb_idid(void)
+{
+  t_addr aof_xbsrc= PC;
+  u8_t xbsrc= fetch();
+  t_addr aof_xbdst= PC;
+  u8_t xbdst= fetch();
+  int xtsrc= xb_type(xbsrc), xtdst= xb_type(xbdst);
+  if ((xtsrc==1) || (xtsrc==3) || (xtsrc==4))
+    {
+      if ((xtdst==1) || (xtdst==3) || (xtdst==4))
+	{
+	  u8_t v;
+	  u16_t asrc= naddr(&aof_xbsrc, NULL, PC);
+	  u16_t adst= naddr(&aof_xbdst, NULL, PC);
+	  if (xb_PC(xbsrc))
+	    asrc+= -1;
+	  if (xb_PC(xbdst))
+	    adst+= 1;
+	  v= rom->read(asrc);
+	  rom->write(adst, v);
+	  vc.rd++;
+	  vc.wr++;
 	}
     }
   return resGO;

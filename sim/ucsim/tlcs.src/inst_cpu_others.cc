@@ -173,8 +173,10 @@ cl_tlcs::inst_div_hl(u8_t d)
       ((reg.hl / m) > 255))
     reg.raf.f|= FLAG_V;
   else
-    reg.rhl.l= reg.hl / m;
-  reg.rhl.h= reg.hl % m;
+    {
+      reg.rhl.l= reg.hl / m;
+      reg.rhl.h= reg.hl % m;
+    }
   return resGO;
 }
 

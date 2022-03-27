@@ -588,7 +588,7 @@ cl_tlcs::exec_inst(void)
       tick(6);
       break;
     case 0x1e: res= inst_ret(); break;
-    case 0x1f: tick(12); res= inst_reti(); break;
+    case 0x1f: tick(4); res= inst_reti(); break;
     case 0x37:  // LD (0ffw),n
       c2= fetch();
       c3= fetch();
@@ -620,36 +620,30 @@ cl_tlcs::exec_inst(void)
       c3= fetch();
       c4= fetch();
       res= exec_inst4_e3(c1, c2, c3, c4);
-      tick(6);
       break;
     case 0xe7:
       c2= fetch();
       c3= fetch();
       res= exec_inst3_e7(c1, c2, c3);
-      tick(4);
       break;
     case 0xeb:
       c2= fetch();
       c3= fetch();
       c4= fetch();
       res= exec_inst4_eb(c1, c2, c3, c4);
-      tick(6);
       break;
     case 0xef:
       c2= fetch();
       c3= fetch();
       res= exec_inst4_ef(c1, c2, c3);
-      tick(4);
       break;
     case 0xf3: // c1
       c2= fetch();
       res= exec_inst2_f3(c2);
-      tick(10);
       break;
     case 0xf7: // c1
       c2= fetch();
       res= exec_inst2_f7(c2);
-      tick(10);
       break;
       //case 0xfe: // c1
       //c2= fetch();
@@ -667,12 +661,11 @@ cl_tlcs::exec_inst(void)
               *ra= op_add16(*ra, c3*256 + c2);
               break;
             }
-          case 0xf0: tick(6);res= exec_inst3_f0ix(c1); break; // F0+ix d XX
+          case 0xf0: res= exec_inst3_f0ix(c1); break; // F0+ix d XX
           case 0xf4: // F4+ix d XX [n [m]]
             c2= fetch();
             c3= fetch();
             res= exec_inst4_f4ix(c1, c2, c3);
-      tick(6);
             break;
           default:
             switch (c1 & 0xf8) // c1= XX+r,rr,...
@@ -684,12 +677,12 @@ cl_tlcs::exec_inst(void)
                 c2= fetch();
                 c3= fetch();
                 *aof_reg16_rr(c1)= c2 + c3*256;
-    tick(4);
+                tick(4);
                 break;
               case 0x40: tick(2); reg.hl= *aof_reg16_rr(c1); break; // LD HL,rr
               case 0x48: tick(2); *aof_reg16_rr(c1)= reg.hl; break; // LD rr,HL
-              case 0x50: tick(6); exec_push(PC-1, *aof_reg16_qq(c1)); break; // PUSH qq
-              case 0x58: tick(8); res= inst_pop(c1); break; // POP qq
+              case 0x50: exec_push(PC-1, *aof_reg16_qq(c1)); break; // PUSH qq
+              case 0x58: res= inst_pop(c1); break; // POP qq
               case 0x80: *aof_reg8(c1)= op_inc(*aof_reg8(c1)); break; // INC r
               case 0x88: *aof_reg8(c1)= op_dec(*aof_reg8(c1)); break; // DEC r
               case 0x90: tick(2);*aof_reg16_rr(c1)= op_inc16(*aof_reg16_rr(c1)); break; // INC rr
@@ -771,11 +764,9 @@ cl_tlcs::exec_inst2(u8_t c1)
         case 0xb8: inst_set(n, c1); break; // SET b,(0ffn)
         case 0xe0: // e0+gg
           res= exec_inst2_e0gg(c1, c2);
-    tick(2);
           break;
         case 0xe8: // e8+gg
           res= exec_inst2_e8gg(c1, c2);
-    tick(2);
           break;
         case 0xf8: // f8+g, f8+gg
           res= exec_inst2_f8gg(c1, c2);
@@ -785,7 +776,10 @@ cl_tlcs::exec_inst2(u8_t c1)
             {
               i8_t d= c2;
               if (cc(c1))
-                PC+= d;
+                {
+                  tick(4);
+                  PC+= d;
+                }
             }
           else
             res= exec_inst3(c1, c2);
@@ -805,6 +799,8 @@ int
 cl_tlcs::exec_inst2_f3(u8_t c2)
 {
   int res= resGO;
+
+  tick(10);
   
   switch (c2)
     {
@@ -910,6 +906,8 @@ cl_tlcs::exec_inst2_f7(u8_t c2)
 {
   int res= resGO;
   u8_t n, m;
+
+  tick(10);
   
   switch (c2)
     {
@@ -926,7 +924,7 @@ cl_tlcs::exec_inst2_f7(u8_t c2)
     default:
       switch (c2 & 0xf0)
         {
-        case 0xc0: if (cc(c2)) PC= reg.hl|reg.raf.a; break; // JP [cc,]HL+A
+        case 0xc0: if (cc(c2)){ tick(2); PC= reg.hl|reg.raf.a;} break; // JP [cc,]HL+A
         case 0xd0: if (cc(c2)) inst_call(PC-2, reg.hl+reg.raf.a); break; // CALL [cc,]HL+A
         default:
           switch (c2 & 0xf8)
@@ -983,6 +981,11 @@ cl_tlcs::exec_inst2_e0gg(u8_t c1, u8_t c2)
 {
   int res= resGO;
   cl_memory_cell *gg= cell_gg(c1);
+
+  tick(2);
+  // 16b registers
+  if((c2 >= 0x38 && c2 <= 0x3F) || (c2 >= 0x24 && c2 <= 0x26) || (c2 >= 0x70 && c2 <= 0x77))
+    tick(2);
   
   switch (c2)
     {
@@ -1062,7 +1065,12 @@ cl_tlcs::exec_inst2_e8gg(u8_t c1, u8_t c2)
   class cl_memory_cell *gg= cell_gg(c1);
   t_addr gv= *aof_reg16_gg(c1);
   u8_t n, m;
-  
+
+  tick(2);
+  // 16b registers
+  if((c2 >= 0x38 && c2 <= 0x3F) || (c2 >= 0x24 && c2 <= 0x26) || (c2 >= 0x70 && c2 <= 0x77))
+    tick(2);
+
   switch (c2)
     {
     case 0x37: n= fetch(); gg->write(n); vc.wr++; break; // LD (gg),n
@@ -1078,7 +1086,7 @@ cl_tlcs::exec_inst2_e8gg(u8_t c1, u8_t c2)
     default:
       switch (c2 & 0xf0)
         {
-        case 0xc0: if (cc(c2)) PC= gv; break; // JP [cc,]gg
+        case 0xc0: if (cc(c2)){ tick(2);  PC= gv; break;} // JP [cc,]gg
         case 0xd0: if (cc(c2)) inst_call(PC-2, gv); break; // CALL [cc,]gg
         default:
           switch (c2 & 0xf8)
@@ -1115,6 +1123,11 @@ cl_tlcs::exec_inst2_f8gg(u8_t c1, u8_t c2)
     res= exec_inst2_fe(c2);
   else
     {
+      // 16b registers
+      if((c2 >= 0x38 && c2 <= 0x3F))
+        tick(2);
+      if((c2 >= 0x24 && c2 <= 0x26) || (c2 >= 0x70 && c2 <= 0x77))
+        tick(4);
       switch (c2)
         {
         case 0x12: reg.hl= reg.rhl.l * (*ga); break; // MUL HL,g
@@ -1189,7 +1202,7 @@ cl_tlcs::exec_inst3(u8_t c1, u8_t c2)
   
   switch (c1)
     {
-    case 0x1a: PC= c3*256 + c2; break; // JP mn
+    case 0x1a: tick(2); PC= c3*256 + c2; break; // JP mn
     case 0x1b: PC+= i16_t(c3*256 + c2); break; // JRL $+2+cd
     case 0x1c: inst_call(PC-3, c3*256 + c2); break; // CALL mn
     case 0x1d: tick(2); inst_call(PC-3, PC + i16_t(c3*256 + c2)); break; // CALR $+2+cd
@@ -1223,6 +1236,8 @@ cl_tlcs::exec_inst3_e7(u8_t c1, u8_t c2, u8_t c3)
 {
   int res= resGO;
   cl_memory_cell *n= cell_n(c2);
+
+  tick(6);
   
   switch (c3)
     {
@@ -1281,6 +1296,8 @@ cl_tlcs::exec_inst3_f0ix(u8_t c1)
   int res= resGO;
   cl_memory_cell *c= cell_ixd(c1, d);
   u16_t a= *aof_reg16_ix(c1)+d;
+
+  tick(6);
   
   switch (c3)
     {
@@ -1362,6 +1379,8 @@ cl_tlcs::exec_inst4_e3(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
   u16_t mn= c3 * 256 + c2;
   class cl_memory_cell *c= nas->get_cell(mn);
 
+  tick(8);
+
   switch (c4)
     {
     case 0x10: inst_rld(c); break; // RLD (mn)
@@ -1437,6 +1456,8 @@ cl_tlcs::exec_inst4_ef(u8_t c1, u8_t c2, u8_t c3)
   u8_t n;
   cl_memory_cell *wc= cell_n(c2);
   u8_t wd= wc->read();
+
+  tick(4);
   
   switch (c3)
     {
@@ -1474,6 +1495,8 @@ cl_tlcs::exec_inst4_eb(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
   u16_t vw23= nm23;
   u8_t n5;
   class cl_memory_cell *c= nas->get_cell(vw23);
+
+  tick(6);
   
   switch (c4)
     {
@@ -1493,9 +1516,10 @@ cl_tlcs::exec_inst4_eb(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
         case 0x20: c->write(*aof_reg8(c4)); vc.wr++; break; // LD (mn),r
         case 0x40: write16(vw23, *aof_reg16_rr(c4)); vc.wr+= 2; break; // LD (mn),rr
         default:
+          tick(2);
           switch (c4 & 0xf0)
             {
-            case 0xc0: if (cc(c4)) PC= vw23; break; // JP cc,mn
+            case 0xc0: if (cc(c4)){ tick(2); PC= vw23;} break; // JP cc,mn
             case 0xd0: if (cc(c4)) inst_call(PC-4, vw23); break; // CALL cc,mn
             default:
               res= resINV_INST;
@@ -1519,6 +1543,8 @@ cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
   i8_t d= c2;
   u8_t n;
   cl_memory_cell *c= cell_ixd(c1, d);
+
+  tick(8);
   
   switch (c3)
     {
@@ -1535,7 +1561,7 @@ cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
     default:
       switch (c3 & 0xf0)
         {
-        case 0xc0: if (cc(c3)) PC= *aof_reg16_ix(c1)+d; break; // JP [cc,]ix+d
+        case 0xc0: if (cc(c3)){ tick(2);  PC= *aof_reg16_ix(c1)+d;} break; // JP [cc,]ix+d
         case 0xd0: if (cc(c3)) inst_call(PC-4, *aof_reg16_ix(c1)+d); break; // CALL [cc,]ix+d
         default:
           switch (c3 & 0xf8)
@@ -1565,6 +1591,7 @@ cl_tlcs::do_push(t_mem data)
   reg.sp-= 1;
   nas->write(reg.sp, (data&0xff));
   vc.wr+= 2;
+  tick(6);
   return sp_before;
 }
 
@@ -1580,6 +1607,7 @@ cl_tlcs::do_pop(t_mem *data)
   if (data)
     *data= val;
   vc.rd+= 2;
+  tick(4);
   return sp_before;
 }
 
@@ -1603,6 +1631,7 @@ cl_tlcs::exec_ret(t_addr PC_of_inst, t_mem *data)
   class cl_stack_ret *o= new cl_stack_ret(PC_of_inst, val, sp_before, reg.sp);
   o->init();
   stack_read(o);
+  tick(4);
   return resGO;
 }
 
@@ -1629,6 +1658,7 @@ cl_tlcs::exec_pop(t_addr PC_of_inst, t_mem *data)
   class cl_stack_pop *o= new cl_stack_pop(PC_of_inst, val, sp_before, reg.sp);
   o->init();
   stack_read(o);
+  tick(4);
   return resGO;
 }
 
@@ -1649,6 +1679,7 @@ cl_tlcs::exec_call(t_addr PC_of_inst, t_addr called, t_mem data)
   class cl_stack_call *o= new cl_stack_call(PC_of_inst, called, data, sp_before, reg.sp);
   o->init();
   stack_write(o);
+  tick(2);
   return resGO;
 }
 

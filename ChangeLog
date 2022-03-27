@@ -1,5 +1,13 @@
 2022-03-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* sdas/astlcs90/tt90.asm,
+	  sim/ucsim/tlcs.src/inst_arith.cc,
+	  sim/ucsim/tlcs.src/inst_jump.cc,
+	  sim/ucsim/tlcs.src/tlcs.cc:
+	  Improve cycle accuracy.
+
+2022-03-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* sdas/astlcs90/tt90.asm:
 	  Add some test assembly.
 

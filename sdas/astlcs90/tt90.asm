@@ -54,7 +54,7 @@
 	;***********************************************************
 	; 6T
 	ld	sp, #stack		; 3E A0 FF
-	ld	ix, sp			; FE 3C ; as 4T
+	ld	ix, sp			; FE 3C
 	ld	(sp), b			; EE 20
 	ld	c, (sp)			; E6 29
 	add	a, (sp)			; E6 60
@@ -66,36 +66,37 @@
 	; 8T (b 0x5e)
 	ld	de, (sp)		; E6 49 ; as 6T
 	push	hl			; 52
-	ld	c, (stack)		; E7 A0 29 ; as 6T
+	ld	c, (stack)		; E7 A0 29
 	add	a, (stack)		; 60 A0 ; as 4T
 	rrc	(sp)			; E6 A1 ; as 6T
 	tset	4, b			; F8 1C
+	xor	hl, hl			; FA 75
 
 	;***********************************************************
 	; 10T
-	pop	de			; 59
-	ld	offset(sp), e		; F6 11 23 ; as 8T
+	pop	hl			; 5A
+	ld	offset(sp), e		; F6 11 23
 	ld	d, offset(sp)		; F2 11 2A ; as 8T
 	add	a, offset(sp)		; F2 11 60 ; as 8T
 	;rr	(stack)			; E7 A0 A3
 	res	5, (sp)			; E6 B5 ; as 6T
 
 	;***********************************************************
-	; 12T (b 0x76)
-	and	(stack), #n		; EF A0 6C 20 ; as 8T
-	inc	1(sp)			; F2 01 87 
-	cp	1(sp), #n		; F6 01 6F 20
+	; 12T (b 0x78)
+	and	(stack), #n		; EF A0 6C 20 ; as 6T
+	inc	1(sp)			; F2 01 87 ; as 8T
+	cp	1(sp), #n		; F6 01 6F 20 ; as 10T
 
 	;***********************************************************
 	; 14T
-	or	1(sp), #n		; F6 01 6E 20
+	or	1(sp), #n		; F6 01 6E 20 ; as 10T
 
 	;***********************************************************
 	; 16T
-	mul	hl, #3			; 12 03
+	mul	hl, #3			; 12 03 ; as 4T
 
 	;***********************************************************
-	; 18T (b 0x87)
+	; 18T (b 0x89)
 	div	hl, b			; F8 13 ; as 4T
 
 	;***********************************************************
@@ -124,14 +125,14 @@
 	ld	bc, #fun2		; 38r85r00
 	;call	NC, bc			; E8 DF
 	;jp	C, bc			; E8 E7
-	call	NZ, fun1		; EBr83r00 DE ; as 8T (not 10T)
-	call	Z, fun1			; EBr83r00 D6 ; as 16T (not 18T)
+	call	NZ, fun1		; EBr83r00 DE
+	call	Z, fun1			; EBr83r00 D6
 	jr	NE, end			; CE 05
-	jr	EQ, end			; C6 03 ; as 4T (not 8T)
+	jr	EQ, end			; C6 03
 fun1:
 	ret	NZ			; FE DE
 	ret	Z			; FE D6
 fun2:
 	ret				; 1E
 end:
-	jp	end			; 1Ar86r00 ; as 6T (not 8T)
+	jp	end			; 1Ar86r00

@@ -137,7 +137,6 @@ cl_tlcs::op_inc16(u16_t data)
   if (n == 0)
     reg.raf.f|= FLAG_X;
 
-  tick(2);
   return n;
 }
 
@@ -205,7 +204,6 @@ cl_tlcs::op_dec16(t_mem data)
   if (n == 0xffff)
     reg.raf.f|= FLAG_X;
 
-  tick(2);
   return n;
 }
 

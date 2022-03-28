@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "gb80cl.h"
 
+#include "z80mac.h"
+
 static u8_t  swap_nibbles(u8_t  val) {
   return ((val >> 4) & 0x0f) | ((val << 4) & 0xf0);
 }
@@ -69,6 +71,158 @@ int cl_gb80::inst_cb(void) {
   default: return resINV_INST;
   }
   regs.raf.F = (result)?0:BIT_Z;  // all except zero are simply cleared
+  return(resGO);
+}
+
+int cl_gb80::inst_jr(t_mem code)
+{
+  /* fix timing for untaken jr */
+  switch(code) {
+    case 0x20: // JR NZ,dd
+      if ((regs.raf.F & BIT_Z)) {
+        tick(1);
+      }
+    break;
+    case 0x28: // JR Z,dd
+      if (!(regs.raf.F & BIT_Z)) {
+        tick(1);
+      }
+    break;
+    case 0x30: // JR NC,dd
+      if ((regs.raf.F & BIT_C)) {
+        tick(1);
+      }
+    break;
+    case 0x38: // JR C,dd
+      if (!(regs.raf.F & BIT_C)) {
+        tick(1);
+      }
+    break;
+  }
+  
+  return cl_z80::inst_jr(code);
+}
+
+int cl_gb80::inst_call(t_mem code)
+{
+  /* fix timing for taken call */
+  switch(code)
+    {
+    case 0xC4: // CALL NZ,nnnn
+      if (!(regs.raf.F & BIT_Z)) {
+        tick(5);
+      }
+      break;
+    case 0xCC: // CALL Z,nnnn
+      if (regs.raf.F & BIT_Z) {
+        tick(5);
+      }
+      break;
+    case 0xD4: // CALL NC,nnnn
+      if (!(regs.raf.F & BIT_C)) {
+        tick(5);
+      }
+      break;
+    case 0xDC: // CALL C,nnnn
+      if (regs.raf.F & BIT_C) {
+        tick(5);
+      }
+      break;
+    }
+  
+  return cl_z80::inst_call(code);
+}
+
+int cl_gb80::inst_ret(t_mem code)
+{
+  /* fix timing for taken ret */
+  switch(code)
+    {
+    case 0xC0: // RET NZ
+      if (!(regs.raf.F & BIT_Z)) {
+        tick(6);
+      }
+      break;
+    case 0xC8: // RET Z
+      if ((regs.raf.F & BIT_Z)) {
+        tick(6);
+      }
+      break;
+    case 0xD0: // RET NC
+      if (!(regs.raf.F & BIT_C)) {
+        tick(6);
+      }
+      break;
+    case 0xD8: // RET C
+      if ((regs.raf.F & BIT_C)) {
+        tick(6);
+      }
+      break;
+    }
+  
+  return cl_z80::inst_ret(code);
+}
+
+int cl_gb80::inst_jp(t_mem code)
+{
+  /* fix timing for taken ret */
+  switch (code)
+    {
+    case 0xC2: // JP NZ,nnnn
+      if (!(regs.raf.F & BIT_Z)) {
+        tick(4);
+      }
+      break;
+      
+    case 0xCA: // JP Z,nnnn
+      if (regs.raf.F & BIT_Z) {
+        tick(4);
+      }
+      break;
+      
+    case 0xD2: // JP NC,nnnn
+      if (!(regs.raf.F & BIT_C)) {
+        tick(4);
+      }
+      break;
+      
+    case 0xDA: // JP C,nnnn
+      if (regs.raf.F & BIT_C) {
+        tick(4);
+      }
+      break;
+    }
+  
+  return cl_z80::inst_jp(code);
+}
+
+int cl_gb80::inst_add(t_mem code)
+{
+  /* 16bit addition is faster */
+  switch(code)
+    {
+    case 0x09: // ADD HL,BC
+      add_HL_Word(regs.BC);
+      tick(7);
+      break;
+    case 0x19: // ADD HL,DE
+      add_HL_Word(regs.DE);
+      tick(7);
+      break;
+    case 0x29: // ADD HL,HL
+      add_HL_Word(regs.HL);
+      tick(7);
+      break;
+    case 0x39: // ADD HL,SP
+      add_HL_Word(regs.SP);
+      tick(7);
+      break;
+      
+    default:
+      return(cl_z80::inst_add(code));
+      break;
+    }
+
   return(resGO);
 }
 

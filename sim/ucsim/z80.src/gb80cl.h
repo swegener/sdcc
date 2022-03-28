@@ -104,18 +104,24 @@ public:
   // see #include "instcl.h" for Z80 versions
   /* instruction function that are add / modified from the Z80 versions */
   virtual int inst_cb(void);
-  
+
+  virtual int inst_jr   (t_mem code);
+  virtual int inst_call (t_mem code);
+  virtual int inst_ret  (t_mem code);
+  virtual int inst_jp   (t_mem code);
+  virtual int inst_add  (t_mem code);
+
   virtual int inst_st_sp_abs(t_mem code);
   virtual int inst_stop0    (t_mem code);
   
-  virtual int inst_ldi   (t_mem code);
-  virtual int inst_ldd   (t_mem code);
-  virtual int inst_ldh   (t_mem code);
+  virtual int inst_ldi  (t_mem code);
+  virtual int inst_ldd  (t_mem code);
+  virtual int inst_ldh  (t_mem code);
   
-  virtual int inst_reti    (t_mem code);
-  virtual int inst_add_sp_d(t_mem code);
-  virtual int inst_ld16    (t_mem code);
-  virtual int inst_ldhl_sp (t_mem code);
+  virtual int inst_reti     (t_mem code);
+  virtual int inst_add_sp_d (t_mem code);
+  virtual int inst_ld16     (t_mem code);
+  virtual int inst_ldhl_sp  (t_mem code);
   
 };
 

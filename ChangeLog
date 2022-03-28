@@ -1,3 +1,11 @@
+2022-03-28 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sim/ucsim/z80.src/gb80.cc,
+	  sim/ucsim/z80.src/gb80cl.h,
+	  sim/ucsim/z80.src/inst.cc,
+	  sim/ucsim/z80.src/inst_gb80.cc:
+	  Fix cycle accuracy.
+
 2022-03-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/astlcs90/tt90.asm,

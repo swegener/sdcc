@@ -514,7 +514,6 @@ cl_gb80::exec_inst(void)
       return ret;
     }
     case 0x18: return(inst_jr(code));
-    //TODO: 16b add is only 8 cycles, not 11
     case 0x19: return(inst_add(code));
     case 0x1a: case 0x1e: tick(1);return(inst_ld(code));
     case 0x1b: tick(2);
@@ -526,7 +525,6 @@ cl_gb80::exec_inst(void)
       return ret;
     }
 
-    //TODO: one cycle longer when not taken ; jp, call and ret similar
     case 0x20: return(inst_jr(code));
     case 0x21: tick(1);
     case 0x26: tick(1);return(inst_ld(code));
@@ -626,7 +624,6 @@ cl_gb80::exec_inst(void)
 
       /* CB escapes out to 2 byte opcodes(CB include), opcodes
          to do register bit manipulations */
-    // TODO: bit (hl) is correct, other (hl) need 1 cycle more
     case 0xcb: return(inst_cb( ));
     case 0xcc: tick(2);return(inst_call(code));
     case 0xcd: tick(7);return(inst_call(code));

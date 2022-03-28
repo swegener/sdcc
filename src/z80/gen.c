@@ -954,6 +954,7 @@ op8_cost (const asmop *op, int offset)
     case AOP_REG:
       if (op->aopu.aop_reg[offset]->rIdx == IYL_IDX || op->aopu.aop_reg[offset]->rIdx == IYH_IDX) // eZ80
         {
+          wassert (HAS_IYL_INST);
           cost (2, 2);
           return;
         }
@@ -998,6 +999,7 @@ incdec_cost (const asmop *op, int offset)
     case AOP_REG:
       if (op->aopu.aop_reg[offset]->rIdx == IYL_IDX || op->aopu.aop_reg[offset]->rIdx == IYH_IDX) // eZ80
         {
+          wassert (HAS_IYL_INST);
           cost (2, 2);
           return;
         }
@@ -4874,9 +4876,10 @@ _toBoolean (const operand *oper, bool needflag)
   while (size--)
     if (size != skipbyte)
       {
-        if (aopInReg (oper->aop, size, IYL_IDX) || aopInReg (oper->aop, size, IYH_IDX))
+        if (!HAS_IYL_INST && (aopInReg (oper->aop, size, IYL_IDX) || aopInReg (oper->aop, size, IYH_IDX)))
           UNIMPLEMENTED;
-        emit3_o (A_OR, ASMOP_A, 0, oper->aop, size);
+        else
+          emit3_o (A_OR, ASMOP_A, 0, oper->aop, size);
       }
 }
 
@@ -4892,7 +4895,10 @@ _castBoolean (const operand *right)
   if (right->aop->size == 1 && !aopInReg (right->aop, 0, A_IDX))
     {
       emit3 (A_XOR, ASMOP_A, ASMOP_A);
-      emit3 (A_CP, ASMOP_A, right->aop);
+      if (!HAS_IYL_INST && (aopInReg (right->aop, 0, IYL_IDX) || aopInReg (right->aop, 0, IYH_IDX)))
+        UNIMPLEMENTED;
+      else
+        emit3 (A_CP, ASMOP_A, right->aop);
     }
   else
     {
@@ -7050,7 +7056,10 @@ genPlusIncr (const iCode *ic)
               offset += 2;
               break;
             }
-          emit3_o (A_INC, IC_RESULT (ic)->aop, offset++, 0, 0);
+          if (!HAS_IYL_INST && (aopInReg (IC_RESULT (ic)->aop, offset, IYL_IDX) || aopInReg (IC_RESULT (ic)->aop, offset, IYH_IDX)))
+            UNIMPLEMENTED;
+          else
+            emit3_o (A_INC, IC_RESULT (ic)->aop, offset++, 0, 0);
           if (size)
             {
               if (!regalloc_dry_run)
@@ -7076,7 +7085,10 @@ genPlusIncr (const iCode *ic)
     {
       cheapMove (IC_RESULT (ic)->aop, LSB, IC_LEFT (ic)->aop, LSB, true);
       while (icount--)
-        emit3_o (A_INC, IC_RESULT (ic)->aop, LSB, 0, 0);
+        if (!HAS_IYL_INST && (aopInReg (IC_RESULT (ic)->aop, 0, IYL_IDX) || aopInReg (IC_RESULT (ic)->aop, 0, IYH_IDX)))
+          UNIMPLEMENTED;
+        else
+          emit3_o (A_INC, IC_RESULT (ic)->aop, 0, 0, 0);
       return TRUE;
     }
 
@@ -7928,6 +7940,8 @@ genPlus (iCode * ic)
               started = TRUE;
             }
           else if (rightop->type == AOP_STL && i < 2)
+            UNIMPLEMENTED;
+          else if (!HAS_IYL_INST && (aopInReg (rightop, i, IYL_IDX) || aopInReg (rightop, i, IYH_IDX)))
             UNIMPLEMENTED;
           else
             {
@@ -10458,7 +10472,10 @@ genAnd (const iCode * ic, iCode * ifx)
         {
           if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
             _push (PAIR_HL);
-          emit3_o (A_AND, ASMOP_A, 0, left->aop, i);
+          if (!HAS_IYL_INST && (aopInReg (left->aop, i, IYL_IDX) || aopInReg (left->aop, i, IYH_IDX)))
+            UNIMPLEMENTED;
+          else
+            emit3_o (A_AND, ASMOP_A, 0, left->aop, i);
           if (requiresHL (left->aop) && left->aop->type != AOP_REG && !hl_free)
             _pop (PAIR_HL);
         }
@@ -10472,7 +10489,10 @@ genAnd (const iCode * ic, iCode * ifx)
 
           if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
             _push (PAIR_HL);
-          emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
+          if (!HAS_IYL_INST && (aopInReg (right->aop, i, IYL_IDX) || aopInReg (right->aop, i, IYH_IDX)))
+            UNIMPLEMENTED;
+          else
+            emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
           if (requiresHL (right->aop) && right->aop->type != AOP_REG && !hl_free)
             _pop (PAIR_HL);
         }
@@ -11014,7 +11034,10 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
           {
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
               _push (PAIR_HL);
-            emit3_o (A_XOR, ASMOP_A, 0, left_aop, i);
+            if (!HAS_IYL_INST && (aopInReg (left_aop, i, IYL_IDX) || aopInReg (left_aop, i, IYH_IDX)))
+              UNIMPLEMENTED;
+            else
+              emit3_o (A_XOR, ASMOP_A, 0, left_aop, i);
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
               _pop (PAIR_HL);
           }
@@ -11023,12 +11046,14 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
         else
           {
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
-               _push (PAIR_HL);
+              _push (PAIR_HL);
             cheapMove (ASMOP_A, 0, left_aop, i, true);
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
                _pop (PAIR_HL);
             if (right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) == 0xff)
               emit3 (A_CPL, 0, 0);
+            else if (!HAS_IYL_INST && (aopInReg (right_aop, i, IYL_IDX) || aopInReg (right_aop, i, IYH_IDX)))
+              UNIMPLEMENTED;
             else
               {
                 if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)

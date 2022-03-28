@@ -186,14 +186,15 @@ CL12::exec_inst(void)
     {
       code= fetch();
       fn= hc12wrap->page0x18[code];
+      inst_ticks= ticks12p18[code];
     }
   else
     {
       fn= hc12wrap->page0[code];
+      inst_ticks= ticks12p0[code];
     }
   if (fn)
     res= fn(this, code);
-  post_inst();
   if (res != resNOT_DONE)
     return res;
 
@@ -204,13 +205,10 @@ CL12::exec_inst(void)
 void
 CL12::post_inst(void)
 {
-  /*
-  if (post_inc_dec)
-    post_idx_reg->W(post_idx_reg->R() + post_inc_dec);
-  post_inc_dec= 0;
-  */
+  tick(inst_ticks);
   if (extra_ticks)
     tick(extra_ticks), extra_ticks= 0;
+  cl_m68hcbase::post_inst();
 }
 
 i16_t

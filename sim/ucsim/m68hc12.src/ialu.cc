@@ -177,5 +177,35 @@ CL12::emul(void)
   return resGO;
 }
 
+int
+CL12::daa(void)
+{
+  u8_t ah= rA>>4;
+  u8_t al= rA&0xf;
+  int C= rF&flagC;
+  int H= rF&flagH;
+  u8_t nc= 0;
+
+  if (!C && (ah>=0x0) && (ah<=0x9) && !H && (al>=0x0) && (al<=0x9)) { rA+= 0x00; nc= 0; }
+  if (!C && (ah>=0x0) && (ah<=0x8) && !H && (al>=0xa) && (al<=0xf)) { rA+= 0x06; nc= 0; }
+  if (!C && (ah>=0x0) && (ah<=0x9) &&  H && (al>=0x0) && (al<=0x3)) { rA+= 0x06; nc= 0; }
+
+  if (!C && (ah>=0xa) && (ah<=0xf) && !H && (al>=0x0) && (al<=0x9)) { rA+= 0x60; nc= 1; }
+  if (!C && (ah>=0x9) && (ah<=0xf) && !H && (al>=0xa) && (al<=0xf)) { rA+= 0x66; nc= 1; }
+  if (!C && (ah>=0xa) && (ah<=0xf) &&  H && (al>=0x0) && (al<=0x3)) { rA+= 0x66; nc= 1; }
+
+  if ( C && (ah>=0x0) && (ah<=0x2) && !H && (al>=0x0) && (al<=0x9)) { rA+= 0x60; nc= 1; }
+  if ( C && (ah>=0x0) && (ah<=0x2) && !H && (al>=0xa) && (al<=0xf)) { rA+= 0x66; nc= 1; }
+  if ( C && (ah>=0x0) && (ah<=0x3) &&  H && (al>=0x0) && (al<=0x3)) { rA+= 0x66; nc= 1; }
+
+  rF&= ~(flagN|flagZ|flagC);
+  if (nc) rF|= flagC;
+  if (rA==0) rF|= flagZ;
+  if (rA&0x80) rF|= flagN;
+  cF.W(rF);
+  cA.W(rA);
+  return resGO;
+}
+
 
 /* End of m68hc12.src/ialu.cc */

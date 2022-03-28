@@ -1,10 +1,10 @@
 #include "gen.h"
 
-// 00
-// 01
+// 00 BGND
+// 01 MEM
 DEC(0, 02,	inxy	, _cY		, "INY"		, ' ', 1	, 1)
 DEC(0, 03,	dexy	, _cY		, "INY"		, ' ', 1	, 1)
-// 04
+// 04 loop
 DEC(0, 05,	jump	, _xba		, "JMP %p"	, ' ', -2	, 0x66433)
 DEC(0, 06,	jump	, _ea		, "JMP %e"	, ' ', 2	, 4)
 DEC(0, 07,	bsr	, _NONE		, "BSR %r"	, ' ', 2	, 4)
@@ -63,9 +63,9 @@ DEC(0, 38,	i_pul8	, _cC		, "PULC"	, ' ', 1	, 3)
 DEC(0, 39,	i_psh8	, _Cop		, "PSHC"	, ' ', 1	, 2)
 DEC(0, 3a,	i_pul16	, _cD		, "PULD"	, ' ', 1	, 3)
 DEC(0, 3b,	i_psh16	, _Dop		, "PSHD"	, ' ', 1	, 2)
-// 3c
+// 3c wavr
 DEC(0, 3d,	rts	, _NONE	 	, "RTS"		, ' ', 1	, 5)
-// 3e
+// 3e WAI
 DEC(0, 3f,	swi	, _NONE	 	, "SWI"		, ' ', 1	, 9)
 
 DEC(0, 40,	neg	, _cA	 	, "NEGA"	, ' ', 1	, 1)
@@ -279,6 +279,12 @@ DEC(0x18, 03,	movw_imex,_NONE		, "MOVW 'IMEX'"	, ' ', 6	, 5)
 DEC(0x18, 04,	movw_exex,_NONE		, "MOVW 'EXEX'"	, ' ', 6	, 6)
 DEC(0x18, 05,	movw_idex,_NONE		, "MOVW 'IDEX'"	, ' ', 5	, 5)
 DEC(0x18, 06,	add	, _A_B		, "ABA"		, ' ', 2	, 2)
+DEC(0x18, 07,	daa	, _NONE		, "DAA"		, ' ', 2	, 3)
 DEC(0x18, 08,	movb_imid,_NONE		, "MOVB 'imid'"	, ' ', 4	, 4)
 DEC(0x18, 09,	movb_exid,_NONE		, "MOVB 'exid'"	, ' ', 5	, 5)
 DEC(0x18, 0a,	movb_idid,_NONE		, "MOVB 'idid'"	, ' ', 4	, 5)
+DEC(0x18, 0b,	movb_imex,_NONE		, "MOVB 'imex'"	, ' ', 5	, 4)
+DEC(0x18, 0c,	movb_exex,_NONE		, "MOVB 'exex'"	, ' ', 6	, 6)
+DEC(0x18, 0d,	movb_idex,_NONE		, "MOVB 'idex'"	, ' ', 5	, 5)
+DEC(0x18, 0e,	TAB	, code		, "TAB"		, ' ', 2	, 2)
+DEC(0x18, 0f,	TBA	, code		, "TBA"		, ' ', 2	, 2)

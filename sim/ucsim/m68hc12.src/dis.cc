@@ -199,6 +199,15 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      work.appendf("$%04x", e);
 	      comment->appendf("; [%04x]=%04x", e, read_addr(rom, e));
 	    }
+	  if (strcmp(fmt.c_str(), "imex") == 0)
+	    {
+	      u8_t i= rom->read(addr+2);
+	      u16_t e= read_addr(rom, addr+3);
+	      work.appendf("#$%02x", i);
+	      work.append(", ");
+	      work.appendf("$%04x", e);
+	      comment->appendf("; [%04x]=%02x", e, rom->read(e));
+	    }
 	  if (strcmp(fmt.c_str(), "EXEX") == 0)
 	    {
 	      u16_t s= read_addr(rom, addr+2);
@@ -210,6 +219,17 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 			       s, read_addr(rom, s),
 			       d, read_addr(rom, d));
 	    }
+	  if (strcmp(fmt.c_str(), "exex") == 0)
+	    {
+	      u16_t s= read_addr(rom, addr+2);
+	      u16_t d= read_addr(rom, addr+4);
+	      work.appendf("$%04x", s);
+	      work.append(", ");
+	      work.appendf("$%04x", d);
+	      comment->appendf("; [%04x]=%02x [%04x]=%02x",
+			       s, rom->read(s),
+			       d, rom->read(d));
+	    }
 	  if (strcmp(fmt.c_str(), "IDEX") == 0)
 	    {
 	      t_addr aof_xb= (addr+=2), adst;
@@ -220,7 +240,19 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      disass_xb(&aof_xb, &work, comment, 2, xb_PC(xb)?-2:0);
 	      work.append(", ");
 	      work.appendf("$%04x", adst= h*256+l);
-	      comment->appendf(" [%04x]=%04x",adst,read_addr(rom,adst));
+	      comment->appendf(" [%04x]=%04x", adst, read_addr(rom,adst));
+	    }
+	  if (strcmp(fmt.c_str(), "idex") == 0)
+	    {
+	      t_addr aof_xb= (addr+=2), adst;
+	      u8_t h, l, xb= rom->read(aof_xb);
+	      addr++;
+	      h= rom->read(addr++);
+	      l= rom->read(addr++);
+	      disass_xb(&aof_xb, &work, comment, 1, xb_PC(xb)?-2:0);
+	      work.append(", ");
+	      work.appendf("$%04x", adst= h*256+l);
+	      comment->appendf(" [%04x]=%02x", adst, rom->read(adst));
 	    }
 	  continue;
 	}

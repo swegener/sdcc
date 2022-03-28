@@ -297,6 +297,20 @@ CL12::movw_imex(void)
 }
 
 int
+CL12::movb_imex(void)
+{
+  u8_t i= fetch();
+  u8_t eh= fetch();
+  u8_t el= fetch();
+  u16_t a= eh*256+el;
+  
+  rom->write(a, i);
+  vc.wr+= 1;
+  
+  return resGO;
+}
+
+int
 CL12::movw_exex(void)
 {
   u8_t sh= fetch();
@@ -313,6 +327,25 @@ CL12::movw_exex(void)
   rom->write(da+1, v);
   vc.rd+= 2;
   vc.wr+= 2;
+  
+  return resGO;
+}
+
+int
+CL12::movb_exex(void)
+{
+  u8_t sh= fetch();
+  u8_t sl= fetch();
+  u8_t dh= fetch();
+  u8_t dl= fetch();
+  u16_t sa= sh*256+sl;
+  u16_t da= dh*256+dl;
+  u8_t v;
+  
+  v= rom->read(sa);
+  rom->write(da, v);
+  vc.rd++;
+  vc.wr++;
   
   return resGO;
 }
@@ -338,6 +371,29 @@ CL12::movw_idex(void)
       rom->write(ea, h);
       rom->write(ea+1, l);
       vc.wr+= 2;
+    }
+  return resGO;
+}
+
+int
+CL12::movb_idex(void)
+{
+  t_addr aof_xb= PC;
+  u8_t xb= fetch();
+  u8_t eh= fetch();
+  u8_t el= fetch();
+  int xt= xb_type(xb);
+  if ((xt==1) || (xt==3) || (xt==4))
+    {
+      u8_t v;
+      u16_t ea= eh*256+el;
+      u16_t a= naddr(&aof_xb, NULL, PC);
+      if (xb_PC(xb))
+	a+= -2;
+      v= rom->read(a);
+      vc.rd++;
+      rom->write(ea, v);
+      vc.wr++;
     }
   return resGO;
 }

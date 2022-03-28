@@ -131,6 +131,7 @@ public:
   virtual int ediv(void);
   virtual int mul(void);
   virtual int emul(void);
+  virtual int daa(void);
   
   // MOVE
 #define ld16 ldsx
@@ -145,8 +146,11 @@ public:
   virtual int movw_idid(void);
   virtual int movb_idid(void);
   virtual int movw_imex(void);
+  virtual int movb_imex(void);
   virtual int movw_exex(void);
+  virtual int movb_exex(void);
   virtual int movw_idex(void);
+  virtual int movb_idex(void);
   
   // BRANCH
   virtual int call_e(void);

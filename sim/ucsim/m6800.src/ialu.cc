@@ -404,7 +404,7 @@ cl_m6800::DAA(t_mem code)
   if ((rA & 0xf0) > 0x90 ||
       (rF & flagC))
     {
-      i= rA + 0x90;
+      i= rA + 0x60;
       if (i > 255)
 	rF|= flagC;
       rA= i;

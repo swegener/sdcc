@@ -35,6 +35,7 @@
 _strlen:
 	ld	hl, 2 (sp)
 	ld	bc, #0
+	ld	a, c
 	cpir
 	ld	hl, #-1
 	sub	hl, bc

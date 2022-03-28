@@ -1001,6 +1001,13 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool result_in_IYH = operand_in_reg(result, REG_IYH, ia, i, G);
   bool result_in_IY = result_in_IYL || result_in_IYH;
 
+  const cfg_dying_t &dying = G[i].dying;
+  
+  bool dead_IYL = result_in_IYL || unused_IYL || dying.find(ia.registers[REG_IYL][1]) != dying.end() || dying.find(ia.registers[REG_IYL][0]) != dying.end();
+  bool dead_IYH = result_in_IYH || unused_IYH || dying.find(ia.registers[REG_IYH][1]) != dying.end() || dying.find(ia.registers[REG_IYH][0]) != dying.end();
+
+  bool dead_IY = dead_IYL && dead_IYH;
+
   bool input_in_IYL, input_in_IYH;
   switch(ic->op)
     {
@@ -1038,20 +1045,27 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // Some instructions can handle anything.
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '+' ||
-    ic->op == '|' ||
-    ic->op == '^' ||
-    ic->op == '~' ||
-    ic->op == BITWISEAND ||
     ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST ||
     ic->op == SEND)
     return(true);
 
+  // Avoid overwriting operand in iy by use of iy as pointer reg to global operand.
   if(!result_in_IY && !input_in_IY &&
     !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
     !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
     !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
+    return(true);
+
+  // Some instructions can handle anything if no operand is pointed to by iy.
+  if((!(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) || dead_IY && getSize(operandType(IC_RESULT (ic))) == 1) &&
+    !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+    !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))) &&
+    (ic->op == '|' ||
+    ic->op == '^' ||
+    ic->op == '~' ||
+    ic->op == BITWISEAND))
     return(true);
 
   // Code generator mostly cannot handle variables that are only partially in IY.
@@ -1072,16 +1086,6 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(false);
   if(ia.registers[REG_IYL][0] >= 0 && I[ia.registers[REG_IYL][0]].byte != 0 || ia.registers[REG_IYH][0] >= 0 && I[ia.registers[REG_IYH][0]].byte != 1)
     return(false);
-
-#if 0
-  if(ic->key == 32)
-    {
-      std::cout << "A IYinst_ok: Assignment: ";
-      //print_assignment(a);
-      std::cout << "\n";
-      std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
-    }
-#endif
 
   if(result_in_IY &&
     (ic->op == '-' || ic->op == UNARYMINUS)) // todo: More instructions that can write iy.

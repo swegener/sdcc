@@ -30,7 +30,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += --debug -mtlcs90 --less-pedantic --out-fmt-ihx
+SDCCFLAGS += -mtlcs90 --less-pedantic --out-fmt-ihx
 LINKFLAGS += tlcs90.lib
 
 OBJEXT = .rel

@@ -1,3 +1,8 @@
+2022-03-29 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Reference section 3.2.5 in 3.2.4, fix typo in 1.2.
+
 2022-03-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/sdbinutils/bfd/*:

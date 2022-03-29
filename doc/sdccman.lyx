@@ -1208,10 +1208,16 @@ pic libraries in device/non-free:
 \begin_inset Newline newline
 \end_inset
 
-Microchip Technology Inc claims to have copyrights on this, and their term
- are non-free.
- However, a more comon opinion is that Microchip Technology Inc is just
- claiming a copyright on uncopyrightable facts.
+Microchip Technology Inc.
+\begin_inset space \space{}
+\end_inset
+
+claims to have copyrights on this, and their term are non-free.
+ However, a more common opinion is that Microchip Technology Inc.
+\begin_inset space \space{}
+\end_inset
+
+is just claiming a copyright on uncopyrightable facts.
 \end_layout
 
 \end_deeper
@@ -10944,6 +10950,17 @@ status collapsed
 
 \emph default
  library file.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Using-sdar-to"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ below contains a minimal example.
  Libraries created in this manner can be included in the command line.
  Make sure you include the -L <library-path> option to tell the linker where
  to look for these files if they are not in the current directory.

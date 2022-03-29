@@ -1,3 +1,8 @@
+2022-03-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/sdbinutils/bfd/*:
+	  Delete unused files as suggested by Felix Salfelder (felixs).
+
 2022-03-28 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* device/lib/tlcs90/strlen.s:

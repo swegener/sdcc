@@ -74,11 +74,11 @@ public:
   class cl_wrap *hc12wrap;
   u16_t TMP2, TMP3;
   class cl_cell16 cTMP2, cTMP3;
-  class cl_memory_cell *tex_cells[8];
-  const char *tex_names[8];
+  class cl_memory_cell *tex_cells[8], *loop_cells[8];
+  const char *tex_names[8], *loop_names[8];
   u16_t XIRQ_AT, COP_AT, TRAP_AT, CMR_AT;
   class cl_hc12_cpu *cpu12;
-  int extra_ticks;
+  int extra_ticks, xb_tick_shift;
   bool block_irq;
 public:
   cl_m68hc12(class cl_sim *asim);
@@ -97,6 +97,8 @@ public:
   virtual char *disassc(t_addr addr, chars *comment=NULL);
   virtual void disass_xb(t_addr *addr, chars *work, chars *comment, int len, int corr= 0, u32_t use_PC=0);
   virtual void disass_b7(t_addr *addr, chars *work, chars *comment);
+  virtual char *disass_loop(t_addr *addr, chars *work, chars *comment);
+  
   virtual int inst_length(t_addr addr);
   virtual int longest_inst(void) { return 6; }
 
@@ -132,6 +134,22 @@ public:
   virtual int mul(void);
   virtual int emul(void);
   virtual int daa(void);
+  virtual int idiv(void);
+  virtual int fdiv(void);
+  virtual int emacs(void);
+  virtual int emuls(void);
+  virtual int edivs(void);
+  virtual int idivs(void);
+  virtual int maxa(void);
+  virtual int mina(void);
+  virtual int emaxd(void);
+  virtual int emind(void);
+  virtual int maxm(void);
+  virtual int minm(void);
+  virtual int emaxm(void);
+  virtual int eminm(void);
+  virtual int tbl(void);
+  virtual int etbl(void);
   
   // MOVE
 #define ld16 ldsx
@@ -171,6 +189,8 @@ public:
   virtual int rts(void);
   virtual int swi(void);
   virtual int rti(void);
+  virtual int lbranch(u8_t code);
+  virtual int loop(u8_t code);
   
   // OTHER
   virtual int andcc(u8_t op);

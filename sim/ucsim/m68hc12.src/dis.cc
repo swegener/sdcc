@@ -74,6 +74,12 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
   struct dis_entry *dis_e;
   int i;
   bool first;
+
+  if (rom->read(addr) == 0x04)
+    {
+      addr++;
+      return disass_loop(&addr, &work, comment);
+    }
   
   if ((dis_e= get_dis_entry(addr)) == NULL)
     return NULL;
@@ -254,11 +260,21 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      work.appendf("$%04x", adst= h*256+l);
 	      comment->appendf(" [%04x]=%02x", adst, rom->read(adst));
 	    }
+	  if (strcmp(fmt.c_str(), "em") == 0) // EMACS
+	    {
+	      u16_t a= read_addr(rom, addr+2);
+	      u32_t m= (read_addr(rom, a)<<16) + (read_addr(rom, a+2));
+	      work.appendf("$%04x", a);
+	      comment->appendf("; [X=%04x]=%04x,%+d [Y=%04x]=%04x,%+d [%04x]=%08x,%+d",
+			       rX, read_addr(rom, rX), (int)read_addr(rom, rX),
+			       rY, read_addr(rom, rY), (int)read_addr(rom, rY),
+			       a, m, int(m));
+	    }
 	  continue;
 	}
       if (b[i] == '%')
 	{
-	  t_addr a;
+	  t_addr a= addr;
 	  u8_t h, l;
 	  i++;
 	  temp= "";
@@ -304,10 +320,19 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
 	      work.appendf("#$%04x",
 			   read_addr(rom, addr+1));
 	      break;
-	    case 'r': // relative
+	    case 'r': // relative 8 bit offset
 	      work.appendf("$%04x",
 			   (addr+2+(i8_t)(rom->read(addr+1))) & 0xffff );
 	      break;
+	    case 'R': // relative 16 bit offset
+	      {
+		u16_t a= addr+4;
+		i16_t r= rom->read(addr+2)*256;
+		r+= rom->read(addr+3);
+		a+= r;
+		work.appendf("$%04x", a);
+		break;
+	      }
 	    case 'p': case 'P':// xb postbyte for 8/16 bit operand
 	      {
 		t_addr a= addr+1;
@@ -438,28 +463,77 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment, int len, int corr, u3
 void
 CL12::disass_b7(t_addr *addr, chars *work, chars *comment)
 {
+  bool spec= false;
   (*addr)++;
   u8_t pb= rom->read(*addr);
   if (pb & 0x08)
     work->append("TFR/EXG INVALID");
   else
     {
+      if (pb == 0x02) work->append("TAP"), spec= true;
+      if (pb == 0x20) work->append("TPA"), spec= true;
+      if (pb == 0x75) work->append("TSX"), spec= true;
+      if (pb == 0x76) work->append("TSY"), spec= true;
+      if (pb == 0x57) work->append("TXS"), spec= true;
+      if (pb == 0x67) work->append("TYS"), spec= true;
+      if (pb == 0xc5) work->append("XGDX"), spec= true;
+      if (pb == 0xc6) work->append("XGDY"), spec= true;
+      if (spec) return;
       if (!(pb & 0x80))
 	work->append("TFR");
       else
 	work->append("EXG");
-      while (work->len() < 6) work->append(' ');
+      while (work->len() < 7) work->append(' ');
       u8_t ls= pb&7, ms= (pb>>4)&7;
-      const char *nd= (ms==3)?("TEMP2"):(tex_names[ms]);
+      const char *nd;
+      nd= tex_names[ms];
+      if (ms==3)
+	nd= "TMP2";
       work->appendf("%s", nd);
       work->append(",");
       work->appendf("%s", tex_names[ls]);
     }
 }
 
+char *
+CL12::disass_loop(t_addr *addr, chars *work, chars *comment)
+{
+  u8_t code;
+  i16_t r;
+
+  code= rom->read(*addr);
+  *addr= *addr + 1;
+  r= rom->read(*addr);
+  *addr= *addr + 1;
+  if ((code & 0xc0) == 0) work->append("D");
+  else if ((code & 0xc0) == 0x40) work->append("T");
+  else if ((code & 0xc0) == 0x80) work->append("I");
+  else
+    return strdup("-- invalid");
+  work->append("B");
+  if (code & 0x20)
+    work->append("NE");
+  else
+    work->append("EQ");
+  while (work->len() < 7) work->append(' ');
+
+  work->append(loop_names[code & 0x7]);
+  work->append(",");
+  if (code & 0x10)
+    r|= 0xff00;
+  
+  u16_t a= *addr + r;
+  work->appendf("$%04x", a);
+  
+  return strdup(work->c_str());
+}
+
 int
 CL12::inst_length(t_addr addr)
 {
+  u8_t code= rom->read(addr);
+  if (code == 0x04)
+    return 3;
   struct dis_entry *di= get_dis_entry(addr);
   if (di && di->mnemonic)
     {

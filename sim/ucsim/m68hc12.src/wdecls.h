@@ -1,8 +1,8 @@
-# 0 "decode.h"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "decode.h"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "/usr/include/stdc-predef.h" 1 3 4
-# 0 "<command-line>" 2
+# 1 "<command-line>" 2
 # 1 "decode.h"
 # 1 "gen.h" 1
 # 2 "decode.h" 2
@@ -295,3 +295,38 @@ extern int wrap_0x18_0c (class CL12 *uc, t_mem code);
 extern int wrap_0x18_0d (class CL12 *uc, t_mem code);
 extern int wrap_0x18_0e (class CL12 *uc, t_mem code);
 extern int wrap_0x18_0f (class CL12 *uc, t_mem code);
+
+extern int wrap_0x18_10 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_11 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_12 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_13 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_14 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_15 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_16 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_17 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_18 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_19 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_1a (class CL12 *uc, t_mem code);
+extern int wrap_0x18_1b (class CL12 *uc, t_mem code);
+extern int wrap_0x18_1c (class CL12 *uc, t_mem code);
+extern int wrap_0x18_1d (class CL12 *uc, t_mem code);
+
+extern int wrap_0x18_20 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_21 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_22 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_23 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_24 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_25 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_26 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_27 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_28 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_29 (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2a (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2b (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2c (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2d (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2e (class CL12 *uc, t_mem code);
+extern int wrap_0x18_2f (class CL12 *uc, t_mem code);
+
+extern int wrap_0x18_3d (class CL12 *uc, t_mem code);
+extern int wrap_0x18_3f (class CL12 *uc, t_mem code);

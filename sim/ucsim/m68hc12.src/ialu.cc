@@ -207,5 +207,313 @@ CL12::daa(void)
   return resGO;
 }
 
+int
+CL12::idiv(void)
+{
+  u8_t f= rF&~(flagZ|flagV|flagC);
+  if (rX == 0)
+    {
+      cX.W(0xffff);
+      f|= flagC;
+    }
+  else
+    {
+      u16_t q, r;
+      q= rD/rX;
+      r= rD%rX;
+      if (!q)
+	f|= flagZ;
+      cX.W(q);
+      cD.W(r);
+    }
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::fdiv(void)
+{
+  u8_t f= rF&~(flagZ|flagV|flagC);
+  if (rX == 0)
+    {
+      cX.W(0xffff);
+      f|= flagC;
+    }
+  else if (rX <= rD)
+    {
+      cX.W(0xffff);
+      f|= flagV;
+    }
+  else
+    {
+      u32_t n;
+      u16_t d, q, r;
+      n= rD<<16;
+      d= rX;
+      q= n/d;
+      r= n%d;
+      if (!q)
+	f|= flagZ;
+      cX.W(q);
+      cD.W(r);
+    }
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::emacs(void)
+{
+  i16_t mx= read_addr(rom, rX);
+  i16_t my= read_addr(rom, rY);
+  u8_t h, l;
+  h= fetch();
+  l= fetch();
+  u16_t a= h*256+l;
+  i32_t m;
+  m= read_addr(rom, a);
+  m<<= 16;
+  m+= read_addr(rom, a+2);
+  vc.rd+= 8;
+  i32_t i= mx*my;
+  i32_t r= i + m;
+  u8_t f= rF&~(flagN|flagZ|flagV|flagC);
+  if (r & 0x80000000) f|= flagN;
+  if (!r) f|= flagZ;
+  if (0x80000000 & ((m&i&~r)|(~m|~i|~r))) f|= flagV;
+  if (0x8000 & ((m&i)|(i&~r)|(~r&m))) f|= flagC;
+  rom->write(a+0, r>>24);
+  rom->write(a+1, r>>16);
+  rom->write(a+2, r>> 8);
+  rom->write(a+3, r    );
+  vc.wr+= 4;
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::emuls(void)
+{
+  i32_t r= (i16_t)rD*(i16_t)rY;
+  u8_t f= rF&~(flagN|flagZ|flagC);
+  if (r & 0x80000000) f|= flagN;
+  if (!r) f|= flagZ;
+  if (r & 0x8000) f|= flagC;
+  cY.W(r>>16);
+  cD.W(r);
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::edivs(void)
+{
+  i32_t op1= (rY<<16)+rD, q;
+  i16_t r;
+  u8_t f= rF&~(flagN|flagZ|flagV|flagC);
+  if (rX != 0)
+    {
+      q= op1 / (i16_t)rX;
+      r= op1 % (i16_t)rX;
+      if (q&0x8000) f|= flagN;
+      if (!q) f|= flagZ;
+      if ((q > 32767) || (q < -32768))
+	f|= flagV;
+      cY.W(q);
+      cD.W(r);
+    }
+  else
+    f|= flagC;
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::idivs(void)
+{
+  i32_t q;
+  i16_t r;
+  u8_t f= rF&~(flagN|flagZ|flagV|flagC);
+  if (rX == 0)
+    {
+      f|= flagC;
+    }
+  else
+    {
+      q= (i16_t)rD / (i16_t)rX;
+      r= (i16_t)rD % (i16_t)rX;
+      if ((q > 32767) || (q < -32768))
+	f|= flagV;
+      if (!q) f|= flagZ;
+      if (q & 0x8000) f|= flagN;
+      cX.W(q);
+      cD.W(r);
+    }
+  cF.W(f);
+  return resGO;
+}
+
+int
+CL12::maxa(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u8_t op= rom->read(a);
+  vc.rd++;
+  cmp(rA, op);
+  if (rF&flagC)
+    cA.W(op);
+  return resGO;
+}
+
+int
+CL12::mina(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u8_t op= rom->read(a);
+  vc.rd++;
+  cmp(rA, op);
+  if (!(rF&flagC))
+    cA.W(op);
+  return resGO;
+}
+
+int
+CL12::emaxd(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u16_t op= read_addr(rom, a);
+  vc.rd+= 2;
+  cp16(rD, op);
+  if (rF&flagC)
+    cD.W(op);
+  return resGO;
+}
+
+int
+CL12::emind(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u16_t op= read_addr(rom, a);
+  vc.rd+= 2;
+  cp16(rD, op);
+  if (!(rF&flagC))
+    cD.W(op);
+  return resGO;
+}
+
+int
+CL12::maxm(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u8_t op= rom->read(a);
+  vc.rd++;
+  cmp(rA, op);
+  if (!(rF&flagC))
+    {
+      rom->write(a, rA);
+      vc.wr++;
+    }
+  return resGO;
+}
+
+int
+CL12::minm(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u8_t op= rom->read(a);
+  vc.rd++;
+  cmp(rA, op);
+  if (rF&flagC)
+    {
+      rom->write(a, rA);
+      vc.wr++;
+    }
+  return resGO;
+}
+
+int
+CL12::emaxm(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u16_t op= read_addr(rom, a);
+  vc.rd+= 2;
+  cp16(rD, op);
+  if (!(rF&flagC))
+    {
+      rom->write(a, rD>>8);
+      rom->write(a+1, rD);
+      vc.wr+= 2;
+    }
+  return resGO;
+}
+
+int
+CL12::eminm(void)
+{
+  u16_t a= naddr(NULL, NULL, 0);
+  u16_t op= read_addr(rom, a);
+  vc.rd+= 2;
+  cp16(rD, op);
+  if (rF&flagC)
+    {
+      rom->write(a, rD>>8);
+      rom->write(a+1, rD);
+      vc.wr+= 2;
+    }
+  return resGO;
+}
+
+int
+CL12::tbl(void)
+{
+  u8_t xb= rom->read(PC);
+  int t= xb_type(xb);
+  u16_t a= naddr(NULL, NULL, 0);
+  if ((t==1) || (t==3) || (t==4))
+    {
+      u8_t y1, y2;
+      int diff;
+      double b= rB/256.0;
+      y1= rom->read(a);
+      y2= rom->read(a+1);
+      vc.rd+= 2;
+      diff= y2-y1;
+      cA.W(y1 + b*diff);
+      u8_t f= rF&~(flagN|flagZ);
+      if (rA & 0x80) f|= flagN;
+      if (!rA) f|= flagZ;
+      cF.W(f);
+    }
+  else
+    return resINV;
+  return resGO;
+}
+
+int
+CL12::etbl(void)
+{
+  u8_t xb= rom->read(PC);
+  int t= xb_type(xb);
+  u16_t a= naddr(NULL, NULL, 0);
+  if ((t==1) || (t==3) || (t==4))
+    {
+      u16_t y1, y2;
+      long int diff;
+      double b= rB/256.0;
+      y1= read_addr(rom, a);
+      y2= read_addr(rom, a+2);
+      vc.rd+= 4;
+      diff= y2-y1;
+      cD.W(y1 + b*diff);
+      u8_t f= rF&~(flagN|flagZ);
+      if (rD & 0x8000) f|= flagN;
+      if (!rD) f|= flagZ;
+      cF.W(f);
+    }
+  else
+    return resINV;
+  return resGO;
+}
+
 
 /* End of m68hc12.src/ialu.cc */

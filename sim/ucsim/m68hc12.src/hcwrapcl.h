@@ -100,6 +100,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _Aop_dop	uc->acc.DAB.a8.Ar,uc->dop()
 #define _Aop_eop	uc->acc.DAB.a8.Ar,uc->eop()
 #define _Aop_xbop8	uc->acc.DAB.a8.Ar,uc->xbop8()
+#define _Aop_Bop	uc->acc.DAB.a8.Ar,uc->acc.DAB.a8.Br
 
 #define _B_i8		uc->cB,uc->i8()
 #define _B_dop		uc->cB,uc->dop()

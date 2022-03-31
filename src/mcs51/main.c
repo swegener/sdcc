@@ -107,9 +107,12 @@ _mcs51_reset_regparm (struct sym_link *funcType)
 }
 
 static int
-_mcs51_regparm (sym_link * l, bool reentrant)
+_mcs51_regparm (sym_link *l, bool reentrant)
 {
   if (IFFUNC_HASVARARGS (regParmFuncType))
+    return 0;
+
+  if (IS_STRUCT (l))
     return 0;
 
   if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))

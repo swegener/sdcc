@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
 /* Test that sibling call is not used if there is an argument overlap.  */
 
 struct S
@@ -16,6 +15,7 @@ struct S
   int a, b, c;
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int
 foo2 (struct S x, struct S y)
 {
@@ -57,7 +57,8 @@ baz3 (struct S x, struct S y, struct S z)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
+#ifndef __SDCC_pdk14 // Lack of memory
+#ifndef __SDCC_mcs51 // bug?
   struct S a = { 3, 4, 5 }, b = { 6, 7, 8 }, c = { 9, 10, 11 };
 
   bar2 (b, a);
@@ -65,4 +66,6 @@ testTortureExecute (void)
   baz3 (c, a, b);
   return;
 #endif
+#endif
 }
+

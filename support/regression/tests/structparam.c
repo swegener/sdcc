@@ -6,7 +6,6 @@
 
 #include <testfwk.h>
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
 struct s
 {
 	{type} a;
@@ -25,11 +24,10 @@ struct s
 	struct s s = {i, j};
 	return f(s);
 }
-#endif
 
 void testParam (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) || defined(__SDCC_STACK_AUTO)) // Todo: enable when struct parameters are supported!
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Bug.
 	ASSERT (g(23, 42) == 23 + 42);
 #endif
 }

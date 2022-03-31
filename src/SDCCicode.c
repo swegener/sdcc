@@ -3540,35 +3540,78 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
   else
     {
       bool is_structparm = IS_STRUCT (parms->ftype); // struct parameter handling is hackish.
-      /* now decide whether to push or assign */
+      if (is_structparm)
+        {
+          sym_link *ptr = newLink (DECLARATOR);
+          DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec(operandType(pval))));
+          ptr->next = copyLinkChain (parms->ftype);
+          setOperandType (pval, ptr);
+        }
+      // now decide whether to push or assign
       if (!(options.stackAuto || IFFUNC_ISREENT (ftype)))
         {
-          if (is_structparm)
-            werror (E_STRUCT_AS_ARG, argVals->name); // TODO: Rewrite as call to __builtin_memcpy!
-          /* assign */
-          operand *top = operandFromValue (argVals, true);
-          /* clear useDef and other bitVectors */
-          OP_USES (top) = OP_DEFS (top) = OP_SYMBOL (top)->clashes = NULL;
-          geniCodeAssign (top, pval, 1, 0);
+          if (is_structparm) // Passing the parameter requires a memcpy.
+            {
+              iCode *dstic, *srcic, *nic, *cic;
+              operand *dstop = operandFromValue (argVals, true);
+              setOperandType (dstop, FUNC_ARGS(builtin_memcpy->type)->type);
+              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->etype))
+                {
+                  dstic = newiCode (SEND, dstop, 0);
+                  dstic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->etype);
+                }
+              else
+                {
+                  dstic = newiCode ('=', 0, dstop);
+                  IC_RESULT (dstic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type), false);
+                }
+              ADDTOCHAIN (dstic);
+              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->next->etype))
+                {
+                  srcic = newiCode (SEND, pval, 0);
+                  srcic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->next->etype);
+                }
+              else
+                {
+                  srcic = newiCode ('=', 0, pval);
+                  IC_RESULT (srcic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type)->next, false);
+                }
+              ADDTOCHAIN (srcic);
+              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->next->next->etype))
+                {
+                  nic = newiCode (SEND, operandFromLit (getSize (parms->ftype)), 0);
+                  nic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->next->next->etype);
+                }
+              else
+                {
+                  nic = newiCode ('=', 0, operandFromLit (getSize (parms->ftype)));
+                  IC_RESULT (nic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type)->next->next, false);
+                }
+              ADDTOCHAIN (nic);
+              cic = newiCode (CALL, operandFromSymbol (builtin_memcpy, false), 0);
+              IC_RESULT (cic) = newiTempOperand (builtin_memcpy->type->next, 0);
+              ADDTOCHAIN (cic);
+            }
+          else
+            {
+              // assign
+              operand *top = operandFromValue (argVals, true);
+              // clear useDef and other bitVectors
+              OP_USES (top) = OP_DEFS (top) = OP_SYMBOL (top)->clashes = 0;
+              geniCodeAssign (top, pval, 1, 0);
+            }
         }
       else
         {
-          if (is_structparm)
-            {
-              sym_link *ptr = newLink (DECLARATOR);
-              DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec(operandType(pval))));
-              ptr->next = copyLinkChain (parms->ftype);
-              setOperandType (pval, ptr);
-            }
           if (argVals && (*iArg >= 0))
             pval = checkTypes (operandFromValue (argVals, false), pval);
-          /* push */
+          // push
           if (is_structparm)
             ic = newiCode (IPUSH_VALUE_AT_ADDRESS , pval, operandFromLit (0));
           else
             ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
-          /* update the stack adjustment */
+          // update the stack adjustment
           *stack += getSize (IS_ARRAY (parms->ftype) ? aggrToPtr (parms->ftype, false) : parms->ftype);
           if (IFFUNC_ISSMALLC (ftype) && !IS_AGGREGATE (parms->ftype) && getSize (parms->ftype) == 1) // SmallC calling convention passes 8-bit parameters as 16-bit values.
             (*stack)++;

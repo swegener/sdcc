@@ -126,6 +126,9 @@ m6502_regparm (sym_link *l, bool reentrant)
   if (IFFUNC_HASVARARGS (_G.regparam.ftype))
     return 0;
 
+  if (IS_STRUCT (l))
+    return 0;
+
   int size = getSize(l);
 
   /* If they fit completely, the first two bytes of parameters can go */

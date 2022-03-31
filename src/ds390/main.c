@@ -118,6 +118,9 @@ _ds390_regparm (sym_link * l, bool reentrant)
   if (IFFUNC_HASVARARGS (regParmFuncType))
     return 0;
 
+  if (IS_STRUCT (l))
+    return 0;
+
     if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
         return 0;
     if (options.parms_in_bank1 == 0) {

@@ -1,3 +1,20 @@
+2022-03-31 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/ds390/main.c,
+	  src/hc08/main.c,
+	  src/mcs51/main.c,
+	  src/mos6502/main.c,
+	  support/regression/tests/bug-3368.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c,
+	  support/regression/tests/gcc-torture-execute-20180131-1.c,
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-4.c,
+	  support/regression/tests/structparam.c:
+	  struct parameter support for non-reentrant functions.
+
 2022-03-29 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx:

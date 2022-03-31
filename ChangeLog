@@ -16,7 +16,9 @@
 	  support/regression/tests/gcc-torture-execute-20021118-1.c,
 	  support/regression/tests/gcc-torture-execute-20040707-1.c,
 	  support/regression/tests/gcc-torture-execute-20180131-1.c,
-	  support/regression/tests/gcc-torture-execute-pr67226.c:
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-23.c:
 	  struct parameter support for non-reentrant functions.
 
 2022-03-29 Benedikt Freisen <b.freisen AT gmx.net>

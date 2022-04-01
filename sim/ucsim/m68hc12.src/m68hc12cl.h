@@ -113,7 +113,7 @@ public:
   virtual u8_t xbop8();
   virtual u16_t xbop16();
   virtual class cl_memory_cell &xb(void);
-  virtual class cl_memory_cell &xbdst(void) { vc.rd++; vc.wr++; return xb(); }
+  virtual class cl_memory_cell &xbdst(void) { vc.wr++; return xb(); }
   virtual t_addr xbaddr(void) { return naddr(NULL, NULL); }
   virtual void print_regs(class cl_console_base *con);
 

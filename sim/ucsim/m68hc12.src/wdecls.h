@@ -1,8 +1,8 @@
-# 1 "decode.h"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "decode.h"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "/usr/include/stdc-predef.h" 1 3 4
-# 1 "<command-line>" 2
+# 0 "<command-line>" 2
 # 1 "decode.h"
 # 1 "gen.h" 1
 # 2 "decode.h" 2

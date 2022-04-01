@@ -87,6 +87,9 @@ cl_m68hc12::disassc(t_addr addr, chars *comment)
     return strdup("-- UNKNOWN/INVALID");
   b= dis_e->mnemonic;
 
+  if (rom->read(addr) == 0x18)
+    addr++;
+
   first= true;
   work= "";
   for (i=0; b[i]; i++)
@@ -376,8 +379,8 @@ CL12::disass_xb(t_addr *addr, chars *work, chars *comment, int len, int corr, u3
       offset= p&0x1f;
       if (p&0x10) offset|= 0xffe0;
       if (offset)
-	work->appendf("%+d,", offset);
-      work->appendf("%s", rr_names[rr]);
+	work->appendf("%+d", offset);
+      work->appendf(",%s", rr_names[rr]);
       break;
   
     case 6: // 6. 111r r111 [D,r] rr={X,Y,SP,PC}

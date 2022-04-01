@@ -201,7 +201,8 @@ CL12::exec_inst(void)
   t_mem code;
   hcwrapper_fn fn= NULL;
 
-  code= fetch();
+  if (fetch(&code))
+    return resBREAKPOINT;
   if (code == 0x18)
     {
       code= fetch();
@@ -300,7 +301,8 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 {
   u8_t p, h, l;
   i8_t n;
-  i16_t offset= 0;
+  i16_t ioffset= 0;
+  u16_t uoffset= 0;
   u16_t ival= 0, a= 0;
   //i8_t post_inc_dec= 0;
   class cl_cell16 *post_idx_reg= NULL;
@@ -331,10 +333,10 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	    ival= PC&0xffff;
 	  break;
 	}
-      offset= p&0x1f;
-      if (p&0x10) offset|= 0xffe0;
+      ioffset= p&0x1f;
+      if (p&0x10) ioffset|= 0xffe0;
       xb_tick_shift= 0;
-      return (u16_t)(ival+offset);
+      return (u16_t)(ival+ioffset);
       break;
       
     case 6: // 6. 111r r111 [D,r] rr={X,Y,SP,PC}
@@ -352,8 +354,8 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	    ival= PC&0xffff;
 	  break;
 	}
-      offset= rD;
-      a= (u16_t)(ival+offset);
+      ioffset= rD;
+      a= (u16_t)(ival+ioffset);
       if (pg)
 	*pg= rom->read(a+2);
       xb_tick_shift= 2;
@@ -387,8 +389,8 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	  h= fetch();
 	  l= fetch();
 	}
-      offset= h*256+l;
-      a= (u16_t)(ival+offset);
+      ioffset= h*256+l;
+      a= (u16_t)(ival+ioffset);
       if (pg)
 	*pg= rom->read(a+2);
       xb_tick_shift= 2;
@@ -445,12 +447,12 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	  // 9 bit
 	  if (addr)
 	    {
-	      offset= rom->read(*addr);
+	      ioffset= rom->read(*addr);
 	      (*addr)++;
 	    }
 	  else
-	    offset= fetch();
-	  if (p&0x01) offset|= 0xff00;
+	    ioffset= fetch();
+	  if (p&0x01) ioffset|= 0xff00;
 	  xb_tick_shift= 0;
 	}
       else
@@ -468,18 +470,18 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	      h= fetch();
 	      l= fetch();
 	    }
-	  offset= h*256+l;
+	  ioffset= h*256+l;
 	  xb_tick_shift= 1;
 	}
-      return (u16_t)(ival+offset);
+      return (u16_t)(ival+ioffset);
       break;
   
     default: // 4. 111r r1aa {A,B,D},r rr={X,Y,SP,PC}
       switch (p & 0x18)
 	{
 	case 0x00: ival= rX; break;
-	case 0x10: ival= rY; break;
-	case 0x08: ival= rSP; break;
+	case 0x08: ival= rY; break;
+	case 0x10: ival= rSP; break;
 	case 0x18:
 	  if (use_PC)
 	    ival= use_PC;
@@ -491,12 +493,12 @@ CL12::naddr(t_addr *addr /* of xb */, u8_t *pg, u32_t use_PC)
 	}
       switch (p&0x03)
 	{
-	case 0x00: offset= s8_16(rA); break;
-	case 0x01: offset= s8_16(rB); break;
-	case 0x02: offset= rD; break;
+	case 0x00: uoffset= rA; break;
+	case 0x01: uoffset= rB; break;
+	case 0x02: uoffset= rD; break;
 	}
       xb_tick_shift= 0;
-      return (u16_t)(ival+offset);
+      return (u16_t)(ival+uoffset);
       break;
     }
   

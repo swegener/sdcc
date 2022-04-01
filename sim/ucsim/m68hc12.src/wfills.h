@@ -1,8 +1,8 @@
-# 1 "decode.h"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "decode.h"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "/usr/include/stdc-predef.h" 1 3 4
-# 1 "<command-line>" 2
+# 0 "<command-line>" 2
 # 1 "decode.h"
 # 1 "gen.h" 1
 # 2 "decode.h" 2
@@ -328,5 +328,5 @@ virtual void fill_0x18_2d() { page0x18[0x2d ]= wrap_0x18_2d; set_disass(0x18, 0x
 virtual void fill_0x18_2e() { page0x18[0x2e ]= wrap_0x18_2e; set_disass(0x18, 0x2e, "LBGT %R", ' ', 4); set_ticks(0x18, 0x2e, 1); }
 virtual void fill_0x18_2f() { page0x18[0x2f ]= wrap_0x18_2f; set_disass(0x18, 0x2f, "LBLE %R", ' ', 4); set_ticks(0x18, 0x2f, 1); }
 
-virtual void fill_0x18_3d() { page0x18[0x3d ]= wrap_0x18_3d; set_disass(0x18, 0x3d, "TBL", ' ', 3); set_ticks(0x18, 0x3d, 6); }
-virtual void fill_0x18_3f() { page0x18[0x3f ]= wrap_0x18_3f; set_disass(0x18, 0x3f, "ETBL", ' ', 3); set_ticks(0x18, 0x3f, 10); }
+virtual void fill_0x18_3d() { page0x18[0x3d ]= wrap_0x18_3d; set_disass(0x18, 0x3d, "TBL %p", ' ', -3); set_ticks(0x18, 0x3d, 6); }
+virtual void fill_0x18_3f() { page0x18[0x3f ]= wrap_0x18_3f; set_disass(0x18, 0x3f, "ETBL %P", ' ', -3); set_ticks(0x18, 0x3f, 10); }

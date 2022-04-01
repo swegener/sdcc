@@ -26,12 +26,14 @@ int f(int x, int y, int z, int a, U u)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug?
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // bug?
+#ifndef __SDCC_ds390 // bug?
   U u = { .ss = -1 };
 
   if (f (0, 0, 0, 0, u) != (1 << sizeof (short) * 8))
     ASSERT (0);
 
   return;
+#endif
 #endif
 }

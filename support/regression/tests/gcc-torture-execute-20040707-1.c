@@ -18,8 +18,10 @@ void foo (struct s s)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_mcs51) || !defined(__SDCC_STACK_AUTO) // bug?
   static struct s s2;
   foo (s2);
   return;
+#endif
 }
 

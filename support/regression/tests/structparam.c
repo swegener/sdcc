@@ -27,8 +27,6 @@ struct s
 
 void testParam (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Bug.
 	ASSERT (g(23, 42) == 23 + 42);
-#endif
 }
 

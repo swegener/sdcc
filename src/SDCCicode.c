@@ -3553,8 +3553,7 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
           if (is_structparm) // Passing the parameter requires a memcpy.
             {
               iCode *dstic, *srcic, *nic, *cic;
-              operand *dstop = operandFromValue (argVals, true);
-              setOperandType (dstop, FUNC_ARGS(builtin_memcpy->type)->type);
+              operand *dstop = geniCodeCast (FUNC_ARGS(builtin_memcpy->type)->type, operandFromValue (argVals, true), false);
               if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->etype))
                 {
                   dstic = newiCode (SEND, dstop, 0);

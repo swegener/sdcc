@@ -217,9 +217,10 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       b->init();
       b->cond= cond;
       uc->fbrk->add_bp(b);
-      con->dd_printf("Breakpoint %d at 0x%06x: ", b->nr, AI(addr));
-      uc->print_disass(addr, con, false);
-      con->dd_printf(" (cond=\"%s\")\n", cond.c_str());
+      con->dd_printf("Breakpoint %d at 0x%06x (cond=\"%s\")\n",
+		     b->nr, AI(addr), cond.c_str());
+      uc->print_disass(addr, con);
+      //con->dd_printf(" (cond=\"%s\")\n", cond.c_str());
     }
 }
 

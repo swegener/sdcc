@@ -4,7 +4,8 @@
 	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
 	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
 	  support/regression/tests/gcc-torture-execute-va-arg-4.c,
-	  support/regression/tests/structparam.c:
+	  support/regression/tests/structparam.c,
+	  support/regression/tests/structparam.c.in:
 	  struct / union parameters on the stack for mcs51.
 
 2022-04-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

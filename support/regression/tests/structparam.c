@@ -1,6 +1,6 @@
 /*  Test struct / union parameters
 
-    type: int, long, long long
+    type: char, int, long, long long
 
  */
 
@@ -19,14 +19,18 @@ struct s
 }
 
 // Caller
+#ifndef __SDCC_pdk14 // Lack of memory
 {type} g({type} i, {type} j)
 {
 	struct s s = {i, j};
 	return f(s);
 }
+#endif
 
 void testParam (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 	ASSERT (g(23, 42) == 23 + 42);
+#endif
 }
 

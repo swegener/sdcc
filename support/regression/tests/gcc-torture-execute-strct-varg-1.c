@@ -10,7 +10,7 @@ strct-varg-1.c from the execute part of the gcc torture tests.
 
 struct s { int x, y; };
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
 f (int attr, ...)
 {
   struct s va_values;
@@ -40,7 +40,7 @@ f (int attr, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
   struct s a, b;
 
   a.x = 0xaaaa;

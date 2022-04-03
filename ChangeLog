@@ -4,7 +4,13 @@
 	  src/SDCCsymt.c,
 	  src/mcs51/gen.c,
 	  src/mcs51/main.c,
-	  support/regression/tests/structreturn.c.in:
+	  support/regression/tests/structreturn.c.in,
+	  device/lib/div.c,
+	  device/lib/ldiv.c,
+	  device/lib/lldiv.c,
+	  device/lib/mcs51/Makefile.in,
+	  support/regression/tests/div.c,
+	  device/include/stdlib.h:
 	  struct/union return for mcs51.
 
 2022-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

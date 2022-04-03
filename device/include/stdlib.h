@@ -133,7 +133,7 @@ typedef struct
 	long long int quot;
 	long long int rem;
 } lldiv_t;
-#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
 div_t div(int numer, int denom);
 ldiv_t ldiv(long int numer, long int denom);
 lldiv_t lldiv(long long int numer, long long int denom);

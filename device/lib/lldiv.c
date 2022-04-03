@@ -28,8 +28,7 @@
 
 #include <stdlib.h>
 
-#ifndef __SDCC_mcs51
-#ifndef __SDCC_ds390 // segfault
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
 lldiv_t lldiv(long long int numer, long long int denom)
 {
 	lldiv_t ret;
@@ -37,6 +36,5 @@ lldiv_t lldiv(long long int numer, long long int denom)
 	ret.rem = numer % denom;
 	return(ret);
 }
-#endif
 #endif
 

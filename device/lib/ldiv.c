@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
 ldiv_t ldiv(long int numer, long int denom)
 {
 	ldiv_t ret;

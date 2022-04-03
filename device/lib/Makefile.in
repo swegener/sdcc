@@ -173,7 +173,10 @@ XA51_LONG = $(COMMON_LONG) \
 XA51_SDCC = $(COMMON_SDCC) \
   _memmove.c \
   _strlen.c \
-  _heap.c
+  _heap.c \
+  div.c \
+  ldiv.c \
+  lldiv.rel
 
 XA51SOURCES = $(XA51_FLOAT) $(XA51_INT) $(XA51_LONG) $(XA51_SDCC)
 XA51OBJECTS = $(XA51SOURCES:%.c=$(PORT)/%.rel)

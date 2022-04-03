@@ -4210,7 +4210,10 @@ genFunction (iCode * ic)
         }
     }
 
+  bool bigreturn = IS_STRUCT (ftype->next);
+  
   _G.stack.param_offset = options.useXstack ? _G.stack.xpushed : _G.stack.pushed;
+  _G.stack.param_offset += (!options.useXstack && bigreturn) * 3;
   _G.stack.pushedregs = _G.stack.pushed;
   _G.stack.xpushedregs = _G.stack.xpushed;
   _G.stack.pushed = 0;
@@ -4629,7 +4632,7 @@ genRet (iCode * ic)
     {
       bool framepointer = (IFFUNC_ISREENT (currFunc->type) || options.stackAuto) && !options.omitFramePtr;
       asmop *aop = newAsmop (0);
-      reg_info *preg = getFreePtr (ic, aop, false);emitcode (";", "%d", currFunc->stack);
+      reg_info *preg = getFreePtr (ic, aop, false);
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
         for (int i = 0; i < size; i++)
           {

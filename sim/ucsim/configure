@@ -1443,7 +1443,7 @@ Optional Features:
   --disable-m6809-port    do not compile simulator for m6809
   --disable-m6800-port    do not compile simulator for m6800
   --disable-m68hc11-port  do not compile simulator for m68hc11
-  --enable-m68hc12-port   compile simulator for m68hc12
+  --disable-m68hc12-port  do not compile simulator for m68hc12
   --disable-mos6502-port  do not compile simulator for mos6502
   --disable-rxk-port      do not compile simulator for Rabbit rXk
   --disable-pblaze-port   do not compile simulator for Xilinx PicoBlaze
@@ -3466,7 +3466,7 @@ then :
     enable_m68hc12_port="yes"
 fi
 else $as_nop
-  enable_m68hc12_port="no"
+  enable_m68hc12_port="yes"
 fi
 
 

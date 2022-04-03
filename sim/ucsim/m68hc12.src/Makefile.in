@@ -136,19 +136,19 @@ $(TN).src: preped_headers $(SEN) $(LEN) shared_lib
 preped_headers: $(srcdir)/wfills.h $(srcdir)/wdecls.h $(srcdir)/wdefs.h
 
 $(srcdir)/wfills.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -DGEN_F -E $< >$@
+	gcc -DGEN_F -E -P $< >$@
 
 #	gcc -E $< |sed '/^#/d'|sed 's/\__NL__/\
 #/g'|grep '^ *virtual' >$@
 
 $(srcdir)/wdecls.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -DGEN_D -E $< >$@
+	gcc -DGEN_D -E -P $< >$@
 
 #	gcc -E $< |sed '/^#/d'|sed 's/__NL__/\
 #/g'|grep '^ *extern' >$@
 
 $(srcdir)/wdefs.h: $(srcdir)/decode.h $(srcdir)/gen.h
-	gcc -DGEN_W -E $< >$@
+	gcc -DGEN_W -E -P $< >$@
 
 #	gcc -E $< |sed '/^#/d'|sed 's/__NL__/\
 #/g'|grep '^ *int' >$@

@@ -1,17 +1,5 @@
-# 0 "decode.h"
-# 0 "<built-in>"
-# 0 "<command-line>"
-# 1 "/usr/include/stdc-predef.h" 1 3 4
-# 0 "<command-line>" 2
-# 1 "decode.h"
-# 1 "gen.h" 1
-# 2 "decode.h" 2
-
-
-
 int wrap_0_02(class CL12 *uc, t_mem code) { return uc-> inxy ( _cY ); }
 int wrap_0_03(class CL12 *uc, t_mem code) { return uc-> dexy ( _cY ); }
-
 int wrap_0_05(class CL12 *uc, t_mem code) { return uc-> jump ( _xba ); }
 int wrap_0_06(class CL12 *uc, t_mem code) { return uc-> jump ( _ea ); }
 int wrap_0_07(class CL12 *uc, t_mem code) { return uc-> bsr ( _NONE ); }
@@ -23,7 +11,6 @@ int wrap_0_0c(class CL12 *uc, t_mem code) { return uc-> Or ( _xb_i8 ); }
 int wrap_0_0d(class CL12 *uc, t_mem code) { return uc-> And ( _xb_i8n ); }
 int wrap_0_0e(class CL12 *uc, t_mem code) { return uc-> brset_id ( _NONE ); }
 int wrap_0_0f(class CL12 *uc, t_mem code) { return uc-> brclr_id ( _NONE ); }
-
 int wrap_0_10(class CL12 *uc, t_mem code) { return uc-> andcc ( _i8 ); }
 int wrap_0_11(class CL12 *uc, t_mem code) { return uc-> ediv ( _NONE ); }
 int wrap_0_12(class CL12 *uc, t_mem code) { return uc-> mul ( _NONE ); }
@@ -32,7 +19,6 @@ int wrap_0_14(class CL12 *uc, t_mem code) { return uc-> andcc ( _i8 ); }
 int wrap_0_15(class CL12 *uc, t_mem code) { return uc-> jsr ( _xba ); }
 int wrap_0_16(class CL12 *uc, t_mem code) { return uc-> jsr ( _ea ); }
 int wrap_0_17(class CL12 *uc, t_mem code) { return uc-> jsr ( _da ); }
-
 int wrap_0_19(class CL12 *uc, t_mem code) { return uc-> lea ( _cY ); }
 int wrap_0_1a(class CL12 *uc, t_mem code) { return uc-> lea ( _cX ); }
 int wrap_0_1b(class CL12 *uc, t_mem code) { return uc-> lea ( _cS ); }
@@ -40,7 +26,6 @@ int wrap_0_1c(class CL12 *uc, t_mem code) { return uc-> Or ( _e_i8 ); }
 int wrap_0_1d(class CL12 *uc, t_mem code) { return uc-> And ( _e_i8n ); }
 int wrap_0_1e(class CL12 *uc, t_mem code) { return uc-> brset_e ( _NONE ); }
 int wrap_0_1f(class CL12 *uc, t_mem code) { return uc-> brclr_e ( _NONE ); }
-
 int wrap_0_20(class CL12 *uc, t_mem code) { return uc-> BRA ( 0x20 ); }
 int wrap_0_21(class CL12 *uc, t_mem code) { return uc-> BRN ( 0x21 ); }
 int wrap_0_22(class CL12 *uc, t_mem code) { return uc-> BHI ( 0x22 ); }
@@ -57,7 +42,6 @@ int wrap_0_2c(class CL12 *uc, t_mem code) { return uc-> BGE ( 0x2c ); }
 int wrap_0_2d(class CL12 *uc, t_mem code) { return uc-> BLT ( 0x2d ); }
 int wrap_0_2e(class CL12 *uc, t_mem code) { return uc-> BGT ( 0x2e ); }
 int wrap_0_2f(class CL12 *uc, t_mem code) { return uc-> BLE ( 0x2f ); }
-
 int wrap_0_30(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cX ); }
 int wrap_0_31(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cY ); }
 int wrap_0_32(class CL12 *uc, t_mem code) { return uc-> i_pul8 ( _cA ); }
@@ -70,11 +54,8 @@ int wrap_0_38(class CL12 *uc, t_mem code) { return uc-> i_pul8 ( _cC ); }
 int wrap_0_39(class CL12 *uc, t_mem code) { return uc-> i_psh8 ( _Cop ); }
 int wrap_0_3a(class CL12 *uc, t_mem code) { return uc-> i_pul16 ( _cD ); }
 int wrap_0_3b(class CL12 *uc, t_mem code) { return uc-> i_psh16 ( _Dop ); }
-
 int wrap_0_3d(class CL12 *uc, t_mem code) { return uc-> rts ( _NONE ); }
-
 int wrap_0_3f(class CL12 *uc, t_mem code) { return uc-> swi ( _NONE ); }
-
 int wrap_0_40(class CL12 *uc, t_mem code) { return uc-> neg ( _cA ); }
 int wrap_0_41(class CL12 *uc, t_mem code) { return uc-> com ( _cA ); }
 int wrap_0_42(class CL12 *uc, t_mem code) { return uc-> inc ( _cA ); }
@@ -91,7 +72,6 @@ int wrap_0_4c(class CL12 *uc, t_mem code) { return uc-> Or ( _d_i8 ); }
 int wrap_0_4d(class CL12 *uc, t_mem code) { return uc-> And ( _d_i8n ); }
 int wrap_0_4e(class CL12 *uc, t_mem code) { return uc-> brset_d ( _NONE ); }
 int wrap_0_4f(class CL12 *uc, t_mem code) { return uc-> brclr_d ( _NONE ); }
-
 int wrap_0_50(class CL12 *uc, t_mem code) { return uc-> neg ( _cB ); }
 int wrap_0_51(class CL12 *uc, t_mem code) { return uc-> com ( _cB ); }
 int wrap_0_52(class CL12 *uc, t_mem code) { return uc-> inc ( _cB ); }
@@ -108,7 +88,6 @@ int wrap_0_5c(class CL12 *uc, t_mem code) { return uc-> stsx ( _da_Dop ); }
 int wrap_0_5d(class CL12 *uc, t_mem code) { return uc-> stsx ( _da_Yop ); }
 int wrap_0_5e(class CL12 *uc, t_mem code) { return uc-> stsx ( _da_Xop ); }
 int wrap_0_5f(class CL12 *uc, t_mem code) { return uc-> stsx ( _da_Sop ); }
-
 int wrap_0_60(class CL12 *uc, t_mem code) { return uc-> neg ( _xb ); }
 int wrap_0_61(class CL12 *uc, t_mem code) { return uc-> com ( _xb ); }
 int wrap_0_62(class CL12 *uc, t_mem code) { return uc-> inc ( _xb ); }
@@ -125,7 +104,6 @@ int wrap_0_6c(class CL12 *uc, t_mem code) { return uc-> stsx ( _xba_Dop ); }
 int wrap_0_6d(class CL12 *uc, t_mem code) { return uc-> stsx ( _xba_Yop ); }
 int wrap_0_6e(class CL12 *uc, t_mem code) { return uc-> stsx ( _xba_Xop ); }
 int wrap_0_6f(class CL12 *uc, t_mem code) { return uc-> stsx ( _xba_Sop ); }
-
 int wrap_0_70(class CL12 *uc, t_mem code) { return uc-> neg ( _e ); }
 int wrap_0_71(class CL12 *uc, t_mem code) { return uc-> com ( _e ); }
 int wrap_0_72(class CL12 *uc, t_mem code) { return uc-> inc ( _e ); }
@@ -142,7 +120,6 @@ int wrap_0_7c(class CL12 *uc, t_mem code) { return uc-> stsx ( _ea_Dop ); }
 int wrap_0_7d(class CL12 *uc, t_mem code) { return uc-> stsx ( _ea_Yop ); }
 int wrap_0_7e(class CL12 *uc, t_mem code) { return uc-> stsx ( _ea_Xop ); }
 int wrap_0_7f(class CL12 *uc, t_mem code) { return uc-> stsx ( _ea_Sop ); }
-
 int wrap_0_80(class CL12 *uc, t_mem code) { return uc-> sub ( _A_i8 ); }
 int wrap_0_81(class CL12 *uc, t_mem code) { return uc-> cmp ( _Aop_i8 ); }
 int wrap_0_82(class CL12 *uc, t_mem code) { return uc-> sbc ( _A_i8 ); }
@@ -159,7 +136,6 @@ int wrap_0_8c(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Dop_i16 ); }
 int wrap_0_8d(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Yop_i16 ); }
 int wrap_0_8e(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Xop_i16 ); }
 int wrap_0_8f(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Sop_i16 ); }
-
 int wrap_0_90(class CL12 *uc, t_mem code) { return uc-> sub ( _A_dop ); }
 int wrap_0_91(class CL12 *uc, t_mem code) { return uc-> cmp ( _Aop_dop ); }
 int wrap_0_92(class CL12 *uc, t_mem code) { return uc-> sbc ( _A_dop ); }
@@ -176,7 +152,6 @@ int wrap_0_9c(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Dop_dop16 ); }
 int wrap_0_9d(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Yop_dop16 ); }
 int wrap_0_9e(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Xop_dop16 ); }
 int wrap_0_9f(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Sop_dop16 ); }
-
 int wrap_0_a0(class CL12 *uc, t_mem code) { return uc-> sub ( _A_xbop8 ); }
 int wrap_0_a1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Aop_xbop8 ); }
 int wrap_0_a2(class CL12 *uc, t_mem code) { return uc-> sbc ( _A_xbop8 ); }
@@ -193,7 +168,6 @@ int wrap_0_ac(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Dop_xbop16 ); }
 int wrap_0_ad(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Yop_xbop16 ); }
 int wrap_0_ae(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Xop_xbop16 ); }
 int wrap_0_af(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Sop_xbop16 ); }
-
 int wrap_0_b0(class CL12 *uc, t_mem code) { return uc-> sub ( _A_eop ); }
 int wrap_0_b1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Aop_eop ); }
 int wrap_0_b2(class CL12 *uc, t_mem code) { return uc-> sbc ( _A_eop ); }
@@ -210,7 +184,6 @@ int wrap_0_bc(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Dop_eop16 ); }
 int wrap_0_bd(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Yop_eop16 ); }
 int wrap_0_be(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Xop_eop16 ); }
 int wrap_0_bf(class CL12 *uc, t_mem code) { return uc-> cp16 ( _Sop_eop16 ); }
-
 int wrap_0_c0(class CL12 *uc, t_mem code) { return uc-> sub ( _B_i8 ); }
 int wrap_0_c1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Bop_i8 ); }
 int wrap_0_c2(class CL12 *uc, t_mem code) { return uc-> sbc ( _B_i8 ); }
@@ -227,7 +200,6 @@ int wrap_0_cc(class CL12 *uc, t_mem code) { return uc-> ld16 ( _D_i16 ); }
 int wrap_0_cd(class CL12 *uc, t_mem code) { return uc-> ld16 ( _Y_i16 ); }
 int wrap_0_ce(class CL12 *uc, t_mem code) { return uc-> ld16 ( _X_i16 ); }
 int wrap_0_cf(class CL12 *uc, t_mem code) { return uc-> ld16 ( _S_i16 ); }
-
 int wrap_0_d0(class CL12 *uc, t_mem code) { return uc-> sub ( _B_dop ); }
 int wrap_0_d1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Bop_dop ); }
 int wrap_0_d2(class CL12 *uc, t_mem code) { return uc-> sbc ( _B_dop ); }
@@ -244,7 +216,6 @@ int wrap_0_dc(class CL12 *uc, t_mem code) { return uc-> ld16 ( _D_dop16 ); }
 int wrap_0_dd(class CL12 *uc, t_mem code) { return uc-> ld16 ( _Y_dop16 ); }
 int wrap_0_de(class CL12 *uc, t_mem code) { return uc-> ld16 ( _X_dop16 ); }
 int wrap_0_df(class CL12 *uc, t_mem code) { return uc-> ld16 ( _S_dop16 ); }
-
 int wrap_0_e0(class CL12 *uc, t_mem code) { return uc-> sub ( _B_xbop8 ); }
 int wrap_0_e1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Bop_xbop8 ); }
 int wrap_0_e2(class CL12 *uc, t_mem code) { return uc-> sbc ( _B_xbop8 ); }
@@ -261,7 +232,6 @@ int wrap_0_ec(class CL12 *uc, t_mem code) { return uc-> ld16 ( _D_xbop16 ); }
 int wrap_0_ed(class CL12 *uc, t_mem code) { return uc-> ld16 ( _Y_xbop16 ); }
 int wrap_0_ee(class CL12 *uc, t_mem code) { return uc-> ld16 ( _X_xbop16 ); }
 int wrap_0_ef(class CL12 *uc, t_mem code) { return uc-> ld16 ( _S_xbop16 ); }
-
 int wrap_0_f0(class CL12 *uc, t_mem code) { return uc-> sub ( _B_eop ); }
 int wrap_0_f1(class CL12 *uc, t_mem code) { return uc-> cmp ( _Bop_eop ); }
 int wrap_0_f2(class CL12 *uc, t_mem code) { return uc-> sbc ( _B_eop ); }
@@ -278,7 +248,6 @@ int wrap_0_fc(class CL12 *uc, t_mem code) { return uc-> ld16 ( _D_eop16 ); }
 int wrap_0_fd(class CL12 *uc, t_mem code) { return uc-> ld16 ( _Y_eop16 ); }
 int wrap_0_fe(class CL12 *uc, t_mem code) { return uc-> ld16 ( _X_eop16 ); }
 int wrap_0_ff(class CL12 *uc, t_mem code) { return uc-> ld16 ( _S_eop16 ); }
-
 int wrap_0x18_00(class CL12 *uc, t_mem code) { return uc-> movw_imid ( _NONE ); }
 int wrap_0x18_01(class CL12 *uc, t_mem code) { return uc-> movw_exid ( _NONE ); }
 int wrap_0x18_02(class CL12 *uc, t_mem code) { return uc-> movw_idid ( _NONE ); }
@@ -295,7 +264,6 @@ int wrap_0x18_0c(class CL12 *uc, t_mem code) { return uc-> movb_exex ( _NONE ); 
 int wrap_0x18_0d(class CL12 *uc, t_mem code) { return uc-> movb_idex ( _NONE ); }
 int wrap_0x18_0e(class CL12 *uc, t_mem code) { return uc-> TAB ( code ); }
 int wrap_0x18_0f(class CL12 *uc, t_mem code) { return uc-> TBA ( code ); }
-
 int wrap_0x18_10(class CL12 *uc, t_mem code) { return uc-> idiv ( _NONE ); }
 int wrap_0x18_11(class CL12 *uc, t_mem code) { return uc-> fdiv ( _NONE ); }
 int wrap_0x18_12(class CL12 *uc, t_mem code) { return uc-> emacs ( _NONE ); }
@@ -310,7 +278,6 @@ int wrap_0x18_1a(class CL12 *uc, t_mem code) { return uc-> emaxd ( _NONE ); }
 int wrap_0x18_1b(class CL12 *uc, t_mem code) { return uc-> emind ( _NONE ); }
 int wrap_0x18_1c(class CL12 *uc, t_mem code) { return uc-> maxm ( _NONE ); }
 int wrap_0x18_1d(class CL12 *uc, t_mem code) { return uc-> minm ( _NONE ); }
-
 int wrap_0x18_20(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
 int wrap_0x18_21(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
 int wrap_0x18_22(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
@@ -327,6 +294,5 @@ int wrap_0x18_2c(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
 int wrap_0x18_2d(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
 int wrap_0x18_2e(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
 int wrap_0x18_2f(class CL12 *uc, t_mem code) { return uc-> lbranch ( code ); }
-
 int wrap_0x18_3d(class CL12 *uc, t_mem code) { return uc-> tbl ( _NONE ); }
 int wrap_0x18_3f(class CL12 *uc, t_mem code) { return uc-> etbl ( _NONE ); }

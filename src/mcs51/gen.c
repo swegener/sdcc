@@ -3518,8 +3518,9 @@ genPcall (iCode * ic)
 {
   sym_link *dtype;
   sym_link *etype;
-  bool swapBanks = FALSE;
-  bool resultInF0 = FALSE;
+  bool swapBanks = false;
+  bool resultInF0 = false;
+  bool assignResultGenerated = false;
 
   D (emitcode (";", "genPcall"));
 
@@ -3543,8 +3544,6 @@ genPcall (iCode * ic)
       // need caution message to user here
     }
 
-  wassertl (!bigreturn, "Unimplemented struct / union return in call via function pointer");
-
   if (IS_LITERAL (etype))
     {
       /* if send set is not empty then assign */
@@ -3552,6 +3551,36 @@ genPcall (iCode * ic)
         {
           genSend (reverseSet (_G.sendSet));
           _G.sendSet = NULL;
+        }
+
+      // Pass pointer for storing return value
+      if (bigreturn)
+        {
+          wassert (IC_RESULT (ic));
+          symbol *sym = OP_SYMBOL (IC_RESULT (ic));
+          wassert (sym);
+
+          if (sym->onStack)
+            {
+              emitcode ("mov", "a,%s", SYM_BP (sym));
+              if (stackoffset (sym))
+                emitcode ("add", "a,#!constbyte", stackoffset (sym) & 0xff);
+              emitpush ("acc");
+              emitcode ("clr", "a");
+              emitpush ("acc");
+              emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
+              emitpush ("acc");
+            }
+          else
+            {
+              emitcode ("mov", "acc, #%s", sym->rname);
+              emitpush ("acc");
+              emitcode ("mov", "acc, #(%s >> 8)", sym->rname);
+              emitpush ("acc");
+              emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
+              emitpush ("acc");
+            }
+          assignResultGenerated = true;
         }
 
       if (swapBanks)
@@ -3580,6 +3609,7 @@ genPcall (iCode * ic)
     }
   else
     {
+      wassertl (!bigreturn, "Unimplemented struct / union return in call via function pointer");
       if (IFFUNC_ISBANKEDCALL (dtype))
         {
           if (IFFUNC_CALLEESAVES (dtype))
@@ -3682,15 +3712,24 @@ genPcall (iCode * ic)
           emitcode ("lcall", "__sdcc_call_dptr");
         }
     }
+
+  // Adjust stack pointer for the hidden pointer parameter.
+  if (bigreturn)
+    {
+      emitpop (0);
+      emitpop (0);
+      emitpop (0);
+    }
+
   if (swapBanks)
     {
       selectRegBank (FUNC_REGBANK (currFunc->type), IS_BIT (etype));
     }
 
   /* if we need assign a result value */
-  if ((IS_ITEMP (IC_RESULT (ic)) &&
+  if (!assignResultGenerated && ((IS_ITEMP (IC_RESULT (ic)) &&
        !IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
-       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->accuse || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
+       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->accuse || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic))))
     {
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);

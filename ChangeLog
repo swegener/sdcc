@@ -1,5 +1,12 @@
 2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/mcs51/gen.c,
+	  src/stm8/gen.c,
+	  support/regression/tests/funptrsstructreturn.c.in:
+	  Fixes for calls via function pointers to functions returning struct / union.
+
+2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCicode.c,
 	  src/SDCCsymt.c,
 	  src/mcs51/gen.c,
@@ -11,7 +18,7 @@
 	  device/lib/mcs51/Makefile.in,
 	  support/regression/tests/div.c,
 	  device/include/stdlib.h:
-	  struct/union return for mcs51.
+	  struct / union return for mcs51.
 
 2022-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

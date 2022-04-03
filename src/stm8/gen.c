@@ -3712,6 +3712,8 @@ genCall (const iCode *ic)
         }
       else if (!stm8IsParmInCall(ftype, "x")) // 5 bytes, 5 cycles.
         {
+          if (ic->op == PCALL && (left->aop->regs[XL_IDX] >= 0 || left->aop->regs[XH_IDX] >= 0))
+            UNIMPLEMENTED;
           emit2 ("ldw", "x, sp");
           emit2 ("addw", "x, #%d", stk + G.stack.pushed);
           cost (1 + 3, 1 + 2);
@@ -3719,6 +3721,8 @@ genCall (const iCode *ic)
         }
       else if (!stm8IsParmInCall(ftype, "y")) // 8 bytes, 6 cycles.
         {
+          if (ic->op == PCALL && (left->aop->regs[YL_IDX] >= 0 || left->aop->regs[YH_IDX] >= 0))
+            UNIMPLEMENTED;
           emit2 ("ldw", "y, sp");
           emit2 ("addw", "y, #%d", stk + G.stack.pushed);
           cost (2 + 4, 1 + 2);

@@ -109,7 +109,7 @@ ${PORTS:%=test-%} : test-%: test-common
 	$(MAKE) test-port PORT=$*
 
 # Shorthand for testing the mcs51 port only
-test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-stack-auto test-mcs51-large-stack-auto test-mcs51-xstack-auto
+test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-small-stack-auto test-mcs51-large-stack-auto test-mcs51-xstack-auto
 
 # Shorthand for testing the z80 related ports only
 test-z80: test-ucz80 test-ucz80-undoc test-ucz80-resiy test-ucz180 test-ucz180-resiy test-ucz80n test-ucgbz80 test-ucr2k test-ucr2ka test-ucr3ka test-ez80-z80 test-tlcs90

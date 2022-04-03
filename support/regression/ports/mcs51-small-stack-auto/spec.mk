@@ -1,4 +1,4 @@
-# Regression test specification for the mcs51-stack-auto target running with uCsim
+# Regression test specification for the mcs51-small-stack-auto target running with uCsim
 #
 # model small stack-auto
 

@@ -21,7 +21,7 @@ struct S0 {
 short a = 1;
 
 struct S0 b = { 1 }, c, d, e;
-#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
 struct S0 fn1() { return c; }
 
 void fn2 (void)
@@ -34,7 +34,7 @@ void fn2 (void)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51 // mcs51 does not yet support returning struct
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
   fn2 ();
   if (a != 0)
     ASSERT (0);

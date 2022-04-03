@@ -1,3 +1,12 @@
+2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/mcs51/gen.c,
+	  src/mcs51/main.c,
+	  support/regression/tests/structreturn.c.in:
+	  struct/union return for mcs51.
+
 2022-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/mcs51/gen.c,

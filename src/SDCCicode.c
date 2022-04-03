@@ -3735,7 +3735,7 @@ geniCodeCall (operand * left, ast * parms, int lvl)
       sym->type = copyLinkChain (type);
       sym->etype = getSpec (sym->type);
       SPEC_SCLS (sym->etype) = S_AUTO;
-      allocVariables (sym);
+      currFunc->stack += allocVariables (sym);
       IC_RESULT (ic) = operandFromSymbol (sym, false);
       return (operandFromSymbol (sym, true));
     }

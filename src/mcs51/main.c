@@ -115,6 +115,10 @@ _mcs51_regparm (sym_link *l, bool reentrant)
   if (IS_STRUCT (l))
     return 0;
 
+  // For struct return keep regs free for pushing hidden parameter.
+  if (IS_STRUCT(regParmFuncType->next))
+    return 0;
+
   if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
     {
       /* bit parameters go to b0 thru b7 */

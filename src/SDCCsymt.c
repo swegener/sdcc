@@ -3237,7 +3237,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if (TARGET_IS_MCS51 && IS_AGGREGATE (sym->type->next))
+  if ((TARGET_IS_DS390 || TARGET_HC08_LIKE || TARGET_IS_MOS6502)  && IS_AGGREGATE (sym->type->next))
     {
       werrorfl (sym->fileDef, sym->lineDef, E_FUNC_AGGR, sym->name);
       return 0;

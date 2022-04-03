@@ -3287,6 +3287,39 @@ selectRegBank (short bank, bool keepFlags)
 }
 
 /*-----------------------------------------------------------------*/
+/* pushbigreturn - emit code to push hidden pointer for struct return */
+/*-----------------------------------------------------------------*/
+static void
+pushbigreturn (operand *result)
+{
+  wassert (result);
+
+  symbol *sym = OP_SYMBOL (result);
+  wassert (sym);
+
+  if (sym->onStack)
+    {
+      emitcode ("mov", "a,%s", SYM_BP (sym));
+      if (stackoffset (sym))
+        emitcode ("add", "a,#!constbyte", stackoffset (sym) & 0xff);
+      emitpush ("acc");
+      emitcode ("clr", "a");
+      emitpush ("acc");
+      emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (result))), 0, 0));
+      emitpush ("acc");
+    }
+  else
+    {
+      emitcode ("mov", "acc, #%s", sym->rname);
+      emitpush ("acc");
+      emitcode ("mov", "acc, #(%s >> 8)", sym->rname);
+      emitpush ("acc");
+      emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (result))), 0, 0));
+      emitpush ("acc");
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -3337,30 +3370,7 @@ genCall (iCode * ic)
   // Pass pointer for storing return value
   if (bigreturn)
     {
-      wassert (IC_RESULT (ic));
-      symbol *sym = OP_SYMBOL (IC_RESULT (ic));
-      wassert (sym);
-
-      if (sym->onStack)
-        {
-          emitcode ("mov", "a,%s", SYM_BP (sym));
-          if (stackoffset (sym))
-            emitcode ("add", "a,#!constbyte", stackoffset (sym) & 0xff);
-          emitpush ("acc");
-          emitcode ("clr", "a");
-          emitpush ("acc");
-          emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
-          emitpush ("acc");
-        }
-      else
-        {
-          emitcode ("mov", "acc, #%s", sym->rname);
-          emitpush ("acc");
-          emitcode ("mov", "acc, #(%s >> 8)", sym->rname);
-          emitpush ("acc");
-          emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
-          emitpush ("acc");
-        }
+      pushbigreturn (IC_RESULT (ic));
       assignResultGenerated = true;
     }
 
@@ -3553,33 +3563,10 @@ genPcall (iCode * ic)
           _G.sendSet = NULL;
         }
 
-      // Pass pointer for storing return value
+        // Pass pointer for storing return value
       if (bigreturn)
         {
-          wassert (IC_RESULT (ic));
-          symbol *sym = OP_SYMBOL (IC_RESULT (ic));
-          wassert (sym);
-
-          if (sym->onStack)
-            {
-              emitcode ("mov", "a,%s", SYM_BP (sym));
-              if (stackoffset (sym))
-                emitcode ("add", "a,#!constbyte", stackoffset (sym) & 0xff);
-              emitpush ("acc");
-              emitcode ("clr", "a");
-              emitpush ("acc");
-              emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
-              emitpush ("acc");
-            }
-          else
-            {
-              emitcode ("mov", "acc, #%s", sym->rname);
-              emitpush ("acc");
-              emitcode ("mov", "acc, #(%s >> 8)", sym->rname);
-              emitpush ("acc");
-              emitcode ("mov", "acc, #0x%02x", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_RESULT (ic)))), 0, 0));
-              emitpush ("acc");
-            }
+          pushbigreturn (IC_RESULT (ic));
           assignResultGenerated = true;
         }
 
@@ -3609,9 +3596,15 @@ genPcall (iCode * ic)
     }
   else
     {
-      wassertl (!bigreturn, "Unimplemented struct / union return in call via function pointer");
       if (IFFUNC_ISBANKEDCALL (dtype))
         {
+          // Pass pointer for storing return value
+          if (bigreturn)
+            {
+              pushbigreturn (IC_RESULT (ic));
+              assignResultGenerated = true;
+            }
+
           if (IFFUNC_CALLEESAVES (dtype))
             {
               werror (E_BANKED_WITH_CALLEESAVES);
@@ -3657,6 +3650,7 @@ genPcall (iCode * ic)
         }
       else if (_G.sendSet)      /* the send set is not empty */
         {
+          wassertl (!bigreturn, "Unimplemented struct / union return in call via function pointer");
           symbol *callLabel = newiTempLabel (NULL);
           symbol *returnLabel = newiTempLabel (NULL);
 
@@ -3686,6 +3680,13 @@ genPcall (iCode * ic)
         }
       else                      /* the send set is empty */
         {
+          // Pass pointer for storing return value
+          if (bigreturn)
+            {
+              pushbigreturn (IC_RESULT (ic));
+              assignResultGenerated = true;
+            }
+
           /* now get the called address into dptr */
           aopOp (IC_LEFT (ic), ic, FALSE);
 

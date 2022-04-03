@@ -3,6 +3,8 @@
 	* support/regression/Makefile.in,
 	  support/regression/ports/mcs51-small-stack-auto:
 	  Rename mcs51-stack-auto to mcs51-small-stack-auto for consistency with mcs51-small and mcs51-large-stack-auto.
+	* doc/sdccman.lyx:
+	  Clarify __z88dk_callee behaviour.
 
 2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

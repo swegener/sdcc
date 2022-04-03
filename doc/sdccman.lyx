@@ -44220,10 +44220,9 @@ The current default is the SDCC calling convention, version 1.
  other compilers.
  For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
  which is passed the same way as the return value of __sdcccall(0).
- For __z88dk_callee, parameters are passed on the stack, but the stack is
- not adjusted for the parameters after the call (thus the callee has to
- do this instead).
- __z88dk_callee can be combined with __smallc.
+ For __z88dk_callee, the stack is not adjusted for stack parameters the
+ parameters after the call (thus the callee has to do this instead).
+ __z88dk_callee can be combined with __smallc, __sdcccall(0) or __sdcccall(1).
 \end_layout
 
 \begin_layout Subsubsection
@@ -44284,7 +44283,7 @@ This calling convention can be chosen per function via __sdcccall(0).
  Except for the SM83, where 8-bit values are passed in e, 16-bit values
  in de, 32-bit values in hlde.
  Larger return values (as well as struct and union independent of their
- size) are passed in memory in a location specified by the caller through
+ size) are passed in a memory in a location specified by the caller through
  a hidden pointer argument.
  Unless __z88dk_callee is used, all stack parameters are cleaned up by the
  caller.
@@ -44304,10 +44303,9 @@ The default is the Z80 SDCC calling convention, version 0 as described above.
  other compilers.
  For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
  which is passed the same way as the return value.
- For __z88dk_callee, parameters are passed on the stack, but the stack is
- not adjusted for the parameters after the call (thus the callee has to
- do this instead).
- __z88dk_callee can be combined with __smallc.
+ For __z88dk_callee, the stack is not adjusted for stack parameters the
+ parameters after the call (thus the callee has to do this instead).
+ __z88dk_callee can be combined with __smallc, __sdcccall(0) or __sdcccall(1).
 \end_layout
 
 \begin_layout Subsubsection

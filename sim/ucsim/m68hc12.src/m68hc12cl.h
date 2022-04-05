@@ -150,6 +150,7 @@ public:
   virtual int eminm(void);
   virtual int tbl(void);
   virtual int etbl(void);
+  virtual int mem(void);
   
   // MOVE
 #define ld16 ldsx

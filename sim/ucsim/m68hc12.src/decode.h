@@ -1,7 +1,7 @@
 #include "gen.h"
 
 // 00 BGND
-// 01 MEM
+DEC(0, 01,	mem	, _NONE		, "MEM"		, ' ', 1	, 5)
 DEC(0, 02,	inxy	, _cY		, "INY"		, ' ', 1	, 1)
 DEC(0, 03,	dexy	, _cY		, "INY"		, ' ', 1	, 1)
 // 04 loop

@@ -233,7 +233,7 @@ void
 CL12::post_inst(void)
 {
   if (inst_ticks & 0xf00)
-    inst_ticks>>= (4*xb_tick_shift);
+    inst_ticks= (inst_ticks>>(4*xb_tick_shift)) & 0xf;
   tick(inst_ticks);
   if (extra_ticks)
     tick(extra_ticks);

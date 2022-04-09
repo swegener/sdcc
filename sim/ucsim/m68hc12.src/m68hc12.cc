@@ -153,6 +153,7 @@ cl_m68hc12::reset(void)
   cl_m68hcbase::reset();
   rCC= flagStop|flagX|flagI;
   //post_inc_dec= 0;
+  rev_st= 0;
 }
 
 void

@@ -321,5 +321,9 @@ DEC(0x18, 2d,	lbranch	, code		, "LBLT %R"	, ' ', 4	, 1)
 DEC(0x18, 2e,	lbranch	, code		, "LBGT %R"	, ' ', 4	, 1)
 DEC(0x18, 2f,	lbranch	, code		, "LBLE %R"	, ' ', 4	, 1)
 
+DEC(0x18, 3a,	rev	, _NONE		, "REV"		, ' ', 2	, 3)
+// 0x18, 3b, REVW
+// 0x18, 3c, WAV
 DEC(0x18, 3d,	tbl	, _NONE		, "TBL %p"	, ' ', -3	, 6)
+// 0x18, 3e, STOP
 DEC(0x18, 3f,	etbl	, _NONE		, "ETBL %P"	, ' ', -3	, 10)

@@ -493,56 +493,56 @@ cl_uc390::clear_sfr(void)
 
 
 t_mem
-cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::read_mem(const char *id, t_addr addr)
 {
 
-  if (strcmp(/*type*/id,/* == */MEM_XRAM_ID)==0 &&
+  if (strcmp(id,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+      (sfr->get (ACON) & 0x02)) // AM1 set: 24-bit flat?
     {
       addr -= 0x400000;
-      id/*type*/ = MEM_IXRAM_ID;
+      id = MEM_IXRAM_ID;
     }
-  return cl_51core::read_mem(id/*type*/, addr); /* 24 bit */
+  return cl_51core::read_mem(id, addr); // 24 bit
 }
 
 t_mem
-cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::get_mem (const char *id, t_addr addr)
 {
-  if (strcmp(/*type*/id/* == */,MEM_XRAM_ID)==0 &&
+  if (strcmp(id,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+      (sfr->get (ACON) & 0x02)) // AM1 set: 24-bit flat?
     {
       addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      id = MEM_IXRAM_ID;
     }
-  return cl_51core::get_mem (/*type*/id, addr);
+  return cl_51core::get_mem (id, addr);
 }
 
 void
-cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
+cl_uc390::write_mem (const char *id, t_addr addr, t_mem val)
 {
-  if (strcmp(/*type ==*/id, MEM_XRAM_ID)==0 &&
+  if (strcmp(id, MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+      (sfr->get (ACON) & 0x02)) // AM1 set: 24-bit flat?
     {
       addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      id = MEM_IXRAM_ID;
     }
-  cl_51core::write_mem (/*type*/id, addr, val);
+  cl_51core::write_mem (id, addr, val);
 }
 
 void
-cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
+cl_uc390::set_mem (const char *id, t_addr addr, t_mem val)
 {
-  if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
+  if (strcmp(id,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+      (sfr->get (ACON) & 0x02)) // AM1 set: 24-bit flat?
     {
       addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      id = MEM_IXRAM_ID;
     }
-  cl_51core::set_mem (id/*type*/, addr, val);
+  cl_51core::set_mem (id, addr, val);
 }
 
 /*
@@ -555,9 +555,9 @@ cl_uc390::push_byte (t_mem uc)
   t_addr sp;
 
   sp = sfr->write(SP, sfr->read(SP) + 1);
-  if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
+  if (sfr->get (ACON) & 0x04) // SA: 10 bit stack
     {
-      if (sp == 0) /* overflow SP */
+      if (sp == 0) // overflow SP
         sfr->write(R51_ESP, sfr->read(R51_ESP) + 1);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
       write_mem (MEM_IXRAM_ID, sp, uc); // fixme
@@ -577,13 +577,13 @@ cl_uc390::pop_byte (void)
   t_mem temp;
   t_addr sp;
 
-  if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
+  if (sfr->get (ACON) & 0x04) // SA: 10 bit stack
     {
       sp = sfr->read (SP);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
       temp = read_mem (MEM_IXRAM_ID, sp); // fixme
       sp = sfr->write(SP, sfr->read(SP) - 1);
-      if (sp == 0xff) /* underflow SP */
+      if (sp == 0xff) // underflow SP
         sfr->write(R51_ESP, sfr->read(R51_ESP) - 1);
       return temp;
     }

@@ -1114,20 +1114,6 @@ cl_uc::set_mem(const char *id, t_addr addr, t_mem val)
 }
 
 
-/*
-class cl_memory *
-cl_uc::mem(enum mem_class type)
-{
-  class cl_m *m;
-
-  if (mems->count < type)
-    m= (class cl_m *)(mems->at(MEM_DUMMY));
-  else
-    m= (class cl_m *)(mems->at(type));
-  return(m);
-}
-*/
-
 class cl_address_space *
 cl_uc::address_space(const char *id)
 {
@@ -1636,6 +1622,145 @@ cl_uc::read_cdb_file(cl_f *f)
   return cnt;
 }
 
+static int h1(const char *s, int p)
+{
+  int r= 0;
+  if (isxdigit(s[p]))
+    {
+      if (s[p]>='a')
+	r= 10+(s[p]-'a');
+      else if (s[p]>='A')
+	r= 10+(s[p]-'A');
+      else
+	r= s[p]-'0';
+    }
+  return r;
+}
+
+static int h2(const char *s, int p)
+{
+  int r= 0;
+  if (isxdigit(s[p]) && isxdigit(s[p+1]))
+    {
+      r= 16 * h1(s, p);
+      r+= h1(s, p+1);
+    }
+  return r;
+}
+
+static t_addr a16(const char *s, int p)
+{
+  t_addr a;
+  a= h2(s, p);
+  a<<= 8;
+  a+= h2(s, p+2);
+  return a;
+}
+
+static t_addr a24(const char *s, int p)
+{
+  t_addr a;
+  a= h2(s, p);
+  a<<= 8;
+  a+= h2(s, p+2);
+  a<<= 8;
+  a+= h2(s, p+4);
+  return a;
+}
+
+static t_addr a32(const char *s, int p)
+{
+  t_addr a;
+  a= h2(s, p);
+  a<<= 8;
+  a+= h2(s, p+2);
+  a<<= 8;
+  a+= h2(s, p+4);
+  a<<= 8;
+  a+= h2(s, p+6);
+  return a;
+}
+
+static int s19(class cl_uc *uc, t_addr a, const char *s, int p, int data_bytes)
+{
+  int b= 0;
+  if (data_bytes < 1)
+    return 0;
+  while (b < data_bytes)
+    {
+      u8_t d= h2(s, p);
+      uc->set_rom(a, d);
+      a++;
+      p+= 2;
+      b++;
+    }
+  return data_bytes;
+}
+
+long
+cl_uc::read_s19_file(cl_f *f)
+{
+  chars line;
+  int cnt;
+  long int written= 0;
+  while (!f->eof())
+    {
+      line= f->get_s();
+      if (line.empty())
+	continue;
+      const char *s= line.c_str();
+      if (s[0] != 'S')
+	continue;
+      if (line.length() < 4)
+	continue;
+      cnt= h2(s, 2);
+      if (line.length() < 4+cnt*2)
+	continue;
+      int b= 0, sum= 0, p= 2;
+      while (b<cnt)
+	{
+	  if (s[p] && s[p+1])
+	    sum+= h2(s, p);
+	  b++;
+	  p+= 2;
+	}
+      if (b!=cnt)
+	continue;
+      int chk= h2(s, 2+cnt*2);
+      sum&= 0xff;
+      sum^= 0xff;
+      if (sum != chk)
+	continue;
+      t_addr a;
+      switch (s[1])
+	{
+	case '0': break;
+	case '1':
+	  a= a16(s, 4);
+	  p=  8;
+	  written+= s19(this, a, s, p, cnt-2-1);
+	  break;
+	case '2':
+	  a= a24(s, 4);
+	  p= 10;
+	  written+= s19(this, a, s, p, cnt-3-1);
+	  break;
+	case '3':
+	  a= a32(s, 4);
+	  p= 12;
+	  written+= s19(this, a, s, p, cnt-4-1);
+	  break;
+	case '4': break;
+	case '5': break;
+	case '6': break;
+	case '7': break;
+	case '8': break;
+	case '9': break;
+	}
+    }
+  return written;
+}
+
 cl_f *
 cl_uc::find_loadable_file(chars nam)
 {
@@ -1664,6 +1789,11 @@ cl_uc::find_loadable_file(chars nam)
   if (o)
     return f;
   c= chars("", "%s.ihex", nam.c_str());
+  f->open(c, "r");
+  o= (f->opened());
+  if (o)
+    return f;
+  c= chars("", "%s.s19", nam.c_str());
   f->open(c, "r");
   o= (f->opened());
   if (o)
@@ -1704,6 +1834,12 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
   if (is_hex_file(f))
     {
       l= read_hex_file(f);
+      if (!application->quiet)
+	printf("%ld words read from %s\n", l, f->get_fname());
+    }
+  else if (is_s19_file(f))
+    {
+      l= read_s19_file(f);
       if (!application->quiet)
 	printf("%ld words read from %s\n", l, f->get_fname());
     }

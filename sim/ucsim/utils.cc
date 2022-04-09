@@ -351,6 +351,23 @@ is_cdb_file(class cl_f *f)
   return false;
 }
 
+bool
+is_s19_file(class cl_f *f)
+{
+  const char *n;
+  if (!f)
+    return false;
+  n= f->get_file_name();
+  if (!n ||
+      !*n)
+    return false;
+
+  if (strend(n, ".s19"))
+    return true;
+
+  return false;
+}
+
 /*
   option_name=col_opt:col_opt
 

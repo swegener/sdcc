@@ -425,4 +425,10 @@ sigpipe_off()
 
 unsigned int cperiod_value() { return 1000000; }
 
+int
+set_console_mode()
+{
+  return 0;
+}
+
 /* End of fuio.cc */

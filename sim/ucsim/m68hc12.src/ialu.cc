@@ -554,5 +554,69 @@ CL12::mem(void)
   return resGO;
 }
 
+int
+CL12::rev(void)
+{
+  bool V= rF&flagV;
+  switch (rev_st)
+    {
+    case 0: case 2: // prepare
+      rd_Rx= rom->read(rX);
+      vc.rd++;
+      cX.W(rX+1);
+      rev_st= 1;
+      tick(3);
+      PC= instPC;
+      break;
+    case 1: // step
+      Rx= rd_Rx;
+      if ((Rx == 0xfe) || (Rx == 0xff))
+	{
+	  rd_Fy= rom->read(rY+Rx);
+	  vc.rd++;
+	}
+      if (Rx == 0xFE)
+	{
+	  if (V)
+	    cA.W(0xff);
+	  cF.W(rF^flagV);
+	  V= rF&flagV;
+	}
+      if (Rx != 0xff)
+	{
+	  rd_Rx= rom->read(rX);
+	  cX.W(rX+1);
+	}
+      if (!V)
+	{
+	  Fy= rd_Fy;
+	  if (Rx == 0xfe)
+	    {
+	      if (Fy < rA)
+		cA.W(Fy);
+	    }
+	  // else {}
+	}
+      else
+	{
+	  Fy= rd_Fy;
+	  if ((Rx == 0xfe) || (Rx == 0xff))
+	    {
+	      if (rA > Fy)
+		{
+		  rom->write(rY+Rx, rA);
+		  vc.wr++;
+		}
+	    }
+	}
+      if (Rx == 0xff)
+	rev_st= 2;
+      else
+	PC= instPC;
+      break;
+    }
+  return resGO;
+}
+
 
 /* End of m68hc12.src/ialu.cc */

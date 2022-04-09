@@ -80,6 +80,7 @@ public:
   class cl_hc12_cpu *cpu12;
   int extra_ticks, xb_tick_shift;
   bool block_irq;
+  u8_t rev_st, rd_Rx, Rx, rd_Fy, Fy; // REV state
 public:
   cl_m68hc12(class cl_sim *asim);
   virtual int init(void);
@@ -151,6 +152,7 @@ public:
   virtual int tbl(void);
   virtual int etbl(void);
   virtual int mem(void);
+  virtual int rev(void);
   
   // MOVE
 #define ld16 ldsx

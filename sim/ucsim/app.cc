@@ -74,6 +74,7 @@ cl_app::cl_app(void)
   if (app_start_at == 0)
     app_start_at= dnow();
   srnd(0);
+  set_console_mode();
 }
 
 cl_app::~cl_app(void)

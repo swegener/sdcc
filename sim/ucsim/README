@@ -9,8 +9,8 @@ What is uCsim?
 
 uCsim is a micro-controller simulator. It is extensible to support
 different micro-controller families. Currently it supports Intel MCS51
-family, XA, Z80, TLCS90, ST7, STM8, PDK, MC6800, MC6809, HC08, MCS6502,
-Rabbit, PicoBlaze and some AVR processors.
+family, XA, Z80, Rabbit, SM83, TLCS90, ST7, STM8, PDK, MC6800, MC6809,
+M68HC08, M68HC11, M68HC12, MOS6502, PicoBlaze and some AVR processors.
 
 
 How to get uCsim?

@@ -2,6 +2,9 @@
 
 	* support/regression/tests/bug-2981.c:
 	  Test for bug #2981.
+	* src/SDCCast.c,
+	  support/regression/tests/bug-3255.c:
+	  Fix bug #3255.
 
 2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -1,4 +1,9 @@
-2022-04-03 Philipp Klaus Krause <pkk AT spth.de>
+2022-04-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-2981.c:
+	  Test for bug #2981.
+
+2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/Makefile.in,
 	  support/regression/ports/mcs51-small-stack-auto:

@@ -26,9 +26,10 @@ Configuration memory of vcd
 # Run the initialization code and stop when we reach the
 # first test loop.
 break 0x800c
-Breakpoint 1 at 0x00800c: 
+Breakpoint 1 at 0x00800c (cond="")
+
 0x0800c    <.loop$0>:
-0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0 (cond="")
+0x0800c F  72 10 00 00    bset   0x0000 <loc1>,#0[0K
 run
 Simulation started, PC=0x008000
 

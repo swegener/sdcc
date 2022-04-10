@@ -66,61 +66,85 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   else if (cmdline->syntax_match(uc, CELL NUMBER STRING STRING)) {
     hit= params[1]->value.number;
     mem= uc->address_space(params[0]->value.cell, &addr);
-    if (!mem)
-      return syntax_error(con),	false;
     s= params[2]->get_svalue();
     if (s && *s &&
 	(strcmp(s, "if") == 0))
       cond= params[3]->get_svalue();
-    if (mem == uc->rom)
+    if (mem && (mem == uc->rom))
       do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, cond, con);
-	do_event(uc, mem, 'w', addr, hit, cond, con);
+	if (!mem)
+	  {
+	    do_event(uc, params[0]->value.cell, 'r', hit, cond, con);
+	    do_event(uc, params[0]->value.cell, 'w', hit, cond, con);
+	  }
+	else
+	  {
+	    do_event(uc, mem, 'r', addr, hit, cond, con);
+	    do_event(uc, mem, 'w', addr, hit, cond, con);
+	  }
       }
   }
   else if (cmdline->syntax_match(uc, CELL STRING STRING)) {
     hit= 1;
     mem= uc->address_space(params[0]->value.cell, &addr);
-    if (!mem)
-      return syntax_error(con),	false;
     s= params[1]->get_svalue();
     if (s && *s &&
 	(strcmp(s, "if") == 0))
       cond= params[2]->get_svalue();
-    if (mem == uc->rom)
+    if (mem && (mem == uc->rom))
       do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, cond, con);
-	do_event(uc, mem, 'w', addr, hit, cond, con);
+	if (!mem)
+	  {
+	    do_event(uc, params[0]->value.cell, 'r', hit, cond, con);
+	    do_event(uc, params[0]->value.cell, 'w', hit, cond, con);
+	  }
+	else
+	  {
+	    do_event(uc, mem, 'r', addr, hit, cond, con);
+	    do_event(uc, mem, 'w', addr, hit, cond, con);
+	  }
       }
   }
   else if (cmdline->syntax_match(uc, CELL NUMBER)) {
     hit= params[1]->value.number;
     mem= uc->address_space(params[0]->value.cell, &addr);
-    if (!mem)
-      return syntax_error(con),	false;
-    if (mem == uc->rom)
+    if (mem && (mem == uc->rom))
       do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, cond, con);
-	do_event(uc, mem, 'w', addr, hit, cond, con);
+	if (!mem)
+	  {
+	    do_event(uc, params[0]->value.cell, 'r', hit, cond, con);
+	    do_event(uc, params[0]->value.cell, 'w', hit, cond, con);
+	  }
+	else
+	  {
+	    do_event(uc, mem, 'r', addr, hit, cond, con);
+	    do_event(uc, mem, 'w', addr, hit, cond, con);
+	  }
       }
   }
   else if (cmdline->syntax_match(uc, CELL)) {
     hit= 1;
     mem= uc->address_space(params[0]->value.cell, &addr);
-    if (!mem)
-      return syntax_error(con),	false;
-    if (mem == uc->rom)
+    if (mem && (mem == uc->rom))
       do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, cond, con);
-	do_event(uc, mem, 'w', addr, hit, cond, con);
+	if (mem)
+	  {
+	    do_event(uc, mem, 'r', addr, hit, cond, con);
+	    do_event(uc, mem, 'w', addr, hit, cond, con);
+	  }
+	else
+	  {
+	    do_event(uc, params[0]->value.cell, 'r', hit, cond, con);
+	    do_event(uc, params[0]->value.cell, 'w', hit, cond, con);
+	  }
       }
   }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER STRING STRING)) {
@@ -234,6 +258,26 @@ cl_break_cmd::do_event(class cl_uc *uc,
   class cl_ev_brk *b= NULL;
 
   b= uc->mk_ebrk(perm, mem, op, addr, hit);
+  if (b)
+    {
+      b->init();
+      b->cond= cond;
+      uc->ebrk->add_bp(b);
+    }
+  else
+    con->dd_printf("Couldn't make event breakpoint\n");
+}
+
+void
+cl_break_cmd::do_event(class cl_uc *uc,
+		       class cl_memory_cell *cell,
+		       char op, int hit,
+		       chars cond,
+		       class cl_console_base *con)
+{
+  class cl_ev_brk *b= NULL;
+
+  b= uc->mk_ebrk(perm, cell, op, hit);
   if (b)
     {
       b->init();

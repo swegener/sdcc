@@ -1318,6 +1318,53 @@ cl_memory_cell::get_banker(void)
   return NULL;
 }
 
+void
+cl_memory_cell::set_brk(class cl_uc *uc, class cl_brk *brk)
+{
+  class cl_memory_operator *op;
+
+  if (!brk) return;
+  switch (brk->get_event())
+    {
+    case brkWRITE: case brkWXRAM: case brkWIRAM: case brkWSFR:
+      //e= 'W';
+      op= new cl_write_operator(this, uc, brk);
+      break;
+    case brkREAD: case brkRXRAM: case brkRCODE: case brkRIRAM: case brkRSFR:
+      //e= 'R';
+      op= new cl_read_operator(this, uc, brk);
+      break;
+    case brkNONE:
+      set_flag(CELL_FETCH_BRK, true);
+      return;
+      break;
+    default:
+      //e= '.';
+      op= 0;
+      break;
+    }
+  if (op)
+    append_operator(op);
+}
+
+void
+cl_memory_cell::del_brk(class cl_brk *brk)
+{
+  if (!brk) return;
+  switch (brk->get_event())
+    {
+    case brkWRITE: case brkWXRAM: case brkWIRAM: case brkWSFR:
+    case brkREAD: case brkRXRAM: case brkRCODE: case brkRIRAM: case brkRSFR:
+      del_operator(brk);
+      break;
+    case brkNONE:
+      set_flag(CELL_FETCH_BRK, false);
+      break;
+    default:
+      break;
+    }
+}
+
 class cl_memory_cell *
 cl_memory_cell::add_hw(class cl_hw *hw)
 {
@@ -1808,19 +1855,18 @@ cl_address_space::set_brk(t_addr addr, class cl_brk *brk)
       addr < start_address)
     return;
   class cl_memory_cell *cell= &cella[idx];
-  class cl_memory_operator *op;
+  /*
+  class cl_memory_operator *op= 0;
 
   switch (brk->get_event())
     {
     case brkWRITE: case brkWXRAM: case brkWIRAM: case brkWSFR:
       //e= 'W';
-      op= new cl_write_operator(cell/*, addr*/, //cell->get_data(), cell->get_mask(),
-				uc, brk);
+      op= new cl_write_operator(cell, uc, brk);
       break;
     case brkREAD: case brkRXRAM: case brkRCODE: case brkRIRAM: case brkRSFR:
       //e= 'R';
-      op= new cl_read_operator(cell/*, addr*/, //cell->get_data(), cell->get_mask(),
-			       uc, brk);
+      op= new cl_read_operator(cell, uc, brk);
       break;
     case brkNONE:
       set_cell_flag(addr, true, CELL_FETCH_BRK);
@@ -1833,6 +1879,8 @@ cl_address_space::set_brk(t_addr addr, class cl_brk *brk)
     }
   if (op)
     cell->append_operator(op);
+  */
+  cell->set_brk(uc, brk);
 }
 
 void
@@ -1843,7 +1891,7 @@ cl_address_space::del_brk(t_addr addr, class cl_brk *brk)
       addr < start_address)
     return;
   class cl_memory_cell *cell= &cella[idx];
-
+  /*
   switch (brk->get_event())
     {
     case brkWRITE: case brkWXRAM: case brkWIRAM: case brkWSFR:
@@ -1857,6 +1905,8 @@ cl_address_space::del_brk(t_addr addr, class cl_brk *brk)
     default:
       break;
     }
+  */
+  cell->del_brk(brk);
 }
 
 void

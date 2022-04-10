@@ -472,14 +472,12 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
       if (m->is_address_space())
 	as= (cl_address_space *)m;
     }
-  if (as == 0)
-    return syntax_error(con), false;
 
   if (!c)
     c= as->get_cell(a);
-  con->dd_printf("%s", as->get_name());
+  con->dd_printf("%s", as?(as->get_name()):"-");
   con->dd_printf("[");
-  con->dd_printf(as->addr_format, a);
+  if (as) con->dd_printf(as->addr_format, a);
   con->dd_printf("] %s\n", uc->cell_name(c).c_str());
 
   con->dd_printf("cell width=%d mask=%x flags=%x\n",

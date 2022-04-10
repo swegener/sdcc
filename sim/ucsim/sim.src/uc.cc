@@ -2464,6 +2464,30 @@ cl_uc::symbol2address(char *sym,
   return false;
 }
 
+bool
+cl_uc::symbol2cell(char *sym,
+		   class cl_memory_cell **cell)
+{
+  t_index i;
+
+  if (!sym ||
+      !*sym)
+    return false;
+  if (vars->by_name.search(sym, i))
+    {
+      class cl_cvar *v= vars->by_name.at(i);
+      class cl_memory_cell *c= v->get_cell();
+      if (c)
+	{
+	  if (cell)
+	    *cell= c;
+	  return true;
+	}
+    }
+  return false;
+}
+
+
 /*
  * Searching for a name in the specified table
  */
@@ -3373,6 +3397,18 @@ cl_uc::mk_ebrk(enum brk_perm perm, class cl_address_space *mem,
   op= toupper(op);
 
   b= new cl_ev_brk(mem, make_new_brknr(), addr, perm, hit, op);
+  b->init();
+  return(b);
+}
+
+class cl_ev_brk *
+cl_uc::mk_ebrk(enum brk_perm perm, class cl_memory_cell *cell,
+	       char op, int hit)
+{
+  class cl_ev_brk *b;
+  op= toupper(op);
+
+  b= new cl_ev_brk(cell, make_new_brknr(), perm, hit, op);
   b->init();
   return(b);
 }

@@ -279,6 +279,8 @@ class cl_memory_cell: public cl_cell_data
   virtual void del_operator(class cl_brk *brk);
   virtual void del_operator(class cl_hw *hw);
   virtual class cl_banker *get_banker(void);
+  virtual void set_brk(class cl_uc *uc, class cl_brk *brk);
+  virtual void del_brk(class cl_brk *brk);
   
   virtual class cl_memory_cell *add_hw(class cl_hw *hw/*, t_addr addr*/);
   virtual void remove_hw(class cl_hw *hw);

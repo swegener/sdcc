@@ -71,7 +71,8 @@ F 0x0080b0
 set hw cpu pipetrace stop
 
 break 0x0100
-Breakpoint 1 at 0x000100: 0x00100 F? 0b             UNKNOWN/INVALID (cond="")
+Breakpoint 1 at 0x000100 (cond="")
+0x00100 F? 0b             UNKNOWN/INVALID[0K
 cont
 Simulation started, PC=0x0080b0
 

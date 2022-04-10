@@ -45,6 +45,11 @@ COMMAND_METHODS_ON(uc,cl_break_cmd)
 			char op, t_addr addr, int hit,
 			chars cond,
 			class cl_console_base *con);
+  virtual void do_event(class cl_uc *uc,
+			class cl_memory_cell *cell,
+			char op, int hit,
+			chars cond,
+			class cl_console_base *con);
 COMMAND_TAIL;
 
 // TBREAK

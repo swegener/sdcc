@@ -5,6 +5,9 @@
 	* src/SDCCast.c,
 	  support/regression/tests/bug-3255.c:
 	  Fix bug #3255.
+	* src/SDCCglue.c,
+	  support/valdiag/tests/generic.c:
+	  Fix part of bug #3145.
 
 2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

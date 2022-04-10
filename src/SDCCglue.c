@@ -239,6 +239,10 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
                 }
               if (ival)
                 {
+                  // No point trying to initialize by something that doesn't even make sense.
+                  if (astErrors (ival))
+                    continue;
+                  
                   // set ival's lineno to where the symbol was defined
                   setAstFileLine (ival, filename = tsym->fileDef, lineno = tsym->lineDef);
                   // check if this is not a constant expression

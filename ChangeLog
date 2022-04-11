@@ -1,3 +1,9 @@
+2022-04-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-3379.c:
+	  Fix bug #3379.
+
 2022-04-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bug-2981.c:

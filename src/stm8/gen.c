@@ -3821,7 +3821,7 @@ genCall (const iCode *ic)
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
-          adjustStack (prestackadjust, true, true, true);
+          adjustStack (prestackadjust, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), !stm8IsParmInCall(ftype, "y"));
 
           emit2 (jump ? "jpf" : "callf", "[%s]", left->aop->aopu.aop_dir);
           cost (4, jump ? 6 : 8);
@@ -3905,7 +3905,7 @@ genCall (const iCode *ic)
 
           if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
             {
-              adjustStack (prestackadjust, true, true, true);
+              adjustStack (prestackadjust, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), !stm8IsParmInCall(ftype, "y"));
 
               if (left->aop->type == AOP_LIT)
                 emit2 (jump ? "jp" : "call", "0x%02x%02x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
@@ -3917,7 +3917,7 @@ genCall (const iCode *ic)
             {
               genMove (ASMOP_Y, left->aop, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), true);
 
-              adjustStack (prestackadjust, true, true, false);
+              adjustStack (prestackadjust, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), false);
 
               emit2 (jump ? "jp" : "call", "(y)");
               cost (2,jump ? 1 : 4);
@@ -3980,7 +3980,7 @@ genCall (const iCode *ic)
           cost (4, 4);
         }
 
-      adjustStack (prestackadjust, true, true, true);
+      adjustStack (prestackadjust, !stm8IsParmInCall(ftype, "a"), !stm8IsParmInCall(ftype, "x"), !stm8IsParmInCall(ftype, "y"));
 
       if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (ftype))
         {

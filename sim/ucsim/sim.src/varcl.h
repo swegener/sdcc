@@ -166,6 +166,7 @@ class cl_var_list: public cl_base
    */
   bool del(const char *name);
 
+  virtual cl_var *by_cell(class cl_memory_cell *c);
   
   /*! \brief Return the length of the longest var name.
    */

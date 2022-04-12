@@ -52,30 +52,59 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
   bool extra;
-
-  con->dd_printf("Num Type       Disp Hit   Cnt   Address  Cond  What\n");
+  chars sa;
+  class cl_memory_cell *c;
+  class cl_var *v;
+  
+  con->dd_printf("Num Type       Disp Hit   Cnt   Address  Cond\n");
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
-      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s ", fb->nr,
+      class cl_memory *mem= fb->get_mem();
+      if (mem)
+	  sa.format("0x%06x", fb->addr);
+      else
+	{
+	  c= fb->get_cell();
+	  v= uc->vars->by_cell(c);
+	  if (v)
+	    sa= v->get_name();
+	  else
+	    sa= "cell";	  
+	  sa.substr(0,8);
+	}
+      con->dd_printf("%-3d %-10s %s %-5d %-5d %8s %-5s ", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
-                     fb->hit, fb->cnt, AU(fb->addr),
+                     fb->hit, fb->cnt, sa.c_str(),
 		     fb->condition()?"true":"false");
-      uc->print_disass(fb->addr, con);
+      //uc->print_disass(fb->addr, con);
       extra= false;
       if (!(fb->cond.empty()))
 	con->dd_printf("     cond=\"%s\"", fb->cond.c_str()), extra= true;
       if (!(fb->commands.empty()))
 	con->dd_printf("     cmd=\"%s\"", fb->commands.c_str()), extra= true;
-      if (extra) con->dd_printf("\n");
+      /*if (extra)*/ con->dd_printf("\n");
     }
   for (i= 0; i < uc->ebrk->count; i++)
     {
       class cl_ev_brk *eb= (class cl_ev_brk *)(uc->ebrk->at(i));
-      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
+      class cl_memory *mem= eb->get_mem();
+      if (mem)
+	sa.format("0x%06x", eb->addr);
+      else
+	{
+	  c= eb->get_cell();
+	  v= uc->vars->by_cell(c);
+	  if (v)
+	    sa= v->get_name();
+	  else
+	    sa= "cell";
+	  sa.substr(0,8);
+	}
+      con->dd_printf("%-3d %-10s %s %-5d %-5d %8s %s\n", eb->nr,
 		     "event", (eb->perm==brkFIX)?"keep":"del ",
 		     eb->hit, eb->cnt,
-		     AU(eb->addr), eb->id);
+		     sa.c_str(), eb->id);
       extra= false;
       if (!(eb->cond.empty()))
 	con->dd_printf("     cond=\"%s\"", eb->cond.c_str()), extra= true;

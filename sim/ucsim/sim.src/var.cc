@@ -482,6 +482,20 @@ cl_var_list::add(chars prefix, class cl_memory *mem, t_addr base, const struct v
     }
 }
 
+class cl_var *
+cl_var_list::by_cell(class cl_memory_cell *c)
+{
+  t_index i;
+  for (i= 0; i<by_name.count; i++)
+    {
+      class cl_var *v= (class cl_var *)(by_name.at(i));
+      class cl_memory_cell *cell= v->get_cell();
+      if (cell == c)
+	return v;
+    }
+  return NULL;
+}
+
 t_mem
 cl_var_list::read(chars name)
 {

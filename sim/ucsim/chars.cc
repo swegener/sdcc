@@ -327,6 +327,25 @@ chars::subst(const char *what, char with)
   return *this;
 }
 
+chars &
+chars::substr(int start, int maxlen)
+{
+  if (!chars_string)
+    return *this;
+
+  char *s= (char*)malloc(maxlen+1);
+  int i, l;
+  for (i= start, l= 0; i<chars_length && chars_string[i] && l<maxlen; i++, l++)
+    s[l]= chars_string[i];
+  s[l]= 0;
+  deallocate_string();
+  chars_string= s;
+  chars_length= l;
+  dynamic= true;
+  return *this;
+}
+
+
 // Assignment operators
 chars &
 chars::operator=(const char *s)

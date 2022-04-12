@@ -63,7 +63,8 @@ public:
   virtual ~cl_brk(void);
 
   class cl_address_space *get_mem(void) { return(mem); }
-
+  class cl_memory_cell *get_cell(void);
+  
   virtual bool condition(void);
   virtual void activate(void);
   virtual void inactivate(void);

@@ -85,6 +85,19 @@ cl_brk::condition(void)
   return l!=0;
 }
 
+cl_memory_cell *
+cl_brk::get_cell(void)
+{
+  if (cell)
+    return cell;
+  if (mem)
+    {
+      cl_memory_cell *c= mem->get_cell(addr);
+      return c;
+    }
+  return NULL;
+}
+
 void
 cl_brk::activate(void)
 {

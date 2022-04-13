@@ -14,9 +14,17 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
+#ifdef HAVE_WINCON_H
+#include <wincon.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
 #include <io.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "fwiocl.h"
 
@@ -637,14 +645,32 @@ set_console_mode()
       return false;
     }
   
-  DWORD dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+  DWORD dwRequestedOutModes =
+#ifdef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#else
+    0x4
+#endif
+    |
+#ifdef DISABLE_NEWLINE_AUTO_RETURN
+    DISABLE_NEWLINE_AUTO_RETURN
+#else
+    0x8
+#endif
+    ;
   //DWORD dwRequestedInModes = ENABLE_VIRTUAL_TERMINAL_INPUT;
   
   DWORD dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
   if (!SetConsoleMode(hOut, dwOutMode))
     {
       // we failed to set both modes, try to step down mode gracefully.
-      dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      dwRequestedOutModes =
+#ifdef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+	ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#else
+	0x4
+#endif
+	;
       dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
       if (!SetConsoleMode(hOut, dwOutMode))
         {
@@ -653,7 +679,13 @@ set_console_mode()
         }
     }
   
-  DWORD dwInMode = dwOriginalInMode | ENABLE_VIRTUAL_TERMINAL_INPUT;
+  DWORD dwInMode = dwOriginalInMode |
+#ifdef ENABLE_VIRTUAL_TERMINAL_INPUT
+    ENABLE_VIRTUAL_TERMINAL_INPUT
+#else
+    0x200
+#endif
+    ;
   if (!SetConsoleMode(hIn, dwInMode))
     {
       // Failed to set VT input mode, can't do anything here.
@@ -661,6 +693,15 @@ set_console_mode()
     }
   
   return 0;
+}
+
+
+double
+dnow(void)
+{
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (double)tv.tv_sec + ((double)tv.tv_usec/1000000.0);
 }
 
 

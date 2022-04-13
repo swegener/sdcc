@@ -5854,6 +5854,13 @@ then :
 
 fi
 
+ac_fn_cxx_check_header_compile "$LINENO" "wincon.h" "ac_cv_header_wincon_h" "$ac_includes_default"
+if test "x$ac_cv_header_wincon_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_WINCON_H 1" >>confdefs.h
+
+fi
+
 
 ac_fn_cxx_check_header_compile "$LINENO" "curses.h" "ac_cv_header_curses_h" "$ac_includes_default"
 if test "x$ac_cv_header_curses_h" = xyes

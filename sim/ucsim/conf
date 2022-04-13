@@ -57,6 +57,11 @@ case $TARGET in
 	if [ -d	/usr/local/cross-tools/mingw32 ] ; then
 	    export CC=/usr/local/cross-tools/mingw32/bin/gcc
 	    export CXX=/usr/local/cross-tools/mingw32/bin/g++
+	elif [ $(hostname) = "d30" ]; then
+	    export CC=i586-mingw32msvc-gcc
+	    export CXX=i586-mingw32msvc-g++
+	    export HOST_OPT='--host=i586-mingw32msvc'
+	    export LDFLAGS='-static-libgcc -static-libstdc++'	    
 	else
 	#if echo $DD_HOSTS|grep $(hostname) >/dev/null 2>&1; then
 	    export CC=i686-w64-mingw32-gcc
@@ -71,6 +76,17 @@ case $TARGET in
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
+    w5)
+	export CC=i586-mingw32msvc-gcc
+	export CXX=i586-mingw32msvc-g++
+	export HOST_OPT='--host=i586-mingw32msvc'
+	export LDFLAGS='-static-libgcc -static-libstdc++'	    
+	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
+	./configure --prefix=${PREFIX} \
+		    --disable-dlso \
+		    --enable-m68hc12-port \
+		    $HOST_OPT "$@"
+	;;	
     w64)
 	export CC=x86_64-w64-mingw32-gcc
 	export CXX=x86_64-w64-mingw32-g++

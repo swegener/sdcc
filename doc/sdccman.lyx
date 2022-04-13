@@ -9465,7 +9465,13 @@ stack-auto
 
 
 \series default
- is specified in the mcs51, ds390, hc08, s08, pdk13, pdk14 and pdk15 ports.
+ is specified in the mcs51, ds390, hc08, s08, pdk13, pdk14, pdk15 and mos6502
+ ports.
+\end_layout
+
+\begin_layout Itemize
+struct and union can not be used as parameters or return values in the hc08,
+ s08, ds390, mos6502, pic14 and pic16 ports.
 \end_layout
 
 \begin_layout Subsection

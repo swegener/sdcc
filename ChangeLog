@@ -1,6 +1,13 @@
 2022-04-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c:
+	  Assertion to catch bug #2629 earlier.
+	* support/regression/tests/bug-2629.c:
+	  (Disabled) test for bug #2629.
+
+2022-04-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c:
 	  Fix printing of plain char for error messages and debug output.
 
 2022-04-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

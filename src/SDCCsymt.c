@@ -2771,6 +2771,9 @@ compareType (sym_link *dest, sym_link *src)
     {
       if (IS_DECL (src))
         {
+          // UPOINTER results in false negatives if it reaches here.
+          wassertl (!IS_PTR (dest) || dest->select.d.dcl_type != UPOINTER, "UPOINTER is only for use during parsing");
+
           if (IS_GENPTR (dest) && IS_GENPTR (src))
             {
               /* banked function pointer */

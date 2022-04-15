@@ -1,5 +1,11 @@
 2022-04-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-2629.c:
+	  Fix bug #2629.
+
+2022-04-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCsymt.c:
 	  Assertion to catch bug #2629 earlier.
 	* support/regression/tests/bug-2629.c:

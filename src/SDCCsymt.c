@@ -416,6 +416,9 @@ pointerTypes (sym_link * ptr, sym_link * type)
   sym_link *p;
   sym_link *etype;
 
+  sym_link *otype = type;
+  sym_link *optr = ptr;
+
   if (IS_SPEC (ptr))
     return;
 
@@ -473,20 +476,20 @@ pointerTypes (sym_link * ptr, sym_link * type)
 
   /* now change all the remaining unknown pointers
      to generic pointers */
-  while (ptr)
+  while (optr)
     {
-      if (!IS_SPEC (ptr) && DCL_TYPE (ptr) == UPOINTER)
-        DCL_TYPE (ptr) = port->unqualified_pointer;
-      ptr = ptr->next;
+      if (!IS_SPEC (optr) && DCL_TYPE (optr) == UPOINTER)
+        DCL_TYPE (optr) = port->unqualified_pointer;
+      optr = optr->next;
     }
 
   /* same for the type although it is highly unlikely that
      type will have a pointer */
-  while (type)
+  while (otype)
     {
-      if (!IS_SPEC (type) && DCL_TYPE (type) == UPOINTER)
-        DCL_TYPE (type) = port->unqualified_pointer;
-      type = type->next;
+      if (!IS_SPEC (otype) && DCL_TYPE (otype) == UPOINTER)
+        DCL_TYPE (otype) = port->unqualified_pointer;
+      otype = otype->next;
     }
 }
 

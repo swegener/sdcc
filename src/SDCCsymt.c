@@ -3814,10 +3814,13 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
             dbuf_append_str (dbuf, "volatile-");
           if (SPEC_CONST (type))
             dbuf_append_str (dbuf, "const-");
-          if (SPEC_USIGN (type))
+          if (SPEC_NOUN (type) == V_CHAR) // char is a different type from both unsigned char and signed char
+            {
+              if (!getSpec (type)->select.s.b_implicit_sign)
+                dbuf_append_str (dbuf, SPEC_USIGN (type) ? "unsigned-" : "signed-");
+            }
+          else if (SPEC_USIGN (type))
             dbuf_append_str (dbuf, "unsigned-");
-          else if (SPEC_NOUN (type) == V_CHAR)
-            dbuf_append_str (dbuf, "signed-");
           switch (SPEC_NOUN (type))
             {
             case V_INT:

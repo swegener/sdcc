@@ -1,3 +1,8 @@
+2022-04-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c:
+	  Fix printing of plain char for error messages and debug output.
+
 2022-04-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:

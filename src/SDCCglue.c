@@ -325,7 +325,7 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
                 }
               codeOutBuf = &statsg->oBuf;
 
-              if (ival)
+              if (ival && !astErrors (ival)) // No point trying to initialize by something that doesn't even make sense.
                 {
                   // set ival's lineno to where the symbol was defined
                   setAstFileLine (ival, filename = sym->fileDef, lineno = sym->lineDef);

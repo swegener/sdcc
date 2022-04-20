@@ -1,5 +1,14 @@
 2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* Merge regtest branch.
+
+2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/cases/Makefile.in:
+	  Test cases cleanup, patch by by Felix Salfelder (felixs).
+
+2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCglue.c,
 	  support/valdiag/tests/generic.c:
 	  Fix another part of bug #3145.
@@ -48,6 +57,13 @@
 	* src/SDCCglue.c,
 	  support/valdiag/tests/generic.c:
 	  Fix part of bug #3145.
+
+2022-04-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/cases/Makefile.in:
+	  Fix rm flag for cleaning MakeList.
+	* support/regression/Makefile.in:
+	  Fix build of mcs51 regression test framework libraries, fix by Felix Salfelder (felixs).
 
 2022-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -143,9 +159,39 @@
 2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/ports/tlcs90/spec.mk:
-	  Do not meit debug info to ease reading asm files.
+	  Do not emit debug info to ease reading asm files.
 	* src/z80/ralloc2.cc:
 	  Fix code generation issues in use of iy.
+
+2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in:
+	  Conditional MakeList include, and conditional test-port, part of patch #430 by Felix Salfelder (felixs).
+
+2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/cases/Makefile.in:
+	  Silence case expansion messages by default, part of patch #430 by Felix Salfelder (felixs).
+
+2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/cases/Makefile.in,
+	  support/regression/ports/host/spec.mk.in:
+	  V flag to control verbosity, decouple test-ports and print-summary. Part of patch #430 by Felix Salfelder (felixs).
+
+2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/*/spec.mk:
+	  Deduplicate spec.mk by using rules in Makefile.in instead. Part of patch #430 by Felix Salfelder (felixs).
+
+2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/host/spec.mk.in:
+	  Regression test infrastructure, picked from patch #430 by Felix Salfelder (felixs): fixes for error reporting, number of compact-results calls, CLEAN_PORTS.
 
 2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -177,6 +223,28 @@
 
 	* support/regression/tests/bitintvararg.c.in:
 	  Fix host test disable condition.
+
+2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/cases/Makefile.in,
+	  support/regression/cases/mkdrv.py,
+	  support/regression/ports/*/spec.mk,
+	  support/regression/ports/host/spec.mk.in:
+	  Regression test infrastructure, picked from patch #430 by Felix Salfelder (felixs).
+	* support/regression/tests/structparam.c.in:
+	  Fix test file extension for parametrized test.
+
+2022-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* configure,
+	  configure.ac,
+	  support/regression/Makefile.in,
+	  support/regression/ports/host/spec.mk.in,
+	  support/regression/cases:
+	  Regression test infrastructure improvements, picked from patch #430 by Felix Salfelder (felixs), made less verbose.
+
+
 
 2022-03-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

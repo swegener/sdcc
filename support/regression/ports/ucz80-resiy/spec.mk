@@ -43,34 +43,10 @@ BINEXT = .ihx
 EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 include $(srcdir)/fwk/lib/spec.mk
 
-# Rule to link into .ihx
-%.ihx: %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
-
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
 	@# TODO: sdas should place it\'s output in the current dir
 	cp $< $(PORT_CASES_DIR)
 	$(AS) -plosgff $(PORT_CASES_DIR)/$(notdir $<)
 	rm $(PORT_CASES_DIR)/$(notdir $<)
-
-%$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
-	cat < $(srcdir)/fwk/lib/fwk.lib > $@
-
-# run simulator with SIM_TIMEOUT seconds timeout
-%.out: %$(BINEXT) $(CASES_DIR)/timeout
-	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) -C $(PORTS_DIR)/$(PORT)/conf.cmd $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
-	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
-	-grep -n FAIL $@ /dev/null || true
 
 _clean:

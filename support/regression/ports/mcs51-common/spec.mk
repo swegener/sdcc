@@ -51,25 +51,6 @@ FWKLIB += $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
-%$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51-common/%.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
-$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib $(PORTS_DIR)/mcs51-common/fwk.lib
-	cat < $(srcdir)/fwk/lib/fwk.lib > $@
-	cat < $(PORTS_DIR)/mcs51-common/fwk.lib >> $@
-
-# run simulator with SIM_TIMEOUT seconds timeout
-%.out: %$(BINEXT) $(CASES_DIR)/timeout
-	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $< < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd > $@ \
-	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
-	-grep -n FAIL $@ /dev/null || true
+SPEC_LIB = $(PORTS_DIR)/mcs51-common/fwk.lib
 
 _clean:

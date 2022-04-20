@@ -1,0 +1,129 @@
+# Makefile for "cases"
+# C code generated from "tests"
+
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+PYTHON = @PYTHON@
+M4 = @M4@
+
+# Script that takes a source test suite and generates the iterations
+GENERATE_CASES = $(srcdir)/generate-cases.py
+MAKE_DRV = $(srcdir)/mkdrv.py # BUG? use 1 line of sed?
+TESTS_DIR = $(srcdir)/../tests
+
+vpath %.c.in $(TESTS_DIR)
+vpath %.c $(TESTS_DIR)
+
+TPL_TESTS = $(shell (cd $(TESTS_DIR); ls *.c.in))
+C_TESTS = $(shell (cd $(TESTS_DIR); ls *.c))
+M4_TESTS = $(shell (cd $(TESTS_DIR); ls *.m4))
+
+TPL_TEST_STEMS = $(TPL_TESTS:%.c.in=%)
+
+# maybe this is not necessary, just ship the tst_*.c files?
+# (does it matter?)
+C_TEST_SRCS = $(C_TESTS:%.c=tst_%.c)
+M4_TEST_SRCS = $(M4_TESTS:%.m4=m4_%.c)
+
+# Rule to generate .c files from .m4 files
+# bug/feature? run MAKE_DRV as well (requires magic filenames and paths)
+m4_%.c: $(TESTS_DIR)/%.m4
+	$(M4) -I $(srcdir)/../m4include rtmacros.m4 $< > $*.m4c
+	$(PYTHON) $(MAKE_DRV) $*.m4c $@
+	touch $@
+
+gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
+	@printf .
+	@echo '#include <testfwk.h>' > $@
+	@echo '#ifdef __SDCC' >> $@
+	@echo '#pragma std_sdcc99' >> $@
+
+# stuff defined in gcc, but not in sdcc
+	@grep -q __CHAR_BIT__ $< && (echo "#include <limits.h>"; echo "#define __CHAR_BIT__ CHAR_BIT") >> $@ || :
+	@grep -q __INT_MAX__ $< && (echo "#include <limits.h>"; echo "#define __INT_MAX__ INT_MAX") >> $@ || :
+	@grep -q __SIZE_TYPE__ $< && (echo "#include <stddef.h>" ;echo "#define __SIZE_TYPE__ size_t") >> $@ || :
+	@grep -q __LONG_LONG_MAX__ $< && (echo "#include <limits.h>"; echo "#define __LONG_LONG_MAX__ LLONG_MAX") >> $@ || :
+	@grep -q __INTPTR_TYPE__ $< && echo "#define __INTPTR_TYPE__ intptr_t" >> $@ || :
+	@grep -q exit $< && echo "void exit__substitute(int i){ASSERT(!i);}" >> $@ || :
+	@grep -q exit $< && echo "#define exit exit__substitute" >> $@ || :
+	@grep -q __builtin_abort $< && echo "void __builtin_abort(){ASSERT(0);}" >> $@ || :
+	@grep -q __builtin_unreachable $< && echo "void __builtin_unreachable(){}" >> $@ || :
+	@grep -q __builtin_memset $< && (echo "#include <string.h>"; echo "#define __builtin_memset memset") >> $@ || :
+
+	@echo '#else // possibly gcc, clang?' >> $@
+	@grep -q exit $< && echo "// is this allowed?" >> $@ || :
+	@grep -q exit $< && echo "void exit__substitute(int i){ASSERT(!i);}" >> $@ || :
+	@grep -q exit $< && echo "#define exit exit__substitute" >> $@ || :
+	@echo '#endif // __SDCC' >> $@
+
+# redirect stuff a bit.
+	@echo '#define main main_' >> $@
+	@echo '#define assert ASSERT' >> $@
+	@echo 'void abort() {__fail(0,0,0,0);}' >> $@
+
+	@#find matching main arguments, none or 2
+	@echo -n '#define MAINARGS' >> $@
+	@(grep -q main.*argv $< && echo " 0, 0" || \
+	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
+
+	@echo '#include "$<"' >> $@
+	@echo 'void __runSuite(void) { __prints("Running main\\n"); main_(MAINARGS); }' >> $@
+	@echo 'const int __numCases = 1;' >> $@
+	@echo '__code const char * __getSuiteName(void) { return "{$*}"; }' >> $@
+
+# expand tests with python script
+%/stamp: %.c.in $(GENERATE_CASES)
+	rm -rf $*
+	mkdir -p $*
+	@printf .
+	@$(PYTHON) $(GENERATE_CASES) $< $*
+	touch $@
+
+tst_%.c: %.c $(MAKE_DRV)
+	@printf .
+	@$(PYTHON) $(MAKE_DRV) $< $@
+
+all: MakeList
+
+MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(C_TEST_SRCS) $(M4_TEST_SRCS) $(GTE_TEST_SRCS) Makefile
+	@echo
+	@echo populated MakeList...
+	@echo GTE_TEST_STEMS = $(GCE_TESTS:%.c=gte_%) > MakeList
+	@echo -n "gce: gcc torture execute.. "
+	@echo $(GCE_TESTS) | wc -w
+	@echo -n "m4: macro tests.. "
+	@echo $(M4_TESTS) | wc -w
+	@echo -n "tpl: template tests.. "
+	@echo $(TPL_TEST_STEMS) | wc -w
+	@echo -n "tst: plain tests.. "
+	@echo $(C_TEST_SRCS) | wc -w
+
+	@echo TPL_TEST_STEMS = $(TPL_TEST_STEMS) >> MakeList
+	@echo C_TEST_STEMS = $(C_TEST_SRCS:%.c=%) >> MakeList
+	@echo M4_TEST_STEMS = $(M4_TEST_SRCS:%.c=%) >> MakeList
+	@echo GTE_TEST_STEMS = $(GTE_TEST_SRCS:%.c=%) >> MakeList
+
+	@echo TEST_STEMS = '$$(M4_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(GTE_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(C_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(TPL_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(QC_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(TCC_TEST_STEMS)' >> MakeList
+
+clean:
+	rm -f */*.c */*/stamp
+	rm -f *.m4c *.c */stamp
+	rm -rf MakeList
+	rmdir * 2> /dev/null || :
+
+.PRECIOUS: %/stamp
+
+info:
+	@echo TESTS_DIR $(TESTS_DIR)
+	@echo VPATH $(VPATH)
+	@echo TPL_TEST_STEMS $(TPL_TEST_STEMS)
+	@echo C_TEST_SRCS $(C_TEST_SRCS)
+	@echo M4_TESTS $(M4_TESTS)
+
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status support/regression/cases/Makefile

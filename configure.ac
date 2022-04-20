@@ -979,6 +979,7 @@ device/include/Makefile
 sdas/linksrc/Makefile
 support/makebin/Makefile
 support/regression/Makefile
+support/regression/cases/Makefile
 support/valdiag/Makefile
 support/scripts/Makefile
 support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in

@@ -9292,7 +9292,7 @@ test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib
 test $OPT_DISABLE_DEVICE_LIB = 0 && test $OPT_DISABLE_NON_FREE = 0 && ac_config_files="$ac_config_files device/non-free/lib/Makefile"
 
 
-ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
+ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile sdas/linksrc/Makefile support/makebin/Makefile support/regression/Makefile support/regression/cases/Makefile support/valdiag/Makefile support/scripts/Makefile support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in Makefile Makefile.common:Makefile.common.in"
 
 if test $OPT_DISABLE_NON_FREE = 0; then
   ac_config_files="$ac_config_files device/non-free/include/Makefile"
@@ -10045,6 +10045,7 @@ do
     "sdas/linksrc/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/linksrc/Makefile" ;;
     "support/makebin/Makefile") CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;
     "support/regression/Makefile") CONFIG_FILES="$CONFIG_FILES support/regression/Makefile" ;;
+    "support/regression/cases/Makefile") CONFIG_FILES="$CONFIG_FILES support/regression/cases/Makefile" ;;
     "support/valdiag/Makefile") CONFIG_FILES="$CONFIG_FILES support/valdiag/Makefile" ;;
     "support/scripts/Makefile") CONFIG_FILES="$CONFIG_FILES support/scripts/Makefile" ;;
     "support/regression/ports/host/spec.mk") CONFIG_FILES="$CONFIG_FILES support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in" ;;

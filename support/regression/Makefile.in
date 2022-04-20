@@ -1,6 +1,7 @@
 # Test suite Makefile
 # Part of SDCC - http://sdcc.sourceforge.net/
 # Michael Hope <michaelh@juju.net.nz> 2001
+# refactored: Felix Salfelder 2022
 #
 # This Makefile builds and runs the test suites under tests/ for each
 # one of the supported ports located under ports/.  The test suite
@@ -45,9 +46,12 @@
 # The output from each device specific test suite derived from a source
 # test suite are collated.
 
-# Uncomment this to show only errors and the summary.
-# Comment this out for debugging.
-.SILENT:
+# set V=0 for normal verbosity
+# set V=1 for more verbosity
+V ?= silent
+ifeq (${V},silent)
+MAKEFLAGS += --silent
+endif
 
 # delete failed attempts (so make will retry...)
 .DELETE_ON_ERROR:
@@ -59,9 +63,42 @@ EXEEXT = @EXEEXT@
 PYTHON = @PYTHON@
 M4 = @M4@
 
+MAKE_SUB_FLAGS = --no-print-directory
+
 srcdir       = @srcdir@
 top_srcdir   = @top_srcdir@
 top_builddir = @top_builddir@
+
+DEFAULT_VERBOSITY = silent
+M_V_at = $(m__v_at_$(V))
+m__v_at_ = $(m__v_at_$(DEFAULT_VERBOSITY))
+m__v_at_silent = @
+m__v_at_0 = @
+m__v_at_1 =
+
+M_V_GEN = $(m__v_GEN_$(V))
+m__v_GEN_ = $(m__v_GEN_$(DEFAULT_VERBOSITY))
+m__v_GEN_silent = @
+m__v_GEN_0 = @echo "  GEN     " $@;
+m__v_GEN_1 =
+
+M_V_EMU = $(m__v_EMU_$(V))
+m__v_EMU_silent =
+m__v_EMU_ = $(m__v_EMU_$(DEFAULT_VERBOSITY))
+m__v_EMU_0 = echo "  EMU     " $@;
+m__v_EMU_1 =
+
+M_V_CC = $(m__v_CC_$(V))
+m__v_CC_ = $(m__v_CC_$(DEFAULT_VERBOSITY))
+m__v_CC_silent = @
+m__v_CC_0 = @echo "  CC      " $@;
+m__v_CC_1 =
+
+M_V_CCLD = $(m__v_CCLD_$(V))
+m__v_CCLD_ = $(m__v_CCLD_$(DEFAULT_VERBOSITY))
+m__v_CCLD_silent = @
+m__v_CCLD_0 = @echo "  CCLD    " $@;
+m__v_CCLD_1 =
 
 # All original tests live in TESTS_DIR and below
 TESTS_DIR = $(srcdir)/tests
@@ -72,11 +109,9 @@ RESULTS_DIR = results
 PORTS_DIR = $(srcdir)/ports
 
 # Intermediate data directories
-# Directory that generated cases and the related object code go.
-CASES_DIR = gen
-
-# Script that takes a source test suite and generates the iterations
-GENERATE_CASES = $(srcdir)/generate-cases.py
+# Directory where test cases and the generated object code go.
+CASES_DIR = cases
+TMP_DIR = gen
 
 # The directories in PORTS_DIR correspond to ports.
 PORTS = $(filter-out .svn, $(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -87,26 +122,33 @@ PORTS = $(filter-out .svn, $(notdir $(wildcard $(PORTS_DIR)/*)))
 ALL_PORTS = $(filter-out mos6502 mos6502-stack-auto mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(PORTS))
 
 # These  ports will be cleaned with 'make clean'
-CLEAN_PORTS = $(filter-out mcs51-common, $(PORTS))
+CLEAN_PORTS = $(filter-out mcs51-common host, $(PORTS))
 
 MAKE_LIBRARY =
 
 # support VPATH:
-vpath %.c $(CASES_DIR):$(TESTS_DIR)
+vpath %.c $(CASES_DIR)
 vpath %.c.in $(TESTS_DIR)
 
-all: test-ports
+all: print-summary
+
+print-summary: test-ports
+	@cat $(RESULTS_DIR)/*.sum
+
+.PHONY: print-summary
 
 # Test all ports that you normally would want to test,
 # normally a subset of all ports.
 test-ports:
-	$(MAKE) test-common
-	for i in $(ALL_PORTS); do $(MAKE) make_library test-port PORT=$$i; done
+	$(MAKE) $(MAKE_SUB_FLAGS) test-common
+	for i in $(ALL_PORTS); \
+	  do $(MAKE) $(MAKE_SUB_FLAGS) make_library test-port PORT=$$i; \
+	done
 
 # Helper rule for testing various ports
 ${PORTS:%=test-%} : test-%: test-common
-	$(MAKE) test-common
 	$(MAKE) test-port PORT=$*
+	cat $(RESULTS_DIR)/$*.sum
 
 # Shorthand for testing the mcs51 port only
 test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-small-stack-auto test-mcs51-large-stack-auto test-mcs51-xstack-auto
@@ -119,30 +161,33 @@ test-pdk: test-pdk14 test-pdk15 test-pdk15-stack-auto
 
 # what is this?
 test-host2:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=host
+	$(MAKE) $(MAKE_SUB_FLAGS) test-common
+	$(MAKE) $(MAKE_SUB_FLAGS) test-port PORT=host
 
-# Begin per-port rules
-# List of all of the known source test suites.
-# Do not do this for the individual test files, to avoid quadratic complexity.
-ifndef CASES
-ALL_C_TESTS_ = $(shell find $(TESTS_DIR) -name "*.c.in")
-ALL_C_TESTS = $(ALL_C_TESTS_:%.in=%) $(shell find $(TESTS_DIR) -name "*.c")
-ALL_M_TESTS = $(shell find $(TESTS_DIR) -name "*.m4")
-M_CASES = $(ALL_M_TESTS:$(TESTS_DIR)/%.m4=$(CASES_DIR)/%.c)
+# generate test list (and possibly expand tests)
+cases/MakeList:
+	$(MAKE) -C cases MakeList
+
+ifdef PORT
+include cases/MakeList
 endif
 
 # Intermediate directory
-PORT_CASES_DIR = $(CASES_DIR)/$(PORT)
+PORT_TMP_DIR = $(TMP_DIR)/$(PORT)
+# BUG. used in spec.mk
+PORT_CASES_DIR = $(TMP_DIR)/$(PORT)
+# PORT_CASES_DIRR = $(TMP_DIR)/$(PORT)
 PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
-# Each test generates a result log file
+
+# For each test we produce a result log file, %.log
 ifndef CASES
-PORT_RESULTS = $(sort $(patsubst %.c,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_C_TESTS))) $(patsubst %.m4,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_M_TESTS))))
+PORT_RESULTS = $(TEST_STEMS:%=$(PORT_RESULTS_DIR)/%.log)
 endif
 
-SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
+DCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 
 # Defaults.  Override in spec.mk if required.
+PORT_BASE = $(PORT)
 # Path to SDCC
 ifdef SDCC_BIN_PATH
   SDCC = $(SDCC_BIN_PATH)/sdcc$(EXEEXT)
@@ -163,12 +208,37 @@ CC_FOR_BUILD = $(CC)
 
 # Only include if we're in a per-port call.
 ifdef PORT
+
+# run simulator with SIM_TIMEOUT seconds timeout
   # include ./$(PORT)/spec.mk if exists, else include $(PORTS_DIR)/$(PORT)/spec.mk
   ifeq ($(shell if test -f ./ports/$(PORT)/spec.mk; then echo OK; fi),OK)
     include ./ports/$(PORT)/spec.mk
   else
     include $(PORTS_DIR)/$(PORT)/spec.mk
   endif
+
+ifdef OVERRIDE_EMU_RULE
+# need rule from spec.mk (e.g. host/spec.mk)
+else
+# this one will do for all the others.
+$(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
+	@mkdir -p $(dir $@)
+	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
+	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd > $@; \
+	  if [ 0 -ne $$? ]; then \
+	    echo --- FAIL: \"timeout, simulation killed\" in $<"\n"--- Summary: 1/1/1: timeout >> $@; \
+	  fi \
+	else \
+	  echo --- Running: $< > $@; \
+	  echo --- FAIL: cannot compile/link $< "\n"--- Summary: 1/1/1: compile >> $@; \
+	fi
+	@# ${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $@ #2
+
+	@# always count ticks?
+	@$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
+	@grep -n FAIL $@ /dev/null || true
+endif
+
 endif
 
 make_library: $(MAKE_LIBRARY)
@@ -180,80 +250,71 @@ endif
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.
-.PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT)
+.PRECIOUS: $(RESULTS_DIR) $(CASES_DIR)/% $(PORT_TMP_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT) \
+	$(CASES_DIR)/%/stamp $(RESULTS_DIR)/$(PORT)/%.out
 
-# $(CASES_DIR)/stamp is really a proxy for $(CASES_DIR). We shouldn't use
-# $(CASES_DIR) as a dependency directly, because as a directory its time
+# $(TMP_DIR)/stamp is really a proxy for $(TMP_DIR). We shouldn't use
+# $(TMP_DIR) as a dependency directly, because as a directory its time
 # stamp updates every time something in the directory is updated (which
 # can then cause spurious rebuilds of other targets that can conflict
 # with parallel make jobs)
-$(CASES_DIR)/stamp:
-	mkdir -p $(CASES_DIR)
-	touch $@
-
-# Rule to generate .c files from .m4 files
-$(CASES_DIR)/%.c: $(TESTS_DIR)/%.m4 $(CASES_DIR)/stamp
-	$(M4) -I $(srcdir)/m4include rtmacros.m4 $< > $@
-
-# Rule to generate the iterations of a test suite off the source suite.
-$(PORT_CASES_DIR)/%/iterations.stamp: %.c.in $(GENERATE_CASES)
-	rm -rf $(dir $@)
-	mkdir -p $(dir $@)
-	$(PYTHON) $(GENERATE_CASES) $< $(dir $@)
-	touch $@
-
-# BUG? also needed to process c files. (from M4 tests)
-$(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
-	rm -rf $(dir $@)
-	mkdir -p $(dir $@)
-	$(PYTHON) $(GENERATE_CASES) $< $(dir $@)
+$(TMP_DIR)/stamp:
+	mkdir -p $(TMP_DIR)
 	touch $@
 
 # Rule linking the combined results log to all of the files in the
 # iteration directory.
-$(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
-	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
-	$(PYTHON) $(srcdir)/compact-results.py $* < $@
+$(PORT_RESULTS_DIR)/%.out: $(CASES_DIR)/%/stamp
+	@ # mkdir -p $(dir $@)/$*
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) iterations PORT=$(PORT) CASES=$*/
+
+$(PORT_RESULTS_DIR)/%.log: $(PORT_RESULTS_DIR)/%.out
+	@# compact-results prints the stats. Do once per test.
+	${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $< #1
+	touch $@
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.
 $(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS)
-	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
+	${M_V_at}cat $(PORT_RESULTS:%.log=%.out) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
 
-port-fwklib: $(EXTRAS) $(FWKLIB)
+port-fwklib: port-dirs $(EXTRAS) $(FWKLIB)
 
 port-dirs:
-	mkdir -p $(PORT_CASES_DIR) $(PORT_RESULTS_DIR)
-	echo Running $(PORT) regression tests
+	${M_V_GEN}mkdir -p $(PORT_TMP_DIR) $(PORT_RESULTS_DIR)
 
 # Files shared between all ports need to be built by the test-common target,
 # which should always be built before the port specific targets.
-test-common: $(CASES_DIR)/stamp $(M_CASES) $(CASES_DIR)/timeout
+test-common: $(TMP_DIR)/timeout
+	$(MAKE) -C cases
 
-test-port:
-	# recurse: force vpath to re-read the $(CASES_DIR)
-	$(MAKE) port-dirs PORT=$(PORT)
-	$(MAKE) port-fwklib PORT=$(PORT)
-	$(MAKE) $(RESULTS_DIR)/$(PORT).sum PORT=$(PORT)
-	cat $(RESULTS_DIR)/$(PORT).sum
+ifdef PORT
+test-port: test-common port-dirs
+	@# recurse: force vpath to re-read the $(CASES_DIR)
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) port-fwklib PORT=$(PORT) V=${V}
+	@echo Running ${PORT} regression tests
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) $(RESULTS_DIR)/$(PORT).sum PORT=$(PORT)
+endif
 
 # Begin rules that process each iteration generated from the source
 # test
 
 # List of all of the generated iteration source files.
-SUB_CASES = $(sort $(wildcard $(CASES)*.c))
+SUB_CASES = $(sort $(wildcard $(CASES_DIR)/$(CASES)*.c))
 # List of all the sub result logs generated from the iterations.
-SUB_RESULTS = $(SUB_CASES:%.c=%.out)
+# these are stored in TMP_DIR...
+SUB_RESULTS_ = $(SUB_CASES:%.c=%.out)
+SUB_RESULTS = $(SUB_RESULTS_:cases%=$(RESULTS_DIR)/$(PORT)%)
 # Overall target.  Concatenation of all of the sub results.
-RESULTS = $(CASES:$(CASES_DIR)/%/$(DIREXT)=$(RESULTS_DIR)/%.out)
+RESULTS = $(CASES:%/$(DIREXT)=$(PORT_RESULTS_DIR)/%.out)
 
 iterations: $(RESULTS)
 
 # Rule to generate the overall target from the sub results.
 $(RESULTS): $(SUB_RESULTS)
-	cat $(SUB_RESULTS) > $@
+	${M_V_at}echo | cat - $(SUB_RESULTS) > $@ # subresult rule
 
-$(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(CASES_DIR)/stamp
+$(TMP_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(TMP_DIR)/stamp
 	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
 
 # The remainder of the rules are in $PORT/spec.mk.  The port needs to
@@ -270,14 +331,32 @@ $(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(CASES_DIR)/stamp
 # BeginGeneric rules
 
 clean:
-	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc __pycache__
+	$(MAKE) -C $(CASES_DIR) clean
+	rm -rf $(TMP_DIR) $(RESULTS_DIR) *.pyc __pycache__
 	for i in $(CLEAN_PORTS); do \
-	  $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \
+	  $(MAKE) $(MAKE_RECURSE_FLAGS) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \
 	done
 
 distclean: clean
 	rm -f $(PORTS_DIR)/host/spec.mk
 	rm -f Makefile
+
+# Rule to link into .ihx
+%$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	${M_V_CCLD}$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): %.c
+	@mkdir -p $(dir $@) # BUG?
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT_BASE)/%.c
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib ${SPEC_LIB}
+	${M_V_GEN}cat $(srcdir)/fwk/lib/fwk.lib ${SPEC_LIB} > $@
 
 Makefile: $(srcdir)/Makefile.in
 	 cd $(top_builddir); ./config.status support/regression/Makefile

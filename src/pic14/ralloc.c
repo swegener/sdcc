@@ -3707,7 +3707,7 @@ packRegisters (eBBlock * ebp)
                                 /* if the type from and type to are the same
                                 then if this is the only use then packit */
                                 if (compareType (operandType (IC_RIGHT (ic)),
-                                        operandType (IC_LEFT (ic))) == 1) {
+                                        operandType (IC_LEFT (ic)), false) == 1) {
 
                                         iCode *dic = packRegsForOneuse (ic, IC_RIGHT (ic), ebp);
                                         if (dic) {

@@ -572,7 +572,7 @@ initPointer (initList *ilist, sym_link *toType, int showError)
       (expr->opval.op == '+' || expr->opval.op == '-') &&
       IS_AST_SYM_VALUE (expr->left) &&
       (IS_ARRAY (expr->left->ftype) || IS_PTR (expr->left->ftype)) &&
-      compareType (toType, expr->left->ftype) && IS_AST_LIT_VALUE (expr->right))
+      compareType (toType, expr->left->ftype, false) && IS_AST_LIT_VALUE (expr->right))
     {
       return valForCastAggr (expr->left, expr->left->ftype, expr->right, expr->opval.op);
     }
@@ -580,7 +580,7 @@ initPointer (initList *ilist, sym_link *toType, int showError)
   /* (char *)(expr1) */
   if (IS_CAST_OP (expr))
     {
-      if (compareType (toType, expr->left->ftype) == 0 && showError)
+      if (compareType (toType, expr->left->ftype, false) == 0 && showError)
         {
           werror (W_INIT_WRONG);
           printFromToType (expr->left->ftype, toType);
@@ -1436,7 +1436,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
 
   if (IS_LITERAL (val->etype))
     {
-      if (compareType (type, val->type) == 0)
+      if (compareType (type, val->type, false) == 0)
         {
           if (ilist)
             werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
@@ -1675,7 +1675,7 @@ printIvalPtr (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s *oBuf)
       return;
 
   /* check the type      */
-  if (compareType (type, val->type) == 0)
+  if (compareType (type, val->type, false) == 0)
     {
       assert (ilist != NULL);
       werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
@@ -1819,7 +1819,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
       // and the type must match
       itype = ilist->init.node->ftype;
 
-      if (compareType (type, itype) == 0)
+      if (compareType (type, itype, false) == 0)
         {
           // special case for literal strings
           if (IS_ARRAY (itype) && IS_CHAR (getSpec (itype)) &&

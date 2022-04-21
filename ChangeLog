@@ -1,3 +1,24 @@
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge implicitintrinsicnamedaddressspaces branch.
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/genericintrinsicnaddr.c,
+	  support/regression/tests/genericnonintrinsicnaddr.c:
+	  Test _Generic on pointers into named address spaces.
+	* src/SDCCmem.c,
+	  src/SDCCast.c:
+	  Fix a _Generic implicit intrinsic named address space issue affecting large and huge mcs51 memory model.
+
+2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList,
+	  support/regression/Makefile.in,
+	  support/regression/cases/Makefile.in,
+	  support/regression/gte:
+	  Import missing gcc torture execute tests, patch by by Felix Salfelder (felixs).
+
 2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge regtest branch.
@@ -6,6 +27,26 @@
 
 	* support/regression/cases/Makefile.in:
 	  Test cases cleanup, patch by by Felix Salfelder (felixs).
+
+2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
+	  src/SDCCcse.c,
+	  src/SDCCglue.c,
+	  src/SDCCicode.c,
+	  src/SDCClospre.hpp,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/ds390/ralloc.c,
+	  src/mcs51/ralloc.c,
+	  src/pic14/glue.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/glue.c,
+	  src/pic16/ralloc.c,
+	  support/regression/tests/bug-3254.c,
+	  support/regression/tests/bug-3245.c:
+	  Fix bugs #3254, #3145.
 
 2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

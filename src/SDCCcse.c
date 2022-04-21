@@ -975,7 +975,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         {
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
-                                   operandType (IC_RIGHT (ic)));
+                                   operandType (IC_RIGHT (ic)), false);
           if ((typematch<0) || (IS_TRUE_SYMOP (IC_RIGHT (ic))))
             {
               ic->op = CAST;
@@ -1001,7 +1001,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         {
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
-                                   operandType (IC_LEFT (ic)));
+                                   operandType (IC_LEFT (ic)), false);
           if ((typematch<0) || (IS_TRUE_SYMOP (IC_LEFT (ic))))
             {
               ic->op = CAST;
@@ -1082,7 +1082,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
               if (compareType (operandType (IC_RESULT (ic)),
-                               operandType (IC_RIGHT (ic))) == 1)
+                               operandType (IC_RIGHT (ic)), false) == 1)
                 {
                   ic->op = '=';
                   IC_LEFT (ic) = NULL;
@@ -1123,7 +1123,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
               if (compareType (operandType (IC_RESULT (ic)),
-                               operandType (IC_LEFT (ic))) == 1)
+                               operandType (IC_LEFT (ic)), false) == 1)
                 {
                   ic->op = '=';
                   IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1285,7 +1285,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               SET_ISADDR (IC_RESULT (ic), 0);
             }
           /* if casting to the same */
-          if (compareType (operandType (IC_RESULT (ic)), operandType (IC_RIGHT (ic))) == 1)
+          if (compareType (operandType (IC_RESULT (ic)), operandType (IC_RIGHT (ic)), false) == 1)
             {
               ic->op = '=';
               IC_LEFT (ic) = NULL;
@@ -2059,7 +2059,7 @@ fixUpTypes (iCode * ic)
   /* for pointer_gets if the types of result & left r the
      same then change it type of result to next */
   if (IS_PTR (t1) &&
-      compareType (t2 = operandType (IC_RESULT (ic)), t1) == 1)
+      compareType (t2 = operandType (IC_RESULT (ic)), t1, false) == 1)
     {
       setOperandType (IC_RESULT (ic), t2->next);
     }
@@ -2483,7 +2483,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         {
           applyToSet (cseSet, findPrevIc, ic, &pdic);
           if (pdic && compareType (operandType (IC_RESULT (pdic)),
-                                   operandType (IC_RESULT (ic))) != 1)
+                                   operandType (IC_RESULT (ic)), false) != 1)
             {
               pdic = NULL;
             }

@@ -1894,7 +1894,7 @@ pic14_printIvalFuncPtr (sym_link *type, initList *ilist, struct dbuf_s *oBuf)
 
   if (IS_LITERAL (val->etype))
     {
-      if (compareType (type, val->type) == 0)
+      if (compareType (type, val->type, false) == 0)
         {
           DBG_MSG ("ERROR:incompatible types");
           if (ilist)
@@ -1943,7 +1943,7 @@ pic14_printIvalPtr (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s 
       return;
 
   /* check the type      */
-  if (compareType (type, val->type) == 0)
+  if (compareType (type, val->type, false) == 0)
     {
       DBG_MSG ("WARNING: wrong initialization");
       wassert (ilist != NULL);
@@ -2029,7 +2029,7 @@ pic14_printIval (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s *oB
       // and the type must match
       sym_link *itype = ilist->init.node->ftype;
 
-      if (compareType (type, itype) == 0)
+      if (compareType (type, itype, false) == 0)
         {
           // special case for literal strings
           if (IS_ARRAY (itype) && IS_CHAR (getSpec (itype)) &&

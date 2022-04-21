@@ -602,6 +602,8 @@ allocGlobal (symbol * sym)
         }
       else
         {
+          if (SPEC_SCLS (sym->etype) != S_XDATA)
+            SPEC_SCLS_IMPLICITINTRINSIC (sym->etype) = true;
           SPEC_SCLS (sym->etype) = S_XDATA;
         }
     }

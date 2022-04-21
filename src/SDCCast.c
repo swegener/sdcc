@@ -984,7 +984,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
   resolveSymbols (*actParm);
 
   /* the parameter type must be at least castable */
-  if (compareType (defParm->type, (*actParm)->ftype) == 0)
+  if (compareType (defParm->type, (*actParm)->ftype, false) == 0)
     {
       werror (E_INCOMPAT_TYPES);
       printFromToType ((*actParm)->ftype, defParm->type);
@@ -993,7 +993,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
   /* if the parameter is castable then add the cast */
   if ((IS_ARRAY((*actParm)->ftype) && IS_PTR(defParm->type)) ||
-      (compareType (defParm->type, (*actParm)->ftype) == -1))
+      (compareType (defParm->type, (*actParm)->ftype, false) == -1))
     {
       ast *pTree;
 
@@ -1667,6 +1667,7 @@ stringToSymbol (value *val)
   sym->etype = getSpec (sym->type);
   /* change to storage class & output class */
   SPEC_SCLS (sym->etype) = S_CODE;
+  SPEC_SCLS_IMPLICITINTRINSIC (sym->etype) = true;
   SPEC_CVAL (sym->etype).v_char = SPEC_CVAL (val->etype).v_char;
   SPEC_STAT (sym->etype) = 1;
   /* make the level & block = 0 */
@@ -3924,22 +3925,36 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
 
       p = newLink (DECLARATOR);
+      
       if (!LETYPE (tree))
-        DCL_TYPE (p) = POINTER;
-      else if (SPEC_SCLS (LETYPE (tree)) == S_CODE)
-        DCL_TYPE (p) = CPOINTER;
-      else if (SPEC_SCLS (LETYPE (tree)) == S_XDATA)
-        DCL_TYPE (p) = FPOINTER;
-      else if (SPEC_SCLS (LETYPE (tree)) == S_XSTACK)
-        DCL_TYPE (p) = PPOINTER;
-      else if (SPEC_SCLS (LETYPE (tree)) == S_IDATA)
-        DCL_TYPE (p) = IPOINTER;
-      else if (SPEC_SCLS (LETYPE (tree)) == S_EEPROM)
-        DCL_TYPE (p) = EEPPOINTER;
-      else if (SPEC_OCLS (LETYPE (tree)))
-        DCL_TYPE (p) = PTR_TYPE (SPEC_OCLS (LETYPE (tree)));
+        {
+          DCL_TYPE (p) = POINTER;
+          DCL_TYPE_IMPLICITINTRINSIC (p) = true;
+        }
       else
-        DCL_TYPE (p) = POINTER;
+        {
+          DCL_TYPE_IMPLICITINTRINSIC (p) = SPEC_SCLS_IMPLICITINTRINSIC (LETYPE (tree));
+          if (SPEC_SCLS (LETYPE (tree)) == S_CODE)
+            DCL_TYPE (p) = CPOINTER;
+          else if (SPEC_SCLS (LETYPE (tree)) == S_XDATA)
+            DCL_TYPE (p) = FPOINTER;
+          else if (SPEC_SCLS (LETYPE (tree)) == S_XSTACK)
+            DCL_TYPE (p) = PPOINTER;
+          else if (SPEC_SCLS (LETYPE (tree)) == S_IDATA)
+            DCL_TYPE (p) = IPOINTER;
+          else if (SPEC_SCLS (LETYPE (tree)) == S_EEPROM)
+            DCL_TYPE (p) = EEPPOINTER;
+          else if (SPEC_OCLS (LETYPE (tree)))
+            {
+              DCL_TYPE (p) = PTR_TYPE (SPEC_OCLS (LETYPE (tree)));
+              DCL_TYPE_IMPLICITINTRINSIC (p) = true;
+            }
+          else
+            {
+              DCL_TYPE (p) = POINTER;
+              DCL_TYPE_IMPLICITINTRINSIC (p) = true;
+            }
+        }
 
       if (IS_AST_SYM_VALUE (tree->left))
         {
@@ -5096,7 +5111,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               tree->left = tree->right;
               tree->right = s;
             }
-          if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
+          if (compareType (LTYPE (tree), RTYPE (tree), false) == 0)
             {
               werrorfl (tree->filename, tree->lineno, E_INCOMPAT_TYPES);
               fprintf (stderr, "comparing type ");
@@ -5116,9 +5131,9 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                     && ((IS_FUNC (LTYPE (tree)) && IS_LITERAL (RTYPE (tree)) && !ullFromVal (valFromType (RTYPE (tree))))
                         || (IS_FUNC (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)) && !ullFromVal (valFromType (LTYPE (tree))))))))
 
-            if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
+            if (compareType (LTYPE (tree), RTYPE (tree), false) == 0)
               {
-                if (compareType (RTYPE (tree), LTYPE (tree)) != 0)
+                if (compareType (RTYPE (tree), LTYPE (tree), false) != 0)
                   {
                     struct ast *s = tree->left;
                     tree->left = tree->right;
@@ -5538,7 +5553,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                 wassert (IS_AST_LINK (assoc->left));
                 assoc_type = assoc->left->opval.lnk;
                 checkTypeSanity (assoc_type, "_Generic");
-                if (compareType (assoc_type, type) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))
+                if (compareType (assoc_type, type, true) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))
                   {
                     if (found_expr)
                       {
@@ -5571,7 +5586,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       return tree;
 
     case ':':
-      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) && (compareType (RTYPE (tree), LTYPE (tree)) == 0))
+      if ((compareType (LTYPE (tree), RTYPE (tree), false) == 0) && (compareType (RTYPE (tree), LTYPE (tree), false) == 0))
         {
           if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)))
             DCL_TYPE (LTYPE(tree)) = GPOINTER;
@@ -5579,8 +5594,8 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             DCL_TYPE (RTYPE(tree)) = GPOINTER;
         }
 
-      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
-        (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&
+      if ((compareType (LTYPE (tree), RTYPE (tree), false) == 0) &&
+        (compareType (RTYPE (tree), LTYPE (tree), false) == 0) &&
         !(IS_ARRAY(LTYPE (tree)) && IS_INTEGRAL(RTYPE (tree))) &&
         !(IS_ARRAY(RTYPE (tree)) && IS_INTEGRAL(LTYPE (tree))))
         {
@@ -5733,7 +5748,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
 
       /* they should either match or be castable */
-      if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
+      if (compareType (LTYPE (tree), RTYPE (tree), false) == 0)
         {
           if (IS_CODEPTR (LTYPE (tree)) && IS_FUNC (LTYPE (tree)->next))        /* function pointer */
             {
@@ -5860,7 +5875,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                 }
             }
 
-          typecompat = compareType (currFunc->type->next, RTYPE (tree));
+          typecompat = compareType (currFunc->type->next, RTYPE (tree), false);
 
           /* if there is going to be a casting required then add it */
           if (typecompat == -1)

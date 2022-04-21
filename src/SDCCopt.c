@@ -288,7 +288,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (type, multypes[bwd][su]) == 1)
+          if (compareType (type, multypes[bwd][su], false) == 1)
             {
               func = conv[0][bwd][su];
               goto found;
@@ -296,7 +296,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
         }
     }
 
-  if (compareType (type, fixed16x16Type) == 1)
+  if (compareType (type, fixed16x16Type, false) == 1)
     {
       func = fp16x16conv[0][4][0];
       goto found;
@@ -413,7 +413,7 @@ cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (type, multypes[bwd][su]) == 1)
+          if (compareType (type, multypes[bwd][su], false) == 1)
             {
               func = fp16x16conv[0][bwd][su];
               goto found;
@@ -525,7 +525,7 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (type, multypes[bwd][su]) == 1)
+          if (compareType (type, multypes[bwd][su], false) == 1)
             {
               func = conv[1][bwd][su];
               goto found;
@@ -637,7 +637,7 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (type, multypes[bwd][su]) == 1)
+          if (compareType (type, multypes[bwd][su], false) == 1)
             {
               func = fp16x16conv[1][bwd][su];
               goto found;
@@ -645,7 +645,7 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
         }
     }
 
-  if (compareType (type, floatType) == 1)
+  if (compareType (type, floatType, false) == 1)
     {
       func = fp16x16conv[1][4][0];
       goto found;
@@ -872,8 +872,8 @@ convilong (iCode *ic, eBBlock *ebp)
 
       for (su = 0; su < 4 && muldivmod >= 0; su++)
         {
-          if ((compareType (leftType, multypes[0][su%2]) == 1) &&
-              (compareType (rightType, multypes[0][su/2]) == 1))
+          if ((compareType (leftType, multypes[0][su%2], false) == 1) &&
+              (compareType (rightType, multypes[0][su/2], false) == 1))
             {
               func = muldiv[muldivmod][0][su];
               goto found;
@@ -886,11 +886,11 @@ convilong (iCode *ic, eBBlock *ebp)
     {
       for (su = 0; su < 2; su++)
         {
-          if (compareType (leftType, multypes[bwd][su]) == 1)
+          if (compareType (leftType, multypes[bwd][su], false) == 1)
             {
               if ((op=='*' || op=='/' || op=='%'))
                 {
-                  int ret = compareType (rightType, multypes[bwd][su]);
+                  int ret = compareType (rightType, multypes[bwd][su], false);
                   if (ret != 1)
                     {
                       assert(0);
@@ -2496,7 +2496,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               skipuic = NULL;
               if (uic->op == '=' && IS_ITEMP (IC_RESULT (uic)) &&
                   bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) == 1 &&
-                  compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
+                  compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic)), false) == 1)
                 {
                   skipuic = uic;
                   uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
@@ -2505,7 +2505,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               /* Try to handle a few cases where the result has multiple uses */
               else if (ic->op == '*' && bitsForType (operandType (IC_RESULT (ic))) > 16 && uic->op == '=' &&
                        bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) > 1 &&
-                       compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
+                       compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic)), false) == 1)
                 {
                   bool ok = true;
                   const bitVect *uses;
@@ -2655,7 +2655,7 @@ optimize:
                     }
                 }
               if (skipuic && skipuic->op == '=' &&
-                  compareType (operandType (IC_RESULT (skipuic)), operandType (IC_RIGHT (skipuic))) != 1)
+                  compareType (operandType (IC_RESULT (skipuic)), operandType (IC_RIGHT (skipuic)), false) != 1)
                 {
                   /* Because of the type change, this assignment  */
                   /* is now really a cast, so make it official.   */

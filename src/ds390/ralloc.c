@@ -3316,7 +3316,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
               /* if the type from and type to are the same
                  then if this is the only use then packit */
-              if (compareType (operandType (IC_RIGHT (ic)), operandType (IC_LEFT (ic))) == 1)
+              if (compareType (operandType (IC_RIGHT (ic)), operandType (IC_LEFT (ic)), false) == 1)
                 {
                   iCode *dic = packRegsDPTRuse (IC_RIGHT (ic));
                   if (dic)

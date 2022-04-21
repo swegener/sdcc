@@ -1589,12 +1589,12 @@ isOperandEqual (const operand * left, const operand * right)
     case SYMBOL:
       return isSymbolEqual (left->svt.symOperand, right->svt.symOperand);
     case VALUE:
-      return (compareType (left->svt.valOperand->type, right->svt.valOperand->type) &&
+      return (compareType (left->svt.valOperand->type, right->svt.valOperand->type, false) &&
         (!IS_FLOAT (getSpec (left->svt.valOperand->type)) ?
           (operandLitValueUll (left) == operandLitValueUll (right)) :
           (operandLitValue (left) == operandLitValue (right))));
     case TYPE:
-      if (compareType (left->svt.typeOperand, right->svt.typeOperand) == 1)
+      if (compareType (left->svt.typeOperand, right->svt.typeOperand, false) == 1)
         return 1;
     }
 
@@ -2126,7 +2126,7 @@ geniCodeCast (sym_link *type, operand *op, bool implicit)
     }
 
   /* if the operand is already the desired type then do nothing */
-  if (compareType (type, optype) == 1)
+  if (compareType (type, optype, false) == 1)
   {
     if (IS_PTR (type) && IS_CONSTANT (opetype) && !IS_CONSTANT (getSpec(type)))
       op->isConstElimnated = 1;
@@ -2891,9 +2891,9 @@ geniCodeBitwise (operand * left, operand * right, int oper, sym_link * resType)
 
   /* Signedness doesn't matter for bit ops, so omit */
   /* possible cast if that is the only difference */
-  if (compareType (resType, operandType (left)) != -2)
+  if (compareType (resType, operandType (left), false) != -2)
     left = geniCodeCast (resType, left, TRUE);
-  if (compareType (resType, operandType (right)) != -2)
+  if (compareType (resType, operandType (right), false) != -2)
     right = geniCodeCast (resType, right, TRUE);
 
   ic = newiCode (oper, left, right);
@@ -3356,7 +3356,7 @@ checkTypes (operand * left, operand * right)
   /* then cast rights type to left */
 
   /* first check the type for pointer assignment */
-  if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) && compareType (ltype, rtype) <= 0)
+  if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) && compareType (ltype, rtype, false) <= 0)
     {
       if (left->aggr2ptr)
         {
@@ -3376,7 +3376,7 @@ checkTypes (operand * left, operand * right)
       werror (W_LIT_OVERFLOW);
     }
 
-  if (always_cast || compareType (ltype, rtype) == -1)
+  if (always_cast || compareType (ltype, rtype, false) == -1)
     right = geniCodeCast (ltype, right, TRUE);
   checkPtrQualifiers (ltype, rtype, !right->isConstElimnated);
   return right;
@@ -4641,7 +4641,7 @@ ast2iCode (ast * tree, int lvl)
       {
         sym_link *rtype = operandType (right);
         sym_link *ltype = operandType (left);
-        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype) == 1)
+        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype, false) == 1)
           right = geniCodeRValue (right, TRUE);
         else
           right = geniCodeRValue (right, FALSE);
@@ -4669,7 +4669,7 @@ ast2iCode (ast * tree, int lvl)
       {
         sym_link *rtype = operandType (right);
         sym_link *ltype = operandType (left);
-        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype) == 1)
+        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype, false) == 1)
           right = geniCodeRValue (right, TRUE);
         else
           right = geniCodeRValue (right, FALSE);
@@ -4683,7 +4683,7 @@ ast2iCode (ast * tree, int lvl)
       {
         sym_link *rtype = operandType (right);
         sym_link *ltype = operandType (left);
-        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype) == 1)
+        if (IS_PTR (rtype) && IS_ITEMP (right) && right->isaddr && compareType (rtype->next, ltype, false) == 1)
           {
             right = geniCodeRValue (right, TRUE);
           }

@@ -1988,7 +1988,10 @@ checkSClass (symbol *sym, int isProto)
       while (IS_ARRAY (t))
         t = t->next;
       if (IS_CONSTANT (t))
-        SPEC_SCLS (sym->etype) = S_CODE;
+        {
+          SPEC_SCLS (sym->etype) = S_CODE;
+          SPEC_SCLS_IMPLICITINTRINSIC (sym->etype) = true;
+        }
     }
 
   /* global variable in code space is a constant */
@@ -2638,7 +2641,7 @@ compareFuncType (sym_link * dest, sym_link * src)
     return 0;
 
   /* check the return value type   */
-  if (compareType (dest->next, src->next) <= 0)
+  if (compareType (dest->next, src->next, false) <= 0)
     return 0;
 
   /* Really, reentrant should match regardless of argCnt, but     */
@@ -2709,7 +2712,7 @@ compareFuncType (sym_link * dest, sym_link * src)
         {
           checkValue = acargs;
         }
-      if (IFFUNC_ISREENT (dest) && compareType (exargs->type, checkValue->type) <= 0)
+      if (IFFUNC_ISREENT (dest) && compareType (exargs->type, checkValue->type, false) <= 0)
         {
           return 0;
         }
@@ -2729,26 +2732,26 @@ compareFuncType (sym_link * dest, sym_link * src)
 }
 
 int
-comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
+comparePtrType (sym_link *dest, sym_link *src, bool mustCast, bool ignoreimplicitintrinsic)
 {
   int res;
 
   if (getAddrspace (src->next) != getAddrspace (dest->next))
-    bMustCast = 1;
+    mustCast = 1;
 
   if (IS_VOID (src->next) && IS_VOID (dest->next))
-    return bMustCast ? -1 : 1;
+    return mustCast ? -1 : 1;
   if ((IS_VOID (src->next) && !IS_VOID (dest->next)) || (!IS_VOID (src->next) && IS_VOID (dest->next)))
     return -1;
-  res = compareType (dest->next, src->next);
+  res = compareType (dest->next, src->next, ignoreimplicitintrinsic);
 
   /* All function pointers can be cast (6.6 in the ISO C11 standard) TODO: What about address spaces? */
-  if (res == 0 && !bMustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
+  if (res == 0 && !mustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
     return -1;
   else if (res == 1)
-    return bMustCast ? -1 : 1;
+    return mustCast ? -1 : 1;
   else if (res == -2)
-    return bMustCast ? -1 : -2;
+    return mustCast ? -1 : -2;
   else
     return res;
 }
@@ -2756,9 +2759,10 @@ comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
 /*--------------------------------------------------------------------*/
 /* compareType - will do type check return 1 if match, 0 if no match, */
 /*               -1 if castable, -2 if only signedness differs        */
+/* ignoreimplicitintrinsic - ignore implicitly assigned intrinsic named address spaces */
 /*--------------------------------------------------------------------*/
 int
-compareType (sym_link *dest, sym_link *src)
+compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
 {
   if (!dest && !src)
     return 1;
@@ -2784,16 +2788,18 @@ compareType (sym_link *dest, sym_link *src)
                 return -1;
               if (IS_FUNC (dest->next) && IS_VOID (src->next))
                 return -1;
-              return comparePtrType (dest, src, FALSE);
+              return comparePtrType (dest, src, false, ignoreimplicitintrinsic);
             }
 
-          if (DCL_TYPE (src) == DCL_TYPE (dest))
+          if (DCL_TYPE (src) == DCL_TYPE (dest) ||
+            (IS_PTR (src) && ignoreimplicitintrinsic && DCL_TYPE_IMPLICITINTRINSIC (src) || IS_GENPTR (src)) &&
+              (IS_PTR (dest) && ignoreimplicitintrinsic && DCL_TYPE_IMPLICITINTRINSIC (dest) || IS_GENPTR (dest)))
             {
               if (IS_FUNC (src))
                 {
                   return compareFuncType (dest, src);
                 }
-              return comparePtrType (dest, src, FALSE);
+              return comparePtrType (dest, src, false, ignoreimplicitintrinsic);
             }
           if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID (src->next))
             {
@@ -2801,19 +2807,19 @@ compareType (sym_link *dest, sym_link *src)
             }
           if (IS_PTR (src) && (IS_GENPTR (dest) || ((DCL_TYPE (src) == POINTER) && (DCL_TYPE (dest) == IPOINTER))))
             {
-              return comparePtrType (dest, src, TRUE);
+              return comparePtrType (dest, src, true, ignoreimplicitintrinsic);
             }
           if (IS_PTR (dest) && IS_ARRAY (src))
             {
               value *val = aggregateToPointer (valFromType (src));
-              int res = compareType (dest, val->type);
+              int res = compareType (dest, val->type, ignoreimplicitintrinsic);
               Safe_free (val->type);
               Safe_free (val);
               return res;
             }
           if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
             {
-              return compareType (dest->next, src);
+              return compareType (dest->next, src, ignoreimplicitintrinsic);
             }
           if (IS_PTR (dest) && IS_VOID (dest->next) && IS_FUNC (src))
             return -1;
@@ -3182,6 +3188,7 @@ aggregateToPointer (value *val)
         default:
           DCL_TYPE (val->type) = port->unqualified_pointer;
         }
+      DCL_TYPE_IMPLICITINTRINSIC (val->type) = SPEC_SCLS_IMPLICITINTRINSIC (val->etype);
 
       /* is there is a symbol associated then */
       /* change the type of the symbol as well */
@@ -3306,7 +3313,7 @@ checkFunction (symbol * sym, symbol * csym)
     }
 
   /* check the return value type   */
-  if (compareType (csym->type, sym->type) <= 0)
+  if (compareType (csym->type, sym->type, false) <= 0)
     {
       werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "type", csym->fileDef, csym->lineDef);
       printFromToType (csym->type, sym->type);
@@ -3393,7 +3400,7 @@ checkFunction (symbol * sym, symbol * csym)
           checkValue = acargs;
         }
 
-      if (compareType (exargs->type, checkValue->type) <= 0)
+      if (compareType (exargs->type, checkValue->type, false) <= 0)
         {
           werror (E_ARG_TYPE, argCnt);
           printFromToType (exargs->type, checkValue->type);

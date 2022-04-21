@@ -397,7 +397,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
       (expr->opval.op == '+' || expr->opval.op == '-') &&
       IS_AST_SYM_VALUE (expr->left) &&
       (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
-      compareType(toType, expr->left->ftype) &&
+      compareType(toType, expr->left->ftype, false) &&
       IS_AST_LIT_VALUE (expr->right)) {
     return valForCastAggr (expr->left, expr->left->ftype,
                            expr->right,
@@ -407,7 +407,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
   /* (char *)&a */
   if (IS_AST_OP(expr) && expr->opval.op==CAST &&
       IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
-    if (compareType(toType, expr->left->ftype)!=1) {
+    if (compareType(toType, expr->left->ftype, false)!=1) {
       werror (W_INIT_WRONG);
       printFromToType(expr->left->ftype, toType);
     }
@@ -1037,7 +1037,7 @@ pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
   }
 
   if (IS_LITERAL(val->etype)) {
-    if (0 && compareType(type, val->etype) == 0) {
+    if (0 && compareType(type, val->etype, false) == 0) {
       werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
       printFromToType (val->type, type);
     }
@@ -1046,7 +1046,7 @@ pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
   }
 
   /* check the types   */
-  if ((dLvl = compareType (val->type, type->next)) <= 0)
+  if ((dLvl = compareType (val->type, type->next, false)) <= 0)
     {
       pic16_emitDB(0x00, ptype, p);
       return;
@@ -1110,7 +1110,7 @@ pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char ptype,
       return;
 
   /* check the type      */
-  if (compareType (type, val->type) == 0) {
+  if (compareType (type, val->type, false) == 0) {
     werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
     printFromToType (val->type, type);
   }

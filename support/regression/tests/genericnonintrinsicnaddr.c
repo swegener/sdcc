@@ -12,7 +12,7 @@ void set_b(void)
 {
 }
 
-#ifndef TEST_HOST
+#ifndef PORT_HOST
 __addressmod set_a space_a;
 __addressmod set_b const space_b;
 
@@ -22,7 +22,7 @@ space_b int *bi;
 
 void testGeneric(void)
 {
-#ifndef TEST_HOST
+#ifndef PORT_HOST
 	ASSERT(_Generic(ai, default : 0, space_a int *: 1, space_b int* : 2) == 1);
 	ASSERT(_Generic(bi, default : 0, space_a int *: 1, space_b int* : 2) == 2);
 #endif

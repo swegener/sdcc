@@ -1,5 +1,10 @@
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/tests/genericnonintrinsicnaddr.c:
+	  Use PORT_HOST, just like the other tests, instead of TEST_HOST.
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge implicitintrinsicnamedaddressspaces branch.
 
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

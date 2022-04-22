@@ -1,5 +1,11 @@
 2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/tests/bug-1981238.c,
+	  support/regression/tests/bug-3368.c:
+	  Disable some warnings about stuff that is meant to be tested.
+
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* device/lib/z180/setjmp.s,
 	  device/lib/z80/setjmp.s,
 	  device/lib/z80n/setjmp.s:

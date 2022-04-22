@@ -3,6 +3,8 @@
 */
 #include <testfwk.h>
 
+#pragma disable_warning 147
+
 #if defined(__SUNPRO_C) || defined(__GNUC__) || defined(__clang__)
 #pragma pack(1)
 #endif

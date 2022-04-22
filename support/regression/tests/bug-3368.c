@@ -6,6 +6,8 @@
 
 #include <stdarg.h>
 
+#pragma disable_warning 85
+
 typedef struct{int x,y;}ipoint;
 ipoint ipts1[]={{1,2},{3,4}};
 

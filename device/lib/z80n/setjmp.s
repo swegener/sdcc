@@ -63,7 +63,6 @@ ___setjmp:
 .globl _longjmp
 
 _longjmp:
-	pop	af
 	push	hl
 	pop	iy
 

@@ -1,3 +1,10 @@
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/lib/z180/setjmp.s,
+	  device/lib/z80/setjmp.s,
+	  device/lib/z80n/setjmp.s:
+	  Fix an issue triggered by tail-call optimization on calls to longjmp.
+
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/genericnonintrinsicnaddr.c:

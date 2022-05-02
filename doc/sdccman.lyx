@@ -13541,6 +13541,64 @@ F:/Projects/test3/output 1/
 \labelwidthstring 00.00.0000
 
 \series bold
+-x
+\begin_inset space ~
+\end_inset
+
+<type>
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-x <type>
+\end_layout
+
+\end_inset
+
+
+\series default
+ The specified type overrides the file type that SDCC detected based on
+ the file name extension.
+ The currently supported options are 
+\begin_inset Quotes sld
+\end_inset
+
+c
+\begin_inset Quotes srd
+\end_inset
+
+, 
+\begin_inset Quotes sld
+\end_inset
+
+c-header
+\begin_inset Quotes srd
+\end_inset
+
+ and 
+\begin_inset Quotes sld
+\end_inset
+
+none
+\begin_inset Quotes srd
+\end_inset
+
+.
+ The option 
+\begin_inset Quotes sld
+\end_inset
+
+none
+\begin_inset Quotes srd
+\end_inset
+
+ restores the default behavior.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
 -
 \begin_inset ERT
 status collapsed

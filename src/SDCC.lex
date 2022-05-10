@@ -489,7 +489,7 @@ decode_UCNs_to_utf8 (char *dest, const char *src, size_t n)
             }
           if (!is_UCN_valid_in_idf(c, is_first))
             {
-              werror(E_INVALID_UNIVERSAL, s);
+              werror(E_INVALID_UNIVERSAL_IDENTIFIER, s);
             }
 
           if (c >= 0x10000)

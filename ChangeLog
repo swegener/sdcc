@@ -2,6 +2,12 @@
 
 	* src/SDCCglue.c:
 	  Fix bug #3031.
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCutil.c,
+	  src/SDCC.lex,
+	  support/valdiag/tests/universal.c:
+	  ISO C23 diagnostics for invalid universal character names.
 
 2022-05-02 Benedikt Freisen <b.freisen AT gmx.net>
 

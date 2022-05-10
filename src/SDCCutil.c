@@ -908,9 +908,10 @@ universalEscape (const char **str, unsigned int n)
       else
           break;
     }
-  if (digits != n || value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060 || value >= 0xd800 && 0xdfff >= value)
+  if (digits != n || value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060 || value >= 0xd800 && 0xdfff >= value ||
+    value > 0x10ffff) // Additional diagnostic required in C23, but since it is just a warning, we enable it even for older standards.
     {
-      werror (E_INVALID_UNIVERSAL, s);
+      werror (W_INVALID_UNIVERSAL, s);
     }
 
   return value;

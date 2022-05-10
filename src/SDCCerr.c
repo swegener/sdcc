@@ -470,7 +470,7 @@ struct
      "Invalid designator for designated initializer", 0 },
   { W_DUPLICATE_INIT, ERROR_LEVEL_WARNING,
      "Duplicate initializer at position %d; ignoring previous.", 0 },
-  { E_INVALID_UNIVERSAL, ERROR_LEVEL_ERROR,
+  { W_INVALID_UNIVERSAL, ERROR_LEVEL_WARNING,
      "invalid universal character name \\%s.", 0 },
   { W_UNIVERSAL_C95, ERROR_LEVEL_WARNING,
      "universal character names are only valid in C95 or later", 0 },
@@ -611,6 +611,8 @@ struct
      "invalid width for bit-precise integer type", 0},
   { W_BITINTCONST_C23, ERROR_LEVEL_WARNING,
      "bit-precise integer constant requires ISO C23 or later", 0},
+  { E_INVALID_UNIVERSAL_IDENTIFIER, ERROR_LEVEL_ERROR,
+     "universal character name \\%s invalid in identifier.", 0 },
 };
 
 /* -------------------------------------------------------------------------------

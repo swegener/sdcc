@@ -1,8 +1,47 @@
 2022-05-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* Merge regtest branch.
+
+2022-05-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/stm8/peeph.def,
 	  support/regression/tests/bug-3385.c:
 	  Fix bug #3385, patch by Ryan Hartlage (ryanplusplus).
+
+2022-05-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList:
+	  Exclude tests that fail on mcs51 due to abnormal stops.
+
+2022-05-11 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/MakeList
+	  exclude queen on pdk15-stack-auto.
+
+2022-05-11 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/Makefile.in:
+	  verbosity fix.
+
+2022-05-10 Felix Salfelder <felix AT salfelder.org>
+
+	* support/valdiag/Makefile.in:
+	  adjust compact-results invocation, add Makefile rule.
+
+2022-05-10 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/compact-results.py:
+	  simplify compact-results output.
+
+2022-05-10 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/Makefile.in:
+	  honour EXCLUDE_PORTS in test-mcs51.
+
+2022-05-10 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/MakeList:
+	  tcc_49_bracket_evaluation excludes on mcs51.
 
 2022-05-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -22,9 +61,33 @@
 
 2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/Makefile.in,
+	  support/regression/ports/host/spec.mk.in:
+	  Deduplicate EMU rule: handle test-host similar to other targets, patch by Felix Salfelder (felixs).
+
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList:
+	  Exclude a test for some pdk15-stack-auto target (due to lack of memory), patch by Felix Salfelder (felixs).
+
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList:
+	  Exclude some tests for some mcs51 targets (due to lack of memory), patch by Felix Salfelder (felixs).
+
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* support/regression/tests/bug-1981238.c,
 	  support/regression/tests/bug-3368.c:
 	  Disable some warnings about stuff that is meant to be tested.
+
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList:
+	  Exclude some known-failing among the new tests, patch by Felix Salfelder (felixs).
+	* support/regression/Makefile.in,
+	  support/regression/ports/host/spec.mk.in:
+	  Work around a linker error reporting issue, patch by Felix Salfelder (felixs).
 
 2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -33,6 +96,45 @@
 	  device/lib/z80n/setjmp.s:
 	  Fix an issue triggered by tail-call optimization on calls to longjmp.
 
+2022-04-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/gte/README,
+	  support/regression/qct/README,
+	  support/regression/tcc/README:
+	  Document Licenses of imported tests, patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList,
+	  support/regression/cases/Makefile.in,
+	  support/regression/tcc,
+	  support/regression/qct:
+	  Add tests from TCC, QuickC, patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/cases/Makefile.in:
+	  Disable some warnings in gce tests, patch by Felix Salfelder (felixs).
+	* support/regression/MakeList:
+	  Disable new tests for z80-undoc (where they fail), patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/cases/Makefile.in,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/stm8/spec.mk,
+	  support/regression/gte:
+	  GCC tests from the execute part of the torture suite. Patch by Felix Salfelder (felixs).
+	* support/regression/gte/951204-1.c:
+	  Un-edit a GCC torture-execute test, patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/host/spec.mk.in:
+	  Fix out creation logic to avoid duplicates, patch by Felix Salfelder (felixs).
+
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/genericnonintrinsicnaddr.c:
@@ -40,7 +142,27 @@
 
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* support/regression/Makefile.in:
+	  Hack to silence trigraph warning in p99 test, patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in:
+	  Filter out tests listed in EXCLUDE_${PORT}, TEST_PREFIX: select tests by prefix (e.g. m4_), TEST_SLICE: slice test list (Python style). Patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in:
+	  .PRECIOUS does not play with .DELETE_ON_ERROR, use .SECONDARY instead. Patch by Felix Salfelder (felixs).
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge implicitintrinsicnamedaddressspaces branch.
+
+2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/Makefile.in:
+	  Split EXCLUDE_PORTS, add uc6502-stack-auto, patch Felix Salfelder (felixs).
 
 2022-04-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -66,7 +188,7 @@
 2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/cases/Makefile.in:
-	  Test cases cleanup, patch by by Felix Salfelder (felixs).
+	  Test cases cleanup, patch by Felix Salfelder (felixs).
 
 2022-04-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

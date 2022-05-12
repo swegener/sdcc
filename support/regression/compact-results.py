@@ -125,7 +125,7 @@ for line in lines:
         print("Stack overflow: %s" % safe_name)
     
 
-print("%-35.35s" % base, end=' ')
+print("%-35.35s" % sys.argv[1], end=' ')
 
 if (invalid > 0):
     print("%d invalid instructions," % invalid, end=' ')

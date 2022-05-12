@@ -44,7 +44,7 @@ clean-port:
 $(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c port-dirs
 	$(PYTHON) $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
 	grep FAIL $@ ; true
-	cat $@ | $(PYTHON) $(srcdir)/../regression/compact-results.py
+	cat $@ | $(PYTHON) $(srcdir)/../regression/compact-results.py $*.c
 
 port-results: port-dirs $(PORT_RESULTS)
 	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/../regression/collate-results.py $(PORT)
@@ -52,3 +52,6 @@ port-results: port-dirs $(PORT_RESULTS)
 port-dirs:
 	mkdir -p $(PORT_RESULTS_DIR)
 	mkdir -p $(PORT_BUILD_DIR)
+
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status support/valdiag/Makefile

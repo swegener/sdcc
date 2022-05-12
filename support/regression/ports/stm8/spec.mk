@@ -48,7 +48,4 @@ include $(srcdir)/fwk/lib/spec.mk
 %$(OBJEXT): %.asm
 	$(AS) -plosgff $<
 
-%$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-
 _clean:

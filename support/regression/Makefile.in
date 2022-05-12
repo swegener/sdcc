@@ -53,6 +53,25 @@ ifeq (${V},silent)
 MAKEFLAGS += --silent
 endif
 
+# TEST_PREFIX: select tests matching a pattern
+# All tests (default)
+TEST_PREFIX =
+#
+# only run m4 test
+# TEST_PREFIX = m4_
+
+# TEST_SLICE. Subselect tests from list of all tests.
+# This is Python syntax for slicing, start:stop:step
+#
+# All tests, 0 1 2... (default)
+TEST_SLICE = 0::1
+#
+# Select first 10
+# TEST_SLICE = 0:10
+#
+# Select 2 9 16...
+# TEST_SLICE = 2::7
+
 # delete failed attempts (so make will retry...)
 .DELETE_ON_ERROR:
 
@@ -116,10 +135,38 @@ TMP_DIR = gen
 # The directories in PORTS_DIR correspond to ports.
 PORTS = $(filter-out .svn, $(notdir $(wildcard $(PORTS_DIR)/*)))
 
+# not a port.
+EXCLUDE_PORTS = \
+	mcs51-common
+
+# unstable
+EXCLUDE_PORTS += \
+	mcs51-xstack-auto \
+	uc6502-stack-auto
+
+# not enough ram
+EXCLUDE_PORTS += \
+	pdk13
+
+# simulator may be unavailable
+EXCLUDE_PORTS += \
+	mos6502 \
+	mos6502-stack-auto
+
+# unstable
+EXCLUDE_PORTS += \
+	pic14 \
+	pic16
+
+# redundant, uCSim works better.
+EXCLUDE_PORTS += \
+	rrz80 \
+	rrgbz80
+
 # Generate the list of ports to test. Each port has a spec.mk with build and
 # emulator flags. Some ports are tested by default, these are the tests
 # associated to the "all" target.
-ALL_PORTS = $(filter-out mos6502 mos6502-stack-auto mcs51-xstack-auto rrz80 rrgbz80 pic16 pic14 mcs51-common pdk13,$(PORTS))
+ALL_PORTS = $(filter-out ${EXCLUDE_PORTS}, $(PORTS))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out mcs51-common host, $(PORTS))
@@ -151,7 +198,15 @@ ${PORTS:%=test-%} : test-%: test-common
 	cat $(RESULTS_DIR)/$*.sum
 
 # Shorthand for testing the mcs51 port only
-test-mcs51: test-mcs51-small test-mcs51-medium test-mcs51-large test-mcs51-huge test-mcs51-small-stack-auto test-mcs51-large-stack-auto test-mcs51-xstack-auto
+TEST_MCS51 = \
+	test-mcs51-small \
+	test-mcs51-medium \
+	test-mcs51-large \
+	test-mcs51-huge \
+	test-mcs51-small-stack-auto \
+	test-mcs51-large-stack-auto \
+	test-mcs51-xstack-auto
+test-mcs51: $(filter-out ${EXCLUDE_PORTS:%=test-%}, $(TEST_MCS51))
 
 # Shorthand for testing the z80 related ports only
 test-z80: test-ucz80 test-ucz80-undoc test-ucz80-resiy test-ucz180 test-ucz180-resiy test-ucz80n test-ucgbz80 test-ucr2k test-ucr2ka test-ucr3ka test-ez80-z80 test-tlcs90
@@ -179,12 +234,11 @@ PORT_CASES_DIR = $(TMP_DIR)/$(PORT)
 # PORT_CASES_DIRR = $(TMP_DIR)/$(PORT)
 PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 
-# For each test we produce a result log file, %.log
-ifndef CASES
-PORT_RESULTS = $(TEST_STEMS:%=$(PORT_RESULTS_DIR)/%.log)
-endif
+##### per-port exclude (cases, not tests) #####
+## BUG/Feature: after excluding tests, manually delete .sum
+include $(srcdir)/MakeList
 
-DCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
+SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 
 # Defaults.  Override in spec.mk if required.
 PORT_BASE = $(PORT)
@@ -209,6 +263,8 @@ CC_FOR_BUILD = $(CC)
 # Only include if we're in a per-port call.
 ifdef PORT
 
+EMU_INPUT = < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd
+
 # run simulator with SIM_TIMEOUT seconds timeout
   # include ./$(PORT)/spec.mk if exists, else include $(PORTS_DIR)/$(PORT)/spec.mk
   ifeq ($(shell if test -f ./ports/$(PORT)/spec.mk; then echo OK; fi),OK)
@@ -217,28 +273,32 @@ ifdef PORT
     include $(PORTS_DIR)/$(PORT)/spec.mk
   endif
 
-ifdef OVERRIDE_EMU_RULE
-# need rule from spec.mk (e.g. host/spec.mk)
-else
-# this one will do for all the others.
 $(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
 	@mkdir -p $(dir $@)
+	@# BUG: need "Running" in .out, regardless of whether we run anything.
+	@echo --- Running: $< > $@;
+
 	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
-	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd > $@; \
+	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@; \
 	  if [ 0 -ne $$? ]; then \
 	    echo --- FAIL: \"timeout, simulation killed\" in $<"\n"--- Summary: 1/1/1: timeout >> $@; \
 	  fi \
 	else \
-	  echo --- Running: $< > $@; \
 	  echo --- FAIL: cannot compile/link $< "\n"--- Summary: 1/1/1: compile >> $@; \
 	fi
-	@# ${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $@ #2
 
 	@# always count ticks?
 	@$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
 	@grep -n FAIL $@ /dev/null || true
-endif
 
+endif # PORT
+
+# For each test we produce a result log file, %.log
+ifndef CASES
+TEST_STEMS_FILTERED_ = $(filter-out ${EXCLUDE_${PORT}}, $(TEST_STEMS))
+TEST_STEMS_FILTERED__ = $(filter ${TEST_PREFIX}%, $(TEST_STEMS_FILTERED_))
+TEST_STEMS_FILTERED = $(shell ${PYTHON} -c 'for i in "${TEST_STEMS_FILTERED__}".split(" ")[${TEST_SLICE}]: print(i)')
+PORT_RESULTS = $(TEST_STEMS_FILTERED:%=$(PORT_RESULTS_DIR)/%.log)
 endif
 
 make_library: $(MAKE_LIBRARY)
@@ -250,8 +310,9 @@ endif
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.
-.PRECIOUS: $(RESULTS_DIR) $(CASES_DIR)/% $(PORT_TMP_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT) \
-	$(CASES_DIR)/%/stamp $(RESULTS_DIR)/$(PORT)/%.out
+.SECONDARY: $(RESULTS_DIR) $(CASES_DIR)/% $(PORT_TMP_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT) \
+	$(CASES_DIR)/%/stamp \
+	${TEST_STEMS:%=$(RESULTS_DIR)/$(PORT)/%.out}
 
 # $(TMP_DIR)/stamp is really a proxy for $(TMP_DIR). We shouldn't use
 # $(TMP_DIR) as a dependency directly, because as a directory its time
@@ -276,7 +337,7 @@ $(PORT_RESULTS_DIR)/%.log: $(PORT_RESULTS_DIR)/%.out
 # Rule to summarise the results for one port after all of the tests
 # have been run.
 $(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS)
-	${M_V_at}cat $(PORT_RESULTS:%.log=%.out) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
+	${M_V_at}echo | cat - $(PORT_RESULTS:%.log=%.out) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
 
 port-fwklib: port-dirs $(EXTRAS) $(FWKLIB)
 
@@ -345,9 +406,12 @@ distclean: clean
 %$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
 	${M_V_CCLD}$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
 
+# ignore (preprocessor) warnings
+gen/%/tst_p99-conformance.rel: EXTRA_COMPILE_HACK=2>/dev/null
+
 $(PORT_CASES_DIR)/%$(OBJEXT): %.c
 	@mkdir -p $(dir $@) # BUG?
-	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@ ${EXTRA_COMPILE_HACK}
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT_BASE)/%.c
 	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@

@@ -47,10 +47,6 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 include $(srcdir)/fwk/lib/spec.mk
 FWKLIB += $(PORT_CASES_DIR)/T2_isr$(OBJEXT)
 
-# Rule to link into .ihx
-%$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
-	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
-
 SPEC_LIB = $(PORTS_DIR)/mcs51-common/fwk.lib
 
 _clean:

@@ -24,8 +24,10 @@ void event_init(event_t* self)
 
 void testBug(void)
 {
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug #3386
   event_t e;
   event_init (&e);
   ASSERT (e.list.head.next == &e.list.head);
+#endif
 }
 

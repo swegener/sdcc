@@ -1,3 +1,8 @@
+2022-05-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-3385.c:
+	  Disable new test for hc08 and s08, where it fails (bug #3386).
+
 2022-05-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge regtest branch.

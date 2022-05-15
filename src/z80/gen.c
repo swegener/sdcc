@@ -10278,7 +10278,8 @@ genAnd (const iCode * ic, iCode * ifx)
             }
           /* Non-destructive and when exactly one bit per byte is set. */
           else if (isLiteralBit (bytelit) >= 0 &&
-            (left->aop->type == AOP_STK || aopInReg (left->aop, 0, A_IDX) || left->aop->type == AOP_HL || left->aop->type == AOP_IY || left->aop->type == AOP_REG && left->aop->aopu.aop_reg[0]->rIdx != IYL_IDX))
+            (left->aop->type == AOP_STK || aopInReg (left->aop, offset, A_IDX) || left->aop->type == AOP_HL || left->aop->type == AOP_IY ||
+              left->aop->type == AOP_REG && !aopInReg (left->aop, offset, IYL_IDX) && !aopInReg (left->aop, offset, IYH_IDX)))
             {
               if (requiresHL (left->aop) && left->aop->type != AOP_REG)
                 _push (PAIR_HL);
@@ -10394,8 +10395,8 @@ genAnd (const iCode * ic, iCode * ifx)
               i = end;
               continue;
             }
-          else if (isLiteralBit (~bytelit & 0xffu) >= 0 &&
-            (result->aop->type == AOP_REG || left == right && (result->aop->type == AOP_STK || result->aop->type == AOP_DIR)))
+          else if (isLiteralBit (~bytelit & 0xffu) >= 0 && aopSame (result->aop, i, left->aop, i, 1) &&
+            (result->aop->type == AOP_STK || result->aop->type == AOP_DIR || result->aop->type == AOP_REG && !aopInReg (result->aop, i, IYL_IDX) && !aopInReg (result->aop, i, IYH_IDX)))
             {
               cheapMove (result->aop, i, left->aop, i, a_free);
               if (!regalloc_dry_run)
@@ -10672,8 +10673,8 @@ genOr (const iCode * ic, iCode * ifx)
               i = end;
               continue;
             }
-          else if (isLiteralBit (bytelit) >= 0 &&
-            (result->aop->type == AOP_REG || left == right && (result->aop->type == AOP_STK || result->aop->type == AOP_DIR)))
+          else if (isLiteralBit (bytelit) >= 0 && aopSame (result->aop, i, left->aop, i, 1) &&
+            (result->aop->type == AOP_STK || result->aop->type == AOP_DIR || result->aop->type == AOP_REG && !aopInReg (result->aop, i, IYL_IDX) && !aopInReg (result->aop, i, IYH_IDX)))
             {
               cheapMove (result->aop, i, left->aop, i, a_free);
               if (!regalloc_dry_run)

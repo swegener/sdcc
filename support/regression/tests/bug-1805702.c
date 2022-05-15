@@ -19,10 +19,14 @@ test(void)
 #if !defined(__SDCC_pdk14) // Not enough RAM
 /* compile time check for compiler defined functions (cdef) */
 
-float __fsmul (float, float);
+#ifndef __SDCC_mcs51
+#define __nonbanked
+#endif
 
-float __fsmul (float a1, float a2) {
-  /* just for tesing... */
+float __fsmul (float, float) __nonbanked;
+
+float __fsmul (float a1, float a2) __nonbanked {
+  /* just for testing... */
   return (a1 + a2);
 }
 #endif

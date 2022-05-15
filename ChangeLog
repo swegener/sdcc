@@ -1,7 +1,12 @@
-2022-05-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2022-05-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:
 	  Fix bug #3388.
+	* src/SDCCsymt.c,
+	  support/valdiag/tests/bug-3389.c:
+	  device/include/float.h,
+	  support/regression/tests/bug-1805702.c:
+	  Fix bug #3389.
 
 2022-05-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

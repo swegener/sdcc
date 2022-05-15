@@ -56,27 +56,33 @@
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 #endif
 
-float __uchar2fs (unsigned char);
-float __schar2fs (signed char);
-float __uint2fs (unsigned int);
-float __sint2fs (signed int);
-float __ulong2fs (unsigned long);
-float __slong2fs (signed long);
-unsigned char __fs2uchar (float);
-signed char __fs2schar (float);
-unsigned int __fs2uint (float);
-signed int __fs2sint (float);
-unsigned long __fs2ulong (float);
-signed long __fs2slong (float);
+#ifdef __SDCC_mcs51
+#define __SDCC_FLOAT_NONBANKED __nonbanked
+#else
+#define __SDCC_FLOAT_NONBANKED
+#endif
 
-float __fsadd (float, float);
-float __fssub (float, float);
-float __fsmul (float, float);
-float __fsdiv (float, float);
+float __uchar2fs (unsigned char) __SDCC_FLOAT_NONBANKED;
+float __schar2fs (signed char) __SDCC_FLOAT_NONBANKED;
+float __uint2fs (unsigned int) __SDCC_FLOAT_NONBANKED;
+float __sint2fs (signed int) __SDCC_FLOAT_NONBANKED;
+float __ulong2fs (unsigned long) __SDCC_FLOAT_NONBANKED;
+float __slong2fs (signed long) __SDCC_FLOAT_NONBANKED;
+unsigned char __fs2uchar (float) __SDCC_FLOAT_NONBANKED;
+signed char __fs2schar (float) __SDCC_FLOAT_NONBANKED;
+unsigned int __fs2uint (float) __SDCC_FLOAT_NONBANKED;
+signed int __fs2sint (float) __SDCC_FLOAT_NONBANKED;
+unsigned long __fs2ulong (float) __SDCC_FLOAT_NONBANKED;
+signed long __fs2slong (float) __SDCC_FLOAT_NONBANKED;
 
-_Bool __fslt (float, float);
-_Bool __fseq (float, float);
-_Bool __fsgt (float, float);
+float __fsadd (float, float) __SDCC_FLOAT_NONBANKED;
+float __fssub (float, float) __SDCC_FLOAT_NONBANKED;
+float __fsmul (float, float) __SDCC_FLOAT_NONBANKED;
+float __fsdiv (float, float) __SDCC_FLOAT_NONBANKED;
+
+_Bool __fslt (float, float) __SDCC_FLOAT_NONBANKED;
+_Bool __fseq (float, float) __SDCC_FLOAT_NONBANKED;
+_Bool __fsgt (float, float) __SDCC_FLOAT_NONBANKED;
 
 
 #if defined(__SDCC_FLOAT_LIB) && defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)

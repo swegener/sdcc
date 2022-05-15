@@ -2945,7 +2945,8 @@ compareTypeExact (sym_link * dest, sym_link * src, long level)
                     return 0;
                   if (IFFUNC_ISNAKED (dest) != IFFUNC_ISNAKED (src))
                     return 0;
-
+                  if (IFFUNC_ISBANKEDCALL (dest) != IFFUNC_ISBANKEDCALL (src))
+                    return 0;
                   if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src))
                     return 0;
                   if (IFFUNC_ISRAISONANCE (dest) != IFFUNC_ISRAISONANCE (src))

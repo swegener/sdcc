@@ -7619,6 +7619,7 @@ createFunctionDecl (symbol *name)
   if ((csym = findSym (SymbolTab, NULL, name->name)))
     {
       name = csym;
+
       /* special case for compiler defined functions
          we need to add the name to the publics list : this
          actually means we are now compiling the compiler

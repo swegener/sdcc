@@ -155,7 +155,7 @@ cl_mos6502::reset(void)
 {
   cl_uc::reset();
 
-  CC= 0x00 | flagI;
+  cF.W(CC= 0x00 | flagI);
   PC= read_addr(rom, RESET_AT);
   rSP= 0xfd;
   
@@ -285,8 +285,8 @@ cl_mos6502::analyze_start(void)
       vars->add(v);
     }
 
-  for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); i++)
-    analyze(vectors[i].addr);
+  //for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); i++)
+  analyze(vectors[0].addr);
 }
 
 void
@@ -304,20 +304,23 @@ cl_mos6502::analyze(t_addr addr)
 
           switch (de->branch)
             {
-              case 'x': // Returns or indirect jumps that end this execution path immediately
-                return;
-
-              case 's': // Subroutine calls
-              case 'j': // Unconditional jumps
-                target= rom->read(addr+1) + (rom->read(addr+2) << 8);
-                break;
-
-              case 'b': // Conditional branches
-                target= addr + 2 + (i8_t)rom->read(addr+1);
-                break;
-
-              default:
-                break;
+	    case 'x': // Returns or indirect jumps that end this execution path immediately
+	      return;
+		
+	    case 's': // Subroutine calls
+	    case 'j': // Unconditional jumps
+	      target= rom->read(addr+1) + (rom->read(addr+2) << 8);
+	      break;
+	      
+	    case 'b': // Conditional branches
+	      target= addr + 2 + (i8_t)rom->read(addr+1);
+	      break;
+	    case 'B': // BBR/BBS in 65c02
+	      target= addr + 3 + (i8_t)rom->read(addr+2);
+	      break;
+	      
+	    default:
+	      break;
             }
 
           analyze_jump(addr, target, de->branch);
@@ -429,6 +432,14 @@ cl_mos6502::disassc(t_addr addr, chars *comment)
 	      a= l;
 	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
 	      break;
+	    case 'I': // (abs,X)
+	      l= rom->read(addr+1);
+	      h= rom->read(addr+2);
+	      a= h*256+l;
+	      work.appendf("($%04x,X)", a);
+	      a+= rX;
+	      temp.appendf("; [$%04x]=$%04x", a, read_addr(rom, a));
+	      break;
 	    case 'i': // abs,X
 	      l= rom->read(addr+1);
 	      h= rom->read(addr+2);
@@ -455,10 +466,29 @@ cl_mos6502::disassc(t_addr addr, chars *comment)
 	      work.appendf("$%04x", a);
 	      addr_name(a, rom, &work);
 	      break;
+	    case 'R': // rel in BBR/BBS
+	      l= rom->read(addr+2);
+	      a= addr + (i8_t)l + 3;
+	      work.appendf("$%04x", a);
+	      addr_name(a, rom, &work);
+	      break;
 	    case '#': // imm8
 	      l= rom->read(addr+1);
 	      work.appendf("#$%02x", l);
 	      break;
+	    case '3': // (ind16)
+	      a= read_addr(rom, addr+1);
+	      a= read_addr(rom, a);
+	      work.appendf("($%04x)", a);
+	      addr_name(a, rom, &work);
+	      break;
+	    case '4': // (zind)
+	      a= rom->read(addr+1);
+	      work.appendf("($%04x)", a);
+	      a= read_addr(rom, a);
+	      addr_name(a, rom, &work);
+	      temp.appendf("; [$%04x]=$%02x", a, rom->read(a));
+	      break;	      
 	    }
 	  if (comment && temp.nempty())
 	    comment->append(temp);
@@ -562,6 +592,17 @@ cl_mos6502::ind(void)
   class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
   vc.rd+= 3;
   tick(3);
+  return *c;
+}
+
+class cl_cell8 &
+cl_mos6502::zind(void)
+{
+  u16_t a= fetch();
+  a= read_addr(rom, a);
+  class cl_cell8 *c= (class cl_cell8 *)rom->get_cell(a);
+  vc.rd+= 2;
+  tick(4);
   return *c;
 }
 

@@ -42,4 +42,4 @@ public:
 
 #endif
 
-/* End of hc08.src/simm68hc08cl.h */
+/* End of m68hc08.src/simm68hc08cl.h */

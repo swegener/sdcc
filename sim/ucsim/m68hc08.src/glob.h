@@ -38,4 +38,4 @@ extern struct dis_entry disass_hc08_9e[];
 
 #endif
 
-/* End of hc08.src/glob.h */
+/* End of m68hc08.src/glob.h */

@@ -66,8 +66,8 @@ int cl_pdk::store_io(t_addr addr, int value) {
   regs8->write(addr, value & 0xFF);
   if (addr == 0x02)
     {
-      if (get_SP() > sp_max)
-        sp_max = get_SP();
+      if (get_SP() > sp_most)
+        sp_most = get_SP();
       if (!ram->valid_address(value))
         return resSTACK_OV;
     }

@@ -80,10 +80,9 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs install_shared_lib
-	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
-	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
 
 
 # Deleting all the installed files
@@ -131,13 +130,13 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: $(SEN) $(LEN) shared_lib
+$(TN).src: $(LEN) shared_lib
 
-$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(LEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-$(LEN): s$(TN)$(EXEEXT)
-	cp $< $@
+#$(LEN): s$(TN)$(EXEEXT)
+#	cp $< $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/$(SONAME)

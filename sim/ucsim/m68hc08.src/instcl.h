@@ -59,4 +59,4 @@
   virtual int inst_bsr(t_mem code, bool prefix);
 
 
-/* End of hc08.src/instcl.h */
+/* End of m68hc08.src/instcl.h */

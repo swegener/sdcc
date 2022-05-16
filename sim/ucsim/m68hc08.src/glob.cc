@@ -392,4 +392,4 @@ struct dis_entry disass_hc08_9e[]= {
 };
 
 
-/* glob.cc */
+/* End of m68hc08.src/glob.cc */

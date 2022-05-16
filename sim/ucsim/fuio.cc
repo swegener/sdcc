@@ -423,7 +423,7 @@ sigpipe_off()
   sigaction(SIGPIPE, &sa, NULL);
 }
 
-unsigned int cperiod_value() { return 1000000; }
+unsigned int cperiod_value() { return 100000; }
 
 int
 set_console_mode()

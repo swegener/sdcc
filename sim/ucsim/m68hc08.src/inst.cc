@@ -1352,4 +1352,4 @@ cl_hc08::inst_swi(t_mem code, bool prefix)
 }
 
 
-/* End of hc08.src/inst.cc */
+/* End of m68hc08.src/inst.cc */

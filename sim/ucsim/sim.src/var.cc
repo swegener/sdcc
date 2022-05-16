@@ -89,7 +89,7 @@ void
 cl_cvar::print_info(cl_console_base *con) const
 {
   con->dd_printf("%s ", get_name("?"));
-  t_mem m= cell->get();
+  t_mem m= cell->/*get*/read();
   if (bitnr_high >= 0)
     {
       if (bitnr_high != bitnr_low)
@@ -148,7 +148,7 @@ cl_var::print_info(cl_console_base *con) const
   con->dd_printf("[");
   con->dd_printf(mem->addr_format, addr);
   con->dd_printf("]");
-  t_mem m= mem->get(addr);
+  t_mem m= mem->read(addr);
   if (bitnr_high >= 0)
     {
       if (bitnr_high != bitnr_low)

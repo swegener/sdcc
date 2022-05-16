@@ -134,7 +134,7 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 CMDHELP(cl_set_mem_cmd,
 	"set memory memory_type address data... | bit data",
 	"Place list of data into memory OR set specified bit(s) to data",
-	"long help of set bit")
+	"")
 
 /*
  * Command: set hw
@@ -166,7 +166,7 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 CMDHELP(cl_set_hw_cmd,
 	"set hardware category params...",
 	"Set parameters of specified hardware element",
-	"long help of set hardware")
+	"")
 
 /*
  * Command: set option
@@ -245,7 +245,7 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
 CMDHELP(cl_set_option_cmd,
 	"set option name|nr value",
 	"Set value of an option",
-	"long help of set option")
+	"")
 	
 /*
  * Command: set error
@@ -306,7 +306,7 @@ COMMAND_DO_WORK_APP(cl_set_error_cmd)
 CMDHELP(cl_set_error_cmd,
 	"set error error_name on|off|unset",
 	"Set value of an error",
-	"long help of set error")
+	"")
 
 /*
  * Command: set console
@@ -376,6 +376,6 @@ COMMAND_DO_WORK_APP(cl_set_console_cmd)
 CMDHELP(cl_set_console_cmd,
 	"set console interactive [on|off]|noninteractive|raw|edited",
 	"Set console parameters",
-	"long help of set console")
+	"")
 
 /* End of cmd.src/cmd_set.cc */

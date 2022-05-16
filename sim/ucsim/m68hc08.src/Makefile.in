@@ -83,14 +83,11 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs install_shared_lib
-	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)
-	$(STRIP) $(DESTDIR)$(bindir)/$(SEN)
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
-	$(INSTALL) $(SOLD) $(DESTDIR)$(bindir)/$(SOLD)
-	$(STRIP) $(DESTDIR)$(bindir)/$(SOLD)
-	$(INSTALL) $(LOLD) $(DESTDIR)$(bindir)/$(LOLD)
-	$(STRIP) $(DESTDIR)$(bindir)/$(LOLD)
+	rm -f $(DESTDIR)$(bindir)/$(SEN)
+	rm -f $(DESTDIR)$(bindir)/$(SOLD)
+	rm -f $(DESTDIR)$(bindir)/$(LOLD)
 
 
 # Deleting all the installed files
@@ -138,21 +135,21 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-$(TN).src: $(SEN) $(LEN) shared_lib olds
+$(TN).src: $(LEN) shared_lib
 
-$(SEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+$(LEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
-$(LEN): $(SEN)
-	cp $< $@
+#$(LEN): $(SEN)
+#	cp $< $@
 
-olds: $(SOLD) $(LOLD)
+#olds: $(SOLD) $(LOLD)
 
-$(SOLD): $(SEN)
-	cp $< $@
+#$(SOLD): $(SEN)
+#	cp $< $@
 
-$(LOLD): $(LEN)
-	cp $< $@
+#$(LOLD): $(LEN)
+#	cp $< $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/$(SONAME)
@@ -197,4 +194,4 @@ checkconf:
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-# End of hc08.src/Makefile.in
+# End of m68hc08.src/Makefile.in

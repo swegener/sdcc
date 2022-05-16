@@ -1,11 +1,10 @@
 
-                                    uCsim
-                          Micro-controller simulator
+# uCsim
+## Micro-controller simulator
 
 
 
-What is uCsim?
---------------
+### What is uCsim?
 
 uCsim is a micro-controller simulator. It is extensible to support
 different micro-controller families. Currently it supports Intel MCS51
@@ -13,23 +12,21 @@ family, XA, Z80, Rabbit, SM83, TLCS90, ST7, STM8, PDK, MC6800, MC6809,
 M68HC08, M68HC11, M68HC12, MOS6502, PicoBlaze and some AVR processors.
 
 
-How to get uCsim?
------------------
+### How to get uCsim?
 
 uCsim is distributed in source code under GPL. It can be downloaded
 from its home site:
 
-http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim/
+[](http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim/)
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
 complete development package with debugger (see below). It can be
 downloaded from its home site (or from its mirrors):
 
-http://sdcc.sourceforge.net/
+[](http://sdcc.sourceforge.net/)
 
 
-Mailing list
-------------
+### Mailing list
 
 There is no mailing list which is specifically opened for
 uCsim. Announcements are sent to sdcc's mailing list. See sdcc's main
@@ -37,8 +34,7 @@ page at above URL for subscribing information and the archive. Ideas,
 bug reports or fixes should be sent to sdcc's list too.
 
 
-Features of uCsim
------------------
+### Features of uCsim
 
 Features of uCsim are similar to features of other simulators. It
 simulates instructions of the program code and all parts of the
@@ -72,20 +68,19 @@ simulators. They include:
   write event occurs at any location of any kind of memory.
 
 
-External tools
---------------
+### External tools
 
 uCsim is not well supported (yet) by external tools. But some exists
 already.
 
-SerialView
+** SerialView **
 
     It is written by Timothy Hurman <ee62th@ee.surrey.ac.uk> and it is
     now included in the uCsim package. It is simple "terminal
     emulator" which can be used to provide input for the simulated
     UART as well as present the output of the UART.
 
-sdcdb
+** sdcdb **
 
     Debugger of the free C compiler, called sdcc written by Sandeep
     Dutta <sandeep.dutta@usa.net>. It is a usual debugger with command
@@ -94,8 +89,7 @@ sdcdb
     any debugger GUI such as ddd to make it comfortable.
 
 
-Contributors and maintainers
-----------------------------
+### Contributors and maintainers
 
 Gunnar Holm <gunnarh@foa.nft.no>
 Sandeep Dutta <dutta@comm.mot.com>

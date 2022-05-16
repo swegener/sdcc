@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
-    <title>&mu;Csim: Code Analyzer</title>
+    <title>&mu;Csim: Code Analyser</title>
   </head>
   <body bgcolor="white">
 
@@ -14,21 +14,21 @@
     and follows the possible execution paths through jumps, branches and
     calls marking data as code and adding variables as necessary. Execution
     paths that are indirect, indexed or otherwise computed are not followed
-    initially but will be analyzed when, or if, execution reaches them.</p>
+    initially but will be analysed when, or if, execution reaches them.</p>
 
     <p>If code is known to exist elsewhere in memory and is not reachable
     without being run explicitly (such as by the "<code>run <i>addr</i></code>"
-    command) you can use "<code>analyze <i>addr</i></code>" to ask the analyzer
+    command) you can use "<code>analyse <i>addr</i></code>" to ask the analyser
     to look there. This is not persistent however. Whenever data is loaded
-    or "<code>analyze</code>" run with no <i>addr</i> argument all the analyzer
+    or "<code>analyse</code>" run with no <i>addr</i> argument all the analyser
     state is reset and recreated from the known vectors so any explicit
-    "<code>analyze <i>addr</i></code>" needs to be rerun if required.</p>
+    "<code>analyse <i>addr</i></code>" needs to be rerun if required.</p>
 
-    <p>Variables created by the analyzer always start with a dot. Such variables
+    <p>Variables created by the analyser always start with a dot. Such variables
     cannot be created by the "<code>var</code>" command and are not listed by
     "<code>info var</code>" (although can be using "<code>info var .</code>") but
     otherwise work like any other variable with one exception. If you create
-    a new variable for the exact same memory location the analyzer's variable
+    a new variable for the exact same memory location the analyser's variable
     will be silently removed.</p>
 
     <pre>0&gt; <font color="#118811">dump .loop$21</font>

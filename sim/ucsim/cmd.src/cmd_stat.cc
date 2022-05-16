@@ -115,7 +115,7 @@ COMMAND_DO_WORK_UC(cl_statistic_cmd)
 CMDHELP(cl_statistic_cmd,
 	"statistic [mem [startaddr [endaddr]]]",
 	"Statistic of memory accesses",
-	"long help of statistic")
+	"")
 
 #endif
 

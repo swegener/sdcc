@@ -142,42 +142,12 @@ F 0x000515
 0x0055 00 00 00 94 a7 01 0c a6 ........
 0x005d 00 6f ff 00 00 00 00 00 .o......
 &gt;
-</pre>First parameter can be a dump format specifier if it starts with /
-      character. Following characters select format and can set some parameters
-      for it. Know fomats are:<br>
-      <dl>
-        <dt>/h</dt>
-        <dd>Hexadecimal dump, this is the default format. See examples above.</dd>
-        <dt>/s</dt>
-        <dd>String format. Ascii characters of bytes will be printed from
-          specified address until first 0 byte. None-printable characters will
-          be escaped in C style.</dd>
-        <dt>/i</dt>
-        <dd>Intel hex format. It can be useful to save code memory content for
-          reload it later.</dd>
-        <dt>/b</dt>
-        <dd>Binary dump. It is not supported on command console. To produce
-          binary dump the output of the command must be redirected to a file.</dd>
-      </dl>
-      Some other characters can be <b>appended</b> to format specifier to
-      define ho many bytes are used as one data entity and the byte order:<br>
-      <dl>
-        <dt>/l</dt>
-        <dd>Use little endian byte order.</dd>
-        <dt>/b</dt>
-        <dd>Use big endian byte order.</dd>
-        <dt>/1</dt>
-        <dd>Use 1 byte as one data.</dd>
-        <dt>/2</dt>
-        <dd>Two bytes is dumped as one data.</dd>
-        <dt>/4</dt>
-        <dd>Four bytes treated as one data.</dd>
-        <dt>/8</dt>
-        <dd>Eight bytes mean one data.</dd>
-      </dl>
-      Default data size is determined by the memory width and the byte order is
-      determined by the simulated processor.<br>
-      <hr> <a name="dump_bit">
+</pre>
+
+
+<hr>
+
+<a name="dump_bit">
         <h4>dump <i>bit_name...</i></h4>
       </a>This command can be used to print out values of bit(s). <a href="syntax.html#bit_param">Any
         form of bit address</a> can be used as parameter:

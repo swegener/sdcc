@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 struct dis_entry disass_p1516[]=
   {
-   { 0x08000000, 0x08000000, ' ', 1, "call  %A", false },
+   { 0x08000000, 0x08000000, 'c', 1, "call  %A", false },
 
    { 0xb4f00000, 0xfff00000, 'M', 1, "jz    %O", false },
    { 0x94f00000, 0xfff00000, 'M', 1, "jnz   %O", false },

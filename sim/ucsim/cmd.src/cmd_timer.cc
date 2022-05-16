@@ -93,7 +93,7 @@ COMMAND_DO_WORK_UC(cl_timer_cmd)
 CMDHELP(cl_timer_cmd,
 	"timer subcommand",
 	"Manage timers",
-	"long help of timer")
+	"")
 
 /*
  * Command: timer add
@@ -199,7 +199,7 @@ COMMAND_DO_WORK_UC(cl_timer_delete_cmd)
 CMDHELP(cl_timer_delete_cmd,
 	"timer delete id",
 	"Delete a timer",
-	"long help of timer delete")
+	"")
 
 /*
  * Command: timer get
@@ -235,7 +235,7 @@ COMMAND_DO_WORK_UC(cl_timer_get_cmd)
 CMDHELP(cl_timer_get_cmd,
 	"timer get [id]",
 	"Get value of a timer, or all",
-	"long help of timer get")
+	"")
 
 /*
  * Command: timer run
@@ -264,7 +264,7 @@ COMMAND_DO_WORK_UC(cl_timer_run_cmd)
 CMDHELP(cl_timer_run_cmd,
 	"timer start id",
 	"Start a timer",
-	"long help of timer run")
+	"")
 
 /*
  * Command: timer stop
@@ -294,7 +294,7 @@ COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
 CMDHELP(cl_timer_stop_cmd,
 	"timer stop id",
 	"Stop a timer",
-	"long help of timer stop")
+	"")
 
 /*
  * Command: timer value
@@ -356,6 +356,6 @@ COMMAND_DO_WORK_UC(cl_timer_value_cmd)
 CMDHELP(cl_timer_value_cmd,
 	"timer set id [ticks] [time [muµnp]sec]",
 	"Set a timer",
-	"long help of timer set")
+	"")
 
 /* End of cmd.src/cmd_timer.cc */

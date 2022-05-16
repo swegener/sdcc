@@ -81,20 +81,15 @@ cl_mos6502::branch(bool cond)
 {
   i8_t rel;
   u16_t a;
-  if (!jaj)
-    rel= fetch();
+  rel= fetch();
   if (cond)
     {
-      if (jaj)
-	rel= fetch();
       a= PC+rel;
       if ((PC&0xff00) != (a&0xff00))
 	tick(1);
       PC= a;
       tick(1);
     }
-  else if (jaj)
-    PC++;
   tick(1);
   return resGO;
 }

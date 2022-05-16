@@ -26,4 +26,4 @@ mostlyclean: clean
 # -----------------------------------------------------------------------
 realclean: distclean
 
-# End of hc08.src/clean.mk
+# End of m68hc08.src/clean.mk

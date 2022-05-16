@@ -79,7 +79,7 @@ cl_conf_cmd::do_work(class cl_uc *uc,
 CMDHELP(cl_conf_cmd,
 	"conf",
 	"Configuration",
-	"long help of conf 1")
+	"")
 
 
 /*
@@ -126,7 +126,7 @@ COMMAND_DO_WORK_APP(cl_conf_objects_cmd)
 CMDHELP(cl_conf_objects_cmd,
 	"conf objects",
 	"Show object tree",
-	"long help of conf objects")
+	"")
 
 
 /*
@@ -143,7 +143,7 @@ COMMAND_DO_WORK_APP(cl_ver_cmd)
 CMDHELP(cl_ver_cmd,
 	"version",
 	"Version of the program",
-	"long help of ver command")
+	"")
 
 
 /*
@@ -177,6 +177,6 @@ COMMAND_DO_WORK_APP(cl_jaj_cmd)
 CMDHELP(cl_jaj_cmd,
 	"jaj [val]",
 	"Jaj",
-	"long help of jaj")
+	"")
 
 /* End of cmd.src/cmd_conf.cc */

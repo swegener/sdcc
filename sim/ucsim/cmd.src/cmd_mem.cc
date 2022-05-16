@@ -103,7 +103,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_chip_cmd)
 CMDHELP(cl_memory_create_chip_cmd,
 	"memory create chip id size cellsize",
 	"Create a new memory chip",
-	"long help of memory create chip")
+	"")
 
 /*
  * Command: memory create addressspace
@@ -163,7 +163,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_addressspace_cmd)
 CMDHELP(cl_memory_create_addressspace_cmd,
 	"memory create addressspace id startaddr size",
 	"Create a new address space",
-	"long help of memory create addressspace")
+	"")
 
 /*
  * Command: memory create addressdecoder
@@ -250,7 +250,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_addressdecoder_cmd)
 CMDHELP(cl_memory_create_addressdecoder_cmd,
 	"memory create addressdecoder addressspace begin end chip begin",
 	"Create a new address decoder",
-	"long help of memory create addressdecoder")
+	"")
 
 /*
  * Command: memory create banker
@@ -309,7 +309,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_banker_cmd)
 CMDHELP(cl_memory_create_banker_cmd,
 	"memory create banker switcher_addressspace switcher_address switcher_mask banked_addressspace start end",
 	"Create a new bank switcher",
-	"long help of memory create banker")
+	"")
 
 /*
  * Command: memory create bander
@@ -382,7 +382,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_bander_cmd)
 CMDHELP(cl_memory_create_bander_cmd,
 	"memory create bander addressspace begin end chip begin bits_per_chip [distance]",
 	"Create a new bit bander",
-	"long help of memory create bander")
+	"")
 
 /*
  * Command: memory create bank
@@ -444,7 +444,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_bank_cmd)
 CMDHELP(cl_memory_create_bank_cmd,
 	"memory create bank addressspace begin bank_nr chip begin",
 	"Add a new bank to bank switcher",
-	"long help of memory create bank")
+	"")
 
 /*
  * Command: memory cell
@@ -508,7 +508,7 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
 CMDHELP(cl_memory_cell_cmd,
 	"memory cell",
 	"Information about a memory cell",
-	"long help of memory cell")
+	"")
 
 
 
@@ -554,7 +554,7 @@ COMMAND_DO_WORK_UC(cl_memory_remove_chip_cmd)
 CMDHELP(cl_memory_remove_chip_cmd,
 	"memory remove chip id",
 	"Delete a memory chip",
-	"long help of memory remove chip")
+	"")
 
 
 

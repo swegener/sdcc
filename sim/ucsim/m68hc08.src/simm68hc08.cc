@@ -75,4 +75,4 @@ cl_simm68hc08::mk_controller(void)
 }
 
 
-/* End of hc08.src/simm68hc08.cc */
+/* End of m68hc08.src/simm68hc08.cc */

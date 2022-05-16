@@ -57,4 +57,4 @@ main(int argc, char *argv[])
 }
 
 
-/* End of hc08.src/sm68hc08.cc */
+/* End of m68hc08.src/sm68hc08.cc */

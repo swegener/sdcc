@@ -1,7 +1,8 @@
-uCsim, Copyright (C)  Daniel Drotos.
+uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+ucsim version [ELIDED]
 Type of microcontroller: STM8 AL,L 162[RM]8
 Controller has 27 hardware element(s).
    on cpu[0]
@@ -34,7 +35,7 @@ Controller has 27 hardware element(s).
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
-0x08000  ? 00 00          neg    (0x00,SP)[0K
+ ? 0x08000 00 00          neg    (0x00,SP)[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0017ff     6144 ram_chip (8,%02x,0x%04lx)
@@ -44,13 +45,11 @@ Memory chips:
   0x000000-0x0007ff     2048 boot_chip (8,%02x,0x%03lx)
   0x000000-0x0000ff      256 cpu_chip (8,%02x,0x%02lx)
   0x000000-0x01ffff   131072 flash_chip (8,%02x,0x%05lx)
-  0x000000-0x000008        9 ports_chip (8,%02x,0x%01lx)
 Address spaces:
   0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
   0x000000-0x027fff   163840 rom (8,%02x,0x%05lx)
   0x000000-0x000001        2 regs8 (8,%02x,0x%01lx)
   0x000000-0x000002        3 regs16 (16,%04x,0x%01lx)
-  0x000000-0x000008        9 ports (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x00000 0x017ff -> ram_chip 0x0000 activated
@@ -60,4 +59,3 @@ Address decoders:
   rom 0x06000 0x067ff -> boot_chip 0x000 activated
   rom 0x07f00 0x07fff -> cpu_chip 0x00 activated
   rom 0x08000 0x27fff -> flash_chip 0x00000 activated
-  ports 0x0 0x8 -> ports_chip 0x0 activated

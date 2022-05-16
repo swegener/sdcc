@@ -111,7 +111,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 CMDHELP(cl_run_cmd,
 	"run [start [stop]]",
 	"Go",
-	"long help of run")
+	"")
 
 /*
  * Command: stop
@@ -131,7 +131,7 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 CMDHELP(cl_stop_cmd,
 	"stop",
 	"Stop",
-	"long help of stop")
+	"")
 
 /*
  * Command: step
@@ -237,7 +237,7 @@ COMMAND_DO_WORK_SIM(cl_step_cmd)
 CMDHELP(cl_step_cmd,
 	"step [number[unit]]",
 	"Step",
-	"long help of step")
+	"")
 
 /*
  * Command: next
@@ -305,7 +305,7 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 CMDHELP(cl_next_cmd,
 	"next",
 	"Next",
-	"long help of next")
+	"")
 
 /*
  * Command: help
@@ -376,7 +376,7 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 CMDHELP(cl_help_cmd,
 	"help [command [subcommand]]",
 	"List of known commands, or description of specified command",
-	"Long help of help command")
+	"")
 
 bool
 cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
@@ -433,7 +433,7 @@ COMMAND_DO_WORK(cl_quit_cmd)
 CMDHELP(cl_quit_cmd,
 	"quit",
 	"Quit",
-	"long help of quit")
+	"")
 
 /*
  * Command: kill
@@ -454,7 +454,7 @@ COMMAND_DO_WORK_APP(cl_kill_cmd)
 CMDHELP(cl_kill_cmd,
 	"kill",
 	"Shutdown simulator",
-	"long help of kill")
+	"")
 
 /*
  * EXEC file
@@ -483,7 +483,7 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
 CMDHELP(cl_exec_cmd,
 	"exec \"file\"",
 	"Execute commands from file",
-	"long help of exec")
+	"")
 
 /*
  * expression expression
@@ -565,7 +565,7 @@ COMMAND_DO_WORK_UC(cl_hist_cmd)
 CMDHELP(cl_hist_cmd,
 	"history",
 	"Execution history",
-	"long help of history")
+	"")
 
 
 /*
@@ -589,7 +589,7 @@ COMMAND_DO_WORK_UC(cl_hist_info_cmd)
 CMDHELP(cl_hist_info_cmd,
 	"history info",
 	"Information about execution history",
-	"long help of history info")
+	"")
 
 
 /*
@@ -612,7 +612,7 @@ COMMAND_DO_WORK_UC(cl_hist_clear_cmd)
 CMDHELP(cl_hist_clear_cmd,
 	"history clear",
 	"Clear execution history",
-	"long help of history clear")
+	"")
 
 
 /*
@@ -640,7 +640,7 @@ COMMAND_DO_WORK_UC(cl_hist_list_cmd)
 CMDHELP(cl_hist_list_cmd,
 	"history list [nr]",
 	"List last `nr' elements of execution history",
-	"long help of history list")
+	"")
 
 
 /* End of cmd.src/cmd_exec.cc */

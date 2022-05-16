@@ -118,7 +118,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 CMDHELP(cl_info_bp_cmd,
 	"info breakpoints",
 	"Status of user-settable breakpoints",
-	"long help of info breakpoints")
+	"")
 
 /*
  * INFO REGISTERS command
@@ -133,7 +133,7 @@ COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 CMDHELP(cl_info_reg_cmd,
 	"info registers",
 	"List of integer registers and their contents",
-	"long help of info registers")
+	"")
 
 /*
  * INFO HW command
@@ -174,7 +174,7 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 CMDHELP(cl_info_hw_cmd,
 	"info hardware category",
 	"Status of hardware elements of the CPU",
-	"long help of info hardware")
+	"")
 
 /*
  * INFO STACK command
@@ -197,7 +197,7 @@ COMMAND_DO_WORK_UC(cl_info_stack_cmd)
 /*CMDHELP(cl_info_stack_cmd,
 	"info stack",
 	"Status of stack of the CPU",
-	"long help of info stack")*/
+	"")*/
 
 /*
  * INFO MEMORY command
@@ -254,7 +254,7 @@ COMMAND_DO_WORK_UC(cl_info_memory_cmd)
 CMDHELP(cl_info_memory_cmd,
 	"info memory",
 	"Information about memory system",
-	"long help of info memory")
+	"")
 
 /*
  * INFO VARIABLES command
@@ -288,7 +288,7 @@ COMMAND_DO_WORK_UC(cl_info_var_cmd)
 CMDHELP(cl_info_var_cmd,
 	"info variables [filter]",
 	"Information about variables",
-	"long help of info variables")
+	"")
 
 
 /* End of cmd.src/cmd_info.cc */

@@ -218,7 +218,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 CMDHELP(cl_break_cmd,
 	"break addr [hit [if expr]] | break mem_type r|w addr [hit [if expr]]",
 	"Set fix or event breakpoint",
-	"long help of break")
+	"")
 
 void
 cl_break_cmd::do_fetch(class cl_uc *uc,
@@ -332,7 +332,7 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
 CMDHELP(cl_clear_cmd,
 	"clear [addr...]",
 	"Clear fix breakpoint",
-	"long help of clear")
+	"")
 
 /*
  * DELETE nr nr ...
@@ -368,7 +368,7 @@ COMMAND_DO_WORK_UC(cl_delete_cmd)
 CMDHELP(cl_delete_cmd,
 	"delete [nr...]",
 	"Delete breakpoint(s)",
-	"long help of clear")
+	"")
 
 /*
  * COMMANDS [nr] cmdstring...
@@ -433,6 +433,6 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
 CMDHELP(cl_commands_cmd,
 	"commands [breakpoint-nr]",
 	"command_string",
-	"long help of commands")
+	"")
 
 /* End of cmd.src/cmd_bp.cc */

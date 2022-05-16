@@ -39,7 +39,6 @@ cl_rst::cl_rst(class cl_uc *auc, t_addr abase, t_mem amask):
 int
 cl_rst::init(void)
 {
-  cl_hw::init();
   rst_sr= register_cell(uc->rom, base);
   return 0;
 }

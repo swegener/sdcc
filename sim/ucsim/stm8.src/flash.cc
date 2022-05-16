@@ -104,7 +104,28 @@ cl_flash::init(void)
   return 0;
 }
 
-/*
+void
+cl_flash::reset(void)
+{
+  uc->sim->app->debug("FLASH reset\n");
+  puk1st= false;
+  duk1st= false;
+  p_unlocked= false;
+  d_unlocked= false;
+  p_failed= false;
+  d_failed= false;
+
+  state= fs_wait_mode;
+  mode= fm_unknown;
+  
+  cr1r->set/*write*/(0);
+  iapsr->set/*write*/(0x40);
+  cr2r->set/*write*/(0);
+  if (ncr2r)
+    ncr2r->set/*write*/(0xff);
+}
+
+
 const char *
 cl_flash::cfg_help(t_addr addr)
 {
@@ -114,7 +135,7 @@ cl_flash::cfg_help(t_addr addr)
     }
   return "Not used";
 }
-*/
+
 
 int
 cl_flash::tick(int cycles)
@@ -169,28 +190,8 @@ cl_flash::finish_program(bool ok)
     iapsr->set(iapsr->get() | 0x04);
   else
     iapsr->set(iapsr->get() | 0x01);
+  uc->sim->app->debug("FLASH prg finish\n");
   state= fs_wait_mode;
-}
-
-void
-cl_flash::reset(void)
-{
-  uc->sim->app->debug("FLASH reset\n");
-  puk1st= false;
-  duk1st= false;
-  p_unlocked= false;
-  d_unlocked= false;
-  p_failed= false;
-  d_failed= false;
-
-  state= fs_wait_mode;
-  mode= fm_unknown;
-  
-  cr1r->write(0);
-  iapsr->write(0x40);
-  cr2r->write(0);
-  if (ncr2r)
-    ncr2r->write(0xff);
 }
 
 t_mem
@@ -214,7 +215,7 @@ cl_flash::read(class cl_memory_cell *cell)
       if (d_unlocked)
 	v|= 0x08;
       // read clears EOP and WR_PG_DIS bits
-      cell->set(v & ~0x05);
+      cell->set(v&= ~0x05);
       if (v & 0x05) uc->sim->app->debug("FLASH read iapsr5 %02x\n",v);	
     }
   return v;
@@ -317,7 +318,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
 }
 
-/*
+
 t_mem
 cl_flash::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
@@ -339,7 +340,7 @@ cl_flash::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     }
   return cell->get();
 }
-*/
+
 
 void
 cl_flash::flash_write(t_addr a, t_mem val)
@@ -479,6 +480,7 @@ cl_flash::set_flash_mode(t_mem cr2val)
       wbuf_size= 4;
     }
   state= fs_wait_data;
+  uc->sim->app->debug("FLASH state=wait_data\n");
   wbuf_started= false;
   wbuf_start= 0;
 }

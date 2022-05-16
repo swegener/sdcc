@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (regsz80.h)
+ * Simulator of microcontrollers (regshc08.h)
  *
  * some z80 code base from Karl Bongers karl@turbobit.com
  *
@@ -60,4 +60,4 @@ struct t_regs
 
 #endif
 
-/* End of hc08.src/regshc08.h */
+/* End of m68hc08.src/regshc08.h */

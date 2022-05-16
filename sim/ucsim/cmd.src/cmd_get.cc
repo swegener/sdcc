@@ -51,7 +51,7 @@ set_get_help(class cl_cmd *cmd)
 {
   cmd->set_help("get subcommand",
 		"Get value of different objects",
-		"Long of get");
+		"");
 }
 
 /*
@@ -91,7 +91,7 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 CMDHELP(cl_get_sfr_cmd,
 	"get sfr address...",
 	"Get value of addressed SFRs",
-	"long help of get sfr")
+	"")
 
 /*
  * Command: get option
@@ -144,6 +144,6 @@ COMMAND_DO_WORK_APP(cl_get_option_cmd)
 CMDHELP(cl_get_option_cmd,
 	"get option name",
 	"Get value of an option",
-	"long help of get option")
+	"")
 
 /* End of cmd.src/cmd_get.cc */

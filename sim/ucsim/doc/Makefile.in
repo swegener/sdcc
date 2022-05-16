@@ -41,6 +41,7 @@ install: all installdirs
 	cp $(srcdir)/*.html $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.svg $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.jpg $(DESTDIR)$(docdir)
+	cp -R $(srcdir)/stm8 $(DESTDIR)$(docdir)
 	cp $(srcdir)/ucsim.1 $(DESTDIR)$(man1dir)
 	cp $(srcdir)/serialview.1 $(DESTDIR)$(man1dir)
 

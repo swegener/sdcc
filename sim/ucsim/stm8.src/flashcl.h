@@ -105,8 +105,8 @@ class cl_flash: public cl_hw
 
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
-  //virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
-  //virtual const char *cfg_help(t_addr addr);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual const char *cfg_help(t_addr addr);
 
   virtual void flash_write(t_addr a, t_mem val);
   virtual void set_flash_mode(t_mem cr2val);

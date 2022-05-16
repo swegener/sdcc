@@ -1,55 +1,55 @@
 $date
-	Date is omitted in quiet mode
+	[ELIDED]
 $end
 $version
 	ucsim
 $end
 $timescale 1ns $end
 $scope module ucsim_vcd_0 $end
-$var wire 8 ! rom_0x00100 $end
+$var wire 8 ! rom_0x00000100[0x00100] $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-b10000011 !
+b10010101 !
 $end
 b00000000 !
-#500
+#125
 b00000001 !
-#1000
+#250
 b00000010 !
-#1500
+#375
 b00000011 !
-#2000
+#500
 $comment Paused $end
 $dumpoff
 bxxxxxxxx !
 $end
-#6000
+#1500
 $comment Unpaused $end
 $dumpon
 b00001011 !
 $end
 b00001100 !
-#6500
+#1625
 b00001101 !
-#7000
+#1750
 b00001110 !
-#7500
+#1875
 b00001111 !
-#8000
+#2000
 $comment Paused $end
 $dumpoff
 bxxxxxxxx !
 $end
-#8300
-$comment Unpaused. Real duration was 0.000004000000000 seconds $end
+#2375
+$comment Unpaused. Real duration was 0.000000625000000 seconds $end
 $dumpon
 b00010111 !
 $end
 b00011000 !
-#8800
+#2500
 b00011001 !
-#9300
+#2625
 b00011010 !
-#9800
+#2750

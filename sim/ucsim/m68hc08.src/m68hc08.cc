@@ -769,4 +769,4 @@ cl_hc08_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 }
 
 
-/* End of hc08.src/m68hc08.cc */
+/* End of m68hc08.src/m68hc08.cc */

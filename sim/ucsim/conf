@@ -21,6 +21,9 @@ while [ -n "$1" ]; do
 	-c)
 	    COMP="yes"
 	    ;;
+	-w)
+	    PREFIX=${HOME}/prj/wucsim/inst
+	    ;;
 	[lLxX]*) TARGET=linux;;
 	[mMwW]6*) TARGET=w64;;
 	[mMwW]*) TARGET=mingw;;

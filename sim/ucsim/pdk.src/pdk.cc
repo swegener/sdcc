@@ -63,7 +63,6 @@ int cl_pdk::init(void) {
   cl_uc::init(); /* Memories now exist */
 
   set_xtal(8000000);
-  sp_max = 0x00;
 
   // rom = address_space(MEM_ROM_ID);
   // ram = mem(MEM_XRAM);
@@ -79,6 +78,7 @@ int cl_pdk::init(void) {
 
 void cl_pdk::reset(void) {
   cl_uc::reset();
+  sp_most = 0x00;
 
   PC = 0x0000;
   regs.a = 0;

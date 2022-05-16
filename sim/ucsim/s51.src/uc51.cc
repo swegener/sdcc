@@ -1599,6 +1599,7 @@ cl_51core::analyze(t_addr addr)
 	    analyze_jump(addr, a, 'j');
 	    return;
 	  }
+	case ' ': break;
 	case '_':
 	  return;
 	default:
@@ -2038,9 +2039,9 @@ cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
     return;
   if (cell == cell_sp)
     {
-      if (*val > uc->sp_max)
-	uc->sp_max= *val;
-      uc->sp_avg= (uc->sp_avg+(*val))/2;
+      if (*val > uc->sp_most)
+	uc->sp_most= *val;
+      //uc->sp_avg= (uc->sp_avg+(*val))/2;
     }
   else 
     {

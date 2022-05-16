@@ -31,7 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "ddconfig.h"
 
 //#include <stdarg.h> /* for va_list */
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -60,9 +59,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "bl.h"
 #include "flashcl.h"
 
+
 /*******************************************************************/
 
-static class cl_stm8_error_registry stm8_error_registry;
+t_mem
+cl_sp::write(t_mem val)
+{
+  t_mem l, h;
+  l= u->sp_limit;
+  h= u->sp_start;
+  if (val < u->sp_most)
+    u->sp_most= val;
+  if (rollover && (val == l))
+    val= h;
+  return cl_cell16::write(val);
+}
+
+
+/*******************************************************************/
 
 
 /*
@@ -74,17 +88,17 @@ cl_stm8::cl_stm8(struct cpu_entry *IType, class cl_sim *asim):
 {
   type= IType;
   flash_ctrl= NULL;
+  cSP.set_uc(this);
+  cSP.decode(&regs.SP);
 }
 
 int
 cl_stm8::init(void)
 {
   cl_uc::init(); /* Memories now exist */
-  sp_limit= 0x1500;
+  sp_limit= 0x14ff;
 
-  pipetrace_file = NULL;
-  pipetrace_fd = NULL;
-  pipetrace_fold = true;
+  set_xtal(8000000);
 
   //rom = address_space(MEM_ROM_ID);
   //ram = mem(MEM_XRAM);
@@ -112,17 +126,13 @@ cl_stm8::reset(void)
 {
   cl_uc::reset();
 
-  regs.SP = 0x17ff;
+  cSP.W(sp_start= sp_most= 0x17ff);
   regs.A = 0;
   regs.X = 0;
   regs.Y = 0;
   regs.CC = 0x28;
   //regs.VECTOR = 1;
   PC= 0x8000;
-
-  div_cycle = 0;
-
-  pipeline_flush(false);
 }
 
 
@@ -173,16 +183,16 @@ static const char *puiks= keysets[puik];
 static class cl_port_data pd;
 
 void
-cl_stm8::mk_port(int portnr, chars n)
+cl_stm8::mk_port(t_addr base, chars n)
 {
   class cl_port *p;
-  add_hw(p= new cl_port(this, portnr, n));
+  add_hw(p= new cl_port(this, base, n));
   p->init();
 
   pd.set_name(n);
-  pd.cell_p  = p->cell_odr;
-  pd.cell_in = p->cell_idr;
-  pd.cell_dir= p->cell_ddr;
+  pd.cell_p  = p->cell_p;
+  pd.cell_in = p->cell_in;
+  pd.cell_dir= p->cell_dir;
   pd.keyset  = puiks;
   pd.basx    = puix;
   pd.basy    = puiy;
@@ -211,7 +221,6 @@ void
 cl_stm8::mk_hw_elements(void)
 {
   class cl_hw *h;
-  class cl_it_src *is;
   cl_uc::mk_hw_elements();
   class cl_option *o;
 
@@ -283,15 +292,17 @@ cl_stm8::mk_hw_elements(void)
       o->hide();
     }
   
-  init_add_hw(h= new cl_dreg(this, 0, "dreg"));
+  add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
 
-  init_add_hw(d= new cl_port_ui(this, 0, "dport"));
+  add_hw(d= new cl_port_ui(this, 0, "dport"));
+  d->init();
   pd.init();
   
   if (type->type == CPU_STM8S)
     {
-      add_hw(clk= new cl_clk_saf(this));
-      clk->init();
+      add_hw(h= new cl_clk_saf(this));
+      h->init();
       if (type->subtype & (DEV_STM8S003|
 			   DEV_STM8S007|
 			   DEV_STM8S103|
@@ -326,8 +337,8 @@ cl_stm8::mk_hw_elements(void)
     }
   if (type->type == CPU_STM8L)
     {
-      add_hw(clk= new cl_clk_all(this));
-      clk->init();
+      add_hw(h= new cl_clk_all(this));
+      h->init();
       add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
       h->init();
       if (type->subtype & (DEV_STM8AL3xE|
@@ -351,91 +362,27 @@ cl_stm8::mk_hw_elements(void)
     }
   if (type->type == CPU_STM8L101)
     {
-      add_hw(clk= new cl_clk_l101(this));
-      clk->init();
+      add_hw(h= new cl_clk_l101(this));
+      h->init();
       add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
       h->init();
     }
 
-  int n_ports = 4;
-
-  if (type->type == CPU_STM8S)
-    {
-      switch (type->subtype)
-        {
-          case DEV_STM8AF62_46:
-            n_ports += 3;
-            break;
-
-          case DEV_STM8S005:
-          case DEV_STM8S007:
-          case DEV_STM8S105:
-          case DEV_STM8S207:
-          case DEV_STM8S208:
-          case DEV_STM8AF52:
-            n_ports += 1;
-            break;
-        }
-    }
-  else if (type->type == CPU_STM8L)
-    {
-      if (type->subtype != DEV_STM8L051)
-        n_ports += 2;
-
-      if (type->subtype & (DEV_STM8AL3xE|
-                           DEV_STM8AL3x8|
-                           DEV_STM8L052R|
-                           DEV_STM8L15x8|
-                           DEV_STM8L162))
-        {
-          n_ports += 1;
-
-          if (type->subtype != DEV_STM8L052R)
-            n_ports += 2;
-        }
-    }
-
-  ports= new cl_address_space("ports", 0, n_ports, 8);
-  ports->init();
-  address_spaces->add(ports);
-
-  ports_chip= new cl_chip8("ports_chip", n_ports, 8);
-  ports_chip->init();
-  memchips->add(ports_chip);
-
-  class cl_address_decoder *ad= new cl_address_decoder(ports, ports_chip, 0, n_ports - 1, 0);
-  ad->init();
-  ports->decoders->add(ad);
-  ad->activate(0);
-
   add_hw(itc= new cl_itc(this));
   itc->init();
 
-  mk_port(0, "pa");
-  mk_port(1, "pb");
-  mk_port(2, "pc");
-  mk_port(3, "pd");
+  {
+    mk_port(0x5000, "pa");
+    mk_port(0x5005, "pb");
+    mk_port(0x500a, "pc");
+    mk_port(0x500f, "pd");
+  }
   
   if (type->type == CPU_STM8S)
     {
       // all S and AF
-      mk_port(4, "pe");
-      mk_port(5, "pf");
-
-      char name[] = "EXTI0";
-      for (int i= 0; i <= 4; i++, name[4]++)
-        {
-          it_sources->add(is= new cl_it_src(this, 3 + i,
-                    itc->exti_sr1, 1 << i,
-                    itc->exti_sr1, 1 << i,
-                    0x8014 + i * 4,
-                    true, // STM8S has no EXTI_SR[12] so port interrupts autoclear and are not ack'd.
-                    false,
-                    strdup(name),
-                    25*10+i));
-          is->init();
-        }
-
+      mk_port(0x5014, "pe");
+      mk_port(0x5019, "pf");
       if (type->subtype & (DEV_STM8S005|
 			   DEV_STM8S007|
 			   DEV_STM8S105|
@@ -444,11 +391,11 @@ cl_stm8::mk_hw_elements(void)
 			   DEV_STM8AF52|
 			   DEV_STM8AF62_46))
 	{
-	  mk_port(6, "pg");
+	  mk_port(0x501e, "pg");
 	  if (type->subtype != DEV_STM8AF62_46)
 	    {
-	      mk_port(7, "ph");
-	      mk_port(8, "pi");
+	      mk_port(0x5023, "ph");
+	      mk_port(0x5028, "pi");
 	    }
 	}
       add_hw(h= new cl_rst(this, 0x50b3, 0x1f));
@@ -489,173 +436,70 @@ cl_stm8::mk_hw_elements(void)
 	  h->init();
 	}
     }
-  else
+  else if (type->type == CPU_STM8L)
     {
-      char name[] = "EXTI0";
-      for (int i= 0; i <= 7; i++, name[4]++)
-        {
-          it_sources->add(is= new cl_it_src(this, 8 + i,
-                    itc->exti_sr1, 1 << i,
-                    itc->exti_sr1, 1 << i,
-                    0x8028 + i * 4,
-                    false,
-                    false,
-                    strdup(name),
-                    25*10+i));
-          is->init();
-        }
-
-      if (type->type == CPU_STM8L)
-        {
-          if (type->subtype != DEV_STM8L051)
+      if (type->subtype != DEV_STM8L051)
+	{
+	  mk_port(0x5014, "pe");
+	  mk_port(0x5019, "pf");
+	}
+      if (type->subtype & (DEV_STM8AL3xE|
+			   DEV_STM8AL3x8|
+			   DEV_STM8L052R|
+			   DEV_STM8L15x8|
+			   DEV_STM8L162))
+	{
+	  mk_port(0x501e, "pg");
+	  if (type->subtype != DEV_STM8L052R)
 	    {
-	      mk_port(0x5014, "pe");
-	      mk_port(0x5019, "pf");
-
-              it_sources->add(is= new cl_it_src(this, 5,
-                        itc->exti_sr2, (1 << 3) | (1 << 2),
-                        itc->exti_sr2, (1 << 3) | (1 << 2),
-                        0x801c,
-                        false,
-                        false,
-                        "EXTIE/F/PVD",
-                        25*10+5));
-              is->init();
+	      mk_port(0x5023, "ph");
+	      mk_port(0x5028, "pi");
 	    }
-
-          if (type->subtype & (DEV_STM8AL3xE|
-			       DEV_STM8AL3x8|
-			       DEV_STM8L052R|
-			       DEV_STM8L15x8|
-			       DEV_STM8L162))
-	    {
-	      mk_port(0x501e, "pg");
-
-              it_sources->add(is= new cl_it_src(this, 6,
-                        itc->exti_sr2, (1 << 4) | (1 << 0),
-                        itc->exti_sr2, (1 << 4) | (1 << 0),
-                        0x8020,
-                        false,
-                        false,
-                        "EXTIB/G",
-                        25*10+6));
-              is->init();
-
-	      if (type->subtype != DEV_STM8L052R)
-	        {
-	          mk_port(0x5023, "ph");
-	          mk_port(0x5028, "pi");
-
-                  it_sources->add(is= new cl_it_src(this, 7,
-                            itc->exti_sr2, (1 << 5) | (1 << 1),
-                            itc->exti_sr2, (1 << 5) | (1 << 1),
-                            0x8024,
-                            false,
-                            false,
-                            "EXTID/H",
-                            25*10+7));
-                  is->init();
-	        }
-              else
-                {
-                  it_sources->add(is= new cl_it_src(this, 7,
-                            itc->exti_sr2, (1 << 1),
-                            itc->exti_sr2, (1 << 1),
-                            0x8024,
-                            false,
-                            false,
-                            "EXTID",
-                            25*10+7));
-                  is->init();
-                }
-	    }
-          else
-            {
-              it_sources->add(is= new cl_it_src(this, 6,
-                        itc->exti_sr2, (1 << 0),
-                        itc->exti_sr2, (1 << 0),
-                        0x8020,
-                        false,
-                        false,
-                        "EXTIB",
-                        25*10+6));
-              is->init();
-
-              it_sources->add(is= new cl_it_src(this, 7,
-                        itc->exti_sr2, (1 << 1),
-                        itc->exti_sr2, (1 << 1),
-                        0x8024,
-                        false,
-                        false,
-                        "EXTID",
-                        25*10+7));
-              is->init();
-            }
-
-          add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
-          h->init();
-          add_hw(h= new cl_tim2_all(this, 2, 0x5250));
-          h->init();
-          add_hw(h= new cl_tim3_all(this, 3, 0x5280));
-          h->init();
-          add_hw(h= new cl_tim4_all(this, 4, 0x52E0));
-          h->init();
-          // all AL
-          if (type->subtype & DEV_STM8AL)
-	    {
-	      add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
-	      h->init();
-	    }
-          // some L
-          if (type->subtype & (DEV_STM8L052C |
-			       DEV_STM8L052R |
-			       DEV_STM8L15x46 |
-			       DEV_STM8L15x8 |
-			       DEV_STM8L162))
-	    {
-	      add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
-	      h->init();
-	    }
-          if (type->subtype & (DEV_STM8AL3xE |
-			       DEV_STM8AL3x8 |
-			       DEV_STM8L052R |
-			       DEV_STM8L15x8 |
-			       DEV_STM8L162))
-	    {
-	      add_hw(h= new cl_tim5_all(this, 5, 0x5300));
-	      h->init();
-	    }
-        }
-      else if (type->type == CPU_STM8L101)
-        {
-          add_hw(h= new cl_rst(this, 0x50b0+1, 0x0f));
-          h->init();
-          add_hw(h= new cl_tim2_l101(this, 2, 0x5250));
-          h->init();
-          add_hw(h= new cl_tim3_l101(this, 2, 0x5280));
-          h->init();
-          add_hw(h= new cl_tim4_l101(this, 4, 0x52E0));
-          h->init();
-
-          it_sources->add(is= new cl_it_src(this, 6,
-                    itc->exti_sr2, (1 << 0),
-                    itc->exti_sr2, (1 << 0),
-                    0x8020,
-                    false,
-                    false,
-                    "EXTIB",
-                    25*10+6));
-          is->init();
-          it_sources->add(is= new cl_it_src(this, 7,
-                    itc->exti_sr2, (1 << 1),
-                    itc->exti_sr2, (1 << 1),
-                    0x8024,
-                    false,
-                    false,
-                    "EXTID",
-                    25*10+7));
-          is->init();
-        }
+	}
+      add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
+      h->init();
+      add_hw(h= new cl_tim2_all(this, 2, 0x5250));
+      h->init();
+      add_hw(h= new cl_tim3_all(this, 3, 0x5280));
+      h->init();
+      add_hw(h= new cl_tim4_all(this, 4, 0x52E0));
+      h->init();
+      // all AL
+      if (type->subtype & DEV_STM8AL)
+	{
+	  add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
+	  h->init();
+	}
+      // some L
+      if (type->subtype & (DEV_STM8L052C |
+			   DEV_STM8L052R |
+			   DEV_STM8L15x46 |
+			   DEV_STM8L15x8 |
+			   DEV_STM8L162))
+	{
+	  add_hw(h= new cl_tim1_all(this, 1, 0x52b0));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8AL3xE |
+			   DEV_STM8AL3x8 |
+			   DEV_STM8L052R |
+			   DEV_STM8L15x8 |
+			   DEV_STM8L162))
+	{
+	  add_hw(h= new cl_tim5_all(this, 5, 0x5300));
+	  h->init();
+	}
+    }
+  else if (type->type == CPU_STM8L101)
+    {
+      add_hw(h= new cl_rst(this, 0x50b0+1, 0x0f));
+      h->init();
+      add_hw(h= new cl_tim2_l101(this, 2, 0x5250));
+      h->init();
+      add_hw(h= new cl_tim3_l101(this, 2, 0x5280));
+      h->init();
+      add_hw(h= new cl_tim4_l101(this, 4, 0x52E0));
+      h->init();
     }
 
   // UID
@@ -684,16 +528,14 @@ cl_stm8::mk_hw_elements(void)
   // FLASH
   if (type->subtype & (DEV_STM8SAF))
     {
-      flash_ctrl= new cl_saf_flash(this, 0x505a);
+      add_hw(flash_ctrl= new cl_saf_flash(this, 0x505a));
       flash_ctrl->init();
-      add_hw(flash_ctrl);
     }
   else if (type->subtype & (DEV_STM8ALL |
 			    DEV_STM8L101))
     {
-      flash_ctrl= new cl_l_flash(this, 0x5050);
+      add_hw(flash_ctrl= new cl_l_flash(this, 0x5050));
       flash_ctrl->init();
-      add_hw(flash_ctrl);
     }
   //add_hw(h= new cl_tim235(this, 3, 0x5320));
   //h->init();
@@ -999,164 +841,6 @@ cl_stm8::get_disasm_info(t_addr addr,
   return b;
 }
 
-void
-cl_stm8::analyze_start(void)
-{
-  // Look for interrupts that _are_ interrupts. Nothing stops you from
-  // using the space for other code or data if the interrupts aren't needed.
-
-  // First those for elements that are implemented in the simulator
-  for (t_index i = 0; i < it_sources->count; i++)
-    {
-      class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
-
-      t_addr addr = is->addr;
-
-      if (rom->get(addr) == 0x82) // int
-        {
-          addr = (rom->get(is->addr+1)<<16) |
-                  (rom->get(is->addr+2)<<8) |
-                  (rom->get(is->addr+3));
-
-          t_index var_i;
-          if (!vars->by_addr.search(rom, addr, -1, -1, var_i))
-            {
-              chars label;
-
-              if (rom->get(addr) == 0x80) // jumps straight to iret
-                label.format("%s", ".isr_unused");
-              else
-                label.format(".%s", is->get_name());
-
-              class cl_var *v = new cl_var(label.subst(" ", '_'), rom, addr, chars("Auto-generated by analyze"), -1, -1);
-              v->init();
-              vars->add(v);
-            }
-
-          analyze(is->addr);
-        }
-    }
-
-  // And now for everything else. One day this will be nothing but reset :-)
-  for (t_addr is_addr = 0x8000; is_addr <= 0x807c; is_addr += 4)
-    {
-      if (!inst_at(is_addr) && rom->get(is_addr) == 0x82) // int
-        {
-          t_addr addr = (rom->get(is_addr+1)<<16) |
-                    (rom->get(is_addr+2)<<8) |
-                    (rom->get(is_addr+3));
-
-          t_index var_i;
-          if (!vars->by_addr.search(rom, addr, -1, -1, var_i))
-            {
-              chars label;
-
-              if (is_addr == 0x8000)
-                label.format("%s", ".reset");
-              else if (rom->get(addr) == 0x80) // jumps straight to iret
-                label.format("%s", ".isr_unused");
-              else if (is_addr == 0x8004)
-                label.format("%s", ".trap");
-              else
-                label.format("%s%lu", ".interrupt", ((unsigned long)is_addr - 0x8008) / 4);
-
-              class cl_var *v = new cl_var(label, rom, addr, chars("Auto-generated by analyze"), -1, -1);
-              v->init();
-              vars->add(v);
-            }
-
-          analyze(is_addr);
-        }
-    }
-}
-
-void
-cl_stm8::analyze(t_addr addr)
-{
-  const char *mnemonic;
-  int length = 0, branch = 0, immed_offset = 0;
-
-  while (!inst_at(addr) && (mnemonic = get_disasm_info(addr, &length, &branch, &immed_offset, NULL)))
-    {
-      set_inst_at(addr);
-
-      // Returns or indirect jumps end this execution path immediately
-      if (branch == 'x')
-        break;
-
-      if (branch != ' ')
-        {
-          t_addr target = 0;
-          unsigned int bit= 0;
-
-          // With jumps, branches and calls the target address is always
-          // given by the last operand. We just need to find it.
-          for (const char *b = mnemonic; *b; b++)
-            {
-              if (b[0] == '%' && b[1])
-                {
-                  b++;
-                  switch (*b)
-                    {
-                      case '3': // 3    24bit index offset
-                        ++immed_offset;
-                       // Fall through
-                      case '2': // 2    word index offset
-                      case 'w': // w    word immediate operand
-                        ++immed_offset;
-                        // Fall through
-                      case '1': // b    byte index offset
-                      case 'b': // b    byte immediate operand
-                      case 'd': // d    direct addressing
-                      case 's': // s    signed byte immediate
-                        ++immed_offset;
-                        break;
-
-                      case 'B': // B    bit number
-                        bit = (rom->get(addr+1) & 0xf) >> 1;
-                        break;
-
-                      case 'e': // e    extended 24bit immediate operand
-                        target= ((rom->get(addr+immed_offset)<<16) |
-                                  (rom->get(addr+immed_offset+1)<<8) |
-                                  (rom->get(addr+immed_offset+2)));
-                        ++immed_offset;
-                        ++immed_offset;
-                        ++immed_offset;
-                        break;
-                      case 'x': // x    extended addressing
-                        target= ((rom->get(addr+immed_offset)<<8) |
-                                  (rom->get(addr+immed_offset+1)));
-                        ++immed_offset;
-                        ++immed_offset;
-                        break;
-                      case 'p': // p    pc relative
-                        {
-                          long int base;
-                          i8_t offs;
-                          base= addr+immed_offset+1;
-                          offs= rom->get(addr+immed_offset);
-                          target= base+offs;
-                          ++immed_offset;
-                        }
-                        break;
-                      default:
-                        break;
-                    }
-                }
-            }
-
-          analyze_jump(addr, target, branch, bit);
-
-          // Unconditional jumps end this execution path
-          if (branch == 'j')
-            break;
-        }
-
-      addr= rom->validate_address(addr + length);
-    }
-}
-
 char *
 cl_stm8::disass(t_addr addr)
 {
@@ -1330,8 +1014,8 @@ cl_stm8::print_regs(class cl_console_base *con)
   con->dd_printf("Y= 0x%04x %3d %c\n",
                  regs.Y, regs.Y, isprint(regs.Y)?regs.Y:'.');
   con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c  Limit= 0x%04x\n",
-                 regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
-                 isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.',
+                 regs.SP, ram->read(regs.SP+1), ram->read(regs.SP+1),
+                 isprint(ram->read(regs.SP+1))?ram->read(regs.SP+1):'.',
 		 AU(sp_limit));
 
   print_disass(PC, con);
@@ -1340,100 +1024,6 @@ cl_stm8::print_regs(class cl_console_base *con)
 /*
  * Execution
  */
-
-// There are three clocks derived from each other. f_OSC is
-// the oscillator frequency. This is then scaled down to give
-// the master clock, f_MASTER, which is the clock used to drive
-// the hardware elements. This, in turn, is further scaled down
-// to give the CPU clock, f_CPU, which is used to drive the CPU.
-// Only some variants of STM8 support both scaling factors and
-// both factors and f_OSC can be changed programmatically.
-
-int
-cl_stm8::clock_per_cycle(void)
-{
-  return clk->clock_per_cycle();
-}
-
-int
-cl_stm8::tick_hw(int cycles_cpu)
-{
-  if (state != stPD)
-    cl_uc::tick_hw(cycles_cpu * clock_per_cycle());
-
-  return 0;
-}
-
-int
-cl_stm8::tick(int cycles_cpu)
-{
-  if (state != stPD)
-    {
-      for (int i = 0; i < cycles_cpu; i++, pipetrace_ticks++)
-        {
-          // Refill the pipeline if there is space and we didn't use the memory this tick.
-          if (pipeline_bytes >= 9)
-              pipetrace_tick(NULL);
-          else
-            {
-              class cl_address_decoder *d = rom->get_decoder_of(PC);
-              if (d && !(d->memchip != flash_chip ? pipeline_busy.data : pipeline_busy.program))
-                {
-                  int step = (d->memchip != flash_chip ? 1 : 4);
-                  pipetrace_tick("F");
-                  pipeline_bytes += step;
-                }
-              // If the other bus is not busy this is a genuine stall due to running out of fetch data
-              else if (!pipeline_busy.program || !pipeline_busy.data)
-                {
-                  //error(new cl_error_stm8_pipeline_fetch_stall());
-                  pipetrace_tick("FS");
-                }
-              // Otherwise if both buses are busy there was a flush and the stall is expected
-              else
-                pipetrace_tick(NULL);
-            }
-        }
-
-      pipeline_busy.program = false;
-      pipeline_busy.data = false;
-      pipeline_busy.regs = false;
-      if (pipetrace_ticks > pipetrace_max_ticks)
-        pipetrace_max_ticks = pipetrace_ticks;
-    }
-
-  cl_uc::tick(cycles_cpu);
-  return 0;
-}
-
-t_mem
-cl_stm8::fetch(void)
-{
-  if (!div_cycle)
-    {
-      if (pipeline_bytes - (pipeline_index & ~3) < 4)
-        {
-          // We have to have a full word before we can use any of it.
-          while (pipeline_bytes - (pipeline_index & ~3) < 4)
-            {
-              //error(new cl_error_stm8_pipeline_decode_stall());
-              pipetrace_type("Sfetch");
-              tick(1);
-              pipetrace_type("D");
-            }
-        }
-
-      pipeline_index++;
-    }
-
-  return cl_uc::fetch();
-}
-
-bool
-cl_stm8::fetch(t_mem *code)
-{
-  return cl_uc::fetch(code);
-}
 
 int
 cl_stm8::exec_inst(void)
@@ -1456,26 +1046,11 @@ cl_stm8::exec_inst(void)
 
   instPC= PC;
 
-  if (do_brk())
-    return(resBREAKPOINT);
-
-  if (!div_cycle)
-    {
-      pipetrace_instr_end();
-      pipetrace_instr_start(instPC);
-
-      // If there was a flush in this cycle nothing happens in the overlapped cycle
-      if (pipeline_busy.flush)
-        tick(1);
-
-      pipeline_busy.flush = false;
-      pipetrace_type("D");
-    }
-
-  code = fetch();
-
-  if (!div_cycle)
-    pipeline_busy.instr = false;
+  if (fetch(&code)) {
+    //printf("******************** break \n");
+	  return(resBREAKPOINT);
+  }
+  tick(1);
 
   switch (code)
     { // get prefix
@@ -1484,25 +1059,18 @@ cl_stm8::exec_inst(void)
     case 0x91:
     case 0x92:
       cprefix = code;
-      code = fetch();
+      fetch(&code);
       break;
-    case 0x82: // INT
+    case 0x82:
       {
 	int ce= fetch();
 	int ch= fetch();
 	int cl= fetch();
-	// Documentation is unclear but we treat it as JP and allow
-	// the prefetch of the next instruction to occur during the
-	// execute tick.
-	pipeline_flush(true);
 	PC= ce*0x10000 + ch*0x100 + cl;
+	tick(1);
 	return resGO;
       }
-    case 0x8b: // BREAK
-      {
-        store_regs();
-        return resSTOP;
-      }
+    case 0x8b: return resSTOP; // BREAK instruction
     default:
       cprefix = 0x00;
       break;
@@ -1564,7 +1132,6 @@ cl_stm8::exec_inst(void)
                pop2( regs.Y);
                pop1( tempi);
                pop2( PC);
-               store_regs();
                PC += (tempi <<16); //Add PCE to PC
 	       {
 		 class it_level *il= (class it_level *)(it_levels->top());
@@ -1575,8 +1142,7 @@ cl_stm8::exec_inst(void)
 		     delete il;
 		   }
 	       }
-	       div_cycle = 0;
-	       pipeline_flush(false);
+	       tick(10);
                return(resGO);
             case 0x10: 
             case 0xA0:
@@ -1594,7 +1160,6 @@ cl_stm8::exec_inst(void)
       case 0x1:
          switch ( code & 0xf0) {
             case 0x00: // RRWA
-               store_regs();
                if (cprefix == 0x00) { // rrwa X,A
                   tempi = regs.X;
                   regs.X >>= 8;
@@ -1617,27 +1182,21 @@ cl_stm8::exec_inst(void)
             case 0x30: // exg A,longmem
                opaddr = fetch2();
                tempi = get1(opaddr);
-               // FIXME: PM0044 says 3 cycles so the stores are in separate cycles
-               // rather than overlapped. But which comes first?
                store1( opaddr, regs.A);
-               exec_cycle();
-               store_regs();
                regs.A = tempi;
+	       tick(2);
                return(resGO);
             case 0x40: // exg A,XL
-               store_regs();
                tempi = regs.X;
                regs.X = (regs.X &0xff00) | regs.A;
                regs.A = tempi & 0xff;
                return(resGO);
             case 0x50: // exgw X,Y
-               store_regs();
                tempi = regs.Y;
                regs.Y = regs.X;
                regs.X = tempi;
                return(resGO);
             case 0x60: // exg A,YL
-               store_regs();
                tempi = regs.Y;
                regs.Y = (regs.Y &0xff00) | regs.A;
                regs.A = tempi & 0xff;
@@ -1645,20 +1204,15 @@ cl_stm8::exec_inst(void)
             case 0x70: // special opcodes
                code = fetch();
                switch(code) {
-                  case 0xEC: exec_cycle(); return(resHALT);
-                  case 0xED: exec_cycle(); putchar(regs.A); fflush(stdout); return(resGO);
+                  case 0xEC: return(resHALT);
+                  case 0xED: putchar(regs.A); fflush(stdout); return(resGO);
                   default:
 		    //printf("************* bad code !!!!\n");
                      return(resINV_INST);
                }
             case 0x80: // ret
                pop2( PC);
-               // PM0044: 5.4.3: For the CALL instruction, it [the fetch of the next
-               // instruction] starts after the last cycle of the CALL execution.
-               // Although nothing is mentioned for RET PM0044 says it takes 4 cycles
-               // which implies the fetch follows the last execute cycle.
-               exec_cycle();
-               pipeline_flush(false);
+	       tick(3);
                return(resGO);
             case 0x10: 
             case 0xA0:
@@ -1678,7 +1232,6 @@ cl_stm8::exec_inst(void)
          switch ( code & 0xf0) {
             case 0x00: // RLWA
                if (cprefix == 0x00) { // rlwa X,A
-                  store_regs();
                   tempi = regs.X;
                   regs.X <<= 8;
                   regs.X |= regs.A ;
@@ -1686,7 +1239,6 @@ cl_stm8::exec_inst(void)
                   FLAG_ASSIGN (BIT_N, 0x8000 & regs.X);
                   FLAG_ASSIGN (BIT_Z, regs.X == 0x0000);
                } else if (cprefix == 0x90) { // rlwa Y,A
-                  store_regs();
                   tempi = regs.Y;
                   regs.Y <<= 8;
                   regs.Y |= regs.A ;
@@ -1703,14 +1255,8 @@ cl_stm8::exec_inst(void)
                pop1(tempi);
                store1(opaddr, tempi);
                return(resGO);
-            case 0x40: // mul
-               // mul low, [store low, mul high], add carry, store high
-               // with the store of the low byte result and the multiply of the
-               // high byte overlapped.
-               exec_cycle();
-               exec_cycle();
-               exec_cycle();
-               store_regs();
+            case 0x40: // MUL
+               tick(3);
                if(cprefix==0x90) {
                   regs.Y = (regs.Y&0xff) * regs.A;
                } else if(cprefix==0x00) {
@@ -1722,14 +1268,10 @@ cl_stm8::exec_inst(void)
                FLAG_CLEAR(BIT_C);
                return(resGO);
                break;
-            case 0x50: // sub sp,#val
-               {
-                 t_mem v = fetch();
-                 store_regs();
-                 regs.SP -= v;
-                 return(resGO);
-               }
-               break;            
+	 case 0x50: // sub sp,#val
+	   cSP.set(regs.SP - fetch());
+	   return(resGO);
+	   break;            
             case 0x60: //div
                return(inst_div(code, cprefix));
                break;
@@ -1758,14 +1300,13 @@ cl_stm8::exec_inst(void)
                return( inst_cpl( code, cprefix));
                break;
             case 0x80: // TRAP
+	      tick(8);
 	       {
 		 class it_level *il= new it_level(3, 0x8004, PC, trap_src);
 		 accept_it(il);
 	       }
                return(/*resHALT*/resGO);
-            case 0x90: // EXGW
-               get_regs();
-               store_regs();
+            case 0x90:
                if(cprefix==0x90) {
                   regs.Y = regs.X;
                } else if(cprefix==0x00) {
@@ -1799,16 +1340,14 @@ cl_stm8::exec_inst(void)
             case 0x70: // SRL
                return( inst_srl( code, cprefix));
                break;
-            case 0x80: // POP A
-	       get_regs();
-               pop1(regs.A);
+            case 0x80: 
+               pop1( regs.A);
                return(resGO);
-            case 0x90: // LDW SP,[XY]
-               store_regs();
+            case 0x90:
                if(cprefix==0x90) {
-                  regs.SP = regs.Y;
+		 cSP.set(regs.Y);
                } else if(cprefix==0x00) {
-                  regs.SP = regs.X;
+		 cSP.set(regs.X);
                } else {
                   return(resHALT);
                }
@@ -1851,7 +1390,8 @@ cl_stm8::exec_inst(void)
             case 0x60: // DIVW
                return( inst_div( code, cprefix));
                break;
-            case 0x80:
+	 case 0x80: // POPW
+	   tick(1);
                if(cprefix==0x90) {
                   pop2(regs.Y);
                } else if(cprefix==0x00) {
@@ -1861,8 +1401,7 @@ cl_stm8::exec_inst(void)
                }
                return(resGO);
                break;
-            case 0x90: // LD [XY]H,A
-               store_regs();
+            case 0x90:
                if(cprefix==0x90) {
                   regs.Y = (regs.Y & 0xff) | (regs.A<<8);
                } else if(cprefix==0x00) {
@@ -1902,8 +1441,7 @@ cl_stm8::exec_inst(void)
             case 0x80: 
                pop1( regs.CC);
                return(resGO);
-            case 0x90: // LDW [XY],SP
-               store_regs();
+            case 0x90:
                if(cprefix==0x90) {
                   regs.Y = regs.SP;
                } else if(cprefix==0x00) {
@@ -1947,15 +1485,9 @@ cl_stm8::exec_inst(void)
                pop1( tempi);
                pop2( PC);
                PC += (tempi <<16); //Add PCE to PC
-               // PM0044: 5.4.3: For the CALL instruction, it [the fetch of the next
-               // instruction] starts after the last cycle of the CALL execution.
-               // Although nothing is mentioned for RETF PM0044 says it takes 5 cycles
-               // which implies the fetch follows the last execute cycle.
-               exec_cycle();
-               pipeline_flush(false);
+	       tick(5);
                return(resGO);
-            case 0x90: // LD[XY]L,A
-	       store_regs();
+            case 0x90:
                if(cprefix==0x90) {
                   regs.Y = (regs.Y & 0xff00) | regs.A;
                } else if(cprefix==0x00) {
@@ -1965,20 +1497,18 @@ cl_stm8::exec_inst(void)
                }
                return(resGO);
                break;
-            case 0xA0:
+	 case 0xA0: // LDF
                opaddr = fetch2();
                if (cprefix == 0x92) {
-                  opaddr = get3(opaddr);
-                  store1(opaddr + regs.X,regs.A);
+                  store1(get3(opaddr)+regs.X,regs.A);
+		  tick(3);
                } else if(cprefix==0x91) {
-                  opaddr = get3(opaddr);
-                  store1(opaddr + regs.Y,regs.A);
+		 store1(get3(opaddr)+regs.Y,regs.A);
+		 tick(3);
                } else if(cprefix==0x90) {
-                  opaddr = (opaddr << 8) + fetch();
-                  store1(opaddr + regs.Y, regs.A);
+                  store1((opaddr << 8) + fetch() + regs.Y, regs.A);
                } else if(cprefix==0x00) {
-                  opaddr = (opaddr << 8) + fetch();
-                  store1(opaddr + regs.X, regs.A);
+                  store1((opaddr << 8) + fetch() + regs.X, regs.A);
                } else {
                   return(resHALT);
                }
@@ -2010,7 +1540,6 @@ cl_stm8::exec_inst(void)
                push1( regs.A);
                return(resGO);
             case 0x90: // RCF
-               exec_cycle();
                FLAG_CLEAR(BIT_C);
                return(resGO);
             case 0x10: 
@@ -2038,6 +1567,7 @@ cl_stm8::exec_inst(void)
                return( inst_rlc( code, cprefix));
                break;
             case 0x80: // PUSHW
+	      tick(1);
                if(cprefix==0x90) {
                   push2(regs.Y);
                } else if(cprefix==0x00) {
@@ -2048,7 +1578,6 @@ cl_stm8::exec_inst(void)
                return(resGO);
                break;
             case 0x90: // SCF
-               exec_cycle();
                FLAG_SET(BIT_C);
                return(resGO);
             case 0x10: 
@@ -2079,7 +1608,6 @@ cl_stm8::exec_inst(void)
                push1( regs.CC);
                return(resGO);
             case 0x90: // RIM
-               exec_cycle();
                FLAG_CLEAR(BIT_I0);
                FLAG_SET(BIT_I1);
                return(resGO);
@@ -2112,31 +1640,23 @@ cl_stm8::exec_inst(void)
 		push1(v);
 		return(resGO);
 	      }
-            case 0x50: // addw sp,#val
-               tempi = fetch1();
-               exec_cycle();
-               store_regs();
-               regs.SP += tempi;
-               return(resGO);
-               break;
+	 case 0x50: // addw sp,#val
+	   cSP.set(regs.SP + fetch1());
+	   return(resGO);
+	   break;
             case 0x60: // ld (shortoff,SP),A
-               tempi = fetch1();
-               store1(tempi + regs.SP, regs.A);
+               store1(fetch1()+regs.SP, regs.A);
                FLAG_NZ(regs.A);
                return(resGO);
                break;
             case 0x70: // ld A,(shortoff,SP)
-               tempi = get1(fetch1()+regs.SP);
-               store_regs();
-               regs.A = tempi;
+               regs.A = get1(fetch1()+regs.SP);
                FLAG_NZ(regs.A);
                return(resGO);
                break;
             case 0x80: // BREAK
-               exec_cycle();
                return(resSTOP);
             case 0x90: // SIM - disable INT
-               exec_cycle();
                FLAG_SET(BIT_I0);
                FLAG_SET(BIT_I1);
                return(resGO);
@@ -2168,37 +1688,30 @@ cl_stm8::exec_inst(void)
                return( inst_addw( code, cprefix));
                break;
             case 0x80: // CCF
-               exec_cycle();
                regs.CC ^= BIT_C;
                return(resGO);
                break;            
             case 0x90: // RVF
-               exec_cycle();
                FLAG_CLEAR(BIT_V);
                return(resGO);
             case 0xA0: // JPF
                opaddr = fetch2();
-               // PM0044: 5.4.3: For a JP instruction, the fetch [of the next
-               // instruction] can start during the first cycle of the "dummy"
-               // execution.
                if (cprefix == 0x92) {
                   PC = get3(opaddr);
+		  tick(5);
                } else {
                   PC = (opaddr << 8) + fetch();
+		  tick(1);
                }
-               pipeline_flush(false);
                return(resGO);
                break;
-            case 0xb0: // LDF A,$eehhll or LDF A,[$eehhll.e]
+            case 0xb0: // LDF
                opaddr = fetch2();
                if (cprefix == 0x92) {
-                  tempi = get1(get3(opaddr));
-                  decode_cycle();
+                  regs.A = get1(get3(opaddr));
                } else {
-                  tempi = get1((opaddr << 8) + fetch());
+                  regs.A = get1((opaddr << 8) + fetch());
                }
-               store_regs();
-               regs.A = tempi;
                FLAG_NZ (regs.A);
                return(resGO);
                break;
@@ -2232,42 +1745,35 @@ cl_stm8::exec_inst(void)
                    push2(PC & 0xffff);
                    push1(PC >> 16);
                    PC = get3(opaddr);
+		   tick(7);
                } else {
                    unsigned char c = fetch();
                    push2(PC & 0xffff);
                    push1(PC >> 16);
                    PC = (opaddr << 8) + c;
+		   tick(4);
                }
-               // PM0044: 5.4.3: For the CALL instruction, it [the fetch of the next
-               // instruction] starts after the last cycle of the CALL execution.
-               exec_cycle();
-               pipeline_flush(false);
                return(resGO);
                break;
             case 0x90: // NOP
-               exec_cycle();
                return(resGO);
                break;
             case 0xA0: // CALLR
              {
                signed char c = (signed char) fetch1();
                push2(PC);
-               // PM0044: 5.4.3: For the CALL instruction, it [the fetch of the next
-               // instruction] starts after the last cycle of the CALL execution.
                PC += c;
-               exec_cycle();
-               pipeline_flush(false);
+	       tick(3);
                return(resGO);
              }
                break;            
             case 0xb0: // LDF
                opaddr = fetch2();
                if (cprefix == 0x92) {
-                  tempi = get3(opaddr);
-                  store1(tempi, regs.A);
+                  store1(get3(opaddr),regs.A);
+		  tick(3);
                } else {
-                  tempi = (opaddr << 8) + fetch();
-                  store1(tempi, regs.A);
+                  store1((opaddr << 8) + fetch(), regs.A);
                }
                FLAG_NZ (regs.A);
                return(resGO);
@@ -2295,18 +1801,16 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: 
 	      //printf("************* HALT instruction reached !!!!\n");
-               exec_cycle();
+	      tick(9);
                return(resHALT);
             case 0x90: // LD A, YH / XH
                if(cprefix==0x90) {
-                  tempi = (regs.Y >> 8) & 0xff;
+                  regs.A = (regs.Y >> 8) & 0xff;
                } else if(cprefix==0x00) {
-                  tempi = (regs.X >> 8) & 0xff;
+                  regs.A = (regs.X >> 8) & 0xff;
                } else {
                   return(resHALT);
                }
-               store_regs();
-               regs.A = tempi;
                return(resGO);
                break;
             case 0x10: 
@@ -2339,26 +1843,25 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: 
 	      //printf("************* WFI/WFE instruction not implemented !!!!\n");
+	      tick(9);
                return(resINV_INST);
-            case 0x90: // LD A,[XY]L
+            case 0x90:
                if(cprefix==0x90) {
-                  tempi = (regs.Y & 0xff);
+                  regs.A = (regs.Y & 0xff);
                } else if(cprefix==0x00) {
-                  tempi = (regs.X & 0xff);
+                  regs.A = (regs.X & 0xff);
                } else {
                   return(resHALT);
                }
-               store_regs();
-               regs.A = tempi;
                return(resGO);
             case 0xA0: // LDF
                opaddr = fetch2();
                if (cprefix == 0x92) {
                   regs.A = get1(get3(opaddr)+regs.X);
-                  decode_cycle();
+		  tick(4);
                } else if(cprefix==0x91) {
                   regs.A = get1(get3(opaddr)+regs.Y);
-                  decode_cycle();
+		  tick(4);
                } else if(cprefix==0x90) {
                   regs.A = get1((opaddr << 8) + fetch() + regs.Y);
                } else if(cprefix==0x00) {
@@ -2366,7 +1869,6 @@ cl_stm8::exec_inst(void)
                } else {
                   return(resHALT);
                }
-               store_regs();
                FLAG_NZ (regs.A);
                return(resGO);
             case 0xB0:
@@ -2465,9 +1967,7 @@ cl_stm8::accept_it(class it_level *il)
     { FLAG_CLEAR(BIT_I1) FLAG_CLEAR(BIT_I0) }
   else // 3
     { FLAG_SET(BIT_I1) FLAG_SET(BIT_I0) }
-
   PC = il->addr;
-  pipeline_flush(false);
 
   it_levels->push(il);
   return resGO;//resINTERRUPT;
@@ -2502,102 +2002,6 @@ cl_stm8::stack_check_overflow(class cl_stack_op *op)
     }
 }
 
-void
-cl_stm8::pipetrace_end_table(void)
-{
-  fputs("\" /></tr>\n"
-        "    </tbody>\n"
-        "    <thead>\n"
-        "        <tr><th>Address</th><th>Instruction</th>",
-        pipetrace_fd);
-
-  for (unsigned int i = 1; i <= pipetrace_max_ticks + 1; i++)
-    fprintf(pipetrace_fd, "<th class=\"n\">%u</th>", i);
-
-  fputs("\n"
-        "    </thead>\n"
-        "</table>\n"
-        "</a>\n\n",
-        pipetrace_fd);
-
-  pipetrace_in_table = false;
-}
-
-void
-cl_stm8::pipetrace_instr_start(t_addr addr)
-{
-  if (pipetrace_running)
-    {
-      if (!pipetrace_in_table)
-        {
-          fputs("<a title=\"Click for legend\">\n"
-                "<table class=\"pipetrace\" onclick=\"toggle('pipetrace_legend')\">\n"
-                "    <tbody>\n",
-                pipetrace_fd);
-          pipetrace_in_table = true;
-          pipetrace_max_ticks = 0;
-        }
-
-      if (pipeline_busy.flush)
-        fputs("        <tr><td /><td class=\"Flushed\" /></tr>\n", pipetrace_fd);
-
-      fputs("        <tr><td>", pipetrace_fd);
-      fprintf(pipetrace_fd, rom->addr_format, addr);
-      fprintf(pipetrace_fd, "</td><td class=\"instr\">");
-      const char *s = disass(addr);
-      while (*s)
-        {
-          int n = strcspn(s, "<>");
-          fprintf(pipetrace_fd, "%*.*s", n, n, s);
-          s += n;
-
-          switch (*s) {
-            case '<':
-              fprintf(pipetrace_fd, "&lt;");
-              s++;
-              break;
-
-            case '>':
-              fprintf(pipetrace_fd, "&gt;");
-              s++;
-              break;
-
-            default:
-              // Not possible
-              break;
-          }
-        }
-      fprintf(pipetrace_fd, "</td><td class=\"");
-      for (unsigned int i = 1; i <= pipetrace_ticks; i++)
-        fputs("\" /><td class=\"", pipetrace_fd);
-    }
-}
-
-void
-cl_stm8::pipetrace_instr_end(void)
-{
-  if (pipetrace_running && pipetrace_in_table)
-    fputs("\" /></tr>\n", pipetrace_fd);
-}
-
-void
-cl_stm8::pipetrace_tick(const char *aux)
-{
-  if (pipetrace_running)
-    {
-      fputs("\">", pipetrace_fd);
-      if (aux) fprintf(pipetrace_fd, "<span class=\"%s\" />", aux);
-      fputs("</td><td class=\"", pipetrace_fd);
-    }
-}
-
-void
-cl_stm8::pipetrace_type(const char *event)
-{
-  if (pipetrace_running)
-    fprintf(pipetrace_fd, " %s", event);
-}
-
 cl_stm8_cpu::cl_stm8_cpu(class cl_uc *auc):
   cl_hw(auc, HW_DUMMY, 0, "cpu")
 {
@@ -2607,6 +2011,7 @@ int
 cl_stm8_cpu::init(void)
 {
   int i;
+  cl_stm8 *u= (cl_stm8*)uc;
   cl_hw::init();
   for (i= 0; i < 11; i++)
     {
@@ -2616,242 +2021,14 @@ cl_stm8_cpu::init(void)
   uc->vars->add(v= new cl_var(chars("sp_limit"), cfg, cpuconf_sp_limit,
 			      cfg_help(cpuconf_sp_limit)));
   v->init();
+  v->write(u->sp_limit);
+
+  uc->vars->add(v= new cl_var(chars("rollover"), cfg, cpuconf_rollover,
+			      cfg_help(cpuconf_rollover)));
+  v->init();
   
   return 0;
 }
-
-void
-cl_stm8_cpu::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
-{
-  class cl_stm8 *stm8 = static_cast<cl_stm8 *>(uc);
-  const char *p1, *p2;
-
-  if (cmdline->syntax_match(uc, STRING STRING))
-    {
-      if ((p1 = cmdline->param(0)->value.string.string) &&
-          strstr(p1, "pi") == p1 &&
-          (p1 = cmdline->param(1)->value.string.string))
-        {
-          if (strstr(p1, "paus") == p1)
-            {
-              if (stm8->pipetrace_running)
-                {
-                  if (stm8->pipetrace_in_table)
-                    stm8->pipetrace_end_table();
-                  stm8->pipetrace_running = false;
-                }
-              else if (!stm8->pipetrace_fd)
-                con->dd_printf("Not currently tracing pipeline acivity\n");
-              return;
-            }
-          else if (strstr(p1, "re") == p1)
-            {
-              if (!stm8->pipetrace_running)
-                {
-                  if (stm8->pipetrace_fd)
-                    {
-                      stm8->pipetrace_ticks = 0;
-                      stm8->pipetrace_running = true;
-                    }
-                  else
-                    con->dd_printf("Not currently tracing pipeline acivity\n");
-                }
-              return;
-            }
-          else if (!strcmp(p1, "stop") || !strcmp(p1, "close"))
-            {
-              if (stm8->pipetrace_running)
-                {
-                  if (stm8->pipetrace_in_table)
-                    stm8->pipetrace_end_table();
-                  stm8->pipetrace_running = false;
-                }
-              if (stm8->pipetrace_fd)
-                {
-                  fputs("</body>\n</html>\n", stm8->pipetrace_fd);
-                  fclose(stm8->pipetrace_fd);
-                }
-              if (stm8->pipetrace_file)
-                free(stm8->pipetrace_file);
-              stm8->pipetrace_fd = NULL;
-              stm8->pipetrace_file= NULL;
-              return;
-            }
-        }
-    }
-  else if (cmdline->syntax_match(uc, STRING STRING STRING))
-    {
-      if ((p1 = cmdline->param(0)->value.string.string) &&
-          !strcmp(p1, "pipetrace") &&
-          (p1 = cmdline->param(1)->value.string.string) &&
-          (p2 = cmdline->param(2)->value.string.string))
-        {
-          if (!strcmp(p1, "fold") || !strcmp(p1, "folding"))
-            {
-              if (!strcmp(p2, "on"))
-                {
-                  stm8->pipetrace_fold = true;
-                  return;
-                }
-              else if (!strcmp(p2, "off"))
-                {
-                  stm8->pipetrace_fold = false;
-                  return;
-                }
-            }
-          else if (!strcmp(p1, "title"))
-            {
-              if (stm8->pipetrace_title)
-                free(stm8->pipetrace_title);
-              stm8->pipetrace_title = strdup(p2);
-              return;
-            }
-	  else if (!strcmp(p1, "style"))
-            {
-              if (stm8->pipetrace_style)
-                free(stm8->pipetrace_style);
-              stm8->pipetrace_style = strdup(p2);
-              return;
-            }
-          else if (!strcmp(p1, "data") || !strcmp(p1, "text"))
-            {
-              if (stm8->pipetrace_fd)
-                {
-                  if (stm8->pipetrace_in_table)
-                    stm8->pipetrace_end_table();
-                  fputs(p2, stm8->pipetrace_fd);
-                  putc('\n', stm8->pipetrace_fd);
-                  stm8->pipetrace_ticks = 0;
-                }
-              else
-                  con->dd_printf("Not currently tracing pipeline acivity\n");
-              return;
-            }
-          else if (!strcmp(p1, "start") || !strcmp(p1, "output") || !strcmp(p1, "file"))
-            {
-              if (stm8->pipetrace_fd)
-                {
-                  con->dd_printf("Already writing pipeline trace to \"%s\". Close this first.\n", stm8->pipetrace_file);
-                  return;
-                }
-
-              if (stm8->pipetrace_file)
-                {
-                  free(stm8->pipetrace_file);
-                  stm8->pipetrace_file = NULL;
-                }
-              stm8->pipetrace_file = NULL;
-
-              if ((stm8->pipetrace_fd = fopen(p2, "w")) == NULL)
-                con->dd_printf("Can't open `%s': %s\n", p2, strerror(errno));
-              else
-                stm8->pipetrace_file = strdup(p2);
-
-              fprintf(stm8->pipetrace_fd, "<html>\n<head>\n");
-
-              if (stm8->pipetrace_title && stm8->pipetrace_title[0])
-                fprintf(stm8->pipetrace_fd, "<title>%s</title>\n", stm8->pipetrace_title);
-
-              if (stm8->pipetrace_style && stm8->pipetrace_style[0])
-                fprintf(stm8->pipetrace_fd, "<link rel=\"stylesheet\" href=\"%s\" />\n", stm8->pipetrace_style);
-              else
-                fprintf(stm8->pipetrace_fd,
-                  "<script>\n"
-                  "    function toggle(id) {\n"
-                  "        var obj = document.getElementById(id);\n"
-                  "        if (obj.style.display === 'none')\n"
-                  "            obj.style.display = 'block';\n"
-                  "        else\n"
-                  "            obj.style.display = 'none';\n"
-                  "    }\n"
-                  "</script>\n"
-                  "\n"
-                  "<style>\n"
-                  "    .pipetrace { margin: 1em 0; }\n"
-                  "    .pipetrace, .pipetrace td { border: 1px solid black; border-collapse: collapse; padding: 0 0.2em; white-space: nowrap; }\n"
-                  "    .pipetrace thead { background-color: #d2d2d2; position: sticky; top: 0; }\n"
-                  "    .pipetrace thead th { border: none; box-shadow: inset -1px -1px #000; }\n"
-                  "    .pipetrace tr:nth-child(even) { background-color: #f2f2f2; }\n"
-                  "    .pipetrace td { min-width: 1.6em; }\n"
-                  "    .pipetrace td.instr:before { content: \"\"; }\n"
-                  "    .pipetrace td.instr { width: 9.5em; }\n"
-                  "    .pipetrace td.Sbus:before { content: \" S₀\"; }\n"
-                  "    .pipetrace td.Sfetch:before { content: \" S₁\"; }\n"
-                  "    .pipetrace td.Sraw:before { content: \" S₂\"; }\n"
-                  "    .pipetrace td:before { content: attr(class); }\n"
-                  "    .pipetrace td.D { background-color: lawngreen; }\n"
-                  "    .pipetrace td.E { background-color: navajowhite; }\n"
-                  "    .pipetrace td.Sbus { background-color: red; }\n"
-                  "    .pipetrace td.Sfetch { background-color: red; }\n"
-                  "    .pipetrace td.Sraw { background-color: red; }\n"
-                  "    .pipetrace td.X, .pipetrace td.Flushed { background-color: red; }\n"
-                  "    .pipetrace td span:after { content: attr(class); }\n"
-                  "    .pipetrace td span { padding: 0 0.2em; margin: 0 0 0 0.1em; }\n"
-                  "    .pipetrace td span.FS { background-color: lightgrey; }\n"
-                  "    .pipetrace td span.F { background-color: lightskyblue; }\n"
-                  "    #pipetrace_legend { border: none; background-color: white; position: fixed; bottom: 0; right: 0; }\n"
-                  "    #pipetrace_legend tr:first-of-type { font-weight: bold; }\n"
-                  "    #pipetrace_legend td { text-align: center; }\n"
-                  "    #pipetrace_legend td.defn { text-align: left; }\n"
-                  "    #pipetrace_legend td.defn:before { content: \"\"; }\n"
-                  "</style>\n");
-
-              fputs(
-                "</head>\n"
-                "\n"
-                "<body onload=\"toggle('pipetrace_legend')\">\n",
-                stm8->pipetrace_fd);
-
-              if (stm8->pipetrace_title)
-                fprintf(stm8->pipetrace_fd, "\n<h1>%s</h1>\n", stm8->pipetrace_title);
-
-              fputs("\n"
-                "<table id=\"pipetrace_legend\" class=\"pipetrace\">\n"
-                "    <tr><td colspan=\"2\">Legend</td></tr>\n"
-                "    <tr><td class=\"D\" /><td class=\"defn\">Decode</td></tr>\n"
-                "    <tr><td class=\"E\" /><td class=\"defn\">Execute</td></tr>\n"
-                "    <tr><td><span class=\"F\" /></td><td class=\"defn\">Fetch</td></tr>\n"
-                "    <tr><td class=\"X\" /><td class=\"defn\">Flush</td></tr>\n"
-                "    <tr><td><span class=\"FS\" /></td><td class=\"defn\">Fetch Stall - space in prefetch buffer but bus busy</td></tr>\n"
-                "    <tr><td class=\"Sbus\" /><td class=\"defn\">Decode Stall - bus busy</td></tr>\n"
-                "    <tr><td class=\"Sfetch\" /><td class=\"defn\">Decode Stall - insufficient data in prefetch buffer</td></tr>\n"
-                "    <tr><td class=\"Sraw\" /><td class=\"defn\">Decode Stall - read after write</td></tr>\n"
-                "</table>\n"
-                "\n",
-                stm8->pipetrace_fd);
-
-              stm8->pipetrace_ticks = 0;
-              stm8->pipetrace_running = true;
-              stm8->pipetrace_in_table = false;
-              return;
-            }
-        }
-    }
-
-    con->dd_printf("set hardware cpu[id] pipetrace title \"title\"\n");
-    con->dd_printf("set hardware cpu[id] pipetrace style \"url\"\n");
-    con->dd_printf("set hardware cpu[id] pipetrace start|output|file \"filename\"\n");
-    con->dd_printf("set hardware cpu[id] pipetrace pause\n");
-    con->dd_printf("set hardware cpu[id] pipetrace resume|restart\n");
-    con->dd_printf("set hardware cpu[id] pipetrace data \"html...\"\n");
-    con->dd_printf("set hardware cpu[id] pipetrace stop|close\n");
-    con->dd_printf("set hardware cpu[id] pipetrace fold on|off\n");
-}
-
-void
-cl_stm8_cpu::print_info(class cl_console_base *con)
-{
-  class cl_stm8 *stm8 = static_cast<cl_stm8 *>(uc);
-
-  con->dd_printf("%s[%d]\n", id_string, id);
-  con->dd_printf("  Pipetrace title: %s\n", (stm8->pipetrace_title ? stm8->pipetrace_title : "<not set>"));
-  con->dd_printf("  Pipetrace style: %s\n", (stm8->pipetrace_style ? stm8->pipetrace_style : "<not set>"));
-  con->dd_printf("  Pipetrace file: %s\n", (stm8->pipetrace_file ? stm8->pipetrace_file : "<not set>"));
-  con->dd_printf("  Pipetrace folding: %s\n", (stm8->pipetrace_fold ? "on" : "off"));
-
-  con->dd_printf("\n");
-}
-
 
 void
 cl_stm8_cpu::write(class cl_memory_cell *cell, t_mem *val)
@@ -2900,10 +2077,10 @@ cl_stm8_cpu::write(class cl_memory_cell *cell, t_mem *val)
       u->regs.Y= (u->regs.Y & 0xff00) | (*val);
       break;
     case 8:
-      u->regs.SP= (u->regs.SP & 0xff) | (*val << 8);
+      u->cSP.set((u->regs.SP & 0xff) | (*val << 8));
       break;
     case 9:
-      u->regs.SP= (u->regs.SP & 0xff00) | (*val);
+      u->cSP.set((u->regs.SP & 0xff00) | (*val));
       break;
     case 0xa:
       u->regs.CC= (u->regs.CC & 0xff00) | (*val);
@@ -2919,7 +2096,7 @@ cl_stm8_cpu::read(class cl_memory_cell *cell)
   cl_stm8 *u= (cl_stm8*)uc;
   
   if (conf(cell, NULL))
-    return v;
+    return cell->get();
   if (!uc->rom->is_owned(cell, &a))
     return v;
   if ((a < 0x7f00) ||
@@ -2970,15 +2147,22 @@ t_mem
 cl_stm8_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
   class cl_stm8 *u= (class cl_stm8 *)uc;
-  if (val)
-    cell->set(*val);
   switch ((enum stm8_cpu_cfg)addr)
     {
     case cpuconf_sp_limit:
       if (val)
 	u->sp_limit= *val & 0xffff;
-      else
-	cell->set(u->sp_limit);
+      cell->set(u->sp_limit);
+      return u->sp_limit;
+      break;
+    case cpuconf_rollover:
+      if (val)
+	u->cSP.set_rollover(*val);
+      cell->set((u->cSP.get_rollover())?1:0);
+      break;
+    default:
+      if (val)
+	cell->set(*val);
       break;
     }
   return cell->get();
@@ -2990,62 +2174,11 @@ cl_stm8_cpu::cfg_help(t_addr addr)
   switch (addr)
     {
     case cpuconf_sp_limit:
-      return "Stack overflows when SP is below this limit";
+      return "Stack overflows when SP reaches this limit";
+    case cpuconf_rollover:
+      return "Use hw roll-over of stack pointer";
     }
   return "Not used";
-}
-
-/*
- * Errors in STM8 execution
- */
-
-/* All of memory errors */
-
-cl_error_stm8::cl_error_stm8(void)
-{
-  classification= stm8_error_registry.find("stm8");
-}
-
-cl_error_stm8_pipeline::
-cl_error_stm8_pipeline(void):
-  cl_error_stm8()
-{
-  classification= stm8_error_registry.find("pipeline");
-}
-
-cl_error_stm8_pipeline_decode_stall::
-cl_error_stm8_pipeline_decode_stall(void):
-  cl_error_stm8_pipeline()
-{
-  classification= stm8_error_registry.find("decode_stall");
-}
-
-void
-cl_error_stm8_pipeline_decode_stall::print(class cl_commander_base *c)
-{
-  c->dd_printf("%s: decode stalled\n", get_type_name());
-}
-
-cl_error_stm8_pipeline_fetch_stall::
-cl_error_stm8_pipeline_fetch_stall(void):
-  cl_error_stm8_pipeline()
-{
-  classification= stm8_error_registry.find("fetch_stall");
-}
-
-void
-cl_error_stm8_pipeline_fetch_stall::print(class cl_commander_base *c)
-{
-  c->dd_printf("%s: fetch stalled\n", get_type_name());
-}
-
-cl_stm8_error_registry::cl_stm8_error_registry(void)
-{
-  class cl_error_class *prev = stm8_error_registry.find("non-classified");
-  prev = register_error(new cl_error_class(err_error, "stm8", prev, ERROR_OFF));
-  prev = register_error(new cl_error_class(err_warning, "pipeline", prev));
-  register_error(new cl_error_class(err_warning, "decode_stall", prev));
-  register_error(new cl_error_class(err_warning, "fetch_stall", prev));
 }
 
 /* End of stm8.src/stm8.cc */

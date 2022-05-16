@@ -1,6 +1,8 @@
 0.8
 
 Motorola HC12 simulator.
+MOS65C02 simulator.
+Stm8 stack pointer roll-over function (configurable).
 
 
 0.7.x

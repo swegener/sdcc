@@ -68,7 +68,7 @@ COMMAND_DO_WORK(cl_show_copying_cmd)
 CMDHELP(cl_show_copying_cmd,
 	"show copying",
 	"Conditions for redistributing copies of uCsim",
-	"long help of show copying")
+	"")
 
 /*
  * Command: show warranty
@@ -87,7 +87,7 @@ COMMAND_DO_WORK(cl_show_warranty_cmd)
 CMDHELP(cl_show_warranty_cmd,
 	"show warranty",
 	"Various kinds of warranty you do not have",
-	"long help of show warranty")
+	"")
 
 /*
  * Command: show option
@@ -147,7 +147,7 @@ COMMAND_DO_WORK_APP(cl_show_option_cmd)
 CMDHELP(cl_show_option_cmd,
 	"show option [name]",
 	"Show internal data of options",
-	"long help of show option")
+	"")
 
 // prj
 #include "errorcl.h"
@@ -210,7 +210,7 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
 CMDHELP(cl_show_error_cmd,
 	"show error",
 	"Show class of errors",
-	"long help of show error")
+	"")
 
 //#include "newcmdposixcl.h"
 

@@ -84,8 +84,10 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 		 (uc->ticks->get_ticks() == 0 ? 0.0 :
 		   (100.0 * uc->idle_ticks->get_rtime() / uc->ticks->get_rtime())));
 
-  con->dd_printf("Max value of stack pointer= 0x%06x, avg= 0x%06x\n",
-		 AU(uc->sp_max), AU(uc->sp_avg));
+  con->dd_printf("Most value of stack pointer= 0x%06x",
+		 AU(uc->sp_most));
+  //con->dd_printf(", avg= 0x%06x", AU(uc->sp_avg));
+  con->dd_printf("\n");
   con->dd_printf("Simulation: %s\n",
 		 (uc->sim->state & SIM_GO)?"running":"stopped");
   con->dd_printf("Runtime: %f sec\n", dnow()-app_start_at);
@@ -95,7 +97,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 CMDHELP(cl_state_cmd,
 	"state",
 	"State of microcontroller",
-	"long help of state")
+	"")
 
 /*
  * Command: file
@@ -128,7 +130,7 @@ COMMAND_DO_WORK_UC(cl_file_cmd)
 CMDHELP(cl_file_cmd,
 	"file \"FILE\"",
         "Load FILE into ROM",
-	"long help of file")
+	"")
 
 /*
  * Command: download
@@ -151,7 +153,7 @@ COMMAND_DO_WORK_UC(cl_dl_cmd)
 CMDHELP(cl_dl_cmd,
 	"download",
 	"Load (intel.hex) data",
-	"long help of download")
+	"")
 
 /*
  * Command: pc
@@ -190,7 +192,7 @@ COMMAND_DO_WORK_UC(cl_pc_cmd)
 CMDHELP(cl_pc_cmd,
 	"pc [addr]",
 	"Set/get PC",
-	"long help of pc")
+	"")
 
 /*
  * Command: reset
@@ -209,7 +211,7 @@ COMMAND_DO_WORK_UC(cl_reset_cmd)
 CMDHELP(cl_reset_cmd,
 	"reset",
 	"Reset processor to start state",
-	"long help of reset")
+	"")
 
 /*
  * Command: tick
@@ -391,7 +393,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 CMDHELP(cl_dump_cmd,
 	"dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...",
 	"Dump memory of specified type or bit(s)",
-	"long help of dump")
+	"")
 
 /*
  * Command: di
@@ -412,7 +414,7 @@ COMMAND_DO_WORK_UC(cl_di_cmd)
 CMDHELP(cl_di_cmd,
 	"di [start [stop]]",
 	"Dump Internal RAM",
-	"long help of di")
+	"")
 
 /*
  * Command: dx
@@ -433,7 +435,7 @@ COMMAND_DO_WORK_UC(cl_dx_cmd)
 CMDHELP(cl_dx_cmd,
 	"dx [start [stop]]",
 	"Dump External RAM",
-	"long help of dx")
+	"")
 
 /*
  * Command: dch
@@ -454,7 +456,7 @@ COMMAND_DO_WORK_UC(cl_dch_cmd)
 CMDHELP(cl_dch_cmd,
 	"dch [start [stop]]",
 	"Dump code in hex form",
-	"long help of dch")
+	"")
 
 /*
  * Command: ds
@@ -475,7 +477,7 @@ COMMAND_DO_WORK_UC(cl_ds_cmd)
 CMDHELP(cl_ds_cmd,
 	"ds [start [stop]]",
 	"Dump SFR",
-	"long help of ds")
+	"")
 
 /*
  * Command: dc
@@ -526,7 +528,7 @@ COMMAND_DO_WORK_UC(cl_dc_cmd)
 CMDHELP(cl_dc_cmd,
 	"dc [start [stop]]",
 	"Dump code in disass form",
-	"long help of dc")
+	"")
 
 /*
  * Command: disassemble
@@ -604,16 +606,23 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
 	}
     }
   
-  
+  i64_t a, n;
+  a= realstart;
   while (lines)
     {
       int len;
-      uc->print_disass(realstart, con);
+      t_addr ta, tn;
+      ta= (t_addr)a;
+      uc->print_disass(ta, con);
       /* fix for #2383: start search next instruction after the actual one */
-      len= uc->inst_length(realstart);
-      realstart= rom->inc_address(realstart, /*+1*/len) + rom->start_address;
-      while (!uc->inst_at(realstart))
-        realstart= rom->inc_address(realstart, +1) + rom->start_address;
+      len= uc->inst_length(ta);
+      tn= rom->inc_address(ta, /*+1*/len) + rom->start_address;
+      while (!uc->inst_at(tn))
+        tn= rom->inc_address(tn, +1) + rom->start_address;
+      n= (i64_t)tn;
+      if (n <= a)
+	break;
+      a= n;
       lines--;
     }
 
@@ -625,7 +634,7 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
 CMDHELP(cl_disassemble_cmd,
 	"disassemble [start [offset [lines]]]",
 	"Disassemble code",
-	"long help of disassemble")
+	"")
 
 /*
  * Command: fill
@@ -667,7 +676,7 @@ COMMAND_DO_WORK_UC(cl_fill_cmd)
 CMDHELP(cl_fill_cmd,
 	"fill memory_type start end data",
 	"Fill memory region with data",
-	"long help of fill")
+	"")
 
 /*
  * Command: where
@@ -719,7 +728,7 @@ COMMAND_DO_WORK_UC(cl_where_cmd)
 CMDHELP(cl_where_cmd,
 	"where memory_type data...",
 	"Case unsensitive search for data",
-	"long help of where")
+	"")
 
 //int
 //cl_Where_cmd::do_work(class cl_sim *sim,
@@ -732,7 +741,7 @@ COMMAND_DO_WORK_UC(cl_Where_cmd)
 CMDHELP(cl_Where_cmd,
 	"Where memory_type data...",
 	"Case sensitive search for data",
-	"long help of Where")
+	"")
 
 
 /*
@@ -830,7 +839,7 @@ COMMAND_DO_WORK_UC(cl_hole_cmd)
 CMDHELP(cl_hole_cmd,
 	"hole [memory [length [value]]]",
 	"search area in memory (min length), filled with value",
-	"long help of hole")
+	"")
 
 
 /*
@@ -935,7 +944,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
 CMDHELP(cl_var_cmd,
 	"var name [memory addr [bit_nr]]",
 	"Create new variable",
-	"long help of var")
+	"")
 
 /*
  * Command: rmvar
@@ -972,7 +981,7 @@ COMMAND_DO_WORK_UC(cl_analyze_cmd)
         class cl_cmd_arg *param = cmdline->param(i);
         if (param)
           {
-            if (param->as_bit(uc))
+            /*if (param->as_bit(uc))
               {
                 if (param->value.bit.mem == uc->rom)
                   uc->analyze(param->value.bit.mem_address);
@@ -984,7 +993,12 @@ COMMAND_DO_WORK_UC(cl_analyze_cmd)
                   }
               }
             else
-              con->dd_printf("%s cannot be interpreted as a rom address\n", cmdline->tokens->at(i));
+	    con->dd_printf("%s cannot be interpreted as a rom address\n", cmdline->tokens->at(i));*/
+	    t_addr addr;
+	    if (param->get_address(uc, &addr))
+	      {
+		uc->analyze(addr);
+	      }
           }
       }
 
@@ -994,6 +1008,6 @@ COMMAND_DO_WORK_UC(cl_analyze_cmd)
 CMDHELP(cl_analyze_cmd,
 	"analyze [addr...]",
 	"Analyze reachable code globally or from the address(es) given",
-	"long help of analyze")
+	"")
 
 /* End of cmd.src/cmd_uc.cc */

@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "glob.h"
+
 #include "mos65c02cl.h"
 
 
@@ -39,7 +41,14 @@ cl_mos65c02::cl_mos65c02(class cl_sim *asim):
 int
 cl_mos65c02::init(void)
 {
+  int i;
   cl_mos6502::init();
+  // Map all 0x_3 into NOP
+  for (i=0x03; i<=0xf3; i+= 0x10)
+    itab[i]= instruction_wrapper_ea;
+  // Map all 0x_b into NOP
+  for (i=0x0b; i<=0xfb; i+= 0x10)
+    itab[i]= instruction_wrapper_ea;
   return 0;
 }
 
@@ -47,6 +56,231 @@ const char *
 cl_mos65c02::id_string(void)
 {
   return "MOS65C02";
+}
+
+void
+cl_mos65c02::reset(void)
+{
+  cl_mos6502::reset();
+  CC&= ~flagD;
+}
+
+struct dis_entry *
+cl_mos65c02::get_dis_entry(t_addr addr)
+{
+  struct dis_entry *de= cl_mos6502::get_dis_entry(addr);
+  if (de != NULL)
+    return de;
+
+  t_mem code= rom->get(addr);
+  for (de = disass_mos65c02; de && de->mnemonic; de++)
+    {
+      if ((code & de->mask) == de->code)
+        return de;
+    }
+  return NULL;
+}
+
+int
+cl_mos65c02::inst_length(t_addr addr)
+{
+  struct dis_entry *de= get_dis_entry(addr);
+  if (!de)
+    return 1;
+  return (de->mnemonic)?(de->length):1;
+}
+
+
+int
+cl_mos65c02::nopft(int nuof_fetches, int nuof_ticks)
+{
+  while (nuof_fetches--)
+    fetch();
+  if (nuof_ticks) tick(nuof_ticks);
+  return resGO;
+}
+
+
+int
+cl_mos65c02::DEA(t_mem code)
+{
+  cA.W(rA-1);
+  rF&= ~(flagZ|flagS);
+  if (!rA) rF|= flagZ;
+  if (rA & 0x80) rF|= flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mos65c02::INA(t_mem code)
+{
+  cA.W(rA+1);
+  rF&= ~(flagZ|flagS);
+  if (!rA) rF|= flagZ;
+  if (rA & 0x80) rF|= flagS;
+  cF.W(rF);
+  tick(1);
+  return resGO;
+}
+
+int
+cl_mos65c02::JMP7c(t_mem code)
+{
+  u16_t a1= i16();
+  u16_t a2= a1 + rX;
+  u16_t a= read_addr(rom, a2);
+  PC= a;
+  tick(5);
+  return resGO;
+}
+
+int
+cl_mos65c02::tsb(class cl_cell8 &op)
+{
+  u8_t o= op.R();
+  u8_t r1= o & rA, r2= o | rA;
+  u8_t f= rF & ~flagZ;
+  if (!r1) f|= flagZ;
+  op.W(r2);
+  cF.W(rF);
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mos65c02::trb(class cl_cell8 &op)
+{
+  u8_t o= op.R();
+  u8_t r1= o & rA, r2= o & ~rA;
+  u8_t f= rF & ~flagZ;
+  if (!r1) f|= flagZ;
+  op.W(r2);
+  cF.W(rF);
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mos65c02::stz(class cl_cell8 &op)
+{
+  op.W(0);
+  return resGO;
+}
+
+int
+cl_mos65c02::PHY(t_mem code)
+{
+  rom->write(0x0100 + rSP, rY);
+  vc.wr++;
+  t_addr spbef= rSP;
+  cSP.W(rSP-1);
+  class cl_stack_push *op= new cl_stack_push(instPC, rY, spbef, rSP);
+  op->init();
+  stack_write(op);
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mos65c02::PLY(t_mem code)
+{
+  t_addr spbef= rSP;
+  cSP.W(rSP+1);
+  cY.W(rom->read(0x0100 + rSP));
+  class cl_stack_pop *op= new cl_stack_pop(instPC, rY, spbef, rSP);
+  op->init();
+  stack_read(op);
+  u8_t f= rF & ~(flagN|flagZ);
+  if (!rY) f|= flagZ;
+  if (rY&0x80) f|= flagN;
+  cF.W(f);
+  vc.rd++;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_mos65c02::PHX(t_mem code)
+{
+  rom->write(0x0100 + rSP, rX);
+  vc.wr++;
+  t_addr spbef= rSP;
+  cSP.W(rSP-1);
+  class cl_stack_push *op= new cl_stack_push(instPC, rX, spbef, rSP);
+  op->init();
+  stack_write(op);
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mos65c02::PLX(t_mem code)
+{
+  t_addr spbef= rSP;
+  cSP.W(rSP+1);
+  cX.W(rom->read(0x0100 + rSP));
+  class cl_stack_pop *op= new cl_stack_pop(instPC, rX, spbef, rSP);
+  op->init();
+  stack_read(op);
+  u8_t f= rF & ~(flagN|flagZ);
+  if (!rX) f|= flagZ;
+  if (rX&0x80) f|= flagN;
+  cF.W(f);
+  vc.rd++;
+  tick(3);
+  return resGO;
+}
+
+int
+cl_mos65c02::rmb(t_mem code, class cl_cell8 &op)
+{
+  u8_t v= op.R();
+  u8_t mask= 1<<((code>>4)&0x7);
+  v&= ~mask;
+  op.W(v);
+  return resGO;
+}
+
+int
+cl_mos65c02::smb(t_mem code, class cl_cell8 &op)
+{
+  u8_t v= op.R();
+  u8_t mask= 1<<((code>>4)&0x7);
+  v|= mask;
+  op.W(v);
+  return resGO;
+}
+
+int
+cl_mos65c02::bbr(t_mem code, class cl_cell8 &op)
+{
+  u8_t v= op.R();
+  u8_t mask= 1<<((code>>4)&0x7);
+  i8_t offset= fetch();
+  if (!(v&mask))
+    {
+      PC+= offset;
+      PC&= 0xffff;
+    }
+  tick(2);
+  return resGO;
+}
+
+int
+cl_mos65c02::bbs(t_mem code, class cl_cell8 &op)
+{
+  u8_t v= op.R();
+  u8_t mask= 1<<((code>>4)&0x7);
+  i8_t offset= fetch();
+  if (v&mask)
+    {
+      PC+= offset;
+      PC&= 0xffff;
+    }
+  tick(2);
+  return resGO;
 }
 
 

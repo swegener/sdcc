@@ -3,15 +3,9 @@
 
    //virtual void incx(void);
    virtual int fetchea(t_mem code, unsigned char prefix);
-   virtual void get_regs(void);
    virtual int get_1(unsigned int addr);
    virtual int get2(unsigned int addr);
    virtual int get3(unsigned int addr);
-   virtual void decode_cycle(void);
-   virtual void exec_cycle(void);
-   virtual void store_regs(void);
-   virtual void store1(unsigned int addr, unsigned int val);
-   virtual void store2(unsigned int addr, unsigned int val);
    virtual int get_dest(t_mem code, unsigned char prefix);
    virtual int operandw(t_mem code, unsigned char prefix);
    virtual void flag_cvh(int x, int m, int r, bool byte, bool add, int mask);

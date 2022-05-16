@@ -370,8 +370,8 @@ cl_m6809::analyze_start(void)
       vars->add(v);
     }
 
-  for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); i++)
-    analyze(vectors[i].addr);
+  //for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); i++)
+  analyze(vectors[0].addr);
 }
 
 

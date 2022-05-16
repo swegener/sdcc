@@ -61,9 +61,22 @@ static int uc_yy_input(char *buf, int max_size);
 "!"			return(PTOK_EXCLAMATION);
 ","			return(PTOK_COMMA);
 
-([0-9]+)|(0x[0-9a-fA-F]+) {
-  //printf("\nlexer found a nr: %s\n",yytext);
-  yylval.number = strtol(yytext, 0, 0);
+($|0[xX])[0-9a-fA-F]+ {
+  yylval.number = 0;
+  int i;
+  if (yytext[0]=='$')
+    i=1;
+  else
+    i=2;
+  for (; yytext[i]; i++)
+  {
+  char c= yytext[i];
+  int val= 0;
+  if (c>='0' && c<='9') val= c-'0';
+  else if (c>='a' && c<='f') val= c-'a'+10;
+  else if (c>='A' && c<='F') val= c-'A'+10;
+  yylval.number = (yylval.number << 4) | (val&0xf);
+  }
   return PTOK_NUMBER;
 }
 
@@ -74,8 +87,25 @@ static int uc_yy_input(char *buf, int max_size);
   return PTOK_NUMBER;
 }
 
-$[0-9a-fA-F]+ {
-  yylval.number= strtol(&yytext[1], 0, 16);
+0[0-7]* {
+  yylval.number = 0;
+  for (int i= 1; yytext[i]; i++)
+  {
+  char c= yytext[i];
+  int val= c-'0';
+  yylval.number = (yylval.number << 3) | (val&0x7);
+  }
+  return PTOK_NUMBER;
+}
+
+[1-9][0-9]* {
+  yylval.number = 0;
+  for (int i= 0; yytext[i]; i++)
+  {
+  char c= yytext[i];
+  int val= c-'0';
+  yylval.number = (yylval.number * 10) + (val&0xf);
+  }
   return PTOK_NUMBER;
 }
 

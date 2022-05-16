@@ -98,14 +98,25 @@ public:
   virtual void option_changed(void);
 };
 
-class cl_analyzer_option: public cl_optref
+
+class cl_analyzer_opt: public cl_bool_option
 {
 protected:
   class cl_uc *uc;
 public:
-  cl_analyzer_option(class cl_uc *the_uc);
-  virtual int init(void);
-  virtual void option_changed(void);
+  cl_analyzer_opt(class cl_uc *Iuc);
+  virtual void set_value(const char *s);
+  virtual void set_raw(bool val) { value.bval= val; }
+};
+
+class cl_analyser_opt: public cl_bool_option
+{
+protected:
+  class cl_uc *uc;
+public:
+  cl_analyser_opt(class cl_uc *Iuc);
+  virtual void set_value(const char *s);
+  virtual void set_raw(bool val) { value.bval= val; }
 };
 
 struct vcounter_t {
@@ -258,7 +269,8 @@ public:
   //class cl_list *options;
   class cl_xtal_option *xtal_option;
   class cl_stop_selfjump_option *stop_selfjump_option;
-  class cl_analyzer_option *analyzer_option;
+  class cl_analyzer_opt *analyzer_opt;
+  class cl_analyser_opt *analyser_opt;
   
   t_addr PC, instPC;		// Program Counter
   bool inst_exec;		// Instruction is executed
@@ -299,8 +311,8 @@ public:
   class cl_list *errors;	// Errors of instruction execution
   class cl_list *events;	// Events happened during inst exec
 
-  t_addr sp_max;
-  t_addr sp_avg;
+  t_addr sp_most;
+  //t_addr sp_avg;
 
   bool vcd_break;
 
@@ -350,6 +362,8 @@ public:
   virtual long read_file(chars nam, class cl_console_base *con);
   
   // instructions, code analyzer
+  virtual void set_analyzer(bool val);
+  virtual t_addr reset_addr(void) { return 0; }
   void analyze_init(void);
   virtual void analyze_start(void);
   virtual void analyze(t_addr addr);

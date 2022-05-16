@@ -1,22 +1,22 @@
-uCsim, Copyright (C)  Daniel Drotos.
+uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 # Memory contents are random initially so set some recognizable content.
 set mem rom 0x1000 0x01 0x02 0x04 0x08 0x10 0x20 0x40 0x80
-0x01000                       01 02 04 08 10 20 40 80 ..... @.
+0x01000                      01 02 04 08 10 20 40 80 ..... @.
 
 # Dump using old format <as> <start> <end>
 dump rom 0x1000 0x1007
-0x01000                       01 02 04 08 10 20 40 80 ..... @.
+0x01000                      01 02 04 08 10 20 40 80 ..... @.
 
 # Dump using new format <as>[<start>] <end>
 dump rom[0x1000] 0x1007
-0x01000                       01 02 04 08 10 20 40 80 ..... @.
+0x01000                      01 02 04 08 10 20 40 80 ..... @.
 
 # We can use new format for both start and end
 dump rom[0x1000] rom[0x1007]
-0x01000                       01 02 04 08 10 20 40 80 ..... @.
+0x01000                      01 02 04 08 10 20 40 80 ..... @.
 
 # But we can't cross address spaces!
 dump rom[0x1000] regs8[0x1007]
@@ -25,23 +25,23 @@ dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
 
 # Bits can be expressed individually
 dump rom[0x1003].1
-0x01003.1                               0b------0- 0x00 '.'   0
+0x01003.1                              0b------0- 0x00 '.'   0
 
 # Or as sets
 dump rom[0x1003][3:1]
-0x01003[3:1]                            0b----100- 0x04 '.'   4
+0x01003[3:1]                           0b----100- 0x04 '.'   4
 
 # We can set bits individually
 set mem rom[0x1000].7 1
-0x01000.7                               0b1------- 0x01 '.'   1
+0x01000.7                              0b1------- 0x01 '.'   1
 
 # Or in groups
 set mem rom[0x1001][6:5] 0b11
-0x01001[6:5]                            0b-11----- 0x03 '.'   3
+0x01001[6:5]                           0b-11----- 0x03 '.'   3
 
 # Vars can be set...
 set mem rom 0x1100 0xff
-0x01100                       ff .
+0x01100                      ff .
 var test rom[0x1100]
 info var test
 test rom[0x01100] = 0xff,255U,255
@@ -93,96 +93,96 @@ var lone1 rom[0x1006].6
 # breaking up the lines of hex data. Where there are names for
 # bits we automatically switch to displaying the data in binary.
 dump rom[0x1000] 0x100f
-0x01000 test0:                81 62                   .b
-0x01002 test2:                04                      .
-0x01003 test3a:              
-        test3b:               0b00001000 0x08 '.'   8
-        set7:                 0b0------- 0x00 '.'   0
-        set6:                 0b-0------ 0x00 '.'   0
-        set5:                 0b--0----- 0x00 '.'   0
-        set4:                 0b---0---- 0x00 '.'   0
-        set3:                 0b----1--- 0x01 '.'   1
-        set2:                 0b-----0-- 0x00 '.'   0
-        set0:                 0b------00 0x00 '.'   0
-        set1:                 0b------0- 0x00 '.'   0
-0x01004                       0b00010000 0x10 '.'  16
-        test4bit6:            0b-0------ 0x00 '.'   0
-        test4bit4:            0b---1---- 0x01 '.'   1
-        test4bit2:            0b-----0-- 0x00 '.'   0
-        test4bit0:            0b-------0 0x00 '.'   0
-0x01005                       20                       
-0x01006                       0b01000000 0x40 '@'  64
-        lone1:                0b-1------ 0x01 '.'   1
-0x01007                       80 f5 d9 d9 2c ac e4 39 ....,..9
-0x0100f                       69                      i
+0x01000 test0:               81 62                   .b
+0x01002 test2:               04                      .
+0x01003 test3a:             
+        test3b:              0b00001000 0x08 '.'   8
+        set7:                0b0------- 0x00 '.'   0
+        set6:                0b-0------ 0x00 '.'   0
+        set5:                0b--0----- 0x00 '.'   0
+        set4:                0b---0---- 0x00 '.'   0
+        set3:                0b----1--- 0x01 '.'   1
+        set2:                0b-----0-- 0x00 '.'   0
+        set0:                0b------00 0x00 '.'   0
+        set1:                0b------0- 0x00 '.'   0
+0x01004                      0b00010000 0x10 '.'  16
+        test4bit6:           0b-0------ 0x00 '.'   0
+        test4bit4:           0b---1---- 0x01 '.'   1
+        test4bit2:           0b-----0-- 0x00 '.'   0
+        test4bit0:           0b-------0 0x00 '.'   0
+0x01005                      20                       
+0x01006                      0b01000000 0x40 '@'  64
+        lone1:               0b-1------ 0x01 '.'   1
+0x01007                      80 6a 30 dd 9a b0 19 b7 .j0.....
+0x0100f                      0f                      .
 
 # Dumping some specific bits from a location works
 dump rom[0x1003][6:2]
-0x01003[6:2] test3a[6:2]:              
-             test3b[6:2]:              
-                                        0b-00010-- 0x02 '.'   2
-             set6:                      0b-0------ 0x00 '.'   0
-             set5:                      0b--0----- 0x00 '.'   0
-             set4:                      0b---0---- 0x00 '.'   0
-             set3:                      0b----1--- 0x01 '.'   1
-             set2:                      0b-----0-- 0x00 '.'   0
+0x01003[6:2] test3a[6:2]:             
+             test3b[6:2]:             
+                                       0b-00010-- 0x02 '.'   2
+             set6:                     0b-0------ 0x00 '.'   0
+             set5:                     0b--0----- 0x00 '.'   0
+             set4:                     0b---0---- 0x00 '.'   0
+             set3:                     0b----1--- 0x01 '.'   1
+             set2:                     0b-----0-- 0x00 '.'   0
 
 # Specifying a format disables all the smarts
 dump /h rom[0x1000] 0x100f
 0x01000 81 62 04 08 10 20 40 80 .b... @.
-0x01008 f5 d9 d9 2c ac e4 39 69 ...,..9i
+0x01008 6a 30 dd 9a b0 19 b7 0f j0......
 
-# Dumping a region with every other bit labeled...
+# Dumping a region with every other bit labelled...
 dump 0x1004
-0x01004                       0b00010000 0x10 '.'  16
-        test4bit6:            0b-0------ 0x00 '.'   0
-        test4bit4:            0b---1---- 0x01 '.'   1
-        test4bit2:            0b-----0-- 0x00 '.'   0
-        test4bit0:            0b-------0 0x00 '.'   0
-0x01005                       20                       
-0x01006                       0b01000000 0x40 '@'  64
-        lone1:                0b-1------ 0x01 '.'   1
-0x01007                       80 f5 d9 d9 2c ac e4 39 ....,..9
-0x0100f                       69 7e 0d 9f 82 7a ad dd i~...z..
+0x01004                      0b00010000 0x10 '.'  16
+        test4bit6:           0b-0------ 0x00 '.'   0
+        test4bit4:           0b---1---- 0x01 '.'   1
+        test4bit2:           0b-----0-- 0x00 '.'   0
+        test4bit0:           0b-------0 0x00 '.'   0
+0x01005                      20                       
+0x01006                      0b01000000 0x40 '@'  64
+        lone1:               0b-1------ 0x01 '.'   1
+0x01007                      80 6a 30 dd 9a b0 19 b7 .j0.....
+0x0100f                      0f 36 cf f5 b9 1e d5 d1 .6......
 
 # And with partial views...
 dump 0x1004[6:4]
-0x01004[6:4]                            0b-001---- 0x01 '.'   1
-             test4bit6:                 0b-0------ 0x00 '.'   0
-             test4bit4:                 0b---1---- 0x01 '.'   1
+0x01004[6:4]                           0b-001---- 0x01 '.'   1
+             test4bit6:                0b-0------ 0x00 '.'   0
+             test4bit4:                0b---1---- 0x01 '.'   1
 dump 0x1004[5:3]
-0x01004[5:3]                            0b--010--- 0x02 '.'   2
-             test4bit4:                 0b---1---- 0x01 '.'   1
+0x01004[5:3]                           0b--010--- 0x02 '.'   2
+             test4bit4:                0b---1---- 0x01 '.'   1
 dump 0x1004[7:2]
-0x01004[7:2]                            0b000100-- 0x04 '.'   4
-             test4bit6:                 0b-0------ 0x00 '.'   0
-             test4bit4:                 0b---1---- 0x01 '.'   1
-             test4bit2:                 0b-----0-- 0x00 '.'   0
+0x01004[7:2]                           0b000100-- 0x04 '.'   4
+             test4bit6:                0b-0------ 0x00 '.'   0
+             test4bit4:                0b---1---- 0x01 '.'   1
+             test4bit2:                0b-----0-- 0x00 '.'   0
 
 # If the first label was qualified due to a request for a bit
 # range subsequent labels may be considered identical even if
 # they aren't strictly identical.
 var some_bits test0[5:3]
 d some_bits
-0x01000[5:3] test0[5:3]:               
-             some_bits:                 0b--000--- 0x00 '.'   0
+0x01000[5:3] test0[5:3]:              
+             some_bits:                0b--000--- 0x00 '.'   0
 var more_bits test0[6:2]
 d some_bits
-0x01000[5:3] test0[5:3]:               
-             some_bits:                 0b--000--- 0x00 '.'   0
+0x01000[5:3] test0[5:3]:              
+             some_bits:                0b--000--- 0x00 '.'   0
 var less_bits test0.4
 d some_bits
-0x01000[5:3] test0[5:3]:               
-             some_bits:                 0b--000--- 0x00 '.'   0
-             less_bits:                 0b---0---- 0x00 '.'   0
+0x01000[5:3] test0[5:3]:              
+             some_bits:                0b--000--- 0x00 '.'   0
+             less_bits:                0b---0---- 0x00 '.'   0
 d less_bits
-0x01000.4    test0.4:                  
-             less_bits:                 0b---0---- 0x00 '.'   0
+0x01000.4    test0.4:                 
+             less_bits:                0b---0---- 0x00 '.'   0
 d more_bits
-0x01000[6:2] test0[6:2]:               
-             more_bits:                 0b-00000-- 0x00 '.'   0
-             some_bits:                 0b--000--- 0x00 '.'   0
-             less_bits:                 0b---0---- 0x00 '.'   0
+0x01000[6:2] test0[6:2]:              
+             more_bits:                0b-00000-- 0x00 '.'   0
+             some_bits:                0b--000--- 0x00 '.'   0
+             less_bits:                0b---0---- 0x00 '.'   0
 
 # Finally the expression evaluater handles bits in the same way
 rom[0x1000]

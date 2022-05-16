@@ -35,6 +35,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "itccl.h"
 
 
+class cl_stm8;
+
+class cl_sp: public cl_cell16
+{
+protected:
+  class cl_stm8 *u;
+  bool rollover;
+public:
+  cl_sp(): cl_cell16() {  u=NULL; rollover= true; }
+public:
+  virtual void set_uc(class cl_uc *uc) { u= (class cl_stm8*)uc; }
+  virtual void set_rollover(bool val) { rollover= val; }
+  virtual bool get_rollover(void) { return rollover; }
+  virtual t_mem write(t_mem val);
+};
+
+  
 /*
  * Base type of STM8 microcontrollers
  */
@@ -45,9 +62,7 @@ public:
   class cl_address_space *ram;
   class cl_address_space *regs8;
   class cl_address_space *regs16;
-  class cl_address_space *ports;
   class cl_memory_chip
-    *ports_chip,
     *ram_chip, // max 6k
     *eeprom_chip, // max 2k
     *option_chip, // 128 bytes
@@ -57,40 +72,18 @@ public:
     *flash_chip; // max 128k
   //class cl_memory *rom;
   struct t_regs regs;
-  class cl_clk *clk;
   class cl_itc *itc;
   class cl_it_src *trap_src;
   class cl_flash *flash_ctrl;
-  t_addr sp_limit;
-
-  char *pipetrace_title, *pipetrace_style, *pipetrace_file;
-  FILE *pipetrace_fd;
-  bool pipetrace_in_table, pipetrace_running, pipetrace_fold;
-  unsigned int pipetrace_ticks, pipetrace_max_ticks;
-private:
-  int div_cycle;
-  u32_t dividend, divisor, quotient;
-  int pipeline_index, pipeline_bytes;
-  struct
-    {
-      bool instr, program, data, regs, flush;
-    } pipeline_busy;
-  void pipeline_flush(bool need_exec);
-
-  void pipetrace_instr_start(t_addr addr);
-  void pipetrace_instr_end(void);
-  void pipetrace_tick(const char *aux);
-  void pipetrace_type(const char *event);
-public:
-  void pipetrace_end_table(void);
-
+  t_addr sp_limit, sp_start;
+  class cl_sp cSP;
 public:
   cl_stm8(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
-  virtual void mk_port(int portnr, chars n);
+  virtual void mk_port(t_addr base, chars n);
   virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
@@ -99,17 +92,10 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual void analyze_start(void);
-  virtual void analyze(t_addr addr);
   virtual char *disass(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
 
-  virtual int clock_per_cycle(void);
-  virtual int tick_hw(int cycles_cpu);
-  virtual int tick(int cycles_cpu);
   virtual int exec_inst(void);
-  virtual t_mem fetch(void);
-  virtual bool fetch(t_mem *code);
 
   virtual const char *get_disasm_info(t_addr addr,
                                       int *ret_len,
@@ -135,6 +121,7 @@ public:
 enum stm8_cpu_cfg
   {
    cpuconf_sp_limit	= 0,
+   cpuconf_rollover	= 1
   };
 
 class cl_stm8_cpu: public cl_hw
@@ -145,50 +132,11 @@ class cl_stm8_cpu: public cl_hw
   cl_stm8_cpu(class cl_uc *auc);
   virtual int init(void);
   virtual unsigned int cfg_size(void) { return 2; }
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-  virtual void print_info(class cl_console_base *con);
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem read(class cl_memory_cell *cell);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual const char *cfg_help(t_addr addr);
-};
-
-
-#include "errorcl.h"
-
-class cl_error_stm8: public cl_error
-{
-public:
-  cl_error_stm8(void);
-};
-
-class cl_error_stm8_pipeline: public cl_error_stm8
-{
-public:
-  cl_error_stm8_pipeline(void);
-};
-
-class cl_error_stm8_pipeline_decode_stall: public cl_error_stm8_pipeline
-{
-public:
-  cl_error_stm8_pipeline_decode_stall(void);
-
-  virtual void print(class cl_commander_base *c);
-};
-
-class cl_error_stm8_pipeline_fetch_stall: public cl_error_stm8_pipeline
-{
-public:
-  cl_error_stm8_pipeline_fetch_stall(void);
-
-  virtual void print(class cl_commander_base *c);
-};
-
-class cl_stm8_error_registry: public cl_error_registry
-{
-public:
-  cl_stm8_error_registry(void);
 };
 
 

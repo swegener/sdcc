@@ -1357,7 +1357,7 @@ constIntVal (const char *s)
         }
       else // Choose first of int, unsigned int, long int, unsigned long int, long long int, unsigned long long int that fits.
        {
-         if (dval > 0x7fffffffffffffff)
+         if (dval > 0x7fffffffffffffffull || dval >= 0 && (unsigned long long int)llval > 0x7fffffffffffffffull)
            {
              SPEC_USIGN (val->type) = 1;
              SPEC_LONGLONG (val->type) = 1;

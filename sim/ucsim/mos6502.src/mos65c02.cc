@@ -92,6 +92,34 @@ cl_mos65c02::inst_length(t_addr addr)
 
 
 int
+cl_mos65c02::accept_it(class it_level *il)
+{
+  class cl_it_src *is= il->source;
+
+  tick(2);
+  push_addr(PC);
+  rom->write(0x0100 + rSP, rF|0x20);
+  // BRK clears D flag
+  if (set_b)
+    rF&= ~(flagB|flagD);
+  cSP.W(rSP-1);
+  tick(1);
+  vc.wr++;
+  
+  t_addr a= read_addr(rom, is->addr);
+  tick(2);
+  vc.rd+= 2;
+  PC= a;
+
+  rF|= flagI;
+  is->clear();
+  it_levels->push(il);
+  
+  return resGO;
+}
+
+
+int
 cl_mos65c02::nopft(int nuof_fetches, int nuof_ticks)
 {
   while (nuof_fetches--)
@@ -100,6 +128,15 @@ cl_mos65c02::nopft(int nuof_fetches, int nuof_ticks)
   return resGO;
 }
 
+int
+cl_mos65c02::BIT8(t_mem code)
+{
+  u8_t v= fetch();
+  u8_t f= rF & ~(flagZ);
+  if (!(rA & v)) f|= flagZ;
+  cF.W(f);
+  return resGO;
+}
 
 int
 cl_mos65c02::DEA(t_mem code)
@@ -144,7 +181,7 @@ cl_mos65c02::tsb(class cl_cell8 &op)
   u8_t f= rF & ~flagZ;
   if (!r1) f|= flagZ;
   op.W(r2);
-  cF.W(rF);
+  cF.W(f);
   tick(2);
   return resGO;
 }
@@ -157,7 +194,7 @@ cl_mos65c02::trb(class cl_cell8 &op)
   u8_t f= rF & ~flagZ;
   if (!r1) f|= flagZ;
   op.W(r2);
-  cF.W(rF);
+  cF.W(f);
   tick(2);
   return resGO;
 }

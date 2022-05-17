@@ -43,6 +43,8 @@ class cl_mos65c02: public cl_mos6502
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   virtual int inst_length(t_addr addr);
 
+  virtual int accept_it(class it_level *il);
+  
   virtual int nopft(int nuof_fetches, int nuof_ticks);
   virtual int tsb(class cl_cell8 &op);
   virtual int trb(class cl_cell8 &op);
@@ -77,6 +79,11 @@ class cl_mos65c02: public cl_mos6502
   virtual int BITzx(t_mem code) { return bit(zpgX()); }
   virtual int STZz(t_mem code) { return stz(dstzpg()); }
   virtual int STZzx(t_mem code) { return stz(dstzpgX()); }
+  // NOPs of coulmn 4
+  virtual int instruction_44(t_mem code) { return nopft(1,2); }
+  virtual int instruction_54(t_mem code) { return nopft(1,3); }
+  virtual int instruction_d4(t_mem code) { return nopft(1,3); }
+  virtual int instruction_f4(t_mem code) { return nopft(1,3); }
   // New insts in column 7
   virtual int RMB0(t_mem code) { return rmb(code, rmwzpg()); }
   virtual int RMB1(t_mem code) { return rmb(code, rmwzpg()); }
@@ -95,7 +102,7 @@ class cl_mos65c02: public cl_mos6502
   virtual int SMB6(t_mem code) { return smb(code, rmwzpg()); }
   virtual int SMB7(t_mem code) { return smb(code, rmwzpg()); }
   // New insts in column 8
-  virtual int BIT8(t_mem code) { return bit(imm8()); }
+  virtual int BIT8(t_mem code);
   // New insts in column 9
   virtual int STZa(t_mem code) { return stz(dstabs()); }
   virtual int STZax(t_mem code) { return stz(dstabsX()); }
@@ -106,10 +113,9 @@ class cl_mos65c02: public cl_mos6502
   virtual int PLY(t_mem code);
   virtual int PHX(t_mem code);
   virtual int PLX(t_mem code);
-  // New insts in column B
+  // New insts in column C
   virtual int TSBa(t_mem code) { return tsb(rmwabs()); }
   virtual int TRBa(t_mem code) { return trb(rmwabs()); }
-  // New insts in column C
   virtual int BITax(t_mem code) { return bit(absX()); }
   virtual int JMP7c(t_mem code);
   virtual int NOP5c(t_mem code) { return nopft(2,7); }

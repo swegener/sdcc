@@ -246,17 +246,24 @@ struct dis_entry disass_mos65c02[]=
     { 0x04, 0xff, ' ', 2, "TSB %z" },
     { 0x14, 0xff, ' ', 2, "TRB %z" },
     { 0x34, 0xff, ' ', 2, "BIT %X" },
+    { 0x44, 0xff, ' ', 2, "NOP %z" },
+    { 0x54, 0xff, ' ', 2, "NOP %X" },
     { 0x64, 0xff, ' ', 2, "STZ %z" },
     { 0x74, 0xff, ' ', 2, "STZ %X" },
+    { 0xd4, 0xff, ' ', 2, "NOP %X" },
+    { 0xf4, 0xff, ' ', 2, "NOP %X" },
 
-    { 0x88, 0xff, ' ', 2, "BIT %#" },
+    { 0x89, 0xff, ' ', 2, "BIT %#" },
 
     { 0x1a, 0xff, ' ', 1, "INA" },
     { 0x3a, 0xff, ' ', 1, "DEA" },
-
-    { 0x0b, 0xff, ' ', 3, "TSB %a" },
-    { 0x1b, 0xff, ' ', 3, "TRB %a" },
-
+    { 0x5a, 0xff, ' ', 1, "PHY" },
+    { 0x7a, 0xff, ' ', 1, "PLY" },
+    { 0xda, 0xff, ' ', 1, "PHX" },
+    { 0xfa, 0xff, ' ', 1, "PLX" },
+    
+    { 0x0c, 0xff, ' ', 3, "TSB %a" },
+    { 0x1c, 0xff, ' ', 3, "TRB %a" },
     { 0x3c, 0xff, ' ', 3, "BIT %i" },
     { 0x5c, 0xff, ' ', 3, "NOP %a" },
     { 0x7c, 0xff, 'x', 3, "JMP %I" },

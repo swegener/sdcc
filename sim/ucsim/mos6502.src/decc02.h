@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define BITzx	instruction_34
 
-#define BIT8	instruction_88
+#define BIT8	instruction_89
 
 #define BITax	instruction_3c
 #define NOP5c	instruction_5c
@@ -58,9 +58,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define BRA	instruction_80
 
 #define TSBz	instruction_04
-#define TSBa	instruction_0b
+#define TSBa	instruction_0c
 #define TRBz	instruction_14
-#define TRBa	instruction_1b
+#define TRBa	instruction_1c
 
 #define STZz	instruction_64
 #define STZzx	instruction_74

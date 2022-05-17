@@ -34,14 +34,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 cl_mos65ce02::cl_mos65ce02(class cl_sim *asim):
-  cl_mos65c02(asim)
+  cl_mos65c02s(asim)
 {
 }
 
 int
 cl_mos65ce02::init(void)
 {
-  cl_mos65c02::init();
+  cl_mos65c02s::init();
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
   RCV(B);
   RCV(Z);

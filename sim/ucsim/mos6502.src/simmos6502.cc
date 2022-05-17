@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mos6502cl.h"
 #include "mos6510cl.h"
 #include "mos65c02cl.h"
+#include "mos65c02scl.h"
 #include "mos65ce02cl.h"
 #include "glob.h"
 
@@ -49,7 +50,7 @@ cl_simmos6502::mk_controller(void)
   type_option.use("cpu_type");
   i= 0;
   if ((typ= type_option.get_value(typ)) == 0)
-    typ= "6502";
+    typ= "65C02S";
   while ((cpus_6502[i].type_str != NULL) &&
 	 (strcasecmp(typ, cpus_6502[i].type_str) != 0))
     i++;
@@ -64,10 +65,14 @@ cl_simmos6502::mk_controller(void)
     case CPU_6502:
       return(new cl_mos6502(this));
     case CPU_6510:
+      printf("Not implemented yet.\n"); return(NULL);
       return(new cl_mos6510(this));
     case CPU_65C02:
       return(new cl_mos65c02(this));
+    case CPU_65C02S:
+      return(new cl_mos65c02s(this));
     case CPU_65CE02:
+      printf("Not implemented yet.\n"); return(NULL); 
       return(new cl_mos65ce02(this));
     default:
       fprintf(stderr, "Unknown processor type\n");

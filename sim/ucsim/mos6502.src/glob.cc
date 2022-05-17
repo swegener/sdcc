@@ -273,18 +273,30 @@ struct dis_entry disass_mos65c02[]=
 
     { 0x9e, 0xff, ' ', 3, "STZ %i" },
 
-    { 0x07, 0x8f, ' ', 2, "RMB%B %z" },
-    { 0x87, 0x8f, ' ', 2, "SMB%B %z" },
-
-    { 0x0f, 0x8f, 'B', 3, "BBR%B %z,%R" },
-    { 0x8f, 0x8f, 'B', 3, "BBS%B %z,%R" },
-    
     { 0x03, 0x0f, ' ', 1, "NOP" },
     { 0x0b, 0x0f, ' ', 1, "NOP" },
     
+    { 0x07, 0x8f, ' ', 1, "NOP" },
+    { 0x87, 0x8f, ' ', 1, "NOP" },
+    { 0x0f, 0x8f, ' ', 1, "NOP" },
+    { 0x8f, 0x8f, ' ', 1, "NOP" },
+
     { 0, 0, 0, 0, 0, 0 }
   };
   
+struct dis_entry disass_mos65c02s[]=
+  {
+    { 0xcb, 0xff, ' ', 1, "WAI" },
+    { 0xdb, 0xff, ' ', 1, "STP" },
+    
+    { 0x07, 0x8f, ' ', 2, "RMB%B %z" },
+    { 0x87, 0x8f, ' ', 2, "SMB%B %z" },
+    { 0x0f, 0x8f, 'B', 3, "BBR%B %z,%R" },
+    { 0x8f, 0x8f, 'B', 3, "BBS%B %z,%R" },
+    
+    { 0, 0, 0, 0, 0, 0 }
+  };
+
 struct cpu_entry cpus_6502[]=
   {
     {"6502"	, CPU_6502, 0		, "MOS6502", ""},
@@ -297,6 +309,10 @@ struct cpu_entry cpus_6502[]=
     {"65CE02"	, CPU_65CE02, 0		, "MOS65CE02", ""},
     {"CE02"	, CPU_65CE02, 0		, "MOS65CE02", ""},
     {"CE"	, CPU_65CE02, 0		, "MOS65CE02", ""},
+    {"65C02S"	, CPU_65C02S, 0		, "MOS65C02S", ""},
+    {"C02S"	, CPU_65C02S, 0		, "MOS65C02S", ""},
+    {"CS"	, CPU_65C02S, 0		, "MOS65C02S", ""},
+    {"S"	, CPU_65C02S, 0		, "MOS65C02S", ""},
     
     {NULL, CPU_NONE, 0, "", ""}
   };

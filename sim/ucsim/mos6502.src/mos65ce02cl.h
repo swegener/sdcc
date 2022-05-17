@@ -28,13 +28,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MOS65CE02CL_HEADER
 #define MOS65CE02CL_HEADER
 
-#include "mos65c02cl.h"
+#include "mos65c02scl.h"
 
 #define rB (B)
 #define rZ (Z)
 
 
-class cl_mos65ce02: public cl_mos65c02
+class cl_mos65ce02: public cl_mos65c02s
 {
 public:
   u8_t B, Z;

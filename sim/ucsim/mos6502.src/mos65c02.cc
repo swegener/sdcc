@@ -43,12 +43,12 @@ cl_mos65c02::init(void)
 {
   int i;
   cl_mos6502::init();
-  // Map all 0x_3 into NOP
-  for (i=0x03; i<=0xf3; i+= 0x10)
-    itab[i]= instruction_wrapper_ea;
-  // Map all 0x_b into NOP
+  // Map all 0x_3 into NOP 1,1
+  for (i=0x13; i<=0xf3; i+= 0x10)
+    itab[i]= instruction_wrapper_03;
+  // Map all 0x_b into NOP 1,1
   for (i=0x0b; i<=0xfb; i+= 0x10)
-    itab[i]= instruction_wrapper_ea;
+    itab[i]= instruction_wrapper_03;
   return 0;
 }
 
@@ -99,9 +99,10 @@ cl_mos65c02::accept_it(class it_level *il)
   tick(2);
   push_addr(PC);
   rom->write(0x0100 + rSP, rF|0x20);
-  // BRK clears D flag
   if (set_b)
-    rF&= ~(flagB|flagD);
+    rF&= ~flagB;
+  // All interrupts (incl BRK) clear D flag
+  rF&= ~flagD;
   cSP.W(rSP-1);
   tick(1);
   vc.wr++;
@@ -267,56 +268,6 @@ cl_mos65c02::PLX(t_mem code)
   cF.W(f);
   vc.rd++;
   tick(3);
-  return resGO;
-}
-
-int
-cl_mos65c02::rmb(t_mem code, class cl_cell8 &op)
-{
-  u8_t v= op.R();
-  u8_t mask= 1<<((code>>4)&0x7);
-  v&= ~mask;
-  op.W(v);
-  return resGO;
-}
-
-int
-cl_mos65c02::smb(t_mem code, class cl_cell8 &op)
-{
-  u8_t v= op.R();
-  u8_t mask= 1<<((code>>4)&0x7);
-  v|= mask;
-  op.W(v);
-  return resGO;
-}
-
-int
-cl_mos65c02::bbr(t_mem code, class cl_cell8 &op)
-{
-  u8_t v= op.R();
-  u8_t mask= 1<<((code>>4)&0x7);
-  i8_t offset= fetch();
-  if (!(v&mask))
-    {
-      PC+= offset;
-      PC&= 0xffff;
-    }
-  tick(2);
-  return resGO;
-}
-
-int
-cl_mos65c02::bbs(t_mem code, class cl_cell8 &op)
-{
-  u8_t v= op.R();
-  u8_t mask= 1<<((code>>4)&0x7);
-  i8_t offset= fetch();
-  if (v&mask)
-    {
-      PC+= offset;
-      PC&= 0xffff;
-    }
-  tick(2);
   return resGO;
 }
 

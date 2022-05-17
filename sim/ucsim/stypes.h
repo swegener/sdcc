@@ -251,7 +251,7 @@ enum cpu_type {
 
   // 6502 based, but not 100% compatible
   CPU_65C02	= 0x0100,	// extended inst.set
-  CPU_65SC02	= 0x0200,      	// 65C02 variant, different inst.set
+  CPU_65C02S	= 0x0200,      	// 65C02 variant, different inst.set
   CPU_65CE02	= 0x0400,	// extension of 65C02
   
   // technology

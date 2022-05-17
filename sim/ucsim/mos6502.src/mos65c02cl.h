@@ -49,10 +49,6 @@ class cl_mos65c02: public cl_mos6502
   virtual int tsb(class cl_cell8 &op);
   virtual int trb(class cl_cell8 &op);
   virtual int stz(class cl_cell8 &op);
-  virtual int rmb(t_mem code, class cl_cell8 &op);
-  virtual int smb(t_mem code, class cl_cell8 &op);
-  virtual int bbr(t_mem code, class cl_cell8 &op);
-  virtual int bbs(t_mem code, class cl_cell8 &op);
   
   // New insts in column 0
   virtual int BRA(t_mem code) { return branch(true); tick(1); }
@@ -73,6 +69,8 @@ class cl_mos65c02: public cl_mos6502
   virtual int instruction_82(t_mem code) { return nopft(1,1); }
   virtual int instruction_c2(t_mem code) { return nopft(1,1); }
   virtual int instruction_e2(t_mem code) { return nopft(1,1); }
+  // NOP 1,1 insts
+  virtual int NOP11(t_mem code) { return nopft(0,0); }
   // New insts in column 4
   virtual int TSBz(t_mem code) { return tsb(rmwzpg()); }
   virtual int TRBz(t_mem code) { return trb(rmwzpg()); }
@@ -84,23 +82,6 @@ class cl_mos65c02: public cl_mos6502
   virtual int instruction_54(t_mem code) { return nopft(1,3); }
   virtual int instruction_d4(t_mem code) { return nopft(1,3); }
   virtual int instruction_f4(t_mem code) { return nopft(1,3); }
-  // New insts in column 7
-  virtual int RMB0(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB1(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB2(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB3(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB4(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB5(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB6(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int RMB7(t_mem code) { return rmb(code, rmwzpg()); }
-  virtual int SMB0(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB1(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB2(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB3(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB4(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB5(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB6(t_mem code) { return smb(code, rmwzpg()); }
-  virtual int SMB7(t_mem code) { return smb(code, rmwzpg()); }
   // New insts in column 8
   virtual int BIT8(t_mem code);
   // New insts in column 9
@@ -121,23 +102,40 @@ class cl_mos65c02: public cl_mos6502
   virtual int NOP5c(t_mem code) { return nopft(2,7); }
   virtual int NOPdc(t_mem code) { return nopft(2,3); }
   virtual int NOPfc(t_mem code) { return nopft(2,3); }
-  // New insts in column F
-  virtual int BBR0(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR1(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR2(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR3(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR4(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR5(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR6(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBR7(t_mem code) { return bbr(code, zpg()); }
-  virtual int BBS0(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS1(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS2(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS3(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS4(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS5(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS6(t_mem code) { return bbs(code, zpg()); }
-  virtual int BBS7(t_mem code) { return bbs(code, zpg()); }
+  // NOPs in columns 7 and F
+  virtual int instruction_07(t_mem code) { return nopft(0,0); }
+  virtual int instruction_17(t_mem code) { return nopft(0,0); }
+  virtual int instruction_27(t_mem code) { return nopft(0,0); }
+  virtual int instruction_37(t_mem code) { return nopft(0,0); }
+  virtual int instruction_47(t_mem code) { return nopft(0,0); }
+  virtual int instruction_57(t_mem code) { return nopft(0,0); }
+  virtual int instruction_67(t_mem code) { return nopft(0,0); }
+  virtual int instruction_77(t_mem code) { return nopft(0,0); }
+  virtual int instruction_87(t_mem code) { return nopft(0,0); }
+  virtual int instruction_97(t_mem code) { return nopft(0,0); }
+  virtual int instruction_a7(t_mem code) { return nopft(0,0); }
+  virtual int instruction_b7(t_mem code) { return nopft(0,0); }
+  virtual int instruction_c7(t_mem code) { return nopft(0,0); }
+  virtual int instruction_d7(t_mem code) { return nopft(0,0); }
+  virtual int instruction_e7(t_mem code) { return nopft(0,0); }
+  virtual int instruction_f7(t_mem code) { return nopft(0,0); }
+  
+  virtual int instruction_0f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_1f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_2f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_3f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_4f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_5f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_6f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_7f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_8f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_9f(t_mem code) { return nopft(0,0); }
+  virtual int instruction_af(t_mem code) { return nopft(0,0); }
+  virtual int instruction_bf(t_mem code) { return nopft(0,0); }
+  virtual int instruction_cf(t_mem code) { return nopft(0,0); }
+  virtual int instruction_df(t_mem code) { return nopft(0,0); }
+  virtual int instruction_ef(t_mem code) { return nopft(0,0); }
+  virtual int instruction_ff(t_mem code) { return nopft(0,0); }
 };
 
 

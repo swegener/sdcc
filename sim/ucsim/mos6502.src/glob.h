@@ -36,6 +36,7 @@ extern instruction_wrapper_fn itab[256];
 
 extern struct dis_entry disass_mos6502[];
 extern struct dis_entry disass_mos65c02[];
+extern struct dis_entry disass_mos65c02s[];
 
 extern struct cpu_entry cpus_6502[];
 

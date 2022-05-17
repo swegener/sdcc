@@ -281,10 +281,12 @@ $(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
 	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
 	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@; \
 	  if [ 0 -ne $$? ]; then \
-	    echo --- FAIL: \"timeout, simulation killed\" in $<"\n"--- Summary: 1/1/1: timeout >> $@; \
+	    echo --- FAIL: \"timeout, simulation killed\" in $< >> $@; \
+	    echo --- Summary: 1/1/1: timeout >> $@; \
 	  fi \
 	else \
-	  echo --- FAIL: cannot compile/link $< "\n"--- Summary: 1/1/1: compile >> $@; \
+	  echo --- FAIL: cannot compile/link $< >> $@; \
+	  echo --- Summary: 1/1/1: compile >> $@; \
 	fi
 
 	@# always count ticks?

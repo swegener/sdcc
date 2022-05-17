@@ -1,9 +1,18 @@
 2022-05-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* Merge regtest branch.
+
+2022-05-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCval.c,
 	  src/SDCCast.c:
 	  support/regression/tests/bug-3391.c:
 	  Fix bug #3391.
+
+2022-05-16 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/Makefile.in:
+	  avoid various newline compound echo arguments.
 
 2022-05-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

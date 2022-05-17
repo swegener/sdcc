@@ -944,7 +944,8 @@ qct_%.c: $(QC_TESTS_DIR)/%.c Makefile
 	@(grep -q main.*argv $< && echo " 0, 0" || \
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 	@echo '#include "$<"' >> $@
-	@echo 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@echo >> $@
 
 tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 	@echo '#include <testfwk.h>' > $@
@@ -972,7 +973,8 @@ tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 	@echo 'void abort() {__fail(0,0,0,0);}' >> $@
 	@echo '#endif' >> $@
 
-	@echo 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@echo >> $@
 
 
 gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
@@ -1013,7 +1015,8 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 
 	@echo '#include "$<"' >> $@
-	@echo 'void __runSuite(void) { __prints("Running main\\n"); main_(MAINARGS); }' >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n"); main_(MAINARGS); }' >> $@
+	@echo >> $@
 	@echo 'const int __numCases = 1;' >> $@
 	@echo '__code const char * __getSuiteName(void) { return "gte/$*"; }' >> $@
 

@@ -7,6 +7,8 @@
 	  Disable a test for targets that cannot complete it within reasonable time.
 	* support/regression/tests/bug-3385.c:
 	  Disable new test for mos6502, where it fails (bug #3386).
+	* support/regression/tests/gcc-torture-execute-20040409-?.c:
+	  Disable parts of tests that test for GCC implementation-defined behaviour.
 
 2022-05-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

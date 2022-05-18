@@ -85,7 +85,7 @@ void jump(unsigned char *a)
 }
 #endif
 
-// Get FreeBSD version to skip part of test for known broken setjmp (FreeBSD bug #255320).
+// Get FreeBSD version to skip part of test for known broken setjmp (FreeBSD bug #255320, affecting at least FreeBSD 13.0 and FreeBSD 13.1).
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #endif
@@ -111,7 +111,7 @@ void testLoop(void)
 	address (array);
 	ASSERT (array[17] == 17);
 	ASSERT (array[18] == 18);
-#if !defined(__FreeBSD__) || __FreeBSD_version > 1300139
+#if !defined(__FreeBSD__) || __FreeBSD_version > 1301000
 	jump (array);
 	ASSERT (array[0] != 13);
 #endif

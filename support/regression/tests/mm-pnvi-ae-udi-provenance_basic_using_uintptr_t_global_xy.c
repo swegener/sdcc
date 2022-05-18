@@ -33,7 +33,7 @@ int x=1, y=2;
 void
 testMM(void)
 {
-#if !(defined(__clang__) && __clang_major__ <= 11) // On FreeBSD 13 on arch64, this test fails for clang 11.
+#if !(defined(__clang__) && __clang_major__ <= 13) // On FreeBSD 13 on arch64, this test fails for clang 11 and clang 13.
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;
   uintptr_t offset = sizeof(int);

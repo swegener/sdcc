@@ -407,8 +407,8 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
 
   WALL_FLAG="-Wall -Wno-parentheses"
   C99_FLAG="--std=c99"
-  # We use CXX instead of CC here, since some of the C++ source files require a C++ compiler even during dependency generation.
-  MAKEDEP="$CXX $sdcc_cv_MM"
+  MAKEDEP_CXX="$CXX $sdcc_cv_MM"
+  MAKEDEP="$CC $sdcc_cv_MM"
 else
   sdcc_IS_SUNPRO
   if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
@@ -417,10 +417,12 @@ else
     CXXFLAGS="-xO2 ${CXXFLAGS}"
     WALL_FLAG=
     MAKEDEP="$CC ${C99_FLAG} -xM1"
+    MAKEDEP_CXX="$CXX -xM1"
   fi
 fi
 
 AC_SUBST(MAKEDEP)
+AC_SUBST(MAKEDEP_CXX)
 AC_SUBST(WALL_FLAG)
 AC_SUBST(C99_FLAG)
 

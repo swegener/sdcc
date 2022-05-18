@@ -23,6 +23,7 @@ LEX             = @LEX@
 AWK             = @AWK@
 STRIP           = @STRIP@
 MAKEDEP         = @MAKEDEP@
+MAKEDEP_CXX     = @MAKEDEP_CXX@
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@

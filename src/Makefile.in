@@ -97,8 +97,10 @@ installdirs:
 # ---------------------
 dep: version.h Makefile.dep
 
+# BUG: belongs to Makefile.common
 Makefile.dep: version.h $(SOURCES) $(CXXSOURCES) $(SLIBSOURCES) $(SPECIAL)
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) $(filter %.cc,$^) >Makefile.dep
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) > Makefile.dep
+	$(MAKEDEP_CXX) $(CPPFLAGS) $(filter %.cc,$^) >> Makefile.dep
 
 # don't include Makefile.dep for the listed targets:
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs checkconf \

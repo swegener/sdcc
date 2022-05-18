@@ -1,4 +1,9 @@
 2022-05-18 Felix Salfelder <felix AT salfelder.org>
+	
+	* Makefile.common.in, configure, configure.ac, src/Makefile.in:
+	  C vs. C++ distinction in dependency generation.
+
+2022-05-18 Felix Salfelder <felix AT salfelder.org>
 
 	* support/sdbinutils:
 	  Merge upstream GNU Binutils 2.38 (feature request #766).

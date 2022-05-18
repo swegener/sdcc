@@ -512,8 +512,7 @@ EXCLUDE_ARCH_mos6502 += \
 
 # Failure
 EXCLUDE_uc6502-stack-auto += \
-	qct_0018-structptr \
-	qct_0042-prime
+	qct_0018-structptr
 
 # compile issue
 EXCLUDE_uc6502 += \
@@ -568,13 +567,12 @@ EXCLUDE_pdk15 += \
 EXCLUDE_pdk15-stack-auto += \
 	qct_0039-sizeof \
 	qct_0041-queen \
-	qct_0042-prime \
 	qct_0051-inits
 
 # too large
 EXCLUDE_pdk14 += \
-	qct_0049-inits \
 	qct_0041-queen \
+	qct_0049-inits \
 	qct_0057-duff \
 	qct_0080-arrays
 
@@ -582,6 +580,18 @@ EXCLUDE_pdk14 += \
 EXCLUDE_pdk14 += \
 	qct_0039-sizeof \
 	qct_0051-inits
+
+# Target too slow (fails with timeout)
+EXCLUDE_pdk15-stack-auto += \
+	qct_0042-prime
+EXCLUDE_pdk14 += \
+	qct_0042-prime
+EXCLUDE_uc6502-stack-auto += \
+	qct_0042-prime
+EXCLUDE_ARCH_mcs51 += \
+	qct_0042-prime
+EXCLUDE_ucgbz80 += \
+	qct_0042-prime
 
 ##############################################
 

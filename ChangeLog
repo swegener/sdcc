@@ -3,6 +3,8 @@
 	* support/regression/tests/setjmp.c,
 	  support/regression/tests/loop.c.in:
 	  Disable two tests for FreeBSD 13.1, since a known issue from FreeBSD 13.0 is still present.
+	* support/regression/MakeList:
+	  Disable a test for targets that cannot complete it within reasonable time.
 
 2022-05-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

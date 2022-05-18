@@ -1,3 +1,9 @@
+2022-05-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList,
+	  support/regression/cases/Makefile.in:
+	  Disable a test that tests for QuickC implementation-defined behaviour.
+
 2022-05-18 Felix Salfelder <felix AT salfelder.org>
 	
 	* Makefile.common.in, configure, configure.ac, src/Makefile.in:

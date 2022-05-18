@@ -2,6 +2,8 @@
 # Tests listed in ${EXCLUDE_${PORT}} will not be tested
 #
 # PORT ist the directory name
+#
+# Tests to be excluded completely (i.e. for all PORT can be excluded in cases/Makefile.in more easily.
 
 # does not compile (expected)
 EXCLUDE_host += \
@@ -399,68 +401,53 @@ EXCLUDE_pdk15 += \
 EXCLUDE_stm8 += \
 	qct_0041-queen
 
-# Assertion failed
-EXCLUDE_stm8 += \
-	qct_0039-sizeof
-
 # Failure
 EXCLUDE_stm8-large += \
-	qct_0039-sizeof \
 	qct_0041-queen
 
 # Failure
 EXCLUDE_s08 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ARCH_z80 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ARCH_z80n += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ez80-z80 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 EXCLUDE_hc08 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ARCH_z180 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_mcs51-stack-auto += \
 	qct_0036-notneg \
-	qct_0039-sizeof \
 	qct_041-queen \
 	qct_0051-inits
 
 # Failure
 EXCLUDE_mcs51-large += \
 	qct_0041-queen \
-	qct_0036-notneg \
-	qct_0039-sizeof
+	qct_0036-notneg
 
 # Failure
 EXCLUDE_mcs51-huge += \
 	qct_0041-queen \
-	qct_0036-notneg \
-	qct_0039-sizeof
+	qct_0036-notneg
 
 # Failure
 EXCLUDE_mcs51-medium += \
 	qct_0041-queen \
 	qct_0036-notneg \
-	qct_0039-sizeof \
 	qct_0080-arrays \
 	qct_0051-inits
 
@@ -468,14 +455,12 @@ EXCLUDE_mcs51-medium += \
 EXCLUDE_mcs51-small += \
 	qct_0080-arrays \
 	qct_0036-notneg \
-	qct_0039-sizeof \
 	qct_0041-queen \
 	qct_0051-inits
 
 # Failure
 EXCLUDE_mcs51-small-stack-auto += \
 	qct_0036-notneg \
-	qct_0039-sizeof \
 	qct_0041-queen \
 	qct_0051-inits
 
@@ -486,29 +471,24 @@ EXCLUDE_mcs51-stack-auto += \
 # Failure
 EXCLUDE_mcs51-large-stack-auto += \
 	qct_0041-queen \
-	qct_0036-notneg \
-	qct_0039-sizeof
+	qct_0036-notneg
 
 # Failure
 EXCLUDE_ds390 += \
 	qct_0041-queen \
-	qct_0036-notneg \
-	qct_0039-sizeof
+	qct_0036-notneg
 
 # Failure
 EXCLUDE_ARCH_r3ka += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_r2k += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ARCH_mos6502 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_uc6502-stack-auto += \
@@ -520,52 +500,43 @@ EXCLUDE_uc6502 += \
 
 # Failure
 EXCLUDE_ucgbz80 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_uc6502 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_r2ka += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_tlcs90 += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ucr2k += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # Failure
 EXCLUDE_ucr2ka += \
-	qct_0041-queen \
-	qct_0039-sizeof
+	qct_0041-queen
 
 # timeout
 EXCLUDE_ucrxk3a += \
 	qct_0041-queen
 
 # assertion fail
-EXCLUDE_ucrxk3a += \
-	qct_0039-sizeof
+EXCLUDE_ucrxk3a +=
 
 # Failure
 EXCLUDE_pdk15 += \
 	qct_0080-arrays \
 	qct_0041-queen \
-	qct_0051-inits \
-	qct_0039-sizeof
+	qct_0051-inits
 
 # Failure
 EXCLUDE_pdk15-stack-auto += \
-	qct_0039-sizeof \
 	qct_0041-queen \
 	qct_0051-inits
 
@@ -578,7 +549,6 @@ EXCLUDE_pdk14 += \
 
 # Failure
 EXCLUDE_pdk14 += \
-	qct_0039-sizeof \
 	qct_0051-inits
 
 # Target too slow (fails with timeout)

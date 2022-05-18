@@ -777,6 +777,10 @@ QC_SKIP_TESTS += \
 	0047-anonexport.c \
 	0101-bug.c
 
+# Tests for QuickC implementation-defined behaviour
+QC_SKIP_TESTS += \
+	0039-sizeof.c
+
 QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
 
 # '___slonglong2fs' referenced by module

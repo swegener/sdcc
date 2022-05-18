@@ -1,3 +1,10 @@
+2022-05-18 Felix Salfelder <felix AT salfelder.org>
+
+	* support/sdbinutils:
+	  Merge upstream GNU Binutils 2.38 (feature request #766).
+	* support/regression/Makefile.in:
+	  clean-results rule
+
 2022-05-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/setjmp.c,

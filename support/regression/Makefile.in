@@ -393,8 +393,10 @@ $(TMP_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(TMP_DIR)/stamp
 
 # BeginGeneric rules
 
-clean:
+clean: clean-results
 	$(MAKE) -C $(CASES_DIR) clean
+
+clean-results:
 	rm -rf $(TMP_DIR) $(RESULTS_DIR) *.pyc __pycache__
 	for i in $(CLEAN_PORTS); do \
 	  $(MAKE) $(MAKE_RECURSE_FLAGS) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \

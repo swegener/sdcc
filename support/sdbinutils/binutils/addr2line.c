@@ -1,5 +1,5 @@
 /* addr2line.c -- convert addresses to line number and function name
-   Copyright (C) 1997-2018 Free Software Foundation, Inc.
+   Copyright (C) 1997-2022 Free Software Foundation, Inc.
    Contributed by Ulrich Lauther <Ulrich.Lauther@mchp.siemens.de>
 
    This file is part of GNU Binutils.
@@ -38,12 +38,15 @@
 #include "bucomm.h"
 #include "elf-bfd.h"
 
-static bfd_boolean unwind_inlines;	/* -i, unwind inlined functions. */
-static bfd_boolean with_addresses;	/* -a, show addresses.  */
-static bfd_boolean with_functions;	/* -f, show function names.  */
-static bfd_boolean do_demangle;		/* -C, demangle names.  */
-static bfd_boolean pretty_print;	/* -p, print on one line.  */
-static bfd_boolean base_names;		/* -s, strip directory names.  */
+static bool unwind_inlines;	/* -i, unwind inlined functions. */
+static bool with_addresses;	/* -a, show addresses.  */
+static bool with_functions;	/* -f, show function names.  */
+static bool do_demangle;	/* -C, demangle names.  */
+static bool pretty_print;	/* -p, print on one line.  */
+static bool base_names;		/* -s, strip directory names.  */
+
+/* Flags passed to the name demangler.  */
+static int demangle_flags = DMGL_PARAMS | DMGL_ANSI;
 
 static int naddr;		/* Number of addresses to process.  */
 static char **addr;		/* Hex addresses to process.  */
@@ -59,6 +62,10 @@ static struct option long_options[] =
   {"functions", no_argument, NULL, 'f'},
   {"inlines", no_argument, NULL, 'i'},
   {"pretty-print", no_argument, NULL, 'p'},
+  {"recurse-limit", no_argument, NULL, 'R'},
+  {"recursion-limit", no_argument, NULL, 'R'},  
+  {"no-recurse-limit", no_argument, NULL, 'r'},
+  {"no-recursion-limit", no_argument, NULL, 'r'},  
   {"section", required_argument, NULL, 'j'},
   {"target", required_argument, NULL, 'b'},
   {"help", no_argument, NULL, 'H'},
@@ -91,6 +98,8 @@ usage (FILE *stream, int status)
   -s --basenames         Strip directory names\n\
   -f --functions         Show function names\n\
   -C --demangle[=style]  Demangle function names\n\
+  -R --recurse-limit     Enable a limit on recursion whilst demangling.  [Default]\n\
+  -r --no-recurse-limit  Disable a limit on recursion whilst demangling\n\
   -h --help              Display this information\n\
   -v --version           Display the program's version\n\
 \n"));
@@ -108,7 +117,7 @@ slurp_symtab (bfd *abfd)
 {
   long storage;
   long symcount;
-  bfd_boolean dynamic = FALSE;
+  bool dynamic = false;
 
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
     return;
@@ -117,7 +126,7 @@ slurp_symtab (bfd *abfd)
   if (storage == 0)
     {
       storage = bfd_get_dynamic_symtab_upper_bound (abfd);
-      dynamic = TRUE;
+      dynamic = true;
     }
   if (storage < 0)
     bfd_fatal (bfd_get_filename (abfd));
@@ -158,7 +167,7 @@ static const char *filename;
 static const char *functionname;
 static unsigned int line;
 static unsigned int discriminator;
-static bfd_boolean found;
+static bool found;
 
 /* Look for an address in a section.  This is called via
    bfd_map_over_sections.  */
@@ -173,14 +182,14 @@ find_address_in_section (bfd *abfd, asection *section,
   if (found)
     return;
 
-  if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
+  if ((bfd_section_flags (section) & SEC_ALLOC) == 0)
     return;
 
-  vma = bfd_get_section_vma (abfd, section);
+  vma = bfd_section_vma (section);
   if (pc < vma)
     return;
 
-  size = bfd_get_section_size (section);
+  size = bfd_section_size (section);
   if (pc >= vma + size)
     return;
 
@@ -199,10 +208,10 @@ find_offset_in_section (bfd *abfd, asection *section)
   if (found)
     return;
 
-  if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
+  if ((bfd_section_flags (section) & SEC_ALLOC) == 0)
     return;
 
-  size = bfd_get_section_size (section);
+  size = bfd_section_size (section);
   if (pc >= size)
     return;
 
@@ -258,7 +267,7 @@ translate_addresses (bfd *abfd, asection *section)
             printf ("\n");
         }
 
-      found = FALSE;
+      found = false;
       if (section)
 	find_offset_in_section (abfd, section);
       else
@@ -289,7 +298,7 @@ translate_addresses (bfd *abfd, asection *section)
                     name = "??";
                   else if (do_demangle)
                     {
-                      alloc = bfd_demangle (abfd, name, DMGL_ANSI | DMGL_PARAMS);
+                      alloc = bfd_demangle (abfd, name, demangle_flags);
                       if (alloc != NULL)
                         name = alloc;
                     }
@@ -305,8 +314,7 @@ translate_addresses (bfd *abfd, asection *section)
                   else
                     printf ("\n");
 
-                  if (alloc != NULL)
-                    free (alloc);
+		  free (alloc);
                 }
 
               if (base_names && filename != NULL)
@@ -329,7 +337,7 @@ translate_addresses (bfd *abfd, asection *section)
 	      else
 		printf ("?\n");
               if (!unwind_inlines)
-                found = FALSE;
+                found = false;
               else
                 found = bfd_find_inliner_info (abfd, &filename, &functionname,
 					       &line);
@@ -401,11 +409,8 @@ process_file (const char *file_name, const char *section_name,
 
   translate_addresses (abfd, section);
 
-  if (syms != NULL)
-    {
-      free (syms);
-      syms = NULL;
-    }
+  free (syms);
+  syms = NULL;
 
   bfd_close (abfd);
 
@@ -420,12 +425,10 @@ main (int argc, char **argv)
   char *target;
   int c;
 
-#if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+#ifdef HAVE_LC_MESSAGES
   setlocale (LC_MESSAGES, "");
 #endif
-#if defined (HAVE_SETLOCALE)
   setlocale (LC_CTYPE, "");
-#endif
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
@@ -435,13 +438,14 @@ main (int argc, char **argv)
 
   expandargv (&argc, &argv);
 
-  bfd_init ();
+  if (bfd_init () != BFD_INIT_MAGIC)
+    fatal (_("fatal error: libbfd ABI mismatch"));
   set_default_bfd_target ();
 
   file_name = NULL;
   section_name = NULL;
   target = NULL;
-  while ((c = getopt_long (argc, argv, "ab:Ce:sfHhij:pVv", long_options, (int *) 0))
+  while ((c = getopt_long (argc, argv, "ab:Ce:rRsfHhij:pVv", long_options, (int *) 0))
 	 != EOF)
     {
       switch (c)
@@ -449,13 +453,13 @@ main (int argc, char **argv)
 	case 0:
 	  break;		/* We've been given a long option.  */
 	case 'a':
-	  with_addresses = TRUE;
+	  with_addresses = true;
 	  break;
 	case 'b':
 	  target = optarg;
 	  break;
 	case 'C':
-	  do_demangle = TRUE;
+	  do_demangle = true;
 	  if (optarg != NULL)
 	    {
 	      enum demangling_styles style;
@@ -468,17 +472,23 @@ main (int argc, char **argv)
 	      cplus_demangle_set_style (style);
 	    }
 	  break;
+	case 'r':
+	  demangle_flags |= DMGL_NO_RECURSE_LIMIT;
+	  break;
+	case 'R':
+	  demangle_flags &= ~ DMGL_NO_RECURSE_LIMIT;
+	  break;
 	case 'e':
 	  file_name = optarg;
 	  break;
 	case 's':
-	  base_names = TRUE;
+	  base_names = true;
 	  break;
 	case 'f':
-	  with_functions = TRUE;
+	  with_functions = true;
 	  break;
         case 'p':
-          pretty_print = TRUE;
+          pretty_print = true;
           break;
 	case 'v':
 	case 'V':
@@ -489,7 +499,7 @@ main (int argc, char **argv)
 	  usage (stdout, 0);
 	  break;
 	case 'i':
-	  unwind_inlines = TRUE;
+	  unwind_inlines = true;
 	  break;
 	case 'j':
 	  section_name = optarg;

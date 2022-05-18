@@ -1,6 +1,6 @@
 /* pe.h  -  PE COFF header information
 
-   Copyright (C) 1999-2018 Free Software Foundation, Inc.
+   Copyright (C) 1999-2022 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -19,6 +19,8 @@
    Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 #ifndef _PE_H
 #define _PE_H
+
+#include "msdos.h"
 
 /* NT specific file attributes.  */
 #define IMAGE_FILE_RELOCS_STRIPPED           0x0001
@@ -47,7 +49,9 @@
 #define IMAGE_DLLCHARACTERISTICS_NO_ISOLATION           0x0200
 #define IMAGE_DLLCHARACTERISTICS_NO_SEH                 0x0400
 #define IMAGE_DLLCHARACTERISTICS_NO_BIND                0x0800
+#define IMAGE_DLLCHARACTERISTICS_APPCONTAINER           0x1000
 #define IMAGE_DLLCHARACTERISTICS_WDM_DRIVER             0x2000
+#define IMAGE_DLLCHARACTERISTICS_GUARD_CF               0x4000
 #define IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE  0x8000
 
 /* Additional flags to be set for section headers to allow the NT loader to
@@ -103,9 +107,12 @@
 #define IMAGE_SCN_ALIGN_8192BYTES	     IMAGE_SCN_ALIGN_POWER_CONST (13)
 
 /* Encode alignment power into IMAGE_SCN_ALIGN bits of s_flags.  */
-#define COFF_ENCODE_ALIGNMENT(SECTION, ALIGNMENT_POWER) \
-  ((SECTION).s_flags |= IMAGE_SCN_ALIGN_POWER_CONST ((ALIGNMENT_POWER) <= 13 \
-						     ? (ALIGNMENT_POWER) : 13))
+#define COFF_ENCODE_ALIGNMENT(ABFD, SECTION, ALIGNMENT_POWER) \
+  (((ABFD)->flags & (EXEC_P | DYNAMIC)) != 0 ? false			\
+   : ((SECTION).s_flags							\
+      |= IMAGE_SCN_ALIGN_POWER_CONST ((ALIGNMENT_POWER) < 13		\
+				      ? (ALIGNMENT_POWER) : 13),	\
+      true))
 #define COFF_DECODE_ALIGNMENT(X)             \
   IMAGE_SCN_ALIGN_POWER_NUM ((X) & IMAGE_SCN_ALIGN_POWER_BIT_MASK)
 
@@ -130,6 +137,7 @@
 #define IMAGE_FILE_MACHINE_AM33              0x01d3
 #define IMAGE_FILE_MACHINE_AMD64             0x8664
 #define IMAGE_FILE_MACHINE_ARM               0x01c0
+#define IMAGE_FILE_MACHINE_ARM64             0xaa64
 #define IMAGE_FILE_MACHINE_AXP64             IMAGE_FILE_MACHINE_ALPHA64
 #define IMAGE_FILE_MACHINE_CEE               0xc0ee
 #define IMAGE_FILE_MACHINE_CEF               0x0cef
@@ -168,39 +176,10 @@
 #define IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER	13
 #define IMAGE_SUBSYSTEM_XBOX			14
 
-/* Magic values that are true for all dos/nt implementations.  */
-#define DOSMAGIC       0x5a4d
-#define NT_SIGNATURE   0x00004550
-
 /* NT allows long filenames, we want to accommodate this.
    This may break some of the bfd functions.  */
 #undef  FILNMLEN
 #define FILNMLEN	18	/* # characters in a file name.  */
-
-struct external_PEI_DOS_hdr
-{
-  /* DOS header fields - always at offset zero in the EXE file.  */
-  char e_magic[2];		/* Magic number, 0x5a4d.  */
-  char e_cblp[2];		/* Bytes on last page of file, 0x90.  */
-  char e_cp[2];			/* Pages in file, 0x3.  */
-  char e_crlc[2];		/* Relocations, 0x0.  */
-  char e_cparhdr[2];		/* Size of header in paragraphs, 0x4.  */
-  char e_minalloc[2];		/* Minimum extra paragraphs needed, 0x0.  */
-  char e_maxalloc[2];		/* Maximum extra paragraphs needed, 0xFFFF.  */
-  char e_ss[2];			/* Initial (relative) SS value, 0x0.  */
-  char e_sp[2];			/* Initial SP value, 0xb8.  */
-  char e_csum[2];		/* Checksum, 0x0.  */
-  char e_ip[2];			/* Initial IP value, 0x0.  */
-  char e_cs[2];			/* Initial (relative) CS value, 0x0.  */
-  char e_lfarlc[2];		/* File address of relocation table, 0x40.  */
-  char e_ovno[2];		/* Overlay number, 0x0.  */
-  char e_res[4][2];		/* Reserved words, all 0x0.  */
-  char e_oemid[2];		/* OEM identifier (for e_oeminfo), 0x0.  */
-  char e_oeminfo[2];		/* OEM information; e_oemid specific, 0x0.  */
-  char e_res2[10][2];		/* Reserved words, all 0x0.  */
-  char e_lfanew[4];		/* File address of new exe header, usually 0x80.  */
-  char dos_message[16][4];	/* Other stuff, always follow DOS header.  */
-};
 
 struct external_PEI_IMAGE_hdr
 {
@@ -524,6 +503,7 @@ struct pex64_unwind_info
   bfd_vma FrameOffset;
   bfd_vma sizeofUnwindCodes;
   bfd_byte *rawUnwindCodes;
+  bfd_byte *rawUnwindCodesEnd;
   bfd_vma rva_ExceptionHandler; /* UNW_EHANDLER or UNW_FLAG_UHANDLER.  */
   bfd_vma rva_BeginAddress;	/* UNW_FLAG_CHAININFO.  */
   bfd_vma rva_EndAddress;	/* UNW_FLAG_CHAININFO.  */
@@ -604,10 +584,10 @@ struct external_IMAGE_DEBUG_DIRECTORY
 /* Extra structures used in codeview debug record.  */
 /* This is not part of the PE specification.  */
 
-#define CVINFO_PDB70_CVSIGNATURE 0x53445352 // "RSDS"
-#define CVINFO_PDB20_CVSIGNATURE 0x3031424e // "NB10"
-#define CVINFO_CV50_CVSIGNATURE  0x3131424e // "NB11"
-#define CVINFO_CV41_CVSIGNATURE  0x3930424e // "NB09"
+#define CVINFO_PDB70_CVSIGNATURE 0x53445352 /* "RSDS" */
+#define CVINFO_PDB20_CVSIGNATURE 0x3031424e /* "NB10" */
+#define CVINFO_CV50_CVSIGNATURE  0x3131424e /* "NB11" */
+#define CVINFO_CV41_CVSIGNATURE  0x3930424e /* "NB09" */
 
 typedef struct _CV_INFO_PDB70
 {

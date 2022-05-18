@@ -1,5 +1,5 @@
 /* resbin.c -- manipulate the Windows binary resource format.
-   Copyright (C) 1997-2018 Free Software Foundation, Inc.
+   Copyright (C) 1997-2022 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support.
    Rewritten by Kai Tietz, Onevision.
 
@@ -966,6 +966,9 @@ bin_to_res_version (windres_bfd *wrbfd, const bfd_byte *data, rc_uint_type lengt
 
   if (type != 0)
     fatal (_("unexpected version type %d"), (int) type);
+
+  /* PR 27686: Ignore any padding bytes after the end of the version structure.  */
+  length = verlen;
 
   data += off;
   length -= off;

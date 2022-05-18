@@ -1,5 +1,5 @@
 /* ar.c - Archive modify and extract.
-   Copyright (C) 1991-2018 Free Software Foundation, Inc.
+   Copyright (C) 1991-2022 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -35,6 +35,7 @@
 #include "binemul.h"
 #include "plugin-api.h"
 #include "plugin.h"
+#include "ansidecl.h"
 
 #ifdef __GO32___
 #define EXT_NAME_LEN 3		/* Bufflen of addition to name if it's MS-DOS.  */
@@ -53,7 +54,7 @@ static void delete_members (bfd *, char **files_to_delete);
 
 static void move_members (bfd *, char **files_to_move);
 static void replace_members
-  (bfd *, char **files_to_replace, bfd_boolean quick);
+  (bfd *, char **files_to_replace, bool quick);
 static void print_descr (bfd * abfd);
 static void write_archive (bfd *);
 static int  ranlib_only (const char *archname);
@@ -74,6 +75,9 @@ int silent_create = 0;
 
 /* Nonzero means describe each action performed.  */
 int verbose = 0;
+
+/* Nonzero means display offsets of files in the archive.  */
+int display_offsets = 0;
 
 /* Nonzero means preserve dates of members when extracting them.  */
 int preserve_dates = 0;
@@ -120,19 +124,24 @@ get_pos_bfd (bfd **, enum pos, const char *);
 
 /* For extract/delete only.  If COUNTED_NAME_MODE is TRUE, we only
    extract the COUNTED_NAME_COUNTER instance of that name.  */
-static bfd_boolean counted_name_mode = 0;
+static bool counted_name_mode = 0;
 static int counted_name_counter = 0;
 
 /* Whether to truncate names of files stored in the archive.  */
-static bfd_boolean ar_truncate = FALSE;
+static bool ar_truncate = false;
 
 /* Whether to use a full file name match when searching an archive.
    This is convenient for archives created by the Microsoft lib
    program.  */
-static bfd_boolean full_pathname = FALSE;
+static bool full_pathname = false;
 
 /* Whether to create a "thin" archive (symbol index only -- no files).  */
-static bfd_boolean make_thin_archive = FALSE;
+static bool make_thin_archive = false;
+
+#define LIBDEPS	"__.LIBDEP"
+/* Text to store in the __.LIBDEP archive element for the linker to use.  */
+static char * libdeps = NULL;
+static bfd *  libdeps_bfd = NULL;
 
 static int show_version = 0;
 
@@ -146,8 +155,14 @@ static const char *plugin_target = NULL;
 
 static const char *target = NULL;
 
-#define OPTION_PLUGIN 201
-#define OPTION_TARGET 202
+enum long_option_numbers
+{
+  OPTION_PLUGIN = 201,
+  OPTION_TARGET,
+  OPTION_OUTPUT
+};
+
+static const char * output_dir = NULL;
 
 static struct option long_options[] =
 {
@@ -155,6 +170,9 @@ static struct option long_options[] =
   {"plugin", required_argument, NULL, OPTION_PLUGIN},
   {"target", required_argument, NULL, OPTION_TARGET},
   {"version", no_argument, &show_version, 1},
+  {"output", required_argument, NULL, OPTION_OUTPUT},
+  {"record-libdeps", required_argument, NULL, 'l'},
+  {"thin", no_argument, NULL, 'T'},
   {NULL, no_argument, NULL, 0}
 };
 
@@ -198,7 +216,7 @@ map_over_members (bfd *arch, void (*function)(bfd *), char **files, int count)
 
   for (; count > 0; files++, count--)
     {
-      bfd_boolean found = FALSE;
+      bool found = false;
 
       match_count = 0;
       for (head = arch->archive_next; head; head = head->archive_next)
@@ -214,7 +232,7 @@ map_over_members (bfd *arch, void (*function)(bfd *), char **files, int count)
 	  if (head->archive_pass)
 	    continue;
 
-	  filename = head->filename;
+	  filename = bfd_get_filename (head);
 	  if (filename == NULL)
 	    {
 	      /* Some archive formats don't get the filenames filled in
@@ -240,7 +258,7 @@ map_over_members (bfd *arch, void (*function)(bfd *), char **files, int count)
 		  continue;
 		}
 
-	      found = TRUE;
+	      found = true;
 	      function (head);
 	      head->archive_pass = 1;
 	      /* PR binutils/15796: Once a file has been matched, do not
@@ -258,7 +276,7 @@ map_over_members (bfd *arch, void (*function)(bfd *), char **files, int count)
     }
 }
 
-bfd_boolean operation_alters_arch = FALSE;
+bool operation_alters_arch = false;
 
 static void
 usage (int help)
@@ -268,13 +286,13 @@ usage (int help)
 #if BFD_SUPPORTS_PLUGINS
   /* xgettext:c-format */
   const char *command_line
-    = _("Usage: %s [emulation options] [-]{dmpqrstx}[abcDfilMNoPsSTuvV]"
+    = _("Usage: %s [emulation options] [-]{dmpqrstx}[abcDfilMNoOPsSTuvV]"
 	" [--plugin <name>] [member-name] [count] archive-file file...\n");
 
 #else
   /* xgettext:c-format */
   const char *command_line
-    = _("Usage: %s [emulation options] [-]{dmpqrstx}[abcDfilMNoPsSTuvV]"
+    = _("Usage: %s [emulation options] [-]{dmpqrstx}[abcDfilMNoOPsSTuvV]"
 	" [member-name] [count] archive-file file...\n");
 #endif
   s = help ? stdout : stderr;
@@ -290,7 +308,7 @@ usage (int help)
   fprintf (s, _("  q[f]         - quick append file(s) to the archive\n"));
   fprintf (s, _("  r[ab][f][u]  - replace existing or insert new file(s) into the archive\n"));
   fprintf (s, _("  s            - act as ranlib\n"));
-  fprintf (s, _("  t            - display contents of archive\n"));
+  fprintf (s, _("  t[O][v]      - display contents of the archive\n"));
   fprintf (s, _("  x[o]         - extract file(s) from the archive\n"));
   fprintf (s, _(" command specific modifiers:\n"));
   fprintf (s, _("  [a]          - put file(s) after [member-name]\n"));
@@ -313,16 +331,21 @@ usage (int help)
   fprintf (s, _("  [f]          - truncate inserted file names\n"));
   fprintf (s, _("  [P]          - use full path names when matching\n"));
   fprintf (s, _("  [o]          - preserve original dates\n"));
+  fprintf (s, _("  [O]          - display offsets of files in the archive\n"));
   fprintf (s, _("  [u]          - only replace files that are newer than current archive contents\n"));
   fprintf (s, _(" generic modifiers:\n"));
   fprintf (s, _("  [c]          - do not warn if the library had to be created\n"));
   fprintf (s, _("  [s]          - create an archive index (cf. ranlib)\n"));
+  fprintf (s, _("  [l <text> ]  - specify the dependencies of this library\n"));
   fprintf (s, _("  [S]          - do not build a symbol table\n"));
-  fprintf (s, _("  [T]          - make a thin archive\n"));
+  fprintf (s, _("  [T]          - deprecated, use --thin instead\n"));
   fprintf (s, _("  [v]          - be verbose\n"));
   fprintf (s, _("  [V]          - display the version number\n"));
   fprintf (s, _("  @<file>      - read options from <file>\n"));
   fprintf (s, _("  --target=BFDNAME - specify the target object format as BFDNAME\n"));
+  fprintf (s, _("  --output=DIRNAME - specify the output directory for extraction operations\n"));
+  fprintf (s, _("  --record-libdeps=<text> - specify the dependencies of this library\n"));
+  fprintf (s, _("  --thin       - make a thin archive\n"));
 #if BFD_SUPPORTS_PLUGINS
   fprintf (s, _(" optional:\n"));
   fprintf (s, _("  --plugin <p> - load the specified plugin\n"));
@@ -428,9 +451,10 @@ decode_options (int argc, char **argv)
 {
   int c;
 
-  /* Convert old-style tar call by exploding option element and rearranging
+  /* Convert old-style ar call by exploding option element and rearranging
      options accordingly.  */
 
+ restart:
   if (argc > 1 && argv[1][0] != '-')
     {
       int new_argc;		/* argc value for rearranged arguments */
@@ -473,7 +497,7 @@ decode_options (int argc, char **argv)
       argv = new_argv;
     }
 
-  while ((c = getopt_long (argc, argv, "hdmpqrtxlcoVsSuvabiMNfPTDU",
+  while ((c = getopt_long (argc, argv, "hdmpqrtxl:coOVsSuvabiMNfPTDU",
 			   long_options, NULL)) != EOF)
     {
       switch (c)
@@ -497,22 +521,22 @@ decode_options (int argc, char **argv)
 	  break;
         case 'd':
           operation = del;
-          operation_alters_arch = TRUE;
+          operation_alters_arch = true;
           break;
         case 'm':
           operation = move;
-          operation_alters_arch = TRUE;
+          operation_alters_arch = true;
           break;
         case 'p':
           operation = print_files;
           break;
         case 'q':
           operation = quick_append;
-          operation_alters_arch = TRUE;
+          operation_alters_arch = true;
           break;
         case 'r':
           operation = replace;
-          operation_alters_arch = TRUE;
+          operation_alters_arch = true;
           break;
         case 't':
           operation = print_table;
@@ -521,6 +545,9 @@ decode_options (int argc, char **argv)
           operation = extract;
           break;
         case 'l':
+          if (libdeps != NULL)
+            fatal (_("libdeps specified more than once"));
+          libdeps = optarg;
           break;
         case 'c':
           silent_create = 1;
@@ -528,8 +555,11 @@ decode_options (int argc, char **argv)
         case 'o':
           preserve_dates = 1;
           break;
+        case 'O':
+          display_offsets = 1;
+          break;
         case 'V':
-          show_version = TRUE;
+          show_version = true;
           break;
         case 's':
           write_armap = 1;
@@ -556,22 +586,22 @@ decode_options (int argc, char **argv)
           mri_mode = 1;
           break;
         case 'N':
-          counted_name_mode = TRUE;
+          counted_name_mode = true;
           break;
         case 'f':
-          ar_truncate = TRUE;
+          ar_truncate = true;
           break;
         case 'P':
-          full_pathname = TRUE;
+          full_pathname = true;
           break;
         case 'T':
-          make_thin_archive = TRUE;
+          make_thin_archive = true;
           break;
         case 'D':
-          deterministic = TRUE;
+          deterministic = true;
           break;
         case 'U':
-          deterministic = FALSE;
+          deterministic = false;
           break;
 	case OPTION_PLUGIN:
 #if BFD_SUPPORTS_PLUGINS
@@ -584,11 +614,26 @@ decode_options (int argc, char **argv)
 	case OPTION_TARGET:
 	  target = optarg;
 	  break;
+	case OPTION_OUTPUT:
+	  output_dir = optarg;
+	  break;
 	case 0:		/* A long option that just sets a flag.  */
 	  break;
         default:
           usage (0);
         }
+    }
+
+  /* PR 13256: Allow for the possibility that the first command line option
+     started with a dash (eg --plugin) but then the following option(s) are
+     old style, non-dash-prefixed versions.  */
+  if (operation == none && write_armap != 1 && !mri_mode
+      && optind > 0 && optind < argc)
+    {
+      argv += (optind - 1);
+      argc -= (optind - 1);
+      optind = 0;
+      goto restart;
     }
 
   return &argv[optind];
@@ -607,7 +652,7 @@ static void
 ranlib_main (int argc, char **argv)
 {
   int arg_index, status = 0;
-  bfd_boolean touch = FALSE;
+  bool touch = false;
   int c;
 
   while ((c = getopt_long (argc, argv, "DhHUvVt", long_options, NULL)) != EOF)
@@ -615,17 +660,17 @@ ranlib_main (int argc, char **argv)
       switch (c)
         {
 	case 'D':
-	  deterministic = TRUE;
+	  deterministic = true;
 	  break;
         case 'U':
-          deterministic = FALSE;
+          deterministic = false;
           break;
 	case 'h':
 	case 'H':
 	  show_help = 1;
 	  break;
 	case 't':
-	  touch = TRUE;
+	  touch = true;
 	  break;
 	case 'v':
 	case 'V':
@@ -680,12 +725,10 @@ main (int argc, char **argv)
   char *inarch_filename;
   int i;
 
-#if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+#ifdef HAVE_LC_MESSAGES
   setlocale (LC_MESSAGES, "");
 #endif
-#if defined (HAVE_SETLOCALE)
   setlocale (LC_CTYPE, "");
-#endif
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
@@ -711,7 +754,8 @@ main (int argc, char **argv)
 
   START_PROGRESS (program_name, 0);
 
-  bfd_init ();
+  if (bfd_init () != BFD_INIT_MAGIC)
+    fatal (_("fatal error: libbfd ABI mismatch"));
   set_default_bfd_target ();
 
   xatexit (remove_output);
@@ -813,6 +857,52 @@ main (int argc, char **argv)
 
       if (operation == extract && bfd_is_thin_archive (arch))
 	fatal (_("`x' cannot be used on thin archives."));
+
+      if (libdeps != NULL)
+	{
+	  char **new_files;
+	  bfd_size_type reclen = strlen (libdeps) + 1;
+
+	  /* Create a bfd to contain the dependencies.
+	     It inherits its type from arch, but we must set the type to
+	     "binary" otherwise bfd_bwrite() will fail.  After writing, we
+	     must set the type back to default otherwise adding it to the
+	     archive will fail.  */
+	  libdeps_bfd = bfd_create (LIBDEPS, arch);
+	  if (libdeps_bfd == NULL)
+	    fatal (_("Cannot create libdeps record."));
+
+	  if (bfd_find_target ("binary", libdeps_bfd) == NULL)
+	    fatal (_("Cannot set libdeps record type to binary."));
+
+	  if (! bfd_set_format (libdeps_bfd, bfd_object))
+	    fatal (_("Cannot set libdeps object format."));
+
+	  if (! bfd_make_writable (libdeps_bfd))
+	    fatal (_("Cannot make libdeps object writable."));
+
+	  if (bfd_bwrite (libdeps, reclen, libdeps_bfd) != reclen)
+	    fatal (_("Cannot write libdeps record."));
+
+	  if (! bfd_make_readable (libdeps_bfd))
+	    fatal (_("Cannot make libdeps object readable."));
+
+	  if (bfd_find_target (plugin_target, libdeps_bfd) == NULL)
+	    fatal (_("Cannot reset libdeps record type."));
+
+	  /* Insert our libdeps record in 2nd slot of the list of files
+	     being operated on.  We shouldn't use 1st slot, but we want
+	     to avoid having to search all the way to the end of an
+	     archive with a large number of members at link time.  */
+	  new_files = xmalloc ((file_count + 2) * sizeof (char *));
+	  new_files[0] = files[0];
+	  new_files[1] = LIBDEPS;
+	  for (i = 1; i < file_count; i++)
+	    new_files[i+1] = files[i];
+	  file_count = ++i;
+	  files = new_files;
+	  files[i] = NULL;
+	}
 
       switch (operation)
 	{
@@ -1029,6 +1119,53 @@ print_contents (bfd *abfd)
   free (cbuf);
 }
 
+
+static FILE * open_output_file (bfd *) ATTRIBUTE_RETURNS_NONNULL;
+
+static FILE *
+open_output_file (bfd * abfd)
+{
+  output_filename = bfd_get_filename (abfd);
+
+  /* PR binutils/17533: Do not allow directory traversal
+     outside of the current directory tree - unless the
+     user has explicitly specified an output directory.  */
+  if (! is_valid_archive_path (output_filename))
+    {
+      char * base = (char *) lbasename (output_filename);
+
+      non_fatal (_("illegal output pathname for archive member: %s, using '%s' instead"),
+		 output_filename, base);
+      output_filename = base;
+    }
+
+  if (output_dir)
+    {
+      size_t len = strlen (output_dir);
+
+      if (len > 0)
+	{
+	  /* FIXME: There is a memory leak here, but it is not serious.  */
+	  if (IS_DIR_SEPARATOR (output_dir [len - 1]))
+	    output_filename = concat (output_dir, output_filename, NULL);
+	  else
+	    output_filename = concat (output_dir, "/", output_filename, NULL);
+	}
+    }
+
+  if (verbose)
+    printf ("x - %s\n", output_filename);
+
+  FILE * ostream = fopen (output_filename, FOPEN_WB);
+  if (ostream == NULL)
+    {
+      perror (output_filename);
+      xexit (1);
+    }
+
+  return ostream;
+}
+
 /* Extract a member of the archive into its own file.
 
    We defer opening the new file until after we have read a BUFSIZ chunk of the
@@ -1042,102 +1179,74 @@ print_contents (bfd *abfd)
 void
 extract_file (bfd *abfd)
 {
-  FILE *ostream;
-  char *cbuf = (char *) xmalloc (BUFSIZE);
-  bfd_size_type nread, tocopy;
-  bfd_size_type ncopied = 0;
   bfd_size_type size;
   struct stat buf;
 
-  /* PR binutils/17533: Do not allow directory traversal
-     outside of the current directory tree.  */
-  if (! is_valid_archive_path (bfd_get_filename (abfd)))
-    {
-      non_fatal (_("illegal pathname found in archive member: %s"),
-		 bfd_get_filename (abfd));
-      free (cbuf);
-      return;
-    }
+  if (preserve_dates)
+    memset (&buf, 0, sizeof (buf));
 
   if (bfd_stat_arch_elt (abfd, &buf) != 0)
     /* xgettext:c-format */
     fatal (_("internal stat error on %s"), bfd_get_filename (abfd));
   size = buf.st_size;
 
-  if (verbose)
-    printf ("x - %s\n", bfd_get_filename (abfd));
-
   bfd_seek (abfd, (file_ptr) 0, SEEK_SET);
 
-  ostream = NULL;
+  output_file = NULL;
   if (size == 0)
     {
-      /* Seems like an abstraction violation, eh?  Well it's OK! */
-      output_filename = bfd_get_filename (abfd);
-
-      ostream = fopen (bfd_get_filename (abfd), FOPEN_WB);
-      if (ostream == NULL)
-	{
-	  perror (bfd_get_filename (abfd));
-	  xexit (1);
-	}
-
-      output_file = ostream;
+      output_file = open_output_file (abfd);
     }
   else
-    while (ncopied < size)
-      {
-	tocopy = size - ncopied;
-	if (tocopy > BUFSIZE)
-	  tocopy = BUFSIZE;
+    {
+      bfd_size_type ncopied = 0;
+      char *cbuf = (char *) xmalloc (BUFSIZE);
 
-	nread = bfd_bread (cbuf, tocopy, abfd);
-	if (nread != tocopy)
-	  /* xgettext:c-format */
-	  fatal (_("%s is not a valid archive"),
-		 bfd_get_filename (abfd->my_archive));
+      while (ncopied < size)
+	{
+	  bfd_size_type nread, tocopy;
 
-	/* See comment above; this saves disk arm motion */
-	if (ostream == NULL)
-	  {
-	    /* Seems like an abstraction violation, eh?  Well it's OK! */
-	    output_filename = bfd_get_filename (abfd);
+	  tocopy = size - ncopied;
+	  if (tocopy > BUFSIZE)
+	    tocopy = BUFSIZE;
 
-	    ostream = fopen (bfd_get_filename (abfd), FOPEN_WB);
-	    if (ostream == NULL)
-	      {
-		perror (bfd_get_filename (abfd));
-		xexit (1);
-	      }
+	  nread = bfd_bread (cbuf, tocopy, abfd);
+	  if (nread != tocopy)
+	    /* xgettext:c-format */
+	    fatal (_("%s is not a valid archive"),
+		   bfd_get_filename (abfd->my_archive));
 
-	    output_file = ostream;
-	  }
+	  /* See comment above; this saves disk arm motion.  */
+	  if (output_file == NULL)
+	    output_file = open_output_file (abfd);
 
-	/* fwrite in mingw32 may return int instead of bfd_size_type. Cast
-	   the return value to bfd_size_type to avoid comparison between
-	   signed and unsigned values.  */
-	if ((bfd_size_type) fwrite (cbuf, 1, nread, ostream) != nread)
-	  fatal ("%s: %s", output_filename, strerror (errno));
-	ncopied += tocopy;
-      }
+	  /* fwrite in mingw32 may return int instead of bfd_size_type. Cast
+	     the return value to bfd_size_type to avoid comparison between
+	     signed and unsigned values.  */
+	  if ((bfd_size_type) fwrite (cbuf, 1, nread, output_file) != nread)
+	    fatal ("%s: %s", output_filename, strerror (errno));
 
-  if (ostream != NULL)
-    fclose (ostream);
+	  ncopied += tocopy;
+	}
+
+      free (cbuf);
+    }
+
+  fclose (output_file);
 
   output_file = NULL;
-  output_filename = NULL;
 
-  chmod (bfd_get_filename (abfd), buf.st_mode);
+  chmod (output_filename, buf.st_mode);
 
   if (preserve_dates)
     {
       /* Set access time to modification time.  Only st_mtime is
 	 initialized by bfd_stat_arch_elt.  */
       buf.st_atime = buf.st_mtime;
-      set_times (bfd_get_filename (abfd), &buf);
+      set_times (output_filename, &buf);
     }
 
-  free (cbuf);
+  output_filename = NULL;
 }
 
 static void
@@ -1146,20 +1255,23 @@ write_archive (bfd *iarch)
   bfd *obfd;
   char *old_name, *new_name;
   bfd *contents_head = iarch->archive_next;
+  int tmpfd = -1;
 
-  old_name = (char *) xmalloc (strlen (bfd_get_filename (iarch)) + 1);
-  strcpy (old_name, bfd_get_filename (iarch));
-  new_name = make_tempname (old_name);
+  old_name = xstrdup (bfd_get_filename (iarch));
+  new_name = make_tempname (old_name, &tmpfd);
 
   if (new_name == NULL)
     bfd_fatal (_("could not create temporary file whilst writing archive"));
 
   output_filename = new_name;
 
-  obfd = bfd_openw (new_name, bfd_get_target (iarch));
+  obfd = bfd_fdopenw (new_name, bfd_get_target (iarch), tmpfd);
 
   if (obfd == NULL)
-    bfd_fatal (old_name);
+    {
+      close (tmpfd);
+      bfd_fatal (old_name);
+    }
 
   output_bfd = obfd;
 
@@ -1179,12 +1291,16 @@ write_archive (bfd *iarch)
   if (deterministic)
     obfd->flags |= BFD_DETERMINISTIC_OUTPUT;
 
+  if (full_pathname)
+    obfd->flags |= BFD_ARCHIVE_FULL_PATH;
+
   if (make_thin_archive || bfd_is_thin_archive (iarch))
-    bfd_is_thin_archive (obfd) = 1;
+    bfd_set_thin_archive (obfd, true);
 
   if (!bfd_set_archive_head (obfd, contents_head))
     bfd_fatal (old_name);
 
+  tmpfd = dup (tmpfd);
   if (!bfd_close (obfd))
     bfd_fatal (old_name);
 
@@ -1194,7 +1310,7 @@ write_archive (bfd *iarch)
   /* We don't care if this fails; we might be creating the archive.  */
   bfd_close (iarch);
 
-  if (smart_rename (new_name, old_name, 0) != 0)
+  if (smart_rename (new_name, old_name, tmpfd, NULL, false) != 0)
     xexit (1);
   free (old_name);
   free (new_name);
@@ -1230,7 +1346,7 @@ get_pos_bfd (bfd **contents, enum pos default_pos, const char *default_posname)
   else
     {
       for (; *after_bfd; after_bfd = &(*after_bfd)->archive_next)
-	if (FILENAME_CMP ((*after_bfd)->filename, realposname) == 0)
+	if (FILENAME_CMP (bfd_get_filename (*after_bfd), realposname) == 0)
 	  {
 	    if (realpos == pos_after)
 	      after_bfd = &(*after_bfd)->archive_next;
@@ -1244,8 +1360,8 @@ static void
 delete_members (bfd *arch, char **files_to_delete)
 {
   bfd **current_ptr_ptr;
-  bfd_boolean found;
-  bfd_boolean something_changed = FALSE;
+  bool found;
+  bool something_changed = false;
   int match_count;
 
   for (; *files_to_delete != NULL; ++files_to_delete)
@@ -1258,18 +1374,18 @@ delete_members (bfd *arch, char **files_to_delete)
 
       if (!strcmp (*files_to_delete, "__.SYMDEF"))
 	{
-	  arch->has_armap = FALSE;
+	  arch->has_armap = false;
 	  write_armap = -1;
 	  continue;
 	}
 
-      found = FALSE;
+      found = false;
       match_count = 0;
       current_ptr_ptr = &(arch->archive_next);
       while (*current_ptr_ptr)
 	{
 	  if (FILENAME_CMP (normalize (*files_to_delete, arch),
-			    (*current_ptr_ptr)->filename) == 0)
+			    bfd_get_filename (*current_ptr_ptr)) == 0)
 	    {
 	      ++match_count;
 	      if (counted_name_mode
@@ -1280,8 +1396,8 @@ delete_members (bfd *arch, char **files_to_delete)
 		}
 	      else
 		{
-		  found = TRUE;
-		  something_changed = TRUE;
+		  found = true;
+		  something_changed = true;
 		  if (verbose)
 		    printf ("d - %s\n",
 			    *files_to_delete);
@@ -1324,7 +1440,7 @@ move_members (bfd *arch, char **files_to_move)
 	{
 	  bfd *current_ptr = *current_ptr_ptr;
 	  if (FILENAME_CMP (normalize (*files_to_move, arch),
-			    current_ptr->filename) == 0)
+			    bfd_get_filename (current_ptr)) == 0)
 	    {
 	      /* Move this file to the end of the list - first cut from
 		 where it is.  */
@@ -1346,7 +1462,8 @@ move_members (bfd *arch, char **files_to_move)
 	  current_ptr_ptr = &((*current_ptr_ptr)->archive_next);
 	}
       /* xgettext:c-format */
-      fatal (_("no entry %s in archive %s!"), *files_to_move, arch->filename);
+      fatal (_("no entry %s in archive %s!"), *files_to_move,
+	     bfd_get_filename (arch));
 
     next_file:;
     }
@@ -1357,9 +1474,9 @@ move_members (bfd *arch, char **files_to_move)
 /* Ought to default to replacing in place, but this is existing practice!  */
 
 static void
-replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
+replace_members (bfd *arch, char **files_to_move, bool quick)
 {
-  bfd_boolean changed = FALSE;
+  bool changed = false;
   bfd **after_bfd;		/* New entries go after this one.  */
   bfd *current;
   bfd **current_ptr;
@@ -1376,9 +1493,10 @@ replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
 	      /* For compatibility with existing ar programs, we
 		 permit the same file to be added multiple times.  */
 	      if (FILENAME_CMP (normalize (*files_to_move, arch),
-				normalize (current->filename, arch)) == 0
+				normalize (bfd_get_filename (current), arch)) == 0
 		  && current->arelt_data != NULL)
 		{
+		  bool replaced;
 		  if (newer_only)
 		    {
 		      struct stat fsbuf, asbuf;
@@ -1392,20 +1510,31 @@ replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
 		      if (bfd_stat_arch_elt (current, &asbuf) != 0)
 			/* xgettext:c-format */
 			fatal (_("internal stat error on %s"),
-			       current->filename);
+			       bfd_get_filename (current));
 
 		      if (fsbuf.st_mtime <= asbuf.st_mtime)
 			goto next_file;
 		    }
 
 		  after_bfd = get_pos_bfd (&arch->archive_next, pos_after,
-					   current->filename);
-		  if (ar_emul_replace (after_bfd, *files_to_move,
-				       target, verbose))
+					   bfd_get_filename (current));
+		  if (libdeps_bfd != NULL
+		      && FILENAME_CMP (normalize (*files_to_move, arch),
+				       LIBDEPS) == 0)
+		    {
+		      replaced = ar_emul_replace_bfd (after_bfd, libdeps_bfd,
+						      verbose);
+		    }
+		  else
+		    {
+		      replaced = ar_emul_replace (after_bfd, *files_to_move,
+						  target, verbose);
+		    }
+		  if (replaced)
 		    {
 		      /* Snip out this entry from the chain.  */
 		      *current_ptr = (*current_ptr)->archive_next;
-		      changed = TRUE;
+		      changed = true;
 		    }
 
 		  goto next_file;
@@ -1417,9 +1546,17 @@ replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
       /* Add to the end of the archive.  */
       after_bfd = get_pos_bfd (&arch->archive_next, pos_end, NULL);
 
-      if (ar_emul_append (after_bfd, *files_to_move, target,
-			  verbose, make_thin_archive))
-	changed = TRUE;
+      if (libdeps_bfd != NULL
+	  && FILENAME_CMP (normalize (*files_to_move, arch), LIBDEPS) == 0)
+        {
+	  changed |= ar_emul_append_bfd (after_bfd, libdeps_bfd,
+					 verbose, make_thin_archive);
+	}
+      else
+        {
+	  changed |= ar_emul_append (after_bfd, *files_to_move, target,
+				     verbose, make_thin_archive);
+	}
 
     next_file:;
 
@@ -1503,5 +1640,5 @@ ranlib_touch (const char *archname)
 static void
 print_descr (bfd *abfd)
 {
-  print_arelt_descr (stdout, abfd, verbose);
+  print_arelt_descr (stdout, abfd, verbose, display_offsets);
 }

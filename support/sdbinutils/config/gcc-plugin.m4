@@ -60,14 +60,14 @@ AC_DEFUN([GCC_ENABLE_PLUGINS],
      if test "x$export_sym_check" != x; then
        echo "int main() {return 0;} int foobar() {return 0;}" > conftest.c
        ${CC} ${CFLAGS} ${LDFLAGS} conftest.c -o conftest$ac_exeext > /dev/null 2>&1
-       if $export_sym_check conftest$ac_exeext | grep -q foobar > /dev/null; then
+       if $export_sym_check conftest$ac_exeext | grep foobar > /dev/null; then
 	 : # No need to use a flag
 	 AC_MSG_RESULT([yes])
        else
 	 AC_MSG_RESULT([yes])
 	 AC_MSG_CHECKING([for -rdynamic])
 	 ${CC} ${CFLAGS} ${LDFLAGS} -rdynamic conftest.c -o conftest$ac_exeext > /dev/null 2>&1
-	 if $export_sym_check conftest$ac_exeext | grep -q foobar > /dev/null; then
+	 if $export_sym_check conftest$ac_exeext | grep foobar > /dev/null; then
 	   plugin_rdynamic=yes
 	   pluginlibs="-rdynamic"
 	 else
@@ -123,4 +123,44 @@ AC_DEFUN([GCC_ENABLE_PLUGINS],
        fi
      fi
    fi
+])
+
+dnl
+dnl
+dnl GCC_PLUGIN_OPTION
+dnl    (SHELL-CODE_HANDLER)
+dnl
+AC_DEFUN([GCC_PLUGIN_OPTION],[dnl
+AC_MSG_CHECKING([for -plugin option])
+
+plugin_names="liblto_plugin.so liblto_plugin-0.dll cyglto_plugin-0.dll"
+plugin_option=
+for plugin in $plugin_names; do
+  plugin_so=`${CC} ${CFLAGS} --print-prog-name $plugin`
+  if test x$plugin_so = x$plugin; then
+    plugin_so=`${CC} ${CFLAGS} --print-file-name $plugin`
+  fi
+  if test x$plugin_so != x$plugin; then
+    plugin_option="--plugin $plugin_so"
+    break
+  fi
+done
+dnl Check if ${AR} $plugin_option rc works.
+AC_CHECK_TOOL(AR, ar)
+if test "${AR}" = "" ; then
+  AC_MSG_ERROR([Required archive tool 'ar' not found on PATH.])
+fi
+touch conftest.c
+${AR} $plugin_option rc conftest.a conftest.c
+if test "$?" != 0; then
+  AC_MSG_WARN([Failed: $AR $plugin_option rc])
+  plugin_option=
+fi
+rm -f conftest.*
+if test -n "$plugin_option"; then
+  $1="$plugin_option"
+  AC_MSG_RESULT($plugin_option)
+else
+  AC_MSG_RESULT([no])
+fi
 ])

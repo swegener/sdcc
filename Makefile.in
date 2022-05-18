@@ -320,3 +320,9 @@ checkconf:
 	fi
 
 # End of Makefile
+#
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status Makefile
+
+Makefile.common: $(srcdir)/Makefile.common.in
+	 cd $(top_builddir); ./config.status Makefile.common

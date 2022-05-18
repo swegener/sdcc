@@ -7,8 +7,6 @@ top_srcdir      = @top_srcdir@
 top_builddir    = @top_builddir@
 VPATH           = @srcdir@
 
-include $(top_builddir)/Makefile.common
-
 USE_ALT_LEX     = 0
 
 PORTS           = $(shell cat ../ports.build)
@@ -36,7 +34,7 @@ OBJECTS         = SDCCy.o SDCChasht.o SDCCmain.o SDCCattr.o \
                   SDCCasm.o SDCCmacro.o SDCCutil.o SDCCdebug.o cdbFile.o SDCCdwarf2.o\
                   SDCCerr.o SDCCsystem.o SDCCgen.o
 
-SPECIAL         = SDCCy.h 
+SPECIAL         = SDCCy.h version.h
 ifeq ($(USE_ALT_LEX), 1)
 OBJECTS         += altlex.o
 SPECIAL         += reswords.h
@@ -52,6 +50,9 @@ CXXSOURCES      += $(sort $(notdir $(wildcard $(srcdir)/*.cc)))
 OBJECTS         += $(patsubst %.cc,%.o,$(CXXSOURCES))
 
 TARGET          = $(top_builddir)/bin/sdcc$(EXEEXT)
+
+# ------------------------------------------
+include $(top_builddir)/Makefile.common
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -93,20 +94,6 @@ installdirs:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
-# Creating dependencies
-# ---------------------
-dep: version.h Makefile.dep
-
-# BUG: belongs to Makefile.common
-Makefile.dep: version.h $(SOURCES) $(CXXSOURCES) $(SLIBSOURCES) $(SPECIAL)
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) > Makefile.dep
-	$(MAKEDEP_CXX) $(CPPFLAGS) $(filter %.cc,$^) >> Makefile.dep
-
-# don't include Makefile.dep for the listed targets:
-ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs checkconf \
-                                   clean distclean mostlyclean realclean)" ""
-  -include Makefile.dep
-endif
 include $(srcdir)/clean.mk
 
 
@@ -152,4 +139,5 @@ checkconf:
 	  freshconf;\
 	fi
 
-# End of main_in.mk/main.mk
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status src/Makefile

@@ -138,15 +138,7 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-dep: Makefile.dep
-
-Makefile.dep: $(LKSOURCES) $(top_builddir)/*.h
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
-
-ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
-                                   clean distclean mostlyclean realclean)" ""
-  -include Makefile.dep
-endif
+SPECIAL = $(srcdir)/*.h
 include $(srcdir)/clean.mk
 
 # My rules

@@ -1,3 +1,9 @@
+2022-05-18 Felix Salfelder <felix AT salfelder.org>
+
+	* Makefile.common.in, Makefile.in,
+	  sdas/*/Makefile.in, src/Makefile.in, src/port.mk:
+	  deduplicate dependency generation and fix for ports
+
 2022-05-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/MakeList,

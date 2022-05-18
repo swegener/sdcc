@@ -2,6 +2,8 @@
 #
 #
 
+all:
+
 # Version
 PACKAGE         = @PACKAGE@
 VERSION         = @VERSION@
@@ -99,3 +101,25 @@ EXTRALIBS      += @LIBS@
 CLEANSPEC = *.lst *.asm *.sym *~ *.cdb *.dep *.rul
 
 OBJ = $(SOURCES:.c=.o) $(CXXSOURCES:.cc=.o)
+
+# for historical reasons, dependencies are mixed up, and then split by extension.
+# (fix later).
+DEPENDENCIES_ = $(PREBUILD) Makefile $(SOURCES) $(ASSOURCES) $(CXXSOURCES) $(SLIBSOURCES) $(SPECIAL)
+DEPENDENCIES_CC = $(filter %.c,${DEPENDENCIES_})
+DEPENDENCIES_CXX = $(filter %.cc,${DEPENDENCIES_})
+
+dep: Makefile.dep
+Makefile.depcc: $(DEPENDENCIES_)
+	( test -z "${DEPENDENCIES_CC}" || $(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) ) > $@
+
+Makefile.depcxx: $(DEPENDENCIES_)
+	( test -z "${DEPENDENCIES_CXX}" || $(MAKEDEP_CXX) $(CPPFLAGS) $(filter %.cc,$^) ) > $@
+
+Makefile.dep: Makefile.depcc Makefile.depcxx
+	cat Makefile.depcc Makefile.depcxx > $@
+
+# don't include Makefile.dep for the listed targets:
+ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs checkconf \
+                                   clean distclean mostlyclean realclean)" ""
+  -include Makefile.dep
+endif

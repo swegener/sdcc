@@ -5,6 +5,8 @@
 	  Disable two tests for FreeBSD 13.1, since a known issue from FreeBSD 13.0 is still present.
 	* support/regression/MakeList:
 	  Disable a test for targets that cannot complete it within reasonable time.
+	* support/regression/tests/bug-3385.c:
+	  Disable new test for mos6502, where it fails (bug #3386).
 
 2022-05-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -3,13 +3,13 @@ VPATH           = @srcdir@
 srcdir          = @srcdir@
 top_builddir    = @top_builddir@
 
-include $(PRJDIR)/$(top_builddir)/Makefile.common
-
 OBJECTS 	= packihx.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/$(top_builddir)/bin/packihx$(EXEEXT)
+
+include $(PRJDIR)/$(top_builddir)/Makefile.common
 
 all: $(TARGET)
 
@@ -52,3 +52,6 @@ $(TARGET): $(OBJECTS)
 checkconf:
 
 include $(srcdir)/clean.mk
+
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status support/packihx/Makefile

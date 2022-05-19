@@ -1,3 +1,8 @@
+2022-05-19 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/cases/Makefile.in:
+	  avoid segv in __fail, ASSERT(0) instead.
+
 2022-05-18 Felix Salfelder <felix AT salfelder.org>
 
 	* Makefile.common.in, Makefile.in,

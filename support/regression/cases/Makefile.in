@@ -974,7 +974,7 @@ tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 	@echo '#ifdef __SDCC' >> $@
 	@echo 'extern void _putchar(char c);' >> $@
 	@echo 'int putchar(int c){_putchar(c);return(c);}' >> $@
-	@echo 'void abort() {__fail(0,0,0,0);}' >> $@
+	@echo 'void abort() {ASSERT(0);}' >> $@
 	@echo '#endif' >> $@
 
 	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
@@ -1011,7 +1011,7 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@grep -q exit $< && echo "#define exit exit__substitute" >> $@ || :
 	@echo '#define main main_' >> $@
 	@echo '#define assert ASSERT' >> $@
-	@echo 'void abort() {__fail(0,0,0,0);}' >> $@
+	@echo 'void abort() {ASSERT(0);}' >> $@
 
 	@#find matching main arguments, none or 2
 	@echo -n '#define MAINARGS' >> $@

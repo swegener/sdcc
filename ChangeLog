@@ -1,3 +1,8 @@
+2022-05-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList:
+	  Disable a test for targets that cannot complete it within reasonable time.
+
 2022-05-19 Felix Salfelder <felix AT salfelder.org>
 
 	* support/packihx/Makefile.in:

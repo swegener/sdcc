@@ -552,13 +552,13 @@ EXCLUDE_pdk14 += \
 	qct_0051-inits
 
 # Target too slow (fails with timeout)
-EXCLUDE_pdk15-stack-auto += \
-	qct_0042-prime
-EXCLUDE_pdk14 += \
+EXCLUDE_ARCH_pdk += \
 	qct_0042-prime
 EXCLUDE_uc6502-stack-auto += \
 	qct_0042-prime
 EXCLUDE_ARCH_mcs51 += \
+	qct_0042-prime
+EXCLUDE_ds390 += \
 	qct_0042-prime
 EXCLUDE_ucgbz80 += \
 	qct_0042-prime
@@ -777,4 +777,8 @@ EXCLUDE_mcs51-huge += ${EXCLUDE_ARCH_mcs51}
 EXCLUDE_mcs51-stack-auto += ${EXCLUDE_ARCH_mcs51}
 EXCLUDE_mcs51-large-stack-auto += ${EXCLUDE_ARCH_mcs51}
 EXCLUDE_mcs51-xstack-auto += ${EXCLUDE_ARCH_mcs51}
+###################################################
+EXCLUDE_pdk14 += ${EXCLUDE_ARCH_pdk}
+EXCLUDE_pdk15 += ${EXCLUDE_ARCH_pdk}
+EXCLUDE_pdk15-stack-auto += ${EXCLUDE_ARCH_pdk}
 ###################################################

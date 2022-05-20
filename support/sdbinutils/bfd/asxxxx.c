@@ -180,7 +180,7 @@
    one).  */
 
 struct asxxxx_symbol
-{ //
+{
   struct asxxxx_symbol *next;
   const char *name;
   symvalue val;
@@ -191,7 +191,7 @@ struct asxxxx_symbol
 /* The asxxxx .rel tdata information.  */
 
 enum asxxxx_cpu_type_e
-  { //
+  {
     CPU_UNKNOWN = 0,
     CPU_MCS51,
     CPU_DS390,
@@ -203,33 +203,33 @@ enum asxxxx_cpu_type_e
   };
 
 enum asxxxx_rel_version_e
-  { //
+  {
     REL_VER_3 = 0,
     REL_VER_4,
   };
 
 enum asxxxx_radix_e
-  { //
+  {
     RADIX_OCT = 8,
     RADIX_DEC = 10,
     RADIX_HEX = 16,
   };
 
 enum asxxxx_endian_e
-  { //
+  {
     ENDIAN_LITTLE = 0,
     ENDIAN_BIG,
   };
 
 enum asxxxx_address_size_e
-  { //
+  {
     ADDR_SIZE_2 = 2,
     ADDR_SIZE_3 = 3,
     ADDR_SIZE_4 = 4,
   };
 
 typedef struct asxxxx_data_struct
-  { //
+  {
     struct asxxxx_symbol *symbols;
     struct asxxxx_symbol *symtail;
     asymbol *csymbols;
@@ -610,12 +610,12 @@ static void
 asxxxx_set_cpu_type(bfd *abfd, const char *cpu_type)
 {
   struct cpu
-    { //
+    {
       const char *name;
       enum asxxxx_cpu_type_e type;
     }
   cpus[] =
-    { //
+    {
       { "-mmcs51", CPU_MCS51 },
       { "-mds390", CPU_DS390 },
       { "-mds400", CPU_DS400 },
@@ -1103,7 +1103,7 @@ static bool asxxxx_bfd_is_target_special_symbol(bfd *, asymbol *)
 #define asxxxx_bfd_define_start_stop                bfd_generic_define_start_stop
 
 const bfd_target asxxxx_vec =
-{ //
+{
   "asxxxx",                     /* Name.  */
   bfd_target_asxxxx_flavour,
   BFD_ENDIAN_UNKNOWN,           /* Target byte order.  */
@@ -1140,7 +1140,7 @@ const bfd_target asxxxx_vec =
   },
   {     /* Write cached information into a file being written, at <<bfd_close>>.  */
     false,
-    false, //    asxxxx_write_object_contents, /* object */
+    false, /*    asxxxx_write_object_contents, object */
     _bfd_write_archive_contents,  /* archive */
     false,                    /* core */
   },

@@ -1,3 +1,8 @@
+2022-05-20 Felix Salfelder <felix AT salfelder.org>
+
+	* support/sdbinutils/bfd/asxxxx.c:
+	  edit out C++ style comments.
+
 2022-05-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/MakeList:

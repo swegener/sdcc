@@ -1,3 +1,9 @@
+2022-05-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList,
+	  support/regression/cases/Makefile.in:
+	  Document reasons for failing QuickC tests (lack of memory / speed vs. SDCC bugs).
+
 2022-05-21 Felix Salfelder <felix AT salfelder.org>
 
 	* support/sdbinutils/bfd/asxxxx.c:
@@ -8029,8 +8035,8 @@
 	  support/regression/tests/bug-2822.c,
 	  support/regression/tests/bug-441448.c,
 	  support/regression/tests/bug-460010.c,
-          support/regression/tests/bug-2712.c,
-          support/regression/tests/bug1665511.c,
+	  support/regression/tests/bug-2712.c,
+	  support/regression/tests/bug1665511.c,
 	  support/regression/tests/bug1757671.c,
 	  support/regression/tests/bug1928022.c,
 	  support/regression/tests/bug2729218.c,

@@ -781,6 +781,10 @@ QC_SKIP_TESTS += \
 QC_SKIP_TESTS += \
 	0039-sizeof.c
 
+# Takes far too much time for SDCC targets
+QC_SKIP_TESTS += \
+	0041-queen.c
+
 QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
 
 # '___slonglong2fs' referenced by module

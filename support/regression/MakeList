@@ -395,164 +395,48 @@ EXCLUDE_pdk15 += \
 EXCLUDE_pdk15 += \
 	gte_20041218-1
 
-###################################################
-
-# timeout
-EXCLUDE_stm8 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_stm8-large += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_s08 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ARCH_z80 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ARCH_z80n += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ez80-z80 += \
-	qct_0041-queen
-
-EXCLUDE_hc08 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ARCH_z180 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_mcs51-stack-auto += \
-	qct_0036-notneg \
-	qct_041-queen \
-	qct_0051-inits
-
-# Failure
-EXCLUDE_mcs51-large += \
-	qct_0041-queen \
-	qct_0036-notneg
-
-# Failure
-EXCLUDE_mcs51-huge += \
-	qct_0041-queen \
-	qct_0036-notneg
-
-# Failure
-EXCLUDE_mcs51-medium += \
-	qct_0041-queen \
-	qct_0036-notneg \
-	qct_0080-arrays \
-	qct_0051-inits
-
-# Failure
-EXCLUDE_mcs51-small += \
-	qct_0080-arrays \
-	qct_0036-notneg \
-	qct_0041-queen \
-	qct_0051-inits
-
-# Failure
-EXCLUDE_mcs51-small-stack-auto += \
-	qct_0036-notneg \
-	qct_0041-queen \
-	qct_0051-inits
-
-# Failure
-EXCLUDE_mcs51-stack-auto += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_mcs51-large-stack-auto += \
-	qct_0041-queen \
-	qct_0036-notneg
-
-# Failure
-EXCLUDE_ds390 += \
-	qct_0041-queen \
-	qct_0036-notneg
-
-# Failure
-EXCLUDE_ARCH_r3ka += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_r2k += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ARCH_mos6502 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_uc6502-stack-auto += \
-	qct_0018-structptr
-
 # compile issue
 EXCLUDE_uc6502 += \
 	gte_memcpy-1
 
-# Failure
-EXCLUDE_ucgbz80 += \
-	qct_0041-queen
+###################################################
 
-# Failure
-EXCLUDE_uc6502 += \
-	qct_0041-queen
+# Failure - Bug
+EXCLUDE_uc6502-stack-auto += \
+	qct_0018-structptr
 
-# Failure
-EXCLUDE_r2ka += \
-	qct_0041-queen
+# Failure - Bug #3392
+EXCLUDE_ARCH_mcs51 += \
+	qct_0036-notneg
+EXCLUDE_ds390 += \
+	qct_0036-notneg
 
-# Failure
-EXCLUDE_tlcs90 += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ucr2k += \
-	qct_0041-queen
-
-# Failure
-EXCLUDE_ucr2ka += \
-	qct_0041-queen
-
-# timeout
-EXCLUDE_ucrxk3a += \
-	qct_0041-queen
-
-# assertion fail
-EXCLUDE_ucrxk3a +=
-
-# Failure
-EXCLUDE_pdk15 += \
-	qct_0080-arrays \
-	qct_0041-queen \
-	qct_0051-inits
-
-# Failure
-EXCLUDE_pdk15-stack-auto += \
-	qct_0041-queen \
-	qct_0051-inits
-
-# too large
+# Failure - Bug #3393
 EXCLUDE_pdk14 += \
-	qct_0041-queen \
+	qct_0051-inits
+EXCLUDE_pdk15 += \
+	qct_0051-inits
+EXCLUDE_pdk15-stack-auto += \
+	qct_0051-inits
+EXCLUDE_ARCH_mcs51 += \
+	qct_0051-inits
+
+# Target doesn't have enough memory
+EXCLUDE_pdk14 += \
 	qct_0049-inits \
 	qct_0057-duff \
 	qct_0080-arrays
-
-# Failure
-EXCLUDE_pdk14 += \
-	qct_0051-inits
+EXCLUDE_pdk15 += \
+	qct_0080-arrays
+EXCLUDE_mcs51-small += \
+	qct_0080-arrays
+EXCLUDE_mcs51-medium += \
+	qct_0080-arrays	
 
 # Target too slow (fails with timeout)
 EXCLUDE_ARCH_pdk += \
+	qct_0042-prime
+EXCLUDE_uc6502 += \
 	qct_0042-prime
 EXCLUDE_uc6502-stack-auto += \
 	qct_0042-prime

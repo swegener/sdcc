@@ -1065,7 +1065,7 @@ asxxxx_print_symbol (bfd *abfd,
     }
 }
 
-static bool asxxxx_bfd_is_target_special_symbol(bfd *, asymbol *)
+static bool asxxxx_bfd_is_target_special_symbol(bfd * a, asymbol * b)
 {
 	return false;
 }

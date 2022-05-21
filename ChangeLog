@@ -1,3 +1,8 @@
+2022-05-21 Felix Salfelder <felix AT salfelder.org>
+
+	* support/sdbinutils/bfd/asxxxx.c:
+	  name 2 unnamed parameters to comply with c99 & al.
+
 2022-05-20 Felix Salfelder <felix AT salfelder.org>
 
 	* support/sdbinutils/bfd/asxxxx.c:

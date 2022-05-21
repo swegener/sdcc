@@ -399,6 +399,55 @@ EXCLUDE_pdk15 += \
 EXCLUDE_uc6502 += \
 	gte_memcpy-1
 
+# SDCC Bug #3395
+EXCLUDE_mcs51-small-stack-auto += \
+	gte_pr30185
+EXCLUDE_mcs51-large-stack-auto += \
+	gte_pr30185
+
+# Target does not yet support struct/union return
+EXCLUDE_hc08 += \
+	gte_991019-1 \
+	gte_pr30185
+EXCLUDE_s08 += \
+	gte_991019-1 \
+	gte_pr30185
+EXCLUDE_ds390 += \
+	gte_991019-1 \
+	gte_pr30185
+EXCLUDE_uc6502 += \
+	gte_991019-1 \
+	gte_pr30185
+
+# Target doesn't have enough memory
+EXCLUDE_ARCH_pdk += \
+	gte_loop-ivopts-2 \
+	gte_shiftdi-2 \
+	gte_pr58984
+EXCLUDE_pdk15-stack-auto += \
+	gte_pr30185 \
+	gte_991019-1
+EXCLUDE_pdk14 += \
+	gte_pr30185 \
+	gte_991019-1
+EXCLUDE_mcs51-small += \
+	gte_loop-ivopts-2 \
+	gte_pr58984 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-small-stack-auto += \
+	gte_loop-ivopts-2 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-medium += \
+	gte_loop-ivopts-2 \
+	gte_pr58984 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-large-stack-auto += \
+	gte_loop-ivopts-2
+
+# Bug?
+EXCLUDE_pdk15-stack-auto += \
+	gte_pr100453
+
 ###################################################
 
 # Failure - Bug
@@ -412,11 +461,7 @@ EXCLUDE_ds390 += \
 	qct_0036-notneg
 
 # Failure - Bug #3393
-EXCLUDE_pdk14 += \
-	qct_0051-inits
-EXCLUDE_pdk15 += \
-	qct_0051-inits
-EXCLUDE_pdk15-stack-auto += \
+EXCLUDE_ARCH_pdk += \
 	qct_0051-inits
 EXCLUDE_ARCH_mcs51 += \
 	qct_0051-inits

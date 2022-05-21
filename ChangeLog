@@ -2,6 +2,12 @@
 
 	* support/regression/MakeList,
 	  support/regression/cases/Makefile.in:
+	  Document reasons for some failing gte tests.
+
+2022-05-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/MakeList,
+	  support/regression/cases/Makefile.in:
 	  Document reasons for failing QuickC tests (lack of memory / speed vs. SDCC bugs).
 
 2022-05-21 Felix Salfelder <felix AT salfelder.org>

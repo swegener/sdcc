@@ -119,20 +119,19 @@ GTE_SKIP_TESTS += \
 	va-arg-8.c \
 	980608-1.c
 
-# return aggregate
+# SDCC does not yet support compound literals (RFE #332)
 GTE_SKIP_TESTS += \
-	20000917-1.c \
-	complex-3.c \
-	991019-1.c \
-	991118-1.c \
-	991118-1.c \
-	991118-1.c \
-	991118-1.c \
-	pr30185.c \
-	pr41919.c \
+	20000917-1.c
+
+# Uses GCC implementation-defined long long bit-fields not supported in SDCC
+GTE_SKIP_TESTS += \
+	991118-1.c
+
+# SDCC bug #3394
+GTE_SKIP_TESTS += \
 	pr58365.c
 
-# old style C declaration
+# SDCC does not yet support K&R-style style functions (RFE #450)
 GTE_SKIP_TESTS += \
 	20020227-1.c \
 	20000914-1.c \
@@ -205,7 +204,7 @@ GTE_SKIP_TESTS += \
 	va-arg-trap-1.c \
 	zerolen-1.c
 
-# fails on ds360 emulator (revisit later..)
+# fails on at least stm8 and ds360 emulator (revisit later..)
 GTE_SKIP_TESTS += \
 	20000223-1.c \
 	20021127-1.c \
@@ -215,14 +214,6 @@ GTE_SKIP_TESTS += \
 	pr45262.c \
 	pr48197.c \
 	pr66556.c
-
-# fails on mcs51-stack-auto emu
-GTE_SKIP_TESTS += \
-	shiftdi-2.c
-
-# timeout on mcs51-stack-auto emu (80)
-GTE_SKIP_TESTS += \
-	loop-ivopts-2.c
 
 # misc syntax error
 GTE_SKIP_TESTS += \
@@ -523,24 +514,23 @@ GTE_SKIP_TESTS += \
 	pr78170.c \
 	pr98366.c
 
-# TODO? SDCC cannot pass structure as function argument
+# SDCC does not yet support omission of braces in initialization. RFE #562.
 GTE_SKIP_TESTS += \
 	20040703-1.c \
-	20040709-1.c \
-	pr100453.c \
-	pr20621-1.c \
-	pr58984.c
+	complex-3.c \
+	pr41919.c \
+	991201-1.c
+
+# Uses GCC extension __builtin_classify_type
+GTE_SKIP_TESTS += \
+	20040709-1.c
 
 # sys/types.h unavailable (POSIX, not part of C standard)
 GTE_SKIP_TESTS += \
 	loop-2f.c \
 	loop-2g.c
 
-# BUG? initialization needs curly braces
-GTE_SKIP_TESTS += \
-	991201-1.c
-
-# long double
+# SDCC does not yet support long double
 GTE_SKIP_TESTS += \
 	align-2.c \
 	960405-1.c \
@@ -622,7 +612,7 @@ GTE_SKIP_TESTS += \
 # TODO?: printf
 GTE_SKIP_TESTS += 20020406-1.c
 
-# uses compound literals
+# SDCC does not yet support compound literals (RFE #332)
 GTE_SKIP_TESTS += \
 	20020206-2.c
 

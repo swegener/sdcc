@@ -752,6 +752,12 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	bitintarith.c
 
+# Needs far too much memory for SDCC targets
+GTE_SKIP_TESTS += \
+	920410-1.c \
+	921113-1.c \
+	multi-ix.c
+	
 GTE_TESTS = $(filter-out $(GTE_SKIP_TESTS), $(GTE_TESTS_WC))
 
 ##############

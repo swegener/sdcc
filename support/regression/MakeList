@@ -32,20 +32,8 @@ EXCLUDE_ds390 += \
 
 # ?ASlink-Error-Could not get consecutive bytes in internal RAM for area DSEG.
 EXCLUDE_mcs51-small += \
-	gte_920410-1 \
-	gte_921113-1 \
 	gte_loop-ivopts-1 \
 	gte_pr93434
-
-# Warning 21
-EXCLUDE_mcs51-small-stack-auto += \
-	gte_920410-1 \
-	gte_921113-1
-
-#?ASlink-Warning-Paged Area PSEG Boundary Error
-EXCLUDE_mcs51-medium += \
-	gte_920410-1 \
-	gte_921113-1
 
 # Möglich, dass irgendwo die Größe als 16-bit-Wert behandelt wird, und dann (1 <<
 # 17) 0 ergibt, oder so. Da kann man einen Bugreport öffnen, um eine bessere
@@ -65,10 +53,6 @@ EXCLUDE_uc6502 += \
 EXCLUDE_uc6502 += \
 	gte_memcpy-1
 
-# invalid instruction/abnormal stop
-EXCLUDE_uc6502 += \
-	gte_multi-ix \
-
 # Failure
 EXCLUDE_ucr3ka += \
 	gte_20041218-1 \
@@ -78,66 +62,16 @@ EXCLUDE_ucr3ka += \
 EXCLUDE_s08 += \
 	gte_20091229-1 \
 	gte_pr94567 \
-   gte_20041218-1 \
-   gte_multi-ix
-
-# memory limit exceeded
-EXCLUDE_s08 += \
-	gte_921113-1
-
-# BUG?: hangs sdcc
-EXCLUDE_stm8 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
+	gte_20041218-1
 
 # Failure
 EXCLUDE_stm8 += \
    gte_20041218-1
 
-# BUG?: hangs sdcc
-EXCLUDE_tlcs90 = \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# BUG?: hangs sdcc
-EXCLUDE_stm8-large += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
 # Fail
 EXCLUDE_stm8-large += \
 	gte_20041218-1
 
-# BUG?: hangs sdcc
-EXCLUDE_ez80-z80 = \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# BUG?: hangs sdcc
-EXCLUDE_pdk15-stack-auto = \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# timeout, simulation killed
-EXCLUDE_pdk15-stack-auto += \
-	gte_pr57131
-
-# does not work
-EXCLUDE_pdk15-stack-auto += \
-	gte_loop-ivopts-1 \
-	gte_20041218-1.ou
-
-# BUG?: hangs compilation
-EXCLUDE_ucr2k += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
 # Failure
 EXCLUDE_ucr2k += \
 	gte_20041218-1 \
@@ -149,30 +83,6 @@ EXCLUDE_ucr2ka += \
 	gte_20041218-1 \
 	gte_20091229-1 \
 	gte_pr94567
-
-# BUG?: hangs compilation
-EXCLUDE_ucr2ka += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# BUG?: hangs compilation
-EXCLUDE_ucr3ka += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# BUG?: hangs compilation
-EXCLUDE_ucrxk3a += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# hangs compilation
-EXCLUDE_ucgbz80 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
 
 # Fail
 EXCLUDE_ucgbz80 += \
@@ -180,18 +90,6 @@ EXCLUDE_ucgbz80 += \
 	gte_20091229-1 \
 	gte_pr94567 \
 	gte_pr97404
-
-# hangs compilation
-EXCLUDE_ucz180-resiy += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# hangs compilation
-EXCLUDE_ucz180 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
 
 # Fail
 EXCLUDE_ucz180 += \
@@ -215,12 +113,6 @@ EXCLUDE_ucz180-resiy += \
 	gte_pr94567 \
 	gte_pr97404
 
-# hangs compilation
-EXCLUDE_ucz80 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
 # Fail
 EXCLUDE_ucz80 += \
 	gte_20091229-1 \
@@ -231,51 +123,21 @@ EXCLUDE_ucz80-nmos += \
 	gte_20091229-1 \
 	gte_pr94567
 
-# timeout?
-EXCLUDE_hc08 += \
-	gte_multi-ix
-
 # fail
 EXCLUDE_hc08 += \
 	gte_memcpy-1
-
-# invalid instruction
-EXCLUDE_hc08 += \
-   gte_921113-1
 
 # Failure
 EXCLUDE_hc08 += \
 	gte_20041218-1 \
 	gte_20091229-1 \
 	gte_pr94567
-
-# abnormal stop
-EXCLUDE_hc08 += \
-	gte_921113-1
-
-# hangs compilation
-EXCLUDE_ucz80n = \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
 
 # Failure
 EXCLUDE_ucz80n += \
 	gte_20041218-1 \
 	gte_20091229-1 \
 	gte_pr94567
-
-# hangs compilation
-EXCLUDE_ucz80-nmos += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
-# hangs compilation
-EXCLUDE_ucz80-resiy += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
 
 # Failure
 EXCLUDE_ARCH_z80 += \
@@ -286,50 +148,17 @@ EXCLUDE_ucz80-resiy += \
 	gte_20091229-1 \
 	gte_pr94567
 
-# Hangs sdcc
-EXCLUDE_ucz80-undoc += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_multi-ix
-
 # Fail
 EXCLUDE_ucz80-undoc += \
 	gte_20091229-1 \
 	gte_20041218-1 \
 	gte_pr94567
 
-# too large
-EXCLUDE_pdk14 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_990127-2 \
-	gte_pr102134 \
-	gte_multi-ix \
-	gte_memcpy-1 \
-	gte_loop-ivopts-1 \
-	gte_pr29798 \
-	gte_pr33669 \
-	gte_pr27364 \
-	gte_pr50865 \
-	gte_pr40386 \
-	gte_pr57131 \
-	gte_pr93434
-
 # Stack overflow
 EXCLUDE_pdk14 += \
-	gte_20041218-1 \
 	gte_20091229-1
-
-# too large (4096W max)
-EXCLUDE_pdk15-stack-auto += \
-	gte_pr40386 \
-	gte_loop-ivopts-1
-
 # misc Failure
 EXCLUDE_pdk15-stack-auto += \
-	gte_20041218-1 \
-	gte_990127-2 \
-	gte_pr29798 \
 	gte_pr33669
 
 # misc Failure
@@ -351,18 +180,6 @@ EXCLUDE_ez80-z80 += \
 EXCLUDE_ez80-z80 += \
    gte_pr94567
 
-# timeout
-EXCLUDE_mcs51-large-stack-auto += \
-	gte_multi-ix
-EXCLUDE_mcs51-stack-auto += \
-	gte_multi-ix
-EXCLUDE_mcs51-small += \
-	gte_multi-ix
-EXCLUDE_mcs51-medium += \
-	gte_multi-ix
-EXCLUDE_mcs51-small-stack-auto += \
-	gte_multi-ix
-
 # Failure
 EXCLUDE_ARCH_mcs51 += \
 	gte_20041218-1 \
@@ -378,26 +195,13 @@ EXCLUDE_tlcs90 += \
 	gte_20091229-1 \
 	gte_pr94567
 
-# ?ASlink-Warning-RAM value too large
-EXCLUDE_pdk15 += \
-	gte_920410-1 \
-	gte_921113-1 \
-	gte_990127-2 \
-	gte_loop-ivopts-1 \
-	gte_multi-ix \
-	gte_memcpy-1 \
-	gte_pr29798 \
-	gte_pr40386 \
-	gte_pr57131 \
-	gte_pr93434
-
-# Failure
-EXCLUDE_pdk15 += \
-	gte_20041218-1
-
 # compile issue
 EXCLUDE_uc6502 += \
 	gte_memcpy-1
+
+# Bug?
+EXCLUDE_pdk15-stack-auto += \
+	gte_pr100453
 
 # SDCC Bug #3395
 EXCLUDE_mcs51-small-stack-auto += \
@@ -421,14 +225,27 @@ EXCLUDE_uc6502 += \
 
 # Target doesn't have enough memory
 EXCLUDE_ARCH_pdk += \
+	gte_20041218-1 \
+	gte_990127-2 \
+	gte_loop-ivopts-1 \
 	gte_loop-ivopts-2 \
-	gte_shiftdi-2 \
-	gte_pr58984
+	gte_memcpy-1 \
+	gte_pr29798 \
+	gte_pr40386 \
+	gte_pr57131 \
+	gte_pr58984 \
+	gte_pr93434 \
+	gte_shiftdi-2
 EXCLUDE_pdk15-stack-auto += \
+	gte_991019-1 \
 	gte_pr30185 \
-	gte_991019-1
+	gte_pr40386
 EXCLUDE_pdk14 += \
+	gte_pr102134 \
+	gte_pr27364 \
 	gte_pr30185 \
+	gte_pr33669 \
+	gte_pr50865 \
 	gte_991019-1
 EXCLUDE_mcs51-small += \
 	gte_loop-ivopts-2 \
@@ -443,10 +260,6 @@ EXCLUDE_mcs51-medium += \
 	gte_shiftdi-2
 EXCLUDE_mcs51-large-stack-auto += \
 	gte_loop-ivopts-2
-
-# Bug?
-EXCLUDE_pdk15-stack-auto += \
-	gte_pr100453
 
 ###################################################
 # QuickC Tests

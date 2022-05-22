@@ -164,18 +164,24 @@ GTE_SKIP_TESTS += \
 	20050215-1.c \
 	strlen-6.c
 
-# BUGs? Failure on stm8
+# Test fpr GCC implementation-defined bit-filed layout
+GTE_SKIP_TESTS += \
+	bitfld-2.c
+
+# Requires int of at least 32 bits.
+GTE_SKIP_TESTS += \
+	vrp-5.c \
+	vrp-6.c
+
+# Bugs? These fail on stm8.
 GTE_SKIP_TESTS += \
 	20001124-1.c \
 	20010116-1.c \
 	20070424-1.c \
 	980526-2.c \
-	bitfld-2.c \
 	call-trap-1.c \
 	cmpsi-2.c \
-	pr31605.c \
-	vrp-5.c \
-	vrp-6.c
+	pr31605.c
 
 # BUGs? abnormal stop on stm8
 GTE_SKIP_TESTS += \
@@ -536,9 +542,12 @@ GTE_SKIP_TESTS += \
 	960405-1.c \
 	pr44942.c
 
-# BUG? FATAL Compiler Internal Error
+# Bug #3398
 GTE_SKIP_TESTS += \
-	pr24851.c \
+	pr24851.c
+
+# Bug #3399
+GTE_SKIP_TESTS += \
 	pr52209.c \
 	pr59388.c
 

@@ -705,7 +705,7 @@ GTE_SKIP_TESTS += \
 	strct-pack-4.c \
 	struct-ret-2.c
 
-# BUG: -:0: error 69: struct/union/array '': initialization needs curly braces
+# SDCC does not yet support omission of braces in initialization. RFE #562.
 GTE_SKIP_TESTS += \
 	pr33631.c
 
@@ -754,6 +754,9 @@ GTE_SKIP_TESTS += \
 
 GTE_TESTS = $(filter-out $(GTE_SKIP_TESTS), $(GTE_TESTS_WC))
 
+##############
+# QuickC tests
+
 # some preprocessor testing, needs careful flags.
 QC_SKIP_TESTS += \
 	0064-sysinclude.c
@@ -777,30 +780,23 @@ QC_SKIP_TESTS += \
 
 QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
 
-# '___slonglong2fs' referenced by module
-TCC_SKIP_TESTS += \
-	110_average.c
+##############
+# Tiny C tests
 
-# compound literals require ISO C99 or later and are not implemented
+# SDCC does not yet support compound literals (RFE #332)
 TCC_SKIP_TESTS += \
 	94_generic.c
 
-# pthread
+# Uses POSIX threads
 TCC_SKIP_TESTS += \
 	106_versym.c \
 	114_bound_signal.c \
 	116_bound_setjmp2.c \
 	124_atomic_counter.c
 
-# long double
+# SDCC does not yet support long double.
 TCC_SKIP_TESTS += \
 	111_conversion.c
-
-# pass structure as function argument
-TCC_SKIP_TESTS += \
-	73_arm64.c \
-	109_float_struct_calling.c \
-	121_struct_return.c
 
 # misc syntax error
 TCC_SKIP_TESTS += \
@@ -864,18 +860,22 @@ TCC_SKIP_TESTS += \
 TCC_SKIP_TESTS += \
 	34_array_assignment.c
 
-# Initializer element is not a constant exp ression
+# Initializer element is not a constant expression
 TCC_SKIP_TESTS += \
 	78_vla_label.c \
 	79_vla_continue.c \
 	115_bound_setjmp.c \
 	122_vla_reuse.c
 
-# bit-field size too wide for type (max 16 bits), per-port?
+# Relies on TinyC implementation-defined support for long long bit-fields and integer width of 32 bits.
 TCC_SKIP_TESTS += \
 	93_integer_promotion.c \
 	95_bitfields.c \
 	95_bitfields_ms.c
+
+# Relies on implicit 0 return by main, but the test framework renames the mainfunction from the test.
+TCC_SKIP_TESTS += \
+	121_struct_return.c
 
 # sin function etc.
 TCC_SKIP_TESTS += \
@@ -887,12 +887,13 @@ TCC_SKIP_TESTS += \
 	60_errors_and_warnings.c \
 	125_atomic_misc.c
 
-# struct/union/array '': initialization needs curly braces
+# SDCC does not yet support omission of braces in initialization. RFE #562.
 TCC_SKIP_TESTS += \
+	73_arm64.c \
 	75_array_in_struct_init.c
 
 # int f9 (int ((int)), int);
-# BUG? Syntax error, declaration ignored at ','
+# BUG? Syntax error, declaration ignored at ','. Possibly related to bug #3358?
 TCC_SKIP_TESTS += \
 	81_types.c
 
@@ -903,8 +904,15 @@ TCC_SKIP_TESTS += \
 
 # assertion failed (on all ports but host)
 TCC_SKIP_TESTS += \
-	84_hex-float.c \
+	84_hex-float.c
+
+# Relies on implementation extensions common on GNU/Linux
+TCC_SKIP_TESTS += \
 	86_memory-model.c
+	
+# long long to float conversion function missing - Bug #3396
+TCC_SKIP_TESTS += \
+	110_average.c
 
 TCC_TESTS = $(filter-out $(TCC_SKIP_TESTS), $(TCC_TESTS_WC))
 

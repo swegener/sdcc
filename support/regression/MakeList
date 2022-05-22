@@ -449,6 +449,7 @@ EXCLUDE_pdk15-stack-auto += \
 	gte_pr100453
 
 ###################################################
+# QuickC Tests
 
 # Failure - Bug
 EXCLUDE_uc6502-stack-auto += \
@@ -492,31 +493,11 @@ EXCLUDE_ds390 += \
 EXCLUDE_ucgbz80 += \
 	qct_0042-prime
 
-##############################################
+###################################################
+# TinyC Tests
 
-# these fail with gcc in various ways
-EXCLUDE_host += \
-	tcc_101_cleanup \
-	tcc_106_versym \
-	tcc_113_btdll \
-	tcc_114_bound_signal \
-	tcc_116_bound_setjmp2 \
-	tcc_117_builtins \
-	tcc_119_random_stuff \
-	tcc_120_alias \
-	tcc_120+_alias \
-	tcc_124_atomic_counter \
-	tcc_125_atomic_misc \
-	tcc_18_include \
-	tcc_34_array_assignment \
-	tcc_39_typedef \
-	tcc_60_errors_and_warnings \
-	tcc_96_nodata_wanted \
-	tcc_98_al_ax_extend \
-	tcc_99_fastcall
-
-# Stack overflow
-EXCLUDE_pdk15 += \
+# Stack overflow - target doesn't have enough RAM.
+EXCLUDE_ARCH_pdk += \
 	tcc_00_assignment \
 	tcc_02_printf \
 	tcc_04_for \
@@ -552,136 +533,38 @@ EXCLUDE_pdk15 += \
 	tcc_70_floating_point_literals \
 	tcc_91_ptr_longlong_arith32
 
-# Failure (partly too big)
-EXCLUDE_pdk14 += \
-	tcc_00_assignment \
-	tcc_02_printf \
-	tcc_04_for \
-	tcc_05_array \
-	tcc_06_case \
-	tcc_07_function \
-	tcc_08_while \
-	tcc_09_do_while \
-	tcc_105_local_extern \
-	tcc_10_pointer \
-	tcc_11_precedence \
-	tcc_12_hashdefine \
-	tcc_13_integer_literals \
-	tcc_15_recursion \
-	tcc_16_nesting \
-	tcc_19_pointer_arithmetic \
-	tcc_20_pointer_comparison \
-	tcc_21_char_array \
-	tcc_23_type_coercion \
-	tcc_25_quicksort \
-	tcc_26_character_constants \
-	tcc_27_sizeof \
-	tcc_28_strings \
-	tcc_29_array_address \
-	tcc_30_hanoi \
-	tcc_31_args \
-	tcc_35_sizeof \
-	tcc_36_array_initialisers \
-	tcc_37_sprintf \
-	tcc_38_multiple_array_index \
-	tcc_45_empty_for \
-	tcc_48_nested_break \
-	tcc_49_bracket_evaluation \
-	tcc_50_logical_second_arg \
-	tcc_51_static \
-	tcc_52_unnamed_enum \
-	tcc_54_goto \
-	tcc_55_lshift_type \
-	tcc_61_integers \
-	tcc_64_macro_nesting \
-	tcc_67_macro_concat \
-	tcc_70_floating_point_literals \
-	tcc_91_ptr_longlong_arith32 \
-	tcc_92_enum_bitfield \
-	tcc_97_utf8_string_literal
-
-# Failure
-EXCLUDE_pdk15 += \
-	tcc_05_array \
-	tcc_10_pointer \
-	tcc_25_quicksort \
-	tcc_28_strings \
-	tcc_30_hanoi \
-	tcc_36_array_initialisers \
-	tcc_37_sprintf \
-	tcc_38_multiple_array_index \
-	tcc_49_bracket_evaluation \
-	tcc_97_utf8_string_literal
-
-# Failure (partly too big)
-EXCLUDE_pdk15-stack-auto += \
-	tcc_00_assignment \
-	tcc_02_printf \
-	tcc_04_for \
-	tcc_05_array \
-	tcc_06_case \
-	tcc_07_function \
-	tcc_08_while \
-	tcc_09_do_while \
-	tcc_105_local_extern \
-	tcc_10_pointer \
-	tcc_11_precedence \
-	tcc_12_hashdefine \
-	tcc_13_integer_literals \
-	tcc_15_recursion \
-	tcc_16_nesting \
-	tcc_19_pointer_arithmetic \
-	tcc_20_pointer_comparison \
-	tcc_21_char_array \
-	tcc_23_type_coercion \
-	tcc_25_quicksort \
-	tcc_26_character_constants \
-	tcc_27_sizeof \
-	tcc_28_strings \
-	tcc_29_array_address \
-	tcc_30_hanoi \
-	tcc_31_args \
-	tcc_35_sizeof \
-	tcc_36_array_initialisers \
-	tcc_37_sprintf \
-	tcc_38_multiple_array_index \
-	tcc_45_empty_for \
-	tcc_48_nested_break \
-	tcc_49_bracket_evaluation \
-	tcc_50_logical_second_arg \
-	tcc_51_static \
-	tcc_52_unnamed_enum \
-	tcc_54_goto \
-	tcc_55_lshift_type \
-	tcc_61_integers \
-	tcc_64_macro_nesting \
-	tcc_67_macro_concat \
-	tcc_70_floating_point_literals \
-	tcc_91_ptr_longlong_arith32 \
-	tcc_92_enum_bitfield \
-	tcc_97_utf8_string_literal
-
-# cannot compile/link
+# Fails since symbol B from test conflicts with symbol B defined in mcs51-common/support.c (via processor register include)
 EXCLUDE_ARCH_mcs51 += \
 	tcc_30_hanoi
 
-# Failure
-EXCLUDE_mcs51-small += \
+# Target doesn't have enough memory
+EXCLUDE_ARCH_pdk += \
+	tcc_05_array \
+	tcc_10_pointer \
+	tcc_25_quicksort \
+	tcc_28_strings \
 	tcc_30_hanoi \
 	tcc_36_array_initialisers \
 	tcc_37_sprintf \
-	tcc_97_utf8_string_literal
-
-# Linker error
+	tcc_38_multiple_array_index \
+	tcc_49_bracket_evaluation \
+	tcc_97_utf8_string_literal \
+	tcc_109_float_struct_calling
+EXCLUDE_pdk14 += \
+	tcc_92_enum_bitfield
+EXCLUDE_pdk15-stack-auto += \
+	tcc_92_enum_bitfield
 EXCLUDE_mcs51-stack-auto += \
 	tcc_49_bracket_evaluation
 EXCLUDE_mcs51-small-stack-auto += \
 	tcc_49_bracket_evaluation
 EXCLUDE_mcs51-small += \
-	tcc_49_bracket_evaluation
+	tcc_36_array_initialisers \
+	tcc_37_sprintf \
+	tcc_49_bracket_evaluation \
+	tcc_97_utf8_string_literal
 EXCLUDE_mcs51-medium += \
 	tcc_49_bracket_evaluation
-
 
 ###################################################
 EXCLUDE_ucz80 += ${EXCLUDE_ARCH_z80}

@@ -131,6 +131,10 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	pr58365.c
 
+# SDCC bug #3400
+GTE_SKIP_TESTS += \
+	pr35163.c
+
 # SDCC does not yet support K&R-style style functions (RFE #450)
 GTE_SKIP_TESTS += \
 	20020227-1.c \
@@ -170,6 +174,10 @@ GTE_SKIP_TESTS += \
 
 # Requires int of at least 32 bits.
 GTE_SKIP_TESTS += \
+	20061101-1.c \
+	pr29797-1.c \
+	pr45262.c \
+	pr66556.c \
 	vrp-5.c \
 	vrp-6.c
 
@@ -181,7 +189,8 @@ GTE_SKIP_TESTS += \
 	980526-2.c \
 	call-trap-1.c \
 	cmpsi-2.c \
-	pr31605.c
+	pr31605.c \
+	pr48197.c
 
 # BUGs? abnormal stop on stm8
 GTE_SKIP_TESTS += \
@@ -210,16 +219,19 @@ GTE_SKIP_TESTS += \
 	va-arg-trap-1.c \
 	zerolen-1.c
 
-# fails on at least stm8 and ds360 emulator (revisit later..)
+# TEst for implementation-defined struct layout
 GTE_SKIP_TESTS += \
-	20000223-1.c \
-	20021127-1.c \
-	20061101-1.c \
-	pr29797-1.c \
-	pr35163.c \
-	pr45262.c \
-	pr48197.c \
-	pr66556.c
+	20000223-1.c
+
+# Test for GCC behaviour when library function is locally overwritten
+GTE_SKIP_TESTS += \
+	20021127-1.c
+
+
+# fails on at least stm8 and ds360 emulator (revisit later..)
+#GTE_SKIP_TESTS += \
+#	pr35163.c \
+#	pr48197.c
 
 # misc syntax error
 GTE_SKIP_TESTS += \

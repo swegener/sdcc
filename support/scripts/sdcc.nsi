@@ -414,7 +414,7 @@ ${Section} "ucSim application files" SEC02
   SectionIn 1 2 3
   SetOutPath "$INSTDIR\bin"
   File "${SDCC_ROOT}\bin\s51.exe"
-  File "${SDCC_ROOT}\bin\shc08.exe"
+  File "${SDCC_ROOT}\bin\ucsim_m68hc08.exe"
   File "${SDCC_ROOT}\bin\sz80.exe"
   File "${SDCC_ROOT}\bin\sstm8.exe"
 ${SectionEnd}
@@ -1259,7 +1259,7 @@ ${Section} Uninstall SECUNINSTALL
 
 
   Delete "$INSTDIR\bin\s51.exe"
-  Delete "$INSTDIR\bin\shc08.exe"
+  Delete "$INSTDIR\bin\ucsim_m68hc08.exe"
   Delete "$INSTDIR\bin\sz80.exe"
   Delete "$INSTDIR\bin\sstm8.exe"
 

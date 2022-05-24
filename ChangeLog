@@ -1,3 +1,8 @@
+2022-05-24 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
+
+	* support/scripts/sdcc.nsi: install/deinstall more uCsim
+	  binaries with correct names
+
 2022-05-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: update for hc08 simulator name change

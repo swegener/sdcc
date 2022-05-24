@@ -291,7 +291,7 @@ $(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
 
 	@# always count ticks?
 	@$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
-	@grep -n FAIL $@ /dev/null || true
+	@grep -n FAIL $@ /dev/null || head -n 20 || true
 
 endif # PORT
 

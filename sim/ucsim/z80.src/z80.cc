@@ -96,6 +96,7 @@ cl_z80::init(void)
 void
 cl_z80::reset(void)
 {
+  cl_uc::reset();
   regs.SP= 0xffff;
   regs.AF= 0xffff;
   IFF1= false;

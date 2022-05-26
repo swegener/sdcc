@@ -60,7 +60,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 		 get_id_string(cpu_states, uc->state),
 		 AU(uc->PC), 
 		 uc->get_xtal());
-  con->dd_printf("Operation since last reset= (%lu vclks)\n",
+  con->dd_printf("Operation since last reset= %lu vclks\n",
 		 (unsigned long)(uc->vc.fetch) +
 		 (unsigned long)(uc->vc.rd) +
 		 (unsigned long)(uc->vc.wr));

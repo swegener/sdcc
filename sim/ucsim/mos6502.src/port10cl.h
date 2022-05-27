@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (mos65ce02cl.h)
+ * Simulator of microcontrollers (port10cl.h)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,28 +25,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef MOS65CE02CL_HEADER
-#define MOS65CE02CL_HEADER
+#ifndef PORT10CL_HEADER
+#define PORT10CL_HEADER
 
-#include "mos65c02scl.h"
-
-#define rB (B)
-#define rZ (Z)
+#include "hwcl.h"
 
 
-class cl_mos65ce02: public cl_mos65c02s
+enum port10_cfg
+  {
+    port10_on	= 0, // RW
+    port10_pin	= 1, // RW
+    port10_port	= 2, // RO
+    port10_nuof	= 3
+  };
+
+class cl_port10: public cl_hw
 {
 public:
-  u8_t B, Z;
-  class cl_cell8 cB, cZ;
+  class cl_cell8 *cdr; // Data reg, address= 1
+  class cl_cell8 *cddr; // Data direction reg, address= 0
+  class cl_cell8 *cpin; // Pins in cfg
 public:
-  cl_mos65ce02(class cl_sim *asim);
+  cl_port10(class cl_uc *auc, const char *aname);
+  virtual unsigned int cfg_size(void) { return port10_nuof; }
   virtual int init(void);
+  virtual void reset(void);
+  virtual u8_t val(void);
+  
+  virtual t_mem read(class cl_memory_cell *cell);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual const char *cfg_help(t_addr addr);
 
-  virtual void print_regs(class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 
 #endif
 
-/* End of mos6502.src/mos65ce02.cc */
+/* End of mos6502.src/port10cl.h */

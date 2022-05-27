@@ -116,6 +116,8 @@ cl_c65::set(t_mem val)
 cl_mos6502::cl_mos6502(class cl_sim *asim):
   cl_uc(asim)
 {
+  my_id= new chars();
+  *my_id= "MOS6502";
 }
 
 int
@@ -147,7 +149,7 @@ cl_mos6502::init(void)
 const char *
 cl_mos6502::id_string(void)
 {
-  return "MOS6502";
+  return my_id->c_str();
 }
 
 void

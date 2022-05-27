@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_mos65c02::cl_mos65c02(class cl_sim *asim):
   cl_mos6502(asim)
 {
+  *my_id= "MOS65C02";
 }
 
 int
@@ -50,12 +51,6 @@ cl_mos65c02::init(void)
   for (i=0x0b; i<=0xfb; i+= 0x10)
     itab[i]= instruction_wrapper_03;
   return 0;
-}
-
-const char *
-cl_mos65c02::id_string(void)
-{
-  return "MOS65C02";
 }
 
 void

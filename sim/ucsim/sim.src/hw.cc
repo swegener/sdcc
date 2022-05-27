@@ -535,7 +535,7 @@ cl_hw::next_displayer(void)
 void
 cl_hw::print_info(class cl_console_base *con)
 {
-  con->dd_printf("%s[%d]\n", id_string, id);
+  con->dd_printf("%s[%d] %s\n", id_string, id, on?"ON":"OFF");
   //print_cfg_info(con);
 }
 

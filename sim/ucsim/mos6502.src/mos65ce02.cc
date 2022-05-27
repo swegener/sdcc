@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_mos65ce02::cl_mos65ce02(class cl_sim *asim):
   cl_mos65c02s(asim)
 {
+  *my_id= "MOS65CE02";
 }
 
 int
@@ -47,12 +48,6 @@ cl_mos65ce02::init(void)
   RCV(Z);
 #undef RCV
   return 0;
-}
-
-const char *
-cl_mos65ce02::id_string(void)
-{
-  return "MOS65CE02";
 }
 
 

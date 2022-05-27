@@ -36,7 +36,14 @@ class cl_mos6510: public cl_mos6502
  public:
   cl_mos6510(class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual void mk_hw_elements(void);
+};
+
+class cl_mos8502: public cl_mos6510
+{
+ public:
+  cl_mos8502(class cl_sim *asim);
+  virtual int init(void);
 };
 
 

@@ -105,6 +105,7 @@ public:
   class cl_cell8 cA, cX, cY, cSP, cCC, ci8;
   class cl_it_src *src_irq, *src_nmi, *src_brk;
   bool set_b;
+  chars *my_id;
 public:
   cl_mos6502(class cl_sim *asim);
   virtual int init(void);

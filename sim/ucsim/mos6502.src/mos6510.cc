@@ -30,10 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "mos6510cl.h"
 
+#include "port10cl.h"
+
 
 cl_mos6510::cl_mos6510(class cl_sim *asim):
   cl_mos6502(asim)
 {
+  *my_id= "MOS6510";
 }
 
 int
@@ -43,10 +46,33 @@ cl_mos6510::init(void)
   return 0;
 }
 
-const char *
-cl_mos6510::id_string(void)
+void
+cl_mos6510::mk_hw_elements(void)
 {
-  return "MOS6510";
+  class cl_hw *h;
+
+  cl_mos6502::mk_hw_elements();
+
+  add_hw(h= new cl_port10(this, "port"));
+  h->init();
+}
+
+/*
+ * 8502
+ */
+
+cl_mos8502::cl_mos8502(class cl_sim *asim):
+  cl_mos6510(asim)
+{
+  *my_id= "MOS8502";
+}
+
+int
+cl_mos8502::init(void)
+{
+  cl_mos6510::init();
+  set_xtal(2000000);
+  return 0;
 }
 
 

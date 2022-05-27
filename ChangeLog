@@ -1,3 +1,8 @@
+2022-05-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/cases/Makefile.in: replace "echo -n" with
+	  "printf" to handle hosts that don't support "-n" option
+
 2022-05-24 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
 
 	* support/scripts/sdcc.nsi: install/deinstall more uCsim

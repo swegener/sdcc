@@ -973,7 +973,8 @@ qct_%.c: $(QC_TESTS_DIR)/%.c Makefile
 	@echo '#define main main_' >> $@
 
 	@#find matching main arguments, none or 2
-	@echo -n '#define MAINARGS' >> $@
+	@#(using printf instead of echo -n for better portability)
+	@printf '#define MAINARGS' >> $@
 	@(grep -q main.*argv $< && echo " 0, 0" || \
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 	@echo '#include "$<"' >> $@
@@ -990,7 +991,7 @@ tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 	@echo '#define main main_' >> $@
 
 	@#find matching main arguments, none or 2
-	@echo -n '#define MAINARGS' >> $@
+	@printf '#define MAINARGS' >> $@
 	@(grep -q main.*argv $< && echo " 0, 0" || \
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 
@@ -1043,7 +1044,7 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@echo 'void abort() {ASSERT(0);}' >> $@
 
 	@#find matching main arguments, none or 2
-	@echo -n '#define MAINARGS' >> $@
+	@printf '#define MAINARGS' >> $@
 	@(grep -q main.*argv $< && echo " 0, 0" || \
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 
@@ -1078,18 +1079,18 @@ MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(TEST_SRCS) Makefile
 	@echo
 	@echo populated MakeList...
 	@echo GTE_TEST_STEMS = $(GTE_TESTS:%.c=gte_%) > MakeList
-	@echo -n "gce: gcc torture execute.. "
+	@printf "gce: gcc torture execute.. "
 	@echo $(GTE_TESTS) | wc -w
-	@echo -n "m4: macro tests.. "
+	@printf "m4: macro tests.. "
 	@echo $(M4_TESTS) | wc -w
-	@echo -n "qct: QuickC tests.. "
+	@printf "qct: QuickC tests.. "
 	@echo $(QC_TEST_STEMS) | wc -w
-	@echo -n "tcc: tinycc tests.. "
+	@printf "tcc: tinycc tests.. "
 	@echo $(TCC_TEST_STEMS) | wc -w
 
-	@echo -n "tpl: template tests.. "
+	@printf "tpl: template tests.. "
 	@echo $(TPL_TEST_STEMS) | wc -w
-	@echo -n "tst: plain tests.. "
+	@printf "tst: plain tests.. "
 	@echo $(C_TEST_SRCS) | wc -w
 
 	@echo QC_TEST_STEMS = $(QC_TESTS:%.c=qct_%) >> MakeList

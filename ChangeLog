@@ -2,6 +2,8 @@
 
 	* support/regression/cases/Makefile.in: replace "echo -n" with
 	  "printf" to handle hosts that don't support "-n" option
+	* support/sdbinutils/include/ansidecl.h: disable some attributes
+	  when compiling with clang so the Mac OS snapshot will build
 
 2022-05-24 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
 

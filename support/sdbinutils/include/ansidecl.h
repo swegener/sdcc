@@ -292,9 +292,14 @@ So instead we use the macro below and test it against specific values.  */
 # endif
 #endif
 
+/* SDCC specific: Apple's clang 9.0.0 does not support alloc_size */
+/* or warn_unused_result attributes, but pretends to be a gcc     */
+/* version that does. Disable these attributes if clang detected  */
+/* so that our daily snapshots build correctly. */
+
 /* Attribute `alloc_size' was valid as of gcc 4.3.  */
 #ifndef ATTRIBUTE_RESULT_SIZE_1
-# if (GCC_VERSION >= 4003)
+# if !defined(__clang__) && (GCC_VERSION >= 4003)
 #  define ATTRIBUTE_RESULT_SIZE_1 __attribute__ ((alloc_size (1)))
 # else
 #  define ATTRIBUTE_RESULT_SIZE_1
@@ -302,7 +307,7 @@ So instead we use the macro below and test it against specific values.  */
 #endif
 
 #ifndef ATTRIBUTE_RESULT_SIZE_2
-# if (GCC_VERSION >= 4003)
+# if !defined(__clang__) && (GCC_VERSION >= 4003)
 #  define ATTRIBUTE_RESULT_SIZE_2 __attribute__ ((alloc_size (2)))
 # else
 #  define ATTRIBUTE_RESULT_SIZE_2
@@ -310,7 +315,7 @@ So instead we use the macro below and test it against specific values.  */
 #endif
 
 #ifndef ATTRIBUTE_RESULT_SIZE_1_2
-# if (GCC_VERSION >= 4003)
+# if !defined(__clang__) && (GCC_VERSION >= 4003)
 #  define ATTRIBUTE_RESULT_SIZE_1_2 __attribute__ ((alloc_size (1, 2)))
 # else
 #  define ATTRIBUTE_RESULT_SIZE_1_2
@@ -319,7 +324,7 @@ So instead we use the macro below and test it against specific values.  */
 
 /* Attribute `warn_unused_result' was valid as of gcc 3.3.  */
 #ifndef ATTRIBUTE_WARN_UNUSED_RESULT
-# if GCC_VERSION >= 3003
+# if !defined(__clang__) && (GCC_VERSION >= 3003)
 #  define ATTRIBUTE_WARN_UNUSED_RESULT __attribute__ ((warn_unused_result))
 # else
 #  define ATTRIBUTE_WARN_UNUSED_RESULT

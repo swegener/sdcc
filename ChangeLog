@@ -1,3 +1,9 @@
+2022-05-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/sdbinutils/include/ansidecl.h: revert to previous
+	* support/sdbinutils/libiberty/Makefile.in: check local include
+	  files first
+
 2022-05-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/cases/Makefile.in: replace "echo -n" with

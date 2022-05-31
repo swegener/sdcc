@@ -184,8 +184,6 @@ GTE_SKIP_TESTS += \
 # Bugs? These fail on stm8.
 GTE_SKIP_TESTS += \
 	20001124-1.c \
-	20010116-1.c \
-	20070424-1.c \
 	980526-2.c \
 	call-trap-1.c \
 	cmpsi-2.c \
@@ -1037,11 +1035,11 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@echo '#endif // __SDCC' >> $@
 
 # redirect stuff a bit.
-	@grep -q exit $< && echo "void exit__substitute(int i){ASSERT(!i);}" >> $@ || :
-	@grep -q exit $< && echo "#define exit exit__substitute" >> $@ || :
-	@echo '#define main main_' >> $@
-	@echo '#define assert ASSERT' >> $@
-	@echo 'void abort() {ASSERT(0);}' >> $@
+	@grep -q exit $< && echo "#include <setjmp.h>" >> $@ \
+	                 && echo "jmp_buf after_main;" >> $@ \
+	                 && echo "void exit__substitute(int i){ASSERT(!i); longjmp(after_main, 1);}" >> $@ \
+	                 && echo "#define exit exit__substitute" >> $@ || :
+	@printf '#define main main_\n#define assert ASSERT\nvoid abort() {ASSERT(0);}\n' >> $@
 
 	@#find matching main arguments, none or 2
 	@printf '#define MAINARGS' >> $@
@@ -1049,8 +1047,9 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
 
 	@echo '#include "$<"' >> $@
-	@printf 'void __runSuite(void) { __prints("Running main\\n"); main_(MAINARGS); }' >> $@
-	@echo >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n");' >> $@
+	@grep -q exit $< && echo 'if(!setjmp(after_main))' >> $@ || :
+	@printf 'main_(MAINARGS); }\n' >> $@
 	@echo 'const int __numCases = 1;' >> $@
 	@echo '__code const char * __getSuiteName(void) { return "gte/$*"; }' >> $@
 

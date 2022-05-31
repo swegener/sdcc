@@ -630,7 +630,7 @@ GTE_SKIP_TESTS += \
 	20040308-1.c \
 	20040811-1.c
 
-# BUG: Caught signal 11: SIGSEGV
+# Bug #3405
 GTE_SKIP_TESTS += \
 	931004-12.c
 

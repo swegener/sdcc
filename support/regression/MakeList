@@ -223,6 +223,12 @@ EXCLUDE_uc6502 += \
 	gte_991019-1 \
 	gte_pr30185
 
+# TODO: Check these
+EXCLUDE_ARCH_pdk += \
+	gte_980526-2 \
+	gte_991019-1 \
+	gte_call-trap-1
+
 # Target doesn't have enough memory
 EXCLUDE_ARCH_pdk += \
 	gte_20041218-1 \
@@ -246,6 +252,7 @@ EXCLUDE_pdk14 += \
 	gte_pr30185 \
 	gte_pr33669 \
 	gte_pr50865 \
+	gte_20001124-1 \
 	gte_991019-1
 EXCLUDE_mcs51-small += \
 	gte_loop-ivopts-2 \

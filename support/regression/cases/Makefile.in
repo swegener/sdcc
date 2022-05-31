@@ -102,7 +102,7 @@ GTE_SKIP_TESTS = \
 	stkalign.c \
 	pr49390.c
 
-# uses typeof
+# uses typeof. typeof was a GCC extension, which became standard in C23. RFE #738.
 GTE_SKIP_TESTS += \
 	20020412-1.c \
 	20020412-1.c \
@@ -168,13 +168,14 @@ GTE_SKIP_TESTS += \
 	20050215-1.c \
 	strlen-6.c
 
-# Test fpr GCC implementation-defined bit-filed layout
+# Test for GCC implementation-defined bit-field layout
 GTE_SKIP_TESTS += \
 	bitfld-2.c
 
 # Requires int of at least 32 bits.
 GTE_SKIP_TESTS += \
 	20061101-1.c \
+	cmpsi-2.c \
 	pr29797-1.c \
 	pr45262.c \
 	pr66556.c \
@@ -183,11 +184,6 @@ GTE_SKIP_TESTS += \
 
 # Bugs? These fail on stm8.
 GTE_SKIP_TESTS += \
-	20001124-1.c \
-	980526-2.c \
-	call-trap-1.c \
-	cmpsi-2.c \
-	pr31605.c \
 	pr48197.c
 
 # BUGs? abnormal stop on stm8
@@ -217,19 +213,13 @@ GTE_SKIP_TESTS += \
 	va-arg-trap-1.c \
 	zerolen-1.c
 
-# TEst for implementation-defined struct layout
+# Test for implementation-defined struct layout
 GTE_SKIP_TESTS += \
 	20000223-1.c
 
 # Test for GCC behaviour when library function is locally overwritten
 GTE_SKIP_TESTS += \
 	20021127-1.c
-
-
-# fails on at least stm8 and ds360 emulator (revisit later..)
-#GTE_SKIP_TESTS += \
-#	pr35163.c \
-#	pr48197.c
 
 # misc syntax error
 GTE_SKIP_TESTS += \

@@ -1,3 +1,8 @@
+2022-06-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c:
+	  Add an assertion to show the underlying issue of bug #3401.
+
 2022-05-31 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/cases/Makefile.in:

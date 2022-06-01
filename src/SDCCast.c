@@ -4116,7 +4116,8 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           !IS_CHAR (RTYPE (tree)) &&
           IS_CHAR(LTYPE(tree)))
         {
-          unsigned long litval = AST_ULONG_VALUE (tree->right); 
+          wassert (tree->right->type == EX_VALUE);
+          unsigned long litval = AST_ULONG_VALUE (tree->right);
           if ((litval >= 0) && (litval <= 255) && reduceTypeAllowed)
             {
               ast *newAst = newAst_VALUE (valueFromLit (litval));

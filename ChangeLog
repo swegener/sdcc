@@ -1,5 +1,11 @@
 2022-06-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3406.c:
+	  Fix bug #3406.
+
+2022-06-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCast.c:
 	  Add an assertion to show the underlying issue of bug #3401.
 

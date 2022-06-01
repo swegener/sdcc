@@ -5786,7 +5786,7 @@ static void genSend (const iCode *ic)
     if (!isRegDead (argreg->aopu.aop_reg[i]->rIdx, ic))
       for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
           {
-            if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
+            if (walk2->op != CALL && IC_LEFT (walk2) && IS_ITEMP (IC_LEFT (walk2)))
               UNIMPLEMENTED;
 
             if (walk2->op == CALL || walk2->op == PCALL)
@@ -8249,7 +8249,9 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               pushed_hl = true;
             }
 
-          if (!offset)
+          if ((aopInReg (right, offset, IYL_IDX)  || aopInReg (right, offset, IYH_IDX)) && !HAS_IYL_INST) // From here on all codepaths needs to use right as operand.
+            UNIMPLEMENTED;
+          else if (!offset)
             {
               if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && aopInReg (right, offset, A_IDX))
                 emit3 (A_NEG, 0, 0);

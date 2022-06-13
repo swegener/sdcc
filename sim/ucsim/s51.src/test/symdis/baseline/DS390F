@@ -11,7 +11,7 @@ var _main rom[0x008e]
 dc 0x0000 0x00090
 
 0x00000    <__interrupt_vect>:
-0x00000    02 00 03 75 LJMP   0x00375[0K
+0x00000  ? 02 00 03 75 LJMP   0x00375[0K
 0x00004  ? 00          NOP[0K
 0x00005  ? aa 75       MOV    R2,0x75[0K
 0x00007  ? 00          NOP[0K

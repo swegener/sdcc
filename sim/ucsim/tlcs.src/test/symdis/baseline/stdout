@@ -5,19 +5,24 @@ under certain conditions; type `show c' for details.
 var _main nas[0x020b]
 dc 0x0100 0x0121
 0x0100  ? 3e a0 ff          LD SP,0xffa0[0K
-0x0103  ? 3a 00 80          LD HL,0x8000[0K
-0x0106  ? 36 00             LD A,00[0K
-0x0108  ? 1c 07 02          CALL 0x0207[0K
-0x010b  ? 7f c0 ff          CP HL,0xffc0[0K
-0x010e  ? c6 05             JR Z,0x0115[0K
-0x0110  ? ea 26             LD (HL),A[0K
-0x0112  ? 92                INC HL[0K
-0x0113  ? c8 f3             JR 0x0108[0K
-0x0115  ? 1c 07 02          CALL 0x0207[0K
-0x0118  ? 1c 07 02          CALL 0x0207[0K
-0x011b  ? 1c 0d 02          CALL 0x020d[0K
-0x011e  ? 1c 0b 02          CALL 0x020b <_main>[0K
-0x0121  ? 01                HALT[0K
+0x0103  ? 1c 07 02          CALL 0x0207[0K
+0x0106  ? 1c 07 02          CALL 0x0207[0K
+0x0109  ? 1c 0d 02          CALL 0x020d[0K
+0x010c  ? 1c 0b 02          CALL 0x020b <_main>[0K
+0x010f  ? 01                HALT[0K
+0x0110  ? 81                INC C[0K
+0x0111  ? a7                SRLA[0K
+0x0112  ? fe                ?[0K
+0x0113  ? 2a                LD D,A[0K
+0x0114  ? cf e1             JR NC,0x00f7[0K
+0x0116  ? b2 ab             RES 2,(0xffab)[0K
+0x0118  ? b1 08             RES 1,(0xff08)[0K
+0x011a  ? cc d9             JR NOV,0x00f5[0K
+0x011c  ? fb                ?[0K
+0x011d  ? cc c5             JR NOV,0x00e4[0K
+0x011f  ? db                ?[0K
+0x0120  ? 22                LD A,D[0K
+0x0121  ? 36 7b             LD A,7b[0K
 dc 0x0207 0x020c
 0x0207  ? 37 d3 4e          LD (0xffd3),4e[0K
 0x020a  ? 1e                RET[0K

@@ -13,3 +13,7 @@ stdout:	test.ihx test.cmd
 
 
 include test-lib.mk
+
+clean:
+	rm -f *.d *.lk *.lst *.map *.noi *.rel *.sym *.cdb
+	rm -f test.asm

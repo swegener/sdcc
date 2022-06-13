@@ -149,7 +149,11 @@ public:
 
   virtual t_mem read(void);
   virtual t_mem read(enum hw_cath skip) { return(read()); }
+  virtual t_mem read(class cl_memory_cell *owner, enum hw_cath skip)
+  { return read(owner); }
+  virtual t_mem read(class cl_memory_cell *owner);
   virtual t_mem write(t_mem val);
+  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 
   virtual class cl_banker *get_banker(void) { return NULL; }
 };
@@ -163,6 +167,7 @@ class cl_bank_switcher_operator: public cl_memory_operator
 			    class cl_banker *the_banker);
   
   virtual t_mem write(t_mem val);
+  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
   virtual class cl_banker *get_banker(void) { return banker; }
 };
 
@@ -178,7 +183,10 @@ public:
 
   virtual t_mem read(void);
   virtual t_mem read(enum hw_cath skip);
+  virtual t_mem read(class cl_memory_cell *owner);
+  virtual t_mem read(class cl_memory_cell *owner, enum hw_cath skip);
   virtual t_mem write(t_mem val);
+  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 };
 
 class cl_event_break_operator: public cl_memory_operator
@@ -205,6 +213,7 @@ public:
 		    class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem write(t_mem val);
+  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 };
 
 class cl_read_operator: public cl_event_break_operator
@@ -214,6 +223,7 @@ public:
 		   class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem read(void);
+  virtual t_mem read(class cl_memory_cell *owner);
 };
 
 
@@ -242,7 +252,8 @@ class cl_memory_cell: public cl_cell_data
  protected:
   uchar width;
   uchar flags;
-  class cl_memory_operator *operators;
+  //class cl_memory_operator *operators;
+  class cl_memory_operator **ops;
  public:
   cl_memory_cell();
   cl_memory_cell(uchar awidth);
@@ -272,7 +283,8 @@ class cl_memory_cell: public cl_cell_data
   virtual t_mem W(t_mem val) { return write(val); }
   virtual t_mem set(t_mem val);
   virtual t_mem download(t_mem val);
-  
+
+  virtual int nuof_ops(void);
   virtual void append_operator(class cl_memory_operator *op);
   virtual void prepend_operator(class cl_memory_operator *op);
   virtual void remove_operator(class cl_memory_operator *op);

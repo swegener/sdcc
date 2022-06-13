@@ -19,7 +19,7 @@ Address spaces:
   0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
   0x000000-0x000007        8 regs (8,%02x,0x%01lx)
   0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -43,6 +43,7 @@ sfr[0xd0] sfr_0000d0
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[80]
 Operators:
+  [0] bank_switcher
 
 # Define the control bits
 var bank sfr[0xd0][4:3]
@@ -98,7 +99,7 @@ Address spaces:
   0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
   0x000000-0x000007        8 regs (8,%02x,0x%01lx)
   0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -139,7 +140,7 @@ Address spaces:
   0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
   0x000000-0x000007        8 regs (8,%02x,0x%01lx)
   0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -174,7 +175,7 @@ Address spaces:
   0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
   0x000000-0x000007        8 regs (8,%02x,0x%01lx)
   0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -202,7 +203,7 @@ info reg
 @R0 00 .  ACC= 0x00   0 .  B= 0x00
 @R1 01 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x83 131 .
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 1
 0xd0[4:3] bank:                     0b---01--- 0x01 '.'   1
@@ -212,7 +213,7 @@ info reg
 @R0 20    ACC= 0x00   0 .  B= 0x00
 @R1 21 !  PSW= 0x08 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x83 131 .
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 2
 0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
@@ -222,7 +223,7 @@ info reg
 @R0 43 C  ACC= 0x00   0 .  B= 0x00
 @R1 84 .  PSW= 0x10 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x83 131 .
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 set mem bank 3
 0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
@@ -232,6 +233,5 @@ info reg
 @R0 41 A  ACC= 0x00   0 .  B= 0x00
 @R1 e7 .  PSW= 0x18 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 07 06 05 04 03 02 01 00
-   DPTR= 0x0000 @DPTR= 0x83 131 .
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
-  00. bank_switcher

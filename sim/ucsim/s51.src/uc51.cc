@@ -871,7 +871,7 @@ cl_51core::make_address_spaces(void)
   bits->init();
   address_spaces->add(bits);
 
-  dptr= new cl_address_space("dptr", 0, 2, 8);
+  dptr= new cl_address_space("dptr", 0, 4, 8);
   dptr->init();
   address_spaces->add(dptr);
 }

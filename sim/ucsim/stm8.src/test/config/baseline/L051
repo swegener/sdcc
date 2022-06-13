@@ -1,8 +1,7 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-ucsim version [ELIDED]
 Type of microcontroller: STM8 AL,L 051F3
 Controller has 17 hardware element(s).
    on cpu[0]
@@ -24,8 +23,8 @@ Controller has 17 hardware element(s).
    on flash[0]
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
-SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x1500
- ? 0x08000 00 00          neg    (0x00,SP)[0K
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08000  ? 00 00          neg    (0x00,SP)[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
   0x000000-0x0017ff     6144 ram_chip (8,%02x,0x%04lx)

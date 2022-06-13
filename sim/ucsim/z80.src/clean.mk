@@ -5,7 +5,9 @@ clean:
 	rm -f .[a-z]*~
 	rm -f sz80 sz80.exe
 	rm -f ucsim_z80 ucsim_z80.exe
-	$(MAKE) -C test -f clean.mk clean
+ifneq ($(shell test -f test/Makefile && echo ok), )
+	$(MAKE) -C test clean
+endif
 
 
 # Deleting all files created by configuring or building the program
@@ -13,7 +15,7 @@ clean:
 distclean: clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
-	$(MAKE) -C test -f clean.mk distclean
+	rm -f test/Makefile
 
 
 # Like clean but some files may still exist

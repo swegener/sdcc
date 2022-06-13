@@ -14,36 +14,43 @@ sfr[0xe9] sfr_0000e9
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[105]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xea
 sfr[0xea] sfr_0000ea
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[106]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xeb
 sfr[0xeb] sfr_0000eb
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[107]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xec
 sfr[0xec] sfr_0000ec
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[108]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xed
 sfr[0xed] sfr_0000ed
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[109]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xee
 sfr[0xee] sfr_0000ee
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[110]
 Operators:
+  [0] hw:mdu
 memory cell sfr 0xef
 sfr[0xef] sfr_0000ef
 cell width=8 mask=ff flags=0
   decoded to sfr_chip[111]
 Operators:
+  [0] hw:mdu
 
 # 0x12345678 / 0x4321 = 0x456c r 0x1f8c
 set mem sfr 0xe9 0x78 0x56 0x34 0x12
@@ -107,10 +114,3 @@ set mem sfr 0xef 0x08
 0xef                      08 .
 dump sfr 0xe9 0xec
 0xe9                      43 65 87 00 Ce..
-  00. hw:mdu
-  00. hw:mdu
-  00. hw:mdu
-  00. hw:mdu
-  00. hw:mdu
-  00. hw:mdu
-  00. hw:mdu

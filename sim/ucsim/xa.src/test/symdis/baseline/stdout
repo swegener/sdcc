@@ -8,7 +8,7 @@ var forever rom[0x0008]
 dc 0x0000 0x0009
 
 0x0000    <init>:
-0x0000    d5 00 01          JMP   0x0004 <main>[0K
+0x0000  ? d5 00 01          JMP   0x0004 <main>[0K
 0x0003  ? 00                NOP   [0K
 
 0x0004    <main>:

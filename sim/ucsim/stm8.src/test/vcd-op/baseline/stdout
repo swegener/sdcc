@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -13,7 +13,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -23,6 +22,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 
 # For ticks (500 ns) of changing data
 set mem rom[0x100] 0
@@ -46,16 +47,17 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000000375000000 s
+  Last event: 0.000000000000000 s
   Pause time: 
   Simul time: 0.000000500000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd pause
 Paused
 info hw vcd
@@ -63,7 +65,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -73,6 +74,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 4
 0x00100                      04 .
 tick
@@ -104,7 +107,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -114,6 +116,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd restart
 Unpaused
 info hw vcd
@@ -121,7 +125,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -131,6 +134,8 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 12
 0x00100                      0c .
 tick
@@ -152,16 +157,17 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000001875000000 s
+  Last event: 0.000001500000000 s
   Pause time: 
   Simul time: 0.000002000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd pausetime 300 ns
 set hw vcd pause
 Paused (pause limit 0.000000300000000 s)
@@ -170,7 +176,6 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -180,9 +185,10 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 # vcd[0] should be clocked (on) until we have exceeded the pause limit.
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -213,7 +219,6 @@ set mem rom[0x100] 16
 0x00100                      10 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -244,7 +249,6 @@ set mem rom[0x100] 17
 0x00100                      11 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
@@ -275,12 +279,11 @@ set mem rom[0x100] 18
 0x00100                      12 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -306,12 +309,11 @@ set mem rom[0x100] 19
 0x00100                      13 .
 tick
 conf
-ucsim version [ELIDED]
 Type of microcontroller: STM8 S,AF 208
 Controller has 24 hardware element(s).
    on cpu[0]
    on simif[0]
-  off vcd[0]
+   on vcd[0]
    on dreg[0]
    on dport[0]
    on clk[0]
@@ -355,16 +357,17 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000002375000000 s
+  Last event: 0.000002000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000003000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd restart
 Unpaused
 info hw vcd
@@ -372,16 +375,17 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000000625000000 s
+  Start time: 0.000000700000000 s
   Last event: 0.000003000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000003000000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set mem rom[0x100] 24
 0x00100                      18 .
 tick
@@ -398,23 +402,23 @@ vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
-  Start time: 0.000000625000000 s
-  Last event: 0.000003250000000 s
+  Start time: 0.000000700000000 s
+  Last event: 0.000003000000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000003375000000 s
   Variables:
     Address           Symbol
     rom[0x00100]      
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
 set hw vcd stop
 info hw vcd
 vcd[0] value change dump
   Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
-  File: [ELIDED]
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
@@ -424,4 +428,5 @@ vcd[0] value change dump
   Variables:
     Address           Symbol
     rom[0x00100]      
-now 0.000002375000000 event 0.000002000000000 pausetime 0.000000300000000
+Configuration memory of vcd
+0x00 00000000 . Turn ticking of this peripheral on/off (bool, RW)

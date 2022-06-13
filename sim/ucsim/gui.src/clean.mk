@@ -1,6 +1,7 @@
 # uCsim gui.src/clean.mk
 
 PKGS		= serio.src
+top_srcdir	= ..
 
 # Deleting all files created by building the program
 # --------------------------------------------------
@@ -10,7 +11,7 @@ clean_local:
 
 clean: clean_local
 	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk clean;\
+	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk clean;\
 	done
 
 
@@ -22,7 +23,7 @@ distclean_local: clean_local
 
 distclean: distclean_local
 	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk distclean;\
+	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk distclean;\
 	done
 
 
@@ -30,7 +31,7 @@ distclean: distclean_local
 # -----------------------------------------
 mostlyclean: clean_local
 	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f clean.mk mostlyclean;\
+	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk mostlyclean;\
 	done
 
 

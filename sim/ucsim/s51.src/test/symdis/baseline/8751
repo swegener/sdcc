@@ -10,15 +10,13 @@ var __mcs51_genXRAMCLEAR rom[0x003b]
 var _main rom[0x0062]
 var __sdcc_external_startup rom[0x0064]
 dc 0x0000 0x00067
-
-0x0000    <.reset>:
-0x0000    02 00 06 LJMP   0x0006 <__sdcc_gsinit_startup>[0K
+0x0000  ? 02 00 06 LJMP   0x0006 <__sdcc_gsinit_startup>[0K
 
 0x0003    <__sdcc_program_startup>:
 0x0003  ? 02 00 62 LJMP   0x0062 <_main>[0K
 
 0x0006    <__sdcc_gsinit_startup>:
-0x0006    75 81 0a MOV    0x81 <SP>,#0x0a[0K
+0x0006  ? 75 81 0a MOV    0x81 <SP>,#0x0a[0K
 0x0009  ? 12 00 64 LCALL  0x0064 <__sdcc_external_startup>[0K
 0x000c  ? e5 82    MOV    A,0x82 <DPL>[0K
 0x000e  ? 60 03    JZ     0x0013 <__mcs51_genXINIT>[0K

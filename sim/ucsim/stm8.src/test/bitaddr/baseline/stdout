@@ -1,4 +1,4 @@
-uCsim [ELIDED], Copyright (C) [ELIDED] Daniel Drotos.
+uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
@@ -113,8 +113,8 @@ dump rom[0x1000] 0x100f
 0x01005                      20                       
 0x01006                      0b01000000 0x40 '@'  64
         lone1:               0b-1------ 0x01 '.'   1
-0x01007                      80 6a 30 dd 9a b0 19 b7 .j0.....
-0x0100f                      0f                      .
+0x01007                      80 f5 d9 d9 2c ac e4 39 ....,..9
+0x0100f                      69                      i
 
 # Dumping some specific bits from a location works
 dump rom[0x1003][6:2]
@@ -130,7 +130,7 @@ dump rom[0x1003][6:2]
 # Specifying a format disables all the smarts
 dump /h rom[0x1000] 0x100f
 0x01000 81 62 04 08 10 20 40 80 .b... @.
-0x01008 6a 30 dd 9a b0 19 b7 0f j0......
+0x01008 f5 d9 d9 2c ac e4 39 69 ...,..9i
 
 # Dumping a region with every other bit labelled...
 dump 0x1004
@@ -142,8 +142,8 @@ dump 0x1004
 0x01005                      20                       
 0x01006                      0b01000000 0x40 '@'  64
         lone1:               0b-1------ 0x01 '.'   1
-0x01007                      80 6a 30 dd 9a b0 19 b7 .j0.....
-0x0100f                      0f 36 cf f5 b9 1e d5 d1 .6......
+0x01007                      80 f5 d9 d9 2c ac e4 39 ....,..9
+0x0100f                      69 7e 0d 9f 82 7a ad dd i~...z..
 
 # And with partial views...
 dump 0x1004[6:4]

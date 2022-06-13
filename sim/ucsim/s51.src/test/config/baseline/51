@@ -22,7 +22,7 @@ Controller has 13 hardware element(s).
 @R0 76 v  ACC= 0x00   0 .  B= 0x00
 @R1 73 s  PSW= 0x00 CY=0 AC=0 OV=0 P=0
 SP 0x07 -> 6b 95 bc 8b c9 fc 58 41
-   DPTR= 0x0000 @DPTR= 0x83 131 .
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
@@ -38,7 +38,7 @@ Address spaces:
   0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
   0x000000-0x000007        8 regs (8,%02x,0x%01lx)
   0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated

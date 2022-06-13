@@ -560,14 +560,14 @@ cl_uc390::push_byte (t_mem uc)
       if (sp == 0) // overflow SP
         sfr->write(R51_ESP, sfr->read(R51_ESP) + 1);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
-      write_mem (MEM_IXRAM_ID, sp, uc); // fixme
+      ixram->write(sp, uc);//write_mem (MEM_IXRAM_ID, sp, uc); // fixme
     }
   else
     {
-      class cl_memory_cell *stck;
-
-      stck = iram->get_cell (sp);
-      stck->write (uc);
+      //class cl_memory_cell *stck;
+      iram->write(sp, uc);
+      //stck = iram->get_cell (sp);
+      //stck->write (uc);
     }
 }
 
@@ -581,7 +581,7 @@ cl_uc390::pop_byte (void)
     {
       sp = sfr->read (SP);
       sp += (sfr->read (R51_ESP) & 0x3) * 256;
-      temp = read_mem (MEM_IXRAM_ID, sp); // fixme
+      temp = ixram->read(sp);//read_mem (MEM_IXRAM_ID, sp); // fixme
       sp = sfr->write(SP, sfr->read(SP) - 1);
       if (sp == 0xff) // underflow SP
         sfr->write(R51_ESP, sfr->read(R51_ESP) - 1);
@@ -589,11 +589,10 @@ cl_uc390::pop_byte (void)
     }
   else
     {
-      class cl_memory_cell *stck;
-
-      stck = iram->get_cell (sfr->get (SP));
-      temp = stck->read();
-      sp = sfr->write(SP, sfr->read(SP) - 1);
+      //class cl_memory_cell *stck;
+      //stck = iram->get_cell (sfr->get (SP));
+      temp = iram->read(sp= sfr->read(SP));//stck->read();
+      sfr->write(SP, sp - 1);
       return temp;
     }
 }

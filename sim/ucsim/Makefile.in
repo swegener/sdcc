@@ -82,7 +82,7 @@ uninstall:
 clean:
 	$(MAKE) -f $(srcdir)/clean.mk clean EXEEXT=$(EXEEXT)
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f clean.mk clean EXEEXT=$(EXEEXT) ;\
+	  $(MAKE) -C $$pkg -f $$(cd $(top_srcdir)&&pwd)/$$pkg/clean.mk top_srcdir=$$(cd $(top_srcdir)&&pwd) clean EXEEXT=$(EXEEXT) ;\
 	done
 
 
@@ -91,16 +91,16 @@ clean:
 distclean: clean
 	$(MAKE) -f $(srcdir)/clean.mk distclean
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f clean.mk distclean ;\
+	  $(MAKE) -C $$pkg -f $$(cd $(top_srcdir)&&pwd)/$$pkg/clean.mk top_srcdir=$$(cd $(top_srcdir)&&pwd) distclean ;\
 	done
-	@for pkg in $(PKGS) sim.src; do\
-		if test -d $$pkg/test; then \
-			$(MAKE) -C $$pkg/test clean ;\
-			if test -f $$pkg/test/Makefile.in; then rm -f $$pkg/test/Makefile; fi ;\
-		fi ;\
-	done
-	rm -rf doc/*~ doc/*.bak Makefile packages.mk libtool
-	$(MAKE) -C example clean
+#	@for pkg in $(PKGS) sim.src; do\
+#		if test -d $$pkg/test; then \
+#			$(MAKE) -C $$pkg/test clean ;\
+#			if test -f $$pkg/test/Makefile.in; then rm -f $$pkg/test/Makefile; fi ;\
+#		fi ;\
+#	done
+	rm -rf doc/*~ doc/*.bak doc/Makefile
+	rm -f Makefile packages.mk libtool
 
 
 # Like clean but some files may still exist

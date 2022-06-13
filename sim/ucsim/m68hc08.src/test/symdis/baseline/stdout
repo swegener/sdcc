@@ -16,8 +16,8 @@ dc 0x8000 0x8028
 0x8009  ? cc 80 21    jmp    $8021 <__sdcc_program_startup>[0K
 
 0x800c    <__sdcc_init_data>:
-0x800c  ? 45 00 00    ldhx   #$0000 <.reset>[0K
-0x800f  ? 65 00 00    cphx   #$0000 <.reset>[0K
+0x800c  ? 45 00 00    ldhx   #$0000[0K
+0x800f  ? 65 00 00    cphx   #$0000[0K
 0x8012  ? 27 0a       beq    $801e[0K
 0x8014  ? d6 80 2b    lda    $802b,x[0K
 0x8017  ? d7 00 82    sta    $0082,x[0K

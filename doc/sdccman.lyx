@@ -44319,7 +44319,7 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
-For Functions that do not have variable arguments: The first parameter is
+For Functions that do not have variable arguments: the first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in hl.
  If it has 32 bits, it is passed in hlde.
@@ -44402,7 +44402,7 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
-For Functions that do not have variable arguments: The first parameter is
+For Functions that do not have variable arguments: the first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in hl.
  If it has 32 bits, it is passed in hlde.
@@ -44462,7 +44462,7 @@ For functions that have variable arguments: All parameters are passed on
 \end_layout
 
 \begin_layout Standard
-For Functions that do not have variable arguments: The first parameter is
+For Functions that do not have variable arguments: the first parameter is
  passed in a if it has 8 bits.
  If it has 16 bits it is passed in de.
  If it has 32 bits, it is passed in debc.
@@ -44655,9 +44655,9 @@ For functions that have variable arguments, all parameters are passed on
  the stack.
  For other functions, if the first parameter has 8 or 16 bits, it is passed
  in a or x.
- If the first parameter has 8 bits, and the second has 16 bits, the second
- is passed in x.
- If the first parameter has 16 bits, and the second has 8 bits, the second
+ If the first parameter is passed in a, and the second has 16 bits, the
+ second is passed in x.
+ If the first parameter is passed in x, and the second has 8 bits, the second
  is passed in a.
  All other parameters are passed on the stack.
  Independent of their size, struct / union parameters and all following

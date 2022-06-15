@@ -1,7 +1,37 @@
 2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* Merge from parser branch.
+
+2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h:
+	  Lexer support for complex numbers and decimal floating point (to emit an error message for these unsupported features instead of a non-descriptive syntax error)
+	* tests/bitintconst.c.in:
+	  Test for bug #3454.
+
+2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCCval.c:
+	  Fix bug #3454.
+
+2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* doc/sdccman.lyx:
 	  Fix two typos in the manual.
+	  
+2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/pic14/ralloc.c,
+	  src/pic16/ralloc.c,
+	  src/altlex.c,
+	  src/Makefile.in:
+	  Steps towards a lexer suitable for C2X, inspired by the Jutta Degener grammar as extended by Jens Gustedt.
 
 2022-06-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

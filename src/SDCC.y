@@ -1,7 +1,10 @@
 /*-----------------------------------------------------------------------
 
-  SDCC.y - parser definition file for sdcc :
-          Written By : Sandeep Dutta . sandeep.dutta@usa.net (1997)
+  SDCC.y - parser definition file for sdcc
+
+  Written By : Sandeep Dutta . sandeep.dutta@usa.net (1997)
+  Revised by : Philipp Klaus Krause krauspeh@informatik.uni-freiburg.de (2022)
+  Using inspiration from the grammar by Jutta Degener as extended by Jens Gustedt (under Expat license)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -70,7 +73,7 @@ bool uselessDecl = TRUE;
 #define YYDEBUG 1
 
 %}
-%expect 11
+%expect 9
 
 %union {
     attribute  *attr;       /* attribute                              */
@@ -88,17 +91,18 @@ bool uselessDecl = TRUE;
 
 %token <yychar> IDENTIFIER TYPE_NAME ADDRSPACE_NAME
 %token <val> CONSTANT
-%token SIZEOF ALIGNOF TYPEOF OFFSETOF
+%token SIZEOF TYPEOF OFFSETOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
-%token ATTRIBCOLON
+%token ATTR_START TOK_SEP
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
-%token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
+%token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA ELLIPSIS CRITICAL
 %token NONBANKED BANKED SHADOWREGS SD_WPARAM
-%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT SD_BITINT
+%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT SD_BITINT DECIMAL32 DECIMAL64 DECIMAL128
+%token COMPLEX IMAGINARY
 %token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY TRAP
@@ -107,7 +111,8 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPUSH_VALUE_AT_ADDRESS IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+%token ALIGNAS ALIGNOF ATOMIC
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -572,6 +577,12 @@ type_specifier
                   SPEC_NOUN($$) = V_FLOAT;
                   ignoreTypedefType = 1;
                }
+   | DOUBLE    {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_FLOAT;
+                  ignoreTypedefType = 1;
+                  werror (W_DOUBLE_UNSUPPORTED);
+               }
    | SIGNED    {
                   $$=newLink(SPECIFIER);
                   $$->select.s.b_signed = 1;
@@ -582,16 +593,36 @@ type_specifier
                   SPEC_USIGN($$) = 1;
                   ignoreTypedefType = 1;
                }
-   | SD_BOOL   {
-                  $$=newLink(SPECIFIER);
-                  SPEC_NOUN($$) = V_BOOL;
-                  ignoreTypedefType = 1;
-               }
    | SD_BITINT '(' constant_expr ')'  {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BITINT;
                   SPEC_BITINTWIDTH($$) = (unsigned int) ulFromVal(constExprValue($3, TRUE));
                   ignoreTypedefType = 1;
+               }
+   | SD_BOOL   {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_BOOL;
+                  ignoreTypedefType = 1;
+               }
+   | COMPLEX   {
+                  $$=newLink(SPECIFIER);
+                  werror (E_COMPLEX_UNSUPPORTED);
+               }
+   | IMAGINARY {
+                  $$=newLink(SPECIFIER);
+                  werror (E_COMPLEX_UNSUPPORTED);
+               }
+   | DECIMAL32 {
+                  $$=newLink(SPECIFIER);
+                  werror (E_DECIMAL_FLOAT_UNSUPPORTED);
+               }
+   | DECIMAL64 {
+                  $$=newLink(SPECIFIER);
+                  werror (E_DECIMAL_FLOAT_UNSUPPORTED);
+               }
+   | DECIMAL128 {
+                  $$=newLink(SPECIFIER);
+                  werror (E_DECIMAL_FLOAT_UNSUPPORTED);
                }
    | struct_or_union_specifier  {
                                    uselessDecl = FALSE;
@@ -1457,7 +1488,7 @@ type_qualifier_list
 
 parameter_type_list
         : parameter_list
-        | parameter_list ',' VAR_ARGS { $1->vArgs = 1;}
+        | parameter_list ',' ELLIPSIS { $1->vArgs = 1;}
         ;
 
 parameter_list
@@ -1683,11 +1714,11 @@ attribute_specifier_sequence_opt
    ;
 
 attribute_specifier
-   : '[' '[' attribute_list ']' ']'
+   : ATTR_START attribute_list ']' ']'
      {
        if (!options.std_c2x)
          werror(E_ATTRIBUTE_C2X);
-       $$ = $3;
+       $$ = $2;
      }
    ;
 
@@ -1730,7 +1761,7 @@ attribute_token
        $$ = $1;
        $$->next = 0;
      }
-   | identifier ATTRIBCOLON identifier
+   | identifier TOK_SEP identifier
      {
        $$ = $1;
        $$->next = $3;

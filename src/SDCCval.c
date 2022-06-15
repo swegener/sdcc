@@ -1247,7 +1247,11 @@ constIntVal (const char *s)
   if (s[0] == '0')
     {
       if (s[1] == 'b' || s[1] == 'B')
-        llval = sepStrToUll (s + 2, &p, 2);
+        {
+          if (!options.std_sdcc && !options.std_c2x)
+            werror (W_BINARY_INTEGER_CONSTANT_C23);
+          llval = sepStrToUll (s + 2, &p, 2);
+        }
       else if (s[1] == 'x' || s[1] == 'X')
         llval = sepStrToUll (s + 2, &p, 16);
       else
@@ -1307,6 +1311,8 @@ constIntVal (const char *s)
       p2 += 2;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
         werror (E_INTEGERSUFFIX, p);
+      else if (!options.std_c2x)
+        werror (W_BITINTCONST_C23);
     }
 
   SPEC_NOUN (val->type) = wb_suffix ? V_BITINT : V_INT;

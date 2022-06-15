@@ -7,8 +7,6 @@ top_srcdir      = @top_srcdir@
 top_builddir    = @top_builddir@
 VPATH           = @srcdir@
 
-USE_ALT_LEX     = 0
-
 PORTS           = $(shell cat ../ports.build)
 ALLPORTS        = $(shell cat ../ports.all)
 PORT_LIBS       = $(PORTS:%=%/port.a)
@@ -35,12 +33,7 @@ OBJECTS         = SDCCy.o SDCChasht.o SDCCmain.o SDCCattr.o \
                   SDCCerr.o SDCCsystem.o SDCCgen.o
 
 SPECIAL         = SDCCy.h version.h
-ifeq ($(USE_ALT_LEX), 1)
-OBJECTS         += altlex.o
-SPECIAL         += reswords.h
-else
 OBJECTS         += SDCClex.o
-endif
 
 SLIBSOURCES     = $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
 SOURCES         := $(patsubst %.o,%.c,$(OBJECTS))
@@ -110,8 +103,6 @@ $(SLIBOBJS):%.o:$(SLIB)/%.c
 
 reswords.h: reswords.gperf Makefile
 	gperf -o -k1,2,4 -t -C -N is_reserved_word $< > $@
-
-altlex.o: altlex.c SDCCy.h reswords.h
 
 SDCCy.h: SDCCy.c
 

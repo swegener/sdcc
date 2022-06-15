@@ -249,7 +249,6 @@ pic16_decodeOp (unsigned int op)
                 case DATA:              return "DATA";
                 case IDATA:             return "IDATA";
                 case PDATA:             return "PDATA";
-                case VAR_ARGS:          return "VAR_ARGS";
                 case CRITICAL:          return "CRITICAL";
                 case NONBANKED:         return "NONBANKED";
                 case BANKED:            return "BANKED";

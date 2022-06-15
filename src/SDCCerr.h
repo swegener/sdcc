@@ -302,6 +302,8 @@ enum {
   E_INVALID_BITINTWIDTH         = 272, /* invalid with for bit-precise integer type */
   W_BITINTCONST_C23             = 273, /* bit-precise integer constant requires ISO C23 or later */
   E_INVALID_UNIVERSAL_IDENTIFIER = 274, /* universal character name %s invalid in identifier */
+  E_COMPLEX_UNSUPPORTED         = 275, /* complex numbers are not supported */
+  E_DECIMAL_FLOAT_UNSUPPORTED   = 276, /* decimal floating-point numbers are not supported */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

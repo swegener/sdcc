@@ -612,7 +612,11 @@ struct
   { W_BITINTCONST_C23, ERROR_LEVEL_WARNING,
      "bit-precise integer constant requires ISO C23 or later", 0},
   { E_INVALID_UNIVERSAL_IDENTIFIER, ERROR_LEVEL_ERROR,
-     "universal character name \\%s invalid in identifier.", 0 },
+     "universal character name \\%s invalid in identifier", 0 },
+  { E_COMPLEX_UNSUPPORTED, ERROR_LEVEL_ERROR,
+     "complex numbers are not supported", 0 },
+  { E_DECIMAL_FLOAT_UNSUPPORTED, ERROR_LEVEL_ERROR,
+     "decimal floating-point numbers are not supported", 0 },
 };
 
 /* -------------------------------------------------------------------------------

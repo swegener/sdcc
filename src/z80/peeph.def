@@ -1126,7 +1126,7 @@ replace restart {
 	jp	C,%2
 	; common peephole 79 removed jp by using inverse jump logic
 %1:
-} if labelRefCountChange(%1 -1)
+} if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
 	jp	C,%1
@@ -1136,7 +1136,7 @@ replace restart {
 	jp	NC,%2
 	; common peephole 80 removed jp by using inverse jump logic
 %1:
-} if labelRefCountChange(%1 -1)
+} if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
 	jp	NZ,%1
@@ -1146,7 +1146,7 @@ replace restart {
 	jp	Z,%2
 	; common peephole 81 removed jp by using inverse jump logic
 %1:
-} if labelRefCountChange(%1 -1)
+} if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
 	jp	Z,%1
@@ -1156,7 +1156,7 @@ replace restart {
 	jp	NZ,%2
 	; common peephole 82 removed jp by using inverse jump logic
 %1:
-} if labelRefCountChange(%1 -1)
+} if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
 	jp	%5
@@ -1176,7 +1176,7 @@ replace restart {
 	jp	%1
 %1:
 } by {
-   ; common peephole 85a eliminated jump.
+	; common peephole 85a eliminated jump.
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -1185,7 +1185,7 @@ replace restart {
 %2:
 %1:
 } by {
-   ; common peephole 85b eliminated jump.
+	; common peephole 85b eliminated jump.
 %2:
 %1:
 } if labelRefCountChange(%1 -1)

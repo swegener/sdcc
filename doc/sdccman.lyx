@@ -44343,7 +44343,7 @@ Z80 SDCC calling convention, version 0
 This calling convention can be chosen per function via __sdcccall(0).
  All parameters are passed on the stack, right-to-left.
  8-bit return values are passed in l, 16-bit values in hl, 24-bit values
- in enhl, 32-bit values in dehl.
+ in ehl, 32-bit values in dehl.
  Except for the SM83, where 8-bit values are passed in e, 16-bit values
  in de, 32-bit values in hlde.
  Larger return values (as well as struct and union independent of their
@@ -44554,7 +44554,7 @@ Z80 banked calls
 \begin_layout Standard
 Banked calls are supported via __banked.
  Banked calls are done via a trampoline (__sdcc_bcall if --legacy-banking
- us specified, __sdcc_bcall_abc for z88dk_fastcall, __sdcc_bcall_ehl for
+ is specified, __sdcc_bcall_abc for z88dk_fastcall, __sdcc_bcall_ehl for
  other calls).
  Default trampolines are provided in the library.
  The default trampolines calls user supplied helper functions set_bank and

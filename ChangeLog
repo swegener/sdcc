@@ -18,11 +18,16 @@
 	  src/SDCCval.c:
 	  Fix bug #3454.
 
+2022-06-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/peeph.def: fixed rules 79 to 82 to fix bug #3387
+	* support/regression/tests/bug-3387.c: new, added
+
 2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:
-	  Fix two typos in the manual.
-	  
+	  Fix two typos in the manual
+
 2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.lex,
@@ -146,7 +151,7 @@
 	  Disable a test that tests for QuickC implementation-defined behaviour.
 
 2022-05-18 Felix Salfelder <felix AT salfelder.org>
-	
+
 	* Makefile.common.in, configure, configure.ac, src/Makefile.in:
 	  C vs. C++ distinction in dependency generation.
 
@@ -793,7 +798,6 @@
 
 	* support/regression/tests/widebitintbitfield.c:
 	  Temporarily disable new failing _BitInt test.
-	  
 
 2022-03-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -1059,7 +1063,7 @@
 
 	* src/mos6502/gen.c:
 	  genPlusInc(), genMinusDec() and genlshTwo() improvements.
-	  
+
 2022-03-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/main.c,
@@ -1183,7 +1187,7 @@
 
 	* src/pdk/gen.c:
 	  Fix compile by gcc 9.4.0: label must be on statement
-	  
+
 2022-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCglue.c,
@@ -1410,7 +1414,7 @@
 	* src/mos6502/gen.c,
 	  src/mos6502/ralloc2.cc:
 	  Add codegen for rotate.
-	  
+
 2022-03-07 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sim/ucsim/z80.src/inst_gb80.cc:
@@ -1538,32 +1542,32 @@
 	* src/mos6502/ralloc.c,
 	  src/mos6502/gen.c:
 	  Remove freeAllRegs()
-  	* src/mos6502/gen.c:
-  	  Fix corner cases in assignResultValue() and genPointerSet()
-  	* support/regression/ports/mos6502/spec.mk
-  	  Removed redundant --out-fmt-ihx command line option
-  	* device/lib/mos6502/_strcpy.s,
-  	  device/lib/mos6502/_strcmp.s,
-  	  device/lib/mos6502/_mullong.s,
-  	  device/lib/mos6502/_mulint.s,
-  	  device/lib/mos6502/_divuint.s,
-  	  device/lib/mos6502/_divulong.s,
-  	  device/lib/mos6502/__memcpy.s:
-  	  Move function parameters to overlay segment.
-  	* device/lib/mos6502/_divsint.s,
-  	  device/lib/mos6502/_divslong.s,
-  	  device/lib/mos6502/_modsint.s,
-  	  device/lib/mos6502/_modslong.s,
-  	  device/lib/mos6502/_moduint.s,
-  	  device/lib/mos6502/_modulong.s,
-  	  device/lib/mos6502/_mulschar.s,
-  	  device/lib/mos6502/_muluchar.s,
-  	  device/lib/mos6502/abs.c:
-  	  Add assembly implementation of divs, mod, mulchar and abs.
-  	* src/mos6502/gen.c:
+	* src/mos6502/gen.c:
+	  Fix corner cases in assignResultValue() and genPointerSet()
+	* support/regression/ports/mos6502/spec.mk
+	  Removed redundant --out-fmt-ihx command line option
+	* device/lib/mos6502/_strcpy.s,
+	  device/lib/mos6502/_strcmp.s,
+	  device/lib/mos6502/_mullong.s,
+	  device/lib/mos6502/_mulint.s,
+	  device/lib/mos6502/_divuint.s,
+	  device/lib/mos6502/_divulong.s,
+	  device/lib/mos6502/__memcpy.s:
+	  Move function parameters to overlay segment.
+	* device/lib/mos6502/_divsint.s,
+	  device/lib/mos6502/_divslong.s,
+	  device/lib/mos6502/_modsint.s,
+	  device/lib/mos6502/_modslong.s,
+	  device/lib/mos6502/_moduint.s,
+	  device/lib/mos6502/_modulong.s,
+	  device/lib/mos6502/_mulschar.s,
+	  device/lib/mos6502/_muluchar.s,
+	  device/lib/mos6502/abs.c:
+	  Add assembly implementation of divs, mod, mulchar and abs.
+	* src/mos6502/gen.c:
 	  Add m6502_unimplemented()
-   	* src/mos6502/gen.c:
-   	   Refactopr genCpl() and genPointerSet()
+	* src/mos6502/gen.c:
+	  Refactopr genCpl() and genPointerSet()
 
 2022-02-26 Gabriele Gorla <gorlik@yahoo.com>
 
@@ -1678,14 +1682,14 @@
 	  sdas/as6500/r65adr.c,
 	  sdas/as6500/r6500.h:
 	  Add .incbin, .define, .undefine, .ifdef and .ifndef to the 6502 assembler.
-  	* sdas/as6808/m6808.h,
+	* sdas/as6808/m6808.h,
 	  sdas/as6808/m08pst.c,
 	  sdas/as6808/m08mch.c,
 	  sdas/as6808/m08adr.c:
 	  Add .incbin hc08/s08 assembler.
-  	* sdas/asstm8/stm8pst.c:
+	* sdas/asstm8/stm8pst.c:
 	  Use I_CODE in S_INCL entry instead of 0.
-	  
+
 2022-02-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peeph.def:
@@ -1746,24 +1750,24 @@
 
 	* sdcc/devicel/lib/mos6502/crt0.s:
 	  Remove incorrect loading of the second memset parameter.
-  	* support/regression/ports/u6502/spec.mk:
+	* support/regression/ports/u6502/spec.mk:
 	  Remove redundant --out-fmt-ihx parameter.
-  	* device/lib/mos6502-stack-auto/Makefile.in,
-  	  device/lib/mos6502-stack-auto/crt0.s,
-  	  device/lib/mos6502-stack-auto/atomic_flasg_test_and_set.c,
-  	  device/lib/mos6502-stack-auto/_setjmp.c,
-  	  device/lib/mos6502-stack-auto/_rrulonglong.c,
-  	  device/lib/mos6502-stack-auto/_rrslonglong.c,
-  	  device/lib/mos6502-stack-auto/_ret.c,
-  	  device/lib/mos6502-stack-auto/,
-  	  device/lib/Makefile.in,
-  	  device/lib/clean.mk,
-  	  sdcc/configure.ac,
-  	  sdcc/configure.ac:  	  
- 	  Add mos6502 stack auto target.
-  	* src/mos6502/main.c:
+	* device/lib/mos6502-stack-auto/Makefile.in,
+	  device/lib/mos6502-stack-auto/crt0.s,
+	  device/lib/mos6502-stack-auto/atomic_flasg_test_and_set.c,
+	  device/lib/mos6502-stack-auto/_setjmp.c,
+	  device/lib/mos6502-stack-auto/_rrulonglong.c,
+	  device/lib/mos6502-stack-auto/_rrslonglong.c,
+	  device/lib/mos6502-stack-auto/_ret.c,
+	  device/lib/mos6502-stack-auto/,
+	  device/lib/Makefile.in,
+	  device/lib/clean.mk,
+	  sdcc/configure.ac,
+	  sdcc/configure.ac:
+	  Add mos6502 stack auto target.
+	* src/mos6502/main.c:
 	  Correct flags affected by cld.
-	  
+
 2022-02-19 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* device/lib/sm83/memcpy.s,
@@ -1998,7 +2002,7 @@
 	  src/mos6502/main.c,
 	  src/mos6502/ralloc.c,
 	  src/mos6502/ralloc.h,
-	  src/mos6502/ralloc2.cc:  
+	  src/mos6502/ralloc2.cc:
 	  Removed dead code and refactored load/stroreRegTemp.
 
 2022-02-02 Benedikt Freisen <b.freisen AT gmx.net>
@@ -2117,7 +2121,7 @@
 	* src/hc08/gen.c,
 	  src/hc08/ralloc2.cc:
 	  Fix a overflow bug in dry run cost calculation.
-    
+
 2022-01-29 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c,

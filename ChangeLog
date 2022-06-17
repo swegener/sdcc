@@ -1,3 +1,8 @@
+2022-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx:
+	  Document standard version pragmas.
+
 2022-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* Merge from parser branch.

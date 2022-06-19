@@ -2718,6 +2718,16 @@ In 4.1.13, support for –profile has been removed.
 In 4.1.14, the gbz80 port was renamed to sm83.
 \end_layout
 
+\begin_layout Itemize
+In 4.2.3, support for non-parenthesized arguments to __using and __interrupt
+ was dropped.
+\end_layout
+
+\begin_layout Itemize
+In 4.2.3, support for non-parenthesized arguments to __at that are not constants
+ was dropped.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -22551,7 +22561,9 @@ at
 
  <address>
 \emph default
- keyword, which can also be used in addition to a named address space, e.g.:
+ keyword (the address needs to be either a parenthesized constant expression
+ or a constant), which can also be used in addition to a named address space,
+ e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -25522,10 +25534,10 @@ using (mcs51, ds390 register bank)
 \emph on
 __using
 \emph default
- 0), the compiler will save the registers used by itself on the stack upon
- entry and restore them at exit, however if such an interrupt service routine
- calls another function then the entire register bank will be saved on the
- stack.
+ (0)), the compiler will save the registers used by itself on the stack
+ upon entry and restore them at exit, however if such an interrupt service
+ routine calls another function then the entire register bank will be saved
+ on the stack.
  This scheme may be advantageous for small interrupt service routines which
  have low register usage.
 \end_layout
@@ -45331,7 +45343,7 @@ PIC14!interrupt
 \begin_layout Verse
 
 \family typewriter
-void Intr(void) __interrupt 0
+void Intr(void) __interrupt (0)
 \begin_inset Newline newline
 \end_inset
 
@@ -50003,7 +50015,7 @@ __interrupt
 \end_layout
 
 \begin_layout LyX-Code
-void isr_shadow(void) __shadowregs __interrupt 1
+void isr_shadow(void) __shadowregs __interrupt (1)
 \end_layout
 
 \begin_layout LyX-Code
@@ -50200,7 +50212,7 @@ __interrupt
 \begin_layout LyX-Code
 void isr(void) __interrupt 
 \emph on
-n
+(n)
 \end_layout
 
 \begin_layout LyX-Code

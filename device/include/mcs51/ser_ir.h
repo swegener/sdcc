@@ -45,6 +45,6 @@ unsigned char ser_can_rcv (void);
 unsigned char ser_can_xmt (void);
 
 /* needs to be defined somewhere :-() */
-void ser_handler (void) __interrupt 4;
+void ser_handler (void) __interrupt (4);
 
 #endif  /* __SER_IR_H */

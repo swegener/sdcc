@@ -1,3 +1,36 @@
+2022-06-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge from parser branch.
+
+2022-06-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* SDCC.y,
+	  SDCCerr.h,
+	  SDCCerr.c:
+	  C2X allows labels in blocks even when not followed by a statement. Warn on C90 implicit int return type.
+
+2022-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  .version,
+	  doc/sdccman.lyx,
+	  device/include/mcs51/ser.h,
+	  device/include/mcs51/ser_ir.h,
+	  device/include/mcs51/serial.h,
+	  device/include/tinibios.h,
+	  support/regression/fwk/lib/testfwk.c,
+	  support/regression/ports/mcs51-common/T2_isr.c,
+	  support/regression/tests/bug1535242.c,
+	  support/regression/tests/critical.c,
+	  support/regression/tests/interrupt.c.in,
+	  support/regression/tests/setjmp.c,
+	  device/lib/_ser.c,
+	  device/lib/serial.c:
+	  Steps towards a parser suitable for C2X, inspired by the Jutta Degener grammar as extended by Jens Gustedt.
+
 2022-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* doc/sdccman.lyx:

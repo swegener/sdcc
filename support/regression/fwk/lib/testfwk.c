@@ -11,7 +11,7 @@
 
 #ifdef __SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
-void T2_isr (void) __interrupt 5;
+void T2_isr (void) __interrupt (5);
 #define MEMSPACE_BUF __idata
 #else
 #define MEMSPACE_BUF

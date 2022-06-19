@@ -122,12 +122,12 @@ extern char i2cReceiveBuffer[I2C_BUFSIZE];
 
 /* internal functions used by tinibios.c */
 unsigned char _sdcc_external_startup(void);
-void Serial0IrqHandler (void) __interrupt 4;
-void Serial1IrqHandler (void) __interrupt 7;
+void Serial0IrqHandler (void) __interrupt (4);
+void Serial1IrqHandler (void) __interrupt (7);
 
 #if !defined(__SDCC_ds400)
 void ClockInit();
-void ClockIrqHandler (void) __interrupt 1 __naked;
+void ClockIrqHandler (void) __interrupt (1) __naked;
 #endif
 
 #if defined(__SDCC_ds400)

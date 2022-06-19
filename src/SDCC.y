@@ -68,12 +68,12 @@ STACK_DCL(swStk   ,ast   *,MAX_NEST_LEVEL)
 STACK_DCL(blockNum,int,MAX_NEST_LEVEL*3)
 
 value *cenum = NULL;        /* current enumeration  type chain*/
-bool uselessDecl = TRUE;
+bool uselessDecl = true;
 
 #define YYDEBUG 1
 
 %}
-%expect 9
+%expect 3
 
 %union {
     attribute  *attr;       /* attribute                              */
@@ -91,17 +91,17 @@ bool uselessDecl = TRUE;
 
 %token <yychar> IDENTIFIER TYPE_NAME ADDRSPACE_NAME
 %token <val> CONSTANT
-%token SIZEOF TYPEOF OFFSETOF
+%token SIZEOF OFFSETOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
 %token ATTR_START TOK_SEP
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
-%token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
+%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA ELLIPSIS CRITICAL
 %token NONBANKED BANKED SHADOWREGS SD_WPARAM
-%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT SD_BITINT DECIMAL32 DECIMAL64 DECIMAL128
+%token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
 %token COMPLEX IMAGINARY
 %token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -111,13 +111,23 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPUSH_VALUE_AT_ADDRESS IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
-%token ALIGNAS ALIGNOF ATOMIC
-%token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+
+/* C11 */
+%token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
+
+/* C2X problem: too many legacy FALSE and TRUE still in SDCC, workaround: prefix by TOKEN_*/
+%token TOKEN_FALSE TOKEN_TRUE TYPEOF SD_BITINT
+%token DECIMAL32 DECIMAL64 DECIMAL128
+
+/* SDCC extensions */
 %token ASM
 
+/* For internal use (in further stages of SDCC) */
+%token GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
+
 %type <yyint> Interrupt_storage
-%type <attr> attribute_specifier_sequence attribute_specifier_sequence_opt attribute_specifier attribute_list attribute
+%type <attr> attribute_specifier_sequence attribute_specifier_sequence_opt attribute_specifier attribute_list attribute attribute_opt
 %type <sym> identifier attribute_token declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
 %type <sym> member_declarator function_declarator
 %type <sym> member_declarator_list member_declaration member_declaration_list
@@ -134,15 +144,16 @@ bool uselessDecl = TRUE;
 %type <lnk> unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
-%type <asts> primary_expr
-%type <asts> postfix_expr unary_expr offsetof_member_designator cast_expr multiplicative_expr
-%type <asts> additive_expr shift_expr relational_expr equality_expr
-%type <asts> and_expr exclusive_or_expr inclusive_or_expr logical_or_expr
+%type <asts> primary_expression
+%type <asts> postfix_expression unary_expression offsetof_member_designator cast_expression multiplicative_expression
+%type <asts> additive_expression shift_expression relational_expression equality_expression
+%type <asts> and_expression exclusive_or_expression inclusive_or_expression logical_or_expr
 %type <asts> logical_and_expr conditional_expr assignment_expr constant_expr
-%type <asts> expr argument_expr_list function_definition expr_opt
-%type <asts> statement_list statement labeled_statement compound_statement
+%type <asts> expression argument_expr_list function_definition expression_opt predefined_constant
+%type <asts> statement_list statement labeled_statement unlabeled_statement compound_statement
+%type <asts> primary_block secondary_block
 %type <asts> expression_statement selection_statement iteration_statement
-%type <asts> jump_statement function_body else_statement string_literal_val
+%type <asts> jump_statement else_statement function_body string_literal_val
 %type <asts> critical_statement asm_statement label
 %type <asts> generic_selection generic_assoc_list generic_association
 %type <asts> implicit_block statements_and_implicit block_item_list
@@ -157,13 +168,19 @@ bool uselessDecl = TRUE;
 
    /* C2X A.2.1 Expressions */
 
-primary_expr
+primary_expression
    : identifier      { $$ = newAst_VALUE (symbolVal ($1)); }
    | CONSTANT        { $$ = newAst_VALUE ($1); }
    | string_literal_val
-   | '(' expr ')'    { $$ = $2; }
+   | '(' expression ')'    { $$ = $2; }
    | generic_selection
+   | predefined_constant
    ;
+
+predefined_constant
+   : TOKEN_FALSE {}
+   | TOKEN_TRUE {}
+   ; /* add nullptr here if it gets approved for C23 */
 
 generic_selection
    : GENERIC '(' assignment_expr ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }
@@ -179,32 +196,32 @@ generic_association
    | DEFAULT ':' assignment_expr { $$ = newNode  (GENERIC_ASSOCIATION,NULL,$3); }
    ;
 
-postfix_expr
-   : primary_expr
-   | postfix_expr '[' expr ']'          { $$ = newNode  ('[', $1, $3); }
-   | postfix_expr '(' ')'               { $$ = newNode  (CALL,$1,NULL);
+postfix_expression
+   : primary_expression
+   | postfix_expression '[' expression ']'          { $$ = newNode  ('[', $1, $3); }
+   | postfix_expression '(' ')'               { $$ = newNode  (CALL,$1,NULL);
                                           $$->left->funcName = 1;}
-   | postfix_expr '(' argument_expr_list ')'
+   | postfix_expression '(' argument_expr_list ')'
           {
             $$ = newNode  (CALL,$1,$3); $$->left->funcName = 1;
           }
-   | postfix_expr '.' { ignoreTypedefType = 1; } identifier
+   | postfix_expression '.' { ignoreTypedefType = 1; } identifier
                       {
                         ignoreTypedefType = 0;
                         $4 = newSymbol($4->name,NestLevel);
                         $4->implicit = 1;
                         $$ = newNode(PTR_OP,newNode('&',$1,NULL),newAst_VALUE(symbolVal($4)));
                       }
-   | postfix_expr PTR_OP { ignoreTypedefType = 1; } identifier
+   | postfix_expression PTR_OP { ignoreTypedefType = 1; } identifier
                       {
                         ignoreTypedefType = 0;
                         $4 = newSymbol($4->name,NestLevel);
                         $4->implicit = 1;
                         $$ = newNode(PTR_OP,$1,newAst_VALUE(symbolVal($4)));
                       }
-   | postfix_expr INC_OP
+   | postfix_expression INC_OP
                       { $$ = newNode(INC_OP,$1,NULL);}
-   | postfix_expr DEC_OP
+   | postfix_expression DEC_OP
                       { $$ = newNode(DEC_OP,$1,NULL); }
    | '(' type_name ')' '{' initializer_list '}'
                       {
@@ -229,11 +246,11 @@ argument_expr_list
    | assignment_expr ',' argument_expr_list { $$ = newNode(PARAM,$1,$3); }
    ;
 
-unary_expr
-   : postfix_expr
-   | INC_OP unary_expr        { $$ = newNode (INC_OP, NULL, $2); }
-   | DEC_OP unary_expr        { $$ = newNode (DEC_OP, NULL, $2); }
-   | unary_operator cast_expr
+unary_expression
+   : postfix_expression
+   | INC_OP unary_expression        { $$ = newNode (INC_OP, NULL, $2); }
+   | DEC_OP unary_expression        { $$ = newNode (DEC_OP, NULL, $2); }
+   | unary_operator cast_expression
        {
          if ($1 == '&' && IS_AST_OP ($2) && $2->opval.op == '*' && $2->right == NULL)
            $$ = $2->left;
@@ -242,14 +259,13 @@ unary_expr
          else
            $$ = newNode ($1, $2, NULL);
        }
-   | SIZEOF unary_expr        { $$ = newNode (SIZEOF, NULL, $2); }
-   | SIZEOF '(' type_name ')' { $$ = newAst_VALUE (sizeofOp ($3)); }
-   | ALIGNOF '(' type_name ')'{ $$ = newAst_VALUE (alignofOp ($3)); }
-   | TYPEOF unary_expr        { $$ = newNode (TYPEOF, NULL, $2); }
+   | SIZEOF unary_expression        { $$ = newNode (SIZEOF, NULL, $2); }
+   | SIZEOF '(' type_name ')'            { $$ = newAst_VALUE (sizeofOp ($3)); }
+   | ALIGNOF '(' type_name ')'           { $$ = newAst_VALUE (alignofOp ($3)); }
    | OFFSETOF '(' type_name ',' offsetof_member_designator ')' { $$ = offsetofOp($3, $5); }
-   | RLC unary_expr           { $$ = newNode (RLC, $2, NULL); }
-   | RRC unary_expr           { $$ = newNode (RRC, $2, NULL); }
-   | SWAP unary_expr          { $$ = newNode (SWAP, $2, NULL); }
+   | RLC unary_expression           { $$ = newNode (RLC, $2, NULL); }
+   | RRC unary_expression           { $$ = newNode (RRC, $2, NULL); }
+   | SWAP unary_expression          { $$ = newNode (SWAP, $2, NULL); }
    ;
 
 unary_operator
@@ -261,62 +277,62 @@ unary_operator
    | '!'    { $$ = '!';}
    ;
 
-cast_expr
-   : unary_expr
-   | '(' type_name ')' cast_expr { $$ = newNode(CAST,newAst_LINK($2),$4); }
+cast_expression
+   : unary_expression
+   | '(' type_name ')' cast_expression { $$ = newNode(CAST,newAst_LINK($2),$4); }
    ;
 
-multiplicative_expr
-   : cast_expr
-   | multiplicative_expr '*' cast_expr { $$ = newNode('*',$1,$3);}
-   | multiplicative_expr '/' cast_expr { $$ = newNode('/',$1,$3);}
-   | multiplicative_expr '%' cast_expr { $$ = newNode('%',$1,$3);}
+multiplicative_expression
+   : cast_expression
+   | multiplicative_expression '*' cast_expression { $$ = newNode('*',$1,$3);}
+   | multiplicative_expression '/' cast_expression { $$ = newNode('/',$1,$3);}
+   | multiplicative_expression '%' cast_expression { $$ = newNode('%',$1,$3);}
    ;
 
-additive_expr
-   : multiplicative_expr
-   | additive_expr '+' multiplicative_expr { $$=newNode('+',$1,$3);}
-   | additive_expr '-' multiplicative_expr { $$=newNode('-',$1,$3);}
+additive_expression
+   : multiplicative_expression
+   | additive_expression '+' multiplicative_expression { $$=newNode('+',$1,$3);}
+   | additive_expression '-' multiplicative_expression { $$=newNode('-',$1,$3);}
    ;
 
-shift_expr
-   : additive_expr
-   | shift_expr LEFT_OP additive_expr  { $$ = newNode(LEFT_OP,$1,$3); }
-   | shift_expr RIGHT_OP additive_expr { $$ = newNode(RIGHT_OP,$1,$3); }
+shift_expression
+   : additive_expression
+   | shift_expression LEFT_OP additive_expression  { $$ = newNode(LEFT_OP,$1,$3); }
+   | shift_expression RIGHT_OP additive_expression { $$ = newNode(RIGHT_OP,$1,$3); }
    ;
 
-relational_expr
-   : shift_expr
-   | relational_expr '<' shift_expr   { $$ = newNode('<',  $1,$3);}
-   | relational_expr '>' shift_expr   { $$ = newNode('>',  $1,$3);}
-   | relational_expr LE_OP shift_expr { $$ = newNode(LE_OP,$1,$3);}
-   | relational_expr GE_OP shift_expr { $$ = newNode(GE_OP,$1,$3);}
+relational_expression
+   : shift_expression
+   | relational_expression '<' shift_expression   { $$ = newNode('<',  $1,$3);}
+   | relational_expression '>' shift_expression   { $$ = newNode('>',  $1,$3);}
+   | relational_expression LE_OP shift_expression { $$ = newNode(LE_OP,$1,$3);}
+   | relational_expression GE_OP shift_expression { $$ = newNode(GE_OP,$1,$3);}
    ;
 
-equality_expr
-   : relational_expr
-   | equality_expr EQ_OP relational_expr { $$ = newNode(EQ_OP,$1,$3);}
-   | equality_expr NE_OP relational_expr { $$ = newNode(NE_OP,$1,$3);}
+equality_expression
+   : relational_expression
+   | equality_expression EQ_OP relational_expression { $$ = newNode(EQ_OP,$1,$3);}
+   | equality_expression NE_OP relational_expression { $$ = newNode(NE_OP,$1,$3);}
    ;
 
-and_expr
-   : equality_expr
-   | and_expr '&' equality_expr  { $$ = newNode('&',$1,$3);}
+and_expression
+   : equality_expression
+   | and_expression '&' equality_expression  { $$ = newNode('&',$1,$3);}
    ;
 
-exclusive_or_expr
-   : and_expr
-   | exclusive_or_expr '^' and_expr { $$ = newNode('^',$1,$3);}
+exclusive_or_expression
+   : and_expression
+   | exclusive_or_expression '^' and_expression { $$ = newNode('^',$1,$3);}
    ;
 
-inclusive_or_expr
-   : exclusive_or_expr
-   | inclusive_or_expr '|' exclusive_or_expr { $$ = newNode('|',$1,$3);}
+inclusive_or_expression
+   : exclusive_or_expression
+   | inclusive_or_expression '|' exclusive_or_expression { $$ = newNode('|',$1,$3);}
    ;
 
 logical_and_expr
-   : inclusive_or_expr
-   | logical_and_expr AND_OP { seqPointNo++;} inclusive_or_expr
+   : inclusive_or_expression
+   | logical_and_expr AND_OP { seqPointNo++;} inclusive_or_expression
                                  { $$ = newNode(AND_OP,$1,$4);}
    ;
 
@@ -328,7 +344,7 @@ logical_or_expr
 
 conditional_expr
    : logical_or_expr
-   | logical_or_expr '?' { seqPointNo++;} expr ':' conditional_expr
+   | logical_or_expr '?' { seqPointNo++;} expression ':' conditional_expr
                      {
                         $$ = newNode(':',$4,$6);
                         $$ = newNode('?',$1,$$);
@@ -337,7 +353,7 @@ conditional_expr
 
 assignment_expr
    : conditional_expr
-   | unary_expr assignment_operator assignment_expr
+   | unary_expression assignment_operator assignment_expr
                      {
 
                              switch ($2) {
@@ -395,14 +411,14 @@ assignment_operator
    | OR_ASSIGN
    ;
 
-expr
+expression
    : assignment_expr
-   | expr ',' { seqPointNo++;} assignment_expr { $$ = newNode(',',$1,$4);}
+   | expression ',' { seqPointNo++;} assignment_expr { $$ = newNode(',',$1,$4);}
    ;
 
-expr_opt
+expression_opt
    :                 { $$ = NULL; seqPointNo++; }
-   | expr            { $$ = $1; seqPointNo++; }
+   | expression      { $$ = $1; seqPointNo++; }
    ;
 
 constant_expr
@@ -428,12 +444,12 @@ declaration
                  sdef->block = currBlockno;
                  sdef->tagsym = newSymbol (osdef->tagsym->name, NestLevel);
                  addSym (StructTab, sdef, sdef->tag, sdef->level, currBlockno, 0);
-                 uselessDecl = FALSE;
+                 uselessDecl = false;
                }
            }
          if (uselessDecl)
            werror(W_USELESS_DECL);
-         uselessDecl = TRUE;
+         uselessDecl = true;
          $$ = NULL;
       }
    | declaration_specifiers init_declarator_list ';'
@@ -468,7 +484,7 @@ declaration
              addDecl (sym,0,lnk);
          }
 
-         uselessDecl = TRUE;
+         uselessDecl = true;
          $$ = sym1;
       }
    | static_assert_declaration
@@ -596,7 +612,7 @@ type_specifier
    | SD_BITINT '(' constant_expr ')'  {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BITINT;
-                  SPEC_BITINTWIDTH($$) = (unsigned int) ulFromVal(constExprValue($3, TRUE));
+                  SPEC_BITINTWIDTH($$) = (unsigned int) ulFromVal(constExprValue($3, true));
                   ignoreTypedefType = 1;
                }
    | SD_BOOL   {
@@ -625,13 +641,13 @@ type_specifier
                   werror (E_DECIMAL_FLOAT_UNSUPPORTED);
                }
    | struct_or_union_specifier  {
-                                   uselessDecl = FALSE;
+                                   uselessDecl = false;
                                    $$ = $1;
                                    ignoreTypedefType = 1;
                                 }
    | enum_specifier     {
                            cenum = NULL;
-                           uselessDecl = FALSE;
+                           uselessDecl = false;
                            ignoreTypedefType = 1;
                            $$ = $1;
                         }       
@@ -657,12 +673,19 @@ type_specifier
                   SPEC_BSTR($$) = 0;
                   ignoreTypedefType = 1;
                }
-   | AT constant_expr {
+   | AT CONSTANT {
                   $$=newLink(SPECIFIER);
                   /* add this to the storage class specifier  */
                   SPEC_ABSA($$) = 1;   /* set the absolute addr flag */
                   /* now get the abs addr from value */
-                  SPEC_ADDR($$) = (unsigned int) ulFromVal(constExprValue($2,TRUE));
+                  SPEC_ADDR($$) = (unsigned int) ulFromVal(constExprValue(newAst_VALUE ($2), true));
+               }
+   | AT '(' constant_expr ')' {
+                  $$=newLink(SPECIFIER);
+                  /* add this to the storage class specifier  */
+                  SPEC_ABSA($$) = 1;   /* set the absolute addr flag */
+                  /* now get the abs addr from value */
+                  SPEC_ADDR($$) = (unsigned int) ulFromVal(constExprValue($3, true));
                }
 
 
@@ -856,7 +879,7 @@ member_declarator
         {
           unsigned int bitsize;
           $$ = newSymbol (genSymName(NestLevel), NestLevel);
-          bitsize = (unsigned int) ulFromVal(constExprValue($2, TRUE));
+          bitsize = (unsigned int) ulFromVal(constExprValue($2, true));
           if (!bitsize)
               bitsize = BITVAR_PAD;
           $$->bitVar = bitsize;
@@ -865,7 +888,7 @@ member_declarator
    | declarator ':' constant_expr
         {
           unsigned int bitsize;
-          bitsize = (unsigned int) ulFromVal(constExprValue($3, TRUE));
+          bitsize = (unsigned int) ulFromVal(constExprValue($3, true));
 
           if (!bitsize)
             {
@@ -993,6 +1016,10 @@ type_qualifier
                   $$=newLink(SPECIFIER);
                   SPEC_VOLATILE($$) = 1;
                }
+   | ATOMIC  {
+                  $$=newLink(SPECIFIER);
+                  werror (E_ATOMIC_UNSUPPORTED);
+               }
    | ADDRSPACE_NAME {
                   $$=newLink(SPECIFIER);
                   SPEC_ADDRSPACE($$) = findSym (AddrspaceTab, 0, $1);
@@ -1043,7 +1070,7 @@ alignment_specifier
               }
    | ALIGNAS '(' constant_expr ')'
               {
-                 value *val = constExprValue ($3, TRUE);
+                 value *val = constExprValue ($3, true);
                  $$ = newLink (SPECIFIER);
                  SPEC_ALIGNAS($$) = 0;
                  if (!val)
@@ -1112,7 +1139,7 @@ array_declarator:
             value *tval;
             int size;
 
-            tval = constExprValue($3, TRUE);
+            tval = constExprValue($3, true);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
@@ -1144,7 +1171,7 @@ array_declarator:
             if (!options.std_c99)
               werror (E_STATIC_ARRAY_PARAM_C99);
 
-            tval = constExprValue($4, TRUE);
+            tval = constExprValue($4, true);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
@@ -1179,7 +1206,7 @@ array_declarator:
             if (!options.std_c99)
               werror (E_QUALIFIED_ARRAY_PARAM_C99);
 
-            tval = constExprValue($4, TRUE);
+            tval = constExprValue($4, true);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
@@ -1221,7 +1248,7 @@ array_declarator:
                 werror (E_QUALIFIED_ARRAY_PARAM_C99);
               }
 
-            tval = constExprValue($5, TRUE);
+            tval = constExprValue($5, true);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
@@ -1263,7 +1290,7 @@ array_declarator:
                 werror (E_STATIC_ARRAY_PARAM_C99);
               }
 
-            tval = constExprValue($5, TRUE);
+            tval = constExprValue($5, true);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
@@ -1297,7 +1324,7 @@ array_declarator:
 
 declarator2_function_attributes
    : function_declarator                 { $$ = $1; }
-   | function_declarator function_attribute  {
+   | function_declarator function_attributes  {
            // copy the functionAttributes (not the args and hasVargs !!)
            struct value *args;
            unsigned hasVargs;
@@ -1382,13 +1409,13 @@ function_declarator
 
 pointer
    : unqualified_pointer { $$ = $1;}
-   | unqualified_pointer AT constant_expr /* Special case to allow __at at the end */
+   | unqualified_pointer AT '(' constant_expr ')' /* Special case to allow __at at the end */
          {
              sym_link *n = newLink(SPECIFIER);
              /* add this to the storage class specifier  */
              SPEC_ABSA(n) = 1;   /* set the absolute addr flag */
              /* now get the abs addr from value */
-             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($3,TRUE));
+             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($4,true));
              n->next = $1;
              $$ = n;
          }
@@ -1405,7 +1432,7 @@ pointer
              else
                  werror (W_PTR_TYPE_INVALID);
          }
-   | unqualified_pointer type_qualifier_list AT constant_expr /* Special case to allow __at at the end */
+   | unqualified_pointer type_qualifier_list AT '(' constant_expr ')' /* Special case to allow __at at the end */
          {
              if (IS_SPEC($2)) {
                  DCL_TSPEC($1) = $2;
@@ -1421,7 +1448,7 @@ pointer
              /* add this to the storage class specifier  */
              SPEC_ABSA(n) = 1;   /* set the absolute addr flag */
              /* now get the abs addr from value */
-             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($4,TRUE));
+             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($5,true));
              n->next = $1;
              $$ = n;
          }
@@ -1560,7 +1587,7 @@ array_abstract_declarator
                                        value *val;
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY;
-                                       DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($3,TRUE));
+                                       DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($3, true));
                                        if($1)
                                          $$->next = $1;
                                     }
@@ -1647,7 +1674,7 @@ designator
             value *tval;
             int elemno;
 
-            tval = constExprValue($2, TRUE);
+            tval = constExprValue($2, true);
             /* if it is not a constant then Error  */
             if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
               {
@@ -1670,7 +1697,7 @@ designator
 static_assert_declaration
    : STATIC_ASSERT '(' constant_expr ',' STRING_LITERAL ')' ';'
                                     {
-                                       value *val = constExprValue ($3, TRUE);
+                                       value *val = constExprValue ($3, true);
                                        if (!val)
                                          werror (E_CONST_EXPECTED);
                                        else if (!ulFromVal(val))
@@ -1678,7 +1705,7 @@ static_assert_declaration
                                     }
    | STATIC_ASSERT '(' constant_expr ')' ';'
                                     {
-                                       value *val = constExprValue ($3, TRUE);
+                                       value *val = constExprValue ($3, true);
                                        if (!options.std_c2x)
                                          werror (E_STATIC_ASSERTION_C2X);
                                        if (!val)
@@ -1723,24 +1750,19 @@ attribute_specifier
    ;
 
 attribute_list
-   : /* empty */
-     {
-       $$ = 0;
-     }
-   | attribute
+   : attribute_opt
      {
        $$ = $1;
      }
-   | attribute_list ','
+   | attribute_list ',' attribute_opt
      {
        $$ = $1;
-     }
-   | attribute_list ',' attribute
-     {
-       $$ = $1;
-       attribute *a;
-       for (a = $$; a->next; a = a->next);
-       a->next = $3;
+       if ($3)
+         {
+           attribute *a;
+           for (a = $$; a->next; a = a->next);
+           a->next = $3;
+         }
      }
    ;
 
@@ -1753,6 +1775,17 @@ attribute
    {
      $$ = newAttribute ($1, 0);
    }
+   ;
+
+attribute_opt
+   : /* empty */
+     {
+       $$ = 0;
+     }
+   | attribute
+     {
+       $$ = $1;
+     }
    ;
 
 attribute_token
@@ -1787,16 +1820,13 @@ balanced_token
 
 statement
    : labeled_statement
-   | expression_statement
-   | attribute_specifier_sequence_opt compound_statement
-     {
-       $$ = $2;
-     }
-   | attribute_specifier_sequence_opt selection_statement
-     {
-       $$ = $2;
-     }
-   | attribute_specifier_sequence_opt iteration_statement
+   | unlabeled_statement
+   ;
+   
+
+unlabeled_statement
+   : expression_statement
+   | attribute_specifier_sequence_opt primary_block
      {
        $$ = $2;
      }
@@ -1808,32 +1838,55 @@ statement
    | asm_statement
    ;
 
-labeled_statement
-   : label statement  { if ($1) {$$ = $1; $1->right = $2;} else $$ = newNode (BLOCK, NULL, NULL); }
-   | attribute_specifier_sequence label statement  { if ($2) {$$ = $2; $2->right = $3;} else $$ = newNode (BLOCK, NULL, NULL); }
-   | label '}'
-     { /* Support a label without a statement at the end of a */
-       /* compound statement as a SDCC extension. Include the */
-       /* closing brace as part of the rule to avoid an */
-       /* unacceptably large number of shift/reduce conflicts */
-       /* and then reinsert it to be parsed a second time. */
-       werror(W_LABEL_WITHOUT_STATEMENT);
+primary_block
+   : compound_statement
+     {
        $$ = $1;
-       yychar = '}';
      }
-    ;
+   | selection_statement
+     {
+       $$ = $1;
+     }
+   | iteration_statement
+     {
+       $$ = $1;
+     }
+   ;
+
+secondary_block
+   : statement
+     {
+       $$ = $1;
+     }
+   ;
+
+labeled_statement
+   : label statement 
+     {
+       if ($1)
+         {
+           $$ = $1;
+           $1->right = $2;
+         }
+       else
+         $$ = newNode (BLOCK, NULL, NULL);
+     }
+   ;
 
 label
-   : identifier ':'                    {  $$ = createLabel($1,NULL);
-                                          $1->isitmp = 0;  }
-   | CASE constant_expr ':'
+   : identifier ':'
+     {
+       $$ = createLabel($1,NULL);
+       $1->isitmp = 0;
+     }
+   | attribute_specifier_sequence_opt CASE constant_expr ':'
      {
        if (STACK_EMPTY(swStk))
-         $$ = createCase(NULL,$2,NULL);
+         $$ = createCase(NULL,$3,NULL);
        else
-         $$ = createCase(STACK_PEEK(swStk),$2,NULL);
+         $$ = createCase(STACK_PEEK(swStk),$3,NULL);
      }
-   | DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':'
+   | attribute_specifier_sequence_opt DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':'
      {
        if (STACK_EMPTY(swStk))
          $$ = createDefault(NULL,$<asts>2,NULL);
@@ -1869,7 +1922,6 @@ compound_statement
        $$ = $2;
        cleanUpLevel(StructTab, NestLevel + LEVEL_UNIT);
      }
-   | error ';'                                { $$ = NULL; }
    ;
 
 block_item_list
@@ -1879,12 +1931,18 @@ block_item_list
    ;
 
 expression_statement
-   : expr_opt ';'
-   | attribute_specifier_sequence expr ';'           { $$ = $2; seqPointNo++;}
+   : expression_opt ';'
+   | attribute_specifier_sequence expression ';'           { $$ = $2; seqPointNo++;}
+   ;
+
+else_statement
+   :  ELSE  statement   { $$ = $2; }
+   |                    { $$ = NULL; }
    ;
 
 selection_statement
-   : IF '(' expr ')' { seqPointNo++;} statement else_statement
+   /* This gives us an unavoidable shift / reduce conflict, but yacc does the right thing for C */
+   : IF '(' expression ')' { seqPointNo++;} statement else_statement
                            {
                               noLineno++;
                               $$ = createIf ($3, $6, $7 );
@@ -1892,7 +1950,7 @@ selection_statement
                               $$->filename = $3->filename;
                               noLineno--;
                            }
-   | SWITCH '(' expr ')'   {
+   | SWITCH '(' expression ')'   {
                               ast *ex;
                               static   int swLabel = 0;
 
@@ -1909,16 +1967,16 @@ selection_statement
                               /* put label in the break stack  */
                               STACK_PUSH(breakStack,$<sym>$);
                            }
-     statement             {
+     secondary_block       {
                               /* get back the switch form the stack  */
                               $$ = STACK_POP(swStk);
                               $$->right = newNode (NULLOP,$6,createLabel($<sym>5,NULL));
                               STACK_POP(breakStack);
                            }
-        ;
+   ;
 
 iteration_statement
-   : while '(' expr ')' { seqPointNo++;}  statement
+   : while '(' expression ')' { seqPointNo++;} secondary_block
                          {
                            noLineno++;
                            $$ = createWhile ( $1, STACK_POP(continueStack),
@@ -1927,7 +1985,7 @@ iteration_statement
                            $$->filename = $1->fileDef;
                            noLineno--;
                          }
-   | do statement   WHILE '(' expr ')' ';'
+   | do secondary_block WHILE '(' expression ')' ';'
                         {
                           seqPointNo++;
                           noLineno++;
@@ -1937,7 +1995,7 @@ iteration_statement
                           $$->filename = $1->fileDef;
                           noLineno--;
                         }
-   | for '(' expr_opt   ';' expr_opt ';' expr_opt ')'  statement
+   | for '(' expression_opt   ';' expression_opt ';' expression_opt ')' secondary_block
                         {
                           noLineno++;
 
@@ -1962,7 +2020,7 @@ iteration_statement
                           NestLevel -= LEVEL_UNIT;
                           currBlockno = STACK_POP(blockNum);
                         }
-   | for '(' declaration expr_opt ';' expr_opt ')'
+   | for '(' declaration expression_opt ';' expression_opt ')'
                         {
                           if (!options.std_c99)
                             werror (E_FOR_INITAL_DECLARATION_C99);
@@ -1972,7 +2030,7 @@ iteration_statement
                           ignoreTypedefType = 0;
                           addSymChain(&$3);
                         }
-   statement
+     secondary_block
                         {
 
                           noLineno++;
@@ -2045,7 +2103,7 @@ jump_statement
            $$ = newNode(RETURN,NULL,NULL);
        }
    }
-   | RETURN expr ';'       {
+   | RETURN expression ';'       {
        seqPointNo++;
        if (inCriticalBlock) {
            werror(E_INVALID_CRITICAL);
@@ -2097,8 +2155,8 @@ external_declaration
 
 function_definition
    : declarator
-        {   /* function type not specified */
-            /* assume it to be 'int'       */
+        {   /* function return type not specified, which is allowed in C90 (and means int), but disallowed in C99 and later */
+            werror (W_RETURN_TYPE_OMITTED_INT);
             addDecl($1,0,newIntLink());
             $1 = createFunctionDecl($1);
             if ($1)
@@ -2165,15 +2223,15 @@ file
 
 
 
-function_attribute
-   : function_attributes
+function_attributes
+   : function_attribute
    | function_attributes function_attribute { $$ = mergeSpec($1,$2,"function_attribute"); }
    ;
 
-function_attributes
-   :  USING constant_expr {
+function_attribute
+   :  USING '(' constant_expr ')' {
                         $$ = newLink(SPECIFIER);
-                        FUNC_REGBANK($$) = (int) ulFromVal(constExprValue($2,TRUE));
+                        FUNC_REGBANK($$) = (int) ulFromVal(constExprValue($3, true));
                      }
    |  REENTRANT      {  $$ = newLink (SPECIFIER);
                         FUNC_ISREENT($$)=1;
@@ -2232,7 +2290,7 @@ function_attributes
    |  COSMIC         {  $$ = newLink (SPECIFIER);
                         FUNC_ISCOSMIC($$) = 1;
                      }
-   |  SDCCCALL '('constant_expr ')'
+   |  SDCCCALL '(' constant_expr ')'
                      {  $$ = newLink (SPECIFIER);
                         FUNC_SDCCCALL($$) = ulFromVal(constExprValue ($3, true));
                      }
@@ -2253,8 +2311,8 @@ function_attributes
                      } 
    |  Z88DK_SHORTCALL '(' constant_expr ',' constant_expr ')'
                      {
-                        value *rst_v = constExprValue ($3, TRUE);
-                        value *value_v = constExprValue ($5, TRUE);
+                        value *rst_v = constExprValue ($3, true);
+                        value *value_v = constExprValue ($5, true);
                         int rst = -1, value = -1;
                         $$ = newLink(SPECIFIER);
 
@@ -2287,7 +2345,7 @@ function_attributes
                             if (!port->getRegByName || ((regnum = port->getRegByName(regsym->name)) < 0))
                               werror (W_UNKNOWN_REG, regsym->name);
                             else
-                              $$->funcAttrs.preserved_regs[regnum] = TRUE;
+                              $$->funcAttrs.preserved_regs[regnum] = true;
                           }
                      }
    ;
@@ -2301,7 +2359,7 @@ offsetof_member_designator
                        $4->implicit = 1;
                        $$ = newNode ('.', $1, newAst_VALUE (symbolVal ($4)));
                      }
-   | offsetof_member_designator '[' expr ']'
+   | offsetof_member_designator '[' expression ']'
                      {
                        $$ = newNode ('[', $1, $3);
                      }
@@ -2336,9 +2394,9 @@ string_literal_val
 
 Interrupt_storage
    : INTERRUPT { $$ = INTNO_UNSPEC; }
-   | INTERRUPT constant_expr
+   | INTERRUPT '(' constant_expr ')'
         { 
-          value *val = constExprValue($2,TRUE);
+          value *val = constExprValue($3, true);
           int intno = (int) ulFromVal(val);
           if (val && (intno >= 0) && (intno <= INTNO_MAX))
             $$ = intno;
@@ -2440,7 +2498,7 @@ opt_assign_expr
         {
           value *val;
 
-          val = constExprValue($2, TRUE);
+          val = constExprValue($2, true);
           if (!val) // Not a constant expression
             {
               werror (E_CONST_EXPECTED);
@@ -2622,16 +2680,11 @@ declaration_list
    ;
 
 statement_list
-   : statement
-   | statement_list statement          {  $$ = newNode(NULLOP,$1,$2);}
+   : unlabeled_statement                { $$ = $1; }
+   | label                              { if (!options.std_c2x) werror(W_LABEL_WITHOUT_STATEMENT_C2X); $$ = $1; }
+   | statement_list unlabeled_statement { $$ = newNode(NULLOP,$1,$2);}
+   | statement_list label               { if (!options.std_c2x) werror(W_LABEL_WITHOUT_STATEMENT_C2X); $$ = newNode(NULLOP,$1,$2);}
    ;
-
-else_statement
-   :  ELSE  statement   { $$ = $2; }
-   |                    { $$ = NULL; }
-   ;
-
-
 
 while : WHILE  {  /* create and push the continue , break & body labels */
                   static int Lblnum = 0;

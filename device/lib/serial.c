@@ -61,7 +61,7 @@ void serial_init(void)
     ES=1;
 }
 
-void serial_interrupt_handler(void) __interrupt 4 __using 1
+void serial_interrupt_handler(void) __interrupt (4) __using (1)
 {
     ES=0;
     if ( RI )

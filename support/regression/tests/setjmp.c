@@ -12,7 +12,7 @@ unsigned int *gpInt;
 #include <8052.h>
 
 void
-T2_isr (void) __interrupt 5 //no using
+T2_isr (void) __interrupt (5) //no using
 {
   //do not clear flag TF2 so it keeps interrupting !
   (*gpInt)++;

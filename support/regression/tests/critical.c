@@ -96,7 +96,7 @@ testCritical (void)
 
 #if defined(__SDCC_mcs51)
 void
-T2_isr (void) __interrupt 5 __using 2
+T2_isr (void) __interrupt (5) __using (2)
 {
   //do not clear flag ET2 so it keeps interrupting !
   global_var.b++;

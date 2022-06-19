@@ -106,7 +106,7 @@ ser_init(void)
 }
 
 void
-ser_interrupt_handler(void) __interrupt 4 __using 1
+ser_interrupt_handler(void) __interrupt (4) __using (1)
 {
   ES=0;
 

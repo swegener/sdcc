@@ -36,7 +36,7 @@ testInterrupt (void)
 // Timer2 interrupt service routine
 // with register and (stack)spil usage
 void
-T2_isr (void) __interrupt 5 __using({regbank})
+T2_isr (void) __interrupt (5) __using({regbank})
 {
     long a, b, c;
     a = lA + 0xBABE;

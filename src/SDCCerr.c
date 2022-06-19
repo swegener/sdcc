@@ -523,8 +523,8 @@ struct
     "multiple matching expressions in generic association", 0 },
   { E_NO_MATCH_IN_GENERIC, ERROR_LEVEL_ERROR,
     "no matching expression in generic association", 0 },
-  { W_LABEL_WITHOUT_STATEMENT, ERROR_LEVEL_WARNING,
-    "label without statement", 0},
+  { W_LABEL_WITHOUT_STATEMENT_C2X, ERROR_LEVEL_WARNING,
+    "label without statement requires ISO C2X or later", 0},
   { E_WCHAR_CONST_C95, ERROR_LEVEL_ERROR,
     "character constant of type wchar_t requires C95 or later", 0},
   { E_WCHAR_CONST_C11, ERROR_LEVEL_ERROR,
@@ -617,6 +617,10 @@ struct
      "complex numbers are not supported", 0 },
   { E_DECIMAL_FLOAT_UNSUPPORTED, ERROR_LEVEL_ERROR,
      "decimal floating-point numbers are not supported", 0 },
+  { E_ATOMIC_UNSUPPORTED, ERROR_LEVEL_ERROR,
+     "atomics are not supported", 0 },
+  { W_RETURN_TYPE_OMITTED_INT, ERROR_LEVEL_WARNING,
+     "return type of function omitted, assuming int", 0 }
 };
 
 /* -------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 bool
-manipulate_bits (bool x) __using 2
+manipulate_bits (bool x) __using (2)
 {
   return x;
 }
@@ -46,7 +46,7 @@ testSaveBits (void)
 
 #if defined(__SDCC_mcs51)
 void
-T2_isr (void) __interrupt 5 __using 2
+T2_isr (void) __interrupt (5) __using (2)
 {
   //do not clear flag ET2 so it keeps interrupting !
 

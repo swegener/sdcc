@@ -186,7 +186,7 @@ TYPE rotate_test_4_xor2(TYPE value)
     return rotate_test_value;
 }
 
-rotate_test_load(TYPE value)
+void rotate_test_load(TYPE value)
 {
     rotate_test_value = value;
 }

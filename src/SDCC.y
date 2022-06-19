@@ -2681,9 +2681,9 @@ declaration_list
 
 statement_list
    : unlabeled_statement                { $$ = $1; }
-   | label                              { if (!options.std_c2x) werror(W_LABEL_WITHOUT_STATEMENT_C2X); $$ = $1; }
+   | label                              { $$ = $1; }
    | statement_list unlabeled_statement { $$ = newNode(NULLOP,$1,$2);}
-   | statement_list label               { if (!options.std_c2x) werror(W_LABEL_WITHOUT_STATEMENT_C2X); $$ = newNode(NULLOP,$1,$2);}
+   | statement_list label               { $$ = newNode(NULLOP,$1,$2);}
    ;
 
 while : WHILE  {  /* create and push the continue , break & body labels */

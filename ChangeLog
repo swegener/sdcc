@@ -1,5 +1,12 @@
 2022-06-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCC.y:
+	  Remove warning on label without statement, as it gives too many false positives.
+	* support/regression/tests/rotate2.c.in:
+	  Fix missing return type.
+
+2022-06-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge from parser branch.
 
 2022-06-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

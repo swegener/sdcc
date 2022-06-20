@@ -178,8 +178,8 @@ primary_expression
    ;
 
 predefined_constant
-   : TOKEN_FALSE {}
-   | TOKEN_TRUE {}
+   : TOKEN_FALSE { $$ = newAst_VALUE (constBoolVal (false, true)); }
+   | TOKEN_TRUE  { $$ = newAst_VALUE (constBoolVal (true, true)); }
    ; /* add nullptr here if it gets approved for C23 */
 
 generic_selection

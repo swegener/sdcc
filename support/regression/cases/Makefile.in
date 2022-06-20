@@ -1011,6 +1011,7 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@echo '#pragma disable_warning 93' >> $@
 	@echo '#pragma disable_warning 196' >> $@
 	@echo '#pragma disable_warning 127' >> $@
+	@grep main $< -C1 | grep -q ^int || echo '#pragma disable_warning 278' >> $@
 
 # stuff defined in gcc, but not in sdcc
 	@grep -q __CHAR_BIT__ $< && (echo "#include <limits.h>"; echo "#define __CHAR_BIT__ CHAR_BIT") >> $@ || :

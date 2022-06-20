@@ -2,6 +2,10 @@
 
 	* src/SDCC.y:
 	  Fix handling of C2X predefined constants.
+	* device/lib/ds390/tinibios.c:
+	  Fix use of __interrupt.
+	* support/regression/tests/compare_2_n.m4:
+	  Fix missing return type.
 
 2022-06-20 Felix Salfelder <felix AT salfelder.org>
 

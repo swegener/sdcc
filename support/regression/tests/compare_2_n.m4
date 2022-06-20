@@ -67,6 +67,7 @@ test_gtr_`'int_right (void)
 
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 /* special case for 0x0000 */
+int
 lwr_if_0x0000 (unsigned left)
 {
   if (left < 0x0000)

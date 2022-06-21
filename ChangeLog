@@ -1,5 +1,7 @@
 2022-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCicode.c/h (PRINTFUNC, +piCode, iCodePrint): replaced
+	  void*/iCode* with const iCode*
 	* device/include/ds80c390.h,
 	  device/include/mcs51/at89S8252.h: use parentheses with __at
 	* device/include/mcs51/at89c55.h,

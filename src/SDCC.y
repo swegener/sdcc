@@ -1889,9 +1889,9 @@ label
    | attribute_specifier_sequence_opt DEFAULT { $<asts>$ = newNode(DEFAULT,NULL,NULL); } ':'
      {
        if (STACK_EMPTY(swStk))
-         $$ = createDefault(NULL,$<asts>2,NULL);
+         $$ = createDefault(NULL,$<asts>3,NULL);
        else
-         $$ = createDefault(STACK_PEEK(swStk),$<asts>2,NULL);
+         $$ = createDefault(STACK_PEEK(swStk),$<asts>3,NULL);
      }
    ;
 

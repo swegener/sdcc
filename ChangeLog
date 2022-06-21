@@ -1,3 +1,8 @@
+2022-06-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y:
+	  Fix SDCC crash on error message for duplicate default label.
+
 2022-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c/h (PRINTFUNC, +piCode, iCodePrint): replaced

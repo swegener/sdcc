@@ -1,3 +1,26 @@
+2022-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/ds80c390.h,
+	  device/include/mcs51/at89S8252.h: use parentheses with __at
+	* device/include/mcs51/at89c55.h,
+	  device/include/mcs51/at89x51.h,
+	  device/include/mcs51/at89x52.h,
+	  device/include/mcs51/C8051F040.h,
+	  device/include/mcs51/C8051F060.h,
+	  device/include/mcs51/mcs51reg.h,
+	  device/include/mcs51/reg764.h,
+	  device/include/mcs51/regc515c.h,
+	  device/include/mcs51/sab80515.h: use compiler.h
+	* device/include/mcs51/at89x051.h: cosmetics
+	* device/lib/_setjmp.c: stack is in __idata
+	* device/lib/ds390/tinibios.c,
+	  device/lib/ds400/tinibios.c,
+	  device/lib/ser_ir.c: use parentheses with __interrupt
+	* device/lib/ser_ir_cts_rts.c: use __bit
+	* src/mos6502/gen.c,
+	  src/z80/gen.c: commented out some unused code to fix warnings
+	* src/z80/peeph.def: removed rule 88 as it is a duplicate of 85a
+
 2022-06-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.y:

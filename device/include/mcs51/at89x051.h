@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,7 +31,7 @@
 #ifndef AT89Cx051_H
 #define AT89Cx051_H
 
-#include <8051.h>     /* load difinitions for the 8051 core */
+#include <8051.h>		/* load definitions for the 8051 core */
 
 #ifdef REG8051_H
 #undef REG8051_H
@@ -39,9 +39,9 @@
 
 /* remove non existing registers */
 
-#ifdef P0				  /* P0 is defined in <8051.h> */
-#undef P0				  /* AT89Cx051 has no P0 */
-#undef P0_0				  /* undefine bit addressable registers in P0 */
+#ifdef P0				/* P0 is defined in <8051.h> */
+#undef P0				/* AT89Cx051 has no P0 */
+#undef P0_0				/* undefine bit addressable registers in P0 */
 #undef P0_1
 #undef P0_2
 #undef P0_3
@@ -51,9 +51,9 @@
 #undef P0_7
 #endif
 
-#ifdef P2				  /* P2 is defined in <8051.h> */
-#undef P2				  /* AT89Cx051 has no P2 */
-#undef P2_0				  /* undefine bit addressable registers in P2 */
+#ifdef P2				/* P2 is defined in <8051.h> */
+#undef P2				/* AT89Cx051 has no P2 */
+#undef P2_0				/* undefine bit addressable registers in P2 */
 #undef P2_1
 #undef P2_2
 #undef P2_3

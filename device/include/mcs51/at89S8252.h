@@ -24,7 +24,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -329,7 +329,7 @@ __sbit __at (0xF7) BREG_F7    ;
 /* This is one of the addons coming from Bernd Krueger-Knauber   */
 
 /* ALE (0x8E) Bit Values */
-__sfr __at 0x8E ALE;     	/* at89S8252 specific register */
+__sfr __at (0x8E) ALE;     	/* at89S8252 specific register */
 
 /* Macro to enable and disable the toggling of the ALE-pin (EMV) */
 

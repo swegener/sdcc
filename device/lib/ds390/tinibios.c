@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
- 
+
 unsigned char _sdcc_external_startup(void)
 {
   IE=0; // disable ALL interrupts
@@ -93,7 +93,7 @@ _Startup390CopyIVT:
 
   // global interrupt enable, all masks cleared
   // let the Gods be with us :)
-  IE = 0x80; 
+  IE = 0x80;
 
   Serial0Init(SERIAL_0_BAUD,1);
   //Serial1Init(SERIAL_1_BAUD,1);
@@ -102,7 +102,7 @@ _Startup390CopyIVT:
   //WatchDogInit();
 
   // signal _sdcc_gsinit_startup to initialize data (call _sdcc_init_data)
-  return 0; 
+  return 0;
 }
 
 /* Set the cpu speed in clocks per machine cycle, valid values are:
@@ -123,7 +123,7 @@ void CpuSpeed(unsigned int speed)
     ; // cpu operates from ring buffer
 #endif
   PMR = 0x80; // div4, CTM off, multiplier 2x
-  switch (speed) 
+  switch (speed)
     {
     case 1:
       PMR=0x88; // div4, CTM off, multiplier 4x
@@ -151,11 +151,11 @@ void CpuSpeed(unsigned int speed)
       cpuSpeed=speed;
       break;
     }
-}  
+}
 
 // now the serial0 stuff
 
-// just to make the code more readable 
+// just to make the code more readable
 #define S0RBS SERIAL_0_RECEIVE_BUFFER_SIZE
 
 // this is a ring buffer and can overflow at anytime!
@@ -185,22 +185,22 @@ void Serial0Init (unsigned long baud, unsigned char buffered)
 
   ES0 = 0; // disable serial channel 0 interrupt
   TR2 = 0; // stop timer 2
-  
+
   // set 8 bit uart with variable baud from timer 1/2
   // enable receiver and clear RI and TI
   SCON0 = 0x50;
-  
+
   PCON |= 0x80; // clock is 16x bitrate
   CKCON|=0x20; // timer uses xtal/4
-  
+
   T2MOD=0; // no fancy functions
   T2CON=0x34; // start timer as a baudrate generator for serial0
-  
+
   // set the baud rate
   Serial0Baud(baud);
-  
+
   serial0Buffered=buffered;
- 
+
   if (buffered) {
     RI_0=TI_0=0; // clear "pending" interrupts
     ES0 = 1; // enable serial channel 0 interrupt
@@ -218,7 +218,7 @@ void Serial0Baud(unsigned long baud)
   TH2=RCAP2H= baud>>8;
   TF2=0; // clear overflow flag
   TR2=1; // start timer
-}  
+}
 
 void Serial0IrqHandler (void) __interrupt (4)
 {
@@ -303,11 +303,11 @@ void Serial0Flush()
   }
 }
 
-/* now let's go for the serial1 stuff, basically it's a replicate of 
+/* now let's go for the serial1 stuff, basically it's a replicate of
    serial0 except it uses timer 1
 */
 
-// just to make the code more readable 
+// just to make the code more readable
 #define S1RBS SERIAL_1_RECEIVE_BUFFER_SIZE
 
 // this is a ring buffer and can overflow at anytime!
@@ -337,19 +337,19 @@ void Serial1Init (unsigned long baud, unsigned char buffered)
 
   ES1 = 0; // disable channel 1 interrupt
   TR1 = 0; // stop timer 1
-  
+
   // set 8 bit uart with variable baud from timer 1
   // enable receiver and clear RI and TI
   SCON1 = 0x50;
-  
+
   WDCON |= 0x80; // clock is 16x bitrate
   CKCON|=0x10; // timer uses xtal/4
-  
+
   TMOD = (TMOD&0x0f) | 0x20; // timer 1 is an 8bit auto-reload counter
-  
+
   // set the baud rate
   Serial1Baud(baud);
-  
+
   serial1Buffered=buffered;
 
   if (buffered) {
@@ -368,7 +368,7 @@ void Serial1Baud(unsigned long baud)
   TL1=TH1 = baud;
   TF1=0; // clear overflow flag
   TR1=1; // start timer
-}  
+}
 
 void Serial1IrqHandler (void) __interrupt (7)
 {
@@ -473,10 +473,10 @@ void ClockInit()
   TCON = (TCON&0xcc)|0x00; // stop timer, clear overflow
   TMOD = (TMOD&0xf0)|0x01; // 16 bit counter
   CKCON|=0x08; // timer uses xtal/4
-  
+
   TL0=timer0ReloadValue&0xff;
   TH0=timer0ReloadValue>>8;
-  
+
   ET0=1; // enable timer interrupts
   TR0=1; // start timer
 }
@@ -484,7 +484,7 @@ void ClockInit()
 // This needs to be SUPER fast. What we really want is:
 
 #if 0
-void junk_ClockIrqHandler (void) __interrupt 10
+void junk_ClockIrqHandler (void) __interrupt (10)
 {
   TL0 = timer0ReloadValue & 0xff;
   TH0 = timer0ReloadValue >> 8;
@@ -537,9 +537,9 @@ void ClockMilliSecondsDelay(unsigned long delay)
 void ClockMicroSecondsDelay(unsigned int delay)
 {
   delay; /* shut compiler up. */
-   
+
   __asm
-     
+
     ; delay is in dpl/dph
     mov	r0, dpl
     mov  r1, dph
@@ -547,11 +547,11 @@ void ClockMicroSecondsDelay(unsigned int delay)
     mov	a, r0
     orl  a, r1			; quick out for zero case.
     jz   _usDelayDone
-   
+
     inc	r1
     cjne r0, #0, _usDelayLoop
     dec  r1
-   
+
   _usDelayLoop:
     nop
     nop
@@ -564,8 +564,8 @@ void ClockMicroSecondsDelay(unsigned int delay)
 				; 10 cycles per iter
 				; we want 9.216, but more is better
 				; than less.
-    djnz r1, _usDelayLoop	
+    djnz r1, _usDelayLoop
   _usDelayDone:
-   
+
   __endasm;
 }

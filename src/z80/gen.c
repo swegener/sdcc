@@ -1580,7 +1580,7 @@ aopForRemat (symbol *sym)
   else
     {
       aop = newAsmop (AOP_IMMD);
-      
+
       dbuf_init (&dbuf, 128);
       if (val)
         {
@@ -1596,6 +1596,7 @@ aopForRemat (symbol *sym)
   return aop;
 }
 
+#if 0 // No longer used?
 /*-----------------------------------------------------------------*/
 /* regsInCommon - two operands have some registers in common       */
 /*-----------------------------------------------------------------*/
@@ -1633,6 +1634,7 @@ regsInCommon (operand * op1, operand * op2)
 
   return FALSE;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* operandsEqu - equivalent                                        */
@@ -15743,7 +15745,6 @@ done:
   freeAsmop (n, NULL);
   freeAsmop (c, NULL);
   freeAsmop (dst, NULL);
-
 
   if (saved_BC)
     _pop (PAIR_BC);

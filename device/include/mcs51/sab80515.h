@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,245 +31,247 @@
 #ifndef SAB80515_H
 #define SAB80515_H
 
+#include <compiler.h>
+
 /* BYTE addressable registers */
-__sfr __at 0x80 P0          ;
-__sfr __at 0x81 SP          ;
-__sfr __at 0x82 DPL         ;
-__sfr __at 0x83 DPH         ;
-__sfr __at 0x87 PCON        ;
-__sfr __at 0x88 TCON        ;
-__sfr __at 0x89 TMOD        ;
-__sfr __at 0x8A TL0         ;
-__sfr __at 0x8B TL1         ;
-__sfr __at 0x8C TH0         ;
-__sfr __at 0x8D TH1         ;
-__sfr __at 0x90 P1          ;
-__sfr __at 0x98 SCON        ;
-__sfr __at 0x99 SBUF        ;
-__sfr __at 0xA0 P2          ;
-__sfr __at 0xA8 IE          ;
-__sfr __at 0xA8 IEN0        ; /* as called by Siemens */
-__sfr __at 0xA9 IP0         ; /* interrupt priority register - SAB80515 specific */
-__sfr __at 0xB0 P3          ;
-__sfr __at 0xB8 IEN1        ; /* interrupt enable register - SAB80515 specific */
-__sfr __at 0xB9 IP1         ; /* interrupt priority register as called by Siemens */
-__sfr __at 0xC0 IRCON       ; /* interrupt control register - SAB80515 specific */
-__sfr __at 0xC1 CCEN        ; /* compare/capture enable register */
-__sfr __at 0xC2 CCL1        ; /* compare/capture register 1, low byte */
-__sfr __at 0xC3 CCH1        ; /* compare/capture register 1, high byte */
-__sfr __at 0xC4 CCL2        ; /* compare/capture register 2, low byte */
-__sfr __at 0xC5 CCH2        ; /* compare/capture register 2, high byte */
-__sfr __at 0xC6 CCL3        ; /* compare/capture register 3, low byte */
-__sfr __at 0xC7 CCH3        ; /* compare/capture register 3, high byte */
-__sfr __at 0xC8 T2CON       ;
-__sfr __at 0xCA CRCL        ; /* compare/reload/capture register, low byte */
-__sfr __at 0xCB CRCH        ; /* compare/reload/capture register, high byte */
-__sfr __at 0xCC TL2         ;
-__sfr __at 0xCD TH2         ;
-__sfr __at 0xD0 PSW         ;
-__sfr __at 0xD8 ADCON       ; /* A/D-converter control register */
-__sfr __at 0xD9 ADDAT       ; /* A/D-converter data register */
-__sfr __at 0xDA DAPR        ; /* D/A-converter program register */
-__sfr __at 0xDB P6          ; /* Port 6 - SAB80515 specific */
-__sfr __at 0xE0 ACC         ;
-__sfr __at 0xE0 A           ;
-__sfr __at 0xE8 P4          ; /* Port 4 - SAB80515 specific */
-__sfr __at 0xF0 B           ;
-__sfr __at 0xF8 P5          ; /* Port 5 - SAB80515 specific */
+SFR(P0,		0x80);
+SFR(SP,		0x81);
+SFR(DPL,	0x82);
+SFR(DPH,	0x83);
+SFR(PCON,	0x87);
+SFR(TCON,	0x88);
+SFR(TMOD,	0x89);
+SFR(TL0,	0x8A);
+SFR(TL1,	0x8B);
+SFR(TH0,	0x8C);
+SFR(TH1,	0x8D);
+SFR(P1,		0x90);
+SFR(SCON,	0x98);
+SFR(SBUF,	0x99);
+SFR(P2,		0xA0);
+SFR(IE,		0xA8);
+SFR(IEN0,	0xA8); /* as called by Siemens */
+SFR(IP0,	0xA9); /* interrupt priority register - SAB80515 specific */
+SFR(P3,		0xB0);
+SFR(IEN1,	0xB8); /* interrupt enable register - SAB80515 specific */
+SFR(IP1,	0xB9); /* interrupt priority register as called by Siemens */
+SFR(IRCON,	0xC0); /* interrupt control register - SAB80515 specific */
+SFR(CCEN,	0xC1); /* compare/capture enable register */
+SFR(CCL1,	0xC2); /* compare/capture register 1, low byte */
+SFR(CCH1,	0xC3); /* compare/capture register 1, high byte */
+SFR(CCL2,	0xC4); /* compare/capture register 2, low byte */
+SFR(CCH2,	0xC5); /* compare/capture register 2, high byte */
+SFR(CCL3,	0xC6); /* compare/capture register 3, low byte */
+SFR(CCH3,	0xC7); /* compare/capture register 3, high byte */
+SFR(T2CON,	0xC8);
+SFR(CRCL,	0xCA); /* compare/reload/capture register, low byte */
+SFR(CRCH,	0xCB); /* compare/reload/capture register, high byte */
+SFR(TL2,	0xCC);
+SFR(TH2,	0xCD);
+SFR(PSW,	0xD0);
+SFR(ADCON,	0xD8); /* A/D-converter control register */
+SFR(ADDAT,	0xD9); /* A/D-converter data register */
+SFR(DAPR,	0xDA); /* D/A-converter program register */
+SFR(P6,		0xDB); /* Port 6 - SAB80515 specific */
+SFR(ACC,	0xE0);
+SFR(A,		0xE0);
+SFR(P4,		0xE8); /* Port 4 - SAB80515 specific */
+SFR(B,		0xF0);
+SFR(P5,		0xF8); /* Port 5 - SAB80515 specific */
 
 
 /* BIT addressable registers */
 /* P0 */
-__sbit __at 0x80 P0_0       ;
-__sbit __at 0x81 P0_1       ;
-__sbit __at 0x82 P0_2       ;
-__sbit __at 0x83 P0_3       ;
-__sbit __at 0x84 P0_4       ;
-__sbit __at 0x85 P0_5       ;
-__sbit __at 0x86 P0_6       ;
-__sbit __at 0x87 P0_7       ;
+SBIT(P0_0,		0x80);
+SBIT(P0_1,		0x81);
+SBIT(P0_2,		0x82);
+SBIT(P0_3,		0x83);
+SBIT(P0_4,		0x84);
+SBIT(P0_5,		0x85);
+SBIT(P0_6,		0x86);
+SBIT(P0_7,		0x87);
 
 /* TCON */
-__sbit __at 0x88 IT0        ;
-__sbit __at 0x89 IE0        ;
-__sbit __at 0x8A IT1        ;
-__sbit __at 0x8B IE1        ;
-__sbit __at 0x8C TR0        ;
-__sbit __at 0x8D TF0        ;
-__sbit __at 0x8E TR1        ;
-__sbit __at 0x8F TF1        ;
+SBIT(IT0,		0x88);
+SBIT(IE0,		0x89);
+SBIT(IT1,		0x8A);
+SBIT(IE1,		0x8B);
+SBIT(TR0,		0x8C);
+SBIT(TF0,		0x8D);
+SBIT(TR1,		0x8E);
+SBIT(TF1,		0x8F);
 
 /* P1 */
-__sbit __at 0x90 P1_0       ;
-__sbit __at 0x91 P1_1       ;
-__sbit __at 0x92 P1_2       ;
-__sbit __at 0x93 P1_3       ;
-__sbit __at 0x94 P1_4       ;
-__sbit __at 0x95 P1_5       ;
-__sbit __at 0x96 P1_6       ;
-__sbit __at 0x97 P1_7       ;
+SBIT(P1_0,		0x90);
+SBIT(P1_1,		0x91);
+SBIT(P1_2,		0x92);
+SBIT(P1_3,		0x93);
+SBIT(P1_4,		0x94);
+SBIT(P1_5,		0x95);
+SBIT(P1_6,		0x96);
+SBIT(P1_7,		0x97);
 
-__sbit __at 0x90 INT3_CC0   ; /* P1 alternate functions - SAB80515 specific */
-__sbit __at 0x91 INT4_CC1   ;
-__sbit __at 0x92 INT5_CC2   ;
-__sbit __at 0x93 INT6_CC3   ;
-__sbit __at 0x94 INT2       ;
-__sbit __at 0x95 T2EX       ;
-__sbit __at 0x96 CLKOUT     ;
-__sbit __at 0x97 T2         ;
+SBIT(INT3_CC0,	0x90); /* P1 alternate functions - SAB80515 specific */
+SBIT(INT4_CC1,	0x91);
+SBIT(INT5_CC2,	0x92);
+SBIT(INT6_CC3,	0x93);
+SBIT(INT2,		0x94);
+SBIT(T2EX,		0x95);
+SBIT(CLKOUT,	0x96);
+SBIT(T2,		0x97);
 
 /* SCON */
-__sbit __at 0x98 RI         ;
-__sbit __at 0x99 TI         ;
-__sbit __at 0x9A RB8        ;
-__sbit __at 0x9B TB8        ;
-__sbit __at 0x9C REN        ;
-__sbit __at 0x9D SM2        ;
-__sbit __at 0x9E SM1        ;
-__sbit __at 0x9F SM0        ;
+SBIT(RI,		0x98);
+SBIT(TI,		0x99);
+SBIT(RB8,		0x9A);
+SBIT(TB8,		0x9B);
+SBIT(REN,		0x9C);
+SBIT(SM2,		0x9D);
+SBIT(SM1,		0x9E);
+SBIT(SM0,		0x9F);
 
 /* P2 */
-__sbit __at 0xA0 P2_0       ;
-__sbit __at 0xA1 P2_1       ;
-__sbit __at 0xA2 P2_2       ;
-__sbit __at 0xA3 P2_3       ;
-__sbit __at 0xA4 P2_4       ;
-__sbit __at 0xA5 P2_5       ;
-__sbit __at 0xA6 P2_6       ;
-__sbit __at 0xA7 P2_7       ;
+SBIT(P2_0,		0xA0);
+SBIT(P2_1,		0xA1);
+SBIT(P2_2,		0xA2);
+SBIT(P2_3,		0xA3);
+SBIT(P2_4,		0xA4);
+SBIT(P2_5,		0xA5);
+SBIT(P2_6,		0xA6);
+SBIT(P2_7,		0xA7);
 
 /* IEN0 */
-__sbit __at 0xA8 EX0        ;
-__sbit __at 0xA9 ET0        ;
-__sbit __at 0xAA EX1        ;
-__sbit __at 0xAB ET1        ;
-__sbit __at 0xAC ES         ;
-__sbit __at 0xAD ET2        ;
-__sbit __at 0xAE WDT        ; /* watchdog timer reset - SAB80515 specific */
-__sbit __at 0xAF EA         ;
+SBIT(EX0,		0xA8);
+SBIT(ET0,		0xA9);
+SBIT(EX1,		0xAA);
+SBIT(ET1,		0xAB);
+SBIT(ES,		0xAC);
+SBIT(ET2,		0xAD);
+SBIT(WDT,		0xAE); /* watchdog timer reset - SAB80515 specific */
+SBIT(EA,		0xAF);
 
-__sbit __at 0xAF EAL        ; /* EA as called by Siemens */
+SBIT(EAL,		0xAF); /* EA as called by Siemens */
 
 /* P3 */
-__sbit __at 0xB0 P3_0       ;
-__sbit __at 0xB1 P3_1       ;
-__sbit __at 0xB2 P3_2       ;
-__sbit __at 0xB3 P3_3       ;
-__sbit __at 0xB4 P3_4       ;
-__sbit __at 0xB5 P3_5       ;
-__sbit __at 0xB6 P3_6       ;
-__sbit __at 0xB7 P3_7       ;
+SBIT(P3_0,		0xB0);
+SBIT(P3_1,		0xB1);
+SBIT(P3_2,		0xB2);
+SBIT(P3_3,		0xB3);
+SBIT(P3_4,		0xB4);
+SBIT(P3_5,		0xB5);
+SBIT(P3_6,		0xB6);
+SBIT(P3_7,		0xB7);
 
-__sbit __at 0xB0 RXD        ;
-__sbit __at 0xB1 TXD        ;
-__sbit __at 0xB2 INT0       ;
-__sbit __at 0xB3 INT1       ;
-__sbit __at 0xB4 T0         ;
-__sbit __at 0xB5 T1         ;
-__sbit __at 0xB6 WR         ;
-__sbit __at 0xB7 RD         ;
+SBIT(RXD,		0xB0);
+SBIT(TXD,		0xB1);
+SBIT(INT0,		0xB2);
+SBIT(INT1,		0xB3);
+SBIT(T0,		0xB4);
+SBIT(T1,		0xB5);
+SBIT(WR,		0xB6);
+SBIT(RD,		0xB7);
 
 /* IEN1 */
-__sbit __at 0xB8 EADC       ; /* A/D converter interrupt enable */
-__sbit __at 0xB9 EX2        ;
-__sbit __at 0xBA EX3        ;
-__sbit __at 0xBB EX4        ;
-__sbit __at 0xBC EX5        ;
-__sbit __at 0xBD EX6        ;
-__sbit __at 0xBE SWDT       ; /* watchdog timer start/reset */
-__sbit __at 0xBF EXEN2      ; /* timer2 external reload interrupt enable */
+SBIT(EADC,		0xB8); /* A/D converter interrupt enable */
+SBIT(EX2,		0xB9);
+SBIT(EX3,		0xBA);
+SBIT(EX4,		0xBB);
+SBIT(EX5,		0xBC);
+SBIT(EX6,		0xBD);
+SBIT(SWDT,		0xBE); /* watchdog timer start/reset */
+SBIT(EXEN2,		0xBF); /* timer2 external reload interrupt enable */
 
 /* IRCON */
-__sbit __at 0xC0 IADC       ; /* A/D converter irq flag */
-__sbit __at 0xC1 IEX2       ; /* external interrupt edge detect flag */
-__sbit __at 0xC2 IEX3       ;
-__sbit __at 0xC3 IEX4       ;
-__sbit __at 0xC4 IEX5       ;
-__sbit __at 0xC5 IEX6       ;
-__sbit __at 0xC6 TF2        ; /* timer 2 owerflow flag  */
-__sbit __at 0xC7 EXF2       ; /* timer2 reload flag */
+SBIT(IADC,		0xC0); /* A/D converter irq flag */
+SBIT(IEX2,		0xC1); /* external interrupt edge detect flag */
+SBIT(IEX3,		0xC2);
+SBIT(IEX4,		0xC3);
+SBIT(IEX5,		0xC4);
+SBIT(IEX6,		0xC5);
+SBIT(TF2,		0xC6); /* timer 2 owerflow flag  */
+SBIT(EXF2,		0xC7); /* timer2 reload flag */
 
 /* T2CON */
-__sbit __at 0xC8 T2CON_0    ;
-__sbit __at 0xC9 T2CON_1    ;
-__sbit __at 0xCA T2CON_2    ;
-__sbit __at 0xCB T2CON_3    ;
-__sbit __at 0xCC T2CON_4    ;
-__sbit __at 0xCD T2CON_5    ;
-__sbit __at 0xCE T2CON_6    ;
-__sbit __at 0xCF T2CON_7    ;
+SBIT(T2CON_0,	0xC8);
+SBIT(T2CON_1,	0xC9);
+SBIT(T2CON_2,	0xCA);
+SBIT(T2CON_3,	0xCB);
+SBIT(T2CON_4,	0xCC);
+SBIT(T2CON_5,	0xCD);
+SBIT(T2CON_6,	0xCE);
+SBIT(T2CON_7,	0xCF);
 
-__sbit __at 0xC8 T2I0       ;
-__sbit __at 0xC9 T2I1       ;
-__sbit __at 0xCA T2CM       ;
-__sbit __at 0xCB T2R0       ;
-__sbit __at 0xCC T2R1       ;
-__sbit __at 0xCD I2FR       ;
-__sbit __at 0xCE I3FR       ;
-__sbit __at 0xCF T2PS       ;
+SBIT(T2I0,		0xC8);
+SBIT(T2I1,		0xC9);
+SBIT(T2CM,		0xCA);
+SBIT(T2R0,		0xCB);
+SBIT(T2R1,		0xCC);
+SBIT(I2FR,		0xCD);
+SBIT(I3FR,		0xCE);
+SBIT(T2PS,		0xCF);
 
 
 /* PSW */
-__sbit __at 0xD0 P          ;
-__sbit __at 0xD1 FL         ;
-__sbit __at 0xD2 OV         ;
-__sbit __at 0xD3 RS0        ;
-__sbit __at 0xD4 RS1        ;
-__sbit __at 0xD5 F0         ;
-__sbit __at 0xD6 AC         ;
-__sbit __at 0xD7 CY         ;
+SBIT(P,			0xD0);
+SBIT(FL,		0xD1);
+SBIT(OV,		0xD2);
+SBIT(RS0,		0xD3);
+SBIT(RS1,		0xD4);
+SBIT(F0,		0xD5);
+SBIT(AC,		0xD6);
+SBIT(CY,		0xD7);
 
-__sbit __at 0xD1 F1         ;
+SBIT(F1,		0xD1);
 
 /* ADCON */
-__sbit __at 0xD8 MX0        ;
-__sbit __at 0xD9 MX1        ;
-__sbit __at 0xDA MX2        ;
-__sbit __at 0xDB ADM        ;
-__sbit __at 0xDC BSY        ;
+SBIT(MX0,		0xD8);
+SBIT(MX1,		0xD9);
+SBIT(MX2,		0xDA);
+SBIT(ADM,		0xDB);
+SBIT(BSY,		0xDC);
 
-__sbit __at 0xDE CLK        ;
-__sbit __at 0xDF BD         ;
+SBIT(CLK,		0xDE);
+SBIT(BD,		0xDF);
 
 /* A */
-__sbit __at 0xA0 AREG_F0    ;
-__sbit __at 0xA1 AREG_F1    ;
-__sbit __at 0xA2 AREG_F2    ;
-__sbit __at 0xA3 AREG_F3    ;
-__sbit __at 0xA4 AREG_F4    ;
-__sbit __at 0xA5 AREG_F5    ;
-__sbit __at 0xA6 AREG_F6    ;
-__sbit __at 0xA7 AREG_F7    ;
+SBIT(AREG_F0,	0xA0);
+SBIT(AREG_F1,	0xA1);
+SBIT(AREG_F2,	0xA2);
+SBIT(AREG_F3,	0xA3);
+SBIT(AREG_F4,	0xA4);
+SBIT(AREG_F5,	0xA5);
+SBIT(AREG_F6,	0xA6);
+SBIT(AREG_F7,	0xA7);
 
 /* P4 */
-__sbit __at 0xE8 P4_0       ;
-__sbit __at 0xE9 P4_1       ;
-__sbit __at 0xEA P4_2       ;
-__sbit __at 0xEB P4_3       ;
-__sbit __at 0xEC P4_4       ;
-__sbit __at 0xED P4_5       ;
-__sbit __at 0xEE P4_6       ;
-__sbit __at 0xEF P4_7       ;
+SBIT(P4_0,		0xE8);
+SBIT(P4_1,		0xE9);
+SBIT(P4_2,		0xEA);
+SBIT(P4_3,		0xEB);
+SBIT(P4_4,		0xEC);
+SBIT(P4_5,		0xED);
+SBIT(P4_6,		0xEE);
+SBIT(P4_7,		0xEF);
 
 /* B */
-__sbit __at 0xF0 BREG_F0    ;
-__sbit __at 0xF1 BREG_F1    ;
-__sbit __at 0xF2 BREG_F2    ;
-__sbit __at 0xF3 BREG_F3    ;
-__sbit __at 0xF4 BREG_F4    ;
-__sbit __at 0xF5 BREG_F5    ;
-__sbit __at 0xF6 BREG_F6    ;
-__sbit __at 0xF7 BREG_F7    ;
+SBIT(BREG_F0,	0xF0);
+SBIT(BREG_F1,	0xF1);
+SBIT(BREG_F2,	0xF2);
+SBIT(BREG_F3,	0xF3);
+SBIT(BREG_F4,	0xF4);
+SBIT(BREG_F5,	0xF5);
+SBIT(BREG_F6,	0xF6);
+SBIT(BREG_F7,	0xF7);
 
 /* P5 */
-__sbit __at 0xF8 P5_0       ;
-__sbit __at 0xF9 P5_1       ;
-__sbit __at 0xFA P5_2       ;
-__sbit __at 0xFB P5_3       ;
-__sbit __at 0xFC P5_4       ;
-__sbit __at 0xFD P5_5       ;
-__sbit __at 0xFE P5_6       ;
-__sbit __at 0xFF P5_7       ;
+SBIT(P5_0,		0xF8);
+SBIT(P5_1,		0xF9);
+SBIT(P5_2,		0xFA);
+SBIT(P5_3,		0xFB);
+SBIT(P5_4,		0xFC);
+SBIT(P5_5,		0xFD);
+SBIT(P5_6,		0xFE);
+SBIT(P5_7,		0xFF);
 
 /* BIT definitions for bits that are not directly accessible */
 /* PCON bits */

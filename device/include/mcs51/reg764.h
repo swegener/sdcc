@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,186 +31,188 @@
 #ifndef REGC764_H
 #define REGC764_H
 
+#include <compiler.h>
+
 /*  Special Function Registers  */
 
-__sfr __at 0x80 P0    ;   // Port 0
-__sfr __at 0x81 SP    ;   // Stack Pointer
-__sfr __at 0x82 DPL   ;   // Data Pointer Low
-__sfr __at 0x83 DPH   ;   // Data Pointer High
-__sfr __at 0x84 P0M1  ;   // Port 0 output mode 1
-__sfr __at 0x85 P0M2  ;   // Port 0 output mode 2
-__sfr __at 0x86 KBI   ;   // Keyboard interrupt
-__sfr __at 0x87 PCON  ;   // Power Control
-__sfr __at 0x88 TCON  ;   // Timer Control
-__sfr __at 0x89 TMOD  ;   // Timer Mode
-__sfr __at 0x8A TL0   ;   // Timer Low 0
-__sfr __at 0x8B TL1   ;   // Timer Low 1
-__sfr __at 0x8C TH0   ;   // Timer High 0
-__sfr __at 0x8D TH1   ;   // Timer High 1
+SFR(P0,		0x80);   // Port 0
+SFR(SP,		0x81);   // Stack Pointer
+SFR(DPL,	0x82);   // Data Pointer Low
+SFR(DPH,	0x83);   // Data Pointer High
+SFR(P0M1,	0x84);   // Port 0 output mode 1
+SFR(P0M2,	0x85);   // Port 0 output mode 2
+SFR(KBI,	0x86);   // Keyboard interrupt
+SFR(PCON,	0x87);   // Power Control
+SFR(TCON,	0x88);   // Timer Control
+SFR(TMOD,	0x89);   // Timer Mode
+SFR(TL0,	0x8A);   // Timer Low 0
+SFR(TL1,	0x8B);   // Timer Low 1
+SFR(TH0,	0x8C);   // Timer High 0
+SFR(TH1,	0x8D);   // Timer High 1
 
-__sfr __at 0x90 P1    ;   // Port 1
-__sfr __at 0x91 P1M1  ;   // Port 1 output mode 1
-__sfr __at 0x92 P1M2  ;   // Port 1 output mode 2
-__sfr __at 0x95 DIVM  ;   // CPU clock divide by N control
-__sfr __at 0x98 SCON  ;   // Serial Control
-__sfr __at 0x99 SBUF  ;   // Serial Data Buffer
+SFR(P1,		0x90);   // Port 1
+SFR(P1M1,	0x91);   // Port 1 output mode 1
+SFR(P1M2,	0x92);   // Port 1 output mode 2
+SFR(DIVM,	0x95);   // CPU clock divide by N control
+SFR(SCON,	0x98);   // Serial Control
+SFR(SBUF,	0x99);   // Serial Data Buffer
 
-__sfr __at 0xA0 P2    ;   // Port 2
-__sfr __at 0xA2 AUXR1 ;   // Auxilliary 1 (not available on 80C51FA/87C51Fx)
-__sfr __at 0xA4 P2M1  ;   // Port 2 output mode 1
-__sfr __at 0xA5 P2M2  ;   // Port 2 output mode 2
-__sfr __at 0xA6 WDRST ;   // Watchdog reset register
-__sfr __at 0xA7 WDCON ;   // Watchdog control register
-__sfr __at 0xA8 IEN0  ;   // Interrupt Enable 0
-__sfr __at 0xA9 SADDR ;   // Serial slave Address
-__sfr __at 0xAC CMP1  ;   // Comparator 1 control register
-__sfr __at 0xAD CMP2  ;   // Comparator 2 control register
+SFR(P2,		0xA0);   // Port 2
+SFR(AUXR1,	0xA2);   // Auxilliary 1 (not available on 80C51FA/87C51Fx)
+SFR(P2M1,	0xA4);   // Port 2 output mode 1
+SFR(P2M2,	0xA5);   // Port 2 output mode 2
+SFR(WDRST,	0xA6);   // Watchdog reset register
+SFR(WDCON,	0xA7);   // Watchdog control register
+SFR(IEN0,	0xA8);   // Interrupt Enable 0
+SFR(SADDR,	0xA9);   // Serial slave Address
+SFR(CMP1,	0xAC);   // Comparator 1 control register
+SFR(CMP2,	0xAD);   // Comparator 2 control register
 
-__sfr __at 0xB7 IP0H  ;   // Interrupt Priority 0 High 
-__sfr __at 0xB8 IP0   ;   // Interrupt Priority 0
-__sfr __at 0xB9 SADEN ;   // Serial slave Address Mask
+SFR(IP0H,	0xB7);   // Interrupt Priority 0 High
+SFR(IP0,	0xB8);   // Interrupt Priority 0
+SFR(SADEN,	0xB9);   // Serial slave Address Mask
 
-__sfr __at 0xC8 I2CFG ;   // I2C configuration register
+SFR(I2CFG,	0xC8);   // I2C configuration register
 
-__sfr __at 0xD0 PSW   ;   // Program Status Word
-__sfr __at 0xD8 I2CON ;   // I2C control register
-__sfr __at 0xD9 I2DAT ;   // I2C data register
+SFR(PSW,	0xD0);   // Program Status Word
+SFR(I2CON,	0xD8);   // I2C control register
+SFR(I2DAT,	0xD9);   // I2C data register
 
-__sfr __at 0xE0 ACC   ;   // Accumulator
-__sfr __at 0xE8 IEN1  ;   // Interrupt enable 1
+SFR(ACC,	0xE0);   // Accumulator
+SFR(IEN1,	0xE8);   // Interrupt enable 1
 
-__sfr __at 0xF0 B     ;   // B Register
-__sfr __at 0xF6 PT0AD ;   // Port 0 digital input disable
-__sfr __at 0xF7 IP1H  ;   // Interrupt Priority 1 High 
-__sfr __at 0xF8 IP1   ;   // Interrupt Priority 1
+SFR(B,		0xF0);   // B Register
+SFR(PT0AD,	0xF6);   // Port 0 digital input disable
+SFR(IP1H,	0xF7);   // Interrupt Priority 1 High
+SFR(IP1,	0xF8);   // Interrupt Priority 1
 
 
 /*  Bit Addressable Registers  */
 
 /*  P0    */
-__sbit __at 0x80 P0_0 ; // Also CMP2
-__sbit __at 0x81 P0_1 ; // Also CIN2B
-__sbit __at 0x82 P0_2 ; // Also CIN2A
-__sbit __at 0x83 P0_3 ; // Also CIN1B
-__sbit __at 0x84 P0_4 ; // Also CIN1A
-__sbit __at 0x85 P0_5 ; // Also CMPREF
-__sbit __at 0x86 P0_6 ; // Also CMP1
-__sbit __at 0x87 P0_7 ; // Also T1
+SBIT(P0_0,		0x80); // Also CMP2
+SBIT(P0_1,		0x81); // Also CIN2B
+SBIT(P0_2,		0x82); // Also CIN2A
+SBIT(P0_3,		0x83); // Also CIN1B
+SBIT(P0_4,		0x84); // Also CIN1A
+SBIT(P0_5,		0x85); // Also CMPREF
+SBIT(P0_6,		0x86); // Also CMP1
+SBIT(P0_7,		0x87); // Also T1
 
 /*  TCON  */
-__sbit __at 0x88 IT0  ; // External Interrupt 0 Type
-__sbit __at 0x89 IE0  ; // External Interrupt 0 Edge Flag
-__sbit __at 0x8A IT1  ; // External Interrupt 1 Type
-__sbit __at 0x8B IE1  ; // External Interrupt 1 Edge Flag
-__sbit __at 0x8C TR0  ; // Timer 0 Run Control
-__sbit __at 0x8D TF0  ; // Timer 0 Overflow Flag
-__sbit __at 0x8E TR1  ; // Timer 1 Run Control
-__sbit __at 0x8F TF1  ; // Timer 1 Overflow Flag
+SBIT(IT0,		0x88); // External Interrupt 0 Type
+SBIT(IE0,		0x89); // External Interrupt 0 Edge Flag
+SBIT(IT1,		0x8A); // External Interrupt 1 Type
+SBIT(IE1,		0x8B); // External Interrupt 1 Edge Flag
+SBIT(TR0,		0x8C); // Timer 0 Run Control
+SBIT(TF0,		0x8D); // Timer 0 Overflow Flag
+SBIT(TR1,		0x8E); // Timer 1 Run Control
+SBIT(TF1,		0x8F); // Timer 1 Overflow Flag
 
 /*  P1 */
-__sbit __at 0x90 P1_0 ; // Also TxD
-__sbit __at 0x91 P1_1 ; // Also RxD
-__sbit __at 0x92 P1_2 ; // Also T0
-__sbit __at 0x93 P1_3 ; // Also INT0
-__sbit __at 0x94 P1_4 ; // Also INT1
-__sbit __at 0x95 P1_5 ; // Also RST
-__sbit __at 0x96 P1_6 ;
-__sbit __at 0x97 P1_7 ;
+SBIT(P1_0,		0x90); // Also TxD
+SBIT(P1_1,		0x91); // Also RxD
+SBIT(P1_2,		0x92); // Also T0
+SBIT(P1_3,		0x93); // Also INT0
+SBIT(P1_4,		0x94); // Also INT1
+SBIT(P1_5,		0x95); // Also RST
+SBIT(P1_6,		0x96);
+SBIT(P1_7,		0x97);
 
 /*  SCON  */
-__sbit __at 0x98 RI   ; // Receive Interrupt Flag
-__sbit __at 0x99 TI   ; // Transmit Interrupt Flag
-__sbit __at 0x9A RB8  ; // Receive Bit 8
-__sbit __at 0x9B TB8  ; // Transmit Bit 8
-__sbit __at 0x9C REN  ; // Receiver Enable
-__sbit __at 0x9D SM2  ; // Serial Mode Control Bit 2
-__sbit __at 0x9E SM1  ; // Serial Mode Control Bit 1
-__sbit __at 0x9F SM0  ; // Serial Mode Control Bit 0
+SBIT(RI,		0x98); // Receive Interrupt Flag
+SBIT(TI,		0x99); // Transmit Interrupt Flag
+SBIT(RB8,		0x9A); // Receive Bit 8
+SBIT(TB8,		0x9B); // Transmit Bit 8
+SBIT(REN,		0x9C); // Receiver Enable
+SBIT(SM2,		0x9D); // Serial Mode Control Bit 2
+SBIT(SM1,		0x9E); // Serial Mode Control Bit 1
+SBIT(SM0,		0x9F); // Serial Mode Control Bit 0
 
 /*  P2    */
-__sbit __at 0xA0 P2_0 ; // Also X2
-__sbit __at 0xA1 P2_1 ; // Also X1
+SBIT(P2_0,		0xA0); // Also X2
+SBIT(P2_1,		0xA1); // Also X1
 
 /*  IEN0 */
-__sbit __at 0xA8 EX0  ; // External Interrupt 0 Enable
-__sbit __at 0xA9 ET0  ; // Timer 0 Interrupt Enable
-__sbit __at 0xAA EX1  ; // External Interrupt 1 Enable
-__sbit __at 0xAB ET1  ; // Timer 1 Interrupt Enable
-__sbit __at 0xAC ES   ; // Serial Port Interrupt Enable
-__sbit __at 0xAD EBO  ; // Brownout Interrupt Enable
-__sbit __at 0xAE EWD  ; // Watchdog Interrupt Enable
-__sbit __at 0xAF EA   ; // Global Interrupt Enable
+SBIT(EX0,		0xA8); // External Interrupt 0 Enable
+SBIT(ET0,		0xA9); // Timer 0 Interrupt Enable
+SBIT(EX1,		0xAA); // External Interrupt 1 Enable
+SBIT(ET1,		0xAB); // Timer 1 Interrupt Enable
+SBIT(ES,		0xAC); // Serial Port Interrupt Enable
+SBIT(EBO,		0xAD); // Brownout Interrupt Enable
+SBIT(EWD,		0xAE); // Watchdog Interrupt Enable
+SBIT(EA,		0xAF); // Global Interrupt Enable
 
-/*  IP0   */ 
-__sbit __at 0xB8 PX0  ; // External Interrupt 0 Priority
-__sbit __at 0xB9 PT0  ; // Timer 0 Interrupt Priority
-__sbit __at 0xBA PX1  ; // External Interrupt 1 Priority
-__sbit __at 0xBB PT1  ; // Timer 1 Interrupt Priority
-__sbit __at 0xBC PS   ; // Serial Port Interrupt Priority
-__sbit __at 0xBD PBO  ; // Brownout Interrupt Priority
-__sbit __at 0xBE PWD  ; // Watchdog Interrupt Priority
+/*  IP0   */
+SBIT(PX0,		0xB8); // External Interrupt 0 Priority
+SBIT(PT0,		0xB9); // Timer 0 Interrupt Priority
+SBIT(PX1,		0xBA); // External Interrupt 1 Priority
+SBIT(PT1,		0xBB); // Timer 1 Interrupt Priority
+SBIT(PS,		0xBC); // Serial Port Interrupt Priority
+SBIT(PBO,		0xBD); // Brownout Interrupt Priority
+SBIT(PWD,		0xBE); // Watchdog Interrupt Priority
 
 /*  I2CFG */
-__sbit __at 0xC8 CT0   ; // Clock Time Select 0
-__sbit __at 0xC9 CT1   ; // Clock Time Select 1
-__sbit __at 0xCC TIRUN ; // Timer I Run Enable
-__sbit __at 0xCD CLRTI ; // Clear Timer I
-__sbit __at 0xCE MASTRQ; // Master Request
-__sbit __at 0xCF SLAVEN; // Slave Enable
+SBIT(CT0,		0xC8); // Clock Time Select 0
+SBIT(CT1,		0xC9); // Clock Time Select 1
+SBIT(TIRUN,		0xCC); // Timer I Run Enable
+SBIT(CLRTI,		0xCD); // Clear Timer I
+SBIT(MASTRQ,	0xCE); // Master Request
+SBIT(SLAVEN,	0xCF); // Slave Enable
 
 /*  PSW   */
-__sbit __at 0xD0 P    ; // Accumulator Parity Flag
-__sbit __at 0xD1 F1   ; // Flag 1
-__sbit __at 0xD2 OV   ; // Overflow Flag
-__sbit __at 0xD3 RS0  ; // Register Bank Select 0
-__sbit __at 0xD4 RS1  ; // Register Bank Select 1
-__sbit __at 0xD5 F0   ; // Flag 0
-__sbit __at 0xD6 AC   ; // Auxiliary Carry Flag
-__sbit __at 0xD7 CY   ; // Carry Flag
+SBIT(P,			0xD0); // Accumulator Parity Flag
+SBIT(F1,		0xD1); // Flag 1
+SBIT(OV,		0xD2); // Overflow Flag
+SBIT(RS0,		0xD3); // Register Bank Select 0
+SBIT(RS1,		0xD4); // Register Bank Select 1
+SBIT(F0,		0xD5); // Flag 0
+SBIT(AC,		0xD6); // Auxiliary Carry Flag
+SBIT(CY,		0xD7); // Carry Flag
 
 /*  I2CON */
-__sbit __at 0xD8 XSTP ;
-__sbit __at 0xD9 MASTER;// Master Status
-__sbit __at 0xDA STP  ; // Stop Detect Flag
-__sbit __at 0xDB STR  ; // Start Detect Flag
-__sbit __at 0xDC ARL  ; // Arbitration Loss Flag
-__sbit __at 0xDD DRDY ; // Data Ready Flag
-__sbit __at 0xDE ATN  ; // Attention: I2C Interrupt Flag
-__sbit __at 0xDF RDAT ; // I2C Read Data
+SBIT(XSTP,		0xD8);
+SBIT(MASTER,	0xD9);// Master Status
+SBIT(STP,		0xDA); // Stop Detect Flag
+SBIT(STR,		0xDB); // Start Detect Flag
+SBIT(ARL,		0xDC); // Arbitration Loss Flag
+SBIT(DRDY,		0xDD); // Data Ready Flag
+SBIT(ATN,		0xDE); // Attention: I2C Interrupt Flag
+SBIT(RDAT,		0xDF); // I2C Read Data
 
 /*  ACC   */
-__sbit __at 0xE0 ACC_0;
-__sbit __at 0xE1 ACC_1;
-__sbit __at 0xE2 ACC_2;
-__sbit __at 0xE3 ACC_3;
-__sbit __at 0xE4 ACC_4;
-__sbit __at 0xE5 ACC_5;
-__sbit __at 0xE6 ACC_6;
-__sbit __at 0xE7 ACC_7;
+SBIT(ACC_0,		0xE0);
+SBIT(ACC_1,		0xE1);
+SBIT(ACC_2,		0xE2);
+SBIT(ACC_3,		0xE3);
+SBIT(ACC_4,		0xE4);
+SBIT(ACC_5,		0xE5);
+SBIT(ACC_6,		0xE6);
+SBIT(ACC_7,		0xE7);
 
 /*  IEN1  */
-__sbit __at 0xE8 EI2  ; // I2C Interrupt Enable
-__sbit __at 0xE9 EKB  ; // Keyboard Interrupt Enable
-__sbit __at 0xEA EC2  ; // Comparator 2 Interrupt Enable
-__sbit __at 0xED EC1  ; // Comparator 1 Interrupt Enable
-__sbit __at 0xEF ETI  ; // Timer I Interrupt Enable
+SBIT(EI2,		0xE8); // I2C Interrupt Enable
+SBIT(EKB,		0xE9); // Keyboard Interrupt Enable
+SBIT(EC2,		0xEA); // Comparator 2 Interrupt Enable
+SBIT(EC1,		0xED); // Comparator 1 Interrupt Enable
+SBIT(ETI,		0xEF); // Timer I Interrupt Enable
 
 /*  B     */
-__sbit __at 0xF0 B_0;
-__sbit __at 0xF1 B_1;
-__sbit __at 0xF2 B_2;
-__sbit __at 0xF3 B_3;
-__sbit __at 0xF4 B_4;
-__sbit __at 0xF5 B_5;
-__sbit __at 0xF6 B_6;
-__sbit __at 0xF7 B_7;
+SBIT(B_0,		0xF0);
+SBIT(B_1,		0xF1);
+SBIT(B_2,		0xF2);
+SBIT(B_3,		0xF3);
+SBIT(B_4,		0xF4);
+SBIT(B_5,		0xF5);
+SBIT(B_6,		0xF6);
+SBIT(B_7,		0xF7);
 
-/*  IP1  */ 
-__sbit __at 0xF8 PI2; // I2C Interrupt Priority
-__sbit __at 0xF9 PKB; // Keyboard Interrupt Priority
-__sbit __at 0xFA PC2; // Comparator 2 Interrupt Priority
-__sbit __at 0xFD PC1; // Comparator 1 Interrupt Priority
-__sbit __at 0xFF PTI; // Timer I Interrupt Priority
+/*  IP1  */
+SBIT(PI2,		0xF8); // I2C Interrupt Priority
+SBIT(PKB,		0xF9); // Keyboard Interrupt Priority
+SBIT(PC2,		0xFA); // Comparator 2 Interrupt Priority
+SBIT(PC1,		0xFD); // Comparator 1 Interrupt Priority
+SBIT(PTI,		0xFF); // Timer I Interrupt Priority
 
 /* Bitmasks for SFRs */
 

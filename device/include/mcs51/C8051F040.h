@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,178 +30,179 @@
 #ifndef C8051F040_H
 #define C8051F040_H
 
+#include <compiler.h>
 
 /*  BYTE Registers  */
 
 /*  All Pages */
-__sfr __at 0x80 P0       ;  /* PORT 0                                        */
-__sfr __at 0x81 SP       ;  /* STACK POINTER                                 */
-__sfr __at 0x82 DPL      ;  /* DATA POINTER - LOW BYTE                       */
-__sfr __at 0x83 DPH      ;  /* DATA POINTER - HIGH BYTE                      */
-__sfr __at 0x84 SFRPAGE  ;  /* SFR PAGE SELECT                               */
-__sfr __at 0x85 SFRNEXT  ;  /* SFR STACK NEXT PAGE                           */
-__sfr __at 0x86 SFRLAST  ;  /* SFR STACK LAST PAGE                           */
-__sfr __at 0x87 PCON     ;  /* POWER CONTROL                                 */
-__sfr __at 0x90 P1       ;  /* PORT 1                                        */
-__sfr __at 0xA0 P2       ;  /* PORT 2                                        */
-__sfr __at 0xA8 IE       ;  /* INTERRUPT ENABLE                              */
-__sfr __at 0xB0 P3       ;  /* PORT 3                                        */
-__sfr __at 0xB8 IP       ;  /* INTERRUPT PRIORITY                            */
-__sfr __at 0xD0 PSW      ;  /* PROGRAM STATUS WORD                           */
-__sfr __at 0xE0 ACC      ;  /* ACCUMULATOR                                   */
-__sfr __at 0xE6 EIE1     ;  /* EXTERNAL INTERRUPT ENABLE 1                   */
-__sfr __at 0xE7 EIE2     ;  /* EXTERNAL INTERRUPT ENABLE 2                   */
-__sfr __at 0xF0 B        ;  /* B REGISTER                                    */
-__sfr __at 0xF6 EIP1     ;  /* EXTERNAL INTERRUPT PRIORITY REGISTER 1        */
-__sfr __at 0xF7 EIP2     ;  /* EXTERNAL INTERRUPT PRIORITY REGISTER 2        */
-__sfr __at 0xFF WDTCN    ;  /* WATCHDOG TIMER CONTROL                        */
+SFR(P0,			0x80);  /* PORT 0                                        */
+SFR(SP,			0x81);  /* STACK POINTER                                 */
+SFR(DPL,		0x82);  /* DATA POINTER - LOW BYTE                       */
+SFR(DPH,		0x83);  /* DATA POINTER - HIGH BYTE                      */
+SFR(SFRPAGE,	0x84);  /* SFR PAGE SELECT                               */
+SFR(SFRNEXT,	0x85);  /* SFR STACK NEXT PAGE                           */
+SFR(SFRLAST,	0x86);  /* SFR STACK LAST PAGE                           */
+SFR(PCON,		0x87);  /* POWER CONTROL                                 */
+SFR(P1,			0x90);  /* PORT 1                                        */
+SFR(P2,			0xA0);  /* PORT 2                                        */
+SFR(IE,			0xA8);  /* INTERRUPT ENABLE                              */
+SFR(P3,			0xB0);  /* PORT 3                                        */
+SFR(IP,			0xB8);  /* INTERRUPT PRIORITY                            */
+SFR(PSW,		0xD0);  /* PROGRAM STATUS WORD                           */
+SFR(ACC,		0xE0);  /* ACCUMULATOR                                   */
+SFR(EIE1,		0xE6);  /* EXTERNAL INTERRUPT ENABLE 1                   */
+SFR(EIE2,		0xE7);  /* EXTERNAL INTERRUPT ENABLE 2                   */
+SFR(B,			0xF0);  /* B REGISTER                                    */
+SFR(EIP1,		0xF6);  /* EXTERNAL INTERRUPT PRIORITY REGISTER 1        */
+SFR(EIP2,		0xF7);  /* EXTERNAL INTERRUPT PRIORITY REGISTER 2        */
+SFR(WDTCN,		0xFF);  /* WATCHDOG TIMER CONTROL                        */
 
 /*  Page 0x00 */
-__sfr __at 0x88 TCON     ;  /* TIMER CONTROL                                 */
-__sfr __at 0x89 TMOD     ;  /* TIMER MODE                                    */
-__sfr __at 0x8A TL0      ;  /* TIMER 0 - LOW BYTE                            */
-__sfr __at 0x8B TL1      ;  /* TIMER 1 - LOW BYTE                            */
-__sfr __at 0x8C TH0      ;  /* TIMER 0 - HIGH BYTE                           */
-__sfr __at 0x8D TH1      ;  /* TIMER 1 - HIGH BYTE                           */
-__sfr __at 0x8E CKCON    ;  /* TIMER 0/1 CLOCK CONTROL                       */
-__sfr __at 0x8F PSCTL    ;  /* FLASH WRITE/ERASE CONTROL                     */
-__sfr __at 0x91 SSTA0    ;  /* UART 0 STATUS                                 */
-__sfr __at 0x98 SCON0    ;  /* UART 0 CONTROL                                */
-__sfr __at 0x98 SCON     ;  /* UART 0 CONTROL                                */
-__sfr __at 0x99 SBUF0    ;  /* UART 0 BUFFER                                 */
-__sfr __at 0x99 SBUF     ;  /* UART 0 BUFFER                                 */
-__sfr __at 0x9A SPI0CFG  ;  /* SPI 0 CONFIGURATION                           */
-__sfr __at 0x9B SPI0DAT  ;  /* SPI 0 DATA                                    */
-__sfr __at 0x9D SPI0CKR  ;  /* SPI 0 CLOCK RATE CONTROL                      */
-__sfr __at 0xA1 EMI0TC   ;  /* EMIF TIMING CONTROL                           */
-__sfr __at 0xA2 EMI0CN   ;  /* EMIF CONTROL                                  */
-__sfr __at 0xA2 _XPAGE   ;  /* XDATA/PDATA PAGE                              */
-__sfr __at 0xA3 EMI0CF   ;  /* EMIF CONFIGURATION                            */
-__sfr __at 0xA9 SADDR0   ;  /* UART 0 SLAVE ADDRESS                          */
-__sfr __at 0xB7 FLSCL    ;  /* FLASH SCALE                                   */
-__sfr __at 0xB9 SADEN0   ;  /* UART 0 SLAVE ADDRESS MASK                     */
-__sfr __at 0xBA AMX0CF   ;  /* ADC 0 MUX CONFIGURATION                       */
-__sfr __at 0xBB AMX0SL   ;  /* ADC 0 MUX CHANNEL SELECTION                   */
-__sfr __at 0xBC ADC0CF   ;  /* ADC 0 CONFIGURATION                           */
-__sfr __at 0xBD AMX0PRT  ;  /* ADC 0 PORT 3 I/O PIN SELECT                   */
-__sfr __at 0xBE ADC0L    ;  /* ADC 0 DATA - LOW BYTE                         */
-__sfr __at 0xBF ADC0H    ;  /* ADC 0 DATA - HIGH BYTE                        */
-__sfr __at 0xC0 SMB0CN   ;  /* SMBUS 0 CONTROL                               */
-__sfr __at 0xC1 SMB0STA  ;  /* SMBUS 0 STATUS                                */
-__sfr __at 0xC2 SMB0DAT  ;  /* SMBUS 0 DATA                                  */
-__sfr __at 0xC3 SMB0ADR  ;  /* SMBUS 0 SLAVE ADDRESS                         */
-__sfr __at 0xC4 ADC0GTL  ;  /* ADC 0 GREATER-THAN REGISTER - LOW BYTE        */
-__sfr __at 0xC5 ADC0GTH  ;  /* ADC 0 GREATER-THAN REGISTER - HIGH BYTE       */
-__sfr __at 0xC6 ADC0LTL  ;  /* ADC 0 LESS-THAN REGISTER - LOW BYTE           */
-__sfr __at 0xC7 ADC0LTH  ;  /* ADC 0 LESS-THAN REGISTER - HIGH BYTE          */
-__sfr __at 0xC8 TMR2CN   ;  /* TIMER 2 CONTROL                               */
-__sfr __at 0xC9 TMR2CF   ;  /* TIMER 2 CONFIGURATION                         */
-__sfr __at 0xCA RCAP2L   ;  /* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
-__sfr __at 0xCB RCAP2H   ;  /* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
-__sfr __at 0xCC TMR2L    ;  /* TIMER 2 - LOW BYTE                            */
-__sfr __at 0xCC TL2      ;  /* TIMER 2 - LOW BYTE                            */
-__sfr __at 0xCD TMR2H    ;  /* TIMER 2 - HIGH BYTE                           */
-__sfr __at 0xCD TH2      ;  /* TIMER 2 - HIGH BYTE                           */
-__sfr __at 0xCF SMB0CR   ;  /* SMBUS 0 CLOCK RATE                            */
-__sfr __at 0xD1 REF0CN   ;  /* VOLTAGE REFERENCE 0 CONTROL                   */
-__sfr __at 0xD2 DAC0L    ;  /* DAC 0 REGISTER - LOW BYTE                     */
-__sfr __at 0xD3 DAC0H    ;  /* DAC 0 REGISTER - HIGH BYTE                    */
-__sfr __at 0xD4 DAC0CN   ;  /* DAC 0 CONTROL                                 */
-__sfr __at 0xD6 HVA0CN   ;  /* HIGH VOLTAGE DIFFERENTIAL AMP CONTROL         */
-__sfr __at 0xD8 PCA0CN   ;  /* PCA 0 COUNTER CONTROL                         */
-__sfr __at 0xD9 PCA0MD   ;  /* PCA 0 COUNTER MODE                            */
-__sfr __at 0xDA PCA0CPM0 ;  /* PCA 0 MODULE 0 CONTROL                        */
-__sfr __at 0xDB PCA0CPM1 ;  /* PCA 0 MODULE 1 CONTROL                        */
-__sfr __at 0xDC PCA0CPM2 ;  /* PCA 0 MODULE 2 CONTROL                        */
-__sfr __at 0xDD PCA0CPM3 ;  /* PCA 0 MODULE 3 CONTROL                        */
-__sfr __at 0xDE PCA0CPM4 ;  /* PCA 0 MODULE 4 CONTROL                        */
-__sfr __at 0xDF PCA0CPM5 ;  /* PCA 0 MODULE 5 CONTROL                        */
-__sfr __at 0xE1 PCA0CPL5 ;  /* PCA 0 MODULE 5 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xE2 PCA0CPH5 ;  /* PCA 0 MODULE 5 CAPTURE/COMPARE - HIGH BYTE    */
-__sfr __at 0xE8 ADC0CN   ;  /* ADC 0 CONTROL                                 */
-__sfr __at 0xE9 PCA0CPL2 ;  /* PCA 0 MODULE 2 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xEA PCA0CPH2 ;  /* PCA 0 MODULE 2 CAPTURE/COMPARE - HIGH BYTE    */
-__sfr __at 0xEB PCA0CPL3 ;  /* PCA 0 MODULE 3 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xEC PCA0CPH3 ;  /* PCA 0 MODULE 3 CAPTURE/COMPARE - HIGH BYTE    */
-__sfr __at 0xED PCA0CPL4 ;  /* PCA 0 MODULE 4 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xEE PCA0CPH4 ;  /* PCA 0 MODULE 4 CAPTURE/COMPARE - HIGH BYTE    */
-__sfr __at 0xEF RSTSRC   ;  /* RESET SOURCE                                  */
-__sfr __at 0xF8 SPI0CN   ;  /* SPI 0 CONTROL                                 */
-__sfr __at 0xF9 PCA0L    ;  /* PCA 0 TIMER - LOW BYTE                        */
-__sfr __at 0xFA PCA0H    ;  /* PCA 0 TIMER - HIGH BYTE                       */
-__sfr __at 0xFB PCA0CPL0 ;  /* PCA 0 MODULE 0 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xFC PCA0CPH0 ;  /* PCA 0 MODULE 0 CAPTURE/COMPARE - HIGH BYTE    */
-__sfr __at 0xFD PCA0CPL1 ;  /* PCA 0 MODULE 1 CAPTURE/COMPARE - LOW BYTE     */
-__sfr __at 0xFE PCA0CPH1 ;  /* PCA 0 MODULE 1 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(TCON,		0x88);  /* TIMER CONTROL                                 */
+SFR(TMOD,		0x89);  /* TIMER MODE                                    */
+SFR(TL0,		0x8A);  /* TIMER 0 - LOW BYTE                            */
+SFR(TL1,		0x8B);  /* TIMER 1 - LOW BYTE                            */
+SFR(TH0,		0x8C);  /* TIMER 0 - HIGH BYTE                           */
+SFR(TH1,		0x8D);  /* TIMER 1 - HIGH BYTE                           */
+SFR(CKCON,		0x8E);  /* TIMER 0/1 CLOCK CONTROL                       */
+SFR(PSCTL,		0x8F);  /* FLASH WRITE/ERASE CONTROL                     */
+SFR(SSTA0,		0x91);  /* UART 0 STATUS                                 */
+SFR(SCON0,		0x98);  /* UART 0 CONTROL                                */
+SFR(SCON,		0x98);  /* UART 0 CONTROL                                */
+SFR(SBUF0,		0x99);  /* UART 0 BUFFER                                 */
+SFR(SBUF,		0x99);  /* UART 0 BUFFER                                 */
+SFR(SPI0CFG,	0x9A);  /* SPI 0 CONFIGURATION                           */
+SFR(SPI0DAT,	0x9B);  /* SPI 0 DATA                                    */
+SFR(SPI0CKR,	0x9D);  /* SPI 0 CLOCK RATE CONTROL                      */
+SFR(EMI0TC,		0xA1);  /* EMIF TIMING CONTROL                           */
+SFR(EMI0CN,		0xA2);  /* EMIF CONTROL                                  */
+SFR(_XPAGE,		0xA2);  /* XDATA/PDATA PAGE                              */
+SFR(EMI0CF,		0xA3);  /* EMIF CONFIGURATION                            */
+SFR(SADDR0,		0xA9);  /* UART 0 SLAVE ADDRESS                          */
+SFR(FLSCL,		0xB7);  /* FLASH SCALE                                   */
+SFR(SADEN0,		0xB9);  /* UART 0 SLAVE ADDRESS MASK                     */
+SFR(AMX0CF,		0xBA);  /* ADC 0 MUX CONFIGURATION                       */
+SFR(AMX0SL,		0xBB);  /* ADC 0 MUX CHANNEL SELECTION                   */
+SFR(ADC0CF,		0xBC);  /* ADC 0 CONFIGURATION                           */
+SFR(AMX0PRT,	0xBD);  /* ADC 0 PORT 3 I/O PIN SELECT                   */
+SFR(ADC0L,		0xBE);  /* ADC 0 DATA - LOW BYTE                         */
+SFR(ADC0H,		0xBF);  /* ADC 0 DATA - HIGH BYTE                        */
+SFR(SMB0CN,		0xC0);  /* SMBUS 0 CONTROL                               */
+SFR(SMB0STA,	0xC1);  /* SMBUS 0 STATUS                                */
+SFR(SMB0DAT,	0xC2);  /* SMBUS 0 DATA                                  */
+SFR(SMB0ADR,	0xC3);  /* SMBUS 0 SLAVE ADDRESS                         */
+SFR(ADC0GTL,	0xC4);  /* ADC 0 GREATER-THAN REGISTER - LOW BYTE        */
+SFR(ADC0GTH,	0xC5);  /* ADC 0 GREATER-THAN REGISTER - HIGH BYTE       */
+SFR(ADC0LTL,	0xC6);  /* ADC 0 LESS-THAN REGISTER - LOW BYTE           */
+SFR(ADC0LTH,	0xC7);  /* ADC 0 LESS-THAN REGISTER - HIGH BYTE          */
+SFR(TMR2CN,		0xC8);  /* TIMER 2 CONTROL                               */
+SFR(TMR2CF,		0xC9);  /* TIMER 2 CONFIGURATION                         */
+SFR(RCAP2L,		0xCA);  /* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
+SFR(RCAP2H,		0xCB);  /* TIMER 2 CAPTURE REGISTER - HIGH BYTE          */
+SFR(TMR2L,		0xCC);  /* TIMER 2 - LOW BYTE                            */
+SFR(TL2,		0xCC);  /* TIMER 2 - LOW BYTE                            */
+SFR(TMR2H,		0xCD);  /* TIMER 2 - HIGH BYTE                           */
+SFR(TH2,		0xCD);  /* TIMER 2 - HIGH BYTE                           */
+SFR(SMB0CR,		0xCF);  /* SMBUS 0 CLOCK RATE                            */
+SFR(REF0CN,		0xD1);  /* VOLTAGE REFERENCE 0 CONTROL                   */
+SFR(DAC0L,		0xD2);  /* DAC 0 REGISTER - LOW BYTE                     */
+SFR(DAC0H,		0xD3);  /* DAC 0 REGISTER - HIGH BYTE                    */
+SFR(DAC0CN,		0xD4);  /* DAC 0 CONTROL                                 */
+SFR(HVA0CN,		0xD6);  /* HIGH VOLTAGE DIFFERENTIAL AMP CONTROL         */
+SFR(PCA0CN,		0xD8);  /* PCA 0 COUNTER CONTROL                         */
+SFR(PCA0MD,		0xD9);  /* PCA 0 COUNTER MODE                            */
+SFR(PCA0CPM0,	0xDA);  /* PCA 0 MODULE 0 CONTROL                        */
+SFR(PCA0CPM1,	0xDB);  /* PCA 0 MODULE 1 CONTROL                        */
+SFR(PCA0CPM2,	0xDC);  /* PCA 0 MODULE 2 CONTROL                        */
+SFR(PCA0CPM3,	0xDD);  /* PCA 0 MODULE 3 CONTROL                        */
+SFR(PCA0CPM4,	0xDE);  /* PCA 0 MODULE 4 CONTROL                        */
+SFR(PCA0CPM5,	0xDF);  /* PCA 0 MODULE 5 CONTROL                        */
+SFR(PCA0CPL5,	0xE1);  /* PCA 0 MODULE 5 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH5,	0xE2);  /* PCA 0 MODULE 5 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(ADC0CN,		0xE8);  /* ADC 0 CONTROL                                 */
+SFR(PCA0CPL2,	0xE9);  /* PCA 0 MODULE 2 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH2,	0xEA);  /* PCA 0 MODULE 2 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(PCA0CPL3,	0xEB);  /* PCA 0 MODULE 3 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH3,	0xEC);  /* PCA 0 MODULE 3 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(PCA0CPL4,	0xED);  /* PCA 0 MODULE 4 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH4,	0xEE);  /* PCA 0 MODULE 4 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(RSTSRC,		0xEF);  /* RESET SOURCE                                  */
+SFR(SPI0CN,		0xF8);  /* SPI 0 CONTROL                                 */
+SFR(PCA0L,		0xF9);  /* PCA 0 TIMER - LOW BYTE                        */
+SFR(PCA0H,		0xFA);  /* PCA 0 TIMER - HIGH BYTE                       */
+SFR(PCA0CPL0,	0xFB);  /* PCA 0 MODULE 0 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH0,	0xFC);  /* PCA 0 MODULE 0 CAPTURE/COMPARE - HIGH BYTE    */
+SFR(PCA0CPL1,	0xFD);  /* PCA 0 MODULE 1 CAPTURE/COMPARE - LOW BYTE     */
+SFR(PCA0CPH1,	0xFE);  /* PCA 0 MODULE 1 CAPTURE/COMPARE - HIGH BYTE    */
 
 /*  Page 0x01 */
-__sfr __at 0x88 CPT0CN   ;  /* COMPARATOR 0 CONTROL                          */
-__sfr __at 0x89 CPT0MD   ;  /* COMPARATOR 0 CONFIGURATION                    */
-__sfr __at 0x98 SCON1    ;  /* UART 1 CONTROL                                */
-__sfr __at 0x99 SBUF1    ;  /* UART 1 BUFFER                                 */
-__sfr __at 0xC0 CAN0STA  ;  /* CAN 0 STATUS                                  */
-__sfr __at 0xC8 TMR3CN   ;  /* TIMER 3 CONTROL                               */
-__sfr __at 0xC9 TMR3CF   ;  /* TIMER 3 CONFIGURATION                         */
-__sfr __at 0xCA RCAP3L   ;  /* TIMER 3 CAPTURE REGISTER - LOW BYTE           */
-__sfr __at 0xCB RCAP3H   ;  /* TIMER 3 CAPTURE REGISTER - HIGH BYTE          */
-__sfr __at 0xCC TMR3L    ;  /* TIMER 3 - LOW BYTE                            */
-__sfr __at 0xCD TMR3H    ;  /* TIMER 3 - HIGH BYTE                           */
-__sfr __at 0xD2 DAC1L    ;  /* DAC 1 REGISTER - LOW BYTE                     */
-__sfr __at 0xD3 DAC1H    ;  /* DAC 1 REGISTER - HIGH BYTE                    */
-__sfr __at 0xD4 DAC1CN   ;  /* DAC 1 CONTROL                                 */
-__sfr __at 0xD8 CAN0DATL ;  /* CAN 0 DATA REGISTER LOW                       */
-__sfr __at 0xD9 CAN0DATH ;  /* CAN 0 DATA REGISTER HIGH                      */
-__sfr __at 0xDA CAN0ADR  ;  /* CAN 0 ADDRESS                                 */
-__sfr __at 0xDB CAN0TST  ;  /* CAN 0 TEST REGISTER                           */
-__sfr __at 0xF8 CAN0CN   ;  /* CAN 0 CONTROL                                 */
+SFR(CPT0CN,		0x88);  /* COMPARATOR 0 CONTROL                          */
+SFR(CPT0MD,		0x89);  /* COMPARATOR 0 CONFIGURATION                    */
+SFR(SCON1,		0x98);  /* UART 1 CONTROL                                */
+SFR(SBUF1,		0x99);  /* UART 1 BUFFER                                 */
+SFR(CAN0STA,	0xC0);  /* CAN 0 STATUS                                  */
+SFR(TMR3CN,		0xC8);  /* TIMER 3 CONTROL                               */
+SFR(TMR3CF,		0xC9);  /* TIMER 3 CONFIGURATION                         */
+SFR(RCAP3L,		0xCA);  /* TIMER 3 CAPTURE REGISTER - LOW BYTE           */
+SFR(RCAP3H,		0xCB);  /* TIMER 3 CAPTURE REGISTER - HIGH BYTE          */
+SFR(TMR3L,		0xCC);  /* TIMER 3 - LOW BYTE                            */
+SFR(TMR3H,		0xCD);  /* TIMER 3 - HIGH BYTE                           */
+SFR(DAC1L,		0xD2);  /* DAC 1 REGISTER - LOW BYTE                     */
+SFR(DAC1H,		0xD3);  /* DAC 1 REGISTER - HIGH BYTE                    */
+SFR(DAC1CN,		0xD4);  /* DAC 1 CONTROL                                 */
+SFR(CAN0DATL,	0xD8);  /* CAN 0 DATA REGISTER LOW                       */
+SFR(CAN0DATH,	0xD9);  /* CAN 0 DATA REGISTER HIGH                      */
+SFR(CAN0ADR,	0xDA);  /* CAN 0 ADDRESS                                 */
+SFR(CAN0TST,	0xDB);  /* CAN 0 TEST REGISTER                           */
+SFR(CAN0CN,		0xF8);  /* CAN 0 CONTROL                                 */
 
 /*  Page 0x02 */
-__sfr __at 0x88 CPT1CN   ;  /* COMPARATOR 1 CONTROL                          */
-__sfr __at 0x89 CPT1MD   ;  /* COMPARATOR 1 CONFIGURATION                    */
-__sfr __at 0xBA AMX2CF   ;  /* ADC 2 MUX CONFIGURATION                       */
-__sfr __at 0xBB AMX2SL   ;  /* ADC 2 MUX CHANNEL SELECTION                   */
-__sfr __at 0xBC ADC2CF   ;  /* ADC 2 CONFIGURATION                           */
-__sfr __at 0xBE ADC2     ;  /* ADC 2 DATA                                    */
-__sfr __at 0xC4 ADC2GT   ;  /* ADC 2 GREATER-THAN REGISTER                   */
-__sfr __at 0xC6 ADC2LT   ;  /* ADC 2 LESS-THAN REGISTER                      */
-__sfr __at 0xC8 TMR4CN   ;  /* TIMER 4 CONTROL                               */
-__sfr __at 0xC9 TMR4CF   ;  /* TIMER 4 CONFIGURATION                         */
-__sfr __at 0xCA RCAP4L   ;  /* TIMER 4 CAPTURE REGISTER - LOW BYTE           */
-__sfr __at 0xCB RCAP4H   ;  /* TIMER 4 CAPTURE REGISTER - HIGH BYTE          */
-__sfr __at 0xCC TMR4L    ;  /* TIMER 4 - LOW BYTE                            */
-__sfr __at 0xCD TMR4H    ;  /* TIMER 4 - HIGH BYTE                           */
-__sfr __at 0xE8 ADC2CN   ;  /* ADC 2 CONTROL                                 */
+SFR(CPT1CN,		0x88);  /* COMPARATOR 1 CONTROL                          */
+SFR(CPT1MD,		0x89);  /* COMPARATOR 1 CONFIGURATION                    */
+SFR(AMX2CF,		0xBA);  /* ADC 2 MUX CONFIGURATION                       */
+SFR(AMX2SL,		0xBB);  /* ADC 2 MUX CHANNEL SELECTION                   */
+SFR(ADC2CF,		0xBC);  /* ADC 2 CONFIGURATION                           */
+SFR(ADC2,		0xBE);  /* ADC 2 DATA                                    */
+SFR(ADC2GT,		0xC4);  /* ADC 2 GREATER-THAN REGISTER                   */
+SFR(ADC2LT,		0xC6);  /* ADC 2 LESS-THAN REGISTER                      */
+SFR(TMR4CN,		0xC8);  /* TIMER 4 CONTROL                               */
+SFR(TMR4CF,		0xC9);  /* TIMER 4 CONFIGURATION                         */
+SFR(RCAP4L,		0xCA);  /* TIMER 4 CAPTURE REGISTER - LOW BYTE           */
+SFR(RCAP4H,		0xCB);  /* TIMER 4 CAPTURE REGISTER - HIGH BYTE          */
+SFR(TMR4L,		0xCC);  /* TIMER 4 - LOW BYTE                            */
+SFR(TMR4H,		0xCD);  /* TIMER 4 - HIGH BYTE                           */
+SFR(ADC2CN,		0xE8);  /* ADC 2 CONTROL                                 */
 
 /*  Page 0x03 */
-__sfr __at 0x88 CPT2CN   ;  /* COMPARATOR 2 CONTROL                          */
-__sfr __at 0x89 CPT2MD   ;  /* COMPARATOR 2 CONFIGURATION                    */
+SFR(CPT2CN,		0x88);  /* COMPARATOR 2 CONTROL                          */
+SFR(CPT2MD,		0x89);  /* COMPARATOR 2 CONFIGURATION                    */
 
 /*  Page 0x0F */
-__sfr __at 0x8A OSCICN   ;  /* INTERNAL OSCILLATOR CONTROL                   */
-__sfr __at 0x8B OSCICL   ;  /* INTERNAL OSCILLATOR CALIBRATION               */
-__sfr __at 0x8C OSCXCN   ;  /* EXTERNAL OSCILLATOR CONTROL                   */
-__sfr __at 0x96 SFRPGCN  ;  /* SFR PAGE CONTROL                              */
-__sfr __at 0x97 CLKSEL   ;  /* SYSTEM CLOCK SELECT                           */
-__sfr __at 0x9C P4MDOUT  ;  /* PORT 4 OUTPUT MODE                            */
-__sfr __at 0x9D P5MDOUT  ;  /* PORT 5 OUTPUT MODE                            */
-__sfr __at 0x9E P6MDOUT  ;  /* PORT 6 OUTPUT MODE                            */
-__sfr __at 0x9F P7MDOUT  ;  /* PORT 7 OUTPUT MODE                            */
-__sfr __at 0xA4 P0MDOUT  ;  /* PORT 0 OUTPUT MODE                            */
-__sfr __at 0xA5 P1MDOUT  ;  /* PORT 1 OUTPUT MODE                            */
-__sfr __at 0xA6 P2MDOUT  ;  /* PORT 2 OUTPUT MODE CONFIGURATION              */
-__sfr __at 0xA7 P3MDOUT  ;  /* PORT 3 OUTPUT MODE CONFIGURATION              */
-__sfr __at 0xAD P1MDIN   ;  /* PORT 1 INPUT MODE                             */
-__sfr __at 0xAE P2MDIN   ;  /* PORT 2 INPUT MODE                             */
-__sfr __at 0xAF P3MDIN   ;  /* PORT 3 INPUT MODE                             */
-__sfr __at 0xB7 FLACL    ;  /* FLASH ACCESS LIMIT                            */
-__sfr __at 0xC8 P4       ;  /* PORT 4                                        */
-__sfr __at 0xD8 P5       ;  /* PORT 5                                        */
-__sfr __at 0xE1 XBR0     ;  /* CROSSBAR CONFIGURATION REGISTER 0             */
-__sfr __at 0xE2 XBR1     ;  /* CROSSBAR CONFIGURATION REGISTER 1             */
-__sfr __at 0xE3 XBR2     ;  /* CROSSBAR CONFIGURATION REGISTER 2             */
-__sfr __at 0xE4 XBR3     ;  /* CROSSBAR CONFIGURATION REGISTER 3             */
-__sfr __at 0xE8 P6       ;  /* PORT 6                                        */
-__sfr __at 0xF8 P7       ;  /* PORT 7                                        */
+SFR(OSCICN,		0x8A);  /* INTERNAL OSCILLATOR CONTROL                   */
+SFR(OSCICL,		0x8B);  /* INTERNAL OSCILLATOR CALIBRATION               */
+SFR(OSCXCN,		0x8C);  /* EXTERNAL OSCILLATOR CONTROL                   */
+SFR(SFRPGCN,	0x96);  /* SFR PAGE CONTROL                              */
+SFR(CLKSEL,		0x97);  /* SYSTEM CLOCK SELECT                           */
+SFR(P4MDOUT,	0x9C);  /* PORT 4 OUTPUT MODE                            */
+SFR(P5MDOUT,	0x9D);  /* PORT 5 OUTPUT MODE                            */
+SFR(P6MDOUT,	0x9E);  /* PORT 6 OUTPUT MODE                            */
+SFR(P7MDOUT,	0x9F);  /* PORT 7 OUTPUT MODE                            */
+SFR(P0MDOUT,	0xA4);  /* PORT 0 OUTPUT MODE                            */
+SFR(P1MDOUT,	0xA5);  /* PORT 1 OUTPUT MODE                            */
+SFR(P2MDOUT,	0xA6);  /* PORT 2 OUTPUT MODE CONFIGURATION              */
+SFR(P3MDOUT,	0xA7);  /* PORT 3 OUTPUT MODE CONFIGURATION              */
+SFR(P1MDIN,		0xAD);  /* PORT 1 INPUT MODE                             */
+SFR(P2MDIN,		0xAE);  /* PORT 2 INPUT MODE                             */
+SFR(P3MDIN,		0xAF);  /* PORT 3 INPUT MODE                             */
+SFR(FLACL,		0xB7);  /* FLASH ACCESS LIMIT                            */
+SFR(P4,			0xC8);  /* PORT 4                                        */
+SFR(P5,			0xD8);  /* PORT 5                                        */
+SFR(XBR0,		0xE1);  /* CROSSBAR CONFIGURATION REGISTER 0             */
+SFR(XBR1,		0xE2);  /* CROSSBAR CONFIGURATION REGISTER 1             */
+SFR(XBR2,		0xE3);  /* CROSSBAR CONFIGURATION REGISTER 2             */
+SFR(XBR3,		0xE4);  /* CROSSBAR CONFIGURATION REGISTER 3             */
+SFR(P6,			0xE8);  /* PORT 6                                        */
+SFR(P7,			0xF8);  /* PORT 7                                        */
 
 /*
 Do NOT use sfr16 for CAN0DAT !
@@ -210,266 +211,266 @@ Do NOT use sfr16 for CAN0DAT !
 /*  BIT Registers  */
 
 /*  P0  0x80 */
-__sbit __at 0x80 P0_0    ;
-__sbit __at 0x81 P0_1    ;
-__sbit __at 0x82 P0_2    ;
-__sbit __at 0x83 P0_3    ;
-__sbit __at 0x84 P0_4    ;
-__sbit __at 0x85 P0_5    ;
-__sbit __at 0x86 P0_6    ;
-__sbit __at 0x87 P0_7    ;
+SBIT(P0_0,		0x80);
+SBIT(P0_1,		0x81);
+SBIT(P0_2,		0x82);
+SBIT(P0_3,		0x83);
+SBIT(P0_4,		0x84);
+SBIT(P0_5,		0x85);
+SBIT(P0_6,		0x86);
+SBIT(P0_7,		0x87);
 
 /*  TCON  0x88 */
-__sbit __at 0x88 IT0     ;  /* EXT. INTERRUPT 0 TYPE                         */
-__sbit __at 0x89 IE0     ;  /* EXT. INTERRUPT 0 EDGE FLAG                    */
-__sbit __at 0x8A IT1     ;  /* EXT. INTERRUPT 1 TYPE                         */
-__sbit __at 0x8B IE1     ;  /* EXT. INTERRUPT 1 EDGE FLAG                    */
-__sbit __at 0x8C TR0     ;  /* TIMER 0 ON/OFF CONTROL                        */
-__sbit __at 0x8D TF0     ;  /* TIMER 0 OVERFLOW FLAG                         */
-__sbit __at 0x8E TR1     ;  /* TIMER 1 ON/OFF CONTROL                        */
-__sbit __at 0x8F TF1     ;  /* TIMER 1 OVERFLOW FLAG                         */
+SBIT(IT0,		0x88);  /* EXT. INTERRUPT 0 TYPE                         */
+SBIT(IE0,		0x89);  /* EXT. INTERRUPT 0 EDGE FLAG                    */
+SBIT(IT1,		0x8A);  /* EXT. INTERRUPT 1 TYPE                         */
+SBIT(IE1,		0x8B);  /* EXT. INTERRUPT 1 EDGE FLAG                    */
+SBIT(TR0,		0x8C);  /* TIMER 0 ON/OFF CONTROL                        */
+SBIT(TF0,		0x8D);  /* TIMER 0 OVERFLOW FLAG                         */
+SBIT(TR1,		0x8E);  /* TIMER 1 ON/OFF CONTROL                        */
+SBIT(TF1,		0x8F);  /* TIMER 1 OVERFLOW FLAG                         */
 
 /*  CPT0CN  0x88 */
-__sbit __at 0x88 CP0HYN0 ;  /* COMPARATOR 0 NEGATIVE HYSTERESIS 0            */
-__sbit __at 0x89 CP0HYN1 ;  /* COMPARATOR 0 NEGATIVE HYSTERESIS 1            */
-__sbit __at 0x8A CP0HYP0 ;  /* COMPARATOR 0 POSITIVE HYSTERESIS 0            */
-__sbit __at 0x8B CP0HYP1 ;  /* COMPARATOR 0 POSITIVE HYSTERESIS 1            */
-__sbit __at 0x8C CP0FIF  ;  /* COMPARATOR 0 FALLING EDGE INTERRUPT           */
-__sbit __at 0x8D CP0RIF  ;  /* COMPARATOR 0 RISING EDGE INTERRUPT            */
-__sbit __at 0x8E CP0OUT  ;  /* COMPARATOR 0 OUTPUT                           */
-__sbit __at 0x8F CP0EN   ;  /* COMPARATOR 0 ENABLE                           */
+SBIT(CP0HYN0,	0x88);  /* COMPARATOR 0 NEGATIVE HYSTERESIS 0            */
+SBIT(CP0HYN1,	0x89);  /* COMPARATOR 0 NEGATIVE HYSTERESIS 1            */
+SBIT(CP0HYP0,	0x8A);  /* COMPARATOR 0 POSITIVE HYSTERESIS 0            */
+SBIT(CP0HYP1,	0x8B);  /* COMPARATOR 0 POSITIVE HYSTERESIS 1            */
+SBIT(CP0FIF,	0x8C);  /* COMPARATOR 0 FALLING EDGE INTERRUPT           */
+SBIT(CP0RIF,	0x8D);  /* COMPARATOR 0 RISING EDGE INTERRUPT            */
+SBIT(CP0OUT,	0x8E);  /* COMPARATOR 0 OUTPUT                           */
+SBIT(CP0EN,		0x8F);  /* COMPARATOR 0 ENABLE                           */
 
 /*  CPT1CN  0x88 */
-__sbit __at 0x88 CP1HYN0 ;  /* COMPARATOR 1 NEGATIVE HYSTERESIS 0            */
-__sbit __at 0x89 CP1HYN1 ;  /* COMPARATOR 1 NEGATIVE HYSTERESIS 1            */
-__sbit __at 0x8A CP1HYP0 ;  /* COMPARATOR 1 POSITIVE HYSTERESIS 0            */
-__sbit __at 0x8B CP1HYP1 ;  /* COMPARATOR 1 POSITIVE HYSTERESIS 1            */
-__sbit __at 0x8C CP1FIF  ;  /* COMPARATOR 1 FALLING EDGE INTERRUPT           */
-__sbit __at 0x8D CP1RIF  ;  /* COMPARATOR 1 RISING EDGE INTERRUPT            */
-__sbit __at 0x8E CP1OUT  ;  /* COMPARATOR 1 OUTPUT                           */
-__sbit __at 0x8F CP1EN   ;  /* COMPARATOR 1 ENABLE                           */
+SBIT(CP1HYN0,	0x88);  /* COMPARATOR 1 NEGATIVE HYSTERESIS 0            */
+SBIT(CP1HYN1,	0x89);  /* COMPARATOR 1 NEGATIVE HYSTERESIS 1            */
+SBIT(CP1HYP0,	0x8A);  /* COMPARATOR 1 POSITIVE HYSTERESIS 0            */
+SBIT(CP1HYP1,	0x8B);  /* COMPARATOR 1 POSITIVE HYSTERESIS 1            */
+SBIT(CP1FIF,	0x8C);  /* COMPARATOR 1 FALLING EDGE INTERRUPT           */
+SBIT(CP1RIF,	0x8D);  /* COMPARATOR 1 RISING EDGE INTERRUPT            */
+SBIT(CP1OUT,	0x8E);  /* COMPARATOR 1 OUTPUT                           */
+SBIT(CP1EN,		0x8F);  /* COMPARATOR 1 ENABLE                           */
 
 /*  CPT2CN  0x88 */
-__sbit __at 0x88 CP2HYN0 ;  /* COMPARATOR 2 NEGATIVE HYSTERESIS 0            */
-__sbit __at 0x89 CP2HYN1 ;  /* COMPARATOR 2 NEGATIVE HYSTERESIS 1            */
-__sbit __at 0x8A CP2HYP0 ;  /* COMPARATOR 2 POSITIVE HYSTERESIS 0            */
-__sbit __at 0x8B CP2HYP1 ;  /* COMPARATOR 2 POSITIVE HYSTERESIS 1            */
-__sbit __at 0x8C CP2FIF  ;  /* COMPARATOR 2 FALLING EDGE INTERRUPT           */
-__sbit __at 0x8D CP2RIF  ;  /* COMPARATOR 2 RISING EDGE INTERRUPT            */
-__sbit __at 0x8E CP2OUT  ;  /* COMPARATOR 2 OUTPUT                           */
-__sbit __at 0x8F CP2EN   ;  /* COMPARATOR 2 ENABLE                           */
+SBIT(CP2HYN0,	0x88);  /* COMPARATOR 2 NEGATIVE HYSTERESIS 0            */
+SBIT(CP2HYN1,	0x89);  /* COMPARATOR 2 NEGATIVE HYSTERESIS 1            */
+SBIT(CP2HYP0,	0x8A);  /* COMPARATOR 2 POSITIVE HYSTERESIS 0            */
+SBIT(CP2HYP1,	0x8B);  /* COMPARATOR 2 POSITIVE HYSTERESIS 1            */
+SBIT(CP2FIF,	0x8C);  /* COMPARATOR 2 FALLING EDGE INTERRUPT           */
+SBIT(CP2RIF,	0x8D);  /* COMPARATOR 2 RISING EDGE INTERRUPT            */
+SBIT(CP2OUT,	0x8E);  /* COMPARATOR 2 OUTPUT                           */
+SBIT(CP2EN,		0x8F);  /* COMPARATOR 2 ENABLE                           */
 
 /*  P1  0x90 */
-__sbit __at 0x90 P1_0    ;
-__sbit __at 0x91 P1_1    ;
-__sbit __at 0x92 P1_2    ;
-__sbit __at 0x93 P1_3    ;
-__sbit __at 0x94 P1_4    ;
-__sbit __at 0x95 P1_5    ;
-__sbit __at 0x96 P1_6    ;
-__sbit __at 0x97 P1_7    ;
+SBIT(P1_0,		0x90);
+SBIT(P1_1,		0x91);
+SBIT(P1_2,		0x92);
+SBIT(P1_3,		0x93);
+SBIT(P1_4,		0x94);
+SBIT(P1_5,		0x95);
+SBIT(P1_6,		0x96);
+SBIT(P1_7,		0x97);
 
 /*  SCON0  0x98 */
-__sbit __at 0x98 RI0     ;  /* UART 0 RX INTERRUPT FLAG                      */
-__sbit __at 0x98 RI      ;  /* UART 0 RX INTERRUPT FLAG                      */
-__sbit __at 0x99 TI0     ;  /* UART 0 TX INTERRUPT FLAG                      */
-__sbit __at 0x99 TI      ;  /* UART 0 TX INTERRUPT FLAG                      */
-__sbit __at 0x9A RB80    ;  /* UART 0 RX BIT 8                               */
-__sbit __at 0x9B TB80    ;  /* UART 0 TX BIT 8                               */
-__sbit __at 0x9C REN0    ;  /* UART 0 RX ENABLE                              */
-__sbit __at 0x9C REN     ;  /* UART 0 RX ENABLE                              */
-__sbit __at 0x9D SM20    ;  /* UART 0 MULTIPROCESSOR EN                      */
-__sbit __at 0x9E SM10    ;  /* UART 0 MODE 1                                 */
-__sbit __at 0x9F SM00    ;  /* UART 0 MODE 0                                 */
+SBIT(RI0,		0x98);  /* UART 0 RX INTERRUPT FLAG                      */
+SBIT(RI,		0x98);  /* UART 0 RX INTERRUPT FLAG                      */
+SBIT(TI0,		0x99);  /* UART 0 TX INTERRUPT FLAG                      */
+SBIT(TI,		0x99);  /* UART 0 TX INTERRUPT FLAG                      */
+SBIT(RB80,		0x9A);  /* UART 0 RX BIT 8                               */
+SBIT(TB80,		0x9B);  /* UART 0 TX BIT 8                               */
+SBIT(REN0,		0x9C);  /* UART 0 RX ENABLE                              */
+SBIT(REN,		0x9C);  /* UART 0 RX ENABLE                              */
+SBIT(SM20,		0x9D);  /* UART 0 MULTIPROCESSOR EN                      */
+SBIT(SM10,		0x9E);  /* UART 0 MODE 1                                 */
+SBIT(SM00,		0x9F);  /* UART 0 MODE 0                                 */
 
 /*  SCON1  0x98 */
-__sbit __at 0x98 RI1     ;  /* UART 1 RX INTERRUPT FLAG                      */
-__sbit __at 0x99 TI1     ;  /* UART 1 TX INTERRUPT FLAG                      */
-__sbit __at 0x9A RB81    ;  /* UART 1 RX BIT 8                               */
-__sbit __at 0x9B TB81    ;  /* UART 1 TX BIT 8                               */
-__sbit __at 0x9C REN1    ;  /* UART 1 RX ENABLE                              */
-__sbit __at 0x9D MCE1    ;  /* UART 1 MCE                                    */
-__sbit __at 0x9F S1MODE  ;  /* UART 1 MODE                                   */
+SBIT(RI1,		0x98);  /* UART 1 RX INTERRUPT FLAG                      */
+SBIT(TI1,		0x99);  /* UART 1 TX INTERRUPT FLAG                      */
+SBIT(RB81,		0x9A);  /* UART 1 RX BIT 8                               */
+SBIT(TB81,		0x9B);  /* UART 1 TX BIT 8                               */
+SBIT(REN1,		0x9C);  /* UART 1 RX ENABLE                              */
+SBIT(MCE1,		0x9D);  /* UART 1 MCE                                    */
+SBIT(S1MODE,	0x9F);  /* UART 1 MODE                                   */
 
 /*  P2  0xA0 */
-__sbit __at 0xA0 P2_0    ;
-__sbit __at 0xA1 P2_1    ;
-__sbit __at 0xA2 P2_2    ;
-__sbit __at 0xA3 P2_3    ;
-__sbit __at 0xA4 P2_4    ;
-__sbit __at 0xA5 P2_5    ;
-__sbit __at 0xA6 P2_6    ;
-__sbit __at 0xA7 P2_7    ;
+SBIT(P2_0,		0xA0);
+SBIT(P2_1,		0xA1);
+SBIT(P2_2,		0xA2);
+SBIT(P2_3,		0xA3);
+SBIT(P2_4,		0xA4);
+SBIT(P2_5,		0xA5);
+SBIT(P2_6,		0xA6);
+SBIT(P2_7,		0xA7);
 
 /*  IE  0xA8 */
-__sbit __at 0xA8 EX0     ;  /* EXTERNAL INTERRUPT 0 ENABLE                   */
-__sbit __at 0xA9 ET0     ;  /* TIMER 0 INTERRUPT ENABLE                      */
-__sbit __at 0xAA EX1     ;  /* EXTERNAL INTERRUPT 1 ENABLE                   */
-__sbit __at 0xAB ET1     ;  /* TIMER 1 INTERRUPT ENABLE                      */
-__sbit __at 0xAC ES0     ;  /* UART0 INTERRUPT ENABLE                        */
-__sbit __at 0xAC ES      ;  /* UART0 INTERRUPT ENABLE                        */
-__sbit __at 0xAD ET2     ;  /* TIMER 2 INTERRUPT ENABLE                      */
-__sbit __at 0xAF EA      ;  /* GLOBAL INTERRUPT ENABLE                       */
+SBIT(EX0,		0xA8);  /* EXTERNAL INTERRUPT 0 ENABLE                   */
+SBIT(ET0,		0xA9);  /* TIMER 0 INTERRUPT ENABLE                      */
+SBIT(EX1,		0xAA);  /* EXTERNAL INTERRUPT 1 ENABLE                   */
+SBIT(ET1,		0xAB);  /* TIMER 1 INTERRUPT ENABLE                      */
+SBIT(ES0,		0xAC);  /* UART0 INTERRUPT ENABLE                        */
+SBIT(ES,		0xAC);  /* UART0 INTERRUPT ENABLE                        */
+SBIT(ET2,		0xAD);  /* TIMER 2 INTERRUPT ENABLE                      */
+SBIT(EA,		0xAF);  /* GLOBAL INTERRUPT ENABLE                       */
 
 /*  P3  0xB0 */
-__sbit __at 0xB0 P3_0    ;
-__sbit __at 0xB1 P3_1    ;
-__sbit __at 0xB2 P3_2    ;
-__sbit __at 0xB3 P3_3    ;
-__sbit __at 0xB4 P3_4    ;
-__sbit __at 0xB5 P3_5    ;
-__sbit __at 0xB6 P3_6    ;
-__sbit __at 0xB7 P3_7    ;
+SBIT(P3_0,		0xB0);
+SBIT(P3_1,		0xB1);
+SBIT(P3_2,		0xB2);
+SBIT(P3_3,		0xB3);
+SBIT(P3_4,		0xB4);
+SBIT(P3_5,		0xB5);
+SBIT(P3_6,		0xB6);
+SBIT(P3_7,		0xB7);
 
 /*  IP  0xB8 */
-__sbit __at 0xB8 PX0     ;  /* EXTERNAL INTERRUPT 0 PRIORITY                 */
-__sbit __at 0xB9 PT0     ;  /* TIMER 0 PRIORITY                              */
-__sbit __at 0xBA PX1     ;  /* EXTERNAL INTERRUPT 1 PRIORITY                 */
-__sbit __at 0xBB PT1     ;  /* TIMER 1 PRIORITY                              */
-__sbit __at 0xBC PS0     ;  /* SERIAL PORT PRIORITY                          */
-__sbit __at 0xBC PS      ;  /* SERIAL PORT PRIORITY                          */
-__sbit __at 0xBD PT2     ;  /* TIMER 2 PRIORITY                              */
+SBIT(PX0,		0xB8);  /* EXTERNAL INTERRUPT 0 PRIORITY                 */
+SBIT(PT0,		0xB9);  /* TIMER 0 PRIORITY                              */
+SBIT(PX1,		0xBA);  /* EXTERNAL INTERRUPT 1 PRIORITY                 */
+SBIT(PT1,		0xBB);  /* TIMER 1 PRIORITY                              */
+SBIT(PS0,		0xBC);  /* SERIAL PORT PRIORITY                          */
+SBIT(PS,		0xBC);  /* SERIAL PORT PRIORITY                          */
+SBIT(PT2,		0xBD);  /* TIMER 2 PRIORITY                              */
 
 /*  SMB0CN  0xC0 */
-__sbit __at 0xC0 SMBTOE  ;  /* SMBUS 0 TIMEOUT ENABLE                        */
-__sbit __at 0xC1 SMBFTE  ;  /* SMBUS 0 FREE TIMER ENABLE                     */
-__sbit __at 0xC2 AA      ;  /* SMBUS 0 ASSERT/ACKNOWLEDGE FLAG               */
-__sbit __at 0xC3 SI      ;  /* SMBUS 0 INTERRUPT PENDING FLAG                */
-__sbit __at 0xC4 STO     ;  /* SMBUS 0 STOP FLAG                             */
-__sbit __at 0xC5 STA     ;  /* SMBUS 0 START FLAG                            */
-__sbit __at 0xC6 ENSMB   ;  /* SMBUS 0 ENABLE                                */
-__sbit __at 0xC7 BUSY    ;  /* SMBUS 0 BUSY                                  */
+SBIT(SMBTOE,	0xC0);  /* SMBUS 0 TIMEOUT ENABLE                        */
+SBIT(SMBFTE,	0xC1);  /* SMBUS 0 FREE TIMER ENABLE                     */
+SBIT(AA,		0xC2);  /* SMBUS 0 ASSERT/ACKNOWLEDGE FLAG               */
+SBIT(SI,		0xC3);  /* SMBUS 0 INTERRUPT PENDING FLAG                */
+SBIT(STO,		0xC4);  /* SMBUS 0 STOP FLAG                             */
+SBIT(STA,		0xC5);  /* SMBUS 0 START FLAG                            */
+SBIT(ENSMB,		0xC6);  /* SMBUS 0 ENABLE                                */
+SBIT(BUSY,		0xC7);  /* SMBUS 0 BUSY                                  */
 
 /*  CAN0STA  0xC0 */
-__sbit __at 0xC3 CANTXOK ;  /* CAN TRANSMITTED A MESSAGE SUCCESSFULLY        */
-__sbit __at 0xC4 CANRXOK ;  /* CAN RECEIVED A MESSAGE SUCCESSFULLY           */
-__sbit __at 0xC5 CANEPASS;  /* CAN ERROR PASSIVE                             */
-__sbit __at 0xC6 CANEWARN;  /* CAN WARNING STATUS                            */
-__sbit __at 0xC7 CANBOFF ;  /* CAN BUSOFF STATUS                             */
+SBIT(CANTXOK,	0xC3);  /* CAN TRANSMITTED A MESSAGE SUCCESSFULLY        */
+SBIT(CANRXOK,	0xC4);  /* CAN RECEIVED A MESSAGE SUCCESSFULLY           */
+SBIT(CANEPASS,	0xC5);  /* CAN ERROR PASSIVE                             */
+SBIT(CANEWARN,	0xC6);  /* CAN WARNING STATUS                            */
+SBIT(CANBOFF,	0xC7);  /* CAN BUSOFF STATUS                             */
 
 /*  TMR2CN  0xC8 */
-__sbit __at 0xC8 CPRL2   ;  /* TIMER 2 CAPTURE SELECT                        */
-__sbit __at 0xC9 CT2     ;  /* TIMER 2 COUNTER SELECT                        */
-__sbit __at 0xCA TR2     ;  /* TIMER 2 ON/OFF CONTROL                        */
-__sbit __at 0xCB EXEN2   ;  /* TIMER 2 EXTERNAL ENABLE FLAG                  */
-__sbit __at 0xCE EXF2    ;  /* TIMER 2 EXTERNAL FLAG                         */
-__sbit __at 0xCF TF2     ;  /* TIMER 2 OVERFLOW FLAG                         */
+SBIT(CPRL2,		0xC8);  /* TIMER 2 CAPTURE SELECT                        */
+SBIT(CT2,		0xC9);  /* TIMER 2 COUNTER SELECT                        */
+SBIT(TR2,		0xCA);  /* TIMER 2 ON/OFF CONTROL                        */
+SBIT(EXEN2,		0xCB);  /* TIMER 2 EXTERNAL ENABLE FLAG                  */
+SBIT(EXF2,		0xCE);  /* TIMER 2 EXTERNAL FLAG                         */
+SBIT(TF2,		0xCF);  /* TIMER 2 OVERFLOW FLAG                         */
 
 /*  TMR3CN  0xC8 */
-__sbit __at 0xC8 CPRL3   ;  /* TIMER 3 CAPTURE SELECT                        */
-__sbit __at 0xC9 CT3     ;  /* TIMER 3 COUNTER SELECT                        */
-__sbit __at 0xCA TR3     ;  /* TIMER 3 ON/OFF CONTROL                        */
-__sbit __at 0xCB EXEN3   ;  /* TIMER 3 EXTERNAL ENABLE FLAG                  */
-__sbit __at 0xCE EXF3    ;  /* TIMER 3 EXTERNAL FLAG                         */
-__sbit __at 0xCF TF3     ;  /* TIMER 3 OVERFLOW FLAG                         */
+SBIT(CPRL3,		0xC8);  /* TIMER 3 CAPTURE SELECT                        */
+SBIT(CT3,		0xC9);  /* TIMER 3 COUNTER SELECT                        */
+SBIT(TR3,		0xCA);  /* TIMER 3 ON/OFF CONTROL                        */
+SBIT(EXEN3,		0xCB);  /* TIMER 3 EXTERNAL ENABLE FLAG                  */
+SBIT(EXF3,		0xCE);  /* TIMER 3 EXTERNAL FLAG                         */
+SBIT(TF3,		0xCF);  /* TIMER 3 OVERFLOW FLAG                         */
 
 /*  TMR4CN  0xC8 */
-__sbit __at 0xC8 CPRL4   ;  /* TIMER 4 CAPTURE SELECT                        */
-__sbit __at 0xC9 CT4     ;  /* TIMER 4 COUNTER SELECT                        */
-__sbit __at 0xCA TR4     ;  /* TIMER 4 ON/OFF CONTROL                        */
-__sbit __at 0xCB EXEN4   ;  /* TIMER 4 EXTERNAL ENABLE FLAG                  */
-__sbit __at 0xCE EXF4    ;  /* TIMER 4 EXTERNAL FLAG                         */
-__sbit __at 0xCF TF4     ;  /* TIMER 4 OVERFLOW FLAG                         */
+SBIT(CPRL4,		0xC8);  /* TIMER 4 CAPTURE SELECT                        */
+SBIT(CT4,		0xC9);  /* TIMER 4 COUNTER SELECT                        */
+SBIT(TR4,		0xCA);  /* TIMER 4 ON/OFF CONTROL                        */
+SBIT(EXEN4,		0xCB);  /* TIMER 4 EXTERNAL ENABLE FLAG                  */
+SBIT(EXF4,		0xCE);  /* TIMER 4 EXTERNAL FLAG                         */
+SBIT(TF4,		0xCF);  /* TIMER 4 OVERFLOW FLAG                         */
 
 /*  P4  0xC8 */
-__sbit __at 0xC8 P4_0    ;
-__sbit __at 0xC9 P4_1    ;
-__sbit __at 0xCA P4_2    ;
-__sbit __at 0xCB P4_3    ;
-__sbit __at 0xCC P4_4    ;
-__sbit __at 0xCD P4_5    ;
-__sbit __at 0xCE P4_6    ;
-__sbit __at 0xCF P4_7    ;
+SBIT(P4_0,		0xC8);
+SBIT(P4_1,		0xC9);
+SBIT(P4_2,		0xCA);
+SBIT(P4_3,		0xCB);
+SBIT(P4_4,		0xCC);
+SBIT(P4_5,		0xCD);
+SBIT(P4_6,		0xCE);
+SBIT(P4_7,		0xCF);
 
 /*  PSW  0xD0 */
-__sbit __at 0xD0 P       ;  /* ACCUMULATOR PARITY FLAG                       */
-__sbit __at 0xD1 F1      ;  /* USER FLAG 1                                   */
-__sbit __at 0xD2 OV      ;  /* OVERFLOW FLAG                                 */
-__sbit __at 0xD3 RS0     ;  /* REGISTER BANK SELECT 0                        */
-__sbit __at 0xD4 RS1     ;  /* REGISTER BANK SELECT 1                        */
-__sbit __at 0xD5 F0      ;  /* USER FLAG 0                                   */
-__sbit __at 0xD6 AC      ;  /* AUXILIARY CARRY FLAG                          */
-__sbit __at 0xD7 CY      ;  /* CARRY FLAG                                    */
+SBIT(P,			0xD0);  /* ACCUMULATOR PARITY FLAG                       */
+SBIT(F1,		0xD1);  /* USER FLAG 1                                   */
+SBIT(OV,		0xD2);  /* OVERFLOW FLAG                                 */
+SBIT(RS0,		0xD3);  /* REGISTER BANK SELECT 0                        */
+SBIT(RS1,		0xD4);  /* REGISTER BANK SELECT 1                        */
+SBIT(F0,		0xD5);  /* USER FLAG 0                                   */
+SBIT(AC,		0xD6);  /* AUXILIARY CARRY FLAG                          */
+SBIT(CY,		0xD7);  /* CARRY FLAG                                    */
 
 /*  PCA0CN  0xD8 */
-__sbit __at 0xD8 CCF0    ;  /* PCA 0 MODULE 0 INTERRUPT FLAG                 */
-__sbit __at 0xD9 CCF1    ;  /* PCA 0 MODULE 1 INTERRUPT FLAG                 */
-__sbit __at 0xDA CCF2    ;  /* PCA 0 MODULE 2 INTERRUPT FLAG                 */
-__sbit __at 0xDB CCF3    ;  /* PCA 0 MODULE 3 INTERRUPT FLAG                 */
-__sbit __at 0xDC CCF4    ;  /* PCA 0 MODULE 4 INTERRUPT FLAG                 */
-__sbit __at 0xDD CCF5    ;  /* PCA 0 MODULE 5 INTERRUPT FLAG                 */
-__sbit __at 0xDE CR      ;  /* PCA 0 COUNTER RUN CONTROL BIT                 */
-__sbit __at 0xDF CF      ;  /* PCA 0 COUNTER OVERFLOW FLAG                   */
+SBIT(CCF0,		0xD8);  /* PCA 0 MODULE 0 INTERRUPT FLAG                 */
+SBIT(CCF1,		0xD9);  /* PCA 0 MODULE 1 INTERRUPT FLAG                 */
+SBIT(CCF2,		0xDA);  /* PCA 0 MODULE 2 INTERRUPT FLAG                 */
+SBIT(CCF3,		0xDB);  /* PCA 0 MODULE 3 INTERRUPT FLAG                 */
+SBIT(CCF4,		0xDC);  /* PCA 0 MODULE 4 INTERRUPT FLAG                 */
+SBIT(CCF5,		0xDD);  /* PCA 0 MODULE 5 INTERRUPT FLAG                 */
+SBIT(CR,		0xDE);  /* PCA 0 COUNTER RUN CONTROL BIT                 */
+SBIT(CF,		0xDF);  /* PCA 0 COUNTER OVERFLOW FLAG                   */
 
 /*  P5  0xD8 */
-__sbit __at 0xD8 P5_0    ;
-__sbit __at 0xD9 P5_1    ;
-__sbit __at 0xDA P5_2    ;
-__sbit __at 0xDB P5_3    ;
-__sbit __at 0xDC P5_4    ;
-__sbit __at 0xDD P5_5    ;
-__sbit __at 0xDE P5_6    ;
-__sbit __at 0xDF P5_7    ;
+SBIT(P5_0,		0xD8);
+SBIT(P5_1,		0xD9);
+SBIT(P5_2,		0xDA);
+SBIT(P5_3,		0xDB);
+SBIT(P5_4,		0xDC);
+SBIT(P5_5,		0xDD);
+SBIT(P5_6,		0xDE);
+SBIT(P5_7,		0xDF);
 
 /*  ADC0CN  0xE8 */
-__sbit __at 0xE8 AD0LJST ;  /* ADC 0 RIGHT JUSTIFY DATA BIT                  */
-__sbit __at 0xE9 AD0WINT ;  /* ADC 0 WINDOW INTERRUPT FLAG                   */
-__sbit __at 0xEA AD0CM0  ;  /* ADC 0 CONVERT START MODE BIT 0                */
-__sbit __at 0xEB AD0CM1  ;  /* ADC 0 CONVERT START MODE BIT 1                */
-__sbit __at 0xEC AD0BUSY ;  /* ADC 0 BUSY FLAG                               */
-__sbit __at 0xED AD0INT  ;  /* ADC 0 EOC INTERRUPT FLAG                      */
-__sbit __at 0xEE AD0TM   ;  /* ADC 0 TRACK MODE                              */
-__sbit __at 0xEF AD0EN   ;  /* ADC 0 ENABLE                                  */
+SBIT(AD0LJST,	0xE8);  /* ADC 0 RIGHT JUSTIFY DATA BIT                  */
+SBIT(AD0WINT,	0xE9);  /* ADC 0 WINDOW INTERRUPT FLAG                   */
+SBIT(AD0CM0,	0xEA);  /* ADC 0 CONVERT START MODE BIT 0                */
+SBIT(AD0CM1,	0xEB);  /* ADC 0 CONVERT START MODE BIT 1                */
+SBIT(AD0BUSY,	0xEC);  /* ADC 0 BUSY FLAG                               */
+SBIT(AD0INT,	0xED);  /* ADC 0 EOC INTERRUPT FLAG                      */
+SBIT(AD0TM,		0xEE);  /* ADC 0 TRACK MODE                              */
+SBIT(AD0EN,		0xEF);  /* ADC 0 ENABLE                                  */
 
 /*  ADC2CN  0xE8 */
-__sbit __at 0xE8 AD2WINT ;  /* ADC 2 WINDOW INTERRUPT FLAG                   */
-__sbit __at 0xE9 AD2CM0  ;  /* ADC 2 CONVERT START MODE BIT 0                */
-__sbit __at 0xEA AD2CM1  ;  /* ADC 2 CONVERT START MODE BIT 1                */
-__sbit __at 0xEB AD2CM2  ;  /* ADC 2 CONVERT START MODE BIT 2                */
-__sbit __at 0xEC AD2BUSY ;  /* ADC 2 BUSY FLAG                               */
-__sbit __at 0xED AD2INT  ;  /* ADC 2 EOC INTERRUPT FLAG                      */
-__sbit __at 0xEE AD2TM   ;  /* ADC 2 TRACK MODE                              */
-__sbit __at 0xEF AD2EN   ;  /* ADC 2 ENABLE                                  */
+SBIT(AD2WINT,	0xE8);  /* ADC 2 WINDOW INTERRUPT FLAG                   */
+SBIT(AD2CM0,	0xE9);  /* ADC 2 CONVERT START MODE BIT 0                */
+SBIT(AD2CM1,	0xEA);  /* ADC 2 CONVERT START MODE BIT 1                */
+SBIT(AD2CM2,	0xEB);  /* ADC 2 CONVERT START MODE BIT 2                */
+SBIT(AD2BUSY,	0xEC);  /* ADC 2 BUSY FLAG                               */
+SBIT(AD2INT,	0xED);  /* ADC 2 EOC INTERRUPT FLAG                      */
+SBIT(AD2TM,		0xEE);  /* ADC 2 TRACK MODE                              */
+SBIT(AD2EN,		0xEF);  /* ADC 2 ENABLE                                  */
 
 /*  P6  0xE8 */
-__sbit __at 0xE8 P6_0    ;
-__sbit __at 0xE9 P6_1    ;
-__sbit __at 0xEA P6_2    ;
-__sbit __at 0xEB P6_3    ;
-__sbit __at 0xEC P6_4    ;
-__sbit __at 0xED P6_5    ;
-__sbit __at 0xEE P6_6    ;
-__sbit __at 0xEF P6_7    ;
+SBIT(P6_0,		0xE8);
+SBIT(P6_1,		0xE9);
+SBIT(P6_2,		0xEA);
+SBIT(P6_3,		0xEB);
+SBIT(P6_4,		0xEC);
+SBIT(P6_5,		0xED);
+SBIT(P6_6,		0xEE);
+SBIT(P6_7,		0xEF);
 
 /*  SPI0CN  0xF8 */
-__sbit __at 0xF8 SPIEN   ;  /* SPI 0 SPI ENABLE                              */
-__sbit __at 0xF9 TXBMT   ;  /* SPI 0 TX BUFFER EMPTY FLAG                    */
-__sbit __at 0xFA NSSMD0  ;  /* SPI 0 SLAVE SELECT MODE 0                     */
-__sbit __at 0xFB NSSMD1  ;  /* SPI 0 SLAVE SELECT MODE 1                     */
-__sbit __at 0xFC RXOVRN  ;  /* SPI 0 RX OVERRUN FLAG                         */
-__sbit __at 0xFD MODF    ;  /* SPI 0 MODE FAULT FLAG                         */
-__sbit __at 0xFE WCOL    ;  /* SPI 0 WRITE COLLISION FLAG                    */
-__sbit __at 0xFF SPIF    ;  /* SPI 0 INTERRUPT FLAG                          */
+SBIT(SPIEN,		0xF8);  /* SPI 0 SPI ENABLE                              */
+SBIT(TXBMT,		0xF9);  /* SPI 0 TX BUFFER EMPTY FLAG                    */
+SBIT(NSSMD0,	0xFA);  /* SPI 0 SLAVE SELECT MODE 0                     */
+SBIT(NSSMD1,	0xFB);  /* SPI 0 SLAVE SELECT MODE 1                     */
+SBIT(RXOVRN,	0xFC);  /* SPI 0 RX OVERRUN FLAG                         */
+SBIT(MODF,		0xFD);  /* SPI 0 MODE FAULT FLAG                         */
+SBIT(WCOL,		0xFE);  /* SPI 0 WRITE COLLISION FLAG                    */
+SBIT(SPIF,		0xFF);  /* SPI 0 INTERRUPT FLAG                          */
 
 /*  CAN0CN  0xF8 */
-__sbit __at 0xF8 CANINIT ;  /* CAN INITIALIZATION                            */
-__sbit __at 0xF9 CANIE   ;  /* CAN MODULE INTERRUPT ENABLE                   */
-__sbit __at 0xFA CANSIE  ;  /* CAN STATUS CHANGE INTERRUPT ENABLE            */
-__sbit __at 0xFB CANEIE  ;  /* CAN ERROR INTERRUPT ENABLE                    */
-__sbit __at 0xFC CANIF   ;  /* CAN INTERRUPT FLAG                            */
-__sbit __at 0xFD CANDAR  ;  /* CAN DISABLE AUTOMATIC RETRANSMISSION          */
-__sbit __at 0xFE CANCCE  ;  /* CAN CONFIGURATION CHANGE ENABLE               */
-__sbit __at 0xFF CANTEST ;  /* CAN TEST MODE ENABLE                          */
+SBIT(CANINIT,	0xF8);  /* CAN INITIALIZATION                            */
+SBIT(CANIE,		0xF9);  /* CAN MODULE INTERRUPT ENABLE                   */
+SBIT(CANSIE,	0xFA);  /* CAN STATUS CHANGE INTERRUPT ENABLE            */
+SBIT(CANEIE,	0xFB);  /* CAN ERROR INTERRUPT ENABLE                    */
+SBIT(CANIF,		0xFC);  /* CAN INTERRUPT FLAG                            */
+SBIT(CANDAR,	0xFD);  /* CAN DISABLE AUTOMATIC RETRANSMISSION          */
+SBIT(CANCCE,	0xFE);  /* CAN CONFIGURATION CHANGE ENABLE               */
+SBIT(CANTEST,	0xFF);  /* CAN TEST MODE ENABLE                          */
 
 /*  P7  0xF8 */
-__sbit __at 0xF8 P7_0    ;
-__sbit __at 0xF9 P7_1    ;
-__sbit __at 0xFA P7_2    ;
-__sbit __at 0xFB P7_3    ;
-__sbit __at 0xFC P7_4    ;
-__sbit __at 0xFD P7_5    ;
-__sbit __at 0xFE P7_6    ;
-__sbit __at 0xFF P7_7    ;
+SBIT(P7_0,		0xF8);
+SBIT(P7_1,		0xF9);
+SBIT(P7_2,		0xFA);
+SBIT(P7_3,		0xFB);
+SBIT(P7_4,		0xFC);
+SBIT(P7_5,		0xFD);
+SBIT(P7_6,		0xFE);
+SBIT(P7_7,		0xFF);
 
 
 /* Predefined SFR Bit Masks */

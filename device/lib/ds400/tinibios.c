@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -38,13 +38,12 @@ unsigned char _sdcc_external_startup(void)
   IE = 0; // Disable all interrupts.
 
   PSW = 0;
-  
+
   __asm
   ; save the 24-bit return address
   pop ar2; msb
   pop ar1
   pop ar0; lsb
-
 
   mov _ESP,#0x00; reinitialize the stack
   mov _SP,#0x00
@@ -53,21 +52,21 @@ unsigned char _sdcc_external_startup(void)
   push ar0; lsb
   push ar1
   push ar2; msb
-  __endasm;    
-  
+  __endasm;
+
   // Stub: call rom_init here, then fixup IVT.
-  // 
-  
+  //
+
   Serial0Init(1, 0); // baud argument ignored.
-  
+
   IE = 0x80; // Enable interrupts.
-  
+
   return 0;
 }
 
 // now the serial0 stuff
 
-// just to make the code more readable 
+// just to make the code more readable
 #define S0RBS SERIAL_0_RECEIVE_BUFFER_SIZE
 
 // this is a ring buffer and can overflow at anytime!
@@ -108,7 +107,7 @@ void Serial0Init (unsigned long baud, unsigned char buffered)
 #endif
 
   serial0Buffered=buffered;
- 
+
  if (buffered) {
     installInterrupt(Serial0IrqHandler, 0x23);
     RI_0=TI_0=0; // clear "pending" interrupts
@@ -122,16 +121,16 @@ void Serial0Init (unsigned long baud, unsigned char buffered)
 void Serial0SwitchToBuffered(void)
 {
   IE &= ~0x80;
-  
+
   serial0Buffered = 1;
   installInterrupt(Serial0IrqHandler, 0x23);
   RI_0=TI_0=0; // clear "pending" interrupts
   ES0 = 1; // enable serial channel 0 interrupt
-  
+
   IE |= 0x80;
 }
 
-void Serial0IrqHandler (void) __interrupt 4
+void Serial0IrqHandler (void) __interrupt (4)
 {
   if (RI_0) {
     receive0Buffer[receive0BufferHead]=SBUF0;
@@ -216,7 +215,7 @@ void Serial0Flush()
 
 // now let's go for the clock stuff - on the DS400, we can just
 // use the ROM's millisecond timer, running off timer 0.
-// 
+//
 // for now, this timer runs too fast by about 20%. We need an implementation of
 // task_settickreload to fix this.
 
@@ -241,11 +240,11 @@ void ClockMilliSecondsDelay(unsigned long delay)
 
 // Return the start of the XI_SEG. Really just a workaround for the
 // fact that the linker defined symbol (s_XISEG) isn't directly accessible
-// from C due to the lack of a leading underscore, and I'm too lazy to hack 
+// from C due to the lack of a leading underscore, and I'm too lazy to hack
 // the linker.
 static void __xdata *_xisegStart(void) __naked
 {
-  __asm    
+  __asm
   mov dptr, #(s_XISEG)
   ret
   __endasm;
@@ -253,7 +252,7 @@ static void __xdata *_xisegStart(void) __naked
 
 // Return the length of the XI_SEG. Really just a workaround for the
 // fact that the linker defined symbol (l_XISEG) isn't directly accessible
-// from C due to the lack of a leading underscore, and I'm too lazy to hack 
+// from C due to the lack of a leading underscore, and I'm too lazy to hack
 // the linker.
 static unsigned  _xisegLen(void) __naked
 {
@@ -263,12 +262,12 @@ static unsigned  _xisegLen(void) __naked
   __endasm;
 }
 
-// Returns the address of the first byte available for heap memory, 
+// Returns the address of the first byte available for heap memory,
 // i.e. the first byte following the XI_SEG.
 static void __xdata *_firstHeapByte(void)
 {
   unsigned char __xdata *start;
-  
+
   start = (unsigned char __xdata *) _xisegStart();
   start += _xisegLen();
 
@@ -277,14 +276,14 @@ static void __xdata *_firstHeapByte(void)
 
 // TINIm400 specific startup.
 
-// The last addressible byte of the CE0 area. 
+// The last addressible byte of the CE0 area.
 #define CE0_END 0xfffff
 
 unsigned char romInit(unsigned char noisy, char speed)
 {
   void __xdata *heapStart;
   void __xdata *heapEnd;
-  unsigned long heapLen; 
+  unsigned long heapLen;
   unsigned char rc;
 
   if (speed == SPEED_2X)

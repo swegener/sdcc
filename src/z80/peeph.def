@@ -1225,16 +1225,6 @@ replace restart {
 } if labelRefCount(%2 0), labelRefCountChange(%3 -1)
 
 replace restart {
-	ld	%1, %2
-	jp	%3
-%3:
-} by {
-	ld	%1, %2
-%3:
-	; common peephole 88 removed redundant jump to %3.
-} if labelRefCountChange(%3 -1)
-
-replace restart {
 	ld	%1, #0x01
 	bit	0, %1
 	jp	Z, %2

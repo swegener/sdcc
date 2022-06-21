@@ -455,10 +455,10 @@ int __setjmp (jmp_buf buf)
     *buf++ = bpx;
 #endif
     *buf++ = SP;
-    *buf++ = *((unsigned char __data *) SP - 0);
-    *buf++ = *((unsigned char __data *) SP - 1);
+    *buf++ = *((unsigned char __idata *) SP - 0);
+    *buf++ = *((unsigned char __idata *) SP - 1);
 #ifdef __SDCC_MODEL_HUGE
-    *buf++ = *((unsigned char __data *) SP - 2);
+    *buf++ = *((unsigned char __idata *) SP - 2);
 #endif
     return 0;
 }
@@ -472,10 +472,10 @@ int longjmp (jmp_buf buf, int rv)
     bpx = *buf++;
 #endif
     lsp = *buf++;
-    *((unsigned char __data *) lsp - 0) = *buf++;
-    *((unsigned char __data *) lsp - 1) = *buf++;
+    *((unsigned char __idata *) lsp - 0) = *buf++;
+    *((unsigned char __idata *) lsp - 1) = *buf++;
 #ifdef __SDCC_MODEL_HUGE
-    *((unsigned char __data *) lsp - 2) = *buf++;
+    *((unsigned char __idata *) lsp - 2) = *buf++;
 #endif
     SP = lsp;
     return rv ? rv : 1;

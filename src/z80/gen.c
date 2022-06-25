@@ -5887,7 +5887,7 @@ genCall (const iCode *ic)
               emit2 ("ld b, h");
               regalloc_dry_run_cost += 2;
               _pop (PAIR_HL);
-              pair = PAIR_BC;             
+              pair = PAIR_BC;           
             }
         }
       emit2 ("push %s", _pairs[pair].name);
@@ -5900,11 +5900,6 @@ genCall (const iCode *ic)
 
   // Check if we can do tail call optimization.
   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
-    (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.aop_reg[0]->rIdx) &&
-      (IC_RESULT (ic)->aop->size <= 1 || aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.aop_reg[1]->rIdx)) &&
-      (IC_RESULT (ic)->aop->size <= 2 || aopInReg (IC_RESULT (ic)->aop, 2, aopRet (ftype)->aopu.aop_reg[2]->rIdx)) &&
-      (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
-      IC_RESULT (ic)->aop->size <= 4) &&
     !ic->parmBytes &&
     (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8 - for z80 and r3ka this will be slower and bigger than without tail call optimization, but it saves RAM */) &&
     !ic->localEscapeAlive &&
@@ -5976,6 +5971,11 @@ genCall (const iCode *ic)
             nic = nic->next;
         }
     }
+
+  if (tailjump && SomethingReturned) // Explicitly check for matching registers, as otherwise calls between __sdcccall(1) and __z88dk_fastcall will go wrong.
+    for (int i = 0; i < IC_RESULT (ic)->aop->size; i++)
+      if (!aopInReg (aopRet (currFunc->type), 0, aopRet (ftype)->aopu.aop_reg[0]->rIdx))
+        tailjump = false;
 
   const bool jump = tailjump || !ic->parmBytes && !bigreturn && ic->op != PCALL && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL(ftype) && IFFUNC_ISNORETURN (ftype);
 

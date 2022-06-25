@@ -1,3 +1,9 @@
+2022-06-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3458.c.in:
+	  Fix bug #3458.
+
 2022-06-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.y:

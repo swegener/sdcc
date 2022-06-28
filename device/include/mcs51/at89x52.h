@@ -67,122 +67,122 @@ SFR(B,		0xF0);
 
 /* BIT addressable registers */
 /* P0 */
-SBIT(P0_0,		0x80);
-SBIT(P0_1,		0x81);
-SBIT(P0_2,		0x82);
-SBIT(P0_3,		0x83);
-SBIT(P0_4,		0x84);
-SBIT(P0_5,		0x85);
-SBIT(P0_6,		0x86);
-SBIT(P0_7,		0x87);
+SBIT(P0_0,		0x80,	0);
+SBIT(P0_1,		0x80,	1);
+SBIT(P0_2,		0x80,	2);
+SBIT(P0_3,		0x80,	3);
+SBIT(P0_4,		0x80,	4);
+SBIT(P0_5,		0x80,	5);
+SBIT(P0_6,		0x80,	6);
+SBIT(P0_7,		0x80,	7);
 
 /* TCON */
-SBIT(IT0,		0x88);
-SBIT(IE0,		0x89);
-SBIT(IT1,		0x8A);
-SBIT(IE1,		0x8B);
-SBIT(TR0,		0x8C);
-SBIT(TF0,		0x8D);
-SBIT(TR1,		0x8E);
-SBIT(TF1,		0x8F);
+SBIT(IT0,		0x88,	0);
+SBIT(IE0,		0x88,	1);
+SBIT(IT1,		0x88,	2);
+SBIT(IE1,		0x88,	3);
+SBIT(TR0,		0x88,	4);
+SBIT(TF0,		0x88,	5);
+SBIT(TR1,		0x88,	6);
+SBIT(TF1,		0x88,	7);
 
 /* P1 */
-SBIT(P1_0,		0x90);
-SBIT(P1_1,		0x91);
-SBIT(P1_2,		0x92);
-SBIT(P1_3,		0x93);
-SBIT(P1_4,		0x94);
-SBIT(P1_5,		0x95);
-SBIT(P1_6,		0x96);
-SBIT(P1_7,		0x97);
+SBIT(P1_0,		0x90,	0);
+SBIT(P1_1,		0x90,	1);
+SBIT(P1_2,		0x90,	2);
+SBIT(P1_3,		0x90,	3);
+SBIT(P1_4,		0x90,	4);
+SBIT(P1_5,		0x90,	5);
+SBIT(P1_6,		0x90,	6);
+SBIT(P1_7,		0x90,	7);
 
-SBIT(T2,		0x90);
-SBIT(T2EX,		0x91);
+SBIT(T2,		0x90,	0);
+SBIT(T2EX,		0x90,	1);
 
 /* SCON */
-SBIT(RI,		0x98);
-SBIT(TI,		0x99);
-SBIT(RB8,		0x9A);
-SBIT(TB8,		0x9B);
-SBIT(REN,		0x9C);
-SBIT(SM2,		0x9D);
-SBIT(SM1,		0x9E);
-SBIT(SM0,		0x9F);
+SBIT(RI,		0x98,	0);
+SBIT(TI,		0x98,	1);
+SBIT(RB8,		0x98,	2);
+SBIT(TB8,		0x98,	3);
+SBIT(REN,		0x98,	4);
+SBIT(SM2,		0x98,	5);
+SBIT(SM1,		0x98,	6);
+SBIT(SM0,		0x98,	7);
 
 /* P2 */
-SBIT(P2_0,		0xA0);
-SBIT(P2_1,		0xA1);
-SBIT(P2_2,		0xA2);
-SBIT(P2_3,		0xA3);
-SBIT(P2_4,		0xA4);
-SBIT(P2_5,		0xA5);
-SBIT(P2_6,		0xA6);
-SBIT(P2_7,		0xA7);
+SBIT(P2_0,		0xA0,	0);
+SBIT(P2_1,		0xA0,	1);
+SBIT(P2_2,		0xA0,	2);
+SBIT(P2_3,		0xA0,	3);
+SBIT(P2_4,		0xA0,	4);
+SBIT(P2_5,		0xA0,	5);
+SBIT(P2_6,		0xA0,	6);
+SBIT(P2_7,		0xA0,	7);
 
 /* IE */
-SBIT(EX0,		0xA8);
-SBIT(ET0,		0xA9);
-SBIT(EX1,		0xAA);
-SBIT(ET1,		0xAB);
-SBIT(ES,		0xAC);
-SBIT(ET2,		0xAD);
-SBIT(EA,		0xAF);
+SBIT(EX0,		0xA8,	0);
+SBIT(ET0,		0xA8,	1);
+SBIT(EX1,		0xA8,	2);
+SBIT(ET1,		0xA8,	3);
+SBIT(ES,		0xA8,	4);
+SBIT(ET2,		0xA8,	5);
+SBIT(EA,		0xA8,	7);
 
 /* P3 */
-SBIT(P3_0,		0xB0);
-SBIT(P3_1,		0xB1);
-SBIT(P3_2,		0xB2);
-SBIT(P3_3,		0xB3);
-SBIT(P3_4,		0xB4);
-SBIT(P3_5,		0xB5);
-SBIT(P3_6,		0xB6);
-SBIT(P3_7,		0xB7);
+SBIT(P3_0,		0xB0,	0);
+SBIT(P3_1,		0xB0,	1);
+SBIT(P3_2,		0xB0,	2);
+SBIT(P3_3,		0xB0,	3);
+SBIT(P3_4,		0xB0,	4);
+SBIT(P3_5,		0xB0,	5);
+SBIT(P3_6,		0xB0,	6);
+SBIT(P3_7,		0xB0,	7);
 
-SBIT(RXD,		0xB0);
-SBIT(TXD,		0xB1);
-SBIT(INT0,		0xB2);
-SBIT(INT1,		0xB3);
-SBIT(T0,		0xB4);
-SBIT(T1,		0xB5);
-SBIT(WR,		0xB6);
-SBIT(RD,		0xB7);
+SBIT(RXD,		0xB0,	0);
+SBIT(TXD,		0xB0,	1);
+SBIT(INT0,		0xB0,	2);
+SBIT(INT1,		0xB0,	3);
+SBIT(T0,		0xB0,	4);
+SBIT(T1,		0xB0,	5);
+SBIT(WR,		0xB0,	6);
+SBIT(RD,		0xB0,	7);
 
 /* IP */
-SBIT(PX0,		0xB8);
-SBIT(PT0,		0xB9);
-SBIT(PX1,		0xBA);
-SBIT(PT1,		0xBB);
-SBIT(PS,		0xBC);
-SBIT(PT2,		0xBD);
+SBIT(PX0,		0xB8,	0);
+SBIT(PT0,		0xB8,	1);
+SBIT(PX1,		0xB8,	2);
+SBIT(PT1,		0xB8,	3);
+SBIT(PS,		0xB8,	4);
+SBIT(PT2,		0xB8,	5);
 
 /* T2CON */
-SBIT(T2CON_0,	0xC8);
-SBIT(T2CON_1,	0xC9);
-SBIT(T2CON_2,	0xCA);
-SBIT(T2CON_3,	0xCB);
-SBIT(T2CON_4,	0xCC);
-SBIT(T2CON_5,	0xCD);
-SBIT(T2CON_6,	0xCE);
-SBIT(T2CON_7,	0xCF);
+SBIT(T2CON_0,	0xC8,	0);
+SBIT(T2CON_1,	0xC8,	1);
+SBIT(T2CON_2,	0xC8,	2);
+SBIT(T2CON_3,	0xC8,	3);
+SBIT(T2CON_4,	0xC8,	4);
+SBIT(T2CON_5,	0xC8,	5);
+SBIT(T2CON_6,	0xC8,	6);
+SBIT(T2CON_7,	0xC8,	7);
 
-SBIT(CP_RL2,	0xC8);
-SBIT(C_T2,		0xC9);
-SBIT(TR2,		0xCA);
-SBIT(EXEN2,		0xCB);
-SBIT(TCLK,		0xCC);
-SBIT(RCLK,		0xCD);
-SBIT(EXF2,		0xCE);
-SBIT(TF2,		0xCF);
+SBIT(CP_RL2,	0xC8,	0);
+SBIT(C_T2,		0xC8,	1);
+SBIT(TR2,		0xC8,	2);
+SBIT(EXEN2,		0xC8,	3);
+SBIT(TCLK,		0xC8,	4);
+SBIT(RCLK,		0xC8,	5);
+SBIT(EXF2,		0xC8,	6);
+SBIT(TF2,		0xC8,	7);
 
 /* PSW */
-SBIT(P,			0xD0);
-SBIT(FL,		0xD1);
-SBIT(OV,		0xD2);
-SBIT(RS0,		0xD3);
-SBIT(RS1,		0xD4);
-SBIT(F0,		0xD5);
-SBIT(AC,		0xD6);
-SBIT(CY,		0xD7);
+SBIT(P,			0xD0,	0);
+SBIT(FL,		0xD0,	1);
+SBIT(OV,		0xD0,	2);
+SBIT(RS0,		0xD0,	3);
+SBIT(RS1,		0xD0,	4);
+SBIT(F0,		0xD0,	5);
+SBIT(AC,		0xD0,	6);
+SBIT(CY,		0xD0,	7);
 
 
 /* BIT definitions for bits that are not directly accessible */

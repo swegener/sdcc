@@ -82,196 +82,196 @@ SFR(P5,		0xF8); /* Port 5 - SAB80515 specific */
 
 /* BIT addressable registers */
 /* P0 */
-SBIT(P0_0,		0x80);
-SBIT(P0_1,		0x81);
-SBIT(P0_2,		0x82);
-SBIT(P0_3,		0x83);
-SBIT(P0_4,		0x84);
-SBIT(P0_5,		0x85);
-SBIT(P0_6,		0x86);
-SBIT(P0_7,		0x87);
+SBIT(P0_0,		0x80,	0);
+SBIT(P0_1,		0x80,	1);
+SBIT(P0_2,		0x80,	2);
+SBIT(P0_3,		0x80,	3);
+SBIT(P0_4,		0x80,	4);
+SBIT(P0_5,		0x80,	5);
+SBIT(P0_6,		0x80,	6);
+SBIT(P0_7,		0x80,	7);
 
 /* TCON */
-SBIT(IT0,		0x88);
-SBIT(IE0,		0x89);
-SBIT(IT1,		0x8A);
-SBIT(IE1,		0x8B);
-SBIT(TR0,		0x8C);
-SBIT(TF0,		0x8D);
-SBIT(TR1,		0x8E);
-SBIT(TF1,		0x8F);
+SBIT(IT0,		0x88,	0);
+SBIT(IE0,		0x88,	1);
+SBIT(IT1,		0x88,	2);
+SBIT(IE1,		0x88,	3);
+SBIT(TR0,		0x88,	4);
+SBIT(TF0,		0x88,	5);
+SBIT(TR1,		0x88,	6);
+SBIT(TF1,		0x88,	7);
 
 /* P1 */
-SBIT(P1_0,		0x90);
-SBIT(P1_1,		0x91);
-SBIT(P1_2,		0x92);
-SBIT(P1_3,		0x93);
-SBIT(P1_4,		0x94);
-SBIT(P1_5,		0x95);
-SBIT(P1_6,		0x96);
-SBIT(P1_7,		0x97);
+SBIT(P1_0,		0x90,	0);
+SBIT(P1_1,		0x90,	1);
+SBIT(P1_2,		0x90,	2);
+SBIT(P1_3,		0x90,	3);
+SBIT(P1_4,		0x90,	4);
+SBIT(P1_5,		0x90,	5);
+SBIT(P1_6,		0x90,	6);
+SBIT(P1_7,		0x90,	7);
 
-SBIT(INT3_CC0,	0x90); /* P1 alternate functions - SAB80515 specific */
-SBIT(INT4_CC1,	0x91);
-SBIT(INT5_CC2,	0x92);
-SBIT(INT6_CC3,	0x93);
-SBIT(INT2,		0x94);
-SBIT(T2EX,		0x95);
-SBIT(CLKOUT,	0x96);
-SBIT(T2,		0x97);
+SBIT(INT3_CC0,	0x90,	0); /* P1 alternate functions - SAB80515 specific */
+SBIT(INT4_CC1,	0x90,	1);
+SBIT(INT5_CC2,	0x90,	2);
+SBIT(INT6_CC3,	0x90,	3);
+SBIT(INT2,		0x90,	4);
+SBIT(T2EX,		0x90,	5);
+SBIT(CLKOUT,	0x90,	6);
+SBIT(T2,		0x90,	7);
 
 /* SCON */
-SBIT(RI,		0x98);
-SBIT(TI,		0x99);
-SBIT(RB8,		0x9A);
-SBIT(TB8,		0x9B);
-SBIT(REN,		0x9C);
-SBIT(SM2,		0x9D);
-SBIT(SM1,		0x9E);
-SBIT(SM0,		0x9F);
+SBIT(RI,		0x98,	0);
+SBIT(TI,		0x98,	1);
+SBIT(RB8,		0x98,	2);
+SBIT(TB8,		0x98,	3);
+SBIT(REN,		0x98,	4);
+SBIT(SM2,		0x98,	5);
+SBIT(SM1,		0x98,	6);
+SBIT(SM0,		0x98,	7);
 
 /* P2 */
-SBIT(P2_0,		0xA0);
-SBIT(P2_1,		0xA1);
-SBIT(P2_2,		0xA2);
-SBIT(P2_3,		0xA3);
-SBIT(P2_4,		0xA4);
-SBIT(P2_5,		0xA5);
-SBIT(P2_6,		0xA6);
-SBIT(P2_7,		0xA7);
+SBIT(P2_0,		0xA0,	0);
+SBIT(P2_1,		0xA0,	1);
+SBIT(P2_2,		0xA0,	2);
+SBIT(P2_3,		0xA0,	3);
+SBIT(P2_4,		0xA0,	4);
+SBIT(P2_5,		0xA0,	5);
+SBIT(P2_6,		0xA0,	6);
+SBIT(P2_7,		0xA0,	7);
 
 /* IEN0 */
-SBIT(EX0,		0xA8);
-SBIT(ET0,		0xA9);
-SBIT(EX1,		0xAA);
-SBIT(ET1,		0xAB);
-SBIT(ES,		0xAC);
-SBIT(ET2,		0xAD);
-SBIT(WDT,		0xAE); /* watchdog timer reset - SAB80515 specific */
-SBIT(EA,		0xAF);
+SBIT(EX0,		0xA8,	0);
+SBIT(ET0,		0xA8,	1);
+SBIT(EX1,		0xA8,	2);
+SBIT(ET1,		0xA8,	3);
+SBIT(ES,		0xA8,	4);
+SBIT(ET2,		0xA8,	5);
+SBIT(WDT,		0xA8,	6); /* watchdog timer reset - SAB80515 specific */
+SBIT(EA,		0xA8,	7);
 
-SBIT(EAL,		0xAF); /* EA as called by Siemens */
+SBIT(EAL,		0xA8,	7); /* EA as called by Siemens */
 
 /* P3 */
-SBIT(P3_0,		0xB0);
-SBIT(P3_1,		0xB1);
-SBIT(P3_2,		0xB2);
-SBIT(P3_3,		0xB3);
-SBIT(P3_4,		0xB4);
-SBIT(P3_5,		0xB5);
-SBIT(P3_6,		0xB6);
-SBIT(P3_7,		0xB7);
+SBIT(P3_0,		0xB0,	0);
+SBIT(P3_1,		0xB0,	1);
+SBIT(P3_2,		0xB0,	2);
+SBIT(P3_3,		0xB0,	3);
+SBIT(P3_4,		0xB0,	4);
+SBIT(P3_5,		0xB0,	5);
+SBIT(P3_6,		0xB0,	6);
+SBIT(P3_7,		0xB0,	7);
 
-SBIT(RXD,		0xB0);
-SBIT(TXD,		0xB1);
-SBIT(INT0,		0xB2);
-SBIT(INT1,		0xB3);
-SBIT(T0,		0xB4);
-SBIT(T1,		0xB5);
-SBIT(WR,		0xB6);
-SBIT(RD,		0xB7);
+SBIT(RXD,		0xB0,	0);
+SBIT(TXD,		0xB0,	1);
+SBIT(INT0,		0xB0,	2);
+SBIT(INT1,		0xB0,	3);
+SBIT(T0,		0xB0,	4);
+SBIT(T1,		0xB0,	5);
+SBIT(WR,		0xB0,	6);
+SBIT(RD,		0xB0,	7);
 
 /* IEN1 */
-SBIT(EADC,		0xB8); /* A/D converter interrupt enable */
-SBIT(EX2,		0xB9);
-SBIT(EX3,		0xBA);
-SBIT(EX4,		0xBB);
-SBIT(EX5,		0xBC);
-SBIT(EX6,		0xBD);
-SBIT(SWDT,		0xBE); /* watchdog timer start/reset */
-SBIT(EXEN2,		0xBF); /* timer2 external reload interrupt enable */
+SBIT(EADC,		0xB8,	0); /* A/D converter interrupt enable */
+SBIT(EX2,		0xB8,	1);
+SBIT(EX3,		0xB8,	2);
+SBIT(EX4,		0xB8,	3);
+SBIT(EX5,		0xB8,	4);
+SBIT(EX6,		0xB8,	5);
+SBIT(SWDT,		0xB8,	6); /* watchdog timer start/reset */
+SBIT(EXEN2,		0xB8,	7); /* timer2 external reload interrupt enable */
 
 /* IRCON */
-SBIT(IADC,		0xC0); /* A/D converter irq flag */
-SBIT(IEX2,		0xC1); /* external interrupt edge detect flag */
-SBIT(IEX3,		0xC2);
-SBIT(IEX4,		0xC3);
-SBIT(IEX5,		0xC4);
-SBIT(IEX6,		0xC5);
-SBIT(TF2,		0xC6); /* timer 2 owerflow flag  */
-SBIT(EXF2,		0xC7); /* timer2 reload flag */
+SBIT(IADC,		0xC0,	0); /* A/D converter irq flag */
+SBIT(IEX2,		0xC0,	1); /* external interrupt edge detect flag */
+SBIT(IEX3,		0xC0,	2);
+SBIT(IEX4,		0xC0,	3);
+SBIT(IEX5,		0xC0,	4);
+SBIT(IEX6,		0xC0,	5);
+SBIT(TF2,		0xC0,	6); /* timer 2 owerflow flag  */
+SBIT(EXF2,		0xC0,	7); /* timer2 reload flag */
 
 /* T2CON */
-SBIT(T2CON_0,	0xC8);
-SBIT(T2CON_1,	0xC9);
-SBIT(T2CON_2,	0xCA);
-SBIT(T2CON_3,	0xCB);
-SBIT(T2CON_4,	0xCC);
-SBIT(T2CON_5,	0xCD);
-SBIT(T2CON_6,	0xCE);
-SBIT(T2CON_7,	0xCF);
+SBIT(T2CON_0,	0xC8,	0);
+SBIT(T2CON_1,	0xC8,	1);
+SBIT(T2CON_2,	0xC8,	2);
+SBIT(T2CON_3,	0xC8,	3);
+SBIT(T2CON_4,	0xC8,	4);
+SBIT(T2CON_5,	0xC8,	5);
+SBIT(T2CON_6,	0xC8,	6);
+SBIT(T2CON_7,	0xC8,	7);
 
-SBIT(T2I0,		0xC8);
-SBIT(T2I1,		0xC9);
-SBIT(T2CM,		0xCA);
-SBIT(T2R0,		0xCB);
-SBIT(T2R1,		0xCC);
-SBIT(I2FR,		0xCD);
-SBIT(I3FR,		0xCE);
-SBIT(T2PS,		0xCF);
+SBIT(T2I0,		0xC8,	0);
+SBIT(T2I1,		0xC8,	1);
+SBIT(T2CM,		0xC8,	2);
+SBIT(T2R0,		0xC8,	3);
+SBIT(T2R1,		0xC8,	4);
+SBIT(I2FR,		0xC8,	5);
+SBIT(I3FR,		0xC8,	6);
+SBIT(T2PS,		0xC8,	7);
 
 
 /* PSW */
-SBIT(P,			0xD0);
-SBIT(FL,		0xD1);
-SBIT(OV,		0xD2);
-SBIT(RS0,		0xD3);
-SBIT(RS1,		0xD4);
-SBIT(F0,		0xD5);
-SBIT(AC,		0xD6);
-SBIT(CY,		0xD7);
+SBIT(P,			0xD0,	0);
+SBIT(FL,		0xD0,	1);
+SBIT(OV,		0xD0,	2);
+SBIT(RS0,		0xD0,	3);
+SBIT(RS1,		0xD0,	4);
+SBIT(F0,		0xD0,	5);
+SBIT(AC,		0xD0,	6);
+SBIT(CY,		0xD0,	7);
 
-SBIT(F1,		0xD1);
+SBIT(F1,		0xD0,	1);
 
 /* ADCON */
-SBIT(MX0,		0xD8);
-SBIT(MX1,		0xD9);
-SBIT(MX2,		0xDA);
-SBIT(ADM,		0xDB);
-SBIT(BSY,		0xDC);
+SBIT(MX0,		0xD8,	0);
+SBIT(MX1,		0xD8,	1);
+SBIT(MX2,		0xD8,	2);
+SBIT(ADM,		0xD8,	3);
+SBIT(BSY,		0xD8,	4);
 
-SBIT(CLK,		0xDE);
-SBIT(BD,		0xDF);
+SBIT(CLK,		0xD8,	6);
+SBIT(BD,		0xD8,	7);
 
 /* A */
-SBIT(AREG_F0,	0xA0);
-SBIT(AREG_F1,	0xA1);
-SBIT(AREG_F2,	0xA2);
-SBIT(AREG_F3,	0xA3);
-SBIT(AREG_F4,	0xA4);
-SBIT(AREG_F5,	0xA5);
-SBIT(AREG_F6,	0xA6);
-SBIT(AREG_F7,	0xA7);
+SBIT(AREG_F0,	0xA0,	0);
+SBIT(AREG_F1,	0xA0,	1);
+SBIT(AREG_F2,	0xA0,	2);
+SBIT(AREG_F3,	0xA0,	3);
+SBIT(AREG_F4,	0xA0,	4);
+SBIT(AREG_F5,	0xA0,	5);
+SBIT(AREG_F6,	0xA0,	6);
+SBIT(AREG_F7,	0xA0,	7);
 
 /* P4 */
-SBIT(P4_0,		0xE8);
-SBIT(P4_1,		0xE9);
-SBIT(P4_2,		0xEA);
-SBIT(P4_3,		0xEB);
-SBIT(P4_4,		0xEC);
-SBIT(P4_5,		0xED);
-SBIT(P4_6,		0xEE);
-SBIT(P4_7,		0xEF);
+SBIT(P4_0,		0xE8,	0);
+SBIT(P4_1,		0xE8,	1);
+SBIT(P4_2,		0xE8,	2);
+SBIT(P4_3,		0xE8,	3);
+SBIT(P4_4,		0xE8,	4);
+SBIT(P4_5,		0xE8,	5);
+SBIT(P4_6,		0xE8,	6);
+SBIT(P4_7,		0xE8,	7);
 
 /* B */
-SBIT(BREG_F0,	0xF0);
-SBIT(BREG_F1,	0xF1);
-SBIT(BREG_F2,	0xF2);
-SBIT(BREG_F3,	0xF3);
-SBIT(BREG_F4,	0xF4);
-SBIT(BREG_F5,	0xF5);
-SBIT(BREG_F6,	0xF6);
-SBIT(BREG_F7,	0xF7);
+SBIT(BREG_F0,	0xF0,	0);
+SBIT(BREG_F1,	0xF0,	1);
+SBIT(BREG_F2,	0xF0,	2);
+SBIT(BREG_F3,	0xF0,	3);
+SBIT(BREG_F4,	0xF0,	4);
+SBIT(BREG_F5,	0xF0,	5);
+SBIT(BREG_F6,	0xF0,	6);
+SBIT(BREG_F7,	0xF0,	7);
 
 /* P5 */
-SBIT(P5_0,		0xF8);
-SBIT(P5_1,		0xF9);
-SBIT(P5_2,		0xFA);
-SBIT(P5_3,		0xFB);
-SBIT(P5_4,		0xFC);
-SBIT(P5_5,		0xFD);
-SBIT(P5_6,		0xFE);
-SBIT(P5_7,		0xFF);
+SBIT(P5_0,		0xF8,	0);
+SBIT(P5_1,		0xF8,	1);
+SBIT(P5_2,		0xF8,	2);
+SBIT(P5_3,		0xF8,	3);
+SBIT(P5_4,		0xF8,	4);
+SBIT(P5_5,		0xF8,	5);
+SBIT(P5_6,		0xF8,	6);
+SBIT(P5_7,		0xF8,	7);
 
 /* BIT definitions for bits that are not directly accessible */
 /* PCON bits */

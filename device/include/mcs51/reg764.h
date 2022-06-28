@@ -90,129 +90,129 @@ SFR(IP1,	0xF8);   // Interrupt Priority 1
 /*  Bit Addressable Registers  */
 
 /*  P0    */
-SBIT(P0_0,		0x80); // Also CMP2
-SBIT(P0_1,		0x81); // Also CIN2B
-SBIT(P0_2,		0x82); // Also CIN2A
-SBIT(P0_3,		0x83); // Also CIN1B
-SBIT(P0_4,		0x84); // Also CIN1A
-SBIT(P0_5,		0x85); // Also CMPREF
-SBIT(P0_6,		0x86); // Also CMP1
-SBIT(P0_7,		0x87); // Also T1
+SBIT(P0_0,		0x80,	0); // Also CMP2
+SBIT(P0_1,		0x80,	1); // Also CIN2B
+SBIT(P0_2,		0x80,	2); // Also CIN2A
+SBIT(P0_3,		0x80,	3); // Also CIN1B
+SBIT(P0_4,		0x80,	4); // Also CIN1A
+SBIT(P0_5,		0x80,	5); // Also CMPREF
+SBIT(P0_6,		0x80,	6); // Also CMP1
+SBIT(P0_7,		0x80,	7); // Also T1
 
 /*  TCON  */
-SBIT(IT0,		0x88); // External Interrupt 0 Type
-SBIT(IE0,		0x89); // External Interrupt 0 Edge Flag
-SBIT(IT1,		0x8A); // External Interrupt 1 Type
-SBIT(IE1,		0x8B); // External Interrupt 1 Edge Flag
-SBIT(TR0,		0x8C); // Timer 0 Run Control
-SBIT(TF0,		0x8D); // Timer 0 Overflow Flag
-SBIT(TR1,		0x8E); // Timer 1 Run Control
-SBIT(TF1,		0x8F); // Timer 1 Overflow Flag
+SBIT(IT0,		0x88,	0); // External Interrupt 0 Type
+SBIT(IE0,		0x88,	1); // External Interrupt 0 Edge Flag
+SBIT(IT1,		0x88,	2); // External Interrupt 1 Type
+SBIT(IE1,		0x88,	3); // External Interrupt 1 Edge Flag
+SBIT(TR0,		0x88,	4); // Timer 0 Run Control
+SBIT(TF0,		0x88,	5); // Timer 0 Overflow Flag
+SBIT(TR1,		0x88,	6); // Timer 1 Run Control
+SBIT(TF1,		0x88,	7); // Timer 1 Overflow Flag
 
 /*  P1 */
-SBIT(P1_0,		0x90); // Also TxD
-SBIT(P1_1,		0x91); // Also RxD
-SBIT(P1_2,		0x92); // Also T0
-SBIT(P1_3,		0x93); // Also INT0
-SBIT(P1_4,		0x94); // Also INT1
-SBIT(P1_5,		0x95); // Also RST
-SBIT(P1_6,		0x96);
-SBIT(P1_7,		0x97);
+SBIT(P1_0,		0x90,	0); // Also TxD
+SBIT(P1_1,		0x90,	1); // Also RxD
+SBIT(P1_2,		0x90,	2); // Also T0
+SBIT(P1_3,		0x90,	3); // Also INT0
+SBIT(P1_4,		0x90,	4); // Also INT1
+SBIT(P1_5,		0x90,	5); // Also RST
+SBIT(P1_6,		0x90,	6);
+SBIT(P1_7,		0x90,	7);
 
 /*  SCON  */
-SBIT(RI,		0x98); // Receive Interrupt Flag
-SBIT(TI,		0x99); // Transmit Interrupt Flag
-SBIT(RB8,		0x9A); // Receive Bit 8
-SBIT(TB8,		0x9B); // Transmit Bit 8
-SBIT(REN,		0x9C); // Receiver Enable
-SBIT(SM2,		0x9D); // Serial Mode Control Bit 2
-SBIT(SM1,		0x9E); // Serial Mode Control Bit 1
-SBIT(SM0,		0x9F); // Serial Mode Control Bit 0
+SBIT(RI,		0x98,	0); // Receive Interrupt Flag
+SBIT(TI,		0x98,	1); // Transmit Interrupt Flag
+SBIT(RB8,		0x98,	2); // Receive Bit 8
+SBIT(TB8,		0x98,	3); // Transmit Bit 8
+SBIT(REN,		0x98,	4); // Receiver Enable
+SBIT(SM2,		0x98,	5); // Serial Mode Control Bit 2
+SBIT(SM1,		0x98,	6); // Serial Mode Control Bit 1
+SBIT(SM0,		0x98,	7); // Serial Mode Control Bit 0
 
 /*  P2    */
-SBIT(P2_0,		0xA0); // Also X2
-SBIT(P2_1,		0xA1); // Also X1
+SBIT(P2_0,		0xA0,	0); // Also X2
+SBIT(P2_1,		0xA0,	1); // Also X1
 
 /*  IEN0 */
-SBIT(EX0,		0xA8); // External Interrupt 0 Enable
-SBIT(ET0,		0xA9); // Timer 0 Interrupt Enable
-SBIT(EX1,		0xAA); // External Interrupt 1 Enable
-SBIT(ET1,		0xAB); // Timer 1 Interrupt Enable
-SBIT(ES,		0xAC); // Serial Port Interrupt Enable
-SBIT(EBO,		0xAD); // Brownout Interrupt Enable
-SBIT(EWD,		0xAE); // Watchdog Interrupt Enable
-SBIT(EA,		0xAF); // Global Interrupt Enable
+SBIT(EX0,		0xA8,	0); // External Interrupt 0 Enable
+SBIT(ET0,		0xA8,	1); // Timer 0 Interrupt Enable
+SBIT(EX1,		0xA8,	2); // External Interrupt 1 Enable
+SBIT(ET1,		0xA8,	3); // Timer 1 Interrupt Enable
+SBIT(ES,		0xA8,	4); // Serial Port Interrupt Enable
+SBIT(EBO,		0xA8,	5); // Brownout Interrupt Enable
+SBIT(EWD,		0xA8,	6); // Watchdog Interrupt Enable
+SBIT(EA,		0xA8,	7); // Global Interrupt Enable
 
 /*  IP0   */
-SBIT(PX0,		0xB8); // External Interrupt 0 Priority
-SBIT(PT0,		0xB9); // Timer 0 Interrupt Priority
-SBIT(PX1,		0xBA); // External Interrupt 1 Priority
-SBIT(PT1,		0xBB); // Timer 1 Interrupt Priority
-SBIT(PS,		0xBC); // Serial Port Interrupt Priority
-SBIT(PBO,		0xBD); // Brownout Interrupt Priority
-SBIT(PWD,		0xBE); // Watchdog Interrupt Priority
+SBIT(PX0,		0xB8,	0); // External Interrupt 0 Priority
+SBIT(PT0,		0xB8,	1); // Timer 0 Interrupt Priority
+SBIT(PX1,		0xB8,	2); // External Interrupt 1 Priority
+SBIT(PT1,		0xB8,	3); // Timer 1 Interrupt Priority
+SBIT(PS,		0xB8,	4); // Serial Port Interrupt Priority
+SBIT(PBO,		0xB8,	5); // Brownout Interrupt Priority
+SBIT(PWD,		0xB8,	6); // Watchdog Interrupt Priority
 
 /*  I2CFG */
-SBIT(CT0,		0xC8); // Clock Time Select 0
-SBIT(CT1,		0xC9); // Clock Time Select 1
-SBIT(TIRUN,		0xCC); // Timer I Run Enable
-SBIT(CLRTI,		0xCD); // Clear Timer I
-SBIT(MASTRQ,	0xCE); // Master Request
-SBIT(SLAVEN,	0xCF); // Slave Enable
+SBIT(CT0,		0xC8,	0); // Clock Time Select 0
+SBIT(CT1,		0xC8,	1); // Clock Time Select 1
+SBIT(TIRUN,		0xC8,	4); // Timer I Run Enable
+SBIT(CLRTI,		0xC8,	5); // Clear Timer I
+SBIT(MASTRQ,	0xC8,	6); // Master Request
+SBIT(SLAVEN,	0xC8,	7); // Slave Enable
 
 /*  PSW   */
-SBIT(P,			0xD0); // Accumulator Parity Flag
-SBIT(F1,		0xD1); // Flag 1
-SBIT(OV,		0xD2); // Overflow Flag
-SBIT(RS0,		0xD3); // Register Bank Select 0
-SBIT(RS1,		0xD4); // Register Bank Select 1
-SBIT(F0,		0xD5); // Flag 0
-SBIT(AC,		0xD6); // Auxiliary Carry Flag
-SBIT(CY,		0xD7); // Carry Flag
+SBIT(P,			0xD0,	0); // Accumulator Parity Flag
+SBIT(F1,		0xD0,	1); // Flag 1
+SBIT(OV,		0xD0,	2); // Overflow Flag
+SBIT(RS0,		0xD0,	3); // Register Bank Select 0
+SBIT(RS1,		0xD0,	4); // Register Bank Select 1
+SBIT(F0,		0xD0,	5); // Flag 0
+SBIT(AC,		0xD0,	6); // Auxiliary Carry Flag
+SBIT(CY,		0xD0,	7); // Carry Flag
 
 /*  I2CON */
-SBIT(XSTP,		0xD8);
-SBIT(MASTER,	0xD9);// Master Status
-SBIT(STP,		0xDA); // Stop Detect Flag
-SBIT(STR,		0xDB); // Start Detect Flag
-SBIT(ARL,		0xDC); // Arbitration Loss Flag
-SBIT(DRDY,		0xDD); // Data Ready Flag
-SBIT(ATN,		0xDE); // Attention: I2C Interrupt Flag
-SBIT(RDAT,		0xDF); // I2C Read Data
+SBIT(XSTP,		0xD8,	0);
+SBIT(MASTER,	0xD8,	1);// Master Status
+SBIT(STP,		0xD8,	2); // Stop Detect Flag
+SBIT(STR,		0xD8,	3); // Start Detect Flag
+SBIT(ARL,		0xD8,	4); // Arbitration Loss Flag
+SBIT(DRDY,		0xD8,	5); // Data Ready Flag
+SBIT(ATN,		0xD8,	6); // Attention: I2C Interrupt Flag
+SBIT(RDAT,		0xD8,	7); // I2C Read Data
 
 /*  ACC   */
-SBIT(ACC_0,		0xE0);
-SBIT(ACC_1,		0xE1);
-SBIT(ACC_2,		0xE2);
-SBIT(ACC_3,		0xE3);
-SBIT(ACC_4,		0xE4);
-SBIT(ACC_5,		0xE5);
-SBIT(ACC_6,		0xE6);
-SBIT(ACC_7,		0xE7);
+SBIT(ACC_0,		0xE0,	0);
+SBIT(ACC_1,		0xE0,	1);
+SBIT(ACC_2,		0xE0,	2);
+SBIT(ACC_3,		0xE0,	3);
+SBIT(ACC_4,		0xE0,	4);
+SBIT(ACC_5,		0xE0,	5);
+SBIT(ACC_6,		0xE0,	6);
+SBIT(ACC_7,		0xE0,	7);
 
 /*  IEN1  */
-SBIT(EI2,		0xE8); // I2C Interrupt Enable
-SBIT(EKB,		0xE9); // Keyboard Interrupt Enable
-SBIT(EC2,		0xEA); // Comparator 2 Interrupt Enable
-SBIT(EC1,		0xED); // Comparator 1 Interrupt Enable
-SBIT(ETI,		0xEF); // Timer I Interrupt Enable
+SBIT(EI2,		0xE8,	0); // I2C Interrupt Enable
+SBIT(EKB,		0xE8,	1); // Keyboard Interrupt Enable
+SBIT(EC2,		0xE8,	2); // Comparator 2 Interrupt Enable
+SBIT(EC1,		0xE8,	5); // Comparator 1 Interrupt Enable
+SBIT(ETI,		0xE8,	7); // Timer I Interrupt Enable
 
 /*  B     */
-SBIT(B_0,		0xF0);
-SBIT(B_1,		0xF1);
-SBIT(B_2,		0xF2);
-SBIT(B_3,		0xF3);
-SBIT(B_4,		0xF4);
-SBIT(B_5,		0xF5);
-SBIT(B_6,		0xF6);
-SBIT(B_7,		0xF7);
+SBIT(B_0,		0xF0,	0);
+SBIT(B_1,		0xF0,	1);
+SBIT(B_2,		0xF0,	2);
+SBIT(B_3,		0xF0,	3);
+SBIT(B_4,		0xF0,	4);
+SBIT(B_5,		0xF0,	5);
+SBIT(B_6,		0xF0,	6);
+SBIT(B_7,		0xF0,	7);
 
 /*  IP1  */
-SBIT(PI2,		0xF8); // I2C Interrupt Priority
-SBIT(PKB,		0xF9); // Keyboard Interrupt Priority
-SBIT(PC2,		0xFA); // Comparator 2 Interrupt Priority
-SBIT(PC1,		0xFD); // Comparator 1 Interrupt Priority
-SBIT(PTI,		0xFF); // Timer I Interrupt Priority
+SBIT(PI2,		0xF8,	0); // I2C Interrupt Priority
+SBIT(PKB,		0xF8,	1); // Keyboard Interrupt Priority
+SBIT(PC2,		0xF8,	2); // Comparator 2 Interrupt Priority
+SBIT(PC1,		0xF8,	5); // Comparator 1 Interrupt Priority
+SBIT(PTI,		0xF8,	7); // Timer I Interrupt Priority
 
 /* Bitmasks for SFRs */
 

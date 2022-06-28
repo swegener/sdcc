@@ -1558,13 +1558,13 @@ SFR(ADCH,	0xC6); // A/D converter high
 #undef ADCON
 SFR(ADCON,	0xD8); // A/D-converter control register SAB80515 specific
 // Bit registers
-SBIT(MX0,	0xD8);
-SBIT(MX1,	0xD9);
-SBIT(MX2,	0xDA);
-SBIT(ADM,	0xDB);
-SBIT(BSY,	0xDC);
-SBIT(CLK,	0xDE);
-SBIT(BD,	0xDF);
+SBIT(MX0,	0xD8,	0);
+SBIT(MX1,	0xD8,	1);
+SBIT(MX2,	0xD8,	2);
+SBIT(ADM,	0xD8,	3);
+SBIT(BSY,	0xD8,	4);
+SBIT(CLK,	0xD8,	6);
+SBIT(BD,	0xD8,	7);
 #endif
 
 // ADCON0 ... Infineon / Siemens also called this register ADCON in the User Manual
@@ -1572,14 +1572,14 @@ SBIT(BD,	0xDF);
 #undef ADCON0
 SFR(ADCON0,	0xD8); // A/D-converter control register 0 SAB80515A &
 // Bit registers          // SAB80517 specific
-SBIT(MX0,	0xD8);
-SBIT(MX1,	0xD9);
-SBIT(MX2,	0xDA);
-SBIT(ADM,	0xDB);
-SBIT(BSY,	0xDC);
-SBIT(ADEX,	0xDD);
-SBIT(CLK,	0xDE);
-SBIT(BD,	0xDF);
+SBIT(MX0,	0xD8,	0);
+SBIT(MX1,	0xD8,	1);
+SBIT(MX2,	0xD8,	2);
+SBIT(ADM,	0xD8,	3);
+SBIT(BSY,	0xD8,	4);
+SBIT(ADEX,	0xD8,	5);
+SBIT(CLK,	0xD8,	6);
+SBIT(BD,	0xD8,	7);
 // Not directly accessible ADCON0
 #define ADCON0_MX0  0x01
 #define ADCON0_MX1  0x02
@@ -1662,14 +1662,14 @@ SFR(AUXR,	0x8E);
 #undef B
 SFR(B,	0xF0);
 // Bit registers
-SBIT(BREG_F0,	0xF0);
-SBIT(BREG_F1,	0xF1);
-SBIT(BREG_F2,	0xF2);
-SBIT(BREG_F3,	0xF3);
-SBIT(BREG_F4,	0xF4);
-SBIT(BREG_F5,	0xF5);
-SBIT(BREG_F6,	0xF6);
-SBIT(BREG_F7,	0xF7);
+SBIT(BREG_F0,	0xF0,	0);
+SBIT(BREG_F1,	0xF0,	1);
+SBIT(BREG_F2,	0xF0,	2);
+SBIT(BREG_F3,	0xF0,	3);
+SBIT(BREG_F4,	0xF0,	4);
+SBIT(BREG_F5,	0xF0,	5);
+SBIT(BREG_F6,	0xF0,	6);
+SBIT(BREG_F7,	0xF0,	7);
 #endif
 
 #ifdef AUXR1__x__x__x__x__GF3__x__x__DPS
@@ -2186,13 +2186,13 @@ SFR(CCL4,	0xCE); // compare/capture register 4, low byte SAB80515 specific
 #undef CCON__0xD8__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
 SFR(CCON,	0xD8); // T89C51RD2 specific register
 // Bit registers
-SBIT(CCF0,	0xD8);
-SBIT(CCF1,	0xD9);
-SBIT(CCF2,	0xDA);
-SBIT(CCF3,	0xDB);
-SBIT(CCF4,	0xDC);
-SBIT(CR,	0xDE);
-SBIT(CF,	0xDF);
+SBIT(CCF0,	0xD8,	0);
+SBIT(CCF1,	0xD8,	1);
+SBIT(CCF2,	0xD8,	2);
+SBIT(CCF3,	0xD8,	3);
+SBIT(CCF4,	0xD8,	4);
+SBIT(CR,	0xD8,	6);
+SBIT(CF,	0xD8,	7);
 #endif
 
 #ifdef CCON__CF__CR__x__CCF4__CCF3__CCF2__CCF1__CCF0
@@ -2200,14 +2200,14 @@ SBIT(CF,	0xDF);
 // P89C668 specific, PCA Counter control:
 SFR(CCON,	0xC0);
 // Bit registers
-SBIT(CCF0,	0xC0);
-SBIT(CCF1,	0xC1);
-SBIT(CCF2,	0xC2);
-SBIT(CCF3,	0xC3);
-SBIT(CCF4,	0xC4);
+SBIT(CCF0,	0xC0,	0);
+SBIT(CCF1,	0xC0,	1);
+SBIT(CCF2,	0xC0,	2);
+SBIT(CCF3,	0xC0,	3);
+SBIT(CCF4,	0xC0,	4);
 //__sbit __at 0xC5 -
-SBIT(CR,	0xC6);
-SBIT(CF,	0xC7);
+SBIT(CR,	0xC0,	6);
+SBIT(CF,	0xC0,	7);
 #endif
 
 #ifdef CCR
@@ -2648,61 +2648,61 @@ SFR(EICC1,	0xBF);
 #undef EIE__x__x__x__EWDI__EX5__EX4__EX3__EX2
 SFR(EIE,	0xE8);
 // Bit registers DS80C320 specific
-SBIT(EX2,	0xE8);
-SBIT(EX3,	0xE9);
-SBIT(EX4,	0xEA);
-SBIT(EX5,	0xEB);
-SBIT(EWDI,	0xEC);
+SBIT(EX2,	0xE8,	0);
+SBIT(EX3,	0xE8,	1);
+SBIT(EX4,	0xE8,	2);
+SBIT(EX5,	0xE8,	3);
+SBIT(EWDI,	0xE8,	4);
 #endif
 
 #ifdef EIE__CANBIE__C0IE__C1IE__EWDI__EX5__EX4__EX3__EX2
 #undef EIE__CANBIE__C0IE__C1IE__EWDI__EX5__EX4__EX3__EX2
 SFR(EIE,	0xE8);
 // Bit registers DS80C390 specific
-SBIT(EX2,		0xE8);
-SBIT(EX3,		0xE9);
-SBIT(EX4,		0xEA);
-SBIT(EX5,		0xEB);
-SBIT(EWDI,		0xEC);
-SBIT(C1IE,		0xED);
-SBIT(C0IE,		0xEE);
-SBIT(CANBIE,	0xEF);
+SBIT(EX2,		0xE8,	0);
+SBIT(EX3,		0xE8,	1);
+SBIT(EX4,		0xE8,	2);
+SBIT(EX5,		0xE8,	3);
+SBIT(EWDI,		0xE8,	4);
+SBIT(C1IE,		0xE8,	5);
+SBIT(C0IE,		0xE8,	6);
+SBIT(CANBIE,	0xE8,	7);
 #endif
 
 #ifdef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 #undef EIP__x__x__x__PWDI__PX5__PX4__PX3__PX2
 SFR(EIP,	0xF8);
 // Bit registers DS80C320 specific
-SBIT(PX2,	0xF8);
-SBIT(PX3,	0xF9);
-SBIT(PX4,	0xFA);
-SBIT(PX5,	0xFB);
-SBIT(PWDI,	0xFC);
+SBIT(PX2,	0xF8,	0);
+SBIT(PX3,	0xF8,	1);
+SBIT(PX4,	0xF8,	2);
+SBIT(PX5,	0xF8,	3);
+SBIT(PWDI,	0xF8,	4);
 #endif
 
 #ifdef EIP__CANBIP__C0IP__C1IP__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
 #undef EIP__CANBIP__C0IP__C1IP__PWDI__PX5__PX4__PX3__PX2__PX1__PX0
 SFR(EIP,	0xF8);
 // Bit registers DS80C320 specific
-SBIT(PX2,		0xF8);
-SBIT(PX3,		0xF9);
-SBIT(PX4,		0xFA);
-SBIT(PX5,		0xFB);
-SBIT(PWDI,		0xFC);
-SBIT(C1IP,		0xFD);
-SBIT(C0IP,		0xFE);
-SBIT(CANBIP,	0xFF);
+SBIT(PX2,		0xF8,	0);
+SBIT(PX3,		0xF8,	1);
+SBIT(PX4,		0xF8,	2);
+SBIT(PX5,		0xF8,	3);
+SBIT(PWDI,		0xF8,	4);
+SBIT(C1IP,		0xF8,	5);
+SBIT(C0IP,		0xF8,	6);
+SBIT(CANBIP,	0xF8,	7);
 #endif
 
 #ifdef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
 #undef EIP0__x__x__x__LPWDI__LPX5__LPX4__LPX3__LPX2
 SFR(EIP0,	0xF8);
 // Bit registers DS89C420 specific
-SBIT(LPX2,	0xF8);
-SBIT(LPX3,	0xF9);
-SBIT(LPX4,	0xFA);
-SBIT(LPX5,	0xFB);
-SBIT(LPWDI,	0xFC);
+SBIT(LPX2,	0xF8,	0);
+SBIT(LPX3,	0xF8,	1);
+SBIT(LPX4,	0xF8,	2);
+SBIT(LPX5,	0xF8,	3);
+SBIT(LPWDI,	0xF8,	4);
 #endif
 
 #ifdef EIP1__x__x__x__MPWDI__MPX5__MPX4__MPX3__MPX2
@@ -2805,25 +2805,25 @@ SFR(FMODE,	0xB3);
 #undef IE__EA__x__x__ES__ET1__EX1__ET0__EX0
 SFR(IE,	0xA8);
 // Bit registers
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES,	0xAC);
-SBIT(EA,	0xAF);
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES,	0xA8,	4);
+SBIT(EA,	0xA8,	7);
 #endif
 
 #ifdef IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__x__ET2__ES__ET1__EX1__ET0__EX0
 SFR(IE,	0xA8);
 // Bit registers
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES,	0xAC);
-SBIT(ET2,	0xAD); // Enable timer2 interrupt
-SBIT(EA,	0xAF);
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES,	0xA8,	4);
+SBIT(ET2,	0xA8,	5); // Enable timer2 interrupt
+SBIT(EA,	0xA8,	7);
 #endif // IE
 
 #ifdef IE__EA__EAD__ES1__ES0__ET1__EX1__ET0__EX0
@@ -2831,42 +2831,43 @@ SBIT(EA,	0xAF);
 SFR(IE,	0xA8); // same as IEN0 - Interrupt enable 0, P80C552 specific
 SFR(IEN0,	0xA8); // alternate name
 // Bit registers
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES0,	0xAC);
-SBIT(ES1,	0xAD);
-SBIT(EAD,	0xAE);
-SBIT(EEA,	0xAF);
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES0,	0xA8,	4);
+SBIT(ES1,	0xA8,	5);
+SBIT(EAD,	0xA8,	6);
+SBIT(EEA,	0xA8,	7);
 #endif
 
 #ifdef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__EC__ET2__ES__ET1__EX1__ET0__EX0
 SFR(IE,	0xA8);
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES,	0xAC);
-SBIT(ET2,	0xAD);
-SBIT(EC,	0xAE);
-SBIT(EA,	0xAF);
+// Bit registers
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES,	0xA8,	4);
+SBIT(ET2,	0xA8,	5);
+SBIT(EC,	0xA8,	6);
+SBIT(EA,	0xA8,	7);
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
 #undef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0
 SFR(IE,	0xA8);
 // Bit registers
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES,	0xAC);
-SBIT(ES0,	0xAC); // Alternate name
-SBIT(ET2,	0xAD); // Enable timer2 interrupt
-SBIT(ES1,	0xAE);
-SBIT(EA,	0xAF);
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES,	0xA8,	4);
+SBIT(ES0,	0xA8,	4); // Alternate name
+SBIT(ET2,	0xA8,	5); // Enable timer2 interrupt
+SBIT(ES1,	0xA8,	6);
+SBIT(EA,	0xA8,	7);
 #endif // IE
 
 #ifdef IE__EA_WDT_ET2_ES_ET1_EX1_ET0_EX0
@@ -2874,16 +2875,16 @@ SBIT(EA,	0xAF);
 SFR(IE,	0xA8);
 SFR(IEN0,	0xA8); // Alternate name
 // Bit registers for the SAB80515 and compatible IE
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES,	0xAC);
-SBIT(ES0,	0xAC);
-SBIT(ET2,	0xAD); // Enable timer 2 overflow SAB80515 specific
-SBIT(WDT,	0xAE); // watchdog timer reset - SAB80515 specific
-SBIT(EA,	0xAF);
-SBIT(EAL,	0xAF); // EA as called by Infineon / Siemens
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES,	0xA8,	4);
+SBIT(ES0,	0xA8,	4);
+SBIT(ET2,	0xA8,	5); // Enable timer 2 overflow SAB80515 specific
+SBIT(WDT,	0xA8,	6); // watchdog timer reset - SAB80515 specific
+SBIT(EA,	0xA8,	7);
+SBIT(EAL,	0xA8,	7); // EA as called by Infineon / Siemens
 #endif
 
 #ifdef IEN0__EA__EC__ES1__ES0__ET1__EX1__ET0__EX0
@@ -2891,14 +2892,14 @@ SBIT(EAL,	0xAF); // EA as called by Infineon / Siemens
 // P89C668 specific
 SFR(IEN0,	0xA8);
 // Bit registers
-SBIT(EX0,	0xA8);
-SBIT(ET0,	0xA9);
-SBIT(EX1,	0xAA);
-SBIT(ET1,	0xAB);
-SBIT(ES0,	0xAC);
-SBIT(ES1,	0xAD);
-SBIT(EC,	0xAE);
-SBIT(EA,	0xAF);
+SBIT(EX0,	0xA8,	0);
+SBIT(ET0,	0xA8,	1);
+SBIT(EX1,	0xA8,	2);
+SBIT(ET1,	0xA8,	3);
+SBIT(ES0,	0xA8,	4);
+SBIT(ES1,	0xA8,	5);
+SBIT(EC,	0xA8,	6);
+SBIT(EA,	0xA8,	7);
 #endif
 
 #ifdef IEN1__x__x__x__x__x__x__x__ET2
@@ -2906,35 +2907,35 @@ SBIT(EA,	0xAF);
 // P89C668 specific bit registers
 SFR(IEN1,	0xE8);
 // Bit registers
-SBIT(ET2,	0xE8);
+SBIT(ET2,	0xE8,	0);
 #endif
 
 #ifdef IEN1__ET2__ECM2__ECM1__ECM0__ECT3__ECT2__ECT1__ECT0
 #undef IEN1__ET2__ECM2__ECM1__ECM0__ECT3__ECT2__ECT1__ECT0
 SFR(IEN1,	0xE8); // Interrupt enable 1, P80C552 specific
 // Bit registers
-SBIT(ECT0,	0xE8);
-SBIT(ECT1,	0xE9);
-SBIT(ECT2,	0xEA);
-SBIT(ECT3,	0xEB);
-SBIT(ECM0,	0xEC);
-SBIT(ECM1,	0xED);
-SBIT(ECM2,	0xEE);
-SBIT(ET2,	0xEF);
+SBIT(ECT0,	0xE8,	0);
+SBIT(ECT1,	0xE8,	1);
+SBIT(ECT2,	0xE8,	2);
+SBIT(ECT3,	0xE8,	3);
+SBIT(ECM0,	0xE8,	4);
+SBIT(ECM1,	0xE8,	5);
+SBIT(ECM2,	0xE8,	6);
+SBIT(ET2,	0xE8,	7);
 #endif
 
 #ifdef IEN1__EXEN2__SWDT__EX6__EX5__EX4__EX3__EX2__EADC
 #undef IEN1__EXEN2__SWDT__EX6__EX5__EX4__EX3__EX2__EADC
 SFR(IEN1,	0xB8); // interrupt enable register - SAB80515 specific
 // Bit registers
-SBIT(EADC,	0xB8); // A/D converter interrupt enable
-SBIT(EX2,	0xB9);
-SBIT(EX3,	0xBA);
-SBIT(EX4,	0xBB);
-SBIT(EX5,	0xBC);
-SBIT(EX6,	0xBD);
-SBIT(SWDT,	0xBE); // watchdog timer start/reset
-SBIT(EXEN2,	0xBF); // timer2 external reload interrupt enable
+SBIT(EADC,	0xB8,	0); // A/D converter interrupt enable
+SBIT(EX2,	0xB8,	1);
+SBIT(EX3,	0xB8,	2);
+SBIT(EX4,	0xB8,	3);
+SBIT(EX5,	0xB8,	4);
+SBIT(EX6,	0xB8,	5);
+SBIT(SWDT,	0xB8,	6); // watchdog timer start/reset
+SBIT(EXEN2,	0xB8,	7); // timer2 external reload interrupt enable
 #endif
 
 #ifdef IEN2__SAB80517
@@ -2951,24 +2952,24 @@ SFR(IEN3,	0xBE);
 #undef IP__x__x__x__PS__PT1__PX1__PT0__PX0
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS,	0xBC);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS,	0xB8,	4);
 #endif
 
 #ifdef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 #undef IP__x__x__PT2__PS__PT1__PX1__PT0__PX0
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS,	0xBC);
-SBIT(PS0,	0xBC);  // alternate name
-SBIT(PT2,	0xBD);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS,	0xB8,	4);
+SBIT(PS0,	0xB8,	4);  // alternate name
+SBIT(PT2,	0xB8,	5);
 #endif
 
 #ifdef IP__x__PAD__PS1__PS0__PT1__PX1__PT0__PX0
@@ -2976,39 +2977,39 @@ SBIT(PT2,	0xBD);
 SFR(IP,	0xB8); // Interrupt priority 0, P80C552 specific
 SFR(IP0,	0xB8); // alternate name
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS0,	0xBC);
-SBIT(PS1,	0xBD);
-SBIT(PAD,	0xBE);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS0,	0xB8,	4);
+SBIT(PS1,	0xB8,	5);
+SBIT(PAD,	0xB8,	6);
 #endif
 
 #ifdef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
 #undef IP__x__PPC__PT2__PS__PT1__PX1__PT0__PX0
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS,	0xBC);
-SBIT(PT2,	0xBD);
-SBIT(PPC,	0xBE);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS,	0xB8,	4);
+SBIT(PT2,	0xB8,	5);
+SBIT(PPC,	0xB8,	6);
 #endif
 
 #ifdef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
 #undef IP__x__PS1__PT2__PS__PT1_PX1__PT0__PX0
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS,	0xBC);
-SBIT(PT2,	0xBD);
-SBIT(PS1,	0xBE);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS,	0xB8,	4);
+SBIT(PT2,	0xB8,	5);
+SBIT(PS1,	0xB8,	6);
 #endif
 
 #ifdef IP__PT2__PPC__PS1__PS0__PT1__PX1__PT0__PX0
@@ -3016,26 +3017,26 @@ SBIT(PS1,	0xBE);
 // P89C668 specific:
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS0,	0xBC);
-SBIT(PS1,	0xBD);
-SBIT(PPC,	0xBE);
-SBIT(PT2,	0xBF);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS0,	0xB8,	4);
+SBIT(PS1,	0xB8,	5);
+SBIT(PPC,	0xB8,	6);
+SBIT(PT2,	0xB8,	7);
 #endif
 
 #ifdef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
 #undef IP__RWT__x__x__PS__PT1__PX1__PT0__PX0
 SFR(IP,	0xB8);
 // Bit registers
-SBIT(PX0,	0xB8);
-SBIT(PT0,	0xB9);
-SBIT(PX1,	0xBA);
-SBIT(PT1,	0xBB);
-SBIT(PS,	0xBC);
-SBIT(RWT,	0xBF);
+SBIT(PX0,	0xB8,	0);
+SBIT(PT0,	0xB8,	1);
+SBIT(PX1,	0xB8,	2);
+SBIT(PT1,	0xB8,	3);
+SBIT(PS,	0xB8,	4);
+SBIT(RWT,	0xB8,	7);
 #endif
 
 #ifdef IP0__x__WDTS__IP0_5__IP0_4__IP0_3__IP0_2__IP0_1__IP0_0
@@ -3055,13 +3056,13 @@ SFR(IP0,	0xA9); // interrupt priority register SAB80515 specific
 #undef IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 SFR(IP0,	0xB8); // interrupt priority register DS89C420 specific
 // Bit registers
-SBIT(LPX0,	0xB8);
-SBIT(LPT0,	0xB9);
-SBIT(LPX1,	0xBA);
-SBIT(LPT1,	0xBB);
-SBIT(LPS0,	0xBC);
-SBIT(LPT2,	0xBD);
-SBIT(LPS1,	0xBE);
+SBIT(LPX0,	0xB8,	0);
+SBIT(LPT0,	0xB8,	1);
+SBIT(LPX1,	0xB8,	2);
+SBIT(LPT1,	0xB8,	3);
+SBIT(LPS0,	0xB8,	4);
+SBIT(LPT2,	0xB8,	5);
+SBIT(LPS1,	0xB8,	6);
 #endif
 
 #ifdef IP1__x__x__IP1_5__IP1_4__IP1_3__IP1_2__IP1_1__IP1_0
@@ -3093,14 +3094,14 @@ SFR(IP1,	0xB1); // interrupt priority register DS89C420 specific
 #undef IP1__PT2__PCM2__PCM1__PCM0__PCT3__PCT2__PCT1__PCT0
 SFR(IP1,	0xF8); // Interrupt priority 1, P80C552 specific
 // Bit registers
-SBIT(PCT0,	0xF8);
-SBIT(PCT1,	0xF9);
-SBIT(PCT2,	0xFA);
-SBIT(PCT3,	0xFB);
-SBIT(PCM0,	0xFC);
-SBIT(PCM1,	0xFD);
-SBIT(PCM2,	0xFE);
-SBIT(PT2,	0xFF);
+SBIT(PCT0,	0xF8,	0);
+SBIT(PCT1,	0xF8,	1);
+SBIT(PCT2,	0xF8,	2);
+SBIT(PCT3,	0xF8,	3);
+SBIT(PCM0,	0xF8,	4);
+SBIT(PCM1,	0xF8,	5);
+SBIT(PCM2,	0xF8,	6);
+SBIT(PT2,	0xF8,	7);
 #endif
 
 #ifdef IPH__x__PPCH__PT2H__PSH__PT1H__PX1H__PT0H__PX0H
@@ -3134,28 +3135,28 @@ SFR(IPH,	0xB7);
 #undef IRCON
 SFR(IRCON,	0xC0); // interrupt control register - SAB80515 specific
 // Bit registers
-SBIT(IADC,	0xC0); // A/D converter irq flag
-SBIT(IEX2,	0xC1); // external interrupt edge detect flag
-SBIT(IEX3,	0xC2);
-SBIT(IEX4,	0xC3);
-SBIT(IEX5,	0xC4);
-SBIT(IEX6,	0xC5);
-SBIT(TF2,	0xC6); // timer 2 owerflow flag
-SBIT(EXF2,	0xC7); // timer2 reload flag
+SBIT(IADC,	0xC0,	0); // A/D converter irq flag
+SBIT(IEX2,	0xC0,	1); // external interrupt edge detect flag
+SBIT(IEX3,	0xC0,	2);
+SBIT(IEX4,	0xC0,	3);
+SBIT(IEX5,	0xC0,	4);
+SBIT(IEX6,	0xC0,	5);
+SBIT(TF2,	0xC0,	6); // timer 2 owerflow flag
+SBIT(EXF2,	0xC0,	7); // timer2 reload flag
 #endif
 
 #ifdef IRCON0
 #undef IRCON0
 SFR(IRCON0,	0xC0); // interrupt control register - SAB80515 specific
 // Bit registers
-SBIT(IADC,	0xC0); // A/D converter irq flag
-SBIT(IEX2,	0xC1); // external interrupt edge detect flag
-SBIT(IEX3,	0xC2);
-SBIT(IEX4,	0xC3);
-SBIT(IEX5,	0xC4);
-SBIT(IEX6,	0xC5);
-SBIT(TF2,	0xC6); // timer 2 owerflow flag
-SBIT(EXF2,	0xC7); // timer2 reload flag
+SBIT(IADC,	0xC0,	0); // A/D converter irq flag
+SBIT(IEX2,	0xC0,	1); // external interrupt edge detect flag
+SBIT(IEX3,	0xC0,	2);
+SBIT(IEX4,	0xC0,	3);
+SBIT(IEX5,	0xC0,	4);
+SBIT(IEX6,	0xC0,	5);
+SBIT(TF2,	0xC0,	6); // timer 2 owerflow flag
+SBIT(EXF2,	0xC0,	7); // timer2 reload flag
 #endif
 
 #ifdef IRCON1
@@ -3281,218 +3282,218 @@ SFR(MXAX,	0xEA); // Dallas DS80C390
 #undef P0
 SFR(P0,	0x80);
 //  Bit Registers
-SBIT(P0_0,	0x80);
-SBIT(P0_1,	0x81);
-SBIT(P0_2,	0x82);
-SBIT(P0_3,	0x83);
-SBIT(P0_4,	0x84);
-SBIT(P0_5,	0x85);
-SBIT(P0_6,	0x86);
-SBIT(P0_7,	0x87);
+SBIT(P0_0,	0x80,	0);
+SBIT(P0_1,	0x80,	1);
+SBIT(P0_2,	0x80,	2);
+SBIT(P0_3,	0x80,	3);
+SBIT(P0_4,	0x80,	4);
+SBIT(P0_5,	0x80,	5);
+SBIT(P0_6,	0x80,	6);
+SBIT(P0_7,	0x80,	7);
 #endif
 
 #ifdef P0_EXT__AD7__AD6__AD5__AD4__AD3__AD2__AD1__AD0
 #undef P0_EXT__AD7__AD6__AD5__AD4__AD3__AD2__AD1__AD0
 // P89C668 alternate names for bits in P0
-SBIT(AD0,	0x80);
-SBIT(AD1,	0x81);
-SBIT(AD2,	0x82);
-SBIT(AD3,	0x83);
-SBIT(AD4,	0x84);
-SBIT(AD5,	0x85);
-SBIT(AD6,	0x86);
-SBIT(AD7,	0x87);
+SBIT(AD0,	0x80,	0);
+SBIT(AD1,	0x80,	1);
+SBIT(AD2,	0x80,	2);
+SBIT(AD3,	0x80,	3);
+SBIT(AD4,	0x80,	4);
+SBIT(AD5,	0x80,	5);
+SBIT(AD6,	0x80,	6);
+SBIT(AD7,	0x80,	7);
 #endif
 
 #ifdef P1
 #undef P1
 SFR(P1,	0x90);
 // Bit registers
-SBIT(P1_0,	0x90);
-SBIT(P1_1,	0x91);
-SBIT(P1_2,	0x92);
-SBIT(P1_3,	0x93);
-SBIT(P1_4,	0x94);
-SBIT(P1_5,	0x95);
-SBIT(P1_6,	0x96);
-SBIT(P1_7,	0x97);
+SBIT(P1_0,	0x90,	0);
+SBIT(P1_1,	0x90,	1);
+SBIT(P1_2,	0x90,	2);
+SBIT(P1_3,	0x90,	3);
+SBIT(P1_4,	0x90,	4);
+SBIT(P1_5,	0x90,	5);
+SBIT(P1_6,	0x90,	6);
+SBIT(P1_7,	0x90,	7);
 #endif
 
 #ifdef P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
 #undef P1_EXT__INT5__INT4__INT3__INT2__TXD1__RXD1__T2EX__T2
 // P1 alternate functions
-SBIT(T2,	0x90);
-SBIT(T2EX,	0x91);
-SBIT(RXD1,	0x92);
-SBIT(TXD1,	0x93);
-SBIT(INT2,	0x94);
-SBIT(INT3,	0x95);
-SBIT(INT4,	0x96);
-SBIT(INT5,	0x97);
+SBIT(T2,	0x90,	0);
+SBIT(T2EX,	0x90,	1);
+SBIT(RXD1,	0x90,	2);
+SBIT(TXD1,	0x90,	3);
+SBIT(INT2,	0x90,	4);
+SBIT(INT3,	0x90,	5);
+SBIT(INT4,	0x90,	6);
+SBIT(INT5,	0x90,	7);
 #endif
 
 #ifdef P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
 #undef P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
 // P89C669 alternate names for bits __at P1
 // P1_EXT__SDA__SCL__CEX2__CEX1__CEX0__ECI__T2EX__T2
-SBIT(T2,	0x90);
-SBIT(T2EX,	0x91);
-SBIT(ECI,	0x92);
-SBIT(CEX0,	0x93);
-SBIT(CEX1,	0x94);
-SBIT(CEX2,	0x95);
-SBIT(SCL,	0x96);
-SBIT(SDA,	0x97);
+SBIT(T2,	0x90,	0);
+SBIT(T2EX,	0x90,	1);
+SBIT(ECI,	0x90,	2);
+SBIT(CEX0,	0x90,	3);
+SBIT(CEX1,	0x90,	4);
+SBIT(CEX2,	0x90,	5);
+SBIT(SCL,	0x90,	6);
+SBIT(SDA,	0x90,	7);
 #endif
 
 #ifdef P1_EXT__T2__CLKOUT__T2EX__INT2__INT6_CC3__INT5_CC2__INT4_CC1__INT3_CC0
-SBIT(INT3_CC0,	0x90); // P1 alternate functions - SAB80515 specific
-SBIT(INT4_CC1,	0x91);
-SBIT(INT5_CC2,	0x92);
-SBIT(INT6_CC3,	0x93);
-SBIT(INT2,		0x94);
-SBIT(T2EX,		0x95);
-SBIT(CLKOUT,	0x96);
-SBIT(T2,		0x97);
+SBIT(INT3_CC0,	0x90,	0); // P1 alternate functions - SAB80515 specific
+SBIT(INT4_CC1,	0x90,	1);
+SBIT(INT5_CC2,	0x90,	2);
+SBIT(INT6_CC3,	0x90,	3);
+SBIT(INT2,		0x90,	4);
+SBIT(T2EX,		0x90,	5);
+SBIT(CLKOUT,	0x90,	6);
+SBIT(T2,		0x90,	7);
 #endif
 
 #ifdef P1_EXT__CT0I__CT1I__CT2I__CT3I__T2__RT2__SCL__SDA
 #undef P1_EXT__CT0I__CT1I__CT2I__CT3I__T2__RT2__SCL__SDA
 // Bit registers
-SBIT(CT0I,	0x90); // Port 1 alternate functions, P80C552 specific
-SBIT(CT1I,	0x91);
-SBIT(CT2I,	0x92);
-SBIT(CT3I,	0x93);
-SBIT(T2,	0x94);
-SBIT(RT2,	0x95);
-SBIT(SCL,	0x96);
-SBIT(SDA,	0x97);
+SBIT(CT0I,	0x90,	0); // Port 1 alternate functions, P80C552 specific
+SBIT(CT1I,	0x90,	1);
+SBIT(CT2I,	0x90,	2);
+SBIT(CT3I,	0x90,	3);
+SBIT(T2,	0x90,	4);
+SBIT(RT2,	0x90,	5);
+SBIT(SCL,	0x90,	6);
+SBIT(SDA,	0x90,	7);
 #endif
 
 #ifdef P1_EXT__x__x__x__x__x__x__T2EX__T2
 #undef P1_EXT__x__x__x__x__x__x__T2EX__T2
 // P1 alternate functions
-SBIT(T2,	0x90);
-SBIT(T2EX,	0x91);
+SBIT(T2,	0x90,	0);
+SBIT(T2EX,	0x90,	1);
 #endif
 
 #ifdef P2
 #undef P2
 SFR(P2,	0xA0);
 // Bit registers
-SBIT(P2_0,	0xA0);
-SBIT(P2_1,	0xA1);
-SBIT(P2_2,	0xA2);
-SBIT(P2_3,	0xA3);
-SBIT(P2_4,	0xA4);
-SBIT(P2_5,	0xA5);
-SBIT(P2_6,	0xA6);
-SBIT(P2_7,	0xA7);
+SBIT(P2_0,	0xA0,	0);
+SBIT(P2_1,	0xA0,	1);
+SBIT(P2_2,	0xA0,	2);
+SBIT(P2_3,	0xA0,	3);
+SBIT(P2_4,	0xA0,	4);
+SBIT(P2_5,	0xA0,	5);
+SBIT(P2_6,	0xA0,	6);
+SBIT(P2_7,	0xA0,	7);
 #endif
 
 #ifdef P2_EXT__AD15__AD14__AD13__AD12__AD11__AD10__AD9__AD8
 #undef P2_EXT__AD15__AD14__AD13__AD12__AD11__AD10__AD9__AD8
 // P89C668 specific bit registers __at P2:
-SBIT(AD8,	0xA0);
-SBIT(AD9,	0xA1);
-SBIT(AD10,	0xA2);
-SBIT(AD11,	0xA3);
-SBIT(AD12,	0xA4);
-SBIT(AD13,	0xA5);
-SBIT(AD14,	0xA6);
-SBIT(AD15,	0xA7);
+SBIT(AD8,	0xA0,	0);
+SBIT(AD9,	0xA0,	1);
+SBIT(AD10,	0xA0,	2);
+SBIT(AD11,	0xA0,	3);
+SBIT(AD12,	0xA0,	4);
+SBIT(AD13,	0xA0,	5);
+SBIT(AD14,	0xA0,	6);
+SBIT(AD15,	0xA0,	7);
 #endif
 
 #ifdef P3
 #undef P3
 SFR(P3,	0xB0);
 // Bit registers
-SBIT(P3_0,	0xB0);
-SBIT(P3_1,	0xB1);
-SBIT(P3_2,	0xB2);
-SBIT(P3_3,	0xB3);
-SBIT(P3_4,	0xB4);
-SBIT(P3_5,	0xB5);
+SBIT(P3_0,	0xB0,	0);
+SBIT(P3_1,	0xB0,	1);
+SBIT(P3_2,	0xB0,	2);
+SBIT(P3_3,	0xB0,	3);
+SBIT(P3_4,	0xB0,	4);
+SBIT(P3_5,	0xB0,	5);
 #ifndef MCS51REG_EXTERNAL_RAM
-SBIT(P3_6,	0xB6);
-SBIT(P3_7,	0xB7);
+SBIT(P3_6,	0xB0,	6);
+SBIT(P3_7,	0xB0,	7);
 #endif
 // alternate names
-SBIT(RXD,	0xB0);
-SBIT(RXD0,	0xB0);
-SBIT(TXD,	0xB1);
-SBIT(TXD0,	0xB1);
-SBIT(INT0,	0xB2);
-SBIT(INT1,	0xB3);
-SBIT(T0,	0xB4);
-SBIT(T1,	0xB5);
+SBIT(RXD,	0xB0,	0);
+SBIT(RXD0,	0xB0,	0);
+SBIT(TXD,	0xB0,	1);
+SBIT(TXD0,	0xB0,	1);
+SBIT(INT0,	0xB0,	2);
+SBIT(INT1,	0xB0,	3);
+SBIT(T0,	0xB0,	4);
+SBIT(T1,	0xB0,	5);
 #ifndef MCS51REG_EXTERNAL_RAM
-SBIT(WR,	0xB6);
-SBIT(RD,	0xB7);
+SBIT(WR,	0xB0,	6);
+SBIT(RD,	0xB0,	7);
 #endif
 #endif
 
 #ifdef P3_EXT__x__x__CEX4__CEX3__x__x__x__x
 #undef P3_EXT__x__x__CEX4__CEX3__x__x__x__x
 // P89C668 specific bit registers __at P3 (alternate names)
-SBIT(CEX4,	0xB5);
-SBIT(CEX3,	0xB4);
+SBIT(CEX4,	0xB0,	5);
+SBIT(CEX3,	0xB0,	4);
 #endif
 
 #ifdef P4_AT_0X80
 #undef P4_AT_0X80
 SFR(P4,	0x80); // Port 4 - DS80C390
 // Bit registers
-SBIT(P4_0,	0x80);
-SBIT(P4_1,	0x81);
-SBIT(P4_2,	0x82);
-SBIT(P4_3,	0x83);
-SBIT(P4_4,	0x84);
-SBIT(P4_5,	0x85);
-SBIT(P4_6,	0x86);
-SBIT(P4_7,	0x87);
+SBIT(P4_0,	0x80,	0);
+SBIT(P4_1,	0x80,	1);
+SBIT(P4_2,	0x80,	2);
+SBIT(P4_3,	0x80,	3);
+SBIT(P4_4,	0x80,	4);
+SBIT(P4_5,	0x80,	5);
+SBIT(P4_6,	0x80,	6);
+SBIT(P4_7,	0x80,	7);
 #endif
 
 #ifdef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
 #undef P4_AT_0XC0__CMT0__CMT1__CMSR5__CMSR4__CMSR3__CMSR2__CMSR1__CMSR0
 SFR(P4,	0xC0); // Port 4, P80C552 specific
 // Bit registers
-SBIT(CMSR0,	0xC0);
-SBIT(CMSR1,	0xC1);
-SBIT(CMSR2,	0xC2);
-SBIT(CMSR3,	0xC3);
-SBIT(CMSR4,	0xC4);
-SBIT(CMSR5,	0xC5);
-SBIT(CMT0,	0xC6);
-SBIT(CMT1,	0xC7);
+SBIT(CMSR0,	0xC0,	0);
+SBIT(CMSR1,	0xC0,	1);
+SBIT(CMSR2,	0xC0,	2);
+SBIT(CMSR3,	0xC0,	3);
+SBIT(CMSR4,	0xC0,	4);
+SBIT(CMSR5,	0xC0,	5);
+SBIT(CMT0,	0xC0,	6);
+SBIT(CMT1,	0xC0,	7);
 #endif
 
 #ifdef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
 #undef P4_AT_0XC0__P4_7__P4_6__P4_5__P4_3__P4_2__P4_1__P4_0
 SFR(P4,	0xC0); // Port 4, T89C51 specific
 // Bit registers
-SBIT(P4_0,	0xC0);
-SBIT(P4_1,	0xC1);
-SBIT(P4_2,	0xC2);
-SBIT(P4_3,	0xC3);
-SBIT(P4_4,	0xC4);
-SBIT(P4_5,	0xC5);
-SBIT(P4_6,	0xC6);
-SBIT(P4_7,	0xC7);
+SBIT(P4_0,	0xC0,	0);
+SBIT(P4_1,	0xC0,	1);
+SBIT(P4_2,	0xC0,	2);
+SBIT(P4_3,	0xC0,	3);
+SBIT(P4_4,	0xC0,	4);
+SBIT(P4_5,	0xC0,	5);
+SBIT(P4_6,	0xC0,	6);
+SBIT(P4_7,	0xC0,	7);
 #endif
 
 #ifdef P4_AT_0XE8
 #undef P4_AT_0XE8
 SFR(P4,	0xE8); // Port 4 - SAB80515 & compatible microcontrollers
 // Bit registers
-SBIT(P4_0,	0xE8);
-SBIT(P4_1,	0xE9);
-SBIT(P4_2,	0xEA);
-SBIT(P4_3,	0xEB);
-SBIT(P4_4,	0xEC);
-SBIT(P4_5,	0xED);
-SBIT(P4_6,	0xEE);
-SBIT(P4_7,	0xEF);
+SBIT(P4_0,	0xE8,	0);
+SBIT(P4_1,	0xE8,	1);
+SBIT(P4_2,	0xE8,	2);
+SBIT(P4_3,	0xE8,	3);
+SBIT(P4_4,	0xE8,	4);
+SBIT(P4_5,	0xE8,	5);
+SBIT(P4_6,	0xE8,	6);
+SBIT(P4_7,	0xE8,	7);
 #endif
 
 #ifdef P4CNT
@@ -3517,14 +3518,14 @@ SFR(P5,	0xA1); // Port 5 - DS80C390
 #undef P5_AT_0XE8
 SFR(P5,	0xE8); // Port 5 - T89C51RD2
 // Bit registers
-SBIT(P5_0,	0xE8);
-SBIT(P5_1,	0xE9);
-SBIT(P5_2,	0xEA);
-SBIT(P5_3,	0xEB);
-SBIT(P5_4,	0xEC);
-SBIT(P5_5,	0xED);
-SBIT(P5_6,	0xEE);
-SBIT(P5_7,	0xEF);
+SBIT(P5_0,	0xE8,	0);
+SBIT(P5_1,	0xE8,	1);
+SBIT(P5_2,	0xE8,	2);
+SBIT(P5_3,	0xE8,	3);
+SBIT(P5_4,	0xE8,	4);
+SBIT(P5_5,	0xE8,	5);
+SBIT(P5_6,	0xE8,	6);
+SBIT(P5_7,	0xE8,	7);
 #endif
 
 #ifdef P5CNT
@@ -3559,14 +3560,14 @@ SFR(P5,	0xC4); // Port 5, P80C552 specific
 #undef P5_AT_0XF8
 SFR(P5,	0xF8); // Port 5 - SAB80515 & compatible microcontrollers
 // Bit registers
-SBIT(P5_0,	0xF8);
-SBIT(P5_1,	0xF9);
-SBIT(P5_2,	0xFA);
-SBIT(P5_3,	0xFB);
-SBIT(P5_4,	0xFC);
-SBIT(P5_5,	0xFD);
-SBIT(P5_6,	0xFE);
-SBIT(P5_7,	0xFF);
+SBIT(P5_0,	0xF8,	0);
+SBIT(P5_1,	0xF8,	1);
+SBIT(P5_2,	0xF8,	2);
+SBIT(P5_3,	0xF8,	3);
+SBIT(P5_4,	0xF8,	4);
+SBIT(P5_5,	0xF8,	5);
+SBIT(P5_6,	0xF8,	6);
+SBIT(P5_7,	0xF8,	7);
 #endif
 
 #ifdef P6_AT_0XDB
@@ -3750,14 +3751,14 @@ SFR(PRSC,	0xB4);
 #undef PSW
 SFR(PSW,	0xD0);
 // Bit registers
-SBIT(P,		0xD0);
-SBIT(F1,	0xD1);
-SBIT(OV,	0xD2);
-SBIT(RS0,	0xD3);
-SBIT(RS1,	0xD4);
-SBIT(F0,	0xD5);
-SBIT(AC,	0xD6);
-SBIT(CY,	0xD7);
+SBIT(P,		0xD0,	0);
+SBIT(F1,	0xD0,	1);
+SBIT(OV,	0xD0,	2);
+SBIT(RS0,	0xD0,	3);
+SBIT(RS1,	0xD0,	4);
+SBIT(F0,	0xD0,	5);
+SBIT(AC,	0xD0,	6);
+SBIT(CY,	0xD0,	7);
 #endif
 
 #ifdef PWM0_AT_0XFC
@@ -3826,13 +3827,14 @@ SFR(ROMSIZE,	0xC2); // DS87C520, DS83C520
 #ifdef RPCTL
 #undef RPCTL
 SFR(RPCTL,		0xD8); // Dallas DS5001 specific
-SBIT(RG0,		0xD8);
-SBIT(RPCON,		0xD9);
-SBIT(DMA,		0xDA);
-SBIT(IBI,		0xDB);
-SBIT(AE,		0xDC);
-SBIT(EXBS,		0xDD);
-SBIT(RNR_FLAG,	0xDF);
+// Bit registers
+SBIT(RG0,		0xD8,	0);
+SBIT(RPCON,		0xD8,	1);
+SBIT(DMA,		0xD8,	2);
+SBIT(IBI,		0xD8,	3);
+SBIT(AE,		0xD8,	4);
+SBIT(EXBS,		0xD8,	5);
+SBIT(RNR_FLAG,	0xD8,	7);
 #endif
 
 #ifdef RTE__TP47__TP46__RP45__RP44__RP43__RP42__RP41__RP40
@@ -3859,28 +3861,29 @@ SFR(S0BUF,	0x99); // serial channel 0 buffer register SAB80517 specific
 SFR(S0CON,	0x98); // serial channel 0 control register P80C552 specific
 // Bit registers
 // Already defined in SCON
-//SBIT(RI0,	0x98);
-//SBIT(TI0,	0x99);
-//SBIT(RB8,	0x9A);
-//SBIT(TB8,	0x9B);
-//SBIT(REN,	0x9C);
-//SBIT(SM2,	0x9D);
-//SBIT(SM1,	0x9E);
-//SBIT(SM0,	0x9F);
+//SBIT(RI0,	0x98,	0);
+//SBIT(TI0,	0x98,	1);
+//SBIT(RB8,	0x98,	2);
+//SBIT(TB8,	0x98,	3);
+//SBIT(REN,	0x98,	4);
+//SBIT(SM2,	0x98,	5);
+//SBIT(SM1,	0x98,	6);
+//SBIT(SM0,	0x98,	7);
 #endif
 
 #ifdef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 #undef S0CON__SM0__SM1__SM20__REN0__TB80__RB80__TI0__RI0
 // serial channel 0 buffer register SAB80517 specific(same as stock SCON)
 SFR(S0CON,	0x98);
-SBIT(RI0,	0x98);
-SBIT(TI0,	0x99);
-SBIT(RB80,	0x9A);
-SBIT(TB80,	0x9B);
-SBIT(REN0,	0x9C);
-SBIT(SM20,	0x9D);
-SBIT(SM1,	0x9E);
-SBIT(SM0,	0x9F);
+// Bit registers
+SBIT(RI0,	0x98,	0);
+SBIT(TI0,	0x98,	1);
+SBIT(RB80,	0x98,	2);
+SBIT(TB80,	0x98,	3);
+SBIT(REN0,	0x98,	4);
+SBIT(SM20,	0x98,	5);
+SBIT(SM1,	0x98,	6);
+SBIT(SM0,	0x98,	7);
 #endif
 
 #ifdef S0RELL
@@ -3914,15 +3917,15 @@ SFR(S1CON,	0x9B); // serial channel 1 control register SAB80517 specific
 #undef S1CON__CR2__ENS1__STA__ST0__SI__AA__CR1__CR0
 SFR(S1CON,	0xD8); // Serial 1 control, P80C552 specific
 SFR(SICON,	0xD8); // sometimes called SICON
-// Bit register
-SBIT(CR0,	0xD8);
-SBIT(CR1,	0xD9);
-SBIT(AA,	0xDA);
-SBIT(SI,	0xDB);
-SBIT(ST0,	0xDC);
-SBIT(STA,	0xDD);
-SBIT(ENS1,	0xDE);
-SBIT(CR2,	0xDF);
+// Bit registers
+SBIT(CR0,	0xD8,	0);
+SBIT(CR1,	0xD8,	1);
+SBIT(AA,	0xD8,	2);
+SBIT(SI,	0xD8,	3);
+SBIT(ST0,	0xD8,	4);
+SBIT(STA,	0xD8,	5);
+SBIT(ENS1,	0xD8,	6);
+SBIT(CR2,	0xD8,	7);
 #endif
 
 #ifdef S1DAT_AT_0XDA
@@ -4008,30 +4011,30 @@ SFR(SBUF1,	0xC1);
 #undef SCON
 SFR(SCON,	0x98);
 // Bit registers
-SBIT(RI,	0x98);
-SBIT(TI,	0x99);
-SBIT(RB8,	0x9A);
-SBIT(TB8,	0x9B);
-SBIT(REN,	0x9C);
-SBIT(SM2,	0x9D);
-SBIT(SM1,	0x9E);
-SBIT(SM0,	0x9F);
+SBIT(RI,	0x98,	0);
+SBIT(TI,	0x98,	1);
+SBIT(RB8,	0x98,	2);
+SBIT(TB8,	0x98,	3);
+SBIT(REN,	0x98,	4);
+SBIT(SM2,	0x98,	5);
+SBIT(SM1,	0x98,	6);
+SBIT(SM0,	0x98,	7);
 #endif
 
 #ifdef SCON0
 #undef SCON0
 SFR(SCON0,	0x98);
 // Bit registers
-SBIT(RI_0,		0x98);
-SBIT(TI_0,		0x99);
-SBIT(RB8_0,		0x9A);
-SBIT(TB8_0,		0x9B);
-SBIT(REN_0,		0x9C);
-SBIT(SM2_0,		0x9D);
-SBIT(SM1_0,		0x9E);
-SBIT(SM0_0,		0x9F);
-SBIT(FE_0,		0x9F);
-SBIT(SM0_FE_0,	0x9F);
+SBIT(RI_0,		0x98,	0);
+SBIT(TI_0,		0x98,	1);
+SBIT(RB8_0,		0x98,	2);
+SBIT(TB8_0,		0x98,	3);
+SBIT(REN_0,		0x98,	4);
+SBIT(SM2_0,		0x98,	5);
+SBIT(SM1_0,		0x98,	6);
+SBIT(SM0_0,		0x98,	7);
+SBIT(FE_0,		0x98,	7);
+SBIT(SM0_FE_0,	0x98,	7);
 #endif
 
 #ifdef SCON1
@@ -4039,16 +4042,16 @@ SBIT(SM0_FE_0,	0x9F);
 // DS80C320 - 80C390 specific
 SFR(SCON1,	0xC0);
 // Bit registers
-SBIT(RI_1,		0xC0);
-SBIT(TI_1,		0xC1);
-SBIT(RB8_1,		0xC2);
-SBIT(TB8_1,		0xC3);
-SBIT(REN_1,		0xC4);
-SBIT(SM2_1,		0xC5);
-SBIT(SM1_1,		0xC6);
-SBIT(SM0_1,		0xC7);
-SBIT(FE_1,		0xC7);
-SBIT(SM0_FE_1,	0xC7);
+SBIT(RI_1,		0xC0,	0);
+SBIT(TI_1,		0xC0,	1);
+SBIT(RB8_1,		0xC0,	2);
+SBIT(TB8_1,		0xC0,	3);
+SBIT(REN_1,		0xC0,	4);
+SBIT(SM2_1,		0xC0,	5);
+SBIT(SM1_1,		0xC0,	6);
+SBIT(SM0_1,		0xC0,	7);
+SBIT(FE_1,		0xC0,	7);
+SBIT(SM0_FE_1,	0xC0,	7);
 #endif
 
 #ifdef SETMSK
@@ -4223,23 +4226,23 @@ SFR(T2,	0xCC);
 SFR(T2CON,	0xC8);
 // Definitions for the 8052 compatible microcontrollers.
 // Bit registers
-SBIT(CP_RL2,	0xC8);
-SBIT(C_T2,		0xC9);
-SBIT(TR2,		0xCA);
-SBIT(EXEN2,		0xCB);
-SBIT(TCLK,		0xCC);
-SBIT(RCLK,		0xCD);
-SBIT(EXF2,		0xCE);
-SBIT(TF2,		0xCF);
+SBIT(CP_RL2,	0xC8,	0);
+SBIT(C_T2,		0xC8,	1);
+SBIT(TR2,		0xC8,	2);
+SBIT(EXEN2,		0xC8,	3);
+SBIT(TCLK,		0xC8,	4);
+SBIT(RCLK,		0xC8,	5);
+SBIT(EXF2,		0xC8,	6);
+SBIT(TF2,		0xC8,	7);
 // alternate names
-SBIT(T2CON_0,	0xC8);
-SBIT(T2CON_1,	0xC9);
-SBIT(T2CON_2,	0xCA);
-SBIT(T2CON_3,	0xCB);
-SBIT(T2CON_4,	0xCC);
-SBIT(T2CON_5,	0xCD);
-SBIT(T2CON_6,	0xCE);
-SBIT(T2CON_7,	0xCF);
+SBIT(T2CON_0,	0xC8,	0);
+SBIT(T2CON_1,	0xC8,	1);
+SBIT(T2CON_2,	0xC8,	2);
+SBIT(T2CON_3,	0xC8,	3);
+SBIT(T2CON_4,	0xC8,	4);
+SBIT(T2CON_5,	0xC8,	5);
+SBIT(T2CON_6,	0xC8,	6);
+SBIT(T2CON_7,	0xC8,	7);
 #endif
 
 #ifdef T2CON__T2PS__I3FR__I2FR__T2R1__T2R0__T2CM__T2I1__T2I0
@@ -4247,23 +4250,23 @@ SBIT(T2CON_7,	0xCF);
 SFR(T2CON,	0xC8);
 // Definitions for the Infineon / Siemens SAB80515, SAB80515A, SAB80517
 // Bit registers
-SBIT(T2I0,	0xC8);
-SBIT(T2I1,	0xC9);
-SBIT(T2CM,	0xCA);
-SBIT(T2R0,	0xCB);
-SBIT(T2R1,	0xCC);
-SBIT(I2FR,	0xCD);
-SBIT(I3FR,	0xCE);
-SBIT(T2PS,	0xCF);
+SBIT(T2I0,	0xC8,	0);
+SBIT(T2I1,	0xC8,	1);
+SBIT(T2CM,	0xC8,	2);
+SBIT(T2R0,	0xC8,	3);
+SBIT(T2R1,	0xC8,	4);
+SBIT(I2FR,	0xC8,	5);
+SBIT(I3FR,	0xC8,	6);
+SBIT(T2PS,	0xC8,	7);
 // alternate names
-SBIT(T2CON_0,	0xC8);
-SBIT(T2CON_1,	0xC9);
-SBIT(T2CON_2,	0xCA);
-SBIT(T2CON_3,	0xCB);
-SBIT(T2CON_4,	0xCC);
-SBIT(T2CON_5,	0xCD);
-SBIT(T2CON_6,	0xCE);
-SBIT(T2CON_7,	0xCF);
+SBIT(T2CON_0,	0xC8,	0);
+SBIT(T2CON_1,	0xC8,	1);
+SBIT(T2CON_2,	0xC8,	2);
+SBIT(T2CON_3,	0xC8,	3);
+SBIT(T2CON_4,	0xC8,	4);
+SBIT(T2CON_5,	0xC8,	5);
+SBIT(T2CON_6,	0xC8,	6);
+SBIT(T2CON_7,	0xC8,	7);
 #endif
 
 #ifdef T2MOD__x__x__x__D13T1__D13T2__x__T2OE__DCEN
@@ -4304,14 +4307,14 @@ SFR(TA,	0xC7);
 #undef TCON
 SFR(TCON,	0x88);
 //  Bit registers
-SBIT(IT0,	0x88);
-SBIT(IE0,	0x89);
-SBIT(IT1,	0x8A);
-SBIT(IE1,	0x8B);
-SBIT(TR0,	0x8C);
-SBIT(TF0,	0x8D);
-SBIT(TR1,	0x8E);
-SBIT(TF1,	0x8F);
+SBIT(IT0,	0x88,	0);
+SBIT(IE0,	0x88,	1);
+SBIT(IT1,	0x88,	2);
+SBIT(IE1,	0x88,	3);
+SBIT(TR0,	0x88,	4);
+SBIT(TF0,	0x88,	5);
+SBIT(TR1,	0x88,	6);
+SBIT(TF1,	0x88,	7);
 #endif
 
 #ifdef TH0
@@ -4379,14 +4382,14 @@ SFR(TM2CON,	0xEA); // Timer 2 control, P80C552 specific
 #undef TM2IR__T20V__CMI2__CMI1__CMI0__CTI3__CTI2__CTI1__CTI0
 SFR(TM2IR,	0xC8); // Timer 2 int flag reg, P80C552 specific
 // Bit register
-SBIT(CTI0,	0xC8);
-SBIT(CTI1,	0xC9);
-SBIT(CTI2,	0xCA);
-SBIT(CTI3,	0xCB);
-SBIT(CMI0,	0xCC);
-SBIT(CMI1,	0xCD);
-SBIT(CMI2,	0xCE);
-SBIT(T20V,	0xCF);
+SBIT(CTI0,	0xC8,	0);
+SBIT(CTI1,	0xC8,	1);
+SBIT(CTI2,	0xC8,	2);
+SBIT(CTI3,	0xC8,	3);
+SBIT(CMI0,	0xC8,	4);
+SBIT(CMI1,	0xC8,	5);
+SBIT(CMI2,	0xC8,	6);
+SBIT(T20V,	0xC8,	7);
 #endif
 
 #ifdef TMH2_AT_0XED
@@ -4416,14 +4419,14 @@ SFR(WCON,	0x96); // AT89S53 specific
 // DS80C320 - 390, DS89C420, etc. specific
 SFR(WDCON,	0xD8);
 //  Bit registers
-SBIT(RWT,		0xD8);
-SBIT(EWT,		0xD9);
-SBIT(WTRF,		0xDA);
-SBIT(WDIF,		0xDB);
-SBIT(PFI,		0xDC);
-SBIT(EPFI,		0xDD);
-SBIT(POR,		0xDE);
-SBIT(SMOD_1,	0xDF);
+SBIT(RWT,		0xD8,	0);
+SBIT(EWT,		0xD8,	1);
+SBIT(WTRF,		0xD8,	2);
+SBIT(WDIF,		0xD8,	3);
+SBIT(PFI,		0xD8,	4);
+SBIT(EPFI,		0xD8,	5);
+SBIT(POR,		0xD8,	6);
+SBIT(SMOD_1,	0xD8,	7);
 #endif
 
 #ifdef WDTPRG_AT_0XA7

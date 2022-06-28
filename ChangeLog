@@ -1,3 +1,15 @@
+2022-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c55.h,
+	  device/include/mcs51/at89x51.h,
+	  device/include/mcs51/at89x52.h,
+	  device/include/mcs51/C8051F040.h,
+	  device/include/mcs51/C8051F060.h,
+	  device/include/mcs51/mcs51reg.h,
+	  device/include/mcs51/reg764.h,
+	  device/include/mcs51/regc515c.h,
+	  device/include/mcs51/sab80515.h: fixed SBIT uses
+
 2022-06-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c,

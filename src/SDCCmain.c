@@ -137,15 +137,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_VERBOSE_ASM          "--fverbose-asm"
 #define OPTION_OPT_CODE_SPEED       "--opt-code-speed"
 #define OPTION_OPT_CODE_SIZE        "--opt-code-size"
-#define OPTION_STD_C89              "--std-c89"
-#define OPTION_STD_C95              "--std-c95"
-#define OPTION_STD_C99              "--std-c99"
-#define OPTION_STD_C11              "--std-c11"
-#define OPTION_STD_C2X              "--std-c2x"
-#define OPTION_STD_SDCC89           "--std-sdcc89"
-#define OPTION_STD_SDCC99           "--std-sdcc99"
-#define OPTION_STD_SDCC11           "--std-sdcc11"
-#define OPTION_STD_SDCC2X           "--std-sdcc2x"
+#define OPTION_STD                  "--std"
 #define OPTION_CODE_SEG             "--codeseg"
 #define OPTION_CONST_SEG            "--constseg"
 #define OPTION_DATA_SEG             "--dataseg"
@@ -198,15 +190,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
   {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
   {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0,   OPTION_STD_C89, NULL, "Use ISO C90 (aka ANSI C89) standard (slightly incomplete)"},
-  {0,   OPTION_STD_SDCC89, NULL, "Use ISO C90 (aka ANSI C89) standard with SDCC extensions"},
-  {0,   OPTION_STD_C95, NULL, "Use ISO C95 (aka ISO C94) standard (slightly incomplete)"},
-  {0,   OPTION_STD_C99, NULL, "Use ISO C99 standard (incomplete)"},
-  {0,   OPTION_STD_SDCC99, NULL, "Use ISO C99 standard with SDCC extensions"},
-  {0,   OPTION_STD_C11, NULL, "Use ISO C11 standard (incomplete)"},
-  {0,   OPTION_STD_SDCC11, NULL, "Use ISO C11 standard with SDCC extensions (default)"},
-  {0,   OPTION_STD_C2X, NULL, "Use ISO C2X standard (incomplete)"},
-  {0,   OPTION_STD_SDCC2X, NULL, "Use ISO C2X standard with SDCC extensions"},
+  {0,   OPTION_STD, NULL, "Determine the language standard (c89, c99, c11, c2x, sdcc89 etc.)"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0,   OPTION_SIGNED_CHAR, &options.signed_char, "Make \"char\" signed by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
@@ -294,9 +278,7 @@ typedef struct
 
 static const UNSUPPORTEDOPT unsupportedOptTable[] = {
   {'X', NULL, "use --xstack-loc instead"},
-  {'i', NULL, "use --idata-loc instead"},
   {'r', NULL, "use --xdata-loc instead"},
-  {'s', NULL, "use --code-loc instead"},
   {'Y', NULL, "use -I instead"},
   {0, "--fommit-frame-pointer", "use --fomit-frame-pointer instead"},
 };
@@ -784,15 +766,66 @@ _setModel (int model, const char *sz)
     werror (W_UNSUPPORTED_MODEL, sz, port->target);
 }
 
+/** Behaves like strcmp, but also returns 0 if s1 is longer, provided that
+    the first excess char is contained in 'delimiters'.
+    In case of a match, also sets charsConsumed to the number of chars
+    consumed, including delimiter.
+    If both first chars of s2 are dashes, but only the first of s1 is,
+    allowSingleDashLong causes the first char of s2 to be ignored.
+*/
+int
+optstrcmp (const char *s1, const char *s2, const char *delimiters, bool allowSingleDashLong, size_t *charsConsumed)
+{
+  /* special handling for single-dash long options */
+  bool isSingleDash = false;
+  if (allowSingleDashLong && s2 && s2[0] == '-' && s2[1] == '-' && s1 && s1[0] == '-' && s1[1] != '-')
+    {
+      s2++;
+      isSingleDash = true;
+    }
+
+  int l2 = strlen (s2);
+  int result = strncmp (s1, s2, l2);
+
+  /* already different? */
+  if (result != 0)
+    return result;
+
+  /* strings identical? */
+  if (s1[l2] == '\0')
+    {
+      if (charsConsumed)
+        *charsConsumed = l2;
+      if (isSingleDash)
+        werror (W_SINGLE_DASH_LONG_OPT, s2);
+      return 0;
+    }
+
+  /* count as matching if first excess char is in delimiters */
+  if (strspn (s1 + l2, delimiters))
+    {
+      if (charsConsumed)
+        *charsConsumed = l2 + 1;
+      if (isSingleDash)
+        werror (W_SINGLE_DASH_LONG_OPT, s2);
+      return 0;
+    }
+
+  /* first excess char was not in delimiters */
+  return 1;
+}
+
 /** Gets the string argument to this option.  If the option is '--opt'
-    then for input of '--optxyz' or '--opt xyz' returns xyz.
+    then for input of '--optxyz' or '--opt xyz' returns xyz, provided that
+    skipChars equals the length of the option.  The skipChars parameter
+    simplifies the handling of option variants.
 */
 char *
-getStringArg (const char *szStart, char **argv, int *pi, int argc)
+getStringArgEx (const char *szStart, size_t skipChars, char **argv, int *pi, int argc)
 {
-  if (argv[*pi][strlen (szStart)])
+  if (argv[*pi][skipChars])
     {
-      return &argv[*pi][strlen (szStart)];
+      return &argv[*pi][skipChars];
     }
   else
     {
@@ -810,15 +843,24 @@ getStringArg (const char *szStart, char **argv, int *pi, int argc)
     }
 }
 
+/** Gets the string argument to this option.  If the option is '--opt'
+    then for input of '--optxyz' or '--opt xyz' returns xyz.
+*/
+char *
+getStringArg (const char *szStart, char **argv, int *pi, int argc)
+{
+  return getStringArgEx (szStart, strlen (szStart), argv, pi, argc);
+}
+
 /** Gets the integer argument to this option using the same rules as
-    getStringArg.
+    getStringArgEx.
 */
 long
-getIntArg (const char *szStart, char **argv, int *pi, int argc)
+getIntArgEx (const char *szStart, size_t skipChars, char **argv, int *pi, int argc)
 {
   char *p;
   int val;
-  char *str = getStringArg (szStart, argv, pi, argc);
+  char *str = getStringArgEx (szStart, skipChars, argv, pi, argc);
 
   val = strtol (str, &p, 0);
   if (p == str || *p != '\0')
@@ -828,6 +870,15 @@ getIntArg (const char *szStart, char **argv, int *pi, int argc)
       exit (EXIT_FAILURE);
     }
   return val;
+}
+
+/** Gets the integer argument to this option using the same rules as
+    getStringArg.
+*/
+long
+getIntArg (const char *szStart, char **argv, int *pi, int argc)
+{
+  return getIntArgEx (szStart, strlen (szStart), argv, pi, argc);
 }
 
 static void
@@ -1025,8 +1076,12 @@ parseCmdLine (int argc, char **argv)
         }
 
       /* options */
-      if (argv[i][0] == '-' && argv[i][1] == '-')
+      if (argv[i][0] == '-')
         {
+
+          /* handle (usually double-dash) long options, first */
+          size_t charsConsumed = 0;
+
           if (strcmp (argv[i], OPTION_USE_STDOUT) == 0)
             {
               if (options.use_stdout == 0)
@@ -1085,18 +1140,18 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
+          if (optstrcmp (argv[i], OPTION_XRAM_LOC, "=", false, &charsConsumed) == 0)
             {
-              int val = getIntArg (OPTION_XRAM_LOC, argv, &i, argc);
+              int val = getIntArgEx (OPTION_XRAM_LOC, charsConsumed, argv, &i, argc);
               if (options.xdata_loc == options.xstack_loc)
                 options.xstack_loc = val;
               options.xdata_loc = val;
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
+          if (optstrcmp (argv[i], OPTION_XRAM_SIZE, "=", false, &charsConsumed) == 0)
             {
-              options.xram_size = getIntArg (OPTION_XRAM_SIZE, argv, &i, argc);
+              options.xram_size = getIntArgEx (OPTION_XRAM_SIZE, charsConsumed, argv, &i, argc);
               options.xram_size_set = TRUE;
               continue;
             }
@@ -1159,9 +1214,9 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_DISABLE_WARNING) == 0)
+          if (optstrcmp (argv[i], OPTION_DISABLE_WARNING, "=", false, &charsConsumed) == 0)
             {
-              int w = getIntArg (OPTION_DISABLE_WARNING, argv, &i, argc);
+              int w = getIntArgEx (OPTION_DISABLE_WARNING, charsConsumed, argv, &i, argc);
               setWarningDisabled (w);
               continue;
             }
@@ -1173,126 +1228,136 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_STD_C89) == 0)
+          if (optstrcmp (argv[i], OPTION_STD, "=-", true, &charsConsumed) == 0)
             {
-              options.std_c95 = 0;
-              options.std_c99 = 0;
-              options.std_c11 = 0;
-              options.std_c2x = 0;
-              options.std_sdcc = 0;
-              continue;
+              char *langVer = getStringArgEx (OPTION_CODE_SEG, charsConsumed, argv, &i, argc);
+
+              if (strcmp (langVer, "c89") == 0 || strcmp (langVer, "c90") == 0 || strcmp (langVer, "iso9899:1990") == 0)
+                {
+                  options.std_c95 = 0;
+                  options.std_c99 = 0;
+                  options.std_c11 = 0;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 0;
+                  continue;
+                }
+
+              if (strcmp (langVer, "c95") == 0 || strcmp (langVer, "iso9899:199409") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 0;
+                  options.std_c11 = 0;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 0;
+                  continue;
+                }
+
+              if (strcmp (langVer, "c99") == 0 || strcmp (langVer, "iso9899:1999") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 0;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 0;
+                  continue;
+                }
+
+              if (strcmp (langVer, "c11") == 0 || strcmp (langVer, "iso9899:2011") == 0 || strcmp (langVer, "c17") == 0 ||
+                  strcmp (langVer, "iso9899:2017") == 0 || strcmp (langVer, "c18") == 0 || strcmp (langVer, "iso9899:2018") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 1;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 0;
+                  continue;
+                }
+
+              if (strcmp (langVer, "c2x") == 0 || strcmp (langVer, "c23") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 1;
+                  options.std_c2x = 1;
+                  options.std_sdcc = 0;
+                  continue;
+                }
+
+              if (strcmp (langVer, "sdcc89") == 0 || strcmp (langVer, "sdcc90") == 0)
+                {
+                  options.std_c95 = 0;
+                  options.std_c99 = 0;
+                  options.std_c11 = 0;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 1;
+                  continue;
+                }
+
+              if (strcmp (langVer, "sdcc99") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 0;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 1;
+                  continue;
+                }
+
+              if (strcmp (langVer, "sdcc11") == 0 || strcmp (langVer, "sdcc17") == 0 || strcmp (langVer, "sdcc18") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 1;
+                  options.std_c2x = 0;
+                  options.std_sdcc = 1;
+                  continue;
+                }
+
+              if (strcmp (langVer, "sdcc2x") == 0 || strcmp (langVer, "sdcc23") == 0)
+                {
+                  options.std_c95 = 1;
+                  options.std_c99 = 1;
+                  options.std_c11 = 1;
+                  options.std_c2x = 1;
+                  options.std_sdcc = 1;
+                  continue;
+                }
+
+              /* if we reach this point, the requested language standard is not supported */
+              werror (E_UNKNOWN_LANGUAGE_STANDARD, langVer);
+              exit (EXIT_FAILURE);
             }
 
-          if (strcmp (argv[i], OPTION_STD_C95) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 0;
-              options.std_c11 = 0;
-              options.std_c2x = 0;
-              options.std_sdcc = 0;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_C99) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 0;
-              options.std_c2x = 0;
-              options.std_sdcc = 0;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_C11) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 1;
-              options.std_c2x = 0;
-              options.std_sdcc = 0;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_C2X) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 1;
-              options.std_c2x = 1;
-              options.std_sdcc = 0;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_SDCC89) == 0)
-            {
-              options.std_c95 = 0;
-              options.std_c99 = 0;
-              options.std_c11 = 0;
-              options.std_c2x = 0;
-              options.std_sdcc = 1;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_SDCC99) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 0;
-              options.std_c2x = 0;
-              options.std_sdcc = 1;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_SDCC11) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 1;
-              options.std_c2x = 0;
-              options.std_sdcc = 1;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_STD_SDCC2X) == 0)
-            {
-              options.std_c95 = 1;
-              options.std_c99 = 1;
-              options.std_c11 = 1;
-              options.std_c2x = 1;
-              options.std_sdcc = 1;
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_CODE_SEG) == 0)
+          if (optstrcmp (argv[i], OPTION_CODE_SEG, "=", false, &charsConsumed) == 0)
             {
               struct dbuf_s segname;
 
               dbuf_init (&segname, 16);
-              dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CODE_SEG, argv, &i, argc));
+              dbuf_printf (&segname, "%-8s(CODE)", getStringArgEx (OPTION_CODE_SEG, charsConsumed, argv, &i, argc));
               if (options.code_seg)
                 Safe_free (options.code_seg);
               options.code_seg = dbuf_detach (&segname);
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_CONST_SEG) == 0)
+          if (optstrcmp (argv[i], OPTION_CONST_SEG, "=", false, &charsConsumed) == 0)
             {
               struct dbuf_s segname;
 
               dbuf_init (&segname, 16);
-              dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CONST_SEG, argv, &i, argc));
+              dbuf_printf (&segname, "%-8s(CODE)", getStringArgEx (OPTION_CONST_SEG, charsConsumed, argv, &i, argc));
               if (options.const_seg)
                 Safe_free (options.const_seg);
               options.const_seg = dbuf_detach (&segname);
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_DATA_SEG) == 0)
+          if (optstrcmp (argv[i], OPTION_DATA_SEG, "=", false, &charsConsumed) == 0)
             {
               struct dbuf_s segname;
 
               dbuf_init (&segname, 16);
-              dbuf_printf (&segname, "%-8s(DATA)", getStringArg (OPTION_DATA_SEG, argv, &i, argc));
+              dbuf_printf (&segname, "%-8s(DATA)", getStringArgEx (OPTION_DATA_SEG, charsConsumed, argv, &i, argc));
               if (options.data_seg)
                 Safe_free (options.data_seg);
               options.data_seg = dbuf_detach (&segname);
@@ -1319,20 +1384,23 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
-          if (strcmp (argv[i], OPTION_INCLUDE) == 0)
+          if (optstrcmp (argv[i], OPTION_INCLUDE, "=", true, &charsConsumed) == 0)
             {
               addSet (&preArgvSet, Safe_strdup ("-include"));
-              addSet (&preArgvSet, getStringArg (OPTION_INCLUDE, argv, &i, argc));
+              addSet (&preArgvSet, getStringArgEx (OPTION_INCLUDE, charsConsumed, argv, &i, argc));
               continue;
             }
 
-          werror (W_UNKNOWN_OPTION, argv[i]);
-          continue;
-        }
+          /* if it is a long option, but none of the above, it is unknown */
 
-      /* if preceded by  '-' then option */
-      if (*argv[i] == '-')
-        {
+          if (argv[i][0] == '-' && argv[i][1] == '-')
+            {
+              werror (W_UNKNOWN_OPTION, argv[i]);
+              continue;
+            }
+
+          /* single-dash short options */
+
           switch (argv[i][1])
             {
             case 'h':

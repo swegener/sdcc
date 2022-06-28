@@ -14975,7 +14975,279 @@ status collapsed
 
 \end_inset
 
--std-sdcc89
+-std-<arg>
+\series default
+ Determine the language standard.
+ For enhanced compatibility with other compilers, 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std
+\series default
+ can also be used with a single dash (i.e.
+ 
+\series bold
+-std
+\series default
+) and with 
+\series bold
+=
+\series default
+ or 
+\series bold
+
+\begin_inset space \textvisiblespace{}
+\end_inset
+
+
+\series default
+ (whitespace) as delimiter.
+ The language standard, specified via 
+\series bold
+<arg>
+\series default
+, can be one of the following:
+\end_layout
+
+\begin_deeper
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c89 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ANSI C89 / ISO C90 standard.
+ Alternative spellings: 
+\series bold
+c90
+\series default
+, 
+\series bold
+iso9899:1990
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c95 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc99
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C90 standard as modified in amendment 1.
+ Alternative spelling: 
+\series bold
+iso9899:199409
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c99 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc99
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C99 standard.
+ Alternative spelling: 
+\series bold
+iso9899:1999
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c11 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc11
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C11 standard.
+ Alternative spelling: 
+\series bold
+iso9899:2011
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c17 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc17
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C17 standard.
+ Alternative spellings: 
+\series bold
+iso9899:2017
+\series default
+, 
+\series bold
+c18
+\series default
+, 
+\series bold
+iso9899:2018
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+c2x 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C2X standard.
+ Alternative spelling: 
+\series bold
+c23
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+sdcc89 
 \begin_inset Index idx
 status collapsed
 
@@ -15002,71 +15274,16 @@ status collapsed
 \series default
  Generally follow the ANSI C89 / ISO C90 standard, but allow some SDCC behaviour
  that conflicts with the standard.
+ Alternative spelling: 
+\series bold
+sdcc90
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- Follow the ANSI C89 / ISO C90 standard.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc99
+sdcc99 
 \begin_inset Index idx
 status collapsed
 
@@ -15099,67 +15316,9 @@ status collapsed
 \labelwidthstring 00.00.0000
 
 \series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
+sdcc11 
 \begin_inset Index idx
 status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc99
-\end_layout
-
-\end_inset
-
-
-\series default
- Follow the ISO C99 standard.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc11
-\begin_inset Index idx
-status open
 
 \begin_layout Plain Layout
 -
@@ -15190,20 +15349,7 @@ status collapsed
 \labelwidthstring 00.00.0000
 
 \series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c11
+sdcc17 
 \begin_inset Index idx
 status collapsed
 
@@ -15221,36 +15367,27 @@ status collapsed
 
 \end_inset
 
--std-sdcc11
+-std-sdcc17
 \end_layout
 
 \end_inset
 
 
 \series default
- Follow the ISO C11 standard.
+ Generally follow the ISO C17 standard, but allow some SDCC behaviour that
+ conflicts with the standard.
+ Alternative spelling: 
+\series bold
+sdcc18
 \end_layout
 
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 
 \series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc2x
+sdcc2x 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -15274,54 +15411,13 @@ status collapsed
 
 \series default
  Generally follow the ISO C2X standard, but allow some SDCC behaviour that
- conflicts with the standard (default).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
+ conflicts with the standard.
+ Alternative spelling: 
 \series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
+sdcc23
 \end_layout
 
-\end_inset
-
--std-c2x
-\begin_inset Index idx
-status open
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc2x
-\end_layout
-
-\end_inset
-
-
-\series default
- Follow the ISO C2X standard.
-\end_layout
-
+\end_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 

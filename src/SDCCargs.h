@@ -61,7 +61,9 @@ typedef struct
     enum cl_opt_arg_type arg_type;
   } OPTION;
 
+char *getStringArgEx(const char *szStart, size_t skipChars, char **argv, int *pi, int argc);
 char *getStringArg(const char *szStart, char **argv, int *pi, int argc);
+long getIntArgEx(const char *szStart, size_t skipChars, char **argv, int *pi, int argc);
 long getIntArg(const char *szStart, char **argv, int *pi, int argc);
 
 #endif

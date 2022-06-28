@@ -306,6 +306,8 @@ enum {
   E_DECIMAL_FLOAT_UNSUPPORTED   = 276, /* decimal floating-point numbers are not supported */
   E_ATOMIC_UNSUPPORTED          = 277, /* atomics are not supported */
   W_RETURN_TYPE_OMITTED_INT     = 278, /* return type of function omitted, assuming int */
+  W_SINGLE_DASH_LONG_OPT        = 279, /* use of single-dash long options is discouraged */
+  E_UNKNOWN_LANGUAGE_STANDARD   = 280, /* unknown language standard */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -3,9 +3,11 @@ COMMON_FLOAT = \
   _schar2fs.c \
   _sint2fs.c \
   _slong2fs.c \
+  _slonglong2fs.c \
   _uchar2fs.c \
   _uint2fs.c \
   _ulong2fs.c \
+  _ulonglong2fs.c \
   _fs2schar.c \
   _fs2sint.c \
   _fs2slong.c \

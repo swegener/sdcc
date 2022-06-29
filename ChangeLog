@@ -1,3 +1,21 @@
+2022-06-29 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/lib/_slonglong2fs.c,
+	  device/lib/_ulonglong2fs.c,
+	  device/lib/incl.mk,
+	  doc/sdccman.lyx,
+	  support/regression/cases/Makefile.in:
+	  Implement long long to float conversion, fixing bug #3396.
+
+2022-06-28 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCCargs.h,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h
+	  src/SDCCmain.c:
+	  Improve command line parser flexibility and GCC compatibility.
+
 2022-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89c55.h,

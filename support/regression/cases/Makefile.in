@@ -924,10 +924,6 @@ TCC_SKIP_TESTS += \
 # Relies on implementation extensions common on GNU/Linux
 TCC_SKIP_TESTS += \
 	86_memory-model.c
-	
-# long long to float conversion function missing - Bug #3396
-TCC_SKIP_TESTS += \
-	110_average.c
 
 TCC_TESTS = $(filter-out $(TCC_SKIP_TESTS), $(TCC_TESTS_WC))
 

@@ -32218,7 +32218,7 @@ SDCC supports (single precision 4 bytes) floating point numbers; the format
 
 \size footnotesize
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="2">
+<lyxtabular version="3" rows="19" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -32321,7 +32321,7 @@ _fssub.c
 \bar no
 \noun off
 \color none
-subtract floating point numbers 
+subtract floating point numbers
 \end_layout
 
 \end_inset
@@ -32359,7 +32359,7 @@ _fsdiv.c
 \bar no
 \noun off
 \color none
-divide floating point numbers 
+divide floating point numbers
 \end_layout
 
 \end_inset
@@ -32397,7 +32397,7 @@ _fsmul.c
 \bar no
 \noun off
 \color none
-multiply floating point numbers 
+multiply floating point numbers
 \end_layout
 
 \end_inset
@@ -32455,7 +32455,7 @@ convert floating point to unsigned char
 \bar no
 \noun off
 \color none
-_fs2char.c
+_fs2schar.c
 \end_layout
 
 \end_inset
@@ -32531,7 +32531,7 @@ convert floating point to unsigned int
 \bar no
 \noun off
 \color none
-_fs2int.c
+_fs2sint.c
 \end_layout
 
 \end_inset
@@ -32615,7 +32615,7 @@ convert floating point to unsigned long
 \bar no
 \noun off
 \color none
-_fs2long.c
+_fs2slong.c
 \end_layout
 
 \end_inset
@@ -32691,7 +32691,7 @@ convert unsigned char to floating point
 \bar no
 \noun off
 \color none
-_char2fs.c
+_schar2fs.c
 \end_layout
 
 \end_inset
@@ -32709,7 +32709,7 @@ _char2fs.c
 \bar no
 \noun off
 \color none
-convert char to floating point number
+convert signed char to floating point
 \end_layout
 
 \end_inset
@@ -32767,7 +32767,7 @@ convert unsigned int to floating point
 \bar no
 \noun off
 \color none
-_int2fs.c
+_sint2fs.c
 \end_layout
 
 \end_inset
@@ -32785,7 +32785,7 @@ _int2fs.c
 \bar no
 \noun off
 \color none
-convert int to floating point numbers
+convert signed int to floating point
 \end_layout
 
 \end_inset
@@ -32823,7 +32823,65 @@ _ulong2fs.c
 \bar no
 \noun off
 \color none
-convert unsigned long to floating point number
+convert unsigned long to floating point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+_slong2fs.c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+convert signed long to floating point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+_ulonglong2fs.c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+convert unsigned long long to floating point
 \end_layout
 
 \end_inset
@@ -32834,16 +32892,7 @@ convert unsigned long to floating point number
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\noun off
-\color none
-_long2fs.c
+_slonglong2fs.c
 \end_layout
 
 \end_inset
@@ -32852,16 +32901,7 @@ _long2fs.c
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\noun off
-\color none
-convert long to floating point number
+convert singed long long to floating point
 \end_layout
 
 \end_inset

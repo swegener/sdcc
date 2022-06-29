@@ -41,6 +41,30 @@
 #define FLT_MAX_EXP     (+128)
 #define FLT_MAX         3.402823466E+38F
 #define FLT_MAX_10_EXP  (+38)
+#if __STDC_VERSION__ >= 201112L
+#define FLT_DECIMAL_DIG 9
+#define FLT_TRUE_MIN    1.175494351E-38F
+#define FLT_HAS_SUBNORM 0
+#endif
+
+#if __SIZEOF_DOUBLE__ == 4
+
+#define DBL_MANT_DIG    FLT_MANT_DIG
+#define DBL_EPSILON     FLT_EPSILON
+#define DBL_DIG         FLT_DIG
+#define DBL_MIN_EXP     FLT_MIN_EXP
+#define DBL_MIN         FLT_MIN
+#define DBL_MIN_10_EXP  FLT_MIN_10_EXP
+#define DBL_MAX_EXP     FLT_MAX_EXP
+#define DBL_MAX         FLT_MAX
+#define DBL_MAX_10_EXP  FLT_MAX_10_EXP
+#if __STDC_VERSION__ >= 201112L
+#define DBL_DECIMAL_DIG FLT_DECIMAL_DIG
+#define DBL_TRUE_MIN    FLT_TRUE_MIN
+#define DBL_HAS_SUBNORM FLT_HAS_SUBNORM
+#endif
+
+#endif
 
 /* the following deal with IEEE single-precision numbers */
 #if defined(__SDCC_FLOAT_LIB)

@@ -1,5 +1,11 @@
 2022-06-29 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* device/include/float.h,
+	  src/SDCCmain.c:
+	  Provide macros for double, as requested in [feature-requests:#304].
+
+2022-06-29 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* device/lib/_slonglong2fs.c,
 	  device/lib/_ulonglong2fs.c,
 	  device/lib/incl.mk,

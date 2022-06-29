@@ -2333,6 +2333,10 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32
 
+      /* set __SIZEOF_x__ macros for internal use by the library */
+      addSet (&preArgvSet, Safe_strdup ("-D__SIZEOF_FLOAT__=4"));
+      addSet (&preArgvSet, Safe_strdup ("-D__SIZEOF_DOUBLE__=4"));
+
       /* set macro for BITINT_MAXWIDTH  - an implementation detail, users should only use BITINT_MAXWIDTH from limits.h */
       {
         struct dbuf_s dbuf;

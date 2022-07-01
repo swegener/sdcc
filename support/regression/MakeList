@@ -241,7 +241,8 @@ EXCLUDE_ARCH_pdk += \
 	gte_pr57131 \
 	gte_pr58984 \
 	gte_pr93434 \
-	gte_shiftdi-2
+	gte_shiftdi-2 \
+	tcc_110_average
 EXCLUDE_pdk15-stack-auto += \
 	gte_991019-1 \
 	gte_pr30185 \

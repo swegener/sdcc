@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "port_hwcl.h"
+
 #include "mos6510cl.h"
 
 #include "port10cl.h"
@@ -49,12 +51,29 @@ cl_mos6510::init(void)
 void
 cl_mos6510::mk_hw_elements(void)
 {
-  class cl_hw *h;
+  class cl_port10 *p;
 
   cl_mos6502::mk_hw_elements();
 
-  add_hw(h= new cl_port10(this, "port"));
-  h->init();
+  add_hw(p= new cl_port10(this, "port"));
+  p->init();
+  
+  class cl_port_ui *u= new cl_port_ui(this, 0, "dport");
+  u->init();
+  add_hw(u);
+
+  class cl_port_data d;
+  d.init();
+  d.cell_dir= p->cddr;
+  d.width= 8;
+  d.set_name("port");
+  d.cell_p = p->cdr;
+  d.cell_in= p->cpin;
+  d.keyset = keysets[0];
+  d.basx   = 5;
+  d.basy   = 5;
+  u->add_port(&d, 0);
+  
 }
 
 /*

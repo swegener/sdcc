@@ -16,7 +16,7 @@ for pkg in cmd.src sim.src gui.src motorola.src \
 	   stm8.src st7.src pdk.src p1516.src \
 	   m68hc08.src m6809.src m6800.src m68hc11.src m68hc12.src \
 	   mos6502.src rxk.src \
-	   pblaze.src \
+	   pblaze.src i8085.src \
 	   doc
 do
     echo "Make distclean of package ${pkg} directory..."

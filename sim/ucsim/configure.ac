@@ -194,6 +194,12 @@ if test $enable_pblaze_port  != "no"; then
     enable_pblaze_port="yes"
 fi,
 enable_pblaze_port="yes")
+AC_ARG_ENABLE(i8085-port,
+[  --enable-i8085-port     compile simulator for i8085],
+if test $enable_i8085_port  != "no"; then
+    enable_i8085_port="yes"
+fi,
+enable_i8085_port="no")
 AC_ARG_ENABLE(serio,
 [  --disable-serio         do not compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -225,6 +231,7 @@ AC_SUBST(enable_m68hc12_port)
 AC_SUBST(enable_mos6502_port)
 AC_SUBST(enable_rxk_port)
 AC_SUBST(enable_pblaze_port)
+AC_SUBST(enable_i8085_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -762,6 +769,7 @@ m68hc12.src/Makefile m68hc12.src/test/Makefile
 mos6502.src/Makefile mos6502.src/test/Makefile
 rxk.src/Makefile     rxk.src/test/Makefile
 pblaze.src/Makefile  pblaze.src/test/Makefile
+i8085.src/Makefile   i8085.src/test/Makefile
 p1516.src/Makefile   p1516.src/test/Makefile
 pdk.src/Makefile     pdk.src/test/Makefile
 s51.src/Makefile     s51.src/test/Makefile

@@ -253,6 +253,10 @@ enum cpu_type {
   CPU_65C02	= 0x0100,	// extended inst.set
   CPU_65C02S	= 0x0200,      	// 65C02 variant, different inst.set
   CPU_65CE02	= 0x0400,	// extension of 65C02
+
+  // Intel 8080, 8085
+  CPU_I8080	= 0x0001,
+  CPU_I8085	= 0x0002,
   
   // technology
   CPU_CMOS	= 0x0001,

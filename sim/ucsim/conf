@@ -52,7 +52,7 @@ case $TARGET in
 	fi
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
-		    --enable-m68hc12-port \
+		    --enable-i8085-port \
 		    "$@"
 	#--enable-ucsim
 	;;
@@ -75,7 +75,7 @@ case $TARGET in
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
-		    --enable-m68hc12-port \
+		    --enable-i8085-port \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
@@ -87,7 +87,7 @@ case $TARGET in
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
-		    --enable-m68hc12-port \
+		    --enable-i8085-port \
 		    $HOST_OPT "$@"
 	;;	
     w64)
@@ -98,7 +98,7 @@ case $TARGET in
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
-		    --enable-m68hc12-port \
+		    --enable-i8085-port \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;

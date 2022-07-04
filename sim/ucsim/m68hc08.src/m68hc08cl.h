@@ -50,6 +50,7 @@ public:
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
+  virtual void make_cpu_hw(void);
   virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);

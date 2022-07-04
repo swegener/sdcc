@@ -138,9 +138,15 @@ cl_hc08::mk_hw_elements(void)
 
   add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
-  
-  add_hw(h= new cl_hc08_cpu(this));
-  h->init();
+}
+
+
+void
+cl_hc08::make_cpu_hw(void)
+{
+  cpu= new cl_hc08_cpu(this);
+  add_hw(cpu);
+  cpu->init();
 }
 
 void

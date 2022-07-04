@@ -920,7 +920,8 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 
   cmdset->add(cmd= new cl_quit_cmd("quit", 0));
   cmd->init();
-
+  cmd->add_name("exit");
+  
   cmdset->add(cmd= new cl_kill_cmd("kill", 0));
   cmd->init();
 

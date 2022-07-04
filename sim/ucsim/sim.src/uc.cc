@@ -3186,6 +3186,20 @@ cl_uc::touch(void)
  */
 
 void
+cl_uc::stack_write(void)
+{
+  stack_check_overflow();
+  return ;
+}
+
+void
+cl_uc::stack_write(t_addr sp_before)
+{
+  stack_check_overflow(sp_before);
+  return ;
+}
+
+void
 cl_uc::stack_write(class cl_stack_op *op)
 {
   stack_check_overflow(op);
@@ -3200,6 +3214,12 @@ cl_uc::stack_write(class cl_stack_op *op)
       return;
     }
   stack_ops->push(op);
+}
+
+void
+cl_uc::stack_read(void)
+{
+  return ;
 }
 
 void
@@ -3286,6 +3306,16 @@ cl_uc::stack_read(class cl_stack_op *op)
 
 void
 cl_uc::stack_check_overflow(class cl_stack_op *op)
+{
+}
+
+void
+cl_uc::stack_check_overflow(void)
+{
+}
+
+void
+cl_uc::stack_check_overflow(t_addr sp_before)
 {
 }
 

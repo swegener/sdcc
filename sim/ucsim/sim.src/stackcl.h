@@ -191,6 +191,7 @@ protected:
   t_addr PC, SP_before, SP_after;
 public:
   cl_error_stack_overflow(class cl_stack_op *op);
+  cl_error_stack_overflow(t_addr iPC, t_addr SPbef, t_addr SPaft);
   virtual void print(class cl_commander_base *c);
 };
   

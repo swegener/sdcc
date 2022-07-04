@@ -425,8 +425,13 @@ public:
   
   // stack tracking
   virtual void stack_write(class cl_stack_op *op);
+  virtual void stack_write(void);
+  virtual void stack_write(t_addr sp_before);
   virtual void stack_read(class cl_stack_op *op);
+  virtual void stack_read(void);
   virtual void stack_check_overflow(class cl_stack_op *op);
+  virtual void stack_check_overflow(void);
+  virtual void stack_check_overflow(t_addr sp_before);
   
   // breakpoints
   virtual class cl_fetch_brk *fbrk_at(t_addr addr);

@@ -448,6 +448,16 @@ cl_error_stack_overflow::cl_error_stack_overflow(class cl_stack_op *op):
   SP_after= op->get_after();
 }
 
+cl_error_stack_overflow::cl_error_stack_overflow(t_addr iPC,
+						 t_addr SPbef,
+						 t_addr SPaft):
+  cl_error_stack()
+{
+  PC= iPC;
+  SP_before= SPbef;
+  SP_after= SPaft;
+}
+
 void
 cl_error_stack_overflow::print(class cl_commander_base *c)
 {

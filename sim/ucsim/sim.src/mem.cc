@@ -722,42 +722,21 @@ cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell):
     {
       mask= ~0;
     }
-  next_operator= 0;
 }
 
 t_mem
 cl_memory_operator::read(void)
 {
-  if (next_operator)
-    return(next_operator->read());
-  else if (cell)
-    return(cell->get());
-  return 0;
-}
-
-t_mem
-cl_memory_operator::read(class cl_memory_cell *owner)
-{
   if (cell)
-    return cell->get();
+    return(cell->get());
   return 0;
 }
 
 t_mem
 cl_memory_operator::write(t_mem val)
 {
-  if (next_operator)
-    return(next_operator->write(val));
-  else if (cell)
-    return(cell->set(val));
-  return val;
-}
-
-t_mem
-cl_memory_operator::write(class cl_memory_cell *owner, t_mem val)
-{
-  if (cell)
-    return cell->set(val);
+  /*if (cell)
+    return(cell->set(val));*/
   return val;
 }
 
@@ -775,8 +754,6 @@ cl_bank_switcher_operator::cl_bank_switcher_operator(class cl_memory_cell *acell
 t_mem
 cl_bank_switcher_operator::write(t_mem val)
 {
-  if (next_operator)
-    next_operator->write(val);
   if (cell)
     cell->set(val);
   banker->activate(NULL);
@@ -785,16 +762,6 @@ cl_bank_switcher_operator::write(t_mem val)
   return 0;  
 }
 
-t_mem
-cl_bank_switcher_operator::write(class cl_memory_cell *owner, t_mem val)
-{
-  if (cell)
-    cell->set(val);
-  banker->activate(NULL);
-  if (cell)
-    return cell->get();
-  return val;
-}
 
 /* Memory operator for hw callbacks */
 
@@ -821,35 +788,14 @@ cl_hw_operator::read(void)
       return d1;
     }
   
-  if (next_operator)
-    return next_operator->read();
-
-  return 0;
-}
-
-t_mem
-cl_hw_operator::read(class cl_memory_cell *owner)
-{
-  t_mem d1= 0, d2= 0;
-
-  if (cell) d2= cell->get();
-  if (hw)
-    {
-      bool act= hw->active;
-      hw->active = true;
-      d1= hw->read(cell);
-      hw->active = act;
-      return d1;
-    }
-  return d2;
+  return cl_memory_operator::read();
 }
 
 t_mem
 cl_hw_operator::read(enum hw_cath skip)
 {
-  t_mem d1= 0, d2= 0;
+  t_mem d1= 0;
 
-  if (cell) d2= cell->get();
   if (hw && (hw->category != skip))
     {
       bool act= hw->active;
@@ -859,27 +805,7 @@ cl_hw_operator::read(enum hw_cath skip)
       return d1;
     }
 
-  if (next_operator)
-    d2= next_operator->read();
-  return d2;
-}
-
-t_mem
-cl_hw_operator::read(class cl_memory_cell *owner, enum hw_cath skip)
-{
-  t_mem d1= 0, d2= 0;
-
-  if (cell) d2= cell->get();
-  if (hw && (hw->category != skip))
-    {
-      bool act= hw->active;
-      hw->active= true;
-      d1= hw->read(cell);
-      hw->active= act;
-      return d1;
-    }
-
-  return d2;
+  return cl_memory_operator::read();
 }
 
 t_mem
@@ -894,21 +820,6 @@ cl_hw_operator::write(t_mem val)
       return val;
     }
 
-  if (next_operator)
-    val= next_operator->write(val);
-  return val;
-}
-
-t_mem
-cl_hw_operator::write(class cl_memory_cell *owner, t_mem val)
-{
-  if (hw)
-    {
-      bool act= hw->active;
-      hw->active= true;
-      hw->write(cell, &val);
-      hw->active= act;
-    }
   return val;
 }
 
@@ -929,22 +840,11 @@ cl_write_operator::write(t_mem val)
 {
   if (bp->do_hit())
     uc->events->add(bp);
-  if (next_operator)
-    return(next_operator->write(val));
-  else if (cell)
-    return(cell->set(val));
+  /*if (cell)
+    return(cell->set(val));*/
   return val;
 }
 
-t_mem
-cl_write_operator::write(class cl_memory_cell *owner, t_mem val)
-{
-  if (bp->do_hit())
-    uc->events->add(bp);
-  if (cell)
-    return(cell->set(val));
-  return val;
-}
 
 /* Read event break on cell */
 
@@ -962,20 +862,8 @@ cl_read_operator::read(void)
 {
   if (bp->do_hit())
     uc->events->add(bp);
-  if (next_operator)
-    return(next_operator->read());
-  else if (cell)
-    return(cell->get());
-  return 0;
-}
-
-t_mem
-cl_read_operator::read(class cl_memory_cell *owner)
-{
-  if (bp->do_hit())
-    uc->events->add(bp);
   if (cell)
-    return cell->get();
+    return(cell->get());
   return 0;
 }
 
@@ -1280,7 +1168,7 @@ cl_memory_cell::read(void)
     {
       t_mem r= 0;
       for (int i=0; ops[i]; i++)
-	r= ops[i]->read(this);
+	r= ops[i]->read(/*this*/);
       return r;
     }
   return d();
@@ -1296,7 +1184,7 @@ cl_memory_cell::read(enum hw_cath skip)
     {
       t_mem r;
       for (int i=0; ops[i]; i++)
-	r= ops[i]->read(this, skip);
+	r= ops[i]->read(/*this,*/ skip);
       return r;
     }
   return d();
@@ -1317,7 +1205,7 @@ cl_memory_cell::write(t_mem val)
   if (ops && ops[0])
     {
       for (int i=0; ops[i]; i++)
-	val= ops[i]->write(this, val);
+	val= ops[i]->write(/*this,*/ val);
     }
   if (flags & CELL_READ_ONLY)
     return d();

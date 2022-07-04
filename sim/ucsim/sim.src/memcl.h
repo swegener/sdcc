@@ -136,24 +136,16 @@ class cl_memory_operator: public cl_base
 {
 public:
   t_mem mask;
-  class cl_memory_operator *next_operator;
   class cl_memory_cell *cell;
 public:
-  cl_memory_operator(class cl_memory_cell *acell/*, t_addr addr*/);
-
-  virtual class cl_memory_operator *get_next(void) { return(next_operator); }
-  virtual void set_next(class cl_memory_operator *next) { next_operator= next;}
+  cl_memory_operator(class cl_memory_cell *acell);
 
   virtual bool match(class cl_hw *the_hw) { return(false); }
   virtual bool match(class cl_brk *brk) { return(false); }
 
   virtual t_mem read(void);
   virtual t_mem read(enum hw_cath skip) { return(read()); }
-  virtual t_mem read(class cl_memory_cell *owner, enum hw_cath skip)
-  { return read(owner); }
-  virtual t_mem read(class cl_memory_cell *owner);
   virtual t_mem write(t_mem val);
-  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 
   virtual class cl_banker *get_banker(void) { return NULL; }
 };
@@ -167,7 +159,6 @@ class cl_bank_switcher_operator: public cl_memory_operator
 			    class cl_banker *the_banker);
   
   virtual t_mem write(t_mem val);
-  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
   virtual class cl_banker *get_banker(void) { return banker; }
 };
 
@@ -183,10 +174,7 @@ public:
 
   virtual t_mem read(void);
   virtual t_mem read(enum hw_cath skip);
-  virtual t_mem read(class cl_memory_cell *owner);
-  virtual t_mem read(class cl_memory_cell *owner, enum hw_cath skip);
   virtual t_mem write(t_mem val);
-  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 };
 
 class cl_event_break_operator: public cl_memory_operator
@@ -213,7 +201,6 @@ public:
 		    class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem write(t_mem val);
-  virtual t_mem write(class cl_memory_cell *owner, t_mem val);
 };
 
 class cl_read_operator: public cl_event_break_operator
@@ -223,7 +210,6 @@ public:
 		   class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem read(void);
-  virtual t_mem read(class cl_memory_cell *owner);
 };
 
 

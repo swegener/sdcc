@@ -232,7 +232,7 @@ cl_i8080::dis_M(chars *comment)
 void
 cl_i8080::dis_rp8(chars *comment, int rp)
 {
-  u16_t a;
+  u16_t a= 0;
   switch (rp)
     {
     case 0: a= rBC; break;
@@ -248,7 +248,7 @@ cl_i8080::dis_rp8(chars *comment, int rp)
 void
 cl_i8080::dis_rp16(chars *comment, int rp)
 {
-  u16_t a;
+  u16_t a= 0;
   switch (rp)
     {
     case 0: a= rBC; break;

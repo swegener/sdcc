@@ -53,12 +53,13 @@ cl_i8080::add8(u8_t op, bool add_c, bool is_daa)
 int
 cl_i8080::sub8(u8_t op, bool sub_c, bool cmp)
 {
+  u16_t orga= rA, orgb= op;
   if (sub_c && (rF & flagC))
     op++;
   op= ~op+1;
   u16_t res= rA+op;
   rF&= ~fAll;
-  if (res<=0xff) rF|= flagC;
+  if (/*res<=0xff*/orga<orgb) rF|= flagC;
   if (res&0x80) rF|= flagS;
   res&= 0xff;
   if (!res) rF|= flagZ;
@@ -242,7 +243,7 @@ cl_i8080::RAR(t_mem code)
 int
 cl_i8080::DAA(t_mem code)
 {
-  u8_t org= rA, corr= 0;
+  u8_t corr= 0;
   if (((rA & 0xf) > 9) || (rF & flagA))
     corr= 6;
   u8_t v= rA>>4, c= 10;
@@ -252,7 +253,8 @@ cl_i8080::DAA(t_mem code)
     corr|= 0x60;
   if (corr)
     {
-      /*rF&= ~(flagS|flagZ|flagV|flagP|flagK);
+      /*u8_t org= rA;
+      rF&= ~(flagS|flagZ|flagV|flagP|flagK);
       rA+= corr;
       if (rA&0x80) rF|= flagS;
       if (!rA) rF|= flagZ;

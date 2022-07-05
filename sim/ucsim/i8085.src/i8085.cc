@@ -376,7 +376,7 @@ cl_i8085_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       else
 	cell->set(u->sp_limit);
       break;
-    case i8080cpu_nuof: break;
+    case i8085cpu_nuof: break;
     }
   return cell->get();
 }

@@ -22,6 +22,10 @@ EXCLUDE_host += \
 	gte_20040409-2w \
 	gte_20040409-3w
 
+# Fails when compiled with clang on FreeBSD 13.1 on aarch64
+EXCLUDE_host += \
+	gte_20031003-1
+
 # does not compile on ds390
 EXCLUDE_ds390 += \
 	gte_memcpy-1

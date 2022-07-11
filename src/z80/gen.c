@@ -14162,7 +14162,7 @@ genIfx (iCode *ic, iCode *popIc)
   aopOp (cond, ic, FALSE, TRUE);
 
   /* Special case: Condition is bool */
-  if (IS_BOOL (operandType (cond)) && !aopInReg (cond->aop, 0, A_IDX))
+  if (IS_BOOL (operandType (cond)) && !aopInReg (cond->aop, 0, A_IDX) && !aopInReg (cond->aop, 0, IYL_IDX) && !aopInReg (cond->aop, 0, IYH_IDX))
     {
       if (!regalloc_dry_run)
         {

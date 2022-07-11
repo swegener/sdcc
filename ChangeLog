@@ -2,6 +2,9 @@
 
 	* support/regression/tests/bug-3459.c:
 	  An attempt at creating a regression test for bug #3459.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3456.c:
+	  Fix bug #3456.
 
 2022-07-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

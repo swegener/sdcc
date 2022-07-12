@@ -1,0 +1,31 @@
+/* bug-3456.c
+   Broken implicit casts from pointers to bool (and a wrong warning for other integer types).
+
+   type: bool, intptr_t, uintptr_t
+ */
+
+#include <testfwk.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+
+#pragma disable_warning 155
+
+{type} f(const void *p)
+{
+	return p;
+}
+
+{type} g(const void *p)
+{
+	{type} t = p;
+	return t;
+}
+
+void testBug(void)
+{
+	char c;
+	ASSERT (f(&c));
+	ASSERT (g(&c));
+}
+

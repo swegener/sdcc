@@ -4,6 +4,9 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+#pragma disable_warning 155
+
 /// Test derived from code by SF user "Under4Mhz" in 2022.
 // GPL 2.0
 #include <stdbool.h>
@@ -37,13 +40,15 @@ bool maths_clip_line( maths_point3d *first, maths_point3d *second )
     return onscreen;
 }
 
-void testBug() {
-    ASSERT ( maths_clip_line (0, 0) );
+void testBug( void ) {
+	maths_point3d p;
+    ASSERT ( maths_clip_line (&p, &p) );
+    ASSERT ( !maths_clip_line (0, 0) );
 }
 
 bool maths_clip_visible( const maths_point3d *point ) __z88dk_fastcall
 {
-	return false;
+	return point;
 }
 
 void maths_clip_points( maths_point3d *first, maths_point3d *second )

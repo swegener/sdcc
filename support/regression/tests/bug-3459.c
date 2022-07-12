@@ -26,7 +26,8 @@ bool IsSameTile( int8_t tile1, int8_t tile2 ) {
     return same || seasons || flowers;
 }
 
-void testBug() {
+void
+testBug( void ) {
     ASSERT ( IsSameTile(35,36) );
     ASSERT ( IsSameTile(40,41) );
 }

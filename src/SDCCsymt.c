@@ -2832,7 +2832,7 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
         return 0;
     }
 
-  if (IS_PTR (src) && IS_VOID (dest))
+  if (IS_PTR (src) && (IS_INTEGRAL (dest) || IS_VOID (dest)))
     return -1;
 
   /* if one is a specifier and the other is not */

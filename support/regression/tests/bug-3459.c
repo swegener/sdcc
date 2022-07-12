@@ -28,7 +28,9 @@ bool IsSameTile( int8_t tile1, int8_t tile2 ) {
 
 void
 testBug( void ) {
-    ASSERT ( IsSameTile(35,36) );
-    ASSERT ( IsSameTile(40,41) );
+    ASSERT ( IsSameTile(PICTURE1_TILES + 1, PICTURE1_TILES + 2) );
+    ASSERT ( IsSameTile(PICTURE2_TILES + 2, PICTURE2_TILES + 3) );
+    ASSERT ( IsSameTile(PICTURE1_TILES + 2, PICTURE1_TILES + 3) );
+    ASSERT ( IsSameTile(PICTURE2_TILES + 1, PICTURE2_TILES + 2) );
 }
 

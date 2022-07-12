@@ -9374,10 +9374,16 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         }
       else if (left->aop->type == AOP_LIT)
         {
+          bool pushed_hl = false;
           if (byteOfVal (left->aop->aopu.aop_lit, offset) == 0x00)
             emit3 (A_XOR, ASMOP_A, ASMOP_A);
           else
             cheapMove (ASMOP_A, 0, left->aop, offset, true);
+          if (requiresHL (right->aop) && right->aop->type != AOP_REG && !isPairDead (PAIR_HL, ic))
+            {
+              _push (PAIR_HL);
+              pushed_hl = true;
+            }
           if (size > 1)
             {
               emit3_o (A_CP, ASMOP_A, 0, right->aop, offset);
@@ -9386,6 +9392,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
             }
           else
             emit3_o (A_SUB, ASMOP_A, 0, right->aop, offset);
+          if (pushed_hl)
+            _pop (PAIR_HL);
           size--;
           offset++;
         }
@@ -9563,7 +9571,14 @@ genCmpGt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
-  setupToPreserveCarry (result->aop, left->aop, right->aop);
+  if (max (left->aop->size, right->aop->size) > 1)
+    {
+      if ((requiresHL (IC_RESULT (ic)->aop) && IC_RESULT (ic)->aop->type != AOP_REG || requiresHL (left->aop) && left->aop->type != AOP_REG || requiresHL (right->aop) && right->aop->type != AOP_REG) &&
+        (left->aop->regs[L_IDX] > 0 || left->aop->regs[H_IDX] > 0 || right->aop->regs[L_IDX] > 0 || right->aop->regs[H_IDX] > 0) || !isPairDead (PAIR_HL, ic))
+        UNIMPLEMENTED;
+      else
+        setupToPreserveCarry (result->aop, left->aop, right->aop);
+    }
 
   genCmp (right, left, result, ifx, sign, ic);
 
@@ -9600,7 +9615,14 @@ genCmpLt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
-  setupToPreserveCarry (result->aop, left->aop, right->aop);
+  if (max (left->aop->size, right->aop->size) > 1)
+    {
+      if ((requiresHL (IC_RESULT (ic)->aop) && IC_RESULT (ic)->aop->type != AOP_REG || requiresHL (left->aop) && left->aop->type != AOP_REG || requiresHL (right->aop) && right->aop->type != AOP_REG) &&
+        (left->aop->regs[L_IDX] > 0 || left->aop->regs[H_IDX] > 0 || right->aop->regs[L_IDX] > 0 || right->aop->regs[H_IDX] > 0) || !isPairDead (PAIR_HL, ic))
+        UNIMPLEMENTED;
+      else
+        setupToPreserveCarry (result->aop, left->aop, right->aop);
+    }
 
   genCmp (left, right, result, ifx, sign, ic);
 

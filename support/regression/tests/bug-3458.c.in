@@ -1,4 +1,4 @@
-/* bug-3458.c
+/* bug-3458.c.in
    A bug in tail call optimization of calls between functions using different calling conventions.
    type: char, int, long
  */

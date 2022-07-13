@@ -2617,7 +2617,8 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
                                                                                                                                    let the result be unsigned too */
                              (SPEC_USIGN (etype1)
                               && SPEC_USIGN (etype2) && IS_CHAR (etype1) && IS_CHAR (etype2) && IS_CHAR (reType))) ||
-                             SPEC_USIGN (etype1) && SPEC_USIGN (etype2) && IS_BITINT (rType)) // unsigned _BitInt stays unsigned.
+                             SPEC_USIGN (etype1) && SPEC_USIGN (etype2) && IS_BITINT (rType) ||  // unsigned _BitInt stays unsigned.
+                             SPEC_USIGN (etype1) && SPEC_USIGN (etype2) && bitsForType (etype1) <= bitsForType (reType) && bitsForType (etype2) < bitsForType (reType)) // keep operations on small unsigned bit-fields unsigned.
     SPEC_USIGN (reType) = 1;
   else
     SPEC_USIGN (reType) = 0;

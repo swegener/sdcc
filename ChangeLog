@@ -3,6 +3,8 @@
 	* src/SDCCsymt.c,
 	  support/regression/tests/bug-3410.c.in:
 	  Fix bug #3410.
+	* src/SDCCsalloc.hpp:
+	  Fix bug #3397.
 
 2022-07-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

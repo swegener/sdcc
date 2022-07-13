@@ -6,7 +6,7 @@
 #include <testfwk.h>
 #include <stdbool.h>
 
-#ifdef __SDCC
+#if defined(__SDCC) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Lack of _BitInt support for hc08 and s08.
 typedef unsigned _BitInt(8) bint;
 #elif __clang_major__ == 11
 typedef unsigned _ExtInt(8) bint;
@@ -28,7 +28,6 @@ bool test( {type} c, const Part *part ) {
 
 void testBug( void ) {
 	Part part = { .a = 48, .b = 1 };
-
 	ASSERT (!test( 254, &part )); // Wrong result here for unsigned char
 	ASSERT (!test( 128, &part )); // Wrong result here for unsigned char
 	ASSERT (!test( 127, &part ));

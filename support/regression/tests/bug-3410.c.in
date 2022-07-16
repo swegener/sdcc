@@ -6,7 +6,7 @@
 #include <testfwk.h>
 #include <stdbool.h>
 
-#if defined(__SDCC) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Lack of _BitInt support for hc08 and s08.
+#if defined(__SDCC) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos65c02) // Lack of _BitInt support for hc08 and s08.
 typedef unsigned _BitInt(8) bint;
 #elif __clang_major__ == 11
 typedef unsigned _ExtInt(8) bint;

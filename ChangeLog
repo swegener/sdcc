@@ -3,6 +3,8 @@
 	* support/regression/tests/bug-1952.c,
 	  support/valdiag/tests/bug-1952.c:
 	  Tests for __func__.
+	* support/regression/tests/bug-3410.c.in:
+	  Disable a test for mos65c02, since that port it still lacks _BitInt.
 
 2022-07-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

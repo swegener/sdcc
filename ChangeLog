@@ -1,3 +1,8 @@
+2022-07-16 Felix Salfelder <felix AT salfelder.org>
+
+	* src/SDCC.{lex,y}, support/cpp/libcpp/{init,macro}.c:
+	  move __func__ elaboration entirely to sdcc.
+
 2022-07-16 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bug-1952.c,

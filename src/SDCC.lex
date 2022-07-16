@@ -165,6 +165,7 @@ static void checkCurrFile (const char *s);
 "..."                   { count (); return ELLIPSIS; }
 
  /* C99 */
+"__func__"              { count (); return FUNC; }
 "_Bool"                 { count (); TKEYWORD99 (SD_BOOL); }
 "_Complex"              { count (); return COMPLEX; }
 "_Imaginary"            { count (); return IMAGINARY; }

@@ -106,7 +106,7 @@ bool uselessDecl = true;
 %token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY TRAP
-%token <yystr> STRING_LITERAL INLINEASM
+%token <yystr> STRING_LITERAL INLINEASM FUNC
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SET_VALUE_AT_ADDRESS SPIL UNSPIL GETABIT GETBYTE GETWORD
 %token BITWISEAND UNARYMINUS IPUSH IPUSH_VALUE_AT_ADDRESS IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
@@ -2366,7 +2366,37 @@ offsetof_member_designator
    ;
 
 string_literal_val
-   : STRING_LITERAL {
+   : FUNC
+       {
+         // essentially do $$ = newAst_VALUE (strVal("\"$function_name\""));
+
+         value* val = newValue ();
+         { // BUG: duplicate from strVal
+           val->type = newLink (DECLARATOR);
+           DCL_TYPE (val->type) = ARRAY;
+           val->type->next = val->etype = newLink (SPECIFIER);
+           SPEC_SCLS (val->etype) = S_LITERAL;
+           SPEC_CONST (val->etype) = 1;
+           SPEC_NOUN (val->etype) = V_CHAR;
+           SPEC_USIGN (val->etype) = !options.signed_char;
+           val->etype->select.s.b_implicit_sign = true;
+         }
+
+         int ll = 1;
+         if(function_name){
+           ll += strlen(function_name);
+         }
+         char* s = (char*) Safe_alloc(ll*sizeof(char));
+         if(function_name){
+				s = strcpy(s, function_name);
+         }else{
+            *s = 0;
+         }
+         SPEC_CVAL (val->etype).v_char = s;
+         DCL_ELEM (val->type) = ll;
+         $$ = newAst_VALUE ( val );
+       }
+   | STRING_LITERAL {
                        int cnt = 1;
                        int max = 253, min = 1;
                        char fb[256];
@@ -2380,6 +2410,8 @@ string_literal_val
                          }
                        else
                          {
+                           fprintf(stderr, "__func__: assuming magic injected by preprocessor\n");
+                           fprintf(stderr, "          This is obsolete. Fix preprocessor\n");
                            memset (fb, 0x00, sizeof (fb));
                            fb[0] = '"';
                            strncpy (fb + 1, function_name, max - min + 1);

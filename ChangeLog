@@ -1,3 +1,8 @@
+2022-07-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-3410.c.in:
+	  Disable a test for mos6502, since that port it still lacks _BitInt.
+
 2022-07-16 Felix Salfelder <felix AT salfelder.org>
 
 	* src/SDCC.{lex,y}, support/cpp/libcpp/{init,macro}.c:

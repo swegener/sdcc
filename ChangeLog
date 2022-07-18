@@ -4,6 +4,8 @@
 	  Disable a test for mos6502, since that port it still lacks _BitInt.
 	* support/regression/tests/bug-3461.c:
 	  New (currently disabled) test for bug #3461.
+	* device/lib/ds400/ds400rom.c:
+	  Remove use of #pragma sdcc_hash.
 
 2022-07-16 Felix Salfelder <felix AT salfelder.org>
 

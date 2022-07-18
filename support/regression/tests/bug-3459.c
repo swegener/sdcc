@@ -1,5 +1,5 @@
 /* bug-3459.c
-   ?
+   An issue that resulted in a value in register hl being overwritten on z80.
  */
 
 #include <testfwk.h>

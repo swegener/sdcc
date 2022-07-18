@@ -8502,9 +8502,10 @@ genPointerSet (iCode *ic)
   bool use_y;
   int pushed_a = 0;
   int blen, bstr;
-  bool bit_field = IS_BITVAR (getSpec (operandType (right))) || IS_BITVAR (getSpec (operandType (left)));
   int cache_l = -1, cache_h = -1/*, cache_a = -1*/;
-  
+  wassert (operandType (left)->next);
+  bool bit_field = IS_BITVAR (getSpec (operandType (left)->next));
+
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
   bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
 

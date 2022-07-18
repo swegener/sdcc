@@ -1,5 +1,5 @@
 /* bug-3459.c
-   ?
+   Writing a bit-field to a non-bit-field pointer resulted in wrong code on stm8 and z80.
  */
 
 #include <testfwk.h>
@@ -41,11 +41,11 @@ void MapStart( maths_point *position, unsigned char *direction ) {
 
     position->x = levelData->start->position.x + 1;
     position->y = levelData->start->position.y;
-    *direction = levelData->start->direction;
+    *direction = levelData->start->direction; // The write to *direction was generated as if it was a write to a bit-field.
 }
 
 void testBug( void ) {
-#if 0 // Bug not yet fixed.
+#if defined (__SDCC_stm8) || defined (__SDCC_mcs51) || defined (__SDCC_mcs51) // Bug not yet fully fixed.
     maths_point p;
     unsigned char direction;
 

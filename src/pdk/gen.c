@@ -4291,10 +4291,10 @@ genPointerSet (iCode *ic)
 
   bool pushed_p = false;
   bool pushed_a = false;
-
-  bool bit_field = IS_BITVAR (getSpec (operandType (right))) || IS_BITVAR (getSpec (operandType (left)));
   int size = right->aop->size;
-
+  wassert (operandType (left)->next);
+  bool bit_field = IS_BITVAR (getSpec (operandType (left)->next));
+ 
   int blen, bstr;
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
   bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;

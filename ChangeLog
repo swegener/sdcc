@@ -6,6 +6,10 @@
 	  New (currently disabled) test for bug #3461.
 	* device/lib/ds400/ds400rom.c:
 	  Remove use of #pragma sdcc_hash.
+	* src/stm8/gen.c,
+	  src/pdk/gen.c,
+	  src/z80/gen.c:
+	  Partial fix for bug #3461.
 
 2022-07-16 Felix Salfelder <felix AT salfelder.org>
 

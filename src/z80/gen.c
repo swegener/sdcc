@@ -13852,17 +13852,15 @@ genPointerSet (iCode *ic)
   int last_offset = 0;
   operand *right, *result;
   PAIR_ID pairId = PAIR_HL;
-  bool isBitvar;
-  sym_link *retype;
-  sym_link *letype;
   bool pushed_a = false;
   bool pushed_pair = false;
   bool surviving_a = !isRegDead (A_IDX, ic);
 
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
-  retype = getSpec (operandType (right));
-  letype = getSpec (operandType (result));
+
+  wassert (operandType (result)->next);
+  bool bit_field = IS_BITVAR (getSpec (operandType (result)->next));
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
@@ -13876,10 +13874,7 @@ genPointerSet (iCode *ic)
 
   size = right->aop->size;
 
-  isBitvar = IS_BITVAR (retype) || IS_BITVAR (letype);
-  emitDebug ("; isBitvar = %d", isBitvar);
-
-  if (IS_SM83 && size == 1 && result->aop->type == AOP_LIT && (((unsigned long)operandLitValue (result) & 0xff00) == 0xff00) && (isRegDead (A_IDX, ic) || aopInReg (right->aop, 0, A_IDX)) && !isBitvar) // SM83 has special instructions for address range 0xff00 - 0xffff.
+  if (IS_SM83 && size == 1 && result->aop->type == AOP_LIT && (((unsigned long)operandLitValue (result) & 0xff00) == 0xff00) && (isRegDead (A_IDX, ic) || aopInReg (right->aop, 0, A_IDX)) && !bit_field) // SM83 has special instructions for address range 0xff00 - 0xffff.
     {
       cheapMove (ASMOP_A, 0, right->aop, 0, isRegDead (A_IDX, ic));
       emit2 ("ldh !mems, a", aopGetLitWordLong (result->aop, 0, true));
@@ -13888,7 +13883,7 @@ genPointerSet (iCode *ic)
     }
 
   /* Handle the exceptions first */
-  if (isPair (result->aop) && size == 1 && !isBitvar)
+  if (isPair (result->aop) && size == 1 && !bit_field)
     {
       /* Just do it */
       const char *pair = getPairName (result->aop);
@@ -13913,7 +13908,7 @@ genPointerSet (iCode *ic)
     }
 
   /* Rematerialized stack location */
-  if (result->aop->type == AOP_STL && !isBitvar && size <= 4)
+  if (result->aop->type == AOP_STL && !bit_field && size <= 4)
     {
       struct asmop saop;
       init_stackop (&saop, size, result->aop->aopu.aop_stk);
@@ -13952,7 +13947,7 @@ genPointerSet (iCode *ic)
       goto release;
     }
 
-  if (getPairId (result->aop) == PAIR_IY && !isBitvar)
+  if (getPairId (result->aop) == PAIR_IY && !bit_field)
     {
       /* Just do it */
       while (size--)
@@ -13973,7 +13968,7 @@ genPointerSet (iCode *ic)
         }
       goto release;
     }
-  else if (getPairId (result->aop) == PAIR_HL && !isPairDead (PAIR_HL, ic) && !isBitvar)
+  else if (getPairId (result->aop) == PAIR_HL && !isPairDead (PAIR_HL, ic) && !bit_field)
     {
       while (offset < size)
         {
@@ -14029,7 +14024,7 @@ genPointerSet (iCode *ic)
       goto release;
     }
 
-  if (!IS_SM83 && !isBitvar && isLitWord (result->aop) && size == 2 && offset == 0 &&
+  if (!IS_SM83 && !bit_field && isLitWord (result->aop) && size == 2 && offset == 0 &&
       (right->aop->type == AOP_REG && getPairId (right->aop) != PAIR_INVALID || isLitWord (right->aop)))
     {
       if (isLitWord (right->aop))
@@ -14043,7 +14038,7 @@ genPointerSet (iCode *ic)
       regalloc_dry_run_cost += (pairId == PAIR_HL) ? 3 : 4;
       goto release;
     }
-  if (!IS_SM83 && !isBitvar && isLitWord (result->aop) && size == 4 && offset == 0 &&
+  if (!IS_SM83 && !bit_field && isLitWord (result->aop) && size == 4 && offset == 0 &&
     (getPartPairId (right->aop, 0) != PAIR_INVALID && getPartPairId (right->aop, 2) != PAIR_INVALID || isLitWord (right->aop)))
     {
       if (isLitWord (right->aop))
@@ -14071,7 +14066,7 @@ genPointerSet (iCode *ic)
      then we do nothing else we move the value to dptr */
   if (result->aop->type != AOP_STR)
     {
-      if (isBitvar && getPairId (result->aop) != PAIR_INVALID && (getPairId (result->aop) != PAIR_IY || SPEC_BLEN (IS_BITVAR (retype) ? retype : letype) < 8 || isPairDead (getPairId (result->aop), ic)))   /* Avoid destroying result by increments */
+      if (bit_field && getPairId (result->aop) != PAIR_INVALID && (getPairId (result->aop) != PAIR_IY || SPEC_BLEN (getSpec (operandType (result)->next)) < 8 || isPairDead (getPairId (result->aop), ic)))   /* Avoid destroying result by increments */
         pairId = getPairId (result->aop);
       else
         {
@@ -14087,9 +14082,9 @@ genPointerSet (iCode *ic)
   /*freeAsmop (result, NULL, ic);*/
 
   /* if bit then unpack */
-  if (isBitvar)
+  if (bit_field)
     {
-      genPackBits ((IS_BITVAR (retype) ? retype : letype), right, pairId, ic);
+      genPackBits (getSpec (operandType (result)->next), right, pairId, ic);
       goto release;
     }
   else

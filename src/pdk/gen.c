@@ -4073,7 +4073,7 @@ genPointerGet (const iCode *ic)
   bool pushed_a = false;
   bool pushed_p = false;
 
-  bool bit_field = IS_BITVAR (getSpec (operandType (result)));
+  bool bit_field = IS_BITVAR (operandType (left)->next);
   int size = result->aop->size;
   int blen, bstr;
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
@@ -4293,7 +4293,7 @@ genPointerSet (iCode *ic)
   bool pushed_a = false;
   int size = right->aop->size;
   wassert (operandType (left)->next);
-  bool bit_field = IS_BITVAR (getSpec (operandType (left)->next));
+  bool bit_field = IS_BITVAR (operandType (left)->next);
  
   int blen, bstr;
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;

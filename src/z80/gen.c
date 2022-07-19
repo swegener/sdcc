@@ -13083,7 +13083,6 @@ genPointerGet (const iCode *ic)
   operand *left, *right, *result;
   int size, offset, rightval;
   int pair = PAIR_HL, extrapair;
-  sym_link *retype;
   bool pushed_pair = FALSE;
   bool pushed_a = FALSE;
   bool surviving_a = !isRegDead (A_IDX, ic);
@@ -13092,7 +13091,7 @@ genPointerGet (const iCode *ic)
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
-  retype = getSpec (operandType (result));
+  bool bit_field = IS_BITVAR (operandType (result)); // Should be IS_BITVAR (operandType (left)->next), but conflicts with optimizations that reuses pointers (when reading from a union of a struct containing bit-fields and other types).
 
   aopOp (left, ic, FALSE, FALSE);
   aopOp (result, ic, FALSE, FALSE);
@@ -13109,20 +13108,20 @@ genPointerGet (const iCode *ic)
   if ((IS_SM83 || IY_RESERVED) && requiresHL (result->aop) && size > 1 && result->aop->type != AOP_REG)
     pair = PAIR_DE;
 
-  if (IS_SM83 && size == 1 && left->aop->type == AOP_LIT && (((unsigned long)(operandLitValue (left) + rightval) & 0xff00) == 0xff00) && isRegDead (A_IDX, ic) && !IS_BITVAR (retype)) // SM83 has special instructions for address range 0xff00 - 0xffff.
+  if (IS_SM83 && size == 1 && left->aop->type == AOP_LIT && (((unsigned long)(operandLitValue (left) + rightval) & 0xff00) == 0xff00) && isRegDead (A_IDX, ic) && !bit_field) // SM83 has special instructions for address range 0xff00 - 0xffff.
     {
       emit2 ("ldh a, !mems", aopGetLitWordLong (left->aop, rightval, true));
       cost (2, 12);
       cheapMove (result->aop, 0, ASMOP_A, 0, true);
       goto release;
     }
-  if ((left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && size == 1 && aopInReg (result->aop, 0, A_IDX) && !IS_BITVAR (retype))
+  if ((left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && size == 1 && aopInReg (result->aop, 0, A_IDX) && !bit_field)
     {
       emit2 ("ld a, !mems", aopGetLitWordLong (left->aop, rightval, true));
       regalloc_dry_run_cost += 3;
       goto release;
     }
-  else if (!IS_SM83 && (left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && isPair (result->aop) && !IS_BITVAR (retype))
+  else if (!IS_SM83 && (left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT && !rightval) && isPair (result->aop) && !bit_field)
     {
       PAIR_ID pair = getPairId (result->aop);
       emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval, TRUE));
@@ -13140,7 +13139,7 @@ genPointerGet (const iCode *ic)
       regalloc_dry_run_cost += (pair == PAIR_HL ? 3 : 4);
       goto release;
     }
-  else if (left->aop->type == AOP_STL && !IS_BITVAR (retype) && size <= 4)
+  else if (left->aop->type == AOP_STL && !bit_field && size <= 4)
     {
       struct asmop saop;
       init_stackop (&saop, size, left->aop->aopu.aop_stk + rightval);
@@ -13151,7 +13150,7 @@ genPointerGet (const iCode *ic)
   if (IS_SM83)
     wassert (!rightval);
 
-  if (isPair (left->aop) && size == 1 && !IS_BITVAR (retype) && !rightval)
+  if (isPair (left->aop) && size == 1 && !bit_field && !rightval)
     {
       /* Just do it */
       if ((getPairId (left->aop) == PAIR_HL || getPairId (left->aop) == PAIR_IY) && result->aop->type == AOP_REG)
@@ -13179,7 +13178,7 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
-  if (getPairId (left->aop) == PAIR_IY && !IS_BITVAR (retype) && rightval_in_range)
+  if (getPairId (left->aop) == PAIR_IY && !bit_field && rightval_in_range)
     {
       offset = 0;
 
@@ -13224,7 +13223,7 @@ genPointerGet (const iCode *ic)
     }
 
   /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_SM83 && !IS_R2K && !IS_R2KA && !IS_BITVAR (retype) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
+  if (!IS_SM83 && !IS_R2K && !IS_R2KA && !bit_field && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -13305,7 +13304,7 @@ genPointerGet (const iCode *ic)
 
   extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
 
-  if (!surviving_a && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE) && isPairDead (getPairId (left->aop), ic) && abs(rightval) <= 2 && !IS_BITVAR (retype) && size < 2) // Use inc ss (size < 2 condition to avoid overwriting pair with result)
+  if (!surviving_a && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE) && isPairDead (getPairId (left->aop), ic) && abs(rightval) <= 2 && !bit_field && size < 2) // Use inc ss (size < 2 condition to avoid overwriting pair with result)
     pair = getPairId (left->aop);
 
   /* For now we always load into temp pair */
@@ -13315,7 +13314,7 @@ genPointerGet (const iCode *ic)
     pair = getPairId (left->aop);
   else
     {
-      if (!isPairDead (pair, ic) && size > 1 && (getPairId (left->aop) != pair || rightval || IS_BITVAR (retype) || size > 2)) // For simple cases, restoring via dec is cheaper than push / pop.
+      if (!isPairDead (pair, ic) && size > 1 && (getPairId (left->aop) != pair || rightval || bit_field || size > 2)) // For simple cases, restoring via dec is cheaper than push / pop.
         _push (pair), pushed_pair = TRUE;
       if (left->aop->type == AOP_IMMD)
         {
@@ -13345,7 +13344,7 @@ genPointerGet (const iCode *ic)
     }
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype))
+  if (bit_field)
     {
       offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
       genUnpackBits (result, pair, ic);
@@ -13355,7 +13354,7 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
- if (isPair (result->aop) && IS_EZ80_Z80 && getPairId (left->aop) == PAIR_HL && !IS_BITVAR (retype) && !rightval)
+ if (isPair (result->aop) && IS_EZ80_Z80 && getPairId (left->aop) == PAIR_HL && !bit_field && !rightval)
    {
      emit2 ("ld %s, !*hl", _pairs[getPairId (result->aop)].name);
      regalloc_dry_run_cost += 2;
@@ -13860,7 +13859,7 @@ genPointerSet (iCode *ic)
   result = IC_RESULT (ic);
 
   wassert (operandType (result)->next);
-  bool bit_field = IS_BITVAR (getSpec (operandType (result)->next));
+  bool bit_field = IS_BITVAR (operandType (result)->next);
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);

@@ -8211,7 +8211,7 @@ genPointerGet (const iCode *ic)
   bool pushed_x = false;
   bool pushed_a = false;
   int blen, bstr;
-  bool bit_field = IS_BITVAR (getSpec (operandType (result)));
+  bool bit_field = IS_BITVAR (operandType (result)); // Should be IS_BITVAR (operandType (left)->next), but conflicts with optimizations that reuses pointers (when reading from a union of a struct containing bit-fields and other types).
   symbol *const tlbl = ((regalloc_dry_run || !bit_field) ? 0 : newiTempLabel (NULL));
   
   blen = bit_field ? SPEC_BLEN (getSpec (operandType (result))) : 0;
@@ -8504,7 +8504,7 @@ genPointerSet (iCode *ic)
   int blen, bstr;
   int cache_l = -1, cache_h = -1/*, cache_a = -1*/;
   wassert (operandType (left)->next);
-  bool bit_field = IS_BITVAR (getSpec (operandType (left)->next));
+  bool bit_field = IS_BITVAR (operandType (left)->next);
 
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
   bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;

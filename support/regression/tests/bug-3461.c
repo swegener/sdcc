@@ -1,5 +1,5 @@
 /* bug-3459.c
-   Writing a bit-field to a non-bit-field pointer resulted in wrong code on stm8 and z80.
+   Multiple codegen issues related to bit-fields and pointers to pointers to structs containing them.
  */
 
 #include <testfwk.h>
@@ -45,7 +45,7 @@ void MapStart( maths_point *position, unsigned char *direction ) {
 }
 
 void testBug( void ) {
-#if defined (__SDCC_stm8) || defined (__SDCC_mcs51) || defined (__SDCC_mcs51) // Bug not yet fully fixed.
+#if !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15) // Bug not yet fully fixed.
     maths_point p;
     unsigned char direction;
 

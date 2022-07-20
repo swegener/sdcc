@@ -9529,14 +9529,14 @@ genPointerSet (iCode * ic, iCode * pi)
   operand *right = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
   int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
   bool needpulla = false;
   bool needpullx = false;
   bool needpullh = false;
   bool vol = false;
   int litOffset = 0;
   char *rematOffset = NULL;
+  wassert (operandType (result)->next);
+  bool bit_field = IS_BITVAR (operandType (result)->next);
 
   D (emitcode (";     genPointerSet", ""));
 
@@ -9545,16 +9545,11 @@ genPointerSet (iCode * ic, iCode * pi)
   /* if the result is rematerializable */
   if (AOP_TYPE (result) == AOP_IMMD || AOP_TYPE (result) == AOP_LIT)
     {
-      if (!IS_BITVAR (retype) && !IS_BITVAR (letype))
-        {
-          genDataPointerSet (left, right, result, ic);
-          return;
-        }
+      if (!bit_field)
+        genDataPointerSet (left, right, result, ic);
       else
-        {
-          genPackBitsImmed (result, left, (IS_BITVAR (retype) ? retype : letype), right, ic);
-          return;
-        }
+        genPackBitsImmed (result, left, operandType (result)->next, right, ic);
+      return;
     }
   if (AOP_TYPE (result) == AOP_REG && pi)
     { 
@@ -9569,10 +9564,10 @@ genPointerSet (iCode * ic, iCode * pi)
   aopOp (right, ic, false);
   size = AOP_SIZE (right);
 
-  /* if bit then pack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  /* if bit-field then pack */
+  if (bit_field)
     {
-      genPackBits (result, left, (IS_BITVAR (retype) ? retype : letype), right);
+      genPackBits (result, left, operandType (result)->next, right);
     }
   else if (AOP_TYPE (right) == AOP_REG)
     {

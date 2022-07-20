@@ -11082,19 +11082,16 @@ genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   asmop *aop = NULL;
   reg_info *preg = NULL;
   const char *rname;
-  sym_link *retype, *letype;
+  bool bit_field = IS_BITVAR (operandType (result)->next);
   sym_link *ptype = operandType (result);
 
   D (emitcode (";", "genNearPointerSet"));
-
-  retype = getSpec (operandType (right));
-  letype = getSpec (ptype);
 
   aopOp (result, ic, FALSE);
 
   /* if the result is rematerializable &
      in data space & not a bit variable */
-  if (AOP_TYPE (result) == AOP_IMMD && DCL_TYPE (ptype) == POINTER && !IS_BITVAR (retype) && !IS_BITVAR (letype))
+  if (AOP_TYPE (result) == AOP_IMMD && DCL_TYPE (ptype) == POINTER && !bit_field)
     {
       genDataPointerSet (right, result, ic);
       return;
@@ -11142,9 +11139,9 @@ genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   aopOp (right, ic, FALSE);
 
   rname = Safe_strdup (rname);
-  /* if bitfield then unpack the bits */
-  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
-    genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, rname, POINTER);
+  /* if bit-field then pack the bits */
+  if (bit_field)
+    genPackBits (operandType (result)->next, right, rname, POINTER);
   else
     {
       /* we can just get the values */
@@ -11206,12 +11203,8 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   asmop *aop = NULL;
   reg_info *preg = NULL;
   const char *rname;
-  sym_link *retype, *letype;
 
   D (emitcode (";", "genPagedPointerSet"));
-
-  retype = getSpec (operandType (right));
-  letype = getSpec (operandType (result));
 
   aopOp (result, ic, FALSE);
 
@@ -11251,9 +11244,9 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   aopOp (right, ic, FALSE);
 
   rname = Safe_strdup (rname);
-  /* if bitfield then unpack the bits */
-  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
-    genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, rname, PPOINTER);
+  /* if bit-field then pack the bits */
+  if (IS_BITFIELD (operandType (result)->next))
+    genPackBits (operandType (result)->next, right, rname, PPOINTER);
   else
     {
       /* we can just get the values */
@@ -11307,8 +11300,6 @@ static void
 genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
 
   D (emitcode (";", "genFarPointerSet"));
 
@@ -11318,9 +11309,9 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   /* so dptr now contains the address */
   aopOp (right, ic, FALSE);
 
-  /* if bit then unpack */
-  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
-    genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, "dptr", FPOINTER);
+  /* if bit-field then pack */
+  if (IS_BITVAR (operandType (result)->next))
+    genPackBits (operandType (result)->next, right, "dptr", FPOINTER);
   else
     {
       size = AOP_SIZE (right);
@@ -11353,9 +11344,6 @@ static void
 genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
 {
   int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
-
   D (emitcode (";", "genGenPointerSet"));
 
   aopOp (result, ic, FALSE);
@@ -11364,10 +11352,10 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   /* so dptr-b now contains the address */
   aopOp (right, ic, FALSE);
 
-  /* if bit then unpack */
-  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
+  /* if bit-field then unpack */
+  if (IS_BITVAR (operandType (result)->next))
     {
-      genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, "dptr", GPOINTER);
+      genPackBits (operandType (result)->next, right, "dptr", GPOINTER);
     }
   else
     {

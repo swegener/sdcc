@@ -9535,14 +9535,14 @@ genPointerSet (iCode * ic)
   operand *left = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
   int size, offset;
-  sym_link *retype = getSpec (operandType (right));
-  sym_link *letype = getSpec (operandType (result));
   bool needpulla = false;
   bool needpullx = false;
   bool needpully = false;
   bool deadA = false;
   int litOffset = 0;
   char *rematOffset = NULL;
+  wassert (operandType (result)->next);
+  bool bit_field = IS_BITVAR (operandType (result)->next);
 
   emitComment (TRACEGEN, __func__);
 
@@ -9554,11 +9554,11 @@ genPointerSet (iCode * ic)
   /* if the result is rematerializable */
   if (AOP_TYPE (result) == AOP_IMMD || AOP_TYPE (result) == AOP_LIT)
     {
-      if (!IS_BITVAR (retype) && !IS_BITVAR (letype))
-          genDataPointerSet (left, right, result, ic);
+      if (!bit_field)
+        genDataPointerSet (left, right, result, ic);
       else
-          genPackBitsImmed (result, left, (IS_BITVAR (retype) ? retype : letype), right, ic);
-          return;
+        genPackBitsImmed (result, left, operandType (result)->next, right, ic);
+      return;
     }
 
   aopOp (right, ic);
@@ -9577,7 +9577,7 @@ genPointerSet (iCode * ic)
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location
 
-  if (!(IS_BITVAR (retype) || IS_BITVAR (letype))
+  if (!bit_field
       && AOP_TYPE (result) == AOP_DIR && !rematOffset && litOffset >= 0 && litOffset <= 256-size
       && !sameRegs(AOP(right), AOP(result)) ) {
 
@@ -9700,14 +9700,14 @@ genPointerSet (iCode * ic)
   if(IS_AOP_WITH_Y(AOP(right))) needpully = storeRegTempIfUsed (m6502_reg_y);
   else needpully = storeRegTempIfSurv (m6502_reg_y);
 
-  /* if bit then pack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  /* if bit-field then pack */
+  if (bit_field)
     {
       emitComment (TRACEGEN|VVDBG," %s : bitvar", __func__ );
 
       if(needpulla && IS_AOP_WITH_A (AOP(right)))
           loadRegTempAt(m6502_reg_a, aloc);
-      genPackBits (result, left, (IS_BITVAR (retype) ? retype : letype), right);
+      genPackBits (result, left, operandType (result)->next, right);
       goto release;
     }
 

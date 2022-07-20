@@ -1,4 +1,13 @@
-2022-07-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2022-07-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/ds390/gen.c,
+	  src/hc08/gen.c,
+	  src/mcs51/gen.c,
+	  src/mos6502/gen.c,
+	  support/regression/tests/bug-3463.c:
+	  Fix bug #3463.
+
+2022-07-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
 	  src/stm8/gen.c,

@@ -45,13 +45,11 @@ void MapStart( maths_point *position, unsigned char *direction ) {
 }
 
 void testBug( void ) {
-#if !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15) // Bug not yet fully fixed.
     maths_point p;
     unsigned char direction;
 
     MapStart( &p, &direction );
 
 	ASSERT (direction == 1);
-#endif
 }
 

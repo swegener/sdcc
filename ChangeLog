@@ -1,3 +1,8 @@
+2022-07-22 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/c-ppoutput.c:
+	  Add "line" to lineinfo lines, following the standard.
+
 2022-07-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCglue.c,

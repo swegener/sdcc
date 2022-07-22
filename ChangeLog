@@ -1,3 +1,8 @@
+2022-07-22 Felix Salfelder <felix AT salfelder.org>
+
+	* src/SDCC.lex:
+	  Skip "line" in lineinfo line. This fixes [r13587].
+
 2022-07-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,

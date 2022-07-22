@@ -361,9 +361,24 @@ checkCurrFile (const char *s)
   int lNum;
   char *tptr;
 
-  /* skip '#' character */
-  if (*s++ != '#')
+  /* skip "#" or "#line" prefix */
+  if (*s++ != '#'){
     return;
+  }else if (*s == ' '){
+    // ok, old lineinfo "# ..."
+  }else if (*s++ != 'l'){
+    return;
+  }else if (*s++ != 'i'){
+    return;
+  }else if (*s++ != 'n'){
+    return;
+  }else if (*s++ != 'e'){
+    return;
+  }else if (*s != ' '){
+    return;
+  }else{
+    // ok, new lineinfo "#line ..."
+  }
 
   /* get the line number */
   lNum = strtol (s, &tptr, 10);

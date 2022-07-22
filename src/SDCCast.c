@@ -4090,10 +4090,11 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       if (reduceTypeAllowed &&
           IS_LITERAL (RTYPE (tree)) &&
           IS_BOOLEAN (LTYPE (tree)) &&
-          IS_INTEGRAL (RTYPE (tree)) &&
+          IS_AST_LIT_VALUE (tree->right) &&
           resultType == RESULT_TYPE_BOOL &&
           tree->opval.op == '^')   /* the same source is used by 'bitwise or' */
         {
+          wassert (tree->right->type == EX_VALUE);
           unsigned long litval = AST_ULONG_VALUE (tree->right);
           if (litval == 0 || litval == 1)
             {
@@ -4107,11 +4108,11 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               return decorateType (tree, resultType, reduceTypeAllowed);
             }
         }
-        
+
       /* OR / XOR char with literal integral, try to reduce integral to CHAR if it fits in a CHAR */
       if (reduceTypeAllowed && 
           !TARGET_PDK_LIKE && // Temporary fix to avoid bug #3259 - Wrong opcodes
-          IS_LITERAL (RTYPE (tree)) &&
+          IS_AST_LIT_VALUE (tree->right) &&
           IS_INTEGRAL (RTYPE (tree)) &&
           !IS_CHAR (RTYPE (tree)) &&
           IS_CHAR(LTYPE(tree)))

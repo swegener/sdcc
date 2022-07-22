@@ -1,3 +1,9 @@
+2022-07-22 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-3401.c:
+	  Fix bug #3401.
+
 2022-07-22 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/c-ppoutput.c:

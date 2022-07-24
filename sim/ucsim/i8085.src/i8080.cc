@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (i8080.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
+/*@1@*/
 
 #include <ctype.h>
 
@@ -88,6 +89,13 @@ cl_i8080::init(void)
   itab[0xed]= instruction_wrapper_cd; // CALL
   itab[0xfd]= instruction_wrapper_cd; // CALL
   
+  cF.W(urnd());
+  cA.W(urnd());
+  cBC.W(urnd());
+  cDE.W(urnd());
+  cHL.W(urnd());
+  cSP.W(urnd());
+
   reset();
   return 0;
 }
@@ -102,12 +110,6 @@ void
 cl_i8080::reset(void)
 {
   cl_uc::reset();
-  cF.W(urnd());
-  cA.W(urnd());
-  cBC.W(urnd());
-  cDE.W(urnd());
-  cHL.W(urnd());
-  cSP.W(urnd());
   PC= 0;
 }
 

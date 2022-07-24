@@ -8,7 +8,6 @@ PREFIX="${HOME}/dani"
 DD_HOSTS="p4 anb anb1 render mms box mazsola v3"
 PERF_FLAG=""
 OPT_FLAG="-O2"
-COMP="no"
 
 while [ -n "$1" ]; do
     case "$1" in
@@ -17,9 +16,6 @@ while [ -n "$1" ]; do
 	    ;;
 	-d)
 	    OPT_FLAG="-O0 -DDEVEL"
-	    ;;
-	-c)
-	    COMP="yes"
 	    ;;
 	-w)
 	    PREFIX=${HOME}/prj/wucsim/inst
@@ -53,6 +49,7 @@ case $TARGET in
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
 		    --enable-i8085-port \
+		    --enable-f8-port \
 		    "$@"
 	#--enable-ucsim
 	;;
@@ -76,6 +73,7 @@ case $TARGET in
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
 		    --enable-i8085-port \
+		    --enable-f8-port \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
@@ -88,6 +86,7 @@ case $TARGET in
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
 		    --enable-i8085-port \
+		    --enable-f8-port \
 		    $HOST_OPT "$@"
 	;;	
     w64)
@@ -99,6 +98,7 @@ case $TARGET in
 	./configure --prefix=${PREFIX} \
 		    --disable-dlso \
 		    --enable-i8085-port \
+		    --enable-f8-port \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
@@ -110,14 +110,5 @@ esac
 for d in s51 m6809 stm8 tlcs z80; do
     [ -L ${d}.src/dtest ] || ln -s ../../test/$d ${d}.src/dtest
 done
-
-if [ "$COMP" = "yes" ]; then
-    make clean
-    make
-    cd s51.src;make;cd ..
-    if [ -n "$PERF_FLAG" ]; then
-	mv s51.src/s51 s51.src/s51p
-    fi
-fi
 
 # End of conf

@@ -257,14 +257,16 @@ enum cpu_type {
   // Intel 8080, 8085
   CPU_I8080	= 0x0001,
   CPU_I8085	= 0x0002,
+
+  CPU_PDK13	= 0x0001,
+  CPU_PDK14	= 0x0002,
+  CPU_PDK15	= 0x0003,
+
+  CPU_F8	= 0x0001,
   
   // technology
   CPU_CMOS	= 0x0001,
   CPU_HMOS	= 0x0002,
-
-  CPU_PDK13 = 0x0001,
-  CPU_PDK14 = 0x0002,
-  CPU_PDK15 = 0x0003,
 };
 
 

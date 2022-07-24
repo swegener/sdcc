@@ -1,3 +1,8 @@
+2022-07-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/lib/ds400/ds400rom.c:
+	  Fix use of macro for #.
+
 2022-07-22 Felix Salfelder <felix AT salfelder.org>
 
 	* src/SDCC.lex:

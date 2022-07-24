@@ -357,7 +357,7 @@ __endasm;
 // This macro is invalid for the standard C preprocessor, since it
 // includes a hash character in the expansion, hence the SDCC specific
 // pragma.
-#define HASH
+#define HASH #
 #define ROMCALL(x) \
         mov     R6_B3, HASH(x & 0xff)              \
         mov     R7_B3, HASH((x >> 8) & 0xff)       \

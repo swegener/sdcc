@@ -489,6 +489,7 @@ cl_irq_stop_option::option_changed(void)
   uc51->stop_at_it= b;
 }
 
+
 instruction_wrapper_fn itab51[256];
 
 /*
@@ -702,7 +703,6 @@ cl_51core::init(void)
   reset();
 
   make_vars();
-
   return(0);
 }
 
@@ -2041,31 +2041,17 @@ cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
     {
       if (*val > uc->sp_most)
 	uc->sp_most= *val;
-      //uc->sp_avg= (uc->sp_avg+(*val))/2;
     }
-  else 
+  else // ACC and its bits
     {
-      bool p;
-      int i;
       uchar uc, n= *val;
-
       if (cell != cell_acc)
 	{
 	  cell->set(*val);
 	  n= cell_acc->get();
 	}
-      p = false;
-      uc= n;
-      for (i= 0; i < 8; i++)
-	{
-	  if (uc & 1)
-	    p= !p;
-	  uc>>= 1;
-	}
-      if (p)
-	cell_psw->set(cell_psw->get() | bmP);
-      else
-	cell_psw->set(cell_psw->get() & ~bmP);
+      uc= cell_psw->get() & ~bmP;
+      cell_psw->set(uc | ptab51[n]);
     }
   /*else if (cell == cell_pcon)
     {

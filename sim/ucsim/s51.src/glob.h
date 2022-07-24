@@ -28,8 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef GLOB_HEADER
 #define GLOB_HEADER
 
+#include "stypes.h"
+
 
 extern struct dis_entry  disass_51[];
+extern u8_t ptab51[256];
 
 
 #endif

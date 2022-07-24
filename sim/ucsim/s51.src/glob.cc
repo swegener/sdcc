@@ -28,7 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 
-#include "stypes.h"
+#include "glob.h"
+#include "regs51.h"
 
 
 /*
@@ -293,6 +294,41 @@ struct dis_entry disass_51[]= {
   { 0xfe, 0xff, ' ', 1, "MOV R6,A"},
   { 0xff, 0xff, ' ', 1, "MOV R7,A"},
   { 0, 0, 0, 0, NULL }
+};
+
+u8_t ptab51[256]= {
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+   0, bmP, bmP,   0, bmP,   0,   0, bmP,
+ bmP,   0,   0, bmP,   0, bmP, bmP,   0
 };
 
 

@@ -1049,9 +1049,9 @@ cl_memory_cell::~cl_memory_cell(void)
 {
   if (ops)
     {
-      int i;
+      /*int i;
       for (i=0; ops[i]; i++)
-	delete ops[i];
+      delete ops[i];*/
       free(ops);
     }
 }

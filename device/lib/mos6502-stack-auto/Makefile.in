@@ -3,10 +3,11 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mmos6502 --stack-auto --max-allocs-per-node 25000 --opt-code-speed
+EXTRA_CFLAGS = -mmos6502 --stack-auto --max-allocs-per-node 25000 --opt-code-speed
 SAS = $(top_builddir)/bin/sdas6500
 
 # override PORTDIR defined by super (parent) makefile
@@ -68,7 +69,6 @@ MOS6502OBJECTS = $(patsubst %.c,%.rel,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_
 OBJ = _ret.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
 
 LIB = mos6502.lib
-CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
@@ -85,10 +85,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(MOS6502OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(MOS6502OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(MOS6502OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(MOS6502OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(MOS6502OBJECTS)
     else
 	rm -f $@
 	for i in $(basename $(OBJ) $(MOS6502OBJECTS)); do echo $$i >>$@; done
@@ -97,17 +97,11 @@ else
   endif
 endif
 
-%.rel: %.c
-	$(CC) $(CFLAGS) -c $<
-
 %.rel: %.s
 	@# TODO: sdas should place it\'s output in the current dir
 	test $(srcdir) = . || cp $< .
 	-$(AS) $(ASFLAGS) $(notdir $<)
 	test $(srcdir) = . || rm $(notdir $<)
-
-%.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
@@ -115,3 +109,5 @@ clean:
 distclean: clean
 	rm -f Makefile
 
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/mos6502-stack-auto/Makefile

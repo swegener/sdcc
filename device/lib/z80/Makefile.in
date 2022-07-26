@@ -3,14 +3,21 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mz80 --max-allocs-per-node 25000
+EXTRA_CFLAGS = -mz80 --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdasz80
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/z80
+
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 include $(srcdir)/../incl.mk
 
@@ -48,7 +55,6 @@ OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel m
       __strreverse.rel __sdcc_bcall.rel __sdcc_critical.rel __mulsint2slong.rel
 
 LIB = z80.lib
-CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
@@ -68,28 +74,16 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(Z8OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(Z8OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(Z8OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(Z8OBJECTS)
     else
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
     endif
   endif
 endif
-
-%.rel: %.c
-	$(CC) $(CFLAGS) -c $<
-
-%.rel: %.s
-	@# TODO: sdas should place it\'s output in the current dir
-	test $(srcdir) = . || cp $< .
-	-$(AS) $(ASFLAGS) $(notdir $<)
-	test $(srcdir) = . || rm $(notdir $<)
-
-%.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

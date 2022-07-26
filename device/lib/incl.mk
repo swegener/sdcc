@@ -1,3 +1,5 @@
+.DELETE_ON_ERROR:
+
 COMMON_FLOAT = \
   _atof.c \
   _schar2fs.c \
@@ -131,3 +133,12 @@ COMMON_SDCC = \
   time.c
 
 MODELS = small medium large huge
+
+CC = ${abs_top_builddir}/bin/sdcc
+SDAR = ${abs_top_builddir}/bin/sdar
+
+%.rel: %.c
+	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<
+
+%.rel: ../%.c
+	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<

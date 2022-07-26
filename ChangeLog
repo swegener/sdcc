@@ -1,3 +1,10 @@
+2022-07-26 Felix Salfelder <felix AT salfelder.org>
+
+	* device/lib/Makefile.in, device/lib/*/Makefile.in,
+	  device/lib/incl.mk:
+	  Deduplicate CC, introduce SDAR, add Makefile rules,
+	  fix error propagation.
+
 2022-07-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/lib/ds400/ds400rom.c:

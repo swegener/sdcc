@@ -3,10 +3,11 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mhc08 --max-allocs-per-node 25000
+EXTRA_CFLAGS = -mhc08 --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdas6808
 
 # override PORTDIR defined by super (parent) makefile
@@ -61,7 +62,6 @@ HC08OBJECTS = $(patsubst %.c,%.rel,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08
 OBJ = _ret.rel _mulint.rel _setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = hc08.lib
-CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
@@ -75,10 +75,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(HC08OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(HC08OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(HC08OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(HC08OBJECTS)
     else
 	rm -f $@
 	for i in $(basename $(OBJ) $(HC08OBJECTS)); do echo $$i >>$@; done
@@ -88,13 +88,16 @@ else
 endif
 
 %.rel: %.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<
 
 %.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
 
 distclean: clean
 	rm -f Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/hc08/Makefile

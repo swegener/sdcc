@@ -9,6 +9,7 @@ top_builddir = @top_builddir@
 LIB_TYPE     = @LIB_TYPE@
 SAS = $(top_builddir)/bin/sdas8051
 SCC = $(top_builddir)/bin/sdcc
+SDAR = $(top_builddir)/bin/sdar
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/$(PORT)
@@ -34,10 +35,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ)
+	$(SDAR) -rcSD $@ $(OBJ)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ)
+	$(SDAR) -rcD $@ $(OBJ)
     else
 	rm -f $@
 	for i in $(basename $(OBJ)); do echo $$i >>$@; done
@@ -60,3 +61,6 @@ clean:
 
 distclean: clean
 	rm -r Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/mcs51/Makefile

@@ -35,10 +35,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJECTS)
+	$(SDAR) -rcD $@ $(OBJECTS)
     else
 	rm -f $@;
 	for libfile in $(basename $(OBJECTS)); do echo $$libfile >>$@; done
@@ -65,3 +65,6 @@ Makefile.dep: $(SOURCES)
 ifeq "$(findstring $(MAKECMDGOALS),clean distclean)" ""
   -include Makefile.dep
 endif
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/ds400/Makefile

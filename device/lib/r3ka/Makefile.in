@@ -3,14 +3,21 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mr3ka --max-allocs-per-node 25000
+EXTRA_CFLAGS = -mr3ka --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdasrab
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/r3ka
+
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 include $(srcdir)/../incl.mk
 
@@ -50,7 +57,6 @@ OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel m
       setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = r3ka.lib
-CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
@@ -70,10 +76,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(Z8OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(Z8OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(Z8OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(Z8OBJECTS)
     else
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
@@ -81,20 +87,11 @@ else
   endif
 endif
 
-%.rel: %.c
-	$(CC) $(CFLAGS) -c $<
-
-%.rel: %.s
-	@# TODO: sdas should place it\'s output in the current dir
-	test $(srcdir) = . || cp $< .
-	-$(AS) $(ASFLAGS) $(notdir $<)
-	test $(srcdir) = . || rm $(notdir $<)
-
-%.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
-
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
 
 distclean: clean
 	rm -f Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/r3ka/Makefile

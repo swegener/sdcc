@@ -3,10 +3,11 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mpdk14 --max-allocs-per-node 25000
+EXTRA_CFLAGS = -mpdk14 --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdaspdk14
 
 # override PORTDIR defined by super (parent) makefile
@@ -65,7 +66,6 @@ PDK14OBJECTS = $(patsubst %.c,%.rel,$(PDK14_FLOAT) $(PDK14_INT) $(PDK14_LONG) $(
 OBJ = __gptrget.rel __gptrget2.rel heap.rel __setjmp.rel
 
 LIB = pdk14.lib
-CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
@@ -79,10 +79,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(PDK14OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(PDK14OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(PDK14OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(PDK14OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(PDK14OBJECTS)
     else
 	rm -f $@
 	for i in $(basename $(OBJ) $(PDK14OBJECTS)); do echo $$i >>$@; done
@@ -91,17 +91,11 @@ else
   endif
 endif
 
-%.rel: %.c
-	$(CC) $(CFLAGS) -c $<
-
 %.rel: %.s
 	@# TODO: sdas should place it\'s output in the current dir
 	test $(srcdir) = . || cp $< .
 	-$(AS) $(ASFLAGS) $(notdir $<)
 	test $(srcdir) = . || rm $(notdir $<)
-
-%.rel: ../%.c
-	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
@@ -109,3 +103,5 @@ clean:
 distclean: clean
 	rm -f Makefile
 
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/pdk14/Makefile

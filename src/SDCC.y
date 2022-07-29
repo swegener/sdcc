@@ -2388,7 +2388,7 @@ string_literal_val
          }
          char* s = (char*) Safe_alloc(ll*sizeof(char));
          if(function_name){
-				s = strcpy(s, function_name);
+            s = strcpy(s, function_name);
          }else{
             *s = 0;
          }
@@ -2396,33 +2396,8 @@ string_literal_val
          DCL_ELEM (val->type) = ll;
          $$ = newAst_VALUE ( val );
        }
-   | STRING_LITERAL {
-                       int cnt = 1;
-                       int max = 253, min = 1;
-                       char fb[256];
-                       /* refer to support/cpp/libcpp/macro.c for details */
-                       while ((((int) ($1[cnt] & 0xff)) & 0xff) == 0xff)
-                         cnt++;
-
-                       if (cnt <= max)
-                         {
-                           $$ = newAst_VALUE (strVal ($1));
-                         }
-                       else
-                         {
-                           fprintf(stderr, "__func__: assuming magic injected by preprocessor\n");
-                           fprintf(stderr, "          This is obsolete. Fix preprocessor\n");
-                           memset (fb, 0x00, sizeof (fb));
-                           fb[0] = '"';
-                           strncpy (fb + 1, function_name, max - min + 1);
-                           fb[max + 1] = '"';
-                           fb[max + 2] = 0;
-                           fb[strlen (fb)] = '"';
-                           fb[strlen (fb) + 1] = 0;
-                           $$ = newAst_VALUE (strVal (fb));
-                         }
-                     }
-    ;
+   | STRING_LITERAL { $$ = newAst_VALUE (strVal ($1)); }
+   ;
 
 Interrupt_storage
    : INTERRUPT { $$ = INTNO_UNSPEC; }

@@ -1,3 +1,8 @@
+2022-07-29 Felix Salfelder <felix AT salfelder.org>
+
+	* src/SDCC.y:
+	  Remove obsolete __func__ magic handling from parser.
+
 2022-07-26 Felix Salfelder <felix AT salfelder.org>
 
 	* device/lib/Makefile.in, device/lib/*/Makefile.in,

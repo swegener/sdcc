@@ -1,5 +1,13 @@
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* device/include/stddef.h,
+	  src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  support/regression/tests/unreachable.c:
+	  C2X unreachable.
+
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* device/include/stdlib.h,
 	  device/lib/incl.mk,
 	  device/lib/memalignment.c,

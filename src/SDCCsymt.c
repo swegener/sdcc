@@ -4260,6 +4260,7 @@ sym_link *fixed16x16Type;
 
 symbol *builtin_memcpy;
 symbol *nonbuiltin_memcpy;
+symbol *builtin_unreachable;
 
 static const char *
 _mangleFunctionName (const char *in)
@@ -4719,6 +4720,8 @@ initBuiltIns ()
   /* if there is no __builtin_memcpy, use __memcpy instead of an actual builtin */
   if (!builtin_memcpy)
     builtin_memcpy = nonbuiltin_memcpy;
+
+  builtin_unreachable = funcOfTypeVarg ("__builtin_unreachable", "v", 0, 0);
 }
 
 sym_link *

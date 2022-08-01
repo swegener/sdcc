@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 #if defined (__SDCC_ds390) || defined (__SDCC_mcs51)
-  volatile __xdata __at 0x7654 char x;
+  volatile __xdata char __at 0x7654 x;
 #endif
 
 void

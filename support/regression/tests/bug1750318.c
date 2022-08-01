@@ -5,9 +5,9 @@
 #include <testfwk.h>
 
 #if defined(__SDCC_pic14)
-__xdata __at(0x01A0) char bar;
+__xdata char __at(0x01A0) bar;
 #else
-__xdata __at(0x1234) char bar;
+__xdata char __at(0x1234) bar;
 #endif
 
 // no need to call this, it generates compiler error:

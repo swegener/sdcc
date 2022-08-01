@@ -34,9 +34,10 @@ testDiv (void)
 {
 #if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #if defined (__SDCC_mcs51) && !defined (__SDCC_STACK_AUTO)
-  __idata __at 0xd0
-#endif
+  volatile __idata float __at 0xd0 left;
+#else
   volatile float left;
+#endif
   volatile float right;
 
   left = 17;

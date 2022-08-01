@@ -45,13 +45,13 @@ static unsigned char lcdLinesStart[LCD_ROWS]={0, 0x40, 0x14, 0x54};
 
 //#define LCD_RW
 
-__xdata __at (0x380002) static unsigned char lcdIwr;
-__xdata __at (0x38000a) static unsigned char lcdDwr;
+__xdata static unsigned char __at (0x380002) lcdIwr;
+__xdata static unsigned char __at (0x38000a) lcdDwr;
 
 #ifdef LCD_RW
 
-__xdata __at (0x380003) static unsigned char lcdIrd;
-__xdata __at (0x38000b) static unsigned char lcdDrd;
+__xdata static unsigned char __at (0x380003) lcdIrd;
+__xdata static unsigned char __at (0x38000b) lcdDrd;
 
 #define LcdWait { while (lcdIrd&0x80) ; }
 

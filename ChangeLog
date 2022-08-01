@@ -1,3 +1,37 @@
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge parser branch to trunk.
+
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.h,
+	  device/include/stddef.h,
+	  support/regression/tests/c2xkeywords.c,
+	  support/regression/tests/typeof.c:
+	  Basic C2X typeof and typeof_unqual support.
+
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/SDCCval.h:
+	  Basic C2X nullptr support.
+
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y:
+	  Simplify grammar rules for enum.
+
 2022-07-29 Felix Salfelder <felix AT salfelder.org>
 
 	* src/SDCC.y:
@@ -166,6 +200,22 @@
 
 	* src/SDCC.y:
 	  Fix SDCC crash on error message for duplicate default label.
+
+2022-06-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx,
+	  device/lib/ds390/lcd390.c,
+	  device/lib/ds390/rtc390.c,
+	  support/regression/tests/absolute.c.in,
+	  support/regression/tests/bitfields-bits1.c.in,
+	  support/regression/tests/bitfields-checks.c.in,
+	  support/regression/tests/bitfields-dead-loop.c.in,
+	  support/regression/tests/bitfields-nibbles.c.in,
+	  support/regression/tests/bug1723128.c,
+	  support/regression/tests/bug1750318.c,
+	  support/regression/tests/bug663539.c,
+	  support/regression/tests/simplefloat.c:
+	  Place __at next to identifier in declarations.
 
 2022-06-21 Maarten Brock <sourceforge.brock AT dse.nl>
 

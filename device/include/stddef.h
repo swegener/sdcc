@@ -74,5 +74,9 @@ typedef int errno_t;
 
 #define offsetof(s, m) __builtin_offsetof (s, m)
 
+#if __STDC_VERSION__ > 201112L // TODO: Replace by >= to exact value from final version of C2X standard.
+typedef typeof(nullptr) nullptr_t;
+#endif
+
 #endif
 

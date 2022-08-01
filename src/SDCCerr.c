@@ -624,7 +624,11 @@ struct
   { W_SINGLE_DASH_LONG_OPT, ERROR_LEVEL_WARNING,
      "use of single-dash long options is discouraged, use '-%s' instead", 0 },
   { E_UNKNOWN_LANGUAGE_STANDARD, ERROR_LEVEL_ERROR,
-     "unknown language standard '%s'", 0 }
+     "unknown language standard '%s'", 0 },
+  { E_CONSTEXPR, ERROR_LEVEL_ERROR,
+     "constexpr not implemented", 0 },
+  { E_TYPEOF, ERROR_LEVEL_ERROR,
+     "typeof and typeof_unqual not implemented for nontrivial expressions", 0 },
 };
 
 /* -------------------------------------------------------------------------------

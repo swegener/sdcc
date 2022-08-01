@@ -100,13 +100,13 @@ typedef struct
     #define VOLATILE_BITS_DEF static volatile TYPE volatileBits
 #elif VAR_TYPE == 5
     #ifdef ABS_ADDR1
-        #define VOLATILE_BITS_DEF static volatile __at(ABS_ADDR1) TYPE volatileBits
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR1) volatileBits
     #else
         #define DUMMY_CASE
     #endif
 #elif VAR_TYPE == 6
     #ifdef ABS_ADDR2
-        #define VOLATILE_BITS_DEF static volatile __at(ABS_ADDR2) TYPE volatileBits
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR2) volatileBits
         #define USE_ONLY_1_BYTE
     #else
         #define DUMMY_CASE

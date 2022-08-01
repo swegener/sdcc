@@ -69,6 +69,8 @@ nounName (sym_link * sl)
       return "_Bool";
     case V_CHAR:
       return "char";
+    case V_NULLPTR:
+      return "nullptr_t";
     case V_VOID:
       return "void";
     case V_STRUCT:
@@ -2827,13 +2829,16 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
 
           return 0;
         }
-      else if (IS_PTR (dest) && IS_INTEGRAL (src))
+      else if (IS_PTR (dest) && (IS_INTEGRAL (src) || IS_NULLPTR (src)))
         return -1;
       else
         return 0;
     }
 
   if (IS_PTR (src) && (IS_INTEGRAL (dest) || IS_VOID (dest)))
+    return -1;
+
+  if (IS_NULLPTR (src) && IS_BOOL (dest))
     return -1;
 
   /* if one is a specifier and the other is not */
@@ -4735,7 +4740,7 @@ validateLink (sym_link * l, const char *macro, const char *args, const char sele
 /* newEnumType - create an integer type compatible with enumerations  */
 /*--------------------------------------------------------------------*/
 sym_link *
-newEnumType (symbol * enumlist)
+newEnumType (symbol *enumlist)
 {
   int min, max, v;
   symbol *sym;

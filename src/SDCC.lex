@@ -192,6 +192,10 @@ static void checkCurrFile (const char *s);
 "static_assert"         { count (); TKEYWORD2X (STATIC_ASSERT); }
 "true"                  { count (); TKEYWORD2X (TOKEN_TRUE); }
 "false"                 { count (); TKEYWORD2X (TOKEN_FALSE); }
+"nullptr"               { count (); TKEYWORD2X (NULLPTR); }
+"constexpr"             { count (); TKEYWORD2X (CONSTEXPR); }
+"typeof"                { count (); TKEYWORD2X (TYPEOF); }
+"typeof_unqual"         { count (); TKEYWORD2X (TYPEOF_UNQUAL); }
 
  /* SDCC-specific intrinsic named address spaces (as per Embedded C TS) */
 "__code"                { count (); TKEYWORD (CODE); }

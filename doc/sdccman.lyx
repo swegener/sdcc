@@ -2689,7 +2689,7 @@ status collapsed
 
 \begin_layout Itemize
 In 4.1.10, the default calling convention switched from __sdccall(0) to __sdccall(
-1) for stm8 and sm83.
+1) for stm8 and gbz80.
 \end_layout
 
 \begin_layout Itemize
@@ -2726,6 +2726,10 @@ In 4.2.3, support for non-parenthesized arguments to __using and __interrupt
 \begin_layout Itemize
 In 4.2.3, support for non-parenthesized arguments to __at that are not constants
  was dropped.
+\end_layout
+
+\begin_layout Itemize
+In 4.2.4, the placement of __at in declarations was restricted.
 \end_layout
 
 \begin_layout Section
@@ -22665,7 +22669,7 @@ at
 \begin_layout Verse
 
 \family typewriter
-__xdata __at (0x7ffe) unsigned int chksum;
+__xdata unsigned int __at (0x7ffe) chksum;
 \end_layout
 
 \begin_layout Standard
@@ -22745,7 +22749,7 @@ Variable initialization
 \begin_layout Verse
 
 \family typewriter
-__code __at (0x7ff0) char Id[5] = 
+__code char __at (0x7ff0) Id[5] = 
 \begin_inset Quotes sld
 \end_inset
 
@@ -22817,7 +22821,7 @@ xdata (mcs51, ds390 named address space)
 
 \end_inset
 
- __at
+ unsigned char __at
 \begin_inset Index idx
 status open
 
@@ -22852,7 +22856,7 @@ at
 
 \end_inset
 
- (0x8000) unsigned char PORTA_8255;
+ (0x8000) PORTA_8255;
 \end_layout
 
 \begin_layout Standard
@@ -24195,7 +24199,7 @@ __bit bvar;
 \begin_inset space ~
 \end_inset
 
-__data __at
+__data unsigned char __at
 \begin_inset Index idx
 status collapsed
 
@@ -24205,7 +24209,7 @@ at
 
 \end_inset
 
- (0x31) unsigned char j;
+ (0x31) j;
 \begin_inset Newline newline
 \end_inset
 

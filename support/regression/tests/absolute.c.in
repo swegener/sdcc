@@ -21,11 +21,11 @@ typedef struct
   int a, b;
 } TestStruct;
 
-{mem} volatile __at(ADDRESS(BC)) TestStruct TestVar = {0,0};
-{mem} __at(ADDRESS(B7)) char u;
-{mem} __at(ADDRESS(B7)) char x = 'x';
-{mem} __at(ADDRESS(B9)) char y = 'y';
-{mem} __at(ADDRESS(B0)) int  k = 0x1234;
+{mem} volatile TestStruct __at(ADDRESS(BC)) TestVar = {0,0};
+{mem} char __at(ADDRESS(B7)) u;
+{mem} char __at(ADDRESS(B7)) x = 'x';
+{mem} char __at(ADDRESS(B9)) y = 'y';
+{mem} int __at(ADDRESS(B0)) k = 0x1234;
 
 char * {mem} __at(ADDRESS(A0)) pc = NULL;
 
@@ -46,7 +46,7 @@ testAbsolute(void)
 {
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
 #if !defined(PORT_HOST)
-  static {mem} __at(ADDRESS(B6)) char s = 's';
+  static {mem} char __at(ADDRESS(B6)) s = 's';
   char {mem} *pC = (char {mem} *)(ADDRESS(B0));
   int  {mem} *pI = (int  {mem} *)(ADDRESS(B0));
 
@@ -68,8 +68,8 @@ testAbsolute(void)
 }
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390)
-volatile __data __at(0x20) unsigned char Byte0 = 0x00;
-volatile __data __at(0x22) unsigned char Byte1 = 0x00;
+volatile __data unsigned char __at(0x20) Byte0 = 0x00;
+volatile __data unsigned char __at(0x22) Byte1 = 0x00;
 volatile __bit Bit0, Bit1, Bit2, Bit3, Bit4, Bit5, Bit6, Bit7, Bit8;
 #endif
 

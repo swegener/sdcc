@@ -36,33 +36,6 @@
 
 #define BITVAR_PAD -1
 
-enum
-{
-  TYPEOF_INT = 1,
-  TYPEOF_SHORT,
-  TYPEOF_BOOL,
-  TYPEOF_CHAR,
-  TYPEOF_LONG,
-  TYPEOF_LONGLONG,
-  TYPEOF_FLOAT,
-  TYPEOF_FIXED16X16,
-  TYPEOF_BIT,
-  TYPEOF_BITFIELD,
-  TYPEOF_SBIT,
-  TYPEOF_SFR,
-  TYPEOF_VOID,
-  TYPEOF_STRUCT,
-  TYPEOF_ARRAY,
-  TYPEOF_FUNCTION,
-  TYPEOF_POINTER,
-  TYPEOF_FPOINTER,
-  TYPEOF_CPOINTER,
-  TYPEOF_GPOINTER,
-  TYPEOF_PPOINTER,
-  TYPEOF_IPOINTER,
-  TYPEOF_EEPPOINTER
-};
-
 // values for first byte (or 3 most significant bits) of generic pointer.
 #if 0
 #define GPTYPE_FAR       0x00
@@ -113,6 +86,7 @@ typedef enum
   V_FIXED16X16,
   V_BOOL,
   V_CHAR,
+  V_NULLPTR,
   V_VOID,
   V_STRUCT,
   V_LABEL,
@@ -174,9 +148,10 @@ typedef struct specifier
   unsigned b_noreturn:1;            /* promised not to return     */
   unsigned b_alignas:1;             /* alignment                  */
   unsigned b_absadr:1;              /* absolute address specfied  */
-  unsigned b_volatile:1;            /* is marked as volatile      */
   unsigned b_const:1;               /* is a constant              */
   unsigned b_restrict:1;            /* is restricted              */
+  unsigned b_volatile:1;            /* is marked as volatile      */
+  unsigned b_atomic:1;              /* is marked as _Atomic       */
   struct symbol *addrspace;         /* is in named address space  */
   unsigned b_typedef:1;             /* is typedefed               */
   unsigned b_isregparm:1;           /* is the first parameter     */
@@ -519,9 +494,10 @@ extern sym_link *validateLink (sym_link * l,
  * _bitStart field instead of defining a new field.
  */
 #define SPEC_ISR_SAVED_BANKS(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
-#define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_volatile
 #define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_const
 #define SPEC_RESTRICT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_restrict
+#define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_volatile
+#define SPEC_ATOMIC(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_atomic
 #define SPEC_ADDRSPACE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.addrspace
 #define SPEC_STRUCT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.v_struct
 #define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_typedef
@@ -569,6 +545,7 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_INLINE(x)     (IS_SPEC(x) && SPEC_INLINE(x))
 #define IS_NORETURN(x)   (IS_SPEC(x) && SPEC_NORETURN(x))
 #define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
+#define IS_NULLPTR(x)    (IS_SPEC(x) && x->select.s.noun == V_NULLPTR)
 #define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_BOOL(x)       (IS_SPEC(x) && x->select.s.noun == V_BOOL)
 #define IS_BITINT(x)     (IS_SPEC(x) && x->select.s.noun == V_BITINT)

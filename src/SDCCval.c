@@ -1536,6 +1536,23 @@ constBoolVal (bool v, bool reduceType)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* constNullptrVal - a value of C2X nullptr_t                      */
+/*-----------------------------------------------------------------*/
+value *
+constNullptrVal (void)
+{
+  value *val = newValue ();     /* alloc space for value   */
+  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
+  SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CONST (val->type) = 1;
+    
+  SPEC_NOUN (val->type) = V_NULLPTR;
+    
+  SPEC_CVAL (val->type).v_uint = 0;
+  return val;
+}
+
 // TODO: Move this function to SDCCutil?
 static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf_8, size_t utf_8_len)
 {
@@ -1960,7 +1977,7 @@ floatFromVal (value * val)
         return (signed char) SPEC_CVAL (val->etype).v_int;
     }
 
-  if (IS_BOOL (val->etype) || IS_BITVAR (val->etype))
+  if (IS_BOOL (val->etype) || IS_NULLPTR (val->etype) || IS_BITVAR (val->etype))
     return SPEC_CVAL (val->etype).v_uint;
 
   if (SPEC_NOUN (val->etype) == V_VOID)
@@ -2129,7 +2146,7 @@ byteOfVal (value *val, int offset)
                (SPEC_CVAL (val->etype).v_int < 0 ? 0xff : 0);
     }
 
-  if (IS_BOOL (val->etype) || IS_BITVAR (val->etype))
+  if (IS_BOOL (val->etype) || IS_NULLPTR (val->etype) || IS_BITVAR (val->etype))
     return offset < 2 ? (SPEC_CVAL (val->etype).v_uint >> shift) & 0xff : 0;
 
   /* we are lost ! */
@@ -2197,7 +2214,7 @@ ullFromLit (sym_link * lit)
         return (signed char) SPEC_CVAL (etype).v_int;
     }
 
-  if (IS_BOOL (etype) || IS_BITVAR (etype))
+  if (IS_BOOL (etype) || IS_NULLPTR (etype) || IS_BITVAR (etype))
     return SPEC_CVAL (etype).v_uint;
 
   if (SPEC_NOUN (etype) == V_VOID)

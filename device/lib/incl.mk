@@ -112,6 +112,7 @@ COMMON_SDCC = \
   wctomb.c \
   mbstowcs.c \
   wcstombs.c \
+  memalignment.c \
   mbrtoc16.c \
   c16rtomb.c \
   mbrtoc32.c \

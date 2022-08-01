@@ -1,5 +1,13 @@
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* device/include/stdlib.h,
+	  device/lib/incl.mk,
+	  device/lib/memalignment.c,
+	  support/regression/tests/memalignment.c.in:
+	  C2X memalignment.
+
+2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge parser branch to trunk.
 
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

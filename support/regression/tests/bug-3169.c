@@ -5,6 +5,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 typedef unsigned char uint8_t;
 typedef unsigned int uint16_t;
 typedef unsigned char bool;

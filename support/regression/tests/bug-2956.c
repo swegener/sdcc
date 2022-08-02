@@ -5,6 +5,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 unsigned int val;
 
 unsigned int testadd()

@@ -4,6 +4,8 @@
  
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 typedef unsigned char UBYTE;
 
 #define MAX_PROJECTILES 2

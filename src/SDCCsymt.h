@@ -253,6 +253,7 @@ typedef struct sym_link
     unsigned rbank:1;               /* seperate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
     unsigned noreturn:1;            /* promised not to return               */
+    bool noprototype:1;             /* Up to C17 function declaratos without prototypes were allowed */
     signed sdcccall;                /* ABI version used                     */
     unsigned smallc:1;              /* Small-C calling convention: Parameters on stack are passed left-to-right */
     unsigned raisonance:1;          /* Raisonance calling convention for STM8 */
@@ -422,6 +423,8 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISINLINE(x) (IS_FUNC(x) && FUNC_ISINLINE(x))
 #define FUNC_ISNORETURN(x) (x->funcAttrs.noreturn)
 #define IFFUNC_ISNORETURN(x) (IS_FUNC(x) && FUNC_ISNORETURN(x))
+#define FUNC_NOPROTOTYPE(x) (x->funcAttrs.noprototype)
+#define IFFUNC_NOPROTOTYPE(x) (IS_FUNC(x) && FUNC_NOPROTOTYPE(x))
 
 #define FUNC_ISREENT(x) (x->funcAttrs.reent)
 #define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))

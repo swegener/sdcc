@@ -6,6 +6,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 #include <stdint.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)

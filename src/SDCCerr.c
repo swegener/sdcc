@@ -629,6 +629,8 @@ struct
      "constexpr not implemented", 0 },
   { E_TYPEOF, ERROR_LEVEL_ERROR,
      "typeof and typeof_unqual not implemented for nontrivial expressions", 0 },
+  { W_FUNCDECL_WITH_NO_PROTOTYPE, ERROR_LEVEL_WARNING,
+     "function declarator with no prototype", 0 },
 };
 
 /* -------------------------------------------------------------------------------

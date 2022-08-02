@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 const char *const data[] = {"a", "b", "c"};
 
 char ptrs(const char *const * ptr);

@@ -5,6 +5,7 @@
 #include <testfwk.h>
 
 #pragma disable_warning 85
+#pragma disable_warning 283
 
 void as(char *c1, const char *c2, unsigned int i)
 {

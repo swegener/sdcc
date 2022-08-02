@@ -1,5 +1,24 @@
 2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/bug-2222.c,
+	  support/regression/tests/bug-2263.c,
+	  support/regression/tests/bug-2320.c,
+	  support/regression/tests/bug-2629.c,
+	  support/regression/tests/bug-2956.c,
+	  support/regression/tests/bug-3079.c,
+	  support/regression/tests/bug-3081.c,
+	  support/regression/tests/bug-3093.c,
+	  support/regression/tests/bug-3135.c,
+	  support/regression/tests/bug-3169.c,
+	  support/regression/tests/bug-3215.c:
+	  Fix handling of pre-C2X function declarators without prototype, RFE #776.
+
+2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge parser branch to trunk.
 
 2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

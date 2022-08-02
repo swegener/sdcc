@@ -867,7 +867,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
   /* if defined parameters ended but actual parameters */
   /* exist and this is not defined as a variable arg   */
-  if (!defParm && *actParm && !IFFUNC_HASVARARGS (functype))
+  if (!defParm && *actParm && !IFFUNC_HASVARARGS (functype) && !IFFUNC_NOPROTOTYPE (functype))
     {
       werror (E_TOO_MANY_PARMS);
       return 1;

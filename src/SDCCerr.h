@@ -310,6 +310,7 @@ enum {
   E_UNKNOWN_LANGUAGE_STANDARD   = 280, /* unknown language standard */
   E_CONSTEXPR                   = 281, /* constexpr not implemented */
   E_TYPEOF                      = 282, /* typeof and typeof_unqual not implemented for nontrivial expressions */
+  W_FUNCDECL_WITH_NO_PROTOTYPE  = 283, /* function declarator with no prototype */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

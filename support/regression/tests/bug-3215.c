@@ -5,6 +5,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 #include <stdio.h>
 
 void foo(void);

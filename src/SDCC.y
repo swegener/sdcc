@@ -1358,8 +1358,6 @@ declarator2_function_attributes
    : function_declarator                 { $$ = $1; }
    | function_declarator function_attributes  {
            // copy the functionAttributes (not the args and hasVargs !!)
-           struct value *args;
-           unsigned hasVargs;
            sym_link *funcType=$1->type;
 
            while (funcType && !IS_FUNC(funcType))
@@ -1369,14 +1367,16 @@ declarator2_function_attributes
              werror (E_FUNC_ATTR);
            else
              {
-               args=FUNC_ARGS(funcType);
-               hasVargs=FUNC_HASVARARGS(funcType);
+               struct value *args = FUNC_ARGS(funcType);
+               unsigned hasVargs = FUNC_HASVARARGS(funcType);
+               bool noprototype = FUNC_NOPROTOTYPE(funcType);
 
                memcpy (&funcType->funcAttrs, &$2->funcAttrs,
                    sizeof($2->funcAttrs));
 
                FUNC_ARGS(funcType)=args;
                FUNC_HASVARARGS(funcType)=hasVargs;
+               FUNC_NOPROTOTYPE(funcType)=noprototype;
 
                // just to be sure
                memset (&$2->funcAttrs, 0,
@@ -1389,9 +1389,17 @@ declarator2_function_attributes
 
 function_declarator
    : declarator2 '('  ')'
-        {
-          addDecl ($1, FUNCTION, NULL);
-        }
+     {
+       addDecl ($1, FUNCTION, NULL);
+
+       // Up to C17, this was a function declarator without a prototype.
+       if (!options.std_c2x)
+         {
+           FUNC_NOPROTOTYPE($1->type) = true;
+           if (!options.lessPedantic)
+             werror (W_FUNCDECL_WITH_NO_PROTOTYPE);
+         }
+     }
    | declarator2 '('
         {
           NestLevel += LEVEL_UNIT;

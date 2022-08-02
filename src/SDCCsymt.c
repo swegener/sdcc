@@ -1444,6 +1444,16 @@ addSymChain (symbol ** symHead)
                   if ((DCL_ELEM (csym->type) > DCL_ELEM (sym->type)) && elemsFromIval)
                     DCL_ELEM (sym->type) = DCL_ELEM (csym->type);
                 }
+              // Is one is a function declarator without a prototype (valid up to C17), and the other one with a prototype, use the prototype for both. */
+              if (IS_FUNC (csym->type) && IS_FUNC (sym->type) && (FUNC_NOPROTOTYPE (csym->type) ^ FUNC_NOPROTOTYPE (sym->type)))
+                {
+                  if (FUNC_NOPROTOTYPE (csym->type))
+                    FUNC_ARGS(csym->type) = FUNC_ARGS(sym->type);
+                  else
+                    FUNC_ARGS(sym->type) = FUNC_ARGS(csym->type);
+                  FUNC_NOPROTOTYPE (csym->type) = false;
+                  FUNC_NOPROTOTYPE (sym->type) = false;
+                }
 
 #if 0
               /* If only one of the definitions used the "at" keyword, copy */

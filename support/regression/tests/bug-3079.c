@@ -4,6 +4,8 @@
  
 #include <testfwk.h>
 
+#pragma disable_warning 283
+
 #if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_gz80)
 #define __smallc
 #endif

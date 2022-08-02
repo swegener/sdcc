@@ -1881,10 +1881,16 @@ checkSClass (symbol *sym, int isProto)
     }
 
   if (!sym->level && SPEC_SCLS (sym->etype) == S_AUTO)
-   {
-     werrorfl (sym->fileDef, sym->lineDef, E_AUTO_FILE_SCOPE);
-     SPEC_SCLS (sym->etype) = S_FIXED;
-   }
+    {
+      werrorfl (sym->fileDef, sym->lineDef, E_AUTO_FILE_SCOPE);
+      SPEC_SCLS (sym->etype) = S_FIXED;
+    }
+
+  if (SPEC_SCLS (sym->etype) == S_AUTO && SPEC_EXTR(sym->etype) ||
+    SPEC_SCLS (sym->etype) == S_AUTO && SPEC_STAT(sym->etype))
+    {
+      werrorfl (sym->fileDef, sym->lineDef, E_TWO_OR_MORE_STORAGE_CLASSES, sym->name);
+    }
 
   /* type is literal can happen for enums change to auto */
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))

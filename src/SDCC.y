@@ -458,6 +458,8 @@ declaration
          /* add the specifier list to the id */
          symbol *sym , *sym1;
 
+         bool autocandidate = options.std_c2x && SPEC_SCLS($1) == S_AUTO;
+
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
              sym_link *lnk = copyLinkChain($1);
              sym_link *l0 = NULL, *l1 = NULL, *l2 = NULL;
@@ -465,13 +467,13 @@ declaration
              for (l0 = sym->type; l0 != NULL; l0 = l0->next)
                if (IS_PTR (l0))
                  break;
-             /* check if creating intances of structs with flexible arrays */
+             /* check if creating instances of structs with flexible arrays */
              for (l1 = lnk; l1 != NULL; l1 = l1->next)
                if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
                  break;
              if (!options.std_c99 && l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
                werror (W_FLEXARRAY_INSTRUCT, sym->name);
-             /* check if creating intances of function type */
+             /* check if creating instances of function type */
              for (l1 = lnk; l1 != NULL; l1 = l1->next)
                if (IS_FUNC (l1))
                  break;
@@ -480,6 +482,11 @@ declaration
                  break;
              if (l0 == NULL && l2 == NULL && l1 != NULL)
                werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
+             if (autocandidate && !sym->type && sym->ival && sym->ival->type == INIT_NODE) // C2X auto type inference
+               {
+                 sym->type = sym->etype = typeofOp (sym->ival->init.node);
+                 SPEC_SCLS (lnk) = 0;
+               }
              /* do the pointer stuff */
              pointerTypes(sym->type,lnk);
              addDecl (sym,0,lnk);
@@ -703,18 +710,8 @@ type_specifier
 typeof_specifier
    : TYPEOF '(' expression ')'
      {
-       if (!IS_AST_LIT_VALUE($3))
-         {
-           werror (E_TYPEOF);
-           $$ = newLink (SPECIFIER);
-           SPEC_NOUN ($$) = V_VOID;
-           ignoreTypedefType = 1;
-         }
-       else
-         {
-           $$ = copyLinkChain ($3->opval.val->type);
-           SPEC_SCLS ($$) = 0;
-         }
+       $$ = typeofOp ($3);
+       wassert ($$);
      }
    | TYPEOF '(' type_name ')'
      {
@@ -723,18 +720,14 @@ typeof_specifier
      }
    | TYPEOF_UNQUAL '(' expression ')'
      {
-       if (!IS_AST_LIT_VALUE($3))
-         {
-           werror (E_TYPEOF);
-           $$ = newLink (SPECIFIER);
-           SPEC_NOUN ($$) = V_VOID;
-           ignoreTypedefType = 1;
-         }
-       else
-         {
-           $$ = copyLinkChain ($3->opval.val->type);
-           SPEC_SCLS ($$) = 0;
-         }
+       $$ = typeofOp ($3);
+       wassert ($$);
+       wassert (IS_SPEC ($$));
+       SPEC_CONST ($$) = 0;
+       SPEC_RESTRICT ($$) = 0;
+       SPEC_VOLATILE ($$) = 0;
+       SPEC_ATOMIC ($$) = 0;
+       SPEC_ADDRSPACE ($$) = 0;
      }
    | TYPEOF_UNQUAL '(' type_name ')'
      {

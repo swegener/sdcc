@@ -3601,6 +3601,8 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         dtr = tree->right;
         break;
       case SIZEOF:
+      case TYPEOF:
+      case TYPEOF_UNQUAL:
         /* don't allocate string if it is a sizeof argument */
         ++noAlloc;
         resultTypeProp = RESULT_TYPE_OTHER;
@@ -5365,6 +5367,12 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
         return tree;
       }
+    case TYPEOF:
+    case TYPEOF_UNQUAL:
+      {
+        wassert (0);
+        return 0;
+      }
       /*------------------------------------------------------------------*/
       /*----------------------------*/
       /* conditional operator  '?'  */
@@ -5938,7 +5946,7 @@ sizeofOp (sym_link *type)
 }
 
 /*-----------------------------------------------------------------*/
-/* sizeofOp - processes alignment of operation                     */
+/* alignofOp - processes alignment of operation                    */
 /*-----------------------------------------------------------------*/
 value *
 alignofOp (sym_link *type)
@@ -5951,6 +5959,20 @@ alignofOp (sym_link *type)
   val = constVal ("1");
 
   return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* sizeofOp - processes typeof for expression                      */
+/*-----------------------------------------------------------------*/
+sym_link *
+typeofOp (ast *tree)
+{
+  ++noAlloc;
+  decorateType (resolveSymbols (tree), RESULT_TYPE_NONE, false);
+  --noAlloc;
+  sym_link *type = copyLinkChain (tree->ftype);
+  SPEC_SCLS (type) = 0;
+  return type;
 }
 
 /*-----------------------------------------------------------------*/

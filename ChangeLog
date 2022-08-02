@@ -1,10 +1,31 @@
+2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge parser branch to trunk.
+
+2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y,
+	  src/SDCCsymt.c,
+	  support/regression/tests/auto.c,
+	  support/valdiag/tests/bug-3464.c:
+	  C2X auto, RFE #849, fix bug #3464.
+
+2022-08-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y,
+	  src/SDCCast.h,
+	  src/SDCCast.c,
+	  .version,
+	  support/regression/tests/typeof.c:
+	  C2X typeof, typeof_unqual, RFE #739, RFE #783.
+
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stddef.h,
 	  src/SDCCicode.c,
 	  src/SDCCsymt.c,
 	  support/regression/tests/unreachable.c:
-	  C2X unreachable.
+	  C2X unreachable, RFE #778.
 
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -12,7 +33,7 @@
 	  device/lib/incl.mk,
 	  device/lib/memalignment.c,
 	  support/regression/tests/memalignment.c.in:
-	  C2X memalignment.
+	  C2X memalignment, RFE #856.
 
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -29,7 +50,7 @@
 	  device/include/stddef.h,
 	  support/regression/tests/c2xkeywords.c,
 	  support/regression/tests/typeof.c:
-	  Basic C2X typeof and typeof_unqual support.
+	  Basic C2X typeof and typeof_unqual support, part of RFE #739, RFE #783. RFE #853.
 
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -41,7 +62,7 @@
 	  src/SDCCsymt.h,
 	  src/SDCCval.c,
 	  src/SDCCval.h:
-	  Basic C2X nullptr support.
+	  Basic C2X nullptr support, part of RFE #853.
 
 2022-08-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -631,6 +631,8 @@ struct
      "typeof and typeof_unqual not implemented for nontrivial expressions", 0 },
   { W_FUNCDECL_WITH_NO_PROTOTYPE, ERROR_LEVEL_WARNING,
      "function declarator with no prototype", 0 },
+  { W_UNKNOWN_ATTRIBUTE, ERROR_LEVEL_WARNING,
+     "unknown attribute '%s' ignored", 0 },
 };
 
 /* -------------------------------------------------------------------------------

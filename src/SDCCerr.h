@@ -311,6 +311,7 @@ enum {
   E_CONSTEXPR                   = 281, /* constexpr not implemented */
   E_TYPEOF                      = 282, /* typeof and typeof_unqual not implemented for nontrivial expressions */
   W_FUNCDECL_WITH_NO_PROTOTYPE  = 283, /* function declarator with no prototype */
+  W_UNKNOWN_ATTRIBUTE           = 284, /* unknown attribute ignored*/
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

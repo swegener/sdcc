@@ -4,7 +4,7 @@
  */
 
 #ifdef TEST1
-int f();
+int f(); /* IGNORE */
 
 enum some_enum
 {

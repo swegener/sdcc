@@ -133,6 +133,7 @@ bool uselessDecl = true;
 %type <sym> member_declarator_list member_declaration member_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list
+%type <sym> kr_declaration kr_declaration_list
 %type <sym> declaration_after_statement
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
@@ -1124,10 +1125,10 @@ declarator
    ;
 
 direct_declarator
-   : identifier
+   : identifier attribute_specifier_sequence_opt
    | '(' declarator ')'     { $$ = $2; }
-   | array_declarator
-   | declarator2_function_attributes
+   | array_declarator attribute_specifier_sequence_opt
+   | declarator2_function_attributes attribute_specifier_sequence_opt
    ;
 
 declarator2
@@ -1412,13 +1413,19 @@ function_declarator
         {
           sym_link *funcType;
 
+          bool is_fptr = IS_FUNC($1->type); // Already a function, must be a function pointer.
+
           addDecl ($1, FUNCTION, NULL);
-
           funcType = $1->type;
-          while (funcType && !IS_FUNC(funcType))
-              funcType = funcType->next;
 
-          assert (funcType);
+          // For a function pointer, the parmeter list here is for the returned type.
+          if (is_fptr)
+            funcType = funcType->next;
+
+          while (funcType && !IS_FUNC(funcType))
+            funcType = funcType->next;
+
+          wassert (funcType);
 
           FUNC_HASVARARGS(funcType) = IS_VARG($4);
           FUNC_ARGS(funcType) = reverseVal($4);
@@ -1833,11 +1840,17 @@ attribute_token
      {
        $$ = $1;
        $$->next = 0;
+       werror (W_UNKNOWN_ATTRIBUTE, $1->name);
      }
    | identifier TOK_SEP identifier
      {
        $$ = $1;
        $$->next = $3;
+       struct dbuf_s dbuf;
+       dbuf_init (&dbuf, 64);
+       dbuf_printf (&dbuf, "%s::%s", $1->name, $3->name);
+       werror (W_UNKNOWN_ATTRIBUTE, dbuf_c_str (&dbuf));
+       dbuf_destroy (&dbuf);
      }
    ;
 
@@ -1854,6 +1867,7 @@ balanced_token_sequence
 balanced_token
    : identifier
    | STRING_LITERAL
+   | CONSTANT
    ;
 
    /* C2X A.2.3 Statements */
@@ -2243,20 +2257,20 @@ function_definition
 
 function_body
    : compound_statement
-   | declaration_list compound_statement
-                     {
-                       werror (E_OLD_STYLE, ($1 ? $1->name: ""));
-                       exit (1);
-                     }
+   | kr_declaration_list compound_statement
+     {
+       werror (E_OLD_STYLE, ($1 ? $1->name: ""));
+       exit (1);
+     }
    ;
 
    /* SDCC-specific stuff */
 
 file
    : /* empty */
-        {
-          werror(W_EMPTY_SOURCE_FILE);
-        }
+     {
+       werror(W_EMPTY_SOURCE_FILE);
+     }
    | translation_unit
    ;
 
@@ -2702,6 +2716,87 @@ declaration_list
      }
 
    | declaration_list declaration
+     {
+       symbol   *sym;
+
+       /* if this is a typedef */
+       if ($2 && IS_TYPEDEF($2->etype)) {
+         allocVariables ($2);
+         $$ = $1;
+       }
+       else {
+         /* get to the end of the previous decl */
+         if ( $1 ) {
+           $$ = sym = $1;
+           while (sym->next)
+             sym = sym->next;
+           sym->next = $2;
+         }
+         else
+           $$ = $2;
+       }
+       ignoreTypedefType = 0;
+       addSymChain(&$2);
+     }
+   ;
+
+// The parameter declarations in K&R-style functions need to be handled in a special way to avoid
+// ambiguities in the grammer. We do this by not allowing attributes on the parameter declarations.
+// Otherwise, in e.g.
+//  void f(x) [[attribute]] int x; {}
+// it would be unclear if the attribute applies to the type of f vs. the declaration of x.
+kr_declaration
+   : declaration_specifiers init_declarator_list ';'
+      {
+         /* add the specifier list to the id */
+         symbol *sym , *sym1;
+
+         for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
+             sym_link *lnk = copyLinkChain($1);
+             sym_link *l0 = NULL, *l1 = NULL, *l2 = NULL;
+             /* check illegal declaration */
+             for (l0 = sym->type; l0 != NULL; l0 = l0->next)
+               if (IS_PTR (l0))
+                 break;
+             /* check if creating instances of structs with flexible arrays */
+             for (l1 = lnk; l1 != NULL; l1 = l1->next)
+               if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
+                 break;
+             if (!options.std_c99 && l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
+               werror (W_FLEXARRAY_INSTRUCT, sym->name);
+             /* check if creating instances of function type */
+             for (l1 = lnk; l1 != NULL; l1 = l1->next)
+               if (IS_FUNC (l1))
+                 break;
+             for (l2 = lnk; l2 != NULL; l2 = l2->next)
+               if (IS_PTR (l2))
+                 break;
+             if (l0 == NULL && l2 == NULL && l1 != NULL)
+               werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
+             /* do the pointer stuff */
+             pointerTypes(sym->type,lnk);
+             addDecl (sym,0,lnk);
+         }
+
+         uselessDecl = true;
+         $$ = sym1;
+      }
+   ;
+
+kr_declaration_list
+   : kr_declaration
+     {
+       /* if this is typedef declare it immediately */
+       if ( $1 && IS_TYPEDEF($1->etype)) {
+         allocVariables ($1);
+         $$ = NULL;
+       }
+       else
+         $$ = $1;
+       ignoreTypedefType = 0;
+       addSymChain(&$1);
+     }
+   | kr_declaration_list kr_declaration
      {
        symbol   *sym;
 

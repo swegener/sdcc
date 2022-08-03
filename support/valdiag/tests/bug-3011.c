@@ -4,7 +4,7 @@
  */
 
 #ifdef TEST1
-void f()
+void f() /* IGNORE */
 {
     int *p = (int *){1}; /* IGNORE */
 }

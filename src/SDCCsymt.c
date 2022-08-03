@@ -499,7 +499,7 @@ pointerTypes (sym_link * ptr, sym_link * type)
 /* addDecl - adds a declarator @ the end of a chain                 */
 /*------------------------------------------------------------------*/
 void
-addDecl (symbol * sym, int type, sym_link * p)
+addDecl (symbol *sym, int type, sym_link *p)
 {
   sym_link *head;
   sym_link *tail;
@@ -3746,6 +3746,8 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                            (IFFUNC_ISBUILTIN (type) ? "__builtin__ " : ""),
                            (IFFUNC_ISJAVANATIVE (type) ? "_JavaNative " : ""));
               dbuf_append_str (dbuf, "( ");
+              if (!FUNC_ARGS (type) && !FUNC_HASVARARGS(type) && !FUNC_NOPROTOTYPE(type))
+                dbuf_append_str (dbuf, "void ");
               for (args = FUNC_ARGS (type); args; args = args->next)
                 {
                   dbuf_printTypeChain (args->type, dbuf);

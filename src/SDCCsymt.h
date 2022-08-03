@@ -532,7 +532,7 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_FARPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
 #define IS_CODEPTR(x)    (IS_DECL(x) && DCL_TYPE(x) == CPOINTER)
 #define IS_GENPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
-#define IS_FUNCPTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER) && IS_FUNC(x->next))
+#define IS_FUNCPTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER || DCL_TYPE(x) == UPOINTER) && IS_FUNC(x->next))
 #define IS_FUNC(x)       (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
 #define IS_LONG(x)       (IS_SPEC(x) && x->select.s.b_long)
 #define IS_LONGLONG(x)   (IS_SPEC(x) && x->select.s.b_longlong)

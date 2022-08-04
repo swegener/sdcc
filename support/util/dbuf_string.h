@@ -67,3 +67,4 @@ void dbuf_write_and_destroy (struct dbuf_s *dbuf, FILE *dest);
 #endif
 
 #endif  /* __DBUF_STRING_H */
+

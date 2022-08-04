@@ -606,7 +606,7 @@ ${Section} "SDCC PIC14 library" SEC22
   File "${DEV_ROOT}\non-free\lib\pic14\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC STM8 small model library" SEC23
+${Section} "SDCC STM8 medium model library" SEC23
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\stm8"
   File "${DEV_ROOT}\lib\stm8\*.*"
@@ -915,7 +915,7 @@ LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC HC08 library"
 LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC S08 library"
 LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC PIC14 library"
-LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 small library"
+LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 medium model library"
 LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC TLCS90 library"
 LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
 LangString DESC_SEC26 ${LANG_ENGLISH} "SDCC STM8 large model library"

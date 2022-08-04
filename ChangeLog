@@ -1,3 +1,8 @@
+2022-08-04 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* support/scripts/sdcc.nsi:
+	  Correct STM8 memory model name from small to medium, fixing bug #3466.
+
 2022-08-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/util/dbuf_string.c:

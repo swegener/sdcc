@@ -31,7 +31,7 @@
 #define __SDCC_STDDEF_H 1
 
 #ifndef NULL
-  #define NULL (void *)0
+  #define NULL ((void *)0)
 #endif
 
 #ifndef __PTRDIFF_T_DEFINED

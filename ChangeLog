@@ -1,5 +1,10 @@
 2022-08-05 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* device/include/stddef.h:
+	  Protect NULL macro with parentheses, fixing bug #3467.
+
+2022-08-05 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* doc/sdccman.lyx:
 	  Missing K&R function support is not a deviation from C2X compliance.
 

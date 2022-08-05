@@ -4,6 +4,8 @@
  */
 #include <testfwk.h>
 
+#ifndef PORT_HOST // No longer works
+
 #if !defined(__SDCC_pdk14) // Lack of memory
 #define type_{type}
 
@@ -71,9 +73,12 @@ mullong_wrapper (TYPE_TARGET_LONG a, TYPE_TARGET_LONG b)
 
 #endif
 
+#endif
+
 void
 testlibmullong(void)
 {
+#ifndef PORT_HOST
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   ASSERT(mullong (         0,          0) ==          0);
   ASSERT(mullong (     0x100,      0x100) ==    0x10000);
@@ -112,5 +117,6 @@ testlibmullong(void)
   ASSERT(mullong (0xfffffcfb, 0xfffffefd) == 0x00030e0f);
 
   ASSERT(mullong (0xffffffff, 0xffffffff) ==          1);
+#endif
 #endif
 }

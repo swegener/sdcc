@@ -30,9 +30,11 @@
 
 #include <stdint.h>
 
+#include <stdbit.h>
+
 #ifdef __SDCC_LONGLONG
 
-#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8) // Big-endian
+#if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
 
 unsigned long long _rlulonglong(unsigned long long l, char s)
 {
@@ -56,7 +58,7 @@ unsigned long long _rlulonglong(unsigned long long l, char s)
 	return(l);
 }
 
-#else // Little-endian
+#else
 
 unsigned long long _rlulonglong(unsigned long long l, char s)
 {

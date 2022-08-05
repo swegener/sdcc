@@ -4,6 +4,7 @@
 
 #include <testfwk.h>
 
+#ifdef __SDCC
 enum e0
 {
 	E0_0,
@@ -27,11 +28,12 @@ enum e3
 	E3_0 = 0xffffffff,
 	E3_1
 };
+#endif
 
 void
 testBug (void)
 {
-// The choicce of the underlying type is implementation-defined.
+// The choice of the underlying type is implementation-defined.
 #ifdef __SDCC
 	ASSERT (sizeof(enum e0) == 1);
 	ASSERT (sizeof(enum e1) == 2);

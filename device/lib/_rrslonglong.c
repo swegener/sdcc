@@ -33,8 +33,7 @@
 #ifdef __SDCC_LONGLONG
 // This function is the same as the one from rrulonglong_rrx_s.c, except for the type of top.
 
-#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8) // Big-endian
-
+#if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
 long long _rrslonglong(long long l, char s)
 {
 	int32_t *top = (uint32_t *)((char *)(&l) + 0);
@@ -56,9 +55,7 @@ long long _rrslonglong(long long l, char s)
 
 	return(l);
 }
-
-#else // Little-endian
-
+#else
 long long _rrslonglong(long long l, char s)
 {
 	int32_t *top = (uint32_t *)((char *)(&l) + 4);

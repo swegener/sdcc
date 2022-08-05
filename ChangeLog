@@ -1,5 +1,20 @@
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* device/include/stdbit.h,
+	  device/include/stdint.h,
+	  device/lib/_mulint.c,
+	  device/lib/_mullong.c,
+	  device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rrulonglong.c,
+	  device/lib/_startup.c,
+	  device/lib/__stdc_count_onesull.c,
+	  support/regression/tests/bitcount.c.in,
+	  device/lib/_mullong.c:
+	  Provide and use bit and byte utility types and macros. Provide bit and byte utilitites bit count and single-bit check functions.
+
+2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* .version,
 	  src/SDCC.y,
 	  src/SDCCerr.c,

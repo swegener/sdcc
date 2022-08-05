@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   _startup.c - startup routine for sdcc
+   __stdc_count_onesull.c - part of bit and byte utilitites
 
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (C) 2022, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,32 +26,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* External startup code can be written in C
-   here .. Special usage if this routine
-   returns a non-zero value then global &
-   static variable initialisation will be skipped.
-   Beware not to use initialized variables as they
-   are not initialized yet nor to use pdata/xdata
-   variables if external data memory needs to be
-   enabled first. */
+#include <stdbit.h>
 
-#if defined(__SDCC_ds390) || defined(__SDCC_ds400)
+#include <limits.h>
+#include <stdint.h>
+#include <assert.h>
 
-/* Disable "ISO C forbids an empty source file" warning message */
-#pragma disable_warning 190
+static_assert(INT_FAST8_MAX >= ULLONG_WIDTH, "Unsuitable return type");
 
-#elif defined(__SDCC_mcs51) || defined(__SDCC_z80)
-
-unsigned char _sdcc_external_startup (void) __nonbanked
+int_fast8_t __stdc_count_onesull(unsigned long long value)
 {
-    return 0;
+	int_fast8_t count = 0;
+	for(uint_fast8_t i = 0; i < ULLONG_WIDTH; i++)
+		if(value & (1ull << i))
+			count++;
+	return count;
 }
 
-#else
-
-unsigned char _sdcc_external_startup (void)
-{
-    return 0;
-}
-
-#endif

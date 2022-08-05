@@ -38,6 +38,9 @@
 #endif
 #endif
 
+#ifndef __SPECIFIED_WIDTH_INTEGER_TYPES_DEFINED
+#define __SPECIFIED_WIDTH_INTEGER_TYPES_DEFINED
+
 /* Signed.  */
 
 typedef signed char             int8_t;
@@ -90,6 +93,8 @@ typedef unsigned long int       uint_fast32_t;
 #ifdef __SDCC_LONGLONG
 typedef unsigned long long int  uint_fast64_t;
 #endif
+
+#endif // __SPECIFIED_WIDTH_INTEGER_TYPES_DEFINED
 
 /* Types for `void *' pointers.  */
 #if defined (__SDCC_mcs51) || defined (__SDCC_ds390)

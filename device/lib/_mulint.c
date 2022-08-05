@@ -208,14 +208,14 @@ __mulint_PARM_2:
 
 #else
 
-#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8)
-// Big-endian
+#include <stdbit.h>
+
+#if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
 union uu {
 	struct { unsigned char hi, lo ;} s;
         unsigned int t;
 };
 #else
-// Little-endian
 union uu {
 	struct { unsigned char lo,hi ;} s;
         unsigned int t;

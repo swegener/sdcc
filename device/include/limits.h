@@ -67,6 +67,10 @@
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 200300L
 #define BITINT_MAXWIDTH __SDCC_BITINT_MAXWIDTH
+#define USHRT_WIDTH 16
+#define UINT_WIDTH 16
+#define ULONG_WIDTH 32
+#define ULLONG_WIDTH 64
 #endif
 
 #endif

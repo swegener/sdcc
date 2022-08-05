@@ -629,8 +629,10 @@ struct some_struct {
 	short a ;
 	char b;
 	long c ;};
-#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8)
-/* big endian order */
+	
+#include <stdbit.h>
+
+#if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
 union bil {
         struct {unsigned char b3,b2,b1,b0 ;} b;
         struct {unsigned short hi,lo ;} i;
@@ -638,7 +640,6 @@ union bil {
         struct { unsigned char b3; unsigned short i12; unsigned char b0;} bi;
 } ;
 #else
-/* little endian order */
 union bil {
         struct {unsigned char b0,b1,b2,b3 ;} b;
         struct {unsigned short lo,hi ;} i;

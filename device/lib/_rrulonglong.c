@@ -33,8 +33,7 @@
 #ifdef __SDCC_LONGLONG
 // This function is the same as the one from rrslonglong_rrx_s.c, except for the type of top, and b[0/3].
 
-#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8) // Big-endian
-
+#if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
 unsigned long long _rrulonglong(unsigned long long l, char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 0);
@@ -56,9 +55,7 @@ unsigned long long _rrulonglong(unsigned long long l, char s)
 
 	return(l);
 }
-
-#else // Little-endian
-
+#else
 unsigned long long _rrulonglong(unsigned long long l, char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
@@ -80,7 +77,6 @@ unsigned long long _rrulonglong(unsigned long long l, char s)
 
 	return(l);
 }
-
 #endif
 
 #endif

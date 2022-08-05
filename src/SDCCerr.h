@@ -312,6 +312,12 @@ enum {
   E_TYPEOF                      = 282, /* typeof and typeof_unqual not implemented for nontrivial expressions */
   W_FUNCDECL_WITH_NO_PROTOTYPE  = 283, /* function declarator with no prototype */
   W_UNKNOWN_ATTRIBUTE           = 284, /* unknown attribute ignored*/
+  W_EMPTY_INIT_C2X              = 285, /* empty initializer requires ISO C2X or later */
+  E_EMPTY_INIT_UNKNOWN_SIZE     = 286, /* array of unknown size cannnot be initialized by an empty initializer */
+  E_VLA_TYPE_C99                = 287, /* variable length array type requires ISO C99 or later */
+  E_VLA_OBJECT                  = 288, /* object of variable length array type not supported */
+  E_VLA_SCOPE                   = 289, /* variable length array declarators must have function prototype scope or block scope */
+  E_VLA_INIT                    = 290, /* variable length arrays can be initalized by empty initalizers only */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

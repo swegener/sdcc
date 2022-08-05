@@ -93,12 +93,12 @@ nounName (sym_link * sl)
   return "unknown";
 }
 
-bucket *SymbolTab[256];         /* the symbol    table  */
-bucket *StructTab[256];         /* the structure table  */
-bucket *TypedefTab[256];        /* the typedef   table  */
-bucket *LabelTab[256];          /* the Label     table  */
-bucket *enumTab[256];           /* enumerated    table  */
-bucket *AddrspaceTab[256];      /* the named address space table  */
+bucket *SymbolTab[HASHTAB_SIZE];         /* the symbol    table  */
+bucket *StructTab[HASHTAB_SIZE];         /* the structure table  */
+bucket *TypedefTab[HASHTAB_SIZE];        /* the typedef   table  */
+bucket *LabelTab[HASHTAB_SIZE];          /* the Label     table  */
+bucket *enumTab[HASHTAB_SIZE];           /* enumerated    table  */
+bucket *AddrspaceTab[HASHTAB_SIZE];      /* the named address space table  */
 
 /*------------------------------------------------------------------*/
 /* initSymt () - initialises symbol table related stuff             */
@@ -108,7 +108,7 @@ initSymt (void)
 {
   int i = 0;
 
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < HASHTAB_SIZE; i++)
     SymbolTab[i] = StructTab[i] = (void *) NULL;
 }
 
@@ -135,7 +135,7 @@ hashKey (const char *s)
 
   while (*s)
     key += *s++;
-  return key % 256;
+  return key % HASHTAB_SIZE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1392,6 +1392,46 @@ reverseLink (sym_link * type)
 }
 
 /*------------------------------------------------------------------*/
+/*arraySizes - fill in missing known array sizes                    */
+/*------------------------------------------------------------------*/
+static void
+arraySizes (sym_link *type, const char *name)
+{
+  // Recurse
+  if (IS_DECL(type) && type->select.d.vla_check_visited)
+    return;
+
+  if (IS_ARRAY (type) && !DCL_ELEM (type) && DCL_ELEM_AST (type))
+    {
+      value *tval = constExprValue(DCL_ELEM_AST (type), true);
+      if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+        {
+          if (!options.std_c99)
+            werror(E_VLA_TYPE_C99);
+          DCL_ARRAY_VLA(type) = true;
+        }
+      else
+        {
+          int size = ulFromVal(tval);
+          if (tval < 0)
+            {
+              werror(E_NEGATIVE_ARRAY_SIZE, name);
+              size = 1;
+            }
+          DCL_ELEM(type) = size;
+        }
+    }
+  if (IS_DECL(type))
+    type->select.d.vla_check_visited = true;
+
+  if (IS_DECL(type))
+    arraySizes (type->next, name);
+  else if (IS_STRUCT (type))
+    for(symbol *fields = SPEC_STRUCT (type)->fields; fields; fields = fields->next)
+      arraySizes (fields->type, name);
+}
+
+/*------------------------------------------------------------------*/
 /* addSymChain - adds a symbol chain to the symboltable             */
 /*------------------------------------------------------------------*/
 void
@@ -1403,24 +1443,34 @@ addSymChain (symbol ** symHead)
   int error = 0;
   int elemsFromIval = 0;
 
-  for (sym = *symHead; sym != NULL; sym = sym->next)
+  for (sym = *symHead; sym; sym = sym->next)
     {
       changePointer (sym->type);
       checkTypeSanity (sym->etype, sym->name);
-
+#if 0
+      printf("addSymChain for %p %s level %ld\n", sym, sym->name, sym->level);
+#endif
+      arraySizes (sym->type, sym->name);
       if (IS_NORETURN (sym->etype))
         {
           SPEC_NORETURN (sym->etype) = 0;
           FUNC_ISNORETURN (sym->type) = 1;
         }
 
+      if (!sym->level && IS_ARRAY (sym->type) && IS_ARRAY (sym->type) && DCL_ARRAY_VLA (sym->type))
+        {
+          werror (E_VLA_SCOPE);
+          continue;
+        }
+
       if (!sym->level && !(IS_SPEC (sym->etype) && IS_TYPEDEF (sym->etype)))
         elemsFromIval = checkDecl (sym, 0);
       else
         {
-          /* if this is an array without any dimension
-             then update the dimension from the initial value */
-          if (IS_ARRAY (sym->type) && !DCL_ELEM (sym->type))
+          if (IS_ARRAY (sym->type) && DCL_ELEM_AST (sym->type))
+            arraySizes (sym->type, sym->name);
+          // if this is an array without any dimension then update the dimension from the initial value
+          else if (IS_ARRAY (sym->type) && !DCL_ELEM_AST (sym->type) && !DCL_ELEM (sym->type))
             elemsFromIval = DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
         }
 
@@ -1483,7 +1533,7 @@ addSymChain (symbol ** symHead)
               if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
                 werror (E_EXTERN_MISMATCH, sym->name);
               else
-                werror (E_DUPLICATE, sym->name);
+                werror (E_DUPLICATE, sym->name);printf("previous %p\n", csym);
               werrorfl (csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
 #if 0
               fprintf (stderr, "from type '");
@@ -1634,7 +1684,7 @@ compStructSize (int su, structdef * sdef)
   const int oldlineno = lineno;
 
   if (!sdef->fields)
-    {
+    {printf("D\n");
       werror (E_UNKNOWN_SIZE, sdef->tag);
     }
 
@@ -2155,11 +2205,17 @@ checkDecl (symbol * sym, int isProto)
 {
   checkSClass (sym, isProto);   /* check the storage class     */
   changePointer (sym->type);    /* change pointers if required */
+  arraySizes (sym->type, sym->name);
 
+  if (IS_ARRAY (sym->type) && DCL_ARRAY_VLA (sym->type) && sym->ival && !sym->ival->isempty)
+    werror (E_VLA_INIT);
   /* if this is an array without any dimension
      then update the dimension from the initial value */
   if (IS_ARRAY (sym->type) && !DCL_ELEM (sym->type))
-    return DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
+    if (sym->ival && sym->ival->isempty)
+      werror (E_EMPTY_INIT_UNKNOWN_SIZE);
+    else
+      return DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
 
   return 0;
 }
@@ -2198,7 +2254,7 @@ cleanUpBlock (bucket ** table, int block)
   bucket *chain;
 
   /* go thru the entire  table  */
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < HASHTAB_SIZE; i++)
     {
       for (chain = table[i]; chain; chain = chain->next)
         {
@@ -2221,7 +2277,7 @@ cleanUpLevel (bucket ** table, long level)
   bucket *chain;
 
   /* go thru the entire  table  */
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < HASHTAB_SIZE; i++)
     {
       for (chain = table[i]; chain; chain = chain->next)
         {
@@ -2244,7 +2300,7 @@ leaveBlockScope (int block)
   bucket *chain;
 
   /* go thru the entire  table  */
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < HASHTAB_SIZE; i++)
     {
       for (chain = SymbolTab[i]; chain; chain = chain->next)
         {
@@ -3466,7 +3522,7 @@ cdbStructBlock (int block)
   bucket *chain;
 
   /* go thru the entire  table  */
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < HASHTAB_SIZE; i++)
     {
       for (chain = table[i]; chain; chain = chain->next)
         {
@@ -3553,7 +3609,7 @@ processFuncArgs (symbol *func, sym_link *funcType)
 
   /* if any of the arguments is an aggregate */
   /* change it to pointer to the same type */
-  while (val)
+  for (; val; val=val->next, pNum++)
     {
       int argreg = 0;
       struct dbuf_s dbuf;
@@ -3594,41 +3650,31 @@ processFuncArgs (symbol *func, sym_link *funcType)
           FUNC_HASSTACKPARM (funcType) = 1;
         }
 
-      val = val->next;
-      pNum++;
-    }
-
-  /* if this is an internal generated function call */
-  if (funcCdef)
-    {
-      /* ignore --stack-auto for this one, we don't know how it is compiled */
-      /* simply trust on --int-long-reent or --float-reent */
-      if (IFFUNC_ISREENT (funcType))
+      /* if this is an internal generated function call */
+      if (funcCdef)
         {
-          return;
+          /* ignore --stack-auto for this one, we don't know how it is compiled */
+          /* simply trust on --int-long-reent or --float-reent */
+          if (IFFUNC_ISREENT (funcType))
+            continue;
         }
-    }
-  else
-    {
-      /* if this function is reentrant or */
-      /* automatics r 2b stacked then nothing */
-      if (IFFUNC_ISREENT (funcType) || options.stackAuto)
-        return;
-    }
+      else
+       {
+          /* if this function is reentrant or */
+          /* automatics r 2b stacked then nothing */
+          if (IFFUNC_ISREENT (funcType) || options.stackAuto)
+            continue;
+        }
 
-  /* Don't create parameter symbols without a function symbol */
-  if (!func)
-    return;
+      /* Don't create parameter symbols without a function symbol */
+      if (!func)
+        continue;
 
-  val = FUNC_ARGS (funcType);
-  pNum = 1;
-  while (val)
-    {
       /* if a symbolname is not given  */
       /* synthesize a variable name */
       if (!val->sym)
         {
-          SNPRINTF (val->name, sizeof (val->name), "_%s_PARM_%d", func->name, pNum++);
+          SNPRINTF (val->name, sizeof (val->name), "_%s_PARM_%d", func->name, pNum);
           val->sym = newSymbol (val->name, 1);
           val->sym->type = copyLinkChain (val->type);
           val->sym->etype = getSpec (val->sym->type);
@@ -3641,7 +3687,7 @@ processFuncArgs (symbol *func, sym_link *funcType)
         }
       else                      /* symbol name given create synth name */
         {
-          SNPRINTF (val->name, sizeof (val->name), "_%s_PARM_%d", func->name, pNum++);
+          SNPRINTF (val->name, sizeof (val->name), "_%s_PARM_%d", func->name, pNum);
           strncpyz (val->sym->rname, val->name, sizeof (val->sym->rname));
           val->sym->_isparm = 1;
           if (!defaultOClass (val->sym))
@@ -3655,7 +3701,6 @@ processFuncArgs (symbol *func, sym_link *funcType)
           addSet (&operKeyReset, val->sym);
           applyToSet (operKeyReset, resetParmKey);
         }
-      val = val->next;
     }
 }
 

@@ -200,15 +200,20 @@ typedef enum
 }
 DECLARATOR_TYPE;
 
+typedef struct ast ast;
+
 typedef struct declarator
 {
   DECLARATOR_TYPE dcl_type;         /* POINTER,ARRAY or FUNCTION  */
   bool dcl_type_implicitintrinsic:1;/* intrinsic named address space indicated by dcltype has been assigned implicitly. */
   size_t num_elem;                  /* # of elems if type==array, */
+  ast *num_elem_ast;                /* ast for # of elems, used to calculate num_elem. */
   /* always 0 for flexible arrays */
   unsigned ptr_const:1;             /* pointer is constant        */
   unsigned ptr_volatile:1;          /* pointer is volatile        */
   unsigned ptr_restrict:1;          /* pointer is resticted       */
+  bool array_vla:1;                 // Array is known to be a VLA.
+  bool vla_check_visited:1;         // Already visited in check for VLA - implementation detail to prevent infinite recursion */
   struct symbol *ptr_addrspace;     /* pointer is in named address space  */
 
   struct sym_link *tspec;           /* pointer type specifier     */
@@ -396,9 +401,11 @@ extern sym_link *validateLink (sym_link * l,
 #define DCL_TYPE(l)  validateLink(l, "DCL_TYPE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.dcl_type
 #define DCL_TYPE_IMPLICITINTRINSIC(l)  validateLink(l, "DCL_TYPE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.dcl_type_implicitintrinsic
 #define DCL_ELEM(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem
+#define DCL_ELEM_AST(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem_ast
 #define DCL_PTR_CONST(l) validateLink(l, "DCL_PTR_CONST", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) validateLink(l, "DCL_PTR_VOLATILE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_volatile
 #define DCL_PTR_RESTRICT(l) validateLink(l, "DCL_PTR_RESTRICT", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_restrict
+#define DCL_ARRAY_VLA(l) validateLink(l, "DCL_ARRAY_VLA", #l, DECLARATOR, __FILE__, __LINE__)->select.d.array_vla
 #define DCL_PTR_ADDRSPACE(l) validateLink(l, "DCL_PTR_ADDRSPACE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_addrspace
 #define DCL_TSPEC(l) validateLink(l, "DCL_TSPEC", #l, DECLARATOR, __FILE__, __LINE__)->select.d.tspec
 

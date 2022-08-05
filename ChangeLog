@@ -1,3 +1,15 @@
+2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge parser branch to trunk.
+
+2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/bug-3465.c:
+	  Basic C99 VLA type support, RFE #786, fix bug #3465.
+
 2022-08-04 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* support/scripts/sdcc.nsi:
@@ -5,10 +17,34 @@
 
 2022-08-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCmem.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h:
+	  Infrastructure for VLA types.
+
+2022-08-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCval.h,
+	  C2X {} empty initializers, RFE #782.
+
+2022-08-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* support/util/dbuf_string.c:
 	  Code cleanup.
 	* src/SDCCglue.c:
 	  Fix area directive for sseg, patch by Tarn.
+
+2022-08-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y:
+	  Refactor handling of array declarators.
 
 2022-08-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

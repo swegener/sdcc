@@ -816,6 +816,12 @@ allocLocal (symbol * sym)
             port->fun_prefix,
             currFunc->name, sym->name, sym->level, sym->block);
 
+  if (!sym->ismyparm && IS_ARRAY(sym->type) && DCL_ARRAY_VLA (sym->type))
+    {
+      werrorfl (sym->fileDef, sym->lineDef, E_VLA_OBJECT);
+      return;
+    }
+
   sym->islocal = 1;
   sym->localof = currFunc;
 

@@ -633,6 +633,18 @@ struct
      "function declarator with no prototype", 0 },
   { W_UNKNOWN_ATTRIBUTE, ERROR_LEVEL_WARNING,
      "unknown attribute '%s' ignored", 0 },
+  { W_EMPTY_INIT_C2X, ERROR_LEVEL_WARNING,
+     "empty initializer requires ISO C2X or later", 0 },
+  { E_EMPTY_INIT_UNKNOWN_SIZE, ERROR_LEVEL_ERROR,
+     "array of unknown size cannnot be initialized by an empty initializer", 0 },
+  { E_VLA_TYPE_C99, ERROR_LEVEL_ERROR,
+     "variable length array type requires ISO C99 or later", 0 },
+  { E_VLA_OBJECT, ERROR_LEVEL_ERROR,
+     "object of variable length array type not supported", 0 },
+  { E_VLA_SCOPE, ERROR_LEVEL_ERROR,
+     "variable length array declarators must have function prototype scope or block scope", 0 },
+  { E_VLA_INIT, ERROR_LEVEL_ERROR,
+     "variable length arrays can be initalized by empty initalizers only", 0 },
 };
 
 /* -------------------------------------------------------------------------------

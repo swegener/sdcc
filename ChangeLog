@@ -1,3 +1,8 @@
+2022-08-05 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Missing K&R function support is not a deviation from C2X compliance.
+
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stdbit.h,

@@ -2732,6 +2732,11 @@ In 4.2.3, support for non-parenthesized arguments to __at that are not constants
 In 4.2.4, the placement of __at in declarations was restricted.
 \end_layout
 
+\begin_layout Itemize
+In 4.2.6, bool is chosen as the underlying integer type for enumerations with
+ just two values.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -9107,7 +9112,22 @@ name "subsec:Standard-Compliance"
 \begin_layout Standard
 SDCC aims to be a conforming freestanding implementation of the C programming
  language.
- 
+ The latest publicly available version of the standard 
+\emph on
+ISO/IEC 9899 - Programming languages - C
+\emph default
+ should be available at: 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -9159,25 +9179,6 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-The latest publicly available version of the standard 
-\emph on
-ISO/IEC 9899 - Programming languages - C
-\emph default
- should be available at: 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899
-\end_layout
-
-\end_inset
-
-.
-\begin_inset Newline newline
-\end_inset
-
 
 \end_layout
 
@@ -9186,7 +9187,149 @@ Deviations from standard compliance:
 \end_layout
 
 \begin_layout Itemize
-structures
+initialization of structure arrays must be fully braced.
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+struct s { char x } a[] = {1, 2};
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+/* invalid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+struct s { char x } a[] = {{1}, {2}}; /* OK */
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+'double
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+double (not supported)
+\end_layout
+
+\end_inset
+
+' precision floating point 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Floating point support
+\end_layout
+
+\end_inset
+
+not supported.
+ Instead a warning is emitted, and float is used instead.
+ long double is not supported.
+\end_layout
+
+\begin_layout Itemize
+K&R style
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+K
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+&
+\end_layout
+
+\end_inset
+
+R style
+\end_layout
+
+\end_inset
+
+ function declarations are not supported.
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+foo(i,j) /* this old style of function declarations */
+\begin_inset Newline newline
+\end_inset
+
+int i,j; /* is valid in ANSI but not valid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+{ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+ 
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Some features of this standard are not supported in some ports:
+\end_layout
+
+\begin_layout Itemize
+ds390, hc08, s08, mos6502, pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -9319,149 +9462,8 @@ return rets; /* is invalid in SDCC although allowed in ANSI */
 
 \end_deeper
 \begin_layout Itemize
-initialization of structure arrays must be fully braced.
-\begin_inset Separator latexpar
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-struct s { char x } a[] = {1, 2};
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-/* invalid in SDCC */
-\begin_inset Newline newline
-\end_inset
-
-struct s { char x } a[] = {{1}, {2}}; /* OK */
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-'double
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-double (not supported)
-\end_layout
-
-\end_inset
-
-' precision floating point 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Floating point support
-\end_layout
-
-\end_inset
-
-not supported.
- Instead a warning is emitted, and float is used instead.
- long double is not supported.
-\end_layout
-
-\begin_layout Itemize
-Old K&R style
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-K
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-&
-\end_layout
-
-\end_inset
-
-R style
-\end_layout
-
-\end_inset
-
- function declarations are not supported.
-\begin_inset Separator latexpar
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-foo(i,j) /* this old style of function declarations */
-\begin_inset Newline newline
-\end_inset
-
-int i,j; /* is valid in ANSI but not valid in SDCC */
-\begin_inset Newline newline
-\end_inset
-
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
- 
-\begin_inset Newline newline
-\end_inset
-
-}
-\end_layout
-
-\end_deeper
-\begin_layout Standard
-Some features of this standard are not supported in some ports:
-\end_layout
-
-\begin_layout Itemize
-Functions are not reentrant unless explicitly declared as such or 
+mcs51, ds390, hc08, s08, pdk13, pdk14, pdk15 and mos6502 ports: functions
+ are not reentrant unless explicitly declared as such or 
 \series bold
 
 \begin_inset Flex Code
@@ -9479,13 +9481,7 @@ stack-auto
 
 
 \series default
- is specified in the mcs51, ds390, hc08, s08, pdk13, pdk14, pdk15 and mos6502
- ports.
-\end_layout
-
-\begin_layout Itemize
-struct and union can not be used as parameters or return values in the hc08,
- s08, ds390, mos6502, pic14 and pic16 ports.
+ is specified.
 \end_layout
 
 \begin_layout Subsection
@@ -9599,7 +9595,11 @@ Compound literals.
 \end_layout
 
 \begin_layout Itemize
-Variable-length arrays.
+Objects of variably-modified types.
+\end_layout
+
+\begin_layout Itemize
+ptrdiff_t has 16 bits, while the standard requires at least 17 bits.
 \end_layout
 
 \begin_layout Standard
@@ -9607,9 +9607,9 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-There is no support for data types long long, unsigned long long, int_fast64_t,
- int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t in the
- pic14 and pic16 ports.
+pic14, pic16: there is no support for data types long long, unsigned long
+ long, int_fast64_t, int_least64_t, int64_t, uint_fast64_t, uint_least64_t,
+ uint64_t.
  
 \end_layout
 
@@ -9714,7 +9714,352 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-Standard and support are still quite incomplete.
+Deviations from standard compliance:
+\end_layout
+
+\begin_layout Itemize
+initialization of structure arrays must be fully braced.
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+struct s { char x } a[] = {1, 2};
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+/* invalid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+struct s { char x } a[] = {{1}, {2}}; /* OK */
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+'double
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+double (not supported)
+\end_layout
+
+\end_inset
+
+' precision floating point 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Floating point support
+\end_layout
+
+\end_inset
+
+not supported.
+ Instead a warning is emitted, and float is used instead.
+ long double is not supported.
+\end_layout
+
+\begin_layout Itemize
+K&R style
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+K
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+&
+\end_layout
+
+\end_inset
+
+R style
+\end_layout
+
+\end_inset
+
+ function declarations are not supported.
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+foo(i,j) /* this old style of function declarations */
+\begin_inset Newline newline
+\end_inset
+
+int i,j; /* is valid in ANSI but not valid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+{ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+ 
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Compund literals are not supported.
+\end_layout
+
+\begin_layout Itemize
+Support for attributes is sightly incomplete.
+\end_layout
+
+\begin_layout Itemize
+The preprocessor is not C2X-compatible.
+\end_layout
+
+\begin_layout Itemize
+Checked integer arithmetic is not supported.
+\end_layout
+
+\begin_layout Itemize
+Qualifier-preserving standard library functions are not implemented.
+\end_layout
+
+\begin_layout Itemize
+Enhanced enumerations are not implemented.
+\end_layout
+
+\begin_layout Itemize
+constexpr is not implemented.
+\end_layout
+
+\begin_layout Itemize
+C2X tag compatibility rule changes are not implemented.
+\end_layout
+
+\begin_layout Itemize
+call_once is not implemented.
+\end_layout
+
+\begin_layout Standard
+Some features of this standard are not supported in some ports:
+\end_layout
+
+\begin_layout Itemize
+ds390, hc08, s08, mos6502, pic14, pic16: structures
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+struct
+\end_layout
+
+\end_inset
+
+ and unions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+union
+\end_layout
+
+\end_inset
+
+ cannot be passed as function parameters and cannot be a return value
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+return value
+\end_layout
+
+\end_inset
+
+ from a function, e.g.:
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+struct s { ...
+ };
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+struct
+\family default
+\series default
+ 
+\family typewriter
+s foo1 (
+\series bold
+struct
+\family default
+\series default
+ 
+\family typewriter
+s parms) /* invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+{
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+struct s rets;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return rets; /* is invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+mcs51, ds390, hc08, s08, pdk13, pdk14, pdk15 and mos6502 ports: functions
+ are not reentrant unless explicitly declared as such or 
+\series bold
+
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+--
+\series default
+stack-auto
+\end_layout
+
+\end_inset
+
+
+\series default
+ is specified.
+\end_layout
+
+\begin_layout Itemize
+pic14, pic16: there is no support for data types long long, unsigned long
+ long, int_fast64_t, int_least64_t, int64_t, uint_fast64_t, uint_least64_t,
+ uint64_t.
+ 
+\end_layout
+
+\begin_layout Itemize
+hc08, s08, mos6502, pic14, pic16: _BitInt is not supported.
 \end_layout
 
 \begin_layout Subsection
@@ -9875,7 +10220,10 @@ Non-bit-field members of structures are aligned on byte boundaries (i.e.
 \end_layout
 
 \begin_layout Itemize
-For the integer types compatible with enum types see the SDCC source code.
+For enumerations, the compatible type is the first from the following list
+ that fits the constants: bool, unsigned char, signed char, unsigned int,
+ signed int, unsigned long int, signed long int, unsigned long long int,
+ signed long long int.
 \end_layout
 
 \begin_layout Subsubsection

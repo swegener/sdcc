@@ -1659,7 +1659,7 @@ static_assert_declaration
                                        value *val = constExprValue ($3, true);
                                        if (!val)
                                          werror (E_CONST_EXPECTED);
-                                       else if (!ulFromVal(val))
+                                       else if (!ullFromVal(val))
                                          werror (W_STATIC_ASSERTION, $5);
                                     }
    | STATIC_ASSERT '(' constant_expr ')' ';'
@@ -1669,7 +1669,7 @@ static_assert_declaration
                                          werror (E_STATIC_ASSERTION_C2X);
                                        if (!val)
                                          werror (E_CONST_EXPECTED);
-                                       else if (!ulFromVal(val))
+                                       else if (!ullFromVal(val))
                                          werror (W_STATIC_ASSERTION_2);
                                     }
    ;
@@ -2480,7 +2480,7 @@ opt_assign_expr
           else if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
             {
               werror(E_ENUM_NON_INTEGER);
-              SNPRINTF(lbuff, sizeof(lbuff), "%d", (int) ulFromVal(val));
+              SNPRINTF(lbuff, sizeof(lbuff), "%lld", (long long int) ullFromVal(val));
               val = constVal(lbuff);
             }
           $$ = cenum = val;
@@ -2488,7 +2488,7 @@ opt_assign_expr
    |    {
           if (cenum)
             {
-              SNPRINTF(lbuff, sizeof(lbuff), "%d", (int) ulFromVal(cenum)+1);
+              SNPRINTF(lbuff, sizeof(lbuff), "%lld", (long long int) ullFromVal(cenum)+1);
               $$ = cenum = constVal(lbuff);
             }
           else

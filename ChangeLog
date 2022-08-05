@@ -1,5 +1,17 @@
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* .version,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  support/regression/tests/bug-3462.c:
+	  Fix bug #3462.
+	* doc/sdccman.lyx:
+	  Update manual section on standard compliance for recent improvements.
+
+2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* Merge parser branch to trunk.
 
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

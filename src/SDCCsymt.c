@@ -4808,7 +4808,7 @@ validateLink (sym_link * l, const char *macro, const char *args, const char sele
 sym_link *
 newEnumType (symbol *enumlist)
 {
-  int min, max, v;
+  long long int min, max, v;
   symbol *sym;
   sym_link *type;
 
@@ -4821,19 +4821,23 @@ newEnumType (symbol *enumlist)
 
   /* Determine the range of the enumerated values */
   sym = enumlist;
-  min = max = (int) ulFromVal (valFromType (sym->type));
+  min = max = (long long int) ullFromVal (valFromType (sym->type));
   for (sym = sym->next; sym; sym = sym->next)
     {
-      v = (int) ulFromVal (valFromType (sym->type));
+      v = (long long int) ullFromVal (valFromType (sym->type));
       if (v < min)
         min = v;
       if (v > max)
         max = v;
     }
 
-  /* Determine the smallest integer type that is compatible with this range */
+  // Use the smallest integer type that is compatible with this range and not a bit-precise type.
   type = newLink (SPECIFIER);
-  if (min >= 0 && max <= 255)
+  if (min >= 0 && max <= 1)
+    {
+      SPEC_NOUN (type) = V_BOOL;
+    }
+  else if (min >= 0 && max <= 255)
     {
       SPEC_NOUN (type) = V_CHAR;
       SPEC_USIGN (type) = 1;
@@ -4852,10 +4856,21 @@ newEnumType (symbol *enumlist)
     {
       SPEC_NOUN (type) = V_INT;
     }
-  else
+  else if (min >= 0 && max <= 4294967295)
     {
       SPEC_NOUN (type) = V_INT;
       SPEC_LONG (type) = 1;
+      SPEC_USIGN (type) = 1;
+    }
+  else if (min >= -2147483648 && max <= 2147483647)
+    {
+      SPEC_NOUN (type) = V_INT;
+      SPEC_LONG (type) = 1;
+    }
+  else
+    {
+      SPEC_NOUN (type) = V_INT;
+      SPEC_LONGLONG (type) = 1;
       if (min >= 0)
         SPEC_USIGN (type) = 1;
     }

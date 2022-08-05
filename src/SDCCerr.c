@@ -645,6 +645,8 @@ struct
      "variable length array declarators must have function prototype scope or block scope", 0 },
   { E_VLA_INIT, ERROR_LEVEL_ERROR,
      "variable length arrays can be initalized by empty initalizers only", 0 },
+  { W_ENUM_INT_RANGE_C2X, ERROR_LEVEL_WARNING,
+     "enumeration constant outside the range of int requires ISO C2X or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

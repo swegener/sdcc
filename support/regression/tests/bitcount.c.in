@@ -1,6 +1,6 @@
 /* Test count operations from stdbit.h
 
-    type: unsigned short, unsigned int, unsigned long, unsigned long long
+   type: unsigned short, unsigned int, unsigned long, unsigned long long
  */
 
 #include <testfwk.h>

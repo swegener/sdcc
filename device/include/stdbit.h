@@ -126,5 +126,31 @@ int_fast8_t __stdc_count_onesull(unsigned long long value); // Todo: Use _BitInt
 #define stdc_has_single_bitul(value) stdc_has_single_bit((unsigned long)(value))
 #define stdc_has_single_bitull(value) stdc_has_single_bit((unsigned long long)(value))
 
+// C2X 7.18.14 Bit Width
+int_fast8_t __stdc_bit_widthull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
+#define stdc_bit_width(value) __stdc_bit_widthull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.
+#define stdc_bit_widthuc(value) ((int)(stdc_bit_width((unsigned char)(value)))
+#define stdc_bit_widthus(value) ((int)(stdc_bit_width((unsigned short)(value)))
+#define stdc_bit_widthui(value) ((int)(stdc_bit_width((unsigned int)(value)))
+#define stdc_bit_widthul(value) ((int)(stdc_bit_width((unsigned long)(value)))
+#define stdc_bit_widthull(value) ((int)(stdc_bit_width((unsigned long long)(value)))
+
+// C2X 7.18.15 Bit Floor
+#define stdc_bit_floor(value) ((typeof(value))(1ull << stdc_bit_width(value)) >> 1)
+#define stdc_bit_flooruc(value) ((unsigned char)(1 << stdc_bit_width(value)((unsigned char)(value))) >> 1)
+#define stdc_bit_floorus(value) ((unsigned short)(1 << stdc_bit_width((unsigned short)(value))) >> 1)
+#define stdc_bit_floorui(value) (1u << stdc_bit_width((unsigned int)(value) >> 1)
+#define stdc_bit_floorul(value) (1ul << stdc_bit_width((unsigned long)(value) >> 1)
+#define stdc_bit_floorull(value) (1ull << stdc_bit_width((unsigned long long)(value) >> 1)
+
+// C2X 7.18.16 Bit Ceiling
+unsigned long long __stdc_bit_ceilull(unsigned long long value);
+#define stdc_bit_ceil(value) ((typeof(value))(__stdc_bit_ceilull(value))) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.
+#define stdc_bit_ceiluc(value) (stdc_bit_ceil(value)((unsigned char)(value))))
+#define stdc_bit_ceilus(value) (stdc_bit_ceil(value)((unsigned short)(value))))
+#define stdc_bit_ceilui(value) (stdc_bit_ceil(value)((unsigned int)(value))))
+#define stdc_bit_ceilul(value) (stdc_bit_ceil(value)((unsigned long)(value))))
+#define stdc_bit_ceilull(value) (stdc_bit_ceil(value)((unsigned long long)(value))))
+
 #endif
 

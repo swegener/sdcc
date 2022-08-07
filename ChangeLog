@@ -1,3 +1,9 @@
+2022-08-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/c2xkeywords.c:
+	  Fix bug #3468.
+
 2022-08-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stdbit.h,

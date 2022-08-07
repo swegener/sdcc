@@ -1133,6 +1133,8 @@ getSize (sym_link * p)
           return BOOLSIZE;
         case V_CHAR:
           return CHARSIZE;
+        case V_NULLPTR:
+          return (GPTRSIZE);
         case V_VOID:
           return 0;
         case V_STRUCT:

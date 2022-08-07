@@ -7,9 +7,9 @@
 #ifdef __SDCC
 #pragma std_c2x
 
+static_assert(sizeof(nullptr) == sizeof(char *));
 alignas(int) int i = alignof(int);
 alignas(1) char c;
-static_assert(1);
 bool b = 0;
 bool t = true;
 bool f = false;

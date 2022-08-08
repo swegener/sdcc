@@ -1,5 +1,12 @@
 2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* device/include/stdlib.h,
+	  device/lib/incl.mk,
+	  device/lib/call_once.c:
+	  call_once, RFE #777.
+
+2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* device/include/stdbit.h,
 	  device/lib/incl.mk,
 	  device/lib/__stdc_first_leading_one.c,

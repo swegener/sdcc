@@ -59,6 +59,7 @@ COMMON_LONG = \
   _modulong.c
 
 COMMON_SDCC = \
+  call_once.c \
   isalnum.c \
   isalpha.c \
   isblank.c \

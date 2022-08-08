@@ -52,6 +52,12 @@
 
 #define MB_CUR_MAX 4
 
+#if __STDC_VERSION__ > 201112L // TODO: Replace by >= to exact value from final version of C2X standard.
+typedef bool once_flag;
+#define ONCE_FLAG_INIT false
+void call_once(once_flag *flag, void (*func)(void));
+#endif
+
 /* Numeric conversion functions (ISO C11 7.22.1) */
 extern float atof (const char *nptr);
 extern int atoi (const char *nptr);

@@ -265,6 +265,23 @@ int_fast8_t __stdc_count_trailing_onesull(unsigned long long value); // Todo: Us
 #define stdc_count_trailing_zerosul(value) ((int)(stdc_count_trailing_ones((unsigned long)(~(value))))
 #define stdc_count_trailing_zerosull(value) ((int)(stdc_count_trailing_ones((unsigned long long)(~(value))))
 
+// C2X 7.18.8 First Leading One
+int_fast8_t __stdc_first_leading_one(unsigned long long value, uint_fast8_t width); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
+#define stdc_first_leading_one(value) __stdc_first_leading_one((value), __typewidth(value))
+#define stdc_first_leading_oneuc(value) ((int)(stdc_first_leading_one((unsigned char)(~(value))))
+#define stdc_first_leading_oneus(value) ((int)(stdc_first_leading_one((unsigned short)(~(value))))
+#define stdc_first_leading_oneui(value) ((int)(stdc_first_leading_one((unsigned int)(~(value))))
+#define stdc_first_leading_oneul(value) ((int)(stdc_first_leading_one((unsigned long)(~(value))))
+#define stdc_first_leading_oneull(value) ((int)(stdc_first_leading_one((unsigned long long)(~(value))))
+
+// C2X 7.18.7 First Leading Zero
+#define stdc_first_leading_zero(value) __stdc_first_leading_one(~(value), __typewidth(value))
+#define stdc_first_leading_zerouc(value) ((int)(stdc_first_leading_zero((unsigned char)(~(value))))
+#define stdc_first_leading_zerous(value) ((int)(stdc_first_leading_zero((unsigned short)(~(value))))
+#define stdc_first_leading_zeroui(value) ((int)(stdc_first_leading_zero((unsigned int)(~(value))))
+#define stdc_first_leading_zeroul(value) ((int)(stdc_first_leading_zero((unsigned long)(~(value))))
+#define stdc_first_leading_zeroull(value) ((int)(stdc_first_leading_zero((unsigned long long)(~(value))))
+
 // C2X 7.18.10 First Trailing One
 int_fast8_t __stdc_first_trailing_oneull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
 #define stdc_first_trailing_one(value) __stdc_first_trailing_oneull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.

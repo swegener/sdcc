@@ -2,9 +2,17 @@
 
 	* device/include/stdbit.h,
 	  device/lib/incl.mk,
+	  device/lib/__stdc_first_leading_one.c,
+	  support/regression/tests/bitfirstleading.c.in:
+	  Provide bit and byte utilities find first leading bit functions. RFE #854.
+
+2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/stdbit.h,
+	  device/lib/incl.mk,
 	  device/lib/__stdc_count_leading_zeros.c,
 	  support/regression/tests/bitcountleading.c.in:
-	  Provide bit and byte utilities count leading bits functions.
+	  Provide bit and byte utilities count leading bits functions. Part of RFE #854.
 	* src/SDCCast.c:
 	  Fix type handling for bit-precise types in _Generic association.
 
@@ -14,7 +22,7 @@
 	  device/lib/incl.mk,
 	  device/lib/__stdc_first_trailing_oneull.c,
 	  support/regression/tests/bitfirst.c.in:
-	  Provide bit and byte utilities first trailing bit functions.
+	  Provide bit and byte utilities first trailing bit functions. Part of RFE #854.
 
 2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -22,7 +30,7 @@
 	  device/lib/__stdc_count_trailing_onesull.c,
 	  device/lib/incl.mk,
 	  support/regression/tests/bitcounttrailing.c.in:
-	  Provide bit and byte utilities trailing bit count functions.
+	  Provide bit and byte utilities trailing bit count functions. Part of RFE #854.
 
 2022-08-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -37,7 +45,7 @@
 	  device/lib/__stdc_bit_ceilull.c,
 	  device/lib/__stdc_bit_widthull.c,
 	  support/regression/tests/bitcount.c.in:
-	  Provide bit and byte utilities bit width floor and ceiling functions.
+	  Provide bit and byte utilities bit width floor and ceiling functions. Part of RFE #854.
 
 2022-08-05 Benedikt Freisen <b.freisen AT gmx.net>
 
@@ -62,7 +70,7 @@
 	  device/lib/__stdc_count_onesull.c,
 	  support/regression/tests/bitcount.c.in,
 	  device/lib/_mullong.c:
-	  Provide and use bit and byte utility types and macros. Provide bit and byte utilities bit count and single-bit check functions.
+	  Provide and use bit and byte utility types and macros. Provide bit and byte utilities bit count and single-bit check functions. Part of RFE #854.
 
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

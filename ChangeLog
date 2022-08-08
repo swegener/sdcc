@@ -1,3 +1,11 @@
+2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/stdbit.h,
+	  device/lib/__stdc_count_trailing_onesull.c,
+	  device/lib/incl.mk,
+	  support/regression/tests/bitcounttrailing.c.in:
+	  Provide bit and byte utilities trailing bit count functions.
+
 2022-08-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,
@@ -11,7 +19,7 @@
 	  device/lib/__stdc_bit_ceilull.c,
 	  device/lib/__stdc_bit_widthull.c,
 	  support/regression/tests/bitcount.c.in:
-	  Provide bit and byte utilitites bit width floor and ceiling functions.
+	  Provide bit and byte utilities bit width floor and ceiling functions.
 
 2022-08-05 Benedikt Freisen <b.freisen AT gmx.net>
 
@@ -36,7 +44,7 @@
 	  device/lib/__stdc_count_onesull.c,
 	  support/regression/tests/bitcount.c.in,
 	  device/lib/_mullong.c:
-	  Provide and use bit and byte utility types and macros. Provide bit and byte utilitites bit count and single-bit check functions.
+	  Provide and use bit and byte utility types and macros. Provide bit and byte utilities bit count and single-bit check functions.
 
 2022-08-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

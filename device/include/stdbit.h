@@ -92,6 +92,8 @@ typedef unsigned long long int  uint_fast64_t;
 
 #endif // __SPECIFIED_WIDTH_INTEGER_TYPES_DEFINED
 
+// C2X 7.18.2 Endian
+
 #define __STDC_ENDIAN_LITTLE__ 0
 #define __STDC_ENDIAN_BIG__ 1
 
@@ -100,6 +102,23 @@ typedef unsigned long long int  uint_fast64_t;
 #else
 #define __STDC_ENDIAN_NATIVE__ __STDC_ENDIAN_LITTLE__
 #endif
+
+// C2X 7.18.6 Count Trailing Ones
+int_fast8_t __stdc_count_trailing_onesull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
+#define stdc_count_trailing_ones(value) __stdc_count_trailing_onesull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.
+#define stdc_count_trailing_onesuc(value) ((int)(stdc_count_trailing_ones((unsigned char)(value)))
+#define stdc_count_trailing_onesus(value) ((int)(stdc_count_trailing_ones((unsigned short)(value)))
+#define stdc_count_trailing_onesui(value) ((int)(stdc_count_trailing_ones((unsigned int)(value)))
+#define stdc_count_trailing_onesul(value) ((int)(stdc_count_trailing_ones((unsigned long)(value)))
+#define stdc_count_trailing_onesull(value) ((int)(stdc_count_trailing_ones((unsigned long long)(value)))
+
+// C2X 7.18.5 Count Trailing Zeros
+#define stdc_count_trailing_zeros(value) stdc_count_trailing_ones((typeof(value))~(value))
+#define stdc_count_trailing_zerosuc(value) ((int)(stdc_count_trailing_ones((unsigned char)(~(value))))
+#define stdc_count_trailing_zerosus(value) ((int)(stdc_count_trailing_ones((unsigned short)(~(value))))
+#define stdc_count_trailing_zerosui(value) ((int)(stdc_count_trailing_ones((unsigned int)(~(value))))
+#define stdc_count_trailing_zerosul(value) ((int)(stdc_count_trailing_ones((unsigned long)(~(value))))
+#define stdc_count_trailing_zerosull(value) ((int)(stdc_count_trailing_ones((unsigned long long)(~(value))))
 
 // C2X 7.18.11 Count Ones
 int_fast8_t __stdc_count_onesull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.

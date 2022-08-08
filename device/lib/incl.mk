@@ -132,6 +132,7 @@ COMMON_SDCC = \
   gets.c \
   __assert.c \
   time.c \
+  __stdc_count_trailing_onesull.c \
   __stdc_count_onesull.c \
   __stdc_bit_widthull.c \
   __stdc_bit_ceilull.c

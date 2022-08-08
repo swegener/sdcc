@@ -2,6 +2,16 @@
 
 	* device/include/stdbit.h,
 	  device/lib/incl.mk,
+	  device/lib/__stdc_count_leading_zeros.c,
+	  support/regression/tests/bitcountleading.c.in:
+	  Provide bit and byte utilities count leading bits functions.
+	* src/SDCCast.c:
+	  Fix type handling for bit-precise types in _Generic association.
+
+2022-08-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/stdbit.h,
+	  device/lib/incl.mk,
 	  device/lib/__stdc_first_trailing_oneull.c,
 	  support/regression/tests/bitfirst.c.in:
 	  Provide bit and byte utilities first trailing bit functions.

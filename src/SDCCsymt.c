@@ -2850,6 +2850,10 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
   if (src && !dest)
     return 0;
 
+#if 0
+  printf("Compare Type: "); printTypeChain (dest, stdout); printf(" vs. "); printTypeChain (src, 0);
+#endif
+
   /* if dest is a declarator then */
   if (IS_DECL (dest))
     {
@@ -2934,13 +2938,16 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
   if (IS_BITFIELD (dest) && IS_BITFIELD (src) && (SPEC_BLEN (dest) != SPEC_BLEN (src) || SPEC_BSTR (dest) != SPEC_BSTR (src)))
     return -1;
 
-  if (SPEC_NOUN (dest) == V_BITINT && SPEC_NOUN (src) == V_BITINT)
+  if ((SPEC_NOUN (dest) == V_BITINT || SPEC_NOUN (dest) == V_BITINTBITFIELD) && (SPEC_NOUN (src) == V_BITINT || SPEC_NOUN (src) == V_BITINTBITFIELD))
     {
       if (SPEC_BITINTWIDTH (dest) != SPEC_BITINTWIDTH (src) ||
         SPEC_USIGN (dest) && !SPEC_USIGN (src) && SPEC_BITINTWIDTH (dest) % 8) // Cast from sgined to unsigned type cannot be omitted, since it requires masking top bits.
         return -1;
       return (SPEC_USIGN (dest) == SPEC_USIGN (src) ? 1 : -2);
     }
+  else if (IS_ARITHMETIC (dest) && IS_ARITHMETIC (src) &&
+    ((SPEC_NOUN (dest) == V_BITINT) ^ (SPEC_NOUN (src) == V_BITINT)))
+    return -1;
 
   /* it is a specifier */
   if (SPEC_NOUN (dest) != SPEC_NOUN (src))

@@ -5468,7 +5468,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               {
                 sym_link *assoc_type;
                 wassert (IS_AST_LINK (assoc->left));
-                
+
                 assoc_type = assoc->left->opval.lnk;
                 checkTypeSanity (assoc_type, "(_Generic)");
                 if (compareType (assoc_type, type, true) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))

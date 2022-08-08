@@ -103,6 +103,151 @@ typedef unsigned long long int  uint_fast64_t;
 #define __STDC_ENDIAN_NATIVE__ __STDC_ENDIAN_LITTLE__
 #endif
 
+#if __SDCC_BITINT_MAXWIDTH >= 64
+#define __typewidth(x) _Generic((x), \
+unsigned _BitInt(1) : 1, \
+signed _BitInt(2) : 2, \
+unsigned _BitInt(2) : 2, \
+signed _BitInt(3) : 3, \
+unsigned _BitInt(3) : 3, \
+signed _BitInt(4) : 4, \
+unsigned _BitInt(4) : 4, \
+signed _BitInt(5) : 5, \
+unsigned _BitInt(5) : 5, \
+signed _BitInt(6) : 6, \
+unsigned _BitInt(7) : 7, \
+signed _BitInt(8) : 8, \
+unsigned _BitInt(9) : 9, \
+signed _BitInt(10) : 10, \
+unsigned _BitInt(10) : 10, \
+signed _BitInt(11) : 11, \
+unsigned _BitInt(11) : 11, \
+signed _BitInt(12) : 12, \
+unsigned _BitInt(12) : 12, \
+signed _BitInt(13) : 13, \
+unsigned _BitInt(13) : 13, \
+signed _BitInt(14) : 14, \
+unsigned _BitInt(14) : 14, \
+signed _BitInt(15) : 15, \
+unsigned _BitInt(15) : 15, \
+signed _BitInt(16) : 16, \
+unsigned _BitInt(16) : 16, \
+signed _BitInt(17) : 17, \
+unsigned _BitInt(17) : 17, \
+signed _BitInt(18) : 18, \
+unsigned _BitInt(18) : 18, \
+signed _BitInt(19) : 19, \
+unsigned _BitInt(19) : 19, \
+signed _BitInt(20) : 20, \
+unsigned _BitInt(20) : 20, \
+signed _BitInt(21) : 21, \
+unsigned _BitInt(21) : 21, \
+signed _BitInt(22) : 22, \
+unsigned _BitInt(22) : 22, \
+signed _BitInt(23) : 23, \
+unsigned _BitInt(23) : 23, \
+signed _BitInt(24) : 24, \
+unsigned _BitInt(24) : 24, \
+signed _BitInt(25) : 25, \
+unsigned _BitInt(25) : 25, \
+signed _BitInt(26) : 26, \
+unsigned _BitInt(26) : 26, \
+signed _BitInt(27) : 27, \
+unsigned _BitInt(27) : 27, \
+signed _BitInt(28) : 28, \
+unsigned _BitInt(28) : 28, \
+signed _BitInt(29) : 29, \
+unsigned _BitInt(29) : 29, \
+signed _BitInt(30) : 30, \
+unsigned _BitInt(30) : 30, \
+signed _BitInt(31) : 31, \
+unsigned _BitInt(31) : 31, \
+signed _BitInt(32) : 32, \
+unsigned _BitInt(32) : 32, \
+signed _BitInt(33) : 33, \
+unsigned _BitInt(33) : 33, \
+signed _BitInt(34) : 34, \
+unsigned _BitInt(34) : 34, \
+signed _BitInt(35) : 35, \
+unsigned _BitInt(35) : 35, \
+signed _BitInt(36) : 36, \
+unsigned _BitInt(36) : 36, \
+signed _BitInt(37) : 37, \
+unsigned _BitInt(37) : 37, \
+signed _BitInt(38) : 38, \
+unsigned _BitInt(38) : 38, \
+signed _BitInt(39) : 39, \
+unsigned _BitInt(39) : 39, \
+signed _BitInt(40) : 40, \
+unsigned _BitInt(40) : 40, \
+signed _BitInt(41) : 41, \
+unsigned _BitInt(41) : 41, \
+signed _BitInt(42) : 42, \
+unsigned _BitInt(42) : 42, \
+signed _BitInt(43) : 43, \
+unsigned _BitInt(43) : 43, \
+signed _BitInt(44) : 44, \
+unsigned _BitInt(44) : 44, \
+signed _BitInt(45) : 45, \
+unsigned _BitInt(45) : 45, \
+signed _BitInt(46) : 46, \
+unsigned _BitInt(46) : 46, \
+signed _BitInt(47) : 47, \
+unsigned _BitInt(47) : 47, \
+signed _BitInt(48) : 48, \
+unsigned _BitInt(48) : 48, \
+signed _BitInt(49) : 49, \
+unsigned _BitInt(49) : 49, \
+signed _BitInt(50) : 50, \
+unsigned _BitInt(50) : 50, \
+signed _BitInt(51) : 51, \
+unsigned _BitInt(51) : 51, \
+signed _BitInt(52) : 52, \
+unsigned _BitInt(52) : 52, \
+signed _BitInt(53) : 53, \
+unsigned _BitInt(53) : 53, \
+signed _BitInt(54) : 54, \
+unsigned _BitInt(54) : 54, \
+signed _BitInt(55) : 55, \
+unsigned _BitInt(55) : 55, \
+signed _BitInt(56) : 16, \
+unsigned _BitInt(56) : 56, \
+signed _BitInt(57) : 57, \
+unsigned _BitInt(57) : 57, \
+signed _BitInt(58) : 58, \
+unsigned _BitInt(58) : 58, \
+signed _BitInt(59) : 59, \
+unsigned _BitInt(59) : 59, \
+signed _BitInt(60) : 60, \
+unsigned _BitInt(60) : 60, \
+signed _BitInt(61) : 61, \
+unsigned _BitInt(61) : 61, \
+signed _BitInt(62) : 62, \
+unsigned _BitInt(62) : 62, \
+signed _BitInt(63) : 63, \
+unsigned _BitInt(63) : 63, \
+default: (sizeof(x) * CHAR_BIT))
+#else
+#define typewidth(x) (sizeof(x) * CHAR_BIT)
+#endif
+
+// C2X 7.18.3 Count Trailing Ones
+int_fast8_t __stdc_count_leading_zeros(unsigned long long value, uint_fast8_t width); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
+#define stdc_count_leading_zeros(value) __stdc_count_leading_zeros((value), __typewidth(value))
+#define stdc_count_leading_zerosuc(value) ((int)(stdc_count_leading_zeros((unsigned char)(value)))
+#define stdc_count_leading_zerosus(value) ((int)(stdc_count_leading_zeros((unsigned short)(value)))
+#define stdc_count_leading_zerosui(value) ((int)(stdc_count_leading_zeros((unsigned int)(value)))
+#define stdc_count_leading_zerosul(value) ((int)(stdc_count_leading_zeros((unsigned long)(value)))
+#define stdc_count_leading_zerosull(value) ((int)(stdc_count_leading_zeros((unsigned long long)(value)))
+
+// C2X 7.18.4 Count Leading Ones
+#define stdc_count_leading_ones(value) __stdc_count_leading_zeros(~(value), __typewidth(value))
+#define stdc_count_leading_onesuc(value) ((int)(stdc_count_leading_ones((unsigned char)(value)))
+#define stdc_count_leading_onesus(value) ((int)(stdc_count_leading_ones((unsigned short)(value)))
+#define stdc_count_leading_onesui(value) ((int)(stdc_count_leading_ones((unsigned int)(value)))
+#define stdc_count_leading_onesul(value) ((int)(stdc_count_leading_ones((unsigned long)(value)))
+#define stdc_count_leading_onesull(value) ((int)(stdc_count_leading_ones((unsigned long long)(value)))
+
 // C2X 7.18.6 Count Trailing Ones
 int_fast8_t __stdc_count_trailing_onesull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
 #define stdc_count_trailing_ones(value) __stdc_count_trailing_onesull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.

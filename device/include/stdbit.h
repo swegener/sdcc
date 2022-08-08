@@ -120,6 +120,23 @@ int_fast8_t __stdc_count_trailing_onesull(unsigned long long value); // Todo: Us
 #define stdc_count_trailing_zerosul(value) ((int)(stdc_count_trailing_ones((unsigned long)(~(value))))
 #define stdc_count_trailing_zerosull(value) ((int)(stdc_count_trailing_ones((unsigned long long)(~(value))))
 
+// C2X 7.18.10 First Trailing One
+int_fast8_t __stdc_first_trailing_oneull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
+#define stdc_first_trailing_one(value) __stdc_first_trailing_oneull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.
+#define stdc_first_trailing_oneuc(value) ((int)(stdc_first_trailing_one((unsigned char)(value)))
+#define stdc_first_trailing_oneus(value) ((int)(stdc_first_trailing_one((unsigned short)(value)))
+#define stdc_first_trailing_oneui(value) ((int)(stdc_first_trailing_one((unsigned int)(value)))
+#define stdc_first_trailing_oneul(value) ((int)(stdc_first_trailing_one((unsigned long)(value)))
+#define stdc_first_trailing_oneull(value) ((int)(stdc_first_trailing_one((unsigned long long)(value)))
+
+// C2X 7.18.9 First Trailing Zero
+#define stdc_first_trailing_zero(value) __stdc_first_trailing_oneull((unsigned long long)~(value)) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.
+#define stdc_first_trailing_zerouc(value) ((int)(stdc_first_trailing_zero((unsigned char)(value)))
+#define stdc_first_trailing_zerous(value) ((int)(stdc_first_trailing_zero((unsigned short)(value)))
+#define stdc_first_trailing_zeroui(value) ((int)(stdc_first_trailing_zero((unsigned int)(value)))
+#define stdc_first_trailing_zeroul(value) ((int)(stdc_first_trailing_zero((unsigned long)(value)))
+#define stdc_first_trailing_zeroull(value) ((int)(stdc_first_trailing_zero((unsigned long long)(value)))
+
 // C2X 7.18.11 Count Ones
 int_fast8_t __stdc_count_onesull(unsigned long long value); // Todo: Use _BitInt(8) here once all ports support it, so we avoid integer promotion for some cases.
 #define stdc_count_ones(value) __stdc_count_onesull(value) // Todo: Use some speed-optimized variants here later. Via _Generic or sizeof.

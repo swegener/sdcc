@@ -758,7 +758,7 @@ struct_or_union_specifier
         {
           structdef *sdef;
 
-          if (! $3->tagsym)
+          if (!$3->tagsym)
             {
               /* no tag given, so new struct def for current scope */
               addSym (StructTab, $3, $3->tag, $3->level, currBlockno, 0);
@@ -772,14 +772,9 @@ struct_or_union_specifier
                   if (sdef->block == currBlockno)
                     {
                       if (sdef->fields)
-                        {
-                          werror(E_STRUCT_REDEF, $3->tag);
-                          werrorfl(sdef->tagsym->fileDef, sdef->tagsym->lineDef, E_PREVIOUS_DEF);
-                        }
-                      else
-                        {
-                          $3 = sdef; /* We are completing an incomplete type */
-                        }
+                        $3->redefinition = true;
+                      else // We are completing an incomplete type
+                        $3 = sdef;
                     }
                   else
                     {
@@ -837,10 +832,33 @@ struct_or_union_specifier
             }
 
           /* Create a structdef   */
-          sdef = $3;
-          sdef->fields = reverseSyms($6);        /* link the fields */
-          sdef->size = compStructSize($1, sdef); /* update size of  */
-          promoteAnonStructs ($1, sdef);
+          $3->fields = reverseSyms($6);        /* link the fields */
+          $3->size = compStructSize($1, $3);   /* update size of  */
+          promoteAnonStructs ($1, $3);
+
+          if ($3->redefinition) // Since C2X, multiple definitions for struct /union are allowed, if they are compatible and have the same tags.
+            {
+              sdef = findSymWithBlock (StructTab, $3->tagsym, currBlockno, NestLevel);
+              bool compatible = options.std_c2x && sdef->tagsym && $3->tagsym && !strcmp (sdef->tagsym->name, $3->tagsym->name);
+              for (symbol *fieldsym1 = sdef->fields, *fieldsym2 = $3->fields; compatible; fieldsym1 = fieldsym1->next, fieldsym2 = fieldsym2->next)
+                {
+                  if (!fieldsym1 && !fieldsym2)
+                    break;
+                  if (!fieldsym1 || !fieldsym2)
+                    compatible = false;
+                  else if (strcmp (fieldsym1->name, fieldsym2->name))
+                    compatible = false;
+                  else if (compareType (fieldsym1->type, fieldsym2->type, true) <= 0)
+                    compatible = false;
+               }
+              if (!compatible)
+                {
+                  werror(E_STRUCT_REDEF_INCOMPATIBLE, $3->tag);
+                  werrorfl(sdef->tagsym->fileDef, sdef->tagsym->lineDef, E_PREVIOUS_DEF);
+                }
+            }
+          else
+            sdef = $3;
 
           /* Create the specifier */
           $$ = newLink (SPECIFIER);

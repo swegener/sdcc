@@ -73,6 +73,7 @@ typedef struct structdef
   int type;                     /* STRUCT or UNION            */
   bool b_flexArrayMember;       /* has got a flexible array member,
                                    only needed for syntax checks */
+  bool redefinition;            /* is a redefinition only needed for syntax checks */
   struct symbol *tagsym;        /* tag symbol (NULL if no tag) */
 }
 structdef;

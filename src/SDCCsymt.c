@@ -2820,6 +2820,8 @@ comparePtrType (sym_link *dest, sym_link *src, bool mustCast, bool ignoreimplici
     return mustCast ? -1 : 1;
   if ((IS_VOID (src->next) && !IS_VOID (dest->next)) || (!IS_VOID (src->next) && IS_VOID (dest->next)))
     return -1;
+  if (IS_STRUCT (src->next) && IS_STRUCT (dest->next) && SPEC_STRUCT (src->next) == SPEC_STRUCT (dest->next))
+    return mustCast ? -1 : 1;
   res = compareType (dest->next, src->next, ignoreimplicitintrinsic);
 
   /* All function pointers can be cast (6.6 in the ISO C11 standard) TODO: What about address spaces? */
@@ -2970,8 +2972,19 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
     {
       if (SPEC_STRUCT (dest) != SPEC_STRUCT (src))
         return 0;
-      else
-        return 1;
+
+      structdef *destsdef = SPEC_STRUCT (dest);
+      structdef *srcsdef = SPEC_STRUCT (src);
+
+      for (symbol *dstfieldsym = destsdef->fields, *srcfieldsym = srcsdef->fields; srcfieldsym || dstfieldsym; dstfieldsym = dstfieldsym->next, srcfieldsym = srcfieldsym->next)
+        {
+          if (!srcfieldsym || !dstfieldsym)
+            return 0;
+          if (compareType (srcfieldsym->type, dstfieldsym->type, ignoreimplicitintrinsic) <= 0)
+            return 0;
+        }
+
+      return 1; 
     }
 
   if (SPEC_SHORT (dest) != SPEC_SHORT (src))

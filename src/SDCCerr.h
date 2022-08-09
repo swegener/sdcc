@@ -237,7 +237,7 @@ enum {
   E_INTEGERSUFFIX               = 207, /* Invalid integer suffix */
   E_AUTO_ADDRSPACE              = 208, /* named address space for auto var */
   W_NORETURNRETURN              = 209, /* return in _noreturn function */
-  E_STRUCT_REDEF                = 210, /* struct or union tag redefined */
+  E_STRUCT_REDEF_INCOMPATIBLE   = 210, /* struct or union tag redefined to incompatible type */
   W_STRING_CANNOT_BE_TERMINATED = 211, /* string cannot be terminated within array */
   W_LONGLONG_LITERAL            = 212, /* long long literal */
   S_SYNTAX_ERROR                = 213, /* syntax error */

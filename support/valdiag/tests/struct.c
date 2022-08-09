@@ -122,3 +122,16 @@ struct tag1 {
   } tag3;		/* IGNORE */
 };
 #endif
+
+// C2X allows multiple compatible definitions for struct.
+#ifdef TEST10
+#ifdef __SDCC
+#pragma std_c2x
+#endif
+
+struct A {int x; int y;}; /* IGNORE */
+struct A {int x; int y;}; /* IGNORE(GCC) */
+struct A {int x; int z;}; /* ERROR */
+
+#endif
+

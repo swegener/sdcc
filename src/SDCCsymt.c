@@ -2853,7 +2853,7 @@ compareType (sym_link *dest, sym_link *src, bool ignoreimplicitintrinsic)
     return 0;
 
 #if 0
-  printf("Compare Type: "); printTypeChain (dest, stdout); printf(" vs. "); printTypeChain (src, 0);
+  printf("compareType: "); printTypeChain (dest, stdout); printf(" vs. "); printTypeChain (src, 0);
 #endif
 
   /* if dest is a declarator then */

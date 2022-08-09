@@ -1,5 +1,18 @@
 2022-08-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCCast.c:
+	  Fix handling of pointers to short, long and long long (without explicit int) in _Generic associations.
+	* device/include/stdckdint.h,
+	  device/lib/incl.mk,
+	  device/lib/ckd_add.c,
+	  device/lib/ckd_mul.c,
+	  device/lib/ckd_sub.c,
+	  doc/sdccman.lyx,
+	  .version:
+	  Checked integer arithmetic for all types except (unsigned) long long, part of RFE #749.
+
+2022-08-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCC.y,
 	  .version,
 	  support/valdiag/tests/enum.c:

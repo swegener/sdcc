@@ -31,15 +31,25 @@
 
 _Static_assert (sizeof(long long) >= 2 * sizeof(long));
 
-// Default implementation: Suitable for additive operators for everything smaller than long long, and for multiplication for everything smaller than long long except for unsigned long times unsigned long. Not very efficient.
+// Default implementation: Suitable for additive operators for everything smaller than long long, and for multiplication for everything smaller than long long except for unsigned long times unsigned long. Not very efficient. Todo: Replace by more efficient implementation using _BitInt once all ports support _BitInt.
 #define __CKD_DEFAULT_IMPL(T,O) \
 (T *r, signed long long a, signed long long b) \
 { \
 	signed long long result = a O b; \
 	*r = result; \
-	return (*r == result); \
+	return (*r != result); \
 }
 
+#define __CKD_ULL_IMPL(T,O) \
+(T *r, unsigned long long a, unsigned long long b) \
+{ \
+	unsigned long long result = a O b; \
+	*r = result; \
+	return (*r != result); \
+}
+
+inline _Bool __ckd_add_schar __CKD_DEFAULT_IMPL(signed char, +)
+inline _Bool __ckd_add_uchar __CKD_DEFAULT_IMPL(unsigned char, +)
 inline _Bool __ckd_add_short __CKD_DEFAULT_IMPL(short, +)
 inline _Bool __ckd_add_ushort __CKD_DEFAULT_IMPL(unsigned short, +)
 inline _Bool __ckd_add_int __CKD_DEFAULT_IMPL(int, +)
@@ -47,6 +57,8 @@ inline _Bool __ckd_add_uint __CKD_DEFAULT_IMPL(unsigned int, +)
 inline _Bool __ckd_add_long __CKD_DEFAULT_IMPL(long, +)
 inline _Bool __ckd_add_ulong __CKD_DEFAULT_IMPL(unsigned long, +)
 
+inline _Bool __ckd_sub_schar __CKD_DEFAULT_IMPL(signed char, -)
+inline _Bool __ckd_sub_uchar __CKD_DEFAULT_IMPL(unsigned char, -)
 inline _Bool __ckd_sub_short __CKD_DEFAULT_IMPL(short, -)
 inline _Bool __ckd_sub_ushort __CKD_DEFAULT_IMPL(unsigned short, -)
 inline _Bool __ckd_sub_int __CKD_DEFAULT_IMPL(int, -)
@@ -54,6 +66,8 @@ inline _Bool __ckd_sub_uint __CKD_DEFAULT_IMPL(unsigned int, -)
 inline _Bool __ckd_sub_long __CKD_DEFAULT_IMPL(long, -)
 inline _Bool __ckd_sub_ulong __CKD_DEFAULT_IMPL(unsigned long, -)
 
+inline _Bool __ckd_mul_schar __CKD_DEFAULT_IMPL(signed char, *)
+inline _Bool __ckd_mul_uchar __CKD_DEFAULT_IMPL(unsigned char, *)
 inline _Bool __ckd_mul_short __CKD_DEFAULT_IMPL(short, *)
 inline _Bool __ckd_mul_ushort __CKD_DEFAULT_IMPL(unsigned short, *)
 inline _Bool __ckd_mul_int __CKD_DEFAULT_IMPL(int, *)
@@ -61,35 +75,43 @@ inline _Bool __ckd_mul_uint __CKD_DEFAULT_IMPL(unsigned int, *)
 inline _Bool __ckd_mul_long __CKD_DEFAULT_IMPL(long, *)
 inline _Bool __ckd_mul_ulong __CKD_DEFAULT_IMPL(unsigned long, *)
 
+inline _Bool __ckd_mul_ulongull __CKD_ULL_IMPL(unsigned long, *)
+
 #define __ckd_add_default(r, a, b) \
   _Generic ((r), \
+    signed char * : __ckd_add_schar, \
+    unsigned char * : __ckd_add_uchar, \
     short * : __ckd_add_short, \
     unsigned short * : __ckd_add_ushort, \
     int * : __ckd_add_int, \
     unsigned int * : __ckd_add_uint, \
     long * : __ckd_add_long, \
     unsigned long * : __ckd_add_ulong) \
-    (r, a, b)
+    ((r), (a), (b))
 
 #define __ckd_sub_default(r, a, b) \
   _Generic ((r), \
+    signed char * : __ckd_sub_schar, \
+    unsigned char * : __ckd_sub_uchar, \
     short * : __ckd_sub_short, \
     unsigned short * : __ckd_sub_ushort, \
     int * : __ckd_sub_int, \
     unsigned int * : __ckd_sub_uint, \
     long * : __ckd_sub_long, \
     unsigned long * : __ckd_sub_ulong) \
-    (r, a, b)
+    ((r), (a), (b))
     
 #define __ckd_mul_default(r, a, b) \
   _Generic ((r), \
+    signed char * : __ckd_mul_schar, \
+    unsigned char * : __ckd_mul_uchar, \
     short * : __ckd_mul_short, \
     unsigned short * : __ckd_mul_ushort, \
     int * : __ckd_mul_int, \
     unsigned int * : __ckd_mul_uint, \
     long * : __ckd_mul_long \
     unsigned long * : __ckd_mul_ulong \
-    (r, a, b)
+    ((r), (a), (b))
 
 extern _Bool __ckd_add_unimplemented (void *, unsigned long long, unsigned long long);
 
@@ -125,7 +147,7 @@ extern _Bool __ckd_mul_unimplemented (void *, unsigned long long, unsigned long 
     _Generic ((b), \
     signed long long: __ckd_mul_unimplemented(r, a, b), \
     unsigned long long: __ckd_mul_unimplemented(r, a, b), \
-    unsigned long: __ckd_mul_unimplemented(r, a, b), \
+    unsigned long: __ckd_mul_ulongull(r, a, b), \
     default: __ckd_mul_default(r, a, b)) \
   default: \
     _Generic ((b), \

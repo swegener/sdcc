@@ -9788,7 +9788,7 @@ Compund literals are not supported.
 \end_layout
 
 \begin_layout Itemize
-Support for attributes is sightly incomplete.
+Support for attributes is slightly incomplete.
 \end_layout
 
 \begin_layout Itemize
@@ -9796,7 +9796,7 @@ The preprocessor is not C2X-compatible.
 \end_layout
 
 \begin_layout Itemize
-Checked integer arithmetic is not supported.
+Checked integer arithmetic is not supported for (unsigned) long long.
 \end_layout
 
 \begin_layout Itemize
@@ -9809,14 +9809,6 @@ Enhanced enumerations are not implemented.
 
 \begin_layout Itemize
 constexpr is not implemented.
-\end_layout
-
-\begin_layout Itemize
-C2X tag compatibility rule changes are not implemented.
-\end_layout
-
-\begin_layout Itemize
-call_once is not implemented.
 \end_layout
 
 \begin_layout Standard

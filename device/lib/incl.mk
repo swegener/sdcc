@@ -74,6 +74,9 @@ COMMON_SDCC = \
   isxdigit.c \
   tolower.c \
   toupper.c \
+  ckd_add.c \
+  ckd_sub.c \
+  ckd_mul.c \
   atoi.c \
   atol.c \
   atoll.c \

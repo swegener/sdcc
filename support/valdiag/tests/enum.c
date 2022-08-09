@@ -95,3 +95,16 @@ enum comma
   second,,	/* ERROR */
 }
 #endif
+
+// C2X allows multiple compatible definitions for enum.
+#ifdef TEST10
+#ifdef __SDCC
+#pragma std_c2x
+#endif
+
+enum X {A = 1, B};     /* IGNORE */
+enum X {B = 2, A = 1}; /* IGNORE(GCC) */
+enum X {A = 1, B = 3}; /* ERROR */
+
+#endif
+

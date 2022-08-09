@@ -993,16 +993,19 @@ enum_specifier
           symbol *csym;
           sym_link *enumtype;
 
-          csym = findSymWithLevel(enumTab, $2);
-          if ((csym && csym->level == $2->level))
-            {
-              werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF, csym->name);
-              werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
-            }
-
           enumtype = newEnumType ($4);
           SPEC_SCLS(getSpec(enumtype)) = 0;
           $2->type = enumtype;
+
+          csym = findSymWithLevel(enumTab, $2);
+          if ((csym && csym->level == $2->level))
+            {
+              if (!options.std_c2x || compareType (csym->type, $2->type, true) <= 0)
+                {
+                  werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF, csym->name);
+                  werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+                }
+            }
 
           /* add this to the enumerator table */
           if (!csym)
@@ -1050,18 +1053,26 @@ enumerator
         {
           symbol *sym;
 
-          // check if the symbol at the same level already exists
-          if ((sym = findSymWithLevel (SymbolTab, $1)) && sym->level == $1->level)
-            {
-              werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
-              werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
-            }
           $1->type = copyLinkChain ($3->type);
           $1->etype = getSpec ($1->type);
           SPEC_ENUM ($1->etype) = 1;
           $$ = $1;
-          // do this now, so we can use it for the next enums in the list
-          addSymChain (&$1);
+
+          // check if the symbol at the same level already exists
+          if ((sym = findSymWithLevel (SymbolTab, $1)) && sym->level == $1->level)
+            {
+              // C2X allows redefinitions of enumeration constants with the same value as part of a redeclaration of the same enumerated type.
+              if (!options.std_c2x || ullFromVal (valFromType (sym->type)) != ullFromVal (valFromType ($1->type)))
+                {
+                  werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
+                  werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
+                }
+            }
+          else
+            {
+              // do this now, so we can use it for the next enums in the list
+              addSymChain (&$1);
+            }
         }
    ;
 

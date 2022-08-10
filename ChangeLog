@@ -1,5 +1,10 @@
 2022-08-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* device/include/stdbit.h:
+	  Fix bit and byte utilities find first leading bit functions for ports that don't have _BitInt yet.
+
+2022-08-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* doc/sdccman.lyx,
 	  src/SDCC.y:
 	  Document intentional deviation from C2X draft N3047 rules for tag compatibility for unions.

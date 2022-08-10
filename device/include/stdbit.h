@@ -228,7 +228,7 @@ signed _BitInt(63) : 63, \
 unsigned _BitInt(63) : 63, \
 default: (sizeof(x) * CHAR_BIT))
 #else
-#define typewidth(x) (sizeof(x) * CHAR_BIT)
+#define __typewidth(x) (sizeof(x) * CHAR_BIT)
 #endif
 
 // C2X 7.18.3 Count Trailing Ones

@@ -9811,6 +9811,15 @@ Enhanced enumerations are not implemented.
 constexpr is not implemented.
 \end_layout
 
+\begin_layout Itemize
+SDCC deviates from the current C2X standard draft N3047 in tag compatibility
+ for unions: in SDCC, redeclarations of unions are required to have their
+ members in the same order as previous declarations.
+ The rule in N3047 is now considered a mistake by many, and will hopefully
+ be changed to the SDCC behaviour via a national body comment for the final
+ version of the standard.
+\end_layout
+
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout

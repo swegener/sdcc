@@ -1,3 +1,9 @@
+2022-08-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y:
+	  Document intentional deviation from C2X draft N3047 rules for tag compatibility for unions.
+
 2022-08-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c:

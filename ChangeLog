@@ -1,3 +1,10 @@
+2022-08-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/pic16/startup/crt0.c,
+	  device/lib/pic16/startup/crt0i.c,
+	  device/lib/pic16/startup/crt0iz.c:
+	  Update interrupt syntax for new parser
+
 2022-08-10 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stdbit.h:

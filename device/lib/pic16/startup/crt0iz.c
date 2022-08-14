@@ -53,7 +53,7 @@ char __uflags = 0;
 /* External reference to the user's main routine. */
 extern void main (void);
 
-void _entry (void) __naked __interrupt 0;
+void _entry (void) __naked __interrupt (0);
 void _startup (void) __naked;
 
 /* Access bank selector. */
@@ -64,7 +64,7 @@ void _startup (void) __naked;
  * Entry function, placed at interrupt vector 0 (RESET).
  */
 void
-_entry (void) __naked __interrupt 0
+_entry (void) __naked __interrupt (0)
 {
   __asm
     goto    __startup

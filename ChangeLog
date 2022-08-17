@@ -1,3 +1,9 @@
+2022-08-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/s08/spec.mk:
+	  Increase regression test timeout slightly, so a passive-cooled Raspi 4B can run the qct_0042-prime regression test in Summer.
+
 2022-08-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/pic16/startup/crt0.c,

@@ -5,10 +5,14 @@ SIM_TIMEOUT = 25
 
 # path to gpsim
 ifdef GPSIM_PATH
-  GPSIM := $(WINE) $(GPSIM_PATH)/gpsim$(EXEEXT)
+  GPSIM = $(GPSIM_PATH)/gpsim$(EXEEXT)
 else
-  GPSIM := $(WINE) gpsim$(EXEEXT)
+  GPSIM = gpsim$(EXEEXT)
 endif
+
+EMU_INPUT = $(PORTS_DIR)/$(PORT_BASE)/gpsim.cmd
+EMU_FLAGS = -i -c
+EMU = ${WINE} ${GPSIM}
 
 ifndef SDCC_BIN_PATH
   ifndef CROSSCOMPILING
@@ -25,7 +29,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mpic14 -pp16f877 --less-pedantic -Wl,-q
+SDCCFLAGS += -mpic14 -pp16f877 --less-pedantic
 SDCCFLAGS += --no-warn-non-free
 LINKFLAGS += libsdcc.lib libm.lib
 

@@ -1,3 +1,8 @@
+2022-08-26 Felix Salfelder <felix AT salfelder.org>
+
+	* regression/ports/pic14/spec.mk:
+	  LDFLAGS & EMU invocation fixes
+
 2022-08-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/ports/hc08/spec.mk,

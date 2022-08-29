@@ -1,3 +1,8 @@
+2022-08-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/cases/Makefile.in:
+	  Disable a GCC test that tests for GCC implementation-defined floating-point behaviour.
+
 2022-08-26 Felix Salfelder <felix AT salfelder.org>
 
 	* regression/ports/pic14/spec.mk:

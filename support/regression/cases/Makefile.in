@@ -172,6 +172,10 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	bitfld-2.c
 
+# Test for GCC implementation-defined floating-point behaviour
+GTE_SKIP_TESTS += \
+	990127-2.c
+	
 # Requires int of at least 32 bits.
 GTE_SKIP_TESTS += \
 	20061101-1.c \

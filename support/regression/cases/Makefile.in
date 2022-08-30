@@ -1097,11 +1097,16 @@ MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(TEST_SRCS) Makefile
 	@echo TEST_STEMS += '$$(QC_TEST_STEMS)' >> MakeList
 	@echo TEST_STEMS += '$$(TCC_TEST_STEMS)' >> MakeList
 
+.PHONY: clean distclean info
+
 clean:
 	rm -f */*.c */*/stamp
 	rm -f *.m4c *.c */stamp
 	rm -rf MakeList
 	rmdir * 2> /dev/null || :
+
+distclean: clean
+	rm -f Makefile
 
 .PRECIOUS: %/stamp
 

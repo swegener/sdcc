@@ -1,6 +1,8 @@
 /* bug-3457.c
 
    Wrong line number on divide by 0 warning
+
+   Based on GPL 2.0 code by "Under4MHz"
  */
 
 #ifdef TEST1

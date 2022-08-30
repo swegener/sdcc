@@ -236,9 +236,11 @@ copyIlist (initList * src)
     {
     case INIT_DEEP:
       dest = newiList (INIT_DEEP, copyIlist (src->init.deep));
+      dest->lineno = src->lineno;
       break;
     case INIT_NODE:
       dest = newiList (INIT_NODE, copyAst (src->init.node));
+      dest->lineno = src->lineno;
       break;
     }
 

@@ -432,6 +432,8 @@ defaultOClass (symbol *sym)
         }
       else
         {
+          if (!sym->ival && !SPEC_ABSA (sym->etype) && !(IS_EXTERN (sym->etype) || IS_FUNC (sym->type)))
+            sym->ival = newiList(INIT_DEEP, revinit(newiList(INIT_NODE, newAst_VALUE(constIntVal("0"))))); // Default initalization to 0.
           SPEC_OCLS (sym->etype) = statsg;
         }
       break;

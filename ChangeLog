@@ -1,3 +1,9 @@
+2022-08-30 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCmem.c,
+	  support/regression/tests/bug-3040.c.in:
+	  Fix bug #3073.
+
 2022-08-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/cases/Makefile.in:

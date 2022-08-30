@@ -20,8 +20,6 @@
 
 void testBug(void)
 {
-# if 0 // Bug #3073.
 	ASSERT(!f());
-#endif
 }
 

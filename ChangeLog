@@ -3,6 +3,8 @@
 	* src/SDCCmem.c,
 	  support/regression/tests/bug-3040.c.in:
 	  Fix bug #3073.
+	* support/regression/tests/checkedint.c.in:
+	  Test checked integers, part of RFE #749.
 
 2022-08-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

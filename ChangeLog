@@ -7,6 +7,9 @@
 	  Test checked integers, part of RFE #749.
 	* tests/gcc-torture-execute-920711-1.c:
 	  Remove a test that relies on undefined behaviour on signed integer overflow.
+	* src/SDCCcse.c,
+	  support/valdiag/tests/bug-3457.c:
+	  Fix bug #3457.
 
 2022-08-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

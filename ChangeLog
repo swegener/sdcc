@@ -6,7 +6,7 @@
 	* support/regression/tests/checkedint.c.in:
 	  Test checked integers, part of RFE #749.
 	* tests/gcc-torture-execute-920711-1.c:
-	  Remove a test that relies on undefined beahviour on signed integer overflow.
+	  Remove a test that relies on undefined behaviour on signed integer overflow.
 
 2022-08-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

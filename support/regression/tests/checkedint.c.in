@@ -31,7 +31,7 @@ void
 testCkd (void)
 {
 #ifdef __SDCC // Todo: Enable for all C2X impl.
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_MEDIUM)) // Lack of memory
 #ifndef __SDCC_ds390 // Bug #3469
 	{type} l, r;
 	{type} result;

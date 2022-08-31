@@ -1,3 +1,8 @@
+2022-08-31 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/checkedint.c.in:
+	  Disable test for mcs51 medium memory model, where it fails due to lack of memory.
+
 2022-08-30 Felix Salfelder <felix AT salfelder.org>
 
 	* support/regression/cases/Makefile.in:

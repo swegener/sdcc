@@ -1,0 +1,12 @@
+#!/bin/sh
+
+bin=sdnm
+abs_top_builddir=@abs_top_builddir@
+path=${abs_top_builddir}/support/sdbinutils/binutils
+
+# non-cygwin
+if [ -f ${path}/.libs/$bin ]; then \
+	path=$path/libs
+fi
+
+$path/$bin "$@"

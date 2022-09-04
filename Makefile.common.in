@@ -1,6 +1,7 @@
 #
 #
 #
+.DELETE_ON_ERROR:
 
 all:
 

@@ -107,6 +107,12 @@ m__v_EMU_ = $(m__v_EMU_$(DEFAULT_VERBOSITY))
 m__v_EMU_0 = echo "  EMU     " $@;
 m__v_EMU_1 =
 
+M_V_echo = $(m__v_echo_$(V))
+m__v_echo_ = $(m__v_EMU_$(DEFAULT_VERBOSITY))
+m__v_echo_silent = echo > /dev/null
+m__v_echo_0 = echo > /dev/null
+m__v_echo_1 = echo
+
 M_V_CC = $(m__v_CC_$(V))
 m__v_CC_ = $(m__v_CC_$(DEFAULT_VERBOSITY))
 m__v_CC_silent = @
@@ -244,7 +250,7 @@ SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 PORT_BASE = $(PORT)
 # Path to SDCC
 ifdef SDCC_BIN_PATH
-  SDCC = $(SDCC_BIN_PATH)/sdcc$(EXEEXT)
+  SDCC = export PATH=$(SDCC_BIN_PATH); sdcc$(EXEEXT)
 else
   SDCC = $(top_builddir)/bin/sdcc$(EXEEXT)
   INC_DIR ?= $(top_srcdir)/device/include
@@ -279,6 +285,7 @@ $(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
 	@echo --- Running: $< > $@;
 
 	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
+	  ${M_V_echo} "$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@"; \
 	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@; \
 	  if [ 0 -ne $$? ]; then \
 	    echo --- FAIL: \"timeout, simulation killed\" in $< >> $@; \
@@ -338,7 +345,7 @@ $(PORT_RESULTS_DIR)/%.log: $(PORT_RESULTS_DIR)/%.out
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.
-$(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS)
+$(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS) cases/MakeList
 	${M_V_at}echo | cat - $(PORT_RESULTS:%.log=%.out) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
 
 port-fwklib: port-dirs $(EXTRAS) $(FWKLIB)

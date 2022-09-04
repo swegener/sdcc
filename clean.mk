@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	cd bin && for name in *; do if [ -f $$name -a $$name != README ]; then rm $$name; fi; done
+	make -C bin clean
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

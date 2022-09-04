@@ -165,14 +165,6 @@ sdcc-packihx:
 
 sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
-	# in some cases (cygwin) the real binaries are in .libs
-	for bin in $(SDBINUTILS_BINS); do \
-	  if [ -f $(SDCC_SDBINUTILS)/binutils/.libs/$$bin ]; then \
-	    cp $(SDCC_SDBINUTILS)/binutils/.libs/$$bin bin; \
-	  else \
-	    cp $(SDCC_SDBINUTILS)/binutils/$$bin bin; \
-	  fi \
-	done
 
 sdcc-device-inc:
 	$(MAKE) -C device/include

@@ -6,6 +6,8 @@ srcdir          = @srcdir@
 top_srcdir      = @top_srcdir@
 top_builddir    = @top_builddir@
 VPATH           = @srcdir@
+GIT_REVISION    = @GIT_REVISION@
+SVN_REVISION    = @SVN_REVISION@
 
 PORTS           = $(shell cat ../ports.build)
 ALLPORTS        = $(shell cat ../ports.all)
@@ -42,7 +44,7 @@ SOURCES         := $(patsubst %.o,%.c,$(OBJECTS))
 CXXSOURCES      += $(sort $(notdir $(wildcard $(srcdir)/*.cc)))
 OBJECTS         += $(patsubst %.cc,%.o,$(CXXSOURCES))
 
-TARGET          = $(top_builddir)/bin/sdcc$(EXEEXT)
+TARGET          = sdcc$(EXEEXT)
 
 # ------------------------------------------
 include $(top_builddir)/Makefile.common
@@ -114,8 +116,19 @@ SDCCy.c: SDCC.y
 SDCClex.c: SDCC.lex SDCCy.h
 	$(LEX) -8 -f -t $< >$@
 
-version.h: ../ChangeLog
-	$(AWK) -f $(srcdir)/version.awk $< > $@
+# BUG: move if changed only.
+version.h: ../ChangeLog Makefile
+	if [ -z "${GIT_REVISION}" ]; then \
+		$(AWK) -f $(srcdir)/version.awk $< > $@; \
+	else \
+		echo "#ifndef __VERSION_H__" > $@; \
+		echo "#define __VERSION_H__" >> $@; \
+		echo "// GIT_REVISION ${GIT_REVISION}" >> $@; \
+		echo "// BUILD_NUMBERs are empty when not using commit from svn..." >> $@; \
+		echo '#define SDCC_BUILD_NUMBER    "${SVN_REVISION}"' >> $@; \
+		echo "#define SDCC_BUILD_NR        ${SVN_REVISION}" >> $@;\
+		echo "#endif" >> $@; \
+	fi
 
 .l.c:
 	rm -f $*.cc

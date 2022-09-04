@@ -31,7 +31,7 @@ endif
 
 CC              = $(top_builddir)/bin/sdcc
 # The predefined macros reflect what SDCC predefines (so we don't get any errors when generating Makefile.dep).
-CPP             = $(top_builddir)/bin/sdcpp -D__STDC_ISO_10646__=201409L -D__STDC_UTF_16__=1 -D__STDC_UTF_32__=1
+CPP             = $(top_builddir)/bin/sdcpp -D__STDC_ISO_10646__=201409L
 SDAR            = $(abs_top_builddir)/bin/sdar
 
 prefix          = @prefix@

@@ -2146,7 +2146,7 @@ preProcess (char **envp)
           struct dbuf_s dbuf;
 
           dbuf_init (&dbuf, 256);
-          dbuf_printf (&dbuf, "-obj-ext=%s", port->linker.rel_ext);
+          dbuf_printf (&dbuf, "--obj-ext=%s", port->linker.rel_ext);
           addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 
@@ -2319,6 +2319,9 @@ preProcess (char **envp)
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
 
+      /* WORKARDOUND */
+//      addSet (&preArgvSet, Safe_strdup ("-D__func__=\\\"unknown_func\\\""));
+
       /* add port (processor information to processor */
       addSet (&preArgvSet, Safe_strdup ("-D__SDCC_{port}"));
 
@@ -2330,8 +2333,6 @@ preProcess (char **envp)
 
       /* Character encoding  - these need to be set in device/lib/Makefile.in for $CPP, too */
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_ISO_10646__=201409L")); // wchar_t is UTF-32
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32
 
       /* set __SIZEOF_x__ macros for internal use by the library */
       addSet (&preArgvSet, Safe_strdup ("-D__SIZEOF_FLOAT__=4"));
@@ -2807,9 +2808,13 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      if (!options.c1mode)
-        if (sdcc_pclose (yyin))
+      if (!options.c1mode) {
+        int cl = sdcc_pclose (yyin);
+        if (cl){
+			 fprintf(stderr, "subprocess error %d\n", cl);
           fatalError = 1;
+		  }
+		}
 
       if (fatalError)
         exit (EXIT_FAILURE);

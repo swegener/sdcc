@@ -1,0 +1,5 @@
+#!/bin/sh
+
+abs_top_builddir=@abs_top_builddir@
+export PATH=${abs_top_builddir}/support/cpp/gcc
+cpp "$@"

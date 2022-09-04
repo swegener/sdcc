@@ -14,6 +14,12 @@ GTE_TESTS_DIR = $(srcdir)/../gte
 QC_TESTS_DIR = $(srcdir)/../qct
 TCC_TESTS_DIR = $(srcdir)/../tcc
 
+TEST_DIRS = \
+	${TESTS_DIR} \
+	${GTE_TESTS_DIR} \
+	${QC_TESTS_DIR} \
+	${TCC_TESTS_DIR}
+
 vpath %.c.in $(TESTS_DIR)
 vpath %.c $(TESTS_DIR)
 
@@ -1065,7 +1071,7 @@ TEST_SRCS = \
 	$(QC_TEST_SRCS) \
 	$(TCC_TEST_SRCS)
 
-MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(TEST_SRCS) Makefile
+MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(TEST_DIRS) $(TEST_SRCS) Makefile
 	@echo
 	@echo populated MakeList...
 	@echo GTE_TEST_STEMS = $(GTE_TESTS:%.c=gte_%) > MakeList

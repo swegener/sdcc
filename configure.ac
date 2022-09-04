@@ -779,6 +779,21 @@ AC_DEFUN([AC_DO_PORT_ENABLER], [
   fi
 ])
 
+# Revision number
+# ===============
+
+dnl Check for Git short SHA to tag version
+dnl The release package should also keep it on the config.h
+GIT_REVISION=""
+SVN_REVISION="unknown"
+if test -d "${srcdir}/.git"; then
+  GIT_REVISION=$( git log --pretty=format:'%h' -n 1u )
+  echo "Found Git repo... $GIT_REVISION"
+  SVN_REVISION=$( git log -1 | tail -n1 | cut -f2 -d @ | cut -f1 -d" " )
+fi
+AC_SUBST(GIT_REVISION)
+AC_SUBST(SVN_REVISION)
+
 # Now handle the port selection
 # ===========================================================================
 rm -f ports.all ports.build
@@ -976,6 +991,7 @@ test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
 test $OPT_DISABLE_DEVICE_LIB = 0 && test $OPT_DISABLE_NON_FREE = 0 && AC_CONFIG_FILES([device/non-free/lib/Makefile])
 
 AC_CONFIG_FILES([main.mk:main_in.mk
+bin/Makefile
 src/Makefile
 device/include/Makefile
 sdas/linksrc/Makefile
@@ -988,6 +1004,12 @@ support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in
 Makefile
 Makefile.common:Makefile.common.in
 ])
+AC_CONFIG_FILES([bin/sdcc], [chmod +x bin/sdcc])
+AC_CONFIG_FILES([bin/sdcpp], [chmod +x bin/sdcpp])
+AC_CONFIG_FILES([bin/sdar], [chmod +x bin/sdar])
+AC_CONFIG_FILES([bin/sdnm], [chmod +x bin/sdnm])
+AC_CONFIG_FILES([bin/sdranlib], [chmod +x bin/sdranlib])
+AC_CONFIG_FILES([bin/sdobjcopy], [chmod +x bin/sdobjcopy])
 if test $OPT_DISABLE_NON_FREE = 0; then
   AC_CONFIG_FILES([device/non-free/include/Makefile])
 fi
@@ -1033,6 +1055,7 @@ sdcc ${VERSION} is now configured for
   CPPFLAGS:             ${CPPFLAGS}
   LDFLAGS:              ${LDFLAGS}
   MAKEDEP:              ${MAKEDEP}
+  MAKEDEP_CXX:          ${MAKEDEP_CXX}
 
   ENABLED Ports:
     ds390               ${enable_ds390_port}

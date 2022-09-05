@@ -538,6 +538,7 @@ cl_z80::inst_Xd(t_mem prefix)
       case 0x62: // LD HX,D
       case 0x63: // LD HX,E
       case 0x64: // LD HX,HX
+      case 0x65: // LD HX,LX
       case 0x66: // LD H,(IX+dd)
       case 0x67: // LD HX,A
       case 0x68: // LD LX,B

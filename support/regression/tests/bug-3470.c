@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) // Lack of memory
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk15) // Remaining aspects of bug
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk15) && !defined(__SDCC_ds390) // Remaining aspects of bug
 struct S0 {
    signed f0 : 3;
    signed f1 : 12;
@@ -78,7 +78,7 @@ void
 testBug (void)
 {
 #if !defined( __SDCC_pdk13) && !defined( __SDCC_pdk14) // Lack of memory
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk15) // Remaining aspects of bug
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk15) && !defined(__SDCC_ds390) // Remaining aspects of bug
     func_1();
 #endif
 #endif

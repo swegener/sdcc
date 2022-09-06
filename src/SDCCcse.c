@@ -2245,7 +2245,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
 
       /* for pcall & ipush we need to add to the useSet */
       if ((ic->op == PCALL ||
-           ic->op == IPUSH ||
+           ic->op == IPUSH || ic->op == IPUSH_VALUE_AT_ADDRESS ||
            ic->op == IPOP ||
            ic->op == SEND) &&
           IS_SYMOP (IC_LEFT (ic)))

@@ -1378,7 +1378,7 @@ MOSTLYCLEANFILES = \
  insn-attrtab.cc insn-dfatab.cc \
  insn-latencytab.cc insn-opinit.cc insn-opinit.h insn-preds.cc \
  tm-preds.h tm-constrs.h checksum-options gimple-match.cc generic-match.cc \
- tree-check.h insn-modes.cc insn-modes.h insn-modes-inline.h \
+ tree-check.h insn-modes.cc \
  genrtl.h gt-*.h gtype-*.h gtype-desc.cc gtyp-input.list \
  case-cfn-macros.h cfn-operators.pd \
  xgcc$(exeext) cpp$(exeext) $(FULL_DRIVER_NAME) \
@@ -2374,7 +2374,7 @@ s-gtype: $(EXTRA_GTYPE_DEPS) build/gengtype$(build_exeext) \
 generated_files = config.h tm.h $(TM_P_H) $(TM_D_H) $(TM_H) multilib.h \
        $(simple_generated_h) specs.h \
        tree-check.h genrtl.h \
-       tm-preds.h tm-constrs.h \
+       tm-constrs.h \
        $(ALL_GTFILES_H) gtype-desc.cc gtype-desc.h version.h \
        options.h target-hooks-def.h insn-opinit.h \
        common/common-target-hooks-def.h pass-instances.def \
@@ -3155,7 +3155,7 @@ clean: mostlyclean lang.clean
 	-rm -f common/common-targhooks.o
 	-rm -f libgcc_s*
 	-rm -f libunwind*
-	-rm -f config.h tconfig.h bconfig.h tm_p.h tm.h
+	-rm -f config.h tconfig.h bconfig.h
 	-rm -f options.cc options.h optionlist
 	-rm -f cs-*
 	-rm -f doc/*.dvi

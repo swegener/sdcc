@@ -5148,7 +5148,7 @@ _gbz80_emitAddSubLong (const iCode * ic, bool isAdd)
 static void
 restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
 {
-  bool bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
+  bool aInRet, bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
   bool SomethingReturned;
 
   SomethingReturned = result && IS_ITEMP (result) && (OP_SYMBOL_CONST (result)->nRegs || OP_SYMBOL_CONST (result)->spildir)
@@ -5157,6 +5157,7 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
   if (SomethingReturned)
     {
       bitVect *rv = z80_rUmaskForOp (result);
+      aInRet = bitVectBitValue (rv, A_IDX);
       bInRet = bitVectBitValue (rv, B_IDX);
       cInRet = bitVectBitValue (rv, C_IDX);
       dInRet = bitVectBitValue (rv, D_IDX);
@@ -5167,12 +5168,13 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
     }
   else
     {
-      bInRet = FALSE;
-      cInRet = FALSE;
-      dInRet = FALSE;
-      eInRet = FALSE;
-      hInRet = FALSE;
-      lInRet = FALSE;
+      aInRet = false;
+      bInRet = false;
+      cInRet = false;
+      dInRet = false;
+      eInRet = false;
+      hInRet = false;
+      lInRet = false;
     }
 
   if (iy)
@@ -5182,7 +5184,7 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
     {
       if (dInRet && eInRet)
         wassertl (0, "Shouldn't push DE if it's wiped out by the return");
-      else if (dInRet)
+      else if (dInRet && !aInRet)
         {
           /* Only restore E */
           emit2 ("ld a, d");
@@ -5191,14 +5193,23 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld d, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (eInRet && !IS_TLCS90) // TLCS-90 has interrupt settings in f, so we can't pop af unless we did push af before.
+      else if (dInRet && !hInRet)
+        {
+          /* Only restore E */
+          emit2 ("ld h, d");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_DE);
+          emit2 ("ld d, h");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (eInRet && !aInRet && !IS_TLCS90) // TLCS-90 has interrupt settings in f, so we can't pop af unless we did push af before.
         {
           /* Only restore D */
           _pop (PAIR_AF);
           emit2 ("ld d, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (eInRet)
+      else if (eInRet && !aInRet)
         {
           /* Only restore D */
           emit2 ("ld a, e");
@@ -5206,6 +5217,10 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           _pop (PAIR_DE);
           emit2 ("ld e, a");
           regalloc_dry_run_cost += 1;
+        }
+      else if (dInRet || eInRet)
+        {
+          UNIMPLEMENTED;
         }
       else
         _pop (PAIR_DE);
@@ -5215,7 +5230,7 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
     {
       if (bInRet && cInRet)
         wassertl (0, "Shouldn't push BC if it's wiped out by the return");
-      else if (bInRet)
+      else if (bInRet && !aInRet)
         {
           /* Only restore C */
           emit2 ("ld a, b");
@@ -5224,14 +5239,23 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld b, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (cInRet && !IS_TLCS90)
+      else if (bInRet && !hInRet)
+        {
+          /* Only restore C */
+          emit2 ("ld a, h");
+          regalloc_dry_run_cost += 1;
+          _pop (PAIR_BC);
+          emit2 ("ld h, a");
+          regalloc_dry_run_cost += 1;
+        }
+      else if (cInRet && !aInRet && !IS_TLCS90)
         {
           /* Only restore B */
           _pop (PAIR_AF);
           emit2 ("ld b, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (cInRet)
+      else if (cInRet && !aInRet)
         {
           /* Only restore B */
           emit2 ("ld a, c");
@@ -5239,6 +5263,10 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           _pop (PAIR_BC);
           emit2 ("ld c, a");
           regalloc_dry_run_cost += 1;
+        }
+      else if (bInRet || cInRet)
+        {
+          UNIMPLEMENTED;
         }
       else
         _pop (PAIR_BC);
@@ -5248,7 +5276,7 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
     {
       if (hInRet && lInRet)
         wassertl (0, "Shouldn't push HL if it's wiped out by the return");
-      else if (hInRet)
+      else if (hInRet && !aInRet)
         {
           /* Only restore E */
           emit2 ("ld a, h");
@@ -5257,14 +5285,14 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           emit2 ("ld h, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (lInRet && !IS_TLCS90)
+      else if (lInRet && !aInRet && !IS_TLCS90)
         {
           /* Only restore D */
           _pop (PAIR_AF);
           emit2 ("ld h, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (lInRet)
+      else if (lInRet&& !aInRet )
         {
           /* Only restore E */
           emit2 ("ld a, l");
@@ -5272,6 +5300,10 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
           _pop (PAIR_HL);
           emit2 ("ld l, a");
           regalloc_dry_run_cost += 1;
+        }
+      else if (lInRet || hInRet)
+        {
+          UNIMPLEMENTED;
         }
       else
         _pop (PAIR_HL);

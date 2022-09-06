@@ -1,3 +1,9 @@
+2022-09-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3471.c:
+	  Fix bug #3471.
+
 2022-09-06 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/gcc/Makefile.in,

@@ -2561,6 +2561,14 @@ FBYNAME (isPort)
   return ret;
 }
 
+/*-----------------------------------------------------------------*/
+/* notInJumpTable - check that we are not in a jump table          */
+/*-----------------------------------------------------------------*/
+FBYNAME (notInJumpTable)
+{
+  return (currPl->ic && currPl->ic->op != JUMPTABLE);
+}
+
 static const struct ftab
 {
   char *fname;
@@ -2663,6 +2671,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "newLabel", newLabel
+  },
+  {
+    "notInJumpTable", notInJumpTable
   },
 };
 

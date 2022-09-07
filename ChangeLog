@@ -1,3 +1,10 @@
+2022-09-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCpeeph.c,
+	  src/z80/peeph.def,
+	  support/regression/tests/bug-3478.c:
+	  Fix bug #3478.
+
 2022-09-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c,

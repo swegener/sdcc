@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 // Based on code by "Under4Mhz" licensed under GPL 2.0 or later
 
 #include <string.h>

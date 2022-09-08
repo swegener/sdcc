@@ -150,7 +150,7 @@ CC = ${abs_top_builddir}/bin/sdcc
 SDAR = ${abs_top_builddir}/bin/sdar
 
 %.rel: %.c
-	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<
+	$(CC) $(CFLAGS) ${CPPFLAGS} ${EXTRA_CFLAGS} -c $< -o $@
 
 %.rel: ../%.c
-	$(CC) $(CFLAGS) ${EXTRA_CFLAGS} -c $<
+	$(CC) $(CFLAGS) ${CPPFLAGS} ${EXTRA_CFLAGS} -c $< -o $@

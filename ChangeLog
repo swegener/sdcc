@@ -1,3 +1,8 @@
+2022-09-08 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/Makefile.in:
+	  avoid tm-preds.h cleanup once more.
+
 2022-09-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCpeeph.c,

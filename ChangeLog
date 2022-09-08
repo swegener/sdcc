@@ -1,5 +1,10 @@
 2022-09-08 Felix Salfelder <felix AT salfelder.org>
 
+	* support/cpp/libbacktrace/allocfail.sh:
+	  Delete unused file.
+
+2022-09-08 Felix Salfelder <felix AT salfelder.org>
+
 	* device/lib/incl.mk:
 	  Fix %.rel rules. Thanks to Job Bolle, see discussion/1865.
 

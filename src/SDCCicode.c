@@ -3660,7 +3660,7 @@ geniCodeCall (operand * left, ast * parms, int lvl)
       return operandFromValue (valueFromLit (0), false);
     }
 
-  // C2X unreachable. Just omit the call for now. TODO: Optimize based on this (remove preceding and subsequent icodes, up zo whole basic block when no side effects)
+  // C2X unreachable. Just omit the call for now. TODO: Optimize based on this (remove preceding and subsequent icodes, up to whole basic block when no side effects)
   if (!IS_FUNCPTR (ftype) && !strcmp(OP_SYMBOL (left)->name, "__builtin_unreachable"))
     return 0;
 

@@ -921,14 +921,14 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
     }
 
   /* If this is a varargs function... */
-  if (!defParm && *actParm && IFFUNC_HASVARARGS (functype))
+  if (!defParm && *actParm && (IFFUNC_HASVARARGS (functype) || FUNC_NOPROTOTYPE (functype)))
     {
       ast *newType = NULL;
       sym_link *ftype;
 
       /* don't perform integer promotion of explicitly typecasted variable arguments
        * if sdcc extensions are enabled */
-      if (options.std_sdcc && !TARGET_PDK_LIKE &&
+      if (options.std_sdcc && !TARGET_PDK_LIKE && IFFUNC_HASVARARGS (functype) &&
           (IS_CAST_OP (*actParm) ||
            (IS_AST_SYM_VALUE (*actParm) && AST_VALUES (*actParm, cast.removedCast)) ||
            (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, cast.literalFromCast))))
@@ -972,8 +972,17 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
           *actParm = decorateType (*actParm, resultType, true);
         }
+
+      if (IFFUNC_HASVARARGS (functype))
+        return 0;
+    }
+
+  if (FUNC_NOPROTOTYPE (functype))
+    {
+      // Todo: implement this! Idea: build a temporarty function type that can be used for processFuncArgs, which then can be used here.
+      wassertl (0, "Setting of register parameter vs. other parameter not yet implemented for functions without prototype.");
       return 0;
-    }                           /* vararg */
+    }
 
   /* if defined parameters ended but actual has not & */
   /* reentrant */

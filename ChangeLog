@@ -1,3 +1,8 @@
+2022-09-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3480.
+
 2022-09-08 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/libbacktrace/allocfail.sh:

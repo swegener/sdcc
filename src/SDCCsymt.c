@@ -627,6 +627,14 @@ checkTypeSanity (sym_link *etype, const char *name)
       fprintf (stderr, "checking sanity for %s %p\n", name, (void *)etype);
     }
 
+  /* transitional support for double and long double as aliases for float */
+  if (SPEC_NOUN (etype) == V_DOUBLE)
+    {
+      SPEC_NOUN (etype) = V_FLOAT;
+      SPEC_LONG (etype) = 0;
+      werror (W_DOUBLE_UNSUPPORTED);
+    }
+
   if ((SPEC_NOUN (etype) == V_BITINT ||
        SPEC_NOUN (etype) == V_BOOL ||
        SPEC_NOUN (etype) == V_CHAR ||

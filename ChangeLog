@@ -1,3 +1,12 @@
+2022-09-11 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCsymt.c,
+	  support/regression/cases/Makefile.in:
+	  Handle types double and long double in checkTypeSanity.
+
 2022-09-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCsymt.c,

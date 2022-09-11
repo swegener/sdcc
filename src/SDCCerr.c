@@ -246,7 +246,7 @@ struct
   { E_NONRENT_ARGS, ERROR_LEVEL_ERROR,
      "Functions called via pointers must be 'reentrant' to take this many (bytes for) arguments", 0 },
   { W_DOUBLE_UNSUPPORTED, ERROR_LEVEL_WARNING,
-     "type 'double' not supported assuming 'float'", 0 },
+     "types 'double', 'long double' not supported. Assuming 'float'", 0 },
   { W_COMP_RANGE, ERROR_LEVEL_PEDANTIC,
      "comparison is always %s due to limited range of data type", 0 },
   { W_FUNC_NO_RETURN, ERROR_LEVEL_WARNING,

@@ -9254,7 +9254,7 @@ Floating point support
 
 not supported.
  Instead a warning is emitted, and float is used instead.
- long double is not supported.
+ long double is treated the same.
 \end_layout
 
 \begin_layout Itemize

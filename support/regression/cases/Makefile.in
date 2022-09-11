@@ -546,12 +546,6 @@ GTE_SKIP_TESTS += \
 	loop-2f.c \
 	loop-2g.c
 
-# SDCC does not yet support long double
-GTE_SKIP_TESTS += \
-	align-2.c \
-	960405-1.c \
-	pr44942.c
-
 # Bug #3398
 GTE_SKIP_TESTS += \
 	pr24851.c

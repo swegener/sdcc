@@ -606,7 +606,7 @@ type_specifier
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_INT;
                   ignoreTypedefType = 1;
-               }              
+               }
    | SD_LONG   {
                   $$=newLink(SPECIFIER);
                   SPEC_LONG($$) = 1;
@@ -619,9 +619,8 @@ type_specifier
                }
    | DOUBLE    {
                   $$=newLink(SPECIFIER);
-                  SPEC_NOUN($$) = V_FLOAT;
+                  SPEC_NOUN($$) = V_DOUBLE;
                   ignoreTypedefType = 1;
-                  werror (W_DOUBLE_UNSUPPORTED);
                }
    | SIGNED    {
                   $$=newLink(SPECIFIER);

@@ -1,3 +1,10 @@
+2022-09-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/tinibios.h,
+	  device/lib/ds390/tinibios.c,
+	  device/lib/ds400/tinibios.c:
+	  Provide function prototypes for tinybios.
+
 2022-09-11 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,

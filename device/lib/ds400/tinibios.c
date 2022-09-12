@@ -193,14 +193,14 @@ char Serial0GetChar (void)
   return c;
 }
 
-void Serial0SendBreak()
+void Serial0SendBreak (void)
 {
   P3 &= ~0x02;
   ClockMilliSecondsDelay(2);
   P3 |= 0x02;
 }
 
-void Serial0Flush()
+void Serial0Flush (void)
 {
   ES0=0; // disable interrupts
   receive0BufferHead=receive0BufferTail=0;
@@ -219,7 +219,7 @@ void Serial0Flush()
 // for now, this timer runs too fast by about 20%. We need an implementation of
 // task_settickreload to fix this.
 
-void ClockInit()
+void ClockInit (void)
 {
   // nada, all done by DSS_rom_init
 }

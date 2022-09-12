@@ -283,14 +283,14 @@ char Serial0GetChar (void)
   return c;
 }
 
-void Serial0SendBreak()
+void Serial0SendBreak (void)
 {
   P3 &= ~0x02;
   ClockMilliSecondsDelay(2);
   P3 |= 0x02;
 }
 
-void Serial0Flush()
+void Serial0Flush (void)
 {
   ES0=0; // disable interrupts
   receive0BufferHead=receive0BufferTail=0;
@@ -431,14 +431,14 @@ char Serial1GetChar (void)
   return c;
 }
 
-void Serial1SendBreak()
+void Serial1SendBreak (void)
 {
   P5 &= ~0x08;
   ClockMilliSecondsDelay(2);
   P5 |= 0x08;
 }
 
-void Serial1Flush()
+void Serial1Flush (void)
 {
   ES1=0; // disable interrupts
   receive1BufferHead=receive1BufferTail=0;
@@ -457,7 +457,7 @@ void Serial1Flush()
 static __data unsigned long milliSeconds=0;
 static __data unsigned int timer0ReloadValue;
 
-void ClockInit()
+void ClockInit (void)
 {
   unsigned long timerReloadValue=OSCILLATOR/1000;
 

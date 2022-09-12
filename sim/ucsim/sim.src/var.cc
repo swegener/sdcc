@@ -51,6 +51,7 @@ cl_cvar::cl_cvar(chars iname, class cl_memory_cell *icell, chars adesc, int ibit
   desc= adesc;
   
   set_name(iname);
+  defined_by= VBY_PRE;
   
   cell= icell;
 }

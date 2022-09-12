@@ -38,16 +38,25 @@
 #include "memcl.h"
 
 
+enum var_by {
+  VBY_PRE	= 'p',
+  VBY_USER	= 'u',
+  VBY_DEBUG	= 'd',
+  VBY_ANALYZE	= 'a'
+};
+
 class cl_cvar: public cl_base
 {
  public:
   int bitnr_high, bitnr_low;
   chars desc;
+  enum var_by defined_by;
  protected:
   class cl_memory_cell *cell;
  public:
   cl_cvar(chars iname, class cl_memory_cell *icell, chars adesc, int ibitnr_high= -1, int ibitnr_low= -1);
   virtual int init(void);
+  virtual void set_by(enum var_by by) { defined_by= by; }
   virtual class cl_memory_cell *get_cell(void) const { return cell; }
   virtual class cl_memory *get_mem() const { return NULL; }
   virtual t_addr get_addr() const { return 0; }

@@ -911,8 +911,12 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     return con->dd_printf("max bit number is %d\n", (int)sizeof(t_mem)*8),
       false;
 
+  class cl_cvar *v;
   if (m)
-    uc->vars->add(params[0]->value.string.string, m, addr, bitnr_high, bitnr_low, "");
+    {
+      v= uc->vars->add(params[0]->value.string.string, m, addr, bitnr_high, bitnr_low, "");
+      v->set_by(VBY_USER);
+    }
   else
     {
       if (bitnr_low < 0)
@@ -930,8 +934,9 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
 	  if (!uc->variables->valid_address(addr))
 	    return con->dd_printf("out of range\n"),
 	      false;
-          uc->vars->add(params[0]->value.string.string,
-                        uc->variables, addr, bitnr_high, bitnr_low, "");
+          v= uc->vars->add(params[0]->value.string.string,
+			   uc->variables, addr, bitnr_high, bitnr_low, "");
+	  v->set_by(VBY_USER);
 	}
       else
 	{

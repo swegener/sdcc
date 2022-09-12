@@ -759,11 +759,18 @@ Address decoders:
 0&gt; 
 </pre>
       <hr>
-      <h4><a name="info_variables">info variables [name]</a></h4>
+      <h4><a name="info_variables">info variables [[/filter] search]</a></h4>
       Print out information about variables. Variable is memory location which
       has a name. It can be created by <a href="cmd_memory.html#var">var</a>
       command and several variables are created by the simulator. Optionally the
-      name can be specified in the command to search for it in variable names.
+      search string can be specified in the command to search for it in variable
+      names.
+      <p>Optional /filter parameter can be used to select variables according
+	to place where they were defined:</p>
+      <ul><li>/p List predefined variables only,</li>
+	<li>/u Print user defined variables,</li>
+	<li>/d List variables from debug info (cdb) file</li>
+      </ul>
       <pre>0&gt; <font color="#118811">info var a</font>
 pa rom[0xf000] = 00000000
   Data register of pa

@@ -2845,6 +2845,103 @@ genIpush (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/* NOTE: derived from the MCS-51 version                           */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (iCode *ic)
+{
+  operand *left;
+  sym_link *type, *etype;
+  int p_type;
+
+  D (emitcode (";", "genPointerPush"));
+
+  left = IC_LEFT (ic);
+
+  wassertl (IC_RIGHT (ic), "IPUSH_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
+  wassertl (!operandLitValue (IC_RIGHT(ic)), "IPUSH_VALUE_AT_ADDRESS with non-zero right operand");
+
+  /* depending on the type of pointer we need to
+     move it to the correct pointer register */
+  type = operandType (left);
+  etype = getSpec (type);
+  /* if left is of type of pointer then it is simple */
+  if (IS_PTR (type) && !IS_FUNC (type->next))
+    {
+      p_type = DCL_TYPE (type);
+    }
+  else
+    {
+      /* we have to go by the storage class */
+      p_type = PTR_TYPE (SPEC_OCLS (etype));
+    }
+
+  /* special case when cast remat */
+  while (IS_SYMOP (left) && OP_SYMBOL (left)->remat && IS_CAST_ICODE (OP_SYMBOL (left)->rematiCode))
+    {
+      left = IC_RIGHT (OP_SYMBOL (left)->rematiCode);
+      type = operandType (left);
+      p_type = DCL_TYPE (type);
+    }
+
+  aopOp (left, ic, false, false);
+
+  asmop *aop = 0;
+  reg_info *preg = 0;
+  if (p_type == POINTER || p_type == IPOINTER)
+    {
+      aop = newAsmop (0);
+      wassert (preg = getFreePtr (ic, &aop, false));
+      emitcode ("mov", "%s,%s", preg->name, aopGet (left, 0, false, true, NULL));
+    }
+  else
+    loadDptrFromOperand (left, p_type == GPOINTER);
+
+  int size = getSize (operandType (IC_LEFT (ic))->next);
+
+  for (int i = 0; i < size; i++)
+    {
+      switch (p_type)
+        {
+        case POINTER:
+        case IPOINTER:
+          emitcode ("mov", "a,@%s", preg->name);
+          break;
+        case PPOINTER:
+        case FPOINTER:
+          emitcode ("movx", "a,@dptr");
+          break;
+        case CPOINTER:
+          emitcode ("clr", "a");
+          emitcode ("movc", "a,@a+dptr");
+          break;
+        case GPOINTER:
+          emitcode ("lcall", "__gptrget");
+          break;
+        default:
+          wassert (0);
+        }
+      if (options.useXstack)
+        wassert (0);
+      else
+        emitpush ("acc");
+      if (i + 1 < size)
+        {
+          if (p_type == POINTER || p_type == IPOINTER)
+            emitcode ("inc", "%s", preg->name);
+          else
+            emitcode ("inc", "dptr");
+        }
+    }
+
+  if (aop)
+    freeAsmop (0, aop, ic, false);
+  freeAsmop (left, 0, ic, true);
+}
+
+/*-----------------------------------------------------------------*/
 /* genIpop - recover the registers: can happen only for spilling   */
 /*-----------------------------------------------------------------*/
 static void
@@ -14281,6 +14378,10 @@ gen390Code (iCode * lic)
 
         case IPUSH:
           genIpush (ic);
+          break;
+
+        case IPUSH_VALUE_AT_ADDRESS:
+          genPointerPush (ic);
           break;
 
         case IPOP:

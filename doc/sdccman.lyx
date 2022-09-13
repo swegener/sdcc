@@ -9334,7 +9334,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-ds390, hc08, s08, mos6502, pic14, pic16: structures
+hc08, s08, mos6502, pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -9785,7 +9785,7 @@ Floating point support
 
 not supported.
  Instead a warning is emitted, and float is used instead.
- long double is not supported.
+ long double is treated the same.
 \end_layout
 
 \begin_layout Itemize
@@ -9830,7 +9830,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-ds390, hc08, s08, mos6502, pic14, pic16: structures
+hc08, s08, mos6502, pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 

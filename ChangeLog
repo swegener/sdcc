@@ -1,3 +1,8 @@
+2022-09-13 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/{system,double-int}.h:
+	  Remove wrong/unneeded gmp use.
+
 2022-09-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/tinibios.h,

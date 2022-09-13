@@ -427,6 +427,7 @@ double_int::popcount () const
   return popcount_hwi (high) + popcount_hwi (low);
 }
 
+#if 0 // sdcpp
 
 #ifndef GENERATOR_FILE
 /* Conversion to and from GMP integer representations.  */
@@ -435,7 +436,6 @@ void mpz_set_double_int (mpz_t, double_int, bool);
 double_int mpz_get_double_int (const_tree, mpz_t, bool);
 #endif
 
-#if 0
 namespace wi
 {
   template <>
@@ -467,6 +467,6 @@ wi::int_traits <double_int>::decompose (HOST_WIDE_INT *scratch, unsigned int p,
   scratch[1] = x.high;
   return wi::storage_ref (scratch, 2, precision);
 }
-#endif
+#endif //sdcpp
 
 #endif /* DOUBLE_INT_H */

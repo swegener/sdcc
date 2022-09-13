@@ -700,7 +700,7 @@ extern int vsnprintf (char *, size_t, const char *, va_list);
 
 /* Do not introduce a gmp.h dependency on the build system.  */
 #ifndef GENERATOR_FILE
-#include <gmp.h>
+// sdcpp #include <gmp.h>
 #endif
 
 /* Get libiberty declarations.  */

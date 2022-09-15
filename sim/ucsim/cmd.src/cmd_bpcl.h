@@ -70,6 +70,13 @@ COMMAND_ON(uc,cl_delete_cmd);
 // COMMANDS
 COMMAND_ON(uc,cl_commands_cmd);
 
+// DISPLAY
+COMMAND_ON(uc,cl_display_cmd);
+
+// UNDISPLAY
+COMMAND_ON(uc,cl_undisplay_cmd);
+
+
 #endif
 
 /* End of cmd.src/cmd_bpcl.h */

@@ -3,9 +3,12 @@
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
     <title>Breakpoints commands of &#956;Csim</title>
   </head>
+
   <body style="   background-color: white;">
+
     <!-- BREAKPOINTS -->
     <h2>Commands of <i>&#956;Csim</i> to manage breakpoints</h2>
+
     Two kind of breakpoint can be used: fetch and event breakpoint. <b>Fetch</b>
     breakpoints are classical breakpoints. They can be placed at any instruction
     in the code memory. Breakpoint will be hit if CPU fetches instruction code
@@ -13,35 +16,47 @@
     byte of the instruction hits the breakpoint. If the execution reaches a
     breakpoint it stops <i>before</i> the instruction at location specified by
     the breakpoint would be executed.
+
     <p><b>Event</b> breakpoints are special onces. They cause stop of execution
       if event specified by the breakpoint occurs. Event can be a read or a
       write operation on any address space location. Event breakpoint stops
       execution <i>after</i> specified event occurred. </p>
+
     <p>Every breakpoint can be <b>fix</b> (permanent) or <b>dynamic</b>
       (temporary). Dynamic breakpoints are automatically removed when they
       reached. Some commands place dynamic fetch breakpoints into the code, for
       example <a href="#g"><b>go</b></a> or <a href="#n"><b>next</b></a>. </p>
+
     <p>A <b>hit number</b> can be associated to any breakpoint. This hit number
       specifies how many times the breakpoint must be hit before it causes the
       execution to stop. This hit number is 1 by default. </p>
-    <hr> <a name="break">
+    <hr>
+
+    <!-- ----------------------------------------------------------------- -->
+    <a name="break">
       <h3>break <i>addr [hit] [if expression]</i> <br>
         break <i>memory_type r|w addr [hit] [if expression]<br>
         </i></h3>
-    </a> <a name="tbreak">
+    </a>
+    <a name="tbreak">
       <h3>tbreak<i> addr [hit] [if expression]</i> <br>
         tbreak <i>memory_type r|w addr [hit] [if expression]<br>
         </i></h3>
-    </a> Set fetch or event breakpoint. The command specifies if the breakpoint
+    </a>
+
+    Set fetch or event breakpoint. The command specifies if the breakpoint
     will be fix (<b>break</b>) or dynamic (temporary) (<b>tbreak</b>).
+
     <p>Fetch or event breakpoint can be defined. First form defines fetch while
       second form defines event breakpoint. </p>
+
     <dl>
       <dt>Fetch breakpoint </dt>
       <dd>First parameter specifies address where the breakpoint must be placed
         to. It should be address of an instruction. <br>
         Second parameter is optional and it specifies the hit number. It is 1 by
         default. </dd>
+
       <dt>Event breakpoint </dt>
       <dd>First parameter specifies class name of memory where we are going to
         watch for en event. Class names of memories can be checked by <a href="cmd_general.html#info_memory">info
@@ -51,6 +66,7 @@
         Remaining parameters are address of watched memory location and an
         optional hit number (1 by default). </dd>
     </dl>
+    
     <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -78,17 +94,26 @@ Simulation started, PC=0x000000
 Stop at 000160: (4) Breakpoint
 F 000160
 &gt; </pre>
+
     Breakpoint hits can be made more noticeable by printing a beep character on
     the console. This function can be turned on by <a href="cmd_general.html#set_option">setting
       the option</a> <b>beep_break</b> (FALSE by default).<br>
-    <hr> <a name="clear">
+    <hr>
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <a name="clear">
       <h3>clear <i>[addr...]</i></h3>
-    </a> Delete fetch breakpoint. Parameter specifies address of breakpoint. If
+    </a>
+
+    Delete fetch breakpoint. Parameter specifies address of breakpoint. If
     there is no breakpoint specified at given address this command prints out a
     warning message.
+
     <p>If parameter is not given then breakpoint at current PC will be deleted
       if it exists. If more than one address is specified then all breakpoints
       at specified addresses will be deleted. </p>
+    
     <pre>&gt; <font color="#118811">i b</font>
 Num Type       Disp Hit   Cnt   Address  What
 1   fetch      keep 1     1     0x000160 CLR   P1.0
@@ -102,23 +127,88 @@ Num Type       Disp Hit   Cnt   Address  What
 2   fetch      del  1     1     0x000180 LJMP  022a
 1   event      keep 1     1     0x000006 wi
 &gt; </pre>
-    <hr> <a name="delete">
+    <hr>
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <a name="delete">
       <h3>delete <i>[number...]</i></h3>
-    </a> Delete breakpoint(s) by its number.
+    </a>
+
+    Delete breakpoint(s) by its number.
+
     <p>If parameter is not used then all breakpoints are deleted. </p>
-    <hr> <a name="commands">
+    <hr>
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <a name="commands">
       <h3>commands <i>[breakpoint-nr] script</i></h3>
     </a>
-    <p><a name="commands">Attach a script to a breakpoint. Breakpoint number can
+    
+    <p>Attach a script to a breakpoint. Breakpoint number can
         be omitted if only one breakpoint exists. Breakpoint numbers can be
-        checked by </a><a href="cmd_general.html#info_breakpoints">info
+        checked by <a href="cmd_general.html#info_breakpoints">info
         breakpoint</a> command. Script is command or a list of commands
       separated by ; character. It will be executed when the specified
       breakpoint is hit. If the text of the script is printed before execution
       is controlled by the option <b>echo_script</b>, which is FALSE by
       default. See <a href="cmd_general.html#set_option">set option</a> command
       how to set it.</p>
-    <p> </p>
     <hr>
+
+
+    <!-- ----------------------------------------------------------------- -->
+    <a name="display">
+      <h3>display <i>[[/format] expr]</i></h3>
+    </a>
+
+    Set expression to be displayed when simulation stops on a
+    breakpoint.
+
+    <p><i>/format</i> option can be used to specify print format for the
+      expression. For meaning of the options, see <a href="cmd_general.html#expression">expression</a> command.</p>
+
+    <p>If no <i>expr</i> argument is given, all defined expressions
+      are listed and evaluated and values are printed.</p>
+
+    <pre>0&gt; <font color="#118811">disp R7</font>
+0&gt; <font color="#118811">disp ACC</font>
+0&gt; <font color="#118811">b 0x10</font>
+Breakpoint 1 at 0x000010 (cond="")
+0x0010 F? ff       MOV    R7,A
+0&gt; <font color="#118811">display</font>
+1: R7 = 107
+2: ACC = 0
+0&gt; <font color="#118811">run</font>
+Simulation started, PC=0x000000
+
+Stop at 0x000010: (104) Breakpoint
+     R0 R1 R2 R3 R4 R5 R6 R7
+     41 58 fc c9 8b bc 95 00
+@R0 76 v  ACC= 0x00   0 .  B= 0x00
+@R1 73 s  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 00 95 bc 8b c9 fc 58 41
+   DPTR= 0x0000 @DPTR= 0x83 131 .
+0x0010 F  ff       MOV    R7,A
+F 0x000010
+Simulated 192 ticks (1.736e-05 sec)
+Host usage: 0.007306 sec, rate=0.002376
+1: R7 = 0
+2: ACC = 0
+0&gt;
+    </pre>
+    <hr>
+    
+    <!-- ----------------------------------------------------------------- -->
+    <a name="undisplay">
+      <h3>undisplay <i>[nr]</i></h3>
+    </a>
+
+    Remove selected, or all (if no <i>nr</i> argument is specified)
+    expression from display list. To check out id number of an
+    expression, use <a href="#display">display</a> command without arguments.
+    <hr>
+    
   </body>
 </html>

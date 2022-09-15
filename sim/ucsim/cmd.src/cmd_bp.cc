@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 
 //#include "ddconfig.h"
+#include "globals.h"
 
 // sim
 //#include "brkcl.h"
@@ -434,5 +435,78 @@ CMDHELP(cl_commands_cmd,
 	"commands [breakpoint-nr]",
 	"command_string",
 	"")
+
+
+/*
+ * DISPLAY [[/fmt] expr]
+ */
+
+COMMAND_DO_WORK_UC(cl_display_cmd)
+{
+  int i= 0;
+  chars fmt, exp;
+  const char *s;
+
+  for (i=0;i<cmdline->tokens->get_count();i++)
+    {
+      s= cmdline->tokens->at(i);
+      if (s && *s)
+	{
+	  if (s[0] == '/')
+	    fmt= s;
+	  else
+	    exp= s;
+	}
+    }
+  
+  if (exp.nempty())
+    {
+      // add new expr
+      class cl_display *d= new cl_display(fmt, exp);
+      uc->displays->add(d);
+    }
+  else
+    {
+      uc->displays->do_display(con);
+    }
+  return false;
+}
+
+CMDHELP(cl_display_cmd,
+	"display [[/fmt] expr]",
+	"Set expression to be displayed on breakpoint",
+	"/fmt can specify format as in \"expr\" command.\n"
+	"If no argument, print all expressions and their values.\n")
+
+
+/*
+ * UNDISPLAY [num]
+ */
+
+COMMAND_DO_WORK_UC(cl_undisplay_cmd)
+{
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+
+  if (params[0]==NULL)
+    {
+      uc->displays->free_all();
+    }
+  else if (cmdline->syntax_match(uc, NUMBER))
+    {
+      uc->displays->undisplay(params[0]->value.number);
+    }
+  else
+    con->dd_printf("Syntax error.\n");
+  return false;
+}
+
+CMDHELP(cl_undisplay_cmd,
+	"undisplay [num]",
+	"Remove some expression to be displayed at breakpoint stop",
+	"Argument is number of expression to be removed,\n"
+	"\"display\" command can be used without argument to\n"
+	"check id number of the expressions.\n"
+	"No argument means remove all expressions.\n")
+
 
 /* End of cmd.src/cmd_bp.cc */

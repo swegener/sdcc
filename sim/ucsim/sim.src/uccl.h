@@ -287,6 +287,7 @@ public:
   int brk_counter;		// Number of breakpoints
   class brk_coll *fbrk;		// Collection of FETCH break-points
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
+  class cl_display_list *displays;// Collection of diplayed exprs on break
   class cl_sim *sim;
   //class cl_list *mems;
   class cl_time_measurer *stop_at_time;

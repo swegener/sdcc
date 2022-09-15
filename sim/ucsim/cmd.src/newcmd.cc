@@ -216,7 +216,7 @@ cl_console_base::print_expr_result(t_mem val, const char *fmt)
 {
   class cl_console_base *con= this;
   t_mem v= val;
-  if (fmt == NULL)
+  if ((fmt == NULL) || (*fmt == 0))
     {
       class cl_option *o= application->options->get_option("expression_format");
       char *cc= NULL;
@@ -226,7 +226,7 @@ cl_console_base::print_expr_result(t_mem val, const char *fmt)
 	  fmt= cc;
 	}
     }
-  if (fmt)
+  if (fmt && *fmt)
     {
       int i, fmt_len= strlen(fmt);
       for (i= 0; i < fmt_len; i++)

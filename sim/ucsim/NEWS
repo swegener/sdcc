@@ -3,11 +3,13 @@
 Motorola HC12 simulator.
 MOS65C02 and MOS6510 simulator.
 Stm8 stack pointer roll-over function (configurable).
+F8 simulator.
+"display" and "undisplay" commands.
 
 
 0.7.x
 
-Bugfix releases. Parial implementations of 0.8 functionalities.
+Bugfix releases. Partial implementations of 0.8 functionalities.
 
 
 0.7

@@ -278,6 +278,9 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 					     (dt*(1/uc->get_xtal())) / (stop_at - start_at));
 	    }
 	}
+      if ((reason == resBREAKPOINT) ||
+	  (reason == resEVENTBREAK))
+	uc->displays->do_display(NULL);	  
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->set_flag(CONS_FROZEN, false);
       //cmd->frozen_console->dd_printf("_s_");

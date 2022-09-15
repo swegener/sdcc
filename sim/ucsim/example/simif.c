@@ -56,7 +56,7 @@ putchar (int c)
 #define SIF_ADDRESS_SPACE	__xdata
 #define SIF_ADDRESS		0xffff
 
-unsigned char SIF_ADDRESS_SPACE * volatile sif;
+volatile unsigned char SIF_ADDRESS_SPACE * sif;
 
 char
 sif_get(char cmd)

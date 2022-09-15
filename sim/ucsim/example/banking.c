@@ -6,7 +6,7 @@
 
 __sfr __at(0xB1) PSBANK; // like Silabs F120
 
-unsigned char __xdata * volatile sif;
+volatile unsigned char __xdata * sif;
 
 unsigned char
 _sdcc_external_startup (void)

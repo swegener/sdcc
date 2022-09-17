@@ -1,3 +1,9 @@
+2022-09-17 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/MakeList,
+	  support/regression/tcc/83_utf8_in_identifiers.c:
+	  Revive erroneously disabled utf8 test.
+
 2022-09-13 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,

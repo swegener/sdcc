@@ -1,3 +1,8 @@
+2022-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/cmd.c: applied patch #439, Thanks Mark Symonds,
+	    also cleaned up many whitespace irregularities
+
 2022-09-17 Felix Salfelder <felix AT salfelder.org>
 
 	* support/regression/MakeList,

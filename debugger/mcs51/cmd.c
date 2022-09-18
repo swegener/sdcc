@@ -2122,6 +2122,12 @@ static int infomode = 0;
 /*-----------------------------------------------------------------*/
 int cmdInfo (char *s, context *cctxt)
 {
+  if (!simactive)
+    {
+      fprintf (stdout, "No executable file specified.\nUse the \"file\" command.\n");
+      return 0;
+    }
+
   /* trim left and_right*/
   s = trim(s);
 

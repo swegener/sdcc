@@ -293,7 +293,7 @@ static const char *_baseValues[] = {
   NULL
 };
 
-static const char *_preCmd = "{cpp} -nostdinc -Wall {cppstd}{cppextraopts} {fullsrcfilename} {cppoutfilename}";
+static const char *_preCmd = "{cpp} -nostdinc -Wall {cppstd}{cppextraopts} -xc {fullsrcfilename} {cppoutfilename}";
 
 PORT *port;
 

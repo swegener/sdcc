@@ -3039,6 +3039,7 @@ cl_uc::exec_inst_tab(instruction_wrapper_fn itab[])
 void
 cl_uc::post_inst(void)
 {
+  cPC.W(PC);
   tick_hw(inst_ticks);
   if (errors->count)
     check_errors();

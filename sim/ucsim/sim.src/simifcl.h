@@ -106,11 +106,11 @@ enum simif_cfg {
   simif_idle_ticks	= 9,  // R
   simif_real_time	= 10, // R
   simif_vclk		= 11, // R
-  simif_pc		= 12, // RW
-  simif_print		= 13, // W
-  simif_write		= 14, // W
+  //simif_pc		= 12, // RW
+  simif_print		= 12, // W
+  simif_write		= 13, // W
   
-  simif_nuof		= 15
+  simif_nuof		= 14
 };
 
 class cl_simulator_interface;

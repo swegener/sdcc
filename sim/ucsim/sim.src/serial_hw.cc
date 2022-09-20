@@ -46,7 +46,7 @@ cl_serial_io::input_avail(void)
 cl_serial_hw::cl_serial_hw(class cl_uc *auc, int aid, chars aid_string):
   cl_hw(auc, HW_UART, aid, (const char *)aid_string)
 {
-  listener= 0;
+  listener_io= listener_i= listener_o= NULL;
 }
 
 cl_serial_hw::~cl_serial_hw(void)
@@ -64,7 +64,7 @@ cl_serial_hw::init(void)
   bool raw= false;
   
   cl_hw::init();
-
+  
   make_io();
   input_avail= false;
   
@@ -87,10 +87,10 @@ cl_serial_hw::init(void)
       if (port < 0) {}
       if (port > 0)
 	{
-	  listener= new cl_serial_listener(port, application, this, sl_io);
-	  listener->init();
+	  listener_io= new cl_serial_listener(port, application, this, sl_io);
+	  listener_io->init();
 	  class cl_commander_base *c= application->get_commander();
-	  c->add_console(listener);
+	  c->add_console(listener_io);
 	}
     }
   
@@ -102,10 +102,10 @@ cl_serial_hw::init(void)
       if (port < 0) {}
       if (port > 0)
 	{
-	  listener= new cl_serial_listener(port, application, this, sl_i);
-	  listener->init();
+	  listener_i= new cl_serial_listener(port, application, this, sl_i);
+	  listener_i->init();
 	  class cl_commander_base *c= application->get_commander();
-	  c->add_console(listener);
+	  c->add_console(listener_i);
 	}
     }
 
@@ -117,10 +117,10 @@ cl_serial_hw::init(void)
       if (port < 0) {}
       if (port > 0)
 	{
-	  listener= new cl_serial_listener(port, application, this, sl_o);
-	  listener->init();
+	  listener_o= new cl_serial_listener(port, application, this, sl_o);
+	  listener_o->init();
 	  class cl_commander_base *c= application->get_commander();
-	  c->add_console(listener);
+	  c->add_console(listener_o);
 	}
     }
   
@@ -236,6 +236,101 @@ cl_serial_hw::cfg_help(t_addr addr)
   return "Not used";
 }
 
+void
+cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
+		      class cl_console_base *con)
+{
+  class cl_cmd_arg *params[2]= {
+    cmdline->param(0),
+    cmdline->param(1)
+  };
+  class cl_commander_base *c= application->get_commander();
+  if (cmdline->syntax_match(uc, STRING NUMBER))
+    {
+      char *p1= params[0]->value.string.string;
+      int port= params[1]->value.number;
+      if (strcmp(p1, "port")==0)
+	{
+	  del_listener_i();
+	  del_listener_o();
+	  if ((port > 0) && c)
+	    {
+	      listener_io= new cl_serial_listener(port, application, this, sl_io);
+	      listener_io->init();
+	      c->add_console(listener_io);
+	    }
+	}
+      if (strcmp(p1, "iport")==0)
+	{
+	  del_listener_i();
+	  if ((port > 0) && c)
+	    {
+	      listener_i= new cl_serial_listener(port, application, this, sl_i);
+	      listener_i->init();
+	      c->add_console(listener_i);
+	    }
+	}
+      if (strcmp(p1, "oport")==0)
+	{
+	  del_listener_o();
+	  if ((port > 0) && c)
+	    {
+	      listener_o= new cl_serial_listener(port, application, this, sl_o);
+	      listener_o->init();
+	      c->add_console(listener_o);
+	    }
+	}
+    }
+  else if (cmdline->syntax_match(uc, STRING STRING))
+    {
+      class cl_f *fi, *fo;
+      char *p1= params[0]->value.string.string;
+      const char *p2= params[1]->value.string.string;
+      if (strcmp(p1, "file")==0)
+	{
+	  if (p2 && *p2)
+	    {
+	      fi= mk_io(p2, "r");
+	      fo= mk_io(p2, "w");
+	      new_io(fi, fo);
+	    }
+	}
+      if (strcmp(p1, "in")==0)
+	{
+	  if (p2 && *p2)
+	    {
+	      fi= mk_io(p2, "r");
+	      if (fi->opened())
+		new_i(fi);
+	      else
+		con->dd_cprintf("error", "Error opening file \"%s\"\n",p2);
+	    }
+	}
+      if (strcmp(p1, "out")==0)
+	{
+	  if (p2 && *p2)
+	    {
+	      fo= mk_io(p2, "w");
+	      new_o(fo);
+	    }
+	}
+      if (strcmp(p1, "raw")==0)
+	{
+	  serial_raw_option->option->set_value(p2);
+	}
+    }
+  else
+    {
+      con->dd_printf("set hardware uart[%d] raw   0|1\n", id);
+      con->dd_printf("set hardware uart[%d] file  \"file\"\n", id);
+      con->dd_printf("set hardware uart[%d] in    \"file\"\n", id);
+      con->dd_printf("set hardware uart[%d] out   \"file\"\n", id);
+      con->dd_printf("set hardware uart[%d] port  nr\n", id);
+      con->dd_printf("set hardware uart[%d] iport nr\n", id);
+      con->dd_printf("set hardware uart[%d] oport nr\n", id);
+    }
+}
+
 t_mem
 cl_serial_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
@@ -287,9 +382,8 @@ cl_serial_hw::make_io()
 void
 cl_serial_hw::new_io(class cl_f *f_in, class cl_f *f_out)
 {
-  bool raw= false;
-
-  serial_raw_option->get_value(&raw);
+  //bool raw= false;
+  //serial_raw_option->get_value(&raw);
   make_io();
   if (!io)
     return;
@@ -330,11 +424,59 @@ cl_serial_hw::new_o(class cl_f *f_out)
   io->replace_files(true, io->get_fin(), f_out);
   if (!f_out)
     return;
-  f_out->set_telnet(!raw);
-  if (!raw)
+  enum file_type ft= f_out->determine_type();
+  if ((ft != F_FILE) && (ft != F_CHAR))
     {
-      io->tu_reset();
+      f_out->set_telnet(!raw);
+      if (!raw)
+	{
+	  io->tu_reset();
+	}
     }
+}
+
+void
+cl_serial_hw::del_listener_i(void)
+{
+  class cl_commander_base *c= application->get_commander();
+  if (c && listener_io)
+    c->del_console(listener_io);
+  if (listener_io)
+    {
+      if (listener_i == listener_io)
+	listener_i= NULL;
+      if (listener_o == listener_io)
+	listener_o= NULL;
+      delete listener_io;
+    }
+  listener_io= NULL;
+  if (c && listener_i)
+    c->del_console(listener_i);
+  if (listener_i)
+    delete listener_i;
+  listener_i= NULL;
+}
+
+void
+cl_serial_hw::del_listener_o(void)
+{
+  class cl_commander_base *c= application->get_commander();
+  if (c && listener_io)
+    c->del_console(listener_io);
+  if (listener_io)
+    {
+      if (listener_i == listener_io)
+	listener_i= NULL;
+      if (listener_o == listener_io)
+	listener_o= NULL;
+      delete listener_io;
+    }
+  listener_io= NULL;
+  if (c && listener_o)
+    c->del_console(listener_o);
+  if (listener_o)
+    delete listener_o;
+  listener_o= NULL;
 }
 
 bool

@@ -71,6 +71,7 @@ public:
   virtual enum brk_type type(void)= 0;
   virtual enum brk_event get_event(void)= 0;
   virtual bool do_hit(void);
+  virtual void breaking(void);
 };
 
 
@@ -88,6 +89,7 @@ public:
 
   virtual enum brk_type type(void);
   virtual enum brk_event get_event(void) { return(brkNONE); }
+  virtual void breaking(void);
 };
 
 
@@ -128,6 +130,7 @@ public:
   virtual enum brk_type type(void);
   virtual enum brk_event get_event(void) { return(event); }
   virtual bool match(struct event_rec *ev);
+  virtual void breaking(void);
 };
 
 

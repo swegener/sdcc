@@ -57,7 +57,7 @@ typedef unsigned TYPE_DWORD u32_t;
 typedef   signed TYPE_QWORD i64_t;
 typedef unsigned TYPE_QWORD u64_t;
 
-typedef i64_t		t_addr;		/* 32 bit max */
+typedef /*i64_t*/u32_t		t_addr;		/* 32 bit max */
 typedef u32_t		t_mem;		/* 32 bit max */
 typedef i32_t		t_smem;		/* signed 32 bit memory */
 

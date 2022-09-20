@@ -581,7 +581,7 @@ cl_simulator_interface::init(void)
   uc->vars->add("sim_idle_ticks", cfg, simif_idle_ticks, cfg_help(simif_idle_ticks));
   uc->vars->add("sim_real_time", cfg, simif_real_time, cfg_help(simif_real_time));
   uc->vars->add("sim_vclk", cfg, simif_vclk, cfg_help(simif_vclk));
-  uc->vars->add("PC", cfg, simif_pc, cfg_help(simif_pc));
+  //uc->vars->add("PC", cfg, simif_pc, cfg_help(simif_pc));
   uc->vars->add("sim_print", cfg, simif_print, cfg_help(simif_print));
   uc->vars->add("sim_write", cfg, simif_write, cfg_help(simif_write));
 
@@ -605,7 +605,7 @@ cl_simulator_interface::cfg_help(t_addr addr)
     case simif_idle_ticks:return "Ticks spent in idle state (int, RO)";
     case simif_real_time: return "Real time since reset in msec (int, RO)";
     case simif_vclk	: return "Nuof simulated virtual clocks (int, RO)";
-    case simif_pc	: return "PC register (int, RW)";
+      //case simif_pc	: return "PC register (int, RW)";
     case simif_print	: return "Print char on stdout (int, WO)";
     case simif_write	: return "Write char to simif output (int, WO)";
     }
@@ -825,7 +825,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	*val= cell->get();
       cell->set(uc->vc.fetch + uc->vc.rd + uc->vc.wr);
       break;
-    case simif_pc: // PC of uc
+      /*case simif_pc: // PC of uc
       if (val)
 	{
 	  t_addr addr= *val;
@@ -838,7 +838,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  uc->PC= addr;
 	}
       cell->set(uc->PC);
-      break;
+      break;*/
     case simif_print:
       if (val)
 	{

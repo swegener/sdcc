@@ -1401,7 +1401,7 @@ cl_51core::bit_address(class cl_memory *mem,
   if (bit_number < 0 ||
       bit_number > 7 ||
       mem_address < 0)
-    return(-1);
+    return(AU(-1));
   class cl_memory *sfrchip= memory("sfr_chip");
   if (mem == sfrchip)
     {
@@ -1413,17 +1413,17 @@ cl_51core::bit_address(class cl_memory *mem,
       if (mem_address < 128 ||
 	  mem_address % 8 != 0 ||
 	  mem_address > 255)
-	return(-1);
+	return(AU(-1));
       return(128 + (mem_address-128) + bit_number);
     }
   if (mem == iram)
     {
       if (mem_address < 0x20 ||
 	  mem_address >= 0x20+32)
-	return(-1);
+	return(AU(-1));
       return((mem_address-0x20)*8 + bit_number);
     }
-  return(-1);
+  return(AU(-1));
 }
 
 /* Get name of directly addressed iram/sfr cell */

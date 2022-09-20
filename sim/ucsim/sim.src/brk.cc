@@ -129,6 +129,28 @@ cl_brk::do_hit(void)
   return(0);
 }
 
+void
+cl_brk::breaking(void)
+{
+  class cl_option *o;
+  class cl_commander_base *cmd= application->get_commander();
+  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_console);
+  // Execute commands
+  if (commands.nempty())
+    {
+      if (con)
+	{
+	  o= application->options->get_option("echo_script");
+	  bool e= false;
+	  if (o)
+	    o->get_value(&e);
+	  if (e)
+	    con->dd_cprintf("answer", "%s\n", commands.c_str());
+	}
+      application->exec(commands);
+    }
+}
+
 
 /*
  * FETCH type of breakpoint
@@ -145,6 +167,12 @@ enum brk_type
 cl_fetch_brk::type(void)
 {
   return(brkFETCH);
+}
+
+void
+cl_fetch_brk::breaking(void)
+{
+  cl_brk::breaking();
 }
 
 
@@ -239,6 +267,21 @@ bool
 cl_ev_brk::match(struct event_rec *ev)
 {
   return(false);
+}
+
+void
+cl_ev_brk::breaking(void)
+{
+  class cl_commander_base *cmd= application->get_commander();
+  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_console);
+  class cl_address_space *m= get_mem();
+
+  cl_brk::breaking();
+  if (con)
+    con->dd_cprintf("answer",
+		    "Event `%s' at %s[0x%x]\n",
+		    id, m?(m->get_name()):"mem?",
+		    AU(addr));
 }
 
 

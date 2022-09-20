@@ -140,15 +140,12 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
 }
 
 void
-cl_sim::stop(int reason, class cl_ev_brk *ebrk)
+cl_sim::stop(int reason)
 {
   class cl_commander_base *cmd= app->get_commander();
   class cl_option *o= app->options->get_option("quit");
-  bool q_opt= false;
   unsigned long dt= uc?(uc->ticks->get_ticks() - start_tick):0;
-
-  if (o)
-    o->get_value(&q_opt);
+  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_console);
   
   state&= ~SIM_GO;
   stop_at= dnow();
@@ -160,10 +157,6 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
     {
       b= uc->fbrk_at(uc->PC);
     }
-  else if (ebrk != NULL)
-    {
-      b= ebrk;
-    }
   if (b)
     {
       class cl_option *o;
@@ -171,7 +164,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
       bool e= false;
       if (o) o->get_value(&e);
       if (e)
-	cmd->frozen_console->dd_printf("\007");
+	if (con) con->dd_printf("\007");
     
       if (!(b->commands.empty()))
 	{
@@ -179,7 +172,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  e= false;
 	  if (o) o->get_value(&e);
 	  if (e)
-	    cmd->dd_cprintf("answer", "%s\n", b->commands.c_str());
+	    if (con) con->dd_cprintf("answer", "%s\n", b->commands.c_str());
 	  application->exec(b->commands);
 	  steps_done= 0;
 	}
@@ -191,105 +184,111 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
       fflush(stdout); // Needed to make sure we get the right simulator output order
       
       if (reason == resUSER &&
-	  cmd->frozen_console->input_avail())
-	cmd->frozen_console->read_line();
-      cmd->frozen_console->un_redirect();
-      cmd->frozen_console->dd_color("debug");
+	  con && con->input_avail())
+	con->read_line();
+      if (con) con->un_redirect();
+      if (con) con->dd_color("debug");
       // Stop message should start with a newline, to avoid mixing this line with previous output from simulated program
-      cmd->frozen_console->dd_printf("\nStop at 0x%06x: (%d) ", AU(uc->PC), reason);
+      if (con) con->dd_printf("\nStop at 0x%06x: (%d) ", AU(uc->PC), reason);
       switch (reason)
 	{
 	case resHALT:
-	  cmd->frozen_console->dd_printf("Halted\n");
+	  if (con) con->dd_printf("Halted\n");
 	  break;
 	case resINV_ADDR:
-	  cmd->frozen_console->dd_printf("Invalid address\n");
+	  if (con) con->dd_printf("Invalid address\n");
 	  break;
 	case resSTACK_OV:
-	  cmd->frozen_console->dd_printf("Stack overflow\n");
+	  if (con) con->dd_printf("Stack overflow\n");
 	  break;
 	case resBREAKPOINT:
-	  cmd->frozen_console->dd_printf("Breakpoint\n");
-	  if (cmd->frozen_console)
+	  if (con) {
+	    con->dd_printf("Breakpoint\n");
 	    uc->print_regs(cmd->frozen_console);
+	  }
+	  steps_done= 0;
 	  break;
 	case resEVENTBREAK:
-	  cmd->frozen_console->dd_printf("Event break\n");
-	  //uc->print_regs(cmd->frozen_console);
-	  if (b)
-	    {
-	      class cl_ev_brk *eb= (cl_ev_brk*)b;
-	      class cl_address_space *m= eb->get_mem();
-	      cmd->frozen_console->dd_printf("Event `%s' at %s[0x%x]: 0x%x\n",
-					     eb->id, m?(m->get_name()):"mem?",
-					     AU(eb->addr),
-					     AU(uc->instPC));
-	      uc->print_disass(uc->instPC, cmd->frozen_console);
-    	    }
+	  if (con) {
+	    con->dd_printf("Event break\n");
+	    uc->print_regs(con);
+	  }
+	  steps_done= 0;
 	  break;
 	case resINTERRUPT:
-	  cmd->frozen_console->dd_printf("Interrupt\n");
+	  if (con) con->dd_printf("Interrupt\n");
 	  break;
 	case resWDTRESET:
-	  cmd->frozen_console->dd_printf("Watchdog reset\n");
+	  if (con) con->dd_printf("Watchdog reset\n");
 	  break;
 	case resUSER:
-	  cmd->frozen_console->dd_printf("User stopped\n");
+	  if (con) con->dd_printf("User stopped\n");
 	  break;
 	case resINV_INST:
 	  {
-	    cmd->frozen_console->dd_printf("Invalid instruction");
+	    if (con) con->dd_printf("Invalid instruction");
 	    if (uc->rom)
-	      cmd->frozen_console->dd_printf(" 0x%04x\n",
-					     MU32(uc->rom->get(uc->PC)));
+	      if (con) con->dd_printf(" 0x%04x\n",
+				      MU32(uc->rom->get(uc->PC)));
 	  }
          break;
 	case resSTEP:
-	  cmd->frozen_console->dd_printf("stepped %ld ticks\n", dt);
-	  uc->print_regs(cmd->frozen_console);
+	  if (con) {
+	    con->dd_printf("stepped %ld ticks\n", dt);
+	    uc->print_regs(con);
+	  }
 	  break;
 	case resERROR:
 	  // uc::check_error prints error messages...
 	  break;
 	case resSIMIF:
-	  cmd->frozen_console->dd_printf("Program stopped itself\n");
+	  if (con) con->dd_printf("Program stopped itself\n");
 	  break;
 	case resSELFJUMP:
-	  cmd->frozen_console->dd_printf("Jump to itself\n");
+	  if (con) con->dd_printf("Jump to itself\n");
 	  break;
         case resNOT_DONE:
-          cmd->frozen_console->dd_printf("Instruction is still executing\n");
+          if (con) con->dd_printf("Instruction is still executing\n");
           break;
 	default:
-	  cmd->frozen_console->dd_printf("Unknown reason\n");
+	  if (con) con->dd_printf("Unknown reason\n");
 	  break;
 	}
-      cmd->frozen_console->dd_cprintf("answer", "F 0x%06x\n", AU(uc->PC)); // for sdcdb
+      if (con) con->dd_cprintf("answer", "F 0x%06x\n", AU(uc->PC)); // for sdcdb
       if ((reason != resSTEP) ||
 	  (steps_done > 1))
 	{
 	  if (!application->quiet)
 	    {
-	      cmd->frozen_console->dd_printf("Simulated %lu ticks (%.3e sec)\n",
-					     dt,
-					     dt*(1/uc->get_xtal()));
-	      cmd->frozen_console->dd_printf("Host usage: %f sec, rate=%f\n",
-					     stop_at - start_at,
-					     (dt*(1/uc->get_xtal())) / (stop_at - start_at));
+	      if (con) {
+		con->dd_printf("Simulated %lu ticks (%.3e sec)\n",
+			       dt,
+			       dt*(1/uc->get_xtal()));
+		con->dd_printf("Host usage: %f sec, rate=%f\n",
+			       stop_at - start_at,
+			       (dt*(1/uc->get_xtal())) / (stop_at - start_at));
+	      }
 	    }
 	}
       if ((reason == resBREAKPOINT) ||
 	  (reason == resEVENTBREAK))
 	uc->displays->do_display(NULL);	  
       //if (cmd->actual_console != cmd->frozen_console)
-      cmd->frozen_console->set_flag(CONS_FROZEN, false);
-      //cmd->frozen_console->dd_printf("_s_");
-      cmd->frozen_console->print_prompt();
+      if (con) {
+	con->set_flag(CONS_FROZEN, false);
+	//cmd->frozen_console->dd_printf("_s_");
+	con->print_prompt();
+      }
       cmd->frozen_console= 0;
     }
+
+  bool q_opt= false;
+  if (o)
+    o->get_value(&q_opt);
   if (!(state & SIM_GO) &&
       q_opt)
     state|= SIM_QUIT;
+  
   cmd->update_active();
 }
 

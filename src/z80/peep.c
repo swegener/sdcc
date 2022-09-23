@@ -1178,6 +1178,15 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
   // 8-bit regs can be assigned to each other directly.
   if(isReg(dst) && isReg(src))
     return true;
+  if(HAS_IYL_INST) // With some restrictions also for iyl, iyh, ixl, ixh.
+    {
+      if (isUReg(dst) && isReg(src) && src[0] <= 'e')
+        return true;
+      if (isUReg(src) && isReg(dst) && dst[0] <= 'e')
+        return true;    
+      if (isUReg(dst) && isUReg(src) && src[1] == dst[1])
+        return true;
+    }
 
   // Immediates van be loaded into 8-bit registers.
   if((isReg(dst) || HAS_IYL_INST && isUReg(dst)) && src[0] == '#')

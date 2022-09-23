@@ -1,3 +1,8 @@
+2022-09-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/peep.c:
+	  Improve handling of iyl, iyh in peephole rules, based on patch by Job Bolle.
+
 2022-09-21 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/peep.c:

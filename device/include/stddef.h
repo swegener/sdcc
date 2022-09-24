@@ -27,8 +27,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDCC_STDDEF_H
-#define __SDCC_STDDEF_H 1
+#ifndef __STDC_VERSION_STDDEF_H__
+#define __STDC_VERSION_STDDEF_H__ __STDC_VERSION__
 
 #ifndef NULL
   #define NULL ((void *)0)
@@ -75,7 +75,7 @@ typedef int errno_t;
 #define offsetof(s, m) __builtin_offsetof (s, m)
 
 void __builtin_unreachable(void);
-#if __STDC_VERSION__ > 201112L // TODO: Replace by >= to exact value from final version of C2X standard.
+#if __STDC_VERSION__ > 202311L
 #define unreachable __builtin_unreachable
 
 typedef typeof(nullptr) nullptr_t;

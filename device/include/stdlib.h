@@ -27,8 +27,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDCC_STDLIB_H
-#define __SDCC_STDLIB_H 1
+#ifndef __STDC_VERSION_STDLIB_H__
+#define __STDC_VERSION_STDLIB_H__ 201710L /* TODO: replace by __STDC_VERSION__ when this header becomes C23-compliant! */
 
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 #define __reentrant
@@ -97,7 +97,7 @@ inline void *aligned_alloc(size_t alignment, size_t size)
 #endif
 extern void free (void * ptr);
 
-#if __STDC_VERSION__ >= 202300L // TODO: Replace by final value when C2X is published!
+#if __STDC_VERSION__ >= 202311L
 inline void free_sized(void *ptr, size_t size)
 {
   (void)size;

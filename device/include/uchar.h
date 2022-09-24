@@ -26,8 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDCC_UCHAR_H
-#define __SDCC_UCHAR_H 1
+#ifndef __STDC_VERSION_UCHAR_H__
+#define __STDC_VERSION_UCHAR_H__ __STDC_VERSION__
 
 #ifndef __MBSTATE_T_DEFINED
 #define __MBSTATE_T_DEFINED
@@ -39,7 +39,7 @@
   typedef unsigned int size_t;
 #endif
 
-#if __STDC_VERSION__ >= 201112L // TODO: Replace by exact value from final version of C23 standard.
+#if __STDC_VERSION__ >= 202311L
 #ifndef __CHAR8_T_DEFINED
 #define __CHAR8_T_DEFINED
   typedef unsigned char char8_t;

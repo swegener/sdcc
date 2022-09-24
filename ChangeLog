@@ -7,7 +7,10 @@
 	  device/include/stdbool.h,
 	  device/include/stddef.h,
 	  device/include/stdlib.h,
-	  device/include/uchar.h:
+	  device/include/uchar.h,
+	  device/include/setjmp.h,
+	  device/include/stdalign.h,
+	  device/include/stdint.h:
 	  Replace include guards by C23 header version macros.
 
 2022-09-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

@@ -27,8 +27,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef _STDINT_H
-#define _STDINT_H       1
+#ifndef __STDC_VERSION_STDINT_H__
+#define __STDC_VERSION_STDINT_H__ __STDC_VERSION__
 
 /* Exact integral types.  */
 

@@ -26,8 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDCC_SETJMP_H
-#define __SDCC_SETJMP_H
+#ifndef __STDC_VERSION_SETJMP_H__
+#define __STDC_VERSION_SETJMP_H__ __STDC_VERSION__
 
 #define SP_SIZE		1
 

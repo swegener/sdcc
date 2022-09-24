@@ -1,3 +1,11 @@
+2022-09-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/assert.h,
+	  device/include/ctype.h,
+	  device/include/limits.h,
+	  device/include/stdarg.h:
+	  Replace include guards by C23 header version macros.
+
 2022-09-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/peep.c:

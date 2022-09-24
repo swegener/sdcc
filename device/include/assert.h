@@ -26,6 +26,9 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+#ifndef __STDC_VERSION_ASSERT_H__
+#define __STDC_VERSION_ASSERT_H__ __STDC_VERSION__
+
 #undef assert
 
 #ifdef NDEBUG
@@ -39,8 +42,10 @@
 void __assert(const char *expression, const char *functionname, const char *filename, unsigned int linenumber);
 #define assert(...) ((__VA_ARGS__) ? (void)0 : __assert(#__VA_ARGS__, __func__, __FILE__, __LINE__))
 
-#if __STDC_VERSION__ >= 201112L // TODO: Replace by exact value from final version of C23 standard.
+#if __STDC_VERSION__ >= 202311L
 #define static_assert _Static_assert
+#endif
+
 #endif
 
 #endif

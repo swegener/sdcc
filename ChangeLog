@@ -3,6 +3,27 @@
 	* src/SDCCmain.c,
 	  support/cpp/libcpp/init.cc:
 	  Fix handling of c2x standard for preprocessor.
+	* device/include/stdlib.h,
+	  device/lib/Makefile.in,
+	  device/lib/__stdc_count_leading_zeros.c,
+	  device/lib/__stdc_first_leading_one.c,
+	  device/lib/__stdc_first_trailing_oneull.c,
+	  device/lib/_divslonglong.c,
+	  device/lib/_divulonglong.c,
+	  device/lib/_modslonglong.c,
+	  device/lib/_mullonglong.c,
+	  device/lib/_rlslonglong.c,
+	  device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rrulonglong.c,
+	  device/lib/aligned_alloc.c,
+	  device/lib/*/Makefile.in,
+	  device/lib/ds390/lcd390.c,
+	  device/lib/printf_large.c,
+	  device/lib/printfl.c,
+	  device/lib/sprintf.c,
+	  device/lib/vprintf.c:
+	  Fix bug #3496.
 
 2022-09-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

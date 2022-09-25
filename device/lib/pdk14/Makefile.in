@@ -69,7 +69,7 @@ LIB = pdk14.lib
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(srcdir)/../../include -I. --std-c11
+CFLAGS = -I$(srcdir)/../../include -I. --std-c2x
 
 all: $(PORTDIR)/$(LIB)
 

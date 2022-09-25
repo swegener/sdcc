@@ -28,8 +28,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#pragma std_c11
-
 #include <stddef.h>
 
 /* it is important to declare this function extern before including

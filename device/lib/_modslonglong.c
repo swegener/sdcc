@@ -26,8 +26,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#pragma std_c99
-
 #include <stdint.h>
 #include <stdbool.h>
 

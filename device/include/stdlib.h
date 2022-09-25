@@ -52,7 +52,7 @@
 
 #define MB_CUR_MAX 4
 
-#if __STDC_VERSION__ > 201112L // TODO: Replace by >= to exact value from final version of C2X standard.
+#if __STDC_VERSION__ >= 202311L
 typedef bool once_flag;
 #define ONCE_FLAG_INIT false
 void call_once(once_flag *flag, void (*func)(void));
@@ -159,7 +159,7 @@ size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n);
 #endif
 
 /* C2X Alignment of memory */
-#if __STDC_VERSION__ >= 202300L // TODO: Replace by final value when C2X is published!
+#if __STDC_VERSION__ >= 202311L
 size_t memalignment(const void *p);
 #endif
 

@@ -312,7 +312,7 @@ AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
 #AM_CFLAGS += --noinduction
 #AM_CFLAGS += --nojtbound
 #AM_CFLAGS += --noloopreverse
-AM_CFLAGS = --std-c11 --asm="$(CCAS)" --no-warn-non-free \
+AM_CFLAGS = --std-c2x --asm="$(CCAS)" --no-warn-non-free \
 	--fomit-frame-pointer --obanksel=9 --denable-peeps \
 	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \

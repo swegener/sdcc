@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#pragma std_c11 // Workaround for bug #3497
+
 #define LCD_COLLUMNS 20
 #define LCD_ROWS 4
 

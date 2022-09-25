@@ -344,7 +344,7 @@ AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(DEVICE_TOP_DIR)/include/pic14 \
 # C compiler flags
 ############################################################
 SDCC_FLAGS = -mpic14 --less-pedantic --no-warn-non-free \
-	--i-code-in-asm --fverbose-asm --std-c11 $(am__append_4)
+	--i-code-in-asm --fverbose-asm --std-c2x $(am__append_4)
 
 # extra flags for enhanced cores
 SDCC_FLAGS_ENHANCED = $(am__append_3)

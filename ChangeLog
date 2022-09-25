@@ -1,3 +1,9 @@
+2022-09-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCmain.c,
+	  support/cpp/libcpp/init.cc:
+	  Fix handling of c2x standard for preprocessor.
+
 2022-09-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/assert.h,

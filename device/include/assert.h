@@ -42,7 +42,7 @@
 void __assert(const char *expression, const char *functionname, const char *filename, unsigned int linenumber);
 #define assert(...) ((__VA_ARGS__) ? (void)0 : __assert(#__VA_ARGS__, __func__, __FILE__, __LINE__))
 
-#if __STDC_VERSION__ >= 202311L
+#if __STDC_VERSION__ < 202311L
 #define static_assert _Static_assert
 #endif
 

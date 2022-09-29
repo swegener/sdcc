@@ -89,6 +89,14 @@ replace restart {
 }
 
 replace restart {
+	ld	a, %1
+	ld	%2, a
+} by {
+	mov	%2, %1
+	; peephole 4d replaced pair of mem-to-mem load with mov.
+} if operandsLitOrSym(%1), operandsLitOrSym(%2), notUsed('a' 'n' 'z')
+
+replace restart {
 	ld	%1, a
 	exg	a, %1
 } by {

@@ -1,3 +1,8 @@
+2022-09-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Use mov in more cases, patch by Basil Hussain.
+
 2022-09-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCmain.c,

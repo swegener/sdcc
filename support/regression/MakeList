@@ -256,6 +256,7 @@ EXCLUDE_pdk15-stack-auto += \
 	gte_pr30185 \
 	gte_pr40386
 EXCLUDE_pdk14 += \
+	gte_align-2 \
 	gte_pr102134 \
 	gte_pr27364 \
 	gte_pr30185 \

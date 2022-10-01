@@ -1,3 +1,8 @@
+2022-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/MakeList:
+	  Disable a test for pdk14 that fails due to lack of memory on the target device.
+
 2022-09-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

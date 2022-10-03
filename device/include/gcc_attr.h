@@ -1,8 +1,7 @@
 /* Macro voodoo rewriting GCC-style attributes to C23-style attributes. */
 /* Can be used via "--include gcc_attr.h" on the command line. */
 
-/* HACK: The folllowing check does not work yet. See feature request #466. */
-#if 0 /*(__STDC_VERSION__ <= 201710L)*/
+#if __STDC_VERSION__ < 202311L
 
 /* Not in C23 mode => remove GCC-style attributes */
 #warning "Rewriting GCC-style to C23-style attributes requires C23. Ignoring all GCC-style attributes."

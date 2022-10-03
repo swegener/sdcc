@@ -1,3 +1,8 @@
+2022-10-03 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/include/gcc_attr.h:
+	  Use C23 version macro.
+
 2022-10-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/MakeList:

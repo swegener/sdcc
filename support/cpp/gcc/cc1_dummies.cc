@@ -221,6 +221,9 @@ bool names_builtin_p(char const*)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
+void output_operand_lossage (const char *, ...)
+{ SDCPP_DUMMY_FCT();
+}
 void parse_basever(int*, int*, int*)
 { SDCPP_DUMMY_FCT();
 }
@@ -315,4 +318,5 @@ const struct ggc_root_tab * const gt_ggc_deletable_rtab[] = { &my_ggc_root_tab }
 const struct ggc_root_tab * const gt_ggc_rtab[] = { &my_ggc_root_tab };
 const struct ggc_root_tab * const gt_pch_scalar_rtab[] = { &my_ggc_root_tab };
 /*----------------------------------------------------------------------*/
+bool this_is_asm_operands = 0;
 /*----------------------------------------------------------------------*/

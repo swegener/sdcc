@@ -1,3 +1,11 @@
+2022-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c,
+	  src/stm8/gen.c,
+	  src/stm8/ralloc.c:
+	  Small improvements in reads of bool bit-fields.
+
 2022-10-07 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/gcc/cc1_dummies.cc:

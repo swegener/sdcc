@@ -1308,8 +1308,10 @@ genNot (const iCode *ic)
                 popPF (true);
             }
           else
-            emit2 ("or", "a, %s", aopGet (left->aop, i));
-          cost (1, 1);
+            {
+              emit2 ("or", "a, %s", aopGet (left->aop, i));
+              cost (1, 1);
+            }
         }
       emit2 ("sub", "a, #0x01");
       emit2 ("mov", "a, #0x00");

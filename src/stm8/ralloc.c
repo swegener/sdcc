@@ -673,7 +673,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   sym->isspilt = false;
                 }
 
-              if (sym->nRegs > 4 && ic->op == CALL) // To be allocated to stack due to the way long long return values are handled via a hidden pointer.
+              if (sym->nRegs > 4 && (ic->op == CALL || ic->op == PCALL)) // To be allocated to stack due to the way long long return values are handled via a hidden pointer.
                 {
                   sym->for_newralloc = 0;
                   stm8SpillThis (sym, TRUE);

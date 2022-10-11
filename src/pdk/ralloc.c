@@ -471,7 +471,7 @@ packRegisters (eBBlock * ebp)
          cast is remat, then we can remat this cast as well */
       if (ic->op == CAST &&
         IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat &&
-        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the paramter is not accounted for in DEFS */
+        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the parameter is not accounted for in DEFS */
         !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));
@@ -615,7 +615,7 @@ serialRegMark (eBBlock **ebbs, int count)
                   sym->isspilt = false;
                 }
 
-              if (sym->nRegs > 2 && ic->op == CALL) // To be allocated to stack due to the way (long) long return values are handled via a hidden pointer.
+              if (sym->nRegs > 2 && (ic->op == CALL || ic->op == PCALL)) // To be allocated to stack due to the way (long) long return values are handled via a hidden pointer.
                 {
                   sym->for_newralloc = 0;
                   pdkSpillThis (sym);

@@ -4020,7 +4020,6 @@ genCall (const iCode *ic)
         adjustStack (ic->parmBytes + bigreturn * 2, a_free, x_free, y_free);
     }
 
-
   const bool result_in_frameptr = stm8_extend_stack && SomethingReturned && !bigreturn && (aopRet (ftype)->regs[YL_IDX] >= 0 || aopRet (ftype)->regs[YH_IDX] >= 0);
 
   asmop *result = IC_RESULT (ic)->aop;
@@ -4375,21 +4374,17 @@ genEndFunction (iCode *ic)
   if (IFFUNC_ISCRITICAL (sym->type))
       genEndCritical (NULL);
 
+  // If debug then send end of function.
+  if (options.debug && currFunc && !regalloc_dry_run)
+    debugFile->writeEndFunction (currFunc, ic, 1);
+
   if (IFFUNC_ISISR (sym->type))
     {
-      /* if debug then send end of function */
-      if (options.debug && currFunc && !regalloc_dry_run)
-        debugFile->writeEndFunction (currFunc, ic, 1);
-        
       emit2 ("iret", "");
       cost (1, 11);
     }
   else
     {
-      /* if debug then send end of function */
-      if (options.debug && currFunc && !regalloc_dry_run)
-        debugFile->writeEndFunction (currFunc, ic, 1);
-
       if (options.model == MODEL_LARGE || IFFUNC_ISCOSMIC (currFunc->type))
         {
           emit2 ("retf", "");
@@ -9133,7 +9128,7 @@ genCast (const iCode *ic)
     }
 
   if ((getSize (resulttype) <= getSize (righttype) || !IS_SPEC (righttype) || (SPEC_USIGN (righttype) || IS_BOOL (righttype))) &&
-    (!IS_BOOL (resulttype) || IS_BOOL (righttype)))
+    (!IS_BOOL (resulttype) || IS_BOOLEAN (righttype)))
     {
       genAssign (ic);
       return;

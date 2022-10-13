@@ -8669,7 +8669,6 @@ genMult (iCode *ic)
   int a_cost = 0, l_cost = 0;
   PAIR_ID pair;
 
-  /* Shouldn't occur - all done through function calls */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);

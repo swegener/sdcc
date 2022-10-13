@@ -1,3 +1,8 @@
+2022-10-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Relax type match requirements on literal operands to multiplication support functions.
+
 2022-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

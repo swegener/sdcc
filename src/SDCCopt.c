@@ -891,8 +891,13 @@ convilong (iCode *ic, eBBlock *ebp)
               if ((op=='*' || op=='/' || op=='%'))
                 {
                   int ret = compareType (rightType, multypes[bwd][su], false);
-                  if (ret != 1)
+                  if (ret != 1 && isOperandLiteral (right) && SPEC_NOUN (multypes[bwd][su]) == V_CHAR && operandLitValue (right) >= 0 && operandLitValue (right) <= 127)
+                    ;
+                  else if (ret != 1)
                     {
+                      printf ("leftType: "); printTypeChain (leftType, 0);
+                      printf ("rightType: "); printTypeChain (rightType, 0);
+                      printf ("multypes[bwd][su]: "); printTypeChain (multypes[bwd][su], 0);
                       assert(0);
                     }
                 }

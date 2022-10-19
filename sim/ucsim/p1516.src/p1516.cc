@@ -45,9 +45,9 @@ cl_p1516::init(void)
 {
   int i;
   cl_uc::init();
-  F= 0;
   for (i=0; i<16; i++)
     R[i]= 0;
+  reg_cell_var(&cF, &F, "F", "Flag register");
   return 0;
 }
 
@@ -61,6 +61,7 @@ void
 cl_p1516::reset(void)
 {
   PC= R[15]= 0;
+  F&= ~(U|P);
 }
   
 void
@@ -177,10 +178,10 @@ cl_p1516::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_chip32("rom_chip", 0x4000, 32);
+  chip= new cl_chip32("rom_chip", 0xd000, 32);
   chip->init();
   memchips->add(chip);
-  ad= new cl_address_decoder(as= rom, chip, 0, 0x3fff, 0);
+  ad= new cl_address_decoder(as= rom, chip, 0, 0xcfff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -270,7 +271,7 @@ cl_p1516::disassc(t_addr addr, chars *comment)
 		{
 		  chars n= "";
 		  addr_name(R[data], rom, &n);
-		  comment->format("; [%08x%s]= %08x",
+		  comment->format("; [0x%08x%s]= 0x%08x",
 				  R[data],
 				  n.c_str(),
 				  rom->get(R[data]));
@@ -386,6 +387,28 @@ cl_p1516::print_regs(class cl_console_base *con)
 }
 
 
+bool
+cl_p1516::cond(t_mem code)
+{
+  t_mem cond= (code & 0xf0000000) >> 28;
+  if ((cond&1) == 1)
+    {
+      u8_t flag= 0, fv, v;
+      switch (cond>>2)
+	{
+	case 0: flag= F&S; break;
+	case 1: flag= F&C; break;
+	case 2: flag= F&Z; break;
+	case 3: flag= F&O; break;
+	}
+      fv= flag?1:0;
+      v= (cond&2)?1:0;
+      if (fv != v)
+	return false;
+    }
+  return true;
+}
+
 t_mem
 cl_p1516::inst_ad(t_mem ra, t_mem rb, u32_t c)
 {
@@ -393,7 +416,7 @@ cl_p1516::inst_ad(t_mem ra, t_mem rb, u32_t c)
   u32_t rd;
   
   big= ra + rb + c;
-  F= 0;
+  F&= ~(C|S|Z|O);
   if (big > 0xffffffff)
     F|= C;
   rd= big;
@@ -406,6 +429,7 @@ cl_p1516::inst_ad(t_mem ra, t_mem rb, u32_t c)
     F|= O;
   if (!(big & 0x80000000) && (F&C))
     F|= O;
+  cF.W(F);
   return rd;
 }
 
@@ -424,77 +448,78 @@ cl_p1516::inst_alu(t_mem code)
   switch (Op)
     {
     case 0: // ADD
-      RC[d]->W(inst_ad(RC[a]->R(), RC[b]->R(), 0));
+      RC[d]->W(inst_ad(R[a], R[b], 0));
       break;
     case 1: // ADC
-      RC[d]->W(inst_ad(RC[a]->R(), RC[b]->R(), (F&C)?1:0));
+      RC[d]->W(inst_ad(R[a], R[b], (F&C)?1:0));
       break;
     case 2: // SUB
-      RC[d]->W(inst_ad(RC[a]->R(), ~(RC[b]->R()), 1));
+      RC[d]->W(inst_ad(R[a], ~(R[b]), 1));
       break;
     case 3: // SBB
-      RC[d]->W(inst_ad(RC[a]->R(), ~(RC[b]->R()), (F&C)?1:0));
+      RC[d]->W(inst_ad(R[a], ~(R[b]), (F&C)?1:0));
       break;
 
     case 4: // INC
-      RC[d]->W(inst_ad(RC[a]->R(), 1, 0));
+      RC[d]->W(inst_ad(R[a], 1, 0));
       break;
     case 5: // DEC
-      RC[d]->W(inst_ad(RC[a]->R(), ~(1), 1));
+      RC[d]->W(inst_ad(R[a], ~(1), 1));
       break;
 
     case 6: // AND
-      RC[d]->W(RC[a]->R() & RC[b]->R());
+      RC[d]->W(R[a] & R[b]);
       SET_Z(R[d]);
       break;
     case 7: // OR
-      RC[d]->W(RC[a]->R() | RC[b]->R());
+      RC[d]->W(R[a] | R[b]);
       SET_Z(R[d]);
       break;
     case 8: // XOR
-      RC[d]->W(RC[a]->R() ^ RC[b]->R());
+      RC[d]->W(R[a] ^ R[b]);
       SET_Z(R[d]);
       break;
 
     case 9: // SHL
       SET_C(R[a] & 0x80000000);
-      RC[d]->W(RC[a]->R() << 1);
+      RC[d]->W(R[a] << 1);
       SET_Z(R[d]);
       break;
     case 10: // SHR
       SET_C(R[a] & 1);
-      RC[d]->W(RC[a]->R() >> 1);
+      RC[d]->W(R[a] >> 1);
       SET_Z(R[d]);
       break;
     case 16: // SHA
       SET_C(R[a] & 1);
-      RC[d]->W(((i32_t)(RC[a]->R())) >> 1);
+      RC[d]->W(((i32_t)(R[a])) >> 1);
       SET_Z(R[d]);
       break;
     case 11: // ROL
       c1= (F&C)?1:0;
       c2= (R[a] & 0x80000000)?1:0;
-      RC[d]->W((RC[a]->R()<<1) + c1);
+      RC[d]->W((R[a]<<1) + c1);
       SET_C(c2);
       SET_Z(R[d]);
       break;
     case 12: // ROR
       c1= (F&C)?1:0;
       c2= R[a] & 1;
-      RC[d]->W(RC[a]->R() >> 1);
+      R[d]= R[a] >> 1;
       if (c1)
 	R[d]|= 0x80000000;
+      RC[d]->W(R[d]);
       SET_C(c2);
       SET_Z(R[d]);
       break;
 
     case 13: // MUL
-      RC[d]->W(RC[a]->R() * RC[b]->R());
+      RC[d]->W(R[a] * R[b]);
       SET_Z(R[d]);
       SET_S(R[d] & 0x80000000);
       break;
     case 19: // MUH
-      big= RC[a]->R() * RC[b]->R();
+      big= R[a] * R[b];
       RC[d]->W(big >> 32);
       SET_Z(R[d]);
       SET_S(R[d] & 0x80000000);
@@ -510,7 +535,7 @@ cl_p1516::inst_alu(t_mem code)
       break;
       
     case 15: // CMP
-      inst_ad(RC[a]->R(), ~(RC[b]->R()), 1);
+      inst_ad(R[a], ~(R[b]), 1);
       break;
     }
   
@@ -522,7 +547,6 @@ cl_p1516::exec_inst(void)
 {
   t_mem code;
   u8_t inst;
-  u8_t cond;
   bool fe;
   
   PC= R[15];
@@ -533,22 +557,8 @@ cl_p1516::exec_inst(void)
   if (fe)
     return(resBREAKPOINT);
 
-  cond= (code & 0xf0000000) >> 28;
-  if ((cond&1) == 1)
-    {
-      u8_t flag= 0, fv, v;
-      switch (cond>>2)
-	{
-	case 0: flag= F&S; break;
-	case 1: flag= F&C; break;
-	case 2: flag= F&Z; break;
-	case 3: flag= F&O; break;
-	}
-      fv= flag?1:0;
-      v= (cond&2)?1:0;
-      if (fv != v)
-	return resGO;
-    }
+  if (!cond(code))
+    return resGO;
   
   inst= (code & 0x0f000000) >> 24;
   if (code & 0x08000000)
@@ -576,16 +586,16 @@ cl_p1516::exec_inst(void)
       vc.wr++;
       break;
     case 3: // MOV Rd,Ra
-      R[d]= R[a];
+      RC[d]->W(R[a]);
       break;
     case 4: // LDL0 Rd,data
-      R[d]= code & 0x0000ffff;
+      RC[d]->W(code & 0x0000ffff);
       break;
     case 5: // LDL Rd,data
-      R[d]= (R[d] & 0xffff0000) | (code & 0x0000ffff);
+      RC[d]->W((R[d] & 0xffff0000) | (code & 0x0000ffff));
       break;
     case 6: // LDH Rd,data
-      R[d]= (R[d] & 0x0000ffff) | (code << 16);
+      RC[d]->W((R[d] & 0x0000ffff) | (code << 16));
       break;
     case 7: // ALU
       inst_alu(code);

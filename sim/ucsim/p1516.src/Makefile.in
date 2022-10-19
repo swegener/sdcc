@@ -52,7 +52,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= sim$(TN).o $(TN).o glob.o port.o
+OBJECTS_SHARED	= sim$(TN).o $(TN).o p2223.o glob.o port.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

@@ -32,6 +32,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern struct dis_entry disass_p1516[];
+extern struct dis_entry disass_p2223[];
+
+extern struct cpu_entry cpus_p1516[];
 
 
 #endif

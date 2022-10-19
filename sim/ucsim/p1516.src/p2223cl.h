@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (p1516cl.h)
+ * Simulator of microcontrollers (p2223cl.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,69 +25,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef P1516CL_HEADER
-#define P1516CL_HEADER
+#ifndef P2223CL_HEADER
+#define P2223CL_HEADER
 
-#include "uccl.h"
-#include "memcl.h"
+#include "p1516cl.h"
 
 
-/*
- * Base of P1516 processor
- */
+#define CLP2 cl_p2223
 
-enum flags
-  {
-   S= 1,
-   N= 1,
-   C= 2,
-   Z= 4,
-   O= 8,
-   V= 8,
-   // p2223 flags
-   P= 0x10, // 1:Pre 0:Post
-   U= 0x20 // 1:Up  0:Down
-  };
+#define setZSw(v)  { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; cF.W(F); }
+#define setZSnw(v) { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; }
 
-class cl_p1516: public cl_uc
+class cl_p2223: public cl_p1516
 {
 public:
-  u8_t F;
-  u32_t R[16];
-  cl_memory_cell *RC[16];
-  cl_cell8 cF;
-  cl_address_space *regs;
-  class cl_porto *pa, *pb, *pc, *pd;
-  class cl_porti *pi, *pj;
-public:
-  //class cl_address_space *rom;
- public:
-  cl_p1516(class cl_sim *asim);
+  cl_p2223(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
-  virtual void reset(void);
-  virtual void set_PC(t_addr addr);
-  
-  virtual void mk_hw_elements(void);
-  virtual void make_memories(void);
-  virtual int clock_per_cycle(void) { return 4; }
-  
+
   virtual struct dis_entry *dis_tbl(void);
   virtual char *disassc(t_addr addr, chars *comment);
-  virtual void analyze_start(void);
+  //virtual void analyze_start(void);
   virtual void analyze(t_addr addr);
-  virtual void print_regs(class cl_console_base *con);
 
   virtual bool cond(t_mem code);
-  virtual t_mem inst_ad(t_mem ra, t_mem rb, u32_t c);
+  virtual int inst_alu_1op(t_mem code);
   virtual int inst_alu(t_mem code);
+  virtual int inst_mem(t_mem code);
+  virtual int inst_ext(t_mem code) { return resINV; }
   virtual int exec_inst(void);
 };
 
-#define SET_C(v) ( cF.W( (F&~C) | ((v)?C:0) ))
-#define SET_Z(v) ( cF.W( (F&~Z) | ((v==0)?Z:0) ))
-#define SET_S(v) ( cF.W( (F&~S) | ((v)?S:0) ))
 
 #endif
 
-/* End of p1516.src/p1516cl.h */
+/* End of p1516.src/p2223cl.h */

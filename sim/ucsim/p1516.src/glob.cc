@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdio.h>
+
 #include "glob.h"
 
 
@@ -69,6 +71,106 @@ struct dis_entry disass_p1516[]=
    { 0x07000900, 0x0f000f80, ' ', 1, "clrc", false },
    
    { 0, 0, 0, 0, 0, 0 }
+  };
+
+struct dis_entry disass_p2223[]=
+  {
+    // Macro
+   { 0x00000000, 0x0fffffff, ' ', 1, "nop", false },
+   { 0x00f00e00, 0x00f00f00, ' ', 1, "ret", false },
+   { 0x11f20000, 0xffff0000, ' ', 1, "jz 'j'", false },
+   { 0x21f20000, 0xffff0000, ' ', 1, "jnz 'j'", false },
+   { 0x01f20000, 0x0fff0000, ' ', 1, "jmp 'j'", false },
+   { 0x0d0d0000, 0x0f0f0000, ' ', 1, "push %d", false },
+   { 0x0f0d0000, 0x0f0f0000, ' ', 1, "pop %d", false },
+   { 0x00f00000, 0x00f00000, ' ', 1, "jp 'jp'", false },
+    
+    // CALL
+   { 0x04000000, 0x0f000000, ' ', 1, "call 'ar'", false },
+   { 0x05000000, 0x0f000000, ' ', 1, "call %d,'s20'", false },
+
+   // ALU 1op
+   { 0x02000000, 0x0e0f0000, ' ', 1, "zeb %d", false },
+   { 0x02010000, 0x0e0f0000, ' ', 1, "zew %d", false },
+   { 0x02020000, 0x0e0f0000, ' ', 1, "seb %d", false },
+   { 0x02030000, 0x0e0f0000, ' ', 1, "sew %d", false },
+   { 0x02040000, 0x0e0f0000, ' ', 1, "not %d:=~%d", false },
+   { 0x02050000, 0x0e0f0000, ' ', 1, "neg %d:=-%d", false },
+   { 0x02060000, 0x0e0f0000, ' ', 1, "ror %d:=(%d,C)>>1", false },
+   { 0x02070000, 0x0e0f0000, ' ', 1, "rol %d:=(C,%d)<<1", false },
+   { 0x02080000, 0x0e0f0000, ' ', 1, "shl %d:=u(%d)<<1", false },
+   { 0x02090000, 0x0e0f0000, ' ', 1, "shr %d:=u(%d)>>1", false },
+   { 0x020a0000, 0x0e0f0000, ' ', 1, "sha %d:=s(%d)>>1", false },
+   { 0x020b0000, 0x0e0f0000, ' ', 1, "sz F.SZ=%d", false },
+   { 0x020c0000, 0x0e0f0000, ' ', 1, "sec F.C=1", false },
+   { 0x020d0000, 0x0e0f0000, ' ', 1, "clc F.C=0", false },
+   { 0x020e0000, 0x0e0f0000, ' ', 1, "getf %d:=F", false },
+   { 0x020f0000, 0x0e0f0000, ' ', 1, "setf F:=%d", false },
+
+   // ALU R
+   { 0x00000000, 0x0f0f0000, ' ', 1, "mov %d:=%b", false },
+   { 0x00030000, 0x0f0f0000, ' ', 1, "sed %d:=s(%b)", false },
+   { 0x00040000, 0x0f0f0000, ' ', 1, "add %d:=%d+%b", false },
+   { 0x00050000, 0x0f0f0000, ' ', 1, "adc %d:=%d+%b", false },
+   { 0x00060000, 0x0f0f0000, ' ', 1, "sub %d:=%d-%b", false },
+   { 0x00070000, 0x0f0f0000, ' ', 1, "sbb %d:=%d-%b", false },
+   { 0x00080000, 0x0f0f0000, ' ', 1, "cmp F:=%d-%b", false },
+   { 0x00090000, 0x0f0f0000, ' ', 1, "mul %d:=%d*%b", false },
+   { 0x000a0000, 0x0f0f0000, ' ', 1, "plus %d:=%d+%b", false },
+   { 0x000c0000, 0x0f0f0000, ' ', 1, "test F:=%d&%b", false },
+   { 0x000d0000, 0x0f0f0000, ' ', 1, "or %d:=%d&%b", false },
+   { 0x000e0000, 0x0f0f0000, ' ', 1, "xor %d:=%d^%b", false },
+   { 0x000f0000, 0x0f0f0000, ' ', 1, "and %d:=%d&%b", false },
+
+   // ALU #immed
+   { 0x01000000, 0x0f0f0000, ' ', 1, "mvl %d:=%l", false },
+   { 0x01010000, 0x0f0f0000, ' ', 1, "mvh %d:=%h", false },
+   { 0x01020000, 0x0f0f0000, ' ', 1, "mvzl %d:=%0", false },
+   { 0x01030000, 0x0f0f0000, ' ', 1, "mvs %d:=#'s16'", false },
+   { 0x01040000, 0x0f0f0000, ' ', 1, "add %d:=%d+#'s16'", false },
+   { 0x01050000, 0x0f0f0000, ' ', 1, "adc %d:=%d+#'s16'", false },
+   { 0x01060000, 0x0f0f0000, ' ', 1, "sub %d:=%d-#'s16'", false },
+   { 0x01070000, 0x0f0f0000, ' ', 1, "sbb %d:=%d-#'s16'", false },
+   { 0x01080000, 0x0f0f0000, ' ', 1, "cmp F:=%d-#'s16'", false },
+   { 0x01090000, 0x0f0f0000, ' ', 1, "mul %d:=%d*#'s16'", false },
+   { 0x010a0000, 0x0f0f0000, ' ', 1, "plus %d:=%d+#'s16'", false },
+   { 0x010c0000, 0x0f0f0000, ' ', 1, "test F:=%d&#'u16'", false },
+   { 0x010d0000, 0x0f0f0000, ' ', 1, "or %d:=%d|#'u16'", false },
+   { 0x010e0000, 0x0f0f0000, ' ', 1, "xor %d:=%d^#'u16'", false },
+   { 0x010f0000, 0x0f0f0000, ' ', 1, "and %d:=%d&#'and16'", false },
+
+   // MEM
+   { 0x08000000, 0x0f008000, ' ', 1, "st mem[%a,%b]:=%d", false },
+   { 0x09000000, 0x0f00c000, ' ', 1, "st mem[%a-,%b]:=%d", false },
+   { 0x09004000, 0x0f00c000, ' ', 1, "st mem[-%a,%b]:=%d", false },
+   { 0x09008000, 0x0f00c000, ' ', 1, "st mem[%a+,%b]:=%d", false },
+   { 0x0900c000, 0x0f00c000, ' ', 1, "st mem[+%a,%b]:=%d", false },
+
+   { 0x0a000000, 0x0f000000, ' ', 1, "ld %d:=mem[%a,%b]", false },
+   { 0x0b000000, 0x0f00c000, ' ', 1, "ld %d:=mem[%a-,%b]", false },
+   { 0x0b004000, 0x0f00c000, ' ', 1, "ld %d:=mem[-%a,%b]", false },
+   { 0x0b008000, 0x0f00c000, ' ', 1, "ld %d:=mem[%a+,%b]", false },
+   { 0x0b00c000, 0x0f00c000, ' ', 1, "ld %d:=mem[+%a,%b]", false },
+
+   { 0x0c000000, 0x0f000000, ' ', 1, "st mem[%a,'s16']:=%d", false },
+   { 0x0d000000, 0x0f000000, ' ', 1, "st mem['*ra','s16']:=%d", false },
+   { 0x0e000000, 0x0f000000, ' ', 1, "ld %d:=mem[%a,'s16']", false },
+   { 0x0f000000, 0x0f000000, ' ', 1, "ld %d:=mem['*ra','s16']", false },
+   
+   { 0, 0, 0, 0, 0, 0 }
+  };
+
+struct cpu_entry cpus_p1516[]=
+  {
+    { "P1516"		, CPU_P1516, 0, "P1516", "" },
+    { "1"		, CPU_P1516, 0, "P1516", "" },
+    { "5"		, CPU_P1516, 0, "P1516", "" },
+    { "6"		, CPU_P1516, 0, "P1516", "" },
+    { "P2223"		, CPU_P2223, 0, "P2223", "" },
+    { "2"		, CPU_P2223, 0, "P2223", "" },
+    { "3"		, CPU_P2223, 0, "P2223", "" },
+
+    {NULL, CPU_NONE, 0, "", ""}
   };
 
 /* End of p1516.src/glob.cc */

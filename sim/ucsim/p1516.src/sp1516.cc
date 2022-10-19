@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "simp1516cl.h"
+#include "glob.h"
 
 
 int
@@ -39,6 +40,7 @@ main(int argc, char *argv[])
   class cl_sim *sim;
 
   app_start_at= dnow();
+  cpus= cpus_p1516;
   application= new cl_app();
   application->set_name("sp1516");
   application->init(argc, argv);

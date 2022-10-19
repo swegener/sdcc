@@ -439,21 +439,18 @@ void
 cl_serial_hw::del_listener_i(void)
 {
   class cl_commander_base *c= application->get_commander();
-  if (c && listener_io)
-    c->del_console(listener_io);
   if (listener_io)
     {
       if (listener_i == listener_io)
 	listener_i= NULL;
       if (listener_o == listener_io)
 	listener_o= NULL;
-      delete listener_io;
     }
+  if (c && listener_io)
+    c->del_console(listener_io);
   listener_io= NULL;
   if (c && listener_i)
     c->del_console(listener_i);
-  if (listener_i)
-    delete listener_i;
   listener_i= NULL;
 }
 
@@ -461,21 +458,18 @@ void
 cl_serial_hw::del_listener_o(void)
 {
   class cl_commander_base *c= application->get_commander();
-  if (c && listener_io)
-    c->del_console(listener_io);
   if (listener_io)
     {
       if (listener_i == listener_io)
 	listener_i= NULL;
       if (listener_o == listener_io)
 	listener_o= NULL;
-      delete listener_io;
     }
+  if (c && listener_io)
+    c->del_console(listener_io);
   listener_io= NULL;
   if (c && listener_o)
     c->del_console(listener_o);
-  if (listener_o)
-    delete listener_o;
   listener_o= NULL;
 }
 

@@ -7593,8 +7593,14 @@ fi
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
 
-if test "$cross_compiling" = "no"; then
-# The cast to long int works around a bug in the HP C Compiler
+if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
+    ac_cv_sizeof_char=1
+    ac_cv_sizeof_short=2
+    ac_cv_sizeof_int=4
+    ac_cv_sizeof_long=4
+    ac_cv_sizeof_long_long=4
+else
+    # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -7627,7 +7633,7 @@ printf "%s\n" "$ac_cv_sizeof_char" >&6; }
 printf "%s\n" "#define SIZEOF_CHAR $ac_cv_sizeof_char" >>confdefs.h
 
 
-# The cast to long int works around a bug in the HP C Compiler
+    # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -7660,7 +7666,7 @@ printf "%s\n" "$ac_cv_sizeof_short" >&6; }
 printf "%s\n" "#define SIZEOF_SHORT $ac_cv_sizeof_short" >>confdefs.h
 
 
-# The cast to long int works around a bug in the HP C Compiler
+    # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -7693,7 +7699,7 @@ printf "%s\n" "$ac_cv_sizeof_int" >&6; }
 printf "%s\n" "#define SIZEOF_INT $ac_cv_sizeof_int" >>confdefs.h
 
 
-# The cast to long int works around a bug in the HP C Compiler
+    # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -7726,7 +7732,7 @@ printf "%s\n" "$ac_cv_sizeof_long" >&6; }
 printf "%s\n" "#define SIZEOF_LONG $ac_cv_sizeof_long" >>confdefs.h
 
 
-# The cast to long int works around a bug in the HP C Compiler
+    # The cast to long int works around a bug in the HP C Compiler
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
@@ -7759,16 +7765,6 @@ printf "%s\n" "$ac_cv_sizeof_long_long" >&6; }
 printf "%s\n" "#define SIZEOF_LONG_LONG $ac_cv_sizeof_long_long" >>confdefs.h
 
 
-else
-    if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
-        ac_cv_sizeof_char=1
-        ac_cv_sizeof_short=2
-        ac_cv_sizeof_int=4
-        ac_cv_sizeof_long=4
-        ac_cv_sizeof_long_long=4
-    else
-        : # FIXME
-    fi
 fi
 
 type_name()

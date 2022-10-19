@@ -151,6 +151,7 @@ cl_f::cl_f(void)
   hist= new cl_history("history");
   proc_telnet= false;
   proc_escape= false;
+  type= F_UNKNOWN;
 }
 
 cl_f::cl_f(chars fn, chars mode):
@@ -174,6 +175,8 @@ cl_f::cl_f(chars fn, chars mode):
   attributes_saved= 0;
   hist= new cl_history("history");
   proc_telnet= false;
+  proc_escape= false;
+  type= F_UNKNOWN;
 }
 
 cl_f::cl_f(int the_server_port)
@@ -196,6 +199,8 @@ cl_f::cl_f(int the_server_port)
   attributes_saved= 0;
   hist= new cl_history("history");
   proc_telnet= false;
+  proc_escape= false;
+  type= F_UNKNOWN;
 }
 
 class cl_f *

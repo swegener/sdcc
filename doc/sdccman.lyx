@@ -44920,7 +44920,7 @@ This calling convention can be chosen per function via __sdcccall(0) (e.g.
  for compatibility with functions written in assembler for use with older
  versions of SDCC).
  All parameters are passed on the stack.
- The stack is not adjusted for the parameters after the call (thus the callee
+ The stack is not adjusted for the parametersby the callee (thus the caller
  has to do this instead), unless __z88dk_callee is specified.
 \end_layout
 

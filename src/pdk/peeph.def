@@ -27,7 +27,6 @@ replace restart {
 	; peephole 3 removed redundant push / pop.
 }
 
-
 replace restart {
 	mo%3	a, #%1
 	ret

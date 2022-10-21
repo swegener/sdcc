@@ -1635,7 +1635,7 @@ replace restart {
 	; peephole j2d-ne removed unreachable jump to %2.
 } if labelRefCountChange(%2 -1)
 
-// Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.
+// Ensure jump-to-jump optimization of absolute jumps above is done before other jump-related optimizations.
 barrier
 
 replace restart {
@@ -1925,7 +1925,6 @@ replace restart {
 } by {
 	; peephole j30 removed unused label %1.
 } if labelRefCount(%1 0)
-
 
 replace restart {
 	ldw	x, (%1, sp)

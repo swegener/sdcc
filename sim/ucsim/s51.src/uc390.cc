@@ -1244,9 +1244,12 @@ cl_uc390::print_regs (class cl_console_base *con)
       return;
     }
   start = sfr->get (PSW) & 0x18;
-  iram->dump (start, start + 7, 8, con/*->get_fout()*/);
-  con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n");
+  //iram->dump (start, start + 7, 8, con/*->get_fout()*/);
+  con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n    ");
+  for (t_addr i= 0; i < 8; i++)
+    con->dd_cprintf("dump_number", " %02x", iram->get(start + i));
   data = iram->get (iram->get (start));
+  con->dd_printf ("\n");
   con->dd_printf ("@R0 %02x %c", data, isprint (data) ? data : '.');
   con->dd_printf ("  ACC= 0x%02x %3d %c  B= 0x%02x",
                   sfr->get (ACC), sfr->get (ACC),
@@ -1280,13 +1283,23 @@ cl_uc390::print_regs (class cl_console_base *con)
       /* SA: 10 bit stack */
       start = (sfr->get (R51_ESP) & 3) * 256 + sfr->get (SP);
       con->dd_printf ("SP10 ", start);
-      ixram->dump (start, start - 7, 8, con);
+      long int s, e;
+      s= start;
+      e= s - 7;
+      if (s<7)
+	e= 0;
+      ixram->dump ((t_addr)s/*tart*/, (t_addr)e/*start - 7*/, 8, con);
     }
   else
     {
       start = sfr->get (SP);
       con->dd_printf ("SP ", start);
-      iram->dump (start, start - 7, 8, con);
+      long int s, e;
+      s= start;
+      e= s - 7;
+      if (s<7)
+	e= 0;
+      iram->dump ((t_addr)s/*tart*/, (t_addr)e/*start - 7*/, 8, con);
     }
 
   print_disass (PC, con);

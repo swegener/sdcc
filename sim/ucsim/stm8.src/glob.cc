@@ -480,7 +480,7 @@ struct dis_entry disass_stm8_72[]= {
 
   { 0x00b0, 0x00ff, ' ', 3, "subw X,%d" },
   { 0x00a2, 0x00ff, ' ', 3, "subw Y,%w" },
-  { 0x00f2, 0x00ff, ' ', 3, "subw Y,%d" },
+  { 0x00b2, 0x00ff, ' ', 3, "subw Y,%d" },
   { 0x00f0, 0x00ff, ' ', 2, "subw X,(%1,SP)" },
   { 0x00f2, 0x00ff, ' ', 2, "subw Y,(%1,SP)" },
 

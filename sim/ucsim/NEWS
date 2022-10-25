@@ -4,6 +4,7 @@ Motorola HC12 simulator.
 MOS65C02 and MOS6510 simulator.
 Stm8 stack pointer roll-over function (configurable).
 F8 simulator.
+p2223 simulator (variant of p1516).
 "display" and "undisplay" commands.
 
 

@@ -2067,23 +2067,25 @@ cl_memory_chip::get_slot(t_addr addr)
   return(a+(addr*bwidth));
 }
 
-t_addr
-cl_memory_chip::is_slot(/*t_mem*/void *data_ptr)
+bool
+cl_memory_chip::is_slot(void *data_ptr, t_addr *addr_of)
 {
   u8_t *p= (u8_t *)data_ptr;
   u8_t *a= (u8_t *)array;
   if (p < &(a[0]))
-    return -1;
+    return false;
   if (p > &(a[alloc_size-1]))
-    return -2;
+    return false;
   t_addr i= p - a;
   if (width <= 8)
-    return i;
+    /*i*/;
   if (width <= 16)
-    return i/2;
+    i= i/2;
   if (width <= 32)
-    return i/4;
-  return i;
+    i= i/4;
+  if (addr_of)
+    *addr_of= i;
+  return true;
 }
 /*
 t_mem

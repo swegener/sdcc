@@ -491,7 +491,7 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
     {
       cl_memory_chip *ch= (cl_memory_chip*)(uc->memchips->at(i));
       t_addr ad;
-      if ((ad= ch->is_slot(c->get_data())) >= 0)
+      if (ch->is_slot(c->get_data(), &ad))
 	{
 	  con->dd_printf("  decoded to %s[%u]\n",
 			 ch->get_name(), AU(ad));

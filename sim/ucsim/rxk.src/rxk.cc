@@ -958,7 +958,7 @@ cl_rxk_cpu::print_info(class cl_console_base *con)
       else if (la >= (y<<12)) t= 'D', con->dd_color("dump_label");
       else t= 'C', con->dd_color("answer");
       c= ruc->mem->get_cell(la);
-      pa= ruc->mem->chip->is_slot(c->get_data());
+      ruc->mem->chip->is_slot(c->get_data(), &pa);
       con->dd_printf("0x%xxxx -> 0x%03xxxx %c", l, pa>>12, t);
       con->dd_printf("   ");
       la= r*0x1000;
@@ -967,7 +967,7 @@ cl_rxk_cpu::print_info(class cl_console_base *con)
       else if (la >= (y<<12)) t= 'D', con->dd_color("dump_label");
       else t= 'C', con->dd_color("answer");
       c= ruc->mem->get_cell(la);
-      pa= ruc->mem->chip->is_slot(c->get_data());
+      ruc->mem->chip->is_slot(c->get_data(), &pa);
       con->dd_printf("0x%xxxx -> 0x%03xxxx %c", r, pa>>12, t);
       con->dd_color("answer");
       con->dd_printf("\n");

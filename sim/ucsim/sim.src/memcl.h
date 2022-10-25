@@ -495,7 +495,7 @@ public:
   virtual bool is_chip(void) { return(true); }
 
   virtual void *get_slot(t_addr addr);
-  virtual t_addr is_slot(/*t_mem*/void *data_ptr);
+  virtual bool is_slot(void *data_ptr, t_addr *addr_of);
   
   virtual t_mem read(t_addr addr) { return d(addr); }
   virtual t_mem read(t_addr addr, enum hw_cath skip) { return d(addr); }

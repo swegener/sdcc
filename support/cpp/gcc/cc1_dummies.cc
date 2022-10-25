@@ -162,7 +162,7 @@ bool lang_GNU_C()
 {
 	return true;
 }
-void lhd_append_data(void const*, unsigned long, void*)
+void lhd_append_data(void const*, size_t, void*)
 { SDCPP_DUMMY_FCT();
 }
 void lhd_begin_section(char const*)

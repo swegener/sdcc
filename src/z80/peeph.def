@@ -2717,7 +2717,7 @@ replace restart {
 	; common peephole 174a reused value still in %1.
 	ld	%7, %5
 	ld	%8, %6
-} if notSame(%1 'ix' 'iy'), notSame(%2 'ix' 'iy'), canSplitReg(%1 %5 %6), canSplitReg(%2 %7 %8), operandsLiteral(%3 %4), immdInRange(0 0 '-' %3 %4 %9), notSame(%1 'ix' 'iy'), notSame(%2 'ix' 'iy')
+} if notSame(%1 'ix' 'iy'), notSame(%2 'ix' 'iy'), canSplitReg(%1 %5 %6), canSplitReg(%2 %7 %8), operandsLiteral(%3 %4), immdInRange(0 0 '-' %3 %4 %9)
 
 // special case for ix/iy, which can't load to/from hl
 replace restart {

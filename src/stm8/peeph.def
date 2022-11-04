@@ -866,6 +866,16 @@ replace restart {
 }
 
 replace restart {
+	push	a
+	clr	a
+	clr	(%1, sp)
+} by {
+	clr	a
+	push	a
+	; peephole 22e optimise 'push-clr-clr' sequence, remove 'clr (%1, sp)' and reorder to 'clr-push'.
+} if immdInRange(1 1 '+' 0 %1 %2)
+
+replace restart {
 	%3	a, %1
 	tnz	a
 } by {

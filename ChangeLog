@@ -3,6 +3,10 @@
 	* src/z80/peep.c,
 	  src/z80/peeph.def:
 	  Fix iy handling in peephole optimizer, variant of patch #441 by Job Bolle.
+	* src/stm8/peeph.def,
+	  support/regression/tests/modulong.c,
+	  support/regression/ports/stm8/spec.mk:
+	  clr-push stm8 peephole optimizer rule, variant of patch #443 by Basil Hussain.
 
 2022-11-03 Benedikt Freisen <b.freisen AT gmx.net>
 

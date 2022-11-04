@@ -1294,7 +1294,7 @@ bool z80canSplitReg (const char *reg, char dst[][16], int nDst)
           dst[i][1] = '\0';
         }
     }
-  else if (!IS_SM83 && (!strcmp (reg, "ix") || !strcmp (reg, "iy")))
+  else if (HAS_IYL_INST && (!strcmp (reg, "ix") || !strcmp (reg, "iy")))
     {
       for (i = 0; i < nDst; ++i)
         {

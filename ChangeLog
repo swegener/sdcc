@@ -1,3 +1,8 @@
+2022-11-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix an issue related to bug #3471.
+
 2022-11-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

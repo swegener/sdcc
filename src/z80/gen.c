@@ -4,7 +4,7 @@
   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
   Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
-  Copyright (C) 2011-2021, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2011-2022, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
   Copyright (C) 2021-2022, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
@@ -3385,11 +3385,34 @@ aopPut (asmop *aop, const char *s, int offset)
 static void
 poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
 {
-  emit2 ("ld %s, %s", regsZ80[tempreg].name, regsZ80[survivingreg].name);
-  regalloc_dry_run_cost += 1;
-  _pop (pair);
-  emit2 ("ld %s, %s", regsZ80[survivingreg].name, regsZ80[tempreg].name);
-  regalloc_dry_run_cost += 1;
+  if (tempreg >= 0)
+    {
+      emit2 ("ld %s, %s", regsZ80[tempreg].name, regsZ80[survivingreg].name);
+      regalloc_dry_run_cost += 1;
+      _pop (pair);
+      emit2 ("ld %s, %s", regsZ80[survivingreg].name, regsZ80[tempreg].name);
+      regalloc_dry_run_cost += 1;
+      return;
+    }
+
+  // No tempreg, need to do it the hard way via stack access.
+  if (survivingreg == B_IDX || survivingreg == D_IDX || survivingreg == H_IDX || survivingreg == IYH_IDX)
+    {
+      _push (PAIR_AF);
+      _push (PAIR_HL);
+      emit2 ("ld hl, !immedword", 3);
+      emit2 ("add hl, sp");
+      emit2 ("ld a, (hl)");
+      emit2 ("inc hl");
+      emit2 ("inc hl");
+      emit2 ("ld (hl), a");
+      regalloc_dry_run_cost += 8;
+      _pop (PAIR_HL);
+      _pop (PAIR_AF);
+      _pop (pair);
+    }
+  else // todo: implement for lower byte
+    UNIMPLEMENTED;
 }
 
 // Move, but try not to. Preserves flags. Cannot use xor to zero, since xor resets the carry flag.
@@ -5164,9 +5187,9 @@ _gbz80_emitAddSubLong (const iCode * ic, bool isAdd)
 
 /* Pop saved regs from stack, taking care not to destroy result */
 static void
-restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
+restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result, const iCode *const ic)
 {
-  bool aInRet, bInRet, cInRet, dInRet, eInRet, hInRet, lInRet;
+  bool a_live, b_live, c_live, d_live, e_live, h_live, l_live, iyl_live, iyh_live;
   bool SomethingReturned;
 
   SomethingReturned = result && IS_ITEMP (result) && (OP_SYMBOL_CONST (result)->nRegs || OP_SYMBOL_CONST (result)->spildir)
@@ -5175,127 +5198,168 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result)
   if (SomethingReturned)
     {
       bitVect *rv = z80_rUmaskForOp (result);
-      aInRet = bitVectBitValue (rv, A_IDX);
-      bInRet = bitVectBitValue (rv, B_IDX);
-      cInRet = bitVectBitValue (rv, C_IDX);
-      dInRet = bitVectBitValue (rv, D_IDX);
-      eInRet = bitVectBitValue (rv, E_IDX);
-      hInRet = bitVectBitValue (rv, H_IDX);
-      lInRet = bitVectBitValue (rv, L_IDX);
+      a_live = bitVectBitValue (rv, A_IDX);
+      b_live = bitVectBitValue (rv, B_IDX);
+      c_live = bitVectBitValue (rv, C_IDX);
+      d_live = bitVectBitValue (rv, D_IDX);
+      e_live = bitVectBitValue (rv, E_IDX);
+      h_live = bitVectBitValue (rv, H_IDX);
+      l_live = bitVectBitValue (rv, L_IDX);
+      iyh_live = bitVectBitValue (rv, IYH_IDX);
+      iyl_live = bitVectBitValue (rv, IYL_IDX);
       freeBitVect (rv);
     }
   else
     {
-      aInRet = false;
-      bInRet = false;
-      cInRet = false;
-      dInRet = false;
-      eInRet = false;
-      hInRet = false;
-      lInRet = false;
+      a_live = false;
+      b_live = false;
+      c_live = false;
+      d_live = false;
+      e_live = false;
+      h_live = false;
+      l_live = false;
+      iyh_live = false;
+      iyl_live = false;
+    }
+
+  if (ic)
+    {
+      if (!isRegDead (A_IDX, ic))
+        a_live = true;
+      if (!de && !isRegDead (D_IDX, ic))
+        d_live = true;
+      if (!de && !isRegDead (E_IDX, ic))
+        e_live = true;
+      if (!bc && !isRegDead (B_IDX, ic))
+        b_live = true;
+      if (!bc && !isRegDead (C_IDX, ic))
+        c_live = true;
+      if (!hl && !isRegDead (H_IDX, ic))
+        h_live = true;
+      if (!hl && !isRegDead (L_IDX, ic))
+        l_live = true;
+      if (!iy && !isRegDead (IYH_IDX, ic))
+        iyh_live = true;
+      if (!iy && !isRegDead (IYL_IDX, ic))
+        iyl_live = true;
     }
 
   if (iy)
-    _pop (PAIR_IY);
+    {
+      if (iyh_live && iyl_live)
+        wassertl (0, "Shouldn't push IY if it's wiped out by the return");
+      else if (iyh_live)
+        poppairwithsavedreg (PAIR_IY, IYH_IDX, -1);
+      else if (iyl_live)
+        poppairwithsavedreg (PAIR_IY, IYL_IDX, -1);
+      else
+        _pop (PAIR_IY);
+    }
 
   if (de)
     {
-      if (dInRet && eInRet)
+      if (d_live && e_live)
         wassertl (0, "Shouldn't push DE if it's wiped out by the return");
-      else if (dInRet && !aInRet)
+      else if (d_live && !a_live)
         poppairwithsavedreg (PAIR_DE, D_IDX, A_IDX);
-      else if (dInRet && !hInRet)
+      else if (d_live && !h_live)
         poppairwithsavedreg (PAIR_DE, D_IDX, H_IDX);
-      else if (dInRet && !bInRet)
+      else if (d_live && !b_live)
         poppairwithsavedreg (PAIR_DE, D_IDX, B_IDX);
-      else if (eInRet && !aInRet && !IS_TLCS90) // TLCS-90 has interrupt settings in f, so we can't pop af unless we did push af before.
+      else if (d_live)
+        poppairwithsavedreg (PAIR_DE, D_IDX, -1);
+      else if (e_live && !a_live && !IS_TLCS90) // TLCS-90 has interrupt settings in f, so we can't pop af unless we did push af before.
         {
           /* Only restore D */
           _pop (PAIR_AF);
           emit2 ("ld d, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (eInRet && !aInRet)
+      else if (e_live && !a_live)
         poppairwithsavedreg (PAIR_DE, E_IDX, A_IDX);
-      else if (eInRet && !lInRet)
+      else if (e_live && !l_live)
         poppairwithsavedreg (PAIR_DE, E_IDX, L_IDX);
-      else if (eInRet && !cInRet)
+      else if (e_live && !c_live)
         poppairwithsavedreg (PAIR_DE, E_IDX, C_IDX);
-      else if (dInRet || eInRet)
-        UNIMPLEMENTED;
+      else if (e_live)
+        poppairwithsavedreg (PAIR_DE, E_IDX, -1);
       else
         _pop (PAIR_DE);
     }
 
   if (bc)
     {
-      if (bInRet && cInRet)
+      if (b_live && c_live)
         wassertl (0, "Shouldn't push BC if it's wiped out by the return");
-      else if (bInRet && !aInRet)
+      else if (b_live && !a_live)
         poppairwithsavedreg (PAIR_BC, B_IDX, A_IDX);
-      else if (bInRet && !hInRet)
+      else if (b_live && !h_live)
         poppairwithsavedreg (PAIR_BC, B_IDX, H_IDX);
-      else if (bInRet && !lInRet)
+      else if (b_live && !l_live)
         poppairwithsavedreg (PAIR_BC, B_IDX, L_IDX);
-      else if (cInRet && !aInRet && !IS_TLCS90)
+      else if (b_live)
+        poppairwithsavedreg (PAIR_BC, B_IDX, -1);
+      else if (c_live && !a_live && !IS_TLCS90)
         {
           /* Only restore B */
           _pop (PAIR_AF);
           emit2 ("ld b, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (cInRet && !aInRet)
+      else if (c_live && !a_live)
         poppairwithsavedreg (PAIR_BC, C_IDX, A_IDX);
-      else if (cInRet && !lInRet)
+      else if (c_live && !l_live)
         poppairwithsavedreg (PAIR_BC, C_IDX, L_IDX);
-      else if (cInRet && !hInRet)
+      else if (c_live && !h_live)
         poppairwithsavedreg (PAIR_BC, C_IDX, H_IDX);
-      else if (bInRet || cInRet)
-        UNIMPLEMENTED;
+      else if (c_live)
+        poppairwithsavedreg (PAIR_BC, C_IDX, -1);
       else
         _pop (PAIR_BC);
     }
 
   if (hl)
     {
-      if (hInRet && lInRet)
+      if (h_live && l_live)
         wassertl (0, "Shouldn't push HL if it's wiped out by the return");
-      else if (hInRet && !aInRet)
+      else if (h_live && !a_live)
         poppairwithsavedreg (PAIR_HL, H_IDX, A_IDX);
-      else if (hInRet && !bc && !bInRet)
+      else if (h_live && !bc && !b_live)
         poppairwithsavedreg (PAIR_HL, H_IDX, B_IDX);
-      else if (hInRet && !de && !bInRet)
+      else if (h_live && !de && !d_live)
         poppairwithsavedreg (PAIR_HL, H_IDX, D_IDX);
-      else if (hInRet && !bc && !cInRet)
+      else if (h_live && !bc && !c_live)
         poppairwithsavedreg (PAIR_HL, H_IDX, C_IDX);
-      else if (hInRet && !de && !eInRet)
+      else if (h_live && !de && !e_live)
         poppairwithsavedreg (PAIR_HL, H_IDX, E_IDX);
-      else if (lInRet && !aInRet && !IS_TLCS90)
+      else if (h_live)
+        poppairwithsavedreg (PAIR_HL, H_IDX, -1);
+      else if (l_live && !a_live && !IS_TLCS90)
         {
-          /* Only restore D */
+          /* Only restore H */
           _pop (PAIR_AF);
           emit2 ("ld h, a");
           regalloc_dry_run_cost += 1;
         }
-      else if (lInRet&& !aInRet )
+      else if (l_live&& !a_live )
         poppairwithsavedreg (PAIR_HL, L_IDX, A_IDX);
-      else if (lInRet && !bc && !cInRet )
+      else if (l_live && !bc && !c_live )
         poppairwithsavedreg (PAIR_HL, L_IDX, C_IDX);
-      else if (lInRet && !de && !eInRet )
+      else if (l_live && !de && !e_live )
         poppairwithsavedreg (PAIR_HL, L_IDX, E_IDX);
-      else if (lInRet && !bc && !bInRet )
+      else if (l_live && !bc && !b_live )
         poppairwithsavedreg (PAIR_HL, L_IDX, B_IDX);
-      else if (lInRet && !de && !dInRet )
+      else if (l_live && !de && !d_live )
         poppairwithsavedreg (PAIR_HL, L_IDX, D_IDX);
-      else if (lInRet || hInRet)
-        UNIMPLEMENTED;
+      else if (l_live)
+        poppairwithsavedreg (PAIR_HL, L_IDX, -1);
       else
         _pop (PAIR_HL);
     }
 }
 
 static void
-_saveRegsForCall (const iCode * ic, bool dontsaveIY)
+_saveRegsForCall (const iCode *ic, bool dontsaveIY)
 {
   /* Rules:
      o Stack parameters are pushed before this function enters
@@ -6216,7 +6280,7 @@ genCall (const iCode *ic)
 
   spillCached ();
 
-  restoreRegs (_G.stack.pushedIY, _G.stack.pushedDE, _G.stack.pushedBC, _G.stack.pushedHL, IC_RESULT (ic));
+  restoreRegs (_G.stack.pushedIY, _G.stack.pushedDE, _G.stack.pushedBC, _G.stack.pushedHL, IC_RESULT (ic), ic);
   _G.stack.pushedIY = FALSE;
   _G.stack.pushedDE = FALSE;
   _G.stack.pushedBC = FALSE;
@@ -6258,7 +6322,7 @@ genFunction (const iCode * ic)
   bool bigreturn;
 
   setArea (IFFUNC_NONBANKED (sym->type));
-  wassert (!_G.stack.pushed);
+  _G.stack.pushed = 0;
 
   /* PENDING: Reset the receive offset as it
      doesn't seem to get reset anywhere else.
@@ -6471,7 +6535,7 @@ genEndFunction (iCode *ic)
   bool iy_free = !IY_RESERVED && (!aopRet (sym->type) || aopRet (sym->type)->regs[IYL_IDX] < 0 && aopRet (sym->type)->regs[IYH_IDX] < 0);
 
   wassert (!regalloc_dry_run);
-  //wassertl (!_G.stack.pushed, "Unbalanced stack.");
+  wassertl (!_G.stack.pushed, "Unbalanced stack.");
 
   if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {
@@ -15859,7 +15923,7 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
       _pop (PAIR_HL);
       genMove (IC_RESULT (ic)->aop, ASMOP_HL, true, true, true, true);
 
-      restoreRegs (0, saved_DE, saved_BC, saved_HL, IC_RESULT (ic));
+      restoreRegs (0, saved_DE, saved_BC, saved_HL, IC_RESULT (ic), ic);
     }
 
   if (SomethingReturned)
@@ -15930,7 +15994,7 @@ genBuiltInStrncpy (const iCode *ic, int nparams, operand **pparams)
 
   spillPair (PAIR_HL);
 
-  restoreRegs (0, saved_DE, saved_BC, saved_HL, 0);
+  restoreRegs (0, saved_DE, saved_BC, saved_HL, 0, ic);
 
 done:
   freeAsmop (n, NULL);
@@ -16023,7 +16087,7 @@ genBuiltInStrchr (const iCode *ic, int nParams, operand **pparams)
   if (SomethingReturned)
     commitPair (IC_RESULT (ic)->aop, pair, ic, FALSE);
 
-  restoreRegs (0, saved_DE, saved_BC, saved_HL, SomethingReturned ? IC_RESULT (ic) : 0);
+  restoreRegs (0, saved_DE, saved_BC, saved_HL, SomethingReturned ? IC_RESULT (ic) : 0, ic);
 
   if (SomethingReturned)
     freeAsmop (IC_RESULT (ic), NULL);
@@ -16442,6 +16506,10 @@ genZ80Code (iCode * lic)
       regalloc_dry_run_cost_bytes = 0;
       regalloc_dry_run_cost_states = 0;
       genZ80iCode (ic);
+
+#if 0 // Helpful to debug "Unbalanced stack" errors.
+      printf("After ic %d (op %d): _G.stack.pushed: %d\n", ic->key, ic->op, _G.stack.pushed);
+#endif
 
 #ifdef DEBUG_DRY_COST
       emit2 ("; iCode %d total cost: %d %d %d\n", ic->key, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);

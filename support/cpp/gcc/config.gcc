@@ -3588,8 +3588,7 @@ m32c-*-elf*)
 	cxx_target_objs="m32c-pragma.o"
  	;;
 *)
-	echo "*** Configuration ${target} not supported" 1>&2
-	exit 1
+	echo "*** Configuration ${target} not supported (ignored)" 1>&2
 	;;
 esac
 

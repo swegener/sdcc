@@ -1,3 +1,9 @@
+2022-11-11 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/config.gcc:
+	  Workaround: Ignore "unsupported target"
+	  ... as suggested by Free-PDK in bug #3517.
+
 2022-11-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

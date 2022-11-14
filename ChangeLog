@@ -1,3 +1,8 @@
+2022-11-14 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/pic16/pcodepeep.c:
+	  Fix type mismatches, one of them critical. See [bugs:#3179].
+
 2022-11-11 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/gcc/config.gcc:

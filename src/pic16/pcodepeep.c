@@ -32,7 +32,7 @@
 #include "pcodeflow.h"
 #include "ralloc.h"
 
-pCodeOp *pic16_popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
+pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 
 pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);
 pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *subtype, pCodeOp *subtype2);
@@ -41,7 +41,7 @@ pCode * pic16_findNextInstruction(pCode *pc);
 int pic16_getpCode(char *mnem,int dest);
 int pic16_getpCodePeepCommand(char *cmd);
 void pic16_pBlockMergeLabels(pBlock *pb);
-char *pic16_pCode2str(char *str, int size, pCode *pc);
+char *pic16_pCode2str(char *str, size_t size, pCode *pc);
 //char *pic16_get_op(pCodeOp *pcop,char *buf, size_t buf_size);
 pCodeOp *pic16_popCombine2(pCodeOp *, pCodeOp *, int);
 
@@ -302,14 +302,14 @@ static pCodeOp *cvt_extract_status(const char *reg, char *bit)
   if(len == 1) {
     // check C,Z
     if(toupper((unsigned char)*bit) == 'C')
-      return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_C_BIT));
+      return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status.pcop,PIC_C_BIT));
     if(toupper((unsigned char)*bit) == 'Z')
-      return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_Z_BIT));
+      return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status.pcop,PIC_Z_BIT));
   }
 
   // Check DC
   if(len ==2 && toupper((unsigned char)bit[0]) == 'D' && toupper((unsigned char)bit[1]) == 'C')
-    return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_DC_BIT));
+    return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status.pcop,PIC_DC_BIT));
 
   return NULL;
 

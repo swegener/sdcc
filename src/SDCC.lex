@@ -121,6 +121,10 @@ static void checkCurrFile (const char *s);
   BEGIN (INITIAL);
   return INLINEASM;
 }
+<asm>^{HASH}.*          {
+  count ();
+  checkCurrFile (yytext);
+}
 <asm>\n                 {
   count ();
   dbuf_append_char(&asmbuff, *yytext);

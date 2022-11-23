@@ -1,3 +1,7 @@
+2022-11-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.lex: process #line directive in __asm__ blocks
+
 2022-11-14 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/pic16/pcodepeep.c:

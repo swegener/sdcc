@@ -803,7 +803,8 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
           while (ic);
           if (foundNonlabel && ic)
             {
-              werrorfl (ic->filename, ic->lineno, W_CODE_UNREACH);
+              if (!ic->mergedElsewhere)
+                werrorfl (ic->filename, ic->lineno, W_CODE_UNREACH);
               continue;
             }
         }

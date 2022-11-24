@@ -1,3 +1,9 @@
+2022-11-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClabel.c (labelGotoGoto, labelUnreach),
+	  src/SDCCBBlock.c (iCodeFromeBBlock),
+	  src/SDCCicode.h: fix bug #3501
+
 2022-11-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.lex: process #line directive in __asm__ blocks

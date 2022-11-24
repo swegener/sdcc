@@ -150,6 +150,7 @@ typedef struct iCode
   bool localEscapeAlive:1;      /* At this iCode, a local variable, a pointer to which has escaped (e.g. by having been stored in a global variable, cast to integer, passed to function) might be alive. */
   bool parmEscapeAlive:1;       /* At this iCode, a stack parameter, a pointer to which has escaped (e.g. by having been stored in a global variable, cast to integer, passed to function) might be alive. */
   unsigned inlined:1;           /* from an inlined function */
+  unsigned mergedElsewhere:1;   /* merged into another iCode during optimization */
 
   struct iCode *next;           /* next in chain */
   struct iCode *prev;           /* previous in chain */

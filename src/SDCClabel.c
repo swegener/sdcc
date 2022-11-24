@@ -374,19 +374,27 @@ labelGotoGoto (iCode *ic)
                   IC_FALSE (loop) = repLabel;
                 }
               hTabAddItem (&labelRef, repLabel->key, loop);
+              stat->mergedElsewhere = 1;
+              stat->next->mergedElsewhere = 1;
               change++;
             }
           break;
+
         case JUMPTABLE:
 
-          for (sLabel = setFirstItem (IC_JTLABELS (loop)); sLabel; sLabel = setNextItem (IC_JTLABELS (loop)))
-            if (repLabel = replaceGotoGoto (loop, sLabel, hTabItemWithKey (labelDef, sLabel->key)))
-              {
-                hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
-                replaceSetItem (IC_JTLABELS (loop), sLabel, repLabel);
-                hTabAddItem (&labelRef, repLabel->key, loop);
-                change++;
-              }
+          for (sLabel = setFirstItem (IC_JTLABELS (loop)); sLabel; sLabel = setNextItem (IC_JTLABELS (loop))) 
+            {
+              stat = hTabItemWithKey (labelDef, sLabel->key);
+              if (repLabel = replaceGotoGoto (loop, sLabel, stat))
+                {
+                  hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
+                  replaceSetItem (IC_JTLABELS (loop), sLabel, repLabel);
+                  hTabAddItem (&labelRef, repLabel->key, loop);
+                  stat->mergedElsewhere = 1;
+                  stat->next->mergedElsewhere = 1;
+                  change++;
+                }
+            }
         }
     }
 
@@ -472,6 +480,8 @@ labelUnreach (iCode * ic)
                     hTabDeleteItem (&labelRef, IC_FALSE (tic)->key, tic, DELETE_ITEM, NULL);
                   break;
                 default:
+                  if (tic->mergedElsewhere)
+                    break;
                   werrorfl (tic->filename, tic->lineno, W_CODE_UNREACH);
                 }
             }

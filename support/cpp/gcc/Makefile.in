@@ -1652,9 +1652,9 @@ config.status: $(srcdir)/configure $(srcdir)/config.gcc $(LANG_CONFIGUREFRAGS)
 quickstrap: all
 	cd $(toplevel_builddir) && $(MAKE) all-target-libgcc
 
-all.internal: cc1 cpp # start.encap rest.encap doc selftest
+all.internal: cc1$(exeext) cpp$(exeext) # start.encap rest.encap doc selftest
 # This is what to compile if making a cross-compiler.
-all.cross: cc1 cpp$(exeext) specs
+all.cross: cc1$(exeext) cpp$(exeext) specs
 	# libgcc-support lang.all.cross doc selftest @GENINSRC@ srcextra
 # This is what must be made before installing GCC and converting libraries.
 start.encap: cpp$(exeext) specs \

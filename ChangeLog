@@ -1,5 +1,6 @@
 2022-11-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* support/cpp/gcc/Makefile.in: add missing $(exeext)
 	* support/cpp/gcc/gcc.cc,
 	  support/cpp/gcc/opts.cc,
 	  support/cpp/gcc/opts-common.cc,

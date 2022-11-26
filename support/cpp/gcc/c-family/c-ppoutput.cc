@@ -16,9 +16,6 @@
    along with this program; see the file COPYING3.  If not see
    <http://www.gnu.org/licenses/>.  */
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
 
 #include "config.h"
 #include "system.h"
@@ -28,6 +25,9 @@
 #include "langhooks.h"
 #include "c-pragma.h"		/* For parse_in.  */
 #include "file-prefix-map.h"    /* remap_macro_filename()  */
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
 
 /* Encapsulates state used to convert a stream of tokens into a text
    file.  */

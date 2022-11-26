@@ -1,3 +1,16 @@
+2022-11-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/cpp/gcc/gcc.cc,
+	  support/cpp/gcc/opts.cc,
+	  support/cpp/gcc/opts-common.cc,
+	  support/cpp/gcc/prefix.cc,
+	  support/cpp/gcc/toplev.cc,
+	  support/cpp/libcpp/lex.cc,
+	  support/cpp/libcpp/mkdeps.cc,
+	  support/cpp/gcc/c-family/c-opts.cc,
+	  support/cpp/gcc/c-family/c-ppoutput.cc: move iostream header
+	  last to avoid inconsistent struct offsets and thus segfaults
+
 2022-11-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClabel.c (labelGotoGoto, labelUnreach),

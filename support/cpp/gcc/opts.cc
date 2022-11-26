@@ -18,8 +18,6 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ <<":" << __func__ << "\n" )
 
 #include "config.h"
 #include "system.h"
@@ -37,6 +35,9 @@ along with GCC; see the file COPYING3.  If not see
 #include "diagnostic-color.h"
 #include "version.h"
 #include "selftest.h"
+
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ <<":" << __func__ << "\n" )
 
 // sdcc hack?
 // #include "defaults.h"

@@ -18,10 +18,6 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <map> // BUG?
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
 
 #include "config.h"
 #include "system.h"
@@ -48,6 +44,10 @@ along with GCC; see the file COPYING3.  If not see
 #include "file-prefix-map.h"    /* add_*_prefix_map()  */
 
 // #include "../libcpp/internal.h" // BUG
+#include <map> // BUG?
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
 
 #ifndef DOLLARS_IN_IDENTIFIERS
 # define DOLLARS_IN_IDENTIFIERS true

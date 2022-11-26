@@ -63,9 +63,6 @@ License along with GCC; see the file COPYING3.  If not see
    advapi32.dll.  */
 
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
 
 #include "config.h"
 #include "system.h"
@@ -75,6 +72,10 @@ License along with GCC; see the file COPYING3.  If not see
 #endif
 #include "prefix.h"
 #include "common/common-target.h"
+
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
 
 static const char *std_prefix = PREFIX;
 

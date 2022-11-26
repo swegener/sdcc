@@ -22,9 +22,6 @@ along with GCC; see the file COPYING3.  If not see
    in the proper order, and counts the time used by each.
    Error messages and low-level interface to malloc also handled here.  */
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -78,6 +75,9 @@ along with GCC; see the file COPYING3.  If not see
 //sdcpp #include "ipa-param-manipulation.h"
 #include "dbgcnt.h"
 #include <cassert>
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
 
 //sdcpp
 bool flag_wpa = false;

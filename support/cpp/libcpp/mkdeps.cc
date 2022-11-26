@@ -20,14 +20,14 @@ along with this program; see the file COPYING3.  If not see
  You are forbidden to forbid anyone else to use, share and improve
  what you give them.   Help stamp out software-hoarding!  */
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
 
 #include "config.h"
 #include "system.h"
 #include "mkdeps.h"
 #include "internal.h"
+#include <iostream>
+#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
+          <<":" << __func__ << "\n" )
 
 /* Not set up to just include std::vector et al, here's a simple
    implementation.  */

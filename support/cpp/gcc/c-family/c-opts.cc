@@ -1256,6 +1256,7 @@ c_common_init (void)
      are known.  */
   cpp_init_iconv (parse_in);
 
+#if 0 //sdcpp
   if (version_flag)
     {
       int i;
@@ -1264,6 +1265,7 @@ c_common_init (void)
 	fprintf (stderr, "%02x", executable_checksum[i]);
       putc ('\n', stderr);
     }
+#endif
 
   /* Has to wait until now so that cpplib has its hash table.  */
   init_pragma ();

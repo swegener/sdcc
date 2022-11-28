@@ -67,7 +67,8 @@ C_OBJS = \
   c/c-lang.o \
   $(C_AND_OBJC_OBJS)
 # c-family/stub-objc.o
-c_OBJS = $(C_OBJS) cc1-checksum.o c/gccspec.o
+# cc1-checksum.o 
+c_OBJS = $(C_OBJS) c/gccspec.o
 
 # Use strict warnings for this front end.
 c-warn = $(STRICT_WARN)
@@ -94,10 +95,11 @@ cc1-checksum.cc : build/genchecksum$(build_exeext) checksum-options \
 	  $(srcdir)/../move-if-change cc1-checksum.cc.tmp cc1-checksum.cc; \
 	fi
 
-cc1$(exeext): $(C_OBJS) cc1-checksum.o $(BACKEND) $(LIBDEPS)
+# cc1-checksum.o
+cc1$(exeext): $(C_OBJS) $(BACKEND) $(LIBDEPS)
 	@$(call LINK_PROGRESS,$(INDEX.c),start)
 	$(LLINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ $(C_OBJS) \
-	  cc1-checksum.o $(BACKEND) $(LIBS) $(BACKENDLIBS)
+	  $(BACKEND) $(LIBS) $(BACKENDLIBS)
 	@$(call LINK_PROGRESS,$(INDEX.c),end)
 
 cc1.fda: ../stage1-gcc/cc1$(exeext) ../prev-gcc/$(PERF_DATA)

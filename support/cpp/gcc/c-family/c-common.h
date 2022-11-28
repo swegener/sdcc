@@ -1174,7 +1174,7 @@ extern void c_common_no_more_pch (void);
 extern void c_common_pch_pragma (cpp_reader *pfile, const char *);
 
 /* In *-checksum.c */
-extern const unsigned char executable_checksum[16];
+// sdcpp extern const unsigned char executable_checksum[16];
 
 /* In c-cppbuiltin.cc  */
 extern void builtin_define_std (const char *macro);

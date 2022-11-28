@@ -1,3 +1,13 @@
+2022-11-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/cpp/gcc/Makefile.in,
+	  support/cpp/gcc/cc1_dummies.cc,
+	  support/cpp/gcc/c/Make-lang.in,
+	  support/cpp/gcc/c-family/c-common.h,
+	  support/cpp/gcc/c-family/c-opts.cc: remove some unneeded
+	  compile time executable requirement so cross compile with
+	  mingw can succeed
+
 2022-11-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/cpp/gcc/Makefile.in: add missing $(exeext)

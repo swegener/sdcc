@@ -1,3 +1,9 @@
+2022-11-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/peep.c,
+	  src/pdk/gen.c:
+	  Pdk peephole infrastructure improvements, patch #446 by Konstantin Kim.
+
 2022-11-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: add cc1.exe

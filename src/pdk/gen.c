@@ -1243,21 +1243,12 @@ genMove (asmop *result, asmop *source, bool a_dead, bool p_dead)
 static int
 isLiteralBit (unsigned long lit)
 {
-  unsigned long pw[32] =
-  {
-    1l, 2l, 4l, 8l, 16l, 32l, 64l, 128l,
-    0x100l, 0x200l, 0x400l, 0x800l,
-    0x1000l, 0x2000l, 0x4000l, 0x8000l,
-    0x10000l, 0x20000l, 0x40000l, 0x80000l,
-    0x100000l, 0x200000l, 0x400000l, 0x800000l,
-    0x1000000l, 0x2000000l, 0x4000000l, 0x8000000l,
-    0x10000000l, 0x20000000l, 0x40000000l, 0x80000000l
-  };
-  int idx;
-
-  for (idx = 0; idx < 32; idx++)
-    if (lit == pw[idx])
-      return idx;
+  if (!(lit & (lit-1)))
+    {
+      for (int idx = 0; idx < 32; idx++) // We could make the argument ull, and go all the way to 63, if needed. Currently all uses call this function with just an 8-bit value, though.
+        if (lit == (1ul << idx))
+          return idx;
+    }
   return -1;
 }
 

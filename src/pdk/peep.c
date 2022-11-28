@@ -168,7 +168,7 @@ static bool argIs(const char *arg, const char *what)
 }
 
 static bool
-stm8MightReadFlag(const lineNode *pl, const char *what)
+pdkMightReadFlag(const lineNode *pl, const char *what)
 {
   if (ISINST (pl->line, "push") && argIs (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
     return true;
@@ -188,7 +188,7 @@ pdkMightRead(const lineNode *pl, const char *what)
 {
 //printf("pdkMightRead() for |%s|%s|\n", pl->line, what);
   if (!strcmp(what, "z") || !strcmp(what, "c") || !strcmp(what, "ac") || !strcmp(what, "ov"))
-    return (stm8MightReadFlag(pl, what));
+    return (pdkMightReadFlag(pl, what));
   else if (strcmp(what, "a") && strcmp(what, "p"))
     return true;
 
@@ -247,7 +247,7 @@ pdkMightRead(const lineNode *pl, const char *what)
 }
 
 static bool
-stm8SurelyWritesFlag(const lineNode *pl, const char *what)
+pdkSurelyWritesFlag(const lineNode *pl, const char *what)
 {
   if (ISINST (pl->line, "pop") && argIs (pl->line + 4, "af") || ISINST (pl->line, "popaf"))
     return true;
@@ -296,7 +296,7 @@ static bool
 pdkSurelyWrites(const lineNode *pl, const char *what)
 {
   if (!strcmp(what, "z") || !strcmp(what, "c") || !strcmp(what, "ac") || !strcmp(what, "ov"))
-    return (stm8SurelyWritesFlag(pl, what));
+    return (pdkSurelyWritesFlag(pl, what));
 
   if (ISINST(pl->line, "mov") || ISINST(pl->line, "idxm"))
     return argIs (pl->line + 4, what);
@@ -343,7 +343,7 @@ pdkCondJump(const lineNode *pl)
 static bool
 pdkSurelyReturns(const lineNode *pl)
 {
-  return(ISINST(pl->line, "ret"));
+  return(ISINST(pl->line, "ret") || ISINST(pl->line, "reti") );
 }
 
 /*-----------------------------------------------------------------*/
@@ -441,7 +441,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           return S4O_CONDJMP;
         }
 
-      /* Don't need to check for de, hl since stm8MightRead() does that */
+      /* Don't need to check for de, hl since pdkMightRead() does that */
       if(pdkSurelyReturns(*pl))
         {
           D(("S4O_TERM\n"));

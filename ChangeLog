@@ -1,5 +1,6 @@
 2022-11-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* support/scripts/sdcc.nsi: add cc1.exe
 	* support/cpp/gcc/Makefile.in,
 	  support/cpp/gcc/cc1_dummies.cc,
 	  support/cpp/gcc/c/Make-lang.in,

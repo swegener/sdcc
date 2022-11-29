@@ -22,6 +22,12 @@ along with GCC; see the file COPYING3.  If not see
 #ifndef GCC_SYSTEM_H
 #define GCC_SYSTEM_H
 
+/* A little hack for sdcpp when compiling for Windows */
+#if defined(_WIN32) || defined(_WIN64)
+#define HOST_LACKS_INODE_NUMBERS 1
+#endif
+
+
 /* Define this so that inttypes.h defines the PRI?64 macros even
    when compiling with a C++ compiler.  Define it here so in the
    event inttypes.h gets pulled in by another header it is already

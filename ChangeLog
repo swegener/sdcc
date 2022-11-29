@@ -1,3 +1,8 @@
+2022-11-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/cpp/gcc/system.h: don't try to check inodes when
+	  compiled for Windows
+
 2022-11-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/peep.c,

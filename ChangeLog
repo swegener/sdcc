@@ -1,5 +1,7 @@
 2022-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* support/cpp/gcc/pretty-print.cc: define some console
+	  attribute constants if they are missing
 	* support/cpp/gcc/gcc.cc,
 	  support/cpp/gcc/opts.cc,
 	  support/cpp/gcc/opts-common.cc,

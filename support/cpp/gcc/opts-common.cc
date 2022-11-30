@@ -26,8 +26,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "diagnostic.h"
 #include "spellcheck.h"
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ <<":" << __func__ << "\n" )
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 
 static void prune_options (struct cl_decoded_option **, unsigned int *);

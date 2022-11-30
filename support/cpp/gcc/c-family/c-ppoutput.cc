@@ -25,9 +25,8 @@
 #include "langhooks.h"
 #include "c-pragma.h"		/* For parse_in.  */
 #include "file-prefix-map.h"    /* remap_macro_filename()  */
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
+
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 /* Encapsulates state used to convert a stream of tokens into a text
    file.  */

@@ -1,3 +1,17 @@
+2022-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/cpp/gcc/gcc.cc,
+	  support/cpp/gcc/opts.cc,
+	  support/cpp/gcc/opts-common.cc,
+	  support/cpp/gcc/opts-global.cc,
+	  support/cpp/gcc/prefix.cc,
+	  support/cpp/gcc/toplev.cc,
+	  support/cpp/libcpp/lex.cc,
+	  support/cpp/libcpp/mkdeps.cc,
+	  support/cpp/gcc/c-family/c-opts.cc,
+	  support/cpp/gcc/c-family/c-ppoutput.cc:
+	  Possible fix for bug #3524
+
 2022-11-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/cpp/gcc/system.h: don't try to check inodes when

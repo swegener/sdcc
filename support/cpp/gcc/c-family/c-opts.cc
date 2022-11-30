@@ -44,10 +44,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "file-prefix-map.h"    /* add_*_prefix_map()  */
 
 // #include "../libcpp/internal.h" // BUG
-#include <map> // BUG?
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 #ifndef DOLLARS_IN_IDENTIFIERS
 # define DOLLARS_IN_IDENTIFIERS true

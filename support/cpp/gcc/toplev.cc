@@ -74,10 +74,8 @@ along with GCC; see the file COPYING3.  If not see
 //sdcpp #include "ipa-modref.h"
 //sdcpp #include "ipa-param-manipulation.h"
 #include "dbgcnt.h"
-#include <cassert>
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
+
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 //sdcpp
 bool flag_wpa = false;
@@ -323,7 +321,7 @@ crash_signal (int signo)
       exit (FATAL_EXIT_CODE);
     }
 
-  assert(false); // sdcpp
+  gcc_assert(false); // sdcpp
   internal_error ("%s", strsignal (signo));
 }
 
@@ -1917,7 +1915,7 @@ lang_dependent_init (const char *name)
   input_location = BUILTINS_LOCATION;
   if (lang_hooks.init () == 0)
     return 0;
-  assert(false);
+  gcc_assert(false);
   input_location = save_loc;
 
   if (!flag_wpa)
@@ -2225,7 +2223,7 @@ do_compile (bool no_backend)
 #endif
 
       /* Set up the back-end if requested.  */
-      if (!no_backend) { assert(false);
+      if (!no_backend) { gcc_assert(false);
         // sdcpp backend_init ();
       }
 
@@ -2401,7 +2399,7 @@ toplev::main (int argc, char **argv)
 	 sets the original filename if appropriate (e.g. foo.i -> foo.c)
 	 so we can correctly initialize debug output.  */
       bool no_backend = lang_hooks.post_options (&main_input_filename);
-      assert(no_backend);
+      gcc_assert(no_backend);
 
       process_options (no_backend);
 

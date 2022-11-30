@@ -23,12 +23,8 @@ along with this program; see the file COPYING3.  If not see
 #include "system.h"
 #include "cpplib.h"
 #include "internal.h"
-#include <map>
-#include <iostream>
-#include <cassert>
 
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ \
-          <<":" << __func__ << "\n" )
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 enum spell_type
 {
@@ -2802,7 +2798,7 @@ copy_text_chars (unsigned char *dest, const unsigned char *src, unsigned int len
 
   for (p = src; p != src + len; ++p)
     {
-      assert(*p != '\0');
+      gcc_assert(*p != '\0');
 
       if (*p != '\r')
         {

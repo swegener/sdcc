@@ -18,9 +18,6 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <iostream>
-#define untested() ( std::cerr <<  "@@#\n@@@:"<< __FILE__ << ":"<< __LINE__ <<":" << __func__ << "\n" )
-#include <cassert>
 
 #include "config.h"
 #include "system.h"
@@ -43,6 +40,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "attribs.h"
 #include "asan.h"
 #include "file-prefix-map.h" /* add_*_prefix_map()  */
+
+#define untested() { fprintf (stderr, "@@#\n@@@:%s:%d:%s\n", __FILE__, __LINE__, __func__); }
 
 typedef const char *const_char_p; /* For DEF_VEC_P.  */
 
@@ -287,7 +286,7 @@ set_default_handlers (struct cl_option_handlers *handlers,
 {
   handlers->unknown_option_callback = unknown_option_callback;
   handlers->wrong_lang_callback = complain_wrong_lang;
-  assert(target_option_override_hook);
+  gcc_assert(target_option_override_hook);
   handlers->target_option_override_hook = target_option_override_hook;
   handlers->num_handlers = 3;
   handlers->handlers[0].handler = lang_handle_option;
@@ -315,7 +314,7 @@ decode_options (struct gcc_options *opts, struct gcc_options *opts_set,
 
   lang_mask = initial_lang_mask;
 
-  assert(target_option_override_hook);
+  gcc_assert(target_option_override_hook);
   set_default_handlers (&handlers, target_option_override_hook);
 
   default_options_optimization (opts, opts_set,

@@ -258,7 +258,7 @@ _hc08_genAssemblerPreamble (FILE * of)
         }
       else
         fprintf (of, "\trsp\n");
-      fprintf (of, "\tjsr\t__sdcc_external_startup\n");
+      fprintf (of, "\tjsr\t___sdcc_external_startup\n");
       fprintf (of, "\tbeq\t__sdcc_init_data\n");
       fprintf (of, "\tjmp\t__sdcc_program_startup\n");
       fprintf (of, "__sdcc_init_data:\n");

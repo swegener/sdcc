@@ -42,16 +42,17 @@
 
 #elif defined(__SDCC_mcs51) || defined(__SDCC_z80)
 
-unsigned char _sdcc_external_startup (void) __nonbanked
+unsigned char __sdcc_external_startup (void) __nonbanked
 {
     return 0;
 }
 
 #else
 
-unsigned char _sdcc_external_startup (void)
+unsigned char __sdcc_external_startup (void)
 {
     return 0;
 }
 
 #endif
+

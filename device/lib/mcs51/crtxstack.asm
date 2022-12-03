@@ -43,7 +43,7 @@
 
 __sdcc_init_xstack::
 
-; Need to initialize in GSINIT1 in case the user's __sdcc_external_startup
+; Need to initialize in GSINIT1 in case the user's ___sdcc_external_startup
 ; uses the xstack.
 	
 	mov	__XPAGE,#(__start__xstack >> 8)

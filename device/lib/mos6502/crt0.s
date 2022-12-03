@@ -57,6 +57,8 @@ __sdcc_gs_init_startup:
 ;        ldx     #0x01         ; MSB of stack ptr
 ;        stx     __BASEPTR+1
 
+        jsr	___sdcc_external_startup
+
 __sdcc_init_data:
 ;; initialize DATA
         lda #<s_XINIT

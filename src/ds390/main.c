@@ -380,7 +380,7 @@ _ds390_genInitStartup (FILE *of)
       fprintf (of, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
     }
 
-  fprintf (of, "\tlcall\t__sdcc_external_startup\n");
+  fprintf (of, "\tlcall\t___sdcc_external_startup\n");
   fprintf (of, "\tmov\ta,dpl\n");
   fprintf (of, "\tjz\t__sdcc_init_data\n");
   fprintf (of, "\tljmp\t__sdcc_program_startup\n");

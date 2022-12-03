@@ -228,7 +228,9 @@ L80:
 	
 _astart:
 	ld    sp, #0x0FFA0	; stack
-	
+
+    call ___sdcc_external_startup
+
 	;halt
 	;swi
 	

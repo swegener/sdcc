@@ -61,6 +61,8 @@ init:
 	;; Set stack pointer directly above top of memory.
 	ld	sp,#0x0000
 
+	call	___sdcc_external_startup
+
 	;; Initialise global variables
 	call	gsinit
 	call	_main

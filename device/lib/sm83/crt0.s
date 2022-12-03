@@ -71,6 +71,8 @@ init:
         ;; Set stack pointer directly above top of Work RAM.
         ld      sp,#0xe000
 
+        call	___sdcc_external_startup
+
         ;; Setup global data
         call    gsinit
 

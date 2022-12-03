@@ -33,7 +33,7 @@
 
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
 
-unsigned char _sdcc_external_startup(void)
+unsigned char __sdcc_external_startup(void)
 {
   IE = 0; // Disable all interrupts.
 

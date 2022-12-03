@@ -2742,6 +2742,11 @@ In 4.2.9, support for –pedantic-parse-number and #pragma pedantic_parse_numer
  was dropped.
 \end_layout
 
+\begin_layout Itemize
+In 4.2.10, _sdcc_external_startup was renamed to __sdcc_external_startup and
+ support for it was added to further ports.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -23917,6 +23922,86 @@ and you can use the same hardware dependent routine without changes, as
 \end_layout
 
 \begin_layout Subsection
+__sdcc_external_startup
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sdcc
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+external
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+startup
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When an __sdcc_external_startup function is present, it is executed before
+ the intialization of global variables.
+ This allows to implement functionality that needs to be done early (e.g.
+ disabling a hardware watchdog that would otherwise bite during the time
+ it takes to intialize global variables or a memory check that needs to
+ be done before any memory (other than the return address for __sdcc_external_st
+artup itself) is in use).
+\end_layout
+
+\begin_layout Standard
+For mos6502, z80, z80n, z180, sm83, ez80_z80, tlcs90, r2k, r2ka, r3ka when
+ using a custom crt0, support depends on the custom crt0.
+\end_layout
+
+\begin_layout Subsection
 Preserved register specification
 \end_layout
 
@@ -40169,7 +40254,7 @@ mov _spx,#__start__xstack
 \begin_inset space ~
 \end_inset
 
-lcall __sdcc_external_startup
+lcall ___sdcc_external_startup
 \begin_inset Newline newline
 \end_inset
 
@@ -42279,11 +42364,24 @@ sjmp .
 \begin_layout Standard
 One of these modules (crtstart.asm) contains a call to the C routine 
 \emph on
-_sdcc_external_startup()
+__sdcc_external_startup()
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
 \begin_inset ERT
 status collapsed
 
@@ -42347,7 +42445,7 @@ Runtime library
  main is invoked.
  You could add an 
 \emph on
-_sdcc_external_startup()
+__sdcc_external_startup()
 \emph default
  routine to your program to override the default if you need to setup hardware
  or perform some other critical operation prior to static & global variable
@@ -42518,7 +42616,7 @@ While these initialization modules are meant as generic startup code there
  might be the need for customization.
  Let's assume the return value of 
 \emph on
-_sdcc_external_startup()
+__sdcc_external_startup()
 \emph default
  in 
 \emph on
@@ -42526,7 +42624,7 @@ crtstart.asm
 \emph default
  should not be checked (or 
 \emph on
-_sdcc_external_startup()
+__sdcc_external_startup()
 \emph default
  should not be called at all).
  The recommended way would be to copy 

@@ -109,7 +109,7 @@ pdk_genInitStartup (FILE *of)
       fprintf (of, "\tmov.io\tsp, a\n");
     }
 
-  fprintf (of, "\tcall\t__sdcc_external_startup\n");
+  fprintf (of, "\tcall\t___sdcc_external_startup\n");
   fprintf (of, "\tgoto\ts_GSINIT\n");
 
   tfprintf (of, "\t!area\n", STATIC_NAME);

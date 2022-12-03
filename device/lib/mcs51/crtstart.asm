@@ -45,7 +45,7 @@ __sdcc_gsinit_startup::
 
 	.area GSINIT2 (CODE)
 	
-        lcall   __sdcc_external_startup
+        lcall   ___sdcc_external_startup
         mov     a,dpl
         jz      __sdcc_init_data
         ljmp    __sdcc_program_startup

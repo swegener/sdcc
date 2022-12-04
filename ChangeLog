@@ -1,3 +1,9 @@
+2022-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-3522.c:
+	  Fix bug #3522.
+
 2022-12-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/_startup.c,
@@ -21,7 +27,7 @@
 	  src/pdk/main.c,
 	  src/stm8/main.c,
 	  support/regression/ports/mcs51-common/support.c:
-	  Rename _sdcc_external_startup to __sdcc_external_startup and make it work for all ports.
+	  Rename _sdcc_external_startup to __sdcc_external_startup and make it work for all ports. Fixes bug #3520.
 
 2022-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

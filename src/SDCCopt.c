@@ -733,6 +733,16 @@ extern operand *geniCodeRValue (operand *, bool);
 /* Insert a cast of operand op of ic to type type */
 static void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb)
 {
+  if (IS_OP_LITERAL (op))
+    {
+      operand *newop = operandFromValue (valCastLiteral (type, operandLitValue (op), operandLitValue (op)), false);
+      if (isOperandEqual (op, IC_LEFT (ic)))
+        IC_LEFT (ic) = newop;
+      if (isOperandEqual (op, IC_RIGHT (ic)))
+        IC_RIGHT (ic) = newop;
+      return;
+    }
+            
   iCode *newic = newiCode (CAST, operandFromLink (type), op);
   hTabAddItem (&iCodehTab, newic->key, newic);
 
@@ -2351,10 +2361,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             }
 
           // Insert cast for comparison.
-          if (IS_OP_LITERAL (IC_RIGHT (ic)))
-            IC_RIGHT (ic) = operandFromValue (valCastLiteral (newcountertype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))), false);
-          else
-            prependCast (ic, IC_RIGHT (ic), newcountertype, ebbs[i]);
+          prependCast (ic, IC_RIGHT (ic), newcountertype, ebbs[i]);
 
           // Bonus: Can narrow a multiplication in the loop.
           if (mul)

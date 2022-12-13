@@ -4,6 +4,8 @@
 	  support/regression/tests/muldiv.c.in,
 	  support/regression/tests/onebyte.c.in:
 	  Fix a % sm83 library issue, patch by Job Bolle.
+	* src/stm8/main.c:
+	  Fix __sdcc_external_startup handling for stm8 large memory model.
 
 2022-12-04 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -265,7 +265,7 @@ stm8_genInitStartup (FILE *of)
     }
 
   /* Init static & global variables */
-  fprintf (of, options.model == MODEL_LARGE ? "lcall ___sdcc_external_startup\n" : "call ___sdcc_external_startup\n");
+  fprintf (of, options.model == MODEL_LARGE ? "\tcallf\t___sdcc_external_startup\n" : "\tcall\t___sdcc_external_startup\n");
 
   /* Init static & global variables */
   fprintf (of, "__sdcc_init_data:\n");

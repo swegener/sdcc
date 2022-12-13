@@ -119,6 +119,8 @@ testMod (void)
    cL =  127;  cR =   -5; r16 =  cL %  cR; ASSERT (r16 ==  2);
    r16 = -1;
    cL =  127; ucR =    5; r16 =  cL % ucR; ASSERT (r16 ==  2);
+   r16 = -1;
+   cL =  127; ucR =    6; r16 =  cL % ucR; ASSERT (r16 ==  1);
 
    cL = -128;  cR =    5; r16 =  cL %  cR; ASSERT (r16 == -3);
    r16 = 0;

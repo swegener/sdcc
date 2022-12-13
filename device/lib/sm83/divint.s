@@ -65,20 +65,19 @@ __divuschar:
 	ld	d, #0
 
 	ld	c, a             ; Sign extend
-        rlca
-        sbc     a
-        ld      b,a
+	rlca
+	sbc     a
+	ld      b,a
 
 	jp	.div16
 
 __moduschar:
-	ld	e, a
 	ld	d, #0
 
-        ld      a,c             ; Sign extend
-        rlca
-        sbc     a
-        ld      b,a
+	ld	c, a             ; Sign extend
+	rlca
+	sbc	a
+	ld	b,a
 
 	call	.div16
 
@@ -88,7 +87,7 @@ __moduschar:
 	ret
 
 __divschar:
-        ld      c, a
+	ld	c, a
 
 	call	.div8
 

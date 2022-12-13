@@ -148,6 +148,7 @@ testMod(void)
     i = 100;
     //    LOG(("i%%17 == 15 = %u\n", (int)(i%9)));
     ASSERT(i%17 == 15);
+    ASSERT(i%(unsigned char)19 == 5);
 
     //    LOG(("i%%-7 == 2 = %u\n", (int)i%-7));
     ASSERT(i%-7 == 2);

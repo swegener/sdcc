@@ -27,3 +27,5 @@ void testBug(void)
 	ASSERT (dat2 == 0x5a);
 }
 
+extern uint8_t test(uintptr_t addr) __reentrant;
+

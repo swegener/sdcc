@@ -1,3 +1,9 @@
+2022-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2567.c,
+	  support/regression/tests/bug-2752.c:
+	  Provide external declaration of inline function to pass test-host for non-inlining host compilers.
+
 2022-12-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/sm83/divint.s,

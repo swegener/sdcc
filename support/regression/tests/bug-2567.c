@@ -104,3 +104,5 @@ void testBug(void)
 	build();
 }
 
+extern cv_vmemp tile_at(uint_fast8_t x, uint_fast8_t y);
+

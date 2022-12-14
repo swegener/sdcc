@@ -3,6 +3,9 @@
 	* support/regression/tests/bug-2567.c,
 	  support/regression/tests/bug-2752.c:
 	  Provide external declaration of inline function to pass test-host for non-inlining host compilers.
+	* sdas/aspdk14/pdk14mch.c,
+	  sdas/aspdk15/pdk15mch.c:
+	  Fix bug #3376, patch by Free-PDK.
 
 2022-12-13 Philipp Klaus Krause <pkk AT spth.de>
 

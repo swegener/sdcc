@@ -219,7 +219,7 @@ machine(struct mne *mp)
 
         case S_SWAPC:
               def.mask = 0x7F;
-              eswapc(op, def, /*N offset*/7);
+              eswapc(opWithFlags, def, /*N offset*/7);
               break;
 
         case S_COMP:

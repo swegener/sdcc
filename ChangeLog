@@ -1,3 +1,8 @@
+2022-12-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-941021-1.c:
+	  Remove a test that apparently relies on implementation-defined floating-point rounding behaviour.
+
 2022-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2567.c,

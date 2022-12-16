@@ -1,7 +1,7 @@
 2022-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
-	  A step towards fixing bug #3500.
+	  Fix bug #3500.
 
 2022-12-15 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -2,6 +2,9 @@
 
 	* doc/sdccman.lyx:
 	  Fix bug #3500.
+	* src/stm8/gen.c,
+	  src/pdk/gen.c:
+	  Fix bug #3515.
 
 2022-12-15 Philipp Klaus Krause <pkk AT spth.de>
 

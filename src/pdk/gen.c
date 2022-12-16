@@ -33,7 +33,6 @@ static unsigned int regalloc_dry_run_cycle_scale = 1;
 
 static struct
 {
-  short debugLine;
   struct
     {
       int pushed;
@@ -149,9 +148,9 @@ regDead (int idx, const iCode *ic)
 void
 pdk_emitDebuggerSymbol (const char *debugSym)
 {
-  G.debugLine = 1;
+  genLine.lineElement.isDebug = 1;
   emit2 ("", "%s ==.", debugSym);
-  G.debugLine = 0;
+  genLine.lineElement.isDebug = 0;
 }
 
 /*-----------------------------------------------------------------*/

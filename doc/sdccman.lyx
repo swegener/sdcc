@@ -26524,7 +26524,8 @@ interrupt
 \end_inset
 
  upon entry to a critical function and restore the interrupt enable to the
- previous state before returning.
+ previous state before returning (for architectures where there is no efficient
+ way to do so, interrupts will be unconditionally enabled instead).
  Nesting critical functions will need one additional byte on the stack
 \begin_inset Index idx
 status collapsed

@@ -332,7 +332,8 @@ public:
   double get_xtal(void) { return xtal; }
   double get_xtal_tick(void) { return xtal_tick; }
   void set_xtal(double freq) { xtal= freq; xtal_tick = 1 / freq; }
-
+  virtual double def_xtal(void) { return 11059200; }
+  
   // making objects
   virtual void make_memories(void);
   virtual void make_variables(void);

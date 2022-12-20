@@ -95,7 +95,8 @@ public:
   chars startup_command;
   class cl_mc32 cperiod, ccyc;
   bool quiet;
-  
+  class cl_console_stdout *ocon;
+
 public:
   cl_app(void);
   virtual ~cl_app(void);

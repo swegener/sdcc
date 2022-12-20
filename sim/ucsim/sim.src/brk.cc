@@ -134,10 +134,11 @@ cl_brk::breaking(void)
 {
   class cl_option *o;
   class cl_commander_base *cmd= application->get_commander();
-  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_console);
+  class cl_console_base *con;
   // Execute commands
   if (commands.nempty())
     {
+      con= (cmd==NULL)?NULL:(cmd->frozen_or_actual());
       if (con)
 	{
 	  o= application->options->get_option("echo_script");
@@ -273,15 +274,21 @@ void
 cl_ev_brk::breaking(void)
 {
   class cl_commander_base *cmd= application->get_commander();
-  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_console);
+  class cl_console_base *con;
   class cl_address_space *m= get_mem();
 
-  cl_brk::breaking();
+  con= (cmd==NULL)?NULL:(cmd->frozen_or_actual());
   if (con)
-    con->dd_cprintf("answer",
-		    "Event `%s' at %s[0x%x]\n",
-		    id, m?(m->get_name()):"mem?",
-		    AU(addr));
+    {
+      const char *a, *b;
+      a= id;
+      b= m?(m->get_name()):"mem?";
+      con->dd_cprintf("answer",
+		      "Event `%s' at %s[0x%x]\n",
+		      a/*id*/, b/*m?(m->get_name()):"mem?"*/,
+		      AU(addr));
+    }
+  cl_brk::breaking();
 }
 
 
@@ -466,7 +473,7 @@ cl_display_list::do_display(class cl_console_base *con)
     {
       if (!cmd)
 	return;
-      if ((con= cmd->frozen_console)==NULL)
+      if ((con= cmd->frozen())==NULL)
 	con= cmd->actual_console;
     }
   if (!con)

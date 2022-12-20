@@ -179,8 +179,8 @@ cl_console_base::welcome(void)
         "`show w'.\n"
         "This is free software, and you are welcome to redistribute it\n"
         "under certain conditions; type `show c' for details.\n",
-		(application->quiet)?"":(" " VERSIONSTR),
-		(application->quiet)?"":"1997"
+		(app->quiet)?"":(" " VERSIONSTR),
+		(app->quiet)?"":"1997"
 		);
     }
 }
@@ -747,6 +747,28 @@ cl_console_base::set_cooked(bool new_val)
 }
 
 
+cl_console_stdout::cl_console_stdout(class cl_app *the_app):
+  cl_console_base()
+{
+  f_stdout= mk_io("-", "w");
+  app= the_app;
+}
+
+cl_console_stdout::~cl_console_stdout(void)
+{
+  delete f_stdout;
+}
+
+int
+cl_console_stdout::init(void)
+{
+  cl_console_base::init();
+  set_flag(CONS_NOWELCOME, true);
+  set_interactive(false);
+  return 0;
+}
+
+
 /*
  * Command interpreter
  *____________________________________________________________________________
@@ -766,6 +788,7 @@ cl_commander_base::~cl_commander_base(void)
   cons->free_all();
   delete cons;
   delete cmdset;
+  //delete stdout_console;
 }
 
 void
@@ -815,6 +838,17 @@ cl_commander_base::consoles_prevent_quit(void)
 	r++;
     }
   return r;
+}
+
+
+class cl_console_base *
+cl_commander_base::frozen_or_actual(void)
+{
+  if (frozen_console)
+    {
+      return frozen_console;
+    }
+  return actual_console?actual_console:(app->ocon);
 }
 
 

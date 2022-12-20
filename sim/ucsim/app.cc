@@ -82,6 +82,7 @@ cl_app::~cl_app(void)
   remove_simulator();
   delete commander;
   delete in_files;
+  delete ocon;
   delete options;
 }
 
@@ -97,6 +98,8 @@ cl_app::init(int argc, char *argv[])
   class cl_cmdset *cmdset= new cl_cmdset();
   cmdset->init();
   build_cmdset(cmdset);
+  ocon= new cl_console_stdout(this);
+  ocon->init();
   commander= new cl_commander(this, cmdset/*, sim*/);
   commander->init();
   return(0);
@@ -176,10 +179,11 @@ cl_app::run(void)
 		    done= commander->proc_input();
 		}
 	      sim->step();
-	      if (jaj && commander->frozen_console)
+	      if (jaj) ocon->dd_printf("** %d\n",ccyc.get());
+	      if (jaj && commander->frozen_or_actual())
 		{
-		  sim->uc->print_regs(commander->frozen_console),
-		    commander->frozen_console->dd_printf("\n");
+		  sim->uc->print_regs(commander->frozen_or_actual()),
+		    commander->frozen_or_actual()->dd_printf("\n");
 		}
             }
 	  else
@@ -832,12 +836,7 @@ cl_app::eval(chars expr)
 void
 cl_app::exec(chars line)
 {
-  class cl_console_base *c= commander->frozen_console;
-  if (c == NULL)
-    {
-      c= new cl_console_dummy();
-      c->init();
-    }
+  class cl_console_base *c= commander->frozen_or_actual();
   do
     {
       c->un_redirect();
@@ -862,8 +861,6 @@ cl_app::exec(chars line)
       delete cmdline;
     }
   while (!line.empty());
-  if (c != commander->frozen_console)
-    delete c;
 }
 
 /*
@@ -1054,7 +1051,7 @@ cl_app::mk_options(void)
   options->new_option(o= new cl_float_option(this, "xtal",
 					     "Frequency of XTAL in Hz"));
   o->init();
-  o->set_value(11059200.0);
+  o->set_value(0.0);
 
   options->new_option(o= new cl_string_option(this, "cpu_type",
 					      "Type of controller (-t)"));

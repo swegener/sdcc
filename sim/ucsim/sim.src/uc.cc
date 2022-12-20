@@ -596,13 +596,15 @@ int
 cl_uc::init(void)
 {
   int i;
-
+  double x= 0;
+  
   set_name("controller");
   cl_base::init();
   if (xtal_option->use("xtal"))
-    set_xtal(xtal_option->get_value(xtal));
-  else
-    set_xtal(11059200);
+    x= xtal_option->get_value(xtal);
+  if (x==0)
+    x= def_xtal();
+  set_xtal(x);
   stop_selfjump= false;
   stop_selfjump_option->option->set_value(stop_selfjump);
   analyzer= false;
@@ -970,6 +972,8 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
     cset->add(cmd= new cl_timer_value_cmd("set", 0));
     cmd->init();
     cmd->add_name("value");
+    cset->add(cmd= new cl_timer_list_cmd("list", 0));
+    cmd->init();
     if (!super_cmd) {
       cmdset->add(cmd= new cl_super_cmd("timer", 0, cset));
       cmd->init();
@@ -2687,7 +2691,7 @@ cl_uc::check_errors(void)
 	      class cl_console_base *con;
 	      con= c->actual_console;
 	      if (!con)
-		con= c->frozen_console;
+		con= c->frozen_or_actual();
 	      if (con)
 		{
 		  con->dd_printf("Erroneous instruction: ");
@@ -3491,14 +3495,14 @@ void
 cl_uc::check_events(void)
 {
   int i;
+  if (events->count)
+    sim->stop(resEVENTBREAK);
   for (i= 0; i < events->count; i++)
     {
       class cl_ev_brk *brk=
 	dynamic_cast<class cl_ev_brk *>(events->object_at(i));
       brk->breaking();
     }
-  if (events->count)
-    sim->stop(resEVENTBREAK);
 }
 
 void

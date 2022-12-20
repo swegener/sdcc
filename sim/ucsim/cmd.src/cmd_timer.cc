@@ -358,4 +358,28 @@ CMDHELP(cl_timer_value_cmd,
 	"Set a timer",
 	"")
 
+
+/*
+ * Command: timer list
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_timer_list_cmd)
+{
+  int i;
+  for (i=0; i<uc->counters->count; i++)
+    {
+      class cl_ticker *t= (class cl_ticker *)(uc->counters->at(i));
+      if (t)
+	t->dump(i, con);
+    }
+  return false;
+}
+
+CMDHELP(cl_timer_list_cmd,
+	"timer list",
+	"List all defined timers",
+	"")
+
+
 /* End of cmd.src/cmd_timer.cc */

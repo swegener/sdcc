@@ -62,7 +62,7 @@ cl_pdk::cl_pdk(struct cpu_entry *IType, class cl_sim *asim) : cl_uc(asim) {
 int cl_pdk::init(void) {
   cl_uc::init(); /* Memories now exist */
 
-  set_xtal(8000000);
+  //set_xtal(8000000);
 
   // rom = address_space(MEM_ROM_ID);
   // ram = mem(MEM_XRAM);

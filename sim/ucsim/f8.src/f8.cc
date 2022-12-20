@@ -48,7 +48,7 @@ cl_f8::init(void)
 {
   cl_uc::init();
   fill_def_wrappers(itab);
-  set_xtal(25000000);
+  //set_xtal(25000000);
 
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
   RCV(X); RCV(XH); RCV(XL);

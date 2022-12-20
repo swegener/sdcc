@@ -47,7 +47,7 @@ static int
 con()
 {
   if (!jaj) return 0;
-  c= application->get_commander()->frozen_console;
+  c= application->get_commander()->frozen_or_actual();
   return c!=NULL;
 }
 
@@ -126,7 +126,7 @@ cl_mos6502::init(void)
   cl_uc::init();
   fill_def_wrappers(itab);
 
-  set_xtal(1000000);
+  //set_xtal(1000000);
     
 #define RCV(R) reg_cell_var(&c ## R , &r ## R , "" #R "" , "CPU register " #R "")
   RCV(A);

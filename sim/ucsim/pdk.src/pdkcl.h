@@ -55,6 +55,8 @@ public:
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
 
+  virtual double def_xtal(void) { return 8000000; }
+  
   virtual struct dis_entry *dis_tbl(void);
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);

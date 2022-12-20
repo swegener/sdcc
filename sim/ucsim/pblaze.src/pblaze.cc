@@ -96,7 +96,7 @@ cl_pblaze::init(void)
 
   cl_uc::init(); /* Memories now exist */
 
-  set_xtal(8000000);
+  //set_xtal(8000000);
 
   // loading file with interrupts
   read_interrupt_file();

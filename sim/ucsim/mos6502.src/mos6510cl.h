@@ -44,6 +44,7 @@ class cl_mos8502: public cl_mos6510
  public:
   cl_mos8502(class cl_sim *asim);
   virtual int init(void);
+  virtual double def_xtal(void) { return 2000000; }
 };
 
 

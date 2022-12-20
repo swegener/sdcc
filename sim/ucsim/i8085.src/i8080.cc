@@ -61,7 +61,7 @@ cl_i8080::init(void)
 {
   cl_uc::init();
   fill_def_wrappers(itab);
-  set_xtal(1000000);
+  //set_xtal(1000000);
   class cl_memory_operator *o= make_flag_op();
   cF.append_operator(o);
   

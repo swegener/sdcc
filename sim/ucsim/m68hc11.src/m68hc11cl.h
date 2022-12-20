@@ -76,6 +76,8 @@ public:
   virtual const char *id_string(void);
   virtual void reset(void);
 
+  virtual double def_xtal(void) { return 8000000; }
+  
   virtual int8_t *tick_tab(t_mem code);
   virtual int tickt(t_mem code);
   virtual struct dis_entry *get_dis_entry(t_addr addr);

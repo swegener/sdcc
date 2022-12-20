@@ -89,6 +89,8 @@ public:
   virtual void make_memories(void);
   virtual void setup_ccr(void) {}
   virtual void make_cpu_hw(void);
+
+  virtual double def_xtal(void) { return 8000000; }
   
   virtual int proba(int,t_mem);
   virtual int prob1(int,t_mem) {return 1;}

@@ -90,7 +90,7 @@ int
 cl_mos8502::init(void)
 {
   cl_mos6510::init();
-  set_xtal(2000000);
+  //set_xtal(2000000);
   return 0;
 }
 

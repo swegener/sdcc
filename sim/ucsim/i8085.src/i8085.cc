@@ -58,7 +58,7 @@ cl_i8085::init(void)
 {
   cl_i8080::init();
   fill_def_wrappers(itab);
-  set_xtal(1000000);
+  //set_xtal(1000000);
   return 0;
 }
 

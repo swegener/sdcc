@@ -51,7 +51,6 @@ extern struct cpu_entry cpus_hc08[];
 extern struct cpu_entry cpus_stm8[];
 extern struct cpu_entry cpus_pdk[];
 
-
 #endif
 
 /* End of globals.h */

@@ -48,7 +48,7 @@ cl_simp1516::mk_controller(void)
   type_option.use("cpu_type");
   i= 0;
   if ((typ= type_option.get_value(typ)) == 0)
-    typ= "P1516";
+    typ= "P2223";
   while ((cpus_p1516[i].type_str != NULL) &&
 	 (strcasecmp(typ, cpus_p1516[i].type_str) != 0))
     i++;

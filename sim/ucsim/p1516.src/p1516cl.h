@@ -49,6 +49,17 @@ enum flags
    U= 0x20 // 1:Up  0:Down
   };
 
+
+class cl_pc_write: public cl_memory_operator
+{
+protected:
+  class cl_uc *uc;
+public:
+  cl_pc_write(class cl_memory_cell *acell, class cl_uc *the_uc);
+  virtual t_mem write(t_mem val);
+};
+
+
 class cl_p1516: public cl_uc
 {
 public:
@@ -59,6 +70,7 @@ public:
   cl_address_space *regs;
   class cl_porto *pa, *pb, *pc, *pd;
   class cl_porti *pi, *pj;
+  class cl_memory_chip *rom_chip;
 public:
   //class cl_address_space *rom;
  public:
@@ -70,7 +82,8 @@ public:
   
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
-  virtual int clock_per_cycle(void) { return 4; }
+  virtual int clock_per_cycle(void) { return 1; }
+  virtual double def_xtal(void) { return 25000000; }
   
   virtual struct dis_entry *dis_tbl(void);
   virtual char *disassc(t_addr addr, chars *comment);

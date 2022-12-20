@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /*@1@*/
 
 #include "glob.h"
+#include "pmon.h"
 
 #include "p2223cl.h"
 
@@ -39,6 +40,25 @@ int
 CLP2::init(void)
 {
   cl_p1516::init();
+
+  class cl_memory_chip *chip= rom_chip;
+  t_addr a;
+  t_mem v;
+  int i;
+  i= 0;
+  a= pmon[i++];
+  v= pmon[i++];
+  while ((a!=0xffffffff) || (v!=0xffffffff))
+    {
+      chip->d(a, v);
+      a= pmon[i++];
+      v= pmon[i++];	
+    }
+
+  class cl_f_write *fw= new cl_f_write(&cF);
+  fw->init();
+  cF.append_operator(fw);
+  
   return 0;
 }
   
@@ -312,6 +332,33 @@ CLP2::analyze(t_addr addr)
 }
 
 
+void
+CLP2::print_regs(class cl_console_base *con)
+{
+  int i;
+  con->dd_color("answer");
+  con->dd_printf("  F= 0x%02x  ", F);
+  con->dd_printf("U=%c ", (F&U)?'1':'0');
+  con->dd_printf("P=%c ", (F&P)?'1':'0');
+  con->dd_printf("O=%c ", (F&O)?'1':'0');
+  con->dd_printf("C=%c ", (F&C)?'1':'0');
+  con->dd_printf("Z=%c ", (F&Z)?'1':'0');
+  con->dd_printf("S=%c ", (F&S)?'1':'0');
+  con->dd_printf("\n");
+  for (i= 0; i<16; i++)
+    {
+      if (i<10) con->dd_printf(" ");
+      con->dd_printf("R%d= 0x%08x ", i, R[i]);
+      if (i<10) con->dd_printf(" ");
+      con->dd_printf("[R%d]= 0x%08x", i, rom->get(R[i]));
+      if (i%2)
+	con->dd_printf("\n");
+      else
+	con->dd_printf(" ");
+    }
+  print_disass(PC, con);
+}
+
 bool
 CLP2::cond(t_mem code)
 {
@@ -427,7 +474,7 @@ CLP2::inst_alu_1op(t_mem code)
       RC[d]->W(F);
       break;
     case 0xf: // SETF
-      cF.W(R[d] & 0x7f);
+      cF.W(R[d] & 0x3f);
       break;
     }
   return resGO;
@@ -470,8 +517,6 @@ CLP2::inst_alu(t_mem code)
 	  RC[d]->W(R[d] & op2);
 	  setZSw(R[d]);
 	  return resGO;
-	case 0xb:
-	  return resINV;
 	}
     }
   else
@@ -526,8 +571,11 @@ CLP2::inst_alu(t_mem code)
     case 0xa: // PLUS
       RC[d]->W(R[d]+iop);
       break;
-    case 0xb: //
-      return resINV;
+    case 0xb: // BTST
+      {
+	u32_t r= R[d] & uop;
+	setZSw(r);
+      }
     case 0xc: // TEST
       setZSw(R[d] & uop);
       break;
@@ -573,13 +621,16 @@ CLP2::inst_mem(t_mem code)
       u= !u;
       p= !p;
     }
-  t_addr org= R[a]+offset;
-  t_addr chg, addr;
-  chg= org+(u?+1:-1);
+  t_addr addr, opa= R[a];
+  t_addr opa_chg, base;
+  opa_chg= opa+(u?+1:-1);
+  base= p?opa_chg:opa;
+  t_addr opa_offset= opa+offset;
+  t_addr base_offset= base+offset;
   if (w)
-    addr= p?chg:org;
+    addr= base_offset;
   else
-    addr= org;
+    addr= opa_offset;
   
   if (code & 0x02000000)
     // LD
@@ -589,9 +640,35 @@ CLP2::inst_mem(t_mem code)
     rom->write(addr, R[d]);
   
   if (w)
-    RC[a]->W(chg);
+    RC[a]->W(opa_chg);
   
   return resGO;
+}
+
+int
+CLP2::inst_ext(t_mem code)
+{
+  t_mem cod= (code & 0x000f000)>>16;
+  int d;
+  t_addr addr;
+  switch (cod)
+    {
+    case 0:
+      d= (code & 0x00f00000) >> 20;
+      addr= code&0xffff;
+      if (code & 0x01000000)
+	{
+	  // LD direct
+	  RC[d]->W(rom->read(addr));
+	}
+      else
+	{
+	  // ST direct
+	  rom->write(addr, R[d]);
+	}
+      return resGO;
+    }
+  return resINV;
 }
 
 int
@@ -604,7 +681,7 @@ CLP2::exec_inst(void)
   PC= R[15];
   instPC= PC;
   fe= fetch(&code);
-  tick(1);
+  tick(4);
   R[15]= PC;
   if (fe)
     return(resBREAKPOINT);

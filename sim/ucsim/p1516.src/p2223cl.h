@@ -36,6 +36,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define setZSw(v)  { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; cF.W(F); }
 #define setZSnw(v) { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; }
 
+
+class cl_f_write: public cl_memory_operator
+{
+public:
+  cl_f_write(class cl_memory_cell *acell):
+    cl_memory_operator(acell) {}
+  virtual t_mem write(t_mem val) { return val&0x3f; }
+};
+
+
 class cl_p2223: public cl_p1516
 {
 public:
@@ -47,12 +57,13 @@ public:
   virtual char *disassc(t_addr addr, chars *comment);
   //virtual void analyze_start(void);
   virtual void analyze(t_addr addr);
+  virtual void print_regs(class cl_console_base *con);
 
   virtual bool cond(t_mem code);
   virtual int inst_alu_1op(t_mem code);
   virtual int inst_alu(t_mem code);
   virtual int inst_mem(t_mem code);
-  virtual int inst_ext(t_mem code) { return resINV; }
+  virtual int inst_ext(t_mem code);
   virtual int exec_inst(void);
 };
 

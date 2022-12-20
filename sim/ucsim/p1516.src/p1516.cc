@@ -31,8 +31,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "glob.h"
 #include "portcl.h"
+#include "uartcl.h"
 
 #include "p1516cl.h"
+
+
+cl_pc_write::cl_pc_write(class cl_memory_cell *acell, class cl_uc *the_uc):
+  cl_memory_operator(acell)
+{
+  uc= the_uc;
+}
+
+t_mem
+cl_pc_write::write(t_mem val)
+{
+  uc->set_PC(val);
+  return uc->PC;
+}
 
 
 cl_p1516::cl_p1516(class cl_sim *asim):
@@ -48,6 +63,9 @@ cl_p1516::init(void)
   for (i=0; i<16; i++)
     R[i]= 0;
   reg_cell_var(&cF, &F, "F", "Flag register");
+  class cl_pc_write *pcw= new cl_pc_write(&cPC, this);
+  pcw->init();
+  cPC.append_operator(pcw);
   return 0;
 }
 
@@ -60,6 +78,8 @@ cl_p1516::id_string(void)
 void
 cl_p1516::reset(void)
 {
+  cl_uc::reset();
+  
   PC= R[15]= 0;
   F&= ~(U|P);
 }
@@ -79,19 +99,22 @@ cl_p1516::mk_hw_elements(void)
   add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
   
-  add_hw(pa= new cl_porto(this, 0xf000, "pa"));
+  add_hw(pa= new cl_porto(this, 0xff00, "pa"));
   pa->init();
-  add_hw(pb= new cl_porto(this, 0xf001, "pb"));
+  add_hw(pb= new cl_porto(this, 0xff01, "pb"));
   pb->init();
-  add_hw(pc= new cl_porto(this, 0xf002, "pc"));
+  add_hw(pc= new cl_porto(this, 0xff02, "pc"));
   pc->init();
-  add_hw(pd= new cl_porto(this, 0xf003, "pd"));
+  add_hw(pd= new cl_porto(this, 0xff03, "pd"));
   pd->init();
 
-  add_hw(pi= new cl_porti(this, 0xe000, "pi"));
+  add_hw(pi= new cl_porti(this, 0xff20, "pi"));
   pi->init();
-  add_hw(pj= new cl_porti(this, 0xd000, "pj"));
+  add_hw(pj= new cl_porti(this, 0xff10, "pj"));
   pj->init();
+
+  add_hw(h= new cl_uart(this, 0, 0xff40));
+  h->init();
 
   class cl_port_ui *u= new cl_port_ui(this, 0, "dport");
   u->init();
@@ -171,17 +194,22 @@ cl_p1516::make_memories(void)
   class cl_address_space *as;
   int i;
   
-  rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x10000, 32);
+  rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x20000, 32);
   as->init();
   address_spaces->add(as);
 
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_chip32("rom_chip", 0xd000, 32);
+  chip= new cl_chip32("rom_chip", 0x10000, 32, 0);
   chip->init();
   memchips->add(chip);
-  ad= new cl_address_decoder(as= rom, chip, 0, 0xcfff, 0);
+  rom_chip= chip;
+  ad= new cl_address_decoder(as= rom, chip, 0, 0xfeff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+  ad= new cl_address_decoder(as= rom, chip, 0x10000, 0x1ffff, 0x10000);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -367,10 +395,10 @@ cl_p1516::print_regs(class cl_console_base *con)
   int i;
   con->dd_color("answer");
   con->dd_printf("  F= 0x%x  ", F);
-  con->dd_printf("S=%c ", (F&S)?'1':'0');
+  con->dd_printf("O=%c ", (F&O)?'1':'0');
   con->dd_printf("C=%c ", (F&C)?'1':'0');
   con->dd_printf("Z=%c ", (F&Z)?'1':'0');
-  con->dd_printf("O=%c ", (F&O)?'1':'0');
+  con->dd_printf("S=%c ", (F&S)?'1':'0');
   con->dd_printf("\n");
   for (i= 0; i<16; i++)
     {
@@ -415,7 +443,7 @@ cl_p1516::inst_ad(t_mem ra, t_mem rb, u32_t c)
   u64_t big;
   u32_t rd;
   
-  big= ra + rb + c;
+  big= (u64_t)ra + (u64_t)rb + (u64_t)c;
   F&= ~(C|S|Z|O);
   if (big > 0xffffffff)
     F|= C;
@@ -519,7 +547,7 @@ cl_p1516::inst_alu(t_mem code)
       SET_S(R[d] & 0x80000000);
       break;
     case 19: // MUH
-      big= R[a] * R[b];
+      big= (u64_t)R[a] * (u64_t)R[b];
       RC[d]->W(big >> 32);
       SET_Z(R[d]);
       SET_S(R[d] & 0x80000000);

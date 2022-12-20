@@ -40,5 +40,13 @@ cl_f8::TRAP(t_mem code)
   return resHALT;
 }
 
+// TODO: ?
+int
+cl_f8::THRD(t_mem code)
+{
+  acc8->W(0);
+  return resGO;
+}
+
 
 /* End of f8.src/inst.cc */

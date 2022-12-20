@@ -145,7 +145,7 @@ cl_f8::disassc(t_addr addr, chars *comment)
   struct dis_entry *de;
   int i, prefs= P_NONE;
   bool first;
-  u8_t /*h,*/ l, /*r,*/ code;
+  u8_t h, l, /*r,*/ code;
   u16_t a, nn;
   i16_t d;
   
@@ -213,6 +213,17 @@ cl_f8::disassc(t_addr addr, chars *comment)
 	      word->appendf("0x%04x", a);
 	      comment->appendf("; [0x%04x]= 0x%04x", a, read_addr(rom, a));
 	    }
+	  if (strstr(fmt.c_str(), "a16_b") == fmt.c_str())
+	    {
+	      char bc= fmt.c_str()[5];
+	      int b= 0;
+	      if (bc && bc>='0' && bc<='7') b= bc-'0';
+	      a= read_addr(rom, addr+1);
+	      word->appendf("0x%04x", a);
+	      l= rom->read(a);
+	      h= l&(1<<b);
+	      comment->appendf("; [0x%04x]= 0x%02x.%d=%d", a, l, b, h?1:0);
+	    }
 	  if (strcmp(fmt.c_str(), "nsp_8") == 0)
 	    {
 	      l= rom->read(addr+1);
@@ -244,6 +255,13 @@ cl_f8::disassc(t_addr addr, chars *comment)
 	      a&= 0xffff;
 	      word->appendf("0x%04x,z", nn);
 	      comment->appendf("; [0x%04x]= 0x%04x", a, read_addr(rom,a));
+	    }
+	  if (strcmp(fmt.c_str(), "z_8") == 0)
+	    {
+	      a= rZ;
+	      a&= 0xffff;
+	      word->appendf("z");
+	      comment->appendf("; [0x%04x]= 0x%02x", a, rom->read(a));
 	    }
 	  if (strcmp(fmt.c_str(), "z_16") == 0)
 	    {
@@ -340,6 +358,13 @@ cl_f8::disassc(t_addr addr, chars *comment)
 	      d= rom->read(addr+1);
 	      if (d&0x80) d|= 0xff00;
 	      word->appendf("%+d", d);
+	      break;
+
+	    case 'r':
+	      d= rom->read(addr+1);
+	      if (d&0x80) d|= 0xff00;
+	      a= addr+2+d;
+	      word->appendf("0x%04x", a);
 	      break;
 	      
 	    }

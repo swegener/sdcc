@@ -70,9 +70,9 @@ cl_f8::ld8_a_r(class cl_cell8 &r)
 }
 
 int
-cl_f8::LD8_YL_I(t_mem code)
+cl_f8::LD8_YH_I(t_mem code)
 {
-  cYL.W(fetch());
+  cYH.W(fetch());
   return resGO;
 }
 
@@ -398,6 +398,26 @@ int
 cl_f8::CLRW_A(t_mem code)
 {
   acc16->write(0);
+  return resGO;
+}
+
+int
+cl_f8::xchb(int b)
+{
+  b&= 7;
+  u8_t mask= 1<<b;
+  class cl_cell8 &c= m_mm();
+  u8_t t= c.R(), a= acc8->get();
+  u8_t mbit= t&mask;
+  vc.rd++;
+  t&= ~mask;
+  if (a & 1) t|= mask;
+  acc8->W(mbit?1:0);
+  c.write(t);
+  rF&= ~flagZ;
+  if (!mbit) rF|= flagZ;
+  cF.W(rF);
+  vc.wr++;
   return resGO;
 }
 

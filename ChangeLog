@@ -1,3 +1,9 @@
+2022-12-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/cpp/gcc/configure.ac,
+	  support/cpp/gcc/configure: disable some assembler and
+	  target tests unneeded for the preprocessor
+
 2022-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

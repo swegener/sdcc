@@ -85,7 +85,7 @@ cl_mos6502::branch(bool cond)
   if (cond)
     {
       a= PC+rel;
-      if ((PC&0xff00) != (a&0xff00))
+      if ((u16_t)(PC&0xff00) != (u16_t)(a&0xff00))
 	tick(1);
       PC= a;
       tick(1);

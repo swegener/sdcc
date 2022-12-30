@@ -250,7 +250,7 @@ CMDHELP(cl_tick_cmd,
 COMMAND_DO_WORK_UC(cl_dump_cmd)
 {
   class cl_memory *mem= uc->rom;
-  t_addr start = -1, end = -1;
+  /*t_addr*/long long int start = -1, end = -1;
   long bpl= -1;
 
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -351,6 +351,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
     mem  = params[0]->value.memory.memory;
     start= params[1]->value.address;
+    end  = start+64;
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
     mem  = params[0]->value.memory.memory;
@@ -368,6 +369,8 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
     return false;
   }
 
+  if (!mem)
+    return false;
   switch (fmt)
     {
     case 0: // default
@@ -855,7 +858,8 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
 				 cmdline->param(3),
 				 cmdline->param(4) };
   class cl_memory *m= NULL;
-  t_addr addr= -1;
+  t_addr addr;
+  bool addr_set= false;
   int bitnr_low= -1;
   int bitnr_high= -1;
 
@@ -863,6 +867,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     {
       m= params[1]->value.memory.memory;
       addr= params[2]->value.address;
+      addr_set= true;
       bitnr_low= bitnr_high= params[3]->value.number;
       bitnr_high= params[4]->value.number;
     }
@@ -870,23 +875,27 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     {
       m= params[1]->value.memory.memory;
       addr= params[2]->value.address;
+      addr_set= true;
       bitnr_low= bitnr_high= params[3]->value.number;
     }
   else if (cmdline->syntax_match(uc, STRING MEMORY ADDRESS))
     {
       m= params[1]->value.memory.memory;
       addr= params[2]->value.address;
+      addr_set= true;
     }
   else if (cmdline->syntax_match(uc, STRING BIT))
     {
       m= params[1]->value.bit.mem;
       addr= params[1]->value.bit.mem_address;
+      addr_set= true;
       bitnr_low= params[1]->value.bit.bitnr_low;
       bitnr_high= params[1]->value.bit.bitnr_high;
     }
   else if (cmdline->syntax_match(uc, STRING CELL))
     {
       m= uc->address_space(params[1]->value.cell, &addr);
+      addr_set= true;
     }
   else if (cmdline->syntax_match(uc, STRING))
     {
@@ -899,13 +908,15 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
       false;
   
   if (m)
-    if (!m->is_address_space())
-      return con->dd_printf("%s is not address space\n", m->get_name()),
-	false;
-  if (addr > 0)
-    if (!m->valid_address(addr))
-      return con->dd_printf("invalid address\n"),
-	false;
+    {
+      if (!m->is_address_space())
+	return con->dd_printf("%s is not address space\n", m->get_name()),
+	  false;
+      if (addr_set)
+	if (!m->valid_address(addr))
+	  return con->dd_printf("invalid address\n"),
+	    false;
+    }
   if (bitnr_low >= (int)sizeof(t_mem)*8 ||
       bitnr_high >= (int)sizeof(t_mem)*8)
     return con->dd_printf("max bit number is %d\n", (int)sizeof(t_mem)*8),
@@ -921,18 +932,23 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     {
       if (bitnr_low < 0)
 	{
-	  if (addr < 0)
+	  if (!addr_set)
 	    {
 	      t_index i;
 	      for (addr= 0; addr < uc->variables->get_size(); addr++)
-		if (!uc->vars->by_addr.search(uc->variables, addr, i))
-		  break;
+		{
+		  if (!uc->vars->by_addr.search(uc->variables, addr, i))
+		    {
+		      addr_set= true;
+		      break;
+		    }
+		}
 	      if (addr == uc->variables->get_size())
 		return con->dd_printf("no space\n"),
 		  false;
 	    }
 	  if (!uc->variables->valid_address(addr))
-	    return con->dd_printf("out of range\n"),
+	    return con->dd_printf("out of range 0x%x\n", AU(addr)),
 	      false;
           v= uc->vars->add(params[0]->value.string.string,
 			   uc->variables, addr, bitnr_high, bitnr_low, "");

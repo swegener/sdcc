@@ -472,7 +472,9 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
       if (m->is_address_space())
 	as= (cl_address_space *)m;
     }
-
+  if (!c && !as)
+    return false;
+  
   if (!c)
     c= as->get_cell(a);
   con->dd_printf("%s", as?(as->get_name()):"-");

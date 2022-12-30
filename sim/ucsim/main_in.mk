@@ -34,8 +34,8 @@ LDFLAGS		= @LDFLAGS@
 
 EXEEXT		= @EXEEXT@
 
-LIB_LIST	= sim ucsimutil guiucsim cmd ucsimutil sim
-UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST)) @LIBS@
+LIB_LIST	= sim ucsimutil guiucsim cmd sim
+UCSIM_LIBS	= -Wl,--start-group $(patsubst %,-l%,$(LIB_LIST)) @LIBS@ -Wl,--end-group
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
 
 RELAY_LIBS	= $(patsubst %,-l%,ucsimutil) @LIBS@
@@ -68,7 +68,8 @@ RELAY_OBJECTS	= relay.o
 RELAY_SOURCES	= $(patsubst %.o,%.cc,$(RELAY_OBJECTS))
 ALL_SOURCES	= $(SOURCES) $(UCSIM_SOURCES) $(RELAY_SSOURCES)
 
-enable_ucsim	= @enable_ucsim@
+enable_ucsim	= yes
+#@enable_ucsim@
 
 
 # Compiling entire program or any subproject

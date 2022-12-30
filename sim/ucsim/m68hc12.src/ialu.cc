@@ -545,7 +545,7 @@ CL12::mem(void)
   else
     g= g2;
   if (((s1 == 0) || (g1 > 0xff)) && (!d12n))
-    g= g;
+    /*g= g*/;
   else
     g= g1;
   rom->write(rY, g);

@@ -100,7 +100,7 @@ CLP2::disassc(t_addr addr, chars *comment)
   work= "";
   
   data= (code&0xf0000000)>>28;
-  if ((dis_tbl()[i].branch == 'M'))
+  if (dis_tbl()[i].branch == 'M')
     work.append("   ");
   else
     {
@@ -536,7 +536,7 @@ CLP2::inst_alu(t_mem code)
 	case 3: // SEXD
 	  op2= 0;
 	  if (R[b] & 0x80000000)
-	    op2= -1;
+	    op2= 0xffffffff;
 	  RC[d]->W(op2);
 	  return resGO;
 	case 0xf: // AND

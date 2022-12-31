@@ -1,3 +1,12 @@
+2022-12-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClabel.c (labelUnreach, deleteIfx),
+	  src/SDCCcse.c (ifxOptimize): disable conditional flow change and
+	  unreachable code warnings within function inlining
+	* src/SDCClabel.c (labelJumptable,iCodeLabelOptimize),
+	  src/SDCCcse.c (cseBBlock): optimize jump tables
+	* src/SDCClabel.c (labelUnreach): clean up dead code def/use info
+
 2022-12-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/cpp/gcc/configure.ac,

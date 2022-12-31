@@ -101,7 +101,8 @@ labelGotoNext (iCode * ic)
 static void
 deleteIfx (iCode * loop, int key)
 {
-  werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
+  if (!loop->inlined)
+    werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
   hTabDeleteItem (&labelRef, key, loop, DELETE_ITEM, NULL);
 
   /* If the condition was volatile, convert IFX to */
@@ -302,6 +303,51 @@ labelIfx (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* labelJumptable - eliminate or simplify jump tables              */
+/*-----------------------------------------------------------------*/
+int 
+labelJumptable (iCode * ic)
+{
+  iCode *loop;
+  int change = 0;
+
+  for (loop = ic; loop; loop = loop->next)
+    {
+      /* Jump table with constant can be replace with GOTO */
+      if (loop->op == JUMPTABLE &&
+          isOperandLiteral (IC_JTCOND (loop)))
+        {
+          symbol *lbl, *caselbl = NULL;
+          int casenum, constcasenum;
+          
+          constcasenum = operandLitValue (IC_JTCOND (loop));
+          if (!loop->inlined)
+            werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
+
+          /* Delete all the references except for the one that we keep */
+          for (casenum = 0, lbl = setFirstItem (IC_JTLABELS (loop)); lbl;
+               casenum++, lbl = setNextItem (IC_JTLABELS (loop)))
+            {
+              if (constcasenum == casenum)
+                caselbl = lbl; /* keep this reference, remember this label */
+              else
+                hTabDeleteItem (&labelRef, lbl->key, loop, DELETE_ITEM, NULL);
+            }
+          
+          loop->op = GOTO;
+          loop->label = caselbl;
+          IC_LEFT (loop) = NULL;
+          IC_RIGHT (loop) = NULL;
+          IC_RESULT (loop) = NULL;
+          change++;
+        }
+      
+    }
+
+  return change;
+}
+
+/*-----------------------------------------------------------------*/
 /* replaceGotoGoto - find new target for jump                      */
 /* if we have a target statement then check if the next            */
 /* one is a goto: this means target of goto is a goto              */
@@ -466,6 +512,9 @@ labelUnreach (iCode * ic)
           /* throw away those in between */
           for (tic = loop->next; tic && tic != loop2; tic = tic->next)
             {
+              symbol *lbl;
+              if (tic->op != GOTO && !tic->inlined && !tic->mergedElsewhere)
+                werrorfl (tic->filename, tic->lineno, W_CODE_UNREACH);
               /* remove label references if any */
               switch (tic->op)
                 {
@@ -473,16 +522,37 @@ labelUnreach (iCode * ic)
                   hTabDeleteItem (&labelRef, IC_LABEL (tic)->key, tic, DELETE_ITEM, NULL);
                   break;
                 case IFX:
-                  werrorfl (tic->filename, tic->lineno, W_CODE_UNREACH);
                   if (IC_TRUE (tic))
                     hTabDeleteItem (&labelRef, IC_TRUE (tic)->key, tic, DELETE_ITEM, NULL);
                   else
                     hTabDeleteItem (&labelRef, IC_FALSE (tic)->key, tic, DELETE_ITEM, NULL);
+                  if (IS_SYMOP (IC_COND (tic)) && OP_USES (IC_COND (tic)))
+                    bitVectUnSetBit (OP_USES (IC_COND (tic)), tic->key);
+                  break;
+                case JUMPTABLE:
+                  for (lbl = setFirstItem (IC_JTLABELS (tic)); lbl;
+                       lbl = setNextItem (IC_JTLABELS (tic)))
+                    {
+                      hTabDeleteItem (&labelRef, lbl->key, tic, DELETE_ITEM, NULL);
+                    }
+                  if (IS_SYMOP (IC_JTCOND (tic)) && OP_USES (IC_JTCOND (tic)))
+                    bitVectUnSetBit (OP_USES (IC_JTCOND (tic)), tic->key);
                   break;
                 default:
-                  if (tic->mergedElsewhere)
-                    break;
-                  werrorfl (tic->filename, tic->lineno, W_CODE_UNREACH);
+                  if (IS_SYMOP (IC_LEFT (tic)) && OP_USES (IC_LEFT (tic)))
+                    bitVectUnSetBit (OP_USES (IC_LEFT (tic)), tic->key);
+                  if (IS_SYMOP (IC_RIGHT (tic)) && OP_USES (IC_RIGHT (tic)))
+                    bitVectUnSetBit (OP_USES (IC_RIGHT (tic)), tic->key);
+                  if (POINTER_SET (tic))
+                    {
+                      if (IS_SYMOP (IC_RESULT (tic)) && OP_USES (IC_RESULT (tic)))
+                        bitVectUnSetBit (OP_DEFS (IC_RESULT (tic)), tic->key);
+                    }
+                  else
+                    {
+                      if (IS_SYMOP (IC_RESULT (tic)) && OP_DEFS (IC_RESULT (tic)))
+                        bitVectUnSetBit (OP_DEFS (IC_RESULT (tic)), tic->key);
+                    }
                 }
             }
 
@@ -525,6 +595,8 @@ iCodeLabelOptimize (iCode * ic)
 
       if (optimize.label2)
         change += labelIfx (ic);
+      if (optimize.label2)
+        change += labelJumptable (ic);
 
       /* target of a goto is a goto then rename this goto */
       if (optimize.label3)

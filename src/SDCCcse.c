@@ -1773,7 +1773,8 @@ ifxOptimize (iCode * ic, set * cseSet,
       /* too often, if it does happen then the user pays */
       /* the price */
       computeControlFlow (ebbi);
-      werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
+      if (!ic->inlined)
+        werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
       return;
     }
 
@@ -1784,7 +1785,8 @@ ifxOptimize (iCode * ic, set * cseSet,
   if (elementsInSet (ebb->succList) == 1 &&
       isinSet (ebb->succList, eBBWithEntryLabel (ebbi, label)))
     {
-      werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
+      if (!ic->inlined)
+        werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
       if (IS_OP_VOLATILE (IC_COND (ic)))
         {
           IC_RIGHT (ic) = IC_COND (ic);
@@ -2287,10 +2289,21 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         {
           if (IS_SYMOP (IC_JTCOND (ic)))
             {
-              OP_USES(IC_JTCOND (ic)) =
-                bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
-              setUsesDefs (IC_JTCOND (ic), ebb->defSet,
-                           ebb->outDefs, &ebb->usesDefs);
+              pdop = NULL;
+              applyToSetFTrue (cseSet, findCheaperOp, IC_JTCOND (ic), &pdop, true);
+              if (pdop)
+                {
+                  ReplaceOpWithCheaperOp (&IC_JTCOND (ic), pdop);
+                  change = 1;
+                }
+              /* recheck since this may no longer be a symbol */
+              if (IS_SYMOP (IC_JTCOND (ic)))
+                {
+                  OP_USES(IC_JTCOND (ic)) =
+                    bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
+                  setUsesDefs (IC_JTCOND (ic), ebb->defSet,
+                               ebb->outDefs, &ebb->usesDefs);
+                }
             }
           continue;
         }

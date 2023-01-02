@@ -2732,8 +2732,8 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
     default:
       return tree;
     }
-  tree->decorated = 0;
   tree = newNode (CAST, newAst_LINK (newlink), tree);
+  tree->decorated = 0;
   tree->filename = tree->right->filename;
   tree->lineno = tree->right->lineno;
   /* keep unsigned type during cast to smaller type,

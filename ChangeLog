@@ -1,3 +1,9 @@
+2022-01-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-3504.c:
+	  Fix bug #3504.
+
 2022-12-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClabel.c (labelUnreach, deleteIfx),

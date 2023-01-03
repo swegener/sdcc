@@ -2,6 +2,10 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
 Type of microcontroller: Z80N
 Controller has 4 hardware element(s).
    on cpu[0]
@@ -16,17 +20,17 @@ SP limit= 0xf000
 SP= 0xffff -> 0041 58fc c98b bc95 6b72 266b c55e af85 8cd8 65df a8d9 9fa6
 0x0000  ? 41          LD     B,C[0K
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x00ffff    65536 in_chip (8,%02x,0x%04lx)
-  0x000000-0x00ffff    65536 out_chip (8,%02x,0x%04lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 in_chip (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 out_chip (8,%02x,0x%04x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x00ffff    65536 inputs (8,%02x,0x%04lx)
-  0x000000-0x00ffff    65536 outputs (8,%02x,0x%04lx)
-  0x000000-0x000011       18 regs8 (8,%02x,0x%02lx)
-  0x000000-0x00000a       11 regs16 (16,%04x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 inputs (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 outputs (8,%02x,0x%04x)
+  0x000000-0x000011       18 regs8 (8,%02x,0x%02x)
+  0x000000-0x00000a       11 regs16 (16,%04x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated

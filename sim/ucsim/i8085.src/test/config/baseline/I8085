@@ -2,23 +2,29 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-Type of microcontroller: i8080
-Controller has 2 hardware element(s).
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: i8085
+Controller has 4 hardware element(s).
+   on cpu[0]
    on simif[0]
   off vcd[0]
-SZ-A-P-C  Flags= 0x43  67 C  A= 0x12  18 .
-01000011
-BC= 0x8615 [BC]= 0xb0 176 .
-DE= 0x78a3 [DE]= 0x21  33 !
-HL= 0x60e0 [HL]= 0x3e  62 >
-SP= 0x5233 -> 9b2c bdf2 e8f4 0895 a564 c86d e217 940b d99b 7000 0777 9c3c
-0x0000  ? 41 MOV    B,C[0K
+   on dreg[0]
+SZXA-PVC  Flags= 0x04   4 .  A= 0x17  23 .
+00000100
+BC= 0x53b7 [BC]= 0x49  73 I
+DE= 0x2d70 [DE]= 0xcc 204 .
+HL= 0xad1f [HL]= 0x5b  91 [
+SP= 0xd472 -> 2003 cbd0 baba fe76 13ea 2f0a 47e0 3a1e 7dda a900 c23b 9d1f
+0x0000  ? 41       MOV    B,C[0K
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated

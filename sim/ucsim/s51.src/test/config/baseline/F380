@@ -2,6 +2,10 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
 Type of microcontroller: F380 CMOS cmos
 Controller has 15 hardware element(s).
    on cpu[0]
@@ -27,21 +31,21 @@ SP 0x07 -> 6b 95 bc 8b c9 fc 58 41
    DPTR= 0x0000 @DPTR= 0x83 131 .
 0x0000  ? ff       MOV    R7,A[0K
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 sfr_0_chip (8,%02x,0x%02lx)
-  0x000000-0x00007f      128 sfr_f_chip (8,%02x,0x%02lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_0_chip (8,%02x,0x%02x)
+  0x000000-0x00007f      128 sfr_f_chip (8,%02x,0x%02x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram (8,%02x,0x%02lx)
-  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
-  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
-  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000001        2 dptr (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000001        2 dptr (8,%02x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated

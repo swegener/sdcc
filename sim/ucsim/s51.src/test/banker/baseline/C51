@@ -2,24 +2,28 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
 # There are four banks of registers available. Which bank is
 # currently in use is selected via two bits in sfr[0xd0]
 info mem
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 iram (8,%02x,0x%02lx)
-  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
-  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
-  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -41,7 +45,7 @@ Address decoders:
 memory cell sfr[0xd0]
 sfr[0xd0] sfr_0000d0
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[80]
+  decoded to sfr_chip[10]
 Operators:
   [0] bank_switcher
 
@@ -86,20 +90,20 @@ set mem bank 1
 # and check the state
 info mem
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 iram (8,%02x,0x%02lx)
-  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
-  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
-  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -127,20 +131,20 @@ set mem bank 2
 0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
 info mem
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 iram (8,%02x,0x%02lx)
-  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
-  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
-  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
@@ -162,20 +166,20 @@ set mem bank 3
 0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
 info mem
 Memory chips:
-  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04lx)
-  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02lx)
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
 Address spaces:
-  0x000000-0x0000ff      256 variables (32,%08x,0x%02lx)
-  0x000000-0x00ffff    65536 rom (8,%02x,0x%04lx)
-  0x000000-0x00007f      128 iram (8,%02x,0x%02lx)
-  0x000080-0x0000ff      128 sfr (8,%02x,0x%02lx)
-  0x000000-0x00ffff    65536 xram (8,%02x,0x%04lx)
-  0x000000-0x000007        8 regs (8,%02x,0x%01lx)
-  0x000000-0x0000ff      256 bits (1,%01x,0x%02lx)
-  0x000000-0x000003        4 dptr (8,%02x,0x%01lx)
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated

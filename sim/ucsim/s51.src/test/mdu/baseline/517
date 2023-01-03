@@ -2,6 +2,10 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
 # Test of the 8xC5x7 MDU
 
 # MDU is mapped at sfr 0xe9 to 0xef
@@ -12,43 +16,43 @@ dump sfr 0xe9 0xef
 memory cell sfr 0xe9
 sfr[0xe9] sfr_0000e9
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[105]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xea
 sfr[0xea] sfr_0000ea
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[106]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xeb
 sfr[0xeb] sfr_0000eb
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[107]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xec
 sfr[0xec] sfr_0000ec
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[108]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xed
 sfr[0xed] sfr_0000ed
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[109]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xee
 sfr[0xee] sfr_0000ee
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[110]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 memory cell sfr 0xef
 sfr[0xef] sfr_0000ef
 cell width=8 mask=ff flags=0
-  decoded to sfr_chip[111]
+  decoded to sfr_chip[13]
 Operators:
   [0] hw:mdu
 

@@ -507,7 +507,13 @@ printVersionInfo (FILE * stream)
   for (i = 0; i < NUM_PORTS; i++)
     fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
 
-  fprintf (stream, " " SDCC_VERSION_STR
+  fprintf (stream,
+#if HAVE_TREEDEC_COMBINATIONS_HPP
+           " "
+#else
+           " TD- "
+#endif
+           SDCC_VERSION_STR
 #ifdef SDCC_SUB_VERSION_STR
            "/" SDCC_SUB_VERSION_STR
 #endif

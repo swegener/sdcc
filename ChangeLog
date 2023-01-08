@@ -1,5 +1,10 @@
 2023-01-08 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* src/SDCCmain.c:
+	  Add "TD-" to the version string of treedec-less builds.
+
+2023-01-08 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* doc/sdccman.lyx:
 	  Amend claims concerning intrinsic address space support.
 

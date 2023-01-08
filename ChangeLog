@@ -1,4 +1,9 @@
-2022-01-02 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-08 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Amend claims concerning intrinsic address space support.
+
+2023-01-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c,
 	  support/regression/tests/bug-3504.c:

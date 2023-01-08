@@ -10006,7 +10006,8 @@ Embedded C
 \end_layout
 
 \begin_layout Standard
-SDCC supports named address spaces.
+SDCC supports objects in named address spaces and to some degree pointers
+ to such objects.
  The support for fixed-point math in SDCC is inconsistent with the standard.
  Other parts of the standard are not supported.
 \end_layout
@@ -19608,6 +19609,8 @@ SDCC supports some language extensions useful for embedded systems.
  Unlike the Embedded C standard, SDCC allows local variables to have an
  intrinsic named address space even when not explicitly declared as static
  or extern.
+ Depending on the target architecture, support can be limited to objects
+ in such address spaces and exclude pointer-based access to those.
 \end_layout
 
 \begin_layout Subsection

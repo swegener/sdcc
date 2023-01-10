@@ -13,9 +13,7 @@ char bug2957(char *p, int i, char c)
 
 void testBug(void)
 {
-#if 0 // TODO: Fix bug 2957, enable!
 	char c;
 	ASSERT(bug2957(&c, 0, 0) == 8);
-#endif
 }
 

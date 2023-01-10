@@ -28,13 +28,11 @@ testTortureExecute (void)
   int *ip = &i;
   int *i3p = &i3;
   int *i4p = &i4;
-#if 0
 #if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_ENHANCED)) // Pseudo-stack size limit
   f (&ip, &i1, &i2, &i3p, &i4p);
   if (i != 66 || ip != &i2 || i2 != 99 || i3 != -1 || i3p != i4p || i4 != 55)
     ASSERT (0);
   return;
-#endif
 #endif
 }
 

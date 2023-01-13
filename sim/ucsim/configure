@@ -3260,7 +3260,7 @@ enable_ucsim="no"
 fi
 
 # ignore setting, always use NO
-enable_ucsim="no"
+#enable_ucsim="no"
 
 # Check whether --enable-dlso was given.
 if test ${enable_dlso+y}

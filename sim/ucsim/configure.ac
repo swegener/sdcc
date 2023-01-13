@@ -44,7 +44,7 @@ fi,
 #default
 enable_ucsim="no")
 # ignore setting, always use NO
-enable_ucsim="no"
+#enable_ucsim="no"
 
 AC_ARG_ENABLE(dlso,
 [  --enable-dlso           compile dynamically loadable shared libraries],

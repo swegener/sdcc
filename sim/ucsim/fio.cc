@@ -71,7 +71,6 @@ cl_history::cl_history(const char *aname):
 cl_ustrings(100, 10, aname)
 {
   nr= 0;
-  //actual_line= "";
 }
 
 cl_history::~cl_history(void)
@@ -84,7 +83,9 @@ cl_history::up(chars line)
   replace(line);
   if (nr > 0)
     nr--;
-  return (char*)Items[nr];
+  if (nr < count)
+    return (char*)Items[nr];
+  return NULL;
 }
 
 const char *
@@ -102,11 +103,7 @@ void
 cl_history::enter(chars line)
 {
   if (count > 1000)
-    {
-      free_at(0);
-      /*if (nr > count)
-	nr= count;*/
-    }
+    free_at(0);
   if (!line.empty())
     {
       add(strdup(line));

@@ -93,7 +93,6 @@ class cl_history: public cl_ustrings
 {
  protected:
   int nr;
-  //chars actual_line;
  public:
   cl_history(char *aname);
   cl_history(const char *aname);

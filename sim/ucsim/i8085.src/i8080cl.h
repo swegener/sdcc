@@ -188,8 +188,8 @@ public:
   virtual int STAX_B(t_mem code) { return stax(rBC); }
   virtual int STAX_D(t_mem code) { return stax(rDE); }
   virtual int XCHG(t_mem code);
-  virtual int IN(t_mem code);
-  virtual int OUT(t_mem code);
+  virtual int IN_INST(t_mem code);
+  virtual int OUT_INST(t_mem code);
   virtual int PUSH_B(t_mem code) { push2(rBC); return resGO; }
   virtual int PUSH_D(t_mem code) { push2(rDE); return resGO; }
   virtual int PUSH_H(t_mem code) { push2(rHL); return resGO; }

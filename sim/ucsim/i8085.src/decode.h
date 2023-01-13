@@ -59,8 +59,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define STAX_D		instruction_12
 #define XCHG		instruction_eb
 
-#define IN		instruction_db
-#define OUT		instruction_d3
+#define IN_INST		instruction_db
+#define OUT_INST	instruction_d3
 
 #define PUSH_B		instruction_c5
 #define PUSH_D		instruction_d5

@@ -99,6 +99,7 @@ cl_app::init(int argc, char *argv[])
   cmdset->init();
   build_cmdset(cmdset);
   ocon= new cl_console_stdout(this);
+  ocon->set_flag(CONS_NOWELCOME, true);
   ocon->init();
   commander= new cl_commander(this, cmdset/*, sim*/);
   commander->init();

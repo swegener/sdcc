@@ -1590,7 +1590,41 @@ cl_uc::read_asc_file(cl_f *f)
     }
   return addr;
 }
-  
+
+long
+cl_uc::read_p2h_file(cl_f *f)
+{
+  chars line= chars();
+  int c;
+  long nr= 0;
+  while ((c= f->get_c()) &&
+	 (!f->eof()))
+    {
+      if ((c=='\n') || (c=='\r'))
+	{
+	  line.trim();
+	  line.start_parse();
+	  chars w1= line.token(" \t");
+	  chars w2= line.token(" \t");
+	  chars w3= line.token(" \t");
+	  if (w1.nempty() && w2.nempty() && w3.nempty())
+	    {
+	      if (w2 == "//C")
+		{
+		  t_mem v= strtol(w1.c_str(), 0, 16);
+		  t_addr a= strtol(w3.c_str(), 0, 16);
+		  set_rom(a, v);
+		  nr++;		  
+		}
+	    }
+	  line= "";
+	}
+      else
+	line.append(c);
+    }
+  return nr;
+}
+
 long
 cl_uc::read_cdb_file(cl_f *f)
 {
@@ -1809,6 +1843,11 @@ cl_uc::find_loadable_file(chars nam)
   if (o)
     return f;
 
+  c= chars("", "%s.p2h", nam.c_str());
+  f->open(c, "r");
+  o= (f->opened());
+  if (o)
+    return f;
   c= chars("", "%s.asc", nam.c_str());
   f->open(c, "r");
   o= (f->opened());
@@ -1861,6 +1900,12 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
     }
   if (!application->quiet)
     printf("Loading from %s\n", f->get_file_name());
+  if (is_p2h_file(f))
+    {
+      l= read_p2h_file(f);
+      if (!application->quiet)
+	printf("%ld words read from %s\n", l, f->get_fname());
+    }
   if (is_asc_file(f))
     {
       l= read_asc_file(f);

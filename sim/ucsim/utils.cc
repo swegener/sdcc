@@ -316,6 +316,23 @@ is_asc_file(class cl_f *f)
 }
 
 bool
+is_p2h_file(class cl_f *f)
+{
+  const char *n;
+  if (!f)
+    return false;
+  n= f->get_file_name();
+  if (!n ||
+      !*n)
+    return false;
+
+  if (strend(n, ".p2h"))
+    return true;
+
+  return false;
+}
+
+bool
 is_omf_file(class cl_f *f)
 {
   const char *n;

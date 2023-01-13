@@ -62,6 +62,7 @@ extern bool valid_sym_name(char *s);
 
 extern bool is_hex_file(class cl_f *f);
 extern bool is_asc_file(class cl_f *f);
+extern bool is_p2h_file(class cl_f *f);
 extern bool is_omf_file(class cl_f *f);
 extern bool is_cdb_file(class cl_f *f);
 extern bool is_s19_file(class cl_f *f);

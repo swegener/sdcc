@@ -231,6 +231,10 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	20021127-1.c
 
+# Test for GCC implementation-defined behaviour (GIMPLE memory model)
+GTE_SKIP_TESTS += \
+	alias-access-path-1.c
+
 # misc syntax error
 GTE_SKIP_TESTS += \
 	20000801-3.c \

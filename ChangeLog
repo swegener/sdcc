@@ -2,6 +2,8 @@
 
 	* support/regression/tests/gcc-torture-execute-va-arg-5.c:
 	  Disable Test for GCC up to 11, since it still fails on x86 hosts for that version.
+	* support/regression/cases/Makefile.in:
+	  Disable Test that tests for GCC implementation-defined behaviour (GIMPLE memory model).
 
 2023-01-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

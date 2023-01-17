@@ -48,7 +48,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
-#if !(defined (__GNUC__) && __GNUC__ < 7) // Test fails on older GCC on 32-bit systems
+#if !(defined (__GNUC__) && __GNUC__ < 12) // Test fails on older GCC on 32-bit systems
   va_double (4, 3.141592, 2.71827, 2.2360679, 2.1474836);
 #if 0
   va_long_double (4, 3.141592L, 2.71827L, 2.2360679L, 2.1474836L);

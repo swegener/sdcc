@@ -23990,8 +23990,8 @@ startup
 \end_layout
 
 \begin_layout Standard
-When an __sdcc_external_startup function is present, it is executed before
- the intialization of global variables.
+When an unsigned char __sdcc_external_startup function(void) is present,
+ it is executed before the intialization of global variables.
  This allows to implement functionality that needs to be done early (e.g.
  disabling a hardware watchdog that would otherwise bite during the time
  it takes to intialize global variables or a memory check that needs to

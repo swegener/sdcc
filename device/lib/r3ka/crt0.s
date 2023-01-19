@@ -74,8 +74,13 @@ MB3CR		.equ	0x17 ; Memory Bank 3 Control Register
 
 	call ___sdcc_external_startup
 
-	; Initialise global variables
+	; Initialise global variables. Skip if __sdcc_external_startup returned
+	; non-zero value. Note: calling convention version 0 only.
+	ld	a, l
+	or	a, a
+	jr	NZ, skip_gsinit
 	call	gsinit
+skip_gsinit:
 
 	call	_main
 	jp	_exit

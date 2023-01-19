@@ -2610,7 +2610,7 @@ glue (void)
        */
       tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
       if(TARGET_IS_STM8)
-        fprintf (asmFile, "\tjp\t__sdcc_program_startup\n");
+        fprintf (asmFile, options.model == MODEL_LARGE ? "\tjpf\t__sdcc_program_startup\n" : "\tjp\t__sdcc_program_startup\n");
       else if(TARGET_PDK_LIKE)
         fprintf (asmFile, "\tgoto\t__sdcc_program_startup\n");
       else

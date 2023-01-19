@@ -63,8 +63,12 @@ init:
 
     call ___sdcc_external_startup
 
-	;; Initialise global variables
-	call	gsinit
+	;; Initialise global variables. Skip if __sdcc_external_startup returned
+	;; non-zero value. Note: calling convention version 0 only.
+	ld	a, l
+	or	a, a
+	call	Z, gsinit
+
 	call	_main
 	jp	_exit
 

@@ -264,8 +264,13 @@ stm8_genInitStartup (FILE *of)
       fprintf (of, "\tldw\tsp, x\n");
     }
 
-  /* Init static & global variables */
+  /* Call external startup code */
   fprintf (of, options.model == MODEL_LARGE ? "\tcallf\t___sdcc_external_startup\n" : "\tcall\t___sdcc_external_startup\n");
+
+  /* If external startup returned non-zero, skip init */
+  fprintf (of, "\ttnz\ta\n");
+  fprintf (of, "\tjreq\t__sdcc_init_data\n");
+  fprintf (of, options.model == MODEL_LARGE ? "\tjpf\t__sdcc_program_startup\n" : "\tjp\t__sdcc_program_startup\n");
 
   /* Init static & global variables */
   fprintf (of, "__sdcc_init_data:\n");

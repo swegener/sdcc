@@ -73,8 +73,10 @@ init:
 
         call	___sdcc_external_startup
 
-        ;; Setup global data
-        call    gsinit
+        ;; Initialise global variables. Skip if __sdcc_external_startup returned
+        ;; non-zero value. Note: calling convention version 1 only.
+        or      a, a
+        call    Z, gsinit
 
         ;; Use _main instead of main to bypass sdcc's intelligence
         call    _main

@@ -57,7 +57,12 @@ __sdcc_gs_init_startup:
 ;        ldx     #0x01         ; MSB of stack ptr
 ;        stx     __BASEPTR+1
 
+;; Skip initialisation of global variables if __sdcc_external_startup
+;; returned non-zero value.
         jsr	___sdcc_external_startup
+        ora #0
+        beq __sdcc_init_data
+        jmp __sdcc_program_startup
 
 __sdcc_init_data:
 ;; initialize DATA

@@ -230,6 +230,7 @@ _astart:
 	ld    sp, #0x0FFA0	; stack
 
     call ___sdcc_external_startup
+	push hl
 
 	;halt
 	;swi
@@ -278,11 +279,15 @@ _astart:
 	
 	call  _wd_reset_asm
 	
-        ;; Initialise global variables
+	;; Initialise global variables. Skip if __sdcc_external_startup returned
+	;; non-zero value. Note: calling convention version 0 only.
 
 	;call _boot3
 	
-        call gsinit
+	pop hl
+	ld a, l
+	or a, a
+	call Z, gsinit
 
 	;call _boot4
 	

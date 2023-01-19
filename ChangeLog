@@ -5,6 +5,10 @@
 	  src/stm8/main.c,
 	  .version:
 	  Patch #453 by Basil Hussain to further harmonize __sdcc_external_startup (RFE #859).
+	* src/z80/gen.c,
+	  src/ds390/gen.c,
+	  src/mcs51/gen.c:
+	  Type fixes for code generation (fixing regressions visible on 32-bit big-endian hosts).
 
 2023-01-17 Philipp Klaus Krause <pkk AT spth.de>
 

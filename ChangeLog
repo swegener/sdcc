@@ -9,6 +9,8 @@
 	  src/ds390/gen.c,
 	  src/mcs51/gen.c:
 	  Type fixes for code generation (fixing regressions visible on 32-bit big-endian hosts).
+	* doc/sdccman.lyx:
+	  Improve __sdcc_external_startup documentation.
 
 2023-01-17 Philipp Klaus Krause <pkk AT spth.de>
 

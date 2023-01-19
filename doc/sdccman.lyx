@@ -23997,6 +23997,10 @@ When an __sdcc_external_startup function is present, it is executed before
  it takes to intialize global variables or a memory check that needs to
  be done before any memory (other than the return address for __sdcc_external_st
 artup itself) is in use).
+ If this routine returns a non-zero value, the static & global variable
+ initialization will be skipped and the function main will be invoked.
+ Otherwise static & global variables will be initialized before the function
+ main is invoked.
 \end_layout
 
 \begin_layout Standard
@@ -42367,105 +42371,7 @@ sjmp .
 \end_layout
 
 \begin_layout Standard
-One of these modules (crtstart.asm) contains a call to the C routine 
-\emph on
-__sdcc_external_startup()
-\begin_inset Index idx
-status open
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-sdcc
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-external
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-startup()
-\end_layout
-
-\end_inset
-
-
-\emph default
- at the start of the CODE area.
- This routine is also in the runtime library
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Runtime library
-\end_layout
-
-\end_inset
-
- and returns 0 by default.
- If this routine returns a non-zero value, the static & global variable
- initialization will be skipped and the function main will be invoked.
- Otherwise static & global variables will be initialized before the function
- main is invoked.
- You could add an 
-\emph on
-__sdcc_external_startup()
-\emph default
- routine to your program to override the default if you need to setup hardware
- or perform some other critical operation prior to static & global variable
- initialization
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Variable initialization
-\end_layout
-
-\end_inset
-
-.
- On some mcs51 variants __xdata
+On some mcs51 variants __xdata
 \begin_inset Index idx
 status open
 

@@ -15,6 +15,9 @@
 	  mos6502 peephole rule fix, patch #453 by Michel Iwaniec.
 	* src/stm8/gen.c
 	  Type fix for code generation (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3532.c:
+	  Fix bug #3532.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 

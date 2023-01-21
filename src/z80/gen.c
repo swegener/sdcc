@@ -5388,8 +5388,12 @@ _saveRegsForCall (const iCode *ic, bool dontsaveIY)
 
   if (_G.saves.saved == FALSE)
     {
-      const bool push_bc = !isRegDead (B_IDX, ic) && !ftype->funcAttrs.preserved_regs[B_IDX] || !isRegDead (C_IDX, ic) && !ftype->funcAttrs.preserved_regs[C_IDX];
-      const bool push_de = !isRegDead (D_IDX, ic) && !ftype->funcAttrs.preserved_regs[D_IDX] || !isRegDead (E_IDX, ic) && !ftype->funcAttrs.preserved_regs[E_IDX];
+      const bool call_preserves_b = ftype->funcAttrs.preserved_regs[B_IDX] && !z80IsParmInCall(ftype, "b");
+      const bool call_preserves_c = ftype->funcAttrs.preserved_regs[C_IDX] && !z80IsParmInCall(ftype, "c");
+      const bool call_preserves_d = ftype->funcAttrs.preserved_regs[D_IDX] && !z80IsParmInCall(ftype, "d");
+      const bool call_preserves_e = ftype->funcAttrs.preserved_regs[E_IDX] && !z80IsParmInCall(ftype, "e");
+      const bool push_bc = !isRegDead (B_IDX, ic) && !call_preserves_b || !isRegDead (C_IDX, ic) && !call_preserves_c;
+      const bool push_de = !isRegDead (D_IDX, ic) && !call_preserves_d || !isRegDead (E_IDX, ic) && !call_preserves_e;
       const bool push_hl = !isRegDead (H_IDX, ic) || !isRegDead (L_IDX, ic);
       const bool push_iy = !dontsaveIY && (!isRegDead (IYH_IDX, ic) || !isRegDead (IYL_IDX, ic));
 

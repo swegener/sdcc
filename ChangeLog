@@ -8,6 +8,8 @@
 	  Enhance documentation for __sdcc_external_startup, patch #456 by Basil Hussain.
 	* src/SDCC.y:
 	  Remove null-pointer checks on something that is not a pointer in current SDCC, patch #442 by Reini Urban.
+	* src/pdk/main.c:
+	  __sdcc_external_startup return checking for pdk, patch #455 by Basil Hussain.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 

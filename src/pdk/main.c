@@ -87,8 +87,11 @@ pdk_genInitStartup (FILE *of)
   fprintf (of, "p::\n");
   fprintf (of, "\t.ds 2\n");
   
+  // WARNING: program memory address 0x20:21 (0x10 in words) is reserved for the
+  // global singular interrupt vector. Ensure startup code never grows too large
+  // and intrudes on this location.
 
-  fprintf (of, "\t.area\tHEADER (ABS)\n"); // In the header we have 16 bytes. First should be nop.
+  fprintf (of, "\t.area\tHEADER (ABS)\n");
   fprintf (of, "\t.org 0x0000\n");
   fprintf (of, "\tnop\n"); // First word is a jump to self-test routine at end of ROM on some new devices.
 
@@ -109,8 +112,22 @@ pdk_genInitStartup (FILE *of)
       fprintf (of, "\tmov.io\tsp, a\n");
     }
 
+  /* Skip init if __sdcc_external_startup returned non-zero */
   fprintf (of, "\tcall\t___sdcc_external_startup\n");
-  fprintf (of, "\tgoto\ts_GSINIT\n");
+  if (TARGET_IS_PDK13)
+    {
+      // No "cneqsn" instruction on pdk13 - we must invert the logic.
+      fprintf (of, "\tnot\ta\n");
+      fprintf (of, "\tceqsn\ta, #0xFF\n");
+      fprintf (of, "\tgoto\t__sdcc_program_startup\n");
+      fprintf (of, "\tgoto\t__sdcc_init_data\n");
+    }
+  else
+    {
+      fprintf (of, "\tcneqsn\ta, #0x00\n");
+      fprintf (of, "\tgoto\t__sdcc_init_data\n");
+      fprintf (of, "\tgoto\t__sdcc_program_startup\n");
+    }
 
   tfprintf (of, "\t!area\n", STATIC_NAME);
 

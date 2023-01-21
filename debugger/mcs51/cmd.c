@@ -393,6 +393,12 @@ static void setBPatModLine (module *mod, int line, char bpType)
   if (line < 0)
       return;
 
+  if(!mod)
+    {
+      fprintf(stderr, "Internal error: NULL module\n");
+      return;
+    }
+    
   if (srcMode == SRC_CMODE && line > mod->ncLines)
     {
       fprintf(stderr,"No line %d in file \"%s\".\n",

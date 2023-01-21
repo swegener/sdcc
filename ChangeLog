@@ -1,3 +1,10 @@
+2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/mos6502/main.c:
+	  stdlib selection, patch #454 by Basil Hussain.
+	* debugger/mcs51/cmd.c:
+	  Avoid debugger segfault, patch #449 by Mark Symonds.
+
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/*/crt0.s,

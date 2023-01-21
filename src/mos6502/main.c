@@ -607,6 +607,15 @@ m6502_getInstructionSize (lineNode *line)
   return line->aln->size;
 }
 
+static const char *
+get_model (void)
+{
+  if (options.stackAuto)
+    return "mos6502-stack-auto";
+  else
+    return "mos6502";
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -640,7 +649,7 @@ PORT mos6502_port =
     false,                      /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_LARGE,
-    NULL,                       /* model == target */
+    get_model,
   },
   {
     _asmCmd,

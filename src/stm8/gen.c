@@ -8200,7 +8200,7 @@ genPointerGet (const iCode *ic)
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
   int size, i;
-  long offset;
+  int offset;
   bool use_y;
   bool pushed_x = false;
   bool pushed_a = false;

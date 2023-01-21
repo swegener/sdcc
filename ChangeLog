@@ -13,6 +13,8 @@
 	  __sdcc_external_startup return checking for pdk, patch #455 by Basil Hussain.
 	* src/mos6502/peeph.def:
 	  mos6502 peephole rule fix, patch #453 by Michel Iwaniec.
+	* src/stm8/gen.c
+	  Type fix for code generation (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -24,7 +26,7 @@
 	* src/z80/gen.c,
 	  src/ds390/gen.c,
 	  src/mcs51/gen.c:
-	  Type fixes for code generation (fixing regressions visible on 32-bit big-endian hosts).
+	  Type fixes for code generation (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
 	* doc/sdccman.lyx:
 	  Improve __sdcc_external_startup documentation.
 

@@ -71,7 +71,7 @@ replace restart {
     ; Peephole genpointer XA   - replaced txa with lda
 	adc     %5
 	sta	%6
-}
+} if notUsed('x')
 
 
 ////////////////////////////////////////////////////////

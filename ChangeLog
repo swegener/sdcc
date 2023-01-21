@@ -11,6 +11,8 @@
 	* src/pdk/main.c,
 	  .version:
 	  __sdcc_external_startup return checking for pdk, patch #455 by Basil Hussain.
+	* src/mos6502/peeph.def:
+	  mos6502 peephole rule fix, patch #453 by Michel Iwaniec.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 

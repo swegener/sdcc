@@ -18,6 +18,10 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3532.c:
 	  Fix bug #3532.
+	* src/SDCCbtree.cc,
+	  support/regression/tests/bug-3523.c,
+	  support/regression/tests/bug-3487.c:
+	  Fix bugs #3523, #3487.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 

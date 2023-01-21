@@ -91,7 +91,7 @@ static btree_t::vertex_descriptor btree_lowest_common_ancestor_impl(btree_t::ver
   else // (a < b)
     b = boost::source(*boost::in_edges(b, btree).first, btree);
 		
-  return(btree_lowest_common_ancestor(a, b));
+  return(btree_lowest_common_ancestor_impl(a, b));
 }
 
 int btree_lowest_common_ancestor(int a, int b)

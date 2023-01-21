@@ -2376,15 +2376,12 @@ string_literal_val
            val->etype->select.s.b_implicit_sign = true;
          }
 
-         int ll = 1;
-         if(function_name){
-           ll += strlen(function_name);
-         }
+         int ll = 1 + strlen(function_name);
          char* s = (char*) Safe_alloc(ll*sizeof(char));
-         if(function_name){
-            s = strcpy(s, function_name);
+         if(ll > 1){
+           s = strncpy(s, function_name, ll);
          }else{
-            *s = 0;
+           *s = 0;
          }
          SPEC_CVAL (val->etype).v_char = s;
          DCL_ELEM (val->type) = ll;

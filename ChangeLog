@@ -4,6 +4,10 @@
 	  stdlib selection, patch #454 by Basil Hussain.
 	* debugger/mcs51/cmd.c:
 	  Avoid debugger segfault, patch #449 by Mark Symonds.
+	* doc/sdccman.lyx:
+	  Enhance documentation for __sdcc_external_startup, patch #456 by Basil Hussain.
+	* src/SDCC.y:
+	  Remove null-pointer checks on something that is not a pointer in current SDCC, patch #442 by Reini Urban.
 
 2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
 

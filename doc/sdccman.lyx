@@ -23990,21 +23990,74 @@ startup
 \end_layout
 
 \begin_layout Standard
-When an unsigned char __sdcc_external_startup function(void) is present,
- it is executed before the intialization of global variables.
- This allows to implement functionality that needs to be done early (e.g.
- disabling a hardware watchdog that would otherwise bite during the time
- it takes to intialize global variables or a memory check that needs to
- be done before any memory (other than the return address for __sdcc_external_st
-artup itself) is in use).
- If this routine returns a non-zero value, the static & global variable
- initialization will be skipped and the function main will be invoked.
- Otherwise static & global variables will be initialized before the function
- main is invoked.
+When a function 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+unsigned char __sdcc_external_startup(void)
+\end_layout
+
+\end_inset
+
+ is present, it is executed before both the initialization of static and
+ global variables, as well as 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+main
+\end_layout
+
+\end_inset
+
+.
+ This allows to implement functionality that needs to be done early.
+ For example: disabling a hardware watchdog that would otherwise bite during
+ the time it takes to initialize global variables; setup or calibration
+ of system/peripheral clocks; or, a memory check that needs to be done before
+ any memory (other than the return address for 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+__sdcc_external_startup
+\end_layout
+
+\end_inset
+
+ itself) is in use.
 \end_layout
 
 \begin_layout Standard
-For mos6502, z80, z80n, z180, sm83, ez80_z80, tlcs90, r2k, r2ka, r3ka when
+If this routine returns a non-zero value, the static and global variable
+ initialization will be skipped and the function 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+main
+\end_layout
+
+\end_inset
+
+ will be invoked.
+ Otherwise static and global variables will be initialized before the function
+ 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+main
+\end_layout
+
+\end_inset
+
+ is invoked.
+\end_layout
+
+\begin_layout Standard
+For mos6502, z80, z80n, z180, sm83, ez80_z80, tlcs90, r2k, r2ka, r3ka, when
  using a custom crt0, support depends on the custom crt0.
 \end_layout
 

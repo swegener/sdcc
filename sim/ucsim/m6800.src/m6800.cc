@@ -580,7 +580,7 @@ cl_m6800::exec_inst(void)
     return res;
 
   inst_unknown(rom->read(instPC));
-  return(res);
+  return(resINV);
 }
 
 int

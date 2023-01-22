@@ -53,6 +53,7 @@ cl_pc_write::write(t_mem val)
 cl_p1516::cl_p1516(class cl_sim *asim):
   cl_uc(asim)
 {
+  PCmask= 0xffffffff;
 }
 
 int

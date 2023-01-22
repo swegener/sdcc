@@ -1889,14 +1889,6 @@ cl_stm8::exec_inst(void)
       
    }
 
-   //printf("************* bad code !!!!\n");
-  /*if (PC)
-    PC--;
-  else
-  PC= get_mem_size(MEM_ROM_ID)-1;*/
-  //PC= rom->inc_address(PC, -1);
-
-  //sim->stop(resINV_INST);
   return(resINV_INST);
 }
 

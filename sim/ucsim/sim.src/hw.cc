@@ -88,15 +88,19 @@ cl_hw::init(void)
 
   if (cfg_size())
     {
-      cfg= new cl_address_space(n, 0, cfg_size(), sizeof(t_mem)*8);
+      cfg= new cl_address_space(n, 0, cfg_size(), 32);
       cfg->init();
       cfg->hidden= true;
       uc->address_spaces->add(cfg);
 
+      n+= "_chip";
+      cfg_chip= new cl_chip32(n.c_str(), cfg_size(), 32, 0);
+      cfg_chip->init();
+      
       for (a= 0; a < cfg_size(); a++)
         {
 	  class cl_memory_cell *c= cfg->get_cell(a);
-	  c->decode(&(c->def_data));
+	  c->decode(cfg_chip->get_slot(a));
           cfg->register_hw(a, this, false);
         }
     }
@@ -447,6 +451,9 @@ cl_hw::handle_input(int c)
 	  }
 	break;
       }
+    case 'p'-'a'+1:
+      uc->sim->step();
+      break;
     default:
       return false;
       break;

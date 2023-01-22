@@ -36,18 +36,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define setZSw(v)  { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; cF.W(F); }
 #define setZSnw(v) { F&= ~(Z|S); if (!(v)) F|=Z; if ((v)&0x80000000) F|=S; }
 
+class cl_p2223;
 
 class cl_f_write: public cl_memory_operator
 {
 public:
-  cl_f_write(class cl_memory_cell *acell):
-    cl_memory_operator(acell) {}
-  virtual t_mem write(t_mem val) { return val&0x3f; }
+  class cl_p2223 *uc;
+public:
+  cl_f_write(class cl_memory_cell *acell,
+	     class cl_p2223 *the_uc):
+    cl_memory_operator(acell)
+  {
+    uc= the_uc;
+  }
+  virtual t_mem write(t_mem val);
 };
 
 
 class cl_p2223: public cl_p1516
 {
+public:
+  //bool dbg_reg;
 public:
   cl_p2223(class cl_sim *asim);
   virtual int init(void);

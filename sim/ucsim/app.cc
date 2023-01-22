@@ -75,6 +75,9 @@ cl_app::cl_app(void)
     app_start_at= dnow();
   srnd(0);
   set_console_mode();
+  period= 0;
+  cyc= 0;
+  acyc= 0;
 }
 
 cl_app::~cl_app(void)
@@ -99,7 +102,6 @@ cl_app::init(int argc, char *argv[])
   cmdset->init();
   build_cmdset(cmdset);
   ocon= new cl_console_stdout(this);
-  ocon->set_flag(CONS_NOWELCOME, true);
   ocon->init();
   commander= new cl_commander(this, cmdset/*, sim*/);
   commander->init();
@@ -119,10 +121,9 @@ int
 cl_app::run(void)
 {
   int done= 0;
-  double input_last_checked= 0;
+  //double input_last_checked= 0;
   class cl_option *o= options->get_option("go");
   bool g_opt= false;
-  //unsigned int cyc= 0, period= 10000;
   enum run_states rs= rs_config;
 
   cperiod.set(cperiod_value());
@@ -144,7 +145,6 @@ cl_app::run(void)
 		  long l;
 		  if ((l= sim->uc->read_file(fname, NULL)) >= 0)
 		    {
-		      ///*commander->all_printf*/printf("%ld words read from %s\n", l, fname);
 		      sim->uc->reset();
 		    }
 		}
@@ -153,15 +153,12 @@ cl_app::run(void)
 	}
       if (rs == rs_start)
 	{
-	  //if (startup_command.nempty())
-	  //exec(startup_command);
 	  if (o)
 	    o->get_value(&g_opt);
 	  if (sim && g_opt)
 	    sim->start(0, 0);
 	  rs= rs_run;
 	}
-      ccyc.set(ccyc.get()+1);
       if (!sim)
 	{
 	  commander->wait_input();
@@ -169,18 +166,19 @@ cl_app::run(void)
 	}
       else
         {
+	  acyc++;
           if (sim->state & SIM_GO)
             {
-	      if (ccyc.get() - input_last_checked > cperiod.get())
+	      if (++cyc > period)
 		{
-		  input_last_checked= ccyc.get();
+		  cyc= 0;
 		  if (sim->uc)
 		    sim->uc->touch();
 		  if (commander->input_avail())
 		    done= commander->proc_input();
 		}
 	      sim->step();
-	      if (jaj) ocon->dd_printf("** %d\n",ccyc.get());
+	      if (jaj) ocon->dd_printf("** %u\n",MU(acyc));
 	      if (jaj && commander->frozen_or_actual())
 		{
 		  sim->uc->print_regs(commander->frozen_or_actual()),

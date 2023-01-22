@@ -143,18 +143,20 @@ Num Type       Disp Hit   Cnt   Address  What
 
     <!-- ----------------------------------------------------------------- -->
     <a name="commands">
-      <h3>commands <i>[breakpoint-nr] script</i></h3>
+      <h3>commands <i>breakpoint-nr [script]</i></h3>
     </a>
     
     <p>Attach a script to a breakpoint. Breakpoint number can
         be omitted if only one breakpoint exists. Breakpoint numbers can be
         checked by <a href="cmd_general.html#info_breakpoints">info
-        breakpoint</a> command. Script is command or a list of commands
-      separated by ; character. It will be executed when the specified
-      breakpoint is hit. If the text of the script is printed before execution
-      is controlled by the option <b>echo_script</b>, which is FALSE by
+        breakpoint</a> command. Script is command or a list of
+      commands separated by ; character. It will be executed when the
+      specified breakpoint is accepted. Whether the text of the script
+      is printed before execution is controlled by the option <b>echo_script</b>, which is FALSE by
       default. See <a href="cmd_general.html#set_option">set option</a> command
-      how to set it.</p>
+      how to set it. If script is not used, breakpoint command will be
+      deleted from the specified breakpoint.
+    </p>
     <hr>
 
 

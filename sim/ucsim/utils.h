@@ -73,6 +73,9 @@ extern double strtoscale(const char *s, const char **units = 0);
 
 extern void srnd(unsigned int seed);
 extern unsigned int urnd(void);
+extern u8_t urnd8(void);
+extern u16_t urnd16(void);
+extern u32_t urnd32(void);
 
 
 #endif

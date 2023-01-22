@@ -73,6 +73,7 @@ class cl_hw: public cl_guiobj
   bool on;
  protected:
   class cl_list *partners;
+  class cl_memory_chip *cfg_chip;
   class cl_address_space *cfg;
   class cl_hw_io *io;
   int cache_run;

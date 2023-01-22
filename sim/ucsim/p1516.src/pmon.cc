@@ -1,1530 +1,1667 @@
 #include "pmon.h"
 
 t_mem pmon[]= {
-0x00000000, 0x01f2f825, /* 01f2f825 //C 00000 jmp	cold_start */
-0x0000f800, 0x01f2f80e, /* 01f2f80e //C 0f800 _f800:	jmp	callin */
-0x0000f801, 0x01f2f825, /* 01f2f825 //C 0f801 _f801:	jmp	cold_start */
-0x0000f802, 0x01f2fb00, /* 01f2fb00 //C 0f802 _f802:	jmp	strchr */
-0x0000f803, 0x01f2fb3b, /* 01f2fb3b //C 0f803 _f803:	jmp	streq */
-0x0000f804, 0x01f2fb42, /* 01f2fb42 //C 0f804 _f804:	jmp	strieq */
-0x0000f805, 0x01f2fb49, /* 01f2fb49 //C 0f805 _f805:	jmp	hexchar2value */
-0x0000f806, 0x01f2fb78, /* 01f2fb78 //C 0f806 _f806:	jmp	value2hexchar */
-0x0000f807, 0x01f2fb7d, /* 01f2fb7d //C 0f807 _f807:	jmp	htoi */
-0x0000f808, 0x01f2fb9f, /* 01f2fb9f //C 0f808 _f808:	jmp	check_uart */
-0x0000f809, 0x01f2fba6, /* 01f2fba6 //C 0f809 _f809:	jmp	read */
-0x0000f80a, 0x01f2fba8, /* 01f2fba8 //C 0f80a _f80a:	jmp	putchar */
-0x0000f80b, 0x01f2fbaf, /* 01f2fbaf //C 0f80b _f80b:	jmp	prints */
-0x0000f80c, 0x01f2fbc3, /* 01f2fbc3 //C 0f80c _f80c:	jmp	printsnl */
-0x0000f80d, 0x01f2fbcb, /* 01f2fbcb //C 0f80d _f80d:	jmp	print_vhex */
-0x0000f80e, 0x0600fc60, /* 0600fc60 //C 0f80e st	r0,reg0 */
-0x0000f80f, 0x0610fc61, /* 0610fc61 //C 0f80f st	r1,reg1 */
-0x0000f810, 0x0620fc62, /* 0620fc62 //C 0f810 st	r2,reg2 */
-0x0000f811, 0x0630fc63, /* 0630fc63 //C 0f811 st	r3,reg3 */
-0x0000f812, 0x0640fc64, /* 0640fc64 //C 0f812 st	r4,reg4 */
-0x0000f813, 0x0650fc65, /* 0650fc65 //C 0f813 st	r5,reg5 */
-0x0000f814, 0x0660fc66, /* 0660fc66 //C 0f814 st	r6,reg6 */
-0x0000f815, 0x0670fc67, /* 0670fc67 //C 0f815 st	r7,reg7 */
-0x0000f816, 0x0680fc68, /* 0680fc68 //C 0f816 st	r8,reg8 */
-0x0000f817, 0x0690fc69, /* 0690fc69 //C 0f817 st	r9,reg9 */
-0x0000f818, 0x06a0fc6a, /* 06a0fc6a //C 0f818 st	r10,reg10 */
-0x0000f819, 0x06b0fc6b, /* 06b0fc6b //C 0f819 st	r11,reg11 */
-0x0000f81a, 0x06c0fc6c, /* 06c0fc6c //C 0f81a st	r12,reg12 */
-0x0000f81b, 0x06d0fc6d, /* 06d0fc6d //C 0f81b st	r13,reg13 */
-0x0000f81c, 0x06e0fc6e, /* 06e0fc6e //C 0f81c st	r14,reg14 */
-0x0000f81d, 0x06e0fc6f, /* 06e0fc6f //C 0f81d st	r14,reg15 */
-0x0000f81e, 0x020e0000, /* 020e0000 //C 0f81e getf	r0 */
-0x0000f81f, 0x0600fc70, /* 0600fc70 //C 0f81f st	r0,regf */
-0x0000f820, 0x01020001, /* 01020001 //C 0f820 mvzl	r0,1 */
-0x0000f821, 0x0600fc5e, /* 0600fc5e //C 0f821 st	r0,called */
-0x0000f822, 0x01f2f82f, /* 01f2f82f //C 0f822 jmp	common_start */
-0x0000f823, 0x01f2f82f, /* 01f2f82f //C 0f823 jmp	common_start */
-0x0000f824, 0x01f2f825, /* 01f2f825 //C 0f824 jmp	cold_start */
-0x0000f825, 0x01020000, /* 01020000 //C 0f825 mvzl	r0,0 */
-0x0000f826, 0x0600fc5e, /* 0600fc5e //C 0f826 st	r0,called */
-0x0000f827, 0x0102f824, /* 0102f824 //C 0f827 mvzl	r0,def_zero	; restore jmp to monitor at zero */
-0x0000f828, 0x0e000000, /* 0e000000 //C 0f828 ld	r0,r0 */
-0x0000f829, 0x06000000, /* 06000000 //C 0f829 st	r0,0 */
-0x0000f82a, 0x01020000, /* 01020000 //C 0f82a mvzl	r0,0		; def values of some regs */
-0x0000f82b, 0x0600fc70, /* 0600fc70 //C 0f82b st	r0,regf		; FALGS= 0 */
-0x0000f82c, 0x0102f7ff, /* 0102f7ff //C 0f82c mvzl	r0,0xf7ff	; R13= 0xf7ff */
-0x0000f82d, 0x0600fc6d, /* 0600fc6d //C 0f82d st	r0,reg13 */
-0x0000f82e, 0x01f2f82f, /* 01f2f82f //C 0f82e jmp	common_start: */
-0x0000f82f, 0x01d2ff52, /* 01d2ff52 //C 0f82f mvzl	sp,stack_end */
-0x0000f830, 0x01020001, /* 01020001 //C 0f830 mvzl	r0,1 */
-0x0000f831, 0x0600fc5d, /* 0600fc5d //C 0f831 st	r0,echo */
-0x0000f832, 0x01020000, /* 01020000 //C 0f832 mvzl	r0,0 */
-0x0000f833, 0x020f0000, /* 020f0000 //C 0f833 setf	r0 */
-0x0000f834, 0x011200d9, /* 011200d9 //C 0f834 mvzl	r1,217 */
-0x0000f835, 0x0610ff44, /* 0610ff44 //C 0f835 st	r1,UART_CPB */
-0x0000f836, 0x01120003, /* 01120003 //C 0f836 mvzl	r1,3 */
-0x0000f837, 0x0610ff41, /* 0610ff41 //C 0f837 st	r1,UART_CTRL */
-0x0000f838, 0x0102fc71, /* 0102fc71 //C 0f838 mvzl	r0,msg_start */
-0x0000f839, 0x0400fbc3, /* 0400fbc3 //C 0f839 call	printsnl */
-0x0000f83a, 0x0400f83c, /* 0400f83c //C 0f83a call	setup_line */
-0x0000f83b, 0x01f2f846, /* 01f2f846 //C 0f83b jmp	main */
-0x0000f83c, 0x0ded0000, /* 0ded0000 //C 0f83c push	lr */
-0x0000f83d, 0x01120000, /* 01120000 //C 0f83d mvzl	r1,0		; lptr= 0 */
-0x0000f83e, 0x0610fc56, /* 0610fc56 //C 0f83e st	r1,line_ptr */
-0x0000f83f, 0x0610fbf2, /* 0610fbf2 //C 0f83f st	r1,line		; line[0]= 0 */
-0x0000f840, 0x01120000, /* 01120000 //C 0f840 mvzl	r1,0		; at_eol= 0 */
-0x0000f841, 0x0610fc57, /* 0610fc57 //C 0f841 st	r1,at_eol */
-0x0000f842, 0x0102fc7f, /* 0102fc7f //C 0f842 mvzl	r0,prompt */
-0x0000f843, 0x0400fbaf, /* 0400fbaf //C 0f843 call	prints */
-0x0000f844, 0x0fed0000, /* 0fed0000 //C 0f844 pop	lr */
-0x0000f845, 0x00f00e00, /* 00f00e00 //C 0f845 ret */
-0x0000f846, 0x0400fb9f, /* 0400fb9f //C 0f846 call	check_uart */
-0x0000f847, 0x41f2f84d, /* 41f2f84d //C 0f847 C0 jmp	no_input */
-0x0000f848, 0x0400fba6, /* 0400fba6 //C 0f848 call	read */
-0x0000f849, 0x0400f84e, /* 0400f84e //C 0f849 call	proc_input */
-0x0000f84a, 0x41f2f84d, /* 41f2f84d //C 0f84a C0 jmp	no_line */
-0x0000f84b, 0x0400f86b, /* 0400f86b //C 0f84b call	proc_line */
-0x0000f84c, 0x0400f83c, /* 0400f83c //C 0f84c call	setup_line */
-0x0000f84d, 0x01f2f846, /* 01f2f846 //C 0f84d jmp	main */
-0x0000f84e, 0x0ded0000, /* 0ded0000 //C 0f84e push	lr */
-0x0000f84f, 0x0108000a, /* 0108000a //C 0f84f cmp	r0,LF */
-0x0000f850, 0x11f2f864, /* 11f2f864 //C 0f850 EQ jmp	got_eol */
-0x0000f851, 0x0108000d, /* 0108000d //C 0f851 cmp	r0,CR */
-0x0000f852, 0x11f2f864, /* 11f2f864 //C 0f852 EQ jmp	got_eol */
-0x0000f853, 0x01220000, /* 01220000 //C 0f853 mvzl	r2,0		; at_aol= 0 */
-0x0000f854, 0x0620fc57, /* 0620fc57 //C 0f854 st	r2,at_eol */
-0x0000f855, 0x0112fc56, /* 0112fc56 //C 0f855 mvzl	r1,line_ptr	; line[line_ptr]= char */
-0x0000f856, 0x0e310000, /* 0e310000 //C 0f856 ld	r3,r1 */
-0x0000f857, 0x0122fbf2, /* 0122fbf2 //C 0f857 mvzl	r2,line */
-0x0000f858, 0x08020300, /* 08020300 //C 0f858 st	r0,r2,r3 */
-0x0000f859, 0x013a0001, /* 013a0001 //C 0f859 plus	r3,1		; line_ptr++ */
-0x0000f85a, 0x0c310000, /* 0c310000 //C 0f85a st	r3,r1 */
-0x0000f85b, 0x01420000, /* 01420000 //C 0f85b mvzl	r4,0 */
-0x0000f85c, 0x09438200, /* 09438200 //C 0f85c st	r4,r3+,r2	; line[line_ptr]= 0 */
-0x0000f85d, 0x08430200, /* 08430200 //C 0f85d st	r4,r3,r2	; double 0 at end, needed by tokenizer */
-0x0000f85e, 0x0142fc5d, /* 0142fc5d //C 0f85e mvzl	r4,echo		; check if echo is turned on */
-0x0000f85f, 0x0e440000, /* 0e440000 //C 0f85f ld	r4,r4 */
-0x0000f860, 0x024b0000, /* 024b0000 //C 0f860 sz	r4 */
-0x0000f861, 0x2400fba8, /* 2400fba8 //C 0f861 NZ call	putchar		; echo */
-0x0000f862, 0x020d0000, /* 020d0000 //C 0f862 clc */
-0x0000f863, 0x01f2f869, /* 01f2f869 //C 0f863 jmp	proc_input_ret */
-0x0000f864, 0x0112fc57, /* 0112fc57 //C 0f864 mvzl	r1,at_eol */
-0x0000f865, 0x0e110000, /* 0e110000 //C 0f865 ld	r1,r1 */
-0x0000f866, 0x021b0000, /* 021b0000 //C 0f866 sz	r1		; Z=0 at eol -> skip, not ready */
-0x0000f867, 0x220d0000, /* 220d0000 //C 0f867 Z0 clc */
-0x0000f868, 0x120c0000, /* 120c0000 //C 0f868 Z1 sec */
-0x0000f869, 0x0fed0000, /* 0fed0000 //C 0f869 pop	lr */
-0x0000f86a, 0x00f00e00, /* 00f00e00 //C 0f86a ret */
-0x0000f86b, 0x0ded0000, /* 0ded0000 //C 0f86b push	lr */
-0x0000f86c, 0x0102000a, /* 0102000a //C 0f86c mvzl	r0,LF */
-0x0000f86d, 0x0400fba8, /* 0400fba8 //C 0f86d call	putchar */
-0x0000f86e, 0x0700fbf2, /* 0700fbf2 //C 0f86e ld	r0,line */
-0x0000f86f, 0x020b0000, /* 020b0000 //C 0f86f sz	r0 */
-0x0000f870, 0x11f2f878, /* 11f2f878 //C 0f870 jz	proc_line_ret */
-0x0000f871, 0x0400f896, /* 0400f896 //C 0f871 call	tokenize */
-0x0000f872, 0x0400f8b7, /* 0400f8b7 //C 0f872 call	find_cmd */
-0x0000f873, 0x41f2f876, /* 41f2f876 //C 0f873 C0 jmp	cmd_not_found */
-0x0000f874, 0x05000000, /* 05000000 //C 0f874 call	r0,0 */
-0x0000f875, 0x01f2f878, /* 01f2f878 //C 0f875 jmp	proc_line_ret */
-0x0000f876, 0x0102f881, /* 0102f881 //C 0f876 mvzl	r0,snotfound */
-0x0000f877, 0x0400fbc3, /* 0400fbc3 //C 0f877 call	printsnl */
-0x0000f878, 0x01120001, /* 01120001 //C 0f878 mvzl	r1,1		; at_eol= 1 */
-0x0000f879, 0x0610fc57, /* 0610fc57 //C 0f879 st	r1,at_eol */
-0x0000f87a, 0x0fed0000, /* 0fed0000 //C 0f87a pop	lr */
-0x0000f87b, 0x00f00e00, /* 00f00e00 //C 0f87b ret */
-0x0000f87c, 0x00000047, /* 00000047 //C 0f87c db	71 */
-0x0000f87d, 0x0000006f, /* 0000006f //C 0f87d db	111 */
-0x0000f87e, 0x00000074, /* 00000074 //C 0f87e db	116 */
-0x0000f87f, 0x0000003a, /* 0000003a //C 0f87f db	58 */
-0x0000f880, 0x00000000, /* 00000000 //C 0f880 db */
-0x0000f881, 0x00000055, /* 00000055 //C 0f881 db	85 */
-0x0000f882, 0x0000006e, /* 0000006e //C 0f882 db	110 */
-0x0000f883, 0x0000006b, /* 0000006b //C 0f883 db	107 */
-0x0000f884, 0x0000006e, /* 0000006e //C 0f884 db	110 */
-0x0000f885, 0x0000006f, /* 0000006f //C 0f885 db	111 */
-0x0000f886, 0x00000077, /* 00000077 //C 0f886 db	119 */
-0x0000f887, 0x0000006e, /* 0000006e //C 0f887 db	110 */
-0x0000f888, 0x00000020, /* 00000020 //C 0f888 db	32 */
-0x0000f889, 0x00000063, /* 00000063 //C 0f889 db	99 */
-0x0000f88a, 0x0000006f, /* 0000006f //C 0f88a db	111 */
-0x0000f88b, 0x0000006d, /* 0000006d //C 0f88b db	109 */
-0x0000f88c, 0x0000006d, /* 0000006d //C 0f88c db	109 */
-0x0000f88d, 0x00000061, /* 00000061 //C 0f88d db	97 */
-0x0000f88e, 0x0000006e, /* 0000006e //C 0f88e db	110 */
-0x0000f88f, 0x00000064, /* 00000064 //C 0f88f db	100 */
-0x0000f890, 0x00000000, /* 00000000 //C 0f890 db */
-0x0000f891, 0x0ded0000, /* 0ded0000 //C 0f891 push	lr */
-0x0000f892, 0x0112fc81, /* 0112fc81 //C 0f892 mvzl	r1,delimiters */
-0x0000f893, 0x0400fb00, /* 0400fb00 //C 0f893 call	strchr */
-0x0000f894, 0x0fed0000, /* 0fed0000 //C 0f894 pop	lr */
-0x0000f895, 0x00f00e00, /* 00f00e00 //C 0f895 ret */
-0x0000f896, 0x0ded0000, /* 0ded0000 //C 0f896 push	lr */
-0x0000f897, 0x0142fc58, /* 0142fc58 //C 0f897 mvzl	r4,words	; array of result */
-0x0000f898, 0x0152fbf2, /* 0152fbf2 //C 0f898 mvzl	r5,line		; address of next char */
-0x0000f899, 0x01620000, /* 01620000 //C 0f899 mvzl	r6,0		; nuof words found */
-0x0000f89a, 0x01720000, /* 01720000 //C 0f89a mvzl	r7,0		; bool in_word */
-0x0000f89b, 0x0e050000, /* 0e050000 //C 0f89b ld	r0,r5		; pick a char */
-0x0000f89c, 0x020b0000, /* 020b0000 //C 0f89c sz	r0		; check end */
-0x0000f89d, 0x11f2f8a7, /* 11f2f8a7 //C 0f89d jz	tok_delimiter	; found end, pretend delim */
-0x0000f89e, 0x0400f891, /* 0400f891 //C 0f89e call	is_delimiter */
-0x0000f89f, 0x31f2f8a7, /* 31f2f8a7 //C 0f89f C1 jmp	tok_delimiter */
-0x0000f8a0, 0x027b0000, /* 027b0000 //C 0f8a0 sz	r7 */
-0x0000f8a1, 0x21f2f8ac, /* 21f2f8ac //C 0f8a1 jnz	tok_next	; still inside word */
-0x0000f8a2, 0x01720001, /* 01720001 //C 0f8a2 mvzl	r7,1		; in_word=true */
-0x0000f8a3, 0x09568400, /* 09568400 //C 0f8a3 st	r5,r6+,r4	; record word address */
-0x0000f8a4, 0x01680005, /* 01680005 //C 0f8a4 cmp	r6,MAX_WORDS	; If no more space */
-0x0000f8a5, 0x11f2f8b0, /* 11f2f8b0 //C 0f8a5 EQ jmp	tok_ret		; then return */
-0x0000f8a6, 0x01f2f8ac, /* 01f2f8ac //C 0f8a6 jmp	tok_next */
-0x0000f8a7, 0x027b0000, /* 027b0000 //C 0f8a7 sz	r7 */
-0x0000f8a8, 0x11f2f8ac, /* 11f2f8ac //C 0f8a8 jz	tok_next	; still between words */
-0x0000f8a9, 0x01720000, /* 01720000 //C 0f8a9 mvzl	r7,0		; in_word=false */
-0x0000f8aa, 0x01120000, /* 01120000 //C 0f8aa mvzl	r1,0		; put a 0 at the end of word */
-0x0000f8ab, 0x08150100, /* 08150100 //C 0f8ab st	r1,r5,r1 */
-0x0000f8ac, 0x020b0000, /* 020b0000 //C 0f8ac sz	r0		; check EOL */
-0x0000f8ad, 0x11f2f8b0, /* 11f2f8b0 //C 0f8ad jz	tok_ret		; jump out if char==0 */
-0x0000f8ae, 0x01540001, /* 01540001 //C 0f8ae add	r5,1 */
-0x0000f8af, 0x01f2f89b, /* 01f2f89b //C 0f8af jmp	tok_cycle */
-0x0000f8b0, 0x01120000, /* 01120000 //C 0f8b0 mvzl	r1,0 */
-0x0000f8b1, 0x01680005, /* 01680005 //C 0f8b1 cmp	r6,MAX_WORDS */
-0x0000f8b2, 0x11f2f8b5, /* 11f2f8b5 //C 0f8b2 jz	tok_end */
-0x0000f8b3, 0x09168400, /* 09168400 //C 0f8b3 st	r1,r6+,r4 */
-0x0000f8b4, 0x01f2f8b0, /* 01f2f8b0 //C 0f8b4 jmp	tok_ret */
-0x0000f8b5, 0x0fed0000, /* 0fed0000 //C 0f8b5 pop	lr */
-0x0000f8b6, 0x00f00e00, /* 00f00e00 //C 0f8b6 ret */
-0x0000f8b7, 0x0ded0000, /* 0ded0000 //C 0f8b7 push	lr */
-0x0000f8b8, 0x0d1d0000, /* 0d1d0000 //C 0f8b8 push	r1 */
-0x0000f8b9, 0x0d2d0000, /* 0d2d0000 //C 0f8b9 push	r2 */
-0x0000f8ba, 0x0d3d0000, /* 0d3d0000 //C 0f8ba push	r3 */
-0x0000f8bb, 0x0dad0000, /* 0dad0000 //C 0f8bb push	r10 */
-0x0000f8bc, 0x0700fc58, /* 0700fc58 //C 0f8bc ld	r0,words	; R0= 1st word of command */
-0x0000f8bd, 0x020b0000, /* 020b0000 //C 0f8bd sz	r0 */
-0x0000f8be, 0x11f2f8ee, /* 11f2f8ee //C 0f8be jz	find_cmd_false */
-0x0000f8bf, 0x0e100000, /* 0e100000 //C 0f8bf ld	r1,r0		; 1st char of word1 */
-0x0000f8c0, 0x0e200001, /* 0e200001 //C 0f8c0 ld	r2,r0,1		; 2nd char */
-0x0000f8c1, 0x0e300002, /* 0e300002 //C 0f8c1 ld	r3,r0,2		; 3rd char */
-0x0000f8c2, 0x011fffdf, /* 011fffdf //C 0f8c2 and	r1,0xffdf	; upcase 1st char */
-0x0000f8c3, 0x01180052, /* 01180052 //C 0f8c3 cmp	r1,'R' */
-0x0000f8c4, 0x21f2f8da, /* 21f2f8da //C 0f8c4 jnz	find_not_rx */
-0x0000f8c5, 0x0128002f, /* 0128002f //C 0f8c5 cmp	r2,'/'		; '0'-1 */
-0x0000f8c6, 0xa1f2f8da, /* a1f2f8da //C 0f8c6 LS jmp	find_not_rx */
-0x0000f8c7, 0x01280039, /* 01280039 //C 0f8c7 cmp	r2,'9' */
-0x0000f8c8, 0x91f2f8da, /* 91f2f8da //C 0f8c8 HI jmp	find_not_rx */
-0x0000f8c9, 0x023b0000, /* 023b0000 //C 0f8c9 sz	r3 */
-0x0000f8ca, 0x11f2f8d5, /* 11f2f8d5 //C 0f8ca jz	find_rx_09 */
-0x0000f8cb, 0x01280031, /* 01280031 //C 0f8cb cmp	r2,'1'		; first char must be '1' */
-0x0000f8cc, 0x21f2f8da, /* 21f2f8da //C 0f8cc jnz	find_not_rx */
-0x0000f8cd, 0x0138002f, /* 0138002f //C 0f8cd cmp	r3,'/'		; '0'-1 */
-0x0000f8ce, 0xa1f2f8da, /* a1f2f8da //C 0f8ce LS jmp	find_not_rx */
-0x0000f8cf, 0x01380035, /* 01380035 //C 0f8cf cmp	r3,'5' */
-0x0000f8d0, 0x91f2f8da, /* 91f2f8da //C 0f8d0 HI jmp	find_not_rx */
-0x0000f8d1, 0x01360030, /* 01360030 //C 0f8d1 sub	r3,'0' */
-0x0000f8d2, 0x0134000a, /* 0134000a //C 0f8d2 add	r3,10 */
-0x0000f8d3, 0x0630fc5f, /* 0630fc5f //C 0f8d3 st	r3,nuof_reg */
-0x0000f8d4, 0x01f2f8d7, /* 01f2f8d7 //C 0f8d4 jmp	find_rx */
-0x0000f8d5, 0x01260030, /* 01260030 //C 0f8d5 sub	r2,'0' */
-0x0000f8d6, 0x0620fc5f, /* 0620fc5f //C 0f8d6 st	r2,nuof_reg */
-0x0000f8d7, 0x0102fabe, /* 0102fabe //C 0f8d7 mvzl	r0,cmd_rx */
-0x0000f8d8, 0x020c0000, /* 020c0000 //C 0f8d8 sec */
-0x0000f8d9, 0x01f2f8f9, /* 01f2f8f9 //C 0f8d9 jmp	find_cmd_ret */
-0x0000f8da, 0x01a2fc91, /* 01a2fc91 //C 0f8da mvzl	r10,commands */
-0x0000f8db, 0x0e2a0000, /* 0e2a0000 //C 0f8db ld	r2,r10		; R2= cmd addr */
-0x0000f8dc, 0x022b0000, /* 022b0000 //C 0f8dc sz	r2 */
-0x0000f8dd, 0x11f2f8ee, /* 11f2f8ee //C 0f8dd jz	find_cmd_false */
-0x0000f8de, 0x01a40001, /* 01a40001 //C 0f8de add	r10,1 */
-0x0000f8df, 0x00100a00, /* 00100a00 //C 0f8df mov	r1,r10		; R1= cmd string */
-0x0000f8e0, 0x01a40001, /* 01a40001 //C 0f8e0 add	r10,1 */
-0x0000f8e1, 0x0e3a0000, /* 0e3a0000 //C 0f8e1 ld	r3,r10 */
-0x0000f8e2, 0x023b0000, /* 023b0000 //C 0f8e2 sz	r3 */
-0x0000f8e3, 0x21f2f8e0, /* 21f2f8e0 //C 0f8e3 jnz	find_cmd_fw */
-0x0000f8e4, 0x01a40001, /* 01a40001 //C 0f8e4 add	r10,1 */
-0x0000f8e5, 0x0400fb3b, /* 0400fb3b //C 0f8e5 call	streq */
-0x0000f8e6, 0x41f2f8db, /* 41f2f8db //C 0f8e6 C0 jmp	find_cmd_cyc */
-0x0000f8e7, 0x00000200, /* 00000200 //C 0f8e7 mov	r0,r2 */
-0x0000f8e8, 0x020c0000, /* 020c0000 //C 0f8e8 sec */
-0x0000f8e9, 0x01f2f8f9, /* 01f2f8f9 //C 0f8e9 jmp	find_cmd_ret */
-0x0000f8ea, 0x0000002f, /* 0000002f //C 0f8ea db	47 */
-0x0000f8eb, 0x0000002f, /* 0000002f //C 0f8eb db	47 */
-0x0000f8ec, 0x00000043, /* 00000043 //C 0f8ec db	67 */
-0x0000f8ed, 0x00000000, /* 00000000 //C 0f8ed db */
-0x0000f8ee, 0x01040001, /* 01040001 //C 0f8ee add	r0,1		; check second word */
-0x0000f8ef, 0x0e100000, /* 0e100000 //C 0f8ef ld	r1,r0		; for //C command */
-0x0000f8f0, 0x021b0000, /* 021b0000 //C 0f8f0 sz	r1 */
-0x0000f8f1, 0x11f2f8f7, /* 11f2f8f7 //C 0f8f1 jz	find_cmd_very_false */
-0x0000f8f2, 0x0102f8ea, /* 0102f8ea //C 0f8f2 mvzl	r0,c_cmd_name */
-0x0000f8f3, 0x0400fb3b, /* 0400fb3b //C 0f8f3 call	streq */
-0x0000f8f4, 0x21f2f8f7, /* 21f2f8f7 //C 0f8f4 jnz	find_cmd_very_false */
-0x0000f8f5, 0x0122f987, /* 0122f987 //C 0f8f5 mvzl	r2,cmd_c */
-0x0000f8f6, 0x01f2f8e7, /* 01f2f8e7 //C 0f8f6 jmp	find_cmd_true */
-0x0000f8f7, 0x020d0000, /* 020d0000 //C 0f8f7 clc */
-0x0000f8f8, 0x01020000, /* 01020000 //C 0f8f8 mvzl	r0,0 */
-0x0000f8f9, 0x0fad0000, /* 0fad0000 //C 0f8f9 pop	r10 */
-0x0000f8fa, 0x0f3d0000, /* 0f3d0000 //C 0f8fa pop	r3 */
-0x0000f8fb, 0x0f2d0000, /* 0f2d0000 //C 0f8fb pop	r2 */
-0x0000f8fc, 0x0f1d0000, /* 0f1d0000 //C 0f8fc pop	r1 */
-0x0000f8fd, 0x0fed0000, /* 0fed0000 //C 0f8fd pop	lr */
-0x0000f8fe, 0x00f00e00, /* 00f00e00 //C 0f8fe ret */
-0x0000f8ff, 0x0ded0000, /* 0ded0000 //C 0f8ff push	lr */
-0x0000f900, 0x0122fc58, /* 0122fc58 //C 0f900 mvzl	r2,words */
-0x0000f901, 0x01020000, /* 01020000 //C 0f901 mvzl	r0,0 */
-0x0000f902, 0x0e420001, /* 0e420001 //C 0f902 ld	r4,r2,1		; addr */
-0x0000f903, 0x0e520002, /* 0e520002 //C 0f903 ld	r5,r2,2		; value */
-0x0000f904, 0x024b0000, /* 024b0000 //C 0f904 sz 	r4 */
-0x0000f905, 0x11f2f926, /* 11f2f926 //C 0f905 jz	m_ret */
-0x0000f906, 0x00000400, /* 00000400 //C 0f906 mov	r0,r4 */
-0x0000f907, 0x0400fb7d, /* 0400fb7d //C 0f907 call	htoi */
-0x0000f908, 0x00400100, /* 00400100 //C 0f908 mov	r4,r1 */
-0x0000f909, 0x31f2f90d, /* 31f2f90d //C 0f909 C1 jmp	m_addr_ok */
-0x0000f90a, 0x0102f928, /* 0102f928 //C 0f90a mvzl	r0,m_err_addr */
-0x0000f90b, 0x0400fbc3, /* 0400fbc3 //C 0f90b call	printsnl */
-0x0000f90c, 0x01f2f926, /* 01f2f926 //C 0f90c jmp	m_ret */
-0x0000f90d, 0x025b0000, /* 025b0000 //C 0f90d sz	r5 */
-0x0000f90e, 0x11f2f91c, /* 11f2f91c //C 0f90e jz	m_read */
-0x0000f90f, 0x0148ff61, /* 0148ff61 //C 0f90f cmp	r4,the_end */
-0x0000f910, 0x91f2f914, /* 91f2f914 //C 0f910 HI jmp	m_addrv_ok */
-0x0000f911, 0x0102f936, /* 0102f936 //C 0f911 mvzl	r0,m_err_addrv */
-0x0000f912, 0x0400fbc3, /* 0400fbc3 //C 0f912 call	printsnl */
-0x0000f913, 0x01f2f926, /* 01f2f926 //C 0f913 jmp	m_ret */
-0x0000f914, 0x00000500, /* 00000500 //C 0f914 mov	r0,r5 */
-0x0000f915, 0x0400fb7d, /* 0400fb7d //C 0f915 call	htoi */
-0x0000f916, 0x00500100, /* 00500100 //C 0f916 mov	r5,r1 */
-0x0000f917, 0x31f2f91b, /* 31f2f91b //C 0f917 C1 jmp	m_value_ok */
-0x0000f918, 0x0102f948, /* 0102f948 //C 0f918 mvzl	r0,m_err_value */
-0x0000f919, 0x0400fbc3, /* 0400fbc3 //C 0f919 call	printsnl */
-0x0000f91a, 0x01f2f926, /* 01f2f926 //C 0f91a jmp	m_ret */
-0x0000f91b, 0x0c540000, /* 0c540000 //C 0f91b st	r5,r4 */
-0x0000f91c, 0x00000400, /* 00000400 //C 0f91c mov	r0,r4 */
-0x0000f91d, 0x01120004, /* 01120004 //C 0f91d mvzl	r1,4 */
-0x0000f91e, 0x0400fbcb, /* 0400fbcb //C 0f91e call	print_vhex */
-0x0000f91f, 0x01020020, /* 01020020 //C 0f91f mvzl	r0,0x20 */
-0x0000f920, 0x0400fba8, /* 0400fba8 //C 0f920 call	putchar */
-0x0000f921, 0x0e040000, /* 0e040000 //C 0f921 ld	r0,r4 */
-0x0000f922, 0x01120004, /* 01120004 //C 0f922 mvzl	r1,4 */
-0x0000f923, 0x0400fbcb, /* 0400fbcb //C 0f923 call	print_vhex */
-0x0000f924, 0x0102000a, /* 0102000a //C 0f924 mvzl	r0,LF */
-0x0000f925, 0x0400fba8, /* 0400fba8 //C 0f925 call	putchar */
-0x0000f926, 0x0fed0000, /* 0fed0000 //C 0f926 pop	lr */
-0x0000f927, 0x00f00e00, /* 00f00e00 //C 0f927 ret */
-0x0000f928, 0x00000041, /* 00000041 //C 0f928 db	65 */
-0x0000f929, 0x00000064, /* 00000064 //C 0f929 db	100 */
-0x0000f92a, 0x00000064, /* 00000064 //C 0f92a db	100 */
-0x0000f92b, 0x00000072, /* 00000072 //C 0f92b db	114 */
-0x0000f92c, 0x00000065, /* 00000065 //C 0f92c db	101 */
-0x0000f92d, 0x00000073, /* 00000073 //C 0f92d db	115 */
-0x0000f92e, 0x00000073, /* 00000073 //C 0f92e db	115 */
-0x0000f92f, 0x00000020, /* 00000020 //C 0f92f db	32 */
-0x0000f930, 0x00000065, /* 00000065 //C 0f930 db	101 */
-0x0000f931, 0x00000072, /* 00000072 //C 0f931 db	114 */
-0x0000f932, 0x00000072, /* 00000072 //C 0f932 db	114 */
-0x0000f933, 0x0000006f, /* 0000006f //C 0f933 db	111 */
-0x0000f934, 0x00000072, /* 00000072 //C 0f934 db	114 */
-0x0000f935, 0x00000000, /* 00000000 //C 0f935 db */
-0x0000f936, 0x0000004d, /* 0000004d //C 0f936 db	77 */
-0x0000f937, 0x0000006f, /* 0000006f //C 0f937 db	111 */
-0x0000f938, 0x0000006e, /* 0000006e //C 0f938 db	110 */
-0x0000f939, 0x00000069, /* 00000069 //C 0f939 db	105 */
-0x0000f93a, 0x00000074, /* 00000074 //C 0f93a db	116 */
-0x0000f93b, 0x0000006f, /* 0000006f //C 0f93b db	111 */
-0x0000f93c, 0x00000072, /* 00000072 //C 0f93c db	114 */
-0x0000f93d, 0x00000027, /* 00000027 //C 0f93d db	39 */
-0x0000f93e, 0x00000073, /* 00000073 //C 0f93e db	115 */
-0x0000f93f, 0x00000020, /* 00000020 //C 0f93f db	32 */
-0x0000f940, 0x00000061, /* 00000061 //C 0f940 db	97 */
-0x0000f941, 0x00000064, /* 00000064 //C 0f941 db	100 */
-0x0000f942, 0x00000064, /* 00000064 //C 0f942 db	100 */
-0x0000f943, 0x00000072, /* 00000072 //C 0f943 db	114 */
-0x0000f944, 0x00000065, /* 00000065 //C 0f944 db	101 */
-0x0000f945, 0x00000073, /* 00000073 //C 0f945 db	115 */
-0x0000f946, 0x00000073, /* 00000073 //C 0f946 db	115 */
-0x0000f947, 0x00000000, /* 00000000 //C 0f947 db */
-0x0000f948, 0x00000056, /* 00000056 //C 0f948 db	86 */
-0x0000f949, 0x00000061, /* 00000061 //C 0f949 db	97 */
-0x0000f94a, 0x0000006c, /* 0000006c //C 0f94a db	108 */
-0x0000f94b, 0x00000075, /* 00000075 //C 0f94b db	117 */
-0x0000f94c, 0x00000065, /* 00000065 //C 0f94c db	101 */
-0x0000f94d, 0x00000020, /* 00000020 //C 0f94d db	32 */
-0x0000f94e, 0x00000065, /* 00000065 //C 0f94e db	101 */
-0x0000f94f, 0x00000072, /* 00000072 //C 0f94f db	114 */
-0x0000f950, 0x00000072, /* 00000072 //C 0f950 db	114 */
-0x0000f951, 0x0000006f, /* 0000006f //C 0f951 db	111 */
-0x0000f952, 0x00000072, /* 00000072 //C 0f952 db	114 */
-0x0000f953, 0x00000000, /* 00000000 //C 0f953 db */
-0x0000f954, 0x0ded0000, /* 0ded0000 //C 0f954 push	lr */
-0x0000f955, 0x0122fc58, /* 0122fc58 //C 0f955 mvzl	r2,words */
-0x0000f956, 0x0e020001, /* 0e020001 //C 0f956 ld	r0,r2,1		; start address */
-0x0000f957, 0x0400fb7d, /* 0400fb7d //C 0f957 call	htoi */
-0x0000f958, 0x00300100, /* 00300100 //C 0f958 mov	r3,r1 */
-0x0000f959, 0x0e020002, /* 0e020002 //C 0f959 ld	r0,r2,2		; end address */
-0x0000f95a, 0x020b0000, /* 020b0000 //C 0f95a sz	r0 */
-0x0000f95b, 0x21f2f95f, /* 21f2f95f //C 0f95b jnz	d_end_ok */
-0x0000f95c, 0x00400300, /* 00400300 //C 0f95c mov	r4,r3 */
-0x0000f95d, 0x01440010, /* 01440010 //C 0f95d add	r4,0x10 */
-0x0000f95e, 0x01f2f961, /* 01f2f961 //C 0f95e jmp	d_chk_end */
-0x0000f95f, 0x0400fb7d, /* 0400fb7d //C 0f95f call	htoi */
-0x0000f960, 0x00400100, /* 00400100 //C 0f960 mov	r4,r1 */
-0x0000f961, 0x00380400, /* 00380400 //C 0f961 cmp	r3,r4		; check if start>end */
-0x0000f962, 0x91f2f971, /* 91f2f971 //C 0f962 HI jmp d_bad */
-0x0000f963, 0x00000300, /* 00000300 //C 0f963 mov	r0,r3		; print address */
-0x0000f964, 0x01120004, /* 01120004 //C 0f964 mvzl	r1,4 */
-0x0000f965, 0x0400fbcb, /* 0400fbcb //C 0f965 call	print_vhex */
-0x0000f966, 0x01020020, /* 01020020 //C 0f966 mvzl	r0,0x20		; print one space */
-0x0000f967, 0x0400fba8, /* 0400fba8 //C 0f967 call	putchar */
-0x0000f968, 0x0e030000, /* 0e030000 //C 0f968 ld	r0,r3		; load data */
-0x0000f969, 0x01120004, /* 01120004 //C 0f969 mvzl	r1,4		; print data */
-0x0000f96a, 0x0400fbcb, /* 0400fbcb //C 0f96a call	print_vhex */
-0x0000f96b, 0x0102000a, /* 0102000a //C 0f96b mvzl	r0,LF		; print new line */
-0x0000f96c, 0x0400fba8, /* 0400fba8 //C 0f96c call	putchar */
-0x0000f96d, 0x00380400, /* 00380400 //C 0f96d cmp	r3,r4 */
-0x0000f96e, 0x11f2f973, /* 11f2f973 //C 0f96e jz	d_ret */
-0x0000f96f, 0x01340001, /* 01340001 //C 0f96f add	r3,1 */
-0x0000f970, 0x01f2f963, /* 01f2f963 //C 0f970 jmp	d_cyc */
-0x0000f971, 0x0102f975, /* 0102f975 //C 0f971 mvzl	r0,d_err_bad */
-0x0000f972, 0x0400fbc3, /* 0400fbc3 //C 0f972 call	printsnl */
-0x0000f973, 0x0fed0000, /* 0fed0000 //C 0f973 pop	lr */
-0x0000f974, 0x00f00e00, /* 00f00e00 //C 0f974 ret */
-0x0000f975, 0x00000057, /* 00000057 //C 0f975 db	87 */
-0x0000f976, 0x00000072, /* 00000072 //C 0f976 db	114 */
-0x0000f977, 0x0000006f, /* 0000006f //C 0f977 db	111 */
-0x0000f978, 0x0000006e, /* 0000006e //C 0f978 db	110 */
-0x0000f979, 0x00000067, /* 00000067 //C 0f979 db	103 */
-0x0000f97a, 0x00000020, /* 00000020 //C 0f97a db	32 */
-0x0000f97b, 0x00000065, /* 00000065 //C 0f97b db	101 */
-0x0000f97c, 0x0000006e, /* 0000006e //C 0f97c db	110 */
-0x0000f97d, 0x00000064, /* 00000064 //C 0f97d db	100 */
-0x0000f97e, 0x00000020, /* 00000020 //C 0f97e db	32 */
-0x0000f97f, 0x00000061, /* 00000061 //C 0f97f db	97 */
-0x0000f980, 0x00000064, /* 00000064 //C 0f980 db	100 */
-0x0000f981, 0x00000064, /* 00000064 //C 0f981 db	100 */
-0x0000f982, 0x00000072, /* 00000072 //C 0f982 db	114 */
-0x0000f983, 0x00000065, /* 00000065 //C 0f983 db	101 */
-0x0000f984, 0x00000073, /* 00000073 //C 0f984 db	115 */
-0x0000f985, 0x00000073, /* 00000073 //C 0f985 db	115 */
-0x0000f986, 0x00000000, /* 00000000 //C 0f986 db */
-0x0000f987, 0x00f00e00, /* 00f00e00 //C 0f987 ret */
-0x0000f988, 0x0ded0000, /* 0ded0000 //C 0f988 push	lr */
-0x0000f989, 0x01a20000, /* 01a20000 //C 0f989 mvzl	r10,0		; state (nr of words) */
-0x0000f98a, 0x01820000, /* 01820000 //C 0f98a mvzl	r8,0		; value */
-0x0000f98b, 0x0162003f, /* 0162003f //C 0f98b mvzl	r6,'?'		; Record type */
-0x0000f98c, 0x0400fb9f, /* 0400fb9f //C 0f98c call	check_uart */
-0x0000f98d, 0x41f2f98c, /* 41f2f98c //C 0f98d C0 jmp	l_cyc */
-0x0000f98e, 0x0400fba6, /* 0400fba6 //C 0f98e call	read */
-0x0000f98f, 0x00b00000, /* 00b00000 //C 0f98f mov	r11,r0		; Copy of char in R11 */
-0x0000f990, 0x0108000a, /* 0108000a //C 0f990 cmp	r0,10		; check EOL chars */
-0x0000f991, 0x11f2f9db, /* 11f2f9db //C 0f991 jz	l_eol */
-0x0000f992, 0x0108000d, /* 0108000d //C 0f992 cmp	r0,13 */
-0x0000f993, 0x11f2f9db, /* 11f2f9db //C 0f993 jz	l_eol */
-0x0000f994, 0x01a80000, /* 01a80000 //C 0f994 cmp	r10,0 */
-0x0000f995, 0x21f2f9a5, /* 21f2f9a5 //C 0f995 jnz	l_no0 */
-0x0000f996, 0x0400fb49, /* 0400fb49 //C 0f996 call	hexchar2value */
-0x0000f997, 0x41f2f99f, /* 41f2f99f //C 0f997 C0 jmp	l_eof_0 */
-0x0000f998, 0x02880000, /* 02880000 //C 0f998 shl	r8		; shift val(char) into value */
-0x0000f999, 0x02880000, /* 02880000 //C 0f999 shl	r8 */
-0x0000f99a, 0x02880000, /* 02880000 //C 0f99a shl	r8 */
-0x0000f99b, 0x02880000, /* 02880000 //C 0f99b shl	r8 */
-0x0000f99c, 0x010b000f, /* 010b000f //C 0f99c btst	r0,0xf */
-0x0000f99d, 0x008d0000, /* 008d0000 //C 0f99d or	r8,r0 */
-0x0000f99e, 0x01f2f98c, /* 01f2f98c //C 0f99e jmp	l_cyc */
-0x0000f99f, 0x01a20001, /* 01a20001 //C 0f99f mvzl	r10,1		; state0 -> state1 */
-0x0000f9a0, 0x0162003f, /* 0162003f //C 0f9a0 mvzl	r6,'?'		; No //C yet */
-0x0000f9a1, 0x01b8002f, /* 01b8002f //C 0f9a1 cmp	r11,'/'		; is it start of // */
-0x0000f9a2, 0x11720001, /* 11720001 //C 0f9a2 z1 mvzl	r7,1		; Yes, first / found */
-0x0000f9a3, 0x21720000, /* 21720000 //C 0f9a3 z0 mvzl	r7,0		; No '/' yet */
-0x0000f9a4, 0x01f2f98c, /* 01f2f98c //C 0f9a4 jmp	l_cyc */
-0x0000f9a5, 0x01a80001, /* 01a80001 //C 0f9a5 cmp	r10,1 */
-0x0000f9a6, 0x21f2f9be, /* 21f2f9be //C 0f9a6 jnz	l_no1 */
-0x0000f9a7, 0x027b0000, /* 027b0000 //C 0f9a7 sz	r7 */
-0x0000f9a8, 0x21f2f9ad, /* 21f2f9ad //C 0f9a8 jnz	l_s1_2nd */
-0x0000f9a9, 0x0108002f, /* 0108002f //C 0f9a9 cmp	r0,'/' */
-0x0000f9aa, 0x21f2f98c, /* 21f2f98c //C 0f9aa jnz	l_cyc */
-0x0000f9ab, 0x01720001, /* 01720001 //C 0f9ab mvzl	r7,1 */
-0x0000f9ac, 0x01f2f98c, /* 01f2f98c //C 0f9ac jmp	l_cyc */
-0x0000f9ad, 0x0108002f, /* 0108002f //C 0f9ad cmp	r0,'/' */
-0x0000f9ae, 0x11f2f98c, /* 11f2f98c //C 0f9ae jz	l_cyc */
-0x0000f9af, 0x01080043, /* 01080043 //C 0f9af cmp	r0,'C' */
-0x0000f9b0, 0x21f2f9b6, /* 21f2f9b6 //C 0f9b0 jnz	l_s1_noC */
-0x0000f9b1, 0x01620043, /* 01620043 //C 0f9b1 mvzl	r6,'C' */
-0x0000f9b2, 0x01a20002, /* 01a20002 //C 0f9b2 mvzl	r10,2 */
-0x0000f9b3, 0x01920000, /* 01920000 //C 0f9b3 mvzl	r9,0		; address= 0 */
-0x0000f9b4, 0x01520000, /* 01520000 //C 0f9b4 mvzl	r5,0		; where we are in word: before */
-0x0000f9b5, 0x01f2f98c, /* 01f2f98c //C 0f9b5 jmp	l_cyc */
-0x0000f9b6, 0x01080045, /* 01080045 //C 0f9b6 cmp	r0,'E' */
-0x0000f9b7, 0x21f2f9bb, /* 21f2f9bb //C 0f9b7 jnz	l_s1_noE */
-0x0000f9b8, 0x01620045, /* 01620045 //C 0f9b8 mvzl	r6,'E' */
-0x0000f9b9, 0x01a20003, /* 01a20003 //C 0f9b9 mvzl	r10,3 */
-0x0000f9ba, 0x01f2f98c, /* 01f2f98c //C 0f9ba jmp	l_cyc */
-0x0000f9bb, 0x0400fba8, /* 0400fba8 //C 0f9bb call	putchar		; print record type */
-0x0000f9bc, 0x01a2000f, /* 01a2000f //C 0f9bc mvzl	r10,0xf		; special state: skip everything */
-0x0000f9bd, 0x01f2f98c, /* 01f2f98c //C 0f9bd jmp	l_cyc */
-0x0000f9be, 0x01a80002, /* 01a80002 //C 0f9be cmp	r10,2 */
-0x0000f9bf, 0x21f2f9d3, /* 21f2f9d3 //C 0f9bf jnz	l_no2 */
-0x0000f9c0, 0x01580000, /* 01580000 //C 0f9c0 cmp	r5,0 */
-0x0000f9c1, 0x21f2f9cc, /* 21f2f9cc //C 0f9c1 jnz	l_s2_no0 */
-0x0000f9c2, 0x0400fb49, /* 0400fb49 //C 0f9c2 call	hexchar2value */
-0x0000f9c3, 0x41f2f98c, /* 41f2f98c //C 0f9c3 C0 jmp	l_cyc */
-0x0000f9c4, 0x01520001, /* 01520001 //C 0f9c4 mvzl	r5,1 */
-0x0000f9c5, 0x02980000, /* 02980000 //C 0f9c5 shl	r9 */
-0x0000f9c6, 0x02980000, /* 02980000 //C 0f9c6 shl	r9 */
-0x0000f9c7, 0x02980000, /* 02980000 //C 0f9c7 shl	r9 */
-0x0000f9c8, 0x02980000, /* 02980000 //C 0f9c8 shl	r9 */
-0x0000f9c9, 0x010b000f, /* 010b000f //C 0f9c9 btst	r0,0xf */
-0x0000f9ca, 0x009d0000, /* 009d0000 //C 0f9ca or	r9,r0 */
-0x0000f9cb, 0x01f2f98c, /* 01f2f98c //C 0f9cb jmp	l_cyc */
-0x0000f9cc, 0x01580001, /* 01580001 //C 0f9cc cmp	r5,1 */
-0x0000f9cd, 0x21f2f9d2, /* 21f2f9d2 //C 0f9cd jnz	l_s2_no1 */
-0x0000f9ce, 0x0400fb49, /* 0400fb49 //C 0f9ce call	hexchar2value */
-0x0000f9cf, 0x31f2f9c5, /* 31f2f9c5 //C 0f9cf C1 jmp	l_s2_got */
-0x0000f9d0, 0x01520002, /* 01520002 //C 0f9d0 mvzl	r5,2 */
-0x0000f9d1, 0x01f2f98c, /* 01f2f98c //C 0f9d1 jmp	l_cyc */
-0x0000f9d2, 0x01f2f98c, /* 01f2f98c //C 0f9d2 jmp	l_cyc */
-0x0000f9d3, 0x01a80003, /* 01a80003 //C 0f9d3 cmp	r10,3 */
-0x0000f9d4, 0x21f2f9d6, /* 21f2f9d6 //C 0f9d4 jnz	l_no3 */
-0x0000f9d5, 0x01f2f98c, /* 01f2f98c //C 0f9d5 jmp	l_cyc		; do nothing, just wait EOL */
-0x0000f9d6, 0x01a8000f, /* 01a8000f //C 0f9d6 cmp	r10,0xf */
-0x0000f9d7, 0x01f2f9d9, /* 01f2f9d9 //C 0f9d7 jmp	l_nof */
-0x0000f9d8, 0x01f2f98c, /* 01f2f98c //C 0f9d8 jmp	l_cyc		; just skip */
-0x0000f9d9, 0x01f2f98c, /* 01f2f98c //C 0f9d9 jmp	l_cyc */
-0x0000f9da, 0x01f2f9f1, /* 01f2f9f1 //C 0f9da jmp	l_ret */
-0x0000f9db, 0x01a80000, /* 01a80000 //C 0f9db cmp	r10,0		; in state0 */
-0x0000f9dc, 0x11f2f9eb, /* 11f2f9eb //C 0f9dc jz	l_back_to_0	; just restart */
-0x0000f9dd, 0x01a80001, /* 01a80001 //C 0f9dd cmp	r10,1		; in state1 */
-0x0000f9de, 0x11f2f9eb, /* 11f2f9eb //C 0f9de jz	l_back_to_0 	;l_cyc ;l_bad ; garbage */
-0x0000f9df, 0x01a80002, /* 01a80002 //C 0f9df cmp	r10,2		; in state2 */
-0x0000f9e0, 0x11f2f9e7, /* 11f2f9e7 //C 0f9e0 jz	l_proc		; process record */
-0x0000f9e1, 0x01a80003, /* 01a80003 //C 0f9e1 cmp	r10,3		; in state3 */
-0x0000f9e2, 0x11f2f9f1, /* 11f2f9f1 //C 0f9e2 jz	l_ret		; eol in end record: finish */
-0x0000f9e3, 0x01a8000f, /* 01a8000f //C 0f9e3 cmp	r10,0xf		; in state skip */
-0x0000f9e4, 0x11f2f9eb, /* 11f2f9eb //C 0f9e4 jz	l_back_to_0	; reset state for new line */
-0x0000f9e5, 0x01f2f98c, /* 01f2f98c //C 0f9e5 jmp	l_cyc */
-0x0000f9e6, 0x01f2f9f1, /* 01f2f9f1 //C 0f9e6 jmp	l_ret */
-0x0000f9e7, 0x01680043, /* 01680043 //C 0f9e7 cmp	r6,'C'		; is it a C record? */
-0x0000f9e8, 0x1c890000, /* 1c890000 //C 0f9e8 z st	r8,r9		; store */
-0x0000f9e9, 0x00000600, /* 00000600 //C 0f9e9 mov	r0,r6		; echo record type */
-0x0000f9ea, 0x0400fba8, /* 0400fba8 //C 0f9ea call	putchar */
-0x0000f9eb, 0x0102002e, /* 0102002e //C 0f9eb mvzl	r0,'.' */
-0x0000f9ec, 0x0400fba8, /* 0400fba8 //C 0f9ec call	putchar */
-0x0000f9ed, 0x01a20000, /* 01a20000 //C 0f9ed mvzl	r10,0 */
-0x0000f9ee, 0x01820000, /* 01820000 //C 0f9ee mvzl	r8,0 */
-0x0000f9ef, 0x0162003f, /* 0162003f //C 0f9ef mvzl	r6,'?' */
-0x0000f9f0, 0x01f2f98c, /* 01f2f98c //C 0f9f0 jmp	l_cyc */
-0x0000f9f1, 0x0102000a, /* 0102000a //C 0f9f1 mvzl	r0,LF */
-0x0000f9f2, 0x0400fba8, /* 0400fba8 //C 0f9f2 call	putchar */
-0x0000f9f3, 0x0fed0000, /* 0fed0000 //C 0f9f3 pop	lr */
-0x0000f9f4, 0x00f00e00, /* 00f00e00 //C 0f9f4 ret */
-0x0000f9f5, 0x0ded0000, /* 0ded0000 //C 0f9f5 push	lr */
-0x0000f9f6, 0x0122fc58, /* 0122fc58 //C 0f9f6 mvzl	r2,words */
-0x0000f9f7, 0x0e020001, /* 0e020001 //C 0f9f7 ld	r0,r2,1		; address */
-0x0000f9f8, 0x020b0000, /* 020b0000 //C 0f9f8 sz	r0 */
-0x0000f9f9, 0x11f2fa1c, /* 11f2fa1c //C 0f9f9 jz	g_no_addr */
-0x0000f9fa, 0x0400fb7d, /* 0400fb7d //C 0f9fa call	htoi */
-0x0000f9fb, 0x00b00100, /* 00b00100 //C 0f9fb mov	r11,r1 */
-0x0000f9fc, 0x0102fa30, /* 0102fa30 //C 0f9fc mvzl	r0,d_msg_run */
-0x0000f9fd, 0x0400fbaf, /* 0400fbaf //C 0f9fd call	prints */
-0x0000f9fe, 0x00000b00, /* 00000b00 //C 0f9fe mov	r0,r11 */
-0x0000f9ff, 0x01120004, /* 01120004 //C 0f9ff mvzl	r1,4 */
-0x0000fa00, 0x0400fbcb, /* 0400fbcb //C 0fa00 call	print_vhex */
-0x0000fa01, 0x0102000a, /* 0102000a //C 0fa01 mvzl	r0,LF */
-0x0000fa02, 0x0400fba8, /* 0400fba8 //C 0fa02 call	putchar */
-0x0000fa03, 0x06b0fc6f, /* 06b0fc6f //C 0fa03 st	r11,reg15 */
-0x0000fa04, 0x0122ff43, /* 0122ff43 //C 0fa04 mvzl	r2,UART_TSTAT */
-0x0000fa05, 0x0e920000, /* 0e920000 //C 0fa05 ld	r9,r2 */
-0x0000fa06, 0x019c0001, /* 019c0001 //C 0fa06 test	r9,1 */
-0x0000fa07, 0x11f2fa05, /* 11f2fa05 //C 0fa07 jz	g_wait_tc */
-0x0000fa08, 0x07000000, /* 07000000 //C 0fa08 ld	r0,0 */
-0x0000fa09, 0x0600fc5e, /* 0600fc5e //C 0fa09 st	r0,called */
-0x0000fa0a, 0x0700fc70, /* 0700fc70 //C 0fa0a ld	r0,regf */
-0x0000fa0b, 0x020f0000, /* 020f0000 //C 0fa0b setf	r0 */
-0x0000fa0c, 0x0700fc60, /* 0700fc60 //C 0fa0c ld	r0,reg0 */
-0x0000fa0d, 0x0710fc61, /* 0710fc61 //C 0fa0d ld	r1,reg1 */
-0x0000fa0e, 0x0720fc62, /* 0720fc62 //C 0fa0e ld	r2,reg2 */
-0x0000fa0f, 0x0730fc63, /* 0730fc63 //C 0fa0f ld	r3,reg3 */
-0x0000fa10, 0x0740fc64, /* 0740fc64 //C 0fa10 ld	r4,reg4 */
-0x0000fa11, 0x0750fc65, /* 0750fc65 //C 0fa11 ld	r5,reg5 */
-0x0000fa12, 0x0760fc66, /* 0760fc66 //C 0fa12 ld	r6,reg6 */
-0x0000fa13, 0x0770fc67, /* 0770fc67 //C 0fa13 ld	r7,reg7 */
-0x0000fa14, 0x0780fc68, /* 0780fc68 //C 0fa14 ld	r8,reg8 */
-0x0000fa15, 0x0790fc69, /* 0790fc69 //C 0fa15 ld	r9,reg9 */
-0x0000fa16, 0x07a0fc6a, /* 07a0fc6a //C 0fa16 ld	r10,reg10 */
-0x0000fa17, 0x07b0fc6b, /* 07b0fc6b //C 0fa17 ld	r11,reg11 */
-0x0000fa18, 0x07c0fc6c, /* 07c0fc6c //C 0fa18 ld	r12,reg12 */
-0x0000fa19, 0x07d0fc6d, /* 07d0fc6d //C 0fa19 ld	r13,reg13 */
-0x0000fa1a, 0x07e0fc6e, /* 07e0fc6e //C 0fa1a ld	r14,reg14 */
-0x0000fa1b, 0x07f0fc6f, /* 07f0fc6f //C 0fa1b ld	r15,reg15 */
-0x0000fa1c, 0x0700fc5e, /* 0700fc5e //C 0fa1c ld	r0,called */
-0x0000fa1d, 0x020b0000, /* 020b0000 //C 0fa1d sz	r0 */
-0x0000fa1e, 0x11f2fa21, /* 11f2fa21 //C 0fa1e jz	g_err */
-0x0000fa1f, 0x07b0fc6f, /* 07b0fc6f //C 0fa1f ld	r11,reg15 */
-0x0000fa20, 0x01f2f9fc, /* 01f2f9fc //C 0fa20 jmp	g_go11 */
-0x0000fa21, 0x0102fa25, /* 0102fa25 //C 0fa21 mvzl	r0,g_err_addr */
-0x0000fa22, 0x0400fbc3, /* 0400fbc3 //C 0fa22 call	printsnl */
-0x0000fa23, 0x0fed0000, /* 0fed0000 //C 0fa23 pop	lr */
-0x0000fa24, 0x00f00e00, /* 00f00e00 //C 0fa24 ret */
-0x0000fa25, 0x0000004e, /* 0000004e //C 0fa25 db	78 */
-0x0000fa26, 0x0000006f, /* 0000006f //C 0fa26 db	111 */
-0x0000fa27, 0x00000020, /* 00000020 //C 0fa27 db	32 */
-0x0000fa28, 0x00000061, /* 00000061 //C 0fa28 db	97 */
-0x0000fa29, 0x00000064, /* 00000064 //C 0fa29 db	100 */
-0x0000fa2a, 0x00000064, /* 00000064 //C 0fa2a db	100 */
-0x0000fa2b, 0x00000072, /* 00000072 //C 0fa2b db	114 */
-0x0000fa2c, 0x00000065, /* 00000065 //C 0fa2c db	101 */
-0x0000fa2d, 0x00000073, /* 00000073 //C 0fa2d db	115 */
-0x0000fa2e, 0x00000073, /* 00000073 //C 0fa2e db	115 */
-0x0000fa2f, 0x00000000, /* 00000000 //C 0fa2f db */
-0x0000fa30, 0x00000052, /* 00000052 //C 0fa30 db	82 */
-0x0000fa31, 0x00000075, /* 00000075 //C 0fa31 db	117 */
-0x0000fa32, 0x0000006e, /* 0000006e //C 0fa32 db	110 */
-0x0000fa33, 0x00000020, /* 00000020 //C 0fa33 db	32 */
-0x0000fa34, 0x00000000, /* 00000000 //C 0fa34 db */
-0x0000fa35, 0x0ded0000, /* 0ded0000 //C 0fa35 push	lr */
-0x0000fa36, 0x0122fce2, /* 0122fce2 //C 0fa36 mvzl	r2,helps */
-0x0000fa37, 0x01320000, /* 01320000 //C 0fa37 mvzl	r3,0 */
-0x0000fa38, 0x0b038200, /* 0b038200 //C 0fa38 ld	r0,r3+,r2	; pick a char */
-0x0000fa39, 0x020b0000, /* 020b0000 //C 0fa39 sz	r0		; is it eos? */
-0x0000fa3a, 0x21f2fa3e, /* 21f2fa3e //C 0fa3a jnz	h_print */
-0x0000fa3b, 0x0b038200, /* 0b038200 //C 0fa3b ld	r0,r3+,r2	; get first char of next string */
-0x0000fa3c, 0x020b0000, /* 020b0000 //C 0fa3c sz	r0 */
-0x0000fa3d, 0x11f2fa40, /* 11f2fa40 //C 0fa3d jz	h_eof */
-0x0000fa3e, 0x0400fba8, /* 0400fba8 //C 0fa3e call	putchar */
-0x0000fa3f, 0x01f2fa38, /* 01f2fa38 //C 0fa3f jmp	h_cyc */
-0x0000fa40, 0x0fed0000, /* 0fed0000 //C 0fa40 pop	lr */
-0x0000fa41, 0x00f00e00, /* 00f00e00 //C 0fa41 ret */
-0x0000fa42, 0x0ded0000, /* 0ded0000 //C 0fa42 push	lr */
-0x0000fa43, 0x0d1d0000, /* 0d1d0000 //C 0fa43 push	r1 */
-0x0000fa44, 0x00100000, /* 00100000 //C 0fa44 mov	r1,r0 */
-0x0000fa45, 0x01180010, /* 01180010 //C 0fa45 cmp	r1,16		; go out if nr>16 */
-0x0000fa46, 0x91f2fa7a, /* 91f2fa7a //C 0fa46 HI jmp	prn_ret */
-0x0000fa47, 0x0118000f, /* 0118000f //C 0fa47 cmp	r1,15		; nr=Flag? */
-0x0000fa48, 0xa1f2fa4f, /* a1f2fa4f //C 0fa48 LS jmp	prn_015 */
-0x0000fa49, 0x01020046, /* 01020046 //C 0fa49 mvzl	r0,'F' */
-0x0000fa4a, 0x0400fba8, /* 0400fba8 //C 0fa4a call	putchar */
-0x0000fa4b, 0x01020020, /* 01020020 //C 0fa4b mvzl	r0,32 */
-0x0000fa4c, 0x0400fba8, /* 0400fba8 //C 0fa4c call	putchar */
-0x0000fa4d, 0x0400fba8, /* 0400fba8 //C 0fa4d call	putchar */
-0x0000fa4e, 0x01f2fa7a, /* 01f2fa7a //C 0fa4e jmp	prn_ret */
-0x0000fa4f, 0x0118000f, /* 0118000f //C 0fa4f cmp	r1,15 */
-0x0000fa50, 0x21f2fa58, /* 21f2fa58 //C 0fa50 jnz	prn_no15 */
-0x0000fa51, 0x0102fa54, /* 0102fa54 //C 0fa51 mvzl	r0,prn_PC */
-0x0000fa52, 0x0400fbaf, /* 0400fbaf //C 0fa52 call	prints */
-0x0000fa53, 0x01f2fa7a, /* 01f2fa7a //C 0fa53 jmp	prn_ret */
-0x0000fa54, 0x00000050, /* 00000050 //C 0fa54 db	80 */
-0x0000fa55, 0x00000043, /* 00000043 //C 0fa55 db	67 */
-0x0000fa56, 0x00000020, /* 00000020 //C 0fa56 db	32 */
-0x0000fa57, 0x00000000, /* 00000000 //C 0fa57 db */
-0x0000fa58, 0x0118000e, /* 0118000e //C 0fa58 cmp	r1,14 */
-0x0000fa59, 0x21f2fa61, /* 21f2fa61 //C 0fa59 jnz	prn_no14 */
-0x0000fa5a, 0x0102fa5d, /* 0102fa5d //C 0fa5a mvzl	r0,prn_LR */
-0x0000fa5b, 0x0400fbaf, /* 0400fbaf //C 0fa5b call	prints */
-0x0000fa5c, 0x01f2fa7a, /* 01f2fa7a //C 0fa5c jmp	prn_ret */
-0x0000fa5d, 0x0000004c, /* 0000004c //C 0fa5d db	76 */
-0x0000fa5e, 0x00000052, /* 00000052 //C 0fa5e db	82 */
-0x0000fa5f, 0x00000020, /* 00000020 //C 0fa5f db	32 */
-0x0000fa60, 0x00000000, /* 00000000 //C 0fa60 db */
-0x0000fa61, 0x0118000d, /* 0118000d //C 0fa61 cmp	r1,13 */
-0x0000fa62, 0x21f2fa6a, /* 21f2fa6a //C 0fa62 jnz	prn_no13 */
-0x0000fa63, 0x0102fa66, /* 0102fa66 //C 0fa63 mvzl	r0,prn_SP */
-0x0000fa64, 0x0400fbaf, /* 0400fbaf //C 0fa64 call	prints */
-0x0000fa65, 0x01f2fa7a, /* 01f2fa7a //C 0fa65 jmp	prn_ret */
-0x0000fa66, 0x00000053, /* 00000053 //C 0fa66 db	83 */
-0x0000fa67, 0x00000050, /* 00000050 //C 0fa67 db	80 */
-0x0000fa68, 0x00000020, /* 00000020 //C 0fa68 db	32 */
-0x0000fa69, 0x00000000, /* 00000000 //C 0fa69 db */
-0x0000fa6a, 0x01020052, /* 01020052 //C 0fa6a mvzl	r0,'R' */
-0x0000fa6b, 0x0400fba8, /* 0400fba8 //C 0fa6b call	putchar */
-0x0000fa6c, 0x01180009, /* 01180009 //C 0fa6c cmp	r1,9 */
-0x0000fa6d, 0x91f2fa74, /* 91f2fa74 //C 0fa6d HI jmp	prn_1015 */
-0x0000fa6e, 0x00000100, /* 00000100 //C 0fa6e mov	r0,r1 */
-0x0000fa6f, 0x01040030, /* 01040030 //C 0fa6f add	r0,'0' */
-0x0000fa70, 0x0400fba8, /* 0400fba8 //C 0fa70 call	putchar */
-0x0000fa71, 0x01020020, /* 01020020 //C 0fa71 mvzl	r0,32 */
-0x0000fa72, 0x0400fba8, /* 0400fba8 //C 0fa72 call	putchar */
-0x0000fa73, 0x01f2fa7a, /* 01f2fa7a //C 0fa73 jmp	prn_ret */
-0x0000fa74, 0x01020031, /* 01020031 //C 0fa74 mvzl	r0,'1' */
-0x0000fa75, 0x0400fba8, /* 0400fba8 //C 0fa75 call	putchar */
-0x0000fa76, 0x00000100, /* 00000100 //C 0fa76 mov	r0,r1 */
-0x0000fa77, 0x0106000a, /* 0106000a //C 0fa77 sub	r0,10 */
-0x0000fa78, 0x01040030, /* 01040030 //C 0fa78 add	r0,'0' */
-0x0000fa79, 0x0400fba8, /* 0400fba8 //C 0fa79 call	putchar */
-0x0000fa7a, 0x0f1d0000, /* 0f1d0000 //C 0fa7a pop	r1 */
-0x0000fa7b, 0x0fed0000, /* 0fed0000 //C 0fa7b pop	lr */
-0x0000fa7c, 0x00f00e00, /* 00f00e00 //C 0fa7c ret */
-0x0000fa7d, 0x0ded0000, /* 0ded0000 //C 0fa7d push	lr */
-0x0000fa7e, 0x0d1d0000, /* 0d1d0000 //C 0fa7e push	r1 */
-0x0000fa7f, 0x01080010, /* 01080010 //C 0fa7f cmp	r0,16 */
-0x0000fa80, 0x91f2fa85, /* 91f2fa85 //C 0fa80 HI jmp	prv_ret */
-0x0000fa81, 0x0112fc60, /* 0112fc60 //C 0fa81 mvzl	r1,reg0 */
-0x0000fa82, 0x0a010000, /* 0a010000 //C 0fa82 ld	r0,r1,r0 */
-0x0000fa83, 0x01120004, /* 01120004 //C 0fa83 mvzl	r1,4 */
-0x0000fa84, 0x0400fbcb, /* 0400fbcb //C 0fa84 call	print_vhex */
-0x0000fa85, 0x0f1d0000, /* 0f1d0000 //C 0fa85 pop	r1 */
-0x0000fa86, 0x0fed0000, /* 0fed0000 //C 0fa86 pop	lr */
-0x0000fa87, 0x00f00e00, /* 00f00e00 //C 0fa87 ret */
-0x0000fa88, 0x0ded0000, /* 0ded0000 //C 0fa88 push	lr */
-0x0000fa89, 0x0dad0000, /* 0dad0000 //C 0fa89 push	r10 */
-0x0000fa8a, 0x0d0d0000, /* 0d0d0000 //C 0fa8a push	r0 */
-0x0000fa8b, 0x00000a00, /* 00000a00 //C 0fa8b mov	r0,r10 */
-0x0000fa8c, 0x0400fa42, /* 0400fa42 //C 0fa8c call	print_reg_name */
-0x0000fa8d, 0x01020020, /* 01020020 //C 0fa8d mvzl	r0,32 */
-0x0000fa8e, 0x0400fba8, /* 0400fba8 //C 0fa8e call	putchar */
-0x0000fa8f, 0x00000a00, /* 00000a00 //C 0fa8f mov	r0,r10 */
-0x0000fa90, 0x0400fa7d, /* 0400fa7d //C 0fa90 call	print_reg_value */
-0x0000fa91, 0x0102000a, /* 0102000a //C 0fa91 mvzl	r0,LF */
-0x0000fa92, 0x0400fba8, /* 0400fba8 //C 0fa92 call	putchar */
-0x0000fa93, 0x0f0d0000, /* 0f0d0000 //C 0fa93 pop	r0 */
-0x0000fa94, 0x0fad0000, /* 0fad0000 //C 0fa94 pop	r10 */
-0x0000fa95, 0x0fed0000, /* 0fed0000 //C 0fa95 pop	lr */
-0x0000fa96, 0x00f00e00, /* 00f00e00 //C 0fa96 ret */
-0x0000fa97, 0x0ded0000, /* 0ded0000 //C 0fa97 push	lr */
-0x0000fa98, 0x0400fba8, /* 0400fba8 //C 0fa98 call	putchar */
-0x0000fa99, 0x001c0200, /* 001c0200 //C 0fa99 test	r1,r2 */
-0x0000fa9a, 0x21020031, /* 21020031 //C 0fa9a NZ mvzl r0,'1' */
-0x0000fa9b, 0x11020030, /* 11020030 //C 0fa9b Z  mvzl r0,'0' */
-0x0000fa9c, 0x0400fba8, /* 0400fba8 //C 0fa9c call	putchar */
-0x0000fa9d, 0x00000300, /* 00000300 //C 0fa9d mov	r0,r3 */
-0x0000fa9e, 0x0400fba8, /* 0400fba8 //C 0fa9e call	putchar */
-0x0000fa9f, 0x0fed0000, /* 0fed0000 //C 0fa9f pop	lr */
-0x0000faa0, 0x00f00e00, /* 00f00e00 //C 0faa0 ret */
-0x0000faa1, 0x0ded0000, /* 0ded0000 //C 0faa1 push	lr */
-0x0000faa2, 0x01a20000, /* 01a20000 //C 0faa2 mvzl	r10,0 */
-0x0000faa3, 0x0400fa88, /* 0400fa88 //C 0faa3 call	print_reg_name_value */
-0x0000faa4, 0x01a40001, /* 01a40001 //C 0faa4 add	r10,1 */
-0x0000faa5, 0x01a80011, /* 01a80011 //C 0faa5 cmp	r10,17 */
-0x0000faa6, 0x21f2faa3, /* 21f2faa3 //C 0faa6 jnz	r_cyc */
-0x0000faa7, 0x0710fc70, /* 0710fc70 //C 0faa7 ld	r1,regf */
-0x0000faa8, 0x01320020, /* 01320020 //C 0faa8 mvzl	r3,32 */
-0x0000faa9, 0x01020055, /* 01020055 //C 0faa9 mvzl	r0,'U' */
-0x0000faaa, 0x01220020, /* 01220020 //C 0faaa mvzl	r2,0x20 */
-0x0000faab, 0x0400fa97, /* 0400fa97 //C 0faab call	print_flag */
-0x0000faac, 0x01020050, /* 01020050 //C 0faac mvzl	r0,'P' */
-0x0000faad, 0x01220010, /* 01220010 //C 0faad mvzl	r2,0x10 */
-0x0000faae, 0x0400fa97, /* 0400fa97 //C 0faae call	print_flag */
-0x0000faaf, 0x0102004f, /* 0102004f //C 0faaf mvzl	r0,'O' */
-0x0000fab0, 0x01220008, /* 01220008 //C 0fab0 mvzl	r2,8 */
-0x0000fab1, 0x0400fa97, /* 0400fa97 //C 0fab1 call	print_flag */
-0x0000fab2, 0x0102005a, /* 0102005a //C 0fab2 mvzl	r0,'Z' */
-0x0000fab3, 0x01220004, /* 01220004 //C 0fab3 mvzl	r2,4 */
-0x0000fab4, 0x0400fa97, /* 0400fa97 //C 0fab4 call	print_flag */
-0x0000fab5, 0x01020043, /* 01020043 //C 0fab5 mvzl	r0,'C' */
-0x0000fab6, 0x01220002, /* 01220002 //C 0fab6 mvzl	r2,2 */
-0x0000fab7, 0x0400fa97, /* 0400fa97 //C 0fab7 call	print_flag */
-0x0000fab8, 0x01020053, /* 01020053 //C 0fab8 mvzl	r0,'S' */
-0x0000fab9, 0x01220001, /* 01220001 //C 0fab9 mvzl	r2,1 */
-0x0000faba, 0x0132000a, /* 0132000a //C 0faba mvzl	r3,LF */
-0x0000fabb, 0x0400fa97, /* 0400fa97 //C 0fabb call	print_flag */
-0x0000fabc, 0x0fed0000, /* 0fed0000 //C 0fabc pop	lr */
-0x0000fabd, 0x00f00e00, /* 00f00e00 //C 0fabd ret */
-0x0000fabe, 0x0ded0000, /* 0ded0000 //C 0fabe push	lr */
-0x0000fabf, 0x07a0fc5f, /* 07a0fc5f //C 0fabf ld	r10,nuof_reg	; Reg num is in R10 */
-0x0000fac0, 0x01a80010, /* 01a80010 //C 0fac0 cmp	r10,16 */
-0x0000fac1, 0xa1f2fad6, /* a1f2fad6 //C 0fac1 LS jmp	rx_nr_ok */
-0x0000fac2, 0x0102fac5, /* 0102fac5 //C 0fac2 mvzl	r0,rx_err_nr */
-0x0000fac3, 0x0400fbc3, /* 0400fbc3 //C 0fac3 call	printsnl */
-0x0000fac4, 0x01f2faf2, /* 01f2faf2 //C 0fac4 jmp	rx_ret */
-0x0000fac5, 0x0000004e, /* 0000004e //C 0fac5 db	78 */
-0x0000fac6, 0x0000006f, /* 0000006f //C 0fac6 db	111 */
-0x0000fac7, 0x00000020, /* 00000020 //C 0fac7 db	32 */
-0x0000fac8, 0x00000073, /* 00000073 //C 0fac8 db	115 */
-0x0000fac9, 0x00000075, /* 00000075 //C 0fac9 db	117 */
-0x0000faca, 0x00000063, /* 00000063 //C 0faca db	99 */
-0x0000facb, 0x00000068, /* 00000068 //C 0facb db	104 */
-0x0000facc, 0x00000020, /* 00000020 //C 0facc db	32 */
-0x0000facd, 0x00000072, /* 00000072 //C 0facd db	114 */
-0x0000face, 0x00000065, /* 00000065 //C 0face db	101 */
-0x0000facf, 0x00000067, /* 00000067 //C 0facf db	103 */
-0x0000fad0, 0x00000069, /* 00000069 //C 0fad0 db	105 */
-0x0000fad1, 0x00000073, /* 00000073 //C 0fad1 db	115 */
-0x0000fad2, 0x00000074, /* 00000074 //C 0fad2 db	116 */
-0x0000fad3, 0x00000065, /* 00000065 //C 0fad3 db	101 */
-0x0000fad4, 0x00000072, /* 00000072 //C 0fad4 db	114 */
-0x0000fad5, 0x00000000, /* 00000000 //C 0fad5 db */
-0x0000fad6, 0x0122fc58, /* 0122fc58 //C 0fad6 mvzl	r2,words */
-0x0000fad7, 0x0e420001, /* 0e420001 //C 0fad7 ld	r4,r2,1		; get aof first parameter */
-0x0000fad8, 0x024b0000, /* 024b0000 //C 0fad8 sz	r4		; is it NULL? */
-0x0000fad9, 0x11f2faf1, /* 11f2faf1 //C 0fad9 jz	rx_print */
-0x0000fada, 0x00000400, /* 00000400 //C 0fada mov	r0,r4 */
-0x0000fadb, 0x0400fb7d, /* 0400fb7d //C 0fadb call	htoi */
-0x0000fadc, 0x00500100, /* 00500100 //C 0fadc mov	r5,r1		; Value is in R5 */
-0x0000fadd, 0x31f2faed, /* 31f2faed //C 0fadd C1 jmp	rx_val_ok */
-0x0000fade, 0x0102fae1, /* 0102fae1 //C 0fade mvzl	r0,rx_err_val */
-0x0000fadf, 0x0400fbc3, /* 0400fbc3 //C 0fadf call	printsnl */
-0x0000fae0, 0x01f2faf2, /* 01f2faf2 //C 0fae0 jmp	rx_ret */
-0x0000fae1, 0x00000056, /* 00000056 //C 0fae1 db	86 */
-0x0000fae2, 0x00000061, /* 00000061 //C 0fae2 db	97 */
-0x0000fae3, 0x0000006c, /* 0000006c //C 0fae3 db	108 */
-0x0000fae4, 0x00000075, /* 00000075 //C 0fae4 db	117 */
-0x0000fae5, 0x00000065, /* 00000065 //C 0fae5 db	101 */
-0x0000fae6, 0x00000020, /* 00000020 //C 0fae6 db	32 */
-0x0000fae7, 0x00000065, /* 00000065 //C 0fae7 db	101 */
-0x0000fae8, 0x00000072, /* 00000072 //C 0fae8 db	114 */
-0x0000fae9, 0x00000072, /* 00000072 //C 0fae9 db	114 */
-0x0000faea, 0x0000006f, /* 0000006f //C 0faea db	111 */
-0x0000faeb, 0x00000072, /* 00000072 //C 0faeb db	114 */
-0x0000faec, 0x00000000, /* 00000000 //C 0faec db */
-0x0000faed, 0x01a80010, /* 01a80010 //C 0faed cmp	r10,16		; Flag reg? */
-0x0000faee, 0x115f003f, /* 115f003f //C 0faee EQ and	r5,0x3f */
-0x0000faef, 0x0102fc60, /* 0102fc60 //C 0faef mvzl	r0,reg0 */
-0x0000faf0, 0x08500a00, /* 08500a00 //C 0faf0 st	r5,r0,r10 */
-0x0000faf1, 0x0400fa88, /* 0400fa88 //C 0faf1 call	print_reg_name_value */
-0x0000faf2, 0x0fed0000, /* 0fed0000 //C 0faf2 pop	lr */
-0x0000faf3, 0x00f00e00, /* 00f00e00 //C 0faf3 ret */
-0x0000faf4, 0x0102000d, /* 0102000d //C 0faf4 mvzl	r0,13 */
-0x0000faf5, 0x0600fc5f, /* 0600fc5f //C 0faf5 st	r0,nuof_reg */
-0x0000faf6, 0x01f2fabe, /* 01f2fabe //C 0faf6 jmp	cmd_rx */
-0x0000faf7, 0x0102000e, /* 0102000e //C 0faf7 mvzl	r0,14 */
-0x0000faf8, 0x0600fc5f, /* 0600fc5f //C 0faf8 st	r0,nuof_reg */
-0x0000faf9, 0x01f2fabe, /* 01f2fabe //C 0faf9 jmp	cmd_rx */
-0x0000fafa, 0x0102000f, /* 0102000f //C 0fafa mvzl	r0,15 */
-0x0000fafb, 0x0600fc5f, /* 0600fc5f //C 0fafb st	r0,nuof_reg */
-0x0000fafc, 0x01f2fabe, /* 01f2fabe //C 0fafc jmp	cmd_rx */
-0x0000fafd, 0x01020010, /* 01020010 //C 0fafd mvzl	r0,16 */
-0x0000fafe, 0x0600fc5f, /* 0600fc5f //C 0fafe st	r0,nuof_reg */
-0x0000faff, 0x01f2fabe, /* 01f2fabe //C 0faff jmp	cmd_rx */
-0x0000fb00, 0x0d1d0000, /* 0d1d0000 //C 0fb00 push	r1 */
-0x0000fb01, 0x0d2d0000, /* 0d2d0000 //C 0fb01 push	r2 */
-0x0000fb02, 0x0e210000, /* 0e210000 //C 0fb02 ld	r2,r1 */
-0x0000fb03, 0x022b0000, /* 022b0000 //C 0fb03 sz	r2 */
-0x0000fb04, 0x11f2fb0b, /* 11f2fb0b //C 0fb04 jz	strchr_no	; eof string found */
-0x0000fb05, 0x00280000, /* 00280000 //C 0fb05 cmp	r2,r0		; compare */
-0x0000fb06, 0x11f2fb09, /* 11f2fb09 //C 0fb06 jz	strchr_yes */
-0x0000fb07, 0x011a0001, /* 011a0001 //C 0fb07 plus	r1,1		; go to next char */
-0x0000fb08, 0x01f2fb02, /* 01f2fb02 //C 0fb08 jmp	strchr_cyc */
-0x0000fb09, 0x020c0000, /* 020c0000 //C 0fb09 sec */
-0x0000fb0a, 0x01f2fb0d, /* 01f2fb0d //C 0fb0a jmp	strchr_ret */
-0x0000fb0b, 0x01120000, /* 01120000 //C 0fb0b mvzl	r1,0 */
-0x0000fb0c, 0x020d0000, /* 020d0000 //C 0fb0c clc */
-0x0000fb0d, 0x0f2d0000, /* 0f2d0000 //C 0fb0d pop	r2 */
-0x0000fb0e, 0x0f1d0000, /* 0f1d0000 //C 0fb0e pop	r1 */
-0x0000fb0f, 0x00f00e00, /* 00f00e00 //C 0fb0f ret */
-0x0000fb10, 0x0ded0000, /* 0ded0000 //C 0fb10 push	lr		; Save used registers */
-0x0000fb11, 0x0d0d0000, /* 0d0d0000 //C 0fb11 push	r0		; and input parameters */
-0x0000fb12, 0x0d1d0000, /* 0d1d0000 //C 0fb12 push	r1 */
-0x0000fb13, 0x0d2d0000, /* 0d2d0000 //C 0fb13 push	r2 */
-0x0000fb14, 0x0d4d0000, /* 0d4d0000 //C 0fb14 push	r4 */
-0x0000fb15, 0x0d5d0000, /* 0d5d0000 //C 0fb15 push	r5 */
-0x0000fb16, 0x0d6d0000, /* 0d6d0000 //C 0fb16 push	r6 */
-0x0000fb17, 0x0e200000, /* 0e200000 //C 0fb17 ld	r2,r0		; Got one-one char */
-0x0000fb18, 0x0e610000, /* 0e610000 //C 0fb18 ld	r6,r1		; from two strings */
-0x0000fb19, 0x023b0000, /* 023b0000 //C 0fb19 sz	r3		; Prepare for comparing */
-0x0000fb1a, 0x112d0020, /* 112d0020 //C 0fb1a Z1 or	r2,0x20		; if insensitive case */
-0x0000fb1b, 0x023b0000, /* 023b0000 //C 0fb1b sz	r3 */
-0x0000fb1c, 0x116d0020, /* 116d0020 //C 0fb1c Z1 or	r6,0x20 */
-0x0000fb1d, 0x00280600, /* 00280600 //C 0fb1d cmp	r2,r6		; compare them */
-0x0000fb1e, 0x21f2fb30, /* 21f2fb30 //C 0fb1e jnz	streq_no	; if differs: strings are not equal */
-0x0000fb1f, 0x0e200000, /* 0e200000 //C 0fb1f ld	r2,r0		; Pick original (non-prepared) */
-0x0000fb20, 0x0e610000, /* 0e610000 //C 0fb20 ld	r6,r1		; chars to check EOS */
-0x0000fb21, 0x022b0000, /* 022b0000 //C 0fb21 sz	r2		; convert them to boolean */
-0x0000fb22, 0x21220001, /* 21220001 //C 0fb22 Z0 mvzl	r2,1		; values in R2,R6 */
-0x0000fb23, 0x11220000, /* 11220000 //C 0fb23 Z1 mvzl	r2,0		; and copy in R4,R5 */
-0x0000fb24, 0x00400200, /* 00400200 //C 0fb24 mov	r4,r2 */
-0x0000fb25, 0x026b0000, /* 026b0000 //C 0fb25 sz	r6 */
-0x0000fb26, 0x21620001, /* 21620001 //C 0fb26 Z0 mvzl	r6,1 */
-0x0000fb27, 0x11620000, /* 11620000 //C 0fb27 Z1 mvzl r6,0 */
-0x0000fb28, 0x00500600, /* 00500600 //C 0fb28 mov	r5,r6 */
-0x0000fb29, 0x004d0500, /* 004d0500 //C 0fb29 or	r4,r5		; if both are EOS: equal */
-0x0000fb2a, 0x11f2fb32, /* 11f2fb32 //C 0fb2a jz	streq_yes */
-0x0000fb2b, 0x002f0600, /* 002f0600 //C 0fb2b and 	r2,r6		; just one is EOS: not equal */
-0x0000fb2c, 0x11f2fb30, /* 11f2fb30 //C 0fb2c jz	streq_no */
-0x0000fb2d, 0x010a0001, /* 010a0001 //C 0fb2d plus	r0,1		; non are EOS: go to check next char */
-0x0000fb2e, 0x011a0001, /* 011a0001 //C 0fb2e plus	r1,1 */
-0x0000fb2f, 0x01f2fb17, /* 01f2fb17 //C 0fb2f jmp	streq_cyc */
-0x0000fb30, 0x020d0000, /* 020d0000 //C 0fb30 clc			; False result */
-0x0000fb31, 0x01f2fb33, /* 01f2fb33 //C 0fb31 jmp	streq_ret */
-0x0000fb32, 0x020c0000, /* 020c0000 //C 0fb32 sec			; True result */
-0x0000fb33, 0x0f6d0000, /* 0f6d0000 //C 0fb33 pop	r6 */
-0x0000fb34, 0x0f5d0000, /* 0f5d0000 //C 0fb34 pop	r5 */
-0x0000fb35, 0x0f4d0000, /* 0f4d0000 //C 0fb35 pop	r4 */
-0x0000fb36, 0x0f2d0000, /* 0f2d0000 //C 0fb36 pop	r2 */
-0x0000fb37, 0x0f1d0000, /* 0f1d0000 //C 0fb37 pop	r1 */
-0x0000fb38, 0x0f0d0000, /* 0f0d0000 //C 0fb38 pop	r0 */
-0x0000fb39, 0x0fed0000, /* 0fed0000 //C 0fb39 pop	lr */
-0x0000fb3a, 0x00f00e00, /* 00f00e00 //C 0fb3a ret */
-0x0000fb3b, 0x0ded0000, /* 0ded0000 //C 0fb3b push	lr */
-0x0000fb3c, 0x0d3d0000, /* 0d3d0000 //C 0fb3c push	r3 */
-0x0000fb3d, 0x01320001, /* 01320001 //C 0fb3d mvzl	r3,1 */
-0x0000fb3e, 0x0400fb10, /* 0400fb10 //C 0fb3e call	str_cmp_eq */
-0x0000fb3f, 0x0f3d0000, /* 0f3d0000 //C 0fb3f pop	r3 */
-0x0000fb40, 0x0fed0000, /* 0fed0000 //C 0fb40 pop	lr */
-0x0000fb41, 0x00f00e00, /* 00f00e00 //C 0fb41 ret */
-0x0000fb42, 0x0ded0000, /* 0ded0000 //C 0fb42 push	lr */
-0x0000fb43, 0x0d3d0000, /* 0d3d0000 //C 0fb43 push	r3 */
-0x0000fb44, 0x01320000, /* 01320000 //C 0fb44 mvzl	r3,0 */
-0x0000fb45, 0x0400fb10, /* 0400fb10 //C 0fb45 call	str_cmp_eq */
-0x0000fb46, 0x0f3d0000, /* 0f3d0000 //C 0fb46 pop	r3 */
-0x0000fb47, 0x0fed0000, /* 0fed0000 //C 0fb47 pop	lr */
-0x0000fb48, 0x00f00e00, /* 00f00e00 //C 0fb48 ret */
-0x0000fb49, 0x0108002f, /* 0108002f //C 0fb49 cmp	r0,'/' */
-0x0000fb4a, 0xa1f2fb5f, /* a1f2fb5f //C 0fb4a LS jmp	hc2v_nok */
-0x0000fb4b, 0x01080039, /* 01080039 //C 0fb4b cmp	r0,'9' */
-0x0000fb4c, 0xa1f2fb5c, /* a1f2fb5c //C 0fb4c LS jmp	hc2v_0_9 */
-0x0000fb4d, 0x01080040, /* 01080040 //C 0fb4d cmp	r0,'@' */
-0x0000fb4e, 0xa1f2fb5f, /* a1f2fb5f //C 0fb4e LS jmp	hc2v_nok */
-0x0000fb4f, 0x01080046, /* 01080046 //C 0fb4f cmp	r0,'F' */
-0x0000fb50, 0xa1f2fb59, /* a1f2fb59 //C 0fb50 LS jmp	hc2v_A_F */
-0x0000fb51, 0x01080060, /* 01080060 //C 0fb51 cmp	r0,'`' */
-0x0000fb52, 0xa1f2fb5f, /* a1f2fb5f //C 0fb52 LS jmp	hc2v_nok */
-0x0000fb53, 0x01080066, /* 01080066 //C 0fb53 cmp	r0,'f' */
-0x0000fb54, 0xa1f2fb56, /* a1f2fb56 //C 0fb54 LS jmp	hc2v_a_f */
-0x0000fb55, 0x01f2fb5f, /* 01f2fb5f //C 0fb55 jmp	hc2v_nok */
-0x0000fb56, 0x0104000a, /* 0104000a //C 0fb56 add	r0,10 */
-0x0000fb57, 0x01060061, /* 01060061 //C 0fb57 sub	r0,'a' */
-0x0000fb58, 0x01f2fb5d, /* 01f2fb5d //C 0fb58 jmp	hc2v_ok */
-0x0000fb59, 0x0104000a, /* 0104000a //C 0fb59 add	r0,10 */
-0x0000fb5a, 0x01060041, /* 01060041 //C 0fb5a sub	r0,'A' */
-0x0000fb5b, 0x01f2fb5d, /* 01f2fb5d //C 0fb5b jmp	hc2v_ok */
-0x0000fb5c, 0x01060030, /* 01060030 //C 0fb5c sub	r0,'0' */
-0x0000fb5d, 0x020c0000, /* 020c0000 //C 0fb5d sec */
-0x0000fb5e, 0x00f00e00, /* 00f00e00 //C 0fb5e ret */
-0x0000fb5f, 0x020d0000, /* 020d0000 //C 0fb5f clc */
-0x0000fb60, 0x00f00e00, /* 00f00e00 //C 0fb60 ret */
-0x0000fb61, 0x0d1d0000, /* 0d1d0000 //C 0fb61 push	r1 */
-0x0000fb62, 0x010f000f, /* 010f000f //C 0fb62 and	r0,0xf */
-0x0000fb63, 0x0112fb67, /* 0112fb67 //C 0fb63 mvzl	r1,v2hc_table */
-0x0000fb64, 0x0a010000, /* 0a010000 //C 0fb64 ld	r0,r1,r0 */
-0x0000fb65, 0x0f1d0000, /* 0f1d0000 //C 0fb65 pop	r1 */
-0x0000fb66, 0x00f00e00, /* 00f00e00 //C 0fb66 ret */
-0x0000fb67, 0x00000030, /* 00000030 //C 0fb67 db	48 */
-0x0000fb68, 0x00000031, /* 00000031 //C 0fb68 db	49 */
-0x0000fb69, 0x00000032, /* 00000032 //C 0fb69 db	50 */
-0x0000fb6a, 0x00000033, /* 00000033 //C 0fb6a db	51 */
-0x0000fb6b, 0x00000034, /* 00000034 //C 0fb6b db	52 */
-0x0000fb6c, 0x00000035, /* 00000035 //C 0fb6c db	53 */
-0x0000fb6d, 0x00000036, /* 00000036 //C 0fb6d db	54 */
-0x0000fb6e, 0x00000037, /* 00000037 //C 0fb6e db	55 */
-0x0000fb6f, 0x00000038, /* 00000038 //C 0fb6f db	56 */
-0x0000fb70, 0x00000039, /* 00000039 //C 0fb70 db	57 */
-0x0000fb71, 0x00000041, /* 00000041 //C 0fb71 db	65 */
-0x0000fb72, 0x00000042, /* 00000042 //C 0fb72 db	66 */
-0x0000fb73, 0x00000043, /* 00000043 //C 0fb73 db	67 */
-0x0000fb74, 0x00000044, /* 00000044 //C 0fb74 db	68 */
-0x0000fb75, 0x00000045, /* 00000045 //C 0fb75 db	69 */
-0x0000fb76, 0x00000046, /* 00000046 //C 0fb76 db	70 */
-0x0000fb77, 0x00000000, /* 00000000 //C 0fb77 db */
-0x0000fb78, 0x0ded0000, /* 0ded0000 //C 0fb78 push	lr */
-0x0000fb79, 0x0400fb61, /* 0400fb61 //C 0fb79 call	value2Hexchar */
-0x0000fb7a, 0x010d0020, /* 010d0020 //C 0fb7a or	r0,0x20 */
-0x0000fb7b, 0x0fed0000, /* 0fed0000 //C 0fb7b pop	lr */
-0x0000fb7c, 0x00f00e00, /* 00f00e00 //C 0fb7c ret */
-0x0000fb7d, 0x0ded0000, /* 0ded0000 //C 0fb7d push	lr */
-0x0000fb7e, 0x0d2d0000, /* 0d2d0000 //C 0fb7e push	r2 */
-0x0000fb7f, 0x0d3d0000, /* 0d3d0000 //C 0fb7f push	r3 */
-0x0000fb80, 0x01120000, /* 01120000 //C 0fb80 mvzl	r1,0		; return value */
-0x0000fb81, 0x01320000, /* 01320000 //C 0fb81 mvzl	r3,0		; index */
-0x0000fb82, 0x0b238000, /* 0b238000 //C 0fb82 ld	r2,r3+,r0	; pick a char */
-0x0000fb83, 0x022b0000, /* 022b0000 //C 0fb83 sz	r2		; check eof string */
-0x0000fb84, 0x11f2fb98, /* 11f2fb98 //C 0fb84 jz	htoi_eos */
-0x0000fb85, 0x0128002e, /* 0128002e //C 0fb85 cmp	r2,'.'		; skip separators */
-0x0000fb86, 0x11f2fb82, /* 11f2fb82 //C 0fb86 jz	htoi_cyc */
-0x0000fb87, 0x0128005f, /* 0128005f //C 0fb87 cmp	r2,'_' */
-0x0000fb88, 0x11f2fb82, /* 11f2fb82 //C 0fb88 jz	htoi_cyc */
-0x0000fb89, 0x0d0d0000, /* 0d0d0000 //C 0fb89 push	r0 */
-0x0000fb8a, 0x00000200, /* 00000200 //C 0fb8a mov	r0,r2 */
-0x0000fb8b, 0x0400fb49, /* 0400fb49 //C 0fb8b call	hexchar2value */
-0x0000fb8c, 0x00200000, /* 00200000 //C 0fb8c mov	r2,r0 */
-0x0000fb8d, 0x0f0d0000, /* 0f0d0000 //C 0fb8d pop	r0 */
-0x0000fb8e, 0x41f2fb96, /* 41f2fb96 //C 0fb8e C0 jmp	htoi_nok */
-0x0000fb8f, 0x02180000, /* 02180000 //C 0fb8f shl	r1 */
-0x0000fb90, 0x02180000, /* 02180000 //C 0fb90 shl	r1 */
-0x0000fb91, 0x02180000, /* 02180000 //C 0fb91 shl	r1 */
-0x0000fb92, 0x02180000, /* 02180000 //C 0fb92 shl	r1 */
-0x0000fb93, 0x012f000f, /* 012f000f //C 0fb93 and	r2,0xf */
-0x0000fb94, 0x001d0200, /* 001d0200 //C 0fb94 or	r1,r2 */
-0x0000fb95, 0x01f2fb82, /* 01f2fb82 //C 0fb95 jmp	htoi_cyc */
-0x0000fb96, 0x020d0000, /* 020d0000 //C 0fb96 clc */
-0x0000fb97, 0x01f2fb9b, /* 01f2fb9b //C 0fb97 jmp	htoi_ret */
-0x0000fb98, 0x01380001, /* 01380001 //C 0fb98 cmp	r3,1 */
-0x0000fb99, 0x920d0000, /* 920d0000 //C 0fb99 HI clc */
-0x0000fb9a, 0xa20c0000, /* a20c0000 //C 0fb9a LS sec */
-0x0000fb9b, 0x0f3d0000, /* 0f3d0000 //C 0fb9b pop	r3 */
-0x0000fb9c, 0x0f2d0000, /* 0f2d0000 //C 0fb9c pop	r2 */
-0x0000fb9d, 0x0fed0000, /* 0fed0000 //C 0fb9d pop	lr */
-0x0000fb9e, 0x00f00e00, /* 00f00e00 //C 0fb9e ret */
-0x0000fb9f, 0x0d0d0000, /* 0d0d0000 //C 0fb9f push	r0 */
-0x0000fba0, 0x0700ff42, /* 0700ff42 //C 0fba0 ld	r0,UART_RSTAT */
-0x0000fba1, 0x010c0001, /* 010c0001 //C 0fba1 test	r0,1 */
-0x0000fba2, 0x020d0000, /* 020d0000 //C 0fba2 clc */
-0x0000fba3, 0x220c0000, /* 220c0000 //C 0fba3 Z0 sec */
-0x0000fba4, 0x0f0d0000, /* 0f0d0000 //C 0fba4 pop	r0 */
-0x0000fba5, 0x00f00e00, /* 00f00e00 //C 0fba5 ret */
-0x0000fba6, 0x0700ff40, /* 0700ff40 //C 0fba6 ld	r0,UART_DR */
-0x0000fba7, 0x00f00e00, /* 00f00e00 //C 0fba7 ret */
-0x0000fba8, 0x0d9d0000, /* 0d9d0000 //C 0fba8 push	r9 */
-0x0000fba9, 0x0790ff43, /* 0790ff43 //C 0fba9 ld	r9,UART_TSTAT */
-0x0000fbaa, 0x019c0001, /* 019c0001 //C 0fbaa test	r9,1 */
-0x0000fbab, 0x11f2fba9, /* 11f2fba9 //C 0fbab jz	wait_tc */
-0x0000fbac, 0x0600ff40, /* 0600ff40 //C 0fbac st	r0,UART_DR */
-0x0000fbad, 0x0f9d0000, /* 0f9d0000 //C 0fbad pop	r9 */
-0x0000fbae, 0x00f00e00, /* 00f00e00 //C 0fbae ret */
-0x0000fbaf, 0x0ded0000, /* 0ded0000 //C 0fbaf push	lr */
-0x0000fbb0, 0x0d0d0000, /* 0d0d0000 //C 0fbb0 push	r0 */
-0x0000fbb1, 0x0d3d0000, /* 0d3d0000 //C 0fbb1 push	r3 */
-0x0000fbb2, 0x0d4d0000, /* 0d4d0000 //C 0fbb2 push	r4 */
-0x0000fbb3, 0x01420000, /* 01420000 //C 0fbb3 mvzl	r4,0 */
-0x0000fbb4, 0x020b0000, /* 020b0000 //C 0fbb4 sz	r0 */
-0x0000fbb5, 0x1102fc8a, /* 1102fc8a //C 0fbb5 Z1 mvzl	r0,null_str */
-0x0000fbb6, 0x0b348000, /* 0b348000 //C 0fbb6 ld	r3,r4+,r0 */
-0x0000fbb7, 0x023b0000, /* 023b0000 //C 0fbb7 sz	r3 */
-0x0000fbb8, 0x11f2fbbe, /* 11f2fbbe //C 0fbb8 jz	prints_done */
-0x0000fbb9, 0x0d0d0000, /* 0d0d0000 //C 0fbb9 push	r0 */
-0x0000fbba, 0x00000300, /* 00000300 //C 0fbba mov	r0,r3 */
-0x0000fbbb, 0x0400fba8, /* 0400fba8 //C 0fbbb call	putchar */
-0x0000fbbc, 0x0f0d0000, /* 0f0d0000 //C 0fbbc pop	r0 */
-0x0000fbbd, 0x01f2fbb6, /* 01f2fbb6 //C 0fbbd jmp	prints_go */
-0x0000fbbe, 0x0f4d0000, /* 0f4d0000 //C 0fbbe pop	r4 */
-0x0000fbbf, 0x0f3d0000, /* 0f3d0000 //C 0fbbf pop	r3 */
-0x0000fbc0, 0x0f0d0000, /* 0f0d0000 //C 0fbc0 pop	r0 */
-0x0000fbc1, 0x0fed0000, /* 0fed0000 //C 0fbc1 pop	lr */
-0x0000fbc2, 0x00f00e00, /* 00f00e00 //C 0fbc2 ret */
-0x0000fbc3, 0x0ded0000, /* 0ded0000 //C 0fbc3 push	lr */
-0x0000fbc4, 0x0400fbaf, /* 0400fbaf //C 0fbc4 call	prints */
-0x0000fbc5, 0x0d0d0000, /* 0d0d0000 //C 0fbc5 push	r0 */
-0x0000fbc6, 0x0102000a, /* 0102000a //C 0fbc6 mvzl	r0,LF */
-0x0000fbc7, 0x0400fba8, /* 0400fba8 //C 0fbc7 call	putchar */
-0x0000fbc8, 0x0f0d0000, /* 0f0d0000 //C 0fbc8 pop	r0 */
-0x0000fbc9, 0x0fed0000, /* 0fed0000 //C 0fbc9 pop	lr */
-0x0000fbca, 0x00f00e00, /* 00f00e00 //C 0fbca ret */
-0x0000fbcb, 0x0ded0000, /* 0ded0000 //C 0fbcb push	lr */
-0x0000fbcc, 0x0d0d0000, /* 0d0d0000 //C 0fbcc push	r0 */
-0x0000fbcd, 0x0d1d0000, /* 0d1d0000 //C 0fbcd push	r1 */
-0x0000fbce, 0x0d2d0000, /* 0d2d0000 //C 0fbce push	r2 */
-0x0000fbcf, 0x0d3d0000, /* 0d3d0000 //C 0fbcf push	r3 */
-0x0000fbd0, 0x0d4d0000, /* 0d4d0000 //C 0fbd0 push	r4 */
-0x0000fbd1, 0x00300000, /* 00300000 //C 0fbd1 mov	r3,r0 */
-0x0000fbd2, 0x01220000, /* 01220000 //C 0fbd2 mvzl	r2,0 */
-0x0000fbd3, 0x01420001, /* 01420001 //C 0fbd3 mvzl	r4,1 */
-0x0000fbd4, 0x01020000, /* 01020000 //C 0fbd4 mvzl	r0,0 */
-0x0000fbd5, 0x02380000, /* 02380000 //C 0fbd5 shl	r3 */
-0x0000fbd6, 0x02070000, /* 02070000 //C 0fbd6 rol	r0 */
-0x0000fbd7, 0x02380000, /* 02380000 //C 0fbd7 shl	r3 */
-0x0000fbd8, 0x02070000, /* 02070000 //C 0fbd8 rol	r0 */
-0x0000fbd9, 0x02380000, /* 02380000 //C 0fbd9 shl	r3 */
-0x0000fbda, 0x02070000, /* 02070000 //C 0fbda rol	r0 */
-0x0000fbdb, 0x02380000, /* 02380000 //C 0fbdb shl	r3 */
-0x0000fbdc, 0x02070000, /* 02070000 //C 0fbdc rol	r0 */
-0x0000fbdd, 0x0400fb61, /* 0400fb61 //C 0fbdd call	value2Hexchar */
-0x0000fbde, 0x0400fba8, /* 0400fba8 //C 0fbde call	putchar */
-0x0000fbdf, 0x01240001, /* 01240001 //C 0fbdf add	r2,1 */
-0x0000fbe0, 0x01280008, /* 01280008 //C 0fbe0 cmp	r2,8 */
-0x0000fbe1, 0x11f2fbeb, /* 11f2fbeb //C 0fbe1 jz	print_vhex_ret */
-0x0000fbe2, 0x021b0000, /* 021b0000 //C 0fbe2 sz	r1 */
-0x0000fbe3, 0x11f2fbe9, /* 11f2fbe9 //C 0fbe3 jz	print_vhex_nosep */
-0x0000fbe4, 0x00480100, /* 00480100 //C 0fbe4 cmp	r4,r1 */
-0x0000fbe5, 0x21f2fbe9, /* 21f2fbe9 //C 0fbe5 jnz	print_vhex_nosep */
-0x0000fbe6, 0x0102005f, /* 0102005f //C 0fbe6 mvzl	r0,'_' */
-0x0000fbe7, 0x0400fba8, /* 0400fba8 //C 0fbe7 call	putchar */
-0x0000fbe8, 0x01420000, /* 01420000 //C 0fbe8 mvzl	r4,0 */
-0x0000fbe9, 0x01440001, /* 01440001 //C 0fbe9 add	r4,1 */
-0x0000fbea, 0x01f2fbd4, /* 01f2fbd4 //C 0fbea jmp	print_vhex_cyc */
-0x0000fbeb, 0x0f4d0000, /* 0f4d0000 //C 0fbeb pop	r4 */
-0x0000fbec, 0x0f3d0000, /* 0f3d0000 //C 0fbec pop	r3 */
-0x0000fbed, 0x0f2d0000, /* 0f2d0000 //C 0fbed pop	r2 */
-0x0000fbee, 0x0f1d0000, /* 0f1d0000 //C 0fbee pop	r1 */
-0x0000fbef, 0x0f0d0000, /* 0f0d0000 //C 0fbef pop	r0 */
-0x0000fbf0, 0x0fed0000, /* 0fed0000 //C 0fbf0 pop	lr */
-0x0000fbf1, 0x00f00e00, /* 00f00e00 //C 0fbf1 ret */
-0x0000fc5e, 0x00000000, /* 00000000 //C 0fc5e dd	0 */
-0x0000fc5f, 0x00000000, /* 00000000 //C 0fc5f dd	0 */
-0x0000fc60, 0x00000000, /* 00000000 //C 0fc60 dd	0 */
-0x0000fc61, 0x00000000, /* 00000000 //C 0fc61 dd	0 */
-0x0000fc62, 0x00000000, /* 00000000 //C 0fc62 dd	0 */
-0x0000fc63, 0x00000000, /* 00000000 //C 0fc63 dd	0 */
-0x0000fc64, 0x00000000, /* 00000000 //C 0fc64 dd	0 */
-0x0000fc65, 0x00000000, /* 00000000 //C 0fc65 dd	0 */
-0x0000fc66, 0x00000000, /* 00000000 //C 0fc66 dd	0 */
-0x0000fc67, 0x00000000, /* 00000000 //C 0fc67 dd	0 */
-0x0000fc68, 0x00000000, /* 00000000 //C 0fc68 dd	0 */
-0x0000fc69, 0x00000000, /* 00000000 //C 0fc69 dd	0 */
-0x0000fc6a, 0x00000000, /* 00000000 //C 0fc6a dd	0 */
-0x0000fc6b, 0x00000000, /* 00000000 //C 0fc6b dd	0 */
-0x0000fc6c, 0x00000000, /* 00000000 //C 0fc6c dd	0 */
-0x0000fc6d, 0x00000000, /* 00000000 //C 0fc6d dd	0 */
-0x0000fc6e, 0x00000000, /* 00000000 //C 0fc6e dd	0 */
-0x0000fc6f, 0x00000000, /* 00000000 //C 0fc6f dd	0 */
-0x0000fc70, 0x00000000, /* 00000000 //C 0fc70 dd	0 */
-0x0000fc71, 0x00000050, /* 00000050 //C 0fc71 db	80 */
-0x0000fc72, 0x0000004d, /* 0000004d //C 0fc72 db	77 */
-0x0000fc73, 0x0000006f, /* 0000006f //C 0fc73 db	111 */
-0x0000fc74, 0x0000006e, /* 0000006e //C 0fc74 db	110 */
-0x0000fc75, 0x00000069, /* 00000069 //C 0fc75 db	105 */
-0x0000fc76, 0x00000074, /* 00000074 //C 0fc76 db	116 */
-0x0000fc77, 0x0000006f, /* 0000006f //C 0fc77 db	111 */
-0x0000fc78, 0x00000072, /* 00000072 //C 0fc78 db	114 */
-0x0000fc79, 0x00000020, /* 00000020 //C 0fc79 db	32 */
-0x0000fc7a, 0x00000076, /* 00000076 //C 0fc7a db	118 */
-0x0000fc7b, 0x00000031, /* 00000031 //C 0fc7b db	49 */
-0x0000fc7c, 0x0000002e, /* 0000002e //C 0fc7c db	46 */
-0x0000fc7d, 0x00000030, /* 00000030 //C 0fc7d db	48 */
-0x0000fc7e, 0x00000000, /* 00000000 //C 0fc7e db */
-0x0000fc7f, 0x0000003e, /* 0000003e //C 0fc7f db	62 */
-0x0000fc80, 0x00000000, /* 00000000 //C 0fc80 db */
-0x0000fc81, 0x00000020, /* 00000020 //C 0fc81 db	32 */
-0x0000fc82, 0x0000003b, /* 0000003b //C 0fc82 db	59 */
-0x0000fc83, 0x00000009, /* 00000009 //C 0fc83 db	9 */
-0x0000fc84, 0x0000000b, /* 0000000b //C 0fc84 db	11 */
-0x0000fc85, 0x0000002c, /* 0000002c //C 0fc85 db	44 */
-0x0000fc86, 0x0000003d, /* 0000003d //C 0fc86 db	61 */
-0x0000fc87, 0x0000005b, /* 0000005b //C 0fc87 db	91 */
-0x0000fc88, 0x0000005d, /* 0000005d //C 0fc88 db	93 */
-0x0000fc89, 0x00000000, /* 00000000 //C 0fc89 db */
-0x0000fc8a, 0x00000028, /* 00000028 //C 0fc8a db	40 */
-0x0000fc8b, 0x0000006e, /* 0000006e //C 0fc8b db	110 */
-0x0000fc8c, 0x00000075, /* 00000075 //C 0fc8c db	117 */
-0x0000fc8d, 0x0000006c, /* 0000006c //C 0fc8d db	108 */
-0x0000fc8e, 0x0000006c, /* 0000006c //C 0fc8e db	108 */
-0x0000fc8f, 0x00000029, /* 00000029 //C 0fc8f db	41 */
-0x0000fc90, 0x00000000, /* 00000000 //C 0fc90 db */
-0x0000fc91, 0x0000f8ff, /* 0000f8ff //C 0fc91 dd	cmd_m */
-0x0000fc92, 0x0000006d, /* 0000006d //C 0fc92 db	109 */
-0x0000fc93, 0x00000000, /* 00000000 //C 0fc93 db */
-0x0000fc94, 0x0000f8ff, /* 0000f8ff //C 0fc94 dd	cmd_m */
-0x0000fc95, 0x0000006d, /* 0000006d //C 0fc95 db	109 */
-0x0000fc96, 0x00000065, /* 00000065 //C 0fc96 db	101 */
-0x0000fc97, 0x0000006d, /* 0000006d //C 0fc97 db	109 */
-0x0000fc98, 0x00000000, /* 00000000 //C 0fc98 db */
-0x0000fc99, 0x0000f954, /* 0000f954 //C 0fc99 dd	cmd_d */
-0x0000fc9a, 0x00000064, /* 00000064 //C 0fc9a db	100 */
-0x0000fc9b, 0x00000000, /* 00000000 //C 0fc9b db */
-0x0000fc9c, 0x0000f954, /* 0000f954 //C 0fc9c dd	cmd_d */
-0x0000fc9d, 0x00000064, /* 00000064 //C 0fc9d db	100 */
-0x0000fc9e, 0x00000075, /* 00000075 //C 0fc9e db	117 */
-0x0000fc9f, 0x0000006d, /* 0000006d //C 0fc9f db	109 */
-0x0000fca0, 0x00000070, /* 00000070 //C 0fca0 db	112 */
-0x0000fca1, 0x00000000, /* 00000000 //C 0fca1 db */
-0x0000fca2, 0x0000f988, /* 0000f988 //C 0fca2 dd	cmd_l */
-0x0000fca3, 0x0000006c, /* 0000006c //C 0fca3 db	108 */
-0x0000fca4, 0x00000000, /* 00000000 //C 0fca4 db */
-0x0000fca5, 0x0000f988, /* 0000f988 //C 0fca5 dd	cmd_l */
-0x0000fca6, 0x0000006c, /* 0000006c //C 0fca6 db	108 */
-0x0000fca7, 0x0000006f, /* 0000006f //C 0fca7 db	111 */
-0x0000fca8, 0x00000061, /* 00000061 //C 0fca8 db	97 */
-0x0000fca9, 0x00000064, /* 00000064 //C 0fca9 db	100 */
-0x0000fcaa, 0x00000000, /* 00000000 //C 0fcaa db */
-0x0000fcab, 0x0000f9f5, /* 0000f9f5 //C 0fcab dd	cmd_g */
-0x0000fcac, 0x00000067, /* 00000067 //C 0fcac db	103 */
-0x0000fcad, 0x00000000, /* 00000000 //C 0fcad db */
-0x0000fcae, 0x0000f9f5, /* 0000f9f5 //C 0fcae dd	cmd_g */
-0x0000fcaf, 0x00000067, /* 00000067 //C 0fcaf db	103 */
-0x0000fcb0, 0x0000006f, /* 0000006f //C 0fcb0 db	111 */
-0x0000fcb1, 0x00000000, /* 00000000 //C 0fcb1 db */
-0x0000fcb2, 0x0000f9f5, /* 0000f9f5 //C 0fcb2 dd	cmd_g */
-0x0000fcb3, 0x00000072, /* 00000072 //C 0fcb3 db	114 */
-0x0000fcb4, 0x00000075, /* 00000075 //C 0fcb4 db	117 */
-0x0000fcb5, 0x0000006e, /* 0000006e //C 0fcb5 db	110 */
-0x0000fcb6, 0x00000000, /* 00000000 //C 0fcb6 db */
-0x0000fcb7, 0x0000fa35, /* 0000fa35 //C 0fcb7 dd	cmd_h */
-0x0000fcb8, 0x0000003f, /* 0000003f //C 0fcb8 db	63 */
-0x0000fcb9, 0x00000000, /* 00000000 //C 0fcb9 db */
-0x0000fcba, 0x0000fa35, /* 0000fa35 //C 0fcba dd	cmd_h */
-0x0000fcbb, 0x00000068, /* 00000068 //C 0fcbb db	104 */
-0x0000fcbc, 0x00000000, /* 00000000 //C 0fcbc db */
-0x0000fcbd, 0x0000fa35, /* 0000fa35 //C 0fcbd dd	cmd_h */
-0x0000fcbe, 0x00000068, /* 00000068 //C 0fcbe db	104 */
-0x0000fcbf, 0x00000065, /* 00000065 //C 0fcbf db	101 */
-0x0000fcc0, 0x0000006c, /* 0000006c //C 0fcc0 db	108 */
-0x0000fcc1, 0x00000070, /* 00000070 //C 0fcc1 db	112 */
-0x0000fcc2, 0x00000000, /* 00000000 //C 0fcc2 db */
-0x0000fcc3, 0x0000faa1, /* 0000faa1 //C 0fcc3 dd	cmd_r */
-0x0000fcc4, 0x00000072, /* 00000072 //C 0fcc4 db	114 */
-0x0000fcc5, 0x00000000, /* 00000000 //C 0fcc5 db */
-0x0000fcc6, 0x0000faa1, /* 0000faa1 //C 0fcc6 dd	cmd_r */
-0x0000fcc7, 0x00000072, /* 00000072 //C 0fcc7 db	114 */
-0x0000fcc8, 0x00000065, /* 00000065 //C 0fcc8 db	101 */
-0x0000fcc9, 0x00000067, /* 00000067 //C 0fcc9 db	103 */
-0x0000fcca, 0x00000000, /* 00000000 //C 0fcca db */
-0x0000fccb, 0x0000faa1, /* 0000faa1 //C 0fccb dd	cmd_r */
-0x0000fccc, 0x00000072, /* 00000072 //C 0fccc db	114 */
-0x0000fccd, 0x00000065, /* 00000065 //C 0fccd db	101 */
-0x0000fcce, 0x00000067, /* 00000067 //C 0fcce db	103 */
-0x0000fccf, 0x00000073, /* 00000073 //C 0fccf db	115 */
-0x0000fcd0, 0x00000000, /* 00000000 //C 0fcd0 db */
-0x0000fcd1, 0x0000faf4, /* 0000faf4 //C 0fcd1 dd	cmd_sp */
-0x0000fcd2, 0x00000073, /* 00000073 //C 0fcd2 db	115 */
-0x0000fcd3, 0x00000070, /* 00000070 //C 0fcd3 db	112 */
-0x0000fcd4, 0x00000000, /* 00000000 //C 0fcd4 db */
-0x0000fcd5, 0x0000faf7, /* 0000faf7 //C 0fcd5 dd	cmd_lr */
-0x0000fcd6, 0x0000006c, /* 0000006c //C 0fcd6 db	108 */
-0x0000fcd7, 0x00000072, /* 00000072 //C 0fcd7 db	114 */
-0x0000fcd8, 0x00000000, /* 00000000 //C 0fcd8 db */
-0x0000fcd9, 0x0000fafa, /* 0000fafa //C 0fcd9 dd	cmd_pc */
-0x0000fcda, 0x00000070, /* 00000070 //C 0fcda db	112 */
-0x0000fcdb, 0x00000063, /* 00000063 //C 0fcdb db	99 */
-0x0000fcdc, 0x00000000, /* 00000000 //C 0fcdc db */
-0x0000fcdd, 0x0000fafd, /* 0000fafd //C 0fcdd dd	cmd_f */
-0x0000fcde, 0x00000066, /* 00000066 //C 0fcde db	102 */
-0x0000fcdf, 0x00000000, /* 00000000 //C 0fcdf db */
-0x0000fce0, 0x00000000, /* 00000000 //C 0fce0 dd	0 */
-0x0000fce1, 0x00000000, /* 00000000 //C 0fce1 dd	0 */
-0x0000fce2, 0x0000006d, /* 0000006d //C 0fce2 db	109 */
-0x0000fce3, 0x0000005b, /* 0000005b //C 0fce3 db	91 */
-0x0000fce4, 0x00000065, /* 00000065 //C 0fce4 db	101 */
-0x0000fce5, 0x0000006d, /* 0000006d //C 0fce5 db	109 */
-0x0000fce6, 0x0000005d, /* 0000005d //C 0fce6 db	93 */
-0x0000fce7, 0x00000020, /* 00000020 //C 0fce7 db	32 */
-0x0000fce8, 0x00000061, /* 00000061 //C 0fce8 db	97 */
-0x0000fce9, 0x00000064, /* 00000064 //C 0fce9 db	100 */
-0x0000fcea, 0x00000064, /* 00000064 //C 0fcea db	100 */
-0x0000fceb, 0x00000072, /* 00000072 //C 0fceb db	114 */
-0x0000fcec, 0x00000020, /* 00000020 //C 0fcec db	32 */
-0x0000fced, 0x0000005b, /* 0000005b //C 0fced db	91 */
-0x0000fcee, 0x00000076, /* 00000076 //C 0fcee db	118 */
-0x0000fcef, 0x00000061, /* 00000061 //C 0fcef db	97 */
-0x0000fcf0, 0x0000006c, /* 0000006c //C 0fcf0 db	108 */
-0x0000fcf1, 0x0000005d, /* 0000005d //C 0fcf1 db	93 */
-0x0000fcf2, 0x00000020, /* 00000020 //C 0fcf2 db	32 */
-0x0000fcf3, 0x00000020, /* 00000020 //C 0fcf3 db	32 */
-0x0000fcf4, 0x00000047, /* 00000047 //C 0fcf4 db	71 */
-0x0000fcf5, 0x00000065, /* 00000065 //C 0fcf5 db	101 */
-0x0000fcf6, 0x00000074, /* 00000074 //C 0fcf6 db	116 */
-0x0000fcf7, 0x0000002f, /* 0000002f //C 0fcf7 db	47 */
-0x0000fcf8, 0x00000073, /* 00000073 //C 0fcf8 db	115 */
-0x0000fcf9, 0x00000065, /* 00000065 //C 0fcf9 db	101 */
-0x0000fcfa, 0x00000074, /* 00000074 //C 0fcfa db	116 */
-0x0000fcfb, 0x00000020, /* 00000020 //C 0fcfb db	32 */
-0x0000fcfc, 0x0000006d, /* 0000006d //C 0fcfc db	109 */
-0x0000fcfd, 0x00000065, /* 00000065 //C 0fcfd db	101 */
-0x0000fcfe, 0x0000006d, /* 0000006d //C 0fcfe db	109 */
-0x0000fcff, 0x0000006f, /* 0000006f //C 0fcff db	111 */
-0x0000fd00, 0x00000072, /* 00000072 //C 0fd00 db	114 */
-0x0000fd01, 0x00000079, /* 00000079 //C 0fd01 db	121 */
-0x0000fd02, 0x0000000a, /* 0000000a //C 0fd02 db	10 */
-0x0000fd03, 0x00000000, /* 00000000 //C 0fd03 db */
-0x0000fd04, 0x00000064, /* 00000064 //C 0fd04 db	100 */
-0x0000fd05, 0x0000005b, /* 0000005b //C 0fd05 db	91 */
-0x0000fd06, 0x00000075, /* 00000075 //C 0fd06 db	117 */
-0x0000fd07, 0x0000006d, /* 0000006d //C 0fd07 db	109 */
-0x0000fd08, 0x00000070, /* 00000070 //C 0fd08 db	112 */
-0x0000fd09, 0x0000005d, /* 0000005d //C 0fd09 db	93 */
-0x0000fd0a, 0x00000020, /* 00000020 //C 0fd0a db	32 */
-0x0000fd0b, 0x00000073, /* 00000073 //C 0fd0b db	115 */
-0x0000fd0c, 0x00000074, /* 00000074 //C 0fd0c db	116 */
-0x0000fd0d, 0x00000061, /* 00000061 //C 0fd0d db	97 */
-0x0000fd0e, 0x00000072, /* 00000072 //C 0fd0e db	114 */
-0x0000fd0f, 0x00000074, /* 00000074 //C 0fd0f db	116 */
-0x0000fd10, 0x00000020, /* 00000020 //C 0fd10 db	32 */
-0x0000fd11, 0x00000065, /* 00000065 //C 0fd11 db	101 */
-0x0000fd12, 0x0000006e, /* 0000006e //C 0fd12 db	110 */
-0x0000fd13, 0x00000064, /* 00000064 //C 0fd13 db	100 */
-0x0000fd14, 0x00000020, /* 00000020 //C 0fd14 db	32 */
-0x0000fd15, 0x00000020, /* 00000020 //C 0fd15 db	32 */
-0x0000fd16, 0x00000044, /* 00000044 //C 0fd16 db	68 */
-0x0000fd17, 0x00000075, /* 00000075 //C 0fd17 db	117 */
-0x0000fd18, 0x0000006d, /* 0000006d //C 0fd18 db	109 */
-0x0000fd19, 0x00000070, /* 00000070 //C 0fd19 db	112 */
-0x0000fd1a, 0x00000020, /* 00000020 //C 0fd1a db	32 */
-0x0000fd1b, 0x0000006d, /* 0000006d //C 0fd1b db	109 */
-0x0000fd1c, 0x00000065, /* 00000065 //C 0fd1c db	101 */
-0x0000fd1d, 0x0000006d, /* 0000006d //C 0fd1d db	109 */
-0x0000fd1e, 0x0000006f, /* 0000006f //C 0fd1e db	111 */
-0x0000fd1f, 0x00000072, /* 00000072 //C 0fd1f db	114 */
-0x0000fd20, 0x00000079, /* 00000079 //C 0fd20 db	121 */
-0x0000fd21, 0x00000020, /* 00000020 //C 0fd21 db	32 */
-0x0000fd22, 0x00000063, /* 00000063 //C 0fd22 db	99 */
-0x0000fd23, 0x0000006f, /* 0000006f //C 0fd23 db	111 */
-0x0000fd24, 0x0000006e, /* 0000006e //C 0fd24 db	110 */
-0x0000fd25, 0x00000074, /* 00000074 //C 0fd25 db	116 */
-0x0000fd26, 0x00000065, /* 00000065 //C 0fd26 db	101 */
-0x0000fd27, 0x0000006e, /* 0000006e //C 0fd27 db	110 */
-0x0000fd28, 0x00000074, /* 00000074 //C 0fd28 db	116 */
-0x0000fd29, 0x0000000a, /* 0000000a //C 0fd29 db	10 */
-0x0000fd2a, 0x00000000, /* 00000000 //C 0fd2a db */
-0x0000fd2b, 0x0000006c, /* 0000006c //C 0fd2b db	108 */
-0x0000fd2c, 0x0000005b, /* 0000005b //C 0fd2c db	91 */
-0x0000fd2d, 0x0000006f, /* 0000006f //C 0fd2d db	111 */
-0x0000fd2e, 0x00000061, /* 00000061 //C 0fd2e db	97 */
-0x0000fd2f, 0x00000064, /* 00000064 //C 0fd2f db	100 */
-0x0000fd30, 0x0000005d, /* 0000005d //C 0fd30 db	93 */
-0x0000fd31, 0x00000020, /* 00000020 //C 0fd31 db	32 */
-0x0000fd32, 0x00000020, /* 00000020 //C 0fd32 db	32 */
-0x0000fd33, 0x00000020, /* 00000020 //C 0fd33 db	32 */
-0x0000fd34, 0x00000020, /* 00000020 //C 0fd34 db	32 */
-0x0000fd35, 0x00000020, /* 00000020 //C 0fd35 db	32 */
-0x0000fd36, 0x00000020, /* 00000020 //C 0fd36 db	32 */
-0x0000fd37, 0x00000020, /* 00000020 //C 0fd37 db	32 */
-0x0000fd38, 0x00000020, /* 00000020 //C 0fd38 db	32 */
-0x0000fd39, 0x00000020, /* 00000020 //C 0fd39 db	32 */
-0x0000fd3a, 0x00000020, /* 00000020 //C 0fd3a db	32 */
-0x0000fd3b, 0x00000020, /* 00000020 //C 0fd3b db	32 */
-0x0000fd3c, 0x00000020, /* 00000020 //C 0fd3c db	32 */
-0x0000fd3d, 0x0000004c, /* 0000004c //C 0fd3d db	76 */
-0x0000fd3e, 0x0000006f, /* 0000006f //C 0fd3e db	111 */
-0x0000fd3f, 0x00000061, /* 00000061 //C 0fd3f db	97 */
-0x0000fd40, 0x00000064, /* 00000064 //C 0fd40 db	100 */
-0x0000fd41, 0x00000020, /* 00000020 //C 0fd41 db	32 */
-0x0000fd42, 0x00000068, /* 00000068 //C 0fd42 db	104 */
-0x0000fd43, 0x00000065, /* 00000065 //C 0fd43 db	101 */
-0x0000fd44, 0x00000078, /* 00000078 //C 0fd44 db	120 */
-0x0000fd45, 0x00000020, /* 00000020 //C 0fd45 db	32 */
-0x0000fd46, 0x00000066, /* 00000066 //C 0fd46 db	102 */
-0x0000fd47, 0x00000069, /* 00000069 //C 0fd47 db	105 */
-0x0000fd48, 0x0000006c, /* 0000006c //C 0fd48 db	108 */
-0x0000fd49, 0x00000065, /* 00000065 //C 0fd49 db	101 */
-0x0000fd4a, 0x00000020, /* 00000020 //C 0fd4a db	32 */
-0x0000fd4b, 0x00000074, /* 00000074 //C 0fd4b db	116 */
-0x0000fd4c, 0x0000006f, /* 0000006f //C 0fd4c db	111 */
-0x0000fd4d, 0x00000020, /* 00000020 //C 0fd4d db	32 */
-0x0000fd4e, 0x0000006d, /* 0000006d //C 0fd4e db	109 */
-0x0000fd4f, 0x00000065, /* 00000065 //C 0fd4f db	101 */
-0x0000fd50, 0x0000006d, /* 0000006d //C 0fd50 db	109 */
-0x0000fd51, 0x0000006f, /* 0000006f //C 0fd51 db	111 */
-0x0000fd52, 0x00000072, /* 00000072 //C 0fd52 db	114 */
-0x0000fd53, 0x00000079, /* 00000079 //C 0fd53 db	121 */
-0x0000fd54, 0x0000000a, /* 0000000a //C 0fd54 db	10 */
-0x0000fd55, 0x00000000, /* 00000000 //C 0fd55 db */
-0x0000fd56, 0x00000067, /* 00000067 //C 0fd56 db	103 */
-0x0000fd57, 0x0000005b, /* 0000005b //C 0fd57 db	91 */
-0x0000fd58, 0x0000006f, /* 0000006f //C 0fd58 db	111 */
-0x0000fd59, 0x0000005d, /* 0000005d //C 0fd59 db	93 */
-0x0000fd5a, 0x0000007c, /* 0000007c //C 0fd5a db	124 */
-0x0000fd5b, 0x00000072, /* 00000072 //C 0fd5b db	114 */
-0x0000fd5c, 0x00000075, /* 00000075 //C 0fd5c db	117 */
-0x0000fd5d, 0x0000006e, /* 0000006e //C 0fd5d db	110 */
-0x0000fd5e, 0x00000020, /* 00000020 //C 0fd5e db	32 */
-0x0000fd5f, 0x0000005b, /* 0000005b //C 0fd5f db	91 */
-0x0000fd60, 0x00000061, /* 00000061 //C 0fd60 db	97 */
-0x0000fd61, 0x00000064, /* 00000064 //C 0fd61 db	100 */
-0x0000fd62, 0x00000064, /* 00000064 //C 0fd62 db	100 */
-0x0000fd63, 0x00000072, /* 00000072 //C 0fd63 db	114 */
-0x0000fd64, 0x0000005d, /* 0000005d //C 0fd64 db	93 */
-0x0000fd65, 0x00000020, /* 00000020 //C 0fd65 db	32 */
-0x0000fd66, 0x00000020, /* 00000020 //C 0fd66 db	32 */
-0x0000fd67, 0x00000020, /* 00000020 //C 0fd67 db	32 */
-0x0000fd68, 0x00000052, /* 00000052 //C 0fd68 db	82 */
-0x0000fd69, 0x00000075, /* 00000075 //C 0fd69 db	117 */
-0x0000fd6a, 0x0000006e, /* 0000006e //C 0fd6a db	110 */
-0x0000fd6b, 0x00000020, /* 00000020 //C 0fd6b db	32 */
-0x0000fd6c, 0x00000066, /* 00000066 //C 0fd6c db	102 */
-0x0000fd6d, 0x00000072, /* 00000072 //C 0fd6d db	114 */
-0x0000fd6e, 0x0000006f, /* 0000006f //C 0fd6e db	111 */
-0x0000fd6f, 0x0000006d, /* 0000006d //C 0fd6f db	109 */
-0x0000fd70, 0x00000020, /* 00000020 //C 0fd70 db	32 */
-0x0000fd71, 0x00000061, /* 00000061 //C 0fd71 db	97 */
-0x0000fd72, 0x00000064, /* 00000064 //C 0fd72 db	100 */
-0x0000fd73, 0x00000064, /* 00000064 //C 0fd73 db	100 */
-0x0000fd74, 0x00000072, /* 00000072 //C 0fd74 db	114 */
-0x0000fd75, 0x00000065, /* 00000065 //C 0fd75 db	101 */
-0x0000fd76, 0x00000073, /* 00000073 //C 0fd76 db	115 */
-0x0000fd77, 0x00000073, /* 00000073 //C 0fd77 db	115 */
-0x0000fd78, 0x0000000a, /* 0000000a //C 0fd78 db	10 */
-0x0000fd79, 0x00000000, /* 00000000 //C 0fd79 db */
-0x0000fd7a, 0x00000072, /* 00000072 //C 0fd7a db	114 */
-0x0000fd7b, 0x0000005b, /* 0000005b //C 0fd7b db	91 */
-0x0000fd7c, 0x00000065, /* 00000065 //C 0fd7c db	101 */
-0x0000fd7d, 0x00000067, /* 00000067 //C 0fd7d db	103 */
-0x0000fd7e, 0x0000005b, /* 0000005b //C 0fd7e db	91 */
-0x0000fd7f, 0x00000073, /* 00000073 //C 0fd7f db	115 */
-0x0000fd80, 0x0000005d, /* 0000005d //C 0fd80 db	93 */
-0x0000fd81, 0x0000005d, /* 0000005d //C 0fd81 db	93 */
-0x0000fd82, 0x00000020, /* 00000020 //C 0fd82 db	32 */
-0x0000fd83, 0x00000020, /* 00000020 //C 0fd83 db	32 */
-0x0000fd84, 0x00000020, /* 00000020 //C 0fd84 db	32 */
-0x0000fd85, 0x00000020, /* 00000020 //C 0fd85 db	32 */
-0x0000fd86, 0x00000020, /* 00000020 //C 0fd86 db	32 */
-0x0000fd87, 0x00000020, /* 00000020 //C 0fd87 db	32 */
-0x0000fd88, 0x00000020, /* 00000020 //C 0fd88 db	32 */
-0x0000fd89, 0x00000020, /* 00000020 //C 0fd89 db	32 */
-0x0000fd8a, 0x00000020, /* 00000020 //C 0fd8a db	32 */
-0x0000fd8b, 0x00000020, /* 00000020 //C 0fd8b db	32 */
-0x0000fd8c, 0x00000050, /* 00000050 //C 0fd8c db	80 */
-0x0000fd8d, 0x00000072, /* 00000072 //C 0fd8d db	114 */
-0x0000fd8e, 0x00000069, /* 00000069 //C 0fd8e db	105 */
-0x0000fd8f, 0x0000006e, /* 0000006e //C 0fd8f db	110 */
-0x0000fd90, 0x00000074, /* 00000074 //C 0fd90 db	116 */
-0x0000fd91, 0x00000020, /* 00000020 //C 0fd91 db	32 */
-0x0000fd92, 0x00000072, /* 00000072 //C 0fd92 db	114 */
-0x0000fd93, 0x00000065, /* 00000065 //C 0fd93 db	101 */
-0x0000fd94, 0x00000067, /* 00000067 //C 0fd94 db	103 */
-0x0000fd95, 0x00000069, /* 00000069 //C 0fd95 db	105 */
-0x0000fd96, 0x00000073, /* 00000073 //C 0fd96 db	115 */
-0x0000fd97, 0x00000074, /* 00000074 //C 0fd97 db	116 */
-0x0000fd98, 0x00000065, /* 00000065 //C 0fd98 db	101 */
-0x0000fd99, 0x00000072, /* 00000072 //C 0fd99 db	114 */
-0x0000fd9a, 0x00000073, /* 00000073 //C 0fd9a db	115 */
-0x0000fd9b, 0x0000000a, /* 0000000a //C 0fd9b db	10 */
-0x0000fd9c, 0x00000000, /* 00000000 //C 0fd9c db */
-0x0000fd9d, 0x00000072, /* 00000072 //C 0fd9d db	114 */
-0x0000fd9e, 0x00000058, /* 00000058 //C 0fd9e db	88 */
-0x0000fd9f, 0x00000020, /* 00000020 //C 0fd9f db	32 */
-0x0000fda0, 0x0000005b, /* 0000005b //C 0fda0 db	91 */
-0x0000fda1, 0x00000076, /* 00000076 //C 0fda1 db	118 */
-0x0000fda2, 0x00000061, /* 00000061 //C 0fda2 db	97 */
-0x0000fda3, 0x0000006c, /* 0000006c //C 0fda3 db	108 */
-0x0000fda4, 0x0000005d, /* 0000005d //C 0fda4 db	93 */
-0x0000fda5, 0x00000020, /* 00000020 //C 0fda5 db	32 */
-0x0000fda6, 0x00000020, /* 00000020 //C 0fda6 db	32 */
-0x0000fda7, 0x00000020, /* 00000020 //C 0fda7 db	32 */
-0x0000fda8, 0x00000020, /* 00000020 //C 0fda8 db	32 */
-0x0000fda9, 0x00000020, /* 00000020 //C 0fda9 db	32 */
-0x0000fdaa, 0x00000020, /* 00000020 //C 0fdaa db	32 */
-0x0000fdab, 0x00000020, /* 00000020 //C 0fdab db	32 */
-0x0000fdac, 0x00000020, /* 00000020 //C 0fdac db	32 */
-0x0000fdad, 0x00000020, /* 00000020 //C 0fdad db	32 */
-0x0000fdae, 0x00000020, /* 00000020 //C 0fdae db	32 */
-0x0000fdaf, 0x00000047, /* 00000047 //C 0fdaf db	71 */
-0x0000fdb0, 0x00000065, /* 00000065 //C 0fdb0 db	101 */
-0x0000fdb1, 0x00000074, /* 00000074 //C 0fdb1 db	116 */
-0x0000fdb2, 0x0000002f, /* 0000002f //C 0fdb2 db	47 */
-0x0000fdb3, 0x00000073, /* 00000073 //C 0fdb3 db	115 */
-0x0000fdb4, 0x00000065, /* 00000065 //C 0fdb4 db	101 */
-0x0000fdb5, 0x00000074, /* 00000074 //C 0fdb5 db	116 */
-0x0000fdb6, 0x00000020, /* 00000020 //C 0fdb6 db	32 */
-0x0000fdb7, 0x00000052, /* 00000052 //C 0fdb7 db	82 */
-0x0000fdb8, 0x00000058, /* 00000058 //C 0fdb8 db	88 */
-0x0000fdb9, 0x0000000a, /* 0000000a //C 0fdb9 db	10 */
-0x0000fdba, 0x00000000, /* 00000000 //C 0fdba db */
-0x0000fdbb, 0x00000073, /* 00000073 //C 0fdbb db	115 */
-0x0000fdbc, 0x00000070, /* 00000070 //C 0fdbc db	112 */
-0x0000fdbd, 0x00000020, /* 00000020 //C 0fdbd db	32 */
-0x0000fdbe, 0x0000005b, /* 0000005b //C 0fdbe db	91 */
-0x0000fdbf, 0x00000076, /* 00000076 //C 0fdbf db	118 */
-0x0000fdc0, 0x00000061, /* 00000061 //C 0fdc0 db	97 */
-0x0000fdc1, 0x0000006c, /* 0000006c //C 0fdc1 db	108 */
-0x0000fdc2, 0x0000005d, /* 0000005d //C 0fdc2 db	93 */
-0x0000fdc3, 0x00000020, /* 00000020 //C 0fdc3 db	32 */
-0x0000fdc4, 0x00000020, /* 00000020 //C 0fdc4 db	32 */
-0x0000fdc5, 0x00000020, /* 00000020 //C 0fdc5 db	32 */
-0x0000fdc6, 0x00000020, /* 00000020 //C 0fdc6 db	32 */
-0x0000fdc7, 0x00000020, /* 00000020 //C 0fdc7 db	32 */
-0x0000fdc8, 0x00000020, /* 00000020 //C 0fdc8 db	32 */
-0x0000fdc9, 0x00000020, /* 00000020 //C 0fdc9 db	32 */
-0x0000fdca, 0x00000020, /* 00000020 //C 0fdca db	32 */
-0x0000fdcb, 0x00000020, /* 00000020 //C 0fdcb db	32 */
-0x0000fdcc, 0x00000020, /* 00000020 //C 0fdcc db	32 */
-0x0000fdcd, 0x00000047, /* 00000047 //C 0fdcd db	71 */
-0x0000fdce, 0x00000065, /* 00000065 //C 0fdce db	101 */
-0x0000fdcf, 0x00000074, /* 00000074 //C 0fdcf db	116 */
-0x0000fdd0, 0x0000002f, /* 0000002f //C 0fdd0 db	47 */
-0x0000fdd1, 0x00000073, /* 00000073 //C 0fdd1 db	115 */
-0x0000fdd2, 0x00000065, /* 00000065 //C 0fdd2 db	101 */
-0x0000fdd3, 0x00000074, /* 00000074 //C 0fdd3 db	116 */
-0x0000fdd4, 0x00000020, /* 00000020 //C 0fdd4 db	32 */
-0x0000fdd5, 0x00000052, /* 00000052 //C 0fdd5 db	82 */
-0x0000fdd6, 0x00000031, /* 00000031 //C 0fdd6 db	49 */
-0x0000fdd7, 0x00000033, /* 00000033 //C 0fdd7 db	51 */
-0x0000fdd8, 0x0000000a, /* 0000000a //C 0fdd8 db	10 */
-0x0000fdd9, 0x00000000, /* 00000000 //C 0fdd9 db */
-0x0000fdda, 0x0000006c, /* 0000006c //C 0fdda db	108 */
-0x0000fddb, 0x00000072, /* 00000072 //C 0fddb db	114 */
-0x0000fddc, 0x00000020, /* 00000020 //C 0fddc db	32 */
-0x0000fddd, 0x0000005b, /* 0000005b //C 0fddd db	91 */
-0x0000fdde, 0x00000076, /* 00000076 //C 0fdde db	118 */
-0x0000fddf, 0x00000061, /* 00000061 //C 0fddf db	97 */
-0x0000fde0, 0x0000006c, /* 0000006c //C 0fde0 db	108 */
-0x0000fde1, 0x0000005d, /* 0000005d //C 0fde1 db	93 */
-0x0000fde2, 0x00000020, /* 00000020 //C 0fde2 db	32 */
-0x0000fde3, 0x00000020, /* 00000020 //C 0fde3 db	32 */
-0x0000fde4, 0x00000020, /* 00000020 //C 0fde4 db	32 */
-0x0000fde5, 0x00000020, /* 00000020 //C 0fde5 db	32 */
-0x0000fde6, 0x00000020, /* 00000020 //C 0fde6 db	32 */
-0x0000fde7, 0x00000020, /* 00000020 //C 0fde7 db	32 */
-0x0000fde8, 0x00000020, /* 00000020 //C 0fde8 db	32 */
-0x0000fde9, 0x00000020, /* 00000020 //C 0fde9 db	32 */
-0x0000fdea, 0x00000020, /* 00000020 //C 0fdea db	32 */
-0x0000fdeb, 0x00000020, /* 00000020 //C 0fdeb db	32 */
-0x0000fdec, 0x00000047, /* 00000047 //C 0fdec db	71 */
-0x0000fded, 0x00000065, /* 00000065 //C 0fded db	101 */
-0x0000fdee, 0x00000074, /* 00000074 //C 0fdee db	116 */
-0x0000fdef, 0x0000002f, /* 0000002f //C 0fdef db	47 */
-0x0000fdf0, 0x00000073, /* 00000073 //C 0fdf0 db	115 */
-0x0000fdf1, 0x00000065, /* 00000065 //C 0fdf1 db	101 */
-0x0000fdf2, 0x00000074, /* 00000074 //C 0fdf2 db	116 */
-0x0000fdf3, 0x00000020, /* 00000020 //C 0fdf3 db	32 */
-0x0000fdf4, 0x00000052, /* 00000052 //C 0fdf4 db	82 */
-0x0000fdf5, 0x00000031, /* 00000031 //C 0fdf5 db	49 */
-0x0000fdf6, 0x00000034, /* 00000034 //C 0fdf6 db	52 */
-0x0000fdf7, 0x0000000a, /* 0000000a //C 0fdf7 db	10 */
-0x0000fdf8, 0x00000000, /* 00000000 //C 0fdf8 db */
-0x0000fdf9, 0x00000070, /* 00000070 //C 0fdf9 db	112 */
-0x0000fdfa, 0x00000063, /* 00000063 //C 0fdfa db	99 */
-0x0000fdfb, 0x00000020, /* 00000020 //C 0fdfb db	32 */
-0x0000fdfc, 0x0000005b, /* 0000005b //C 0fdfc db	91 */
-0x0000fdfd, 0x00000076, /* 00000076 //C 0fdfd db	118 */
-0x0000fdfe, 0x00000061, /* 00000061 //C 0fdfe db	97 */
-0x0000fdff, 0x0000006c, /* 0000006c //C 0fdff db	108 */
-0x0000fe00, 0x0000005d, /* 0000005d //C 0fe00 db	93 */
-0x0000fe01, 0x00000020, /* 00000020 //C 0fe01 db	32 */
-0x0000fe02, 0x00000020, /* 00000020 //C 0fe02 db	32 */
-0x0000fe03, 0x00000020, /* 00000020 //C 0fe03 db	32 */
-0x0000fe04, 0x00000020, /* 00000020 //C 0fe04 db	32 */
-0x0000fe05, 0x00000020, /* 00000020 //C 0fe05 db	32 */
-0x0000fe06, 0x00000020, /* 00000020 //C 0fe06 db	32 */
-0x0000fe07, 0x00000020, /* 00000020 //C 0fe07 db	32 */
-0x0000fe08, 0x00000020, /* 00000020 //C 0fe08 db	32 */
-0x0000fe09, 0x00000020, /* 00000020 //C 0fe09 db	32 */
-0x0000fe0a, 0x00000020, /* 00000020 //C 0fe0a db	32 */
-0x0000fe0b, 0x00000047, /* 00000047 //C 0fe0b db	71 */
-0x0000fe0c, 0x00000065, /* 00000065 //C 0fe0c db	101 */
-0x0000fe0d, 0x00000074, /* 00000074 //C 0fe0d db	116 */
-0x0000fe0e, 0x0000002f, /* 0000002f //C 0fe0e db	47 */
-0x0000fe0f, 0x00000073, /* 00000073 //C 0fe0f db	115 */
-0x0000fe10, 0x00000065, /* 00000065 //C 0fe10 db	101 */
-0x0000fe11, 0x00000074, /* 00000074 //C 0fe11 db	116 */
-0x0000fe12, 0x00000020, /* 00000020 //C 0fe12 db	32 */
-0x0000fe13, 0x00000052, /* 00000052 //C 0fe13 db	82 */
-0x0000fe14, 0x00000031, /* 00000031 //C 0fe14 db	49 */
-0x0000fe15, 0x00000035, /* 00000035 //C 0fe15 db	53 */
-0x0000fe16, 0x0000000a, /* 0000000a //C 0fe16 db	10 */
-0x0000fe17, 0x00000000, /* 00000000 //C 0fe17 db */
-0x0000fe18, 0x00000066, /* 00000066 //C 0fe18 db	102 */
-0x0000fe19, 0x00000020, /* 00000020 //C 0fe19 db	32 */
-0x0000fe1a, 0x0000005b, /* 0000005b //C 0fe1a db	91 */
-0x0000fe1b, 0x00000076, /* 00000076 //C 0fe1b db	118 */
-0x0000fe1c, 0x00000061, /* 00000061 //C 0fe1c db	97 */
-0x0000fe1d, 0x0000006c, /* 0000006c //C 0fe1d db	108 */
-0x0000fe1e, 0x0000005d, /* 0000005d //C 0fe1e db	93 */
-0x0000fe1f, 0x00000020, /* 00000020 //C 0fe1f db	32 */
-0x0000fe20, 0x00000020, /* 00000020 //C 0fe20 db	32 */
-0x0000fe21, 0x00000020, /* 00000020 //C 0fe21 db	32 */
-0x0000fe22, 0x00000020, /* 00000020 //C 0fe22 db	32 */
-0x0000fe23, 0x00000020, /* 00000020 //C 0fe23 db	32 */
-0x0000fe24, 0x00000020, /* 00000020 //C 0fe24 db	32 */
-0x0000fe25, 0x00000020, /* 00000020 //C 0fe25 db	32 */
-0x0000fe26, 0x00000020, /* 00000020 //C 0fe26 db	32 */
-0x0000fe27, 0x00000020, /* 00000020 //C 0fe27 db	32 */
-0x0000fe28, 0x00000020, /* 00000020 //C 0fe28 db	32 */
-0x0000fe29, 0x00000020, /* 00000020 //C 0fe29 db	32 */
-0x0000fe2a, 0x00000047, /* 00000047 //C 0fe2a db	71 */
-0x0000fe2b, 0x00000065, /* 00000065 //C 0fe2b db	101 */
-0x0000fe2c, 0x00000074, /* 00000074 //C 0fe2c db	116 */
-0x0000fe2d, 0x0000002f, /* 0000002f //C 0fe2d db	47 */
-0x0000fe2e, 0x00000073, /* 00000073 //C 0fe2e db	115 */
-0x0000fe2f, 0x00000065, /* 00000065 //C 0fe2f db	101 */
-0x0000fe30, 0x00000074, /* 00000074 //C 0fe30 db	116 */
-0x0000fe31, 0x00000020, /* 00000020 //C 0fe31 db	32 */
-0x0000fe32, 0x00000066, /* 00000066 //C 0fe32 db	102 */
-0x0000fe33, 0x0000006c, /* 0000006c //C 0fe33 db	108 */
-0x0000fe34, 0x00000061, /* 00000061 //C 0fe34 db	97 */
-0x0000fe35, 0x00000067, /* 00000067 //C 0fe35 db	103 */
-0x0000fe36, 0x00000073, /* 00000073 //C 0fe36 db	115 */
-0x0000fe37, 0x0000000a, /* 0000000a //C 0fe37 db	10 */
-0x0000fe38, 0x00000000, /* 00000000 //C 0fe38 db */
-0x0000fe39, 0x00000068, /* 00000068 //C 0fe39 db	104 */
-0x0000fe3a, 0x0000002c, /* 0000002c //C 0fe3a db	44 */
-0x0000fe3b, 0x0000003f, /* 0000003f //C 0fe3b db	63 */
-0x0000fe3c, 0x00000020, /* 00000020 //C 0fe3c db	32 */
-0x0000fe3d, 0x00000020, /* 00000020 //C 0fe3d db	32 */
-0x0000fe3e, 0x00000020, /* 00000020 //C 0fe3e db	32 */
-0x0000fe3f, 0x00000020, /* 00000020 //C 0fe3f db	32 */
-0x0000fe40, 0x00000020, /* 00000020 //C 0fe40 db	32 */
-0x0000fe41, 0x00000020, /* 00000020 //C 0fe41 db	32 */
-0x0000fe42, 0x00000020, /* 00000020 //C 0fe42 db	32 */
-0x0000fe43, 0x00000020, /* 00000020 //C 0fe43 db	32 */
-0x0000fe44, 0x00000020, /* 00000020 //C 0fe44 db	32 */
-0x0000fe45, 0x00000020, /* 00000020 //C 0fe45 db	32 */
-0x0000fe46, 0x00000020, /* 00000020 //C 0fe46 db	32 */
-0x0000fe47, 0x00000020, /* 00000020 //C 0fe47 db	32 */
-0x0000fe48, 0x00000020, /* 00000020 //C 0fe48 db	32 */
-0x0000fe49, 0x00000020, /* 00000020 //C 0fe49 db	32 */
-0x0000fe4a, 0x00000020, /* 00000020 //C 0fe4a db	32 */
-0x0000fe4b, 0x00000048, /* 00000048 //C 0fe4b db	72 */
-0x0000fe4c, 0x00000065, /* 00000065 //C 0fe4c db	101 */
-0x0000fe4d, 0x0000006c, /* 0000006c //C 0fe4d db	108 */
-0x0000fe4e, 0x00000070, /* 00000070 //C 0fe4e db	112 */
-0x0000fe4f, 0x0000000a, /* 0000000a //C 0fe4f db	10 */
-0x0000fe50, 0x00000000, /* 00000000 //C 0fe50 db */
-0x0000fe51, 0x00000000, /* 00000000 //C 0fe51 dd	0 */
-0x0000ff53, 0x00000045, /* 00000045 //C 0ff53 db	69 */
-0x0000ff54, 0x0000004f, /* 0000004f //C 0ff54 db	79 */
-0x0000ff55, 0x00000046, /* 00000046 //C 0ff55 db	70 */
-0x0000ff56, 0x00000020, /* 00000020 //C 0ff56 db	32 */
-0x0000ff57, 0x00000050, /* 00000050 //C 0ff57 db	80 */
-0x0000ff58, 0x0000004d, /* 0000004d //C 0ff58 db	77 */
-0x0000ff59, 0x0000006f, /* 0000006f //C 0ff59 db	111 */
-0x0000ff5a, 0x0000006e, /* 0000006e //C 0ff5a db	110 */
-0x0000ff5b, 0x00000069, /* 00000069 //C 0ff5b db	105 */
-0x0000ff5c, 0x00000074, /* 00000074 //C 0ff5c db	116 */
-0x0000ff5d, 0x0000006f, /* 0000006f //C 0ff5d db	111 */
-0x0000ff5e, 0x00000072, /* 00000072 //C 0ff5e db	114 */
-0x0000ff5f, 0x0000000a, /* 0000000a //C 0ff5f db	10 */
-0x0000ff60, 0x00000000, /* 00000000 //C 0ff60 db */
+0x00000000, 0x01f2f038, /* 01f2f038 //C 00000 jmp	cold_start */
+0x0000f000, 0x01f2f021, /* 01f2f021 //C 0f000 _f000:	jmp	callin */
+0x0000f001, 0x01f2f012, /* 01f2f012 //C 0f001 _f001:	jmp	enter_by_uart */
+0x0000f002, 0x00f00e00, /* 00f00e00 //C 0f002 _f002:	ret */
+0x0000f003, 0x00f00e00, /* 00f00e00 //C 0f003 _f003:	ret */
+0x0000f004, 0x00f00e00, /* 00f00e00 //C 0f004 _f004:	ret */
+0x0000f005, 0x01f2f038, /* 01f2f038 //C 0f005 _f005:	jmp	cold_start */
+0x0000f006, 0x01f2f373, /* 01f2f373 //C 0f006 _f006:	jmp	strchr */
+0x0000f007, 0x01f2f3ae, /* 01f2f3ae //C 0f007 _f007:	jmp	streq */
+0x0000f008, 0x01f2f414, /* 01f2f414 //C 0f008 _f008:	jmp	check_uart */
+0x0000f009, 0x01f2f3bc, /* 01f2f3bc //C 0f009 _f009:	jmp	hexchar2value */
+0x0000f00a, 0x01f2f3eb, /* 01f2f3eb //C 0f00a _f00a:	jmp	value2hexchar */
+0x0000f00b, 0x01f2f3f0, /* 01f2f3f0 //C 0f00b _f00b:	jmp	htoi */
+0x0000f00c, 0x01f2f3b5, /* 01f2f3b5 //C 0f00c _f00c:	jmp	strieq */
+0x0000f00d, 0x01f2f41c, /* 01f2f41c //C 0f00d _f00d:	jmp	read */
+0x0000f00e, 0x01f2f41e, /* 01f2f41e //C 0f00e _f00e:	jmp	putchar */
+0x0000f00f, 0x01f2f428, /* 01f2f428 //C 0f00f _f00f:	jmp	prints */
+0x0000f010, 0x01f2f43c, /* 01f2f43c //C 0f010 _f010:	jmp	printsnl */
+0x0000f011, 0x01f2f444, /* 01f2f444 //C 0f011 _f011:	jmp	print_vhex */
+0x0000f012, 0x0d0d0000, /* 0d0d0000 //C 0f012 push	r0 */
+0x0000f013, 0x020e0000, /* 020e0000 //C 0f013 getf	r0 */
+0x0000f014, 0x0d0d0000, /* 0d0d0000 //C 0f014 push	r0 */
+0x0000f015, 0x0700ff42, /* 0700ff42 //C 0f015 ld	r0,UART_RSTAT */
+0x0000f016, 0x010c0001, /* 010c0001 //C 0f016 test	r0,1 */
+0x0000f017, 0x21f2f01c, /* 21f2f01c //C 0f017 jnz	ebu_callin */
+0x0000f018, 0x0f0d0000, /* 0f0d0000 //C 0f018 pop	r0 */
+0x0000f019, 0x020f0000, /* 020f0000 //C 0f019 setf	r0 */
+0x0000f01a, 0x0f0d0000, /* 0f0d0000 //C 0f01a pop	r0 */
+0x0000f01b, 0x00f00e00, /* 00f00e00 //C 0f01b ret */
+0x0000f01c, 0x0700ff40, /* 0700ff40 //C 0f01c ld	r0,UART_DR */
+0x0000f01d, 0x0f0d0000, /* 0f0d0000 //C 0f01d pop	r0 */
+0x0000f01e, 0x020f0000, /* 020f0000 //C 0f01e setf	r0 */
+0x0000f01f, 0x0f0d0000, /* 0f0d0000 //C 0f01f pop	r0 */
+0x0000f020, 0x01f2f021, /* 01f2f021 //C 0f020 jmp	callin */
+0x0000f021, 0x0600f4d9, /* 0600f4d9 //C 0f021 st	r0,reg0 */
+0x0000f022, 0x0610f4da, /* 0610f4da //C 0f022 st	r1,reg1 */
+0x0000f023, 0x0620f4db, /* 0620f4db //C 0f023 st	r2,reg2 */
+0x0000f024, 0x0630f4dc, /* 0630f4dc //C 0f024 st	r3,reg3 */
+0x0000f025, 0x0640f4dd, /* 0640f4dd //C 0f025 st	r4,reg4 */
+0x0000f026, 0x0650f4de, /* 0650f4de //C 0f026 st	r5,reg5 */
+0x0000f027, 0x0660f4df, /* 0660f4df //C 0f027 st	r6,reg6 */
+0x0000f028, 0x0670f4e0, /* 0670f4e0 //C 0f028 st	r7,reg7 */
+0x0000f029, 0x0680f4e1, /* 0680f4e1 //C 0f029 st	r8,reg8 */
+0x0000f02a, 0x0690f4e2, /* 0690f4e2 //C 0f02a st	r9,reg9 */
+0x0000f02b, 0x06a0f4e3, /* 06a0f4e3 //C 0f02b st	r10,reg10 */
+0x0000f02c, 0x06b0f4e4, /* 06b0f4e4 //C 0f02c st	r11,reg11 */
+0x0000f02d, 0x06c0f4e5, /* 06c0f4e5 //C 0f02d st	r12,reg12 */
+0x0000f02e, 0x06d0f4e6, /* 06d0f4e6 //C 0f02e st	r13,reg13 */
+0x0000f02f, 0x06e0f4e7, /* 06e0f4e7 //C 0f02f st	r14,reg14 */
+0x0000f030, 0x06e0f4e8, /* 06e0f4e8 //C 0f030 st	r14,reg15 */
+0x0000f031, 0x020e0000, /* 020e0000 //C 0f031 getf	r0 */
+0x0000f032, 0x0600f4e9, /* 0600f4e9 //C 0f032 st	r0,regf */
+0x0000f033, 0x01020001, /* 01020001 //C 0f033 mvzl	r0,1 */
+0x0000f034, 0x0600f4d7, /* 0600f4d7 //C 0f034 st	r0,called */
+0x0000f035, 0x01f2f042, /* 01f2f042 //C 0f035 jmp	common_start */
+0x0000f036, 0x01f2f042, /* 01f2f042 //C 0f036 jmp	common_start */
+0x0000f037, 0x01f2f038, /* 01f2f038 //C 0f037 jmp	cold_start */
+0x0000f038, 0x01020000, /* 01020000 //C 0f038 mvzl	r0,0 */
+0x0000f039, 0x0600f4d7, /* 0600f4d7 //C 0f039 st	r0,called */
+0x0000f03a, 0x0102f037, /* 0102f037 //C 0f03a mvzl	r0,def_zero	; restore jmp to monitor at zero */
+0x0000f03b, 0x0e000000, /* 0e000000 //C 0f03b ld	r0,r0 */
+0x0000f03c, 0x06000000, /* 06000000 //C 0f03c st	r0,0 */
+0x0000f03d, 0x01020000, /* 01020000 //C 0f03d mvzl	r0,0		; def values of some regs */
+0x0000f03e, 0x0600f4e9, /* 0600f4e9 //C 0f03e st	r0,regf		; FALGS= 0 */
+0x0000f03f, 0x0102f7ff, /* 0102f7ff //C 0f03f mvzl	r0,0xf7ff	; R13= 0xf7ff */
+0x0000f040, 0x0600f4e6, /* 0600f4e6 //C 0f040 st	r0,reg13 */
+0x0000f041, 0x01f2f042, /* 01f2f042 //C 0f041 jmp	common_start: */
+0x0000f042, 0x01d2f725, /* 01d2f725 //C 0f042 mvzl	sp,stack_end */
+0x0000f043, 0x01020001, /* 01020001 //C 0f043 mvzl	r0,1 */
+0x0000f044, 0x0600f4d6, /* 0600f4d6 //C 0f044 st	r0,echo */
+0x0000f045, 0x01020000, /* 01020000 //C 0f045 mvzl	r0,0 */
+0x0000f046, 0x020f0000, /* 020f0000 //C 0f046 setf	r0 */
+0x0000f047, 0x011200d9, /* 011200d9 //C 0f047 mvzl	r1,217 */
+0x0000f048, 0x0610ff44, /* 0610ff44 //C 0f048 st	r1,UART_CPB */
+0x0000f049, 0x01120003, /* 01120003 //C 0f049 mvzl	r1,3 */
+0x0000f04a, 0x0610ff41, /* 0610ff41 //C 0f04a st	r1,UART_CTRL */
+0x0000f04b, 0x0102f4ea, /* 0102f4ea //C 0f04b mvzl	r0,msg_start */
+0x0000f04c, 0x0400f43c, /* 0400f43c //C 0f04c call	printsnl */
+0x0000f04d, 0x0700f4d7, /* 0700f4d7 //C 0f04d ld	r0,called */
+0x0000f04e, 0x020b0000, /* 020b0000 //C 0f04e sz	r0 */
+0x0000f04f, 0x11f2f059, /* 11f2f059 //C 0f04f jz	no_called_from */
+0x0000f050, 0x0102000a, /* 0102000a //C 0f050 mvzl	r0,LF */
+0x0000f051, 0x0400f41e, /* 0400f41e //C 0f051 call	putchar */
+0x0000f052, 0x0102f4f8, /* 0102f4f8 //C 0f052 mvzl	r0,msg_stopat */
+0x0000f053, 0x0400f428, /* 0400f428 //C 0f053 call	prints */
+0x0000f054, 0x0700f4e7, /* 0700f4e7 //C 0f054 ld	r0,reg14 */
+0x0000f055, 0x01120004, /* 01120004 //C 0f055 mvzl	r1,4 */
+0x0000f056, 0x0400f444, /* 0400f444 //C 0f056 call	print_vhex */
+0x0000f057, 0x0102000a, /* 0102000a //C 0f057 mvzl	r0,LF */
+0x0000f058, 0x0400f41e, /* 0400f41e //C 0f058 call	putchar */
+0x0000f059, 0x0400f05b, /* 0400f05b //C 0f059 call	setup_line */
+0x0000f05a, 0x01f2f065, /* 01f2f065 //C 0f05a jmp	main */
+0x0000f05b, 0x0ded0000, /* 0ded0000 //C 0f05b push	lr */
+0x0000f05c, 0x01120000, /* 01120000 //C 0f05c mvzl	r1,0		; lptr= 0 */
+0x0000f05d, 0x0610f4cf, /* 0610f4cf //C 0f05d st	r1,line_ptr */
+0x0000f05e, 0x0610f46b, /* 0610f46b //C 0f05e st	r1,line		; line[0]= 0 */
+0x0000f05f, 0x01120000, /* 01120000 //C 0f05f mvzl	r1,0		; at_eol= 0 */
+0x0000f060, 0x0610f4d0, /* 0610f4d0 //C 0f060 st	r1,at_eol */
+0x0000f061, 0x0102f506, /* 0102f506 //C 0f061 mvzl	r0,prompt */
+0x0000f062, 0x0400f428, /* 0400f428 //C 0f062 call	prints */
+0x0000f063, 0x0fed0000, /* 0fed0000 //C 0f063 pop	lr */
+0x0000f064, 0x00f00e00, /* 00f00e00 //C 0f064 ret */
+0x0000f065, 0x0400f414, /* 0400f414 //C 0f065 call	check_uart */
+0x0000f066, 0x41f2f06c, /* 41f2f06c //C 0f066 C0 jmp	no_input */
+0x0000f067, 0x0400f41c, /* 0400f41c //C 0f067 call	read */
+0x0000f068, 0x0400f06d, /* 0400f06d //C 0f068 call	proc_input */
+0x0000f069, 0x41f2f06c, /* 41f2f06c //C 0f069 C0 jmp	no_line */
+0x0000f06a, 0x0400f09f, /* 0400f09f //C 0f06a call	proc_line */
+0x0000f06b, 0x0400f05b, /* 0400f05b //C 0f06b call	setup_line */
+0x0000f06c, 0x01f2f065, /* 01f2f065 //C 0f06c jmp	main */
+0x0000f06d, 0x0ded0000, /* 0ded0000 //C 0f06d push	lr */
+0x0000f06e, 0x0108000a, /* 0108000a //C 0f06e cmp	r0,LF */
+0x0000f06f, 0x11f2f098, /* 11f2f098 //C 0f06f EQ jmp	got_eol */
+0x0000f070, 0x0108000d, /* 0108000d //C 0f070 cmp	r0,CR */
+0x0000f071, 0x11f2f098, /* 11f2f098 //C 0f071 EQ jmp	got_eol */
+0x0000f072, 0x01080008, /* 01080008 //C 0f072 cmp	r0,8 */
+0x0000f073, 0x11f2f077, /* 11f2f077 //C 0f073 jz	got_BS */
+0x0000f074, 0x0108007f, /* 0108007f //C 0f074 cmp	r0,127 */
+0x0000f075, 0x11f2f077, /* 11f2f077 //C 0f075 jz	got_DEL */
+0x0000f076, 0x01f2f083, /* 01f2f083 //C 0f076 jmp	got_char */
+0x0000f077, 0x0700f4cf, /* 0700f4cf //C 0f077 ld	r0,line_ptr */
+0x0000f078, 0x020b0000, /* 020b0000 //C 0f078 sz	r0 */
+0x0000f079, 0x11f2f081, /* 11f2f081 //C 0f079 jz	got_done */
+0x0000f07a, 0x01060001, /* 01060001 //C 0f07a sub	r0,1 */
+0x0000f07b, 0x0600f4cf, /* 0600f4cf //C 0f07b st	r0,line_ptr */
+0x0000f07c, 0x0112f46b, /* 0112f46b //C 0f07c mvzl	r1,line */
+0x0000f07d, 0x01220000, /* 01220000 //C 0f07d mvzl	r2,0 */
+0x0000f07e, 0x08210000, /* 08210000 //C 0f07e st	r2,r1,r0 */
+0x0000f07f, 0x0102f502, /* 0102f502 //C 0f07f mvzl	r0,msg_BS */
+0x0000f080, 0x0400f428, /* 0400f428 //C 0f080 call	prints */
+0x0000f081, 0x020d0000, /* 020d0000 //C 0f081 clc */
+0x0000f082, 0x01f2f09d, /* 01f2f09d //C 0f082 jmp	proc_input_ret */
+0x0000f083, 0x0108001f, /* 0108001f //C 0f083 cmp	r0,31		; refuse control chars */
+0x0000f084, 0xa1f2f09d, /* a1f2f09d //C 0f084 LS jmp	proc_input_ret */
+0x0000f085, 0x0108007e, /* 0108007e //C 0f085 cmp	r0,126		; refuse graph chars */
+0x0000f086, 0x91f2f09d, /* 91f2f09d //C 0f086 HI jmp	proc_input_ret */
+0x0000f087, 0x01220000, /* 01220000 //C 0f087 mvzl	r2,0		; at_aol= 0 */
+0x0000f088, 0x0620f4d0, /* 0620f4d0 //C 0f088 st	r2,at_eol */
+0x0000f089, 0x0112f4cf, /* 0112f4cf //C 0f089 mvzl	r1,line_ptr	; line[line_ptr]= char */
+0x0000f08a, 0x0e310000, /* 0e310000 //C 0f08a ld	r3,r1 */
+0x0000f08b, 0x0122f46b, /* 0122f46b //C 0f08b mvzl	r2,line */
+0x0000f08c, 0x08020300, /* 08020300 //C 0f08c st	r0,r2,r3 */
+0x0000f08d, 0x013a0001, /* 013a0001 //C 0f08d plus	r3,1		; line_ptr++ */
+0x0000f08e, 0x0c310000, /* 0c310000 //C 0f08e st	r3,r1 */
+0x0000f08f, 0x01420000, /* 01420000 //C 0f08f mvzl	r4,0 */
+0x0000f090, 0x09438200, /* 09438200 //C 0f090 st	r4,r3+,r2	; line[line_ptr]= 0 */
+0x0000f091, 0x08430200, /* 08430200 //C 0f091 st	r4,r3,r2	; double 0 at end, needed by tokenizer */
+0x0000f092, 0x0142f4d6, /* 0142f4d6 //C 0f092 mvzl	r4,echo		; check if echo is turned on */
+0x0000f093, 0x0e440000, /* 0e440000 //C 0f093 ld	r4,r4 */
+0x0000f094, 0x024b0000, /* 024b0000 //C 0f094 sz	r4 */
+0x0000f095, 0x2400f41e, /* 2400f41e //C 0f095 NZ call	putchar		; echo */
+0x0000f096, 0x020d0000, /* 020d0000 //C 0f096 clc */
+0x0000f097, 0x01f2f09d, /* 01f2f09d //C 0f097 jmp	proc_input_ret */
+0x0000f098, 0x0112f4d0, /* 0112f4d0 //C 0f098 mvzl	r1,at_eol */
+0x0000f099, 0x0e110000, /* 0e110000 //C 0f099 ld	r1,r1 */
+0x0000f09a, 0x021b0000, /* 021b0000 //C 0f09a sz	r1		; Z=0 at eol -> skip, not ready */
+0x0000f09b, 0x220d0000, /* 220d0000 //C 0f09b Z0 clc */
+0x0000f09c, 0x120c0000, /* 120c0000 //C 0f09c Z1 sec */
+0x0000f09d, 0x0fed0000, /* 0fed0000 //C 0f09d pop	lr */
+0x0000f09e, 0x00f00e00, /* 00f00e00 //C 0f09e ret */
+0x0000f09f, 0x0ded0000, /* 0ded0000 //C 0f09f push	lr */
+0x0000f0a0, 0x0102000a, /* 0102000a //C 0f0a0 mvzl	r0,LF */
+0x0000f0a1, 0x0400f41e, /* 0400f41e //C 0f0a1 call	putchar */
+0x0000f0a2, 0x0700f46b, /* 0700f46b //C 0f0a2 ld	r0,line */
+0x0000f0a3, 0x020b0000, /* 020b0000 //C 0f0a3 sz	r0 */
+0x0000f0a4, 0x11f2f0ac, /* 11f2f0ac //C 0f0a4 jz	proc_line_ret */
+0x0000f0a5, 0x0400f0ca, /* 0400f0ca //C 0f0a5 call	tokenize */
+0x0000f0a6, 0x0400f0eb, /* 0400f0eb //C 0f0a6 call	find_cmd */
+0x0000f0a7, 0x41f2f0aa, /* 41f2f0aa //C 0f0a7 C0 jmp	cmd_not_found */
+0x0000f0a8, 0x05000000, /* 05000000 //C 0f0a8 call	r0,0 */
+0x0000f0a9, 0x01f2f0ac, /* 01f2f0ac //C 0f0a9 jmp	proc_line_ret */
+0x0000f0aa, 0x0102f0b5, /* 0102f0b5 //C 0f0aa mvzl	r0,snotfound */
+0x0000f0ab, 0x0400f43c, /* 0400f43c //C 0f0ab call	printsnl */
+0x0000f0ac, 0x01120001, /* 01120001 //C 0f0ac mvzl	r1,1		; at_eol= 1 */
+0x0000f0ad, 0x0610f4d0, /* 0610f4d0 //C 0f0ad st	r1,at_eol */
+0x0000f0ae, 0x0fed0000, /* 0fed0000 //C 0f0ae pop	lr */
+0x0000f0af, 0x00f00e00, /* 00f00e00 //C 0f0af ret */
+0x0000f0b0, 0x00000047, /* 00000047 //C 0f0b0 db	71 */
+0x0000f0b1, 0x0000006f, /* 0000006f //C 0f0b1 db	111 */
+0x0000f0b2, 0x00000074, /* 00000074 //C 0f0b2 db	116 */
+0x0000f0b3, 0x0000003a, /* 0000003a //C 0f0b3 db	58 */
+0x0000f0b4, 0x00000000, /* 00000000 //C 0f0b4 db */
+0x0000f0b5, 0x00000055, /* 00000055 //C 0f0b5 db	85 */
+0x0000f0b6, 0x0000006e, /* 0000006e //C 0f0b6 db	110 */
+0x0000f0b7, 0x0000006b, /* 0000006b //C 0f0b7 db	107 */
+0x0000f0b8, 0x0000006e, /* 0000006e //C 0f0b8 db	110 */
+0x0000f0b9, 0x0000006f, /* 0000006f //C 0f0b9 db	111 */
+0x0000f0ba, 0x00000077, /* 00000077 //C 0f0ba db	119 */
+0x0000f0bb, 0x0000006e, /* 0000006e //C 0f0bb db	110 */
+0x0000f0bc, 0x00000020, /* 00000020 //C 0f0bc db	32 */
+0x0000f0bd, 0x00000063, /* 00000063 //C 0f0bd db	99 */
+0x0000f0be, 0x0000006f, /* 0000006f //C 0f0be db	111 */
+0x0000f0bf, 0x0000006d, /* 0000006d //C 0f0bf db	109 */
+0x0000f0c0, 0x0000006d, /* 0000006d //C 0f0c0 db	109 */
+0x0000f0c1, 0x00000061, /* 00000061 //C 0f0c1 db	97 */
+0x0000f0c2, 0x0000006e, /* 0000006e //C 0f0c2 db	110 */
+0x0000f0c3, 0x00000064, /* 00000064 //C 0f0c3 db	100 */
+0x0000f0c4, 0x00000000, /* 00000000 //C 0f0c4 db */
+0x0000f0c5, 0x0ded0000, /* 0ded0000 //C 0f0c5 push	lr */
+0x0000f0c6, 0x0112f508, /* 0112f508 //C 0f0c6 mvzl	r1,delimiters */
+0x0000f0c7, 0x0400f373, /* 0400f373 //C 0f0c7 call	strchr */
+0x0000f0c8, 0x0fed0000, /* 0fed0000 //C 0f0c8 pop	lr */
+0x0000f0c9, 0x00f00e00, /* 00f00e00 //C 0f0c9 ret */
+0x0000f0ca, 0x0ded0000, /* 0ded0000 //C 0f0ca push	lr */
+0x0000f0cb, 0x0142f4d1, /* 0142f4d1 //C 0f0cb mvzl	r4,words	; array of result */
+0x0000f0cc, 0x0152f46b, /* 0152f46b //C 0f0cc mvzl	r5,line		; address of next char */
+0x0000f0cd, 0x01620000, /* 01620000 //C 0f0cd mvzl	r6,0		; nuof words found */
+0x0000f0ce, 0x01720000, /* 01720000 //C 0f0ce mvzl	r7,0		; bool in_word */
+0x0000f0cf, 0x0e050000, /* 0e050000 //C 0f0cf ld	r0,r5		; pick a char */
+0x0000f0d0, 0x020b0000, /* 020b0000 //C 0f0d0 sz	r0		; check end */
+0x0000f0d1, 0x11f2f0db, /* 11f2f0db //C 0f0d1 jz	tok_delimiter	; found end, pretend delim */
+0x0000f0d2, 0x0400f0c5, /* 0400f0c5 //C 0f0d2 call	is_delimiter */
+0x0000f0d3, 0x31f2f0db, /* 31f2f0db //C 0f0d3 C1 jmp	tok_delimiter */
+0x0000f0d4, 0x027b0000, /* 027b0000 //C 0f0d4 sz	r7 */
+0x0000f0d5, 0x21f2f0e0, /* 21f2f0e0 //C 0f0d5 jnz	tok_next	; still inside word */
+0x0000f0d6, 0x01720001, /* 01720001 //C 0f0d6 mvzl	r7,1		; in_word=true */
+0x0000f0d7, 0x09568400, /* 09568400 //C 0f0d7 st	r5,r6+,r4	; record word address */
+0x0000f0d8, 0x01680005, /* 01680005 //C 0f0d8 cmp	r6,MAX_WORDS	; If no more space */
+0x0000f0d9, 0x11f2f0e4, /* 11f2f0e4 //C 0f0d9 EQ jmp	tok_ret		; then return */
+0x0000f0da, 0x01f2f0e0, /* 01f2f0e0 //C 0f0da jmp	tok_next */
+0x0000f0db, 0x027b0000, /* 027b0000 //C 0f0db sz	r7 */
+0x0000f0dc, 0x11f2f0e0, /* 11f2f0e0 //C 0f0dc jz	tok_next	; still between words */
+0x0000f0dd, 0x01720000, /* 01720000 //C 0f0dd mvzl	r7,0		; in_word=false */
+0x0000f0de, 0x01120000, /* 01120000 //C 0f0de mvzl	r1,0		; put a 0 at the end of word */
+0x0000f0df, 0x08150100, /* 08150100 //C 0f0df st	r1,r5,r1 */
+0x0000f0e0, 0x020b0000, /* 020b0000 //C 0f0e0 sz	r0		; check EOL */
+0x0000f0e1, 0x11f2f0e4, /* 11f2f0e4 //C 0f0e1 jz	tok_ret		; jump out if char==0 */
+0x0000f0e2, 0x01540001, /* 01540001 //C 0f0e2 add	r5,1 */
+0x0000f0e3, 0x01f2f0cf, /* 01f2f0cf //C 0f0e3 jmp	tok_cycle */
+0x0000f0e4, 0x01120000, /* 01120000 //C 0f0e4 mvzl	r1,0 */
+0x0000f0e5, 0x01680005, /* 01680005 //C 0f0e5 cmp	r6,MAX_WORDS */
+0x0000f0e6, 0x11f2f0e9, /* 11f2f0e9 //C 0f0e6 jz	tok_end */
+0x0000f0e7, 0x09168400, /* 09168400 //C 0f0e7 st	r1,r6+,r4 */
+0x0000f0e8, 0x01f2f0e4, /* 01f2f0e4 //C 0f0e8 jmp	tok_ret */
+0x0000f0e9, 0x0fed0000, /* 0fed0000 //C 0f0e9 pop	lr */
+0x0000f0ea, 0x00f00e00, /* 00f00e00 //C 0f0ea ret */
+0x0000f0eb, 0x0ded0000, /* 0ded0000 //C 0f0eb push	lr */
+0x0000f0ec, 0x0d1d0000, /* 0d1d0000 //C 0f0ec push	r1 */
+0x0000f0ed, 0x0d2d0000, /* 0d2d0000 //C 0f0ed push	r2 */
+0x0000f0ee, 0x0d3d0000, /* 0d3d0000 //C 0f0ee push	r3 */
+0x0000f0ef, 0x0dad0000, /* 0dad0000 //C 0f0ef push	r10 */
+0x0000f0f0, 0x0700f4d1, /* 0700f4d1 //C 0f0f0 ld	r0,words	; R0= 1st word of command */
+0x0000f0f1, 0x020b0000, /* 020b0000 //C 0f0f1 sz	r0 */
+0x0000f0f2, 0x11f2f122, /* 11f2f122 //C 0f0f2 jz	find_cmd_false */
+0x0000f0f3, 0x0e100000, /* 0e100000 //C 0f0f3 ld	r1,r0		; 1st char of word1 */
+0x0000f0f4, 0x0e200001, /* 0e200001 //C 0f0f4 ld	r2,r0,1		; 2nd char */
+0x0000f0f5, 0x0e300002, /* 0e300002 //C 0f0f5 ld	r3,r0,2		; 3rd char */
+0x0000f0f6, 0x011fffdf, /* 011fffdf //C 0f0f6 and	r1,0xffdf	; upcase 1st char */
+0x0000f0f7, 0x01180052, /* 01180052 //C 0f0f7 cmp	r1,'R' */
+0x0000f0f8, 0x21f2f10e, /* 21f2f10e //C 0f0f8 jnz	find_not_rx */
+0x0000f0f9, 0x0128002f, /* 0128002f //C 0f0f9 cmp	r2,'/'		; '0'-1 */
+0x0000f0fa, 0xa1f2f10e, /* a1f2f10e //C 0f0fa LS jmp	find_not_rx */
+0x0000f0fb, 0x01280039, /* 01280039 //C 0f0fb cmp	r2,'9' */
+0x0000f0fc, 0x91f2f10e, /* 91f2f10e //C 0f0fc HI jmp	find_not_rx */
+0x0000f0fd, 0x023b0000, /* 023b0000 //C 0f0fd sz	r3 */
+0x0000f0fe, 0x11f2f109, /* 11f2f109 //C 0f0fe jz	find_rx_09 */
+0x0000f0ff, 0x01280031, /* 01280031 //C 0f0ff cmp	r2,'1'		; first char must be '1' */
+0x0000f100, 0x21f2f10e, /* 21f2f10e //C 0f100 jnz	find_not_rx */
+0x0000f101, 0x0138002f, /* 0138002f //C 0f101 cmp	r3,'/'		; '0'-1 */
+0x0000f102, 0xa1f2f10e, /* a1f2f10e //C 0f102 LS jmp	find_not_rx */
+0x0000f103, 0x01380035, /* 01380035 //C 0f103 cmp	r3,'5' */
+0x0000f104, 0x91f2f10e, /* 91f2f10e //C 0f104 HI jmp	find_not_rx */
+0x0000f105, 0x01360030, /* 01360030 //C 0f105 sub	r3,'0' */
+0x0000f106, 0x0134000a, /* 0134000a //C 0f106 add	r3,10 */
+0x0000f107, 0x0630f4d8, /* 0630f4d8 //C 0f107 st	r3,nuof_reg */
+0x0000f108, 0x01f2f10b, /* 01f2f10b //C 0f108 jmp	find_rx */
+0x0000f109, 0x01260030, /* 01260030 //C 0f109 sub	r2,'0' */
+0x0000f10a, 0x0620f4d8, /* 0620f4d8 //C 0f10a st	r2,nuof_reg */
+0x0000f10b, 0x0102f331, /* 0102f331 //C 0f10b mvzl	r0,cmd_rx */
+0x0000f10c, 0x020c0000, /* 020c0000 //C 0f10c sec */
+0x0000f10d, 0x01f2f12d, /* 01f2f12d //C 0f10d jmp	find_cmd_ret */
+0x0000f10e, 0x01a2f524, /* 01a2f524 //C 0f10e mvzl	r10,commands */
+0x0000f10f, 0x0e2a0000, /* 0e2a0000 //C 0f10f ld	r2,r10		; R2= cmd addr */
+0x0000f110, 0x022b0000, /* 022b0000 //C 0f110 sz	r2 */
+0x0000f111, 0x11f2f122, /* 11f2f122 //C 0f111 jz	find_cmd_false */
+0x0000f112, 0x01a40001, /* 01a40001 //C 0f112 add	r10,1 */
+0x0000f113, 0x00100a00, /* 00100a00 //C 0f113 mov	r1,r10		; R1= cmd string */
+0x0000f114, 0x01a40001, /* 01a40001 //C 0f114 add	r10,1 */
+0x0000f115, 0x0e3a0000, /* 0e3a0000 //C 0f115 ld	r3,r10 */
+0x0000f116, 0x023b0000, /* 023b0000 //C 0f116 sz	r3 */
+0x0000f117, 0x21f2f114, /* 21f2f114 //C 0f117 jnz	find_cmd_fw */
+0x0000f118, 0x01a40001, /* 01a40001 //C 0f118 add	r10,1 */
+0x0000f119, 0x0400f3ae, /* 0400f3ae //C 0f119 call	streq */
+0x0000f11a, 0x41f2f10f, /* 41f2f10f //C 0f11a C0 jmp	find_cmd_cyc */
+0x0000f11b, 0x00000200, /* 00000200 //C 0f11b mov	r0,r2 */
+0x0000f11c, 0x020c0000, /* 020c0000 //C 0f11c sec */
+0x0000f11d, 0x01f2f12d, /* 01f2f12d //C 0f11d jmp	find_cmd_ret */
+0x0000f11e, 0x0000002f, /* 0000002f //C 0f11e db	47 */
+0x0000f11f, 0x0000002f, /* 0000002f //C 0f11f db	47 */
+0x0000f120, 0x00000043, /* 00000043 //C 0f120 db	67 */
+0x0000f121, 0x00000000, /* 00000000 //C 0f121 db */
+0x0000f122, 0x01040001, /* 01040001 //C 0f122 add	r0,1		; check second word */
+0x0000f123, 0x0e100000, /* 0e100000 //C 0f123 ld	r1,r0		; for //C command */
+0x0000f124, 0x021b0000, /* 021b0000 //C 0f124 sz	r1 */
+0x0000f125, 0x11f2f12b, /* 11f2f12b //C 0f125 jz	find_cmd_very_false */
+0x0000f126, 0x0102f11e, /* 0102f11e //C 0f126 mvzl	r0,c_cmd_name */
+0x0000f127, 0x0400f3ae, /* 0400f3ae //C 0f127 call	streq */
+0x0000f128, 0x21f2f12b, /* 21f2f12b //C 0f128 jnz	find_cmd_very_false */
+0x0000f129, 0x0122f1bb, /* 0122f1bb //C 0f129 mvzl	r2,cmd_c */
+0x0000f12a, 0x01f2f11b, /* 01f2f11b //C 0f12a jmp	find_cmd_true */
+0x0000f12b, 0x020d0000, /* 020d0000 //C 0f12b clc */
+0x0000f12c, 0x01020000, /* 01020000 //C 0f12c mvzl	r0,0 */
+0x0000f12d, 0x0fad0000, /* 0fad0000 //C 0f12d pop	r10 */
+0x0000f12e, 0x0f3d0000, /* 0f3d0000 //C 0f12e pop	r3 */
+0x0000f12f, 0x0f2d0000, /* 0f2d0000 //C 0f12f pop	r2 */
+0x0000f130, 0x0f1d0000, /* 0f1d0000 //C 0f130 pop	r1 */
+0x0000f131, 0x0fed0000, /* 0fed0000 //C 0f131 pop	lr */
+0x0000f132, 0x00f00e00, /* 00f00e00 //C 0f132 ret */
+0x0000f133, 0x0ded0000, /* 0ded0000 //C 0f133 push	lr */
+0x0000f134, 0x0122f4d1, /* 0122f4d1 //C 0f134 mvzl	r2,words */
+0x0000f135, 0x01020000, /* 01020000 //C 0f135 mvzl	r0,0 */
+0x0000f136, 0x0e420001, /* 0e420001 //C 0f136 ld	r4,r2,1		; addr */
+0x0000f137, 0x0e520002, /* 0e520002 //C 0f137 ld	r5,r2,2		; value */
+0x0000f138, 0x024b0000, /* 024b0000 //C 0f138 sz 	r4 */
+0x0000f139, 0x11f2f15a, /* 11f2f15a //C 0f139 jz	m_ret */
+0x0000f13a, 0x00000400, /* 00000400 //C 0f13a mov	r0,r4 */
+0x0000f13b, 0x0400f3f0, /* 0400f3f0 //C 0f13b call	htoi */
+0x0000f13c, 0x00400100, /* 00400100 //C 0f13c mov	r4,r1 */
+0x0000f13d, 0x31f2f141, /* 31f2f141 //C 0f13d C1 jmp	m_addr_ok */
+0x0000f13e, 0x0102f15c, /* 0102f15c //C 0f13e mvzl	r0,m_err_addr */
+0x0000f13f, 0x0400f43c, /* 0400f43c //C 0f13f call	printsnl */
+0x0000f140, 0x01f2f15a, /* 01f2f15a //C 0f140 jmp	m_ret */
+0x0000f141, 0x025b0000, /* 025b0000 //C 0f141 sz	r5 */
+0x0000f142, 0x11f2f150, /* 11f2f150 //C 0f142 jz	m_read */
+0x0000f143, 0x0148f734, /* 0148f734 //C 0f143 cmp	r4,the_end */
+0x0000f144, 0x91f2f148, /* 91f2f148 //C 0f144 HI jmp	m_addrv_ok */
+0x0000f145, 0x0102f16a, /* 0102f16a //C 0f145 mvzl	r0,m_err_addrv */
+0x0000f146, 0x0400f43c, /* 0400f43c //C 0f146 call	printsnl */
+0x0000f147, 0x01f2f15a, /* 01f2f15a //C 0f147 jmp	m_ret */
+0x0000f148, 0x00000500, /* 00000500 //C 0f148 mov	r0,r5 */
+0x0000f149, 0x0400f3f0, /* 0400f3f0 //C 0f149 call	htoi */
+0x0000f14a, 0x00500100, /* 00500100 //C 0f14a mov	r5,r1 */
+0x0000f14b, 0x31f2f14f, /* 31f2f14f //C 0f14b C1 jmp	m_value_ok */
+0x0000f14c, 0x0102f17c, /* 0102f17c //C 0f14c mvzl	r0,m_err_value */
+0x0000f14d, 0x0400f43c, /* 0400f43c //C 0f14d call	printsnl */
+0x0000f14e, 0x01f2f15a, /* 01f2f15a //C 0f14e jmp	m_ret */
+0x0000f14f, 0x0c540000, /* 0c540000 //C 0f14f st	r5,r4 */
+0x0000f150, 0x00000400, /* 00000400 //C 0f150 mov	r0,r4 */
+0x0000f151, 0x01120004, /* 01120004 //C 0f151 mvzl	r1,4 */
+0x0000f152, 0x0400f444, /* 0400f444 //C 0f152 call	print_vhex */
+0x0000f153, 0x01020020, /* 01020020 //C 0f153 mvzl	r0,0x20 */
+0x0000f154, 0x0400f41e, /* 0400f41e //C 0f154 call	putchar */
+0x0000f155, 0x0e040000, /* 0e040000 //C 0f155 ld	r0,r4 */
+0x0000f156, 0x01120004, /* 01120004 //C 0f156 mvzl	r1,4 */
+0x0000f157, 0x0400f444, /* 0400f444 //C 0f157 call	print_vhex */
+0x0000f158, 0x0102000a, /* 0102000a //C 0f158 mvzl	r0,LF */
+0x0000f159, 0x0400f41e, /* 0400f41e //C 0f159 call	putchar */
+0x0000f15a, 0x0fed0000, /* 0fed0000 //C 0f15a pop	lr */
+0x0000f15b, 0x00f00e00, /* 00f00e00 //C 0f15b ret */
+0x0000f15c, 0x00000041, /* 00000041 //C 0f15c db	65 */
+0x0000f15d, 0x00000064, /* 00000064 //C 0f15d db	100 */
+0x0000f15e, 0x00000064, /* 00000064 //C 0f15e db	100 */
+0x0000f15f, 0x00000072, /* 00000072 //C 0f15f db	114 */
+0x0000f160, 0x00000065, /* 00000065 //C 0f160 db	101 */
+0x0000f161, 0x00000073, /* 00000073 //C 0f161 db	115 */
+0x0000f162, 0x00000073, /* 00000073 //C 0f162 db	115 */
+0x0000f163, 0x00000020, /* 00000020 //C 0f163 db	32 */
+0x0000f164, 0x00000065, /* 00000065 //C 0f164 db	101 */
+0x0000f165, 0x00000072, /* 00000072 //C 0f165 db	114 */
+0x0000f166, 0x00000072, /* 00000072 //C 0f166 db	114 */
+0x0000f167, 0x0000006f, /* 0000006f //C 0f167 db	111 */
+0x0000f168, 0x00000072, /* 00000072 //C 0f168 db	114 */
+0x0000f169, 0x00000000, /* 00000000 //C 0f169 db */
+0x0000f16a, 0x0000004d, /* 0000004d //C 0f16a db	77 */
+0x0000f16b, 0x0000006f, /* 0000006f //C 0f16b db	111 */
+0x0000f16c, 0x0000006e, /* 0000006e //C 0f16c db	110 */
+0x0000f16d, 0x00000069, /* 00000069 //C 0f16d db	105 */
+0x0000f16e, 0x00000074, /* 00000074 //C 0f16e db	116 */
+0x0000f16f, 0x0000006f, /* 0000006f //C 0f16f db	111 */
+0x0000f170, 0x00000072, /* 00000072 //C 0f170 db	114 */
+0x0000f171, 0x00000027, /* 00000027 //C 0f171 db	39 */
+0x0000f172, 0x00000073, /* 00000073 //C 0f172 db	115 */
+0x0000f173, 0x00000020, /* 00000020 //C 0f173 db	32 */
+0x0000f174, 0x00000061, /* 00000061 //C 0f174 db	97 */
+0x0000f175, 0x00000064, /* 00000064 //C 0f175 db	100 */
+0x0000f176, 0x00000064, /* 00000064 //C 0f176 db	100 */
+0x0000f177, 0x00000072, /* 00000072 //C 0f177 db	114 */
+0x0000f178, 0x00000065, /* 00000065 //C 0f178 db	101 */
+0x0000f179, 0x00000073, /* 00000073 //C 0f179 db	115 */
+0x0000f17a, 0x00000073, /* 00000073 //C 0f17a db	115 */
+0x0000f17b, 0x00000000, /* 00000000 //C 0f17b db */
+0x0000f17c, 0x00000056, /* 00000056 //C 0f17c db	86 */
+0x0000f17d, 0x00000061, /* 00000061 //C 0f17d db	97 */
+0x0000f17e, 0x0000006c, /* 0000006c //C 0f17e db	108 */
+0x0000f17f, 0x00000075, /* 00000075 //C 0f17f db	117 */
+0x0000f180, 0x00000065, /* 00000065 //C 0f180 db	101 */
+0x0000f181, 0x00000020, /* 00000020 //C 0f181 db	32 */
+0x0000f182, 0x00000065, /* 00000065 //C 0f182 db	101 */
+0x0000f183, 0x00000072, /* 00000072 //C 0f183 db	114 */
+0x0000f184, 0x00000072, /* 00000072 //C 0f184 db	114 */
+0x0000f185, 0x0000006f, /* 0000006f //C 0f185 db	111 */
+0x0000f186, 0x00000072, /* 00000072 //C 0f186 db	114 */
+0x0000f187, 0x00000000, /* 00000000 //C 0f187 db */
+0x0000f188, 0x0ded0000, /* 0ded0000 //C 0f188 push	lr */
+0x0000f189, 0x0122f4d1, /* 0122f4d1 //C 0f189 mvzl	r2,words */
+0x0000f18a, 0x0e020001, /* 0e020001 //C 0f18a ld	r0,r2,1		; start address */
+0x0000f18b, 0x0400f3f0, /* 0400f3f0 //C 0f18b call	htoi */
+0x0000f18c, 0x00300100, /* 00300100 //C 0f18c mov	r3,r1 */
+0x0000f18d, 0x0e020002, /* 0e020002 //C 0f18d ld	r0,r2,2		; end address */
+0x0000f18e, 0x020b0000, /* 020b0000 //C 0f18e sz	r0 */
+0x0000f18f, 0x21f2f193, /* 21f2f193 //C 0f18f jnz	d_end_ok */
+0x0000f190, 0x00400300, /* 00400300 //C 0f190 mov	r4,r3 */
+0x0000f191, 0x01440010, /* 01440010 //C 0f191 add	r4,0x10 */
+0x0000f192, 0x01f2f195, /* 01f2f195 //C 0f192 jmp	d_chk_end */
+0x0000f193, 0x0400f3f0, /* 0400f3f0 //C 0f193 call	htoi */
+0x0000f194, 0x00400100, /* 00400100 //C 0f194 mov	r4,r1 */
+0x0000f195, 0x00380400, /* 00380400 //C 0f195 cmp	r3,r4		; check if start>end */
+0x0000f196, 0x91f2f1a5, /* 91f2f1a5 //C 0f196 HI jmp d_bad */
+0x0000f197, 0x00000300, /* 00000300 //C 0f197 mov	r0,r3		; print address */
+0x0000f198, 0x01120004, /* 01120004 //C 0f198 mvzl	r1,4 */
+0x0000f199, 0x0400f444, /* 0400f444 //C 0f199 call	print_vhex */
+0x0000f19a, 0x01020020, /* 01020020 //C 0f19a mvzl	r0,0x20		; print one space */
+0x0000f19b, 0x0400f41e, /* 0400f41e //C 0f19b call	putchar */
+0x0000f19c, 0x0e030000, /* 0e030000 //C 0f19c ld	r0,r3		; load data */
+0x0000f19d, 0x01120004, /* 01120004 //C 0f19d mvzl	r1,4		; print data */
+0x0000f19e, 0x0400f444, /* 0400f444 //C 0f19e call	print_vhex */
+0x0000f19f, 0x0102000a, /* 0102000a //C 0f19f mvzl	r0,LF		; print new line */
+0x0000f1a0, 0x0400f41e, /* 0400f41e //C 0f1a0 call	putchar */
+0x0000f1a1, 0x00380400, /* 00380400 //C 0f1a1 cmp	r3,r4 */
+0x0000f1a2, 0x11f2f1a7, /* 11f2f1a7 //C 0f1a2 jz	d_ret */
+0x0000f1a3, 0x01340001, /* 01340001 //C 0f1a3 add	r3,1 */
+0x0000f1a4, 0x01f2f197, /* 01f2f197 //C 0f1a4 jmp	d_cyc */
+0x0000f1a5, 0x0102f1a9, /* 0102f1a9 //C 0f1a5 mvzl	r0,d_err_bad */
+0x0000f1a6, 0x0400f43c, /* 0400f43c //C 0f1a6 call	printsnl */
+0x0000f1a7, 0x0fed0000, /* 0fed0000 //C 0f1a7 pop	lr */
+0x0000f1a8, 0x00f00e00, /* 00f00e00 //C 0f1a8 ret */
+0x0000f1a9, 0x00000057, /* 00000057 //C 0f1a9 db	87 */
+0x0000f1aa, 0x00000072, /* 00000072 //C 0f1aa db	114 */
+0x0000f1ab, 0x0000006f, /* 0000006f //C 0f1ab db	111 */
+0x0000f1ac, 0x0000006e, /* 0000006e //C 0f1ac db	110 */
+0x0000f1ad, 0x00000067, /* 00000067 //C 0f1ad db	103 */
+0x0000f1ae, 0x00000020, /* 00000020 //C 0f1ae db	32 */
+0x0000f1af, 0x00000065, /* 00000065 //C 0f1af db	101 */
+0x0000f1b0, 0x0000006e, /* 0000006e //C 0f1b0 db	110 */
+0x0000f1b1, 0x00000064, /* 00000064 //C 0f1b1 db	100 */
+0x0000f1b2, 0x00000020, /* 00000020 //C 0f1b2 db	32 */
+0x0000f1b3, 0x00000061, /* 00000061 //C 0f1b3 db	97 */
+0x0000f1b4, 0x00000064, /* 00000064 //C 0f1b4 db	100 */
+0x0000f1b5, 0x00000064, /* 00000064 //C 0f1b5 db	100 */
+0x0000f1b6, 0x00000072, /* 00000072 //C 0f1b6 db	114 */
+0x0000f1b7, 0x00000065, /* 00000065 //C 0f1b7 db	101 */
+0x0000f1b8, 0x00000073, /* 00000073 //C 0f1b8 db	115 */
+0x0000f1b9, 0x00000073, /* 00000073 //C 0f1b9 db	115 */
+0x0000f1ba, 0x00000000, /* 00000000 //C 0f1ba db */
+0x0000f1bb, 0x00f00e00, /* 00f00e00 //C 0f1bb ret */
+0x0000f1bc, 0x0ded0000, /* 0ded0000 //C 0f1bc push	lr */
+0x0000f1bd, 0x01a20000, /* 01a20000 //C 0f1bd mvzl	r10,0		; state (nr of words) */
+0x0000f1be, 0x01820000, /* 01820000 //C 0f1be mvzl	r8,0		; value */
+0x0000f1bf, 0x0162003f, /* 0162003f //C 0f1bf mvzl	r6,'?'		; Record type */
+0x0000f1c0, 0x0400f414, /* 0400f414 //C 0f1c0 call	check_uart */
+0x0000f1c1, 0x41f2f1c0, /* 41f2f1c0 //C 0f1c1 C0 jmp	l_cyc */
+0x0000f1c2, 0x0400f41c, /* 0400f41c //C 0f1c2 call	read */
+0x0000f1c3, 0x00b00000, /* 00b00000 //C 0f1c3 mov	r11,r0		; Copy of char in R11 */
+0x0000f1c4, 0x0108000a, /* 0108000a //C 0f1c4 cmp	r0,10		; check EOL chars */
+0x0000f1c5, 0x11f2f20f, /* 11f2f20f //C 0f1c5 jz	l_eol */
+0x0000f1c6, 0x0108000d, /* 0108000d //C 0f1c6 cmp	r0,13 */
+0x0000f1c7, 0x11f2f20f, /* 11f2f20f //C 0f1c7 jz	l_eol */
+0x0000f1c8, 0x01a80000, /* 01a80000 //C 0f1c8 cmp	r10,0 */
+0x0000f1c9, 0x21f2f1d9, /* 21f2f1d9 //C 0f1c9 jnz	l_no0 */
+0x0000f1ca, 0x0400f3bc, /* 0400f3bc //C 0f1ca call	hexchar2value */
+0x0000f1cb, 0x41f2f1d3, /* 41f2f1d3 //C 0f1cb C0 jmp	l_eof_0 */
+0x0000f1cc, 0x02880000, /* 02880000 //C 0f1cc shl	r8		; shift val(char) into value */
+0x0000f1cd, 0x02880000, /* 02880000 //C 0f1cd shl	r8 */
+0x0000f1ce, 0x02880000, /* 02880000 //C 0f1ce shl	r8 */
+0x0000f1cf, 0x02880000, /* 02880000 //C 0f1cf shl	r8 */
+0x0000f1d0, 0x010b000f, /* 010b000f //C 0f1d0 btst	r0,0xf */
+0x0000f1d1, 0x008d0000, /* 008d0000 //C 0f1d1 or	r8,r0 */
+0x0000f1d2, 0x01f2f1c0, /* 01f2f1c0 //C 0f1d2 jmp	l_cyc */
+0x0000f1d3, 0x01a20001, /* 01a20001 //C 0f1d3 mvzl	r10,1		; state0 -> state1 */
+0x0000f1d4, 0x0162003f, /* 0162003f //C 0f1d4 mvzl	r6,'?'		; No //C yet */
+0x0000f1d5, 0x01b8002f, /* 01b8002f //C 0f1d5 cmp	r11,'/'		; is it start of // */
+0x0000f1d6, 0x11720001, /* 11720001 //C 0f1d6 z1 mvzl	r7,1		; Yes, first / found */
+0x0000f1d7, 0x21720000, /* 21720000 //C 0f1d7 z0 mvzl	r7,0		; No '/' yet */
+0x0000f1d8, 0x01f2f1c0, /* 01f2f1c0 //C 0f1d8 jmp	l_cyc */
+0x0000f1d9, 0x01a80001, /* 01a80001 //C 0f1d9 cmp	r10,1 */
+0x0000f1da, 0x21f2f1f2, /* 21f2f1f2 //C 0f1da jnz	l_no1 */
+0x0000f1db, 0x027b0000, /* 027b0000 //C 0f1db sz	r7 */
+0x0000f1dc, 0x21f2f1e1, /* 21f2f1e1 //C 0f1dc jnz	l_s1_2nd */
+0x0000f1dd, 0x0108002f, /* 0108002f //C 0f1dd cmp	r0,'/' */
+0x0000f1de, 0x21f2f1c0, /* 21f2f1c0 //C 0f1de jnz	l_cyc */
+0x0000f1df, 0x01720001, /* 01720001 //C 0f1df mvzl	r7,1 */
+0x0000f1e0, 0x01f2f1c0, /* 01f2f1c0 //C 0f1e0 jmp	l_cyc */
+0x0000f1e1, 0x0108002f, /* 0108002f //C 0f1e1 cmp	r0,'/' */
+0x0000f1e2, 0x11f2f1c0, /* 11f2f1c0 //C 0f1e2 jz	l_cyc */
+0x0000f1e3, 0x01080043, /* 01080043 //C 0f1e3 cmp	r0,'C' */
+0x0000f1e4, 0x21f2f1ea, /* 21f2f1ea //C 0f1e4 jnz	l_s1_noC */
+0x0000f1e5, 0x01620043, /* 01620043 //C 0f1e5 mvzl	r6,'C' */
+0x0000f1e6, 0x01a20002, /* 01a20002 //C 0f1e6 mvzl	r10,2 */
+0x0000f1e7, 0x01920000, /* 01920000 //C 0f1e7 mvzl	r9,0		; address= 0 */
+0x0000f1e8, 0x01520000, /* 01520000 //C 0f1e8 mvzl	r5,0		; where we are in word: before */
+0x0000f1e9, 0x01f2f1c0, /* 01f2f1c0 //C 0f1e9 jmp	l_cyc */
+0x0000f1ea, 0x01080045, /* 01080045 //C 0f1ea cmp	r0,'E' */
+0x0000f1eb, 0x21f2f1ef, /* 21f2f1ef //C 0f1eb jnz	l_s1_noE */
+0x0000f1ec, 0x01620045, /* 01620045 //C 0f1ec mvzl	r6,'E' */
+0x0000f1ed, 0x01a20003, /* 01a20003 //C 0f1ed mvzl	r10,3 */
+0x0000f1ee, 0x01f2f1c0, /* 01f2f1c0 //C 0f1ee jmp	l_cyc */
+0x0000f1ef, 0x0400f41e, /* 0400f41e //C 0f1ef call	putchar		; print record type */
+0x0000f1f0, 0x01a2000f, /* 01a2000f //C 0f1f0 mvzl	r10,0xf		; special state: skip everything */
+0x0000f1f1, 0x01f2f1c0, /* 01f2f1c0 //C 0f1f1 jmp	l_cyc */
+0x0000f1f2, 0x01a80002, /* 01a80002 //C 0f1f2 cmp	r10,2 */
+0x0000f1f3, 0x21f2f207, /* 21f2f207 //C 0f1f3 jnz	l_no2 */
+0x0000f1f4, 0x01580000, /* 01580000 //C 0f1f4 cmp	r5,0 */
+0x0000f1f5, 0x21f2f200, /* 21f2f200 //C 0f1f5 jnz	l_s2_no0 */
+0x0000f1f6, 0x0400f3bc, /* 0400f3bc //C 0f1f6 call	hexchar2value */
+0x0000f1f7, 0x41f2f1c0, /* 41f2f1c0 //C 0f1f7 C0 jmp	l_cyc */
+0x0000f1f8, 0x01520001, /* 01520001 //C 0f1f8 mvzl	r5,1 */
+0x0000f1f9, 0x02980000, /* 02980000 //C 0f1f9 shl	r9 */
+0x0000f1fa, 0x02980000, /* 02980000 //C 0f1fa shl	r9 */
+0x0000f1fb, 0x02980000, /* 02980000 //C 0f1fb shl	r9 */
+0x0000f1fc, 0x02980000, /* 02980000 //C 0f1fc shl	r9 */
+0x0000f1fd, 0x010b000f, /* 010b000f //C 0f1fd btst	r0,0xf */
+0x0000f1fe, 0x009d0000, /* 009d0000 //C 0f1fe or	r9,r0 */
+0x0000f1ff, 0x01f2f1c0, /* 01f2f1c0 //C 0f1ff jmp	l_cyc */
+0x0000f200, 0x01580001, /* 01580001 //C 0f200 cmp	r5,1 */
+0x0000f201, 0x21f2f206, /* 21f2f206 //C 0f201 jnz	l_s2_no1 */
+0x0000f202, 0x0400f3bc, /* 0400f3bc //C 0f202 call	hexchar2value */
+0x0000f203, 0x31f2f1f9, /* 31f2f1f9 //C 0f203 C1 jmp	l_s2_got */
+0x0000f204, 0x01520002, /* 01520002 //C 0f204 mvzl	r5,2 */
+0x0000f205, 0x01f2f1c0, /* 01f2f1c0 //C 0f205 jmp	l_cyc */
+0x0000f206, 0x01f2f1c0, /* 01f2f1c0 //C 0f206 jmp	l_cyc */
+0x0000f207, 0x01a80003, /* 01a80003 //C 0f207 cmp	r10,3 */
+0x0000f208, 0x21f2f20a, /* 21f2f20a //C 0f208 jnz	l_no3 */
+0x0000f209, 0x01f2f1c0, /* 01f2f1c0 //C 0f209 jmp	l_cyc		; do nothing, just wait EOL */
+0x0000f20a, 0x01a8000f, /* 01a8000f //C 0f20a cmp	r10,0xf */
+0x0000f20b, 0x01f2f20d, /* 01f2f20d //C 0f20b jmp	l_nof */
+0x0000f20c, 0x01f2f1c0, /* 01f2f1c0 //C 0f20c jmp	l_cyc		; just skip */
+0x0000f20d, 0x01f2f1c0, /* 01f2f1c0 //C 0f20d jmp	l_cyc */
+0x0000f20e, 0x01f2f225, /* 01f2f225 //C 0f20e jmp	l_ret */
+0x0000f20f, 0x01a80000, /* 01a80000 //C 0f20f cmp	r10,0		; in state0 */
+0x0000f210, 0x11f2f21f, /* 11f2f21f //C 0f210 jz	l_back_to_0	; just restart */
+0x0000f211, 0x01a80001, /* 01a80001 //C 0f211 cmp	r10,1		; in state1 */
+0x0000f212, 0x11f2f21f, /* 11f2f21f //C 0f212 jz	l_back_to_0 	;l_cyc ;l_bad ; garbage */
+0x0000f213, 0x01a80002, /* 01a80002 //C 0f213 cmp	r10,2		; in state2 */
+0x0000f214, 0x11f2f21b, /* 11f2f21b //C 0f214 jz	l_proc		; process record */
+0x0000f215, 0x01a80003, /* 01a80003 //C 0f215 cmp	r10,3		; in state3 */
+0x0000f216, 0x11f2f225, /* 11f2f225 //C 0f216 jz	l_ret		; eol in end record: finish */
+0x0000f217, 0x01a8000f, /* 01a8000f //C 0f217 cmp	r10,0xf		; in state skip */
+0x0000f218, 0x11f2f21f, /* 11f2f21f //C 0f218 jz	l_back_to_0	; reset state for new line */
+0x0000f219, 0x01f2f1c0, /* 01f2f1c0 //C 0f219 jmp	l_cyc */
+0x0000f21a, 0x01f2f225, /* 01f2f225 //C 0f21a jmp	l_ret */
+0x0000f21b, 0x01680043, /* 01680043 //C 0f21b cmp	r6,'C'		; is it a C record? */
+0x0000f21c, 0x1c890000, /* 1c890000 //C 0f21c z st	r8,r9		; store */
+0x0000f21d, 0x00000600, /* 00000600 //C 0f21d mov	r0,r6		; echo record type */
+0x0000f21e, 0x0400f41e, /* 0400f41e //C 0f21e call	putchar */
+0x0000f21f, 0x0102002e, /* 0102002e //C 0f21f mvzl	r0,'.' */
+0x0000f220, 0x0400f41e, /* 0400f41e //C 0f220 call	putchar */
+0x0000f221, 0x01a20000, /* 01a20000 //C 0f221 mvzl	r10,0 */
+0x0000f222, 0x01820000, /* 01820000 //C 0f222 mvzl	r8,0 */
+0x0000f223, 0x0162003f, /* 0162003f //C 0f223 mvzl	r6,'?' */
+0x0000f224, 0x01f2f1c0, /* 01f2f1c0 //C 0f224 jmp	l_cyc */
+0x0000f225, 0x0102000a, /* 0102000a //C 0f225 mvzl	r0,LF */
+0x0000f226, 0x0400f41e, /* 0400f41e //C 0f226 call	putchar */
+0x0000f227, 0x0fed0000, /* 0fed0000 //C 0f227 pop	lr */
+0x0000f228, 0x00f00e00, /* 00f00e00 //C 0f228 ret */
+0x0000f229, 0x0ded0000, /* 0ded0000 //C 0f229 push	lr */
+0x0000f22a, 0x0122f4d1, /* 0122f4d1 //C 0f22a mvzl	r2,words */
+0x0000f22b, 0x0e020001, /* 0e020001 //C 0f22b ld	r0,r2,1		; address */
+0x0000f22c, 0x020b0000, /* 020b0000 //C 0f22c sz	r0 */
+0x0000f22d, 0x11f2f250, /* 11f2f250 //C 0f22d jz	g_no_addr */
+0x0000f22e, 0x0400f3f0, /* 0400f3f0 //C 0f22e call	htoi */
+0x0000f22f, 0x00b00100, /* 00b00100 //C 0f22f mov	r11,r1 */
+0x0000f230, 0x0102f264, /* 0102f264 //C 0f230 mvzl	r0,d_msg_run */
+0x0000f231, 0x0400f428, /* 0400f428 //C 0f231 call	prints */
+0x0000f232, 0x00000b00, /* 00000b00 //C 0f232 mov	r0,r11 */
+0x0000f233, 0x01120004, /* 01120004 //C 0f233 mvzl	r1,4 */
+0x0000f234, 0x0400f444, /* 0400f444 //C 0f234 call	print_vhex */
+0x0000f235, 0x0102000a, /* 0102000a //C 0f235 mvzl	r0,LF */
+0x0000f236, 0x0400f41e, /* 0400f41e //C 0f236 call	putchar */
+0x0000f237, 0x06b0f4e8, /* 06b0f4e8 //C 0f237 st	r11,reg15 */
+0x0000f238, 0x0122ff43, /* 0122ff43 //C 0f238 mvzl	r2,UART_TSTAT */
+0x0000f239, 0x0e920000, /* 0e920000 //C 0f239 ld	r9,r2 */
+0x0000f23a, 0x019c0001, /* 019c0001 //C 0f23a test	r9,1 */
+0x0000f23b, 0x11f2f239, /* 11f2f239 //C 0f23b jz	g_wait_tc */
+0x0000f23c, 0x07000000, /* 07000000 //C 0f23c ld	r0,0 */
+0x0000f23d, 0x0600f4d7, /* 0600f4d7 //C 0f23d st	r0,called */
+0x0000f23e, 0x0700f4e9, /* 0700f4e9 //C 0f23e ld	r0,regf */
+0x0000f23f, 0x020f0000, /* 020f0000 //C 0f23f setf	r0 */
+0x0000f240, 0x0700f4d9, /* 0700f4d9 //C 0f240 ld	r0,reg0 */
+0x0000f241, 0x0710f4da, /* 0710f4da //C 0f241 ld	r1,reg1 */
+0x0000f242, 0x0720f4db, /* 0720f4db //C 0f242 ld	r2,reg2 */
+0x0000f243, 0x0730f4dc, /* 0730f4dc //C 0f243 ld	r3,reg3 */
+0x0000f244, 0x0740f4dd, /* 0740f4dd //C 0f244 ld	r4,reg4 */
+0x0000f245, 0x0750f4de, /* 0750f4de //C 0f245 ld	r5,reg5 */
+0x0000f246, 0x0760f4df, /* 0760f4df //C 0f246 ld	r6,reg6 */
+0x0000f247, 0x0770f4e0, /* 0770f4e0 //C 0f247 ld	r7,reg7 */
+0x0000f248, 0x0780f4e1, /* 0780f4e1 //C 0f248 ld	r8,reg8 */
+0x0000f249, 0x0790f4e2, /* 0790f4e2 //C 0f249 ld	r9,reg9 */
+0x0000f24a, 0x07a0f4e3, /* 07a0f4e3 //C 0f24a ld	r10,reg10 */
+0x0000f24b, 0x07b0f4e4, /* 07b0f4e4 //C 0f24b ld	r11,reg11 */
+0x0000f24c, 0x07c0f4e5, /* 07c0f4e5 //C 0f24c ld	r12,reg12 */
+0x0000f24d, 0x07d0f4e6, /* 07d0f4e6 //C 0f24d ld	r13,reg13 */
+0x0000f24e, 0x07e0f4e7, /* 07e0f4e7 //C 0f24e ld	r14,reg14 */
+0x0000f24f, 0x07f0f4e8, /* 07f0f4e8 //C 0f24f ld	r15,reg15 */
+0x0000f250, 0x0700f4d7, /* 0700f4d7 //C 0f250 ld	r0,called */
+0x0000f251, 0x020b0000, /* 020b0000 //C 0f251 sz	r0 */
+0x0000f252, 0x11f2f255, /* 11f2f255 //C 0f252 jz	g_err */
+0x0000f253, 0x07b0f4e8, /* 07b0f4e8 //C 0f253 ld	r11,reg15 */
+0x0000f254, 0x01f2f230, /* 01f2f230 //C 0f254 jmp	g_go11 */
+0x0000f255, 0x0102f259, /* 0102f259 //C 0f255 mvzl	r0,g_err_addr */
+0x0000f256, 0x0400f43c, /* 0400f43c //C 0f256 call	printsnl */
+0x0000f257, 0x0fed0000, /* 0fed0000 //C 0f257 pop	lr */
+0x0000f258, 0x00f00e00, /* 00f00e00 //C 0f258 ret */
+0x0000f259, 0x0000004e, /* 0000004e //C 0f259 db	78 */
+0x0000f25a, 0x0000006f, /* 0000006f //C 0f25a db	111 */
+0x0000f25b, 0x00000020, /* 00000020 //C 0f25b db	32 */
+0x0000f25c, 0x00000061, /* 00000061 //C 0f25c db	97 */
+0x0000f25d, 0x00000064, /* 00000064 //C 0f25d db	100 */
+0x0000f25e, 0x00000064, /* 00000064 //C 0f25e db	100 */
+0x0000f25f, 0x00000072, /* 00000072 //C 0f25f db	114 */
+0x0000f260, 0x00000065, /* 00000065 //C 0f260 db	101 */
+0x0000f261, 0x00000073, /* 00000073 //C 0f261 db	115 */
+0x0000f262, 0x00000073, /* 00000073 //C 0f262 db	115 */
+0x0000f263, 0x00000000, /* 00000000 //C 0f263 db */
+0x0000f264, 0x00000052, /* 00000052 //C 0f264 db	82 */
+0x0000f265, 0x00000075, /* 00000075 //C 0f265 db	117 */
+0x0000f266, 0x0000006e, /* 0000006e //C 0f266 db	110 */
+0x0000f267, 0x00000020, /* 00000020 //C 0f267 db	32 */
+0x0000f268, 0x00000000, /* 00000000 //C 0f268 db */
+0x0000f269, 0x0ded0000, /* 0ded0000 //C 0f269 push	lr */
+0x0000f26a, 0x0122f575, /* 0122f575 //C 0f26a mvzl	r2,helps */
+0x0000f26b, 0x01320000, /* 01320000 //C 0f26b mvzl	r3,0 */
+0x0000f26c, 0x0b038200, /* 0b038200 //C 0f26c ld	r0,r3+,r2	; pick a char */
+0x0000f26d, 0x020b0000, /* 020b0000 //C 0f26d sz	r0		; is it eos? */
+0x0000f26e, 0x21f2f272, /* 21f2f272 //C 0f26e jnz	h_print */
+0x0000f26f, 0x0b038200, /* 0b038200 //C 0f26f ld	r0,r3+,r2	; get first char of next string */
+0x0000f270, 0x020b0000, /* 020b0000 //C 0f270 sz	r0 */
+0x0000f271, 0x11f2f274, /* 11f2f274 //C 0f271 jz	h_eof */
+0x0000f272, 0x0400f41e, /* 0400f41e //C 0f272 call	putchar */
+0x0000f273, 0x01f2f26c, /* 01f2f26c //C 0f273 jmp	h_cyc */
+0x0000f274, 0x0fed0000, /* 0fed0000 //C 0f274 pop	lr */
+0x0000f275, 0x00f00e00, /* 00f00e00 //C 0f275 ret */
+0x0000f276, 0x0ded0000, /* 0ded0000 //C 0f276 push	lr */
+0x0000f277, 0x0d1d0000, /* 0d1d0000 //C 0f277 push	r1 */
+0x0000f278, 0x00100000, /* 00100000 //C 0f278 mov	r1,r0 */
+0x0000f279, 0x01180010, /* 01180010 //C 0f279 cmp	r1,16		; go out if nr>16 */
+0x0000f27a, 0x91f2f2ae, /* 91f2f2ae //C 0f27a HI jmp	prn_ret */
+0x0000f27b, 0x0118000f, /* 0118000f //C 0f27b cmp	r1,15		; nr=Flag? */
+0x0000f27c, 0xa1f2f283, /* a1f2f283 //C 0f27c LS jmp	prn_015 */
+0x0000f27d, 0x01020046, /* 01020046 //C 0f27d mvzl	r0,'F' */
+0x0000f27e, 0x0400f41e, /* 0400f41e //C 0f27e call	putchar */
+0x0000f27f, 0x01020020, /* 01020020 //C 0f27f mvzl	r0,32 */
+0x0000f280, 0x0400f41e, /* 0400f41e //C 0f280 call	putchar */
+0x0000f281, 0x0400f41e, /* 0400f41e //C 0f281 call	putchar */
+0x0000f282, 0x01f2f2ae, /* 01f2f2ae //C 0f282 jmp	prn_ret */
+0x0000f283, 0x0118000f, /* 0118000f //C 0f283 cmp	r1,15 */
+0x0000f284, 0x21f2f28c, /* 21f2f28c //C 0f284 jnz	prn_no15 */
+0x0000f285, 0x0102f288, /* 0102f288 //C 0f285 mvzl	r0,prn_PC */
+0x0000f286, 0x0400f428, /* 0400f428 //C 0f286 call	prints */
+0x0000f287, 0x01f2f2ae, /* 01f2f2ae //C 0f287 jmp	prn_ret */
+0x0000f288, 0x00000050, /* 00000050 //C 0f288 db	80 */
+0x0000f289, 0x00000043, /* 00000043 //C 0f289 db	67 */
+0x0000f28a, 0x00000020, /* 00000020 //C 0f28a db	32 */
+0x0000f28b, 0x00000000, /* 00000000 //C 0f28b db */
+0x0000f28c, 0x0118000e, /* 0118000e //C 0f28c cmp	r1,14 */
+0x0000f28d, 0x21f2f295, /* 21f2f295 //C 0f28d jnz	prn_no14 */
+0x0000f28e, 0x0102f291, /* 0102f291 //C 0f28e mvzl	r0,prn_LR */
+0x0000f28f, 0x0400f428, /* 0400f428 //C 0f28f call	prints */
+0x0000f290, 0x01f2f2ae, /* 01f2f2ae //C 0f290 jmp	prn_ret */
+0x0000f291, 0x0000004c, /* 0000004c //C 0f291 db	76 */
+0x0000f292, 0x00000052, /* 00000052 //C 0f292 db	82 */
+0x0000f293, 0x00000020, /* 00000020 //C 0f293 db	32 */
+0x0000f294, 0x00000000, /* 00000000 //C 0f294 db */
+0x0000f295, 0x0118000d, /* 0118000d //C 0f295 cmp	r1,13 */
+0x0000f296, 0x21f2f29e, /* 21f2f29e //C 0f296 jnz	prn_no13 */
+0x0000f297, 0x0102f29a, /* 0102f29a //C 0f297 mvzl	r0,prn_SP */
+0x0000f298, 0x0400f428, /* 0400f428 //C 0f298 call	prints */
+0x0000f299, 0x01f2f2ae, /* 01f2f2ae //C 0f299 jmp	prn_ret */
+0x0000f29a, 0x00000053, /* 00000053 //C 0f29a db	83 */
+0x0000f29b, 0x00000050, /* 00000050 //C 0f29b db	80 */
+0x0000f29c, 0x00000020, /* 00000020 //C 0f29c db	32 */
+0x0000f29d, 0x00000000, /* 00000000 //C 0f29d db */
+0x0000f29e, 0x01020052, /* 01020052 //C 0f29e mvzl	r0,'R' */
+0x0000f29f, 0x0400f41e, /* 0400f41e //C 0f29f call	putchar */
+0x0000f2a0, 0x01180009, /* 01180009 //C 0f2a0 cmp	r1,9 */
+0x0000f2a1, 0x91f2f2a8, /* 91f2f2a8 //C 0f2a1 HI jmp	prn_1015 */
+0x0000f2a2, 0x00000100, /* 00000100 //C 0f2a2 mov	r0,r1 */
+0x0000f2a3, 0x01040030, /* 01040030 //C 0f2a3 add	r0,'0' */
+0x0000f2a4, 0x0400f41e, /* 0400f41e //C 0f2a4 call	putchar */
+0x0000f2a5, 0x01020020, /* 01020020 //C 0f2a5 mvzl	r0,32 */
+0x0000f2a6, 0x0400f41e, /* 0400f41e //C 0f2a6 call	putchar */
+0x0000f2a7, 0x01f2f2ae, /* 01f2f2ae //C 0f2a7 jmp	prn_ret */
+0x0000f2a8, 0x01020031, /* 01020031 //C 0f2a8 mvzl	r0,'1' */
+0x0000f2a9, 0x0400f41e, /* 0400f41e //C 0f2a9 call	putchar */
+0x0000f2aa, 0x00000100, /* 00000100 //C 0f2aa mov	r0,r1 */
+0x0000f2ab, 0x0106000a, /* 0106000a //C 0f2ab sub	r0,10 */
+0x0000f2ac, 0x01040030, /* 01040030 //C 0f2ac add	r0,'0' */
+0x0000f2ad, 0x0400f41e, /* 0400f41e //C 0f2ad call	putchar */
+0x0000f2ae, 0x0f1d0000, /* 0f1d0000 //C 0f2ae pop	r1 */
+0x0000f2af, 0x0fed0000, /* 0fed0000 //C 0f2af pop	lr */
+0x0000f2b0, 0x00f00e00, /* 00f00e00 //C 0f2b0 ret */
+0x0000f2b1, 0x0ded0000, /* 0ded0000 //C 0f2b1 push	lr */
+0x0000f2b2, 0x0d1d0000, /* 0d1d0000 //C 0f2b2 push	r1 */
+0x0000f2b3, 0x01080010, /* 01080010 //C 0f2b3 cmp	r0,16 */
+0x0000f2b4, 0x91f2f2b9, /* 91f2f2b9 //C 0f2b4 HI jmp	prv_ret */
+0x0000f2b5, 0x0112f4d9, /* 0112f4d9 //C 0f2b5 mvzl	r1,reg0 */
+0x0000f2b6, 0x0a010000, /* 0a010000 //C 0f2b6 ld	r0,r1,r0 */
+0x0000f2b7, 0x01120004, /* 01120004 //C 0f2b7 mvzl	r1,4 */
+0x0000f2b8, 0x0400f444, /* 0400f444 //C 0f2b8 call	print_vhex */
+0x0000f2b9, 0x0f1d0000, /* 0f1d0000 //C 0f2b9 pop	r1 */
+0x0000f2ba, 0x0fed0000, /* 0fed0000 //C 0f2ba pop	lr */
+0x0000f2bb, 0x00f00e00, /* 00f00e00 //C 0f2bb ret */
+0x0000f2bc, 0x0ded0000, /* 0ded0000 //C 0f2bc push	lr */
+0x0000f2bd, 0x0dad0000, /* 0dad0000 //C 0f2bd push	r10 */
+0x0000f2be, 0x0d0d0000, /* 0d0d0000 //C 0f2be push	r0 */
+0x0000f2bf, 0x00000a00, /* 00000a00 //C 0f2bf mov	r0,r10 */
+0x0000f2c0, 0x0400f276, /* 0400f276 //C 0f2c0 call	print_reg_name */
+0x0000f2c1, 0x01020020, /* 01020020 //C 0f2c1 mvzl	r0,32 */
+0x0000f2c2, 0x0400f41e, /* 0400f41e //C 0f2c2 call	putchar */
+0x0000f2c3, 0x00000a00, /* 00000a00 //C 0f2c3 mov	r0,r10 */
+0x0000f2c4, 0x0400f2b1, /* 0400f2b1 //C 0f2c4 call	print_reg_value */
+0x0000f2c5, 0x0102000a, /* 0102000a //C 0f2c5 mvzl	r0,LF */
+0x0000f2c6, 0x0400f41e, /* 0400f41e //C 0f2c6 call	putchar */
+0x0000f2c7, 0x0f0d0000, /* 0f0d0000 //C 0f2c7 pop	r0 */
+0x0000f2c8, 0x0fad0000, /* 0fad0000 //C 0f2c8 pop	r10 */
+0x0000f2c9, 0x0fed0000, /* 0fed0000 //C 0f2c9 pop	lr */
+0x0000f2ca, 0x00f00e00, /* 00f00e00 //C 0f2ca ret */
+0x0000f2cb, 0x0ded0000, /* 0ded0000 //C 0f2cb push	lr */
+0x0000f2cc, 0x0400f41e, /* 0400f41e //C 0f2cc call	putchar */
+0x0000f2cd, 0x001c0200, /* 001c0200 //C 0f2cd test	r1,r2 */
+0x0000f2ce, 0x21020031, /* 21020031 //C 0f2ce NZ mvzl r0,'1' */
+0x0000f2cf, 0x11020030, /* 11020030 //C 0f2cf Z  mvzl r0,'0' */
+0x0000f2d0, 0x0400f41e, /* 0400f41e //C 0f2d0 call	putchar */
+0x0000f2d1, 0x00000300, /* 00000300 //C 0f2d1 mov	r0,r3 */
+0x0000f2d2, 0x0400f41e, /* 0400f41e //C 0f2d2 call	putchar */
+0x0000f2d3, 0x0fed0000, /* 0fed0000 //C 0f2d3 pop	lr */
+0x0000f2d4, 0x00f00e00, /* 00f00e00 //C 0f2d4 ret */
+0x0000f2d5, 0x0ded0000, /* 0ded0000 //C 0f2d5 push	lr */
+0x0000f2d6, 0x0700f4d7, /* 0700f4d7 //C 0f2d6 ld	r0,called */
+0x0000f2d7, 0x020b0000, /* 020b0000 //C 0f2d7 sz	r0 */
+0x0000f2d8, 0x11f2f2e1, /* 11f2f2e1 //C 0f2d8 jz	r_not_called */
+0x0000f2d9, 0x0102f2ff, /* 0102f2ff //C 0f2d9 mvzl	r0,msg_r_called */
+0x0000f2da, 0x0400f428, /* 0400f428 //C 0f2da call	prints */
+0x0000f2db, 0x0700f4e8, /* 0700f4e8 //C 0f2db ld	r0,reg15 */
+0x0000f2dc, 0x01120004, /* 01120004 //C 0f2dc mvzl	r1,4 */
+0x0000f2dd, 0x0400f444, /* 0400f444 //C 0f2dd call	print_vhex */
+0x0000f2de, 0x0102000a, /* 0102000a //C 0f2de mvzl	r0,LF */
+0x0000f2df, 0x0400f41e, /* 0400f41e //C 0f2df call	putchar */
+0x0000f2e0, 0x01f2f2e3, /* 01f2f2e3 //C 0f2e0 jmp	r_start */
+0x0000f2e1, 0x0102f315, /* 0102f315 //C 0f2e1 mvzl	r0,msg_r_notcalled */
+0x0000f2e2, 0x0400f428, /* 0400f428 //C 0f2e2 call	prints */
+0x0000f2e3, 0x01a20000, /* 01a20000 //C 0f2e3 mvzl	r10,0 */
+0x0000f2e4, 0x0400f2bc, /* 0400f2bc //C 0f2e4 call	print_reg_name_value */
+0x0000f2e5, 0x01a40001, /* 01a40001 //C 0f2e5 add	r10,1 */
+0x0000f2e6, 0x01a80011, /* 01a80011 //C 0f2e6 cmp	r10,17 */
+0x0000f2e7, 0x21f2f2e4, /* 21f2f2e4 //C 0f2e7 jnz	r_cyc */
+0x0000f2e8, 0x0710f4e9, /* 0710f4e9 //C 0f2e8 ld	r1,regf */
+0x0000f2e9, 0x01320020, /* 01320020 //C 0f2e9 mvzl	r3,32 */
+0x0000f2ea, 0x01020055, /* 01020055 //C 0f2ea mvzl	r0,'U' */
+0x0000f2eb, 0x01220020, /* 01220020 //C 0f2eb mvzl	r2,0x20 */
+0x0000f2ec, 0x0400f2cb, /* 0400f2cb //C 0f2ec call	print_flag */
+0x0000f2ed, 0x01020050, /* 01020050 //C 0f2ed mvzl	r0,'P' */
+0x0000f2ee, 0x01220010, /* 01220010 //C 0f2ee mvzl	r2,0x10 */
+0x0000f2ef, 0x0400f2cb, /* 0400f2cb //C 0f2ef call	print_flag */
+0x0000f2f0, 0x0102004f, /* 0102004f //C 0f2f0 mvzl	r0,'O' */
+0x0000f2f1, 0x01220008, /* 01220008 //C 0f2f1 mvzl	r2,8 */
+0x0000f2f2, 0x0400f2cb, /* 0400f2cb //C 0f2f2 call	print_flag */
+0x0000f2f3, 0x0102005a, /* 0102005a //C 0f2f3 mvzl	r0,'Z' */
+0x0000f2f4, 0x01220004, /* 01220004 //C 0f2f4 mvzl	r2,4 */
+0x0000f2f5, 0x0400f2cb, /* 0400f2cb //C 0f2f5 call	print_flag */
+0x0000f2f6, 0x01020043, /* 01020043 //C 0f2f6 mvzl	r0,'C' */
+0x0000f2f7, 0x01220002, /* 01220002 //C 0f2f7 mvzl	r2,2 */
+0x0000f2f8, 0x0400f2cb, /* 0400f2cb //C 0f2f8 call	print_flag */
+0x0000f2f9, 0x01020053, /* 01020053 //C 0f2f9 mvzl	r0,'S' */
+0x0000f2fa, 0x01220001, /* 01220001 //C 0f2fa mvzl	r2,1 */
+0x0000f2fb, 0x0132000a, /* 0132000a //C 0f2fb mvzl	r3,LF */
+0x0000f2fc, 0x0400f2cb, /* 0400f2cb //C 0f2fc call	print_flag */
+0x0000f2fd, 0x0fed0000, /* 0fed0000 //C 0f2fd pop	lr */
+0x0000f2fe, 0x00f00e00, /* 00f00e00 //C 0f2fe ret */
+0x0000f2ff, 0x0000004d, /* 0000004d //C 0f2ff db	77 */
+0x0000f300, 0x0000006f, /* 0000006f //C 0f300 db	111 */
+0x0000f301, 0x0000006e, /* 0000006e //C 0f301 db	110 */
+0x0000f302, 0x00000069, /* 00000069 //C 0f302 db	105 */
+0x0000f303, 0x00000074, /* 00000074 //C 0f303 db	116 */
+0x0000f304, 0x0000006f, /* 0000006f //C 0f304 db	111 */
+0x0000f305, 0x00000072, /* 00000072 //C 0f305 db	114 */
+0x0000f306, 0x00000020, /* 00000020 //C 0f306 db	32 */
+0x0000f307, 0x00000063, /* 00000063 //C 0f307 db	99 */
+0x0000f308, 0x00000061, /* 00000061 //C 0f308 db	97 */
+0x0000f309, 0x0000006c, /* 0000006c //C 0f309 db	108 */
+0x0000f30a, 0x0000006c, /* 0000006c //C 0f30a db	108 */
+0x0000f30b, 0x00000065, /* 00000065 //C 0f30b db	101 */
+0x0000f30c, 0x00000064, /* 00000064 //C 0f30c db	100 */
+0x0000f30d, 0x00000020, /* 00000020 //C 0f30d db	32 */
+0x0000f30e, 0x00000066, /* 00000066 //C 0f30e db	102 */
+0x0000f30f, 0x00000072, /* 00000072 //C 0f30f db	114 */
+0x0000f310, 0x0000006f, /* 0000006f //C 0f310 db	111 */
+0x0000f311, 0x0000006d, /* 0000006d //C 0f311 db	109 */
+0x0000f312, 0x0000003a, /* 0000003a //C 0f312 db	58 */
+0x0000f313, 0x00000020, /* 00000020 //C 0f313 db	32 */
+0x0000f314, 0x00000000, /* 00000000 //C 0f314 db */
+0x0000f315, 0x0000004d, /* 0000004d //C 0f315 db	77 */
+0x0000f316, 0x0000006f, /* 0000006f //C 0f316 db	111 */
+0x0000f317, 0x0000006e, /* 0000006e //C 0f317 db	110 */
+0x0000f318, 0x00000069, /* 00000069 //C 0f318 db	105 */
+0x0000f319, 0x00000074, /* 00000074 //C 0f319 db	116 */
+0x0000f31a, 0x0000006f, /* 0000006f //C 0f31a db	111 */
+0x0000f31b, 0x00000072, /* 00000072 //C 0f31b db	114 */
+0x0000f31c, 0x00000020, /* 00000020 //C 0f31c db	32 */
+0x0000f31d, 0x0000006e, /* 0000006e //C 0f31d db	110 */
+0x0000f31e, 0x0000006f, /* 0000006f //C 0f31e db	111 */
+0x0000f31f, 0x00000074, /* 00000074 //C 0f31f db	116 */
+0x0000f320, 0x00000020, /* 00000020 //C 0f320 db	32 */
+0x0000f321, 0x00000063, /* 00000063 //C 0f321 db	99 */
+0x0000f322, 0x00000061, /* 00000061 //C 0f322 db	97 */
+0x0000f323, 0x0000006c, /* 0000006c //C 0f323 db	108 */
+0x0000f324, 0x0000006c, /* 0000006c //C 0f324 db	108 */
+0x0000f325, 0x00000065, /* 00000065 //C 0f325 db	101 */
+0x0000f326, 0x00000064, /* 00000064 //C 0f326 db	100 */
+0x0000f327, 0x00000020, /* 00000020 //C 0f327 db	32 */
+0x0000f328, 0x00000062, /* 00000062 //C 0f328 db	98 */
+0x0000f329, 0x00000079, /* 00000079 //C 0f329 db	121 */
+0x0000f32a, 0x00000020, /* 00000020 //C 0f32a db	32 */
+0x0000f32b, 0x00000075, /* 00000075 //C 0f32b db	117 */
+0x0000f32c, 0x00000073, /* 00000073 //C 0f32c db	115 */
+0x0000f32d, 0x00000065, /* 00000065 //C 0f32d db	101 */
+0x0000f32e, 0x00000072, /* 00000072 //C 0f32e db	114 */
+0x0000f32f, 0x0000000a, /* 0000000a //C 0f32f db	10 */
+0x0000f330, 0x00000000, /* 00000000 //C 0f330 db */
+0x0000f331, 0x0ded0000, /* 0ded0000 //C 0f331 push	lr */
+0x0000f332, 0x07a0f4d8, /* 07a0f4d8 //C 0f332 ld	r10,nuof_reg	; Reg num is in R10 */
+0x0000f333, 0x01a80010, /* 01a80010 //C 0f333 cmp	r10,16 */
+0x0000f334, 0xa1f2f349, /* a1f2f349 //C 0f334 LS jmp	rx_nr_ok */
+0x0000f335, 0x0102f338, /* 0102f338 //C 0f335 mvzl	r0,rx_err_nr */
+0x0000f336, 0x0400f43c, /* 0400f43c //C 0f336 call	printsnl */
+0x0000f337, 0x01f2f365, /* 01f2f365 //C 0f337 jmp	rx_ret */
+0x0000f338, 0x0000004e, /* 0000004e //C 0f338 db	78 */
+0x0000f339, 0x0000006f, /* 0000006f //C 0f339 db	111 */
+0x0000f33a, 0x00000020, /* 00000020 //C 0f33a db	32 */
+0x0000f33b, 0x00000073, /* 00000073 //C 0f33b db	115 */
+0x0000f33c, 0x00000075, /* 00000075 //C 0f33c db	117 */
+0x0000f33d, 0x00000063, /* 00000063 //C 0f33d db	99 */
+0x0000f33e, 0x00000068, /* 00000068 //C 0f33e db	104 */
+0x0000f33f, 0x00000020, /* 00000020 //C 0f33f db	32 */
+0x0000f340, 0x00000072, /* 00000072 //C 0f340 db	114 */
+0x0000f341, 0x00000065, /* 00000065 //C 0f341 db	101 */
+0x0000f342, 0x00000067, /* 00000067 //C 0f342 db	103 */
+0x0000f343, 0x00000069, /* 00000069 //C 0f343 db	105 */
+0x0000f344, 0x00000073, /* 00000073 //C 0f344 db	115 */
+0x0000f345, 0x00000074, /* 00000074 //C 0f345 db	116 */
+0x0000f346, 0x00000065, /* 00000065 //C 0f346 db	101 */
+0x0000f347, 0x00000072, /* 00000072 //C 0f347 db	114 */
+0x0000f348, 0x00000000, /* 00000000 //C 0f348 db */
+0x0000f349, 0x0122f4d1, /* 0122f4d1 //C 0f349 mvzl	r2,words */
+0x0000f34a, 0x0e420001, /* 0e420001 //C 0f34a ld	r4,r2,1		; get aof first parameter */
+0x0000f34b, 0x024b0000, /* 024b0000 //C 0f34b sz	r4		; is it NULL? */
+0x0000f34c, 0x11f2f364, /* 11f2f364 //C 0f34c jz	rx_print */
+0x0000f34d, 0x00000400, /* 00000400 //C 0f34d mov	r0,r4 */
+0x0000f34e, 0x0400f3f0, /* 0400f3f0 //C 0f34e call	htoi */
+0x0000f34f, 0x00500100, /* 00500100 //C 0f34f mov	r5,r1		; Value is in R5 */
+0x0000f350, 0x31f2f360, /* 31f2f360 //C 0f350 C1 jmp	rx_val_ok */
+0x0000f351, 0x0102f354, /* 0102f354 //C 0f351 mvzl	r0,rx_err_val */
+0x0000f352, 0x0400f43c, /* 0400f43c //C 0f352 call	printsnl */
+0x0000f353, 0x01f2f365, /* 01f2f365 //C 0f353 jmp	rx_ret */
+0x0000f354, 0x00000056, /* 00000056 //C 0f354 db	86 */
+0x0000f355, 0x00000061, /* 00000061 //C 0f355 db	97 */
+0x0000f356, 0x0000006c, /* 0000006c //C 0f356 db	108 */
+0x0000f357, 0x00000075, /* 00000075 //C 0f357 db	117 */
+0x0000f358, 0x00000065, /* 00000065 //C 0f358 db	101 */
+0x0000f359, 0x00000020, /* 00000020 //C 0f359 db	32 */
+0x0000f35a, 0x00000065, /* 00000065 //C 0f35a db	101 */
+0x0000f35b, 0x00000072, /* 00000072 //C 0f35b db	114 */
+0x0000f35c, 0x00000072, /* 00000072 //C 0f35c db	114 */
+0x0000f35d, 0x0000006f, /* 0000006f //C 0f35d db	111 */
+0x0000f35e, 0x00000072, /* 00000072 //C 0f35e db	114 */
+0x0000f35f, 0x00000000, /* 00000000 //C 0f35f db */
+0x0000f360, 0x01a80010, /* 01a80010 //C 0f360 cmp	r10,16		; Flag reg? */
+0x0000f361, 0x115f003f, /* 115f003f //C 0f361 EQ and	r5,0x3f */
+0x0000f362, 0x0102f4d9, /* 0102f4d9 //C 0f362 mvzl	r0,reg0 */
+0x0000f363, 0x08500a00, /* 08500a00 //C 0f363 st	r5,r0,r10 */
+0x0000f364, 0x0400f2bc, /* 0400f2bc //C 0f364 call	print_reg_name_value */
+0x0000f365, 0x0fed0000, /* 0fed0000 //C 0f365 pop	lr */
+0x0000f366, 0x00f00e00, /* 00f00e00 //C 0f366 ret */
+0x0000f367, 0x0102000d, /* 0102000d //C 0f367 mvzl	r0,13 */
+0x0000f368, 0x0600f4d8, /* 0600f4d8 //C 0f368 st	r0,nuof_reg */
+0x0000f369, 0x01f2f331, /* 01f2f331 //C 0f369 jmp	cmd_rx */
+0x0000f36a, 0x0102000e, /* 0102000e //C 0f36a mvzl	r0,14 */
+0x0000f36b, 0x0600f4d8, /* 0600f4d8 //C 0f36b st	r0,nuof_reg */
+0x0000f36c, 0x01f2f331, /* 01f2f331 //C 0f36c jmp	cmd_rx */
+0x0000f36d, 0x0102000f, /* 0102000f //C 0f36d mvzl	r0,15 */
+0x0000f36e, 0x0600f4d8, /* 0600f4d8 //C 0f36e st	r0,nuof_reg */
+0x0000f36f, 0x01f2f331, /* 01f2f331 //C 0f36f jmp	cmd_rx */
+0x0000f370, 0x01020010, /* 01020010 //C 0f370 mvzl	r0,16 */
+0x0000f371, 0x0600f4d8, /* 0600f4d8 //C 0f371 st	r0,nuof_reg */
+0x0000f372, 0x01f2f331, /* 01f2f331 //C 0f372 jmp	cmd_rx */
+0x0000f373, 0x0d1d0000, /* 0d1d0000 //C 0f373 push	r1 */
+0x0000f374, 0x0d2d0000, /* 0d2d0000 //C 0f374 push	r2 */
+0x0000f375, 0x0e210000, /* 0e210000 //C 0f375 ld	r2,r1 */
+0x0000f376, 0x022b0000, /* 022b0000 //C 0f376 sz	r2 */
+0x0000f377, 0x11f2f37e, /* 11f2f37e //C 0f377 jz	strchr_no	; eof string found */
+0x0000f378, 0x00280000, /* 00280000 //C 0f378 cmp	r2,r0		; compare */
+0x0000f379, 0x11f2f37c, /* 11f2f37c //C 0f379 jz	strchr_yes */
+0x0000f37a, 0x011a0001, /* 011a0001 //C 0f37a plus	r1,1		; go to next char */
+0x0000f37b, 0x01f2f375, /* 01f2f375 //C 0f37b jmp	strchr_cyc */
+0x0000f37c, 0x020c0000, /* 020c0000 //C 0f37c sec */
+0x0000f37d, 0x01f2f380, /* 01f2f380 //C 0f37d jmp	strchr_ret */
+0x0000f37e, 0x01120000, /* 01120000 //C 0f37e mvzl	r1,0 */
+0x0000f37f, 0x020d0000, /* 020d0000 //C 0f37f clc */
+0x0000f380, 0x0f2d0000, /* 0f2d0000 //C 0f380 pop	r2 */
+0x0000f381, 0x0f1d0000, /* 0f1d0000 //C 0f381 pop	r1 */
+0x0000f382, 0x00f00e00, /* 00f00e00 //C 0f382 ret */
+0x0000f383, 0x0ded0000, /* 0ded0000 //C 0f383 push	lr		; Save used registers */
+0x0000f384, 0x0d0d0000, /* 0d0d0000 //C 0f384 push	r0		; and input parameters */
+0x0000f385, 0x0d1d0000, /* 0d1d0000 //C 0f385 push	r1 */
+0x0000f386, 0x0d2d0000, /* 0d2d0000 //C 0f386 push	r2 */
+0x0000f387, 0x0d4d0000, /* 0d4d0000 //C 0f387 push	r4 */
+0x0000f388, 0x0d5d0000, /* 0d5d0000 //C 0f388 push	r5 */
+0x0000f389, 0x0d6d0000, /* 0d6d0000 //C 0f389 push	r6 */
+0x0000f38a, 0x0e200000, /* 0e200000 //C 0f38a ld	r2,r0		; Got one-one char */
+0x0000f38b, 0x0e610000, /* 0e610000 //C 0f38b ld	r6,r1		; from two strings */
+0x0000f38c, 0x023b0000, /* 023b0000 //C 0f38c sz	r3		; Prepare for comparing */
+0x0000f38d, 0x112d0020, /* 112d0020 //C 0f38d Z1 or	r2,0x20		; if insensitive case */
+0x0000f38e, 0x023b0000, /* 023b0000 //C 0f38e sz	r3 */
+0x0000f38f, 0x116d0020, /* 116d0020 //C 0f38f Z1 or	r6,0x20 */
+0x0000f390, 0x00280600, /* 00280600 //C 0f390 cmp	r2,r6		; compare them */
+0x0000f391, 0x21f2f3a3, /* 21f2f3a3 //C 0f391 jnz	streq_no	; if differs: strings are not equal */
+0x0000f392, 0x0e200000, /* 0e200000 //C 0f392 ld	r2,r0		; Pick original (non-prepared) */
+0x0000f393, 0x0e610000, /* 0e610000 //C 0f393 ld	r6,r1		; chars to check EOS */
+0x0000f394, 0x022b0000, /* 022b0000 //C 0f394 sz	r2		; convert them to boolean */
+0x0000f395, 0x21220001, /* 21220001 //C 0f395 Z0 mvzl	r2,1		; values in R2,R6 */
+0x0000f396, 0x11220000, /* 11220000 //C 0f396 Z1 mvzl	r2,0		; and copy in R4,R5 */
+0x0000f397, 0x00400200, /* 00400200 //C 0f397 mov	r4,r2 */
+0x0000f398, 0x026b0000, /* 026b0000 //C 0f398 sz	r6 */
+0x0000f399, 0x21620001, /* 21620001 //C 0f399 Z0 mvzl	r6,1 */
+0x0000f39a, 0x11620000, /* 11620000 //C 0f39a Z1 mvzl r6,0 */
+0x0000f39b, 0x00500600, /* 00500600 //C 0f39b mov	r5,r6 */
+0x0000f39c, 0x004d0500, /* 004d0500 //C 0f39c or	r4,r5		; if both are EOS: equal */
+0x0000f39d, 0x11f2f3a5, /* 11f2f3a5 //C 0f39d jz	streq_yes */
+0x0000f39e, 0x002f0600, /* 002f0600 //C 0f39e and 	r2,r6		; just one is EOS: not equal */
+0x0000f39f, 0x11f2f3a3, /* 11f2f3a3 //C 0f39f jz	streq_no */
+0x0000f3a0, 0x010a0001, /* 010a0001 //C 0f3a0 plus	r0,1		; non are EOS: go to check next char */
+0x0000f3a1, 0x011a0001, /* 011a0001 //C 0f3a1 plus	r1,1 */
+0x0000f3a2, 0x01f2f38a, /* 01f2f38a //C 0f3a2 jmp	streq_cyc */
+0x0000f3a3, 0x020d0000, /* 020d0000 //C 0f3a3 clc			; False result */
+0x0000f3a4, 0x01f2f3a6, /* 01f2f3a6 //C 0f3a4 jmp	streq_ret */
+0x0000f3a5, 0x020c0000, /* 020c0000 //C 0f3a5 sec			; True result */
+0x0000f3a6, 0x0f6d0000, /* 0f6d0000 //C 0f3a6 pop	r6 */
+0x0000f3a7, 0x0f5d0000, /* 0f5d0000 //C 0f3a7 pop	r5 */
+0x0000f3a8, 0x0f4d0000, /* 0f4d0000 //C 0f3a8 pop	r4 */
+0x0000f3a9, 0x0f2d0000, /* 0f2d0000 //C 0f3a9 pop	r2 */
+0x0000f3aa, 0x0f1d0000, /* 0f1d0000 //C 0f3aa pop	r1 */
+0x0000f3ab, 0x0f0d0000, /* 0f0d0000 //C 0f3ab pop	r0 */
+0x0000f3ac, 0x0fed0000, /* 0fed0000 //C 0f3ac pop	lr */
+0x0000f3ad, 0x00f00e00, /* 00f00e00 //C 0f3ad ret */
+0x0000f3ae, 0x0ded0000, /* 0ded0000 //C 0f3ae push	lr */
+0x0000f3af, 0x0d3d0000, /* 0d3d0000 //C 0f3af push	r3 */
+0x0000f3b0, 0x01320001, /* 01320001 //C 0f3b0 mvzl	r3,1 */
+0x0000f3b1, 0x0400f383, /* 0400f383 //C 0f3b1 call	str_cmp_eq */
+0x0000f3b2, 0x0f3d0000, /* 0f3d0000 //C 0f3b2 pop	r3 */
+0x0000f3b3, 0x0fed0000, /* 0fed0000 //C 0f3b3 pop	lr */
+0x0000f3b4, 0x00f00e00, /* 00f00e00 //C 0f3b4 ret */
+0x0000f3b5, 0x0ded0000, /* 0ded0000 //C 0f3b5 push	lr */
+0x0000f3b6, 0x0d3d0000, /* 0d3d0000 //C 0f3b6 push	r3 */
+0x0000f3b7, 0x01320000, /* 01320000 //C 0f3b7 mvzl	r3,0 */
+0x0000f3b8, 0x0400f383, /* 0400f383 //C 0f3b8 call	str_cmp_eq */
+0x0000f3b9, 0x0f3d0000, /* 0f3d0000 //C 0f3b9 pop	r3 */
+0x0000f3ba, 0x0fed0000, /* 0fed0000 //C 0f3ba pop	lr */
+0x0000f3bb, 0x00f00e00, /* 00f00e00 //C 0f3bb ret */
+0x0000f3bc, 0x0108002f, /* 0108002f //C 0f3bc cmp	r0,'/' */
+0x0000f3bd, 0xa1f2f3d2, /* a1f2f3d2 //C 0f3bd LS jmp	hc2v_nok */
+0x0000f3be, 0x01080039, /* 01080039 //C 0f3be cmp	r0,'9' */
+0x0000f3bf, 0xa1f2f3cf, /* a1f2f3cf //C 0f3bf LS jmp	hc2v_0_9 */
+0x0000f3c0, 0x01080040, /* 01080040 //C 0f3c0 cmp	r0,'@' */
+0x0000f3c1, 0xa1f2f3d2, /* a1f2f3d2 //C 0f3c1 LS jmp	hc2v_nok */
+0x0000f3c2, 0x01080046, /* 01080046 //C 0f3c2 cmp	r0,'F' */
+0x0000f3c3, 0xa1f2f3cc, /* a1f2f3cc //C 0f3c3 LS jmp	hc2v_A_F */
+0x0000f3c4, 0x01080060, /* 01080060 //C 0f3c4 cmp	r0,'`' */
+0x0000f3c5, 0xa1f2f3d2, /* a1f2f3d2 //C 0f3c5 LS jmp	hc2v_nok */
+0x0000f3c6, 0x01080066, /* 01080066 //C 0f3c6 cmp	r0,'f' */
+0x0000f3c7, 0xa1f2f3c9, /* a1f2f3c9 //C 0f3c7 LS jmp	hc2v_a_f */
+0x0000f3c8, 0x01f2f3d2, /* 01f2f3d2 //C 0f3c8 jmp	hc2v_nok */
+0x0000f3c9, 0x0104000a, /* 0104000a //C 0f3c9 add	r0,10 */
+0x0000f3ca, 0x01060061, /* 01060061 //C 0f3ca sub	r0,'a' */
+0x0000f3cb, 0x01f2f3d0, /* 01f2f3d0 //C 0f3cb jmp	hc2v_ok */
+0x0000f3cc, 0x0104000a, /* 0104000a //C 0f3cc add	r0,10 */
+0x0000f3cd, 0x01060041, /* 01060041 //C 0f3cd sub	r0,'A' */
+0x0000f3ce, 0x01f2f3d0, /* 01f2f3d0 //C 0f3ce jmp	hc2v_ok */
+0x0000f3cf, 0x01060030, /* 01060030 //C 0f3cf sub	r0,'0' */
+0x0000f3d0, 0x020c0000, /* 020c0000 //C 0f3d0 sec */
+0x0000f3d1, 0x00f00e00, /* 00f00e00 //C 0f3d1 ret */
+0x0000f3d2, 0x020d0000, /* 020d0000 //C 0f3d2 clc */
+0x0000f3d3, 0x00f00e00, /* 00f00e00 //C 0f3d3 ret */
+0x0000f3d4, 0x0d1d0000, /* 0d1d0000 //C 0f3d4 push	r1 */
+0x0000f3d5, 0x010f000f, /* 010f000f //C 0f3d5 and	r0,0xf */
+0x0000f3d6, 0x0112f3da, /* 0112f3da //C 0f3d6 mvzl	r1,v2hc_table */
+0x0000f3d7, 0x0a010000, /* 0a010000 //C 0f3d7 ld	r0,r1,r0 */
+0x0000f3d8, 0x0f1d0000, /* 0f1d0000 //C 0f3d8 pop	r1 */
+0x0000f3d9, 0x00f00e00, /* 00f00e00 //C 0f3d9 ret */
+0x0000f3da, 0x00000030, /* 00000030 //C 0f3da db	48 */
+0x0000f3db, 0x00000031, /* 00000031 //C 0f3db db	49 */
+0x0000f3dc, 0x00000032, /* 00000032 //C 0f3dc db	50 */
+0x0000f3dd, 0x00000033, /* 00000033 //C 0f3dd db	51 */
+0x0000f3de, 0x00000034, /* 00000034 //C 0f3de db	52 */
+0x0000f3df, 0x00000035, /* 00000035 //C 0f3df db	53 */
+0x0000f3e0, 0x00000036, /* 00000036 //C 0f3e0 db	54 */
+0x0000f3e1, 0x00000037, /* 00000037 //C 0f3e1 db	55 */
+0x0000f3e2, 0x00000038, /* 00000038 //C 0f3e2 db	56 */
+0x0000f3e3, 0x00000039, /* 00000039 //C 0f3e3 db	57 */
+0x0000f3e4, 0x00000041, /* 00000041 //C 0f3e4 db	65 */
+0x0000f3e5, 0x00000042, /* 00000042 //C 0f3e5 db	66 */
+0x0000f3e6, 0x00000043, /* 00000043 //C 0f3e6 db	67 */
+0x0000f3e7, 0x00000044, /* 00000044 //C 0f3e7 db	68 */
+0x0000f3e8, 0x00000045, /* 00000045 //C 0f3e8 db	69 */
+0x0000f3e9, 0x00000046, /* 00000046 //C 0f3e9 db	70 */
+0x0000f3ea, 0x00000000, /* 00000000 //C 0f3ea db */
+0x0000f3eb, 0x0ded0000, /* 0ded0000 //C 0f3eb push	lr */
+0x0000f3ec, 0x0400f3d4, /* 0400f3d4 //C 0f3ec call	value2Hexchar */
+0x0000f3ed, 0x010d0020, /* 010d0020 //C 0f3ed or	r0,0x20 */
+0x0000f3ee, 0x0fed0000, /* 0fed0000 //C 0f3ee pop	lr */
+0x0000f3ef, 0x00f00e00, /* 00f00e00 //C 0f3ef ret */
+0x0000f3f0, 0x0ded0000, /* 0ded0000 //C 0f3f0 push	lr */
+0x0000f3f1, 0x0d2d0000, /* 0d2d0000 //C 0f3f1 push	r2 */
+0x0000f3f2, 0x0d3d0000, /* 0d3d0000 //C 0f3f2 push	r3 */
+0x0000f3f3, 0x01120000, /* 01120000 //C 0f3f3 mvzl	r1,0		; return value */
+0x0000f3f4, 0x01320000, /* 01320000 //C 0f3f4 mvzl	r3,0		; index */
+0x0000f3f5, 0x0b238000, /* 0b238000 //C 0f3f5 ld	r2,r3+,r0	; pick a char */
+0x0000f3f6, 0x022b0000, /* 022b0000 //C 0f3f6 sz	r2		; check eof string */
+0x0000f3f7, 0x11f2f40d, /* 11f2f40d //C 0f3f7 jz	htoi_eos */
+0x0000f3f8, 0x0128002e, /* 0128002e //C 0f3f8 cmp	r2,'.'		; skip separators */
+0x0000f3f9, 0x11f2f3f5, /* 11f2f3f5 //C 0f3f9 jz	htoi_cyc */
+0x0000f3fa, 0x0128005f, /* 0128005f //C 0f3fa cmp	r2,'_' */
+0x0000f3fb, 0x11f2f3f5, /* 11f2f3f5 //C 0f3fb jz	htoi_cyc */
+0x0000f3fc, 0x0128002d, /* 0128002d //C 0f3fc cmp	r2,'-' */
+0x0000f3fd, 0x11f2f3f5, /* 11f2f3f5 //C 0f3fd jz	htoi_cyc */
+0x0000f3fe, 0x0d0d0000, /* 0d0d0000 //C 0f3fe push	r0 */
+0x0000f3ff, 0x00000200, /* 00000200 //C 0f3ff mov	r0,r2 */
+0x0000f400, 0x0400f3bc, /* 0400f3bc //C 0f400 call	hexchar2value */
+0x0000f401, 0x00200000, /* 00200000 //C 0f401 mov	r2,r0 */
+0x0000f402, 0x0f0d0000, /* 0f0d0000 //C 0f402 pop	r0 */
+0x0000f403, 0x41f2f40b, /* 41f2f40b //C 0f403 C0 jmp	htoi_nok */
+0x0000f404, 0x02180000, /* 02180000 //C 0f404 shl	r1 */
+0x0000f405, 0x02180000, /* 02180000 //C 0f405 shl	r1 */
+0x0000f406, 0x02180000, /* 02180000 //C 0f406 shl	r1 */
+0x0000f407, 0x02180000, /* 02180000 //C 0f407 shl	r1 */
+0x0000f408, 0x012f000f, /* 012f000f //C 0f408 and	r2,0xf */
+0x0000f409, 0x001d0200, /* 001d0200 //C 0f409 or	r1,r2 */
+0x0000f40a, 0x01f2f3f5, /* 01f2f3f5 //C 0f40a jmp	htoi_cyc */
+0x0000f40b, 0x020d0000, /* 020d0000 //C 0f40b clc */
+0x0000f40c, 0x01f2f410, /* 01f2f410 //C 0f40c jmp	htoi_ret */
+0x0000f40d, 0x01380001, /* 01380001 //C 0f40d cmp	r3,1 */
+0x0000f40e, 0x920d0000, /* 920d0000 //C 0f40e HI clc */
+0x0000f40f, 0xa20c0000, /* a20c0000 //C 0f40f LS sec */
+0x0000f410, 0x0f3d0000, /* 0f3d0000 //C 0f410 pop	r3 */
+0x0000f411, 0x0f2d0000, /* 0f2d0000 //C 0f411 pop	r2 */
+0x0000f412, 0x0fed0000, /* 0fed0000 //C 0f412 pop	lr */
+0x0000f413, 0x00f00e00, /* 00f00e00 //C 0f413 ret */
+0x0000f414, 0x0d0d0000, /* 0d0d0000 //C 0f414 push	r0 */
+0x0000f415, 0x0700ff42, /* 0700ff42 //C 0f415 ld	r0,UART_RSTAT */
+0x0000f416, 0x010c0001, /* 010c0001 //C 0f416 test	r0,1 */
+0x0000f417, 0x020d0000, /* 020d0000 //C 0f417 clc */
+0x0000f418, 0x220c0000, /* 220c0000 //C 0f418 Z0 sec */
+0x0000f419, 0x0f0d0000, /* 0f0d0000 //C 0f419 pop	r0 */
+0x0000f41a, 0x30f00e00, /* 30f00e00 //C 0f41a C1 ret */
+0x0000f41b, 0x00f00e00, /* 00f00e00 //C 0f41b ret */
+0x0000f41c, 0x0700ff40, /* 0700ff40 //C 0f41c ld	r0,UART_DR */
+0x0000f41d, 0x00f00e00, /* 00f00e00 //C 0f41d ret */
+0x0000f41e, 0x0d9d0000, /* 0d9d0000 //C 0f41e push	r9 */
+0x0000f41f, 0x01920070, /* 01920070 //C 0f41f mvzl	r9,'p' */
+0x0000f420, 0x0690ffff, /* 0690ffff //C 0f420 st	r9,SIMIF */
+0x0000f421, 0x0600ffff, /* 0600ffff //C 0f421 st	r0,SIMIF */
+0x0000f422, 0x0790ff43, /* 0790ff43 //C 0f422 ld	r9,UART_TSTAT */
+0x0000f423, 0x019c0001, /* 019c0001 //C 0f423 test	r9,1 */
+0x0000f424, 0x11f2f422, /* 11f2f422 //C 0f424 jz	wait_tc */
+0x0000f425, 0x0600ff40, /* 0600ff40 //C 0f425 st	r0,UART_DR */
+0x0000f426, 0x0f9d0000, /* 0f9d0000 //C 0f426 pop	r9 */
+0x0000f427, 0x00f00e00, /* 00f00e00 //C 0f427 ret */
+0x0000f428, 0x0ded0000, /* 0ded0000 //C 0f428 push	lr */
+0x0000f429, 0x0d0d0000, /* 0d0d0000 //C 0f429 push	r0 */
+0x0000f42a, 0x0d3d0000, /* 0d3d0000 //C 0f42a push	r3 */
+0x0000f42b, 0x0d4d0000, /* 0d4d0000 //C 0f42b push	r4 */
+0x0000f42c, 0x0d2d0000, /* 0d2d0000 //C 0f42c push	r2 */
+0x0000f42d, 0x01420000, /* 01420000 //C 0f42d mvzl	r4,0 */
+0x0000f42e, 0x020b0000, /* 020b0000 //C 0f42e sz	r0 */
+0x0000f42f, 0x1102f511, /* 1102f511 //C 0f42f Z1 mvzl	r0,null_str */
+0x0000f430, 0x00200000, /* 00200000 //C 0f430 mov	r2,r0 */
+0x0000f431, 0x0b048200, /* 0b048200 //C 0f431 ld	r0,r4+,r2 */
+0x0000f432, 0x020b0000, /* 020b0000 //C 0f432 sz	r0 */
+0x0000f433, 0x11f2f436, /* 11f2f436 //C 0f433 jz	prints_done */
+0x0000f434, 0x0400f41e, /* 0400f41e //C 0f434 call	putchar */
+0x0000f435, 0x01f2f431, /* 01f2f431 //C 0f435 jmp	prints_go */
+0x0000f436, 0x0f2d0000, /* 0f2d0000 //C 0f436 pop	r2 */
+0x0000f437, 0x0f4d0000, /* 0f4d0000 //C 0f437 pop	r4 */
+0x0000f438, 0x0f3d0000, /* 0f3d0000 //C 0f438 pop	r3 */
+0x0000f439, 0x0f0d0000, /* 0f0d0000 //C 0f439 pop	r0 */
+0x0000f43a, 0x0fed0000, /* 0fed0000 //C 0f43a pop	lr */
+0x0000f43b, 0x00f00e00, /* 00f00e00 //C 0f43b ret */
+0x0000f43c, 0x0ded0000, /* 0ded0000 //C 0f43c push	lr */
+0x0000f43d, 0x0400f428, /* 0400f428 //C 0f43d call	prints */
+0x0000f43e, 0x0d0d0000, /* 0d0d0000 //C 0f43e push	r0 */
+0x0000f43f, 0x0102000a, /* 0102000a //C 0f43f mvzl	r0,LF */
+0x0000f440, 0x0400f41e, /* 0400f41e //C 0f440 call	putchar */
+0x0000f441, 0x0f0d0000, /* 0f0d0000 //C 0f441 pop	r0 */
+0x0000f442, 0x0fed0000, /* 0fed0000 //C 0f442 pop	lr */
+0x0000f443, 0x00f00e00, /* 00f00e00 //C 0f443 ret */
+0x0000f444, 0x0ded0000, /* 0ded0000 //C 0f444 push	lr */
+0x0000f445, 0x0d0d0000, /* 0d0d0000 //C 0f445 push	r0 */
+0x0000f446, 0x0d1d0000, /* 0d1d0000 //C 0f446 push	r1 */
+0x0000f447, 0x0d2d0000, /* 0d2d0000 //C 0f447 push	r2 */
+0x0000f448, 0x0d3d0000, /* 0d3d0000 //C 0f448 push	r3 */
+0x0000f449, 0x0d4d0000, /* 0d4d0000 //C 0f449 push	r4 */
+0x0000f44a, 0x00300000, /* 00300000 //C 0f44a mov	r3,r0 */
+0x0000f44b, 0x01220000, /* 01220000 //C 0f44b mvzl	r2,0 */
+0x0000f44c, 0x01420001, /* 01420001 //C 0f44c mvzl	r4,1 */
+0x0000f44d, 0x01020000, /* 01020000 //C 0f44d mvzl	r0,0 */
+0x0000f44e, 0x02380000, /* 02380000 //C 0f44e shl	r3 */
+0x0000f44f, 0x02070000, /* 02070000 //C 0f44f rol	r0 */
+0x0000f450, 0x02380000, /* 02380000 //C 0f450 shl	r3 */
+0x0000f451, 0x02070000, /* 02070000 //C 0f451 rol	r0 */
+0x0000f452, 0x02380000, /* 02380000 //C 0f452 shl	r3 */
+0x0000f453, 0x02070000, /* 02070000 //C 0f453 rol	r0 */
+0x0000f454, 0x02380000, /* 02380000 //C 0f454 shl	r3 */
+0x0000f455, 0x02070000, /* 02070000 //C 0f455 rol	r0 */
+0x0000f456, 0x0400f3d4, /* 0400f3d4 //C 0f456 call	value2Hexchar */
+0x0000f457, 0x0400f41e, /* 0400f41e //C 0f457 call	putchar */
+0x0000f458, 0x01240001, /* 01240001 //C 0f458 add	r2,1 */
+0x0000f459, 0x01280008, /* 01280008 //C 0f459 cmp	r2,8 */
+0x0000f45a, 0x11f2f464, /* 11f2f464 //C 0f45a jz	print_vhex_ret */
+0x0000f45b, 0x021b0000, /* 021b0000 //C 0f45b sz	r1 */
+0x0000f45c, 0x11f2f462, /* 11f2f462 //C 0f45c jz	print_vhex_nosep */
+0x0000f45d, 0x00480100, /* 00480100 //C 0f45d cmp	r4,r1 */
+0x0000f45e, 0x21f2f462, /* 21f2f462 //C 0f45e jnz	print_vhex_nosep */
+0x0000f45f, 0x0102005f, /* 0102005f //C 0f45f mvzl	r0,'_' */
+0x0000f460, 0x0400f41e, /* 0400f41e //C 0f460 call	putchar */
+0x0000f461, 0x01420000, /* 01420000 //C 0f461 mvzl	r4,0 */
+0x0000f462, 0x01440001, /* 01440001 //C 0f462 add	r4,1 */
+0x0000f463, 0x01f2f44d, /* 01f2f44d //C 0f463 jmp	print_vhex_cyc */
+0x0000f464, 0x0f4d0000, /* 0f4d0000 //C 0f464 pop	r4 */
+0x0000f465, 0x0f3d0000, /* 0f3d0000 //C 0f465 pop	r3 */
+0x0000f466, 0x0f2d0000, /* 0f2d0000 //C 0f466 pop	r2 */
+0x0000f467, 0x0f1d0000, /* 0f1d0000 //C 0f467 pop	r1 */
+0x0000f468, 0x0f0d0000, /* 0f0d0000 //C 0f468 pop	r0 */
+0x0000f469, 0x0fed0000, /* 0fed0000 //C 0f469 pop	lr */
+0x0000f46a, 0x00f00e00, /* 00f00e00 //C 0f46a ret */
+0x0000f4d7, 0x00000000, /* 00000000 //C 0f4d7 dd	0 */
+0x0000f4d8, 0x00000000, /* 00000000 //C 0f4d8 dd	0 */
+0x0000f4d9, 0x00000000, /* 00000000 //C 0f4d9 dd	0 */
+0x0000f4da, 0x00000000, /* 00000000 //C 0f4da dd	0 */
+0x0000f4db, 0x00000000, /* 00000000 //C 0f4db dd	0 */
+0x0000f4dc, 0x00000000, /* 00000000 //C 0f4dc dd	0 */
+0x0000f4dd, 0x00000000, /* 00000000 //C 0f4dd dd	0 */
+0x0000f4de, 0x00000000, /* 00000000 //C 0f4de dd	0 */
+0x0000f4df, 0x00000000, /* 00000000 //C 0f4df dd	0 */
+0x0000f4e0, 0x00000000, /* 00000000 //C 0f4e0 dd	0 */
+0x0000f4e1, 0x00000000, /* 00000000 //C 0f4e1 dd	0 */
+0x0000f4e2, 0x00000000, /* 00000000 //C 0f4e2 dd	0 */
+0x0000f4e3, 0x00000000, /* 00000000 //C 0f4e3 dd	0 */
+0x0000f4e4, 0x00000000, /* 00000000 //C 0f4e4 dd	0 */
+0x0000f4e5, 0x00000000, /* 00000000 //C 0f4e5 dd	0 */
+0x0000f4e6, 0x00000000, /* 00000000 //C 0f4e6 dd	0 */
+0x0000f4e7, 0x00000000, /* 00000000 //C 0f4e7 dd	0 */
+0x0000f4e8, 0x00000000, /* 00000000 //C 0f4e8 dd	0 */
+0x0000f4e9, 0x00000000, /* 00000000 //C 0f4e9 dd	0 */
+0x0000f4ea, 0x00000050, /* 00000050 //C 0f4ea db	80 */
+0x0000f4eb, 0x0000004d, /* 0000004d //C 0f4eb db	77 */
+0x0000f4ec, 0x0000006f, /* 0000006f //C 0f4ec db	111 */
+0x0000f4ed, 0x0000006e, /* 0000006e //C 0f4ed db	110 */
+0x0000f4ee, 0x00000069, /* 00000069 //C 0f4ee db	105 */
+0x0000f4ef, 0x00000074, /* 00000074 //C 0f4ef db	116 */
+0x0000f4f0, 0x0000006f, /* 0000006f //C 0f4f0 db	111 */
+0x0000f4f1, 0x00000072, /* 00000072 //C 0f4f1 db	114 */
+0x0000f4f2, 0x00000020, /* 00000020 //C 0f4f2 db	32 */
+0x0000f4f3, 0x00000076, /* 00000076 //C 0f4f3 db	118 */
+0x0000f4f4, 0x00000031, /* 00000031 //C 0f4f4 db	49 */
+0x0000f4f5, 0x0000002e, /* 0000002e //C 0f4f5 db	46 */
+0x0000f4f6, 0x00000030, /* 00000030 //C 0f4f6 db	48 */
+0x0000f4f7, 0x00000000, /* 00000000 //C 0f4f7 db */
+0x0000f4f8, 0x00000053, /* 00000053 //C 0f4f8 db	83 */
+0x0000f4f9, 0x00000074, /* 00000074 //C 0f4f9 db	116 */
+0x0000f4fa, 0x0000006f, /* 0000006f //C 0f4fa db	111 */
+0x0000f4fb, 0x00000070, /* 00000070 //C 0f4fb db	112 */
+0x0000f4fc, 0x00000020, /* 00000020 //C 0f4fc db	32 */
+0x0000f4fd, 0x00000061, /* 00000061 //C 0f4fd db	97 */
+0x0000f4fe, 0x00000074, /* 00000074 //C 0f4fe db	116 */
+0x0000f4ff, 0x0000003a, /* 0000003a //C 0f4ff db	58 */
+0x0000f500, 0x00000020, /* 00000020 //C 0f500 db	32 */
+0x0000f501, 0x00000000, /* 00000000 //C 0f501 db */
+0x0000f502, 0x00000008, /* 00000008 //C 0f502 db	8 */
+0x0000f503, 0x00000020, /* 00000020 //C 0f503 db	32 */
+0x0000f504, 0x00000008, /* 00000008 //C 0f504 db	8 */
+0x0000f505, 0x00000000, /* 00000000 //C 0f505 db	0 */
+0x0000f506, 0x0000003a, /* 0000003a //C 0f506 db	58 */
+0x0000f507, 0x00000000, /* 00000000 //C 0f507 db */
+0x0000f508, 0x00000020, /* 00000020 //C 0f508 db	32 */
+0x0000f509, 0x0000003b, /* 0000003b //C 0f509 db	59 */
+0x0000f50a, 0x00000009, /* 00000009 //C 0f50a db	9 */
+0x0000f50b, 0x0000000b, /* 0000000b //C 0f50b db	11 */
+0x0000f50c, 0x0000002c, /* 0000002c //C 0f50c db	44 */
+0x0000f50d, 0x0000003d, /* 0000003d //C 0f50d db	61 */
+0x0000f50e, 0x0000005b, /* 0000005b //C 0f50e db	91 */
+0x0000f50f, 0x0000005d, /* 0000005d //C 0f50f db	93 */
+0x0000f510, 0x00000000, /* 00000000 //C 0f510 db */
+0x0000f511, 0x00000028, /* 00000028 //C 0f511 db	40 */
+0x0000f512, 0x0000006e, /* 0000006e //C 0f512 db	110 */
+0x0000f513, 0x00000075, /* 00000075 //C 0f513 db	117 */
+0x0000f514, 0x0000006c, /* 0000006c //C 0f514 db	108 */
+0x0000f515, 0x0000006c, /* 0000006c //C 0f515 db	108 */
+0x0000f516, 0x00000029, /* 00000029 //C 0f516 db	41 */
+0x0000f517, 0x00000000, /* 00000000 //C 0f517 db */
+0x0000f518, 0x00000000, /* 00000000 //C 0f518 db	0 */
+0x0000f519, 0x00000000, /* 00000000 //C 0f519 db	0 */
+0x0000f524, 0x0000f133, /* 0000f133 //C 0f524 dd	cmd_m */
+0x0000f525, 0x0000006d, /* 0000006d //C 0f525 db	109 */
+0x0000f526, 0x00000000, /* 00000000 //C 0f526 db */
+0x0000f527, 0x0000f133, /* 0000f133 //C 0f527 dd	cmd_m */
+0x0000f528, 0x0000006d, /* 0000006d //C 0f528 db	109 */
+0x0000f529, 0x00000065, /* 00000065 //C 0f529 db	101 */
+0x0000f52a, 0x0000006d, /* 0000006d //C 0f52a db	109 */
+0x0000f52b, 0x00000000, /* 00000000 //C 0f52b db */
+0x0000f52c, 0x0000f188, /* 0000f188 //C 0f52c dd	cmd_d */
+0x0000f52d, 0x00000064, /* 00000064 //C 0f52d db	100 */
+0x0000f52e, 0x00000000, /* 00000000 //C 0f52e db */
+0x0000f52f, 0x0000f188, /* 0000f188 //C 0f52f dd	cmd_d */
+0x0000f530, 0x00000064, /* 00000064 //C 0f530 db	100 */
+0x0000f531, 0x00000075, /* 00000075 //C 0f531 db	117 */
+0x0000f532, 0x0000006d, /* 0000006d //C 0f532 db	109 */
+0x0000f533, 0x00000070, /* 00000070 //C 0f533 db	112 */
+0x0000f534, 0x00000000, /* 00000000 //C 0f534 db */
+0x0000f535, 0x0000f1bc, /* 0000f1bc //C 0f535 dd	cmd_l */
+0x0000f536, 0x0000006c, /* 0000006c //C 0f536 db	108 */
+0x0000f537, 0x00000000, /* 00000000 //C 0f537 db */
+0x0000f538, 0x0000f1bc, /* 0000f1bc //C 0f538 dd	cmd_l */
+0x0000f539, 0x0000006c, /* 0000006c //C 0f539 db	108 */
+0x0000f53a, 0x0000006f, /* 0000006f //C 0f53a db	111 */
+0x0000f53b, 0x00000061, /* 00000061 //C 0f53b db	97 */
+0x0000f53c, 0x00000064, /* 00000064 //C 0f53c db	100 */
+0x0000f53d, 0x00000000, /* 00000000 //C 0f53d db */
+0x0000f53e, 0x0000f229, /* 0000f229 //C 0f53e dd	cmd_g */
+0x0000f53f, 0x00000067, /* 00000067 //C 0f53f db	103 */
+0x0000f540, 0x00000000, /* 00000000 //C 0f540 db */
+0x0000f541, 0x0000f229, /* 0000f229 //C 0f541 dd	cmd_g */
+0x0000f542, 0x00000067, /* 00000067 //C 0f542 db	103 */
+0x0000f543, 0x0000006f, /* 0000006f //C 0f543 db	111 */
+0x0000f544, 0x00000000, /* 00000000 //C 0f544 db */
+0x0000f545, 0x0000f229, /* 0000f229 //C 0f545 dd	cmd_g */
+0x0000f546, 0x00000072, /* 00000072 //C 0f546 db	114 */
+0x0000f547, 0x00000075, /* 00000075 //C 0f547 db	117 */
+0x0000f548, 0x0000006e, /* 0000006e //C 0f548 db	110 */
+0x0000f549, 0x00000000, /* 00000000 //C 0f549 db */
+0x0000f54a, 0x0000f269, /* 0000f269 //C 0f54a dd	cmd_h */
+0x0000f54b, 0x0000003f, /* 0000003f //C 0f54b db	63 */
+0x0000f54c, 0x00000000, /* 00000000 //C 0f54c db */
+0x0000f54d, 0x0000f269, /* 0000f269 //C 0f54d dd	cmd_h */
+0x0000f54e, 0x00000068, /* 00000068 //C 0f54e db	104 */
+0x0000f54f, 0x00000000, /* 00000000 //C 0f54f db */
+0x0000f550, 0x0000f269, /* 0000f269 //C 0f550 dd	cmd_h */
+0x0000f551, 0x00000068, /* 00000068 //C 0f551 db	104 */
+0x0000f552, 0x00000065, /* 00000065 //C 0f552 db	101 */
+0x0000f553, 0x0000006c, /* 0000006c //C 0f553 db	108 */
+0x0000f554, 0x00000070, /* 00000070 //C 0f554 db	112 */
+0x0000f555, 0x00000000, /* 00000000 //C 0f555 db */
+0x0000f556, 0x0000f2d5, /* 0000f2d5 //C 0f556 dd	cmd_r */
+0x0000f557, 0x00000072, /* 00000072 //C 0f557 db	114 */
+0x0000f558, 0x00000000, /* 00000000 //C 0f558 db */
+0x0000f559, 0x0000f2d5, /* 0000f2d5 //C 0f559 dd	cmd_r */
+0x0000f55a, 0x00000072, /* 00000072 //C 0f55a db	114 */
+0x0000f55b, 0x00000065, /* 00000065 //C 0f55b db	101 */
+0x0000f55c, 0x00000067, /* 00000067 //C 0f55c db	103 */
+0x0000f55d, 0x00000000, /* 00000000 //C 0f55d db */
+0x0000f55e, 0x0000f2d5, /* 0000f2d5 //C 0f55e dd	cmd_r */
+0x0000f55f, 0x00000072, /* 00000072 //C 0f55f db	114 */
+0x0000f560, 0x00000065, /* 00000065 //C 0f560 db	101 */
+0x0000f561, 0x00000067, /* 00000067 //C 0f561 db	103 */
+0x0000f562, 0x00000073, /* 00000073 //C 0f562 db	115 */
+0x0000f563, 0x00000000, /* 00000000 //C 0f563 db */
+0x0000f564, 0x0000f367, /* 0000f367 //C 0f564 dd	cmd_sp */
+0x0000f565, 0x00000073, /* 00000073 //C 0f565 db	115 */
+0x0000f566, 0x00000070, /* 00000070 //C 0f566 db	112 */
+0x0000f567, 0x00000000, /* 00000000 //C 0f567 db */
+0x0000f568, 0x0000f36a, /* 0000f36a //C 0f568 dd	cmd_lr */
+0x0000f569, 0x0000006c, /* 0000006c //C 0f569 db	108 */
+0x0000f56a, 0x00000072, /* 00000072 //C 0f56a db	114 */
+0x0000f56b, 0x00000000, /* 00000000 //C 0f56b db */
+0x0000f56c, 0x0000f36d, /* 0000f36d //C 0f56c dd	cmd_pc */
+0x0000f56d, 0x00000070, /* 00000070 //C 0f56d db	112 */
+0x0000f56e, 0x00000063, /* 00000063 //C 0f56e db	99 */
+0x0000f56f, 0x00000000, /* 00000000 //C 0f56f db */
+0x0000f570, 0x0000f370, /* 0000f370 //C 0f570 dd	cmd_f */
+0x0000f571, 0x00000066, /* 00000066 //C 0f571 db	102 */
+0x0000f572, 0x00000000, /* 00000000 //C 0f572 db */
+0x0000f573, 0x00000000, /* 00000000 //C 0f573 dd	0 */
+0x0000f574, 0x00000000, /* 00000000 //C 0f574 dd	0 */
+0x0000f575, 0x0000006d, /* 0000006d //C 0f575 db	109 */
+0x0000f576, 0x0000005b, /* 0000005b //C 0f576 db	91 */
+0x0000f577, 0x00000065, /* 00000065 //C 0f577 db	101 */
+0x0000f578, 0x0000006d, /* 0000006d //C 0f578 db	109 */
+0x0000f579, 0x0000005d, /* 0000005d //C 0f579 db	93 */
+0x0000f57a, 0x00000020, /* 00000020 //C 0f57a db	32 */
+0x0000f57b, 0x00000061, /* 00000061 //C 0f57b db	97 */
+0x0000f57c, 0x00000064, /* 00000064 //C 0f57c db	100 */
+0x0000f57d, 0x00000064, /* 00000064 //C 0f57d db	100 */
+0x0000f57e, 0x00000072, /* 00000072 //C 0f57e db	114 */
+0x0000f57f, 0x00000020, /* 00000020 //C 0f57f db	32 */
+0x0000f580, 0x0000005b, /* 0000005b //C 0f580 db	91 */
+0x0000f581, 0x00000076, /* 00000076 //C 0f581 db	118 */
+0x0000f582, 0x00000061, /* 00000061 //C 0f582 db	97 */
+0x0000f583, 0x0000006c, /* 0000006c //C 0f583 db	108 */
+0x0000f584, 0x0000005d, /* 0000005d //C 0f584 db	93 */
+0x0000f585, 0x00000020, /* 00000020 //C 0f585 db	32 */
+0x0000f586, 0x00000020, /* 00000020 //C 0f586 db	32 */
+0x0000f587, 0x00000047, /* 00000047 //C 0f587 db	71 */
+0x0000f588, 0x00000065, /* 00000065 //C 0f588 db	101 */
+0x0000f589, 0x00000074, /* 00000074 //C 0f589 db	116 */
+0x0000f58a, 0x0000002f, /* 0000002f //C 0f58a db	47 */
+0x0000f58b, 0x00000073, /* 00000073 //C 0f58b db	115 */
+0x0000f58c, 0x00000065, /* 00000065 //C 0f58c db	101 */
+0x0000f58d, 0x00000074, /* 00000074 //C 0f58d db	116 */
+0x0000f58e, 0x00000020, /* 00000020 //C 0f58e db	32 */
+0x0000f58f, 0x0000006d, /* 0000006d //C 0f58f db	109 */
+0x0000f590, 0x00000065, /* 00000065 //C 0f590 db	101 */
+0x0000f591, 0x0000006d, /* 0000006d //C 0f591 db	109 */
+0x0000f592, 0x0000006f, /* 0000006f //C 0f592 db	111 */
+0x0000f593, 0x00000072, /* 00000072 //C 0f593 db	114 */
+0x0000f594, 0x00000079, /* 00000079 //C 0f594 db	121 */
+0x0000f595, 0x0000000a, /* 0000000a //C 0f595 db	10 */
+0x0000f596, 0x00000000, /* 00000000 //C 0f596 db */
+0x0000f597, 0x00000064, /* 00000064 //C 0f597 db	100 */
+0x0000f598, 0x0000005b, /* 0000005b //C 0f598 db	91 */
+0x0000f599, 0x00000075, /* 00000075 //C 0f599 db	117 */
+0x0000f59a, 0x0000006d, /* 0000006d //C 0f59a db	109 */
+0x0000f59b, 0x00000070, /* 00000070 //C 0f59b db	112 */
+0x0000f59c, 0x0000005d, /* 0000005d //C 0f59c db	93 */
+0x0000f59d, 0x00000020, /* 00000020 //C 0f59d db	32 */
+0x0000f59e, 0x00000073, /* 00000073 //C 0f59e db	115 */
+0x0000f59f, 0x00000074, /* 00000074 //C 0f59f db	116 */
+0x0000f5a0, 0x00000061, /* 00000061 //C 0f5a0 db	97 */
+0x0000f5a1, 0x00000072, /* 00000072 //C 0f5a1 db	114 */
+0x0000f5a2, 0x00000074, /* 00000074 //C 0f5a2 db	116 */
+0x0000f5a3, 0x00000020, /* 00000020 //C 0f5a3 db	32 */
+0x0000f5a4, 0x00000065, /* 00000065 //C 0f5a4 db	101 */
+0x0000f5a5, 0x0000006e, /* 0000006e //C 0f5a5 db	110 */
+0x0000f5a6, 0x00000064, /* 00000064 //C 0f5a6 db	100 */
+0x0000f5a7, 0x00000020, /* 00000020 //C 0f5a7 db	32 */
+0x0000f5a8, 0x00000020, /* 00000020 //C 0f5a8 db	32 */
+0x0000f5a9, 0x00000044, /* 00000044 //C 0f5a9 db	68 */
+0x0000f5aa, 0x00000075, /* 00000075 //C 0f5aa db	117 */
+0x0000f5ab, 0x0000006d, /* 0000006d //C 0f5ab db	109 */
+0x0000f5ac, 0x00000070, /* 00000070 //C 0f5ac db	112 */
+0x0000f5ad, 0x00000020, /* 00000020 //C 0f5ad db	32 */
+0x0000f5ae, 0x0000006d, /* 0000006d //C 0f5ae db	109 */
+0x0000f5af, 0x00000065, /* 00000065 //C 0f5af db	101 */
+0x0000f5b0, 0x0000006d, /* 0000006d //C 0f5b0 db	109 */
+0x0000f5b1, 0x0000006f, /* 0000006f //C 0f5b1 db	111 */
+0x0000f5b2, 0x00000072, /* 00000072 //C 0f5b2 db	114 */
+0x0000f5b3, 0x00000079, /* 00000079 //C 0f5b3 db	121 */
+0x0000f5b4, 0x00000020, /* 00000020 //C 0f5b4 db	32 */
+0x0000f5b5, 0x00000063, /* 00000063 //C 0f5b5 db	99 */
+0x0000f5b6, 0x0000006f, /* 0000006f //C 0f5b6 db	111 */
+0x0000f5b7, 0x0000006e, /* 0000006e //C 0f5b7 db	110 */
+0x0000f5b8, 0x00000074, /* 00000074 //C 0f5b8 db	116 */
+0x0000f5b9, 0x00000065, /* 00000065 //C 0f5b9 db	101 */
+0x0000f5ba, 0x0000006e, /* 0000006e //C 0f5ba db	110 */
+0x0000f5bb, 0x00000074, /* 00000074 //C 0f5bb db	116 */
+0x0000f5bc, 0x0000000a, /* 0000000a //C 0f5bc db	10 */
+0x0000f5bd, 0x00000000, /* 00000000 //C 0f5bd db */
+0x0000f5be, 0x0000006c, /* 0000006c //C 0f5be db	108 */
+0x0000f5bf, 0x0000005b, /* 0000005b //C 0f5bf db	91 */
+0x0000f5c0, 0x0000006f, /* 0000006f //C 0f5c0 db	111 */
+0x0000f5c1, 0x00000061, /* 00000061 //C 0f5c1 db	97 */
+0x0000f5c2, 0x00000064, /* 00000064 //C 0f5c2 db	100 */
+0x0000f5c3, 0x0000005d, /* 0000005d //C 0f5c3 db	93 */
+0x0000f5c4, 0x00000020, /* 00000020 //C 0f5c4 db	32 */
+0x0000f5c5, 0x00000020, /* 00000020 //C 0f5c5 db	32 */
+0x0000f5c6, 0x00000020, /* 00000020 //C 0f5c6 db	32 */
+0x0000f5c7, 0x00000020, /* 00000020 //C 0f5c7 db	32 */
+0x0000f5c8, 0x00000020, /* 00000020 //C 0f5c8 db	32 */
+0x0000f5c9, 0x00000020, /* 00000020 //C 0f5c9 db	32 */
+0x0000f5ca, 0x00000020, /* 00000020 //C 0f5ca db	32 */
+0x0000f5cb, 0x00000020, /* 00000020 //C 0f5cb db	32 */
+0x0000f5cc, 0x00000020, /* 00000020 //C 0f5cc db	32 */
+0x0000f5cd, 0x00000020, /* 00000020 //C 0f5cd db	32 */
+0x0000f5ce, 0x00000020, /* 00000020 //C 0f5ce db	32 */
+0x0000f5cf, 0x00000020, /* 00000020 //C 0f5cf db	32 */
+0x0000f5d0, 0x0000004c, /* 0000004c //C 0f5d0 db	76 */
+0x0000f5d1, 0x0000006f, /* 0000006f //C 0f5d1 db	111 */
+0x0000f5d2, 0x00000061, /* 00000061 //C 0f5d2 db	97 */
+0x0000f5d3, 0x00000064, /* 00000064 //C 0f5d3 db	100 */
+0x0000f5d4, 0x00000020, /* 00000020 //C 0f5d4 db	32 */
+0x0000f5d5, 0x00000068, /* 00000068 //C 0f5d5 db	104 */
+0x0000f5d6, 0x00000065, /* 00000065 //C 0f5d6 db	101 */
+0x0000f5d7, 0x00000078, /* 00000078 //C 0f5d7 db	120 */
+0x0000f5d8, 0x00000020, /* 00000020 //C 0f5d8 db	32 */
+0x0000f5d9, 0x00000066, /* 00000066 //C 0f5d9 db	102 */
+0x0000f5da, 0x00000069, /* 00000069 //C 0f5da db	105 */
+0x0000f5db, 0x0000006c, /* 0000006c //C 0f5db db	108 */
+0x0000f5dc, 0x00000065, /* 00000065 //C 0f5dc db	101 */
+0x0000f5dd, 0x00000020, /* 00000020 //C 0f5dd db	32 */
+0x0000f5de, 0x00000074, /* 00000074 //C 0f5de db	116 */
+0x0000f5df, 0x0000006f, /* 0000006f //C 0f5df db	111 */
+0x0000f5e0, 0x00000020, /* 00000020 //C 0f5e0 db	32 */
+0x0000f5e1, 0x0000006d, /* 0000006d //C 0f5e1 db	109 */
+0x0000f5e2, 0x00000065, /* 00000065 //C 0f5e2 db	101 */
+0x0000f5e3, 0x0000006d, /* 0000006d //C 0f5e3 db	109 */
+0x0000f5e4, 0x0000006f, /* 0000006f //C 0f5e4 db	111 */
+0x0000f5e5, 0x00000072, /* 00000072 //C 0f5e5 db	114 */
+0x0000f5e6, 0x00000079, /* 00000079 //C 0f5e6 db	121 */
+0x0000f5e7, 0x0000000a, /* 0000000a //C 0f5e7 db	10 */
+0x0000f5e8, 0x00000000, /* 00000000 //C 0f5e8 db */
+0x0000f5e9, 0x00000067, /* 00000067 //C 0f5e9 db	103 */
+0x0000f5ea, 0x0000005b, /* 0000005b //C 0f5ea db	91 */
+0x0000f5eb, 0x0000006f, /* 0000006f //C 0f5eb db	111 */
+0x0000f5ec, 0x0000005d, /* 0000005d //C 0f5ec db	93 */
+0x0000f5ed, 0x0000007c, /* 0000007c //C 0f5ed db	124 */
+0x0000f5ee, 0x00000072, /* 00000072 //C 0f5ee db	114 */
+0x0000f5ef, 0x00000075, /* 00000075 //C 0f5ef db	117 */
+0x0000f5f0, 0x0000006e, /* 0000006e //C 0f5f0 db	110 */
+0x0000f5f1, 0x00000020, /* 00000020 //C 0f5f1 db	32 */
+0x0000f5f2, 0x0000005b, /* 0000005b //C 0f5f2 db	91 */
+0x0000f5f3, 0x00000061, /* 00000061 //C 0f5f3 db	97 */
+0x0000f5f4, 0x00000064, /* 00000064 //C 0f5f4 db	100 */
+0x0000f5f5, 0x00000064, /* 00000064 //C 0f5f5 db	100 */
+0x0000f5f6, 0x00000072, /* 00000072 //C 0f5f6 db	114 */
+0x0000f5f7, 0x0000005d, /* 0000005d //C 0f5f7 db	93 */
+0x0000f5f8, 0x00000020, /* 00000020 //C 0f5f8 db	32 */
+0x0000f5f9, 0x00000020, /* 00000020 //C 0f5f9 db	32 */
+0x0000f5fa, 0x00000020, /* 00000020 //C 0f5fa db	32 */
+0x0000f5fb, 0x00000052, /* 00000052 //C 0f5fb db	82 */
+0x0000f5fc, 0x00000075, /* 00000075 //C 0f5fc db	117 */
+0x0000f5fd, 0x0000006e, /* 0000006e //C 0f5fd db	110 */
+0x0000f5fe, 0x00000020, /* 00000020 //C 0f5fe db	32 */
+0x0000f5ff, 0x00000066, /* 00000066 //C 0f5ff db	102 */
+0x0000f600, 0x00000072, /* 00000072 //C 0f600 db	114 */
+0x0000f601, 0x0000006f, /* 0000006f //C 0f601 db	111 */
+0x0000f602, 0x0000006d, /* 0000006d //C 0f602 db	109 */
+0x0000f603, 0x00000020, /* 00000020 //C 0f603 db	32 */
+0x0000f604, 0x00000061, /* 00000061 //C 0f604 db	97 */
+0x0000f605, 0x00000064, /* 00000064 //C 0f605 db	100 */
+0x0000f606, 0x00000064, /* 00000064 //C 0f606 db	100 */
+0x0000f607, 0x00000072, /* 00000072 //C 0f607 db	114 */
+0x0000f608, 0x00000065, /* 00000065 //C 0f608 db	101 */
+0x0000f609, 0x00000073, /* 00000073 //C 0f609 db	115 */
+0x0000f60a, 0x00000073, /* 00000073 //C 0f60a db	115 */
+0x0000f60b, 0x0000000a, /* 0000000a //C 0f60b db	10 */
+0x0000f60c, 0x00000000, /* 00000000 //C 0f60c db */
+0x0000f60d, 0x00000072, /* 00000072 //C 0f60d db	114 */
+0x0000f60e, 0x0000005b, /* 0000005b //C 0f60e db	91 */
+0x0000f60f, 0x00000065, /* 00000065 //C 0f60f db	101 */
+0x0000f610, 0x00000067, /* 00000067 //C 0f610 db	103 */
+0x0000f611, 0x0000005b, /* 0000005b //C 0f611 db	91 */
+0x0000f612, 0x00000073, /* 00000073 //C 0f612 db	115 */
+0x0000f613, 0x0000005d, /* 0000005d //C 0f613 db	93 */
+0x0000f614, 0x0000005d, /* 0000005d //C 0f614 db	93 */
+0x0000f615, 0x00000020, /* 00000020 //C 0f615 db	32 */
+0x0000f616, 0x00000020, /* 00000020 //C 0f616 db	32 */
+0x0000f617, 0x00000020, /* 00000020 //C 0f617 db	32 */
+0x0000f618, 0x00000020, /* 00000020 //C 0f618 db	32 */
+0x0000f619, 0x00000020, /* 00000020 //C 0f619 db	32 */
+0x0000f61a, 0x00000020, /* 00000020 //C 0f61a db	32 */
+0x0000f61b, 0x00000020, /* 00000020 //C 0f61b db	32 */
+0x0000f61c, 0x00000020, /* 00000020 //C 0f61c db	32 */
+0x0000f61d, 0x00000020, /* 00000020 //C 0f61d db	32 */
+0x0000f61e, 0x00000020, /* 00000020 //C 0f61e db	32 */
+0x0000f61f, 0x00000050, /* 00000050 //C 0f61f db	80 */
+0x0000f620, 0x00000072, /* 00000072 //C 0f620 db	114 */
+0x0000f621, 0x00000069, /* 00000069 //C 0f621 db	105 */
+0x0000f622, 0x0000006e, /* 0000006e //C 0f622 db	110 */
+0x0000f623, 0x00000074, /* 00000074 //C 0f623 db	116 */
+0x0000f624, 0x00000020, /* 00000020 //C 0f624 db	32 */
+0x0000f625, 0x00000072, /* 00000072 //C 0f625 db	114 */
+0x0000f626, 0x00000065, /* 00000065 //C 0f626 db	101 */
+0x0000f627, 0x00000067, /* 00000067 //C 0f627 db	103 */
+0x0000f628, 0x00000069, /* 00000069 //C 0f628 db	105 */
+0x0000f629, 0x00000073, /* 00000073 //C 0f629 db	115 */
+0x0000f62a, 0x00000074, /* 00000074 //C 0f62a db	116 */
+0x0000f62b, 0x00000065, /* 00000065 //C 0f62b db	101 */
+0x0000f62c, 0x00000072, /* 00000072 //C 0f62c db	114 */
+0x0000f62d, 0x00000073, /* 00000073 //C 0f62d db	115 */
+0x0000f62e, 0x0000000a, /* 0000000a //C 0f62e db	10 */
+0x0000f62f, 0x00000000, /* 00000000 //C 0f62f db */
+0x0000f630, 0x00000072, /* 00000072 //C 0f630 db	114 */
+0x0000f631, 0x00000058, /* 00000058 //C 0f631 db	88 */
+0x0000f632, 0x00000020, /* 00000020 //C 0f632 db	32 */
+0x0000f633, 0x0000005b, /* 0000005b //C 0f633 db	91 */
+0x0000f634, 0x00000076, /* 00000076 //C 0f634 db	118 */
+0x0000f635, 0x00000061, /* 00000061 //C 0f635 db	97 */
+0x0000f636, 0x0000006c, /* 0000006c //C 0f636 db	108 */
+0x0000f637, 0x0000005d, /* 0000005d //C 0f637 db	93 */
+0x0000f638, 0x00000020, /* 00000020 //C 0f638 db	32 */
+0x0000f639, 0x00000020, /* 00000020 //C 0f639 db	32 */
+0x0000f63a, 0x00000020, /* 00000020 //C 0f63a db	32 */
+0x0000f63b, 0x00000020, /* 00000020 //C 0f63b db	32 */
+0x0000f63c, 0x00000020, /* 00000020 //C 0f63c db	32 */
+0x0000f63d, 0x00000020, /* 00000020 //C 0f63d db	32 */
+0x0000f63e, 0x00000020, /* 00000020 //C 0f63e db	32 */
+0x0000f63f, 0x00000020, /* 00000020 //C 0f63f db	32 */
+0x0000f640, 0x00000020, /* 00000020 //C 0f640 db	32 */
+0x0000f641, 0x00000020, /* 00000020 //C 0f641 db	32 */
+0x0000f642, 0x00000047, /* 00000047 //C 0f642 db	71 */
+0x0000f643, 0x00000065, /* 00000065 //C 0f643 db	101 */
+0x0000f644, 0x00000074, /* 00000074 //C 0f644 db	116 */
+0x0000f645, 0x0000002f, /* 0000002f //C 0f645 db	47 */
+0x0000f646, 0x00000073, /* 00000073 //C 0f646 db	115 */
+0x0000f647, 0x00000065, /* 00000065 //C 0f647 db	101 */
+0x0000f648, 0x00000074, /* 00000074 //C 0f648 db	116 */
+0x0000f649, 0x00000020, /* 00000020 //C 0f649 db	32 */
+0x0000f64a, 0x00000052, /* 00000052 //C 0f64a db	82 */
+0x0000f64b, 0x00000058, /* 00000058 //C 0f64b db	88 */
+0x0000f64c, 0x0000000a, /* 0000000a //C 0f64c db	10 */
+0x0000f64d, 0x00000000, /* 00000000 //C 0f64d db */
+0x0000f64e, 0x00000073, /* 00000073 //C 0f64e db	115 */
+0x0000f64f, 0x00000070, /* 00000070 //C 0f64f db	112 */
+0x0000f650, 0x00000020, /* 00000020 //C 0f650 db	32 */
+0x0000f651, 0x0000005b, /* 0000005b //C 0f651 db	91 */
+0x0000f652, 0x00000076, /* 00000076 //C 0f652 db	118 */
+0x0000f653, 0x00000061, /* 00000061 //C 0f653 db	97 */
+0x0000f654, 0x0000006c, /* 0000006c //C 0f654 db	108 */
+0x0000f655, 0x0000005d, /* 0000005d //C 0f655 db	93 */
+0x0000f656, 0x00000020, /* 00000020 //C 0f656 db	32 */
+0x0000f657, 0x00000020, /* 00000020 //C 0f657 db	32 */
+0x0000f658, 0x00000020, /* 00000020 //C 0f658 db	32 */
+0x0000f659, 0x00000020, /* 00000020 //C 0f659 db	32 */
+0x0000f65a, 0x00000020, /* 00000020 //C 0f65a db	32 */
+0x0000f65b, 0x00000020, /* 00000020 //C 0f65b db	32 */
+0x0000f65c, 0x00000020, /* 00000020 //C 0f65c db	32 */
+0x0000f65d, 0x00000020, /* 00000020 //C 0f65d db	32 */
+0x0000f65e, 0x00000020, /* 00000020 //C 0f65e db	32 */
+0x0000f65f, 0x00000020, /* 00000020 //C 0f65f db	32 */
+0x0000f660, 0x00000047, /* 00000047 //C 0f660 db	71 */
+0x0000f661, 0x00000065, /* 00000065 //C 0f661 db	101 */
+0x0000f662, 0x00000074, /* 00000074 //C 0f662 db	116 */
+0x0000f663, 0x0000002f, /* 0000002f //C 0f663 db	47 */
+0x0000f664, 0x00000073, /* 00000073 //C 0f664 db	115 */
+0x0000f665, 0x00000065, /* 00000065 //C 0f665 db	101 */
+0x0000f666, 0x00000074, /* 00000074 //C 0f666 db	116 */
+0x0000f667, 0x00000020, /* 00000020 //C 0f667 db	32 */
+0x0000f668, 0x00000052, /* 00000052 //C 0f668 db	82 */
+0x0000f669, 0x00000031, /* 00000031 //C 0f669 db	49 */
+0x0000f66a, 0x00000033, /* 00000033 //C 0f66a db	51 */
+0x0000f66b, 0x0000000a, /* 0000000a //C 0f66b db	10 */
+0x0000f66c, 0x00000000, /* 00000000 //C 0f66c db */
+0x0000f66d, 0x0000006c, /* 0000006c //C 0f66d db	108 */
+0x0000f66e, 0x00000072, /* 00000072 //C 0f66e db	114 */
+0x0000f66f, 0x00000020, /* 00000020 //C 0f66f db	32 */
+0x0000f670, 0x0000005b, /* 0000005b //C 0f670 db	91 */
+0x0000f671, 0x00000076, /* 00000076 //C 0f671 db	118 */
+0x0000f672, 0x00000061, /* 00000061 //C 0f672 db	97 */
+0x0000f673, 0x0000006c, /* 0000006c //C 0f673 db	108 */
+0x0000f674, 0x0000005d, /* 0000005d //C 0f674 db	93 */
+0x0000f675, 0x00000020, /* 00000020 //C 0f675 db	32 */
+0x0000f676, 0x00000020, /* 00000020 //C 0f676 db	32 */
+0x0000f677, 0x00000020, /* 00000020 //C 0f677 db	32 */
+0x0000f678, 0x00000020, /* 00000020 //C 0f678 db	32 */
+0x0000f679, 0x00000020, /* 00000020 //C 0f679 db	32 */
+0x0000f67a, 0x00000020, /* 00000020 //C 0f67a db	32 */
+0x0000f67b, 0x00000020, /* 00000020 //C 0f67b db	32 */
+0x0000f67c, 0x00000020, /* 00000020 //C 0f67c db	32 */
+0x0000f67d, 0x00000020, /* 00000020 //C 0f67d db	32 */
+0x0000f67e, 0x00000020, /* 00000020 //C 0f67e db	32 */
+0x0000f67f, 0x00000047, /* 00000047 //C 0f67f db	71 */
+0x0000f680, 0x00000065, /* 00000065 //C 0f680 db	101 */
+0x0000f681, 0x00000074, /* 00000074 //C 0f681 db	116 */
+0x0000f682, 0x0000002f, /* 0000002f //C 0f682 db	47 */
+0x0000f683, 0x00000073, /* 00000073 //C 0f683 db	115 */
+0x0000f684, 0x00000065, /* 00000065 //C 0f684 db	101 */
+0x0000f685, 0x00000074, /* 00000074 //C 0f685 db	116 */
+0x0000f686, 0x00000020, /* 00000020 //C 0f686 db	32 */
+0x0000f687, 0x00000052, /* 00000052 //C 0f687 db	82 */
+0x0000f688, 0x00000031, /* 00000031 //C 0f688 db	49 */
+0x0000f689, 0x00000034, /* 00000034 //C 0f689 db	52 */
+0x0000f68a, 0x0000000a, /* 0000000a //C 0f68a db	10 */
+0x0000f68b, 0x00000000, /* 00000000 //C 0f68b db */
+0x0000f68c, 0x00000070, /* 00000070 //C 0f68c db	112 */
+0x0000f68d, 0x00000063, /* 00000063 //C 0f68d db	99 */
+0x0000f68e, 0x00000020, /* 00000020 //C 0f68e db	32 */
+0x0000f68f, 0x0000005b, /* 0000005b //C 0f68f db	91 */
+0x0000f690, 0x00000076, /* 00000076 //C 0f690 db	118 */
+0x0000f691, 0x00000061, /* 00000061 //C 0f691 db	97 */
+0x0000f692, 0x0000006c, /* 0000006c //C 0f692 db	108 */
+0x0000f693, 0x0000005d, /* 0000005d //C 0f693 db	93 */
+0x0000f694, 0x00000020, /* 00000020 //C 0f694 db	32 */
+0x0000f695, 0x00000020, /* 00000020 //C 0f695 db	32 */
+0x0000f696, 0x00000020, /* 00000020 //C 0f696 db	32 */
+0x0000f697, 0x00000020, /* 00000020 //C 0f697 db	32 */
+0x0000f698, 0x00000020, /* 00000020 //C 0f698 db	32 */
+0x0000f699, 0x00000020, /* 00000020 //C 0f699 db	32 */
+0x0000f69a, 0x00000020, /* 00000020 //C 0f69a db	32 */
+0x0000f69b, 0x00000020, /* 00000020 //C 0f69b db	32 */
+0x0000f69c, 0x00000020, /* 00000020 //C 0f69c db	32 */
+0x0000f69d, 0x00000020, /* 00000020 //C 0f69d db	32 */
+0x0000f69e, 0x00000047, /* 00000047 //C 0f69e db	71 */
+0x0000f69f, 0x00000065, /* 00000065 //C 0f69f db	101 */
+0x0000f6a0, 0x00000074, /* 00000074 //C 0f6a0 db	116 */
+0x0000f6a1, 0x0000002f, /* 0000002f //C 0f6a1 db	47 */
+0x0000f6a2, 0x00000073, /* 00000073 //C 0f6a2 db	115 */
+0x0000f6a3, 0x00000065, /* 00000065 //C 0f6a3 db	101 */
+0x0000f6a4, 0x00000074, /* 00000074 //C 0f6a4 db	116 */
+0x0000f6a5, 0x00000020, /* 00000020 //C 0f6a5 db	32 */
+0x0000f6a6, 0x00000052, /* 00000052 //C 0f6a6 db	82 */
+0x0000f6a7, 0x00000031, /* 00000031 //C 0f6a7 db	49 */
+0x0000f6a8, 0x00000035, /* 00000035 //C 0f6a8 db	53 */
+0x0000f6a9, 0x0000000a, /* 0000000a //C 0f6a9 db	10 */
+0x0000f6aa, 0x00000000, /* 00000000 //C 0f6aa db */
+0x0000f6ab, 0x00000066, /* 00000066 //C 0f6ab db	102 */
+0x0000f6ac, 0x00000020, /* 00000020 //C 0f6ac db	32 */
+0x0000f6ad, 0x0000005b, /* 0000005b //C 0f6ad db	91 */
+0x0000f6ae, 0x00000076, /* 00000076 //C 0f6ae db	118 */
+0x0000f6af, 0x00000061, /* 00000061 //C 0f6af db	97 */
+0x0000f6b0, 0x0000006c, /* 0000006c //C 0f6b0 db	108 */
+0x0000f6b1, 0x0000005d, /* 0000005d //C 0f6b1 db	93 */
+0x0000f6b2, 0x00000020, /* 00000020 //C 0f6b2 db	32 */
+0x0000f6b3, 0x00000020, /* 00000020 //C 0f6b3 db	32 */
+0x0000f6b4, 0x00000020, /* 00000020 //C 0f6b4 db	32 */
+0x0000f6b5, 0x00000020, /* 00000020 //C 0f6b5 db	32 */
+0x0000f6b6, 0x00000020, /* 00000020 //C 0f6b6 db	32 */
+0x0000f6b7, 0x00000020, /* 00000020 //C 0f6b7 db	32 */
+0x0000f6b8, 0x00000020, /* 00000020 //C 0f6b8 db	32 */
+0x0000f6b9, 0x00000020, /* 00000020 //C 0f6b9 db	32 */
+0x0000f6ba, 0x00000020, /* 00000020 //C 0f6ba db	32 */
+0x0000f6bb, 0x00000020, /* 00000020 //C 0f6bb db	32 */
+0x0000f6bc, 0x00000020, /* 00000020 //C 0f6bc db	32 */
+0x0000f6bd, 0x00000047, /* 00000047 //C 0f6bd db	71 */
+0x0000f6be, 0x00000065, /* 00000065 //C 0f6be db	101 */
+0x0000f6bf, 0x00000074, /* 00000074 //C 0f6bf db	116 */
+0x0000f6c0, 0x0000002f, /* 0000002f //C 0f6c0 db	47 */
+0x0000f6c1, 0x00000073, /* 00000073 //C 0f6c1 db	115 */
+0x0000f6c2, 0x00000065, /* 00000065 //C 0f6c2 db	101 */
+0x0000f6c3, 0x00000074, /* 00000074 //C 0f6c3 db	116 */
+0x0000f6c4, 0x00000020, /* 00000020 //C 0f6c4 db	32 */
+0x0000f6c5, 0x00000066, /* 00000066 //C 0f6c5 db	102 */
+0x0000f6c6, 0x0000006c, /* 0000006c //C 0f6c6 db	108 */
+0x0000f6c7, 0x00000061, /* 00000061 //C 0f6c7 db	97 */
+0x0000f6c8, 0x00000067, /* 00000067 //C 0f6c8 db	103 */
+0x0000f6c9, 0x00000073, /* 00000073 //C 0f6c9 db	115 */
+0x0000f6ca, 0x0000000a, /* 0000000a //C 0f6ca db	10 */
+0x0000f6cb, 0x00000000, /* 00000000 //C 0f6cb db */
+0x0000f6cc, 0x00000068, /* 00000068 //C 0f6cc db	104 */
+0x0000f6cd, 0x0000002c, /* 0000002c //C 0f6cd db	44 */
+0x0000f6ce, 0x0000003f, /* 0000003f //C 0f6ce db	63 */
+0x0000f6cf, 0x00000020, /* 00000020 //C 0f6cf db	32 */
+0x0000f6d0, 0x00000020, /* 00000020 //C 0f6d0 db	32 */
+0x0000f6d1, 0x00000020, /* 00000020 //C 0f6d1 db	32 */
+0x0000f6d2, 0x00000020, /* 00000020 //C 0f6d2 db	32 */
+0x0000f6d3, 0x00000020, /* 00000020 //C 0f6d3 db	32 */
+0x0000f6d4, 0x00000020, /* 00000020 //C 0f6d4 db	32 */
+0x0000f6d5, 0x00000020, /* 00000020 //C 0f6d5 db	32 */
+0x0000f6d6, 0x00000020, /* 00000020 //C 0f6d6 db	32 */
+0x0000f6d7, 0x00000020, /* 00000020 //C 0f6d7 db	32 */
+0x0000f6d8, 0x00000020, /* 00000020 //C 0f6d8 db	32 */
+0x0000f6d9, 0x00000020, /* 00000020 //C 0f6d9 db	32 */
+0x0000f6da, 0x00000020, /* 00000020 //C 0f6da db	32 */
+0x0000f6db, 0x00000020, /* 00000020 //C 0f6db db	32 */
+0x0000f6dc, 0x00000020, /* 00000020 //C 0f6dc db	32 */
+0x0000f6dd, 0x00000020, /* 00000020 //C 0f6dd db	32 */
+0x0000f6de, 0x00000048, /* 00000048 //C 0f6de db	72 */
+0x0000f6df, 0x00000065, /* 00000065 //C 0f6df db	101 */
+0x0000f6e0, 0x0000006c, /* 0000006c //C 0f6e0 db	108 */
+0x0000f6e1, 0x00000070, /* 00000070 //C 0f6e1 db	112 */
+0x0000f6e2, 0x0000000a, /* 0000000a //C 0f6e2 db	10 */
+0x0000f6e3, 0x00000000, /* 00000000 //C 0f6e3 db */
+0x0000f6e4, 0x00000000, /* 00000000 //C 0f6e4 dd	0 */
+0x0000f726, 0x00000045, /* 00000045 //C 0f726 db	69 */
+0x0000f727, 0x0000004f, /* 0000004f //C 0f727 db	79 */
+0x0000f728, 0x00000046, /* 00000046 //C 0f728 db	70 */
+0x0000f729, 0x00000020, /* 00000020 //C 0f729 db	32 */
+0x0000f72a, 0x00000050, /* 00000050 //C 0f72a db	80 */
+0x0000f72b, 0x0000004d, /* 0000004d //C 0f72b db	77 */
+0x0000f72c, 0x0000006f, /* 0000006f //C 0f72c db	111 */
+0x0000f72d, 0x0000006e, /* 0000006e //C 0f72d db	110 */
+0x0000f72e, 0x00000069, /* 00000069 //C 0f72e db	105 */
+0x0000f72f, 0x00000074, /* 00000074 //C 0f72f db	116 */
+0x0000f730, 0x0000006f, /* 0000006f //C 0f730 db	111 */
+0x0000f731, 0x00000072, /* 00000072 //C 0f731 db	114 */
+0x0000f732, 0x0000000a, /* 0000000a //C 0f732 db	10 */
+0x0000f733, 0x00000000, /* 00000000 //C 0f733 db */
 0xffffffff, 0xffffffff
 };

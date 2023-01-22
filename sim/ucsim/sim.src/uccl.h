@@ -272,7 +272,7 @@ public:
   class cl_analyzer_opt *analyzer_opt;
   class cl_analyser_opt *analyser_opt;
   
-  t_addr PC, instPC;		// Program Counter
+  t_addr PC, instPC, PCmask;	// Program Counter
   class cl_cell32 cPC;		// Cell of PC
   bool inst_exec;		// Instruction is executed
   class cl_ticker *ticks;	// Nr of XTAL clocks
@@ -410,7 +410,7 @@ public:
   virtual u8_t fetch8(void) { return (u8_t)fetch(); }
   virtual i8_t fetchi8(void) { return (i8_t)fetch(); }
   virtual bool fetch(t_mem *code);
-  virtual int do_inst(int step);
+  virtual int do_inst(void/*int step*/);
   virtual void pre_inst(void);
   virtual int exec_inst(void);
   virtual int exec_inst_tab(instruction_wrapper_fn itab[]);

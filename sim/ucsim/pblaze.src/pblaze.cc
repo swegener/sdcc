@@ -69,6 +69,7 @@ using namespace std;
 cl_pblaze::cl_pblaze(struct cpu_entry *cputype, class cl_sim *asim):
   cl_uc(asim)
 {
+  PCmask= 0x3ff;
   type = cputype;
 }
 
@@ -835,7 +836,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
  */
 
 
-
+/*
 int
 cl_pblaze::do_inst(int step)
 {
@@ -852,7 +853,6 @@ cl_pblaze::do_inst(int step)
       post_inst();
 
       if (result == resINV_INST)
-        /* backup to start of instruction */
         PC = PCsave;
       else if (result == resGO) {
           if (!inst_at(PCsave))
@@ -867,7 +867,7 @@ cl_pblaze::do_inst(int step)
     sim->stop(result);
   return(result);
 }
-
+*/
 
 int
 cl_pblaze::exec_inst(void)
@@ -978,9 +978,6 @@ cl_pblaze::exec_inst(void)
     }
 
   // this shouldnt be executed. If so, something bad happend in simulated program
-  PC = rom->inc_address(PC, -1);
-
-  sim->stop(resINV_INST);
   return(resINV_INST);
 }
 

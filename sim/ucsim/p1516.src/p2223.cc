@@ -31,6 +31,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "p2223cl.h"
 
 
+t_mem
+cl_f_write::write(t_mem val)
+{
+  /*
+  if (val&0x80) uc->dbg_reg= true;
+  else if (val&0x40) uc->dbg_reg= false;
+  */
+  return val&0x3f;
+}
+
+
 CLP2::cl_p2223(class cl_sim *asim):
   cl_p1516(asim)
 {
@@ -41,6 +52,7 @@ CLP2::init(void)
 {
   cl_p1516::init();
 
+  //dbg_reg= false;
   class cl_memory_chip *chip= rom_chip;
   t_addr a;
   t_mem v;
@@ -55,7 +67,7 @@ CLP2::init(void)
       v= pmon[i++];	
     }
 
-  class cl_f_write *fw= new cl_f_write(&cF);
+  class cl_f_write *fw= new cl_f_write(&cF, this);
   fw->init();
   cF.append_operator(fw);
   
@@ -474,7 +486,7 @@ CLP2::inst_alu_1op(t_mem code)
       RC[d]->W(F);
       break;
     case 0xf: // SETF
-      cF.W(R[d] & 0x3f);
+      cF.W(R[d] & 0xff/*0x3f*/);
       break;
     }
   return resGO;
@@ -681,6 +693,7 @@ CLP2::exec_inst(void)
   PC= R[15];
   instPC= PC;
   fe= fetch(&code);
+  //if (dbg_reg) fprintf(stderr, "F: %08x %08x %08x\n", instPC, code, F);
   tick(4);
   R[15]= PC;
   if (fe)

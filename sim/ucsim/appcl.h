@@ -94,6 +94,7 @@ public:
   long expr_result;
   chars startup_command;
   class cl_mc32 cperiod, ccyc;
+  u32_t period, cyc, acyc;
   bool quiet;
   class cl_console_stdout *ocon;
 

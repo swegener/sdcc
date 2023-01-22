@@ -219,7 +219,19 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 CMDHELP(cl_break_cmd,
 	"break addr [hit [if expr]] | break mem_type r|w addr [hit [if expr]]",
 	"Set fix or event breakpoint",
-	"")
+	"Fix breakpoint stops execution if instruction fetch happens at the\n"
+	"specified address. If the first parameter is an address then fix\n"
+	"breakpoint is created. Address can be a number or a name of a \n"
+	"variable. In this case variable must point to an address space,\n"
+	"otherwise fetch breakpoint is created.\n"
+	"Fetch breakpoint will be hit if read or write operation happens\n"
+	"at the specified address in the specified address space during\n"
+	"the instruction execution.\n"
+	"`Hit' parameter can be used to specify how many times the breakpoint\n"
+	"must be hit before acception.\n"
+	"`Expr' parameter can specify an expression which is evaluated\n"
+	"at every hit of the breakpint and it will be accepeted only when\n"
+	"the result is true.")
 
 void
 cl_break_cmd::do_fetch(class cl_uc *uc,
@@ -333,7 +345,8 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
 CMDHELP(cl_clear_cmd,
 	"clear [addr...]",
 	"Clear fix breakpoint",
-	"")
+	"Delete fix breakpoint(s) from the specified address(es).\n"
+	"To delete fetch breakpoints, `delete' command must be used.")
 
 /*
  * DELETE nr nr ...
@@ -369,10 +382,12 @@ COMMAND_DO_WORK_UC(cl_delete_cmd)
 CMDHELP(cl_delete_cmd,
 	"delete [nr...]",
 	"Delete breakpoint(s)",
-	"")
+	"Delete fix or fetch breakpoint by its id number. `info break' command\n"
+	"can be used to list id number of the breakpoints.\n"
+	"If parameter is not used then all breakpoints will be deleted.")
 
 /*
- * COMMANDS [nr] cmdstring...
+ * COMMANDS nr [cmdstring...]
  */
 
 COMMAND_DO_WORK_UC(cl_commands_cmd)
@@ -432,9 +447,17 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
 }
 
 CMDHELP(cl_commands_cmd,
-	"commands [breakpoint-nr]",
-	"command_string",
-	"")
+	"commands breakpoint-nr [command_string]",
+	"Add/delete a command to/from a breakpoint",
+	"Breakpoint command is executed every time when the breakpoint is\n"
+	"accepted.\n"
+	"First parameter is id number of the breakpoint to be modify.\n"
+	"If command string is not used then command will be deleted from\n"
+	"the specified breakpoint.\n"
+	"If any string is used after the breakpoint number, the whole\n"
+	"string is copied into the breakpoint as the command.\n"
+	"If command separator (semicolon) is used, it will be part of the\n"
+	"breakpoint command.")
 
 
 /*
@@ -475,7 +498,7 @@ COMMAND_DO_WORK_UC(cl_display_cmd)
 CMDHELP(cl_display_cmd,
 	"display [[/fmt] expr]",
 	"Set expression to be displayed on breakpoint",
-	"/fmt can specify format as in \"expr\" command.\n"
+	"/fmt can specify format as in `expr' command.\n"
 	"If no argument, print all expressions and their values.\n")
 
 

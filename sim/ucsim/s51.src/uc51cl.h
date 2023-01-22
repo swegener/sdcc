@@ -126,7 +126,7 @@ public:
   virtual void   clear_sfr(void);
   virtual void   analyze(t_addr addr);
 
-  virtual int    do_inst(int step);
+  virtual int    do_inst(void);
 
   //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 

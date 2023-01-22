@@ -1165,13 +1165,7 @@ cl_st7::exec_inst(void)
 		return(resINV_INST);
 	}
 	  
-  /*if (PC)
-    PC--;
-  else
-  PC= get_mem_size(MEM_ROM_ID)-1;*/
-  PC= rom->inc_address(PC, -1);
-
-  sim->stop(resINV_INST);
+  //PC= instPC;//rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

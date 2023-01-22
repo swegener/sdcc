@@ -762,8 +762,18 @@ cl_console_stdout::~cl_console_stdout(void)
 int
 cl_console_stdout::init(void)
 {
-  cl_console_base::init();
+  cl_base::init();
+  prompt_option= 0;
+  null_prompt_option= 0;
+  debug_option= 0;
   set_flag(CONS_NOWELCOME, true);
+  //cl_console_base::init();
+  if (get_fin() != NULL)
+    get_fin()->set_echo_color(get_color_ansiseq("command"));
+  last_command= 0;
+  //last_cmdline= 0;
+  last_cmd= chars("");
+  prev_quit= -1;
   set_interactive(false);
   return 0;
 }

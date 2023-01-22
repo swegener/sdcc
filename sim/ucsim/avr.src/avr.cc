@@ -665,16 +665,8 @@ cl_avr::exec_inst(void)
 	break;
       }
     }
-  /*if (PC)
-    PC--;
-  else
-  PC= get_mem_size(MEM_ROM_ID)-1;*/
   class cl_error_unknown_code *e= new cl_error_unknown_code(this);
   error(e);
-  return(resGO);
-  PC= rom->inc_address(PC, -1);
-  //tick(-clock_per_cycle());
-  sim->stop(resINV_INST);
   return(resINV_INST);
 }
 

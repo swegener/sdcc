@@ -691,9 +691,7 @@ cl_gb80::exec_inst(void)
     case 0xff: tick(5);return(inst_rst(code));
     }
 
-  PC= rom->inc_address(PC, -1);
-
-  sim->stop(resINV_INST);
+  //PC= instPC;//rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

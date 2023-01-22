@@ -100,10 +100,6 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	}
     }
   con->dd_printf("Simulation started, PC=0x%06x\n", AI(sim->uc->PC));
-  /*
-  if (sim->uc->fbrk_at(sim->uc->PC))
-    sim->uc->do_inst(1);
-  */
   sim->start(con, 0);
   return(false);
 }
@@ -282,22 +278,13 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 			      next, brkDYNAMIC, 1);
 
 	  b->init();
-//	  sim->uc->fbrk->add_bp(b);
-
 	  sim->uc->fbrk->add(b);
 	  b->activate();
 	}
-      /*if (sim->uc->fbrk_at(sim->uc->PC))
-	sim->uc->do_inst(1);*/
       sim->start(con, 0);
-      //sim->uc->do_inst(-1);
     }
   else {
-    //sim->uc->do_inst(1);
     sim->start(con, 1);
-    //sim->step();
-    //sim->stop(resSTEP);
-    //sim->uc->print_regs(con);
   }
   return(false);
 }
@@ -542,6 +529,7 @@ CMDHELP(cl_expression_cmd,
 	" /B C style boolean value with 1|0: 1\n"
 	" /L logical boolean value with T|F: T\n"
 	" /c ascii character in C style escape: \'\\5137\'\n"
+	" /n print nothing\n"
 	"If more format characters are specified then result is printed in all\n"
 	"requested format.\n"
 	)

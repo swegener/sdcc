@@ -761,5 +761,23 @@ urnd(void)
   return (Q[i] = r - x);
 }
 
+u8_t
+urnd8()
+{
+  return urnd();
+}
+
+u16_t
+urnd16()
+{
+  return urnd();
+}
+
+u32_t
+urnd32()
+{
+  return urnd();
+}
+
 
 /* End of utils.cc */

@@ -1705,67 +1705,52 @@ cl_51core::high_movxri(void)
 
 /*
  * Simulating execution of next instruction
- *
- * This is an endless loop if requested number of steps is negative.
- * In this case execution is stopped if an instruction results other
- * status than GO. Execution can be stopped if `cmd_in' is not NULL
- * and there is input available on that file. It is useful if the
- * command console is on a terminal. If input is available then a
- * complete line is read and dropped out because input is buffered
- * (inp_avail will be TRUE if ENTER is pressed) and it can confuse
- * command interpreter.
  */
-//static class cl_console *c= NULL;
+
 int
-cl_51core::do_inst(int step)
+cl_51core::do_inst(void)
 {
   t_addr PCsave= PC;
   result= resGO;
-  while ((result == resGO) &&
-	 (state != stPD) &&
-	 (step != 0))
+
+  save_hist();
+  if (state == stGO)
     {
-      if (step > 0)
-	step--;
-      if (state == stGO)
-	{
-	  interrupt->was_reti= false;
-	  pre_inst();
-	  PCsave= PC;
-	  result= exec_inst();
-	  if (result == resGO && !inst_at(PCsave))
-            analyze(PCsave);
-	  post_inst();
-	}
-      else
-	{
-	  // tick hw in idle state
-	  tick(1);
-	}
-
-      if ((result == resGO) && (PC == PCsave) && stop_selfjump)
-	{
-	  result= resSELFJUMP;
-	  sim->stop(result);
-	  break;
-	}
-
-      if (result == resGO)
-	{
-	  int res;
-	  if ((res= do_interrupt()) != resGO)
-	    result= res;
-	  else
-	    result= idle_pd();
-	}
-      if (((result == resINTERRUPT) &&
-	   stop_at_it) ||
-	  result >= resSTOP)
-	{
-	  sim->stop(result);
-	  break;
-	}
+      interrupt->was_reti= false;
+      pre_inst();
+      PCsave= PC;
+      result= exec_inst();
+      if (result == resGO && !inst_at(PCsave) && analyzer)
+	analyze(PCsave);
+      post_inst();
     }
+  else
+    {
+      // tick hw in idle state
+      tick(1);
+    }
+
+  if ((result == resGO) && (PC == PCsave) && stop_selfjump)
+    {
+      result= resSELFJUMP;
+      return result;
+    }
+  
+  if (result == resGO)
+    {
+      int res;
+      if ((res= do_interrupt()) != resGO)
+	result= res;
+      else
+	result= idle_pd();
+    }
+  if ((result == resINTERRUPT) &&
+      stop_at_it)
+    {
+      sim->stop(result);
+      return result;
+    }
+
   if (state == stPD)
     {
       //FIXME: tick outsiders eg. watchdog

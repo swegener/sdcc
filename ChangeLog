@@ -1,3 +1,8 @@
+2023-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCbtree.cc:
+	  Fix bug #3505.
+
 2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/mos6502/main.c:

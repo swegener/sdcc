@@ -16,7 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <set>
+#include <list>
+#include <algorithm>
 #include <map>
 #include <iostream>
 
@@ -31,7 +32,10 @@ extern "C"
 
 #undef BTREE_DEBUG
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, std::pair<std::set<symbol *>, int> > btree_t;
+// We used to use an std::set<symbol *> instead of std::list<symbol *>.
+// That was faster, but resulted in non-reproducible compilaton result, especially on systems with address space randomizatrion, such as macOS.
+// When performance becomes an issue here, we might want to switch to boost::multi_index.
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, std::pair<std::list<symbol *>, int> > btree_t;
 
 typedef std::map<int, btree_t::vertex_descriptor> bmap_t;
 typedef std::map<btree_t::vertex_descriptor, int> bmaprev_t;
@@ -111,12 +115,13 @@ void btree_add_symbol(struct symbol *s)
 
   wassert(bmap.find(block) != bmap.end());
   wassert(bmap[block] < boost::num_vertices(btree));
-  btree[bmap[block]].first.insert(s);
+  if (std::find(btree[bmap[block]].first.begin(), btree[bmap[block]].first.end(), s) == btree[bmap[block]].first.end())
+  	btree[bmap[block]].first.push_back(s);
 }
 
 static void btree_alloc_subtree(btree_t::vertex_descriptor v, int sPtr, int cssize, int *ssize)
 {
-  std::set<symbol *>::iterator s, s_end;
+  std::list<symbol *>::iterator s, s_end;
   wassert(v < boost::num_vertices(btree));
   for(s = btree[v].first.begin(), s_end = btree[v].first.end(); s != s_end; ++s)
     {

@@ -2465,7 +2465,7 @@ saveRegisters (iCode * lic)
               if (BINUSE)
                 emitpush ("b");
               emitcode ("mov", "a,#0x%02x", count);
-              emitcode ("mov", "b,#0x%02x", mask & 0xFF);
+              emitcode ("mov", "b,#0x%02x", mask & 0xffu);
               if (mask & 0x100)
                 emitcode ("lcall", "___sdcc_xpush_regs_r0\t;(%s)", szRegs);
               else
@@ -2597,7 +2597,7 @@ unsaveRegisters (iCode * ic)
             {
               char szRegs[32];
               int mask = xstackRegisters (rsave, FALSE, count, szRegs);
-              emitcode ("mov", "b,#0x%02x", mask & 0xFF);
+              emitcode ("mov", "b,#0x%02x", mask & 0xffu);
               if (mask & 0x100)
                 emitcode ("lcall", "___sdcc_xpop_regs_r0\t;(%s)", szRegs);
               else
@@ -5046,8 +5046,8 @@ genPlus (iCode * ic)
 
   sym_link *resulttype = operandType (IC_RESULT (ic));
   unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
-    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
-  bool maskedtopbyte = (topbytemask != 0xff);
+    (0xffu >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xffu;
+  bool maskedtopbyte = (topbytemask != 0xffu);
 
   /* if literal, literal on the right or
      if left requires ACC or right is already
@@ -10199,7 +10199,7 @@ genUnpackBits (operand * result, const char *rname, int ptype, iCode * ifx)
       else
         {
           if (blen < 8)
-            emitcode ("anl", "a,#!constbyte", (unsigned)((((unsigned char) - 1) >> (8 - blen)) << bstr));
+            emitcode ("anl", "a,#!constbyte", (unsigned)((((unsigned char)-1) >> (8 - blen)) << bstr));
           return "a";
         }
     }
@@ -10210,14 +10210,14 @@ genUnpackBits (operand * result, const char *rname, int ptype, iCode * ifx)
     {
       emitPtrByteGet (rname, ptype, FALSE);
       AccRol (8 - bstr);
-      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char) - 1) >> (8 - blen)));
+      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char)-1) >> (8 - blen)));
       if (!SPEC_USIGN (etype))
         {
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("jnb", "acc.%d,!tlabel", blen - 1, labelKey2num (tlbl->key));
-          emitcode ("orl", "a,#0x%02x", (unsigned)(unsigned char)(0xff << blen));
+          emitcode ("orl", "a,#0x%02x", 0xffu << blen);
           emitLabel (tlbl);
         }
       aopPut (result, "a", offset++);
@@ -10238,14 +10238,14 @@ genUnpackBits (operand * result, const char *rname, int ptype, iCode * ifx)
   if (rlen)
     {
       emitPtrByteGet (rname, ptype, FALSE);
-      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char) - 1) >> (8 - rlen)));
+      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char)-1) >> (8 - rlen)));
       if (!SPEC_USIGN (etype))
         {
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("jnb", "acc.%d,!tlabel", rlen - 1, labelKey2num (tlbl->key));
-          emitcode ("orl", "a,#0x%02x", (unsigned)((unsigned char)(0xff << rlen)));
+          emitcode ("orl", "a,#0x%02x", 0xffu << rlen);
           emitLabel (tlbl);
         }
       aopPut (result, "a", offset++);

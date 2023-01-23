@@ -3288,11 +3288,11 @@ selectRegBank (short bank, bool keepFlags)
     {
       emitcode ("anl", "psw,#0xE7");
       if (bank)
-        emitcode ("orl", "psw,#0x%02x", (bank << 3) & 0xff);
+        emitcode ("orl", "psw,#0x%02x", (unsigned)((bank << 3) & 0xff));
     }
   else
     {
-      emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0xff);
+      emitcode ("mov", "psw,#0x%02x", (unsigned)((bank << 3) & 0xff));
     }
 }
 
@@ -6063,9 +6063,9 @@ genDivOneByte (operand * left, operand * right, operand * result, iCode * ic)
       signed char val = (char) ulFromVal (AOP (right)->aopu.aop_lit);
 
       if (!rUnsigned && val < 0)
-        emitcode ("mov", "b,#0x%02x", -val);
+        emitcode ("mov", "b,#0x%02x", (unsigned)-val);
       else
-        emitcode ("mov", "b,#0x%02x", (unsigned char) val);
+        emitcode ("mov", "b,#0x%02x", (unsigned)(unsigned char)val);
     }
   else                          /* ! literal */
     {
@@ -6089,9 +6089,9 @@ genDivOneByte (operand * left, operand * right, operand * result, iCode * ic)
       signed char val = (char) ulFromVal (AOP (left)->aopu.aop_lit);
 
       if (!lUnsigned && val < 0)
-        emitcode ("mov", "a,#0x%02x", -val);
+        emitcode ("mov", "a,#0x%02x", (unsigned)-val);
       else
-        emitcode ("mov", "a,#0x%02x", (unsigned char) val);
+        emitcode ("mov", "a,#0x%02x", (unsigned)(unsigned char)val);
     }
   else                          /* ! literal */
     {
@@ -6402,9 +6402,9 @@ genModOneByte (operand * left, operand * right, operand * result, iCode * ic)
       signed char val = (signed char) operandLitValue (right);
 
       if (!rUnsigned && val < 0)
-        emitcode ("mov", "b,#0x%02x", -val);
+        emitcode ("mov", "b,#0x%02x", (unsigned)-val);
       else
-        emitcode ("mov", "b,#0x%02x", (unsigned char) val);
+        emitcode ("mov", "b,#0x%02x", (unsigned)(unsigned char)val);
     }
   else                          /* not literal */
     {
@@ -6436,10 +6436,10 @@ genModOneByte (operand * left, operand * right, operand * result, iCode * ic)
       if (!lUnsigned && val < 0)
         {
           compiletimeSign = TRUE;       /* set sign flag */
-          emitcode ("mov", "a,#0x%02x", -val);
+          emitcode ("mov", "a,#0x%02x", (unsigned)-val);
         }
       else
-        emitcode ("mov", "a,#0x%02x", (unsigned char) val);
+        emitcode ("mov", "a,#0x%02x", (unsigned)(unsigned char)val);
     }
   else                          /* ! literal */
     {
@@ -10486,14 +10486,14 @@ genUnpackBits (operand * result, const char *rname, int ptype)
     {
       emitPtrByteGet (rname, ptype, FALSE);
       AccRol (8 - bstr);
-      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char) - 1) >> (8 - blen)));
+      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char)-1) >> (8 - blen)));
       if (!SPEC_USIGN (etype))
         {
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("jnb", "acc[%d],!tlabel", blen - 1, labelKey2num (tlbl->key));
-          emitcode ("orl", "a,#0x%02x", (unsigned)(unsigned char)(0xff << blen));
+          emitcode ("orl", "a,#0x%02x", 0xffu << blen);
           emitLabel (tlbl);
         }
       aopPut (result, "a", offset++);
@@ -10514,14 +10514,14 @@ genUnpackBits (operand * result, const char *rname, int ptype)
   if (rlen)
     {
       emitPtrByteGet (rname, ptype, FALSE);
-      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char) - 1) >> (8 - rlen)));
+      emitcode ("anl", "a,#!constbyte", (unsigned)(((unsigned char)-1) >> (8 - rlen)));
       if (!SPEC_USIGN (etype))
         {
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
 
           emitcode ("jnb", "acc[%d],!tlabel", rlen - 1, labelKey2num (tlbl->key));
-          emitcode ("orl", "a,#0x%02x", (unsigned)(unsigned char)(0xff << rlen));
+          emitcode ("orl", "a,#0x%02x", 0xffu << rlen);
           emitLabel (tlbl);
         }
       aopPut (result, "a", offset++);

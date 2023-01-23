@@ -12960,7 +12960,7 @@ unpackMaskA(sym_link *type, int len)
 {
   if (SPEC_USIGN (type) || len != 1)
     {
-      emit2 ("and a, !immedbyte", (unsigned)(((unsigned char) - 1) >> (8 - len)));
+      emit2 ("and a, !immedbyte", ((unsigned)-1 & 0xffu) >> (8 - len));
       regalloc_dry_run_cost += 2;
     }
   if (!SPEC_USIGN (type))
@@ -12977,7 +12977,7 @@ unpackMaskA(sym_link *type, int len)
               symbol *tlbl = newiTempLabel (NULL);
               emit2 ("bit %d, a", len - 1);
               emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
-              emit2 ("or a, !immedbyte", (unsigned)(unsigned char)(0xff << len));
+              emit2 ("or a, !immedbyte", ((0xffu << len) & 0xffu));
               emitLabel (tlbl);
             }
           regalloc_dry_run_cost += 7;
@@ -13705,7 +13705,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
   unsigned blen;                /* bit-field length */
   unsigned bstr;                /* bit-field starting bit within byte */
   unsigned long long litval;    /* source literal value (if AOP_LIT) */
-  unsigned char mask;           /* bitmask within current byte */
+  unsigned mask;                /* bitmask within current byte */
   int extraPair;                /* a tempory register */
   bool needPopExtra = 0;        /* need to restore original value of temp reg */
   unsigned int pairincrement = 0;
@@ -13718,7 +13718,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
   /* If the bit-field length is less than a byte */
   if (blen < 8)
     {
-      mask = ((unsigned char) (0xFF << (blen + bstr)) | (unsigned char) (0xFF >> (8 - bstr)));
+      mask = ((0xffu << (blen + bstr)) | (0xffu >> (8 - bstr))) & 0xffu;
 
       if (right->aop->type == AOP_LIT && blen == 1 && (pair == PAIR_HL || pair == PAIR_IX || pair == PAIR_IY))
         {
@@ -13737,7 +13737,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
           regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 3 : 1;
           if ((mask | litval) != 0xff)
             {
-              emit2 ("and a, !immedbyte", (unsigned)mask);
+              emit2 ("and a, !immedbyte", mask);
               regalloc_dry_run_cost += 2;
             }
           if (litval)
@@ -13766,7 +13766,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
           else
             {
               AccRol (bstr);
-              emit2 ("and a, !immedbyte", (~mask) & 0xffu);
+              emit2 ("and a, !immedbyte", ~mask & 0xffu);
               regalloc_dry_run_cost += 2;
             }
 
@@ -13791,7 +13791,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
           emit2 ("ld a, !mems", _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 3 : 1;
 
-          emit2 ("and a, !immedbyte", (unsigned)mask);
+          emit2 ("and a, !immedbyte", mask);
           regalloc_dry_run_cost += 2;
           emit2 ("or a, %s", _pairs[extraPair].l);
           regalloc_dry_run_cost += 1;
@@ -13832,7 +13832,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
   /* If there was a partial byte at the end */
   if (rlen)
     {
-      mask = (((unsigned char) - 1 << rlen) & 0xff);
+      mask = ((unsigned char)-1 << rlen) & 0xffu;
 
       if (right->aop->type == AOP_LIT)
         {
@@ -13853,7 +13853,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
             }
 
           if ((mask | litval) != 0xff)
-            emit2 ("and a, !immedbyte", (unsigned)mask);
+            emit2 ("and a, !immedbyte", mask);
           if (litval)
             emit2 ("or a, !immedbyte", (unsigned)litval);
         }
@@ -13895,7 +13895,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
               regalloc_dry_run_cost += 1;
             }
 
-          emit2 ("and a, !immedbyte", (unsigned)mask);
+          emit2 ("and a, !immedbyte", mask);
           regalloc_dry_run_cost += 2;
           emit2 ("or a, %s", _pairs[extraPair].l);
           regalloc_dry_run_cost += 1;
@@ -14804,7 +14804,7 @@ genCast (const iCode *ic)
           emit2 ("bit %d, a", (int)(SPEC_BITINTWIDTH (resulttype) % 8 - 1));
           if (!regalloc_dry_run)
             emit2 ("jr z, !tlabel", labelKey2num (tlbl->key));
-          emit2 ("or a, #0x%02x", ~topbytemask & 0xff);
+          emit2 ("or a, #0x%02x", ~topbytemask & 0xffu);
           regalloc_dry_run_cost += 6;
           emitLabel (tlbl);
         }

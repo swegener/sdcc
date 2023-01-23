@@ -16,6 +16,10 @@
 	  extern declaration for inline function to pass host regression tests where the host compiler does not inline.
 	* support/regression/MakeList:
 	  Exclude test for host, since it fails for GCC 7, which is still used on the PPC macOS machine in the compile farm.
+	* src/z80/gen.c,
+	  src/pdk/gen.c,
+	  support/regression/tests/bug-3503.c:
+	  Fix bug #3503.
 
 2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
 

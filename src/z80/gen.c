@@ -9523,13 +9523,32 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               size -= 2;
               offset += 2;
             }
-          else
+          else if (right->aop->type == AOP_STL &&
+            (isRegDead (B_IDX, ic) && left->aop->regs[B_IDX] <= offset || isRegDead (B_IDX, ic) && left->aop->regs[C_IDX] <= offset ))
+            {
+              bool use_b = isRegDead (B_IDX, ic) && left->aop->regs[B_IDX] <= offset;
+              if (!left_already_in_a)
+                cheapMove (ASMOP_A, 0, left->aop, offset, true);
+              cheapMove (use_b ? ASMOP_B : ASMOP_C, 0, right->aop, offset, false);
+              a_always_byte = -1;
+              emit3_o (started ? A_SBC : A_SUB, ASMOP_A, 0, use_b ? ASMOP_B : ASMOP_C, 0);
+              started = true;
+              size--;
+              offset++;
+            }
+          else if (right->aop->type != AOP_STL)
             {
               if (!left_already_in_a)
                 cheapMove (ASMOP_A, 0, left->aop, offset, true);
               a_always_byte = -1;
               emit3_o (started ? A_SBC : A_SUB, ASMOP_A, 0, right->aop, offset);
               started = true;
+              size--;
+              offset++;
+            }
+          else
+            {
+              UNIMPLEMENTED;
               size--;
               offset++;
             }

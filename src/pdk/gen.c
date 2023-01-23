@@ -2757,7 +2757,7 @@ genCmp (const iCode *ic, iCode *ifx)
           emit2 ("subc", "a, p");
           cost (1, 1);
         }
-      else if (right->aop->type == AOP_STK)
+      else if (right->aop->type == AOP_STK || right->aop->type == AOP_STL)
         {
           if (!regDead (P_IDX, ic) || aopInReg (left->aop, i + 1, P_IDX))
             pushPF (!aopInReg (left->aop, i, A_IDX));

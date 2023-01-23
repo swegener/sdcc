@@ -10,6 +10,8 @@ p18298.c from the execute part of the gcc torture tests.
 #include <stdlib.h>
 
 #if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Lack of memory
+extern bool foo(const char *str); // extern declaration required by C standard, not present in GCC original, added to pass hosts regression tests everywhere.
+
 int strcmp (const char*, const char*);
 char s[2048] = "a";
 inline bool foo(const char *str) {

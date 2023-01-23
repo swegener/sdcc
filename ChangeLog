@@ -6,6 +6,12 @@
 	  src/mcs51/gen.c,
 	  src/z80/gen.c:
 	  Type fixes for code generation (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
+	* device/include/stdckdint.h,
+	  device/lib/strtol.c,
+	  device/lib/strtoul.c,
+	  support/regression/tests/bug-3474.c,
+	  support/regression/tests/bug-2854.c
+	  Fix bug #3474.
 
 2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
 

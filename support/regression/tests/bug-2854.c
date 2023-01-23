@@ -13,7 +13,7 @@
 #pragma disable_warning 88
 #pragma disable_warning 127
 
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) && !(defined( __SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
 
 void lock_give_fastcall(uint8_t * mutex)
 #ifdef __SDCC_z80
@@ -88,7 +88,7 @@ int8_t ya_loadb(char **args)
 void
 testBug(void)
 {
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) && !(defined( __SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
   const char *args[] = {"", "", "23", 0};
   char b;
   buffer = &b;

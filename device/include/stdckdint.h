@@ -109,9 +109,9 @@ inline _Bool __ckd_mul_ulongull __CKD_ULL_IMPL(unsigned long, *)
     unsigned short * : __ckd_mul_ushort, \
     int * : __ckd_mul_int, \
     unsigned int * : __ckd_mul_uint, \
-    long * : __ckd_mul_long \
+    long * : __ckd_mul_long, \
     unsigned long * : __ckd_mul_ulong \
-    ((r), (a), (b))
+    ((r), (a), (b)))
 
 extern _Bool __ckd_add_unimplemented (void *, unsigned long long, unsigned long long);
 
@@ -148,7 +148,7 @@ extern _Bool __ckd_mul_unimplemented (void *, unsigned long long, unsigned long 
     signed long long: __ckd_mul_unimplemented(r, a, b), \
     unsigned long long: __ckd_mul_unimplemented(r, a, b), \
     unsigned long: __ckd_mul_ulongull(r, a, b), \
-    default: __ckd_mul_default(r, a, b)) \
+    default: __ckd_mul_default(r, a, b)), \
   default: \
     _Generic ((b), \
     signed long long: __ckd_mul_unimplemented(r, a, b), \

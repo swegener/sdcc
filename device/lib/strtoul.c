@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------
    strtoul() - convert a string to a unsigned long int and return it
 
-   Copyright (C) 2018, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+   Copyright (C) 2018-2023, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -31,6 +31,9 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#include <stdckdint.h>
+#endif
 #include <limits.h>
 #include <errno.h>
 
@@ -110,9 +113,14 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
         break;
 
       oldret = ret;
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+      range_error |= ckd_mul(&ret, ret, base);
+#else
       ret *= base;
       if (ret < oldret)
         range_error = true;
+#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul support)
+#endif
 
       ret += (unsigned char)digit;
     }

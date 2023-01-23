@@ -30,6 +30,10 @@ EXCLUDE_host += \
 EXCLUDE_host += \
 	gte_20031003-1
 
+# Fails on GCC 7, which we still use on macOS PPC host.
+EXCLUDE_host += \
+	gte_pr94809
+
 # does not compile on ds390
 EXCLUDE_ds390 += \
 	gte_memcpy-1

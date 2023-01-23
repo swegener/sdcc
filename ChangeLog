@@ -14,6 +14,8 @@
 	  Fix bug #3474.
 	* support/regression/tests/gcc-torture-execute-p18298.c:
 	  extern declaration for inline function to pass host regression tests where the host compiler does not inline.
+	* support/regression/MakeList:
+	  Exclude test for host, since it fails for GCC 7, which is still used on the PPC macOS machine in the compile farm.
 
 2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
 

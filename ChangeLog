@@ -3,6 +3,11 @@
 	* doc/sdccman.lyx,
 	  doc/z80-stack-cleanup.svg:
 	  Improve documentation on stack cleanup (support request #182).
+	* src/SDCCpeeph.c,
+	  src/pdk/gen.c,
+	  src/pdk/peeph.def,
+	  support/regression/tests/bug-3525.c:
+	  Fix bug #3525.
 
 2023-01-23 Philipp Klaus Krause <pkk AT spth.de>
 

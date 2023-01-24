@@ -66,3 +66,172 @@ replace restart {
 	; peephole j1 removed redundant ret after ret k.
 }
 
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j2 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j3 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j4 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j5 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j6 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j7 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j8 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j9 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j10 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j11 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j12 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j13 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+

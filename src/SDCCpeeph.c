@@ -3698,7 +3698,15 @@ buildLabelRefCountHash (lineNode *head)
         !strncmp(line->line, "t0sn", 4) || !strncmp(line->line, "t1sn", 4) ||
         !strncmp(line->line, "izsn", 4) || !strncmp(line->line, "dzsn", 4)))
         {
-          const lineNode *const l = line->next->next;
+          const lineNode *l = line;
+          // Skip over following inst.
+          do
+          	l = l->next;
+          while(l && (l->isComment || l->isDebug || l->isLabel));
+          do
+          	l = l->next;
+          while(l && (l->isComment || l->isDebug));
+
           wassert (l);
           if (l->isLabel && isLabelDefinition (l->line, &label, &labelLen, false))
             {
@@ -3706,12 +3714,20 @@ buildLabelRefCountHash (lineNode *head)
               strcpy(name, label);
               name[labelLen] = 0;
 
-              labelHashEntry *e = hTabFirstItemWK (labelHash, hashSymbolName (name));
+              labelHashEntry *e;
+              for (e = hTabFirstItemWK (labelHash, hashSymbolName (name)); e; e = hTabNextItemWK (labelHash))
+                if (!strcmp (name, e->name))
+                 break;
+
               if (e)
                 e->refCount++;
             }
+          else
+            {
+              wassertl (0, "skip instruction has no target label:");
+              fprintf (stderr, "\'%s\'\n", line->line);
+            }
         }
-
 
       for (i = 0; i < HTAB_SIZE; i++)
         {
@@ -3740,8 +3756,8 @@ buildLabelRefCountHash (lineNode *head)
 
       while (thisEntry)
         {
-          fprintf (stderr, "label: %s ref %d\n",
-                   thisEntry->name, thisEntry->refCount);
+          fprintf (stderr, "label: %s (%p) ref %d\n",
+                   thisEntry->name, thisEntry, thisEntry->refCount);
           thisEntry = hTabNextItemWK (labelHash);
         }
     }

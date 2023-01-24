@@ -1,4 +1,10 @@
-2023-01-22 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx,
+	  doc/z80-stack-cleanup.svg:
+	  Improve documentation on stack cleanup (support request #182).
+
+2023-01-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCbtree.cc:
 	  Fix bug #3505.

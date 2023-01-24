@@ -44630,7 +44630,19 @@ For Functions that do not have variable arguments: the first parameter is
  is passed in de; all other parameters are passed on the stack, right-to-left.
  Independent of their size, struct / union parameters and all following
  parameters are always passed on the stack.
- If __z88dk_callee is not used, after the call, the stack parameters are
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename z80-stack-cleanup.svg
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If __z88dk_callee is not used, after the call, the stack parameters are
  cleaned up by the caller, with the following exceptions: functions that
  do not have variable arguments and return void or a type of at most 16
  bits, or have both a first parameter of type float and a return value of
@@ -44714,7 +44726,19 @@ For Functions that do not have variable arguments: the first parameter is
  hl; all other parameters are passed on the stack, right-to-left.
  Independent of their size, struct / union parameters and all following
  parameters are always passed on the stack.
- If __z88dk_callee is not used, after the call, the stack parameters are
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename z80-stack-cleanup.svg
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If __z88dk_callee is not used, after the call, the stack parameters are
  cleaned up by the caller, with the following exceptions: functions that
  do not have variable arguments and return void or a type of at most 16
  bits, or have both a first parameter of type float and a return value of
@@ -44776,7 +44800,7 @@ For Functions that do not have variable arguments: the first parameter is
  Independent of their size, struct / union parameters and all following
  parameters are always passed on the stack.
  The stack is adjusted by the callee (thus explicitly specifying __z88dk_callee
- does not make a difference).
+ does not make a difference), unless the functionhas variable arguments.
 \end_layout
 
 \begin_layout Subsubsection

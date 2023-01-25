@@ -5914,8 +5914,10 @@ genCmp (const iCode *ic, iCode *ifx)
               emit2 (started ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
               cost (2, 1);
             }
-          else
+          else if (right->aop->type != AOP_STL)
             emit3_o (started ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
+          else
+            UNIMPLEMENTED;
           started = true;
 
           if (right_stacked)

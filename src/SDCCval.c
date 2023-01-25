@@ -2112,7 +2112,7 @@ byteOfVal (value *val, int offset)
   if (SPEC_NOUN (val->etype) == V_FIXED16X16)
     return offset < 4 ? (SPEC_CVAL (val->etype).v_fixed16x16 >> shift) & 0xff : 0;
 
-  if (SPEC_LONGLONG (val->etype) || SPEC_NOUN (val->etype) == V_BITINT)
+  if (SPEC_LONGLONG (val->etype) || SPEC_NOUN (val->etype) == V_BITINT || SPEC_NOUN (val->etype) == V_BITFIELD || SPEC_NOUN (val->etype) == V_BITINTBITFIELD)
     {
       if (SPEC_USIGN (val->etype))
         return offset < 8 ? (SPEC_CVAL (val->etype).v_ulonglong >> shift) & 0xff : 0;
@@ -2184,7 +2184,7 @@ ullFromLit (sym_link * lit)
   if (SPEC_NOUN (etype) == V_FIXED16X16)
     return double2ul (doubleFromFixed16x16 (SPEC_CVAL (etype).v_fixed16x16)); /* FIXME: this loses bits */
 
-  if (SPEC_LONGLONG (etype) || SPEC_NOUN (etype) == V_BITINT)
+  if (SPEC_LONGLONG (etype) || SPEC_NOUN (etype) == V_BITINT || SPEC_NOUN (etype) == V_BITFIELD || SPEC_NOUN (etype) == V_BITINTBITFIELD)
     {
       if (SPEC_USIGN (etype))
         return SPEC_CVAL (etype).v_ulonglong;
@@ -3118,7 +3118,7 @@ valCastLiteral (sym_link *dtype, double fval, TYPE_TARGET_ULONGLONG llval)
     l = (unsigned long)llval;
     
 #if 0
-  printf("valCastLiteral: %lx to ", llval); printTypeChain (dtype, stdout); printf("\n");
+  printf("valCastLiteral: %llx to ", (unsigned long long)llval); printTypeChain (dtype, stdout); printf("\n");
 #endif
 
   val = newValue ();
@@ -3177,9 +3177,9 @@ valCastLiteral (sym_link *dtype, double fval, TYPE_TARGET_ULONGLONG llval)
     case V_BITFIELD:
       llval &= (0xffffffffffffffffull >> (64 - SPEC_BLEN (val->etype)));
       if (SPEC_USIGN (val->etype))
-        SPEC_CVAL (val->etype).v_uint = (TYPE_TARGET_UINT) llval;
+        SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_UINT) llval;
       else
-        SPEC_CVAL (val->etype).v_int = (TYPE_TARGET_INT) llval;
+        SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_INT) llval;
       break;
 
     case V_CHAR:
@@ -3271,11 +3271,12 @@ valRecastLitVal (sym_link * dtype, value * val)
       break;
 
     case V_BITFIELD:
+    case V_BITINTBITFIELD:
       ull &= (0xffffffffffffffffull >> (64 - SPEC_BLEN (val->etype)));
       if (SPEC_USIGN (val->etype))
-        SPEC_CVAL (val->etype).v_uint = (TYPE_TARGET_UINT) ull;
+        SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) ull;
       else
-        SPEC_CVAL (val->etype).v_int = (TYPE_TARGET_INT) ull;
+        SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_LONGLONG) ull;
       break;
 
     case V_CHAR:
@@ -3286,7 +3287,7 @@ valRecastLitVal (sym_link * dtype, value * val)
       break;
 
     default:
-      if (SPEC_LONGLONG (val->etype))
+      if (SPEC_LONGLONG (val->etype) || SPEC_NOUN (val->etype) == V_BITINT)
         {
           if (SPEC_USIGN (val->etype))
             SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) ull;

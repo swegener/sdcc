@@ -1,4 +1,4 @@
-/* bug-3523.c
+/* bug-3503.c
    A z80 (and pdk with --stack-auto) codegen issue when comparing pointers to the stack.
  */
 

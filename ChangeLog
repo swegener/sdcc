@@ -4,6 +4,8 @@
 	  Type fixes (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
 	* src/stm8/gen.c:
 	  Fix an stm8 issue similar to z80 bug #3503.
+	* src/pdk/peeph.def:
+	  Fix use of cneqsn, which is not supported on pdk13.
 
 2023-01-24 Philipp Klaus Krause <pkk AT spth.de>
 

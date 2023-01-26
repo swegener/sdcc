@@ -1,3 +1,8 @@
+2023-01-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCval.c:
+	  Make ulFromVal a wrapper for ullFromVal to remove duplicate code and partially fix bug #3539.
+
 2023-01-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCval.c:

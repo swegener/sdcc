@@ -1999,70 +1999,7 @@ floatFromVal (value * val)
 unsigned long
 ulFromVal (const value *val)
 {
-  if (!val)
-    return 0;
-
-  if (val->etype && SPEC_SCLS (val->etype) != S_LITERAL)
-    {
-      werror (E_CONST_EXPECTED, val->name);
-      return 0;
-    }
-
-  /* if it is not a specifier then we can assume that */
-  /* it will be an unsigned long                      */
-  if (!IS_SPEC (val->type))
-    return SPEC_CVAL (val->etype).v_ulong;
-
-  if (SPEC_NOUN (val->etype) == V_FLOAT)
-    return double2ul (SPEC_CVAL (val->etype).v_float);
-
-  if (SPEC_NOUN (val->etype) == V_FIXED16X16)
-    return double2ul (doubleFromFixed16x16 (SPEC_CVAL (val->etype).v_fixed16x16));
-
-  if (SPEC_LONGLONG (val->etype) || SPEC_NOUN (val->etype) == V_BITINT)
-    {
-      if (SPEC_USIGN (val->etype))
-        return (unsigned long)SPEC_CVAL (val->etype).v_ulonglong;
-      else
-        return (unsigned long)SPEC_CVAL (val->etype).v_longlong;
-    }
-
-  if (SPEC_LONG (val->etype))
-    {
-      if (SPEC_USIGN (val->etype))
-        return SPEC_CVAL (val->etype).v_ulong;
-      else
-        return SPEC_CVAL (val->etype).v_long;
-    }
-
-  if (SPEC_NOUN (val->etype) == V_INT)
-    {
-      if (SPEC_USIGN (val->etype))
-        return SPEC_CVAL (val->etype).v_uint;
-      else
-        return SPEC_CVAL (val->etype).v_int;
-    }
-
-  if (SPEC_NOUN (val->etype) == V_CHAR)
-    {
-      if (SPEC_USIGN (val->etype))
-        return (unsigned char) SPEC_CVAL (val->etype).v_uint;
-      else
-        return (signed char) SPEC_CVAL (val->etype).v_int;
-    }
-
-  if (IS_BOOL (val->etype) || IS_BITVAR (val->etype))
-    return SPEC_CVAL (val->etype).v_uint;
-
-  if (SPEC_NOUN (val->etype) == V_VOID)
-    return SPEC_CVAL (val->etype).v_ulong;
-
-  if (SPEC_NOUN (val->etype) == V_STRUCT)
-    return SPEC_CVAL (val->etype).v_ulong;
-
-  /* we are lost ! */
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "ulFromVal: unknown value");
-  return 0;
+  return ullFromVal (val);
 }
 
 /*------------------------------------------------------------------*/

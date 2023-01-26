@@ -639,7 +639,7 @@ stringLiteral (char enc)
     {
       ch = input();
       count_char(ch);
-      if (ch == EOF)
+      if (!ch || ch == EOF) // We have to check for both: at the end of the file, some lexe return 0, some EOF.
         break;
 
       switch (ch)
@@ -656,7 +656,7 @@ stringLiteral (char enc)
             {
               char buf[2];
 
-              if (ch == EOF)
+              if (!ch || ch == EOF)
                 goto out;
 
               buf[0] = '\\';
@@ -685,7 +685,7 @@ stringLiteral (char enc)
                   if ((ch = input()) != '\n')
                     {
                       werror(W_STRAY_BACKSLASH, column);
-                      if (ch != EOF)
+                      if (ch && ch != EOF)
                         unput(ch);
                       else
                         count_char(ch);
@@ -710,7 +710,7 @@ stringLiteral (char enc)
                       dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
                       dbuf_append_char(&linebuf, '#');
 
-                      while ((ch = input()) != EOF && ch != '\n')
+                      while ((ch = input()) && ch != EOF && ch != '\n')
                         dbuf_append_char(&linebuf, (char)ch);
 
                       if (ch == '\n')
@@ -738,7 +738,7 @@ stringLiteral (char enc)
                 }
             }
 
-          if (ch == EOF)
+          if (!ch || ch == EOF)
             goto out;
 
           if (ch == 'u' || ch == 'U' || ch == 'L') /* Could be an utf-16 or utf-32 wide string literal prefix or an utf-8 prefix */

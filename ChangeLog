@@ -15,6 +15,9 @@
 	  Fix an issue in two pdk peephole rule conditions.s
 	* src/SDCCsymt.c:
 	  Fix bug #2998.
+	* src/SDCC.lex,
+	  support/valdiag/tests/bug-3012.c:
+	  Fix bug #3012.
 
 2023-01-25 Philipp Klaus Krause <pkk AT spth.de>
 

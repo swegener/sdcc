@@ -2138,7 +2138,7 @@ geniCodeCast (sym_link *type, operand *op, bool implicit)
       return operandFromValue (valCastLiteral (type, operandLitValue (op), operandLitValueUll (op)), false);
     }
 
-  checkPtrCast (type, optype, implicit, IS_LITERAL (opetype) && !operandLitValue (op));
+  checkPtrCast (type, optype, implicit, IS_OP_LITERAL (op) && !operandLitValue (op));
 
   ic = newiCode (CAST, operandFromLink (type), geniCodeRValue (op, FALSE));
   IC_RESULT (ic) = newiTempOperand (type, 0);

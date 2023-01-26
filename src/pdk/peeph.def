@@ -176,7 +176,7 @@ replace restart {
 %4:
 	%5	%6
 %3:
-} if if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
+} if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
 
 replace restart {
 	ceqsn	%1, %2
@@ -190,7 +190,7 @@ replace restart {
 %4:
 	%5	%6, %7
 %3:
-} if if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
+} if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
 
 replace restart {
 	cneqsn	%1, %2

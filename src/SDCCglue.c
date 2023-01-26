@@ -1829,6 +1829,10 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
             }
         }
 
+      // Give up here, to avoid reading invalid memory below.
+      if (ilist->init.node->isError)
+        goto ilist_done;
+
       // and the type must match
       itype = ilist->init.node->ftype;
 
@@ -1856,6 +1860,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf,
             }
         }
     }
+ilist_done:
 
   /* if this is a pointer */
   if (IS_PTR (type))

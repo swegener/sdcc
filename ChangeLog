@@ -12,7 +12,9 @@
 	  support/regression/tests/bug-2983.c:
 	  Fix bug #2983.
 	* src/pdk/peeph.def:
-	  Fix an issue in two pdk peephole rule conditions.
+	  Fix an issue in two pdk peephole rule conditions.s
+	* src/SDCCsymt.c:
+	  Fix bug #2998.
 
 2023-01-25 Philipp Klaus Krause <pkk AT spth.de>
 

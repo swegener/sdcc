@@ -3877,7 +3877,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                   }
               break;
             case GPOINTER:
-              dbuf_append_str (dbuf, "generic*");
+                if (type->next && !IS_DECL (type->next) && SPEC_ADDRSPACE (type->next))
+                  dbuf_printf (dbuf, "%s*", SPEC_ADDRSPACE (type->next)->name);
+                else
+                  dbuf_append_str (dbuf, "generic*");
               break;
             case CPOINTER:
               dbuf_append_str (dbuf, "code*");

@@ -9263,7 +9263,9 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         }
 
       // On the SM83 we can't afford to adjust HL as it may trash the carry.
-      if (size > 1 && (IS_SM83 || IY_RESERVED) && left->aop->type != AOP_REG && right->aop->type != AOP_REG && (requiresHL (right->aop) && requiresHL (left->aop)))
+      if (size > 1 && (IS_SM83 || IY_RESERVED) &&
+        left->aop->type != AOP_REG && requiresHL (left->aop) && left->aop->type != AOP_STL &&
+        right->aop->type != AOP_REG && requiresHL (right->aop) && right->aop->type != AOP_STL)
         {
           if (!isPairDead (PAIR_DE, ic))
             _push (PAIR_DE);
@@ -9306,7 +9308,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           result_in_carry = TRUE;
           goto fix;
         }
-      else if (size > 1 && IS_SM83 && (requiresHL (right->aop) && right->aop->type != AOP_REG && !requiresHL (left->aop)))
+      else if (size > 1 && IS_SM83 && (requiresHL (right->aop) && right->aop->type != AOP_REG && right->aop->type != AOP_STL && !requiresHL (left->aop)))
         {
           if (!regalloc_dry_run)
             aopGet (right->aop, LSB, FALSE);
@@ -9335,7 +9337,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           result_in_carry = TRUE;
           goto fix;
         }
-      else if (size > 1 && IS_SM83 && (!requiresHL (right->aop) && requiresHL (left->aop) && left->aop->type != AOP_REG))
+      else if (size > 1 && IS_SM83 && (!requiresHL (right->aop) && requiresHL (left->aop) && left->aop->type != AOP_REG && left->aop->type != AOP_STL))
         {
           if (!regalloc_dry_run)
             aopGet (left->aop, LSB, FALSE);

@@ -2,6 +2,10 @@
 
 	* src/SDCCval.c:
 	  Make ulFromVal a wrapper for ullFromVal to remove duplicate code and partially fix bug #3539.
+	* src/z80/gen.c:
+	  Fix an sm83 issue similar to z80 bug #3503.
+	* doc/sdccman.lyx:
+	  Add _BitInt to type list in manual.
 
 2023-01-25 Philipp Klaus Krause <pkk AT spth.de>
 

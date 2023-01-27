@@ -133,10 +133,6 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	991118-1.c
 
-# SDCC bug #3394
-GTE_SKIP_TESTS += \
-	pr58365.c
-
 # SDCC does not yet support K&R-style style functions (RFE #450)
 GTE_SKIP_TESTS += \
 	20020227-1.c \

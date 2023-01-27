@@ -1,5 +1,12 @@
 2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCicode.c,
+	  support/regression/cases/Makefile.in,
+	  support/regression/MakeList:
+	  Fix bug #3394.
+
+2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* sdas/aspdk15/pdk15mch.c:
 	  Fix bug #3191.
 	* src/SDCCsymt.c:

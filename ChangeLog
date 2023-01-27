@@ -1,4 +1,9 @@
-2023-01-26 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/aspdk15/pdk15mch.c:
+	  Fix bug #3191.
+
+2023-01-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCval.c:
 	  Make ulFromVal a wrapper for ullFromVal to remove duplicate code and partially fix bug #3539.
@@ -19,7 +24,7 @@
 	  support/valdiag/tests/bug-3012.c:
 	  Fix bug #3012.
 
-2023-01-25 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-25 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCval.c:
 	  Type fixes (fixing regressions visible on 32-bit big-endian hosts), partial fix for bug #3539.
@@ -28,7 +33,7 @@
 	* src/pdk/peeph.def:
 	  Fix use of cneqsn, which is not supported on pdk13.
 
-2023-01-24 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx,
 	  doc/z80-stack-cleanup.svg:
@@ -39,7 +44,7 @@
 	  support/regression/tests/bug-3525.c:
 	  Fix bug #3525.
 
-2023-01-23 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCbtree.cc:
 	  Fix bug #3505.
@@ -62,7 +67,7 @@
 	  support/regression/tests/bug-3503.c:
 	  Fix bug #3503.
 
-2023-01-21 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mos6502/main.c:
 	  stdlib selection, patch #454 by Basil Hussain.
@@ -87,7 +92,7 @@
 	  support/regression/tests/bug-3487.c:
 	  Fix bugs #3523, #3487.
 
-2023-01-19 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/*/crt0.s,
 	  src/SDCCglue.c,
@@ -101,7 +106,7 @@
 	* doc/sdccman.lyx:
 	  Improve __sdcc_external_startup documentation.
 
-2023-01-17 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-17 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/gcc-torture-execute-va-arg-5.c:
 	  Disable Test for GCC up to 11, since it still fails on x86 hosts for that version.
@@ -126,7 +131,7 @@
 	* doc/sdccman.lyx:
 	  Amend claims concerning intrinsic address space support.
 
-2023-01-02 Philipp Klaus Krause <pkk AT spth.de>
+2023-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCast.c,
 	  support/regression/tests/bug-3504.c:

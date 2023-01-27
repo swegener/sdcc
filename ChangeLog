@@ -4,6 +4,9 @@
 	  Fix bug #3191.
 	* src/SDCCsymt.c:
 	  Fix bug #3516.
+	* src/SDCCopt.c,
+	  support/regression/cases/Makefile.in:
+	  Fix bug #3400.
 
 2023-01-26 Philipp Klaus Krause <philipp@colecovision.eu>
 

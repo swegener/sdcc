@@ -2876,6 +2876,9 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
               if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
                  continue;
+              /* Similarly for singed->unsigned->signed widening casts to ensure that negative values end up as nonnegative ones in the end. */
+              if (!SPEC_USIGN (type1) && SPEC_USIGN (type2) && !SPEC_USIGN (type3) && bitsForType (type3) > bitsForType (type2))
+                continue;
 
               /* Special case: Second use is a bit test */
               if (uic->op == BITWISEAND && IS_OP_LITERAL (IC_RIGHT (uic)) && ifxForOp (IC_RESULT (uic), uic))
@@ -2908,7 +2911,6 @@ optimizeCastCast (eBBlock ** ebbs, int count)
                 }
               else
                 continue;
-
 
               /* Change the first cast to a simple assignment and */
               /* let the second cast do all the work */

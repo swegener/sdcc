@@ -2804,6 +2804,11 @@ In 4.2.10, _sdcc_external_startup was renamed to __sdcc_external_startup and
  support for it was added to further ports.
 \end_layout
 
+\begin_layout Itemize
+In 4.2.13, for the sm83 port, __sfr addresses need to be specified using the
+ full 16-bit address.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -22108,7 +22113,7 @@ Z180!I/O memory
 \begin_layout Verse
 
 \family typewriter
-__sfr __at 0x78 IoPort;
+__sfr __at(0x78) IoPort;
 \begin_inset space ~
 \end_inset
 
@@ -22266,7 +22271,7 @@ at
 
 \end_inset
 
- 0x123 IoPort; 
+(0x123) IoPort; 
 \end_layout
 
 \begin_layout Standard
@@ -22484,6 +22489,99 @@ in/out
 \end_layout
 
 \begin_layout Subsection
+SM83 intrinsic named address spaces
+\end_layout
+
+\begin_layout Subsubsection
+__sfr
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sfr
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The keyword 
+\emph on
+__sfr
+\emph default
+ is an alternative way to access memory locations 0xff00 to 0xffff, which
+ are typically used for memory-mapped I/O e.g.:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+__sfr __at
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+at
+\end_layout
+
+\end_inset
+
+(0xff01) IoPort; 
+\end_layout
+
+\begin_layout Subsection
 HC08/S08 intrinsic named address spaces
 \end_layout
 
@@ -22645,7 +22743,7 @@ utput memory.
 \begin_layout Verse
 
 \family typewriter
-__sfr __at 0x18 gpcc;
+__sfr __at(0x18) gpcc;
 \begin_inset space ~
 \end_inset
 

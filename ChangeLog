@@ -10,6 +10,10 @@
 	  src/z80/gen.c,
 	  support/valdiag/tests/bug-3228.c:
 	  Fix bug #3228.
+	* src/SDCCsymt.c,
+	  .version,
+	  doc/sdccman.lyx:
+	  Fix bug #3263.
 
 2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

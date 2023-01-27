@@ -6547,6 +6547,9 @@ genEndFunction (iCode *ic)
       return;
     }
 
+  if (!regalloc_dry_run && IFFUNC_ISZ88DK_CALLEE (sym->type) && FUNC_HASVARARGS (sym->type))
+    werror (E_Z88DK_CALLEE_VARARG); // We have no idea how many bytes on the stack we'd have to clean up.
+
   const bool bigreturn = (getSize (sym->type->next) > 4) || IS_STRUCT (sym->type->next);
   int stackparmbytes = bigreturn * 2;
   for (value *arg = FUNC_ARGS(sym->type); arg; arg = arg->next)

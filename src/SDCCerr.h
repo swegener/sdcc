@@ -319,6 +319,7 @@ enum {
   E_VLA_SCOPE                   = 289, /* variable length array declarators must have function prototype scope or block scope */
   E_VLA_INIT                    = 290, /* variable length arrays can be initalized by empty initalizers only */
   W_ENUM_INT_RANGE_C2X          = 291, /* enumeration constant outside the range of int requires ISO C2X or later */
+  E_Z88DK_CALLEE_VARARG         = 292, /* __z88dk_callee with variable arguments not supported */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

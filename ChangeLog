@@ -4,6 +4,12 @@
 	  support/regression/cases/Makefile.in,
 	  support/regression/MakeList:
 	  Fix bug #3394.
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  support/valdiag/tests/bug-3228.c:
+	  Fix bug #3228.
 
 2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

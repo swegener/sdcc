@@ -2739,6 +2739,9 @@ compareFuncType (sym_link * dest, sym_link * src)
       return 0;
     }
 
+  if (IFFUNC_ISBANKEDCALL (dest) != IFFUNC_ISBANKEDCALL (src))
+    return 0;
+
   if (IFFUNC_ISWPARAM (dest) != IFFUNC_ISWPARAM (src))
     {
       return 0;

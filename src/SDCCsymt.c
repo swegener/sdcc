@@ -468,6 +468,9 @@ pointerTypes (sym_link * ptr, sym_link * type)
         case S_EEPROM:
           DCL_TYPE (ptr) = EEPPOINTER;
           break;
+        case S_SFR:
+          if (!port->mem.sfrupointer)
+            werror (E_SFR_POINTER);
         default:
           DCL_TYPE (ptr) = port->unqualified_pointer;
           break;

@@ -3912,9 +3912,9 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           goto errorTreeReturn;
         }
         
-      if ((TARGET_Z80_LIKE || TARGET_PDK_LIKE) && SPEC_SCLS (LETYPE (tree)) == S_SFR)
+      if (SPEC_SCLS (LETYPE (tree)) == S_SFR && !port->mem.sfrupointer)
         {
-          werror (W_SFR_ADDRESS);
+          werror (E_SFR_POINTER);
         }
 
       if (LETYPE (tree) && SPEC_SCLS (tree->left->etype) == S_REGISTER)

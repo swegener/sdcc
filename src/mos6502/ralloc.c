@@ -339,25 +339,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* reassignLR - reassign this to registers                         */
-/*-----------------------------------------------------------------*/
-static void
-reassignLR (operand * op)
-{
-  symbol *sym = OP_SYMBOL (op);
-  int i;
-
-  /* not spilt any more */
-  sym->isspilt = sym->spillA = sym->blockSpil = sym->remainSpil = 0;
-  bitVectUnSetBit (_G.spiltSet, sym->key);
-
-  _G.blockSpil--;
-
-  for (i = 0; i < sym->nRegs; i++)
-    sym->regs[i]->isFree = 0;
-}
-
 /*------------------------------------------------------------------*/
 /* verifyRegsAssigned - make sure an iTemp is properly initialized; */
 /* it should either have registers or have been spilled. Otherwise, */

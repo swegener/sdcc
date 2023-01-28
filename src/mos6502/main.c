@@ -717,6 +717,7 @@ PORT mos6502_port =
     NULL,                 // default location for auto vars
     NULL,                 // default location for globl vars
     1,                    /* CODE  is read-only */
+    false,                // doesn't matter, as port has no __sfr anyway
     1                     /* No fancy alignments supported. */
   },
   { NULL, NULL },         /* No extra areas */
@@ -875,6 +876,7 @@ PORT mos65c02_port =
     NULL,                 // default location for auto vars
     NULL,                 // default location for globl vars
     1,                    // code space read-only 1=yes
+    false,                // doesn't matter, as port has no __sfr anyway
     1                     // No fancy alignments supported.
   },
   { NULL, NULL },

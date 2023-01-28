@@ -298,7 +298,7 @@ enum {
   E_IAR_PSEUDOPARM              = 268, /* IAR function call with parameter in pseudoregister */
   E_COSMIC_LARGE_RETURN         = 269, /* large return value not supported for Cosmic calling convention */
   E_MULTIPLE_CALLINGCONVENTIONS = 270, /* multiple incompatible calling conventions */
-  W_SFR_ADDRESS                 = 271, /* unsupported address of __sfr taken */
+  E_SFR_POINTER                 = 271, /* unsupported pointer to __sfr */
   E_INVALID_BITINTWIDTH         = 272, /* invalid with for bit-precise integer type */
   W_BITINTCONST_C23             = 273, /* bit-precise integer constant requires ISO C23 or later */
   E_INVALID_UNIVERSAL_IDENTIFIER = 274, /* universal character name %s invalid in identifier */

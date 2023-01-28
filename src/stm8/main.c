@@ -515,6 +515,7 @@ PORT stm8_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // doesn't matter, as port has no __sfr anyway
     1                           /* No fancy alignments supported. */
   },
   { stm8_genExtraArea, NULL },

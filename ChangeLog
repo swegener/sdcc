@@ -1,3 +1,16 @@
+2023-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/port.h,
+	  src/*/main.c:
+	  Fix bug #3160.
+	* src/mos6502/ralloc.c,
+	  src/z80/ralloc.c:
+	  Code cleanup.
+
 2023-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,

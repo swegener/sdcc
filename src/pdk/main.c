@@ -336,6 +336,7 @@ PORT pdk13_port =
     0,
     0,
     1,                          /* CODE  is read-only */
+    false,                      // no instructions accessing i/o space with indirect addressing available in hardware
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },
@@ -504,6 +505,7 @@ PORT pdk14_port =
     0,
     0,
     1,                          /* CODE  is read-only */
+    false,                      // no instructions accessing i/o space with indirect addressing available in hardware
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },
@@ -672,6 +674,7 @@ PORT pdk15_port =
     0,
     0,
     1,                          /* CODE  is read-only */
+    false,                      // no instructions accessing i/o space with indirect addressing available in hardware
     1                           /* No fancy alignments supported. */
   },
   { 0, 0 },

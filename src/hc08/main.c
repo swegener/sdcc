@@ -843,6 +843,7 @@ PORT hc08_port =
     NULL,
     NULL,
     1,
+    false,                // doesn't matter, as port has no __sfr anyway
     1                     // No fancy alignments supported.
   },
   { _hc08_genExtraAreas,
@@ -989,6 +990,7 @@ PORT s08_port =
     NULL,
     NULL,
     1,
+    false,                // doesn't matter, as port has no __sfr anyway
     1                     // No fancy alignments supported.
   },
   { _hc08_genExtraAreas,

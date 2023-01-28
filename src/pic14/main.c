@@ -420,6 +420,7 @@ PORT pic_port =
     NULL,
     NULL,
     1,                      // code is read only
+    true,                   // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behviour of rpevious version of sdcc for now.
     1                       // No fancy alignments supported.
   },
   { NULL, NULL },

@@ -1128,6 +1128,7 @@ PORT z80_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1260,6 +1261,7 @@ PORT z180_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1388,6 +1390,7 @@ PORT r2k_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1517,6 +1520,7 @@ PORT r2ka_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1646,6 +1650,7 @@ PORT r3ka_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1777,6 +1782,7 @@ PORT sm83_port =
     NULL,
     NULL,
     1,                          /* CODE is read-only */
+    true,                       // unqualified pointers can point to __sfr (the i/o space is part of the flat address space).
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -1906,6 +1912,7 @@ PORT tlcs90_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // doesn't matter, as port has no __sfr anyway
     1                           /* No fancy alignments supported. */
    },
   { NULL, NULL },
@@ -2035,6 +2042,7 @@ PORT ez80_z80_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
@@ -2164,6 +2172,7 @@ PORT z80n_port =
     NULL,
     NULL,
     1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },

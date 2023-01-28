@@ -1358,6 +1358,7 @@ PORT pic16_port =
     NULL,                   // default location for auto vars
     NULL,                   // default location for global vars
     1,                      // code is read only 1=yes
+    true,                  // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behviour of rpevious version of sdcc for now.
     1                       // No fancy alignments supported.
   },
   {

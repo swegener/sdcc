@@ -30,6 +30,12 @@
 
 #include <sdcc-lib.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if _SDCC_MANGLES_SUPPORT_FUNS
 unsigned unsigned _divuint (unsigned x, unsigned y);
 #endif
@@ -204,7 +210,7 @@ not_negative:
 #else  // _DIVSINT_ASM_
 
 int
-_divsint (int x, int y)
+_divsint (int x, int y) __SDCC_NONBANKED
 {
   register int r;
 

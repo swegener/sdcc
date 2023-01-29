@@ -33,6 +33,12 @@
 
 #include <stdbool.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
@@ -152,7 +158,7 @@ smaller:			; -> no
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
 unsigned int
-_divuint (unsigned int x, unsigned int y)
+_divuint (unsigned int x, unsigned int y) __SDCC_NONBANKED
 {
   unsigned int reste = 0;
   unsigned char count = 16;

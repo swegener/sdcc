@@ -28,6 +28,12 @@
 
 #include <sdcc-lib.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if _SDCC_MANGLES_SUPPORT_FUNS
 unsigned long _modulong (unsigned long a, unsigned long b);
 #endif
@@ -256,7 +262,7 @@ not_negative:
 #else // _MODSLONG_ASM
 
 long
-_modslong (long a, long b)
+_modslong (long a, long b) __SDCC_NONBANKED
 {
   long r;
 

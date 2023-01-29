@@ -35,6 +35,12 @@
      mcs51 small stack-auto
 */
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
@@ -734,7 +740,7 @@ _mullong (long a, long b)
 }
 #else
 long
-_mullong (long a, long b)
+_mullong (long a, long b) __SDCC_NONBANKED
 {
         union bil t;
 

@@ -33,7 +33,7 @@
 
 
 /* convert signed long long to float */
-float __slonglong2fs (signed long long sll) {
+float __slonglong2fs (signed long long sll) __SDCC_FLOAT_NONBANKED {
   if (sll<0) 
     return -__ulonglong2fs(-sll);
   else 

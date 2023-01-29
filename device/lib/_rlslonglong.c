@@ -28,9 +28,15 @@
 
 #include <stdint.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #ifdef __SDCC_LONGLONG
 
-long long _rlslonglong(long long l, char s)
+long long _rlslonglong(long long l, char s) __SDCC_NONBANKED
 {
 	return((unsigned long long)(l) << s);
 }

@@ -92,6 +92,10 @@ float __uint2fs (unsigned int) __SDCC_FLOAT_NONBANKED;
 float __sint2fs (signed int) __SDCC_FLOAT_NONBANKED;
 float __ulong2fs (unsigned long) __SDCC_FLOAT_NONBANKED;
 float __slong2fs (signed long) __SDCC_FLOAT_NONBANKED;
+#ifdef __SDCC_LONGLONG
+float __ulonglong2fs (unsigned long long) __SDCC_FLOAT_NONBANKED;
+float __slonglong2fs (signed long long) __SDCC_FLOAT_NONBANKED;
+#endif
 unsigned char __fs2uchar (float) __SDCC_FLOAT_NONBANKED;
 signed char __fs2schar (float) __SDCC_FLOAT_NONBANKED;
 unsigned int __fs2uint (float) __SDCC_FLOAT_NONBANKED;

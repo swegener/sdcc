@@ -36,6 +36,12 @@
      mcs51 large
 */
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_ds390)
 #    if !defined(__SDCC_STACK_AUTO)
@@ -61,7 +67,7 @@
 #pragma save
 #pragma less_pedantic
 int
-_mulint (int a, int b)
+_mulint (int a, int b) __SDCC_NONBANKED
 {
   a*b; // hush the compiler
 
@@ -223,7 +229,7 @@ union uu {
 #endif
 
 int
-_mulint (int a, int b)
+_mulint (int a, int b) __SDCC_NONBANKED
 {
 #if !defined(__SDCC_STACK_AUTO) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_ds390))	// still needed for large
 	union uu __xdata *x;

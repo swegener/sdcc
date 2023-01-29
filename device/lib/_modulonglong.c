@@ -30,12 +30,18 @@
 
 #include <stdint.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #ifdef __SDCC_LONGLONG
 
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
 unsigned long long
-_modulonglong (unsigned long long a, unsigned long long b)
+_modulonglong (unsigned long long a, unsigned long long b) __SDCC_NONBANKED
 {
   unsigned char count = 0;
 

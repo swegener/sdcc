@@ -29,6 +29,12 @@
 
 #include <sdcc-lib.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if _SDCC_MANGLES_SUPPORT_FUNS
 unsigned long _divulong (unsigned long x, unsigned long y);
 #endif
@@ -256,7 +262,7 @@ not_negative:
 #else // _DIVSLONG_ASM
 
 long
-_divslong (long x, long y)
+_divslong (long x, long y) __SDCC_NONBANKED
 {
   long r;
 

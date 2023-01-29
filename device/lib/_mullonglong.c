@@ -28,9 +28,15 @@
 
 #include <stdint.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #ifdef __SDCC_LONGLONG
 
-long long _mullonglong(long long ll, long long lr)
+long long _mullonglong(long long ll, long long lr) __SDCC_NONBANKED
 {
   unsigned long long ret = 0ull;
   unsigned char i, j;

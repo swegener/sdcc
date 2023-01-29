@@ -29,6 +29,12 @@
 
 #include <sdcc-lib.h>
 
+#ifdef __SDCC_mcs51
+#define __SDCC_NONBANKED __nonbanked
+#else
+#define __SDCC_NONBANKED
+#endif
+
 #if _SDCC_MANGLES_SUPPORT_FUNS
 unsigned unsigned _moduint (unsigned a, unsigned b);
 #endif
@@ -200,7 +206,7 @@ not_negative:
 
 #else  // _MODSINT_ASM_
 
-int _modsint (int a, int b)
+int _modsint (int a, int b) __SDCC_NONBANKED
 {
   register int r;
 

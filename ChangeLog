@@ -1,3 +1,29 @@
+2023-01-29 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/include/float.h,
+	  device/lib/_divsint.c,
+	  device/lib/_divslong.c,
+	  device/lib/_divslonglong.c,
+	  device/lib/_divuint.c,
+	  device/lib/_divulong.c,
+	  device/lib/_divulonglong.c,
+	  device/lib/_modsint.c,
+	  device/lib/_modslong.c,
+	  device/lib/_modslonglong.c,
+	  device/lib/_moduint.c,
+	  device/lib/_modulong.c,
+	  device/lib/_modulonglong.c,
+	  device/lib/_mulint.c,
+	  device/lib/_mullong.c,
+	  device/lib/_mullonglong.c,
+	  device/lib/_rlslonglong.c,
+	  device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rrulonglong.c,
+	  device/lib/_slonglong2fs.c,
+	  device/lib/_ulonglong2fs.c:
+	  Add conditional `__nonbanked` to fix mcs51 library build.
+
 2023-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCerr.c,

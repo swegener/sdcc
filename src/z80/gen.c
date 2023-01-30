@@ -5983,7 +5983,7 @@ genCall (const iCode *ic)
     }
 
   // Check if we can do tail call optimization.
-  else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
+  else if (currFunc && !IFFUNC_ISISR (currFunc->type) &&
     !ic->parmBytes &&
     (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8 - for z80 and r3ka this will be slower and bigger than without tail call optimization, but it saves RAM */) &&
     !ic->localEscapeAlive &&
@@ -6210,7 +6210,7 @@ genCall (const iCode *ic)
         }
       else
         {
-          if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
+          if (currFunc && isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
             {
               wassert (0);
               /* todo: implement */

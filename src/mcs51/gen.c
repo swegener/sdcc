@@ -2406,7 +2406,7 @@ saveRegisters (iCode * lic)
         return;
     }
 
-  if (IFFUNC_CALLEESAVES (_G.currentFunc->type))
+  if (_G.currentFunc && IFFUNC_CALLEESAVES (_G.currentFunc->type))
     {
       /* save all registers if the caller is callee_saves and the callee is not */
       rsave = bitVectCopy (mcs51_allBankregs ());
@@ -2543,7 +2543,7 @@ unsaveRegisters (iCode * ic)
   int i;
   bitVect *rsave;
 
-  if (IFFUNC_CALLEESAVES (_G.currentFunc->type))
+  if (_G.currentFunc && IFFUNC_CALLEESAVES (_G.currentFunc->type))
     {
       /* restore all registers if the caller is callee_saves and the callee is not */
       rsave = bitVectCopy (mcs51_allBankregs ());

@@ -13,6 +13,9 @@
 	  device/lib/sprintf.c,
 	  device/lib/vprintf.c:
 	  Fix bug #3497.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3249.c:
+	  Fix bug #3249.
 
 2023-01-29 Benedikt Freisen <b.freisen AT gmx.net>
 

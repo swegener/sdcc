@@ -3733,7 +3733,7 @@ genCall (const iCode *ic)
       freeAsmop (IC_RESULT (ic));
     }
   // Check if we can do tail call optimization.
-  else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
+  else if (currFunc && !IFFUNC_ISISR (currFunc->type) &&
     (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.bytes[0].byteu.reg->rIdx) &&
       (IC_RESULT (ic)->aop->size <= 1 || aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.bytes[1].byteu.reg->rIdx)) &&
       (IC_RESULT (ic)->aop->size <= 2 || aopInReg (IC_RESULT (ic)->aop, 2, aopRet (ftype)->aopu.bytes[2].byteu.reg->rIdx)) &&
@@ -3969,7 +3969,7 @@ genCall (const iCode *ic)
     }
   else
     {
-      if (isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
+      if (currFunc && isFuncCalleeStackCleanup (currFunc->type) && prestackadjust && !IFFUNC_ISNORETURN (ftype)) // Copy return value into correct location on stack for tail call optimization.
         {
           wassert (options.model != MODEL_LARGE && !IFFUNC_ISCOSMIC (ftype));
           bool use_y = stm8IsParmInCall(ftype, "x");

@@ -217,7 +217,7 @@ enum {
   W_C89_NO_FLEXARRAY            = 187, /* ISO C90 does not support flexible array members */
   E_FLEXARRAY_NOTATEND          = 188, /* flexible array member not at end of struct */
   E_FLEXARRAY_INEMPTYSTRCT      = 189, /* flexible array in otherwise empty struct */
-  W_EMPTY_SOURCE_FILE           = 190, /* ISO C forbids an empty source file */
+  W_EMPTY_TRANSLATION_UNIT      = 190, /* ISO C forbids an empty translation unit */
   W_BAD_PRAGMA_ARGUMENTS        = 191, /* #pragma %s: bad argument(s); pragma ignored */
   E_BAD_RESTRICT                = 192, /* Only object pointers may be qualified with 'restrict' */
   E_BAD_INLINE                  = 193, /* Only functions may be qualified with 'inline' */

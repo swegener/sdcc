@@ -5911,7 +5911,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
     case PARAM:
       werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__, "node PARAM shouldn't be processed here");
       /* but in processParms() */
-      return tree;
+      goto errorTreeReturn;
     case INLINEASM:
       formatInlineAsm (tree->values.inlineasm);
       TTYPE (tree) = TETYPE (tree) = NULL;

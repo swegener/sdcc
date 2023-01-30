@@ -19,6 +19,11 @@
 	  Fix bug #3249.
 	* support/regression/tests/inline.c:
 	  Disable a test for host, which fails on GNU/Linux on aarch64 using GCC 12.2.
+	* src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h:
+	  Fix error message test for empty translation units.
 
 2023-01-29 Benedikt Freisen <b.freisen AT gmx.net>
 

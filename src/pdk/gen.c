@@ -4334,6 +4334,21 @@ genPointerSet (iCode *ic)
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
   bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
 
+  sym_link *type = operandType (left);
+  int ptype = (IS_PTR (type) && !IS_FUNC (type->next)) ? DCL_TYPE (type) : PTR_TYPE (SPEC_OCLS (getSpec (type)));
+
+  if (left->aop->type == AOP_IMMD && ptype == GPOINTER && IS_SYMOP (left) && OP_SYMBOL (left)->remat)
+    ptype = left->aop->aopu.code ? CPOINTER : POINTER;
+  else if (left->aop->type == AOP_STL)
+    ptype = POINTER;
+
+  if (ptype == CPOINTER)
+    {
+      if (!regalloc_dry_run)
+        werror (W_CODEMEM_WRITE);
+      goto release;
+    }
+
 #if 0 // TODO: Implement alignment requirements - idxm needs 16-bit-aligned operand
   if (left->aop->type == AOP_DIR && TARGET_IS_PDK16 && !bit_field)
     {
@@ -4684,6 +4699,7 @@ genPointerSet (iCode *ic)
   if (pushed_a)
     popAF ();
 
+release:
   freeAsmop (right);
   freeAsmop (left);
 }

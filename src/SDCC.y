@@ -470,7 +470,7 @@ declaration
          /* add the specifier list to the id */
          symbol *sym , *sym1;
 
-         bool autocandidate = options.std_c2x && SPEC_SCLS($1) == S_AUTO;
+         bool autocandidate = options.std_c2x && IS_SPEC ($1) && SPEC_SCLS($1) == S_AUTO;
 
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
              sym_link *lnk = copyLinkChain($1);

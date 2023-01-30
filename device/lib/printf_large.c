@@ -38,8 +38,6 @@
 #include <stdio.h>
 #include <sdcc-lib.h>
 
-#pragma std_c11
-
 #define PTR value.ptr
 
 #ifdef __SDCC_ds390

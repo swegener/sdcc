@@ -7,6 +7,12 @@
 	  Disable a rule that uses not-yet-implemented notUsed.
 	* src/pdk/gen.c:
 	  Fix a pdk issue similar to mcs51 bug #3023.
+	* src/SDCC.y,
+	  device/lib/printf_large.c,
+	  device/lib/printfl.c,
+	  device/lib/sprintf.c,
+	  device/lib/vprintf.c:
+	  Fix bug #3497.
 
 2023-01-29 Benedikt Freisen <b.freisen AT gmx.net>
 

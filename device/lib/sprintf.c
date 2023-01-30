@@ -30,8 +30,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#pragma std_c11 // Workaround for bug #3497
-
 static void
 put_char_to_string (char c, void* p) _REENTRANT
 {

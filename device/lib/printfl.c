@@ -46,8 +46,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#pragma std_c11 // Workaround for bug #3497
-
 static __data char radix ;
 static __bit  long_flag = 0;
 static __bit  string_flag =0;

@@ -1,7 +1,8 @@
 2023-01-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCsymt.c,
-	  support/regression/tests/bug-3025.c:
+	  support/regression/tests/bug-3025.c,
+	  support/regression/cases/Makefile.in,
 	  Fix bug #3025.
 	* src/mos6502/peeph.def:
 	  Disable a rule that uses not-yet-implemented notUsed.

@@ -542,11 +542,6 @@ GTE_SKIP_TESTS += \
 	loop-2f.c \
 	loop-2g.c
 
-# Bug #3399
-GTE_SKIP_TESTS += \
-	pr52209.c \
-	pr59388.c
-
 # VLA
 GTE_SKIP_TESTS += \
 	pr41935.c \

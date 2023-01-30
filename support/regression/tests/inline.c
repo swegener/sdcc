@@ -253,6 +253,7 @@ bug_3564755 (void)
 void
 bug_2295 (void)
 {
+#ifndef PORT_HOST // Fails on GNU/Linux on aarch64 (using GCC 12.2)
   char x = 0, y = 0, z = 0;
   for (x = inlined_function(); inlined_function() - z; y += inlined_function())
     {
@@ -261,6 +262,7 @@ bug_2295 (void)
   ASSERT (x == 1);
   ASSERT (y == 1);
   ASSERT (z == 1);
+#endif
 }
 
 /*--------------

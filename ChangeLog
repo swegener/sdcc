@@ -1,3 +1,11 @@
+2023-01-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-3025.c:
+	  Fix bug #3025.
+	* src/mos6502/peeph.def:
+	  Disable a rule that uses not-yet-implemented notUsed.
+
 2023-01-29 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* device/include/float.h,

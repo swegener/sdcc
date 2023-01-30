@@ -649,7 +649,7 @@ struct
      "enumeration constant outside the range of int requires ISO C2X or later", 0 },
   { E_Z88DK_CALLEE_VARARG, ERROR_LEVEL_ERROR,
      "__z88dk_callee with variable arguments not supported", 0 },
-  {W_CODEMEM_WRITE, ERROR_LEVEL_WARNING, // This is a warning, not an error, since writing to a string literal is syntactically correct, but has undefined behaviour. So if the code is never executed, the program is still correct and should work.
+  { W_CODEMEM_WRITE, ERROR_LEVEL_WARNING, // This is a warning, not an error, since writing to a string literal is syntactically correct, but has undefined behaviour. So if the code is never executed, the program is still correct and should work.
      "attempt to write to read-only-memory", 0},
 };
 

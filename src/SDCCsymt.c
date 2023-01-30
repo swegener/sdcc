@@ -2353,10 +2353,10 @@ getAddrspace (sym_link *type)
 /* computeTypeOr - computes the resultant type from two types       */
 /*------------------------------------------------------------------*/
 static sym_link *
-computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
+computeTypeOr (sym_link *etype1, sym_link *etype2, sym_link *reType)
 {
   /* sanity check */
-  assert ((IS_CHAR (etype1) || IS_BOOLEAN (etype1)) &&
+  wassert ((IS_CHAR (etype1) || IS_BOOLEAN (etype1)) &&
           (IS_CHAR (etype2) || IS_BOOLEAN (etype2)));
 
   if (SPEC_USIGN (etype1) == SPEC_USIGN (etype2))
@@ -2633,7 +2633,8 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
             {
             case '|':
             case '^':
-              return computeTypeOr (etype1, etype2, reType);
+              if (!IS_BITFIELD (etype1) && !IS_BITFIELD (etype2))
+                return computeTypeOr (etype1, etype2, reType);
             case '&':
             case BITWISEAND:
               if (SPEC_USIGN (etype1) != SPEC_USIGN (etype2))

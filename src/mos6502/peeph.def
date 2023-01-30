@@ -19,19 +19,19 @@ replace restart {
 }
 
 replace restart {
-        sta	%1
-        stx	%2
+	sta	%1
+	stx	%2
 	lda     %1
 	ldx     %2
 } by {
-        sta	%1
-        stx	%2
+	sta	%1
+	stx	%2
     ; Peephole Function Entry  - eliminated redundant lda/ldx
 } if notVolatile(%1), notVolatile(%2)
 
 replace restart {
-      	ldx	%1
-        ldy	%2
+	ldx	%1
+	ldy	%2
 	clc
 	txa
 	adc	%3
@@ -46,32 +46,33 @@ replace restart {
 	clc
 	adc	%3
 	sta	%4
-        lda	%2
+	lda	%2
     ; Peephole genpointer YX   - replaced tya with lda
-	adc     %5
+	adc	%5
 	sta	%6
 }
 
-replace restart {
-      	lda	%1
-        ldx	%2
-	clc
-	adc	%3
-	sta	%4
-	txa
-	adc     %5
-	sta	%6
-} by {
-	lda	%1
-    ; Peephole genpointer XA   - eliminated ldx
-	clc
-	adc	%3
-	sta	%4
-        lda	%2
-    ; Peephole genpointer XA   - replaced txa with lda
-	adc     %5
-	sta	%6
-} if notUsed('x')
+// TODO: Enable when notUsed() gets implemented!
+//replace restart {
+//	lda	%1
+//	ldx	%2
+//	clc
+//	adc	%3
+//	sta	%4
+//	txa
+//	adc	%5
+//	sta	%6
+//} by {
+//	lda	%1
+//	; Peephole genpointer XA   - eliminated ldx
+//	clc
+//	adc	%3
+//	sta	%4
+//	lda	%2
+//	; Peephole genpointer XA   - replaced txa with lda
+//	adc	%5
+//	sta	%6
+//} if notUsed('x')
 
 
 ////////////////////////////////////////////////////////

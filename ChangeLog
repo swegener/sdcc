@@ -1,3 +1,8 @@
+2023-01-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCglue.c:
+	  Fix bug #2837 for z80 and related.
+
 2023-01-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCsymt.c,

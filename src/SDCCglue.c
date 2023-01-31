@@ -2075,8 +2075,17 @@ emitMaps (void)
 void
 flushStatics (void)
 {
+  if (!setFirstItem (statsg->syms))
+    return;
+
+  if (options.const_seg)
+    dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
+
   emitStaticSeg (statsg, codeOutBuf);
-  statsg->syms = NULL;
+  statsg->syms = 0;
+
+  if (options.const_seg)
+    dbuf_tprintf (&code->oBuf, "\t!area\n", options.code_seg);
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,8 @@
+2023-02-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3249.c:
+	  Do not test non-intrinsic named address space areas for mcs51, as DATA is overwritten by stack there.
+
 2023-01-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCglue.c:

@@ -225,6 +225,10 @@ EXCLUDE_mcs51-large-stack-auto += \
 	EXCLUDE_mcs51-large-stack-auto += \
 	gte_pr58365
 
+# SDCC Bug #3540
+	EXCLUDE_mcs51-small-stack-auto += \
+	gte_pr58365
+
 # Target does not yet support struct/union return
 EXCLUDE_hc08 += \
 	gte_991019-1 \

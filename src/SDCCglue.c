@@ -1110,6 +1110,10 @@ printIvalStruct (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s *oB
     }
   else
     {
+      // Hack to avoid the hack below (the one that fixed bug #2643) breaking zero-length bit-fields as first member of a struct (bug #3542).
+      if(IS_BITFIELD (sflds->type) && !SPEC_BLEN (sflds->etype))
+        sflds = sflds->next;
+
       while (sflds)
         {
           unsigned int oldoffset = sflds->offset;

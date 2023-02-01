@@ -44,14 +44,9 @@ testBitfield (void)
   ASSERT (noPad.q == 20);
   ASSERT (noPad.s == -1 || noPad.s == 1);
   ASSERT (noPad.t == -1 || noPad.t == 127);
-#if 0
-  __printd(initialNoPad[0].b);
-  __prints("\n");
-  __printd(initialNoPad[1].b);
-  __prints("\n");
+
   ASSERT (initialNoPad[0].b == 2);
   ASSERT (initialNoPad[1].b == 4);
-#endif
 #endif
 }
 

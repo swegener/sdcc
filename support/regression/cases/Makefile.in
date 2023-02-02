@@ -782,7 +782,8 @@ QC_SKIP_TESTS += \
 
 # Takes far too much time for SDCC targets
 QC_SKIP_TESTS += \
-	0041-queen.c
+	0041-queen.c \
+	0042-prime.c
 
 QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
 

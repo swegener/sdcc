@@ -1,3 +1,8 @@
+2023-02-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/cases/Makefile.in:
+	  Disable a test that often times out on slower machines in the compile farm (due a large number of slow operations in a loop).
+
 2023-02-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3249.c:

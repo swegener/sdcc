@@ -1767,7 +1767,7 @@ processBlockVars (ast * tree, int *stack, int action)
 /*                 expression                                  */
 /*-------------------------------------------------------------*/
 bool
-constExprTree (ast * cexpr)
+constExprTree (ast *cexpr)
 {
   if (!cexpr)
     {
@@ -1830,6 +1830,10 @@ constExprTree (ast * cexpr)
       if (cexpr->opval.op == '&')
         {
           return TRUE;
+        }
+      if (cexpr->opval.op == PTR_OP && !IS_ARRAY (TTYPE (cexpr)))
+        {
+          return FALSE;
         }
       if (cexpr->opval.op == CALL || cexpr->opval.op == PCALL)
         {

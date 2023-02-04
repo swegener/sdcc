@@ -9,6 +9,10 @@
 	  doc/sdccman.lyx,
 	  support/regression/tests/snprintf.c.in:
 	  Fix endiannness of %p output, based on patch #457 by Basil Hussain, bug #3543.
+	* src/SDCCast.c,
+	  src/SDCCglue.c,
+	  support/valdiag/tests/bug-3060.c:
+	  Fix bug #3060.
 
 2023-02-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -249,7 +249,7 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
                   if (!constExprTree (ival))
                     {
                       werrorfl (ival->filename, ival->lineno, E_CONST_EXPECTED, "found expression");
-                      // but try to do it anyway
+                      continue; // Don't even try to do it anyway to avoid segfaults later.
                     }
                 }
 

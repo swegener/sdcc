@@ -13,6 +13,8 @@
 	  src/SDCCglue.c,
 	  support/valdiag/tests/bug-3060.c:
 	  Fix bug #3060.
+	* src/SDCCpeeph.c:
+	  Fix bug #3545.
 
 2023-02-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

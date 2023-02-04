@@ -3693,7 +3693,7 @@ buildLabelRefCountHash (lineNode *head)
         continue;
 
       /* Padauk skip instructions */
-      if (TARGET_PDK_LIKE &&
+      if (TARGET_PDK_LIKE && !line->isInline &&
         (!strncmp(line->line, "ceqsn", 5) || !strncmp(line->line, "cneqsn", 6) ||
         !strncmp(line->line, "t0sn", 4) || !strncmp(line->line, "t1sn", 4) ||
         !strncmp(line->line, "izsn", 4) || !strncmp(line->line, "dzsn", 4)))

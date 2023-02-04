@@ -1,5 +1,5 @@
 /** tests for snprintf
-  type: INT, LONG, STRING, FLOAT
+  type: INT, LONG, STRING, FLOAT, PTR
 */
 #include <testfwk.h>
 #include <string.h>
@@ -66,9 +66,9 @@ struct
   {0xffffFFFF, "%lo(oct)", "37777777777(oct)"},
 
   // do we want to check these:
-#if defined(SDCC) && !defined(SDCC_z80) && CHECK_B
+#if defined(__SDCC) && !defined(__SDCC_z80) && CHECK_B
   {0xfedcba98, "0x%bX%bX%bx%bx", "0xFEDCba98"}, /* non-std: print as bytes! */
-#elif defined(SDCC) && defined(SDCC_z80) && CHECK_B
+#elif defined(__SDCC) && defined(__SDCC_z80) && CHECK_B
   {0xfedcba98, "0x%bX%bX%bx%bx", "0x98BAdcfe"}, /* non-std: print as bytes! */
 #endif
 };
@@ -107,6 +107,58 @@ struct
 #else
   {1.0, "%f", "1.000000"},
   {1.96, "%3.1f", "2.0"},
+#endif
+};
+
+#elif defined(PTR)
+
+#ifndef PORT_HOST
+#define PTR_NON_STD
+#endif
+
+#if defined(__SDCC) && (defined(__SDCC_mcs51) || defined(__SDCC_ds390))
+__idata unsigned char __at(0xAA) var_idata;
+__pdata unsigned char __at(0xAA) var_pdata;
+__xdata unsigned char __at(0xAABB) var_xdata;
+__code unsigned char __at(0xAABB) var_code;
+#endif
+
+struct
+{
+  void *arg;
+  char *fmt;
+  char *result;
+} static const cases[] = {
+  // arg, fmt,    result
+#if defined(__SDCC) && defined(__SDCC_ds390)
+  // Special cases for ds390 covering different address spaces.
+  {var_idata, "%p", "I:0x0000aa"},
+  {var_pdata, "%p", "P:0x0000aa"},
+  {var_xdata, "%p", "X:0x00aabb"},
+  {var_code, "%p", "C:0x00aabb"},
+#ifdef PTR_NON_STD
+  {var_idata, "%P", "I:0x0000AA"},
+  {var_pdata, "%P", "P:0x0000AA"},
+  {var_xdata, "%P", "X:0x00AABB"},
+  {var_code, "%P", "C:0x00AABB"},
+#endif
+#elif defined(__SDCC) && defined(__SDCC_mcs51)
+  // Special cases for mcs51 covering different address spaces.
+  {var_idata, "%p", "I:0xaa"},
+  {var_pdata, "%p", "P:0xaa"},
+  {var_xdata, "%p", "X:0xaabb"},
+  {var_code, "%p", "C:0xaabb"},
+#ifdef PTR_NON_STD
+  {var_idata, "%P", "I:0xAA"},
+  {var_pdata, "%P", "P:0xAA"},
+  {var_xdata, "%P", "X:0xAABB"},
+  {var_code, "%P", "C:0xAABB"},
+#endif
+#else
+  {(void *)0xAABB, "%p", "0xaabb"},
+#ifdef PTR_NON_STD
+  {(void *)0xAABB, "%P", "0xAABB"},
+#endif
 #endif
 };
 

@@ -36,6 +36,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdbit.h>
 #include <sdcc-lib.h>
 
 #define PTR value.ptr
@@ -653,6 +654,11 @@ get_conversion_spec:
           OUTPUT_2DIGITS( value.byte[1] );
         }
         OUTPUT_2DIGITS( value.byte[0] );
+#elif __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
+        OUTPUT_CHAR('0', p);
+        OUTPUT_CHAR('x', p);
+        OUTPUT_2DIGITS( value.byte[0] );
+        OUTPUT_2DIGITS( value.byte[1] );
 #else
         OUTPUT_CHAR('0', p);
         OUTPUT_CHAR('x', p);

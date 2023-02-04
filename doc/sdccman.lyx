@@ -2809,6 +2809,12 @@ In 4.2.13, for the sm83 port, __sfr addresses need to be specified using the
  full 16-bit address.
 \end_layout
 
+\begin_layout Itemize
+In 4.2.14, byte order in output from the %p specifier of printf()-family functions
+ was corrected for big-endian platforms (stm8, hc08, s08, mos6502) to match
+ uintptr_t.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

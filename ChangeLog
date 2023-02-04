@@ -4,6 +4,11 @@
 	  src/SDCCerr.c,
 	  src/SDCC.y:
 	  Warn on deprecated _sdcc_external_startup, RFE #868.
+	* device/lib/printf_large.c,
+	  .version,
+	  doc/sdccman.lyx,
+	  support/regression/tests/snprintf.c.in:
+	  Fix endiannness of %p output, based on patch #457 by Basil Hussain, bug #3543.
 
 2023-02-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

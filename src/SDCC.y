@@ -2175,6 +2175,8 @@ function_definition
             $2 = createFunctionDecl($2);
             if ($2)
                 {
+                	if (!strcmp ($2->name, "_sdcc_external_startup")) // The rename (and semantics change happened) in SDCC 4.2.10. Keep this warning for two major releases afterwards.
+                		werror (W__SDCC_EXTERNAL_STARTUP_DEF);
                     if (FUNC_ISCRITICAL ($2->type))
                         inCriticalFunction = 1;
                     // warn for loss of calling convention for inlined functions.

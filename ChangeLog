@@ -1,3 +1,10 @@
+2023-02-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCC.y:
+	  Warn on deprecated _sdcc_external_startup, RFE #868.
+
 2023-02-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/cases/Makefile.in:

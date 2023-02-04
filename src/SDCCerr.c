@@ -651,6 +651,8 @@ struct
      "__z88dk_callee with variable arguments not supported", 0 },
   { W_CODEMEM_WRITE, ERROR_LEVEL_WARNING, // This is a warning, not an error, since writing to a string literal is syntactically correct, but has undefined behaviour. So if the code is never executed, the program is still correct and should work.
      "attempt to write to read-only-memory", 0},
+  { W__SDCC_EXTERNAL_STARTUP_DEF, ERROR_LEVEL_WARNING,
+     "_sdcc_external_startup function definition - possible deprecated old-style variant of __sdcc_external_startup", 0},
 };
 
 /* -------------------------------------------------------------------------------

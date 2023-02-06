@@ -112,8 +112,8 @@ _exit::
         .area   _GSINIT
 gsinit::
         ; Default-initialized global variables.
-        ld      de, #s__DATA
-        ld	bc, #l__DATA + 0x0101
+        ld      hl, #s__DATA
+        ld      bc, #l__DATA + 0x0101
         xor     a, a
         jr      loop_implicit_compare
 loop_implicit:

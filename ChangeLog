@@ -3,6 +3,10 @@
 	* src/SDCCicode.c,
 	  support/regression/tests/bug-3352.c:
 	  Fix bug #3352.
+	* device/lib/sm83/crt0.s:
+	  Fix bug #3548.
+	* support/regression/tests/gcc-torture-execute-pr91137.c:
+	  Fix bug #3549.
 
 2023-02-05 Philipp Klaus Krause <philipp@colecovision.eu>
 

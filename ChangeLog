@@ -7,6 +7,8 @@
 	  Fix bug #3548.
 	* support/regression/tests/gcc-torture-execute-pr91137.c:
 	  Fix bug #3549.
+	* support/regression/tests/bug1723128.c:
+	  Fix bug #3550.
 
 2023-02-05 Philipp Klaus Krause <philipp@colecovision.eu>
 

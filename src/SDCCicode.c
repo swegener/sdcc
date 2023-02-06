@@ -1361,7 +1361,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         retval = operandFromValue (valCastLiteral (type, operandLitValue (left) * operandLitValue (right), operandLitValueUll (left) * operandLitValueUll (right)), false);
       break;
     case '/':
-      if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0 && operandLitValueUll (right) == 0)
+      if (!IS_FLOAT (operandType (right)) && (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0 && operandLitValueUll (right) == 0)
         {
           werror (E_DIVIDE_BY_ZERO);
           retval = right;
@@ -1384,7 +1384,12 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
                                                        (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))), false);
         }
       else
-        retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)), false);
+        {
+          if (IS_FLOAT (operandType (right))) // Avoid division by 0 for right operand close to 0.
+            retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValue (left) / operandLitValue (right)), false);
+          else
+            retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)), false);
+        }
       break;
     case '%':
       if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0 && operandLitValueUll (right) == 0)

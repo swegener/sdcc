@@ -1,4 +1,4 @@
-static unsigned char * volatile sif;
+volatile static unsigned char *sif;
 
 void
 _putchar(unsigned char c)

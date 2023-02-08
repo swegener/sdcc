@@ -1,4 +1,4 @@
-/* bug-3368.c
+/* bug-3372.c
    A bug in integer promotion for unary +
  */
 

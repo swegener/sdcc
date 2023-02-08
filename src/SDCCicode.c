@@ -3547,8 +3547,10 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
       if (is_structparm)
         {
           sym_link *ptr = newLink (DECLARATOR);
-          DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec(operandType(pval))));
+          DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec (operandType (pval))));
           ptr->next = copyLinkChain (parms->ftype);
+          if (IS_PTR (operandType (pval)))
+            pval = geniCodeCast (ptr, pval, true);
           setOperandType (pval, ptr);
         }
       // now decide whether to push or assign
@@ -3615,10 +3617,11 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
             ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
           // update the stack adjustment
-          *stack += getSize (IS_ARRAY (parms->ftype) ? aggrToPtr (parms->ftype, false) : parms->ftype);
-          if (IFFUNC_ISSMALLC (ftype) && !IS_AGGREGATE (parms->ftype) && getSize (parms->ftype) == 1) // SmallC calling convention passes 8-bit parameters as 16-bit values.
+          sym_link *parmtype = IS_ARRAY (parms->ftype) ? aggrToPtr (parms->ftype, false) : parms->ftype;
+          *stack += getSize (parmtype);
+          if (IFFUNC_ISSMALLC (ftype) && getSize (parmtype) == 1) // SmallC calling convention passes 8-bit parameters as 16-bit values.
             (*stack)++;
-          if (TARGET_PDK_LIKE && !IS_AGGREGATE (parms->ftype) && getSize (parms->ftype) % 2) // So does pdk due to stack alignment requirements.
+          if (TARGET_PDK_LIKE && getSize (parmtype) % 2) // So does pdk due to stack alignment requirements.
             (*stack)++;
           ADDTOCHAIN (ic);
         }

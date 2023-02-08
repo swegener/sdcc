@@ -1,3 +1,10 @@
+2023-02-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCicode.c,
+	  support/regression/tests/bug-2776.c,
+	  support/regression/tests/bug-3368.c:
+	  Fix bugs #2776, #3378.
+
 2023-02-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,

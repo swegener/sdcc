@@ -1,4 +1,4 @@
-__sfr __at 0x03 sif;
+__sfr __at 0xff03 sif;
 
 void
 _putchar(unsigned char c)

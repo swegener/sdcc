@@ -1,6 +1,6 @@
 /*
    bug-2643.c
-   char was the smae type as either signed char or unsigned char.
+   char was the same type as either signed char or unsigned char.
  */
 
 #include <testfwk.h>

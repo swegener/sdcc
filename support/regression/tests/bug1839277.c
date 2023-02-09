@@ -15,11 +15,11 @@ testBug1839277 (void)
 {
   const char __code* const * volatile p;
   unsigned long v = 0;
-//first subexpression 'Values[0].Name' is evaluted as follows:
+//first subexpression 'Values[0].Name' is evaluated as follows:
 //mov     r2,#_Values
 //mov     r3,#(_Values >> 8)
 //mov     r4,#(_Values >> 16) ;this is wrong - should be 'mov r4,#128' shouldn't it?
-//second subexpression 'Values[1].Name' is evaluted as follows:
+//second subexpression 'Values[1].Name' is evaluated as follows:
 //mov     a,#0x04
 //add     a,#_Values
 //mov     r2,a

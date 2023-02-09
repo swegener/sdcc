@@ -24,7 +24,7 @@
 
 
 // Test for size = 1 byte
-// It must assing global variable from input param and return 0
+// It must assign global variable from input param and return 0
 // The case for STM8 can be triggered by a local array of size 1 or a local volatile
 static volatile char globalValue;
 uint8_t 

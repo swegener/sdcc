@@ -1,5 +1,5 @@
 /* bug-2708.c
-   The STM8 peephole optimizer didn't like indirect adressing modes in inline asm.
+   The STM8 peephole optimizer didn't like indirect addressing modes in inline asm.
  */
 
 #include <testfwk.h>

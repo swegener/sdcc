@@ -3,7 +3,7 @@
 /* In addition to the usual promotion rules that apply to the operands */
 /* to all operators, the conditional operator has some special rules   */
 /* that apply to pointer types (as well as arrays, since an array      */
-/* reference is interchangable with a pointer to the first element):   */
+/* reference is interchangeable with a pointer to the first element):   */
 /*   1. If the operands are a pointer and NULL, the resultant type     */
 /*      is that of the non-NULL pointer. NULL can be defined as either */
 /*      0 or (void *)0.                                                */

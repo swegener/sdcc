@@ -118,14 +118,14 @@ static void testSwap_16_ptr(void)
     {
         unsigned char c;
 
-        /* uglyness += 1 */
+        /* ugliness += 1 */
         c = *(0+(unsigned char _STATMEM *)&tt);
         *(0+(unsigned char _STATMEM *)&tt) = *(2+(unsigned char _STATMEM *)&tt);
         *(2+(unsigned char _STATMEM *)&tt) = c;
         c = *(1+(unsigned char _STATMEM *)&tt);
         *(1+(unsigned char _STATMEM *)&tt) = *(3+(unsigned char _STATMEM *)&tt);
         *(3+(unsigned char _STATMEM *)&tt) = c;
-        /* uglyness -= 1 */
+        /* ugliness -= 1 */
     }
     ASSERT( tt == SWAP_16(TEST_VECT_32));
 #endif

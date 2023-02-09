@@ -1,7 +1,7 @@
 #include <testfwk.h>
 
 /* Bug #3260 caused typecast function pointers to pass all */
-/* parameters via the stack and not pass any paramter via  */
+/* parameters via the stack and not pass any parameter via  */
 /* register, even when some should have been passed via    */
 /* register. */
 

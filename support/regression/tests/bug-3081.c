@@ -1,5 +1,5 @@
 /* bug-3081.c
-   z80 backend inserted extra whitespace in call vie __z88dk_fastcall function pointer 
+   z80 backend inserted extra whitespace in call via __z88dk_fastcall function pointer 
    for --reserve-regs-iy, confusing peephole optimizer
  */
 

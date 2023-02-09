@@ -25,7 +25,7 @@ void f(int i)
 	else
 		e();
 
-	g(p); /* False "may be used before initialization" warning occoured here. */
+	g(p); /* False "may be used before initialization" warning occurred here. */
 }
 #endif
 

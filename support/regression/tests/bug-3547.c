@@ -1,5 +1,5 @@
 /* bug-3547.c
-   Codegen for sm83 could generate an "ex de, hl" (a Z80 instruction not supported on SM83) when passing a struct as function argumnet while register hl holds another variable.
+   Codegen for sm83 could generate an "ex de, hl" (a Z80 instruction not supported on SM83) when passing a struct as function argument while register hl holds another variable.
    This would then result in an error message from the assembler.
  */
 

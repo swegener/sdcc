@@ -22,7 +22,7 @@ int f(int argc, char **argv)
 {
     STEP = Basic_RND(0);
     do {
-        // A load of L into register pair de got optimized out, though it was still needed for the claculation of L + 50
+        // A load of L into register pair de got optimized out, though it was still needed for the calculation of L + 50
         Basic_PRINT((L + 50) / 100);
         L += STEP;
     } while (!(L > 3600));

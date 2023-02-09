@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-// Function declarations without protoypes no longer exist in C2X.
+// Function declarations without prototypes no longer exist in C2X.
 #pragma std_c99
 #pragma disable_warning 283
 

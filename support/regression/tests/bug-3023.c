@@ -8,7 +8,7 @@
 
 void f(void)
 {
-  *(char *)"c" = 0; // Undefined behviour if this ever gets executed. Should still compile, though.
+  *(char *)"c" = 0; // Undefined behaviour if this ever gets executed. Should still compile, though.
 }
 
 void

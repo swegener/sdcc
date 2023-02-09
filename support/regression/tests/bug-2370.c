@@ -1,6 +1,6 @@
 /*
    bug-2370.c
-   --reserve-regs-iy register allcoation issue.
+   --reserve-regs-iy register allocation issue.
 */
 
 #include <testfwk.h>

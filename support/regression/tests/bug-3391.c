@@ -1,6 +1,6 @@
 /*
    bug-3166.c
-   Due to a check in SDCCval.c using double instead of long long (thus loosing precision, 0x8000000000000000 was given the type of signed long long instead of unsigned long long.
+   Due to a check in SDCCval.c using double instead of long long (thus losing precision, 0x8000000000000000 was given the type of signed long long instead of unsigned long long.
  */
 
 #include <testfwk.h>

@@ -1,4 +1,4 @@
-/** Test the 8-bit bitwise operators under regsiter pressure
+/** Test the 8-bit bitwise operators under register pressure
     Meant to trigger use of 16-bit bitwise instructions for 8-bit operations.
 
  */

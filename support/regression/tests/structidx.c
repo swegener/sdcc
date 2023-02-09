@@ -1,4 +1,4 @@
-/* Code to generate code to see how structure indexs are evaluated.
+/* Code to generate code to see how structure indexes are evaluated.
    Originally part of gbdk/examples/gb/paint.c
 
  */

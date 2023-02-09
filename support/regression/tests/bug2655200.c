@@ -6,7 +6,7 @@
  *
  * SDCCclue.c(initPointer)
  * ... SPEC_SCLS (expr->left->etype) == S_PDATA)
- * was not handeled
+ * was not handled
  */
 
 #include <testfwk.h>

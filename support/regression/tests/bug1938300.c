@@ -159,8 +159,8 @@
     * allow to dedicate specific functions to be reentrant with a special
     * extended keyword (such as "reentrant" for Keil C51). The macro
     * Q_REENTRANT is defined to nothing by default, to work with ANSI-C
-    * compiliant compilers, but can be defined to "reentrant" to work with
-    * Keil C51 and perhpas other compilers.
+    * compliant compilers, but can be defined to "reentrant" to work with
+    * Keil C51 and perhaps other compilers.
     */
     #define Q_REENTRANT
 #endif
@@ -586,7 +586,7 @@ typedef struct QActiveTag {
 
 
 #if (Q_PARAM_SIZE != 0)
-    /** \brief Posts an event \a e directly to the event queue of the acitve
+    /** \brief Posts an event \a e directly to the event queue of the active
     * object \a prio using the First-In-First-Out (FIFO) policy. This
     * function briefly locks and unlocks interrupts to protect the
     * queue integrity.
@@ -609,7 +609,7 @@ typedef struct QActiveTag {
     */
     void QF_post(uint8_t prio, QSignal sig, QParam par) Q_REENTRANT;
 
-    /** \brief Posts an event \a e directly to the event queue of the acitve
+    /** \brief Posts an event \a e directly to the event queue of the active
     * object \a prio using the First-In-First-Out (FIFO) policy. This
     * function does NOT lock/unlock interrupts and is intended only
     * to be used inside critical sections (such as inside ISRs that cannot
@@ -745,7 +745,7 @@ void QF_start(void);
 * least one active object control block in QF_active[].
 *
 * \note When the Quantum Kernel (QK) is used as the underlying real-time
-* kernel for the QF, all platfrom dependencies are handled in the QK, so
+* kernel for the QF, all platform dependencies are handled in the QK, so
 * no porting of QF is necessary. In other words, you only need to recompile
 * the QF platform-independent code with the compiler for your platform, but
 * you don't need to provide any platform-specific implementation (so, no
@@ -767,7 +767,7 @@ void QF_run(void);
     * QF_onIdle() MUST unlock the interrupts internally, but not before
     * putting the CPU into the low-power mode. (Ideally, unlocking interrupts
     * and low-power mode should happen atomically). At the very least, the
-    * function MUST unlock interrupts, otherwise interrups will be locked
+    * function MUST unlock interrupts, otherwise interrupts will be locked
     * permanently.
     *
     * \note QF_onIdle() is not used in the PREEMPTIVE configuration. When
@@ -963,7 +963,7 @@ extern uint8_t volatile QF_readySet_;
 
 
 /*****************************************************************************
-* Product; QEP-nano implemenation
+* Product; QEP-nano implementation
 * Last Updated for Version; 3.4.01
 * Date of the Last Update;  Sep 18, 2007
 *

@@ -39,7 +39,7 @@
  *  The end result was "it just didn't work" with no real hints.  So if
  *  this happens to you, think about up-ing the stack size or moving your
  *  arrays out of automatic stack variables (defined inside {}s, which
- *  scope the variable) and out to staticly declared memory (aka "global"
+ *  scope the variable) and out to statically declared memory (aka "global"
  *  variables).
  *
  *  I hope this saves you the day it took me to write and debug.

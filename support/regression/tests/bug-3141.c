@@ -1,5 +1,5 @@
 /* bug 3141
-   a bug in code generation for stm8 large meory model (24-bit function pointers),
+   a bug in code generation for stm8 large memory model (24-bit function pointers),
    when returning function pointers fromk a function with a single 16-bit parameter while optimizing for code size.
  */
 #include <testfwk.h>

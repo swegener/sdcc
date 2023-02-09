@@ -1,7 +1,7 @@
 /*
    bug-2958.c
 
-   The pdk backends didn't handle comparions of __sfr for equality correctly, resulting in invalid asm.
+   The pdk backends didn't handle comparisons of __sfr for equality correctly, resulting in invalid asm.
 */
 
 #include <testfwk.h>

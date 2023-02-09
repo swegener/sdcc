@@ -76,7 +76,7 @@ struct sip_lcb
 {
 	UCHAR iState;			// State of this line
 	BOOLEAN bCallee;		// Caller or callee
-	UCHAR iTimer;			// No anser timer
+	UCHAR iTimer;			// No answer timer
 	UCHAR iRemoteRb;		// ringback tone type
 	BOOLEAN bHolding;
 	BOOLEAN bEarlyDlg;		// already received a 1xx response

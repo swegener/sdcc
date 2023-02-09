@@ -3,7 +3,7 @@
 
    Dead code elimination fails here, resulting in unconnected CFG and live-ranges.
    Those, in turn did mess up register allocation, which, then resulted in code-generation
-   failing. Fixed by workarounds in register allcoation.
+   failing. Fixed by workarounds in register allocation.
 
 */
 

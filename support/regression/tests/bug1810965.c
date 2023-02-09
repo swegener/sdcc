@@ -40,7 +40,7 @@ static void bar(void)
 {
 	enum foo_tag { e_foo };		//error 163: duplicate enum member 'e_foo'
 					//error 0: Duplicate symbol 'e_foo', symbol IGNORED
-					//error 51: typedef/enum 'foo_tag' duplicate. Previous definiton Ignored
+					//error 51: typedef/enum 'foo_tag' duplicate. Previous definition Ignored
 	volatile unsigned char a = e_foo;
 }
 

@@ -9,7 +9,7 @@ char c1 = 0, c2 = 1;
 void
 testEmptyWhile(void)
 {
-  /* loops forever if bug ist present */
+  /* loops forever if bug is present */
   do {} while (c1 && c2);
 
   /* other cases: */

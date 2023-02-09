@@ -1,5 +1,5 @@
-/* Tests an uninitalised variable bug.
-   t is not initalised in all paths in the do loop, causing the while
+/* Tests an uninitialised variable bug.
+   t is not initialised in all paths in the do loop, causing the while
    conditional to fail unpredictably.
 
    Doesn't actually test, is really an example.

@@ -1,5 +1,5 @@
 /*
-   bug-3283.c. On z80, a veriable allocated to iy was overwritten by the use of iy for an address at a cast.
+   bug-3283.c. On z80, a variable allocated to iy was overwritten by the use of iy for an address at a cast.
  */
 
 #include <testfwk.h>

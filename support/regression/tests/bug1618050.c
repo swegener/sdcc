@@ -1,6 +1,6 @@
 /** bug 1618050
  *    global variable px in function buggy, is marked rematr..
- *    and is erronously assumed to retain its value "x" across
+ *    and is erroneously assumed to retain its value "x" across
  *    the function call to fiddle_px
  */
 

@@ -8,7 +8,7 @@
  *
  * a bug in SDCCast.c:1883 isConformingBody()
  *  case... PTR_OP
- *  causing loopreversal to be erronously applied here
+ *  causing loopreversal to be erroneously applied here
  *
  *  case... INC_OP and DEC_OP
  *    suffer the same way

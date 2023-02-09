@@ -324,7 +324,7 @@ bool test(void)
 	if (memcmp(ref_degree_list, degree_list, n * sizeof(node_t)))
 		return(false);
 
-	/* Compare degress of neighbours next. */
+	/* Compare degrees of neighbours next. */
 	calc_neighbour_degrees(neighbour_degrees, adjacency_matrix, node_degrees);
 	if (memcmp(ref_neighbour_degrees, neighbour_degrees, n * sizeof(node_t)))
 		return(false);

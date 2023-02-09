@@ -1,5 +1,5 @@
 /*
-   stm8-conventions.c. Test support for calling convetions of other STM8-compilers.
+   stm8-conventions.c. Test support for calling conventions of other STM8-compilers.
    typearg: unsigned char, unsigned int
    typeret: unsigned char, unsigned int
    convention: , __raisonance, __iar, __cosmic

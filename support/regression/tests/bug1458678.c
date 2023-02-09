@@ -21,7 +21,7 @@ void does_not_give_error(char * w)
    w[0]='a';
 }
 
-/* this correctly gives error 33, therefor cannot be regression tested
+/* this correctly gives error 33, therefore cannot be regression tested
 void gives_error(const char * w)
 {
    w[0]='a';

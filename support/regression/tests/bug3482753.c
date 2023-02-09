@@ -14,7 +14,7 @@ int f(void)
   x.a = t;
   t = x.a + 2;
   d = t;
-  t = x.a + 3;  /* bug: x.a was optimized to t, dispite redefinition of t */
+  t = x.a + 3;  /* bug: x.a was optimized to t, despite redefinition of t */
   return t;
 }
 

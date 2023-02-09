@@ -32,7 +32,7 @@ static volatile uint8_t* f(const uint8_t id)
             result = (volatile uint8_t *)0x500a;
             break;
     }
-    g(); // This call overwrites result by hte return address for z80.
+    g(); // This call overwrites result by the return address for z80.
     return result;
 }
 

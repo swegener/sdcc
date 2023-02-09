@@ -1,4 +1,4 @@
-/* Testing arithmetics with long litterals
+/* Testing arithmetic with long literals
  */
 
 #include <testfwk.h>

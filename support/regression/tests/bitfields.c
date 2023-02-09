@@ -107,7 +107,7 @@ struct {
 void
 testBitfieldSizeof(void)
 {
-  /* Although bitfields are extremely implementation dependant, these
+  /* Although bitfields are extremely implementation dependent, these
      assertions should hold for all implementations with storage units
      of 8 bits or larger (nearly universal).
   */

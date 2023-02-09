@@ -1,5 +1,5 @@
 /* bug-2822.c
-   A division optimization evaluated operands to double precision only, thus loosing information on long long variables.
+   A division optimization evaluated operands to double precision only, thus losing information on long long variables.
  */
 
 #include <testfwk.h>

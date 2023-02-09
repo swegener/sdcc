@@ -1,5 +1,5 @@
 /*
-   patch-235.c - used shift insetad of rotate instruction.
+   patch-235.c - used shift instead of rotate instruction.
  */
 
 #include <testfwk.h>

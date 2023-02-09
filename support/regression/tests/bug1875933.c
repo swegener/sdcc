@@ -39,7 +39,7 @@ void void_txor0(char x)
 /*
  * function genOr() in z80/gen.c
  *   assumed identity of "or a, literal" and "or a,a"
- *   thats definitly not so
+ *   that's definitely not so
  */
 
 char tor1(char x)

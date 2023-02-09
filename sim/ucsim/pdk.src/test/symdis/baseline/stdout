@@ -17,14 +17,14 @@ dc 0x0000 0x0020
 0x005  ? 0102 mov    [0x2], a[0K
 0x006  ? 701f call   #0x1f[0K
 0x007  ? 6012 goto   #0x12[0K
-0x008  ? 0000 nop[0K
-0x009  ? 0000 nop[0K
-0x00a  ? 0000 nop[0K
-0x00b  ? 0000 nop[0K
-0x00c  ? 0000 nop[0K
-0x00d  ? 0000 nop[0K
-0x00e  ? 0000 nop[0K
-0x00f  ? 0000 nop[0K
+0x008  ? f772 UNKNOWN/INVALID[0K
+0x009  ? f526 UNKNOWN/INVALID[0K
+0x00a  ? f96b UNKNOWN/INVALID[0K
+0x00b  ? 7bc5 call   #0xbc5[0K
+0x00c  ? 5b5e UNKNOWN/INVALID[0K
+0x00d  ? 34af t1sn   [0x2f], #0x1[0K
+0x00e  ? c785 UNKNOWN/INVALID[0K
+0x00f  ? d38c UNKNOWN/INVALID[0K
 0x010  ? 007b reti[0K
 
 0x011    <__sdcc_program_startup>:
@@ -52,4 +52,4 @@ dc 0x0000 0x0020
 0x01f  ? 0200 ret    #0x0[0K
 
 0x020    <__interrupt_vect>:
-0x020  ? 0000 nop[0K
+0x020  ? 2f43 cneqsn 0x43[0K

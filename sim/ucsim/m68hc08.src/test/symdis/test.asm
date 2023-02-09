@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ISO C Compiler 
-; Version 4.2.2 #13397 (Linux)
+; File Created by SDCC : free open source ANSI-C Compiler
+; Version 3.6.5 #9879 (Linux)
 ;--------------------------------------------------------
 	.module test
 	.optsdcc -mhc08
@@ -56,7 +56,7 @@ __sdcc_program_startup:
 ;--------------------------------------------------------
 	.area DSEG    (PAG)
 ;--------------------------------------------------------
-; overlayable items in ram
+; overlayable items in ram 
 ;--------------------------------------------------------
 ;--------------------------------------------------------
 ; absolute ram data
@@ -68,7 +68,7 @@ __sdcc_program_startup:
 ;--------------------------------------------------------
 	.area XABS    (ABS)
 ;--------------------------------------------------------
-; initialized external ram data
+; external initialized ram data
 ;--------------------------------------------------------
 	.area XISEG
 ;--------------------------------------------------------
@@ -108,7 +108,6 @@ _main_PARM_2:
 _main:
 00103$:
 	bra	00103$
-;test.c:4: }
 	rts
 	.area CSEG    (CODE)
 	.area CONST   (CODE)

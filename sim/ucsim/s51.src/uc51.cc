@@ -2002,7 +2002,7 @@ cl_uc51_cpu::cfg_help(t_addr addr)
     case uc51cpu_aof_mdps1h:
       return "Address of multi_DPTR_sfr DPH1 (int, RW)";
     case uc51cpu_aof_mdpc:
-      return "Address of multi_DPTR_chip selector, WR selects this stlye of multi_DPTR (int, RW)";
+      return "Address of multi_DPTR_chip selector, WR selects this style of multi_DPTR (int, RW)";
     case uc51cpu_mask_mdpc:
       return "Mask in multi_DPTR_chip selector (int, RW)";
     case uc51cpu_mdp_mode:

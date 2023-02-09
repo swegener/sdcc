@@ -1,6 +1,6 @@
 /******************************************************************************
- * posix_signal.hh - A signal handleing class for linux + solaris             *
- * to convert posix into somthing easier to use                               *
+ * posix_signal.hh - A signal handling class for linux + solaris             *
+ * to convert posix into something easier to use                               *
  * Tim Hurman - t.hurman@virgin.net                                           *
  * Last edited on 01th Oct 1999                                               *
  ******************************************************************************/

@@ -30,7 +30,7 @@ flt_name(enum filter_t f)
 
 Viewer::Viewer()
 {
-  /* initalise the output screen */
+  /* initialise the output screen */
   initscr();
   cbreak();
   noecho();
@@ -70,7 +70,7 @@ Viewer::Viewer()
   inp = subwin(stdscr, inp_c.max_y, inp_c.max_x, inp_c.min_y, inp_c.min_x);
   outp = subwin(stdscr, outp_c.max_y, outp_c.max_x, outp_c.min_y,outp_c.min_x);
   
-  // initalise the windows
+  // initialise the windows
   touchwin(inp);
   werase(inp);
   wrefresh(inp);
@@ -117,7 +117,7 @@ Viewer::oflt_mode(enum filter_t oflt)
 {
   char s[100];
   flt_out= oflt;
-  sprintf(s, "Otput filter: %s\n", flt_name(flt_out));
+  sprintf(s, "Output filter: %s\n", flt_name(flt_out));
   waddstr(outp, s);
   wrefresh(outp);
   wrefresh(inp);

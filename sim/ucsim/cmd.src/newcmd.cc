@@ -789,7 +789,7 @@ cl_console_stdout::init(void)
 
 
 /*
- * Console where all output is catched in a string
+ * Console where all output is caught in a string
  */
 
 cl_console_sout::cl_console_sout(class cl_app *the_app):

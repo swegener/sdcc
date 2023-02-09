@@ -110,7 +110,7 @@ struct dis_entry_pblaze
   uchar length;             /* total length of instruction */
   const char *mnemonic;     /* type of opcode(ADD, ADDC...) */
   uint instruction;          /* instruction (enum instructions_pblaze) */
-  uint operands;             /* clasification of operands (enum op_operands_pblaze) */
+  uint operands;             /* classification of operands (enum op_operands_pblaze) */
 };
 
 #endif

@@ -54,7 +54,7 @@ test_mem_speed: $(top_builddir)/lib*.a test_mem_speed.o
 sim.src: all
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs
 

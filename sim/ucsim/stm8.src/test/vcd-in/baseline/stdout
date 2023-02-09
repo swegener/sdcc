@@ -64,7 +64,7 @@ Controller has 24 hardware element(s).
    on flash[0]
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       input

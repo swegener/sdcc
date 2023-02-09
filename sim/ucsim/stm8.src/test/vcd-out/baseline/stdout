@@ -9,7 +9,7 @@ var loc2 rom[0x0001]
 # Check the initial state of the default vcd.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    no
   Paused:     no
   Mode:       output
@@ -54,7 +54,7 @@ set hw vcd start
 # Make sure what it is going to do is what we asked.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output

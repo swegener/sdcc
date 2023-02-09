@@ -77,7 +77,7 @@ TEST_OBJ	=
 all: checkconf otherlibs $(TN).src
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs install_shared_lib
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)

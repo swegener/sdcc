@@ -85,7 +85,7 @@ endif
 gui_api: ucsim_lib tool_lib
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: install_gui_api
 ifeq ($(curses_ok),yes)

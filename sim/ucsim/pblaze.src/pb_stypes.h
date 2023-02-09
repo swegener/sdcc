@@ -138,7 +138,7 @@ enum mem_class
 
 /* Result of instruction simulation */
 #define resGO		0	/* OK, go on */
-#define resWDTRESET	1	/* Reseted by WDT */
+#define resWDTRESET	1	/* Reset by WDT */
 #define resINTERRUPT	2	/* Interrupt accepted */
 #define resSTOP		100	/* Stop if result greater then this */
 #define resHALT		101	/* Serious error, halt CPU */
@@ -205,7 +205,7 @@ enum brk_event
 #define IT_LOW		1 /* low level interrupt service */
 #define IT_HIGH		2 /* service of high priority interrupt */
 
-/* cathegories of hw elements (peripherials) */
+/* cathegories of hw elements (peripherals) */
 enum hw_cath {
   HW_DUMMY	= 0x0000,
   HW_TIMER	= 0x0002,

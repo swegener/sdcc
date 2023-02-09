@@ -77,7 +77,7 @@ TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 all: checkconf otherlibs $(TN).src
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs install_shared_lib
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)

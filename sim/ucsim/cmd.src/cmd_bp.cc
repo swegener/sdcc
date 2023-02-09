@@ -230,7 +230,7 @@ CMDHELP(cl_break_cmd,
 	"`Hit' parameter can be used to specify how many times the breakpoint\n"
 	"must be hit before acception.\n"
 	"`Expr' parameter can specify an expression which is evaluated\n"
-	"at every hit of the breakpint and it will be accepeted only when\n"
+	"at every hit of the breakpint and it will be accepted only when\n"
 	"the result is true.")
 
 void

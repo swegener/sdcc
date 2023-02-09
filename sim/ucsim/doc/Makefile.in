@@ -35,7 +35,7 @@ all: doc
 
 doc: checkconf
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs
 	cp $(srcdir)/*.html $(DESTDIR)$(docdir)

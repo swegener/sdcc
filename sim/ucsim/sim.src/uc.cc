@@ -1390,7 +1390,7 @@ cl_uc::read_hex_file(cl_f *f)
   int c;
   long written= 0, recnum= 0;
 
-  uint  base= 0;  // extended address, added to every adress
+  uint  base= 0;  // extended address, added to every address
   uchar dnum;     // data number
   uchar rtyp=0;   // record type
   uint  addr= 0;  // address

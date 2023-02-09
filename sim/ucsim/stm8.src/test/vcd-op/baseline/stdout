@@ -10,7 +10,7 @@ set hw vcd add rom[0x100]
 set hw vcd start
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -44,7 +44,7 @@ tick
 # recorded but not values.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -62,7 +62,7 @@ set hw vcd pause
 Paused
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -104,7 +104,7 @@ tick
 # Resume. States are updated to current values and recording resumes.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -122,7 +122,7 @@ set hw vcd restart
 Unpaused
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -154,7 +154,7 @@ tick
 # record the first 3 ticks (375 ns) then ignore the rest.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -173,7 +173,7 @@ set hw vcd pause
 Paused (pause limit 0.000000300000000 s)
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -354,7 +354,7 @@ tick
 # placed in the VCD but it's up to the viewer whether they are shown at all.
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -372,7 +372,7 @@ set hw vcd restart
 Unpaused
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -399,7 +399,7 @@ tick
 # That's all folks!
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -416,7 +416,7 @@ Configuration memory of vcd
 set hw vcd stop
 info hw vcd
 vcd[0] value change dump
-  Modul:      ucsim_vcd_0
+  Module:      ucsim_vcd_0
   Started:    no
   Paused:     no
   Mode:       output

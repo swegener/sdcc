@@ -138,7 +138,7 @@ This user guide has got the detailed information on the XA chip.
 
 http://www.semiconductors.philips.com/acrobat/various/XA_USER_GUIDE_1.pdf
 
-f: {unused slot(word accessable only) for R8-R15}
+f: {unused slot(word accessible only) for R8-R15}
 e: R7h,R7l  Stack pointer, ptr to USP(PSW.SM=0), or SSP(PSW.SM=1)
 c: R6h,R6l
 a: R5h,R5l
@@ -233,7 +233,7 @@ Any direct address references between 400H and 7FFH access the SFRs
 regardless of the segment register contents.
 
 To access any external memory which overlaps the 2K onchip memory
-ues the MOVX instruction.
+use the MOVX instruction.
 
 ---------------------------
 Proposed segment layout use for SDCC/XA compiler:

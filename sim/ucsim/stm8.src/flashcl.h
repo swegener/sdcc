@@ -94,7 +94,7 @@ class cl_flash: public cl_hw
   bool rww;
   enum stm8_flash_state state;
   enum stm8_flash_mode mode;
-  double tprog; /* programing time in usec */
+  double tprog; /* programming time in usec */
   double start_time;
  public:
   cl_flash(class cl_uc *auc, t_addr abase, const char *aname);

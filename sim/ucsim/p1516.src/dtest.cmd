@@ -20,7 +20,7 @@ expr /n rom[0xe]=0x001e0200
 expr /n rom[0xf]=0x001f0200
 dc 0 0xf
 
-# alu 2op #positiv
+# alu 2op #positive
 
 expr /n rom[0x10]=0x01a00e00
 expr /n rom[0x11]=0x01a10e00

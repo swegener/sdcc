@@ -58,7 +58,7 @@ $(PKGS):
 #	$(MAKE) -f main.mk libs
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 .PHONY: install INSTALL Install
 install:

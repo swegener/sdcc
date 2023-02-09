@@ -79,7 +79,7 @@ libs: libucsimutil.a
 
 main_app: checkconf ucsim_app relay_app
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs
 

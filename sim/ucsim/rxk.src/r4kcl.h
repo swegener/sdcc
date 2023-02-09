@@ -131,7 +131,7 @@ public:
   virtual int test32(u32_t op);					// 0f,2t,0w,0r
   virtual int flag_cc_hl(t_mem code);				// 0f,4t,0w,0r
   
-  // brach
+  // branch
   virtual int lljp_cx(t_mem code);				// 4f,14t,0w,0r
   virtual int lljp_cc(t_mem code);				// 4f,14t,0w,0r
   virtual int jre_cx_cc(bool cond);				// 2f,9t,0w,0r

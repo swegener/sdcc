@@ -319,7 +319,7 @@ enum cpu_state {
 /* Result of instruction simulation */
 enum inst_result {
   resGO		= 0,	/* OK, go on */
-  resWDTRESET	= 1,	/* Reseted by WDT */
+  resWDTRESET	= 1,	/* Reset by WDT */
   resINTERRUPT	= 2,	/* Interrupt accepted */
   resSTOP	= 100,	/* Stop if result greater then this */
   resHALT	= 101,	/* Serious error, halt CPU */
@@ -377,7 +377,7 @@ enum intr_levels {
   IT_HIGH	= 2 /* service of high priority interrupt */
 };
 
-/* cathegories of hw elements (peripherials) */
+/* cathegories of hw elements (peripherals) */
 enum hw_cath {
   HW_DUMMY	= 0x0000,
   HW_TIMER	= 0x0002,

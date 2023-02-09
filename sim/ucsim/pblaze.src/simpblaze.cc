@@ -23,7 +23,7 @@
 #include "glob.h"
 
 /**
- * Contructor
+ * Constructor
  */
 cl_simpblaze::cl_simpblaze(class cl_app *the_app):
   cl_sim(the_app)

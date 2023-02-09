@@ -54,6 +54,7 @@ enum cell_flag {
 
 #define CELL_GENERAL	(CELL_NORMAL|CELL_INST|CELL_FETCH_BRK)
 
+extern t_mem def_data;
 
 /*
  * 3rd version of memory system
@@ -238,7 +239,7 @@ class cl_memory_cell: public cl_cell_data
 #endif
  public:
   t_mem mask;
-  t_mem def_data;
+  //t_mem def_data;
  protected:
   uchar width;
   uchar flags;

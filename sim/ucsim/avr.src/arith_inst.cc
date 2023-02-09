@@ -80,7 +80,7 @@ cl_avr::cpi_Rd_K(t_mem code)
 
 
 /*
- * Substract Immediate with Carry
+ * Subtract Immediate with Carry
  * SBCI Rd,K 16<=d<=31, 0<=K<=255
  * 0100 KKKK dddd KKKK
  *____________________________________________________________________________
@@ -131,7 +131,7 @@ cl_avr::sbci_Rd_K(t_mem code)
 
 
 /*
- * Substract Immediate
+ * Subtract Immediate
  * SUBI Rd,K 16<=d<=31, 0<=K<=255
  * 0101 KKKK dddd KKKK
  *____________________________________________________________________________
@@ -266,7 +266,7 @@ cl_avr::cpc_Rd_Rr(t_mem code)
 
 
 /*
- * Substract with Carry
+ * Subtract with Carry
  * SBC Rd,Rr 0<=d<=31, 0<=r<=31
  * 0000 10rd dddd rrrr
  *____________________________________________________________________________
@@ -418,7 +418,7 @@ cl_avr::cp_Rd_Rr(t_mem code)
 
 
 /*
- * Substract without Carry
+ * Subtract without Carry
  * SUB Rd,Rr 0<=d<=31, 0<=r<=31
  * 0001 10rd dddd rrrr
  *____________________________________________________________________________
@@ -728,7 +728,7 @@ cl_avr::lsr_Rd(t_mem code)
 
 
 /*
- * Rotate Right trough Carry
+ * Rotate Right through Carry
  * ROR Rd 0<=d<=31
  * 1001 010d dddd 0111
  *____________________________________________________________________________
@@ -903,7 +903,7 @@ cl_avr::adiw_Rdl_K(t_mem code)
 
 
 /*
- * Substract Immediate from Word
+ * Subtract Immediate from Word
  * SBIW Rdl,K dl={24,26,28,30}, 0<=K<=63
  * 1001 0111 KK dd KKKK
  *____________________________________________________________________________

@@ -412,7 +412,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0xA0: // LDI
-      // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
+      // BC - count, source=HL, dest=DE.  *DE++ = *HL++, --BC until zero
       regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       store1(regs.DE, get1(regs.HL));
       ++regs.HL;
@@ -518,7 +518,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0xB0: // LDIR
-      // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
+      // BC - count, source=HL, dest=DE.  *DE++ = *HL++, --BC until zero
       regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       do {
         store1(regs.DE, get1(regs.HL));

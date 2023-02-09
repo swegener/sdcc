@@ -1,6 +1,6 @@
 /******************************************************************************
- * posix_signal.cc - A signal handleing class for linux + solaris             *
- * to convert posix into somthing easier to use                               *
+ * posix_signal.cc - A signal handling class for linux + solaris             *
+ * to convert posix into something easier to use                               *
  * Tim Hurman - t.hurman@virgin.net                                           *
  * Last edited on 01th Oct 19999                                              *
  ******************************************************************************/
@@ -65,7 +65,7 @@ int SigHandler::BlockSignal(int SIGNAL)
 {
   sigset_t set;
 
-  /* initalise */
+  /* initialise */
   sigemptyset(&set);
   
   /* add the SIGNAL to the set */
@@ -88,7 +88,7 @@ int SigHandler::UnBlockSignal(int SIGNAL)
 {
   sigset_t set;
   
-  /* initalise */
+  /* initialise */
   sigemptyset(&set);
   
   /* add the SIGNAL to the set */

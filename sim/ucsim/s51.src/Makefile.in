@@ -80,7 +80,7 @@ dlso_ok		= @dlso_ok@
 all: checkconf otherlibs s$(TN).src
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs install_shared_lib
 	$(INSTALL) $(SEN) $(DESTDIR)$(bindir)/$(SEN)

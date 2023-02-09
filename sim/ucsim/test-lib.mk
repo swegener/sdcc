@@ -48,7 +48,7 @@ ELIDE += -e 's/([[:upper:]][[:alpha:]]{2} [[:upper:]][[:alpha:]]{2} .[[:digit:]]
 # using -e immediately after any args specified.
 # Prerequisites of the form %.ihx are given as image files to load.
 # Other prerequisites are ignored.
-# If there are no %.cmd prequisites and -e does not appear anywhere
+# If there are no %.cmd prerequisites and -e does not appear anywhere
 # in the sim args "-e run" is passed to the simulator.
 define run-sim =
 	-$(SIM) -q -R 0 $(SIM_ARGS) $(1) \

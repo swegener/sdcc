@@ -716,7 +716,7 @@ cl_string_option::print(class cl_console_base *con)
 
 
 /*
- * PONITER type of option
+ * POINTER type of option
  *____________________________________________________________________________
  *
  */

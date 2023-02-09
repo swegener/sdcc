@@ -91,7 +91,7 @@ cl_pblaze::inst_add(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "ADD: Unsuported operand type\n");
+    fprintf(stderr, "ADD: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -126,7 +126,7 @@ cl_pblaze::inst_addcy(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "ADDCY: Unsuported operand type\n");
+    fprintf(stderr, "ADDCY: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -166,7 +166,7 @@ cl_pblaze::inst_and(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "ADDCY: Unsuported operand type\n");
+    fprintf(stderr, "ADDCY: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -199,7 +199,7 @@ cl_pblaze::inst_call(uint code, int inst, int operands)
     address = ((r1->get() & 0x0f) << 8) | r2->get();
   }
   else {
-    application->debug("CALL: Unsuported operand type\n");
+    application->debug("CALL: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -235,7 +235,7 @@ cl_pblaze::inst_call(uint code, int inst, int operands)
       break;
 
     default:
-      fprintf(stderr, "Unsuported CALL instruction\n");
+      fprintf(stderr, "Unsupported CALL instruction\n");
       return (resERROR);
   }
 
@@ -268,7 +268,7 @@ cl_pblaze::inst_compare(uint code, int operands)
       operand2 = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "COMPARE: Unsuported operand type\n");
+    fprintf(stderr, "COMPARE: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -293,7 +293,7 @@ cl_pblaze::inst_comparecy(uint code, int operands)
       operand2 = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "COMPARECY: Unsuported operand type\n");
+    fprintf(stderr, "COMPARECY: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -321,7 +321,7 @@ cl_pblaze::inst_fetch(uint code, int operands)
     addr = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "FETCH: Unsuported operand type\n");
+    fprintf(stderr, "FETCH: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -341,7 +341,7 @@ cl_pblaze::inst_hwbuild(uint code, int operands)
     r1->set(hw_constant);
   }
   else {
-    fprintf(stderr, "HWBUILD: Unsuported operand type\n");
+    fprintf(stderr, "HWBUILD: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -366,7 +366,7 @@ cl_pblaze::inst_input(uint code, int operands)
     port = get_constant(code);
   }
   else {
-    fprintf(stderr, "INPUT: Unsuported operand type\n");
+    fprintf(stderr, "INPUT: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -408,7 +408,7 @@ cl_pblaze::inst_jump(uint code, int inst, int operands)
     address = ((r1->get() & 0x0f) << 8) | r2->get();
   }
   else {
-    fprintf(stderr, "JUMP: Unsuported operand type\n");
+    fprintf(stderr, "JUMP: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -444,7 +444,7 @@ cl_pblaze::inst_jump(uint code, int inst, int operands)
       break;
 
     default:
-      fprintf(stderr, "Unsuported JUMP instruction\n");
+      fprintf(stderr, "Unsupported JUMP instruction\n");
       return (resERROR);
   }
 
@@ -469,7 +469,7 @@ cl_pblaze::inst_load(uint code, int operands)
       r1->set(get_register(code, false)->get());
   }
   else {
-    fprintf(stderr, "LOAD: Unsuported operand type\n");
+    fprintf(stderr, "LOAD: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -497,7 +497,7 @@ cl_pblaze::inst_load_return(uint code, int operands)
     PC = addr+1;
   }
   else {
-    fprintf(stderr, "LOAD&RETURN: Unsuported operand type\n");
+    fprintf(stderr, "LOAD&RETURN: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -520,7 +520,7 @@ cl_pblaze::inst_or(uint code, int operands)
     operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "OR: Unsuported operand type\n");
+    fprintf(stderr, "OR: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -549,7 +549,7 @@ cl_pblaze::inst_output(uint code, int operands)
     port = get_constant(code);
   }
   else {
-    fprintf(stderr, "OUTPUT: Unsuported operand type\n");
+    fprintf(stderr, "OUTPUT: Unsupported operand type\n");
     return (resERROR);
   }
   t_mem value = r1->get();
@@ -575,7 +575,7 @@ cl_pblaze::inst_outputk(uint code, int operands)
     port = code & 0x0000f;
   }
   else {
-    fprintf(stderr, "OUTPUTK: Unsuported operand type\n");
+    fprintf(stderr, "OUTPUTK: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -628,7 +628,7 @@ cl_pblaze::inst_return(uint code, int inst)
       break;
 
     default:
-      fprintf(stderr, "Unsuported RETURN instruction\n");
+      fprintf(stderr, "Unsupported RETURN instruction\n");
       return (resERROR);
   }
 
@@ -794,7 +794,7 @@ cl_pblaze::inst_star(uint code, int operands)
     r1->set(r2->get());
   }
   else {
-    fprintf(stderr, "STAR: Unsuported operand type\n");
+    fprintf(stderr, "STAR: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -820,7 +820,7 @@ cl_pblaze::inst_store(uint code, int operands)
     addr = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "STORE: Unsuported operand type\n");
+    fprintf(stderr, "STORE: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -845,7 +845,7 @@ cl_pblaze::inst_sub(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "SUB: Unsuported operand type\n");
+    fprintf(stderr, "SUB: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -880,7 +880,7 @@ cl_pblaze::inst_subcy(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "SUBCY: Unsuported operand type\n");
+    fprintf(stderr, "SUBCY: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -920,7 +920,7 @@ cl_pblaze::inst_test(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "TEST: Unsuported operand type\n");
+    fprintf(stderr, "TEST: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -928,7 +928,7 @@ cl_pblaze::inst_test(uint code, int operands)
   //zero flag
   FLAGS_SET_Z(result == 0);
 
-  // algorith source: http://graphics.stanford.edu/~seander/bithacks.html#ParityNaive
+  // algorithm source: http://graphics.stanford.edu/~seander/bithacks.html#ParityNaive
   bool parity = false;
   while (result)
   {
@@ -958,7 +958,7 @@ cl_pblaze::inst_testcy(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "TESTCY: Unsuported operand type\n");
+    fprintf(stderr, "TESTCY: Unsupported operand type\n");
     return (resERROR);
   }
 
@@ -966,7 +966,7 @@ cl_pblaze::inst_testcy(uint code, int operands)
   //zero flag
   FLAGS_SET_Z((result == 0) && FLAGS_GET_Z);
 
-  // algorith source: http://graphics.stanford.edu/~seander/bithacks.html#ParityNaive
+  // algorithm source: http://graphics.stanford.edu/~seander/bithacks.html#ParityNaive
   bool parity = false;
   while (result)
   {
@@ -996,7 +996,7 @@ cl_pblaze::inst_xor(uint code, int operands)
       operand = get_register(code, false)->get();
   }
   else {
-    fprintf(stderr, "XOR: Unsuported operand type\n");
+    fprintf(stderr, "XOR: Unsupported operand type\n");
     return (resERROR);
   }
 

@@ -64,7 +64,7 @@ t_mem pmon[]= {
 0x0000f03b, 0x0e000000, /* 0e000000 //C 0f03b ld	r0,r0 */
 0x0000f03c, 0x06000000, /* 06000000 //C 0f03c st	r0,0 */
 0x0000f03d, 0x01020000, /* 01020000 //C 0f03d mvzl	r0,0		; def values of some regs */
-0x0000f03e, 0x0600f4e9, /* 0600f4e9 //C 0f03e st	r0,regf		; FALGS= 0 */
+0x0000f03e, 0x0600f4e9, /* 0600f4e9 //C 0f03e st	r0,regf		; FLAGS= 0 */
 0x0000f03f, 0x0102f7ff, /* 0102f7ff //C 0f03f mvzl	r0,0xf7ff	; R13= 0xf7ff */
 0x0000f040, 0x0600f4e6, /* 0600f4e6 //C 0f040 st	r0,reg13 */
 0x0000f041, 0x01f2f042, /* 01f2f042 //C 0f041 jmp	common_start: */

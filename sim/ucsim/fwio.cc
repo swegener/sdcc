@@ -225,7 +225,7 @@ cl_io::check_dev(void)
         /*
          * Peek all pending console events
          */
-	//printf("win iput check on console id=%d handle=%p\n", file_id, handle);
+	//printf("win input check on console id=%d handle=%p\n", file_id, handle);
         if (INVALID_HANDLE_VALUE == handle)
 	  return ret;
 	if (!GetNumberOfConsoleInputEvents(handle, &NumPending))

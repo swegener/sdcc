@@ -52,6 +52,8 @@
 static class cl_mem_error_registry mem_error_registry;
 static unsigned int mem_uids= 0;
 
+t_mem def_data;
+
 /*
  *                                                3rd version of memory system
  */
@@ -1538,11 +1540,12 @@ cl_address_space::init(void)
   cell->as= this;
   u8_t *p1= (u8_t*)cella;
   //void *p1;
+  cell->init();
   for (i= 0; i < size; i++)
     {
       //p1= &(cella[i]);
       memcpy(p1, (void*)cell, s);
-      cella[i].init();
+      //cella[i].init();
       p1+= s;
     }
   return 0;
@@ -1875,7 +1878,7 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
 	    }
 	  else
 	    {
-	      D("    Shrinked to 0x%lx-0x%lx -> %s[0x%lx]\n",
+	      D("    Shrunk to 0x%lx-0x%lx -> %s[0x%lx]\n",
 		d->as_begin, d->as_end, (d->memchip)?(d->memchip->get_name()):"(none)", d->chip_begin);
 	    }
 	}

@@ -52,7 +52,7 @@ serio.src: checkconf
 endif
 
 
-# Compiling and installing everything and runing test
+# Compiling and installing everything and running test
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) serialview$(EXEEXT) $(DESTDIR)$(bindir)/serialview$(EXEEXT)

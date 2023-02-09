@@ -270,7 +270,7 @@ public:
   int XCHB_6(t_mem code) { return xchb(6); }
   int XCHB_7(t_mem code) { return xchb(7); }
   
-  // aritmetic (ALU) instuctions: ialu.cc
+  // arithmetic (ALU) instructions: ialu.cc
   // 8-bit 2-op-inst
   int add8(class cl_cell8 *op1, class cl_cell8 *op2, bool usec, bool memop);
   int sub8(class cl_cell8 *op1, class cl_cell8 *op2, bool usec, bool memop, bool cmp);

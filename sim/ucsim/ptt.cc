@@ -115,7 +115,7 @@ r_cmd(FILE *fin, FILE *fout)
   start_command();
   if (pthread_mutex_trylock(&simulation_lock) != 0)
     {
-      fprintf(fout, "Simulation already runing\n");
+      fprintf(fout, "Simulation already running\n");
     }
   else
     {

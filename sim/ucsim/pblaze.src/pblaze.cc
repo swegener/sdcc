@@ -714,7 +714,7 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
   TiXmlElement *root = doc.FirstChildElement("picoblaze");
   TiXmlElement *element;
 
-  // TODO lover/uppper case
+  // TODO lover/upper case
   if (strcmp(root->Attribute("type"), id_string()) != 0) {
     con->dd_printf("Error: types of Picoblaze don't match current configuration.");
     return;
@@ -977,7 +977,7 @@ cl_pblaze::exec_inst(void)
             break;
     }
 
-  // this shouldnt be executed. If so, something bad happend in simulated program
+  // this shouldn't be executed. If so, something bad happened in simulated program
   return(resINV_INST);
 }
 
@@ -1150,7 +1150,7 @@ cl_pblaze::pblaze_read_hex_file(const char *nam)
       addr++;
       written++;
 
-      // skip unnecesary characters (white space etc)
+      // skip unnecessary characters (white space etc)
       if (fscanf(f, "%*[ \n\r\t]"))
         {} // if statement only for prevent warning during compilation
     }

@@ -2,10 +2,6 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-uCsim, Copyright (C)  Daniel Drotos.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 Type of microcontroller: EZ80
 Controller has 4 hardware element(s).
    on cpu[0]
@@ -34,5 +30,5 @@ Address spaces:
 Address decoders:
   variables 0x00 0xff -> variable_storage 0x00 activated
   rom 0x0000 0xffff -> rom_chip 0x0000 activated
-  inputs 0x0000 0xffff -> in_chip 0x0000 inactive
-  outputs 0x0000 0xffff -> out_chip 0x0000 inactive
+  inputs 0x0000 0xffff -> in_chip 0x0000 activated
+  outputs 0x0000 0xffff -> out_chip 0x0000 activated

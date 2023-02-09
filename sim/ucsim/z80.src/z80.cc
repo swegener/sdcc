@@ -183,6 +183,7 @@ cl_z80::make_memories(void)
   ad->init();
   inputs->decoders->add(ad);
   address_spaces->add(inputs);
+  ad->activate(0);
   outputs= new cl_address_space("outputs", 0, 0x10000, 8);
   outputs->init();
   chip= new cl_chip8("out_chip", 0x10000, 8);
@@ -192,6 +193,7 @@ cl_z80::make_memories(void)
   ad->init();
   outputs->decoders->add(ad);
   address_spaces->add(outputs);
+  ad->activate(0);
   
   regs8= new cl_address_space("regs8", 0, 18, 8);
   regs8->init();

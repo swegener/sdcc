@@ -39,41 +39,13 @@ const t_addr  lr35902_rom_size  = 0x6000;
 const t_addr  lr35902_ram_start = 0xA000;
 const t_addr  lr35902_ram_size  = 0x5F80;
 
-class lr35902_memory
-{
- protected:
-  cl_uc  &uc_r;
-  
- public:
-  cl_memory *rom;
-  cl_memory *ram;
-  
-  lr35902_memory( cl_uc &uc_p );
-  
-  virtual void init( void );
-  
-  
-  virtual void store1( u16_t addr, t_mem val );
-  virtual void store2( u16_t addr, u16_t val );
-  
-  virtual u8_t  get1( u16_t addr );
-  virtual u16_t  get2( u16_t addr );
-  
-  // fetch not included b/c it only uses the rom
-};
-
-
 class cl_gb80: public cl_z80
 {
-public:
-  lr35902_memory    mem;
-  
 public:
   cl_gb80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
   
-  //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
   
@@ -92,8 +64,6 @@ public:
                         int *ret_branch,
                         int *immed_offset);
   
-
-  // memory access altered to use the 'mem' object
   virtual void store1( u16_t addr, t_mem val );
   virtual void store2( u16_t addr, u16_t val );
   

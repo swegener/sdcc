@@ -603,7 +603,7 @@ bool _mcs51_rtrackUpdate (const char *line)
               if (regs8051[regIdx].rtrack.valueKnown)
                 rtrack_data_set_val (regIdx, (unsigned char) (regs8051[regIdx].rtrack.value + 1));
               else
-                /* explicitely unsetting (could be known by symbol).
+                /* explicitly unsetting (could be known by symbol).
                    not yet handling offset to a symbol. (idata/pdata) */
                 rtrack_data_unset (regIdx);
 

@@ -1452,7 +1452,7 @@ assignResultValue (operand * oper)
 static void
 saveZreg (iCode * ic)
 {
-        /* only if live accross this call */
+        /* only if live across this call */
         if (ic->regsSaved == 0 &&
             (bitVectBitValue (ic->rMask, R30_IDX) ||
              bitVectBitValue (ic->rMask, R31_IDX))) {
@@ -1498,7 +1498,7 @@ genIpush (iCode * ic)
                         saveZreg (lic);
         }
 
-        /* this is a paramter push */
+        /* this is a parameter push */
         aopOp (IC_LEFT (ic), ic, FALSE);
         size = AOP_SIZE (IC_LEFT (ic));
         while (size--) {
@@ -2084,7 +2084,7 @@ genPlus (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genMinusDec :- does subtraction with deccrement if possible     */
+/* genMinusDec :- does subtraction with decrement if possible     */
 /*-----------------------------------------------------------------*/
 static bool
 genMinusDec (iCode * ic)
@@ -5030,7 +5030,7 @@ genCast (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genDjnz - generate decrement & jump if not zero instrucion      */
+/* genDjnz - generate decrement & jump if not zero instruction      */
 /*-----------------------------------------------------------------*/
 static int
 genDjnz (iCode * ic, iCode * ifx)
@@ -5178,7 +5178,7 @@ genAVRCode (iCode * lic)
                            spilt live range, if there is an ifx statement
                            following this pop then the if statement might
                            be using some of the registers being popped which
-                           would destory the contents of the register so
+                           would destroy the contents of the register so
                            we need to check for this condition and handle it */
                         if (ic->next &&
                             ic->next->op == IFX &&

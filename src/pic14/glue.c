@@ -587,7 +587,7 @@ pic14emitOverlay (struct dbuf_s *aBuf)
           /* I don't think this applies to us. We are using gpasm.  CRF */
 
           dbuf_printf (aBuf, ";\t.area _DUMMY\n");
-          /* output the area informtion */
+          /* output the area information */
           dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name); /* MOF */
         }
 
@@ -783,7 +783,7 @@ picglue (void)
   else
     dbuf_destroy (&vBuf);
 
-  /* create interupt vector handler */
+  /* create interrupt vector handler */
   pic14_emitInterruptHandler (asmFile);
 
   /* copy over code */
@@ -820,7 +820,7 @@ picglue (void)
 
 /*
  * Emit the section preamble, absolute location (if any) and
- * symbol name(s) for intialized data.
+ * symbol name(s) for initialized data.
  * Set in_code to the address space of the symbol.
  */
 static void

@@ -724,7 +724,7 @@ double2ul (double val)
  * This shows up on Mac OS X i386 platform which useus SSE unit instead of the x87 FPU for floating-point operations
  */
 /*
- * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitely convert it to 0x80000000
+ * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitly convert it to 0x80000000
  * on other known platforms (long) 2147483648.0 equals to -2147483648
  */
   return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
@@ -1905,7 +1905,7 @@ charVal (const char *s)
       free ((void *)ustr);
       return (val);
     }
-  else // Character constant that is not wide - compability with legacy encodings.
+  else // Character constant that is not wide - compatibility with legacy encodings.
     return constCharacterVal (*s, 0);
 }
 

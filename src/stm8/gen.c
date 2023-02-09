@@ -1553,7 +1553,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
 {
   while (n)
     {
-      // The manual is ambigious (not even documenting if the #byte is signed), but it from experimenting with the hardware it
+      // The manual is ambiguous (not even documenting if the #byte is signed), but it from experimenting with the hardware it
       // seems addw sp, byte has a signed operand, while sub sp, #byte has an unsigned operand, also, in contrast to what the
       // manual states, addw sp, #byte only takes 1 cycle.
 
@@ -2847,7 +2847,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genEor - generates code for bitwise exlusive or                 */
+/* genEor - generates code for bitwise exclusive or                 */
 /*-----------------------------------------------------------------*/
 static void
 genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
@@ -3147,7 +3147,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = TRUE;
           i += 2;
          }
-      // In some cases we gain so much by using decw that it is worth handling the carry explictly.
+      // In some cases we gain so much by using decw that it is worth handling the carry explicitly.
       else if (started && !maskedword && i == size - 2 && (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) && aopIsLitVal (left_aop, i, 2, 0x0000) &&
         (aopOnStack (right_aop, i, 2) || right_aop->type == AOP_DIR))
         {
@@ -3162,7 +3162,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           emit3w_o (A_NEGW, result_aop, i, 0, 0);
           i += 2;
          }
-       // In some cases we gain so much by using decw that it is worth handling the carry explictly.
+       // In some cases we gain so much by using decw that it is worth handling the carry explicitly.
       else if (started && !maskedword && i == size - 2 && aopIsLitVal (right_aop, i, 2, 0x0000) &&
         (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX) || x_free && (aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR)))
         {
@@ -4206,7 +4206,7 @@ genFunction (iCode *ic)
   if (IFFUNC_ISCRITICAL (ftype))
       genCritical (NULL);
 
-  // Workaround for hardware bug: Undocumented bit 6 of the condition code register needs to be cleared before div/divw. It is set during div/divw execution, and then reset. Without the workaround, the div and divw inside interrupt routines will give wrong results when the interrupt itself occured while another div or divw was executed.
+  // Workaround for hardware bug: Undocumented bit 6 of the condition code register needs to be cleared before div/divw. It is set during div/divw execution, and then reset. Without the workaround, the div and divw inside interrupt routines will give wrong results when the interrupt itself occurred while another div or divw was executed.
   // For more information see sections titled "Unexpected DIV/DIVW instruction result in ISR" in various STM8 errata notes (apparently all STM8 are affected).
   // The workaround here is the one recommended by STM in the erratum. There might be better ways to do it.
   if (IFFUNC_ISISR (sym->type) && !sym->funcDivFlagSafe)
@@ -8167,7 +8167,7 @@ postshift:
 }
 
 /*------------------------------------------------------------------*/
-/* init_stackop - initalize asmop for stack location                */
+/* init_stackop - initialize asmop for stack location                */
 /*------------------------------------------------------------------*/
 static void 
 init_stackop (asmop *stackop, int size, long int stk_off)

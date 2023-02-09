@@ -1980,7 +1980,7 @@ genIpush (iCode * ic)
       return;
     }
 
-  /* this is a paramter push: in this case we call
+  /* this is a parameter push: in this case we call
      the routine to find the call and save those
      registers that need to be saved */
   saveRegisters (ic);
@@ -2190,7 +2190,7 @@ genCall (iCode * ic)
        * As SDCC emits code as soon as it reaches the end of each
        * function's definition, prototyped functions that are implemented
        * after the current one are always considered EXTERN, which
-       * introduces many unneccessary PAGESEL instructions.
+       * introduces many unnecessary PAGESEL instructions.
        * XXX: Use a post pass to iterate over all `CALL _name' statements
        * and insert `PAGESEL _name' and `PAGESEL $' around the CALL
        * only iff there is no definition of the function in the whole
@@ -3336,7 +3336,7 @@ pic14_mov2w_regOrLit (asmop * aop, unsigned long lit, int offset)
  *
  * This version leaves in sequences like
  * "B[CS]F STATUS,0; BTFS[CS] STATUS,0"
- * which should be optmized by the peephole
+ * which should be optimized by the peephole
  * optimizer - RN 2005-01-01 */
 static void
 genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign)
@@ -3569,7 +3569,7 @@ result_in_carry:
 
 correct_result_in_carry:
 
-  // assign result to variable (if neccessary), but keep CARRY intact to be used below
+  // assign result to variable (if necessary), but keep CARRY intact to be used below
   if (result && AOP_TYPE (result) != AOP_CRY)
     {
       //DEBUGpc ("assign result");
@@ -5793,7 +5793,7 @@ SetIrp (operand * result)
     }
   else
     {
-      emitCLRIRP;           /* always ensure this is clear as it may have previouly been set */
+      emitCLRIRP;           /* always ensure this is clear as it may have previously been set */
       if (AOP_SIZE (result) > 1)
         {
           emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (result), 1, FALSE, FALSE), 0, 0));
@@ -7560,7 +7560,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genDjnz - generate decrement & jump if not zero instrucion      */
+/* genDjnz - generate decrement & jump if not zero instruction      */
 /*-----------------------------------------------------------------*/
 static int
 genDjnz (iCode * ic, iCode * ifx)
@@ -7745,7 +7745,7 @@ genpic14Code (iCode * lic)
              spilt live range, if there is an ifx statement
              following this pop then the if statement might
              be using some of the registers being popped which
-             would destory the contents of the register so
+             would destroy the contents of the register so
              we need to check for this condition and handle it */
           if (ic->next && ic->next->op == IFX && regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
             genIfx (ic->next, ic);

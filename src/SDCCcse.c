@@ -1945,7 +1945,7 @@ constFold (iCode * ic, set * cseSet)
   if (!(applyToSet (cseSet, diCodeForSym, IC_LEFT (ic), &dic)))
     return 0;
 
-  if (ic->op == BITWISEAND) /* Optimize out bitwise and of comparion results */
+  if (ic->op == BITWISEAND) /* Optimize out bitwise and of comparison results */
     {
       /* check that this results in 0 or 1 only */
       if(dic->op != EQ_OP && dic->op != NE_OP && dic->op != LE_OP && dic->op != GE_OP && dic->op != '<' && dic->op != '>' && dic->op != '!')

@@ -244,7 +244,7 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
       j++;
     }
 
-  // Edges for aligment conflict
+  // Edges for alignment conflict
   typename SI_t::edge_iterator ei, ei_end;
   for(boost::tie(ei, ei_end) = boost::edges(scon); ei != ei_end; ++ei)
     scon[*ei].alignment_conflict_only = false;

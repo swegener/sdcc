@@ -78,7 +78,7 @@ DEFSETFUNC (isFreeSTM8)
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
-     the size can be accomodated  */
+     the size can be accommodated  */
   if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type))
     {
       *sloc = sym;
@@ -550,7 +550,7 @@ packRegisters (eBBlock * ebp)
       /* if straight assignment then carry remat flag if this is the
          only definition */
       if (ic->op == '=' && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat &&
-        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the paramter is not accounted for in DEFS */
+        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the parameter is not accounted for in DEFS */
         !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
@@ -561,7 +561,7 @@ packRegisters (eBBlock * ebp)
          cast is remat, then we can remat this cast as well */
       if (ic->op == CAST &&
         IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat &&
-        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the paramter is not accounted for in DEFS */
+        !isOperandGlobal (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* The receiving of the parameter is not accounted for in DEFS */
         !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));
@@ -653,7 +653,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   sym->isspilt = FALSE;
                 }
 
-              /* Make sure any spill location is definately allocated */
+              /* Make sure any spill location is definitely allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
                 sym->usl.spillLoc->allocreq++;
 

@@ -160,7 +160,7 @@ DEFSETFUNC (mergeInDefs)
 
 
 /*------------------------------------------------------------------*/
-/* computeDataFlow - does computations for data flow accross blocks */
+/* computeDataFlow - does computations for data flow across blocks */
 /*------------------------------------------------------------------*/
 void
 computeDataFlow (ebbIndex * ebbi)
@@ -385,7 +385,7 @@ usedInRemaining (operand * op, iCode * ic)
 
 
 /*-------------------------------------------------------------------*/
-/* isDefAlive - will return true if definiton reaches a block & used */
+/* isDefAlive - will return true if definition reaches a block & used */
 /*-------------------------------------------------------------------*/
 DEFSETFUNC (isDefAlive)
 {

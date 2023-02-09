@@ -139,7 +139,7 @@ labelIfx (iCode * ic)
       /*   goto label                */
       /* i.e. the flow is going to the same location 
          regardless of the condition in this case the 
-         condition can be eliminated with a WARNING ofcource */
+         condition can be eliminated with a WARNING of course */
       if (loop->op == IFX &&
             loop->next &&
         loop->next->op == GOTO)

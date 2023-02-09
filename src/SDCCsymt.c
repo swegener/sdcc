@@ -1792,7 +1792,7 @@ compStructSize (int su, structdef * sdef)
                 {
                   if (TARGET_IS_PIC16 && getenv ("PIC16_PACKED_BITFIELDS"))
                     {
-                      /* if PIC16 && enviroment variable is set, then
+                      /* if PIC16 && environment variable is set, then
                        * tightly pack bitfields, this means that when a
                        * bitfield goes beyond byte alignment, do not
                        * automatically start allocatint from next byte,
@@ -4365,9 +4365,9 @@ symbol *muldiv[3][4][4];
 symbol *muls16tos32[2];
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 sym_link *multypes[4][2];
-/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
+/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
 symbol *conv[2][4][2];
-/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/USIGNED */
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/UNSIGNED */
 symbol *fp16x16conv[2][5][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
 symbol *rlrr[2][4][2];

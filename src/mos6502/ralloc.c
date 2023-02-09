@@ -180,7 +180,7 @@ DEFSETFUNC (isFree)
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
-     the size can be accomodated  */
+     the size can be accommodated  */
   if (sym->isFree
       && noOverLap (sym->usl.itmpStack, fsym)
       && getSize (sym->type) >= getSize (fsym->type))

@@ -10992,7 +10992,7 @@ genLiteralAssign (operand * result, operand * right, int size, bool (*output_fn)
               MOVA ("#0x00");
             }
         }
-      else if ((mov_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) && (mov_num_bytes_saved > clr_num_bytes_saved)) /* preferrably have 0 in acc */
+      else if ((mov_num_bytes_saved >= num_bytes_to_save_before_using_acc_takes_effect) && (mov_num_bytes_saved > clr_num_bytes_saved)) /* preferably have 0 in acc */
         {
           if ((lit & 0xff) != accumulator_value)
             {

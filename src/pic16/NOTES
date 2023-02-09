@@ -20,11 +20,11 @@ Scott Dattalo	<scott AT dattalo.com>
 ======================================================================
 ======================================================================
 2006-Mar-14 Vangelis Rokas
-1. Added enviroment variable 'PIC16_PACKED_BITFIELDS' which agressively
+1. Added environment variable 'PIC16_PACKED_BITFIELDS' which aggressively
 packs bitfields in structures
 
 2005-Mar-23 Vangelis Rokas
-1. I have added some optimizations that are controlled via enviroment
+1. I have added some optimizations that are controlled via environment
 variables to allow checking. Later these will be either enabled globally
 or controlled by command line options. The variables are:
 	a. OPTIMIZE_BITFIELD_POINTER_GET : optimizes bit field pointer reads

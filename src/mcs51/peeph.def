@@ -1379,7 +1379,7 @@ replace {
 	mov	%1,@r%2
 } if notVolatile
 
-// this one will screw assignes to volatile/sfr's
+// this one will screw assigns to volatile/sfr's
 replace {
 	mov  %1,%2
 	mov  %2,%1

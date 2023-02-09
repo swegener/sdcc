@@ -733,7 +733,7 @@ DEFSETFUNC (isFree)
 	/* if it is free && and the itmp assigned to
 	   this does not have any overlapping live ranges
 	   with the one currently being assigned and
-	   the size can be accomodated  */
+	   the size can be accommodated  */
 	if (sym->isFree &&
 	    noOverLap (sym->usl.itmpStack, fsym) &&
 	    getSize (sym->type) >= getSize (fsym->type)) {
@@ -1137,7 +1137,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 			continue;
 
 		/* special case check if this is an IFX &
-		   the privious one was a pop and the 
+		   the previous one was a pop and the 
 		   previous one was not spilt then keep track
 		   of the symbol */
 		if (ic->op == IFX && ic->prev &&
@@ -1171,7 +1171,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 			    !result->remat &&
 			    !bitVectBitValue (_G.regAssigned, result->key) &&
 			    /* the number of free regs + number of regs in this LR
-			       can accomodate the what result Needs */
+			       can accommodate the what result Needs */
 			    ((nfreeRegsType (result->regType) + sym->nRegs) >= result->nRegs)) {
 
 				for (i = 0; i < result->nRegs; i++) {
@@ -1365,7 +1365,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				int willCS;
 				int j=0;
 
-				/* Make sure any spill location is definately allocated */
+				/* Make sure any spill location is definitely allocated */
 				if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
 				    !sym->usl.spillLoc->allocreq) {
 					sym->usl.spillLoc->allocreq++;
@@ -1453,7 +1453,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 						sym->regs[j] = getRegScr (ic, ebbs[i], sym);
 					else
 						sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
-					/* if the allocation falied which means
+					/* if the allocation failed which means
 					   this was spilt then break */
 					if (!sym->regs[j]) break;
 				}
@@ -1688,7 +1688,7 @@ regTypeNum ()
 				avr_ptrRegReq++;
 			}
 			else {
-				/* live accross a function call then gpr else scratch */
+				/* live across a function call then gpr else scratch */
 				if (sym->isLiveFcall)
 					sym->regType = REG_GPR;
 				else
@@ -1848,7 +1848,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 		return NULL;
 
 	/* this routine will mark the a symbol as used in one 
-	   instruction use only && if the defintion is local 
+	   instruction use only && if the definition is local 
 	   (ie. within the basic block) && has only one definition &&
 	   that definiion is either a return value from a 
 	   function or does not contain any variables in
@@ -1858,7 +1858,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 	if (!bitVectIsZero (uses))	/* has other uses */
 		return NULL;
 
-	/* if it has only one defintion */
+	/* if it has only one definition */
 	if (bitVectnBitsOn (OP_DEFS (op)) > 1)
 		return NULL;	/* has more than one definition */
 

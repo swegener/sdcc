@@ -724,16 +724,16 @@ FBYNAME (okToRemoveSLOC)
   if (p == NULL) return FALSE;
   p += 4;
   if (sscanf(p, "%d_%d_%d", &dummy1, &dummy2, &dummy3) != 3) return FALSE;
-  /*TODO: ultra-paranoid: get funtion name from "head" and check that */
+  /*TODO: ultra-paranoid: get function name from "head" and check that */
   /* the sloc name begins with that.  Probably not really necessary */
 
-  /* Look for any occurance of this SLOC before the peephole match */
+  /* Look for any occurrence of this SLOC before the peephole match */
   for (pl = currPl->prev; pl; pl = pl->prev) {
         if (pl->line && !pl->isDebug && !pl->isComment
           && *pl->line != ';' && strstr(pl->line, sloc))
                 return FALSE;
   }
-  /* Look for any occurance of this SLOC after the peephole match */
+  /* Look for any occurrence of this SLOC after the peephole match */
   for (pl = endPl->next; pl; pl = pl->next) {
         if (pl->line && !pl->isDebug && !pl->isComment
           && *pl->line != ';' && strstr(pl->line, sloc))
@@ -3366,7 +3366,7 @@ reassociate_ic (lineNode *shead, lineNode *stail,
   **    2) Start at the bottom and scan up. As long as the source line
   **       matches the replacement line, they have the same iCode.
   **    3) For any label in the source, look for a matching label in
-  **       the replacment. If found, they have the same iCode. From
+  **       the replacement. If found, they have the same iCode. From
   **       these matching labels, scan down for additional matching
   **       lines; if found, they also have the same iCode.
   */
@@ -3392,7 +3392,7 @@ reassociate_ic (lineNode *shead, lineNode *stail,
 
       if (csl->isLabel)
         {
-          /* found a source line label; look for it in the replacment lines */
+          /* found a source line label; look for it in the replacement lines */
           crl = rhead;
           while (1)
             {
@@ -3509,7 +3509,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 
   if (lhead && cl)
     {
-      /* determine which iCodes the replacment lines relate to */
+      /* determine which iCodes the replacement lines relate to */
       reassociate_ic(*shead,stail,lhead,cl);
 
       /* now we need to connect / replace the original chain */

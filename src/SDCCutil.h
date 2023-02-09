@@ -53,7 +53,7 @@ void fputStrSet (FILE * fp, set * list);
  */
 set *processStrSet (set * list, const char *pre, const char *post, char *(*file) (const char *));
 
-/** Given a set returns a string containing all of the strings seperated
+/** Given a set returns a string containing all of the strings separated
  *  by spaces. The returned string is on the heap.
  */
 const char *joinStrSet (set * list);

@@ -196,7 +196,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   bool safety_required = false;
 
   // In redundancy elimination, safety means not doing a computation on any path were it was not done before.
-  // This is important, if the compuation can have side-effects, which depends on the target architecure.
+  // This is important, if the computation can have side-effects, which depends on the target architecture.
   // E.g. On some systems division requires safety, since division by zero might result in an interrupt.
   // When there are memory-mapped devices or there is memory management, reading from a pointer requires
   // safety, since reading from an unknown location could result in making the device do something or in a SIGSEGV. 

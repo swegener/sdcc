@@ -662,7 +662,7 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, const char 
         DCL_ELEM (type) = ilen;
 #endif
 
-      /* len is 0 if declartion equals initializer,
+      /* len is 0 if declaration equals initializer,
        * >0 if declaration greater than initializer
        * <0 if declaration less than initializer
        * Strategy: if >0 emit 0x00 for the rest of the length,
@@ -1659,7 +1659,7 @@ pic16emitOverlay (struct dbuf_s *aBuf)
              declarations into one chunk and will not overlay
              sad but true */
           dbuf_printf (aBuf, ";\t.area _DUMMY\n");
-          /* output the area informtion */
+          /* output the area information */
           dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name); /* MOF */
         }
 

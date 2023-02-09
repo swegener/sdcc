@@ -657,7 +657,7 @@ static void genAddLit (iCode *ic, int lit)
                 pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
 
                 if (lit < 0x100)
-                  carry_info = 3;  /* Were adding only one byte and propogating the carry. */
+                  carry_info = 3;  /* Were adding only one byte and propagating the carry. */
                 else
                   carry_info = 2;
                 break;
@@ -997,7 +997,7 @@ static void genAddLit (iCode *ic, int lit)
             pic16_emitpcode(POC_MOVLW,pic16_popGetLit(lo));
             pic16_emitpcode(POC_ADDWF, pic16_popGet(AOP(result),offset));
             if(lit <0x100)
-              carry_info = 3;  /* Were adding only one byte and propogating the carry */
+              carry_info = 3;  /* Were adding only one byte and propagating the carry */
             else
               carry_info = 2;
             break;
@@ -1521,7 +1521,7 @@ bool pic16_genMinusDec (iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_addSign - propogate sign bit to higher bytes                    */
+/* pic16_addSign - propagate sign bit to higher bytes                    */
 /*-----------------------------------------------------------------*/
 void pic16_addSign(operand *result, int offset, int sign)
 {
@@ -2013,7 +2013,7 @@ pic16_genMult8X8_n (operand *left, operand *right, operand *result)
               pic16_emitpcode (POC_SUBWF, pic16_popCopyReg (&pic16_pc_prodh));
             } // if
 
-          /* Assing high byte of result -- this may overwrite one of the operands. */
+          /* Assign high byte of result -- this may overwrite one of the operands. */
           pic16_emitpcode (POC_MOVFF, pic16_popGet2p (pic16_popCopyReg(&pic16_pc_prodh), pic16_popGet (AOP (result), 1)));
         } // if
 

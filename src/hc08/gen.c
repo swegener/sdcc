@@ -10215,7 +10215,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genDjnz - generate decrement & jump if not zero instrucion      */
+/* genDjnz - generate decrement & jump if not zero instruction      */
 /*-----------------------------------------------------------------*/
 static int
 genDjnz (iCode * ic, iCode * ifx)
@@ -10516,7 +10516,7 @@ genhc08iCode (iCode *ic)
          spilt live range, if there is an ifx statement
          following this pop then the if statement might
          be using some of the registers being popped which
-         would destory the contents of the register so
+         would destroy the contents of the register so
          we need to check for this condition and handle it */
       if (ic->next && ic->next->op == IFX && regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
         genIfx (ic->next, ic);

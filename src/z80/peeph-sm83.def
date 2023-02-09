@@ -267,7 +267,7 @@ replace {
 	xor	a, a
 }
 
-//TOOD: fails for unknown reasons
+//TODO: fails for unknown reasons
 //replace {
 //	ld	%1, #%2
 //	push	%1
@@ -486,7 +486,7 @@ replace restart {
 } if immdInRange(-128 127 '+' %1 %2 %3), notUsed('hf' 'cf')
 
 // only handle stack adjustment after calls to not 
-// disturb detection of unitialized reads in emulators
+// disturb detection of uninitialized reads in emulators
 replace {
 	call	%2
 	add	sp, #%1

@@ -10411,7 +10411,7 @@ genm6502iCode (iCode *ic)
         m6502_freeReg (reg);
         // if (reg->aop)
         //   emitcode ("", "; %s = %s offset %d", reg->name, aopName (reg->aop), reg->aopofs);
-        // FIXME: removing the folowing generates worse code
+        // FIXME: removing the following generates worse code
         if (regalloc_dry_run)
           m6502_dirtyReg (reg);
         //  reg->isLitConst = 0; //

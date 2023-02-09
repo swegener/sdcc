@@ -343,7 +343,7 @@ get_path (const char *cmd)
 
 
 /*!
- * call an external program with arguements
+ * call an external program with arguments
  */
 
 int
@@ -369,7 +369,7 @@ sdcc_system (const char *cmd)
 
 
 /*!
- * pipe an external program with arguements
+ * pipe an external program with arguments
  */
 
 #ifdef _WIN32

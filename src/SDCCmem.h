@@ -69,8 +69,8 @@ extern memmap *xstack;                 /* xternal stack data           */
 extern memmap *istack;                 /* internal stack               */
 extern memmap *code;                   /* code segment                 */
 extern memmap *data;                   /* internal data upto 128       */
-extern memmap *initialized;            /* initialized data, such as initalized, nonzero globals or local statics. */
-extern memmap *initializer;            /* a copy of the values for the initalized data from initialized in code space */
+extern memmap *initialized;            /* initialized data, such as initialized, nonzero globals or local statics. */
+extern memmap *initializer;            /* a copy of the values for the initialized data from initialized in code space */
 extern memmap *pdata;                  /* paged external data upto 256 */
 extern memmap *xdata;                  /* external data                */
 extern memmap *xidata;                 /* the initialized xdata        */

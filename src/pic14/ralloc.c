@@ -1297,7 +1297,7 @@ DEFSETFUNC (isFree)
                 /* if it is free && and the itmp assigned to
                 this does not have any overlapping live ranges
                 with the one currently being assigned and
-        the size can be accomodated  */
+        the size can be accommodated  */
         if (sym->isFree &&
                 noOverLap (sym->usl.itmpStack, fsym) &&
                 getSize (sym->type) >= getSize (fsym->type))
@@ -1803,7 +1803,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                 if (!bitVectBitValue (_G.regAssigned, sym->key))
                         continue;
                 /* special case check if this is an IFX &
-                the privious one was a pop and the
+                the previous one was a pop and the
                 previous one was not spilt then keep track
                 of the symbol */
                 if (ic->op == IFX && ic->prev &&
@@ -1841,7 +1841,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                                 !result->remat &&
                                 !bitVectBitValue (_G.regAssigned, result->key) &&
                                 /* the number of free regs + number of regs in this LR
-                                can accomodate the what result Needs */
+                                can accommodate the what result Needs */
                                 ((nfreeRegsType (result->regType) +
                                 sym->nRegs) >= result->nRegs)
                                 )
@@ -2053,7 +2053,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                                 int j;
                                 int ptrRegSet = 0;
 
-                                /* Make sure any spill location is definately allocated */
+                                /* Make sure any spill location is definitely allocated */
                                 if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
                                     !sym->usl.spillLoc->allocreq)
                                 {
@@ -2965,7 +2965,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
         if (!bitVectIsZero (uses))      /* has other uses */
                 return NULL;
 
-        /* if it has only one defintion */
+        /* if it has only one definition */
         if (bitVectnBitsOn (OP_DEFS (op)) > 1)
                 return NULL;            /* has more than one definition */
 
@@ -3738,7 +3738,7 @@ packRegisters (eBBlock * ebp)
                 /* pack registers for accumulator use, when the
                 result of an arithmetic or bit wise operation
                 has only one use, that use is immediately following
-                the defintion and the using iCode has only one
+                the definition and the using iCode has only one
                 operand or has two operands but one is literal &
                 the result of that operation is not on stack then
                 we can leave the result of this operation in acc:b

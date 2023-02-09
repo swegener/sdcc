@@ -3887,7 +3887,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             return decorateType (otree, RESULT_TYPE_NONE, reduceTypeAllowed);
 
           /* if right is a literal and has the same size with left, 
-             then also sync their signess to avoid unecessary cast */
+             then also sync their signess to avoid unnecessary cast */
           if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
             SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
@@ -4144,7 +4144,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
 
       /* if right is a literal and has the same size with left, 
-         then also sync their signess to avoid unecessary cast */
+         then also sync their signess to avoid unnecessary cast */
       if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
         SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
@@ -5669,7 +5669,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/
-      /*      straight assignemnt   */
+      /*      straight assignment   */
       /*----------------------------*/
     case '=':
       /* cannot be an array */
@@ -7729,7 +7729,7 @@ skipall:
   processBlockVars (body, &stack, DEALLOCATE);
   if (!fatalError)
     outputDebugStackSymbols ();
-  /* deallocate paramaters */
+  /* deallocate parameters */
   deallocParms (FUNC_ARGS (name->type));
 
   if (IFFUNC_ISREENT (name->type))
@@ -8423,7 +8423,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
 
     /*------------------------------------------------------------------*/
     /*----------------------------*/
-    /*      straight assignemnt   */
+    /*      straight assignment   */
     /*----------------------------*/
     case '=':
       fprintf (outfile, "ASSIGN(=) (%p) type (", tree);

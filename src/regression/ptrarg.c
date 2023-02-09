@@ -1,6 +1,6 @@
 #include "gpsim_assert.h"
 
-// Pointer to argumet tests
+// Pointer to argument tests
 #define VALUE 0x1234
 
 unsigned char failures = 0;

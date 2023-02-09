@@ -288,7 +288,7 @@ static const UNSUPPORTEDOPT unsupportedOptTable[] = {
 static const char *_baseValues[] = {
   "cpp", "sdcpp",
   "cppextraopts", "",
-  /* Path seperator character */
+  /* Path separator character */
   "sep", DIR_SEPARATOR_STRING,
   NULL
 };
@@ -1954,8 +1954,8 @@ linkEdit (char **envp)
               for (p = port->linker.crt; NULL != *p; ++p)
                 {
                   /* Try to find where C runtime files are ...
-                     It is very important for this file to be first on the linking proccess
-                     so the areas are set in the correct order, expecially _GSINIT */
+                     It is very important for this file to be first on the linking process
+                     so the areas are set in the correct order, especially _GSINIT */
                   for (s = setFirstItem (libDirsSet); s != NULL; s = setNextItem (libDirsSet))
                     {
                       dbuf_set_length (&crtpath, 0);
@@ -2750,7 +2750,7 @@ main (int argc, char **argv, char **envp)
 
   _findProcessor (argc, argv);
 
-  /* Initalise the port. */
+  /* Initialise the port. */
   if (port->init)
     port->init ();
 

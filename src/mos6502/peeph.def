@@ -231,7 +231,7 @@ replace restart {
 	%1
 	lda	%2
 } by {
-	; Peephole regop 1 - removed dead %1 folowed by lda
+	; Peephole regop 1 - removed dead %1 followed by lda
 	lda	%2
 } if same(%1 'txa' 'tya')
 
@@ -239,7 +239,7 @@ replace restart {
 	%1 %3
 	lda	%2
 } by {
-	; Peephole regop 2 - removed dead %1 folowed by lda
+	; Peephole regop 2 - removed dead %1 followed by lda
 	lda	%2
 } if same(%1 'and' 'eor' 'ora' )
 

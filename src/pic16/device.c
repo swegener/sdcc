@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  device.c - Accomodates subtle variations in PIC16 devices
+  device.c - Accommodates subtle variations in PIC16 devices
 
   Copyright (C) 2000, Scott Dattalo scott@dattalo.com
   PIC16 port:
@@ -433,7 +433,7 @@ pic16_dump_int_registers (FILE *of, set *section)
 
 /**
  * Find the device structure for the named device.
- * Consider usind pic16_find_device() instead!
+ * Consider using pic16_find_device() instead!
  *
  * @param   name
  *      a name for the desired device

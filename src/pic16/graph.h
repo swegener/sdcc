@@ -107,7 +107,7 @@ void remGNode (Graph *graph, void *data, hash_t hash);
 /* Returns the specified node or NULL if no such node exists. */
 GraphNode *getGNode (Graph *graph, void *data, hash_t hash);
 
-/* Returns the specified node (after creating it if neccessary). */
+/* Returns the specified node (after creating it if necessary). */
 GraphNode *getOrAddGNode (Graph *graph, void *data, hash_t hash);
 
 #endif

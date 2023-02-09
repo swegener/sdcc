@@ -41,7 +41,7 @@
  * are the logical or:
  *  PCC_ZERO_BIT | PCC_W
  *
- * The conditions are intialized when the pCode for an
+ * The conditions are initialized when the pCode for an
  * instruction is created. They're subsequently used
  * by the pCode optimizer determine state information
  * in the program flow.

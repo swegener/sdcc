@@ -61,7 +61,7 @@ UTF8IDF         {UTF8IDF1ST}|\xcc[\x80-\xbf]|\xcd[\x80-\xaf]|\xe2\x83[\x90-\xbf]
 #include "common.h"
 #include "newalloc.h"
 #include "dbuf_string.h"
-/* Some systems, noteably Mac OS, do not have uchar.h. */
+/* Some systems, notably Mac OS, do not have uchar.h. */
 /* If it is missing, use our own type definitions. */
 #ifdef HAVE_UCHAR_H
 #include <uchar.h>

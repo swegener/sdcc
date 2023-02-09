@@ -389,7 +389,7 @@ PORT pic_port =
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
     1, 2, 2, 4, 8, 2, 2, 3, 2, 3, 1, 4, 0
     /* TSD - I changed the size of gptr from 3 to 1. However, it should be
-       2 so that we can accomodate the PIC's with 4 register banks (like the
+       2 so that we can accommodate the PIC's with 4 register banks (like the
        16f877)
      */
   },
@@ -420,7 +420,7 @@ PORT pic_port =
     NULL,
     NULL,
     1,                      // code is read only
-    true,                   // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behviour of rpevious version of sdcc for now.
+    true,                   // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behaviour of rpevious version of sdcc for now.
     1                       // No fancy alignments supported.
   },
   { NULL, NULL },

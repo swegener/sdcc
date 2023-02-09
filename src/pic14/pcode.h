@@ -37,7 +37,7 @@ struct reg_info;
 
    The post code generation is an assembler optimizer. The assembly code
    produced by all of the previous steps is fully functional. This step
-   will attempt to analyze the flow of the assembly code and agressively 
+   will attempt to analyze the flow of the assembly code and aggressively 
    optimize it. The peep hole optimizer attempts to do the same thing.
    As you may recall, the peep hole optimizer replaces blocks of assembly
    with more optimal blocks (e.g. removing redundant register loads).
@@ -455,7 +455,7 @@ typedef struct pCodeCSource
 
   The Flow object is used as marker to separate 
  the assembly code into contiguous chunks. In other
- words, everytime an instruction cause or potentially
+ words, every time an instruction cause or potentially
  causes a branch, a Flow object will be inserted into
  the pCode chain to mark the beginning of the next
  contiguous chunk.

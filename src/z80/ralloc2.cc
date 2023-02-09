@@ -75,7 +75,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
                 }
 
               // Penalty for not placing 2- and 4-byte variables in register pairs
-              // Todo: Extend this once the register allcoator can use registers other than bc, de:
+              // Todo: Extend this once the register allocator can use registers other than bc, de:
               if ((size == 2 || size == 4) &&
                   (byteregs[1] != byteregs[0] + 1 || (byteregs[0] != REG_C && byteregs[0] != REG_E && byteregs[0] != REG_L)))
                 c += 2.0f;
@@ -1456,7 +1456,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
           c += 2.0f;
     }
 
-  // An artifical ordering of assignments.
+  // An artificial ordering of assignments.
   if(ia.registers[REG_E][1] < 0)
     c += 0.0001f;
   if(ia.registers[REG_D][1] < 0)

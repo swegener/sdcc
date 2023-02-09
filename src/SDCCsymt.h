@@ -256,7 +256,7 @@ typedef struct sym_link
     unsigned banked:1;              /* function has the banked attribute    */
     unsigned critical:1;            /* critical function                    */
     unsigned intrtn:1;              /* this is an interrupt routine         */
-    unsigned rbank:1;               /* seperate register bank               */
+    unsigned rbank:1;               /* separate register bank               */
     unsigned inlinereq:1;           /* inlining requested                   */
     unsigned noreturn:1;            /* promised not to return               */
     bool noprototype:1;             /* Up to C17 function declaratos without prototypes were allowed */
@@ -265,7 +265,7 @@ typedef struct sym_link
     unsigned raisonance:1;          /* Raisonance calling convention for STM8 */
     unsigned iar:1;                 /* IAR calling convention               */
     unsigned cosmic:1;              /* Cosmic calling convention            */
-    unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
+    unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single parameter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
     unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
     unsigned z88dk_has_params_offset:1;     /* Has a parameter offset (Z80 only) */
@@ -632,9 +632,9 @@ extern symbol *muldiv[3][4][4];
 extern symbol *muls16tos32[2];
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 extern sym_link *multypes[4][2];
-/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
+/* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
 extern symbol *conv[2][4][2];
-/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/USIGNED */
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/QWORD/FLOAT, SIGNED/UNSIGNED */
 extern symbol *fp16x16conv[2][5][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
 extern symbol *rlrr[2][4][2];

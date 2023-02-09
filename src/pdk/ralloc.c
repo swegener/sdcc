@@ -595,7 +595,7 @@ serialRegMark (eBBlock **ebbs, int count)
                   sym->isspilt = FALSE;
                 }
 
-              /* Make sure any spill location is definately allocated */
+              /* Make sure any spill location is definitely allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
                 sym->usl.spillLoc->allocreq++;
 

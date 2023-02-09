@@ -520,7 +520,7 @@ static void genAddLit (iCode *ic, int lit)
                           emitpcode(POC_MOVLW,popGetLit(lo));
                           emitpcode(POC_ADDWF, popGet(AOP(result),offset));
                           if (lit <0x100) 
-                            carry_info = 3;  /* Were adding only one byte and propogating the carry */
+                            carry_info = 3;  /* Were adding only one byte and propagating the carry */
                           else
                             carry_info = 2;
                           break;
@@ -927,7 +927,7 @@ void genPlus (iCode *ic)
                 
                 
                 if(sign && offset > 0 && offset < AOP_SIZE(IC_RESULT(ic))) {
-                /* Now this is really horrid. Gotta check the sign of the addends and propogate
+                /* Now this is really horrid. Gotta check the sign of the addends and propagate
                         * to the result */
                         
                         emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(IC_LEFT(ic)),offset-1,FALSE,FALSE),7,0));
@@ -1079,7 +1079,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* addSign - propogate sign bit to higher bytes                    */
+/* addSign - propagate sign bit to higher bytes                    */
 /*-----------------------------------------------------------------*/
 void addSign(operand *result, int offset, int sign)
 {

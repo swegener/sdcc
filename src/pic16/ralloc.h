@@ -52,7 +52,7 @@ enum {
 //#define REG_GPR 0x02
 //#define REG_CND 0x04
 //#define REG_SFR 0x08
-//#define REG_STK 0x10  /* Use a register as a psuedo stack */
+//#define REG_STK 0x10  /* Use a register as a pseudo stack */
 //#define REG_TMP 0x20  
 
 /* definition for the registers */

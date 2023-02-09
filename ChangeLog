@@ -2,7 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Fix bug #3382.
-	* support/regression/tests/*.c:
+	* support/regression/tests/*.c,
+	  src/*:
 	  Spelling fixes for comments, from patch #459 by Konstantin Kim.
 
 2023-02-08 Philipp Klaus Krause <philipp@colecovision.eu>

@@ -456,7 +456,7 @@ computeControlFlow (ebbIndex * ebbi)
 int returnAtEnd (eBBlock *ebp)
 {
     /* case 1.
-       This basic block ends in a return statment 
+       This basic block ends in a return statement 
     */
     if (ebp->ech && ebp->ech->op == RETURN) return 1;
 

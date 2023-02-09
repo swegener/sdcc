@@ -1379,7 +1379,7 @@ isPowerOf2 (unsigned long val)
 static void
 miscOpt (eBBlock ** ebbs, int count)
 {
-/* Borut: disabled optimization of comparision unsigned with 2^n literal
+/* Borut: disabled optimization of comparison unsigned with 2^n literal
  * since it is broken; see bug #2165 Broken comparison */
 #if 0
   int i;
@@ -1399,9 +1399,9 @@ miscOpt (eBBlock ** ebbs, int count)
                Transformation depends on lt_nge, gt_nle, bool le_ngt,
                ge_nlt, ne_neq and eq_nne members of PORT structure.
              MB: Why do we need IFX in the first case and not in the second ?
-             Borutr: Because the result of comparision is logically negated,
+             Borutr: Because the result of comparison is logically negated,
                so in case of IFX the jump logic is inverted for '<' and '<='.
-               TODO: The logical negation of the result should be implemeted
+               TODO: The logical negation of the result should be implemented
                for '<' and '<=' in case when the following instruction is not IFX.
              Philipp: Added the test for ifx in the second case, too:
              We want 0 or 1 as a result, the bitwise and won't do, unless we add a cast to bool.
@@ -1618,7 +1618,7 @@ getAddrspaceiCode (const iCode *ic)
   result = IC_RESULT (ic);
 
   /* Previous transformations in separateAddressSpaces() should
-     ensure that at most one addressspace occours in each iCode. */
+     ensure that at most one addressspace occurs in each iCode. */
   if (left && ic->op != ADDRESS_OF && IS_SYMOP (left))
     {
       if (POINTER_GET (ic))
@@ -2685,7 +2685,7 @@ optimize:
 }
 
 /*-----------------------------------------------------------------*/
-/* Go back a chain of assigments / casts to try to find a string   */
+/* Go back a chain of assignments / casts to try to find a string   */
 /* literal symbol that op really is.                               */
 /*-----------------------------------------------------------------*/
 static symbol *findStrLitDef (operand *op, iCode **def)
@@ -3431,7 +3431,7 @@ eBBlockFromiCode (iCode *ic)
      operations to be as they are for optimizations */
   convertToFcall (ebbi->bbOrder, ebbi->count);
 
-  /* miscelaneous optimizations */
+  /* miscellaneous optimizations */
   miscOpt (ebbi->bbOrder, ebbi->count);
 
   /* Split any live-ranges that became non-connected in dead code elimination. */

@@ -412,7 +412,7 @@ DEFSETFUNC (isFree)
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
-     the size can be accomodated  */
+     the size can be accommodated  */
   if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type)
       && (IS_BIT (sym->type) == IS_BIT (fsym->type)))
     {
@@ -1018,7 +1018,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
         continue;
 
       /* special case check if this is an IFX &
-         the privious one was a pop and the
+         the previous one was a pop and the
          previous one was not spilt then keep track
          of the symbol */
       if (ic->op == IFX && ic->prev && ic->prev->op == IPOP && !ic->prev->parmPush && !OP_SYMBOL (IC_LEFT (ic->prev))->isspilt)
@@ -1051,7 +1051,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
               !result->remat &&
               !bitVectBitValue (_G.regAssigned, result->key) &&
               /* the number of free regs + number of regs in this LR
-                 can accomodate the what result Needs */
+                 can accommodate the what result Needs */
               ((nfreeRegsType (result->regType) + sym->nRegs) >= result->nRegs))
             {
               for (i = 0; i < result->nRegs; i++)
@@ -1934,7 +1934,7 @@ rematStr (symbol * sym)
 }
 
 /*------------------------------------------------------------------*/
-/* isBitVar - returns true if sym is a good candiate for allocation */
+/* isBitVar - returns true if sym is a good candidate for allocation */
 /*            to a bit                                              */
 /*------------------------------------------------------------------*/
 static bool isFlagVar (symbol *sym)

@@ -1348,7 +1348,7 @@ swapPairs (PAIR_ID pair1Id, PAIR_ID pair2Id)
   _G.pairs[pair1Id].value = _G.pairs[pair2Id].value;
   _G.pairs[pair2Id].value = tv;*/
   
-  // For now just spill both: Makign this work would require proper tracking of de (i.e. adding spillPair (PAIR_DE) as consistently as has been done for spillPair (PAIR_HL)
+  // For now just spill both: Making this work would require proper tracking of de (i.e. adding spillPair (PAIR_DE) as consistently as has been done for spillPair (PAIR_HL)
   spillPair (pair1Id);
   spillPair (pair2Id);
 }
@@ -4173,7 +4173,7 @@ skip_byte:
         if (!assigned[i])
           break;
 
-      wassertl_bt (i != n, "genCopy error: Trying to cache non-existant byte in accumulator.");
+      wassertl_bt (i != n, "genCopy error: Trying to cache non-existent byte in accumulator.");
       if (!a_free && !pushed_a)
         {
           _push (PAIR_AF);
@@ -4783,7 +4783,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
           cost (2, IS_SM83 ? 16 : 4);
           n -= d;
         }
-      // on sm83 pop is smaller and faster, but that makes detection of unitialized memory harder
+      // on sm83 pop is smaller and faster, but that makes detection of uninitialized memory harder
       // On TLCS-90 pop af messes up interrupts (unless we have a valid value for f on the stack from previous push af).
       else if (!IS_SM83 && !IS_TLCS90 && n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
@@ -5042,7 +5042,7 @@ skip_byte:
         if (!assigned[i])
           break;
 
-      wassertl (i != n, "regMove error: Trying to cache non-existant byte in accumulator.");
+      wassertl (i != n, "regMove error: Trying to cache non-existent byte in accumulator.");
       if (preserve_a && !pushed_a)
         {
           _push (PAIR_AF);
@@ -13166,7 +13166,7 @@ static void offsetPair (PAIR_ID pair, PAIR_ID extrapair, bool save_extrapair, in
 }
 
 /*------------------------------------------------------------------*/
-/* init_stackop - initalize asmop for stack location                */
+/* init_stackop - initialize asmop for stack location                */
 /*------------------------------------------------------------------*/
 static void 
 init_stackop (asmop *stackop, int size, long int stk_off)

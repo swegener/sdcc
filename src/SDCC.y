@@ -1339,7 +1339,7 @@ function_declarator
           addDecl ($1, FUNCTION, NULL);
           funcType = $1->type;
 
-          // For a function pointer, the parmeter list here is for the returned type.
+          // For a function pointer, the parameter list here is for the returned type.
           if (is_fptr)
             funcType = funcType->next;
 

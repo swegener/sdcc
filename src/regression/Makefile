@@ -89,7 +89,7 @@ LIB_X = $(findstring x,$(TARGET))
 
 ifeq (e,$(strip $(LIB_E)))
 # pic14 enhanced device
-# the defaut device for enhanced cores in SDCC is the 16f1934,
+# the default device for enhanced cores in SDCC is the 16f1934,
 # but it is not supported by gpsim, so we use here the 16f1788,
 # which in fact has more ROM and RAM memory
 DEV ?= 16f1788

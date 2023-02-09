@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-  device.c - Accomodates subtle variations in PIC16 devices
+  device.c - Accommodates subtle variations in PIC16 devices
 
    Written By -  Scott Dattalo scott@dattalo.com
 

@@ -33,7 +33,7 @@ extern "C"
 #undef BTREE_DEBUG
 
 // We used to use an std::set<symbol *> instead of std::list<symbol *>.
-// That was faster, but resulted in non-reproducible compilaton result, especially on systems with address space randomizatrion, such as macOS.
+// That was faster, but resulted in non-reproducible compilation result, especially on systems with address space randomizatrion, such as macOS.
 // When performance becomes an issue here, we might want to switch to boost::multi_index.
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, std::pair<std::list<symbol *>, int> > btree_t;
 

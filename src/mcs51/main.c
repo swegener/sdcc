@@ -884,7 +884,7 @@ PORT mcs51_port =
     NULL,
     NULL,
     1,
-    true,                       // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behviour of rpevious version of sdcc for now.
+    true,                       // unqualified pointer can point to __sfr: TODO: CHECK IF THIS IS ACTUALLY SUPPORTED. Set to true to emulate behaviour of rpevious version of sdcc for now.
     1                           // No fancy alignments supported.
   },
   { _mcs51_genExtraAreas, NULL },

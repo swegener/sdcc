@@ -454,7 +454,7 @@ DEFSETFUNC (isFree)
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
-     the size can be accomodated  */
+     the size can be accommodated  */
   if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type)
       && (IS_BIT (sym->type) == IS_BIT (fsym->type)))
     {
@@ -1063,7 +1063,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
         continue;
 
       /* special case check if this is an IFX &
-         the privious one was a pop and the
+         the previous one was a pop and the
          previous one was not spilt then keep track
          of the symbol */
       if (ic->op == IFX && ic->prev && ic->prev->op == IPOP && !ic->prev->parmPush && !OP_SYMBOL (IC_LEFT (ic->prev))->isspilt)
@@ -1088,7 +1088,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
               !result->isspilt &&       /* and does not already have them */
               !result->remat && !bitVectBitValue (_G.regAssigned, result->key) &&
               /* the number of free regs + number of regs in this LR
-                 can accomodate the what result Needs */
+                 can accommodate the what result Needs */
               ((nfreeRegsType (result->regType) + sym->nRegs) >= result->nRegs))
             {
 
@@ -1295,7 +1295,7 @@ unusedLRs (eBBlock * ebp)
 }
 
 /*-----------------------------------------------------------------*/
-/* deassignUnsedLRs - if this baisc block ends in a return then    */
+/* deassignUnsedLRs - if this basic block ends in a return then    */
 /*                    deassign symbols not used in this block      */
 /*-----------------------------------------------------------------*/
 bitVect *
@@ -3240,7 +3240,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
         packRegsForSupport (ic, ebp);
 #endif
       /* some cases the redundant moves can
-         can be eliminated for return statements . Can be elminated for the first SEND */
+         can be eliminated for return statements . Can be eliminated for the first SEND */
       if ((ic->op == RETURN ||
            ((ic->op == SEND || ic->op == RECEIVE) && ic->argreg == 1)) && !isOperandInFarSpace (IC_LEFT (ic)) && !options.model)
         {

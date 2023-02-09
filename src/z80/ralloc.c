@@ -4,12 +4,12 @@
     Note: much of this is ripped straight from Sandeep's mcs51 code.
 
     This code maps the virtual symbols and code onto the real
-    hardware.  It allocates based on usage and how long the varible
+    hardware.  It allocates based on usage and how long the variable
     lives into registers or temporary memory on the stack.
 
     On the Z80 hl and ix and a are reserved for the code generator,
     leaving bc and de for allocation.  iy is unusable due to currently
-    as it's only adressable as a pair.  The extra register pressure
+    as it's only addressable as a pair.  The extra register pressure
     from reserving hl is made up for by how much easier the sub
     operations become.  You could swap hl for iy if the undocumented
     iyl/iyh instructions are available.
@@ -20,9 +20,9 @@
     ix+4:       param 0
     ix+2:       return address
     ix+0:       calling functions ix
-    ix-n:       local varibles
+    ix-n:       local variables
     ...
-    sp:         end of local varibles
+    sp:         end of local variables
 
     There is currently no support for bit spaces or banked functions.
 
@@ -190,7 +190,7 @@ DEFSETFUNC (isFree)
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
-     the size can be accomodated  */
+     the size can be accommodated  */
   if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type))
     {
       *sloc = sym;
@@ -1191,7 +1191,7 @@ serialRegMark (eBBlock ** ebbs, int count)
 
               D (D_ALLOC, ("serialRegAssign: in loop on result %p (%s)\n", sym, sym->name));
 
-              /* Make sure any spill location is definately allocated */
+              /* Make sure any spill location is definitely allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
                 {
                   sym->usl.spillLoc->allocreq++;

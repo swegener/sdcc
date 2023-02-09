@@ -170,7 +170,7 @@ dwWriteHalf (const char * label, int offset, char * comment)
 static void
 dwWriteWord (const char * label, int offset, char * comment)
 {
-  /* FIXME: need to implement !dd pseudo-op in the assember. In the */
+  /* FIXME: need to implement !dd pseudo-op in the assembler. In the */
   /* meantime, we use dw with zero padding and hope the values fit  */
   /* in only 16 bits.                                               */
 #if 0

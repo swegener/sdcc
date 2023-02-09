@@ -384,7 +384,7 @@ findPrevUseSym  (eBBlock *ebp, iCode *ic, symbol * sym)
 
   if (ebp->visited)
     {
-     /* already visited: this branch must have been succesfull, */
+     /* already visited: this branch must have been successful, */
      /* because otherwise the search would have been aborted. */
       return TRUE;
     }
@@ -594,7 +594,7 @@ rliveClear (eBBlock **ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rlivePoint - for each point compute the ranges that are alive   */
 /* The live range is only stored for ITEMPs; the same code is used */
-/* to find use of unitialized AUTOSYMs (an ITEMP is an AUTOSYM).   */
+/* to find use of uninitialized AUTOSYMs (an ITEMP is an AUTOSYM).   */
 /* also, update funcUsesVolatile flag for current function         */
 /*-----------------------------------------------------------------*/
 static int

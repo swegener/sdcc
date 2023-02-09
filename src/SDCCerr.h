@@ -47,7 +47,7 @@ enum {
   E_AUTO_ABSA                   =  17, /* abs addr for auto var*/
   W_INIT_WRONG                  =  18, /* initializer type !=  */
   E_FUNC_REDEF                  =  19, /* func name redefined  */
-  E_ID_UNDEF                    =  20, /* identifer undefined  */
+  E_ID_UNDEF                    =  20, /* Undefined identifier '%s' */
   W_STACK_OVERFLOW              =  21, /* stack overflow       */
   E_NEED_ARRAY_PTR              =  22, /* array or pointer reqd*/
   E_IDX_NOT_INT                 =  23, /* index not an integer */
@@ -81,7 +81,7 @@ enum {
   E_DUPLICATE_TYPEDEF           =  51, /* typedef name duplicate */
   E_ARG_TYPE                    =  52, /* arg type mismatch   */
   E_RET_VALUE                   =  53, /* return value mismatch */
-  E_FUNC_AGGR                   =  54, /* function returing aggr */
+  E_FUNC_AGGR                   =  54, /* Function cannot return aggregate. Func body ignored */
   E_FUNC_DEF                    =  55, /* ANSI Style def neede */
   E_DUPLICATE_LABEL             =  56, /* duplicate label name */
   E_LABEL_UNDEF                 =  57, /* undefined label used */
@@ -141,7 +141,7 @@ enum {
   W_PTR_TYPE_INVALID            = 111, /* invalid type specifier for pointer */
   W_IMPLICIT_FUNC               = 112, /* function declared implicitly */
   W_CONTINUE                    = 113, /* more than one line  */
-  I_EXTENDED_STACK_SPILS        = 114, /* too many spils occured */
+  I_EXTENDED_STACK_SPILS        = 114, /* extended stack by %d bytes for compiler temp(s) :in function  '%s': %s  */
   W_UNKNOWN_PRAGMA              = 115, /* #pragma directive unsupported */
   W_SHIFT_CHANGED               = 116, /* shift changed to zero */
   W_UNKNOWN_OPTION              = 117, /* don't know the option */
@@ -167,7 +167,7 @@ enum {
   W_ESC_SEQ_OOR_FOR_CHAR        = 137, /* Escape sequence of of range for char */
   E_INVALID_HEX                 = 138, /* \x used with no following hex digits */
   W_FUNCPTR_IN_USING_ISR        = 139, /* Call via function pointer in ISR with using attribute. */
-  E_NO_SUCH_BANK                = 140, /* 'using' attribute specifies non-existant register bank. */
+  E_NO_SUCH_BANK                = 140, /* called function uses unknown register bank %d. */
   E_TWO_OR_MORE_DATA_TYPES      = 141, /* two or more data types in declaration for '%s' */
   E_LONG_OR_SHORT_INVALID       = 142, /* long or short invalid for .. */
   E_SIGNED_OR_UNSIGNED_INVALID  = 143, /* signed or unsigned invalid for .. */
@@ -317,7 +317,7 @@ enum {
   E_VLA_TYPE_C99                = 287, /* variable length array type requires ISO C99 or later */
   E_VLA_OBJECT                  = 288, /* object of variable length array type not supported */
   E_VLA_SCOPE                   = 289, /* variable length array declarators must have function prototype scope or block scope */
-  E_VLA_INIT                    = 290, /* variable length arrays can be initalized by empty initalizers only */
+  E_VLA_INIT                    = 290, /* variable length arrays can be initialized by empty initalizers only */
   W_ENUM_INT_RANGE_C2X          = 291, /* enumeration constant outside the range of int requires ISO C2X or later */
   E_Z88DK_CALLEE_VARARG         = 292, /* __z88dk_callee with variable arguments not supported */
   W_CODEMEM_WRITE               = 293, /* attempt to write to read-only-memory */
@@ -391,7 +391,7 @@ FILE * SetErrorOut (FILE *NewErrorOut);
 
 /*
 -------------------------------------------------------------------------------
-vwerror - Output a standard eror message with variable number of arguements
+vwerror - Output a standard error message with variable number of arguments
 
 -------------------------------------------------------------------------------
 */
@@ -400,7 +400,7 @@ int vwerror (int errNum, va_list marker);
 
 /*
 -------------------------------------------------------------------------------
-werror - Output a standard eror message with variable number of arguements
+werror - Output a standard error message with variable number of arguments
 
 -------------------------------------------------------------------------------
 */
@@ -418,7 +418,7 @@ int werror_bt (int errNum, ... );
 
 /*
 -------------------------------------------------------------------------------
-werrorfl - Output a standard eror message with variable number of arguements.
+werrorfl - Output a standard error message with variable number of arguments.
            Use a specified filename and line number instead of the default.
 
 -------------------------------------------------------------------------------
@@ -428,7 +428,7 @@ int werrorfl (char *newFilename, int newLineno, int errNum, ...);
 
 /*
 -------------------------------------------------------------------------------
-fatal - Output a standard eror message with variable number of arguements and
+fatal - Output a standard error message with variable number of arguments and
         call exit()
 -------------------------------------------------------------------------------
 */

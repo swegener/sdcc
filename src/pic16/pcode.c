@@ -4482,7 +4482,7 @@ struct DBdata DBd;
 static int DBd_init = -1;
 
 /*-----------------------------------------------------------------*/
-/*    Initialiase "DB" data buffer                                 */
+/*    Initialise "DB" data buffer                                 */
 /*-----------------------------------------------------------------*/
 void pic16_initDB(void)
 {
@@ -5010,7 +5010,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
 #if 0
     if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
-        fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
+        fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (default: %x)\n",
                 __FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
         //              exit(EXIT_FAILURE);
     }
@@ -6812,7 +6812,7 @@ void pic16_pBlockMergeLabels(pBlock *pb)
 //      fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
         // And link it into the instruction's pBranch labels. (Note, since
         // it's possible to have multiple labels associated with one instruction
-        // we must provide a means to accomodate the additional labels. Thus
+        // we must provide a means to accommodate the additional labels. Thus
         // the labels are placed into the singly-linked list "label" as
         // opposed to being a single member of the pCodeInstruction.)
 
@@ -7396,7 +7396,7 @@ void pic16_OptimizeJumps (void)
         /* (1) resolve chained jumps
          * Do not perform this until pattern (4) is no longer present! Otherwise we will
          * (a) leave dead code in and
-         * (b) skip over the dead code with an (unneccessary) jump.
+         * (b) skip over the dead code with an (unnecessary) jump.
          */
         if (!matchedInvertRule && (IS_GOTO(pc) || isConditionalBranch(pc))) {
           pCodeOp *lastTargetOp = NULL;
@@ -7680,7 +7680,7 @@ static void AnalyzeFlow(int level)
     /* Phase 2 - Flow Analysis - linking flow blocks
      *
      * In this phase, the individual flow blocks are examined
-     * to determine their order of excution.
+     * to determine their order of execution.
      */
 
     for(pb = the_pFile->pbHead; pb; pb = pb->next)
@@ -9722,7 +9722,7 @@ static int defmapInsertAfter (defmap_t *ref, defmap_t *newItem) {
   return 0;
 }
 
-/* Check whether item (or an identical one) is already in the chain and add it if neccessary.
+/* Check whether item (or an identical one) is already in the chain and add it if necessary.
  * item is copied before insertion into chain and therefore left untouched.
  * Returns 1 iff the item has been inserted into the list, 0 otherwise. */
 static int defmapAddCopyIfNew (defmap_t **head, defmap_t *item) {
@@ -10850,7 +10850,7 @@ static void mergeDefmapSymbols (defmap_t *list) {
     while (curr && (curr->pc == list->pc)) {
       if (curr->sym == ref->sym) {
         //fprintf (stderr, "Merging defmap entries for symbol %s\n", strFromSym (ref->sym));
-        /* found a symbol occuring twice... merge the two */
+        /* found a symbol occurring twice... merge the two */
         if (curr->acc.access.isRead) {
           //if (ref->acc.access.isRead) fprintf (stderr, "symbol %s was marked twice as read at pc %p\n", strFromSym (ref->sym), ref->pc);
           ref->acc.access.isRead = 1;
@@ -11023,7 +11023,7 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
     list = newDefmap (symFromStr ("WREG"), mask, mask, inCond & PCC_W, outCond & PCC_W, pc, newValnum (), list);
   } // if
 
-  /* keep STATUS read BEFORE STATUS write in the list (still neccessary?) */
+  /* keep STATUS read BEFORE STATUS write in the list (still necessary?) */
   if (inCond & PCC_STATUS) {
     smask = 0;
     if (inCond & PCC_C) smask |= 1U << PIC_C_BIT;
@@ -11633,7 +11633,7 @@ static void assignValnums (pCode *pc) {
     //fprintf (stderr, "MOVWF: lit: %i (%x, %x)\n", lit, lit, val->in_val);
 
     if ((lit == 0 || lit == 0x0ff) && !pic16_isAlive (SPO_STATUS, pc)) {
-      /* might replace with CLRF/SETF (will possibly make previous MOVLW 0x00/0xff unneccessary --> dead code elimination) */
+      /* might replace with CLRF/SETF (will possibly make previous MOVLW 0x00/0xff unnecessary --> dead code elimination) */
       //fprintf (stderr, "replacing MOVWF with CLRF/SETF\n");
       if (lit == 0) {
         newpc = pic16_newpCode (POC_CLRF, pic16_pCodeOpCopy (pci->pcop));

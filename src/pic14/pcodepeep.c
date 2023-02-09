@@ -643,7 +643,7 @@ static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
 /*                    by SDCCpeeph.c into a string of tokens.      */
 /*                                                                 */
 /*                                                                 */
-/* The tokenizer is of the classic type. When an item is encounterd*/
+/* The tokenizer is of the classic type. When an item is encountered*/
 /* it is converted into a token. The token is a structure that     */
 /* encodes the item's type and it's value (when appropriate).      */
 /*                                                                 */
@@ -1285,7 +1285,7 @@ void peepRules2pCode(peepRule *rules)
 /* DLList * DLL_append                                             */
 /*                                                                 */
 /*  Append a DLList object to the end of a DLList (doubly linked   */
-/* list). If The list to which we want to append is non-existant   */
+/* list). If The list to which we want to append is non-existent   */
 /* then one is created. Other wise, the end of the list is sought  */
 /* out and a new DLList object is appended to it. In either case,  */
 /* the void *data is added to the newly created DLL object.        */
@@ -1510,7 +1510,7 @@ static int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 /* ination has no wild cards, then MatchLine will compare the two  */
 /* pcodes (src and dest) for a one-to-one match. If the destination*/
 /* has wildcards, then those get expanded. When a wild card is     */
-/* encountered for the first time it autmatically is considered a  */
+/* encountered for the first time it automatically is considered a  */
 /* match and the object that matches it is referenced in the       */
 /* variables or opcodes array (depending on the type of match).    */
 /*                                                                 */

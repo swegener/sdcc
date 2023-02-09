@@ -84,6 +84,7 @@ cl_m68hc12::cl_m68hc12(class cl_sim *asim):
   hc12wrap= new cl_12wrap();
   hc12wrap->init();
   extra_ticks= 0;
+  cCC.decode(&CC);
 }
 
 int

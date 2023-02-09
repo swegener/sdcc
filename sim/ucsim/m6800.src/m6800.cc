@@ -94,6 +94,7 @@ cl_m6800::cl_m6800(class cl_sim *asim):
   SWI_AT	= 0xfffa;
   NMI_AT	= 0xfffc;
   RESET_AT	= 0xfffe;
+  cCC.decode(&CC);
 }
 
 int

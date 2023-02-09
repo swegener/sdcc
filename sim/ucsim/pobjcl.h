@@ -67,8 +67,8 @@ public:
   virtual bool have_real_name(void) { return/*(name != 0 && *name != '\0')*/ !name.empty(); }
   const char *set_name(const char *new_name);
   const char *set_name(const char *new_name, const char *def_name);
-  bool is_named(const char *the_name) const;
-  bool is_inamed(const char *the_name) const;
+  virtual bool is_named(const char *the_name) const;
+  virtual bool is_inamed(const char *the_name) const;
 
   class cl_base *get_parent(void) { return(parent); }
   int nuof_children(void);

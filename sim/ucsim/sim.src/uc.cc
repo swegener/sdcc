@@ -1697,6 +1697,122 @@ cl_uc::read_cdb_file(cl_f *f)
   return cnt;
 }
 
+static bool is_area(chars w1, chars w2, chars w3)
+{
+  if (w1.empty() || w2.empty() || w3.empty())
+    return false;
+  if (w1 != "Area")
+    return false;
+  if (w2 != "Addr")
+    return false;
+  if (w3 != "Size")
+    return false;
+  return true;
+}
+
+static bool is_code_seg(chars wlast)
+{
+  return wlast == "(REL,CON,CODE)";
+}
+
+static bool is_ncode_seg(chars w1, chars wlast)
+{
+  return (wlast == "(REL,CON)")
+    &&
+    (
+     (w1 == "CODE") ||
+     (w1 == "_CODE")
+     );
+}
+
+static bool is_addr(chars w)
+{
+  int l= w.len();
+  if (l != 8) return false;
+  const char *s= w.c_str();
+  int i;
+  for (i= 0; i<l; i++)
+    if (!isxdigit(s[i])) return false;
+  return true;
+}
+
+long
+cl_uc::read_map_file(cl_f *f)
+{
+  int cnt= 0;
+  chars ln;
+  chars s, w1, w2, w3, wlast, w;
+  enum { s_wait_area, s_wait_seginfo, s_wait_sym, s_wait_nsym } stat;
+  class cl_cvar *v;
+  
+  stat= s_wait_area;
+  ln= f->get_s();
+  while (ln.nempty())
+    {
+      ln= f->get_s();
+      s= ln.c_str();
+      ln.start_parse();
+      w1= ln.token(" \t\v");
+      if (w1.nempty()) wlast= w1;
+      w2= ln.token(" \t\v");
+      if (w2.nempty()) wlast= w2;
+      w3= ln.token(" \t\v");
+      if (w3.nempty()) wlast= w3;
+      w= ln.token(" \t\v");
+      while (w.nempty())
+	{
+	  wlast= w;
+	  w= ln.token(" \t\v");
+	}
+      switch (stat)
+	{
+	case s_wait_area:
+	  if (is_area(w1, w2, w3))
+	    stat= s_wait_seginfo;
+	  break;
+	case s_wait_seginfo:
+	  if (is_code_seg(wlast))
+	    stat= s_wait_sym;
+	  else if (is_ncode_seg(w1, wlast))
+	    stat= s_wait_nsym;
+	  break;
+	case s_wait_sym:
+	  if (is_area(w1, w2, w3))
+	    stat= s_wait_seginfo;
+	  else
+	    {
+	      if ((w1 == "C:") && is_addr(w2) && (w3.c(0) == '_'))
+		{
+		  w3= &(w3.c_str()[1]);
+		  t_addr a= strtol(w2.c_str(), NULL, 16);
+		  //printf("%s %08x\n", w3.c_str(), AU(a));
+		  v= vars->add(w3, rom, a, "");
+		  v->set_by(VBY_DEBUG);
+		  cnt++;
+		}
+	    }
+	  break;
+	case s_wait_nsym:
+	  if (is_area(w1, w2, w3))
+	    stat= s_wait_seginfo;
+	  else
+	    {
+	      if (is_addr(w1) && (w2.c(0) == '_'))
+		{
+		  w2= &(w2.c_str()[1]);
+		  t_addr a= strtol(w1.c_str(), NULL, 16);
+		  //printf("%s %08x\n", w2.c_str(), AU(a));
+		  v= vars->add(w2, rom, a, "");
+		  v->set_by(VBY_DEBUG);
+		  cnt++;
+		}
+	    }
+	  break;
+	}
+    }
+  return cnt;
+}
+
 static int h1(const char *s, int p)
 {
   int r= 0;
@@ -1941,6 +2057,12 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
       if (!application->quiet)
 	printf("%ld symbols read from %s\n", l, f->get_fname());
     }
+  else if (is_map_file(f))
+    {
+      l= read_map_file(f);
+      if (!application->quiet)
+	printf("%ld symbols read from %s\n", l, f->get_fname());
+    }
   if (strcmp(nam, f->get_fname()) != 0)
     {
       chars n= nam;
@@ -1949,6 +2071,19 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
       if (c->opened())
 	{
 	  l= read_cdb_file(c);
+	  if (!application->quiet)
+	    printf("%ld symbols read from %s\n", l, c->get_fname());
+	}
+      delete c;
+    }
+  if (strcmp(nam, f->get_fname()) != 0)
+    {
+      chars n= nam;
+      n+= ".map";
+      cl_f *c= mk_io(n, "r");
+      if (c->opened())
+	{
+	  l= read_map_file(c);
 	  if (!application->quiet)
 	    printf("%ld symbols read from %s\n", l, c->get_fname());
 	}
@@ -3093,7 +3228,7 @@ cl_uc::save_hist()
       if (pc_dump==NULL) pc_dump= fopen("addr.txt","w");
       if (pc_dump!=NULL)
 	{
-	  fprintf(pc_dump,"0x%06x\n",AU(PC));
+	  fprintf(pc_dump,"%x 0x%06x\n", MU(application->cyc), AU(PC));
 	  fflush(pc_dump);
 	}
     }

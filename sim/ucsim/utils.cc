@@ -280,6 +280,23 @@ valid_sym_name(char *s)
 
 
 bool
+filename_has_ext(class cl_f *f, const char *ext)
+{
+  const char *n;
+  if (!f)
+    return false;
+  n= f->get_file_name();
+  if (!n ||
+      !*n)
+    return false;
+
+  if (strend(n, ext))
+    return true;
+
+  return false;
+}
+
+bool
 is_hex_file(class cl_f *f)
 {
   const char *n;
@@ -301,86 +318,37 @@ is_hex_file(class cl_f *f)
 bool
 is_asc_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
-
-  if (strend(n, ".asc"))
-    return true;
-
-  return false;
+  return filename_has_ext(f, ".asc");
 }
 
 bool
 is_p2h_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
-
-  if (strend(n, ".p2h"))
-    return true;
-
-  return false;
+  return filename_has_ext(f, ".p2h");
 }
 
 bool
 is_omf_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
-
-  if (strend(n, ".omf"))
-    return true;
-
-  return false;
+  return filename_has_ext(f, ".omf");
 }
 
 bool
 is_cdb_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
-
-  if (strend(n, ".cdb"))
-    return true;
-
-  return false;
+  return filename_has_ext(f, ".cdb");
 }
 
 bool
 is_s19_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
+  return filename_has_ext(f, ".s19");
+}
 
-  if (strend(n, ".s19"))
-    return true;
-
-  return false;
+bool
+is_map_file(class cl_f *f)
+{
+  return filename_has_ext(f, ".map");
 }
 
 /*

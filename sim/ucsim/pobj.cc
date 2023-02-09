@@ -90,16 +90,6 @@ cl_base::get_name(const char *def) const
 const char *
 cl_base::set_name(const char *new_name)
 {
-  /*
-  if (name)
-    free((void*)name);
-  if (!new_name)
-    name= 0;
-  else if (*new_name)
-    name= strdup(new_name);
-  else
-    name= strdup("");
-  */
   name= new_name;
   return(name);
 }
@@ -118,22 +108,13 @@ cl_base::set_name(const char *new_name, const char *def_name)
 bool
 cl_base::is_named(const char *the_name) const
 {
-  /*
-  if (!name ||
-      !*name ||
-      !the_name ||
-      !*the_name)
-      return(false);*/
-  return(/*strcmp(name, the_name) == 0*/name==the_name);
+  return name==the_name;
 }
 
 bool
 cl_base::is_inamed(const char *the_name) const
 {
-  if (/*!name ||
-      !*name ||
-      !the_name ||
-      !*the_name*/name.empty())
+  if (name.empty())
     return(false);
   return(strcasecmp(name, the_name) == 0);
 }
@@ -152,14 +133,8 @@ cl_base::add_child(class cl_base *child)
 {
   if (!children)
     {
-      /*
-      char *s;
-      s= (char*)malloc(name.len()+100);
-      sprintf(s, "children of %s", get_name("?"));
-      */
       chars cs("", "children of %s", get_name("?"));
       children= new cl_list(1, 1, cs);
-      //free(s);
     }
   if (child)
     {
@@ -410,18 +385,6 @@ cl_list::add_at(t_index index, void *item)
   if (count == Limit)
     set_limit(count + Delta);
 
-  /*{
-    char s[1000];
-    s[0]='\0';
-    sprintf(s, "%s add_at(%d,%p) PC=0x%x (count=%d)", get_name("?"), index, item,
-	    application?
-	    ((application->sim)?
-	     ((application->sim->uc)?(application->sim->uc->PC):
-	      -3):
-	     -1):
-	    -2, count);
-    strcat(s,"\n");
-    }*/
   memmove(&Items[index+1], &Items[index], (count-index)*sizeof(void *));
   count++;
   
@@ -616,26 +579,6 @@ cl_list::last_that(match_func test, const void *arg)
 
 
 /*
- * ???
- */
-
-/*void
-cl_list::pack(void)
-{
-  void **CurDst= Items;
-  void **CurSrc= Items;
-  void **Last  = Items + count;
-
-  while (CurSrc < Last)
-    {
-      if (*CurSrc != 0)
-	*CurDst++= *CurSrc;
-      *CurSrc++;
-    }
-}*/
-
-
-/*
  * Setting up the maximum number of items. This function may expand
  * the size of the collection.
  */
@@ -655,7 +598,6 @@ cl_list::set_limit(t_index alimit)
 	AItems= 0;
       else
 	{
-	  //AItems = new void *[alimit];
 	  int i= alimit*(sizeof(void *));
 	  AItems= (void **)malloc(i);
 	  if (count)

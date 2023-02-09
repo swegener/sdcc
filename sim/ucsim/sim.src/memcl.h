@@ -73,11 +73,14 @@ public:
   int width; // in bits
   t_mem data_mask;
   bool hidden;
+  chars altname;
 protected:
   t_addr dump_finished;
 public:
   cl_memory(const char *id, t_addr asize, int awidth);
   virtual ~cl_memory(void);
+  virtual bool is_named(const char *the_name) const;
+  virtual bool is_inamed(const char *the_name) const;
   virtual int init(void);
 
   t_addr get_start_address(void) { return(start_address); }
@@ -231,6 +234,7 @@ class cl_memory_cell: public cl_cell_data
 #ifdef STATISTIC
  public:
   unsigned long nuof_writes, nuof_reads;
+  class cl_memory *as;
 #endif
  public:
   t_mem mask;

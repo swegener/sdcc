@@ -78,6 +78,30 @@ cl_memory::~cl_memory(void)
     free(data_format);
 }
 
+bool
+cl_memory::is_named(const char *the_name) const
+{
+  bool b1= cl_base::is_named(the_name);
+  if (!the_name || !*the_name)
+    return false;
+  if (b1 || altname.empty())
+    return b1;
+  bool b2= altname==the_name;
+  return b2;
+}
+
+bool
+cl_memory::is_inamed(const char *the_name) const
+{
+  bool b1= cl_base::is_inamed(the_name);
+  if (!the_name || !*the_name)
+    return false;
+  if (b1 || altname.empty())
+    return b1;
+  bool b2= strcasecmp(altname.c_str(), the_name) == 0;
+  return b2;
+}
+
 int
 cl_memory::init(void)
 {
@@ -877,19 +901,22 @@ cl_read_operator::read(void)
 t_mem
 cl_cell8::d()
 {
+  return *((u8_t*)data);
   return data?(*((u8_t*)data)):0;
 }
 
 void
 cl_cell8::d(t_mem v)
 {
-  data?(*((u8_t*)data)=(u8_t)v):0;
+  *((u8_t*)data)=(u8_t)v;
+  //data?(*((u8_t*)data)=(u8_t)v):0;
 }
 
 void
 cl_cell8::dl(t_mem v)
 {
-  data?(*((u8_t*)data)=(u8_t)v):0;
+  *((u8_t*)data)=(u8_t)v;
+  //data?(*((u8_t*)data)=(u8_t)v):0;
 }
 
 // 8 bit cell for bit spaces
@@ -897,8 +924,7 @@ cl_cell8::dl(t_mem v)
 t_mem
 cl_bit_cell8::d()
 {
-  if (!data)
-    return 0;
+  //if (!data) return 0;
   u8_t x= *((u8_t*)data);
   x&= mask;
   return x?1:0;
@@ -907,8 +933,7 @@ cl_bit_cell8::d()
 void
 cl_bit_cell8::d(t_mem v)
 {
-  if (!data)
-    return;
+  //if (!data) return;
   if (v)
     *((u8_t*)data) |= (u8_t)mask;
   else
@@ -964,19 +989,22 @@ cl_bit_cell16::d(t_mem v)
 t_mem
 cl_cell32::d()
 {
+  return *((u32_t*)data);
   return data?(*((u32_t*)data)):0;
 }
 
 void
 cl_cell32::d(t_mem v)
 {
-  data?(*((u32_t*)data)=(u32_t)v):0;
+  *((u32_t*)data)=(u32_t)v;
+  //data?(*((u32_t*)data)=(u32_t)v):0;
 }
 
 void
 cl_cell32::dl(t_mem v)
 {
-  data?(*((u32_t*)data)=(u32_t)v):0;
+  *((u32_t*)data)=(u32_t)v;
+  //data?(*((u32_t*)data)=(u32_t)v):0;
 }
 
 // 32 bit cell for bit spaces
@@ -984,8 +1012,7 @@ cl_cell32::dl(t_mem v)
 t_mem
 cl_bit_cell32::d()
 {
-  if (!data)
-    return 0;
+  //if (!data) return 0;
   u32_t x= *((u32_t*)data);
   x&= mask;
   return x?1:0;
@@ -994,8 +1021,7 @@ cl_bit_cell32::d()
 void
 cl_bit_cell32::d(t_mem v)
 {
-  if (!data)
-    return;
+  //if (!data) return;
   if (v)
     *((u32_t*)data) |= (u32_t)mask;
   else
@@ -1012,7 +1038,7 @@ cl_memory_cell::cl_memory_cell()
   data= 0;
   flags= CELL_NON_DECODED;
   width= 8;
-  def_data= 0;
+  //def_data= 0;
   ops= NULL;
 #ifdef STATISTIC
   nuof_writes= nuof_reads= 0;
@@ -1031,7 +1057,7 @@ cl_memory_cell::cl_memory_cell(uchar awidth)
   data= 0;
   flags= CELL_NON_DECODED;
   width= awidth;
-  def_data= 0;
+  //def_data= 0;
   ops= NULL;
 #ifdef STATISTIC
   nuof_writes= nuof_reads= 0;
@@ -1168,7 +1194,7 @@ cl_memory_cell::read(void)
     {
       t_mem r= 0;
       for (int i=0; ops[i]; i++)
-	r= ops[i]->read(/*this*/);
+	r= ops[i]->read();
       return r;
     }
   return d();
@@ -1184,7 +1210,7 @@ cl_memory_cell::read(enum hw_cath skip)
     {
       t_mem r;
       for (int i=0; ops[i]; i++)
-	r= ops[i]->read(/*this,*/ skip);
+	r= ops[i]->read(skip);
       return r;
     }
   return d();
@@ -1205,7 +1231,7 @@ cl_memory_cell::write(t_mem val)
   if (ops && ops[0])
     {
       for (int i=0; ops[i]; i++)
-	val= ops[i]->write(/*this,*/ val);
+	val= ops[i]->write(val);
     }
   if (flags & CELL_READ_ONLY)
     return d();
@@ -1508,13 +1534,16 @@ cl_address_space::init(void)
 {
   cl_memory::init();
   class cl_memory_cell *cell= cell_template();
-  unsigned int i;
+  unsigned int i, s= sizeof(class cl_cell32);
+  cell->as= this;
+  u8_t *p1= (u8_t*)cella;
+  //void *p1;
   for (i= 0; i < size; i++)
     {
-      void *p1= &(cella[i]);
-      void *p2= cell;
-      memcpy(p1, p2, sizeof(class cl_cell32));
+      //p1= &(cella[i]);
+      memcpy(p1, (void*)cell, s);
       cella[i].init();
+      p1+= s;
     }
   return 0;
 }
@@ -2588,7 +2617,7 @@ cl_banker::init()
   if (c)
     {
       class cl_bank_switcher_operator *o=
-	new cl_bank_switcher_operator(c/*, banker_addr*/, this);
+	new cl_bank_switcher_operator(c, this);
       c->prepend_operator(o);
       op1= o;
     }
@@ -2599,7 +2628,7 @@ cl_banker::init()
       if (c)
 	{
 	  class cl_bank_switcher_operator *o=
-	    new cl_bank_switcher_operator(c/*, banker_addr*/, this);
+	    new cl_bank_switcher_operator(c, this);
 	  c->prepend_operator(o);
 	  op2= o;
 	}

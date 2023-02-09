@@ -6917,8 +6917,11 @@ Cross compiling SDCC on Linux for Windows
 \end_layout
 
 \begin_layout Standard
-With the Mingw32 gcc cross compiler it's easy to compile SDCC for Win32.
+With the MinGW gcc cross compilerSDCC can be cross-compiled for Win32.
  See section 'Configure Options'.
+ SDCC requires boost, but the header-only parts should be sufficient: Get
+ a current boost tarball from www.boost.org, unpack it, and choose suitable
+ configure options so the headers are found by the C++ compiler.
 \end_layout
 
 \begin_layout Subsection

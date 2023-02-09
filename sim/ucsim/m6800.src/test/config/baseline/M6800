@@ -2,10 +2,6 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-uCsim, Copyright (C)  Daniel Drotos.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 Type of microcontroller: M6800
 Controller has 9 hardware element(s).
    on simif[0]
@@ -18,7 +14,7 @@ Controller has 9 hardware element(s).
    on pia[1]
    on dport[0]
 A= $00   0   +0 .  B= $00   0   +0 .  
-CC= 00000000
+CC= 11000000
       HINZVC
 IX= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
 SP= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k

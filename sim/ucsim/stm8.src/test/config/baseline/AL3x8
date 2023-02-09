@@ -2,10 +2,6 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-uCsim, Copyright (C)  Daniel Drotos.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 Type of microcontroller: STM8 AL,L 318x, 3L8x
 Controller has 27 hardware element(s).
    on cpu[0]

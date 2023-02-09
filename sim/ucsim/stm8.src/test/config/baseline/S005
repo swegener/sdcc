@@ -2,10 +2,6 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-uCsim, Copyright (C)  Daniel Drotos.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 Type of microcontroller: STM8 S,AF 005
 Controller has 23 hardware element(s).
    on cpu[0]
@@ -25,7 +21,7 @@ Controller has 23 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]

@@ -262,17 +262,17 @@ protected:
 
 
 enum uc51cpu_cfg {
-  uc51cpu_aof_mdps	= 0, // addr of multi_DPTR_sfr selector
-  uc51cpu_mask_mdps	= 1, // mask in mutli_DPTR_sfr selector
-  uc51cpu_aof_mdps1l	= 2, // addr of multi_DPTR_sfr DPL1
-  uc51cpu_aof_mdps1h	= 3, // addr of multi_DPTR_sfr DPH1
-  uc51cpu_aof_mdpc	= 4, // addr of multi_DPTR_chip selector
-  uc51cpu_mask_mdpc	= 5, // mask in multi_DPTR_chip selector
-  uc51cpu_mdp_mode	= 6, // 's': sfr mode, 'c': chip_mode
+  uc51cpu_aof_mdps	= 1,  // addr of multi_DPTR_sfr selector
+  uc51cpu_mask_mdps	= 2,  // mask in mutli_DPTR_sfr selector
+  uc51cpu_aof_mdps1l	= 3,  // addr of multi_DPTR_sfr DPL1
+  uc51cpu_aof_mdps1h	= 4,  // addr of multi_DPTR_sfr DPH1
+  uc51cpu_aof_mdpc	= 5,  // addr of multi_DPTR_chip selector
+  uc51cpu_mask_mdpc	= 6,  // mask in multi_DPTR_chip selector
+  uc51cpu_mdp_mode	= 7,  // 's': sfr mode, 'c': chip_mode
 
-  uc51cpu_movxri_mode	= 7, // 'm': memory, 'e': expr
-  uc51cpu_movxri_as	= 8, // 's': sfr, 'i': iram, 'x': xram, 'c','r': code
-  uc51cpu_movxri_addr	= 9, // address of memory
+  uc51cpu_movxri_mode	= 8,  // 'm': memory, 'e': expr
+  uc51cpu_movxri_as	= 9,  // 's': sfr, 'i': iram, 'x': xram, 'c','r': code
+  uc51cpu_movxri_addr	= 10, // address of memory
   
   uc51cpu_nuof		= 16
 };

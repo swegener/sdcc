@@ -55,11 +55,13 @@ public:
   //virtual t_addr get_mem_size (enum mem_class type);
 
   // manipulating memories
+  /*
   virtual t_mem read_mem (const char *id, t_addr addr);
   virtual t_mem get_mem (const char *id, t_addr addr);
   virtual void  write_mem (const char *id, t_addr addr, t_mem val);
   virtual void  set_mem (const char *id, t_addr addr, t_mem val);
-
+  */
+  
   /* mods for dual-dptr */
   virtual int instruction_a3/*inst_inc_dptr*/(t_mem/*uchar*/ code);		// a3
   virtual int instruction_73/*inst_jmp_Sa_dptr*/(t_mem/*uchar*/ code);		// 73

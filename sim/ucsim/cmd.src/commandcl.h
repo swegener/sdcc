@@ -74,6 +74,7 @@ private:
   virtual void split_out_array(char *dot, char *param_str);
   virtual int token_length(char *start);
   virtual chars get_token(char *start);
+  virtual bool expand_commands(chars *params);
 public:
   virtual int split(void);
   virtual int shift(void);

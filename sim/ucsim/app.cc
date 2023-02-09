@@ -862,6 +862,38 @@ cl_app::exec(chars line)
   while (!line.empty());
 }
 
+void
+cl_app::exec(chars line, class cl_console_base *con)
+{
+  if (!con)
+    return;
+  do
+    {
+      con->un_redirect();
+      class cl_cmdline *cmdline= new cl_cmdline(this, line, con);
+      cmdline->init();
+      class cl_cmd *cm= commander->cmdset->get_cmd(cmdline, false/*c->is_interactive()*/);
+      if (cm)
+	{
+	  cm->work(this, cmdline, con);
+	}
+      else if (cmdline->get_name() != 0)
+	{
+	  char *e= cmdline->cmd;
+	  if (strlen(e) > 0)
+	    {
+	      t_mem l= eval(e);
+	      con->dd_color("result");
+	      con->print_expr_result(l, NULL);
+	      
+	    }
+	}
+      line= cmdline->rest;
+      delete cmdline;
+    }
+  while (!line.empty());
+}
+
 /*
  * Messages to broadcast
  */
@@ -922,6 +954,13 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
   cmd->init();
 
   cmdset->add(cmd= new cl_exec_cmd("exec", 0));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_echo_cmd("echo", 0));
+  cmd->init();
+  cmd->add_name("print");
+
+  cmdset->add(cmd= new cl_dev_cmd("dev", 0));
   cmd->init();
 
   cmdset->add(cmd= new cl_expression_cmd("expression", 0));

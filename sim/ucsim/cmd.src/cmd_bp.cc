@@ -437,6 +437,7 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
 
   if (!s.empty())
     {
+      s.rip("\"\n\t\v ");
       b->commands= s;
     }
   else

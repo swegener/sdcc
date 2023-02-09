@@ -146,7 +146,8 @@ class cl_console_base: public cl_base
   virtual void welcome(void);
   virtual int proc_input(class cl_cmdset *cmdset);
   virtual bool need_check(void) { return false; }
-  
+
+  virtual bool non_color(void)= 0;
   virtual void print_prompt(void);
   virtual void print_expr_result(t_mem val, const char *fmt);
   virtual void print_expr_result(t_mem val, const chars &fmt)
@@ -210,6 +211,7 @@ public:
   cl_console_stdout(class cl_app *the_app);
   virtual ~cl_console_stdout(void);
   virtual int init(void);
+  virtual bool non_color(void) { return false; }
   virtual class cl_f *get_fout(void) { return f_stdout; }
   virtual class cl_f *get_fin(void) { return NULL; }
   virtual class cl_console_base *clone_for_exec(char *fin) { return NULL; }
@@ -225,6 +227,33 @@ public:
 };
 
 
+class cl_console_sout: public cl_console_base
+{
+public:
+  chars sout;
+public:
+  cl_console_sout(class cl_app *the_app);
+  virtual ~cl_console_sout(void);
+  virtual int init(void);
+  virtual bool non_color(void) { return true; }
+  virtual class cl_f *get_fout(void) { return NULL; }
+  virtual class cl_f *get_fin(void) { return NULL; }
+  virtual class cl_console_base *clone_for_exec(char *fin) { return NULL; }
+  virtual void redirect(const char *fname, const char *mode) {}
+  virtual void un_redirect(void) {}
+  virtual bool is_tty(void) const { return false; }
+  virtual bool is_eof(void) const { return false; }
+  virtual bool input_avail(void) { return false; }
+  virtual int read_line(void) { return 0; }
+  virtual void drop_files(void) {}
+  virtual void close_files(bool close_in, bool close_out) {}
+  virtual void replace_files(bool close_old, cl_f *new_in, cl_f *new_out) {}
+  virtual int write(char *buf, int count);
+  virtual int cmd_do_print(const char *format, va_list ap);
+  virtual int cmd_do_cprint(const char *color_name, const char *format, va_list ap);
+};
+
+
 class cl_console_dummy: public cl_console_base
 {
  public:
@@ -232,6 +261,7 @@ class cl_console_dummy: public cl_console_base
 
   virtual class cl_console_base *clone_for_exec(char *fin) { return NULL; }
 
+  virtual bool non_color(void) { return false; }
   virtual void redirect(const char *fname, const char *mode) {}
   virtual void un_redirect(void) {}
   virtual bool is_tty(void) const { return false; }

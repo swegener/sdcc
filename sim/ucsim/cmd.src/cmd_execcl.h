@@ -53,8 +53,9 @@ COMMAND(cl_quit_cmd);
 COMMAND_ON(app,cl_kill_cmd);
 COMMAND_ON(app,cl_exec_cmd);
 COMMAND_ON(app,cl_expression_cmd);
-
-
+COMMAND_ON(app,cl_echo_cmd);
+COMMAND_ON(app,cl_dev_cmd);
+  
 // History
 COMMAND_ON(uc,cl_hist_cmd);
 COMMAND_ON(uc,cl_hist_info_cmd);

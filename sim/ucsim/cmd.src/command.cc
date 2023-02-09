@@ -157,10 +157,15 @@ cl_cmdline::split(void)
 	  char *dot;
           i= strcspn(start, " \t\v\r,#;");
           end= start+i;
-          param_str= (char *)malloc(i+1);
+          /*param_str= (char *)malloc(i+1);
           strncpy(param_str, start, i);
 	  param_str[i]= '\0';
-	  tokens->add(strdup(param_str));
+	  */
+	  chars ps;
+	  ps.appendn(start, i);
+	  expand_commands(&ps);
+	  tokens->add(strdup(/*param_str*/ps.c_str()));
+	  param_str= (char*)ps.c_str();
 	  if ((dot= strchr(param_str, '[')) != NULL)
             {
               char *p;
@@ -193,7 +198,7 @@ cl_cmdline::split(void)
 	      params->add(arg= new cl_cmd_sym_arg(param_str));
 	      arg->init();
 	    }
-	  free(param_str);
+	  //free(param_str);
 	}
       start= end;
       start= skip_delims(start);
@@ -222,15 +227,15 @@ cl_cmdline::split_out_string(char **_start, char **_end)
   if (*end == '"')
     end--;
   else
-    con->dd_printf("Unterminated string\n");
-  char *param_str= (char *)malloc(end-start+2);
-  strncpy(param_str, start, 1+end-start);
-  param_str[1+end-start]= '\0';
-  tokens->add(strdup(param_str));
+    con->dd_cprintf("error", "Unterminated string\n");
+  chars ps;
+  ps.appendn(start, 1+end-start);
+  expand_commands(&ps);
+  tokens->add(strdup(ps.c_str()));
   class cl_cmd_arg *arg;
-  params->add(arg= new cl_cmd_str_arg(param_str));
+  params->add(arg= new cl_cmd_str_arg(ps.c_str()));
   arg->init();
-  free(param_str);
+  //free(param_str);
   if (*end)
     end++;
   if (*end == '"')
@@ -277,7 +282,7 @@ cl_cmdline::add_bit(char *dot, char *colon, class cl_cmd_arg *sfr)
           *end = '\0';
       else
         {
-          con->dd_printf("Incomplete bit address\n");
+          con->dd_cprintf("error", "Incomplete bit address\n");
           delete sfr;
           return;
         }
@@ -285,7 +290,7 @@ cl_cmdline::add_bit(char *dot, char *colon, class cl_cmd_arg *sfr)
 
   if (*dot == '\0')
     {
-      con->dd_printf("Incomplete bit address\n");
+      con->dd_cprintf("error", "Incomplete bit address\n");
       delete sfr;
       return;
     }
@@ -359,14 +364,14 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
   if (*dot == '\0')
     {
       aname= 0;
-      con->dd_printf("Incomplete array\n");
+      con->dd_cprintf("error", "Incomplete array\n");
     }
   else
     {
       char *p = strchr(dot, ']');
       if (!p)
         {
-          con->dd_printf("Missing ']' in array index\n");
+          con->dd_cprintf("error", "Missing ']' in array index\n");
           delete aname;
         }
       else
@@ -374,7 +379,7 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
           *(p++)= '\0';
           if (strlen(dot) == 0)
             {
-              con->dd_printf("Incomplete array index\n");
+              con->dd_cprintf("error", "Incomplete array index\n");
               delete aname;
             }
           else
@@ -392,9 +397,9 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
               class cl_cmd_arg *arg= new cl_cmd_array_arg(aname, aindex);
               arg->init();
               if (*p == '.' || *p == '[')
-                  add_bit(p+1, strchr(p+1, ':'), arg);
+		add_bit(p+1, strchr(p+1, ':'), arg);
               else
-                  params->add(arg);
+		params->add(arg);
             }
         }
     }
@@ -472,6 +477,50 @@ cl_cmdline::get_token(char *start)
 	cs+= start[i];
     }
   return cs;
+}
+
+bool
+cl_cmdline::expand_commands(chars *params)
+{
+  int start= -1, end= -1;
+  int i, level= 0;
+  char *s= params->str();
+  if (params->empty())
+    return false;
+  for (i= 0; s[i]; i++)
+    {
+      if (s[i] == '\\')
+	{
+	  i++;
+	}
+      else if (s[i] == '$')
+	{
+	  if (s[++i] == '(')
+	    {
+	      if ((level == 0) && s[i+1])
+		start= ++i;
+	      level++;
+	    }
+	}
+      else if (s[i] == ')')
+	{
+	  level--;
+	  if (level == 0)
+	    end= i-1;
+	}
+    }
+  //printf("S:%d E:%d L:%d\n",start,end,level);
+  if ((start < 0) && (end < 0))
+    return true;
+  if ((start < 0) || (end < 0) || (level != 0))
+    {
+      con->dd_cprintf("error", "Syntax error: unbalanced command expansion\n");
+      return false;
+    }
+  chars cmd;
+  cmd.appendn(&s[start], end-start+1);
+  //printf("OK |%s|\n", cmd.c_str());
+  return true;
 }
 
 int
@@ -802,21 +851,21 @@ cl_cmd::work(class cl_app *app,
     case operate_on_app:
       if (!app)
 	{
-	  con->dd_printf("There is no application to work on!\n");
+	  con->dd_cprintf("error", "There is no application to work on!\n");
 	  return(false);
 	}
       return(do_work(app, cmdline, con));
     case operate_on_sim:
       if (!sim)
 	{
-	  con->dd_printf("There is no simulator to work on!\n");
+	  con->dd_cprintf("error", "There is no simulator to work on!\n");
 	  return(false);
 	}
       return(do_work(sim, cmdline, con));
     case operate_on_uc:
       if (!sim)
 	{
-	  con->dd_printf("There is no microcontroller to work on!\n");
+	  con->dd_cprintf("error", "There is no microcontroller to work on!\n");
 	  return(false);
 	}
       return(do_work(uc, cmdline, con));
@@ -828,7 +877,7 @@ cl_cmd::work(class cl_app *app,
 int
 cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console_base *con)
 {
-  con->dd_printf("Command \"%s\" does nothing.\n",
+  con->dd_cprintf("answer", "Command \"%s\" does nothing.\n",
 		 names->at(0));
   return(0);
 }
@@ -837,7 +886,7 @@ int
 cl_cmd::do_work(class cl_app *app,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
-  con->dd_printf("Command \"%s\" does nothing on application.\n",
+  con->dd_cprintf("answer", "Command \"%s\" does nothing on application.\n",
 		 names->at(0));
   return(0);
 }
@@ -846,7 +895,7 @@ int
 cl_cmd::do_work(class cl_sim *sim,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
-  con->dd_printf("Command \"%s\" does nothing on simulator.\n",
+  con->dd_cprintf("answer", "Command \"%s\" does nothing on simulator.\n",
 		 names->at(0));
   return(0);
 }
@@ -855,7 +904,7 @@ int
 cl_cmd::do_work(class cl_uc *uc,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
-  con->dd_printf("Command \"%s\" does nothing on microcontroller.\n",
+  con->dd_cprintf("answer", "Command \"%s\" does nothing on microcontroller.\n",
 		 names->at(0));
   return(0);
 }
@@ -897,7 +946,7 @@ cl_cmd::syntax_error(class cl_console_base *con)
       if (short_help.nempty())
 	print_short(con);
       else
-	con->dd_printf("Error: wrong syntax\n");
+	con->dd_cprintf("error", "Error: wrong syntax\n");
     }
 }
 

@@ -52,6 +52,7 @@ class cl_console: public cl_console_base
 
   virtual ~cl_console(void);
   //virtual void set_id(int new_id);
+  virtual bool non_color(void) { return false; }
   virtual class cl_console *clone_for_exec(char *_fin);
   virtual void drop_files(void); // do not close, just ignore
   virtual void close_files(bool close_in, bool close_out);

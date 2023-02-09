@@ -117,6 +117,7 @@ public:
   //virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
   virtual t_mem eval(chars expr);
   virtual void exec(chars line);
+  virtual void exec(chars line, class cl_console_base *con);
   
 public: // messages to broadcast
   //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);

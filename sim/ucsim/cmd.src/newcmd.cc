@@ -302,7 +302,9 @@ cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
       !fo->tty)
       )
     bw= true;
-
+  if (non_color())
+    bw= true;
+  
   o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
   if (o) o->get_value(&cc);
@@ -321,7 +323,7 @@ cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
 chars
 cl_console_base::get_color_ansiseq(const char *color_name, bool add_reset)
 {
-  bool bw= false;
+  bool bw= non_color();
   char *cc;
   chars cce= "";
   class cl_f *fo= get_fout();
@@ -349,7 +351,8 @@ cl_console_base::get_color_ansiseq(const char *color_name, bool add_reset)
 void
 cl_console_base::dd_color(const char *color_name)
 {
-  dd_printf("%s", get_color_ansiseq(color_name, true).c_str());
+  if (!non_color())
+    dd_printf("%s", get_color_ansiseq(color_name, true).c_str());
 }
 
 int
@@ -444,7 +447,9 @@ cl_console_base::cmd_do_cprint(const char *color_name, const char *format, va_li
       !fo->tty)
       )
     bw= true;
-
+  if (non_color())
+    bw= true;
+      
   o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
   if (o) o->get_value(&cc);
@@ -747,6 +752,10 @@ cl_console_base::set_cooked(bool new_val)
 }
 
 
+/*
+ * Console where all output goes to the standard output
+ */
+
 cl_console_stdout::cl_console_stdout(class cl_app *the_app):
   cl_console_base()
 {
@@ -776,6 +785,69 @@ cl_console_stdout::init(void)
   prev_quit= -1;
   set_interactive(false);
   return 0;
+}
+
+
+/*
+ * Console where all output is catched in a string
+ */
+
+cl_console_sout::cl_console_sout(class cl_app *the_app):
+  cl_console_base()
+{
+  app= the_app;
+}
+
+cl_console_sout::~cl_console_sout(void)
+{
+}
+
+int
+cl_console_sout::init(void)
+{
+  cl_base::init();
+  prompt_option= 0;
+  null_prompt_option= 0;
+  debug_option= 0;
+  set_flag(CONS_NOWELCOME, true);
+  //cl_console_base::init();
+  last_command= 0;
+  //last_cmdline= 0;
+  last_cmd= chars("");
+  prev_quit= -1;
+  set_interactive(false);
+  return 0;
+}
+
+int
+cl_console_sout::write(char *buf, int count)
+{
+  int ret= 0;
+  if (!buf)
+    return 0;
+  while (buf[ret] && (ret<count))
+    sout+= buf[ret++];
+  sout.trim();
+  return ret;
+}
+
+int
+cl_console_sout::cmd_do_print(const char *format, va_list ap)
+{
+  int ret;
+  char *msg;
+  msg= vformat_string(format, ap);
+  sout+= msg;
+  ret= strlen(msg);
+  free(msg);
+  sout.trim();
+  return ret;
+}
+
+int
+cl_console_sout::cmd_do_cprint(const char *color_name, const char *format, va_list ap)
+{
+  return cmd_do_print(format, ap);
 }
 
 

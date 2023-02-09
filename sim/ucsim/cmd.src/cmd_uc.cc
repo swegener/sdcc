@@ -250,6 +250,7 @@ CMDHELP(cl_tick_cmd,
 COMMAND_DO_WORK_UC(cl_dump_cmd)
 {
   class cl_memory *mem= uc->rom;
+  t_addr addr;
   /*t_addr*/long long int start = -1, end = -1;
   long bpl= -1;
 
@@ -322,6 +323,25 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 
   if (params[0] == 0)
     ;
+  else if (cmdline->syntax_match(uc, CELL))
+    {
+      mem= uc->address_space(params[0]->value.cell, &addr);
+      start= addr;
+      end= start+64;
+    }
+  else if (cmdline->syntax_match(uc, CELL ADDRESS))
+    {
+      mem= uc->address_space(params[0]->value.cell, &addr);
+      start= addr;
+      end= params[1]->value.address;
+    }
+  else if (cmdline->syntax_match(uc, CELL ADDRESS NUMBER))
+    {
+      mem= uc->address_space(params[0]->value.cell, &addr);
+      start= addr;
+      end= params[1]->value.address;
+      bpl= params[2]->value.number;
+    }
   else if (cmdline->syntax_match(uc, BIT)) {
     mem= params[0]->value.bit.mem;
     start= params[0]->value.bit.mem_address;

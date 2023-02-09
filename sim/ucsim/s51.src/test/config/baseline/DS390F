@@ -2,10 +2,6 @@ uCsim, Copyright (C)  Daniel Drotos.
 uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-uCsim, Copyright (C)  Daniel Drotos.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
 Type of microcontroller: DS390F CMOS cmos
 Controller has 15 hardware element(s).
    on cpu[0]
@@ -25,8 +21,12 @@ Controller has 15 hardware element(s).
    on ds390hw[0]
      R0 R1 R2 R3 R4 R5 R6 R7
      00 00 00 00 00 00 00 00
-@R0 00 .  ACC= 0x00   0 .  B= 0x00  *DPTR0= 0x000000 @DPTR0= 0x00   0 .   DPTR1= 0x000000 @DPTR1= 0x00   0 .
-@R1 00 .  AP= 0x00  PSW= 0x00 CY=0 AC=0 OV=0 P=0    SP 0x00000  ? ff          MOV    R7,A[0K
+@R0 00 .  ACC= 0x00   0 .  B= 0x00
+@R1 00 .  AP= 0x00  PSW= 0x00 CY=0 AC=0 OV=0 P=0    
+  *DPTR0= 0x000000 @DPTR0= 0x00   0 .
+   DPTR1= 0x000000 @DPTR1= 0x00   0 .
+SP 0x07 00 00 00 00 00 00 00 00
+0x00000  ? ff          MOV    R7,A[0K
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x01ffff   131072 rom_chip (8,%02x,0x%05x)

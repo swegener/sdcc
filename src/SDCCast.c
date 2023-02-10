@@ -3887,7 +3887,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             return decorateType (otree, RESULT_TYPE_NONE, reduceTypeAllowed);
 
           /* if right is a literal and has the same size with left, 
-             then also sync their signess to avoid unnecessary cast */
+             then also sync their signedness to avoid unnecessary cast */
           if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
             SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
@@ -4144,7 +4144,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
 
       /* if right is a literal and has the same size with left, 
-         then also sync their signess to avoid unnecessary cast */
+         then also sync their signedness to avoid unnecessary cast */
       if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
         SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 

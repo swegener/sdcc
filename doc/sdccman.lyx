@@ -6917,7 +6917,7 @@ Cross compiling SDCC on Linux for Windows
 \end_layout
 
 \begin_layout Standard
-With the MinGW gcc cross compilerSDCC can be cross-compiled for Win32.
+With the MinGW gcc cross compiler SDCC can be cross-compiled for Win32.
  See section 'Configure Options'.
  SDCC requires boost, but the header-only parts should be sufficient: Get
  a current boost tarball from www.boost.org, unpack it, and choose suitable
@@ -14542,7 +14542,7 @@ status collapsed
 unsigned
 \family default
 .
- To set the signess for characters to signed, use the option -
+ To set the signedness for characters to signed, use the option -
 \series bold
 
 \begin_inset ERT

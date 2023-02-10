@@ -1,3 +1,10 @@
+2023-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c: changed possible to probable
+	* src/SDCCast.c,
+	  doc/sdccman.lyx: fixed spelling
+
 2023-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:
@@ -15063,7 +15070,7 @@
 2016-04-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c
-	  Change the signess of the literal operand in bitwise operation.
+	  Change the signedness of the literal operand in bitwise operation.
 	* support/regression/tests/bug-1929.c
 	  Add a new test case.
 	* support/regression/tests/gcc-torture-execute-20020506-1.c

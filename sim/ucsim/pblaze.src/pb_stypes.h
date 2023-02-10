@@ -140,7 +140,7 @@ enum mem_class
 #define resGO		0	/* OK, go on */
 #define resWDTRESET	1	/* Reset by WDT */
 #define resINTERRUPT	2	/* Interrupt accepted */
-#define resSTOP		100	/* Stop if result greater then this */
+#define resSTOP		100	/* Stop if result greater than this */
 #define resHALT		101	/* Serious error, halt CPU */
 #define resINV_ADDR	102	/* Invalid indirect address */
 #define resSTACK_OV	103	/* Stack overflow */

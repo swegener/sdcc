@@ -1372,7 +1372,7 @@ ed70    in --,(c)
 *
 ed71    out (c),--
 * seems to send a 00 to port stored in (c).
-* the same reference as as above calls this: out (hl),(c).
+* the same reference as above calls this: out (hl),(c).
 
 A full article on this material is available upon request.
 This information from NORTHERN BYTES, volume 5 number 8.

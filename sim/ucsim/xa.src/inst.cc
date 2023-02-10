@@ -772,7 +772,7 @@ int cl_xa::inst_JMP(uint code, int operands)
 int cl_xa::inst_JNZ(uint code, int operands)
 {
   short saddr = (fetch1() * 2);
-  /* reg1(8) = R4L, is ACC for MCS51 compatiblility */
+  /* reg1(8) = R4L, is ACC for MCS51 compatibility */
   if (reg1(8)!=0) {
     PC = (PC + saddr) & 0xfffffe;
   }
@@ -780,7 +780,7 @@ int cl_xa::inst_JNZ(uint code, int operands)
 }
 int cl_xa::inst_JZ(uint code, int operands)
 {
-  /* reg1(8) = R4L, is ACC for MCS51 compatiblility */
+  /* reg1(8) = R4L, is ACC for MCS51 compatibility */
   short saddr = (fetch1() * 2);
   if (reg1(8)==0) {
       PC += saddr;

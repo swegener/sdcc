@@ -321,7 +321,7 @@ enum inst_result {
   resGO		= 0,	/* OK, go on */
   resWDTRESET	= 1,	/* Reset by WDT */
   resINTERRUPT	= 2,	/* Interrupt accepted */
-  resSTOP	= 100,	/* Stop if result greater then this */
+  resSTOP	= 100,	/* Stop if result greater than this */
   resHALT	= 101,	/* Serious error, halt CPU */
   resINV_ADDR	= 102,	/* Invalid indirect address */
   resSTACK_OV	= 103,	/* Stack overflow */

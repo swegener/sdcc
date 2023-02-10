@@ -179,11 +179,11 @@ MOVC instructions use either PC(SSEL.4=0) or CS(SSEL.4=1) register.
 Core SFRs:
 PCON, SCR, SSEL, PSWH, PSWL, CS, ES, DS
 (1K SFR space)
-400H-43FH are bit or byte accesable.
+400H-43FH are bit or byte accessible.
 400H-5FFH is for built in SFR hardware.
 600H-7FFH is for external SFR hardware access.
 SFR access is independent of segment regs.
-SFR inacessable from indirect addressing(must use direct-addr in opcodes).
+SFR inaccessible from indirect addressing(must use direct-addr in opcodes).
 
 Bit space:
 0 to ffH - R0 to R15

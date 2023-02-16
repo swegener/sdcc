@@ -1,3 +1,7 @@
+2023-02-16 Felix Salfelder <felix AT salfelder.org>
+
+	* src/clean.mk: Delete Makefile target only.
+
 2023-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCerr.h,

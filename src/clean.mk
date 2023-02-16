@@ -7,7 +7,7 @@ clean:
 	rm -f .[a-z]*~ \#*
 	rm -f version.h
 	rm -f SDCCy.c SDCCy.h SDCClex.c
-	rm -f $(top_builddir)/bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
+	rm -f $(TARGET)
 	for port in $(CLEANALLPORTS) ; do\
 	  if [ -f $$port/Makefile ]; then\
 	    $(MAKE) -C $$port clean ;\

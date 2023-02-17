@@ -1056,7 +1056,6 @@ search_path_head (cpp_reader *pfile, const char *fname, int angle_brackets,
     return make_cpp_dir (pfile, dir_name_of_file (file),
 			 pfile->buffer ? pfile->buffer->sysp : 0);
 
-  assert(dir);
   if (dir == NULL)
     cpp_error (pfile, CPP_DL_ERROR,
 	       "no include path in which to search for %s", fname);

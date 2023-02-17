@@ -1,3 +1,8 @@
+2023-02-17 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/libcpp/files.cc:
+	  Remove stray assert, fix bug #3483.
+
 2023-02-16 Felix Salfelder <felix AT salfelder.org>
 
 	* src/clean.mk: Delete Makefile target only.

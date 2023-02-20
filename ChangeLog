@@ -1,3 +1,8 @@
+2023-02-20 Felix Salfelder <felix AT salfelder.org>
+
+	* Makefile.in:
+	  fix literal sdcc-sdbinutils dep, towards fixing bug #3491.
+
 2023-02-17 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/libcpp/files.cc:

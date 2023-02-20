@@ -142,7 +142,7 @@ all: checkconf sdcc
 
 tini: checkconf sdcc-tini
 
-sdcc-libs: sdcc-sdbinutils
+sdcc-libs: ${SDCC_SDBINUTILS}
 	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
 
 sdcc-cc: sdcc-libs

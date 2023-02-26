@@ -1,7 +1,13 @@
+2023-02-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCloop.c,
+	  support/regression/tests/bug-3560.c:
+	  Fix bug #3560.
+
 2023-02-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/_minimal.c:
-	  Pick minimal regression test from MP8 fork of sdcc to ease initial debuggng of new ports.
+	  Pick minimal regression test from MP8 fork of sdcc to ease initial debugging of new ports.
 
 2023-02-20 Felix Salfelder <felix AT salfelder.org>
 

@@ -626,6 +626,10 @@ loopInvariants (region *theLoop, ebbIndex *ebbi)
               if (sBlock)
                 continue;       /* another definition present in the block */
 
+              // Avoid bug #3560 - the address might have been passed elsewehere, so functions called in the loop could change the value (and rely on the changed value).
+              if (OP_SYMBOL (IC_RESULT (ic))->addrtaken && fCallsInBlock)
+                continue;
+
               /* now check if it exists in the in of this block */
               /* if not then it was killed before this instruction */
               if (!bitVectBitValue (lBlock->inDefs, ic->key))

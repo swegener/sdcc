@@ -3,6 +3,8 @@
 	* src/mcs51/rtrack.c: placed all comment emitting code in D(),
 	  (_mcs51_rtrackUpdate): enabled literal mov to register part by removing D(),
 	                         enabled tracking dptr by removing if(options.verboseAsm)
+	* device/lib/ds390/Makefile.in,
+	* device/lib/ds390/lcd390.c: removed buggy lcd390.c, the DS80C390 has no native LCD interface
 
 2023-02-26 Philipp Klaus Krause <philipp@colecovision.eu>
 

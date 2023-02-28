@@ -1,3 +1,9 @@
+2023-02-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/rtrack.c: placed all comment emitting code in D(),
+	  (_mcs51_rtrackUpdate): enabled literal mov to register part by removing D(),
+	                         enabled tracking dptr by removing if(options.verboseAsm)
+
 2023-02-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCloop.c,

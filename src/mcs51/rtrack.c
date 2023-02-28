@@ -152,16 +152,16 @@ static void rtrack_data_copy_dst_src (const unsigned int idxdst, const unsigned 
   (
     if ((NULL != regs8051[idxsrc].rtrack.symbol) || regs8051[idxsrc].rtrack.valueKnown)
       {
-        emitcode (";", "\t%s=%s", regs8051[idxdst].name, regs8051[idxsrc].name);
+        D(emitcode (";", "\t%s=%s", regs8051[idxdst].name, regs8051[idxsrc].name));
       }
     else if (regs8051[idxdst].rtrack.symbol || regs8051[idxdst].rtrack.valueKnown)
       {
-        emitcode (";", "\t%s=*",regs8051[idxdst].name);
+        D(emitcode (";", "\t%s=*",regs8051[idxdst].name));
       }
 
     if (rtrack_data_is_same (idxdst, idxsrc))
       {
-        emitcode (";", "genFromRTrack redundant?");
+        D(emitcode (";", "genFromRTrack redundant?"));
       }
   );
 
@@ -214,7 +214,7 @@ static void dumpAll()
             break;
           }
       }
-    emitcode (";", "\t%s", s);
+    D(emitcode (";", "\t%s", s));
   );
 }
 
@@ -320,38 +320,35 @@ bool _mcs51_rtrackUpdate (const char *line)
               /* check literal mov to register */
               if ((s != argument + 1) && !strncmp (argument, "#0x", 3))
                 {
-                  D
-                  (
-                    if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value))
-                      {
-                        emitcode (";", "genFromRTrack removed\t%s", line);
-                        modified = true;
-                      }
-                    if (regs8051[A_IDX].rtrack.valueKnown && (value == regs8051[A_IDX].rtrack.value) &&
-                        (regIdx != A_IDX) && (regIdx != DPL_IDX) && (regIdx != DPH_IDX))
-                        /* ignore DPL/DPH for now as peephole rule for MOV DPTR is much better */
-                      {
-                        emitcode (";", "genFromRTrack replaced\t%s", line);
-                        emitcode ("mov", "%s,a", regs8051[regIdx].dname);
-                        modified = true;
-                      }
-                    else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value + 1) &&
-                             ((regIdx != A_IDX) || (0xff != regs8051[regIdx].rtrack.value)))
-                      {
-                        /* does not occur in regression test mcs51-small */
-                        emitcode (";", "genFromRTrack replaced\t%s", line);
-                        emitcode ("inc", "%s", regs8051[regIdx].name);
-                        modified = true;
-                      }
-                    else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value - 1) &&
-                             ((regIdx != A_IDX) || (0x01 != regs8051[regIdx].rtrack.value)))
-                      {
-                        /* does not occur in regression test mcs51-small */
-                        emitcode (";", "genFromRTrack replaced\t%s", line);
-                        emitcode ("dec", "%s", regs8051[regIdx].name);
-                        modified = true;
-                      }
-                  );
+                  if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value))
+                    {
+                      D(emitcode (";", "genFromRTrack removed\t%s", line));
+                      modified = true;
+                    }
+                  if (regs8051[A_IDX].rtrack.valueKnown && (value == regs8051[A_IDX].rtrack.value) &&
+                      (regIdx != A_IDX) && (regIdx != DPL_IDX) && (regIdx != DPH_IDX))
+                      /* ignore DPL/DPH for now as peephole rule for MOV DPTR is much better */
+                    {
+                      D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                      emitcode ("mov", "%s,a", regs8051[regIdx].dname);
+                      modified = true;
+                    }
+                  else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value + 1) &&
+                           ((regIdx != A_IDX) || (0xff != regs8051[regIdx].rtrack.value)))
+                    {
+                      /* does not occur in regression test mcs51-small */
+                      D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                      emitcode ("inc", "%s", regs8051[regIdx].name);
+                      modified = true;
+                    }
+                  else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value - 1) &&
+                           ((regIdx != A_IDX) || (0x01 != regs8051[regIdx].rtrack.value)))
+                    {
+                      /* does not occur in regression test mcs51-small */
+                      D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                      emitcode ("dec", "%s", regs8051[regIdx].name);
+                      modified = true;
+                    }
 
                   rtrack_data_set_val (regIdx, (unsigned char) value);
                 }
@@ -389,95 +386,92 @@ bool _mcs51_rtrackUpdate (const char *line)
           int value = strtol (line + 10, &s, 16);
           if( s != line + 10 )
             {
-              if (options.verboseAsm)
+              bool foundshortcut = 0;
+
+              if ( regs8051[DPH_IDX].rtrack.valueKnown &&
+                   regs8051[DPL_IDX].rtrack.valueKnown &&
+                  (regs8051[DPH_IDX].rtrack.value == (value >> 8)) &&
+                  (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
                 {
-                  bool foundshortcut = 0;
+                  D(emitcode (";", "genFromRTrack removed\t%s", line));
+                  foundshortcut = 1;
+                  modified = true;
+                }
 
-                  if ( regs8051[DPH_IDX].rtrack.valueKnown &&
-                       regs8051[DPL_IDX].rtrack.valueKnown &&
-                      (regs8051[DPH_IDX].rtrack.value == (value >> 8)) &&
-                      (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
+              if (!foundshortcut &&
+                   regs8051[DPH_IDX].rtrack.valueKnown &&
+                   regs8051[DPL_IDX].rtrack.valueKnown)
+                {
+                  /* some instructions are shorter than mov dptr,#0xabcd */
+                  const struct
                     {
-                      emitcode (";", "genFromRTrack removed\t%s", line);
-                      foundshortcut = 1;
-                      modified = true;
-                    }
-
-                  if (!foundshortcut &&
-                       regs8051[DPH_IDX].rtrack.valueKnown &&
-                       regs8051[DPL_IDX].rtrack.valueKnown)
+                       int offset;
+                       const char* inst;
+                       const char* parm;
+                    } reachable[6] =
                     {
-                      /* some instructions are shorter than mov dptr,#0xabcd */
-                      const struct
-                        {
-                           int offset;
-                           const char* inst;
-                           const char* parm;
-                        } reachable[6] =
-                        {
-                          {   1, "inc", "dptr"},
-                          { 256, "inc", "dph"},
-                          {-256, "dec", "dph"},
-                          {-255, "inc", "dpl"},    /* if overflow */
-                          {  -1, "dec", "dpl"},    /* if no overflow */
-                          { 255, "dec", "dpl"}     /* if overflow */
-                        };
+                      {   1, "inc", "dptr"},
+                      { 256, "inc", "dph"},
+                      {-256, "dec", "dph"},
+                      {-255, "inc", "dpl"},    /* if overflow */
+                      {  -1, "dec", "dpl"},    /* if no overflow */
+                      { 255, "dec", "dpl"}     /* if overflow */
+                    };
 
-                       unsigned int dptr = (regs8051[DPH_IDX].rtrack.value << 8 ) |
-                                            regs8051[DPL_IDX].rtrack.value;
-                       unsigned int i;
+                   unsigned int dptr = (regs8051[DPH_IDX].rtrack.value << 8 ) |
+                                        regs8051[DPL_IDX].rtrack.value;
+                   unsigned int i;
 
-                       for (i = 0; i < 6; i++)
+                   for (i = 0; i < 6; i++)
+                     {
+                       if (dptr + reachable[i].offset == value)
                          {
-                           if (dptr + reachable[i].offset == value)
-                             {
-                                /* check if an overflow would occur */
-                                if ((i == 3) && ((dptr & 0xff) != 0xff)) continue;
-                                if ((i == 4) && ((dptr & 0xff) == 0x00)) continue;
-                                if ((i == 5) && ((dptr & 0xff) != 0x00)) continue;
+                            /* check if an overflow would occur */
+                            if ((i == 3) && ((dptr & 0xff) != 0xff)) continue;
+                            if ((i == 4) && ((dptr & 0xff) == 0x00)) continue;
+                            if ((i == 5) && ((dptr & 0xff) != 0x00)) continue;
 
-                                /* does not occur in regression test mcs51-small */
-                                emitcode (";", "genFromRTrack replaced\t%s", line);
-                                emitcode (reachable[i].inst, "%s", reachable[i].parm);
-                                modified = true;
-                                foundshortcut = 1;
+                            /* does not occur in regression test mcs51-small */
+                            D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                            emitcode (reachable[i].inst, "%s", reachable[i].parm);
+                            modified = true;
+                            foundshortcut = 1;
 
-                                break;
-                             }
-                         };
-                    }
+                            break;
+                         }
+                     };
+                }
 
-                  if (!foundshortcut &&
-                       regs8051[DPH_IDX].rtrack.valueKnown &&
-                      (regs8051[DPH_IDX].rtrack.value == (value >> 8)))
+              if (!foundshortcut &&
+                   regs8051[DPH_IDX].rtrack.valueKnown &&
+                  (regs8051[DPH_IDX].rtrack.value == (value >> 8)))
+                {
+                  char s[32];
+                  sprintf (s, "#0x%02x", value & 0xff);
+
+                  if (s != rtrackGetLit(s))
                     {
-                      char s[32];
-                      sprintf (s, "#0x%02x", value & 0xff);
-
-                      if (s != rtrackGetLit(s))
-                        {
-                          /* does not occur in regression test mcs51-small */
-                          emitcode (";", "genFromRTrack replaced\t%s", line);
-                          emitcode ("mov", "dpl,%s", rtrackGetLit (s));
-                          modified = true;
-                          foundshortcut = 1;
-                        }
+                      /* does not occur in regression test mcs51-small */
+                      D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                      emitcode ("mov", "dpl,%s", rtrackGetLit (s));
+                      modified = true;
+                      foundshortcut = 1;
                     }
-                  if (!foundshortcut &&
-                       regs8051[DPL_IDX].rtrack.valueKnown &&
-                      (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
-                    {
-                      char s[32];
-                      sprintf (s, "#0x%02x", value >> 8);
+                }
+              if (!foundshortcut &&
+                   regs8051[DPL_IDX].rtrack.valueKnown &&
+                  (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
+                {
+                  char s[32];
+                  sprintf (s, "#0x%02x", value >> 8);
 
-                      if (s != rtrackGetLit (s))
-                        {
-                          /* does not occur in regression test mcs51-small */
-                          emitcode (";", "genFromRTrack replaced\t%s", line);
-                          emitcode ("mov", "dph,%s", rtrackGetLit (s));
-                          modified = true;
-                          foundshortcut = 1;
-                        }
+                  if (s != rtrackGetLit (s))
+                    {
+                      /* does not occur in regression test mcs51-small */
+                      D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                      emitcode ("mov", "dph,%s", rtrackGetLit (s));
+                      modified = true;
+                      foundshortcut = 1;
                     }
                 }
 
@@ -525,7 +519,7 @@ bool _mcs51_rtrackUpdate (const char *line)
               if (s != rtrackGetLit (s))
                 {
                   int lengthuptoargument = argument - (line + 4);
-                  emitcode (";", "1-genFromRTrack replaced\t%s", line);
+                  D(emitcode (";", "1-genFromRTrack replaced\t%s", line));
                   emitcode ("mov", "%.*s%s",
                                   lengthuptoargument,
                                   line + 4,
@@ -810,7 +804,7 @@ bool _mcs51_rtrackUpdate (const char *line)
     {
       if (regs8051[A_IDX].rtrack.valueKnown && (0 == regs8051[A_IDX].rtrack.value))
         {
-          emitcode (";", "genFromRTrack removed\t%s", line);
+          D(emitcode (";", "genFromRTrack removed\t%s", line));
           modified = true;
         }
       rtrack_data_set_val (A_IDX, 0);

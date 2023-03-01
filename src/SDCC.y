@@ -835,7 +835,7 @@ struct_or_union_specifier
           $3->size = compStructSize($1, $3);   /* update size of  */
           promoteAnonStructs ($1, $3);
 
-          if ($3->redefinition) // Since C2X, multiple definitions for struct /union are allowed, if they are compatible and have the same tags. The current standard draft N3047 allows redeclaration sof unions to have a different oder of the members. We don't. The rule in N3047 is now considered a mistake by many, and will hopefully be changed to the SDCC behaviour via a national body comment for the final version of the standard.
+          if ($3->redefinition) // Since C2X, multiple definitions for struct / union are allowed, if they are compatible and have the same tags. The current standard draft N3047 allows redeclarations of unions to have a different order of the members. We don't. The rule in N3047 is now considered a mistake by many, and will hopefully be changed to the SDCC behaviour via a national body comment for the final version of the standard.
             {
               sdef = findSymWithBlock (StructTab, $3->tagsym, currBlockno, NestLevel);
               bool compatible = options.std_c2x && sdef->tagsym && $3->tagsym && !strcmp (sdef->tagsym->name, $3->tagsym->name);

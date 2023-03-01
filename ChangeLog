@@ -13,7 +13,10 @@
 	  support/regression/tests/gcc-torture-execute-20030714-1.c,
 	  support/regression/tests/gcc-torture-execute-980707-1.c:
 	  Document why some regression tests are disabled for pdk.
-	* device/include/mcs51/stc89.h:
+	* device/include/mcs51/stc89.h,
+	  src/SDCC.y,
+	  src/SDCCmem.c,
+	  src/SDCCsymt.c:
 	  Fix typos.
 	* src/SDCCicode.c:
 	  Fix bug #3290.

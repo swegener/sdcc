@@ -974,7 +974,7 @@ genSymName (long level)
 /* getSpec - returns the specifier part from a declaration chain    */
 /*------------------------------------------------------------------*/
 sym_link *
-getSpec (sym_link * p)
+getSpec (sym_link *p)
 {
   while (p && !(IS_SPEC (p)))
     p = p->next;
@@ -1697,7 +1697,7 @@ compStructSize (int su, structdef * sdef)
   const int oldlineno = lineno;
 
   if (!sdef->fields)
-    {printf("D\n");
+    {
       werror (E_UNKNOWN_SIZE, sdef->tag);
     }
 

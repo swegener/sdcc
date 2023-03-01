@@ -1083,7 +1083,7 @@ clearStackOffsets (void)
 
   if (currFunc)
     {
-      //wassert(!(currFunc->stack)); // Sometimes some local variable was included in istack->sams.
+      //wassert(!(currFunc->stack)); // Sometimes some local variable was included in istack->syms.
       currFunc->stack = 0;
     }
 }

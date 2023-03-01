@@ -1,3 +1,19 @@
+2023-03-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/atomic.c,
+	  support/regression/tests/bug-1918.c,
+	  support/regression/tests/bug-2124.c,
+	  support/regression/tests/bug-2181.c,
+	  support/regression/tests/bug-2271.c,
+	  support/regression/tests/bug-2373.c,
+	  support/regression/tests/bug-2455.c,
+	  support/regression/tests/bug-2497.c,
+	  support/regression/tests/bug-716242.c,
+	  support/regression/tests/bug1908493.c,
+	  support/regression/tests/gcc-torture-execute-20030714-1.c,
+	  support/regression/tests/gcc-torture-execute-980707-1.c:
+	  Document why some regression tests are disabled for pdk.
+
 2023-02-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/rtrack.c: placed all comment emitting code in D(),

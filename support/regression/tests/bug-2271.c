@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // pdk needs function pointer to be reentrant even for a single argument
 extern int foo0 (int *[]);
 extern int foo1 (int (*[])(int), int, int);
 

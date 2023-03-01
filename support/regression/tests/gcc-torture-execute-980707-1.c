@@ -15,7 +15,7 @@
 char **
 buildargv (char *input)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Use shorter array for low-memory devices.
   static char *arglist[256];
 #else
   static char *arglist[8];
@@ -43,7 +43,7 @@ void
 testTortureExecute (void)
 {
   char **args;
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Use shorter array for low-memory devices.
   char input[256];
 #else
   char input[8];

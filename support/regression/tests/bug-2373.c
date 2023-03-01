@@ -2,7 +2,6 @@
  */
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14
 char func(char a)
 {
   return a-1;
@@ -16,12 +15,11 @@ static struct
 } s;
 
 static char (* __xdata func_ptr) (char);
-#endif
 
 void
 testFptr(void)
 {
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // pdk needs function pointer to be reentrant even for a single argument
   char b = 10;
   a      = 10;
   s.c    = 10;

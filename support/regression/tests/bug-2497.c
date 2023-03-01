@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // pdk needs function pointer to be reentrant even for a single argument
 typedef int func_t (int a);
 typedef int (*func_p_t)(int a);
 

@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // pdk needs functions called via pointer to be reentrant even for a single argument
 #if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
 /* derived from PR optimization/11440  */
 

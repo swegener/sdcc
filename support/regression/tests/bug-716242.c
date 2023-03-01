@@ -9,7 +9,7 @@
 
 #pragma disable_warning 244
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // pdk needs functions called via pointer to be reentrant even for a single argument
 const void *p;
 int ret;
 

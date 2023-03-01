@@ -202,7 +202,11 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
           /* if assigned to registers */
           if (OP_SYMBOL (op)->nRegs)
             {
-              if (OP_SYMBOL (op)->isspilt)
+              bool completely_spilt = OP_SYMBOL (op)->isspilt;
+              for (int i = 0; i < OP_SYMBOL (op)->nRegs; i++)
+                if (OP_SYMBOL (op)->regs[i]);
+                  completely_spilt = false;
+              if (completely_spilt)
                 {
                   if (!OP_SYMBOL (op)->remat)
                     if (OP_SYMBOL (op)->usl.spillLoc)
@@ -215,10 +219,19 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
                 }
               else
                 {
-                  int i;
                   dbuf_append_char (dbuf, '[');
-                  for (i = 0; i < OP_SYMBOL (op)->nRegs; i++)
-                    dbuf_printf (dbuf, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
+                  for (int i = 0; i < OP_SYMBOL (op)->nRegs; i++)
+                    {
+                      if (OP_SYMBOL (op)->regs[i]) // A byte in a register.
+                        dbuf_printf (dbuf, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
+                      else // A spilt byte in an operand that has been partially assigned to registers, partially spilt.
+                        if (OP_SYMBOL (op)->usl.spillLoc)
+                          dbuf_printf (dbuf, "%s ", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
+                                                  OP_SYMBOL (op)->usl.spillLoc->rname : OP_SYMBOL (op)->usl.spillLoc->name));
+                        else
+                          dbuf_append_str (dbuf, "[err]");
+                        
+                    }
                   dbuf_append_char (dbuf, ']');
                 }
             }

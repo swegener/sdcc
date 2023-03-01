@@ -105,7 +105,7 @@ SFR(T2CON, 0xC8);
  *   Bit Mapping: - - - - - - T2OE DCEN
  *   Reset Value: xxxx,xx00
  */
-SFR(T2MOD, 0xC9H);
+SFR(T2MOD, 0xC9);
 
 /* Timer/Counter 2 Reload/Capture Low Byte
  *   Reset Value: 0000,0000
@@ -115,17 +115,17 @@ SFR(RCAP2L, 0xCA);
 /* Timer/Counter 2 Reload/Capture High Byte
  *   Reset Value: 0000,0000
  */
-SFR(RCAP2L, 0xCB);
+SFR(RCAP2H, 0xCB);
 
 /* Timer/Counter 2 Low Byte
  *   Reset Value: 0000,0000
  */
-SFR(RCAP2L, 0xCC);
+SFR(TL2, 0xCC);
 
 /* Timer/Counter 2 High Byte
  *   Reset Value: 0000,0000
  */
-SFR(RCAP2L, 0xCD);
+SFR(TH2, 0xCD);
 
 /*
  * Watchdog Timer Control Register

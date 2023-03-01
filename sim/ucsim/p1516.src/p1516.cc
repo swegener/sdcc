@@ -82,7 +82,7 @@ cl_p1516::reset(void)
   cl_uc::reset();
   
   PC= R[15]= 0;
-  F&= ~(U|P);
+  F= 0;//F&= ~(U|P);
 }
   
 void

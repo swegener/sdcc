@@ -42,6 +42,15 @@
 #  endif
 #endif
 
+#if SIZE == 64
+#  define TYPE uint64_t
+#  if MSB
+#    define TEST_VECT 0xa8c5a5c655357553
+#  else
+#    define TEST_VECT 0x55357553a8c5a5c6
+#  endif
+#endif
+
 TYPE rol1(TYPE s){ return (s<<1) | (s>>(SIZE-1)); }
 TYPE rol2(TYPE s){ return (s<<2) | (s>>(SIZE-2)); }
 TYPE rol3(TYPE s){ return (s<<3) | (s>>(SIZE-3)); }

@@ -1,3 +1,9 @@
+2023-03-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bigreturn-remat.c.in,
+	  support/regression/tests/rotate.c.in:
+	  Improve test coverage.
+
 2023-03-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/atomic.c,

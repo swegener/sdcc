@@ -1,3 +1,9 @@
+2023-03-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-3564.c:
+	  Fix bug #3564.
+
 2023-03-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bigreturn-remat.c.in,

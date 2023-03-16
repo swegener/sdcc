@@ -3504,12 +3504,19 @@ genLeftShift (const iCode *ic)
 
   int size = result->aop->size;
 
+  bool pushed_a_global = false;
   bool pushed_p = false;
   bool p_dead = regDead (P_IDX, ic);
 
+  if (!regDead (A_IDX, ic) && right->aop->type != AOP_LIT)
+    {
+      pushAF();
+      pushed_a_global = true;
+    }
+
   if (result->aop->type == AOP_STK && !p_dead)
     {
-      pushPF (regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
+      pushPF ((regDead (A_IDX, ic) || pushed_a_global) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
       pushed_p = true;
       p_dead = true;
     }
@@ -3700,7 +3707,10 @@ genLeftShift (const iCode *ic)
     }
 
   if (pushed_p)
-    popPF (regDead (A_IDX, ic));
+    popPF (!aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX));
+
+  if (pushed_a_global)
+    popAF();
 
   freeAsmop (right);
   freeAsmop (left);
@@ -3724,15 +3734,22 @@ genRightShift (const iCode *ic)
   aopOp (result, ic);
 
   bool pushed_a = false;
+  bool pushed_a_global = false;
   bool pushed_p = false;
 
   int size = result->aop->size;
 
   bool p_dead = regDead (P_IDX, ic);
 
+  if (!regDead (A_IDX, ic) && right->aop->type != AOP_LIT)
+    {
+      pushAF();
+      pushed_a_global = true;
+    }
+ 
   if (result->aop->type == AOP_STK && !p_dead)
     {
-      pushPF (regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
+      pushPF ((regDead (A_IDX, ic) || pushed_a_global) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
       pushed_p = true;
       p_dead = true;
     }
@@ -4023,8 +4040,11 @@ genRightShift (const iCode *ic)
     popAF();
 
   if (pushed_p)
-    popPF (regDead (A_IDX, ic));
+    popPF (!aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX));
 
+  if (pushed_a_global)
+    popAF();
+    
 release:
   freeAsmop (right);
   freeAsmop (left);

@@ -13276,10 +13276,10 @@ genPointerGet (const iCode *ic)
       else
         {
           if (surviving_a && !pushed_a)
-            _push (PAIR_AF), pushed_a = TRUE;
+            _push (PAIR_AF), pushed_a = true;
           emit2 ("ld a, !mems", getPairName (left->aop));
           regalloc_dry_run_cost += (getPairId (left->aop) == PAIR_IY ? 3 : 1);
-          genMove(result->aop, ASMOP_A, true, isPairDead(PAIR_HL, ic), isPairDead(PAIR_DE, ic), true);
+          genMove (result->aop, ASMOP_A, true, isPairDead(PAIR_HL, ic), isPairDead(PAIR_DE, ic), true);
         }
 
       goto release;
@@ -13620,6 +13620,9 @@ genPointerGet (const iCode *ic)
 
       while (offset < size)
         {
+          if (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset)
+            surviving_a = true;
+
           last_offset = offset;
 
           if (IS_EZ80_Z80 && getPairId_o (result->aop, offset) != PAIR_INVALID)
@@ -13637,6 +13640,9 @@ genPointerGet (const iCode *ic)
               continue;
             }
 
+          // _moveFrom_tpair_ below might use a.
+          if (result->aop->type != AOP_REG && surviving_a && !pushed_a)
+            _push (PAIR_AF), pushed_a = true;
           _moveFrom_tpair_ (result->aop, offset++, pair);
 
           if (offset < size)
@@ -13662,10 +13668,13 @@ genPointerGet (const iCode *ic)
       size = result->aop->size;
       offset = 0;
 
+      if (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < offset)
+        surviving_a = true;
+
       for (offset = 0; offset < size;)
         {
           if (surviving_a && !pushed_a)
-            _push (PAIR_AF), pushed_a = TRUE;
+            _push (PAIR_AF), pushed_a = true;
 
           /* PENDING: make this better */
           if ((pair == PAIR_HL) && result->aop->type == AOP_REG)

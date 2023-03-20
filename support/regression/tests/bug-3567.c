@@ -7,7 +7,7 @@
 // Based on code by "Under4Mhz" licensed under GPL 2.0 or later
 #include <stdint.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
 static volatile uint8_t VDPControlPort;
 static volatile uint8_t VDPDataPortOut;
 
@@ -75,7 +75,7 @@ void GameTileCallback() {
 
 void
 testBug(void) {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
     GameTileCallback();
 #endif
 }

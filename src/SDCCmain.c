@@ -2165,6 +2165,7 @@ preProcess (char **envp)
             dbuf_append_str (&dbuf, "-MD ");
           else
             dbuf_append_str (&dbuf, "-MMD ");
+          dbuf_append_str (&dbuf, "-MF ");
           if (fullDstFileName)
             dbuf_splitFile (fullDstFileName, &dbuf, NULL);
           else

@@ -322,6 +322,7 @@ enum {
   E_Z88DK_CALLEE_VARARG         = 292, /* __z88dk_callee with variable arguments not supported */
   W_CODEMEM_WRITE               = 293, /* attempt to write to read-only-memory */
   W__SDCC_EXTERNAL_STARTUP_DEF  = 294, /* _sdcc_external_startup function definition - probable deprecated old-style variant of __sdcc_external_startup */
+  E_NO_SKIP_TARGET              = 295, /* target label missing for skip instruction */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -653,6 +653,8 @@ struct
      "attempt to write to read-only-memory", 0},
   { W__SDCC_EXTERNAL_STARTUP_DEF, ERROR_LEVEL_WARNING,
      "_sdcc_external_startup function definition - probable deprecated old-style variant of __sdcc_external_startup", 0},
+  { E_NO_SKIP_TARGET, ERROR_LEVEL_ERROR,
+     "target label missing for skip instruction '%s'", 0},
 };
 
 /* -------------------------------------------------------------------------------

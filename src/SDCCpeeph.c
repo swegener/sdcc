@@ -3723,10 +3723,7 @@ buildLabelRefCountHash (lineNode *head)
                 e->refCount++;
             }
           else
-            {
-              wassertl (0, "skip instruction has no target label:");
-              fprintf (stderr, "\'%s\'\n", line->line);
-            }
+            werror (E_NO_SKIP_TARGET, line->line);
         }
 
       for (i = 0; i < HTAB_SIZE; i++)

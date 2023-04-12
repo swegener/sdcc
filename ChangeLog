@@ -1,3 +1,8 @@
+2023-04-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCpeeph.c:
+	  Improve error message on missing skip instruction target label at end of inline asm in __naked function (bug #3566).
+
 2023-03-21 Felix Salfelder <felix AT salfelder.org>
 
 	* src/SDCCmain.c:

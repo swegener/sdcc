@@ -906,7 +906,9 @@ allocLocal (symbol * sym)
   /* again note that we have put it into the overlay segment
      will remove and put into the 'data' segment if required after
      overlay  analysis has been done */
-  if (options.model == MODEL_SMALL)
+  if (options.model == MODEL_SMALL &&
+    // Do not put anything into overlay segment for non-extern, non-static inline function, since it would never get removed (was bug #3030).
+    !(FUNC_ISINLINE (sym->localof->type) && !IS_EXTERN (getSpec (sym->localof->type)) && !IS_STATIC (getSpec (sym->localof->type))))
     {
       SPEC_OCLS (sym->etype) =
         (options.noOverlay ? port->mem.default_local_map : overlay);

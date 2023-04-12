@@ -1281,6 +1281,8 @@ canOverlayLocals (eBBlock ** ebbs, int count)
       return FALSE;
     }
 
+  wassert (currFunc);
+
   /* if this is a forces overlay */
   if (IFFUNC_ISOVERLAY(currFunc->type)) return TRUE;
 

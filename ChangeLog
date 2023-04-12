@@ -5,6 +5,8 @@
 	* src/SDCCast.c,
 	  support/regression/tests/bug-3570.c:
 	  Fix bug #3570.
+	* src/SDCCmem.c:
+	  Add an assertion to ease debugging of bugs related to spilt variables outside functions.
 
 2023-03-21 Felix Salfelder <felix AT salfelder.org>
 

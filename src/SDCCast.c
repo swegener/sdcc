@@ -5128,14 +5128,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       /* if they are pointers they must be castable */
       else if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
         {
-          if (tree->opval.op == EQ_OP && !IS_GENPTR (LTYPE (tree)) && IS_GENPTR (RTYPE (tree)))
-            {
-              // we cannot cast a gptr to a !gptr: switch the leaves
-              struct ast *s = tree->left;
-              tree->left = tree->right;
-              tree->right = s;
-            }
-          if (compareType (LTYPE (tree), RTYPE (tree), false) == 0)
+          if (compareType (LTYPE (tree), RTYPE (tree), false) == 0 && compareType (RTYPE (tree), LTYPE (tree), false) == 0) // Compare both ways, just cast to the one that is more generic.
             {
               werrorfl (tree->filename, tree->lineno, E_INCOMPAT_TYPES);
               fprintf (stderr, "comparing type ");

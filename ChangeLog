@@ -1,3 +1,8 @@
+2023-04-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asz80/z80mch.c:
+	  Fix error message on use of undocumented inc/dec ixl/ixh/iyl/iyh.
+
 2023-04-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCpeeph.c:

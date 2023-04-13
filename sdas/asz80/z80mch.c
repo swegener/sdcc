@@ -1446,7 +1446,7 @@ struct mne *mp;
                  * op  IYL
                  * op  IYH
                  */
-                if ((t1 == S_R8U1)||(t1 == S_R8U2)) {
+                if (allow_undoc && ((t1 == S_R8U1)||(t1 == S_R8U2))) {
                         outab( ((t1 == S_R8U1) ? 0xDD : 0xFD ) );
                         outab(op|(v1<<3));
                         break;

@@ -1,7 +1,7 @@
 2023-04-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asz80/z80mch.c:
-	  Fix error message on use of undocumented inc/dec ixl/ixh/iyl/iyh. Fix error message on undocumented load between ix/iy l/h.
+	  Fix error message on use of undocumented inc/dec ixl/ixh/iyl/iyh. Fix error message on undocumented load between ix/iy l/h. Fix bug #3574.
 
 2023-04-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

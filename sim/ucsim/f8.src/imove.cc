@@ -113,9 +113,31 @@ cl_f8::ldw_m_r(u16_t addr, u16_t r)
 }
 
 int
-cl_f8::LDW_SP_A(t_mem code)
+cl_f8::ldw_a_r(u16_t r)
 {
-  cSP.W(acc16->get());
+  acc16->W(r);
+  return resGO;
+}
+
+int
+cl_f8::LDW_A_SP(t_mem code)
+{
+  IFSWAP
+    cSP.W(acc16->get());
+  else
+    acc16->W(rSP);
+  return resGO;
+}
+
+int
+cl_f8::XCH_F_0SP(t_mem code)
+{
+  class cl_cell8 &c= *(class cl_cell8 *)rom->get_cell(rSP);
+  u8_t t= rF;
+  rF = c.R();
+  vc.rd++;
+  c.W(t);
+  vc.wr++;
   return resGO;
 }
 

@@ -88,13 +88,13 @@ struct dis_entry disass_f8[]=
     { 0xcd, 0xff, ' ', 1, "ldw (%A),x" },
     { 0xce, 0xff, ' ', 2, "ldw ('nA_16'),x" },
     { 0xcf, 0xff, ' ', 3, "ldw ('nnA_16'),x" },
-    { 0x70, 0xff, ' ', 1, "ldw sp,%A" },
+    { 0x70, 0xff, ' ', 1, "ldw %A, sp" },
     { 0x74, 0xff, ' ', 1, "ldw ('dsp_16'),%A" },
 
     { 0x60, 0xff, ' ', 3, "push 'a16_8'" },
-    { 0x60, 0xff, ' ', 2, "push ('nsp_8')" },
-    { 0x60, 0xff, ' ', 1, "push %a" },
-    { 0x60, 0xff, ' ', 1, "push zh" },
+    { 0x61, 0xff, ' ', 2, "push ('nsp_8')" },
+    { 0x62, 0xff, ' ', 1, "push %a" },
+    { 0x63, 0xff, ' ', 1, "push zh" },
     { 0x90, 0xff, ' ', 2, "push #'i8'" },
 
     { 0xb0, 0xff, ' ', 3, "pushw 'a16_16'" },
@@ -287,15 +287,15 @@ struct dis_entry disass_f8[]=
     { 0xe1, 0xff, ' ', 1, "sllw %A"},
     { 0xe2, 0xff, ' ', 1, "rrcw %A"},
     { 0xe3, 0xff, ' ', 1, "rlcw %A"},
-    { 0xe6, 0xff, ' ', 2, "rlcw 'nsp_16'"},
-    { 0xe7, 0xff, ' ', 2, "rrcw 'nsp_16'"},
+    { 0xe6, 0xff, ' ', 2, "rrcw ('nsp_16')"},
+    { 0xe7, 0xff, ' ', 2, "rlcw ('nsp_16')"},
     { 0xe4, 0xff, ' ', 1, "sraw %A"},
     { 0xea, 0xff, ' ', 2, "addw sp,#%d"},
     { 0xeb, 0xff, ' ', 2, "addw %A,#%d"},
-    { 0xec, 0xff, ' ', 2, "addw y,sp"},
+    { 0xec, 0xff, ' ', 1, "xch f,(0, sp)"},
     { 0xf8, 0xff, ' ', 3, "cpw %A,#'i16'"},
     { 0xf6, 0xff, ' ', 1, "incnw %A"},
-    { 0xf7, 0xff, ' ', 2, "decw 'nsp_16'"},
+    { 0xf7, 0xff, ' ', 2, "decw ('nsp_16')"},
     { 0xe5, 0xff, ' ', 1, "sllw %A,xl"},
     { 0xee, 0xff, ' ', 1, "sex %A,xl"},
     { 0xef, 0xff, ' ', 1, "sex %A,xl"},
@@ -377,12 +377,12 @@ u8_t allowed_prefs[256]= {
   /*          _0 _1 _2 _3   _4 _5 _6 _7   _8 _9 _a _b   _c _d _e _f */
   /* 0_ */    PN,PA,PA,PA,  PA,PA,PA,PA,  PN,PA,PA,PA,  PA,PA,PA,PA,
   /* 1_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
-  /* 2_ */    PN,PA,PA,PA,  PA,PA,PA,PA,  PN,PA,PA,PA,  PA,PA,PA,PA,
-  /* 3_ */    PN,PA,PA,PA,  PA,PA,PA,PA,  PN,PA,PA,PA,  PA,PA,PA,PA,
+  /* 2_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
+  /* 3_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
   /* 4_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
   /* 5_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
   /* 6_ */    PD,PD,PD,PD,  PN,P6,PN,P6,  PD,PD,PD,PD,  PD,PD,PD,PD,
-  /* 7_ */    PD,P2,P2,P2,  PD,P2,P2,P2,  P6,P2,P2,P2,  P6,P2,P2,P2,
+  /* 7_ */    P2,P2,P2,P2,  PD,P2,P2,P2,  P6,P2,P2,P2,  P6,P2,P2,P2,
   /* 8_ */    PD,PD,PD,PD,  PD,PD,PA,PA,  PA,PA,PA,PD,  PD,PD,PD,PD,
   /* 9_ */    PN,PD,PD,P6,  PN,PD,PD,PD,  PD,PD,PD,PN,   0, 0, 0, 0,
   /* a_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
@@ -390,7 +390,7 @@ u8_t allowed_prefs[256]= {
   /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
   /* d_ */    PN,PN,PN,PN,  PN,PN,PN,PN,  PN,PN,PN,PN,  PN,PN,PN,PN,
   /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,P6,P6,
-  /* f_ */    PN,P2,P2,P2,  PN,PN,P6,PN,  P6,PN,P6,P6,   0, 0, 0, 0
+  /* f_ */    P6,P2,P2,P2,  PN,PN,P6,PN,  P6,PN,P6,P6,   0, 0, 0, 0
 };
 
 

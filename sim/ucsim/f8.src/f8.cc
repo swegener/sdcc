@@ -114,20 +114,33 @@ cl_f8::make_memories(void)
 {
   class cl_address_space *as;
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
-  
+  class cl_memory_chip *ram_chip, *prom_chip;
+
+  // Flat address space
   rom= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
 
-  chip= new cl_chip8("rom_chip", 0x10000, 8);
-  chip->init();
-  memchips->add(chip);
+  // RAM
+  ram_chip= new cl_chip8("ram_chip", 0x2000, 8);
+  ram_chip->init();
+  memchips->add(ram_chip);
   ad= new cl_address_decoder(as= rom,
-			     chip, 0, 0xffff, 0);
+			     ram_chip, 0x2000, 0x3fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
+
+  // PROM
+  prom_chip= new cl_chip8("prom_chip", 0xc000, 8);
+  prom_chip->init();
+  memchips->add(prom_chip);
+  ad= new cl_address_decoder(as= rom,
+			     prom_chip, 0x4000, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+  rom->set_cell_flag(0x4000, 0xffff, true, CELL_READ_ONLY);
 }
 
 
@@ -416,7 +429,7 @@ cl_f8::exec_inst(void)
   else if (prefixes & P_ALT2)
     {
       acc8 = &cZL;
-      acc16= &cY;
+      acc16= &cZ;
     }
   /*
     // clear_prefixes() prepares this state

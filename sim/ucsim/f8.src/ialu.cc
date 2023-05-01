@@ -80,15 +80,15 @@ cl_f8::sub8(class cl_cell8 *op1, class cl_cell8 *op2, bool usec, bool memop, boo
       if (memop)
 	vc.rd++;	
     }
-  u8_t a= op1->read(), b= op2->read();
-  u16_t r= a+~b+c;
+  u8_t a= op1->read(), b= ~op2->read();
+  u16_t r= a+b+c;
   u8_t r8= r;
   rF&= ~fAll;
   if (r8==0) rF|= flagZ;
   if (r8&0x80) rF|= flagN;
   if (r>0xff) rF|= flagC;
-  if (((a&~b&~r8)|(~a&b&r8))&0x80) rF|= flagO;
-  if (((a&0xf)+(~b&0xf)+c)>0xf) rF|= flagH;
+  if (((a&b&~r8)|(~a&~b&r8))&0x80) rF|= flagO;
+  if (((a&0xf)+(b&0xf)+c)>0xf) rF|= flagH;
   cF.W(rF);
   if (!cmp)
     op1->write(r8);
@@ -176,20 +176,15 @@ cl_f8::And8(class cl_cell8 *op1, class cl_cell8 *op2, bool memop)
 u16_t
 cl_f8::add16(u16_t a, u16_t b, int c, bool sub)
 {
+  if (sub)
+    b = ~b;
   u32_t rb= a+b+c;
   u16_t r= rb;
   rF&= ~fAll_H;
   if (rb>0xffff) rF|= flagC;
-  if (r&0x8000) rF|= flagC;
+  if (r&0x8000) rF|= flagN;
   if (!r) rF|= flagZ;
-  if (sub)
-    {
-      if (((a&~b&~r)|(~a&b&r))&0x8000) rF|= flagO;
-    }
-  else
-    {
-      if (((a&b&~r)|(~a&~b&r))&0x8000) rF|= flagO;
-    }
+  if (((a&b&~r)|(~a&~b&r))&0x8000) rF|= flagO;
   cF.W(rF);
   return r;
 }
@@ -274,7 +269,7 @@ u16_t
 cl_f8::or16(u16_t a, u16_t b)
 {
   u16_t r= a|b;
-  rF&= flagOZN;
+  rF&= ~flagOZN;
   if (!r) rF|= flagZ;
   if (r&0x8000) rF|= flagN;
   // TODO flagO ?
@@ -635,7 +630,7 @@ cl_f8::DEC_M(t_mem code)
   u8_t v= c.read()-1;
   vc.rd++;
   rF&= ~flagCZ;
-  if (v==0xff) rF|= flagC;
+  if (v!=0xff) rF|= flagC;
   if (!v) rF|= flagZ;
   c.W(v);
   vc.wr++;
@@ -650,7 +645,7 @@ cl_f8::DEC_NSP(t_mem code)
   u8_t v= c.read()-1;
   vc.rd++;
   rF&= ~flagCZ;
-  if (v==0xff) rF|= flagC;
+  if (v!=0xff) rF|= flagC;
   if (!v) rF|= flagZ;
   c.W(v);
   vc.wr++;
@@ -663,7 +658,7 @@ cl_f8::DEC_A(t_mem code)
 {
   u8_t v= acc8->read()-1;
   rF&= ~flagCZ;
-  if (v==0xff) rF|= flagC;
+  if (v!=0xff) rF|= flagC;
   if (!v) rF|= flagZ;
   acc8->W(v);
   cF.W(rF);
@@ -675,7 +670,7 @@ cl_f8::DEC_ZH(t_mem code)
 {
   u8_t v= rZH-1;
   rF&= ~flagCZ;
-  if (v==0xff) rF|= flagC;
+  if (v!=0xff) rF|= flagC;
   if (!v) rF|= flagZ;
   cZH.W(v);
   cF.W(rF);
@@ -741,9 +736,9 @@ cl_f8::INCW_M(t_mem code)
   u16_t a= a_mm();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 1, 0, false);
-  rom->write(a  , v);
-  rom->write(a+1, v>>8);
+  u16_t r= add16(v, 1, 0, false);
+  rom->write(a  , r);
+  rom->write(a+1, r>>8);
   vc.wr+= 2;
   return resGO;
 }
@@ -754,9 +749,9 @@ cl_f8::INCW_NSP(t_mem code)
   u16_t a= a_n_sp();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 1, 0, false);
-  rom->write(a  , v);
-  rom->write(a+1, v>>8);
+  u16_t r= add16(v, 1, 0, false);
+  rom->write(a  , r);
+  rom->write(a+1, r>>8);
   vc.wr+= 2;
   return resGO;
 }
@@ -767,9 +762,9 @@ cl_f8::INCW_NNZ(t_mem code)
   u16_t a= a_nn_z();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 1, 0, false);
-  rom->write(a  , v);
-  rom->write(a+1, v>>8);
+  u16_t r= add16(v, 1, 0, false);
+  rom->write(a  , r);
+  rom->write(a+1, r>>8);
   vc.wr+= 2;
   return resGO;
 }
@@ -778,8 +773,8 @@ int
 cl_f8::INCW_A(t_mem code)
 {
   u16_t v= acc16->get();
-  add16(v, 1, 0, false);
-  acc16->write(v);
+  u16_t r= add16(v, 1, 0, false);
+  acc16->write(r);
   return resGO;
 }
 
@@ -802,7 +797,7 @@ cl_f8::ADCW1_NSP(t_mem code)
   u16_t a= a_n_sp();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0, (rF&flagC)?1:0, false);
+  v = add16(v, 0, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -815,7 +810,7 @@ cl_f8::ADCW1_NNZ(t_mem code)
   u16_t a= a_nn_z();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0, (rF&flagC)?1:0, false);
+  v = add16(v, 0, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -826,7 +821,7 @@ int
 cl_f8::ADCW1_A(t_mem code)
 {
   u16_t v= acc16->get();
-  add16(v, 0, (rF&flagC)?1:0, false);
+  v = add16(v, 0, (rF&flagC)?1:0, false);
   acc16->write(v);
   return resGO;
 }
@@ -837,7 +832,7 @@ cl_f8::SBCW1_M(t_mem code)
   u16_t a= a_mm();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0xffff, (rF&flagC)?1:0, false);
+  v = add16(v, 0xffff, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -850,7 +845,7 @@ cl_f8::SBCW1_NSP(t_mem code)
   u16_t a= a_n_sp();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0xffff, (rF&flagC)?1:0, false);
+  v = add16(v, 0xffff, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -863,7 +858,7 @@ cl_f8::SBCW1_NNZ(t_mem code)
   u16_t a= a_nn_z();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0xffff, (rF&flagC)?1:0, false);
+  v = add16(v, 0xffff, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -874,7 +869,7 @@ int
 cl_f8::SBCW1_A(t_mem code)
 {
   u16_t v= acc16->get();
-  add16(v, 0xffff, (rF&flagC)?1:0, false);
+  v = add16(v, 0xffff, (rF&flagC)?1:0, false);
   acc16->write(v);
   return resGO;
 }
@@ -1204,22 +1199,13 @@ cl_f8::ADDW_A_D(t_mem code)
 }
 
 int
-cl_f8::ADDW_Y_SP(t_mem code)
-{
-  cY.W(rY+rSP);
-  return resGO;
-}
-
-int
 cl_f8::CPW(t_mem code)
 {
   u16_t a, b;
   a= acc16->get();
   b= fetch();
   b+= fetch()*256;
-  b= ~b;
-  b++;
-  add16(a, b, 0, true);
+  add16(a, b, 1, true);
   return resGO;
 }
 
@@ -1233,13 +1219,12 @@ cl_f8::INCNW(t_mem code)
 int
 cl_f8::DECW_NSP(t_mem code)
 {
-  // TODO: flags untuched?
   u16_t a= a_n_sp();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  v--;
-  rom->write(a, v);
-  rom->write(a+1, v>>8);
+  u16_t r= add16(v, 1, 1, true);
+  rom->write(a  , r);
+  rom->write(a+1, r>>8);
   vc.wr+= 2;
   return resGO;
 }

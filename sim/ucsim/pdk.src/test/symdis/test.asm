@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ISO C Compiler 
-; Version 4.2.10 #13780 (Linux)
+; Version 4.2.2 #13388 (Linux)
 ;--------------------------------------------------------
 	.module test
 	.optsdcc -mpdk15
@@ -29,7 +29,7 @@
 ;--------------------------------------------------------
 ; Stack segment in internal ram
 ;--------------------------------------------------------
-	.area SSEG
+	.area	SSEG
 __start__stack:
 	.ds	1
 
@@ -64,7 +64,7 @@ p::
 	add	a, #l_OSEG + 1
 	and	a, #0xfe
 	mov.io	sp, a
-	call	___sdcc_external_startup
+	call	__sdcc_external_startup
 	goto	s_GSINIT
 	.area GSINIT
 __sdcc_init_data:

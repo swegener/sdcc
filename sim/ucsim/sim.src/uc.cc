@@ -521,7 +521,7 @@ cl_exec_hist::get_insts()
  */
 
 cl_uc::cl_uc(class cl_sim *asim):
-  cl_base()
+  cl_itab()
 {
   PCmask= 0xffff;
   type= NULL;
@@ -1572,7 +1572,7 @@ cl_uc::read_asc_file(cl_f *f)
 		s= word.c_str();
 		if (isxdigit(*s))
 		  {
-		    t_mem d= strtoll(s, 0, 16);
+		    t_mem d= chars(s).htoi();//strtoll(s, 0, 16);
 		    set_rom(addr, d);
 		    addr++;
 		  }
@@ -1614,10 +1614,10 @@ cl_uc::read_p2h_file(cl_f *f)
 	  chars w3= line.token(" \t");
 	  if (w1.nempty() && w2.nempty() && w3.nempty())
 	    {
-	      if (w2 == "//C")
+	      if ((w2 == "//C") || (w2 == "//I"))
 		{
-		  t_mem v= strtol(w1.c_str(), 0, 16);
-		  t_addr a= strtol(w3.c_str(), 0, 16);
+		  t_mem v= w1.htoi();//strtol(w1.c_str(), 0, 16);
+		  t_addr a= w3.htoi();//strtol(w3.c_str(), 0, 16);
 		  set_rom(a, v);
 		  nr++;		  
 		}
@@ -1676,7 +1676,7 @@ cl_uc::read_cdb_file(cl_f *f)
 		  chars n= ln.token("$");
 		  chars t= ln.token(":");
 		  t= ln.token(" ");
-		  t_addr a= strtol(t.c_str(), 0, 16);
+		  t_addr a= t.htoi();//strtol(t.c_str(), 0, 16);
 		  if ((r= fns->rec(n)) != NULL)
 		    {
 		      fns->del(n);
@@ -1784,7 +1784,7 @@ cl_uc::read_map_file(cl_f *f)
 	      if ((w1 == "C:") && is_addr(w2) && (w3.c(0) == '_'))
 		{
 		  w3= &(w3.c_str()[1]);
-		  t_addr a= strtol(w2.c_str(), NULL, 16);
+		  t_addr a= w2.htoi();//strtol(w2.c_str(), NULL, 16);
 		  //printf("%s %08x\n", w3.c_str(), AU(a));
 		  v= vars->add(w3, rom, a, "");
 		  v->set_by(VBY_DEBUG);
@@ -1800,7 +1800,7 @@ cl_uc::read_map_file(cl_f *f)
 	      if (is_addr(w1) && (w2.c(0) == '_'))
 		{
 		  w2= &(w2.c_str()[1]);
-		  t_addr a= strtol(w1.c_str(), NULL, 16);
+		  t_addr a= w1.htoi();//strtol(w1.c_str(), NULL, 16);
 		  //printf("%s %08x\n", w2.c_str(), AU(a));
 		  v= vars->add(w2, rom, a, "");
 		  v->set_by(VBY_DEBUG);
@@ -3195,6 +3195,30 @@ cl_uc::exec_inst_tab(instruction_wrapper_fn itab[])
     }
   tickt(c);
   res= itab[c](this, c);
+  if (res == resNOT_DONE)
+    {
+      PC= instPC;
+      return res;
+    }
+  //tick(1);
+  return res;
+}
+
+
+int
+cl_uc::exec_inst_uctab()
+{
+  t_mem c;
+  int res= resGO;
+  if (fetch(&c))
+    return resBREAKPOINT;
+  if (uc_itab[c] == NULL)
+    {
+      PC= instPC;
+      return resNOT_DONE;
+    }
+  tickt(c);
+  res= (this->*uc_itab[c])(c);
   if (res == resNOT_DONE)
     {
       PC= instPC;

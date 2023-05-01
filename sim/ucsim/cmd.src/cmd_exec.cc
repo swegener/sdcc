@@ -79,7 +79,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
       if (!sim->uc->inst_at(start))
 	con->dd_printf("Warning: maybe not instruction at 0x%06x\n",
 		       AI(start));
-      sim->uc->PC= start;
+      sim->uc->set_PC(start);
       if (params[1])
 	{
 	  if (start == end)

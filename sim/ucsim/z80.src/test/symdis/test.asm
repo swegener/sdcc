@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.5 #9879 (Linux)
+; File Created by SDCC : free open source ISO C Compiler 
+; Version 4.2.2 #13388 (Linux)
 ;--------------------------------------------------------
 	.module test
 	.optsdcc -mz80
@@ -46,6 +46,7 @@
 ; ---------------------------------
 _main::
 00103$:
+;test.c:4: }
 	jr	00103$
 	.area _CODE
 	.area _INITIALIZER

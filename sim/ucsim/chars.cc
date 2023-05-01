@@ -166,6 +166,28 @@ chars::token(const char *delims) const
   return c;
 }
 
+unsigned int
+chars::htoi(void)
+{
+  unsigned int v= 0;
+  int i, x;
+  if (!chars_string)
+    return 0;
+  for (i= 0; chars_string[i]; i++)
+    {
+      char c= toupper(chars_string[i]);
+      if ((c>='0') && (c<='9'))
+	x= c-'0';
+      else if ((c>='A') && (c<='F'))
+	x= 10+c-'A';
+      else
+	x= 0;
+      v<<= 4;
+      v|= x;
+    }
+  return v;
+}
+
 
 void
 chars::ltrim(void)

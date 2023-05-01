@@ -39,6 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "brkcl.h"
 #include "stackcl.h"
 #include "varcl.h"
+#include "itabcl.h"
 
 
 class cl_uc;
@@ -255,7 +256,7 @@ public:
 
 /* Abstract microcontroller */
 
-class cl_uc: public cl_base
+class cl_uc: public /*cl_base*/cl_itab
 {
 private:
   double xtal;			// Clock speed
@@ -415,6 +416,7 @@ public:
   virtual void pre_inst(void);
   virtual int exec_inst(void);
   virtual int exec_inst_tab(instruction_wrapper_fn itab[]);
+  virtual int exec_inst_uctab(void);
   virtual void post_inst(void);
   virtual void save_hist();
   virtual int inst_unknown(t_mem code);

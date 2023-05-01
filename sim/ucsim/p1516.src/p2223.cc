@@ -406,19 +406,19 @@ CLP2::inst_alu_1op(t_mem code)
   u8_t c1, c2;
   switch (op)
     {
-    case 0x0: // ZEXB
+    case 0x0: // ZEXB, ZEB
       RC[d]->W(R[d] & 0x000000ff);
       break;
-    case 0x1: // ZEXW
+    case 0x1: // ZEXW, ZEW
       RC[d]->W(R[d] & 0x0000ffff);
       break;
-    case 0x2: // SEXB
+    case 0x2: // SEXB, SEB
       R[d]= R[d] & 0x000000ff;
       if (R[d] & 0x00000080)
 	R[d]|= 0xffffff00;
       RC[d]->W(R[d]);
       break;
-    case 0x3: // SEXW
+    case 0x3: // SEXW, SEW
       R[d]= R[d] & 0x0000ffff;
       if (R[d] & 0x00008000)
 	R[d]|= 0xffff0000;
@@ -464,7 +464,7 @@ CLP2::inst_alu_1op(t_mem code)
       RC[d]->W(R[d] >> 1);
       setZSw(R[d]);
       break;
-    case 0xa: //SHA      
+    case 0xa: //SHA
       SET_C(R[d] & 1);
       RC[d]->W(((i32_t)(R[d])) >> 1);
       setZSw(R[d]);
@@ -482,7 +482,7 @@ CLP2::inst_alu_1op(t_mem code)
       RC[d]->W(F);
       break;
     case 0xf: // SETF
-      cF.W(R[d] & 0xff/*0x3f*/);
+      cF.W(R[d] & 0xff);
       break;
     }
   return resGO;
@@ -514,7 +514,7 @@ CLP2::inst_alu(t_mem code)
 	  op2<<= 16;
 	  RC[d]->W(R[d] | op2);
 	  return resGO;
-	case 2: // MVL0
+	case 2: // MVL0, MVZL, LDL0, LD0L
 	  RC[d]->W(uop);
 	  return resGO;
 	case 3: // MVS
@@ -541,7 +541,7 @@ CLP2::inst_alu(t_mem code)
 	  return resINV;
 	case 2: // 
 	  return resINV;
-	case 3: // SEXD
+	case 3: // SEXD, SED
 	  op2= 0;
 	  if (R[b] & 0x80000000)
 	    op2= 0xffffffff;
@@ -582,6 +582,7 @@ CLP2::inst_alu(t_mem code)
     case 0xb: // BTST
       {
 	u32_t r= R[d] & uop;
+	RC[d]->W(r);
 	setZSw(r);
       }
     case 0xc: // TEST

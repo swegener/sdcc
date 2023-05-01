@@ -29,6 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef CMD_NEWCMDFDCL_HEADER
 #define CMD_NEWCMDFDCL_HEADER
 
+#include <sys/select.h>
+
 #include "fiocl.h"
 #include "newcmdcl.h"
 #include "cmdutil.h"

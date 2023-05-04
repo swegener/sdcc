@@ -3419,7 +3419,9 @@ poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
 static void
 cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
 {
-  // emitDebug ("; cheapMove");
+#if 0
+  emitDebug ("; cheapMove");
+#endif
 
   if (aopInReg (to, to_offset, A_IDX))
     a_dead = true;
@@ -3493,6 +3495,19 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       if (!regalloc_dry_run)
         aopPut (to, aopGet (from, from_offset, false), to_offset);
       regalloc_dry_run_cost += ld_cost (to, 0, from_offset < from->size ? from : ASMOP_ZERO, from_offset);
+      return;
+    }
+  else if (to_index && HAS_IYL_INST)
+    {
+      if (!a_dead)
+        _push (PAIR_AF);
+      cheapMove (ASMOP_A, 0, from, from_offset, true);
+      if (!regalloc_dry_run)
+        aopPut (to, "a", to_offset);
+      spillPairReg (to->aopu.aop_reg[to_offset]->name);
+      regalloc_dry_run_cost += 2;
+      if (!a_dead)
+        _pop (PAIR_AF);
       return;
     }
 
@@ -4416,7 +4431,7 @@ skip_byte:
 static void
 genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool hl_dead_global, bool de_dead_global, bool iy_dead_global, bool f_dead)
 {
-  emitDebug ("; genMove_o");
+  emitDebug ("; genMove_o size %d", size);
   wassert (result->size >= roffset + size);
 
   if (aopSame (result, roffset, source, soffset, size))
@@ -6090,10 +6105,19 @@ genCall (const iCode *ic)
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           regalloc_dry_run_cost += 3;
         }
-      else if (!IS_SM83 && !IY_RESERVED && !z80IsParmInCall (ftype, "iy"))
+      else if (!IS_SM83 && !IY_RESERVED && !z80IsParmInCall (ftype, "iy")) // Ensure that we don't access the stack via iy when reading IC_LEFT (ic).
         {
           spillPair (PAIR_IY);
-          genMove (ASMOP_IY, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call, true);
+          if (IC_LEFT (ic)->aop->type == AOP_EXSTK) // Ensure that we don't directly overwrite iyl while accessing the stack via iy.
+            {
+              _push (PAIR_HL);
+              genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_free_pre_call, true, de_free_pre_call, true);
+              emit2 ("ex (sp), hl");
+              regalloc_dry_run_cost += (1 + IS_RAB);
+              _pop (PAIR_IY);
+            }
+          else
+            genMove (ASMOP_IY, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call, true);
           adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           regalloc_dry_run_cost += 3;

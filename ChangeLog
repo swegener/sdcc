@@ -2,7 +2,7 @@
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3579.c:
-	  Fix bug #3579.
+	  iy handling fixes in code generation.
 
 2023-04-26 Philipp Klaus Krause <philipp@colecovision.eu>
 

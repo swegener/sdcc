@@ -29,7 +29,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef CMD_NEWCMDFDCL_HEADER
 #define CMD_NEWCMDFDCL_HEADER
 
-#include <sys/select.h>
 
 #include "fiocl.h"
 #include "newcmdcl.h"
@@ -43,17 +42,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_console: public cl_console_base
 {
  protected:
-  //FILE *in/*, *out, *rout*//*redirected output*/;
   cl_f *fin, *fout, *frout;
   
  public:
   cl_console(void) { fin= fout= frout= 0; }
   cl_console(const char *_fin, const char *_fout, class cl_app *the_app);
-  //cl_console(FILE *_fin, FILE *_fout, class cl_app *the_app);
   cl_console(cl_f *_fin, cl_f *_fout, class cl_app *the_app);
 
   virtual ~cl_console(void);
-  //virtual void set_id(int new_id);
   virtual bool non_color(void) { return false; }
   virtual class cl_console *clone_for_exec(char *_fin);
   virtual void drop_files(void); // do not close, just ignore
@@ -65,13 +61,12 @@ class cl_console: public cl_console_base
   virtual UCSOCKET_T get_in_fd(void) { return(fin ? (fin->file_id) : -1); }
   virtual bool is_tty(void) const { return fin && (fin->tty); }
   virtual bool is_eof(void) const { return fin ? (fin->eof()) : true; }
-  virtual bool input_avail(void);// { return input_active() ? (fin->input_avail()) : false; };
+  virtual bool input_avail(void);
   virtual int read_line(void);
   virtual bool need_check(void);
   virtual bool set_cooked(bool new_val);
   
  public:
-  //FILE *get_out(void) { return rout ? rout : out; }
   class cl_f *get_fout(void) { return frout ? frout : fout; }
   class cl_f *get_fin(void) { return fin; }
 };
@@ -81,11 +76,7 @@ class cl_listen_console: public cl_console
 {
  public:
   cl_listen_console(int serverport, class cl_app *the_app);
-
-  //virtual void set_id(int new_id);
   virtual void welcome(void) {}
-
-  //virtual UCSOCKET_T get_in_fd(void) { return(sock); }
   virtual int proc_input(class cl_cmdset *cmdset);
   virtual bool set_cooked(bool new_val) { return false; }
 };
@@ -98,12 +89,10 @@ class cl_sub_console: public cl_console
   class cl_console_base *parent;
 
  public:
-  //cl_sub_console(class cl_console_base *the_parent, FILE *fin, FILE *fout, class cl_app *the_app);
   cl_sub_console(class cl_console_base *the_parent,
                  class cl_f *fin, class cl_f *fout, class cl_app *the_app);
   virtual ~cl_sub_console(void);
   virtual int init(void);
-  //virtual void set_id(int new_id);
 };
 
 
@@ -113,20 +102,13 @@ class cl_sub_console: public cl_console
 
 class cl_commander: public cl_commander_base
 {
- private:
-  //fd_set read_set, active_set;
-  //UCSOCKET_T fd_num;
-  
  public:
   cl_commander(class cl_app *the_app, class cl_cmdset *acmdset)
     : cl_commander_base(the_app, acmdset)
-  {
-  }
-
+  {}
   virtual int init(void);
   virtual void update_active(void);
   virtual int input_avail(void);
-  virtual int wait_input(void);
   virtual int proc_input(void);
   virtual void check(void);
 };

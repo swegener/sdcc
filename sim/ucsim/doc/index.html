@@ -17,57 +17,39 @@
 \ ._,_|\_____|___/_|_| |_| |_|
 | |                           
 |_|                           
-    </font></tt></pre>
-    
+  </font></tt></pre>
     <h1>Software simulator for microcontrollers</h1>
-    
-    <p><b><i>&micro;Csim</i></b> can be used to simulate
-    microcontrollers. It supports MCS51 family, AVR core, Z80, HC08,
-    ST7, STM8, TLCS90, XA51 and Padauk. It can run on Linux, Windows,
-      OSX, BSD, and other systems.</p>
-
-    <p>See <a href="news.html">what's new</a> in current version.</p>
-      
-      <h2><a name="download">Download</a></h2>
-      
-      <p>There are two places where you can download <i>μCsim</i> from:</p>
-      
-      <ol>
-	
-	<li>SDCC homepage. <i>&micro;Csim</i> is part of the SDCC
-        (Small Device C Compiler) project. You can download source of
-        SDCC and precompiled binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.</li>
-	
-	<li><i>&micro;Csim</i> site. Standalone source package is available on the <i>&micro;Csim</i> web site:<br>
-        <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a>
-	</li>
-	
-      </ol>
-      
-      <p><!-- INSTALL --></p>
-      
-      <h2><a name="install">How to install</a></h2>
-      
-      <p>UNIX version is distributed in source.</p>
-      
+    <b><i>μCsim</i></b> can be used to simulate microcontrollers. It supports
+    MCS51 family, AVR core, Z80, HC08, ST7, STM8, TLCS90, XA51 and Padauk. It can
+    run on Linux, Windows, OSX, BSD, and other systems.<br>
+    <br>
+    See <a href="news.html">what's new</a> in current version.<br>
+    <h2><a name="download">Download</a></h2>
+    There are two places where you can download <i>μCsim</i> from:<br>
     <ol>
-
-      <li>Get archive file, uncompress and untar it. These steps will
-        produce a directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
-      
-      <li>Make sure, that following packages are installed on your
-      system: <b>make</b>,
+      <li>SDCC homepage. <i>μCsim</i> is part of the SDCC (Small Device C
+        Compiler) project. You can download source of SDCC and precompiled
+        binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.</li>
+      <li><i>μCsim</i> site. Standalone source package is available on the <i>μCsim</i>
+        web site:<br>
+        <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a>
+      </li>
+    </ol>
+    <p><!-- INSTALL --></p>
+    <h2><a name="install">How to install</a></h2>
+    UNIX version is distributed in source.
+    <ol>
+      <li>Get archive file, uncompress and untar it. These steps will produce a
+        directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
+      <li>Make sure, that following packages are installed on your system: <b>make</b>,
         <b>bison</b> (or yacc), <b>flex</b> (or lex), <b>libncurses-dev</b>.
         You will need a C and a C++ compiler as well.</li>
-      
       <li>Go to the directory and configure the package. Issue <tt><b>configure</b></tt>
         command. It will determine your system and produce <b>Makefile</b>.
         Installation directory can be specified with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- -->
         option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
         Executable file will be placed in <tt>bin</tt> subdirectory. </li>
-      
       <li>Compile the package with <tt><b>make</b></tt> command. </li>
-      
       <li>Install executables <b>ucsim_51</b>, <b>ucsim_avr</b>, <b>ucsim_hc08</b>, <b>ucsim_xa</b>,
         <b>ucsim_z80, etc.</b> to any directory you want. It can be done with <tt><b>make
             install</b></tt> command which will place files in installation
@@ -75,9 +57,7 @@
 --></tt> option of <tt><b>configure</b></tt>. Note that you may have to have
         special privilege to do this if installation directory is not writable
         by you. </li>
-      
     </ol>
-    
     <!-- USE -->
     <h2><a name="use">How to use</a></h2>
     <ul>

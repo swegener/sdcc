@@ -440,40 +440,5 @@ dnow(void)
   return (double)tv.tv_sec + ((double)tv.tv_usec/1000000.0);
 }
 
-static int in_attribs_saved= 0;
-static int out_attribs_saved= 0;
-static struct termios in_attribs;
-static struct termios out_attribs;
-
-void
-save_std_attribs()
-{
-  if (!in_attribs_saved)
-    {
-      if (isatty(STDIN_FILENO))
-	{
-	  tcgetattr(STDIN_FILENO, &in_attribs);
-	  in_attribs_saved= 1;
-	}
-    }
-  if (!out_attribs_saved)
-    {
-      if (isatty(STDOUT_FILENO))
-	{
-	  tcgetattr(STDIN_FILENO, &out_attribs);
-	  out_attribs_saved= 1;
-	}
-    }
-}
-
-void
-restore_std_attribs()
-{
-  if (in_attribs_saved)
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &in_attribs);
-  if (out_attribs_saved)
-    tcsetattr(STDOUT_FILENO, TCSAFLUSH, &out_attribs);
-}
-
 
 /* End of fuio.cc */

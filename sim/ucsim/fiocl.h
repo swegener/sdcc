@@ -138,6 +138,7 @@ class cl_f: public cl_base
   virtual ~cl_f(void);
   virtual class cl_f *copy(chars mode);
   virtual int init(void);
+  //virtual int open(void) { return init(); }
   virtual int open(const char *fn);
   virtual int open(const char *fn, const char *mode);
   virtual int use_opened(int opened_file_id, const char *mode);
@@ -172,6 +173,7 @@ class cl_f: public cl_base
   virtual chars get_s(void);
   
  public:
+  //FILE *f(void) { return file_f; };
   int id(void) { return file_id; };
 
   virtual int check_dev(void)= 0;
@@ -182,6 +184,7 @@ class cl_f: public cl_base
   virtual int vprintf(const char *format, va_list ap);
   virtual int prntf(const char *format, ...);
   virtual bool eof(void);
+  //virtual void flush(void);
 
   virtual void echo_cursor_save();
   virtual void echo_cursor_restore();
@@ -209,6 +212,9 @@ class cl_f: public cl_base
   int server_port;
 
  public:
+  //virtual int listen(int on_port);
+  //virtual class cl_f *accept();
+  //virtual int connect(chars host, int to_port);
 };
 
 //extern void deb(const char *format, ...);
@@ -216,7 +222,7 @@ class cl_f: public cl_base
 extern int mk_srv_socket(int port);
 
 extern class cl_f *mk_io(const char *fn, const char *mode);
-extern class cl_f *cp_io(int file_id, const char *mode);
+extern class cl_f *cp_io(/*FILE *f*/int file_id, const char *mode);
 extern class cl_f *mk_srv(int server_port);
 extern int srv_accept(class cl_f *listen_io,
 		      class cl_f **fin, class cl_f **fout);
@@ -232,8 +238,6 @@ extern double dnow(void);
 extern const char *fio_type_name(enum file_type t);
 extern void  sigpipe_off();
 
-extern void save_std_attribs();
-extern void restore_std_attribs();
 
 #endif
 

@@ -109,6 +109,7 @@ class cl_console_base: public cl_base
   class cl_debug_option *debug_option;
   class cl_ustrings *lines_printed;
   class cl_cmd *last_command;
+  //class cl_cmdline *last_cmdline;
   chars last_cmd;
   chars startup_command;
   
@@ -161,6 +162,7 @@ class cl_console_base: public cl_base
   virtual void print_char_octal(char c);
   virtual int cmd_do_print(const char *format, va_list ap);
   virtual int cmd_do_cprint(const char *color_name, const char *format, va_list ap);
+  //virtual void flush(void);
   virtual void tu_cls(void);
   virtual void tu_clc(void);
   virtual void tu_cll(void);
@@ -180,6 +182,7 @@ class cl_console_base: public cl_base
   virtual void set_prompt(char *p);
   
   virtual bool input_active(void) const;
+  //virtual bool accept_last(void) { return /*is_tty() ? true : false;*/flags&CONS_INTERACTIVE; }
   virtual bool prevent_quit(void) { return (prev_quit>=0)?prev_quit:true; }
   
  private:
@@ -284,6 +287,7 @@ class cl_commander_base: public cl_base
   class cl_console_base *actual_console, *config_console;
 protected: class cl_console_base *frozen_console;
 public:
+  //class cl_console_base *stdout_console;
   class cl_cmdset *cmdset;
  protected:
   class cl_list *active_inputs;
@@ -301,8 +305,9 @@ public:
   virtual class cl_console_base *frozen_or_actual(void);
   virtual class cl_console_base *frozen(void) { return frozen_console; }
   virtual void freeze(class cl_console_base *con)
-  { frozen_console= con; }
+  { /*if (con != stdout_console)*/ frozen_console= con; }
   
+  //void prompt(void);
   int all_printf(const char *format, ...);        // print to all consoles
   int dd_printf(const char *format, va_list ap);  // print to actual_console
   int dd_cprintf(const char *color_name, const char *format, va_list ap);  // print to actual_console
@@ -318,6 +323,7 @@ public:
   virtual void update_active(void) = 0;
   virtual int proc_input(void) = 0;
   virtual int input_avail(void) = 0;
+  virtual int wait_input(void) = 0;
   virtual void check(void) { return; }
 };
 

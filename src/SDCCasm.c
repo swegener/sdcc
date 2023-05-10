@@ -83,7 +83,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
       if (*sz == '!')
         {
           /* Start of a token.  Search until the first
-             [non alpha, *] and call it a token. */
+             [non alphanum, *] and call it a token. */
           const char *t;
           struct dbuf_s token;
 
@@ -96,7 +96,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 
           dbuf_init (&token, 64);
           ++sz;
-          while (isalpha ((unsigned char) *sz) || *sz == '*')
+          while (isalnum ((unsigned char) *sz) || *sz == '*')
             {
               dbuf_append (&token, sz++, 1);
             }
@@ -418,6 +418,8 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
   {"dbs", ".db %s"},
   {"dw", ".dw"},
   {"dws", ".dw %s"},
+  {"3byte", ".3byte"},
+  {"triple", ".triple"},
   {"constbyte", "0x%02x"},
   {"constword", "0x%04x"},
   {"immedword", "#0x%04x"},

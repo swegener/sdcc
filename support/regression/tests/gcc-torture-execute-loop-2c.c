@@ -10,7 +10,6 @@
 
 int a[2];
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static
 inline void f (int b, int o)
 {
@@ -24,16 +23,13 @@ void g(int b)
 {
   f (b, (int)a);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   a[0] = a[1] = 0;
   g (2);
   if (a[0] != (int)a || a[1] != (int)a + 3)
     ASSERT (0);
   return;
-#endif
 }

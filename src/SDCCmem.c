@@ -724,7 +724,8 @@ allocParms (value *val, bool smallc)
           /* otherwise depending on the memory model */
           SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
               port->mem.default_local_map;
-          if (options.model == MODEL_SMALL)
+          if (options.model == MODEL_SMALL ||
+            options.model == NO_MODEL && !TARGET_PIC_LIKE /* The test for NO_MODEL was introduced to fix an issue for pdk (pdk has no xdata) maybe it is the right thing to do for pic, too. But I don't know about pic*/)
             {
               /* note here that we put it into the overlay segment
                  first, we will remove it from the overlay segment

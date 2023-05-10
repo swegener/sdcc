@@ -12,7 +12,6 @@
 
 /* PR tree-optimization/65215 */
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static inline unsigned int
 foo (unsigned int x)
 {
@@ -24,17 +23,14 @@ bar (unsigned long long *x)
 {
   return foo (*x);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   if (CHAR_BIT != 8 || sizeof (unsigned int) != 4 || sizeof (unsigned long long) != 8)
     return;
 
   unsigned long long l = foo (0xdeadbeefU) | 0xfeedbea800000000ULL;
   if (bar (&l) != 0xdeadbeefU)
     ASSERT (0);
-#endif
 }

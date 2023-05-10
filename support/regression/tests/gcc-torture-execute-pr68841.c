@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static inline int
 foo (int *x, int y)
 {
@@ -17,12 +16,10 @@ foo (int *x, int y)
     z *= 2;
   return z;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   int i;
   for (i = 1; i < 17; i++)
     {
@@ -41,5 +38,4 @@ testTortureExecute (void)
 	ASSERT (0);
     }
   return;
-#endif
 }

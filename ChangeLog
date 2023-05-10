@@ -1,7 +1,10 @@
-2023-0510 Philipp Klaus Krause <philipp@colecovision.eu>
+2023-05-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3563.c:
 	  Regression test for bug #3563 (disabled for mcs51, as the bug is not yet fixed).
+	* src/SDCCmem.c,
+	  support/regression/tests/*.c:
+	  Fix bug #2874.
 
 2023-05-04 Philipp Klaus Krause <philipp@colecovision.eu>
 

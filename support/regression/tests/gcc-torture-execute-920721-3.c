@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static inline int fu (unsigned short data)
 {
   return data;
@@ -30,15 +29,12 @@ void rs(int i)
    if(fs(i++)!=5)ASSERT(0);
    if(fs(++i)!=7)ASSERT(0);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   ru(5);
   rs(5);
   return;
-#endif
 }
 

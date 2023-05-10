@@ -84,16 +84,27 @@ long help of timer run
 0&gt; </pre>
     <p>If parameter is unique name of a command then long description of the
       command is printed out. </p>
+
     <hr>
+    
     <h3><a name="q">quit</a></h3>
+    
     Quit. This command terminates actual console, it does not ask you to confirm
     your intention. Simulator always reads commands from a file so end of file
     condition finishes too.
+
+    <p>If networks server function is not turned of by <a href="invoke.html@zoption">-z option</a> and
+    some active connections are opened then quit will close the actual
+    console only and will not finish <i>&micro;Csim</i>. Quit command
+    must be used on all consoles to completly exit, quit on last
+    console will exit the program.
+      
     <p>Note that if <a href="invoke.html#Zoption">-Z option</a> was used at
       invocation then the quit command does not terminate the simulator program.
       In this case <a href="#kill">kill</a> command can be used to terminate
       the simulator. See for more information about <a href="mulcons.html">using
-        multiple consoles</a>. </p>
+      multiple consoles</a>. </p>
+    
     <pre>$ <font color="#118811">ucsim_51</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -101,12 +112,17 @@ This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 &gt; <font color="#118811">q</font>
 $ </pre>
+
     <hr>
+
     <h3><a name="kill">kill</a></h3>
+
     This command terminates the simulator. It does not ask for confirmation. It
     doesn't matter how many consoles are used and what commands are running on
     them.
+
     <hr>
+
     <h3><a name="exec">exec <i>"file"</i></a></h3>
     Reads commands from "file" and executes them. This command opens a new
     console (which will use same in/out file as the actual one) to execute the

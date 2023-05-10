@@ -705,4 +705,15 @@ dnow(void)
 }
 
 
+void
+save_std_attribs()
+{
+}
+
+void
+restore_std_attribs()
+{
+}
+
+
 /* End of fwio.cc */

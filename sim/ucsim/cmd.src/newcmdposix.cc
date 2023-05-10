@@ -467,6 +467,8 @@ cl_commander::init(void)
   class cl_optref console_on_option(this);
   class cl_optref config_file_option(this);
   class cl_optref port_number_option(this);
+  class cl_optref default_port_option(this);
+  
   class cl_console_base *con;
   int ccnt= 0;
   cl_console_base *c;
@@ -476,7 +478,8 @@ cl_commander::init(void)
   config_file_option.init();
   config_file_option.use("config_file");
   port_number_option.init();
-
+  default_port_option.init();
+  
   cl_base::init();
   set_name("Commander");
   active_inputs= new cl_list(10, 5, "active_inputs");
@@ -484,6 +487,18 @@ cl_commander::init(void)
   
   bool need_config= true;
 
+  int def_port= 4567;
+  if (default_port_option.use("default_port"))
+    {
+      def_port= default_port_option.get_value((long)0);
+    }
+  if (def_port >= 1000)
+    {
+      add_console(c= new cl_listen_console(def_port, app));
+      c->prev_quit= 0;
+      ccnt++;
+    }
+  
   if (port_number_option.use("port_number"))
     {
       add_console(c= new cl_listen_console(port_number_option.get_value((long)0), app));
@@ -640,7 +655,7 @@ cl_commander::input_avail(void)
     }
   return ret;
 }
-
+/*
 int
 cl_commander::wait_input(void)
 {
@@ -648,7 +663,7 @@ cl_commander::wait_input(void)
     loop_delay();
   return 0;
 }
-
+*/
 int
 cl_commander::proc_input(void)
 {

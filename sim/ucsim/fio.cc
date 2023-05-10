@@ -238,6 +238,7 @@ cl_f::init(void)
 	  own= false;
 	  return -1;
 	}
+      //fprintf(stdout, "Start listening on port %d\n", server_port);
       listen(file_id, 50);
       own= true;
       tty= false;

@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>&#956;Csim: Invocation</title>
+    <title>&micro;Csim: Invocation</title>
   </head>
   <body style=" background-color: white;">
     <h1>Starting the simulator</h1>
@@ -27,7 +27,7 @@
     <p>The simulator can be started in the following way: </p>
     <p><tt><font color="blue">$</font> ucsim_51 [-hHVvPgGwlbB] [-p prompt] [-t CPU] [-X
         freq[k|M]] [-R seed] [-C cfg_file] [-e command] [-c file] [-s file] [-S
-        optionlist] [-I if_optionlist] [-a nr] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
+        optionlist] [-I if_optionlist] [-a nr] [-z portnum] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
     <p>Specified files must be names of Intel hex files. Simulator loads them in
       the specified order into the ROM of the simulated system. If the file is
       specified without extension, the simulator will try to find intel hex file
@@ -66,13 +66,29 @@
       <dd>Open command console on <b>file</b>. Command consoles are on standard
         input and output by default. Using this option the console can be opened
         on any file for example on the serial interface of the computer. <a name="Zoption"></a></dd>
+
+      <dt><a name="zoption"><tt><b>-z portnum</b></tt></a></dt>
+
+      <dd>If sockets are available on the system, <i>&micro;Csim</i>
+	listens on port <b>4567</b> by default for incoming
+      connections and servs command consoles for clients. Port number
+      can be changed using this option. If the parameter is less than
+      1000, this network server is not initiated and this feature is
+      turned off. <a href="cmd_general.html#q">quit</a> command exits <i>&micro;Csim</i> only
+      if not active connection is opened to this port. <a href="cmd_general.html#kill">kill</a>
+	command can be used to close all connections and quit <i>&micro;Csim</i> immediately.
+      </dd>
+      
       <dt><a name="Zoption"><tt><b>-Z portnum</b></tt></a> </dt>
+      
       <dd>Listen for incoming connections on port <b>portnum</b>. Using this
-        option <i>&#956;Csim</i> can serve multiple consoles. You can get a console
-        by simply telnet into machine running <i>&#956;Csim</i> to port <b>portnumber</b>.
-        This option is not available on platforms which doesn't support BSD
-        networking. <br>
-        See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
+        option <i>&micro;Csim</i> can serve multiple consoles. You can
+        get a console by simply telnet into machine running <i>&#956;Csim</i> to port <b>portnumber</b>.
+        This option is not available on platforms which doesn't
+        support BSD networking.
+
+	<br> See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
+      
       <dt><tt><b>-k portnum</b></tt></dt>
       <dd>Listen for incoming connections on port <b>portnum</b>. When this
         port connected, the connection will be attached to simulated UART0.This

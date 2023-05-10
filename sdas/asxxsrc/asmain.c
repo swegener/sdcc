@@ -1812,23 +1812,22 @@ loop:
                 break;
 
         case S_DATA:
-                if (mp->m_valu >= 1 && mp->m_valu <= 3) {
+                switch (mp->m_valu) {
+                case O_1BYTE:
+                case O_2BYTE:
                         do {
                                 clrexpr(&e1);
                                 expr(&e1, 0);
-                switch (mp->m_valu) {
-                                case 1:
+                                if (mp->m_valu == O_1BYTE) {
                                         outrb(&e1, R_NORM);
-                    break;
-                case 2:
+                                } else {
                                         outrw(&e1, R_NORM);
-                    break;
-                case 3:
-                                        outr3b(&e1, R_NORM);
-                    break;
                                 }
                         } while ((c = getnb()) == ',');
                         unget(c);
+                        break;
+                default:
+                        break;
                 }
                 break;
 

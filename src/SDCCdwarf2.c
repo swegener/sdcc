@@ -172,7 +172,7 @@ dwWriteWord (const char * label, int offset, char * comment)
 {
   /* FIXME: need to implement !dd pseudo-op in the assembler. In the */
   /* meantime, we use dw with zero padding and hope the values fit  */
-  /* in only 24 bits.                                               */
+  /* in only 16 bits.                                               */
 #if 0
   tfprintf (dwarf2FilePtr, "\t!dd\t");
   if (label)
@@ -185,33 +185,30 @@ dwWriteWord (const char * label, int offset, char * comment)
   else
     fprintf (dwarf2FilePtr, "%d", offset);
 #else
+  tfprintf (dwarf2FilePtr, "\t!dw\t");
   if (port->little_endian)
     {
       if (label)
         {
-          tfprintf (dwarf2FilePtr, "\t!3byte\t");
           if (offset)
-            fprintf (dwarf2FilePtr, "(%s+%d)", label, offset);
+            fprintf (dwarf2FilePtr, "(%s+%d),0", label, offset);
           else
-            fprintf (dwarf2FilePtr, "(%s)", label);
-          tfprintf(dwarf2FilePtr, "\n\t!db\t0");
+            fprintf (dwarf2FilePtr, "(%s),0", label);
         }
       else
-        tfprintf (dwarf2FilePtr, "\t!dw\t%d,%d", offset, offset >> 16);
+        fprintf (dwarf2FilePtr, "%d,%d", offset, offset >> 16);
     }
   else
     {
       if (label)
         {
-          tfprintf(dwarf2FilePtr, "\t!db\t0\n");
-          tfprintf (dwarf2FilePtr, "\t!3byte\t");
           if (offset)
-            fprintf (dwarf2FilePtr, "(%s+%d)", label, offset);
+            fprintf (dwarf2FilePtr, "0,(%s+%d)", label, offset);
           else
-            fprintf (dwarf2FilePtr, "(%s)", label);
+            fprintf (dwarf2FilePtr, "0,(%s)", label);
         }
       else
-        tfprintf (dwarf2FilePtr, "\t!dw\t%d,%d", offset >> 16, offset);
+        fprintf (dwarf2FilePtr, "%d,%d", offset >> 16, offset);
     }
 #endif
   
@@ -396,27 +393,17 @@ static void
 dwWriteWordDelta (char * label1, char * label2)
 {
   /* FIXME: need to implement !dd pseudo-op; this hack only */
-  /* works for positive offsets of less than 16M            */
+  /* works for positive offsets of less than 64k            */
 #if 0
   tfprintf (dwarf2FilePtr, "\t!dd\t%s-%s\n", label1,label2);
 #else
   if (port->little_endian)
     {
-#if 0
       tfprintf (dwarf2FilePtr, "\t!dw\t%s-%s,%d\n", label1, label2, 0);
-#else
-      tfprintf (dwarf2FilePtr, "\t!3byte\t%s-%s\n", label1, label2);
-      tfprintf (dwarf2FilePtr, "\t!db\t%d\n", 0);
-#endif
     }
   else
     {
-#if 0
       tfprintf (dwarf2FilePtr, "\t!dw\t%d,%s-%s\n", 0, label1, label2);
-#else
-      tfprintf (dwarf2FilePtr, "\t!db\t%d\n", 0);
-      tfprintf (dwarf2FilePtr, "\t!3byte\t%s-%s\n", label1, label2);
-#endif
     }
 #endif
 }

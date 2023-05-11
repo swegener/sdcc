@@ -1,3 +1,12 @@
+2023-05-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3352.c,
+	  support/regression/tests/bug-3465.c,
+	  support/regression/tests/bug-3523.c,
+	  support/regression/tests/bug-3532.c,
+	  support/regression/tests/bug-3547.c:
+	  Disable warning 85 for some tests (as parameters are intentionally unused in these).
+
 2023-05-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3563.c:

@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 float m(int argc, char **argv)
 {
    int mx = 384, x0 = 1, x1 = (mx - 1) - 1;

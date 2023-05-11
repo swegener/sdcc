@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 typedef struct tSpriteStruct {
   char dummy;
   signed char handle;

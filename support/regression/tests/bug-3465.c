@@ -5,6 +5,8 @@
 #include <testfwk.h>
 #include <string.h>
 
+#pragma disable_warning 85
+
 void f(unsigned int j, char d[sizeof(j)])
 {
 	unsigned int k;

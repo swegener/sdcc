@@ -1,3 +1,8 @@
+2023-05-01 Felix Salfelder <felix AT salfelder.org>
+
+	* support/sdbinutils/bfd/{asxxxx,targets}.c:
+	  Fix bug #3569 and a memory leak.
+
 2023-05-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3352.c,

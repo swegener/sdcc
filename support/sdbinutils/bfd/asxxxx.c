@@ -304,8 +304,14 @@ asxxxx_get_byte (bfd *abfd, bool *errorptr)
 
   if (bfd_bread (&c, (bfd_size_type) 1, abfd) != 1)
     {
-      if (bfd_get_error () != bfd_error_file_truncated)
-        *errorptr = true;
+      if (bfd_get_error () == bfd_error_invalid_operation){
+        // FEATURE? // this error is set at EOF
+        // BUG // caller expects no error
+      } else if (bfd_get_error () == bfd_error_file_truncated){
+         // possibly this error was set at EOF in binutils<2.38
+      } else {
+         *errorptr = true;
+      }
       return EOF;
     }
 
@@ -911,6 +917,12 @@ __begin_check:
   return error ? false : true;
 }
 
+static void asxxxx_cleanup(bfd *abfd)
+{
+	bfd_release (abfd, abfd->tdata.any);
+	abfd->tdata.any = NULL;
+}
+
 bfd_cleanup
 asxxxx_object_p (bfd *abfd);
 
@@ -940,7 +952,7 @@ asxxxx_object_p (bfd *abfd)
   if (abfd->symcount > 0)
     abfd->flags |= HAS_SYMS;
 
-  return _bfd_no_cleanup;
+  return asxxxx_cleanup;
 }
 
 /* Get the contents of a section.  */
@@ -1067,6 +1079,8 @@ asxxxx_print_symbol (bfd *abfd,
 
 static bool asxxxx_bfd_is_target_special_symbol(bfd * a, asymbol * b)
 {
+	(void) a;
+	(void) b;
 	return false;
 }
 

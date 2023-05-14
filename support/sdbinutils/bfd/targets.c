@@ -977,11 +977,9 @@ static const bfd_target * const _bfd_target_vector[] =
 
 #else /* not SELECT_VECS */
 
-//#ifdef DEFAULT_VECTOR
-#if 0
+#ifdef DEFAULT_VECTOR
 	&DEFAULT_VECTOR,
 #endif
-        &asxxxx_vec,
 	/* This list is alphabetized to make it easy to compare
 	   with other vector lists -- the decls above and
 	   the case statement in configure.ac.

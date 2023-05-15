@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- *  Copyright (C) 1989-2012  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
  * Kent, Ohio  44240
  *
  *   With enhancements from
- *      John L. Hartman (JLH)
- *      jhartman@compuserve.com
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
  */
 
 /*
@@ -39,18 +39,18 @@
  * Local Definitions
  */
 
-#define VERSION "V03.00 + NoICE + sdld"
-#define	COPYRIGHT "2012"
+#define VERSION "V03.00/V05.40 + sdld"
+#define	COPYRIGHT "2021"
 
 /*
  * To include NoICE Debugging set non-zero
  */
-#define NOICE   1
+#define	NOICE	1
 
 /*
  * To include SDCC Debugging set non-zero
  */
-#define SDCDB   1
+#define	SDCDB	1
 
 /*
  * The assembler requires certain variables to have
@@ -66,30 +66,30 @@
 /* Turbo C++ 3.0 for DOS */
 /* 'int' is 16-bits, 'long' is 32-bits */
 
-#ifdef  __TURBOC__
-#define         INT32   long
-#define         LONGINT
+#ifdef	__TURBOC__
+#define		INT32	long
+#define		LONGINT
 #endif
 
 /* Symantec C++ V6.x/V7.x for DOS (not DOSX) */
 /* 'int' is 16-bits, 'long' is 32-bits */
 
-#ifdef  __SC__
-#define         INT32   long
-#define         LONGINT
+#ifdef	__SC__
+#define		INT32	long
+#define		LONGINT
 #endif
 
 /* The DEFAULT is 'int' is 32 bits */
-#ifndef INT32
-#define         INT32   int
+#ifndef	INT32
+#define		INT32	int
 #endif
 
 
-/*)Module       aslink.h
+/*)Module	aslink.h
  *
- *      The module aslink.h contains the definitions for constants,
- *      structures, global variables, and LKxxxx functions
- *      contained in the LKxxxx.c files.
+ *	The module aslink.h contains the definitions for constants,
+ *	structures, global variables, and LKxxxx functions
+ *	contained in the LKxxxx.c files.
  */
 
 /*)BUILD
@@ -116,39 +116,46 @@
         $(STACK) = 2000
 */
 
-#if defined  DECUS
+#undef	VOID
+
 /* DECUS C void definition */
 /* File/extension seperator */
 
-#define VOID        char
-#define FSEPX       '.'
+#ifdef	DECUS
+#define	VOID	char
+#define	FSEPX	'.'
+#endif
 
-#elif defined  PDOS
 /* PDOS C void definition */
 /* File/extension seperator */
 
-#define VOID        char
-#define FSEPX       ':'
+#ifdef	PDOS
+#define	VOID	char
+#define	FSEPX	':'
+#endif
 
-#elif defined UNIX
+/* Default void definition */
+/* File/extension seperator */
+
+#ifndef	VOID
+#define	VOID	void
+#define	FSEPX	'.'
+#define	OTHERSYSTEM
+#endif
+
+#ifdef UNIX
 /* UNIX void definition */
 /* File/extension seperator */
 
-#define VOID        void
-#define FSEPX       '.'
 #define LKDIRSEP    '/'
 #define LKDIRSEPSTR "/"
-#define OTHERSYSTEM
 
 #else
 /* DOS/WINDOWS void definition */
 /* File/extension seperator */
 
-#define VOID        void
-#define FSEPX       '.'
 #define LKDIRSEP    '\\'
 #define LKDIRSEPSTR "\\"
-#define OTHERSYSTEM
 
 #endif
 
@@ -184,24 +191,24 @@
 /*
  * Global symbol types.
  */
-#define S_REF   1               /* referenced */
-#define S_DEF   2               /* defined */
+#define	S_REF	1		/* referenced */
+#define	S_DEF	2		/* defined */
 
 /*
  * File types
  */
-#define F_OUT   0               /* File.ixx / File.sxx */
-#define F_STD   1               /* stdin */
-#define F_LNK   2               /* File.lnk */
-#define F_REL   3               /* File.rel */
+#define	F_OUT	0		/* File.ixx / File.sxx */
+#define	F_STD	1		/* stdin */
+#define	F_LNK	2		/* File.lnk */
+#define	F_REL	3		/* File.rel */
 
 /*
  * Error definitions
  */
-#define ER_NONE         0       /* No error */
-#define ER_WARNING      1       /* Warning */
-#define ER_ERROR        2       /* Assembly error */
-#define ER_FATAL        3       /* Fatal error */
+#define	ER_NONE		0	/* No error */
+#define	ER_WARNING	1	/* Warning */
+#define	ER_ERROR	2	/* Assembly error */
+#define	ER_FATAL	3	/* Fatal error */
 
 /*
  * This file defines the format of the
@@ -210,13 +217,13 @@
 
 #define NCPS    PATH_MAX        /* characters per symbol */
 #define NINPUT  PATH_MAX        /* Input buffer size */
-#define NHASH   (1 << 6)        /* Buckets in hash table */
-#define HMASK   (NHASH - 1)     /* Hash mask */
-#define NLPP    60              /* Lines per page */
-#define NMAX    78              /* IXX/SXX/DBX Buffer Length */
-#define         IXXMAXBYTES     32      /* NMAX > (2 * IXXMAXBYTES) */
-#define         SXXMAXBYTES     32      /* NMAX > (2 * SXXMAXBYTES) */
-#define         DBXMAXBYTES     64      /* NMAX > (  DBXMAXBYTES  ) */
+#define	NHASH	     (1 << 6)	/* Buckets in hash table */
+#define	HMASK	    (NHASH - 1)	/* Hash mask */
+#define	NLPP		60	/* Lines per page */
+#define	NMAX		78	/* IXX/SXX/DBX Buffer Length */
+#define		IXXMAXBYTES	32	/* NMAX > (2 * IXXMAXBYTES) */
+#define		SXXMAXBYTES	32	/* NMAX > (2 * SXXMAXBYTES) */
+#define		DBXMAXBYTES	64	/* NMAX > (  DBXMAXBYTES  ) */
 #define FILSPC  PATH_MAX        /* File spec length */
 
 #define NDATA   16              /* actual data */
@@ -228,18 +235,18 @@
  * the T Line index.  The MAXIMUM value for NTXT
  * is 16.  It should not be changed.
  */
-#define NTXT    16              /* T values */
+#define	NTXT		16	/* T values */
 
 /*
  * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
  */
-#define CYCNT_BGN       '['     /* Cycle count begin delimiter */
-#define CYCNT_END       ']'     /* Cycle count end   delimiter */
+#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
+#define	CYCNT_END	']'	/* Cycle count end   delimiter */
 
 /*
  * Internal ASxxxx Version Variable
  */
-extern  int     ASxxxx_VERSION;
+extern	int	ASxxxx_VERSION;
 
 
 /*
@@ -258,12 +265,12 @@ extern  int     ASxxxx_VERSION;
  *      +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define A3_CON    000           /* concatenate */
-#define A3_OVR    004           /* overlay */
-#define A3_REL    000           /* relocatable */
-#define A3_ABS    010           /* absolute */
-#define A3_NOPAG  000           /* non-paged */
-#define A3_PAG    020           /* paged */
+#define	A3_CON		000		/* concatenate */
+#define	A3_OVR		004		/* overlay */
+#define	A3_REL		000		/* relocatable */
+#define	A3_ABS		010		/* absolute */
+#define	A3_NOPAG	000		/* non-paged */
+#define	A3_PAG		020		/* paged */
 
 /* sdld specific */
 /* Additional flags for 8051 address spaces */
@@ -278,72 +285,72 @@ extern  int     ASxxxx_VERSION;
 /* end sdld specific */
 
 /*
- *      The "R3_" relocation constants define values used in
- *      generating the assembler relocation output data for
- *      areas, symbols, and code.
+ *	The "R3_" relocation constants define values used in
+ *	generating the assembler relocation output data for
+ *	areas, symbols, and code.
  *
  *
- *      Relocation types.
+ *	Relocation types.
  *
- *             7     6     5     4     3     2     1     0
- *          +-----+-----+-----+-----+-----+-----+-----+-----+
- *          | MSB | PAGn| PAG0| USGN| BYT2| PCR | SYM | BYT |
- *          +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	       7     6     5     4     3     2     1     0
+ *	    +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	    | MSB | PAGn| PAG0| USGN| BYT2| PCR | SYM | BYT |
+ *	    +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R3_WORD  0x00           /* 16 bit */
-#define R3_BYTE  0x01           /*  8 bit */
+#define	R3_WORD		0000		/* 16 bit */
+#define	R3_BYTE		0001		/*  8 bit */
 
-#define R3_AREA  0x00           /* Base type */
-#define R3_SYM   0x02
+#define	R3_AREA		0000		/* Base type */
+#define	R3_SYM		0002
 
-#define R3_NORM  0x00           /* PC adjust */
-#define R3_PCR   0x04
+#define	R3_NORM		0000		/* PC adjust */
+#define	R3_PCR		0004
 
-#define R3_BYT1  0x00           /* Byte count for R_BYTE = 1 */
-#define R3_BYTX  0x08           /* Byte count for R_BYTE = X */
+#define	R3_BYT1		0000		/* Byte count for R_BYTE = 1 */
+#define	R3_BYTX		0010		/* Byte count for R_BYTE = X */
 
-#define R3_SGND  0x00           /* Signed value */
-#define R3_USGN  0x10           /* Unsigned value */
+#define	R3_SGND		0000		/* Signed value */
+#define	R3_USGN		0020		/* Unsigned value */
 
-#define R3_NOPAG 0x00           /* Page Mode */
-#define R3_PAG0  0x20           /* Page '0' */
-#define R3_PAG   0x40           /* Page 'nnn' */
+#define	R3_NOPAG	0000		/* Page Mode */
+#define	R3_PAG0		0040		/* Page '0' */
+#define	R3_PAG		0100		/* Page 'nnn' */
 
-#define R3_LSB   0x00           /* output low byte */
-#define R3_MSB   0x80           /* output high byte */
+#define	R3_LSB		0000		/* output low byte */
+#define	R3_MSB		0200		/* output high byte */
 
 /*
- *      Additional "R3_" functionality is required to support
- *      some microprocesssor architectures.   The 'illegal'
- *      "R3_" mode of R3_WORD | R3_BYTX is used as a designator
- *      of the extended R3_ modes.  The extended modes replace
- *      the PAGING modes and are being added in an adhoc manner
- *      as follows:
+ *	Additional "R3_" functionality is required to support
+ *	some microprocesssor architectures.   The 'illegal'
+ *	"R3_" mode of R3_WORD | R3_BYTX is used as a designator
+ *	of the extended R3_ modes.  The extended modes replace
+ *	the PAGING modes and are being added in an adhoc manner
+ *	as follows:
  *
  * Extended Mode relocation flags
  *
- *         7     6     5     4     3     2     1     0
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
- *      | MSB |  x  |  x  | USGN|  1  | PCR | SYM |  0  |
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| MSB |  x  |  x  | USGN|  1  | PCR | SYM |  0  |
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R3_ECHEK        0011            /* Extended Mode Check Bits */
-#define R3_EXTND        0010            /* Extended Mode Code */
-#define R3_EMASK        0151            /* Extended Mode Mask */
+#define	R3_ECHEK	0011		/* Extended Mode Check Bits */
+#define	R3_EXTND	0010		/* Extended Mode Code */
+#define	R3_EMASK	0151		/* Extended Mode Mask */
 
-/* #define R3_AREA 0000 */      /* Base type */
-/* #define R3_SYM  0002 */
+/* #define R3_AREA	0000 */		/* Base type */
+/* #define R3_SYM	0002 */
 
-/* #define R3_NORM 0000 */      /* PC adjust */
-/* #define R3_PCR  0004 */
+/* #define R3_NORM	0000 */		/* PC adjust */
+/* #define R3_PCR	0004 */
 
-/* #define R3_SGND 0000 */      /* Signed value */
-/* #define R3_USGN 0020 */      /* Unsigned value */
+/* #define R3_SGND	0000 */		/* Signed value */
+/* #define R3_USGN	0020 */		/* Unsigned value */
 
-/* #define R3_LSB  0000 */      /* output low byte */
-/* #define R3_MSB  0200 */      /* output high byte */
+/* #define R3_LSB	0000 */		/* output low byte */
+/* #define R3_MSB	0200 */		/* output high byte */
 
 #define R3_J11     (R3_WORD|R3_BYTX)        /* JLH: 11 bit JMP and CALL (8051) */
 #define R3_J19     (R3_WORD|R3_BYTX|R3_MSB) /* BM:  19 bit JMP and CALL (DS80C390) */
@@ -376,48 +383,44 @@ extern  int     ASxxxx_VERSION;
 
 
 /*
- *      ASLINK - Version 4 Definitions
- */
-
-/*
- *      The "A4_" area constants define values used in
- *      generating the assembler area output data.
+ *	The "A4_" area constants define values used in
+ *	generating the assembler area output data.
  *
  * Area flags
  *
- *         7     6     5     4     3     2     1     0
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
- *      | BNK | SEG |     | PAG | ABS | OVR | WL1 | WL0 |
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| BNK | SEG |     | PAG | ABS | OVR | WL1 | WL0 |
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define A4_BYTE         0x0000          /*  8 bit */
-#define A4_WORD         0x0001          /* 16 bit */
+#define	A4_BYTE		0x0000		/*  8 bit */
+#define	A4_WORD		0x0001		/* 16 bit */
 
-#define A4_1BYTE        0x0000          /* 1 Byte Word Length */
-#define A4_2BYTE        0x0001          /* 2 Byte Word Length */
-#define A4_3BYTE        0x0002          /* 3 Byte Word Length */
-#define A4_4BYTE        0x0003          /* 4 Byte Word Length */
-#define A4_WLMSK        0x0003          /* Word Length Mask */
+#define A4_1BYTE	0x0000		/* 1 Byte Word Length */
+#define A4_2BYTE	0x0001		/* 2 Byte Word Length */
+#define A4_3BYTE	0x0002		/* 3 Byte Word Length */
+#define A4_4BYTE	0x0003		/* 4 Byte Word Length */
+#define	A4_WLMSK	0x0003		/* Word Length Mask */
 
-#define A4_CON          0x0400          /* Concatenating */
-#define A4_OVR          0x0404          /* Overlaying */
-#define A4_REL          0x0800          /* Relocatable */
-#define A4_ABS          0x0808          /* absolute */
-#define A4_NOPAG        0x1000          /* Non-Paged */
-#define A4_PAG          0x1010          /* Paged */
+#define	A4_CON		0x0400		/* Concatenating */
+#define	A4_OVR		0x0404		/* Overlaying */
+#define	A4_REL		0x0800		/* Relocatable */
+#define	A4_ABS		0x0808		/* absolute */
+#define	A4_NOPAG	0x1000		/* Non-Paged */
+#define	A4_PAG		0x1010		/* Paged */
 
-#define A4_CSEG         0x4000          /* CSEG */
-#define A4_DSEG         0x4040          /* DSEG */
-#define A4_NOBNK        0x8000          /* Non-Banked */
-#define A4_BNK          0x8080          /* Banked */
+#define	A4_CSEG		0x4000		/* CSEG */
+#define	A4_DSEG		0x4040		/* DSEG */
+#define A4_NOBNK	0x8000		/* Non-Banked */
+#define A4_BNK		0x8080		/* Banked */
 
-#define A4_OUT          0x0100          /* Output Code Flag */
+#define	A4_OUT		0x0100		/* Output Code Flag */
 
 /*
- *      The "R4_" relocation constants define values used in
- *      generating the assembler relocation output data for
- *      areas, symbols, and code.
+ *	The "R4_" relocation constants define values used in
+ *	generating the assembler relocation output data for
+ *	areas, symbols, and code.
  *
  * Note:  The PAGE modes, PCR modes, Signed, Unsigned,
  *        and MSB codes are mutually exclusive !!!
@@ -425,129 +428,129 @@ extern  int     ASxxxx_VERSION;
  *
  * Relocation flags
  *
- *         7     6     5     4     3     2     1     0
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
- *      | SYM | PCR | PAGn| PAG0| USGN| SGND| BYT1| BYT0|
- *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| SYM | PCR | PAGn| PAG0| USGN| SGND| BYT1| BYT0|
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define R4_BYTE         0x0000          /*  8 bit */
-#define R4_WORD         0x0001          /* 16 bit */
+#define	R4_BYTE		0x0000		/*  8 bit */
+#define	R4_WORD		0x0001		/* 16 bit */
 
-#define R4_1BYTE        0x0000          /* 1 Byte */
-#define R4_2BYTE        0x0001          /* 2 Byte */
-#define R4_3BYTE        0x0002          /* 3 Byte */
-#define R4_4BYTE        0x0003          /* 4 Byte */
-#define R4_BYTES        0x0003          /* Data Size */
+#define R4_1BYTE	0x0000		/* 1 Byte */
+#define R4_2BYTE	0x0001		/* 2 Byte */
+#define R4_3BYTE	0x0002		/* 3 Byte */
+#define R4_4BYTE	0x0003		/* 4 Byte */
+#define	R4_BYTES	0x0003		/* Data Size */
 
-#define R4_SGND         0x0004          /* Signed */
-#define R4_USGN         0x0008          /* Unsigned */
-#define R4_OVRF         0x0008          /* Overflow */
+#define	R4_SGND		0x0004		/* Signed */
+#define	R4_USGN		0x0008		/* Unsigned */
+#define	R4_OVRF		0x0008		/* Overflow */
 
-#define R4_MBRS         0x0004          /* Merge Bit Range Signed */
-                                        /* An alias for Signed */
-#define R4_MBRU         0x0008          /* Merge Bit Range Unsigned */
-                                        /* An alias for Unsigned */
-#define R4_MBRO         0x0008          /* Merge Bit Range Overflow */
-                                        /* An alias for Unsigned */
+#define	R4_MBRS		0x0004		/* Merge Bit Range Signed */
+					/* An alias for Signed */
+#define	R4_MBRU		0x0008		/* Merge Bit Range Unsigned */
+					/* An alias for Unsigned */
+#define	R4_MBRO		0x0008		/* Merge Bit Range Overflow */
+					/* An alias for Unsigned */
 
-#define R4_MSB          0x000C          /* MSB */
-                                        /* Mutually exclusive with Signed / Unsigned */
+#define	R4_MSB		0x000C		/* MSB */
+					/* Mutually exclusive with Signed / Unsigned */
 
-#define R4_AREA         0x0000          /* Base type */
-#define R4_SYM          0x0080
+#define	R4_AREA		0x0000		/* Base type */
+#define	R4_SYM		0x0080
 
 /*
  * Paging Modes:
  */
 
-#define R4_NOPAG        0x0000          /* Page Mode */
-#define R4_PBITS        0x003C          /* Paging Bits */
-#define R4_PAGE         0x0030          /* Paged Addressing */
-#define R4_PAG0         0x0010          /* Page '0'    .setdp */
-#define R4_PAGN         0x0020          /* Page 'nnn'  .setdp */
-#define R4_PAGX         0x0030          /* Page 'x', Extended Relocation Mode */
-#define R4_PAGX0        0x0030          /* Page 'x', pc + 0 */
-#define R4_PAGX1        0x0034          /* Page 'x', pc + 1 */
-#define R4_PAGX2        0x0038          /* Page 'x', pc + 2 */
-#define R4_PAGX3        0x003C          /* Page 'x', pc + 3 */
+#define	R4_NOPAG	0x0000		/* Page Mode */
+#define	R4_PBITS	0x003C		/* Paging Bits */
+#define	R4_PAGE		0x0030		/* Paged Addressing */
+#define	R4_PAG0		0x0010		/* Page '0'    .setdp */
+#define	R4_PAGN		0x0020		/* Page 'nnn'  .setdp */
+#define	R4_PAGX		0x0030		/* Page 'x', Extended Relocation Mode */
+#define	R4_PAGX0	0x0030		/* Page 'x', pc + 0 */
+#define	R4_PAGX1	0x0034		/* Page 'x', pc + 1 */
+#define	R4_PAGX2	0x0038		/* Page 'x', pc + 2 */
+#define	R4_PAGX3	0x003C		/* Page 'x', pc + 3 */
 
 /*
  * PCR Modes:
  */
 
-#define R4_PCR          0x0040          /* PC adjust (default)    */
-#define R4_PCRN         0x0050          /* PC adjust (default) no range check */
+#define	R4_PCR		0x0040		/* PC adjust (default)    */
+#define	R4_PCRN		0x0050		/* PC adjust (default) no range check */
 
-#define R4_PCR0         0x0054          /* PC adjust (offset = 0) */
-#define R4_PCR1         0x0060          /* PC adjust (offset = 1) */
-#define R4_PCR2         0x0064          /* PC adjust (offset = 2) */
-#define R4_PCR3         0x0068          /* PC adjust (offset = 3) */
-#define R4_PCR4         0x006C          /* PC adjust (offset = 4) */
+#define	R4_PCR0		0x0054		/* PC adjust (offset = 0) */
+#define	R4_PCR1		0x0060		/* PC adjust (offset = 1) */
+#define	R4_PCR2		0x0064		/* PC adjust (offset = 2) */
+#define	R4_PCR3		0x0068		/* PC adjust (offset = 3) */
+#define	R4_PCR4		0x006C		/* PC adjust (offset = 4) */
 
-#define R4_PCR0N        0x0058          /* PC adjust (offset = 0) no range check */
-#define R4_PCR1N        0x0070          /* PC adjust (offset = 1) no range check */
-#define R4_PCR2N        0x0074          /* PC adjust (offset = 2) no range check */
-#define R4_PCR3N        0x0078          /* PC adjust (offset = 3) no range check */
-#define R4_PCR4N        0x007C          /* PC adjust (offset = 4) no range check */
+#define	R4_PCR0N	0x0058		/* PC adjust (offset = 0) no range check */
+#define	R4_PCR1N	0x0070		/* PC adjust (offset = 1) no range check */
+#define	R4_PCR2N	0x0074		/* PC adjust (offset = 2) no range check */
+#define	R4_PCR3N	0x0078		/* PC adjust (offset = 3) no range check */
+#define	R4_PCR4N	0x007C		/* PC adjust (offset = 4) no range check */
 
 /*
  * Basic Relocation Modes
  */
 
-#define R4_NORM         0x0000          /* No Bit Positioning */
+#define	R4_NORM		0x0000		/* No Bit Positioning */
 
 
 /*
- *      The defined type 'a_uint' is used for all address and
- *      unsigned variable value calculations.  Its size is
- *      required to be at least 32-bits to allow upto
- *      32-bit addressing or 32-bit value manipulation.
+ *	The defined type 'a_uint' is used for all address and
+ *	unsigned variable value calculations.  Its size is
+ *	required to be at least 32-bits to allow upto
+ *	32-bit addressing or 32-bit value manipulation.
  */
-typedef unsigned INT32 a_uint;
+typedef	unsigned INT32 a_uint;
 
 /*
- *      The defined type 'v_sint' is used for address and
- *      variable value calculations requiring a sign.
- *      Its size is required to be at least 32-bits to allow
- *      upto 32-bit addressing or 32-bit value manipulation.
+ *	The defined type 'v_sint' is used for address and
+ *	variable value calculations requiring a sign.
+ *	Its size is required to be at least 32-bits to allow
+ *	upto 32-bit addressing or 32-bit value manipulation.
  */
-typedef signed INT32 v_sint;
+typedef	signed INT32 v_sint;
 
 /*
- *      The structures of head, mode, bank, area, areax, and sym
- *      are created as the REL files are read during the first
- *      pass of the linker.  The struct head is created upon
- *      encountering a H directive in the REL file.  The
- *      structure contains a link to a link file structure
- *      (struct lfile) which describes the file containing the H
- *      directive, a pointer to an array of merge mode
- *      definition pointers, the number of data/code areas
- *      contained in this header segment, the number of
- *      symbols referenced/defined in this header segment, a pointer
- *      to an array of pointers to areax structures (struct areax)
- *      created as each A directive is read, a pointer to an
- *      array of pointers to symbol structures (struct sym) for
- *      all referenced/defined symbols and a pointer to an array
- *      of pointers to bank structures (struct bank) referenced
- *      by this module.  As H directives are read
- *      from the REL files a linked list of head structures is
- *      created by placing a link to the new head structure
- *      in the previous head structure.
+ *	The structures of head, mode, bank, area, areax, and sym
+ *	are created as the REL files are read during the first
+ *	pass of the linker.  The struct head is created upon
+ *	encountering a H directive in the REL file.  The
+ *	structure contains a link to a link file structure
+ *	(struct lfile) which describes the file containing the H
+ *	directive, a pointer to an array of merge mode
+ *	definition pointers, the number of data/code areas
+ *	contained in this header segment, the number of
+ *	symbols referenced/defined in this header segment, a pointer
+ *	to an array of pointers to areax structures (struct areax)
+ *	created as each A directive is read, a pointer to an
+ *	array of pointers to symbol structures (struct sym) for
+ *	all referenced/defined symbols and a pointer to an array
+ *	of pointers to bank structures (struct bank) referenced
+ *	by this module.  As H directives are read
+ *	from the REL files a linked list of head structures is
+ *	created by placing a link to the new head structure
+ *	in the previous head structure.
  */
-struct  head
+struct	head
 {
-        struct  head  *h_hp;    /* Header link */
-        struct  lfile *h_lfile; /* Associated file */
-        int     h_narea;        /* # of areas */
-        struct  areax **a_list; /* Area list */
-        int     h_nsym; /* # of symbols */
-        struct  sym   **s_list; /* Symbol list */
-        int     h_nbank;        /* # of banks */
-        struct  bank  **b_list; /* Bank list */
-        int     h_nmode;        /* # of modes */
-        struct  mode  **m_list; /* Mode list */
-        char *  m_id;           /* Module name */
+	struct	head  *h_hp;	/* Header link */
+	struct	lfile *h_lfile;	/* Associated file */
+	int	h_narea;	/* # of areas */
+	struct	areax **a_list;	/* Area list */
+	int	h_nsym;		/* # of symbols */
+	struct	sym   **s_list;	/* Symbol list */
+	int	h_nbank;	/* # of banks */
+	struct	bank  **b_list;	/* Bank list */
+	int	h_nmode;	/* # of modes */
+	struct	mode  **m_list;	/* Mode list */
+	char *	m_id;		/* Module name */
 };
 
 /*
@@ -1134,19 +1137,19 @@ extern  char    idatamap[256];  /*      ' ' means unused
 
 /* C Library function definitions */
 /* for reference only
-extern  VOID            exit();
-extern  int             fclose();
-extern  char *          fgets();
-extern  FILE *          fopen();
-extern  int             fprintf();
-extern  VOID            free();
-extern  VOID *          malloc();
-extern  char            putc();
-extern  char *          sprintf();
-extern  char *          strcpy();
-extern  int             strlen();
-extern  char *          strncpy();
-extern  char *          strrchr();
+extern	VOID		exit();
+extern	int		fclose();
+extern	char *		fgets();
+extern	FILE *		fopen();
+extern	int		fprintf();
+extern	VOID		free();
+extern	VOID *		malloc();
+extern	char		putc();
+extern	char *		sprintf();
+extern	char *		strcpy();
+extern	int		strlen();
+extern	char *		strncpy();
+extern	char *		strrchr();
 */
 
 /* Program function definitions */
@@ -1238,17 +1241,17 @@ extern  VOID            lkalist(a_uint cpc);
 extern  VOID            lkglist(a_uint cpc, int v, int err);
 
 /* lknoice.c */
-extern  VOID            NoICEfopen(void);
-extern  VOID            NoICEmagic(void);
-extern  VOID            DefineNoICE(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineGlobal(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineScoped(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineFile(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineFunction(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineStaticFunction(char *name, a_uint value, struct bank *yp);
-extern  VOID            DefineEndFunction(a_uint value, struct bank *yp);
-extern  VOID            DefineLine(char *lineString, a_uint value, struct bank *yp);
-extern  VOID            PagedAddress(a_uint value, struct bank *yp);
+extern	VOID		NoICEfopen(void);
+extern	VOID		NoICEmagic(void);
+extern	VOID		DefineNoICE(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineGlobal(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineScoped(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineFile(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineFunction(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineStaticFunction(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineEndFunction(a_uint value, struct bank *yp);
+extern	VOID		DefineLine(char *lineString, a_uint value, struct bank *yp);
+extern	VOID		PagedAddress(a_uint value, struct bank *yp);
 
 /* lksdcdb.c */
 extern  VOID            SDCDBfopen(void);

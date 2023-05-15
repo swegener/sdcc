@@ -117,51 +117,51 @@ int i;
 }
 
 
-/*)Function     lkflush()
+/*)Function	lkflush()
  *
- *      The function lkflush() dispatches
- *      to the required data flushing routine.
+ *	The function lkflush() dispatches
+ *	to the required data flushing routine.
  *
- *      local variables:
- *              none
+ *	local variables:
+ *		none
  *
- *      global variables:
- *              int     oflag           output type flag
- *              FILE *  ofp             output file handle
+ *	global variables:
+ *		int	oflag		output type flag
+ *		FILE *	ofp		output file handle
  *
- *      functions called:
- *              VOID    iflush()        lkout.c
- *              VOID    sflush()        lks19.c
- *              VOID    dflush()        lkout.c
+ *	functions called:
+ *		VOID	iflush()	lkout.c
+ *		VOID	sflush()	lkout.c
+ *		VOID	dflush()	lkout.c
  *
- *      side effects:
- *              Any remaining REL data is flushed
- *              to the output file.
+ *	side effects:
+ *		Any remaining REL data is flushed
+ *		to the output file.
  */
 
 VOID
 lkflush()
 {
-        if (ofp == NULL)   { return; }
+	if (ofp == NULL)   { return; }
 
-        /*
-         * Intel Formats
-         */
-        if (oflag == 1) {
-                iflush();
-        } else
-        /*
-         * Motorola Formats
-         */
-        if (oflag == 2) {
-                sflush();
-        } else
-        /*
-         * Disk Basic Formats
-         */
-        if (oflag == 3) {
-                dflush();
-        }
+	/*
+	 * Intel Formats
+	 */
+ 	if (oflag == 1) {
+		iflush();
+	} else
+	/*
+	 * Motorola Formats
+	 */
+	if (oflag == 2) {
+		sflush();
+	} else
+	/*
+	 * Disk Basic Formats
+	 */
+	if (oflag == 3) {
+		dflush();
+	}
 }
 
 
@@ -777,143 +777,143 @@ sflush()
  * execution address.
  */
 
-/*)Function     dbx(i)
+/*)Function	dbx(i)
  *
- *              int     i               1 - process data
- *                                      0 - end of data
+ *		int	i		1 - process data
+ *					0 - end of data
  *
- *      The function decb() loads the output buffer with
- *      the relocated data.
+ *	The function decb() loads the output buffer with
+ *	the relocated data.
  *
- *      local variables:
- *              int     k               loop counter
- *              struct sym *sp          symbol pointer
- *              a_uint  symadr          start address
+ *	local variables:
+ *		int	k		loop counter
+ *		struct sym *sp		symbol pointer
+ *		a_uint	symadr		start address
  *
- *      global variables:
- *              int     a_bytes         T Line Address Bytes
- *              FILE *  ofp             output file handle
- *              int     rtcnt           count of data words
- *              int     rtflg[]         output the data flag
- *              a_uint  rtval[]         relocated data
- *              char    rtbuf[]         output buffer
- *              a_uint  rtadr0          address temporary
- *              a_uint  rtadr1          address temporary
- *              a_uint  rtadr2          address temporary
+ *	global variables:
+ *		int	a_bytes		T Line Address Bytes
+ *		FILE *	ofp		output file handle
+ *		int	rtcnt		count of data words
+ *		int	rtflg[]		output the data flag
+ *		a_uint	rtval[]		relocated data
+ *		char	rtbuf[]		output buffer
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
+ *		a_uint	rtadr2		address temporary
  *
- *      functions called:
- *              int     putc()          c_library
- *              VOID    dflush()        lkout.c
+ *	functions called:
+ *		int	putc()		c_library
+ *		VOID	dflush()	lkout.c
  *
- *      side effects:
- *              The data is placed into the output buffer.
+ *	side effects:
+ *		The data is placed into the output buffer.
  */
 
 VOID
 dbx(i)
 int i;
 {
-        struct sym *sp;
-        int k;
-        a_uint  j, symadr;
+	struct sym *sp;
+	int k;
+	a_uint	j, symadr;
 
-        if (i) {
-                if (hilo == 0) {
-                        switch(a_bytes){
-                        default:
-                        case 2:
-                                j = rtval[0];
-                                rtval[0] = rtval[1];
-                                rtval[1] = j;
-                                break;
-                        case 3:
-                                j = rtval[0];
-                                rtval[0] = rtval[2];
-                                rtval[2] = j;
-                                break;
-                        case 4:
-                                j = rtval[0];
-                                rtval[0] = rtval[3];
-                                rtval[3] = j;
-                                j = rtval[2];
-                                rtval[2] = rtval[1];
-                                rtval[1] = j;
-                                break;
-                        }
-                }
-                for (i=0,rtadr2=0; i<a_bytes; i++) {
-                        rtadr2 = (rtadr2 << 8) | rtval[i];
-                }
+	if (i) {
+		if (hilo == 0) {
+			switch(a_bytes){
+			default:
+			case 2:
+				j = rtval[0];
+				rtval[0] = rtval[1];
+				rtval[1] = j;
+				break;
+			case 3:
+				j = rtval[0];
+				rtval[0] = rtval[2];
+				rtval[2] = j;
+				break;
+			case 4:
+				j = rtval[0];
+				rtval[0] = rtval[3];
+				rtval[3] = j;
+				j = rtval[2];
+				rtval[2] = rtval[1];
+				rtval[1] = j;
+				break;
+			}
+		}
+		for (i=0,rtadr2=0; i<a_bytes; i++) {
+			rtadr2 = (rtadr2 << 8) | rtval[i];
+		}
 
-                if (rtadr2 != rtadr1) {
-                        /*
-                         * data bytes not contiguous between records
-                         */
-                        dflush();
-                        rtadr0 = rtadr1 = rtadr2;
-                }
-                for (k=a_bytes; k<rtcnt; k++) {
-                        if (rtflg[k]) {
-                                rtbuf[(int) (rtadr1++ - rtadr0)] = rtval[k];
-                                if (rtadr1 - rtadr0 == (unsigned) (DBXMAXBYTES - (2 * a_bytes) - 1)) {
-                                        dflush();
-                                }
-                        }
-                }
-        } else {
-                /* Disk BASIC BIN Trailer */
-                sp = lkpsym(".__.END.", 0);
-                if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
-                        symadr = symval(sp);
-                } else {
-                        symadr = 0;
-                }
-                /* Terminator */
-                putc(0xFF, ofp);
+		if (rtadr2 != rtadr1) {
+			/*
+			 * data bytes not contiguous between records
+			 */
+			dflush();
+			rtadr0 = rtadr1 = rtadr2;
+		}
+		for (k=a_bytes; k<rtcnt; k++) {
+			if (rtflg[k]) {
+				rtbuf[(int) (rtadr1++ - rtadr0)] = rtval[k];
+				if (rtadr1 - rtadr0 == (unsigned) (DBXMAXBYTES - (2 * a_bytes) - 1)) {
+					dflush();
+				}
+			}
+		}
+	} else {
+		/* Disk BASIC BIN Trailer */
+		sp = lkpsym(".__.END.", 0);
+		if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
+			symadr = symval(sp);
+		} else {
+			symadr = 0;
+		}
+		/* Terminator */
+		putc(0xFF, ofp);
 
-                /* Size (0) */
-                switch(a_bytes) {
-                case 4: putc((int) (0 >> 24) & 0xFF, ofp);
-                case 3: putc((int) (0 >> 16) & 0xFF, ofp);
-                default:
-                case 2: putc((int) (0 >>  8) & 0xFF, ofp);
-                        putc((int) (0 >>  0) & 0xFF, ofp);
-                        break;
-                }
+		/* Size (0) */
+		switch(a_bytes) {
+		case 4:	putc((int) (0 >> 24) & 0xFF, ofp);
+		case 3:	putc((int) (0 >> 16) & 0xFF, ofp);
+		default:
+		case 2:	putc((int) (0 >>  8) & 0xFF, ofp);
+			putc((int) (0 >>  0) & 0xFF, ofp);
+			break;
+		}
 
-                /* Starting Address */
-                switch(a_bytes) {
-                case 4: putc((int) (symadr >> 24) & 0xFF, ofp);
-                case 3: putc((int) (symadr >> 16) & 0xFF, ofp);
-                default:
-                case 2: putc((int) (symadr >>  8) & 0xFF, ofp);
-                        putc((int) (symadr >>  0) & 0xFF, ofp);
-                        break;
-                }
-        }
+		/* Starting Address */
+		switch(a_bytes) {
+		case 4:	putc((int) (symadr >> 24) & 0xFF, ofp);
+		case 3:	putc((int) (symadr >> 16) & 0xFF, ofp);
+		default:
+		case 2:	putc((int) (symadr >>  8) & 0xFF, ofp);
+			putc((int) (symadr >>  0) & 0xFF, ofp);
+			break;
+		}
+	}
 }
 
 
-/*)Function     dflush()
+/*)Function	dflush()
  *
- *      The function dflush() outputs the relocated data
- *      in the Disk BASIC loadable format
+ *	The function dflush() outputs the relocated data
+ *	in the Disk BASIC loadable format
  *
- *      local variables:
- *              int     i               loop counter
- *              int     max             number of data bytes
+ *	local variables:
+ *		int	i		loop counter
+ *		int	max		number of data bytes
  *
- *      global variables:
- *              FILE *  ofp             output file handle
- *              char    rtbuf[]         output buffer
- *              a_uint  rtadr0          address temporary
- *              a_uint  rtadr1          address temporary
+ *	global variables:
+ *		FILE *	ofp		output file handle
+ *		char	rtbuf[]		output buffer
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
  *
- *      functions called:
- *              int     putc()          c_library
+ *	functions called:
+ *		int	putc()		c_library
  *
- *      side effects:
- *              The data is output to the file defined by ofp.
+ *	side effects:
+ *		The data is output to the file defined by ofp.
  */
 
 /*
@@ -923,39 +923,40 @@ int i;
 VOID
 dflush()
 {
-        int i, max;
+	int i, max;
 
-        max = (int) (rtadr1 - rtadr0);
-        if (max == 0) {
-                return;
-        }
+	max = (int) (rtadr1 - rtadr0);
+	if (max == 0) {
+		return;
+	}
 
-        /* Preamble Byte */
-        putc(0, ofp);
+	/* Preamble Byte */
+	putc(0, ofp);
 
-        /* Record Size */
-        switch(a_bytes){
-        case 4: putc((int) (max >> 24) & 0xFF, ofp);
-        case 3: putc((int) (max >> 16) & 0xFF, ofp);
-        default:
-        case 2: putc((int) (max >>  8) & 0xFF, ofp);
-                putc((int) (max >>  0) & 0xFF, ofp);
-                break;
-        }
+	/* Record Size */
+	switch(a_bytes){
+	case 4:	putc((int) (max >> 24) & 0xFF, ofp);
+	case 3:	putc((int) (max >> 16) & 0xFF, ofp);
+	default:
+	case 2:	putc((int) (max >>  8) & 0xFF, ofp);
+		putc((int) (max >>  0) & 0xFF, ofp);
+		break;
+	}
 
-        /* Load Address */
-        switch(a_bytes){
-        case 4: putc((int) (rtadr0 >> 24) & 0xFF, ofp);
-        case 3: putc((int) (rtadr0 >> 16) & 0xFF, ofp);
-        default:
-        case 2: putc((int) (rtadr0 >>  8) & 0xFF, ofp);
-                putc((int) (rtadr0 >>  0) & 0xFF, ofp);
-                break;
-        }
+	/* Load Address */
+	switch(a_bytes){
+	case 4:	putc((int) (rtadr0 >> 24) & 0xFF, ofp);
+	case 3:	putc((int) (rtadr0 >> 16) & 0xFF, ofp);
+	default:
+	case 2:	putc((int) (rtadr0 >>  8) & 0xFF, ofp);
+		putc((int) (rtadr0 >>  0) & 0xFF, ofp);
+		break;
+	}
 
-        for (i = 0; i < max; i++) {
-                putc(rtbuf[i], ofp);
-        }
+	for (i = 0; i < max; i++) {
+		putc(rtbuf[i], ofp);
+	}
 
-        rtadr0 = rtadr1;
+	rtadr0 = rtadr1;
 }
+

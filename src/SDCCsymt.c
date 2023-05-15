@@ -2558,7 +2558,6 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
             SPEC_NOUN (getSpec (rType)) = V_INT;
         }
     }
-
   else if (bitsForType (type1) > bitsForType (type2))
     rType = copyLinkChain (type1);
   else
@@ -2633,6 +2632,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
             {
             case '|':
             case '^':
+            case ':':
               if (!IS_BITFIELD (etype1) && !IS_BITFIELD (etype2))
                 return computeTypeOr (etype1, etype2, reType);
             case '&':

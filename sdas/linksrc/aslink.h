@@ -1295,12 +1295,14 @@ extern  VOID            loadfile(char *filspc);
 extern  VOID            search(void);
 
 /* lkout.c */
-extern  VOID            lkout(int i);
-extern  VOID            lkflush(void);
-extern  VOID            ixx(int i);
-extern  VOID            iflush(void);
-extern  VOID            dbx(int i);
-extern  VOID            dflush(void);
+extern	VOID		lkout(int i);
+extern	VOID		lkflush(void);
+extern	VOID		ixx(int i);
+extern	VOID		iflush(void);
+extern	VOID		sxx(int i);
+extern	VOID		sflush(void);
+extern	VOID		dbx(int i);
+extern	VOID		dflush(void);
 
 /* lks19.c */
 extern  VOID            s19(int i);

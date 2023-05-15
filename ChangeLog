@@ -1,5 +1,13 @@
 2023-05-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* sdas/linksrc/Makefile.in,
+	  sdas/linksrc/aslink.h,
+	  sdas/linksrc/lkout.c,
+	  sdas/linksrc/lks19.c:
+	  Port Motorola SREC format support from upstream asxxxx 5.40 to fix bug #3559.
+
+2023-05-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCsymt.c,
 	  support/regression/tests/bug-3585.c:
 	  Fix bug #3585.

@@ -5,6 +5,8 @@
 	  Fix bug #3455.
 	* support/regression/tests/sizeof.c.in:
 	  Disable a warning where we intentionally test something that is implementation-defined in SDCC (though undefined in the standard).
+	* device/lib/ds400/Makefile.in:
+	  Fix invokation of sdar during ds400 library build.
 
 2023-05-15 Philipp Klaus Krause <philipp@colecovision.eu>
 

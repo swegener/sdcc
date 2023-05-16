@@ -3,10 +3,12 @@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
 CC = $(top_builddir)/bin/sdcc
+SDAR = $(abs_top_builddir)/bin/sdar
 
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/ds400

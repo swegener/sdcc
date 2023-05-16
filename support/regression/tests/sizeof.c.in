@@ -5,6 +5,9 @@
 */
 
 #include <testfwk.h>
+
+#pragma disable_warning 259
+
 #ifdef __sun__
 #include <inttypes.h>
 #else

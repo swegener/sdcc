@@ -1,12 +1,13 @@
 #!/bin/sh
 
-bin=sdar
+EXEEXT=@EXEEXT@
+bin=sdar${EXEEXT}
 abs_top_builddir=@abs_top_builddir@
 path=${abs_top_builddir}/support/sdbinutils/binutils
 
-# non-cygwin
+# use different path, if sth. there (e.g. on cygwin)
 if [ -f ${path}/.libs/$bin ]; then \
-	path=$path/libs
+	path=$path/.libs
 fi
 
 $path/$bin "$@"

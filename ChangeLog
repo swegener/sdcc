@@ -1,3 +1,8 @@
+2023-05-16 Felix Salfelder <felix AT salfelder.org>
+
+	* bin/sd{ar,cpp,nm,objcopy,ranlib}.in:
+	  fix #3587 (with Philipp).
+
 2023-05-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCClrange.c,

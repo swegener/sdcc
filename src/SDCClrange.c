@@ -598,7 +598,7 @@ rliveClear (eBBlock **ebbs, int count)
 /* also, update funcUsesVolatile flag for current function         */
 /*-----------------------------------------------------------------*/
 static int
-rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
+rlivePoint (eBBlock **ebbs, int count, bool emitWarnings)
 {
   int i, key;
   eBBlock *succ;
@@ -728,21 +728,27 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	  if (!POINTER_SET(ic) && IC_RESULT(ic))
 	    ic->defKey = IC_RESULT(ic)->key;
 
-	}
+        }
 
       /* check all symbols that are alive in the last instruction */
       /* but are not alive in all successors */
 
       succ = setFirstItem (ebbs[i]->succList);
+
+      while (succ && !succ->sch)
+        succ = setNextItem (ebbs[i]->succList);
+
       if (!succ)
         continue;
+
+      wassert (succ->sch);
 
       alive = succ->sch->rlive;
       while ((succ = setNextItem (ebbs[i]->succList)))
         {
-	  if (succ->sch)
+          if (succ->sch)
             alive = bitVectIntersect (alive, succ->sch->rlive);
-	}
+        }
 
       if (ebbs[i]->ech)
         alive = bitVectCplAnd ( bitVectCopy (ebbs[i]->ech->rlive), alive);
@@ -751,12 +757,12 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
         continue;
       for (key = 1; key < alive->size; key++)
         {
-	  if (!bitVectBitValue (alive, key))
-	    continue;
+          if (!bitVectBitValue (alive, key))
+            continue;
 
-	  unvisitBlocks(ebbs, count);
-	  findNextUseSym (ebbs[i], NULL, hTabItemWithKey (liveRanges, key));
-	}
+          unvisitBlocks(ebbs, count);
+          findNextUseSym (ebbs[i], NULL, hTabItemWithKey (liveRanges, key));
+       }
 
     }
 
@@ -1078,7 +1084,9 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
   symbol *sym;
   int num_separated = 0;
 
-  // printf("separateLiveRanges()\n");
+#if 0
+  printf("separateLiveRanges()\n");
+#endif
 
   for (iCode *ic = sic; ic; ic = ic->next)
     {
@@ -1104,13 +1112,10 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
           if (bitVectBitValue (sym->defs, i))
             {
               iCode *dic;
-              if(dic = hTabItemWithKey (iCodehTab, i))
+              if (dic = hTabItemWithKey (iCodehTab, i))
                 addSet (&defs, dic);
-              else
-                {
-                  werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Definition not found");
-                  return (num_separated);
-                }
+              else // Can happen if one of the definitions was in an ebblock, that due to optimizations is no longer reachable, and thus its ic are not in current iCodehTab.
+                bitVectUnSetBit (sym->defs, i); // This might not be the right place to do it, but better here than nowhere.
             }
           if (bitVectBitValue (sym->uses, i))
             {
@@ -1118,7 +1123,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
               if(uic = hTabItemWithKey (iCodehTab, i))
                 addSet (&uses, uic);
               else
-                skip_uses = true; // werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Use not found"); // return (num_separated); seems too harsh.
+                bitVectUnSetBit (sym->uses, i); // This might not be the right place to do it, but better here than nowhere.
             }
         }
       do

@@ -4450,7 +4450,7 @@ status collapsed
 
 \end_inset
 
--disable-device-lib
+-disable-device-lib 
 \backslash
 
 \begin_inset Newline newline
@@ -4469,7 +4469,7 @@ status collapsed
 
 \end_inset
 
--host=i586-mingw32msvc
+-host=i586-mingw32msvc 
 \backslash
 
 \begin_inset Newline newline

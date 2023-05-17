@@ -225,11 +225,10 @@ void test_ptr_array (void)
   A (*(*(paa[1]) - i1), 5);
   A (*(*(paa[1]) - i2), 3);
   A (*(*(paa[1]) - i3), 1);
-
+#endif
   A (*(*(paa[0]) + i0) + i1, 0);
   A (*(*(paa[0]) + i1) + i2, 1);
   A (*(*(paa[0]) + i2) + i3, 2);
-#endif
 #endif
 }
 

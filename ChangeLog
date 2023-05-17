@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Fix whitespace in cross-build configure example.
+	* support/regression/tests/gcc-torture-execute-strlen-4.c:
+	  Enable some more bits of this test that now pass.
 
 2023-05-16 Felix Salfelder <felix AT salfelder.org>
 

@@ -1,3 +1,9 @@
+2023-05-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/ralloc2.cc,
+	  src/hc08/gen.c:
+	  Prepare for hc08/s08 _BitInt support: codegen for casts.
+
 2023-05-17 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

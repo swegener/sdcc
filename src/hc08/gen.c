@@ -3214,7 +3214,7 @@ genCopy (operand * result, operand * source)
       return;
     }
 
-   if (IS_HC08 && (size > 2))
+   if (IS_HC08 && (size > 2) && size == srcsize /* todo: load adjusted value into hx when srcsize > size to generate better code */)
      aopOpExtToIdx (AOP (result), NULL, AOP (source));
     
   /* general case */
@@ -10056,8 +10056,9 @@ static void
 genCast (iCode * ic)
 {
   operand *result = IC_RESULT (ic);
-  sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
+  sym_link *resulttype = operandType (result);
+  sym_link *righttype = operandType (right);
   int size, offset;
   bool signExtend;
   bool save_a;
@@ -10068,10 +10069,43 @@ genCast (iCode * ic)
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
     return;
 
+  unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+
   aopOp (right, ic, false);
   aopOp (result, ic, false);
 
-  if (IS_BOOL (operandType (result)))
+  // Cast to _BitInt can require mask of top byte.
+  if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
+    {
+      save_a = false;
+      genCopy (result, right);
+      if (result->aop->type != AOP_REG || result->aop->aopu.aop_reg[result->aop->size - 1] != hc08_reg_a)
+        {
+          save_a = result->aop->aopu.aop_reg[0] == hc08_reg_a || !hc08_reg_a->isDead;
+          if (save_a)
+            pushReg(hc08_reg_a, false);
+          loadRegFromAop (hc08_reg_a, result->aop, result->aop->size - 1);
+        }
+      emitcode ("and", "#0x%02x", topbytemask);
+      regalloc_dry_run_cost += 2;
+      if (!SPEC_USIGN (resulttype)) // Sign-extend
+        {
+          symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          emitcode ("bit", "#0x%02x", 1u << (SPEC_BITINTWIDTH (resulttype) % 8 - 1));
+          if (!regalloc_dry_run)
+            emitcode ("beq", "!tlabel", labelKey2num (tlbl->key));
+          emitcode ("ora", "#0x%02x", ~topbytemask & 0xff);
+          regalloc_dry_run_cost += 6;
+          emitLabel (tlbl);
+        }
+      storeRegToAop (hc08_reg_a, result->aop, result->aop->size - 1);
+      if (save_a)
+        pullReg (hc08_reg_a);
+      goto release;
+    }
+
+  if (IS_BOOL (resulttype))
     {
       bool needpulla = pushRegIfSurv (hc08_reg_a);
       asmopToBool (AOP (right), true);
@@ -10084,17 +10118,19 @@ genCast (iCode * ic)
   /* nothing special required. */
   if (AOP_SIZE (result) == 1)
     {
+      wassert (!IS_BITINT (resulttype) || !(SPEC_BITINTWIDTH (resulttype) % 8));
       transferAopAop (AOP (right), 0, AOP (result), 0);
       goto release;
     }
 
-  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (rtype) && IS_SPEC (rtype) && !SPEC_USIGN (rtype);
+  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (righttype) && IS_SPEC (righttype) && !SPEC_USIGN (righttype);
+  bool masktopbyte = IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && SPEC_USIGN (resulttype);
 
   /* If the result is 2 bytes and in registers, we have to be careful */
   /* to make sure the registers are not overwritten prematurely. */
   if (AOP_SIZE (result) == 2 && AOP (result)->type == AOP_REG)
     {
-      if (IS_AOP_HX (AOP (result)) && (AOP_SIZE (right) == 2))
+      if (IS_AOP_HX (AOP (result)) && AOP_SIZE (right) == 2 && !IS_BITINT (resulttype))
         {
           loadRegFromAop (hc08_reg_hx, AOP (right), 0);
           goto release;
@@ -10117,6 +10153,12 @@ genCast (iCode * ic)
               accopWithMisc ("rola", "");
               accopWithMisc ("clra", "");
               accopWithMisc ("sbc", zero);
+              regalloc_dry_run_cost += 4;
+              if (masktopbyte)
+                {
+                  emitcode ("and", "#0x%02x", topbytemask);
+                  regalloc_dry_run_cost++;
+                }
               storeRegToAop (hc08_reg_a, AOP (result), 1);
               if (save_a)
                 pullReg(hc08_reg_a);
@@ -10153,8 +10195,8 @@ genCast (iCode * ic)
     }
 
   wassert (AOP (result)->type != AOP_REG);
-  
-  save_a = !hc08_reg_a->isDead && signExtend;
+
+  save_a = !hc08_reg_a->isDead && (signExtend || topbytemask != 0xff);
   if (save_a)
     pushReg(hc08_reg_a, true);
 
@@ -10199,8 +10241,16 @@ genCast (iCode * ic)
       accopWithMisc ("rola", "");
       accopWithMisc ("clra", "");
       accopWithMisc ("sbc", zero);
+      regalloc_dry_run_cost += 4;
       while (size--)
-        storeRegToAop (hc08_reg_a, AOP (result), offset++);
+        {
+          if (!size && masktopbyte)
+            {
+              emitcode ("and", "#0x%02x", topbytemask);
+              regalloc_dry_run_cost++;
+            }
+          storeRegToAop (hc08_reg_a, AOP (result), offset++);
+        }
     }
 
   if (save_a)

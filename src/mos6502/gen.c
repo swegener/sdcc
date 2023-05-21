@@ -7661,6 +7661,11 @@ genlshTwo (operand * result, operand * left, int shCount)
 {
   bool needpulla, needpullx;
 
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
   emitComment (TRACEGEN, __func__);
 
   /* if shCount >= 8 */
@@ -7674,15 +7679,15 @@ genlshTwo (operand * result, operand * left, int shCount)
           storeRegToAop (m6502_reg_a, AOP (result), 1);
       storeConstToAop (0, AOP (result), LSB);
       pullOrFreeReg (m6502_reg_a, needpulla);
+      goto done; // Top byte is 0, doesn't need masking.
     }
   /*  1 <= shCount <= 7 */
   // TODO: count > 2 efficient?
-  else
-    if(IS_AOP_XA(AOP(result))) {
+  else if(IS_AOP_XA(AOP(result))) {
       loadRegFromAop (m6502_reg_xa, AOP (left), 0);
       reg16Lsh (m6502_reg_x, shCount);
-    } else
-    if(aopCanShift(AOP(result)) && shCount <= 4)
+    }
+  else if(aopCanShift(AOP(result)) && shCount <= 4)
     {
       if( sameRegs (AOP (left), AOP (result))) {
       while (shCount--) {
@@ -7713,6 +7718,24 @@ genlshTwo (operand * result, operand * left, int shCount)
       loadOrFreeRegTemp (reg, needpullx);
       loadOrFreeRegTemp (m6502_reg_a, needpulla);
     }
+
+  if (maskedtopbyte)
+    {
+      bool in_a = (result->aop->type == AOP_REG && result->aop->aopu.aop_reg[1]->rIdx == A_IDX);
+      bool needpull = false;
+      if (!in_a)
+        {
+          needpull = pushRegIfUsed (m6502_reg_a);
+          loadRegFromAop (m6502_reg_a, result->aop, 1);
+        }
+      emit6502op ("and", IMMDFMT, topbytemask);
+      if (!in_a)
+        {
+          storeRegToAop (m6502_reg_a, result->aop, 1);
+          pullOrFreeReg (m6502_reg_a, needpull);
+        }
+    }
+done:
 }
 
 /**************************************************************************

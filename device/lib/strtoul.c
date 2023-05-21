@@ -120,15 +120,15 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
 
       oldret = ret;
 #if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-      range_error |= ckd_mul(&ret, ret, base);
+      range_error |= ckd_mul (&ret, ret, base);
+      range_error |= ckd_add (&ret, ret, (unsigned char)digit);
 #else
       ret *= base;
       if (ret < oldret)
         range_error = true;
+      ret += (unsigned char)digit;
 #warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul support)
 #endif
-
-      ret += (unsigned char)digit;
     }
 
   if (endptr)

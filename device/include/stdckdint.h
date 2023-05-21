@@ -2,6 +2,7 @@
    stdckdint.h: Checked integer arithmetic
 
    Copyright (C) 2021, Philipp Klaus Krause, pkk@spth.de
+   Copyright (C) 2023, Philipp Klaus Krause, philipp@colecovision.eu
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

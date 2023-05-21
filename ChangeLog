@@ -8,6 +8,9 @@
 	  Fix C23 binary prefix for strtoo(u)l.
 	* src/hc08/gen.c:
 	  Comparison codegen improvement.
+	* device/lib/strtoul.c,
+	  support/regression/tests/strto.c:
+	  Fix a corner case in strtoul range check.
 
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

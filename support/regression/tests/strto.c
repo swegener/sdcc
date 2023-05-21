@@ -44,6 +44,12 @@ testStrto(void)
   ASSERT(strtol("-0x42", 0, 0) == -0x42);
   ASSERT(strtol("-0x42", 0, 16) == -0x42);
 
+#if ULONG_MAX == 4294967295
+  errno = 0;
+  strtoul("4294967296", 0, 10);
+  ASSERT(errno == ERANGE);
+#endif
+
   errno = 0;
   ASSERT(strtol(string1, &e, 10) == LONG_MIN);
   ASSERT(errno == ERANGE);

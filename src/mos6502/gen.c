@@ -4043,6 +4043,11 @@ genUminus (iCode * ic)
 
   optype = operandType (left);
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
     {
@@ -4059,6 +4064,8 @@ genUminus (iCode * ic)
       needpula = pushRegIfSurv (m6502_reg_a);
       loadRegFromAop (m6502_reg_a, AOP (left), 0);
       rmwWithReg ("neg", m6502_reg_a);
+      if (maskedtopbyte)
+        emit6502op ("and", IMMDFMT, topbytemask);
       m6502_freeReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), SPEC_USIGN (operandType (left)));
       pullOrFreeReg (m6502_reg_a, needpula);
@@ -5127,6 +5134,10 @@ genPlus (iCode * ic)
   bool delayedstore = false;
   bool mayskip = true;
   bool skip = false;
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
 
   /* special cases :- */
 
@@ -5148,7 +5159,7 @@ genPlus (iCode * ic)
 
   /* if I can do an increment instead
      of add then GOOD for ME */
-  if (genPlusIncr (ic) == true)
+  if (!maskedtopbyte && genPlusIncr (ic))
     goto release;
 
   emitComment (TRACEGEN|VVDBG, "    %s - Can't Inc", __func__);
@@ -5207,6 +5218,8 @@ genPlus (iCode * ic)
       if (!mayskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
         {
           accopWithAop ("adc", rightOp, offset);
+          if (!size && maskedtopbyte)
+            emit6502op ("and", IMMDFMT, topbytemask);
           mayskip = false;
           skip = false;
         }
@@ -5344,6 +5357,11 @@ genMinus (iCode * ic)
   bool earlystore = false;
   bool delayedstore = false;
 
+  sym_link *resulttype = operandType (IC_RESULT (ic));
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
   asmop *leftOp, *rightOp;
 
   emitComment (TRACEGEN, __func__);
@@ -5358,7 +5376,7 @@ genMinus (iCode * ic)
   /* special cases :- */
   /* if I can do an decrement instead
      of subtract then GOOD for ME */
-  if (genMinusDec (ic) == true)
+  if (!maskedtopbyte && genMinusDec (ic))
     goto release;
 
   emitComment (TRACEGEN|VVDBG, "    %s - Can't Dec", __func__);
@@ -5371,7 +5389,7 @@ genMinus (iCode * ic)
   rightOp = AOP (right);
   offset = 0;
 
-  if ( size==2 && AOP_TYPE (right) == AOP_LIT
+  if ( size==2 && AOP_TYPE (right) == AOP_LIT && !maskedtopbyte
        && operandLitValue (right) >= 0
        && operandLitValue (right) <= 255
        && sameRegs(AOP(result),AOP(left))
@@ -5402,6 +5420,8 @@ genMinus (iCode * ic)
       emit6502op("clc", "");
       accopWithAop ("sbc", leftOp, offset);
       emit6502op("eor", "#0xff");
+      if (maskedtopbyte)
+        emit6502op ("and", IMMDFMT, topbytemask);
       storeRegToAop (m6502_reg_a, AOP (result), offset);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;
@@ -5441,6 +5461,8 @@ genMinus (iCode * ic)
             }
           accopWithAop ("sbc", rightOp, offset);
         }
+      if (!size && maskedtopbyte)
+        emit6502op ("and", IMMDFMT, topbytemask);
       if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
         {
           emitComment (TRACEGEN|VVDBG, "    - push");
@@ -5450,7 +5472,7 @@ genMinus (iCode * ic)
       else
         {
           emitComment (TRACEGEN|VVDBG, "    - store");
-        storeRegToAop (m6502_reg_a, AOP (result), offset);
+          storeRegToAop (m6502_reg_a, AOP (result), offset);
         }
       offset++;
       carry = false;
@@ -7522,8 +7544,13 @@ XAccRsh (int shCount, bool sign)
 static void
 shiftL1Left2Result (operand * left, int offl, operand * result, int offr, int shCount)
 {
+  sym_link *resulttype = operandType (result);
+  unsigned bytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedbyte = (bytemask != 0xff);
+
   // TODO: shift > 2?
-  if (sameRegs (AOP (left), AOP (result)) && aopCanShift(AOP(left)) && offr == offl)
+  if (sameRegs (AOP (left), AOP (result)) && aopCanShift(AOP(left)) && offr == offl && !maskedbyte)
     {
       while (shCount--)
         rmwWithAop ("asl", AOP (result), 0);
@@ -7534,6 +7561,8 @@ shiftL1Left2Result (operand * left, int offl, operand * result, int offr, int sh
       loadRegFromAop (m6502_reg_a, AOP (left), offl);
       /* shift left accumulator */
       AccLsh (shCount);
+      if (maskedbyte)
+        emit6502op ("and", IMMDFMT, bytemask);
       storeRegToAop (m6502_reg_a, AOP (result), offr);
       pullOrFreeReg (m6502_reg_a, needpulla);
     }
@@ -7903,9 +7932,15 @@ genLeftShift (iCode * ic)
 
   aopOp (right, ic);
 
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
+
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (AOP_TYPE (right) == AOP_LIT)
+  if (AOP_TYPE (right) == AOP_LIT &&
+    (getSize (operandType (result)) == 1 || getSize (operandType (result)) == 2 || getSize (operandType (result)) == 4))
     {
       genLeftShiftLiteral (left, right, result, ic);
       return;
@@ -8020,6 +8055,23 @@ genLeftShift (iCode * ic)
     emitComment (TRACEGEN|VVDBG, "  pull null (1) ");
     loadRegTemp(NULL);
   }
+
+  if (maskedtopbyte)
+    {
+      bool in_a = (result->aop->type == AOP_REG && result->aop->aopu.aop_reg[size - 1]->rIdx == A_IDX);
+      bool needpull = false;
+      if (!in_a)
+        {
+          needpull = pushRegIfUsed (m6502_reg_a);
+          loadRegFromAop (m6502_reg_a, result->aop, size - 1);
+        }
+      emit6502op ("and", IMMDFMT, topbytemask);
+      if (!in_a)
+        {
+          storeRegToAop (m6502_reg_a, result->aop, size - 1);
+          pullOrFreeReg (m6502_reg_a, needpull);
+        }
+    }
 
   freeAsmop (result, NULL);
   freeAsmop (right, NULL);
@@ -10040,7 +10092,8 @@ genCast (iCode * ic)
 {
   operand *right  = IC_RIGHT (ic);
   operand *result = IC_RESULT (ic);
-  sym_link *rtype = operandType (right);
+  sym_link *resulttype = operandType (result);
+  sym_link *righttype = operandType (right);
   int size, offset;
   bool signExtend;
   bool save_a;
@@ -10051,11 +10104,46 @@ genCast (iCode * ic)
   if (operandsEqu (result, right))
     return;
 
+  unsigned topbytemask = (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+
   aopOp (right, ic);
   aopOp (result, ic);
   printIC(ic);
 
   emitComment (TRACEGEN|VVDBG, "      genCast - size %d -> %d", right?AOP_SIZE(right):0, result?AOP_SIZE(result):0);
+
+  // Cast to _BitInt can require mask of top byte.
+  if (IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && bitsForType (resulttype) < bitsForType (righttype))
+    {
+      save_a = false;
+      genCopy (result, right);
+      if (result->aop->type != AOP_REG || result->aop->aopu.aop_reg[result->aop->size - 1] != m6502_reg_a)
+        {
+          save_a = result->aop->aopu.aop_reg[0] == m6502_reg_a || !m6502_reg_a->isDead;
+          if (save_a)
+            pushReg(m6502_reg_a, false);
+          loadRegFromAop (m6502_reg_a, result->aop, result->aop->size - 1);
+        }
+      emit6502op ("and", IMMDFMT, topbytemask);
+      if (!SPEC_USIGN (resulttype)) // Sign-extend
+        {
+          symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          pushReg (m6502_reg_a, true);
+          emit6502op ("and", IMMDFMT, 1u << (SPEC_BITINTWIDTH (resulttype) % 8 - 1));
+          if (!regalloc_dry_run)
+            emitBranch ("beq", tlbl);
+          pullReg (m6502_reg_a);
+          emit6502op ("ora", IMMDFMT, ~topbytemask & 0xff);
+          pushReg (m6502_reg_a, true);
+          emitLabel (tlbl);
+          pullReg (m6502_reg_a);
+        }
+      storeRegToAop (m6502_reg_a, result->aop, result->aop->size - 1);
+      if (save_a)
+        pullReg (m6502_reg_a);
+      goto release;
+    }
 
   if (IS_BOOL (operandType (result)))
     {
@@ -10074,7 +10162,8 @@ genCast (iCode * ic)
       goto release;
     }
 
-  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (rtype) && IS_SPEC (rtype) && !SPEC_USIGN (rtype);
+  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (righttype) && IS_SPEC (righttype) && !SPEC_USIGN (righttype);
+  bool masktopbyte = IS_BITINT (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8) && SPEC_USIGN (resulttype);
 
 #if 0
   if(AOP_TYPE (right)==AOP_REG) {
@@ -10205,7 +10294,11 @@ genCast (iCode * ic)
     {
       signExtendA();
       while (size--)
-        storeRegToAop (m6502_reg_a, AOP (result), offset++);
+        {
+          if (!size && masktopbyte)
+            emit6502op ("and", IMMDFMT, topbytemask);
+          storeRegToAop (m6502_reg_a, AOP (result), offset++);
+        }
     }
 
   if (save_a)

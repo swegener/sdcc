@@ -8256,11 +8256,8 @@ genLeftShift (iCode * ic)
           needpull = pushRegIfUsed (hc08_reg_a);
           loadRegFromAop (hc08_reg_a, result->aop, size - 1);
         }
-      if (maskedtopbyte)
-        {
-          emitcode ("and", "#0x%02x", topbytemask);
-          regalloc_dry_run_cost += 2;
-        }
+      emitcode ("and", "#0x%02x", topbytemask);
+      regalloc_dry_run_cost += 2;
       if (!in_a)
         {
           storeRegToAop (hc08_reg_a, result->aop, size - 1);

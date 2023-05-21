@@ -688,7 +688,7 @@ PORT mos6502_port =
     0,                          /* banked func ptr */
     1,                          /* bit */
     4,                          /* float */
-    0,                         /* bit-precise integer types up to _BitInt (64) */
+    8,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
@@ -847,7 +847,7 @@ PORT mos65c02_port =
     0,                          /* banked func ptr */
     1,                          /* bit */
     4,                          /* float */
-    0,                          /* bit-precise integer types up to _BitInt (64) */
+    8,                          /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */

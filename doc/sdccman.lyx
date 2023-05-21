@@ -10069,7 +10069,7 @@ pic14, pic16: there is no support for data types long long, unsigned long
 \end_layout
 
 \begin_layout Itemize
-hc08, s08, mos6502, pic14, pic16: _BitInt is not supported.
+mos6502, pic14, pic16: _BitInt is not supported.
 \end_layout
 
 \begin_layout Subsection

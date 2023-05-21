@@ -1,8 +1,9 @@
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/hc08/gen.c
-	  src/hc08/main.c:
-	  hc08/s08 _BitInt support up to 32 bits.
+	  src/hc08/main.c,
+	  doc/sdccman.lyx:
+	  hc08/s08 _BitInt support up to 64 bits.
 
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

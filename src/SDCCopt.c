@@ -790,7 +790,7 @@ convilong (iCode *ic, eBBlock *ebp)
   int op = ic->op;
 
   // Use basic type multiplication function for _BitInt
-  if ((op == '*' || op == '/' || op == '%') &&
+  if ((op == '*' || op == '/' || op == '%' || op == LEFT_OP || op == RIGHT_OP) &&
     (IS_BITINT (operandType (IC_LEFT (ic))) || IS_BITINT (operandType (IC_RIGHT (ic)))))
     {
       // long multiplication is more efficient than long long, so use it if we can.
@@ -931,7 +931,8 @@ convilong (iCode *ic, eBBlock *ebp)
             }
         }
     }
-  werrorfl (filename, lineno, E_INVALID_OP, "");
+  werrorfl (filename, lineno, E_INVALID_OP, "mul/div/shift");
+  fprintf (stderr, "op %d\n", op);
   return;
 found:
   remiCodeFromeBBlock (ebp, ic);

@@ -814,7 +814,7 @@ PORT hc08_port =
   },
   {
     /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
-    1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4, 32
+    1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4, 64
   },
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
@@ -961,7 +961,7 @@ PORT s08_port =
   },
   {
     /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
-    1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4, 32
+    1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4, 64
   },
   /* tags for generic pointers */
   { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */

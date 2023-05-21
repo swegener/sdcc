@@ -265,6 +265,33 @@ updateCFA (void)
     debugFile->writeFrameAddress (NULL, hc08_reg_sp, 1 + _G.stackOfs + _G.stackPushes);
 }
 
+/*-----------------------------------------------------------------*/
+/* aopIsLitVal - asmop from offset is val                          */
+/*-----------------------------------------------------------------*/
+static bool
+aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
+{
+  wassert_bt (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
+
+  for(; size; size--, offset++)
+    {
+      unsigned char b = val & 0xff;
+      val >>= 8;
+
+      // Leading zeroes
+      if (aop->size <= offset && !b && aop->type != AOP_LIT)
+        continue;
+
+      if (aop->type != AOP_LIT)
+        return (false);
+
+      if (byteOfVal (aop->aopu.aop_lit, offset) != b)
+        return (false);
+    }
+
+  return (true);
+}
+
 /*--------------------------------------------------------------------------*/
 /* pushReg - Push register reg onto the stack. If freereg is true, reg is   */
 /*           marked free and available for reuse.                           */
@@ -3249,12 +3276,13 @@ genCopy (operand *result, operand *source)
       offset = 0;
       while (size)
         {
-          if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
-            (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT ||IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
+          if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead &&
+            (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT || IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
             (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
             {
               loadRegFromAop (hc08_reg_hx, AOP (source), offset);
               storeRegToAop (hc08_reg_hx, AOP (result), offset);
+              hc08_freeReg (hc08_reg_hx);
               offset += 2;
               size -= 2;
             }
@@ -5978,7 +6006,15 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
       while (size--)
         {
           if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == X_IDX)
-            accopWithAop ("cpx", AOP (right), offset);
+            {
+              if (aopIsLitVal (right->aop, offset, 1, 0x00))
+                {
+                  emitcode ("tstx", "");
+                  regalloc_dry_run_cost++;
+                }
+              else
+                accopWithAop ("cpx", AOP (right), offset);
+            }
           else
             {
               if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
@@ -5986,7 +6022,13 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
                   needpulla = pushRegIfSurv (hc08_reg_a);
                   loadRegFromAop (hc08_reg_a, AOP (left), offset);
                 }
-              accopWithAop ("cmp", AOP (right), offset);
+              if (aopIsLitVal (right->aop, offset, 1, 0x00))
+                {
+                  emitcode ("tsta", "");
+                  regalloc_dry_run_cost++;
+                }
+              else
+                accopWithAop ("cmp", AOP (right), offset);
               if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
                 pullOrFreeReg (hc08_reg_a, needpulla);
               needpulla = false;
@@ -8181,7 +8223,7 @@ genLeftShift (iCode * ic)
       regalloc_dry_run_cost++;
       pullReg (hc08_reg_a);
     }
-  else if (!sameRegs (AOP (left), aopResult))
+  else if (!sameRegs (left->aop, aopResult))
     {
       int size = AOP_SIZE (result);
       offset = 0;
@@ -8225,7 +8267,8 @@ genLeftShift (iCode * ic)
   emitcode (countreg == hc08_reg_a ? "tsta" : (countreg ? "tstx" : "tst 1, s"), "");
   regalloc_dry_run_cost += (countreg ? 1 : 3);
 
-  emitBranch ("beq", tlbl1);
+  if (right->aop->type != AOP_LIT || !ulFromVal (right->aop->aopu.aop_lit))
+    emitBranch ("beq", tlbl1);
   if (!regalloc_dry_run)
     emitLabel (tlbl);
 
@@ -8605,9 +8648,9 @@ genRightShift (iCode * ic)
       regalloc_dry_run_cost++;
       pullReg (hc08_reg_a);
     }
-  else if (!sameRegs (AOP (left), aopResult))
+  else if (!sameRegs (left->aop, aopResult))
     {
-      size = AOP_SIZE (result);
+      int size = AOP_SIZE (result);
       offset = 0;
       while (size--)
         {
@@ -8649,7 +8692,8 @@ genRightShift (iCode * ic)
   emitcode (countreg == hc08_reg_a ? "tsta" : (countreg ? "tstx" : "tst 1, s"), "");
   regalloc_dry_run_cost += (countreg ? 1 : 3);
 
-  emitBranch ("beq", tlbl1);
+  if (right->aop->type != AOP_LIT || !ulFromVal (right->aop->aopu.aop_lit))
+    emitBranch ("beq", tlbl1);
   if (!regalloc_dry_run)
     emitLabel (tlbl);
 

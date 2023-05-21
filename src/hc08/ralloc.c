@@ -138,12 +138,14 @@ hc08_freeReg (reg_info * reg)
       case HX_IDX:
         hc08_reg_h->isFree = 1;
         hc08_reg_x->isFree = 1;
+        hc08_reg_hx->isFree = 1;
         if (hc08_reg_a->isFree)
           hc08_reg_xa->isFree = 1;
         break;
       case XA_IDX:
         hc08_reg_x->isFree = 1;
         hc08_reg_a->isFree = 1;
+        hc08_reg_xa->isFree = 1;
         if (hc08_reg_h->isFree)
           hc08_reg_hx->isFree = 1;
         break;

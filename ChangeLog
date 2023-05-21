@@ -2,7 +2,7 @@
 
 	* src/mos6502/gen.c,
 	  src/mos6502/main.c:
-	  mos6502 _BitInt support up to 16 bits.
+	  mos6502 _BitInt support.
 
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

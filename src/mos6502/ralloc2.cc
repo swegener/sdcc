@@ -413,6 +413,8 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
       while(++oi != oi_end)
         if(!std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
+      if (OP_SYMBOL_CONST (o)->nRegs > 2) // cannot handle register operand wider than 2 B yet.
+        return (false);
     }
   else
     {

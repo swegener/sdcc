@@ -3,6 +3,9 @@
 	* src/mos6502/gen.c,
 	  src/mos6502/main.c:
 	  mos6502 _BitInt support.
+	* device/lib/strtoul.c,
+	  support/regression/tests/strto.c:
+	  Fix C23 binary prefix for stro(u)l.
 
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

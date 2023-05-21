@@ -83,6 +83,11 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
           base = 16;
           ptr += 2;
         }
+      else if (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2))
+        {
+          base = 2;
+          ptr += 2;
+        }
       else if (*ptr == '0')
         {
           base = 8;
@@ -94,7 +99,8 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
   // Handle optional hex prefix.
   else if (base == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
     ptr += 2;
-
+  else if (base == 2 && (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2)))
+    ptr += 2;
 
   // Empty sequence conversion error
   if (_isdigit (*ptr, base) < 0)

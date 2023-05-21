@@ -29,6 +29,11 @@ testStrto(void)
   ASSERT(strtoul("23", 0, 0) == 23);
   ASSERT(strtoul("023", 0, 0) == 023);
   ASSERT(strtoul("0x23", 0, 0) == 0x23);
+  
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202300L // C2X introduces binary prefix.
+  ASSERT(strtoul("0b11", 0, 0) == 0b11);
+  ASSERT(strtoul("0b11", 0, 2) == 0b11);
+#endif
 
   ASSERT(strtoul("+23", 0, 0) == +23);
   ASSERT(strtoul("+023", 0, 0) == +023);

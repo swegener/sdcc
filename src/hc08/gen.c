@@ -7756,13 +7756,17 @@ genlshOne (operand * result, operand * left, int shCount)
 /* genlshTwo - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
 static void
-genlshTwo (operand * result, operand * left, int shCount)
+genlshTwo (operand *result, operand *left, int shCount)
 {
   int size;
   bool needpulla, needpullx;
 
-  D (emitcode (";     genlshTwo", ""));
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
 
+  D (emitcode (";     genlshTwo", ""));
 
   size = getDataSize (result);
 
@@ -7776,6 +7780,11 @@ genlshTwo (operand * result, operand * left, int shCount)
         {
           loadRegFromAop (hc08_reg_a, AOP (left), 0);
           AccLsh (shCount);
+          if (maskedtopbyte)
+            {
+              emitcode ("and", "#0x%02x", topbytemask);
+              regalloc_dry_run_cost += 2;
+            }
           storeRegToAop (hc08_reg_a, AOP (result), 1);
         }
       storeConstToAop (0, AOP (result), LSB);
@@ -7789,6 +7798,15 @@ genlshTwo (operand * result, operand * left, int shCount)
       needpullx = pushRegIfSurv (hc08_reg_x);
       loadRegFromAop (hc08_reg_xa, AOP (left), 0);
       XAccLsh (shCount);
+      if (maskedtopbyte)
+        {
+          emitcode ("psha", "");
+          emitcode ("txa", "");
+          emitcode ("and", "#0x%02x", topbytemask);
+          emitcode ("tax", "");
+          emitcode ("pula", "");
+          regalloc_dry_run_cost += 6;
+        }
       storeRegToFullAop (hc08_reg_xa, AOP (result), 0);
       pullOrFreeReg (hc08_reg_x, needpullx);
       pullOrFreeReg (hc08_reg_a, needpulla);

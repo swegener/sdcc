@@ -2,7 +2,7 @@
 
 	* src/hc08/gen.c,
 	  src/hc08/main.c:
-	  hc08/s08 _BitInt support: codegen for addition, subtraction and 8-bit shifts. Enable _BitInt up to 8 bits.
+	  hc08/s08 _BitInt support: codegen for addition, subtraction and 16-bit shifts. Enable _BitInt up to 16 bits.
 
 2023-05-19 Philipp Klaus Krause <philipp@colecovision.eu>
 

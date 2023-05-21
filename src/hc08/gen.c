@@ -2380,7 +2380,7 @@ operandsEqu (operand *op1, operand *op2)
 /* sameRegs - two asmops have the same registers                   */
 /*-----------------------------------------------------------------*/
 static bool
-sameRegs (asmop * aop1, asmop * aop2)
+sameRegs (asmop *aop1, asmop *aop2)
 {
   int i;
 
@@ -2390,7 +2390,7 @@ sameRegs (asmop * aop1, asmop * aop2)
 //  if (aop1->size != aop2->size)
 //    return false;
 
-  if (aop1->type == aop2->type)
+  if (aop1->type == aop2->type && aop1->size == aop2->size)
     {
       switch (aop1->type)
         {
@@ -3142,7 +3142,7 @@ asmopToBool (asmop *aop, bool resultInA)
 /*           The caller is responsible for aopOp and freeAsmop     */
 /*-----------------------------------------------------------------*/
 static void
-genCopy (operand * result, operand * source)
+genCopy (operand *result, operand *source)
 {
   int size = AOP_SIZE (result);
   int srcsize = AOP_SIZE (source);
@@ -3217,39 +3217,97 @@ genCopy (operand * result, operand * source)
 
    if (IS_HC08 && (size > 2) && size == srcsize /* todo: load adjusted value into hx when srcsize > size to generate better code */)
      aopOpExtToIdx (AOP (result), NULL, AOP (source));
-    
-  /* general case */
-  /* Copy in msb to lsb order, since some multi-byte hardware registers */
-  /* expect this order. */
-  offset = size - 1;
-  while (size)
-    {
-      if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
-        (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT ||IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
-        (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
-        {
-          loadRegFromAop (hc08_reg_hx, AOP (source), offset - 1);
-          storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
-          offset -= 2;
-          size -= 2;
-        }
 
-      else
+  /* general case */
+  bool need_lsb_to_msb_order = false; // Copy in msb to lsb order, if possible, since some multi-byte hardware registers expect this order.
+  if ((result->aop->type == AOP_DIR || result->aop->type == AOP_SOF) && // Avoid overwriting still-needed value.
+    result->aop->type == source->aop->type)
+   {
+     bool overlap = false;
+     bool result_at_lower_address = false;
+     if (result->aop->type == AOP_DIR)
+       {
+         symbol *rsym = OP_SYMBOL (result);
+         symbol *ssym = OP_SYMBOL (source);
+         if(rsym && ssym && !strcmp (rsym->rname, ssym->rname))
+           {
+             overlap = true;
+             result_at_lower_address = (result->aop->size < source->aop->size);
+           }
+       }
+     else if (result->aop->type == AOP_SOF)
+       {
+         // todo.
+       }
+     else
+       wassert (0);
+     need_lsb_to_msb_order = (overlap && result_at_lower_address);
+   }
+  if (need_lsb_to_msb_order)
+    {
+      wassert (!IS_OP_VOLATILE (result) && !IS_OP_VOLATILE (source));
+      offset = 0;
+      while (size)
         {
-          if (AOP_TYPE (source) == AOP_IDX && AOP_TYPE (result) == AOP_DIR)
+          if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
+            (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT ||IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
+            (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
             {
-              emitcode ("mov", ",x+,%s", aopAdrStr (AOP (result), offset, false));
-              regalloc_dry_run_cost += 2;
-            }
-          else if (AOP_TYPE (source) == AOP_DIR && AOP_TYPE (result) == AOP_IDX)
-            {
-              emitcode ("mov", "%s,x+", aopAdrStr (AOP (source), offset, false));
-              regalloc_dry_run_cost += 2;
+              loadRegFromAop (hc08_reg_hx, AOP (source), offset);
+              storeRegToAop (hc08_reg_hx, AOP (result), offset);
+              offset += 2;
+              size -= 2;
             }
           else
-            transferAopAop (AOP (source), offset, AOP (result), offset);
-          offset--;
-          size--;
+            {
+              if (AOP_TYPE (source) == AOP_IDX && AOP_TYPE (result) == AOP_DIR)
+                {
+                  emitcode ("mov", ",x+,%s", aopAdrStr (AOP (result), offset, false));
+                  regalloc_dry_run_cost += 2;
+                }
+              else if (AOP_TYPE (source) == AOP_DIR && AOP_TYPE (result) == AOP_IDX)
+                {
+                  emitcode ("mov", "%s,x+", aopAdrStr (AOP (source), offset, false));
+                  regalloc_dry_run_cost += 2;
+                }
+              else
+                transferAopAop (AOP (source), offset, AOP (result), offset);
+              offset++;
+              size--;
+            }
+        }
+    }
+  else
+    {
+      offset = size - 1;
+      while (size)
+        {
+          if (size >= 2 && hc08_reg_h->isDead && hc08_reg_x->isDead  &&
+            (AOP_TYPE (source) == AOP_IMMD || AOP_TYPE (source) == AOP_LIT ||IS_S08 && AOP_TYPE (source) == AOP_EXT) &&
+            (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))
+            {
+              loadRegFromAop (hc08_reg_hx, AOP (source), offset - 1);
+              storeRegToAop (hc08_reg_hx, AOP (result), offset - 1);
+              offset -= 2;
+              size -= 2;
+            }
+          else
+            {
+              if (AOP_TYPE (source) == AOP_IDX && AOP_TYPE (result) == AOP_DIR)
+                {
+                  emitcode ("mov", ",x+,%s", aopAdrStr (AOP (result), offset, false));
+                  regalloc_dry_run_cost += 2;
+                }
+              else if (AOP_TYPE (source) == AOP_DIR && AOP_TYPE (result) == AOP_IDX)
+                {
+                  emitcode ("mov", "%s,x+", aopAdrStr (AOP (source), offset, false));
+                  regalloc_dry_run_cost += 2;
+                }
+              else
+                transferAopAop (AOP (source), offset, AOP (result), offset);
+              offset--;
+              size--;
+            }
         }
     }
 }
@@ -6185,6 +6243,45 @@ isLiteralBit (unsigned long lit)
   return 0;
 }
 
+/*-----------------------------------------------------------------*/
+/* maskByte - apply bit mask to byte of operand                    */
+/*-----------------------------------------------------------------*/
+void maskByte (operand *op, int offset, unsigned mask)
+{
+  mask &= 0xff;
+  if (mask == 0xff)
+    return;
+  wassert (offset < op->aop->size);
+  bool in_a = (op->aop->type == AOP_REG && op->aop->aopu.aop_reg[offset]->rIdx == A_IDX);
+  bool in_x = (op->aop->type == AOP_REG && op->aop->aopu.aop_reg[offset]->rIdx == X_IDX);
+  if (in_a)
+    {
+      emitcode ("and", "#0x%02x", mask);
+      regalloc_dry_run_cost += 2;
+    }
+  else if (in_x && mask == 0x7f)
+    {
+      emitcode ("lslx", "");
+      emitcode ("lsrx", "");
+      regalloc_dry_run_cost += 2;
+    }
+  else if (op->aop->type == AOP_DIR && isLiteralBit (~mask & 0xff))
+    {
+      int bitpos = isLiteralBit (~mask & 0xff) - 1;
+      emitcode ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (op->aop, offset, false));
+      regalloc_dry_run_cost += 3;
+    }
+  else
+    {
+      bool needpula = pushRegIfUsed (hc08_reg_a);
+      loadRegFromAop (hc08_reg_a, op->aop, offset);
+      emitcode ("and", "#0x%02x", mask);
+      regalloc_dry_run_cost += 2;
+      hc08_useReg (hc08_reg_a);
+      storeRegToAop (hc08_reg_a, op->aop, offset);
+      pullOrFreeReg (hc08_reg_a, needpula);
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* genAnd  - code for and                                          */
@@ -7780,11 +7877,6 @@ genlshTwo (operand *result, operand *left, int shCount)
         {
           loadRegFromAop (hc08_reg_a, AOP (left), 0);
           AccLsh (shCount);
-          if (maskedtopbyte)
-            {
-              emitcode ("and", "#0x%02x", topbytemask);
-              regalloc_dry_run_cost += 2;
-            }
           storeRegToAop (hc08_reg_a, AOP (result), 1);
         }
       storeConstToAop (0, AOP (result), LSB);
@@ -7800,12 +7892,21 @@ genlshTwo (operand *result, operand *left, int shCount)
       XAccLsh (shCount);
       if (maskedtopbyte)
         {
-          emitcode ("psha", "");
-          emitcode ("txa", "");
-          emitcode ("and", "#0x%02x", topbytemask);
-          emitcode ("tax", "");
-          emitcode ("pula", "");
-          regalloc_dry_run_cost += 6;
+          if (topbytemask == 0x7f)
+            {
+              emitcode ("lslx", "");
+              emitcode ("lsrx", "");
+              regalloc_dry_run_cost += 2;
+            }
+          else
+            {
+              emitcode ("psha", "");
+              emitcode ("txa", "");
+              emitcode ("and", "#0x%02x", topbytemask);
+              emitcode ("tax", "");
+              emitcode ("pula", "");
+              regalloc_dry_run_cost += 6;
+            }
         }
       storeRegToFullAop (hc08_reg_xa, AOP (result), 0);
       pullOrFreeReg (hc08_reg_x, needpullx);
@@ -7862,6 +7963,11 @@ static void
 genlshFour (operand * result, operand * left, int shCount)
 {
   int size;
+
+  sym_link *resulttype = operandType (result);
+  unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
+    (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
+  bool maskedtopbyte = (topbytemask != 0xff);
 
   D (emitcode (";     genlshFour", ""));
 
@@ -7943,6 +8049,8 @@ genlshFour (operand * result, operand * left, int shCount)
       shiftLLong (left, result, LSB);
       if (shCount == 2)
         shiftLLong (result, result, LSB);
+      if (maskedtopbyte)
+        maskByte (result, 3, topbytemask);
     }
   /* 3 <= shCount <= 7, optimize */
   else
@@ -7950,6 +8058,8 @@ genlshFour (operand * result, operand * left, int shCount)
       shiftL2Left2Result (left, MSB24, result, MSB24, shCount);
       shiftRLeftOrResult (left, MSB16, result, MSB24, 8 - shCount);
       shiftL2Left2Result (left, LSB, result, LSB, shCount);
+      if (maskedtopbyte)
+        maskByte (result, 3, topbytemask);
     }
 }
 
@@ -8000,6 +8110,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
         case 4:
           genlshFour (result, left, shCount);
           break;
+
         default:
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
           fprintf (stderr, "Shift by %d\n", size);
@@ -8039,7 +8150,8 @@ genLeftShift (iCode * ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (AOP_TYPE (right) == AOP_LIT)
+  if (AOP_TYPE (right) == AOP_LIT &&
+    (getSize (operandType (result)) == 1 || getSize (operandType (result)) == 2 || getSize (operandType (result)) == 4))
     {
       genLeftShiftLiteral (left, right, result, ic);
       return;
@@ -8071,7 +8183,7 @@ genLeftShift (iCode * ic)
     }
   else if (!sameRegs (AOP (left), aopResult))
     {
-      size = AOP_SIZE (result);
+      int size = AOP_SIZE (result);
       offset = 0;
       while (size--)
         {
@@ -8465,7 +8577,8 @@ genRightShift (iCode * ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (AOP_TYPE (right) == AOP_LIT)
+  if (AOP_TYPE (right) == AOP_LIT &&
+    (getSize (operandType (result)) == 1 || getSize (operandType (result)) == 2 || getSize (operandType (result)) == 4))
     {
       genRightShiftLiteral (left, right, result, ic, sign);
       return;
@@ -10206,10 +10319,10 @@ genCast (iCode * ic)
 
   /* If the result is 1 byte, then just copy the one byte; there is */
   /* nothing special required. */
-  if (AOP_SIZE (result) == 1)
+  if (result->aop->size <= right->aop->size)
     {
       wassert (!IS_BITINT (resulttype) || !(SPEC_BITINTWIDTH (resulttype) % 8));
-      transferAopAop (AOP (right), 0, AOP (result), 0);
+      genCopy (result, right);
       goto release;
     }
 
@@ -10256,32 +10369,7 @@ genCast (iCode * ic)
           goto release;
         }
 
-      if (AOP (right)->type == AOP_REG)
-        {
-          wassert (AOP_SIZE (right) == 2);
-          /* Source and destination are the same size; no need for sign */
-          /* extension or zero padding. Just copy in the order that */
-          /* won't prematurely overwrite the source. */
-          if (AOP (result)->aopu.aop_reg[0] == AOP (right)->aopu.aop_reg[1])
-            {
-              transferAopAop (AOP (right), 1, AOP (result), 1);
-              transferAopAop (AOP (right), 0, AOP (result), 0);
-            }
-          else
-            {
-              transferAopAop (AOP (right), 0, AOP (result), 0);
-              transferAopAop (AOP (right), 1, AOP (result), 1);
-            }
-          goto release;
-        }
-      else
-        {
-          /* Source is at least 2 bytes and not in registers; no need */
-          /* for sign extension or zero padding. Just copy. */
-          transferAopAop (AOP (right), 0, AOP (result), 0);
-          transferAopAop (AOP (right), 1, AOP (result), 1);
-          goto release;
-        }
+      wassert (0); // Should have been covered by logic earlier in this function,
     }
 
   wassert (AOP (result)->type != AOP_REG);

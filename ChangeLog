@@ -1,3 +1,12 @@
+2023-05-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Fix a segdfault in a corner case in stm8 codegen.
+	* device/lib/strtoul.c:
+	  Improve strtoul range error check.
+	* support/regression/tests/mulextra.c:
+	  Improve test coverage for multiplication with operands of different types.
+
 2023-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mos6502/gen.c,

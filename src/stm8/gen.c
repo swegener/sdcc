@@ -1513,9 +1513,9 @@ void swap_from_a(int idx)
 static
 const asmop *stack_aop (const asmop *aop, int i, int *offset)
 {
-  asmop *stacked = NULL;
+  asmop *stacked = 0;
 
-  if (aopRS (aop) && !aopOnStack (aop, i, 1) && !aopInReg (aop, i, A_IDX))
+  if (aopRS (aop) && i < aop->size && !aopOnStack (aop, i, 1) && !aopInReg (aop, i, A_IDX))
     {
       if (aop->aopu.bytes[i].byteu.reg->rIdx == XL_IDX)
         {

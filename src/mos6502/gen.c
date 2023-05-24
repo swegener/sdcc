@@ -7736,6 +7736,7 @@ genlshTwo (operand * result, operand * left, int shCount)
         }
     }
 done:
+  ;
 }
 
 /**************************************************************************

@@ -3,6 +3,8 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/bigstack.c.in:
 	  Improve guards against a potential issue in the interaction of function entry stack adjustment and register parameters.
+	* src/mos6502/gen.c:
+	  Fix missing statement after label.
 
 2023-05-23 Philipp Klaus Krause <philipp@colecovision.eu>
 

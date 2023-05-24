@@ -9404,10 +9404,7 @@ genSend (const iCode *ic)
       for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
         {
           if (walk2->op != CALL && IC_LEFT (walk2) && !IS_OP_LITERAL (IC_LEFT (walk2)))
-            {
-              cost (500, 500);
-              wassert (regalloc_dry_run);
-            }
+            UNIMPLEMENTED;
 
           if (walk2->op == CALL || walk2->op == PCALL)
             break;
@@ -9702,7 +9699,7 @@ genSTM8iCode (iCode *ic)
     case RECEIVE:
       genReceive (ic);
       break;
-      
+
     case SEND:
       genSend (ic);
       break;
@@ -9845,30 +9842,30 @@ stm8IsReturned(const char *what)
 // Check if what is part of the ith argument (counting from 1) to a function of type ftype.
 // If what is 0, just check if hte ith argument is in registers.
 bool
-stm8IsRegArg(struct sym_link *ftype, int i, const char *what)
+stm8IsRegArg (struct sym_link *ftype, int i, const char *what)
 {
   if (what && !strcmp(what, "x"))
     return (stm8IsRegArg (ftype, i, "xl") || stm8IsRegArg (ftype, i, "xh"));
   else if (what && !strcmp(what, "y"))
     return (stm8IsRegArg (ftype, i, "yl") || stm8IsRegArg (ftype, i, "yh"));
- 
+
   const asmop *argaop = aopArg (ftype, i);
 
   if (!argaop)
     return false;
-    
+
   if (!what)
     return true;
-    
+
   for (int i = 0; i < argaop->size; i++)
     if (!strcmp(argaop->aopu.bytes[i].byteu.reg->name, what))
       return true;
 
-  return false; 
+  return false;
 }
 
 bool
-stm8IsParmInCall(sym_link *ftype, const char *what)
+stm8IsParmInCall (sym_link *ftype, const char *what)
 {
   const value *args;
   int i;

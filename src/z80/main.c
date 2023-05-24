@@ -353,7 +353,7 @@ _reg_parm (sym_link *l, bool reentrant)
         werror (E_Z88DK_FASTCALL_PARAMETER);
     }
 
-  bool is_regarg = z80IsRegArg(_G.regparam.ftype, ++_G.regparam.n, 0);
+  bool is_regarg = z80IsRegArg (_G.regparam.ftype, ++_G.regparam.n, 0);
 
   return (is_regarg ? _G.regparam.n : 0);
 }

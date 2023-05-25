@@ -18,7 +18,7 @@ const char string6[] = "-0x23test";
 void
 testStrto(void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_mcs51) // Lack of memory
   char *e;
 
   ASSERT(strtoul("", 0, 10) == 0);

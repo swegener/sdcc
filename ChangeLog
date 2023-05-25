@@ -1,3 +1,10 @@
+2023-05-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-2854.,
+	  support/regression/tests/bug-3474.c,
+	  support/regression/tests/strto.c:
+	  Disable tests for mcs51 medium model that need too much memory since recent strotul fixes (see also RFE #875).
+
 2023-05-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/stm8/gen.c,

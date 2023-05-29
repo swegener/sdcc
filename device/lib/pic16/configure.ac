@@ -8,6 +8,7 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([debug/gstack/gstack.c])
 AC_CONFIG_HEADERS([config.h])
 
+AM_MAINTAINER_MODE
 
 # SDCC setup
 case $srcdir in

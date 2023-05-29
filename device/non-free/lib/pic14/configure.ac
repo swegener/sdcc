@@ -14,8 +14,10 @@
 #
 
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.60)
+AC_PREREQ([2.71])
 AC_INIT
+
+AM_MAINTAINER_MODE
 
 AC_DEFUN([AC_CONFIG_SRCDIR])
 #AC_DEFUN(AC_CONFIG_FILES)

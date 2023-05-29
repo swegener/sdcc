@@ -29,6 +29,10 @@
 
 /* XXX */
 #undef HAVE_CURSES_H
+#undef HAVE_NCURSESW_H
+#undef HAVE_NCURSES_H
+#undef HAVE_NCURSESW_CURSES_H
+#undef HAVE_NCURSES_CURSES_H
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */

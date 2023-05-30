@@ -2800,6 +2800,11 @@ In 4.2.9, support for –pedantic-parse-number and #pragma pedantic_parse_numer
 \end_layout
 
 \begin_layout Itemize
+In 4.2.9 support for arguments to -MMD was dropped.
+ The output fiel can be specified via -MF instead.
+\end_layout
+
+\begin_layout Itemize
 In 4.2.10, _sdcc_external_startup was renamed to __sdcc_external_startup and
  support for it was added to further ports.
 \end_layout

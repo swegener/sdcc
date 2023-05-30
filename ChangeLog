@@ -1,5 +1,14 @@
 2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* doc/sdccman.lyx:
+	  Document change in -MMD vs. -MF argument.
+	* .version,
+	  doc/INSTALL.txt,
+	  sdcc.spec:
+	  Bump version to prepare for 4.3.0 release.
+
+2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/mos6502/peeph.def,
 	  support/regression/tests/bug-3593.c:
 	  Fix bug #3593, using a variant of a patch by Christopher Williams.

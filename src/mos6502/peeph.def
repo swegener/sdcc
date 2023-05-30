@@ -16,7 +16,7 @@ replace restart {
 	sta	%3
     ; Peephole Function Entry  - eliminated unnecessary lda
 	stx	%4
-}
+} if notVolatile(%1), notVolatile(%2)
 
 replace restart {
 	sta	%1
@@ -79,12 +79,14 @@ replace restart {
 // Remove unnecessary loads
 ////////////////////////////////////////////////////////
 
+// ora is cheaper than lda (except for lda from immediate, but that can't happen for the two rules below)
 replace restart {
         sta	%1
 	lda     %1
 } by {
         sta	%1
-    ; Peephole load 1 - eliminated redundant lda
+        ora	#0x00
+    ; Peephole load 1 - replaced redundant lda by ora
 } if notVolatile(%1)
 
 replace restart {
@@ -92,24 +94,26 @@ replace restart {
 	lda     %1, %2
 } by {
         sta	%1, %2
-    ; Peephole load 2 - eliminated redundant lda
+        ora	#0x00
+    ; Peephole load 2 - replaced redundant lda by ora
 } if notVolatile(%1)
 
-replace restart {
-        stx	%1
-	ldx     %1
-} by {
-        stx	%1
-    ; Peephole load 3 - eliminated redundant ldx
-} if notVolatile(%1)
-
-replace restart {
-        sty	%1
-	ldy     %1
-} by {
-        sty	%1
-    ; Peephole load 4 - eliminated redundant ldy
-} if notVolatile(%1)
+// TODO: Enable when notUsed() gets implemented!
+//replace restart {
+//        stx	%1
+//	ldx     %1
+//} by {
+//        stx	%1
+//    ; Peephole load 3 - eliminated redundant ldx
+//} if notVolatile(%1), notUsed ('z')
+//
+//replace restart {
+//        sty	%1
+//	ldy     %1
+//} by {
+//        sty	%1
+//    ; Peephole load 4 - eliminated redundant ldy
+//} if notVolatile(%1), notUsed ('z')
 
 ////////////////////////////////////////////////////////
 // Remove dead loads
@@ -155,7 +159,7 @@ replace restart {
 } by {
 	; Peephole load 9 - removed dead ldx followed by %2
 	%2
-} if same(%2 'tax' 'tsx' )
+} if same(%2 'tax' 'tsx'), notVolatile(%1)
 
 replace restart {
 	ldy %1
@@ -163,7 +167,7 @@ replace restart {
 } by {
 	; Peephole load 10 - removed dead ldy followed by tay
 	tay
-}
+} if notVolatile(%1)
 
 replace restart {
 	lda	%1
@@ -171,7 +175,7 @@ replace restart {
 } by {
 	; Peephole load 11 - removed dead lda
 	%2
-} if same(%2 'txa' 'tya' 'pla' )
+} if same(%2 'txa' 'tya' 'pla'), notVolatile(%1)
 
 replace restart {
 	lda	%4
@@ -181,7 +185,7 @@ replace restart {
 	; Peephole load 12 - removed dead lda not followed by store or branch
 	%1	%2
 	lda	%3
-} if notSame(%1 'sta' 'adc' 'sbc' 'cmp' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp'), notSame(%2 'a')
+} if notSame(%1 'sta' 'adc' 'sbc' 'cmp' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp'), notSame(%2 'a'), notVolatile(%4)
 
 replace restart {
 	ldx	%4
@@ -191,7 +195,7 @@ replace restart {
 	; Peephole load 13 - removed dead ldx not followed by store or branch
 	%1	%2
 	ldx	%3
-} if notSame(%1 'stx' 'cpx' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
+} if notSame(%1 'stx' 'cpx' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp'), notVolatile(%4)
 
 replace restart {
 	ldy	%4
@@ -201,7 +205,7 @@ replace restart {
 	; Peephole load 14 - removed dead ldy  not followed by store or branch
 	%1	%2
 	ldy	%3
-} if notSame(%1 'sty' 'cpy' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
+} if notSame(%1 'sty' 'cpy' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp'), notVolatile(%4)
 
 replace restart {
 	lda	%3
@@ -211,7 +215,7 @@ replace restart {
 	; Peephole load 15 - removed dead lda
 	%1 
 	lda	%2
-} if notSame(%1 'pha' 'php' 'tax' 'tay')
+} if notSame(%1 'pha' 'php' 'tax' 'tay'), notVolatile(%3)
 
 replace restart {
 	ldx	%3
@@ -221,7 +225,7 @@ replace restart {
 	; Peephole load 16 - removed dead ldx
 	%1 
 	ldx	%2
-} if notSame(%1 'txa' 'txs')
+} if notSame(%1 'txa' 'txs'), notVolatile(%3)
 
 ////////////////////////////////////////////////////////
 // Remove dead register operation/transfers
@@ -241,7 +245,7 @@ replace restart {
 } by {
 	; Peephole regop 2 - removed dead %1 followed by lda
 	lda	%2
-} if same(%1 'and' 'eor' 'ora' )
+} if same(%1 'and' 'eor' 'ora'), notVolatile(%3)
 
 replace restart {
 	%1
@@ -335,62 +339,63 @@ replace restart {
 // Remove unnecessary cmp/cpx/cpy #00
 ////////////////////////////////////////////////////////
 
-replace restart {
-	lda	%1
-	cmp	#0x00
-} by {
-	lda	%1
-	; Peephole cmp 1 - eliminated unnecessary cmp #0x00
-}
-
-replace restart {
-	lda	%1,%2
-	cmp	#0x00
-} by {
-	lda	%1,%2
-	; Peephole cmp 2 - eliminated unnecessary cmp #0x00
-}
-
-replace restart {
-	%1
-	cmp	#0x00
-} by {
-	%1
-	; Peephole cmp 3 - eliminated unnecessary cmp #0x00
-} if same(%1 'pla' 'txa' 'tya' )
-
-replace restart {
-	ldx	%1
-	cpx	#0x00
-} by {
-	ldx	%1
-	; Peephole cmp 4 - eliminated unnecessary cpx #0x00
-}
-
-replace restart {
-	ldy	%1
-	cpy	#0x00
-} by {
-	ldy	%1
-	; Peephole cmp 5 - eliminated unnecessary cpy #0x00
-}
-
-replace restart {
-	%1
-	cpx	#0x00
-} by {
-	%1
-	; Peephole cmp 6 - eliminated unnecessary cpx #0x00
-} if same(%1 'inx' 'dex' 'tax' )
-
-replace restart {
-	%1
-	cpy	#0x00
-} by {
-	%1
-	; Peephole cmp 7 - eliminated unnecessary cpy #0x00
-} if same(%1 'iny' 'dey' 'tay' )
-
+// TODO: Enable when notUsed() gets implemented!
+//replace restart {
+//	lda	%1
+//	cmp	#0x00
+//} by {
+//	lda	%1
+//	; Peephole cmp 1 - eliminated unnecessary cmp #0x00
+//} if notUsed ('c')
+//
+//replace restart {
+//	lda	%1,%2
+//	cmp	#0x00
+//} by {
+//	lda	%1,%2
+//	; Peephole cmp 2 - eliminated unnecessary cmp #0x00
+//} if notUsed ('c')
+//
+//replace restart {
+//	%1
+//	cmp	#0x00
+//} by {
+//	%1
+//	; Peephole cmp 3 - eliminated unnecessary cmp #0x00
+//} if same(%1 'pla' 'txa' 'tya' ), notUsed ('c')
+//
+//replace restart {
+//	ldx	%1
+//	cpx	#0x00
+//} by {
+//	ldx	%1
+//	; Peephole cmp 4 - eliminated unnecessary cpx #0x00
+//} if notUsed ('c')
+//
+//replace restart {
+//	ldy	%1
+//	cpy	#0x00
+//} by {
+//	ldy	%1
+//	; Peephole cmp 5 - eliminated unnecessary cpy #0x00
+//} if notUsed ('c')
+//
+//replace restart {
+//	%1
+//	cpx	#0x00
+//} by {
+//	%1
+//	; Peephole cmp 6 - eliminated unnecessary cpx #0x00
+//} if same(%1 'inx' 'dex' 'tax' ), notUsed ('c')
+//
+//replace restart {
+//	%1
+//	cpy	#0x00
+//} by {
+//	%1
+//	; Peephole cmp 7 - eliminated unnecessary cpy #0x00
+//} if same(%1 'iny' 'dey' 'tay' ), notUsed ('c')
+//
 ////////////////////////////////////////////////////////
 // Remove redundant stores
 ////////////////////////////////////////////////////////

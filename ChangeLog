@@ -1,3 +1,9 @@
+2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mos6502/peeph.def,
+	  support/regression/tests/bug-3593.c:
+	  Fix bug #3593, using a variant of a patch by Christopher Williams.
+
 2023-05-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/pic14/Makefile.in,

@@ -2582,6 +2582,10 @@ valZeroResultFromOp (sym_link * type1, sym_link * type2, int op, bool reduceType
 {
   value *val;
 
+#if 0
+  printf("valZeroResultFromOp %d ", op); printTypeChain (type1, stdout); printf (" vs. "); printTypeChain (type2, 0);
+#endif
+
   /* create a new value */
   val = newValue ();
   val->type = computeType (type1, type2, RESULT_TYPE_INT, op);

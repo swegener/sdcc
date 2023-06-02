@@ -3076,13 +3076,13 @@ genOr (const iCode *ic)
   for (int i = 0; i < size; i++)
     {
       /* Swap if left is literal or right is in A. */
-      if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || (right->aop->type == AOP_STK || right->aop->type == AOP_SFR) && !aopInReg (left->aop, i, A_IDX))
+      if (left->aop->type == AOP_LIT || aopInReg (right->aop, i, A_IDX)  || (right->aop->type == AOP_STK || right->aop->type == AOP_SFR) && !aopInReg (left->aop, i, A_IDX))
         {
           operand *t = right;
           right = left;
           left = t;
         }
-    
+
       if (regDead (P_IDX, ic) && aopInReg (left->aop, i, P_IDX))
         p_free = true;
       if (regDead (A_IDX, ic) && aopInReg (left->aop, i, A_IDX))
@@ -3762,12 +3762,12 @@ genRightShift (const iCode *ic)
 
       if (SPEC_USIGN (getSpec (operandType (left))))
         {
-          genMove_o (result->aop, 0, left->aop, shCount / 8, result->aop->size, regDead (A_IDX, ic), true);
+          genMove_o (result->aop, 0, left->aop, shCount / 8, result->aop->size, regDead (A_IDX, ic), p_dead);
           size -= shCount / 8;
           shCount %= 8;
         }
       else
-        genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), true);
+        genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), p_dead);
 
       if (!shCount)
         goto release;

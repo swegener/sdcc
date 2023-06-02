@@ -12185,8 +12185,10 @@ AccLsh (unsigned int shCount)
 static void
 shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount, const iCode *ic)
 {
+  if (!shCount)
+    cheapMove (result->aop, offr, left->aop, offl, isRegDead (A_IDX, ic));
   // add hl, hl is cheap in code size. On Rabbits it is also fastest.
-  if (sameRegs (result->aop, left->aop) && aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic) && offr == offl && (!optimize.codeSpeed && IS_RAB))
+  else if (sameRegs (result->aop, left->aop) && aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic) && offr == offl && (!optimize.codeSpeed && IS_RAB))
     {
       while (shCount--)
         {
@@ -12269,7 +12271,7 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
 
   wassert (size == 2);
 
-  if (IS_Z80N &&
+  if (IS_Z80N && !operandType (result) &&
     aopInReg (result->aop, 0, DE_IDX) && isRegDead (B_IDX, ic) &&
     shCount > 2 && shCount != 8) // Only worth it when shifting by more than 2 (we can get a cheap path using add hl, hl in shiftL2Left2Result (left, result, shCount, ic)).
     {
@@ -12281,13 +12283,7 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
   else if (shCount >= 8)
     {
       shCount -= 8;
-      if (size > 1)
-        {
-          if (shCount)
-            shiftL1Left2Result (left, 0, result, 1, shCount, ic);
-          else
-            cheapMove (result->aop, 1, left->aop, 0, isRegDead (A_IDX, ic));
-        }
+      shiftL1Left2Result (left, 0, result, 1, shCount, ic);
       cheapMove (result->aop, 0, ASMOP_ZERO, 0, isRegDead (A_IDX, ic));
     }
   else

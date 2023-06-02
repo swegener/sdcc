@@ -2427,7 +2427,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   etype2 = type2 ? getSpec (type2) : type1;
 
 #if 0
-  printf("computeType types "); printTypeChain (type1, stdout); printf (" vs. "); printTypeChain (type2, 0);
+  printf("computeType %d types ", op); printTypeChain (type1, stdout); printf (" vs. "); printTypeChain (type2, 0);
 #endif
 
   /* Conditional operator has some special type conversion rules */

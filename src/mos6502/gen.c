@@ -7674,9 +7674,11 @@ genlshTwo (operand * result, operand * left, int shCount)
       shCount -= 8;
       // TODO
       needpulla = pushRegIfSurv (m6502_reg_a);
-          loadRegFromAop (m6502_reg_a, AOP (left), 0);
-          AccLsh (shCount);
-          storeRegToAop (m6502_reg_a, AOP (result), 1);
+      loadRegFromAop (m6502_reg_a, AOP (left), 0);
+      AccLsh (shCount);
+      if (maskedtopbyte)
+        emit6502op ("and", IMMDFMT, topbytemask);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
       storeConstToAop (0, AOP (result), LSB);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto done; // Top byte is 0, doesn't need masking.
@@ -8096,6 +8098,13 @@ genLeftShift (iCode * ic)
     }
 
   safeEmitLabel (tlbl1);
+
+  // After loop, countreg is 0
+  if (countreg)
+    {
+      countreg->isLitConst = 1;
+      countreg->litConst = 0;
+    }
 
   if (!countreg) {
     emitComment (TRACEGEN|VVDBG, "  pull null (1) ");
@@ -8552,6 +8561,13 @@ genRightShift (iCode * ic)
     }
 
   safeEmitLabel (tlbl1);
+
+  // After loop, countreg is 0
+  if (countreg)
+    {
+      countreg->isLitConst = 1;
+      countreg->litConst = 0;
+    }
 
   if (!countreg)
     loadRegTemp(NULL);

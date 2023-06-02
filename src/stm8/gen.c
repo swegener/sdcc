@@ -7448,7 +7448,7 @@ genLeftShift (const iCode *ic)
     (iterations <= 3 || iterations == 7) &&
     (aopInReg (shiftop, skip_bytes, X_IDX) || aopInReg (shiftop, skip_bytes, Y_IDX)))
     {
-      bool a_free = regDead (A_IDX, ic) && shiftop->regs[A_IDX] < 0;
+      bool a_free = (regDead (A_IDX, ic) || pushed_a) && shiftop->regs[A_IDX] < 0;
       if (iterations <= 3)
         {
           for(int i = 0; i < iterations; i++)
@@ -7493,9 +7493,11 @@ genLeftShift (const iCode *ic)
               cost (4, 2);
               pop (ASMOP_A, 0, 1);
               adjustStack (1, false, false, false);
+              pushed_premoved_count = false;
             }
         }
     }
+  wassert (!pushed_premoved_count);
 
   tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (0));
   tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (0));
@@ -8025,8 +8027,8 @@ genRightShift (const iCode *ic)
   if (right->aop->type == AOP_LIT &&
     ((getSize (operandType (result)) <= 2) ||
       (!sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2ul : 1ul)) ||
-      (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10) ||
-      (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) >= 16) ||
+      (getSize (operandType (result)) == 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10) ||
+      (getSize (operandType (result)) == 4 && ulFromVal (right->aop->aopu.aop_lit) >= 16) ||
       (!sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8) ) )
     {
       genRightShiftLiteral (left, right, result, ic);

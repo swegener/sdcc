@@ -4837,8 +4837,8 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               werrorfl (tree->filename, tree->lineno, W_SHIFT_CHANGED, (tree->opval.op == LEFT_OP ? "left" : "right"));
               /* Change shift op to comma op and replace the right operand with 0. */
               /* This preserves the left operand in case there were side-effects. */
-              tree->opval.op = ',';
               tree->right->opval.val = valZeroResultFromOp(LTYPE (tree), RTYPE (tree), tree->opval.op, reduceTypeAllowed);
+              tree->opval.op = ',';
               TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;
               return tree;
             }

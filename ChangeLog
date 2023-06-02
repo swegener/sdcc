@@ -1,3 +1,18 @@
+2023-06-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c:
+	  Fix type of result in optimization of shifts wider than operand.
+	* src/z80/gen.c:
+	  Fix left-shift for wide _BitInt.
+	* src/hc08/gen.c:
+	  Fix shift issues.
+	* src/pdk/gen.c:
+	  Fix 16-bit bitwise or for register operand with global operand. Fix a in left shift by 8 code generation that overwrote a live pseudoregister p when storing the shift result onto the stack.
+	* src/stm8/gen.c:
+	  Fix stack balance issue in left shift code generation.
+	* support/regression/tests/bitintrot.c.in:
+	  _BitInt rotation test.
+
 2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

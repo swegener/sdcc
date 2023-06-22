@@ -401,7 +401,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\packihx.exe"
   File "${SDCC_ROOT}\bin\sdcc.exe"
   File "${SDCC_ROOT}\bin\sdcpp.exe"
-  File "${SDCC_ROOT}\bin\cc1.exe"
+  File "${SDCC_ROOT}\libexec\sdcc\cc1"
   File "${SDCC_ROOT}\bin\as2gbmap.cmd"
   File "${SDCC_ROOT}\bin\readline5.dll"
 !ifdef WIN64
@@ -1260,7 +1260,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\packihx.exe"
   Delete "$INSTDIR\bin\sdcc.exe"
   Delete "$INSTDIR\bin\sdcpp.exe"
-  Delete "$INSTDIR\bin\cc1.exe"
+  Delete "$INSTDIR\bin\cc1"
   Delete "$INSTDIR\bin\as2gbmap.cmd"
   Delete "$INSTDIR\bin\readline5.dll"
 !ifdef WIN64

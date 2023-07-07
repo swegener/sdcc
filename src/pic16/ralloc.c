@@ -295,8 +295,7 @@ pic16_decodeOp (unsigned int op)
                 case FUNCTION:          return "FUNCTION";
                 case ENDFUNCTION:       return "ENDFUNCTION";
                 case JUMPTABLE:         return "JUMPTABLE";
-                case RRC:               return "RRC";
-                case RLC:               return "RLC";
+                case ROT:               return "ROT";
                 case CAST:              return "CAST";
                 case CALL:              return "CALL";
                 case PARAM:             return "PARAM  ";

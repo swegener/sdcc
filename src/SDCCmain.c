@@ -381,17 +381,25 @@ static PORT *_ports[] = {
 static void
 _setPort (const char *name)
 {
-  int i;
-  for (i = 0; i < NUM_PORTS; i++)
+  size_t maxnamelen = 0;
+  for (int i = 0; i < NUM_PORTS; i++)
     {
       if (!strcmp (_ports[i]->target, name))
         {
           port = _ports[i];
           return;
         }
+      size_t namelen = strlen (_ports[i]->target_name);
+      maxnamelen = namelen > maxnamelen ? namelen: maxnamelen;
     }
   /* Error - didnt find */
   werror (E_UNKNOWN_TARGET, name);
+
+  fprintf (stderr, "Supported ports and corresponding port selection options:\n");
+  wassert (maxnamelen <= INT_MAX);
+  for (int i = 0; i < NUM_PORTS; i++)
+    fprintf (stderr, "%-*s-m%s\n", (int)(maxnamelen + 4), _ports[i]->target_name, _ports[i]->target);
+
   exit (EXIT_FAILURE);
 }
 

@@ -607,18 +607,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
           if (SKIP_IC2 (ic))
             continue;
 
-          if (ic->op == IFX)
-            {
-              verifyRegsAssigned (IC_COND (ic), ic);
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              verifyRegsAssigned (IC_JTCOND (ic), ic);
-              continue;
-            }
-
           verifyRegsAssigned (IC_RESULT (ic), ic);
           verifyRegsAssigned (IC_LEFT (ic), ic);
           verifyRegsAssigned (IC_RIGHT (ic), ic);
@@ -665,21 +653,6 @@ regsUsedIniCode (iCode * ic)
 {
   bitVect *rmask = newBitVect (hc08_nRegs);
 
-  /* do the special cases first */
-  if (ic->op == IFX)
-    {
-      rmask = bitVectUnion (rmask, hc08_rUmaskForOp (IC_COND (ic)));
-      goto ret;
-    }
-
-  /* for the jumptable */
-  if (ic->op == JUMPTABLE)
-    {
-      rmask = bitVectUnion (rmask, hc08_rUmaskForOp (IC_JTCOND (ic)));
-      goto ret;
-    }
-
-  /* of all other cases */
   if (IC_LEFT (ic))
     rmask = bitVectUnion (rmask, hc08_rUmaskForOp (IC_LEFT (ic)));
 
@@ -1813,18 +1786,6 @@ RegFix (eBBlock ** ebbs, int count)
           if (SKIP_IC2 (ic))
             continue;
 
-          if (ic->op == IFX)
-            {
-              verifyRegsAssigned (IC_COND (ic), ic);
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              verifyRegsAssigned (IC_JTCOND (ic), ic);
-              continue;
-            }
-
           verifyRegsAssigned (IC_RESULT (ic), ic);
           verifyRegsAssigned (IC_LEFT (ic), ic);
           verifyRegsAssigned (IC_RIGHT (ic), ic);
@@ -1883,18 +1844,6 @@ replaceAccuse (eBBlock ** ebbs, int count)
         {
           if (SKIP_IC2 (ic))
             continue;
-
-          if (ic->op == IFX)
-            {
-              replaceAccuseOperand (IC_COND (ic));
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              replaceAccuseOperand (IC_JTCOND (ic));
-              continue;
-            }
 
           replaceAccuseOperand (IC_RESULT (ic));
           replaceAccuseOperand (IC_LEFT (ic));

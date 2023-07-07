@@ -253,8 +253,7 @@ decodeOp (unsigned int op)
         case PCALL:                     return "PCALL";
         case ENDFUNCTION:               return "ENDFUNCTION";
         case JUMPTABLE:                 return "JUMPTABLE";
-        case RRC:                       return "RRC";
-        case RLC:                       return "RLC";
+        case ROT:                       return "ROT";
         case CAST:                      return "CAST";
         case CALL:                      return "CALL";
         case PARAM:                     return "PARAM  ";
@@ -1772,8 +1771,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                         case '|':       /* bitwise OR */
                         case '^':       /* bitwise XOR */
                         case '~':       /* bitwise negate */
-                        case RLC:       /* rotate through carry */
-                        case RRC:
+                        case ROT:       /* rotate */
                         case UNARYMINUS:
                         case '+':       /* addition */
                         case '-':       /* subtraction */

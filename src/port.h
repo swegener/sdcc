@@ -283,8 +283,10 @@ typedef struct
     /** Size of the biggest shift the port can handle. -1 if port can handle shifts of arbitrary size. */
     signed int shift;
 
-    /* Has support routines for int x int -> long multiplication and unsigned int x unsigned int -> unsigned long multiplication */
+    // Has support routines for int x int -> long multiplication and unsigned int x unsigned int -> unsigned long multiplication
     bool has_mulint2long;
+    // Has support routine for unsigned long x unsigned char -> unsigned long long multiplication.
+    bool has_mululonguchar2ulonglong;
   }
   support;
 
@@ -389,8 +391,13 @@ typedef struct
 
   /** Returns true if the port has implemented certain bit
       manipulation iCodes (RRC, RLC, SWAP, GETABIT, GETBYTE, GETWORD)
+      right parameter: value of right operand if in >= 0; negative if non-literal.
    */
-  bool (*hasExtBitOp) (int op, int size);
+  bool (*hasExtBitOp) (int op, sym_link *left, int right);
+
+  /** Returns true if the port has implemented certain bit
+      manipulation iCodes (RRC, RLC, SWAP, GETABIT, GETBYTE, GETWORD)
+   */
 
   /** Returns the relative expense of accessing a particular output
       storage class. Larger values indicate higher expense.

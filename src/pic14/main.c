@@ -249,15 +249,11 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 
 /* Indicate which extended bit operations this port supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
-  if (op == RRC
-    || op == RLC
-    || op == GETABIT
-    )
-    return TRUE;
-  else
-    return FALSE;
+  unsigned int lbits = bitsForType (left);
+  return (op == ROT && (right & lbits == 1 || right % lbits == lbits - 1) ||
+    op == GETABIT);
 }
 
 /* Indicate the expense of an access to an output storage class */
@@ -430,7 +426,7 @@ PORT pic_port =
   },
     /* pic14 has an 8 bit mul */
   {
-    -1, FALSE
+    -1, false, false         // Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine.
   },
   {
     pic14_emitDebuggerSymbol

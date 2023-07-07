@@ -2489,7 +2489,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
     }
 
   /* shift operators have the important type in the left operand */
-  if (op == LEFT_OP || op == RIGHT_OP)
+  if (op == LEFT_OP || op == RIGHT_OP || op == ROT)
     rType = copyLinkChain(type1);
   /* If difference between pointers or arrays then the result is a ptrdiff */
   else if ((op == '-') && (IS_PTR (type1) || IS_ARRAY (type1)) && (IS_PTR (type2) || IS_ARRAY (type2)))
@@ -3371,7 +3371,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if ((TARGET_IS_DS390 || TARGET_HC08_LIKE || TARGET_IS_MOS6502)  && IS_AGGREGATE (sym->type->next))
+  if ((TARGET_IS_DS390 || TARGET_IS_MOS6502)  && IS_AGGREGATE (sym->type->next))
     {
       werrorfl (sym->fileDef, sym->lineDef, E_FUNC_AGGR, sym->name);
       return 0;
@@ -4363,6 +4363,7 @@ symbol *fps16x16_gteq;
 /* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
 symbol *muldiv[3][4][4];
 symbol *muls16tos32[2];
+symbol *mulu32u8tou64;
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 sym_link *multypes[4][2];
 /* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED */
@@ -4800,6 +4801,10 @@ initCSupport (void)
     const char *uiparams[] = {"Ui", "Ui"};
     muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, iparams) : 0;
     muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "Ul", 2, uiparams) : 0;
+  }
+  {
+    const char *uiparams[] = {"Ul", "Uc"};
+    mulu32u8tou64 = port->support.has_mululonguchar2ulonglong ? funcOfTypeVarg ("__mululonguchar2ulonglong", "UL", 2, uiparams) : 0;
   }
 }
 

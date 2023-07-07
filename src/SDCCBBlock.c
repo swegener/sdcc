@@ -685,16 +685,6 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
       /* for all instructions in this block do */
       for (ic = rBlock->sch; ic; ic = ic->next)
         {
-
-          /* if we find usage */
-          if (ic->op == IFX && isOperandEqual (src, IC_COND (ic)))
-            {
-              bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
-              IC_COND (ic) = operandFromOperand (dest);
-              OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
-              continue;
-            }
-
           if (isOperandEqual (IC_RIGHT (ic), src))
             {
               bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);

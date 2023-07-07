@@ -8400,13 +8400,6 @@ genRRC (iCode * ic)
   /* move it to the result */
   size = AOP_SIZE (result);
   offset = size - 1;
-  if (size == 1)
-    {
-      /* special case for 1 byte */
-      MOVA (aopGet (left, offset, FALSE, FALSE));
-      emitcode ("rr", "a");
-      goto release;
-    }
   /* no need to clear carry, bit7 will be written later */
   while (size--)
     {
@@ -8422,7 +8415,7 @@ genRRC (iCode * ic)
       MOVA (aopGet (result, AOP_SIZE (result) - 1, FALSE, FALSE));
     }
   emitcode ("mov", "acc.7,c");
-release:
+
   aopPut (result, "a", AOP_SIZE (result) - 1);
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
@@ -8451,12 +8444,6 @@ genRLC (iCode * ic)
   if (size--)
     {
       MOVA (aopGet (left, offset, FALSE, FALSE));
-      if (size == 0)
-        {
-          /* special case for 1 byte */
-          emitcode ("rl", "a");
-          goto release;
-        }
       emitcode ("rlc", "a");    /* bit0 will be written later */
       if (AOP_SIZE (result) > 1)
         {
@@ -8478,7 +8465,7 @@ genRLC (iCode * ic)
       MOVA (aopGet (result, 0, FALSE, FALSE));
     }
   emitcode ("mov", "acc.0,c");
-release:
+
   aopPut (result, "a", 0);
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
@@ -8601,9 +8588,47 @@ genGetWord (iCode * ic)
   aopOp (result, ic, FALSE);
 
   offset = (int) ulFromVal (AOP (right)->aopu.aop_lit) / 8;
+
+  if (AOP (result)->type == AOP_REG && AOP (left)->type == AOP_REG)
+    {
+      // assume that the result always has 2 regs and
+      // the left operand has two or more regs.
+      wassert (AOP (result)->size == 2 && (AOP (left)->size - offset) >= 2);
+  
+      if (AOP (result)->aopu.aop_reg[0]->rIdx == AOP (left)->aopu.aop_reg[offset + 1]->rIdx
+            && AOP (result)->aopu.aop_reg[1]->rIdx == AOP (left)->aopu.aop_reg[offset]->rIdx)
+        {
+          D (emitcode (";", "overlapping regs (1)"));
+    
+          // [r0:r1] -> [r1:r0]
+          // swap registers by ferrying them through the accumulator
+          //
+          //                 a    r0    r1
+          // xch  a,r0      r0    a
+          // xch  a,r1      r1          r0
+          // xch  a,r0      a     r1
+    
+          emitcode ("xch", "a,%s", aopGet (left, offset, false, false));
+          emitcode ("xch", "a,%s", aopGet (left, offset + 1, false, false));
+          emitcode ("xch", "a,%s", aopGet (left, offset, false, false));
+          goto done;
+        }
+      else if (AOP (left)->aopu.aop_reg[offset+1]->rIdx == AOP (result)->aopu.aop_reg[0]->rIdx)
+        {
+          D (emitcode (";", "overlapping regs (3)"));
+    
+          // [r0:r3] -> [r1:r0]
+    
+          aopPut (result, aopGet (left, offset + 1, false, false), 1);
+          aopPut (result, aopGet (left, offset, false, false), 0);
+          goto done;
+        }
+    }
+
   aopPut (result, aopGet (left, offset, FALSE, FALSE), 0);
   aopPut (result, aopGet (left, offset + 1, FALSE, FALSE), 1);
 
+done:
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
@@ -8626,11 +8651,6 @@ genSwap (iCode * ic)
 
   switch (AOP_SIZE (left))
     {
-    case 1:                    /* swap nibbles in byte */
-      MOVA (aopGet (left, 0, FALSE, FALSE));
-      emitcode ("swap", "a");
-      aopPut (result, "a", 0);
-      break;
     case 2:                    /* swap bytes in word */
       if (AOP_TYPE (left) == AOP_REG && sameRegs (AOP (left), AOP (result)))
         {
@@ -9339,6 +9359,53 @@ genlshAny (operand *result, operand *left, int shCount)
           aopPut (result, "a", offset);
         }
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* genRot1 - generates code for rotation of 8-bit values           */
+/*-----------------------------------------------------------------*/
+static void
+genRot1 (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+
+  aopOp (left, ic, false);
+  aopOp (result, ic, false);
+
+  wassert (bitsForType (operandType (left)) == 8);
+  wassert (IS_OP_LITERAL (right));
+
+  int s = operandLitValueUll (right) % 8;
+
+  MOVA (aopGet (left, 0, FALSE, FALSE));
+  AccRol (s);
+  aopPut (result, "a", 0);
+
+  freeAsmop (result, NULL, ic, true);
+  freeAsmop (left, NULL, ic, true);
+}
+
+/*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  unsigned int lbits = bitsForType (operandType (left));
+  if (lbits == 8)
+    genRot1 (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits == 1)
+    genRLC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits ==  lbits - 1)
+    genRRC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) %lbits == lbits / 2)
+    genSwap (ic);
+  else
+    wassertl (0, "Unsupported rotation.");
 }
 
 /*-----------------------------------------------------------------*/
@@ -12557,14 +12624,6 @@ gen51Code (iCode * lic)
           genInline (ic);
           break;
 
-        case RRC:
-          genRRC (ic);
-          break;
-
-        case RLC:
-          genRLC (ic);
-          break;
-
         case GETABIT:
           genGetAbit (ic);
           break;
@@ -12575,6 +12634,10 @@ gen51Code (iCode * lic)
 
         case GETWORD:
           genGetWord (ic);
+          break;
+
+        case ROT:
+          genRot (ic);
           break;
 
         case LEFT_OP:
@@ -12630,10 +12693,6 @@ gen51Code (iCode * lic)
 
         case ENDCRITICAL:
           genEndCritical (ic);
-          break;
-
-        case SWAP:
-          genSwap (ic);
           break;
 
         default:

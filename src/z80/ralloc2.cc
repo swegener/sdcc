@@ -371,22 +371,6 @@ call_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
   return(c);
 }
 
-template <class G_t, class I_t> static float
-ifx_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
-{
-  const iCode *ic = G[i].ic;
-
-  return(default_operand_cost(IC_COND(ic), a, i, G, I));
-}
-
-template <class G_t, class I_t> static float
-jumptab_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
-{
-  const iCode *ic = G[i].ic;
-
-  return(default_operand_cost(IC_JTCOND(ic), a, i, G, I));
-}
-
 template <class I_t>
 static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 {
@@ -561,19 +545,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   bool result_in_A = operand_in_reg(IC_RESULT(ic), REG_A, ia, i, G);
   
   // Check if an input of this instruction is placed in A.
-  bool input_in_A;
-  switch(ic->op)
-    {
-    case IFX:
-      input_in_A = operand_in_reg(IC_COND(ic), REG_A, ia, i, G);
-      break;
-    case JUMPTABLE:
-      input_in_A = operand_in_reg(IC_JTCOND(ic), REG_A, ia, i, G);
-      break;
-    default:
-      input_in_A = operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(right, REG_A, ia, i, G);
-      break;
-    }
+  bool input_in_A = operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(right, REG_A, ia, i, G);
 
   // sfr access needs to go through a.
   if(input_in_A &&
@@ -584,13 +556,13 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   // For some iCodes, we can handle anything.
   if(ic->op == '~' || ic->op == IPUSH || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
-    ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
+    ic->op == GETBYTE || ic->op == GETWORD ||
+    ic->op == ROT && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||
     ic->op == LEFT_OP ||
-    ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST)
+    ic->op == RECEIVE || ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST)
     return(true);
 
-  if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right) ||
-    (ic->op == RRC || ic->op == RLC) && getSize(operandType(result)) == 1)
+  if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right))
     return(true);
 
   // Can use non-destructive cp on == and < (> might swap operands).
@@ -746,22 +718,8 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool result_in_H = operand_in_reg(result, REG_H, ia, i, G);
   bool result_in_HL = result_in_L || result_in_H;
 
-  bool input_in_L, input_in_H;
-  switch(ic->op)
-    {
-    case IFX:
-      input_in_L = operand_in_reg(IC_COND(ic), REG_L, ia, i, G);
-      input_in_H = operand_in_reg(IC_COND(ic), REG_L, ia, i, G);
-      break;
-    case JUMPTABLE:
-      input_in_L = operand_in_reg(IC_JTCOND(ic), REG_L, ia, i, G);
-      input_in_H = operand_in_reg(IC_JTCOND(ic), REG_L, ia, i, G);
-      break;
-    default:
-      input_in_L = operand_in_reg(left, REG_L, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G);
-      input_in_H = operand_in_reg(left, REG_H, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G);
-      break;
-    }
+  bool input_in_L = operand_in_reg(left, REG_L, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G);
+  bool input_in_H = operand_in_reg(left, REG_H, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G);
   bool input_in_HL = input_in_L || input_in_H;
 
   const cfg_dying_t &dying = G[i].dying;
@@ -784,7 +742,8 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // For some iCodes, code generation can handle anything.
   if(ic->op == '~' || ic->op == CALL || ic->op == RETURN || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
-    ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
+    ic->op == GETBYTE || ic->op == GETWORD ||
+    ic->op == ROT && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||
     !((IS_SM83 || IY_RESERVED) && (operand_on_stack(result, a, i, G) || operand_on_stack(right, a, i, G))) && (ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST) ||
     ic->op == RECEIVE || ic->op == SEND)
     return(true);
@@ -1008,22 +967,8 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   bool dead_IY = dead_IYL && dead_IYH;
 
-  bool input_in_IYL, input_in_IYH;
-  switch(ic->op)
-    {
-    case IFX:
-      input_in_IYL = operand_in_reg(IC_COND(ic), REG_IYL, ia, i, G);
-      input_in_IYH = operand_in_reg(IC_COND(ic), REG_IYL, ia, i, G);
-      break;
-    case JUMPTABLE:
-      input_in_IYL = operand_in_reg(IC_JTCOND(ic), REG_IYL, ia, i, G);
-      input_in_IYH = operand_in_reg(IC_JTCOND(ic), REG_IYL, ia, i, G);
-      break;
-    default:
-      input_in_IYL = operand_in_reg(left, REG_IYL, ia, i, G) || operand_in_reg(right, REG_IYL, ia, i, G);
-      input_in_IYH = operand_in_reg(left, REG_IYH, ia, i, G) || operand_in_reg(right, REG_IYH, ia, i, G);
-      break;
-    }
+  bool input_in_IYL = operand_in_reg(left, REG_IYL, ia, i, G) || operand_in_reg(right, REG_IYL, ia, i, G);
+  bool input_in_IYH = operand_in_reg(left, REG_IYH, ia, i, G) || operand_in_reg(right, REG_IYH, ia, i, G);
   bool input_in_IY = input_in_IYL || input_in_IYH;
 
   //const std::set<var_t> &dying = G[i].dying;
@@ -1045,7 +990,8 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   // Some instructions can handle anything.
   if(ic->op == IPUSH || ic->op == CALL ||
     ic->op == '+' ||
-    ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
+    ic->op == GETBYTE || ic->op == GETWORD ||
+    ic->op == ROT && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||
     ic->op == '=' && !POINTER_SET(ic) ||
     ic->op == CAST ||
     ic->op == SEND)
@@ -1230,16 +1176,9 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
 {
   const iCode *ic = G[i].ic;
   
-  if(ic->op == IFX)
-    assign_operand_for_cost(IC_COND(ic), a, i, G, I);
-  else if(ic->op == JUMPTABLE)
-    assign_operand_for_cost(IC_JTCOND(ic), a, i, G, I);
-  else
-    {
-      assign_operand_for_cost(IC_LEFT(ic), a, i, G, I);
-      assign_operand_for_cost(IC_RIGHT(ic), a, i, G, I);
-      assign_operand_for_cost(IC_RESULT(ic), a, i, G, I);
-    }
+  assign_operand_for_cost(IC_LEFT(ic), a, i, G, I);
+  assign_operand_for_cost(IC_RIGHT(ic), a, i, G, I);
+  assign_operand_for_cost(IC_RESULT(ic), a, i, G, I);
     
   if(ic->op == SEND && ic->builtinSEND)
     assign_operands_for_cost(a, (unsigned short)*(adjacent_vertices(i, G).first), G, I);
@@ -1305,6 +1244,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case GETABIT:
     case GETBYTE:
     case GETWORD:
+    case ROT:
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:

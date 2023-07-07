@@ -5803,6 +5803,9 @@ genCmp (const iCode *ic, iCode *ifx)
       opcode = exchangedCmp (opcode);
     }
 
+  bool need_w = (size == 2) && // jrsle and jrsgt test the Z flag, which only works correctly when we do the whole subtraction as 16 bit.
+    (!strcmp (branchInstCmp (opcode, sign, ifx && IC_TRUE (ifx)), "jrsle") || !strcmp (branchInstCmp (opcode, sign, ifx && IC_TRUE (ifx)), "jrsgt"));
+
   if (size == 1 &&
     (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK) &&
     aopInReg (left->aop, 0, A_IDX))
@@ -5826,17 +5829,22 @@ genCmp (const iCode *ic, iCode *ifx)
               emit3w (A_EXGW, ASMOP_X, ASMOP_Y);
             }
         }
+      else if (aopInReg (left->aop, 0, Y_IDX) || !regDead (X_IDX, ic) && regDead (Y_IDX, ic) && left->aop->type == AOP_STK && right->aop->type != AOP_STK)
+        {
+          genMove (ASMOP_Y, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+          emit2 ("cpw", "y, %s", aopGet2 (right->aop, 0));
+          cost (4, 2);
+        }
       else
         {
-          bool save_x = !regDead (X_IDX, ic) && !aopInReg (left->aop, 0, X_IDX) && !aopInReg (left->aop, 0, Y_IDX);
+          bool save_x = !regDead (X_IDX, ic) && !aopInReg (left->aop, 0, X_IDX);
           if (save_x)
             push (ASMOP_X, 0, 2);
 
-          if (!aopInReg (left->aop, 0, Y_IDX))
-            genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+          genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
 
-          emit2 ("cpw", aopInReg (left->aop, 0, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, 0));
-          cost (3 + aopInReg (left->aop, 0, Y_IDX), 2);
+          emit2 ("cpw", "x, %s", aopGet2 (right->aop, 0));
+          cost (3, 2);
 
           if (save_x)
             pop (ASMOP_X, 0, 2);
@@ -5890,6 +5898,9 @@ genCmp (const iCode *ic, iCode *ifx)
               started = true;
               continue;
             }
+
+          if (need_w)
+            UNIMPLEMENTED;
 
           if (!regDead (A_IDX, ic) && !pushed_a && !aopInReg (left->aop, i, A_IDX))
             {
@@ -6794,68 +6805,15 @@ genRotate (const iCode *ic)
 
   aopOp (left = IC_LEFT (ic), ic);
   aopOp (result = IC_RESULT (ic), ic);
-  
-  const bool rlc = (ic->op == RLC);
-  
-  wassert (left->aop->size == result->aop->size);
+
+  unsigned int lbits = bitsForType (operandType (IC_LEFT (ic)));
+  const bool rlc = (operandLitValueUll (IC_RIGHT (ic)) % lbits == 1);
+
+  wassert (left->aop->size == result->aop->size && bitsForType (operandType (left)) == bitsForType (operandType (result)) && !(bitsForType (operandType (left)) % 8));
+  wassert (IS_OP_LITERAL (IC_RIGHT (ic)) && (operandLitValueUll (IC_RIGHT (ic)) % lbits == 1 || operandLitValueUll (IC_RIGHT (ic)) % lbits == lbits - 1));
   
   switch (left->aop->size)
     {
-    case 1:
-      if (aopSame (result->aop, 0, left->aop, 0, 1) && left->aop->type == AOP_DIR) // Use bccm
-        {
-          emit3 (rlc ? A_SLL : A_SRL, left->aop, 0);
-          emit2 ("bccm", rlc ? "%s, #0" : "%s, #7", aopGet (left->aop, 0));
-          cost (4, 1);
-        }
-      else if (rlc && aopSame (result->aop, 0, left->aop, 0, 1) && aopOnStack (left->aop, 0, 1))
-        {
-          emit3 (A_SLL, left->aop, 0);
-          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
-          if (!regalloc_dry_run)
-              emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
-          emit2 ("inc", aopGet (left->aop, 0));
-          cost (2, 2);
-          emitLabel (tlbl);
-        }
-      else
-        {
-          if (!regDead (A_IDX, ic))
-            push (ASMOP_A, 0, 1);
-          cheapMove (ASMOP_A, 0, left->aop, 0, false);
-          if (rlc) // 3 bytes, 2 cycles.
-            {
-              emit3 (A_SLL, ASMOP_A, 0);
-              emit3 (A_ADC, ASMOP_A, ASMOP_ZERO);
-            }
-          else if (aopOnStack (left->aop, 0, 1) || (!aopInReg (left->aop, 0, A_IDX) && left->aop->type == AOP_REG)) // 3 or 4 bytes, 3 cycles.
-            {
-              emit3 (A_SRL, ASMOP_A, 0); // Get lowest bit into carry
-              cheapMove (ASMOP_A, 0, left->aop, 0, false);
-              emit3 (A_RRC, ASMOP_A, 0); // Rotate
-            }
-          else if (optimize.codeSpeed) // 5 bytes, 3 cycles
-            {
-              emit3 (A_SRL, ASMOP_A, 0);
-              symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
-              if (!regalloc_dry_run)
-                emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
-              emit2 ("or", "#0x80");
-              cost (4, 2);
-              emitLabel (tlbl);
-            }
-          else // 4 bytes, 4 cycles.
-            {
-              push (ASMOP_A, 0, 1);
-              emit3 (A_SRL, ASMOP_A, 0); // Get lowest bit into carry
-              pop (ASMOP_A, 0, 1);
-              emit3 (A_RRC, ASMOP_A, 0); // Rotate
-            }
-          cheapMove (result->aop, 0, ASMOP_A, 0, false);
-          if (!regDead (A_IDX, ic))
-            pop (ASMOP_A, 0, 1);
-        }
-      break;
     case 2:
       if (rlc && aopSame (result->aop, 0, left->aop, 0, 2) && left->aop->type == AOP_DIR)  // Use bccm
         {
@@ -6936,34 +6894,17 @@ genSwap (const iCode *ic)
 {
   operand *left, *result;
 
-  D (emit2 ("; genSwap", ""));
-
   aopOp (left = IC_LEFT (ic), ic);
   aopOp (result = IC_RESULT (ic), ic);
 
   asmop swapped_aop;
 
-  wassert (left->aop->size == result->aop->size);
+  wassert (left->aop->size == result->aop->size &&
+    bitsForType (operandType (left)) == bitsForType (operandType (result)) &&
+    !(bitsForType (operandType (left)) % 8));
 
   switch (left->aop->size)
     {
-    case 1:
-      if (aopSame (result->aop, 0, left->aop, 0, 1) &&
-        (aopOnStack (result->aop, 0, 1) || result->aop->type == AOP_DIR))
-        emit3 (A_SWAP, result->aop, 0);
-      else
-        {
-          if (!regDead (A_IDX, ic))
-            push (ASMOP_A, 0, 1);
-
-          cheapMove (ASMOP_A, 0, left->aop, 0, false);
-          emit3 (A_SWAP, ASMOP_A, 0);
-          cheapMove (result->aop, 0, ASMOP_A, 0, false);
-  
-          if (!regDead (A_IDX, ic))
-            pop (ASMOP_A, 0, 1);
-        }
-      break;
     case 2:
       if (result->aop->type == AOP_REG) // Let genMove handle all the coalescing, swapw, exg, rlwa, etc).
         {
@@ -7138,6 +7079,159 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
     if (!shiftop->aopu.bytes[i].in_reg)
       all_in_reg = FALSE;
   shiftop->type = all_in_reg ? AOP_REG : AOP_REGSTK;
+}
+
+/*-----------------------------------------------------------------*/
+/* genRot1 - generates code for 1 Byte rotation                    */
+/*-----------------------------------------------------------------*/
+static void
+genRot1 (iCode *ic)
+{
+  operand *left, *result;
+
+  aopOp (left = IC_LEFT (ic), ic);
+  aopOp (result = IC_RESULT (ic), ic);
+
+  wassert (result->aop->size == 1 && left->aop->size == 1 &&
+    bitsForType (operandType (result)) == 8 && IS_OP_LITERAL (IC_RIGHT (ic)));
+
+  int s = operandLitValueUll (IC_RIGHT (ic)) % 8;
+
+  if (s == 4 && aopSame (result->aop, 0, left->aop, 0, 1) &&
+    (aopOnStack (result->aop, 0, 1) || result->aop->type == AOP_DIR))
+    emit3 (A_SWAP, result->aop, 0);
+  else if ((s == 1 || s == 7) && aopSame (result->aop, 0, left->aop, 0, 1) && left->aop->type == AOP_DIR) // Use bccm
+    {
+      emit3 ((s == 1) ? A_SLL : A_SRL, left->aop, 0);
+      emit2 ("bccm", (s == 1) ? "%s, #0" : "%s, #7", aopGet (left->aop, 0));
+      cost (4, 1);
+    }
+  else if (s == 1 && aopSame (result->aop, 0, left->aop, 0, 1) && aopOnStack (left->aop, 0, 1))
+    {
+      emit3 (A_SLL, left->aop, 0);
+      symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
+      if (!regalloc_dry_run)
+          emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
+      emit2 ("inc", aopGet (left->aop, 0));
+      cost (2, 2);
+      emitLabel (tlbl);
+    }
+  else if (regDead (A_IDX, ic) && (regDead (X_IDX, ic) || aopInReg (left->aop, 0, A_IDX)) &&
+    (aopInReg (result->aop, 0, XL_IDX) && s >= 6 || aopInReg (result->aop, 0, XH_IDX) && s <= 3))
+    {
+      if (aopInReg (left->aop, 0, XH_IDX))
+        {
+          cheapMove (ASMOP_A, 0, left->aop, 0, true);
+          cheapMove (ASMOP_X, 0, left->aop, 0, true);
+        }
+      else if (aopInReg (left->aop, 0, XL_IDX))
+        {
+          cheapMove (ASMOP_A, 0, left->aop, 0, true);
+          cheapMove (ASMOP_X, 1, left->aop, 0, true);
+        }
+      else
+        {
+          cheapMove (ASMOP_A, 0, left->aop, 0, true);
+          cheapMove (ASMOP_X, 0, left->aop, 0, false);
+          cheapMove (ASMOP_X, 1, left->aop, 0, false);
+        }
+      while (s)
+        {
+          if (aopInReg (result->aop, 0, XH_IDX)) // rotate left
+            {
+              emit3w (A_SLLW, ASMOP_X, 0);
+              s--;
+            }
+          else // rotate right
+            {
+              emit3w (A_SRLW, ASMOP_X, 0);
+              s++;
+            }
+          s %= 8;
+        }
+    }
+  else
+    {
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+      cheapMove (ASMOP_A, 0, left->aop, 0, false);
+
+      bool started = false;
+      while (s)
+        {
+          if (!started && (s == 7 || s == 3) && // 3 or 4 bytes, 3 cycles.
+            (aopOnStack (left->aop, 0, 1) || (!aopInReg (left->aop, 0, A_IDX) && left->aop->type == AOP_REG)))
+            {
+              emit3 (A_SRL, ASMOP_A, 0); // Get lowest bit into carry
+              cheapMove (ASMOP_A, 0, left->aop, 0, false);
+              emit3 (A_RRC, ASMOP_A, 0); // Rotate
+              s++;
+            }
+          else if (s >= 3 && s <= 6)
+            {
+              emit3 (A_SWAP, ASMOP_A, 0);
+              s += 4;
+            }
+          else if (s == 7)
+            {
+              if (optimize.codeSpeed) // 5 bytes, 3 cycles
+                {
+                  emit3 (A_SRL, ASMOP_A, 0);
+                  symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
+                  if (!regalloc_dry_run)
+                    emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
+                  emit2 ("or", "#0x80");
+                  cost (4, 2);
+                  emitLabel (tlbl);
+                }
+              else // 4 bytes, 4 cycles.
+                {
+                  push (ASMOP_A, 0, 1);
+                  emit3 (A_SRL, ASMOP_A, 0); // Get lowest bit into carry
+                  pop (ASMOP_A, 0, 1);
+                  emit3 (A_RRC, ASMOP_A, 0); // Rotate
+                }
+              s++;
+              started = true;
+            }
+          else // 3 bytes, 2 cycles.
+            {
+              emit3 (A_SLL, ASMOP_A, 0);
+              emit3 (A_ADC, ASMOP_A, ASMOP_ZERO);
+              s--;
+            }
+          s %= 8;
+        }
+
+      cheapMove (result->aop, 0, ASMOP_A, 0, false);
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+    }
+
+  freeAsmop (left);
+  freeAsmop (result);
+}
+
+/*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+
+  D (emit2 ("; genRot", ""));
+
+  unsigned int lbits = bitsForType (operandType (left));
+  if (lbits == 8)
+    genRot1 (ic);
+  else if (IS_OP_LITERAL (right) && (operandLitValueUll (right) % lbits == 1 || operandLitValueUll (right) % lbits == lbits - 1))
+    genRotate (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) %lbits == lbits / 2)
+    genSwap (ic);
+  else
+    wassertl (0, "Unsupported rotation.");
 }
 
 /*------------------------------------------------------------------*/
@@ -7779,7 +7873,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   size = getSize (operandType (result));
 
-  sign =  !SPEC_USIGN (getSpec (operandType (left)));
+  sign = !SPEC_USIGN (getSpec (operandType (left)));
 
   /* I suppose that the left size >= result size */
   wassert ((int) getSize (operandType (left)) >= size);
@@ -9640,11 +9734,6 @@ genSTM8iCode (iCode *ic)
       genInline (ic);
       break;
 
-    case RRC:
-    case RLC:
-      genRotate (ic);
-      break;
-
     case GETABIT:
       genGetABit (ic, ifxForOp (IC_RESULT (ic), ic));
       break;
@@ -9657,8 +9746,8 @@ genSTM8iCode (iCode *ic)
       genGetWord (ic);
       break;
 
-    case SWAP:
-      genSwap (ic);
+    case ROT:
+      genRot (ic);
       break;
 
     case LEFT_OP:

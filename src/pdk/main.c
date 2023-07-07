@@ -220,9 +220,11 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 
 /* Indicate which extended bit operations this backend supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
-  return (op == GETBYTE || op == SWAP && size == 1);
+  return (op == GETBYTE ||
+    op == ROT && bitsForType (left) == 8 ||
+    op == ROT && !(bitsForType (left) % 8) && right <= 2);
 }
 
 static const char *
@@ -254,7 +256,7 @@ PORT pdk13_port =
 {
   TARGET_ID_PDK13,
   "pdk13",
-  "PDK13",                       /* Target name */
+  "Padauk PDK13",                /* Target name */
   0,                             /* Processor name */
   {
     glue,
@@ -350,7 +352,7 @@ PORT pdk13_port =
      2,
      1,                         /* sp points to next free stack location */
   },     
-  { -1, false },                /* no int x int -> long multiplication support routine. */
+  { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { pdk_emitDebuggerSymbol,
     {
       0,
@@ -425,7 +427,7 @@ PORT pdk14_port =
 {
   TARGET_ID_PDK14,
   "pdk14",
-  "PDK14",                       /* Target name */
+  "Padauk PDK14",                /* Target name */
   0,                             /* Processor name */
   {
     glue,
@@ -519,7 +521,7 @@ PORT pdk14_port =
      2,
      1,                         /* sp points to next free stack location */
   },     
-  { -1, false },                /* no int x int -> long multiplication support routine. */
+  { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { pdk_emitDebuggerSymbol,
     {
       0,
@@ -594,7 +596,7 @@ PORT pdk15_port =
 {
   TARGET_ID_PDK15,
   "pdk15",
-  "PDK15",                       /* Target name */
+  "Padauk PDK15",                /* Target name */
   0,                             /* Processor name */
   {
     glue,
@@ -688,7 +690,7 @@ PORT pdk15_port =
      2,
      1,                         /* sp points to next free stack location */
   },     
-  { -1, false },                /* no int x int -> long multiplication support routine. */
+  { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { pdk_emitDebuggerSymbol,
     {
       0,

@@ -9598,6 +9598,25 @@ genlshFixed (operand *result, operand *left, int shCount)
 }
 
 /*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  unsigned int lbits = bitsForType (operandType (left));
+  if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits == 1)
+    genRLC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits ==  lbits - 1)
+    genRRC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) %lbits == lbits / 2)
+    genSwap (ic);
+  else
+    wassertl (0, "Unsupported rotation.");
+}
+
+/*-----------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
 static void
@@ -12315,7 +12334,7 @@ genCast (iCode * ic)
       bool masktopbyte = IS_BITINT (ctype) && (SPEC_BITINTWIDTH (ctype) % 8) && bitsForType (ctype) < bitsForType (rtype);
 
       /* if they are in the same place */
-      if (sameRegs (AOP (right), AOP (result)))
+      if (!masktopbyte && sameRegs (AOP (right), AOP (result)))
         goto release;
 
       /* if they in different places then copy */
@@ -14503,16 +14522,12 @@ gen390Code (iCode * lic)
           genInline (ic);
           break;
 
-        case RRC:
-          genRRC (ic);
-          break;
-
-        case RLC:
-          genRLC (ic);
-          break;
-
         case GETABIT:
           genGetAbit (ic);
+          break;
+
+        case ROT:
+          genRot (ic);
           break;
 
         case LEFT_OP:
@@ -14571,10 +14586,6 @@ gen390Code (iCode * lic)
 
         case ENDCRITICAL:
           genEndCritical (ic);
-          break;
-
-        case SWAP:
-          genSwap (ic);
           break;
 
         default:

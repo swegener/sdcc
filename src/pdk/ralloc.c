@@ -691,18 +691,6 @@ pdkRegFix (eBBlock ** ebbs, int count)
           if (SKIP_IC2 (ic))
             continue;
 
-          if (ic->op == IFX)
-            {
-              verifyRegsAssigned (IC_COND (ic), ic);
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              verifyRegsAssigned (IC_JTCOND (ic), ic);
-              continue;
-            }
-
           verifyRegsAssigned (IC_RESULT (ic), ic);
           verifyRegsAssigned (IC_LEFT (ic), ic);
           verifyRegsAssigned (IC_RIGHT (ic), ic);

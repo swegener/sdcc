@@ -458,21 +458,6 @@ regsUsedIniCode (iCode * ic)
 {
   bitVect *rmask = newBitVect (IS_SM83 ? SM83_MAX_REGS : Z80_MAX_REGS);
 
-  /* do the special cases first */
-  if (ic->op == IFX)
-    {
-      rmask = bitVectUnion (rmask, rUmaskForOp (IC_COND (ic)));
-      goto ret;
-    }
-
-  /* for the jumptable */
-  if (ic->op == JUMPTABLE)
-    {
-      rmask = bitVectUnion (rmask, rUmaskForOp (IC_JTCOND (ic)));
-
-      goto ret;
-    }
-
   /* of all other cases */
   if (IC_LEFT (ic))
     rmask = bitVectUnion (rmask, rUmaskForOp (IC_LEFT (ic)));
@@ -1264,18 +1249,6 @@ Z80RegFix (eBBlock ** ebbs, int count)
 
           if (SKIP_IC2 (ic))
             continue;
-
-          if (ic->op == IFX)
-            {
-              verifyRegsAssigned (IC_COND (ic), ic);
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              verifyRegsAssigned (IC_JTCOND (ic), ic);
-              continue;
-            }
 
           verifyRegsAssigned (IC_RESULT (ic), ic);
           verifyRegsAssigned (IC_LEFT (ic), ic);

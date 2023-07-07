@@ -22,8 +22,26 @@ EXCLUDE_host += \
 	gte_20040409-2w \
 	gte_20040409-3w
 
+# Bug #3598
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-pr47148
+
+# Bug #3599
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-ssad-run \
+	tst_gcc-torture-execute-usad-run
+
+# Bug #3600
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-930628-1
+	
+# Bug #3601
+EXCLUDE_s08-stack-auto += \
+	gte_20091229-1
+
 # possibly unsupported.
 EXCLUDE_host += \
+	tst_p99-conformance \
 	tcc_83_utf8_in_identifiers
 
 # Fails when compiled with clang on FreeBSD 13.1 on aarch64
@@ -58,8 +76,7 @@ EXCLUDE_s08 += \
 # Failure
 EXCLUDE_uc6502 += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # compile issue
 EXCLUDE_uc6502 += \
@@ -73,7 +90,6 @@ EXCLUDE_ucr3ka += \
 # Failure
 EXCLUDE_s08 += \
 	gte_20091229-1 \
-	gte_pr94567 \
 	gte_20041218-1
 
 # Failure
@@ -87,27 +103,23 @@ EXCLUDE_stm8-large += \
 # Failure
 EXCLUDE_ucr2k += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Failure
 EXCLUDE_ucr2ka += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Fail
 EXCLUDE_ucgbz80 += \
 	gte_20041218-1 \
 	gte_20091229-1 \
-	gte_pr94567 \
 	gte_pr97404
 
 # Fail
 EXCLUDE_ucz180 += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # abnormal stop
 EXCLUDE_ucz80 += \
@@ -122,18 +134,15 @@ EXCLUDE_ucz180-resiy += \
 # Fail
 EXCLUDE_ucz180-resiy += \
 	gte_20091229-1 \
-	gte_pr94567 \
 	gte_pr97404
 
 # Fail
 EXCLUDE_ucz80 += \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Fail
 EXCLUDE_ucz80-nmos += \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # fail
 EXCLUDE_hc08 += \
@@ -142,14 +151,12 @@ EXCLUDE_hc08 += \
 # Failure
 EXCLUDE_hc08 += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Failure
 EXCLUDE_ucz80n += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Failure
 EXCLUDE_ARCH_z80 += \
@@ -157,14 +164,12 @@ EXCLUDE_ARCH_z80 += \
 
 # Failure
 EXCLUDE_ucz80-resiy += \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # Fail
 EXCLUDE_ucz80-undoc += \
 	gte_20091229-1 \
-	gte_20041218-1 \
-	gte_pr94567
+	gte_20041218-1
 
 # Stack overflow
 EXCLUDE_pdk14 += \
@@ -176,21 +181,12 @@ EXCLUDE_pdk15-stack-auto += \
 # misc Failure
 EXCLUDE_ucrxk3a += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
-
-# Failure
-EXCLUDE_ucr3ka += \
-	gte_pr94567
+	gte_20091229-1
 
 # abnormal stop
 EXCLUDE_ez80-z80 += \
 	gte_20041218-1 \
 	gte_20091229-1
-
-# Failure
-EXCLUDE_ez80-z80 += \
-   gte_pr94567
 
 # Failure
 EXCLUDE_ARCH_mcs51 += \
@@ -201,11 +197,7 @@ EXCLUDE_ARCH_mcs51 += \
 # Failure
 EXCLUDE_tlcs90 += \
 	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567 \
-	gte_20041218-1 \
-	gte_20091229-1 \
-	gte_pr94567
+	gte_20091229-1
 
 # compile issue
 EXCLUDE_uc6502 += \
@@ -235,6 +227,10 @@ EXCLUDE_hc08 += \
 	gte_pr30185 \
 	gte_pr58365
 EXCLUDE_s08 += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_s08-stack-auto += \
 	gte_991019-1 \
 	gte_pr30185 \
 	gte_pr58365

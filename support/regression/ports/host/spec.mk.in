@@ -5,7 +5,7 @@ RUN_TIMEOUT = 1
 
 CC = @CC@
 SDCC =${CC}
-SDCCFLAGS = @CFLAGS@ @C99_FLAG@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
+SDCCFLAGS = @CFLAGS@ $(CPPFLAGS) -DPORT_HOST=1 -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
 SDLDFLAGS = @LDFLAGS@
 # disable all warnings:
 SDCCFLAGS+= -w

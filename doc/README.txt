@@ -1,14 +1,14 @@
-SDCC - free open source, retargettable, optimizing ANSI-C compiler
+SDCC - free open source, retargettable, optimizing ISO C compiler
 ------------------------------------------------------------------
 
-Welcome to SDCC, free open source, retargettable, optimizing ANSI C
+Welcome to SDCC, free open source, retargettable, optimizing ISO C
 compiler suite that targets a growing list of processors including the
 Intel MCS-51 based microprocessors (8031, 8032, 8051, 8052, etc.), Maxim
 (formerly Dallas) DS80C390 variants, Freescale (formerly Motorola) HC08
 based (hc08, s08), Zilog Z80 based MCUs (Z80, Z80N, Z180, SM83 (e.g. Game Boy),
-Rabbit 2000, Rabbit 2000A/3000, Rabbit 3000A, TLCS-90), STMicroelectronics STM8
-and Padauk PDK14 and PDk15.
-Work is in progress on supporting the Padauk PDK13 and MOS 6502 targets.
+Rabbit 2000, Rabbit 2000A/3000, Rabbit 3000A, TLCS-90), STMicroelectronics STM8,
+Padauk PDK14 and PDK15 and MOS 6502.
+Work is in progress on supporting the Padauk PDK13 target.
 There are unmaintained Microchip PIC16 and PIC18 targets.
 It can be retargeted for other microprocessors.
 

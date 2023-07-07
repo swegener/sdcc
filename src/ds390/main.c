@@ -486,16 +486,21 @@ bool _ds390_nativeMulCheck(iCode *ic, sym_link *left, sym_link *right)
 
 /* Indicate which extended bit operations this port supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
-  if (op == RRC
-      || op == RLC
-      || op == GETABIT
-      || (op == SWAP && size <= 2)
-     )
-    return TRUE;
-  else
-    return FALSE;
+  switch (op)
+    {
+    case GETABIT:
+      return true;
+    case ROT:
+      unsigned int lbits = bitsForType (left);
+      if (getSize (left) <= 2 && (right % lbits  == 1 || right % lbits == lbits - 1))
+        return true;
+      if (getSize (left) <= 2 && lbits == right * 2)
+        return true;
+      return false;
+    }
+  return false;
 }
 
 /* Indicate the expense of an access to an output storage class */
@@ -1416,7 +1421,7 @@ PORT tininative_port =
   0,                            // ABI revision
   { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
-  { -1, FALSE },
+  { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
@@ -1673,7 +1678,7 @@ PORT ds400_port =
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
   0,                            // ABI revision
   { +1, 1, 4, 1, 1, 0, 0 },
-  { -1, FALSE },
+  { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */

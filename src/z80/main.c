@@ -972,20 +972,27 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 
 /* Indicate which extended bit operations this port supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
   switch (op)
     {
     case GETABIT:
     case GETBYTE:
     case GETWORD:
-    case RLC:
-    case RRC:
-      return true;
-    case SWAP:
-      return size <= 4;
+      return (true);
+    case ROT:
+      unsigned int lbits = bitsForType (left);
+      if (lbits % 8)
+        return (false);
+      if (lbits == 8)
+        return (true);
+      if (right % lbits  == 1 || right % lbits == lbits - 1)
+        return (true);
+      if ((getSize (left) <= 2 || getSize (left) == 4) && lbits == right * 2)
+        return (true);
+      return (false);
     }
-  return false;
+  return (false);
 }
 
 /* Indicate the expense of an access to an output storage class */
@@ -1137,6 +1144,7 @@ PORT z80_port =
   { 
     -1,                         /* shifts never use support routines */
     true,                       /* use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
   },
   { z80_emitDebuggerSymbol },
   {
@@ -1267,7 +1275,11 @@ PORT z180_port =
   { NULL, NULL },
   1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -1396,7 +1408,11 @@ PORT r2k_port =
   { NULL, NULL },
   0,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -1526,7 +1542,11 @@ PORT r2ka_port =
   { NULL, NULL },
   0,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -1656,7 +1676,11 @@ PORT r3ka_port =
   { NULL, NULL },
   0,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -1788,7 +1812,11 @@ PORT sm83_port =
   { NULL, NULL },
   1,                            /* default ABI revision */
   { -1, 0, 0, 2, 0, 4, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -1918,7 +1946,11 @@ PORT tlcs90_port =
   { NULL, NULL },
   0,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -2048,7 +2080,11 @@ PORT ez80_z80_port =
   { NULL, NULL },
   0,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */
@@ -2104,7 +2140,7 @@ PORT z80n_port =
 {
   TARGET_ID_Z80N,
   "z80n",
-  "z80n",                       /* Target name */
+  "Z80N",                       /* Target name */
   NULL,                         /* Processor name */
   {
     glue,
@@ -2178,7 +2214,11 @@ PORT z80n_port =
   { NULL, NULL },
   1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
-  { -1, FALSE },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
   { z80_emitDebuggerSymbol },
   {
     256,                        /* maxCount */

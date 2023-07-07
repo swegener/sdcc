@@ -5748,6 +5748,23 @@ genGenericShift (iCode * ic, int shiftRight)
   freeAsmop (result, NULL, ic, TRUE);
 }
 
+/*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  unsigned int lbits = bitsForType (operandType (left));
+  if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits == 1)
+    genRLC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits ==  lbits - 1)
+    genRRC (ic);
+  else
+    wassertl (0, "Unsupported rotation.");
+}
+
 static void
 genRightShift (iCode * ic)
 {
@@ -7848,16 +7865,12 @@ genpic14Code (iCode * lic)
           pic14_genInline (ic);
           break;
 
-        case RRC:
-          genRRC (ic);
-          break;
-
-        case RLC:
-          genRLC (ic);
-          break;
-
         case GETABIT:
           genGetABit (ic);
+          break;
+
+        case ROT:
+          genRot (ic);
           break;
 
         case LEFT_OP:

@@ -481,16 +481,9 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             }
         }
 
-      if (ic->op == IFX)
-        add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_COND(ic), sym_to_index);
-      else if (ic->op == JUMPTABLE)
-        add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_JTCOND(ic), sym_to_index);
-      else
-        {
-          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RESULT(ic), sym_to_index);
-          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_LEFT(ic), sym_to_index);
-          add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RIGHT(ic), sym_to_index);
-        }
+      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RESULT(ic), sym_to_index);
+      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_LEFT(ic), sym_to_index);
+      add_operand_to_cfg_node(cfg[key_to_index[ic->key]], IC_RIGHT(ic), sym_to_index);
 
       // TODO: Extend live-ranges of returns of built-in function calls back to first SEND.
 

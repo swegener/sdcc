@@ -72,8 +72,7 @@ symbol *currFunc = NULL;
 static ast *createIval (ast *, sym_link *, initList *, ast *, ast *, int);
 static ast *createIvalCharPtr (ast *, sym_link *, ast *, ast *);
 static ast *optimizeCompare (ast *);
-ast *optimizeRRCRLC (ast *);
-ast *optimizeSWAP (ast *);
+ast *optimizeROT (ast *);
 ast *optimizeGetAbit (ast *, RESULT_TYPE);
 ast *optimizeGetByte (ast *, RESULT_TYPE);
 ast *optimizeGetWord (ast *, RESULT_TYPE);
@@ -2199,6 +2198,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case GETABIT:
     case GETBYTE:
     case GETWORD:
+    case ROT:
 
       if (IS_AST_SYM_VALUE (pbody->left) && isSymbolEqual (AST_SYMBOL (pbody->left), sym))
         return FALSE;
@@ -2210,9 +2210,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 
     case '~':
     case '!':
-    case RRC:
-    case RLC:
-    case SWAP:
+
       if (IS_AST_SYM_VALUE (pbody->left) && isSymbolEqual (AST_SYMBOL (pbody->left), sym))
         return FALSE;
       return isConformingBody (pbody->left, sym, body);
@@ -3679,13 +3677,6 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           goto errorTreeReturn;
         }
 
-      /* if the left is an rvalue then error */
-      if (LRVAL (tree))
-        {
-          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "array access");
-          goto errorTreeReturn;
-        }
-
       if (IS_LITERAL (RTYPE (tree)))
         {
           int arrayIndex = (int) ulFromVal (valFromType (RETYPE (tree)));
@@ -3898,7 +3889,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
             SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
-          LRVAL (tree) = RRVAL (tree) = 1;
+          TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
           TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op);
           TETYPE (tree) = getSpec (TTYPE (tree));
@@ -3928,6 +3919,12 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           werror (E_SFR_POINTER);
         }
 
+      if (LRVAL (tree))
+        {
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "address of");
+          goto errorTreeReturn;
+        }
+
       if (LETYPE (tree) && SPEC_SCLS (tree->left->etype) == S_REGISTER)
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of register variable");
@@ -3937,12 +3934,6 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       if (IS_LITERAL (LTYPE (tree)))
         {
           werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of literal");
-          goto errorTreeReturn;
-        }
-
-      if (LRVAL (tree))
-        {
-          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "address of");
           goto errorTreeReturn;
         }
 
@@ -4013,11 +4004,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
     case '|':
       /* if the rewrite succeeds then don't go any further */
       {
-        ast *wtree = optimizeRRCRLC (tree);
-        if (wtree != tree)
-          return decorateType (wtree, RESULT_TYPE_NONE, reduceTypeAllowed);
-
-        wtree = optimizeSWAP (tree);
+        ast *wtree = optimizeROT (tree);
         if (wtree != tree)
           return decorateType (wtree, RESULT_TYPE_NONE, reduceTypeAllowed);
       }
@@ -4155,7 +4142,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
         SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
       TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op);
       TETYPE (tree) = getSpec (TTYPE (tree));
@@ -4183,7 +4170,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           return decorateType (tree, resultType, reduceTypeAllowed);
         }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
       TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
 
@@ -4254,7 +4241,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           rewriteAstNodeVal (tree, valMod (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), reduceTypeAllowed));
           return decorateType (tree, resultType, reduceTypeAllowed);
         }
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
       return tree;
 
@@ -4271,11 +4258,6 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               goto errorTreeReturn;
             }
 
-          if (LRVAL (tree))
-            {
-              werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "pointer deref");
-              goto errorTreeReturn;
-            }
           if (IS_ADDRESS_OF_OP (tree->left))
             {
               /* replace *&obj with obj */
@@ -4333,7 +4315,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             }
         }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
       { // cast happen only if both left and right can be casted to result type
         ast *l = addCast (tree->left, resultTypeProp, FALSE);
@@ -4372,7 +4354,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
               return tree;
             }
           
-          LRVAL (tree) = 1;
+          TRVAL (tree) = LRVAL (tree) = 1;
           if (reduceTypeAllowed)
               COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
           else
@@ -4468,7 +4450,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             }
         }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
       /* if the left is a pointer */
       if (IS_PTR (LTYPE (tree)) || IS_AGGREGATE (LTYPE (tree)))
@@ -4513,7 +4495,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             }
           tree->left = addCast (tree->left, resultTypeProp, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), NULL, resultType, tree->opval.op));
-          LRVAL (tree) = 1;
+          TRVAL (tree) = LRVAL (tree) = 1;
           return tree;
         }
 
@@ -4585,7 +4567,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           SPEC_SCLS (TETYPE (tree)) = 0;
         }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
 
       /* if right is a literal and */
       /* left is also an addition/subtraction with a literal then */
@@ -4671,7 +4653,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
       else
         tree->left = addCast (tree->left, resultTypeProp, TRUE);
-      LRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
       return tree;
 
@@ -4714,7 +4696,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           rewriteAstNodeVal (tree, valNot (valFromType (LETYPE (tree)), reduceTypeAllowed));
           return decorateType (tree, resultType, reduceTypeAllowed);
         }
-      LRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = 1;
       if (reduceTypeAllowed)
         {
           TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
@@ -4732,13 +4714,6 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       /*----------------------------*/
       /*           shift            */
       /*----------------------------*/
-    case RRC:
-    case RLC:
-    case SWAP:
-      TTYPE (tree) = LTYPE (tree);
-      TETYPE (tree) = LETYPE (tree);
-      return tree;
-
     case GETABIT:
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       return tree;
@@ -4753,6 +4728,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
     case LEFT_OP:
     case RIGHT_OP:
+    case ROT:
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (tree->left->etype))
         {
           werrorfl (tree->filename, tree->lineno, E_SHIFT_OP_INVALID);
@@ -4794,7 +4770,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           return decorateType (otree, RESULT_TYPE_NONE, reduceTypeAllowed);
       }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
       if(!reduceTypeAllowed)
         {
           TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), NULL, resultType, tree->opval.op));
@@ -4817,7 +4793,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             SPEC_SCLS (TTYPE (tree)) &= ~S_LITERAL;
         }
 
-      if (IS_LITERAL (RTYPE (tree)) && floatFromVal (valFromType (RETYPE (tree))) < 0)
+      if (tree->opval.op != ROT && IS_LITERAL (RTYPE (tree)) && floatFromVal (valFromType (RETYPE (tree))) < 0)
         {
           werrorfl (tree->filename, tree->lineno, W_SHIFT_NEGATIVE, (tree->opval.op == LEFT_OP ? "left" : "right"));
           /* Change shift op to comma op and replace the right operand with 0. */
@@ -5045,7 +5021,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                     }
                 }
               checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast, !ullFromVal (valFromType (RTYPE (tree))));
-              LRVAL (tree) = 1;
+              TRVAL (tree) = LRVAL (tree) = 1;
               tree->type = EX_VALUE;
               tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | pVal, gpVal | pVal);
               TTYPE (tree) = tree->opval.val->type;
@@ -5065,7 +5041,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             DCL_TYPE (LTYPE (tree)) = PTR_TYPE (SPEC_OCLS (RETYPE (tree)));
         }
       TTYPE (tree) = LTYPE (tree);
-      LRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = 1;
 
 #endif
       TETYPE (tree) = getSpec (TTYPE (tree));
@@ -5097,7 +5073,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           rewriteAstNodeVal (tree, valLogicAndOr (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op, reduceTypeAllowed));
           return decorateType (tree, resultType, reduceTypeAllowed);
         }
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL(tree) = LRVAL (tree) = RRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = reduceTypeAllowed ? ((resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ()) : newIntLink();
       return tree;
 
@@ -5303,7 +5279,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
             }
         }
 
-      LRVAL (tree) = RRVAL (tree) = 1;
+      TRVAL (tree) = LRVAL (tree) = RRVAL (tree) = 1;
       if (reduceTypeAllowed)
           TTYPE (tree) = TETYPE (tree) = (resultType == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
       else
@@ -5708,7 +5684,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         tree = rewriteStructAssignment (tree);
       else
         {
-          RRVAL (tree) = 1;
+          TRVAL(tree) = RRVAL (tree) = 1;
           LLVAL (tree) = 1;
         }
       if (!tree->initMode)
@@ -5718,7 +5694,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         }
       if (tree->initMode && SPEC_STAT (getSpec (LTYPE (tree))) && !constExprTree (tree->right))
         werrorfl (tree->filename, tree->lineno, E_CONST_EXPECTED, "=");
-      if (LRVAL (tree))
+      if (TRVAL(tree) = LRVAL (tree))
         {
           werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "=");
           goto errorTreeReturn;
@@ -6557,7 +6533,7 @@ optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
     return tree;
 
   /* make sure the port supports GETABIT */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETABIT, getSize (TTYPE (expr))))
+  if (port->hasExtBitOp && !port->hasExtBitOp (GETABIT, TTYPE (expr), AST_ULONG_VALUE (count)))
     return tree;
 
   return decorateType (newNode (GETABIT, expr, count), resultType, true);
@@ -6599,7 +6575,7 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
     return tree;
 
   /* make sure the port supports GETBYTE */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETBYTE, size))
+  if (port->hasExtBitOp && !port->hasExtBitOp (GETBYTE, TTYPE (expr), AST_ULONG_VALUE (count)))
     return tree;
 
   return decorateType (newNode (GETBYTE, expr, count), RESULT_TYPE_NONE, true);
@@ -6642,17 +6618,17 @@ optimizeGetWord (ast *tree, RESULT_TYPE resultType)
     return tree;
 
   /* make sure the port supports GETWORD */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETWORD, size))
+  if (port->hasExtBitOp && !port->hasExtBitOp (GETWORD, TTYPE (expr), AST_ULONG_VALUE (count)))
     return tree;
 
   return decorateType (newNode (GETWORD, expr, count), RESULT_TYPE_NONE, true);
 }
 
 /*-----------------------------------------------------------------*/
-/* optimizeRRCRLC :- optimize for Rotate Left/Right with carry     */
+/* optimizeROT :- optimize for Rotate Left/Right                   */
 /*-----------------------------------------------------------------*/
 ast *
-optimizeRRCRLC (ast * root)
+optimizeROT (ast * root)
 {
   /* will look for trees of the form
      (?expr << 1) | (?expr >> 7) or
@@ -6679,31 +6655,30 @@ optimizeRRCRLC (ast * root)
         return root;
 
       if (!IS_AST_LIT_VALUE (root->left->right) || !IS_AST_LIT_VALUE (root->right->right))
-        goto tryNext0;
+        goto tryNext;
 
       /* make sure it is the same expression */
       if (!isAstEqual (root->left->left, root->right->left))
-        goto tryNext0;
+        goto tryNext;
 
-      if (AST_ULONG_VALUE (root->left->right) != 1)
-        goto tryNext0;
+      unsigned char s = AST_ULONG_VALUE (root->left->right);
 
-      if (AST_ULONG_VALUE (root->right->right) != (getSize (TTYPE (root->left->left)) * 8 - 1))
-        goto tryNext0;
+      if (AST_ULONG_VALUE (root->right->right) != (getSize (TTYPE (root->left->left)) * 8 - s))
+        goto tryNext;
 
       /* cannot have side effects or volatility */
       if (hasSEFcalls (root))
         return root;
 
-      /* make sure the port supports RLC */
-      if (port->hasExtBitOp && !port->hasExtBitOp (RLC, getSize (TTYPE (root->left->left))))
-        return root;
+      /* make sure the port supports RLC/RRC */
+      if (port->hasExtBitOp && !port->hasExtBitOp (ROT, TTYPE (root->left->left), s))
+        goto tryNext;
 
       /* whew got the first case : create the AST */
-      return newNode (RLC, root->left->left, NULL);
+      return newNode (ROT, root->left->left, newAst_VALUE (constCharVal (s)));
     }
 
-tryNext0:
+tryNext:
   /* check for second case */
   /* (?expr >> 7) | (?expr << 1) */
   if (IS_LEFT_OP (root->right) && IS_RIGHT_OP (root->left))
@@ -6713,148 +6688,27 @@ tryNext0:
         return root;
 
       if (!IS_AST_LIT_VALUE (root->left->right) || !IS_AST_LIT_VALUE (root->right->right))
-        goto tryNext1;
-
-      /* make sure it is the same symbol */
-      if (!isAstEqual (root->left->left, root->right->left))
-        goto tryNext1;
-
-      if (AST_ULONG_VALUE (root->right->right) != 1)
-        goto tryNext1;
-
-      if (AST_ULONG_VALUE (root->left->right) != (getSize (TTYPE (root->left->left)) * 8 - 1))
-        goto tryNext1;
-
-      /* cannot have side effects or volatility */
-      if (hasSEFcalls (root))
-        return root;
-
-      /* make sure the port supports RLC */
-      if (port->hasExtBitOp && !port->hasExtBitOp (RLC, getSize (TTYPE (root->left->left))))
-        return root;
-
-      /* whew got the first case : create the AST */
-      return newNode (RLC, root->left->left, NULL);
-
-    }
-
-tryNext1:
-  /* third case for RRC */
-  /*  (?symbol >> 1) | (?symbol << 7) */
-  if (IS_LEFT_OP (root->right) && IS_RIGHT_OP (root->left))
-    {
-
-      if (!SPEC_USIGN (TETYPE (root->left->left)))
-        return root;
-
-      if (!IS_AST_LIT_VALUE (root->left->right) || !IS_AST_LIT_VALUE (root->right->right))
-        goto tryNext2;
-
-      /* make sure it is the same symbol */
-      if (!isAstEqual (root->left->left, root->right->left))
-        goto tryNext2;
-
-      if (AST_ULONG_VALUE (root->left->right) != 1)
-        goto tryNext2;
-
-      if (AST_ULONG_VALUE (root->right->right) != (getSize (TTYPE (root->left->left)) * 8 - 1))
-        goto tryNext2;
-
-      /* cannot have side effects or volatility */
-      if (hasSEFcalls (root))
-        return root;
-
-      /* make sure the port supports RRC */
-      if (port->hasExtBitOp && !port->hasExtBitOp (RRC, getSize (TTYPE (root->left->left))))
-        return root;
-
-      /* whew got the first case : create the AST */
-      return newNode (RRC, root->left->left, NULL);
-
-    }
-tryNext2:
-  /* fourth and last case for now */
-  /* (?symbol << 7) | (?symbol >> 1) */
-  if (IS_RIGHT_OP (root->right) && IS_LEFT_OP (root->left))
-    {
-      if (!SPEC_USIGN (TETYPE (root->left->left)))
-        return root;
-
-      if (!IS_AST_LIT_VALUE (root->left->right) || !IS_AST_LIT_VALUE (root->right->right))
         return root;
 
       /* make sure it is the same symbol */
       if (!isAstEqual (root->left->left, root->right->left))
         return root;
 
-      if (AST_ULONG_VALUE (root->right->right) != 1)
-        return root;
+      unsigned char s = AST_ULONG_VALUE (root->right->right);
 
-      if (AST_ULONG_VALUE (root->left->right) != (getSize (TTYPE (root->left->left)) * 8 - 1))
+      if (AST_ULONG_VALUE (root->left->right) != (getSize (TTYPE (root->left->left)) * 8 - s))
         return root;
 
       /* cannot have side effects or volatility */
       if (hasSEFcalls (root))
         return root;
 
-      /* make sure the port supports RRC */
-      if (port->hasExtBitOp && !port->hasExtBitOp (RRC, getSize (TTYPE (root->left->left))))
+      /* make sure the port supports RLC/RRC */
+      if (port->hasExtBitOp && !port->hasExtBitOp (ROT, TTYPE (root->left->left), s))
         return root;
 
       /* whew got the first case : create the AST */
-      return newNode (RRC, root->left->left, NULL);
-    }
-
-  /* not found return root */
-  return root;
-}
-
-/*-----------------------------------------------------------------*/
-/* optimizeSWAP :- optimize for nibble/byte/word swaps             */
-/*-----------------------------------------------------------------*/
-ast *
-optimizeSWAP (ast * root)
-{
-  /* will look for trees of the form
-     (?expr << 4) | (?expr >> 4) or
-     (?expr >> 4) | (?expr << 4) will make that
-     into a SWAP : operation ..
-     note : by 4 I mean (number of bits required to hold the
-     variable /2 ) */
-  /* if the root operation is not a | operation then not */
-  if (!IS_BITOR (root))
-    return root;
-
-  /* (?expr << 4) | (?expr >> 4) */
-  if ((IS_LEFT_OP (root->left) && IS_RIGHT_OP (root->right)) || (IS_RIGHT_OP (root->left) && IS_LEFT_OP (root->right)))
-    {
-
-      if (!SPEC_USIGN (TETYPE (root->left->left)))
-        return root;
-
-      if (!IS_AST_LIT_VALUE (root->left->right) || !IS_AST_LIT_VALUE (root->right->right))
-        return root;
-
-      /* make sure it is the same expression */
-      if (!isAstEqual (root->left->left, root->right->left))
-        return root;
-
-      if (AST_ULONG_VALUE (root->left->right) != (getSize (TTYPE (root->left->left)) * 4))
-        return root;
-
-      if (AST_ULONG_VALUE (root->right->right) != (getSize (TTYPE (root->left->left)) * 4))
-        return root;
-      
-      /* cannot have side effects or volatility */
-      if (hasSEFcalls (root))
-        return root;
-
-      /* make sure the port supports SWAP */
-      if (port->hasExtBitOp && !port->hasExtBitOp (SWAP, getSize (TTYPE (root->left->left))))
-        return root;
-
-      /* found it : create the AST */
-      return newNode (SWAP, root->left->left, NULL);
+      return newNode (ROT, root->left->left, newAst_VALUE (constCharVal (s)));
     }
 
   /* not found return root */
@@ -8168,25 +8022,12 @@ ast_print (ast * tree, FILE * outfile, int indent)
     /*----------------------------*/
     /*           shift            */
     /*----------------------------*/
-    case RRC:
-      fprintf (outfile, "RRC (%p) type (", tree);
+    case ROT:
+      fprintf (outfile, "ROT (%p) type (", tree);
       printTypeChain (tree->ftype, outfile);
       fprintf (outfile, ")\n");
       ast_print (tree->left, outfile, indent + 2);
-      return;
-
-    case RLC:
-      fprintf (outfile, "RLC (%p) type (", tree);
-      printTypeChain (tree->ftype, outfile);
-      fprintf (outfile, ")\n");
-      ast_print (tree->left, outfile, indent + 2);
-      return;
-
-    case SWAP:
-      fprintf (outfile, "SWAP (%p) type (", tree);
-      printTypeChain (tree->ftype, outfile);
-      fprintf (outfile, ")\n");
-      ast_print (tree->left, outfile, indent + 2);
+      ast_print (tree->right, outfile, indent + 2);
       return;
 
     case GETABIT:

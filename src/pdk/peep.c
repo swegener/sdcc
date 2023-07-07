@@ -281,7 +281,7 @@ pdkSurelyWritesFlag(const lineNode *pl, const char *what)
     ISINST (pl->line, "xor.io"))
       return !strcmp(what, "z");
 
-  // mov writes z when the destination is a and hte source not an immediate only.
+  // mov writes z when the destination is a and the source not an immediate only.
   if (!strcmp(what, "z") && !strchr(pl->line, '#'))
     {
       if ( (ISINST (pl->line, "mov") && pl->line[4] == 'a' && pl->line[5] == ',') ||

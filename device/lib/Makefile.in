@@ -203,6 +203,7 @@ endif
 
 ifeq ($(OPT_DISABLE_S08), 0)
 TARGETS        += model-s08
+TARGETS        += model-s08-stack-auto
 endif
 
 ifeq ($(OPT_DISABLE_MOS6502), 0)
@@ -426,6 +427,11 @@ model-hc08:
 model-s08:
 	if grep '^hc08$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-ms08" PORT=s08 objects-hc08 || exit 1; \
+	fi
+
+model-s08-stack-auto:
+	if grep '^hc08$$' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-ms08 --stack-auto" PORT=s08-stack-auto objects-hc08 || exit 1; \
 	fi
 
 objects-hc08:

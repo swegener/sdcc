@@ -341,18 +341,27 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
 /* Indicate which extended bit operations this port supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
-  if (op == RRC
-      || op == RLC
-      || op == GETABIT
-      || op == GETBYTE
-      || op == GETWORD
-      || (op == SWAP && size <= 2)
-     )
-    return TRUE;
-  else
-    return FALSE;
+  switch (op)
+    {
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
+      return true;
+    case ROT:
+      unsigned int lbits = bitsForType (left);
+      if (lbits % 8)
+        return false;
+      if (lbits == 8)
+        return true;
+      if (lbits <= 16 && (right % lbits  == 1 || right % lbits == lbits - 1))
+        return true;
+      if (lbits <= 16 && lbits == right * 2)
+        return true;
+      return false;
+    }
+  return false;
 }
 
 /* Indicate the expense of an access to an output storage class */
@@ -898,7 +907,7 @@ PORT mcs51_port =
     1,          /* banked_overhead (switch between code banks) */
     0           /* sp points directly at last item pushed */
   },
-  { -1, FALSE },
+  { -1, false, false },         // Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine.
   { mcs51_emitDebuggerSymbol },
   {
     256,        /* maxCount */

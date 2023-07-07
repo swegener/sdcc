@@ -2820,6 +2820,11 @@ In 4.2.14, byte order in output from the %p specifier of printf()-family functio
  uintptr_t.
 \end_layout
 
+\begin_layout Itemize
+In 4.3.1, __builtin_rlc, __builtin_rrc and __builtin_swap were replaced by
+ __builtin_rot.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -9415,7 +9420,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-hc08, s08, mos6502, pic14, pic16: structures
+mos6502, pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -9435,7 +9440,8 @@ union
 
 \end_inset
 
- cannot be passed as function parameters and cannot be a return value
+ cannot be passed as function parameters; hc08, s08, mos6502, pic14, pic16:
+ they cannot be a return value
 \begin_inset Index idx
 status collapsed
 
@@ -9911,7 +9917,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-hc08, s08, mos6502, pic14, pic16: structures
+mos6502, pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -9931,7 +9937,8 @@ union
 
 \end_inset
 
- cannot be passed as function parameters and cannot be a return value
+ cannot be passed as function parameters; hc08, s08, mos6502, pic14, pic16:
+ they cannot be a return value
 \begin_inset Index idx
 status collapsed
 

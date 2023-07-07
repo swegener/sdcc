@@ -1,7 +1,141 @@
+2022-07-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge next branch to trunk.
+
+2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/ds390/gen.c:
+	  Fix an issue in ds390 casts to _BitInt.
+
+2023-07-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mcs51/gen.c,
+	  support/regression/tests/bug-3607.c:
+	  Fix bug #3607, using a variant of the patch by Oleg Endo.
+
+2023-06-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Fix bug #3609.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3606.c:
+	  Fix bug #3606.
+	* src/hc08/gen.c:
+	  Fix bug #3604.
+	* doc/README.txt:
+	  Fix bug #3605.
+
+2023-06-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Improve 16-bit comparisons.
+
+2023-06-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c,
+	  support/valdiag/tests/bug-3603.c:
+	  Fix bug #3603.
+	* src/SDCCmain.c,
+	  src/pdk/main.c,
+	  src/z80/main.c:
+	  Improve error message on invalid -mmarch option, part of RFE #881.
+
 2023-06-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/scripts/sdcc.nsi:
 	  Change references to bin\cc1.exe to libexec\sdcc\cc1 (picked from nativecrosstools branch).
+
+2023-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCBBlock.c,
+	  src/SDCCcse.c,
+	  src/SDCCdflow.c,
+	  src/SDCClrange.c,
+	  src/SDCCopt.c,
+	  src/SDCCralloc.hpp,
+	  src/*/ralloc.c,
+	  src/*/ralloc2.cc:
+	  Simplify based on IC_(JT)COND now being an alias for IC_LEFT.
+
+2023-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCClrange.c:
+	  Fix a corner case in live-range separation that would hang SDCC on compiling the pic14 library (and result in some missed optimizations for other ports).
+	* src/pdk/gen.c:
+	  Fix a pdk codegen issue that could result in invalid asm for pdk13 on bitwise and in if condition.
+	* src/SDCCopt.c:
+	  Fix an issue in support function call handling that gets exposed in the genconstprop branch via incorrect elimination of an iCode in live range separation.
+
+2023-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/include/stdckdint.h:
+	  Work around an issue in inlining _Generic results to mitigate strtotul code size regression.
+
+2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCicode.h:
+	  Store operands of IFX and JUMPTAB the same way as operands of other iCodes.
+
+2023-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/MakeList:
+	  Disable tests that fail due to known -ms08 --stack-auto bugs.
+	* doc/sdccman.lyx:
+	  Document hc08/s08 struct/union parameter support.
+
+2023-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c,
+	  src/mos6502/gen.c,
+	  src/z80/gen.c:
+	  support/regression/MakeList:
+	  Fix a right-shift codegen sign issue triggered by register packing.
+
+2023-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c,
+	  support/regression/MakeList:
+	  Catch bug #3598 early.
+
+2023-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c:
+	  Fix stacked hx result in shifts.
+	* support/regression/MakeList:
+	  Exclude some tests that need features not yet supported by s08 from s08-stack-auto testing.
+
+2023-06-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c:
+	  hc08/s08 --stack-auto struct/union parameters.
+
+2023-06-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsymt.c,
+	  src/hc08/gen.c:
+	  Caller-side support for hc08/s08 struct/union return.
+
+2023-06-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Improve z80 rotation.
+	* src/mcs51/ralloc.c:
+	  Work around a mcs51 register saving issue (codegen cannot handle a return value in a bit if other bits are live at the call).
+	* src/SDCCicode.c,
+	  src/SDCCopt.c:
+	  Fix bug #3595.
+
+2023-06-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/MakeList:
+	  Disable trigraph test for host, since many host compilers no longer support trigraphs.
+
+2023-06-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/ports/host/spec.mk.in:
+	  Fix C99 flag handling.
+	* support/regression/tests/align.c.in:
+	  Fix test for current state of SDCC and host compilers wrt. C11 alignment support.
 
 2023-06-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -17,6 +151,84 @@
 	  Fix stack balance issue in left shift code generation.
 	* support/regression/tests/bitintrot.c.in:
 	  _BitInt rotation test.
+
+2023-06-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/main.c,
+	  src/z80/gen.c:
+	  Improve z80 rotations.
+	* src/pdk/main.c,
+	  src/pdk/gen.c,
+	  src/pdk/peeph.def:
+	  Improve pdk rotations.
+	* src/mcs51/main.c,
+	  src/mcs51/gen.c:
+	  Improve mcs51 rotations.
+	* src/hc08/main.c,
+	  src/hc08/gen.c:
+	  Improve hc08 rotations.
+
+2023-06-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c,
+	  src/SDCCsymt.c:
+	  Simplify ROT optimization.
+	* src/stm8/gen.c,
+	  src/stm8/main.c:
+	  Improve stm8 rotations.
+
+2023-05-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Support arbitrary rotations of 8-bit values in pdk code generation.
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Support arbitrary rotations of 8-bit values in stm8 code generation.
+	* src/hc08/gen.c,
+	  src/hc08/ralloc2.cc:
+	  Improve code generation for hc08/s08 rotations.
+
+2023-05-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version,
+	  doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCcse.c,
+	  src/SDCCicode.c,
+	  src/SDCClospre.cc,
+	  src/SDCCopt.c,
+	  src/*/gen.c,
+	  src/*/main.c,
+	  src/*/ralloc2.cc:
+	  Replace RLC, RRC, SWAP by ROT, RFE #877.
+
+2023-05-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/port.h,
+	  src/SDCCast.c,
+	  src/*/main.c:
+	  Prepare for generalized swap / rotation support.
+
+2023-05-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* configure,
+	  configure.ac,
+	  device/lib/Makefile.in,
+	  device/lib/clean.mk,
+	  device/lib/s08-stack-auto,
+	  support/regression/ports/s08-stack-auto:
+	  Infrastructure for testing s08 port with --stack-auto.
+
+2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* aclocal.m4,
+	  configure,
+	  configure.ac,
+	  sdccconf_in.h:
+	  Update configure-time host C compiler checks for currently used standard.
 
 2023-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -68,7 +280,7 @@
 	* support/regression/tests/bug-2854.,
 	  support/regression/tests/bug-3474.c,
 	  support/regression/tests/strto.c:
-	  Disable tests for mcs51 medium model that need too much memory since recent strotul fixes (see also RFE #875).
+	  Disable tests for mcs51 medium model that need too much memory since recent strtoul fixes (see also RFE #875).
 
 2023-05-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -77,6 +289,26 @@
 	  Improve guards against a potential issue in the interaction of function entry stack adjustment and register parameters.
 	* src/mos6502/gen.c:
 	  Fix missing statement after label.
+
+2023-05-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Optimize out some redundant iTemps.
+	* src/SDCClrange.c:
+	  Live range separation fixes.
+
+2023-05-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/stm8/__mululonguchar2ulonglong.s,
+	  device/lib/stm8-large/__mululonguchar2ulonglong.s,
+	  device/lib/stm8/Makefile.in,
+	  device/lib/stm8-large/Makefile.in,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/port.h,
+	  src/*/main.c:
+	  Special handling of 32x8->64 unsigned multiplication for optimization.
 
 2023-05-23 Philipp Klaus Krause <philipp@colecovision.eu>
 

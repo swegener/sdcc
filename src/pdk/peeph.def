@@ -28,6 +28,13 @@ replace restart {
 }
 
 replace restart {
+	pop	af
+	push	af
+} by {
+	; peephole 3a removed redundant pop af / push af.
+} if notUsed('a'), notUsed('z'), notUsed('c'), notUsed('ov')
+
+replace restart {
 	mo%3	a, #%1
 	ret
 } by {

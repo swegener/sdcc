@@ -119,14 +119,14 @@ extern const operand *validateOpTypeConst (const operand * op,
 #define OP_TYPE(op)          validateOpType(op, "OP_TYPE", #op, TYPE, __FILE__, __LINE__)->svt.typeOperand
 
 /* definition for intermediate code */
-#define IC_RESULT(x)     (x)->ulrrcnd.lrr.result
-#define IC_LEFT(x)       (x)->ulrrcnd.lrr.left
-#define IC_RIGHT(x)      (x)->ulrrcnd.lrr.right
-#define IC_COND(x)       (x)->ulrrcnd.cnd.condition
+#define IC_RESULT(x)     (x)->result
+#define IC_LEFT(x)       (x)->left
+#define IC_RIGHT(x)      (x)->right
+#define IC_COND(x)       (x)->left // Not for use in new code. Some code still uses this, as it used to be separate from left.
 #define IC_TRUE(x)       (x)->ulrrcnd.cnd.trueLabel
 #define IC_FALSE(x)      (x)->ulrrcnd.cnd.falseLabel
 #define IC_LABEL(x)      (x)->label
-#define IC_JTCOND(x)     (x)->ulrrcnd.jmpTab.condition
+#define IC_JTCOND(x)     (x)->left // Not for use in new code. Some code still uses this, as it used to be separate from left.
 #define IC_JTLABELS(x)   (x)->ulrrcnd.jmpTab.labels
 #define IC_INLINE(x)     (x)->inlineAsm
 #define IC_ARRAYILIST(x) (x)->arrayInitList
@@ -161,19 +161,15 @@ typedef struct iCode
   bitVect *rUsed;               /* registers used by this instruction */
   bitVect *rMask;               /* registers in use during this instruction */
   bitVect *rSurv;               /* registers that survive this instruction (i.e. they are in use, it is not their last use and they are not in the return) */
+
+  operand *left;                // left if any
+  operand *right;               // right if any
+  operand *result;              // result of this op, if any
+
   union
   {
     struct
     {
-      operand *left;            /* left if any   */
-      operand *right;           /* right if any  */
-      operand *result;          /* result of this op */
-    }
-    lrr;
-
-    struct
-    {
-      operand *condition;       /* if this is a conditional */
       symbol *trueLabel;        /* true for conditional     */
       symbol *falseLabel;       /* false for conditional    */
     }
@@ -181,7 +177,6 @@ typedef struct iCode
 
     struct
     {
-      operand *condition;       /* condition for the jump */
       set *labels;              /* ordered set of labels  */
     }
     jmpTab;

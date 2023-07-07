@@ -109,10 +109,10 @@ bool uselessDecl = true;
 %token NAKED JAVANATIVE OVERLAY TRAP
 %token <yystr> STRING_LITERAL INLINEASM FUNC
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SET_VALUE_AT_ADDRESS SPIL UNSPIL GETABIT GETBYTE GETWORD
-%token BITWISEAND UNARYMINUS IPUSH IPUSH_VALUE_AT_ADDRESS IPOP PCALL  ENDFUNCTION JUMPTABLE
-%token RRC RLC
+%token BITWISEAND UNARYMINUS IPUSH IPUSH_VALUE_AT_ADDRESS IPOP PCALL ENDFUNCTION JUMPTABLE
+%token ROT
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+%token DUMMY_READ_VOLATILE ENDCRITICAL INLINE RESTRICT SMALLC RAISONANCE IAR COSMIC SDCCCALL PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
 
 /* C11 */
 %token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
@@ -273,12 +273,10 @@ unary_expression
            $$ = newNode ($1, $2, NULL);
        }
    | SIZEOF unary_expression        { $$ = newNode (SIZEOF, NULL, $2); }
-   | SIZEOF '(' type_name ')'            { $$ = newAst_VALUE (sizeofOp ($3)); }
-   | ALIGNOF '(' type_name ')'           { $$ = newAst_VALUE (alignofOp ($3)); }
+   | SIZEOF '(' type_name ')'       { $$ = newAst_VALUE (sizeofOp ($3)); }
+   | ALIGNOF '(' type_name ')'      { $$ = newAst_VALUE (alignofOp ($3)); }
    | OFFSETOF '(' type_name ',' offsetof_member_designator ')' { $$ = offsetofOp($3, $5); }
-   | RLC unary_expression           { $$ = newNode (RLC, $2, NULL); }
-   | RRC unary_expression           { $$ = newNode (RRC, $2, NULL); }
-   | SWAP unary_expression          { $$ = newNode (SWAP, $2, NULL); }
+   | ROT '(' unary_expression ',' unary_expression ')'         { $$ = newNode (ROT, $3, $5); }
    ;
 
 unary_operator

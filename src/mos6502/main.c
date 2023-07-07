@@ -296,19 +296,20 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
 /* Indicate which extended bit operations this port supports */
 static bool
-hasExtBitOp (int op, int size)
+hasExtBitOp (int op, sym_link *left, int right)
 {
-  if (op == RRC
-      || op == RLC
-      //|| (op == SWAP && size <= 2)
-      // TODO?
-      //|| op == GETABIT
-      || op == GETBYTE
-      || op == GETWORD
-     )
-    return true;
-  else
-    return false;
+  switch (op)
+    {
+    case GETBYTE:
+    case GETWORD:
+      return true;
+    case ROT:
+      unsigned int lbits = bitsForType (left);
+      if (right % lbits  == 1 || right % lbits == lbits - 1)
+        return (true);
+      return false;
+    }
+  return false;
 }
 
 /* Indicate the expense of an access to an output storage class */
@@ -732,8 +733,9 @@ PORT mos6502_port =
     1,                    /* sp points to next free stack location */
   },
   {
-    5,          /* shifts up tp 5 use support routines */
-    false       /* do not use support routine for int x int -> long multiplication */
+    5,                    /* shifts up to 5 use support routines */
+    false,                /* do not use support routine for int x int -> long multiplication */
+    false,                /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
   },
   {
     m6502_emitDebuggerSymbol,
@@ -891,7 +893,9 @@ PORT mos65c02_port =
     1           /* sp is offset by 1 from last item pushed */
   },
   {
-    5, false
+    5,                    // Shifts up to 5 use support routines.
+    false,                // Do not use support routine for int x int -> long multiplication.
+    false,                // Do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication.
   },
   {
     m6502_emitDebuggerSymbol,

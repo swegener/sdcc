@@ -369,8 +369,7 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
   else if ((dic->op == CAST ||
     dic->op == UNARYMINUS || dic->op == '+' || dic->op == '-' || dic->op == '*' || dic->op == '%' ||
     dic->op == '~' || dic->op == '^' || dic->op == '|' || dic->op == BITWISEAND ||
-    dic->op == LEFT_OP || dic->op == RIGHT_OP ||
-    dic->op == RRC || dic->op == RLC || dic->op == SWAP || dic->op == GETABIT) &&
+    dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == ROT || dic->op == GETABIT) &&
     dic->next == ic && IS_ITEMP (IC_RESULT (ic)))
     ;
   /* Otherwise, for now eliminate 8-bit temporary variables only.
@@ -748,18 +747,6 @@ stm8RegFix (eBBlock ** ebbs, int count)
         {
           if (SKIP_IC2 (ic))
             continue;
-
-          if (ic->op == IFX)
-            {
-              verifyRegsAssigned (IC_COND (ic), ic);
-              continue;
-            }
-
-          if (ic->op == JUMPTABLE)
-            {
-              verifyRegsAssigned (IC_JTCOND (ic), ic);
-              continue;
-            }
 
           verifyRegsAssigned (IC_RESULT (ic), ic);
           verifyRegsAssigned (IC_LEFT (ic), ic);

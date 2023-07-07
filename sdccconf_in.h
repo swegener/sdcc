@@ -235,9 +235,6 @@
 /* XXX */
 #undef PREFIX2DATA_DIR
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
-
 /* XXX */
 #undef SDCC_DIR_NAME
 

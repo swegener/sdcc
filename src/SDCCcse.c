@@ -214,39 +214,6 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
     {
       int isaddr;
 
-      /* do the special cases first */
-      if (lic->op == IFX)
-        {
-          if (IS_SYMOP (to) &&
-              IC_COND (lic)->key == from->key)
-            {
-
-              bitVectUnSetBit (OP_USES (from), lic->key);
-              OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-              isaddr = IC_COND (lic)->isaddr;
-              IC_COND (lic) = operandFromOperand (to);
-              IC_COND (lic)->isaddr = isaddr;
-
-            }
-          continue;
-        }
-
-      if (lic->op == JUMPTABLE)
-        {
-          if (IS_SYMOP (to) &&
-              IC_JTCOND (lic)->key == from->key)
-            {
-
-              bitVectUnSetBit (OP_USES (from), lic->key);
-              OP_USES(to)=bitVectSetBit (OP_USES (to), lic->key);
-              isaddr = IC_COND (lic)->isaddr;
-              IC_JTCOND (lic) = operandFromOperand (to);
-              IC_JTCOND (lic)->isaddr = isaddr;
-
-            }
-          continue;
-        }
-
       if (IS_SYMOP(to) &&
           IC_RESULT (lic) && IC_RESULT (lic)->key == from->key)
         {
@@ -1716,38 +1683,25 @@ setUsesDefs (operand * op, bitVect * bdefs,
 /* unsetDefsAndUses - clear this operation for the operands        */
 /*-----------------------------------------------------------------*/
 void
-unsetDefsAndUses (iCode * ic)
+unsetDefsAndUses (iCode *ic)
 {
-  if (ic->op == JUMPTABLE)
-    {
-      if (IS_SYMOP (IC_JTCOND (ic)))
-        bitVectUnSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
-      return;
-    }
-
   /* take away this definition from the def chain of the */
   /* result & take away from use set of the operands */
-  if (ic->op != IFX)
-    {
-      /* turn off def set */
-      if (IS_SYMOP (IC_RESULT (ic)))
-        {
-          if (!POINTER_SET (ic))
-            bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-          else
-            bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
-        }
-      /* turn off the useSet for the operands */
-      if (IS_SYMOP (IC_LEFT (ic)))
-        bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
 
-      if (IS_SYMOP (IC_RIGHT (ic)))
-        bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+  /* turn off def set */
+  if (IS_SYMOP (IC_RESULT (ic)))
+    {
+      if (!POINTER_SET (ic))
+        bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+      else
+        bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
     }
-  else
-    /* must be ifx turn off the use */
-    if (IS_SYMOP (IC_COND (ic)))
-      bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
+  /* turn off the useSet for the operands */
+  if (IS_SYMOP (IC_LEFT (ic)))
+    bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+
+  if (IS_SYMOP (IC_RIGHT (ic)))
+    bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2171,6 +2125,7 @@ static int isSignedOp (iCode *ic)
     case '|':
     case BITWISEAND:
     case INLINEASM:
+    case ROT:
     case LEFT_OP:
     case GET_VALUE_AT_ADDRESS:
     case '=':
@@ -2186,8 +2141,6 @@ static int isSignedOp (iCode *ic)
     case LE_OP:
     case GE_OP:
     case NE_OP:
-    case RRC:
-    case RLC:
     case GETABIT:
     case GETBYTE:
     case GETWORD:

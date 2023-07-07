@@ -224,16 +224,9 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
 {
   const iCode *ic = G[i].ic;
   
-  if(ic->op == IFX)
-    assign_operand_for_cost(IC_COND(ic), a, i, G, I);
-  else if(ic->op == JUMPTABLE)
-    assign_operand_for_cost(IC_JTCOND(ic), a, i, G, I);
-  else
-    {
-      assign_operand_for_cost(IC_LEFT(ic), a, i, G, I);
-      assign_operand_for_cost(IC_RIGHT(ic), a, i, G, I);
-      assign_operand_for_cost(IC_RESULT(ic), a, i, G, I);
-    }
+  assign_operand_for_cost(IC_LEFT(ic), a, i, G, I);
+  assign_operand_for_cost(IC_RIGHT(ic), a, i, G, I);
+  assign_operand_for_cost(IC_RESULT(ic), a, i, G, I);
     
   if(ic->op == SEND && ic->builtinSEND)
     assign_operands_for_cost(a, (unsigned short)*(adjacent_vertices(i, G).first), G, I);
@@ -348,12 +341,10 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case NE_OP:
     case AND_OP:
     case OR_OP:
-    case RLC:
-    case RRC:
     case GETABIT:
     case GETBYTE:
     case GETWORD:
-    case SWAP:
+    case ROT:
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:

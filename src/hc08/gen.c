@@ -3727,8 +3727,6 @@ assignResultValue (operand * oper)
     pullReg (hc08_reg_x);
 }
 
-
-
 /*-----------------------------------------------------------------*/
 /* genIpush - generate code for pushing this gets a little complex */
 /*-----------------------------------------------------------------*/
@@ -3797,6 +3795,35 @@ genIpush (iCode * ic)
     }
 
 release:
+  freeAsmop (IC_LEFT (ic), NULL, ic, true);
+}
+
+/*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+
+  D (emitcode (";     genPointerPush", ""));
+
+  aopOp (left, ic, false);
+
+  wassertl (IC_RIGHT (ic), "IPUSH_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
+  wassertl (!operandLitValue (IC_RIGHT(ic)), "IPUSH_VALUE_AT_ADDRESS with non-zero right operand");
+
+  loadRegFromAop (hc08_reg_hx, left->aop, 0);
+  /* so hx now contains the address */
+
+  int size = getSize (operandType (IC_LEFT (ic))->next);
+  while (size--)
+    {
+      loadRegIndexed (hc08_reg_a, size, 0);
+      pushReg (hc08_reg_a, true);
+    }
+
   freeAsmop (IC_LEFT (ic), NULL, ic, true);
 }
 
@@ -3907,6 +3934,49 @@ genSend (set *sendSet)
 }
 
 /*-----------------------------------------------------------------*/
+/* pushbigreturn - emit code to push hidden pointer for struct return */
+/*-----------------------------------------------------------------*/
+static void
+pushbigreturn (operand *result)
+{
+  wassert (result);
+
+  symbol *sym = OP_SYMBOL (result);
+  wassert (sym);
+
+  if (sym->onStack)
+    {
+      /* if it has an offset then we need to compute it */
+      int offset = _G.stackOfs + _G.stackPushes + sym->stack;
+      hc08_useReg (hc08_reg_hx);
+      emitcode ("tsx", "");
+      hc08_dirtyReg (hc08_reg_hx, false);
+      regalloc_dry_run_cost++;
+      while (offset > 127)
+        {
+          emitcode ("aix", "#127");
+          regalloc_dry_run_cost += 2;
+          offset -= 127;
+        }
+      while (offset < -128)
+        {
+          emitcode ("aix", "#-128");
+          regalloc_dry_run_cost += 2;
+          offset += 128;
+        }
+      if (offset)
+        {
+          emitcode ("aix", "#%d", offset);
+          regalloc_dry_run_cost += 2;
+        }
+    }
+  else
+    loadRegFromImm (hc08_reg_hx, sym->rname);
+
+  pushReg (hc08_reg_hx, true);
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -3925,6 +3995,8 @@ genCall (iCode * ic)
 
   dtype = operandType (IC_LEFT (ic));
   etype = getSpec (dtype);
+  const bool bigreturn = IS_STRUCT (dtype->next);
+
   /* if send set is not empty then assign */
   if (_G.sendSet && !regalloc_dry_run)
     {
@@ -3938,6 +4010,10 @@ genCall (iCode * ic)
         }
       _G.sendSet = NULL;
     }
+
+  // Pass pointer for storing return value
+  if (bigreturn)
+    pushbigreturn (IC_RESULT (ic));
 
   /* make the call */
   if (IS_LITERAL (etype))
@@ -3957,8 +4033,12 @@ genCall (iCode * ic)
   hc08_dirtyReg (hc08_reg_a, false);
   hc08_dirtyReg (hc08_reg_hx, false);
 
+  // Adjust stack pointer for the hidden pointer parameter.
+  if (bigreturn)
+    adjustStack (2);
+
   /* if we need assign a result value */
-  if ((IS_ITEMP (IC_RESULT (ic)) &&
+  else if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
       hc08_useReg (hc08_reg_a);
@@ -4356,6 +4436,14 @@ genRet (iCode * ic)
      move the return value into place */
   aopOp (IC_LEFT (ic), ic, false);
   size = AOP_SIZE (IC_LEFT (ic));
+  const bool bigreturn = IS_STRUCT (operandType (IC_LEFT (ic)));
+
+  if (bigreturn) // todo: implement!
+    {
+      if (!regalloc_dry_run)
+        werror ( E_FUNC_AGGR);
+      goto jumpret;
+    }
 
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
@@ -7137,30 +7225,28 @@ genRLC (iCode * ic)
         }
     }
 
-  if ((!hc08_reg_a->isFree) || resultInA)
-    {
-      pushReg (hc08_reg_a, true);
-      needpula = true;
-    }
-
   /* now we need to put the carry into the
      lowest order byte of the result */
-  offset = 0;
-  emitcode ("clra", "");
-  emitcode ("rola", "");
-  regalloc_dry_run_cost += 2;
-  hc08_dirtyReg (hc08_reg_a, false);
   if (resultInA)
     {
-      emitcode ("ora", "1,s");
-      pullNull (1);
-      regalloc_dry_run_cost += 3;
-      hc08_dirtyReg (hc08_reg_a, false);
-      needpula = false;
+      emitcode ("adc", "#0x00");
+      regalloc_dry_run_cost += 2;
     }
   else
-    accopWithAop ("ora", AOP (result), offset);
-  storeRegToAop (hc08_reg_a, AOP (result), offset);
+    {
+      if (!hc08_reg_a->isFree)
+        {
+          pushReg (hc08_reg_a, true);
+          needpula = true;
+        }
+      offset = 0;
+      emitcode ("clra", "");
+      emitcode ("rola", "");
+      regalloc_dry_run_cost += 2;
+      hc08_dirtyReg (hc08_reg_a, false);
+      accopWithAop ("ora", AOP (result), offset);
+      storeRegToAop (hc08_reg_a, AOP (result), offset);
+    }
 
   pullOrFreeReg (hc08_reg_a, needpula);
 
@@ -7321,15 +7407,6 @@ genSwap (iCode * ic)
 
   switch (AOP_SIZE (left))
     {
-    case 1:                    /* swap nibbles in byte */
-      needpulla = pushRegIfSurv (hc08_reg_a);
-      loadRegFromAop (hc08_reg_a, AOP (left), 0);
-      emitcode ("nsa", "");
-      regalloc_dry_run_cost++;
-      hc08_dirtyReg (hc08_reg_a, false);
-      storeRegToAop (hc08_reg_a, AOP (result), 0);
-      pullOrFreeReg (hc08_reg_a, needpulla);
-      break;
     case 2:                    /* swap bytes in a word */
       if (IS_AOP_XA (AOP (left)) && IS_AOP_AX (AOP (result)) ||
         IS_AOP_AX (AOP (left)) && IS_AOP_XA (AOP (result)))
@@ -7365,7 +7442,6 @@ genSwap (iCode * ic)
   freeAsmop (result, NULL, ic, true);
 }
 
-#if 0
 /*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
 /*-----------------------------------------------------------------*/
@@ -7379,38 +7455,61 @@ AccRol (int shCount)
     case 0:
       break;
     case 1:
-      emitcode ("rola", "");    /* 1 cycle */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      regalloc_dry_run_cost += 3;
       break;
     case 2:
-      emitcode ("rola", "");    /* 1 cycle */
-      emitcode ("rola", "");    /* 1 cycle */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      regalloc_dry_run_cost += 6;
       break;
     case 3:
-      emitcode ("nsa", "");
-      emitcode ("rora", "");
-      break;
+      emitcode ("nsa", "");     /* 3 cycles */
+      regalloc_dry_run_cost++;
+      goto ror;
     case 4:
       emitcode ("nsa", "");     /* 3 cycles */
+      regalloc_dry_run_cost++;
       break;
     case 5:
       emitcode ("nsa", "");     /* 3 cycles */
-      emitcode ("rola", "");    /* 1 cycle */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      regalloc_dry_run_cost += 4;
       break;
     case 6:
       emitcode ("nsa", "");     /* 3 cycles */
-      emitcode ("rola", "");    /* 1 cycle */
-      emitcode ("rola", "");    /* 1 cycle */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      emitcode ("lsla", "");    /* 1 cycle */
+      emitcode ("adc", "#0x00");/* 2 cycles */
+      regalloc_dry_run_cost += 7;
       break;
     case 7:
-      emitcode ("nsa", "");     /* 3 cycles */
-      emitcode ("rola", "");    /* 1 cycle */
-      emitcode ("rola", "");    /* 1 cycle */
-      emitcode ("rola", "");    /* 1 cycle */
+ror:
+      emitcode ("lsra", "");     /* 1 cycle */
+      emitcode ("psha", "");     /* 2 cycles */
+      emitcode ("clra", "");     /* 1 cycle */
+      emitcode ("rora", "");     /* 1 cycles */
+      emitcode ("ora", "1, s"); /* 1 cycles */
+      regalloc_dry_run_cost += 6;
+      if (hc08_reg_h->isFree && optimize.codeSize)
+        {
+          emitcode ("pulh", "");      /* 1 byte,  3 cycles */
+          regalloc_dry_run_cost++;
+        }
+      else
+        {
+          emitcode ("ais", "#1"); /* 2 bytes, 2 cycles */
+          regalloc_dry_run_cost += 2;
+        }
       break;
     }
+  hc08_dirtyReg (hc08_reg_a, false);
 }
-#endif
-
 
 /*-----------------------------------------------------------------*/
 /* AccLsh - left shift accumulator by known count                  */
@@ -8111,6 +8210,55 @@ genlshFour (operand * result, operand * left, int shCount)
 }
 
 /*-----------------------------------------------------------------*/
+/* genRot1 - generates code for rotation of 8-bit values           */
+/*-----------------------------------------------------------------*/
+static void
+genRot1 (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
+
+  aopOp (left, ic, false);
+  aopOp (result, ic, false);
+
+  wassert (bitsForType (operandType (left)) == 8);
+  wassert (IS_OP_LITERAL (right));
+
+  int s = operandLitValueUll (right) % 8;
+
+  bool needpulla = pushRegIfSurv (hc08_reg_a);
+  loadRegFromAop (hc08_reg_a, left->aop, 0);
+  AccRol (s);
+  storeRegToAop (hc08_reg_a, result->aop, 0);
+  pullOrFreeReg (hc08_reg_a, needpulla);
+
+  freeAsmop (result, NULL, ic, true);
+  freeAsmop (left, NULL, ic, true);
+}
+
+/*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  unsigned int lbits = bitsForType (operandType (left));
+  if (lbits == 8)
+    genRot1 (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits == 1)
+    genRLC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) % lbits ==  lbits - 1)
+    genRRC (ic);
+  else if (IS_OP_LITERAL (right) && operandLitValueUll (right) %lbits == lbits / 2)
+    genSwap (ic);
+  else
+    wassertl (0, "Unsupported rotation.");
+}
+
+/*-----------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
 static void
@@ -8172,7 +8320,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 /* genLeftShift - generates code for left shifting                 */
 /*-----------------------------------------------------------------*/
 static void
-genLeftShift (iCode * ic)
+genLeftShift (iCode *ic)
 {
   operand *left, *right, *result;
   int size, offset;
@@ -8219,7 +8367,7 @@ genLeftShift (iCode * ic)
 
   /* now move the left to the result if they are not the
      same */
-  if (IS_AOP_HX (AOP (result)))
+  if (IS_AOP_HX (aopResult) && !aopResult->stacked)
     loadRegFromAop (hc08_reg_hx, AOP (left), 0);
   else if (IS_AOP_AX (AOP (result)) && IS_AOP_XA (AOP (left)) || IS_AOP_XA (AOP (result)) && IS_AOP_AX (AOP (left)))
     {
@@ -8319,7 +8467,7 @@ genLeftShift (iCode * ic)
           pullOrFreeReg (hc08_reg_a, needpull);
         }
     }
-      
+
   freeAsmop (result, NULL, ic, true);
   freeAsmop (right, NULL, ic, true);
 }
@@ -8598,7 +8746,6 @@ static void
 genRightShift (iCode * ic)
 {
   operand *right, *left, *result;
-  sym_link *retype;
   int size, offset;
   symbol *tlbl, *tlbl1;
   char *shift;
@@ -8608,11 +8755,6 @@ genRightShift (iCode * ic)
   reg_info *countreg = NULL;
 
   D (emitcode (";     genRightShift", ""));
-
-  /* if signed then we do it the hard way preserve the
-     sign bit moving it inwards */
-  retype = getSpec (operandType (IC_RESULT (ic)));
-  sign = !SPEC_USIGN (retype);
 
   /* signed & unsigned types are treated the same : i.e. the
      signed is NOT propagated inwards : quoting from the
@@ -8624,6 +8766,10 @@ genRightShift (iCode * ic)
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
+
+  /* if signed then we do it the hard way preserve the
+     sign bit moving it inwards */
+  sign = !SPEC_USIGN (getSpec (operandType (left)));
 
   aopOp (right, ic, false);
 
@@ -8651,7 +8797,7 @@ genRightShift (iCode * ic)
 
   /* now move the left to the result if they are not the
      same */
-  if (IS_AOP_HX (AOP (result)))
+  if (IS_AOP_HX (aopResult) && !aopResult->stacked)
     loadRegFromAop (hc08_reg_hx, AOP (left), 0);
   else if (IS_AOP_AX (AOP (result)) && IS_AOP_XA (AOP (left)) || IS_AOP_XA (AOP (result)) && IS_AOP_AX (AOP (left)))
     {
@@ -8687,6 +8833,7 @@ genRightShift (iCode * ic)
   else if(!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)) && !IS_AOP_AX (AOP (result)))
     countreg = hc08_reg_a;
   needpullcountreg = (countreg && pushRegIfSurv (countreg));
+  wassert (right->aop); // This can fail is left and right are the same, resulting in a segfault later (bug #3598).
   if(countreg)
     {
       countreg->isFree = false;
@@ -9634,7 +9781,7 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
         {
           /* Case with a bitfield length <8 and literal source
            */
-          litval = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+          litval = ullFromVal (AOP (right)->aopu.aop_lit);
           litval <<= bstr;
           litval &= (~mask) & 0xff;
 
@@ -9647,7 +9794,7 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
             }
           if (litval)
             {
-              emitcode ("ora", "#0x%02x", litval);
+              emitcode ("ora", "#0x%02llx", litval);
               regalloc_dry_run_cost += 2;
             }
           hc08_dirtyReg (hc08_reg_a, false);
@@ -9708,7 +9855,7 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
             }
           if (litval)
             {
-              emitcode ("ora", "#0x%02x", litval);
+              emitcode ("ora", "#0x%02llx", litval);
               regalloc_dry_run_cost += 2;
             }
           hc08_dirtyReg (hc08_reg_a, false);
@@ -10799,6 +10946,10 @@ genhc08iCode (iCode *ic)
           genIpush (ic);
           break;
 
+    case IPUSH_VALUE_AT_ADDRESS:
+          genPointerPush (ic);
+          break;
+  
     case IPOP:
       /* IPOP happens only when trying to restore a
          spilt live range, if there is an ifx statement
@@ -10897,14 +11048,6 @@ genhc08iCode (iCode *ic)
       hc08_genInline (ic);
       break;
 
-    case RRC:
-      genRRC (ic);
-      break;
-
-    case RLC:
-      genRLC (ic);
-      break;
-
     case GETABIT:
       genGetAbit (ic);
       break;
@@ -10915,6 +11058,10 @@ genhc08iCode (iCode *ic)
 
     case GETWORD:
       genGetWord (ic);
+      break;
+
+    case ROT:
+      genRot (ic);
       break;
 
     case LEFT_OP:
@@ -10980,12 +11127,9 @@ genhc08iCode (iCode *ic)
       genEndCritical (ic);
       break;
 
-    case SWAP:
-      genSwap (ic);
-      break;
-
     default:
       wassertl (0, "Unknown iCode");
+      fprintf (stderr, "ic->op: %d\n", ic->op);
     }
 }
 
@@ -11115,8 +11259,8 @@ genhc08Code (iCode *lic)
 
       regalloc_dry_run_cost = 0;
       genhc08iCode(ic);
-      /*if (options.verboseAsm)
-        emitcode (";", "iCode %d (key %d) total cost: %d\n", ic->seq, ic->key, (int) regalloc_dry_run_cost);*/
+      //if (options.verboseAsm)
+      //  emitcode (";", "iCode %d (key %d) total cost: %d\n", ic->seq, ic->key, (int) regalloc_dry_run_cost);
 
       if (!hc08_reg_a->isFree)
         DD (emitcode ("", "; forgot to free a"));

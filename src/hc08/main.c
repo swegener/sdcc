@@ -145,12 +145,6 @@ _hc08_parseOptions (int *pargc, char **argv, int *i)
       return true;
     }
 
-  if (!strcmp (argv[*i], "--oldralloc"))
-    {
-      options.oldralloc = true;
-      return true;
-    }
-
   return false;
 }
 
@@ -162,7 +156,6 @@ static OPTION _hc08_options[] =
     {0, OPTION_SMALL_MODEL, NULL, "8-bit address space for data"},
     {0, OPTION_LARGE_MODEL, NULL, "16-bit address space for data (default)"},
     {0, "--out-fmt-elf", NULL, "Output executable in ELF format" },
-    {0, "--oldralloc", NULL, "Use old register allocator"},
     {0, NULL }
   };
 
@@ -422,6 +415,8 @@ hc08_dwarfRegNum (const struct reg_info *reg)
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
+  wassert (ic->op == '*' || ic->op == '/' || ic->op == '%');
+
   if (IS_BITINT (OP_SYM_TYPE (IC_RESULT(ic))) && SPEC_BITINTWIDTH (OP_SYM_TYPE (IC_RESULT(ic))) % 8)
     return false;
 

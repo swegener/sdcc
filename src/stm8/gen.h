@@ -78,6 +78,7 @@ typedef struct asmop
     asmop_byte bytes[8];
   } aopu;
   signed char regs[6]; // Byte of this aop that is in the register. -1 if no byte of this aop is in the reg.
+  struct valinfo valinfo;
 }
 asmop;
 

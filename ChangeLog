@@ -1,4 +1,13 @@
-2022-07-07 Philipp Klaus Krause <philipp@colecovision.eu>
+2023-07-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge genconstprop branch to trunk.
+
+2023-07-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version:
+	  Bump version for generalized constant propagation.
+
+2023-07-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* Merge next branch to trunk.
 	* device/lib/stm8/support:
@@ -6,8 +15,29 @@
 
 2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCopt.c:
+	  Fix a compiler crash due to operation narrowing invaldiating iCode seuqence numbers.
+
+2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/ds390/gen.c:
 	  Fix an issue in ds390 casts to _BitInt.
+
+2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/pdk/main.c:
+	  Generalized constant propagation optimization for pdk and mcs51 pointers.
+
+2023-07-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Basic generalized constant propagation analysis for pdk and mcs51 pointers.
+
+2023-07-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Fix dumping of generalized constant propagation analysis graph debug info for initialization of global objects.
 
 2023-07-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -32,6 +62,16 @@
 	* src/stm8/gen.c:
 	  Improve 16-bit comparisons.
 
+2023-06-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve generalized constant propagation analysis for /, %.
+
+2023-06-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve interval / bit synchronization in generalized constant propagation analysis.
+
 2023-06-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCast.c,
@@ -47,6 +87,61 @@
 	* support/scripts/sdcc.nsi:
 	  Change references to bin\cc1.exe to libexec\sdcc\cc1 (picked from nativecrosstools branch).
 
+2023-06-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/SDCCopt.c,
+	  src/hc08/main.c,
+	  src/*/ralloc2.cc:
+	  Fixes for generalized constant propagation and support functions for _BitInt.
+
+2023-06-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve generalized constant propagation analysis and optimization.
+
+2023-06-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCBBlock.c,
+	  src/SDCCgenconstprop.cc,
+	  src/SDCCopt.c,
+	  src/SDCCopt.h:
+	  Replace a multiplication narrowing optimization by a more generic one based on generalized constant propagation.
+
+2023-06-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve generalized constant propgation analysis and optimization.
+	* src/hc08/gen.c,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c,
+	  src/mos6502/ralloc2.cc:
+	  Further use of information from generalized constant propagation analysis in code generation.
+
+2023-06-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c,
+	  src/hc08/gen.h,
+	  src/hc08/main.c,
+	  src/hc08/ralloc.c,
+	  src/hc08/ralloc2.cc:
+	  Use information from generalized constant propagation analysis in hc08 code generation, remove support for old register allocator.
+
+2023-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/pdk/gen.c:
+	  Improve generalized constant propagation analysis and optimization.
+
+2023-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/z80/gen.c,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c:
+	  Use information from generalized constant propagation analysis in code generation.
+
 2023-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCBBlock.c,
@@ -59,6 +154,43 @@
 	  src/*/ralloc2.cc:
 	  Simplify based on IC_(JT)COND now being an alias for IC_LEFT.
 
+2023-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCdflow.h,
+	  src/SDCCgenconstprop.cc,
+	  src/SDCCopt.c,
+	  src/z80/gen.c,
+	  src/z80/gen.h,
+	  src/z80/ralloc2.cc,
+	  src/stm8/gen.c,
+	  src/stm8/gen.h,
+	  src/stm8/ralloc2.cc:
+	  Basic generalized constant propgation analysis and optimization for individual operand bits.
+
+2023-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Fixes and improvements for generalized constant propagation optimization and analysis.
+
+2023-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mos6502/gen.c
+	  Fix negation of literals for mos6502.
+	* src/SDCCgenconstprop.cc:
+	  Fix handling of __bit in generalized constant propagation analysis.
+
+2023-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Fix an issue in handling parameters during conversion of builtin functions at the beginning of a basic block.
+
+2023-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCBBlock.c,
+	  src/SDCCglobl.h,
+	  src/SDCCopt.c:
+	  Dump iCode after generalized constant propagation.
+
 2023-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCClrange.c:
@@ -70,13 +202,55 @@
 
 2023-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCdflow.h,
+	  src/SDCCgenconstprop.cc,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h:
+	  Basic generalized constant propagation operation narrowing optimization.
+
+2023-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve generalized constant propagation analysis.
+
+2023-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* device/include/stdckdint.h:
 	  Work around an issue in inlining _Generic results to mitigate strtotul code size regression.
 
 2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc:
+	  A few more bits of generalized constant propagation analysis and optimization.
+
+2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve proof-of-concept for generalized constant propagation analysis and optimization to the point where it almost passes regression tests.
+	* src/SDCCglobl.h,
+	  src/SDCCmain.c,
+	  src/SDCCopt.c:
+	  Introduce --nogenconstprop option.
+
+2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Refactor proof-of-concept for generalized constant propagation analysis using new iCode operand handling.
+
+2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCicode.h:
 	  Store operands of IFX and JUMPTAB the same way as operands of other iCodes.
+
+2023-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCdflow.h,
+	  src/SDCCicode.c,
+	  src/SDCCicode.h,
+	  src/SDCClrange.c,
+	  src/SDCCopt.c,
+	  src/SDCCgenconstprop.cc:
+	  A first proof-of-concept for generalized constant propagation analysis.
 
 2023-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
 

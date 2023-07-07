@@ -39,5 +39,7 @@ const symbol *getAddrspaceiCode (const iCode *ic);
 void switchAddressSpaceAt (iCode *ic, const symbol *const addrspace);
 bool isPowerOf2 (unsigned long val);
 void guessCounts (iCode *start_ic, ebbIndex *ebbi);
+void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb);
+void appendCast (iCode *ic, sym_link *type, eBBlock *ebb);
 
 #endif

@@ -154,6 +154,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_DUMP_I_CODE          "--dump-i-code"
 #define OPTION_DUMP_GRAPHS          "--dump-graphs"
 #define OPTION_INCLUDE              "--include"
+#define OPTION_NO_GENCONSTPROP      "--nogenconstprop"
 
 #define OPTION_SMALL_MODEL          "--model-small"
 #define OPTION_MEDIUM_MODEL         "--model-medium"
@@ -215,24 +216,25 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_DATA_SEG, NULL, "<name> use this name for the data segment"},
 
   {0,   NULL, NULL, "Optimization options"},
+  {0,   OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
+  {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
+  {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
+  {0,   "--no-reg-params", &options.noRegParams, "On some ports, disable passing some parameters in registers"},
+  {0,   "--nostdlibcall", &optimize.noStdLibCall, "Disable optimization of calls to standard library"},
   {0,   "--nooverlay", &options.noOverlay, "Disable overlaying leaf function auto variables"},
   {0,   OPTION_NO_GCSE, NULL, "Disable the GCSE optimisation"},
+  {0,   OPTION_NO_LOSPRE, NULL, "Disable lospre"},
+  {0,   OPTION_NO_GENCONSTPROP, NULL, "Disable generalized constant propagation"},
   {0,   OPTION_NO_LABEL_OPT, NULL, "Disable label optimisation"},
   {0,   OPTION_NO_LOOP_INV, NULL, "Disable optimisation of invariants"},
   {0,   OPTION_NO_LOOP_IND, NULL, "Disable loop variable induction"},
   {0,   "--noloopreverse", &optimize.noLoopReverse, "Disable the loop reverse optimisation"},
   {0,   "--no-peep", &options.nopeep, "Disable the peephole assembly file optimisation"},
-  {0,   "--no-reg-params", &options.noRegParams, "On some ports, disable passing some parameters in registers"},
   {0,   "--peep-asm", &options.asmpeep, "Enable peephole optimization on inline assembly"},
   {0,   OPTION_PEEP_RETURN, NULL, "Enable peephole optimization for return instructions"},
   {0,   OPTION_NO_PEEP_RETURN, NULL, "Disable peephole optimization for return instructions"},
   {0,   OPTION_PEEP_FILE, &options.peep_file, "<file> use this extra peephole file", CLAT_STRING},
-  {0,   OPTION_OPT_CODE_SPEED, NULL, "Optimize for code speed rather than size"},
-  {0,   OPTION_OPT_CODE_SIZE, NULL, "Optimize for code size rather than speed"},
-  {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
-  {0,   OPTION_NO_LOSPRE, NULL, "Disable lospre"},
   {0,   OPTION_ALLOW_UNSAFE_READ, NULL, "Allow optimizations to read any memory location anytime"},
-  {0,   "--nostdlibcall", &optimize.noStdLibCall, "Disable optimization of calls to standard library"},
 
   {0,   NULL, NULL, "Internal debugging options"},
   {0,   OPTION_DUMP_AST, &options.dump_ast, "Dump front-end AST before generating i-code"},
@@ -665,6 +667,7 @@ setDefaultOptions (void)
   options.max_allocs_per_node = 3000;
   optimize.lospre = 1;
   optimize.allow_unsafe_read = 0;
+  optimize.genconstprop = 1;
 
   /* now for the ports */
   port->setDefaultOptions ();
@@ -1173,6 +1176,12 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_NO_GCSE) == 0)
             {
               optimize.global_cse = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_NO_GENCONSTPROP) == 0)
+            {
+              optimize.genconstprop = 0;
               continue;
             }
 

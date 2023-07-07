@@ -80,6 +80,7 @@ typedef struct asmop
 	int aop_stk;		/* stack offset when AOP_STK */
       }
     aopu;
+    struct valinfo valinfo;
   }
 asmop;
 

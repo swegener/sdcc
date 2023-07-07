@@ -1056,6 +1056,23 @@ newLongLongLink ()
 }
 
 /*------------------------------------------------------------------*/
+/* newBitIntLink() - creates a BitInt type                          */
+/*------------------------------------------------------------------*/
+sym_link *
+newBitIntLink (unsigned int width)
+{
+  wassert (width <= port->s.bitint_maxwidth);
+
+  sym_link *p;
+
+  p = newLink (SPECIFIER);
+  SPEC_NOUN (p) = V_BITINT;
+  SPEC_BITINTWIDTH (p) = width;
+
+  return p;
+}
+
+/*------------------------------------------------------------------*/
 /* newIntLink() - creates an int type                               */
 /*------------------------------------------------------------------*/
 sym_link *

@@ -312,7 +312,7 @@ PORT pdk13_port =
     64,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x80 },   /* far, near, xstack, code */
   {
     "XSEG",
     "STACK",
@@ -481,7 +481,7 @@ PORT pdk14_port =
     64,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x80 },   /* far, near, xstack, code */
   {
     "XSEG",
     "STACK",
@@ -650,7 +650,7 @@ PORT pdk15_port =
     64,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x80 },   /* far, near, xstack, code */
   {
     "XSEG",
     "STACK",

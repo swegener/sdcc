@@ -1084,12 +1084,15 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 
           wassert (defs);
           wassert (setFirstItem (defs));
+
 #if 0
           printf("Looking at def of %s at %d now\n", OP_SYMBOL (((iCode *)(setFirstItem (defs)))->result)->name,  ((iCode *)(setFirstItem (defs)))->key);
 #endif
+
           if (!bitVectBitValue (((iCode *)(setFirstItem (defs)))->rlive, sym->key))
             {
               werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Variable is not alive at one of its definitions");
+              fprintf (stderr, "\"Definition\" of %s at ic %d\n", sym->name, sym->key);
               break;
             }
  
@@ -1105,6 +1108,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 #if 0
                   printf("Looking at other def of %s at %d now\n", OP_SYMBOL(ic->result)->name, ic->key);
 #endif
+
                   set *visited2 = 0;
                   set *intersection = 0;
                   visit (&visited2, ic, sym->key);

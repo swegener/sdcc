@@ -81,6 +81,7 @@ typedef struct asmop
     int stk_off;
     asmop_byte bytes[8];
   } aopu;
+  struct valinfo valinfo;
 }
 asmop;
 

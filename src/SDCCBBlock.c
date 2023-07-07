@@ -39,12 +39,14 @@ struct _dumpFiles dumpFiles[] = {
   {DUMP_LOOP, ".dumploop", NULL},
   {DUMP_LOOPG, ".dumploopg", NULL},
   {DUMP_LOOPD, ".dumploopd", NULL},
+  {DUMP_LOSPRE, ".dumplospre", NULL},
+  {DUMP_GENCONSTPROP, ".dumpgenconstprop", NULL},
   {DUMP_RANGE, ".dumprange", NULL},
   {DUMP_PACK, ".dumppack", NULL},
   {DUMP_RASSGN, ".dumprassgn", NULL},
   {DUMP_LRANGE, ".dumplrange", NULL},
-  {DUMP_LOSPRE, ".dumplospre", NULL},
-  {DUMP_CUSTOM, ".dumpcustom", NULL},
+  {DUMP_CUSTOM0, ".dumpcustom0", NULL},
+  {DUMP_CUSTOM1, ".dumpcustom1", NULL},
   {0, NULL, NULL}
 };
 
@@ -449,7 +451,7 @@ edgesTo (eBBlock * to)
 /* addiCodeToeBBlock - will add an iCode to the end of a block     */
 /*-----------------------------------------------------------------*/
 void
-addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
+addiCodeToeBBlock (eBBlock *ebp, iCode *ic, iCode *ip)
 {
   ic->prev = ic->next = NULL;
   /* if the insert point is given */
@@ -462,11 +464,16 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
       ip->prev = ic;
       ic->next = ip;
       if (!ic->prev)
-        ebp->sch = ic;
+        {
+          wassert (ebp);
+          ebp->sch = ic;
+        }
       else
         ic->prev->next = ic;
       return;
     }
+
+  wassert (ebp);
 
   /* if the block has no  instructions */
   if (ebp->ech == NULL)

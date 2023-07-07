@@ -651,6 +651,9 @@ iCode *pdk_ralloc2_cc(ebbIndex *ebbi)
 
   ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
+  if (optimize.genconstprop)
+    recomputeValinfos (ic, ebbi, "_2");
+
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);
 

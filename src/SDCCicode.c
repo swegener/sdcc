@@ -604,6 +604,9 @@ newiCode (int op, operand *left, operand *right)
   ic->localEscapeAlive = true;
   ic->parmEscapeAlive = true;
 
+  ic->valinfos = 0;
+  ic->resultvalinfo = 0;
+
   return ic;
 }
 

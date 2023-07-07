@@ -2970,6 +2970,7 @@ aopOp (operand *op, const iCode * ic)
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
       op->aop = aop;
+      aop->op = op; // asmopToBool needs the op to check thetype of the literal.
       return;
     }
 

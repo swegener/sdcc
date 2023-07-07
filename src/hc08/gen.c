@@ -282,6 +282,12 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
       if (aop->size <= offset && !b && aop->type != AOP_LIT)
         continue;
 
+      // Information from generalized constant propagation analysis
+      if (!aop->valinfo.anything &&
+        ((aop->valinfo.knownbitsmask >> (offset * 8)) & 0xff) == 0xff &&
+        ((aop->valinfo.knownbits >> (offset * 8)) & 0xff) == b)
+        continue;
+
       if (aop->type != AOP_LIT)
         return (false);
 
@@ -2063,6 +2069,7 @@ newAsmop (short type)
   aop = Safe_calloc (1, sizeof (asmop));
   aop->type = type;
   aop->op = NULL;
+  aop->valinfo.anything = true;
   return aop;
 }
 
@@ -2466,6 +2473,8 @@ aopOp (operand *op, iCode * ic, bool result)
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
       aop->op = op;
+      if (!result)
+        aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
 
@@ -2498,6 +2507,8 @@ aopOp (operand *op, iCode * ic, bool result)
     {
       op->aop = aop = aopForSym (ic, OP_SYMBOL (op), result);
       aop->op = op;
+      if (!result)
+        aop->valinfo = getOperandValinfo (ic, op);
       //printf ("new symbol %s\n", OP_SYMBOL (op)->name);
       //printf (" with size = %d\n", aop->size);
       return;
@@ -2522,6 +2533,8 @@ aopOp (operand *op, iCode * ic, bool result)
       sym->aop = op->aop = aop = newAsmop (AOP_CRY);
       aop->size = 0;
       aop->op = op;
+      if (!result)
+        aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
 
@@ -2538,6 +2551,8 @@ aopOp (operand *op, iCode * ic, bool result)
           sym->aop = op->aop = aop = aopForRemat (sym);
           aop->size = getSize (sym->type);
           aop->op = op;
+          if (!result)
+            aop->valinfo = getOperandValinfo (ic, op);
           return;
         }
 
@@ -2554,6 +2569,8 @@ aopOp (operand *op, iCode * ic, bool result)
             sym->aop = op->aop = aop = newAsmop (AOP_DIR);
           aop->size = getSize (sym->type);
           aop->op = op;
+          if (!result)
+            aop->valinfo = getOperandValinfo (ic, op);
           return;
         }
 
@@ -2579,6 +2596,8 @@ aopOp (operand *op, iCode * ic, bool result)
           aop->op = op;
           //printf ("spill symbol %s\n", OP_SYMBOL (op)->name);
           //printf (" with size = %d\n", aop->size);
+          if (!result)
+            aop->valinfo = getOperandValinfo (ic, op);
           return;
         }
 
@@ -2586,6 +2605,8 @@ aopOp (operand *op, iCode * ic, bool result)
       sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
       aop->op = op;
+      if (!result)
+        aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
 
@@ -2603,6 +2624,8 @@ aopOp (operand *op, iCode * ic, bool result)
   if ((sym->nRegs > 1) && (sym->regs[0]->mask > sym->regs[1]->mask))
     aop->regmask |= HC08MASK_REV;
   aop->op = op;
+  if (!result)
+    aop->valinfo = getOperandValinfo (ic, op);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4677,8 +4700,6 @@ genPlus (iCode *ic)
       IC_LEFT (ic) = t;
     }
 
-
-
   /* if I can do an increment instead
      of add then GOOD for ME */
   if (!maskedtopbyte && genPlusIncr (ic))
@@ -4711,7 +4732,7 @@ genPlus (iCode *ic)
         pullReg (hc08_reg_a);
       else
         loadRegFromAop (hc08_reg_a, leftOp, offset);
-      if (!mayskip || AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT || (byteOfVal (AOP (IC_RIGHT (ic))->aopu.aop_lit, offset) != 0x00) )
+      if (!mayskip || !aopIsLitVal (rightOp, offset, 1, 0x00))
         {
           accopWithAop (add, rightOp, offset);
           if (!size && maskedtopbyte)
@@ -6623,23 +6644,26 @@ genAnd (iCode * ic, iCode * ifx)
     }
   while (size--)
     {
-      bytemask = (lit >> (offset * 8)) & 0xff;
-
       if (earlystore && offset == 1)
         pullReg (hc08_reg_a);
-      if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
+      if (aopIsLitVal (left->aop, offset, 1, 0x00) || aopIsLitVal (right->aop, offset, 1, 0x00))
         {
           if (isOperandVolatile (left, false))
             {
               loadRegFromAop (hc08_reg_a, AOP (left), offset);
               hc08_freeReg (hc08_reg_a);
             }
+          if (isOperandVolatile (right, false))
+            {
+              loadRegFromAop (hc08_reg_a, AOP (left), offset);
+              hc08_freeReg (hc08_reg_a);
+            }
           storeConstToAop (0, AOP (result), offset);
         }
-      else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
-        {
-          transferAopAop (AOP (left), offset, AOP (result), offset);
-        }
+      else if (aopIsLitVal (right->aop, offset, 1, 0xff) && !isOperandVolatile (left, false))
+        transferAopAop (left->aop, offset, result->aop, offset);
+      else if (aopIsLitVal (left->aop, offset, 1, 0xff) && !isOperandVolatile (right, false))
+        transferAopAop (right->aop, offset, result->aop, offset);
       else
         {
           loadRegFromAop (hc08_reg_a, AOP (left), offset);
@@ -6808,11 +6832,9 @@ genOr (iCode * ic, iCode * ifx)
     }
   while (size--)
     {
-      bytemask = (lit >> (offset * 8)) & 0xff;
-
       if (earlystore && offset == 1)
         pullReg (hc08_reg_a);
-      if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
+      if (aopIsLitVal (right->aop, offset, 1, 0xff))
         {
           if (isOperandVolatile (left, false))
             {
@@ -6821,10 +6843,10 @@ genOr (iCode * ic, iCode * ifx)
             }
           transferAopAop (AOP (right), offset, AOP (result), offset);
         }
-      else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
-        {
-          transferAopAop (AOP (left), offset, AOP (result), offset);
-        }
+      else if (aopIsLitVal (right->aop, offset, 1, 0x00))
+        transferAopAop (left->aop, offset, result->aop, offset);
+      else if (aopIsLitVal (left->aop, offset, 1, 0x00))
+        transferAopAop (right->aop, offset, result->aop, offset);
       else
         {
           loadRegFromAop (hc08_reg_a, AOP (left), offset);
@@ -6940,7 +6962,8 @@ genXor (iCode * ic, iCode * ifx)
       if (earlystore && offset == 1)
         pullReg (hc08_reg_a);
       loadRegFromAop (hc08_reg_a, AOP (left), offset);
-      accopWithAop ("eor", AOP (right), offset);
+      if (!aopIsLitVal (right->aop, offset, 1, 0x00))
+        accopWithAop ("eor", right->aop, offset);
       storeRegToAop (hc08_reg_a, AOP (result), offset);
       if (AOP_TYPE (result) == AOP_REG && size && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
         {

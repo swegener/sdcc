@@ -209,6 +209,7 @@ struct optimize
     int codeSpeed;
     int codeSize;
     int lospre;
+    int genconstprop;
     int allow_unsafe_read;
     int noStdLibCall;
   };
@@ -391,12 +392,14 @@ enum {
   DUMP_LOOP,
   DUMP_LOOPG,
   DUMP_LOOPD,
+  DUMP_LOSPRE,
+  DUMP_GENCONSTPROP,
   DUMP_RANGE,
   DUMP_PACK,
   DUMP_RASSGN,
   DUMP_LRANGE,
-  DUMP_LOSPRE,
-  DUMP_CUSTOM /* For temporary dump points */
+  DUMP_CUSTOM0, // For temporary dump points
+  DUMP_CUSTOM1  // For temporary dump points
 };
 
 struct _dumpFiles {

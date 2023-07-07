@@ -731,7 +731,8 @@ found:
 extern operand *geniCodeRValue (operand *, bool);
 
 /* Insert a cast of operand op of ic to type type */
-static void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb)
+void
+prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb)
 {
   if (IS_OP_LITERAL (op))
     {
@@ -764,7 +765,8 @@ static void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb)
 }
 
 /* Insert a cast of result of ic from type type */
-static void appendCast (iCode *ic, sym_link *type, eBBlock *ebb)
+void
+appendCast (iCode *ic, sym_link *type, eBBlock *ebb)
 {
   iCode *newic = newiCode (CAST, operandFromLink (operandType (IC_RESULT (ic))), 0);
   hTabAddItem (&iCodehTab, newic->key, newic);
@@ -793,20 +795,33 @@ convilong (iCode *ic, eBBlock *ebp)
   if ((op == '*' || op == '/' || op == '%' || op == LEFT_OP || op == RIGHT_OP) &&
     (IS_BITINT (operandType (IC_LEFT (ic))) || IS_BITINT (operandType (IC_RIGHT (ic)))))
     {
-      // long multiplication is more efficient than long long, so use it if we can.
-      if (IS_BITINT (operandType (IC_LEFT (ic))) && SPEC_BITINTWIDTH (operandType (IC_LEFT (ic))) <= 32 &&
+      // Try 16x16->16
+      if (IS_BITINT (operandType (IC_LEFT (ic))) && SPEC_BITINTWIDTH (operandType (IC_LEFT (ic))) <= 16 &&
+        IS_BITINT (operandType (IC_RIGHT (ic))) && SPEC_BITINTWIDTH (operandType (IC_RIGHT (ic))) <= 16)
+        {
+          prependCast (ic, IC_LEFT (ic), newIntLink(), ebp);
+          if (op != LEFT_OP && op != RIGHT_OP)
+            prependCast (ic, IC_RIGHT (ic), newIntLink(), ebp);
+          appendCast (ic, newIntLink(), ebp);
+        }
+      // Try 32x32->32
+      else if (IS_BITINT (operandType (IC_LEFT (ic))) && SPEC_BITINTWIDTH (operandType (IC_LEFT (ic))) <= 32 &&
         IS_BITINT (operandType (IC_RIGHT (ic))) && SPEC_BITINTWIDTH (operandType (IC_RIGHT (ic))) <= 32)
         {
           prependCast (ic, IC_LEFT (ic), newLongLink(), ebp);
-          prependCast (ic, IC_RIGHT (ic), newLongLink(), ebp);
+          if (op != LEFT_OP && op != RIGHT_OP)
+            prependCast (ic, IC_RIGHT (ic), newLongLink(), ebp);
           appendCast (ic, newLongLink(), ebp);
         }
-      else
+      else // Fall back to 64x64->64.
         {
           prependCast (ic, IC_LEFT (ic), newLongLongLink(), ebp);
-          prependCast (ic, IC_RIGHT (ic), newLongLongLink(), ebp);
+          if (op != LEFT_OP && op != RIGHT_OP)
+            prependCast (ic, IC_RIGHT (ic), newLongLongLink(), ebp);
           appendCast (ic, newLongLongLink(), ebp);
         }
+      if ((op == '*' || op == '/' || op == '%') && port->hasNativeMulFor && port->hasNativeMulFor (ic, operandType (IC_LEFT (ic)), operandType (IC_RIGHT (ic)))) // Avoid introducing calls to non-existing support functions.
+        return;
     }
   
   symbol *func = NULL;
@@ -975,7 +990,7 @@ convilong (iCode *ic, eBBlock *ebp)
         }
     }
   werrorfl (filename, lineno, E_INVALID_OP, "mul/div/shift");
-  fprintf (stderr, "op %d\n", op);
+  fprintf (stderr, "ic %d op %d leftType: ", ic->key, op); printTypeChain (stderr, leftType); fprintf (stderr, "\n");
   return;
 found:
   // Update left and right - they might have changed due to inserted casts.
@@ -1180,7 +1195,7 @@ convert:
   /* Reverse parameters. */
   for (icc = ic; icc->op != CALL; icc = icc->next)
     {
-      if(icc->next->op != CALL)
+      if (icc->next->op != CALL)
         icc->prev = icc->next;
       else
         icc->prev = icp;
@@ -1193,7 +1208,7 @@ convert:
     }
   for(; icc != icp; ico = icc, icc = icc->prev)
     {
-      if(icc->op != CALL)
+      if (icc->op != CALL)
         icc->next = ico;
     }
 }
@@ -2040,6 +2055,7 @@ killDeadCode (ebbIndex * ebbi)
                     {
                       if (SPIL_LOC (IC_RESULT (ic)))
                         {
+                          bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
                           IC_RESULT (ic) = newiTempFromOp (IC_RESULT (ic));
                           SPIL_LOC (IC_RESULT (ic)) = NULL;
                         }
@@ -2357,105 +2373,6 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             }
         }
     }
-
-  /* long and long long multiplications where operands are unsigned char due to bitwise and */
-  for (i = 0; i < count; i++)
-    for (ic = ebbs[i]->sch; ic; ic = ic->next)
-      if (ic->op == '*' && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
-        {
-          operand *left = IC_LEFT (ic);
-          operand *right = IC_RIGHT (ic);
-          sym_link *resulttype = operandType (IC_RESULT (ic));
-
-          if (!IS_INTEGRAL (resulttype) || bitsForType (resulttype) <= 16 ||
-              !(IS_ITEMP (left) || IS_OP_LITERAL (left)) ||
-              !(IS_ITEMP (right) || IS_OP_LITERAL (right)))
-            {
-              continue;
-            }
-
-          if (IS_ITEMP (left) && bitVectnBitsOn (OP_DEFS (left)) != 1 ||
-              IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
-            {
-              continue;
-            }
-
-          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
-          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
-
-          if (lic)
-            {
-              if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
-                continue;
-
-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
-
-              if (litval > 0x7f)
-                continue;
-            }
-          else if (operandLitValue (left) > 0x7f)
-            continue;
-
-          if (ric)
-            {
-              if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
-                continue;
-
-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
-
-              if (litval > 0x7f)
-                continue;
-            }
-          else if (operandLitValue (right) > 0x7f)
-            {
-              continue;
-            }
-
-          // Now replace the wide multiplication by 8x8->16 multiplication and insert casts.
-
-          if (lic)
-            {
-              newic = newiCode (CAST, operandFromLink (newCharLink()), left);
-              hTabAddItem (&iCodehTab, newic->key, newic);
-              IC_RESULT (newic) = newiTempOperand (newCharLink(), 0);
-              IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
-              bitVectUnSetBit (OP_USES (left), ic->key);
-              bitVectSetBit (OP_USES (left), newic->key);
-              OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-              OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
-              newic->filename = ic->filename;
-              newic->lineno = ic->lineno;
-              addiCodeToeBBlock (ebbs[i], newic, ic);
-            }
-          else
-            {
-              IC_LEFT (ic) = operandFromValue (valCastLiteral (newCharLink(), operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))), false);
-            }
-
-          if (ric)
-            {
-              newic = newiCode (CAST, operandFromLink (newCharLink()), right);
-              hTabAddItem (&iCodehTab, newic->key, newic);
-              IC_RESULT (newic) = newiTempOperand (newCharLink(), 0);
-              IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
-              bitVectUnSetBit (OP_USES (right), ic->key);
-              bitVectSetBit (OP_USES (right), newic->key);
-              OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-              OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
-              newic->filename = ic->filename;
-              newic->lineno = ic->lineno;
-              addiCodeToeBBlock (ebbs[i], newic, ic);
-            }
-          else
-            {
-              IC_LEFT (ic) = operandFromValue (valCastLiteral (newCharLink(), operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))), false);
-            }
-
-          // Insert cast on result
-          nextresulttype = newIntLink();
-          SPEC_USIGN (nextresulttype) = 1;
-          appendCast(ic, nextresulttype, ebbs[i]);
-        }
 
   // Operation followed by cast
   for (i = 0; i < count; i++)
@@ -2859,7 +2776,7 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
               if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
                  continue;
-              /* Similarly for singed->unsigned->signed widening casts to ensure that negative values end up as nonnegative ones in the end. */
+              /* Similarly for signed->unsigned->signed widening casts to ensure that negative values end up as nonnegative ones in the end. */
               if (!SPEC_USIGN (type1) && SPEC_USIGN (type2) && !SPEC_USIGN (type3) && bitsForType (type3) > bitsForType (type2))
                 continue;
 
@@ -3173,7 +3090,7 @@ narrowRead (iCode *ic, operand **opp, eBBlock *ebp)
 }
 
 /*-----------------------------------------------------------------*/
-/* narrowRead() - Will read fewer bytes by eliminating downcasts.  */
+/* narrowReads() - Will read fewer bytes by eliminating downcasts. */
 /*-----------------------------------------------------------------*/
 static void
 narrowReads(ebbIndex *ebbi)
@@ -3361,13 +3278,30 @@ eBBlockFromiCode (iCode *ic)
 
   offsetFoldGet (ebbi->bbOrder, ebbi->count);
 
-  /* lospre */
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
-  computeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
+  computeLiveRanges (ebbi->bbOrder, ebbi->count, true);
+
+  // Generalized constant propagation - do it here a first time before the first call to computeLiveRanges to ensure uninitalized variables are still recognized as such.
+  if (optimize.genconstprop)
+    {
+      ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+      recomputeValinfos (ic, ebbi, "_0");
+      optimizeValinfo (ic);
+      freeeBBlockData (ebbi);
+      ebbi = iCodeBreakDown (ic);
+      computeControlFlow (ebbi);
+      loops = createLoopRegions (ebbi);
+      computeDataFlow (ebbi);
+    }
+
+  // lospre
+  recomputeLiveRanges (ebbi->bbOrder, ebbi->count, false);
   while (optimizeOpWidth (ebbi->bbOrder, ebbi->count))
     optimizeCastCast (ebbi->bbOrder, ebbi->count);
+  recomputeLiveRanges (ebbi->bbOrder, ebbi->count, false); // Recompute again before killing dead code, since dead code elimination needs updated ic->seq - the old ones might have been invalidated in optimizeOpWidth above.
+  killDeadCode (ebbi); // Ensure lospre doesn't resurrect dead code.
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
   shortenLiveRanges (ic, ebbi);
@@ -3384,7 +3318,7 @@ eBBlockFromiCode (iCode *ic)
       computeControlFlow (ebbi);
       loops = createLoopRegions (ebbi);
       computeDataFlow (ebbi);
-      recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
+      recomputeLiveRanges (ebbi->bbOrder, ebbi->count, false);
       adjustIChain (ebbi->bbOrder, ebbi->count);
       ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
       separateLiveRanges (ic, ebbi);
@@ -3398,9 +3332,7 @@ eBBlockFromiCode (iCode *ic)
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
-
   killDeadCode (ebbi);
-
   offsetFoldUse (ebbi->bbOrder, ebbi->count);
   killDeadCode (ebbi);
 
@@ -3458,16 +3390,37 @@ eBBlockFromiCode (iCode *ic)
      this at this point since I want all the
      operations to be as they are for optimizations */
   convertToFcall (ebbi->bbOrder, ebbi->count);
+  adjustIChain (ebbi->bbOrder, ebbi->count); // Fix ebb->sch pointers potentially messed up by convertToFcall.
 
   /* miscellaneous optimizations */
   miscOpt (ebbi->bbOrder, ebbi->count);
+
+  // Generalized constant propagation - second time.
+  if (optimize.genconstprop)
+    {
+      computeControlFlow (ebbi);
+      loops = createLoopRegions (ebbi);
+      computeDataFlow (ebbi);
+      recomputeLiveRanges (ebbi->bbOrder, ebbi->count, false);
+      ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+      recomputeValinfos (ic, ebbi, "_1");
+      optimizeValinfo (ic);
+      freeeBBlockData (ebbi);
+      ebbi = iCodeBreakDown (ic);
+      computeControlFlow (ebbi);
+      loops = createLoopRegions (ebbi);
+      computeDataFlow (ebbi);
+      killDeadCode (ebbi);
+      if (options.dump_i_code)
+        dumpEbbsToFileExt (DUMP_GENCONSTPROP, ebbi);
+    }
 
   /* Split any live-ranges that became non-connected in dead code elimination. */
   change = 0;
   do
   {
-    recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
     adjustIChain (ebbi->bbOrder, ebbi->count);
+    recomputeLiveRanges (ebbi->bbOrder, ebbi->count, false);
     ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
     change = separateLiveRanges (ic, ebbi);
     removeRedundantTemps (ic); // Remove some now-redundant leftovers iTemps that can confuse later optimizations.
@@ -3476,12 +3429,12 @@ eBBlockFromiCode (iCode *ic)
     computeControlFlow (ebbi);
     loops = createLoopRegions (ebbi);
     computeDataFlow (ebbi);
+    killDeadCode (ebbi); /* iCodeLabelOptimize() above might result in dead code, when both branches of an ifx go to the same destination. */
   }
   while (change);
-  killDeadCode (ebbi); /* iCodeLabelOptimize() above might result in dead code, when both branches of an ifx go to the same destination. */
 
   /* compute the live ranges */
-  recomputeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
+  recomputeLiveRanges (ebbi->bbOrder, ebbi->count, true);
 
   if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_RANGE, ebbi);

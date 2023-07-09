@@ -422,11 +422,10 @@ DEFSETFUNC (findCheaperOp)
           return 0;
         }
 
+      *opp = operandFromOperand (*opp);
+
       if ((*opp)->isaddr != cop->isaddr && IS_ITEMP (cop))
-        {
-          *opp = operandFromOperand (*opp);
-          (*opp)->isaddr = cop->isaddr;
-        }
+        (*opp)->isaddr = cop->isaddr;
 
       /* copy signedness to literal operands */
       if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp))
@@ -446,7 +445,6 @@ DEFSETFUNC (findCheaperOp)
               SPEC_NOUN(operandType(*opp)) == V_CHAR &&
               SPEC_NOUN(operandType(cop)) == V_INT)
             {
-              *opp = operandFromOperand (*opp);
               SPEC_NOUN(operandType(*opp)) = V_INT;
             }
           else

@@ -5,6 +5,8 @@
 	  Fix bug #3611 via patch by bbbbbr.
 	* src/SDCCgenconstprop.cc:
 	  Use (CHAR_BIT * sizeof (unsigned long long)) when C2X ULLONG_WIDTH is not available.
+	* src/SDCCcse.c:
+	  Fix bug #3612.
 
 2023-07-07 Philipp Klaus Krause <philipp@colecovision.eu>
 

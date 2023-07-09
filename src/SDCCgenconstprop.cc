@@ -1121,6 +1121,9 @@ reTypeOp (operand *op, sym_link *newtype)
 }
 
 // todo: Remove this, use stdc_bit_width instead once we can assume C2X support on host compiler
+#ifndef ULLONG_WIDTH // Also a C2X feature
+#define ULLONG_WIDTH (CHAR_BITS * sizeof (unsigned long long))
+#endif
 unsigned int my_stdc_bit_width (unsigned long long value)
 {
   unsigned int width = 0;

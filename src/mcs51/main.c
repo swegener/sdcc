@@ -350,15 +350,17 @@ hasExtBitOp (int op, sym_link *left, int right)
     case GETWORD:
       return true;
     case ROT:
-      unsigned int lbits = bitsForType (left);
-      if (lbits % 8)
-        return false;
-      if (lbits == 8)
-        return true;
-      if (lbits <= 16 && (right % lbits  == 1 || right % lbits == lbits - 1))
-        return true;
-      if (lbits <= 16 && lbits == right * 2)
-        return true;
+      {
+        unsigned int lbits = bitsForType (left);
+        if (lbits % 8)
+          return false;
+        if (lbits == 8)
+          return true;
+        if (lbits <= 16 && (right % lbits  == 1 || right % lbits == lbits - 1))
+          return true;
+        if (lbits <= 16 && lbits == right * 2)
+          return true;
+      }
       return false;
     }
   return false;

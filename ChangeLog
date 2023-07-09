@@ -1,4 +1,10 @@
-2023-07-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2023-07-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCicode.c,
+	  src/*/main.c:
+	  Fix bug #3611 via patch by bbbbbr.
+
+2023-07-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* Merge genconstprop branch to trunk.
 

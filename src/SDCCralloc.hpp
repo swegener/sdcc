@@ -133,7 +133,7 @@ typedef std::vector<var_t> varset_t; // Faster than std::set,  std::tr1::unorder
 
 typedef boost::container::flat_map<int, float> icosts_t; // Faster than std::map and stx::btree_map here.
 
-typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here .
+typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here.
 typedef boost::container::flat_set<var_t> cfg_dying_t; // Faster than stx::btree_set and std::set here.
 
 struct assignment

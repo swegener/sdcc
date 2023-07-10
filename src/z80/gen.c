@@ -13705,7 +13705,7 @@ genPointerGet (const iCode *ic)
               spillPair (pair);
               goto release;
             }
-          else if (l >= 0 && h >= 0)    // Two bytes of result somewehere in hl. Assign it last and use a for caching.
+          else if (l >= 0 && h >= 0)    // Two bytes of result somewehere in hl. Assign them last and use a for caching.
             {
               while (offset < size)
                 {
@@ -13744,8 +13744,8 @@ genPointerGet (const iCode *ic)
                   emit2 ("dec %s", _pairs[pair].name);
                   regalloc_dry_run_cost += 1;
                 }
-              if ((surviving_a || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < r) && !pushed_a)
-                _push (PAIR_AF), pushed_a = TRUE;
+              if ((surviving_a || result->aop->regs[A_IDX] >= 0) && !pushed_a)
+                _push (PAIR_AF), pushed_a = true;
               _moveFrom_tpair_ (ASMOP_A, 0, pair);
 
               r = (l < h ? l : h);

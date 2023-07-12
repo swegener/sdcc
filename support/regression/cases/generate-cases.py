@@ -169,9 +169,7 @@ class InstanceGenerator:
         createdir(outdir)
 
         # Generate
-        sortedkeys = self.replacements.keys()
-        sortedkeys.sort()
-        self.permute(self.basename, list(sortedkeys))
+        self.permute(self.basename, list(self.replacements.keys()))
 
         # Remove the temporary file
         os.remove(self.tmpname)

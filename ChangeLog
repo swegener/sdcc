@@ -2,6 +2,8 @@
 
 	* support/regression/tests/_minimal.c:
 	  Fix an accidentially comitted debug line.
+	* src/stm8/gen.c:
+	  Fix bug #3615 for stm8.
 
 2023-07-10 Philipp Klaus Krause <philipp@colecovision.eu>
 

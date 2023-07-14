@@ -1,5 +1,10 @@
 2023-07-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/pdk/gen.c:
+	  Fix bug #3615 for pdk15.
+
+2023-07-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* support/regression/tests/_minimal.c:
 	  Fix an accidentially comitted debug line.
 	* src/stm8/gen.c:
@@ -38,7 +43,7 @@
 2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c:
-	  Fix a compiler crash due to operation narrowing invaldiating iCode seuqence numbers.
+	  Fix a compiler crash due to operation narrowing invalidating iCode sequence numbers.
 
 2023-07-03 Philipp Klaus Krause <philipp@colecovision.eu>
 

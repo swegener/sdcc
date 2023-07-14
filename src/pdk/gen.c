@@ -1573,7 +1573,6 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cheapMove (ASMOP_A, 0, left_aop, i, true, false, !started);
           emit2 (started ? "subc" : "sub", "a, p");
           started = true;
-          continue;
         }
       else if (!started && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00))
         {

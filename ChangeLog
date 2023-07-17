@@ -1,5 +1,10 @@
 2023-07-17 Felix Salfelder <felix AT salfelder.org>
 
+	* support/regression/cases/generate-cases.py:
+	  Fix bug #3614.
+
+2023-07-17 Felix Salfelder <felix AT salfelder.org>
+
 	* support/regression/Makefile.in,
 	  support/regression/compact-results.py:
 	  Fix bug #3613.

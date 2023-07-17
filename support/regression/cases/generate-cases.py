@@ -46,7 +46,7 @@ class InstanceGenerator:
         self.inname = inname
         # Initalise the replacements hash.
         # Map of name to values.
-        self.replacements = { }
+        self.replacements = []
         # Initalise the function list hash.
         self.functions = []
         # Emit the suite wrapper into a temporary file
@@ -56,14 +56,14 @@ class InstanceGenerator:
         if self.ext == ".in":
             (self.basename, self.ext) = os.path.splitext (self.filename[:-3])
 
-    def permute(self, basename, keys, trans = {}):
+    def permute(self, basename, repl, trans = {}):
         """Permutes across all of the names.  For each value, recursively creates
         a mangled form of the name, this value, and all the combinations of
         the remaining values.  At the tail of the recursion when one full
         combination is built, generates an instance of the test case from
         the template."""
         basepath = os.path.join(outdir, basename)
-        if len(keys) == 0:
+        if len(repl) == 0:
             # End of the recursion.
             # Set the runtime substitutions.
             trans['testcase'] = re.sub(r'\\', r'\\\\', basename)
@@ -73,18 +73,18 @@ class InstanceGenerator:
             T.write(basepath + self.ext)
         else:
             # Pull off this key, then recursively iterate through the rest.
-            key = keys[0]
-            for part in self.replacements[key]:
+            key = repl[0][0]
+            for part in repl[0][1]:
                 trans[key] = part
                 # Turn a empty string into something decent for a filename
                 if not part:
                     part = 'none'
                 # Remove any bad characters from the filename.
                 part = re.sub(r'\s+', r'_', part)
-                # The slice operator (keys[1:]) creates a copy of the list missing the
+                # The slice operator (_[1:]) creates a copy of the list missing the
                 # first element.
                 # Can't use '-' as a seperator due to the mcs51 assembler.
-                self.permute(basename + '_' + key + '_' + part, keys[1:], trans)
+                self.permute(basename + '_' + key + '_' + part, repl[1:], trans)
 
     def writetemplate(self):
         """Given a template file and a temporary name writes out a verbatim copy
@@ -145,7 +145,7 @@ class InstanceGenerator:
                     # Trim all the values
                     values = [value.strip() for value in values]
                     
-                    self.replacements[name] = values
+                    self.replacements.append((name, values))
                 elif re.search(r'\*/', line) != None:
                     # Hit the end of the comments
                     inheader = 0;
@@ -169,7 +169,7 @@ class InstanceGenerator:
         createdir(outdir)
 
         # Generate
-        self.permute(self.basename, list(self.replacements.keys()))
+        self.permute(self.basename, self.replacements)
 
         # Remove the temporary file
         os.remove(self.tmpname)

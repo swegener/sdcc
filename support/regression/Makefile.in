@@ -284,6 +284,7 @@ $(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
 	@# BUG: need "Running" in .out, regardless of whether we run anything.
 	@echo --- Running: $< > $@;
 
+	@# BUG: does not respect --dry-run
 	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
 	  ${M_V_echo} "$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@"; \
 	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@; \
@@ -340,8 +341,7 @@ $(PORT_RESULTS_DIR)/%.out: $(CASES_DIR)/%/stamp
 
 $(PORT_RESULTS_DIR)/%.log: $(PORT_RESULTS_DIR)/%.out
 	@# compact-results prints the stats. Do once per test.
-	${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $< #1
-	touch $@
+	${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $< | tee $@
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.

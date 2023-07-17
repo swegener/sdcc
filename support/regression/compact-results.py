@@ -13,7 +13,7 @@ def number_from_string(str_value):
     return int(str_value.replace("0x", "").replace("x", ""), 16);
   else:
     return int(str_value)
-    
+
 def running_name_valid(name):
   if (name != "") and (name.find(" ") == -1) and ((name.find("/") != -1) or re.match(r'^(.*).c$', name)):
     return True
@@ -40,14 +40,12 @@ if len(sys.argv) > 1:
 
 # Create lines not present in simulation log
 if not summary_found:
-    fp = open(sys.argv[1], "w")
-    fp.write("- Added by compact-results script: %s\n" % sys.argv[1])    
+    print("- Added by compact-results script: %s\n" % sys.argv[1])
     m = re.match(r'^(.*).out', outname)
     if (m):
       outname = m.group(1)
-    fp.write("--- Running: %s\n" % outname)
-    fp.write("--- Summary: 1/0/0: 1 failed of 0 tests in 0 cases.\n")  
-    fp.close()
+    print("--- Running: %s\n" % outname)
+    print("--- Summary: 1/0/0: 1 failed of 0 tests in 0 cases.\n")
 
 # Init the running totals
 failures = 0 if summary_found else 1
@@ -70,20 +68,20 @@ for line in lines:
         stripped_name = m.group(1).strip()
         if running_name_valid(stripped_name):
           name = stripped_name
-        
+
     # In case the test program crashes before the "--- Running" message
     m = re.match(r'^[0-9]+ words read from (.*).ihx', line)
     if (m):
         name = m.group(1)
-        
+
     safe_name = name if name != "" else outname
-        
+
     # Get base name from name
     base = safe_name 
     m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', base)
     if (m):
         base = m.group(3)
-  
+
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
@@ -92,7 +90,7 @@ for line in lines:
               (summary, data) = re.split(r':', line)
             else:
               (summary, data, rest) = re.split(r':', line)
-            
+
             (nfailures, ntests, ncases) = re.split(r'/', data)
             tests = tests + number_from_string(ntests)
             cases = cases + number_from_string(ncases)
@@ -118,12 +116,12 @@ for line in lines:
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):
         invalid += 1;
         print("Invalid instruction: %s" % safe_name)
-        
+
     # Stop at 0xXXXXXX: (103) Stack overflow
     if (re.search(r'Stack overflow', line)):
         stack_overflow += 1
         print("Stack overflow: %s" % safe_name)
-    
+
 
 print("%-35.35s" % sys.argv[1], end=' ')
 

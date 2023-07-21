@@ -2800,8 +2800,21 @@ In 4.2.9, support for –pedantic-parse-number and #pragma pedantic_parse_numer
 \end_layout
 
 \begin_layout Itemize
-In 4.2.9 support for arguments to -MMD was dropped.
- The output fiel can be specified via -MF instead.
+In 4.2.9, support for #pragma sdcc_hash was dropped, necessitating a wrapper
+ macro for literal 
+\begin_inset Quotes sld
+\end_inset
+
+#
+\begin_inset Quotes srd
+\end_inset
+
+ characters in macro bodies.
+\end_layout
+
+\begin_layout Itemize
+In 4.2.9, support for arguments to -MMD was dropped.
+ The output file can be specified via -MF instead.
 \end_layout
 
 \begin_layout Itemize
@@ -37747,7 +37760,17 @@ hash
 
 \end_inset
 
- (+ | -) - Allow "naked" hash in macro definition, for example:
+ (+ | -) - 
+\begin_inset Flex Emph
+status open
+
+\begin_layout Plain Layout
+Until SDCC 4.2.8:
+\end_layout
+
+\end_inset
+
+ Allow "naked" hash in macro definition, for example:
 \begin_inset Newline newline
 \end_inset
 

@@ -1,3 +1,8 @@
+2023-07-21 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Update documentation of pragma sdcc_hash.
+
 2023-07-17 Felix Salfelder <felix AT salfelder.org>
 
 	* support/regression/cases/generate-cases.py:

@@ -53,7 +53,7 @@ _gptrput (char *gptr, char c) __naked
         jb      _B_7,codeptr$        ; >0x80 code       ; 3
         jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     dph,r0 ; save r0 independent of regbank ; 2
         mov     r0,dpl ; use only low order address     ; 2
 
         jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
@@ -63,7 +63,7 @@ _gptrput (char *gptr, char c) __naked
         mov     @r0,a                                   ; 1
  dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
+        mov     dph,#0 ; restore dph                    ; 3
         ret                                             ; 1
     ;
     ;   cannot store into code space, lock up
@@ -86,7 +86,7 @@ _gptrput (char *gptr, char c) __naked
         ret                                             ; 1
 
                                                         ;===
-                                                        ;29 bytes
+                                                        ;30 bytes
     __endasm;
 }
 
@@ -107,14 +107,12 @@ _gptrput (char *gptr, char c) __naked
         mov     b,dph                                   ; 3
         jb      _B_7,codeptr$        ; >0x80 code       ; 3
         jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
-
-        mov     b,r0   ; save r0 independant of regbank ; 2
-        mov     r0,dpl ; use only low order address     ; 2
-
         jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
     ;
     ;   store into near/idata space
     ;
+        mov     b,r0   ; save r0 independent of regbank ; 2
+        mov     r0,dpl ; use only low order address     ; 2
         mov     @r0,a                                   ; 1
  dataptrrestore$:
         mov     r0,b   ; restore r0                     ; 2
@@ -128,6 +126,8 @@ _gptrput (char *gptr, char c) __naked
     ;   store into external stack/pdata space
     ;
  pdataptr$:
+        mov     b,r0   ; save r0 independent of regbank ; 2
+        mov     r0,dpl ; use only low order address     ; 2
         movx    @r0,a                                   ; 1
         sjmp    dataptrrestore$                         ; 2
     ;
@@ -138,7 +138,7 @@ _gptrput (char *gptr, char c) __naked
         movx    @dptr,a                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;27 bytes
+                                                        ;31 bytes
     __endasm;
 }
 
@@ -159,7 +159,7 @@ _gptrput (char *gptr, char c) __naked
         jb      _B_7,codeptr$        ; >0x80 code       ; 3
         jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     dph,r0 ; save r0 independent of regbank ; 2
         mov     r0,dpl ; use only low order address     ; 2
 
         jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
@@ -169,7 +169,7 @@ _gptrput (char *gptr, char c) __naked
         mov     @r0,a                                   ; 1
  dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
+        mov     dph,#0 ; restore dph                    ; 3
         ret                                             ; 1
     ;
     ;   cannot store into code space, lock up
@@ -190,7 +190,7 @@ _gptrput (char *gptr, char c) __naked
         ret                                             ; 1
 
                                                         ;===
-                                                        ;26 bytes
+                                                        ;27 bytes
     __endasm;
 }
 
@@ -213,7 +213,7 @@ _gptrputWord (int *gptr, int w) __naked
         jb      _B_7,codeptr_w$       ; >0x80 code
         jnb     _B_6,xdataptr_w$      ; <0x40 far
 
-        mov     dph,r0 ; save r0 independant of regbank
+        mov     dph,r0 ; save r0 independent of regbank
         mov     r0,dpl ; use only low order address
 
         jb      _B_5,pdataptr_w$      ; >0x60 pdata

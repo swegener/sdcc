@@ -55,7 +55,7 @@ _gptrget (char *gptr) __naked
         jb      _B_7,codeptr$        ; >0x80 code       ; 3
         jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     dph,r0 ; save r0 independent of regbank ; 2
         mov     r0,dpl ; use only low order address     ; 2
 
         jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
@@ -65,7 +65,7 @@ _gptrget (char *gptr) __naked
         mov     a,@r0                                   ; 1
  dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
+        mov     dph,#0 ; restore dph                    ; 3
         ret                                             ; 1
     ;
     ;   pointer to external stack or pdata
@@ -99,7 +99,7 @@ _gptrget (char *gptr) __naked
         movx    a,@dptr                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;44 bytes
+                                                        ;45 bytes
      __endasm;
 }
 
@@ -117,14 +117,14 @@ _gptrget (char *gptr) __naked
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
-        mov     b,dph                                   ; 3
-        jb      _B_7,codeptr$        ; >0x80 code       ; 3
-        jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
+        mov     a,dph                                   ; 2
+        jb      acc[7],codeptr$      ; >0x80 code       ; 3
+        jnb     acc[6],xdataptr$     ; <0x40 far        ; 3
 
-        mov     b,r0   ; save r0 independant of regbank ; 2
+        mov     b,r0   ; save r0 independent of regbank ; 2
         mov     r0,dpl ; use only low order address     ; 2
 
-        jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
+        jb      acc[5],pdataptr$     ; >0x60 pdata      ; 3
     ;
     ;   Pointer to data space
     ;
@@ -157,7 +157,7 @@ _gptrget (char *gptr) __naked
         movx    a,@dptr                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;35 bytes
+                                                        ;34 bytes
      __endasm;
 }
 
@@ -178,7 +178,7 @@ _gptrget (char *gptr) __naked
         jb      _B_7,codeptr$        ; >0x80 code       ; 3
         jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     dph,r0 ; save r0 independent of regbank ; 2
         mov     r0,dpl ; use only low order address     ; 2
 
         jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
@@ -188,7 +188,7 @@ _gptrget (char *gptr) __naked
         mov     a,@r0                                   ; 1
  dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
+        mov     dph,#0 ; restore dph                    ; 3
         ret                                             ; 1
     ;
     ;   pointer to xternal stack or pdata
@@ -210,7 +210,7 @@ _gptrget (char *gptr) __naked
         movx    a,@dptr                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;27 bytes
+                                                        ;28 bytes
      __endasm;
 }
 
@@ -232,7 +232,7 @@ _gptrgetWord (unsigned *gptr)
         jb      _B_7,00003$           ; >0x80 code
         jnb     _B_6,00002$           ; <0x40 far
 
-        mov     dph,r0 ; save r0 independant of regbank
+        mov     dph,r0 ; save r0 independent of regbank
         mov     r0,dpl ; use only low order address
 
         jb      _B_5,00004$           ; >0x60 pdata

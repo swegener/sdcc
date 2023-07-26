@@ -1,3 +1,10 @@
+2023-07-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* _gptrget.c,
+	* _gptrgetc.c,
+	* _gptrput.c: applied patch #464, Thanks Konstantin Kim
+	    also fixed/improved non-active SDCC_MODEL_MEDIUM variants of this lib
+
 2023-07-21 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx:

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -48,7 +48,7 @@ _gptrgetc (char *gptr) __naked
     	jb		_B_7,codeptr$        ; >0x80 code		; 3
     	jnb		_B_6,xdataptr$       ; <0x40 far		; 3
 
-        mov     dph,r0 ; save r0 independant of regbank	; 2
+        mov     dph,r0 ; save r0 independent of regbank	; 2
         mov     r0,dpl ; use only low order address		; 2
 
     	jb		_B_5,pdataptr$       ; >0x60 pdata		; 3

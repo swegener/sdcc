@@ -58,8 +58,8 @@ MB3CR		.equ	0x17 ; Memory Bank 3 Control Register
 	ioi
 	ld	(MB2CR), a;
 
-	; Configure logical address space. 32 KB root segment followed by 8 KB data segment, 16 KB stack segement, 8 KB xpc segment.
-	; By default, SDCC will use the root segment for code and constant data, stack segment for data (including stack). data segment and xpc segement are then unused.
+	; Configure logical address space. 32 KB root segment followed by 8 KB data segment, 16 KB stack segment, 8 KB xpc segment.
+	; By default, SDCC will use the root segment for code and constant data, stack segment for data (including stack). data segment and xpc segment are then unused.
 	ld	a, #0xa8	; 16 KB stack segment at 0xa000, 8 KB data segment at 0x8000
 	ioi
 	ld	(SEGSIZE), a

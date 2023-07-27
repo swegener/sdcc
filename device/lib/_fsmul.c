@@ -88,7 +88,7 @@ ___fsmul:
 00007$:
 	mov	exp_a, a
 
-	// now we need to multipy r4/r3/r2 * r7/r6/r5
+	// now we need to multiply r4/r3/r2 * r7/r6/r5
 	// ------------------------------------------
 	//	                        r2 * r5		<< 0
 	//	            r3 * r5  +  r2 * r6		<< 8

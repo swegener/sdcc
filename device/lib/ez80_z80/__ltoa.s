@@ -96,7 +96,7 @@ ___ultoa_dehl:
 	cp	a, #10		;most popular radix
 	jr	NZ, 110$
 ;
-;-------- decimal convertion
+;-------- decimal conversion
 ;this algorithm is 20% faster than generic one
 ;
 	ld	c, l

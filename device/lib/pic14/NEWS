@@ -1,10 +1,10 @@
 --- 2011-11-01  Raphael Neider
 
-To accomodate for devices with enhanced cores, there are now
+To accommodate for devices with enhanced cores, there are now
 two variants of libm and libsdcc:
-Applications targetting regular, non-enhanced devices should
+Applications targeting regular, non-enhanced devices should
 link with libm.lib and libsdcc.lib (no change).
-Applications that target enhaned devices should link with
+Applications that target enhanced devices should link with
 libme.lib and libsdcce.lib instead. When the linker is
 invoked via sdcc, the proper libsdcc{,e}.lib will be chosen
 automatically -- no such mechanism has been established for
@@ -39,7 +39,7 @@ BANKSEL directives, i.e. updates to the IRP bit).
 The pic14 library is split into several parts:
 
 * common part
-  The common part reuses the (hardware independant) sources found 
+  The common part reuses the (hardware independent) sources found 
   under device/lib/ (currently not used).
 * pic14 specific part
   The pic14 specific library routines are found in subdirectories of

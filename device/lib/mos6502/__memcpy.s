@@ -38,7 +38,7 @@
 	.globl ___memcpy
 
 ;--------------------------------------------------------
-; overlayable function paramters in zero page
+; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
 ___memcpy_PARM_2:

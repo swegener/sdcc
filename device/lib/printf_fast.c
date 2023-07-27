@@ -90,7 +90,7 @@
 //#define DO_NOT_TRIM_TRAILING_ZEROS
 
 // Omit saving and restoring registers when calling putchar().  If you
-// are desparate for a little more code space, this will give you a
+// are desperate for a little more code space, this will give you a
 // small savings.  You MUST define putchar() with #pragma callee_saves,
 // or implement it in assembly and avoid changing the registers.
 //#define PUTCHAR_CALLEE_SAVES
@@ -321,7 +321,7 @@ printf_str_loop:
 	lcall	printf_putchar
 	sjmp	printf_str_loop
 printf_str_done:
-	pop	dpl		// restore addr withing fmt
+	pop	dpl		// restore addr within fmt
 	pop	dph
 	ljmp	printf_main_loop
 

@@ -392,7 +392,7 @@ output_float (float f, unsigned char reqWidth,
     OUTPUT_CHAR (fpBuffer[i], p);
   } while (i--);
 
-  // ouput the decimal part
+  // output the decimal part
   if (reqDecimals)
   {
     OUTPUT_CHAR ('.', p);

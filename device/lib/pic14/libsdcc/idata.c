@@ -58,7 +58,7 @@ typedef struct {
  */
 extern __code struct {
     unsigned	records;    // number of entries in this file
-    cinit_t	entry[];    // intialization descriptor
+    cinit_t	entry[];    // initialization descriptor
 } cinit;
 
 /*

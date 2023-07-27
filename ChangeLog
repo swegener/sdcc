@@ -1,3 +1,8 @@
+2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib:
+	  Spelling fixes, patch #465 by Konstantin Kim.
+
 2023-07-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* _gptrget.c,

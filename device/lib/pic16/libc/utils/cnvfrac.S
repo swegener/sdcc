@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  cnvfrac.S - convertion routine of 24 bits floating point to ASCII
+;  cnvfrac.S - conversion routine of 24 bits floating point to ASCII
 ;
 ;  Copyright (C) 2004, Vangelis Rokas <vrokas at otenet.gr>
 ;
@@ -1405,7 +1405,7 @@ _convert_frac:
 
 	end
 
-; Converstion table
+; Conversion table
 ;
 ;00	0.5000000000000000000000000	5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 ;01	0.2500000000000000000000000	2 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 

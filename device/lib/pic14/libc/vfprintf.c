@@ -212,7 +212,7 @@ vfprintf (FILE *stream, const char *fmt, va_list ap)
 #endif
 
 #ifdef PRECISION
-  unsigned char precision;  // precission width in number of characters
+  unsigned char precision;  // precision width in number of characters
 #endif
 
   const char *cstr;

@@ -109,7 +109,7 @@ if test "$depmode" = msvc7msys; then
 fi
 
 if test "$depmode" = xlc; then
-   # IBM C/C++ Compilers xlc/xlC can output gcc-like dependency informations.
+   # IBM C/C++ Compilers xlc/xlC can output gcc-like dependency information.
    gccflag=-qmakedep=gcc,-MF
    depmode=gcc
 fi

@@ -36,7 +36,7 @@
 	.globl _strcmp
 
 ;--------------------------------------------------------
-; overlayable function paramters in zero page
+; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
 _strcmp_PARM_2:

@@ -37,7 +37,7 @@ static unsigned char __xdata stx_buffer[0x100];
 static unsigned char __xdata srx_buffer[0x100];
 
 static __bit work_flag_byte_arrived;
-static __bit work_flag_buffer_transfered;
+static __bit work_flag_buffer_transferred;
 static __bit tx_serial_buffer_empty;
 static __bit rx_serial_buffer_empty;
 
@@ -56,7 +56,7 @@ void serial_init(void)
     
     stx_index_in = srx_index_in = stx_index_out = srx_index_out = 0;
     rx_serial_buffer_empty = tx_serial_buffer_empty = 1;
-    work_flag_buffer_transfered = 0;
+    work_flag_buffer_transferred = 0;
     work_flag_byte_arrived = 0;
     ES=1;
 }
@@ -77,7 +77,7 @@ void serial_interrupt_handler(void) __interrupt (4) __using (1)
 	    if (stx_index_out == stx_index_in )
 		{
 		    tx_serial_buffer_empty = 1;
-		    work_flag_buffer_transfered = 1;
+		    work_flag_buffer_transferred = 1;
 		}
 	    else SBUF = stx_buffer[stx_index_out++];
 	}

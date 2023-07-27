@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   adcsetch - select convertion channel
+   adcsetch - select conversion channel
 
    Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
 

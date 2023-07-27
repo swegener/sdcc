@@ -26,10 +26,10 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* This implemenation is based on an example I once grabbed from
+/* This implementation is based on an example I once grabbed from
    the Philips bbs.
    Don't know who wrote it, but is has been hacked so heavily, he/she wouldn't
-   recogize it anyway */
+   recognize it anyway */
 
 //#define DEBUG_I2C ==> DON'T DO THIS, THIS IS A LIBRARY <==
 

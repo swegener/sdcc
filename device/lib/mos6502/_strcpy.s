@@ -36,7 +36,7 @@
 	.globl _strcpy
 
 ;--------------------------------------------------------
-; overlayable function paramters in zero page
+; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
 _strcpy_PARM_2:

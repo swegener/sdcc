@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  cnvint.S - convertion routine of 24 bits integer to ASCII
+;  cnvint.S - conversion routine of 24 bits integer to ASCII
 ;
 ;  Copyright (C) 2004, Vangelis Rokas <vrokas at otenet.gr>
 ;
@@ -523,7 +523,7 @@ _convert_int:
 
 	end
 
-; Converstion table
+; Conversion table
 ;
 ;00	000000000000000000000001	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
 ;01	000000000000000000000002	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 

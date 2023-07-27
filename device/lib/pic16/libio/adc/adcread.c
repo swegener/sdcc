@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   adcread - read value of convertion
+   adcread - read value of conversion
 
    Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
 

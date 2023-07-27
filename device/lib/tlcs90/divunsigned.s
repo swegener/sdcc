@@ -93,7 +93,7 @@ __divu16::
         ;; The add above sets the carry, because sbc a,e did set it.
 .nodrop7:
         ccf                     ; Complement borrow so 1 indicates a
-                                ;  successful substraction (this is the
+                                ;  successful subtraction (this is the
                                 ;  next bit of quotient)
         adc     hl,hl
         djnz    .dvloop7
@@ -124,7 +124,7 @@ __divu16::
 	;; The add above sets the carry, because sbc hl,de did set it.
 .nodrop:
         ccf                     ; Complement borrow so 1 indicates a
-                                ;  successful substraction (this is the
+                                ;  successful subtraction (this is the
                                 ;  next bit of quotient)
         rla
         djnz    .dvloop

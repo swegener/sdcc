@@ -216,7 +216,7 @@ signexte:
         ;; Take absolute value of divisor
         bit     7,d
         jr      Z,.chkde        ; Jump if divisor is positive
-        sub     a               ; Substract divisor from 0
+        sub     a               ; Subtract divisor from 0
         sub     e
         ld      e,a
         sbc     a               ; Propagate borrow (A=0xFF if borrow)
@@ -226,7 +226,7 @@ signexte:
 .chkde:
         bit     7,b
         jr      Z,.dodiv        ; Jump if dividend is positive
-        sub     a               ; Substract dividend from 0
+        sub     a               ; Subtract dividend from 0
         sub     c
         ld      c,a
         sbc     a               ; Propagate borrow (A=0xFF if borrow)
@@ -240,7 +240,7 @@ signexte:
         pop     af              ; recover sign of quotient
         and     #0x80
         jr      Z,.dorem        ; Jump if quotient is positive
-        sub     a               ; Substract quotient from 0
+        sub     a               ; Subtract quotient from 0
         sub     c
         ld      c,a
         sbc     a               ; Propagate borrow (A=0xFF if borrow)
@@ -251,7 +251,7 @@ signexte:
         pop     af              ; recover sign of remainder
         and     #0x80
         ret     Z               ; Return if remainder is positive
-        sub     a               ; Substract remainder from 0
+        sub     a               ; Subtract remainder from 0
         sub     e
         ld      e,a
         sbc     a               ; Propagate remainder (A=0xFF if borrow)
@@ -302,14 +302,14 @@ signexte:
         ;; If remainder is >= divisor, next bit of quotient is 1. This
         ;;  bit goes to carry
         push    bc              ; Save current remainder
-        ld      a,c             ; Substract divisor from remainder
+        ld      a,c             ; Subtract divisor from remainder
         sbc     e
         ld      c,a
         ld      a,b
         sbc     d
         ld      b,a
         ccf                     ; Complement borrow so 1 indicates a
-                                ;  successful substraction (this is the
+                                ;  successful subtraction (this is the
                                 ;  next bit of quotient)
         jr      C,.drop         ; Jump if remainder is >= dividend
         pop     bc              ; Otherwise, restore remainder

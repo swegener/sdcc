@@ -86,7 +86,7 @@ __div16::
         ; Take absolute value of dividend
         rla
         jr      NC, .chkde      ; Jump if dividend is positive
-        sub     a, a            ; Substract dividend from 0
+        sub     a, a            ; Subtract dividend from 0
         sub     a, l
         ld      l, a
         sbc     a, a            ; Propagate borrow (A=0xFF if borrow)

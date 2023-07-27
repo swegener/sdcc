@@ -95,7 +95,7 @@ void RtcWrite(struct tm *rtcDate) {
   rtcBytes[6]=INTtoBCD(rtcDate->tm_mon)+1;
   rtcBytes[5]=INTtoBCD(rtcDate->tm_mday);
   rtcBytes[4]=(INTtoBCD(rtcDate->tm_wday)+1)&0x07; //set 24h  mode
-  rtcBytes[3]=INTtoBCD(rtcDate->tm_hour)&0x3f; // oscilator on, reset on
+  rtcBytes[3]=INTtoBCD(rtcDate->tm_hour)&0x3f; // oscillator on, reset on
   rtcBytes[2]=INTtoBCD(rtcDate->tm_min);
   rtcBytes[1]=INTtoBCD(rtcDate->tm_sec);
   //rtcBytes[0]=INTtoBCD(rtcDate->hundredth);

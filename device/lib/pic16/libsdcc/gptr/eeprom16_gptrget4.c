@@ -45,7 +45,7 @@ void
 __eeprom16_gptrget4(void) __naked
 {
     __asm
-        MOVFF   _INTCON, _TBLPTRL   ; save previous interupt state
+        MOVFF   _INTCON, _TBLPTRL   ; save previous interrupt state
         BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
         BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory

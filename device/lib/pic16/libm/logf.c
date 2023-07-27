@@ -32,7 +32,7 @@
 #include <math.h>
 #include <errno.h>
 
-/*Constans for 24 bits or less (8 decimal digits)*/
+/*Constants for 24 bits or less (8 decimal digits)*/
 #define A0 -0.5527074855E+0
 #define B0 -0.6632718214E+1
 #define A(w) (A0)

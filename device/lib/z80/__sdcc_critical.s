@@ -45,7 +45,7 @@ ___sdcc_critical_enter::
 	pop	af
 	or	a, a	;A = 0 if interrupts disabled
 	jr	NZ, 00100$
-;inetrrupts disabled
+;interrupts disabled
 	sub	a, a	;force P/V = 0
 	ret
 ;interrupts enabled

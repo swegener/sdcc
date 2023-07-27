@@ -56,7 +56,7 @@ void _initHeap(unsigned char _MALLOC_SPEC *dheap, unsigned int heapsize)
 }
 
 /* search heap starting from sBlock for a block of size bSize, merging
- * adjacent blocks if necessery */
+ * adjacent blocks if necessary */
 _malloc_rec _MALLOC_SPEC *_mergeHeapBlock(_malloc_rec _MALLOC_SPEC *sBlock, unsigned char bSize)
 {
   _malloc_rec _MALLOC_SPEC *temp;

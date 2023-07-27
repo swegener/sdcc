@@ -97,7 +97,7 @@ void Serial0Init (unsigned long baud, unsigned char buffered)
   // Need no port setup, done by boot rom.
   baud;
 #else
-  SCON0 = 0x5A; // 10 bit serial 0, use timer baud rate, enable recieving
+  SCON0 = 0x5A; // 10 bit serial 0, use timer baud rate, enable receiving
   RCAP2H = (TIMER_RELOAD >> 8) & 0xff;
   RCAP2L = TIMER_RELOAD & 0xff;
   T2CON = 0x30; // Enable timer 2 for serial port
@@ -276,7 +276,7 @@ static void __xdata *_firstHeapByte(void)
 
 // TINIm400 specific startup.
 
-// The last addressible byte of the CE0 area.
+// The last addressable byte of the CE0 area.
 #define CE0_END 0xfffff
 
 unsigned char romInit(unsigned char noisy, char speed)

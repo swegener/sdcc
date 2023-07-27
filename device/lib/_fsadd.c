@@ -76,7 +76,7 @@ fsadd_direct_entry:
 00011$:
 	// decide if we need to add or subtract
 	// sign_a and sign_b are stored in the flag bits of psw,
-	// so this little trick checks if the arguements have the
+	// so this little trick checks if the arguments have the
 	// same sign.
 	mov	a, psw
 	swap	a

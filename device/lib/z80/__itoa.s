@@ -95,7 +95,7 @@ ___uitoa_dehl:		;DE - value, HL - string, 6 (ix) - radix
 	cp	a, #10		;most popular radix
 	jr	NZ, 110$
 ;
-;-------- decimal convertion
+;-------- decimal conversion
 ; this algorithm up to 2 times faster than generic
 ;
 	ld	c, l

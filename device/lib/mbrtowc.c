@@ -94,7 +94,7 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 
 	if(pwc)
 		*pwc = codepoint;
-	return(n);
+	return(codepoint ? n : 0);
 
 eilseq:
 	errno = EILSEQ;

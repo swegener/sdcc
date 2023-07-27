@@ -1,5 +1,11 @@
 2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* device/lib/mbrtowc.c,
+	  support/regression/tests/wchar.c.in:
+	  Fix an issue in the return value of mbrtowc for 0 character (it indirectly also affected mbrtoc16 and mbrtoc32).
+
+2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/z80/gen.c:
 	  Fix bug #3619.
 

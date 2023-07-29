@@ -8,6 +8,9 @@
 	* src/SDCCsymt.c,
 	  support/regression/tests/bug-3597.c:
 	  Fix bug #3597.
+	* src/SDCCast.c,
+	  support/valdiag/tests/bug-2240.c:
+	  Fix bug #2240.
 
 2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -3798,6 +3798,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
           RLVAL (tree) = 1;
         else
           LLVAL (tree) = 1;
+        TRVAL (tree) = 1;
         return tree;
       }
 

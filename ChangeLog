@@ -5,6 +5,9 @@
 	  src/SDCCopt.c,
 	  support/regression/tests/bug-3636.c:
 	  Fix bug #3626.
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-3597.c:
+	  Fix bug #3597.
 
 2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

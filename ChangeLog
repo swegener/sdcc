@@ -1,3 +1,11 @@
+2023-07-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCcse.c,
+	  src/SDCCcse.h,
+	  src/SDCCopt.c,
+	  support/regression/tests/bug-3636.c:
+	  Fix bug #3626.
+
 2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/mbrtowc.c,

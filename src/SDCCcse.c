@@ -2319,7 +2319,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
             {
               pdop = NULL;
               applyToSetFTrue (cseSet, findCheaperOp, IC_JTCOND (ic), &pdop, true);
-              if (pdop)
+              if (pdop && !computeOnly)
                 {
                   ReplaceOpWithCheaperOp (&IC_JTCOND (ic), pdop);
                   change = 1;
@@ -2790,5 +2790,6 @@ freeCSEdata (eBBlock * ebb)
   freeBitVect (ebb->inPtrsSet);
   freeBitVect (ebb->ndompset);
   deleteSet (&ebb->addrOf);
-
+  freeBitVect (ebb->linds);
 }
+

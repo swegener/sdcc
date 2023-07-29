@@ -54,7 +54,7 @@ int ifDefSymIs (set *, operand *);
 DEFSETFUNC (findPrevIc);
 DEFSETFUNC (ifOperandsHave);
 DEFSETFUNC (findCheaperOp);
-int cseBBlock (eBBlock *, int, ebbIndex *);
+int cseBBlock (eBBlock *, int computeOnly, ebbIndex *);
 int cseAllBlocks (ebbIndex *, int computeOnly);
 void unsetDefsAndUses (iCode *);
 void updateSpillLocation (iCode * ic,int);

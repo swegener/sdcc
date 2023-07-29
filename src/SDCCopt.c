@@ -990,7 +990,7 @@ convilong (iCode *ic, eBBlock *ebp)
         }
     }
   werrorfl (filename, lineno, E_INVALID_OP, "mul/div/shift");
-  fprintf (stderr, "ic %d op %d leftType: ", ic->key, op); printTypeChain (stderr, leftType); fprintf (stderr, "\n");
+  fprintf (stderr, "ic %d op %d leftType: ", ic->key, op); printTypeChain (leftType, stderr); fprintf (stderr, "\n");
   return;
 found:
   // Update left and right - they might have changed due to inserted casts.

@@ -281,15 +281,15 @@ cl_51core::instruction_a8/*inst_mov_rn_addr*/(t_mem/*uchar*/ code)
 int
 cl_51core::instruction_c0/*inst_push*/(t_mem/*uchar*/ code)
 {
-  t_addr sp, sp_before/*, sp_after*/;
+  t_addr sp, sp_before;
   t_mem data;
-  class cl_memory_cell *stck, *cell;
+  class cl_memory_cell *cell;
 
   cell= get_direct(fetch());
   sp_before= sfr->get(SP);
-  sp= /*sp_after= */sfr->write(SP, sfr->read(SP) + 1);
-  stck= iram->get_cell(sp);
-  stck->write(data= cell->read());
+  data= cell->read();
+  sp= sfr->write(SP, sfr->read(SP) + 1);
+  iram->write(sp, data);
   class cl_stack_op *so=
     new cl_stack_push(instPC, data, sp_before, sp/*_after*/);
   so->init();
@@ -376,20 +376,20 @@ cl_51core::instruction_c8/*inst_xch_a_rn*/(t_mem/*uchar*/ code)
 int
 cl_51core::instruction_d0/*inst_pop*/(t_mem/*uchar*/ code)
 {
-  t_addr sp, sp_before/*, sp_after*/;
+  t_addr sp, sp_before;
   t_mem data;
   class cl_memory_cell *cell, *stck;
 
   sp_before= sfr->get(SP);
   cell= get_direct(fetch());
-  stck= iram->get_cell(/*sfr->get(SP)*/sp_before);
+  stck= iram->get_cell(sp_before);
   /* Order of decrement and write changed to fix POP SP, reported by
      Alexis Pavlov <alexis.pavlov@certess.com> */
   sp= sfr->write(SP, sfr->read(SP) - 1);
   cell->write(data= stck->read());
   tick(1);
   class cl_stack_op *so=
-    new cl_stack_pop(instPC, data, sp_before, sp/*_after*/);
+    new cl_stack_pop(instPC, data, sp_before, sp);
   so->init();
   stack_read(so);
   vc.rd++;

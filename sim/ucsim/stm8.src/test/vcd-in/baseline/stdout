@@ -10,7 +10,7 @@ var loc2 rom[0x0001]
 # first test loop.
 break 0x800c
 Breakpoint 1 at 0x00800c (cond="")
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 run
 Simulation started, PC=0x008000
 
@@ -18,7 +18,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 
 # Start the vcd (we set the input file via the Makefile) and
@@ -56,7 +56,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -64,7 +64,7 @@ Controller has 24 hardware element(s).
    on flash[0]
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       input
@@ -98,7 +98,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -111,7 +111,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -124,7 +124,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -137,7 +137,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -150,7 +150,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -163,7 +163,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                00    .
@@ -176,7 +176,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                01    .
@@ -189,7 +189,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                01    .
@@ -202,7 +202,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 timer get
 timer #1("time") ON 0.000001750000000 sec (14 clks)
@@ -236,7 +236,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -248,7 +248,7 @@ Stop at 0x00800c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 step
 
@@ -256,7 +256,7 @@ Stop at 0x00800c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 step
 
@@ -264,7 +264,7 @@ Stop at 0x00800c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 step
 
@@ -272,7 +272,7 @@ Stop at 0x00800c: (109) stepped 1 ticks
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 set hw vcd pause
 Unpaused
@@ -297,7 +297,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -316,7 +316,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                03    .
@@ -329,7 +329,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 timer get
 timer #1("time") ON 0.000002500000000 sec (20 clks)
@@ -347,7 +347,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                02    .
@@ -360,7 +360,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                06    .
@@ -373,7 +373,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                04    .
@@ -386,7 +386,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                04    .
@@ -399,7 +399,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                0c    .
@@ -412,7 +412,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                08    .
@@ -425,7 +425,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                08    .
@@ -438,7 +438,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                18    .
@@ -451,7 +451,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                10    .
@@ -464,7 +464,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? cc 80 0c       jp     0x800c[0K
+0x0800c F? cc 80 0c       jp     0x800c                              
 F 0x00800c
 dump rom 0 1
 0x00000 loc1:                10    .
@@ -472,3 +472,30 @@ dump rom 0 1
 
 # Stop now
 set hw vcd stop
+conf
+Type of microcontroller: STM8 S,AF 208
+Controller has 24 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on uart[3]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on pg[0]
+   on ph[0]
+   on pi[0]
+   on rst[0]
+   on tim1[1]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on flash[0]

@@ -105,6 +105,7 @@ struct dis_entry
   const char *mnemonic;
   bool is_call;
   uchar ticks;
+  void *info;
 };
 
 // table entry of SFR and BIT names
@@ -266,6 +267,22 @@ enum cpu_type {
 
   CPU_P1516	= 0x0001,
   CPU_P2223	= 0x0002,
+
+  // MCS48 Intel 8048 family
+  CPU_I8021	= 0x0001, // 1k-? "1"
+  CPU_I8022	= 0x0002, // 2k-? "2"
+  CPU_MCS21	= (CPU_I8021|CPU_I8022),
+  CPU_I8035	= 0x0010, // 0k-64 "8"
+  CPU_I8039	= 0x0020, // 0k-128 "8"
+  CPU_I8040	= 0x0040, // 0k-256 "8"
+  CPU_MCS30	= (CPU_I8035|CPU_I8039|CPU_I8040),
+  CPU_I8041	= 0x0100, // "4"
+  CPU_I8041A	= 0x0200, // "A"
+  CPU_MCS41	= (CPU_I8041|CPU_I8041A),
+  CPU_I8048	= 0x1000, // 1k-64 "8"
+  CPU_I8049	= 0x2000, // 2k-128 "8"
+  CPU_I8050	= 0x4000, // 4k-256 "8"
+  CPU_MCS48	= (CPU_I8048|CPU_I8049|CPU_I8050),
   
   // technology
   CPU_CMOS	= 0x0001,
@@ -383,6 +400,7 @@ enum hw_cath {
   HW_TIMER	= 0x0002,
   HW_UART	= 0x0004,
   HW_PORT	= 0x0008,
+  HW_GPIO	= 0x0008,
   HW_PCA	= 0x0010,
   HW_INTERRUPT	= 0x0020,
   HW_WDT	= 0x0040,

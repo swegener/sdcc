@@ -51,7 +51,7 @@ class cl_console: public cl_console_base
 
   virtual ~cl_console(void);
   virtual bool non_color(void) { return false; }
-  virtual class cl_console *clone_for_exec(char *_fin);
+  virtual class cl_console_base *clone_for_exec(char *_fin);
   virtual void drop_files(void); // do not close, just ignore
   virtual void close_files(bool close_in, bool close_out);
   virtual void replace_files(bool close_old, cl_f *new_in, cl_f *new_out);
@@ -75,6 +75,7 @@ class cl_console: public cl_console_base
 class cl_listen_console: public cl_console
 {
  public:
+  cl_listen_console(cl_f *_fin, class cl_app *the_app);
   cl_listen_console(int serverport, class cl_app *the_app);
   virtual void welcome(void) {}
   virtual int proc_input(class cl_cmdset *cmdset);
@@ -108,7 +109,6 @@ class cl_commander: public cl_commander_base
   {}
   virtual int init(void);
   virtual void update_active(void);
-  virtual int wait_input(void);
   virtual int input_avail(void);
   virtual int proc_input(void);
   virtual void check(void);

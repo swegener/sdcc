@@ -722,6 +722,15 @@ cl_uc::reg_cell_var(class cl_memory_cell *cell,
     }
 }
 
+void
+cl_uc::mk_cvar(class cl_memory_cell *cell, chars vname, chars vdesc,
+	       enum var_by vby)
+{
+  class cl_cvar *v;
+  vars->add(v= new cl_cvar(vname, cell, vdesc));
+  v->init();
+  v->set_by(vby);
+}
 
 /*
  * Making elements
@@ -3076,9 +3085,7 @@ cl_uc::fetch(void)
     return(0);
 
   code= rom->read(PC);
-  //PC= ++PC & PCmask;//rom->inc_address(PC);
-  PC++;
-  PC&= PCmask;
+  set_PC((PC+1)&PCmask);
   vc.fetch++;
   return(code);
 }

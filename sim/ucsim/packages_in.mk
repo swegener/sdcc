@@ -25,6 +25,7 @@ enable_rxk_port	    = @enable_rxk_port@
 enable_pblaze_port  = @enable_pblaze_port@
 enable_i8085_port   = @enable_i8085_port@
 enable_f8_port      = @enable_f8_port@
+enable_i8048_port   = @enable_i8048_port@
 
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
@@ -164,17 +165,23 @@ else
 F8		=
 endif
 
+ifeq ($(enable_i8048_port),yes)
+I8048      	= i8048.src
+else
+I8048		=
+endif
+
 PKGS		= $(S51) $(S390) \
 		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
 		  $(TLCS) \
 		  $(SM68HC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
 		  $(M6809) $(M6800) $(M68HC11) $(M68HC12) $(MOS6502) \
-		  $(RXK) $(PBLAZE) $(I8085) $(F8) \
+		  $(RXK) $(PBLAZE) $(I8085) $(F8) $(I8048) \
 		  doc gui.src
 
 PKGS_ALL	= cmd.src sim.src gui.src motorola.src \
 		  s51.src avr.src z80.src tlcs.src xa.src \
 		  m68hc08.src stm8.src st7.src pdk.src p1516.src \
 		  m6809.src m6800.src m68hc11.src m68hc12.src mos6502.src \
-		  rxk.src pblaze.src i8085.src f8.src\
+		  rxk.src pblaze.src i8085.src f8.src i8048.src \
 		  doc

@@ -1325,9 +1325,12 @@ cl_memory_cell::remove_operator(class cl_memory_operator *op)
 	  dst++;
 	}
     }
-  ops[dst]= NULL;
-  if (dst == 0)
-    free(ops), ops= NULL;
+  if (ops)
+    {
+      ops[dst]= NULL;
+      if (dst == 0)
+	free(ops), ops= NULL;
+    }
 }
 
 void

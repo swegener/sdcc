@@ -10,7 +10,7 @@ set hw vcd add rom[0x100]
 set hw vcd start
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -44,13 +44,13 @@ tick
 # recorded but not values.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000000000000000 s
+  Last event: 0.000000375000000 s
   Pause time: 
   Simul time: 0.000000500000000 s
   Variables:
@@ -62,7 +62,7 @@ set hw vcd pause
 Paused
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -104,7 +104,7 @@ tick
 # Resume. States are updated to current values and recording resumes.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -122,7 +122,7 @@ set hw vcd restart
 Unpaused
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -154,13 +154,13 @@ tick
 # record the first 3 ticks (375 ns) then ignore the rest.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000000000000 s
-  Last event: 0.000001500000000 s
+  Last event: 0.000001875000000 s
   Pause time: 
   Simul time: 0.000002000000000 s
   Variables:
@@ -173,7 +173,7 @@ set hw vcd pause
 Paused (pause limit 0.000000300000000 s)
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -209,7 +209,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -239,7 +239,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -269,7 +269,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -299,7 +299,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -329,7 +329,7 @@ Controller has 24 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-  off rst[0]
+   on rst[0]
    on tim1[1]
    on tim2[2]
    on tim3[3]
@@ -354,7 +354,7 @@ tick
 # placed in the VCD but it's up to the viewer whether they are shown at all.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     YES
   Mode:       output
@@ -372,7 +372,7 @@ set hw vcd restart
 Unpaused
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -399,13 +399,13 @@ tick
 # That's all folks!
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
   Time scale: 1 ns
   Start time: 0.000000700000000 s
-  Last event: 0.000003000000000 s
+  Last event: 0.000003250000000 s
   Pause time: 0.000000300000000 s
   Simul time: 0.000003375000000 s
   Variables:
@@ -416,7 +416,7 @@ Configuration memory of vcd
 set hw vcd stop
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
   Mode:       output

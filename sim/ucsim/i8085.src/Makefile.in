@@ -62,7 +62,6 @@ OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 # short/long exe and lib name
 SEN		= s$(TN)$(EXEEXT)
 LEN		= ucsim_$(TN)$(EXEEXT)
-LENOLD		= ucsim_mcs6502$(EXEEXT)
 
 SONAME		= libucsim_$(TN).so
 
@@ -84,7 +83,6 @@ install: all installdirs install_shared_lib
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)
 	rm -f $(DESTDIR)$(bindir)/$(SEN)
-	rm -f $(DESTDIR)$(bindir)/$(LENOLD)
 
 
 # Deleting all the installed files
@@ -92,7 +90,6 @@ install: all installdirs install_shared_lib
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(SEN)
 	rm -f $(DESTDIR)$(bindir)/$(LEN)
-	rm -f $(DESTDIR)$(bindir)/$(LENOLD)
 	rm -f $(DESTDIR)$(libdir)/$(SONAME)
 
 

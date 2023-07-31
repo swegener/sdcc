@@ -9,7 +9,7 @@ Controller has 3 hardware element(s).
    on dreg[0]
 CA---VNZ | R0:0d07 R1:b242 R2:3ecd R3:ecc3
 01---001 | R4:64ef R5:4773 R6:3bb3 SP:0100 ES:0000  DS:0000
-0xc9fc  ? 18                UNKNOWN/INVALID[0K
+0xc9fc  ? 18                UNKNOWN/INVALID                          
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)

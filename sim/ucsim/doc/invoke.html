@@ -1,11 +1,14 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>&#956;Csim: Invocation</title>
+    <title>&micro;Csim: Invocation</title>
   </head>
   <body style=" background-color: white;">
+    
     <h1>Starting the simulator</h1>
+
     There are separate programs to simulate different microcontroller families:
+
     <p>Intel MCS51 family is simulated by <b>ucsim_51</b> <br>
       Philips XA processor is simulated by <b>ucsim_xa</b> <br>
       Atmel AVR processor is simulated by <b>ucsim_avr</b> <br>
@@ -25,18 +28,24 @@
     </p>
 
     <p>The simulator can be started in the following way: </p>
+
     <p><tt><font color="blue">$</font> ucsim_51 [-hHVvPgGwlbB] [-p prompt] [-t CPU] [-X
         freq[k|M]] [-R seed] [-C cfg_file] [-e command] [-c file] [-s file] [-S
-        optionlist] [-I if_optionlist] [-a nr] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
+      optionlist] [-I if_optionlist] [-a nr] [-z portnum] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
+    
     <p>Specified files must be names of Intel hex files. Simulator loads them in
       the specified order into the ROM of the simulated system. If the file is
       specified without extension, the simulator will try to find intel hex file
       (filename extended with .hex), omf file (with .omf) and cdb file (with
       .cdb extension). Simulator can interpret content of these SDCC output
       files and reads information from them.</p>
+    
     <p>Options: </p>
+
     <dl>
+
       <dt><tt><b>-t CPU</b></tt> </dt>
+
       <dd>Type of CPU. Recognized types are different for different simulators,
         for example MCS51 simulator recognizes 51, 8051, 8751, C51, 80C51,
         87C51, 31, 8031, C31, 80C31, 52, 8052, 8752, C52, 80C52, 87C52, 32,
@@ -51,54 +60,90 @@
         <span style="font-family: monospace;">-H</span> option can be used to
         list all of recognized CPU types.<br>
         See <a href="cpu_types.html">how to select CPU type</a>. </dd>
+
       <dt><tt><b>-X freq[k|M]</b></tt> </dt>
+
       <dd>XTAL frequency is <b>freq</b> Hertz. <b>k</b> or <b>M</b> can be
         used to specify frequency in kHZ or MHz. Space is not allowed between
         the number and the <b>k</b> or <b>M</b>. Default value is 11059200 Hz.
-        <a name="coption"></a></dd>
+        <a name="lccoption"></a></dd>
+
       <dt><tt><b>-R seed</b></tt></dt>
+
       <dd>Set seed value for the random number generator.</dd>
+      
       <dt><span style="font-family: monospace;"><b>-C cfg_file</b></span></dt>
+
       <dd>Read and execute initial commands from specified file.</dd>
+      
       <dt><b><span style="font-family: monospace;">-e command</span></b></dt>
+
       <dd>Execute command at program startup (before config file).</dd>
-      <dt><a name="coption"><tt><b>-c file</b></tt></a> </dt>
+      
+      <dt><a name="lccoption"><tt><b>-c file</b></tt></a> </dt>
+
       <dd>Open command console on <b>file</b>. Command consoles are on standard
         input and output by default. Using this option the console can be opened
-        on any file for example on the serial interface of the computer. <a name="Zoption"></a></dd>
-      <dt><a name="Zoption"><tt><b>-Z portnum</b></tt></a> </dt>
+        on any file for example on the serial interface of the computer.</dd>
+
+      <dt><a name="lczoption"><tt><b>-z portnum</b></tt></a></dt>
+
+      <dd>If sockets are available on the system, <i>&micro;Csim</i>
+	listens on port <b>portnum</b> for incoming connections and
+      servs command consoles for clients. Port number can be changed
+	using this option.
+	<a href="cmd_general.html#q">quit</a> command exits <i>&micro;Csim</i> only
+      if not active connection is opened to this port. <a href="cmd_general.html#kill">kill</a>
+	command can be used to close all connections and quit <i>&micro;Csim</i> immediately.
+      </dd>
+      
+      <dt><a name="ucZoption"><tt><b>-Z portnum</b></tt></a> </dt>
+      
       <dd>Listen for incoming connections on port <b>portnum</b>. Using this
-        option <i>&#956;Csim</i> can serve multiple consoles. You can get a console
-        by simply telnet into machine running <i>&#956;Csim</i> to port <b>portnumber</b>.
-        This option is not available on platforms which doesn't support BSD
-        networking. <br>
-        See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
+        option <i>&micro;Csim</i> can serve multiple consoles. You can
+        get a console by simply telnet into machine running <i>&micro;Csim</i>
+	to port <b>portnumber</b>.  This option is not available on
+        platforms which doesn't support BSD networking. If -Z option
+        is used, instead of <a href="#lczoption">-z</a>, then default
+	console on stdio will not be opened, and the only way to open
+	a console is using telnet to portnum.
+
+	<br> See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
+      
       <dt><tt><b>-k portnum</b></tt></dt>
+
       <dd>Listen for incoming connections on port <b>portnum</b>. When this
         port connected, the connection will be attached to simulated UART0.This
         option is not useful for other UARTs, so it is better to use the more
         general -S option. </dd>
+
       <dt><tt><b>-s file</b></tt> </dt>
+
       <dd>Connect serial interface (UART0) of the simulated microcontroller to
         the <b>file</b>. Nothing is used by default which means that characters
         transmitted by serial interface of the simulated microcontroller go to
         nowhere and it will never receive anything. If you are going to
         communicate with serial interface interactively the best idea is to
         specify a terminal with -s option. </dd>
-      <dt><tt><b>-S uart=nr,in=file,out=file,port=nr,iport=nr,oport=nr,raw</b></tt>
-      </dt>
+
+      <dt><tt><b>-S uart=nr,in=file,out=file,port=nr,iport=nr,oport=nr,raw</b></tt></dt>
+      
       <dd>Using this option you can specify different files for input and output
-        streams that <i>&#956;Csim</i> uses to simulate microprocessor's serial
+        streams that <i>&micro;Csim</i> uses to simulate microprocessor's serial
         interface. <br>
         See <a href="serial.html">more about serial interface simulation</a>. </dd>
+
       <dt><span style="font-family: monospace;"><b>-I
             if=memory[address],in=file,out=file</b></span></dt>
+
       <dd>Specify options (as comma separated list) for the simulator interface.
         <b>if</b> option turns on the interface and specifies address space and
         location for use by the interface. <b>in</b> and <b>out</b> can be
         used to specify file names to use for file IO.
 	<br>See <a href="simif.html">more about simulator interface</a>.</dd>
+
       <dt><tt><b>-p prompt</b></tt> </dt>
+
       <dd>Using this option you can specify any string to be the prompt of
         command interpreter, for example:
         <pre><font color="blue">$</font> ucsim_51 -p "s51&gt; "
@@ -108,11 +153,15 @@ This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 0s51&gt; </font></pre>
       </dd>
+
       <dt><tt><b>-P</b></tt> </dt>
+
       <dd>Prompt will be a null ('\0') character. This feature can be useful for
         programs which controls simulator through a pipe. </dd>
+
       <dt><span style="font-family: monospace;"><b>-o colorsetting,...<br>
           </b></span></dt>
+
       <dd>List of color settings in form: <span style="font-family: monospace;">what=colspec,...</span>
         where <i>what</i> specifies object to be colored and <i>colspec</i> is
         : separated list of color options e.g.: prompt=b:white:black (bold white
@@ -198,35 +247,59 @@ under certain conditions; type `show c' for details.
         and blue.<br>
         Example (set prompt to blinking bold white on green, and set command to
         underlined bright green on black):<br>
-        <span style="font-family: monospace;">-o
+
+	<span style="font-family: monospace;">-o
           prompt=lb:white:green,command=u:bgreen:black</span></dd>
+
       <dt><b><tt>-l</tt></b></dt>
+
       <dd>Use colors of light theme (default is dark)</dd>
+
       <dt><b><span style="font-family: monospace;">-b</span></b></dt>
+
       <dd>Black &amp; white (non-color) console.</dd>
+
       <dt><tt><b>-B</b></tt></dt>
+
       <dd>Beep on breakpoints. Print out a beep character to the
       console when a breakpoint hits.</dd>
+
       <dt><span style="font-family: monospace;"><b>-g</b></span></dt>
+
       <dd>Go, start simulation when the program is loaded.</dd>
+
       <dt><span style="font-family: monospace;"><b>-G</b></span></dt>
+
       <dd>Start simulation when the program is loaded and terminate the
         simulator when the simulation stops (maybe on breakpoint).</dd>
+
       <dt><span style="font-family: monospace;"><b>-a nr</b></span></dt>
+
       <dd>Set size of variable space. Default is 256.</dd>
+
       <dt><span style="font-family: monospace;"><b>-w</b></span></dt>
+
       <dd>Writable flash.</dd>
+
       <dt><tt><b>-V</b></tt> </dt>
+
       <dd>Verbose mode. The simulator notifies you about some kind of internal
         actions for example interrupts. Messages are printed on command console.
       </dd>
+
       <dt><tt><b>-v</b></tt> </dt>
+
       <dd>Print out version number and stop. </dd>
+
       <dt><tt><b>-H</b></tt> </dt>
+
       <dd>Print out types of known CPUs. Names printed out by this option can be
         used to determine CPU type using <tt><b>-t</b></tt> option. </dd>
+
       <dt><tt><b>-h</b></tt> </dt>
+
       <dd>Print out a short help about the options and stop. </dd>
+      
     </dl>
     <hr>
   </body>

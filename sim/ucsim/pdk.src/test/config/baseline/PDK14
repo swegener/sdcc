@@ -10,7 +10,7 @@ Controller has 3 hardware element(s).
 A= 0x00(  0)
 Flag= 0x00(  0)  
 SP= 0x00(  0)
-0x000  ? 5a41 UNKNOWN/INVALID[0K
+0x000  ? 5a41 UNKNOWN/INVALID                                        
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x0007ff     2048 rom_chip (16,%04x,0x%03x)

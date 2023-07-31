@@ -21,7 +21,7 @@ SP= 0x0000 00 00 00 00 00 00 00 00 ........
 aAF= 0x00-00  aBC= 0x00-00  aDE= 0x00-00  aHL= 0x00-00  aJK= 0x00-00  
  PW= 0x0000-0000   PX= 0x0000-0000   PY= 0x0000-0000   PZ= 0x0000-0000  
 aPW= 0x0000-0000  aPX= 0x0000-0000  aPY= 0x0000-0000  aPZ= 0x0000-0000  
-0x0000  ? 00                NOP[0K
+0x0000  ? 00                NOP                                      
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0xffffff 16777216 rom_chip (8,%02x,0x%06x)

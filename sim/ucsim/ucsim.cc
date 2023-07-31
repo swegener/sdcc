@@ -45,7 +45,7 @@ cl_general_uc::make_memories(void)
   class cl_memory_chip *ch;
   class cl_address_decoder *ad;
 
-  as= new cl_address_space("nas", 0, 0x100000, 8);
+  rom= as= new cl_address_space("nas", 0, 0x100000, 8);
   as->init();
   address_spaces->add(as);
 

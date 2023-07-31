@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 
 //#include "i_string.h"
 
@@ -161,12 +162,6 @@ cl_console_base::init(void)
   last_cmd= chars("");
   prev_quit= -1;
   return(0);
-}
-
-void
-cl_console_base::set_startup(chars the)
-{
-  startup_command= the;
 }
 
 void
@@ -785,6 +780,31 @@ cl_console_stdout::init(void)
   prev_quit= -1;
   set_interactive(false);
   return 0;
+}
+
+class cl_console_base *
+cl_console_stdout::clone_for_exec(char *_fin)
+{
+  class cl_f *fi= 0, *fo= 0, *fout;
+
+  if (!_fin)
+    return(0);
+  if (fi= mk_io(_fin, "r"), !fi)
+    {
+      fprintf(stderr, "Can't open `%s': %s\n", _fin, strerror(errno));
+      return(0);
+    }
+
+  fout= get_fout();
+  if ((fout == 0) || ((fo= fout->copy("a")) == 0))
+    {
+      delete fi;
+      fprintf(stderr, "Can't re-open output file: %s\n", strerror(errno));
+      return(0);
+    }
+    
+  class cl_console *con= new cl_sub_console(this, fi, fo, app);
+  return(con);
 }
 
 

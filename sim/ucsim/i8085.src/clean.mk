@@ -10,7 +10,6 @@ clean:
 	rm -f si8085$(EXEEXT) si8085.exe
 	rm -f smcs6502$(EXEEXT) smcs6502.exe
 	rm -f ucsim_i8085$(EXEEXT) ucsim_i8085.exe
-	rm -f ucsim_mcs6502$(EXEEXT) ucsim_mcs6502.exe
 ifneq ($(shell test -f test/Makefile && echo ok), )
 	$(MAKE) -C test clean
 endif

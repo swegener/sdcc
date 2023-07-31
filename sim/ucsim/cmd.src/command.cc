@@ -863,7 +863,7 @@ cl_cmd::work(class cl_app *app,
 	}
       return(do_work(sim, cmdline, con));
     case operate_on_uc:
-      if (!sim)
+      if (!uc)
 	{
 	  con->dd_cprintf("error", "There is no microcontroller to work on!\n");
 	  return(false);

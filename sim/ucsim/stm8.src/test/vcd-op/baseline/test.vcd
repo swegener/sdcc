@@ -13,6 +13,13 @@ $enddefinitions $end
 $dumpvars
 b10000011 !
 $end
+b00000000 !
+#125
+b00000001 !
+#250
+b00000010 !
+#375
+b00000011 !
 #500
 $comment Paused $end
 $dumpoff
@@ -23,6 +30,13 @@ $comment Unpaused $end
 $dumpon
 b00001011 !
 $end
+b00001100 !
+#1625
+b00001101 !
+#1750
+b00001110 !
+#1875
+b00001111 !
 #2000
 $comment Paused $end
 $dumpoff
@@ -33,4 +47,9 @@ $comment Unpaused. Real duration was 0.000001000000000 seconds $end
 $dumpon
 b00010111 !
 $end
+b00011000 !
+#2425
+b00011001 !
+#2550
+b00011010 !
 #2675

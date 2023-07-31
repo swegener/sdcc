@@ -76,7 +76,7 @@ cl_stack_op::info(class cl_console_base *con, class cl_uc *uc)
 {
   con->dd_printf("%-4s 0x%06x-0x%06x %ld ",
 		 get_op_name(),
-		 AU(SP_before), AU(SP_after), labs(SP_before-SP_after));
+		 AU(SP_before), AU(SP_after), labs((i64_t)SP_before-(i64_t)SP_after));
   print_info(con);
   con->dd_printf(" ");
   uc->print_disass(PC, con);

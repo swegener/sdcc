@@ -289,6 +289,7 @@ cl_itab::cl_itab(void):
   uc_itab[0xfe]= &cl_itab::instruction_fe;
   uc_itab[0xff]= &cl_itab::instruction_ff;
 
+  uc_itab[0x100]= &cl_itab::invalid_instruction;
 }
 
 /* End of sim.src/itab.cc */

@@ -20,7 +20,7 @@ CC= 11010000                          TMP2= $0000     0    +0
 IX= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
 IY= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
 SP= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
-0xf17c  ? 19 ee             LEAY   D,Y                ; [0000]=$4158fc[0K
+0xf17c  ? 19 ee             LEAY   D,Y                ; [0000]=$4158fc
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x3fffff  4194304 rom_chip (8,%02x,0x%06x)

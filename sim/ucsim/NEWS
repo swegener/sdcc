@@ -1,27 +1,37 @@
+0.8.x
+
+- Bugfixes, partial implmentations of 0.9 features.
+
+
 0.8
 
-Motorola HC12 simulator.
-MOS65C02 and MOS6510 simulator.
-Stm8 stack pointer roll-over function (configurable).
-F8 simulator.
-p2223 simulator (variant of p1516).
-"display" and "undisplay" commands.
+- Motorola HC12 simulator.
+
+- Intel 8080 and 8085 simulator.
+
+- Stm8 stack pointer roll-over function (configurable).
+
+- F8 simulator.
+
+- p2223 simulator (variant of p1516).
+
+- "display", "undisplay" and "echo" commands.
 
 
 0.7.x
 
-Bugfix releases. Partial implementations of 0.8 functionalities.
+- Bugfix releases. Partial implementations of 0.8 functionalities.
 
 
 0.7
 
-New sub-option for -S option: raw, serial input will be
+- New sub-option for -S option: raw, serial input will be
 non-interactive even on tty.
 
 
 0.6.x
 
-Bugfix releases.
+- Bugfix releases.
 
 
 0.6

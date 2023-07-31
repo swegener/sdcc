@@ -23,7 +23,7 @@ Controller has 27 hardware element(s).
    on pg[0]
    on ph[0]
    on pi[0]
-   on rst[0]
+  off rst[0]
    on tim2[2]
    on tim3[3]
    on tim4[4]
@@ -34,7 +34,7 @@ Controller has 27 hardware element(s).
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x08000  ? 00 00          neg    (0x00,SP)[0K
+0x08000  ? 00 00          neg    (0x00,SP)                           
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x0017ff     6144 ram_chip (8,%02x,0x%04x)

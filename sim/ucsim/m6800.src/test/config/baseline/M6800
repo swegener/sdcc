@@ -18,7 +18,7 @@ CC= 11000000
       HINZVC
 IX= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
 SP= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
-0xf17c  ? 19          DAA[0K
+0xf17c  ? 19          DAA                                            
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)

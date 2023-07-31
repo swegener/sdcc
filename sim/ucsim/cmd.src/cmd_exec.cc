@@ -106,8 +106,13 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 
 CMDHELP(cl_run_cmd,
 	"run [start [stop]]",
-	"Go",
-	"")
+	"Start execution in foreground",
+	"Start simulation at given address (first parameter) or at\n"
+	"actual PC value. If second parameter is used, a breakpoint\n"
+	"will be placed at that address which stops the simulation\n"
+	"when reached. The run command stops the actual console which\n"
+	"became frozen. Pressing ENTER key on this console stops the\n"
+	"simulation.\n")
 
 /*
  * Command: stop
@@ -126,8 +131,10 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 
 CMDHELP(cl_stop_cmd,
 	"stop",
-	"Stop",
-	"")
+	"Stop simulation.",
+	"This command simply stops the simulation.\n"
+	"After stop, value of actual PC, code memory and the\n"
+	"disassembled instruction is printed.\n")
 
 /*
  * Command: step
@@ -231,9 +238,19 @@ COMMAND_DO_WORK_SIM(cl_step_cmd)
 }
 
 CMDHELP(cl_step_cmd,
-	"step [number[unit]]",
-	"Step",
-	"")
+	"step [number [unit]]",
+	"Execute one or specified instructions.",
+	"Step executes one instruction or number of specified instructions.\n"
+	"Number of steps can be specified in different units. Known units:\n"
+	" s,sec       Simulated execution time in seconds\n"
+	" ms,msec     Simulated execution time in millisecs\n"
+	" us,usec     Simulated execution time in microseconds\n"
+	" ns,nsec     Simulated execution time in nanosecs\n"
+	" vclk        Number of virtual clock counts\n"
+	" fclk,fetch  Number of fetches\n"
+	" rclk,read   Number of memory read operations\n"
+	" wclk,write  Number of memory write operations\n")
+
 
 /*
  * Command: next
@@ -291,8 +308,12 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 
 CMDHELP(cl_next_cmd,
 	"next",
-	"Next",
-	"")
+	"Execute until next instruction is reached.",
+	"his command is similar to step command described above but\n"
+	"if actual instruction to execute is a subroutine call the next\n"
+	"command places a dynamic breakpoint after the call instruction\n"
+	"and starts to execute the subroutine. If the subroutine is\n"
+	"infinite the breakpoint set by next will never be reached.\n")
 
 /*
  * Command: help
@@ -419,8 +440,10 @@ COMMAND_DO_WORK(cl_quit_cmd)
 
 CMDHELP(cl_quit_cmd,
 	"quit",
-	"Quit",
-	"")
+	"Close actual console",
+	"Quit command closes the actual console. If -Z option was used\n"
+	"to start the simulator, it will continue running.\n"
+	"Otherwise it exists when last console closes.\n")
 
 /*
  * Command: kill
@@ -440,7 +463,7 @@ COMMAND_DO_WORK_APP(cl_kill_cmd)
 
 CMDHELP(cl_kill_cmd,
 	"kill",
-	"Shutdown simulator",
+	"Shutdown simulator.",
 	"")
 
 /*
@@ -470,7 +493,10 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
 CMDHELP(cl_exec_cmd,
 	"exec \"file\"",
 	"Execute commands from file",
-	"")
+	"Reads commands from \"file\" and executes them. This command\n"
+	"opens a new console (which will use same in/out file as the\n"
+	"actual one) to execute the file. This means the \"quit\" command\n"
+	"in the file will not exit the simulator.")
 
 /*
  * expression expression

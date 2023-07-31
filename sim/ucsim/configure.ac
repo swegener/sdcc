@@ -6,6 +6,7 @@ AC_CONFIG_SRCDIR(.version)
 AC_CONFIG_HEADERS([ddconfig.h:ddconfig_in.h])
 
 AC_PROG_AWK
+AC_PROG_SED
 
 AC_MSG_CHECKING(version of the package)
 if test -f ${srcdir}/.version; then
@@ -206,6 +207,12 @@ if test $enable_f8_port  != "no"; then
     enable_f8_port="yes"
 fi,
 enable_f8_port="yes")
+AC_ARG_ENABLE(i8048-port,
+[  --disable-i8048-port    do not compile simulator for i8048],
+if test $enable_i8048_port  != "no"; then
+    enable_i8048_port="yes"
+fi,
+enable_i8048_port="yes")
 AC_ARG_ENABLE(serio,
 [  --disable-serio         do not compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -239,6 +246,7 @@ AC_SUBST(enable_rxk_port)
 AC_SUBST(enable_pblaze_port)
 AC_SUBST(enable_i8085_port)
 AC_SUBST(enable_f8_port)
+AC_SUBST(enable_i8048_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -781,6 +789,7 @@ rxk.src/Makefile     rxk.src/test/Makefile
 pblaze.src/Makefile  pblaze.src/test/Makefile
 i8085.src/Makefile   i8085.src/test/Makefile
 f8.src/Makefile      f8.src/test/Makefile
+i8048.src/Makefile   i8048.src/test/Makefile
 p1516.src/Makefile   p1516.src/test/Makefile
 pdk.src/Makefile     pdk.src/test/Makefile
 s51.src/Makefile     s51.src/test/Makefile

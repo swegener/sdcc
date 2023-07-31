@@ -36,10 +36,11 @@
 class cl_itab: public cl_base
 {
  public:
-  int (cl_itab::*uc_itab[256])(t_mem code);
+  int (cl_itab::*uc_itab[257])(t_mem code);
  public:
   cl_itab(void);
  public:
+  virtual int invalid_instruction(t_mem code) { return resINV; }
   virtual int instruction_00(t_mem code) { return resNOT_DONE; }
   virtual int instruction_01(t_mem code) { return resNOT_DONE; }
   virtual int instruction_02(t_mem code) { return resNOT_DONE; }

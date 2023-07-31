@@ -419,6 +419,7 @@ void
 sigpipe_off()
 {
   struct sigaction sa;
+  sigaction(SIGPIPE, NULL, &sa);
   sa.sa_handler= SIG_IGN;
   sigaction(SIGPIPE, &sa, NULL);
 }
@@ -438,6 +439,44 @@ dnow(void)
   struct timeval tv;
   gettimeofday(&tv, NULL);
   return (double)tv.tv_sec + ((double)tv.tv_usec/1000000.0);
+}
+
+static int in_attribs_saved= 0;
+static int out_attribs_saved= 0;
+static struct termios in_attribs;
+static struct termios out_attribs;
+
+void
+save_std_attribs()
+{
+  if (!in_attribs_saved)
+    {
+      if (isatty(STDIN_FILENO))
+	{
+	  tcgetattr(STDIN_FILENO, &in_attribs);
+	  in_attribs_saved= 1;
+	}
+    }
+  if (!out_attribs_saved)
+    {
+      if (isatty(STDOUT_FILENO))
+	{
+	  tcgetattr(STDOUT_FILENO, &out_attribs);
+	  out_attribs_saved= 1;
+	}
+    }
+}
+
+void
+restore_std_attribs()
+{
+  if (in_attribs_saved)
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &in_attribs);
+  if (out_attribs_saved)
+    {
+      //out_attribs.c_lflag|= ICANON|ECHO;
+      tcsetattr(STDOUT_FILENO, TCSAFLUSH, &out_attribs);
+    }
 }
 
 

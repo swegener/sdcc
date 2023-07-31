@@ -329,7 +329,10 @@ public:
   virtual void reg_cell_var(class cl_memory_cell *cell,
 			    void *store,
 			    chars vname, chars vdesc);
-
+  virtual void mk_cvar(class cl_memory_cell *cell,
+		       chars vname, chars vdesc,
+		       enum var_by vby= VBY_PRE);
+  
   double get_xtal(void) { return xtal; }
   double get_xtal_tick(void) { return xtal_tick; }
   void set_xtal(double freq) { xtal= freq; xtal_tick = 1 / freq; }

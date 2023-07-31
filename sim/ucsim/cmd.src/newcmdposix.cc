@@ -103,7 +103,7 @@ cl_console::cl_console(cl_f *_fin, cl_f *_fout, class cl_app *the_app)
   lines_printed= new cl_ustrings(100, 100, "console_cache");
 }
 
-class cl_console *
+class cl_console_base *
 cl_console::clone_for_exec(char *_fin)
 {
   class cl_f *fi= 0, *fo= 0;
@@ -158,7 +158,6 @@ cl_console::close_files(bool close_in, bool close_out)
       fin= 0;
       application->get_commander()->update_active();
     }
-  //drop_files();
 }
 
 void
@@ -174,31 +173,11 @@ cl_console::replace_files(bool close_old, cl_f *new_in, cl_f *new_out)
   application->get_commander()->update_active();
 }
 
-/*
-void
-cl_console::set_id(int new_id)
-{
-  char *s;
-
-  id= new_id;
-  set_name(s= format_string("console%d fin=%s,%d fout=%s,%d",
-			    id,
-			    fin?fin->get_file_name():"",
-			    fin?fin->file_id:-1,
-			    fout?fout->get_file_name():"",
-			    fout?fout->file_id:-1));
-  free(s);
-}
-*/
-
 cl_console::~cl_console(void)
 {
   un_redirect();
   if (fout)
     {
-      //if (flags & CONS_PROMPT)
-      //fout->write_str("\n");
-      //fout->flush();
       if (fout->tty)
 	tu_reset();
       delete fout;
@@ -239,13 +218,9 @@ bool
 cl_console::input_avail(void)
 {
   bool ret= false;
-  if (startup_command.nempty())
-    return true;
   if (input_active())
     {
       ret= fin->input_avail();
-      if (ret)
-        {}
     }
   return ret;
 }
@@ -288,17 +263,7 @@ cl_console::read_line(void)
   int b[2]= { 0, 0 };
 
   do {
-    if (startup_command.nempty())
-      {
-	const char *s= startup_command;
-	b[0]= s[0];
-	startup_command= &s[1];
-	i= 1;
-      }
-    else
-      {
-	i= fin->read(b, 1);
-      }
+    i= fin->read(b, 1);
     if (i < -1)
       {
 	return -1;
@@ -361,25 +326,16 @@ cl_listen_console::cl_listen_console(int serverport, class cl_app *the_app)
   fout= frout= 0;
 }
 
-/*
-void
-cl_listen_console::set_id(int new_id)
+cl_listen_console::cl_listen_console(cl_f *_fin, class cl_app *the_app)
 {
-  char *s;
-
-  id= new_id;
-  set_name(s= format_string("listen_console%d port=%d",
-			    id,
-			    fin?fin->server_port:-1));
-  free(s);
+  app= the_app;
+  fin= _fin;
+  fout= frout= 0;
 }
-*/
 
 int
 cl_listen_console::proc_input(class cl_cmdset *cmdset)
 {
-  //int newsock;
-  
   class cl_commander_base *cmd;
   cl_f *in, *out;
   
@@ -399,14 +355,7 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
 /*
  * Sub-console
  */
-/*
-cl_sub_console::cl_sub_console(class cl_console_base *the_parent,
-                               FILE *fin, FILE *fout, class cl_app *the_app):
-  cl_console(fin, fout, the_app)
-{
-  parent= the_parent;
-}
-*/
+
 cl_sub_console::cl_sub_console(class cl_console_base *the_parent,
                                class cl_f *fin, class cl_f *fout, class cl_app *the_app):
   cl_console(fin, fout, the_app)
@@ -438,23 +387,6 @@ cl_sub_console::init(void)
   return(0);
 }
 
-/*
-void
-cl_sub_console::set_id(int new_id)
-{
-  char *s;
-
-  id= new_id;
-  set_name(s= format_string("sub_console%d (of %d) fin=%s,%d fout=%s,%d",
-			    id,
-			    parent?parent->get_id():-1,
-			    fin?fin->get_file_name():"",
-			    fin?fin->file_id:-1,
-			    fout?fout->get_file_name():"",
-			    fout?fout->file_id:-1));
-  free(s);
-}
-*/
 
 /*
  * Command interpreter
@@ -467,6 +399,8 @@ cl_commander::init(void)
   class cl_optref console_on_option(this);
   class cl_optref config_file_option(this);
   class cl_optref port_number_option(this);
+  class cl_optref default_port_option(this);
+  
   class cl_console_base *con;
   int ccnt= 0;
   cl_console_base *c;
@@ -476,27 +410,38 @@ cl_commander::init(void)
   config_file_option.init();
   config_file_option.use("config_file");
   port_number_option.init();
-
+  default_port_option.init();
+  
   cl_base::init();
   set_name("Commander");
   active_inputs= new cl_list(10, 5, "active_inputs");
   check_list= new cl_list(10, 5, "check_list");
-  
-  bool need_config= true;
 
+  int def_port= 0;
+  if (default_port_option.use("default_port"))
+    {
+      def_port= default_port_option.get_value((long)0);
+    }
+  if (def_port >= 1000)
+    {
+      cl_f *srv= mk_srv(def_port);
+      if (srv->opened())
+	{
+	  c= new cl_listen_console(srv, app);
+	  add_console(c);
+	  c->prev_quit= 0;
+	  ccnt++;
+	}
+      else delete srv;
+    }
+  
   if (port_number_option.use("port_number"))
     {
-      add_console(c= new cl_listen_console(port_number_option.get_value((long)0), app));
-    }
-  /*
-  else
-    {
-      c= new cl_listen_console(5559, app);
+      c= new cl_listen_console(port_number_option.get_value((long)0), app);
+      c->init();
       add_console(c);
-      c->prev_quit= 0;
-      ccnt= 1;
     }
-  */
+
   char *Config= config_file_option.get_value("");
   char *cn= console_on_option.get_value("");
 
@@ -509,20 +454,23 @@ cl_commander::init(void)
 	  out= cp_io(fileno(stdout), "w");
 	  in->interactive(out);
 	  add_console(con= new cl_console(in, out, app));
-	  config_console= exec_on(con, Config);
-	  if (config_console)
-	    config_console->set_startup(app->startup_command);
-	  else
-	    con->set_startup(app->startup_command);
-	  need_config= false;
 	  if (in->tty)
 	    con->set_flag(CONS_INTERACTIVE, true);
 	}
       else
 	{
-	  add_console(con= new cl_console(cn, cn, app));
-	  config_console= exec_on(con, Config);
-	  need_config= false;
+	  class cl_f *in, *out;
+	  in= mk_io(cn, "r");
+	  if (!in)
+	    fprintf(stderr, "Can not open %s\n", cn);
+	  else
+	    {
+	      if (in->type == F_FILE)
+		out= cp_io(fileno(stdout), "w");
+	      else
+		out= cp_io(in->file_id, "w");
+	      add_console(con= new cl_console(in, out, app));
+	    }
 	}
     }
   if (cons->get_count() == ccnt)
@@ -532,40 +480,24 @@ cl_commander::init(void)
       out= cp_io(fileno(stdout), "w");
       in->interactive(out);
       add_console(con= new cl_console(in, out, app));
-      config_console= exec_on(con, Config);
-      if (config_console)
-	config_console->set_startup(app->startup_command);
-      else
-	con->set_startup(app->startup_command);
-      need_config= false;
       if (in->tty)
 	con->set_flag(CONS_INTERACTIVE, true);
     }
-  if (
-      need_config &&
-      (
-       (Config && *Config)
-       ||
-       app->startup_command.nempty()
-       )
-      )
+
+  class cl_f *i= NULL, *o;
+  if (Config &&
+      *Config)
     {
-      class cl_f *i= NULL, *o;
-      if (Config && *Config)
+      i= mk_io(Config, "r");
+      if (i->file_id < 0)
+	fprintf(stderr, "Error opening cfg file: %s\n", Config);
+      else
 	{
-	  i= mk_io(Config, "r");
-	  if (i->file_id < 0)
-	    fprintf(stderr, "Error opening cfg file: %s\n", Config);
-	  else
-	    {
-	      o= cp_io(fileno(stderr), "w");
-	      con= new cl_console(/*fc*/i, /*stderr*/o, app);
-	      con->set_flag(CONS_NOWELCOME|CONS_ECHO, true);
-	      //exec_on(con, Config);
-	      config_console= con;
-	      con->set_startup(app->startup_command);
-	      add_console(con);
-	    }
+	  o= cp_io(fileno(stderr), "w");
+	  con= new cl_console(i, o, app);
+	  con->set_flag(CONS_NOWELCOME|CONS_ECHO, true);
+	  config_console= con;
+	  add_console(con);
 	}
     }
   return(0);
@@ -582,10 +514,11 @@ cl_commander::update_active(void)
   if (config_console)
     {
       if (!cons->index_of(config_console, NULL))
-	config_console= 0;
+	{
+	  config_console= 0;
+	}
     }
 
-  //printf("List of active cons: ");
   for (i= 0; i < cons->count; i++)
     {
       class cl_console *c=
@@ -604,21 +537,11 @@ cl_commander::update_active(void)
 	  f)
 	{
 	  active_inputs->add(f);
-	  //printf("%d,",c->get_id());
 	}
       if (c->need_check() &&
 	  f)
 	check_list->add(f);
     }
-  //printf("\n");
-  //printf("List of check cons: ");
-  /*for (i= 0; i < check_list->count; i++)
-    {
-      class cl_console *c=
-	(class cl_console *)cons->at(i);
-      printf("%d,", c->get_id());
-      }*/
-  //printf("\n");
 }
 
 int
@@ -628,25 +551,7 @@ cl_commander::input_avail(void)
   bool ret= check_inputs(active_inputs, avail);
   avail->disconn_all();
   delete avail;
-  if (!ret)
-    for (int j = 0; j < cons->count; j++)
-    {
-      class cl_console *c = dynamic_cast<class cl_console*>((class cl_console_base*)(cons->at(j)));
-      chars *s= c->get_startup();
-      if (s->nempty())
-	{
-	  return true;
-	}
-    }
   return ret;
-}
-
-int
-cl_commander::wait_input(void)
-{
-  while (!input_avail())
-    loop_delay();
-  return 0;
 }
 
 int
@@ -668,7 +573,7 @@ cl_commander::proc_input(void)
 	continue;
 
       if (c->input_active() &&
-	  (f || c->has_startup()))
+	  f)
         {
 	  if (c->input_avail())
             {

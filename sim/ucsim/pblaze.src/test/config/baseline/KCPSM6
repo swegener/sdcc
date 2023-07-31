@@ -49,7 +49,7 @@ Active regbank= A
 PC= 0x000000
 SP= 0x000000
 C= 0, Z= 0, I= 0
-0x000  ? 3331d BAD_OPCODE[0K
+0x000  ? 3331d BAD_OPCODE                                            
 Memory chips:
   0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
   0x000000-0x000021       34 sfr_chip (8,%02x,0x%02x)

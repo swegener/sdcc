@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (cmd.src/syntaxcl.h)
+ * Simulator of microcontrollers (inst.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,9 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef CMD_SYNTAXCL_HEADER
-#define CMD_SYNTAXCL_HEADER
+#include "i8020cl.h"
 
-#endif
 
-/* End of cmd.src/syntaxcl.h */
+/* End of i8085.src/inst.cc */

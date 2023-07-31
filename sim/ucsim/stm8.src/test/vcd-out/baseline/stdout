@@ -9,7 +9,7 @@ var loc2 rom[0x0001]
 # Check the initial state of the default vcd.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    no
   Paused:     no
   Mode:       output
@@ -27,7 +27,7 @@ Configuration memory of vcd
 # first test loop.
 break 0x800c
 Breakpoint 1 at 0x00800c (cond="")
-0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0                    
 run
 Simulation started, PC=0x008000
 
@@ -35,7 +35,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
 0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0                    
 F 0x00800c
 
 # Set up a vcd to monitor the bit changes in loc1 and the value of loc2.
@@ -54,7 +54,7 @@ set hw vcd start
 # Make sure what it is going to do is what we asked.
 info hw vcd
 vcd[0] value change dump
-  Module:      ucsim_vcd_0
+  Modul:      ucsim_vcd_0
   Started:    YES
   Paused:     no
   Mode:       output
@@ -85,7 +85,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0                    
 F 0x00800c
 
 # Remove the probe from every second bit.
@@ -108,7 +108,7 @@ Stop at 0x00800c: (104) Breakpoint
 V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
 0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
 SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
-0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0[0K
+0x0800c F? 72 10 00 00    bset   0x0000 <loc1>,#0                    
 F 0x00800c
 
 # Don't forget to close the vcd properly!

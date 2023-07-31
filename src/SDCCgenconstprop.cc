@@ -107,9 +107,10 @@ getTypeValinfo (sym_link *type)
   struct valinfo v;
   v.anything = true;
   v.nothing = false;
+  // Initialize all members of v, to ensure we don't read uninitalized memory later.
   v.min = v.max = 0;
-  v.knownbitsmask = 0;
-  v.knownbits = 0;
+  v.knownbitsmask = 0ull;
+  v.knownbits = 0ull;
 
   if (IS_BOOLEAN (type))
     {
@@ -119,12 +120,13 @@ getTypeValinfo (sym_link *type)
       v.knownbitsmask = ~1ull;
       v.knownbits = 0;
     }
-  else if (IS_PTR (type))
+  else if (IS_PTR (type) || IS_ARRAY (type))
     {
       v.anything = false;
       v.min = 0;
       v.max = (1ul << (GPTRSIZE * 8)) - 1;
-      if (TARGET_IS_MCS51 && !IS_GENPTR (type) ||
+      v.knownbitsmask = ~((unsigned long)v.max);
+      if (TARGET_IS_MCS51 && IS_PTR (type) && !IS_GENPTR (type) ||
         TARGET_PDK_LIKE && IS_PTR (type) && (DCL_TYPE (type) == CPOINTER || DCL_TYPE (type) == POINTER))
         {
           int addrbits = GPTRSIZE * 8;
@@ -183,13 +185,15 @@ getOperandValinfo (const iCode *ic, const operand *op)
   v.anything = true;
   v.nothing = false;
   v.min = v.max = 0;
+  v.knownbitsmask = 0ull;
+  v.knownbits = 0ull;
 
   if (!op)
     return (v);
 
   sym_link *type = operandType (op);
 
-  if (IS_INTEGRAL (type) && bitsForType (type) < 64 && !IS_OP_VOLATILE (op) &&// Todo: More exact check than this bits thing?
+  if (IS_INTEGRAL (type) && bitsForType (type) < 64 && !IS_OP_VOLATILE (op) && // Todo: More exact check than this bits thing?
     (IS_OP_LITERAL (op) || IS_SYMOP (op) && SPEC_CONST (type) && OP_SYMBOL_CONST (op)->ival && IS_AST_VALUE (list2expr (OP_SYMBOL_CONST (op)->ival))))
     {
       struct valinfo v2;
@@ -354,6 +358,8 @@ valinfoUpdate (struct valinfo *v)
 static void
 valinfoPlus (struct valinfo *result, sym_link *resulttype, const struct valinfo &left, const struct valinfo &right)
 {
+  if (result->anything)
+    result->knownbitsmask = 0ull;
   // todo: rewrite using ckd_add when we can assume host compiler has c2x support!
   if (!left.anything && !right.anything &&
     left.min > LLONG_MIN / 2 && right.min > LLONG_MIN / 2 &&
@@ -410,6 +416,9 @@ valinfoPlus (struct valinfo *result, sym_link *resulttype, const struct valinfo 
 static void
 valinfoMinus (struct valinfo *result, sym_link *resulttype, const struct valinfo &left, const struct valinfo &right)
 {
+  if (result->anything)
+    result->knownbitsmask = 0ull;
+
   if (IS_PTR (resulttype) && !left.anything && !right.anything)
     {
       if (TARGET_IS_MCS51)
@@ -443,6 +452,9 @@ valinfoMinus (struct valinfo *result, sym_link *resulttype, const struct valinfo
 static void
 valinfoMult (struct valinfo *result, const struct valinfo &left, const struct valinfo &right)
 {
+  if (result->anything)
+    result->knownbitsmask = 0ull;
+
   // todo: rewrite using ckd_mul when we can assume host compiler has c2x support!
   if (!left.anything && !right.anything &&
     left.min >=0 && right.min >= 0 &&
@@ -463,6 +475,9 @@ valinfoMult (struct valinfo *result, const struct valinfo &left, const struct va
 static void
 valinfoDiv (struct valinfo *result, const struct valinfo &left, const struct valinfo &right)
 {
+  if (result->anything)
+    result->knownbitsmask = 0ull;
+
   if (!left.anything && left.min >= result->min && left.max <= result->max)
     {
       if (!right.anything && right.min >= 0)
@@ -478,6 +493,9 @@ valinfoDiv (struct valinfo *result, const struct valinfo &left, const struct val
 static void
 valinfoMod (struct valinfo *result, const struct valinfo &left, const struct valinfo &right)
 {
+  if (result->anything)
+    result->knownbitsmask = 0ull;
+
   if (!left.anything && left.min >= result->min && left.max <= result->max)
     {
       result->min = std::min (left.min, 0ll);
@@ -614,7 +632,6 @@ valinfoCast (struct valinfo *result, sym_link *targettype, const struct valinfo 
   else if (!right.anything && (IS_INTEGRAL (targettype) || IS_GENPTR (targettype)) && 
     (!result->anything && right.min >= result->min && right.max <= result->max || result->anything))
     {
-      result->anything = false;
       result->min = right.min;
       result->max = right.max;
       if (result->min >= 0)
@@ -847,6 +864,10 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
         valinfoCast (&resultvalinfo, operandType (IC_RESULT (ic)), rightvalinfo);
       valinfoUpdate (&resultvalinfo);
 
+#ifdef DEBUG_GCP_ANALYSIS
+      std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
+#endif
+
       if (resultsym)
         {
           if (!ic->resultvalinfo)
@@ -866,8 +887,8 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
 void
 recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
 {
-#ifdef DEBUG_ANALYSIS
-  std::cout << "recomputeValinfos at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n";
+#ifdef DEBUG_GCP_ANALYSIS
+  std::cout << "recomputeValinfos at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n"; std::cout.flush();
 #endif
 
   unsigned int max_rounds = 1000; // Rapidly end analysis once this number of rounds has been exceeded.
@@ -897,7 +918,7 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
       todo.second.erase (i);
 
 #ifdef DEBUG_GCP_ANALYSIS
-      std::cout << "Round " << round << " node " << i << " ic " << G[i].ic->key << "\n";
+      std::cout << "Round " << round << " node " << i << " ic " << G[i].ic->key << "\n"; std::cout.flush();
 #endif
       recompute_node (G, i, ebbi, todo, false, round >= max_rounds);
     }
@@ -914,7 +935,7 @@ static void
 optimizeValinfoConst (iCode *sic)
 {
 #ifdef DEBUG_GCP_OPT
-  std::cout << "optimizeValinfoConst at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n";
+  std::cout << "optimizeValinfoConst at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n"; std::cout.flush();
 #endif
   for (iCode *ic = sic; ic; ic = ic->next)
     {
@@ -928,7 +949,7 @@ optimizeValinfoConst (iCode *sic)
           const valinfo vleft = getOperandValinfo (ic, left);
           const valinfo vright = getOperandValinfo (ic, right);
           if (ic->resultvalinfo && !ic->resultvalinfo->anything && ic->resultvalinfo->min == ic->resultvalinfo->max &&
-            !(ic->op == '=' && IS_OP_LITERAL (right)))
+            !(ic->op == '=' && IS_OP_LITERAL (right)) && !POINTER_SET (ic))
             {
               const valinfo &vresult = *ic->resultvalinfo;
 #ifdef DEBUG_GCP_OPT
@@ -1443,7 +1464,7 @@ optimizeMult (iCode *ic)
   struct valinfo rightv = getOperandValinfo (ic, right);
   struct valinfo resultv = *ic->resultvalinfo;
 
-  if (leftv.anything || rightv.anything || leftv.min < 0 || rightv.min < 0 || leftv.max > 0xffff || rightv.max > 0xffff || resultv.max > 0xffff)
+  if (leftv.anything || rightv.anything || resultv.anything || leftv.min < 0 || rightv.min < 0 || leftv.max > 0xffff || rightv.max > 0xffff || resultv.max > 0xffff)
     return;
 
   sym_link *newoptype;

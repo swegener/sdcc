@@ -1,3 +1,9 @@
+2023-07-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/pdk/ralloc.c:
+	  Fix some issues, mostly in generalized constant propagation.
+
 2023-07-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCcse.c,

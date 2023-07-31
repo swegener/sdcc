@@ -523,24 +523,30 @@ packRegisters (eBBlock * ebp)
           operand *op = IC_RESULT (ic);
           if ((use->op == LEFT_OP || use->op == '+' || use->op == '-' || use->op == UNARYMINUS ||
             use->op == '&' || use->op == '|' || use->op == '^') &&
-            IC_LEFT (use)->key == op->key && (!IC_RIGHT(use) || IC_RIGHT (use)->key != op->key))
+            IC_LEFT (use)->key == op->key && (!IC_RIGHT (use) || IC_RIGHT (use)->key != op->key))
             {
-              bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
-              bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, use->key);
+              if (IS_SYMOP (ic->right))
+                {
+                  bitVectUnSetBit (OP_SYMBOL (ic->right)->uses, ic->key);
+                  bitVectSetBit (OP_SYMBOL (ic->right)->uses, use->key);
+                }
               IC_LEFT (use) = operandFromOperand (IC_RIGHT(ic));
               remiCodeFromeBBlock (ebp, ic);
               hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
               if(ic->prev)
                 ic = ic->prev;
             }
-          else if ((/*(use->op == SET_VALUE_AT_ADDRESS && !IS_BITVAR (getSpec (operandType (IC_LEFT (use)))) && !IS_BITVAR (getSpec (operandType (IC_RIGHT (use))))) || - resulted in pointer writes toring too few bytes*/
+          else if ((/*(use->op == SET_VALUE_AT_ADDRESS && !IS_BITVAR (getSpec (operandType (IC_LEFT (use)))) && !IS_BITVAR (getSpec (operandType (IC_RIGHT (use))))) || - resulted in pointer write storing too few bytes*/
             use->op == CAST && (SPEC_USIGN (getSpec (operandType (IC_RIGHT (use)))) || operandSize (IC_RESULT (use)) <= operandSize (IC_RIGHT (use))) ||
             use->op == LEFT_OP || use->op == RIGHT_OP || use->op == '+' || use->op == '-' ||
             use->op == '&' || use->op == '|' || use->op == '^') &&
             IC_RIGHT (use)->key == op->key && (!IC_LEFT(use) || IC_LEFT (use)->key != op->key))
             {
-              bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
-              bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, use->key);
+              if (IS_SYMOP (ic->right))
+                {
+                  bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
+                  bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, use->key);
+                }
               IC_RIGHT (use) = operandFromOperand (IC_RIGHT(ic));
               remiCodeFromeBBlock (ebp, ic);
               hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);

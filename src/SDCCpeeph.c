@@ -3622,7 +3622,7 @@ hashSymbolName (const char *name)
 
   while (*name)
     {
-      hash = (hash << 6) ^ *name;
+      hash = ((unsigned)hash << 6) ^ *name;
       name++;
     }
 

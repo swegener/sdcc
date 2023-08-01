@@ -160,6 +160,8 @@ stm8_init_reg_asmop(asmop *aop, const signed char *regidx)
       aop->aopu.bytes[i].in_reg = true;
       aop->size++;
     }
+
+  aop->valinfo.anything = true;
 }
 
 void
@@ -181,6 +183,7 @@ stm8_init_asmops (void)
   asmop_zero.regs[YL_IDX] = -1;
   asmop_zero.regs[YH_IDX] = -1;
   asmop_zero.regs[C_IDX] = -1;
+  asmop_zero.valinfo.anything = true;
 
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;
@@ -191,6 +194,7 @@ stm8_init_asmops (void)
   asmop_one.regs[YL_IDX] = -1;
   asmop_one.regs[YH_IDX] = -1;
   asmop_one.regs[C_IDX] = -1;
+  asmop_one.valinfo.anything = true;
   
   asmop_mone.type = AOP_LIT;
   asmop_mone.size = 8; // Maximum size for asmop.
@@ -201,6 +205,7 @@ stm8_init_asmops (void)
   asmop_mone.regs[YL_IDX] = -1;
   asmop_mone.regs[YH_IDX] = -1;
   asmop_mone.regs[C_IDX] = -1;
+  asmop_mone.valinfo.anything = true;
 }
 
 static void 
@@ -366,7 +371,7 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
         continue;
 
       // Information from generalized constant propagation analysis
-      if (!aop->valinfo.anything &&
+      if (!aop->valinfo.anything && (offset * 8 < sizeof (aop->valinfo.knownbitsmask) * CHAR_BIT) &&
         ((aop->valinfo.knownbitsmask >> (offset * 8)) & 0xff) == 0xff &&
         ((aop->valinfo.knownbits >> (offset * 8)) & 0xff) == b)
         continue;
@@ -4627,11 +4632,13 @@ genPlus (const iCode *ic)
       lop_impl.regs[XH_IDX] = -1;
       lop_impl.regs[YL_IDX] = -1;
       lop_impl.regs[YH_IDX] = -1;
+      lop_impl.valinfo.anything = true;
       rop_impl.regs[A_IDX] = -1;
       rop_impl.regs[XL_IDX] = -1;
       rop_impl.regs[XH_IDX] = -1;
       rop_impl.regs[YL_IDX] = -1;
       rop_impl.regs[YH_IDX] = -1;
+      rop_impl.valinfo.anything = true;
 
       for (i = 0; i < size; i++)
         {
@@ -5340,6 +5347,7 @@ genDivMod2 (const iCode *ic)
       cop.aopu.bytes[1] = left->aop->aopu.bytes[1];
       cop.aopu.bytes[2] = right->aop->aopu.bytes[0];
       cop.aopu.bytes[3] = right->aop->aopu.bytes[1];
+      cop.valinfo.anything = true;
       genMove (ASMOP_XY, &cop, regDead (A_IDX, ic), TRUE, TRUE);
     }
   else if (aopRS (right->aop))
@@ -7044,6 +7052,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
   bool all_in_reg = TRUE;
 
   shiftop->size = size;
+  shiftop->valinfo.anything = true;
   memset (shiftop->regs, -1, sizeof(shiftop->regs));
 
   for (i = 0; i < size;)
@@ -8324,6 +8333,7 @@ init_stackop (asmop *stackop, int size, long int stk_off)
     }
 
   stackop->type = AOP_STK;
+  stackop->valinfo.anything = true;
 }
 
 /*-----------------------------------------------------------------*/

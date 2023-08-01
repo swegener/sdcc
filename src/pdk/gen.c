@@ -68,11 +68,13 @@ pdk_init_asmops (void)
   asmop_a.size = 1;
   asmop_a.aopu.bytes[0].in_reg = true;
   asmop_a.aopu.bytes[0].byteu.reg = pdk_regs + A_IDX;
+  asmop_a.valinfo.anything = true;
 
   asmop_p.type = AOP_REG;
   asmop_p.size = 1;
   asmop_p.aopu.bytes[0].in_reg = true;
   asmop_p.aopu.bytes[0].byteu.reg = pdk_regs + P_IDX;
+  asmop_p.valinfo.anything = true;
 
   asmop_ap.type = AOP_REG;
   asmop_ap.size = 2;
@@ -80,6 +82,7 @@ pdk_init_asmops (void)
   asmop_ap.aopu.bytes[0].byteu.reg = pdk_regs + A_IDX;
   asmop_ap.aopu.bytes[1].in_reg = true;
   asmop_ap.aopu.bytes[1].byteu.reg = pdk_regs + P_IDX;
+  asmop_ap.valinfo.anything = true;
 
   asmop_pa.type = AOP_REG;
   asmop_pa.size = 2;
@@ -87,22 +90,27 @@ pdk_init_asmops (void)
   asmop_pa.aopu.bytes[0].byteu.reg = pdk_regs + P_IDX;
   asmop_pa.aopu.bytes[1].in_reg = true;
   asmop_pa.aopu.bytes[1].byteu.reg = pdk_regs + A_IDX;
+  asmop_pa.valinfo.anything = true;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
   asmop_zero.aopu.aop_lit = constVal ("0");
+  asmop_zero.valinfo.anything = true;
 
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;
   asmop_one.aopu.aop_lit = constVal ("1");
+  asmop_one.valinfo.anything = true;
   
   asmop_mone.type = AOP_LIT;
   asmop_mone.size = 8; // Maximum size for asmop.
   asmop_mone.aopu.aop_lit = constVal ("-1");
+  asmop_mone.valinfo.anything = true;
 
   asmop_sp.type = AOP_SFR;
   asmop_sp.aopu.aop_dir = "sp";
   asmop_sp.size = 1;
+  asmop_sp.valinfo.anything = true;
 }
 
 static void
@@ -194,7 +202,8 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
         !strcmp(aop1->aopu.aop_dir, aop2->aopu.aop_dir))
         return (true);
 
-      if (aop1->type == AOP_STK && aop2->type == AOP_STK && aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
+      if (aop1->type == AOP_STK && aop2->type == AOP_STK &&
+        offset1 <= 8 && offset2 <= 8 && aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
         return (true);
 
       if (aop1->type == AOP_SFR && aop2->type == AOP_SFR && offset1 == offset2 &&

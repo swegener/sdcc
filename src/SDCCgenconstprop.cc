@@ -594,7 +594,7 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
       rv.max = left.max;
       for(long long r = right.max; r; r--)
         {
-          if (rv.min < (-1ll << 61) || rv.max > (1ll << 61))
+          if (rv.min < 0 || rv.max > (1ll << 61))
             return;
           rv.min <<= 1;
           rv.max <<= 1;
@@ -862,14 +862,13 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
       else if (ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST)
         //resultvalinfo = rightvalinfo; // Doesn't work for = - sometimes = with mismatched types arrive here.
         valinfoCast (&resultvalinfo, operandType (IC_RESULT (ic)), rightvalinfo);
-      valinfoUpdate (&resultvalinfo);
-
-#ifdef DEBUG_GCP_ANALYSIS
-      std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
-#endif
 
       if (resultsym)
         {
+          valinfoUpdate (&resultvalinfo);
+#ifdef DEBUG_GCP_ANALYSIS
+          std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
+#endif
           if (!ic->resultvalinfo)
             ic->resultvalinfo = new struct valinfo;
           *ic->resultvalinfo = resultvalinfo;

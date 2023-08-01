@@ -288,6 +288,8 @@ z80_init_reg_asmop(asmop *aop, const signed char *regidx)
       aop->regs[regidx[i]] = i;
       aop->size++;
     }
+
+  aop->valinfo.anything = true;
 }
 
 void
@@ -315,16 +317,19 @@ z80_init_asmops (void)
   asmop_zero.aopu.aop_lit = constVal ("0");
   asmop_zero.size = 1;
   memset (asmop_zero.regs, -1, 9);
+  asmop_zero.valinfo.anything = true;
 
   asmop_one.type = AOP_LIT;
   asmop_one.aopu.aop_lit = constVal ("1");
   asmop_one.size = 1;
   memset (asmop_one.regs, -1, 9);
+  asmop_one.valinfo.anything = true;
 
   asmop_mone.type = AOP_LIT;
   asmop_mone.aopu.aop_lit = constVal ("-1");
   asmop_mone.size = 1;
   memset (asmop_mone.regs, -1, 9);
+  asmop_mone.valinfo.anything = true;
 }
 
 static bool regalloc_dry_run;
@@ -4280,7 +4285,7 @@ skip_byte:
       const int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
       bool a_free = a_dead && (result->regs[A_IDX] < roffset || !assigned[result->regs[A_IDX] - roffset]);
-      const bool hl_free = hl_dead && (result->regs[L_IDX] < roffset || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
+      const bool hl_free = hl_dead && (result->regs[L_IDX] < roffset || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < roffset || !assigned[result->regs[H_IDX] - roffset]);
       const bool e_free = de_dead && (result->regs[E_IDX] < roffset || !assigned[result->regs[E_IDX] - roffset]);
       const bool d_free = de_dead && (result->regs[D_IDX] < roffset || !assigned[result->regs[D_IDX] - roffset]);
       const bool de_free = e_free && d_free;
@@ -8790,7 +8795,7 @@ genMultTwoChar (const iCode *ic)
 static void
 genMult (iCode *ic)
 {
-  int val, i;
+  int val;
   /* If true then the final operation should be a subtract */
   bool active = false;
   bool byteResult;
@@ -8924,7 +8929,7 @@ no_mlt:
     {
       int num_add = 0;
       bool active = false;
-      i = val;
+      unsigned int i = val;
       for (int count = 0; count < 16; count++)
         {
           if (count != 0 && active)
@@ -9037,7 +9042,7 @@ no_mlt:
     }
   else // Don't try to use CSD for hl, since subtraction there is more expensive than addition.
     {
-      i = val;
+      unsigned int i = val;
       for (int count = 0; count < 16; count++)
         {
           if (count != 0 && active)
@@ -13332,6 +13337,8 @@ init_stackop (asmop *stackop, int size, long int stk_off)
     stackop->type = AOP_EXSTK;
   else
     stackop->type = AOP_STK;
+
+  stackop->valinfo.anything = true;
 }
 
 /*-----------------------------------------------------------------*/

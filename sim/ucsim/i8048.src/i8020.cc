@@ -29,6 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "utils.h"
 
+#include "dregcl.h"
+
 #include "glob.h"
 
 #include "i8020cl.h"
@@ -165,7 +167,8 @@ void
 cl_i8020::mk_hw_elements(void)
 {
   cl_uc::mk_hw_elements();
-  //class cl_hw *h;
+  class cl_hw *h;
+
   timer= new cl_timer(this);
   timer->init();
   add_hw(timer);
@@ -186,6 +189,10 @@ cl_i8020::mk_hw_elements(void)
   pext= new cl_pext(this, 0, ports, 4, p2);
   pext->init();
   add_hw(pext);
+
+  h= new cl_dreg(this, 0, "dreg");
+  h->init();
+  add_hw(h);
 }
 
 void

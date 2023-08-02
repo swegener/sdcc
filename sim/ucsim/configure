@@ -707,10 +707,8 @@ enable_tlcs_port
 enable_r3ka_port
 enable_r2k_port
 enable_gbz80_port
-enable_z180_port
 enable_z80_port
 enable_avr_port
-enable_ds390_port
 enable_mcs51_port
 enable_dlso
 enable_ucsim
@@ -765,13 +763,8 @@ enable_option_checking
 enable_ucsim
 enable_dlso
 enable_mcs51_port
-enable_ds390_port
 enable_avr_port
 enable_z80_port
-enable_z180_port
-enable_gbz80_port
-enable_r2k_port
-enable_r3ka_port
 enable_tlcs_port
 enable_m68hc08_port
 enable_s08_port
@@ -780,8 +773,8 @@ enable_stm8_port
 enable_pdk_port
 enable_st7_port
 enable_p1516_port
-enable_m6809_port
 enable_m6800_port
+enable_m6809_port
 enable_m68hc11_port
 enable_m68hc12_port
 enable_mos6502_port
@@ -1429,35 +1422,33 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-ucsim          obsolete, ignored
-  --enable-dlso           compile dynamically loadable shared libraries
-  --disable-mcs51-port    do not compile simulator for mcs51
-  --disable-ds390-port    do not compile simulator for ds390
-  --disable-avr-port      do not compile simulator for AVR
-  --disable-z80-port      do not compile simulator for z80
-  --disable-z180-port     do not compile simulator for z180
-  --disable-gbz80-port    do not compile simulator for gbz80
-  --disable-r2k-port      do not compile simulator for r2k
-  --disable-r3ka-port     do not compile simulator for r3ka
-  --disable-tlcs-port     do not compile simulator for TLCS
+  --enable-ucsim=ARG      en/disable compile of exe wrapper (unfinished)
+  --enable-dlso=ARG       en/disable compile shared objects
+  --enable-mcs51-port=ARG en/disable compile mcs51 simulator
+  --enable-avr-port=ARG   en/disable compile avr simulator
+  --enable-z80-port=ARG   en/disable compile z80 simulator
+  --enable-tlcs-port=ARG  en/disable compile tlcs simulator
   --disable-m68hc08-port  do not compile simulator for m68hc08
   --disable-s08-port      do not compile simulator for s08
   --disable-xa-port       do not compile simulator for xa
   --disable-stm8-port     do not compile simulator for stm8
   --disable-pdk-port      do not compile simulator for pdk
-  --disable-st7-port      do not compile simulator for st7
-  --disable-p1516-port    do not compile simulator for p1516
-  --disable-m6809-port    do not compile simulator for m6809
-  --disable-m6800-port    do not compile simulator for m6800
-  --disable-m68hc11-port  do not compile simulator for m68hc11
-  --disable-m68hc12-port  do not compile simulator for m68hc12
+  --enable-st7-port=ARG   en/disable compile st7 simulator
+  --disable-p1516-port    en/dsbale compile p1516 simulator
+  --enable-m6800-port=ARG en/disable compile m6800 simulator
+  --enable-m6809-port=ARG en/disable compile m6809 simulator
+  --enable-m68hc11-port=ARG
+                          en/disable compile m68hc11 simulator
+  --enable-m68hc12-port=ARG
+                          en/disable compile m68hc12 simulator
   --disable-mos6502-port  do not compile simulator for mos6502
   --disable-rxk-port      do not compile simulator for Rabbit rXk
-  --disable-pblaze-port   do not compile simulator for Xilinx PicoBlaze
-  --disable-i8085-port    do not compile simulator for i8085
+  --enable-pblaze-port=ARG
+                          en/disable compile picoblaze simulator
+  --enable-i8085-port=ARG en/disable compile i8085 simulator
   --disable-f8-port       do not compile simulator for f8
-  --disable-i8048-port    do not compile simulator for i8048
-  --disable-serio         do not compile serio GUI tool (needs curses)
+  --enable-i8048-port=ARG en/disable compile i8048 simulator
+  --enable-serio=ARG      en/disable compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
 
 Some influential environment variables:
@@ -3155,6 +3146,53 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 ac_config_headers="$ac_config_headers ddconfig.h:ddconfig_in.h"
 
 
+def_ucsim="yes"
+def_dlso="no"
+def_mcs51_port="yes"
+def_p1516="yes"
+def_avr="yes"
+def_serio="yes"
+def_z80="yes"
+def_tlcs="yes"
+def_m6800="yes"
+def_m6809="yes"
+def_m68hc11="yes"
+def_m68hc12="yes"
+def_pblaze="yes"
+def_i8085="yes"
+def_i8048="yes"
+def_st7="yes"
+
+in_sdcc="no"
+src_root=$(dirname $0)
+if test "$src_root"x == "x" -o "$src_root" == "." ; then
+    src_root=$(pwd)
+fi
+last_root=$(basename $src_root)
+if test $last_root == "ucsim" ; then
+    up_src=$(dirname $src_root)
+    if test $(basename $up_src) == "sim" ; then
+	in_sdcc="yes"
+    fi
+fi
+echo "In SDCC tree: $in_sdcc"
+
+if test $in_sdcc == "yes" ; then
+    def_ucsim="no"
+    def_p1516="no"
+    def_avr="no"
+    def_serio="no"
+    def_m6800="no"
+    def_m6809="no"
+    def_m68hc11="no"
+    def_m68hc12="no"
+    def_pblaze="no"
+    def_i8085="no"
+    def_i8048="no"
+    def_st7="no"
+fi
+
+
 for ac_prog in gawk mawk nawk awk
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3330,116 +3368,56 @@ fi
 # Check whether --enable-ucsim was given.
 if test ${enable_ucsim+y}
 then :
-  enableval=$enable_ucsim; if test $enable_ucsim != "no"; then
-    enable_ucsim="yes"
-fi
+  enableval=$enable_ucsim;
 else $as_nop
-  #default
-enable_ucsim="no"
+  enable_ucsim=$def_ucsim
 fi
 
-# ignore setting, always use NO
-#enable_ucsim="no"
 
 # Check whether --enable-dlso was given.
 if test ${enable_dlso+y}
 then :
-  enableval=$enable_dlso; if test $enable_dlso != "no"; then
-    enable_dlso="yes"
-fi
+  enableval=$enable_dlso;
 else $as_nop
-  enable_dlso="no"
+  enable_dlso=$def_dlso
 fi
+
 
 # Check whether --enable-mcs51-port was given.
 if test ${enable_mcs51_port+y}
 then :
-  enableval=$enable_mcs51_port; if test $enable_mcs51_port != "no"; then
-    enable_mcs51_port="yes"
-fi
+  enableval=$enable_mcs51_port;
 else $as_nop
-  enable_mcs51_port="yes"
+  enable_mcs51_port=$def_mcs51_port
 fi
 
-# Check whether --enable-ds390-port was given.
-if test ${enable_ds390_port+y}
-then :
-  enableval=$enable_ds390_port; if test $enable_ds390_port != "no"; then
-    enable_ds390_port="yes"
-fi
-else $as_nop
-  enable_ds390_port="yes"
-fi
 
 # Check whether --enable-avr-port was given.
 if test ${enable_avr_port+y}
 then :
-  enableval=$enable_avr_port; if test $enable_avr_port != "no"; then
-    enable_avr_port="yes"
-fi
+  enableval=$enable_avr_port;
 else $as_nop
-  enable_avr_port="yes"
+  enable_avr_port=$def_avr
 fi
+
 
 # Check whether --enable-z80-port was given.
 if test ${enable_z80_port+y}
 then :
-  enableval=$enable_z80_port; if test $enable_z80_port != "no"; then
-    enable_z80_port="yes"
-fi
+  enableval=$enable_z80_port;
 else $as_nop
-  enable_z80_port="yes"
+  enable_z80_port=$def_z80
 fi
 
-# Check whether --enable-z180-port was given.
-if test ${enable_z180_port+y}
-then :
-  enableval=$enable_z180_port; if test $enable_z180_port != "no"; then
-    enable_z180_port="yes"
-fi
-else $as_nop
-  enable_z180_port="yes"
-fi
-
-# Check whether --enable-gbz80-port was given.
-if test ${enable_gbz80_port+y}
-then :
-  enableval=$enable_gbz80_port; if test $enable_gbz80_port != "no"; then
-    enable_gbz80_port="yes"
-fi
-else $as_nop
-  enable_gbz80_port="yes"
-fi
-
-# Check whether --enable-r2k-port was given.
-if test ${enable_r2k_port+y}
-then :
-  enableval=$enable_r2k_port; if test $enable_r2k_port != "no"; then
-    enable_r2k_port="yes"
-fi
-else $as_nop
-  enable_r2k_port="yes"
-fi
-
-# Check whether --enable-r3ka-port was given.
-if test ${enable_r3ka_port+y}
-then :
-  enableval=$enable_r3ka_port; if test $enable_r3ka_port != "no"; then
-    enable_r3ka_port="yes"
-fi
-else $as_nop
-  enable_r3ka_port="yes"
-fi
 
 # Check whether --enable-tlcs-port was given.
 if test ${enable_tlcs_port+y}
 then :
-  enableval=$enable_tlcs_port; if test $enable_tlcs_port != "no"; then
-    enable_tlcs_port="yes"
-fi
+  enableval=$enable_tlcs_port;
 else $as_nop
-  enable_tlcs_port="yes"
+  enable_tlcs_port=$def_tlcs
 fi
+
 
 # Check whether --enable-m68hc08-port was given.
 if test ${enable_m68hc08_port+y}
@@ -3491,67 +3469,58 @@ else $as_nop
   enable_pdk_port="yes"
 fi
 
+
 # Check whether --enable-st7-port was given.
 if test ${enable_st7_port+y}
 then :
-  enableval=$enable_st7_port; if test $enable_st7_port  != "no"; then
-    enable_st7_port="yes"
-fi
+  enableval=$enable_st7_port;
 else $as_nop
-  enable_st7_port="yes"
+  enable_st7_port=$def_st7
 fi
+
 
 # Check whether --enable-p1516-port was given.
 if test ${enable_p1516_port+y}
 then :
-  enableval=$enable_p1516_port; if test $enable_p1516_port  != "no"; then
-    enable_p1516_port="yes"
-fi
+  enableval=$enable_p1516_port;
 else $as_nop
-  enable_p1516_port="yes"
-fi
-
-# Check whether --enable-m6809-port was given.
-if test ${enable_m6809_port+y}
-then :
-  enableval=$enable_m6809_port; if test $enable_m6809_port  != "no"; then
-    enable_m6809_port="yes"
-fi
-else $as_nop
-  enable_m6809_port="yes"
+  enable_p1516_port=$def_p1516
 fi
 
 
 # Check whether --enable-m6800-port was given.
 if test ${enable_m6800_port+y}
 then :
-  enableval=$enable_m6800_port; if test $enable_m6800_port  != "no"; then
-    enable_m6800_port="yes"
-fi
+  enableval=$enable_m6800_port;
 else $as_nop
-  enable_m6800_port="yes"
+  enable_m6800_port=$def_m6800
+fi
+
+
+# Check whether --enable-m6809-port was given.
+if test ${enable_m6809_port+y}
+then :
+  enableval=$enable_m6809_port;
+else $as_nop
+  enable_m6809_port=$def_m6809
 fi
 
 
 # Check whether --enable-m68hc11-port was given.
 if test ${enable_m68hc11_port+y}
 then :
-  enableval=$enable_m68hc11_port; if test $enable_m68hc11_port  != "no"; then
-    enable_m68hc11_port="yes"
-fi
+  enableval=$enable_m68hc11_port;
 else $as_nop
-  enable_m68hc11_port="yes"
+  enable_m68hc11_port=$def_m68hc11
 fi
 
 
 # Check whether --enable-m68hc12-port was given.
 if test ${enable_m68hc12_port+y}
 then :
-  enableval=$enable_m68hc12_port; if test $enable_m68hc12_port  != "no"; then
-    enable_m68hc12_port="yes"
-fi
+  enableval=$enable_m68hc12_port;
 else $as_nop
-  enable_m68hc12_port="yes"
+  enable_m68hc12_port=$def_m68hc12
 fi
 
 
@@ -3575,25 +3544,24 @@ else $as_nop
   enable_rxk_port="yes"
 fi
 
+
 # Check whether --enable-pblaze-port was given.
 if test ${enable_pblaze_port+y}
 then :
-  enableval=$enable_pblaze_port; if test $enable_pblaze_port  != "no"; then
-    enable_pblaze_port="yes"
-fi
+  enableval=$enable_pblaze_port;
 else $as_nop
-  enable_pblaze_port="yes"
+  enable_pblaze_port=$def_pblaze
 fi
+
 
 # Check whether --enable-i8085-port was given.
 if test ${enable_i8085_port+y}
 then :
-  enableval=$enable_i8085_port; if test $enable_i8085_port  != "no"; then
-    enable_i8085_port="yes"
-fi
+  enableval=$enable_i8085_port;
 else $as_nop
-  enable_i8085_port="yes"
+  enable_i8085_port=$def_i8085
 fi
+
 
 # Check whether --enable-f8-port was given.
 if test ${enable_f8_port+y}
@@ -3605,24 +3573,22 @@ else $as_nop
   enable_f8_port="yes"
 fi
 
+
 # Check whether --enable-i8048-port was given.
 if test ${enable_i8048_port+y}
 then :
-  enableval=$enable_i8048_port; if test $enable_i8048_port  != "no"; then
-    enable_i8048_port="yes"
-fi
+  enableval=$enable_i8048_port;
 else $as_nop
-  enable_i8048_port="yes"
+  enable_i8048_port=$def_i8048
 fi
+
 
 # Check whether --enable-serio was given.
 if test ${enable_serio+y}
 then :
-  enableval=$enable_serio; if test $enable_serio != "no"; then
-    enable_serio="yes"
-fi
+  enableval=$enable_serio;
 else $as_nop
-  enable_serio="yes"
+  enable_serio=$def_serio
 fi
 
 
@@ -9371,6 +9337,32 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 printf "%s\n" "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+
+echo "Compile for SDCC  $in_sdcc"
+echo "Compile dlso      $enable_dlso"
+echo "Compile ucsim     $enable_ucsim"
+echo "Compile s51       $enable_mcs51_port"
+echo "Compile avr       $enable_avr_port"
+echo "Compile z80       $enable_z80_port"
+echo "Compile tlcs      $enable_tlcs_port"
+echo "Compile m68hc08   $enable_m68hc08_port"
+echo "Compile s08       $enable_s08_port"
+echo "Compile xa        $enable_xa_port"
+echo "Compile stm8      $enable_stm8_port"
+echo "Compile pdk       $enable_pdk_port"
+echo "Compile st7       $enable_st7_port"
+echo "Compile p1516     $enable_p1516_port"
+echo "Compile m6809     $enable_m6809_port"
+echo "Compile m6800     $enable_m6800_port"
+echo "Compile m68hc11   $enable_m68hc11_port"
+echo "Compile m68hc12   $enable_m68hc12_port"
+echo "Compile mos6502   $enable_mos6502_port"
+echo "Compile rxk       $enable_rxk_port"
+echo "Compile pblaze    $enable_pblaze_port"
+echo "Compile i8085     $enable_i8085_port"
+echo "Compile f8        $enable_f8_port"
+echo "Compile i8048     $enable_i8048_port"
+echo "Compile serio     $enable_serio"
 
 #gui.src/portmon.src/Makefile
 

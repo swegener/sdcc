@@ -1,10 +1,8 @@
 EXEEXT		= @EXEEXT@
 
 enable_mcs51_port   = @enable_mcs51_port@
-enable_ds390_port   = @enable_ds390_port@
 enable_avr_port     = @enable_avr_port@
 enable_z80_port     = @enable_z80_port@
-enable_z180_port    = @enable_z180_port@
 enable_gbz80_port   = @enable_gbz80_port@
 enable_r2k_port     = @enable_r2k_port@
 enable_r3ka_port    = @enable_r3ka_port@
@@ -30,11 +28,7 @@ enable_i8048_port   = @enable_i8048_port@
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
 else
-ifeq ($(enable_ds390_port),yes)
-S390		= s51.src
-else
 S51		=
-endif
 endif
 
 ifeq ($(enable_avr_port),yes)
@@ -46,23 +40,7 @@ endif
 ifeq ($(enable_z80_port),yes)
 SZ80		= z80.src
 else
-ifeq ($(enable_z180_port),yes)
-SZ180		= z80.src
-else
-ifeq ($(enable_gbz80_port),yes)
-SGBZ80		= z80.src
-else
-ifeq ($(enable_r2k_port),yes)
-SR2K		= z80.src
-else
-ifeq ($(enable_r3ka_port),yes)
-SR3KA		= z80.src
-else
 SZ80		=
-endif
-endif
-endif
-endif
 endif
 
 ifeq ($(enable_tlcs_port),yes)
@@ -171,8 +149,8 @@ else
 I8048		=
 endif
 
-PKGS		= $(S51) $(S390) \
-		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
+PKGS		= $(S51) \
+		  $(SAVR) $(SZ80) \
 		  $(TLCS) \
 		  $(SM68HC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
 		  $(M6809) $(M6800) $(M68HC11) $(M68HC12) $(MOS6502) \

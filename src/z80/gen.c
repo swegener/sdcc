@@ -465,7 +465,7 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
         continue;
 
       // Information from generalized constant propagation analysis
-      if (!aop->valinfo.anything &&
+      if (!aop->valinfo.anything && offset < 8 &&
         ((aop->valinfo.knownbitsmask >> (offset * 8)) & 0xff) == 0xff &&
         ((aop->valinfo.knownbits >> (offset * 8)) & 0xff) == b)
         continue;

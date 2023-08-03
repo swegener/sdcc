@@ -5,7 +5,8 @@
 	  src/hc08/gen.c,
 	  src/mcs51/gen.c,
 	  src/mcs51/ralloc.c,
-	  src/pdk/gen.c:
+	  src/pdk/gen.c,
+	  src/z80/gen.c:
 	  Fix various bugs found by sanitizers.
 
 2023-08-01 Philipp Klaus Krause <philipp@colecovision.eu>

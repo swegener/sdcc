@@ -6624,7 +6624,7 @@ genAnd (iCode * ic, iCode * ifx)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      litinv = (~lit) & (((unsigned int) 0xffffffff) >> (8 * (4 - size)));
+      litinv = (~lit) & ((0xffffffffffffffffull) >> (8 * (8 - size)));
       if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && (AOP_TYPE (left) == AOP_DIR) && isLiteralBit (litinv))
         {
           bitpos = isLiteralBit (litinv) - 1;

@@ -1,3 +1,13 @@
+2023-08-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/ds390/gen.c,
+	  src/ds390/ralloc.c,
+	  src/hc08/gen.c,
+	  src/mcs51/gen.c,
+	  src/mcs51/ralloc.c,
+	  src/pdk/gen.c:
+	  Fix various bugs found by sanitizers.
+
 2023-08-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc,

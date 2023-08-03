@@ -11000,9 +11000,9 @@ genLiteralAssign (operand * result, operand * right, int size, bool (*output_fn)
 
       fl.f = (float) floatFromVal (AOP (right)->aopu.aop_lit);
 #ifdef WORDS_BIGENDIAN
-      lit = (fl.c[3] << 0) | (fl.c[2] << 8) | (fl.c[1] << 16) | (fl.c[0] << 24);
+      lit = ((unsigned long long)(fl.c[3]) << 0) | ((unsigned long long)(fl.c[2]) << 8) | ((unsigned long long)(fl.c[1]) << 16) | ((unsigned long long)(fl.c[0]) << 24);
 #else
-      lit = (fl.c[0] << 0) | (fl.c[1] << 8) | (fl.c[2] << 16) | (fl.c[3] << 24);
+      lit = ((unsigned long long)(fl.c[0]) << 0) | ((unsigned long long)(fl.c[1]) << 8) | ((unsigned long long)(fl.c[2]) << 16) | ((unsigned long long)(fl.c[3]) << 24);
 #endif
     }
 

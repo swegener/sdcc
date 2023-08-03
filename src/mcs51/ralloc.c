@@ -857,7 +857,7 @@ tryAgain:
     return NULL;
 
   /* make sure partially assigned registers aren't reused */
-  for (j = 0; j <= sym->nRegs; j++)
+  for (j = 0; j <= sym->nRegs && j < 8; j++)
     if (sym->regs[j])
       sym->regs[j]->isFree = 0;
 

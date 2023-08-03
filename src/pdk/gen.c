@@ -203,7 +203,7 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
         return (true);
 
       if (aop1->type == AOP_STK && aop2->type == AOP_STK &&
-        offset1 <= 8 && offset2 <= 8 && aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
+        offset1 < 8 && offset2 < 8 && aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
         return (true);
 
       if (aop1->type == AOP_SFR && aop2->type == AOP_SFR && offset1 == offset2 &&

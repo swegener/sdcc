@@ -1,3 +1,7 @@
+2023-08-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/scripts/sdcc.nsi: Remove unused/unbuilt simulators
+
 2023-08-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/ds390/gen.c,

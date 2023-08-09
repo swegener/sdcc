@@ -9,8 +9,14 @@
 #include <stddef.h> // For wchar_t
 
 #if defined(__SDCC) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if defined(__APPLE__)
+// Work around Apple's missing uchar.h
+#include <stdint.h>
+typedef int_least16_t char16_t;
+typedef int_least32_t char32_t;
+#else
 #include <uchar.h> // For char16_t, char32_t
-
+#endif
 char16_t uc = u'c';
 char32_t Uc = U'c';
 

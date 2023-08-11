@@ -134,6 +134,7 @@ char16restart(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
+#if !defined(__APPLE__)
 	static mbstate_t ps;
 	char16_t c16[3];
 	char c[MB_LEN_MAX];
@@ -166,6 +167,7 @@ char16restart(void)
 #endif
 #endif
 #endif
+#endif
 }
 #endif
 
@@ -175,6 +177,7 @@ char32restart(void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if !defined(__APPLE__)
 	static mbstate_t ps;
 	char32_t c32[3];
 	char c[MB_LEN_MAX];
@@ -186,6 +189,7 @@ char32restart(void)
 	ASSERT(c32[0] == (U"C")[0]);
 	ASSERT(c32rtomb(c, c32[0], &ps) == 1);
 	ASSERT(c[0] == 'C');
+#endif
 #endif
 #endif
 }

@@ -63,6 +63,7 @@ int BitBankUsed;                /* MB: overlayable bit bank */
 struct optimize optimize;
 struct options options;
 int preProcOnly = 0;
+int SyntaxOnly = 0;
 int noAssemble = 0;
 set *preArgvSet = NULL;         /* pre-processor arguments  */
 set *asmOptionsSet = NULL;      /* set of assembler options */
@@ -175,9 +176,10 @@ static const OPTION optionsTable[] = {
   {'M', NULL, NULL, "Preprocessor option"},
   {'W', NULL, NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)"},
   {0,   OPTION_INCLUDE, NULL, "Pre-include a file during pre-processing"},
+  {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
+  {0,   "--syntax-only", &SyntaxOnly, "Parse and verify syntax only, do not compile"},
   {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
   {'c', "--compile-only", &options.cc_only, "Compile and assemble, but do not link"},
-  {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
   {0,   "--c1mode", &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code."},
   {'o', NULL, NULL, "Place the output into the given path resp. file"},
   {'x', NULL, NULL, "Optional file type override (c, c-header or none), valid until the next -x"},
@@ -1070,7 +1072,7 @@ parseCmdLine (int argc, char **argv)
 {
   int i;
 
-  /* go thru all whole command line */
+  /* go thru whole command line */
   for (i = 1; i < argc; i++)
     {
       if (i >= argc)
@@ -1095,7 +1097,6 @@ parseCmdLine (int argc, char **argv)
       /* options */
       if (argv[i][0] == '-')
         {
-
           /* handle (usually double-dash) long options, first */
           size_t charsConsumed = 0;
 
@@ -1442,12 +1443,6 @@ parseCmdLine (int argc, char **argv)
                * already been done. */
               break;
 
-            case 'c':
-              verifyShortOption (argv[i]);
-
-              options.cc_only = 1;
-              break;
-
             case 'L':
               addSet (&libPathsSet, Safe_strdup (getStringArg ("-L", argv, &i, argc)));
               break;
@@ -1646,11 +1641,11 @@ parseCmdLine (int argc, char **argv)
       deleteSet (&relFilesSet);
       deleteSet (&libFilesSet);
 
-      if (options.cc_only || noAssemble || preProcOnly)
+      if (options.cc_only || noAssemble || SyntaxOnly || preProcOnly)
         {
           werror (W_ILLEGAL_OPT_COMBINATION);
         }
-      options.cc_only = noAssemble = preProcOnly = 0;
+      options.cc_only = noAssemble = SyntaxOnly = preProcOnly = 0;
       if (!dstFileName)
         {
           werror (E_NEED_OPT_O_IN_C1);
@@ -2833,13 +2828,18 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      if (!options.c1mode) {
-        int cl = sdcc_pclose (yyin);
-        if (cl){
-			 fprintf(stderr, "subprocess error %d\n", cl);
-          fatalError = 1;
-		  }
-		}
+      if (SyntaxOnly)
+        exit (fatalError ? EXIT_FAILURE : EXIT_SUCCESS);
+
+      if (!options.c1mode)
+        {
+          int cl = sdcc_pclose (yyin);
+          if (cl)
+            {
+              fprintf(stderr, "subprocess error %d\n", cl);
+              fatalError = 1;
+            }
+        }
 
       if (fatalError)
         exit (EXIT_FAILURE);

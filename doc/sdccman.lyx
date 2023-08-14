@@ -13793,6 +13793,54 @@ Preprocessor
 \labelwidthstring 00.00.0000
 
 \series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-syntax-only
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-syntax-only
+\end_layout
+
+\end_inset
+
+
+\series default
+\size large
+ 
+\size default
+Parse and verify syntax only, no output files are produced.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
 -o
 \begin_inset space ~
 \end_inset
@@ -14049,7 +14097,6 @@ status collapsed
 
 \series default
 -float-reent.
- 
 \end_layout
 
 \begin_layout Labeling

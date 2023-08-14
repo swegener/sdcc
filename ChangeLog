@@ -1,3 +1,8 @@
+2023-08-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c: added --syntax-only option, implements RFE #886
+	* doc/sdccman.lyx: documented --syntax-only
+
 2023-08-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/charconst.c,

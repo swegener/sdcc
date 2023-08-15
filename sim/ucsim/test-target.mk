@@ -47,7 +47,7 @@ baseline:	$(BASELINES) always
 clean::	$(CLEAN_TESTS)
 
 $(CLEAN_TESTS):
-	@-rm -fr $(@F)/*.{ihx,rel} $(@F)/out
+	@-rm -fr $(@F)/*.{rel} $(@F)/out
 #@-$(MAKE) $(if $(MAKECMDGOALS),,-s) -C '$(@F)' -f '$(srcdir)/$(@F)/Makefile' -I '$(abs_top_srcdir)' srcdir='$(srcdir)/$(@F)' SIM='$(SIM)' clean
 
 

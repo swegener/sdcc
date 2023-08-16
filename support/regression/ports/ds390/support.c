@@ -27,7 +27,9 @@
 void
 _putchar (char c)
 {
-  Serial0PutChar (c);
+  //Serial0PutChar (c);
+  (* (char __xdata *) 0x7654)= 'p';
+  (* (char __xdata *) 0x7654)= c;
 }
 
 void
@@ -38,7 +40,8 @@ _initEmu (void)
 void
 _exitEmu (void)
 {
-  Serial0PutChar (' '); /* wait for the last character to be transmitted */
+  //Serial0PutChar (' '); /* wait for the last character to be transmitted */
                         /* before hitting the breakpoint */
-  * (char __idata *) 0 = * (char __xdata *) 0x7654;
+  //* (char __idata *) 0 = * (char __xdata *) 0x7654;
+  (* (char __xdata *) 0x7654)= 's';
 }

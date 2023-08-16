@@ -259,7 +259,10 @@ struct options
     int dump_ast;               /* dump front-end tree before lowering to iCode */
     int dump_i_code;            /* dump iCode at various stages */
     int dump_graphs;            /* Dump graphs in .dot format (control-flow, conflict, etc) */
-    int cc_only;                /* compile only flag              */
+    int syntax_only;            /* Parse and check syntax only, generate no output files */
+    int no_assemble;            /* Do not assemble, stop after code generation, generate asm */
+    int cc_only;                /* compile and assemble only, generate asm and rel object */
+    int c1mode;                 /* Act like c1 - no pre-proc, asm or link, generate asm */
     int intlong_rent;           /* integer & long support routines reentrant */
     int float_rent;             /* floating point routines are reentrant */
     int out_fmt;                /* 0 = undefined, 'i' = intel Hex format, 's' = motorola S19 format, 'E' = elf format, 'Z' = gb format */
@@ -270,7 +273,6 @@ struct options
     int asmpeep;                /* pass inline assembler thru peep hole */
     int peepReturn;             /* enable peephole optimization for return instructions */
     int debug;                  /* generate extra debug info */
-    int c1mode;                 /* Act like c1 - no pre-proc, asm or link */
     char *peep_file;            /* additional rules for peep hole */
     int nostdlib;               /* Don't use standard lib files */
     int nostdinc;               /* Don't use standard include files */
@@ -333,7 +335,6 @@ struct options
   };
 
 /* forward definition for variables accessed globally */
-extern int noAssemble;          /* no assembly, stop after code generation */
 extern char *yytext;
 extern char *lexFilename;       /* lex idea of current file name */
 extern int lexLineno;           /* lex idea of line number of the current file */

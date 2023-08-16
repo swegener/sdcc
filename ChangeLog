@@ -1,3 +1,12 @@
+2023-08-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/cmd.c: fixed compiler warning
+	* src/SDCCglobl.h,
+	* src/SDCCglue.c,
+	* src/SDCCmain.c: moved syntax_only & no_assemble into options
+	* src/SDCCopt.c(eBBlockFromiCode): do not call assignRegisters() for
+	    --syntax-only
+
 2023-08-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sim/ucsim/test-target.mk: do not remove ihx files that are in svn

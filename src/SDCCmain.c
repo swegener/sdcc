@@ -63,8 +63,6 @@ int BitBankUsed;                /* MB: overlayable bit bank */
 struct optimize optimize;
 struct options options;
 int preProcOnly = 0;
-int SyntaxOnly = 0;
-int noAssemble = 0;
 set *preArgvSet = NULL;         /* pre-processor arguments  */
 set *asmOptionsSet = NULL;      /* set of assembler options */
 set *linkOptionsSet = NULL;     /* set of linker options */
@@ -177,8 +175,8 @@ static const OPTION optionsTable[] = {
   {'W', NULL, NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)"},
   {0,   OPTION_INCLUDE, NULL, "Pre-include a file during pre-processing"},
   {'E', "--preprocessonly", &preProcOnly, "Preprocess only, do not compile"},
-  {0,   "--syntax-only", &SyntaxOnly, "Parse and verify syntax only, do not compile"},
-  {'S', NULL, &noAssemble, "Compile only; do not assemble or link"},
+  {0,   "--syntax-only", &options.syntax_only, "Parse and verify syntax only, do not compile"},
+  {'S', NULL, &options.no_assemble, "Compile only; do not assemble or link"},
   {'c', "--compile-only", &options.cc_only, "Compile and assemble, but do not link"},
   {0,   "--c1mode", &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code."},
   {'o', NULL, NULL, "Place the output into the given path resp. file"},
@@ -1641,11 +1639,11 @@ parseCmdLine (int argc, char **argv)
       deleteSet (&relFilesSet);
       deleteSet (&libFilesSet);
 
-      if (options.cc_only || noAssemble || SyntaxOnly || preProcOnly)
+      if (options.cc_only || options.no_assemble || options.syntax_only || preProcOnly)
         {
           werror (W_ILLEGAL_OPT_COMBINATION);
         }
-      options.cc_only = noAssemble = SyntaxOnly = preProcOnly = 0;
+      options.cc_only = options.no_assemble = options.syntax_only = preProcOnly = 0;
       if (!dstFileName)
         {
           werror (E_NEED_OPT_O_IN_C1);
@@ -2828,7 +2826,7 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      if (SyntaxOnly)
+      if (options.syntax_only)
         exit (fatalError ? EXIT_FAILURE : EXIT_SUCCESS);
 
       if (!options.c1mode)
@@ -2857,7 +2855,7 @@ main (int argc, char **argv, char **envp)
       if (fatalError)
         exit (EXIT_FAILURE);
 
-      if (!options.c1mode && !noAssemble)
+      if (!options.c1mode && !options.no_assemble)
         {
           if (options.verbose)
             printf ("sdcc: Calling assembler...\n");
@@ -2869,7 +2867,8 @@ main (int argc, char **argv, char **envp)
   if (options.debug && debugFile)
     debugFile->closeFile ();
 
-  if (!options.cc_only && !fatalError && !noAssemble && !options.c1mode && (fullSrcFileName || peekSet (relFilesSet) != NULL))
+  if (!options.cc_only && !fatalError && !options.no_assemble && !options.c1mode &&
+      (fullSrcFileName || peekSet (relFilesSet) != NULL))
     {
       if (options.verbose)
         printf ("sdcc: Calling linker...\n");

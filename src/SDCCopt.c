@@ -3447,7 +3447,8 @@ eBBlockFromiCode (iCode *ic)
   narrowReads(ebbi);
 
   /* allocate registers & generate code */
-  port->assignRegisters (ebbi);
+  if (!options.syntax_only)
+    port->assignRegisters (ebbi);
 
   /* throw away blocks */
   setToNull ((void *) &graphEdges);

@@ -398,7 +398,7 @@ static void setBPatModLine (module *mod, int line, char bpType)
       fprintf(stderr, "Internal error: NULL module\n");
       return;
     }
-    
+
   if (srcMode == SRC_CMODE && line > mod->ncLines)
     {
       fprintf(stderr,"No line %d in file \"%s\".\n",
@@ -3184,14 +3184,14 @@ DEFSETFUNC (dsymWithNumber)
 void displayAll (context *cctxt)
 {
   dsymbol *dsym;
-  symbol  *sym;
   if ( !dispsymbols )
       return;
   for (dsym = setFirstItem (dispsymbols);
        dsym;
        dsym = setNextItem (dispsymbols))
     {
-      if (sym = symLookup (dsym->name, cctxt))
+      symbol *sym = symLookup (dsym->name, cctxt);
+      if (sym)
           printOrSetSymValue (sym, cctxt, 2, dsym->dnum, dsym->fmt,
                               dsym->rs, NULL, '\0');
     }

@@ -43,11 +43,11 @@ cl_simf8::mk_controller(void)
   class cl_f8 *uc;
 
   /* Replace 1s to flagO in p table */
-  for (int i= 0; i<256; i++)
-    if (!ptab[i]) // odd=1, even=0
-      ptab[i]= flagO;
+  for (int ii= 0; ii<256; ii++)
+    if (!ptab[ii]) // odd=1, even=0
+      ptab[ii]= flagO;
     else
-      ptab[i]= 0;
+      ptab[ii]= 0;
   type_option.init();
   type_option.use("cpu_type");
   i= 0;

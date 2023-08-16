@@ -55,8 +55,8 @@
 #include "outputportcl.h"
 #include "cmdpblazecl.h"
 
-#define uint32 t_addr
-#define uint8 unsigned char
+//#define uint32 t_addr
+//#define uint8 unsigned char
 
 using namespace std;
 /*******************************************************************/
@@ -835,39 +835,6 @@ cl_pblaze::load_state(class cl_console_base *con, char *file_name)
  * Execution
  */
 
-
-/*
-int
-cl_pblaze::do_inst(int step)
-{
-  t_addr PCsave = PC;
-  int result = resGO;
-
-  if (step < 0)
-    step= 1;
-  while (step-- &&
-         result == resGO)
-    {
-      pre_inst();
-      result = exec_inst();
-      post_inst();
-
-      if (result == resINV_INST)
-        PC = PCsave;
-      else if (result == resGO) {
-          if (!inst_at(PCsave))
-            analyze(PCsave);
-
-          int res;
-          if ((res = do_interrupt()) != resGO)
-            result = res;
-      }
-    }
-  if (result != resGO && result != resINTERRUPT)
-    sim->stop(result);
-  return(result);
-}
-*/
 
 int
 cl_pblaze::exec_inst(void)

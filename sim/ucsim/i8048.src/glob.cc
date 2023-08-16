@@ -37,7 +37,7 @@ struct dis_entry dis_tab20[]=
     { 0, 0, 0, 0, 0, 0 }
   };
 
-int8_t tick_tab20[256];
+i8_t tick_tab20[256];
   
 struct cpu_entry cpus_8048[]=
   {

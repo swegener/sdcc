@@ -279,7 +279,7 @@ COMMAND_DO_WORK_APP(cl_set_error_cmd)
       for (i= 0; i < registered_errors->count; i++)
 	{
 	  class cl_error_class *e=
-	    dynamic_cast<class cl_error_class *>(registered_errors->object_at(i));
+	    (class cl_error_class *)(registered_errors->object_at(i));
 	  if (e->is_inamed(error_name))
 	    {
 	      if (strchr("uU-?", *value) != NULL)

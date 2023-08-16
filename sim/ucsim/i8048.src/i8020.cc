@@ -437,8 +437,8 @@ cl_i8020::print_regs(class cl_console_base *con)
   con->dd_printf("0x%02x %+3d %c", ACC, ACC, (isprint(ACC)?ACC:'?'));
   con->dd_printf("\n");
   con->dd_cprintf("dump_address", "   0x%02x", start);
-  for (t_addr i= 0; i < 8; i++)
-    con->dd_cprintf("dump_number", " %02x", iram->get(start + i));
+  for (int ii= 0; ii < 8; ii++)
+    con->dd_cprintf("dump_number", " %02x", iram->get(start + ii));
   con->dd_cprintf("dump_number", "    0x%02x ", psw);
   con->dd_color("dump_number");
   con->print_bin(psw, 8);
@@ -449,12 +449,14 @@ cl_i8020::print_regs(class cl_console_base *con)
   stop= start+7;
   con->dd_color("answer");
   con->dd_printf("R0=");
-  iram->dump(0, start, stop, 8, con);
+  class cl_dump_ads ads(start, stop);
+  iram->dump(0, /*start, stop*/&ads, 8, con);
   start= R[1]->get();
   stop= start+7;
   con->dd_color("answer");
   con->dd_printf("R1=");
-  iram->dump(0, start, stop, 8, con);
+  ads._ss(start, stop);
+  iram->dump(0, /*start, stop*/&ads, 8, con);
 
   con->dd_cprintf("answer", "SP=%d", psw&7);
   start= 8;

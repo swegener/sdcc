@@ -208,7 +208,12 @@ cl_memory::err_non_decoded(t_addr addr)
 }
 
 t_addr
-cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_low, int bpl, class cl_console_base *con)
+cl_memory::dump(int smart,
+		//t_addr start, t_addr stop,
+		class cl_dump_ads *ads,
+		int bitnr_high, int bitnr_low,
+		int bpl,
+		class cl_console_base *con)
 {
   if (!con->get_fout())
     return dump_finished;
@@ -220,42 +225,42 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 	bpl= 4;
     }
 
-  if (start < 0)
-    start= dump_finished;
+  if (!ads->use_start)
+    ads->start= dump_finished;
 
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
 
-  if (start < lva)
-    start= lva;
-  if (start > hva)
+  if (ads->start < lva)
+    ads->start= lva;
+  if (ads->start > hva)
     return dump_finished;
 
   int lines= -1;
-  if (stop < 0)
+  if (!ads->use_stop)
     {
-      stop= hva;
+      ads->stop= hva;
       lines= 10;
     }
-  if (stop > hva)
-    stop= hva;
-  if (stop < lva)
+  if (ads->stop > hva)
+    ads->stop= hva;
+  if (ads->stop < lva)
     return dump_finished;
 
   int i, step;
-  if (stop >= start)
+  if (ads->stop >= ads->start)
     {
       step= +1;
-      stop++;
-      if (start + bpl > stop)
-        bpl= stop - start;
+      ads->stop++;
+      if (ads->start + bpl > ads->stop)
+        bpl= ads->stop - ads->start;
     }
   else
     {
       step= -1;
-      stop--;
-      if (start - bpl < stop)
-        bpl= start - stop;
+      ads->stop--;
+      if (ads->start - bpl < ads->stop)
+        bpl= ads->start - ads->stop;
     }
 
   long label_width = -1;
@@ -273,13 +278,13 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
   int state = 0;
 
-  while ((step>0)?(start < stop):(start > stop))
+  while ((step>0)?(ads->start < ads->stop):(ads->start > ads->stop))
     {
-      if (smart && step > 0 && this == uc->rom && uc->inst_at(start))
+      if (smart && step > 0 && this == uc->rom && uc->inst_at(ads->start))
         {
-          uc->print_disass(start, con, true);
-          start += uc->inst_length(start);
-          dump_finished = start;
+          uc->print_disass(ads->start, con, true);
+          ads->start += uc->inst_length(ads->start);
+          dump_finished = ads->start;
           if (lines > 0 && --lines == 0)
             break;
           continue;
@@ -289,7 +294,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
       con->dd_color("dump_address");
       if (state == 0)
-        con->dd_printf(addr_format, start);
+        con->dd_printf(addr_format, ads->start);
       else
         con->dd_printf("  %-*s", atoi(addr_format+4), "");
 
@@ -313,7 +318,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               // Find the first var for this location.
               //fprintf(stderr, "Find first var for %s -> %s[0x%04x][%d:%d]\n", this->get_name(), this->get_name(), start, bitnr_high, bitnr_low);
-             var = vi.first(this, start);
+             var = vi.first(this, ads->start);
              while (var)
                 {
                   // If _any_ var for this location names bits we output in bitmode
@@ -410,7 +415,7 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
               con->dd_printf(" ");
 
-              /*t_mem*/u64_t m= read(start);
+              /*t_mem*/u64_t m= read(ads->start);
 
               int i;
               con->dd_printf("0b");
@@ -430,8 +435,8 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
               con->dd_color("dump_char");
               con->dd_printf(" '");
 	      // FIXME: endian assumption: low byte first - should be a uc flag or option?
-              for (int i= 0; i <= (nbits - 1) - ((nbits - 1) % 8); i += 8)
-                con->dd_printf("%c", (isprint((m >> i) & 255) ? (m >> i) & 255 : '.'));
+              for (int ii= 0; ii <= (nbits - 1) - ((nbits - 1) % 8); ii += 8)
+                con->dd_printf("%c", (isprint((m >> ii) & 255) ? (m >> ii) & 255 : '.'));
               con->dd_printf("'");
               con->dd_color("dump_number");
 
@@ -451,8 +456,8 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
                 var = var_next;
               else
                 {
-                  start += step;
-                  dump_finished= start;
+                  ads->start += step;
+                  dump_finished= ads->start;
 
                   if (lines == 0)
                     break;
@@ -472,37 +477,37 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 
       for (n= 0;
            (n < bpl) &&
-             (start+n*step >= lva) &&
-             (start+n*step <= hva) &&
-             (start+n*step != stop);
+             (ads->start+n*step >= lva) &&
+             (ads->start+n*step <= hva) &&
+             (ads->start+n*step != ads->stop);
            n++)
         {
           if (smart && n)
             {
-              if (uc->inst_at(start+n*step) || (var = vi.first(this, start+n*step)))
+              if (uc->inst_at(ads->start+n*step) || (var = vi.first(this, ads->start+n*step)))
                 break;
             }
           con->dd_printf(" ");
-          con->dd_printf(data_format, read(start+n*step));
+          con->dd_printf(data_format, read(ads->start+n*step));
         }
       con->dd_printf("%-*s", (bpl - n) * (width/4 + ((width%4)?1:0) + 1) + 1, " ");
 
       con->dd_color("dump_char");
       for (i= 0; i < n &&
-             start+i*step >= lva &&
-             start+i*step <= hva &&
-             start+i*step != stop;
+             ads->start+i*step >= lva &&
+             ads->start+i*step <= hva &&
+             ads->start+i*step != ads->stop;
            i++)
         {
-          long c= read(start+i*step);
+          long c= read(ads->start+i*step);
 	  // FIXME: endian assumption: low byte first - should be a uc flag or option?
-          for (int i= 0; i <= (width - 1) - ((width - 1) % 8); i += 8)
-            con->dd_printf("%c", (isprint((c >> i) & 255) ? (c >> i) & 255 : '.'));
+          for (int ii= 0; ii <= (width - 1) - ((width - 1) % 8); ii += 8)
+            con->dd_printf("%c", (isprint((c >> ii) & 255) ? (c >> ii) & 255 : '.'));
         }
       con->dd_printf("\n");
 
-      start+= n*step;
-      dump_finished= start;
+      ads->start+= n*step;
+      dump_finished= ads->start;
       state = 0;
       if (lines > 0 && --lines == 0)
         break;
@@ -515,13 +520,16 @@ cl_memory::dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_
 }
 
 t_addr
-cl_memory::dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con)
+cl_memory::dump_s(//t_addr start, t_addr stop,
+		  class cl_dump_ads *ads,
+		  int bpl,
+		  class cl_console_base *con)
 {
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
   class cl_f *f= con->get_fout();
 
-  t_addr a= start;
+  t_addr a= ads->start;
   t_mem d= read(a);
   char last= '\n';
   con->dd_printf("%s", con->get_color_ansiseq("dump_char").c_str());
@@ -569,18 +577,21 @@ cl_memory::dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 }
 
 t_addr
-cl_memory::dump_b(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con)
+cl_memory::dump_b(//t_addr start, t_addr stop,
+		  class cl_dump_ads *ads,
+		  int bpl,
+		  class cl_console_base *con)
 {
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
   class cl_f *f= con->get_fout();
 
-  if (stop < 0)
-    stop= start + 10 * bpl - 1;
+  if (!ads->use_stop)
+    ads->stop= ads->start + 10 * bpl - 1;
 
-  t_addr a= start;
+  t_addr a= ads->start;
   t_mem d= read(a);
-  while ((a <= stop) &&
+  while ((a <= ads->stop) &&
 	 (a <= hva))
     {
       char c= d;
@@ -599,7 +610,10 @@ cl_memory::dump_b(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
 }
 
 t_addr
-cl_memory::dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con)
+cl_memory::dump_i(//t_addr start, t_addr stop,
+		  class cl_dump_ads *ads,
+		  int bpl,
+		  class cl_console_base *con)
 {
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
@@ -607,35 +621,35 @@ cl_memory::dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_
   t_addr start_line;
   class cl_f *f= con->get_fout();
   
-  if (stop < 0)
-    stop= start + 10 * bpl - 1;
+  if (!ads->use_stop)
+    ads->stop= ads->start + 10 * bpl - 1;
 
-  if (start < lva)
-    start= lva;
-  if (stop > hva)
-    stop= hva;
+  if (ads->start < lva)
+    ads->start= lva;
+  if (ads->stop > hva)
+    ads->stop= hva;
 
-  if (start < lva)
-    start= lva;
-  if (start > hva)
+  if (ads->start < lva)
+    ads->start= lva;
+  if (ads->start > hva)
     return dump_finished;
-  if (stop > hva)
-    stop= hva;
-  if (stop < lva)
+  if (ads->stop > hva)
+    ads->stop= hva;
+  if (ads->stop < lva)
     return dump_finished;
   
-  if (start > stop)
-    return dump_finished= stop;
+  if (ads->start > ads->stop)
+    return dump_finished= ads->stop;
   if (bpl > 32)
     bpl= 32;
-  t_addr a= start;
+  t_addr a= ads->start;
   sum= 0;
   start_line= a;
-  while (a <= stop)
+  while (a <= ads->stop)
     {
       a++;
       if (((a % bpl) == 0) ||
-	  (a > stop))
+	  (a > ads->stop))
 	{
 	  // dump line
 	  if ((a - start_line) > 0)
@@ -1834,7 +1848,7 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
   for (i= 0; i < decoders->count; i++)
     {
       class cl_address_decoder *d=
-	dynamic_cast<class cl_address_decoder *>(decoders->object_at(i));
+	(class cl_address_decoder *)(decoders->object_at(i));
       if (!d ||
 	  d == skip)
 	continue;
@@ -2984,9 +2998,9 @@ cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr):
 void
 cl_error_mem_invalid_address::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s: invalid address ", get_type_name());
+  c->dd_printf("%s: invalid address ", (char*)get_type_name());
   c->dd_printf(mem->addr_format, addr);
-  c->dd_printf(" in memory %s.\n", mem->get_name());
+  c->dd_printf(" in memory %s.\n", (char*)(mem->get_name()));
 }
 
 /* Non-decoded address space access */
@@ -3001,9 +3015,9 @@ cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr):
 void
 cl_error_mem_non_decoded::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s: access of non-decoded address ", get_type_name());
+  c->dd_printf("%s: access of non-decoded address ", (char*)get_type_name());
   c->dd_printf(mem->addr_format, addr);
-  c->dd_printf(" in memory %s.\n", mem->get_name());
+  c->dd_printf(" in memory %s.\n", (char*)(mem->get_name()));
 }
 
 cl_mem_error_registry::cl_mem_error_registry(void)

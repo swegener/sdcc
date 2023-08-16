@@ -96,7 +96,6 @@ public:
   virtual void read_interrupt_file(void);
   virtual void read_input_file(void);
 
-  //virtual int do_inst(int step);
   virtual int exec_inst(void);
   virtual int do_interrupt(void);
 

@@ -106,8 +106,10 @@ public:
   virtual int longest_inst(void) { return 6; }
 
   virtual void pre_inst(void);
+  virtual void pre_emu(void);
   virtual int exec_inst(void);
   virtual void post_inst(void);
+  virtual void post_emu(void);
   virtual i16_t s8_16(u8_t op); // sex 8->16
   virtual int xb_type(u8_t p);
   virtual bool xb_indirect(u8_t p);

@@ -323,7 +323,9 @@ enum mem_class
 enum sim_state {
   SIM_NONE	= 0,
   SIM_GO	= 0x01,	// Processor is running
-  SIM_QUIT	= 0x02	// Program must exit
+  SIM_QUIT	= 0x02,	// Program must exit
+  SIM_STARTEMU	= 0x04,	// Start emulation mode
+  SIM_EMU	= 0x08	// Run in emulation mode
 };
 
 /* States of CPU */

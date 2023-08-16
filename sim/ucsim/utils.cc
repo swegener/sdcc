@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 
   // prj
-//#include "stypes.h"
+#include "stypes.h"
 //#include "pobjcl.h"
 
 #include "utils.h"
@@ -697,7 +697,7 @@ strtoscale(const char *scale, const char **units)
 
 #define PHI 0x9e3779b9
 
-static uint32_t Q[4096], c = 362436;
+static u32_t Q[4096], c = 362436;
 
 void
 srnd(unsigned int seed)
@@ -715,9 +715,9 @@ srnd(unsigned int seed)
 unsigned int
 urnd(void)
 {
-  uint64_t t, a = 18782LL;
-  static uint32_t i = 4095;
-  uint32_t x, r = 0xfffffffe;
+  u64_t t, a = 18782LL;
+  static u32_t i = 4095;
+  u32_t x, r = 0xfffffffe;
   i = (i + 1) & 4095;
   t = a * Q[i] + c;
   c = (t >> 32);

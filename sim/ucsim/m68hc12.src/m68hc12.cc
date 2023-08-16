@@ -196,6 +196,16 @@ CL12::pre_inst(void)
   extra_ticks= 0;
 }
 
+void
+CL12::pre_emu(void)
+{
+  cl_m68hcbase::pre_emu();
+  block_irq= false;
+  cI= &cIX;
+  xb_tick_shift= 0;
+  extra_ticks= 0;
+}
+
 int
 CL12::exec_inst(void)
 {
@@ -241,6 +251,17 @@ CL12::post_inst(void)
   if (extra_ticks)
     tick(extra_ticks);
   cl_m68hcbase::post_inst();
+}
+
+void
+CL12::post_emu(void)
+{
+  if (inst_ticks & 0xf00)
+    inst_ticks= (inst_ticks>>(4*xb_tick_shift)) & 0xf;
+  tick(inst_ticks);
+  if (extra_ticks)
+    tick(extra_ticks);
+  cl_m68hcbase::post_emu();
 }
 
 i16_t
@@ -592,15 +613,18 @@ cl_m68hc12::print_regs(class cl_console_base *con)
   con->dd_printf("\n");
 
   con->dd_printf("IX= ");
-  rom->dump(0, IX, IX+7, 8, con);
+  class cl_dump_ads ads(IX, IX+7);
+  rom->dump(0, /*IX, IX+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("IY= ");
-  rom->dump(0, IY, IY+7, 8, con);
+  ads._ss(IY, IY+7);
+  rom->dump(0, /*IY, IY+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("SP= ");
-  rom->dump(0, SP, SP+7, 8, con);
+  ads._ss(SP, SP+7);
+  rom->dump(0, /*SP, SP+7*/&ads, 8, con);
   con->dd_color("answer");
   
   print_disass(PC, con);

@@ -376,7 +376,12 @@ AC_EGREP_CPP(yes, [
 #include <sys/select.h>
 #ifdef FD_ZERO
 yes
-#endif], ucsim_cv_fd="<sys/select.h>")])
+#endif], ucsim_cv_fd="<sys/select.h>")
+AC_EGREP_CPP(yes, [
+#include <gnu/types.h>
+#ifdef FD_ZERO
+yes
+#endif], ucsim_cv_fd="<gnu/types.h>")])
 
 ucsim_cv_header_ok=0
 if echo $ucsim_cv_fd|grep time >/dev/null 2>&1; then
@@ -385,18 +390,28 @@ ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_TIME_H, 0, [XXX])
 fi
-if echo $ucsim_cv_fd|grep types >/dev/null 2>&1; then
+
+if echo $ucsim_cv_fd|grep sys/types >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_TYPES_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_TYPES_H, 0, [XXX])
 fi
+
+if echo $ucsim_cv_fd|grep gnu/types >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_GNUTYPES_H, 1, [XXX])
+ucsim_cv_header_ok=1
+else
+AC_DEFINE(FD_NEED_GNUTYPES_H, 0, [XXX])
+fi
+
 if echo $ucsim_cv_fd|grep select >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_SELECT_H, 1, [XXX])
 ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_SELECT_H, 0, [XXX])
 fi
+
 if echo $ucsim_cv_fd|grep winsock2 >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_WINSOCK2_H, 1, [XXX])
 ucsim_cv_header_ok=1
@@ -614,15 +629,20 @@ if test "$ac_cv_cxx_compiler_gnu" = "yes"; then
 
   # This is the first time when CFLAGS are set/modified!!
 
-  sdcc_IS_VALID_OPTION(-ggdb)
-  if test "$sdcc_cv_cxx_ggdb" = "yes"; then
-      CXXFLAGS="$CXXFLAGS -ggdb"
-  fi
+dnl  sdcc_IS_VALID_OPTION(-ggdb)
+#  if test "$sdcc_cv_cxx_ggdb" = "yes"; then
+#      CXXFLAGS="$CXXFLAGS -ggdb"
+#  fi
 dnl  sdcc_IS_VALID_OPTION(-gstabs)
   sdcc_IS_VALID_OPTION(-pipe)
   if test "$sdcc_cv_cxx_pipe" = "yes"; then
     CXXFLAGS="$CXXFLAGS -pipe"
   fi
+  
+dnl  sdcc_IS_VALID_OPTION(-fhandle-exceptions)
+#  if test "$sdcc_cv_cxx_fhandle_exceptions" = "yes"; then
+#    CXXFLAGS="$CXXFLAGS -fhandle-exceptions"
+#  fi
   
   MAKEDEP="$CXX $ucsim_cv_MM"
   WALL_FLAG="-Wall"
@@ -630,6 +650,16 @@ dnl  sdcc_IS_VALID_OPTION(-gstabs)
   sdcc_IS_VALID_OPTION(-Wno-overloaded-virtual)
   if test "$sdcc_cv_cxx_Wno_overloaded_virtual" = "yes"; then
       WALL_FLAG="$WALL_FLAG -Wno-overloaded-virtual"
+  fi
+
+  sdcc_IS_VALID_OPTION(-Wno-unused-parameters)
+  if test "$sdcc_cv_cxx_Wno_unused_parameters" = "yes"; then
+      WALL_FLAG="$WALL_FLAG -Wno-unused-parameters"
+  fi
+
+  sdcc_IS_VALID_OPTION(-Wno-unused)
+  if test "$sdcc_cv_cxx_Wno_unused" = "yes"; then
+      WALL_FLAG="$WALL_FLAG -Wno-unused"
   fi
 else
   sdcc_IS_SUNPRO

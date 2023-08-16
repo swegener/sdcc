@@ -43,8 +43,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern instruction_wrapper_fn itab18[256];
-extern int8_t p0ticks11[256];
-extern int8_t p18ticks11[256];
+extern i8_t p0ticks11[256];
+extern i8_t p18ticks11[256];
 
 class cl_m68hcbase: public cl_m6800
 {
@@ -78,7 +78,7 @@ public:
 
   virtual double def_xtal(void) { return 8000000; }
   
-  virtual int8_t *tick_tab(t_mem code);
+  virtual i8_t *tick_tab(t_mem code);
   virtual int tickt(t_mem code);
   virtual struct dis_entry *get_dis_entry(t_addr addr);
   //virtual char *disassc(t_addr addr, chars *comment=NULL);

@@ -252,7 +252,7 @@ cl_sif_commands::produce_answer(void)
     {
       answer[i+1]= 0;
       class cl_sif_command *sc=
-	dynamic_cast<class cl_sif_command *>(sif->commands->object_at(i));
+	(class cl_sif_command *)(sif->commands->object_at(i));
       if (!sc)
 	continue;
       answer[i+1]= sc->get_command();
@@ -278,7 +278,7 @@ cl_sif_cmdinfo::produce_answer(void)
   for (i= 0; i < sif->commands->count; i++)
     {
       class cl_sif_command *sc=
-	dynamic_cast<class cl_sif_command *>(sif->commands->object_at(i));
+	(class cl_sif_command *)(sif->commands->object_at(i));
       if (sc->get_command() == (enum sif_command)cm)
 	{
 	  about= sc;
@@ -309,7 +309,7 @@ cl_sif_cmdhelp::produce_answer(void)
   for (i= 0; i < sif->commands->count; i++)
     {
       class cl_sif_command *sc=
-	dynamic_cast<class cl_sif_command *>(sif->commands->object_at(i));
+	(class cl_sif_command *)(sif->commands->object_at(i));
       if (sc->get_command() == (enum sif_command)cm)
 	{
 	  about= sc;
@@ -509,8 +509,8 @@ cl_simulator_interface::init(void)
       if (as)
 	{
 	  address= addr;
-	  if (addr < 0)
-	    address= as->highest_valid_address();
+	  //if (addr < 0)
+	  //address= as->highest_valid_address();
 	  cell= register_cell(as, address);
 	}
       else
@@ -639,11 +639,11 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 	}
       as_name= strdup(mem->get_name());
       addr= a;
-      if ((as= dynamic_cast<class cl_address_space *>(mem)) != 0)
+      if ((as= (class cl_address_space *)(mem)) != 0)
 	{
 	  address= addr;
-	  if (addr < 0)
-	    address= as->highest_valid_address();
+	  //if (addr < 0)
+	  //address= as->highest_valid_address();
 	  if (cell != NULL)
 	    unregister_cell(cell);
 	  cell= register_cell(as, address);
@@ -714,7 +714,7 @@ cl_simulator_interface::write(class cl_memory_cell *cel, t_mem *val)
       for (i= 0; i < commands->count; i++)
 	{
 	  class cl_sif_command *c=
-	    dynamic_cast<class cl_sif_command *>(commands->object_at(i));
+	    (class cl_sif_command *)(commands->object_at(i));
 	  if (!c)
 	    continue;
 	  enum sif_command cm= c->get_command();
@@ -798,7 +798,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case simif_xtal: // xtal frequ
       if (val)
 	uc->set_xtal(*val);
-      cell->set(uc->get_xtal());
+      cell->set((u32_t)(uc->get_xtal()));
       break;
     case simif_ticks: // tick counter
       if (val)
@@ -818,7 +818,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case simif_real_time: // real time in msec
       if (val)
 	*val= cell->get();
-      cell->set(uc->ticks->get_rtime() * 1000);
+      cell->set((u32_t)(uc->ticks->get_rtime() * 1000));
       break;
     case simif_vclk: // virtual clock
       if (val)
@@ -916,7 +916,7 @@ cl_simulator_interface::print_info(class cl_console_base *con)
   for (i= 0; i < commands->count; i++)
     {
       class cl_sif_command *c=
-	dynamic_cast<class cl_sif_command *>(commands->object_at(i));
+	(class cl_sif_command *)(commands->object_at(i));
       if (!c)
 	continue;
       int cmd= c->get_command();

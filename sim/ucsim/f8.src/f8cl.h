@@ -102,9 +102,9 @@ enum {
 enum {
   P_NONE	= 0,
   P_SWAP	= 0x01, // (0) swapop
-  P_ALT0	= 0x02, // (1) altacc    XH
-  P_ALT1	= 0x04, // (2) altacc'   YL  X
-  P_ALT2	= 0x08  // (2) altacc''  ZL  Z
+  P_ALT1	= 0x02, // (1) altacc    XH
+  P_ALT2	= 0x04, // (2) altacc'   YL  X
+  P_ALT3	= 0x08  // (2) altacc''  ZL  Z
 };
 
 #define IFSWAP if (prefixes&P_SWAP)

@@ -180,8 +180,9 @@ cl_cmdline::split(void)
 	  else if (param_str[0] == '0' && param_str[1] == 'b')
             {
               long n= 0;
-	      for (int i= 2; param_str[i] == '0' || param_str[i] == '1'; i++)
-                n = (n << 1) | (param_str[i] == '0' ? 0 : 1);
+	      int ii;
+	      for (ii= 2; param_str[ii] == '0' || param_str[ii] == '1'; ii++)
+                n = (n << 1) | (param_str[ii] == '0' ? 0 : 1);
 	      params->add(arg= new cl_cmd_int_arg(n));
 	      arg->init();
             }
@@ -537,7 +538,7 @@ cl_cmdline::shift(void)
 	     strchr(" \t\v\r,;#", *s) == NULL)
 	s++;
       s= skip_delims(s);
-      char *p= strdup(s), *r= rest?strdup(rest):NULL;
+      char *p= strdup(s), *r= rest?strdup(rest):(char*)NULL;
       free(cmd);
       cmd= p;
       rest= r;

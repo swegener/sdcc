@@ -43,7 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 instruction_wrapper_fn itab18[256];
 
-int8_t p0ticks11[256]= {
+i8_t p0ticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 2,40,40, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
   /* 1 */ 2, 2, 6, 6, 6, 6, 2, 2, 0, 2, 0, 2, 7, 7, 7, 7,
@@ -63,7 +63,7 @@ int8_t p0ticks11[256]= {
   /* f */ 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
-int8_t p18ticks11[256]= {
+i8_t p18ticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0,
   /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8,
@@ -83,7 +83,7 @@ int8_t p18ticks11[256]= {
   /* f */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6
 };
 
-int8_t pcdticks11[256]= {
+i8_t pcdticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -103,7 +103,7 @@ int8_t pcdticks11[256]= {
   /* f */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-int8_t p1aticks11[256]= {
+i8_t p1aticks11[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   /* 1 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -165,15 +165,18 @@ cl_m68hcbase::print_regs(class cl_console_base *con)
   con->dd_printf("      HINZVC\n");
 
   con->dd_printf("IX= ");
-  rom->dump(0, IX, IX+7, 8, con);
+  class cl_dump_ads ads(IX, IX+7);
+  rom->dump(0, /*IX, IX+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("IY= ");
-  rom->dump(0, IY, IY+7, 8, con);
+  ads._ss(IY, IY+7);
+  rom->dump(0, /*IY, IY+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("SP= ");
-  rom->dump(0, SP, SP+7, 8, con);
+  ads._ss(SP, SP+7);
+  rom->dump(0, /*SP, SP+7*/&ads, 8, con);
   con->dd_color("answer");
   
   print_disass(PC, con);
@@ -210,7 +213,7 @@ cl_m68hc11::reset(void)
   cl_m68hcbase::reset();
 }
 
-int8_t *
+i8_t *
 CL11::tick_tab(t_mem code)
 {
   if (code == 0x18)
@@ -225,7 +228,7 @@ CL11::tick_tab(t_mem code)
 int
 CL11::tickt(t_mem code)
 {
-  int8_t *tt= tick_tab(code);
+  i8_t *tt= tick_tab(code);
   if ((code == 0x18) ||
       (code == 0x1a) ||
       (code == 0xcd))

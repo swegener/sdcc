@@ -135,7 +135,10 @@ cl_serial_hw::init(void)
       if (f_serial_in && *f_serial_in)
 	{
 	  if (f_serial_in[0] == '\001')
-	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
+	    {
+	      chars c= &(f_serial_in[1]);
+	      fi= (class cl_f *)(c.htoll());
+	    }
 	  else
 	    fi= mk_io(f_serial_in, "r");
 	  if (!fi->tty && !raw)
@@ -147,7 +150,10 @@ cl_serial_hw::init(void)
       if (f_serial_out && *f_serial_out)
 	{
 	  if (f_serial_out[0] == '\001')
-	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
+	    {
+	      chars c= &(f_serial_out[1]);
+	      fo= (class cl_f *)(c.htoll());
+	    }
 	  else
 	    fo= mk_io(chars(f_serial_out), "w");
 	  if (!fo->tty && !raw)
@@ -162,7 +168,10 @@ cl_serial_hw::init(void)
       if (f_serial_out && *f_serial_out)
 	{
 	  if (f_serial_out[0] == '\001')
-	    fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
+	    {
+	      chars c= &(f_serial_out[1]);
+	      fo= (class cl_f *)(c.htoll());
+	    }
 	  else
 	    fo= mk_io(chars(f_serial_out), "w");
 	  if (!fo->tty && !raw)
@@ -174,7 +183,10 @@ cl_serial_hw::init(void)
       if (f_serial_in && *f_serial_in)
 	{
 	  if (f_serial_in[0] == '\001')
-	    fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
+	    {
+	      chars c= &(f_serial_in[1]);
+	      fi= (class cl_f *)(c.htoll());
+	    }
 	  else
 	    fi= mk_io(f_serial_in, "r");
 	  if (!fi->tty && !raw)

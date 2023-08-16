@@ -104,7 +104,13 @@ public:
 
 public:
   virtual int init(int argc , char *argv[]);
+  virtual void read_conf_file(void);
+  virtual void read_input_files(void);
+  virtual void exec_startup_cmd(void);
+  virtual int check_start_options(void);
   virtual int run(void);
+  virtual int run_go(void);
+  virtual int run_nogo(void);
   virtual void done(void);
 
 protected:

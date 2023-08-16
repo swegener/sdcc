@@ -79,7 +79,7 @@ public:
   virtual void hide(void) { hidden= true; }
   virtual void show(void) { hidden= false; }
 
-  virtual void print(class cl_console_base *con) {}
+  virtual void print(class cl_console_base */*con*/) {}
   virtual const char *get_type_name(void) { return("none"); }
 
   virtual union option_value *get_value(void) { return(&value); }

@@ -479,7 +479,7 @@ CL12::tbl(void)
       y2= rom->read(a+1);
       vc.rd+= 2;
       diff= y2-y1;
-      cA.W(y1 + b*diff);
+      cA.W((u32_t)(y1 + b*diff));
       u8_t f= rF&~(flagN|flagZ);
       if (rA & 0x80) f|= flagN;
       if (!rA) f|= flagZ;
@@ -505,7 +505,7 @@ CL12::etbl(void)
       y2= read_addr(rom, a+2);
       vc.rd+= 4;
       diff= y2-y1;
-      cD.W(y1 + b*diff);
+      cD.W((u32_t)(y1 + b*diff));
       u8_t f= rF&~(flagN|flagZ);
       if (rD & 0x8000) f|= flagN;
       if (!rD) f|= flagZ;

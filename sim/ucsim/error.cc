@@ -88,7 +88,7 @@ cl_error_class::is_on(void)
       if (!get_parent())
 	return(true);
       class cl_error_class *p=
-	dynamic_cast<class cl_error_class *>(get_parent());
+	(class cl_error_class *)(get_parent());
       return(p->is_on());
     }
   else
@@ -168,7 +168,7 @@ cl_error::is_on(void)
 void
 cl_error::print(class cl_commander_base *c)
 {
-  c->dd_cprintf("error", "%s\n", get_type_name());
+  c->dd_cprintf("error", "%s\n", (char *)get_type_name());
 }
 
 const char *

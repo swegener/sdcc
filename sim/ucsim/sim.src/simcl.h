@@ -71,6 +71,7 @@ public:
   virtual class cl_uc *get_uc(void) { return(uc); }
 
   virtual void start(class cl_console_base *con, unsigned long steps_to_do);
+  virtual void emulation(class cl_console_base *con);
   virtual void stop(int reason);
   virtual void change_run(int reason= resSIMIF);
   virtual int step(void);

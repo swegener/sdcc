@@ -1213,7 +1213,7 @@ cl_uc::memory(const char *id)
   for (i= 0; i < address_spaces->count; i++)
     {
       class cl_base *b= address_spaces->object_at(i);
-      class cl_memory *m= dynamic_cast<cl_memory *>(b);
+      class cl_memory *m= (class cl_memory *)(b);
       if (!m ||
 	  !m->have_real_name())
 	continue;
@@ -2638,7 +2638,7 @@ cl_uc::addr_name(t_addr addr,
 
       // If there is a context var and its name prefixes the var for this
       // addr we strip the prefix off.
-      size_t len;
+      size_t len= 0;
       if (context && (len = strlen(context->get_name())) &&
           !strncmp(name, context->get_name(), len) &&
           (name[len] == '\0' || name[len] == '_'))
@@ -2804,14 +2804,14 @@ cl_uc::handle_event(class cl_event &event)
     {
     case ev_address_space_added:
       {
-	try {
+	//try {
 	  class cl_event_address_space_added &e=
-	    dynamic_cast<class cl_event_address_space_added &>(event);
+	    (class cl_event_address_space_added &)(event);
 	  address_space_added(e.as);
 	  e.handle();
-	}
-	catch (...)
-	  { break; }
+	  //}
+	  //catch (...)
+	  //{ break; }
 	break;
       }
     default:
@@ -2977,7 +2977,7 @@ cl_uc::tick(int cycles)
 int
 cl_uc::tickt(t_mem code)
 {
-  int8_t *tt= tick_tab(code);
+  i8_t *tt= tick_tab(code);
   if (tt == NULL)
     return tick(1);
   int t= tt[code];
@@ -3173,8 +3173,43 @@ cl_uc::do_inst(void)
   return(res);
 }
 
+int
+cl_uc::do_emu(void)
+{
+  int res= resGO;
+
+  if (state == stGO)
+    {
+      pre_emu();
+      instPC= PC;
+      res= exec_inst();
+      if (res == resINV_INST)
+	/* backup to start of instruction */
+	PC= instPC;
+    }
+  post_emu();
+
+  if ((res == resGO || res == resNOT_DONE))
+    {
+      int r= do_interrupt();
+      if (r != resGO)
+	res= r;
+    }
+
+  return(res);
+}
+
 void
 cl_uc::pre_inst(void)
+{
+  inst_exec= true;
+  events->disconn_all();
+  vc.inst++;
+  inst_ticks= 0;
+}
+
+void
+cl_uc::pre_emu(void)
 {
   inst_exec= true;
   events->disconn_all();
@@ -3245,6 +3280,14 @@ cl_uc::post_inst(void)
     check_errors();
   if (events->count)
     check_events();
+  inst_exec= false;
+}
+
+void
+cl_uc::post_emu(void)
+{
+  tick_hw(inst_ticks);
+  errors->free_all();
   inst_exec= false;
 }
 
@@ -3696,7 +3739,7 @@ cl_uc::check_events(void)
   for (i= 0; i < events->count; i++)
     {
       class cl_ev_brk *brk=
-	dynamic_cast<class cl_ev_brk *>(events->object_at(i));
+	(class cl_ev_brk *)(events->object_at(i));
       brk->breaking();
     }
 }
@@ -3724,7 +3767,7 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 void
 cl_error_unknown_code::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s: unknown instruction code at ", get_type_name());
+  c->dd_printf("%s: unknown instruction code at ", (char*)get_type_name());
   if (uc->rom)
     {
       c->dd_printf(uc->rom->addr_format, PC);

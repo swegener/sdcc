@@ -43,7 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 instruction_wrapper_fn itab[256];
 
-int8_t p0ticks[256]= {
+i8_t p0ticks[256]= {
   /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f  */
   /* 0 */ 0, 2, 0, 0, 0, 0, 2, 2, 4, 4, 2, 2, 2, 2, 2, 2,
   /* 1 */ 2, 2, 0, 0, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 0, 0,
@@ -482,7 +482,7 @@ cl_m6800::analyze_start(void)
 void
 cl_m6800::analyze(t_addr addr)
 {
-  struct dis_entry *di;
+  struct dis_entry *di= 0;
 
   while (!inst_at(addr) && (di = get_dis_entry(addr)) && (di->mnemonic != NULL))
     {
@@ -559,11 +559,13 @@ cl_m6800::print_regs(class cl_console_base *con)
   con->dd_printf("      HINZVC\n");
 
   con->dd_printf("IX= ");
-  rom->dump(0, IX, IX+7, 8, con);
+  class cl_dump_ads ads(IX, IX+7);
+  rom->dump(0, /*IX, IX+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("SP= ");
-  rom->dump(0, SP, SP+7, 8, con);
+  ads._ss(SP, SP+7);
+  rom->dump(0, /*SP, SP+7*/&ads, 8, con);
   con->dd_color("answer");
   
   print_disass(PC, con);
@@ -576,7 +578,7 @@ cl_m6800::exec_inst(void)
   
   cI= &cIX;
   res= exec_inst_tab(itab);
-  post_inst();
+  //post_ inst(); // will be called by do_inst()
   if (res != resNOT_DONE)
     return res;
 

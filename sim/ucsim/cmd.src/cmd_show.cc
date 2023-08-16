@@ -162,7 +162,7 @@ show_error_cmd_print_node(class cl_console_base *con,
   for (i= 0; i < indent; i++)
     con->dd_printf(" ");
   const char *name= node->get_name("unknown");
-  class cl_error_class *ec= dynamic_cast<class cl_error_class *>(node);
+  class cl_error_class *ec= (class cl_error_class *)(node);
   char *str;
   con->dd_printf("%s: %s [%s/%s]\n",
 		 str= case_string(case_case, ec->get_type_name()),
@@ -200,7 +200,7 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
   for (i= 0; i < registered_errors->count; i++)
     {
       class cl_error_class *ec;
-      ec= dynamic_cast<class cl_error_class*>(registered_errors->object_at(i));
+      ec= (class cl_error_class*)(registered_errors->object_at(i));
       if (!ec->get_parent())
 	show_error_cmd_print_node(con, 0, ec);
     }

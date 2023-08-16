@@ -156,14 +156,34 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
 }
 
 void
+cl_sim::emulation(class cl_console_base *con)
+{
+  class cl_commander_base *cmd= app->get_commander();
+  if (uc)
+    {
+      state|= SIM_STARTEMU;
+      if (con)
+	{
+	  con->set_flag(CONS_FROZEN, true);
+	  cmd->freeze(con);
+	  cmd->update_active();
+	}
+      start_tick= uc->ticks->get_ticks();
+    }
+}
+
+void
 cl_sim::stop(int reason)
 {
   class cl_commander_base *cmd= app->get_commander();
   class cl_option *o= app->options->get_option("quit");
   unsigned long dt= uc?(uc->ticks->get_ticks() - start_tick):0;
-  class cl_console_base *con= (cmd==NULL)?NULL:(cmd->frozen_or_actual());
+  class cl_console_base *con= NULL;
 
-  state&= ~SIM_GO;
+  if (cmd!=NULL)
+    con= cmd->frozen_or_actual();
+
+  state&= ~(SIM_GO|SIM_EMU);
   stop_at= dnow();
   if (simif)
     simif->cfg_set(simif_reason, reason);
@@ -331,6 +351,9 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
   cmdset->add(cmd= new cl_next_cmd("next", true));
   cmd->init();
   cmd->add_name("n");
+
+  cmdset->add(cmd= new cl_emu_cmd("emulation", 0));
+  cmd->init();
 
   //class cl_super_cmd *super_cmd;
   //class cl_cmdset *cset;

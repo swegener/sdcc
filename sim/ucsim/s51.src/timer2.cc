@@ -381,7 +381,7 @@ void
 cl_timer2::print_info(class cl_console_base *con)
 {
   int t2con= cell_tcon->get();
-  class cl_memory_cell *iec= sfr?(sfr->get_cell(IE)):NULL;
+  class cl_memory_cell *iec= sfr?(sfr->get_cell(IE)):0;
   u8_t ier= iec?(iec->get()):0;
   
   con->dd_printf("%s[%d] 0x%04x", id_string, id,

@@ -401,14 +401,14 @@ cl_f8::exec_inst(void)
 	case PREF_SWAPOP: // swapop
 	  prefixes|= P_SWAP;
 	  break;
-	case PREF_ALT0: // altacc
-	  prefixes|= P_ALT0;
-	  break;
-	case PREF_ALT1: // altacc'
+	case PREF_ALT1: // altacc
 	  prefixes|= P_ALT1;
 	  break;
-	case PREF_ALT2: // altacc''
+	case PREF_ALT2: // altacc'
 	  prefixes|= P_ALT2;
+	  break;
+	case PREF_ALT3: // altacc''
+	  prefixes|= P_ALT3;
 	  break;
 	}
       if (fetch(&code))
@@ -416,20 +416,20 @@ cl_f8::exec_inst(void)
     }
   prefixes&= allowed_prefs[code]; // drop swap if not allowed!
   // select accumulators according to prefixes
-  if (prefixes & P_ALT0)
+  if (prefixes & P_ALT1)
     {
       acc8 = &cXH;
       acc16= &cY;
     }
-  else if (prefixes & P_ALT1)
-    {
-      acc8 = &cYL;
-      acc16= &cX;
-    }
   else if (prefixes & P_ALT2)
     {
-      acc8 = &cZL;
+      acc8 = &cYL;
       acc16= &cZ;
+    }
+  else if (prefixes & P_ALT3)
+    {
+      acc8 = &cZL;
+      acc16= &cX;
     }
   /*
     // clear_prefixes() prepares this state

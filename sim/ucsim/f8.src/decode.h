@@ -34,9 +34,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // Opcodes of prefixes
 #define PREF_SWAPOP	0x9c
-#define PREF_ALT0	0x9d
-#define PREF_ALT1	0x9e
-#define PREF_ALT2	0x9f
+#define PREF_ALT1	0x9d
+#define PREF_ALT2	0x9e
+#define PREF_ALT3	0x9f
 
 
 // data moves

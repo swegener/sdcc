@@ -199,22 +199,28 @@ cl_r3ka::print_regs(class cl_console_base *con)
 		 mem->get_xpc(), rIP, rIIR, rEIR, rSU);
   
   con->dd_printf("BC= ");
-  rom->dump(0, rBC, rBC+7, 8, con);
+  class cl_dump_ads ads(rBC, rBC+7);
+  rom->dump(0, /*rBC, rBC+7*/&ads, 8, con);
   con->dd_color("answer");
   con->dd_printf("DE= ");
-  rom->dump(0, rDE, rDE+7, 8, con);
+  ads._ss7(rDE);
+  rom->dump(0, /*rDE, rDE+7*/&ads, 8, con);
   con->dd_color("answer");
   con->dd_printf("HL= ");
-  rom->dump(0, rHL, rHL+7, 8, con);
+  ads._ss7(rHL);
+  rom->dump(0, /*rHL, rHL+7*/&ads, 8, con);
   con->dd_color("answer");
   con->dd_printf("IX= ");
-  rom->dump(0, rIX, rIX+7, 8, con);
+  ads._ss7(rIX);
+  rom->dump(0, /*rIX, rIX+7*/&ads, 8, con);
   con->dd_color("answer");
   con->dd_printf("IY= ");
-  rom->dump(0, rIY, rIY+7, 8, con);
+  ads._ss7(rIY);
+  rom->dump(0, /*rIY, rIY+7*/&ads, 8, con);
   con->dd_color("answer");
   con->dd_printf("SP= ");
-  rom->dump(0, rSP, rSP+7, 8, con);
+  ads._ss7(rSP);
+  rom->dump(0, /*rSP, rSP+7*/&ads, 8, con);
   con->dd_color("answer");
 
   con->dd_printf("aAF= 0x%02x-0x%02x  ", raA, raF);

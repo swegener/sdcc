@@ -138,7 +138,9 @@ cl_brk::breaking(void)
   // Execute commands
   if (commands.nempty())
     {
-      con= (cmd==NULL)?NULL:(cmd->frozen_or_actual());
+      con= NULL;
+      if (cmd!=NULL)
+	con= cmd->frozen_or_actual();
       if (con)
 	{
 	  o= application->options->get_option("echo_script");
@@ -274,10 +276,11 @@ void
 cl_ev_brk::breaking(void)
 {
   class cl_commander_base *cmd= application->get_commander();
-  class cl_console_base *con;
+  class cl_console_base *con= 0;
   class cl_address_space *m= get_mem();
 
-  con= (cmd==NULL)?NULL:(cmd->frozen_or_actual());
+  if (cmd)
+    con= cmd->frozen_or_actual();
   if (con)
     {
       const char *a, *b;

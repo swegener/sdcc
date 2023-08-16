@@ -50,8 +50,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "regsz80.h"
 #include "z80mac.h"
 
-#define uint32 t_addr
-#define uint8 unsigned char
+//#define uint32 t_addr
+//#define uint8 unsigned char
 
 /*******************************************************************/
 

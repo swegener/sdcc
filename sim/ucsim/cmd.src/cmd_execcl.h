@@ -38,6 +38,7 @@ COMMAND_ON(sim,cl_run_cmd);
 COMMAND_ON(sim,cl_stop_cmd);
 COMMAND_ON(sim,cl_step_cmd);
 COMMAND_ON(sim,cl_next_cmd);
+COMMAND_ON(sim,cl_emu_cmd);
 
 //COMMAND_ON(app,cl_help_cmd);
 COMMAND_HEAD(cl_help_cmd)

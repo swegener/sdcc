@@ -1576,13 +1576,15 @@ cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, int *bitnr_high, int *bitnr_
   return(m);
 }
 
+/*
 t_addr
 cl_51core::bit_address(class cl_memory *mem,
 		       t_addr mem_address, int bit_number)
 {
   if (bit_number < 0 ||
       bit_number > 7 ||
-      mem_address < 0)
+      mem_address < 0
+      )
     return(AU(-1));
   class cl_memory *sfrchip= memory("sfr_chip");
   if (mem == sfrchip)
@@ -1607,6 +1609,7 @@ cl_51core::bit_address(class cl_memory *mem,
     }
   return(AU(-1));
 }
+*/
 
 /* Get name of directly addressed iram/sfr cell */
 
@@ -1937,6 +1940,42 @@ cl_51core::do_inst(void)
   if (state == stPD)
     {
       //FIXME: tick outsiders eg. watchdog
+    }
+  return(result);
+}
+
+int
+cl_51core::do_emu(void)
+{
+  result= resGO;
+
+  if (state == stGO)
+    {
+      interrupt->was_reti= false;
+      pre_emu();
+      instPC= PC;
+      result= exec_inst();
+      post_emu();
+    }
+  else
+    {
+      // tick hw in idle state
+      tick(1);
+    }
+
+  if (result == resGO)
+    {
+      int res;
+      if ((res= do_interrupt()) != resGO)
+	result= res;
+      else
+	result= idle_pd();
+    }
+  if ((result == resINTERRUPT) &&
+      stop_at_it)
+    {
+      sim->stop(result);
+      return result;
     }
   return(result);
 }

@@ -33,7 +33,7 @@
 
     <p>The simulator can be started in the following way: </p>
 
-    <p><tt><font color="blue">$</font> ucsim_51 [-hHVvPgGwlbB] [-p prompt] [-t CPU] [-X
+    <p><tt><font color="blue">$</font> ucsim_51 [-hHVvPgGEwlbB] [-p prompt] [-t CPU] [-X
         freq[k|M]] [-R seed] [-C cfg_file] [-e command] [-c file] [-s file] [-S
       optionlist] [-I if_optionlist] [-a nr] [-z portnum] [-Z portnum] [-k portnum] [-o colorlist] [files...]</tt> </p>
     
@@ -276,6 +276,11 @@ under certain conditions; type `show c' for details.
 
       <dd>Start simulation when the program is loaded and terminate the
         simulator when the simulation stops (maybe on breakpoint).</dd>
+
+      <dt><tt><b>-E</b></tt></dt>
+
+      <dd>Start simulation when the program is loaded, but use emulation
+	mode instead of normal run mode.</dd>
 
       <dt><span style="font-family: monospace;"><b>-a nr</b></span></dt>
 

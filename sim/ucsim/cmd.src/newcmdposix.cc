@@ -565,7 +565,8 @@ cl_commander::proc_input(void)
   
   for (int j = 0; j < cons->count; j++)
     {
-      class cl_console *c = dynamic_cast<class cl_console*>((class cl_console_base*)(cons->at(j)));
+      class cl_console *c =
+	(class cl_console*)((class cl_console_base*)(cons->at(j)));
       class cl_f *f= c->get_fin();
       
       if (config_console &&

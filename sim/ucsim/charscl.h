@@ -69,6 +69,7 @@ public:
   void start_parse(int at) const { pars_pos= at; }
   chars token(const char *delims) const;
   unsigned int htoi(void);
+  unsigned long long int htoll(void);
   void ltrim(void);
   void rtrim(void);
   void trim() { ltrim(); rtrim(); }

@@ -209,11 +209,11 @@ struct dis_entry disass_rxk[]=
   };
 
 
-#define ROTL8(x,shift) ((/*uint8_t*/u8_t) ((x) << (shift)) | ((x) >> (8 - (shift))))
+#define ROTL8(x,shift) ((/*u8_t*/u8_t) ((x) << (shift)) | ((x) >> (8 - (shift))))
 
 void init_sbox()
 {
-  /*uint8_t*/u8_t p = 1, q = 1;
+  /*u8_t*/u8_t p = 1, q = 1;
 	
   /* loop invariant: p * q == 1 in the Galois field */
   do
@@ -228,7 +228,7 @@ void init_sbox()
       q ^= q & 0x80 ? 0x09 : 0;
       
       /* compute the affine transformation */
-      /*uint8_t*/u8_t xformed = q ^ ROTL8(q, 1) ^ ROTL8(q, 2) ^ ROTL8(q, 3) ^ ROTL8(q, 4);
+      /*u8_t*/u8_t xformed = q ^ ROTL8(q, 1) ^ ROTL8(q, 2) ^ ROTL8(q, 3) ^ ROTL8(q, 4);
       u8_t val= xformed ^ 0x63;
       sbox_tab[p] = val;
       ibox_tab[val]= p;

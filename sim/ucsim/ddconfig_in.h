@@ -25,6 +25,9 @@
 #undef FD_NEED_WINSOCK2_H
 
 /* XXX */
+#undef FD_NEED_GNUTYPES_H
+
+/* XXX */
 //#undef GNU_GETCWD
 
 /* XXX */

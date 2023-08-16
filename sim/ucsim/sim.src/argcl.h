@@ -58,11 +58,11 @@ public:
   virtual char *get_svalue(void);
   virtual double get_fvalue(void);
   virtual void *get_pvalue(void);
-  virtual bool get_bit_address(class cl_uc *uc, // input
-                               class cl_memory **mem, // outputs
-                               t_addr *mem_addr,
-                               int *bitnr_high,
-                               int *bitnr_low) { return(false); }
+  virtual bool get_bit_address(class cl_uc */*uc*/, // input
+                               class cl_memory **/*mem*/, // outputs
+                               t_addr */*mem_addr*/,
+                               int */*bitnr_high*/,
+                               int */*bitnr_low*/) { return(false); }
 };
 
 

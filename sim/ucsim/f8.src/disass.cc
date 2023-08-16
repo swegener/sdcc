@@ -73,11 +73,11 @@ cl_f8::inst_length(t_addr addr)
 u8_t
 cl_f8::a8(u8_t prefs)
 {
-  if (prefs & P_ALT0)
+  if (prefs & P_ALT1)
     return rXH;
-  else if (prefs & P_ALT1)
-    return rYL;
   else if (prefs & P_ALT2)
+    return rYL;
+  else if (prefs & P_ALT3)
     return rZL;
   return rXL;
 }
@@ -85,9 +85,9 @@ cl_f8::a8(u8_t prefs)
 u16_t
 cl_f8::a16(u8_t prefs)
 {
-  if (prefs & P_ALT1)
+  if (prefs & P_ALT2)
     return rX;
-  else if (prefs & P_ALT2)
+  else if (prefs & P_ALT3)
     return rZ;
   return rY;
 }
@@ -95,11 +95,11 @@ cl_f8::a16(u8_t prefs)
 const char *
 cl_f8::a8_name(u8_t prefs)
 {
-  if (prefs & P_ALT0)
+  if (prefs & P_ALT1)
     return "xh";
-  else if (prefs & P_ALT1)
-    return "yl";
   else if (prefs & P_ALT2)
+    return "yl";
+  else if (prefs & P_ALT3)
     return "zl";
   return "xl";
 }
@@ -107,30 +107,30 @@ cl_f8::a8_name(u8_t prefs)
 const char *
 cl_f8::a16_name(u8_t prefs)
 {
-  if (prefs & P_ALT1)
-    return "x";
-  else if (prefs & P_ALT2)
+  if (prefs & P_ALT2)
     return "z";
+  else if (prefs & P_ALT3)
+    return "x";
   return "y";
 }
 
 const char *
 cl_f8::a16h_name(u8_t prefs)
 {
-  if (prefs & P_ALT1)
-    return "xh";
-  else if (prefs & P_ALT2)
+  if (prefs & P_ALT2)
     return "zh";
+  else if (prefs & P_ALT3)
+    return "xh";
   return "yh";
 }
 
 const char *
 cl_f8::a16l_name(u8_t prefs)
 {
-  if (prefs & P_ALT1)
-    return "xl";
-  else if (prefs & P_ALT2)
+  if (prefs & P_ALT2)
     return "zl";
+  else if (prefs & P_ALT3)
+    return "xl";
   return "yl";
 }
 

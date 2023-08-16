@@ -251,7 +251,8 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 {
   class cl_memory *mem= uc->rom;
   t_addr addr;
-  /*t_addr*/long long int start = -1, end = -1;
+  ///*t_addr*/long long int start = -1, end = -1;
+  class cl_dump_ads ads;
   long bpl= -1;
 
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -326,25 +327,25 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
   else if (cmdline->syntax_match(uc, CELL))
     {
       mem= uc->address_space(params[0]->value.cell, &addr);
-      start= addr;
-      end= start+64;
+      ads._start(addr);
+      ads._stop(ads.start+64);
     }
   else if (cmdline->syntax_match(uc, CELL ADDRESS))
     {
       mem= uc->address_space(params[0]->value.cell, &addr);
-      start= addr;
-      end= params[1]->value.address;
+      ads._start(addr);
+      ads._stop(params[1]->value.address);
     }
   else if (cmdline->syntax_match(uc, CELL ADDRESS NUMBER))
     {
       mem= uc->address_space(params[0]->value.cell, &addr);
-      start= addr;
-      end= params[1]->value.address;
+      ads._start(addr);
+      ads._stop(params[1]->value.address);
       bpl= params[2]->value.number;
     }
   else if (cmdline->syntax_match(uc, BIT)) {
     mem= params[0]->value.bit.mem;
-    start= params[0]->value.bit.mem_address;
+    ads._start(params[0]->value.bit.mem_address);
   }
   else if (cmdline->syntax_match(uc, BIT BIT)) {
     mem= params[0]->value.bit.mem;
@@ -352,8 +353,8 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
       con->dd_printf("Start and end must be in the same address space\n");
       return false;
     }
-    start= params[0]->value.bit.mem_address;
-    end= params[1]->value.bit.mem_address;
+    ads._start(params[0]->value.bit.mem_address);
+    ads._stop(params[1]->value.bit.mem_address);
   }
   else if (cmdline->syntax_match(uc, BIT BIT NUMBER)) {
     mem= params[0]->value.bit.mem;
@@ -361,8 +362,8 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
       con->dd_printf("Start and end must be in the same address space\n");
       return false;
     }
-    start= params[0]->value.bit.mem_address;
-    end= params[1]->value.bit.mem_address;
+    ads._start(params[0]->value.bit.mem_address);
+    ads._stop(params[1]->value.bit.mem_address);
     bpl  = params[2]->value.number;
   }
   else if (cmdline->syntax_match(uc, MEMORY)) {
@@ -370,18 +371,18 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
     mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end  = start+64;
+    ads._start(params[1]->value.address);
+    ads._stop(ads.start+64);
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
     mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
+    ads._start(params[1]->value.address);
+    ads._stop(params[2]->value.address);
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
     mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
+    ads._start(params[1]->value.address);
+    ads._stop(params[2]->value.address);
     bpl  = params[3]->value.number;
   }
   else {
@@ -394,19 +395,19 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
   switch (fmt)
     {
     case 0: // default
-      mem->dump(1, start, end, bpl, con);
+      mem->dump(1, &ads, bpl, con);
       break;
     case 'b': // binary
-      mem->dump_b(start, end, bpl, con);
+      mem->dump_b(&ads, bpl, con);
       break;
     case 'h': case 'x':// hex
-      mem->dump(0, start, end, bpl, con);
+      mem->dump(0, &ads, bpl, con);
       break;
     case 'i': // ihex
-      mem->dump_i(start, end, 32, con);
+      mem->dump_i(&ads, 32, con);
       break;
     case 's': // string
-      mem->dump_s(start, end, bpl, con);
+      mem->dump_s(&ads, bpl, con);
       break;
     }
 
@@ -729,7 +730,11 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
     while (found)
       {
 	if (con->get_fout())
-	  mem->dump(0, addr, addr+len-1, -1, con);
+	  {
+	    class cl_dump_ads ads;
+	    ads._start(addr); ads._stop(addr+len-1);
+	    mem->dump(0, &ads, -1, con);
+	  }
 	addr++;
 	found= mem->search_next(case_sensitive, array, len, &addr);
       }

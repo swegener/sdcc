@@ -56,6 +56,59 @@ enum cell_flag {
 
 extern t_mem def_data;
 
+class cl_dump_ads: public cl_base
+{
+public:
+  t_addr start, stop;
+  bool use_start, use_stop;
+public:
+  cl_dump_ads(void): cl_base()
+  {
+    start= 0; stop= 0;
+    use_start= false; use_stop= false;
+  }
+  cl_dump_ads(t_addr the_start): cl_base()
+  {
+    start= the_start; stop= 0;
+    use_start= true; use_stop= false;
+  }
+  cl_dump_ads(t_addr the_start,
+	      t_addr the_stop): cl_base()
+  {
+    start= the_start; stop= the_stop;
+    use_start= true; use_stop= true;
+  }
+  cl_dump_ads(t_addr the_start, bool the_use_start,
+	      t_addr the_stop, bool the_use_stop): cl_base()
+  {
+    start= the_start; stop= the_stop;
+    use_start= the_use_start; use_stop= the_use_stop;
+  }
+  cl_dump_ads(const cl_dump_ads &da)
+  {
+    start= da.start; stop= da.stop;
+    use_start= da.use_start; use_stop= da.use_stop;
+  }
+public:
+  virtual void _start(t_addr the_start) {
+    start= the_start;
+    use_start= true;
+  }
+  virtual void _stop(t_addr the_stop) {
+    stop= the_stop;
+    use_stop= true;
+  }
+  virtual void _ss(t_addr the_start, t_addr the_stop) {
+    start= the_start; stop= the_stop;
+    use_start= true; use_stop= true;
+  }
+  virtual void _ss7(t_addr the_start) {
+    start= the_start; stop= the_start+7;
+    use_start= true; use_stop= true;
+  }
+};
+
+  
 /*
  * 3rd version of memory system
  */
@@ -99,17 +152,48 @@ public:
   virtual void err_inv_addr(t_addr addr);
   virtual void err_non_decoded(t_addr addr);
 
-  virtual t_addr dump(int smart, t_addr start, t_addr stop, int bitnr_high, int bitnr_low, int bpl, class cl_console_base *con);
-  virtual t_addr dump(int smart, t_addr start, t_addr stop, int bpl, class cl_console_base *con) {
-    return dump(smart, start, stop, -1, -1, bpl, con);
+  virtual t_addr dump(int smart,
+		      //t_addr start, t_addr stop,
+		      class cl_dump_ads *ads,
+		      int bitnr_high, int bitnr_low,
+		      int bpl,
+		      class cl_console_base *con);
+  virtual t_addr dump(int smart,
+		      //t_addr start, t_addr stop,
+		      class cl_dump_ads *ads,
+		      int bpl,
+		      class cl_console_base *con) {
+    return dump(smart, /*start, stop*/ads, -1, -1, bpl, con);
   }
-  virtual t_addr dump(t_addr addr, int bitnr_high, int bitnr_low, class cl_console_base *con) {
-    return dump(2, addr, addr, bitnr_high, bitnr_low, -1, con);
+  virtual t_addr dump(t_addr addr,
+		      int bitnr_high, int bitnr_low,
+		      class cl_console_base *con) {
+    cl_dump_ads ads(addr, true, addr, true);
+    return dump(2,
+		//addr, addr,
+		&ads,
+		bitnr_high, bitnr_low,
+		-1,
+		con);
   }
-  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
-  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
-  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, class cl_console_base *con);
-  virtual t_addr dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con) { return dump(1, start, stop, bpl, con); }
+  virtual t_addr dump_s(//t_addr start, t_addr stop,
+			class cl_dump_ads *ads,
+			int bpl,
+			class cl_console_base *con);
+  virtual t_addr dump_b(//t_addr start, t_addr stop,
+			class cl_dump_ads *ads,
+			int bpl,
+			class cl_console_base *con);
+  virtual t_addr dump_i(//t_addr start, t_addr stop,
+			class cl_dump_ads *ads,
+			int bpl,
+			class cl_console_base *con);
+  virtual t_addr dump(//t_addr start, t_addr stop,
+		      class cl_dump_ads *ads,
+		      int bpl,
+		      class cl_console_base *con) {
+    return dump(1, /*start, stop*/ads, bpl, con);
+  }
   //virtual t_addr dump(class cl_console_base *con) { return(dump(df_smart, -1, -1, -1, con)); }
   virtual bool search_next(bool case_sensitive,
 			   t_mem *array, int len, t_addr *addr);

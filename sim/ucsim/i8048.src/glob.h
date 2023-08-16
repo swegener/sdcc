@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 extern struct dis_entry dis_tab20[];
 
-extern int8_t tick_tab20[256];
+extern i8_t tick_tab20[256];
 
 extern struct cpu_entry cpus_8048[];
 

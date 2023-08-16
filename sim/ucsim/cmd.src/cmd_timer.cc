@@ -333,7 +333,7 @@ COMMAND_DO_WORK_UC(cl_timer_value_cmd)
           if (units[0] != '\0' && units[0] != 's')
             con->dd_printf("Expected units to be in seconds not \"%s\"\n", cmdline->param(1)->value.string.string);
           else
-            ticker->set(time / uc->get_xtal_tick(), time);
+            ticker->set((int)(time / uc->get_xtal_tick()), time);
         }
       else if (cmdline->syntax_match(uc, NUMBER NUMBER STRING))
         {

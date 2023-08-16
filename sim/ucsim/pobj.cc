@@ -174,7 +174,7 @@ cl_base::first_child(void)
   if (!children ||
       children->count == 0)
     return(0);
-  return(dynamic_cast<class cl_base *>(children->object_at(0)));
+  return (class cl_base *)(children->object_at(0));
 }
 
 class cl_base *
@@ -202,7 +202,7 @@ cl_base::pass_event_down(class cl_event &event)
   for (i= 0; i < children->count; i++)
     {
       class cl_base *child=
-	dynamic_cast<class cl_base *>(children->object_at(i));
+	(class cl_base *)(children->object_at(i));
       if (child)
 	{
 	  child->handle_event(event);

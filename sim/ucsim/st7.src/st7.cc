@@ -48,8 +48,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "regsst7.h"
 #include "st7mac.h"
 
-#define uint32 t_addr
-#define uint8 unsigned char
+//#define uint32 t_addr
+//#define uint8 unsigned char
 
 /*******************************************************************/
 

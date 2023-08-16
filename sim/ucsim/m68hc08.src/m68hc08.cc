@@ -49,9 +49,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "regshc08.h"
 #include "hc08mac.h"
 
-#define uint32 t_addr
-#define uint8 unsigned char
-#define int8 char
+//#define uint32 t_addr
+//#define uint8 unsigned char
+//#define int8 char
 
 //const bool TRUE = 1;
 //const bool FALSE = 0;

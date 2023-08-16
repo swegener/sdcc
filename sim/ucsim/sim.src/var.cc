@@ -384,7 +384,7 @@ cl_var_list::add(class cl_cvar *item)
       t_index i;
       if (by_addr.search(var->get_mem(), var->get_addr(), var->bitnr_high, var->bitnr_low, i))
         {
-          class cl_var *v;
+          class cl_var *v= 0;
           while (i < by_addr.count && (v = by_addr.at(i)) &&
                  v->get_mem() == var->get_mem() && v->get_addr() == var->get_addr() &&
                  v->bitnr_high == var->bitnr_high && v->bitnr_low == var->bitnr_low)
@@ -441,7 +441,7 @@ void
 cl_var_list::add(chars prefix, class cl_memory *mem, t_addr base, const struct var_def *def, size_t n)
 {
   chars regname = chars("");
-  t_addr offset = 0;
+  /*t_addr*/i64_t offset = 0;
 
   for (; n; def++, n--)
     {
@@ -454,7 +454,6 @@ cl_var_list::add(chars prefix, class cl_memory *mem, t_addr base, const struct v
           if (def->bitnr_low < 0)
             {
               offset = -1;
-
               int i;
               if (by_name.search(regname, i))
                 {
@@ -530,6 +529,7 @@ cl_vars_iterator::compare_bits(const class cl_var *var1, const class cl_var *var
 
   return ret;
 }
+
 const cl_var *
 cl_vars_iterator::first(cl_memory *mem, t_addr addr)
 {
@@ -544,7 +544,7 @@ cl_vars_iterator::first(cl_memory *mem, t_addr addr)
   const cl_var *chip_var = NULL;
   chip_mem = NULL;
 
-  cl_address_decoder *ad;
+  cl_address_decoder *ad= 0;
   if (space_mem->is_address_space() &&
       (ad = ((cl_address_space *)space_mem)->get_decoder_of(space_addr)))
     {

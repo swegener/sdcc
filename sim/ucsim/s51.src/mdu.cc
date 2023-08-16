@@ -192,7 +192,7 @@ cl_mdu517::read(class cl_memory_cell *cell)
   else if (sfr->is_owned(cell, &a))
     {
       a-= 0xe9;
-      if ((a < 0) ||
+      if (/*(a < 0) ||*/
 	  (a > 5))
 	return v;
     }
@@ -213,7 +213,7 @@ cl_mdu517::write(class cl_memory_cell *cell, t_mem *val)
     {
       // if (a==0xee) printf(" WRITE EE %02x\n", *val);
       a-= 0xe9;
-      if ((a < 0) ||
+      if (/*(a < 0) ||*/
 	  (a > 6))
 	{
 	  return;
@@ -394,7 +394,7 @@ cl_mdu88x::read(class cl_memory_cell *cell)
   else if (sfr->is_owned(cell, &a))
     {
       a-= 0xb2;
-      if (((a < 0) ||
+      if ((/*(a < 0) ||*/
 	   (a > 5)))
 	{
 	  if (con->get() & 0x20)
@@ -478,7 +478,7 @@ cl_mdu88x::write(class cl_memory_cell *cell, t_mem *val)
   else if (sfr->is_owned(cell, &a))
     {
       a-= 0xb2;
-      if ((a < 0) ||
+      if (/*(a < 0) ||*/
 	  (a > 5))
 	return;
       /*if (calcing)

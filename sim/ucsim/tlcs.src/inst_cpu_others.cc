@@ -80,7 +80,7 @@ cl_tlcs::inst_neg_a()
   if (reg.raf.a)
     reg.raf.f|= (FLAG_C|FLAG_X);
 
-  //uint8_t a= ~reg.raf.a;
+  //u8_t a= ~reg.raf.a;
   if ((reg.raf.a & 0x0f) == 0)//if (a&0xf + 1 > 15)
     reg.raf.f|= FLAG_H;
   reg.raf.a= 0-reg.raf.a;

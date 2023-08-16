@@ -810,19 +810,23 @@ cl_m6809::print_regs(class cl_console_base *con)
   con->dd_printf("DP= $%02x\n", reg.DP);
 
   con->dd_printf("X= ");
-  rom->dump(0, reg.X, reg.X+7, 8, con);
+  class cl_dump_ads ads(reg.X, reg.X+7);
+  rom->dump(0, /*reg.X, reg.X+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("Y= ");
-  rom->dump(0, reg.Y, reg.Y+7, 8, con);
+  ads._ss(reg.Y, reg.Y+7);
+  rom->dump(0, /*reg.Y, reg.Y+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("S= ");
-  rom->dump(0, reg.S, reg.S+7, 8, con);
+  ads._ss(reg.S, reg.S+7);
+  rom->dump(0, /*reg.S, reg.S+7*/&ads, 8, con);
   con->dd_color("answer");
   
   con->dd_printf("U= ");
-  rom->dump(0, reg.U, reg.U+7, 8, con);
+  ads._ss(reg.U, reg.U+7);
+  rom->dump(0, /*reg.U, reg.U+7*/&ads, 8, con);
   con->dd_color("answer");
   
   print_disass(PC, con);

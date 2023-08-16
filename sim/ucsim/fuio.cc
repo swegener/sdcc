@@ -2,12 +2,25 @@
 #include "ddconfig.h"
 
 #include <stdio.h>
+
 #if defined HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
+#endif
+#if defined HAVE_NEED_SELECT_H
 # include <sys/select.h>
+#endif
+#if defined HAVE_NEED_TIME_H
+# include <sys/time.h>
+#endif
+#if defined HAVE_NEED_TYPES_H
+# include <sys/types.h>
+#endif
+#if defined HAVE_NEED_GNUTYPES_H
+# include <gnu/types.h>
+#endif
+
 # include <netinet/in.h>
 # include <arpa/inet.h>
-#endif
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>

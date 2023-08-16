@@ -16,6 +16,9 @@ __sdcc_external_startup (void) __nonbanked
 void
 _putchar (char c)
 {
+  (* (volatile char __xdata *) 0x7654)= 'p';
+  (* (volatile char __xdata *) 0x7654)= c;
+  return;
   while (!TI)
     ;
   TI = 0;
@@ -30,7 +33,8 @@ _initEmu (void)
 void
 _exitEmu (void)
 {
-  while (!TI) /* wait for the last character to be transmitted */
-    ;         /* before hitting the breakpoint */
+  //while (!TI) /* wait for the last character to be transmitted */
+  //  ;         /* before hitting the breakpoint */
   * (char __idata *) 0 = * (char __xdata *) 0x7654;
+  (* (volatile char __xdata *) 0x7654)= 's';
 }

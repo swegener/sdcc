@@ -1839,7 +1839,7 @@ pic16glue ()
 
     /* now put it all together into the assembler file */
     /* create the assembler file name */
-    if((noAssemble || options.c1mode)  && fullDstFileName) {
+    if((options.no_assemble || options.c1mode)  && fullDstFileName) {
       SNPRINTF(buffer, sizeof(buffer), "%s", fullDstFileName);
     } else {
       SNPRINTF(buffer, sizeof(buffer), "%s.asm", dstFileName);

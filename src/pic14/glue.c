@@ -417,7 +417,7 @@ pic14createInterruptVect (struct dbuf_s *vBuf)
   if (!(mainf = findSymWithLevel (SymbolTab, mainf)))
     {
       struct options *op = &options;
-      if (!(op->cc_only || noAssemble))
+      if (!(op->cc_only || options.no_assemble))
         //      werror (E_NO_MAIN);
         fprintf (stderr, "WARNING: function 'main' undefined\n");
       return;
@@ -427,7 +427,7 @@ pic14createInterruptVect (struct dbuf_s *vBuf)
   if (!IFFUNC_HASBODY (mainf->type))
     {
       /* if ! compile only then main function should be present */
-      if (!(options.cc_only || noAssemble))
+      if (!(options.cc_only || options.no_assemble))
         //      werror (E_NO_MAIN);
         fprintf (stderr, "WARNING: function 'main' undefined\n");
       return;
@@ -732,7 +732,7 @@ picglue (void)
   /* now put it all together into the assembler file */
   /* create the assembler file name */
 
-  if ((noAssemble || options.c1mode) && fullDstFileName)
+  if ((options.no_assemble || options.c1mode) && fullDstFileName)
     {
       SNPRINTF (buffer, sizeof (buffer), "%s", fullDstFileName);
     }

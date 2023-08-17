@@ -2,6 +2,7 @@
    wchar.h - Extended and multibyte wide character utilitites (ISO C 11 7.29)
 
    Copyright (c) 2015-2016, Philipp Klaus Krause / pkk@spth.de
+                 2023, Benedikt Freisen / b.freisen@gmx.net
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -55,8 +56,16 @@ struct tm;
   #define WEOF 0xfffffffful
 #endif
 
+/* C99 Character classification */
+
+inline int iswblank(wint_t c)
+{
+  return ((wchar_t)c == L' ' || (wchar_t)c == L'\t');
+}
+
 /* C99 Wide string comparison functions (ISO C11 7.29.4.4) */
 int wcscmp(const wchar_t *s1, const wchar_t *s2);
+int wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t count);
 
 /* C99 Miscellaneous functions (ISO C11 7.29.4.6) */
 size_t wcslen(const wchar_t *s);
@@ -72,5 +81,13 @@ int mbsinit(const mbstate_t *ps);
 size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
+
+/* C99 Wide string numeric conversion functions (ISO C 11 7.29.4.1) */
+long int wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base);
+unsigned long int wcstoul(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base);
+#ifdef __SDCC_LONGLONG
+long long int wcstoll(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base);
+unsigned long long int wcstoull(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base);
+#endif
 
 #endif /* __SDCC_WCHAR_H */

@@ -1,7 +1,8 @@
 /*---------------------------------------------------------------------
-   strtoul() - convert a string to a unsigned long int and return it
+   strtoull() - convert a string to an unsigned long long int and return it
 
    Copyright (C) 2018-2023, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+                 2023, Benedikt Freisen . b.freisen@gmx.net
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -31,12 +32,13 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if __SDCC_LONGLONG
 #include <stdckdint.h>
 #endif
 #include <limits.h>
 #include <errno.h>
 
+#if __SDCC_LONGLONG
 static signed char _isdigit(const char c, unsigned char base)
 {
   unsigned char v;
@@ -58,10 +60,10 @@ static signed char _isdigit(const char c, unsigned char base)
 
 // NOTE for maintenance: strtoull, wcstoul and wcstoull have been derived from strtoul
 
-unsigned long int strtoul(const char *nptr, char **endptr, int base)
+unsigned long long int strtoull(const char *nptr, char **endptr, int base)
 {
   const char *ptr = nptr;
-  unsigned long int ret;
+  unsigned long long int ret;
   bool range_error = false;
   bool neg = false;
   unsigned char b = base;
@@ -105,6 +107,7 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
   else if (b == 2 && (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2)))
     ptr += 2;
 
+
   // Empty sequence conversion error
   if (_isdigit (*ptr, b) < 0)
     {
@@ -115,22 +118,17 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
 
   for (ret = 0;; ptr++)
     {
+      unsigned long long int oldret;
       signed char digit = _isdigit (*ptr, b);
 
       if (digit < 0)
         break;
 
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+      oldret = ret;
       range_error |= ckd_mul (&ret, ret, b);
       range_error |= ckd_add (&ret, ret, digit);
-#else
-      unsigned long int oldret = ret;
-      ret *= b;
-      if (ret < oldret)
-        range_error = true;
+
       ret += (unsigned char)digit;
-#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul and ckd_add)
-#endif
     }
 
   if (endptr)
@@ -139,9 +137,9 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
   if (range_error)
     {
       errno = ERANGE;
-      return (ULONG_MAX);
+      return (ULLONG_MAX);
     }
 
   return (neg ? -ret : ret);
 }
-
+#endif

@@ -81,11 +81,23 @@ COMMON_SDCC = \
   atol.c \
   atoll.c \
   strtol.c \
+  strtoll.c \
+  strtoimax.c \
   strtoul.c \
+  strtoull.c \
+  strtoumax.c \
+  wcstol.c \
+  wcstoll.c \
+  wcstoimax.c \
+  wcstoul.c \
+  wcstoull.c \
+  wcstoumax.c \
   bsearch.c \
   qsort.c \
   abs.c \
   labs.c \
+  llabs.c \
+  imaxabs.c \
   rand.c \
   _strcat.c \
   _strchr.c \
@@ -125,6 +137,7 @@ COMMON_SDCC = \
   c16stombs.c \
   wcscmp.c \
   wcslen.c \
+  wcsncmp.c \
   btowc.c \
   wctob.c \
   mbsinit.c \

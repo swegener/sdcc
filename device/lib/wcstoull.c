@@ -1,7 +1,8 @@
 /*---------------------------------------------------------------------
-   strtoul() - convert a string to a unsigned long int and return it
+   wcstoull() - convert a wide string to an unsigned long long int and return it
 
    Copyright (C) 2018-2023, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+                 2023, Benedikt Freisen . b.freisen@gmx.net
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -31,22 +32,24 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if __SDCC_LONGLONG
 #include <stdckdint.h>
 #endif
 #include <limits.h>
 #include <errno.h>
+#include <wchar.h>
 
-static signed char _isdigit(const char c, unsigned char base)
+#if __SDCC_LONGLONG
+static signed char _isdigit(const wchar_t c, unsigned char base)
 {
   unsigned char v;
 
-  if (c >= '0' && c <= '9')
-    v = c - '0';
-  else if (c >= 'a' && c <='z')
+  if (c >= L'0' && c <= L'9')
+    v = c - L'0';
+  else if (c >= L'a' && c <= L'z')
     v = c - 'a' + 10;
-  else if (c >= 'A' && c <='Z')
-    v = c - 'A' + 10;
+  else if (c >= L'A' && c <= L'Z')
+    v = c - L'A' + 10;
   else
     return (-1);
 
@@ -58,10 +61,10 @@ static signed char _isdigit(const char c, unsigned char base)
 
 // NOTE for maintenance: strtoull, wcstoul and wcstoull have been derived from strtoul
 
-unsigned long int strtoul(const char *nptr, char **endptr, int base)
+unsigned long long int strtoull(const wchar_t *nptr, wchar_t **endptr, int base)
 {
-  const char *ptr = nptr;
-  unsigned long int ret;
+  const wchar_t *ptr = nptr;
+  unsigned long long int ret;
   bool range_error = false;
   bool neg = false;
   unsigned char b = base;
@@ -72,26 +75,26 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
   // Handle sign.
   switch(*ptr)
     {
-    case '-':
+    case L'-':
       neg = true;
-    case '+':
+    case L'+':
       ptr++;
     }
 
   // base not specified.
   if (!b)
     {
-      if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
+      if (!wcsncmp (ptr, L"0x", 2) || !wcsncmp (ptr, L"0X", 2))
         {
           b = 16;
           ptr += 2;
         }
-      else if (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2))
+      else if (!wcsncmp (ptr, L"0b", 2) || !wcsncmp (ptr, L"0B", 2))
         {
           b = 2;
           ptr += 2;
         }
-      else if (*ptr == '0')
+      else if (*ptr == L'0')
         {
           b = 8;
           ptr++;
@@ -100,48 +103,44 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
         b = 10;
     }
   // Handle optional hex prefix.
-  else if (b == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
+  else if (b == 16 && (!wcsncmp (ptr, L"0x", 2) || !wcsncmp (ptr, L"0X", 2)))
     ptr += 2;
-  else if (b == 2 && (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2)))
+  else if (b == 2 && (!wcsncmp (ptr, L"0b", 2) || !wcsncmp (ptr, L"0B", 2)))
     ptr += 2;
+
 
   // Empty sequence conversion error
   if (_isdigit (*ptr, b) < 0)
     {
       if (endptr)
-        *endptr = (char*)nptr;
+        *endptr = (wchar_t*)nptr;
       return (0);
     }
 
   for (ret = 0;; ptr++)
     {
+      unsigned long long int oldret;
       signed char digit = _isdigit (*ptr, b);
 
       if (digit < 0)
         break;
 
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-      range_error |= ckd_mul (&ret, ret, b);
+      oldret = ret;
+      range_error |= ckd_mul(&ret, ret, b);
       range_error |= ckd_add (&ret, ret, digit);
-#else
-      unsigned long int oldret = ret;
-      ret *= b;
-      if (ret < oldret)
-        range_error = true;
+
       ret += (unsigned char)digit;
-#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul and ckd_add)
-#endif
     }
 
   if (endptr)
-    *endptr = (char*)ptr;
+    *endptr = (wchar_t*)ptr;
 
   if (range_error)
     {
       errno = ERANGE;
-      return (ULONG_MAX);
+      return (ULLONG_MAX);
     }
 
   return (neg ? -ret : ret);
 }
-
+#endif

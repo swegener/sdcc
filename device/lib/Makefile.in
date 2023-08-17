@@ -141,6 +141,7 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   div.c \
   ldiv.c \
   lldiv.c \
+  imaxdiv.c \
   sprintf.c \
   vprintf.c \
   printf_fast.c \

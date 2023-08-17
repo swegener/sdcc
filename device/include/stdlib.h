@@ -62,11 +62,13 @@ void call_once(once_flag *flag, void (*func)(void));
 extern float atof (const char *nptr);
 extern int atoi (const char *nptr);
 extern long int atol (const char *nptr);
-#ifdef __SDCC_LONGLONG
-extern long long int atoll (const char *nptr);
-#endif
 extern long int strtol(const char *nptr, char **endptr, int base);
 extern unsigned long int strtoul(const char *nptr, char **endptr, int base);
+#ifdef __SDCC_LONGLONG
+extern long long int atoll (const char *nptr);
+extern long long int strtoll(const char *nptr, char **endptr, int base);
+extern unsigned long long int strtoull(const char *nptr, char **endptr, int base);
+#endif
 
 /* SDCC extensions */
 extern void __uitoa(unsigned int, char *, unsigned char);
@@ -123,6 +125,9 @@ int abs(int j) __preserves_regs(b, c, iyl, iyh);
 int abs(int j);
 #endif
 long int labs(long int j);
+#ifdef __SDCC_LONGLONG
+long long int llabs(long long int j);
+#endif
 
 typedef struct
 {

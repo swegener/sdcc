@@ -28,6 +28,8 @@
 
 #include <stdint.h>
 
+#include <stdbit.h>
+
 #ifdef __SDCC_mcs51
 #define __SDCC_NONBANKED __nonbanked
 #else
@@ -59,7 +61,7 @@ unsigned long long _rrulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 
 	return(l);
 }
-#else
+#elif __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_LITTLE__
 unsigned long long _rrulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
@@ -81,6 +83,8 @@ unsigned long long _rrulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 
 	return(l);
 }
+#else
+#error Support for mixed endiannness not implemented!
 #endif
 
 #endif

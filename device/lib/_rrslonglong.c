@@ -59,7 +59,7 @@ long long _rrslonglong(long long l, char s) __SDCC_NONBANKED
 
 	return(l);
 }
-#else
+#elif __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_LITTLE__
 long long _rrslonglong(long long l, char s) __SDCC_NONBANKED
 {
 	int32_t *top = (uint32_t *)((char *)(&l) + 4);
@@ -81,6 +81,8 @@ long long _rrslonglong(long long l, char s) __SDCC_NONBANKED
 
 	return(l);
 }
+#else
+#error Support for mixed endiannness not implemented!
 #endif
 
 #endif

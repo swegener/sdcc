@@ -1,7 +1,7 @@
 /** extended tests for shift operations, added by
     Frieder Ferlemann to check for bugs related to bug 1533966
 
-    size: 8,16,32
+    size: 8,16,32,64
     right: 0,1
     vol: 0,1
     sign: u,
@@ -32,6 +32,11 @@
 #if SIZE == 32
 #  define TYPE {sign}int32_t
 #  define TEST_VECT 0xa8b5c4d6
+#endif
+
+#if SIZE == 64
+#  define TYPE {sign}int64_t
+#  define TEST_VECT 0x8091a2b3c4d5e6f7
 #endif
 
 #if RIGHT == 0
@@ -80,6 +85,7 @@ testShift(void)
     TESTSHIFT(15);
 #endif
 
+#if !defined (__SDCC_pdk15) // Lack of code memory
 #if SIZE >= 32
     TESTSHIFT(16);
     TESTSHIFT(17);
@@ -98,6 +104,38 @@ testShift(void)
     TESTSHIFT(29);
     TESTSHIFT(30);
     TESTSHIFT(31);
+#endif
+
+#if SIZE >= 48
+    TESTSHIFT(32);
+    TESTSHIFT(33);
+    TESTSHIFT(34);
+    TESTSHIFT(35);
+    TESTSHIFT(36);
+    TESTSHIFT(37);
+    TESTSHIFT(38);
+    TESTSHIFT(39);
+
+    TESTSHIFT(40);
+    TESTSHIFT(41);
+    TESTSHIFT(42);
+    TESTSHIFT(43);
+    TESTSHIFT(44);
+    TESTSHIFT(45);
+    TESTSHIFT(46);
+    TESTSHIFT(47);
+#endif
+
+#if SIZE >= 56
+    TESTSHIFT(48);
+    TESTSHIFT(49);
+    TESTSHIFT(50);
+    TESTSHIFT(51);
+    TESTSHIFT(52);
+    TESTSHIFT(53);
+    TESTSHIFT(54);
+    TESTSHIFT(55);
+#endif
 #endif
 #endif
 #endif

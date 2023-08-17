@@ -62,7 +62,7 @@ unsigned long long _rlulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 	return(l);
 }
 
-#else
+#elif __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_LITTLE__
 
 unsigned long long _rlulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 {
@@ -86,6 +86,8 @@ unsigned long long _rlulonglong(unsigned long long l, char s) __SDCC_NONBANKED
 	return(l);
 }
 
+#else
+#error Support for mixed endiannness not implemented!
 #endif
 
 #endif

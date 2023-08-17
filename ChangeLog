@@ -1,3 +1,13 @@
+2023-08-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/shifts2.c.in,
+	  support/regression/tests/bitintshift.c.in:
+	  Improve test coverage for shifts of wide variables.
+	* device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rrulonglong.c:
+	  Fix choice of endiannness for support functions for shifts of wide variables.
+
 2023-08-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/cmd.c: fixed compiler warning

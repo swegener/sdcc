@@ -106,6 +106,7 @@ testShift(void)
     TESTSHIFT(31);
 #endif
 
+#if !(defined (__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of code memory
 #if SIZE >= 48
     TESTSHIFT(32);
     TESTSHIFT(33);
@@ -135,6 +136,7 @@ testShift(void)
     TESTSHIFT(53);
     TESTSHIFT(54);
     TESTSHIFT(55);
+#endif
 #endif
 #endif
 #endif

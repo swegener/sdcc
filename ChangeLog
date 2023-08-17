@@ -2,6 +2,8 @@
 
 	* src/pdk/gen.c:
 	  Fix a bug in pdk code generation for shifts.
+	* support/regression/tests/shifts2.c.in:
+	  Disable a part of a test for configurations where it fails due to lack of memory.
 
 2023-08-17 Maarten Brock <sourceforge.brock AT dse.nl>
 

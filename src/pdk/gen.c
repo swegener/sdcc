@@ -778,6 +778,10 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
 {
   bool dummy = (result->type == AOP_DUMMY || source->type == AOP_DUMMY);
 
+#if 0
+  D (emit2 ("; cheapMove", "a_dead %d p_dead %d", a_dead, p_dead));
+#endif
+
   if (aopSame (result, roffset, source, soffset, 1))
     return;
   else if (source->type == AOP_STL)
@@ -1030,6 +1034,9 @@ push (const asmop *op, int offset, int size)
 static void
 genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool p_dead_global)
 {
+#if 0
+  D (emit2 ("; genMove_o", "a_dead_global %d p_dead_global %d", a_dead_global, p_dead_global));
+#endif
   // Handle I/O first.
   if (result->type == AOP_SFR && source->type == AOP_SFR)
     {
@@ -3801,7 +3808,7 @@ genLeftShift (const iCode *ic)
       if (pushed_counter)
         popAF ();
       else
-        cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
+        cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX) && !aopInReg (result->aop, 1, P_IDX), true);
       emitLabel (tlbl1);
       G.p.type = AOP_INVALID;
       emit2 ("sub", "a, #1");
@@ -4108,7 +4115,7 @@ genRightShift (const iCode *ic)
       if (pushed_counter)
         popAF ();
       else
-        cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX), true);
+        cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX) && !aopInReg (result->aop, 1, P_IDX), true);
       emitLabel (tlbl1);
       G.p.type = AOP_INVALID;
 

@@ -1,3 +1,8 @@
+2023-08-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/gen.c:
+	  Fix a bug in pdk code generation for shifts.
+
 2023-08-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/pic14/glue.c,

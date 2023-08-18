@@ -1316,6 +1316,8 @@ struct cpu_entry cpus_z80[]=
     {"EZ80"   , CPU_EZ80,    0			, ""		, ""},
 
     {"Z80N"   , CPU_Z80N,    0                  , ""            , ""},
+
+    {"R800"   , CPU_R800,    0                  , ""            , ""},
     
     {NULL, CPU_NONE, 0, "", ""}
   };

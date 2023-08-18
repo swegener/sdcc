@@ -60,7 +60,7 @@ OBJECTS_SHARED	= glob.o \
 		  inst_fd.o \
 		  inst_ddcb.o \
 		  inst_fdcb.o \
-		  glob_gb80.o inst_gb80.o gb80.o lr35902.o \
+		  glob_gb80.o inst_gb80.o gb80.o lr35902.o r800.o \
 		  sim$(TN).o $(TN).o e$(TN).o
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

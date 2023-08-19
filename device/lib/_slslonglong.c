@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _rlslonglong.c - routine for left shift of 64 bit long long
+   _slslonglong.c - routine for shift left of 64 bit signed long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -28,17 +28,13 @@
 
 #include <stdint.h>
 
-#ifdef __SDCC_mcs51
-#define __SDCC_NONBANKED __nonbanked
-#else
-#define __SDCC_NONBANKED
-#endif
+#include <sdcc-lib.h>
 
 #ifdef __SDCC_LONGLONG
 
-long long _rlslonglong(long long l, char s) __SDCC_NONBANKED
+long long _slslonglong(long long l, char s) __SDCC_NONBANKED
 {
-	return((unsigned long long)(l) << s);
+    return((unsigned long long)(l) << s);
 }
 
 #endif

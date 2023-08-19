@@ -1,3 +1,104 @@
+2023-08-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/asm/default/features.h,
+	* device/include/asm/ds390/features.h,
+	* device/include/asm/mcs51/features.h,
+	* device/include/asm/pic14/features.h,
+	* device/include/asm/pic16/features.h,
+	* device/include/asm/r2k/features.h,
+	* device/include/asm/r3ka/features.h,
+	* device/include/asm/sm83/features.h,
+	* device/include/asm/stm8/features.h,
+	* device/include/asm/tlcs90/features.h,
+	* device/include/asm/z80/features.h: added __SDCC_NONBANKED
+	* device/include/float.h: use __SDCC_NONBANKED for __SDCC_FLOAT_NONBANKED
+	* device/include/sdcc-lib.h: cosmetics
+	* device/lib/_divsint.c,
+	* device/lib/_divslong.c,
+	* device/lib/_divslonglong.c,
+	* device/lib/_divuint.c,
+	* device/lib/_divulong.c,
+	* device/lib/_divulonglong.c,
+	* device/lib/_modsint.c,
+	* device/lib/_modslong.c,
+	* device/lib/_modslonglong.c,
+	* device/lib/_moduint.c,
+	* device/lib/_modulong.c,
+	* device/lib/_modulonglong.c,
+	* device/lib/_mulint.c,
+	* device/lib/_mullong.c,
+	* device/lib/_mullonglong.c: moved __SDCC_NONBANKED to sdcc-lib.h
+	* device/lib/_slonglong2fs.c: cosmetics
+	* device/lib/Makefile.in,
+	* device/lib/hc08/Makefile.in,
+	* device/lib/mos6502/Makefile.in,
+	* device/lib/mos6502-stack-auto/Makefile.in,
+	* device/lib/mos65c02/Makefile.in,
+	* device/lib/pdk13/Makefile.in,
+	* device/lib/pdk14/Makefile.in,
+	* device/lib/pdk15/Makefile.in,
+	* device/lib/pdk15-stack-auto/Makefile.in,
+	* device/lib/s08/Makefile.in,
+	* device/lib/s08-stack-auto/Makefile.in,
+	* device/lib/stm8/Makefile.in,
+	* device/lib/stm8-large/Makefile.in,
+	* src/SDCCsymt.c (initCSupport): renamed _r[lr][su]longlong.c to
+	  _s[lr][su]longlong.c because they are shifts not rotates
+	* device/lib/_slslonglong.c: renamed from _rlslonglong.c,
+	  moved __SDCC_NONBANKED to sdcc-lib.h
+	* device/lib/_slulonglong.c: renamed from _rlulonglong.c,
+	  moved __SDCC_NONBANKED to sdcc-lib.h,
+	  use _AUTOMEM for better code generation
+	* device/lib/_srslonglong.c: renamed from _rrslonglong.c,
+	  bugfix little endian variant,
+	  moved __SDCC_NONBANKED to sdcc-lib.h,
+	  use _AUTOMEM for better code generation,
+	  removed comment about non-existing rrulonglong_rrx_s.c
+	* device/lib/_srulonglong.c: renamed from _rrulonglong.c,
+	  moved __SDCC_NONBANKED to sdcc-lib.h,
+	  use _AUTOMEM for better code generation,
+	  removed comment about non-existing rrulonglong_rrx_s.c
+	* device/lib/mos6502/_srslonglong.c: renamed from _rrslonglong.c
+	* device/lib/mos6502/_srulonglong.c: renamed from _rrulonglong.c
+	* device/lib/mos6502-stack-auto/_srslonglong.c: renamed from _rrslonglong.c
+	* device/lib/mos6502-stack-auto/_srulonglong.c: renamed from _rrulonglong.c
+
+	* device/lib/atomic_flag_clear.c: generate external definition for
+	  inline definition with external linkage
+	* device/include/stdatomic.h: inline atomic_flag_clear(),
+	  use 0xfe for z80-like,
+	  use __SDCC_NONBANKED
+	* device/lib/ez80_z80/atomic_flag_test_and_set.s,
+	* device/lib/r2k/atomic_flag_test_and_set.s,
+	* device/lib/r2ka/atomic_flag_test_and_set.s,
+	* device/lib/r3ka/atomic_flag_test_and_set.s,
+	* device/lib/sm83/atomic_flag_test_and_set.s,
+	* device/lib/z180/atomic_flag_test_and_set.s,
+	* device/lib/z80/atomic_flag_test_and_set.s,
+	* device/lib/z80n/atomic_flag_test_and_set.s: use sra on 0xfe and drop ccf
+
+	* device/lib/strtoull.c: drop oldret
+	* device/lib/wcstoull.c: drop oldret,
+	  (_isdigit): fix L'a',
+	  (strtoull): bugfix, renamed to wcstoull() & use iswblank()
+
+	* debugger/mcs51/sdcdb.c (readCdb): fixed warning/bug
+	* src/SDCC.y: fixed warnings
+	* src/SDCCval.h,
+	* src/SDCCval.c (ullFromVal): make val const to fix warnings
+	* src/mcs51/ralloc.c (regsUsedIniCode): removed label to fix warning
+	* src/mos6502/gen.c (opInfo): fix warning,
+	  (genRightShift): fixed warning
+	* src/z80/ralloc.c (regsUsedIniCode): removed label to fix warning
+	* support/cpp/gcc/diagnostic.cc (fancy_abort): fixed warning,
+	  removed formfeeds
+	* support/cpp/gcc/gcc.cc (insert_comments,get_random_number): fixed warnings
+	  removed formfeeds
+	* support/cpp/libcpp/expr.cc (cpp_classify_number): fixed warnings,
+	  removed formfeeds
+	* support/cpp/libcpp/macro.cc (update,create_iso_definition): fixed warnings
+	* support/makebin/makebin.c: fixed warning
+
 2023-08-17 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* device/include/inttypes.h,

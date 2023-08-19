@@ -1,11 +1,8 @@
-
-#pragma std_c99
-
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
 
-long long _rrslonglong(long long l, char s)
+long long _srslonglong(long long l, char s)
 {
 
   uint8_t *const b = (uint8_t *)(&l);
@@ -13,7 +10,7 @@ long long _rrslonglong(long long l, char s)
   signed char zb,i;
 
   sign=b[7]&0x80;
-  
+
   zb=s>>3;
   if(zb) {
     i=0;
@@ -23,7 +20,7 @@ long long _rrslonglong(long long l, char s)
     for(;i<8;i++)
       b[i]=sign?0xff:0x00;
   }
-  
+
   shift=s&0x7;
   while(shift--) {
     t2=sign;
@@ -31,9 +28,9 @@ long long _rrslonglong(long long l, char s)
       t1=b[i]&1;
       b[i]=(b[i]>>1)|t2;
       t2=t1?0x80:0;
-    } 
+    }
   }
-  
+
   return(l);
 }
 

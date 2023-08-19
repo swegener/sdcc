@@ -32,11 +32,7 @@
      mcs51 small stack-auto
 */
 
-#ifdef __SDCC_mcs51
-#define __SDCC_NONBANKED __nonbanked
-#else
-#define __SDCC_NONBANKED
-#endif
+#include <sdcc-lib.h>
 
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
@@ -238,7 +234,7 @@ __modulong:
 
 __modlong:			; entry point for __modslong
 				; a in r1, b, dph, dpl
-				; b in r5, r4, r3, r2 
+				; b in r5, r4, r3, r2
 
 	mov	count,#0
 

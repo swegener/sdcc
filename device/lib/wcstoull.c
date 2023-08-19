@@ -47,7 +47,7 @@ static signed char _isdigit(const wchar_t c, unsigned char base)
   if (c >= L'0' && c <= L'9')
     v = c - L'0';
   else if (c >= L'a' && c <= L'z')
-    v = c - 'a' + 10;
+    v = c - L'a' + 10;
   else if (c >= L'A' && c <= L'Z')
     v = c - L'A' + 10;
   else
@@ -61,7 +61,7 @@ static signed char _isdigit(const wchar_t c, unsigned char base)
 
 // NOTE for maintenance: strtoull, wcstoul and wcstoull have been derived from strtoul
 
-unsigned long long int strtoull(const wchar_t *nptr, wchar_t **endptr, int base)
+unsigned long long int wcstoull(const wchar_t *nptr, wchar_t **endptr, int base)
 {
   const wchar_t *ptr = nptr;
   unsigned long long int ret;
@@ -69,7 +69,7 @@ unsigned long long int strtoull(const wchar_t *nptr, wchar_t **endptr, int base)
   bool neg = false;
   unsigned char b = base;
 
-  while (isblank (*ptr))
+  while (iswblank (*ptr))
     ptr++;
 
   // Handle sign.
@@ -108,7 +108,6 @@ unsigned long long int strtoull(const wchar_t *nptr, wchar_t **endptr, int base)
   else if (b == 2 && (!wcsncmp (ptr, L"0b", 2) || !wcsncmp (ptr, L"0B", 2)))
     ptr += 2;
 
-
   // Empty sequence conversion error
   if (_isdigit (*ptr, b) < 0)
     {
@@ -119,13 +118,11 @@ unsigned long long int strtoull(const wchar_t *nptr, wchar_t **endptr, int base)
 
   for (ret = 0;; ptr++)
     {
-      unsigned long long int oldret;
       signed char digit = _isdigit (*ptr, b);
 
       if (digit < 0)
         break;
 
-      oldret = ret;
       range_error |= ckd_mul(&ret, ret, b);
       range_error |= ckd_add (&ret, ret, digit);
 

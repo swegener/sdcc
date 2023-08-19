@@ -468,7 +468,6 @@ regsUsedIniCode (iCode * ic)
   if (IC_RESULT (ic))
     rmask = bitVectUnion (rmask, rUmaskForOp (IC_RESULT (ic)));
 
-ret:
   return rmask;
 }
 

@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _rrulonglong.c - routine for right shift of 64 bit unsigned long long
+   _srslonglong.c - routine for shift right of 64 bit signed long long
 
    Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
 
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,58 +30,53 @@
 
 #include <stdbit.h>
 
-#ifdef __SDCC_mcs51
-#define __SDCC_NONBANKED __nonbanked
-#else
-#define __SDCC_NONBANKED
-#endif
+#include <sdcc-lib.h>
 
 #ifdef __SDCC_LONGLONG
-// This function is the same as the one from rrslonglong_rrx_s.c, except for the type of top, and b[0/3].
 
 #if __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_BIG__
-unsigned long long _rrulonglong(unsigned long long l, char s) __SDCC_NONBANKED
+long long _srslonglong(long long l, char s) __SDCC_NONBANKED
 {
-	uint32_t *const top = (uint32_t *)((char *)(&l) + 0);
-	uint32_t *const middle = (uint16_t *)((char *)(&l) + 2);
-	uint32_t *const bottom = (uint32_t *)((char *)(&l) + 4);
-	uint16_t *const b = (uint16_t *)(&l);
+     int32_t * const top =    ( int32_t *)((char *)(&l) + 0);
+    uint32_t * const middle = (uint32_t *)((char *)(&l) + 2);
+    uint32_t * const bottom = (uint32_t *)((char *)(&l) + 4);
+    uint16_t * const w =      (uint16_t *)(&l);
 
-	for(;s >= 16; s -= 16)
-	{
-		b[3] = b[2];
-		b[2] = b[1];
-		b[1] = b[0];
-		b[0] = 0x000000;
-	}
+    for (; s >= 16; s-= 16)
+    {
+        w[3] = w[2];
+        w[2] = w[1];
+        w[1] = w[0];
+        w[0] = (w[0] & 0x8000) ? 0xffff : 0x000000;
+    }
 
-	(*bottom) >>= s;
-	(*middle) |= (((*middle & 0xffff0000ul) >> s) & 0x0000fffful);
-	(*top) >>= s;
+    (*bottom) >>= s;
+    (*middle) |= (((*middle & 0xffff0000ul) >> s) & 0x0000fffful);
+    (*top) >>= s;
 
-	return(l);
+    return(l);
 }
 #elif __STDC_ENDIAN_NATIVE__ == __STDC_ENDIAN_LITTLE__
-unsigned long long _rrulonglong(unsigned long long l, char s) __SDCC_NONBANKED
+long long _srslonglong(long long l, char s) __SDCC_NONBANKED
 {
-	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
-	uint16_t *const middle = (uint16_t *)((char *)(&l) + 4);
-	uint32_t *const bottom = (uint32_t *)(&l);
-	uint16_t *const b = (uint16_t *)(&l);
+    _AUTOMEM  int32_t * const top =    (_AUTOMEM  int32_t *)((_AUTOMEM char *)(&l) + 4);
+    _AUTOMEM uint32_t * const middle = (_AUTOMEM uint32_t *)((_AUTOMEM char *)(&l) + 2);
+    _AUTOMEM uint32_t * const bottom = (_AUTOMEM uint32_t *)((_AUTOMEM char *)(&l) + 0);
+    _AUTOMEM uint16_t * const w =      (_AUTOMEM uint16_t *)(&l);
 
-	for(;s >= 16; s -= 16)
-	{
-		b[0] = b[1];
-		b[1] = b[2];
-		b[2] = b[3];
-		b[3] = 0x000000;
-	}
+    for (; s >= 16; s-= 16)
+    {
+        w[0] = w[1];
+        w[1] = w[2];
+        w[2] = w[3];
+        w[3] = (w[3] & 0x8000) ? 0xffff : 0x000000;
+    }
 
-	(*bottom) >>= s;
-	(*middle) |= (uint16_t)(((uint32_t)(*middle) << 16) >> s);
-	(*top) |= (((*middle) & 0xffff0000ul) >> s);
+    (*bottom) >>= s;
+    (*middle) |= (((*middle & 0xffff0000ul) >> s) & 0x0000fffful);
+    (*top) >>= s;
 
-	return(l);
+    return(l);
 }
 #else
 #error Support for mixed endiannness not implemented!

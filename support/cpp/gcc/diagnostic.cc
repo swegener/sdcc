@@ -79,7 +79,7 @@ const char *progname;
 /* A diagnostic_context surrogate for stderr.  */
 static diagnostic_context global_diagnostic_context;
 diagnostic_context *global_dc = &global_diagnostic_context;
-
+
 /* Return a malloc'd string containing MSG formatted a la printf.  The
    caller is responsible for freeing the memory.  */
 char *
@@ -105,8 +105,6 @@ file_name_as_prefix (diagnostic_context *context, const char *f)
   return build_message_string ("%s%s:%s ", locus_cs, f, locus_ce);
 }
 
-
-
 /* Return the value of the getenv("COLUMNS") as an integer. If the
    value is not set to a positive integer, use ioctl to get the
    terminal width. If it fails, return INT_MAX.  */
@@ -135,11 +133,11 @@ void
 diagnostic_set_caret_max_width (diagnostic_context *context, int value)
 {
   /* One minus to account for the leading empty space.  */
-  value = value ? value - 1 
+  value = value ? value - 1
     : (isatty (fileno (pp_buffer (context->printer)->stream))
        ? get_terminal_width () - 1: INT_MAX);
-  
-  if (value <= 0) 
+
+  if (value <= 0)
     value = INT_MAX;
 
   context->caret_max_width = value;
@@ -1357,7 +1355,7 @@ diagnostic_report_diagnostic (diagnostic_context *context,
 	      || diagnostic_kind_count (context, DK_SORRY) > 0)
 	  && !context->abort_on_error)
 	{
-	  expanded_location s 
+	  expanded_location s
 	    = expand_location (diagnostic_location (diagnostic));
 	  fnotice (stderr, "%s:%d: confused by earlier errors, bailing out\n",
 		   s.file, s.line);
@@ -1470,7 +1468,7 @@ trim_filename (const char *name)
 
   return p;
 }
-
+
 /* Standard error reporting routines in increasing order of severity.
    All of these take arguments like printf.  */
 
@@ -1966,7 +1964,7 @@ internal_error_no_backtrace (const char *gmsgid, ...)
 
   gcc_unreachable ();
 }
-
+
 /* Special case error functions.  Most are implemented in terms of the
    above, or should be.  */
 
@@ -2024,7 +2022,7 @@ fancy_abort (const char *file, int line, const char *function)
   if (global_dc->printer == NULL)
     {
       /* Print the error message.  */
-      fnotice (stderr, diagnostic_kind_text[DK_ICE]);
+      fnotice (stderr, "%s", diagnostic_kind_text[DK_ICE]);
       fnotice (stderr, "in %s, at %s:%d", function, trim_filename (file), line);
       fputc ('\n', stderr);
 

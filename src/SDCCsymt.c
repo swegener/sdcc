@@ -4581,7 +4581,7 @@ initCSupport (void)
     "s", "su", "us", "u"
   };
   const char *srlrr[] = {
-    "rl", "rr"
+    "sl", "sr"
   };
   /* type as character codes for typeFromStr() */
   const char *sbwdCodes[] = {

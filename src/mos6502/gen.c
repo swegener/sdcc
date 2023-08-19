@@ -327,8 +327,9 @@ char * opInfo(char str[64], operand *op)
   if(op==0) {
     snprintf(str, 64, "---");
   } else if(IS_SYMOP(op)) {
-    snprintf(str, 64, "SYM:%s(%s:%d)",
-      op->svt.symOperand->rname, type, size);
+    if (snprintf(str, 64, "SYM:%s(%s:%d)", op->svt.symOperand->rname, type, size) >= 64) {
+      str[63] = 0; // ridiculous workaround to silence GCC warning ‘%s’ directive output may be truncated
+    }
   } else if(IS_VALOP(op)) {
     snprintf(str, 64, "VAL(%s:%d)",
       type, size);
@@ -3355,7 +3356,7 @@ aopAdrPrepare (asmop * aop, int loffset)
   if (aop->type==AOP_SOF)
     {
 #if 0
-      // code for lda [BASEPTR],y 
+      // code for lda [BASEPTR],y
       aopPrepareStoreTemp = storeRegTemp(m6502_reg_y, false);
       // FIXME: offset is wrong
       emitComment (TRACE_AOP, "ofs=%d base=%d tsx=%d push=%d stk=%d loffset=%d", _G.stackOfs, _G.baseStackPushes, _G.tsxStackPushes, _G.stackPushes, aop->aopu.aop_stk, loffset);
@@ -8438,7 +8439,6 @@ genRightShift (iCode * ic)
   operand *left   = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
 
-  sym_link *retype;
   int size, offset;
   symbol *tlbl, *tlbl1;
   char *shift;
@@ -9926,7 +9926,7 @@ genIfx (iCode * ic, iCode * popIc)
   /* the result is now in the z flag bit */
   freeAsmop (cond, NULL);
 
-// TODO: redundant bne/beq 
+// TODO: redundant bne/beq
   emitComment (TRACEGEN|VVDBG, "      genIfx - call jump");
   genIfxJump (ic, "a");
 
@@ -10346,7 +10346,7 @@ genCast (iCode * ic)
           offset++;
           size--;
         }
-      else if ((size > 2 || size >= 2 && !signExtend) && m6502_reg_y->isDead && m6502_reg_x->isDead && 
+      else if ((size > 2 || size >= 2 && !signExtend) && m6502_reg_y->isDead && m6502_reg_x->isDead &&
         (AOP_TYPE (right) == AOP_IMMD || IS_MOS65C02 && AOP_TYPE (right) == AOP_EXT) &&
         (AOP_TYPE (result) == AOP_DIR || IS_MOS65C02 && AOP_TYPE (result) == AOP_EXT))
         {

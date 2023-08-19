@@ -130,7 +130,7 @@ usage (void)
 struct gb_opt_s
 {
   char cart_name[CART_NAME_LEN];  /* cartridge name buffer */
-  char licensee_str[2];           /* new licensee string */
+  char licensee_str[3];           /* new licensee string */
   BYTE mbc_type;                  /* MBC type (default: no MBC) */
   short nb_rom_banks;             /* Number of rom banks (default: 2) */
   BYTE nb_ram_banks;              /* Number of ram banks (default: 0) */
@@ -699,7 +699,7 @@ main (int argc, char **argv)
   int sms = 0;
 
   struct gb_opt_s gb_opt = {.cart_name="",
-                            .licensee_str={'0', '0'},
+                            .licensee_str="00",
                             .mbc_type=0,
                             .nb_rom_banks=2,
                             .nb_ram_banks=0,
@@ -721,10 +721,13 @@ main (int argc, char **argv)
   setmode (fileno (stdout), O_BINARY);
 #endif
 
-  while (*++argv && '-' == argv[0][0] && '\0' != argv[0][1])
+  while (*++argv && '-' == argv[0][0])
     {
       switch (argv[0][1])
         {
+        case '\0':
+          break;
+
         case 's':
           if (!*++argv)
             {
@@ -762,6 +765,7 @@ main (int argc, char **argv)
            * -ya  Number of ram banks (default: 0)
            * -yt  MBC type (default: no MBC)
            * -yn  Name of program (default: name of output file)
+           * -yk,-yl,-yc,-yC,-yN,-ys,-yS,-yj,-yp see usage()
            */
           switch (argv[0][2])
             {
@@ -815,7 +819,6 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              // we don't need \0
               strncpy (gb_opt.licensee_str, *argv, 2);
               break;
 

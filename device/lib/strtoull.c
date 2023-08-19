@@ -107,7 +107,6 @@ unsigned long long int strtoull(const char *nptr, char **endptr, int base)
   else if (b == 2 && (!strncmp (ptr, "0b", 2) || !strncmp (ptr, "0B", 2)))
     ptr += 2;
 
-
   // Empty sequence conversion error
   if (_isdigit (*ptr, b) < 0)
     {
@@ -118,13 +117,11 @@ unsigned long long int strtoull(const char *nptr, char **endptr, int base)
 
   for (ret = 0;; ptr++)
     {
-      unsigned long long int oldret;
       signed char digit = _isdigit (*ptr, b);
 
       if (digit < 0)
         break;
 
-      oldret = ret;
       range_error |= ckd_mul (&ret, ret, b);
       range_error |= ckd_add (&ret, ret, digit);
 

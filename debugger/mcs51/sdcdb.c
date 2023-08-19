@@ -414,9 +414,8 @@ static int readCdb (FILE *file)
             }
 
           bp += 2;
-          currl->line = Safe_malloc(strlen(bp));
-          strncpy(currl->line, bp, strlen(bp)-1);
-          currl->line[strlen(bp)-1] = '\0';
+          currl->line = Safe_malloc(strlen(bp)+1);
+          strcpy(currl->line, bp);
         }
 
       if (!(bp = fgets(buffer, sizeof(buffer), file)))

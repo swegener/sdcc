@@ -799,26 +799,25 @@ cpp_classify_number (cpp_reader *pfile, const cpp_token *token,
       if ((result & CPP_N_WIDTH) == CPP_N_LARGE
 	  && CPP_OPTION (pfile, cpp_warn_long_long))
         {
-          const char *message = CPP_OPTION (pfile, cplusplus) 
-				? N_("use of C++11 long long integer constant")
-		                : N_("use of C99 long long integer constant");
+          const char *message = CPP_OPTION (pfile, cplusplus)
+                                ? N_("use of C++11 long long integer constant")
+                                : N_("use of C99 long long integer constant");
 
-	  if (CPP_OPTION (pfile, c99))
-            cpp_warning_with_line (pfile, CPP_W_LONG_LONG, virtual_location,
-				   0, message);
+          if (CPP_OPTION (pfile, c99))
+            cpp_warning_with_line (pfile, CPP_W_LONG_LONG,
+                                   virtual_location, 0, "%s", message);
           else
             cpp_pedwarning_with_line (pfile, CPP_W_LONG_LONG,
-				      virtual_location, 0, message);
+                                      virtual_location, 0, "%s", message);
         }
 
-      if ((result & CPP_N_SIZE_T) == CPP_N_SIZE_T
-	  && !CPP_OPTION (pfile, size_t_literals))
+      if ((result & CPP_N_SIZE_T) == CPP_N_SIZE_T && !CPP_OPTION (pfile, size_t_literals))
        {
-	  const char *message = (result & CPP_N_UNSIGNED) == CPP_N_UNSIGNED
-				? N_("use of C++23 %<size_t%> integer constant")
-				: N_("use of C++23 %<make_signed_t<size_t>%> integer constant");
-	  cpp_warning_with_line (pfile, CPP_W_SIZE_T_LITERALS,
-				 virtual_location, 0, message);
+          const char *message = (result & CPP_N_UNSIGNED) == CPP_N_UNSIGNED
+                                ? N_("use of C++23 %<size_t%> integer constant")
+                                : N_("use of C++23 %<make_signed_t<size_t>%> integer constant");
+          cpp_warning_with_line (pfile, CPP_W_SIZE_T_LITERALS,
+                                 virtual_location, 0, "%s", message);
        }
 
       result |= CPP_N_INTEGER;
@@ -866,8 +865,7 @@ cpp_classify_number (cpp_reader *pfile, const cpp_token *token,
    because the preprocessor doesn't need it and we don't want to
    drag in GCC's floating point emulator.  */
 cpp_num
-cpp_interpret_integer (cpp_reader *pfile, const cpp_token *token,
-		       unsigned int type)
+cpp_interpret_integer (cpp_reader *pfile, const cpp_token *token, unsigned int type)
 {
   const uchar *p, *end;
   cpp_num result;
@@ -1226,7 +1224,7 @@ eval_token (cpp_reader *pfile, const cpp_token *token,
   result.unsignedp = !!unsignedp;
   return result;
 }
-
+
 /* Operator precedence and flags table.
 
 After an operator is returned from the lexer, if it has priority less
@@ -1577,7 +1575,7 @@ reduce (cpp_reader *pfile, struct op *top, enum cpp_ttype op)
 	case CPP_OPEN_PAREN:
 	  if (op != CPP_CLOSE_PAREN)
 	    {
-	      cpp_error_with_line (pfile, CPP_DL_ERROR, 
+	      cpp_error_with_line (pfile, CPP_DL_ERROR,
 				   top->token->src_loc,
 				   0, "missing ')' in expression");
 	      return 0;

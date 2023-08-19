@@ -31,6 +31,8 @@
 
 #include <limits.h>
 
+#include <sdcc-lib.h>
+
 #define FLT_RADIX       2
 #define FLT_MANT_DIG    24
 #define FLT_EPSILON     1.192092896E-07F
@@ -80,11 +82,7 @@
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 #endif
 
-#ifdef __SDCC_mcs51
-#define __SDCC_FLOAT_NONBANKED __nonbanked
-#else
-#define __SDCC_FLOAT_NONBANKED
-#endif
+#define __SDCC_FLOAT_NONBANKED __SDCC_NONBANKED
 
 float __uchar2fs (unsigned char) __SDCC_FLOAT_NONBANKED;
 float __schar2fs (signed char) __SDCC_FLOAT_NONBANKED;

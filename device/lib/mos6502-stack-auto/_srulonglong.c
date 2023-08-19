@@ -1,13 +1,9 @@
-
-#pragma std_c99
-
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
 
-unsigned long long _rrulonglong(unsigned long long l, char s)
+unsigned long long _srulonglong(unsigned long long l, char s)
 {
-
   uint8_t *const b = (uint8_t *)(&l);
   unsigned char shift,t1,t2;
   signed char zb,i;

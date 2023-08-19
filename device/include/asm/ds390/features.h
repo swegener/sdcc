@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,8 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDC51_ASM_DS390_FEATURES_H
-#define __SDC51_ASM_DS390_FEATURES_H   1
+#ifndef __SDCC_ASM_DS390_FEATURES_H
+#define __SDCC_ASM_DS390_FEATURES_H   1
 
 #define _REENTRANT	__reentrant
 #define _CODE		__code
@@ -70,5 +70,7 @@
 #else
   #define _STATMEM __xdata
 #endif
+
+#define __SDCC_NONBANKED
 
 #endif

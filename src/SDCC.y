@@ -2155,7 +2155,7 @@ function_definition
                 {
                     if (FUNC_ISCRITICAL ($1->type))
                         inCriticalFunction = 1;
-                    strncpy (function_name, $1->name, sizeof (function_name) - 4);
+                    strncpyz (function_name, $1->name, sizeof (function_name) - 3);
                     memset (function_name + sizeof (function_name) - 4, 0x00, 4);
                 }
         }
@@ -2173,8 +2173,8 @@ function_definition
             $2 = createFunctionDecl($2);
             if ($2)
                 {
-                	if (!strcmp ($2->name, "_sdcc_external_startup")) // The rename (and semantics change happened) in SDCC 4.2.10. Keep this warning for two major releases afterwards.
-                		werror (W__SDCC_EXTERNAL_STARTUP_DEF);
+                    if (!strcmp ($2->name, "_sdcc_external_startup")) // The rename (and semantics change happened) in SDCC 4.2.10. Keep this warning for two major releases afterwards.
+                        werror (W__SDCC_EXTERNAL_STARTUP_DEF);
                     if (FUNC_ISCRITICAL ($2->type))
                         inCriticalFunction = 1;
                     // warn for loss of calling convention for inlined functions.
@@ -2183,7 +2183,7 @@ function_definition
                           FUNC_BANKED ($2->type)         || FUNC_REGBANK ($2->type)          ||
                           FUNC_ISOVERLAY ($2->type)      || FUNC_ISISR ($2->type) ))
                         werror (W_INLINE_FUNCATTR, $2->name);
-                    strncpy (function_name, $2->name, sizeof (function_name) - 4);
+                    strncpyz (function_name, $2->name, sizeof (function_name) - 3);
                     memset (function_name + sizeof (function_name) - 4, 0x00, 4);
                 }
         }

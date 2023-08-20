@@ -516,7 +516,7 @@ cl_z80::inst_dec(t_mem code)
       break;
     case 0x0B: // DEC BC
       --regs.BC;
-      tick(6);
+      tick(5);
       break;
     case 0x0D: // DEC C
       dec(regs.bc.l);
@@ -528,7 +528,7 @@ cl_z80::inst_dec(t_mem code)
       break;
     case 0x1B: // DEC DE
       --regs.DE;
-      tick(6);
+      tick(5);
       break;
     case 0x1D: // DEC E
       dec(regs.de.l);
@@ -540,7 +540,7 @@ cl_z80::inst_dec(t_mem code)
       break;
     case 0x2B: // DEC HL
       --regs.HL;
-      tick(6);
+      tick(5);
       break;
     case 0x2D: // DEC L
       dec(regs.hl.l);

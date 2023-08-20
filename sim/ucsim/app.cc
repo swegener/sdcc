@@ -234,7 +234,9 @@ cl_app::run_go(void)
     {
       class cl_console_base *c= commander->frozen_or_actual();
       if (c)
-	sim->uc->print_regs(c), c->dd_printf("\n");
+	sim->uc->print_regs(c),
+          c->dd_printf("%d %lu\n", sim->uc->inst_ticks, sim->uc->ticks->get_ticks()),
+          c->dd_printf("\n");
     }
   return done;
 }

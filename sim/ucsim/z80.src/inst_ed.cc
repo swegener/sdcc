@@ -519,18 +519,24 @@ int  cl_z80::inst_ed_(t_mem code)
 
     case 0xB0: // LDIR
       // BC - count, source=HL, dest=DE.  *DE++ = *HL++, --BC until zero
-      regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
-      do {
-        store1(regs.DE, get1(regs.HL));
-        ++regs.HL;
-        ++regs.DE;
-        --regs.BC;
-        vc.rd++;
-        vc.wr++;
-	tick(15);
-	if (regs.BC) tick(5);
-      } while (regs.BC != 0);
-      return(resGO);
+      {
+	bool first= true;
+	regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+	do {
+	  store1(regs.DE, get1(regs.HL));
+	  ++regs.HL;
+	  ++regs.DE;
+	  --regs.BC;
+	  vc.rd++;
+	  vc.wr++;
+	  if (first)
+	    tick(15), first= false;
+	  else
+	    tick(16);
+	  if (regs.BC) tick(5);
+	} while (regs.BC != 0);
+	return(resGO);
+      }
 
     case 0xB1: // CPIR
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.

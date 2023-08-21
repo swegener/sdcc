@@ -15,7 +15,7 @@ SDAR = $(top_builddir)/bin/sdar
 override PORTDIR = ../build/$(PORT)
 
 OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel \
-      crtpagesfr.rel crtbank.rel crtcall.rel crtstackprobe.rel \
+      crtpagesfr.rel crtbank.rel crtcall.rel \
       crtxstack.rel crtxpush.rel crtxpushr0.rel crtxpop.rel crtxpopr0.rel \
       gptr_cmp.rel atomic_flag_test_and_set.rel atomic_flag_clear.rel
 

@@ -1,3 +1,8 @@
+2023-08-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/rtrack.c(_mcs51_rtrackUpdate): added dptr+=2 case,
+	  added detecting modified bits in B
+
 2023-08-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/mcs51/Makefile.in: reverted accidental commit

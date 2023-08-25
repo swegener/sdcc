@@ -384,7 +384,7 @@ bool _mcs51_rtrackUpdate (const char *line)
         {
           char* s;
           int value = strtol (line + 10, &s, 16);
-          if( s != line + 10 )
+          if (s != line + 10)
             {
               bool foundshortcut = 0;
 
@@ -408,9 +408,10 @@ bool _mcs51_rtrackUpdate (const char *line)
                        int offset;
                        const char* inst;
                        const char* parm;
-                    } reachable[6] =
+                    } reachable[] =
                     {
                       {   1, "inc", "dptr"},
+                      {   2, "inc", "dptr"},
                       { 256, "inc", "dph"},
                       {-256, "dec", "dph"},
                       {-255, "inc", "dpl"},    /* if overflow */
@@ -422,22 +423,25 @@ bool _mcs51_rtrackUpdate (const char *line)
                                         regs8051[DPL_IDX].rtrack.value;
                    unsigned int i;
 
-                   for (i = 0; i < 6; i++)
+                   for (i = 0; i < sizeof (reachable) / sizeof (reachable[0]); i++)
                      {
                        if (dptr + reachable[i].offset == value)
                          {
-                            /* check if an overflow would occur */
-                            if ((i == 3) && ((dptr & 0xff) != 0xff)) continue;
-                            if ((i == 4) && ((dptr & 0xff) == 0x00)) continue;
-                            if ((i == 5) && ((dptr & 0xff) != 0x00)) continue;
+                           /* check if an overflow would occur */
+                           if ((reachable[i].offset == -255) && ((dptr & 0xff) != 0xff)) continue;
+                           if ((reachable[i].offset ==   -1) && ((dptr & 0xff) == 0x00)) continue;
+                           if ((reachable[i].offset ==  255) && ((dptr & 0xff) != 0x00)) continue;
 
-                            /* does not occur in regression test mcs51-small */
-                            D(emitcode (";", "genFromRTrack replaced\t%s", line));
-                            emitcode (reachable[i].inst, "%s", reachable[i].parm);
-                            modified = true;
-                            foundshortcut = 1;
-
-                            break;
+                           /* does not occur in regression test mcs51-small */
+                           D(emitcode (";", "genFromRTrack replaced\t%s", line));
+                           emitcode (reachable[i].inst, "%s", reachable[i].parm);
+                           if (reachable[i].offset == 2)
+                             {
+                               emitcode (reachable[i].inst, "%s", reachable[i].parm);
+                             }
+                           modified = true;
+                           foundshortcut = 1;
+                           break;
                          }
                      };
                 }
@@ -614,6 +618,13 @@ bool _mcs51_rtrackUpdate (const char *line)
       rtrack_data_unset (A_IDX);
       return false;
     }
+  /* some bit in B is cleared
+     MB: I'm too lazy to find out which right now */
+  if (!strncmp (line, "jbc\tb.", 6))
+    {
+      rtrack_data_unset (B_IDX);
+      return false;
+    }
 
   /* unfortunately the label typically following these
      will cause loss of tracking */
@@ -624,7 +635,7 @@ bool _mcs51_rtrackUpdate (const char *line)
       !strncmp (line, "jbc\t", 4))
     return false;
 
-  /* if branch not taken in "cjne r2,#0x08,somewhere" 
+  /* if branch not taken in "cjne r2,#0x08,somewhere"
      r2 is known to be 8 */
   if (!strncmp (line, "cjne\t", 5))
     {
@@ -691,6 +702,13 @@ bool _mcs51_rtrackUpdate (const char *line)
       !strncmp (line, "clrb\ta", 6))
     {
       rtrack_data_unset (A_IDX);
+      return false;
+    }
+  /* bitwise operations on B */
+  if (!strncmp (line, "setb\tb.", 7) ||
+      !strncmp (line, "clrb\tb.", 7))
+    {
+      rtrack_data_unset (B_IDX);
       return false;
     }
 
@@ -990,7 +1008,7 @@ char * rtrackGetLit(const char *x)
   return (char *)x;
 }
 
-/* Similar to the above function 
+/* Similar to the above function
    As the destination is the accumulator try harder yet and
    try to generate the result with arithmetic operations */
 int rtrackMoveALit (const char *x)

@@ -11,11 +11,11 @@ struct
   short i ;
 } t;
 
-f ()
+void
+f (void)
 {
   t.i = x1;
-  if (t.i != 17)
-    ASSERT (0);
+  ASSERT(t.i == 17);
 }
 
 void

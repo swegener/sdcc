@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+int
 f(short *p)
 {
   short x = *p;
@@ -18,8 +19,7 @@ void
 testTortureExecute (void)
 {
   short x = -10;
-  if (!f(&x))
-    ASSERT(0);
+  ASSERT(f(&x));
   return;
 }
 

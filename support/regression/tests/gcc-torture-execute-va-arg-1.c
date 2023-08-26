@@ -4,23 +4,28 @@ va-arg-1.c from the execute part of the gcc torture tests.
 
 #include <testfwk.h>
 
-#pragma disable_warning 85
-
 #include <stdarg.h>
 
 typedef unsigned long L;
+void
 f (L p0, L p1, L p2, L p3, L p4, L p5, L p6, L p7, L p8, ...)
 {
   va_list select;
 
+  (void)p0;
+  (void)p1;
+  (void)p2;
+  (void)p3;
+  (void)p4;
+  (void)p5;
+  (void)p6;
+  (void)p7;
+
   va_start (select, p8);
 
-  if (va_arg (select, L) != 10)
-    ASSERT (0);
-  if (va_arg (select, L) != 11)
-    ASSERT (0);
-  if (va_arg (select, L) != 0)
-    ASSERT (0);
+  ASSERT(va_arg (select, L) == 10);
+  ASSERT(va_arg (select, L) == 11);
+  ASSERT(va_arg (select, L) == 0);
 
   va_end (select);
 }

@@ -44,6 +44,7 @@ static void check (const char *s, int arg1, int shift)
 
 int main (int argc, char **argv)
 {
+  (void)argv;
   debug = argc > 1;
   TEST4(1);
   TEST4(-1);

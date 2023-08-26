@@ -9,7 +9,8 @@
 #endif
 
 #include <stdio.h>
-g ()
+int
+g (void)
 {
   return '\n';
 }
@@ -30,8 +31,7 @@ void f ()
     ;
   sprintf (sp + 1, "X");
 
-  if (s[12] != 'X')
-    ASSERT (0);
+  ASSERT(s[12] == 'X');
 #endif
 }
 

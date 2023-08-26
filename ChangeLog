@@ -1,3 +1,67 @@
+2023-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/pic16/libc/string/memchr.c,
+	* device/lib/pic16/libc/string/memchrpgm.c,
+	* device/lib/pic16/libc/string/memchrram.c: fixed buggy implementations
+	* src/pic14/genarith.c(genPlus): fixed warning
+	* support/regression/qct/0026-implicitret.c: disable expected warning 278
+	* support/regression/tcc/97_utf8_string_literal.c: replaced abort() by
+	  return, is this test even linked, let alone run?
+	* support/regression/tests/gcc-torture-execute-930106-1.c: very odd test,
+	  fixed warnings
+	* support/regression/tests/gcc-torture-execute-cmpsf-1.c: enabled for mcs51
+	  with correct_results[] const, fixed warnings
+	* support/regression/tests/gcc-torture-execute-strct-varg-1.c: enabled for
+	  hc08 & s08, fixed warnings
+	* support/regression/tests/lonesha256.c: disabled for mcs51-stack-auto
+	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_2_xy.c:
+	  added comment about incorrect warning 127
+	* support/regression/tcc/109_float_struct_calling.c,
+	* support/regression/tcc/10_pointer.c,
+	* support/regression/tcc/11_precedence.c,
+	* support/regression/tcc/30_hanoi.c,
+	* support/regression/tcc/52_unnamed_enum.c,
+	* support/regression/tcc/54_goto.c,
+	* support/regression/tcc/55_lshift_type.c,
+	* support/regression/tests/gcc-torture-execute-20000717-3.c,
+	* support/regression/tests/gcc-torture-execute-20020201-1.c,
+	* support/regression/tests/gcc-torture-execute-20020328-1.c,
+	* support/regression/tests/gcc-torture-execute-20020819-1.c,
+	* support/regression/tests/gcc-torture-execute-20041019-1.c,
+	* support/regression/tests/gcc-torture-execute-20100430-1.c,
+	* support/regression/tests/gcc-torture-execute-20120427-1.c,
+	* support/regression/tests/gcc-torture-execute-20120427-2.c,
+	* support/regression/tests/gcc-torture-execute-920202-1.c,
+	* support/regression/tests/gcc-torture-execute-920428-1.c,
+	* support/regression/tests/gcc-torture-execute-920520-1.c,
+	* support/regression/tests/gcc-torture-execute-920812-1.c,
+	* support/regression/tests/gcc-torture-execute-921123-1.c,
+	* support/regression/tests/gcc-torture-execute-930123-1.c,
+	* support/regression/tests/gcc-torture-execute-930518-1.c,
+	* support/regression/tests/gcc-torture-execute-930603-2.c,
+	* support/regression/tests/gcc-torture-execute-931017-1.c,
+	* support/regression/tests/gcc-torture-execute-950322-1.c,
+	* support/regression/tests/gcc-torture-execute-950621-1.c,
+	* support/regression/tests/gcc-torture-execute-950809-1.c,
+	* support/regression/tests/gcc-torture-execute-960219-1.c,
+	* support/regression/tests/gcc-torture-execute-960302-1.c,
+	* support/regression/tests/gcc-torture-execute-960327-1.c,
+	* support/regression/tests/gcc-torture-execute-960402-1.c,
+	* support/regression/tests/gcc-torture-execute-980701-1.c,
+	* support/regression/tests/gcc-torture-execute-990106-1.c,
+	* support/regression/tests/gcc-torture-execute-991023-1.c,
+	* support/regression/tests/gcc-torture-execute-cmpsi-1.c,
+	* support/regression/tests/gcc-torture-execute-divconst-1.c,
+	* support/regression/tests/gcc-torture-execute-divmod-1.c,
+	* support/regression/tests/gcc-torture-execute-lto-tbaa-1.c,
+	* support/regression/tests/gcc-torture-execute-packed-1.c,
+	* support/regression/tests/gcc-torture-execute-postmod-1.c,
+	* support/regression/tests/gcc-torture-execute-strct-stdarg-1.c,
+	* support/regression/tests/gcc-torture-execute-string-opt-5.c,
+	* support/regression/tests/gcc-torture-execute-va-arg-1.c,
+	* support/regression/tests/gcc-torture-execute-va-arg-5.c,
+	* support/regression/tests/gcc-torture-execute-va-arg-6.c: fixed warnings
+
 2023-08-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/rtrack.c(_mcs51_rtrackUpdate): added dptr+=2 case,

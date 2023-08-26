@@ -10,6 +10,7 @@
 
 int c = -1;
 
+int
 foo (int *p)
 {
   int x;
@@ -28,8 +29,7 @@ testTortureExecute (void)
    int b = 1;
    int a = foo(&b);
 
-   if (a != -1 || b != (1 + 5 - 15))
-     ASSERT (0);
+   ASSERT(!(a != -1 || b != (1 + 5 - 15)));
 
    return;
 }

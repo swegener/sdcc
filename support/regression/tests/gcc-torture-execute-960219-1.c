@@ -8,10 +8,10 @@
 #pragma std_c99
 #endif
 
+void
 f (int i)
 {
-  if (((1 << i) & 1) == 0)
-    ASSERT (0);
+  ASSERT(((1 << i) & 1) != 0);
 }
 
 void

@@ -963,7 +963,7 @@ void genPlus (iCode *ic)
           size = AOP_SIZE(IC_LEFT(ic)) - AOP_SIZE(IC_RIGHT(ic));
         if (size > 0)
           {
-            symbol *lbl_nosign, *lbl_done;
+            symbol *lbl_nosign, *lbl_done = NULL;
             sign = !(SPEC_USIGN(getSpec(operandType(IC_RIGHT(ic)))));
             if (sign)
               {
@@ -1028,8 +1028,8 @@ void genPlus (iCode *ic)
         else
           {
             size = AOP_SIZE(IC_RESULT(ic)) - AOP_SIZE(IC_LEFT(ic));
-            sign =  !(SPEC_USIGN(getSpec(operandType(IC_LEFT(ic)))) |
-                    SPEC_USIGN(getSpec(operandType(IC_RIGHT(ic)))) );
+            sign =  !(SPEC_USIGN(getSpec(operandType(IC_LEFT(ic))))  |
+                      SPEC_USIGN(getSpec(operandType(IC_RIGHT(ic)))) );
             if (size > 0)
               {
                 if (sign)

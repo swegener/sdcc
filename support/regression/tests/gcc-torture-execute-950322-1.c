@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+int
 f (unsigned char *a)
 {
   int i, j;
@@ -28,15 +29,13 @@ f (unsigned char *a)
   return x + y;
 }
 
-
 void
 testTortureExecute (void)
 {
   unsigned char a[2];
   a[0] = 8;
   a[1] = 9;
-  if (f (a) != 2)
-    ASSERT (0);
+  ASSERT(f (a) == 2);
   return;
 }
 

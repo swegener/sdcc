@@ -9,7 +9,7 @@
 #endif
 
 typedef int t;
-f(t y){switch(y){case 1:return 1;}return 0;}
+int f(t y){switch(y){case 1:return 1;}return 0;}
 void
-testTortureExecute (void){if(f((t)1)!=1)ASSERT(0);return;}
+testTortureExecute (void){ASSERT((f((t)1)==1));return;}
 

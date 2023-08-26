@@ -10,7 +10,7 @@
 
 int v;
 
-void f ();
+void f (void);
 
 void
 testTortureExecute (void)
@@ -19,15 +19,14 @@ testTortureExecute (void)
   return;
 }
 
-h1 ()
+int h1 (void)
 {
   return 0;
 }
 
 int h2 (int *e)
 {
-  if (e != &v)
-    ASSERT (0);
+  ASSERT(e == &v);
   return 0;
 }
 
@@ -58,7 +57,7 @@ int g (char *c)
 }
 
 
-void f ()
+void f (void)
 {
   char c;
   g (&c);

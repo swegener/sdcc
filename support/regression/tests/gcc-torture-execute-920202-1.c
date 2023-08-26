@@ -8,9 +8,12 @@
 #pragma std_c99
 #endif
 
+// No ASSERT ?
+
 static int rule_text_needs_stack_pop = 0;
 static int input_stack_pos = 1;
 
+int
 f (void)
 {
   rule_text_needs_stack_pop = 1;

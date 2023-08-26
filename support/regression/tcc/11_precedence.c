@@ -1,7 +1,7 @@
 //#include <stdio.h>
 extern int printf(const char *, ...);
 
-int main()
+int main(void)
 {
    int a;
    int b;
@@ -9,7 +9,6 @@ int main()
    int d;
    int e;
    int f;
-   int x;
    int y;
 
    a = 12;

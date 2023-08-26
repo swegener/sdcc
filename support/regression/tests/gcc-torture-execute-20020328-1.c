@@ -10,18 +10,17 @@
 
 int b = 0;
 
-func () { }
+void
+func (void) { }
 
 void
 testit(int x)
 {
-  if (x != 20)
-    ASSERT (0);
+  ASSERT (x == 20);
 }
 
 void
 testTortureExecute (void)
-
 {
   int a = 0;
 

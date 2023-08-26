@@ -9,7 +9,9 @@
 #endif
 
 int blah;
-foo()
+
+int
+foo(void)
 {
   int i;
 
@@ -23,12 +25,10 @@ foo()
   return blah;
 }
 
-
 void
 testTortureExecute (void)
 {
-  if (foo () != 0xfcc)
-    ASSERT (0);
+  ASSERT(foo () == 0xfcc);
   return;
 }
 

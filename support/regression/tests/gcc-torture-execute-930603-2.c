@@ -10,7 +10,8 @@
 
 int w[2][2];
 
-f ()
+void
+f (void)
 {
   int i, j;
 
@@ -24,8 +25,7 @@ void
 testTortureExecute (void)
 {
   f ();
-  if (w[0][0] != 1 || w[1][1] != 1 || w[1][0] != 0 || w[0][1] != 0)
-    ASSERT (0);
+  ASSERT(!(w[0][0] != 1 || w[1][1] != 1 || w[1][0] != 0 || w[0][1] != 0));
   return;
 }
 

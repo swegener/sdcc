@@ -8,12 +8,14 @@
 #pragma std_c99
 #endif
 
+void
 foo(int *bar)
 {
   *bar = 8;
 }
 
-bugger()
+int
+bugger(void)
 {
   int oldDepth, newDepth;
 
@@ -41,8 +43,7 @@ bugger()
 void
 testTortureExecute (void)
 {
-  if (bugger() != 0)
-    ASSERT (0);
+  ASSERT((bugger() == 0));
   return;
 }
 

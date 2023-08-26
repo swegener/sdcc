@@ -7,11 +7,10 @@ struct ziggy
    int c;
 } bolshevic;
 
-int main()
+int main(void)
 {
    int a;
    int *b;
-   int c;
 
    a = 42;
    b = &a;

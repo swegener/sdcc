@@ -23,7 +23,7 @@ PERFORMANCE OF THIS SOFTWARE.
 
 #include <testfwk.h>
 
-#include <string.h> 
+#include <string.h>
 #include <stdint.h>
 
 int x=1, y=2;
@@ -36,9 +36,9 @@ testMM(void)
   uintptr_t i = (uintptr_t)p;
   uintptr_t j = (uintptr_t)q;
   if (memcmp(&p, &q, sizeof(p)) == 0) {
-    int *r = (int *)i;
-    r=r-1;  // is this free of UB?
-    *r=11;  // and this?    
+    int *r = (int *)i;  // should not give warning 127: non-pointer type cast to generic pointer
+    r=r-1;              // is this free of UB?
+    *r=11;              // and this?
     ASSERT (x == *r);
     ASSERT (x == 11);
   }

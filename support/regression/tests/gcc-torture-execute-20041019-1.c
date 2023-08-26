@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+int
 ftest_store_ccp (int i)
 {
   int *p, a, b, c;
@@ -26,7 +27,7 @@ ftest_store_ccp (int i)
   return *p + 2;
 }
 
-
+int
 ftest_store_copy_prop (int i)
 {
   int *p, a, b, c;
@@ -50,14 +51,12 @@ void
 testTortureExecute (void)
 {
   int x;
-  
+
   x = ftest_store_ccp (10);
-  if (x == 12)
-    ASSERT (0);
-  
+  ASSERT(x != 12);
+
   x = ftest_store_copy_prop (9);
-  if (x == 9)
-    ASSERT (0);
+  ASSERT(x != 9);
 
   return;
 }

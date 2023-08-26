@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+int
 foo(char *bufp)
 {
     int x = 80;
@@ -19,8 +20,7 @@ testTortureExecute (void)
 {
   char x;
 
-  if (foo (&x) != 'a')
-    ASSERT (0);
+  ASSERT(foo (&x) == 'a');
 
   return;
 }

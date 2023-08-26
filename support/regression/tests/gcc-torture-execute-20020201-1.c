@@ -23,8 +23,10 @@ testTortureExecute (void)
   unsigned char cy;
   unsigned short sy;
   unsigned int iy;
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   unsigned long ly;
   unsigned long long Ly;
+#endif
 
   cy = cx / 6; ASSERT (cy == 1);
   cy = cx % 6; ASSERT (cy == 1);

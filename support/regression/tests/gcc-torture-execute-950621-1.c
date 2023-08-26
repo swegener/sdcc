@@ -15,6 +15,7 @@ struct s
   struct s *dummy;
 };
 
+int
 f (struct s *sp)
 {
   return sp && sp->a == -1 && sp->b == -1;
@@ -25,8 +26,7 @@ testTortureExecute (void)
 {
   struct s x;
   x.a = x.b = -1;
-  if (f (&x) == 0)
-    ASSERT (0);
+  ASSERT(f (&x) != 0);
   return;
 }
 

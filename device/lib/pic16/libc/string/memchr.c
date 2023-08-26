@@ -32,17 +32,14 @@
 void *
 memchr (const void *s, char c, size_t count)
 {
-  if (!count)
-    return NULL;
-
-  while ((*(char *)s != c) && count)
+  while (count && (*(char *)s != c))
     {
-      s = (char *)s + sizeof (char *);
+      s = (char *)s + sizeof (char);
       --count;
     }
 
   if (count)
-    return s;
+    return (void *)s;
   else
     return NULL;
 }

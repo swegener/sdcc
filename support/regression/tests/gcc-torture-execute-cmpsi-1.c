@@ -6,28 +6,27 @@ cmpsi-1.c from the execute part of the gcc torture tests.
 
 void dummy (void) {}
 
+int
 f1 (unsigned int x, unsigned int y)
 {
   if (x == 0)
     dummy ();
   x -= y;
   /* 0xfffffff2 < 0x80000000? */
-  if (x < ~(~(unsigned int) 0 >> 1))
-    ASSERT (0);
+  ASSERT(!(x < ~(~(unsigned int) 0 >> 1)));
   return x;
 }
 
+int
 f2 (unsigned long int x, unsigned long int y)
 {
   if (x == 0)
     dummy ();
   x -= y;
   /* 0xfffffff2 < 0x80000000? */
-  if (x < ~(~(unsigned long int) 0 >> 1))
-    ASSERT (0);
+  ASSERT(!(x < ~(~(unsigned long int) 0 >> 1)));
   return x;
 }
-
 
 void
 testTortureExecute (void)

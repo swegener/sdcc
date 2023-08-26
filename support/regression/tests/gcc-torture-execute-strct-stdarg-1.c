@@ -15,6 +15,7 @@ struct tiny
   char g;
 };
 
+void
 f (int n, ...)
 {
   struct tiny x;
@@ -25,21 +26,15 @@ f (int n, ...)
   for (i = 0; i < n; i++)
     {
       x = va_arg (ap,struct tiny);
-      if (x.c != i + 10)
-	ASSERT(0);
-      if (x.d != i + 20)
-	ASSERT(0);
-      if (x.e != i + 30)
-	ASSERT(0);
-      if (x.f != i + 40)
-	ASSERT(0);
-      if (x.g != i + 50)
-	ASSERT(0);
+      ASSERT(x.c == i + 10);
+      ASSERT(x.d == i + 20);
+      ASSERT(x.e == i + 30);
+      ASSERT(x.f == i + 40);
+      ASSERT(x.g == i + 50);
     }
   {
     long x = va_arg (ap, long);
-    if (x != 123)
-      ASSERT(0);
+    ASSERT(x == 123);
   }
   va_end (ap);
 }

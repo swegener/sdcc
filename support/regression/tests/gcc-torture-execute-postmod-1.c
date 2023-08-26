@@ -41,6 +41,7 @@ float MANY (DECLARE_COUNTER);
 volatile int stop = 1;
 volatile int vol;
 
+void
 foo (int x)
 {
   float MANY (DECLARE_POINTER);

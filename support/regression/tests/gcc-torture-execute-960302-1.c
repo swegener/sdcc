@@ -11,7 +11,8 @@
 long a = 1;
 
 #if !defined(__SDCC_pdk14) // Lack of memory - see RFE #364.
-foo ()
+int
+foo (void)
 {
   switch (a % 2 % 2 % 2 % 2 % 2 % 2 % 2 % 2)
     {
@@ -29,8 +30,7 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory - see RFE #364.
-  if (foo () != 1)
-    ASSERT (0);
+  ASSERT(foo () == 1);
   return;
 #endif
 }

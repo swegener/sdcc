@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+int
 x (const char*s)
 {
   char a[1];
@@ -19,8 +20,7 @@ x (const char*s)
 void
 testTortureExecute (void)
 {
-  if (x("") != 1)
-    ASSERT(0);
+  ASSERT((x("") == 1));
   return;
 }
 

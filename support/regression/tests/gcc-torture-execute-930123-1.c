@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+void
 f(int *x)
 {
   *x = 0;
@@ -21,8 +22,7 @@ testTortureExecute (void)
 
   f(&s);
   a[c = 0] = s == 0 ? (x=1, 'a') : (x=2, 'b');
-  if (a[c] != 'a')
-    ASSERT(0);
+  ASSERT(a[c] == 'a');
   return;
 }
 

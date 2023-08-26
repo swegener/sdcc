@@ -14,6 +14,7 @@ typedef struct sreal
   int exp;		/* Exponent.  */
 } sreal;
 
+int
 sreal_compare (sreal *a, sreal *b)
 {
   if (a->exp > b->exp)
@@ -38,9 +39,9 @@ testTortureExecute (void)
   int i, j;
   for (i = 0; i <= 3; i++) {
     for (j = 0; j < 3; j++) {
-      if (i < j && sreal_compare(&a[i], &a[j]) != -1) ASSERT(0);
-      if (i == j && sreal_compare(&a[i], &a[j]) != 0) ASSERT(0);
-      if (i > j && sreal_compare(&a[i], &a[j]) != 1) ASSERT(0);
+      ASSERT(!(i < j && sreal_compare(&a[i], &a[j]) != -1));
+      ASSERT(!(i == j && sreal_compare(&a[i], &a[j]) != 0));
+      ASSERT(!(i > j && sreal_compare(&a[i], &a[j]) != 1));
     }
   }
 }

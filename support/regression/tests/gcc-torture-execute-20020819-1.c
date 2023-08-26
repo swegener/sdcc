@@ -8,7 +8,8 @@
 #pragma std_c99
 #endif
 
-foo ()
+int
+foo (void)
 {
   return 0;
 }
@@ -23,10 +24,9 @@ testTortureExecute (void)
       for (j = 0; j < 10; j++)
 	if (foo ())
 	  ccp_bad = 1;
-    
+
       k = ccp_bad != 0;
-      if (k)
-	ASSERT (0);
+      ASSERT(!(k));
     }
 
   return;

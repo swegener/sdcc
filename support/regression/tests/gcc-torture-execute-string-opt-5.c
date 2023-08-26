@@ -27,7 +27,9 @@ testTortureExecute (void)
 {
 #if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   const char *const foo = "hello world";
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   char dst [64];
+#endif
 
   if (strlen (bar) != 8)
     ASSERT (0);

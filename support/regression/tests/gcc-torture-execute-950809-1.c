@@ -13,6 +13,7 @@ struct S
   int *sp, fc, *sc, a[2];
 };
 
+void
 f (struct S *x)
 {
   int *t = x->sc;
@@ -38,8 +39,7 @@ testTortureExecute (void)
   s.a[0] = 10;
   s.a[1] = 11;
   f (&s);
-  if (s.sp[2] != 2)
-    ASSERT (0);
+  ASSERT(s.sp[2] == 2);
   return;
 }
 

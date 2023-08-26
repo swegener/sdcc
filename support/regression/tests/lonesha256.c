@@ -9,7 +9,7 @@
 
 #define LONESHA256_STATIC
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || defined(__SDCC_STACK_AUTO))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 
 /*
    lonesha256.h - Portable, endian-proof, single-file, single-function sha256 implementation, originally based on LibTomCrypt

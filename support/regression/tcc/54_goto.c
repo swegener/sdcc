@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void fred()
+void fred(void)
 {
    printf("In fred()\n");
    goto done;
@@ -9,7 +9,7 @@ done:
    printf("At end\n");
 }
 
-void joe()
+void joe(void)
 {
    int b = 5678;
 
@@ -22,21 +22,19 @@ void joe()
       printf("uh-oh\n");
    }
 
-outer:    
+outer:
 
    printf("done\n");
 }
 
-void henry()
+void henry(void)
 {
-   int a;
-
    printf("In henry()\n");
    goto inner;
 
    {
       int b;
-inner:    
+inner:
       b = 1234;
       printf("b = %d\n", b);
    }
@@ -44,7 +42,7 @@ inner:
    printf("done\n");
 }
 
-int main()
+int main(void)
 {
    fred();
    joe();

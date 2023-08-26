@@ -15,6 +15,7 @@
 #define T 13
 
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+int
 feq (float x, float y)
 {
   if (x == y)
@@ -23,6 +24,7 @@ feq (float x, float y)
     return F;
 }
 
+int
 fne (float x, float y)
 {
   if (x != y)
@@ -31,6 +33,7 @@ fne (float x, float y)
     return F;
 }
 
+int
 flt (float x, float y)
 {
   if (x < y)
@@ -39,6 +42,7 @@ flt (float x, float y)
     return F;
 }
 
+int
 fge (float x, float y)
 {
   if (x >= y)
@@ -47,6 +51,7 @@ fge (float x, float y)
     return F;
 }
 
+int
 fgt (float x, float y)
 {
   if (x > y)
@@ -55,6 +60,7 @@ fgt (float x, float y)
     return F;
 }
 
+int
 fle (float x, float y)
 {
   if (x <= y)
@@ -67,7 +73,7 @@ float args[] =
 {
   0.0F,
   1.0F,
-  -1.0F, 
+  -1.0F,
   FLT_MAX,
   FLT_MIN,
   0.0000000000001F,
@@ -75,35 +81,37 @@ float args[] =
   -987654321.0F
 };
 
-#ifndef __SDCC_mcs51
+#ifdef __SDCC_mcs51
+const
+#endif
 
 int correct_results[] =
 {
- T, F, F, T, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, F, T, T, F,                                             
- T, F, F, T, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, T, F, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, F, T, T, F,                                             
- F, T, T, F, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- T, F, F, T, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, T, F, F, T,                                             
- F, T, F, T, T, F,                                             
- F, T, F, T, T, F,                                             
+ T, F, F, T, F, T,
+ F, T, T, F, F, T,
+ F, T, F, T, T, F,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, F, T, T, F,
+ F, T, F, T, T, F,
+ T, F, F, T, F, T,
+ F, T, F, T, T, F,
+ F, T, T, F, F, T,
+ F, T, F, T, T, F,
+ F, T, F, T, T, F,
+ F, T, T, F, F, T,
+ F, T, F, T, T, F,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ T, F, F, T, F, T,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, T, F, F, T,
+ F, T, F, T, T, F,
+ F, T, F, T, T, F,
  F, T, F, T, T, F,
  F, T, F, T, T, F,
  T, F, F, T, F, T,
@@ -145,13 +153,13 @@ int correct_results[] =
  T, F, F, T, F, T,
 };
 #endif
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
-  int i, j, *res = correct_results;
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+  const int *res = correct_results;
+  int i, j;
 
   for (i = 0; i < 8; i++)
     {
@@ -160,18 +168,12 @@ testTortureExecute (void)
 	{
 	  float arg1 = args[j];
 
-	  if (feq (arg0, arg1) != *res++)
-	    ASSERT (0);
-	  if (fne (arg0, arg1) != *res++)
-	    ASSERT (0);
-	  if (flt (arg0, arg1) != *res++)
-	    ASSERT (0);
-	  if (fge (arg0, arg1) != *res++)
-	    ASSERT (0);
-	  if (fgt (arg0, arg1) != *res++)
-	    ASSERT (0);
-	  if (fle (arg0, arg1) != *res++)
-	    ASSERT (0);
+	  ASSERT(feq (arg0, arg1) == *res++);
+	  ASSERT(fne (arg0, arg1) == *res++);
+	  ASSERT(flt (arg0, arg1) == *res++);
+	  ASSERT(fge (arg0, arg1) == *res++);
+	  ASSERT(fgt (arg0, arg1) == *res++);
+	  ASSERT(fle (arg0, arg1) == *res++);
 	}
     }
 #endif

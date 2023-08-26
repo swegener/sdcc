@@ -13,12 +13,15 @@ struct Rect {
 };
 
 float foo(struct Point p, struct Rect r) {
+   (void)p;
    return r.size.x;
 }
 
 int main(int argc, char **argv) {
    struct Point p = {1, 2};
    struct Rect r = {{3, 4}, {5, 6}};
+   (void)argc;
+   (void)argv;
    printf("%f\n", foo(p, r));
    return 0;
 }

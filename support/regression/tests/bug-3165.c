@@ -1,5 +1,5 @@
 /*
-   bug-3167.c
+   bug-3165.c
    a crash in z80 code generation on __sfr right subtraction operand.
  */
 

@@ -1,3 +1,9 @@
+2023-08-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3165.c,
+	  support/regression/tests/bug-3167.c:
+	  Rename regression test to mach correct bug number.
+
 2023-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/pic16/libc/string/memchr.c,

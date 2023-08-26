@@ -3,6 +3,15 @@
 	* sdas/asrab/rab.h,
 	  sdas/asrab/rabadr.c,
 	  sdas/asrab/rabmch.c:
+	  Fix handling of some valid instructions in Rabbit assembler (bug #3636, patch by by D-mo).
+	* support/regression/tests/bug-3636.c:
+	  Regression test for bug #3636.
+
+2023-08-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asrab/rab.h,
+	  sdas/asrab/rabadr.c,
+	  sdas/asrab/rabmch.c:
 	  Fix handling of some invalid instructions in Rabbit assembler (bug #3638, patch by by D-mo).
 
 2023-08-26 Philipp Klaus Krause <philipp@colecovision.eu>

@@ -153,6 +153,9 @@ struct expr *esp;
                 if ((indx = admode(R16AF)) != 0) {
                         mode = S_R16AF;
                 } else
+                if ((indx = admode(R16_ALT)) != 0) {
+                        mode = S_R16_ALT;
+                } else
                 if ((indx = admode(R16)) != 0) {
                         mode = S_R16;
                 } else
@@ -285,6 +288,13 @@ struct  adsym   R16[] = {
     {   "ix",   IX|0400 },
     {   "iy",   IY|0400 },
     {   "",     0000    }
+};
+
+struct  adsym   R16_ALT[] = {
+    {   "bc'",  BC|0400 },
+    {   "de'",  DE|0400 },
+    {   "hl'",  HL|0400 },
+    {   "",     0000 }
 };
 
 struct  adsym   R16AF[] = {

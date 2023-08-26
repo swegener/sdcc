@@ -724,6 +724,15 @@ VOID  machine(struct mne * mp)
                         outab(0x9F);
                         break;
                 }
+
+                if ((t1 == S_R16_ALT) && (t2 == S_R16)) {
+                        if ((v2 == BC) || (v2 == DE)) {
+                                /* LD BC'|DE'|HL', BC|DE */
+                                outab(0xED);
+                                outab(((v2 == BC) ? 0x49 : 0x41) | (v1 << 4));
+                                break;
+                        }
+                }
       
                 /* 16-bit operations valid only in rabbit 4000 mode */
                 if (r4k_mode && (t1 == S_R16) && (t2 == S_R16)) {
@@ -807,6 +816,19 @@ VOID  machine(struct mne * mp)
                                 }
                                 if (r4k_mode && (v1==BC) && (v2==HL)) {
                                         outab(0xB3);
+                                        break;
+                                }
+                        }
+                        else if (t1 == S_R16_ALT) {
+                                if ((v1 == DE) && (v2 == HL)) {
+                                        /* EX DE', HL */
+                                        outab(0xE3);
+                                        break;
+                                }
+                                if (r4k_mode && (v1==BC) && (v2==HL)) {
+                                        /* EX BC', HL */
+                                        outab(0xED);
+                                        outab(0x74);
                                         break;
                                 }
                         }

@@ -123,7 +123,7 @@
 #define S_R8X           32
 
 #define S_R16           34
-
+#define S_R16_ALT       35
 #define S_CND           36
 #define S_FLAG          37
 
@@ -228,6 +228,7 @@ extern  struct  adsym   R8[];
 extern  struct  adsym   R8X[];
 extern  struct  adsym   R8IP[];
 extern  struct  adsym   R16[];
+extern  struct  adsym   R16_ALT[];
 extern  struct  adsym   R16AF[];
 extern  struct  adsym   R16AF_ALT[];
 

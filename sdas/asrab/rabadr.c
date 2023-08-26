@@ -102,8 +102,12 @@ struct expr *esp;
                         mode = S_R8X;
                         aerr();
                 } else
-                if ((indx = admode(R16X)) != 0) {
-                        mode = S_R16X;
+                if ((indx = admode(R16AF_ALT)) != 0) {
+                        mode = S_R16AF_ALT;
+                        aerr();
+                } else
+                if ((indx = admode(R16AF)) != 0) {
+                        mode = S_R16AF;
                         aerr();
                 } else
                 if ((indx = admode(R16)) != 0) {
@@ -143,8 +147,11 @@ struct expr *esp;
                 if ((indx = admode(R8X)) != 0) {
                         mode = S_R8X;
                 } else
-                if ((indx = admode(R16X)) != 0) {
-                        mode = S_R16X;
+                if ((indx = admode(R16AF_ALT)) != 0) {
+                        mode = S_R16AF_ALT;
+                } else
+                if ((indx = admode(R16AF)) != 0) {
+                        mode = S_R16AF;
                 } else
                 if ((indx = admode(R16)) != 0) {
                         mode = S_R16;
@@ -280,9 +287,13 @@ struct  adsym   R16[] = {
     {   "",     0000    }
 };
 
-struct  adsym   R16X[] = {
-    {   "af'",  AF|0400 },      /* af' must be first !!! */
+struct  adsym   R16AF[] = {
     {   "af",   AF|0400 },
+    {   "",     0000    }
+};
+
+struct  adsym   R16AF_ALT[] = {
+    {   "af'",  AF|0400 },
     {   "",     0000    }
 };
 

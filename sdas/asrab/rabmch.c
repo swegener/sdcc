@@ -129,7 +129,7 @@ VOID  machine(struct mne * mp)
                 break;
 
         case S_PUSH:
-                if (admode(R16X)) {
+                if (admode(R16AF)) {
                         outab(op+0x30);
                         break;
                 } else if ((v1 = admode(R8IP)) != 0) {
@@ -826,7 +826,7 @@ VOID  machine(struct mne * mp)
                                 }
                         }
                 }
-                if ((t1 == S_R16X) && (t2 == S_R16X)) {
+                if ((t1 == S_R16AF) && (t2 == S_R16AF_ALT)) {
                         outab(0x08);
                         break;
                 }

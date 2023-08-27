@@ -166,6 +166,7 @@
 #define	X_HD64	1
 #define	X_ZXN	2
 #define	X_EZ80	3
+#define X_R800  4
 
 /*
  * HD64180 Instructions
@@ -196,6 +197,12 @@
 #define	X_EZ_INH2	111
 #define	X_EZ_LEA	112
 #define	X_EZ_PEA	113
+
+/*
+ * R800/Z280 Instructions
+ */
+#define X_Z280_MULTU   120  
+#define X_Z280_MULTUW  121  
 
 /*
  * eZ80 specific addressing extensions (used in mne m_flag)

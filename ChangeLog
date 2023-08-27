@@ -1,7 +1,26 @@
+2023-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* Merge r800 brnach to trunk.
+
+2023-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sim/ucsim/z80.src/inst_ed.cc,
+	  src/z80/gen.c,
+	  src/z80/peep.c:
+	  Fixes for R800 multiplication instructions.
+
 2023-08-27 Felix Salfelder <felix AT salfelder.org>
 
 	* support/regression/Makefile.in: deal with longer subresult list.
 	* support/regression/tests/bitintshift.c.in: more subcases.
+
+2023-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/fwk/include/testfwk.h,
+	  support/regression/ports/ucr800/spec.mk:
+	  r800 regression test infrstructure.
+	* src/z80/gen.c:
+	  r800 calling convention fix.
 
 2023-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -353,6 +372,11 @@
 	  src/z80/gen.c:
 	  Fix various bugs found by sanitizers.
 
+2023-07-31 Philipp Klaus Krause <pkk@spth.de>
+
+	* support/regression/ports/ucr800/spec.mk:
+	  Infrastructure for future r800 regression testing.
+
 2023-07-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc,
@@ -372,6 +396,28 @@
 	* src/SDCCast.c,
 	  support/valdiag/tests/bug-2240.c:
 	  Fix bug #2240.
+
+2023-07-28 Philipp Klaus Krause <pkk@spth.de>
+
+	* sdas/asz80/z80.h,
+	  sdas/asz80/z80mch.c,
+	  sdas/asz80/z80pst.c:
+	  Basic R800 assembler support.
+	* configure,
+	  configure.ac,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/z80/main.c,
+	  src/SDCCglue.c,
+      src/z80/gen.c,
+      src/z80/z80.h,
+      src/z80/peep.c,
+      device/include/*.h,
+      device/lib/Makefile.in,
+      device/lib/_memset.c,
+      device/lib/clean.mk,
+      device/lib/r800:
+	  Infrastructure for r800 port, use multu for 8x8->16 multiplication.
 
 2023-07-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -63,7 +63,7 @@ union float_long
 
 /* Functions on the z80 and related are always reentrant and so the "reentrant" */
 /* keyword is not defined. */
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined(__SDCC_sm83) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_stm8)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined(__SDCC_sm83) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_r800) || defined(__SDCC_stm8)
 #define _FLOAT_FUNC_REENTRANT
 #else
 #define _FLOAT_FUNC_REENTRANT __reentrant

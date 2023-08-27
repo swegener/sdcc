@@ -47,7 +47,8 @@ void *memset (void *s, int c, size_t n)
 #if !defined (_SDCC_NO_ASM_LIB_FUNCS) && (\
               defined (__SDCC_z80) ||\
               defined (__SDCC_z180) ||\
-              defined (__SDCC_z80n))
+              defined (__SDCC_z80n) ||\
+              defined (__SDCC_r800))
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS      
 #error Unimplemented broken string function
 #endif    

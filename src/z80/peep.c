@@ -249,7 +249,10 @@ z80MightReadFlag(const lineNode *pl, const char *what)
      ISINST(pl->line, "ldi") ||
      ISINST(pl->line, "neg") ||
      ISINST(pl->line, "rld") ||
-     ISINST(pl->line, "rrd"))
+     ISINST(pl->line, "rrd") ||
+     ISINST(pl->line, "mlt") ||
+     ISINST(pl->line, "multu") ||
+     ISINST(pl->line, "multuw"))
     return false;
   if(ISINST(pl->line, "halt") ||
      ISINST(pl->line, "rlca") ||
@@ -406,9 +409,17 @@ z80MightRead(const lineNode *pl, const char *what)
      ISINST(pl->line, "and") ||
      ISINST(pl->line, "sbc") ||
      ISINST(pl->line, "sub") ||
-     ISINST(pl->line, "xor"))
+     ISINST(pl->line, "xor") ||
+     IS_R800 && ISINST(pl->line, "multu") ||
+     IS_R800 && ISINST(pl->line, "multuw"))
     {
-      const char *arg = pl->line + 4;
+      const char *arg;
+      if (ISINST(pl->line, "multu"))
+        arg = pl->line + 5;
+      else if (ISINST(pl->line, "multuw"))
+        arg = pl->line + 6;
+      else
+        arg = pl->line + 4;
       while(isspace(*arg))
         arg++;
       if(arg[0] == 'a' && arg[1] == ',')
@@ -818,6 +829,14 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if (IS_Z180 || IS_EZ80_Z80 || IS_Z80N)
     if (ISINST(pl->line, "mlt"))
       return(strchr(pl->line + 4, *what) != 0);
+
+  if (IS_R800)
+    if (ISINST(pl->line, "multu"))
+      return(strchr("hl", *what) != NULL);
+
+  if (IS_R800)
+    if (ISINST(pl->line, "multuw"))
+      return(strchr("dehl", *what) != NULL);
 
   if (IS_Z180 || IS_EZ80_Z80)
     {
@@ -1586,6 +1605,9 @@ int z80instructionSize(lineNode *pl)
     return(3);
 
   if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "mlt"))
+    return(2);
+
+  if (IS_R800 && (ISINST(pl->line, "multu") || ISINST(pl->line, "multuw")))
     return(2);
 
   if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))

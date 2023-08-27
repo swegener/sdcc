@@ -30,7 +30,7 @@
 #include "asxxxx.h"
 #include "z80.h"
 
-char    *cpu    = "Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80";
+char    *cpu    = "Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80 / R800";
 char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
@@ -601,6 +601,11 @@ struct mne *mp;
                                 break;
                         }
                 }
+                break;
+
+        case X_R800:
+                if (rf > S_CPU && rf < X_Z280_MULTU)
+                        rf = 0;
                 break;
 
         default:
@@ -1555,7 +1560,7 @@ struct mne *mp;
                 mchtyp = op;
                 sym[2].s_addr = op;
                 lmode = SLIST;
-                allow_undoc = (mchtyp == X_EZ80 || mchtyp == X_ZXN);
+                allow_undoc = (mchtyp == X_EZ80 || mchtyp == X_ZXN || mchtyp == X_R800);
                 break;
 
         case X_INH2:
@@ -1883,6 +1888,31 @@ struct mne *mp;
                 aerr();
                 break;
 
+        case X_Z280_MULTU:
+                t1 = addr(&e1);
+                comma(1);
+                t2 = addr(&e2);
+                // For the R800, this instruction only works if the second operand is b, c, d, or e.
+                if (t1 == S_R8 && e1.e_addr == A && t2 == S_R8 && (e2.e_addr == B || e2.e_addr == C || e2.e_addr == D || e2.e_addr == E)) {
+                        outab(0xED);
+                        outab(op | (e2.e_addr<<3));
+                        break;
+                }       
+                aerr();
+                break;
+
+        case X_Z280_MULTUW:
+                t1 = addr(&e1);
+                comma(1);
+                t2 = addr(&e2);
+                // For the R800, this instruction only works if the second operand is bc or sp.
+                if (t1 == S_R16 && e1.e_addr == HL && t2 == S_R16 && (e2.e_addr == BC || e2.e_addr == SP)) {
+                        outab(0xED);
+                        outab(op | (e2.e_addr<<4));
+                        break;
+                }
+                aerr();
+                break;
 
         default:
                 opcycles = OPCY_ERR;

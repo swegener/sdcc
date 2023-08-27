@@ -665,6 +665,45 @@ int  cl_z80::inst_ed_(t_mem code)
       while (regs.BC);
       return(resGO);
 
+    // Z280/R800 multu
+    case 0xc1:
+    case 0xc9:
+    case 0xd1:
+    case 0xd9:
+      if (type->type==CPU_R800)
+        {
+          unsigned int result = (unsigned int)(regs.raf.A) * reg_g_read((code >> 3) & 0x07);
+          regs.HL = result;
+          regs.raf.F &= ~(BIT_S | BIT_Z | BIT_P | BIT_C);
+          if (!result)
+            regs.raf.F |= BIT_Z;
+          if (result >= 0x100)
+            regs.raf.F |= BIT_C;
+          tick (14);
+          return(resGO);
+        }
+      return(resINV_INST);
+
+    // Z280/R800 multuw
+    case 0xc3: // multuw hl, bc
+      if (type->type==CPU_R800)
+        {
+          unsigned long result = (unsigned long)(regs.HL) *  (unsigned long)(regs.BC);
+          regs.HL = (result >> 0) & 0xff;
+          regs.DE = (result >> 16) & 0xff;
+          regs.raf.F &= ~(BIT_S | BIT_Z | BIT_P | BIT_C);
+          if (!result)
+            regs.raf.F |= BIT_Z;
+          if (regs.DE)
+            regs.raf.F |= BIT_C;
+          tick (36);
+          return(resGO);
+        }
+      return(resINV_INST);
+    case 0xf3: // multuw hl, sp
+      //todo
+      return(resINV_INST);
+
     default:
       return(resINV_INST);
     }

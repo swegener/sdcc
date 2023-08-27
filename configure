@@ -680,6 +680,7 @@ OPT_DISABLE_PIC16
 OPT_DISABLE_PIC14
 OPT_DISABLE_DS400
 OPT_DISABLE_DS390
+OPT_DISABLE_R800
 OPT_DISABLE_Z80N
 OPT_DISABLE_EZ80_Z80
 OPT_DISABLE_TLCS90
@@ -807,6 +808,7 @@ enable_sm83_port
 enable_tlcs90_port
 enable_ez80_z80_port
 enable_z80n_port
+enable_r800_port
 enable_ds390_port
 enable_ds400_port
 enable_pic14_port
@@ -1495,6 +1497,7 @@ Optional Features:
   --disable-tlcs90-port   Excludes the TLCS-90 port
   --disable-ez80_z80-port Excludes the EZ80-Z80 port
   --disable-z80n-port     Excludes the Z80N port
+  --disable-r800-port     Excludes the R800 port
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic14-port    Excludes the PIC14 port
@@ -8733,6 +8736,31 @@ printf "%s\n" "#define OPT_DISABLE_Z80N $OPT_DISABLE_Z80N" >>confdefs.h
   fi
 
 
+  # Check whether --enable-r800-port was given.
+if test ${enable_r800_port+y}
+then :
+  enableval=$enable_r800_port;
+fi
+
+
+  if test "$enable_r800_port" = "no"; then
+    OPT_DISABLE_R800=1
+  else
+    enable_r800_port="yes"
+    OPT_DISABLE_R800=0
+  fi
+
+
+printf "%s\n" "#define OPT_DISABLE_R800 $OPT_DISABLE_R800" >>confdefs.h
+
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_R800 = 0; then
+    echo z80 >>ports.build
+  fi
+
+
   # Check whether --enable-ds390-port was given.
 if test ${enable_ds390_port+y}
 then :
@@ -9660,15 +9688,15 @@ if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
 
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_SM83 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_SM83 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0 || test $OPT_DISABLE_R800 = 0; then
   ac_config_files="$ac_config_files src/z80/Makefile"
 
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0 || test $OPT_DISABLE_R800 = 0; then
   ac_config_files="$ac_config_files sdas/asz80/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/z80/Makefile device/lib/z180/Makefile device/lib/ez80_z80/Makefile device/lib/z80n/Makefile"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/z80/Makefile device/lib/z180/Makefile device/lib/ez80_z80/Makefile device/lib/z80n/Makefile device/lib/r800/Makefile"
 
 fi
 
@@ -10474,6 +10502,7 @@ do
     "device/lib/z180/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z180/Makefile" ;;
     "device/lib/ez80_z80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/ez80_z80/Makefile" ;;
     "device/lib/z80n/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z80n/Makefile" ;;
+    "device/lib/r800/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r800/Makefile" ;;
     "sdas/asrab/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asrab/Makefile" ;;
     "device/lib/r2k/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2k/Makefile" ;;
     "device/lib/r2ka/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2ka/Makefile" ;;
@@ -11511,6 +11540,7 @@ sdcc ${VERSION} is now configured for
     tlcs90              ${enable_tlcs90_port}
     ez80_z80            ${enable_ez80_z80_port}
     z80n                ${enable_z80n_port}
+    r800                ${enable_r800_port}
     stm8                ${enable_stm8_port}
     pdk13               ${enable_pdk13_port}
     pdk14               ${enable_pdk14_port}
@@ -11591,6 +11621,7 @@ sdcc ${VERSION} is now configured for
     tlcs90              ${enable_tlcs90_port}
     ez80_z80            ${enable_ez80_z80_port}
     z80n                ${enable_z80n_port}
+    r800                ${enable_r800_port}
     stm8                ${enable_stm8_port}
     pdk13               ${enable_pdk13_port}
     pdk14               ${enable_pdk14_port}

@@ -334,6 +334,16 @@ _z80n_init (void)
 }
 
 static void
+_r800_init (void)
+{
+  z80_opts.sub = SUB_R800;
+  asm_addTree (&_asxxxx_z80);
+
+  regsZ80 = z80_regs;
+  z80_init_asmops ();
+}
+
+static void
 _reset_regparm (struct sym_link *ftype)
 {
   _G.regparam.n = 0;
@@ -2232,6 +2242,140 @@ PORT z80n_port =
   },
   "_",
   _z80n_init,
+  _parseOptions,
+  _z80_like_options,
+  NULL,
+  _finaliseOptions,
+  _setDefaultOptions,
+  z80_assignRegisters,
+  _getRegName,
+  _getRegByName,
+  NULL,
+  _keywords,
+  0,                            /* no assembler preamble */
+  NULL,                         /* no genAssemblerEnd */
+  0,                            /* no local IVT generation code */
+  0,                            /* no genXINIT code */
+  NULL,                         /* genInitStartup */
+  _reset_regparm,
+  _reg_parm,
+  _process_pragma,
+  NULL,
+  _hasNativeMulFor,
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
+  FALSE,                        /* Array initializer support. */
+  0,                            /* no CSE cost estimation yet */
+  _z80_builtins,                /* builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
+  PORT_MAGIC
+};
+
+PORT r800_port =
+{
+  TARGET_ID_R800,
+  "r800",
+  "R800",                       /* Target name */
+  NULL,                         /* Processor name */
+  {
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
+  {                             /* Assembler */
+    _z80AsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"
+  },
+  {                             /* Linker */
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_z80,                 /* libs */
+  },
+  {                             /* Peephole optimizer */
+    _z80_defaultRules,
+    z80instructionSize,
+    NULL,
+    NULL,
+    NULL,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+    z80canJoinRegs,
+    z80canSplitReg,
+  },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, BitInt (in bits) */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4, 64 },
+  /* tags for generic pointers */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
+  {
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    false,                      // unqualified pointers cannot point to __sfr.
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  1,                            /* ABI revision */
+  { -1, 0, 0, 4, 0, 3, 0 },
+  { 
+    -1,                         /* shifts never use support routines */
+    false,                      /* do not use support routine for int x int -> long multiplication */
+    false,                      /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+  },
+  { z80_emitDebuggerSymbol },
+  {
+    256,                        /* maxCount */
+    3,                          /* sizeofElement */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
+    1,                          /* sizeofSubtract - Assumes use of a singel inc or dec */
+    9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
+  },
+  "_",
+  _r800_init,
   _parseOptions,
   _z80_like_options,
   NULL,

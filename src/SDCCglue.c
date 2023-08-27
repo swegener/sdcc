@@ -2342,6 +2342,8 @@ glue (void)
     fprintf (asmFile, "\t.ez80\n");
   else if (TARGET_IS_Z80N)
     fprintf (asmFile, "\t.zxn\n");
+  else if (TARGET_IS_R800)
+    fprintf (asmFile, "\t.r800\n");
   else if (TARGET_IS_Z80 && options.allow_undoc_inst)
     fprintf (asmFile, "\t.allow_undocumented\n");
 

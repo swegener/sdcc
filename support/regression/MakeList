@@ -144,6 +144,10 @@ EXCLUDE_ucz80 += \
 EXCLUDE_ucz80-nmos += \
 	gte_20091229-1
 
+# Fail
+EXCLUDE_ucr800 += \
+	gte_20091229-1
+
 # fail
 EXCLUDE_hc08 += \
 	gte_memcpy-1

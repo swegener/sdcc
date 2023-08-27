@@ -1,13 +1,11 @@
 /** shifts of bit-precise integers.
 
     width: 7, 8, 9, 16, 24, 32, 33, 40, 48, 63, 64
-    count: 1, 20, 40
+    count: 1, 4, 5, 7, 8, 9, 16, 20, 33, 40, 47, 48
     varstorage: auto, static
     countstorage: auto, static
     direction: 0, 1
 */
-
-// TODO: Change count to count: 1, 4, 5, 7, 8, 9, 16, 20, 33, 40, 47, 48 once issues in regtest infrastructure (argument list too long error for mcs51-large-stack-auto) are fixed.
 
 #include <testfwk.h>
 

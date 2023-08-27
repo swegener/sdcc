@@ -375,6 +375,8 @@ SUB_CASES = $(sort $(wildcard $(CASES_DIR)/$(CASES)*.c))
 # these are stored in TMP_DIR...
 SUB_RESULTS_ = $(SUB_CASES:%.c=%.out)
 SUB_RESULTS = $(SUB_RESULTS_:cases%=$(RESULTS_DIR)/$(PORT)%)
+SUB_RESULTS_FILES = $(SUB_RESULTS_:cases/%=%)
+SUB_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Overall target.  Concatenation of all of the sub results.
 RESULTS = $(CASES:%/$(DIREXT)=$(PORT_RESULTS_DIR)/%.out)
 
@@ -382,7 +384,7 @@ iterations: $(RESULTS)
 
 # Rule to generate the overall target from the sub results.
 $(RESULTS): $(SUB_RESULTS)
-	${M_V_at}echo | cat - $(SUB_RESULTS) > $@ # subresult rule
+	${M_V_at}( cd $(SUB_RESULTS_DIR); echo | cat - $(SUB_RESULTS_FILES) ) > $@ # subresult rule
 
 $(TMP_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(TMP_DIR)/stamp
 	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@

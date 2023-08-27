@@ -1,3 +1,8 @@
+2023-08-27 Felix Salfelder <felix AT salfelder.org>
+
+	* support/regression/Makefile.in: deal with longer subresult list.
+	* support/regression/tests/bitintshift.c.in: more subcases.
+
 2023-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/gte/960830-1.c: deleted, is only relevant for i386

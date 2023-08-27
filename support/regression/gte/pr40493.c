@@ -54,7 +54,7 @@ typedef union i386_operand_type
 
 unsigned int x00, x01, y00, y01;
 
-int main (int argc, char *argv[])
+int main (void)
 {
   i386_operand_type a,b,c,d;
 

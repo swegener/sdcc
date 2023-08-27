@@ -5,6 +5,8 @@ int a[2], b, c, d, e;
 void
 foo (int x, int y)
 {
+  (void)x;
+  (void)y;
 }
 
 int
@@ -19,7 +21,7 @@ bar (void)
 }
 
 int
-main ()
+main (void)
 {
   for (b = 0; b < 2; b++)
     while (c)

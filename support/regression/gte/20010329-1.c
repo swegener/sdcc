@@ -1,5 +1,8 @@
 #include <limits.h>
 
+/* suppress warning W_LITERAL_GENERIC, the pointers are not dereferenced */
+#pragma disable_warning 88
+
 int main (void)
 {
   void *x = ((void *)((unsigned int)INT_MAX + 2));

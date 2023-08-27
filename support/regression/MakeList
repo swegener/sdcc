@@ -375,10 +375,6 @@ EXCLUDE_ARCH_pdk += \
 	tcc_70_floating_point_literals \
 	tcc_91_ptr_longlong_arith32
 
-# Fails since symbol B from test conflicts with symbol B defined in mcs51-common/support.c (via processor register include)
-EXCLUDE_ARCH_mcs51 += \
-	tcc_30_hanoi
-
 # Target doesn't have enough memory
 EXCLUDE_ARCH_pdk += \
 	tcc_05_array \

@@ -1,9 +1,9 @@
-f (char *x)
+void f (char *x)
 {
   *x = 'x';
 }
 
-main ()
+void main (void)
 {
   int i;
   char x = '\0';

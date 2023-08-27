@@ -1,3 +1,6 @@
+/* suppress warning W_LOCAL_NOINIT, it is valid here but never executed */
+#pragma disable_warning 84
+
 int test1 (int b, int c)
 {
   char x;
@@ -32,7 +35,8 @@ int test4 (int b, int c)
 }
 
 extern void abort (void);
-int main()
+
+int main(void)
 {
   if (test1(1, 1000) != 0)
     abort ();

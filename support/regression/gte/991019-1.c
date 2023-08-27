@@ -10,7 +10,7 @@ material_type foo(double x)
      return m;
 }
 
-main()
+void main(void)
 {
   int i;
   material_type x;

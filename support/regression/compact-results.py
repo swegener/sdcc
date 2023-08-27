@@ -77,7 +77,7 @@ for line in lines:
     safe_name = name if name != "" else outname
 
     # Get base name from name
-    base = safe_name 
+    base = safe_name
     m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', base)
     if (m):
         base = m.group(3)

@@ -980,7 +980,7 @@ tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 	@echo '#ifdef __SDCC' >> $@
 	@echo 'extern void _putchar(char c);' >> $@
 	@echo 'int putchar(int c){_putchar(c);return(c);}' >> $@
-	@echo 'void abort() {ASSERT(0);}' >> $@
+	@echo 'void abort(void) {ASSERT(0);}' >> $@
 	@echo '#endif' >> $@
 
 	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
@@ -992,14 +992,6 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@echo '#include <testfwk.h>' > $@
 	@echo '#ifdef __SDCC' >> $@
 	@echo '#pragma std_sdcc99' >> $@
-	@echo '#pragma disable_warning 24' >> $@
-	@echo '#pragma disable_warning 84' >> $@
-	@echo '#pragma disable_warning 85' >> $@
-	@echo '#pragma disable_warning 88' >> $@
-	@echo '#pragma disable_warning 93' >> $@
-	@echo '#pragma disable_warning 196' >> $@
-	@echo '#pragma disable_warning 127' >> $@
-	@grep main $< -C1 | grep -q ^int || echo '#pragma disable_warning 278' >> $@
 
 # stuff defined in gcc, but not in sdcc
 	@grep -q __CHAR_BIT__ $< && (echo "#include <limits.h>"; echo "#define __CHAR_BIT__ CHAR_BIT") >> $@ || :
@@ -1007,8 +999,8 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@grep -q __SIZE_TYPE__ $< && (echo "#include <stddef.h>" ;echo "#define __SIZE_TYPE__ size_t") >> $@ || :
 	@grep -q __LONG_LONG_MAX__ $< && (echo "#include <limits.h>"; echo "#define __LONG_LONG_MAX__ LLONG_MAX") >> $@ || :
 	@grep -q __INTPTR_TYPE__ $< && echo "#define __INTPTR_TYPE__ intptr_t" >> $@ || :
-	@grep -q __builtin_abort $< && echo "void __builtin_abort(){ASSERT(0);}" >> $@ || :
-	@grep -q __builtin_unreachable $< && echo "void __builtin_unreachable(){}" >> $@ || :
+	@grep -q __builtin_abort $< && echo "void __builtin_abort(void){ASSERT(0);}" >> $@ || :
+	@grep -q __builtin_unreachable $< && echo "void __builtin_unreachable(void){}" >> $@ || :
 	@grep -q __builtin_memset $< && (echo "#include <string.h>"; echo "#define __builtin_memset memset") >> $@ || :
 
 	@echo '#endif // __SDCC' >> $@
@@ -1018,7 +1010,7 @@ gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	                 && echo "jmp_buf after_main;" >> $@ \
 	                 && echo "void exit__substitute(int i){ASSERT(!i); longjmp(after_main, 1);}" >> $@ \
 	                 && echo "#define exit exit__substitute" >> $@ || :
-	@printf '#define main main_\n#define assert ASSERT\nvoid abort() {ASSERT(0);}\n' >> $@
+	@printf '#define main main_\n#define assert ASSERT\nvoid abort(void) {ASSERT(0);}\n' >> $@
 
 	@#find matching main arguments, none or 2
 	@printf '#define MAINARGS' >> $@

@@ -33,7 +33,7 @@ do_isofs_readdir(struct inode *inode, struct file *filp)
 
  	if (filp->f_pos >= inode->i_size)
 		return 0;
- 
+
 	offset = filp->f_pos & (bufsize - 1);
 	block = filp->f_pos >> bufbits;
 	hs = inode->i_sb->s_hs;
@@ -63,7 +63,7 @@ struct inode i;
 struct file f;
 
 int
-main(int argc, char **argv)
+main(void)
 {
 	s.s_blocksize = 512;
 	s.s_blocksize_bits = 9;

@@ -2,14 +2,14 @@ extern void abort (void);
 
 static int inv_J(int a[][2])
 {
-  int i, j;
+  int j;
   int det = 0.0;
    for (j=0; j<2; ++j)
      det += a[j][0] + a[j][1];
   return det;
 }
 
-int foo()
+int foo(void)
 {
   int mat[2][2];
   mat[0][0] = 1;
@@ -19,7 +19,7 @@ int foo()
   return inv_J(mat);
 }
 
-int main()
+int main(void)
 {
   if (foo () != 15)
     abort ();

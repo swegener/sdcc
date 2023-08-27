@@ -1,5 +1,8 @@
 /* PR target/44942 */
 
+/* suppress valid warning W_NO_REFERENCE */
+#pragma disable_warning 85
+
 #include <stdarg.h>
 
 void

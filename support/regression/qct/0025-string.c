@@ -2,10 +2,10 @@
 int strlen(char *);
 
 int
-main()
+main(void)
 {
 	char *p;
-	
+
 	p = "hello";
 	return strlen(p) - 5;
 }

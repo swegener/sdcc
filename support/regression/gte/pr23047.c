@@ -1,6 +1,6 @@
 /* { dg-options "-fwrapv" } */
 #include <limits.h>
-extern void abort ();
+extern void abort (void);
 extern void exit (int);
 void f(int i)
 {
@@ -10,7 +10,7 @@ void f(int i)
   abort ();
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
   f(INT_MIN);
   exit (0);

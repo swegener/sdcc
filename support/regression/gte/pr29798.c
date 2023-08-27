@@ -1,7 +1,11 @@
-extern void abort ();
+/* suppress warning W_LOCAL_NOINIT, oldrho is not used uninitialized
+   but that is hard to spot for the compiler */
+#pragma disable_warning 84
+
+extern void abort (void);
 
 int
-main ()
+main (void)
 {
   int i;
   double oldrho;

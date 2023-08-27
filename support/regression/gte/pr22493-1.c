@@ -13,7 +13,7 @@ void f(int i)
   abort ();
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
   f(INT_MIN);
   exit (0);

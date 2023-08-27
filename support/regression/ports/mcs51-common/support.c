@@ -1,5 +1,6 @@
-// #define MICROCONTROLLER_8051
-#include <mcs51reg.h>
+/* define UART sfr only */
+__sbit __at(0x98+1) TI;
+__sfr  __at(0x99) SBUF;
 
 /* assume P1 for bankswitching address lines */
 __sfr __at(0x90) PSBANK;

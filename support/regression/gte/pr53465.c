@@ -1,6 +1,10 @@
 /* PR tree-optimization/53465 */
 
-extern void abort ();
+/* suppress warning W_LOCAL_NOINIT, c is not used uninitialized,
+   but that is hard to spot for the compiler */
+#pragma disable_warning 84
+
+extern void abort (void);
 
 static const int a[] = { 1, 2 };
 
@@ -23,7 +27,7 @@ foo (const int *x, int y)
 }
 
 int
-main ()
+main (void)
 {
   foo (a, 2);
   return 0;

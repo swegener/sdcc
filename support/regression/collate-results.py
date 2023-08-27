@@ -39,12 +39,12 @@ exlist = ["bug663539"]
 name = ""
 
 for line in lines:
-  
+
     m = re.match(r'^Simulation started,', line)
     if (m):
         flag = 0
         name = ""
-    
+
     # --- Running: gen/ucz80/longor/longor
     m = re.match(r'^--- Running: (.*)$', line)
     if (m):
@@ -66,7 +66,7 @@ for line in lines:
               (summary, data) = re.split(r':', line)
             else:
               (summary, data, rest) = re.split(r':', line)
-            
+
             (nfailures, ntests, ncases) = re.split(r'/', data)
             failures = failures + number_from_string(nfailures)
             tests = tests + number_from_string(ntests)
@@ -77,7 +77,7 @@ for line in lines:
             nfailures = '1'
         if (number_from_string(nfailures)):
             messagelog.append("Failure: %s" % name)
-        flag = 1 
+        flag = 1
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
@@ -102,23 +102,23 @@ for line in lines:
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):
         invalid += 1
         messagelog.append("Invalid instruction: %s" % name)
-    
+
     # Stop at 0xXXXXXX: (103) Stack overflow
     if (re.search(r'Stack overflow', line)):
         stack_overflow += 1
         messagelog.append("Stack overflow: %s" % name)
 
-    # HALT instruction 
+    # HALT instruction
     if (re.search(r'HALT instruction', line) or re.search(r'Halt instruction', line) or re.search(r'halt instruction', line)):
         halt += 1
         messagelog.append("HALT instruction: %s" % name)
-    
+
     # --- FAIL: "timeout, simulation killed" in xx/xx/testfile.c
     m = re.search(r'simulation killed',line)
     if (m):
       name = line.split()[-1]
       name = '.'.join(name.split('.')[0:-1])
-    
+
 
 if (len(sys.argv) > 1):
     print("Summary for '%s':" % sys.argv[1], end=' ')

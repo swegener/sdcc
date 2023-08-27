@@ -22,7 +22,7 @@ test_endianness_vol()
   return dw.u[0] != 0 ? 1 : 0;
 }
 
-main ()
+void main (void)
 {
   if (test_endianness () != test_endianness_vol ())
     abort ();

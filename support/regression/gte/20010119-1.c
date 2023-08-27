@@ -1,8 +1,8 @@
 #ifdef __OPTIMIZE__
 extern void undef (void);
 
-void bar (unsigned x) { }
-void baz (unsigned x) { }
+void bar (unsigned x) { (void)x; }
+void baz (unsigned x) { (void)x; }
 
 extern inline void foo (int a, int b)
 {
@@ -13,6 +13,8 @@ extern inline void foo (int a, int b)
 #else
 void foo (int a, int b)
 {
+  (void)a;
+  (void)b;
 }
 #endif
 

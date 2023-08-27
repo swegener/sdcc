@@ -45,7 +45,7 @@ int A[N], B[N], C[N];
 void Hanoi(int,int*,int*,int*);
 
 /* Print the current configuration of A, B, and C to the screen */
-void PrintAll()
+void PrintAll(void)
 {
    int i;
 
@@ -96,7 +96,7 @@ void Hanoi(int n,int *source, int *dest, int *spare)
    return;
 }
 
-int main()
+int main(void)
 {
    int i;
 

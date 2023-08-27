@@ -1,3 +1,6 @@
+/* suppress warning W_IDX_OUT_OF_BOUNDS as this is tested here */
+#pragma disable_warning 24
+
 extern void abort (void);
 
 struct container

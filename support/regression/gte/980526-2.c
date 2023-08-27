@@ -1,10 +1,13 @@
+/* suppress valid warning W_NONPTR2_GENPTR, pointer is not dereferenced */
+#pragma disable_warning 127
+
 typedef unsigned int dev_t;
 typedef unsigned int kdev_t;
 
 static inline kdev_t to_kdev_t(int dev)
 {
 	int major, minor;
-	
+
 	if (sizeof(kdev_t) == 16)
 		return (kdev_t)dev;
 	major = (dev >> 8);
@@ -15,6 +18,9 @@ static inline kdev_t to_kdev_t(int dev)
 
 void do_mknod(const char * filename, int mode, kdev_t dev)
 {
+	(void)filename;
+	(void)mode;
+
 	if (dev==0x15800078)
 		exit(0);
 	else

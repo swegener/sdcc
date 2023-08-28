@@ -886,6 +886,12 @@ ${Section} "SDCC MOS 6502 library" SEC34
   File "${DEV_ROOT}\lib\mos6502\*.*"
 ${SectionEnd}
 
+${Section} "SDCC R800 library" SEC35
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\r800"
+  File "${DEV_ROOT}\lib\r800\*.*"
+${SectionEnd}
+
 ;--------------------------------
 ;Descriptions
 
@@ -924,6 +930,7 @@ LangString DESC_SEC31 ${LANG_ENGLISH} "SDCC PDK15 stack-auto library"
 LangString DESC_SEC32 ${LANG_ENGLISH} "SDCC Z80N library"
 LangString DESC_SEC33 ${LANG_ENGLISH} "SDCC Rabbit 2000A library"
 LangString DESC_SEC34 ${LANG_ENGLISH} "SDCC MOS 6502 library"
+LangString DESC_SEC35 ${LANG_ENGLISH} "SDCC R800 library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -963,6 +970,7 @@ LangString DESC_SEC34 ${LANG_ENGLISH} "SDCC MOS 6502 library"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC32} $(DESC_SEC32)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC33} $(DESC_SEC33)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC34} $(DESC_SEC34)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC35} $(DESC_SEC35)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
@@ -1129,6 +1137,11 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\z80n\README"
   Delete "$INSTDIR\lib\src\z80n\Makefile"
 
+  Delete "$INSTDIR\lib\src\r800n\*.s"
+  Delete "$INSTDIR\lib\src\r800\r800.lib"
+  Delete "$INSTDIR\lib\src\r800\README"
+  Delete "$INSTDIR\lib\src\r800\Makefile"
+
   Delete "$INSTDIR\lib\src\*.c"
 
   Delete "$INSTDIR\lib\pic14\*.lib"
@@ -1200,6 +1213,9 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\z80n\*.rel"
   Delete "$INSTDIR\lib\z80n\*.lib"
+
+  Delete "$INSTDIR\lib\r800\*.rel"
+  Delete "$INSTDIR\lib\r800\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\r2k\*.h"
@@ -1319,6 +1335,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\tlcs90"
   RMDir "$INSTDIR\lib\src\mos6502"
   RMDir "$INSTDIR\lib\src\z80n"
+  RMDir "$INSTDIR\lib\src\r800"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
 
@@ -1352,6 +1369,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\tlcs90"
   RMDir "$INSTDIR\lib\mos6502"
   RMDir "$INSTDIR\lib\z80n"
+  RMDir "$INSTDIR\lib\r800"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"
 

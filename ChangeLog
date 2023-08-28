@@ -1,3 +1,11 @@
+2023-08-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/README.txt,
+	  doc/sdccman.lyx:
+	  Basic r800 port documentation.
+	* support/scripts/sdcc.nsi:
+	  Include r800 library in Windows installer.
+
 2023-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* Merge r800 branch to trunk.

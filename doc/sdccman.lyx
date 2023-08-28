@@ -274,7 +274,8 @@ Z80, Z180, SM83, Rabbit 2000/3000, Rabbit 3000A CPU
 
 \end_inset
 
-), Toshiba TLCS-90, Zilog eZ80 in Z80 mode, STMicroelectronics STM8 
+), Toshiba TLCS-90, Zilog eZ80 in Z80 mode, ASCII R800, STMicroelectronics
+ STM8 
 \begin_inset Index idx
 status collapsed
 
@@ -44627,7 +44628,7 @@ ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html
 
 \begin_layout Section
 The Z80, Z180, Rabbit 2000, Rabbit 2000A, Rabbit 3000A, SM83 (GameBoy),
- eZ80 and TLCS-90 ports
+ eZ80, TLCS-90 and R800 ports
 \end_layout
 
 \begin_layout Standard
@@ -44819,7 +44820,7 @@ For all Rabbit ports, SDCC assumes that all data memory is at least as fast
 \end_layout
 
 \begin_layout Subsection
-Z80, Z180 and Z80N calling conventions
+Z80, Z180, Z80N and R800 calling conventions
 \end_layout
 
 \begin_layout Standard

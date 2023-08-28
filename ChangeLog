@@ -5,6 +5,8 @@
 	  Basic r800 port documentation.
 	* support/scripts/sdcc.nsi:
 	  Include r800 library in Windows installer.
+	* src/z80/gen.c:
+	  Cost function fixes for z80-related backends.
 
 2023-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

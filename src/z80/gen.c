@@ -1355,7 +1355,10 @@ static void
 _push (PAIR_ID pairId)
 {
   emit2 ("push %s", _pairs[pairId].name);
-  regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY ? 2 : 1);
+  if (pairId == PAIR_IX || pairId == PAIR_IY)
+  	cost2 (2 - IS_TLCS90, 15, 14, 12, 16, 8, 4, 5);
+  else
+  	cost2 (1, 11, 11, 10, 16, 8, 3, 4);
   _G.stack.pushed += 2;
 }
 
@@ -1365,7 +1368,10 @@ _pop (PAIR_ID pairId)
   if (pairId != PAIR_INVALID)
     {
       emit2 ("pop %s", _pairs[pairId].name);
-      regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY ? 2 : 1);
+      if (pairId == PAIR_IX || pairId == PAIR_IY)
+  	    cost2 (2 - IS_TLCS90, 14, 12, 9, 12, 10, 4, 4);
+      else
+  	    cost2 (1, 10, 9, 7, 12, 10, 3, 3);
       _G.stack.pushed -= 2;
       spillPair (pairId);
     }
@@ -2355,7 +2361,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
           else if (IS_RAB && !new_high && (new_low == 1 && (old_high || old_low)) && f_dead)
             {
               emit2 ("bool hl");
-              regalloc_dry_run_cost++;
+              cost (1, 2);
               goto adjusted;
             }
           else if (new_high == old_high && new_low == old_high)
@@ -2388,12 +2394,15 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
   {
     emit2 ("bool hl");
     emit2 ("ld l, h");
-    regalloc_dry_run_cost += 2;
+    cost (1 + 1, 2 + 2);
   }
   else
   {
     emit2 ("ld %s, !hashedstr", pair, l);
-    regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY) ? 4 : 3;
+    if (pairId == PAIR_IX || pairId == PAIR_IY)
+      cost2 (4 - IS_TLCS90 , 14, 12, 8, 12, 6, 4, 4);
+    else
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
   }
 
 adjusted:
@@ -2459,7 +2468,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         {
           emit2 ("ld iy, !immed%d", spOffset(aop->aopu.aop_stk));
           emit2 ("add iy, sp");
-          regalloc_dry_run_cost += 6;
+          cost2 (6 - IS_TLCS90, 29, 22, 12, 0, 14, 6, 6);
           return;
         }
 
@@ -2497,7 +2506,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         {
           int fp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
           emit2 ("ld %s, %d (ix)", _pairs[pairId].name, fp_offset);
-          regalloc_dry_run_cost += 3;
+          cost (3, 5);
         }
       /* Getting the parameter by a pop / push sequence is cheaper when we have a free pair (except for the Rabbit, which has an even cheaper sp-relative load).
          SM83 is nearly twice as fast doing it byte by byte, but that's a byte bigger.
@@ -2719,14 +2728,14 @@ setupPairFromSP (PAIR_ID id, int offset)
   if (_G.preserveCarry)
     {
       _push (PAIR_AF);
-      regalloc_dry_run_cost++;
+      cost2 (1, 11, 11, 10, 16, 8, 3, 4);
       offset += 2;
     }
 
   if (id == PAIR_DE && !IS_SM83) // TODO: Could hl be in use for sm83, so it needs to be saved and restored?
     {
       emit2 ("ex de, hl");
-      regalloc_dry_run_cost++;
+      cost2 (1, 4, 3, 2, 0, 2, 1, 1);
     }
 
   if (offset < INT8MIN || offset > INT8MAX || id == PAIR_IY)
@@ -2750,7 +2759,7 @@ setupPairFromSP (PAIR_ID id, int offset)
   if (id == PAIR_DE && !IS_SM83)
     {
       emit2 ("ex de, hl");
-      regalloc_dry_run_cost++;
+      cost2 (1, 4, 3, 2, 0, 2, 1, 1);
     }
   else if (id == PAIR_DE)
     {
@@ -2761,7 +2770,7 @@ setupPairFromSP (PAIR_ID id, int offset)
   if (_G.preserveCarry)
     {
       _pop (PAIR_AF);
-      regalloc_dry_run_cost++;
+      cost2 (1, 10, 9, 7, 12, 6, 3, 3);
       offset -= 2;
     }
     
@@ -3462,8 +3471,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       _push (PAIR_AF); // Preserve f
       emit2 ("ld hl, !immed%d", spOffset(from->aopu.aop_stk));
       emit2 ("add hl, sp");
-      _pop (PAIR_AF);
       regalloc_dry_run_cost += 4;
+      _pop (PAIR_AF);
       spillPair (PAIR_HL);
       cheapMove (to, to_offset, ASMOP_HL, from_offset, a_dead);
       if (aopInReg (to, to_offset, L_IDX))
@@ -3698,7 +3707,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy) // Obsol
   else if (IS_EZ80_Z80 && aop->type == AOP_STK)
     {
       emit2 ("ld %d (ix), %s", fp_offset, _pairs[id].name);
-      regalloc_dry_run_cost += 3;
+      cost (3, 5);
     }
   else if (!regalloc_dry_run && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset)
     {
@@ -4492,7 +4501,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emit2 ("lea %s, ix, !immed%d", _pairs[getPairId_o(result, roffset)].name, fpOffset (source->aopu.aop_stk));
           spillPair (getPairId_o(result, roffset));
-          regalloc_dry_run_cost += 3;
+          cost (3, 3);
           i += 2;
           continue;
         }
@@ -4502,10 +4511,10 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             _push (PAIR_AF);
           emit2 ("ld iy, !immed%d", spOffset (source->aopu.aop_stk));
           emit2 ("add iy, sp");
+          cost2 (6 - IS_TLCS90, 29, 22, 12, 0, 14, 6, 6);
           if (!f_dead)
             _pop (PAIR_AF);
           spillPair (PAIR_IY);
-          regalloc_dry_run_cost += 6 + 2 * !f_dead;
           i += 2;
           continue;
         }
@@ -4514,7 +4523,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           if (!hl_dead)
             {
               emit2 ("ex de, hl");
-              regalloc_dry_run_cost++;
+              cost2 (1, 4, 3, 2, 0, 2, 1, 1);
             }
           else
             spillPair (PAIR_HL);
@@ -4525,7 +4534,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           if (!f_dead)
             _pop (PAIR_AF);
           emit2 ("ex de, hl");
-          regalloc_dry_run_cost += 5 + 2 * !f_dead;;
+          regalloc_dry_run_cost += 5;
           spillPair (PAIR_DE);
           i += 2;
           continue;
@@ -4540,7 +4549,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           emit2 ("add hl, sp");
           if (!f_dead)
             _pop (PAIR_AF);
-          regalloc_dry_run_cost += 4 + 2 * !f_dead;;
+          regalloc_dry_run_cost += 4;
           spillPair (PAIR_HL);
           genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead, true, de_dead_global, iy_dead, f_dead);
           i += 2;
@@ -4555,7 +4564,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           if (!regalloc_dry_run)
             emit2 ("ld %s, hl", aopGet (result, roffset + i, false));
           cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 5, 0);
-          regalloc_dry_run_cost += 3;
           value_hl = ullFromVal (source->aopu.aop_lit) >> ((soffset + i) * 8) & 0xffff;
           i += 2;
           continue;
@@ -4600,7 +4608,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       if (size > 1 && result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead && source->regs[A_IDX] <= i && f_dead)
         {
           emit3 (A_XOR, ASMOP_A, ASMOP_A);
-          regalloc_dry_run_cost += 1;
           zeroed_a = true;
         }
 
@@ -4624,7 +4631,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       else if (aopIsLitVal (source, soffset + i, 1, 0x00) && aopInReg (result, roffset + i, A_IDX) && f_dead)
         {
           emit3 (A_XOR, ASMOP_A, ASMOP_A);
-          regalloc_dry_run_cost += 1;
           zeroed_a = true;
         }
       else
@@ -4765,7 +4771,6 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
       emit2 ("ld sp, hl");
       spillPair (PAIR_HL);
       cost2 (5, 27, 20, 10, 28, 18, 4, 5);
-      regalloc_dry_run_cost += 5;
       n -= n;
     }
   else if ((optimize.codeSpeed ?
@@ -4780,7 +4785,6 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
       emit2 ("ex de, hl");
       spillPair (PAIR_DE);
       cost2 (7, 35, 26, 14, 0, 22, 6, 7);
-      regalloc_dry_run_cost += 5;
       n -= n;
     }
   else if ((optimize.codeSpeed ?
@@ -4793,7 +4797,6 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
       emit2 ("ld sp, iy");
       spillPair (PAIR_IY);
       cost2 (IS_TLCS90 ? 7 : 8, 39, 26, 16, 0, 20, 8, 8);
-      regalloc_dry_run_cost += 8;
       n -= n;
     }
   else if (loop_bytes >= 9 && bc_free)
@@ -4953,8 +4956,8 @@ _toBoolean (const operand *oper, bool needflag)
     {
       if (skipbyte != size - 1)
         UNIMPLEMENTED;
-      emit2 ("res 7, a");   //clear sign bit
-      regalloc_dry_run_cost += 2;
+      emit2 ("res 7, a");   // clear sign bit
+      cost2 (2, 8, 7, 4, 8, 4, 2, 2);
       skipbyte = size - 1;
     }
   while (size--)
@@ -5123,8 +5126,7 @@ genNot (const iCode * ic)
   else if (IS_BOOL (operandType (left)))
     {
       cheapMove (ASMOP_A, 0, left->aop, 0, true);
-      emit2 ("xor a, !immedbyte", 0x01u);
-      regalloc_dry_run_cost += 2;
+      emit3 (A_XOR, ASMOP_A, ASMOP_ONE);
       cheapMove (result->aop, 0, ASMOP_A, 0, true);
       goto release;
     }
@@ -9193,7 +9195,6 @@ genIfxJump (iCode * ic, char *jval)
       if (!strcmp (jval, "a"))
         {
           emit3 (A_OR, ASMOP_A, ASMOP_A);
-          regalloc_dry_run_cost++;
           inst = "Z";
         }
       else if (!strcmp (jval, "z"))
@@ -12243,8 +12244,7 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
       emit2 ("xor a, a");
       regalloc_dry_run_cost++;
       pointPairToAop (PAIR_HL, result->aop, 0);
-      emit2 ("rld");
-      regalloc_dry_run_cost += 2;
+      emit3 (A_RLD, 0, 0);
     }
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
@@ -12804,11 +12804,9 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
   else if (!IS_SM83 && !IS_RAB && !is_signed && aopSame (result->aop, 0, left->aop, 0, 1) && shCount == 4 && isPairDead (PAIR_HL, ic) && isRegDead (A_IDX, ic) &&
     (result->aop->type == AOP_DIR || result->aop->type == AOP_HL || result->aop->type == AOP_IY))
     {
-      emit2 ("xor a, a");
-      regalloc_dry_run_cost++;
+      emit3 (A_XOR, ASMOP_A, ASMOP_A);
       pointPairToAop (PAIR_HL, result->aop, 0);
-      emit2 ("rrd");
-      regalloc_dry_run_cost += 2;
+      emit3 (A_RRD, 0, 0);
     }
   else if (!is_signed && // Shifting in the accumulator is cheap for unsigned operands.
     (aopInReg (result->aop, 0, A_IDX) ||
@@ -16661,7 +16659,7 @@ dryZ80iCode (iCode * ic)
       spillPair (pairId);
   }
 
-  return (regalloc_dry_run_cost + regalloc_dry_run_cost_bytes);
+  return (regalloc_dry_run_cost + regalloc_dry_run_cost_bytes); // Hack, since the legacy regalloc_dry_run_cost is still used often, and regalloc_dry_run_cost_states is still incomplete.
 }
 
 #ifdef DEBUG_DRY_COST

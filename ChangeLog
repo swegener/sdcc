@@ -1,3 +1,12 @@
+2023-08-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asrab/rab.h,
+	  sdas/asrab/rabmch.c,
+	  sdas/asrab/rabpst.c:
+	  Fix handling of some valid instructions in Rabbit assembler (bug #3639, patch by by D-mo).
+	* support/regression/tests/bug-3639.c:
+	  Regression test for bug #3639.
+
 2023-08-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/README.txt,

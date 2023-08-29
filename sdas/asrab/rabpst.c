@@ -286,6 +286,7 @@ struct  mne     mne[] = {
     {   NULL,   "lcall",        X_LCALL,        0,      0xCF    },
     {   NULL,   "lret",         S_INH2,         0,      0x45    },
     {   NULL,   "bool",         X_BOOL,         0,      0xCC    },
+    {   NULL,   "ldp",          X_LDP,          0,      0x64    },
     {   NULL,   "syscall",      R4K_INH2,       0,      0x75    },
     {   NULL,   "sysret",       R4K_INH2,       0,      0x83    },
     {   NULL,   "mulu",         X_R4K_MULU,     S_EOL,  0xA7    }

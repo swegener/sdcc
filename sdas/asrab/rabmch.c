@@ -1084,6 +1084,81 @@ VOID  machine(struct mne * mp)
                 xerr('a', "Invalid Addressing Mode.");
                 break;
 
+        case X_LDP:
+                t1 = addr(&e1);
+                v1 = (int) e1.e_addr;
+                comma(1);
+                t2 = addr(&e2);
+                v2 = (int) e2.e_addr;
+                /* LDP (mn), HL|IX|IY */
+                if ((t1 == S_INDM) && (t2 == S_R16)) {
+                        if ((v2 != HL) && (v2 != IX) && (v2 != IY)) {
+                                aerr();
+                                break;
+                        }
+                        if (v2 == HL) {
+                                outab(0xED);
+                        } else {
+                                gixiy(v2);
+                        }
+                        outab(op | 0x01);
+                        outrw(&e1, 0);
+                        break;
+                }
+                /* LDP HL|IX|IY, (mn) */
+                if ((t1 == S_R16) && (t2 == S_INDM)) {
+                        if ((v1 != HL) && (v1 != IX) && (v1 != IY)) {
+                                aerr();
+                                break;
+                        }
+                        if (v1 == HL) {
+                                outab(0xED);
+                        } else {
+                                gixiy(v1);
+                        }
+                        outab(op | 0x09);
+                        outrw(&e2, 0);
+                        break;
+                }
+                /* LDP (HL|IX|IY), HL */
+                if ((t2 == S_R16) && (v2 == HL)) {
+                        if ((t1 != S_IDHL) && (t1 != S_IDIX) && (t1 != S_IDIY)) {
+                                aerr();
+                                break;
+                        }
+                        if ((e1.e_base.e_ap != NULL) || (v1 != 0)) {
+                                aerr();
+                                break;
+                        }
+                        if (t1 == S_IDHL) {
+                                outab(0xED);
+                        } else {
+                                gixiy(t1);
+                        }
+                        outab(op);
+                        break;
+                }
+                /* LDP HL, (HL|IX|IY) */
+                if ((t1 == S_R16) && (v1 == HL)) {
+                        if ((t2 != S_IDHL) && (t2 != S_IDIX) && (t2 != S_IDIY)) {
+                                aerr();
+                                break;
+                        }
+                        if ((e2.e_base.e_ap != NULL) || (v2 != 0)) {
+                                aerr();
+                                break;
+                        }
+                        if (t2 == S_IDHL) {
+                                outab(0xED);
+                        } else {
+                                gixiy(t2);
+                        }
+                        outab(op | 0x08);
+                        break;
+                }
+                aerr();
+                break;
+
         case R3K_INH1:
                 if (!(r3k_mode || r4k_mode))
                         xerr('o', "A Rabbit 3000/4000 Instruction.");

@@ -1035,6 +1035,8 @@ optimizeNarrowOpCandidate (struct valinfo *v, operand *op, const iCode *ic)
             ;
           else if (uic->op == GET_VALUE_AT_ADDRESS && !isOperandEqual (IS_INTEGRAL (operandType (op)) ? uic->left : uic->right, op))
             ;
+          else if (POINTER_SET (uic) && isOperandEqual (uic->result, op))
+            ;
           else 
             {
               v->anything = true;
@@ -1090,6 +1092,8 @@ optimizeNarrowResultCandidate (struct valinfo *v, operand *op, const iCode *ic)
             ;
           else if (uic->op == GET_VALUE_AT_ADDRESS && !isOperandEqual (IS_INTEGRAL (operandType (op)) ? uic->left : uic->right, op))
             ;
+          else if (POINTER_SET (uic) && isOperandEqual (uic->result, op))
+            ;
           else
             {
               v->anything = true;
@@ -1119,6 +1123,8 @@ reTypeOp (operand *op, sym_link *newtype)
         setOperandType (uic->left, newtype);
       if (isOperandEqual (op, uic->right))
         setOperandType (uic->right, newtype);
+      if (POINTER_SET (uic) && isOperandEqual (op, uic->result))
+        setOperandType (uic->result, newtype);
     }
   freeBitVect (uses);
 
@@ -1312,6 +1318,8 @@ static void
 optimizeUnaryOpWithoutResult (iCode *ic)
 {
   operand *op = (ic->op == '!' || ic->op == IFX || ic->op == GET_VALUE_AT_ADDRESS) ? ic->left : ic->right;
+  if (POINTER_SET (ic))
+    op = ic->result;
 
   if (!IS_INTEGRAL (operandType (op)) && !IS_PTR (operandType (op)) || !IS_ITEMP (op))
     return;
@@ -1501,7 +1509,7 @@ optimizeValinfoNarrow (iCode *sic)
         optimizeBinaryOpWithoutResult (ic);
       else if (ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)
         optimizeBinaryOpWithResult (ic);
-      else if (ic->op == '!' || ic->op == CAST || ic->op == IFX || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == ROT || ic->op == GET_VALUE_AT_ADDRESS)
+      else if (ic->op == '!' || ic->op == CAST || ic->op == IFX || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == ROT || ic->op == GET_VALUE_AT_ADDRESS || POINTER_SET(ic))
         optimizeUnaryOpWithoutResult (ic);
       else if (ic->op == '~' || ic->op == UNARYMINUS || ic->op == LEFT_OP || ic->op == RIGHT_OP) // Not ROT, since the width of the left operand matters for the semantics.
         optimizeUnaryOpWithResult (ic);

@@ -1,5 +1,11 @@
 2023-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc,
+	  src/pdk/gen.c:
+	  Optimize some pointer writes using intrinsic named address space information from generalized constant propagation.
+
+2023-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* support/regression/tests/bitintshift.c.in:
 	  Disable parts of test that fail due to known bug #3634.
 

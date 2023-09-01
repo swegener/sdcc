@@ -3006,6 +3006,8 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
                 cost (250, 250);
                 wassert (regalloc_dry_run);
               }
+            if (!aopInReg (left->aop, i, A_IDX) && !regDead (A_IDX, ic))
+              UNIMPLEMENTED;
             cheapMove (ASMOP_A, 0, left->aop, i, true, true, true);
             if (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i)
               {

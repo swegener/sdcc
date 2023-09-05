@@ -1,3 +1,7 @@
+2023-09-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genAssignLit): fix bug #3641
+
 2023-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc,

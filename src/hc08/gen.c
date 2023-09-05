@@ -10304,7 +10304,6 @@ genAssignLit (operand * result, operand * right)
           assigned[offset] = 1;
           assigned[offset+1] = 1;
         }
-      return true;
     }
 
   remaining = size;

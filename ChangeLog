@@ -1,3 +1,8 @@
+2023-09-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3641.c:
+	  Regression test for bug #3641.
+
 2023-09-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genAssignLit): fix bug #3641

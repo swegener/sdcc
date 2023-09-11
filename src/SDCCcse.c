@@ -2441,6 +2441,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
                       if (bitVectBitValue (ebb->ndompset, IC_LEFT (ic)->key))
                           ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, pdop->key);
                       ReplaceOpWithCheaperOp (&IC_LEFT (ic), pdop);
+                      SET_ISADDR (IC_LEFT (ic), 1);
                       change = replaced = 1;
                     }
                   /* check if there is a pointer set

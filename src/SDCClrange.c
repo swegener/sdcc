@@ -1136,7 +1136,11 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
               for (iCode *ic = setFirstItem (visited); ic; ic = setNextItem (visited))
                 {
                   if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic)) == sym && (!ic->prev || isinSet (visited, ic->prev)))
-                    IC_LEFT (ic) = operandFromOperand (tmpop);
+                    {
+                      bool pget = POINTER_GET (ic);
+                      IC_LEFT (ic) = operandFromOperand (tmpop);
+                      SET_ISADDR (IC_LEFT (ic), pget);
+                    }
                   if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic)) == sym && (!ic->prev || isinSet (visited, ic->prev)))
                     IC_RIGHT (ic) = operandFromOperand (tmpop);
                   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym && !POINTER_SET(ic) &&

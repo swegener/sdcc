@@ -1,3 +1,9 @@
+2023-09-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCcse.c,
+	  src/SDCClrange.c:
+	  Fix issues that resulted in isaddr flag value loss, confusing the ds390 register allocator.
+
 2023-09-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3641.c:

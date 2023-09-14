@@ -1054,7 +1054,7 @@ optimizeNarrowOpNet (iCode *ic)
   struct valinfo v = *(ic->resultvalinfo);
 
 #if 0
-  std::cout << "optimizeNarrowNet at ic " << ic->key << ": " << OP_SYMBOL (ic->result)->name << "\n"; std::cout.flush();
+  std::cout << "optimizeNarrowOpNet at ic " << ic->key << ": " << OP_SYMBOL (ic->result)->name << "\n"; std::cout.flush();
 #endif
 
   while (!checknet.empty())

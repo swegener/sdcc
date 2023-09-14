@@ -33,7 +33,7 @@ testMM(void)
 {
 // PNVI-ae-udi non-compliance in PPC for at least GCC 4.9.2 and GCC 7.2.0
 #if !(defined(__GNUC__) && (defined(__PPC__) || defined(__POWERPC__))) 
-#if !(defined(__clang__) && __clang_major__ <= 13) // On FreeBSD 13 on arch64, this test fails for clang 11 and clang 13. On amd64 it fails for clang 6, but passes with clang 14.
+#if !defined(__FreeBSD__) || !(defined(__clang__) && __clang_major__ <= 14) // On FreeBSD 13 on arch64, this test fails for clang 11, clang 13 and clang14. On amd64 it fails for clang 6, but passes with clang 14. FreeBSD bug #273773.
   int y=2, x=1;
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;

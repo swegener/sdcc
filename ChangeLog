@@ -1,3 +1,12 @@
+2023-09-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c,
+	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c,
+	  support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_global_xy.c,
+	  support/regression/tests/setjmp.c,
+	  support/regression/tests/wchar.c.in:
+	  Disable tests where they fail due to known FreeBSD 13 bugs.
+
 2023-09-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCcse.c,
@@ -8,7 +17,7 @@
 	* support/regression/tests/bug-3641.c:
 	  Disable test for target where it fails due to known bug #3643.
 
-2023-09-09 Philipp Klaus Krause <philipp@colecovision.eu>
+2023-09-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3641.c:
 	  Support pre-C23 hosts in test for bug #3641.

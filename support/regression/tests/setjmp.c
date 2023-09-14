@@ -76,7 +76,7 @@ testJmp (void)
     }
   ASSERT (exception == 1);
   
-#if !defined(__FreeBSD__) || __FreeBSD_version > 1301000
+#if !defined(__FreeBSD__) || __FreeBSD_version >= 1302000 // Known FreeBSD 13.0 and 13.1 bug #255320.
   f1();
 #endif
 #endif

@@ -7,7 +7,7 @@
 #endif
 
 #include <stddef.h> // For wchar_t
-#ifndef PORT_HOST // Too many old host compilers out there
+#if defined(__SDCC) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__APPLE__) && !defined(__OpenBSD__) // As of 2023, macOS and OpenBSD are still not fully C11-compliant: they lack uchar.h.
 #include <uchar.h> // For char16_t, char32_t
 #endif
 
@@ -15,7 +15,7 @@ void
 testEscape(void)
 {
   volatile char c;
-#ifndef PORT_HOST // Too many old host compilers out there
+#if defined(__SDCC) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__APPLE__) && !defined(__OpenBSD__) // As of 2023, macOS and OpenBSD are still not fully C11-compliant: they lack uchar.h.
   volatile char16_t u;
 #endif
 
@@ -23,7 +23,7 @@ testEscape(void)
   c = '\x55';
   ASSERT (c == 0x55);
 
-#ifndef PORT_HOST // Too many old host compilers out there
+#if defined(__SDCC) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__APPLE__) && !defined(__OpenBSD__) // As of 2023, macOS and OpenBSD are still not fully C11-compliant: they lack uchar.h.
   ASSERT (u'\777' == 0777);
   u = u'\777';
   ASSERT (u == 0777);

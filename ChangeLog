@@ -1,3 +1,11 @@
+2023-09-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/charconst.c,
+	  support/regression/tests/escape.c,
+	  support/regression/tests/new_wide.c,
+	  support/regression/tests/string.c:
+	  Handle hosts that are C11-compliant on the compiler side, but not the library side better.
+
 2023-09-14 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c,

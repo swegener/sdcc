@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#ifndef PORT_HOST
+#if defined(__SDCC) || defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__APPLE__) && !defined(__OpenBSD__) // As of 2023, macOS and OpenBSD are still not fully C11-compliant: they lack uchar.h.
 #include <uchar.h>
 #endif
 

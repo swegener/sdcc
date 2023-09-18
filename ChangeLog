@@ -3,8 +3,11 @@
 	* support/regression/tests/charconst.c,
 	  support/regression/tests/escape.c,
 	  support/regression/tests/new_wide.c,
-	  support/regression/tests/string.c:
+	  support/regression/tests/string.c,
+	  support/regression/tests/wchar.c.in:
 	  Handle hosts that are C11-compliant on the compiler side, but not the library side better.
+	* support/regression/tests/wchar.c.in:
+	  Disable a test for OpenBSD, where it fails due to known OpenBSD bug.
 
 2023-09-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

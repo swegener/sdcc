@@ -159,8 +159,8 @@ extern	VOID		minit(void);
 extern	VOID		opcy_aerr(void);
 extern	VOID		valu_aerr(struct expr *e, int n);
 extern	int		ls_mode(struct expr *e);
-extern	int		setbit(int b);
-extern	int		getbit(void);
+extern	unsigned		setbit(unsigned b);
+extern	unsigned		getbit(void);
 
 #else
 
@@ -179,8 +179,8 @@ extern	VOID		minit();
 extern	VOID		opcy_aerr();
 extern	VOID		valu_aerr();
 extern	int		ls_mode();
-extern	int		setbit();
-extern	int		getbit();
+extern	unsigned		setbit();
+extern	unsigned		getbit();
 
 #endif
 

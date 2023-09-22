@@ -611,8 +611,8 @@ lstarea(struct area *xp, struct bank *yp)
                 if (wflag) {
                         fprintf(mfp, "%-32.32s", ptr);
                         i++;
-                        ptr = &sp->m_id[0];
-                        if(ptr) {
+                        if(sp->m_id) {
+                                ptr = &sp->m_id[0];
                                 fprintf(mfp, "   %-.28s", ptr);
                         }
                 } else {

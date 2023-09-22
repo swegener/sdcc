@@ -31,9 +31,9 @@ char	*dsft	= "asm";
 
 #define	NB	512
 
-int	*bp;
-int	bm;
-int	bb[NB];
+unsigned	*bp;
+unsigned	bm;
+unsigned	bb[NB];
 
 /*
  * Opcode Cycle Definitions
@@ -1811,9 +1811,9 @@ int
 ls_mode(e)
 struct expr *e;
 {
-	int flag, v;
+	unsigned flag, v;
 
-	v = (int) e->e_addr;
+	v = (unsigned) e->e_addr;
 	/*
 	 * 1) area based arguments (e_base.e_ap != 0) use longer mode
 	 * 2) constant arguments (e_base.e_ap == 0) use
@@ -1920,9 +1920,9 @@ minit()
  * Store `b' in the next slot of the bit table.
  * If no room, force the longer form of the offset.
  */
-int
+unsigned
 setbit(b)
-int b;
+unsigned b;
 {
 	if (bp >= &bb[NB])
 		return(1);
@@ -1941,10 +1941,10 @@ int b;
  * If none left, return a `1'.
  * This will force the longer form of the offset.
  */
-int
+unsigned
 getbit()
 {
-	int f;
+	unsigned f;
 
 	if (bp >= &bb[NB])
 		return (1);

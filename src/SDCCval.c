@@ -2651,26 +2651,26 @@ valPlus (value * lval, value * rval, bool reduceType)
     {
       if (SPEC_USIGN (val->type))
         {
-          SPEC_CVAL (val->type).v_ulonglong = (TYPE_TARGET_ULONGLONG) ullFromVal (lval) + (TYPE_TARGET_ULONGLONG) ullFromVal (rval);
+          SPEC_CVAL (val->type).v_ulonglong = (TYPE_TARGET_ULONGLONG)(ullFromVal (lval) + ullFromVal (rval));
           if (IS_BITINT (val->type)) // unsigned wrap-around
             SPEC_CVAL (val->type).v_ulonglong &= (0xffffffffffffffffull >> (64 - SPEC_BITINTWIDTH (val->type)));
         }
       else
-        SPEC_CVAL (val->type).v_longlong = (TYPE_TARGET_LONGLONG) ullFromVal (lval) + (TYPE_TARGET_LONGLONG) ullFromVal (rval);
+        SPEC_CVAL (val->type).v_longlong = (TYPE_TARGET_LONGLONG)(ullFromVal (lval) + ullFromVal (rval));
     }
   else if (SPEC_LONG (val->type))
     {
       if (SPEC_USIGN (val->type))
-        SPEC_CVAL (val->type).v_ulong = (TYPE_TARGET_ULONG) ulFromVal (lval) + (TYPE_TARGET_ULONG) ulFromVal (rval);
+        SPEC_CVAL (val->type).v_ulong =  (TYPE_TARGET_ULONG)(ulFromVal (lval) + ulFromVal (rval));
       else
-        SPEC_CVAL (val->type).v_long = (TYPE_TARGET_LONG) ulFromVal (lval) + (TYPE_TARGET_LONG) ulFromVal (rval);
+        SPEC_CVAL (val->type).v_long = (TYPE_TARGET_LONG)(ulFromVal (lval) + ulFromVal (rval));
     }
   else
     {
       if (SPEC_USIGN (val->type))
-        SPEC_CVAL (val->type).v_uint = (TYPE_TARGET_UINT) ulFromVal (lval) + (TYPE_TARGET_UINT) ulFromVal (rval);
+        SPEC_CVAL (val->type).v_uint =  (TYPE_TARGET_UINT)(ulFromVal (lval) + ulFromVal (rval));
       else
-        SPEC_CVAL (val->type).v_int = (TYPE_TARGET_INT) ulFromVal (lval) + (TYPE_TARGET_INT) ulFromVal (rval);
+        SPEC_CVAL (val->type).v_int =  (TYPE_TARGET_INT)(ulFromVal (lval) + ulFromVal (rval));
     }
   return reduceType ? cheapestVal (val) : val;
 }
@@ -2759,7 +2759,7 @@ valShift (value * lval, value * rval, int lr, bool reduceType)
       else
         {
           SPEC_CVAL (val->type).v_longlong = lr ?
-            (TYPE_TARGET_LONGLONG) ullFromVal (lval) << (TYPE_TARGET_ULONGLONG) ullFromVal (rval) :
+            (TYPE_TARGET_LONGLONG) (ullFromVal (lval) << (TYPE_TARGET_ULONGLONG) ullFromVal (rval)) :
             (TYPE_TARGET_LONGLONG) ullFromVal (lval) >> (TYPE_TARGET_ULONGLONG) ullFromVal (rval);
         }
     }
@@ -2774,7 +2774,7 @@ valShift (value * lval, value * rval, int lr, bool reduceType)
       else
         {
           SPEC_CVAL (val->type).v_long = lr ?
-            (TYPE_TARGET_LONG) ulFromVal (lval) << (TYPE_TARGET_ULONG) ulFromVal (rval) :
+            (TYPE_TARGET_LONG) (ulFromVal (lval) << (TYPE_TARGET_ULONG) ulFromVal (rval)) :
             (TYPE_TARGET_LONG) ulFromVal (lval) >> (TYPE_TARGET_ULONG) ulFromVal (rval);
         }
     }
@@ -2789,7 +2789,7 @@ valShift (value * lval, value * rval, int lr, bool reduceType)
       else
         {
           SPEC_CVAL (val->type).v_int = lr ?
-            (TYPE_TARGET_INT) ulFromVal (lval) << (TYPE_TARGET_ULONG) ulFromVal (rval) :
+            (TYPE_TARGET_INT) (ulFromVal (lval) << (TYPE_TARGET_ULONG) ulFromVal (rval)) :
             (TYPE_TARGET_INT) ulFromVal (lval) >> (TYPE_TARGET_ULONG) ulFromVal (rval);
         }
     }

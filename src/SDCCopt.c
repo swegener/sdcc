@@ -2783,7 +2783,7 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* Special case: Second use is a bit test */
               if (uic->op == BITWISEAND && IS_OP_LITERAL (IC_RIGHT (uic)) && ifxForOp (IC_RESULT (uic), uic))
                 {
-                  unsigned long long mask = operandLitValue (IC_RIGHT (uic));
+                  unsigned long long mask = operandLitValueUll (IC_RIGHT (uic));
 
                   /* Signed cast might set bits above the width of type1 */
                   if (!SPEC_USIGN (type1) && (mask >> (bitsForType (type1))))

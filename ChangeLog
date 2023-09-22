@@ -1,3 +1,12 @@
+2023-09-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asstm8/stm8.h,
+	  sdas/asstm8/stm8mch.c,
+	  sdas/linksrc/lklist.c,
+	  src/SDCCopt.c,
+	  src/SDCCval.c:
+	  Fix a few cases of undefined behavior.
+
 2023-09-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/charconst.c,

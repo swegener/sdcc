@@ -94,7 +94,7 @@ skip_gsinit:
 	reti
 
 	; Secondary Watchdog - Rabbit 3000A only
-	.org	0x100
+	.org	0x110
 	reti
 
 	; rst 0x10

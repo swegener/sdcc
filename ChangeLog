@@ -6,6 +6,8 @@
 	  src/SDCCopt.c,
 	  src/SDCCval.c:
 	  Fix a few cases of undefined behavior.
+	* device/lib/r*k*/crt0.s:
+	  Fix location of secondary watchdog interrupt vector (part of bug #3652).
 
 2023-09-18 Philipp Klaus Krause <philipp@colecovision.eu>
 

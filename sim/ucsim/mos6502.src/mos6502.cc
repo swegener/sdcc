@@ -680,6 +680,24 @@ cl_mos6502::print_regs(class cl_console_base *con)
 }
 
 int
+cl_mos6502::inst_length(t_addr addr)
+{
+  struct dis_entry *de= get_dis_entry(addr);
+  if (!de)
+    return 0;
+  return de->length;
+}
+
+bool
+cl_mos6502::is_call(t_addr addr)
+{
+  struct dis_entry *de= get_dis_entry(addr);
+  if (!de)
+    return false;
+  return de->branch == 's';
+}
+
+int
 cl_mos6502::exec_inst(void)
 {
   int res;

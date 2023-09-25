@@ -127,6 +127,8 @@ public:
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
 
   virtual void print_regs(class cl_console_base *con);
+  virtual int inst_length(t_addr addr);
+  virtual bool is_call(t_addr addr);
 
   virtual int exec_inst(void);
   virtual int priority_of(uchar nuof_it) { return nuof_it; }

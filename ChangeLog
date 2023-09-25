@@ -1,3 +1,8 @@
+2023-09-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c:
+	  Disable test for FreeBSD 13 / clang-14, where it fails due to known bug.
+
 2023-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/mos6502-stack-auto/crt0.s,

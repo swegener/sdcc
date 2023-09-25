@@ -1,10 +1,8 @@
 /* bug-3563.c
-   A paramter passing issue in the mcs51 port when using --stack-auto.
+   A parameter passing issue in the mcs51 port when using --stack-auto.
  */
 
 // According to bug reporter, his reproducing sample code, from which this regression test is derived, was derived from TinyUSb. TinyUSB is under MIT license.
-
-#pragma disable_warning 85
 
 #include <testfwk.h>
 
@@ -16,6 +14,7 @@
 bool check_now;
 
 void my_putchar(char c) {
+  (void)c;
 }
 
 void my_putchar_hex(uint8_t c) {
@@ -57,7 +56,6 @@ void _ff_pull(tu_fifo_t* f, void * app_buf, uint16_t rel)
 
   my_puts("rel="); my_putchar_hex(rel >> 8); my_putchar_hex(rel & 0xff); my_putchar('\n');
   my_puts("app_buf="); my_putchar_hex((uintptr_t)app_buf >> 8); my_putchar_hex((uintptr_t)app_buf & 0xff); my_putchar('\n');
-
 }
 
 static bool _tu_fifo_peek(tu_fifo_t* f, void * p_buffer, uint16_t wr_idx, uint16_t rd_idx)
@@ -79,9 +77,7 @@ static bool _tu_fifo_peek(tu_fifo_t* f, void * p_buffer, uint16_t wr_idx, uint16
 
 uint8_t app_buf[2];
 
-int m() {
-    //TI = 1;
-
+int m(void) {
     uint8_t buf[32];
 
     tu_fifo_t fifo = {
@@ -105,10 +101,10 @@ int m() {
 void
 testBug (void)
 {
-#ifndef __SDCC_mcs51 // This bug #3565 is not yet fixed.
+//#ifndef __SDCC_mcs51 // This bug #3563 is not yet fixed.
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   m ();
 #endif
-#endif
+//#endif
 }
 

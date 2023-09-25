@@ -1,3 +1,5 @@
+#pragma disable_warning 84
+
 int foo (int b, int c)
 {
   int x;

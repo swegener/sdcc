@@ -1,3 +1,19 @@
+2023-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/mos6502-stack-auto/crt0.s,
+	* device/lib/mos6502/crt0.s: clear zero page, reorder areas
+	* src/mos6502/main.c(m6502_finaliseOptions): use whole zero page,
+	  improved default memory map
+	  (m6502_genAssemblerPreamble): move __DPTR & __TEMP to fixed
+	  address from 0 and up,
+	  (m6502_genIVT): fixed, allow only 2 interrupts
+	* support/regression/ports/uc6502-stack-auto/spec.mk,
+	* support/regression/ports/uc6502/spec.mk: use more logical memory map
+	* support/regression/gte/pr34099.c: suppress valid warning
+	* support/regression/gte/pr97404.c,
+	* support/regression/gte/pr97836.c,
+	* support/regression/tests/bug-3563.c: fixed warnings
+
 2023-09-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asstm8/stm8.h,

@@ -1,6 +1,6 @@
 int a;
 
-int b(int c) { return 0; }
+int b(int c) { (void)c; return 0; }
 
 static int *d(int *e) {
   if (a) {

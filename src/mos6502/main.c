@@ -187,10 +187,10 @@ m6502_setDefaultOptions (void)
 //  options.intlong_rent = 1;
 //  options.float_rent = 1;
 //  options.noRegParams = 0;
-  options.code_loc = 0x200;
-  options.data_loc = 0x20;	/* zero page */
-  options.xdata_loc = 0x0;      /* 0 means immediately following data */
-  options.stack_loc = 0x1ff;
+  options.code_loc = 0x8000;
+  options.data_loc = 0x0001;    /* Zero page, We can't use the byte at address zero in C, since NULL pointers have special meaning */
+  options.xdata_loc = 0x0200;   /* immediately following stack */
+  options.stack_loc = 0x01ff;
 
   options.omitFramePtr = 1;     /* no frame pointer (we use SP */
                                 /* offsets instead)            */
@@ -208,18 +208,16 @@ m6502_getRegName (const struct reg_info *reg)
 static void
 m6502_genAssemblerPreamble (FILE * of)
 {
-  symbol *mainExists=newSymbol("main", 0);
-  mainExists->block=0;
+  symbol *mainExists = newSymbol("main", 0);
+  mainExists->block = 0;
 
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists)))
     {
       // global variables in zero page
-      fprintf (of, "\t.globl __TEMP\n");
-      fprintf (of, "\t.globl __DPTR\n");
-      
-      fprintf (of, "\t.area %s\n",port->mem.data_name);
-      fprintf (of, "__TEMP:\t.ds %d\n", NUM_TEMP_REGS);
-      fprintf (of, "__DPTR:\t.ds 2\n");
+      fprintf (of, "\t.area\tZPABS (ABS,PAG)\n");
+      fprintf (of, "\t.org\t0\n");
+      fprintf (of, "__DPTR::\t.ds 2\n");
+      fprintf (of, "__TEMP::\t.ds %d\n", NUM_TEMP_REGS);
     }
 }
 
@@ -236,27 +234,19 @@ m6502_genAssemblerEnd (FILE * of)
 static int
 m6502_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
-  int i;
-
   dbuf_printf (oBuf, "\t.area\tCODEIVT (ABS)\n");
-  dbuf_printf (oBuf, "\t.org\t0x%04x\n",
-    (0xfffe - 2 - (maxInterrupts * 2)));
+  dbuf_printf (oBuf, "\t.org\t0xFFFA\n");
 
-  for (i=maxInterrupts;i>1;i--)
-    {
-      if (interrupts[i])
-        dbuf_printf (oBuf, "\t.dw\t%s\n", interrupts[i]->rname);
-      else
-        dbuf_printf (oBuf, "\t.dw\t0xffff\n");
-    }
+  wassertl(maxInterrupts <= 2, "Too many interrupt vectors");
+  if (maxInterrupts > 1 && interrupts[1])
+    dbuf_printf (oBuf, "\t.dw\t%s\n", interrupts[1]->rname);
+  else
+    dbuf_printf (oBuf, "\t.dw\t0xffff\n");
   dbuf_printf (oBuf, "\t.dw\t%s", "__sdcc_gs_init_startup\n");
-  if (maxInterrupts > 0)
-    {
-      if (interrupts[0])
-        dbuf_printf (oBuf, "\t.dw\t%s\n", interrupts[0]->rname);
-      else
-        dbuf_printf (oBuf, "\t.dw\t0xffff\n");
-    }
+  if (maxInterrupts > 0 && interrupts[0])
+    dbuf_printf (oBuf, "\t.dw\t%s\n", interrupts[0]->rname);
+  else
+    dbuf_printf (oBuf, "\t.dw\t0xffff\n");
 
   return true;
 }

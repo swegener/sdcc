@@ -47,8 +47,8 @@ MB3CR		.equ	0x17 ; Memory Bank 3 Control Register
 	; Reset vector - assuming smode0 and smode1 input pins are grounded
 	.org 	0
 
-	; setup internal interrupts
-	ld	a, #1
+	; Setup internal interrupts. Upper byte of interrupt vector table address. For compatibility with Rabbit 3000, we choose this even here (Rabbit 2000 allows odd values, so #1 could be used to save space).
+	ld	a, #2
 	ld	iir, a
 
 	; Configure physical address space.
@@ -86,7 +86,7 @@ skip_gsinit:
 	jp	_exit
 
 	; Periodic Interrupt
-	.org	0x100
+	.org	0x200
 	push	af
 	ioi
 	ld	a, (GCSR) ; clear interrupt
@@ -94,62 +94,62 @@ skip_gsinit:
 	reti
 
 	; Secondary Watchdog - Rabbit 3000A only
-	.org	0x110
+	.org	0x210
 	reti
 
 	; rst 0x10
-	.org	0x120
+	.org	0x220
 	ret
 
 	; rst 0x18
-	.org	0x130
+	.org	0x230
 	ret
 
 	; rst 0x20
-	.org	0x140
+	.org	0x240
 	ret
 
 	; rst 0x28
-	.org	0x150
+	.org	0x250
 	ret
 
 	; Syscall instruction - Rabbit 3000A only
-	.org	0x160
+	.org	0x260
 	ret
 
 	; rst 0x38
-	.org	0x170
+	.org	0x270
 	ret
 
 	; Slave Port
-	.org	0x180
+	.org	0x280
 	reti
 
 	; Timer A
-	.org	0x1a0
+	.org	0x2a0
 	reti
 
 	; Timer B
-	.org	0x1b0
+	.org	0x2b0
 	reti
 
 	; Serial Port A
-	.org	0x1c0
+	.org	0x2c0
 	reti
 
 	; Serial Port B
-	.org	0x1d0
+	.org	0x2d0
 	reti
 
 	; Serial Port C
-	.org	0x1e0
+	.org	0x2e0
 	reti
 
 	; Serial Port D
-	.org	0x1f0
+	.org	0x2f0
 	reti
 
-	.org	0x200
+	.org	0x300
 
 	;; Ordering of segments for the linker.
 	.area	_HOME

@@ -1,3 +1,10 @@
+2023-09-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/r2k/crt0.s,
+	  device/lib/r2ka/crt0.s,
+	  device/lib/r3ka/crt0.s:
+	  Place interrupt vector table at multiple of 512B, as required on Rabbit 3000 and above.
+
 2023-09-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug-3563.c: revert accidental enable of failing test

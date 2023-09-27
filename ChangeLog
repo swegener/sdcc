@@ -1,3 +1,7 @@
+2023-09-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug-3563.c: revert accidental enable of failing test
+
 2023-09-25 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c:

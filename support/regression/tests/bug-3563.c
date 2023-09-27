@@ -101,10 +101,10 @@ int m(void) {
 void
 testBug (void)
 {
-//#ifndef __SDCC_mcs51 // This bug #3563 is not yet fixed.
+#ifndef __SDCC_mcs51 // This bug #3563 is not yet fixed.
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   m ();
 #endif
-//#endif
+#endif
 }
 

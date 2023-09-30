@@ -1,3 +1,10 @@
+2023-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/uc6502-stack-auto/support.c,
+	* support/regression/ports/uc6502-stack-auto/uCsim.cmd,
+	* support/regression/ports/uc6502/support.c,
+	* support/regression/ports/uc6502/uCsim.cmd: moved simif to safer location
+
 2023-09-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/r2k/crt0.s,

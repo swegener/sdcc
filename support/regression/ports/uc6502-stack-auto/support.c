@@ -11,7 +11,7 @@ _putchar(unsigned char c)
 void
 _initEmu(void)
 {
-  sif= (unsigned char *)0xdfff;
+  sif= (unsigned char *)0xfff0;
 }
 
 void

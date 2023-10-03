@@ -1347,6 +1347,11 @@ minit(void)
          */
         hilo = 0;
 
+        /*
+         * Address Space
+         */
+        exprmasks(3);
+
         if (pass == 0) {
                 mchtyp = X_R2K;
                 sym[2].s_addr = X_R2K;

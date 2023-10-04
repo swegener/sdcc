@@ -1,5 +1,11 @@
 2023-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-3660.c:
+	  Fix bug #3660.
+
+2023-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/z80/gen.c:
 	  Rabbit interrupt handling fixes, based on patch by D-mo.
 

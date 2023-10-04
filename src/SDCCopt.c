@@ -2412,6 +2412,8 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 {
                   skipuic = uic;
                   uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
+                  if (!uic)
+                    continue;
                 }
 
               /* Try to handle a few cases where the result has multiple uses */

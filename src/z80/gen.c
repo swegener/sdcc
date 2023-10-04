@@ -6684,10 +6684,8 @@ genEndFunction (iCode *ic)
          If critical function then turn interrupts back on */
       if (IFFUNC_ISCRITICAL (sym->type))
         {
-          if (IS_SM83 || IS_TLCS90)
+          if (IS_SM83 || IS_TLCS90 || IS_RAB)
             emit2 ("!ei");
-          else if (IS_RAB)
-            emit2 ("ipres");
           else
             {
               symbol *tlbl = newiTempLabel (NULL);
@@ -6824,19 +6822,34 @@ genEndFunction (iCode *ic)
   if (IFFUNC_ISISR (sym->type))
     {
       if (is_nmi)
-        emit2 ("retn");
-      else if (IS_RAB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
         {
-          emit2 ("ipres");
+          emit2 ("retn");
+          regalloc_dry_run_cost++;
+        }
+      else if (IS_RAB)
+        {
+          if (IFFUNC_ISCRITICAL (sym->type))
+            {
+              emit2 ("!ei");
+              regalloc_dry_run_cost++;
+            }
           emit2 ("ret");
+          regalloc_dry_run_cost++;
         }
       else if (IS_SM83)
-        emit2 (IFFUNC_ISCRITICAL (sym->type) ? "reti" : "ret");
+        {
+          emit2 (IFFUNC_ISCRITICAL (sym->type) ? "reti" : "ret");
+          regalloc_dry_run_cost++;
+        }
       else
         {
           if (IFFUNC_ISCRITICAL (sym->type) && !is_nmi)
-            emit2 ("!ei");
+            {
+              emit2 ("!ei");
+              regalloc_dry_run_cost++;
+            }
           emit2 ("reti");
+          regalloc_dry_run_cost++;
         }
     }
   else
@@ -15277,14 +15290,9 @@ genEndCritical (const iCode * ic)
 {
   symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
 
-  if (IS_SM83 || IS_TLCS90)
+  if (IS_SM83 || IS_TLCS90 || IS_RAB)
     {
       emit2 ("!ei");
-      regalloc_dry_run_cost += 1;
-    }
-  else if (IS_RAB)
-    {
-      emit2 ("ipres");
       regalloc_dry_run_cost += 1;
     }
   else if (IC_RIGHT (ic))

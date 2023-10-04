@@ -1,3 +1,8 @@
+2023-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Rabbit interrupt handling fixes, based on patch by D-mo.
+
 2023-10-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asrab/rabmch.c:

@@ -596,7 +596,7 @@ _sm83_rgblink (void)
 
   fclose (lnkfile);
 
-  buffer = buildCmdLine (port->linker.cmd, dstFileName, NULL, NULL, NULL);
+  buffer = buildCmdLine (port->linker.cmd, dstFileName, NULL, NULL, NULL, NULL);
   /* call the linker */
   if (sdcc_system (buffer))
     {
@@ -1031,11 +1031,11 @@ oclsExpense (struct memmap *oclass)
 */
 
 static const char *_z80LinkCmd[] = {
-  "sdldz80", "-nf", "$1", NULL
+  "sdldz80", "-nf", "$1", "$L", NULL
 };
 
 static const char *_gbLinkCmd[] = {
-  "sdldgb", "-nf", "$1", NULL
+  "sdldgb", "-nf", "$1", "$L", NULL
 };
 /*
 static const char *_gnuLdCmd[] = {

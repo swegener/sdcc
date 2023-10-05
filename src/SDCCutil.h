@@ -91,7 +91,7 @@ char *buildMacros (const char *cmd);
 
 void populateMainValues (const char **ppin);
 
-char *buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3, set *list);
+char *buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3, set *list, set *list2);
 
 char *buildCmdLine2 (const char *pcmd, ...);
 

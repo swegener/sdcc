@@ -1,5 +1,24 @@
 2023-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCmain.c (parseCmdLine): place -Wl-f options in linkOptionsSet2,
+	  (linkEdit): pass linkOptionsSet2 for $L,
+	  (assemble): pass NULL for $L
+	* src/SDCCutil.h,
+	* src/SDCCutil.c (buildCmdLine): added list2 for $L command line options
+	* src/ds390/main.c (_tininative_do_assemble): pass NULL for $L
+	* src/avr/main.c (_linkCmd),
+	* src/ds390/main.c (_linkCmd),
+	* src/hc08/main.c (_linkCmd),
+	* src/mcs51/main.c (_linkCmd),
+	* src/mos6502/main.c (_linkCmd),
+	* src/pdk/main.c (_linkCmd),
+	* src/stm8/main.c (_linkCmd),
+	* src/z80/main.c (_z80LinkCmd): added $L for command line options
+	* src/z80/main.c (_sm83_rgblink): pass NULL for $L
+	* src/SDCCsymt.c (checkSClass): cosmetics
+
+2023-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sdas/linksrc/lkmain.c (parse): warn about ignored nested linker script
 
 2023-10-04 Philipp Klaus Krause <philipp@colecovision.eu>

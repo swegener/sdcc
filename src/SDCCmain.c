@@ -66,6 +66,7 @@ int preProcOnly = 0;
 set *preArgvSet = NULL;         /* pre-processor arguments  */
 set *asmOptionsSet = NULL;      /* set of assembler options */
 set *linkOptionsSet = NULL;     /* set of linker options */
+set *linkOptionsSet2 = NULL;    /* set of linker options that must be passed on command line */
 set *libFilesSet = NULL;
 set *libPathsSet = NULL;
 set *relFilesSet = NULL;
@@ -1510,7 +1511,13 @@ parseCmdLine (int argc, char **argv)
               /* linker options */
               else if (argv[i][2] == 'l')
                 {
-                  setParseWithComma (&linkOptionsSet, getStringArg ("-Wl", argv, &i, argc));
+                  char *arg = getStringArg ("-Wl", argv, &i, argc);
+                  while (*arg == ' ')
+                    arg++;
+                  if (arg[0] == '-' && arg[1] == 'f')
+                    setParseWithComma (&linkOptionsSet2, arg);
+                  else
+                    setParseWithComma (&linkOptionsSet, arg);
                 }
               /* assembler options */
               else if (argv[i][2] == 'a')
@@ -1868,11 +1875,14 @@ linkEdit (char **envp)
              the best place for xdata */
           if (options.xdata_loc)
             {
-	      if(!TARGET_MOS6502_LIKE) {
-		WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
-	      } else {
-		WRITE_SEG_LOC ("_DATA", options.xdata_loc);
-	      }
+              if (!TARGET_MOS6502_LIKE)
+                {
+                  WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+                }
+              else
+                {
+                  WRITE_SEG_LOC ("_DATA", options.xdata_loc);
+                }
             }
 
           /* pdata/xstack segment start. If zero, the linker
@@ -2022,7 +2032,7 @@ linkEdit (char **envp)
       char *b3 = shell_escape (dbuf_c_str (&linkerScriptFileName));
       char *bfn = shell_escape (dbuf_c_str (&binFileName));
 
-      buf = buildCmdLine (port->linker.cmd, b3, bfn, NULL, linkOptionsSet);
+      buf = buildCmdLine (port->linker.cmd, b3, bfn, NULL, linkOptionsSet, linkOptionsSet2);
       Safe_free (b3);
       Safe_free (bfn);
     }
@@ -2098,7 +2108,8 @@ assemble (char **envp)
           char *asmn = shell_escape (dbuf_c_str (&asmName));
 
           buf = buildCmdLine (port->assembler.cmd, dfn, asmn,
-                    options.debug ? port->assembler.debug_opts : port->assembler.plain_opts, asmOptionsSet);
+                              options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
+                              asmOptionsSet, NULL);
           Safe_free (dfn);
           Safe_free (asmn);
         }

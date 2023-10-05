@@ -514,7 +514,7 @@ buildMacros (const char *cmd)
 }
 
 char *
-buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3, set * list)
+buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3, set * list, set * list2)
 {
   int first = 1;
   struct dbuf_s dbuf;
@@ -565,20 +565,33 @@ buildCmdLine (const char **cmds, const char *p1, const char *p2, const char *p3,
                 const char *tmp;
                 par = NULL;
 
-                if (list != NULL && (tmp = (const char *) setFirstItem (list)) != NULL)
+                for (tmp = setFirstItem (list); tmp; tmp = setNextItem (list))
                   {
-                    do
+                    if (*tmp != '\0')
                       {
-                        if (*tmp != '\0')
-                          {
-                            if (sep)
-                              dbuf_append_char (&dbuf, ' ');    /* separate it */
-                            dbuf_append_str (&dbuf, tmp);
-                            tmp++;
-                            sep = 1;
-                          }
+                        if (sep)
+                          dbuf_append_char (&dbuf, ' ');    /* separate it */
+                        dbuf_append_str (&dbuf, tmp);
+                        sep = 1;
                       }
-                    while ((tmp = (const char *) setNextItem (list)) != NULL);
+                  }
+              }
+              break;
+
+            case 'L':
+              {
+                const char *tmp;
+                par = NULL;
+
+                for (tmp = setFirstItem (list2); tmp; tmp = setNextItem (list2))
+                  {
+                    if (*tmp != '\0')
+                      {
+                        if (sep)
+                          dbuf_append_char (&dbuf, ' ');    /* separate it */
+                        dbuf_append_str (&dbuf, tmp);
+                        sep = 1;
+                      }
                   }
               }
               break;

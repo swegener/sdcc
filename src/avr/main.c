@@ -158,10 +158,11 @@ oclsExpense (struct memmap *oclass)
     $2 is always the output file.
     $3 varies
     $l is the list of extra options that should be there somewhere...
+    $L is the list of extra options that should be passed on the command line...
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] = {
-	"linkavr", "", "$1", NULL
+	"linkavr", "", "$1", "$L", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

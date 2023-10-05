@@ -985,11 +985,12 @@ get_model (void)
     $2 is always the output file.
     $3 varies
     $l is the list of extra options that should be there somewhere...
+    $L is the list of extra options that should be passed on the command line...
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] =
 {
-  "sdld", "-nf", "$1", NULL
+  "sdld", "-nf", "$1", "$L", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
@@ -1250,13 +1251,13 @@ static void _tininative_do_assemble (set *asmOptions)
         "a390","$1.mpp",NULL
     };
 
-    buf = buildCmdLine(macroCmd, dstFileName, NULL, NULL, NULL);
+    buf = buildCmdLine(macroCmd, dstFileName, NULL, NULL, NULL, NULL);
     if (sdcc_system(buf)) {
         Safe_free (buf);
         exit(1);
     }
     Safe_free (buf);
-    buf = buildCmdLine(a390Cmd, dstFileName, NULL, NULL, asmOptions);
+    buf = buildCmdLine(a390Cmd, dstFileName, NULL, NULL, asmOptions, NULL);
     if (sdcc_system(buf)) {
         Safe_free (buf);
         exit(1);

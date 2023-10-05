@@ -961,8 +961,10 @@ parse()
 
                                 case 'f':
                                 case 'F':
-                                        if (startp->f_type == F_LNK)
+                                        if (startp->f_type == F_LNK) {
+                                                fprintf(stderr, "Nested option -%c ignored\n", c);
                                                 return(0);
+                                        }
                                         unget(getnb());
                                         if (*ip == 0)
                                                 usage(ER_FATAL);

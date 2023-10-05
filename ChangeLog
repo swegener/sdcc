@@ -1,3 +1,7 @@
+2023-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkmain.c (parse): warn about ignored nested linker script
+
 2023-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c,

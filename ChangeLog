@@ -1,3 +1,8 @@
+2023-10-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Fix a use of an uninitialized struct member in generalized constant propagation analysis of some left shifts: bugs #3625, #3665.
+
 2023-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (parseCmdLine): place -Wl-f options in linkOptionsSet2,

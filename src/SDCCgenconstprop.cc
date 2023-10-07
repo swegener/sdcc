@@ -585,8 +585,6 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
   if (!left.anything && !right.anything && right.min == right.max && right.max < 64)
     {
       result->nothing = left.nothing || right.nothing;
-      result->knownbitsmask = (left.knownbitsmask << right.max) | ~(~0ull << right.max);
-      result->knownbits = left.knownbits << right.max;
       struct valinfo rv;
       rv.nothing = result->nothing;
       rv.anything = false;
@@ -599,6 +597,8 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
           rv.min <<= 1;
           rv.max <<= 1;
         }
+      rv.knownbitsmask = (left.knownbitsmask << right.max) | ~(~0ull << right.max);
+      rv.knownbits = left.knownbits << right.max;
       *result = rv;
     }
 }

@@ -13,6 +13,8 @@
 	  device/lib/ez80_z80/*.s,
 	  device/lib/_memset:
 	  Make new calling convention the default for r2k, r2ka, r3ka, tlcs90, ez80-z80.
+	* support/regression/ports/uc6502/spec.mk:
+	  Increase test-uc6502 timeout to work around bug #3663.
 
 2023-10-07 Philipp Klaus Krause <philipp@colecovision.eu>
 

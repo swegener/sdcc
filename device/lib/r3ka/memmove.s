@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  memmove.s
 ;
-;  Copyright (C) 2008-2009, Philipp Klaus Krause, Marco Bodrato
+;  Copyright (C) 2008-2021, Philipp Klaus Krause, Marco Bodrato
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -33,17 +33,12 @@
 ; The Z80 has the ldir and lddr instructions, which are perfect for implementing memmove().
 
 _memmove:
-	pop	af
-	pop	hl
+	pop	iy
 	pop	de
 	pop	bc
-	push	bc
-	push	de
-	push	hl
-	push	af
 	ld	a, c
 	or	a, b
-	ret	Z
+	jr	Z, end
 	push	hl
 	sbc	hl, de		; or above cleared carry.
 	add	hl, de		; same carry as the line before
@@ -56,10 +51,11 @@ memmove_down:
 	inc	bc
 	lddr
 	pop	hl
-	ret
+end:
+	jp	(iy)
 memmove_up:
 	ex      de, hl
 	ldir
 	pop	hl
-	ret
+	jp	(iy)
 

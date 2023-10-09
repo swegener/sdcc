@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  divsigned.s
 ;
-;  Copyright (C) 2000-2010, Michael Hope, Philipp Klaus Krause
+;  Copyright (C) 2000-2021, Michael Hope, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -32,22 +32,16 @@
 .globl	__divschar
 
 __divsint:
-        pop     af
-        pop     hl
+        pop     iy
         pop     de
-        push    de
-        push    hl
-        push    af
 
-        jp      __div16
+	call	__div16
+
+	jp	(iy)
 
 __divschar:
-        ld      hl, #2+1
-        add     hl, sp
-
-        ld      e, (hl)
-        dec     hl
-        ld      l, (hl)
+	ld	e, l
+	ld	l, a
 
 __div8::
         ld      a, l            ; Sign extend
@@ -57,7 +51,7 @@ __div8::
 __div_signexte::
         ld      a, e            ; Sign extend
         rlca
-        sbc     a,a
+        sbc     a, a
         ld      d, a
         ; Fall through to __div16
 

@@ -33,17 +33,12 @@
 ; The Z80 has the ldir and lddr instructions, which are perfect for implementing memmove(). Unfortunately, it is broken on early Rabbits, so we use ldi and ldd.
 
 _memmove:
-	pop	af
-	pop	hl
+	pop	iy
 	pop	de
 	pop	bc
-	push	bc
-	push	de
-	push	hl
-	push	af
 	ld	a, c
 	or	a, b
-	ret	Z
+	jr	Z, end
 	push	hl
 	sbc	hl, de		; or above cleared carry.
 	add	hl, de		; same carry as the line before
@@ -58,12 +53,13 @@ loop_down:
 	ldd
 	jp	LO, loop_down
 	pop	hl
-	ret
+end:
+	jp	(iy)
 memmove_up:
 	ex      de, hl
 loop_up:
 	ldi
 	jp	LO, loop_up
 	pop	hl
-	ret
+	jp	(iy)
 

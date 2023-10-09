@@ -47,7 +47,7 @@ MB3CR		.equ	0x17 ; Memory Bank 3 Control Register
 	; Reset vector - assuming smode0 and smode1 input pins are grounded
 	.org 	0
 
-	; Setup internal interrupts. Upper byte of interrupt vector table address. Needs to be even.
+	; Setup internal interrupts. Upper byte of interrupt vector table address. For compatibility with Rabbit 3000, we choose this even here (Rabbit 2000 allows odd values, so #1 could be used to save space).
 	ld	a, #2
 	ld	iir, a
 
@@ -76,7 +76,6 @@ MB3CR		.equ	0x17 ; Memory Bank 3 Control Register
 
 	; Initialise global variables. Skip if __sdcc_external_startup returned
 	; non-zero value. Note: calling convention version 0 only.
-	ld	a, l
 	or	a, a
 	jr	NZ, skip_gsinit
 	call	gsinit

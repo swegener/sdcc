@@ -1,7 +1,8 @@
 ;--------------------------------------------------------------------------
-;  mulchar.s
+;  mul.s
 ;
 ;  Copyright (C) 2000, Michael Hope
+;  Copyright (C) 2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,19 +32,11 @@
 .globl	__mulint
 
 __mulint:
-        pop     af
-        pop     hl
-        pop     de
-        push    de
-        push    hl
-        push    af
-
-        ;; Fall through
-
-	;; Parameters:
-	;;	hl, de (left, right irrelevant)
-	ld	b,h
-	ld	c,l
+        pop	iy
+        pop	bc
+        ex	de, hl
+        call	__mul16
+       	jp	(iy)
 
 	;; 16-bit multiplication
 	;;

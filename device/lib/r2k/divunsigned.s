@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  divunsigned.s
 ;
-;  Copyright (C) 2000-2012, Michael Hope, Philipp Klaus Krause, Marco Bodrato
+;  Copyright (C) 2000-2021, Michael Hope, Philipp Klaus Krause, Marco Bodrato
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -34,22 +34,16 @@
 .globl	__divuchar
 
 __divuint:
-        pop     af
-        pop     hl
+	pop     iy
         pop     de
-        push    de
-        push    hl
-        push    af
 
-        jr      __divu16
+        call	__divu16
+
+	jp	(iy)
 
 __divuchar:
-        ld      hl,#2+1
-        add     hl,sp
-
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
+	ld	e, l
+	ld	l, a
 
         ;; Fall through
 __divu8::

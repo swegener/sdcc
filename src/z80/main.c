@@ -1418,7 +1418,7 @@ PORT r2k_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
   { 
     -1,                         /* shifts never use support routines */
@@ -1552,7 +1552,7 @@ PORT r2ka_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
   { 
     -1,                         /* shifts never use support routines */
@@ -1686,7 +1686,7 @@ PORT r3ka_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
   { 
     -1,                         /* shifts never use support routines */

@@ -78,52 +78,6 @@ end:
     jp	(iy)
   __endasm;
 }
-#elif !defined (_SDCC_NO_ASM_LIB_FUNCS) && (\
-              defined (__SDCC_ez80_z80) ||\
-              defined (__SDCC_r2k) ||\
-              defined (__SDCC_z3ka))
-
-__naked
-{
-  (void)s;
-  (void)c;
-  (void)n;
-  __asm
-    pop   af
-    pop   hl
-#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
-    dec   sp
-#endif
-    pop   de
-    pop   bc
-    push  bc
-    push  de
-#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
-    inc   sp
-#endif
-    push  hl
-    push  af
-    ld    a, c
-    or    a, b
-    ret   Z
-#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
-    ld    (hl), d
-#else
-    ld    (hl), e
-#endif
-    dec   bc
-    ld    a, c
-    or    a, b
-    ret   Z
-    push  hl
-    ld    e, l
-    ld    d, h
-    inc   de
-    ldir
-    pop   hl
-    ret
-  __endasm;
-}
 #elif !defined (_SDCC_NO_ASM_LIB_FUNCS) && defined(__SDCC_sm83)
 __naked
 {

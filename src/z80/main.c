@@ -1956,7 +1956,7 @@ PORT tlcs90_port =
     1                           /* No fancy alignments supported. */
    },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 2, 0 },
   { 
     -1,                         /* shifts never use support routines */
@@ -2090,7 +2090,7 @@ PORT ez80_z80_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  0,                            /* ABI revision */
+  1,                            /* ABI revision */
   { -1, 0, 0, 4, 0, 3, 0 },
   { 
     -1,                         /* shifts never use support routines */

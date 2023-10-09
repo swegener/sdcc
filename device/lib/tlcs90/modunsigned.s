@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  modunsigned.s
 ;
-;  Copyright (C) 2009-2010, Philipp Klaus Krause
+;  Copyright (C) 2009-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -32,26 +32,22 @@
 .globl	__moduint
 
 __moduchar:
-        ld      hl,#2+1
-        add     hl,sp
+	ld	e, l
+	ld	l, a
 
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
+	call    __divu8
 
-        call    __divu8
+	ex	de, hl
 
-	ex	de,hl
-
-        ret
+	ret
 
 __moduint:
-        ld	hl, 2 (sp)
-        ld	de, 4 (sp)
+	pop     iy
+	pop     de
 
-        call    __divu16
+	call    __divu16
 
-        ex      de,hl
+	ex	de, hl
 
-        ret
+	jp	(iy)
 

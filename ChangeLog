@@ -5,11 +5,14 @@
 	  src/SDCCmain.c:
 	  Fix bug #3658 by warning on non-default sdcccall with default stdlib or crt0.
 	* src/z80/main.c,
+	  doc/sdccman.lyx,
 	  device/lib/r2k/*.s,
 	  device/lib/r2ka/*.s,
 	  device/lib/r3ka/*.s,
+	  device/lib/tlcs90/*.s,
+	  device/lib/ez80_z80/*.s,
 	  device/lib/_memset:
-	  Make new calling convention the default for r2k, r2ka, r3ka.
+	  Make new calling convention the default for r2k, r2ka, r3ka, tlcs90, ez80-z80.
 
 2023-10-07 Philipp Klaus Krause <philipp@colecovision.eu>
 

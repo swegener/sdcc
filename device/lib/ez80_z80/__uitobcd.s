@@ -36,14 +36,10 @@
 ; bcd[] will contain BCD value.
 ;
 ___uitobcd:
-	push	ix
-	ld	ix, #0
-	add	ix, sp
 ;
 	ld	bc, #0x1000
 	ld	d, c
 	ld	e, c
-	ld	hl, 4 (ix)
 ;
 ;--- begin speed optimization
 ;
@@ -75,12 +71,12 @@ ___uitobcd:
 	ld	c, a
 	djnz	100$
 ;
-	ld	hl, 6 (ix)
+	pop	hl
+	ex	(sp), hl
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
 	inc	hl
 	ld	(hl), c
 ;
-	pop	ix
 	ret

@@ -39,15 +39,17 @@ ___ltoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	8(ix) - string
-;	10(ix) - radix
+	push	hl
+;	push	de
 ;
-	ld	de, 4 (ix)
-	bit	7, 7 (ix)
+;	HLDE, -4 (ix) - value
+;	4 (ix) - string
+;	6 (ix) - radix
+;
+	bit	7, h
 	jr	Z, ___ultoa_de
 ;positive/negative numbers are supported only for radix=10
-	ld	a, 10 (ix)
+	ld	a, 6 (ix)
 	cp	a, #10
 	jr	NZ, ___ultoa_de
 ;add minus sign to result and inverse value
@@ -56,13 +58,13 @@ ___ltoa::
 	sbc	hl, de
 	ex	de, hl
 	ld	hl, #0
-	ld	bc, 6 (ix)
+	ld	bc, -2 (ix)
 	sbc	hl, bc
-	ld	6 (ix), hl
-	ld	hl, 8 (ix)
+	ld	-2 (ix), hl
+	ld	hl, 4 (ix)
 	ld	(hl), #0x2D	;minus symbol
 	inc	hl
-	ld	8 (ix), hl
+	ld	4 (ix), hl
 	jr	___ultoa_dehl
 ;
 ;void __uitoa(unsigned int value, char *string, unsigned char radix);
@@ -72,27 +74,28 @@ ___ultoa::
 	ld	ix, #0
 	add	ix, sp
 ;
-;	4(ix) - value
-;	8(ix) - string
-;	10(ix) - radix
+	push	hl
+;	push	de
 ;
-	ld	de, 4 (ix)
+;	HLDE, -4 (ix) - value
+;	4 (ix) - string
+;	6 (ix) - radix
 ;
 ___ultoa_de:
-	ld	hl, 8 (ix)
+	ld	hl, 4 (ix)
 ;
 ___ultoa_dehl:
 	ld	a, e
 	or	a, d
-	or	a, 6 (ix)
-	or	a, 7 (ix)
+	or	a, -2 (ix)
+	or	a, -1 (ix)
 	jr	NZ, 100$
 ;
 	ld	(hl), #0x30
 	inc	hl
 	jp	190$
 100$:
-	ld	a, 10 (ix)
+	ld	a, 6 (ix)
 	cp	a, #10		;most popular radix
 	jr	NZ, 110$
 ;
@@ -106,16 +109,11 @@ ___ultoa_dehl:
 	ld	sp, hl
 	push	bc
 	push	hl
-	ld	bc, 6 (ix)
-	push	bc
-	push	de
+	ld	hl, -2 (ix)
 	call	___ultobcd
-	ld	hl, #6
-	add	hl, sp
-	ld	sp, hl
 	pop	de		;DE - pointer to string
-	inc	hl
-	inc	hl		;HL - pointer to BCD value
+	ld	hl, #0
+	add	hl, sp		;HL - pointer to BCD value
 	ld	b, #5		;number of bytes in BCD value
 	ld	a, #0x30	;ASCII code of '0'
 103$:
@@ -160,8 +158,8 @@ ___ultoa_dehl:
 	ld	a, e
 	ld	b, c
 125$:
-	srl	7 (ix)
-	rr	6 (ix)
+	srl	-1 (ix)
+	rr	-2 (ix)
 	rr	d
 	rr	e
 	srl	b
@@ -177,8 +175,8 @@ ___ultoa_dehl:
 	inc	hl
 	ld	a, e
 	or	a, d
-	or	a, 6 (ix)
-	or	a, 7 (ix)
+	or	a, -2 (ix)
+	or	a, -1 (ix)
 	jr	NZ, 120$
 	jr	190$
 ;
@@ -190,10 +188,10 @@ ___ultoa_dehl:
 	ex	de, hl
 	ld	c, e
 	ld	b, d
-	ld	de, 6 (ix)
+	ld	de, -2 (ix)
 160$:
 	push	bc
-	ld	c, 10 (ix)
+	ld	c, 6 (ix)
 	call	___divu32_8
 	pop	bc
 	add	a, #0x30
@@ -217,11 +215,15 @@ ___ultoa_dehl:
 ;-------- finish string and reverse order
 190$:
 	ld	(hl), #0
-	ld	de, 8 (ix)
+	ld	de, 4 (ix)
 	call	___strreverse_reg
 	ld	sp, ix
 	pop	ix
-	ret
+	pop	hl
+	inc	sp
+	inc	sp
+	inc	sp
+	jp	(hl)
 ;
 ;in: DEHL - divident, C - divisor
 ;out: DEHL - quotient, A - remainder

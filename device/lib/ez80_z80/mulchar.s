@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  mulchar.s
 ;
-;  Copyright (c) 2017, Philipp Klaus Krause
+;  Copyright (c) 2017-2021, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -36,44 +36,33 @@
 
 ; operands have different sign
 
-__mulsuchar:
-        ld      hl,#2+1
-        ld      b, h
-        add     hl,sp
+__muluschar:
+	ld	e, l
+	ld	d, #0
+	ld	c, a
 
-        ld      e,(hl)
-        dec     hl
-        ld      c,(hl)
         jr      signexte
 
-__muluschar:
-        ld      hl,#2
-        ld      b, h
-        add     hl,sp
+__mulsuchar:
+	ld	e, a
+	ld	d, #0
+	ld	c, l
 
-        ld      e,(hl)
-        inc     hl
-        ld      c,(hl)
         jr      signexte
 
 __mulschar:
-        ld      hl,#2+1
-        add     hl,sp
-
-        ld      e,(hl)
-        dec     hl
-        ld      c,(hl)
+	ld	e, a
+        ld      c, l
 
         ;; Need to sign extend before going in.
-        ld      a,c
         rla
-        sbc     a,a
-        ld      b,a
+        sbc     a, a
+        ld      d, a
 signexte:
-        ld      a,e
+        ld      a, c
         rla
-        sbc     a,a
-        ld      d,a
+        sbc     a, a
+        ld      b, a
 
         jp      __mul16
 

@@ -44919,9 +44919,10 @@ Rabbit 2000, Rabbit 2000A, Rabbit 3000A, eZ80 and TLCS-90 calling conventions
 \end_layout
 
 \begin_layout Standard
-The default is the Z80 SDCC calling convention, version 0 as described above.
- Using the command-line option –sdcccall 1, the default can be changed to
- version 1 of the Rabbit SDCC calling convention.
+The current default is the Rabbit calling convetion desribed here, version
+ 1.
+ Using the command-line option –sdcccall 8, the default can be changed to
+ version 0 of the Z80 calling convention, described above.
  There are four other calling conventions supported, which can be specified
  using the keywords __smallc, __z88dk_fastcall and __z88dk_callee.
  They are primarily intended for compatibility with libraries written for

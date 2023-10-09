@@ -36,10 +36,8 @@
 ___strreverse::
 	pop	bc
 	pop	de
-	pop	hl
-	push	hl
-	push	de
 	push	bc
+	ex	de, hl
 ;
 ;in: HL - pointer to end of string (null symbol), DE - pointer to start of string
 ;

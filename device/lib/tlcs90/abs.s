@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  abs.s
 ;
-;  Copyright (C) 2010, Philipp Klaus Krause
+;  Copyright (c) 2010-2023, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -29,38 +29,12 @@
 	.area   _CODE
 
 	.globl _abs
-; 12B; 44T for nonnegative arguments, 40T for negative.
+; 10B; 36T for nonnegative arguments, 32T for negative.
 _abs:
-	ld	de, 2 (sp)
+	ex	de, hl
 	ld	hl, #0
 	sub	hl, de
 	ret	P
 	ex	de, hl
 	ret
-
-; 13B; 46T for nonnegative arguments, 42T for negative.
-;_abs:
-;	ld	de, 2 (sp)
-;	xor	a, a
-;	ld	l, a
-;	ld	h, a
-;	sbc	hl, de
-;	ret	P
-;	ex	de, hl
-;	ret
-
-; 16B; 54T for nonegative arguments, 72T for negative:
-;_abs:
-;	pop	de
-;	pop	hl
-;	push	hl
-;	push	de
-;	bit	7, h
-;	ret	Z
-;	xor	a, a
-;	ld	e, a
-;	ld	d, a
-;	ex	de, hl
-;	sbc	hl, de
-;	ret
 

@@ -31,18 +31,17 @@
 	.globl _atomic_flag_test_and_set
 
 _atomic_flag_test_and_set:
-	ld	de, 2 (sp)
+	srl	(hl)
 	ld	l, #1
-	srl	(de)
 	sbc	hl, #0
+	ld	a, l
 	ret
 	
 ; Previous implementation (which might be needed again in the future, see below)
-;	ld	de, 2 (sp)
-;	ld	l, #0
-;	tset	0, (de)
+;	xor	a, a
+;	tset	0, (hl)
 ;	ret	Z
-;	inc	l
+;	inc	a
 ;	ret
 ; This implementation used 0 as clear state, 1 as set state,
 ; which seems closer to the spirit of atomic_flag. The current

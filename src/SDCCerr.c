@@ -655,6 +655,8 @@ struct
      "_sdcc_external_startup function definition - probable deprecated old-style variant of __sdcc_external_startup", 0},
   { E_NO_SKIP_TARGET, ERROR_LEVEL_ERROR,
      "target label missing for skip instruction '%s'", 0},
+  { W_SDCCCALL_STD_LIB_CRT0, ERROR_LEVEL_WARNING,
+     "non-default sdcccall specified, but default stdlib or crt0", 0},
 };
 
 /* -------------------------------------------------------------------------------

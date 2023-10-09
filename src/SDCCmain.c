@@ -2825,6 +2825,13 @@ main (int argc, char **argv, char **envp)
   /* finalize common options */
   finalizeOptions ();
 
+  /* When a non-default calling convetion is requested, the default stdlib and crt0 can't be used */
+  /* This is a warning, not an error, since some users like to compile their own stdlib, and use it in the stdlib location. */
+  if (options.sdcccall != port->sdcccall &&
+  	(TARGET_IS_STM8 && !options.nostdlib ||
+  	TARGET_Z80_LIKE && (!options.nostdlib || !options.no_std_crt0)))
+  	werror (W_SDCCCALL_STD_LIB_CRT0);
+
   if (fullSrcFileName || options.c1mode)
     {
       preProcess (envp);

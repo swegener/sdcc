@@ -72,7 +72,7 @@ MOS6502_SDCC = $(COMMON_SDCC) \
 MOS6502SOURCES = $(addprefix ../,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_LONG) $(MOS6502_LONGLONG) $(MOS6502_SDCC))
 MOS6502OBJECTS = $(patsubst %.c,%.rel,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_LONG) $(MOS6502_LONGLONG) $(MOS6502_SDCC))
 
-OBJ = _ret.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
+OBJ = _dptr.rel _temp.rel _ret01.rel _ret23.rel _ret4567.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
 
 LIB = mos6502.lib
 AS = $(SAS)

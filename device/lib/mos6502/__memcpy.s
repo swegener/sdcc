@@ -49,11 +49,11 @@ ___memcpy_PARM_3:
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define save  "___SDCC_m6502_ret0"
-	.define dst   "___SDCC_m6502_ret2"
+	.define save  "REGTEMP+0"
+	.define dst   "REGTEMP+2"
 	.define src   "___memcpy_PARM_2"
 	.define count "___memcpy_PARM_3"
-	
+
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
@@ -67,29 +67,29 @@ ___memcpy:
 
 	ldy	#0
 	ldx	*count+1
-	beq	L2
-L1:
+	beq	00002$
+00001$:
 	lda	[*src],y
 	sta	[*dst],y
 	iny
 	lda	[*src],y
 	sta	[*dst],y
 	iny
-	bne	L1
+	bne	00001$
 	inc	*src+1
 	inc	*dst+1
 	dex
-	bne	L1
-L2:
+	bne	00001$
+00002$:
 	ldx	*count+0
-	beq	done
-L3:
+	beq	00004$
+00003$:
 	lda	[*src],y
 	sta	[*dst],y
 	iny
 	dex
-	bne	L3
-done:
+	bne	00003$
+00004$:
 	lda	*save+0
 	ldx	*save+1
 	rts

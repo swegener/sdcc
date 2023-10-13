@@ -1,3 +1,32 @@
+2023-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mos6502/gen.h: moved NUM_TEMP_REGS into gen.c
+	* src/mos6502/gen.c: renamed __DPTR & __TEMP to DPTR & REGTEMP to remove
+	  them from the C namespace,
+	  simplified INDFMT_IY macro
+	* src/mos6502/main.c (m6502_genAssemblerPreamble): moved __DPTR & __TEMP
+	  definition to libraries,
+	  removed ZPABS so --data_loc works as expected, leaving address 0 unused
+	* device/lib/mos6502/__memcpy.s: use REGTEMP instead of ___SDCC_m6502_retN,
+	  use local labels
+	* device/lib/mos6502-stack-auto/__sdcc_indirect_jsr.s,
+	* device/lib/mos6502/__sdcc_indirect_jsr.s: use renamed REGTEMP
+	* device/lib/mos6502-stack-auto/_dptr.s,
+	* device/lib/mos6502/_dptr.s: new, DPTR in zero page
+	* device/lib/mos6502-stack-auto/_ret.c,
+	* device/lib/mos6502/_ret.c: replace by _ret01.s, _ret23.s & _ret4567.s
+	* device/lib/mos6502-stack-auto/_ret01.s,
+	* device/lib/mos6502-stack-auto/_ret23.s,
+	* device/lib/mos6502-stack-auto/_ret4567.s,
+	* device/lib/mos6502/_ret01.s,
+	* device/lib/mos6502/_ret23.s,
+	* device/lib/mos6502/_ret4567.s: new, ___SDCC_m6502_retN in zero page
+	* device/lib/mos6502-stack-auto/_temp.s,
+	* device/lib/mos6502/_temp.s: new, REGTEMP in zeropage
+	* device/lib/mos6502-stack-auto/Makefile.in,
+	* device/lib/mos6502/Makefile.in: added _dptr.rel, _ret01.rel, _re23,rel,
+	  _ret4567.rel & _temp.rel
+
 2023-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* .version:

@@ -62,6 +62,9 @@ struct attr_t {
   unsigned char literalValue;
 };
 
+// keep this in sync with _temp.s in the library
+#define NUM_TEMP_REGS 8
+
 static struct
 {
   int stackOfs;
@@ -110,14 +113,14 @@ static asmop *m6502_aop_pass[8];
 static asmop tsxaop;
 
 static char *IMMDFMT = "#0x%02x";
-static char *TEMPFMT = "*(__TEMP+%d)";
-static char *TEMPFMT_IND = "[__TEMP+%d]";
-//static char *TEMPFMT_IY = "[__TEMP+%d],y";
+static char *TEMPFMT = "*(REGTEMP+%d)";
+static char *TEMPFMT_IND = "[REGTEMP+%d]";
+//static char *TEMPFMT_IY = "[REGTEMP+%d],y";
 
 //static char *IDX_FMT = "0x%x,x";
-//static char *TEMPFMT_IX = "[(__TEMP+%d),x]";
-static char *DPTRFMT = "*(__DPTR+%d)";
-static char *INDFMT_IY = "[%s],y";
+//static char *TEMPFMT_IX = "[(REGTEMP+%d),x]";
+static char *DPTRFMT = "*(DPTR+%d)";
+static char *INDFMT_IY = "[DPTR],y";
 
 
 const int STACK_TOP = 0x100;
@@ -769,7 +772,7 @@ updateCFA (void)
 }
 
 /**************************************************************************
- * Store register onto the __TEMP stack. If freereg is true,
+ * Store register onto the REGTEMP stack. If freereg is true,
  * reg is marked free and available for reuse.
  *
  * @param reg pointer for the register to save
@@ -778,7 +781,7 @@ updateCFA (void)
 static void
 storeRegTemp (reg_info * reg, bool freereg)
 {
-  emitComment (REGOPS, "  storeRegTemp(%s) %s", reg ? reg->name : "-", freereg?"free":"");
+  emitComment (REGOPS, "  storeRegTemp(%s) %s", reg ? reg->name : "-", freereg ? "free" : "");
 
   int regidx = reg->rIdx;
 
@@ -819,7 +822,7 @@ storeRegTemp (reg_info * reg, bool freereg)
 }
 
 /**************************************************************************
- * Store register onto the __TEMP stack if register is alive
+ * Store register onto the REGTEMP stack if register is alive
  *
  * @param reg pointer for the register to save
  * @return true if the register was saved
@@ -835,7 +838,7 @@ storeRegTempIfSurv (reg_info *reg)
 }
 
 /**************************************************************************
- * Store register onto the __TEMP stack if register is in use
+ * Store register onto the REGTEMP stack if register is in use
  *
  * @param reg pointer for the register to save
  * @return true if the register was saved
@@ -852,7 +855,7 @@ storeRegTempIfUsed (reg_info *reg)
 }
 
 /**************************************************************************
- * Load register from the __TEMP stack at an arbitrary offset
+ * Load register from the REGTEMP stack at an arbitrary offset
  *
  * @param reg pointer for the register to save
  *************************************************************************/
@@ -886,7 +889,7 @@ loadRegTempAt (reg_info * reg, int offset)
 }
 
 /**************************************************************************
- * Load register from the __TEMP stack.
+ * Load register from the REGTEMP stack.
  *
  * @param reg pointer for the register to save
  *************************************************************************/
@@ -925,7 +928,7 @@ loadRegTemp (reg_info * reg)
 }
 
 /**************************************************************************
- * Conditionally load a register from the __TEMP stack.
+ * Conditionally load a register from the REGTEMP stack.
  *
  * @param reg pointer for the register to load
  * @param load register if true otherwise free the register
@@ -940,7 +943,7 @@ loadOrFreeRegTemp (reg_info * reg, bool needpull)
 }
 
 /**************************************************************************
- * Conditionally load a register from the __TEMP stack without
+ * Conditionally load a register from the REGTEMP stack without
  * affecting condition flags
  *
  * @param reg pointer for the register to load
@@ -2108,7 +2111,7 @@ forceStackedAop (asmop * aop, bool copyOrig)
   bool needpula = false;
   asmop *newaop = newAsmop (AOP_DIR);
   memcpy (newaop, aop, sizeof (*newaop));
-  newaop->aopu.aop_dir = "__TEMP";
+  newaop->aopu.aop_dir = "REGTEMP";
 
   emitComment (TRACE_AOP|VVDBG, "  forcedStackedAop %s", aopName (aop));
 
@@ -3503,7 +3506,7 @@ else if (m6502_reg_y->aop == &tsxaop) {
       storeRegTemp (m6502_reg_yx, true);
       if (m6502_reg_y->aop == &tsxaop) {
         loadRegFromConst(m6502_reg_y, offset);
-        return "ERROR [__TEMP],y"; // TODO: what if != 0 tempOfs?
+        return "ERROR [REGTEMP],y"; // TODO: what if != 0 tempOfs?
       } else
         return "ERROR"; // TODO: error
      default:
@@ -4599,7 +4602,7 @@ genPcall (iCode * ic)
       emitBranch ("jsr", tlbl);
       emitBranch ("bra", rlbl);
       safeEmitLabel (tlbl);
-      emit6502op("jmp", "[__TEMP]");
+      emit6502op("jmp", "[REGTEMP]");
       safeEmitLabel (rlbl);
 #endif
       _G.tempOfs -= 2;
@@ -8680,7 +8683,7 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
   if (ifx && blen <= 8)
     {
       loadRegFromConst(m6502_reg_y, yoff);
-      emit6502op("lda", INDFMT_IY, "__DPTR");
+      emit6502op("lda", INDFMT_IY);
       if (blen < 8)
         {
           emit6502op ("and", IMMDFMT, (((unsigned char) - 1) >> (8 - blen)) << bstr);
@@ -8699,7 +8702,7 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
   if (blen < 8)
     {
       loadRegFromConst(m6502_reg_y, yoff);
-      emit6502op("lda", INDFMT_IY, "__DPTR");
+      emit6502op("lda", INDFMT_IY);
       AccRsh (bstr, false);
       emit6502op ("and", IMMDFMT, ((unsigned char) - 1) >> (8 - blen));
       if (!SPEC_USIGN (etype))
@@ -8721,7 +8724,7 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
   for (rlen = blen; rlen >= 8; rlen -= 8)
     {
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op("lda", INDFMT_IY, "__DPTR");
+      emit6502op("lda", INDFMT_IY);
       if (rlen > 8 && AOP_TYPE (result) == AOP_REG)
         pushReg (m6502_reg_a, true);
       else
@@ -8733,7 +8736,7 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
   if (rlen)
     {
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op("lda", INDFMT_IY, "__DPTR");
+      emit6502op("lda", INDFMT_IY);
       emit6502op ("and", IMMDFMT, ((unsigned char) - 1) >> (8 - rlen));
       if (!SPEC_USIGN (etype))
         {
@@ -9254,14 +9257,14 @@ genPointerGet (iCode * ic, iCode * ifx)
   if (IS_AOP_XA (AOP (result)))
             {
       loadRegFromConst(m6502_reg_y, yoff + 1);
-      emit6502op ("lda", INDFMT_IY, "__DPTR");
+      emit6502op ("lda", INDFMT_IY);
           transferRegReg(m6502_reg_a, m6502_reg_x, true);
       loadRegFromConst(m6502_reg_y, yoff + 0);
-      emit6502op ("lda", INDFMT_IY, "__DPTR");
+      emit6502op ("lda", INDFMT_IY);
   } else {
         for (offset=0; offset<size; offset++) {
         loadRegFromConst(m6502_reg_y, yoff + offset);
-        emit6502op ("lda", INDFMT_IY, "__DPTR");
+        emit6502op ("lda", INDFMT_IY);
           storeRegToAop (m6502_reg_a, AOP (result), offset);
         }
   }
@@ -9330,7 +9333,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
           litval &= (~mask) & 0xff;
 
           loadRegFromConst(m6502_reg_y, yoff + offset);
-          emit6502op ("lda", INDFMT_IY, "__DPTR");
+          emit6502op ("lda", INDFMT_IY);
           if ((mask | litval) != 0xff)
             {
               emit6502op ("and", IMMDFMT, mask);
@@ -9340,7 +9343,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
               emit6502op ("ora", IMMDFMT, litval);
             }
           loadRegFromConst(m6502_reg_y, yoff + offset);
-          emit6502op ("sta", INDFMT_IY, "__DPTR");
+          emit6502op ("sta", INDFMT_IY);
           pullOrFreeReg (m6502_reg_a, needpulla);
           return;
         }
@@ -9357,11 +9360,11 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       storeRegTemp (m6502_reg_a, true);
 
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op ("lda", INDFMT_IY, "__DPTR");
+      emit6502op ("lda", INDFMT_IY);
       emit6502op ("and", IMMDFMT, mask);
       emit6502op ("ora", TEMPFMT, _G.tempOfs-1);
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op ("sta", INDFMT_IY, "__DPTR");
+      emit6502op ("sta", INDFMT_IY);
 //      loadRegTemp (m6502_reg_a);
       loadRegTemp (NULL);
       // TODO? redundant?
@@ -9389,7 +9392,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
 
 //          storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
           loadRegFromConst(m6502_reg_y, yoff + offset);
-          emit6502op ("sta", INDFMT_IY, "__DPTR");
+          emit6502op ("sta", INDFMT_IY);
         }
       offset++;
     }
@@ -9408,7 +9411,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
           litval &= (~mask) & 0xff;
 //          loadRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
           loadRegFromConst(m6502_reg_y, yoff + offset);
-          emit6502op ("lda", INDFMT_IY, "__DPTR");
+          emit6502op ("lda", INDFMT_IY);
           if ((mask | litval) != 0xff)
             {
               emit6502op ("and", IMMDFMT, mask);
@@ -9420,7 +9423,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
           m6502_dirtyReg (m6502_reg_a);
 //          storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
           loadRegFromConst(m6502_reg_y, yoff + offset);
-          emit6502op ("sta", INDFMT_IY, "__DPTR");
+          emit6502op ("sta", INDFMT_IY);
           pullOrFreeReg (m6502_reg_a, needpulla);
           return;
         }
@@ -9437,7 +9440,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       // FIXME: works but ugly
 //      loadRegIndexed(m6502_reg_a, litOffset+offset, rematOffset);
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op ("lda", INDFMT_IY, "__DPTR");
+      emit6502op ("lda", INDFMT_IY);
       emit6502op ("and", IMMDFMT, mask);
 //      emitcode ("ora19", "1,s");
       storeRegTemp(m6502_reg_a, true);
@@ -9447,7 +9450,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       loadRegTemp(NULL);
 //      storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op ("sta", INDFMT_IY, "__DPTR");
+      emit6502op ("sta", INDFMT_IY);
       pullReg (m6502_reg_a);
     }
 
@@ -9865,7 +9868,7 @@ genPointerSet (iCode * ic)
     for (offset=0; offset<size; offset++) {
       loadRegFromAop (m6502_reg_a, AOP (right), offset);
       loadRegFromConst(m6502_reg_y, yoff + offset);
-      emit6502op("sta", INDFMT_IY, "__DPTR");
+      emit6502op("sta", INDFMT_IY);
     }
 
 release:

@@ -213,11 +213,6 @@ m6502_genAssemblerPreamble (FILE * of)
 
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists)))
     {
-      // global variables in zero page
-      fprintf (of, "\t.area\tZPABS (ABS,PAG)\n");
-      fprintf (of, "\t.org\t0\n");
-      fprintf (of, "__DPTR::\t.ds 2\n");
-      fprintf (of, "__TEMP::\t.ds %d\n", NUM_TEMP_REGS);
     }
 }
 
@@ -636,7 +631,7 @@ PORT mos6502_port =
 {
   TARGET_ID_MOS6502,
   "mos6502",
-  "MOS 6502",                       /* Target name */
+  "MOS 6502",                   /* Target name */
   NULL,                         /* Processor name */
   {
     glue,
@@ -661,7 +656,7 @@ PORT mos6502_port =
     ".rel",                     /* object file extension */
     1,                          /* need linker script */
     _crt,                       /* crt */
-    _libs_m6502,                 /* libs */
+    _libs_m6502,                /* libs */
   },
   {                             /* Peephole optimizer */
     _m6502_defaultRules,
@@ -685,7 +680,7 @@ PORT mos6502_port =
     64,                         /* bit-precise integer types up to _BitInt (64) */
   },
   /* tags for generic pointers */
-  { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x00 },   /* far, near, xstack, code */
   {
     "XSEG",               /* xstack_name */
     "STACK",              /* istack_name */
@@ -764,9 +759,9 @@ PORT mos6502_port =
   NULL,
   m6502_keywords,
   m6502_genAssemblerPreamble,
-  m6502_genAssemblerEnd,        /* no genAssemblerEnd */
+  m6502_genAssemblerEnd,        /* genAssemblerEnd */
   m6502_genIVT,
-  m6502_genXINIT,               /* no genXINIT code */
+  m6502_genXINIT,               /* genXINIT code */
   0,                            /* genInitStartup */
   m6502_reset_regparm,
   m6502_regparm,
@@ -797,14 +792,14 @@ PORT mos65c02_port =
 {
   TARGET_ID_MOS65C02,
   "mos65c02",
-  "WDC 65C02",                        /* Target name */
+  "WDC 65C02",                  /* Target name */
   NULL,                         /* Processor name */
   {
     glue,
     false,                      /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_LARGE,
-    0,                       /* model == target */
+    0,                          /* model == target */
   },
   {
     _asmCmd,
@@ -822,7 +817,7 @@ PORT mos65c02_port =
     ".rel",
     1,
     NULL,                       /* crt */
-    _libs_m65c02,                  /* libs */
+    _libs_m65c02,               /* libs */
   },
   {                             /* Peephole optimizer */
     _m65c02_defaultRules,
@@ -924,7 +919,7 @@ PORT mos65c02_port =
   NULL,
   m6502_keywords,
   m6502_genAssemblerPreamble,
-  m6502_genAssemblerEnd,       /* genAssemblerEnd */
+  m6502_genAssemblerEnd,        /* genAssemblerEnd */
   m6502_genIVT,
   m6502_genXINIT,
   0,                            /* genInitStartup */

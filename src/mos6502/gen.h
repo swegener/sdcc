@@ -72,7 +72,5 @@ extern unsigned fReturnSizeM6502;
 
 extern bool m6502_assignment_optimal;
 
-#define NUM_TEMP_REGS 8
-
 #endif
 

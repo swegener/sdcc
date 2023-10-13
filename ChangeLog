@@ -1,3 +1,8 @@
+2023-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version:
+	  Bump version for now fully working generalized constant propagation.
+
 2023-10-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCerr.c,

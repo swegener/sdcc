@@ -1,3 +1,8 @@
+2023-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/r*/crt0.s:
+	  Fix reti vs. ipres ret in crt0 templates for Rabbits (last part of bug #3652).
+
 2023-10-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mos6502/gen.h: moved NUM_TEMP_REGS into gen.c

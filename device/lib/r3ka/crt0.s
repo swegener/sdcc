@@ -90,11 +90,13 @@ skip_gsinit:
 	ioi
 	ld	a, (GCSR) ; clear interrupt
 	pop	af
-	reti
+	ipres
+	ret
 
 	; Secondary Watchdog - Rabbit 3000A only
 	.org	0x210
-	reti
+	ipres
+	ret
 
 	; rst 0x10
 	.org	0x220
@@ -122,31 +124,38 @@ skip_gsinit:
 
 	; Slave Port
 	.org	0x280
-	reti
+	ipres
+	ret
 
 	; Timer A
 	.org	0x2a0
-	reti
+	ipres
+	ret
 
 	; Timer B
 	.org	0x2b0
-	reti
+	ipres
+	ret
 
 	; Serial Port A
 	.org	0x2c0
-	reti
+	ipres
+	ret
 
 	; Serial Port B
 	.org	0x2d0
-	reti
+	ipres
+	ret
 
 	; Serial Port C
 	.org	0x2e0
-	reti
+	ipres
+	ret
 
 	; Serial Port D
 	.org	0x2f0
-	reti
+	ipres
+	ret
 
 	.org	0x300
 

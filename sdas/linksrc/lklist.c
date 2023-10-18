@@ -900,13 +900,13 @@ loop:   if (tfp == NULL)
         /*
          * Must have an ASxxxx Listing line number
          */
-         switch(a_bytes) {
-         default:
-         case 2: n = 30; break;
-         case 3:
-         case 4: n = 38; break;
-         }
-         if (!dgt(RAD10, &rb[n], 1)) {
+        switch(a_bytes) {
+        default:
+        case 2: n = 30; break;
+        case 3:
+        case 4: n = 38; break;
+        }
+        if (!dgt(RAD10, &rb[n], 1)) {
                 fprintf(rfp, "%s", rb);
                 goto loop;
         }
@@ -978,9 +978,9 @@ loop:   if (tfp == NULL)
         }
 #endif
         if (!dgt(r, &rb[n], m)) {
-                        fprintf(rfp, "%s", rb);
-                        goto loop;
-                }
+                fprintf(rfp, "%s", rb);
+                goto loop;
+        }
         sprintf(str, frmt, cpc);
         strncpy(&rb[n], str, m);
 

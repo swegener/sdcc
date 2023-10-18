@@ -208,12 +208,29 @@ m6502_getRegName (const struct reg_info *reg)
 static void
 m6502_genAssemblerPreamble (FILE * of)
 {
+  fprintf(of, ";; Ordering of segments for the linker.\n");
+  tfprintf (of, "\t!area\n", DATA_NAME);
+  tfprintf (of, "\t!area\n", OVERLAY_NAME);
+
+  tfprintf (of, "\t!area\n", "_DATA");
+  tfprintf (of, "\t!area\n", XIDATA_NAME);
+  tfprintf (of, "\t!area\n", XDATA_NAME);
+
+  tfprintf (of, "\t!area\n", HOME_NAME);
+  tfprintf (of, "\t!area\n", STATIC_NAME);
+  tfprintf (of, "\t!area\n", "GSFINAL");
+  tfprintf (of, "\t!area\n", CODE_NAME);
+  tfprintf (of, "\t!area\n", CONST_NAME);
+  tfprintf (of, "\t!area\n", XINIT_NAME);
+
+#if 0
   symbol *mainExists = newSymbol("main", 0);
   mainExists->block = 0;
 
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists)))
     {
     }
+#endif
 }
 
 static void

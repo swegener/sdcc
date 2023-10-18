@@ -645,7 +645,7 @@ allocParms (value *val, bool smallc)
           fatalError++;
           return;
         }
-        
+
       /* check the declaration */
       checkDecl (lval->sym, 0);
 
@@ -1253,7 +1253,7 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
           if (port->stack.direction < 0)
             stack_offset = -stack_offset;
 
-          dbuf_printf (oBuf, "to stack - %s %+d\n", SYM_BP (sym), sym->stack - stack_offset);
+          dbuf_printf (oBuf, "to stack - %s %+d %+d \n", SYM_BP (sym), sym->stack - stack_offset, getSize (sym->type));
           continue;
         }
 

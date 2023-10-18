@@ -639,7 +639,7 @@ relr3(void)
                  * Page Relocation Error Checking
                  */
                 if ((TARGET_IS_GB || TARGET_IS_Z80) &&
-                        mode & R3_PAG0 && (relv & ~0xFF || paga || pags))
+                    mode & R3_PAG0 && (relv & ~0xFF || paga || pags))
                         error = 4;
                 if (mode & R3_PAG  && (relv & ~0xFF))
                         error = 5;
@@ -1065,7 +1065,7 @@ erpdmp3(FILE *fptr, char *str)
 /*         111111111122222222223333333333444444444455555555556666666666777*/
 /*123456789012345678901234567890123456789012345678901234567890123456789012*/
         fprintf(fptr,
-"         file              module            pgarea            pgoffset\n");
+"         file              module            pgarea               pgoffset\n");
         fprintf(fptr,
 "  PgDef  %-14.14s    %-14.14s    %-14.14s    ",
                         thp->h_lfile->f_idp,

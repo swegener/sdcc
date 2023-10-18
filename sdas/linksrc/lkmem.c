@@ -81,14 +81,14 @@ int summary(struct area * areap)
     _Mem Rom8051 =   {0xffff, 0, 65536, "ROM/EPROM/FLASH",    0x0200};
 
     _Mem Ram6808[] = {
-        {0,     0,      0,       "REG_BANK_0", 0x0001},
-        {0x0,   0,      0,       "REG_BANK_1", 0x0002},
-        {0x0,   0,      0,       "REG_BANK_2", 0x0004},
-        {0x0,   0,      0,       "REG_BANK_3", 0x0008},
-        {0x0,   0,      0,       "BSEG_BYTES", 0x0010},
+        {0,     0,      0,      "REG_BANK_0", 0x0001},
+        {0x0,   0,      0,      "REG_BANK_1", 0x0002},
+        {0x0,   0,      0,      "REG_BANK_2", 0x0004},
+        {0x0,   0,      0,      "REG_BANK_3", 0x0008},
+        {0x0,   0,      0,      "BSEG_BYTES", 0x0010},
         {0,     0,      256,    "UNUSED",     0x0000},
         {0xff,  0,      256,    "DATA",       0x0020},
-        {0,             0,      256, "TOTAL:",     0x0000}
+        {0,     0,      256,    "TOTAL:",     0x0000}
     };
 
     _Mem IRam6808 =  {0xff,   0,     0, "INDIRECT RAM",           0x0080};

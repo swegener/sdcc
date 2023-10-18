@@ -1,3 +1,24 @@
+2023-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lklist.c,
+	* sdas/linksrc/lkmem.c,
+	* sdas/linksrc/lkrloc3.c: cosmetics
+	* src/SDCCglobl.h: reduced LEVEL_UNIT to 10000 for human readability
+	* src/SDCCicode.c(geniCodeCall): support xstack
+	* src/SDCCmem.c(printAllocInfoSeg): also print size on stack
+	* src/mcs51/gen.c(pushbigreturn): use xstack when asked for,
+	  (genCall): clean up xstack when asked for,
+	  (genFunction): optimize stack adjustment > 7,
+	  (genRet): try to use tempregs for bigreturn,
+	  use add in A instead of many inc dptr for larger offsets,
+	  support xstack,
+	  (genPagedPointerSet): add pdata support
+	* src/mcs51/rtrack.c(_mcs51_rtrackUpdate): updated comments
+	* src/mos6502/main.c(m6502_genAssemblerPreamble): attempt to keep areas in
+	  correct order
+	* support/regression/tests/gcc-torture-execute-20020328-1.c: renamed testit()
+	  to tryit() since the test prefix has special meaning in regression testing
+
 2023-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/r*/crt0.s:

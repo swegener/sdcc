@@ -14,7 +14,7 @@ void
 func (void) { }
 
 void
-testit(int x)
+tryit(int x)
 {
   ASSERT (x == 20);
 }
@@ -29,6 +29,6 @@ testTortureExecute (void)
 
   /* simplify_and_const_int would incorrectly omit the mask in
      the line below.  */
-  testit ((a + 23) & 0xfffffffc);
+  tryit ((a + 23) & 0xfffffffc);
   return;
 }

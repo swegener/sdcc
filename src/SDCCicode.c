@@ -3754,7 +3754,9 @@ geniCodeCall (operand * left, ast * parms, int lvl)
       SPEC_OCLS (sym->etype) = NULL;
       SPEC_EXTR (sym->etype) = 0;
       SPEC_STAT (sym->etype) = 0;
-      currFunc->stack += allocVariables (sym);
+      stack = allocVariables (sym);
+      currFunc->stack += options.useXstack ? 0 : stack;
+      currFunc->xstack += options.useXstack ? stack : 0;
       IC_RESULT (ic) = operandFromSymbol (sym, false);
       return (operandFromSymbol (sym, true));
     }

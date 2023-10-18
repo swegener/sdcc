@@ -191,7 +191,7 @@
                                          : "empty"))
 
 /* for semantically partitioned nest level values */
-#define LEVEL_UNIT      65536
+#define LEVEL_UNIT      10000
 #define SUBLEVEL_UNIT   1
 
 /* optimization options */

@@ -1,3 +1,7 @@
+2023-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/push_pop_sp.c: bug fix, remove unintended code
+
 2023-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lklist.c,

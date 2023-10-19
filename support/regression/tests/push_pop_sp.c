@@ -10,9 +10,6 @@ void test(void)
 	__asm
 		mov	__SP0,SP
 		push	SP
-		mov	r0,#s_SSEG
-		mov	r0,#l_SSEG
-		mov	r0,#e_SSEG
 		mov	r0,SP
 		mov	__SP1,@r0
 		mov	@r0,#0xFE

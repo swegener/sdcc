@@ -4700,14 +4700,22 @@ genRet (iCode * ic)
       bool framepointer = (IFFUNC_ISREENT (currFunc->type) || options.stackAuto) && !options.omitFramePtr;
       asmop *aop = newAsmop (0);
       reg_info *preg = getFreePtr (ic, aop, false);
+      const char *bp = options.useXstack ? (framepointer ? "_bpx" : "_spx") : (framepointer ? "_bp" : "sp");
+      int offset = -(GPTRSIZE - 1);
+      if (!options.useXstack)
+        offset -= 2 + IFFUNC_ISBANKEDCALL (currFunc->type);
+      offset -= framepointer;
+      if (!framepointer)
+        offset -= currFunc->stack;
+
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
         {
           reg_info *tempRegs[2];
 
           if (getTempRegs (tempRegs, 2, ic))
             {
-              emitcode ("mov", "a,sp");
-              emitcode ("add", "a,#0x%02x", 0xfc - IFFUNC_ISBANKEDCALL (currFunc->type) - currFunc->stack - framepointer - 3);
+              emitcode ("mov", "a,%s", bp);
+              emitcode ("add", "a,#0x%02x", offset & 0xffu);
               emitcode ("mov", "%s,a", preg->name);
               emitcode ("mov", "%s,@%s", tempRegs[0]->name, preg->name);
               emitcode ("inc", "%s", preg->name);
@@ -4744,8 +4752,8 @@ genRet (iCode * ic)
                   emitpush ("dpl");
                   emitpush ("dph");
                   emitpush ("acc");
-                  emitcode ("mov", "a,sp");
-                  emitcode ("add", "a,#0x%02x", 0xfc - IFFUNC_ISBANKEDCALL (currFunc->type) - currFunc->stack - framepointer - 3);
+                  emitcode ("mov", "a,%s", bp);
+                  emitcode ("add", "a,#0x%02x", offset & 0xffu);
                   emitcode ("mov", "%s,a", preg->name);
                   if (i < 6)
                     {
@@ -4778,15 +4786,6 @@ genRet (iCode * ic)
         }
       else
         {
-          const char *bp = options.useXstack ? SP_BP("_spx", "_bpx") : SP_BP("sp", "_bp");
-          int offset = -GPTRSIZE;
-          if (!options.useXstack)
-            offset -= 2 + IFFUNC_ISBANKEDCALL (currFunc->type);
-          else
-            offset -= framepointer;
-          if (!framepointer)
-            offset -= currFunc->stack;
-
           emitcode ("mov", "a,%s", bp);
           emitcode ("add", "a,#0x%02x", offset & 0xffu);
           emitcode ("mov", "%s,a", preg->name);

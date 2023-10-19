@@ -1,6 +1,9 @@
 2023-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/push_pop_sp.c: bug fix, remove unintended code
+	* src/SDCCmem.c(printAllocInfoSeg): adjust stack offsets for struct
+	  returning functions
+	* src/mcs51/gen.c(genRet): fixed stack/xstack with/without framepointer
 
 2023-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

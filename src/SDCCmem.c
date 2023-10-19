@@ -1248,6 +1248,9 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
                 stack_offset = func->stack;
             }
 
+          if (IS_STRUCT (func->type->next) && sym->stack < 0)
+            stack_offset += GPTRSIZE;
+
           stack_offset += port->stack.offset; /* in case sp/bp points to the next location instead of last */
 
           if (port->stack.direction < 0)

@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 COMMAND_ON(uc,cl_state_cmd);
 COMMAND_ON(uc,cl_file_cmd);
 COMMAND_ON(uc,cl_dl_cmd);
+COMMAND_ON(uc,cl_check_cmd);
 COMMAND_ON(uc,cl_pc_cmd);
 COMMAND_ON(uc,cl_reset_cmd);
 COMMAND_ON(uc,cl_tick_cmd);

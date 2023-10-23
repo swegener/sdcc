@@ -133,6 +133,36 @@ CMDHELP(cl_file_cmd,
 	"")
 
 /*
+ * Command: check
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_check_cmd)
+{
+  const char *fname= 0;
+  long l;
+
+  if ((cmdline->param(0) == 0) ||
+      ((fname= cmdline->param(0)->get_svalue()) == NULL))
+    {
+      con->dd_printf("File name is missing.\n");
+      return(0);
+    }
+
+  if ((l= uc->read_file(fname, con, true)) >= 0)
+    {
+      //con->dd_printf("%ld words read from %s\n", l, fname);
+    }
+
+  return(0);
+}
+
+CMDHELP(cl_check_cmd,
+	"check \"FILE\"",
+        "Compare FILE with ROM",
+	"")
+
+/*
  * Command: download
  *----------------------------------------------------------------------------
  */
@@ -154,6 +184,7 @@ CMDHELP(cl_dl_cmd,
 	"download",
 	"Load (intel.hex) data",
 	"")
+
 
 /*
  * Command: pc

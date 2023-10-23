@@ -827,6 +827,9 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
   cmd->init();
   cmd->add_name("dl");
 
+  cmdset->add(cmd= new cl_check_cmd("check", 0));
+  cmd->init();
+
   cmdset->add(cmd= new cl_pc_cmd("pc", 0));
   cmd->init();
 
@@ -1606,7 +1609,7 @@ cl_uc::read_asc_file(cl_f *f)
 }
 
 long
-cl_uc::read_p2h_file(cl_f *f)
+cl_uc::read_p2h_file(cl_f *f, bool just_check)
 {
   chars line= chars();
   int c;
@@ -1627,7 +1630,17 @@ cl_uc::read_p2h_file(cl_f *f)
 		{
 		  t_mem v= w1.htoi();//strtol(w1.c_str(), 0, 16);
 		  t_addr a= w3.htoi();//strtol(w3.c_str(), 0, 16);
-		  set_rom(a, v);
+		  if (just_check)
+		    {
+		      t_mem mv= rom->read(a);
+		      if (mv != v)
+			{
+			  application->dd_printf("Diff at %08x, FILE=%08x MEM=%08x\n",
+						 AU32(a), MU32(v), MU32(mv));
+			}
+		    }
+		  else
+		    set_rom(a, v);
 		  nr++;		  
 		}
 	    }
@@ -2015,7 +2028,7 @@ cl_uc::find_loadable_file(chars nam)
 }
 
 long
-cl_uc::read_file(chars nam, class cl_console_base *con)
+cl_uc::read_file(chars nam, class cl_console_base *con, bool just_check)
 {
   cl_f *f= find_loadable_file(nam);
   long l= 0;
@@ -2032,7 +2045,7 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
     printf("Loading from %s\n", f->get_file_name());
   if (is_p2h_file(f))
     {
-      l= read_p2h_file(f);
+      l= read_p2h_file(f, just_check);
       if (!application->quiet)
 	printf("%ld words read from %s\n", l, f->get_fname());
     }
@@ -2100,7 +2113,8 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
     }
   delete f;
 
-  analyze_init();
+  if (!just_check)
+    analyze_init();
   return l;
 }
 
@@ -2620,16 +2634,21 @@ cl_uc::addr_name(t_addr addr,
       cl_address_decoder *ad = ((cl_address_space *)mem)->get_decoder_of(addr);
       if (ad)
         {
-          mem = ad->memchip;
-          addr = ad->as_to_chip(addr);
-
-          if (vars->by_addr.search(mem, addr, bitnr_high, bitnr_low, i))
-            var = vars->by_addr.at(i);
-          else if (vars->by_addr.search(mem, addr, mem->width - 1, 0, i))
-            var = vars->by_addr.at(i);
-          else if (bitnr_high >= 0 && vars->by_addr.search(mem, addr, -1, -1, i))
-            var = vars->by_addr.at(i);
-        }
+          class cl_memory *chip = ad->memchip;
+	  if (chip)
+	    {
+	      addr = ad->as_to_chip(addr);
+	      
+	      if (vars->by_addr.search(chip, addr, bitnr_high, bitnr_low, i))
+		var = vars->by_addr.at(i);
+	      else if (vars->by_addr.search(chip, addr, chip->width - 1, 0, i))
+		var = vars->by_addr.at(i);
+	      else if (bitnr_high >= 0 && vars->by_addr.search(chip, addr, -1, -1, i))
+		var = vars->by_addr.at(i);
+	    }
+	  else if (vars->by_addr.search(mem, addr, -1, -1, i))
+	    var = vars->by_addr.at(i);
+	}
     }
 
   if (var)
@@ -3150,14 +3169,19 @@ cl_uc::do_inst(void)
 	/* backup to start of instruction */
 	PC= instPC;
       else
-	if (res == resGO && !inst_at(instPC) && analyzer)
-	  {
-	    analyze(instPC);
-	  }
+	{
+	  if (analyzer)
+	    {
+	      if (res == resGO && !inst_at(instPC))
+		{
+		  analyze(instPC);
+		}
+	    }
+	}
     }
   post_inst();
 
-  if ((res == resGO) && (PC == instPC) && stop_selfjump)
+  if ((res == resGO) && (PC == instPC) && stop_selfjump && !repeating)
     {
       res= resSELFJUMP;
       return res;
@@ -3206,6 +3230,7 @@ cl_uc::pre_inst(void)
   events->disconn_all();
   vc.inst++;
   inst_ticks= 0;
+  repeating= false;
 }
 
 void

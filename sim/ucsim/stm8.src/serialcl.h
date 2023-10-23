@@ -44,6 +44,7 @@ class cl_serial: public cl_serial_hw
 {
  protected:
   bool clk_enabled;
+  bool clk_en_is_set;
   t_addr base;
   int type, txit, rxit;
   class cl_memory_cell *regs[12];

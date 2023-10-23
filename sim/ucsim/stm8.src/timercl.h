@@ -83,6 +83,7 @@ class cl_tim: public cl_hw
   t_addr base;
   cl_memory_cell *regs[32+6];
   bool clk_enabled;
+  bool clk_en_is_set;
   
   int cnt; // copy of counter value
 

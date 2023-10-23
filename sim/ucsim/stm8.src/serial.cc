@@ -75,6 +75,7 @@ cl_serial::cl_serial(class cl_uc *auc,
   base= abase;
   txit= atxit;
   rxit= arxit;
+  clk_en_is_set= false;
 }
 
 
@@ -130,7 +131,10 @@ cl_serial::reset(void)
     regs[i]->set(0);
 
   s_sending= s_receiving= false;
-  clk_enabled= false;
+  if (clk_en_is_set)
+    clk_en_is_set= false;
+  else
+    clk_enabled= false;
   pick_div();
   pick_ctrl();
 
@@ -355,6 +359,7 @@ cl_serial::happen(class cl_hw *where, enum hw_event he,
       if ((e->cath == HW_UART) &&
 	  (e->id == id))
 	clk_enabled= he == EV_CLK_ON;
+      clk_en_is_set= true;
     }
 }
 

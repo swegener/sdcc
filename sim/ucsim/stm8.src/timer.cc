@@ -67,6 +67,7 @@ cl_tim::cl_tim(class cl_uc *auc, int aid, t_addr abase):
   for (i= 0; i<32+6; i++)
     regs[i]= 0;
   memset(&idx, 0xff, sizeof(idx));
+  clk_en_is_set= false;
 }
 
 int
@@ -106,7 +107,10 @@ cl_tim::init(void)
     }
   pbits= 16;
   bidir= true;
-  clk_enabled= false;
+  if (clk_en_is_set)
+    clk_en_is_set= false;
+  else
+    clk_enabled= false;
   
   return 0;
 }
@@ -177,6 +181,7 @@ cl_tim::happen(class cl_hw *where, enum hw_event he,
       if ((e->cath == HW_TIMER) &&
 	  (e->id == id))
 	clk_enabled= he == EV_CLK_ON;
+      clk_en_is_set= true;
     }
 }
 

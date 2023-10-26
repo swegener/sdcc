@@ -80,6 +80,7 @@ static void func_2(void);
 void
 testBug (void)
 {
+    player.ySpr = 16;
     func_1();
 }
 

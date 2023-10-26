@@ -40,7 +40,12 @@ typedef struct {
 
 } SpriteItem;
 
-const SpriteItem * wolf_sheets[1];
+const ImageBaseType I2[1] = {0};
+const ImageBaseType * const I1 = &I2;
+const ImageBaseType * const * const I0 = &I1;
+SpriteItem SI = {I0, 0};
+
+const SpriteItem * wolf_sheets[1] = {&SI};
 
 uint8_t sprite_state_show( uint8_t id, SpriteData *sprite, uint8_t y, uint8_t tile ) {
 

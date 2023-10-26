@@ -40,10 +40,9 @@ typedef struct {
 
 } SpriteItem;
 
-const ImageBaseType I2[1] = {0};
-const ImageBaseType * const I1 = &I2;
+const ImageBaseType * const I1 = {0};
 const ImageBaseType * const * const I0 = &I1;
-SpriteItem SI = {I0, 0};
+SpriteItem SI = {&I0, 0};
 
 const SpriteItem * wolf_sheets[1] = {&SI};
 

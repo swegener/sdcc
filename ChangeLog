@@ -1,3 +1,8 @@
+2023-10-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Fix generalized constant propagation analysis of pointers for host with 32-bit long (bug #3667).
+
 2023-10-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3579.c,

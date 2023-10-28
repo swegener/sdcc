@@ -108,7 +108,7 @@ getTypeValinfo (sym_link *type)
   v.anything = true;
   v.nothing = false;
   // Initialize all members of v, to ensure we don't read uninitalized memory later.
-  v.min = v.max = 0;
+  v.min = v.max = 0ll;
   v.knownbitsmask = 0ull;
   v.knownbits = 0ull;
 
@@ -124,8 +124,8 @@ getTypeValinfo (sym_link *type)
     {
       v.anything = false;
       v.min = 0;
-      v.max = (1ul << (GPTRSIZE * 8)) - 1;
-      v.knownbitsmask = ~((unsigned long)v.max);
+      v.max = (1ll << (GPTRSIZE * 8)) - 1;
+      v.knownbitsmask = ~((unsigned long long)v.max);
       if (TARGET_IS_MCS51 && IS_PTR (type) && !IS_GENPTR (type) ||
         TARGET_PDK_LIKE && IS_PTR (type) && (DCL_TYPE (type) == CPOINTER || DCL_TYPE (type) == POINTER))
         {
@@ -760,7 +760,7 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
 
 #ifdef DEBUG_GCP_ANALYSIS
       if (localchange)
-        std::cout << "Recompute node " << i << " ic " << ic->key << "\n";
+        std::cout << "Recompute node " << i << " ic " << ic->key << "\n";std::cout << "getTypeValinfo: resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
 #endif
 
       if (!localchange) // Input didn't change. No need to recompute result.

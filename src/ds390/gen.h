@@ -45,7 +45,7 @@ typedef struct asmop
                                    AOP_R0/R1  -  r0/r1 contains address of operand
                                    AOP_STK    -  should be pushed on stack this
                                                  can happen only for the result
-                                   AOP_IMMD   -  immediate value for eg. remateriazable
+                                   AOP_IMMD   -  immediate value for e.g. rematerializable
                                    AOP_CRY    -  carry contains the value of this
                                    AOP_STR    -  array of strings
                                    AOP_ACC    -  result is in the acc:b pair

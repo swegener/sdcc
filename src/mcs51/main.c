@@ -563,15 +563,21 @@ mcs51operandCompare (const void *key, const void *member)
 }
 
 static void
-updateOpRW (asmLineNode *aln, char *op, char *optype)
+updateOpRW (asmLineNode *aln, const char *op_in, const char *optype)
 {
   mcs51operanddata *opdat;
-  char *dot;
 
-  dot = strchr(op, '.');
-  if (dot)
-    *dot = '\0';
+  /* Ignore dots or brackets in operand (bit numbes) for operand table search.
+     But remember that it's a bit access for special case handling.  */
+  char op[32];
+  strncpy (op, op_in, 31);
+  op[31] = '\0';
 
+  char *bit_sep;
+  if (bit_sep = strchr (op, '.'))
+    *bit_sep = '\0';
+  else if (bit_sep = strchr (op, '['))
+    *bit_sep = '\0';
   opdat = bsearch (op, mcs51operandDataTable,
                    sizeof(mcs51operandDataTable)/sizeof(mcs51operanddata),
                    sizeof(mcs51operanddata), mcs51operandCompare);
@@ -589,6 +595,13 @@ updateOpRW (asmLineNode *aln, char *op, char *optype)
         aln->regsWritten = bitVectSetBit (aln->regsWritten, opdat->regIdx1);
       if (opdat->regIdx2 >= 0)
         aln->regsWritten = bitVectSetBit (aln->regsWritten, opdat->regIdx2);
+
+      /* Any bit access always implies a read of the full register.  */
+      if (opdat->regIdx1 == A_IDX && bit_sep)
+        aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
+
+      if (opdat->regIdx1 == B_IDX && bit_sep)
+        aln->regsRead = bitVectSetBit (aln->regsRead, B_IDX);
     }
   if (op[0] == '@')
     {
@@ -670,6 +683,12 @@ mcs51opcodeCompare (const void *key, const void *member)
   return strcmp((const char *)key, ((mcs51opcodedata *)member)->name);
 }
 
+static const char* skip_spaces (const char* p)
+{
+  while (*p && isspace(*p)) p++;
+  return p;
+}
+
 static asmLineNode *
 asmLineNodeFromLineNode (lineNode *ln)
 {
@@ -679,10 +698,13 @@ asmLineNodeFromLineNode (lineNode *ln)
   const char *p;
   char inst[8];
   mcs51opcodedata *opdat;
+  bool op_ignore_case;
 
   p = ln->line;
 
-  while (*p && isspace(*p)) p++;
+  /* extract instruction */
+
+  p = skip_spaces (p);
   for (op = inst, opsize=1; *p; p++)
     {
       if (isspace(*p) || *p == ';' || *p == ':' || *p == '=')
@@ -696,22 +718,33 @@ asmLineNodeFromLineNode (lineNode *ln)
   if (*p == ';' || *p == ':' || *p == '=')
     return aln;
 
-  while (*p && isspace(*p)) p++;
+  p = skip_spaces (p);
   if (*p == '=')
     return aln;
+
+
+  /* extract first operand.  if it starts with '_' that usually means
+     it's a case sensitive symbol from c code.  */
+  op_ignore_case = *p != '_';
 
   for (op = op1, opsize=1; *p && *p != ','; p++)
     {
       if (!isspace(*p) && opsize < sizeof(op1))
-        *op++ = tolower(*p), opsize++;
+        *op++ = (op_ignore_case ? tolower(*p) : *p), opsize++;
     }
   *op = '\0';
 
   if (*p == ',') p++;
+
+  /* extract second operand.  if it starts with '_' that usually means
+     it's a case sensitive symbol from c code.  */
+  p = skip_spaces (p);
+  op_ignore_case = *p != '_';
+
   for (op = op2, opsize=1; *p && *p != ','; p++)
     {
       if (!isspace(*p) && opsize < sizeof(op2))
-        *op++ = tolower(*p), opsize++;
+        *op++ = (op_ignore_case ? tolower(*p) : *p), opsize++;
     }
   *op = '\0';
 

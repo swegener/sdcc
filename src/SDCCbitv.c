@@ -520,7 +520,7 @@ bitVectClear (bitVect *bvp)
 /* bitVectDebugOn - prints bits that are on                        */
 /*-----------------------------------------------------------------*/
 void 
-bitVectDebugOn (bitVect * bvp, FILE * of)
+bitVectDebugOn (const bitVect * bvp, FILE * of)
 {
   int i;
 
@@ -539,3 +539,17 @@ bitVectDebugOn (bitVect * bvp, FILE * of)
   fprintf (of, "}\n");
 }
 
+/*-----------------------------------------------------------------*/
+/* bitVectPrint - prints all the bits                              */
+/*-----------------------------------------------------------------*/
+void
+bitVectPrint (FILE * of, const bitVect * bvp)
+{
+  if (bvp)
+    {
+      for (int i = 0; i < bvp->size; ++i)
+        fprintf (of, "%d", bitVectBitValue (bvp, i));
+    }
+  else
+    fprintf (of, "(nil)");
+}

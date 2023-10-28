@@ -61,6 +61,7 @@ int bitVectIsZero (const bitVect *);
 int bitVectnBitsOn (const bitVect *);
 int bitVectFirstBit (const bitVect *);
 void bitVectClear (bitVect *bvp);
-void bitVectDebugOn (bitVect *, FILE *);
+void bitVectDebugOn (const bitVect *, FILE *);
+void bitVectPrint (FILE *, const bitVect *);
 #endif
 

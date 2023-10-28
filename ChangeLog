@@ -11,6 +11,9 @@
 	  Patch 3 from patch ticket #466 by Oleg Endo.
 	* src/mcs51/main.c:
 	  Patch 6 from patch ticket #466 by Oleg Endo.
+	* src/SDCCbitv.c,
+	  src/SDCCbitv.h:
+	  Patch 10 from patch ticket #466 by Oleg Endo.
 
 2023-10-28 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -78,4 +78,14 @@ bitVect *mcs51_allBankregs (void);
 extern int mcs51_ptrRegReq;
 extern int mcs51_nRegs;
 
+
+/* reverse lookup register mnemonic to ?_IDX enum.
+
+   { "r7", "r6", ... } -> { R7_IDX, R6_IDX, ... }
+   { "ar7", "ar6", ... } -> { R7_IDX, R6_IDX, ... }
+
+   returns -1 if not found.  */
+int mcs51_regname_to_idx (const char* name);
+
+
 #endif

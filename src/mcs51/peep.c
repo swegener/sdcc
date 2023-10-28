@@ -304,14 +304,14 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
   len = strlen (pReg);
 
   /* get index into pReg table */
-  for (rIdx = 0; rIdx < mcs51_nRegs; ++rIdx)
-    if (strcmp (regs8051[rIdx].name, pReg + 1) == 0)
-      break;
+  rIdx = mcs51_regname_to_idx (pReg);
 
-  /* sanity check */
-  if (rIdx >= mcs51_nRegs)
+  if (rIdx < 0)
     {
-      DEADMOVEERROR();
+      /* This can happen if a wrong register name is passed from the peephole pattern. */
+      char msg[256];
+      sprintf (msg, "scan4op -- got invalid register name: '%s'", pReg);
+      werror (W_INTERNAL_ERROR, __FILE__, __LINE__, msg);
       return S4O_ABORT;
     }
 

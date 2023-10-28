@@ -1301,10 +1301,12 @@ operandBaseName (const char *op)
 {
   if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
     {
-      if (!strcmp (op, "acc") || !strncmp (op, "acc.", 4))
-        return "a";
       if (!strncmp (op, "ar", 2) && ISCHARDIGIT(*(op+2)) && !*(op+3))
         return op+1;
+      if (!strcmp (op, "ab"))
+        return "ab";
+      if (!strcmp (op, "acc") || !strncmp (op, "acc.", 4) || *op == 'a')
+        return "a";
       // bug 1739475, temp fix
       if (op[0] == '@')
         return operandBaseName(op+1);
@@ -1797,6 +1799,7 @@ FBYNAME (operandsNotRelated)
       return FALSE;
     }
 
+  bool ret = true;
   while ((op1 = setFirstItem (operands)))
     {
       deleteSetItem (&operands, (void*)op1);
@@ -1807,14 +1810,28 @@ FBYNAME (operandsNotRelated)
           op2 = operandBaseName (op2);
           if (strcmp (op1, op2) == 0)
             {
-              deleteSet (&operands);
-              return FALSE;
+              ret = false;
+              goto done;
+            }
+
+          if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
+            {
+              /* handle overlapping 'dptr' vs. { 'dpl', 'dph' }  */
+              if (!strcmp (op1, "dptr") && (!strcmp (op2, "dpl") || !strcmp (op2, "dph")) ||
+                !strcmp (op2, "dptr") && (!strcmp (op1, "dpl") || !strcmp (op1, "dph")) || 
+                !strcmp (op1, "ab") && (!strcmp (op2, "a") || !strcmp (op2, "b")) ||
+                !strcmp (op2, "ab") && (!strcmp (op1, "a") || !strcmp (op1, "b")))
+                  {
+                    ret = false;
+                    goto done;
+                  }
             }
         }
     }
 
+done:
   deleteSet (&operands);
-  return TRUE;
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/

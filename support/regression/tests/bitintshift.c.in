@@ -36,7 +36,7 @@ typedef unsigned char counttype;
 #elif defined (__SDCC_pdk15)
 #define MAXWIDTH 40
 #elif defined (__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)
-#define MAXWIDTH 32 // Todo: Change to 48, once bug #3634 is fixed.
+#define MAXWIDTH 48
 #else
 #define MAXWDITH 64
 #endif

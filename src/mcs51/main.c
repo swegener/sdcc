@@ -92,10 +92,13 @@ static int regParmFlg = 0;      /* determine if we can register a parameter     
 static int regBitParmFlg = 0;   /* determine if we can register a bit parameter */
 static struct sym_link *regParmFuncType;
 
+extern void mcs51_init_asmops (void);
+
 static void
 _mcs51_init (void)
 {
   asm_addTree (&asm_asxxxx_mapping);
+  mcs51_init_asmops ();
 }
 
 static void

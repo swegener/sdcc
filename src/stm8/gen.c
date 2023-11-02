@@ -2256,12 +2256,10 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
-          int j;
-
           if (assigned[i] || !source->aopu.bytes[soffset + i].in_reg)
             continue;
 
-          for (j = 0; j < n; j++)
+          for (int j = 0; j < n; j++)
             {
               if (!source->aopu.bytes[soffset + j].in_reg || !result->aopu.bytes[roffset + i].in_reg)
                 continue;

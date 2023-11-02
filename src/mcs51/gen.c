@@ -153,6 +153,31 @@ static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 #define MSB24   2
 #define MSB32   3
 
+static struct asmop asmop_a, asmop_ret;
+static struct asmop *const ASMOP_A = &asmop_a;
+static struct asmop *const ASMOP_RET = &asmop_ret;
+
+// Init aop as a an asmop for data in registers, as given by the -1-terminated array regidx.
+static void
+mcs51_init_reg_asmop (asmop *aop, const signed char *regidx)
+{
+  aop->type = AOP_REG;
+  aop->size = 0;
+  
+  for(int i = 0; regidx[i] >= 0; i++)
+    {
+      aop->aopu.aop_reg[i] = regs8051 + regidx[i];
+      aop->size++;
+    }
+}
+
+void
+mcs51_init_asmops (void)
+{
+  mcs51_init_reg_asmop(&asmop_a, (const signed char[]){A_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_ret, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, R5_IDX, R6_IDX, R7_IDX, -1});
+}
+
 /*-----------------------------------------------------------------*/
 /* mcs51_emitDebuggerSymbol - associate the current code location  */
 /*   with a debugger symbol                                        */
@@ -2106,6 +2131,217 @@ xch_a_aopGet (operand * oper, int offset, bool bit16, bool dname)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopInReg - asmop from offset in the register                    */
+/*-----------------------------------------------------------------*/
+static bool
+aopInReg (const asmop *aop, int offset, short rIdx)
+{
+  if (aop->type != AOP_REG)
+    return (false);
+
+  if (offset >= aop->size || offset < 0)
+    return (false);
+
+  // todo enable when we hvae DPTR_IDX
+  //if (rIdx == DPTR_IDX)
+  //  return (aopInReg (aop, offset, DPL_IDX) && aopInReg (aop, offset + 1, DPH_IDX));
+
+  return (aop->aopu.aop_reg[offset]->rIdx == rIdx);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopInRn - Check if byte of asmop is in any of R0, ..., R7.      */
+/*-----------------------------------------------------------------*/
+static bool aopInRn (const asmop *aop, int i)
+{
+  if (aop->type != AOP_REG  || i >= aop->size)
+    return (false);
+  int rIdx = aop->aopu.aop_reg[i]->rIdx;
+  return (rIdx == R0_IDX || rIdx == R1_IDX || rIdx == R2_IDX || rIdx == R3_IDX || rIdx == R4_IDX || rIdx == R5_IDX || rIdx == R6_IDX || rIdx == R7_IDX);
+}
+
+/*-----------------------------------------------------------------*/
+/* cheapMove - Copy a single byte from one asmop to another.       */
+/*-----------------------------------------------------------------*/
+static void
+cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
+{
+  if (aopInReg (to, to_offset, A_IDX))
+    a_dead = true;
+
+  if (to->type == AOP_REG && from->type == AOP_REG &&
+    to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
+    return;
+        
+  if (aopInReg (to, to_offset, A_IDX) && (aopInRn (from, from_offset) || aopInReg (from, from_offset, B_IDX) || aopInReg (from, from_offset, DPL_IDX) || aopInReg (from, from_offset, DPH_IDX)))
+    {
+      emitcode ("mov", "a, %s", from->aopu.aop_reg[from_offset]->name);
+    }
+  else if (aopInReg (from, from_offset, A_IDX) && (aopInRn (to, to_offset) || aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)))
+    {
+      emitcode ("mov", "%s, a", to->aopu.aop_reg[to_offset]->name);
+    }
+  else if (aopInRn (to, to_offset) && (aopInRn (from, from_offset) || aopInReg (from, from_offset, B_IDX) || aopInReg (from, from_offset, DPL_IDX) || aopInReg (from, from_offset, DPH_IDX)))
+    {
+      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->name, from->aopu.aop_reg[from_offset]->dname);
+    }
+  else if (aopInRn (from, from_offset) && (aopInRn (to, to_offset) || aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)))
+    {
+      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, from->aopu.aop_reg[from_offset]->name);
+    }
+  else if (a_dead)
+    {
+      cheapMove (ASMOP_A, 0, from, from_offset, true);
+      cheapMove (to, to_offset, ASMOP_A, 0, true);
+    }
+  else if (aopInRn (from, from_offset))
+    {
+      emitcode ("xch", "a, %s", from->aopu.aop_reg[from_offset]->name);
+      cheapMove (to, to_offset, ASMOP_A, 0, false);
+      emitcode ("xch", "a, %s", from->aopu.aop_reg[from_offset]->name);
+    }
+  else if (aopInRn (to, to_offset))
+    {
+      emitcode ("xch", "a, %s", to->aopu.aop_reg[to_offset]->name);
+      cheapMove (ASMOP_A, 0, from, from_offset, true);
+      emitcode ("xch", "a, %s", to->aopu.aop_reg[to_offset]->name);
+    }
+  else if (!a_dead)
+    {
+      emitpush ("acc");
+      cheapMove (to, to_offset, from, from_offset, true);
+      emitpop ("acc");
+    }
+  else
+    wassert (0);
+}
+
+/*-----------------------------------------------------------------*/
+/* genCopy - Copy the value from one reg/stk asmop to another.     */
+/*-----------------------------------------------------------------*/
+static void
+genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool a_dead)
+{
+  int regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
+  bool assigned[8] = {false, false, false, false, false, false, false, false};
+  //bool a_free, hl_free;
+  //int cached_byte = -1;
+  //bool pushed_a = false;
+
+  wassertl_bt (n <= 8, "Invalid size for genCopy().");
+  //wassertl_bt (aopRS (source), "Invalid source type.");
+  //wassertl_bt (aopRS (result), "Invalid result type.");
+  wassertl_bt (result->type == AOP_REG && source->type == AOP_REG, "genCopy not yet implemented for non-register operands");
+
+  //a_dead |= (result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + sizex); todo: enable when supported by struct asmop
+
+  size = n;
+  regsize = 0;
+  for (int i = 0; i < n; i++)
+    regsize += (source->type == AOP_REG);
+
+  // Do nothing for coalesced bytes.
+  for (int i = 0; i < n; i++)
+    if (result->type == AOP_REG && source->type == AOP_REG && result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + i])
+      {
+        assigned[i] = true;
+        regsize--;
+        size--;
+      }
+
+  // Move everything from registers to the stack.
+  wassert (source->type != AOP_REG || source->size <= 8);
+  // todo
+
+  // Copy (stack-to-stack) what we can with whatever free regs we have.
+  // todo
+  // genCopyStack ();
+
+  // Now do the register shuffling.
+
+  // Try to use xch (even triple is cheaper than the 4 mov via a needed otherwise, also does not require a to be free).
+  for (int i = 0; i < sizex; i++)
+    for (int j = 0; j < sizex; j++)
+      {
+        if (assigned[i] || assigned[j])
+          continue;
+        if (!(aopInReg (source, soffset + i, A_IDX) || aopInRn (source, soffset + i)) ||
+          !(aopInReg (result, roffset + i, A_IDX) || aopInRn (result, roffset + i)) ||
+          !(aopInReg (source, soffset + j, A_IDX) || aopInRn (source, soffset + j)) ||
+          !(aopInReg (result, roffset + j, A_IDX) || aopInRn (result, roffset + j)))
+          continue;
+        if (source->aopu.aop_reg[soffset + i] != result->aopu.aop_reg[roffset + j] || source->aopu.aop_reg[soffset + j] != result->aopu.aop_reg[roffset + i])
+          continue;
+        if (aopInReg (source, soffset + i, A_IDX))
+          {
+            emitcode ("xch", "a, %s", source->aopu.aop_reg[soffset + j]->name);
+          }
+        else if (aopInReg (result, roffset + i, A_IDX))
+          {
+            emitcode ("xch", "a, %s", source->aopu.aop_reg[soffset + i]->name);
+          }
+        else
+          {
+            emitcode ("xch", "a, %s", source->aopu.aop_reg[soffset + i]->name);
+            emitcode ("xch", "a, %s", source->aopu.aop_reg[soffset + j]->name);
+            emitcode ("xch", "a, %s", source->aopu.aop_reg[soffset + i]->name);
+          }
+        assigned[i] = assigned[j] = true;
+        regsize -= 2;
+        size -= 2;
+      }
+
+  while (regsize)
+    {
+      int i;
+
+      // Find lowest byte that can be assigned and needs to be assigned.
+      for (i = 0; i < n; i++)
+        {
+          if (assigned[i])
+            continue;
+
+          for (int j = 0; j < n; j++)
+            {
+              if (!assigned[j] && i != j && result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j])
+                goto skip_byte; // We can't write this one without overwriting the source.
+            }
+
+          break;                // Found byte that can be written safely.
+
+skip_byte:
+          ;
+        }
+
+      if (i < n)
+        {
+          cheapMove (result, roffset + i, source, soffset + i, false);       // We can safely assign a byte.
+          regsize--;
+          size--;
+          assigned[i] = true;
+          continue;
+        }
+
+      // No byte can be assigned safely (i.e. the assignment is a permutation).
+      //if (!regalloc_dry_run)
+      //  wassertl_bt (0, "Unimplemented.");
+      //cost (180, 180);
+      wassert (0);
+      return;
+    }
+
+  // Copy (stack-to-stack) what we can with whatever free regs we have now.
+  // todo
+  // genCopyStack ();
+
+  // Last, move everything else from stack to registers.
+  wassert (result->type != AOP_REG || result->size <= 8);
+  // todo
+  
+  wassertl_bt (size >= 0, "genCopy() copied more than there is to be copied.");
+}
+
+/*-----------------------------------------------------------------*/
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
 static void
@@ -2718,17 +2954,22 @@ assignResultValue (operand * oper, operand * func)
       outBitC (oper);
       return FALSE;
     }
-  if ((size > 3) && aopPutUsesAcc (oper, fReturn[offset], offset))
+  if (oper->aop->type == AOP_REG)
+    genCopy (oper->aop, 0, ASMOP_RET, 0, size, true);
+  else
     {
-      emitpush ("acc");
-      pushedA = TRUE;
-    }
-  while (size--)
-    {
-      if ((offset == 3) && pushedA)
-        emitpop ("acc");
-      accuse |= aopPut (oper, fReturn[offset], offset);
-      offset++;
+      if ((size > 3) && aopPutUsesAcc (oper, fReturn[offset], offset))
+        {
+          emitpush ("acc");
+          pushedA = TRUE;
+        }
+      while (size--)
+        {
+          if ((offset == 3) && pushedA)
+            emitpop ("acc");
+          accuse |= aopPut (oper, fReturn[offset], offset);
+          offset++;
+        }
     }
   return accuse;
 }
@@ -4830,6 +5071,8 @@ genRet (iCode * ic)
       if (!IS_OP_RUONLY (IC_LEFT (ic)))
         toCarry (IC_LEFT (ic));
     }
+  else if (ic->left->aop->type == AOP_REG)
+    genCopy (ASMOP_RET, 0, ic->left->aop, 0, size, true);
   else
     {
       while (size--)

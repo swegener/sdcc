@@ -1,3 +1,9 @@
+2023-11-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* Makefile.common.in,
+	* Makefile.in,
+	* sdccconf_in.h: added OPT_DISABLE_R800
+
 2023-10-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCpeeph.c:

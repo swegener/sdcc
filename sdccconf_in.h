@@ -203,6 +203,9 @@
 #undef OPT_DISABLE_Z80N
 
 /* XXX */
+#undef OPT_DISABLE_R800
+
+/* XXX */
 #undef OPT_ENABLE_DOC
 
 /* XXX */

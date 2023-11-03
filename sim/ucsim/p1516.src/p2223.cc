@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <ctype.h>
+
 #include "glob.h"
 #include "pmon.h"
 
@@ -154,6 +156,14 @@ CLP2::disassc(t_addr addr, chars *comment)
 	  if (!b[i]) i--;
 	  if (fmt.empty())
 	    work.append("'");
+	  if (strcmp(fmt.c_str(), "char8") == 0)
+	    {
+	      int c= (code & 0xff);
+	      if (isprint(c))
+		work.appendf("'%c'", c);
+	      else
+		work.appendf("'\%03o'", c);
+	    }
 	  if (strcmp(fmt.c_str(), "*Ra") == 0)
 	    {
 	      data= (code & 0x000f0000)>>16;

@@ -77,13 +77,18 @@ struct dis_entry disass_p2223[]=
   {
     // Macro
    { 0x00000000, 0x0fffffff, ' ', 1, "nop", false },
+   { 0x00000000, 0x0fffff00, ' ', 1, "'char8'", false },
    { 0x00f00e00, 0x00f00f00, ' ', 1, "ret", false },
    { 0x11f20000, 0xffff0000, ' ', 1, "jz 'j'", false },
    { 0x21f20000, 0xffff0000, ' ', 1, "jnz 'j'", false },
+   { 0x31f20000, 0xffff0000, ' ', 1, "jc 'j'", false },
+   { 0x41f20000, 0xffff0000, ' ', 1, "jnc 'j'", false },
    { 0x01f20000, 0x0fff0000, ' ', 1, "jmp 'j'", false },
    { 0x0d0d0000, 0x0f0f0000, ' ', 1, "push %d", false },
    { 0x0f0d0000, 0x0f0f0000, ' ', 1, "pop %d", false },
    { 0x00f00000, 0x00f00000, ' ', 1, "jp 'jp'", false },
+   { 0x01040001, 0x0f0fffff, ' ', 1, "inc %d", false },
+   { 0x0104ffff, 0x0f0fffff, ' ', 1, "dec %d", false },
     
     // CALL
    { 0x04000000, 0x0f000000, ' ', 1, "call 'ar'", true },

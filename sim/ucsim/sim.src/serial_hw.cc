@@ -544,6 +544,8 @@ cl_serial_hw::proc_input(void)
 		  input= c;
 		  input_avail= true;
 		}
+	      else
+		fin->unget(c);
 	    }
 	}
       else if (!input_avail)

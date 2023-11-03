@@ -183,6 +183,8 @@ cl_io::check_dev(void)
     case F_SOCKET:
     case F_LISTENER:
     case F_PIPE:
+      if (last_used != first_free)
+	return true;
       FD_ZERO(&s);
       FD_SET(file_id, &s);
       i= select(file_id+1, &s, NULL, NULL, &tv);
@@ -199,7 +201,7 @@ cl_io::check_dev(void)
 	}
       break;
     }
-  return 0;
+  return false;
 }
 
 

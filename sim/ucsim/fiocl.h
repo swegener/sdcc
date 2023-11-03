@@ -126,7 +126,7 @@ class cl_f: public cl_base
   char esc_buffer[100];
   char last_ln;
   int buffer[1024];
-  int last_used, first_free;
+  int prev_last_used, last_used, first_free;
   bool attributes_saved;
   class cl_history *hist;
   bool proc_telnet; // in raw mode
@@ -170,6 +170,7 @@ class cl_f: public cl_base
   virtual int read(int *buf, int max);
   virtual int get_c(void);
   virtual chars get_s(void);
+  virtual int unget(int c);
   
  public:
   int id(void) { return file_id; };

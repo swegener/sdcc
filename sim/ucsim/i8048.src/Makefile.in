@@ -138,7 +138,7 @@ $(TN).src: preped_headers $(LEN) shared_lib
 preped_headers: $(srcdir)/aliases.h
 
 $(srcdir)/aliases.h: $(srcdir)/decode.h $(srcdir)/gen.h $(srcdir)/genal.h
-	$(CXXCPP) -P genal.h | $(SED) 's/^/#/' >$(srcdir)/aliases.h
+	$(CXXCPP) -P genal.h | $(SED) '/./s/^/#/' >$(srcdir)/aliases.h
 
 $(LEN): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@

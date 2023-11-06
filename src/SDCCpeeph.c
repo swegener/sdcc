@@ -1056,6 +1056,14 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
         return true;
     }
 
+  if (TARGET_HC08_LIKE || TARGET_IS_MOS6502)
+    {
+      if (var[0] == '#')
+        return true;
+      if (strstr(var, "0x") || strstr(var, "0X") || isdigit(var[0]))
+        return global_not_volatile;
+    }
+
   /* Extract a symbol name from the variable */
   while (*vp && (*vp!='_'))
     vp++;

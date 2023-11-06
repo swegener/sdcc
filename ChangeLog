@@ -2,8 +2,9 @@
 
 	* src/SDCCpeeph.c:
 	  Fix bug #3656.
-	* src/SDCCgenconstprop.cc:
-	  Fix an issue in generalized constant propagation that resulted in some optimizations being omitted on bitwise operations. Fixes bug #3640.
+	* src/SDCCgenconstprop.cc,
+	  src/SDCCcse.c:
+	  Fix bug #3640.
 
 2023-11-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

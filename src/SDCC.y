@@ -183,7 +183,7 @@ predefined_constant
    : TOKEN_FALSE { $$ = newAst_VALUE (constBoolVal (false, true)); }
    | TOKEN_TRUE  { $$ = newAst_VALUE (constBoolVal (true, true)); }
    | NULLPTR     { $$ = newAst_VALUE (constNullptrVal ()); }
-   ; /* add nullptr here if it gets approved for C23 */
+   ;
 
 generic_selection
    : GENERIC '(' assignment_expr ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }

@@ -447,6 +447,11 @@ DEFSETFUNC (findCheaperOp)
             {
               SPEC_NOUN(operandType(*opp)) = V_INT;
             }
+          // more special cases: we need this one to avoid regressions from _BOOL -> __bit optimization.
+          else if (IS_BOOL (operandType(cop)) && SPEC_NOUN(operandType(*opp)) == V_BIT)
+            {
+              SPEC_NOUN(operandType(*opp)) = V_BOOL;
+            }
           else
             {
               // No clue...

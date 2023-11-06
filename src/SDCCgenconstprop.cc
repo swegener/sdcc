@@ -350,7 +350,7 @@ valinfoUpdate (struct valinfo *v)
       if (bitmax < (unsigned long long)(v->max))
         v->max = bitmax;
       unsigned long long bitmin = v->knownbitsmask & v->knownbits;
-      if (bitmin < (unsigned long long)(v->min))
+      if (bitmin > (unsigned long long)(v->min))
         v->min = bitmin;
     }
 }
@@ -867,7 +867,7 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
         {
           valinfoUpdate (&resultvalinfo);
 #ifdef DEBUG_GCP_ANALYSIS
-          std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
+          std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << " knownbits 0x" << resultvalinfo.knownbits << std::dec << " min " << resultvalinfo.min << "\n";
 #endif
           if (!ic->resultvalinfo)
             ic->resultvalinfo = new struct valinfo;

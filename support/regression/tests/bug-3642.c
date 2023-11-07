@@ -25,10 +25,8 @@ void ss(long k)
 void
 testBug(void)
 {
-#if 0 // Bug not yet fixed
 	ss(-1);
 	ASSERT(sss == 1);
 	ASSERT(kkk == 2);
-#endif
 }
 

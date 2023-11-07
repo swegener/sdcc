@@ -1,3 +1,10 @@
+2023-11-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCClrange.c,
+	  support/regression/tests/bug-3642.c,
+	  .version:
+	  Fix bug #3642.
+
 2023-11-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCpeeph.c:

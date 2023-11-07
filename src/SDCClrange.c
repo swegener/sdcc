@@ -1135,7 +1135,8 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 #endif
               for (iCode *ic = setFirstItem (visited); ic; ic = setNextItem (visited))
                 {
-                  if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic)) == sym && (!ic->prev || isinSet (visited, ic->prev)))
+                  if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic)) == sym &&
+                    (!ic->prev || isinSet (visited, ic->prev) && !(IC_RESULT (ic->prev) && IS_ITEMP (IC_RESULT (ic->prev)) && OP_SYMBOL (IC_RESULT (ic->prev)) == sym && !POINTER_SET (ic->prev) && !isinSet (newdefs, ic->prev))))
                     {
                       bool pget = POINTER_GET (ic);
                       IC_LEFT (ic) = operandFromOperand (tmpop);
@@ -1143,7 +1144,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                     }
                   if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic)) == sym && (!ic->prev || isinSet (visited, ic->prev)))
                     IC_RIGHT (ic) = operandFromOperand (tmpop);
-                  if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym && !POINTER_SET(ic) &&
+                  if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym && !POINTER_SET (ic) &&
                     ic->next && (!isinSet (visited, ic->next) || isinSet (newdefs, ic->next)))
                     continue;
                   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym)

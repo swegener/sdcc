@@ -21,7 +21,7 @@ OBJECTS = tinibios.rel memcpyx.rel i2c390.rel rtc390.rel putchar.rel gptr_cmp.re
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 
 CPPFLAGS = -I$(srcdir)/../../include
-CFLAGS = -mds390 $(CPPFLAGS) $(VERBOSE) --std-c2x
+CFLAGS = -mds390 $(CPPFLAGS) $(VERBOSE) --std-c23
 
 all: $(OBJECTS) $(PORTDIR)/libds390.lib
 

@@ -26,7 +26,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#pragma std_c2x
+#pragma std_c23
 
 /* it is important to declare these functions extern before including
    the inline definition to give it external linkage */

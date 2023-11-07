@@ -18,7 +18,7 @@ void testStaticAssert (void)
 #endif
 }
 
-#pragma std_c2x
+#pragma std_c23
 
 void testStaticAssert2X (void)
 {

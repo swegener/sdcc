@@ -1,5 +1,38 @@
 2023-11-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* .version,
+	  device/lib/Makefile.in,
+	  device/lib/ckd_add.c,
+	  device/lib/ckd_mul.c,
+	  device/lib/ckd_sub.c,
+	  device/lib/*/Makefile.in,
+	  doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCglobl.h,
+	  src/SDCCmain.c,
+	  src/SDCCval.c,
+	  support/regression/tests/assert.c,
+	  support/regression/tests/auto.c,
+	  support/regression/tests/bitcount.c.in,
+	  support/regression/tests/bitcountleading.c.in,
+	  support/regression/tests/bitcounttrailing.c.in,
+	  support/regression/tests/bitfirst.c.in,
+	  support/regression/tests/bitfirstleading.c.in,
+	  support/regression/tests/bitwidth.c.in,
+	  support/regression/tests/c2xkeywords.c,
+	  support/regression/tests/checkedint.c.in,
+	  support/regression/tests/digit_separators.c,
+	  support/regression/tests/memalignment.c.in,
+	  support/regression/tests/typeof.c,
+	  support/regression/tests/unreachable.c,
+	  support/valdiag/tests/enum.c,
+	  support/valdiag/tests/static_assert.c,
+	  support/valdiag/tests/struct.c:
+	  Since the standard name is now fixed at C23, use that instead of C2X (for compatibility, keep c2x option and pragma for now).
+
+2023-11-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCClrange.c,
 	  support/regression/tests/bug-3642.c,
 	  .version:

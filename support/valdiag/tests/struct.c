@@ -123,10 +123,10 @@ struct tag1 {
 };
 #endif
 
-// C2X allows multiple compatible definitions for struct.
+// C23 allows multiple compatible definitions for struct.
 #ifdef TEST10
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 #endif
 
 struct A {int x; int y;}; /* IGNORE */

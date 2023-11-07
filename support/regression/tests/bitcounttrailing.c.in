@@ -5,8 +5,8 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC // Todo: Enable for all C2X implementations
-#pragma std_c2x
+#ifdef __SDCC // Todo: Enable for all C23 implementations
+#pragma std_c23
 #include <stdbit.h>
 #endif
 
@@ -17,7 +17,7 @@ volatile {type} i;
 void
 testTrailing(void)
 {
-#ifdef __SDCC // Todo: Enable for all C2X implementations
+#ifdef __SDCC // Todo: Enable for all C23 implementations
 	i = 0x0;
 	ASSERT (stdc_count_trailing_ones(i) == 0);
 	ASSERT (stdc_count_trailing_zeros(i) == sizeof({type}) * CHAR_BIT);

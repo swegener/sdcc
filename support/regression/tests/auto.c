@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 
 char c = 7;
 auto i = 7;

@@ -10,9 +10,9 @@ static_assert (0, "test");	/* WARNING */
 static_assert (1);	/* ERROR */
 #endif
 
-/* C2X static_assert */
+/* C23 static_assert */
 #ifdef TEST2
-#pragma std_c2x
+#pragma std_c23
 static_assert (1);
 static_assert (0);	/* WARNING */
 #endif

@@ -63,7 +63,7 @@ LIB = stm8.lib
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(srcdir)/../../include -I. --std-c2x
+CFLAGS = -I$(srcdir)/../../include -I. --std-c23
 
 all: $(PORTDIR)/$(LIB)
 

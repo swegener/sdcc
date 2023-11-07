@@ -25,7 +25,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(top_srcdir)/device/include --std-c2x
+CFLAGS = -I$(top_srcdir)/device/include --std-c23
 
 all: $(PORTDIR)/$(LIB)
 

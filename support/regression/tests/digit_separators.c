@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 #endif
 
 void

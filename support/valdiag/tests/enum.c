@@ -96,10 +96,10 @@ enum comma
 }
 #endif
 
-// C2X allows multiple compatible definitions for enum.
+// C23 allows multiple compatible definitions for enum.
 #ifdef TEST10
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 #endif
 
 enum X {A = 1, B};     /* IGNORE */

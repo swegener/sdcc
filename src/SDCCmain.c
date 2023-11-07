@@ -192,7 +192,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
   {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
   {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0,   OPTION_STD, NULL, "Determine the language standard (c89, c99, c11, c2x, sdcc89 etc.)"},
+  {0,   OPTION_STD, NULL, "Determine the language standard (c89, c99, c11, c23, sdcc89 etc.)"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0,   OPTION_SIGNED_CHAR, &options.signed_char, "Make \"char\" signed by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
@@ -649,7 +649,7 @@ setDefaultOptions (void)
   options.std_c95 = 1;
   options.std_c99 = 1;
   options.std_c11 = 1;          /* default to C11 (we want inline by default, so we need at least C99, and support for C11 is more complete than C99) */
-  options.std_c2x = 0;
+  options.std_c23 = 0;
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.data_seg = DATA_NAME ? Safe_strdup (DATA_NAME) : NULL;        /* default to DATA for non-initialized data */
@@ -1263,7 +1263,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 0;
                   options.std_c99 = 0;
                   options.std_c11 = 0;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 0;
                   continue;
                 }
@@ -1273,7 +1273,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 0;
                   options.std_c11 = 0;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 0;
                   continue;
                 }
@@ -1283,7 +1283,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 0;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 0;
                   continue;
                 }
@@ -1294,17 +1294,17 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 1;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 0;
                   continue;
                 }
 
-              if (strcmp (langVer, "c2x") == 0 || strcmp (langVer, "c23") == 0)
+              if (strcmp (langVer, "c23") == 0 || strcmp (langVer, "c23") == 0)
                 {
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 1;
-                  options.std_c2x = 1;
+                  options.std_c23 = 1;
                   options.std_sdcc = 0;
                   continue;
                 }
@@ -1314,7 +1314,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 0;
                   options.std_c99 = 0;
                   options.std_c11 = 0;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 1;
                   continue;
                 }
@@ -1324,7 +1324,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 0;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 1;
                   continue;
                 }
@@ -1334,7 +1334,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 1;
-                  options.std_c2x = 0;
+                  options.std_c23 = 0;
                   options.std_sdcc = 1;
                   continue;
                 }
@@ -1344,7 +1344,7 @@ parseCmdLine (int argc, char **argv)
                   options.std_c95 = 1;
                   options.std_c99 = 1;
                   options.std_c11 = 1;
-                  options.std_c2x = 1;
+                  options.std_c23 = 1;
                   options.std_sdcc = 1;
                   continue;
                 }
@@ -2662,7 +2662,7 @@ initValues (void)
    * corresponding to the --std used to start sdcc
    */
   setMainValue ("cppstd",
-    options.std_c2x ? "-std=c2x " :
+    options.std_c23 ? "-std=c2x " :
     (options.std_c11 ? "-std=c11 " :
     (options.std_c99 ? "-std=c99 " :
     (options.std_c95 ? "-std=iso9899:199409 " :

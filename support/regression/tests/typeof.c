@@ -1,11 +1,11 @@
 /*
-   C2X typeof, typeof_unqual
+   C23 typeof, typeof_unqual
 */
 
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 
 typeof(7l) l7 = 7;
 

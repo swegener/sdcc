@@ -5,11 +5,11 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c2x
+#pragma std_c23
 
 #include <stddef.h>
 
-// todo: drop dis extra macro once we have c2x preprocessor support
+// todo: drop dis extra macro once we have c23 preprocessor support
 #ifndef unreachable
 #define unreachable __builtin_unreachable
 #endif

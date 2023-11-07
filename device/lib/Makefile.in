@@ -51,7 +51,7 @@ lib_dir_suffix  = @lib_dir_suffix@
 sdcc_libdir     = $(DESTDIR)$(datadir)/$(lib_dir_suffix)
 
 CPPFLAGS        = -I$(INCDIR) -I$(PORTINCDIR)
-CFLAGS          = $(MODELFLAGS) --nostdinc --std-c2x
+CFLAGS          = $(MODELFLAGS) --nostdinc --std-c23
 
 BUILDDIR        = build
 # Default
@@ -725,7 +725,7 @@ dep: Makefile.dep
 Makefile.dep: $(SOURCES) $(INCDIR)/*.h $(PORTINCDIR)/*.h
 	rm -f Makefile.dep
 	for i in $(filter %.c,$^); do \
-	  $(CPP) -std=c2x -M $(CPPFLAGS) $$i >$${i}.dep; \
+	  $(CPP) -std=c23 -M $(CPPFLAGS) $$i >$${i}.dep; \
 	  cat $${i}.dep >>Makefile.dep; \
 	  rm $${i}.dep; \
 	done

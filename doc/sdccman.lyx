@@ -1737,9 +1737,9 @@ status collapsed
 
 \end_inset
 
--std-c2x
+-std-c23
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -1755,7 +1755,7 @@ status collapsed
 
 \end_inset
 
--std-c2x
+-std-c23
 \end_layout
 
 \end_inset
@@ -1960,9 +1960,9 @@ status collapsed
 
 \end_inset
 
--std-c2x
+-std-c23
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -1978,7 +1978,7 @@ status collapsed
 
 \end_inset
 
--std-c2x
+-std-c23
 \end_layout
 
 \end_inset
@@ -9772,7 +9772,7 @@ Except for the issues mentioned in the section above, this standard is supported
 \end_layout
 
 \begin_layout Subsection
-ISO C2X
+ISO C23
 \end_layout
 
 \begin_layout Standard
@@ -9791,7 +9791,7 @@ status open
 
 \end_inset
 
--std-c2x
+-std-c23
 \begin_inset Index idx
 status open
 
@@ -9809,7 +9809,7 @@ status collapsed
 
 \end_inset
 
--std-c2x
+-std-c23
 \end_layout
 
 \end_inset
@@ -9890,15 +9890,11 @@ not supported.
 \end_layout
 
 \begin_layout Itemize
-Compund literals are not supported.
+Compound literals are not supported.
 \end_layout
 
 \begin_layout Itemize
 Support for attributes is slightly incomplete.
-\end_layout
-
-\begin_layout Itemize
-The preprocessor is not C2X-compatible.
 \end_layout
 
 \begin_layout Itemize
@@ -9918,9 +9914,9 @@ constexpr is not implemented.
 \end_layout
 
 \begin_layout Itemize
-SDCC deviates from the current C2X standard draft N3047 in tag compatibility
- for unions: in SDCC, redeclarations of unions are required to have their
- members in the same order as previous declarations.
+SDCC deviates from the C2X standard draft N3047 in tag compatibility for
+ unions: in SDCC, redeclarations of unions are required to have their members
+ in the same order as previous declarations.
  The rule in N3047 is now considered a mistake by many, and will hopefully
  be changed to the SDCC behaviour via a national body comment for the final
  version of the standard.
@@ -15588,9 +15584,9 @@ iso9899:2018
 \labelwidthstring 00.00.0000
 
 \series bold
-c2x 
+c23 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -15606,17 +15602,17 @@ status collapsed
 
 \end_inset
 
--std-sdcc2x
+-std-sdcc23
 \end_layout
 
 \end_inset
 
 
 \series default
- Follow the ISO C2X standard.
+ Follow the ISO C23 standard.
  Alternative spelling: 
 \series bold
-c23
+c2x
 \end_layout
 
 \begin_layout Labeling
@@ -15761,9 +15757,9 @@ sdcc18
 \labelwidthstring 00.00.0000
 
 \series bold
-sdcc2x 
+sdcc23 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -15779,18 +15775,18 @@ status collapsed
 
 \end_inset
 
--std-sdcc2x
+-std-sdcc23
 \end_layout
 
 \end_inset
 
 
 \series default
- Generally follow the ISO C2X standard, but allow some SDCC behaviour that
+ Generally follow the ISO C23 standard, but allow some SDCC behaviour that
  conflicts with the standard.
  Alternative spelling: 
 \series bold
-sdcc23
+sdcc2x
 \end_layout
 
 \end_deeper
@@ -37210,7 +37206,51 @@ c11
 \begin_layout Itemize
 
 \series bold
-std_c2x
+std_sdcc11
+\series default
+ 
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma std
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sdcc11
+\end_layout
+
+\end_inset
+
+- Follow the C11 standard, but allow SDCC features that conflict with the
+ standard.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+std_c23
 \series default
 
 \begin_inset Index idx
@@ -37242,13 +37282,61 @@ _
 
 \end_inset
 
-c2x
+c23
 \end_layout
 
 \end_inset
 
-- Follow the C2X standard and disable SDCC features that conflict with the
- standard.
+- Follow the C23 standard and disable SDCC features that conflict with the
+ standard (for backwards compatibility, 
+\series bold
+std_c2x
+\series default
+ still exists as an alias).
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+std_sdcc99
+\series default
+ 
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma std
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sdcc23
+\end_layout
+
+\end_inset
+
+- Generally follow the C23 standard, but allow SDCC features that conflict
+ with the standard.
 \end_layout
 
 \begin_layout Itemize

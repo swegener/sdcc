@@ -78,7 +78,7 @@ LIB = mos6502.lib
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(srcdir)/../../include -I. --std-c2x
+CFLAGS = -I$(srcdir)/../../include -I. --std-c23
 
 all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.rel
 

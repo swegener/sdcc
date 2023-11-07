@@ -63,7 +63,7 @@ typedef struct initList
   int type;
   int lineno;
   char *filename;
-  bool isempty;                         // C2X empty initializer
+  bool isempty;                         // C23 empty initializer
   struct designation *designation;
   union
   {

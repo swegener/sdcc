@@ -1217,7 +1217,7 @@ sepStrToUll (const char *nptr, char **endptr, int base)
       ret += next;
     }
 
-  if(separated && !options.std_c2x)
+  if(separated && !options.std_c23)
     werror (W_DIGIT_SEPARATOR_C23);
 
   if (endptr) 
@@ -1250,7 +1250,7 @@ constIntVal (const char *s)
     {
       if (s[1] == 'b' || s[1] == 'B')
         {
-          if (!options.std_sdcc && !options.std_c2x)
+          if (!options.std_sdcc && !options.std_c23)
             werror (W_BINARY_INTEGER_CONSTANT_C23);
           llval = sepStrToUll (s + 2, &p, 2);
         }
@@ -1313,7 +1313,7 @@ constIntVal (const char *s)
       p2 += 2;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
         werror (E_INTEGERSUFFIX, p);
-      else if (!options.std_c2x)
+      else if (!options.std_c23)
         werror (W_BITINTCONST_C23);
     }
 
@@ -1490,8 +1490,8 @@ constCharacterVal (unsigned long v, char type)
       SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
       break;
     case '8': // u8 character constant of type char8_t, a typedef for unsigned char.
-      if (!options.std_c2x)
-        werror (E_U8_CHAR_C2X);
+      if (!options.std_c23)
+        werror (E_U8_CHAR_C23);
       if (v >= 128)
         werror (E_U8_CHAR_INVALID);
       SPEC_NOUN (val->type) = V_CHAR;
@@ -1539,7 +1539,7 @@ constBoolVal (bool v, bool reduceType)
 }
 
 /*-----------------------------------------------------------------*/
-/* constNullptrVal - a value of C2X nullptr_t                      */
+/* constNullptrVal - a value of C23 nullptr_t                      */
 /*-----------------------------------------------------------------*/
 value *
 constNullptrVal (void)
@@ -1663,7 +1663,7 @@ strVal (const char *s)
       utf_8 = copyStr (s[0] == '"' ? s : s + 2, &utf_8_size);
 
       SPEC_NOUN (val->etype) = V_CHAR;
-      if (options.std_c2x && explicit_u8) // In C23, u8-prefixed string literals are of type char8_t *, ad char8_t is a typedef for unsigned char.
+      if (options.std_c23 && explicit_u8) // In C23, u8-prefixed string literals are of type char8_t *, ad char8_t is a typedef for unsigned char.
         SPEC_USIGN (val->etype) = true;
       else
         {

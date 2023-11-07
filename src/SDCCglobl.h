@@ -315,7 +315,7 @@ struct options
     int std_c95;                /* enable C95 keywords/constructs */
     int std_c99;                /* enable C99 keywords/constructs */
     int std_c11;                /* enable C11 keywords/constructs */
-    int std_c2x;                /* enable C2X keywords/constructs */
+    int std_c23;                /* enable C23 keywords/constructs */
     int std_sdcc;               /* enable SDCC extensions to C */
     int dollars_in_ident;       /* zero means dollar signs are punctuation */
     int signed_char;            /* use signed for char without signed/unsigned modifier */

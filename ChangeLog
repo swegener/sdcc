@@ -1,3 +1,10 @@
+2023-11-08 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/diagnostic-color.cc,
+	  support/cpp/gcc/prefix.cc:
+	  attempt to fix bug #3669, cf
+	  https://gcc.gnu.org/pipermail/gcc-patches/2023-January/609526.html
+
 2023-11-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* .version,

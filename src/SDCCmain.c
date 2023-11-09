@@ -1299,7 +1299,7 @@ parseCmdLine (int argc, char **argv)
                   continue;
                 }
 
-              if (strcmp (langVer, "c23") == 0 || strcmp (langVer, "c23") == 0)
+              if (strcmp (langVer, "c23") == 0 || strcmp (langVer, "c2x") == 0)
                 {
                   options.std_c95 = 1;
                   options.std_c99 = 1;
@@ -1339,7 +1339,7 @@ parseCmdLine (int argc, char **argv)
                   continue;
                 }
 
-              if (strcmp (langVer, "sdcc2x") == 0 || strcmp (langVer, "sdcc23") == 0)
+              if (strcmp (langVer, "sdcc23") == 0 || strcmp (langVer, "sdcc2x") == 0)
                 {
                   options.std_c95 = 1;
                   options.std_c99 = 1;

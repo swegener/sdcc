@@ -4,6 +4,9 @@
 	  Fix --std-c2x.
 	* src/SDCCralloc.hpp:
 	  Fix an UB issue in register allocation affecting z80 (and related).
+	* src/mcs51/ralloc.h,
+	  src/mcs51/ralloc.c:
+	  Destroy the xreg relics.
 
 2023-11-08 Felix Salfelder <felix AT salfelder.org>
 

@@ -1,3 +1,8 @@
+2023-11-00 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/cc1_dummies.cc:
+	  Rectify dummy prototype. Fixes bug #3654.
+
 2023-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCmain.c:

@@ -58,9 +58,8 @@ int c_get_alias_set(tree_node*)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
-int c_initialize_diagnostics(diagnostic_context*)
+void c_initialize_diagnostics(diagnostic_context*)
 {
-	return 0;
 }
 int c_gimplify_expr(tree_node**, gimple**, gimple**)
 { SDCPP_DUMMY_FCT();

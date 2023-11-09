@@ -42,8 +42,8 @@ extern char delimiters[];
 extern struct id_element error_type_names[];
 //extern char *case_string(enum letter_case lcase, const char *str);
 
-extern char *warranty;
-extern char *copying;
+extern const char *warranty;
+extern const char *copying;
 
 extern struct cpu_entry *cpus;
 extern struct cpu_entry cpus_51[];

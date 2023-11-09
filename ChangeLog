@@ -1,7 +1,9 @@
-2023-11-07 Philipp Klaus Krause <philipp@colecovision.eu>
+2023-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCmain.c:
 	  Fix --std-c2x.
+	* src/SDCCralloc.hpp:
+	  Fix an UB issue in register allocation affecting z80 (and related).
 
 2023-11-08 Felix Salfelder <felix AT salfelder.org>
 

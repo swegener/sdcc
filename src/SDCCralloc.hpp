@@ -880,6 +880,7 @@ static void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vert
   assignment_list_t &alist = T[t].assignments;
 
   a.s = 0;
+  a.marked = false;
   a.global.resize(boost::num_vertices(I), -1);
   alist.push_back(a);
   

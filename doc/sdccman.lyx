@@ -2707,7 +2707,24 @@ In 3.7.0 mcs51 and ds390 got a full _Bool/bool type, separate from __bit.
 \end_layout
 
 \begin_layout Itemize
-In 3.7.0, the option –nojtbound and the corresponding pragma have been deprecated.
+In 3.7.0, the option 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nojtbound
+\series default
+ and the corresponding pragma have been deprecated.
 \end_layout
 
 \begin_layout Itemize
@@ -2729,7 +2746,9 @@ In 4.1.1, typeof.h has been removed.
 \end_layout
 
 \begin_layout Itemize
-In 4.1.3, support for -
+In 4.1.3, support for 
+\series bold
+-
 \begin_inset ERT
 status collapsed
 
@@ -2742,7 +2761,9 @@ status collapsed
 
 \end_inset
 
--oldralloc has been removed for the z80-related backends.
+-oldralloc
+\series default
+ has been removed for the z80-related backends.
 \end_layout
 
 \begin_layout Itemize
@@ -2751,7 +2772,24 @@ In 4.1.10, the default calling convention switched from __sdccall(0) to __sdccal
 \end_layout
 
 \begin_layout Itemize
-In 4.1.10, support for –profile has been removed for gbz80.
+In 4.1.10, support for
+\series bold
+ -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-profile
+\series default
+ has been removed for gbz80.
 \end_layout
 
 \begin_layout Itemize
@@ -2765,11 +2803,45 @@ In 4.1.12, the default calling convention switched from __sdccall(0) to __sdccal
 \end_layout
 
 \begin_layout Itemize
-In 4.1.12, support for –profile has been removed for z80, z180, z80n.
+In 4.1.12, support for 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-profile
+\series default
+ has been removed for z80, z180, z80n.
 \end_layout
 
 \begin_layout Itemize
-In 4.1.13, support for –profile has been removed.
+In 4.1.13, support for 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-profile
+\series default
+ has been removed.
 \end_layout
 
 \begin_layout Itemize
@@ -2796,8 +2868,24 @@ In 4.2.6, bool is chosen as the underlying integer type for enumerations with
 \end_layout
 
 \begin_layout Itemize
-In 4.2.9, support for –pedantic-parse-number and #pragma pedantic_parse_numer
- was dropped.
+In 4.2.9, support for
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-pedantic-parse-number
+\series default
+ and #pragma pedantic_parse_numer was dropped.
 \end_layout
 
 \begin_layout Itemize
@@ -2840,7 +2928,24 @@ In 4.3.1, __builtin_rlc, __builtin_rrc and __builtin_swap were replaced by
 \end_layout
 
 \begin_layout Itemize
-In 4.3.6, support for –parms-in-bank1 was removed from the mcs51 port.
+In 4.3.6, support for 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-parms-in-bank1
+\series default
+ was removed from the mcs51 port.
 \end_layout
 
 \begin_layout Section

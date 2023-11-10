@@ -50,7 +50,6 @@ static OPTION _mcs51_options[] =
     { 0, OPTION_LARGE_MODEL, NULL, "external data space is used"},
     { 0, OPTION_HUGE_MODEL, NULL, "functions are banked, data in external space"},
     { 0, OPTION_STACK_SIZE,  &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
-    { 0, "--parms-in-bank1", &options.parms_in_bank1, "use Bank1 for parameter passing"},
     { 0, "--acall-ajmp",     &options.acall_ajmp, "Use acall/ajmp instead of lcall/ljmp" },
     { 0, "--no-ret-without-call", &options.no_ret_without_call, "Do not use ret independent of acall/lcall" },
     { 0, NULL }
@@ -132,36 +131,13 @@ _mcs51_regparm (sym_link *l, bool reentrant)
         }
       return 0;
     }
-  if (options.parms_in_bank1 == 0)
-    {
-      /* simple can pass only the first parameter in a register */
-      if (regParmFlg)
-        return 0;
 
-      regParmFlg = 1;
-      return 1;
-    }
-  else
-    {
-      int size = getSize(l);
-      int remain;
+  /* simple can pass only the first parameter in a register */
+  if (regParmFlg)
+    return 0;
 
-      /* first one goes the usual way to DPTR */
-      if (regParmFlg == 0)
-        {
-          regParmFlg += 4 ;
-          return 1;
-        }
-      /* second one onwards goes to RB1_0 thru RB1_7 */
-      remain = regParmFlg - 4;
-      if (size > (8 - remain))
-        {
-          regParmFlg = 12 ;
-          return 0;
-        }
-      regParmFlg += size ;
-      return regParmFlg - size + 1;
-    }
+  regParmFlg = 1;
+  return 1;
 }
 
 static bool
@@ -203,9 +179,6 @@ _mcs51_finaliseOptions (void)
       break;
     }
 
-  if (options.parms_in_bank1)
-    addSet(&preArgvSet, Safe_strdup("-DSDCC_PARMS_IN_BANK1"));
-
   /* mcs51 has an assembly coded float library that's almost always reentrant */
   if (!options.useXstack)
     options.float_rent = 1;
@@ -234,12 +207,6 @@ _mcs51_getRegName (const struct reg_info *reg)
 static void
 _mcs51_genAssemblerPreamble (FILE * of)
 {
-  if (options.parms_in_bank1)
-    {
-      int i;
-      for (i=0; i < 8 ; i++ )
-        fprintf (of, "\tb1_%d = 0x%x \n", i, 8+i);
-    }
 }
 
 /* Generate interrupt vector table. */

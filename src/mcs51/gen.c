@@ -4190,13 +4190,6 @@ genFunction (iCode * ic)
                  determine register usage so we will have to push the
                  entire bank */
               saveRBank (0, ic, FALSE);
-              if (options.parms_in_bank1)
-                {
-                  for (i = 0; i < 8; i++)
-                    {
-                      emitpush (rb1regs[i]);
-                    }
-                }
             }
         }
       else
@@ -4692,13 +4685,6 @@ genEndFunction (iCode * ic)
             }
           else
             {
-              if (options.parms_in_bank1)
-                {
-                  for (i = 7; i >= 0; i--)
-                    {
-                      emitpop (rb1regs[i]);
-                    }
-                }
               /* this function has a function call. We cannot
                  determine register usage so we will have to pop the
                  entire bank */

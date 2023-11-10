@@ -2839,6 +2839,10 @@ In 4.3.1, __builtin_rlc, __builtin_rrc and __builtin_swap were replaced by
  __builtin_rot.
 \end_layout
 
+\begin_layout Itemize
+In 4.3.6, support for –parms-in-bank1 was removed from the mcs51 port.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

@@ -7998,7 +7998,6 @@ genOr (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
-  int bytelit = 0;
 
   D (emitcode (";", "genOr"));
 
@@ -8160,25 +8159,23 @@ genOr (iCode * ic, iCode * ifx)
     {
       for (; size--; offset++)
         {
-          if (AOP_TYPE (right) == AOP_LIT)
+          if (aopIsLitVal (right->aop, offset, 1, 0x00))
             {
-              bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
-              if (bytelit == 0)
-                {
-                  /* dummy read of volatile operand */
-                  if (isOperandVolatile (left, FALSE))
-                    MOVA (aopGet (left, offset, FALSE, FALSE));
-                  else
-                    continue;
-                }
-              else if (bytelit == 0x0FF)
-                {
-                  /* dummy read of volatile operand */
-                  if (isOperandVolatile (left, FALSE))
-                    MOVA (aopGet (left, offset, FALSE, FALSE));
-                  aopPut (result, "#0xff", offset);
-                }
-              else if (IS_AOP_PREG (left))
+              /* dummy read of volatile operand */
+             if (isOperandVolatile (left, FALSE))
+               MOVA (aopGet (left, offset, FALSE, FALSE));
+             else
+               continue;
+            }
+          else if (aopIsLitVal (right->aop, offset, 1, 0xff))
+            {
+              if (isOperandVolatile (left, FALSE))
+                MOVA (aopGet (left, offset, FALSE, FALSE));
+              aopPut (result, "#0xff", offset);
+            }
+          else if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if (IS_AOP_PREG (left))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8312,31 +8309,27 @@ genOr (iCode * ic, iCode * ifx)
             {
               // normal case
               // result = left | right
-              if (AOP_TYPE (right) == AOP_LIT)
+              if (aopIsLitVal (right->aop, offset, 1, 0x00))
                 {
-                  bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
-                  if (bytelit == 0)
-                    {
-                      aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
-                      continue;
-                    }
-                  else if (bytelit == 0x0FF)
-                    {
-                      /* dummy read of volatile operand */
-                      if (isOperandVolatile (left, FALSE))
-                        MOVA (aopGet (left, offset, FALSE, FALSE));
-                      aopPut (result, "#0xff", offset);
-                      continue;
-                    }
-                  else if (AOP_TYPE (left) == AOP_ACC)
-                    {
-                      // this should be the only use of left so A,B can be overwritten
-                      char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
-                      emitcode ("orl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
-                      aopPut (result, l, offset);
-                      Safe_free (l);
-                      continue;
-                    }
+                  aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+                  continue;
+                }
+              else if (aopIsLitVal (right->aop, offset, 1, 0xff))
+                {
+                  /* dummy read of volatile operand */
+                  if (isOperandVolatile (left, FALSE))
+                    MOVA (aopGet (left, offset, FALSE, FALSE));
+                  aopPut (result, "#0xff", offset);
+                  continue;
+                }
+              if (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_ACC)
+                {
+                  // this should be the only use of left so A,B can be overwritten
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("orl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  aopPut (result, l, offset);
+                  Safe_free (l);
+                  continue;
                 }
               // faster than result <- left, orl result,right
               // and better if result is SFR

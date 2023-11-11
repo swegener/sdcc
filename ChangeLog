@@ -1,3 +1,8 @@
+2023-11-11 Felix Salfelder <felix AT salfelder.org>
+
+	* Makefile.in:
+	  Fix Ticket #193
+
 2023-11-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* .version,

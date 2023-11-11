@@ -38,7 +38,7 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-char *aopLiteralGptr (const char *name, value * val);
+char *aopLiteralGptr (const char *name, const value *val);
 extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of
@@ -600,6 +600,8 @@ newAsmop (short type)
 
   aop = Safe_calloc (1, sizeof (asmop));
   aop->type = type;
+  aop->aop_litimmd_is_gptr = false;
+  aop->aop_lit_is_funcptr = false;
   aop->allocated = 1;
   aop->valinfo.anything = true;
   return aop;
@@ -826,6 +828,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_IMMD);
       aop->aopu.aop_immd.aop_immd1 = Safe_strdup (sym->rname);
       aop->size = getSize (sym->type);
+      aop->aop_litimmd_is_gptr = (aop->size == GPTRSIZE && (IS_GENPTR (sym->type) || IFFUNC_ISBANKEDCALL (sym->type)));
       return aop;
     }
 
@@ -848,7 +851,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 /* aopForRemat - rematerializes an object                          */
 /*-----------------------------------------------------------------*/
 static asmop *
-aopForRemat (symbol * sym)
+aopForRemat (symbol *sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = newAsmop (AOP_IMMD);
@@ -1031,10 +1034,20 @@ sameRegs (asmop * aop1, asmop * aop2)
 }
 
 /*-----------------------------------------------------------------*/
+/* opIsGptr: returns non-zero if the passed operand is             */
+/* a generic pointer type.                                         */
+/*-----------------------------------------------------------------*/
+static bool
+opIsGptr (const operand *op)
+{
+  return (op && op->aop->size == GPTRSIZE && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))));
+}
+
+/*-----------------------------------------------------------------*/
 /* aopOp - allocates an asmop for an operand  :                    */
 /*-----------------------------------------------------------------*/
 static void
-aopOp (operand * op, iCode * ic, bool result)
+aopOp (operand *op, iCode *ic, bool result)
 {
   asmop *aop;
   symbol *sym;
@@ -1049,6 +1062,8 @@ aopOp (operand * op, iCode * ic, bool result)
       op->aop = aop = newAsmop (AOP_LIT);
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
+      aop->aop_lit_is_funcptr = IS_FUNCPTR (operandType (op));
+      aop->aop_litimmd_is_gptr = opIsGptr (op);
       aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
@@ -1098,6 +1113,7 @@ aopOp (operand * op, iCode * ic, bool result)
         {
           sym->aop = op->aop = aop = aopForRemat (sym);
           aop->size = operandSize (op);
+          aop->aop_litimmd_is_gptr = (aop->size == GPTRSIZE && (IS_GENPTR (sym->type) || IFFUNC_ISBANKEDCALL (sym->type)));
           return;
         }
 
@@ -1362,20 +1378,6 @@ freeForBranchAsmops (operand * op1, operand * op2, operand * op3, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* opIsGptr: returns non-zero if the passed operand is             */
-/* a generic pointer type.                                         */
-/*-----------------------------------------------------------------*/
-static int
-opIsGptr (operand * op)
-{
-  if (op && (AOP_SIZE (op) == GPTRSIZE) && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))))
-    {
-      return 1;
-    }
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
 /* swapOperands - swap two operands                                */
 /*-----------------------------------------------------------------*/
 static void
@@ -1539,7 +1541,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_IMMD:
-          if (aop->aopu.aop_immd.from_cast_remat && opIsGptr (oper) && offset == GPTRSIZE - 1)
+          if (aop->aopu.aop_immd.from_cast_remat) wassert (aop->aop_litimmd_is_gptr == opIsGptr (oper));
+          if (aop->aopu.aop_immd.from_cast_remat && aop->aop_litimmd_is_gptr && offset == GPTRSIZE - 1)
             {
               dbuf_printf (&dbuf, "%s", aop->aopu.aop_immd.aop_immd2);
             }
@@ -1590,7 +1593,9 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_LIT:
-          if (opIsGptr (oper) && IS_FUNCPTR (operandType (oper)) && offset == GPTRSIZE - 1)
+          wassert (aop->aop_litimmd_is_gptr == opIsGptr (oper));
+          wassert (IS_FUNCPTR (operandType (oper)) == aop->aop_lit_is_funcptr);
+          if (aop->aop_litimmd_is_gptr && aop->aop_lit_is_funcptr && offset == GPTRSIZE - 1)
             {
               dbuf_append_str (&dbuf, aopLiteralGptr (NULL, aop->aopu.aop_lit));
             }

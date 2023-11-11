@@ -46,7 +46,7 @@ int noInit = 0;                 /* no initialization */
 
 
 char *
-aopLiteralGptr (const char * name, value * val)
+aopLiteralGptr (const char *name, const value *val)
 {
   unsigned long v = ulFromVal (val);
   struct dbuf_s dbuf;

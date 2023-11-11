@@ -3,8 +3,9 @@
 	* src/mcs51/gen.c,
 	  src/mcs51/gen.h,
 	  src/mcs51/main.c,
-	  src/mcs51/ralloc.c:
-	  mcs51 refactoring.
+	  src/mcs51/ralloc.c,
+	  src/SDCCglue.c:
+	  mcs51 code generation refactoring.
 
 2023-11-11 Felix Salfelder <felix AT salfelder.org>
 

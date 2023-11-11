@@ -1391,10 +1391,8 @@ swapOperands (operand ** left, operand ** right)
 /*                 clobber the accumulator                         */
 /*-----------------------------------------------------------------*/
 static bool
-aopGetUsesAcc (operand * oper, int offset)
+aopGetUsesAcc (const asmop* aop, int offset)
 {
-  asmop *aop = AOP (oper);
-
   if (offset > (aop->size - 1))
     return FALSE;
 
@@ -1625,10 +1623,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
 /*                 clobber the accumulator                         */
 /*-----------------------------------------------------------------*/
 static bool
-aopPutUsesAcc (operand * oper, const char *s, int offset)
+aopPutUsesAcc (const asmop* aop, const char *s, int offset)
 {
-  asmop *aop = AOP (oper);
-
   if (offset > (aop->size - 1))
     return FALSE;
 
@@ -1668,7 +1664,7 @@ aopPutUsesAcc (operand * oper, const char *s, int offset)
 /* aopPut - puts a string for a aop and indicates if acc is in use */
 /*-----------------------------------------------------------------*/
 static bool
-aopPut (operand * result, const char *s, int offset)
+aopPut (operand *result, const char *s, int offset)
 {
   bool bvolatile = isOperandVolatile (result, FALSE);
   bool accuse = FALSE;
@@ -1703,7 +1699,7 @@ aopPut (operand * result, const char *s, int offset)
 
     case AOP_DIR:
     case AOP_SFR:
-      if ((SPEC_SCLS (getSpec (operandType (result))) == S_SFR) && (aop->size > 1))
+      if (aop->type == AOP_SFR && aop->size > 1)
         {
           dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
         }
@@ -2042,7 +2038,7 @@ toBoolean (operand * oper)
 
   while (!AccUsed && size--)
     {
-      AccUsed |= aopGetUsesAcc (oper, offset++);
+      AccUsed |= aopGetUsesAcc (oper->aop, offset++);
     }
 
   if (opIsGptr (oper))
@@ -2147,7 +2143,7 @@ xch_a_aopGet (operand * oper, int offset, bool dname)
 {
   const char *l;
 
-  if (aopGetUsesAcc (oper, offset))
+  if (aopGetUsesAcc (oper->aop, offset))
     {
       emitcode ("mov", "b,a");
       MOVA (aopGet (oper, offset, false, dname));
@@ -2996,7 +2992,7 @@ assignResultValue (operand * oper, operand * func)
     genCopy (oper->aop, 0, ASMOP_RET, 0, size, true);
   else
     {
-      if ((size > 3) && aopPutUsesAcc (oper, fReturn[offset], offset))
+      if ((size > 3) && aopPutUsesAcc (oper->aop, fReturn[offset], offset))
         {
           emitpush ("acc");
           pushedA = TRUE;
@@ -5115,7 +5111,7 @@ genRet (iCode * ic)
                   emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
                 else
                   emitcode ("mov", "%s,%s", fReturn[offset], l);
-              if (size && !strcmp(fReturn[offset], "a") && aopGetUsesAcc (IC_LEFT (ic), offset+1))
+              if (size && !strcmp(fReturn[offset], "a") && aopGetUsesAcc (ic->left->aop, offset+1))
                 {
                   emitpush ("acc");
                   pushedA = TRUE;
@@ -5243,7 +5239,7 @@ genPlusIncr (iCode * ic)
       (AOP_SIZE (IC_RESULT (ic)) == 2) &&
       !strncmp (AOP (IC_RESULT (ic))->aopu.aop_str[0], "dpl", 4) && !strncmp (AOP (IC_RESULT (ic))->aopu.aop_str[1], "dph", 4))
     {
-      if (aopGetUsesAcc (IC_LEFT (ic), 0))
+      if (aopGetUsesAcc (ic->left->aop, 0))
         return FALSE;
 
       if (icount > 9)
@@ -5512,7 +5508,7 @@ genPlus (iCode * ic)
     {
       if (offset >= skip_bytes)
         {
-          if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
+          if (aopGetUsesAcc (leftOp->aop, offset) && aopGetUsesAcc (rightOp->aop, offset))
             {
               bool pushedB;
               MOVA (aopGet (leftOp, offset, FALSE, FALSE));
@@ -5522,7 +5518,7 @@ genPlus (iCode * ic)
               emitcode (add, "a,b");
               popB (pushedB);
             }
-          else if (aopGetUsesAcc (leftOp, offset))
+          else if (aopGetUsesAcc (leftOp->aop, offset))
             {
               MOVA (aopGet (leftOp, offset, FALSE, FALSE));
               emitcode (add, "a,%s", aopGet (rightOp, offset, FALSE, FALSE));
@@ -5639,7 +5635,7 @@ genMinusDec (iCode * ic)
     {
       const char *l;
 
-      if (aopGetUsesAcc (IC_LEFT (ic), 0))
+      if (aopGetUsesAcc (ic->left->aop, 0))
         {
           MOVA (aopGet (IC_RESULT (ic), 0, FALSE, FALSE));
           l = "a";
@@ -5815,9 +5811,9 @@ genMinus (iCode * ic)
 
       while (size--)
         {
-          if (aopGetUsesAcc (rightOp, offset))
+          if (aopGetUsesAcc (rightOp->aop, offset))
             {
-              if (aopGetUsesAcc (leftOp, offset))
+              if (aopGetUsesAcc (leftOp->aop, offset))
                 {
                   bool pushedB;
 
@@ -5837,7 +5833,7 @@ genMinus (iCode * ic)
                     emitcode ("setb", "c");
                   else
                     emitcode ("cpl", "c");
-                  wassertl (!aopGetUsesAcc (leftOp, offset), "accumulator clash");
+                  wassertl (!aopGetUsesAcc (leftOp->aop, offset), "accumulator clash");
                   MOVA (aopGet (rightOp, offset, FALSE, FALSE));
                   emitcode ("subb", "a,%s", aopGet (leftOp, offset, FALSE, FALSE));
                   emitcode ("cpl", "a");
@@ -6343,7 +6339,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
             }
           else                  /* compiletimeSign */
             {
-              if (aopPutUsesAcc (result, "#0xff", offset))
+              if (aopPutUsesAcc (result->aop, "#0xff", offset))
                 {
                   emitpush ("acc");
                   pushedA = TRUE;
@@ -6817,7 +6813,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           while (size--)
             {
               bool pushedB = FALSE;
-              rightInB = aopGetUsesAcc (right, offset);
+              rightInB = aopGetUsesAcc (right->aop, offset);
               if (rightInB)
                 {
                   pushedB = pushB ();
@@ -7076,7 +7072,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 
           for (lidx = 0; lidx < size; lidx++)
             {
-              if (chk[lidx] && !aopGetUsesAcc(left, lidx))
+              if (chk[lidx] && !aopGetUsesAcc(left->aop, lidx))
                 {
                   if (pidx >= 0)
                     {
@@ -7807,14 +7803,14 @@ genAnd (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode ("mov", "b,a");
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
                   aopPut (result, "a", offset);
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -7874,13 +7870,13 @@ genAnd (iCode * ic, iCode * ifx)
                       emitcode ("anl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -7962,13 +7958,13 @@ genAnd (iCode * ic, iCode * ifx)
                       emitcode ("anl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8205,14 +8201,14 @@ genOr (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode ("mov", "b,a");
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
                   aopPut (result, "a", offset);
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8272,13 +8268,13 @@ genOr (iCode * ic, iCode * ifx)
                       emitcode ("orl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8357,13 +8353,13 @@ genOr (iCode * ic, iCode * ifx)
                       emitcode ("orl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8567,14 +8563,14 @@ genXor (iCode * ic, iCode * ifx)
                   if (offset)
                     emitcode ("mov", "b,a");
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
                   aopPut (result, "a", offset);
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8639,13 +8635,13 @@ genXor (iCode * ic, iCode * ifx)
                       emitcode ("xrl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8720,13 +8716,13 @@ genXor (iCode * ic, iCode * ifx)
                       emitcode ("xrl", "a,b");
                     }
                 }
-              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+              else if (aopGetUsesAcc (left->aop, offset) && aopGetUsesAcc (right->aop, offset))
                 {
                   MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
                 }
-              else if (aopGetUsesAcc (left, offset))
+              else if (aopGetUsesAcc (left->aop, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -9033,7 +9029,7 @@ genSwap (iCode * ic)
 
           src = aopGet (left, 0, FALSE, FALSE);
           MOVA (src);
-          if (aopGetUsesAcc (left, 1) || aopGetUsesAcc (result, 0) || aopPutUsesAcc (result, src, 0))
+          if (aopGetUsesAcc (left->aop, 1) || aopGetUsesAcc (result->aop, 0) || aopPutUsesAcc (result->aop, src, 0))
             {
               pushedB = pushB ();
               emitcode ("mov", "b,a");
@@ -9485,7 +9481,7 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
       x = xch_a_aopGet (left, offl + MSB16, FALSE);
       usedB = !strncmp (x, "b", 1);
     }
-  else if (aopGetUsesAcc (result, offr))
+  else if (aopGetUsesAcc (result->aop, offr))
     {
       movLeft2Result (left, offl, result, offr, 0);
       pushedB = pushB ();
@@ -9533,7 +9529,7 @@ shiftR2Left2Result (operand * left, int offl, operand * result, int offr, int sh
       x = xch_a_aopGet (left, offl + MSB16, FALSE);
       usedB = !strncmp (x, "b", 1);
     }
-  else if (aopGetUsesAcc (result, offr))
+  else if (aopGetUsesAcc (result->aop, offr))
     {
       movLeft2Result (left, offl, result, offr, 0);
       pushedB = pushB ();
@@ -9574,7 +9570,7 @@ shiftLLeftOrResult (operand * left, int offl, operand * result, int offr, int sh
   /* shift left accumulator */
   AccLsh (shCount);
   /* or with result */
-  if (aopGetUsesAcc (result, offr))
+  if (aopGetUsesAcc (result->aop, offr))
     {
       emitcode ("xch", "a,b");
       MOVA (aopGet (result, offr, FALSE, FALSE));
@@ -9598,7 +9594,7 @@ shiftRLeftOrResult (operand * left, int offl, operand * result, int offr, int sh
   /* shift right accumulator */
   AccRsh (shCount);
   /* or with result */
-  if (aopGetUsesAcc (result, offr))
+  if (aopGetUsesAcc (result->aop, offr))
     {
       emitcode ("xch", "a,b");
       MOVA (aopGet (result, offr, FALSE, FALSE));
@@ -10026,7 +10022,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
         }
       else
         {
-          if (aopPutUsesAcc (result, zero, MSB32))
+          if (aopPutUsesAcc (result->aop, zero, MSB32))
             {
               emitcode ("xch", "a,b");
               aopPut (result, zero, MSB32);
@@ -12094,7 +12090,7 @@ genAssign (iCode * ic)
   size = getDataSize (result);
 
   if ((size > 1) && (AOP_TYPE (result) != AOP_REG) &&   /* for registers too? (regression test passes) */
-      (AOP_TYPE (right) == AOP_LIT) && !aopPutUsesAcc (result, aopGet (right, 0, FALSE, FALSE), 0))
+      (AOP_TYPE (right) == AOP_LIT) && !aopPutUsesAcc (result->aop, aopGet (right, 0, FALSE, FALSE), 0))
     {
       genLiteralAssign (result, right, size, aopPut);
     }

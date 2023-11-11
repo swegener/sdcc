@@ -28,7 +28,7 @@
 enum
 {
   AOP_LIT = 1,
-  AOP_REG, AOP_DIR,
+  AOP_REG, AOP_DIR, AOP_SFR,
   AOP_DPTR, AOP_R0, AOP_R1,
   AOP_STK, AOP_IMMD, AOP_STR,
   AOP_CRY, AOP_ACC, AOP_DUMMY
@@ -44,6 +44,7 @@ typedef struct asmop
      AOP_LIT    -  operand is a literal value
      AOP_REG    -  is in registers
      AOP_DIR    -  direct just a name
+     AOP_SFR    -  special function register
      AOP_DPTR   -  dptr contains address of operand
      AOP_R0/R1  -  r0/r1 contains address of operand
      AOP_STK    -  should be pushed on stack this
@@ -75,6 +76,7 @@ typedef struct asmop
     char *aop_str[8];           /* just a string array containing the location */
   }
   aopu;
+  struct valinfo valinfo;
 }
 asmop;
 

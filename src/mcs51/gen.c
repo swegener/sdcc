@@ -557,6 +557,38 @@ getTempRegs (reg_info ** tempRegs, int size, iCode * ic)
   return 0;
 }
 
+/*-----------------------------------------------------------------*/
+/* aopIsLitVal - asmop from offset is val                          */
+/*-----------------------------------------------------------------*/
+static bool
+aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
+{
+  wassert_bt (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
+
+  for(; size; size--, offset++)
+    {
+      unsigned char b = val & 0xff;
+      val >>= 8;
+
+      // Leading zeroes
+      if (aop->size <= offset && !b && aop->type != AOP_LIT)
+        continue;
+
+      // Information from generalized constant propagation analysis
+      if (!aop->valinfo.anything && (offset * 8 < sizeof (aop->valinfo.knownbitsmask) * CHAR_BIT) &&
+        ((aop->valinfo.knownbitsmask >> (offset * 8)) & 0xff) == 0xff &&
+        ((aop->valinfo.knownbits >> (offset * 8)) & 0xff) == b)
+        continue;
+
+      if (aop->type != AOP_LIT)
+        return (false);
+
+      if (byteOfVal (aop->aopu.aop_lit, offset) != b)
+        return (false);
+    }
+
+  return (true);
+}
 
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
@@ -569,6 +601,7 @@ newAsmop (short type)
   aop = Safe_calloc (1, sizeof (asmop));
   aop->type = type;
   aop->allocated = 1;
+  aop->valinfo.anything = true;
   return aop;
 }
 
@@ -780,8 +813,8 @@ aopForSym (iCode * ic, symbol * sym, bool result)
     {
       //printf("aopForSym, using AOP_DIR for %s (%x)\n", sym->name, sym);
       //printTypeChainRaw(sym->type, NULL);
-      //printf("space = %s\n", space ? space->sname : "NULL");
-      sym->aop = aop = newAsmop (AOP_DIR);
+      //printf("space = %s\n", space ? space->sname : "NULL");() && (aop->size > 1))
+      sym->aop = aop = newAsmop (SPEC_SCLS (getSpec (sym->type)) == S_SFR ? AOP_SFR : AOP_DIR);
       aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
       return aop;
@@ -1016,6 +1049,7 @@ aopOp (operand * op, iCode * ic, bool result)
       op->aop = aop = newAsmop (AOP_LIT);
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
+      aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
 
@@ -1026,18 +1060,12 @@ aopOp (operand * op, iCode * ic, bool result)
       return;
     }
 
-  /* if the underlying symbol has a aop */
-  if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
-    {
-      op->aop = OP_SYMBOL (op)->aop;
-      op->aop->allocated++;
-      return;
-    }
-
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
     {
       op->aop = aopForSym (ic, OP_SYMBOL (op), result);
+      if (!result)
+        op->aop->valinfo = getOperandValinfo (ic, op);
       return;
     }
 
@@ -1105,6 +1133,8 @@ aopOp (operand * op, iCode * ic, bool result)
               sym->usl.spillLoc->aop = NULL;
             }
           sym->aop = op->aop = aop = aopForSym (ic, sym->usl.spillLoc, result);
+          if (!result)
+            aop->valinfo = getOperandValinfo (ic, op);
           if (getSize (sym->type) != getSize (sym->usl.spillLoc->type))
             {
               /* Don't reuse the new aop, go with the last one */
@@ -1381,7 +1411,8 @@ aopGetUsesAcc (operand * oper, int offset)
     case AOP_IMMD:
       return FALSE;
     case AOP_DIR:
-      return FALSE;
+    case AOP_SFR:
+      return false;
     case AOP_REG:
       wassert (!EQ (aop->aopu.aop_reg[offset]->name, "a"));
       return FALSE;
@@ -1529,7 +1560,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_DIR:
-          if ((SPEC_SCLS (getSpec (operandType (oper))) == S_SFR) && (aop->size > 1))
+        case AOP_SFR:
+          if (aop->type == AOP_SFR && aop->size > 1)
             {
               dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
             }
@@ -1605,7 +1637,8 @@ aopPutUsesAcc (operand * oper, const char *s, int offset)
     case AOP_DUMMY:
       return TRUE;
     case AOP_DIR:
-      return FALSE;
+    case AOP_SFR:
+      return false;
     case AOP_REG:
       wassert (!EQ (aop->aopu.aop_reg[offset]->name, "a"));
       return FALSE;
@@ -1669,6 +1702,7 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_DIR:
+    case AOP_SFR:
       if ((SPEC_SCLS (getSpec (operandType (result))) == S_SFR) && (aop->size > 1))
         {
           dbuf_printf (&dbuf, "((%s >> %d) & 0xFF)", aop->aopu.aop_dir, offset * 8);
@@ -2109,14 +2143,14 @@ assignBit (operand * result, operand * right)
 /* xch_a_aopGet - for exchanging acc with value of the aop           */
 /*-------------------------------------------------------------------*/
 static const char *
-xch_a_aopGet (operand * oper, int offset, bool bit16, bool dname)
+xch_a_aopGet (operand * oper, int offset, bool dname)
 {
   const char *l;
 
   if (aopGetUsesAcc (oper, offset))
     {
       emitcode ("mov", "b,a");
-      MOVA (aopGet (oper, offset, bit16, dname));
+      MOVA (aopGet (oper, offset, false, dname));
       emitcode ("xch", "a,b");
       aopPut (oper, "a", offset);
       emitcode ("xch", "a,b");
@@ -2124,7 +2158,7 @@ xch_a_aopGet (operand * oper, int offset, bool bit16, bool dname)
     }
   else
     {
-      l = aopGet (oper, offset, bit16, dname);
+      l = aopGet (oper, offset, false, dname);
       emitcode ("xch", "a,%s", l);
     }
   return l;
@@ -2172,8 +2206,12 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
   if (to->type == AOP_REG && from->type == AOP_REG &&
     to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
     return;
-        
-  if (aopInReg (to, to_offset, A_IDX) && (aopInRn (from, from_offset) || aopInReg (from, from_offset, B_IDX) || aopInReg (from, from_offset, DPL_IDX) || aopInReg (from, from_offset, DPH_IDX)))
+
+  if (aopInReg (to, to_offset, A_IDX) && aopIsLitVal (from, from_offset, 1, 0))
+    {
+      emitcode ("clr", "a");
+    }
+  else if (aopInReg (to, to_offset, A_IDX) && (aopInRn (from, from_offset) || aopInReg (from, from_offset, B_IDX) || aopInReg (from, from_offset, DPL_IDX) || aopInReg (from, from_offset, DPH_IDX)))
     {
       emitcode ("mov", "a, %s", from->aopu.aop_reg[from_offset]->name);
     }
@@ -2924,7 +2962,7 @@ pushSide (operand * oper, int size, iCode * ic)
   while (size--)
     {
       const char *l = aopGet (oper, offset++, FALSE, TRUE);
-      if (AOP_TYPE (oper) != AOP_REG && AOP_TYPE (oper) != AOP_DIR)
+      if (AOP_TYPE (oper) != AOP_REG && AOP_TYPE (oper) != AOP_DIR && AOP_TYPE (oper) != AOP_SFR)
         {
           MOVA (l);
           emitpush ("acc");
@@ -3071,7 +3109,7 @@ genIpush (iCode * ic)
   while (size--)
     {
       const char *l = aopGet (IC_LEFT (ic), offset++, FALSE, TRUE);
-      if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG && AOP_TYPE (IC_LEFT (ic)) != AOP_DIR)
+      if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG && AOP_TYPE (IC_LEFT (ic)) != AOP_DIR && AOP_TYPE (IC_LEFT (ic)) != AOP_SFR)
         {
           if (!EQ (l, prev) || *l == '@')
             MOVA (l);
@@ -5153,7 +5191,7 @@ genPlusIncr (iCode * ic)
 
   /* if increment >=16 bits in register or direct space */
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
-       AOP_TYPE (IC_LEFT (ic)) == AOP_DIR ||
+       AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_SFR ||
        (IS_AOP_PREG (IC_LEFT (ic)) && !AOP_NEEDSACC (IC_LEFT (ic)))) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       !isOperandVolatile (IC_RESULT (ic), FALSE) && (size > 1) && (icount == 1))
@@ -5211,7 +5249,7 @@ genPlusIncr (iCode * ic)
       if (icount > 9)
         return FALSE;
 
-      if ((AOP_TYPE (IC_LEFT (ic)) != AOP_DIR) && (icount > 5))
+      if ((AOP_TYPE (IC_LEFT (ic)) != AOP_DIR && AOP_TYPE (IC_LEFT (ic)) != AOP_SFR) && (icount > 5))
         return FALSE;
 
       aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 0, FALSE, FALSE), 0);
@@ -5544,7 +5582,7 @@ genMinusDec (iCode * ic)
 
   /* if decrement >=16 bits in register or direct space */
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
-       AOP_TYPE (IC_LEFT (ic)) == AOP_DIR ||
+       AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_SFR ||
        (IS_AOP_PREG (IC_LEFT (ic)) && !AOP_NEEDSACC (IC_LEFT (ic)))) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && (size > 1) && (icount == 1))
     {
@@ -6709,7 +6747,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       size = max (AOP_SIZE (left), AOP_SIZE (right));
 
       /* if unsigned char cmp with lit, do cjne left,#right,zz */
-      if (size == 1 && !sign && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_STR)
+      if (size == 1 && !sign && AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_SFR && AOP_TYPE (left) != AOP_STR)
         {
           char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
           symbol *lbl = newiTempLabel (NULL);
@@ -6916,7 +6954,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   /* if the left side is a immediate/literal or
      if the right is in a pointer register and left is not */
   if (IS_AOP_IMMEDIATE (left) ||
-      (AOP_TYPE (left) == AOP_DIR && !IS_AOP_IMMEDIATE (right)) ||
+      ((left->aop->type == AOP_DIR || left->aop->type == AOP_SFR) && !IS_AOP_IMMEDIATE (right)) ||
       (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
     {
       operand *t = right;
@@ -6941,7 +6979,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 
   /* if the right side is a literal then anything goes */
   else if (IS_AOP_IMMEDIATE (right) &&
-           AOP_TYPE (left) != AOP_DIR && !IS_AOP_IMMEDIATE (left))
+           AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_SFR && !IS_AOP_IMMEDIATE (left))
     {
       while (size--)
         {
@@ -6959,7 +6997,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   /* if the right side is in a register or in direct space or
      if the left is a pointer register & right is not */
   else if (AOP_TYPE (right) == AOP_REG ||
-           AOP_TYPE (right) == AOP_DIR ||
+           AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR ||
            IS_AOP_IMMEDIATE (right) ||
            (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
     {
@@ -7607,7 +7645,7 @@ genAnd (iCode * ic, iCode * ifx)
                   emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
                 }
             }
-          else if (AOP_TYPE (right) == AOP_DIR && IS_BOOL (operandType (right)) && AOP_TYPE (left) == AOP_CRY)
+          else if ((AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR) && IS_BOOL (operandType (right)) && AOP_TYPE (left) == AOP_CRY)
             {
               MOVA (aopGet (right, 0, FALSE, FALSE));
               emitcode ("anl", "c,acc.0");
@@ -7812,7 +7850,7 @@ genAnd (iCode * ic, iCode * ifx)
             emitcode ("setb", "c");
           while (sizer--)
             {
-              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR)
+              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR)
                   && AOP_TYPE (left) == AOP_ACC)
                 {
                   if (offset)
@@ -7900,7 +7938,7 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               // faster than result <- left, anl result,right
               // and better if result is SFR
-              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR)
+              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR)
                   && AOP_TYPE (left) == AOP_ACC)
                 {
                   if (offset)
@@ -8302,7 +8340,7 @@ genOr (iCode * ic, iCode * ifx)
                 }
               // faster than result <- left, orl result,right
               // and better if result is SFR
-              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR)
+              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR)
                   && AOP_TYPE (left) == AOP_ACC)
                 {
                   if (offset)
@@ -8584,7 +8622,7 @@ genXor (iCode * ic, iCode * ifx)
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                 }
-              else if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR)
+              else if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR)
                        && AOP_TYPE (left) == AOP_ACC)
                 {
                   if (offset)
@@ -8665,7 +8703,7 @@ genXor (iCode * ic, iCode * ifx)
                 }
               // faster than result <- left, xrl result,right
               // and better if result is SFR
-              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR)
+              if ((AOP_TYPE (right) == AOP_REG || IS_AOP_PREG (right) || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_SFR)
                   && AOP_TYPE (left) == AOP_ACC)
                 {
                   if (offset)
@@ -9451,7 +9489,7 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
     {
       /* don't crash result[offr] */
       MOVA (aopGet (left, offl, FALSE, FALSE));
-      x = xch_a_aopGet (left, offl + MSB16, FALSE, FALSE);
+      x = xch_a_aopGet (left, offl + MSB16, FALSE);
       usedB = !strncmp (x, "b", 1);
     }
   else if (aopGetUsesAcc (result, offr))
@@ -9499,7 +9537,7 @@ shiftR2Left2Result (operand * left, int offl, operand * result, int offr, int sh
     {
       /* don't crash result[offr] */
       MOVA (aopGet (left, offl, FALSE, FALSE));
-      x = xch_a_aopGet (left, offl + MSB16, FALSE, FALSE);
+      x = xch_a_aopGet (left, offl + MSB16, FALSE);
       usedB = !strncmp (x, "b", 1);
     }
   else if (aopGetUsesAcc (result, offr))
@@ -9597,7 +9635,7 @@ shiftLLong (operand * left, operand * result, int offr)
       MOVA (aopGet (left, offl, FALSE, FALSE));
       emitcode ("add", "a,acc");
       if (useXch)
-        xch_a_aopGet (left, offl + offr, FALSE, FALSE);
+        xch_a_aopGet (left, offl + offr, FALSE);
       else
         aopPut (result, "a", offl + offr);
     }
@@ -9610,7 +9648,7 @@ shiftLLong (operand * left, operand * result, int offr)
             MOVA (aopGet (left, offl, FALSE, FALSE));
           emitcode ("rlc", "a");
           if (useXch)
-            xch_a_aopGet (left, offl + offr, FALSE, FALSE);
+            xch_a_aopGet (left, offl + offr, FALSE);
           else
             aopPut (result, "a", offl + offr);
         }
@@ -9985,7 +10023,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
           emitcode ("subb", "a,acc");
           if (overlapping && sameByte (AOP (left), MSB32, AOP (result), MSB32))
             {
-              xch_a_aopGet (left, MSB32, FALSE, FALSE);
+              xch_a_aopGet (left, MSB32, FALSE);
             }
           else
             {
@@ -10021,7 +10059,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 
   if (overlapping && offl == MSB16 && sameByte (AOP (left), MSB24, AOP (result), MSB32 - offl))
     {
-      xch_a_aopGet (left, MSB24, FALSE, FALSE);
+      xch_a_aopGet (left, MSB24, FALSE);
     }
   else
     {
@@ -10032,7 +10070,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
   emitcode ("rrc", "a");
   if (overlapping && offl == MSB16 && sameByte (AOP (left), MSB16, AOP (result), MSB24 - offl))
     {
-      xch_a_aopGet (left, MSB16, FALSE, FALSE);
+      xch_a_aopGet (left, MSB16, FALSE);
     }
   else
     {
@@ -10049,7 +10087,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
     {
       if (overlapping && sameByte (AOP (left), LSB, AOP (result), MSB16 - offl))
         {
-          xch_a_aopGet (left, LSB, FALSE, FALSE);
+          xch_a_aopGet (left, LSB, FALSE);
         }
       else
         {
@@ -11372,7 +11410,7 @@ genLiteralAssign (operand * result, operand * right, int size, bool (*output_fn)
 
       int num_bytes_to_save_before_using_acc_takes_effect = 1;
 
-      if (optimize.codeSpeed && (AOP_TYPE (result) != AOP_DIR))
+      if (optimize.codeSpeed && (AOP_TYPE (result) != AOP_DIR && AOP_TYPE (result) != AOP_SFR))
         {
           /* require an extra byte being saved */
           num_bytes_to_save_before_using_acc_takes_effect++;

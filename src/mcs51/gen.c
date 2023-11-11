@@ -7549,7 +7549,6 @@ genAnd (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long long lit = 0ull;
-  int bytelit = 0;
 
   D (emitcode (";", "genAnd"));
 
@@ -7718,6 +7717,7 @@ genAnd (iCode * ic, iCode * ifx)
             emitcode ("setb", "c");
           while (sizel--)
             {
+              int bytelit;
               if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
@@ -7758,22 +7758,21 @@ genAnd (iCode * ic, iCode * ifx)
     {
       for (; size--; offset++)
         {
-          if (AOP_TYPE (right) == AOP_LIT)
+          if (aopIsLitVal (right->aop, offset, 1, 0xff))
             {
-              bytelit = (int) ((lit >> (offset * 8)) & 0x0ffull);
-              if (bytelit == 0x0FF)
-                {
-                  /* dummy read of volatile operand */
-                  if (isOperandVolatile (left, FALSE))
-                    MOVA (aopGet (left, offset, FALSE, FALSE));
-                  else
-                    continue;
-                }
-              else if (bytelit == 0)
-                {
-                  aopPut (result, zero, offset);
-                }
-              else if (IS_AOP_PREG (result))
+              /* dummy read of volatile operand */
+              if (isOperandVolatile (left, FALSE))
+                MOVA (aopGet (left, offset, FALSE, FALSE));
+              else
+                continue;
+            }
+          else if (aopIsLitVal (right->aop, offset, 1, 0x00))
+            {
+              aopPut (result, zero, offset);
+            }
+          else if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if (IS_AOP_PREG (result))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -7907,30 +7906,26 @@ genAnd (iCode * ic, iCode * ifx)
             {
               // normal case
               // result = left & right
-              if (AOP_TYPE (right) == AOP_LIT)
+              if (aopIsLitVal (right->aop, offset, 1, 0xff))
                 {
-                  bytelit = (int) ((lit >> (offset * 8)) & 0x0ffull);
-                  if (bytelit == 0x0FF)
-                    {
-                      aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
-                      continue;
-                    }
-                  else if (bytelit == 0)
-                    {
-                      /* dummy read of volatile operand */
-                      if (isOperandVolatile (left, FALSE))
-                        MOVA (aopGet (left, offset, FALSE, FALSE));
-                      aopPut (result, zero, offset);
-                      continue;
-                    }
-                  else if (AOP_TYPE (left) == AOP_ACC)
-                    {
-                      char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
-                      emitcode ("anl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
-                      aopPut (result, l, offset);
-                      Safe_free (l);
-                      continue;
-                    }
+                  aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+                  continue;
+                }
+              else if (aopIsLitVal (right->aop, offset, 1, 0x00))
+                {
+                  /* dummy read of volatile operand */
+                  if (isOperandVolatile (left, FALSE))
+                    MOVA (aopGet (left, offset, FALSE, FALSE));
+                  aopPut (result, zero, offset);
+                  continue;
+                }
+              else if (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_ACC)
+                {
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("anl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  aopPut (result, l, offset);
+                  Safe_free (l);
+                  continue;
                 }
               // faster than result <- left, anl result,right
               // and better if result is SFR
@@ -8389,7 +8384,6 @@ genXor (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
-  int bytelit = 0;
 
   D (emitcode (";", "genXor"));
 
@@ -8522,18 +8516,17 @@ genXor (iCode * ic, iCode * ifx)
     {
       for (; size--; offset++)
         {
-          if (AOP_TYPE (right) == AOP_LIT)
+          if (aopIsLitVal (right->aop, offset, 1, 0x00))
             {
-              bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
-              if (bytelit == 0)
-                {
-                  /* dummy read of volatile operand */
-                  if (isOperandVolatile (left, FALSE))
-                    MOVA (aopGet (left, offset, FALSE, FALSE));
-                  else
-                    continue;
-                }
-              else if (IS_AOP_PREG (left))
+              /* dummy read of volatile operand */
+              if (isOperandVolatile (left, FALSE))
+                MOVA (aopGet (left, offset, FALSE, FALSE));
+              else
+                continue;
+            }
+          else if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if (IS_AOP_PREG (left))
                 {
                   MOVA (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
@@ -8607,7 +8600,7 @@ genXor (iCode * ic, iCode * ifx)
             emitcode ("setb", "c");
           while (sizer--)
             {
-              if ((AOP_TYPE (right) == AOP_LIT) && (((lit >> (offset * 8)) & 0x0FFL) == 0x00L))
+              if (aopIsLitVal (right->aop, offset, 1, 0x00))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                 }
@@ -8672,23 +8665,19 @@ genXor (iCode * ic, iCode * ifx)
             {
               // normal case
               // result = left ^ right
-              if (AOP_TYPE (right) == AOP_LIT)
+              if (aopIsLitVal (right->aop, offset, 1, 0x00))
                 {
-                  bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
-                  if (bytelit == 0)
-                    {
-                      aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
-                      continue;
-                    }
-                  else if (AOP_TYPE (left) == AOP_ACC)
-                    {
-                      // this should be the only use of left so A,B can be overwritten
-                      char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
-                      emitcode ("xrl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
-                      aopPut (result, l, offset);
-                      Safe_free (l);
-                      continue;
-                    }
+                  aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+                   continue;
+                }
+              else if (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) == AOP_ACC)
+                {
+                  // this should be the only use of left so A,B can be overwritten
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("xrl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  aopPut (result, l, offset);
+                  Safe_free (l);
+                  continue;
                 }
               // faster than result <- left, xrl result,right
               // and better if result is SFR

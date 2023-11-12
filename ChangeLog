@@ -1,6 +1,11 @@
 2023-11-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mcs51/gen.c:
+	  Make aopGet use asmop * instead of operand *.
+
+2023-11-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mcs51/gen.c:
 	  Fix opIsGptr, so it works even when the op has no aop yet.
 
 2023-11-11 Philipp Klaus Krause <philipp@colecovision.eu>

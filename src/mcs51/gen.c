@@ -2230,6 +2230,18 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     {
       emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, from->aopu.aop_reg[from_offset]->name);
     }
+  else if (aopInReg (to, to_offset, A_IDX))
+    {
+      emitcode ("mov", "a, %s", aopGet (from, from_offset, false, false));
+    }
+  else if (aopInRn (to, to_offset) && (!aopGetUsesAcc (from, from_offset) || a_dead))
+    {
+      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->name, aopGet (from, from_offset, false, true));
+    }
+  else if ((aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)) && (!aopGetUsesAcc (from, from_offset) || a_dead))
+    {
+      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, aopGet (from, from_offset, false, true));
+    }
   else if (a_dead)
     {
       cheapMove (ASMOP_A, 0, from, from_offset, true);

@@ -1040,7 +1040,7 @@ sameRegs (asmop * aop1, asmop * aop2)
 static bool
 opIsGptr (const operand *op)
 {
-  return (op && op->aop->size == GPTRSIZE && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))));
+  return (op && getSize (operandType (op)) == GPTRSIZE && (IS_GENPTR (operandType (op)) || IFFUNC_ISBANKEDCALL (operandType (op))));
 }
 
 /*-----------------------------------------------------------------*/

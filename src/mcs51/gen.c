@@ -52,7 +52,7 @@ static char *spname;
 
 unsigned fReturnSizeMCS51 = 4;  /* shared with ralloc.c */
 const char **fReturn = fReturn8051;
-const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" };
+const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" }; // TODO: This ia a legacy mechanism. Codegen should migrate to aopArg and aopRet.
 static asmop *aopRet (sym_link *ftype);
 
 static char *accUse[] = { "a", "b" };
@@ -1436,6 +1436,58 @@ aopRet (sym_link *ftype)
     }
 }
 
+// Get asmop for registers containing a parameter
+// Returns 0 if the parameter is not passed in a register.
+static asmop *
+aopArg (sym_link *ftype, int i)
+{
+  wassert (IS_FUNC (ftype));
+
+  if (FUNC_HASVARARGS (ftype))
+    return 0;
+
+  // For struct return keep regs free for pushing hidden parameter.
+  if (IS_STRUCT (ftype->next))
+    return 0;
+
+  value *args = FUNC_ARGS(ftype);
+  int j;
+  value *arg;
+
+  for (j = 1, arg = args; j < i; j++, arg = arg->next)
+    wassert (arg);
+
+  if (IS_SPEC(arg->type) && SPEC_NOUN(arg->type) == V_BIT)
+    {
+      wassert (0); // todo: special handling for bits.
+    }
+      
+  if (i != 1)
+    return (0);
+
+  switch (getSize (arg->type))
+    {
+    case 1:
+      return (ASMOP_DPL);
+    case 2:
+      return (ASMOP_DPTR);
+    case 3:
+      return (ASMOP_BDPTR);
+    case 4:
+      return (ASMOP_ABDPTR);
+    case 5:
+      return (ASMOP_R4ABDPTR);
+    case 6:
+      return (ASMOP_R5R4ABDPTR);
+    case 7:
+      return (ASMOP_R6R5R4ABDPTR);
+    case 8:
+      return (ASMOP_R7R6R5R4ABDPTR);
+    default:
+      return (0);
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* swapOperands - swap two operands                                */
 /*-----------------------------------------------------------------*/
@@ -2464,6 +2516,42 @@ skip_byte:
   // todo
   
   wassertl_bt (size >= 0, "genCopy() copied more than there is to be copied.");
+}
+
+/*-----------------------------------------------------------------*/
+/* genMove_o - Copy part of one asmop to another                   */
+/*-----------------------------------------------------------------*/
+static void
+genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global)
+{
+  wassertl_bt (result->type != AOP_LIT, "Trying to write to literal.");
+  wassertl_bt (result->type != AOP_IMMD, "Trying to write to immediate.");
+  wassertl_bt (roffset + size <= result->size, "Trying to write beyond end of operand");
+
+  if ((result->type == AOP_REG || result->type == AOP_ACC) && (source->type == AOP_REG || source->type == AOP_ACC))
+    {
+      genCopy (result, roffset, source, soffset, size, a_dead_global);
+      return;
+    }
+
+  a_dead_global |= result->type = AOP_ACC;
+
+  for (int i = 0; i < size;)
+    {
+      bool a_dead = a_dead_global && result->type != AOP_REG && result->type != AOP_ACC && source->type != AOP_REG && source->type != AOP_ACC; // todo: make more exact
+
+      cheapMove (result, roffset + i, source, soffset + i, a_dead);
+      i++;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* genMove - Copy the value from one asmop to another              */
+/*-----------------------------------------------------------------*/
+static void
+genMove (asmop *result, asmop *source, bool a_dead)
+{
+  genMove_o (result, 0, source, 0, result->size, a_dead);
 }
 
 /*-----------------------------------------------------------------*/
@@ -12692,7 +12780,7 @@ genReceive (iCode * ic)
           _G.accInUse++;
           aopOp (IC_RESULT (ic), ic, FALSE);
           _G.accInUse--;
-          assignResultValue (IC_RESULT (ic), NULL); // TODO: Change this! This relies on register parmeters being in exctly the same registers as result values, which should not be assumed!
+          assignResultValue (IC_RESULT (ic), NULL); // TODO: Change this! This relies on register parmeters being in exactly the same registers as result values, which should not be assumed!
         }
     }
   else if (ic->argreg > 12)

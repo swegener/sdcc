@@ -1,3 +1,9 @@
+2023-11-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.h,
+	  src/z80/gen.c:
+	  Burn AOP_STR.
+
 2023-11-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mcs51/gen.c:

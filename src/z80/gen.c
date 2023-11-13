@@ -756,15 +756,6 @@ getPairId_o (const asmop *aop, int offset)
               return PAIR_IY;
             }
         }
-      else if (aop->type == AOP_STR)
-        {
-          int i;
-          for (i = 0; i < NUM_PAIRS; i++)
-            {
-              if (!strcmp (aop->aopu.aop_str[offset], _pairs[i].l) && !strcmp (aop->aopu.aop_str[offset + 1], _pairs[i].h))
-                return i;
-            }
-        }
     }
   return PAIR_INVALID;
 }
@@ -1192,7 +1183,6 @@ static const char *aopNames[] =
   "AOP_SFR",
   "AOP_STK",
   "AOP_IMMD",
-  "AOP_STR",
   "AOP_CRY",
   "AOP_IY",
   "AOP_HL",
@@ -1263,15 +1253,6 @@ getPairName (asmop *aop)
         case IYL_IDX:
           return "iy";
           break;
-        }
-    }
-  else if (aop->type == AOP_STR)
-    {
-      int i;
-      for (i = 0; i < NUM_PAIRS; i++)
-        {
-          if (strcmp (aop->aopu.aop_str[0], _pairs[i].l) == 0)
-            return _pairs[i].name;
         }
     }
   wassertl (0, "Tried to get the pair name of something that isn't a pair");
@@ -2212,7 +2193,6 @@ aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
     case AOP_DIR:
     case AOP_SFR:
     case AOP_STL:
-    case AOP_STR:
     case AOP_CRY:
     case AOP_EXSTK:
     case AOP_PAIRPTR:
@@ -3087,11 +3067,6 @@ aopGet (asmop *aop, int offset, bool bit16)
           dbuf_append_str (&dbuf, aopLiteral (aop->aopu.aop_lit, offset));
           break;
 
-        case AOP_STR:
-          aop->coff = offset;
-          dbuf_append_str (&dbuf, aop->aopu.aop_str[offset]);
-          break;
-
         case AOP_PAIRPTR:
           setupPair (aop->aopu.aop_pairId, aop, offset);
           if (aop->aopu.aop_pairId == PAIR_IX)
@@ -3356,37 +3331,6 @@ aopPut (asmop *aop, const char *s, int offset)
           wassertl (0, "Tried to write into a bit variable");
         }
       break;
-
-    case AOP_STR:
-      aop->coff = offset;
-      if (strcmp (aop->aopu.aop_str[offset], s))
-        {
-          emit2 ("ld %s, %s", aop->aopu.aop_str[offset], s);
-        }
-      spillPairReg (aop->aopu.aop_str[offset]);
-      break;
-
-#if 0
-    case AOP_ACC:
-      aop->coff = offset;
-      if (!offset && (strcmp (s, "acc") == 0))
-        break;
-      if (offset > 0)
-        {
-          wassertl (0, "Tried to access past the end of A");
-        }
-      else
-        {
-          wassert (aop->aopu.aop_str[offset]);
-          wassert (s);
-          if (strcmp (aop->aopu.aop_str[offset], s))
-            {
-              emit2 ("ld %s, %s", aop->aopu.aop_str[offset], s);
-              spillPairReg (aop->aopu.aop_str[offset]);
-            }
-        }
-      break;
-#endif
 
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
@@ -14378,19 +14322,16 @@ genPointerSet (iCode *ic)
 
   /* if the operand is already in dptr
      then we do nothing else we move the value to dptr */
-  if (result->aop->type != AOP_STR)
+  if (bit_field && getPairId (result->aop) != PAIR_INVALID && (getPairId (result->aop) != PAIR_IY || SPEC_BLEN (getSpec (operandType (result)->next)) < 8 || isPairDead (getPairId (result->aop), ic)))   /* Avoid destroying result by increments */
+    pairId = getPairId (result->aop);
+  else
     {
-      if (bit_field && getPairId (result->aop) != PAIR_INVALID && (getPairId (result->aop) != PAIR_IY || SPEC_BLEN (getSpec (operandType (result)->next)) < 8 || isPairDead (getPairId (result->aop), ic)))   /* Avoid destroying result by increments */
-        pairId = getPairId (result->aop);
-      else
+      if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId)
         {
-          if (!isPairDead (pairId, ic) && getPairId (result->aop) != pairId)
-            {
-              _push (pairId);
-              pushed_pair = true;
-            }
-          fetchPairLong (pairId, result->aop, ic, 0);
+          _push (pairId);
+          pushed_pair = true;
         }
+      fetchPairLong (pairId, result->aop, ic, 0);
     }
   /* so hl now contains the address */
   /*freeAsmop (result, NULL, ic);*/

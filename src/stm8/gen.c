@@ -1239,6 +1239,10 @@ aopRet (sym_link *ftype)
   if (FUNC_ISCOSMIC (ftype) && size > 2)
     werror (E_COSMIC_LARGE_RETURN);
 
+  const bool bigreturn = (size > 4) || IS_STRUCT (ftype->next);
+  if (bigreturn)
+    return (0);
+
   switch (size)
     {
     case 1:

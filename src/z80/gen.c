@@ -1888,6 +1888,10 @@ aopRet (sym_link *ftype)
 
   int size = getSize (ftype->next);
 
+  const bool bigreturn = (size > 4) || IS_STRUCT (ftype->next);
+  if (bigreturn)
+    return (0);
+
   if (FUNC_SDCCCALL (ftype) == 0 || FUNC_ISSMALLC (ftype) || FUNC_ISZ88DK_FASTCALL (ftype))
     switch (size)
       {

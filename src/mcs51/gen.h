@@ -76,7 +76,7 @@ typedef struct asmop
       char *aop_immd2;          /* cast remat will generate this   */
     } aop_immd;
     symbol *aop_sym;            /* symbol when AOP_STK */
-    char *aop_str[8];           /* just a string array containing the location */
+    const char *aop_str[8];     /* just a string array containing the location */
   }
   aopu;
   struct valinfo valinfo;
@@ -86,7 +86,7 @@ asmop;
 void gen51Code (iCode *);
 void mcs51_emitDebuggerSymbol (const char *);
 
-extern char *fReturn8051[];
+extern const char *fReturn8051[];
 extern unsigned fReturnSizeMCS51;
 //extern char **fReturn;
 

@@ -50,10 +50,11 @@ static char *zero = "#0x00";
 static char *one = "#0x01";
 static char *spname;
 
-char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" };
-
 unsigned fReturnSizeMCS51 = 4;  /* shared with ralloc.c */
-char **fReturn = fReturn8051;
+const char **fReturn = fReturn8051;
+const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" };
+static asmop *aopRet (sym_link *ftype);
+
 static char *accUse[] = { "a", "b" };
 
 static short rbank = -1;
@@ -153,9 +154,16 @@ static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 #define MSB24   2
 #define MSB32   3
 
-static struct asmop asmop_a, asmop_ret;
+static struct asmop asmop_a, asmop_dpl, asmop_dptr, asmop_bdptr, asmop_abdptr, asmop_r4abdptr, asmop_r5r4abdptr, asmop_r6r5r4abdptr, asmop_r7r6r5r4abdptr;
 static struct asmop *const ASMOP_A = &asmop_a;
-static struct asmop *const ASMOP_RET = &asmop_ret;
+static struct asmop *const ASMOP_DPL = &asmop_dpl;
+static struct asmop *const ASMOP_DPTR = &asmop_dptr;
+static struct asmop *const ASMOP_BDPTR = &asmop_bdptr;
+static struct asmop *const ASMOP_ABDPTR = &asmop_abdptr;
+static struct asmop *const ASMOP_R4ABDPTR = &asmop_r4abdptr;
+static struct asmop *const ASMOP_R5R4ABDPTR = &asmop_r5r4abdptr;
+static struct asmop *const ASMOP_R6R5R4ABDPTR = &asmop_r6r5r4abdptr;
+static struct asmop *const ASMOP_R7R6R5R4ABDPTR = &asmop_r7r6r5r4abdptr;
 
 // Init aop as a an asmop for data in registers, as given by the -1-terminated array regidx.
 static void
@@ -175,7 +183,14 @@ void
 mcs51_init_asmops (void)
 {
   mcs51_init_reg_asmop(&asmop_a, (const signed char[]){A_IDX, -1});
-  mcs51_init_reg_asmop(&asmop_ret, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, R5_IDX, R6_IDX, R7_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_dpl, (const signed char[]){DPL_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_dptr, (const signed char[]){DPL_IDX, DPH_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_bdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_abdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_r4abdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_r5r4abdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, R5_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_r6r5r4abdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, R5_IDX, R6_IDX, R7_IDX, -1});
+  mcs51_init_reg_asmop(&asmop_r7r6r5r4abdptr, (const signed char[]){DPL_IDX, DPH_IDX, B_IDX, A_IDX, R4_IDX, R5_IDX,R6_IDX, R7_IDX, -1});
 }
 
 /*-----------------------------------------------------------------*/
@@ -1134,13 +1149,13 @@ aopOp (operand *op, iCode *ic, bool result)
           return;
         }
 
-      if (sym->ruonly)
+      if (sym->ruonly) // Weird: this is used even in functions returning void?
         {
           unsigned i;
 
           sym->aop = op->aop = aop = newAsmop (AOP_STR);
           aop->size = getSize (sym->type);
-          for (i = 0; i < fReturnSizeMCS51; i++)
+          for (i = 0; i < aop->size; i++)
             aop->aopu.aop_str[i] = fReturn[i];
           return;
         }
@@ -1382,6 +1397,43 @@ freeForBranchAsmops (operand * op1, operand * op2, operand * op3, iCode * ic)
     freeForBranchAsmop (op2, ic);
   if (op3)
     freeForBranchAsmop (op3, ic);
+}
+
+// Get asmop for registers containing the return type of function
+// Returns 0 if the function does not have a return value or it is not returned in registers.
+static asmop *
+aopRet (sym_link *ftype)
+{
+  wassert (IS_FUNC (ftype));
+
+  int size = getSize (ftype->next);
+
+  const bool bigreturn = (size > 8) || IS_STRUCT (ftype->next);
+
+  if (bigreturn)
+    return (0);
+
+  switch (size)
+    {
+    case 1:
+      return (ASMOP_DPL);
+    case 2:
+      return (ASMOP_DPTR);
+    case 3:
+      return (ASMOP_BDPTR);
+    case 4:
+      return (ASMOP_ABDPTR);
+    case 5:
+      return (ASMOP_R4ABDPTR);
+    case 6:
+      return (ASMOP_R5R4ABDPTR);
+    case 7:
+      return (ASMOP_R6R5R4ABDPTR);
+    case 8:
+      return (ASMOP_R7R6R5R4ABDPTR);
+    default:
+      return (0);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2250,6 +2302,10 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     {
       emitcode ("mov", "a, %s", aopGet (from, from_offset, false, false));
     }
+  else if (aopInReg (from, from_offset, A_IDX))
+    {
+      aopPut (to, "a", to_offset);
+    }
   else if (aopInRn (to, to_offset) && (!aopGetUsesAcc (from, from_offset) || a_dead))
     {
       emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->name, aopGet (from, from_offset, false, true));
@@ -3018,13 +3074,16 @@ assignResultValue (operand * oper, operand * func)
   bool accuse = FALSE;
   bool pushedA = FALSE;
 
+  sym_link *dtype = func ? operandType (func) : 0;
+  sym_link *ftype = func ? (IS_FUNCPTR (dtype) ? dtype->next : dtype) : 0;
+
   if (func && IS_BIT (getSpec (operandType (func))))
     {
       outBitC (oper);
       return FALSE;
     }
   if (oper->aop->type == AOP_REG)
-    genCopy (oper->aop, 0, ASMOP_RET, 0, size, true);
+    genCopy (oper->aop, 0, func ? aopRet (ftype) : ASMOP_R7R6R5R4ABDPTR /* hack to allow for abuse of assignResultValue (. 0) by genReceive */, 0, size, true);
   else
     {
       if ((size > 3) && aopPutUsesAcc (oper->aop, fReturn[offset], offset))
@@ -4980,6 +5039,8 @@ genRet (iCode * ic)
 
   D (emitcode (";", "genRet"));
 
+  wassert (currFunc);
+
   /* if we have no return value then
      just generate the "ret" */
   if (!IC_LEFT (ic))
@@ -5127,7 +5188,7 @@ genRet (iCode * ic)
         toCarry (IC_LEFT (ic));
     }
   else if (ic->left->aop->type == AOP_REG)
-    genCopy (ASMOP_RET, 0, ic->left->aop, 0, size, true);
+    genCopy (aopRet (currFunc->type), 0, ic->left->aop, 0, size, true);
   else
     {
       while (size--)
@@ -12631,7 +12692,7 @@ genReceive (iCode * ic)
           _G.accInUse++;
           aopOp (IC_RESULT (ic), ic, FALSE);
           _G.accInUse--;
-          assignResultValue (IC_RESULT (ic), NULL);
+          assignResultValue (IC_RESULT (ic), NULL); // TODO: Change this! This relies on register parmeters being in exctly the same registers as result values, which should not be assumed!
         }
     }
   else if (ic->argreg > 12)

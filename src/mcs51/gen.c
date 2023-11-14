@@ -55,8 +55,6 @@ const char **fReturn = fReturn8051;
 const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" }; // TODO: This ia a legacy mechanism. Codegen should migrate to aopArg and aopRet.
 static asmop *aopRet (sym_link *ftype);
 
-static char *accUse[] = { "a", "b" };
-
 static short rbank = -1;
 
 #define REG_WITH_INDEX   mcs51_regWithIdx
@@ -171,10 +169,12 @@ mcs51_init_reg_asmop (asmop *aop, const signed char *regidx)
 {
   aop->type = AOP_REG;
   aop->size = 0;
+  memset (aop->regs, -1, sizeof(aop->regs));
   
   for(int i = 0; regidx[i] >= 0; i++)
     {
       aop->aopu.aop_reg[i] = regs8051 + regidx[i];
+      aop->regs[regidx[i]] = i;
       aop->size++;
     }
 }
@@ -619,6 +619,7 @@ newAsmop (short type)
   aop->aop_lit_is_funcptr = false;
   aop->aop_is_volatile = false;
   aop->allocated = 1;
+  memset (aop->regs, -1, sizeof(aop->regs));
   aop->valinfo.anything = true;
   return aop;
 }
@@ -1144,8 +1145,11 @@ aopOp (operand *op, iCode *ic, bool result)
           int i;
           sym->aop = op->aop = aop = newAsmop (AOP_ACC);
           aop->size = getSize (sym->type);
-          for (i = 0; i < 2; i++)
-            aop->aopu.aop_str[i] = accUse[i];
+          for (i = 0; i < aop->size; i++)
+            {
+              aop->aopu.aop_reg[i] = &regs8051[i ? B_IDX : A_IDX];
+              aop->regs[i ? B_IDX : A_IDX] = i;
+            }
           return;
         }
 
@@ -1202,7 +1206,10 @@ aopOp (operand *op, iCode *ic, bool result)
   sym->aop = op->aop = aop = newAsmop (AOP_REG);
   aop->size = sym->nRegs;
   for (i = 0; i < sym->nRegs; i++)
-    aop->aopu.aop_reg[i] = sym->regs[i];
+    {
+      aop->aopu.aop_reg[i] = sym->regs[i];
+      aop->regs[sym->regs[i]->rIdx] = i;
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1499,6 +1506,22 @@ swapOperands (operand ** left, operand ** right)
   *left = t;
 }
 
+void
+setAopR01Offset (asmop *aop, int offset)
+{
+  while (offset > aop->coff)
+    {
+      emitcode ("inc", "%s", aop->aopu.aop_ptr->name);
+      aop->coff++;
+    }
+
+  while (offset < aop->coff)
+    {
+      emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
+      aop->coff--;
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* aopGetUsesAcc - indicates ahead of time whether aopGet() will   */
 /*                 clobber the accumulator                         */
@@ -1591,20 +1614,8 @@ aopGet (asmop *aop, int offset, bool bit16, bool dname)
 
         case AOP_R0:
         case AOP_R1:
-          /* if we need to increment it */
-          while (offset > aop->coff)
-            {
-              emitcode ("inc", "%s", aop->aopu.aop_ptr->name);
-              aop->coff++;
-            }
+          setAopR01Offset (aop, offset);
 
-          while (offset < aop->coff)
-            {
-              emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
-              aop->coff--;
-            }
-
-          aop->coff = offset;
           if (aop->paged)
             {
               emitcode ("movx", "a,@%s", aop->aopu.aop_ptr->name);
@@ -1685,6 +1696,7 @@ aopGet (asmop *aop, int offset, bool bit16, bool dname)
             }
           break;
 
+        case AOP_ACC:
         case AOP_REG:
           dbuf_append_str (&dbuf, dname ? aop->aopu.aop_reg[offset]->dname : aop->aopu.aop_reg[offset]->name);
           break;
@@ -1695,10 +1707,6 @@ aopGet (asmop *aop, int offset, bool bit16, bool dname)
           emitcode ("clr", "a");
           emitcode ("rlc", "a");
           dbuf_append_str (&dbuf, dname ? "acc" : "a");
-          break;
-
-        case AOP_ACC:
-          dbuf_append_str (&dbuf, (!offset && dname) ? "acc" : aop->aopu.aop_str[offset]);
           break;
 
         case AOP_LIT:
@@ -1782,7 +1790,7 @@ aopPutUsesAcc (const asmop* aop, const char *s, int offset)
 /* aopPut- puts a string for a aop and indicates if acc is in use */
 /*-----------------------------------------------------------------*/
 static bool
-aopPut(asmop *aop, const char *s, int offset)
+aopPut (asmop *aop, const char *s, int offset)
 {
   bool accuse = false;
   static struct dbuf_s dbuf = { 0 };
@@ -1838,6 +1846,12 @@ aopPut(asmop *aop, const char *s, int offset)
         }
       break;
 
+    case AOP_ACC:
+      accuse = TRUE;
+      aop->coff = offset;
+      if (!offset && EQ (s, "acc") && !aop->aop_is_volatile)
+        break;
+
     case AOP_REG:
       if (!EQ (aop->aopu.aop_reg[offset]->name, s) && !EQ (aop->aopu.aop_reg[offset]->dname, s))
         {
@@ -1890,17 +1904,7 @@ aopPut(asmop *aop, const char *s, int offset)
           MOVA (s);
         }
 
-      while (offset > aop->coff)
-        {
-          aop->coff++;
-          emitcode ("inc", "%s", aop->aopu.aop_ptr->name);
-        }
-      while (offset < aop->coff)
-        {
-          aop->coff--;
-          emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
-        }
-      aop->coff = offset;
+      setAopR01Offset (aop, offset);
 
       if (aop->paged)
         {
@@ -1966,16 +1970,6 @@ aopPut(asmop *aop, const char *s, int offset)
     case AOP_STR:
       aop->coff = offset;
       if (!EQ (aop->aopu.aop_str[offset], s) || aop->aop_is_volatile)
-        emitcode ("mov", "%s,%s", aop->aopu.aop_str[offset], s);
-      break;
-
-    case AOP_ACC:
-      accuse = TRUE;
-      aop->coff = offset;
-      if (!offset && EQ (s, "acc") && !aop->aop_is_volatile)
-        break;
-
-      if (!EQ (aop->aopu.aop_str[offset], s) && !aop->aop_is_volatile)
         emitcode ("mov", "%s,%s", aop->aopu.aop_str[offset], s);
       break;
 
@@ -2106,6 +2100,51 @@ getDataSize (operand * op)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopDir - aop at offset can be addressed directly                */
+/*-----------------------------------------------------------------*/
+static bool
+aopDir (const asmop *aop, int offset)
+{
+  if (offset >= aop->size || offset < 0)
+    return (false);
+
+  return (aop->type == AOP_DIR || aop->type == AOP_SFR || aop->type == AOP_REG || aop->type == AOP_ACC);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopInReg - asmop from offset in the register                    */
+/*-----------------------------------------------------------------*/
+static bool
+aopInReg (const asmop *aop, int offset, short rIdx)
+{
+  if (offset >= aop->size || offset < 0)
+    return (false);
+
+  if (aop->type == AOP_ACC)
+    return (offset ? (rIdx == B_IDX) : (rIdx == A_IDX));
+
+  if (aop->type != AOP_REG)
+    return (false);
+
+  // todo enable when we hvae DPTR_IDX
+  //if (rIdx == DPTR_IDX)
+  //  return (aopInReg (aop, offset, DPL_IDX) && aopInReg (aop, offset + 1, DPH_IDX));
+
+  return (aop->aopu.aop_reg[offset]->rIdx == rIdx);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopInRn - Check if byte of asmop is in any of R0, ..., R7.      */
+/*-----------------------------------------------------------------*/
+static bool aopInRn (const asmop *aop, int i)
+{
+  if (aop->type != AOP_REG  || i >= aop->size)
+    return (false);
+  int rIdx = aop->aopu.aop_reg[i]->rIdx;
+  return (rIdx == R0_IDX || rIdx == R1_IDX || rIdx == R2_IDX || rIdx == R3_IDX || rIdx == R4_IDX || rIdx == R5_IDX || rIdx == R6_IDX || rIdx == R7_IDX);
+}
+
+/*-----------------------------------------------------------------*/
 /* outAcc - output Acc                                             */
 /*-----------------------------------------------------------------*/
 static void
@@ -2197,7 +2236,8 @@ toBoolean (operand * oper)
       MOVA (opGet (oper, offset++, FALSE, FALSE));
       while (size--)
         {
-          emitcode ("orl", "a,%s", opGet (oper, offset++, FALSE, FALSE));
+          emitcode ("orl", "a,%s", aopGet (oper->aop, offset, false, !aopInRn (oper->aop, offset)));
+          offset++;
         }
     }
 }
@@ -2285,39 +2325,6 @@ xch_a_aopGet (operand * oper, int offset, bool dname)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopInReg - asmop from offset in the register                    */
-/*-----------------------------------------------------------------*/
-static bool
-aopInReg (const asmop *aop, int offset, short rIdx)
-{
-  if (offset >= aop->size || offset < 0)
-    return (false);
-
-  if (aop->type == AOP_ACC)
-    return (offset ? (rIdx == B_IDX) : (rIdx == A_IDX));
-
-  if (aop->type != AOP_REG)
-    return (false);
-
-  // todo enable when we hvae DPTR_IDX
-  //if (rIdx == DPTR_IDX)
-  //  return (aopInReg (aop, offset, DPL_IDX) && aopInReg (aop, offset + 1, DPH_IDX));
-
-  return (aop->aopu.aop_reg[offset]->rIdx == rIdx);
-}
-
-/*-----------------------------------------------------------------*/
-/* aopInRn - Check if byte of asmop is in any of R0, ..., R7.      */
-/*-----------------------------------------------------------------*/
-static bool aopInRn (const asmop *aop, int i)
-{
-  if (aop->type != AOP_REG  || i >= aop->size)
-    return (false);
-  int rIdx = aop->aopu.aop_reg[i]->rIdx;
-  return (rIdx == R0_IDX || rIdx == R1_IDX || rIdx == R2_IDX || rIdx == R3_IDX || rIdx == R4_IDX || rIdx == R5_IDX || rIdx == R6_IDX || rIdx == R7_IDX);
-}
-
-/*-----------------------------------------------------------------*/
 /* cheapMove - Copy a single byte from one asmop to another.       */
 /*-----------------------------------------------------------------*/
 static void
@@ -2326,17 +2333,25 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
   if (aopInReg (to, to_offset, A_IDX))
     a_dead = true;
 
-  if (to->type == AOP_REG && from->type == AOP_REG &&
+  if ((to->type == AOP_REG || to->type == AOP_ACC) && (from->type == AOP_REG || from->type == AOP_ACC) &&
     to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
+    return;
+
+  if (to->type == AOP_STR && from->type == AOP_REG &&
+    EQ (to->aopu.aop_str[to_offset], from->aopu.aop_reg[from_offset]->name))
     return;
 
   if (aopInReg (to, to_offset, A_IDX) && aopIsLitVal (from, from_offset, 1, 0))
     {
       emitcode ("clr", "a");
     }
-  else if (aopInReg (to, to_offset, A_IDX) && (aopInRn (from, from_offset) || aopInReg (from, from_offset, B_IDX) || aopInReg (from, from_offset, DPL_IDX) || aopInReg (from, from_offset, DPH_IDX)))
+  else if (aopInReg (to, to_offset, A_IDX) && aopInRn (from, from_offset))
     {
       emitcode ("mov", "a, %s", from->aopu.aop_reg[from_offset]->name);
+    }
+  else if (aopInReg (to, to_offset, A_IDX) && aopDir (from, from_offset))
+    {
+      emitcode ("mov", "a, %s", aopGet (from, from_offset, false, true));
     }
   else if (aopInReg (from, from_offset, A_IDX) && (aopInRn (to, to_offset) || aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)))
     {
@@ -2346,13 +2361,13 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     {
       emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->name, from->aopu.aop_reg[from_offset]->dname);
     }
-  else if (aopInRn (from, from_offset) && (aopInRn (to, to_offset) || aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)))
-    {
-      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, from->aopu.aop_reg[from_offset]->name);
-    }
   else if (aopInReg (to, to_offset, A_IDX))
     {
       emitcode ("mov", "a, %s", aopGet (from, from_offset, false, false));
+    }
+  else if (aopDir (to, to_offset) && aopInRn (from, from_offset))
+    {
+      emitcode ("mov", "%s, %s", aopGet (to, to_offset, false, true), from->aopu.aop_reg[from_offset]->name);
     }
   else if (aopInReg (from, from_offset, A_IDX))
     {
@@ -2365,6 +2380,16 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
   else if ((aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)) && (!aopGetUsesAcc (from, from_offset) || a_dead))
     {
       emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, aopGet (from, from_offset, false, true));
+    }
+  else if ((to->type == AOP_R0 || to->type == AOP_R1) && !to->paged && aopDir (from, from_offset)) // Can't be part of the case below, since aopPut wants to pass the value through acc, which is less efficient.
+    {
+      setAopR01Offset (to, to_offset);
+      emitcode ("mov", "@%s, %s", to->aopu.aop_ptr->name, aopGet (from, from_offset, false, true));
+    }
+  else if ((aopDir (to, to_offset) && aopDir (from, from_offset) ||
+    aopDir (to, to_offset) && (from->type == AOP_R0 || from->type == AOP_R1) && !from->paged))
+    {
+      aopPut (to, aopGet (from, from_offset, false, true), to_offset);
     }
   else if (a_dead)
     {
@@ -2408,7 +2433,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   wassertl_bt (n <= 8, "Invalid size for genCopy().");
   //wassertl_bt (aopRS (source), "Invalid source type.");
   //wassertl_bt (aopRS (result), "Invalid result type.");
-  wassertl_bt (result->type == AOP_REG && source->type == AOP_REG, "genCopy not yet implemented for non-register operands");
+  wassertl_bt ((result->type == AOP_REG || result->type == AOP_ACC) && (source->type == AOP_REG || source->type == AOP_ACC), "genCopy not yet implemented for non-register operands");
 
   //a_dead |= (result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + sizex); todo: enable when supported by struct asmop
 
@@ -2534,14 +2559,32 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       return;
     }
 
-  a_dead_global |= result->type = AOP_ACC;
+  a_dead_global |= (result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + size); // a will be overwritten.
 
+  bool pushed_a = false;
   for (int i = 0; i < size;)
     {
-      bool a_dead = a_dead_global && result->type != AOP_REG && result->type != AOP_ACC && source->type != AOP_REG && source->type != AOP_ACC; // todo: make more exact
+      bool a_dead = a_dead_global && (source->regs[A_IDX] <= soffset + i || source->regs[A_IDX] >= soffset + size) && (result->regs[A_IDX] < roffset || result->regs[A_IDX] >= roffset + i) || pushed_a;
 
-      cheapMove (result, roffset + i, source, soffset + i, a_dead);
+      if (pushed_a && aopInReg (source, i, A_IDX))
+        {
+          emitpop ("acc");
+          pushed_a = false;
+        }
+
+      if (!a_dead && !pushed_a && (aopGetUsesAcc (source, soffset + i) && !aopInReg (source, soffset + i, A_IDX) || result->paged))
+        {
+          emitpush ("acc");
+          pushed_a = true;
+        }
+      bool a_free = a_dead || pushed_a;
+      cheapMove (result, roffset + i, source, soffset + i, a_free);
       i++;
+    }
+  if (pushed_a)
+    {
+      emitpop ("acc");
+      pushed_a = false;
     }
 }
 
@@ -3152,42 +3195,18 @@ pushSide (operand * oper, int size, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* assignResultValue - also indicates if acc is in use afterwards  */
+/* assignResultValue                                               */
 /*-----------------------------------------------------------------*/
-static bool
-assignResultValue (operand * oper, operand * func)
+static void
+assignResultValue (operand *oper, operand *func)
 {
-  int offset = 0;
-  int size = AOP_SIZE (oper);
-  bool accuse = FALSE;
-  bool pushedA = FALSE;
-
   sym_link *dtype = func ? operandType (func) : 0;
   sym_link *ftype = func ? (IS_FUNCPTR (dtype) ? dtype->next : dtype) : 0;
 
   if (func && IS_BIT (getSpec (operandType (func))))
-    {
-      outBitC (oper);
-      return FALSE;
-    }
-  if (oper->aop->type == AOP_REG)
-    genCopy (oper->aop, 0, func ? aopRet (ftype) : ASMOP_R7R6R5R4ABDPTR /* hack to allow for abuse of assignResultValue (. 0) by genReceive */, 0, size, true);
+    outBitC (oper);
   else
-    {
-      if ((size > 3) && aopPutUsesAcc (oper->aop, fReturn[offset], offset))
-        {
-          emitpush ("acc");
-          pushedA = TRUE;
-        }
-      while (size--)
-        {
-          if ((offset == 3) && pushedA)
-            emitpop ("acc");
-          accuse |= opPut (oper, fReturn[offset], offset);
-          offset++;
-        }
-    }
-  return accuse;
+    genMove (oper->aop, func ? aopRet (ftype) : ASMOP_R7R6R5R4ABDPTR /* hack to allow for abuse of assignResultValue (. 0) by genReceive */, true);
 }
 
 
@@ -3928,7 +3947,8 @@ genCall (iCode * ic)
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
 
-      accuse = assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
+      assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
+      accuse = (IC_RESULT (ic)->aop->regs[A_IDX] > 0);
       assignResultGenerated = TRUE;
 
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
@@ -5705,12 +5725,12 @@ genPlus (iCode * ic)
           else if (aopGetUsesAcc (leftOp->aop, offset))
             {
               MOVA (opGet (leftOp, offset, FALSE, FALSE));
-              emitcode (add, "a,%s", opGet (rightOp, offset, FALSE, FALSE));
+              emitcode (add, "a, %s", aopGet (rightOp->aop, offset, false, !aopInRn (rightOp->aop, offset)));
             }
           else
             {
               MOVA (opGet (rightOp, offset, FALSE, FALSE));
-              emitcode (add, "a,%s", opGet (leftOp, offset, FALSE, FALSE));
+              emitcode (add, "a, %s", aopGet (leftOp->aop, offset, false, !aopInRn (leftOp->aop, offset)));
             }
           if (!size && maskedtopbyte)
             emitcode ("anl", "a,#!constbyte", topbytemask);
@@ -7232,7 +7252,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
                   MOVA (opGet (left, 0, false, false));
                   for (cidx = 1; cidx < size; cidx++)
                     if (chk[cidx])
-                      emitcode ("orl", "a,%s", opGet (left, cidx, false, false));
+                      emitcode ("orl", "a,%s", opGet (left, cidx, false, true));
                   emitcode ("jnz", "%05d$", lbl->key + 100);
                   return;
                 }

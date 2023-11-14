@@ -1,3 +1,9 @@
+2023-11-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mcs51/gen.c,
+	  src/mcs51/gen.h:
+	  Use aopRet.
+
 2023-11-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mcs51/gen.c:

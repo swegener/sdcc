@@ -79,6 +79,7 @@ typedef struct asmop
     const char *aop_str[8];     /* just a string array containing the location */
   }
   aopu;
+  signed char regs[24]; // Byte of this aop that is in the register. -1 if no byte of this aop is in the reg. Todo: Reorder regs in ralloc.h, so this can be shortened to save some bytes.
   struct valinfo valinfo;
 }
 asmop;

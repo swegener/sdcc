@@ -3716,14 +3716,7 @@ genSend (set *sendSet)
                   while (size--)
                     {
                       offset--;
-                      if (!EQ ("a", fReturn[offset]))
-                        {
-                          emitpop (fReturn[offset]);
-                        }
-                      else
-                        {
-                          emitpop ("acc");
-                        }
+                      emitpop (argreg->aopu.aop_reg[offset]->dname);
                     }
                 }
             }

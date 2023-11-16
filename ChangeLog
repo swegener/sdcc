@@ -1,5 +1,10 @@
 2023-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/mcs51/gen.c:
+	  Use aopArg for all non-bit parameters in genSend.
+
+2023-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/mcs51/ralloc.c,
 	  src/mcs51/ralloc.h:
 	  Fix mcs51_regname_to_idx, patch by Oleg Endo.

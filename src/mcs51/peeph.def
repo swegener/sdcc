@@ -1733,16 +1733,17 @@ replace {
 	mov	a,#0x01
 	movc	a,@a+dptr
 } by {
-	;	Peephole 186.e	optimized movc sequence (b, dptr differ)
+	;	Peephole 186.e	optimized movc sequence
 	add	a,acc
-	mov	b,a
-	mov	dptr,#%2
-	jnc	.+3
-	inc	dph
+	mov	dpl,a
+	clr	a
+	addc	a,#(%2 >> 8)
+	mov	dph,a
+	mov	a,#%2
 	movc	a,@a+dptr
 	mov	%3,a
-	mov	a,b
-	inc	a
+	mov	a,#%2
+	inc	dptr
 	movc	a,@a+dptr
 }
 

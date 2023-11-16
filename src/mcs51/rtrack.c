@@ -295,6 +295,9 @@ bool _mcs51_rtrackUpdate (const char *line)
               char *s;
               int value;
 
+              while (*argument && isblank (*argument))
+                argument++;
+
               value = strtol (argument + 1, &s, 16);
 
               /* check literal mov to register */

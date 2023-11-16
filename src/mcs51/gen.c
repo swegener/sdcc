@@ -1468,9 +1468,15 @@ aopArg (sym_link *ftype, int i)
     {
       wassert (0); // todo: special handling for bits.
     }
-      
-  if (i != 1)
+
+  // struct arguments are never passed in registers.
+  if (IS_STRUCT (arg->type))
     return (0);
+
+  // Only first non-struct, non-bit argument is passed in registers.
+  for (value *arg2 = args; arg2 != arg; arg2 = arg2->next)
+    if (!IS_STRUCT (arg2->type) && !(IS_SPEC (arg2->type) && SPEC_NOUN (arg2->type) == V_BIT))
+      return (0);
 
   switch (getSize (arg->type))
     {
@@ -2126,7 +2132,7 @@ aopInReg (const asmop *aop, int offset, short rIdx)
   if (aop->type != AOP_REG)
     return (false);
 
-  // todo enable when we hvae DPTR_IDX
+  // todo enable when we have DPTR_IDX
   //if (rIdx == DPTR_IDX)
   //  return (aopInReg (aop, offset, DPL_IDX) && aopInReg (aop, offset + 1, DPH_IDX));
 
@@ -2379,7 +2385,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     }
   else if ((aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, DPL_IDX) || aopInReg (to, to_offset, DPH_IDX)) && (!aopGetUsesAcc (from, from_offset) || a_dead))
     {
-      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, aopGet (from, from_offset, false, true));
+      emitcode ("mov", "%s, %s", to->aopu.aop_reg[to_offset]->dname, aopGet (from, from_offset, false, !aopGetUsesAcc (from, from_offset)));
     }
   else if ((to->type == AOP_R0 || to->type == AOP_R1) && !to->paged && aopDir (from, from_offset)) // Can't be part of the case below, since aopPut wants to pass the value through acc, which is less efficient.
     {
@@ -2426,7 +2432,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 {
   int regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
   bool assigned[8] = {false, false, false, false, false, false, false, false};
-  //bool a_free, hl_free;
+  //bool a_free;
   //int cached_byte = -1;
   //bool pushed_a = false;
 
@@ -3625,7 +3631,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
 /* genSend - gen code for SEND                                     */
 /*-----------------------------------------------------------------*/
 static void
-genSend (set * sendSet)
+genSend (set *sendSet)
 {
   iCode *sic;
   int bit_count = 0;
@@ -3633,9 +3639,9 @@ genSend (set * sendSet)
   /* first we do all bit parameters */
   for (sic = setFirstItem (sendSet); sic; sic = setNextItem (sendSet))
     {
-      if (sic->argreg > 12)
+      if (sic->argreg > 1000)
         {
-          int bit = sic->argreg - 13;
+          int bit = sic->argreg - 1001;
 
           aopOp (IC_LEFT (sic), sic, FALSE);
 
@@ -3678,35 +3684,26 @@ genSend (set * sendSet)
   /* then we do all other parameters */
   for (sic = setFirstItem (sendSet); sic; sic = setNextItem (sendSet))
     {
-      if (sic->argreg <= 12)
+      wassert (sic->argreg <= 1000);
         {
-          int size, offset = 0;
-          aopOp (IC_LEFT (sic), sic, FALSE);
-          size = AOP_SIZE (IC_LEFT (sic));
+          const iCode *walk;
+          for (walk = sic->next; walk; walk = walk->next)
+            {
+              if (walk->op == CALL || walk->op == PCALL)
+                break;
+            }
 
-          if (sic->argreg == 1)
+          sym_link *ftype = IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk));
+          asmop *argreg = aopArg (ftype, sic->argreg);
+
+          int size, offset = 0;
+          aopOp (sic->left, sic, FALSE);
+          size = sic->left->aop->size;
+
+          if (argreg)
             {
               if (AOP_TYPE (IC_LEFT (sic)) != AOP_DPTR)
-                {
-                  bool pushedA = FALSE;
-                  while (size--)
-                    {
-                      const char *l = opGet (IC_LEFT (sic), offset, FALSE, FALSE);
-                      if (!EQ (l, fReturn[offset]))
-                        if (fReturn[offset][0] == 'r' && (AOP_TYPE (IC_LEFT (sic)) == AOP_REG || AOP_TYPE (IC_LEFT (sic)) == AOP_R0 || AOP_TYPE (IC_LEFT (sic)) == AOP_R1)) 
-                          emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
-                        else
-                          emitcode ("mov", "%s,%s", fReturn[offset], l);
-                      else if (EQ (l, "a") && size != 0)
-                        {
-                          emitpush ("acc");
-                          pushedA = TRUE;
-                        }
-                      offset++;
-                    }
-                  if (pushedA)
-                    emitpop ("acc");
-                }
+                genMove (argreg, sic->left->aop, true);
               else /* need to load dpl, dph, etc from @dptr */
                 {
                   while (size--)
@@ -3728,14 +3725,6 @@ genSend (set * sendSet)
                           emitpop ("acc");
                         }
                     }
-                }
-            }
-          else
-            {
-              while (size--)
-                {
-                  emitcode ("mov", "%s,%s", rb1regs[sic->argreg + offset - 5], opGet (IC_LEFT (sic), offset, FALSE, FALSE));
-                  offset++;
                 }
             }
           freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
@@ -4600,7 +4589,7 @@ genFunction (iCode * ic)
 
   /* For some cases it is worthwhile to perform a RECEIVE iCode */
   /* before setting up the stack frame completely. */
-  if (ric && ric->argreg == 1 && IC_RESULT (ric))
+  if (ric && ric->argreg <= 1000 && IC_RESULT (ric))
     {
       symbol *rsym = OP_SYMBOL (IC_RESULT (ric));
 
@@ -12737,7 +12726,7 @@ genReceive (iCode * ic)
 
   D (emitcode (";", "genReceive"));
 
-  if (ic->argreg == 1)
+  if (ic->argreg <= 1000)
     {
       /* first parameter */
       if ((isOperandInFarSpace (IC_RESULT (ic)) ||
@@ -12803,16 +12792,16 @@ genReceive (iCode * ic)
           assignResultValue (IC_RESULT (ic), NULL); // TODO: Change this! This relies on register parmeters being in exactly the same registers as result values, which should not be assumed!
         }
     }
-  else if (ic->argreg > 12)
+  else if (ic->argreg > 1000)
     {
       /* bit parameters */
       reg_info *reg = OP_SYMBOL (IC_RESULT (ic))->regs[0];
 
       BitBankUsed = 1;
-      if (!reg || reg->rIdx != ic->argreg - 5)
+      if (!reg || reg->rIdx != ic->argreg - 993)
         {
           aopOp (IC_RESULT (ic), ic, FALSE);
-          emitcode ("mov", "c,%s", rb1regs[ic->argreg - 5]);
+          emitcode ("mov", "c,%s", rb1regs[ic->argreg - 993]);
           outBitC (IC_RESULT (ic));
         }
     }
@@ -13267,3 +13256,43 @@ gen51Code (iCode * lic)
   /* destroy the line list */
   destroy_line_list ();
 }
+
+bool
+mcs51IsReturned(const char *what)
+{
+  if (!strcmp(what, "dptr"))
+    return (mcs51IsReturned ("dpl") || mcs51IsReturned ("dph"));
+
+  const asmop *retaop = aopRet (currFunc->type);
+
+  if (!retaop)
+    return false;
+  for (int i = 0; i < retaop->size; i++)
+    if (!strcmp(retaop->aopu.aop_reg[i]->name, what))
+      return true;
+  return false;
+}
+
+// Check if what is part of the ith argument (counting from 1) to a function of type ftype.
+// If what is 0, just check if hte ith argument is in registers.
+bool
+mcs51IsRegArg (struct sym_link *ftype, int i, const char *what)
+{
+  if (what && !strcmp(what, "dptr"))
+    return (mcs51IsRegArg (ftype, i, "dpl") || mcs51IsRegArg (ftype, i, "dph"));
+
+  const asmop *argaop = aopArg (ftype, i);
+
+  if (!argaop)
+    return false;
+
+  if (!what)
+    return true;
+
+  for (int i = 0; i < argaop->size; i++)
+    if (!strcmp(argaop->aopu.aop_reg[i]->name, what))
+      return true;
+
+  return false;
+}
+

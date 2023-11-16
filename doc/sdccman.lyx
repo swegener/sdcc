@@ -43173,8 +43173,8 @@ ACC (mcs51, ds390 register)
 
 
 \emph default
- to pass the first (non-bit) parameter to a function, and also to pass the
- return value 
+ to pass the first (non-bit, non-struct) parameter to a function, and also
+ to pass the return value 
 \begin_inset Index idx
 status collapsed
 
@@ -43271,7 +43271,8 @@ This might not be the case of certain memory models (medium???)
 \end_layout
 
 \begin_layout Standard
-The second parameter onwards is either allocated on the stack (for reentrant
+Further such parameters (and all struct parameters, as well as the bit parameter
+s from the 9th onwards) are either allocated on the stack (for reentrant
  routines or if -
 \begin_inset ERT
 status collapsed
@@ -43289,8 +43290,9 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-Bit parameters are passed in a virtual register called 'bits' in bit-addressable
- space for reentrant functions or allocated directly in bit memory otherwise.
+The first 8 bit parameters are passed in a virtual register called 'bits'
+ in bit-addressable space for reentrant functions or allocated directly
+ in bit memory otherwise.
 \end_layout
 
 \begin_layout Standard

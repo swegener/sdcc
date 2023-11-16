@@ -111,6 +111,8 @@ _mcs51_reset_regparm (struct sym_link *funcType)
 static int
 _mcs51_regparm (sym_link *l, bool reentrant)
 {
+  ++regParmFlg;
+
   if (IFFUNC_HASVARARGS (regParmFuncType))
     return 0;
 
@@ -127,17 +129,14 @@ _mcs51_regparm (sym_link *l, bool reentrant)
       if (reentrant && (regBitParmFlg < 8))
         {
           regBitParmFlg++;
-          return 12 + regBitParmFlg;
+          return 1000 + regBitParmFlg;
         }
       return 0;
     }
 
-  /* simple can pass only the first parameter in a register */
-  if (regParmFlg)
-    return 0;
+  bool is_regarg = mcs51IsRegArg (regParmFuncType, regParmFlg, 0);
 
-  regParmFlg = 1;
-  return 1;
+  return (is_regarg ? regParmFlg : 0);
 }
 
 static bool

@@ -85,6 +85,30 @@ reg_info regs8051[] = {
   {0, A_IDX, 0, "a", "acc", "0xe0", 0, 0},
 };
 
+static const char* alt_regnames[] = {
+  NULL, /* R7_IDX */
+  NULL, /* R6_IDX */
+  NULL, /* R5_IDX */
+  NULL, /* R4_IDX */
+  NULL, /* R3_IDX */
+  NULL, /* R2_IDX */
+  NULL, /* R1_IDX */
+  NULL, /* R0_IDX */
+  NULL, /* B0_IDX */
+  NULL, /* B1_IDX */
+  NULL, /* B2_IDX */
+  NULL, /* B3_IDX */
+  NULL, /* B4_IDX */
+  NULL, /* B5_IDX */
+  NULL, /* B6_IDX */
+  NULL, /* B7_IDX */
+  "c", /* CND_ID */
+  NULL, /* DPL_IDX */
+  NULL, /* DPH_IDX */
+  NULL, /* B_IDX */
+  NULL, /* A_IDX */
+};
+
 int mcs51_nRegs = 16;
 static void spillThis (symbol *);
 static void freeAllRegs ();
@@ -96,15 +120,30 @@ mcs51_regname_to_idx (const char* reg_name)
   if (reg_name == NULL || *reg_name == '\0')
     return -1;
 
+  char op[16];
+  strncpy (op, reg_name, 15);
+  op[15] = '\0';
+
+  /* assuming that 'reg_name' could be a text snippet consisting of multiple
+     insn operands, find the end of the first operand.  */
+  char *op_end = &op[0];
+  for (; op_end != &op[16]; ++op_end)
+    if (*op_end == '\0' || *op_end == ',' || *op_end == ' ' || *op_end == '\t' || *op_end == ';')
+      {
+        *op_end = '\0';
+        break;
+      }
+
   for (int i = 0; i < END_IDX; ++i)
     {
-       if (regs8051[i].name)
-         if (!strncmp (reg_name, regs8051[i].name, strlen(regs8051[i].name)))
-            return i;
+       if (regs8051[i].name && !strcmp (op, regs8051[i].name))
+         return i;
 
-       if (regs8051[i].dname)
-         if (!strncmp (reg_name, regs8051[i].dname, strlen(regs8051[i].dname)))
-            return i;
+       if (alt_regnames[i] && !strcmp (op, alt_regnames[i]))
+         return i;
+
+       if (regs8051[i].dname && !strcmp (op, regs8051[i].dname))
+        return i;
     }
 
   return -1;

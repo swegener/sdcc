@@ -1,5 +1,11 @@
 2023-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/mcs51/ralloc.c,
+	  src/mcs51/ralloc.h:
+	  Fix mcs51_regname_to_idx, patch by Oleg Endo.
+
+2023-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* doc/sdccman.lyx:
 	  Improve mcs51 calling convention documentation.
 	* src/mcs51/gen.c,

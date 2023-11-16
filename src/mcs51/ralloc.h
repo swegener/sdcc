@@ -83,6 +83,9 @@ extern int mcs51_nRegs;
    { "r7", "r6", ... } -> { R7_IDX, R6_IDX, ... }
    { "ar7", "ar6", ... } -> { R7_IDX, R6_IDX, ... }
 
+   if the input 'name' contains a pair of insn operands (separated by comma)
+   then the first operand will be matched.
+
    returns -1 if not found.  */
 int mcs51_regname_to_idx (const char* name);
 

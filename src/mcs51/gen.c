@@ -52,7 +52,7 @@ static char *spname;
 
 unsigned fReturnSizeMCS51 = 4;  /* shared with ralloc.c */
 const char **fReturn = fReturn8051;
-const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" }; // TODO: This ia a legacy mechanism. Codegen should migrate to aopArg and aopRet.
+const char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" }; // Historically the registers used for return values. Got abused for other stuff since, then partially replaced by aopArg and aopRet.
 static asmop *aopRet (sym_link *ftype);
 
 static short rbank = -1;
@@ -3206,13 +3206,15 @@ pushSide (operand * oper, int size, iCode * ic)
 static void
 assignResultValue (operand *oper, operand *func)
 {
-  sym_link *dtype = func ? operandType (func) : 0;
-  sym_link *ftype = func ? (IS_FUNCPTR (dtype) ? dtype->next : dtype) : 0;
+  wassert (func);
+
+  sym_link *dtype = operandType (func);
+  sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
 
   if (func && IS_BIT (getSpec (operandType (func))))
     outBitC (oper);
   else
-    genMove (oper->aop, func ? aopRet (ftype) : ASMOP_R7R6R5R4ABDPTR /* hack to allow for abuse of assignResultValue (. 0) by genReceive */, true);
+    genMove (oper->aop, aopRet (ftype), true);
 }
 
 
@@ -5277,8 +5279,8 @@ genRet (iCode * ic)
       if (!IS_OP_RUONLY (IC_LEFT (ic)))
         toCarry (IC_LEFT (ic));
     }
-  else if (ic->left->aop->type == AOP_REG)
-    genCopy (aopRet (currFunc->type), 0, ic->left->aop, 0, size, true);
+  else if (size && aopRet (currFunc->type) && ic->left->aop->type != AOP_DPTR)
+    genMove (aopRet (currFunc->type), ic->left->aop, true);
   else
     {
       while (size--)
@@ -12719,9 +12721,12 @@ genReceive (iCode * ic)
 
   D (emitcode (";", "genReceive"));
 
+  wassert (currFunc);
+
   if (ic->argreg <= 1000)
     {
-      /* first parameter */
+      asmop *argaop = aopArg (currFunc->type, ic->argreg);
+
       if ((isOperandInFarSpace (IC_RESULT (ic)) ||
            isOperandInPagedSpace (IC_RESULT (ic))) && (OP_SYMBOL (IC_RESULT (ic))->isspilt || IS_TRUE_SYMOP (IC_RESULT (ic))))
         {
@@ -12730,7 +12735,7 @@ genReceive (iCode * ic)
           int roffset = 0;
 
           for (offset = 0; offset < size; offset++)
-            if (EQ (fReturn[offset], "a"))
+            if (aopInReg (argaop, offset, A_IDX))
               receivingA = 1;
 
           if (!receivingA)
@@ -12738,8 +12743,8 @@ genReceive (iCode * ic)
               if (size == 1 || getTempRegs (tempRegs, size - 1, ic))
                 {
                   for (offset = size - 1; offset > 0; offset--)
-                    emitcode ("mov", "%s,%s", tempRegs[roffset++]->name, fReturn[offset]);
-                  emitcode ("mov", "a,%s", fReturn[0]);
+                    emitcode ("mov", "%s,%s", tempRegs[roffset++]->name, argaop->aopu.aop_reg[offset]->name);
+                  emitcode ("mov", "a,%s", argaop->aopu.aop_reg[0]->name);
                   _G.accInUse++;
                   aopOp (IC_RESULT (ic), ic, FALSE);
                   _G.accInUse--;
@@ -12754,7 +12759,7 @@ genReceive (iCode * ic)
               if (getTempRegs (tempRegs, size, ic) && size <= 4 /* Workaround for issue: For size >= 4, getTempRegs will give us regs in use for param, making us overwrite param bytes still needed */)
                 {
                   for (offset = 0; offset < size; offset++)
-                    emitcode ("mov", "%s,%s", tempRegs[offset]->name, fReturn[offset]);
+                    emitcode ("mov", "%s,%s", tempRegs[offset]->name, argaop->aopu.aop_reg[offset]->name);
                   aopOp (IC_RESULT (ic), ic, FALSE);
                   for (offset = 0; offset < size; offset++)
                     opPut(IC_RESULT (ic), tempRegs[offset]->name, offset);
@@ -12782,7 +12787,7 @@ genReceive (iCode * ic)
           _G.accInUse++;
           aopOp (IC_RESULT (ic), ic, FALSE);
           _G.accInUse--;
-          assignResultValue (IC_RESULT (ic), NULL); // TODO: Change this! This relies on register parmeters being in exactly the same registers as result values, which should not be assumed!
+          genMove (ic->result->aop, argaop, true);
         }
     }
   else if (ic->argreg > 1000)

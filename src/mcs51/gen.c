@@ -5124,10 +5124,9 @@ genEndFunction (iCode * ic)
 /* genRet - generate code for return statement                     */
 /*-----------------------------------------------------------------*/
 static void
-genRet (iCode * ic)
+genRet (iCode *ic)
 {
   int size, offset = 0, pushed = 0;
-  bool pushedA = FALSE;
 
   D (emitcode (";", "genRet"));
 
@@ -5285,31 +5284,8 @@ genRet (iCode * ic)
     {
       while (size--)
         {
-          if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
-            {
-              /* #NOCHANGE */
-              emitpush (opGet (IC_LEFT (ic), offset++, FALSE, TRUE));
-              pushed++;
-            }
-          else
-            {
-              const char *l = opGet (IC_LEFT (ic), offset, FALSE, FALSE);
-              if (!EQ (fReturn[offset], l))
-                if (fReturn[offset][0] == 'r' && (AOP_TYPE (IC_LEFT (ic)) == AOP_REG || AOP_TYPE (IC_LEFT (ic)) == AOP_R0 || AOP_TYPE (IC_LEFT (ic)) == AOP_R1)) 
-                  emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
-                else
-                  emitcode ("mov", "%s,%s", fReturn[offset], l);
-              if (size && !strcmp(fReturn[offset], "a") && aopGetUsesAcc (ic->left->aop, offset+1))
-                {
-                  emitpush ("acc");
-                  pushedA = TRUE;
-                }
-              offset++;
-            }
-        }
-      if (pushedA)
-        {
-           emitpop ("acc");
+          emitpush (opGet (ic->left, offset++, false, true));
+          pushed++;
         }
 
       while (pushed)
@@ -13291,6 +13267,18 @@ mcs51IsRegArg (struct sym_link *ftype, int i, const char *what)
     if (!strcmp(argaop->aopu.aop_reg[i]->name, what))
       return true;
 
+  return false;
+}
+
+bool
+mcs51IsParmInCall (sym_link *ftype, const char *what)
+{
+  const value *args;
+  int i;
+
+  for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
+    if (stm8IsRegArg(ftype, i, what))
+      return true;
   return false;
 }
 

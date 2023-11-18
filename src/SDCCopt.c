@@ -1327,11 +1327,9 @@ convertToFcall (eBBlock ** ebbs, int count)
                   /* modulo by 1: no remainder */
                   if (litVal == 1)
                     {
+                      detachiCodeOperand (&ic->left, ic);
                       ic->op = '=';
                       IC_RIGHT (ic) = operandFromLit (0);
-                      if (IS_SYMOP (IC_LEFT (ic)))
-                        bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
-                      IC_LEFT (ic) = NULL;
                       continue;
                     }
                   // See if literal value is a power of 2.
@@ -2562,11 +2560,7 @@ optimize:
                 {
                   uic->op = '=';
                   if (skipuic)
-                    {
-                      bitVectUnSetBit (OP_USES (IC_RIGHT (uic)), uic->key);
-                      IC_RIGHT (uic) = IC_RIGHT (skipuic);
-                      OP_USES (IC_RIGHT (uic)) = bitVectSetBit (OP_USES (IC_RIGHT (uic)), uic->key);
-                    }
+                    attachiCodeOperand (skipuic->right, &uic->right, uic);
                 }
               if (skipuic && skipuic->op == '=' &&
                   compareType (operandType (IC_RESULT (skipuic)), operandType (IC_RIGHT (skipuic)), false) != 1)

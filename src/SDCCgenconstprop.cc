@@ -954,12 +954,9 @@ optimizeValinfoConst (iCode *sic)
 #ifdef DEBUG_GCP_OPT
               std::cout << "Replace result at " << ic->key << ". anything " << vresult.anything << " min " << vresult.min << " max " << vresult.max << "\n";
 #endif
-              if (IS_SYMOP (left))
-                bitVectUnSetBit (OP_USES (left), ic->key);
-              if (IS_SYMOP (right))
-                bitVectUnSetBit (OP_USES (right), ic->key);
+              detachiCodeOperand (&ic->left, ic);
+              detachiCodeOperand (&ic->right, ic);
               ic->op = '=';
-              ic->left = NULL;
               ic->right = operandFromValue (valCastLiteral (operandType (result), vresult.min, vresult.min), false);
             }
           else
@@ -969,16 +966,14 @@ optimizeValinfoConst (iCode *sic)
 #ifdef DEBUG_GCP_OPT
                   std::cout << "Replace left (" << OP_SYMBOL(left)->name << "), key " << left->key << " at " << ic->key << "\n";std::cout << "anything " << vleft.anything << " min " << vleft.min << " max " << vleft.max << "\n";
 #endif
-                  bitVectUnSetBit (OP_USES (left), ic->key);
-                  ic->left = operandFromValue (valCastLiteral (operandType (left), vleft.min, vleft.min), false);
+                  attachiCodeOperand (operandFromValue (valCastLiteral (operandType (left), vleft.min, vleft.min), false), &ic->left, ic);
                 }
               if (right && IS_ITEMP (right) && !vright.anything && vright.min == vright.max)
                 {
 #ifdef DEBUG_GCP_OPT
                   std::cout << "Replace right at " << ic->key << "\n";std::cout << "anything " << vleft.anything << " min " << vleft.min << " max " << vleft.max << "\n";
 #endif
-                  bitVectUnSetBit (OP_USES (right), ic->key);
-                  ic->right = operandFromValue (valCastLiteral (operandType (right), vright.min, vright.min), false);
+                  attachiCodeOperand (operandFromValue (valCastLiteral (operandType (right), vright.min, vright.min), false), &ic->right, ic);
                 }
             }
           

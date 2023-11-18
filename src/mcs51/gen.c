@@ -13277,7 +13277,7 @@ mcs51IsParmInCall (sym_link *ftype, const char *what)
   int i;
 
   for (i = 1, args = FUNC_ARGS (ftype); args; args = args->next, i++)
-    if (stm8IsRegArg(ftype, i, what))
+    if (mcs51IsRegArg(ftype, i, what))
       return true;
   return false;
 }

@@ -1259,12 +1259,9 @@ shortenLiveRanges (iCode *sic, ebbIndex *ebbi)
         }
 
       if (IC_LEFT (nic) == IC_RESULT (pic))
-        IC_LEFT (nic) = IC_RIGHT (pic);
+        attachiCodeOperand (pic->right, &nic->left, nic);
       if (IC_RIGHT (nic) == IC_RESULT (pic))
-        IC_RIGHT (nic) = IC_RIGHT (pic);
-      bitVectUnSetBit (OP_USES (IC_RESULT (pic)), nic->key);
-      if (IS_SYMOP (IC_RIGHT (pic)))
-        bitVectSetBit (OP_USES (IC_RIGHT (pic)), nic->key);
+        attachiCodeOperand (pic->right, &nic->right, nic);
 
       // Assignment to self will get optimized out later
       IC_LEFT (pic) = IC_RESULT (pic); 

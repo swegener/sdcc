@@ -2,6 +2,13 @@
 
 	* support/regression/tests/bug-3675.c:
 	  Regression test for bug #3675.
+	* src/SDCCicode.c,
+	  src/SDCCopt.c,
+	  src/SDCCgenconstprop.cc,
+	  src/SDCClrange.c:
+	  Code refactoring for iCode operand replacement.
+	* src/mcs51/gen.c:
+	  Fix a typo.
 
 2023-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
 

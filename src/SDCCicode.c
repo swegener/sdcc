@@ -1119,38 +1119,30 @@ isOperandOnStack (operand * op)
 
 /*-------------------------------------------------------------------*/
 /* detachiCodeOperand - remove a specific operand position (left,    */
-/*                      right, result, etc) from an iCode and update */
+/*                      right, result) from an iCode and update      */
 /*                      the uses & defs as appropriate.              */
 /*-------------------------------------------------------------------*/
 operand *
 detachiCodeOperand (operand **opp, iCode *ic)
 {
-  operand * op = *opp;
+  operand *op = *opp;
   
   if (IS_SYMOP (op))
     {
-      if ((ic->op == IFX) || (ic->op == JUMPTABLE))
-        {
-          *opp = NULL;
-          bitVectUnSetBit (OP_USES (op), ic->key);
-        }
-      else
-        {
-          int uses = 0;
-          bool ispointerset = POINTER_SET (ic);
+      int uses = 0;
+      bool ispointerset = POINTER_SET (ic);
 
-          if (!ispointerset && (opp == &IC_RESULT (ic)))
-            bitVectUnSetBit (OP_DEFS (op), ic->key);
-          *opp = NULL;
-          if (ispointerset && (op == IC_RESULT (ic)))
-            uses++;
-          if (op == IC_LEFT (ic))
-            uses++;
-          if (op == IC_RIGHT (ic))
-            uses++;
-          if (uses == 0)
-            bitVectUnSetBit (OP_USES (op), ic->key);
-        }
+      if (!ispointerset && (opp == &ic->result))
+        bitVectUnSetBit (OP_DEFS (op), ic->key);
+      *opp = NULL;
+      if (ispointerset && (op == ic->result))
+        uses++;
+      if (op == ic->left)
+        uses++;
+      if (op == ic->right)
+         uses++;
+      if (uses == 0)
+        bitVectUnSetBit (OP_USES (op), ic->key);
     }
   else
     *opp = NULL;
@@ -1159,7 +1151,7 @@ detachiCodeOperand (operand **opp, iCode *ic)
 
 /*-------------------------------------------------------------------*/
 /* attachiCodeOperand - insert an operand to a specific operand      */
-/*                      position (left, right, result, etc) in an    */
+/*                      position (left, right, result) in an         */
 /*                      iCode and update the uses & defs as          */
 /*                      appropriate. Any previously existing operand */
 /*                      in that position will be detached first.     */
@@ -1177,7 +1169,7 @@ attachiCodeOperand (operand *newop, operand **opp, iCode *ic)
   /* Update defs/uses for new operand */
   if (IS_SYMOP (newop))
     {
-      if (opp == &IC_RESULT (ic) && !POINTER_SET (ic))
+      if (opp == &ic->result && !POINTER_SET (ic))
         OP_DEFS (newop) = bitVectSetBit (OP_DEFS (newop), ic->key);
       else
         OP_USES (newop) = bitVectSetBit (OP_USES (newop), ic->key);

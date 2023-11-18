@@ -1,5 +1,11 @@
 2023-11-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCicode.c,
+	  src/SDCCicode.h:
+	  Directly create iCode chain instead of via intermediate set-style linked list.
+
+2023-11-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* support/regression/tests/bug-3675.c:
 	  Regression test for bug #3675.
 	* src/SDCCicode.c,

@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------
-    SDCCset.h - contains support routines for doubly linked lists.
+    SDCCset.h - contains support routines for linked lists.
 
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1998)
 

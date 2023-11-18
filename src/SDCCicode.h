@@ -52,8 +52,6 @@ OPTYPE;
 #define IS_VALOP(op) (op && op->type == VALUE)
 #define IS_TYPOP(op) (op && op->type == TYPE)
 
-#define ADDTOCHAIN(x) addSetHead(&iCodeChain,x)
-
 #define LRFTYPE       sym_link *ltype = operandType(left), \
                            *rtype = operandType(right) ;
 #define LRETYPE       sym_link *letype= getSpec(ltype)   , \

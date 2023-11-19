@@ -26,7 +26,6 @@ int f(int x, int y, int z, int a, U u)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // bug?
 #ifndef __SDCC_ds390 // bug?
   U u = { .ss = -1 };
 
@@ -34,6 +33,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 #endif
 }

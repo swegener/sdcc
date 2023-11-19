@@ -1,3 +1,12 @@
+2023-11-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCicode.c,
+	  support/regression/tests/bug-3675.c,
+	  support/regression/tests/gcc-torture-execute-20180131-1.c,
+	  support/regression/tests/gcc-torture-execute-pr67226.c,
+	  support/regression/tests/gcc-torture-execute-20040707-1.c:
+	  Fix bug #3675.
+
 2023-11-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,

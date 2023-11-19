@@ -20,12 +20,10 @@ void f(unsigned int i, struct s s)
 void
 testBug (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // Bug not yet fixed.
 #ifndef __SDCC_ds390 // Fails to link
 	struct s s = {0xa5a5};
 
 	f(0x5a5a, s); // When passing s, a memcpy call will be used as helper function. The 0x5a5a will be passed as if it was an additional parameter to that memcpy instead of being passed to f.
-#endif
 #endif
 }
 

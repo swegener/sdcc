@@ -45,13 +45,11 @@ testTortureExecute (void)
   from_input.symtype = 7;
   from_input.symflags = 8;
   from_input.marker = 9;
-#if !defined(__SDCC_mcs51) || !defined(__SDCC_STACK_AUTO) // bug?
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // bug?
+
 #ifndef __SDCC_ds390 // bug?
   t0 (to_input, from_input);
 #endif
-#endif
-#endif
+
   return;
 }
 

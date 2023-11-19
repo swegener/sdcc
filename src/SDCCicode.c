@@ -3515,19 +3515,24 @@ geniCodeSEParms (ast *parms, int lvl)
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
 value *
-geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * ftype, int lvl)
+geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * ftype, int lvl, iCode *iic_start)
 {
   iCode *ic;
+  iCode *castic_start = 0;
+  iCode *castic_end = 0;
   operand *pval;
 
   if (!parms)
     return argVals;
 
+  if (!iic_start)
+    iic_start = iCodeChainEnd;
+
   /* if this is a param node then do the left & right */
   if (parms->type == EX_OP && parms->opval.op == PARAM)
     {
-      argVals = geniCodeParms (parms->left, argVals, iArg, stack, ftype, lvl);
-      argVals = geniCodeParms (parms->right, argVals, iArg, stack, ftype, lvl);
+      argVals = geniCodeParms (parms->left, argVals, iArg, stack, ftype, lvl, iic_start);
+      argVals = geniCodeParms (parms->right, argVals, iArg, stack, ftype, lvl, iic_start);
       return argVals;
     }
 
@@ -3553,7 +3558,9 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
           DCL_TYPE (ptr) = PTR_TYPE (SPEC_OCLS (getSpec (operandType (pval))));
           ptr->next = copyLinkChain (parms->ftype);
           if (IS_PTR (operandType (pval)))
-            pval = geniCodeCast (ptr, pval, true);
+            {
+              pval = geniCodeCast (ptr, pval, true);
+            }
           setOperandType (pval, ptr);
         }
       // now decide whether to push or assign
@@ -3561,44 +3568,77 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
         {
           if (is_structparm) // Passing the parameter requires a memcpy.
             {
-              iCode *dstic, *srcic, *nic, *cic;
+              iCode *dstic, *srcic, *nic, *cic, *iic_end;
+              // Keep this one in mind in so we can move it later.
+              if (iic_start != iCodeChainEnd)
+                castic_start = iCodeChainEnd;
               operand *dstop = geniCodeCast (FUNC_ARGS(builtin_memcpy->type)->type, operandFromValue (argVals, true), false);
-              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->etype))
+              castic_end = iCodeChainEnd;
+              if (IS_REGPARM (FUNC_ARGS (builtin_memcpy->type)->etype))
                 {
                   dstic = newiCode (SEND, dstop, 0);
-                  dstic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->etype);
+                  dstic->argreg = SPEC_ARGREG (FUNC_ARGS (builtin_memcpy->type)->etype);
                 }
               else
                 {
                   dstic = newiCode ('=', 0, dstop);
                   IC_RESULT (dstic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type), false);
                 }
-              ADDTOCHAIN (dstic);
-              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->next->etype))
+              if (IS_REGPARM (FUNC_ARGS (builtin_memcpy->type)->next->etype))
                 {
                   srcic = newiCode (SEND, pval, 0);
-                  srcic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->next->etype);
+                  srcic->argreg = SPEC_ARGREG (FUNC_ARGS (builtin_memcpy->type)->next->etype);
                 }
               else
                 {
                   srcic = newiCode ('=', 0, pval);
                   IC_RESULT (srcic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type)->next, false);
                 }
-              ADDTOCHAIN (srcic);
-              if (IS_REGPARM (FUNC_ARGS(builtin_memcpy->type)->next->next->etype))
+              if (IS_REGPARM (FUNC_ARGS (builtin_memcpy->type)->next->next->etype))
                 {
                   nic = newiCode (SEND, operandFromLit (getSize (parms->ftype)), 0);
-                  nic->argreg = SPEC_ARGREG(FUNC_ARGS(builtin_memcpy->type)->next->next->etype);
+                  nic->argreg = SPEC_ARGREG (FUNC_ARGS (builtin_memcpy->type)->next->next->etype);
                 }
               else
                 {
                   nic = newiCode ('=', 0, operandFromLit (getSize (parms->ftype)));
                   IC_RESULT (nic) = operandFromValue (FUNC_ARGS(builtin_memcpy->type)->next->next, false);
                 }
-              ADDTOCHAIN (nic);
               cic = newiCode (CALL, operandFromSymbol (builtin_memcpy, false), 0);
               IC_RESULT (cic) = newiTempOperand (builtin_memcpy->type->next, 0);
-              ADDTOCHAIN (cic);
+              // Insert before passing any other parameters - otherwise register parameters to the function will instead up as parameters to the memcpy call.
+              if (castic_start)
+                {
+                  iCode *castic = castic_start->next;
+                  //Cut out cast from where it is.
+                  castic_start->next = castic_end->next;
+                  if (castic_end->next)
+                    castic_end->next->prev = castic_start;
+                  if (castic_end == iCodeChainEnd)
+                    iCodeChainEnd = castic_start;
+                  // Insert it earlier.
+                  iic_end = iic_start->next;
+                  iic_start->next = castic;
+                  castic->prev = iic_start;
+                  castic_end->next = iic_end;
+                  if (iic_end)
+                    iic_end->prev = castic_end;
+                }
+              iic_start = castic_end;
+              iic_end = iic_start->next;
+              iic_start->next = dstic;
+              dstic->prev = iic_start;
+              dstic->next = srcic;
+              srcic->prev = dstic;
+              srcic->next = nic;
+              nic->prev = srcic;
+              nic->next = cic;
+              cic->prev = nic;
+              cic->next = iic_end;
+              if (iic_end)
+                iic_end->prev = cic;
+              else if (iic_start == iCodeChainEnd)
+                iCodeChainEnd = cic;
             }
           else
             {
@@ -3711,12 +3751,12 @@ geniCodeCall (operand * left, ast * parms, int lvl)
 
       // reverse the argVals to match the parms
       argVals = reverseVal (argVals);
-      geniCodeParms (parms, argVals, &iArg, &stack, ftype, lvl);
+      geniCodeParms (parms, argVals, &iArg, &stack, ftype, lvl, 0);
       argVals = reverseVal (argVals);
     }
   else
     {
-      geniCodeParms (parms, FUNC_ARGS (ftype), &iArg, &stack, ftype, lvl);
+      geniCodeParms (parms, FUNC_ARGS (ftype), &iArg, &stack, ftype, lvl, 0);
     }
 
   /* now call : if symbol then pcall */

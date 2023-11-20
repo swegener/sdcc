@@ -3350,6 +3350,8 @@ genPointerPush (iCode *ic)
   wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
   wassertl (!operandLitValue (IC_RIGHT(ic)), "IPUSH_VALUE_AT_ADDRESS with non-zero right operand");
 
+  saveRegisters (ic);
+
   /* depending on the type of pointer we need to
      move it to the correct pointer register */
   type = operandType (left);

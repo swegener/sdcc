@@ -5,6 +5,9 @@
 	  Optimize towards djnz use.
 	* sdccman.lyx:
 	  Fix dead link.
+	* src/mcs51/gen.c,
+	  support/regression/tests/gcc-torture-execute-20050713-1.c:
+	  Fix an mcs51 codegen bug affecting calls to reentrant functions where the last parameter is a struct, and some registers are live across the call.
 
 2023-11-19 Philipp Klaus Krause <philipp@colecovision.eu>
 

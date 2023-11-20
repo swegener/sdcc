@@ -219,9 +219,9 @@ int flag_isoc99;
 
 int flag_isoc11;
 
-/* Nonzero means use the ISO C2X dialect of C.  */
+/* Nonzero means use the ISO C23 dialect of C.  */
 
-int flag_isoc2x;
+int flag_isoc23;
 
 
 /* Nonzero means that we have builtin functions, and main is an int.  */

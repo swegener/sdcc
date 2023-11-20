@@ -2329,9 +2329,13 @@ std=c18
 C ObjC Alias(std=c17)
 Conform to the ISO 2017 C standard (published in 2018).
 
-std=c2x
+std=c23
 C ObjC
-Conform to the ISO 202X C standard draft (experimental and incomplete support).
+Conform to the ISO 2023 C standard.
+
+std=c2x
+C ObjC Alias(std=c23)
+Deprecated in favor of -std=c23.
 
 std=c89
 C ObjC Alias(std=c90)

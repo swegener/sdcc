@@ -1,3 +1,11 @@
+2023-11-20 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/c-family/c-common.{cc,h},
+	  support/cpp/gcc/c-family/c-{lex,opts}.cc,
+	  support/cpp/gcc/c-family/c.opt,
+	  support/cpp/gcc/c/c-errors.cc:
+	  Fix #3677.
+
 2023-11-20 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

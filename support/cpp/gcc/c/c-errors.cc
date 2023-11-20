@@ -46,7 +46,7 @@ pedwarn_c11 (location_t location, int opt, const char *gmsgid, ...)
   if (warn_c11_c2x_compat > 0)
     {
       diagnostic_set_info (&diagnostic, gmsgid, &ap, &richloc,
-			   (pedantic && !flag_isoc2x)
+			   (pedantic && !flag_isoc23)
 			   ? DK_PEDWARN : DK_WARNING);
       diagnostic.option_index = OPT_Wc11_c2x_compat;
       warned = diagnostic_report_diagnostic (global_dc, &diagnostic);
@@ -55,7 +55,7 @@ pedwarn_c11 (location_t location, int opt, const char *gmsgid, ...)
   else if (warn_c11_c2x_compat == 0)
     ;
   /* For -pedantic outside C2X, issue a pedwarn.  */
-  else if (pedantic && !flag_isoc2x)
+  else if (pedantic && !flag_isoc23)
     {
       diagnostic_set_info (&diagnostic, gmsgid, &ap, &richloc, DK_PEDWARN);
       diagnostic.option_index = opt;

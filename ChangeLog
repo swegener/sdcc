@@ -3,6 +3,8 @@
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Optimize towards djnz use.
+	* sdccman.lyx:
+	  Fix dead link.
 
 2023-11-19 Philipp Klaus Krause <philipp@colecovision.eu>
 

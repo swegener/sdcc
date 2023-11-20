@@ -70743,11 +70743,11 @@ wiki
 
  (preliminary link 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
-http://sdcc.sourceforge.net/wiki/index.php/SDCC_internals_and_porting
+https://sourceforge.net/p/sdcc/wiki/Adding%20a%20port/
 \end_layout
 
 \end_inset

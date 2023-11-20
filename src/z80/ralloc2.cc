@@ -1443,6 +1443,24 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
+  // djnz
+  if(ic->op == '-' && ic->next && ic->next->op == IFX && ic->next->left->key == ic->result->key && getSize (operandType (ic->result)) == 1)
+    {
+      iCode *ifx = ic->next;
+
+      if (!IS_ITEMP (ic->result) /*&& !isOperandGlobal (ic->left)*/)
+        return;
+
+      if (!IS_OP_LITERAL (ic->right))
+        return;
+
+      if (ullFromVal (OP_VALUE (ic->right)) != 1)
+        return;
+
+      ifx->generated = true;
+      return;
+    }
+
   if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP ||
     (ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND) && (IS_OP_LITERAL (IC_LEFT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
     {

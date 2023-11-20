@@ -1,3 +1,9 @@
+2023-11-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Optimize towards djnz use.
+
 2023-11-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,

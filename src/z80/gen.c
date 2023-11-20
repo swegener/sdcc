@@ -320,10 +320,10 @@ z80_init_asmops (void)
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost; // Legacy: cost counted in bytes only (i.e. states have been ignored for corresponding instructions).
 static unsigned int regalloc_dry_run_cost_bytes;
-static unsigned int regalloc_dry_run_cost_states;
+static float regalloc_dry_run_cost_states;
 
 static void
-cost (unsigned int bytes, unsigned int states)
+cost (unsigned int bytes, float states)
 {
   regalloc_dry_run_cost_bytes += bytes;
   regalloc_dry_run_cost_states += states;
@@ -8445,13 +8445,39 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
 /* genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
 static void
-genMinus (const iCode *ic)
+genMinus (const iCode *ic, const iCode *ifx)
 {
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
 
-  genSub (ic, IC_RESULT (ic)->aop, IC_LEFT (ic)->aop, IC_RIGHT (ic)->aop);
+  if (ifx && ifx->generated)
+    {
+      wassert (ic->result->aop->size == 1 && IS_OP_LITERAL (ic->right) && ullFromVal (OP_VALUE (ic->right)) == 1);
+
+      if (ic->result->aop->type == AOP_REG && (!aopInReg (ic->result->aop, 0, IYL_IDX) && !aopInReg (ic->result->aop, 0, IYH_IDX) || HAS_IYL_INST))
+        {
+          cheapMove (ic->result->aop, 0, ic->left->aop, 0, isRegDead (A_IDX, ic));
+          emit3 (A_DEC, ic->result->aop, 0);
+          if (!IS_SM83 && aopInReg (ic->result->aop, 0, B_IDX) && IC_TRUE (ifx)) // This jump can likely be optimized to djnz.
+            cost (-1, -1.0f);
+        }
+      else
+        {
+          if (!isRegDead (A_IDX, ic))
+            UNIMPLEMENTED;
+          cheapMove (ASMOP_A, 0, ic->left->aop, 0, true);
+          emit3 (A_DEC, ASMOP_A, 0);
+          cheapMove (ic->result->aop, 0, ASMOP_A, 0, true);
+        }
+      if (IC_TRUE (ifx))
+        emit2 ("jp NZ, !tlabel", labelKey2num (IC_TRUE (ifx)->key));
+      else
+        emit2 ("jp Z, !tlabel", labelKey2num (IC_FALSE (ifx)->key));
+      cost2 (2, 9.5f, 7.0f, 5.0f, 10.0f, 6.0f, 2.5f, 2.5f); // Assume both branches equally likely. Assume jp will be optimized to jr.
+    }
+  else
+    genSub (ic, ic->result->aop, ic->left->aop, ic->right->aop);
 
   _G.preserveCarry = FALSE;
   freeAsmop (IC_LEFT (ic), NULL);
@@ -9202,10 +9228,6 @@ genIfxJump (iCode * ic, char *jval)
   if (!regalloc_dry_run)
     emit2 ("jp %s, !tlabel", inst, labelKey2num (jlbl->key));
   regalloc_dry_run_cost += 3;
-
-  /* mark the icode as generated */
-  if (!regalloc_dry_run)
-    ic->generated = 1;
 }
 
 #if DISABLED
@@ -10118,8 +10140,6 @@ genCmpEq (iCode * ic, iCode * ifx)
               regalloc_dry_run_cost += 3;
             }
         }
-      /* mark the icode as generated */
-      ifx->generated = 1;
       goto release;
     }
 
@@ -10284,8 +10304,6 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
         }
       regalloc_dry_run_cost += 3;
     }
-  if (!regalloc_dry_run)
-    ic->generated = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -14483,16 +14501,11 @@ genIfx (iCode *ic, iCode *popIc)
   else
     genIfxJump (ic, popIc ? "a" : "nz");
 
-  if (!regalloc_dry_run)
-    ic->generated = 1;
-
   return;
 
 release:
 
   freeAsmop (cond, NULL);
-  if (!regalloc_dry_run)
-    ic->generated = 1;
 
   return;
 }
@@ -16334,9 +16347,15 @@ genZ80iCode (iCode * ic)
      spilt and rematerializable or code for
      this has already been generated then
      do nothing */
-  if (resultRemat (ic) || ic->generated)
+  if (resultRemat (ic))
     {
       emitDebug ("; skipping iCode since result will be rematerialized");
+      return;
+    }
+
+  if (ic->generated)
+    {
+      emitDebug ("; skipping generated iCode");
       return;
     }
 
@@ -16406,7 +16425,7 @@ genZ80iCode (iCode * ic)
 
     case '-':
       emitDebug ("; genMinus");
-      genMinus (ic);
+      genMinus (ic, ic->next->op == IFX ? ic->next : 0);
       break;
 
     case '*':
@@ -16652,9 +16671,6 @@ genZ80Code (iCode * lic)
     {
       debugFile->writeFunction (currFunc, lic);
     }
-
-  for (ic = lic; ic; ic = ic->next)
-    ic->generated = false;
 
   /* Generate Code for all instructions */
   for (ic = lic; ic; ic = ic->next)

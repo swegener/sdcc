@@ -3454,15 +3454,24 @@ genAnd (const iCode *ic, iCode *ifx)
           emit2 ("xch", "a, p");
           cost (3, 3);
         }
-      else if (right->aop->type == AOP_SFR)
-        UNIMPLEMENTED;
       else
         {
           if (!a_free)
             pushAF();
           cheapMove (ASMOP_A, 0, left->aop, i, true, p_free && !aopInReg (right->aop, i, P_IDX), true);
-          emit2 ("and", "a, %s", aopGet (right->aop, i));
-          cost (1, 1);
+          if (right->aop->type == AOP_SFR)
+            {
+              if (!p_free)
+                UNIMPLEMENTED;
+              cheapMove (ASMOP_P, 0, right->aop, i, true, true, false);
+              emit2 ("and", "a, p");
+              cost (1, 1);
+            }
+          else
+            {
+              emit2 ("and", "a, %s", aopGet (right->aop, i));
+              cost (1, 1);
+            }
           cheapMove (result->aop, i, ASMOP_A, 0, true, p_free, true);
           if (!a_free)
             popAF();

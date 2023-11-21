@@ -1,3 +1,13 @@
+2023-11-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/pdk/gen.c:
+	  Preparations for improved speed optimization for z80. Fix bug #3678.
+	* src/z80/peeph.def:
+	  Fix a peephole rule bug.
+	* src/SDCCmain.c:
+	  Use -std=c23 when calling preprocessor.
+
 2023-11-20 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/gcc/c-family/c-common.{cc,h},

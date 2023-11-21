@@ -2662,7 +2662,7 @@ initValues (void)
    * corresponding to the --std used to start sdcc
    */
   setMainValue ("cppstd",
-    options.std_c23 ? "-std=c2x " :
+    options.std_c23 ? "-std=c23 " :
     (options.std_c11 ? "-std=c11 " :
     (options.std_c99 ? "-std=c99 " :
     (options.std_c95 ? "-std=iso9899:199409 " :

@@ -1632,6 +1632,7 @@ replace {
 	; common peephole 103 loaded value in a first and used it next
 } if notVolatile(%1 %2), canAssign(%1 'a'), operandsNotRelated(%1 %2), notSame(%1 '(hl+)' '(hl-)'), notSame(%2 '(hl+)' '(hl-)')
 
+// Cannot allow (hl) for %2, as otherwise the first ld could have a different width from the second (8- vs 16-bit). E.g. ld hl, (hl)
 replace restart {
 	ld	%2, #%1
 	ld	%3, #%1
@@ -1639,7 +1640,7 @@ replace restart {
 	; common peephole 103b loaded constant in %2 first and used it next
 	ld	%2, #%1
 	ld	%3, %2
-} if notVolatile(%2), canAssign(%3 %2)
+} if notVolatile(%2), canAssign(%3 %2), same(%2 'a' 'b' 'c' 'd' 'e' 'h' 'l')
 
 replace restart {
 	ld	%1,%2

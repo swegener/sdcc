@@ -1,7 +1,8 @@
 2023-11-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,
-	  src/pdk/gen.c:
+	  src/pdk/gen.c,
+	  support/regression/tests/bug-3678.c:
 	  Preparations for improved speed optimization for z80. Fix bug #3678.
 	* src/z80/peeph.def:
 	  Fix a peephole rule bug.

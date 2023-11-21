@@ -3247,7 +3247,7 @@ replace restart {
 } by {
 	; common peephole 162a changed absolute to relative unconditional jump.
 	jr	%5
-} if isPort('z180' 'ez80_z80' 'r2k' 'r2ka' 'r3ka' 'tlcs90' 'gbz80'), labelInRange(%5)
+} if isPort('z180' 'ez80_z80' 'r2k' 'r2ka' 'r3ka' 'tlcs90' 'sm83' 'r800'), labelInRange(%5)
 
 replace restart {
 	jp	%1, %5

@@ -4,6 +4,10 @@
 	  Implement optimization for code speed via cost function.
 	* src/*/ralloc2.cc:
 	  Do another execution frequency estimate just before register allocation to improve the accuracy of speed optimizations.
+	* src/mcs51/main.c,
+	  src/mcs51/peep.c,
+	  src/mcs51/peep.h:
+	  Implement notUsed peephole condition for mcs51, patch by Oleg Endo.
 
 2023-11-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

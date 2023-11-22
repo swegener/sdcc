@@ -23,3 +23,6 @@
 -------------------------------------------------------------------------*/
 
 bool mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head);
+bool mcs51notUsed (const char *what, lineNode *endPl, lineNode *head);
+bool mcs51notUsedFrom (const char *what, const char *label, lineNode *head);
+

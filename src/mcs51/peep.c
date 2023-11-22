@@ -773,6 +773,12 @@ removeDeadPushPop (const char *pReg, lineNode *currPl, lineNode *head)
 /*-----------------------------------------------------------------*/
 /* removeDeadMove - remove superflous 'mov r%1,%2'                 */
 /*-----------------------------------------------------------------*/
+
+//#define dbglog_deadmove(...) do { __VA_ARGS__; } while (0)
+#ifndef dbglog_deadmove
+  #define dbglog_deadmove(...) do { } while (0)
+#endif
+
 static bool
 removeDeadMove (const char *pReg, lineNode *currPl)
 {
@@ -791,14 +797,45 @@ removeDeadMove (const char *pReg, lineNode *currPl)
       ; callee save), "reti" or write access of r0 terminate
       ; the search, and the "mov r0,a" can safely be removed.
   */
+
+  dbglog_deadmove (printf ("removeDeadMove %s\n", pReg));
+
   pl = currPl->next;
   if (!doTermScan (&pl, pReg))
     return FALSE;
 
-  if (!checkLabelRef())
-    return FALSE;
-
   return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* canonicalizeRegName                                             */
+/*   Operands from the peephole patterns can be passed either as   */
+/*   explicity numbered and named registers or just as a number.   */
+/*   Convert it into explicit form for our internal processing.    */
+/*-----------------------------------------------------------------*/
+static char*
+canonicalizeRegName (char* outBuf, unsigned int outBufSz, const char* inBuf)
+{
+  if (outBufSz < 4)
+    return outBuf;
+
+  if (strlen (inBuf) == 1)
+    {
+      /* single digit 0-7 refers to ar0-ar7  */
+      int c = inBuf[0] - '0';
+      if (c >= 0 && c <= 7)
+        {
+          outBuf[0] = 'a';
+          outBuf[1] = 'r';
+          outBuf[2] = inBuf[0];
+          outBuf[3] = '\0';
+          return outBuf;
+        }
+    }
+
+  strncpy (outBuf, inBuf, outBufSz - 1);
+  outBuf[outBufSz - 1] = '\0';
+  return outBuf;
 }
 
 /*-----------------------------------------------------------------*/
@@ -809,10 +846,12 @@ removeDeadMove (const char *pReg, lineNode *currPl)
 bool
 mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
 {
-  char pReg[5] = "ar";
+  dbglog_deadmove (printf ("mcs51DeadMove  reg: %s  line: %s\n", reg, currPl->line));
 
   _G.head = head;
-  strcat (pReg, reg);
+
+  char pReg[32];
+  canonicalizeRegName (pReg, sizeof (pReg), reg);
 
   unvisitLines (_G.head);
   cleanLabelRef();
@@ -823,7 +862,11 @@ mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
     return removeDeadPushPop (pReg, currPl, head);
   else if (strncmp (currPl->line, "mov", 3) == 0 &&
            (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
-    return removeDeadMove (pReg, currPl);
+  {
+    bool r = removeDeadMove (pReg, currPl);
+    dbglog_deadmove (printf ("  -> %d\n", r));
+    return r;
+  }
   else
     {
       fprintf (stderr, "Error: "
@@ -832,4 +875,38 @@ mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
                        "\t%s\n", currPl->line);
       return FALSE;
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* mcs51notUsed - Check that 'what' is never read after 'endPl'.   */
+/*-----------------------------------------------------------------*/
+bool
+mcs51notUsed (const char *what, lineNode *endPl, lineNode *head)
+{
+  dbglog_deadmove (printf ("mcs51notUsed %s  after line: %s\n", what, endPl->line));
+
+  _G.head = head;
+
+  unvisitLines (_G.head);
+  cleanLabelRef();
+
+  char pReg[32];
+  canonicalizeRegName (pReg, sizeof (pReg), what);
+
+  bool r = removeDeadMove (pReg, endPl);
+  dbglog_deadmove (printf ("  -> %d\n", r));
+  return r;
+}
+
+/*----------------------------------------------------------------------------*/
+/* mcs51notUsedFrom - Check that 'what' is never read starting from 'label'.  */
+/*----------------------------------------------------------------------------*/
+bool
+mcs51notUsedFrom (const char *what, const char *label, lineNode *head)
+{
+  for (lineNode *cpl = head; cpl; cpl = cpl->next)
+    if (cpl->isLabel && !strncmp (label, cpl->line, strlen(label)))
+      return (mcs51notUsed (what, cpl, head));
+
+  return false;
 }

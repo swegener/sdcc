@@ -1633,6 +1633,8 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);
 
+  guessCounts (ic, ebbi);
+
   if(options.dump_graphs)
     dump_con(conflict_graph);
 

@@ -2672,7 +2672,13 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                     _push (PAIR_AF);
 
                   emit2 ("!ldahli");
-                  regalloc_dry_run_cost += 2;
+                  if (IS_SM83)
+                    cost (1, 8); // ldi
+                  else
+                    {
+                      cost2 (1, 7, 6, 5, 8, 6, 2, 2); // ld , a(hl)
+                      cost2 (1, 6, 4, 2, 8, 4, 1, 1); // inc hl
+                    }
                   emit2 ("ld h, !*hl");
                   cost2 (1, 7, 6, 5, 8, 6, 2, 2);
                   emit3 (A_LD, ASMOP_L, ASMOP_A);
@@ -2755,7 +2761,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                 emit2 ("ld %s, %d (sp)", pairId == PAIR_IY ? "iy" : "hl", sp_offset);   /* Fetch relative to stack pointer. */
               else
                 emit2 ("ld hl, %d (ix)", fp_offset);    /* Fetch relative to frame pointer. */
-              regalloc_dry_run_cost += (pairId == PAIR_IY ? 3 : 2);
+              cost (pairId == PAIR_IY ? 3 : 2, pairId == PAIR_IY ? 11 : 9);
               if (pairId == PAIR_DE)
                 {
                   emit2 ("ex de, hl");
@@ -2841,15 +2847,28 @@ setupPairFromSP (PAIR_ID id, int offset)
       dbuf_init (&dbuf, sizeof(int) * 3 + 1);
       dbuf_printf (&dbuf, "%d", offset);
       emit2 ("ld %s, !hashedstr", _pairs[lid].name, dbuf_c_str (&dbuf));
+      if (lid == PAIR_IY)
+        cost2 (4 - IS_TLCS90, 14, 12, 8, 0, 6, 4, 4);
+      else
+        cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       dbuf_destroy (&dbuf);
       emit2 ("add %s, sp", _pairs[lid].name);
-      regalloc_dry_run_cost += 4 + (id == PAIR_IY) * 2;
+      if (lid == PAIR_IY)
+        cost2 (2, 15, 10, 4, 0, 8, 2, 2);
+      else
+        cost2 (1, 11, 7, 2, 8, 8, 1, 1);
     }
   else
     {
       wassert (id == PAIR_DE || id == PAIR_HL);
       emit2 ("!ldahlsp", offset);
-      regalloc_dry_run_cost += 4 - IS_SM83 * 2;
+      if (IS_SM83)
+        cost (2, 12);
+      else
+        {
+          cost2 (3, 10, 9, 6, 12, 6, 3, 3);
+          cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+        }
     }
 
   if (id == PAIR_DE && !IS_SM83)
@@ -3475,10 +3494,10 @@ poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
   if (tempreg >= 0)
     {
       emit2 ("ld %s, %s", regsZ80[tempreg].name, regsZ80[survivingreg].name);
-      regalloc_dry_run_cost += 1;
+      ld_cost (ASMOP_L, 0, ASMOP_H, 0, true);
       _pop (pair);
       emit2 ("ld %s, %s", regsZ80[survivingreg].name, regsZ80[tempreg].name);
-      regalloc_dry_run_cost += 1;
+      ld_cost (ASMOP_L, 0, ASMOP_H, 0, true);
       return;
     }
 
@@ -3488,12 +3507,17 @@ poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
       _push (PAIR_AF);
       _push (PAIR_HL);
       emit2 ("ld hl, !immedword", 3u);
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("add hl, sp");
+      cost2 (2, 15, 10, 4, 0, 8, 2, 2);
       emit2 ("ld a, (hl)");
+      cost2 (1, 7, 6, 6, 8, 6, 2, 2);
       emit2 ("inc hl");
+      cost2 (1, 6, 4, 2, 8, 4, 1, 1);
       emit2 ("inc hl");
+      cost2 (1, 6, 4, 2, 8, 4, 1, 1);
       emit2 ("ld (hl), a");
-      regalloc_dry_run_cost += 8;
+      cost2 (1, 7, 7, 6, 8, 6, 2, 2);
       _pop (PAIR_HL);
       _pop (PAIR_AF);
       _pop (pair);
@@ -3521,20 +3545,23 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
           return;
         }
 
-      // Need free a do be able to partially restore a below.
+      // Need free a do be able to partially restore hl below.
+      bool pushed_a = false;
       if ((aopInReg (to, to_offset, L_IDX) || aopInReg (to, to_offset, H_IDX)) && !a_dead)
         {
-          UNIMPLEMENTED;
-          return;
+          _push (PAIR_AF);
+          pushed_a = true;
         }
 
       _push (PAIR_HL);
-      _push (PAIR_AF); // Preserve f
+      if (!pushed_a) // Preserve f
+        _push (PAIR_AF);
       emit2 ("ld hl, !immed%d", spOffset(from->aopu.aop_stk));
       cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("add hl, sp");
       cost2 (1, 11, 7, 2, 8, 8, 1, 1);
-      _pop (PAIR_AF);
+      if (!pushed_a)
+        _pop (PAIR_AF);
       spillPair (PAIR_HL);
       cheapMove (to, to_offset, ASMOP_HL, from_offset, a_dead);
       if (aopInReg (to, to_offset, L_IDX))
@@ -3543,6 +3570,9 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
         poppairwithsavedreg (PAIR_HL, L_IDX, A_IDX);
       else
         _pop (PAIR_HL);
+
+      if (pushed_a)
+        _pop (PAIR_AF);
 
       return;
     }
@@ -3560,10 +3590,9 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
         // eZ80 can assign between any byte of an index register and any non-hl register.
         HAS_IYL_INST && !aopInReg (to, to_offset, L_IDX) && !aopInReg (to, to_offset, H_IDX) && !aopInReg (from, from_offset, L_IDX) && !aopInReg (from, from_offset, H_IDX))
         {
-          bool a = aopInReg (to, to_offset, A_IDX) || aopInReg (from, from_offset, A_IDX);
           if (!regalloc_dry_run)
             aopPut (to, aopGet (from, from_offset, false), to_offset);
-          regalloc_dry_run_cost += 1 + (IS_TLCS90 && !a) + index;
+          ld_cost (to, to_offset, from, from_offset, true);
           spillPairReg (to->aopu.aop_reg[to_offset]->name);
           return;
         }
@@ -3597,8 +3626,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       cheapMove (ASMOP_A, 0, from, from_offset, true);
       if (!regalloc_dry_run)
         aopPut (to, "a", to_offset);
+      ld_cost (to, to_offset, ASMOP_A, 0, true);
       spillPairReg (to->aopu.aop_reg[to_offset]->name);
-      regalloc_dry_run_cost += 2;
       if (!a_dead)
         _pop (PAIR_AF);
       return;
@@ -3700,9 +3729,14 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       if (!sp_offset)
         {
           emit2 ("inc sp");
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
           emit2 ("push %s", aopInReg (from, from_offset, A_IDX) ? "af" : (aopInReg (from, from_offset, B_IDX) ? "bc" : (aopInReg (from, from_offset, D_IDX) ? "de" : (aopInReg (from, from_offset, H_IDX) ? "hl" : "iy"))));
+          if (aopInReg (from, from_offset, IYH_IDX))
+            cost2 (2 - IS_TLCS90, 1, 13, 12, 0, 8, 4, 5);
+          else
+            cost2 (1, 11, 11, 10, 16, 8, 3, 4);
           emit2 ("inc sp");
-          regalloc_dry_run_cost += 3 + aopInReg (from, from_offset, IYH_IDX);
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
           return;
         }
     }
@@ -4884,9 +4918,11 @@ adjustStack (int n, bool af_free, bool bc_free, bool de_free, bool hl_free, bool
       emit3 (A_LD, ASMOP_C, ASMOP_L);
       emit3 (A_LD, ASMOP_B, ASMOP_H);
       emit2 ("ld hl, !immed%d", n);
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("add hl, sp");
+      cost2 (1, 11, 7, 2, 8, 8, 1, 1);
       emit2 ("ld sp, hl");
-      regalloc_dry_run_cost += 5;
+      regalloc_dry_run_cost++;
       emit3 (A_LD, ASMOP_L, ASMOP_C);
       emit3 (A_LD, ASMOP_H, ASMOP_B);
       n -= n;
@@ -11462,8 +11498,6 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
               _pop (PAIR_HL);
           }
-        else if (right_aop->type == AOP_STL)
-          UNIMPLEMENTED;
         else
           {
             if (requiresHL (left_aop) && left_aop->type != AOP_REG && !hl_free)
@@ -11473,13 +11507,15 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
                _pop (PAIR_HL);
             if (right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) == 0xff)
               emit3 (A_CPL, 0, 0);
-            else if (right_aop->type == AOP_SFR && hl_free)
+            else if (right_aop->type == AOP_SFR || right_aop->type == AOP_STL || aopInReg (right_aop, i, IYL_IDX) || aopInReg (right_aop, i, IYH_IDX))
               {
+                if (!hl_free)
+                  _push (PAIR_HL);
                 cheapMove (ASMOP_L, 0, right_aop, i, false);
                 emit3_o (A_XOR, ASMOP_A, 0, ASMOP_L, 0);
+                if (!hl_free)
+                  _pop (PAIR_HL);
               }
-            else if (right_aop->type == AOP_SFR || !HAS_IYL_INST && (aopInReg (right_aop, i, IYL_IDX) || aopInReg (right_aop, i, IYH_IDX)))
-              UNIMPLEMENTED;
             else
               {
                 if (requiresHL (right_aop) && right_aop->type != AOP_REG && !hl_free)
@@ -13385,7 +13421,7 @@ unpackMaskA(sym_link *type, int len)
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
 static void
-genUnpackBits (operand * result, int pair, const iCode *ic)
+genUnpackBits (operand *result, int pair, const iCode *ic)
 {
   int offset = 0;               /* result byte offset */
   int rsize;                    /* result size */
@@ -13419,19 +13455,21 @@ genUnpackBits (operand * result, int pair, const iCode *ic)
           || result->aop->aopu.aop_reg[0]->rIdx == H_IDX))
     {
       emit2 ("!ldahli");
+      regalloc_dry_run_cost++;
       if (result->aop->type != AOP_REG || result->aop->aopu.aop_reg[0]->rIdx != H_IDX)
         {
           emit2 ("ld h, !*hl");
+          cost2 (1, 7, 6, 5, 8, 6, 2, 2);
           cheapMove (result->aop, offset++, ASMOP_A, 0, true);
-          emit2 ("ld a, h");
+          emit3 (A_LD, ASMOP_A, ASMOP_H);
         }
       else
         {
           emit2 ("ld l, !*hl");
+          cost2 (1, 7, 6, 5, 8, 6, 2, 2);
           cheapMove (result->aop, offset++, ASMOP_A, 0, true);
-          emit2 ("ld a, l");
+          emit3 (A_LD, ASMOP_A, ASMOP_L);
         }
-      regalloc_dry_run_cost += 5;
       unpackMaskA (etype, blen - 8);
       cheapMove (result->aop, offset++, ASMOP_A, 0, true);
       spillPair (PAIR_HL);
@@ -13448,7 +13486,7 @@ genUnpackBits (operand * result, int pair, const iCode *ic)
       if (rlen > 8)
         {
           emit2 ("inc %s", _pairs[pair].name);
-          regalloc_dry_run_cost += 1;
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
           _G.pairs[pair].offset++;
           pairincrement++;
         }
@@ -13464,11 +13502,11 @@ genUnpackBits (operand * result, int pair, const iCode *ic)
     }
 
 finish:
-  if (!isPairDead(pair, ic))
+  if (!isPairDead (pair, ic))
     while (pairincrement)
       {
         emit2 ("dec %s", _pairs[pair].name);
-        regalloc_dry_run_cost += 1;
+        cost2 (1, 6, 4, 2, 8, 4, 1, 1);
         pairincrement--;
         _G.pairs[pair].offset--;
       }
@@ -13517,11 +13555,11 @@ static void offsetPair (PAIR_ID pair, PAIR_ID extrapair, bool save_extrapair, in
       while (val)
         {
           emit2 (val > 0 ? "inc %s" : "dec %s", _pairs[pair].name);
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
           if (val > 0)
             val--;
           else
             val++;
-          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
         }
     }
   else
@@ -13529,8 +13567,15 @@ static void offsetPair (PAIR_ID pair, PAIR_ID extrapair, bool save_extrapair, in
       if (save_extrapair)
         _push (extrapair);
       emit2 ("ld %s, !immedword", _pairs[extrapair].name, (unsigned)val);
+      if (extrapair == PAIR_IY)
+        cost2 (4 - IS_TLCS90, 14, 12, 8, 0, 6, 4, 4);
+      else
+       	cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("add %s, %s", _pairs[pair].name, _pairs[extrapair].name);
-      regalloc_dry_run_cost += (pair == PAIR_HL ? 4 : 5);
+      if (pair == PAIR_HL)
+        cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+      else
+        cost2 (2, 15, 10, 4, 0, 8, 2, 2);
       if (save_extrapair)
         _pop (extrapair);
     }
@@ -16852,7 +16897,24 @@ dryZ80iCode (iCode * ic)
       spillPair (pairId);
   }
 
-  return (regalloc_dry_run_cost + regalloc_dry_run_cost_bytes); // Hack, since the legacy regalloc_dry_run_cost is still used often, and regalloc_dry_run_cost_states is still incomplete.
+  const unsigned int byte_cost_weight = 4 << (optimize.codeSize * 4 + !optimize.codeSpeed * 4);
+
+  // Hack, since the legacy regalloc_dry_run_cost is still used often, and regalloc_dry_run_cost_states is still incomplete.
+  regalloc_dry_run_cost_bytes += regalloc_dry_run_cost;
+  regalloc_dry_run_cost_states += regalloc_dry_run_cost * 4;
+
+  // Compensate for typically lower state count of some targets
+  if (IS_RAB)
+    regalloc_dry_run_cost_states *= 2;
+  else if (IS_EZ80_Z80 || IS_R800)
+    regalloc_dry_run_cost_states *= 3;
+
+// Since cycle/state counting is incomplete, only use byte count for now.
+#if 0
+  return ((float)regalloc_dry_run_cost_bytes * byte_cost_weight + (float)regalloc_dry_run_cost_states * ic->count);
+#else
+  return (regalloc_dry_run_cost_bytes);
+#endif
 }
 
 #ifdef DEBUG_DRY_COST

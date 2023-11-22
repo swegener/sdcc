@@ -1,3 +1,10 @@
+2023-11-22 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Implement optimization for code speed via cost function.
+	* src/*/ralloc2.cc:
+	  Do another execution frequency estimate just before register allocation to improve the accuracy of speed optimizations.
+
 2023-11-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

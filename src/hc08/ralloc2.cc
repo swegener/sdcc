@@ -649,6 +649,8 @@ iCode *hc08_ralloc2_cc(ebbIndex *ebbi)
   if (optimize.genconstprop)
     recomputeValinfos (ic, ebbi, "_2");
 
+  guessCounts(ic, ebbi);
+
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);
 

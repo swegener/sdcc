@@ -1,7 +1,7 @@
 2023-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:
-	  Preparations for improved speed optimization for z80.
+	  Speed optimization in register allocation for z80 and related.
 
 2023-11-22 Philipp Klaus Krause <philipp@colecovision.eu>
 

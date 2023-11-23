@@ -9874,7 +9874,7 @@ drySTM8iCode (iCode *ic)
 
   wassert (regalloc_dry_run);
 
-  const unsigned int byte_cost_weight = 2 << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
+  const unsigned int byte_cost_weight = 2u << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
 
   return ((float)regalloc_dry_run_cost_bytes * byte_cost_weight + (float)regalloc_dry_run_cost_cycles * ic->count);
 }

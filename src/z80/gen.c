@@ -10369,7 +10369,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               if (pop != PAIR_INVALID)
                 {
                   emit2 ("pop %s", _pairs[pop].name);
-                  regalloc_dry_run_cost += 1;
+                  cost2 (1, 10, 9, 7, 12, 10, 3, 3);
                 }
               if (!regalloc_dry_run)
                 emit2 ("jp !tlabel", labelKey2num (IC_TRUE (ifx)->key));
@@ -10387,7 +10387,7 @@ genCmpEq (iCode * ic, iCode * ifx)
               if (pop != PAIR_INVALID)
                 {
                   emit2 ("pop %s", _pairs[pop].name);
-                  regalloc_dry_run_cost += 1;
+                  cost2 (1, 10, 9, 7, 12, 10, 3, 3);
                 }
               if (!regalloc_dry_run)
                 emit2 ("jp !tlabel", labelKey2num (lbl->key));
@@ -10869,7 +10869,12 @@ genAnd (const iCode * ic, iCode * ifx)
               cheapMove (result->aop, i, left->aop, i, a_free);
               if (!regalloc_dry_run)
                 emit2 ("res %d, %s", isLiteralBit (~bytelit & 0xffu), aopGet (result->aop, i, false));
-              regalloc_dry_run_cost += 2;
+              if (result->aop->type == AOP_STK && !IS_SM83)
+                cost2 (4, 23, 19, 13, 0, 14, 5, 7); // res b, d(ix)
+              else if (result->aop->type == AOP_DIR)
+                cost2 (2, 15, 13, 10, 16, 10, 3 , 5); // res b, (hl)
+              else
+                cost2 (2, 8, 6, 4, 8, 4, 2, 2); // res b, r
               if (aopInReg (result->aop, i, A_IDX))
                 a_free = false;
               i++;
@@ -11173,7 +11178,12 @@ genOr (const iCode * ic, iCode * ifx)
               cheapMove (result->aop, i, left->aop, i, a_free);
               if (!regalloc_dry_run)
                 emit2 ("set %d, %s", isLiteralBit (bytelit), aopGet (result->aop, i, false));
-              regalloc_dry_run_cost += 2;
+              if (result->aop->type == AOP_STK && !IS_SM83)
+                cost2 (4, 23, 19, 13, 0, 14, 5, 7); // set b, d(ix)
+              else if (result->aop->type == AOP_DIR)
+                cost2 (2, 15, 13, 10, 16, 10, 3 , 5); // set b, (hl)
+              else
+                cost2 (2, 8, 6, 4, 8, 4, 2, 2); // set b, r
               if (aopInReg (result->aop, i, A_IDX))
                 a_free = false;
               i++;
@@ -16903,11 +16913,11 @@ dryZ80iCode (iCode * ic)
       spillPair (pairId);
   }
 
-  const unsigned int byte_cost_weight = 6 << (optimize.codeSize * 4 + !optimize.codeSpeed * 4);
+  const unsigned int state_cost_divider = 8u << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
 
-  // Hack, since the legacy regalloc_dry_run_cost is still used often, and regalloc_dry_run_cost_states is still incomplete.
+  // Hack, since the legacy regalloc_dry_run_cost is still used in some places.
   regalloc_dry_run_cost_bytes += regalloc_dry_run_cost;
-  regalloc_dry_run_cost_states += regalloc_dry_run_cost * 4;
+  regalloc_dry_run_cost_states += regalloc_dry_run_cost * 4; // Assume 4 states per byte.
 
   // Compensate for typically lower state count of some targets
   if (IS_RAB)
@@ -16915,12 +16925,7 @@ dryZ80iCode (iCode * ic)
   else if (IS_EZ80_Z80 || IS_R800)
     regalloc_dry_run_cost_states *= 3;
 
-// Since cycle/state counting is incomplete, only use byte count for now.
-#if 0
-  return ((float)regalloc_dry_run_cost_bytes * byte_cost_weight + (float)regalloc_dry_run_cost_states * ic->count);
-#else
-  return (regalloc_dry_run_cost_bytes);
-#endif
+  return (regalloc_dry_run_cost_bytes + (float)regalloc_dry_run_cost_states * ic->count *  0.00001 / state_cost_divider); // The 0.00001 was chosen here empirically. In the future, when peephole rules have been adapted, and the state cost estimate has been made more accurate, a smaller value can be used.
 }
 
 #ifdef DEBUG_DRY_COST

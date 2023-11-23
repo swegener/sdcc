@@ -323,7 +323,7 @@ static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost; // Legacy: cost counted in bytes only (i.e. states have been ignored for corresponding instructions).
 static unsigned int regalloc_dry_run_cost_bytes;
 static float regalloc_dry_run_cost_states;
-static unsigned int regalloc_dry_run_states_scale = 1;
+static unsigned int regalloc_dry_run_state_scale = 1;
 
 static void
 cost (unsigned int bytes, float states)
@@ -337,19 +337,19 @@ cost2 (unsigned int bytes, unsigned int z80_states /* also z80n */, unsigned int
 {
   regalloc_dry_run_cost_bytes += bytes;
   if (IS_Z80 || IS_Z80N)
-    regalloc_dry_run_cost_states += z80_states * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += z80_states * regalloc_dry_run_state_scale;
   else if (IS_Z180)
-    regalloc_dry_run_cost_states += z180_states * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += z180_states * regalloc_dry_run_state_scale;
   else if (IS_R2K || IS_R2KA || IS_R3KA)
-    regalloc_dry_run_cost_states += r2k_clocks * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += r2k_clocks * regalloc_dry_run_state_scale;
   else if (IS_SM83)
-    regalloc_dry_run_cost_states += sm83_cycles * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += sm83_cycles * regalloc_dry_run_state_scale;
   else if(IS_TLCS90)
-    regalloc_dry_run_cost_states += tlcs90_states * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += tlcs90_states * regalloc_dry_run_state_scale;
   else if(IS_EZ80_Z80)
-    regalloc_dry_run_cost_states += ez80_z80_cycles * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += ez80_z80_cycles * regalloc_dry_run_state_scale;
   else if(IS_R800)
-    regalloc_dry_run_cost_states += r800_cycles * regalloc_dry_run_states_scale;
+    regalloc_dry_run_cost_states += r800_cycles * regalloc_dry_run_state_scale;
   else
     wassert (0);
 }
@@ -6981,52 +6981,62 @@ genEndFunction (iCode *ic)
         {
           if (poststackadjust == 1)
             {
-              emit2 ("push hl");
-              emit2 ("push de");
+              _push (PAIR_HL);
+              _push (PAIR_DE);
               emit2 ("ld hl, !immedword", 4u);
               emit2 ("add hl, sp");
+              regalloc_dry_run_cost += 4;
               emit2 ("ld e, (hl)");
-              emit2 ("inc hl");
+              cost2 (1, 7, 6, 5, 8, 6, 2, 2);
+              emit3w (A_INC, ASMOP_HL, 0);
               emit2 ("ld d, (hl)");
+              cost2 (1, 7, 6, 5, 8, 6, 2, 2);
               emit2 ("ld (hl), e");
-              emit2 ("inc hl");
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              emit3w (A_INC, ASMOP_HL, 0);
               emit2 ("ld (hl), d");
-              emit2 ("pop de");
-              emit2 ("pop hl");
-              regalloc_dry_run_cost += 14;
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              _pop (PAIR_DE);
+              _pop (PAIR_HL);     
             }
           else if (IS_SM83)
             {
-              emit2 ("push hl");
-              emit2 ("push de");
+              _push (PAIR_HL);
+              _push (PAIR_DE);
               emit2 ("!ldahlsp", 4);
               emit2 ("ld e, (hl)");
               emit2 ("inc hl");
               emit2 ("ld d, (hl)");
               emit2 ("ld hl, !immedword", (unsigned)(4 +  poststackadjust));
               emit2 ("add hl, sp");
+              regalloc_dry_run_cost += 9;
               emit2 ("ld (hl), e");
-              emit2 ("inc hl");
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              emit3w (A_INC, ASMOP_HL, 0);
               emit2 ("ld (hl), d");
-              emit2 ("pop de");
-              emit2 ("pop hl");
-              regalloc_dry_run_cost += 16;
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              _pop (PAIR_DE);
+              _pop (PAIR_HL);  
             }
           else
             {
               wassert (!IS_SM83);
               wassert (stackparmbytes != 1); // Avoid overwriting return address and hl.
               emit2 ("ex (sp), hl");
-              emit2 ("push de");
-              emit2 ("ex de, hl");
+              cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5, 5);
+              _push (PAIR_DE);
+              emit3w (A_EX, ASMOP_DE, ASMOP_HL);
               emit2 ("ld hl, !immedword", (unsigned)(2 +  poststackadjust));
               emit2 ("add hl, sp");
+              regalloc_dry_run_cost += 4;
               emit2 ("ld (hl), e");
-              emit2 ("inc hl");
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              emit3w (A_INC, ASMOP_HL, 0);
               emit2 ("ld (hl), d");
-              emit2 ("pop de");
+              cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+              _pop (PAIR_DE);
               emit2 ("ex (sp), hl");
-              regalloc_dry_run_cost += 12;
+              cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5, 5);
             }
 
           adjustStack (poststackadjust,
@@ -7424,6 +7434,8 @@ genPlusIncr (const iCode *ic)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       while (size--)
         {
+          if (offset)
+            regalloc_dry_run_state_scale = 0.0f; // Cycle cost contribution of upper byte additions is negligible
           if (size == 1 && getPairId_o (IC_RESULT (ic)->aop, offset) != PAIR_INVALID)
             {
               emit3w_o (A_INC, ic->result->aop, offset, 0, 0);
@@ -7439,9 +7451,10 @@ genPlusIncr (const iCode *ic)
             {
               if (!regalloc_dry_run)
                 emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
-              regalloc_dry_run_cost += 2;
+              cost2 (3, 10, 9, 7, 16, 12, 4, 3); // Assume jump is taken (upper bytes are skipped).
             }
         }
+      regalloc_dry_run_state_scale = 1.0f;
       if (!regalloc_dry_run)
         (IC_LEFT (ic)->aop->type == AOP_HL || IS_SM83
          && IC_LEFT (ic)->aop->type == AOP_STK) ? emitLabelSpill (tlbl) : emitLabel (tlbl);
@@ -7500,7 +7513,9 @@ outBitAcc (operand * result)
           emit2 ("ld a, !one");
           emitLabel (tlbl);
         }
-      regalloc_dry_run_cost += 5;
+      // Assume that both values are equally likely.
+      cost2 (3, 10, 7.5f, 3.5f, 14.0f, 11.0f, 3.5f, 3.0f);
+      cost2 (1,	3.5f, 3.0f, 2.0f, 4.0f, 4.0f, 2.0f, 2.0f);
       outAcc (result);
     }
 }
@@ -9504,7 +9519,7 @@ genIfxJump (iCode * ic, char *jval)
   /* Z80 can do a conditional long jump */
   if (!regalloc_dry_run)
     emit2 ("jp %s, !tlabel", inst, labelKey2num (jlbl->key));
-  regalloc_dry_run_cost += 3;
+  cost2 (3, 10.0f, 7.5f,7.0f, 14.0f, 11.0f, 3.5f, 3.0f); // Assume either way equally likely.
 }
 
 #if DISABLED
@@ -9738,7 +9753,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                   PAIR_ID litpair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
                   fetchPair (PAIR_HL, left->aop);
                   emit2 ("ld %s, !immedbyte", _pairs[litpair].name, (unsigned) ((lit ^ 0x8000u) & 0xffffu));
-                  regalloc_dry_run_cost += 3;
+                  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
                   emit3w (A_ADD, ASMOP_HL, ASMOP_HL);
                   emit2 ("ccf");
                   cost2 (1, 4, 3, 2, 4, 2, 2, 1);
@@ -9749,9 +9764,8 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                     }
                   else
                     {
-                      emit2 ("rr h");
-                      emit2 ("rr l");
-                      regalloc_dry_run_cost += 2;
+                      emit3 (A_RR, ASMOP_H, 0);
+                      emit3 (A_RR, ASMOP_L, 0);
                     }
                   emit2 ("sbc hl, %s", _pairs[litpair].name);
                   cost2 (2, 15, 10, 4, 0, 8, 2, 2);
@@ -15977,15 +15991,18 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
   if (n == 1)
     {
       emit2 ("ld a, !*hl");
+      cost2 (1, 7, 6, 5, 8, 6, 2, 2);
       emit2 ("ld !mems, a", "de");
-      regalloc_dry_run_cost += 2;
+      cost2 (1, 7, 7, 7, 8, 6, 2, 2);
     }
   else if (n == 2)
     {
       emit2 ("ldi");
+      cost2 (2, 16, 12, 10, 0, 14, 5, 4);
       emit2 ("ld a, !*hl");
+      cost2 (1, 7, 6, 5, 8, 6, 2, 2);
       emit2 ("ld !mems, a", "de");
-      regalloc_dry_run_cost += 4;
+      cost2 (1, 7, 7, 7, 8, 6, 2, 2);
       if (!isPairDead (PAIR_BC, ic)) /* Restore bc. */
         emit3w (A_INC, ASMOP_BC, 0);
     }
@@ -16004,14 +16021,14 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
         fetchPair (PAIR_BC, count->aop);
       if (count->aop->type != AOP_LIT)
         {
+          emit3 (A_LD, ASMOP_A, ASMOP_B);
+          emit3 (A_OR, ASMOP_A, ASMOP_C);
           if (!regalloc_dry_run)
             {
               tlbl = newiTempLabel (0);
-              emit2 ("ld a, b");
-              emit2 ("or a, c");
               emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
             }
-          regalloc_dry_run_cost += 5;
+          cost2 (3, 10, 6, 7, 12, 10, 3, 3); // For cycle cost, assume that n is non-zero.
         }
       if ((IS_R2K || IS_R2KA) && optimize.codeSpeed && n != UINT_MAX) // Work around ldir wait state bug, but care for speed
         {
@@ -16167,15 +16184,15 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
         }
 
       setupForMemset (ic, dst, c, direct_c);
-
-      regalloc_dry_run_cost += (size * 2 - 1);
-      if (!regalloc_dry_run)
-        while (size--)
-		  {
+      
+      while (size--)
+        {
+		  if (!regalloc_dry_run)
             emit2 ("ld !*hl, %s", aopGet (direct_c ? c->aop : ASMOP_A, 0, FALSE));
-            if (size)
-              emit3w (A_INC, ASMOP_HL, 0);
-          }
+          cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+          if (size)
+            emit3w (A_INC, ASMOP_HL, 0);
+        }
     }
   else if (size <= 510 && sizecost_loop < sizecost_ldir) // Loop
     {

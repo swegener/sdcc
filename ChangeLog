@@ -3,6 +3,11 @@
 	* src/z80/gen.c:
 	  Fix bug #3680.
 
+2023-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Fix bug #3679.
+
 2023-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

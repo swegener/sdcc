@@ -4368,6 +4368,8 @@ skip_byte:
           regsize--;
           size--;
           assigned[i] = true;
+          if (aopInReg (result, roffset + i, A_IDX))
+            a_free = false;
           continue;
         }
 

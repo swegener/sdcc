@@ -7784,7 +7784,8 @@ genPlus (iCode * ic)
       _pop (PAIR_IY);
       goto release;
     }
-  else if (!maskedtopbyte && getPairId (IC_RESULT (ic)->aop) == PAIR_IY)
+  else if (!maskedtopbyte && getPairId (ic->result->aop) == PAIR_IY &&
+    ic->left->aop->type != AOP_IY && ic->right->aop->type != AOP_IY)
     {
       bool save_pair = FALSE;
       PAIR_ID pair;

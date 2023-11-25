@@ -10060,8 +10060,6 @@ genLeftShift (iCode * ic)
   /* if it is only one byte then */
   if (size == 1)
     {
-      symbol *tlbl1 = newiTempLabel (NULL);
-
       MOVA (opGet (left, 0, FALSE, FALSE));
       emitcode ("sjmp", "!tlabel", labelKey2num (tlbl1->key));
       emitLabel (tlbl);

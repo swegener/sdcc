@@ -1,3 +1,9 @@
+2023-11-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Shift optimization using information from generalized constant propagation.
+
 2023-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

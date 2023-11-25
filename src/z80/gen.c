@@ -429,7 +429,7 @@ aopRegUsedRange (const asmop *aop, short rIdx, int minPos, int maxPos)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopRS - asmop in register or on stack                           */
+/* aopRS - asmop in register or on stack.                          */
 /*-----------------------------------------------------------------*/
 static bool
 aopRS (const asmop *aop)
@@ -438,7 +438,8 @@ aopRS (const asmop *aop)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopIsLitVal - asmop from offset is val                          */
+/* aopIsLitVal - asmop from offset is val.                         */
+/* False negatives are possible.                                   */
 /*-----------------------------------------------------------------*/
 static bool
 aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
@@ -468,6 +469,49 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
     }
 
   return (true);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopIsNotLitVal - asmop from offset is not val.                  */
+/* False negatives are possible.                                   */
+/* Note that both aopIsLitVal and aopIsNotLitVal can be false for  */
+/* same arguments: we might just not have enough information.      */
+/*-----------------------------------------------------------------*/
+static bool
+aopIsNotLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
+{
+  wassert (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
+
+  for(; size; size--, offset++)
+    {
+      unsigned char b = val & 0xff;
+      val >>= 8;
+
+      // Leading zeroes
+      if (aop->size <= offset && b)
+        return (true);
+
+      // Information from generalized constant propagation analysis
+      if (!aop->valinfo.anything && offset < 8)
+        {
+          unsigned char knownbitsmask = aop->valinfo.knownbitsmask >> (offset * 8);
+          unsigned char knownbits = aop->valinfo.knownbits >> (offset * 8);
+
+          if (knownbits & knownbitsmask != b & knownbitsmask)
+            return (true);
+          if (!offset && aop->valinfo.min > 0 && aop->valinfo.max <= 255 &&
+            (aop->valinfo.min > b || aop->valinfo.min < b))
+            return (true);
+        }
+
+      if (aop->type != AOP_LIT)
+        continue;
+
+      if (byteOfVal (aop->aopu.aop_lit, offset) != b)
+        return (true);
+    }
+
+  return (false);
 }
 
 /*-----------------------------------------------------------------*/
@@ -12896,7 +12940,7 @@ genLeftShift (const iCode *ic)
       emit2 ("ld %s, !immedbyte", countreg == A_IDX ? "a" : regsZ80[countreg].name, (unsigned)shiftcount);
       cost2 (2, 7, 6, 4, 8, 4, 2, 2);
     }
-  else if (!shift_by_lit)
+  else if (!shift_by_lit && !aopIsNotLitVal (right->aop, 0, 1, 0))
     {
       emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
       cost2 (1, 4, 4, 2, 4, 2, 1, 1);
@@ -13340,7 +13384,7 @@ genRightShift (const iCode * ic)
       emit2 ("ld %s, !immedbyte", countreg == A_IDX ? "a" : regsZ80[countreg].name, (unsigned)shiftcount);
       cost2 (2, 7, 6, 4, 8, 4, 2, 2);
     }
-  else if (!shift_by_lit)
+  else if (!shift_by_lit && !aopIsNotLitVal (right->aop, 0, 1, 0))
     {
       emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
       cost2 (1, 4, 4, 2, 4, 2, 1, 1);

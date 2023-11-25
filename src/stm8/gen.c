@@ -354,7 +354,8 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
 }
 
 /*-----------------------------------------------------------------*/
-/* aopIsLitVal - asmop from offset is val                          */
+/* aopIsLitVal - asmop from offset is val.                         */
+/* False negatives are possible.                                   */
 /*-----------------------------------------------------------------*/
 static bool
 aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
@@ -384,6 +385,49 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
     }
 
   return (true);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopIsNotLitVal - asmop from offset is not val.                  */
+/* False negatives are possible.                                   */
+/* Note that both aopIsLitVal and aopIsNotLitVal can be false for  */
+/* same arguments: we might just not have enough information.      */
+/*-----------------------------------------------------------------*/
+static bool
+aopIsNotLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
+{
+  wassert (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
+
+  for(; size; size--, offset++)
+    {
+      unsigned char b = val & 0xff;
+      val >>= 8;
+
+      // Leading zeroes
+      if (aop->size <= offset && b)
+        return (true);
+
+      // Information from generalized constant propagation analysis
+      if (!aop->valinfo.anything && offset < 8)
+        {
+          unsigned char knownbitsmask = aop->valinfo.knownbitsmask >> (offset * 8);
+          unsigned char knownbits = aop->valinfo.knownbits >> (offset * 8);
+
+          if (knownbits & knownbitsmask != b & knownbitsmask)
+            return (true);
+          if (!offset && aop->valinfo.min > 0 && aop->valinfo.max <= 255 &&
+            (aop->valinfo.min > b || aop->valinfo.min < b))
+            return (true);
+        }
+
+      if (aop->type != AOP_LIT)
+        continue;
+
+      if (byteOfVal (aop->aopu.aop_lit, offset) != b)
+        return (true);
+    }
+
+  return (false);
 }
 
 static void
@@ -7555,7 +7599,7 @@ genLeftShift (const iCode *ic)
   else
     shiftop = result->aop;
 
-  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2); // Use 2 as a guess for estimating hte cycle count.
 
   // Avoid overwriting shift count on stack when moving to shiftop.
   if (aopOnStack (right->aop, 0, 1) && aopRS (shiftop))
@@ -7655,7 +7699,7 @@ genLeftShift (const iCode *ic)
   else
     cheapMove (ASMOP_A, 0, right->aop, 0, false);
 
-  if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
+  if (!aopIsNotLitVal (right->aop, 0, 1, 0))
     {
       if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR || premoved_count)
         emit3 (A_TNZ, ASMOP_A, 0);
@@ -8238,7 +8282,7 @@ genRightShift (const iCode *ic)
   else
     cheapMove (ASMOP_A, 0, right->aop, 0, false);
 
-  if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
+  if (!aopIsNotLitVal (right->aop, 0, 1, 0))
     {
       if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR)
         emit3 (A_TNZ, ASMOP_A, 0);

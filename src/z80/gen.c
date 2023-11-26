@@ -6190,19 +6190,23 @@ genCall (const iCode *ic)
 
   _saveRegsForCall (ic, FALSE);
 
+  aopOp (IC_LEFT (ic), ic, false, false);
+
   const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next); // Return value of big type or returning struct or union.
   const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
                        IS_TRUE_SYMOP (IC_RESULT (ic));
 
-  bool a_free_pre_call = !z80IsParmInCall(ftype, "a");
-  bool hl_free_pre_call = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h");
-  bool de_free_pre_call = !z80IsParmInCall(ftype, "e") && !z80IsParmInCall(ftype, "d");
-  bool bc_free_pre_call = !z80IsParmInCall(ftype, "c") && !z80IsParmInCall(ftype, "b");
+  bool a_free_pre_call = !z80IsParmInCall(ftype, "a") && ic->left->aop->regs[A_IDX] < 0;
+  bool hl_free_pre_call = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h") && ic->left->aop->regs[L_IDX] < 0 && ic->left->aop->regs[H_IDX] < 0;
+  bool de_not_parm = !z80IsParmInCall(ftype, "e") && !z80IsParmInCall(ftype, "d");
+  bool de_free_pre_call = de_not_parm && ic->left->aop->regs[E_IDX] < 0 && ic->left->aop->regs[D_IDX] < 0;
+  bool bc_not_parm = !z80IsParmInCall(ftype, "b") && !z80IsParmInCall(ftype, "c");
+  bool bc_free_pre_call = bc_not_parm && ic->left->aop->regs[C_IDX] < 0 && ic->left->aop->regs[B_IDX] < 0;
 
-  aopOp (IC_LEFT (ic), ic, false, false);
+  
   if (SomethingReturned && !bigreturn)
     aopOp (IC_RESULT (ic), ic, true, false);
-
+emit2("; hl_free_pre_call %d", hl_free_pre_call);
   if (bigreturn)
     {
       PAIR_ID pair;
@@ -6402,12 +6406,12 @@ genCall (const iCode *ic)
               // todo: add cycles spent in ___sdcc_call_iy here
             }
         }
-      else if (bc_free_pre_call) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
+      else if (bc_not_parm) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED || IS_SM83); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           symbol *tlbl = 0;
-          if (aopInReg (IC_LEFT (ic)->aop, 0, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, C_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, C_IDX))
+          if (ic->left->aop->regs[B_IDX] >= 0 || ic->left->aop->regs[C_IDX] >= 0)
             {
               if (!de_free_pre_call)
                 UNIMPLEMENTED;
@@ -6439,12 +6443,12 @@ genCall (const iCode *ic)
           if (tlbl)
             emitLabel (tlbl);
         }
-      else if (de_free_pre_call) // Try de.
+      else if (de_not_parm) // Try de.
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED || IS_SM83); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           symbol *tlbl = 0;
-          if (aopInReg (IC_LEFT (ic)->aop, 0, D_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, E_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, D_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, E_IDX))
+          if (ic->left->aop->regs[D_IDX] >= 0 || ic->left->aop->regs[E_IDX] >= 0)
             {
               if (!bc_free_pre_call)
                 UNIMPLEMENTED;

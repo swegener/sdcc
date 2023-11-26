@@ -43,7 +43,7 @@ enum
 
 #define UNIMPLEMENTED do {wassertl (regalloc_dry_run, "Unimplemented"); cost (500, 500);} while(0)
 
-// #define DEBUG_DRY_COST
+#undef DEBUG_DRY_COST
 
 extern struct dbuf_s *codeOutBuf;
 
@@ -329,7 +329,7 @@ static void
 cost (unsigned int bytes, float states)
 {
   regalloc_dry_run_cost_bytes += bytes;
-  regalloc_dry_run_cost_states += states;
+  regalloc_dry_run_cost_states += states * regalloc_dry_run_state_scale;
 }
 
 static void
@@ -6039,7 +6039,7 @@ genPointerPush (const iCode *ic)
 
       walk = walk->next; // Keep looking.
     }
-  if (!regalloc_dry_run && !_G.saves.saved && !regalloc_dry_run) /* Cost is counted at CALL or PCALL instead */
+  if (!regalloc_dry_run && !_G.saves.saved) /* Cost is counted at CALL or PCALL instead */
     _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
 
   sym_link *ftype = operandType (IC_LEFT (walk));
@@ -6415,9 +6415,9 @@ genCall (const iCode *ic)
                 {
                   tlbl = newiTempLabel (NULL);
                   emit2 ("ld de, !immed!tlabel", labelKey2num (tlbl->key));
-                  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
                   _push (PAIR_DE);
                 }
+              cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
           else if (!regalloc_dry_run)
             {
@@ -6425,9 +6425,9 @@ genCall (const iCode *ic)
                 {
                   tlbl = newiTempLabel (NULL);
                   emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
-                  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
                   _push (PAIR_BC);
                 }
+              cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
           genMove (ASMOP_BC, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, de_free_pre_call, true);
           emit2 ("push bc");
@@ -6452,9 +6452,9 @@ genCall (const iCode *ic)
                 {
                   tlbl = newiTempLabel (NULL);
                   emit2 ("ld bc, !immed!tlabel", labelKey2num (tlbl->key));
-                  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
                   _push (PAIR_BC);
                 }
+              cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
           else if (!regalloc_dry_run)
             {
@@ -6462,9 +6462,9 @@ genCall (const iCode *ic)
                 {
                   tlbl = newiTempLabel (NULL);
                   emit2 ("ld de, !immed!tlabel", labelKey2num (tlbl->key));
-                  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
                   _push (PAIR_DE);
                 }
+              cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
           genMove (ASMOP_DE, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, true, true);
           emit2 ("push de");
@@ -8591,18 +8591,15 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               /* Order is important.  Right may be HL */
               fetchPair (rightp, right);
 
-              if (!regalloc_dry_run)
-                {
-                  emit2 ("ld a, %s", _pairs[leftp].l);
-                  cost2 (1, 4, 4, 2, 4, 2, 1, 1);
-                  emit2 ("sub a, %s", _pairs[rightp].l);
-                  cost2 (1 + IS_TLCS90, 4, 4, 2, 4, 4, 1, 1);
-                  emit3 (A_LD, ASMOP_E, ASMOP_A);
-                  emit2 ("ld a, %s", _pairs[leftp].h);
-                  cost2 (1, 4, 4, 2, 4, 2, 1, 1);
-                  emit2 ("sbc a, %s", _pairs[rightp].h);
-                  cost2 (1 + IS_TLCS90, 4, 4, 2, 4, 4, 1, 1);
-                }
+              emit2 ("ld a, %s", _pairs[leftp].l);
+              cost2 (1, 4, 4, 2, 4, 2, 1, 1);
+              emit2 ("sub a, %s", _pairs[rightp].l);
+              cost2 (1 + IS_TLCS90, 4, 4, 2, 4, 4, 1, 1);
+              emit3 (A_LD, ASMOP_E, ASMOP_A);
+              emit2 ("ld a, %s", _pairs[leftp].h);
+              cost2 (1, 4, 4, 2, 4, 2, 1, 1);
+              emit2 ("sbc a, %s", _pairs[rightp].h);
+              cost2 (1 + IS_TLCS90, 4, 4, 2, 4, 4, 1, 1);
 
               if (IC_RESULT (ic)->aop->size > 1)
                 cheapMove (IC_RESULT (ic)->aop, 1, ASMOP_A, 0, true);
@@ -10004,14 +10001,18 @@ fix:
               symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel (0);
               emit2 ("bit 7, e");
               cost2 (2, 8, 6, 4, 8, 4, 2, 2);
-              emit2 ("jp Z, !tlabel", labelKey2num (tlbl1->key));
+              if (!regalloc_dry_run)
+                emit2 ("jp Z, !tlabel", labelKey2num (tlbl1->key));
               emit2 ("bit 7, d");
-              emit2 ("jp NZ, !tlabel", labelKey2num (tlbl2->key));
+              if (!regalloc_dry_run)
+                emit2 ("jp NZ, !tlabel", labelKey2num (tlbl2->key));
               emit2 ("cp a, a");
-              emit2 ("jp !tlabel", labelKey2num (tlbl2->key));
+              if (!regalloc_dry_run)
+                emit2 ("jp !tlabel", labelKey2num (tlbl2->key));
               emitLabelSpill (tlbl1);
               emit2 ("bit 7, d");
-              emit2 ("jp Z, !tlabel", labelKey2num (tlbl2->key));
+              if (!regalloc_dry_run)
+                emit2 ("jp Z, !tlabel", labelKey2num (tlbl2->key));
               emit2 ("scf");
               emitLabelSpill (tlbl2);
               regalloc_dry_run_cost += 18;
@@ -13779,7 +13780,10 @@ genPointerGet (const iCode *ic)
     {
       PAIR_ID pair = getPairId (result->aop);
       emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval, TRUE));
-      regalloc_dry_run_cost += (pair == PAIR_HL ? 3 : 4);
+      if (pair == PAIR_HL)
+        cost2 (3, 16 , 15, 11, 0, 12, 5, 5);
+      else
+        cost2 (4, 20, 18, 13, 0, 12, 6, 6);
       goto release;
     }
   else if (!IS_SM83 && (left->aop->type == AOP_IMMD) && getPartPairId (result->aop, 0) != PAIR_INVALID && getPartPairId (result->aop, 2) != PAIR_INVALID)
@@ -13787,10 +13791,16 @@ genPointerGet (const iCode *ic)
       PAIR_ID pair;
       pair = getPartPairId (result->aop, 0);
       emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval, TRUE));
-      regalloc_dry_run_cost += (pair == PAIR_HL ? 3 : 4);
+      if (pair == PAIR_HL)
+        cost2 (3, 16 , 15, 11, 0, 12, 5, 5);
+      else
+        cost2 (4, 20, 18, 13, 0, 12, 6, 6);
       pair = getPartPairId (result->aop, 2);
       emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (left->aop, rightval + 2, TRUE));
-      regalloc_dry_run_cost += (pair == PAIR_HL ? 3 : 4);
+      if (pair == PAIR_HL)
+        cost2 (3, 16 , 15, 11, 0, 12, 5, 5);
+      else
+        cost2 (4, 20, 18, 13, 0, 12, 6, 6);
       goto release;
     }
   else if (left->aop->type == AOP_STL && !bit_field && size <= 4)
@@ -13870,7 +13880,7 @@ genPointerGet (const iCode *ic)
               aopPut (result->aop, dbuf_c_str (&dbuf), offset);
               dbuf_destroy (&dbuf);
             }
-          regalloc_dry_run_cost += ld_cost (result->aop, offset, ASMOP_A, 0, false) + 2; // Todo: More exact cost.
+          cost2 (3, 19, 14, 9, 0, 10, 4, 5); // Assume ld r, d(iy)
           offset++;
         }
 
@@ -14559,7 +14569,15 @@ genPointerSet (iCode *ic)
         {
           if (!regalloc_dry_run)
             emit2 ("ld !mems, %s", pair, aopGet (right->aop, 0, FALSE));
-          regalloc_dry_run_cost += ld_cost (ASMOP_A, 0, right->aop, 0, false) + (getPairId (result->aop) != PAIR_IY ? 0 : 2);
+          if (getPairId (result->aop) == PAIR_HL)
+            cost2 (1, 7, 7, 6, 8, 6, 2, 2); // Assume ld (hl), r
+          else if (aopInReg (right->aop, 0, A_IDX))
+            cost2 (1, 7, 7, 7, 8, 6 , 2, 2); // Assume ld (rr), a
+          else
+            {
+              ld_cost (ASMOP_A, 0, right->aop, 0, true);
+              cost2 (1, 7, 7, 7, 8, 6 , 2, 2); // Assume ld (rr), a
+            }
         }
       else
         {
@@ -14570,7 +14588,7 @@ genPointerSet (iCode *ic)
           else
             cheapMove (ASMOP_A, 0, right->aop, 0, true);
           emit2 ("ld !mems, a", pair);
-          regalloc_dry_run_cost += (getPairId (result->aop) != PAIR_IY ? 1 : 3);
+          cost2 (1, 7, 7, 7, 8, 6 , 2, 2); // Assume ld (rr), a
         }
       goto release;
     }
@@ -14601,10 +14619,12 @@ genPointerSet (iCode *ic)
       fp_offset = right->aop->aopu.aop_stk + (right->aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
       emit2 ("!ldahlsp", sp_offset);
+      regalloc_dry_run_cost += 4;
       emit2 ("ld bc, !immedword", (unsigned)size);
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("ldir");
+      cost2 (2, 21 * size - 5, 14 * size - 2, 7 * size - 1, 0, 18 * size - 4, 2 * size - 1, 4 * size);
       spillPair (PAIR_HL);
-      regalloc_dry_run_cost += 9;
 
       if(!isPairDead (PAIR_HL, ic))
         _pop (PAIR_HL);
@@ -14624,13 +14644,16 @@ genPointerSet (iCode *ic)
             {
               if (!regalloc_dry_run)
                 emit2 ("ld !*iyx, %s", offset, aopGet (right->aop, offset, FALSE));
-              regalloc_dry_run_cost += 3;       // Todo: More exact cost here!
+              if (right->aop->type == AOP_LIT)
+                cost2 (4, 19, 15, 11, 0, 12, 5, 5); // ld d (iy), n
+              else
+                cost2 (3, 19, 15, 10, 0, 10, 4, 5); // ld d (iy), r
             }
           else
             {
               cheapMove (ASMOP_A, 0, right->aop, offset, true);
               emit2 ("ld !*iyx, a", offset);
-              regalloc_dry_run_cost += 3;
+              cost2 (3, 19, 15, 10, 0, 10, 4, 5); // ld d (iy), r
             }
           offset++;
         }
@@ -14698,7 +14721,10 @@ genPointerSet (iCode *ic)
       else
         pairId = getPairId (right->aop);
       emit2 ("ld !mems, %s", aopGetLitWordLong (result->aop, offset, FALSE), _pairs[pairId].name);
-      regalloc_dry_run_cost += (pairId == PAIR_HL) ? 3 : 4;
+      if (!IS_TLCS90 && pairId == PAIR_HL)
+        cost2 (3, 16, 16, 13, 0, 0, 5, 5);
+      else
+        cost2 (4, 20, 19, 15, 0, 12, 6, 6);
       goto release;
     }
   if (!IS_SM83 && !bit_field && isLitWord (result->aop) && size == 4 && offset == 0 &&
@@ -14712,7 +14738,10 @@ genPointerSet (iCode *ic)
       else
         pairId = getPartPairId (right->aop, 0);
       emit2 ("ld !mems, %s", aopGetLitWordLong (result->aop, offset, FALSE), _pairs[pairId].name);
-      regalloc_dry_run_cost += (pairId == PAIR_HL) ? 3 : 4;
+      if (!IS_TLCS90 && pairId == PAIR_HL)
+        cost2 (3, 16, 16, 13, 0, 0, 5, 5);
+      else
+        cost2 (4, 20, 19, 15, 0, 12, 6, 6);
       if (isLitWord (right->aop))
         {
           pairId = PAIR_HL;
@@ -17034,7 +17063,7 @@ dryZ80iCode (iCode * ic)
   else if (IS_EZ80_Z80 || IS_R800)
     regalloc_dry_run_cost_states *= 3;
 
-  return (regalloc_dry_run_cost_bytes + (float)regalloc_dry_run_cost_states * ic->count *  0.00001 / state_cost_divider); // The 0.00001 was chosen here empirically. In the future, when peephole rules have been adapted, and the state cost estimate has been made more accurate, a smaller value can be used.
+  return (regalloc_dry_run_cost_bytes + regalloc_dry_run_cost_states * ic->count / state_cost_divider);
 }
 
 #ifdef DEBUG_DRY_COST
@@ -17045,7 +17074,11 @@ dryZ80Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     if (ic->op != FUNCTION && ic->op != ENDFUNCTION && ic->op != LABEL && ic->op != GOTO && ic->op != INLINEASM)
-      printf ("; iCode %d total cost: %d\n", ic->key, (int) (dryZ80iCode (ic)));
+      {
+        printf ("; iCode %d total cost: %f ", ic->key, dryZ80iCode (ic));
+        const unsigned int state_cost_divider = 8u << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
+        printf ("(%u + %f * %f * 0.0001 / %u\n", regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states, ic->count, state_cost_divider);
+      }
 }
 #endif
 
@@ -17102,7 +17135,7 @@ genZ80Code (iCode * lic)
 #endif
 
 #ifdef DEBUG_DRY_COST
-      emit2 ("; iCode %d total cost: %d %d %d\n", ic->key, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);
+      emit2 ("; iCode %d (count %f) total costs: %u %u %f\n", ic->key, ic->count, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);
 #endif
     }
 

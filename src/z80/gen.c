@@ -6196,23 +6196,25 @@ genCall (const iCode *ic)
   const bool SomethingReturned = IS_ITEMP (IC_RESULT (ic)) && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir) ||
                        IS_TRUE_SYMOP (IC_RESULT (ic));
 
-  bool a_free_pre_call = !z80IsParmInCall(ftype, "a") && ic->left->aop->regs[A_IDX] < 0;
-  bool hl_free_pre_call = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h") && ic->left->aop->regs[L_IDX] < 0 && ic->left->aop->regs[H_IDX] < 0;
+  bool a_not_parm = !z80IsParmInCall(ftype, "a");
+  bool a_free = a_not_parm && ic->left->aop->regs[A_IDX] < 0;
+  bool hl_not_parm = !z80IsParmInCall(ftype, "l") && !z80IsParmInCall(ftype, "h");
+  bool hl_free = hl_not_parm && ic->left->aop->regs[L_IDX] < 0 && ic->left->aop->regs[H_IDX] < 0;
   bool de_not_parm = !z80IsParmInCall(ftype, "e") && !z80IsParmInCall(ftype, "d");
-  bool de_free_pre_call = de_not_parm && ic->left->aop->regs[E_IDX] < 0 && ic->left->aop->regs[D_IDX] < 0;
+  bool de_free = de_not_parm && ic->left->aop->regs[E_IDX] < 0 && ic->left->aop->regs[D_IDX] < 0;
   bool bc_not_parm = !z80IsParmInCall(ftype, "b") && !z80IsParmInCall(ftype, "c");
-  bool bc_free_pre_call = bc_not_parm && ic->left->aop->regs[C_IDX] < 0 && ic->left->aop->regs[B_IDX] < 0;
+  bool bc_free = bc_not_parm && ic->left->aop->regs[C_IDX] < 0 && ic->left->aop->regs[B_IDX] < 0;
 
   
   if (SomethingReturned && !bigreturn)
     aopOp (IC_RESULT (ic), ic, true, false);
-emit2("; hl_free_pre_call %d", hl_free_pre_call);
+
   if (bigreturn)
     {
       PAIR_ID pair;
       int fp_offset, sp_offset;
 
-      if (ic->op == PCALL && IS_SM83 || !hl_free_pre_call)
+      if (ic->op == PCALL && IS_SM83 || !hl_free)
         _push (PAIR_HL);
       aopOp (IC_RESULT (ic), ic, true, false);
       wassert (IC_RESULT (ic)->aop->type == AOP_STK || IC_RESULT (ic)->aop->type == AOP_EXSTK);
@@ -6239,9 +6241,9 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
           else
             cost2 (1 + IS_TLCS90, 11, 7, 2, 8, 8, 1, 1);
         }
-      if (ic->op == PCALL && IS_SM83 || !hl_free_pre_call)
+      if (ic->op == PCALL && IS_SM83 || !hl_free)
         {
-          if (de_free_pre_call)
+          if (de_free)
             {
               emit3 (A_LD, ASMOP_E, ASMOP_L);
               emit3 (A_LD, ASMOP_D, ASMOP_H);
@@ -6250,7 +6252,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
             }
           else
             {
-              wassert (bc_free_pre_call);
+              wassert (bc_free);
               emit3 (A_LD, ASMOP_C, ASMOP_L);
               emit3 (A_LD, ASMOP_B, ASMOP_H);
               _pop (PAIR_HL);
@@ -6265,7 +6267,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
       if (!regalloc_dry_run)
         _G.stack.pushed += 2;
       freeAsmop (IC_RESULT (ic), 0);
-      hl_free_pre_call = false;
+      hl_free = false;
     }
 
   // Check if we can do tail call optimization.
@@ -6362,18 +6364,18 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
 
       if (isLitWord (IC_LEFT (ic)->aop))
         {
-          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
+          adjustStack (prestackadjust, a_free, bc_free, de_free, hl_free, false);
           emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, FALSE));
           if (jump)
             cost2 (3, 10, 9, 8, 16,	8, 4, 3);
           else
             cost2 (3, 17, 16, 12, 24, 14, 5, 3);
         }
-      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && hl_free_pre_call)
+      else if (getPairId (IC_LEFT (ic)->aop) != PAIR_IY && hl_free)
         {
           spillPair (PAIR_HL);
-          genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call, true);
-          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, false, false);
+          genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_free, hl_free, de_free, true);
+          adjustStack (prestackadjust, a_not_parm, bc_not_parm, de_not_parm, false, false);
           emit2 (jump ? "!jphl" : "call ___sdcc_call_hl");
           if (jump)
             cost2 (1, 4, 3, 4, 4, 8, 3, 1);
@@ -6389,14 +6391,14 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
           if (IC_LEFT (ic)->aop->type == AOP_EXSTK) // Ensure that we don't directly overwrite iyl while accessing the stack via iy.
             {
               _push (PAIR_HL);
-              genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_free_pre_call, true, de_free_pre_call, true);
+              genMove (ASMOP_HL, IC_LEFT (ic)->aop, a_not_parm, true, de_not_parm, true);
               emit2 ("ex (sp), hl");
               cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5, 5);
               _pop (PAIR_IY);
             }
           else
-            genMove (ASMOP_IY, IC_LEFT (ic)->aop, a_free_pre_call, hl_free_pre_call, de_free_pre_call, true);
-          adjustStack (prestackadjust, a_free_pre_call, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
+            genMove (ASMOP_IY, IC_LEFT (ic)->aop, a_not_parm, hl_not_parm, de_not_parm, true);
+          adjustStack (prestackadjust, a_not_parm, bc_not_parm, de_not_parm, hl_not_parm, false);
           emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
           if (jump)
             cost2 (2, 8, 6, 6, 0, 8, 4, 2);
@@ -6406,15 +6408,14 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
               // todo: add cycles spent in ___sdcc_call_iy here
             }
         }
-      else if (bc_not_parm) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
+      else if (bc_not_parm && (ic->left->aop->regs[B_IDX] < 0 && ic->left->aop->regs[C_IDX] < 0 || de_free)) // Try bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED || IS_SM83); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           symbol *tlbl = 0;
           if (ic->left->aop->regs[B_IDX] >= 0 || ic->left->aop->regs[C_IDX] >= 0)
             {
-              if (!de_free_pre_call)
-                UNIMPLEMENTED;
+              wassert (de_free);
               if (!regalloc_dry_run)
                 {
                   tlbl = newiTempLabel (NULL);
@@ -6433,7 +6434,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
                 }
               cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
-          genMove (ASMOP_BC, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, de_free_pre_call, true);
+          genMove (ASMOP_BC, IC_LEFT (ic)->aop, a_not_parm, hl_not_parm, de_not_parm, true);
           emit2 ("push bc");
           cost2 (1, 11, 11, 10, 16, 8, 3, 4);
           emit2 ("ret");
@@ -6443,15 +6444,14 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
           if (tlbl)
             emitLabel (tlbl);
         }
-      else if (de_not_parm) // Try de.
+      else if (de_not_parm && (ic->left->aop->regs[D_IDX] < 0 && ic->left->aop->regs[E_IDX] < 0 || bc_free)) // Try de.
         {
           wassert (!prestackadjust);
           wassert (IY_RESERVED || IS_SM83); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           symbol *tlbl = 0;
           if (ic->left->aop->regs[D_IDX] >= 0 || ic->left->aop->regs[E_IDX] >= 0)
             {
-              if (!bc_free_pre_call)
-                UNIMPLEMENTED;
+              wassert (bc_free);
               if (!regalloc_dry_run)
                 {
                   tlbl = newiTempLabel (NULL);
@@ -6470,7 +6470,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
                 }
               cost2 (3, 10, 9, 6, 12, 6, 3, 3);
             }
-          genMove (ASMOP_DE, IC_LEFT (ic)->aop, z80IsParmInCall(ftype, "a"), hl_free_pre_call, true, true);
+          genMove (ASMOP_DE, IC_LEFT (ic)->aop, a_not_parm, hl_not_parm, true, true);
           emit2 ("push de");
           cost2 (1, 11, 11, 10, 16, 8, 3, 4);
           emit2 ("ret");
@@ -6481,9 +6481,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
             emitLabel (tlbl);
         }
       else
-        {
-          wassert (0);
-        }
+        UNIMPLEMENTED;
     }
   else
     {
@@ -6530,7 +6528,7 @@ emit2("; hl_free_pre_call %d", hl_free_pre_call);
               /* todo: implement */
             }
 
-          adjustStack (prestackadjust, false, bc_free_pre_call, de_free_pre_call, hl_free_pre_call, false);
+          adjustStack (prestackadjust, false, bc_free, de_free, hl_free, false);
 
           if (IS_LITERAL (etype))
             {

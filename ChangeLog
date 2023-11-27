@@ -1,5 +1,10 @@
 2023-11-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/z80/gen.c:
+	  Fix a codegen crash affecting sm83 function calls via pointers to functions returning struct.
+
+2023-11-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Fully enable code speed optimization for z80 (and related).

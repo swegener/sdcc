@@ -5036,17 +5036,10 @@ replace restart {
 } if deadMove(%1)
 
 replace {
-	mov	r%1,%2
+	mov	%1, %2
 } by {
-	;	Peephole 302	mov r%1,%2 removed
-} if notVolatile(%2), deadMove(%1)
-
-replace {
-	mov	ar%1,%2
-} by {
-	;	Peephole 303	mov ar%1,%2 removed
-} if notVolatile(%2), deadMove(%1)
-
+	;	Peephole 302 removed dead mov %1, %2
+} if notVolatile(%2), notUsed(%1)
 
 // applies to: void test( char c ) { if( c ) func1(); else func2(); }
 replace {

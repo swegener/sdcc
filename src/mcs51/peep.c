@@ -860,13 +860,6 @@ mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
     return removeDeadPopPush (pReg, currPl, head);
   else if (strncmp (currPl->line, "push", 4) == 0)
     return removeDeadPushPop (pReg, currPl, head);
-  else if (strncmp (currPl->line, "mov", 3) == 0 &&
-           (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
-  {
-    bool r = removeDeadMove (pReg, currPl);
-    dbglog_deadmove (printf ("  -> %d\n", r));
-    return r;
-  }
   else
     {
       fprintf (stderr, "Error: "
@@ -884,6 +877,20 @@ bool
 mcs51notUsed (const char *what, lineNode *endPl, lineNode *head)
 {
   dbglog_deadmove (printf ("mcs51notUsed %s  after line: %s\n", what, endPl->line));
+
+  wassert (what);
+
+  if (!strcmp (what, "dptr"))
+    return (mcs51notUsed ("dpl", endPl, head) && mcs51notUsed ("dph", endPl, head));
+
+  if (!strcmp (what, "acc"))
+    return (mcs51notUsed ("a", endPl, head));
+
+  // If we don't know what it is, assume it might be used.
+  // todo: allow a, and support it in removeDeadMove.
+  // todo: allow dpl, dph, and support it in removeDeadMove.
+  if (!(what[0] == 'r' && isdigit(what[1])) && !(what[0] == 'a' && what[0] == 'r' && isdigit(what[2]))) // Allow r?
+    return (false);
 
   _G.head = head;
 

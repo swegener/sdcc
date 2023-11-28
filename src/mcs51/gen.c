@@ -13232,7 +13232,7 @@ gen51Code (iCode * lic)
 }
 
 bool
-mcs51IsReturned(const char *what)
+mcs51IsReturned (const char *what)
 {
   if (!strcmp(what, "dptr"))
     return (mcs51IsReturned ("dpl") || mcs51IsReturned ("dph"));

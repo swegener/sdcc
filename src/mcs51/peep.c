@@ -513,12 +513,8 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
                   return S4O_ABORT;  /* not a function? */
                 if (FUNC_CALLEESAVES (currFunc->type))
                   return S4O_ABORT; /* returning from callee saves function */
-                if (getSize(currFunc->etype) > 4)
-                  {
-                    for (unsigned i = 0; i < getSize(currFunc->etype); i++)
-                      if (strstr (pReg, fReturn8051[i]))
-                        return S4O_ABORT; /* return value is partially in r4-r7 */
-                  }
+                if (mcs51IsReturned (pReg))
+                  return S4O_ABORT;
                 return S4O_TERM;
               }
             break;

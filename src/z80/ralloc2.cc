@@ -1501,6 +1501,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
     add_edge(boost::source(*e, I), boost::target(*e, I), I2);
 
   assignment ac;
+  ac.s = 0.0f;
   assignment_optimal = true;
   tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac, &assignment_optimal);
 

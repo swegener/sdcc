@@ -747,7 +747,7 @@ struct assignment_rep
 };
 
 template <class I_t>
-float compability_cost(const assignment& a, const assignment& ac, const I_t &I)
+float compatibility_cost(const assignment& a, const assignment& ac, const I_t &I)
 {
   typedef typename boost::graph_traits<I_t>::adjacency_iterator adjacency_iter_t;
   
@@ -801,7 +801,7 @@ static void drop_worst_assignments(assignment_list_t &alist, unsigned short int 
   for (n = 0, ai = alist.begin(); n < alist_size; ++ai, n++)
     {
       arep[n].i = ai;
-      arep[n].s = ai->s + rough_cost_estimate(*ai, i, G, I) + compability_cost(*ai, ac, I);
+      arep[n].s = ai->s + rough_cost_estimate(*ai, i, G, I) + compatibility_cost(*ai, ac, I);
     }
 
   std::nth_element(arep + 1, arep + options.max_allocs_per_node / port->num_regs, arep + alist_size);
@@ -828,7 +828,7 @@ static void drop_worst_assignments(assignment_list_t &alist, unsigned short int 
           alist.erase(ai++);
           continue;
         }
-      s += compability_cost(*ai, ac, I);
+      s += compatibility_cost(*ai, ac, I);
       if(s > bound)
         {
           alist.erase(ai++);

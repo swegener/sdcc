@@ -41,7 +41,7 @@ enum
   DISABLE_DEBUG = 0
 };
 
-#define UNIMPLEMENTED do {wassertl (regalloc_dry_run, "Unimplemented"); cost (500, 500);} while(0)
+#define UNIMPLEMENTED do {wassertl (regalloc_dry_run, "Unimplemented"); cost (4000, 4000.0f);} while(0)
 
 #undef DEBUG_DRY_COST
 
@@ -321,7 +321,7 @@ z80_init_asmops (void)
 
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost; // Legacy: cost counted in bytes only (i.e. states have been ignored for corresponding instructions).
-static unsigned int regalloc_dry_run_cost_bytes;
+static unsigned long regalloc_dry_run_cost_bytes;
 static float regalloc_dry_run_cost_states;
 static float regalloc_dry_run_state_scale = 1.0f;
 
@@ -1289,7 +1289,7 @@ emit3wCost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
 static void
 emit3_o (enum asminst inst, asmop *op1, int offset1, asmop *op2, int offset2)
 {
-  unsigned int cost, bytecost;
+  unsigned long cost, bytecost;
   float statecost;
 
   emit3Cost (inst, op1, offset1, op2, offset2);
@@ -3595,7 +3595,7 @@ aopPut (asmop *aop, const char *s, int offset)
   dbuf_destroy (&dbuf);
 }
 
-/* pop a register pair while not destroying one of the two registers in it (destroying tempreg instead). */
+// pop a register pair while not destroying one of the two registers in it (destroying tempreg instead, if available).
 static void
 poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
 {
@@ -3610,26 +3610,18 @@ poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
     }
 
   // No tempreg, need to do it the hard way via stack access.
-  if (survivingreg == B_IDX || survivingreg == D_IDX || survivingreg == H_IDX || survivingreg == IYH_IDX)
-    {
-      _push (PAIR_AF);
-      _push (PAIR_HL);
-      emit2 ("ld hl, !immedword", 3u);
-      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
-      emit2 ("add hl, sp");
-      cost2 (2, 15, 10, 4, 0, 8, 2, 2);
-      emit2 ("ld a, (hl)");
-      cost2 (1, 7, 6, 6, 8, 6, 2, 2);
-      emit3w (A_INC, ASMOP_HL, 0);
-      emit3w (A_INC, ASMOP_HL, 0);
-      emit2 ("ld (hl), a");
-      cost2 (1, 7, 7, 6, 8, 6, 2, 2);
-      _pop (PAIR_HL);
-      _pop (PAIR_AF);
-      _pop (pair);
-    }
-  else // todo: implement for lower byte
-    UNIMPLEMENTED;
+  bool isupperbyte = (survivingreg == B_IDX || survivingreg == D_IDX || survivingreg == H_IDX || survivingreg == IYH_IDX);
+  _push (PAIR_AF); // Save flags
+  _push (PAIR_HL); // Save hl
+  emit2 ("ld hl, !immedword", 4 + isupperbyte);
+  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
+  emit2 ("add hl, sp");
+  cost2 (2, 15, 10, 4, 0, 8, 2, 2);
+  emit2 ("ld (hl), %s", regsZ80[survivingreg].name);
+  cost2 (1, 7, 7, 6, 8, 6, 2, 2);
+  _pop (PAIR_HL);
+  _pop (PAIR_AF);
+  _pop (pair);
 }
 
 // Move, but try not to. Preserves flags. Cannot use xor to zero, since xor resets the carry flag.
@@ -8359,7 +8351,7 @@ genPlus (iCode * ic)
               }
             else // Can't handle both sides in iy.
               UNIMPLEMENTED;
-          else if (rightop->type == AOP_STL && i < 2) // can't handle rematerialized stack location on the right.
+          else if (rightop->type == AOP_STL && i < 2) // can't handle rematerialized stack location on the right efficiently.
             {
               operand *t = IC_RIGHT (ic);
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -8384,7 +8376,13 @@ genPlus (iCode * ic)
               started = TRUE;
             }
           else if (rightop->type == AOP_STL && i < 2)
-            UNIMPLEMENTED;
+            {
+              _push (PAIR_HL);
+              genMove (ASMOP_HL, rightop, false, true, false, false);
+              emit3 (started ? A_ADC : A_ADD, ASMOP_A, i ? ASMOP_H : ASMOP_L);
+              started = true;
+              _pop (PAIR_HL);
+            }
           else if (!HAS_IYL_INST && (aopInReg (rightop, i, IYL_IDX) || aopInReg (rightop, i, IYH_IDX)))
             UNIMPLEMENTED;
           else
@@ -8707,12 +8705,21 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
 
           if ((aopInReg (right, offset, IYL_IDX)  || aopInReg (right, offset, IYH_IDX)) && !HAS_IYL_INST) // From here on all codepaths needs to use right as operand.
             UNIMPLEMENTED;
+          else if (right->type == AOP_STL && offset < 2)
+            {
+              cheapMove (ASMOP_A, 0, left, offset, true);
+              if (!hl_dead && !pushed_hl)
+                {
+                  _push (PAIR_HL);
+                  pushed_hl = true;
+                }
+              genMove (ASMOP_HL, right, false, true, false, false);
+              emit3 (offset ? A_SBC : A_SUB, ASMOP_A, offset ? ASMOP_H : ASMOP_L);
+            }
           else if (!offset)
             {
               if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && aopInReg (right, offset, A_IDX))
                 emit3 (A_NEG, 0, 0);
-              else if (right->type == AOP_STL)
-                UNIMPLEMENTED;
               else
                 {
                   if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00)
@@ -8732,8 +8739,6 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               emit3 (A_SBC, ASMOP_A, ASMOP_A);
               emit3_o (A_SUB, ASMOP_A, 0, right, offset);
             }
-          else if (right->type == AOP_STL)
-            UNIMPLEMENTED;
           else
             {
               cheapMove (ASMOP_A, 0, left, offset, true);
@@ -17079,7 +17084,7 @@ dryZ80Code (iCode * lic)
       {
         printf ("; iCode %d total cost: %f ", ic->key, dryZ80iCode (ic));
         const unsigned int state_cost_divider = 8u << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
-        printf ("(%u + %f * %f * 0.0001 / %u\n", regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states, ic->count, state_cost_divider);
+        printf ("(%f + %f * %f * 0.0001 / %u\n", (float)regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states, ic->count, state_cost_divider);
       }
 }
 #endif
@@ -17137,7 +17142,7 @@ genZ80Code (iCode * lic)
 #endif
 
 #ifdef DEBUG_DRY_COST
-      emit2 ("; iCode %d (count %f) total costs: %u %u %f\n", ic->key, ic->count, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);
+      emit2 ("; iCode %d (count %f) total costs: %u %lu %f\n", ic->key, ic->count, regalloc_dry_run_cost, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_states);
 #endif
     }
 

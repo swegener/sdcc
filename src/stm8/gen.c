@@ -3423,6 +3423,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
               cheapMove (result_aop, i, ASMOP_A, 0, false);
               pushed_a = true;
             }
+          started = true;
           i++;
         }
       else

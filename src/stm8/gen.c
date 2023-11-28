@@ -7270,7 +7270,7 @@ genRot1 (iCode *ic)
                   symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
                   if (!regalloc_dry_run)
                     emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
-                  emit2 ("or", "#0x80");
+                  emit2 ("or", "a, #0x80");
                   cost (4, 2);
                   emitLabel (tlbl);
                 }

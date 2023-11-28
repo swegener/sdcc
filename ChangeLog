@@ -3,6 +3,8 @@
 	* src/mcs51/peep.c,
 	  src/mcs51/peeph.def:
 	  Replace deadMove by notUsed in non-push/pop roles.
+	* src/stm8/gen.c:
+	  Fix an stm8 rotation codegen issue resulting in invalid asm for --opt-code-speed.
 
 2023-11-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

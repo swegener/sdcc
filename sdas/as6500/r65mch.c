@@ -684,7 +684,12 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 0;
-
+	
+	/*
+	 * Address Space
+	 */
+	exprmasks(3);
+	
 	/*
 	 * Zero Page Area Pointer
 	 */

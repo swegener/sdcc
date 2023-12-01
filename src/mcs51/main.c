@@ -731,7 +731,7 @@ asmLineNodeFromLineNode (lineNode *ln)
       updateOpRW (aln, op1, opdat->op1type);
       updateOpRW (aln, op2, opdat->op2type);
       if (!strcmp (inst, "jnz") || !strcmp (inst, "jz"))
-        aln->regsWritten = bitVectSetBit (aln->regsRead, A_IDX);
+        aln->regsRead = bitVectSetBit (aln->regsRead, A_IDX);
       if (strchr(opdat->pswtype,'r'))
         aln->regsRead = bitVectSetBit (aln->regsRead, CND_IDX);
       if (strchr(opdat->pswtype,'w'))

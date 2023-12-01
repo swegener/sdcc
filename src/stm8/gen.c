@@ -1759,15 +1759,14 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 
   for (i = 0; i < n;)
     {
-      if (!aopOnStack (result, roffset + i, 1) || !aopOnStack (source, soffset + i, 1))
+      if (assigned[i] || !aopOnStack (result, roffset + i, 1) || !aopOnStack (source, soffset + i, 1))
         {
           i++;
           continue;
         }
 
       // Same location.
-      if (!assigned[i] &&
-        result->aopu.bytes[roffset + i].byteu.stk == source->aopu.bytes[soffset + i].byteu.stk)
+      if (result->aopu.bytes[roffset + i].byteu.stk == source->aopu.bytes[soffset + i].byteu.stk)
         {
           wassert_bt (*size >= 1);
 
@@ -1779,7 +1778,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 
       // Could transfer two bytes at a time now.
       if (i + 1 < n &&
-        !assigned[i] && !assigned[i + 1] &&
+        !assigned[i + 1] &&
         aopOnStackNotExt (result, roffset + i, 2) && aopOnStackNotExt (source, soffset + i, 2))
         {
           wassert_bt (*size >= 2);

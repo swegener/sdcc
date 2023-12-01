@@ -1,3 +1,8 @@
+2023-12-01 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/asxxsrc/asmain.c:
+	  simplify parsing of number radix (similar to upstream asxxxx).
+	  
 2023-12-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/stm8/gen.c:
@@ -5,6 +10,11 @@
 	* src/mcs51/main.c:
 	  Fix an mcs51 peephole optimizer issue noticed by Oleg Endo.
 
+2023-11-29 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/as6500/r65mch.c:
+	  enable 24bit address in sdas for mos6502 (patch #436).
+	  
 2023-11-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mcs51/main.c:

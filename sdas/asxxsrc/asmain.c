@@ -1746,29 +1746,15 @@ loop:
 
         case S_RADIX:
                 if (more()) {
-                        switch (getnb()) {
-                        case 'b':
-                        case 'B':
-                                radix = 2;
-                                break;
-                        case '@':
-                        case 'o':
-                        case 'O':
-                        case 'q':
-                        case 'Q':
-                                radix = 8;
-                                break;
-                        case 'd':
-                        case 'D':
-                                radix = 10;
-                                break;
-                        case 'h':
-                        case 'H':
-                        case 'x':
-                        case 'X':
-                                radix = 16;
-                                break;
-                        default:
+                        switch (ccase[getnb()]) {
+ 			case 'b':	radix = 2;	break;	/* B */
+			case '@':				/* @ */
+			case 'o':				/* O */
+			case 'q':	radix = 8;	break;	/* Q */
+			case 'd':	radix = 10;	break;	/* D */
+			case 'h':				/* H */
+			case 'x':	radix = 16;	break;	/* X */
+			default:				/* 2, 8, 10, 16 */
                                 radix = 10;
                                 qerr();
                                 break;

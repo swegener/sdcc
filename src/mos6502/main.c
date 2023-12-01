@@ -5,7 +5,7 @@
 
   Hacked for the MOS6502:
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
-  Copyright (C) 2021-2022, Gabriele Gorla
+  Copyright (C) 2021-2023, Gabriele Gorla
 
 
   This program is free software; you can redistribute it and/or modify it
@@ -231,6 +231,13 @@ m6502_genAssemblerPreamble (FILE * of)
     {
     }
 #endif
+}
+
+static void
+m65c02_genAssemblerPreamble (FILE * of)
+{
+  fprintf(of, "\t.r65c02\n\n");
+  m6502_genAssemblerPreamble (of);
 }
 
 static void
@@ -935,7 +942,7 @@ PORT mos65c02_port =
   0,
   NULL,
   m6502_keywords,
-  m6502_genAssemblerPreamble,
+  m65c02_genAssemblerPreamble,
   m6502_genAssemblerEnd,        /* genAssemblerEnd */
   m6502_genIVT,
   m6502_genXINIT,

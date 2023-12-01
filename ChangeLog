@@ -2,6 +2,8 @@
 
 	* sdas/asxxsrc/asmain.c:
 	  simplify parsing of number radix (similar to upstream asxxxx).
+	* src/mos6502/main.c:
+	  add ".r56c02" to the assembler output for mos65c02 port.
 	  
 2023-12-01 Philipp Klaus Krause <philipp@colecovision.eu>
 

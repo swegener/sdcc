@@ -35,7 +35,9 @@
 	  Add regression for mos65c02 using uCsim.
   	* src/mos6502/main.c
 	  Add crt to mos65c02 link step by default.
-	  	  
+	* src/mos6502/gen.c
+	  Implement GenAnd and GenOr for mos65c02.
+	  	  	  
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-2776.c,

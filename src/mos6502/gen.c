@@ -6450,8 +6450,11 @@ genAnd (iCode * ic, iCode * ifx)
         {
 	  // FIXME: unimplemented
           bitpos = isLiteralBit (litinv) - 1;
-          m6502_unimplemented("genAnd 65C02 path");
+          char rmb[5] = "rmbx";
+//          m6502_unimplemented("genAnd 65C02 path");
           // emitcode ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
+          rmb[3] = '0' + (bitpos & 7);
+          emitcode (rmb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
           goto release;
         }
     }
@@ -6672,10 +6675,11 @@ genOr (iCode * ic, iCode * ifx)
   if (IS_MOS65C02 && sameRegs (AOP (left), AOP (result)) &&
       (AOP_TYPE (right) == AOP_LIT) && isLiteralBit (lit) && (AOP_TYPE (left) == AOP_DIR))
     {
-      // FIXME: unimplemented
-      m6502_unimplemented("genOr 65C02 path");
-//      int bitpos = isLiteralBit (lit) - 1;
+      int bitpos = isLiteralBit (lit) - 1;
 //      emitcode ("bset", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
+      char smb[5] = "smbx";
+      smb[3] = '0' + (bitpos & 7);
+      emitcode (smb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
       goto release;
     }
 

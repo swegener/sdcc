@@ -4,6 +4,11 @@
 	  simplify parsing of number radix (similar to upstream asxxxx).
 	* src/mos6502/main.c:
 	  add ".r56c02" to the assembler output for mos65c02 port.
+	* src/device/lib/mos65c02/Makefile.in,
+	  src/device/lib/mos65c02/__sdcc_indirect_jsr.s,
+	  src/device/lib/mos65c02/_dptr.s,
+	  src/device/lib/mos65c02/_temp.s
+	  add missing files to the mos65c02 std lib.
 	  
 2023-12-01 Philipp Klaus Krause <philipp@colecovision.eu>
 

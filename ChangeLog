@@ -1,3 +1,12 @@
+2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-2776.c,
+	  support/regression/tests/bug-3368.c,
+	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-4.c:
+	  Enable struct parameter tests for all ports except mos6502 (which doesn't support them yet).
+
 2023-12-01 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdas/asxxsrc/asmain.c:

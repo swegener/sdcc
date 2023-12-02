@@ -1,7 +1,7 @@
 /* r65mch.c */
 
 /*
- *  Copyright (C) 1995-2019  Alan R. Baldwin
+ *  Copyright (C) 1995-2023  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -149,6 +149,7 @@ static char c02pg1[256] = {
 /*F0*/   4, 7, 6,UN,UN, 5, 6, 5, 2, 6, 4,UN,UN, 6, 7, 7
 };
 
+int mchtyp;
 struct area *zpg;
 
 /*
@@ -191,33 +192,37 @@ struct mne *mp;
 		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
+	case S_CPU:
+		mchtyp = op;
+		switch(mchtyp) {
+		case X_R6500:
+			opcycles = OPCY_6500;
+			r65f11 = 0;
+			r65c00 = 0;
+			r65c02 = 0;
+			break;
 
-	case S_R6500:
-		opcycles = OPCY_6500;
-		r65f11 = 0;
-		r65c00 = 0;
-		r65c02 = 0;
-		break;
+		case X_R65F11:
+			opcycles = OPCY_65F11;
+			r65f11 = 1;
+			r65c00 = 0;
+			r65c02 = 0;
+			break;
 
-	case S_R65F11:
-		opcycles = OPCY_65F11;
-		r65f11 = 1;
-		r65c00 = 0;
-		r65c02 = 0;
-		break;
+		case X_R65C00:
+			opcycles = OPCY_65C00;
+			r65f11 = 1;
+			r65c00 = 1;
+			r65c02 = 0;
+			break;
 
-	case S_R65C00:
-		opcycles = OPCY_65C00;
-		r65f11 = 1;
-		r65c00 = 1;
-		r65c02 = 0;
-		break;
-
-	case S_R65C02:
-		opcycles = OPCY_65C02;
-		r65f11 = 1;
-		r65c00 = 1;
-		r65c02 = 1;
+		case X_R65C02:
+			opcycles = OPCY_65C02;
+			r65f11 = 1;
+			r65c00 = 1;
+			r65c02 = 1;
+			break;
+		}
 		break;
 
 	case S_INH3:
@@ -698,6 +703,7 @@ minit()
 	/*
 	 * Default Machine
 	 */
+	mchtyp = X_R6500;
 	r6500  = 1;
 	r65f11 = 0;
 	r65c00 = 0;

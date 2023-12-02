@@ -251,10 +251,10 @@ struct	mne	mne[] = {
 
 	/* Machines */
 
-//    {	NULL,	".r6500",	S_R6500,	0,	0	},
-//    {	NULL,	".r65f11",	S_R65F11,	0,	0	},
-//    {	NULL,	".r65c00",	S_R65C00,	0,	0	},
-//    {	NULL,	".r65c02",	S_R65C02,	0,	0	},
+    {	NULL,	".r6500",	S_CPU,		0,	X_R6500	},
+    {	NULL,	".r65f11",	S_CPU,		0,	X_R65F11},
+    {	NULL,	".r65c00",	S_CPU,		0,	X_R65C00},
+    {	NULL,	".r65c02",	S_CPU,		0,	X_R65C02},
 
 	/* 650X / 651X Family  Instructions */
 

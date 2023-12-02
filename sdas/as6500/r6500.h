@@ -69,11 +69,13 @@ struct adsym
 /*
  * Machine Extensions
  */
-#define	S_SDP		30
-#define	S_R6500		31
-#define	S_R65F11	32
-#define S_R65C00	33
-#define	S_R65C02	34
+#define	S_SDP		80
+#define	S_CPU		82
+
+#define	X_R6500		31
+#define	X_R65F11	32
+#define X_R65C00	33
+#define	X_R65C02	34
 
 /*
  * Addressing types

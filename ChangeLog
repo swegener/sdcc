@@ -1,3 +1,9 @@
+2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/main.c
+	  Correct opcode ordering.
+	  Fix get_model() reporting.
+
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/ports/pic16/spec.mk:

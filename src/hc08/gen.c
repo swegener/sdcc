@@ -252,7 +252,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
 
 /*--------------------------------------------------------------------------*/
 /* updateCFA - update the debugger information to reflect the current       */
-/*             connonical frame address relative to the stack pointer       */
+/*             canonical frame address relative to the stack pointer        */
 /*--------------------------------------------------------------------------*/
 static void
 updateCFA (void)
@@ -2630,7 +2630,7 @@ aopOp (operand *op, iCode * ic, bool result)
 
 /*-----------------------------------------------------------------*/
 /* freeAsmop - free up the asmop given to an operand               */
-/*----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 static void
 freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 {

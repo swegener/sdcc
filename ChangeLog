@@ -5,6 +5,9 @@
 	  Fix get_model() reporting.
    	* src/mos6502/gen.c
 	  Make mos65c02 register transfer code use phx/phy/plx/ply.
+   	* src/mos6502/gen.c,
+   	  src/hc08/gen.c
+	  Reformat comments to match other ports.
 
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

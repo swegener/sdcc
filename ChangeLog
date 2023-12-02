@@ -3,6 +3,8 @@
   	* src/mos6502/main.c
 	  Correct opcode ordering.
 	  Fix get_model() reporting.
+   	* src/mos6502/gen.c
+	  Make mos65c02 register transfer code use phx/phy/plx/ply.
 
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

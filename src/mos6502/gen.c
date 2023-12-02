@@ -8,7 +8,7 @@
   Copyright (C) 2003, Erik Petrich
   Hacked for the MOS6502:
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
-  Copyright (C) 2021-2022, Gabriele Gorla
+  Copyright (C) 2021-2023, Gabriele Gorla
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -453,7 +453,7 @@ emit6502op (const char *inst, const char *fmt, ...)
         break;
     }
   } else {
-    emitComment(ALWAYS,"unkwnon opcode %s",inst);
+    emitComment(ALWAYS,"unkwnown opcode %s",inst);
     isize=10;
     //werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL opcode in emit6502op");
   }
@@ -679,11 +679,16 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
           if(m6502_reg_x->isLitConst) {
             loadRegFromConst (m6502_reg_y, m6502_reg_x->litConst);
           } else if(m6502_reg_a->isFree) {
-          emit6502op ("txa", "");
-          emit6502op ("tay", "");
+            emit6502op ("txa", "");
+            emit6502op ("tay", "");
           } else {
-            storeRegTemp (m6502_reg_x, false);
-            loadRegTemp (m6502_reg_y);
+            if (IS_MOS65C02) {
+              emit6502op ("phx", "");
+              emit6502op ("ply", "");
+            } else {
+              storeRegTemp (m6502_reg_x, false);
+              loadRegTemp (m6502_reg_y);
+            }
           }
           break;
         default:
@@ -703,8 +708,13 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
           emit6502op ("tya", "");
           emit6502op ("tax", "");
           } else {
-            storeRegTemp (m6502_reg_y, false);
-            loadRegTemp (m6502_reg_x);
+            if (IS_MOS65C02) {
+              emit6502op ("phy", "");
+              emit6502op ("plx", "");
+            } else {
+              storeRegTemp (m6502_reg_y, false);
+              loadRegTemp (m6502_reg_x);
+            }
           }
           break;
         default:
@@ -1816,7 +1826,7 @@ storeConstToAop (int c, asmop * aop, int loffset)
         {
 	  // FIXME: unimplemented
           aopAdrPrepare(aop, loffset);
-          emitcode ("stz", "%s", aopAdrStr (aop, loffset, false));
+          emit6502op ("stz", "%s", aopAdrStr (aop, loffset, false));
           aopAdrUnprepare(aop, loffset);
           break;
         }
@@ -1876,7 +1886,7 @@ storeImmToAop (char *c, asmop * aop, int loffset)
         {
 	  // FIXME: unimplemented
           aopAdrPrepare(aop, loffset);
-          emitcode ("stz", "%s", aopAdrStr (aop, loffset, false));
+          emit6502op ("stz", "%s", aopAdrStr (aop, loffset, false));
           aopAdrUnprepare(aop, loffset);
           break;
         }
@@ -6273,7 +6283,7 @@ genAnd (iCode * ic, iCode * ifx)
       if (IC_TRUE (ifx))
         {
 	  // FIXME: unimplemented
-          emitcode ("brclr", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
+          emit6502op ("brclr", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
           emitBranch ("jmp", IC_TRUE (ifx));
           safeEmitLabel (tlbl);
           if (IC_FALSE (ifx))
@@ -6283,7 +6293,7 @@ genAnd (iCode * ic, iCode * ifx)
         {
 	  // FIXME: unimplemented
           if (!regalloc_dry_run)
-            emitcode ("brset", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
+            emit6502op ("brset", "#%d,%s,%05d$", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false), safeLabelKey2num ((tlbl->key)));
           emitBranch ("jmp", IC_FALSE (ifx));
           safeEmitLabel (tlbl);
         }
@@ -6307,8 +6317,8 @@ genAnd (iCode * ic, iCode * ifx)
 	  // FIXME: unimplemented
           loadRegFromAop (m6502_reg_a, AOP (left), offset);
           accopWithAop ("and", AOP (right), offset);
-          emitcode ("ora", "1,s");
-          emitcode ("sta", "1,s");
+          emit6502op ("ora", "1,s");
+          emit6502op ("sta", "1,s");
           offset++;
         }
 
@@ -6451,10 +6461,9 @@ genAnd (iCode * ic, iCode * ifx)
 	  // FIXME: unimplemented
           bitpos = isLiteralBit (litinv) - 1;
           char rmb[5] = "rmbx";
-//          m6502_unimplemented("genAnd 65C02 path");
-          // emitcode ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
+          // emit6502op ("bclr", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
           rmb[3] = '0' + (bitpos & 7);
-          emitcode (rmb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
+          emit6502op (rmb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
           goto release;
         }
     }
@@ -6605,8 +6614,8 @@ genOr (iCode * ic, iCode * ifx)
 	  // FIXME: unimplemented
           loadRegFromAop (m6502_reg_a, AOP (left), offset);
           accopWithAop ("ora", AOP (right), offset);
-          emitcode ("ora", "1,s"); // TODO :P
-          emitcode ("sta", "1,s");
+          emit6502op ("ora", "1,s");
+          emit6502op ("sta", "1,s");
           offset++;
         }
 
@@ -6676,10 +6685,10 @@ genOr (iCode * ic, iCode * ifx)
       (AOP_TYPE (right) == AOP_LIT) && isLiteralBit (lit) && (AOP_TYPE (left) == AOP_DIR))
     {
       int bitpos = isLiteralBit (lit) - 1;
-//      emitcode ("bset", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
+//      emit6502op ("bset", "#%d,%s", bitpos & 7, aopAdrStr (AOP (left), bitpos >> 3, false));
       char smb[5] = "smbx";
       smb[3] = '0' + (bitpos & 7);
-      emitcode (smb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
+      emit6502op (smb, "%s", aopAdrStr (AOP (left), bitpos >> 3, false));
       goto release;
     }
 
@@ -8830,7 +8839,7 @@ genUnpackBitsImmed (operand * left, operand *right, operand * result, iCode * ic
 	  // FIXME: unimplemented
           loadRegFromConst (m6502_reg_a, 0);
           m6502_unimplemented("genUnpackBitsImmed");
-//          emitcode ("brclr", "#%d,%s,%05d$", bstr, aopAdrStr (derefaop, 0, false), safeLabelKey2num ((tlbl->key)));
+//          emit6502op ("brclr", "#%d,%s,%05d$", bstr, aopAdrStr (derefaop, 0, false), safeLabelKey2num ((tlbl->key)));
           if (SPEC_USIGN (etype))
             rmwWithReg ("inc", m6502_reg_a);
           else
@@ -9384,7 +9393,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
         {
 	  // FIXME: unimplemented
           m6502_unimplemented("genPackBits");
-          // emitcode ("mov", "%s,x+", aopAdrStr (AOP (right), offset, false));
+          // emit6502op ("mov", "%s,x+", aopAdrStr (AOP (right), offset, false));
           litOffset--;
         }
       else
@@ -9446,7 +9455,7 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op ("lda", INDFMT_IY);
       emit6502op ("and", IMMDFMT, mask);
-//      emitcode ("ora19", "1,s");
+//      emit6502op ("ora19", "1,s");
       storeRegTemp(m6502_reg_a, true);
       emit6502op("pla","");
       emit6502op("pha","");
@@ -9501,7 +9510,7 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
           litval = ullFromVal (AOP (right)->aopu.aop_lit);
 	  // FIXME: unimplemented
           m6502_unimplemented("genPackBitsImmed 1");
-          //emitcode ((litval & 1) ? "bset" : "bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
+          //emit6502op ((litval & 1) ? "bset" : "bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
         }
       else
         {
@@ -9514,10 +9523,10 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
           loadRegFromAop (m6502_reg_a, AOP (right), 0);
           emit6502op ("lsr", "a");
           emitBranch ("bcs", tlbl1);
-          emitcode ("bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
+          emit6502op ("bclr", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
           emitBranch ("bra", tlbl2);
           safeEmitLabel (tlbl1);
-          emitcode ("bset", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
+          emit6502op ("bset", "#%d,%s", bstr, aopAdrStr (derefaop, 0, false));
           safeEmitLabel (tlbl2);
           pullOrFreeReg (m6502_reg_a, needpulla);
         }

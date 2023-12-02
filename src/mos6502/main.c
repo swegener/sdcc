@@ -840,7 +840,7 @@ PORT mos65c02_port =
     NULL,
     ".rel",
     1,
-    NULL,                       /* crt */
+    _crt,                       /* crt */
     _libs_m65c02,               /* libs */
   },
   {                             /* Peephole optimizer */

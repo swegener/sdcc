@@ -2,6 +2,8 @@
 
 	* support/regression/ports/pic16/spec.mk:
 	  pic16 regression test infrastructure fix, patch by Jonathon Hall.
+	* support/regression/tests/sdcccall.c.in:
+	  Disable a long long test for pic16, which does not support long long yet, patch by Jonathon Hall.
 
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 

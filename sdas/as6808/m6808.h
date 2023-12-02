@@ -96,7 +96,11 @@ struct adsym
  * Special Types
  */
 #define	S_SDP	80
-#define	S_CPU	81
+
+/*
+ * CPU Option
+ */
+#define	S_CPU	82
 
 /*
  * Processor Types (S_CPU)

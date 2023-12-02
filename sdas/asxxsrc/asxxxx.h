@@ -510,29 +510,29 @@ struct  sym
 
 #define S_EOL           040     /* End mark for ___pst files */
 
+#define S_NEW           0       /* New  Name (External) */
+#define S_USER          1       /* User Name (Assigned) */
+
 #define S_LCL           001     /* Local Variable */
 #define S_GBL           002     /* Global Variable */
 #define S_ASG           004     /* Assigned Value */
 #define S_MDF           010     /* Multiple Definition */
 
-#define S_NEW           0       /* New  Name (External) */
-#define S_USER          1       /* User Name (Assigned) */
-#define S_SPARE         2       /* Spare Definition */
-#define S_PAGE          3       /* .page */
-#define S_HEADER        4       /* .title, .sbttl */
+#define	S_PAGE		2	/* .page */
+#define	S_HEADER	3	/* .title, .sbttl */
 #define   O_TITLE    0          /* .title */
 #define   O_SBTTL    1          /* .sbttl */
-#define S_MODUL         5       /* .module */
-#define	S_INCL		6	/* .include, .incbin */
+#define	S_MODUL		4	/* .module */
+#define	S_INCL		5	/* .include, .incbin */
 #define	  I_CODE     0		/* .include */
 #define	  I_BNRY     1		/* .incbin */
-#define S_AREA          7       /* .area */
-#define S_ATYP          8       /* .area type */
-#define S_ORG           11      /* .org */
-#define S_RADIX         12      /* .radix */
-#define S_GLOBL         13      /* .globl */
-#define S_LOCAL         14      /* .local */
-#define S_CONDITIONAL   15      /* .if, .iif, .else, .endif, ... */
+#define	S_AREA		6	/* .area */
+#define S_ATYP          7       /* .area type */
+#define	S_ORG		8	/* .org */
+#define	S_RADIX		9	/* .radix */
+#define	S_GLOBL		10	/* .globl */
+#define	S_LOCAL		11	/* .local */
+#define	S_CONDITIONAL	12	/* .if, .iif, .else, .endif, ... */
 #define   O_IF       0          /* .if */
 #define   O_IFF      1          /* .iff */
 #define   O_IFT      2          /* .ift */
@@ -569,45 +569,45 @@ struct  sym
 #define   O_IIFEND   40         /* end of .iif conditionals */
 #define   O_ELSE     40         /* .else */
 #define   O_ENDIF    41         /* .endif */
-#define S_LISTING       16      /* .nlist, .list */
+#define	S_LISTING	13	/* .nlist, .list */
 #define   O_LIST     0          /* .list */
 #define   O_NLIST    1          /* .nlist */
-#define S_EQU           17      /* .equ, .gblequ, .lclequ */
+#define	S_EQU		14	/* .equ, .gblequ, .lclequ */
 #define   O_EQU      0          /* .equ */
 #define   O_GBLEQU   1          /* .gblequ */
 #define   O_LCLEQU   2          /* .lclequ */
-#define S_DATA          18      /* .byte, .word, .3byte, .4byte, .db, .dw, .fcb, .fdb */
+#define	S_DATA		15	/* .byte, .word, long, .3byte, .4byte, .db, .dw, .dl, .fcb, .fdb */
 #define   O_1BYTE    1          /* .byte, .db, .fcb */
 #define   O_2BYTE    2          /* .word, .dw, .fdb */
 #define   O_3BYTE    3          /* .3byte */
-#define   O_4BYTE    4          /* .4byte */
-#define	S_BLK		19	/* .blkb, .blkw, .blk3, .blk4, .ds, .rmb, .rs */
+#define	  O_4BYTE    4		/* .4byte, .long, .dl */
+#define	S_BLK		16	/* .blkb, .blkw, .blk3, .blk4, .ds, .rmb, .rs */
 /*	  O_1BYTE    1	*/	/* .blkb, .ds, .rmb, .rs */
 /*	  O_2BYTE    2	*/	/* .blkw */
 /*	  O_3BYTE    3	*/	/* .blk3 */
 /*	  O_4BYTE    4	*/	/* .blk4 */
-#define S_ASCIX         20      /* .ascii, .ascis, .asciz, .str, .strs, .strz */
+#define S_ASCIX         17      /* .ascii, .ascis, .asciz, .str, .strs, .strz */
 #define   O_ASCII    0          /* .ascii */
 #define   O_ASCIS    1          /* .ascis */
 #define   O_ASCIZ    2          /* .asciz */
-#define	S_DEFINE	21	/* .define, .undefine */
+#define	S_DEFINE	18	/* .define, .undefine */
 #define	  O_DEF      0		/* .define */
 #define	  O_UNDEF    1		/* .undefine */
-#define S_BOUNDARY      22      /* .even, .odd */
+#define	S_BOUNDARY	19	/* .even, .odd */
 #define   O_EVEN     0          /* .even */
 #define   O_ODD      1          /* .odd */
 #define   O_BNDRY    2          /* .bndry */
-#define	S_MSG		23	/* .msg */
-#define	S_ERROR		24	/* .assume, .error */
+#define	S_MSG		20	/* .msg */
+#define	S_ERROR		21	/* .assume, .error */
 #define	  O_ASSUME   0		/* .assume */
 #define	  O_ERROR    1		/* .error */
-#define S_BITS          26      /* .8bit, .16bit, .24bit, .32bit */
+#define S_BITS          23      /* .8bit, .16bit, .24bit, .32bit */
 /*        O_1BYTE    1  */      /* .8bit */
 /*        O_2BYTE    2  */      /* .16bit */
 /*        O_3BYTE    3  */      /* .24bit */
 /*        O_4BYTE    4  */      /* .32bit */
-#define S_END           27      /* .end */
-#define S_MACRO         28      /* .macro, .endm, .mexit, ... */
+#define	S_END		24	/* .end */
+#define	S_MACRO		25	/* .macro, .endm, .mexit, ... */
 #define   O_MACRO    0          /* .macro */
 #define   O_ENDM     1          /* .endm */
 #define   O_MEXIT    2          /* .mexit */

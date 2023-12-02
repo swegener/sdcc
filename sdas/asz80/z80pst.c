@@ -53,7 +53,9 @@ struct  mne     mne[] = {
     {	NULL,	".include",	S_INCL,		0,	I_CODE	},
     {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {   NULL,   ".area",        S_AREA,         0,      0       },
-
+//    {	NULL,	".psharea",	S_AREA,		0,	O_PSH	},
+//    {	NULL,	".poparea",	S_AREA,		0,	O_POP	},
+//    {	NULL,	".bank",	S_BANK,		0,	0	},
     {   NULL,   ".org",         S_ORG,          0,      0       },
     {   NULL,   ".radix",       S_RADIX,        0,      0       },
     {   NULL,   ".globl",       S_GLOBL,        0,      0       },
@@ -105,8 +107,10 @@ struct  mne     mne[] = {
     {   NULL,   ".fdb",         S_DATA,         0,      O_2BYTE },
     {   NULL,   ".3byte",       S_DATA,         0,      O_3BYTE },
     {   NULL,   ".triple",      S_DATA,         0,      O_3BYTE },
-/*    { NULL,   ".4byte",       S_DATA,         0,      O_4BYTE },      */
-/*    { NULL,   ".quad",        S_DATA,         0,      O_4BYTE },      */
+/*    {	NULL,	".dl",		S_DATA,		0,	O_4BYTE	},	*/
+/*    {	NULL,	".4byte",	S_DATA,		0,	O_4BYTE	},	*/
+/*    {	NULL,	".quad",	S_DATA,		0,	O_4BYTE	},	*/
+/*    {	NULL,	".long",	S_DATA,		0,	O_4BYTE	},	*/
     {   NULL,   ".df",          S_FLOAT,        0,      0       },
     {   NULL,   ".blkb",        S_BLK,          0,      O_1BYTE },
     {   NULL,   ".ds",          S_BLK,          0,      O_1BYTE },
@@ -115,6 +119,7 @@ struct  mne     mne[] = {
     {   NULL,   ".blkw",        S_BLK,          0,      O_2BYTE },
     {   NULL,   ".blk3",        S_BLK,          0,      O_3BYTE },
 /*    { NULL,   ".blk4",        S_BLK,          0,      O_4BYTE },      */
+/*    {	NULL,	".blkl",	S_BLK,		0,	O_4BYTE	},	*/
     {   NULL,   ".ascii",       S_ASCIX,        0,      O_ASCII },
     {   NULL,   ".ascis",       S_ASCIX,        0,      O_ASCIS },
     {   NULL,   ".asciz",       S_ASCIX,        0,      O_ASCIZ },

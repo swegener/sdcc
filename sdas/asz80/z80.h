@@ -157,16 +157,7 @@
 /*
  * CPU Types
  */
-#define	S_CPU	83
-
-/*
- * Processor Types (S_CPU)
- */
-#define	X_Z80	0
-#define	X_HD64	1
-#define	X_ZXN	2
-#define	X_EZ80	3
-#define X_R800  4
+#define	S_CPU	84
 
 /*
  * HD64180 Instructions
@@ -177,6 +168,15 @@
 #define	X_MLT	93
 #define	X_TST	94
 #define	X_TSTIO	95
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_Z80	0
+#define	X_HD64	1
+#define	X_ZXN	2
+#define	X_EZ80	3
+#define X_R800  4
 
 /*
  * Z80-ZX Next Instructions

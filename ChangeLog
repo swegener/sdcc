@@ -1,3 +1,12 @@
+2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
+
+	* sdas/asz80/z80pst.c,
+	  sdas/asz80/z80.h,
+	  sdas/asxxsrc/asxxxx.h,
+	  sdas/as6808/m6808.h,
+	  sdas/as6808/m08pst.c:
+	  Change several constants to match upstream asxxxx.
+
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-2776.c,

@@ -1,3 +1,8 @@
+2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/ports/pic16/spec.mk:
+	  pic16 regression test infrastructure fix, patch by Jonathon Hall.
+
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
 	* sdas/asz80/z80pst.c,

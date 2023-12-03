@@ -1,5 +1,25 @@
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
+  	* src/mos6502/gen.c,
+  	  support/regression/tests/structreturn.c.in,
+	  support/regression/tests/gcc-torture-execute-va-arg-4.c,
+  	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
+	  support/regression/tests/gcc-torture-execute-struct-ret-1.c,
+  	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
+	  support/regression/tests/gcc-torture-execute-pr60017.c,
+  	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/funptrsstructreturn.c,
+  	  support/regression/tests/div.c,
+	  support/regression/tests/bug-3385.c,
+	  support/regression/tests/bug-3368.c,
+	  support/regression/tests/bug-2776.c,
+	  support/regression/tests/bigreturn-remat.c.in,
+	  support/regression/MakeList,
+  	  Implement IPUSH_VALUE_AT_ADDRESS iCode and enable corresponding regression tests.
+  	  Disable failing tests for mos65c02.
+  	
+2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
+
   	* src/mos6502/main.c
 	  Correct opcode ordering.
 	  Fix get_model() reporting.

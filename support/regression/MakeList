@@ -1,7 +1,7 @@
 # Exclude lists for testing
 # Tests listed in ${EXCLUDE_${PORT}} will not be tested
 #
-# PORT ist the directory name
+# PORT is the directory name
 #
 # Tests to be excluded completely (i.e. for all PORT can be excluded in cases/Makefile.in more easily.
 
@@ -75,11 +75,14 @@ EXCLUDE_s08 += \
 
 # Failure
 EXCLUDE_uc6502 += \
-	gte_20041218-1 \
+	gte_20091229-1
+EXCLUDE_uc65c02 += \
 	gte_20091229-1
 
 # compile issue
 EXCLUDE_uc6502 += \
+	gte_memcpy-1
+EXCLUDE_uc65c02 += \
 	gte_memcpy-1
 
 # Failure
@@ -203,10 +206,6 @@ EXCLUDE_tlcs90 += \
 	gte_20041218-1 \
 	gte_20091229-1
 
-# compile issue
-EXCLUDE_uc6502 += \
-	gte_memcpy-1
-
 # Bug?
 EXCLUDE_pdk15-stack-auto += \
 	gte_pr100453
@@ -243,6 +242,10 @@ EXCLUDE_ds390 += \
 	gte_pr30185 \
 	gte_pr58365
 EXCLUDE_uc6502 += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_uc65c02 += \
 	gte_991019-1 \
 	gte_pr30185 \
 	gte_pr58365

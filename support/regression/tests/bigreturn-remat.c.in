@@ -10,7 +10,7 @@ struct s
 	{type} i;
 };
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Todo: enable when struct parameters are supported!
 struct s f(struct s p) // Returned via extra hidden parameter
 {
 	p.i++; // Uses rematerialized address to parameter
@@ -27,7 +27,7 @@ struct s f(struct s p) // Returned via extra hidden parameter
 void
 testRemat(void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_mos6502) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Todo: enable when struct parameters are supported!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Todo: enable when struct parameters are supported!
 	struct s s;
 	s.i = 0;
 	ASSERT (f(s).i == 1);

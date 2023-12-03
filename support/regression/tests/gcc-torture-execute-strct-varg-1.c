@@ -8,7 +8,6 @@ strct-varg-1.c from the execute part of the gcc torture tests.
 
 struct s { int x, y; };
 
-#if !defined(__SDCC_mos6502) // Todo: enable when struct parameters are supported!
 void
 f (int attr, ...)
 {
@@ -29,12 +28,10 @@ f (int attr, ...)
   ASSERT(!(va_values.x != 0xffff || va_values.y != 0x1111));
   va_end (va);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mos6502) // Todo: enable when struct parameters are supported!
   struct s a, b;
 
   a.x = 0xaaaa;
@@ -44,5 +41,4 @@ testTortureExecute (void)
 
   f (2, a, 3, b);
   return;
-#endif
 }

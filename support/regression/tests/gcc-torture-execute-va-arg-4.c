@@ -13,7 +13,6 @@ typedef struct {
   char a[32];
 } big;
 
-#if !defined(__SDCC_mos6502) // Todo: enable when struct parameters are supported!
 void
 f (big x, char *s, ...)
 {
@@ -30,15 +29,12 @@ f (big x, char *s, ...)
     ASSERT (0);
   va_end (ap);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mos6502) // Todo: enable when struct parameters are supported!
   static big x = { "abc" };
 
   f (x, "", 42, 'x', 0);
   return;
-#endif
 }

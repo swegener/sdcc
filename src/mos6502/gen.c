@@ -2198,7 +2198,7 @@ accopWithAop (char *accop, asmop *aop, int loffset)
 /* rmwWithReg - Emit read/modify/write instruction rmwop with register reg. */
 /*              byte at logical offset loffset of asmop aop. Register reg   */
 /*              must be 8-bit.                                              */
-/*              Supports: com, dec, inc, lsl, lsr, neg, rol, ror ??? - FIXME
+/*              Supports: com, dec, inc, lsl, lsr, neg, rol, ror - FIXME    */
 /*--------------------------------------------------------------------------*/
 static void
 rmwWithReg (char *rmwop, reg_info * reg)
@@ -4361,6 +4361,38 @@ genIpush (iCode * ic)
 release:
   freeAsmop (left, NULL);
 }
+
+/*-----------------------------------------------------------------*/
+/* genPointerPush - generate code for pushing                      */
+/*-----------------------------------------------------------------*/
+static void
+genPointerPush (iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  int yoff;
+
+  emitComment (TRACEGEN, __func__);
+
+  aopOp (left, ic);
+
+  wassertl (IC_RIGHT (ic), "IPUSH_VALUE_AT_ADDRESS without right operand");
+  wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "IPUSH_VALUE_AT_ADDRESS with non-literal right operand");
+  wassertl (!operandLitValue (IC_RIGHT(ic)), "IPUSH_VALUE_AT_ADDRESS with non-zero right operand");
+
+  yoff = setupDPTR(left, 0, NULL, false);
+
+
+  int size = getSize (operandType (left)->next);
+  while (size--)
+    {
+      loadRegFromConst(m6502_reg_y, yoff+size);
+      emit6502op("lda", INDFMT_IY);
+      pushReg (m6502_reg_a, true);
+    }
+
+  freeAsmop (left, NULL);
+}
+
 
 /*-----------------------------------------------------------------*/
 /* genSend - gen code for SEND                                     */
@@ -8968,9 +9000,9 @@ finish:
 }
 
 
-/**************************************************************************
- * genDataPointerGet - generates code when ptr offset is known
- *************************************************************************/
+/*-----------------------------------------------------------------*/
+/* genDataPointerGet - generates code when ptr offset is known     */
+/*-----------------------------------------------------------------*/
 static void
 genDataPointerGet (operand * left, operand * right, operand * result, iCode * ic, iCode * ifx)
 {
@@ -10627,8 +10659,7 @@ genm6502iCode (iCode *ic)
           break;
 
    case IPUSH_VALUE_AT_ADDRESS:
-      wassertl (0, "Unimplemented iCode: IPUSH_VALUE_AT_ADDRESS");
-      //genPointerPush (ic);
+      genPointerPush (ic);
       break;
 
     case CALL:

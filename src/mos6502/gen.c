@@ -5323,8 +5323,10 @@ genMinusDec (iCode * ic)
     return false;
 
   // do dex/dey and inx/iny if icount is negative
-  if(smallAdjustReg(AOP(result)->aopu.aop_reg[0],-icount))
+  if (/*size==1 && */ AOP(result)->type==AOP_REG) {
+    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0],-icount))
       return true;
+  }
 
   if ((icount > 1) || (icount < 0))
     return false;

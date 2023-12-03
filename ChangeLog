@@ -17,6 +17,8 @@
 	  support/regression/MakeList,
   	  Implement IPUSH_VALUE_AT_ADDRESS iCode and enable corresponding regression tests.
   	  Disable failing tests for mos65c02.
+	* src/mos6502/gen.c
+	  Make sure result is a register before dereferencing the pointer (fix bug #3631)
   	
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 

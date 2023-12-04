@@ -1,6 +1,19 @@
 2023-12-04 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/gen.c
+  	* device/lib/mos6502/_setjump.c,
+  	  device/lib/mos65c02/_setjump.c,
+  	  device/lib/mos6502-stack-auto/_setjump.c
+  	  Reduce ZP usage in setjump.
+  	* device/lib/mos6502/_ret01.s,
+  	  device/lib/mos6502/_ret23.s,
+	  device/lib/mos6502/_ret4567.s,
+	  device/lib/mos65c02/_ret01.s,
+  	  device/lib/mos65c02/_ret23.s,
+	  device/lib/mos65c02/_ret4567.s,
+	  device/lib/mos6502-stack-auto/_ret01.s,
+  	  device/lib/mos6502-stack-auto/_ret23.s,
+	  device/lib/mos6502-stack-auto/_ret4567.s
+	  Remove unnecessary .optsdcc directive.
 
 2023-12-03 Gabriele Gorla <gorlik@yahoo.com>
 

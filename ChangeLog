@@ -1,8 +1,11 @@
 2023-12-03 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c
-	  Fix bug #3511  	  
-  	 
+	  Fix bug #3511
+	* src/mos6502/gen.c,
+	  src/SDCCsymt.c
+  	  Add limited support to return aggregates to mos6502 port.
+  	  
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c,

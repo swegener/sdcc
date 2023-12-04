@@ -4266,7 +4266,12 @@ assignResultValue (operand * oper)
 
   emitComment (TRACEGEN, __func__);
 
-  if(AOP_TYPE (oper) == AOP_REG) {//
+      if(size>8) {
+          emitcode("ERROR","assignresultvalue return struct size: %d\n",size);
+	return;
+}
+
+  if(AOP_TYPE (oper) == AOP_REG) {
     if(size==1) {
       transferRegReg(m6502_reg_a, (AOP(oper))->aopu.aop_reg[0], true);
     } else {
@@ -4278,7 +4283,7 @@ assignResultValue (operand * oper)
         swapXA();
     }
     return;
-  }//
+  }
 
   while (size--)
     {
@@ -4937,6 +4942,22 @@ genRet (iCode * ic)
      move the return value into place */
   aopOp (left, ic);
   size = AOP_SIZE (left);
+  const bool bigreturn = IS_STRUCT (operandType (left));
+
+  if (bigreturn) // todo: implement!
+    {
+      if(size>8)
+          emitcode("ERROR","return struct size %d is too large\n",size);
+
+      while (size--)
+        {
+            transferAopAop (AOP (left), size, m6502_aop_pass[size], 0);
+       //   offset--;
+        }
+//      emitcode("ERROR","*** end return");
+
+      goto jumpret;
+    }
 
   if (AOP_TYPE (left) == AOP_LIT)
     {

@@ -11,6 +11,11 @@
   	  Add div and ldiv to the mos6502 standard library.
   	* device/lib/_divulonglong.c
   	  Trivial spelling fix.
+  	* sdas/as6500/r6500.h,
+  	  sdas/as6500/r65adr.c,
+  	  sdas/as6500/r65mch.c,
+  	  sdas/as6500/pst.c
+  	  Merge several minor changes from upstream asxxxx 5.50
   	    
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 

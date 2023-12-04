@@ -587,13 +587,13 @@ struct mne *mp;
 			outab(op + 0x04);
 			outrb(&e1, R_PAG0);
 			break;
-		case S_DINDX:
-			outab(op + 0x14);
-			outrb(&e1, R_PAG0);
-			break;
 		case S_EXT:
 			outab(op + 0x3C);
 			outrw(&e1, 0);
+			break;
+		case S_DINDX:
+			outab(op + 0x14);
+			outrb(&e1, R_PAG0);
 			break;
 		case S_INDX:
 			outab(op + 0x3E);

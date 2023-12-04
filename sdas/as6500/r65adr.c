@@ -57,20 +57,22 @@ struct expr *esp;
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
 		esp->e_mode = S_IMMED;
-	} else if (c == '*') {
+	} else
+        if (c == '*') {
 		expr(esp, 0);
-		esp->e_mode = S_DIR;
+			esp->e_mode = S_DIR;	/* ___  *arg */
 		if (more()) {
 			comma(1);
 			switch(admode(axy)) {
 			case S_X:
-				esp->e_mode = S_DINDX;
+				esp->e_mode = S_DINDX;	/* ___  *arg,X */
 				break;
 			case S_Y:
-				esp->e_mode = S_DINDY;
+				esp->e_mode = S_DINDY;	/* ___  *arg,Y */
 				break;
 			default:
 				aerr();
+				break;
 			}
 		}
 	} else if (c == '[') {
@@ -100,21 +102,21 @@ struct expr *esp;
 		unget(c);
 		switch(admode(axy)) {
 		case S_A:
-			esp->e_mode = S_ACC;
+			esp->e_mode = S_ACC;	/* ___  A */
 			break;
-		case S_X:
-		case S_Y:
+		case S_X:	/* ___  X  Is Illegal */
+		case S_Y:	/* ___  Y  Is Illegal */
 			aerr();
 			break;
 		default:
 			if (!more()) {
-			    esp->e_mode = S_ACC;
+			    esp->e_mode = S_ACC;	/* ___  BLANK  ->  ___  A */
 			} else {
 			    expr(esp, 0);
 			    if (more()) {
 				comma(1);
 				switch(admode(axy)) {
-				case S_X:
+				case S_X:	/* ___  arg,X */
 					if ((!esp->e_flag)
 						&& (esp->e_base.e_ap==NULL)
 						&& !(esp->e_addr & ~0xFF)) {
@@ -129,7 +131,7 @@ struct expr *esp;
 					    }
 					}
 					break;
-				case S_Y:
+				case S_Y:	/* ___  arg,Y */
 					if ((!esp->e_flag)
 						&& (esp->e_base.e_ap==NULL)
 						&& !(esp->e_addr & ~0xFF)) {

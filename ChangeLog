@@ -9,7 +9,9 @@
   	  device/lib/ldiv.c,
   	  device/include/stdlib.h
   	  Add div and ldiv to the mos6502 standard library.
-  	  
+  	* device/lib/_divulonglong.c
+  	  Trivial spelling fix.
+  	    
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c,

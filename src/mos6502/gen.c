@@ -9394,14 +9394,14 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
   /* all except the partial byte at the end                 */
   for (rlen = blen; rlen >= 8; rlen -= 8)
     {
-      if (!litOffset && !rematOffset && AOP (right)->type == AOP_DIR)
+   /*   if (!litOffset && !rematOffset && AOP (right)->type == AOP_DIR)
         {
 	  // FIXME: unimplemented
           m6502_unimplemented("genPackBits");
           // emit6502op ("mov", "%s,x+", aopAdrStr (AOP (right), offset, false));
           litOffset--;
         }
-      else
+      else*/
         {
           if (AOP_TYPE (right) == AOP_REG)
             pullReg (m6502_reg_a);
@@ -9874,8 +9874,8 @@ genPointerSet (iCode * ic)
 
     int yoff = setupDPTR(result, litOffset, rematOffset, false);
     if(IS_AOP_WITH_A (AOP(right))) {
-          loadRegTempAt(m6502_reg_a, aloc);
-    } 
+      loadRegTempAt(m6502_reg_a, aloc);
+    }
     if(IS_AOP_WITH_X (AOP(right))) {
       if(needpullx) loadRegTempAt(m6502_reg_x, xloc);
     }

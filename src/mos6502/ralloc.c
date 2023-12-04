@@ -227,7 +227,7 @@ createStackSpil (symbol * sym)
   /* set the type to the spilling symbol */
   sloc->type = copyLinkChain (sym->type);
   sloc->etype = getSpec (sloc->type);
-  SPEC_SCLS (sloc->etype) = S_DATA;
+  SPEC_SCLS (sloc->etype) = (options.xdata_spill)?S_XDATA:S_DATA;
   SPEC_EXTR (sloc->etype) = 0;
   SPEC_STAT (sloc->etype) = 0;
   SPEC_VOLATILE(sloc->etype) = 0;
@@ -278,7 +278,7 @@ createStackSpil (symbol * sym)
 }
 
 /*-----------------------------------------------------------------*/
-/* spillThis - spils a specific operand                            */
+/* spillThis - spills a specific operand                           */
 /*-----------------------------------------------------------------*/
 void
 m6502SpillThis (symbol * sym)
@@ -1306,7 +1306,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                 }
 
               /* if some liverange has been spilt at the block level
-                 and this one live beyond this block then spil this
+                 and this one live beyond this block then spill this
                  to be safe */
               if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
                 {

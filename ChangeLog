@@ -14,7 +14,12 @@
   	  device/lib/mos6502-stack-auto/_ret23.s,
 	  device/lib/mos6502-stack-auto/_ret4567.s
 	  Remove unnecessary .optsdcc directive.
-
+	* src/SDCCmem.c,
+	  src/SDCCglobl.h,
+	  src/mos6502/ralloc.c,
+	  src/mos6502/main.c
+	  Add --no-zp-spill option to avoid register spills in ZP.
+	  
 2023-12-03 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c

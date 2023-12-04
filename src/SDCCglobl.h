@@ -332,6 +332,8 @@ struct options
     bool oldralloc;             /* Use old register allocator */
     int sdcccall;               /* ABI version */
     bool allow_undoc_inst;      /* Allow the use of undocumented instructions */
+//    int xdata_overlay;          /* Place the overlay in 16-bit addressable memory to conserve ZP space */
+    int xdata_spill;            /* Place the register spills in 16-bit addressable memory */
   };
 
 /* forward definition for variables accessed globally */

@@ -21,10 +21,6 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #include "common.h"
@@ -36,6 +32,8 @@
 
 #define OPTION_SMALL_MODEL          "--model-small"
 #define OPTION_LARGE_MODEL          "--model-large"
+//#define OPTION_XDATA_OVR            "--xdata-overlay"
+#define OPTION_XDATA_SPILL          "--no-zp-spill"
 //#define OPTION_CODE_SEG        "--codeseg"
 //#define OPTION_CONST_SEG       "--constseg"
 //#define OPTION_DATA_SEG        "--dataseg"
@@ -48,6 +46,8 @@ extern int dwarf2FinalizeFile(FILE *);
 static OPTION mos6502_options[] = {
     {0, OPTION_SMALL_MODEL, NULL, "8-bit address space for data"},
     {0, OPTION_LARGE_MODEL, NULL, "16-bit address space for data (default)"},
+//    {0, OPTION_XDATA_OVR,   &options.xdata_overlay, "place overlay segment in 16-bit address space"},
+    {0, OPTION_XDATA_SPILL, &options.xdata_spill,   "place register spills in 16-bit address space"},
     //    {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
     //    {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
     //    {0, OPTION_DATA_SEG,        &options.data_seg, "<name> use this name for the data segment", CLAT_STRING},
@@ -195,6 +195,8 @@ m6502_setDefaultOptions (void)
   options.omitFramePtr = 1;     /* no frame pointer (we use SP */
                                 /* offsets instead)            */
   options.out_fmt = 'i';        /* Default output format is ihx */
+//  options.xdata_overlay = 0;    /* Overlay in ZP */
+  options.xdata_spill = 0;      /* Spill in ZP   */
 }
 
 static const char *
@@ -211,9 +213,13 @@ m6502_genAssemblerPreamble (FILE * of)
   fprintf(of, ";; Ordering of segments for the linker.\n");
   tfprintf (of, "\t!area\n", DATA_NAME);
   tfprintf (of, "\t!area\n", OVERLAY_NAME);
+//  if(options.xdata_overlay==0) 
+//      tfprintf (of, "\t!area    (PAG, OVR)\n", OVERLAY_NAME);
 
   tfprintf (of, "\t!area\n", "_DATA");
   tfprintf (of, "\t!area\n", XIDATA_NAME);
+//  if(options.xdata_overlay) 
+//      tfprintf (of, "\t!area    (OVR)\n", OVERLAY_NAME);
   tfprintf (of, "\t!area\n", XDATA_NAME);
 
   tfprintf (of, "\t!area\n", HOME_NAME);
@@ -723,11 +729,11 @@ PORT mos6502_port =
     NULL,                 /* bit */
     "RSEG    (ABS)",      /* reg */
     "GSINIT",             /* static initialization */
-    "OSEG    (PAG, OVR)", /* overlay */
+    "OSEG",               /* overlay */
     "GSFINAL",            /* gsfinal */
     "_CODE",              /* home */
     "DATA",               /* initialized xdata */
-    "XINIT",              /* a code copy of xiseg */
+    "XINIT",              /* a code copy of DATA */
     "RODATA",             /* const_name */
     "CABS    (ABS)",      /* cabs_name - const absolute data */
     "DABS    (ABS)",      /* xabs_name - absolute xdata */
@@ -883,11 +889,11 @@ PORT mos65c02_port =
     NULL,                 // bit
     "RSEG    (ABS)",      // reg
     "GSINIT",             // static initialization
-    "OSEG    (PAG, OVR)", // overlay
+    "OSEG",               // overlay
     "GSFINAL",            // gsfinal
     "_CODE",              // home
     "DATA",               // initialized xdata
-    "XINIT",              // a code copy of xiseg
+    "XINIT",              // a code copy of DATA
     "RODATA",             // const_name - const data (code or not)
     "CABS    (ABS)",      // cabs_name - const absolute data (code or not)
     "DABS    (ABS)",      // xabs_name - absolute xdata

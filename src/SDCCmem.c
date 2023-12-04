@@ -964,6 +964,7 @@ overlay2data ()
        sym = setNextItem (overlay->syms))
     {
 
+//      SPEC_OCLS (sym->etype) = (options.xdata_spill)?xdata:data;
       SPEC_OCLS (sym->etype) = data;
       allocIntoSeg (sym);
     }

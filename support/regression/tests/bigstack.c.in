@@ -15,7 +15,7 @@ volatile {type2} int2;
 
 #ifdef __SDCC_pdk14
 #define ARRAYSIZE 30
-#elif defined (__SDCC_pdk15) || defined (__SDCC_mcs51)
+#elif defined (__SDCC_pdk15) || defined (__SDCC_mcs51) || defined (__SDCC_mos6502) || defined (__SDCC_mos65c02)
 #define ARRAYSIZE 60
 #else
 #define ARRAYSIZE 780 // Needs to be bigger than 266 to reliably trigger conditions for stm8, also sufficient for z80

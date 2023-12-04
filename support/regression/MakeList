@@ -72,18 +72,16 @@ EXCLUDE_ARCH_mcs51 += \
 	gte_memcpy-1
 EXCLUDE_s08 += \
 	gte_memcpy-1
+# fail
+EXCLUDE_hc08 += \
+	gte_memcpy-1
+# compile issue - test is malformed unless STACK_SIZE is defined
+EXCLUDE_ARCH_mos6502 += \
+	gte_memcpy-1
 
 # Failure
-EXCLUDE_uc6502 += \
+EXCLUDE_ARCH_mos6502 += \
 	gte_20091229-1
-EXCLUDE_uc65c02 += \
-	gte_20091229-1
-
-# compile issue
-EXCLUDE_uc6502 += \
-	gte_memcpy-1
-EXCLUDE_uc65c02 += \
-	gte_memcpy-1
 
 # Failure
 EXCLUDE_ucr3ka += \
@@ -150,10 +148,6 @@ EXCLUDE_ucz80-nmos += \
 # Fail
 EXCLUDE_ucr800 += \
 	gte_20091229-1
-
-# fail
-EXCLUDE_hc08 += \
-	gte_memcpy-1
 
 # Failure
 EXCLUDE_hc08 += \
@@ -241,12 +235,7 @@ EXCLUDE_ds390 += \
 	gte_991019-1 \
 	gte_pr30185 \
 	gte_pr58365
-EXCLUDE_uc6502 += \
-	gte_991019-1 \
-	gte_pr30185 \
-	gte_pr58365
-EXCLUDE_uc65c02 += \
-	gte_991019-1 \
+EXCLUDE_ARCH_mos6502 += \
 	gte_pr30185 \
 	gte_pr58365
 
@@ -296,6 +285,9 @@ EXCLUDE_mcs51-medium += \
 	gte_shiftdi-2
 EXCLUDE_mcs51-large-stack-auto += \
 	gte_loop-ivopts-2
+EXCLUDE_uc6502-stack-auto += \
+	gte_loop-ivopts-2
+
 
 ###################################################
 # QuickC Tests
@@ -440,3 +432,8 @@ EXCLUDE_pdk14 += ${EXCLUDE_ARCH_pdk}
 EXCLUDE_pdk15 += ${EXCLUDE_ARCH_pdk}
 EXCLUDE_pdk15-stack-auto += ${EXCLUDE_ARCH_pdk}
 ###################################################
+EXCLUDE_uc6502 += ${EXCLUDE_ARCH_mos6502}
+EXCLUDE_uc65c02 += ${EXCLUDE_ARCH_mos6502}
+EXCLUDE_uc6502-stack-auto += ${EXCLUDE_ARCH_mos6502}
+###################################################
+

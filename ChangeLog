@@ -16,7 +16,12 @@
   	  sdas/as6500/r65mch.c,
   	  sdas/as6500/pst.c
   	  Merge several minor changes from upstream asxxxx 5.50
-  	    
+  	* support/regression/MakeList,
+  	  support/regression/tests/bigstack.c.in,
+  	  support/regression/tests/div.c,
+  	  support/regression/tests/gcc-roture-execute-20131127-1.c
+  	  Enable additional tests for mos6502.
+  	  
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c,

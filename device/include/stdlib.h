@@ -144,10 +144,12 @@ typedef struct
 	long long int quot;
 	long long int rem;
 } lldiv_t;
-#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) // struct return not yet supported
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // struct return not yet supported
 div_t div(int numer, int denom);
 ldiv_t ldiv(long int numer, long int denom);
+#if !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // size of struct return is limited to <= 8 
 lldiv_t lldiv(long long int numer, long long int denom);
+#endif
 #endif
 
 /* C99 Multibyte/wide character conversion functions (ISO C11 7.22.7) */

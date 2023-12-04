@@ -5,6 +5,10 @@
 	* src/mos6502/gen.c,
 	  src/SDCCsymt.c
   	  Add limited support to return aggregates to mos6502 port.
+  	* device/lib/div.c,
+  	  device/lib/ldiv.c,
+  	  device/include/stdlib.h
+  	  Add div and ldiv to the mos6502 standard library.
   	  
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 

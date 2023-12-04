@@ -35,15 +35,6 @@ static void dummy (void) __naked
         __asm
 
 ;--------------------------------------------------------
-; overlayable items in ram
-;--------------------------------------------------------
-        .area   OSEG    (PAG, OVR)
-___setjmp_buf:
-        .ds 2
-        .area   OSEG    (PAG, OVR)
-_longjmp_buf:
-        .ds 2
-;--------------------------------------------------------
 ; extended address mode data
 ;--------------------------------------------------------
         .area BSS
@@ -65,22 +56,22 @@ _longjmp_PARM_2:
 ;       Stack space usage: 1 bytes.
         .globl ___setjmp
 ___setjmp:
-        stx	*(___setjmp_buf + 1)		; msb(buf)
-        sta	*(___setjmp_buf + 0)		; lsb(buf)
+        stx	*(DPTR + 1)		; msb(buf)
+        sta	*(DPTR + 0)		; lsb(buf)
 
         ; save stack pointer
         tsx
         ldy	#0
         txa
-        sta	[___setjmp_buf],y
+        sta	[DPTR],y
 
         ; save return address
         lda	0x101,x
         iny
-        sta	[___setjmp_buf],y
+        sta	[DPTR],y
         lda	0x102,x
         iny
-        sta	[___setjmp_buf],y
+        sta	[DPTR],y
 
         ; return 0
         lda	#0
@@ -101,21 +92,21 @@ ___setjmp:
         .globl _longjmp
         .globl _longjmp_PARM_2
 _longjmp:
-        stx	*(_longjmp_buf + 1)		; msb(buf)
-        sta	*(_longjmp_buf + 0)		; lsb(buf)
+        stx	*(DPTR + 1)		; msb(buf)
+        sta	*(DPTR + 0)		; lsb(buf)
 
         ; restore stack pointer
         ldy	#0
-        lda	[___setjmp_buf],y
+        lda	[DPTR],y
         tax
         txs
 
         ; set return address
         iny
-        lda	[___setjmp_buf],y
+        lda	[DPTR],y
         sta	0x101,x
         iny
-        lda	[___setjmp_buf],y
+        lda	[DPTR],y
         sta	0x102,x
 
 ;_setjmp.c:224: return rv ? rv : 1;

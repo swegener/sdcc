@@ -1,3 +1,11 @@
+2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/include/pic16/pic16devices.txt,
+	  device/lib/pic16/startup/crt0iz.c,
+	  src/pic16/glue.c,
+	  support/regression/ports/pic16/spec.mk:
+	  pic16 memory zeroing fixes, patch by Jonathon Hall.
+
 2023-12-04 Gabriele Gorla <gorlik@yahoo.com>
 
   	* device/lib/mos6502/_setjump.c,
@@ -43,7 +51,7 @@
   	  support/regression/tests/div.c,
   	  support/regression/tests/gcc-roture-execute-20131127-1.c
   	  Enable additional tests for mos6502.
-  	  
+
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c,

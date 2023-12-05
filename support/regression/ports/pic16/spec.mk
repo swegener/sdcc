@@ -32,9 +32,6 @@ endif
 SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q
 SDCCFLAGS += --no-peep
 SDCCFLAGS += --no-warn-non-free
-# The default crt0iz.o does not work in the simulator.  It clears all memory
-# from 0xeff to 0x0, many devices don't have that much memory.
-SDCCFLAGS += --use-crt=crt0i.o
 LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib
 
 OBJEXT = .o

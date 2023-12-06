@@ -1,8 +1,11 @@
 2023-12-06 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* device/lib/mos6502/_muluchar.c,
-  	  device/lib/mos6502/_mulschar.c
+  	* device/lib/mos6502/_muluchar.s,
+  	  device/lib/mos6502/_mulschar.s
   	  use ZP instead of absolute address
+   	* device/lib/mos6502/_strcpy.s,
+  	  device/lib/mos6502/_strcmp.s
+  	  use DPTR instead of temp
   	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -729,7 +729,7 @@ PORT mos6502_port =
     NULL,                 /* bit */
     "RSEG    (ABS)",      /* reg */
     "GSINIT",             /* static initialization */
-    "OSEG",               /* overlay */
+    "OSEG    (PAG, OVR)", /* overlay */
     "GSFINAL",            /* gsfinal */
     "_CODE",              /* home */
     "DATA",               /* initialized xdata */
@@ -889,7 +889,7 @@ PORT mos65c02_port =
     NULL,                 // bit
     "RSEG    (ABS)",      // reg
     "GSINIT",             // static initialization
-    "OSEG",               // overlay
+    "OSEG    (PAG, OVR)", // overlay
     "GSFINAL",            // gsfinal
     "_CODE",              // home
     "DATA",               // initialized xdata

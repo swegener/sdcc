@@ -1,3 +1,9 @@
+2023-12-06 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* device/lib/mos6502/_muluchar.c,
+  	  device/lib/mos6502/_mulschar.c
+  	  use ZP instead of absolute address
+  	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/include/pic16/pic16devices.txt,

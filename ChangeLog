@@ -8,6 +8,10 @@
   	  use DPTR instead of temp
    	* device/lib/mos6502/_strlen.s
 	  implement strlen in asm
+   	* device/lib/mos6502/_memset.s,
+   	  device/lib/mos6502/crt0.s
+   	  implement memset in asm
+   	  
   	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 

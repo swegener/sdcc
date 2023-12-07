@@ -9543,7 +9543,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-mos6502, pic14, pic16: structures
+pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -10036,7 +10036,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-mos6502, pic14, pic16: structures
+pic14, pic16: structures
 \begin_inset Index idx
 status collapsed
 
@@ -12105,6 +12105,46 @@ PIC16
 
 -bit processors (p18f452 and variants.
  In development, not complete).
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mmos6502
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-mmos6502
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the original MOS Technology NMOS 6502 processor and compatibl
+e derivatives including the 6510 and 8502.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mmos65c02
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-mmos65c02
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the CMOS Rockwell/WDC 65C02.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -19122,6 +19162,172 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
+MOS6502 Options
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Options MOS6502
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+MOS6502 options
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-small
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-small
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for small model programs, see section Memory Models for more
+ details.
+ 
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-large
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-large
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for large model programs, see section Memory Models for more
+ details.
+ This is the default memory model.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-zp-spill
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-zp-spill
+\end_layout
+
+\end_inset
+
+
+\series default
+ Force the compiler to spill registers to 16-bit addressable memory (xdata)
+ instead of Page Zero.
+ When running out of Page Zero space, this option will allow to free many
+ Page Zero locations at the expense of slightly larger and slower code
+\end_layout
+
+\begin_layout Subsection
 Intermediate Dump Options
 \begin_inset CommandInset label
 LatexCommand label
@@ -22812,7 +23018,7 @@ data (hc08 named address space)
 \end_layout
 
 \begin_layout Standard
-Variables int the address space __data resides in the first 256 bytes of
+Variables in the address space __data resides in the first 256 bytes of
  memory (the direct page).
  The HC08
 \begin_inset Index idx
@@ -22982,6 +23188,112 @@ sfr16
 
 \begin_layout Standard
 The Padauk family has a 16-bit timer accessed with special instructions.
+\end_layout
+
+\begin_layout Subsection
+MOS6502 intrinsic named address spaces
+\end_layout
+
+\begin_layout Subsubsection
+__zp/__data
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+data (hc08 named address space)
+\end_layout
+
+\end_inset
+
+ /__near
+\end_layout
+
+\begin_layout Standard
+Variables in the address space __zp resides in the first 256 bytes of memory
+ (the Page Zero).
+ The MOS6502
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+MOS6502
+\end_layout
+
+\end_inset
+
+ is most efficient at accessing variables stored here.
+ Pointers can only be dereferenced directly if they reside in Page Zero.
+ This is the default for the small memory model.
+\end_layout
+
+\begin_layout Subsubsection
+__xdata
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+xdata (hc08 named address space)
+\end_layout
+
+\end_inset
+
+ /__far
+\end_layout
+
+\begin_layout Standard
+Variables in the address space __xdata can reside anywhere in the 64K memory
+ space.
+ This is the default (for the large memory model).
 \end_layout
 
 \begin_layout Subsection
@@ -35974,6 +36286,62 @@ In the large memory model, the address space is 16 bits for objects and
  can be used for functions.
  Code generated for the large model is slightly bigger and slower and needs
  slightly more stack space than code generated for the medium model.
+\end_layout
+
+\begin_layout Subsection
+MOS6502 Memory Models
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Memory model
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+MOS6502 memory models
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SDCC implements two memory models for the MOS6502: 
+\emph on
+small
+\emph default
+ and 
+\emph on
+large
+\emph default
+ (default).
+ Modules compiled with different memory models should 
+\emph on
+never
+\emph default
+ be combined together.
+ The library routines supplied with the compiler are compiled for all models.
+\end_layout
+
+\begin_layout Standard
+In the small model all data objects are placed by default in Page Zero.
+ This is normally only useful in embedded systems.
+\end_layout
+
+\begin_layout Standard
+In the large memory model, data is placed by default in 16-bit addressable
+ memory.
+ Critical data can still be placed in Page Zero using the __ZP or __near
+ storage modifier.
+ Code generated for the large model is slightly bigger and slower than code
+ generated for the small model.
 \end_layout
 
 \begin_layout Section
@@ -52893,6 +53261,93 @@ reference "sec:Quality-control"
  target.
 \end_layout
 
+\begin_layout Section
+The MOS6502 port
+\end_layout
+
+\begin_layout Standard
+The mos6502
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+MOS6502
+\end_layout
+
+\end_inset
+
+ port can target the original MOS Technology NMOS 6502 , and the CMOS Rockwell/W
+DC 65C02 with enhanched instruction set.
+ 
+\end_layout
+
+\begin_layout Subsection
+Startup Code
+\end_layout
+
+\begin_layout Standard
+On the MOS6502
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+MOS6502
+\end_layout
+
+\end_inset
+
+ the startup code is inserted by linking with crt0.rel which is generated
+ from sdcc/device/lib/mos6502/crt0.s.
+ If you need a different startup code you can use the compiler option 
+\emph on
+-
+\series bold
+\emph default
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+\emph on
+-no-std-crt0
+\emph default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-std-crt0
+\end_layout
+
+\end_inset
+
+ and provide your own crt0.rel.
+ When using a custom crt0.rel it needs to be listed first when linking.
+\end_layout
+
 \begin_layout Chapter
 Debugging
 \end_layout
@@ -57558,7 +58013,7 @@ Tools
 \begin_layout Standard
 \align left
 \begin_inset Tabular
-<lyxtabular version="3" rows="28" columns="3">
+<lyxtabular version="3" rows="29" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -58133,6 +58588,44 @@ sdcc/bin
 \begin_inset Text
 
 \begin_layout Plain Layout
+sdas6500
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+assembler
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 sdas8051
 \end_layout
 
@@ -58509,7 +59002,7 @@ sdcc/bin
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58528,7 +59021,7 @@ uCsim
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58537,7 +59030,7 @@ simulator for various architectures
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout

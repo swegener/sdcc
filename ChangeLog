@@ -14,6 +14,8 @@
    	* device/lib/mos6502/abs.s,
    	  device/lib/mos6502/abs.c
    	  rename abs.c to abs.s
+   	* doc/sdccman.lyx
+   	  add mos6502 port documentation to SDCC manual
    	  
   	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>

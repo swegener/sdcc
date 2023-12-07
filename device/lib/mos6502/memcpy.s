@@ -3,7 +3,7 @@
 ;
 ;   Copyright (C) 2003, Ullrich von Bassewitz
 ;   Copyright (C) 2009, Christian Krueger
-;   Copyright (C) 2022, Gabriele Gorla
+;   Copyright (C) 2022-2023, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module ___memcpy
+;	.module __memcpy
 
 ;--------------------------------------------------------
 ; exported symbols
@@ -36,13 +36,18 @@
 	.globl ___memcpy_PARM_2
 	.globl ___memcpy_PARM_3
 	.globl ___memcpy
+	.globl _memcpy_PARM_2
+	.globl _memcpy_PARM_3
+	.globl _memcpy
 
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+_memcpy_PARM_2:
 ___memcpy_PARM_2:
 	.ds 2
+_memcpy_PARM_3:
 ___memcpy_PARM_3:
 	.ds 2
 
@@ -50,7 +55,7 @@ ___memcpy_PARM_3:
 ; local aliases
 ;--------------------------------------------------------
 	.define save  "REGTEMP+0"
-	.define dst   "REGTEMP+2"
+	.define dst   "DPTR"
 	.define src   "___memcpy_PARM_2"
 	.define count "___memcpy_PARM_3"
 
@@ -59,6 +64,7 @@ ___memcpy_PARM_3:
 ;--------------------------------------------------------
 	.area CODE
 
+_memcpy:
 ___memcpy:
 	sta	*save+0
 	stx	*save+1
@@ -69,11 +75,11 @@ ___memcpy:
 	ldx	*count+1
 	beq	00002$
 00001$:
-	lda	[*src],y
-	sta	[*dst],y
+	lda	[src],y
+	sta	[dst],y
 	iny
-	lda	[*src],y
-	sta	[*dst],y
+	lda	[src],y
+	sta	[dst],y
 	iny
 	bne	00001$
 	inc	*src+1
@@ -84,8 +90,8 @@ ___memcpy:
 	ldx	*count+0
 	beq	00004$
 00003$:
-	lda	[*src],y
-	sta	[*dst],y
+	lda	[src],y
+	sta	[dst],y
 	iny
 	dex
 	bne	00003$

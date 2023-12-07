@@ -54,17 +54,15 @@ MOS6502_LONGLONG = $(COMMON_LONGLONG) \
 MOS6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
-  __memcpy.c \
   _heap.c \
   _memmove.c \
-  _spx.c \
   _startup.c \
   _strcmp.c \
   _strcpy.c \
   _strlen.c \
+  memcpy.c \
   div.c \
   ldiv.c \
-  memcpy.c \
   sprintf.c \
   vprintf.c \
   atomic_flag_clear.c

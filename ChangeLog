@@ -1,3 +1,11 @@
+2023-12-07 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* device/lib/mos6502/memcpy.s,
+  	  device/lib/mos6502/_memcmp.s,
+  	  device/lib/mos6502/_setjmp.s,
+  	  device/lib/mos6502/Makefile.in
+  	  optimize memcpy, memcmp amd setjump implemetations
+  	
 2023-12-06 Gabriele Gorla <gorlik@yahoo.com>
 
   	* device/lib/mos6502/_muluchar.s,
@@ -17,7 +25,6 @@
    	* doc/sdccman.lyx
    	  add mos6502 port documentation to SDCC manual
    	  
-  	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/include/pic16/pic16devices.txt,

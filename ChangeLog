@@ -11,6 +11,9 @@
    	* device/lib/mos6502/_memset.s,
    	  device/lib/mos6502/crt0.s
    	  implement memset in asm
+   	* device/lib/mos6502/abs.s,
+   	  device/lib/mos6502/abs.c
+   	  rename abs.c to abs.s
    	  
   	
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>

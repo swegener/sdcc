@@ -71,8 +71,8 @@ CFLAGS = -I$(srcdir)/../../include -I. --std-c23
 all: $(PORTDIR)/$(LIB)
 
 $(PORTDIR)/$(LIB): $(OBJ) $(HC08OBJECTS) Makefile
+	rm -f $@
 ifeq ($(LIB_TYPE), SDCCLIB)
-	rm -f $@; \
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
@@ -81,7 +81,6 @@ else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(SDAR) -rcD $@ $(OBJ) $(HC08OBJECTS)
     else
-	rm -f $@
 	for i in $(basename $(OBJ) $(HC08OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(HC08OBJECTS) $(PORTDIR)
     endif

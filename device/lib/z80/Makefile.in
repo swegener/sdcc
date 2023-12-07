@@ -65,9 +65,6 @@ all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.rel
 $(PORTDIR)/crt0.rel: crt0.rel
 	cp crt0.rel $(PORTDIR)/crt0.rel
 
-Makefile: $(srcdir)/Makefile.in
-	cd $(top_builddir); ./config.status device/lib/z80/Makefile
-
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
 	rm -f $@
 ifeq ($(LIB_TYPE), SDCCLIB)
@@ -91,3 +88,5 @@ clean:
 distclean: clean
 	rm -f Makefile
 
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/z80/Makefile

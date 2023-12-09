@@ -1,3 +1,8 @@
+2023-12-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/gen.c:
+	  Fix a popP bug.
+
 2023-12-07 Gabriele Gorla <gorlik@yahoo.com>
 
   	* device/lib/mos6502/memcpy.s,

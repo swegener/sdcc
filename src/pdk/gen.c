@@ -960,13 +960,13 @@ adjustStack (int n, bool a_free, bool p_free)
 static void popP (bool a_dead)
 {
   pushAF ();
-  pointPStack (G.stack.pushed - 3, false, true);
+  pointPStack (G.stack.pushed - 3, true, true);
   emit2 ("idxm", "a, p");
   emit2 ("mov", "p, a");
   cost (2, 3);
+  G.p.type = AOP_INVALID;
   popAF ();
   adjustStack (-2, a_dead, false);
-  G.p.type = AOP_INVALID;
 }
 
 static void
@@ -3951,7 +3951,9 @@ genRightShift (const iCode *ic)
       if (!shCount)
         goto release;
 
-      bool loop = (shCount > 2 + (size == 1) * 2 + optimize.codeSpeed) && !(size == 1 && aopInReg (result->aop, 0, A_IDX)) &&
+      bool loop = (shCount > 2 + (size == 1) * 2 + optimize.codeSpeed) &&
+        !(shCount == 7 && size == 1 && (result->aop->type == AOP_REG || result->aop->type == AOP_DIR)) && // Right shift by 7 can be optimized in some cases
+        !(size == 1 && aopInReg (result->aop, 0, A_IDX)) &&
         regDead (A_IDX, ic) && !aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX);
 
       symbol *tlbl = (!loop || regalloc_dry_run) ? 0 : newiTempLabel (0);

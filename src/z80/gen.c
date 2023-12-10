@@ -9160,13 +9160,21 @@ genMultTwoChar (const iCode *ic)
 
   emit2 ("mul");
   cost (1, 12);
-  
-  genMove (IC_RESULT (ic)->aop, ASMOP_HLBC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), true, true);
-  
+
   if (save_de)
     _pop (PAIR_DE);
+
+  genMove (ic->result->aop, ASMOP_HLBC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), true, true);
+
   if (save_bc)
-    _pop (PAIR_BC);
+    {
+      if (ic->result->aop->regs[B_IDX] >= 0)
+        poppairwithsavedreg (PAIR_BC, B_IDX, -1);
+      else if (ic->result->aop->regs[C_IDX] >= 0)
+        poppairwithsavedreg (PAIR_BC, C_IDX, -1);
+      else
+        _pop (PAIR_BC);
+    }
 }
 
 /*-----------------------------------------------------------------*/

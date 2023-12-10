@@ -4,6 +4,8 @@
 	  Fix simulation of z flag for not and neg.
 	* src/pdk/gen.c:
 	  pdk code generation improvements.
+	* src/z80/gen.c:
+	  Fix a Rabbit multiplication code generation bug.
 
 2023-12-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

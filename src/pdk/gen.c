@@ -960,13 +960,9 @@ adjustStack (int n, bool a_free, bool p_free)
 static void popP (bool a_dead)
 {
   pushAF ();
-  pointPStack (G.stack.pushed - 3, true, true);
-  emit2 ("idxm", "a, p");
-  emit2 ("mov", "p, a");
-  cost (2, 3);
-  G.p.type = AOP_INVALID;
+  moveStackStack (G.stack.pushed - 3, G.stack.pushed - 1, 1, true); // Copy flags.
   popAF ();
-  adjustStack (-2, a_dead, false);
+  popPF (a_dead);
 }
 
 static void
@@ -1519,6 +1515,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
   for (int i = 0; i < size; i++)
     {
       bool maskedbyte = maskedtopbyte && (i + 1 == size);
+      bool a_dead = regDead (A_IDX, ic) && !(i && aopInReg (result_aop, i - 1, A_IDX));
 
       if (!started && !maskedbyte && aopIsLitVal (right_aop, i, 1, 0x00))
         {
@@ -1530,12 +1527,21 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             }
           continue;
         }
-      else if (!started && !maskedbyte && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00) &&
-        (right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
+      else if (!started && !maskedbyte && aopIsLitVal (left_aop, i, 1, 0x00) &&
+        (right_aop->type == AOP_DIR || right_aop->type == AOP_REGDIR || right_aop->type == AOP_REG) && aopSame (right_aop, i, result_aop, i, 1) &&
+        (i + 1 == size || !a_dead || aopInReg (right_aop, i, A_IDX)))
         {
           emit2 ("neg", "%s", aopGet (right_aop, i));
           cost (1, 1);
           started = true;
+          if (i + 1 != size)
+            {
+              emit2 ("set0.io", "f, c");
+              emit2 ("t1sn.io", "f, z");
+              emit2 ("set1.io", "f, c");
+              emitCondTargetLbl ();
+              cost (3, 3);
+            }
           continue;
         }
       else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
@@ -1569,8 +1575,15 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cost (1, 1);
           continue;
         }
+      else if (started && !maskedbyte && (result_aop->type == AOP_DIR || result_aop->type == AOP_REGDIR || result_aop->type == AOP_REG) && aopIsLitVal (left_aop, i, 1, 0x00) && aopIsLitVal (right_aop, i, 1, 0x00))
+        {
+          cheapMove (result_aop, i, ASMOP_ZERO, 0, false, false, false);
+          emit2 ("subc", "%s", aopGet (result_aop, i));
+          cost (2, 2);
+          continue;
+        }
 
-      if (!(regDead (A_IDX, ic) || pushed_a))
+      if (!a_dead && !pushed_a)
         {
           pushAF();
           pushed_a = true;
@@ -1697,15 +1710,13 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
               pushPF (false);
               pushed_p = true;
             }
-          else if (regalloc_dry_run)
-            cost (1000, 1000);
           else
-            wassertl (0, "Unimplemented p result in subtraction with stack operand");
+            UNIMPLEMENTED; // Unimplemented p result in subtraction with stack operand.
         }
       if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX))) // Avoid overwriting still-needed p when storing onto stack.
         {
           emit2 ("xch", "a, p");
-           G.p.type = AOP_INVALID;
+          G.p.type = AOP_INVALID;
           pushAF ();
           cheapMove (result_aop, i, ASMOP_P, 0, true, true, i + 1 == size);
           popAF ();
@@ -1714,13 +1725,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           continue;
         }
 
-      if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)
-        {
-          pushAF ();
-          pushed_a = true;
-        }
-      else
-        cheapMove (result_aop, i, ASMOP_A, 0, true, true, i + 1 == size);
+      cheapMove (result_aop, i, ASMOP_A, 0, true, true, i + 1 == size);
     }
 
   if (pushed_a)
@@ -2761,43 +2766,55 @@ genCmp (const iCode *ic, iCode *ifx)
     {
       if (!started && sign && aopIsLitVal (right->aop, i, 1, 0x00) && i + 1 == size)
         {
-          cheapMove (ASMOP_A, 0, left->aop, i, true, true, true);
-          if (ifx)
+          if (ifx && aopInReg (left->aop, i, P_IDX))
             {
-               if (IC_FALSE (ifx))
-                 {
-                   if (aopInReg (left->aop, i, A_IDX) && !regDead (A_IDX, ic))
-                     {
-                       emit2 ("ceqsn", "a, #0x80");
-                       emit2 ("nop", "");
-                       cost (2, 2);
-                       emitCondTargetLbl ();
-                     }
-                   else
-                     {
-                       emit2 ("sub", "a, #0x80");
-                       cost (1, 1);
-                     }
-                   emit2 ("t0sn.io", "f, c");
-                   cost (1, 1.5);
-                 }
-               else
-                 {
-                   emit2 ("ceqsn", "a, #0x80");
-                   emit2 ("t1sn.io", "f, c");
-                   cost (2, 2.5);
-                   emitCondTargetLbl ();
-                 }
-
-               emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.5f);
-               emitCondTargetLbl ();
+              emit2 (IC_FALSE  (ifx) ? "t1sn" : "t0sn", "p, #7");
+              cost (1, 1.5f);
+              emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.5f);
+              emitCondTargetLbl ();
             }
           else
             {
-              emit2 ("sl", "a");
-              emit2 ("mov", "a, #0x00");
-              emit2 ("slc", "a");
-              cheapMove (result->aop, 0, ASMOP_A, 0, true, true, true);
+              if (!regDead (A_IDX, ic) && !aopInReg (left->aop, i, A_IDX))
+                UNIMPLEMENTED;
+              cheapMove (ASMOP_A, 0, left->aop, i, true, true, true);
+              if (ifx)
+                {
+                   if (IC_FALSE (ifx))
+                     {
+                       if (aopInReg (left->aop, i, A_IDX) && !regDead (A_IDX, ic))
+                         {
+                           emit2 ("ceqsn", "a, #0x80");
+                           emit2 ("nop", "");
+                           cost (2, 2);
+                           emitCondTargetLbl ();
+                         }
+                       else
+                         {
+                           emit2 ("sub", "a, #0x80");
+                           cost (1, 1);
+                         }
+                       emit2 ("t0sn.io", "f, c");
+                       cost (1, 1.5);
+                     }
+                   else
+                     {
+                       emit2 ("ceqsn", "a, #0x80");
+                       emit2 ("t1sn.io", "f, c");
+                       cost (2, 2.5);
+                       emitCondTargetLbl ();
+                     }
+    
+                   emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.5f);
+                   emitCondTargetLbl ();
+                }
+              else
+                {
+                  emit2 ("sl", "a");
+                  emit2 ("mov", "a, #0x00");
+                  emit2 ("slc", "a");
+                  cheapMove (result->aop, 0, ASMOP_A, 0, true, true, true);
+                }
             }
           goto release;
         }

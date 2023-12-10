@@ -1,3 +1,10 @@
+2023-12-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sim/ucsim/pdk.src/inst.cc:
+	  Fix simulation of z flag for not and neg.
+	* src/pdk/gen.c:
+	  pdk code generation improvements.
+
 2023-12-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/pdk/gen.c:

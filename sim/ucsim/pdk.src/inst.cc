@@ -324,15 +324,21 @@ int cl_pdk::execute_pdk14(unsigned int code) {
   } else if (code == 0x0068) {
     // not a
     regs.a = ~regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x1400, 0x7F)) {
     // not m
-    ram->write(code & 0x7F, ~get_mem(code & 0x7F));
+    int store = (~get_mem(code & 0x7F) & 0xff);
+    store_flag(flag_z, !store);
+    ram->write(code & 0x7F, store);
   } else if (code == 0x0069) {
     // neg a
     regs.a = -regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x1480, 0x7F)) {
     // neg m
-    ram->write(code & 0x7F, -get_mem(code & 0x7F));
+    int store = (-get_mem(code & 0x7F) & 0xff);
+    store_flag(flag_z, !store);
+    ram->write(code & 0x7F, store);
   } else if (CODE_MASK(0x1C00, 0x1FF)) {
     // set0 io, k
     const u8_t bit = (code & 0x1C0) >> 6;
@@ -681,15 +687,21 @@ int cl_pdk::execute_pdk13(unsigned int code) {
   } else if (code == 0x0018) {
     // not a
     regs.a = ~regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x0A00, 0x3F)) {
     // not m
-    ram->write(code & 0x3F, ~get_mem(code & 0x3F));
+    int store = (~get_mem(code & 0x3F) & 0xff);
+    store_flag(flag_z, !store);
+    ram->write(code & 0x3F, store);
   } else if (code == 0x0019) {
     // neg a
     regs.a = -regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x0A40, 0x3F)) {
     // neg m
-    ram->write(code & 0x3F, -get_mem(code & 0x3F));
+    int store = (-get_mem(code & 0x3F) & 0xff);
+    store_flag(flag_z, !store);
+    ram->write(code & 0x3F, store);
   } else if (CODE_MASK(0x0E00, 0xFF)) {
     // set0 io, k
     const u8_t bit = (code & 0xE0) >> 5;
@@ -1014,15 +1026,21 @@ int cl_pdk::execute_pdk15(unsigned int code) {
   } else if (code == 0x0068) {
     // not a
     regs.a = ~regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x2800, 0xFF)) {
     // not m
-    ram->write(code & 0xFF, ~get_mem(code & 0xFF));
+    int store = (~get_mem(code & 0xFF) & 0xFF);
+    store_flag(flag_z, !store);
+    ram->write(code & 0xFF, store);
   } else if (code == 0x0069) {
     // neg a
     regs.a = -regs.a;
+    store_flag(flag_z, !regs.a);
   } else if (CODE_MASK(0x2900, 0xFF)) {
     // neg m
-    ram->write(code & 0xFF, -get_mem(code & 0xFF));
+    int store = (-get_mem(code & 0xFF) & 0xFF);
+    store_flag(flag_z, !store);
+    ram->write(code & 0xFF, store);
   } else if (CODE_MASK(0x3800, 0x3FF)) {
     // set0 io, k
     const u8_t bit = (code & 0x380) >> 7;

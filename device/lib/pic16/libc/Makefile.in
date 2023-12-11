@@ -148,10 +148,10 @@ am_libc18f_a_OBJECTS = iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
 	atoi.$(OBJEXT) atol.$(OBJEXT) calloc.$(OBJEXT) crc16.$(OBJEXT) \
 	free.$(OBJEXT) g_ftoa.$(OBJEXT) itoa.$(OBJEXT) ltoa.$(OBJEXT) \
 	malloc.$(OBJEXT) memfree.$(OBJEXT) memfreemax.$(OBJEXT) \
-	memmisc.$(OBJEXT) rand.$(OBJEXT) realloc.$(OBJEXT) \
-	x_ftoa.$(OBJEXT) memccpy.$(OBJEXT) memchr.$(OBJEXT) \
-	memchrpgm.$(OBJEXT) memchrram.$(OBJEXT) memcmp.$(OBJEXT) \
-	memcpy.$(OBJEXT) memcpypgm2ram.$(OBJEXT) \
+	memmisc.$(OBJEXT) setjmp.$(OBJEXT) rand.$(OBJEXT) \
+	realloc.$(OBJEXT) x_ftoa.$(OBJEXT) memccpy.$(OBJEXT) \
+	memchr.$(OBJEXT) memchrpgm.$(OBJEXT) memchrram.$(OBJEXT) \
+	memcmp.$(OBJEXT) memcpy.$(OBJEXT) memcpypgm2ram.$(OBJEXT) \
 	memcpyram2ram.$(OBJEXT) memmove.$(OBJEXT) memrchr.$(OBJEXT) \
 	memset.$(OBJEXT) strcat.$(OBJEXT) strchr.$(OBJEXT) \
 	strcmp.$(OBJEXT) strcpy.$(OBJEXT) strcspn.$(OBJEXT) \
@@ -200,19 +200,20 @@ am__depfiles_remade = ./$(DEPDIR)/atof.Po ./$(DEPDIR)/atoi.Po \
 	./$(DEPDIR)/printf.Po ./$(DEPDIR)/printf_small.Po \
 	./$(DEPDIR)/printf_tiny.Po ./$(DEPDIR)/putchar.Po \
 	./$(DEPDIR)/rand.Po ./$(DEPDIR)/realloc.Po \
-	./$(DEPDIR)/sprintf.Po ./$(DEPDIR)/strcat.Po \
-	./$(DEPDIR)/strchr.Po ./$(DEPDIR)/strcmp.Po \
-	./$(DEPDIR)/strcpy.Po ./$(DEPDIR)/strcspn.Po \
-	./$(DEPDIR)/streams.Po ./$(DEPDIR)/strlen.Po \
-	./$(DEPDIR)/strlwr.Po ./$(DEPDIR)/strmgpsim.Po \
-	./$(DEPDIR)/strmmssp.Po ./$(DEPDIR)/strmputchar.Po \
-	./$(DEPDIR)/strmusart.Po ./$(DEPDIR)/strncat.Po \
-	./$(DEPDIR)/strncmp.Po ./$(DEPDIR)/strncpy.Po \
-	./$(DEPDIR)/strpbrk.Po ./$(DEPDIR)/strrchr.Po \
-	./$(DEPDIR)/strspn.Po ./$(DEPDIR)/strstr.Po \
-	./$(DEPDIR)/strtok.Po ./$(DEPDIR)/strupr.Po \
-	./$(DEPDIR)/vfprintf.Po ./$(DEPDIR)/vprintf.Po \
-	./$(DEPDIR)/vsprintf.Po ./$(DEPDIR)/x_ftoa.Po
+	./$(DEPDIR)/setjmp.Po ./$(DEPDIR)/sprintf.Po \
+	./$(DEPDIR)/strcat.Po ./$(DEPDIR)/strchr.Po \
+	./$(DEPDIR)/strcmp.Po ./$(DEPDIR)/strcpy.Po \
+	./$(DEPDIR)/strcspn.Po ./$(DEPDIR)/streams.Po \
+	./$(DEPDIR)/strlen.Po ./$(DEPDIR)/strlwr.Po \
+	./$(DEPDIR)/strmgpsim.Po ./$(DEPDIR)/strmmssp.Po \
+	./$(DEPDIR)/strmputchar.Po ./$(DEPDIR)/strmusart.Po \
+	./$(DEPDIR)/strncat.Po ./$(DEPDIR)/strncmp.Po \
+	./$(DEPDIR)/strncpy.Po ./$(DEPDIR)/strpbrk.Po \
+	./$(DEPDIR)/strrchr.Po ./$(DEPDIR)/strspn.Po \
+	./$(DEPDIR)/strstr.Po ./$(DEPDIR)/strtok.Po \
+	./$(DEPDIR)/strupr.Po ./$(DEPDIR)/vfprintf.Po \
+	./$(DEPDIR)/vprintf.Po ./$(DEPDIR)/vsprintf.Po \
+	./$(DEPDIR)/x_ftoa.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -372,7 +373,7 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 	stdlib/atol.c stdlib/calloc.c stdlib/crc16.c stdlib/free.c \
 	stdlib/g_ftoa.S stdlib/itoa.c stdlib/ltoa.c stdlib/malloc.c \
 	stdlib/memfree.c stdlib/memfreemax.c stdlib/memmisc.c \
-	stdlib/rand.c stdlib/realloc.c stdlib/x_ftoa.c \
+	stdlib/setjmp.c stdlib/rand.c stdlib/realloc.c stdlib/x_ftoa.c \
 	string/memccpy.c string/memchr.c string/memchrpgm.c \
 	string/memchrram.c string/memcmp.c string/memcpy.c \
 	string/memcpypgm2ram.c string/memcpyram2ram.c string/memmove.c \
@@ -529,6 +530,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/putchar.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rand.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/realloc.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/setjmp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sprintf.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strcat.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strchr.Po@am__quote@ # am--include-marker
@@ -1220,6 +1222,20 @@ memmisc.obj: stdlib/memmisc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memmisc.obj `if test -f 'stdlib/memmisc.c'; then $(CYGPATH_W) 'stdlib/memmisc.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/memmisc.c'; fi`
 
+setjmp.o: stdlib/setjmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT setjmp.o -MD -MP -MF $(DEPDIR)/setjmp.Tpo -c -o setjmp.o `test -f 'stdlib/setjmp.c' || echo '$(srcdir)/'`stdlib/setjmp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/setjmp.Tpo $(DEPDIR)/setjmp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='stdlib/setjmp.c' object='setjmp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o setjmp.o `test -f 'stdlib/setjmp.c' || echo '$(srcdir)/'`stdlib/setjmp.c
+
+setjmp.obj: stdlib/setjmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT setjmp.obj -MD -MP -MF $(DEPDIR)/setjmp.Tpo -c -o setjmp.obj `if test -f 'stdlib/setjmp.c'; then $(CYGPATH_W) 'stdlib/setjmp.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/setjmp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/setjmp.Tpo $(DEPDIR)/setjmp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='stdlib/setjmp.c' object='setjmp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o setjmp.obj `if test -f 'stdlib/setjmp.c'; then $(CYGPATH_W) 'stdlib/setjmp.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/setjmp.c'; fi`
+
 rand.o: stdlib/rand.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rand.o -MD -MP -MF $(DEPDIR)/rand.Tpo -c -o rand.o `test -f 'stdlib/rand.c' || echo '$(srcdir)/'`stdlib/rand.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/rand.Tpo $(DEPDIR)/rand.Po
@@ -1815,6 +1831,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/putchar.Po
 	-rm -f ./$(DEPDIR)/rand.Po
 	-rm -f ./$(DEPDIR)/realloc.Po
+	-rm -f ./$(DEPDIR)/setjmp.Po
 	-rm -f ./$(DEPDIR)/sprintf.Po
 	-rm -f ./$(DEPDIR)/strcat.Po
 	-rm -f ./$(DEPDIR)/strchr.Po
@@ -1935,6 +1952,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/putchar.Po
 	-rm -f ./$(DEPDIR)/rand.Po
 	-rm -f ./$(DEPDIR)/realloc.Po
+	-rm -f ./$(DEPDIR)/setjmp.Po
 	-rm -f ./$(DEPDIR)/sprintf.Po
 	-rm -f ./$(DEPDIR)/strcat.Po
 	-rm -f ./$(DEPDIR)/strchr.Po

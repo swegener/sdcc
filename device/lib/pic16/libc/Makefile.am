@@ -45,6 +45,7 @@ libc18f_a_SOURCES += stdlib/malloc.c
 libc18f_a_SOURCES += stdlib/memfree.c
 libc18f_a_SOURCES += stdlib/memfreemax.c
 libc18f_a_SOURCES += stdlib/memmisc.c
+libc18f_a_SOURCES += stdlib/setjmp.c
 libc18f_a_SOURCES += stdlib/rand.c
 libc18f_a_SOURCES += stdlib/realloc.c
 libc18f_a_SOURCES += stdlib/x_ftoa.c

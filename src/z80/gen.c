@@ -7840,9 +7840,8 @@ genPlus (iCode * ic)
       bool save_pair = FALSE;
       PAIR_ID pair;
 
-      if (getPairId (IC_RIGHT (ic)->aop) == PAIR_IY || getPairId (IC_LEFT (ic)->aop) == PAIR_BC
-          || getPairId (IC_LEFT (ic)->aop) == PAIR_DE || getPairId (IC_LEFT (ic)->aop) != PAIR_IY
-          && (IC_RIGHT (ic)->aop->type == AOP_IMMD || IC_RIGHT (ic)->aop->type == AOP_LIT))
+      if (getPairId (IC_RIGHT (ic)->aop) == PAIR_IY || getPairId (IC_LEFT (ic)->aop) == PAIR_BC || getPairId (IC_LEFT (ic)->aop) == PAIR_DE ||
+          ic->left->aop->regs[IYL_IDX] < 0 && ic->left->aop->regs[IYH_IDX] < 0 && (ic->right->aop->type == AOP_IMMD || ic->right->aop->type == AOP_LIT))
         {
           operand *t = IC_RIGHT (ic);
           IC_RIGHT (ic) = IC_LEFT (ic);

@@ -1,3 +1,9 @@
+2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3685.c:
+	  Fix bug #3685.
+
 2023-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/pic16/libc/Makefile.am,

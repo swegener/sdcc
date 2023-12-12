@@ -1,5 +1,5 @@
 /* bug-3685.c
-   todo: description.
+   Wrong code was generated for an addition involving an operand using exactly one byte of iy.
 */
 
 // Based on code by "Under4Mhz" licensed under GPL 2.0 or later

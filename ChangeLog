@@ -1,6 +1,12 @@
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,
+	 tests/bug-3482.c:
+	 Fix the worst part of bug #3482.
+
+2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
 	  support/regression/tests/bug-3685.c:
 	  Fix bug #3685.
 

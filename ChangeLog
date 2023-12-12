@@ -1,8 +1,13 @@
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCopt.c:
+	  Enable elimination of dead RECEIVE iCodes. Fixs the rest of bug #3482.
+
+2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/z80/gen.c,
-	 tests/bug-3482.c:
-	 Fix the worst part of bug #3482.
+	  tests/bug-3482.c:
+	  Fix the worst part of bug #3482.
 
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -5634,7 +5634,7 @@ _saveRegsForCall (const iCode *ic, bool dontsaveIY)
 
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
-emit2("; _saveRegsForCall b_dead %d c_dead %d", isRegDead (B_IDX, ic), isRegDead (C_IDX, ic));
+
   if (_G.saves.saved == FALSE)
     {
       const bool call_preserves_b = ftype->funcAttrs.preserved_regs[B_IDX] && !z80IsParmInCall(ftype, "b");
@@ -6343,7 +6343,7 @@ genCall (const iCode *ic)
         tailjump = false;
 
   const bool jump = tailjump || !ic->parmBytes && !bigreturn && ic->op != PCALL && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL(ftype) && IFFUNC_ISNORETURN (ftype);
-emit2("; tailjump %d jump %d", tailjump, jump);
+
   if (ic->op == PCALL)
     {
       if (IFFUNC_ISBANKEDCALL (dtype))

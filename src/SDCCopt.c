@@ -1962,7 +1962,7 @@ killDeadCode (ebbIndex * ebbi)
               int kill, j;
               kill = 0;
 
-              if (SKIP_IC (ic) ||
+              if (SKIP_IC (ic) && ic->op != RECEIVE ||
                   ic->op == IFX ||
                   ic->op == RETURN ||
                   ic->op == DUMMY_READ_VOLATILE ||

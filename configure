@@ -5901,6 +5901,19 @@ then :
 
 fi
 
+# zlib is not needed by sdcc itself, but by sdcpp and sdbinutils.
+       for ac_header in zlib.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "zlib.h" "ac_cv_header_zlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_zlib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_ZLIB_H 1" >>confdefs.h
+
+else $as_nop
+  as_fn_error $? "zlib library not found (zlib.h)." "$LINENO" 5
+fi
+
+done
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'

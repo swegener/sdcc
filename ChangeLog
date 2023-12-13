@@ -1,3 +1,9 @@
+2023-12-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* configure.ac,
+	  configure:
+	  Fix bug #3508, patch by Steve Schnepp.
+
 2023-12-12 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos650/gen.c

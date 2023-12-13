@@ -759,8 +759,9 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   } else {
     m6502_dirtyReg (dreg);
   }
-//  dreg->aop = sreg->aop;
-//  dreg->aopofs = sreg->aopofs;
+
+  dreg->aop = sreg->aop;
+  dreg->aopofs = sreg->aopofs;
 
   if (freesrc)
     m6502_freeReg (sreg);
@@ -2382,6 +2383,8 @@ storeRegToDPTR(reg_info *reg, int dofs)
 static int
 setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 {
+  emitComment (TRACEGEN, __func__);
+
   /* The rematerialized offset may have a "#" prefix; skip over it */
   if (rematOfs && rematOfs[0] == '#')
     rematOfs++;
@@ -2402,9 +2405,11 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
     if (!rematOfs && offset >= 0 && offset <= 0xff) {
       // no remat and 8-bit offset
       if(AOP_TYPE(op) == AOP_REG) {
+        emitComment (TRACEGEN|VVDBG, " %s: AOP_REG", __func__);
         storeRegToDPTR(AOP(op)->aopu.aop_reg[0], 0);
         storeRegToDPTR(AOP(op)->aopu.aop_reg[1], 1);
       } else {
+        emitComment (TRACEGEN|VVDBG, "  %s: not AOP_REG", __func__);
         if(savea) transferRegReg(m6502_reg_a, m6502_reg_y, true);
         loadRegFromAop(m6502_reg_a, AOP(op), 0);
         storeRegToDPTR(m6502_reg_a, 0);
@@ -2416,6 +2421,7 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       return offset;
     } else {
       // general case
+      emitComment (TRACEGEN|VVDBG, "  %s: general case", __func__);
 
           if(!rematOfs) rematOfs="0";
 
@@ -2592,10 +2598,10 @@ tsxUseful(const iCode *ic)
 
 static void doTSX()
 {
-  // already did TSX
   emitComment (TRACE_STACK|VVDBG, "%s: stackOfs=%d tsx=%d stackpush=%d",
   __func__, _G.stackOfs, _G.tsxStackPushes, _G.stackPushes);
 
+  // already did TSX
   if (m6502_reg_x->aop == &tsxaop)
     return;
 

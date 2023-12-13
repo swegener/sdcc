@@ -5961,10 +5961,13 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
   /* need register operand on left, prefer literal operand on right */
   if ((AOP_TYPE (right) == AOP_REG) || AOP_TYPE (left) == AOP_LIT)
     {
-      operand *temp = left;
-      left = right;
-      right = temp;
-      opcode = exchangedCmp (opcode);
+      // don't swap if left is A
+      if(!((AOP_TYPE (left) == AOP_REG) && AOP (left)->aopu.aop_reg[0]->rIdx == A_IDX)) {
+        operand *temp = left;
+        left = right;
+        right = temp;
+        opcode = exchangedCmp (opcode);
+      }
     }
 
   size = max (AOP_SIZE (left), AOP_SIZE (right));
@@ -6004,6 +6007,11 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
             // TODO? why do we push when we could cpx?
               if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
                 {
+		if(AOP_TYPE(right) == AOP_REG) {
+                   emitComment (TRACEGEN|VVDBG, "   genCmpEQorNE right is reg: %s",AOP (right)->aopu.aop_reg[offset]->name);
+
+                }
+
                   // FIXME: always?
 //                  storeRegTemp (m6502_reg_a, true);
 //                  needloada = true;

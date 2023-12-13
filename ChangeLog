@@ -1,3 +1,7 @@
+2023-12-13 Gabriele Gorla <gorlik@yahoo.com>
+	* support/regression/tests/stack-restore.c.in
+	  partially disable test for mos6502-stack-auto due to stack size limitations
+
 2023-12-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* configure.ac,
@@ -9,6 +13,21 @@
   	* src/mos650/gen.c
   	  fix bug3223041 regression failure for mos6502-stack-auto port
   	  fix bug3531687 regression failure for mos6502-stack-auto port
+  	* device/lib/mos65c02/Makefile.in,
+  	  device/lib/mos65c02/__memcpy.s,
+  	  device/lib/mos65c02/_memcmp.s,
+  	  device/lib/mos65c02/_memset.s,
+  	  device/lib/mos65c02/_mullong.s,
+  	  device/lib/mos65c02/_mulschar.s,
+  	  device/lib/mos65c02/_muluchar.s,
+  	  device/lib/mos65c02/_setjmp.s,
+  	  device/lib/mos65c02/_strcmp.s,
+  	  device/lib/mos65c02/_strcpy.s,
+  	  device/lib/mos65c02/_strlen.s,
+  	  device/lib/mos65c02/abs.s,
+  	  device/lib/mos65c02/crt0.s,
+  	  device/lib/mos65c02/memcpy.s
+      add mos6502 improvements to mos65c02 port 
 
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

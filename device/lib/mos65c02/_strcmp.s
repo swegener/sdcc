@@ -1,8 +1,8 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   _strcmp.s - standard C library function
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 1998, Ullrich von Bassewitz
+;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +27,54 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module _strcmp
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
+	.globl _strcmp_PARM_2
+	.globl _strcmp
 
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+_strcmp_PARM_2:
+	.ds 2
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
-
+	.define _str2 "_strcmp_PARM_2"
+	.define _str1 "DPTR"
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
-        clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
-        dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+_strcmp:
+	sta	*_str1+0
+	stx	*_str1+1
+
+	ldy	#0
+loop:
+	lda	[_str1],y
+	cmp	[_str2],y
+	bne	L1
+	tax
+	beq	end
+	iny
+	bne	loop
+	inc	*_str1+1
+	inc	*_str2+1
+	bne	loop
+L1:
+	bcs	L2
+	ldx	#0xFF
+;//	txa
+	rts
+L2:
+	ldx	#0x01
+;//	txa
+end:
+	rts

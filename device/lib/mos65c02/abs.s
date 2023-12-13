@@ -1,8 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   abs.s - standard C library function
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 2023, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +26,32 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module _abs
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
-
-;--------------------------------------------------------
-; overlayable function parameters in zero page
-;--------------------------------------------------------
-	.area	OSEG    (PAG, OVR)
-
-;--------------------------------------------------------
-; local aliases
-;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
+	.globl _abs
+	.globl ___negax
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
-	.area CODE
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
-        clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
-        dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+	.area CODE
+_abs:
+	cpx #0x00
+	bpl skip
+___negax:
+  	sec
+	eor #0xff
+	adc #0x00
+	pha
+	txa
+	eor #0xff
+	adc #0x00
+	tax
+	pla
+skip:
+	rts
+

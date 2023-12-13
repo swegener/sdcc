@@ -1,8 +1,8 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   _mullong.s - routine for multiplication of 32 bit (unsigned) long
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 1998, Ullrich von Bassewitz
+;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +27,81 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module _mullong
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
+	.globl __mullong_PARM_2
+	.globl __mullong_PARM_1
+	.globl __mullong
 
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+__mullong_PARM_1:
+	.ds 4
+__mullong_PARM_2:
+	.ds 4
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
+	.define tmp  "___SDCC_m6502_ret4"
+	.define res0 "__mullong_PARM_1+0"
+	.define res1 "__mullong_PARM_1+1"
+	.define res2 "___SDCC_m6502_ret2"
+	.define res3 "___SDCC_m6502_ret3"
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
+__mullong:
+
+        ldx	*__mullong_PARM_1+3
+        stx	*res3
+        ldx	*__mullong_PARM_1+2
+        stx	*res2
+;        ldx	*__mullong_PARM_1+1
+;        stx	*res1
+;        ldx	*__mullong_PARM_1+0
+;        stx	*res0
+
+        lda     #0
+        sta     *tmp+2
+        sta     *tmp+1
+        sta     *tmp+0
+
+        ldy     #32
+next_bit:
+	lsr     *tmp+2
+        ror     *tmp+1
+        ror     *tmp+0
+        ror     a
+        ror     *res3
+        ror     *res2
+        ror     *res1
+        ror     *res0
+        bcc     skip
         clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
+        adc     *__mullong_PARM_2+0
+        tax
+        lda     *__mullong_PARM_2+1
+        adc     *tmp+0
+        sta     *tmp+0
+        lda     *__mullong_PARM_2+2
+        adc     *tmp+1
+        sta     *tmp+1
+        lda     *__mullong_PARM_2+3
+        adc     *tmp+2
+        sta     *tmp+2
+        txa
+skip:
         dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+        bpl	next_bit
+        ldx	*res1
+        lda	*res0
+	rts

@@ -1,8 +1,8 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   _strcpy.s - standard C library function
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 1998, Ullrich von Bassewitz
+;   Copyright (C) 2022, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +27,47 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module _strcpy
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
+	.globl _strcpy_PARM_2
+	.globl _strcpy
 
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+_strcpy_PARM_2:
+	.ds 2
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
-
+	.define _src "_strcpy_PARM_2"
+	.define _dst "DPTR"
+	
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
-        clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
-        dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+_strcpy:
+	sta	*_dst+0
+	stx	*_dst+1
+
+	ldy	#0
+cpy_loop:
+	lda	[_src],y
+	sta	[_dst],y
+	beq	end
+	iny
+	bne	cpy_loop
+	inc	*_src+1
+	inc	*_dst+1
+	bne	cpy_loop
+;	jmp	cpy_loop
+end:
+	lda	*_dst+0
+	rts

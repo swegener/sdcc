@@ -1,8 +1,9 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   memcmp.s - standarc C library
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 2003, Ullrich von Bassewitz
+;   Copyright (C) 2009, Christian Krueger
+;   Copyright (C) 2023, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +28,73 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module memcmp
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
+	.globl _memcmp_PARM_2
+	.globl _memcmp_PARM_3
+	.globl _memcmp
 
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+_memcmp_PARM_2:
+	.ds 2
+_memcmp_PARM_3:
+	.ds 2
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
+	.define s1    "DPTR"
+	.define s2    "_memcmp_PARM_2"
+	.define count "_memcmp_PARM_3"
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
+	
+;--------------------------------------------------------
+; int memcmp (int *s1, int *s2, int count)
+;--------------------------------------------------------
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
-        clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
-        dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+_memcmp:
+	sta	*s1+0
+	stx	*s1+1
+	ldy	#0
+	ldx	*count+1
+	beq	endhi
+hiloop:
+	lda	[s1],y
+	cmp	[s2],y
+	bne	noteq
+	iny
+	bne	hiloop
+	inc	*s1+1
+	inc	*s2+1
+	dex
+	bne	hiloop
+endhi:
+	ldx	*count+0
+	beq	end
+loloop:
+	lda	[s1],y
+	cmp	[s2],y
+	bne	noteq
+	iny
+	dex
+	bne	loloop
+end:
+	txa
+	rts
+noteq:
+	bcs	L2
+	ldx	#0xFF
+	rts
+L2:
+	ldx	#0x01
+	rts

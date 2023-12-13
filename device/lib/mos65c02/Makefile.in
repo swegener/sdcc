@@ -7,7 +7,7 @@ abs_top_builddir = @abs_top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-EXTRA_CFLAGS = -mmos65c02 --max-allocs-per-node 25000
+EXTRA_CFLAGS = -mmos65c02 --max-allocs-per-node 25000 --opt-code-speed
 SAS = $(top_builddir)/bin/sdas6500
 
 # override PORTDIR defined by super (parent) makefile
@@ -54,17 +54,15 @@ M6502_LONGLONG = $(COMMON_LONGLONG) \
 M6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
-  __memcpy.c \
   _heap.c \
   _memmove.c \
-  _spx.c \
   _startup.c \
   _strcmp.c \
   _strcpy.c \
   _strlen.c \
+  memcpy.c \
   div.c \
   ldiv.c \
-  memcpy.c \
   sprintf.c \
   vprintf.c \
   atomic_flag_clear.c

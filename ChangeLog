@@ -2,6 +2,7 @@
 
   	* src/mos650/gen.c
   	  fix bug3223041 regression failure for mos6502-stack-auto port
+  	  fix bug3531687 regression failure for mos6502-stack-auto port
 
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

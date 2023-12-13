@@ -1,8 +1,8 @@
 ;-------------------------------------------------------------------------
-;   _muluchar.s - routine for multiplication of 8 bit (unsigned char)
+;   setjmp.s - source file for ANSI routines setjmp & longjmp
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022-2023, Gabriele Gorla
+;   Copyright (C) 2020, Steven Hugg. hugg@efasterlight.com
+;   Copyright (C) 2023, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,44 +27,89 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _muluchar
+	.module _setjmp
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __muluchar   ; arguments in A and X, result in AX
-	.globl ___umul8     ; arguments in ret0 and ret1, result in AX
-
+	.globl ___setjmp    ; 
+        .globl _longjmp
+        .globl _longjmp_PARM_2
+	
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
+_longjmp_PARM_2:
+        .ds 2
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define arg1 "___SDCC_m6502_ret0"
-	.define arg2 "___SDCC_m6502_ret2"
+	.define ptr "DPTR"
+	.define rv "_longjmp_PARM_2"
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
-	.area CODE
+        .area CODE
 
-__muluchar:
-	sta     *arg1
-	stx	*arg2
-___umul8:
-        lda     #0              ; Clear byte 1
-        ldy     #8              ; Number of bits
-        lsr     *arg2           ; Get first bit of RHS into carry
-L0:    	bcc	L1
-        clc
-        adc     *arg1
-L1:    	ror
-        ror     *arg2
-        dey
-        bne    	L0
-        tax                     ; Load the result MSB
-        lda     *arg2           ; Load the result LSB
-        rts                     ; Done
+;------------------------------------------------------------
+; int __setjmp (jmp_buf buf)
+;------------------------------------------------------------
+
+___setjmp:
+        stx	*(ptr + 1)		; msb(buf)
+        sta	*(ptr + 0)		; lsb(buf)
+
+        ; save stack pointer
+        tsx
+        ldy	#0
+        txa
+        sta	[ptr],y
+
+        ; save return address
+        lda	0x101,x
+        iny
+        sta	[ptr],y
+        lda	0x102,x
+        iny
+        sta	[ptr],y
+
+        ; return 0
+        lda	#0
+        tax
+        rts
+
+;------------------------------------------------------------
+; int longjmp (jmp_buf buf, int rv)
+;------------------------------------------------------------
+
+_longjmp:
+        stx	*(ptr + 1)		; msb(buf)
+        sta	*(ptr + 0)		; lsb(buf)
+
+        ; restore stack pointer
+        ldy	#0
+        lda	[ptr],y
+        tax
+        txs
+
+        ; set return address
+        iny
+        lda	[ptr],y
+        sta	0x101,x
+        iny
+        lda	[ptr],y
+        sta	0x102,x
+
+;_setjmp.c:224: return rv ? rv : 1;
+        ldx    *(rv + 1)
+        txa
+        ora    *(rv + 0)
+        beq     0001$
+        lda    *(rv + 0)
+        rts
+0001$:
+        lda     #0x01
+        rts

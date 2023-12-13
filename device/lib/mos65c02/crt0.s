@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  crt0.s - Generic crt0.s for a bare metal 6502
 ;
-;  Copyright (C) 2021-2022, Gabriele Gorla
+;  Copyright (C) 2021-2023, Gabriele Gorla
 ;  Copyright (C) 2023, Maarten Brock
 ;
 ;  This library is free software; you can redistribute it and/or modify it
@@ -92,13 +92,12 @@ __sdcc_init_data:
 	jsr	___memcpy
 
 ;; clear BSS
-;; somehow _memset_PARM_x is in BSS instead of OSEG
 	lda	#>l_BSS
-	sta	_memset_PARM_3+1
+	sta	*_memset_PARM_3+1
 	lda	#<l_BSS
-	sta	_memset_PARM_3
+	sta	*_memset_PARM_3
 	lda	#0x00
-	sta	_memset_PARM_2
+	sta	*_memset_PARM_2
 	lda	#<s_BSS
 	ldx	#>s_BSS
 	jsr	_memset

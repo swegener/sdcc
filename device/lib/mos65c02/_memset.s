@@ -1,9 +1,9 @@
 ;-------------------------------------------------------------------------
-;   memcpy.s - standarc C library
+;   _memset.s - standarc C library
 ;
 ;   Copyright (C) 2003, Ullrich von Bassewitz
 ;   Copyright (C) 2009, Christian Krueger
-;   Copyright (C) 2022, Gabriele Gorla
+;   Copyright (C) 2023, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -28,55 +28,53 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module ___memcpy
+	.module _memset
 
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl ___memcpy_PARM_2
-	.globl ___memcpy_PARM_3
-	.globl ___memcpy
-
+	.globl _memset_PARM_2
+	.globl _memset_PARM_3
+	.globl _memset
+	
 ;--------------------------------------------------------
 ; overlayable function parameters in zero page
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-___memcpy_PARM_2:
-	.ds 2
-___memcpy_PARM_3:
+_memset_PARM_2:
+	.ds 1
+_memset_PARM_3:
 	.ds 2
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
 	.define save  "REGTEMP+0"
-	.define dst   "REGTEMP+2"
-	.define src   "___memcpy_PARM_2"
-	.define count "___memcpy_PARM_3"
+	.define dst   "DPTR"
+	.define val   "_memset_PARM_2"
+	.define count "_memset_PARM_3"
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
-___memcpy:
+_memset:
 	sta	*save+0
 	stx	*save+1
 	sta	*dst+0
 	stx	*dst+1
 
 	ldy	#0
+	lda	*val
 	ldx	*count+1
 	beq	00002$
 00001$:
-	lda	[*src],y
-	sta	[*dst],y
+	sta	[dst],y
 	iny
-	lda	[*src],y
-	sta	[*dst],y
+	sta	[dst],y
 	iny
 	bne	00001$
-	inc	*src+1
 	inc	*dst+1
 	dex
 	bne	00001$
@@ -84,8 +82,7 @@ ___memcpy:
 	ldx	*count+0
 	beq	00004$
 00003$:
-	lda	[*src],y
-	sta	[*dst],y
+	sta	[dst],y
 	iny
 	dex
 	bne	00003$

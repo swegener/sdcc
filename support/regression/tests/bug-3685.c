@@ -22,7 +22,7 @@ inline uint16_t vdu_tile_page_address( uint8_t page ) {
     return page == 1 ? 0x9000 : 0x9800;
 }
 
-inline uint16_t vdu_tile_page_address_get_fast() {
+inline uint16_t vdu_tile_page_address_get_fast( void ) {
 
     return vdu_tile_page_address( vduTileData.page );
 }
@@ -67,3 +67,6 @@ testBug(void)
     vdu_image_put( pixels, colours, index );
 }
 
+extern uint16_t vdu_tile_page_address( uint8_t page );
+
+extern uint16_t vdu_tile_page_address_get_fast( void );

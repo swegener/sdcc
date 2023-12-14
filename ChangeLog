@@ -1,4 +1,10 @@
+2023-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3685.c:
+	  Provide extern declartion to make test compile on hosts that choose not to inline.
+
 2023-12-13 Gabriele Gorla <gorlik@yahoo.com>
+
 	* support/regression/tests/stack-restore.c.in
 	  partially disable test for mos6502-stack-auto due to stack size limitations
 

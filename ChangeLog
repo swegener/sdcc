@@ -1,3 +1,8 @@
+2023-12-17 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/main.c
+  	  fix bra in the opcode table. Use strncmp in the opcode search to support 65C02 bit manipulation instructions.
+
 2023-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3685.c:
@@ -16,7 +21,7 @@
 
 2023-12-12 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos650/gen.c
+  	* src/mos6502/gen.c
   	  fix bug3223041 regression failure for mos6502-stack-auto port
   	  fix bug3531687 regression failure for mos6502-stack-auto port
   	* device/lib/mos65c02/Makefile.in,

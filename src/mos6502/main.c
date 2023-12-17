@@ -412,10 +412,10 @@ static m6502opcodedata m6502opcodeDataTable[] =
     {"bmi",   M6502OP_BR,  0,     0 },
     {"bne",   M6502OP_BR,  0,     0 },
     {"bpl",   M6502OP_BR,  0,     0 },
+    {"bra",   M6502OP_BR,  0,     0 }, // 65C02 only
     {"brk",   M6502OP_INH, 0,     0 },
     {"bvc",   M6502OP_BR,  0,     0 },
     {"bvs",   M6502OP_BR,  0,     0 },
-    {"bra",   M6502OP_BR,  0,     0 }, // 65C02 only
     {"clc",   M6502OP_INH, 0,     0x01 },
     {"cld",   M6502OP_INH, 0,     0x08 },
     {"cli",   M6502OP_INH, 0,     0x04 },
@@ -475,7 +475,7 @@ static m6502opcodedata m6502opcodeDataTable[] =
 static int
 m6502_opcodeCompare (const void *key, const void *member)
 {
-  return strcmp((const char *)key, ((m6502opcodedata *)member)->name);
+  return strncmp((const char *)key, ((m6502opcodedata *)member)->name,3);
 }
 
 

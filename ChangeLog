@@ -2,6 +2,8 @@
 
   	* src/mos6502/main.c
   	  fix bra in the opcode table. Use strncmp in the opcode search to support 65C02 bit manipulation instructions.
+	* src/mos6502/gen.c
+	  fix wrong offset for struct return in mos6502-stack-auto port
 
 2023-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -453,7 +453,7 @@ emit6502op (const char *inst, const char *fmt, ...)
         break;
     }
   } else {
-    emitComment(ALWAYS,"unkwnown opcode %s",inst);
+    emitcode("ERROR","Unimplemented opcode %s", inst);
     isize=10;
     //werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "NULL opcode in emit6502op");
   }
@@ -1226,7 +1226,7 @@ swapXA ()
 static char *
 aopName (asmop * aop)
 {
-  static char buffer[262];
+  static char buffer[276];
   char *buf = buffer;
 
   if (!aop)
@@ -1247,7 +1247,7 @@ aopName (asmop * aop)
       sprintf (buf, "EXT(%s)", aop->aopu.aop_dir);
       return buf;
     case AOP_SOF:
-      sprintf (buf, "SOF(%s)", OP_SYMBOL (aop->op)->name);
+      sprintf (buf, "SOF(%s@%d)", OP_SYMBOL (aop->op)->name, aop->aopu.aop_stk);
       return buf;
     case AOP_REG:
       sprintf (buf, "REG(%s%s%s%s)",
@@ -1294,13 +1294,13 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
 {
   int regidx = reg->rIdx;
 
+  emitComment (REGOPS, "      loadRegFromAop (%s, %s, %d)", reg->name, aopName (aop), loffset);
+  
   if (aop->stacked && aop->stk_aop[loffset])
     {
       loadRegFromAop (reg, aop->stk_aop[loffset], 0);
       return;
     }
-
-  emitComment (REGOPS, "      loadRegFromAop (%s, %s, %d)", reg->name, aopName (aop), loffset);
 
 #if 0
   /* If operand is volatile, we cannot optimize. */
@@ -1366,17 +1366,18 @@ forceload:
         {
           loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset));
         }
-      // no such thing as stx aa,x
+      // no such thing as ldx aa,x
       else if (aop->type == AOP_SOF && regidx != A_IDX)
         {
           bool needloada = storeRegTempIfUsed(m6502_reg_a);
           loadRegFromAop(m6502_reg_a, aop, loffset);
           transferRegReg(m6502_reg_a, reg, false);
           loadOrFreeRegTemp(m6502_reg_a,needloada);
-          break;
+//          break;
         }
       else
         {
+          emitComment (TRACE_STACK|VVDBG, "      loadRegFromAop: A [%d, %d]",aop->aopu.aop_stk, loffset);
           aopAdrPrepare(aop, loffset);
           const char *l = aopAdrStr (aop, loffset, false);
           emit6502op (regidx == A_IDX ? "lda" : regidx == X_IDX ? "ldx" : "ldy", l);
@@ -1532,12 +1533,10 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
 
     switch (regidx) {
       case A_IDX:
-        emitComment (TRACE_AOP|VVDBG, "      storeRegToAop: A");
+        emitComment (TRACE_STACK|VVDBG, "      storeRegToAop: A [%d, %d]",aop->aopu.aop_stk, loffset);
         needpullx = storeRegTempIfUsed(m6502_reg_x);
         doTSX();
         emit6502op ("sta", aopAdrStr (aop, loffset, false));
-
-//        emit6502op ("sta", "0x%x,x", xofs);
         loadOrFreeRegTemp(m6502_reg_x, needpullx);
         break;
       case X_IDX:
@@ -1560,12 +1559,15 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         pullOrFreeReg(m6502_reg_a, needpulla);
         break;
       case XA_IDX:
-        pushReg(m6502_reg_a, true);
+     // options.stackAuto 
+//        pushReg(m6502_reg_a, true);
         needpullx = storeRegTempIfSurv(m6502_reg_x);
+        storeRegTemp(m6502_reg_a, false);
         transferRegReg (m6502_reg_x, m6502_reg_a, true);
         doTSX();
         emit6502op ("sta", aopAdrStr (aop, loffset + 1, false));
-        pullReg(m6502_reg_a);
+//        pullReg(m6502_reg_a);
+        loadRegTemp(m6502_reg_a);
         emit6502op ("sta", aopAdrStr (aop, loffset, false));
         loadOrFreeRegTemp(m6502_reg_x, needpullx);
         break;
@@ -2047,8 +2049,11 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       return;
     }
 
-  emitComment (TRACE_AOP|VVDBG, "  transferAopAop from (%s, %d)", aopName (srcaop), srcofs);
-  emitComment (TRACE_AOP|VVDBG, "  transferAopAop to (%s, %d)", aopName (dstaop), dstofs);
+  emitComment (TRACE_AOP|VVDBG, "    transferAopAop from (%s, %d, %x)",
+               aopName (srcaop), srcofs, srcaop->regmask);
+  emitComment (TRACE_AOP|VVDBG, "    transferAopAop   to (%s, %d, %x)",
+               aopName (dstaop), dstofs, dstaop->regmask);
+
 //  DD(emitcode ("", "; srcaop->type = %d, regmask = %x", srcaop->type, srcaop->regmask));
 //  DD(emitcode ("", "; dstaop->type = %d, regmask = %x", dstaop->type, dstaop->regmask));
 
@@ -2465,7 +2470,7 @@ newAsmop (short type)
   return aop;
 }
 
-
+#if 0
 /*-----------------------------------------------------------------*/
 /* operandConflictsWithYX - true if operand in y and/or x register */
 /*-----------------------------------------------------------------*/
@@ -2595,6 +2600,7 @@ tsxUseful(const iCode *ic)
 
   return uses >= 1;
 }
+#endif
 
 static void doTSX()
 {
@@ -2645,8 +2651,8 @@ aopForSym (const iCode * ic, symbol * sym)
   wassertl (ic != NULL, "Got a null iCode");
   wassertl (sym != NULL, "Got a null symbol");
 
-//  printf("in aopForSym for symbol %s\n", sym->name);
-
+  emitComment (TRACE_AOP|VVDBG, "%s", __func__);
+      
   space = SPEC_OCLS (sym->etype);
 
   /* if already has one */
@@ -2669,10 +2675,13 @@ aopForSym (const iCode * ic, symbol * sym)
   if (sym->onStack)
     {
       sym->aop = aop = newAsmop (AOP_SOF);
-      aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
       aop->aopu.aop_stk = sym->stack;
 
+      emitComment (TRACE_STACK|VVDBG, "%s: symbol %s: stack=%d size=%d", 
+      __func__, sym->name, sym->stack, aop->size);
+
+#if 0
       if (!regalloc_dry_run && m6502_reg_x->isFree && m6502_reg_x->aop != &tsxaop)
         {
           if (!m6502_reg_x->isDead)
@@ -2683,7 +2692,7 @@ aopForSym (const iCode * ic, symbol * sym)
             return aop;
           else
             {
-              // FIXME: this is likely incorrect at YX is not a adr register in the 6502
+              // FIXME: this is likely incorrect as YX is not a adr register in the 6502
               /* If this is a pointer gen/set, then hx is definitely in use */
               if (POINTER_SET (ic) || POINTER_GET (ic))
                 return aop;
@@ -2701,6 +2710,7 @@ aopForSym (const iCode * ic, symbol * sym)
           // transfer S to X
           doTSX();
         }
+#endif
       return aop;
     }
 
@@ -2956,20 +2966,32 @@ aopOp (operand *op, const iCode * ic)
     return;
 
   /* if already has an asmop */
-  if (op->aop)
+  if (op->aop) {
+       emitComment (VVDBG|TRACE_AOP, "    %s: skip", __func__);
+       if (IS_SYMOP (op) && OP_SYMBOL (op)->aop) {
+       if(op->aop->type==AOP_SOF) {
+             emitComment (VVDBG|TRACE_AOP, "    asmop symbol: %s [%d:%d] - %d",
+                OP_SYMBOL (op)->name, OP_SYMBOL (op)->stack, op->aop->size,
+                op->aop->aopu.aop_stk );
+           // FIXME: ugly fix to correct stack offset for some symbols
+           // Should find the source of the bug
+           op->aop->aopu.aop_stk = OP_SYMBOL (op)->stack;
+           }
+       }
     return;
+  }
 
   // Is this a pointer set result?
-  //
   if ((op == IC_RESULT (ic)) && POINTER_SET (ic))
     {
+       emitComment (VVDBG|TRACE_AOP, "    %s: POINTER_SET", __func__);
     }
 
 //  printf("checking literal\n");
   /* if this a literal */
   if (IS_OP_LITERAL (op))
     {
-      //op->aop =
+      emitComment (VVDBG|TRACE_AOP, "    %s: LITERAL", __func__);
       aop = newAsmop (AOP_LIT);
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
@@ -2983,10 +3005,13 @@ aopOp (operand *op, const iCode * ic)
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
+      emitComment (VVDBG|TRACE_AOP, "    %s: SYMOP", __func__);
       op->aop = aop = Safe_calloc (1, sizeof (*aop));
       memcpy (aop, OP_SYMBOL (op)->aop, sizeof (*aop));
       //op->aop = aop = OP_SYMBOL (op)->aop;
       aop->size = getSize (operandType (op));
+      emitComment (VVDBG|TRACE_AOP, "    symbol: %s [%d]",
+                OP_SYMBOL (op)->name, OP_SYMBOL (op)->stack );
       //printf ("reusing underlying symbol %s\n",OP_SYMBOL (op)->name);
       //printf (" with size = %d\n", aop->size);
 
@@ -2998,6 +3023,7 @@ aopOp (operand *op, const iCode * ic)
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
     {
+      emitComment (VVDBG|TRACE_AOP, "    %s: TRUE_SYMOP", __func__);
       op->aop = aop = aopForSym (ic, OP_SYMBOL (op));
       aop->op = op;
       //printf ("new symbol %s\n", OP_SYMBOL (op)->name);
@@ -3484,6 +3510,10 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
           // hc08's tsx returns +1, ours returns +0
           //DD( emitcode( "", "; %d + %d + %d + %d + 1", _G.stackOfs, _G.tsxStackPushes, aop->aopu.aop_stk, offset ));
           xofs = STACK_TOP + _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1;
+          emitComment(VVDBG|TRACE_STACK,"      op target: STACK_FRAME%+d (SP%+d [%d, %d, %d])",
+          /*_G.tsxStackPushes + */aop->aopu.aop_stk + offset + 1,
+          _G.stackOfs + aop->aopu.aop_stk + offset + 1,
+          _G.tsxStackPushes, aop->aopu.aop_stk, offset);
           sprintf (s, "0x%x,x", xofs);
           rs = Safe_calloc (1, strlen (s) + 1);
           strcpy (rs, s);
@@ -4792,13 +4822,13 @@ genFunction (iCode * ic)
           int ofs;
 
           genLine.lineElement.ic = ric;
-          emitComment (TRACEGEN, "genReceive", "size=%d", rsymSize);
+          emitComment (TRACEGEN, "genReceive: size=%d", rsymSize);
 	  //          for (ofs = 0; ofs < rsymSize; ofs++)
           m6502_reg_a->isFree=false;
 	  for (ofs = rsymSize-1; ofs >=0; ofs--)
             {
               reg_info *reg = m6502_aop_pass[ofs + (ric->argreg - 1)]->aopu.aop_reg[0];
-	      emitComment (TRACEGEN, "pushreg", "ofs=%d", ofs);
+	      emitComment (TRACEGEN, "pushreg: ofs=%d", ofs);
               pushReg (reg, true);
 	      //              if (reg->rIdx == A_IDX)
 	      //                accIsFree = 1;
@@ -9935,7 +9965,7 @@ release:
       if(needpulla) loadRegTemp(NULL);
       m6502_freeReg(m6502_reg_a);
   } else {
-  loadOrFreeRegTemp (m6502_reg_a, needpulla);
+      loadOrFreeRegTemp (m6502_reg_a, needpulla);
   }
 
 }

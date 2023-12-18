@@ -10307,6 +10307,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
     {
       while (size--)
         {
+          bool hl_dead = isRegDead (HL_IDX, ic) && left->aop->regs[L_IDX] < offset && left->aop->regs[H_IDX] < offset && right->aop->regs[L_IDX] < offset && right->aop->regs[H_IDX] < offset;
           if (aopInReg (right->aop, offset, A_IDX)  || aopInReg (right->aop, offset, HL_IDX) || aopInReg (left->aop, offset, BC_IDX) || aopInReg (left->aop, offset, DE_IDX))
             {
               operand *t = right;
@@ -10329,7 +10330,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
               cost2 (2, 15, 10, 4, 0, 8, 2, 2);
               if (!regalloc_dry_run)
                 emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
-              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
+              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, jp not optimzed into jr.
               spillPair (PAIR_HL);
               offset += 2;
               size--;
@@ -10337,23 +10338,31 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             }
 
           cheapMove (ASMOP_A, 0, left->aop, offset, true);
-          if (right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, offset) == 0)
+          if (right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, offset) == 0 || right->aop->type == AOP_STL && offset >= 2)
             {
               emit3 (A_OR, ASMOP_A, ASMOP_A);
               if (!regalloc_dry_run)
                 emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
-              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
+              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, jp not optimzed into jr.
             }
-          else if (right->aop->type == AOP_STL)
+          else if (right->aop->type == AOP_STL && offset < 2)
             {
-              UNIMPLEMENTED;
+              if (!hl_dead)
+                _push (PAIR_HL);
+              genMove_o (ASMOP_HL, 0, right->aop, 0, 2, false, true, false, false, true);
+              emit3 (A_SUB, ASMOP_A, offset ? ASMOP_H : ASMOP_L);
+              if (!hl_dead)
+                _pop (PAIR_HL);
+              if (!regalloc_dry_run)
+                emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
+              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, jp not optimzed into jr.
             }
           else
             {
               emit3_o (A_SUB, ASMOP_A, 0, right->aop, offset);
               if (!regalloc_dry_run)
                 emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
-              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
+              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, jp not optimzed into jr.
             }
           offset++;
         }

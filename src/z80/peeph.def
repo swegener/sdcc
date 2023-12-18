@@ -1925,89 +1925,89 @@ replace restart {
 } if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notUsed('f')
 
 replace restart {
-	sub	a,%1
-	jp	NZ,%2
-	ld	%3,#0x00
+	sub	a, %1
+	jp	NZ, %2
+	ld	%3, #0x00
 } by {
-	sub	a,%1
-	jp	NZ,%2
-	ld	%3,a
+	sub	a, %1
+	jp	NZ, %2
+	ld	%3, a
 	; common peephole 124 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	inc	a
-	jp	NZ,%1
-	ld	%2,#0x00
+	jp	NZ, %1
+	ld	%2, #0x00
 } by {
 	inc	a
-	jp	NZ,%1
-	ld	%2,a
+	jp	NZ, %1
+	ld	%2, a
 	; common peephole 125a replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
 	dec	a
-	jp	NZ,%1
-	ld	%2,#0x00
+	jp	NZ, %1
+	ld	%2, #0x00
 } by {
 	dec	a
-	jp	NZ,%1
-	ld	%2,a
+	jp	NZ, %1
+	ld	%2, a
 	; common peephole 125b replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
-	or	a,%1
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
+	or	a, %1
+	jp	NZ, %2
+	ld	a, %3
+	or	a, a
 } by {
-	or	a,%1
-	jp	NZ,%2
-	or	a,%3
+	or	a, %1
+	jp	NZ, %2
+	or	a, %3
 	; common peephole 126a shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
 // canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
-	or	a,%1
+	or	a, %1
 	ld	%4, a
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
+	jp	NZ, %2
+	ld	a, %3
+	or	a, a
 } by {
-	or	a,%1
+	or	a, %1
 	ld	%4, a
-	jp	NZ,%2
-	or	a,%3
+	jp	NZ, %2
+	or	a, %3
 	; common peephole 126b shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
 
 replace restart {
-	sub	a,%1
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
+	sub	a, %1
+	jp	NZ, %2
+	ld	a, %3
+	or	a, a
 } by {
-	sub	a,%1
-	jp	NZ,%2
-	or	a,%3
+	sub	a, %1
+	jp	NZ, %2
+	or	a, %3
 	; common peephole 127a shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
 // canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
-	sub	a,%1
+	sub	a, %1
 	ld	%4, a
-	jp	NZ,%2
-	ld	a,%3
-	or	a,a
+	jp	NZ, %2
+	ld	a, %3
+	or	a, a
 } by {
-	sub	a,%1
+	sub	a, %1
 	ld	%4, a
-	jp	NZ,%2
-	or	a,%3
+	jp	NZ, %2
+	or	a, %3
 	; common peephole 127b shortened or using a (which has just been tested to be #0x00).
 } if canAssign('b' %3)
 

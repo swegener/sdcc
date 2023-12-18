@@ -34,8 +34,9 @@ enum
     X_IDX,
     Y_IDX,
 //    Z_IDX,
-    YX_IDX,
     XA_IDX,
+//    YA_IDX,   
+    YX_IDX,
     CND_IDX,
     SP_IDX
   };
@@ -53,9 +54,10 @@ enum
 #define M6502MASK_A 0x01
 #define M6502MASK_X 0x02
 #define M6502MASK_Y 0x04
-#define M6502MASK_Z 0x10
+//#define M6502MASK_Z 0x10
 #define M6502MASK_REV 0x80
 #define M6502MASK_XA (M6502MASK_X | M6502MASK_A)
+//#define M6502MASK_YA (M6502MASK_Y | M6502MASK_A)
 #define M6502MASK_YX (M6502MASK_Y | M6502MASK_X)
 #define M6502MASK_AX (M6502MASK_REV | M6502MASK_X | M6502MASK_A)
     

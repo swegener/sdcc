@@ -58,9 +58,9 @@ reg_info regsm6502[] =
   {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
   {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
   {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
-  {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
   {REG_GPR, XA_IDX,  "xa", M6502MASK_XA, NULL, 0, 1},
-
+//  {REG_GPR, YA_IDX,  "ya", M6502MASK_YA, NULL, 0, 1},
+  {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
   {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
   {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
 };
@@ -76,8 +76,9 @@ int m6502_nRegs = sizeof(regsm6502)/sizeof(reg_info);
 reg_info *m6502_reg_a;
 reg_info *m6502_reg_x;
 reg_info *m6502_reg_y;
-reg_info *m6502_reg_yx;
 reg_info *m6502_reg_xa;
+//reg_info *m6502_reg_ya;
+reg_info *m6502_reg_yx;
 reg_info *m6502_reg_sp;
 
 void m6502SpillThis (symbol *);
@@ -130,17 +131,23 @@ m6502_freeReg (reg_info * reg)
         if (m6502_reg_x->isFree)
           m6502_reg_yx->isFree = 1;
         break;
-      case YX_IDX:
-        m6502_reg_y->isFree = 1;
-        m6502_reg_x->isFree = 1;
-        if (m6502_reg_a->isFree)
-          m6502_reg_xa->isFree = 1;
-        break;
       case XA_IDX:
         m6502_reg_x->isFree = 1;
         m6502_reg_a->isFree = 1;
         if (m6502_reg_y->isFree)
           m6502_reg_yx->isFree = 1;
+        break;
+//      case YA_IDX:
+//        m6502_reg_y->isFree = 1;
+//        m6502_reg_a->isFree = 1;
+//        if (m6502_reg_x->isFree)
+//          m6502_reg_yx->isFree = 1;
+//        break;
+      case YX_IDX:
+        m6502_reg_y->isFree = 1;
+        m6502_reg_x->isFree = 1;
+        if (m6502_reg_a->isFree)
+          m6502_reg_xa->isFree = 1;
         break;
       default:
         break;
@@ -841,7 +848,6 @@ isBitwiseOptimizable (iCode * ic)
     return false;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* packForPush - heuristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
@@ -1045,6 +1051,13 @@ packPointerOp (iCode * ic, eBBlock ** ebpp)
             }
           else if (POINTER_SET (uic))
             {
+// FIXME: this code will make bug-3385.c fail
+// it seems there are some corner cases where this 
+// optimization is unsafe.
+// Other cases might also be unsafe but no test triggers it.
+// HC08 is also affected by the same issue.
+            //  return;
+// remove the return above to trigger the failure.
               if (IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic)) && operandLitValue (IC_LEFT (uic)) != 0)
                 return;
               if (IC_LEFT (uic) && IS_SYMOP (IC_LEFT (uic)))
@@ -1171,7 +1184,7 @@ packRegisters (eBBlock ** ebpp, int count)
         {
           sym_link *to_type = operandType(IC_LEFT(ic));
           sym_link *from_type = operandType(IC_RIGHT(ic));
-          if (IS_PTR(to_type) && IS_PTR(from_type))
+              if (IS_PTR(to_type) && IS_PTR(from_type))
             {
               OP_SYMBOL (IC_RESULT (ic))->remat = 1;
               OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
@@ -1392,8 +1405,9 @@ m6502_assignRegisters (ebbIndex *ebbi)
   m6502_reg_a = m6502_regWithIdx(A_IDX);
   m6502_reg_x = m6502_regWithIdx(X_IDX);
   m6502_reg_y = m6502_regWithIdx(Y_IDX);
-  m6502_reg_yx = m6502_regWithIdx(YX_IDX);
   m6502_reg_xa = m6502_regWithIdx(XA_IDX);
+//  m6502_reg_ya = m6502_regWithIdx(YA_IDX);
+  m6502_reg_yx = m6502_regWithIdx(YX_IDX);
   m6502_reg_sp = m6502_regWithIdx(SP_IDX);
 
 //  transformPointerSet (ebbs, count);
@@ -1479,6 +1493,8 @@ m6502_useReg (reg_info * reg)
       case A_IDX:
         m6502_reg_xa->aop = NULL;
         m6502_reg_xa->isFree = 0;
+//        m6502_reg_ya->aop = NULL;
+//        m6502_reg_ya->isFree = 0;
         break;
       case X_IDX:
         m6502_reg_xa->aop = NULL;
@@ -1487,20 +1503,28 @@ m6502_useReg (reg_info * reg)
         m6502_reg_yx->isFree = 0;
         break;
       case Y_IDX:
+//        m6502_reg_ya->aop = NULL;
+//        m6502_reg_ya->isFree = 0;
         m6502_reg_yx->aop = NULL;
         m6502_reg_yx->isFree = 0;
         break;
+      case XA_IDX:
+        m6502_reg_x->aop = NULL;
+       m6502_reg_x->isFree = 0;
+        m6502_reg_a->aop = NULL;
+        m6502_reg_a->isFree = 0;
+        break;
+//      case YA_IDX:
+//        m6502_reg_y->aop = NULL;
+//        m6502_reg_y->isFree = 0;
+//        m6502_reg_a->aop = NULL;
+//        m6502_reg_a->isFree = 0;
+//        break;
       case YX_IDX:
         m6502_reg_y->aop = NULL;
         m6502_reg_y->isFree = 0;
         m6502_reg_x->aop = NULL;
         m6502_reg_x->isFree = 0;
-        break;
-      case XA_IDX:
-        m6502_reg_x->aop = NULL;
-        m6502_reg_x->isFree = 0;
-        m6502_reg_a->aop = NULL;
-        m6502_reg_a->isFree = 0;
         break;
       default:
         break;
@@ -1520,6 +1544,8 @@ m6502_dirtyReg (reg_info * reg)
       case A_IDX:
         m6502_reg_xa->aop = NULL;
 	m6502_reg_xa->isLitConst = 0;
+//	m6502_reg_ya->aop = NULL;
+//	m6502_reg_ya->isLitConst = 0;
 	m6502_reg_a->aop = NULL;
 	m6502_reg_a->isLitConst = 0;
         break;
@@ -1532,18 +1558,12 @@ m6502_dirtyReg (reg_info * reg)
 	m6502_reg_x->isLitConst = 0;
         break;
       case Y_IDX:
+//        m6502_reg_ya->aop = NULL;
+//	m6502_reg_ya->isLitConst = 0;
         m6502_reg_yx->aop = NULL;
 	m6502_reg_yx->isLitConst = 0;
 	m6502_reg_y->aop = NULL;
 	m6502_reg_y->isLitConst = 0;
-        break;
-      case YX_IDX:
-        m6502_reg_yx->aop = NULL;
-	m6502_reg_yx->isLitConst = 0;
-        m6502_reg_y->aop = NULL;
-	m6502_reg_y->isLitConst = 0;
-        m6502_reg_x->aop = NULL;
-	m6502_reg_x->isLitConst = 0;
         break;
       case XA_IDX:
         m6502_reg_xa->aop = NULL;
@@ -1552,6 +1572,22 @@ m6502_dirtyReg (reg_info * reg)
 	m6502_reg_x->isLitConst = 0;
         m6502_reg_a->aop = NULL;
 	m6502_reg_a->isLitConst = 0;
+        break;
+//      case YA_IDX:
+//        m6502_reg_ya->aop = NULL;
+//	m6502_reg_ya->isLitConst = 0;
+//        m6502_reg_y->aop = NULL;
+//	m6502_reg_y->isLitConst = 0;
+//        m6502_reg_a->aop = NULL;
+//	m6502_reg_a->isLitConst = 0;
+        break;
+      case YX_IDX:
+        m6502_reg_yx->aop = NULL;
+	m6502_reg_yx->isLitConst = 0;
+        m6502_reg_y->aop = NULL;
+	m6502_reg_y->isLitConst = 0;
+        m6502_reg_x->aop = NULL;
+	m6502_reg_x->isLitConst = 0;
         break;
       default:
         break;

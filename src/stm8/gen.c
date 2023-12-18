@@ -6117,21 +6117,21 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
           right = temp;
         }
 
+      bool x_dead2 = regDead (X_IDX, ic) && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] <= i + 1 && right->aop->regs[XH_IDX] <= i + 1;
+      bool y_dead2 = regDead (Y_IDX, ic) && left->aop->regs[YL_IDX] <= i + 1 && left->aop->regs[YH_IDX] <= i + 1 && right->aop->regs[YL_IDX] <= i + 1 && right->aop->regs[YH_IDX] <= i + 1;
+
       if (i <= size - 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2)) && !((aopInReg(left->aop, i, A_IDX) || aopInReg(left->aop, i + 1, A_IDX))&& pushed_a))
         {
-          bool x_dead = regDead (X_IDX, ic) && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] <= i + 1 && right->aop->regs[XH_IDX] <= i + 1;
-          bool y_dead = regDead (Y_IDX, ic) && left->aop->regs[YL_IDX] <= i + 1 && left->aop->regs[YH_IDX] <= i + 1 && right->aop->regs[YL_IDX] <= i + 1 && right->aop->regs[YH_IDX] <= i + 1;
-
           /* Try to use flag setting from ldw */
           if((aopOnStackNotExt (left->aop, i, 2) || left->aop->type == AOP_DIR) &&
-            aopIsLitVal (right->aop, i, 2, 0x0000) && (x_dead || y_dead))
+            aopIsLitVal (right->aop, i, 2, 0x0000) && (x_dead2 || y_dead2))
             {
-              emit2 ("ldw", x_dead ? "x, %s" : "y, %s", aopGet2 (left->aop, i));
-              cost (2 + (left->aop->type == AOP_DIR) * (2 - x_dead), 2);
+              emit2 ("ldw", x_dead2 ? "x, %s" : "y, %s", aopGet2 (left->aop, i));
+              cost (2 + (left->aop->type == AOP_DIR) * (2 - x_dead2), 2);
             }
           else if (aopInReg (left->aop, i, Y_IDX) && aopOnStack (right->aop, i, 2))
             {
-              if (x_dead)
+              if (x_dead2)
                 {
                   emit3w (A_LDW, ASMOP_X, ASMOP_Y);
                   emit2 ("cpw", "x, %s", aopGet2 (right->aop, i));
@@ -6148,12 +6148,12 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
           else
             {
               bool cmp_y = aopInReg (left->aop, i, Y_IDX);
-              if (!cmp_y && !x_dead && !aopInReg (left->aop, i, X_IDX))
+              if (!cmp_y && !x_dead2 && !aopInReg (left->aop, i, X_IDX))
                 push (ASMOP_X, 0, 2);
               genMove_o (aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
               if (aopIsLitVal (right->aop, i, 2, 0x0000))
                 emit3w (A_TNZW, cmp_y ? ASMOP_Y : ASMOP_X, 0);
-              else if ((!cmp_y && (x_dead || !aopInReg (left->aop, i, X_IDX)) || cmp_y && regDead (Y_IDX, ic)) &&
+              else if ((!cmp_y && (x_dead2 || !aopInReg (left->aop, i, X_IDX)) || cmp_y && y_dead2) &&
                 (aopIsLitVal (right->aop, i, 2, 0x0001) || aopIsLitVal (right->aop, i, 2, 0xffff)))
                 emit3w (aopIsLitVal (right->aop, i, 2, 0x0001) ? A_DECW : A_INCW, cmp_y ? ASMOP_Y : ASMOP_X, 0);
               else
@@ -6162,7 +6162,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
                   cost (3 + cmp_y, 2);
                 }
 
-              if (!cmp_y && !x_dead && !aopInReg (left->aop, i, X_IDX))
+              if (!cmp_y && !x_dead2 && !aopInReg (left->aop, i, X_IDX))
                 pop (ASMOP_X, 0, 2);
             }
 
@@ -6191,14 +6191,32 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
           i++;
         }
-      else if (aopInReg (left->aop, i, X_IDX) && right->aop->type == AOP_STL || left->aop->type == AOP_STL && aopInReg (right->aop, i, X_IDX))
+      else if (i <= size - 2 && (aopInReg (left->aop, i, X_IDX) && right->aop->type == AOP_STL || left->aop->type == AOP_STL && aopInReg (right->aop, i, X_IDX)))
         {
           push (ASMOP_X, 0, 2);
-          genMove_o (ASMOP_X, 0, right->aop->type == AOP_STL ? right->aop : left->aop, i, 2, regDead (A_IDX, ic) || pushed_a, true, regDead (Y_IDX, ic));
+          genMove_o (ASMOP_X, 0, right->aop->type == AOP_STL ? right->aop : left->aop, i, 2, regDead (A_IDX, ic) || pushed_a, true, y_dead2);
           emit2 ("cpw", "x, (1, sp)");
           cost (2, 2);
-          pop (ASMOP_X, 0, 2);
+          if (x_dead2)
+            adjustStack (2, regDead (A_IDX, ic) || pushed_a, true, y_dead2);
+          else
+            pop (ASMOP_X, 0, 2);
           
+          i += 2;
+        }
+      else if (i <= size - 2 && right->aop->type == AOP_STL)
+        {
+          if (!x_dead2)
+            push (ASMOP_X, 0, 2);
+          genMove_o (ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) || pushed_a, true, y_dead2);
+          push (ASMOP_X, 0, 2);
+          genMove_o (ASMOP_X, 0, right->aop, i, 2, regDead (A_IDX, ic) || pushed_a, true, y_dead2);
+          emit2 ("cpw", "x, (1, sp)");
+          cost (2, 2);
+          adjustStack (2, regDead (A_IDX, ic) || pushed_a, true, y_dead2);
+          if (!x_dead2)
+            pop (ASMOP_X, 0, 2);
+
           i += 2;
         }
       else

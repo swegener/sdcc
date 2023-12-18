@@ -4,6 +4,8 @@
 	  Fix bug #3681.
 	* src/z80/peeph.def:
 	  Whitespace fix.
+	* src/stm8/gen.c:
+	  Fix bug #3683.
 
 2023-12-17 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -1,3 +1,9 @@
+2023-12-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdcc/configure,
+	  sdcc/configure.ac:
+	  Enable mos65c02 port.
+
 2023-12-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

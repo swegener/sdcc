@@ -1510,7 +1510,7 @@ Optional Features:
   --disable-pdk15-port    Excludes the PDK15 port
   --enable-pdk16-port     Includes the PDK16 port
   --disable-mos6502-port  Excludes the MOS6502 port
-  --enable-mos65c02-port  Includes the MOS65C02 port
+  --disable-mos65c02-port Excludes the MOS65C02 port
   --disable-ucsim         Disables configuring and building of ucsim
   --disable-device-lib    Disables building device libraries
   --disable-packihx       Disables building packihx
@@ -9084,11 +9084,11 @@ then :
 fi
 
 
-  if test "$enable_mos65c02_port" = "yes"; then
-    OPT_DISABLE_MOS65C02=0
-  else
-    enable_mos65c02_port="no"
+  if test "$enable_mos65c02_port" = "no"; then
     OPT_DISABLE_MOS65C02=1
+  else
+    enable_mos65c02_port="yes"
+    OPT_DISABLE_MOS65C02=0
   fi
 
 

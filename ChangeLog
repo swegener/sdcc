@@ -1,5 +1,15 @@
 2023-12-20 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* doc/sdccman.lyx:
+	  Remove comment on non-compliance with C2X draft N3047 wrt. tag compatibility: current C23 draft N3149 matches SDCC behaviour.
+
+2023-12-20 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Various updates to the manual.
+
+2023-12-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* .version,
 	  doc/INSTALL.txt,
 	  sdcc.spec:

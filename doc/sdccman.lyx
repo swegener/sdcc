@@ -2654,7 +2654,11 @@ reference "subsec:PIC16_Pragmas"
 \begin_layout Itemize
 In 3.2.0 new inline assembler format 
 \family typewriter
-__asm__ (inline_assembler_code
+__asm__ (
+\begin_inset Quotes sld
+\end_inset
+
+inline_assembler_code
 \begin_inset Quotes srd
 \end_inset
 
@@ -3333,7 +3337,61 @@ status collapsed
 
 \end_inset
 
+-disable-z80n-port Excludes the z80n port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-r800-port Excludes the r800 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
 -disable-r2k-port Excludes the r2k port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-r2ka-port Excludes the r2ka port
 \end_layout
 
 \begin_layout Labeling
@@ -3387,7 +3445,7 @@ status collapsed
 
 \end_inset
 
--disable-avr-port Excludes the AVR port (disabled by default)
+-disable-tlcs90-port Excludes the TLCS-90 port
 \end_layout
 
 \begin_layout Labeling
@@ -3406,6 +3464,24 @@ status collapsed
 \end_inset
 
 -disable-ds390-port Excludes the DS390 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-ds400-port Excludes the DS400 port
 \end_layout
 
 \begin_layout Labeling
@@ -3477,7 +3553,61 @@ status collapsed
 
 \end_inset
 
--disable-pic-port Excludes the PIC14 port
+-disable-pdk13-port Excludes the PDK13 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-pdk14-port Excludes the PDK14 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-pdk15-port Excludes the PDK15 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-pic14-port Excludes the PIC14 port
 \end_layout
 
 \begin_layout Labeling
@@ -3513,7 +3643,25 @@ status collapsed
 
 \end_inset
 
--disable-xa51-port Excludes the XA51 port (disabled by default)
+-disable-mos6502-port Excludes the MOS6502
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-mos65c02-port Excludes the MOS65C02
 \end_layout
 
 \begin_layout Labeling
@@ -8440,8 +8588,9 @@ version
 
 
 \family typewriter
-SDCC : mcs51/z80/avr/ds390/pic16/pic14/ds400/hc08 2.5.6 #4169 (May 8 2006)
- (UNIX)
+SDCC : mcs51/z80/z180/r2k/r2ka/r3ka/sm83/tlcs90/ez80_z80/z80n/r800/ds390/pic16/p
+ic14/TININative/ds400/hc08/s08/stm8/pdk13/pdk14/pdk15/mos6502/mos65c02 4.4.0
+ #14546 (Linux)
 \end_layout
 
 \begin_layout Standard
@@ -8950,7 +9099,8 @@ SDCC is not just a compiler, but a collection of tools by various developers.
 \end_inset
 
 You might want to look at the files which are installed in <installdir>.
- At the time of this writing, we find the following programs for gcc-builds:
+ At the time of this writing, we find the following programs, among others,
+ for gcc-builds:
 \begin_inset Newline newline
 \end_inset
 
@@ -9010,19 +9160,19 @@ sdld6808 - The 6808 linker.
 \end_layout
 
 \begin_layout Itemize
-s51 - The ucSim 8051 simulator.
+ucsim_51, s51 - The ucSim 8051 simulator.
 \end_layout
 
 \begin_layout Itemize
-sz80 - The ucSim Z80 simulator.
+ucsim_m68hc08 - The ucSim 6808 simulator.
 \end_layout
 
 \begin_layout Itemize
-shc08 - The ucSim 6808 simulator.
+ucsim_stm8 - The ucSim STM8 simulator.
 \end_layout
 
 \begin_layout Itemize
-sstm8 - The ucSim STM8 simulator.
+ucsim_z80 - The ucSim Z80 simulator.
 \end_layout
 
 \begin_layout Itemize
@@ -9199,11 +9349,12 @@ https://shop-pdp.net/
 \end_layout
 
 \begin_layout Subsection
-s51, sz80, shc08, sstm8 - The Simulators
+ucsim_51, ucsim_z80, ucsim_stm8 etc.
+ - The Simulators
 \end_layout
 
 \begin_layout Standard
-s51
+ucsim_51 (or s51)
 \begin_inset Index idx
 status collapsed
 
@@ -9213,7 +9364,7 @@ s51 (simulator)
 
 \end_inset
 
-, sz80
+, ucsim_z80
 \begin_inset Index idx
 status collapsed
 
@@ -9223,7 +9374,7 @@ sz80 (simulator)
 
 \end_inset
 
- shc08
+ ucsim_m68hc08
 \begin_inset Index idx
 status collapsed
 
@@ -9233,7 +9384,7 @@ shc08 (simulator)
 
 \end_inset
 
- and sstm8 
+ and ucsim_stm8 
 \begin_inset Index idx
 status collapsed
 
@@ -9243,7 +9394,8 @@ sstm8 (simulator)
 
 \end_inset
 
- are free open source simulators developed by Daniel Drotos.
+, as well as similarly named programs provided with SDCC, are free open
+ source simulators developed by Daniel Drotos.
  The simulators are built as part of the build process.
  For more information visit Daniel's web site at: 
 \begin_inset Flex URL
@@ -9258,7 +9410,7 @@ http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51
 
 .
  It currently supports the core mcs51, the Dallas DS80C390, the Phillips
- XA51 family, the Z80, 6808 and the STM8.
+ XA51 family, the Z80, 6808 the STM8 and various others.
 \end_layout
 
 \begin_layout Subsection
@@ -10023,7 +10175,7 @@ constexpr is not implemented.
 \end_layout
 
 \begin_layout Itemize
-SDCC deviates from the C2X standard draft N3047 in tag compatibility for
+SDCC deviates from the C23 standard draft N3047 in tag compatibility for
  unions: in SDCC, redeclarations of unions are required to have their members
  in the same order as previous declarations.
  The rule in N3047 is now considered a mistake by many, and will hopefully
@@ -19182,7 +19334,7 @@ MOS6502 options
 
 \end_inset
 
-
+ (apply to mos6502, mos65c02)
 \end_layout
 
 \begin_layout Labeling
@@ -23234,7 +23386,7 @@ data (hc08 named address space)
 \end_layout
 
 \begin_layout Standard
-Variables in the address space __zp resides in the first 256 bytes of memory
+Variables in the address space __zp reside in the first 256 bytes of memory
  (the Page Zero).
  The MOS6502
 \begin_inset Index idx
@@ -28014,7 +28166,7 @@ or for SDCC version 3.2.0 or newer:
 \begin_layout Verse
 
 \family typewriter
-#define CLI asm (
+#define CLI __asm__ (
 \begin_inset Quotes sld
 \end_inset
 
@@ -28028,7 +28180,7 @@ cli
 \begin_layout Verse
 
 \family typewriter
-#define SEI asm (
+#define SEI __asm__ (
 \begin_inset Quotes sld
 \end_inset
 
@@ -28657,6 +28809,11 @@ nop
 __endasm;
 \end_layout
 
+\begin_layout Standard
+Note: As of SDCC 4.2.9, assembler comments occurring in this type of inline
+ assembler block are affected by macro expansion.
+\end_layout
+
 \begin_layout Subsubsection
 New __asm__ (
 \begin_inset Quotes sld
@@ -28672,6 +28829,8 @@ inline_assembler_code
 \begin_layout Standard
 The __asm__ inline assembler code format was introduced in SDCC version
  3.2.0.
+ Its main advantage is that it is compatible with all standard compliant
+ C preprocessors.
 \end_layout
 
 \begin_layout Standard
@@ -28695,6 +28854,88 @@ tnop
 \begin_inset Quotes srd
 \end_inset
 
+);
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or for better readability:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+__asm__ (
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\begin_inset Quotes sld
+\end_inset
+
+; This is a comment
+\backslash
+n
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\begin_inset Quotes sld
+\end_inset
+
+label:
+\backslash
+n
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\begin_inset Quotes sld
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+nop
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
 );
 \end_layout
 
@@ -31328,7 +31569,7 @@ volatile
 
 \end_inset
 
- data unsigned char counter;
+ __data unsigned char counter;
 \begin_inset Newline newline
 \end_inset
 

@@ -8,7 +8,7 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       4.3.0
+Version:       4.4.0
 Release:       1
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
@@ -98,6 +98,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
+* Mon Feb 14 2022 - philipp AT colecovision.eu
+- version updated to 4.4.0
 * Mon Feb 14 2022 - krauseph AT informatik.uni-freiburg.de
 - version updated to 4.2.0
 * Sat Feb 20 2021 - pkk AT spth.de

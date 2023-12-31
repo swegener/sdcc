@@ -221,7 +221,7 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
             {
               bool completely_spilt = OP_SYMBOL (op)->isspilt;
               for (int i = 0; i < OP_SYMBOL (op)->nRegs; i++)
-                if (OP_SYMBOL (op)->regs[i]);
+                if (OP_SYMBOL (op)->regs[i])
                   completely_spilt = false;
               if (completely_spilt)
                 {

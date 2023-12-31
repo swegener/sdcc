@@ -2080,13 +2080,15 @@ static void accopWithAop (char *accop, asmop *aop, int loffset)
   if (aop->type == AOP_DUMMY)
     return;
 
-  if (loffset >= aop->size) {
-    emit6502op (accop, "#0x00");
-  } else if (aop->type == AOP_REG) {
+  if (aop->type == AOP_REG) {
+    if (loffset < aop->size) {
     // TODO FIXME: this needs forcestore
     storeRegTemp (aop->aopu.aop_reg[loffset], true);
     emit6502op (accop, TEMPFMT, _G.tempOfs - 1);
     loadRegTemp(NULL);
+    } else {
+      emit6502op (accop, "#0x00");
+    }
   } else {
     aopAdrPrepare(aop, loffset);
     emit6502op (accop, aopAdrStr (aop, loffset, false));

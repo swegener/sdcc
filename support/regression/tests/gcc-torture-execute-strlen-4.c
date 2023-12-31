@@ -41,7 +41,6 @@ volatile int v7 = 7;
 void test_array_ptr (void)
 {
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Bug #2987
   /* Compute the length of the string at the refeenced array.  */
   A (*(&a[0][0] + 0), 1);
   A (*(&a[0][0] + 1), 3);
@@ -170,7 +169,6 @@ void test_array_ptr (void)
   A (*(&a[i0][v1] - i1) + i1, 0);
   A (*(&a[i0][v1] + i0) + i3, 0);
   A (*(&a[i0][v1] + i1) + i5, 0);
-#endif
 #endif
 }
 

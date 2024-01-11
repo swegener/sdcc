@@ -1073,6 +1073,7 @@ static const char *const _libs_tlcs90[] = { "tlcs90", NULL, };
 static const char *const _libs_sm83[] = { "sm83", NULL, };
 static const char *const _libs_ez80_z80[] = { "ez80_z80", NULL, };
 static const char *const _libs_z80n[] = { "z80n", NULL, };
+static const char *const _libs_r800[] = { "r800", NULL, };
 
 /* Globals */
 PORT z80_port =
@@ -2310,7 +2311,7 @@ PORT r800_port =
     ".rel",
     1,
     _crt,                       /* crt */
-    _libs_z80,                 /* libs */
+    _libs_r800,                 /* libs */
   },
   {                             /* Peephole optimizer */
     _z80_defaultRules,

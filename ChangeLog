@@ -2,6 +2,8 @@
 
 	* src/z80/main.c:
 	  Fix bug #3693.
+	* support/scripts/sdcc.nsi:
+	  Fix bug #3686.
 
 2023-12-28 Gabriele Gorla <gorlik@yahoo.com>
 

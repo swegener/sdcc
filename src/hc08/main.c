@@ -762,6 +762,12 @@ hc08_getInstructionSize (lineNode *line)
   return line->aln->size;
 }
 
+static const char *
+s08_get_model (void)
+{
+    return(options.stackAuto ? "s08-stack-auto" : "s08");
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -942,7 +948,7 @@ PORT s08_port =
     false,                      /* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,
     MODEL_LARGE,
-    NULL,                       /* model == target */
+    s08_get_model,
   },
   {
     _asmCmd,

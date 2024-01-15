@@ -898,6 +898,12 @@ ${Section} "SDCC WDC 65C02 library" SEC36
   File "${DEV_ROOT}\lib\mos65c02\*.*"
 ${SectionEnd}
 
+${Section} "SDCC S08 stack-auto library" SEC37
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\s08-stack-auto"
+  File "${DEV_ROOT}\lib\s08-stack-auto\*.*"
+${SectionEnd}
+
 ;--------------------------------
 ;Descriptions
 
@@ -938,6 +944,7 @@ LangString DESC_SEC33 ${LANG_ENGLISH} "SDCC Rabbit 2000A library"
 LangString DESC_SEC34 ${LANG_ENGLISH} "SDCC MOS 6502 library"
 LangString DESC_SEC35 ${LANG_ENGLISH} "SDCC R800 library"
 LangString DESC_SEC36 ${LANG_ENGLISH} "SDCC WDC 65C02 library"
+LangString DESC_SEC37 ${LANG_ENGLISH} "SDCC S08 stack-auto library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -979,6 +986,7 @@ LangString DESC_SEC36 ${LANG_ENGLISH} "SDCC WDC 65C02 library"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC34} $(DESC_SEC34)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC35} $(DESC_SEC35)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC36} $(DESC_SEC36)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC37} $(DESC_SEC37)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
@@ -1154,6 +1162,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\mos65c02\mos65c02.lib"
   Delete "$INSTDIR\lib\src\mos65c02\Makefile"
 
+  Delete "$INSTDIR\lib\src\s08-stack-auto\pdk15.lib"
+  Delete "$INSTDIR\lib\src\s08-stack-auto\Makefile"
+
   Delete "$INSTDIR\lib\src\*.c"
 
   Delete "$INSTDIR\lib\pic14\*.lib"
@@ -1231,6 +1242,8 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\mos65c02\*.rel"
   Delete "$INSTDIR\lib\mos65c02\*.lib"
+
+  Delete "$INSTDIR\lib\s08-stack-auto\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\r2k\*.h"
@@ -1352,6 +1365,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\z80n"
   RMDir "$INSTDIR\lib\src\r800"
   RMDir "$INSTDIR\lib\src\mos65c02"
+  RMDir "$INSTDIR\lib\src\s08-stack-auto"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
 
@@ -1387,6 +1401,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\z80n"
   RMDir "$INSTDIR\lib\r800"
   RMDir "$INSTDIR\lib\mos65c02"
+  RMDir "$INSTDIR\lib\s08-stack-auto"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"
 

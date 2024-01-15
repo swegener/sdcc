@@ -1,3 +1,8 @@
+2023-01-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/scripts/sdcc.nsi:
+	  Fix bug #3695.
+
 2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/hc08/main.c:

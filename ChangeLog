@@ -1,14 +1,19 @@
-2023-01-15 Philipp Klaus Krause <philipp@colecovision.eu>
+2024-01-16 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/Makefile.in:
+	  Makeshift fix for bug #3694: Delete sdcpp in uninstall.
+
+2024-01-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/scripts/sdcc.nsi:
 	  Fix bug #3695.
 
-2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/hc08/main.c:
 	  Fix bug #3690.
 
-2023-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
+2024-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/main.c:
 	  Fix bug #3693.

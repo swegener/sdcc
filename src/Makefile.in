@@ -70,8 +70,10 @@ install: all installdirs
 
 # Deleting all the installed files
 # --------------------------------
+# NOTE: Deleting sdcpp in here, because the GNU cpp code base does not implement the uninstall target
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/`echo sdcc|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo sdcpp|sed '$(transform)'`$(EXEEXT)
 
 # Performing self-test
 # --------------------

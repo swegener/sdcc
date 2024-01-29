@@ -344,9 +344,12 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
   if (dic->seq < ebp->fSeq || dic->seq > ebp->lSeq)
     return 0;                /* non-local */
 
-  /* for now handle results from assignments from globals only */
-  if (!(dic->op == '=' || dic->op == CAST && SPEC_USIGN (getSpec (operandType (IC_RIGHT (dic)))) && operandSize (op) > operandSize (IC_RIGHT (dic)))
-    || !isOperandGlobal (IC_RIGHT (dic)))
+  /* for now handle results from assignments from globals, and from 8-bit __sfr only */
+  if (!(dic->op == '=' || dic->op == CAST && SPEC_USIGN (getSpec (operandType (IC_RIGHT (dic)))) && operandSize (op) >= operandSize (IC_RIGHT (dic)) && (!IS_BITINT (OP_SYM_TYPE (IC_RIGHT (dic))) || !(SPEC_BITINTWIDTH (OP_SYM_TYPE (IC_RIGHT (dic))) % 8)))
+    || !(isOperandGlobal (IC_RIGHT (dic)) || IS_SYMOP (IC_RIGHT (dic)) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (IC_RIGHT (dic))->etype)) && operandSize (op) == 1 && operandSize (IC_RIGHT (dic)) == 1))
+    return 0;
+
+  if ((IS_OP_VOLATILE (IC_LEFT (ic)) || IS_OP_VOLATILE (IC_RIGHT (ic))) && IS_OP_VOLATILE (IC_RIGHT (dic))) // Avoid swapping read order on volatiles.
     return 0;
 
   if (IS_OP_VOLATILE (IC_RESULT (ic)) && IS_OP_VOLATILE (IC_RIGHT (dic))) // Only case with two volatiles that we can optimize: Some bitwise operation on __sfr.
@@ -391,7 +394,7 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
     }
 
   /* Optimize out the assignment */
-  *opp = operandFromOperand (IC_RIGHT(dic));
+  *opp = operandFromOperand (IC_RIGHT (dic));
   (*opp)->isaddr = true;
   
   bitVectUnSetBit (OP_SYMBOL (op)->defs, dic->key);
@@ -502,14 +505,14 @@ packRegisters (eBBlock * ebp)
       /* In some cases redundant moves can be eliminated */
       if (ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS ||
         ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS ||
-        ic->op == '|' || ic->op == '&' || ic->op == '^' ||
+        ic->op == '|' || ic->op == BITWISEAND || ic->op == '^' ||
         ic->op == EQ_OP || ic->op == NE_OP ||
         ic->op == IFX && operandSize (IC_COND (ic)) == 1 ||
         ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1 ||
         ic->op == LEFT_OP || ic->op == RIGHT_OP)
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
       if (ic->op == '+' || ic->op == '-' ||
-        ic->op == '|' || ic->op == '&' || ic->op == '^' ||
+        ic->op == '|' || ic->op == BITWISEAND || ic->op == '^' ||
         ic->op == EQ_OP || ic->op == NE_OP ||
         ic->op == LEFT_OP || ic->op == RIGHT_OP)
         packRegsForOneuse (ic, &(IC_RIGHT (ic)), ebp);

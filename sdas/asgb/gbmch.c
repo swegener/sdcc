@@ -750,5 +750,5 @@ minit()
         /*
          * Address Space
          */
-        exprmasks(3);
+        exprmasks(4);
 }

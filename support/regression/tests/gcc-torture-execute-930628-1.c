@@ -18,7 +18,7 @@ void f (double x[2], double y[2])
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !( (defined (__SDCC_mos6502) || defined(__SDCC_mos65c02 )) && defined(__SDCC_STACK_AUTO) ) // Lack of memory
   struct { int f[3]; double x[1][2]; } tp[4][2];
   int i, j, ki, kj, mi, mj;
   float bdm[4][2][4][2];

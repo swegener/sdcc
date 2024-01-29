@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !( (defined (__SDCC_mos6502) || defined(__SDCC_mos65c02 )) && defined(__SDCC_STACK_AUTO) ) // Lack of memory
   int i, j, k, l;
   float x[8][2][8][2];
 

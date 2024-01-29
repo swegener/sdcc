@@ -2,38 +2,33 @@
 
   SDCCralloc.c - source file for register allocation. M6502 specific
 
-                Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
+  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
--------------------------------------------------------------------------*/
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  -------------------------------------------------------------------------*/
 
 #include "ralloc.h"
 #include "gen.h"
-
 #include "dbuf_string.h"
 
 /* Flags to turn on debugging code.
  */
 enum
-{
-  D_ALLOC = 0,
-};
+  {
+    D_ALLOC = 0,
+  };
 
 #if 1
 #define D(_a, _s)       if (_a)  { printf _s; fflush(stdout); }
@@ -43,33 +38,30 @@ enum
 
 /** Local static variables */
 static struct
-  {
-    bitVect *spiltSet;
-    set *stackSpil;
-    short blockSpil;
-    int slocNum;
-    int stackExtend;
-    int dataExtend;
+{
+  bitVect *spiltSet;
+  set *stackSpil;
+  short blockSpil;
+  int slocNum;
+  int stackExtend;
+  int dataExtend;
 } _G;
 
 /* 6502 registers */
 reg_info regsm6502[] =
-{
-  {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
-  {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
-  {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
-  {REG_GPR, XA_IDX,  "xa", M6502MASK_XA, NULL, 0, 1},
-//  {REG_GPR, YA_IDX,  "ya", M6502MASK_YA, NULL, 0, 1},
-  {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
-  {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
-  {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
-};
-
-extern void genm6502Code (iCode *);
+  {
+    {REG_GPR, A_IDX,   "a",  M6502MASK_A,  NULL, 0, 1},
+    {REG_GPR, X_IDX,   "x",  M6502MASK_X,  NULL, 0, 1},
+    {REG_GPR, Y_IDX,   "y",  M6502MASK_Y,  NULL, 0, 1},
+    {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
+    {REG_GPR, XA_IDX,  "xa", M6502MASK_XA, NULL, 0, 1},
+    //  {REG_GPR, YA_IDX,  "ya", M6502MASK_YA, NULL, 0, 1},
+    {REG_GPR, YX_IDX,  "yx", M6502MASK_YX, NULL, 0, 1},
+    {0,       SP_IDX,  "sp", 0, NULL, 0, 1},
+  };
 
 /* Shared with gen.c */
 int m6502_ptrRegReq;             /* one byte pointer register required */
-
 
 int m6502_nRegs = sizeof(regsm6502)/sizeof(reg_info);
 
@@ -81,8 +73,10 @@ reg_info *m6502_reg_xa;
 reg_info *m6502_reg_yx;
 reg_info *m6502_reg_sp;
 
-void m6502SpillThis (symbol *);
+static void m6502SpillThis (symbol *);
 static void updateRegUsage (iCode * ic);
+extern void genm6502Code (iCode *);
+
 
 /*-----------------------------------------------------------------*/
 /* m6502_regWithIdx - returns pointer to register with index number */
@@ -96,7 +90,7 @@ m6502_regWithIdx (int idx)
     if (regsm6502[i].rIdx == idx)
       return &regsm6502[i];
 
-    printf("error: regWithIdx %d not found\n",idx);
+  printf("error: regWithIdx %d not found\n",idx);
   exit (1);
 }
 
@@ -117,40 +111,40 @@ m6502_freeReg (reg_info * reg)
 
   switch (reg->rIdx)
     {
-      case A_IDX:
-        if (m6502_reg_x->isFree)
-          m6502_reg_xa->isFree = 1;
-        break;
-      case X_IDX:
-        if (m6502_reg_a->isFree)
-          m6502_reg_xa->isFree = 1;
-        if (m6502_reg_y->isFree)
-          m6502_reg_yx->isFree = 1;
-        break;
-      case Y_IDX:
-        if (m6502_reg_x->isFree)
-          m6502_reg_yx->isFree = 1;
-        break;
-      case XA_IDX:
-        m6502_reg_x->isFree = 1;
-        m6502_reg_a->isFree = 1;
-        if (m6502_reg_y->isFree)
-          m6502_reg_yx->isFree = 1;
-        break;
-//      case YA_IDX:
-//        m6502_reg_y->isFree = 1;
-//        m6502_reg_a->isFree = 1;
-//        if (m6502_reg_x->isFree)
-//          m6502_reg_yx->isFree = 1;
-//        break;
-      case YX_IDX:
-        m6502_reg_y->isFree = 1;
-        m6502_reg_x->isFree = 1;
-        if (m6502_reg_a->isFree)
-          m6502_reg_xa->isFree = 1;
-        break;
-      default:
-        break;
+    case A_IDX:
+      if (m6502_reg_x->isFree)
+	m6502_reg_xa->isFree = 1;
+      break;
+    case X_IDX:
+      if (m6502_reg_a->isFree)
+	m6502_reg_xa->isFree = 1;
+      if (m6502_reg_y->isFree)
+	m6502_reg_yx->isFree = 1;
+      break;
+    case Y_IDX:
+      if (m6502_reg_x->isFree)
+	m6502_reg_yx->isFree = 1;
+      break;
+    case XA_IDX:
+      m6502_reg_x->isFree = 1;
+      m6502_reg_a->isFree = 1;
+      if (m6502_reg_y->isFree)
+	m6502_reg_yx->isFree = 1;
+      break;
+      //      case YA_IDX:
+      //        m6502_reg_y->isFree = 1;
+      //        m6502_reg_a->isFree = 1;
+      //        if (m6502_reg_x->isFree)
+      //          m6502_reg_yx->isFree = 1;
+      //        break;
+    case YX_IDX:
+      m6502_reg_y->isFree = 1;
+      m6502_reg_x->isFree = 1;
+      if (m6502_reg_a->isFree)
+	m6502_reg_xa->isFree = 1;
+      break;
+    default:
+      break;
     }
 }
 
@@ -164,8 +158,8 @@ noOverLap (set * itmpStack, symbol * fsym)
 
   for (sym = setFirstItem (itmpStack); sym; sym = setNextItem (itmpStack))
     {
-        if (bitVectBitValue(sym->clashes,fsym->key)) 
-          return 0;
+      if (bitVectBitValue(sym->clashes,fsym->key)) 
+	return 0;
     }
   return 1;
 }
@@ -245,19 +239,19 @@ createStackSpil (symbol * sym)
      temporarily turn it off ; we also
      turn off memory model to prevent
      the spil from going to the external storage
-   */
+  */
 
-//  useXstack = options.useXstack;
-//  model = options.model;
-/*     noOverlay = options.noOverlay; */
-/*     options.noOverlay = 1; */
-//  options.model = options.useXstack = 0;
+  //  useXstack = options.useXstack;
+  //  model = options.model;
+  /*     noOverlay = options.noOverlay; */
+  /*     options.noOverlay = 1; */
+  //  options.model = options.useXstack = 0;
 
   allocLocal (sloc);
 
-//  options.useXstack = useXstack;
-//  options.model = model;
-/*     options.noOverlay = noOverlay; */
+  //  options.useXstack = useXstack;
+  //  options.model = model;
+  /*     options.noOverlay = noOverlay; */
   sloc->isref = 1;              /* to prevent compiler warning */
 
   /* if it is on the stack then update the stack */
@@ -268,7 +262,7 @@ createStackSpil (symbol * sym)
     }
   else
     {
-    _G.dataExtend += getSize (sloc->type);
+      _G.dataExtend += getSize (sloc->type);
     }
 
   /* add it to the stackSpil set */
@@ -287,7 +281,7 @@ createStackSpil (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spills a specific operand                           */
 /*-----------------------------------------------------------------*/
-void
+static void
 m6502SpillThis (symbol * sym)
 {
   int i;
@@ -682,7 +676,7 @@ findAssignToSym (operand * op, iCode * ic)
           !POINTER_SET (dic) &&
           IC_RESULT (dic)->key == op->key
           &&  IS_TRUE_SYMOP(IC_RIGHT(dic))
-        )
+	  )
         break;  /* found where this temp was defined */
 
       /* if we find an usage then we cannot delete it */
@@ -719,7 +713,7 @@ findAssignToSym (operand * op, iCode * ic)
 
   /* if the symbol is in far space then we should not */
   /* if (isOperandInFarSpace (IC_RIGHT (dic)))
-    return NULL; */
+     return NULL; */
 
 
   /* now make sure that the right side of dic
@@ -1021,7 +1015,7 @@ packPointerOp (iCode * ic, eBBlock ** ebpp)
     return;
 
   if (dic->op == '+' && (IS_OP_LITERAL (IC_RIGHT (dic)) ||
-                        (IS_ITEMP (IC_RIGHT (dic)) && OP_SYMBOL (IC_RIGHT (dic))->remat)))
+			 (IS_ITEMP (IC_RIGHT (dic)) && OP_SYMBOL (IC_RIGHT (dic))->remat)))
     {
       nonOffsetOp = IC_LEFT (dic);
       offsetOp = IC_RIGHT (dic);
@@ -1051,13 +1045,13 @@ packPointerOp (iCode * ic, eBBlock ** ebpp)
             }
           else if (POINTER_SET (uic))
             {
-// FIXME: this code will make bug-3385.c fail
-// it seems there are some corner cases where this 
-// optimization is unsafe.
-// Other cases might also be unsafe but no test triggers it.
-// HC08 is also affected by the same issue.
-            //  return;
-// remove the return above to trigger the failure.
+	      // FIXME: this code will make bug-3385.c fail
+	      // it seems there are some corner cases where this 
+	      // optimization is unsafe.
+	      // Other cases might also be unsafe but no test triggers it.
+	      // HC08 is also affected by the same issue.
+	      //  return;
+	      // remove the return above to trigger the failure.
               if (IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic)) && operandLitValue (IC_LEFT (uic)) != 0)
                 return;
               if (IC_LEFT (uic) && IS_SYMOP (IC_LEFT (uic)))
@@ -1114,145 +1108,145 @@ packRegisters (eBBlock ** ebpp, int count)
 
   for (blockno=0; blockno<count; blockno++)
     {
-  eBBlock *ebp = ebpp[blockno];
+      eBBlock *ebp = ebpp[blockno];
 
-  do
-    {
-      change = 0;
-      /* look for assignments of the form */
-      /* iTempNN = TrueSym (someoperation) SomeOperand */
-      /*       ....                       */
-      /* TrueSym := iTempNN:1             */
+      do
+	{
+	  change = 0;
+	  /* look for assignments of the form */
+	  /* iTempNN = TrueSym (someoperation) SomeOperand */
+	  /*       ....                       */
+	  /* TrueSym := iTempNN:1             */
+	  for (ic = ebp->sch; ic; ic = ic->next)
+	    {
+	      /* find assignment of the form TrueSym := iTempNN:1 */
+	      if (ic->op == '=' && !POINTER_SET (ic))
+		change += packRegsForAssign (ic, ebp);
+	    }
+	}
+      while (change);
+
       for (ic = ebp->sch; ic; ic = ic->next)
-        {
-          /* find assignment of the form TrueSym := iTempNN:1 */
-          if (ic->op == '=' && !POINTER_SET (ic))
-            change += packRegsForAssign (ic, ebp);
-        }
-    }
-  while (change);
-
-  for (ic = ebp->sch; ic; ic = ic->next)
-    {
-      //packRegsForLiteral (ic);
+	{
+	  //packRegsForLiteral (ic);
       
-      /* move SEND to immediately precede its CALL/PCALL */
-      if (ic->op == SEND && ic->next &&
-          ic->next->op != CALL && ic->next->op != PCALL)
-        {
-          ic = moveSendToCall (ic, ebp);
-        }
+	  /* move SEND to immediately precede its CALL/PCALL */
+	  if (ic->op == SEND && ic->next &&
+	      ic->next->op != CALL && ic->next->op != PCALL)
+	    {
+	      ic = moveSendToCall (ic, ebp);
+	    }
       
-      /* if this is an itemp & result of an address of a true sym
-         then mark this as rematerialisable   */
-      if (ic->op == ADDRESS_OF &&
-          IS_ITEMP (IC_RESULT (ic)) &&
-          IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-          !OP_SYMBOL (IC_LEFT (ic))->onStack)
-        {
-          OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-          OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-          OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-        }
+	  /* if this is an itemp & result of an address of a true sym
+	     then mark this as rematerialisable   */
+	  if (ic->op == ADDRESS_OF &&
+	      IS_ITEMP (IC_RESULT (ic)) &&
+	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+	      bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+	      !OP_SYMBOL (IC_LEFT (ic))->onStack)
+	    {
+	      OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	      OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	      OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+	    }
 
-      /* Safe: just propagates the remat flag */
-      /* if straight assignment then carry remat flag if this is the
-         only definition */
-      if (ic->op == '=' &&
-          !POINTER_SET (ic) &&
-          IS_SYMOP (IC_RIGHT (ic)) &&
-          OP_SYMBOL (IC_RIGHT (ic))->remat &&
-          bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1 &&
-          !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
-          !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
-          !isOperandGlobal (IC_RESULT (ic)))
-        {
-          OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
-          OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-        }
+	  /* Safe: just propagates the remat flag */
+	  /* if straight assignment then carry remat flag if this is the
+	     only definition */
+	  if (ic->op == '=' &&
+	      !POINTER_SET (ic) &&
+	      IS_SYMOP (IC_RIGHT (ic)) &&
+	      OP_SYMBOL (IC_RIGHT (ic))->remat &&
+	      bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1 &&
+	      !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
+	      !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
+	      !isOperandGlobal (IC_RESULT (ic)))
+	    {
+	      OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
+	      OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+	    }
 
-      /* if cast to a pointer & the pointer being
-         cast is remat, then we can remat this cast as well */
-      if (ic->op == CAST &&
-          IS_SYMOP(IC_RIGHT(ic)) &&
-          OP_SYMBOL(IC_RIGHT(ic))->remat &&
-          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-          !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
-          !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
-          !isOperandGlobal (IC_RESULT (ic)))
-        {
-          sym_link *to_type = operandType(IC_LEFT(ic));
-          sym_link *from_type = operandType(IC_RIGHT(ic));
+	  /* if cast to a pointer & the pointer being
+	     cast is remat, then we can remat this cast as well */
+	  if (ic->op == CAST &&
+	      IS_SYMOP(IC_RIGHT(ic)) &&
+	      OP_SYMBOL(IC_RIGHT(ic))->remat &&
+	      bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+	      !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
+	      !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
+	      !isOperandGlobal (IC_RESULT (ic)))
+	    {
+	      sym_link *to_type = operandType(IC_LEFT(ic));
+	      sym_link *from_type = operandType(IC_RIGHT(ic));
               if (IS_PTR(to_type) && IS_PTR(from_type))
-            {
-              OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-              OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-              OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-            }
-        }
+		{
+		  OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+		  OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+		  OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+		}
+	    }
 
-      /* if this is a +/- operation with a rematerializable
-         then mark this as rematerializable as well */
-      if ((ic->op == '+' || ic->op == '-') &&
-          (IS_SYMOP (IC_LEFT (ic)) &&
-           IS_ITEMP (IC_RESULT (ic)) &&
-           IS_OP_LITERAL (IC_RIGHT (ic))) &&
-           OP_SYMBOL (IC_LEFT (ic))->remat &&
-          (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
-           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
-        {
-          OP_SYMBOL (IC_RESULT (ic))->remat = 1;
-          OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
-          OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-        }
-      /* mark the pointer usages */
-      if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
-        OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
+	  /* if this is a +/- operation with a rematerializable
+	     then mark this as rematerializable as well */
+	  if ((ic->op == '+' || ic->op == '-') &&
+	      (IS_SYMOP (IC_LEFT (ic)) &&
+	       IS_ITEMP (IC_RESULT (ic)) &&
+	       IS_OP_LITERAL (IC_RIGHT (ic))) &&
+	      OP_SYMBOL (IC_LEFT (ic))->remat &&
+	      (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
+	      bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
+	    {
+	      OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+	      OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+	      OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+	    }
+	  /* mark the pointer usages */
+	  if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
+	    OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-      if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic)))
-        OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
+	  if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic)))
+	    OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
-      /* reduce for support function calls */
-      if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
-        packRegsForSupport (ic, ebp);
+	  /* reduce for support function calls */
+	  if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
+	    packRegsForSupport (ic, ebp);
 
-      /* if the condition of an if instruction
-         is defined in the previous instruction and
-         this is the only usage then
-         mark the itemp as a conditional */
-      if ((IS_CONDITIONAL (ic) ||
-           (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
-          ic->next && ic->next->op == IFX &&
-          bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
-          isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
-          OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
-        {
-          OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
-          continue;
-        }
+	  /* if the condition of an if instruction
+	     is defined in the previous instruction and
+	     this is the only usage then
+	     mark the itemp as a conditional */
+	  if ((IS_CONDITIONAL (ic) ||
+	       (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
+	      ic->next && ic->next->op == IFX &&
+	      bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
+	      isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
+	      OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
+	    {
+	      OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+	      continue;
+	    }
 
-      /* pack for PUSH
-         iTempNN := (some variable in farspace) V1
-         push iTempNN ;
-         -------------
-         push V1
-       */
-      if (ic->op == IPUSH || ic->op == SEND)
-        {
+	  /* pack for PUSH
+	     iTempNN := (some variable in farspace) V1
+	     push iTempNN ;
+	     -------------
+	     push V1
+	  */
+	  if (ic->op == IPUSH || ic->op == SEND)
+	    {
               packForPush (ic, ebpp, count);
-        }
+	    }
 
-      if (POINTER_SET (ic) || POINTER_GET (ic))
-        packPointerOp (ic, ebpp);
+	  if (POINTER_SET (ic) || POINTER_GET (ic))
+	    packPointerOp (ic, ebpp);
 
         }
     }
 }
 
-/**
-  Mark variables for assignment by the register allocator.
- */
+/*-----------------------------------------------------------------*/
+/*   Mark variables for assignment by the register allocator.      */
+/*-----------------------------------------------------------------*/
 static void
 serialRegMark (eBBlock ** ebbs, int count)
 {
@@ -1293,7 +1287,7 @@ serialRegMark (eBBlock ** ebbs, int count)
               ic->op == IFX ||
               ic->op == IPUSH ||
               (IC_RESULT (ic) && POINTER_SET (ic)))
-              continue;
+	    continue;
 
           /* now we need to allocate registers only for the result */
           if (IC_RESULT (ic))
@@ -1402,15 +1396,16 @@ m6502_assignRegisters (ebbIndex *ebbi)
   int i;
 
   m6502_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
+  // TODO: add asserts to make sure IDX is correct
   m6502_reg_a = m6502_regWithIdx(A_IDX);
   m6502_reg_x = m6502_regWithIdx(X_IDX);
   m6502_reg_y = m6502_regWithIdx(Y_IDX);
   m6502_reg_xa = m6502_regWithIdx(XA_IDX);
-//  m6502_reg_ya = m6502_regWithIdx(YA_IDX);
+  //  m6502_reg_ya = m6502_regWithIdx(YA_IDX);
   m6502_reg_yx = m6502_regWithIdx(YX_IDX);
   m6502_reg_sp = m6502_regWithIdx(SP_IDX);
 
-//  transformPointerSet (ebbs, count);
+  //  transformPointerSet (ebbs, count);
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */
@@ -1437,13 +1432,13 @@ m6502_assignRegisters (ebbIndex *ebbi)
   /* if stack was extended then tell the user */
   if (_G.stackExtend)
     {
-//      printf("Stack spills for %s: %d\n", currFunc->name, _G.stackExtend);
+      //      printf("Stack spills for %s: %d\n", currFunc->name, _G.stackExtend);
       _G.stackExtend = 0;
     }
 
   if (_G.dataExtend)
     {
-//      printf("Data spills for %s: %d\n", currFunc->name, _G.dataExtend);
+      //      printf("Data spills for %s: %d\n", currFunc->name, _G.dataExtend);
       _G.dataExtend = 0;
     }
 
@@ -1472,9 +1467,9 @@ m6502_assignRegisters (ebbIndex *ebbi)
 
   /* mark all registers as free */
   for (i = 0; i < m6502_nRegs; i++) {
-      reg_info *reg = m6502_regWithIdx (i);
-      m6502_freeReg (reg);
-      m6502_dirtyReg (reg);
+    reg_info *reg = m6502_regWithIdx (i);
+    m6502_freeReg (reg);
+    m6502_dirtyReg (reg);
   }
 
   return;
@@ -1490,44 +1485,44 @@ m6502_useReg (reg_info * reg)
 
   switch (reg->rIdx)
     {
-      case A_IDX:
-        m6502_reg_xa->aop = NULL;
-        m6502_reg_xa->isFree = 0;
-//        m6502_reg_ya->aop = NULL;
-//        m6502_reg_ya->isFree = 0;
-        break;
-      case X_IDX:
-        m6502_reg_xa->aop = NULL;
-        m6502_reg_xa->isFree = 0;
-        m6502_reg_yx->aop = NULL;
-        m6502_reg_yx->isFree = 0;
-        break;
-      case Y_IDX:
-//        m6502_reg_ya->aop = NULL;
-//        m6502_reg_ya->isFree = 0;
-        m6502_reg_yx->aop = NULL;
-        m6502_reg_yx->isFree = 0;
-        break;
-      case XA_IDX:
-        m6502_reg_x->aop = NULL;
-       m6502_reg_x->isFree = 0;
-        m6502_reg_a->aop = NULL;
-        m6502_reg_a->isFree = 0;
-        break;
-//      case YA_IDX:
-//        m6502_reg_y->aop = NULL;
-//        m6502_reg_y->isFree = 0;
-//        m6502_reg_a->aop = NULL;
-//        m6502_reg_a->isFree = 0;
-//        break;
-      case YX_IDX:
-        m6502_reg_y->aop = NULL;
-        m6502_reg_y->isFree = 0;
-        m6502_reg_x->aop = NULL;
-        m6502_reg_x->isFree = 0;
-        break;
-      default:
-        break;
+    case A_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isFree = 0;
+      //        m6502_reg_ya->aop = NULL;
+      //        m6502_reg_ya->isFree = 0;
+      break;
+    case X_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isFree = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isFree = 0;
+      break;
+    case Y_IDX:
+      //        m6502_reg_ya->aop = NULL;
+      //        m6502_reg_ya->isFree = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isFree = 0;
+      break;
+    case XA_IDX:
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isFree = 0;
+      m6502_reg_a->aop = NULL;
+      m6502_reg_a->isFree = 0;
+      break;
+      //      case YA_IDX:
+      //        m6502_reg_y->aop = NULL;
+      //        m6502_reg_y->isFree = 0;
+      //        m6502_reg_a->aop = NULL;
+      //        m6502_reg_a->isFree = 0;
+      //        break;
+    case YX_IDX:
+      m6502_reg_y->aop = NULL;
+      m6502_reg_y->isFree = 0;
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isFree = 0;
+      break;
+    default:
+      break;
     }
 }
 
@@ -1538,59 +1533,48 @@ void
 m6502_dirtyReg (reg_info * reg)
 {
   reg->aop = NULL;
+  reg->isLitConst=0;
 
   switch (reg->rIdx)
     {
-      case A_IDX:
-        m6502_reg_xa->aop = NULL;
-	m6502_reg_xa->isLitConst = 0;
-//	m6502_reg_ya->aop = NULL;
-//	m6502_reg_ya->isLitConst = 0;
-	m6502_reg_a->aop = NULL;
-	m6502_reg_a->isLitConst = 0;
-        break;
-      case X_IDX:
-        m6502_reg_xa->aop = NULL;
-	m6502_reg_xa->isLitConst = 0;
-        m6502_reg_yx->aop = NULL;
-	m6502_reg_yx->isLitConst = 0;
-	m6502_reg_x->aop = NULL;
-	m6502_reg_x->isLitConst = 0;
-        break;
-      case Y_IDX:
-//        m6502_reg_ya->aop = NULL;
-//	m6502_reg_ya->isLitConst = 0;
-        m6502_reg_yx->aop = NULL;
-	m6502_reg_yx->isLitConst = 0;
-	m6502_reg_y->aop = NULL;
-	m6502_reg_y->isLitConst = 0;
-        break;
-      case XA_IDX:
-        m6502_reg_xa->aop = NULL;
-	m6502_reg_xa->isLitConst = 0;
-        m6502_reg_x->aop = NULL;
-	m6502_reg_x->isLitConst = 0;
-        m6502_reg_a->aop = NULL;
-	m6502_reg_a->isLitConst = 0;
-        break;
-//      case YA_IDX:
-//        m6502_reg_ya->aop = NULL;
-//	m6502_reg_ya->isLitConst = 0;
-//        m6502_reg_y->aop = NULL;
-//	m6502_reg_y->isLitConst = 0;
-//        m6502_reg_a->aop = NULL;
-//	m6502_reg_a->isLitConst = 0;
-        break;
-      case YX_IDX:
-        m6502_reg_yx->aop = NULL;
-	m6502_reg_yx->isLitConst = 0;
-        m6502_reg_y->aop = NULL;
-	m6502_reg_y->isLitConst = 0;
-        m6502_reg_x->aop = NULL;
-	m6502_reg_x->isLitConst = 0;
-        break;
-      default:
-        break;
+    case A_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isLitConst = 0;
+      //	m6502_reg_ya->aop = NULL;
+      //	m6502_reg_ya->isLitConst = 0;
+      break;
+    case X_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isLitConst = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isLitConst = 0;
+      break;
+    case Y_IDX:
+      //      m6502_reg_ya->aop = NULL;
+      //	m6502_reg_ya->isLitConst = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isLitConst = 0;
+      break;
+    case XA_IDX:
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isLitConst = 0;
+      m6502_reg_a->aop = NULL;
+      m6502_reg_a->isLitConst = 0;
+      break;
+      //      case YA_IDX:
+      //        m6502_reg_y->aop = NULL;
+      //	m6502_reg_y->isLitConst = 0;
+      //        m6502_reg_a->aop = NULL;
+      //	m6502_reg_a->isLitConst = 0;
+      break;
+    case YX_IDX:
+      m6502_reg_y->aop = NULL;
+      m6502_reg_y->isLitConst = 0;
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isLitConst = 0;
+      break;
+    default:
+      break;
     }
 }
 

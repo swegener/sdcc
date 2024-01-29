@@ -48,6 +48,10 @@ enum
     AOP_STA		// asmop on stack
   };
 
+/* Maximum number of registers allocated to an operand (maximum operand size).
+ * Many buffers are sized to this. */
+#define PIC16_MAX_ASMOP_REGS  8
+
 /* type asmop : a homogenised type for 
    all the different spaces an operand can be
    in */
@@ -72,16 +76,16 @@ typedef struct asmop
     union
       {
 	value *aop_lit;		/* if literal */
-	reg_info *aop_reg[4];	/* array of registers */
+	reg_info *aop_reg[PIC16_MAX_ASMOP_REGS];	/* array of registers */
 	char *aop_dir;		/* if direct  */
 	reg_info *aop_ptr;		/* either -> to r0 or r1 */
 	int aop_stk;		/* stack offset when AOP_STK */
-	char *aop_str[4];	/* just a string array containing the location */
+	char *aop_str[PIC16_MAX_ASMOP_REGS];	/* just a string array containing the location */
 /*	regs *aop_alloc_reg;     * points to a dynamically allocated register */
 	pCodeOp *pcop;
 	struct {
 	  int stk;
-	  pCodeOp *pop[4];
+	  pCodeOp *pop[PIC16_MAX_ASMOP_REGS];
         } stk;
       }
     aopu;

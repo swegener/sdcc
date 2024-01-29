@@ -2809,8 +2809,8 @@ regTypeNum ()
       sym->nRegs = 3; // patch 14
     }
 
-      if (sym->nRegs > 4) {
-        fprintf (stderr, "allocated more than 4 or 0 registers for type ");
+      if (sym->nRegs > PIC16_MAX_ASMOP_REGS) {
+        fprintf (stderr, "allocated more than %d registers for type ", PIC16_MAX_ASMOP_REGS);
         printTypeChain (sym->type, stderr);
         fprintf (stderr, "\n");
       }

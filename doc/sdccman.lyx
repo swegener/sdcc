@@ -2952,6 +2952,11 @@ status collapsed
  was removed from the mcs51 port.
 \end_layout
 
+\begin_layout Itemize
+In 4.4.1, the address width in .rel files was increased from 24 bits to 32
+ bits for the z80 (and related) ports.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

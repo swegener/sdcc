@@ -657,6 +657,8 @@ struct
      "target label missing for skip instruction '%s'", 0},
   { W_SDCCCALL_STD_LIB_CRT0, ERROR_LEVEL_WARNING,
      "non-default sdcccall specified, but default stdlib or crt0", 0},
+  { W_PEEPHOLE_RULE_LIMIT, ERROR_LEVEL_WARNING,
+     "peephole rule application limit reached", 0},
 };
 
 /* -------------------------------------------------------------------------------

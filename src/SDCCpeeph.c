@@ -1052,7 +1052,7 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
     {
       if (var[0] == '#')
         return true;
-      if (!strcmp (var, "p"))
+      if (!strcmp (var, "a") || !strcmp (var, "p"))
         return true;
     }
 
@@ -3811,6 +3811,7 @@ peepHole (lineNode ** pls)
   peepRule *pr;
   lineNode *mtail = NULL;
   bool restart, replaced;
+  unsigned long rule_application_counter = 0ul;
 
 #if !OPT_DISABLE_PIC14 || !OPT_DISABLE_PIC16
   /* The PIC port uses a different peep hole optimizer based on "pCode" */
@@ -3834,6 +3835,13 @@ peepHole (lineNode ** pls)
             {
               replaced = FALSE;
 
+              // Break out of an infinite loop of rule applications.
+              if (rule_application_counter > 200000ul)
+                {
+                  werror (W_PEEPHOLE_RULE_LIMIT);
+                  goto end;
+                }
+
               /* if inline assembler then no peep hole */
               if (spl->isInline)
                 continue;
@@ -3850,6 +3858,8 @@ peepHole (lineNode ** pls)
               /* if it matches */
               if (matchRule (spl, &mtail, pr, *pls))
                 {
+                  rule_application_counter++;
+
                   /* restart at the replaced line */
                   replaced = TRUE;
 
@@ -3882,6 +3892,7 @@ peepHole (lineNode ** pls)
         }
     } while (restart == TRUE);
 
+end:
   if (labelHash)
     {
       hTabDeleteAll (labelHash);

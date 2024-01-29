@@ -1,10 +1,24 @@
 // peeph.def - PDK peephole rules
 
+// Reads from RAM or I/O change z flag.
 replace restart {
 	mo%3	%1, %2
 } by {
 	; peephole 0 removed dead load into %1 from %2.
-} if notUsed(%1), notVolatile(%1), notVolatile(%2)
+} if notUsed(%1), notUsed('z'), notVolatile(%1), notVolatile(%2)
+
+// Write to memory or I/O does not change z flag.
+replace restart {
+	mo%3	%1, a
+} by {
+	; peephole 0a removed dead load into %1 from %2.
+} if notUsed(%1), notVolatile(%1)
+
+replace restart {
+	mo%3	%1, #%2
+} by {
+	; peephole 0b removed dead load into %1 from #%2.
+} if notUsed(%1)
 
 replace restart {
 	clear	%1
@@ -18,7 +32,7 @@ replace restart {
 } by {
 	mo%3	%1, a
 	; peephole 2 removed redundant load from %1 into a.
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('z')
 
 replace restart {
 	push	%1
@@ -60,10 +74,42 @@ replace restart {
 }
 
 replace restart {
-%1:
+    mov a, %1
+    %9  %2, a
+    mov a, %1
 } by {
-	; peephole j0 removed unused label %1.
-} if labelRefCount(%1 0)
+    mov a, %1
+    %9  %2, a
+    ; peephole 7 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
+
+replace restart {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    mov a,  %1
+} by {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    ; peephole 8 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
+
+replace restart {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    %9  %4, a
+    %9  %5, a
+    mov a,  %1
+} by {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    %9  %4, a
+    %9  %5, a
+    ; peephole 9 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
 
 replace restart {
 	ret	%1
@@ -240,5 +286,21 @@ replace restart {
 	%5	%6, %7
 %3:
 } if labelRefCountChange(%4 -1)
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+replace restart {
+%1:
+} by {
+	; peephole j14 removed unused label %1.
+} if labelRefCount(%1 0)
+
+barrier
+
+replace restart {
+	goto	%1
+} by {
+	ret
+	; peephole j15 replaced goto by ret.
+} if labelIsReturnOnly(%1), labelRefCountChange(%1 -1)
 
 

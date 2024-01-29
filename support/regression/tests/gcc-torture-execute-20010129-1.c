@@ -29,7 +29,7 @@ int baz3 (int i)
 
 void **bar;
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) && !( (defined (__SDCC_mos6502) || defined(__SDCC_mos65c02 )) && defined(__SDCC_STACK_AUTO) ) // Lack of memory
 int foo (void *a, long b, int c)
 {
   int d = 0, e, f = 0, i;
@@ -71,7 +71,7 @@ int foo (void *a, long b, int c)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) && !( (defined (__SDCC_mos6502) || defined(__SDCC_mos65c02 )) && defined(__SDCC_STACK_AUTO) ) // Lack of memory
   void *n = 0;
   bar = &n;
   foo (&n, 1, 0xc811);

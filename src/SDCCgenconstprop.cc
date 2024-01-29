@@ -1263,15 +1263,21 @@ optimizeMult (iCode *ic)
 
   sym_link *oldoptype = operandType (left);
   sym_link *oldresulttype = operandType (result);
-  
-  if (!IS_INTEGRAL (oldresulttype) || bitsForType (oldresulttype) <= 16 || bitsForType (oldoptype) <= 8)
-    return;
 
   struct valinfo leftv = getOperandValinfo (ic, left);
   struct valinfo rightv = getOperandValinfo (ic, right);
   struct valinfo resultv = *ic->resultvalinfo;
 
   if (leftv.anything || rightv.anything || resultv.anything || leftv.min < 0 || rightv.min < 0 || leftv.max > 0xffff || rightv.max > 0xffff || resultv.max > 0xffff)
+    return;
+
+  if (!IS_INTEGRAL (oldresulttype) || bitsForType (oldoptype) <= 8 || bitsForType (oldresulttype) <= 8)
+    return;
+
+  if (bitsForType (oldresulttype) <= 16 && (leftv.max > 0xff || rightv.max > 0xff))
+    return;
+
+  if (ic->op == '*' && bitsForType (oldresulttype) <= 16)
     return;
 
   sym_link *newoptype;
@@ -1308,8 +1314,8 @@ optimizeValinfoNarrow (iCode *sic)
     optimizeNarrowOpNet (ic);
 
   for (iCode *ic = sic; ic; ic = ic->next)
-    if (ic->op == '*')
-      optimizeMult (ic);
+      if (ic->op == '*' || ic->op == '/' || ic->op == '%')
+        optimizeMult (ic);
 }
 
 // Do machine-independent optimizations based on valinfos.

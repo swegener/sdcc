@@ -12,6 +12,7 @@
   Bug Fixes  -  Raphael Neider <rneider AT web.de> (2004,2005)
   Bug Fixes  -  Borut Razem <borut.razem AT siol.net> (2007)
   Bug Fixes  -  Mauro Giachero <maurogiachero AT users.sourceforge.net> (2008)
+  Copyright (C) 2024, Jonathon Hall dabigjhall@gmail.com
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -486,7 +487,7 @@ aopForSym (iCode * ic, operand * op, bool result)
   /* space we need to assign either r0 or r1 to it   */
   if (sym->onStack)             // || sym->iaccess)
     {
-      pCodeOp *pcop[4];
+      pCodeOp *pcop[PIC16_MAX_ASMOP_REGS];
       int i;
 
       DEBUGpic16_emitcode ("; ***", "%s:%d sym->onStack:%d || sym->iaccess:%d",
@@ -2739,21 +2740,13 @@ assignResultValue (operand * oper, int res_size, int rescall)
         }
       else
         {
-          /* >32-bits, result on stack, and FSR0 points to beginning.
-           * Fix stack when done */
-          /* FIXME FIXME */
-//      debugf("WARNING: Possible bug when returning more than 4-bytes\n");
-          while (size--)
+          /* >32-bits, result on stack, and FSR0 points to beginning. */
+          for (int resultOffs=0; resultOffs<size; ++resultOffs)
             {
-//          DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpseudoStkPtr);
-//          DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
-
-              popaopidx (AOP (oper), size, GpseudoStkPtr);
+              pic16_emitpcode (POC_MOVFF, pic16_popCombine2 (&pic16_pc_preinc0,
+                PCOR (pic16_popGet (AOP (oper), resultOffs)), 0));
               GpseudoStkPtr++;
             }
-
-          /* fix stack */
-          free_stack_parameters (AOP_SIZE (oper));
         }
     }
   else
@@ -3738,27 +3731,20 @@ genRet (iCode * ic)
       /* >32-bits, setup stack and FSR0 */
       while (size--)
         {
-//                      DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpseudoStkPtr);
-//                      DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
-
           pic16_pushpCodeOp (pic16_popGet (AOP (IC_LEFT (ic)), size));
-
-//                      popaopidx(AOP(oper), size, GpseudoStkPtr);
           GpseudoStkPtr++;
         }
 
-      /* setup FSR0 */
+      /* set up FSR0 */
       pic16_emitpcode (POC_MOVFF, pic16_popGet2p (pic16_popCopyReg (pic16_stackpnt_lo), pic16_popCopyReg (&pic16_pc_fsr0l)));
 
-      if (STACK_MODEL_LARGE)
-        {
-          pic16_emitpcode (POC_MOVFF,
-                           pic16_popGet2p (pic16_popCopyReg (pic16_stackpnt_hi), pic16_popCopyReg (&pic16_pc_fsr0h)));
-        }
-      else
-        {
-          pic16_emitpcode (POC_CLRF, pic16_popCopyReg (pic16_stackpnt_hi));
-        }
+      pic16_emitpcode (POC_MOVFF,
+                        pic16_popGet2p (pic16_popCopyReg (pic16_stackpnt_hi), pic16_popCopyReg (&pic16_pc_fsr0h)));
+
+      /* Roll back the stack.  The callee must do this (here) rather than the
+       * caller (assignResultValue()) so the callee's epilogue will restore
+       * preserved registers from the stack correctly. */
+      free_stack_parameters (AOP_SIZE (IC_LEFT (ic)));
     }
 
   pic16_freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
@@ -8367,6 +8353,11 @@ pic16_genLeftShiftLiteral (operand * left, operand * right, operand * result, iC
         case 4:
           genlshFour (result, left, shCount);
           break;
+        case 8:
+        default:
+          pic16_emitcode ("; ", "UNIMPLEMENTED left shift from value of size %d to result of size %d", getSize(operandType(left)), size);
+          fprintf (stderr, "UNIMPLEMENTED left shift from value of size %d to result of size %d\n", getSize(operandType(left)), size);
+          break;
         }
     }
   pic16_freeAsmop (left, NULL, ic, TRUE);
@@ -8662,7 +8653,10 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
         case 4:
           genrshFour (result, left, shCount, sign);
           break;
+        case 8:
         default:
+          pic16_emitcode ("; ", "UNIMPLEMENTED right shift from value of size %d to result of size %d", getSize(operandType(left)), res_size);
+          fprintf (stderr, "UNIMPLEMENTED right shift from value of size %d to result of size %d\n", getSize(operandType(left)), res_size);
           break;
         }
     }
@@ -8698,7 +8692,10 @@ genGenericShift (iCode * ic, int isShiftLeft)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (AOP_TYPE (right) == AOP_LIT)
+  /* This isn't implemented yet for 8-byte types, for now use the dynamic shift
+   * code for those (works but inefficient) */
+  if (AOP_TYPE (right) == AOP_LIT && pic16_getDataSize(left) <= 4 &&
+    pic16_getDataSize(result) <= 4)
     {
       long lit = (long) ulFromVal (AOP (right)->aopu.aop_lit);
       if (signedCount && lit < 0)
@@ -8792,6 +8789,11 @@ genGenericShift (iCode * ic, int isShiftLeft)
   else
     {
       pic16_mov2w (AOP (right), 0);
+      /* If the shift count is a literal, the MOVLW generated above doesn't
+       * update the Z/N flags.  Add 0 to W just to update the flags.  (This will
+       * go away when 8-byte literal shifts are implemented.) */
+      if(AOP_TYPE (right) == AOP_LIT)
+        pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x00));
     }                           // if
 
   pic16_emitpcode (POC_BZ, pic16_popGetLabel (label_complete->key));
@@ -9321,18 +9323,72 @@ genNearPointerGet (operand * left, operand * result, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGenPointerGet - gget value from generic pointer space        */
+/* loadGenPtr - Load a generic pointer to WREG:PRODL:FSR0L and     */
+/*   (optionally) add a literal offset before a call to _gptrgetN  */
+/*   or _gptrsetN                                                  */
+/*                                                                 */
+/* asmop - ASM operand containing 3-byte generic pointer value     */
+/* offset - number of bytes to offset ptr, range 0 to 0xFFFF       */
+/* write - whether this is a write.  Writes don't handle carry or  */
+/*   offset of WREG, since it only contains address bits for code  */
+/*   pointers, and those aren't valid in writes.                   */
+/*                                                                 */
+/* PRODH is used as a scratch register for reads with offset.      */
+/*-----------------------------------------------------------------*/
+static void
+loadGenPtr (asmop * pointer, int ptrOffset, bool write)
+{
+  /* ptrOffset can't exceed 0xFFFF - carries into upper byte are allowed but
+   * literal offsets are not currently */
+  if(ptrOffset < 0 || ptrOffset > 0xFFFF) {
+    werror(W_POSSBUG2, __FILE__, __LINE__);
+    abort();
+  }
+
+  /* Load pointer's low 16 bits to PRODL:FSR0L */
+  mov2fp (pic16_popCopyReg (&pic16_pc_fsr0l), pointer, 0);
+  mov2fp (pic16_popCopyReg (&pic16_pc_prodl), pointer, 1);
+
+  /* If there's an offset, apply it before loading the upper byte, since this
+   * uses WREG. */
+  if (ptrOffset)
+    {
+      /* Add to the low byte */
+      pic16_emitpcode (POC_MOVLW, pic16_popGetLit (ptrOffset & 0xFF));
+      pic16_emitpcode (POC_ADDWF, pic16_popCopyReg (&pic16_pc_fsr0l));
+
+      /* Add to the high byte, including carry from the low byte */
+      /* Even if offset's high byte is 0, there's no way to do this in fewer than
+      * two cycles. */
+      pic16_emitpcode (POC_MOVLW, pic16_popGetLit ((ptrOffset >> 8) & 0xFF));
+      pic16_emitpcode (POC_ADDWFC, pic16_popCopyReg (&pic16_pc_prodl));
+    }
+
+  /* Load the upper byte */
+  pic16_mov2w (pointer, 2);
+
+  if (!write && ptrOffset)
+    {
+      /* If the carry bit is set, increment WREG */
+      pic16_emitpcode (POC_BTFSC, pic16_popCopyReg (&pic16_pc_status));
+      pic16_emitpcode (POC_INCF, pic16_popCopyReg (&pic16_pc_wreg));
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* genGenPointerGet - get value from generic pointer space        */
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerGet (operand * left, operand * result, iCode * ic)
 {
-  int size;
+  int size, resultOffs;
   sym_link *letype = getSpec (operandType (left));
 
   DEBUGpic16_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   pic16_aopOp (left, ic, FALSE);
   pic16_aopOp (result, ic, TRUE);
   size = AOP_SIZE (result);
+  resultOffs = 0;
 
   DEBUGpic16_pic16_AopType (__LINE__, left, NULL, result);
 
@@ -9343,13 +9399,48 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
       goto release;
     }
 
-  /* set up WREG:PRODL:FSR0L with address from left */
-  mov2fp (pic16_popCopyReg (&pic16_pc_fsr0l), AOP (left), 0);
-  mov2fp (pic16_popCopyReg (&pic16_pc_prodl), AOP (left), 1);
-  pic16_mov2w (AOP (left), 2);
+  /* If result is more than 4 bytes, break up the read into multiple reads of
+   * 4 or fewer bytes */
+  while (size > PIC16_GENPTRRW_MAXSIZE)
+    {
+      /* TODO - if the pointer and result are both temporaries, they might
+       * be allocated to the same registers.  But this may mean loading 32 bits
+       * of the result overwrites the pointer, which we still need.
+       * Either need to change the calling convention of _gptr*4 to avoid
+       * destroying the address (would simplify code here a lot too) or
+       * figure out which chunk overlaps the pointer and load it last */
+      if (pic16_sameRegs (AOP (left), AOP (result))) {
+        werror(W_POSSBUG2, __FILE__, __LINE__);
+        abort();
+      }
+
+      /* Load pointer's WREG:PRODL:FSR0L with resultOffs */
+      loadGenPtr (AOP (left), resultOffs, false);
+
+      /* Call _gptrget4 */
+      pic16_callGenericPointerRW (0, 4);
+
+      pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP (result), resultOffs));
+      pic16_loadFromReturn (result, resultOffs+1, pic16_popCopyReg (&pic16_pc_prodl));
+      pic16_loadFromReturn (result, resultOffs+2, pic16_popCopyReg (&pic16_pc_prodh));
+      pic16_loadFromReturn (result, resultOffs+3, pic16_popCopyReg (&pic16_pc_fsr0l));
+
+      size -= PIC16_GENPTRRW_MAXSIZE;
+      resultOffs += PIC16_GENPTRRW_MAXSIZE;
+    }
+
+  /* Load pointer's WREG:PRODL:FSR0L with resultOffs */
+  loadGenPtr (AOP (left), resultOffs, false);
   pic16_callGenericPointerRW (0, size);
 
-  assignResultValue (result, size, 1);
+  if (AOP_TYPE(result) != AOP_ACC)
+    pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP (result), resultOffs));
+  if (size > 1)
+    pic16_loadFromReturn (result, resultOffs+1, pic16_popCopyReg (&pic16_pc_prodl));
+  if (size > 2)
+    pic16_loadFromReturn (result, resultOffs+2, pic16_popCopyReg (&pic16_pc_prodh));
+  if (size > 3)
+    pic16_loadFromReturn (result, resultOffs+3, pic16_popCopyReg (&pic16_pc_fsr0l));
 
 release:
   pic16_freeAsmop (left, NULL, ic, TRUE);
@@ -9958,7 +10049,7 @@ genNearPointerSet (operand * right, operand * result, iCode * ic)
 static void
 genGenPointerSet (operand * right, operand * result, iCode * ic)
 {
-  int size;
+  int size, rightOffs;
   sym_link *retype = getSpec (operandType (result));
 
   DEBUGpic16_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -9966,6 +10057,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
   pic16_aopOp (result, ic, FALSE);
   pic16_aopOp (right, ic, FALSE);
   size = AOP_SIZE (right);
+  rightOffs = 0;
 
   DEBUGpic16_pic16_AopType (__LINE__, NULL, right, result);
 
@@ -9982,6 +10074,27 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 
   DEBUGpic16_emitcode ("; ***", "%s  %d size=%d", __FUNCTION__, __LINE__, size);
 
+  /* If right is more than 4 bytes, break up the write into multiple writes of
+   * 4 or fewer bytes */
+  while (size > PIC16_GENPTRRW_MAXSIZE)
+    {
+      /* Load 4 bytes to TBLPTRH:TBLPTRL:PRODH:[stack] */
+      pushaop (AOP (right), rightOffs);
+      mov2fp (pic16_popCopyReg (&pic16_pc_prodh), AOP (right), rightOffs+1);
+      mov2fp (pic16_popCopyReg (&pic16_pc_tblptrl), AOP (right), rightOffs+2);
+      mov2fp (pic16_popCopyReg (&pic16_pc_tblptrh), AOP (right), rightOffs+3);
+
+      /* Load pointer's WREG:PRODL:FSR0L with rightOffs */
+      loadGenPtr (AOP (result), rightOffs, true);
+
+      /* Call _gptrput4 */
+      pic16_callGenericPointerRW (1, PIC16_GENPTRRW_MAXSIZE);
+
+      size -= PIC16_GENPTRRW_MAXSIZE;
+      rightOffs += PIC16_GENPTRRW_MAXSIZE;
+    }
+
+  /* At this point, 1-4 bytes remain */
 
   /* load value to write in TBLPTRH:TBLPTRL:PRODH:[stack] */
 
@@ -9989,20 +10102,18 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
    * by the support function thus restoring the stack. The important
    * thing is that there is no need to manually restore stack pointer
    * here */
-  pushaop (AOP (right), 0);
+  pushaop (AOP (right), rightOffs);
 //    mov2fp(pic16_popCopyReg(&pic16_pc_postdec1), AOP(right), 0);
   if (size > 1)
-    mov2fp (pic16_popCopyReg (&pic16_pc_prodh), AOP (right), 1);
+    mov2fp (pic16_popCopyReg (&pic16_pc_prodh), AOP (right), rightOffs+1);
   if (size > 2)
-    mov2fp (pic16_popCopyReg (&pic16_pc_tblptrl), AOP (right), 2);
+    mov2fp (pic16_popCopyReg (&pic16_pc_tblptrl), AOP (right), rightOffs+2);
   if (size > 3)
-    mov2fp (pic16_popCopyReg (&pic16_pc_tblptrh), AOP (right), 3);
+    mov2fp (pic16_popCopyReg (&pic16_pc_tblptrh), AOP (right), rightOffs+3);
 
-  /* load address to write to in WREG:FSR0H:FSR0L */
-  pic16_emitpcode (POC_MOVFF, pic16_popGet2p (pic16_popGet (AOP (result), 0), pic16_popCopyReg (&pic16_pc_fsr0l)));
-  pic16_emitpcode (POC_MOVFF, pic16_popGet2p (pic16_popGet (AOP (result), 1), pic16_popCopyReg (&pic16_pc_prodl)));
-  pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (result), 2));
-
+  /* Load pointer's WREG:PRODL:FSR0L with rightOffs */
+  loadGenPtr (AOP (result), rightOffs, true);
+  /* Call _gptrputN */
   pic16_callGenericPointerRW (1, size);
 
 release:

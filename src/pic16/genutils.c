@@ -496,7 +496,7 @@ void gpsimDebug_StackDump(char *fname, int line, char *info)
   gpsimio2_lit('\n');
 }
 
-const char *gptr_fns[4][2] = {
+const char *gptr_fns[PIC16_GENPTRRW_MAXSIZE][2] = {
   { "_gptrget1", "_gptrput1" },
   { "_gptrget2", "_gptrput2" },
   { "_gptrget3", "_gptrput3" },
@@ -510,7 +510,9 @@ void pic16_callGenericPointerRW(int rw, int size)
   char buf[32];
   symbol *sym;
 
-    if(size>4) {
+    /* Generic pointer read/write functions read or write up to 4 bytes, larger
+     * accesses are broken into multiple calls */
+    if(size>PIC16_GENPTRRW_MAXSIZE) {
       werror(W_POSSBUG2, __FILE__, __LINE__);
       abort();
     }

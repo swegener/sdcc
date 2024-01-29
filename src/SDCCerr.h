@@ -324,6 +324,7 @@ enum {
   W__SDCC_EXTERNAL_STARTUP_DEF  = 294, /* _sdcc_external_startup function definition - probable deprecated old-style variant of __sdcc_external_startup */
   E_NO_SKIP_TARGET              = 295, /* target label missing for skip instruction */
   W_SDCCCALL_STD_LIB_CRT0       = 296, /* non-default sdcccall specified, but default stdlib or crt0 */
+  W_PEEPHOLE_RULE_LIMIT         = 297, /* peephole rule application limit reached */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

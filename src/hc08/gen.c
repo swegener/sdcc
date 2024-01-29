@@ -567,7 +567,7 @@ aopName (asmop * aop)
   switch (aop->type)
     {
     case AOP_IMMD:
-      sprintf (buf, "IMMD(%s)", aop->aopu.aop_immd.aop_immd1);
+      sprintf (buf, "IMMD(%s)", aop->aopu.aop_immd);
       return buf;
     case AOP_LIT:
       sprintf (buf, "LIT(%s)", aopLiteral (aop->aopu.aop_lit, 0));
@@ -2206,8 +2206,8 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   if (IS_FUNC (sym->type))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
-      strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
+      aop->aopu.aop_immd = Safe_calloc (1, strlen (sym->rname) + 1);
+      strcpy (aop->aopu.aop_immd, sym->rname);
       aop->size = FARPTRSIZE;
       return aop;
     }
@@ -2216,7 +2216,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   if (sym->onStack)
     {
       sym->aop = aop = newAsmop (AOP_SOF);
-      aop->aopu.aop_dir = sym->rname;
+//      aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
       aop->aopu.aop_stk = sym->stack;
 
@@ -2316,8 +2316,7 @@ aopForRemat (symbol * sym)
         }
 
       aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_strdup (buffer);
-      /* set immd2 field if required */
+      aop->aopu.aop_immd = Safe_strdup (buffer);
     }
   else if (ic->op == '=')
     {
@@ -2441,6 +2440,8 @@ sameRegs (asmop *aop1, asmop *aop2)
             return false;
         case AOP_EXT:
           return (!strcmp (aop1->aopu.aop_dir, aop2->aopu.aop_dir));
+        default:
+          break;
         }
     }
 
@@ -2722,11 +2723,11 @@ aopDerefAop (asmop * aop, int offset)
       else
         newaop = newAsmop (AOP_EXT);
       if (!offset)
-        newaop->aopu.aop_dir = aop->aopu.aop_immd.aop_immd1;
+        newaop->aopu.aop_dir = aop->aopu.aop_immd;
       else
         {
           dbuf_init (&dbuf, 64);
-          dbuf_printf (&dbuf, "(%s+%d)", aop->aopu.aop_immd.aop_immd1, offset);
+          dbuf_printf (&dbuf, "(%s+%d)", aop->aopu.aop_immd, offset);
           newaop->aopu.aop_dir = dbuf_detach_c_str (&dbuf);
         }
       break;
@@ -2753,7 +2754,6 @@ aopDerefAop (asmop * aop, int offset)
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "unsupported asmop");
       return NULL;
     }
-
 
   return newaop;
 }
@@ -2869,12 +2869,12 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       if (loffset)
         {
           if (loffset > 1)
-            sprintf (s, "#(%s >> %d)", aop->aopu.aop_immd.aop_immd1, loffset * 8);
+            sprintf (s, "#(%s >> %d)", aop->aopu.aop_immd, loffset * 8);
           else
-            sprintf (s, "#>%s", aop->aopu.aop_immd.aop_immd1);
+            sprintf (s, "#>%s", aop->aopu.aop_immd);
         }
       else
-        sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
+        sprintf (s, "#%s", aop->aopu.aop_immd);
       rs = Safe_calloc (1, strlen (s) + 1);
       strcpy (rs, s);
       return rs;
@@ -2937,6 +2937,8 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
         }
       else
         return ",x";
+    default:
+      break;
     }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopAdrStr got unsupported aop->type");
@@ -8934,7 +8936,7 @@ decodePointerOffset (operand * opOffset, int * litOffset, char ** rematOffset)
       if (aop->type == AOP_LIT)
         *litOffset = (int) floatFromVal (aop->aopu.aop_lit);
       else if (aop->type == AOP_IMMD)
-        *rematOffset = aop->aopu.aop_immd.aop_immd1;
+        *rematOffset = aop->aopu.aop_immd;
     }
   else
     wassertl (0, "Pointer get/set with non-constant offset");

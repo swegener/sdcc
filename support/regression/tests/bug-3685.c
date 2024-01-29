@@ -6,6 +6,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 #include <stdint.h>
 #include <stdbool.h>
 

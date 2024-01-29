@@ -1608,7 +1608,7 @@ replace {
 //	mov	%1,a
 //} if notVolatile %1
 
-// char indexed access to: long code table[] = {4,3,2,1};
+// char indexed access to: long __code table[] = {4,3,2,1};
 replace restart {
 	add	a,#%1
 	mov	dpl,a
@@ -1648,7 +1648,7 @@ replace restart {
 	movc	a,@a+dptr
 }
 
-// char indexed access to: void* code table[] = {4,3,2,1};
+// char indexed access to: void* __code table[] = {4,3,2,1};
 replace restart {
 	add	a,#%1
 	mov	dpl,a
@@ -1680,7 +1680,7 @@ replace restart {
 	movc	a,@a+dptr
 }
 
-// char indexed access to: int code table[] = {4,3,2,1};
+// char indexed access to: int __code table[] = {4,3,2,1};
 replace restart {
 	add	a,#%1
 	mov	dpl,a
@@ -1703,7 +1703,7 @@ replace restart {
 	movc	a,@a+dptr
 }
 
-// char indexed access to: char code table[] = {4,3,2,1};
+// char indexed access to: char __code table[] = {4,3,2,1};
 replace {
 	add	a,#%1
 	mov	dpl,a
@@ -1718,7 +1718,7 @@ replace {
 	movc	a,@a+dptr
 }
 
-// char indexed access to: int code table[] = {4,3,2,1};
+// char indexed access to: int __code table[] = {4,3,2,1};
 replace {
 	mov	b,#0x02
 	mul	ab
@@ -1744,6 +1744,23 @@ replace {
 	mov	%3,a
 	mov	a,#%2
 	inc	dptr
+	movc	a,@a+dptr
+}
+
+// char indexed access to: char __code table[] = {4,3,2,1};
+replace {
+	mov	%1,#0x00
+	add	a, #%2
+	mov	dpl,a
+	mov	a,%1
+	addc	a, #(%2 >> 8)
+	mov	dph,a
+	clr	a
+	movc	a,@a+dptr
+} by {
+	mov	%1,#0x00
+	;	Peephole 186.f	optimized movc sequence
+	mov	dptr,#%2
 	movc	a,@a+dptr
 }
 
@@ -5035,11 +5052,19 @@ replace restart {
 	;	Peephole 301	push ar%1 removed
 } if deadMove(%1)
 
-replace {
+replace restart {
 	mov	%1, %2
 } by {
 	;	Peephole 302 removed dead mov %1, %2
 } if notVolatile(%2), notUsed(%1)
+
+replace restart {
+	mov	%1, a
+	mov	%2, %1
+} by {
+	mov	%2, a
+	;	Peephole 303 used a directly instead of going through %1
+} if notVolatile(%1), notUsed(%1)
 
 // applies to: void test( char c ) { if( c ) func1(); else func2(); }
 replace {

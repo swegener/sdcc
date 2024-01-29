@@ -1,24 +1,220 @@
+2024-01-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* Merge next branch to trunk.
+
+2024-01-28 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Refactor asmopToBool().
+  	* src/mos6502/gen.c:
+  	  Improvements to genAnd().
+
+2024-01-27 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.h:
+	  Remove dead references to M6502MASK_REV.
+
+2024-01-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asz80/z80mch.c:
+	  Fix bug #3700.
+
+2024-01-27 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/ralloc.c:
+	  Small cleanup of m6502_dirtyReg.
+   	* src/mos6502/gen.c:
+   	  Imporvements to genCmp.
+
+2024-01-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asgb/gbmch.c
+	  .version,
+	  doc/sdccman.lyx:
+	  Export 32-bit addresses from gb assembler (instead of 24-bit).
+
+2024-01-22 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/gen.c:
+	  Fix pdk code generation issues, bug #3697.
+	* sdas/asz80/z80mch.c:
+	  Export 32-bit addresses from z80 assembler (instead of 24-bit).
+
 2024-01-16 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/Makefile.in:
 	  Makeshift fix for bug #3694: Delete sdcpp in uninstall.
+
+2024-01-15 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/peep.def:
+	  Fix bug in peephole load 12 rule.
+  	* src/mos6502/gen.c,
+	  src/mos6502/peep.def:
+	  Improvements in genCast(), genCopy() and loadRegFromAop().
 
 2024-01-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/scripts/sdcc.nsi:
 	  Fix bug #3695.
 
+2023-01-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c,
+	  src/pdk/ralloc2.cc:
+	  Optimize pdk register packing for some operations on __sfr (part of RFE #801).
+
+2024-01-13 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Fix constanRange regression failure for mos6502-stack-auto.
+	  Implement special case for genCompare < 0
+	* src/mos6502/ralloc2.cc:
+	  Add instruction cost for IPUSH_VALUE_AT_ADDRESS icode.
+	* src/mos6502/peep.def:
+	  Add several new rules that take advantage of if used().
+	* support/regression/ports/uc6502-stack-auto/spec.mk,
+	  support/regression/tests/gcc-torture-execute-20010129-1.c,
+	  support/regression/tests/gcc-torture-execute-20030916-1.c,
+	  support/regression/tests/gcc-torture-execute-20071030-1.c,
+	  support/regression/tests/gcc-torture-execute-930614-2.c,
+	  support/regression/tests/gcc-torture-execute-930628-1.c,
+	  support/regression/tests/gcc-torture-execute-990513-1.c,
+	  support/regression/tests/gcc-torture-execute-ssad-run.c,
+	  support/regression/tests/gcc-torture-execute-usad-run.c,
+	  support/regression/tests/lonesha256.c,
+	  support/regression/tests/tinyaes.c.in:
+	  disable tests failing in the mos6502-stack-auto port due to stack size limitation.
+  	* src/mos6502/main.c:
+      Rearrange memory segments to support systems without ROM space.
+   	* src/mos6502/gen.c,
+   	  src/mos6502/ralloc.h:
+   	  Remove dead code to support registers in reverse order.
+      	  
+2024-01-12 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve asmopToBool.
+
+2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+||||||| .merge-left.r14616
+2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+=======
 2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+>>>>>>> .merge-right.r14635
 
 	* src/hc08/main.c:
 	  Fix bug #3690.
 
+<<<<<<< .working
+2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/peep.c:
+	  Improve pdk notUsed() accuracy.
+
+2023-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
+||||||| .merge-left.r14616
+2023-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
+=======
 2024-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
+>>>>>>> .merge-right.r14635
 
 	* src/z80/main.c:
 	  Fix bug #3693.
 	* support/scripts/sdcc.nsi:
 	  Fix bug #3686.
+
+2024-01-10 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Implement a few 65C02 optimizations.
+	  
+2024-01-09 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Additional carry flag tracking optimizations.
+  	* src/mos6502/gen.c:
+	  Improve debug messages.
+	  
+2024-01-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/ports/pic16/spec.mk,
+	  sdcc/src/pic16/gen.c,
+	  sdcc/src/pic16/gen.h,
+	  sdcc/src/pic16/genutils.c,
+	  sdcc/src/pic16/genutils.h,
+	  sdcc/src/pic16/ralloc.c,
+	  sdcc/src/SDCCsymt.c:
+	  Basic pic16 long long support, patch #471 by Jonathon Hall.
+
+2024-01-08 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  replace all instances of emitLabel() with safeEmitLabel().
+ 	* src/mos6502/gen.c,
+ 	  src/mos6502/main.c:
+      enable last operation flag tracking.
+   	* src/mos6502/gen.c:
+	  enable carry flag tracking.
+ 
+2024-01-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/_divuchar.c,
+	  device/lib/_moduchar.c:
+	  Fix optimization turning division support troutines into infinite loops.
+	* device/lib/pdk*/Makefile.in,
+	  device/lib/pdk*/_muluchar.s:
+	  Improve pdk 8x8 multiplication efficiency, based on patch #470 by Konstantin Kim.
+
+2024-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/satcounteroverflow.c.in:
+	  Regression test for saturating counter implemented via overflow-check-revert, inspired by discussion of patch #447 by Konstantin Kim.
+
+2023-12-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/peeph.def:
+	  Fixes for z flag handling in pdk peephole optimizer rules.
+	* src/pdk/gen.c,
+	  src/pdk/peeph.def:
+	  Optimize out some redundant stores to a, insprired by parts of patch #447 by Konstantin Kim.
+	* src/SDCCpeeph.c:
+	  Fix notVolatile('a') for pdk.
+	* src/pdk/peep.c:
+	  Improve flag handling in pdk peephole optimizer.
+	* src/z80/peep.c:
+	  Improve flag handling in z80 peephole optimizer.
+
+2023-12-29 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Imporve use of BIT instruction.
+	* src/mos6502/ralloc.c,
+	  src/mos6502/ralloc.h:
+	  Prepare for improved register pair handling.
+	* src/mos6502/gen.c:
+	  correct constant size in isLiteralBit().
+	* src/mos6502/gen.c:
+	  Prepare for improved register pair handling.
+	  
+2023-12-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pdk/peep.c:
+	  pdk peephole optimizer improvements, mostly from patch #447 by Konstantin Kim.
+	* support/regression/tests/iobit.c.in:
+	  Improve test coverage for bit access on __sfr, inspired by discussion of patch #447.
+	* src/pdk/peeph.def:
+	  Add a peephole optimizer rule from patch #447 by Konstantin Kim.
+
+2023-12-29 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c,
+	  src/mos6502/gen.h,
+	  src/hc08/gen.c,
+	  src/hc08/gen.h:
+	  remove unused aop_immd2 from aop structure.
 
 2023-12-28 Gabriele Gorla <gorlik@yahoo.com>
 
@@ -31,6 +227,34 @@
 	  Fix bug #2987 and enable gcc-torture-execute-strlen-4 for mos6502 and hc08.
 	* src/SDCCicode.c:
 	  Fix small debug print bug.
+	* src/mos6502/peep.c:
+	  Fix affected flags and add "sec".
+	* src/mos6502/gen.c:
+	  Minor code cleanups
+	  Make comments style consistent
+
+2023-12-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/mcs51/peeph.def:
+	  Optimize out some unnecessary register use.
+
+2023-12-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peep.c:
+	  Improve handling of I/O and tail calls, fixes bug #3688.
+	* src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCpeeph.c:
+	  Peephole rule application limit, fixes bug #3557.
+	* src/SDCCgenconstprop.cc:
+	  Improve narrowing of multiplicative operators based on generalized constant propagation.
+	* src/mcs51/peeph.def:
+	  Peephole optimizer rule to optimize another variant of __code array access.
+	* src/mos6502/main.c,
+	  src/mos6502/peeph.def,
+	  src/mos6502/peep.c,
+	  src/mos6502/peep.h:
+	  notUsed/notUsedFrom for mos6502 flags.
 
 2023-12-20 Philipp Klaus Krause <philipp@colecovision.eu>
 

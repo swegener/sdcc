@@ -18,7 +18,6 @@ include $(srcdir)/../incl.mk
 PDK14_FLOAT = $(COMMON_FLOAT)
 
 PDK14_INT = $(COMMON_INT) \
-  _muluchar.c \
   _mulschar.c \
   _mulint.c \
   _divuchar.c \
@@ -63,7 +62,7 @@ PDK14_SDCC = $(COMMON_SDCC) \
 PDK14SOURCES = $(addprefix ../,$(PDK14_FLOAT) $(PDK14_INT) $(PDK14_LONG) $(PDK14_LONGLONG) $(PDK14_SDCC))
 PDK14OBJECTS = $(patsubst %.c,%.rel,$(PDK14_FLOAT) $(PDK14_INT) $(PDK14_LONG) $(PDK14_LONGLONG) $(PDK14_SDCC))
 
-OBJ = __gptrget.rel __gptrget2.rel heap.rel __setjmp.rel
+OBJ = __gptrget.rel __gptrget2.rel heap.rel __setjmp.rel _muluchar.rel
 
 LIB = pdk14.lib
 AS = $(SAS)

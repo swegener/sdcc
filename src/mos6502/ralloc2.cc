@@ -36,7 +36,6 @@ extern "C"
 #define REG_X 1
 #define REG_Y 2
 
-
 template <class I_t>
 static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 {
@@ -480,6 +479,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case '|':
     case BITWISEAND:
     case IPUSH:
+    case IPUSH_VALUE_AT_ADDRESS:
     //case IPOP:
     case CALL:
     case PCALL:
@@ -522,6 +522,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
 #endif
       return(c);
     default:
+      std::cout << "no cost for op " << ic->op << "\n";
       return(0.0f);
     }
 }

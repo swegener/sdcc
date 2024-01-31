@@ -66,6 +66,8 @@ int atoi (char *);
 /* convert a ASCII string to long */
 long atol (char *);
 
+long long int atoll (const char *);
+
 /* convert an unsigned/signed integer to ASCII string */
 void uitoa (unsigned int, __data char *, unsigned char);
 void itoa (int, __data char*, unsigned char);

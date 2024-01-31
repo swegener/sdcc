@@ -9,7 +9,7 @@
 	  device/include/setjmp.h,
 	  device/include/stdarg.h,
 	  device/include/stdint.h:
-	  pic16 refactoring and fixes, parts 1 to 3 of patch #472 by Jonathon Hall.
+	  pic16 refactoring and fixes, parts 1 to 3 and 7 to 10 of patch #472 by Jonathon Hall.
 
 2024-01-29 Philipp Klaus Krause <philipp@colecovision.eu>
 

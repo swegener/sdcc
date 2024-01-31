@@ -2484,13 +2484,19 @@ pic16_toBoolean (operand * oper)
 
   DEBUGpic16_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
-  if (AOP_TYPE (oper) != AOP_ACC)
+  /* If it's in WREG already, there's nothing to do */
+  if (AOP_TYPE (oper) == AOP_ACC)
+    return;
+
+  /* Load the MSB first, because for floating-point types, we need to mask off
+   * the sign bit so -0 becomes false. */
+  pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (oper), size));
+  if (IS_FLOAT (operandType (oper)))
+    pic16_emitpcode (POC_ANDLW, pic16_popGetLit (0x7F));
+  while (size)
     {
-      pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (oper), 0));
-    }
-  while (size--)
-    {
-      pic16_emitpcode (POC_IORFW, pic16_popGet (AOP (oper), offset++));
+      --size;
+      pic16_emitpcode (POC_IORFW, pic16_popGet (AOP (oper), size));
     }
 }
 
@@ -5894,6 +5900,10 @@ genAnd (iCode * ic, iCode * ifx)
   unsigned long lit = 0L;
   resolvedIfx rIfx;
 
+  // This becomes true if we need to emit a jump to ifx based on the zero flag
+  // after freeing the asm operands
+  bool emitIfxZJump = false;
+
   FENTRY;
 
   pic16_aopOp ((left = IC_LEFT (ic)), ic, FALSE);
@@ -5994,107 +6004,49 @@ genAnd (iCode * ic, iCode * ifx)
   // bit = val & 0xZZ     - size = 1, ifx = FALSE -
   if ((AOP_TYPE (right) == AOP_LIT) && (AOP_TYPE (result) == AOP_CRY) && (AOP_TYPE (left) != AOP_CRY))
     {
-      symbol *tlbl = newiTempLabel (NULL);
-      int sizel = AOP_SIZE (left);
-      int nonnull = 0;
-      char emitBra;
+      /* Jump to nonzerolbl as soon as we know the result is nonzero (don't need
+       * to check the remaining bytes) */
+      symbol *nonzerolbl = newiTempLabel (NULL);
 
-      if (size)
-        emitSETC;
+      /* If the literal is 0, we won't emit any tests, and the result is always
+       * false.  Clear the zero flag and emit the remaining code normally - this
+       * could be short-circuited, but for now focus on generating correct code.
+       * A peephole optimization might be able to simplify this. */
+      if (lit == 0)
+        emitCLRZ;
 
-      /* get number of non null bytes in literal */
-      while (sizel--)
-        {
-          if (lit & (0xff << (sizel * 8)))
-            ++nonnull;
-        }
-
-      emitBra = nonnull || rIfx.condition;
-
-      for (sizel = AOP_SIZE (left); sizel--; ++offset, lit >>= 8)
+      /* Check each byte of left where the corresponding byte of right is
+       * nonzero.  Once any nonzero result is found, jump ahead to the end. */
+      for (int sizel = AOP_SIZE (left); sizel--; ++offset)
         {
           unsigned char bytelit = lit & 0xFF;
 
-          if (bytelit != 0)
-            {
-              int posbit;
+          lit >>= 8;
 
-              --nonnull;
+          if (bytelit == 0)
+            continue; // Don't bother testing this byte
 
-              /* patch provided by Aaron Colwell */
-              if ((posbit = isLiteralBit (bytelit)) != 0)
-                {
-                  if (nonnull)
-                    {
-                      pic16_emitpcode (POC_BTFSC,
-                                       pic16_newpCodeOpBit (pic16_aopGet (AOP (left), offset, FALSE, FALSE), posbit - 1, 0,
-                                                            PO_GPR_REGISTER));
-                      pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.condition ? rIfx.lbl->key : tlbl->key));
-                    }
-                  else
-                    {
-                      pic16_emitpcode (rIfx.condition ? POC_BTFSC : POC_BTFSS,
-                                       pic16_newpCodeOpBit (pic16_aopGet (AOP (left), offset, FALSE, FALSE), posbit - 1, 0,
-                                                            PO_GPR_REGISTER));
-                    }
-                }
-              else
-                {
-                  if (bytelit == 0xff)
-                    {
-                      /* Aaron had a MOVF instruction here, changed to MOVFW cause
-                       * a peephole could optimize it out -- VR */
-                      pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (left), offset));
-                    }
-                  else
-                    {
-                      pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (left), offset));
-                      pic16_emitpcode (POC_ANDLW, pic16_popGetLit (bytelit));
-                    }
-                  if (nonnull)
-                    {
-                      if (rIfx.condition)
-                        {
-                          emitSKPZ;
-                          pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key));        /* to false */
-                        }
-                      else
-                        {
-                          pic16_emitpcode (POC_BNZ, pic16_popGetLabel (tlbl->key));     /* to true */
-                        }
-                    }
-                  else
-                    {
-                      /* last non null byte */
-                      if (rIfx.condition)
-                        emitSKPZ;
-                      else
-                        emitSKPNZ;
-                    }
-                }
-            }
+          pic16_emitpcode (POC_MOVFW, pic16_popGet (AOP (left), offset));
+          // Don't bother with ANDLW 0xFF; MOVFW already set the zero flag
+          if (bytelit != 0xff)
+            pic16_emitpcode (POC_ANDLW, pic16_popGetLit (bytelit));
+          // Once we get a nonzero byte we're done, result is in zero flag.
+          // The last nonzero byte doesn't have to branch though.
+          if (lit)
+            pic16_emitpcode (POC_BNZ, pic16_popGetLabel (nonzerolbl->key));
         }
 
-      // bit = left & literal
+      pic16_emitpLabel (nonzerolbl->key);
+      // For nonzero size, result is in the zero flag and we need to store it
       if (size)
         {
-          emitCLRC;
-          pic16_emitpLabel (tlbl->key);
+          /* There's no logic to store a bit result from the Z bit.  It's
+           * not too complex, but pic16 doesn't have bit variables yet. */
+          werror(W_POSSBUG2, __FILE__, __LINE__);
+          abort();
         }
-
-      // if(left & literal)
       else
-        {
-          if (ifx)
-            {
-              if (emitBra)
-                pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key));
-              ifx->generated = 1;
-            }
-          pic16_emitpLabel (tlbl->key);
-          goto release;
-        }
-      pic16_outBitC (result);
+        emitIfxZJump = true;  // Can't skip freeing asm ops, check Z and jump after that
       goto release;
     }
 
@@ -6271,6 +6223,16 @@ release:
   pic16_freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   pic16_freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   pic16_freeAsmop (result, NULL, ic, TRUE);
+
+  if (emitIfxZJump)
+    {
+      if (rIfx.condition)
+        emitSKPZ;
+      else
+        emitSKPNZ;
+      pic16_emitpcode (POC_GOTO, pic16_popGetLabel (rIfx.lbl->key));
+      ifx->generated = 1;
+    }
 }
 
 /*-----------------------------------------------------------------*/

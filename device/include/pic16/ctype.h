@@ -42,6 +42,7 @@
 
 #include <sdcc-lib.h>
 
+extern char  isblank   (unsigned char )  ;
 extern char  iscntrl   (unsigned char )  ;
 extern char  isdigit   (unsigned char )  ;
 extern char  isgraph   (unsigned char )  ;

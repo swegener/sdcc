@@ -134,10 +134,10 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libc18f_a_AR = $(AR) $(ARFLAGS)
 libc18f_a_LIBADD =
-am_libc18f_a_OBJECTS = iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
-	isgraph.$(OBJEXT) islower.$(OBJEXT) isprint.$(OBJEXT) \
-	ispunct.$(OBJEXT) isspace.$(OBJEXT) isupper.$(OBJEXT) \
-	isxdigit.$(OBJEXT) delay100ktcy.$(OBJEXT) \
+am_libc18f_a_OBJECTS = isblank.$(OBJEXT) iscntrl.$(OBJEXT) \
+	isdigit.$(OBJEXT) isgraph.$(OBJEXT) islower.$(OBJEXT) \
+	isprint.$(OBJEXT) ispunct.$(OBJEXT) isspace.$(OBJEXT) \
+	isupper.$(OBJEXT) isxdigit.$(OBJEXT) delay100ktcy.$(OBJEXT) \
 	delay100tcy.$(OBJEXT) delay10ktcy.$(OBJEXT) \
 	delay10tcy.$(OBJEXT) delay1ktcy.$(OBJEXT) delay1mtcy.$(OBJEXT) \
 	fprintf.$(OBJEXT) printf.$(OBJEXT) printf_small.$(OBJEXT) \
@@ -145,21 +145,22 @@ am_libc18f_a_OBJECTS = iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
 	streams.$(OBJEXT) strmgpsim.$(OBJEXT) strmmssp.$(OBJEXT) \
 	strmputchar.$(OBJEXT) strmusart.$(OBJEXT) vfprintf.$(OBJEXT) \
 	vprintf.$(OBJEXT) vsprintf.$(OBJEXT) atof.$(OBJEXT) \
-	atoi.$(OBJEXT) atol.$(OBJEXT) calloc.$(OBJEXT) crc16.$(OBJEXT) \
-	free.$(OBJEXT) g_ftoa.$(OBJEXT) itoa.$(OBJEXT) ltoa.$(OBJEXT) \
-	malloc.$(OBJEXT) memfree.$(OBJEXT) memfreemax.$(OBJEXT) \
-	memmisc.$(OBJEXT) setjmp.$(OBJEXT) rand.$(OBJEXT) \
-	realloc.$(OBJEXT) x_ftoa.$(OBJEXT) memccpy.$(OBJEXT) \
-	memchr.$(OBJEXT) memchrpgm.$(OBJEXT) memchrram.$(OBJEXT) \
-	memcmp.$(OBJEXT) memcpy.$(OBJEXT) memcpypgm2ram.$(OBJEXT) \
-	memcpyram2ram.$(OBJEXT) memmove.$(OBJEXT) memrchr.$(OBJEXT) \
-	memset.$(OBJEXT) strcat.$(OBJEXT) strchr.$(OBJEXT) \
-	strcmp.$(OBJEXT) strcpy.$(OBJEXT) strcspn.$(OBJEXT) \
-	strlen.$(OBJEXT) strlwr.$(OBJEXT) strncat.$(OBJEXT) \
-	strncmp.$(OBJEXT) strncpy.$(OBJEXT) strpbrk.$(OBJEXT) \
-	strrchr.$(OBJEXT) strspn.$(OBJEXT) strstr.$(OBJEXT) \
-	strtok.$(OBJEXT) strupr.$(OBJEXT) cnvfrac.$(OBJEXT) \
-	cnvint.$(OBJEXT) cvtdec.$(OBJEXT)
+	atoi.$(OBJEXT) atol.$(OBJEXT) atoll.$(OBJEXT) calloc.$(OBJEXT) \
+	crc16.$(OBJEXT) free.$(OBJEXT) g_ftoa.$(OBJEXT) itoa.$(OBJEXT) \
+	ltoa.$(OBJEXT) malloc.$(OBJEXT) memfree.$(OBJEXT) \
+	memfreemax.$(OBJEXT) memmisc.$(OBJEXT) setjmp.$(OBJEXT) \
+	rand.$(OBJEXT) realloc.$(OBJEXT) x_ftoa.$(OBJEXT) \
+	memccpy.$(OBJEXT) memchr.$(OBJEXT) memchrpgm.$(OBJEXT) \
+	memchrram.$(OBJEXT) memcmp.$(OBJEXT) memcpy.$(OBJEXT) \
+	memcpypgm2ram.$(OBJEXT) memcpyram2ram.$(OBJEXT) \
+	memmove.$(OBJEXT) memrchr.$(OBJEXT) memset.$(OBJEXT) \
+	strcat.$(OBJEXT) strchr.$(OBJEXT) strcmp.$(OBJEXT) \
+	strcpy.$(OBJEXT) strcspn.$(OBJEXT) strlen.$(OBJEXT) \
+	strlwr.$(OBJEXT) strncat.$(OBJEXT) strncmp.$(OBJEXT) \
+	strncpy.$(OBJEXT) strpbrk.$(OBJEXT) strrchr.$(OBJEXT) \
+	strspn.$(OBJEXT) strstr.$(OBJEXT) strtok.$(OBJEXT) \
+	strupr.$(OBJEXT) cnvfrac.$(OBJEXT) cnvint.$(OBJEXT) \
+	cvtdec.$(OBJEXT)
 libc18f_a_OBJECTS = $(am_libc18f_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -177,19 +178,20 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/atof.Po ./$(DEPDIR)/atoi.Po \
-	./$(DEPDIR)/atol.Po ./$(DEPDIR)/calloc.Po \
+	./$(DEPDIR)/atol.Po ./$(DEPDIR)/atoll.Po ./$(DEPDIR)/calloc.Po \
 	./$(DEPDIR)/cnvfrac.Po ./$(DEPDIR)/cnvint.Po \
 	./$(DEPDIR)/crc16.Po ./$(DEPDIR)/cvtdec.Po \
 	./$(DEPDIR)/delay100ktcy.Po ./$(DEPDIR)/delay100tcy.Po \
 	./$(DEPDIR)/delay10ktcy.Po ./$(DEPDIR)/delay10tcy.Po \
 	./$(DEPDIR)/delay1ktcy.Po ./$(DEPDIR)/delay1mtcy.Po \
 	./$(DEPDIR)/fprintf.Po ./$(DEPDIR)/free.Po \
-	./$(DEPDIR)/g_ftoa.Po ./$(DEPDIR)/iscntrl.Po \
-	./$(DEPDIR)/isdigit.Po ./$(DEPDIR)/isgraph.Po \
-	./$(DEPDIR)/islower.Po ./$(DEPDIR)/isprint.Po \
-	./$(DEPDIR)/ispunct.Po ./$(DEPDIR)/isspace.Po \
-	./$(DEPDIR)/isupper.Po ./$(DEPDIR)/isxdigit.Po \
-	./$(DEPDIR)/itoa.Po ./$(DEPDIR)/ltoa.Po ./$(DEPDIR)/malloc.Po \
+	./$(DEPDIR)/g_ftoa.Po ./$(DEPDIR)/isblank.Po \
+	./$(DEPDIR)/iscntrl.Po ./$(DEPDIR)/isdigit.Po \
+	./$(DEPDIR)/isgraph.Po ./$(DEPDIR)/islower.Po \
+	./$(DEPDIR)/isprint.Po ./$(DEPDIR)/ispunct.Po \
+	./$(DEPDIR)/isspace.Po ./$(DEPDIR)/isupper.Po \
+	./$(DEPDIR)/isxdigit.Po ./$(DEPDIR)/itoa.Po \
+	./$(DEPDIR)/ltoa.Po ./$(DEPDIR)/malloc.Po \
 	./$(DEPDIR)/memccpy.Po ./$(DEPDIR)/memchr.Po \
 	./$(DEPDIR)/memchrpgm.Po ./$(DEPDIR)/memchrram.Po \
 	./$(DEPDIR)/memcmp.Po ./$(DEPDIR)/memcpy.Po \
@@ -360,20 +362,21 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LIBRARIES = libc18f.a
-libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
-	ctype/islower.c ctype/isprint.c ctype/ispunct.c \
-	ctype/isspace.c ctype/isupper.c ctype/isxdigit.c \
-	delay/delay100ktcy.S delay/delay100tcy.S delay/delay10ktcy.S \
-	delay/delay10tcy.S delay/delay1ktcy.S delay/delay1mtcy.S \
-	stdio/fprintf.c stdio/printf.c stdio/printf_small.c \
-	stdio/printf_tiny.c stdio/putchar.c stdio/sprintf.c \
-	stdio/streams.c stdio/strmgpsim.c stdio/strmmssp.c \
-	stdio/strmputchar.c stdio/strmusart.c stdio/vfprintf.c \
-	stdio/vprintf.c stdio/vsprintf.c stdlib/atof.c stdlib/atoi.c \
-	stdlib/atol.c stdlib/calloc.c stdlib/crc16.c stdlib/free.c \
-	stdlib/g_ftoa.S stdlib/itoa.c stdlib/ltoa.c stdlib/malloc.c \
-	stdlib/memfree.c stdlib/memfreemax.c stdlib/memmisc.c \
-	stdlib/setjmp.c stdlib/rand.c stdlib/realloc.c stdlib/x_ftoa.c \
+libc18f_a_SOURCES = ctype/isblank.c ctype/iscntrl.c ctype/isdigit.c \
+	ctype/isgraph.c ctype/islower.c ctype/isprint.c \
+	ctype/ispunct.c ctype/isspace.c ctype/isupper.c \
+	ctype/isxdigit.c delay/delay100ktcy.S delay/delay100tcy.S \
+	delay/delay10ktcy.S delay/delay10tcy.S delay/delay1ktcy.S \
+	delay/delay1mtcy.S stdio/fprintf.c stdio/printf.c \
+	stdio/printf_small.c stdio/printf_tiny.c stdio/putchar.c \
+	stdio/sprintf.c stdio/streams.c stdio/strmgpsim.c \
+	stdio/strmmssp.c stdio/strmputchar.c stdio/strmusart.c \
+	stdio/vfprintf.c stdio/vprintf.c stdio/vsprintf.c \
+	stdlib/atof.c stdlib/atoi.c stdlib/atol.c ../../atoll.c \
+	stdlib/calloc.c stdlib/crc16.c stdlib/free.c stdlib/g_ftoa.S \
+	stdlib/itoa.c stdlib/ltoa.c stdlib/malloc.c stdlib/memfree.c \
+	stdlib/memfreemax.c stdlib/memmisc.c stdlib/setjmp.c \
+	stdlib/rand.c stdlib/realloc.c stdlib/x_ftoa.c \
 	string/memccpy.c string/memchr.c string/memchrpgm.c \
 	string/memchrram.c string/memcmp.c string/memcpy.c \
 	string/memcpypgm2ram.c string/memcpyram2ram.c string/memmove.c \
@@ -486,6 +489,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atof.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atoi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/atoll.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/calloc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cnvfrac.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cnvint.Po@am__quote@ # am--include-marker
@@ -500,6 +504,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fprintf.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/g_ftoa.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/isblank.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iscntrl.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/isdigit.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/isgraph.Po@am__quote@ # am--include-marker
@@ -733,6 +738,20 @@ cvtdec.obj: utils/cvtdec.S
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+isblank.o: ctype/isblank.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT isblank.o -MD -MP -MF $(DEPDIR)/isblank.Tpo -c -o isblank.o `test -f 'ctype/isblank.c' || echo '$(srcdir)/'`ctype/isblank.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/isblank.Tpo $(DEPDIR)/isblank.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ctype/isblank.c' object='isblank.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o isblank.o `test -f 'ctype/isblank.c' || echo '$(srcdir)/'`ctype/isblank.c
+
+isblank.obj: ctype/isblank.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT isblank.obj -MD -MP -MF $(DEPDIR)/isblank.Tpo -c -o isblank.obj `if test -f 'ctype/isblank.c'; then $(CYGPATH_W) 'ctype/isblank.c'; else $(CYGPATH_W) '$(srcdir)/ctype/isblank.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/isblank.Tpo $(DEPDIR)/isblank.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ctype/isblank.c' object='isblank.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o isblank.obj `if test -f 'ctype/isblank.c'; then $(CYGPATH_W) 'ctype/isblank.c'; else $(CYGPATH_W) '$(srcdir)/ctype/isblank.c'; fi`
 
 iscntrl.o: ctype/iscntrl.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iscntrl.o -MD -MP -MF $(DEPDIR)/iscntrl.Tpo -c -o iscntrl.o `test -f 'ctype/iscntrl.c' || echo '$(srcdir)/'`ctype/iscntrl.c
@@ -1097,6 +1116,20 @@ atol.obj: stdlib/atol.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='stdlib/atol.c' object='atol.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o atol.obj `if test -f 'stdlib/atol.c'; then $(CYGPATH_W) 'stdlib/atol.c'; else $(CYGPATH_W) '$(srcdir)/stdlib/atol.c'; fi`
+
+atoll.o: ../../atoll.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT atoll.o -MD -MP -MF $(DEPDIR)/atoll.Tpo -c -o atoll.o `test -f '../../atoll.c' || echo '$(srcdir)/'`../../atoll.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/atoll.Tpo $(DEPDIR)/atoll.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../atoll.c' object='atoll.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o atoll.o `test -f '../../atoll.c' || echo '$(srcdir)/'`../../atoll.c
+
+atoll.obj: ../../atoll.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT atoll.obj -MD -MP -MF $(DEPDIR)/atoll.Tpo -c -o atoll.obj `if test -f '../../atoll.c'; then $(CYGPATH_W) '../../atoll.c'; else $(CYGPATH_W) '$(srcdir)/../../atoll.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/atoll.Tpo $(DEPDIR)/atoll.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../atoll.c' object='atoll.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o atoll.obj `if test -f '../../atoll.c'; then $(CYGPATH_W) '../../atoll.c'; else $(CYGPATH_W) '$(srcdir)/../../atoll.c'; fi`
 
 calloc.o: stdlib/calloc.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT calloc.o -MD -MP -MF $(DEPDIR)/calloc.Tpo -c -o calloc.o `test -f 'stdlib/calloc.c' || echo '$(srcdir)/'`stdlib/calloc.c
@@ -1787,6 +1820,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/atof.Po
 	-rm -f ./$(DEPDIR)/atoi.Po
 	-rm -f ./$(DEPDIR)/atol.Po
+	-rm -f ./$(DEPDIR)/atoll.Po
 	-rm -f ./$(DEPDIR)/calloc.Po
 	-rm -f ./$(DEPDIR)/cnvfrac.Po
 	-rm -f ./$(DEPDIR)/cnvint.Po
@@ -1801,6 +1835,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/fprintf.Po
 	-rm -f ./$(DEPDIR)/free.Po
 	-rm -f ./$(DEPDIR)/g_ftoa.Po
+	-rm -f ./$(DEPDIR)/isblank.Po
 	-rm -f ./$(DEPDIR)/iscntrl.Po
 	-rm -f ./$(DEPDIR)/isdigit.Po
 	-rm -f ./$(DEPDIR)/isgraph.Po
@@ -1908,6 +1943,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/atof.Po
 	-rm -f ./$(DEPDIR)/atoi.Po
 	-rm -f ./$(DEPDIR)/atol.Po
+	-rm -f ./$(DEPDIR)/atoll.Po
 	-rm -f ./$(DEPDIR)/calloc.Po
 	-rm -f ./$(DEPDIR)/cnvfrac.Po
 	-rm -f ./$(DEPDIR)/cnvint.Po
@@ -1922,6 +1958,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/fprintf.Po
 	-rm -f ./$(DEPDIR)/free.Po
 	-rm -f ./$(DEPDIR)/g_ftoa.Po
+	-rm -f ./$(DEPDIR)/isblank.Po
 	-rm -f ./$(DEPDIR)/iscntrl.Po
 	-rm -f ./$(DEPDIR)/isdigit.Po
 	-rm -f ./$(DEPDIR)/isgraph.Po

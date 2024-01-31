@@ -26,10 +26,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
- * therefore we choose return type void here. Generic pointer is expected
- * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
-
 extern int EEADR;
 extern int EEADRH;
 extern int EECON1;
@@ -37,8 +33,10 @@ extern int EEDATA;
 extern int FSR0L;
 extern int INTCON;
 extern int PRODL;
+extern int PRODH;
 extern int TBLPTRL;
 
+/* Read 2 bytes from 16-bit EEPROM address.  Result in PRODL:WREG. */
 void
 __eeprom16_gptrget2(void) __naked
 {
@@ -46,11 +44,6 @@ __eeprom16_gptrget2(void) __naked
         MOVFF   _INTCON, _TBLPTRL   ; save previous interrupt state
         BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
-        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
-        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
-
-        MOVFF   _FSR0L, _EEADR      ; address first byte
-        MOVFF   _PRODL, _EEADRH     ; address first byte, high address bits
         BSF     _EECON1, 0, 0       ; RD = 1: read EEPROM
         MOVF    _EEDATA, 0, 0       ; W = EEPROM[adr]
 
@@ -58,6 +51,9 @@ __eeprom16_gptrget2(void) __naked
         INCF    _EEADRH, 1, 0       ; high address bits
         BSF     _EECON1, 0, 0       ; RD = 1: read EEPROM
         MOVFF   _EEDATA, _PRODL     ; PRODL = EEPROM[adr+1]
+
+        ; Do not need to increment address again - only gptrget4() could be
+        ; followed by another read
 
         BTFSC   _TBLPTRL, 7, 0      ; check previous interrupt state
         BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts

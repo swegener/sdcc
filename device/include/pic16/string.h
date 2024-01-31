@@ -73,5 +73,7 @@ __data void *memchrram(__data void *, char, size_t);
 __data void *memcpypgm2ram(__data void *, __code void *, size_t);
 __data void *memcpyram2ram(__data void *, __data void *, size_t);
 
+void *__memcpy (void *, const void *, size_t);
+#define memcpy __memcpy
 
 #endif	/* } */

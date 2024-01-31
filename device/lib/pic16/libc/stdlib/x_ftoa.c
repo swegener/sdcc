@@ -26,6 +26,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+#define __SDCC_FLOAT_LIB
 #include <float.h>
 
 extern int convert_frac;

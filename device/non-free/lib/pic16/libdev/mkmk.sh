@@ -36,7 +36,7 @@ libdev${arch}_a_SOURCES = pic${arch}.c
 HERE
 
 
-    sdcc -mpic16 -p${arch} --nostdinc -I../../../../include/pic16 -I../../../include/pic16 -o pic${arch}.inc -E pic${arch}.c;
+    sdcc -mpic16 -p${arch} --nostdinc -I../../../../include/pic16 -I../../../../include -I../../../include/pic16 -o pic${arch}.inc -E pic${arch}.c;
     if grep '\bEEADRH\b' pic${arch}.inc >/dev/null 2>&1; then
         # 16 bit EEPROM address space
         for i in get put; do

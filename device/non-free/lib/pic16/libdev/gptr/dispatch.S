@@ -1,5 +1,6 @@
 	radix dec
 
+	global	___eeprom_gptrload
 	global	___eeprom_gptrget1
 	global	___eeprom_gptrget2
 	global	___eeprom_gptrget3
@@ -10,6 +11,7 @@
 	global	___eeprom_gptrput4
 
 S___eeprom_gptr_stubs	code
+___eeprom_gptrload:
 ___eeprom_gptrget1:
 ___eeprom_gptrget2:
 ___eeprom_gptrget3:

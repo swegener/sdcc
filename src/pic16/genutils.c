@@ -503,6 +503,32 @@ const char *gptr_fns[PIC16_GENPTRRW_MAXSIZE][2] = {
   { "_gptrget4", "_gptrput4" } };
 
 extern set *externs;
+
+/* Add an external symbol */
+void pic16_addExtern(const char *name)
+{
+  symbol *sym;
+
+    sym = newSymbol( name, 0 );
+    sym->used++;
+    strcpy(sym->rname, name);
+    checkAddSym(&externs, sym);
+}
+
+/* generate a call to load a generic pointer, preparing for a generic pointer
+ * read or write */
+void pic16_callGenericPointerLoad(void)
+{
+  char buf[32];
+  symbol *sym;
+
+    strcpy(buf, port->fun_prefix);
+    strcat(buf, "_gptrload");
+
+    pic16_emitpcode (POC_CALL, pic16_popGetWithString (buf));
+
+    pic16_addExtern (buf);
+}
   
 /* generate a call to the generic pointer read/write functions */
 void pic16_callGenericPointerRW(int rw, int size)
@@ -522,10 +548,7 @@ void pic16_callGenericPointerRW(int rw, int size)
     
     pic16_emitpcode (POC_CALL, pic16_popGetWithString (buf));
     
-    sym = newSymbol( buf, 0 );
-    sym->used++;
-    strcpy(sym->rname, buf);
-    checkAddSym(&externs, sym);
+    pic16_addExtern (buf);
 }
 
 

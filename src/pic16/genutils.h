@@ -55,9 +55,11 @@ void pic16_DumpOp(char *prefix, operand *op);
 void pic16_DumpOpX(FILE *fp, char *prefix, operand *op);
 
 pCodeOp *pic16_popGetWithString(char *str);
+void pic16_addExtern(const char *name);
 /* Maximum number of bytes that pic16_callGenericPointerRW can read or write.
  * Larger accesses must be broken up. */
 #define PIC16_GENPTRRW_MAXSIZE  4
+void pic16_callGenericPointerLoad(void);
 void pic16_callGenericPointerRW(int rw, int size);
 
 

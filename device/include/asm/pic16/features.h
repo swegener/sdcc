@@ -32,8 +32,6 @@
 #define _REENTRANT
 
 #define _IL_REENTRANT
-#define _FS_REENTRANT
-#define _MATH_REENTRANT
 
 #define _CODE	__code
 #define _DATA	__data

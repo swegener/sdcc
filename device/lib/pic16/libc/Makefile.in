@@ -385,6 +385,7 @@ libc18f_a_SOURCES = ctype/iscntrl.c ctype/isdigit.c ctype/isgraph.c \
 	string/strstr.c string/strtok.c string/strupr.c \
 	utils/cnvfrac.S utils/cnvint.S utils/cvtdec.S
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../include \
 	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
@@ -403,6 +404,7 @@ AM_CFLAGS = --std-c11 --asm="$(CCAS)" --no-warn-non-free \
 	--fomit-frame-pointer --obanksel=9 --denable-peeps \
 	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../include \
 	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: all-am
 

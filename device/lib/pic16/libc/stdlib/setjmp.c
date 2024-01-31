@@ -31,25 +31,21 @@
 #define __SDCC_HIDE_LONGJMP
 #include <setjmp.h>
 
-extern int _gptrput1;
-extern int _gptrget1;
+extern int _gptrload;
+extern int _gptrput2;
+extern int _gptrput4;
+extern int _gptrget2;
+extern int _gptrget4;
 
-// We have to stash the stack pointer outside of the stack while manipulating
-// the stack in setjmp and longjmp.  longjump must also stash its return value
-// parameter.
-#if defined(__SDCC_MODEL_LARGE)
-#define STACK_PTR_SIZE 2
-#else
-#define STACK_PTR_SIZE 1
-#endif
-static unsigned char longjmp_stack[STACK_PTR_SIZE];
+// We have to stash the return value outside of the stack in longjmp while
+// manipulating the stack.
 static int longjmp_rv;
 
 // Jump buffer bytes:
-// 0 - TOSU
-// 1 - TOSH
-// 2 - TOSL
-// 3 - STKPTR
+// 0 - STKPTR
+// 1 - TOSU
+// 2 - TOSH
+// 3 - TOSL
 // 4 (sm) / 4-5 (lg) - FSR2 (H, L for large)
 // 5 (sm) / 6-7 (lg) - FSR1 (H, L for large)
 
@@ -57,68 +53,48 @@ int __setjmp (jmp_buf buf) __naked
 {
    (void)buf;
    __asm
-      // Grab FSR1 into the scratch area before touching the stack.
-      MOVFF _FSR1L, _longjmp_stack
-#if defined(__SDCC_MODEL_LARGE)
-      MOVFF _FSR1H, (_longjmp_stack+1) // Also get FSR1H
-#endif
-
-      // Load the buf pointer into WREG:PRODL:FSR0L for _gptrput1().
+      // Load the buf pointer using _gptrload().
       // Since we are not creating a stack frame, buf is at FSR1+{1-3}
-      // Load buf into W:PRODL:FSR0L
-      MOVFF _PREINC1, _FSR0L
-      MOVFF _PREINC1, _PRODL
-      MOVF _PREINC1, W
+      MOVFF _PREINC1, _TBLPTRL
+      MOVFF _PREINC1, _TBLPTRH
+      MOVFF _PREINC1, _PCLATH
       // Rewind stack to restore buf on the stack (caller cleans stack)
       MOVF _POSTDEC1, F
       MOVF _POSTDEC1, F
       MOVF _POSTDEC1, F
 
-      // Push everything needed for jmp_buf onto the stack
-#if defined(__SDCC_MODEL_LARGE)
-      MOVFF (_longjmp_stack+1), _POSTDEC1 // FSR1H
-#endif
-      MOVFF _longjmp_stack, _POSTDEC1  // FSR1L
-      MOVFF _FSR2L, _POSTDEC1
-#if defined(__SDCC_MODEL_LARGE)
-      MOVFF _FSR2H, _POSTDEC1
-#endif
-      MOVFF _STKPTR, _POSTDEC1
-      MOVFF _TOSL, _POSTDEC1
-      MOVFF _TOSH, _POSTDEC1
-      MOVFF _TOSU, _POSTDEC1
+      // Prepare for __gptrput4
+      CALL __gptrload
 
-      // Write out 6 (sm) or 8 (lg) bytes to buf from the stack
+      // _gptrput4 writes 4 bytes from TABLAT:PRODH:PRODL:WREG
+      // buf[0] = STKPTR
+      MOVF _STKPTR, W
+      // buf[1] = TOSU
+      MOVFF _TOSU, _PRODL
+      // buf[2] = TOSH
+      MOVFF _TOSH, _PRODH
+      // buf[3] = TOSL
+      MOVFF _TOSL, _TABLAT
+      CALL __gptrput4
 
-      // buf[0] = TOSU
-      CALL __gptrput1
-      // __gptrput1 increments FSR0, but it expects the high byte in PRODL,
-      // refresh PRODL in case FSR0L carried
-      MOVFF _FSR0H, _PRODL
-      // buf[1] = TOSH
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
-      // buf[2] = TOSL
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
-      // buf[3] = STKPTR
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
+      // __gptrput4 advances the pointer for another call as well
 #if defined(__SDCC_MODEL_LARGE)
-      // buf[4 lg] = FSR2H
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
+      // buf[4] = FSR2H
+      MOVF _FSR2H, W
+      // buf[5] = FSR2L
+      MOVFF _FSR2L, _PRODL
+      // buf[6] = FSR1H
+      MOVFF _FSR1H, _PRODH
+      // buf[7] = FSR1L
+      MOVFF _FSR1L, _TABLAT
+      CALL __gptrput4
+#else
+      // buf[4] = FSR2L
+      MOVF _FSR2L, W
+      // buf[5] = FSR1L
+      MOVFF _FSR1L, _PRODL
+      CALL __gptrput2
 #endif
-      // buf[4 sm / 5 lg] = FSR2L
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
-#if defined(__SDCC_MODEL_LARGE)
-      // buf[6 lg] = FSR1H
-      CALL __gptrput1
-      MOVFF _FSR0H, _PRODL
-#endif
-      // bur[5 sm / 7 lg] = FSR1L
-      CALL __gptrput1
 
       // Return 0
       CLRF _PRODL
@@ -131,97 +107,47 @@ int longjmp (jmp_buf buf, int rv) __naked
    (void)buf;
    (void)rv;
    __asm
-      // Load buf into WREG:PRODL:FSR0L for _gptrget1()
-      MOVFF _PREINC1, _FSR0L
-      MOVFF _PREINC1, _PRODL
-      // Use PRODH to hold high byte instead of WREG since each call to
-      // _gptrget overwrites WREG.
-      MOVFF _PREINC1, _PRODH
+      // Load buf into with _gptrget1()
+      MOVFF _PREINC1, _TBLPTRL
+      MOVFF _PREINC1, _TBLPTRH
+      MOVFF _PREINC1, _PCLATH
 
       // Stash return value
       MOVFF _PREINC1, _longjmp_rv   // LSB
       MOVFF _PREINC1, (_longjmp_rv+1)  // MSB
 
-      // Read 6 (small) / 8 (large) bytes from buf onto the stack
-      // buf[0] = TOSU
-      MOVF _PRODH, W // Load WREG, high byte of address
-      CALL __gptrget1
-      // Like _gptrput1(), FSR0 is incremented but we must refresh PRODL in case
-      // it carries into the high byte.
-      MOVFF _FSR0H, _PRODL
-      // Push the result onto the stack
-      MOVWF _POSTDEC1
+      // Prepare for __gptrput4
+      CALL __gptrload
 
-      // buf[1] = TOSH
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
+      // Read 6 (small) / 8 (large) bytes from buf
+      CALL __gptrget4
+      // buf[0] = STKPTR
+      MOVWF _STKPTR
+      // buf[1] = TOSU
+      MOVFF _PRODL, _TOSU
+      // buf[2] = TOSH
+      MOVFF _PRODH, _TOSH
+      // buf[3] = TOSL
+      MOVFF _TABLAT, _TOSL
 
-      // buf[2] = TOSL
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
-
-      // buf[3] = STKPTR
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
-
+      // __gptrget4 advances the pointer for another call as well
 #if defined(__SDCC_MODEL_LARGE)
-      // buf[4 lg] = FSR2H
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
-#endif
-
-      // buf[4 sm / 5 lg] = FSR2L
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
-
-#if defined(__SDCC_MODEL_LARGE)
-      // buf[6 lg] = FSR1H
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVFF _FSR0H, _PRODL
-      MOVWF _POSTDEC1
-#endif
-
-      // bur[5 sm / 7 lg] = FSR1L
-      MOVF _PRODH, W
-      CALL __gptrget1
-      MOVWF _POSTDEC1
-
-      // Pop FSR1 into the scratch space
-      MOVFF _PREINC1, _longjmp_stack   // FSR1L
-#if defined(__SDCC_MODEL_LARGE)
-      MOVFF _PREINC1, (_longjmp_stack+1)  // FSR1H
-#endif
-
-      // Pop everything else into the actual registers
-#if defined(__SDCC_MODEL_LARGE)
-      // FSR2H must be written first, load FSR2L into WREG for a moment
-      MOVF _PREINC1, W
-      MOVFF _PREINC1, _FSR2H
-      MOVWF _FSR2L
+      CALL __gptrget4
+      // buf[4] = FSR2H
+      MOVWF _FSR2H
+      // buf[5] = FSR2L
+      MOVFF _PRODL, _FSR2L
+      // buf[6] = FSR1H
+      MOVFF _PRODH, _FSR1H
+      // buf[7] = FSR1L
+      MOVFF _TABLAT, _FSR1L
 #else
-      MOVFF _PREINC1, _FSR2L
+      CALL __gptrget2
+      // buf[4] = FSR2L
+      MOVWF _FSR2L
+      // buf[5] = FSR1L
+      MOVFF _PRODL, _FSR1L
 #endif
-      MOVFF _PREINC1, _STKPTR
-      MOVFF _PREINC1, _TOSL
-      MOVFF _PREINC1, _TOSH
-      MOVFF _PREINC1, _TOSU
-
-      // Restore the stack
-#if defined(__SDCC_MODEL_LARGE)
-      MOVFF (_longjmp_stack+1), _FSR1H
-#endif
-      MOVFF _longjmp_stack, _FSR1L
 
       // Put the return value in PRODL:WREG
       MOVF _longjmp_rv, W

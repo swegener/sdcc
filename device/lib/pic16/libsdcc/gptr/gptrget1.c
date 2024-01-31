@@ -27,10 +27,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
- * therefore we choose return type void here. Generic pointer is expected
- * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
-
 extern int POSTINC0;
 extern int INDF0;
 extern int FSR0L;
@@ -40,28 +36,24 @@ extern int TBLPTRL;
 extern int TBLPTRH;
 extern int TBLPTRU;
 extern int TABLAT;
+extern int PCLATH;
 extern int PRODL;
 extern int __eeprom_gptrget1;
 
+/* Read 1 byte following _gptrload().  Result in WREG. */
 void _gptrget1(void) __naked
 {
   __asm
-    /* decode generic pointer MSB (in WREG) bits 6 and 7:
+    /* decode generic pointer MSB (in PCLATH) bits 6 and 7:
      * 00 -> code
      * 01 -> EEPROM
      * 10 -> data
      * 11 -> data
-     *
-     * address in (WREG, PRODL, FSR0L)
-     * result in (FSR0L, PRODH, PRODL, WREG)
      */
-    btfss	_WREG, 7, 0
+    btfss	_PCLATH, 7, 0
     bra		_lab_01_
     
     /* data pointer  */
-    /* FSR0L is already set up */
-    movff	_PRODL, _FSR0H
-    
     movf	_POSTINC0, 0, 0
     
     return
@@ -69,14 +61,11 @@ void _gptrget1(void) __naked
 
 _lab_01_:
     /* code or eeprom */
-    btfsc	_WREG, 6, 0
+    btfsc	_PCLATH, 6, 0
     goto        ___eeprom_gptrget1
     
-    ; code pointer
-    movff	_FSR0L, _TBLPTRL    
-    movff	_PRODL, _TBLPTRH
-    movwf	_TBLPTRU, 0
-    
+    /* code pointer */
+
     /* fetch first byte */
     TBLRD*+
     movf	_TABLAT, 0, 0

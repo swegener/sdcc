@@ -147,29 +147,31 @@ am_libsdcc_a_OBJECTS = divschar.$(OBJEXT) divuchar.$(OBJEXT) \
 	schar2fps16x16.$(OBJEXT) sint2fps16x16.$(OBJEXT) \
 	slong2fps16x16.$(OBJEXT) uchar2fps16x16.$(OBJEXT) \
 	uint2fps16x16.$(OBJEXT) ulong2fps16x16.$(OBJEXT) \
-	fs2schar.$(OBJEXT) fs2sint.$(OBJEXT) fs2slong.$(OBJEXT) \
-	fs2uchar.$(OBJEXT) fs2uint.$(OBJEXT) fs2ulong.$(OBJEXT) \
-	fsadd.$(OBJEXT) fsdiv.$(OBJEXT) fseq.$(OBJEXT) fsgt.$(OBJEXT) \
-	fslt.$(OBJEXT) fsmul.$(OBJEXT) fsneq.$(OBJEXT) fssub.$(OBJEXT) \
-	schar2fs.$(OBJEXT) sint2fs.$(OBJEXT) slong2fs.$(OBJEXT) \
-	uchar2fs.$(OBJEXT) uint2fs.$(OBJEXT) ulong2fs.$(OBJEXT) \
-	gptrget1.$(OBJEXT) gptrget2.$(OBJEXT) gptrget3.$(OBJEXT) \
-	gptrget4.$(OBJEXT) gptrput1.$(OBJEXT) gptrput2.$(OBJEXT) \
-	gptrput3.$(OBJEXT) gptrput4.$(OBJEXT) \
-	eeprom8_gptrget1.$(OBJEXT) eeprom8_gptrget2.$(OBJEXT) \
-	eeprom8_gptrget3.$(OBJEXT) eeprom8_gptrget4.$(OBJEXT) \
-	eeprom8_gptrput1.$(OBJEXT) eeprom8_gptrput2.$(OBJEXT) \
-	eeprom8_gptrput3.$(OBJEXT) eeprom8_gptrput4.$(OBJEXT) \
-	eeprom8_write.$(OBJEXT) eeprom16_gptrget1.$(OBJEXT) \
-	eeprom16_gptrget2.$(OBJEXT) eeprom16_gptrget3.$(OBJEXT) \
-	eeprom16_gptrget4.$(OBJEXT) eeprom16_gptrput1.$(OBJEXT) \
-	eeprom16_gptrput2.$(OBJEXT) eeprom16_gptrput3.$(OBJEXT) \
-	eeprom16_gptrput4.$(OBJEXT) eeprom16_write.$(OBJEXT) \
-	divsint.$(OBJEXT) divuint.$(OBJEXT) modsint.$(OBJEXT) \
-	moduint.$(OBJEXT) mulint.$(OBJEXT) divslong.$(OBJEXT) \
-	divulong.$(OBJEXT) modslong.$(OBJEXT) modulong.$(OBJEXT) \
-	mullong.$(OBJEXT) lrrest.$(OBJEXT) lrst.$(OBJEXT) \
-	stack.$(OBJEXT)
+	_fs2schar.$(OBJEXT) _fs2sint.$(OBJEXT) _fs2slong.$(OBJEXT) \
+	_fs2uchar.$(OBJEXT) _fs2uint.$(OBJEXT) _fs2ulong.$(OBJEXT) \
+	_fsadd.$(OBJEXT) _fsdiv.$(OBJEXT) _fseq.$(OBJEXT) \
+	_fslt.$(OBJEXT) _fsmul.$(OBJEXT) _fsneq.$(OBJEXT) \
+	_fssub.$(OBJEXT) _schar2fs.$(OBJEXT) _sint2fs.$(OBJEXT) \
+	_slong2fs.$(OBJEXT) _uchar2fs.$(OBJEXT) _uint2fs.$(OBJEXT) \
+	_ulong2fs.$(OBJEXT) gptrget1.$(OBJEXT) gptrget2.$(OBJEXT) \
+	gptrget3.$(OBJEXT) gptrget4.$(OBJEXT) gptrload.$(OBJEXT) \
+	gptrput1.$(OBJEXT) gptrput2.$(OBJEXT) gptrput3.$(OBJEXT) \
+	gptrput4.$(OBJEXT) eeprom8_gptrget1.$(OBJEXT) \
+	eeprom8_gptrget2.$(OBJEXT) eeprom8_gptrget3.$(OBJEXT) \
+	eeprom8_gptrget4.$(OBJEXT) eeprom8_gptrput1.$(OBJEXT) \
+	eeprom8_gptrput2.$(OBJEXT) eeprom8_gptrput3.$(OBJEXT) \
+	eeprom8_gptrput4.$(OBJEXT) eeprom8_write.$(OBJEXT) \
+	eeprom16_gptrget1.$(OBJEXT) eeprom16_gptrget2.$(OBJEXT) \
+	eeprom16_gptrget3.$(OBJEXT) eeprom16_gptrget4.$(OBJEXT) \
+	eeprom16_gptrput1.$(OBJEXT) eeprom16_gptrput2.$(OBJEXT) \
+	eeprom16_gptrput3.$(OBJEXT) eeprom16_gptrput4.$(OBJEXT) \
+	eeprom16_write.$(OBJEXT) divsint.$(OBJEXT) divuint.$(OBJEXT) \
+	modsint.$(OBJEXT) moduint.$(OBJEXT) mulint.$(OBJEXT) \
+	divslong.$(OBJEXT) divulong.$(OBJEXT) modslong.$(OBJEXT) \
+	modulong.$(OBJEXT) mullong.$(OBJEXT) _divslonglong.$(OBJEXT) \
+	_divulonglong.$(OBJEXT) _modslonglong.$(OBJEXT) \
+	_modulonglong.$(OBJEXT) _mullonglong.$(OBJEXT) \
+	lrrest.$(OBJEXT) lrst.$(OBJEXT) stack.$(OBJEXT)
 libsdcc_a_OBJECTS = $(am_libsdcc_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -186,10 +188,22 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/divschar.Po ./$(DEPDIR)/divsint.Po \
-	./$(DEPDIR)/divslong.Po ./$(DEPDIR)/divuchar.Po \
-	./$(DEPDIR)/divuint.Po ./$(DEPDIR)/divulong.Po \
-	./$(DEPDIR)/eeprom16_gptrget1.Po \
+am__depfiles_remade = ./$(DEPDIR)/_divslonglong.Po \
+	./$(DEPDIR)/_divulonglong.Po ./$(DEPDIR)/_fs2schar.Po \
+	./$(DEPDIR)/_fs2sint.Po ./$(DEPDIR)/_fs2slong.Po \
+	./$(DEPDIR)/_fs2uchar.Po ./$(DEPDIR)/_fs2uint.Po \
+	./$(DEPDIR)/_fs2ulong.Po ./$(DEPDIR)/_fsadd.Po \
+	./$(DEPDIR)/_fsdiv.Po ./$(DEPDIR)/_fseq.Po \
+	./$(DEPDIR)/_fslt.Po ./$(DEPDIR)/_fsmul.Po \
+	./$(DEPDIR)/_fsneq.Po ./$(DEPDIR)/_fssub.Po \
+	./$(DEPDIR)/_modslonglong.Po ./$(DEPDIR)/_modulonglong.Po \
+	./$(DEPDIR)/_mullonglong.Po ./$(DEPDIR)/_schar2fs.Po \
+	./$(DEPDIR)/_sint2fs.Po ./$(DEPDIR)/_slong2fs.Po \
+	./$(DEPDIR)/_uchar2fs.Po ./$(DEPDIR)/_uint2fs.Po \
+	./$(DEPDIR)/_ulong2fs.Po ./$(DEPDIR)/divschar.Po \
+	./$(DEPDIR)/divsint.Po ./$(DEPDIR)/divslong.Po \
+	./$(DEPDIR)/divuchar.Po ./$(DEPDIR)/divuint.Po \
+	./$(DEPDIR)/divulong.Po ./$(DEPDIR)/eeprom16_gptrget1.Po \
 	./$(DEPDIR)/eeprom16_gptrget2.Po \
 	./$(DEPDIR)/eeprom16_gptrget3.Po \
 	./$(DEPDIR)/eeprom16_gptrget4.Po \
@@ -213,28 +227,20 @@ am__depfiles_remade = ./$(DEPDIR)/divschar.Po ./$(DEPDIR)/divsint.Po \
 	./$(DEPDIR)/fps16x16_gt.Po ./$(DEPDIR)/fps16x16_gteq.Po \
 	./$(DEPDIR)/fps16x16_lt.Po ./$(DEPDIR)/fps16x16_lteq.Po \
 	./$(DEPDIR)/fps16x16_mul.Po ./$(DEPDIR)/fps16x16_neq.Po \
-	./$(DEPDIR)/fps16x16_sub.Po ./$(DEPDIR)/fs2schar.Po \
-	./$(DEPDIR)/fs2sint.Po ./$(DEPDIR)/fs2slong.Po \
-	./$(DEPDIR)/fs2uchar.Po ./$(DEPDIR)/fs2uint.Po \
-	./$(DEPDIR)/fs2ulong.Po ./$(DEPDIR)/fsadd.Po \
-	./$(DEPDIR)/fsdiv.Po ./$(DEPDIR)/fseq.Po ./$(DEPDIR)/fsgt.Po \
-	./$(DEPDIR)/fslt.Po ./$(DEPDIR)/fsmul.Po ./$(DEPDIR)/fsneq.Po \
-	./$(DEPDIR)/fssub.Po ./$(DEPDIR)/gptrget1.Po \
+	./$(DEPDIR)/fps16x16_sub.Po ./$(DEPDIR)/gptrget1.Po \
 	./$(DEPDIR)/gptrget2.Po ./$(DEPDIR)/gptrget3.Po \
-	./$(DEPDIR)/gptrget4.Po ./$(DEPDIR)/gptrput1.Po \
-	./$(DEPDIR)/gptrput2.Po ./$(DEPDIR)/gptrput3.Po \
-	./$(DEPDIR)/gptrput4.Po ./$(DEPDIR)/lrrest.Po \
-	./$(DEPDIR)/lrst.Po ./$(DEPDIR)/modschar.Po \
-	./$(DEPDIR)/modsint.Po ./$(DEPDIR)/modslong.Po \
-	./$(DEPDIR)/moduchar.Po ./$(DEPDIR)/moduint.Po \
-	./$(DEPDIR)/modulong.Po ./$(DEPDIR)/mulint.Po \
-	./$(DEPDIR)/mullong.Po ./$(DEPDIR)/schar2fps16x16.Po \
-	./$(DEPDIR)/schar2fs.Po ./$(DEPDIR)/sint2fps16x16.Po \
-	./$(DEPDIR)/sint2fs.Po ./$(DEPDIR)/slong2fps16x16.Po \
-	./$(DEPDIR)/slong2fs.Po ./$(DEPDIR)/stack.Po \
-	./$(DEPDIR)/uchar2fps16x16.Po ./$(DEPDIR)/uchar2fs.Po \
-	./$(DEPDIR)/uint2fps16x16.Po ./$(DEPDIR)/uint2fs.Po \
-	./$(DEPDIR)/ulong2fps16x16.Po ./$(DEPDIR)/ulong2fs.Po
+	./$(DEPDIR)/gptrget4.Po ./$(DEPDIR)/gptrload.Po \
+	./$(DEPDIR)/gptrput1.Po ./$(DEPDIR)/gptrput2.Po \
+	./$(DEPDIR)/gptrput3.Po ./$(DEPDIR)/gptrput4.Po \
+	./$(DEPDIR)/lrrest.Po ./$(DEPDIR)/lrst.Po \
+	./$(DEPDIR)/modschar.Po ./$(DEPDIR)/modsint.Po \
+	./$(DEPDIR)/modslong.Po ./$(DEPDIR)/moduchar.Po \
+	./$(DEPDIR)/moduint.Po ./$(DEPDIR)/modulong.Po \
+	./$(DEPDIR)/mulint.Po ./$(DEPDIR)/mullong.Po \
+	./$(DEPDIR)/schar2fps16x16.Po ./$(DEPDIR)/sint2fps16x16.Po \
+	./$(DEPDIR)/slong2fps16x16.Po ./$(DEPDIR)/stack.Po \
+	./$(DEPDIR)/uchar2fps16x16.Po ./$(DEPDIR)/uint2fps16x16.Po \
+	./$(DEPDIR)/ulong2fps16x16.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -394,14 +400,14 @@ libsdcc_a_SOURCES = char/divschar.c char/divuchar.c char/modschar.c \
 	fixed16x16/schar2fps16x16.S fixed16x16/sint2fps16x16.S \
 	fixed16x16/slong2fps16x16.S fixed16x16/uchar2fps16x16.S \
 	fixed16x16/uint2fps16x16.S fixed16x16/ulong2fps16x16.S \
-	float/fs2schar.c float/fs2sint.c float/fs2slong.c \
-	float/fs2uchar.c float/fs2uint.c float/fs2ulong.c \
-	float/fsadd.c float/fsdiv.c float/fseq.c float/fsgt.c \
-	float/fslt.c float/fsmul.c float/fsneq.c float/fssub.c \
-	float/schar2fs.c float/sint2fs.c float/slong2fs.c \
-	float/uchar2fs.c float/uint2fs.c float/ulong2fs.c \
-	gptr/gptrget1.c gptr/gptrget2.c gptr/gptrget3.c \
-	gptr/gptrget4.c gptr/gptrput1.c gptr/gptrput2.c \
+	../../_fs2schar.c ../../_fs2sint.c ../../_fs2slong.c \
+	../../_fs2uchar.c ../../_fs2uint.c ../../_fs2ulong.c \
+	../../_fsadd.c ../../_fsdiv.c ../../_fseq.c ../../_fslt.c \
+	../../_fsmul.c ../../_fsneq.c ../../_fssub.c ../../_schar2fs.c \
+	../../_sint2fs.c ../../_slong2fs.c ../../_uchar2fs.c \
+	../../_uint2fs.c ../../_ulong2fs.c gptr/gptrget1.c \
+	gptr/gptrget2.c gptr/gptrget3.c gptr/gptrget4.c \
+	gptr/gptrload.c gptr/gptrput1.c gptr/gptrput2.c \
 	gptr/gptrput3.c gptr/gptrput4.c gptr/eeprom8_gptrget1.c \
 	gptr/eeprom8_gptrget2.c gptr/eeprom8_gptrget3.c \
 	gptr/eeprom8_gptrget4.c gptr/eeprom8_gptrput1.c \
@@ -414,8 +420,11 @@ libsdcc_a_SOURCES = char/divschar.c char/divuchar.c char/modschar.c \
 	gptr/eeprom16_write.c int/divsint.c int/divuint.c \
 	int/modsint.c int/moduint.c int/mulint.c long/divslong.c \
 	long/divulong.c long/modslong.c long/modulong.c long/mullong.c \
-	lregs/lrrest.c lregs/lrst.c stack/stack.S
+	../../_divslonglong.c ../../_divulonglong.c \
+	../../_modslonglong.c ../../_modulonglong.c \
+	../../_mullonglong.c lregs/lrrest.c lregs/lrst.c stack/stack.S
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../include \
 	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
 
@@ -434,6 +443,7 @@ AM_CFLAGS = --std-c11 --asm="$(CCAS)" --no-warn-non-free \
 	--fomit-frame-pointer --obanksel=9 --denable-peeps \
 	--optimize-cmp --optimize-df --i-code-in-asm @USE_FLOATS@
 AM_CCASFLAGS = -I$(top_srcdir)/../../include/pic16 \
+	-I$(top_srcdir)/../../include \
 	-I$(top_srcdir)/../../non-free/include/pic16 -I$(srcdir)
 all: all-am
 
@@ -512,6 +522,30 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divslonglong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divulonglong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2schar.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2sint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2slong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2uchar.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2uint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fs2ulong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fsadd.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fsdiv.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fseq.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fslt.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fsmul.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fsneq.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fssub.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modslonglong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modulonglong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mullonglong.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_schar2fs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_sint2fs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_slong2fs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_uchar2fs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_uint2fs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ulong2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divschar.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divsint.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/divslong.Po@am__quote@ # am--include-marker
@@ -553,24 +587,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x16_mul.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x16_neq.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps16x16_sub.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2schar.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2sint.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2slong.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2uchar.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2uint.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2ulong.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsadd.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsdiv.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fseq.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsgt.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fslt.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsmul.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsneq.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fssub.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrget1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrget2.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrget3.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrget4.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrload.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrput1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrput2.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gptrput3.Po@am__quote@ # am--include-marker
@@ -586,18 +607,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mulint.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mullong.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schar2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schar2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sint2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sint2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slong2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slong2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stack.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uchar2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uchar2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uint2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uint2fs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ulong2fps16x16.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ulong2fs.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1025,285 +1040,271 @@ fps16x16_sub.obj: fixed16x16/fps16x16_sub.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fps16x16_sub.obj `if test -f 'fixed16x16/fps16x16_sub.c'; then $(CYGPATH_W) 'fixed16x16/fps16x16_sub.c'; else $(CYGPATH_W) '$(srcdir)/fixed16x16/fps16x16_sub.c'; fi`
 
-fs2schar.o: float/fs2schar.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2schar.o -MD -MP -MF $(DEPDIR)/fs2schar.Tpo -c -o fs2schar.o `test -f 'float/fs2schar.c' || echo '$(srcdir)/'`float/fs2schar.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2schar.Tpo $(DEPDIR)/fs2schar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2schar.c' object='fs2schar.o' libtool=no @AMDEPBACKSLASH@
+_fs2schar.o: ../../_fs2schar.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2schar.o -MD -MP -MF $(DEPDIR)/_fs2schar.Tpo -c -o _fs2schar.o `test -f '../../_fs2schar.c' || echo '$(srcdir)/'`../../_fs2schar.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2schar.Tpo $(DEPDIR)/_fs2schar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2schar.c' object='_fs2schar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2schar.o `test -f 'float/fs2schar.c' || echo '$(srcdir)/'`float/fs2schar.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2schar.o `test -f '../../_fs2schar.c' || echo '$(srcdir)/'`../../_fs2schar.c
 
-fs2schar.obj: float/fs2schar.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2schar.obj -MD -MP -MF $(DEPDIR)/fs2schar.Tpo -c -o fs2schar.obj `if test -f 'float/fs2schar.c'; then $(CYGPATH_W) 'float/fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2schar.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2schar.Tpo $(DEPDIR)/fs2schar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2schar.c' object='fs2schar.obj' libtool=no @AMDEPBACKSLASH@
+_fs2schar.obj: ../../_fs2schar.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2schar.obj -MD -MP -MF $(DEPDIR)/_fs2schar.Tpo -c -o _fs2schar.obj `if test -f '../../_fs2schar.c'; then $(CYGPATH_W) '../../_fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2schar.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2schar.Tpo $(DEPDIR)/_fs2schar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2schar.c' object='_fs2schar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2schar.obj `if test -f 'float/fs2schar.c'; then $(CYGPATH_W) 'float/fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2schar.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2schar.obj `if test -f '../../_fs2schar.c'; then $(CYGPATH_W) '../../_fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2schar.c'; fi`
 
-fs2sint.o: float/fs2sint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2sint.o -MD -MP -MF $(DEPDIR)/fs2sint.Tpo -c -o fs2sint.o `test -f 'float/fs2sint.c' || echo '$(srcdir)/'`float/fs2sint.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2sint.Tpo $(DEPDIR)/fs2sint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2sint.c' object='fs2sint.o' libtool=no @AMDEPBACKSLASH@
+_fs2sint.o: ../../_fs2sint.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2sint.o -MD -MP -MF $(DEPDIR)/_fs2sint.Tpo -c -o _fs2sint.o `test -f '../../_fs2sint.c' || echo '$(srcdir)/'`../../_fs2sint.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2sint.Tpo $(DEPDIR)/_fs2sint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2sint.c' object='_fs2sint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2sint.o `test -f 'float/fs2sint.c' || echo '$(srcdir)/'`float/fs2sint.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2sint.o `test -f '../../_fs2sint.c' || echo '$(srcdir)/'`../../_fs2sint.c
 
-fs2sint.obj: float/fs2sint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2sint.obj -MD -MP -MF $(DEPDIR)/fs2sint.Tpo -c -o fs2sint.obj `if test -f 'float/fs2sint.c'; then $(CYGPATH_W) 'float/fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2sint.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2sint.Tpo $(DEPDIR)/fs2sint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2sint.c' object='fs2sint.obj' libtool=no @AMDEPBACKSLASH@
+_fs2sint.obj: ../../_fs2sint.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2sint.obj -MD -MP -MF $(DEPDIR)/_fs2sint.Tpo -c -o _fs2sint.obj `if test -f '../../_fs2sint.c'; then $(CYGPATH_W) '../../_fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2sint.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2sint.Tpo $(DEPDIR)/_fs2sint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2sint.c' object='_fs2sint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2sint.obj `if test -f 'float/fs2sint.c'; then $(CYGPATH_W) 'float/fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2sint.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2sint.obj `if test -f '../../_fs2sint.c'; then $(CYGPATH_W) '../../_fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2sint.c'; fi`
 
-fs2slong.o: float/fs2slong.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2slong.o -MD -MP -MF $(DEPDIR)/fs2slong.Tpo -c -o fs2slong.o `test -f 'float/fs2slong.c' || echo '$(srcdir)/'`float/fs2slong.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2slong.Tpo $(DEPDIR)/fs2slong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2slong.c' object='fs2slong.o' libtool=no @AMDEPBACKSLASH@
+_fs2slong.o: ../../_fs2slong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2slong.o -MD -MP -MF $(DEPDIR)/_fs2slong.Tpo -c -o _fs2slong.o `test -f '../../_fs2slong.c' || echo '$(srcdir)/'`../../_fs2slong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2slong.Tpo $(DEPDIR)/_fs2slong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2slong.c' object='_fs2slong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2slong.o `test -f 'float/fs2slong.c' || echo '$(srcdir)/'`float/fs2slong.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2slong.o `test -f '../../_fs2slong.c' || echo '$(srcdir)/'`../../_fs2slong.c
 
-fs2slong.obj: float/fs2slong.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2slong.obj -MD -MP -MF $(DEPDIR)/fs2slong.Tpo -c -o fs2slong.obj `if test -f 'float/fs2slong.c'; then $(CYGPATH_W) 'float/fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2slong.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2slong.Tpo $(DEPDIR)/fs2slong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2slong.c' object='fs2slong.obj' libtool=no @AMDEPBACKSLASH@
+_fs2slong.obj: ../../_fs2slong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2slong.obj -MD -MP -MF $(DEPDIR)/_fs2slong.Tpo -c -o _fs2slong.obj `if test -f '../../_fs2slong.c'; then $(CYGPATH_W) '../../_fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2slong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2slong.Tpo $(DEPDIR)/_fs2slong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2slong.c' object='_fs2slong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2slong.obj `if test -f 'float/fs2slong.c'; then $(CYGPATH_W) 'float/fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2slong.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2slong.obj `if test -f '../../_fs2slong.c'; then $(CYGPATH_W) '../../_fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2slong.c'; fi`
 
-fs2uchar.o: float/fs2uchar.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uchar.o -MD -MP -MF $(DEPDIR)/fs2uchar.Tpo -c -o fs2uchar.o `test -f 'float/fs2uchar.c' || echo '$(srcdir)/'`float/fs2uchar.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2uchar.Tpo $(DEPDIR)/fs2uchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2uchar.c' object='fs2uchar.o' libtool=no @AMDEPBACKSLASH@
+_fs2uchar.o: ../../_fs2uchar.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2uchar.o -MD -MP -MF $(DEPDIR)/_fs2uchar.Tpo -c -o _fs2uchar.o `test -f '../../_fs2uchar.c' || echo '$(srcdir)/'`../../_fs2uchar.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2uchar.Tpo $(DEPDIR)/_fs2uchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2uchar.c' object='_fs2uchar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uchar.o `test -f 'float/fs2uchar.c' || echo '$(srcdir)/'`float/fs2uchar.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2uchar.o `test -f '../../_fs2uchar.c' || echo '$(srcdir)/'`../../_fs2uchar.c
 
-fs2uchar.obj: float/fs2uchar.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uchar.obj -MD -MP -MF $(DEPDIR)/fs2uchar.Tpo -c -o fs2uchar.obj `if test -f 'float/fs2uchar.c'; then $(CYGPATH_W) 'float/fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2uchar.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2uchar.Tpo $(DEPDIR)/fs2uchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2uchar.c' object='fs2uchar.obj' libtool=no @AMDEPBACKSLASH@
+_fs2uchar.obj: ../../_fs2uchar.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2uchar.obj -MD -MP -MF $(DEPDIR)/_fs2uchar.Tpo -c -o _fs2uchar.obj `if test -f '../../_fs2uchar.c'; then $(CYGPATH_W) '../../_fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2uchar.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2uchar.Tpo $(DEPDIR)/_fs2uchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2uchar.c' object='_fs2uchar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uchar.obj `if test -f 'float/fs2uchar.c'; then $(CYGPATH_W) 'float/fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2uchar.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2uchar.obj `if test -f '../../_fs2uchar.c'; then $(CYGPATH_W) '../../_fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2uchar.c'; fi`
 
-fs2uint.o: float/fs2uint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uint.o -MD -MP -MF $(DEPDIR)/fs2uint.Tpo -c -o fs2uint.o `test -f 'float/fs2uint.c' || echo '$(srcdir)/'`float/fs2uint.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2uint.Tpo $(DEPDIR)/fs2uint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2uint.c' object='fs2uint.o' libtool=no @AMDEPBACKSLASH@
+_fs2uint.o: ../../_fs2uint.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2uint.o -MD -MP -MF $(DEPDIR)/_fs2uint.Tpo -c -o _fs2uint.o `test -f '../../_fs2uint.c' || echo '$(srcdir)/'`../../_fs2uint.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2uint.Tpo $(DEPDIR)/_fs2uint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2uint.c' object='_fs2uint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uint.o `test -f 'float/fs2uint.c' || echo '$(srcdir)/'`float/fs2uint.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2uint.o `test -f '../../_fs2uint.c' || echo '$(srcdir)/'`../../_fs2uint.c
 
-fs2uint.obj: float/fs2uint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uint.obj -MD -MP -MF $(DEPDIR)/fs2uint.Tpo -c -o fs2uint.obj `if test -f 'float/fs2uint.c'; then $(CYGPATH_W) 'float/fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2uint.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2uint.Tpo $(DEPDIR)/fs2uint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2uint.c' object='fs2uint.obj' libtool=no @AMDEPBACKSLASH@
+_fs2uint.obj: ../../_fs2uint.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2uint.obj -MD -MP -MF $(DEPDIR)/_fs2uint.Tpo -c -o _fs2uint.obj `if test -f '../../_fs2uint.c'; then $(CYGPATH_W) '../../_fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2uint.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2uint.Tpo $(DEPDIR)/_fs2uint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2uint.c' object='_fs2uint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uint.obj `if test -f 'float/fs2uint.c'; then $(CYGPATH_W) 'float/fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2uint.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2uint.obj `if test -f '../../_fs2uint.c'; then $(CYGPATH_W) '../../_fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2uint.c'; fi`
 
-fs2ulong.o: float/fs2ulong.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2ulong.o -MD -MP -MF $(DEPDIR)/fs2ulong.Tpo -c -o fs2ulong.o `test -f 'float/fs2ulong.c' || echo '$(srcdir)/'`float/fs2ulong.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2ulong.Tpo $(DEPDIR)/fs2ulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2ulong.c' object='fs2ulong.o' libtool=no @AMDEPBACKSLASH@
+_fs2ulong.o: ../../_fs2ulong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2ulong.o -MD -MP -MF $(DEPDIR)/_fs2ulong.Tpo -c -o _fs2ulong.o `test -f '../../_fs2ulong.c' || echo '$(srcdir)/'`../../_fs2ulong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2ulong.Tpo $(DEPDIR)/_fs2ulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2ulong.c' object='_fs2ulong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2ulong.o `test -f 'float/fs2ulong.c' || echo '$(srcdir)/'`float/fs2ulong.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2ulong.o `test -f '../../_fs2ulong.c' || echo '$(srcdir)/'`../../_fs2ulong.c
 
-fs2ulong.obj: float/fs2ulong.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2ulong.obj -MD -MP -MF $(DEPDIR)/fs2ulong.Tpo -c -o fs2ulong.obj `if test -f 'float/fs2ulong.c'; then $(CYGPATH_W) 'float/fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2ulong.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fs2ulong.Tpo $(DEPDIR)/fs2ulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fs2ulong.c' object='fs2ulong.obj' libtool=no @AMDEPBACKSLASH@
+_fs2ulong.obj: ../../_fs2ulong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fs2ulong.obj -MD -MP -MF $(DEPDIR)/_fs2ulong.Tpo -c -o _fs2ulong.obj `if test -f '../../_fs2ulong.c'; then $(CYGPATH_W) '../../_fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2ulong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fs2ulong.Tpo $(DEPDIR)/_fs2ulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fs2ulong.c' object='_fs2ulong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2ulong.obj `if test -f 'float/fs2ulong.c'; then $(CYGPATH_W) 'float/fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/float/fs2ulong.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fs2ulong.obj `if test -f '../../_fs2ulong.c'; then $(CYGPATH_W) '../../_fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../../_fs2ulong.c'; fi`
 
-fsadd.o: float/fsadd.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsadd.o -MD -MP -MF $(DEPDIR)/fsadd.Tpo -c -o fsadd.o `test -f 'float/fsadd.c' || echo '$(srcdir)/'`float/fsadd.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsadd.Tpo $(DEPDIR)/fsadd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsadd.c' object='fsadd.o' libtool=no @AMDEPBACKSLASH@
+_fsadd.o: ../../_fsadd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsadd.o -MD -MP -MF $(DEPDIR)/_fsadd.Tpo -c -o _fsadd.o `test -f '../../_fsadd.c' || echo '$(srcdir)/'`../../_fsadd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsadd.Tpo $(DEPDIR)/_fsadd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsadd.c' object='_fsadd.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsadd.o `test -f 'float/fsadd.c' || echo '$(srcdir)/'`float/fsadd.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsadd.o `test -f '../../_fsadd.c' || echo '$(srcdir)/'`../../_fsadd.c
 
-fsadd.obj: float/fsadd.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsadd.obj -MD -MP -MF $(DEPDIR)/fsadd.Tpo -c -o fsadd.obj `if test -f 'float/fsadd.c'; then $(CYGPATH_W) 'float/fsadd.c'; else $(CYGPATH_W) '$(srcdir)/float/fsadd.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsadd.Tpo $(DEPDIR)/fsadd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsadd.c' object='fsadd.obj' libtool=no @AMDEPBACKSLASH@
+_fsadd.obj: ../../_fsadd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsadd.obj -MD -MP -MF $(DEPDIR)/_fsadd.Tpo -c -o _fsadd.obj `if test -f '../../_fsadd.c'; then $(CYGPATH_W) '../../_fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsadd.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsadd.Tpo $(DEPDIR)/_fsadd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsadd.c' object='_fsadd.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsadd.obj `if test -f 'float/fsadd.c'; then $(CYGPATH_W) 'float/fsadd.c'; else $(CYGPATH_W) '$(srcdir)/float/fsadd.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsadd.obj `if test -f '../../_fsadd.c'; then $(CYGPATH_W) '../../_fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsadd.c'; fi`
 
-fsdiv.o: float/fsdiv.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsdiv.o -MD -MP -MF $(DEPDIR)/fsdiv.Tpo -c -o fsdiv.o `test -f 'float/fsdiv.c' || echo '$(srcdir)/'`float/fsdiv.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsdiv.Tpo $(DEPDIR)/fsdiv.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsdiv.c' object='fsdiv.o' libtool=no @AMDEPBACKSLASH@
+_fsdiv.o: ../../_fsdiv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsdiv.o -MD -MP -MF $(DEPDIR)/_fsdiv.Tpo -c -o _fsdiv.o `test -f '../../_fsdiv.c' || echo '$(srcdir)/'`../../_fsdiv.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsdiv.Tpo $(DEPDIR)/_fsdiv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsdiv.c' object='_fsdiv.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsdiv.o `test -f 'float/fsdiv.c' || echo '$(srcdir)/'`float/fsdiv.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsdiv.o `test -f '../../_fsdiv.c' || echo '$(srcdir)/'`../../_fsdiv.c
 
-fsdiv.obj: float/fsdiv.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsdiv.obj -MD -MP -MF $(DEPDIR)/fsdiv.Tpo -c -o fsdiv.obj `if test -f 'float/fsdiv.c'; then $(CYGPATH_W) 'float/fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/float/fsdiv.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsdiv.Tpo $(DEPDIR)/fsdiv.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsdiv.c' object='fsdiv.obj' libtool=no @AMDEPBACKSLASH@
+_fsdiv.obj: ../../_fsdiv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsdiv.obj -MD -MP -MF $(DEPDIR)/_fsdiv.Tpo -c -o _fsdiv.obj `if test -f '../../_fsdiv.c'; then $(CYGPATH_W) '../../_fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsdiv.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsdiv.Tpo $(DEPDIR)/_fsdiv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsdiv.c' object='_fsdiv.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsdiv.obj `if test -f 'float/fsdiv.c'; then $(CYGPATH_W) 'float/fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/float/fsdiv.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsdiv.obj `if test -f '../../_fsdiv.c'; then $(CYGPATH_W) '../../_fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsdiv.c'; fi`
 
-fseq.o: float/fseq.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fseq.o -MD -MP -MF $(DEPDIR)/fseq.Tpo -c -o fseq.o `test -f 'float/fseq.c' || echo '$(srcdir)/'`float/fseq.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fseq.Tpo $(DEPDIR)/fseq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fseq.c' object='fseq.o' libtool=no @AMDEPBACKSLASH@
+_fseq.o: ../../_fseq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fseq.o -MD -MP -MF $(DEPDIR)/_fseq.Tpo -c -o _fseq.o `test -f '../../_fseq.c' || echo '$(srcdir)/'`../../_fseq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fseq.Tpo $(DEPDIR)/_fseq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fseq.c' object='_fseq.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fseq.o `test -f 'float/fseq.c' || echo '$(srcdir)/'`float/fseq.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fseq.o `test -f '../../_fseq.c' || echo '$(srcdir)/'`../../_fseq.c
 
-fseq.obj: float/fseq.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fseq.obj -MD -MP -MF $(DEPDIR)/fseq.Tpo -c -o fseq.obj `if test -f 'float/fseq.c'; then $(CYGPATH_W) 'float/fseq.c'; else $(CYGPATH_W) '$(srcdir)/float/fseq.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fseq.Tpo $(DEPDIR)/fseq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fseq.c' object='fseq.obj' libtool=no @AMDEPBACKSLASH@
+_fseq.obj: ../../_fseq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fseq.obj -MD -MP -MF $(DEPDIR)/_fseq.Tpo -c -o _fseq.obj `if test -f '../../_fseq.c'; then $(CYGPATH_W) '../../_fseq.c'; else $(CYGPATH_W) '$(srcdir)/../../_fseq.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fseq.Tpo $(DEPDIR)/_fseq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fseq.c' object='_fseq.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fseq.obj `if test -f 'float/fseq.c'; then $(CYGPATH_W) 'float/fseq.c'; else $(CYGPATH_W) '$(srcdir)/float/fseq.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fseq.obj `if test -f '../../_fseq.c'; then $(CYGPATH_W) '../../_fseq.c'; else $(CYGPATH_W) '$(srcdir)/../../_fseq.c'; fi`
 
-fsgt.o: float/fsgt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsgt.o -MD -MP -MF $(DEPDIR)/fsgt.Tpo -c -o fsgt.o `test -f 'float/fsgt.c' || echo '$(srcdir)/'`float/fsgt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsgt.Tpo $(DEPDIR)/fsgt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsgt.c' object='fsgt.o' libtool=no @AMDEPBACKSLASH@
+_fslt.o: ../../_fslt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fslt.o -MD -MP -MF $(DEPDIR)/_fslt.Tpo -c -o _fslt.o `test -f '../../_fslt.c' || echo '$(srcdir)/'`../../_fslt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fslt.Tpo $(DEPDIR)/_fslt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fslt.c' object='_fslt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsgt.o `test -f 'float/fsgt.c' || echo '$(srcdir)/'`float/fsgt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fslt.o `test -f '../../_fslt.c' || echo '$(srcdir)/'`../../_fslt.c
 
-fsgt.obj: float/fsgt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsgt.obj -MD -MP -MF $(DEPDIR)/fsgt.Tpo -c -o fsgt.obj `if test -f 'float/fsgt.c'; then $(CYGPATH_W) 'float/fsgt.c'; else $(CYGPATH_W) '$(srcdir)/float/fsgt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsgt.Tpo $(DEPDIR)/fsgt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsgt.c' object='fsgt.obj' libtool=no @AMDEPBACKSLASH@
+_fslt.obj: ../../_fslt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fslt.obj -MD -MP -MF $(DEPDIR)/_fslt.Tpo -c -o _fslt.obj `if test -f '../../_fslt.c'; then $(CYGPATH_W) '../../_fslt.c'; else $(CYGPATH_W) '$(srcdir)/../../_fslt.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fslt.Tpo $(DEPDIR)/_fslt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fslt.c' object='_fslt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsgt.obj `if test -f 'float/fsgt.c'; then $(CYGPATH_W) 'float/fsgt.c'; else $(CYGPATH_W) '$(srcdir)/float/fsgt.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fslt.obj `if test -f '../../_fslt.c'; then $(CYGPATH_W) '../../_fslt.c'; else $(CYGPATH_W) '$(srcdir)/../../_fslt.c'; fi`
 
-fslt.o: float/fslt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fslt.o -MD -MP -MF $(DEPDIR)/fslt.Tpo -c -o fslt.o `test -f 'float/fslt.c' || echo '$(srcdir)/'`float/fslt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fslt.Tpo $(DEPDIR)/fslt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fslt.c' object='fslt.o' libtool=no @AMDEPBACKSLASH@
+_fsmul.o: ../../_fsmul.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsmul.o -MD -MP -MF $(DEPDIR)/_fsmul.Tpo -c -o _fsmul.o `test -f '../../_fsmul.c' || echo '$(srcdir)/'`../../_fsmul.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsmul.Tpo $(DEPDIR)/_fsmul.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsmul.c' object='_fsmul.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fslt.o `test -f 'float/fslt.c' || echo '$(srcdir)/'`float/fslt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsmul.o `test -f '../../_fsmul.c' || echo '$(srcdir)/'`../../_fsmul.c
 
-fslt.obj: float/fslt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fslt.obj -MD -MP -MF $(DEPDIR)/fslt.Tpo -c -o fslt.obj `if test -f 'float/fslt.c'; then $(CYGPATH_W) 'float/fslt.c'; else $(CYGPATH_W) '$(srcdir)/float/fslt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fslt.Tpo $(DEPDIR)/fslt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fslt.c' object='fslt.obj' libtool=no @AMDEPBACKSLASH@
+_fsmul.obj: ../../_fsmul.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsmul.obj -MD -MP -MF $(DEPDIR)/_fsmul.Tpo -c -o _fsmul.obj `if test -f '../../_fsmul.c'; then $(CYGPATH_W) '../../_fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsmul.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsmul.Tpo $(DEPDIR)/_fsmul.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsmul.c' object='_fsmul.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fslt.obj `if test -f 'float/fslt.c'; then $(CYGPATH_W) 'float/fslt.c'; else $(CYGPATH_W) '$(srcdir)/float/fslt.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsmul.obj `if test -f '../../_fsmul.c'; then $(CYGPATH_W) '../../_fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsmul.c'; fi`
 
-fsmul.o: float/fsmul.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsmul.o -MD -MP -MF $(DEPDIR)/fsmul.Tpo -c -o fsmul.o `test -f 'float/fsmul.c' || echo '$(srcdir)/'`float/fsmul.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsmul.Tpo $(DEPDIR)/fsmul.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsmul.c' object='fsmul.o' libtool=no @AMDEPBACKSLASH@
+_fsneq.o: ../../_fsneq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsneq.o -MD -MP -MF $(DEPDIR)/_fsneq.Tpo -c -o _fsneq.o `test -f '../../_fsneq.c' || echo '$(srcdir)/'`../../_fsneq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsneq.Tpo $(DEPDIR)/_fsneq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsneq.c' object='_fsneq.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsmul.o `test -f 'float/fsmul.c' || echo '$(srcdir)/'`float/fsmul.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsneq.o `test -f '../../_fsneq.c' || echo '$(srcdir)/'`../../_fsneq.c
 
-fsmul.obj: float/fsmul.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsmul.obj -MD -MP -MF $(DEPDIR)/fsmul.Tpo -c -o fsmul.obj `if test -f 'float/fsmul.c'; then $(CYGPATH_W) 'float/fsmul.c'; else $(CYGPATH_W) '$(srcdir)/float/fsmul.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsmul.Tpo $(DEPDIR)/fsmul.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsmul.c' object='fsmul.obj' libtool=no @AMDEPBACKSLASH@
+_fsneq.obj: ../../_fsneq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fsneq.obj -MD -MP -MF $(DEPDIR)/_fsneq.Tpo -c -o _fsneq.obj `if test -f '../../_fsneq.c'; then $(CYGPATH_W) '../../_fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsneq.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fsneq.Tpo $(DEPDIR)/_fsneq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fsneq.c' object='_fsneq.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsmul.obj `if test -f 'float/fsmul.c'; then $(CYGPATH_W) 'float/fsmul.c'; else $(CYGPATH_W) '$(srcdir)/float/fsmul.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fsneq.obj `if test -f '../../_fsneq.c'; then $(CYGPATH_W) '../../_fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../../_fsneq.c'; fi`
 
-fsneq.o: float/fsneq.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsneq.o -MD -MP -MF $(DEPDIR)/fsneq.Tpo -c -o fsneq.o `test -f 'float/fsneq.c' || echo '$(srcdir)/'`float/fsneq.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsneq.Tpo $(DEPDIR)/fsneq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsneq.c' object='fsneq.o' libtool=no @AMDEPBACKSLASH@
+_fssub.o: ../../_fssub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fssub.o -MD -MP -MF $(DEPDIR)/_fssub.Tpo -c -o _fssub.o `test -f '../../_fssub.c' || echo '$(srcdir)/'`../../_fssub.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fssub.Tpo $(DEPDIR)/_fssub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fssub.c' object='_fssub.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsneq.o `test -f 'float/fsneq.c' || echo '$(srcdir)/'`float/fsneq.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fssub.o `test -f '../../_fssub.c' || echo '$(srcdir)/'`../../_fssub.c
 
-fsneq.obj: float/fsneq.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsneq.obj -MD -MP -MF $(DEPDIR)/fsneq.Tpo -c -o fsneq.obj `if test -f 'float/fsneq.c'; then $(CYGPATH_W) 'float/fsneq.c'; else $(CYGPATH_W) '$(srcdir)/float/fsneq.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fsneq.Tpo $(DEPDIR)/fsneq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fsneq.c' object='fsneq.obj' libtool=no @AMDEPBACKSLASH@
+_fssub.obj: ../../_fssub.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _fssub.obj -MD -MP -MF $(DEPDIR)/_fssub.Tpo -c -o _fssub.obj `if test -f '../../_fssub.c'; then $(CYGPATH_W) '../../_fssub.c'; else $(CYGPATH_W) '$(srcdir)/../../_fssub.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_fssub.Tpo $(DEPDIR)/_fssub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_fssub.c' object='_fssub.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsneq.obj `if test -f 'float/fsneq.c'; then $(CYGPATH_W) 'float/fsneq.c'; else $(CYGPATH_W) '$(srcdir)/float/fsneq.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _fssub.obj `if test -f '../../_fssub.c'; then $(CYGPATH_W) '../../_fssub.c'; else $(CYGPATH_W) '$(srcdir)/../../_fssub.c'; fi`
 
-fssub.o: float/fssub.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fssub.o -MD -MP -MF $(DEPDIR)/fssub.Tpo -c -o fssub.o `test -f 'float/fssub.c' || echo '$(srcdir)/'`float/fssub.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fssub.Tpo $(DEPDIR)/fssub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fssub.c' object='fssub.o' libtool=no @AMDEPBACKSLASH@
+_schar2fs.o: ../../_schar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _schar2fs.o -MD -MP -MF $(DEPDIR)/_schar2fs.Tpo -c -o _schar2fs.o `test -f '../../_schar2fs.c' || echo '$(srcdir)/'`../../_schar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_schar2fs.Tpo $(DEPDIR)/_schar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_schar2fs.c' object='_schar2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fssub.o `test -f 'float/fssub.c' || echo '$(srcdir)/'`float/fssub.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _schar2fs.o `test -f '../../_schar2fs.c' || echo '$(srcdir)/'`../../_schar2fs.c
 
-fssub.obj: float/fssub.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fssub.obj -MD -MP -MF $(DEPDIR)/fssub.Tpo -c -o fssub.obj `if test -f 'float/fssub.c'; then $(CYGPATH_W) 'float/fssub.c'; else $(CYGPATH_W) '$(srcdir)/float/fssub.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fssub.Tpo $(DEPDIR)/fssub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/fssub.c' object='fssub.obj' libtool=no @AMDEPBACKSLASH@
+_schar2fs.obj: ../../_schar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _schar2fs.obj -MD -MP -MF $(DEPDIR)/_schar2fs.Tpo -c -o _schar2fs.obj `if test -f '../../_schar2fs.c'; then $(CYGPATH_W) '../../_schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_schar2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_schar2fs.Tpo $(DEPDIR)/_schar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_schar2fs.c' object='_schar2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fssub.obj `if test -f 'float/fssub.c'; then $(CYGPATH_W) 'float/fssub.c'; else $(CYGPATH_W) '$(srcdir)/float/fssub.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _schar2fs.obj `if test -f '../../_schar2fs.c'; then $(CYGPATH_W) '../../_schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_schar2fs.c'; fi`
 
-schar2fs.o: float/schar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT schar2fs.o -MD -MP -MF $(DEPDIR)/schar2fs.Tpo -c -o schar2fs.o `test -f 'float/schar2fs.c' || echo '$(srcdir)/'`float/schar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/schar2fs.Tpo $(DEPDIR)/schar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/schar2fs.c' object='schar2fs.o' libtool=no @AMDEPBACKSLASH@
+_sint2fs.o: ../../_sint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _sint2fs.o -MD -MP -MF $(DEPDIR)/_sint2fs.Tpo -c -o _sint2fs.o `test -f '../../_sint2fs.c' || echo '$(srcdir)/'`../../_sint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_sint2fs.Tpo $(DEPDIR)/_sint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_sint2fs.c' object='_sint2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o schar2fs.o `test -f 'float/schar2fs.c' || echo '$(srcdir)/'`float/schar2fs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _sint2fs.o `test -f '../../_sint2fs.c' || echo '$(srcdir)/'`../../_sint2fs.c
 
-schar2fs.obj: float/schar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT schar2fs.obj -MD -MP -MF $(DEPDIR)/schar2fs.Tpo -c -o schar2fs.obj `if test -f 'float/schar2fs.c'; then $(CYGPATH_W) 'float/schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/schar2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/schar2fs.Tpo $(DEPDIR)/schar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/schar2fs.c' object='schar2fs.obj' libtool=no @AMDEPBACKSLASH@
+_sint2fs.obj: ../../_sint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _sint2fs.obj -MD -MP -MF $(DEPDIR)/_sint2fs.Tpo -c -o _sint2fs.obj `if test -f '../../_sint2fs.c'; then $(CYGPATH_W) '../../_sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_sint2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_sint2fs.Tpo $(DEPDIR)/_sint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_sint2fs.c' object='_sint2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o schar2fs.obj `if test -f 'float/schar2fs.c'; then $(CYGPATH_W) 'float/schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/schar2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _sint2fs.obj `if test -f '../../_sint2fs.c'; then $(CYGPATH_W) '../../_sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_sint2fs.c'; fi`
 
-sint2fs.o: float/sint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sint2fs.o -MD -MP -MF $(DEPDIR)/sint2fs.Tpo -c -o sint2fs.o `test -f 'float/sint2fs.c' || echo '$(srcdir)/'`float/sint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sint2fs.Tpo $(DEPDIR)/sint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/sint2fs.c' object='sint2fs.o' libtool=no @AMDEPBACKSLASH@
+_slong2fs.o: ../../_slong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _slong2fs.o -MD -MP -MF $(DEPDIR)/_slong2fs.Tpo -c -o _slong2fs.o `test -f '../../_slong2fs.c' || echo '$(srcdir)/'`../../_slong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_slong2fs.Tpo $(DEPDIR)/_slong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_slong2fs.c' object='_slong2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sint2fs.o `test -f 'float/sint2fs.c' || echo '$(srcdir)/'`float/sint2fs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _slong2fs.o `test -f '../../_slong2fs.c' || echo '$(srcdir)/'`../../_slong2fs.c
 
-sint2fs.obj: float/sint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sint2fs.obj -MD -MP -MF $(DEPDIR)/sint2fs.Tpo -c -o sint2fs.obj `if test -f 'float/sint2fs.c'; then $(CYGPATH_W) 'float/sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/sint2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/sint2fs.Tpo $(DEPDIR)/sint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/sint2fs.c' object='sint2fs.obj' libtool=no @AMDEPBACKSLASH@
+_slong2fs.obj: ../../_slong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _slong2fs.obj -MD -MP -MF $(DEPDIR)/_slong2fs.Tpo -c -o _slong2fs.obj `if test -f '../../_slong2fs.c'; then $(CYGPATH_W) '../../_slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_slong2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_slong2fs.Tpo $(DEPDIR)/_slong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_slong2fs.c' object='_slong2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sint2fs.obj `if test -f 'float/sint2fs.c'; then $(CYGPATH_W) 'float/sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/sint2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _slong2fs.obj `if test -f '../../_slong2fs.c'; then $(CYGPATH_W) '../../_slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_slong2fs.c'; fi`
 
-slong2fs.o: float/slong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slong2fs.o -MD -MP -MF $(DEPDIR)/slong2fs.Tpo -c -o slong2fs.o `test -f 'float/slong2fs.c' || echo '$(srcdir)/'`float/slong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slong2fs.Tpo $(DEPDIR)/slong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/slong2fs.c' object='slong2fs.o' libtool=no @AMDEPBACKSLASH@
+_uchar2fs.o: ../../_uchar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _uchar2fs.o -MD -MP -MF $(DEPDIR)/_uchar2fs.Tpo -c -o _uchar2fs.o `test -f '../../_uchar2fs.c' || echo '$(srcdir)/'`../../_uchar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_uchar2fs.Tpo $(DEPDIR)/_uchar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_uchar2fs.c' object='_uchar2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slong2fs.o `test -f 'float/slong2fs.c' || echo '$(srcdir)/'`float/slong2fs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _uchar2fs.o `test -f '../../_uchar2fs.c' || echo '$(srcdir)/'`../../_uchar2fs.c
 
-slong2fs.obj: float/slong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slong2fs.obj -MD -MP -MF $(DEPDIR)/slong2fs.Tpo -c -o slong2fs.obj `if test -f 'float/slong2fs.c'; then $(CYGPATH_W) 'float/slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/slong2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slong2fs.Tpo $(DEPDIR)/slong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/slong2fs.c' object='slong2fs.obj' libtool=no @AMDEPBACKSLASH@
+_uchar2fs.obj: ../../_uchar2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _uchar2fs.obj -MD -MP -MF $(DEPDIR)/_uchar2fs.Tpo -c -o _uchar2fs.obj `if test -f '../../_uchar2fs.c'; then $(CYGPATH_W) '../../_uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_uchar2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_uchar2fs.Tpo $(DEPDIR)/_uchar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_uchar2fs.c' object='_uchar2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slong2fs.obj `if test -f 'float/slong2fs.c'; then $(CYGPATH_W) 'float/slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/slong2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _uchar2fs.obj `if test -f '../../_uchar2fs.c'; then $(CYGPATH_W) '../../_uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_uchar2fs.c'; fi`
 
-uchar2fs.o: float/uchar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uchar2fs.o -MD -MP -MF $(DEPDIR)/uchar2fs.Tpo -c -o uchar2fs.o `test -f 'float/uchar2fs.c' || echo '$(srcdir)/'`float/uchar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/uchar2fs.Tpo $(DEPDIR)/uchar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/uchar2fs.c' object='uchar2fs.o' libtool=no @AMDEPBACKSLASH@
+_uint2fs.o: ../../_uint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _uint2fs.o -MD -MP -MF $(DEPDIR)/_uint2fs.Tpo -c -o _uint2fs.o `test -f '../../_uint2fs.c' || echo '$(srcdir)/'`../../_uint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_uint2fs.Tpo $(DEPDIR)/_uint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_uint2fs.c' object='_uint2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uchar2fs.o `test -f 'float/uchar2fs.c' || echo '$(srcdir)/'`float/uchar2fs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _uint2fs.o `test -f '../../_uint2fs.c' || echo '$(srcdir)/'`../../_uint2fs.c
 
-uchar2fs.obj: float/uchar2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uchar2fs.obj -MD -MP -MF $(DEPDIR)/uchar2fs.Tpo -c -o uchar2fs.obj `if test -f 'float/uchar2fs.c'; then $(CYGPATH_W) 'float/uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/uchar2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/uchar2fs.Tpo $(DEPDIR)/uchar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/uchar2fs.c' object='uchar2fs.obj' libtool=no @AMDEPBACKSLASH@
+_uint2fs.obj: ../../_uint2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _uint2fs.obj -MD -MP -MF $(DEPDIR)/_uint2fs.Tpo -c -o _uint2fs.obj `if test -f '../../_uint2fs.c'; then $(CYGPATH_W) '../../_uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_uint2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_uint2fs.Tpo $(DEPDIR)/_uint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_uint2fs.c' object='_uint2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uchar2fs.obj `if test -f 'float/uchar2fs.c'; then $(CYGPATH_W) 'float/uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/uchar2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _uint2fs.obj `if test -f '../../_uint2fs.c'; then $(CYGPATH_W) '../../_uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_uint2fs.c'; fi`
 
-uint2fs.o: float/uint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uint2fs.o -MD -MP -MF $(DEPDIR)/uint2fs.Tpo -c -o uint2fs.o `test -f 'float/uint2fs.c' || echo '$(srcdir)/'`float/uint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/uint2fs.Tpo $(DEPDIR)/uint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/uint2fs.c' object='uint2fs.o' libtool=no @AMDEPBACKSLASH@
+_ulong2fs.o: ../../_ulong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _ulong2fs.o -MD -MP -MF $(DEPDIR)/_ulong2fs.Tpo -c -o _ulong2fs.o `test -f '../../_ulong2fs.c' || echo '$(srcdir)/'`../../_ulong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_ulong2fs.Tpo $(DEPDIR)/_ulong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_ulong2fs.c' object='_ulong2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uint2fs.o `test -f 'float/uint2fs.c' || echo '$(srcdir)/'`float/uint2fs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _ulong2fs.o `test -f '../../_ulong2fs.c' || echo '$(srcdir)/'`../../_ulong2fs.c
 
-uint2fs.obj: float/uint2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uint2fs.obj -MD -MP -MF $(DEPDIR)/uint2fs.Tpo -c -o uint2fs.obj `if test -f 'float/uint2fs.c'; then $(CYGPATH_W) 'float/uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/uint2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/uint2fs.Tpo $(DEPDIR)/uint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/uint2fs.c' object='uint2fs.obj' libtool=no @AMDEPBACKSLASH@
+_ulong2fs.obj: ../../_ulong2fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _ulong2fs.obj -MD -MP -MF $(DEPDIR)/_ulong2fs.Tpo -c -o _ulong2fs.obj `if test -f '../../_ulong2fs.c'; then $(CYGPATH_W) '../../_ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_ulong2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_ulong2fs.Tpo $(DEPDIR)/_ulong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_ulong2fs.c' object='_ulong2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uint2fs.obj `if test -f 'float/uint2fs.c'; then $(CYGPATH_W) 'float/uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/uint2fs.c'; fi`
-
-ulong2fs.o: float/ulong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ulong2fs.o -MD -MP -MF $(DEPDIR)/ulong2fs.Tpo -c -o ulong2fs.o `test -f 'float/ulong2fs.c' || echo '$(srcdir)/'`float/ulong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ulong2fs.Tpo $(DEPDIR)/ulong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/ulong2fs.c' object='ulong2fs.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ulong2fs.o `test -f 'float/ulong2fs.c' || echo '$(srcdir)/'`float/ulong2fs.c
-
-ulong2fs.obj: float/ulong2fs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ulong2fs.obj -MD -MP -MF $(DEPDIR)/ulong2fs.Tpo -c -o ulong2fs.obj `if test -f 'float/ulong2fs.c'; then $(CYGPATH_W) 'float/ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/ulong2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ulong2fs.Tpo $(DEPDIR)/ulong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='float/ulong2fs.c' object='ulong2fs.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ulong2fs.obj `if test -f 'float/ulong2fs.c'; then $(CYGPATH_W) 'float/ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/float/ulong2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _ulong2fs.obj `if test -f '../../_ulong2fs.c'; then $(CYGPATH_W) '../../_ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../../_ulong2fs.c'; fi`
 
 gptrget1.o: gptr/gptrget1.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gptrget1.o -MD -MP -MF $(DEPDIR)/gptrget1.Tpo -c -o gptrget1.o `test -f 'gptr/gptrget1.c' || echo '$(srcdir)/'`gptr/gptrget1.c
@@ -1360,6 +1361,20 @@ gptrget4.obj: gptr/gptrget4.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gptr/gptrget4.c' object='gptrget4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gptrget4.obj `if test -f 'gptr/gptrget4.c'; then $(CYGPATH_W) 'gptr/gptrget4.c'; else $(CYGPATH_W) '$(srcdir)/gptr/gptrget4.c'; fi`
+
+gptrload.o: gptr/gptrload.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gptrload.o -MD -MP -MF $(DEPDIR)/gptrload.Tpo -c -o gptrload.o `test -f 'gptr/gptrload.c' || echo '$(srcdir)/'`gptr/gptrload.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gptrload.Tpo $(DEPDIR)/gptrload.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gptr/gptrload.c' object='gptrload.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gptrload.o `test -f 'gptr/gptrload.c' || echo '$(srcdir)/'`gptr/gptrload.c
+
+gptrload.obj: gptr/gptrload.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gptrload.obj -MD -MP -MF $(DEPDIR)/gptrload.Tpo -c -o gptrload.obj `if test -f 'gptr/gptrload.c'; then $(CYGPATH_W) 'gptr/gptrload.c'; else $(CYGPATH_W) '$(srcdir)/gptr/gptrload.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gptrload.Tpo $(DEPDIR)/gptrload.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gptr/gptrload.c' object='gptrload.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gptrload.obj `if test -f 'gptr/gptrload.c'; then $(CYGPATH_W) 'gptr/gptrload.c'; else $(CYGPATH_W) '$(srcdir)/gptr/gptrload.c'; fi`
 
 gptrput1.o: gptr/gptrput1.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gptrput1.o -MD -MP -MF $(DEPDIR)/gptrput1.Tpo -c -o gptrput1.o `test -f 'gptr/gptrput1.c' || echo '$(srcdir)/'`gptr/gptrput1.c
@@ -1809,6 +1824,76 @@ mullong.obj: long/mullong.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mullong.obj `if test -f 'long/mullong.c'; then $(CYGPATH_W) 'long/mullong.c'; else $(CYGPATH_W) '$(srcdir)/long/mullong.c'; fi`
 
+_divslonglong.o: ../../_divslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divslonglong.o -MD -MP -MF $(DEPDIR)/_divslonglong.Tpo -c -o _divslonglong.o `test -f '../../_divslonglong.c' || echo '$(srcdir)/'`../../_divslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_divslonglong.Tpo $(DEPDIR)/_divslonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_divslonglong.c' object='_divslonglong.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divslonglong.o `test -f '../../_divslonglong.c' || echo '$(srcdir)/'`../../_divslonglong.c
+
+_divslonglong.obj: ../../_divslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divslonglong.obj -MD -MP -MF $(DEPDIR)/_divslonglong.Tpo -c -o _divslonglong.obj `if test -f '../../_divslonglong.c'; then $(CYGPATH_W) '../../_divslonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_divslonglong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_divslonglong.Tpo $(DEPDIR)/_divslonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_divslonglong.c' object='_divslonglong.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divslonglong.obj `if test -f '../../_divslonglong.c'; then $(CYGPATH_W) '../../_divslonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_divslonglong.c'; fi`
+
+_divulonglong.o: ../../_divulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divulonglong.o -MD -MP -MF $(DEPDIR)/_divulonglong.Tpo -c -o _divulonglong.o `test -f '../../_divulonglong.c' || echo '$(srcdir)/'`../../_divulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_divulonglong.Tpo $(DEPDIR)/_divulonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_divulonglong.c' object='_divulonglong.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divulonglong.o `test -f '../../_divulonglong.c' || echo '$(srcdir)/'`../../_divulonglong.c
+
+_divulonglong.obj: ../../_divulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divulonglong.obj -MD -MP -MF $(DEPDIR)/_divulonglong.Tpo -c -o _divulonglong.obj `if test -f '../../_divulonglong.c'; then $(CYGPATH_W) '../../_divulonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_divulonglong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_divulonglong.Tpo $(DEPDIR)/_divulonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_divulonglong.c' object='_divulonglong.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divulonglong.obj `if test -f '../../_divulonglong.c'; then $(CYGPATH_W) '../../_divulonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_divulonglong.c'; fi`
+
+_modslonglong.o: ../../_modslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modslonglong.o -MD -MP -MF $(DEPDIR)/_modslonglong.Tpo -c -o _modslonglong.o `test -f '../../_modslonglong.c' || echo '$(srcdir)/'`../../_modslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_modslonglong.Tpo $(DEPDIR)/_modslonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_modslonglong.c' object='_modslonglong.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modslonglong.o `test -f '../../_modslonglong.c' || echo '$(srcdir)/'`../../_modslonglong.c
+
+_modslonglong.obj: ../../_modslonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modslonglong.obj -MD -MP -MF $(DEPDIR)/_modslonglong.Tpo -c -o _modslonglong.obj `if test -f '../../_modslonglong.c'; then $(CYGPATH_W) '../../_modslonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_modslonglong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_modslonglong.Tpo $(DEPDIR)/_modslonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_modslonglong.c' object='_modslonglong.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modslonglong.obj `if test -f '../../_modslonglong.c'; then $(CYGPATH_W) '../../_modslonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_modslonglong.c'; fi`
+
+_modulonglong.o: ../../_modulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modulonglong.o -MD -MP -MF $(DEPDIR)/_modulonglong.Tpo -c -o _modulonglong.o `test -f '../../_modulonglong.c' || echo '$(srcdir)/'`../../_modulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_modulonglong.Tpo $(DEPDIR)/_modulonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_modulonglong.c' object='_modulonglong.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modulonglong.o `test -f '../../_modulonglong.c' || echo '$(srcdir)/'`../../_modulonglong.c
+
+_modulonglong.obj: ../../_modulonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modulonglong.obj -MD -MP -MF $(DEPDIR)/_modulonglong.Tpo -c -o _modulonglong.obj `if test -f '../../_modulonglong.c'; then $(CYGPATH_W) '../../_modulonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_modulonglong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_modulonglong.Tpo $(DEPDIR)/_modulonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_modulonglong.c' object='_modulonglong.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modulonglong.obj `if test -f '../../_modulonglong.c'; then $(CYGPATH_W) '../../_modulonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_modulonglong.c'; fi`
+
+_mullonglong.o: ../../_mullonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mullonglong.o -MD -MP -MF $(DEPDIR)/_mullonglong.Tpo -c -o _mullonglong.o `test -f '../../_mullonglong.c' || echo '$(srcdir)/'`../../_mullonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_mullonglong.Tpo $(DEPDIR)/_mullonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_mullonglong.c' object='_mullonglong.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mullonglong.o `test -f '../../_mullonglong.c' || echo '$(srcdir)/'`../../_mullonglong.c
+
+_mullonglong.obj: ../../_mullonglong.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mullonglong.obj -MD -MP -MF $(DEPDIR)/_mullonglong.Tpo -c -o _mullonglong.obj `if test -f '../../_mullonglong.c'; then $(CYGPATH_W) '../../_mullonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_mullonglong.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/_mullonglong.Tpo $(DEPDIR)/_mullonglong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../../_mullonglong.c' object='_mullonglong.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mullonglong.obj `if test -f '../../_mullonglong.c'; then $(CYGPATH_W) '../../_mullonglong.c'; else $(CYGPATH_W) '$(srcdir)/../../_mullonglong.c'; fi`
+
 lrrest.o: lregs/lrrest.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lrrest.o -MD -MP -MF $(DEPDIR)/lrrest.Tpo -c -o lrrest.o `test -f 'lregs/lrrest.c' || echo '$(srcdir)/'`lregs/lrrest.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lrrest.Tpo $(DEPDIR)/lrrest.Po
@@ -1963,7 +2048,31 @@ clean: clean-am
 clean-am: clean-generic clean-libLIBRARIES clean-local mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/divschar.Po
+		-rm -f ./$(DEPDIR)/_divslonglong.Po
+	-rm -f ./$(DEPDIR)/_divulonglong.Po
+	-rm -f ./$(DEPDIR)/_fs2schar.Po
+	-rm -f ./$(DEPDIR)/_fs2sint.Po
+	-rm -f ./$(DEPDIR)/_fs2slong.Po
+	-rm -f ./$(DEPDIR)/_fs2uchar.Po
+	-rm -f ./$(DEPDIR)/_fs2uint.Po
+	-rm -f ./$(DEPDIR)/_fs2ulong.Po
+	-rm -f ./$(DEPDIR)/_fsadd.Po
+	-rm -f ./$(DEPDIR)/_fsdiv.Po
+	-rm -f ./$(DEPDIR)/_fseq.Po
+	-rm -f ./$(DEPDIR)/_fslt.Po
+	-rm -f ./$(DEPDIR)/_fsmul.Po
+	-rm -f ./$(DEPDIR)/_fsneq.Po
+	-rm -f ./$(DEPDIR)/_fssub.Po
+	-rm -f ./$(DEPDIR)/_modslonglong.Po
+	-rm -f ./$(DEPDIR)/_modulonglong.Po
+	-rm -f ./$(DEPDIR)/_mullonglong.Po
+	-rm -f ./$(DEPDIR)/_schar2fs.Po
+	-rm -f ./$(DEPDIR)/_sint2fs.Po
+	-rm -f ./$(DEPDIR)/_slong2fs.Po
+	-rm -f ./$(DEPDIR)/_uchar2fs.Po
+	-rm -f ./$(DEPDIR)/_uint2fs.Po
+	-rm -f ./$(DEPDIR)/_ulong2fs.Po
+	-rm -f ./$(DEPDIR)/divschar.Po
 	-rm -f ./$(DEPDIR)/divsint.Po
 	-rm -f ./$(DEPDIR)/divslong.Po
 	-rm -f ./$(DEPDIR)/divuchar.Po
@@ -2004,24 +2113,11 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/fps16x16_mul.Po
 	-rm -f ./$(DEPDIR)/fps16x16_neq.Po
 	-rm -f ./$(DEPDIR)/fps16x16_sub.Po
-	-rm -f ./$(DEPDIR)/fs2schar.Po
-	-rm -f ./$(DEPDIR)/fs2sint.Po
-	-rm -f ./$(DEPDIR)/fs2slong.Po
-	-rm -f ./$(DEPDIR)/fs2uchar.Po
-	-rm -f ./$(DEPDIR)/fs2uint.Po
-	-rm -f ./$(DEPDIR)/fs2ulong.Po
-	-rm -f ./$(DEPDIR)/fsadd.Po
-	-rm -f ./$(DEPDIR)/fsdiv.Po
-	-rm -f ./$(DEPDIR)/fseq.Po
-	-rm -f ./$(DEPDIR)/fsgt.Po
-	-rm -f ./$(DEPDIR)/fslt.Po
-	-rm -f ./$(DEPDIR)/fsmul.Po
-	-rm -f ./$(DEPDIR)/fsneq.Po
-	-rm -f ./$(DEPDIR)/fssub.Po
 	-rm -f ./$(DEPDIR)/gptrget1.Po
 	-rm -f ./$(DEPDIR)/gptrget2.Po
 	-rm -f ./$(DEPDIR)/gptrget3.Po
 	-rm -f ./$(DEPDIR)/gptrget4.Po
+	-rm -f ./$(DEPDIR)/gptrload.Po
 	-rm -f ./$(DEPDIR)/gptrput1.Po
 	-rm -f ./$(DEPDIR)/gptrput2.Po
 	-rm -f ./$(DEPDIR)/gptrput3.Po
@@ -2037,18 +2133,12 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/mulint.Po
 	-rm -f ./$(DEPDIR)/mullong.Po
 	-rm -f ./$(DEPDIR)/schar2fps16x16.Po
-	-rm -f ./$(DEPDIR)/schar2fs.Po
 	-rm -f ./$(DEPDIR)/sint2fps16x16.Po
-	-rm -f ./$(DEPDIR)/sint2fs.Po
 	-rm -f ./$(DEPDIR)/slong2fps16x16.Po
-	-rm -f ./$(DEPDIR)/slong2fs.Po
 	-rm -f ./$(DEPDIR)/stack.Po
 	-rm -f ./$(DEPDIR)/uchar2fps16x16.Po
-	-rm -f ./$(DEPDIR)/uchar2fs.Po
 	-rm -f ./$(DEPDIR)/uint2fps16x16.Po
-	-rm -f ./$(DEPDIR)/uint2fs.Po
 	-rm -f ./$(DEPDIR)/ulong2fps16x16.Po
-	-rm -f ./$(DEPDIR)/ulong2fs.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2094,7 +2184,31 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/divschar.Po
+		-rm -f ./$(DEPDIR)/_divslonglong.Po
+	-rm -f ./$(DEPDIR)/_divulonglong.Po
+	-rm -f ./$(DEPDIR)/_fs2schar.Po
+	-rm -f ./$(DEPDIR)/_fs2sint.Po
+	-rm -f ./$(DEPDIR)/_fs2slong.Po
+	-rm -f ./$(DEPDIR)/_fs2uchar.Po
+	-rm -f ./$(DEPDIR)/_fs2uint.Po
+	-rm -f ./$(DEPDIR)/_fs2ulong.Po
+	-rm -f ./$(DEPDIR)/_fsadd.Po
+	-rm -f ./$(DEPDIR)/_fsdiv.Po
+	-rm -f ./$(DEPDIR)/_fseq.Po
+	-rm -f ./$(DEPDIR)/_fslt.Po
+	-rm -f ./$(DEPDIR)/_fsmul.Po
+	-rm -f ./$(DEPDIR)/_fsneq.Po
+	-rm -f ./$(DEPDIR)/_fssub.Po
+	-rm -f ./$(DEPDIR)/_modslonglong.Po
+	-rm -f ./$(DEPDIR)/_modulonglong.Po
+	-rm -f ./$(DEPDIR)/_mullonglong.Po
+	-rm -f ./$(DEPDIR)/_schar2fs.Po
+	-rm -f ./$(DEPDIR)/_sint2fs.Po
+	-rm -f ./$(DEPDIR)/_slong2fs.Po
+	-rm -f ./$(DEPDIR)/_uchar2fs.Po
+	-rm -f ./$(DEPDIR)/_uint2fs.Po
+	-rm -f ./$(DEPDIR)/_ulong2fs.Po
+	-rm -f ./$(DEPDIR)/divschar.Po
 	-rm -f ./$(DEPDIR)/divsint.Po
 	-rm -f ./$(DEPDIR)/divslong.Po
 	-rm -f ./$(DEPDIR)/divuchar.Po
@@ -2135,24 +2249,11 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/fps16x16_mul.Po
 	-rm -f ./$(DEPDIR)/fps16x16_neq.Po
 	-rm -f ./$(DEPDIR)/fps16x16_sub.Po
-	-rm -f ./$(DEPDIR)/fs2schar.Po
-	-rm -f ./$(DEPDIR)/fs2sint.Po
-	-rm -f ./$(DEPDIR)/fs2slong.Po
-	-rm -f ./$(DEPDIR)/fs2uchar.Po
-	-rm -f ./$(DEPDIR)/fs2uint.Po
-	-rm -f ./$(DEPDIR)/fs2ulong.Po
-	-rm -f ./$(DEPDIR)/fsadd.Po
-	-rm -f ./$(DEPDIR)/fsdiv.Po
-	-rm -f ./$(DEPDIR)/fseq.Po
-	-rm -f ./$(DEPDIR)/fsgt.Po
-	-rm -f ./$(DEPDIR)/fslt.Po
-	-rm -f ./$(DEPDIR)/fsmul.Po
-	-rm -f ./$(DEPDIR)/fsneq.Po
-	-rm -f ./$(DEPDIR)/fssub.Po
 	-rm -f ./$(DEPDIR)/gptrget1.Po
 	-rm -f ./$(DEPDIR)/gptrget2.Po
 	-rm -f ./$(DEPDIR)/gptrget3.Po
 	-rm -f ./$(DEPDIR)/gptrget4.Po
+	-rm -f ./$(DEPDIR)/gptrload.Po
 	-rm -f ./$(DEPDIR)/gptrput1.Po
 	-rm -f ./$(DEPDIR)/gptrput2.Po
 	-rm -f ./$(DEPDIR)/gptrput3.Po
@@ -2168,18 +2269,12 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/mulint.Po
 	-rm -f ./$(DEPDIR)/mullong.Po
 	-rm -f ./$(DEPDIR)/schar2fps16x16.Po
-	-rm -f ./$(DEPDIR)/schar2fs.Po
 	-rm -f ./$(DEPDIR)/sint2fps16x16.Po
-	-rm -f ./$(DEPDIR)/sint2fs.Po
 	-rm -f ./$(DEPDIR)/slong2fps16x16.Po
-	-rm -f ./$(DEPDIR)/slong2fs.Po
 	-rm -f ./$(DEPDIR)/stack.Po
 	-rm -f ./$(DEPDIR)/uchar2fps16x16.Po
-	-rm -f ./$(DEPDIR)/uchar2fs.Po
 	-rm -f ./$(DEPDIR)/uint2fps16x16.Po
-	-rm -f ./$(DEPDIR)/uint2fs.Po
 	-rm -f ./$(DEPDIR)/ulong2fps16x16.Po
-	-rm -f ./$(DEPDIR)/ulong2fs.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

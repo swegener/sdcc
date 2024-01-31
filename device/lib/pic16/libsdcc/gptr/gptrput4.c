@@ -26,50 +26,49 @@
    not however invalidate any other reasons why the executable file
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
-
-/* write address is expected to be in WREG:PRODL:FSR0L while
- * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
  
 extern int FSR0H;
 extern int POSTINC0;
 extern int PREINC1;
+extern int PCLATH;
 extern int PRODH;
 extern int PRODL;
 extern int TBLPTRH;
 extern int TBLPTRL;
+extern int TABLAT;
 extern int WREG;
 extern int __eeprom_gptrput4;
 
+/* _gptrget4() - Read 4 bytes after loading a generic pointer with _gptrload().
+ * - Pointer type is indicated by PCLATH.
+ * - Address is already loaded in type-specific registers.
+ * - Data to write is in TABLAT:PRODH:PRODL:WREG.
+ * - Address is incremented by 4 for next read.
+ */
 void _gptrput4(void) __naked
 {
   __asm
-    /* decode generic pointer MSB (in WREG) bits 6 and 7:
+    /* decode generic pointer MSB (in PCLATH) bits 6 and 7:
      * 00 -> code (unimplemented)
      * 01 -> EEPROM
      * 10 -> data
      * 11 -> data
-     *
-     * address: (WREG, PRODL, FSR0L)
-     * value: (TBLPTRH, TBLPTRL, PRODH, STACK1[+1])
      */
-    btfss	_WREG, 7
+    btfss	_PCLATH, 7
     bra		_lab_01_
     
     /* data pointer  */
-    /* FSR0L is already set up */
-    movff	_PRODL, _FSR0H
-    
-    movff	_PREINC1, _POSTINC0
+    movwf	_POSTINC0
+    movff	_PRODL, _POSTINC0
     movff	_PRODH, _POSTINC0
-    movff	_TBLPTRL, _POSTINC0
-    movff	_TBLPTRH, _POSTINC0
+    movff	_TABLAT, _POSTINC0
     
     return
     
 
 _lab_01_:
     /* code or eeprom */
-    btfsc	_WREG, 6
+    btfsc	_PCLATH, 6
     goto        ___eeprom_gptrput4
 
     /* code pointer, cannot write code pointers */

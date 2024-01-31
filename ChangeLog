@@ -1,3 +1,16 @@
+2024-01-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/include/pic16,
+	  device/lib/pic16,
+	  device/non-free/lib/pic16,
+	  src/pic16,
+	  device/include/asm/pic16/features.h,
+	  device/include/sdcc-lib.h,
+	  device/include/setjmp.h,
+	  device/include/stdarg.h,
+	  device/include/stdint.h:
+	  pic16 refactoring and fixes, parts 1 to 3 of patch #472 by Jonathon Hall.
+
 2024-01-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* Merge next branch to trunk.

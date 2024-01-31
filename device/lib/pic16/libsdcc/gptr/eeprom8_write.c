@@ -44,6 +44,6 @@ void __eeprom8_write(void) __naked
     btfsc       _EECON1, 1, 0   ; WR still set?
     bra         wait_till_done
 
-    infsnz      _EEADR, 1, 0    ; address next byte
+    incf        _EEADR, 1, 0    ; address next byte
   __endasm;
 }

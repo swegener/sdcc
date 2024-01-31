@@ -26,10 +26,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
- * therefore we choose return type void here. Generic pointer is expected
- * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
-
 extern int EEADR;
 extern int EECON1;
 extern int EEDATA;
@@ -39,7 +35,23 @@ extern int INTCON;
 extern int PRODH;
 extern int PRODL;
 extern int TBLPTRL;
+extern int TABLAT;
 
+/* Load 8-bit EEPROM address from generic pointer.  Generic pointer is in
+ * PCLATH:TBLPTRH:TBLPTRL. */
+void
+__eeprom8_gptrload(void) __naked
+{
+    __asm
+        MOVFF   _TBLPTRL, _EEADR
+        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
+        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
+        RETURN
+    __endasm;
+}
+
+/* Read 4 bytes from 8-bit EEPROM address, increment EEPROM address by 4 for
+ * next read.  Result in TABLAT:PRODH:PRODL:WREG. */
 void
 __eeprom8_gptrget4(void) __naked
 {
@@ -47,10 +59,6 @@ __eeprom8_gptrget4(void) __naked
         MOVFF   _INTCON, _TBLPTRL   ; save previous interrupt state
         BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
-        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
-        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
-
-        MOVFF   _FSR0L, _EEADR      ; address first byte
         BSF     _EECON1, 0, 0       ; RD = 1
         MOVF    _EEDATA, 0, 0       ; W = EEPROM[adr]
 
@@ -64,7 +72,11 @@ __eeprom8_gptrget4(void) __naked
 
         INCF    _EEADR, 1, 0        ; address fourth byte
         BSF     _EECON1, 0, 0       ; RD = 1
-        MOVFF   _EEDATA, _FSR0H     ; PRODL = EEPROM[adr+3]
+        MOVFF   _EEDATA, _TABLAT    ; TABLAT = EEPROM[adr+3]
+
+        ; Advance to next byte in case another read is needed (code/RAM get this
+        ; for free, EEPROM must do it explicitly)
+        INCF    _EEADR, 1, 0
 
         BTFSC   _TBLPTRL, 7, 0      ; check previous interrupt state
         BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts

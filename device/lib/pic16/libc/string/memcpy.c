@@ -29,7 +29,7 @@
 #include <string.h>
 
 void *
-memcpy (void *dst, const void *src, size_t acount)
+__memcpy (void *dst, const void *src, size_t acount)
 {
   char *d = dst;
   const char *s = src;
@@ -41,4 +41,11 @@ memcpy (void *dst, const void *src, size_t acount)
     *d++ = *s++;
 
   return dst;
+}
+
+#undef memcpy
+void *
+memcpy (void *dst, const void *src, size_t acount)
+{
+  return __memcpy(dst, src, acount);
 }

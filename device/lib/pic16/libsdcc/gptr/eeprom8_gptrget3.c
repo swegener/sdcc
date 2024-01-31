@@ -26,10 +26,6 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* the return value is expected to be in (FSR0H, PRODH, PRODL, WREG),
- * therefore we choose return type void here. Generic pointer is expected
- * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
-
 extern int EEADR;
 extern int EECON1;
 extern int EEDATA;
@@ -39,6 +35,7 @@ extern int PRODH;
 extern int PRODL;
 extern int TBLPTRL;
 
+/* Read 3 bytes from 8-bit EEPROM address.  Result in PRODH:PRODL:WREG. */
 void
 __eeprom8_gptrget3(void) __naked
 {
@@ -46,10 +43,6 @@ __eeprom8_gptrget3(void) __naked
         MOVFF   _INTCON, _TBLPTRL   ; save previous interrupt state
         BCF     _INTCON, 7, 0       ; GIE = 0: disable interrupts
 
-        BCF     _EECON1, 7, 0       ; EEPGD = 0: access EEPROM, not program memory
-        BCF     _EECON1, 6, 0       ; CFGS = 0: access EEPROM, not config words
-
-        MOVFF   _FSR0L, _EEADR      ; address first byte
         BSF     _EECON1, 0, 0       ; RD = 1
         MOVF    _EEDATA, 0, 0       ; W = EEPROM[adr]
 
@@ -60,6 +53,9 @@ __eeprom8_gptrget3(void) __naked
         INCF    _EEADR, 1, 0        ; address third byte
         BSF     _EECON1, 0, 0       ; RD = 1
         MOVFF   _EEDATA, _PRODH     ; PRODH = EEPROM[adr+2]
+
+        ; Do not need to increment address again - only gptrget4() could be
+        ; followed by another read
 
         BTFSC   _TBLPTRL, 7, 0      ; check previous interrupt state
         BSF     _INTCON, 7, 0       ; conditionally re-enable interrupts

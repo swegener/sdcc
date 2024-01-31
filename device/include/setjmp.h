@@ -59,6 +59,19 @@ typedef unsigned char jmp_buf[5]; /* 2 for the stack pointer, 3 for the return a
 typedef unsigned char jmp_buf[4]; /* 2 for the stack pointer, 2 for the return address. */
 #elif defined (__SDCC_pdk13) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15) || defined(__SDCC_mos6502) || defined(__SDCC_mos65c02)
 typedef unsigned char jmp_buf[3]; /* 1 for the stack pointer, 2 for the return address. */
+#elif defined (__SDCC_pic16)
+/*
+ * return address - 3 (TOS)
+ * return address stack index - 1 (STKPTR)
+ * stack pointer - 1 (small) / 2 (large) (FSR1)
+ * frame pointer - 1 (small) / 2 (large) (FSR2)
+ */
+    #if defined(__SDCC_MODEL_LARGE)
+        #define __SETJMP_H_STACK_PTR_SIZE 2
+    #else
+        #define __SETJMP_H_STACK_PTR_SIZE 1
+    #endif
+typedef unsigned char jmp_buf[2 * __SETJMP_H_STACK_PTR_SIZE + 4];
 #else
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
 #endif

@@ -2,6 +2,8 @@
 
 	* sdas/asrab/rabmch.c:
 	  Back-port error messages from asrab 5.40, patch #473 by D-mo.
+	* support/scripts/sdcc.nsi:
+	  Fix installer creation script for recent pic16 library changes.
 
 2024-01-31 Philipp Klaus Krause <philipp@colecovision.eu>
 

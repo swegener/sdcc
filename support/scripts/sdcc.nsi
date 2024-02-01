@@ -785,7 +785,6 @@ ${Section} "SDCC library sources" SEC25
 #  File "${DEV_ROOT}\lib\src\pic16\libio\usart\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic16\libm"
-  File "${DEV_ROOT}\lib\src\pic16\libm\*.c"
 #  File "${DEV_ROOT}\lib\src\pic16\libm\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic16\libsdcc"

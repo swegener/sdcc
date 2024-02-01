@@ -1,3 +1,8 @@
+2024-02-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asrab/rabmch.c:
+	  Back-port error messages from asrab 5.40, patch #473 by D-mo.
+
 2024-01-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/include/pic16,
@@ -8,7 +13,8 @@
 	  device/include/sdcc-lib.h,
 	  device/include/setjmp.h,
 	  device/include/stdarg.h,
-	  device/include/stdint.h:
+	  device/include/stdint.h,
+	  support/regression/tests/float_single.c.in:
 	  pic16 refactoring and fixes, parts 1 to 3 and 7 to 10 of patch #472 by Jonathon Hall.
 
 2024-01-29 Philipp Klaus Krause <philipp@colecovision.eu>

@@ -1093,7 +1093,7 @@ VOID  machine(struct mne * mp)
                 /* LDP (mn), HL|IX|IY */
                 if ((t1 == S_INDM) && (t2 == S_R16)) {
                         if ((v2 != HL) && (v2 != IX) && (v2 != IY)) {
-                                aerr();
+                                xerr('a', "Second argument: must be HL, IX, or IY.");
                                 break;
                         }
                         if (v2 == HL) {
@@ -1108,7 +1108,7 @@ VOID  machine(struct mne * mp)
                 /* LDP HL|IX|IY, (mn) */
                 if ((t1 == S_R16) && (t2 == S_INDM)) {
                         if ((v1 != HL) && (v1 != IX) && (v1 != IY)) {
-                                aerr();
+                                xerr('a', "First argument: must be HL, IX, or IY.");
                                 break;
                         }
                         if (v1 == HL) {
@@ -1123,11 +1123,11 @@ VOID  machine(struct mne * mp)
                 /* LDP (HL|IX|IY), HL */
                 if ((t2 == S_R16) && (v2 == HL)) {
                         if ((t1 != S_IDHL) && (t1 != S_IDIX) && (t1 != S_IDIY)) {
-                                aerr();
+                                xerr('a', "First argument: must be (HL), (IX), or (IY).");
                                 break;
                         }
                         if ((e1.e_base.e_ap != NULL) || (v1 != 0)) {
-                                aerr();
+                                xerr('a', "First argument: (HL+D, (IX+D), and (IY+D) are invalid.");
                                 break;
                         }
                         if (t1 == S_IDHL) {
@@ -1141,11 +1141,11 @@ VOID  machine(struct mne * mp)
                 /* LDP HL, (HL|IX|IY) */
                 if ((t1 == S_R16) && (v1 == HL)) {
                         if ((t2 != S_IDHL) && (t2 != S_IDIX) && (t2 != S_IDIY)) {
-                                aerr();
+                                xerr('a', "Second argument: must be (HL), (IX), or (IY).");
                                 break;
                         }
                         if ((e2.e_base.e_ap != NULL) || (v2 != 0)) {
-                                aerr();
+                                xerr('a', "Second argument: (HL+D, (IX+D), and (IY+D) are invalid.");
                                 break;
                         }
                         if (t2 == S_IDHL) {
@@ -1156,7 +1156,7 @@ VOID  machine(struct mne * mp)
                         outab(op | 0x08);
                         break;
                 }
-                aerr();
+                xerr('a', "Invalid Addressing Mode.");
                 break;
 
         case R3K_INH1:

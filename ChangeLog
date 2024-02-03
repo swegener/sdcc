@@ -1,3 +1,8 @@
+2024-02-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/scripts/sdcc.nsi:
+	  Fix installer creation script for recent pic16 library changes.
+
 2024-02-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asrab/rabmch.c:

@@ -163,7 +163,8 @@ enum { SRC_CMODE = 1, SRC_AMODE };
 typedef struct srcLine
 {
     unsigned addr     ;
-    short block, level; /* scope information */
+    short block;
+    int level; /* scope information */
     char     *src ;
 
 } srcLine ;
@@ -200,7 +201,8 @@ typedef struct exePoint
 {
     unsigned addr  ;
     int      line  ;
-    short    block , level ;
+    short    block ;
+    int      level ;
 } exePoint ;
 
 /*-----------------------------------------------------------------*/

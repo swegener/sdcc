@@ -28,6 +28,8 @@
 structdef *structWithName (char *);
 DEFSETFUNC(symWithRName);
 
+#define LEVEL_UNIT      65536
+
 /*-----------------------------------------------------------------*/
 /* gc_strcat - allocate and return concatenated strings            */
 /*-----------------------------------------------------------------*/
@@ -257,6 +259,45 @@ static char  *parseTypeInfo (symbol *sym, char *s)
   return ++s;
 }
 
+int calcLevel(int level1, int level2)
+{
+    return (level1 * LEVEL_UNIT) + level2;
+}
+
+int parseLevel(char *s, char **rs, int base)
+{
+  char *bp = s;
+
+  long level = strtol (s, &bp, 10);
+  if( *bp == '_')
+    {
+      s = ++bp;
+      level = calcLevel(level, strtol (s, &bp, 10));
+    }
+
+  *rs = bp;
+
+  return (int) level;
+}
+
+char *allocRName(char *start, int length)
+{
+  int idx = length > 2 ? length - 2 : 0;
+
+  while(idx && start[idx] != '$')
+    {
+      if(start[idx] == '_')
+        {
+          start[idx++] = '$';
+          length = idx;
+          break;
+        }
+      --idx;
+    }
+
+  return alloccpy(start, length);
+}
+
 /*-----------------------------------------------------------------*/
 /* symFromRec - parse a symbol record and extract and create a sym */
 /*              expects the input string to be of the form         */
@@ -288,7 +329,7 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
   if ( ! nsym )
     {
       nsym = Safe_calloc(1, sizeof(symbol));
-      nsym->rname = alloccpy(s, bp - s);
+      nsym->rname = allocRName(s, bp - s);
     }
   *bp = save_ch;
   /* if this is a Global Symbol */
@@ -311,7 +352,7 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
 
   s++;
   /* get the level number */
-  nsym->level = (short)strtol (s, &bp, 10);
+  nsym->level = parseLevel (s, &bp, 10);
   s = ++bp;
   /* skip the '$' & get the block number */
   nsym->block = (short)strtol (s, &bp, 10);
@@ -348,6 +389,18 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
 
   Dprintf(D_symtab, ("symtab: par %s(0x%x) add=%d sym=%p\n",
           nsym->name, nsym->addr, doadd, nsym));
+
+  Dprintf(D_symtab, ("symbol\n name: %s\n size: %d\n level: %hd\n block: %hd\n isonstack: %hd\n",
+          nsym->name, nsym->size, nsym->level, nsym->block, nsym->isonstack));
+
+  Dprintf(D_symtab, (" isfunc: %d\n offset: %d\n addr: %d\n eaddr: %d\n",
+          nsym->isfunc, nsym->offset, nsym->addr, nsym->eaddr));
+
+  Dprintf(D_symtab, (" addr_type: %c\n type: %p\n etype: %p\n",
+          nsym->addr_type, nsym->type, nsym->type));
+
+  Dprintf(D_symtab, (" scopetype: %c\n sname: %s\n rname: %s\n addrspace: %c\n",
+          nsym->scopetype, nsym->sname, nsym->rname, nsym->addrspace));
 
   return nsym;
 }
@@ -706,7 +759,7 @@ static void lnkSymRec (char *s)
   if (! sym)
     {
       sym = Safe_calloc(1,sizeof(symbol));
-      sym->rname = alloccpy(s,bp - s);
+      sym->rname = allocRName(s,bp - s);
       sym->scopetype = *s;
       sym->name  = sym->rname;
       addSet(&symbols,sym);
@@ -759,6 +812,8 @@ static void lnkCSrc (char *s)
 {
   char mname[128], *bp = mname;
   int block,level,line;
+  int level1 = 0;
+  int level2 = 0;
   unsigned int addr;
   module *mod ;
 
@@ -772,8 +827,11 @@ static void lnkCSrc (char *s)
   while (*s != '$')
     s++;
 
-  if (sscanf(s,"$%d$%d$%d:%x", &line,&level,&block,&addr) != 4)
-      return ;
+  if (sscanf(s,"$%d$%d$%d:%x", &line,&level2,&block,&addr) != 4)
+      if (sscanf(s,"$%d$%d_%d$%d:%x", &line,&level1,&level2,&block,&addr) != 5)
+          return ;
+
+  level = calcLevel(level1, level2);
 
   mod = NULL;
   if (!applyToSet(modules,moduleWithCName,mname,&mod))

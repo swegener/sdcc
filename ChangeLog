@@ -1,5 +1,11 @@
 2024-02-04 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* debugger/mcs51/sdcdb.h,
+	  debugger/mcs51/symtab.c:
+	  Fix bug #3529 via patch #450 by Mark Symonds.
+
+2024-02-04 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* device/include/stddef.h:
 	  Use >= instead of > for C23 test. (bug #3709)
 

@@ -75,7 +75,7 @@ typedef int errno_t;
 #define offsetof(s, m) __builtin_offsetof (s, m)
 
 void __builtin_unreachable(void);
-#if __STDC_VERSION__ > 202311L
+#if __STDC_VERSION__ >= 202311L
 #define unreachable __builtin_unreachable
 
 typedef typeof(nullptr) nullptr_t;

@@ -132,7 +132,7 @@ SFR(TH2, 0xCD);
  *   Bit Mapping: - - EN_WDT CLR_WDT IDLE_WDT PS2 PS1 PS0
  *   Reset Value: xx00,0000
  */
-SFR(WDT_CONTR, 0xC1);
+SFR(WDT_CONTR, 0xE1);
 
 /* In-Application-Programming Data Register
  *   Reset Value: 1111,1111

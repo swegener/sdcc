@@ -7,7 +7,6 @@
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
   Copyright (C) 2021-2023, Gabriele Gorla
 
-
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
@@ -226,8 +225,8 @@ m6502_genAssemblerPreamble (FILE * of)
 
   tfprintf (of, "\t!area\n", "_DATA");
   tfprintf (of, "\t!area\n", XIDATA_NAME);
-//  if(options.xdata_overlay) 
-//      tfprintf (of, "\t!area    (OVR)\n", OVERLAY_NAME);
+  //  if(options.xdata_overlay) 
+  //      tfprintf (of, "\t!area    (OVR)\n", OVERLAY_NAME);
   tfprintf (of, "\t!area\n", XDATA_NAME);
 
 }

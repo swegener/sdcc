@@ -351,13 +351,18 @@ verifyRegsAssigned (operand *op, iCode * ic)
 {
   symbol * sym;
 
-  if (!op) return;
-  if (!IS_ITEMP (op)) return;
+  if (!op)
+    return;
+  if (!IS_ITEMP (op))
+    return;
 
   sym = OP_SYMBOL (op);
-  if (sym->isspilt) return;
-  if (!sym->nRegs) return;
-  if (sym->regs[0]) return;
+  if (sym->isspilt)
+    return;
+  if (!sym->nRegs)
+    return;
+  if (sym->regs[0])
+    return;
 
   m6502SpillThis (sym);
 }
@@ -403,7 +408,8 @@ regTypeNum (void)
   int k;
 
   /* for each live range do */
-  for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
+  for (sym = hTabFirstItem (liveRanges, &k); sym;
+       sym = hTabNextItem (liveRanges, &k))
     {
       /* if used zero times then no registers needed */
       if ((sym->liveTo - sym->liveFrom) == 0)
@@ -430,8 +436,9 @@ regTypeNum (void)
           /* if not then we require registers */
           D (D_ALLOC,
              ("regTypeNum: isagg %u nRegs %u type %p\n", IS_AGGREGATE (sym->type) || sym->isptr, sym->nRegs, sym->type));
-          sym->nRegs = ((IS_AGGREGATE (sym->type)
-                         || sym->isptr) ? getSize (sym->type = aggrToPtr (sym->type, false)) : getSize (sym->type));
+          sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) 
+			? getSize (sym->type = aggrToPtr (sym->type, false)) 
+			: getSize (sym->type));
           D (D_ALLOC, ("regTypeNum: setting nRegs of %s (%p) to %u\n", sym->name, sym, sym->nRegs));
 
           D (D_ALLOC, ("regTypeNum: setup to assign regs sym %p\n", sym));

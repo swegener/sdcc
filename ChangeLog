@@ -3,6 +3,8 @@
 	* src/mos6502/gen.c:
 	  Remove a few dead code paths.
 	  Improve tracking of literals in the RegTemp stack.
+	* src/mos6502/peeph.def:
+	  Add rule for tax/tay followed by tax/tay.
 	
 2024-02-17 Gabriele Gorla <gorlik@yahoo.com>
 

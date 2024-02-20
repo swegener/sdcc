@@ -277,7 +277,7 @@ replace restart {
 	; Peephole load 17 - removed dead ldy
 	%1 
 	ldy	%2
-} if notSame(%1 'phy'), notVolatile(%3)
+} if notSame(%1 'tya' 'phy'), notVolatile(%3)
 
 ////////////////////////////////////////////////////////
 // Remove dead register operation/transfers
@@ -346,6 +346,28 @@ replace restart {
 	tay
 	; Peephole regop 8 - removed redundant tya preceded by tay
 }
+
+replace restart {
+	tax
+        %1 %2
+	tax
+} by {
+	; Peephole regop 9 - removed redundant tax
+        %1 %2
+	tax
+} if notSame(%1 'stx' 'cpx' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
+
+// if same(%1 'ora' 'and' 'eor' )
+
+replace restart {
+	tay
+        %1 %2
+	tay
+} by {
+	; Peephole regop 10 - removed redundant tay
+        %1 %2
+	tay
+} if notSame(%1 'sty' 'cpy' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
 
 ////////////////////////////////////////////////////////
 // Remove redundant/unnecessry stack operations

@@ -5575,7 +5575,7 @@ genIfxJump (iCode * ic, char *jval)
 {
   symbol *jlbl;
   symbol *tlbl = safeNewiTempLabel (NULL);
-  char *inst;
+  char *inst = "ERORR";
 
   emitComment (TRACEGEN, "%s : %s", __func__, jval);
 
@@ -5583,7 +5583,7 @@ genIfxJump (iCode * ic, char *jval)
      supplied is true */
   if (IC_TRUE (ic)) {
     jlbl = IC_TRUE (ic);
-    if (!strcmp (jval, "a"))
+    if (!strcmp (jval, "z"))
       inst = "beq";
     else if (!strcmp (jval, "c"))
       inst = "bcc";
@@ -5592,11 +5592,12 @@ genIfxJump (iCode * ic, char *jval)
     else if (!strcmp (jval, "v"))
       inst = "bvc";
     else
-      inst = "bge";
+    emitcode("ERROR", "; %s IC_TRUE: Unimplemented jval (%s)", __func__, jval );
+//      inst = "bge";
   } else {
     /* false label is present */
     jlbl = IC_FALSE (ic);
-    if (!strcmp (jval, "a"))
+    if (!strcmp (jval, "z"))
       inst = "bne";
     else if (!strcmp (jval, "c"))
       inst = "bcs";
@@ -5605,7 +5606,8 @@ genIfxJump (iCode * ic, char *jval)
     else if (!strcmp (jval, "v"))
       inst = "bvs";
     else
-      inst = "blt";
+    emitcode("ERROR", "; %s IC_FALSE: Unimplemented jval (%s)", __func__, jval );
+//      inst = "blt";
   }
   emitBranch (inst, tlbl);
   emitBranch ("jmp", jlbl);
@@ -6376,7 +6378,7 @@ genAnd (iCode * ic, iCode * ifx)
      pullReg (m6502_reg_a);
      emitCpz(A_IDX);
      pullOrFreeReg (m6502_reg_a, needpulla);
-     genIfxJump (ifx, "a");
+     genIfxJump (ifx, "z");
      goto release;
      }
   */
@@ -6441,7 +6443,7 @@ genAnd (iCode * ic, iCode * ifx)
 	      loadRegTempNoFlags(m6502_reg_a, true); // preserve flags
 	    }
         }
-      genIfxJump (ifx, "a");
+      genIfxJump (ifx, "z");
       goto release;
     }
 
@@ -6500,7 +6502,7 @@ genAnd (iCode * ic, iCode * ifx)
       // TODO: better way to preserve flags?
       if (ifx) {
         loadRegTempNoFlags (m6502_reg_a, needpulla);
-        genIfxJump (ifx, "a");
+        genIfxJump (ifx, "z");
       } else {
         if (needpulla) loadRegTemp (NULL);
       }
@@ -6718,7 +6720,7 @@ static void genOr (iCode * ic, iCode * ifx)
 
      pullOrFreeRegNoFlags (m6502_reg_a, needpulla);
 
-     genIfxJump (ifx, "a");
+     genIfxJump (ifx, "z");
 
      goto release;
      }
@@ -6763,7 +6765,7 @@ static void genOr (iCode * ic, iCode * ifx)
 
     if (ifx) {
       loadRegTempNoFlags (m6502_reg_a, needpulla);
-      genIfxJump (ifx, "a");
+      genIfxJump (ifx, "z");
     } else {
       if (needpulla) loadRegTemp (NULL);
     }
@@ -6984,7 +6986,7 @@ static void genXor (iCode * ic, iCode * ifx)
           safeEmitLabel (tlbl);
           if (ifx) {
             loadRegTempNoFlags (m6502_reg_a, needpulla);
-            genIfxJump (ifx, "a");
+            genIfxJump (ifx, "z");
           } else {
             if (needpulla) loadRegTemp (NULL);
           }
@@ -8719,7 +8721,7 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
     pullOrFreeReg (m6502_reg_x, needpullx);
     pullOrFreeReg (m6502_reg_a, needpulla);
     //      emit6502op("plp", "");
-    genIfxJump (ifx, "a");
+    genIfxJump (ifx, "z");
     return;
   }
   wassert (!ifx);
@@ -8963,7 +8965,7 @@ static void genUnpackBitsImmed (operand * left, operand *right, operand * result
   freeAsmop (result, NULL);
 
   if (ifx && !ifx->generated) {
-    genIfxJump (ifx, "a");
+    genIfxJump (ifx, "z");
   }
   if (delayed_a)
     pullReg (m6502_reg_a);
@@ -9013,7 +9015,7 @@ static void genDataPointerGet (operand * left, operand * right, operand * result
 
   if (ifx && !ifx->generated) {
     loadRegTempNoFlags (m6502_reg_a, needpulla);
-    genIfxJump (ifx, "a");
+    genIfxJump (ifx, "z");
   } else {
     if (needpulla) loadRegTemp (NULL);
   }
@@ -9258,7 +9260,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
   freeAsmop (result, NULL);
 
   if (ifx && !ifx->generated) {
-    genIfxJump (ifx, "a");
+    genIfxJump (ifx, "z");
   }
 }
 
@@ -9872,7 +9874,7 @@ static void genIfx (iCode * ic, iCode * popIc)
 
   // TODO: redundant bne/beq
   emitComment (TRACEGEN|VVDBG, "      genIfx - call jump");
-  genIfxJump (ic, "a");
+  genIfxJump (ic, "z");
 
   ic->generated = 1;
 }

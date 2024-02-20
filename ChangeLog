@@ -1,7 +1,8 @@
 2024-02-20 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:
-	  Renamed jflag in genIfxJump from "a" to "z".
+	  Rename jflag in genIfxJump from "a" to "z".
+	  Refactor genAnd, GenOr, GenXor.
 	
 2024-02-19 Gabriele Gorla <gorlik@yahoo.com>
 

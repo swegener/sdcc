@@ -2,6 +2,7 @@
 
 	* src/mos6502/gen.c:
 	  Remove a few dead code paths.
+	  Improve tracking of literals in the RegTemp stack.
 	
 2024-02-17 Gabriele Gorla <gorlik@yahoo.com>
 

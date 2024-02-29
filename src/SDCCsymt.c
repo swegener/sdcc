@@ -3914,10 +3914,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                   dbuf_append_str (dbuf, "generic*");
               break;
             case CPOINTER:
-              dbuf_append_str (dbuf, "code*");
+              dbuf_append_str (dbuf, "__code*");
               break;
             case FPOINTER:
-              dbuf_append_str (dbuf, "xdata*");
+              dbuf_append_str (dbuf, "__xdata*");
               break;
             case EEPPOINTER:
               dbuf_append_str (dbuf, "eeprom*");
@@ -3926,10 +3926,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, "near*");
               break;
             case IPOINTER:
-              dbuf_append_str (dbuf, "idata*");
+              dbuf_append_str (dbuf, "__idata*");
               break;
             case PPOINTER:
-              dbuf_append_str (dbuf, "pdata*");
+              dbuf_append_str (dbuf, "__pdata*");
               break;
             case UPOINTER:
               dbuf_append_str (dbuf, "unknown*");
@@ -4061,22 +4061,22 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, " data");
               break;
             case S_XDATA:
-              dbuf_append_str (dbuf, " xdata");
+              dbuf_append_str (dbuf, " __xdata");
               break;
             case S_SFR:
               dbuf_append_str (dbuf, " sfr");
               break;
             case S_SBIT:
-              dbuf_append_str (dbuf, " sbit");
+              dbuf_append_str (dbuf, " __sbit");
               break;
             case S_CODE:
-              dbuf_append_str (dbuf, " code");
+              dbuf_append_str (dbuf, " __code");
               break;
             case S_IDATA:
-              dbuf_append_str (dbuf, " idata");
+              dbuf_append_str (dbuf, " __idata");
               break;
             case S_PDATA:
-              dbuf_append_str (dbuf, " pdata");
+              dbuf_append_str (dbuf, " __pdata");
               break;
             case S_LITERAL:
               dbuf_append_str (dbuf, " literal");
@@ -4088,7 +4088,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, " xstack");
               break;
             case S_BIT:
-              dbuf_append_str (dbuf, " bit");
+              dbuf_append_str (dbuf, " __bit");
               break;
             case S_EEPROM:
               dbuf_append_str (dbuf, " eeprom");

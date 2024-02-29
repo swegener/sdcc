@@ -3688,7 +3688,7 @@ genSend (set *sendSet)
   /* then we do all other parameters */
   for (sic = setFirstItem (sendSet); sic; sic = setNextItem (sendSet))
     {
-      wassert (sic->argreg <= 1000);
+      if (sic->argreg <= 1000)
         {
           const iCode *walk;
           for (walk = sic->next; walk; walk = walk->next)

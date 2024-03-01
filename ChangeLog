@@ -1,3 +1,8 @@
+2024-03-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  Workaround for a LyX 2.4 issue, fixes bug #3708.
+
 2024-02-29 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:

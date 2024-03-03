@@ -501,7 +501,7 @@ valinfoMod (struct valinfo *result, const struct valinfo &left, const struct val
       result->min = std::min (left.min, 0ll);
       result->max = std::max (left.max, 0ll);
     }
-  if (!left.anything && !right.anything && left.min >= 0 && right.min >= 0 && right.max <= result->max);
+  if (!left.anything && !right.anything && left.min >= 0 && right.min >= 0 && right.max <= result->max)
     result->max = right.max - 1;
 }
 

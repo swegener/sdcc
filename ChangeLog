@@ -1,3 +1,8 @@
+2024-03-03 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCCgenconstprop.cc:
+	  Remove semicolon after if-condition. (bug #3713)
+
 2024-03-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

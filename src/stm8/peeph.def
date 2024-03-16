@@ -151,7 +151,7 @@ replace restart {
 } by {
 	pushw	%1
 	; peephole 7 simplified pushw.
-} if notUsed(%1)
+} if notUsed('n' 'z')
 
 replace restart {
 	addw	%1, #%2

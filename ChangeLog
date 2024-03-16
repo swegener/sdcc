@@ -1,3 +1,8 @@
+2024-03-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/peeph.def:
+	  Simplify some stm8 pushw, common at beginning of function.
+
 2024-03-03 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCgenconstprop.cc:

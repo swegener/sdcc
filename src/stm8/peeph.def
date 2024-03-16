@@ -142,7 +142,15 @@ replace restart {
 	popw	%1
 	pushw	%1
 } by {
-	; peephole 7 removed dead popw / pushw pair.
+	; peephole 6a removed dead popw / pushw pair.
+} if notUsed(%1)
+
+replace restart {
+	sub	sp, #2
+	ldw	(0x01, sp), %1
+} by {
+	pushw	%1
+	; peephole 7 simplified pushw.
 } if notUsed(%1)
 
 replace restart {

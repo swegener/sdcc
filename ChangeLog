@@ -1,3 +1,8 @@
+2024-03-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/peeph.def:
+	  Optimize out some tnz(w).
+
 2024-03-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/stm8/peeph.def:

@@ -892,12 +892,28 @@ replace restart {
 } if same(%3 'and' 'or' 'xor' 'add' 'adc' 'sub' 'sbc')
 
 replace restart {
-	%3	(%1, %2)
-	tnz	(%1, %2)
+	%2	%1
+	tnz	%1
 } by {
-	%3	(%1, %2)
+	%2	%1
 	; peephole 24 removed redundant tnz.
-} if same(%3 'neg' 'cpl' 'inc' 'dec' 'sll' 'srl' 'sra' 'rlc' 'rrc')
+} if same(%2 'neg' 'cpl' 'inc' 'dec' 'sll' 'srl' 'sra' 'rlc' 'rrc'), notVolatile(%1)
+
+replace restart {
+	%2	(%1, sp)
+	tnz	(%1, sp)
+} by {
+	%2	(%1, sp)
+	; peephole 24a removed redundant tnz.
+} if same(%2 'neg' 'cpl' 'inc' 'dec' 'sll' 'srl' 'sra' 'rlc' 'rrc')
+
+replace restart {
+	%2	%1
+	tnzw	%1
+} by {
+	%2	%1
+	; peephole 24b removed redundant tnzw.
+} if same(%2 'cplw' 'decw' 'negw' 'incw' 'rlcw' 'rrcw' 'sllw' 'sraw' 'srlw'), notVolatile(%1)
 
 replace restart {
 	ld	a, %1

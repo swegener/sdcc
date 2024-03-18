@@ -774,7 +774,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_SM83 && POINTER_GET(ic) && !(result_only_HL || getSize(operandType(right)) == 1))
     return(false);
 
-  if((IS_SM83 || IY_RESERVED) && (IS_TRUE_SYMOP(left) || IS_TRUE_SYMOP(right)))
+  if((IS_SM83 || IY_RESERVED) && (IS_TRUE_SYMOP(left) && (!IS_PARM(left) || exstk) || IS_TRUE_SYMOP(right) && (!IS_PARM(right) || exstk)))
     return(false);
 
   if((IS_SM83 || IY_RESERVED) && IS_TRUE_SYMOP(result) && getSize(operandType(IC_RESULT(ic))) > 2)
@@ -790,7 +790,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(ic->op == '-' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) && IS_TRUE_SYMOP (right) && result_only_HL)
     return(true);
-    
+
   if(exstk &&
      (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) &&
      (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL))

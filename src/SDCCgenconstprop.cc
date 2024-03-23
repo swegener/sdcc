@@ -597,9 +597,12 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
           rv.min <<= 1;
           rv.max <<= 1;
         }
-      rv.knownbitsmask = (left.knownbitsmask << right.max) | ~(~0ull << right.max);
-      rv.knownbits = left.knownbits << right.max;
       *result = rv;
+    }
+  if(!right.anything && right.min > 0 && right.max < 64)
+    {
+      result->knownbitsmask |= ~(~0ull << right.min);
+      result->knownbits &= (~0ull << right.min);
     }
 }
 
@@ -763,10 +766,16 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
         std::cout << "Recompute node " << i << " ic " << ic->key << "\n";std::cout << "getTypeValinfo: resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
 #endif
 
+      if (end_it_quickly) // Just use the very rough approximation from the type info only to speed up analysis.
+        {
+          if (left && !(IS_INTEGRAL (operandType (left)) && bitsForType (operandType (left)) < 64 && IS_OP_LITERAL (left)))
+            leftvalinfo = getTypeValinfo (operandType (left));
+          if (right && !(IS_INTEGRAL (operandType (right)) && bitsForType (operandType (right)) < 64 && IS_OP_LITERAL (right)))
+            rightvalinfo = getTypeValinfo (operandType (right));
+        }
+
       if (!localchange) // Input didn't change. No need to recompute result.
         resultsym = 0;
-      else if (end_it_quickly) // Just use the very rough approximation from the type info only to speed up analysis.
-        ;
       else if (IS_OP_VOLATILE (IC_RESULT (ic))) // No point trying to find out what we write to a volatile operand. At the next use, it could be anything, anyway.
         ;
       else if (ic->op == '!')
@@ -890,7 +899,7 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
   std::cout << "recomputeValinfos at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n"; std::cout.flush();
 #endif
 
-  unsigned int max_rounds = 1000; // Rapidly end analysis once this number of rounds has been exceeded.
+  unsigned long max_rounds = 8000; // Rapidly end analysis once this number of rounds has been exceeded.
 
   cfg_t G;
 
@@ -909,7 +918,7 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
     }
 
   // Forward pass to get first approximation.
-  for (unsigned int round = 0; !todo.first.empty (); round++)
+  for (unsigned long round = 0; !todo.first.empty (); round++)
     {
       // Take next node that needs updating.
       unsigned int i = todo.first.front ();

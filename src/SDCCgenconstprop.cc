@@ -1,4 +1,4 @@
-// (c) 2023 Philipp Klaus Krause, philipp@colecovision.eu
+// (c) 2023-2024 Philipp Klaus Krause, philipp@colecovision.eu
 //
 // SPDX-License-Identifier: GPL-2.0-or-later
 //
@@ -1111,7 +1111,7 @@ optimizeNarrowOpNet (iCode *ic)
           iCode *uic = (iCode *)hTabItemWithKey (iCodehTab, key);
           if (!uic)
             bitVectUnSetBit (OP_USES (op), key); // Looks like some earlier optimization didn't clean up properly. Do it now.
-          else if (uic->op == CAST)
+          else if (uic->op == CAST && !IS_FLOAT (operandType (uic->result)))
             valinfo_union (&v, getOperandValinfo (uic, uic->right));
           else if (uic->op == EQ_OP || uic->op == NE_OP || uic->op == '<' || uic->op == LE_OP || uic->op == '>' || uic->op == GE_OP)
             {

@@ -1,6 +1,12 @@
 2024-03-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc,
+	  support/regression/tests/bug-3717.c:
+	  Fix bug #3717.
+
+2024-03-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
 	  src/pdk/gen.c:
 	  Improve generalized constant propagation analysis accuracy.
 

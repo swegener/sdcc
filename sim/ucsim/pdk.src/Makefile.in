@@ -53,6 +53,7 @@ VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o port.o \
 		  inst.o \
+		  pdk13.o pdk14.o pdk15.o pdk16.o \
 		  sim$(TN).o $(TN).o
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

@@ -51,6 +51,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /*******************************************************************/
 
+cl_pdk::cl_pdk(class cl_sim *asim):
+  cl_uc(asim)
+{
+}
+
+
 /*
  * Base type of PDK controllers
  */

@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "simpdkcl.h"
 #include "pdkcl.h"
+#include "pdk16cl.h"
 
 
 cl_simpdk::cl_simpdk(class cl_app *the_app):
@@ -67,6 +68,8 @@ cl_simpdk::mk_controller(void)
     case CPU_PDK14:
     case CPU_PDK15:
       return(new cl_pdk(&cpus_pdk[i], this));
+    case CPU_PDK16:
+      return new cl_pdk16(this);
     default:
       fprintf(stderr, "Unknown processor type\n");
       return NULL;

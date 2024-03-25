@@ -46,6 +46,7 @@ public:
   class cl_address_space *regs8;
   union t_regs regs;
 public:
+  cl_pdk(class cl_sim *asim);
   cl_pdk(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);

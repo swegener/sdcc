@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (z80.src/gb80cl.h)
+ * Simulator of microcontrollers (gb80cl.h)
  *
  * Copyright (C) 2021,21 Drotos Daniel, Talker Bt.
  * 
@@ -57,6 +57,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
+  virtual int tickt(t_mem code);
   virtual void xy(u8_t v) {}
 
   virtual const char *get_disasm_info(t_addr addr,

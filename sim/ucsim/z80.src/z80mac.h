@@ -366,3 +366,5 @@
       }									\
     /* book shows BIT_S & BIT_P as unknown state */			\
   }
+
+/* End of z80.src/z80mac.h */

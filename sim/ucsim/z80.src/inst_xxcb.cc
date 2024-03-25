@@ -75,7 +75,7 @@ cl_z80::inst_XXcb_rlc(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -120,7 +120,7 @@ cl_z80::inst_XXcb_rrc(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -165,7 +165,7 @@ cl_z80::inst_XXcb_rl(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -210,7 +210,7 @@ cl_z80::inst_XXcb_rr(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -255,7 +255,7 @@ cl_z80::inst_XXcb_sla(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -300,7 +300,7 @@ cl_z80::inst_XXcb_sra(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -345,7 +345,7 @@ cl_z80::inst_XXcb_slia(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -390,7 +390,7 @@ cl_z80::inst_XXcb_srl(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -411,7 +411,7 @@ cl_z80::inst_XXcb_bit(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(19);
+  //tick(19);
   return(resGO);
 }
 
@@ -451,7 +451,7 @@ cl_z80::inst_XXcb_res(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 
@@ -491,7 +491,7 @@ cl_z80::inst_XXcb_set(t_mem code)
   store1(addr, tmp);
   vc.wr++;
 
-  tick(22);
+  //tick(22);
   return(resGO);
 }
 

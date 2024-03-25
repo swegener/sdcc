@@ -48,6 +48,7 @@ class cl_r800: public cl_ez80
   virtual int inst_dd_spec(t_mem code);
   virtual int inst_fd_spec(t_mem code);
   */
+  virtual int inst_ed_(t_mem code);    
 };
 
 #endif

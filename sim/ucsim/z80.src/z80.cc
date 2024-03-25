@@ -89,6 +89,14 @@ cl_z80::init(void)
   }
   sp_limit= 0xf000;
   iblock= false;
+
+  ttab_00= z80_ttab_00;
+  ttab_dd= z80_ttab_dd;
+  ttab_cb= z80_ttab_cb;
+  ttab_ed= z80_ttab_ed;
+  ttab_fd= z80_ttab_fd;
+  ttab_ddcb= z80_ttab_ddcb;
+  ttab_fdcb= z80_ttab_fdcb;
   
   return(0);
 }
@@ -617,6 +625,7 @@ int
 cl_z80::exec_inst(void)
 {
   t_mem code;
+  int res= -1;
   
   instPC= PC;
 
@@ -625,187 +634,239 @@ cl_z80::exec_inst(void)
   tick(1);
   inc_R();
   iblock= false;
+  cond_true= false;
   
   switch (code)
     {
-    case 0x00: return(inst_nop(code));
-    case 0x01: case 0x02: case 0x06: return(inst_ld(code));
-    case 0x03: case 0x04: return(inst_inc(code));
-    case 0x05: return(inst_dec(code));
-    case 0x07: return(inst_rlca(code));
+    case 0x00: res= (inst_nop(code)); break;
+    case 0x01: case 0x02: case 0x06: res= (inst_ld(code)); break;
+    case 0x03: case 0x04: res= (inst_inc(code)); break;
+    case 0x05: res= (inst_dec(code)); break;
+    case 0x07: res= (inst_rlca(code)); break;
 
-    case 0x08: return(inst_ex(code));
-    case 0x09: return(inst_add(code));
-    case 0x0a: case 0x0e: return(inst_ld(code));
-    case 0x0b: case 0x0d: return(inst_dec(code));
-    case 0x0c: return(inst_inc(code));
-    case 0x0f: return(inst_rrca(code));
-
-
-    case 0x10: return(inst_djnz(code));
-    case 0x11: case 0x12: case 0x16: return(inst_ld(code));
-    case 0x13: case 0x14: return(inst_inc(code));
-    case 0x15: return(inst_dec(code));
-    case 0x17: return(inst_rla(code));
-
-    case 0x18: return(inst_jr(code));
-    case 0x19: return(inst_add(code));
-    case 0x1a: case 0x1e: return(inst_ld(code));
-    case 0x1b: case 0x1d: return(inst_dec(code));
-    case 0x1c: return(inst_inc(code));
-    case 0x1f: return(inst_rra(code));
+    case 0x08: res= (inst_ex(code)); break;
+    case 0x09: res= (inst_add(code)); break;
+    case 0x0a: case 0x0e: res= (inst_ld(code)); break;
+    case 0x0b: case 0x0d: res= (inst_dec(code)); break;
+    case 0x0c: res= (inst_inc(code)); break;
+    case 0x0f: res= (inst_rrca(code)); break;
 
 
-    case 0x20: return(inst_jr(code));
-    case 0x21: case 0x22: case 0x26: return(inst_ld(code));
-    case 0x23: case 0x24: return(inst_inc(code));
-    case 0x25: return(inst_dec(code));
-    case 0x27: return(inst_daa(code));
+    case 0x10: res= (inst_djnz(code)); break;
+    case 0x11: case 0x12: case 0x16: res= (inst_ld(code)); break;
+    case 0x13: case 0x14: res= (inst_inc(code)); break;
+    case 0x15: res= (inst_dec(code)); break;
+    case 0x17: res= (inst_rla(code)); break;
 
-    case 0x28: return(inst_jr(code));
-    case 0x29: return(inst_add(code));
-    case 0x2a: case 0x2e: return(inst_ld(code));
-    case 0x2b: case 0x2d: return(inst_dec(code));
-    case 0x2c: return(inst_inc(code));
-    case 0x2f: return(inst_cpl(code));
+    case 0x18: res= (inst_jr(code)); break;
+    case 0x19: res= (inst_add(code)); break;
+    case 0x1a: case 0x1e: res= (inst_ld(code)); break;
+    case 0x1b: case 0x1d: res= (inst_dec(code)); break;
+    case 0x1c: res= (inst_inc(code)); break;
+    case 0x1f: res= (inst_rra(code)); break;
 
 
-    case 0x30: return(inst_jr(code));
-    case 0x31: case 0x32: case 0x36: return(inst_ld(code));
-    case 0x33: case 0x34: return(inst_inc(code));
-    case 0x35: return(inst_dec(code));
-    case 0x37: return(inst_scf(code));
+    case 0x20: res= (inst_jr(code)); break;
+    case 0x21: case 0x22: case 0x26: res= (inst_ld(code)); break;
+    case 0x23: case 0x24: res= (inst_inc(code)); break;
+    case 0x25: res= (inst_dec(code)); break;
+    case 0x27: res= (inst_daa(code)); break;
 
-    case 0x38: return(inst_jr(code));
-    case 0x39: return(inst_add(code));
-    case 0x3a: case 0x3e: return(inst_ld(code));
-    case 0x3b: case 0x3d: return(inst_dec(code));
-    case 0x3c: return(inst_inc(code));
-    case 0x3f: return(inst_ccf(code));
+    case 0x28: res= (inst_jr(code)); break;
+    case 0x29: res= (inst_add(code)); break;
+    case 0x2a: case 0x2e: res= (inst_ld(code)); break;
+    case 0x2b: case 0x2d: res= (inst_dec(code)); break;
+    case 0x2c: res= (inst_inc(code)); break;
+    case 0x2f: res= (inst_cpl(code)); break;
+
+
+    case 0x30: res= (inst_jr(code)); break;
+    case 0x31: case 0x32: case 0x36: res= (inst_ld(code)); break;
+    case 0x33: case 0x34: res= (inst_inc(code)); break;
+    case 0x35: res= (inst_dec(code)); break;
+    case 0x37: res= (inst_scf(code)); break;
+
+    case 0x38: res= (inst_jr(code)); break;
+    case 0x39: res= (inst_add(code)); break;
+    case 0x3a: case 0x3e: res= (inst_ld(code)); break;
+    case 0x3b: case 0x3d: res= (inst_dec(code)); break;
+    case 0x3c: res= (inst_inc(code)); break;
+    case 0x3f: res= (inst_ccf(code)); break;
 
     case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
     case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-      return(inst_ld(code));
+      res= (inst_ld(code)); break;
 
     case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
     case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-      return(inst_ld(code));
+      res= (inst_ld(code)); break;
 
     case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
     case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-      return(inst_ld(code));
+      res= (inst_ld(code)); break;
 
     case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
     case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-      return(inst_ld(code));
+      res= (inst_ld(code)); break;
     case 0x76:
-      return(inst_halt(code));
+      res= (inst_halt(code)); break;
 
     case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
-      return(inst_add(code));
+      res= (inst_add(code)); break;
     case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-      return(inst_adc(code));
+      res= (inst_adc(code)); break;
 
     case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
-      return(inst_sub(code));
+      res= (inst_sub(code)); break;
     case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-      return(inst_sbc(code));
+      res= (inst_sbc(code)); break;
 
     case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-      return(inst_and(code));
+      res= (inst_and(code)); break;
     case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
-      return(inst_xor(code));
+      res= (inst_xor(code)); break;
 
     case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-      return(inst_or(code));
+      res= (inst_or(code)); break;
     case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-      return(inst_cp(code));
+      res= (inst_cp(code)); break;
 
-    case 0xc0: return(inst_ret(code));
-    case 0xc1: return(inst_pop(code));
-    case 0xc2: case 0xc3: return(inst_jp(code));
-    case 0xc4: return(inst_call(code));
-    case 0xc5: return(inst_push(code));
-    case 0xc6: return(inst_add(code));
-    case 0xc7: return(inst_rst(code));
+    case 0xc0: res= (inst_ret(code)); break;
+    case 0xc1: res= (inst_pop(code)); break;
+    case 0xc2: case 0xc3: res= (inst_jp(code)); break;
+    case 0xc4: res= (inst_call(code)); break;
+    case 0xc5: res= (inst_push(code)); break;
+    case 0xc6: res= (inst_add(code)); break;
+    case 0xc7: res= (inst_rst(code)); break;
 
-    case 0xc8: case 0xc9: return(inst_ret(code));
-    case 0xca: return(inst_jp(code));
+    case 0xc8: case 0xc9: res= (inst_ret(code)); break;
+    case 0xca: res= (inst_jp(code)); break;
 
       /* CB escapes out to 2 byte opcodes(CB include), opcodes
          to do register bit manipulations */
-    case 0xcb: return(inst_cb());
-    case 0xcc: case 0xcd: return(inst_call(code));
-    case 0xce: return(inst_adc(code));
-    case 0xcf: return(inst_rst(code));
+    case 0xcb: res= (inst_cb()); break;
+    case 0xcc: case 0xcd: res= (inst_call(code)); break;
+    case 0xce: res= (inst_adc(code)); break;
+    case 0xcf: res= (inst_rst(code)); break;
 
 
-    case 0xd0: return(inst_ret(code));
-    case 0xd1: return(inst_pop(code));
-    case 0xd2: return(inst_jp(code));
-    case 0xd3: return(inst_out(code));
-    case 0xd4: return(inst_call(code));
-    case 0xd5: return(inst_push(code));
-    case 0xd6: return(inst_sub(code));
-    case 0xd7: return(inst_rst(code));
+    case 0xd0: res= (inst_ret(code)); break;
+    case 0xd1: res= (inst_pop(code)); break;
+    case 0xd2: res= (inst_jp(code)); break;
+    case 0xd3: res= (inst_out(code)); break;
+    case 0xd4: res= (inst_call(code)); break;
+    case 0xd5: res= (inst_push(code)); break;
+    case 0xd6: res= (inst_sub(code)); break;
+    case 0xd7: res= (inst_rst(code)); break;
 
-    case 0xd8: return(inst_ret(code));
-    case 0xd9: return(inst_exx(code));
-    case 0xda: return(inst_jp(code));
-    case 0xdb: return(inst_in(code));
-    case 0xdc: return(inst_call(code));
+    case 0xd8: res= (inst_ret(code)); break;
+    case 0xd9: res= (inst_exx(code)); break;
+    case 0xda: res= (inst_jp(code)); break;
+    case 0xdb: res= (inst_in(code)); break;
+    case 0xdc: res= (inst_call(code)); break;
       /* DD escapes out to 2 to 4 byte opcodes(DD included)
         with a variety of uses.  It can precede the CB escape
         sequence to extend CB codes with IX+immed_byte */
-    case 0xdd: return(inst_dd(0xdd));
-    case 0xde: return(inst_sbc(code));
-    case 0xdf: return(inst_rst(code));
+    case 0xdd: res= (inst_dd(0xdd)); break;
+    case 0xde: res= (inst_sbc(code)); break;
+    case 0xdf: res= (inst_rst(code)); break;
 
 
-    case 0xe0: return(inst_ret(code));
-    case 0xe1: return(inst_pop(code));
-    case 0xe2: return(inst_jp(code));
-    case 0xe3: return(inst_ex(code));
-    case 0xe4: return(inst_call(code));
-    case 0xe5: return(inst_push(code));
-    case 0xe6: return(inst_and(code));
-    case 0xe7: return(inst_rst(code));
+    case 0xe0: res= (inst_ret(code)); break;
+    case 0xe1: res= (inst_pop(code)); break;
+    case 0xe2: res= (inst_jp(code)); break;
+    case 0xe3: res= (inst_ex(code)); break;
+    case 0xe4: res= (inst_call(code)); break;
+    case 0xe5: res= (inst_push(code)); break;
+    case 0xe6: res= (inst_and(code)); break;
+    case 0xe7: res= (inst_rst(code)); break;
 
-    case 0xe8: return(inst_ret(code));
-    case 0xe9: return(inst_jp(code));
-    case 0xea: return(inst_jp(code));
-    case 0xeb: return(inst_ex(code));
-    case 0xec: return(inst_call(code));
+    case 0xe8: res= (inst_ret(code)); break;
+    case 0xe9: res= (inst_jp(code)); break;
+    case 0xea: res= (inst_jp(code)); break;
+    case 0xeb: res= (inst_ex(code)); break;
+    case 0xec: res= (inst_call(code)); break;
       /* ED escapes out to misc IN, OUT and other oddball opcodes */
-    case 0xed: return(inst_ed(0xed));
-    case 0xee: return(inst_xor(code));
-    case 0xef: return(inst_rst(code));
+    case 0xed: res= (inst_ed(0xed)); break;
+    case 0xee: res= (inst_xor(code)); break;
+    case 0xef: res= (inst_rst(code)); break;
 
 
-    case 0xf0: return(inst_ret(code));
-    case 0xf1: return(inst_pop(code));
-    case 0xf2: return(inst_jp(code));
-    case 0xf3: return(inst_di(code));
-    case 0xf4: return(inst_call(code));
-    case 0xf5: return(inst_push(code));
-    case 0xf6: return(inst_or(code));
-    case 0xf7: return(inst_rst(code));
+    case 0xf0: res= (inst_ret(code)); break;
+    case 0xf1: res= (inst_pop(code)); break;
+    case 0xf2: res= (inst_jp(code)); break;
+    case 0xf3: res= (inst_di(code)); break;
+    case 0xf4: res= (inst_call(code)); break;
+    case 0xf5: res= (inst_push(code)); break;
+    case 0xf6: res= (inst_or(code)); break;
+    case 0xf7: res= (inst_rst(code)); break;
 
-    case 0xf8: return(inst_ret(code));
-    case 0xf9: return(inst_ld(code));
-    case 0xfa: return(inst_jp(code));
-    case 0xfb: return(inst_ei(code));
-    case 0xfc: return(inst_call(code));
+    case 0xf8: res= (inst_ret(code)); break;
+    case 0xf9: res= (inst_ld(code)); break;
+    case 0xfa: res= (inst_jp(code)); break;
+    case 0xfb: res= (inst_ei(code)); break;
+    case 0xfc: res= (inst_call(code)); break;
       /* DD escapes out to 2 to 4 byte opcodes(DD included)
         with a variety of uses.  It can precede the CB escape
         sequence to extend CB codes with IX+immed_byte */
-    case 0xfd: return(inst_fd(0xfd));
-    case 0xfe: return(inst_cp(code));
-    case 0xff: return(inst_rst(code));
+    case 0xfd: res= (inst_fd(0xfd)); break;
+    case 0xfe: res= (inst_cp(code)); break;
+    case 0xff: res= (inst_rst(code)); break;
     }
 
-  //PC= instPC;//rom->inc_address(PC, -1);
-  return(resINV_INST);
+  tickt(code);
+  
+  if (res >= 0)
+    return res;
+  return resINV_INST;
+}
+
+int
+cl_z80::tickt(t_mem code)
+{
+  // special cases: dd, cb, ed, ddcb, fd, fdcb
+  u16_t t= 0;
+  u8_t c2, c3, c4;
+  switch (code)
+    {
+    case 0xdd:
+      c2= rom->read(instPC+1);
+      if (c2 == 0xcb)
+	{
+	  c4= rom->read(instPC+3);
+	  t= ttab_ddcb[c4];
+	  break;
+	}
+      t= ttab_dd[c2];
+      break;
+    case 0xfd:
+      c2= rom->read(instPC+1);
+      if (c2==0xcb)
+	{
+	  c4= rom->read(instPC+3);
+	  t= ttab_fdcb[c4];
+	  break;
+	}
+      t= ttab_fd[c2];
+      break;
+    case 0xcb:
+      c2= rom->read(instPC+1);
+      t= ttab_cb[c2];
+      break;
+    case 0xed:
+      c2= rom->read(instPC+1);
+      t= ttab_ed[c2];
+      break;
+    default:
+      t= ttab_00[code];
+      break;
+    }
+  if (cond_true)
+    t>>= 8;
+  else
+    t&= 0xff;
+  tick(t-1);
+  return t;
 }
 
 bool cl_z80::inst_z80n(t_mem code, int *ret)
@@ -1105,6 +1166,19 @@ void        cl_z80::reg_g_store( t_mem g, u8_t new_val )
 
     case 7:  regs.raf.A    = new_val;  break;  /* write to a */
     }
+}
+
+u16_t
+cl_z80::regrp_ss_read(u8_t ss)
+{
+  switch (ss)
+    {
+    case 0: return regs.BC;
+    case 1: return regs.DE;
+    case 2: return regs.HL;
+      //case 3:
+    }
+  return regs.SP;
 }
 
 void

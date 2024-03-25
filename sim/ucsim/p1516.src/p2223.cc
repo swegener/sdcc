@@ -249,6 +249,16 @@ CLP2::disassc(t_addr addr, chars *comment)
 		    comment->appendf("r%d%c", ra, c);
 		}
 	    }
+	  if (strcmp(fmt.c_str(), "ri0") == 0)
+	    {
+	      int ri= (code & 0xf);
+	      work.appendf("r%d", ri);
+	    }
+	  if (strcmp(fmt.c_str(), "u2") == 0)
+	    {
+	      int ri= (code & 0x3);
+	      work.appendf("%d", ri);
+	    }
 	  continue;
 	}
       if (b[i] == '%')
@@ -561,8 +571,6 @@ CLP2::inst_alu(t_mem code)
 	  RC[d]->W(R[d] & op2);
 	  setZSw(R[d]);
 	  return resGO;
-	case 0xb:
-	  return resINV;
 	}
     }
   switch (op)
@@ -667,8 +675,8 @@ CLP2::inst_mem(t_mem code)
 int
 CLP2::inst_ext(t_mem code)
 {
-  t_mem cod= (code & 0x000f000)>>16;
-  int d;
+  t_mem cod= (code & 0x000f0000)>>16;
+  int d, b, i;
   t_addr addr;
   switch (cod)
     {
@@ -684,6 +692,31 @@ CLP2::inst_ext(t_mem code)
 	{
 	  // ST direct
 	  rom->write(addr, R[d]);
+	}
+      return resGO;
+    case 1:
+      d= (code & 0x00f00000) >> 20;
+      i= (code & 0x00008000) ? code : RC[code&0xf]->R();
+      i&= 3;
+      b= (code & 0x00000f00) >> 8;
+      if (code & 0x01000000)
+	{
+	  // PUTB
+	  u32_t mask= 0xff << (i*8);
+	  u32_t data= RC[d]->R();
+	  u32_t byte= RC[b]->R() & 0xff;
+	  data&= ~mask;
+	  byte<<= (i*8);
+	  data|= byte;
+	  RC[d]->W(data);
+	}
+      else
+	{
+	  // GETB
+	  u32_t byte= RC[b]->R();
+	  byte>>= (i*8);
+	  byte&= 0xff;
+	  RC[d]->W(byte);
 	}
       return resGO;
     }

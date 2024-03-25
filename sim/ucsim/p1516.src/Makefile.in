@@ -53,7 +53,7 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= sim$(TN).o $(TN).o p2223.o glob.o port.o uart.o clock.o \
-		pmon.o
+		fpga.o pmon.o
 
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

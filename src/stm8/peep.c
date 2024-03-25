@@ -844,7 +844,7 @@ stm8MightRead(const lineNode *pl, const char *what)
   if (ISINST (pl->line, "call") || ISINST (pl->line, "callr") || ISINST (pl->line, "callf"))
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + (ISINST (pl->line, "call") ? 6 : 7));
-      if (f)
+      if (f && IS_FUNC (f->type))
         return stm8IsParmInCall(f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
         return (stm8MightBeParmInCallFromCurrentFunction(what) || stm8MightBeParmInPCallFromCurrentFunction(what));

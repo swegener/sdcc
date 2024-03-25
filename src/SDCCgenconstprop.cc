@@ -582,7 +582,7 @@ valinfoGetABit (struct valinfo *result, const struct valinfo &left, const struct
 static void
 valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct valinfo &right)
 {
-  if (!left.anything && !right.anything && right.min == right.max && right.max < 64)
+  if (!left.anything && !right.anything && right.min == right.max && right.max < 62)
     {
       result->nothing = left.nothing || right.nothing;
       struct valinfo rv;
@@ -597,9 +597,11 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
           rv.min <<= 1;
           rv.max <<= 1;
         }
+      if (!result->anything)
+      	rv.max = std::min (result->max, rv.max);
       *result = rv;
     }
-  if(!right.anything && right.min > 0 && right.max < 64)
+  if(!right.anything && right.min > 0 && right.min < 63)
     {
       result->knownbitsmask |= ~(~0ull << right.min);
       result->knownbits &= (~0ull << right.min);
@@ -610,14 +612,14 @@ static void
 valinfoRight (struct valinfo *result, const struct valinfo &left, const struct valinfo &right)
 {
   if (!left.anything && !right.anything &&
-    left.min >= 0 && right.min >= 0 && right.min <= 60)
+    left.min >= 0 && right.min >= 0 && right.min <= 61)
     {
-      result->anything = false;
       result->nothing = left.nothing || right.nothing;
       result->min = 0;
       auto max = (left.max >> right.min);
-      if (max <= result->max)
+      if (result->anything || max <= result->max)
         result->max = max;
+      result->anything = false;
       if (right.min == right.max)
         {
           result->knownbitsmask = left.knownbitsmask >> right.min;

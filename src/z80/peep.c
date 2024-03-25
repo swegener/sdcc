@@ -372,7 +372,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
-      if (f)
+      if (f && IS_FUNC (f->type))
         return z80IsParmInCall(f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
         return z80MightBeParmInCallFromCurrentFunction(what);

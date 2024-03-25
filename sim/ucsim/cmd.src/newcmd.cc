@@ -347,7 +347,13 @@ void
 cl_console_base::dd_color(const char *color_name)
 {
   if (!non_color())
-    dd_printf("%s", get_color_ansiseq(color_name, true).c_str());
+    {
+      chars c;
+      const char *s;
+      c= get_color_ansiseq(color_name, true);
+      s= c.c_str();
+      dd_printf("%s", s);
+    }
 }
 
 int
@@ -546,6 +552,20 @@ cl_console_base::tu_color(int bg, int fg)
 {
   if (bg >= 0)
     dd_printf("\033[%dm", (tu_bg_color= bg)+40);
+  if (fg >= 0)
+    dd_printf("\033[%dm", (tu_fg_color= fg)+30);
+}
+
+void
+cl_console_base::tu_bgcolor(int bg)
+{
+  if (bg >= 0)
+    dd_printf("\033[%dm", (tu_bg_color= bg)+40);
+}
+
+void
+cl_console_base::tu_fgcolor(int fg)
+{
   if (fg >= 0)
     dd_printf("\033[%dm", (tu_fg_color= fg)+30);
 }

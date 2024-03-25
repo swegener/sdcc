@@ -398,7 +398,9 @@ cl_f::get(void)
     {
       return -1;
     }
-  int c= buffer[prev_last_used= last_used] & 0xff;
+  int c= buffer[prev_last_used= last_used];
+  if (c > 0)
+    c&= 0xff;
   last_used= (last_used + 1) % 1024;
   return c;
 }
@@ -490,7 +492,9 @@ cl_f::process_csi(void)
   // first char not recognized, check the last
   switch (c)
     {
-    case 'A': return finish_esc(TU_UP);
+    case 'A':
+      return
+	finish_esc(TU_UP);
     case 'B': return finish_esc(TU_DOWN);
     case 'C': return finish_esc(TU_RIGHT);
     case 'D': return finish_esc(TU_LEFT);

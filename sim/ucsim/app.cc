@@ -830,6 +830,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  break;
 	}
       case 'l':
+	set_option_s("color_bg", "bwhite");
 	set_option_s("color_prompt", "green:bwhite");
 	set_option_s("color_prompt_console", "blue:bwhite");
 	set_option_s("color_command", "blue:bwhite");
@@ -850,6 +851,12 @@ cl_app::proc_arguments(int argc, char *argv[])
 	set_option_s("color_ui_bit0", "white:black");
 	set_option_s("color_ui_bit1", "bred:black");
 	set_option_s("color_debug", "magenta:bwhite");
+	set_option_s("color_led_on", "green:bwhite");
+	set_option_s("color_led_off", "black:bwhite");
+	set_option_s("color_btn_on", "bcyan:bwhite");
+	set_option_s("color_btn_off", "black:bwhite");
+	set_option_s("color_sw_on", "bcyan:bwhite");
+	set_option_s("color_sw_off", "black:bwhite");
 	break;
       case 'B':
 	if (!options->set_value("beep_break", this, (bool)true))
@@ -1246,6 +1253,11 @@ cl_app::mk_options(void)
   o->init();
   o->set_value("bwhite:black");
   
+  options->new_option(o= new cl_string_option(this, "color_bg",
+					      "Default background color"));
+  o->init();
+  o->set_value("black");
+  
   options->new_option(o= new cl_string_option(this, "color_prompt_console",
 					      "Color of console number in prompt"));
   o->init();
@@ -1345,6 +1357,36 @@ cl_app::mk_options(void)
 					      "Stop state color on UI display"));
   o->init();
   o->set_value("white:red");
+  
+  options->new_option(o= new cl_string_option(this, "color_led_on",
+					      ""));
+  o->init();
+  o->set_value("b:green:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_led_off",
+					      ""));
+  o->init();
+  o->set_value("white:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_btn_on",
+					      ""));
+  o->init();
+  o->set_value("bcyan:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_btn_off",
+					      ""));
+  o->init();
+  o->set_value("white:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_sw_on",
+					      ""));
+  o->init();
+  o->set_value("bcyan:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_sw_off",
+					      ""));
+  o->init();
+  o->set_value("white:black");
   
   options->new_option(o= new cl_number_option(this, "label_width",
 					      "Space to allow for labels in dumps and disassembly (-1 for auto)"));

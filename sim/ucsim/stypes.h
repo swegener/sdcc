@@ -262,10 +262,12 @@ enum cpu_type {
   CPU_I8080	= 0x0001,
   CPU_I8085	= 0x0002,
 
+  // Padauk
   CPU_PDK13	= 0x0001,
   CPU_PDK14	= 0x0002,
   CPU_PDK15	= 0x0003,
-
+  CPU_PDK16     = 0x0004,
+  
   CPU_F8	= 0x0001,
 
   CPU_P1516	= 0x0001,

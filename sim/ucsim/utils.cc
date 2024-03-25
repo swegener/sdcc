@@ -44,6 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stypes.h"
 //#include "pobjcl.h"
 
+#include "globals.h"
 #include "utils.h"
 
 
@@ -396,7 +397,10 @@ colopt2ansiseq(char *opt)
   chars r= "", full= opt, tok= "";
   int fg= -1, bg= -1;
   int ctype= ct_none;
-
+  class cl_option *o= application->options->get_option("color_bg");
+  char *bgcolor;
+  if (o) o->get_value(&bgcolor);
+  
   if (!opt ||
       !*opt)
     return r;
@@ -405,6 +409,8 @@ colopt2ansiseq(char *opt)
   while (tok.nempty())
     {
       const char *s= tok.c_str();
+      if (tok=="bg")
+	tok= bgcolor;
       if (tok=="black")
 	{
 	  if (fg<0)

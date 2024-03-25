@@ -2,6 +2,8 @@
 
 - Intel 8048 simulator
 
+- New device type in z80 simulator: r800
+
 
 0.8.x
 

@@ -350,6 +350,7 @@ cl_hw::new_i(class cl_f *f_in)
       f_in->interactive(NULL);
       f_in->raw();
       f_in->echo(NULL);
+      f_in->set_escape(true);
     }
   draw_display();
 }
@@ -525,6 +526,7 @@ cl_hw::draw_display(void)
   io->dd_cprintf("ui_title", "%-13s", s.c_str());
 
   io->tu_go(1,3);
+  io->dd_color("answer");
   io->dd_printf("\033[2K"); // entire line
   io->dd_printf("\033[0J"); // from cursor to end of screen
   io->dd_printf("\n");

@@ -1,5 +1,10 @@
 2024-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/z80/gen.c:
+	  Fix an optimization hint inversion bug that prevented use of djnz.
+
+2024-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCgenconstprop.cc,
 	  src/SDCCsymt.c:
 	  Fix bug #3720.

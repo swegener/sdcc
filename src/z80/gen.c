@@ -8816,7 +8816,7 @@ genMinus (const iCode *ic, const iCode *ifx)
           cheapMove (ic->result->aop, 0, ic->left->aop, 0, isRegDead (A_IDX, ic));
           emit3 (A_DEC, ic->result->aop, 0);
           if (!IS_SM83 && aopInReg (ic->result->aop, 0, B_IDX) && IC_TRUE (ifx)) // This jump can likely be optimized to djnz.
-            cost (-1, -1.0f);
+            regalloc_dry_run_cost_bytes--;
         }
       else
         {

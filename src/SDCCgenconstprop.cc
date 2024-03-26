@@ -166,6 +166,8 @@ getTypeValinfo (sym_link *type)
     {
       v.anything = false;
       v.max = 0x7fffffffffffffffull >> (64 - bitsForType (type));
+      if (IS_CHAR (type))
+        v.max = 0xffffffffffffffffull >> (64 - bitsForType (type)); // Use upper limit of unsigned type here, since sometimes, SDCC generates incorrect AST (using signed char, where there should be unsigned char) trying to avoid the costs of integer promotion.
       v.min = -v.max - 1;
       v.knownbitsmask = ~(0xffffffffffffffffull >> (64 - bitsForType (type)));
       v.knownbits = 0;
@@ -328,13 +330,13 @@ valinfoUpdate (struct valinfo *v)
     return;
 
   // Update bits from min/max.
-  if (v->min == v->max)
+  if (v->min == v->max) // Fixed value.
     {
       v->knownbitsmask = ~0ull;
       v->knownbits = v->min;
       return;
     }
-  for (int i = 0; i < 62; i++)
+  for (int i = 0; i < 62; i++) // Leading zeroes.
     {
       if (v->min >= 0 && v->max < (1ll << i))
         {
@@ -585,21 +587,21 @@ valinfoLeft (struct valinfo *result, const struct valinfo &left, const struct va
   if (!left.anything && !right.anything && right.min == right.max && right.max < 62)
     {
       result->nothing = left.nothing || right.nothing;
-      struct valinfo rv;
-      rv.nothing = result->nothing;
-      rv.anything = false;
-      rv.min = left.min;
-      rv.max = left.max;
+      long long min, max;
+      min = left.min;
+      max = left.max;
       for(long long r = right.max; r; r--)
         {
-          if (rv.min < 0 || rv.max > (1ll << 61))
+          if (min < 0 || max > (1ll << 61))
             return;
-          rv.min <<= 1;
-          rv.max <<= 1;
+          min <<= 1;
+          max <<= 1;
         }
       if (!result->anything)
-      	rv.max = std::min (result->max, rv.max);
-      *result = rv;
+      	max = std::min (result->max, max);
+      result->anything = false;
+      result->min = min;
+      result->max = max;
     }
   if(!right.anything && right.min > 0 && right.min < 63)
     {

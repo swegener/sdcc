@@ -1,3 +1,9 @@
+2024-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/SDCCsymt.c:
+	  Fix bug #3720.
+
 2024-03-25 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:

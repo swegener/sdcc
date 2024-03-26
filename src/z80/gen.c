@@ -1878,7 +1878,7 @@ operandsEqu (operand * op1, operand * op2)
 /* sameRegs - two asmops have the same registers                   */
 /*-----------------------------------------------------------------*/
 static bool
-sameRegs (asmop * aop1, asmop * aop2)
+sameRegs (const asmop *aop1, const asmop *aop2)
 {
   int i;
 
@@ -1888,7 +1888,7 @@ sameRegs (asmop * aop1, asmop * aop2)
   if (aop1 == aop2)
     return TRUE;
 
-  if (! regalloc_dry_run && // Todo: Check if always enabling this even for dry runs tends to result in better code.
+  if (!regalloc_dry_run && // Todo: Check if always enabling this even for dry runs tends to result in better code.
     (aop1->type == AOP_STK && aop2->type == AOP_STK ||
     aop1->type == AOP_EXSTK && aop2->type == AOP_EXSTK))
     return (aop1->aopu.aop_stk == aop2->aopu.aop_stk);
@@ -6116,8 +6116,8 @@ static void genSend (const iCode *ic)
 {
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   
-  /* Caller saves, and this is the first iPush. */
-  // Scan ahead until we find the function that we are pushing parameters to.
+  /* Caller saves, and this is the first push/send. */
+  // Scan ahead until we find the function that we are pushing/sending parameters to.
   const iCode *walk;
   for (walk = ic->next; walk; walk = walk->next)
     {
@@ -6134,11 +6134,12 @@ static void genSend (const iCode *ic)
   wassert (argreg);
 
   // The register argument shall not overwrite a still-needed (i.e. as further parameter or function for the call) value.
-  for (int i = 0; i < argreg->size; i++)
-    if (!isRegDead (argreg->aopu.aop_reg[i]->rIdx, ic))
-      for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
+  if (!aopSame (argreg, 0, ic->left->aop, 0, argreg->size))
+    for (int i = 0; i < argreg->size; i++)
+      if (!isRegDead (argreg->aopu.aop_reg[i]->rIdx, ic))
+        for (iCode *walk2 = ic->next; walk2; walk2 = walk2->next)
           {
-            if (walk2->op != CALL && IC_LEFT (walk2) && IS_ITEMP (IC_LEFT (walk2)))
+            if (walk2->op != CALL && walk2->left && IS_ITEMP (walk2->left))
               UNIMPLEMENTED;
 
             if (walk2->op == CALL || walk2->op == PCALL)

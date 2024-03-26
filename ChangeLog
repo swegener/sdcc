@@ -3,6 +3,8 @@
 	* src/SDCCgenconstprop.cc,
 	  src/SDCCsymt.c:
 	  Fix bug #3720.
+	* src/z80/gen.c:
+	  Allow for some more flexibility in the handling of register arguments.
 
 2024-03-25 Philipp Klaus Krause <philipp@colecovision.eu>
 

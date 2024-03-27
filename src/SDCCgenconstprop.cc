@@ -102,7 +102,7 @@ create_cfg_genconstprop (cfg_t &cfg, iCode *start_ic, ebbIndex *ebbi)
 }
 
 struct valinfo
-getTypeValinfo (sym_link *type)
+getTypeValinfo (sym_link *type, bool loose)
 {
   struct valinfo v;
   v.anything = true;
@@ -166,9 +166,9 @@ getTypeValinfo (sym_link *type)
     {
       v.anything = false;
       v.max = 0x7fffffffffffffffull >> (64 - bitsForType (type));
-      if (IS_CHAR (type))
-        v.max = 0xffffffffffffffffull >> (64 - bitsForType (type)); // Use upper limit of unsigned type here, since sometimes, SDCC generates incorrect AST (using signed char, where there should be unsigned char) trying to avoid the costs of integer promotion.
       v.min = -v.max - 1;
+      if (loose && IS_CHAR (type))
+        v.max = 0xffffffffffffffffull >> (64 - bitsForType (type)); // Use upper limit of unsigned type here, since sometimes, SDCC generates incorrect AST (using signed char, where there should be unsigned char) trying to avoid the costs of integer promotion.
       v.knownbitsmask = ~(0xffffffffffffffffull >> (64 - bitsForType (type)));
       v.knownbits = 0;
     }
@@ -222,7 +222,7 @@ getOperandValinfo (const iCode *ic, const operand *op)
       return (v);
     }
   else
-    return (getTypeValinfo (type));
+    return (getTypeValinfo (type, true));
 }
 
 static bool
@@ -633,7 +633,7 @@ valinfoRight (struct valinfo *result, const struct valinfo &left, const struct v
 static void
 valinfoCast (struct valinfo *result, sym_link *targettype, const struct valinfo &right)
 {
-  *result = getTypeValinfo (targettype);
+  *result = getTypeValinfo (targettype, false);
   if (right.nothing)
     result->nothing = true;
   else if (!right.anything && (IS_INTEGRAL (targettype) || IS_GENPTR (targettype)) && 
@@ -763,19 +763,22 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
       G[*out] = *ic->valinfos;
 
       if (resultsym)
-        resultvalinfo = getTypeValinfo (operandType (IC_RESULT (ic)));
+        resultvalinfo = getTypeValinfo (operandType (IC_RESULT (ic)), true);
 
 #ifdef DEBUG_GCP_ANALYSIS
-      if (localchange)
-        std::cout << "Recompute node " << i << " ic " << ic->key << "\n";std::cout << "getTypeValinfo: resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << "\n";
+      if (localchange && resultsym)
+        {
+          std::cout << "Recompute node " << i << " ic " << ic->key << "\n";
+          std::cout << "getTypeValinfo: resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << std::dec << " min " << resultvalinfo.min << "\n";
+        }
 #endif
 
       if (end_it_quickly) // Just use the very rough approximation from the type info only to speed up analysis.
         {
           if (left && !(IS_INTEGRAL (operandType (left)) && bitsForType (operandType (left)) < 64 && IS_OP_LITERAL (left)))
-            leftvalinfo = getTypeValinfo (operandType (left));
+            leftvalinfo = getTypeValinfo (operandType (left), true);
           if (right && !(IS_INTEGRAL (operandType (right)) && bitsForType (operandType (right)) < 64 && IS_OP_LITERAL (right)))
-            rightvalinfo = getTypeValinfo (operandType (right));
+            rightvalinfo = getTypeValinfo (operandType (right), true);
         }
 
       if (!localchange) // Input didn't change. No need to recompute result.
@@ -880,7 +883,7 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
         {
           valinfoUpdate (&resultvalinfo);
 #ifdef DEBUG_GCP_ANALYSIS
-          std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << " knownbits 0x" << resultvalinfo.knownbits << std::dec << " min " << resultvalinfo.min << "\n";
+          std::cout << "resultvalinfo anything " << resultvalinfo.anything << " knownbitsmask 0x" << std::hex << resultvalinfo.knownbitsmask << " knownbits 0x" << resultvalinfo.knownbits << std::dec << " min " << resultvalinfo.min << " max " << resultvalinfo.max << "\n";
 #endif
           if (!ic->resultvalinfo)
             ic->resultvalinfo = new struct valinfo;

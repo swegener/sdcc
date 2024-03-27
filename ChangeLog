@@ -1,3 +1,8 @@
+2024-03-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Fix an issue introduced in yesterday's fix for bug #3720.
+
 2024-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

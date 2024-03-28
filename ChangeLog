@@ -1,3 +1,8 @@
+2024-03-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peeph.def:
+	  Optimize out some more intermediate pop/push.
+
 2024-03-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:

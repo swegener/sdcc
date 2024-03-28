@@ -733,9 +733,18 @@ replace restart {
 	ld	%2 (ix), %3
 	push	%1
 } by {
-	; common peephole 51 eliminated dead pop/push pair.
+	; common peephole 51 eliminated dead pop/push %1 pair.
 	ld	%2 (ix), %3
 } if notUsed(%1), operandsNotRelated(%1 %3)
+
+replace restart {
+	pop	%1
+	ld	%2, %3
+	push	%1
+} by {
+	; common peephole 51a eliminated dead pop/push %1 pair.
+	ld	%2, %3
+} if notUsed(%1), operandsNotRelated(%1 %3), operandsNotRelated(%1 %2)
 
 replace restart {
 	push	%1
@@ -753,6 +762,17 @@ replace restart {
 	ld	a, %3
 	; common peephole 52b replaced push/pop pair by load.
 } if canSplitReg(%1 %3 %4), notUsed('f')
+
+replace restart {
+	push	%1
+	ld	%1, %7
+	pop	%2
+} by {
+	ld	%6, %4
+	ld	%5, %3
+	ld	%1, %7
+	; common peephole 52c replaced push/pop pair by loads.
+} if canSplitReg(%1 %3 %4), canSplitReg(%2 %5 %6), notSame(%1 %2 'ix' 'iy'), operandsNotRelated(%7 %1)
 
 replace restart {
 	ld	%3, #%1

@@ -1512,7 +1512,7 @@ spillPairReg (const char *regname)
       switch (*regname)
         {
         case 'h':
-        case 'l':emit2("; spillPairReg hl");
+        case 'l':
           spillPair (PAIR_HL);
           break;
         case 'd':
@@ -4493,7 +4493,7 @@ skip_byte:
       const bool e_free = de_dead && (result->regs[E_IDX] < roffset || !assigned[result->regs[E_IDX] - roffset]);
       const bool d_free = de_dead && (result->regs[D_IDX] < roffset || !assigned[result->regs[D_IDX] - roffset]);
       const bool de_free = e_free && d_free;
- 
+
       if (assigned[i])
         {
           i++;

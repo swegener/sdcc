@@ -4,7 +4,7 @@
   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
   Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
-  Copyright (C) 2011-2023, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2011-2024, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
   Copyright (C) 2021-2022, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
@@ -340,7 +340,7 @@ cost2 (unsigned int bytes, unsigned int z80_states /* also z80n */, unsigned int
     regalloc_dry_run_cost_states += z80_states * regalloc_dry_run_state_scale;
   else if (IS_Z180)
     regalloc_dry_run_cost_states += z180_states * regalloc_dry_run_state_scale;
-  else if (IS_R2K || IS_R2KA || IS_R3KA)
+  else if (IS_RAB)
     regalloc_dry_run_cost_states += r2k_clocks * regalloc_dry_run_state_scale;
   else if (IS_SM83)
     regalloc_dry_run_cost_states += sm83_cycles * regalloc_dry_run_state_scale;
@@ -8816,7 +8816,18 @@ genMinus (const iCode *ic, const iCode *ifx)
           cheapMove (ic->result->aop, 0, ic->left->aop, 0, isRegDead (A_IDX, ic));
           emit3 (A_DEC, ic->result->aop, 0);
           if (!IS_SM83 && aopInReg (ic->result->aop, 0, B_IDX) && IC_TRUE (ifx)) // This jump can likely be optimized to djnz.
-            regalloc_dry_run_cost_bytes--;
+            {
+              // cost2 can't handle negative costs, so we do this manually.
+              regalloc_dry_run_cost_bytes--; 
+              if (IS_Z80 || IS_Z80N || IS_Z180)
+                regalloc_dry_run_cost_states += -3.0 * regalloc_dry_run_state_scale;
+              else if (IS_RAB)
+                regalloc_dry_run_cost_states += -2.0 * regalloc_dry_run_state_scale;
+              else if (IS_TLCS90)
+                regalloc_dry_run_cost_states += +2.0 * regalloc_dry_run_state_scale; // For the TLCS-90, djnz is slower (typically still worth it for code size, though).
+              else if (IS_EZ80_Z80 || IS_R800)
+                regalloc_dry_run_cost_states += -1.0 * regalloc_dry_run_state_scale;
+            }
         }
       else
         {

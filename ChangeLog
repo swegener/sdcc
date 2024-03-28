@@ -2,6 +2,8 @@
 
 	* src/z80/peeph.def:
 	  Optimize out some more intermediate pop/push.
+	* src/z80/gen.c:
+	  Fine-tune djnz optimization hint.
 
 2024-03-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

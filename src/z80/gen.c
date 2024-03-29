@@ -8916,12 +8916,12 @@ genMultOneChar (const iCode * ic)
   symbol *tlbl1, *tlbl2;
   bool savedB = false;
 
-  asmop *result = IC_RESULT (ic)->aop;
+  asmop *result = ic->result->aop;
   int resultsize = result->size;
 
-  if (IC_LEFT (ic)->aop->size > 1 || IC_RIGHT (ic)->aop->size > 2)
+  if (ic->left->aop->size > 1 || ic->right->aop->size > 2)
     wassertl (0, "Large multiplication is handled through support function calls.");
-    
+
   if (IS_SM83)
     {
       wassertl (0, "Multiplication is handled through support function calls on sm83");

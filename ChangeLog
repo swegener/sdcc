@@ -1,3 +1,11 @@
+2024-03-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/stm8/ralloc.c,
+	  src/pdk/ralloc.c,
+	  src/z80/ralloc.c:
+	  Enable more register packing optimizations.
+
 2024-03-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def:

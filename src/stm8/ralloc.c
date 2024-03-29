@@ -376,24 +376,13 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
      The STM8 instructions operating directly on memory
      operands are 8-bit, so the most benefit is in 8-bit
      operations. On the other hand, supporting wider
-     operations well in codegen is also more effort. */ 
-  else if (bitsForType (operandType (IC_RESULT (dic))) > 8)
+     operations well in codegen is also more effort. On the other hand,
+     allowing wider operations here could help reduce register pressure.
+     Currently, codegen can already handle more than 8 bits correctly
+     (except for shifts/rotations), but the code size regresses. */
+  else if (bitsForType (operandType (IC_RESULT (dic))) > 8 /*&& (dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == ROT)*/)
     return 0;
 
-  /* if the result is on stack or iaccess then it must be
-     the same as at least one of the operands */
-  if (OP_SYMBOL (IC_RESULT (ic))->onStack || OP_SYMBOL (IC_RESULT (ic))->iaccess)
-    {
-      /* the operation has only one symbol
-         operator then we can pack */
-      if ((IC_LEFT (dic) && !IS_SYMOP (IC_LEFT (dic))) || (IC_RIGHT (dic) && !IS_SYMOP (IC_RIGHT (dic))))
-        goto pack;
-
-      if (!((IC_LEFT (dic) &&
-             IC_RESULT (ic)->key == IC_LEFT (dic)->key) || (IC_RIGHT (dic) && IC_RESULT (ic)->key == IC_RIGHT (dic)->key)))
-        return 0;
-    }
-pack:
   /* found the definition */
 
   /* delete from liverange table also

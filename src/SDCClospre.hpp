@@ -262,7 +262,7 @@ void tree_dec_lospre_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
     }
 
   if(!alist.size())
-    std::cerr << "No surviving assignments at forget node (lospre).\n";
+    std::cerr << "lospre: No surviving assignments at forget node.\n";
 
 #ifdef DEBUG_LOSPRE
   std::cout << "Remaining assignments: " << alist.size() << "\n"; std::cout.flush();
@@ -745,13 +745,13 @@ static int implement_lospre_assignment(assignment_lospre a, T_t &T, G_t &G, cons
 
   if(substituted <= 0)
     {
-      std::cerr << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did not substitute any calculations.\n";
+      std::cerr << "lospre: Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did not substitute any calculations.\n";
       return (-1);
     }
 
   if(substituted < split) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
     {
-      std::cout << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did substitute only " << substituted << " calculations, while introducing "<< split << ".\n";
+      std::cout << "lospre: Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did substitute only " << substituted << " calculations, while introducing "<< split << ".\n";
       std::cout.flush();
     }
 

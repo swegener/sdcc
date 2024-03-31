@@ -45,20 +45,23 @@ create_cfg_lospre (cfg_lospre_t &cfg, iCode *start_ic, ebbIndex *ebbi)
   // Get control flow graph from sdcc.
   for (ic = start_ic; ic; ic = ic->next)
     {
+      
+      float base_cost = 128.0f /*+ ic->count * (!optimize.codeSize + 2.0f * !optimize.codeSpeed)*/; // Constant summand: Optimization for code size.
+
       if((ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND) && ifxForOp (IC_RESULT (ic), ic))
-        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], 4.0f, cfg); // Try not to separate op from ifx.
+        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], base_cost * 1.3f, cfg); // 1.3f: Try not to separate op from ifx.
       else if (ic->op != GOTO && ic->op != RETURN && ic->op != JUMPTABLE && ic->next)
-        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], 3.0f, cfg);
+        boost::add_edge(key_to_index[ic->key], key_to_index[ic->next->key], base_cost, cfg);
 
       if (ic->op == GOTO)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key], 6.0f, cfg);
+        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, ic->label)->sch->key], base_cost * 2.0f, cfg);
       else if (ic->op == RETURN)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key], 6.0f, cfg);
+        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, returnLabel)->sch->key], base_cost * 2.0f, cfg);
       else if (ic->op == IFX)
-        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key], 6.0f, cfg);
+        boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, IC_TRUE(ic) ? IC_TRUE(ic) : IC_FALSE(ic))->sch->key], base_cost * 2.0f, cfg);
       else if (ic->op == JUMPTABLE)
         for (symbol *lbl = (symbol *)(setFirstItem (IC_JTLABELS (ic))); lbl; lbl = (symbol *)(setNextItem (IC_JTLABELS (ic))))
-          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key], 6.0f, cfg);
+          boost::add_edge(key_to_index[ic->key], key_to_index[eBBWithEntryLabel(ebbi, lbl)->sch->key], base_cost * 2.0f, cfg);
     }
 }
 
@@ -269,6 +272,13 @@ void dump_cfg_lospre (const cfg_lospre_t &cfg)
       const char *iLine = printILine (cfg[i].ic);
       std::ostringstream os;
       os << i << ", " << cfg[i].ic->key << " : " << iLine;
+      { // Ugly workaround for me not knowing how to make boost::write_graphviz write the edge weight.
+        typedef typename boost::graph_traits<cfg_lospre_t>::out_edge_iterator n_iter_t;
+        n_iter_t n, n_end;
+        boost::tie(n, n_end) = boost::out_edges(i, cfg);
+        if(n != n_end)
+         os << " weight of first outgoing edge: " << cfg[*n];
+      }
       dbuf_free (iLine);
       name[i] = os.str();
     }

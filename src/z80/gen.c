@@ -9631,6 +9631,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
   bool result_in_carry = FALSE;
   int a_always_byte = -1;
   bool started = false;
+  bool inv = false;
 
   /* if left & right are bit variables */
   if (left->aop->type == AOP_CRY && right->aop->type == AOP_CRY)
@@ -9680,7 +9681,15 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         (right->aop->type == AOP_LIT || right->aop->type == AOP_REG && right->aop->aopu.aop_reg[offset]->rIdx != IYL_IDX && right->aop->aopu.aop_reg[offset]->rIdx != IYH_IDX || right->aop->type == AOP_STK))
         {
           emit3 (A_CP, ASMOP_A, right->aop);
-          result_in_carry = TRUE;
+          result_in_carry = true;
+          goto release;
+        }
+      else if (ifx && size == 1 && !sign && aopInReg (right->aop, 0, A_IDX) && left->aop->type == AOP_LIT && ullFromVal (left->aop->aopu.aop_lit) < 255)
+        {
+          emit3 (A_CP, ASMOP_A, left->aop);
+          emit2 ("cp a, !immedbyte", ullFromVal (left->aop->aopu.aop_lit) + 1);
+          result_in_carry = true;
+          inv = true;
           goto release;
         }
         
@@ -9822,7 +9831,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           goto fix;
         }
 
-      if (IS_SM83 && sign && right->aop->type != AOP_LIT)
+      if (IS_SM83 && sign && right->aop->type != AOP_LIT && !aopInReg (left->aop, offset, A_IDX))
         {
           cheapMove (ASMOP_A, 0, right->aop, size - 1, true);
           cheapMove (ASMOP_E, 0, ASMOP_A, 0, true);
@@ -9910,7 +9919,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           size -= 2;
           offset += 2;
         }
-      else if (left->aop->type == AOP_LIT)
+      else if (left->aop->type == AOP_LIT && !aopInReg (right->aop, offset, A_IDX) && isRegDead (A_IDX, ic))
         {
           bool pushed_hl = false;
           if (byteOfVal (left->aop->aopu.aop_lit, offset) == 0x00)
@@ -9983,7 +9992,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               size--;
               offset++;
             }
-          else if (right->aop->type != AOP_STL)
+          else if (right->aop->type != AOP_STL && !aopInReg (right->aop, offset, A_IDX))
             {
               if (!left_already_in_a)
                 cheapMove (ASMOP_A, 0, left->aop, offset, true);
@@ -10053,6 +10062,7 @@ fix:
 release:
   if (result->aop->type == AOP_CRY && result->aop->size)
     {
+      wassert (!inv);
       if (!result_in_carry)
         {
           /* Shift the sign bit up into carry */
@@ -10069,6 +10079,7 @@ release:
         {
           if (!result_in_carry)
             {
+              wassert (!inv);
               if (!IS_SM83)
                 genIfxJump (ifx, "m");
               else
@@ -10078,10 +10089,11 @@ release:
                 }
             }
           else
-            genIfxJump (ifx, "c");
+            genIfxJump (ifx, inv ? "nc" : "c");
         }
       else
         {
+          wassert (!inv);
           if (!result_in_carry)
             {
               /* Shift the sign bit up into carry */
@@ -10893,6 +10905,13 @@ genAnd (const iCode * ic, iCode * ifx)
               if (!regalloc_dry_run)
                 emit2 ("tst a, %s", aopGet (right->aop, 0, FALSE));
               cost2 (3, 11, 9, 0, 0, 0, 3, 0);
+              sizel--;
+              offset++;
+            }
+          else if (!isRegDead (A_IDX, ic) && bytelit == 0x0ff && !aopInReg (left->aop, offset, A_IDX) && left->aop->type == AOP_REG && !aopInReg (left->aop, offset, IYL_IDX) && !aopInReg (left->aop, offset, IYH_IDX))
+            {
+              emit3_o (A_RLC, left->aop, offset, 0, 0);
+              emit3_o (A_RRC, left->aop, offset, 0, 0);
               sizel--;
               offset++;
             }

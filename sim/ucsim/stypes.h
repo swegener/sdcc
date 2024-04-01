@@ -265,8 +265,9 @@ enum cpu_type {
   // Padauk
   CPU_PDK13	= 0x0001,
   CPU_PDK14	= 0x0002,
-  CPU_PDK15	= 0x0003,
-  CPU_PDK16     = 0x0004,
+  CPU_PDK15	= 0x0004,
+  CPU_PDK16     = 0x0008,
+  CPU_PDKX      = 0x0010,
   
   CPU_F8	= 0x0001,
 

@@ -509,16 +509,5 @@ struct cpu_entry cpus_stm8[]=
     {NULL, CPU_NONE, 0, "", ""}
   };
 
-struct cpu_entry cpus_pdk[]=
-  {
-    {"PDK13"   , CPU_PDK13, 0			, "PDK13"		, ""},
-    {"PMC153"  , CPU_PDK13, 0			, "PDK13"		, ""},
-    {"PDK14"   , CPU_PDK14, 0			, "PDK14"		, ""},
-    {"PMS132B" , CPU_PDK14, 0			, "PDK14"		, ""},
-    {"PDK15"   , CPU_PDK15, 0			, "PDK15"		, ""},
-    {"PMS134"  , CPU_PDK15, 0			, "PDK15"		, ""},
-    
-    {NULL, CPU_NONE, 0, "", ""}
-  };
 
 /* End of globals.cc */

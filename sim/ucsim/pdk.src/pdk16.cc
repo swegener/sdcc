@@ -27,33 +27,44 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "pdk16cl.h"
 
-#define PDK16 cl_pdk16
 
-PDK16::PDK16(class cl_sim *asim):
-  cl_pdk(asim)
+cl_fppa16::cl_fppa16(int aid, class cl_pdk *the_puc, class cl_sim *asim):
+  cl_fppa15(aid, the_puc, asim)
 {
-  PCmask= 0xffff;
+  type= new struct cpu_entry;
+  type->type= CPU_PDK16;
 }
 
-int
-PDK16::init(void)
+cl_fppa16::cl_fppa16(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim):
+  cl_fppa15(aid, the_puc, IType, asim)
 {
-  cl_pdk::init();
+}
+
+
+int
+cl_fppa16::init(void)
+{
+  cl_fppa::init();
   return 0;
 }
 
 const char *
-PDK16::id_string(void)
+cl_fppa16::id_string(void)
 {
   return "pdk16";
 }
 
 void
-PDK16::reset(void)
+cl_fppa16::reset(void)
 {
-  cl_pdk::reset();
+  cl_fppa::reset();
 }
 
+int
+cl_fppa16::execute(unsigned int code)
+{
+  return resINV;
+}
 
 
 /* End of pdk.src/pdk16.cc */

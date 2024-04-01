@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "appcl.h"
 
 // local
+#include "glob.h"
 #include "simpdkcl.h"
 
 

@@ -1,5 +1,5 @@
 /* pdk.src/instcl.h */
-
+/*
 int get_mem(unsigned int addr);
 unsigned char add_to(unsigned char initial, int value, bool carry = false);
 unsigned char sub_to(unsigned char initial, int value, bool carry = false);
@@ -22,5 +22,5 @@ int execute(unsigned int code);
 int execute_pdk13(unsigned int code);
 int execute_pdk14(unsigned int code);
 int execute_pdk15(unsigned int code);
-
+*/
 /* End of pdk.src/instcl.h */

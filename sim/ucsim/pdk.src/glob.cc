@@ -359,4 +359,27 @@ struct dis_entry disass_pdk_15[]= {
 };
 
 
+struct cpu_entry cpus_pdk[]=
+  {
+    {"13"      , CPU_PDK13, 0			, "PDK13"		, ""},
+    {"PDK13"   , CPU_PDK13, 0			, "PDK13"		, ""},
+    {"PMC153"  , CPU_PDK13, 0			, "PDK13"		, ""},
+    
+    {"14"      , CPU_PDK14, 0			, "PDK14"		, ""},
+    {"PDK14"   , CPU_PDK14, 0			, "PDK14"		, ""},
+    {"PMS132B" , CPU_PDK14, 0			, "PDK14"		, ""},
+    
+    {"15"      , CPU_PDK15, 0			, "PDK15"		, ""},
+    {"PDK15"   , CPU_PDK15, 0			, "PDK15"		, ""},
+    {"PMS134"  , CPU_PDK15, 0			, "PDK15"		, ""},
+
+    {"16"      , CPU_PDK16, 0			, "PDK16"		, ""},
+    {"PDK16"   , CPU_PDK16, 0			, "PDK16"		, ""},
+
+    {"X"       , CPU_PDKX, 0			, "PDKX"		, ""},
+
+    {NULL, CPU_NONE, 0, "", ""}
+  };
+
+
 /* glob.cc */

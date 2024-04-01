@@ -39,6 +39,9 @@ extern struct dis_entry disass_pdk_15[];
 
 /*extern struct dis_entry disass_pdk_16[];*/
 
+extern struct cpu_entry cpus_pdk[];
+
+
 #endif
 
 /* End of pdk.src/glob.h */

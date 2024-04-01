@@ -45,15 +45,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "glob.h"
-#include "pdkcl.h"
+#include "pdk16cl.h"
 //#include "portcl.h"
 //#include "regspdk.h"
 
 /*******************************************************************/
 
-cl_pdk::cl_pdk(class cl_sim *asim):
+cl_fppa::cl_fppa(int aid, class cl_pdk *the_puc, class cl_sim *asim):
   cl_uc(asim)
 {
+  id= aid;
+  puc= the_puc;
+  PCmask= 0xfff;
 }
 
 
@@ -61,17 +64,14 @@ cl_pdk::cl_pdk(class cl_sim *asim):
  * Base type of PDK controllers
  */
 
-cl_pdk::cl_pdk(struct cpu_entry *IType, class cl_sim *asim) : cl_uc(asim) {
+cl_fppa::cl_fppa(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim) : cl_uc(asim)
+{
+  id= aid;
+  puc= the_puc;
   type = IType;
-  if (type->type == CPU_PDK13)
-    PCmask= 0x3ff;
-  if (type->type == CPU_PDK14)
-    PCmask= 0x7ff;
-  if (type->type == CPU_PDK15)
-    PCmask= 0xfff;
 }
 
-int cl_pdk::init(void) {
+int cl_fppa::init(void) {
   cl_uc::init(); /* Memories now exist */
 
   //set_xtal(8000000);
@@ -85,51 +85,33 @@ int cl_pdk::init(void) {
   //   ram->set((t_addr)i, 0);
   // }
 
+  cA= new cl_cell8();
+  cA->init();
+  cA->decode(&rA);
+
   return (0);
 }
 
-void cl_pdk::reset(void) {
+
+void
+cl_fppa::act(void)
+{
+  cSP->decode(&rSP);
+  cF ->decode(&rF);
+}
+
+void cl_fppa::reset(void) {
   cl_uc::reset();
   sp_most = 0x00;
 
-  PC = 0x0000;
-  regs.a = 0;
+  PC = id;
+  rA = 0;
   for (t_addr i = 0; i < io_size; ++i) {
     store_io(i, 0);
   }
 }
 
-const char *cl_pdk::id_string(void) {
-  switch (type->type) {
-    case CPU_PDK13:
-      return("pdk13");
-    case CPU_PDK14:
-      return("pdk14");
-    case CPU_PDK15:
-      return("pdk15");
-    default:
-      return("unknown pdk");
-  }
-}
-
-/*
- * Making elements of the controller
- */
-/*
-t_addr
-cl_pdk::get_mem_size(enum mem_class type)
-{
-  switch(type)
-    {
-    case MEM_ROM: return(0x10000);
-    case MEM_XRAM: return(0x10000);
-    default: return(0);
-    }
- return(cl_uc::get_mem_size(type));
-}
-*/
-
-void cl_pdk::mk_hw_elements(void)
+void cl_fppa::mk_hw_elements(void)
 {
   // TODO: Add hardware stuff here.
   class cl_hw *h;
@@ -139,83 +121,84 @@ void cl_pdk::mk_hw_elements(void)
   h->init();
 }
 
-class cl_memory_chip *c;
-
-void cl_pdk::make_memories(void) {
+void cl_fppa::make_memories(void)
+{
   class cl_address_space *as;
-
   int rom_storage, ram_storage;
-  switch (type->type) {
-  case CPU_PDK13:
-    rom_storage = 0x400;
-    ram_storage = 0x40;
-    break;
-  case CPU_PDK14:
-    rom_storage = 0x800;
-    ram_storage = 0x80;
-    break;
-  case CPU_PDK15:
-    rom_storage = 0x1000;
-    ram_storage = 0x100;
-    break;
-  default:
-    return;//__builtin_unreachable();
-  }
-  rom = as = new cl_address_space("rom", 0, rom_storage, 16);
-  as->init();
-  address_spaces->add(as);
-  ram = as = new cl_address_space("ram", 0, ram_storage, 8);
-  as->init();
-  address_spaces->add(as);
-  regs8 = as = new cl_address_space("regs8", 0, io_size + 1, 8);
-  as->init();
-  address_spaces->add(as);
 
-  {
-    class cl_address_decoder *ad;
-    class cl_memory_chip *chip;
-
-    chip = new cl_chip16("rom_chip", rom_storage, 16);
-    chip->init();
-    memchips->add(chip);
-
-    ad = new cl_address_decoder(as = address_space("rom"), chip, 0, rom_storage-1, 0);
-    ad->init();
-    as->decoders->add(ad);
-    ad->activate(0);
-
-    chip = new cl_chip16("ram_chip", ram_storage, 8);
-    chip->init();
-    memchips->add(chip);
-
-    ad = new cl_address_decoder(as = address_space("ram"), chip, 0, ram_storage-1, 0);
-    ad->init();
-    as->decoders->add(ad);
-    ad->activate(0);
-
-    chip = new cl_chip16("io_chip", io_size, 8);
-    chip->init();
-    memchips->add(chip);
-
-    ad = new cl_address_decoder(as = address_space("regs8"), chip, 0, io_size-1, 0);
-    ad->init();
-    as->decoders->add(ad);
-    ad->activate(0);
-  }
-  {
-    // extra byte of the IO memory will point to the A register just for the debugger
-    regs8->get_cell(io_size)->decode(&(regs._a));
-  }
-
-  vars->add("flag", regs8, 0, 7, 0, "Flags");
-  vars->add("sp", regs8, 1, 7, 0, "Stack Pointer");
+  if (puc != NULL)
+    {
+      ram= puc->ram;
+      rom= puc->rom;
+      sfr= puc->sfr;
+    }
+  else
+    {
+      rom_storage = 0x1000;
+      ram_storage = 0x100;
+      rom = as = new cl_address_space("rom", 0, rom_storage, 16);
+      as->init();
+      address_spaces->add(as);
+      ram = as = new cl_address_space("ram", 0, ram_storage, 8);
+      as->init();
+      address_spaces->add(as);
+      sfr = as = new cl_address_space("regs8", 0, io_size + 1, 8);
+      as->init();
+      address_spaces->add(as);
+      
+      class cl_address_decoder *ad;
+      class cl_memory_chip *chip;
+    
+      chip = new cl_chip16("rom_chip", rom_storage, 16);
+      chip->init();
+      memchips->add(chip);
+      
+      ad = new cl_address_decoder(as = rom, chip, 0, rom_storage-1, 0);
+      ad->init();
+      as->decoders->add(ad);
+      ad->activate(0);
+      
+      chip = new cl_chip16("ram_chip", ram_storage, 8);
+      chip->init();
+      memchips->add(chip);
+      
+      ad = new cl_address_decoder(as = ram, chip, 0, ram_storage-1, 0);
+      ad->init();
+      as->decoders->add(ad);
+      ad->activate(0);
+      
+      chip = new cl_chip16("io_chip", io_size, 8);
+      chip->init();
+      memchips->add(chip);
+      
+      ad = new cl_address_decoder(as = sfr, chip, 0, io_size-1, 0);
+      ad->init();
+      as->decoders->add(ad);
+      ad->activate(0);
+   
+      // extra byte of the IO memory will point to the A register just for the debugger
+      sfr->get_cell(io_size)->decode(&(rA));
+    }
+  
+  cSP= sfr->get_cell(2);
+  cF = sfr->get_cell(0);
+  act();
 }
+
+
+void
+cl_fppa::build_cmdset(class cl_cmdset *cmdset)
+{
+  if (puc == NULL)
+    cl_uc::build_cmdset(cmdset);
+}
+
 
 /*
  * Help command interpreter
  */
 
-struct dis_entry *cl_pdk::dis_tbl(void) {
+struct dis_entry *cl_fppa::dis_tbl(void) {
   switch (type->type) {
   case CPU_PDK13:
     return (disass_pdk_13);
@@ -228,23 +211,12 @@ struct dis_entry *cl_pdk::dis_tbl(void) {
   }
 }
 
-/*struct name_entry *
-cl_pdk::sfr_tbl(void)
-{
-  return(0);
-}*/
 
-/*struct name_entry *
-cl_pdk::bit_tbl(void)
-{
-  //FIXME
-  return(0);
-}*/
-
-int cl_pdk::inst_length(t_addr /*addr*/) {
+int cl_fppa::inst_length(t_addr /*addr*/) {
   return 1;
 }
-int cl_pdk::inst_branch(t_addr addr) {
+
+int cl_fppa::inst_branch(t_addr addr) {
   int b;
 
   get_disasm_info(addr, NULL, &b, NULL, NULL);
@@ -252,7 +224,7 @@ int cl_pdk::inst_branch(t_addr addr) {
   return b;
 }
 
-bool cl_pdk::is_call(t_addr addr) {
+bool cl_fppa::is_call(t_addr addr) {
   struct dis_entry *e;
 
   get_disasm_info(addr, NULL, NULL, NULL, &e);
@@ -260,9 +232,9 @@ bool cl_pdk::is_call(t_addr addr) {
   return e ? (e->is_call) : false;
 }
 
-int cl_pdk::longest_inst(void) { return 1; }
+int cl_fppa::longest_inst(void) { return 1; }
 
-const char *cl_pdk::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
+const char *cl_fppa::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
                                     int *immed_offset,
                                     struct dis_entry **dentry) {
   const char *b = NULL;
@@ -314,7 +286,7 @@ const char *cl_pdk::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
   return b;
 }
 
-char *cl_pdk::disass(t_addr addr)
+char *cl_fppa::disass(t_addr addr)
 {
   chars work, temp;
   const char *b;
@@ -419,12 +391,16 @@ char *cl_pdk::disass(t_addr addr)
   return strdup(work.c_str());
 }
 
-void cl_pdk::print_regs(class cl_console_base *con) {
+void
+cl_fppa::print_regs(class cl_console_base *con)
+{
+  act();
   con->dd_color("answer");
-  con->dd_printf("A= 0x%02x(%3d)\n", regs.a, regs.a);
-  con->dd_printf("Flag= 0x%02x(%3d)  \n", get_flags(), get_flags());
-  con->dd_printf("SP= 0x%02x(%3d)\n", get_SP(), get_SP());
-
+  con->dd_printf("A = %02x %3u\n", rA, rA);
+  con->dd_printf("       OACZ\n");
+  con->dd_printf("F = %02x ", rF);
+  con->dd_printf("%d%d%d%d\n", fO, fA, fC, fZ);
+  con->dd_printf("SP= %02x\n", rSP);
   print_disass(PC, con);
 }
 
@@ -432,10 +408,11 @@ void cl_pdk::print_regs(class cl_console_base *con) {
  * Execution
  */
 
-int cl_pdk::exec_inst(void)
+int cl_fppa::exec_inst(void)
 {
   t_mem code;
 
+  act();
   instPC= PC;
   if (fetch(&code)) {
     return (resBREAKPOINT);
@@ -450,5 +427,318 @@ int cl_pdk::exec_inst(void)
     }
   return (status);
 }
+
+
+void
+cl_fppa::stack_check_overflow(void)
+{
+  if (0)
+    {
+      class cl_stack_op *op;
+      op= new cl_stack_op(stack_push, instPC, rSP-1, rSP);
+      class cl_error_stack_overflow *e=
+	new cl_error_stack_overflow(op);
+      e->init();
+      error(e);
+    }
+}
+
+
+/****************************************************************************/
+
+
+/* Set nr of active FPP */
+
+t_mem
+cl_act_cell::write(t_mem val)
+{
+  val= puc->set_act(val);
+  return cl_pdk_cell::write(val);
+}
+
+/* Set nr of FPPs */
+
+t_mem
+cl_nuof_cell::write(t_mem val)
+{
+  val= puc->set_nuof(val);
+  return cl_pdk_cell::write(val);
+}
+
+
+cl_fppen_op::cl_fppen_op(class cl_pdk *the_puc, class cl_memory_cell *acell):
+  cl_memory_operator(acell)
+{
+  puc= the_puc;
+}
+
+t_mem
+cl_fppen_op::write(t_mem val)
+{
+  return puc->set_fppen(val);
+}
+
+
+/*
+ * PDK uc
+ */
+
+cl_pdk::cl_pdk(struct cpu_entry *IType, class cl_sim *asim):
+  cl_uc(asim)
+{
+  int i;
+  type = IType;
+  for (i= 0; i<8; i++)
+    fpps[i]= NULL;
+}
+
+int
+cl_pdk::init(void)
+{
+  cl_uc::init();
+  class cl_fppen_op *op;
+  fpps[0]= mk_fppa(0);
+
+  cFPPEN= sfr->get_cell(1);
+  op= new cl_fppen_op(this, cFPPEN);
+  op->init();
+  cFPPEN->append_operator(op);
+  reg_cell_var(cFPPEN, &rFPPEN, "FPPEN", "FPP unit Enable Register");
+  mk_cvar(sfr->get_cell(0), "FLAG", "ACC Status Flag Register");
+  mk_cvar(sfr->get_cell(2), "SP", "Stack Pointer Register");
+
+  cact= new cl_act_cell(this);
+  reg_cell_var(cact, &act, "fpp", "ID of actual FPPA");
+  nuof_fpp= 1;
+  cnuof_fpp= new cl_nuof_cell(this);
+  reg_cell_var(cnuof_fpp, &nuof_fpp, "nuof_fpp", "Number of FPPs");
+
+  if (type->type == CPU_PDKX)
+    {
+      fpps[1]= mk_fppa(1);
+      fpps[2]= mk_fppa(2);
+      fpps[3]= mk_fppa(3);
+      fpps[4]= mk_fppa(4);
+      fpps[5]= mk_fppa(5);
+      fpps[6]= mk_fppa(6);
+      fpps[7]= mk_fppa(7);
+      nuof_fpp= 8;
+    }
+  
+  act= 0;
+  rFPPEN= 1;
+  return 0;
+}
+
+const char *
+cl_pdk::id_string(void)
+{
+  switch (type->type)
+    {
+    case CPU_PDK13:
+      return("pdk13");
+    case CPU_PDK14:
+      return("pdk14");
+    case CPU_PDK15:
+      return("pdk15");
+    case CPU_PDK16:
+      return("pdk16");
+    default:
+      return("pdk");
+  }
+}
+
+void
+cl_pdk::make_memories(void)
+{
+  class cl_address_space *as;
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+  int rom_size= 0x1000, ram_size=0x100;
+
+  rom = as = new cl_address_space("rom", 0, rom_size, 16);
+  as->init();
+  address_spaces->add(as);
+  ram = as = new cl_address_space("ram", 0, ram_size, 8);
+  as->init();
+  address_spaces->add(as);
+  sfr = as = new cl_address_space("regs8", 0, io_size + 1, 8);
+  as->init();
+  address_spaces->add(as);
+
+  chip = new cl_chip16("rom_chip", rom_size, 16);
+  chip->init();
+  memchips->add(chip);
+
+  ad = new cl_address_decoder(as = rom, chip, 0, rom_size-1, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  chip = new cl_chip16("ram_chip", ram_size, 8);
+  chip->init();
+  memchips->add(chip);
+  
+  ad = new cl_address_decoder(as = ram, chip, 0, ram_size-1, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+    
+  chip = new cl_chip16("io_chip", io_size, 8);
+  chip->init();
+  memchips->add(chip);
+
+  ad = new cl_address_decoder(as = sfr, chip, 0, io_size-1, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+}
+
+class cl_fppa *
+cl_pdk::mk_fppa(int id)
+{
+  class cl_fppa *fppa;
+  switch (type->type)
+    {
+    case CPU_PDK13: fppa= new cl_fppa13(id, this, sim); break;
+    case CPU_PDK14: fppa= new cl_fppa14(id, this, sim); break;
+    case CPU_PDK15: fppa= new cl_fppa15(id, this, sim); break;
+    case CPU_PDK16: fppa= new cl_fppa16(id, this, sim); break;
+    case CPU_PDKX:  fppa= new cl_fppa15(id, this, sim); break;
+    default: fppa= new cl_fppa14(id, this, sim); break;
+    }  
+  fppa->init();
+  return fppa;
+}
+
+
+u8_t
+cl_pdk::set_fppen(u8_t val)
+{
+  int i;
+  u8_t m;
+  if (val == 0)
+    val= 1;
+  for (i=0, m=1; i<8; i++, m<<=1)
+    {
+      if (fpps[i] == NULL)
+	val&= ~m;
+    }
+  return val;
+}
+
+u8_t
+cl_pdk::set_act(u8_t val)
+{
+  if (val < nuof_fpp)
+    return val;
+  return 0;
+}
+
+u8_t
+cl_pdk::set_nuof(u8_t val)
+{
+  int i;
+  if (val > 8)
+    val= 8;
+  if (val<1)
+    val= 1;
+  for (i=0; i<8; i++)
+    {
+      if (i<val)
+	{
+	  if (fpps[i] == NULL)
+	    fpps[i]= mk_fppa(i);
+	  else
+	    fpps[i]->reset();
+	}
+      else
+	{
+	  if (fpps[i] != NULL)
+	    {
+	      delete fpps[i];
+	      fpps[i]= NULL;
+	    }
+	}
+    }
+  if (rFPPEN == 0)
+    set_fppen(1);
+  else
+    set_fppen(rFPPEN);
+  return val;
+}
+
+
+int
+cl_pdk::exec_inst(void)
+{
+  while (!(rFPPEN & (1<<act)))
+    act= (act+1)%nuof_fpp;
+  fpps[act]->pre_inst();
+  int ret= fpps[act]->exec_inst();
+  fpps[act]->post_inst();
+  tick(inst_ticks= fpps[act]->inst_ticks);
+  if (rFPPEN != 1)
+    {
+      do
+	act= (act+1)%nuof_fpp;
+      while (!(rFPPEN & (1<<act)));
+    }
+  return ret;
+}
+
+
+void
+cl_pdk::print_regs(class cl_console_base *con)
+{
+  int i;
+  
+  for (i= 0; i<nuof_fpp; i++)
+    {
+      //con->dd_color((i==act)?"result":"answer");
+      if (rFPPEN & (1<<i))
+	con->dd_cprintf("ui_run", "FPP%d:EN   ", i);
+      else
+	con->dd_cprintf("ui_stop", "FPP%d:DIS  ", i);
+    }
+  con->dd_printf("\n");
+  for (i= 0; i<nuof_fpp; i++)
+    {
+      con->dd_color((i==act)?"result":"answer");
+      con->dd_printf("A=%02x %3u  ", fpps[i]->rA, fpps[i]->rA);
+    }
+  con->dd_printf("\n");
+  for (i= 0; i<nuof_fpp; i++)
+    {
+      con->dd_color((i==act)?"result":"answer");
+      con->dd_printf("  OACZ    ");
+    }
+  con->dd_printf("\n");
+  for (i= 0; i<nuof_fpp; i++)
+    {
+      con->dd_color((i==act)?"result":"answer");
+      con->dd_printf("F=", fpps[i]->rF);
+      con->dd_printf("%d%d%d%d    ",
+		     ((fpps[i]->rF&BIT_OV)>>BITPOS_OV),
+		     ((fpps[i]->rF&BIT_AC)>>BITPOS_AC),
+		     ((fpps[i]->rF&BIT_C )>>BITPOS_C ),
+		     ((fpps[i]->rF&BIT_Z )>>BITPOS_Z ));
+    }
+  con->dd_printf("\n");
+  for (i= 0; i<nuof_fpp; i++)
+    {
+      con->dd_color((i==act)?"result":"answer");
+      con->dd_printf("SP=%02x     ", fpps[i]->rSP);
+    }
+  con->dd_printf("\n");
+
+  for (i=0; i<nuof_fpp; i++)
+    {
+      con->dd_color((i==act)?"result":"answer");
+      con->dd_printf("FPP%d: ", i);
+      fpps[0]->print_disass(fpps[i]->PC, con);
+    }
+}
+
 
 /* End of pdk.src/pdk.cc */

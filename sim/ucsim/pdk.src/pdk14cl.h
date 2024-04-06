@@ -31,12 +31,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "pdk13cl.h"
 
 
-class cl_fppa14: public cl_fppa13
+class cl_fpp14: public cl_fpp13
 {
  public:
-  cl_fppa14(int aid, class cl_pdk *the_puc, class cl_sim *asim);
-  cl_fppa14(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim);
+  cl_fpp14(int aid, class cl_pdk *the_puc, class cl_sim *asim);
+  cl_fpp14(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim);
   virtual const char *id_string(void) { return "pdk14"; }
+  virtual int m_mask(void) { return 0x7f; }
+  virtual int io_mask(void) { return 0x3f; }
+  virtual int rom_mask(void) { return 0x1fff; }
+  virtual struct dis_entry *dis_tbl(void);
   virtual int execute(unsigned int code);
 };
 

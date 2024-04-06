@@ -51,7 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /*******************************************************************/
 
-cl_fppa::cl_fppa(int aid, class cl_pdk *the_puc, class cl_sim *asim):
+cl_fpp::cl_fpp(int aid, class cl_pdk *the_puc, class cl_sim *asim):
   cl_uc(asim)
 {
   id= aid;
@@ -64,14 +64,14 @@ cl_fppa::cl_fppa(int aid, class cl_pdk *the_puc, class cl_sim *asim):
  * Base type of PDK controllers
  */
 
-cl_fppa::cl_fppa(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim) : cl_uc(asim)
+cl_fpp::cl_fpp(int aid, class cl_pdk *the_puc, struct cpu_entry *IType, class cl_sim *asim) : cl_uc(asim)
 {
   id= aid;
   puc= the_puc;
   type = IType;
 }
 
-int cl_fppa::init(void) {
+int cl_fpp::init(void) {
   cl_uc::init(); /* Memories now exist */
 
   //set_xtal(8000000);
@@ -85,22 +85,34 @@ int cl_fppa::init(void) {
   //   ram->set((t_addr)i, 0);
   // }
 
-  cA= new cl_cell8();
-  cA->init();
-  cA->decode(&rA);
+  cA.init();
+  cA.decode(&rA);
 
+  if (puc)
+    {
+      chars n, d;
+      n.format("A%d", id);
+      d.format("Accumulator of FPP%d", id);
+      puc->mk_cvar(&cA, n, d);
+      if (id == 0)
+	puc->mk_cvar(&cA, "A", "Accumulator");
+      n.format("PC%d", id);
+      d.format("Program counter of FPP%d", id);
+      puc->mk_cvar(&cPC, n, d);
+    }
+  
   return (0);
 }
 
 
 void
-cl_fppa::act(void)
+cl_fpp::act(void)
 {
   cSP->decode(&rSP);
   cF ->decode(&rF);
 }
 
-void cl_fppa::reset(void) {
+void cl_fpp::reset(void) {
   cl_uc::reset();
   sp_most = 0x00;
 
@@ -109,9 +121,10 @@ void cl_fppa::reset(void) {
   for (t_addr i = 0; i < io_size; ++i) {
     store_io(i, 0);
   }
+  rTMP= 0;
 }
 
-void cl_fppa::mk_hw_elements(void)
+void cl_fpp::mk_hw_elements(void)
 {
   // TODO: Add hardware stuff here.
   class cl_hw *h;
@@ -121,11 +134,21 @@ void cl_fppa::mk_hw_elements(void)
   h->init();
 }
 
-void cl_fppa::make_memories(void)
+void cl_fpp::make_memories(void)
 {
   class cl_address_space *as;
-  int rom_storage, ram_storage;
+  int rom_storage= 0x2000, ram_storage= 0x200;
+  int rom_width= 16;
 
+  switch (type->type)
+    {
+    case CPU_PDK13: rom_width= 13; break;
+    case CPU_PDK14: rom_width= 14; break;
+    case CPU_PDK15: rom_width= 15; break;
+    case CPU_PDK16: rom_width= 16; break;
+    default: rom_width= 16;
+    }
+  
   if (puc != NULL)
     {
       ram= puc->ram;
@@ -134,22 +157,20 @@ void cl_fppa::make_memories(void)
     }
   else
     {
-      rom_storage = 0x1000;
-      ram_storage = 0x100;
-      rom = as = new cl_address_space("rom", 0, rom_storage, 16);
+      rom = as = new cl_address_space("rom", 0, rom_storage, rom_width);
       as->init();
       address_spaces->add(as);
       ram = as = new cl_address_space("ram", 0, ram_storage, 8);
       as->init();
       address_spaces->add(as);
-      sfr = as = new cl_address_space("regs8", 0, io_size + 1, 8);
+      sfr = as = new cl_address_space("regs8", 0, io_size, 8);
       as->init();
       address_spaces->add(as);
       
       class cl_address_decoder *ad;
       class cl_memory_chip *chip;
     
-      chip = new cl_chip16("rom_chip", rom_storage, 16);
+      chip = new cl_chip16("rom_chip", rom_storage, rom_width);
       chip->init();
       memchips->add(chip);
       
@@ -187,7 +208,7 @@ void cl_fppa::make_memories(void)
 
 
 void
-cl_fppa::build_cmdset(class cl_cmdset *cmdset)
+cl_fpp::build_cmdset(class cl_cmdset *cmdset)
 {
   if (puc == NULL)
     cl_uc::build_cmdset(cmdset);
@@ -197,11 +218,11 @@ cl_fppa::build_cmdset(class cl_cmdset *cmdset)
 /*
  * Help command interpreter
  */
-
+/*
 struct dis_entry *cl_fppa::dis_tbl(void) {
   switch (type->type) {
-  case CPU_PDK13:
-    return (disass_pdk_13);
+    case CPU_PDK13:
+      return (disass_pdk_13);
   case CPU_PDK14:
     return (disass_pdk_14);
   case CPU_PDK15:
@@ -210,13 +231,13 @@ struct dis_entry *cl_fppa::dis_tbl(void) {
     return NULL;//__builtin_unreachable();
   }
 }
+*/
 
-
-int cl_fppa::inst_length(t_addr /*addr*/) {
+int cl_fpp::inst_length(t_addr /*addr*/) {
   return 1;
 }
 
-int cl_fppa::inst_branch(t_addr addr) {
+int cl_fpp::inst_branch(t_addr addr) {
   int b;
 
   get_disasm_info(addr, NULL, &b, NULL, NULL);
@@ -224,7 +245,7 @@ int cl_fppa::inst_branch(t_addr addr) {
   return b;
 }
 
-bool cl_fppa::is_call(t_addr addr) {
+bool cl_fpp::is_call(t_addr addr) {
   struct dis_entry *e;
 
   get_disasm_info(addr, NULL, NULL, NULL, &e);
@@ -232,34 +253,30 @@ bool cl_fppa::is_call(t_addr addr) {
   return e ? (e->is_call) : false;
 }
 
-int cl_fppa::longest_inst(void) { return 1; }
+int cl_fpp::longest_inst(void) { return 1; }
 
-const char *cl_fppa::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
+const char *cl_fpp::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
                                     int *immed_offset,
                                     struct dis_entry **dentry) {
   const char *b = NULL;
   int immed_n = 0;
   int start_addr = addr;
-  struct dis_entry *instructions;
-
+  struct dis_entry *instructions= dis_tbl();
+  /*
   switch (type->type) {
-      /* Dispatch to appropriate pdk port. */
       case CPU_PDK13:
         instructions = disass_pdk_13;
         break;
-
       case CPU_PDK14:
         instructions = disass_pdk_14;
         break;
-
       case CPU_PDK15:
         instructions = disass_pdk_15;
         break;
-
       default:
         return "";//__builtin_unreachable();
   }
-
+  */
   uint code = rom->get(addr++);
   int i = 0;
   while ((code & instructions[i].mask) != instructions[i].code &&
@@ -285,7 +302,7 @@ const char *cl_fppa::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
 
   return b;
 }
-
+/*
 char *cl_fppa::disass(t_addr addr)
 {
   chars work, temp;
@@ -322,43 +339,20 @@ char *cl_fppa::disass(t_addr addr)
 	      temp.format("#0x%x", code);
 	      break;
 	    case 'm':  // m    memory addressing
-	      if (*b == 'n') {
-		switch (type->type) {
-		case CPU_PDK13:
-		  code &= 0x0F;
-		  break;
-		case CPU_PDK14:
-		  code &= 0x3F;
-		  break;
-		case CPU_PDK15:
-		  code &= 0x7F;
-		  break;
-		default:
-		  ;//__builtin_unreachable();
+	      if (*b == 'n')
+		{
+		  code &= m_mask();
+		  b++;
 		}
-		++b;
-	      }
 	      temp.format("0x%x", code);
 	      break;
 	    case 'i':  // i    IO addressing
 	      // TODO: Maybe add pretty printing.
-	      if (*b == 'n') {
-		switch (type->type) {
-		case CPU_PDK13:
-		  code &= 0x1F;
-		  break;
-		case CPU_PDK14:
-		  code &= 0x3F;
-		  break;
-		case CPU_PDK15:
-		  code &= 0x7F;
-		  break;
-		default:
-		  ;//__builtin_unreachable();
+	      if (*b == 'n')
+		{
+		  code &= io_mask();
+		  ++b;
 		}
-		
-		++b;
-	      }
 	      temp.format("[0x%x]", code);
 	      break;
 	    case 'n':  // n    N-bit addressing
@@ -390,9 +384,134 @@ char *cl_fppa::disass(t_addr addr)
 
   return strdup(work.c_str());
 }
+*/
+
+struct dis_entry *
+cl_fpp::get_dis_entry(t_addr addr)
+{
+  t_mem code;
+  code= rom->get(addr);
+  int i;
+  i= 0;
+  while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
+	 dis_tbl()[i].mnemonic)
+    i++;
+  return &dis_tbl()[i];
+}
+
+char *
+cl_fpp::disassc(t_addr addr, chars *comment)
+{
+  chars work= chars(), temp= chars(), fmt= chars();
+  const char *b;
+  t_mem code;
+  int i;
+  bool first;
+  struct dis_entry *de;
+
+  code= rom->get(addr);
+  de= get_dis_entry(addr);
+  if (!de || !de->mnemonic)
+    return strdup("-- UNKNOWN/INVALID");
+
+  b= de->mnemonic;
+  
+  first= true;
+  work= "";
+  for (i=0; b[i]; i++)
+    {
+      if ((b[i] == ' ') && first)
+	{
+	  first= false;
+	  while (work.len() < 9) work.append(' ');
+	}
+      if (b[i] == '\'')
+	{
+	  fmt= "";
+	  i++;
+	  while (b[i] && (b[i]!='\''))
+	    fmt.append(b[i++]);
+	  if (!b[i]) i--;
+	  if (fmt.empty())
+	    work.append("'");
+	  if (fmt == "i5")
+	    work.appendf("0x%02x", code & 0x1f);
+	  if (fmt == "m4")
+	    work.appendf("[0x%04x]", code & 0xf);
+	  if (fmt == "m6")
+	    work.appendf("[0x%04x]", code & 0x3f);
+	  if (fmt == "m7")
+	    work.appendf("[0x%04x]", code & 0x7f);
+	  if (fmt == "m8")
+	    work.appendf("[0x%04x]", code & 0xff);
+	  if (fmt == "M5")
+	    work.appendf("[0x%04x]", code & 0x1f & ~1);
+	  if (fmt == "M7")
+	    work.appendf("[0x%04x]", code & 0x7f & ~1);
+	  if (fmt == "M8")
+	    work.appendf("[0x%04x]", code & 0xff & ~1);
+	  if (fmt == "M9")
+	    work.appendf("[0x%04x]", code & 0x1ff & ~1);
+	  if (fmt == "n5")
+	    work.appendf("%d", (code>>5)&7);
+	  if (fmt == "n6")
+	    work.appendf("%d", (code>>6)&7);
+	  if (fmt == "n7")
+	    work.appendf("%d", (code>>7)&7);
+	  if (fmt == "n9")
+	    work.appendf("%d", (code>>9)&7);
+	  if (fmt == "a8")
+	    work.appendf("0x%04x", code & 0xff);
+	  if (fmt == "a10")
+	    work.appendf("0x%04x", code & 0x3ff);
+	  if (fmt == "a11")
+	    work.appendf("0x%04x", code & 0x7ff);
+	  if (fmt == "a12")
+	    work.appendf("0x%04x", code & 0xfff);
+	  if (fmt == "a13")
+	    work.appendf("0x%04x", code & 0x1fff);
+	  if (fmt == "d4")
+	    work.appendf("%d", code & 0xf);
+	  if (fmt == "d5")
+	    work.appendf("%d", code & 0x1f);
+	  if (comment && temp.nempty())
+	    comment->append(temp);
+	  continue;
+	}
+      if (b[i] == '%')
+	{
+	  i++;
+	  temp= "";
+	  switch (b[i])
+	    {
+	    case 'm':
+	      work.appendf("[0x%04x]", code & m_mask());
+	      break;
+	    case 'M':
+	      work.appendf("[0x%04x]", code & m_mask() & ~1);
+	      break;
+	    case 'k':
+	      work.appendf("#0x%02x", code & 0xff);
+	      break;
+	    case 'i':
+	      work.appendf("0x%02x", code & io_mask());
+	      break;
+	    case 'n': // == n5
+	      work.appendf("%d", (code>>5)&7);
+	      break;
+	    }
+	  if (comment && temp.nempty())
+	    comment->append(temp);
+	}
+      else
+	work+= b[i];
+    }
+
+  return strdup(work.c_str());
+}
 
 void
-cl_fppa::print_regs(class cl_console_base *con)
+cl_fpp::print_regs(class cl_console_base *con)
 {
   act();
   con->dd_color("answer");
@@ -408,7 +527,7 @@ cl_fppa::print_regs(class cl_console_base *con)
  * Execution
  */
 
-int cl_fppa::exec_inst(void)
+int cl_fpp::exec_inst(void)
 {
   t_mem code;
 
@@ -430,12 +549,34 @@ int cl_fppa::exec_inst(void)
 
 
 void
-cl_fppa::stack_check_overflow(void)
+cl_fpp::push(u16_t word)
+{
+  u8_t b= rSP;
+  ram->write(rSP, word);
+  ram->write(rSP+1, word>>8);
+  cSP->W(rSP+2);
+  vc.wr+= 2;
+  stack_check_overflow(b);
+}
+
+void
+cl_fpp::pushlh(u8_t low, u8_t high)
+{
+  u8_t b= rSP;
+  ram->write(rSP, low);
+  ram->write(rSP+1, high);
+  cSP->W(rSP+2);
+  vc.wr+= 2;
+  stack_check_overflow(b);
+}
+
+void
+cl_fpp::stack_check_overflow(void)
 {
   if (0)
     {
       class cl_stack_op *op;
-      op= new cl_stack_op(stack_push, instPC, rSP-1, rSP);
+      op= new cl_stack_op(stack_push, instPC, rSP-2, rSP);
       class cl_error_stack_overflow *e=
 	new cl_error_stack_overflow(op);
       e->init();
@@ -443,6 +584,19 @@ cl_fppa::stack_check_overflow(void)
     }
 }
 
+void
+cl_fpp::stack_check_overflow(t_addr sp_before)
+{
+  if (0)
+    {
+      class cl_stack_op *op;
+      op= new cl_stack_op(stack_push, instPC, sp_before, rSP);
+      class cl_error_stack_overflow *e=
+	new cl_error_stack_overflow(op);
+      e->init();
+      error(e);
+    }
+}
 
 /****************************************************************************/
 
@@ -497,7 +651,7 @@ cl_pdk::init(void)
 {
   cl_uc::init();
   class cl_fppen_op *op;
-  fpps[0]= mk_fppa(0);
+  fpps[0]= mk_fpp(0);
 
   cFPPEN= sfr->get_cell(1);
   op= new cl_fppen_op(this, cFPPEN);
@@ -505,6 +659,7 @@ cl_pdk::init(void)
   cFPPEN->append_operator(op);
   reg_cell_var(cFPPEN, &rFPPEN, "FPPEN", "FPP unit Enable Register");
   mk_cvar(sfr->get_cell(0), "FLAG", "ACC Status Flag Register");
+  mk_cvar(sfr->get_cell(0), "F", "ACC Status Flag Register");
   mk_cvar(sfr->get_cell(2), "SP", "Stack Pointer Register");
 
   cact= new cl_act_cell(this);
@@ -515,18 +670,20 @@ cl_pdk::init(void)
 
   if (type->type == CPU_PDKX)
     {
-      fpps[1]= mk_fppa(1);
-      fpps[2]= mk_fppa(2);
-      fpps[3]= mk_fppa(3);
-      fpps[4]= mk_fppa(4);
-      fpps[5]= mk_fppa(5);
-      fpps[6]= mk_fppa(6);
-      fpps[7]= mk_fppa(7);
+      fpps[1]= mk_fpp(1);
+      fpps[2]= mk_fpp(2);
+      fpps[3]= mk_fpp(3);
+      fpps[4]= mk_fpp(4);
+      fpps[5]= mk_fpp(5);
+      fpps[6]= mk_fpp(6);
+      fpps[7]= mk_fpp(7);
       nuof_fpp= 8;
     }
   
   act= 0;
   rFPPEN= 1;
+  single= true;
+  cPC.decode(&(fpps[0]->PC));
   return 0;
 }
 
@@ -554,7 +711,7 @@ cl_pdk::make_memories(void)
   class cl_address_space *as;
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
-  int rom_size= 0x1000, ram_size=0x100;
+  int rom_size= 0x2000, ram_size=0x200;
 
   rom = as = new cl_address_space("rom", 0, rom_size, 16);
   as->init();
@@ -562,7 +719,7 @@ cl_pdk::make_memories(void)
   ram = as = new cl_address_space("ram", 0, ram_size, 8);
   as->init();
   address_spaces->add(as);
-  sfr = as = new cl_address_space("regs8", 0, io_size + 1, 8);
+  sfr = as = new cl_address_space("regs8", 0, io_size, 8);
   as->init();
   address_spaces->add(as);
 
@@ -594,18 +751,18 @@ cl_pdk::make_memories(void)
   ad->activate(0);
 }
 
-class cl_fppa *
-cl_pdk::mk_fppa(int id)
+class cl_fpp *
+cl_pdk::mk_fpp(int id)
 {
-  class cl_fppa *fppa;
+  class cl_fpp *fppa;
   switch (type->type)
     {
-    case CPU_PDK13: fppa= new cl_fppa13(id, this, sim); break;
-    case CPU_PDK14: fppa= new cl_fppa14(id, this, sim); break;
-    case CPU_PDK15: fppa= new cl_fppa15(id, this, sim); break;
-    case CPU_PDK16: fppa= new cl_fppa16(id, this, sim); break;
-    case CPU_PDKX:  fppa= new cl_fppa15(id, this, sim); break;
-    default: fppa= new cl_fppa14(id, this, sim); break;
+    case CPU_PDK13: fppa= new cl_fpp13(id, this, sim); break;
+    case CPU_PDK14: fppa= new cl_fpp14(id, this, sim); break;
+    case CPU_PDK15: fppa= new cl_fpp15(id, this, sim); break;
+    case CPU_PDK16: fppa= new cl_fpp16(id, this, sim); break;
+    case CPU_PDKX:  fppa= new cl_fpp15(id, this, sim); break;
+    default: fppa= new cl_fpp14(id, this, sim); break;
     }  
   fppa->init();
   return fppa;
@@ -615,24 +772,30 @@ cl_pdk::mk_fppa(int id)
 u8_t
 cl_pdk::set_fppen(u8_t val)
 {
-  int i;
+  int i, n;
   u8_t m;
   if (val == 0)
     val= 1;
-  for (i=0, m=1; i<8; i++, m<<=1)
+  for (i=0, m=1, n=0; i<8; i++, m<<=1)
     {
       if (fpps[i] == NULL)
 	val&= ~m;
+      else
+	n++;
     }
+  single= n==1;
   return val;
 }
 
 u8_t
 cl_pdk::set_act(u8_t val)
 {
+  u8_t r= 0;
   if (val < nuof_fpp)
-    return val;
-  return 0;
+    r= val;
+  cPC.decode(&(fpps[act]->PC));
+  PC= fpps[act]->PC;
+  return r;
 }
 
 u8_t
@@ -648,7 +811,7 @@ cl_pdk::set_nuof(u8_t val)
       if (i<val)
 	{
 	  if (fpps[i] == NULL)
-	    fpps[i]= mk_fppa(i);
+	    fpps[i]= mk_fpp(i);
 	  else
 	    fpps[i]->reset();
 	}
@@ -668,6 +831,22 @@ cl_pdk::set_nuof(u8_t val)
   return val;
 }
 
+t_addr
+cl_pdk::get_pc(int id)
+{
+  if (id >= nuof_fpp)
+    return 0;
+  return fpps[id]->PC;
+}
+
+void
+cl_pdk::set_pc(int id, t_addr new_pc)
+{
+  if (id >= nuof_fpp)
+    return;
+  fpps[id]->cPC.W(new_pc);
+}
+
 
 int
 cl_pdk::exec_inst(void)
@@ -683,8 +862,17 @@ cl_pdk::exec_inst(void)
       do
 	act= (act+1)%nuof_fpp;
       while (!(rFPPEN & (1<<act)));
+      cPC.decode(&(fpps[act]->PC));
     }
+  PC= fpps[act]->PC;
   return ret;
+}
+
+
+char *
+cl_pdk::disassc(t_addr addr, chars *comment)
+{
+  return fpps[0]->disassc(addr, comment);
 }
 
 
@@ -735,7 +923,7 @@ cl_pdk::print_regs(class cl_console_base *con)
   for (i=0; i<nuof_fpp; i++)
     {
       con->dd_color((i==act)?"result":"answer");
-      con->dd_printf("FPP%d: ", i);
+      con->dd_printf("%cFPP%d%c: ", (rFPPEN&(1<<act))?'+':'-', i, (act==i)?'*':' ');
       fpps[0]->print_disass(fpps[i]->PC, con);
     }
 }

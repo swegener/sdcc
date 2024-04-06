@@ -29,37 +29,45 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regspdk.h"
 
 
-unsigned char cl_fppa::add_to(unsigned char initial, int value, bool carry) {
+u8_t cl_fpp::add_to(u8_t initial, int value, bool carry) {
+  u8_t f= 0, res;
+  int c= carry?(fC):0;
+  int r, r2, r3;
+
+  r= (int)initial + (int)value + c;
+  r2= (initial & 0x7f) + (value & 0x7f) + c;
+  r3= (initial &  0xf) + (value &  0xf) + c;
+  if ((r & 0xff) == 0) f|= BIT_Z;
+  if (r > 0xff) f|= BIT_C;
+  if (r3 > 0xf) f|= BIT_AC;
+  if ( (r2 & 0x80) && !(f & BIT_C)) f|= BIT_OV;
+  if (!(r2 & 0x80) &&  (f & BIT_C)) f|= BIT_OV;
+  cF->W(f);
+  return r;
+  
   store_flag(flag_z, initial + value + carry == 0);
   store_flag(flag_c, initial + value + carry > 0xFF);
   store_flag(flag_ac, (initial & 0xF) + (value & 0xF) + carry > 0xF);
   store_flag(
       flag_ov,
       fC ^ ((initial & 0x7F) + (value & 0x7F) + carry > 0x7F));
-
   return initial + value + carry;
 }
 
-unsigned char cl_fppa::sub_to(unsigned char initial, int value, bool carry) {
-  store_flag(flag_z, initial - value - carry == 0);
-  store_flag(flag_c, initial < value + carry);
-  store_flag(flag_ac, (value & 0xF) > (initial & 0xF) - carry);
-  store_flag(
-      flag_ov,
-      fC ^ ((initial & 0x7F) - (value & 0x7F) - carry < 0));
+u8_t cl_fpp::sub_to(u8_t initial, int value, bool carry) {
+  u8_t f= 0;
+  int r= initial - value - carry;
+  
+  if ((r&0xff) == 0) f|= BIT_Z;
+  if (initial < value + carry) f|= BIT_C;
+  if ((value & 0xF) > (initial & 0xF) - carry) f|= BIT_AC;
+  if (((f&BIT_C)>>BITPOS_C) ^ ((initial & 0x7F) - (value & 0x7F) - carry < 0))
+    f|= BIT_OV;
 
-  return initial - value - carry;
+  cF->W(f);
+  return r;
 }
-
-int cl_fppa::get_mem(unsigned int addr) {
-  vc.rd++;
-  return ram->read((t_addr)(addr));
-}
-
-unsigned char cl_fppa::get_io(t_addr addr) {
-  return sfr->read(addr);
-}
-
+/*
 int cl_fppa::store_io(t_addr addr, int value) {
   
   sfr->write(addr, value & 0xFF);
@@ -72,8 +80,8 @@ int cl_fppa::store_io(t_addr addr, int value) {
     }
   return resGO;
 }
-
-void cl_fppa::store_flag(flag n, int value) {
+*/
+void cl_fpp::store_flag(flag n, int value) {
   value= value?1:0;
   switch (n) {
   case flag_z: cF->W((rF & ~1) | (value << BITPOS_Z)); break;

@@ -1,3 +1,8 @@
+2024-04-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Small z80 codegen improvements, RFE #904.
+
 2024-03-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/ralloc2.cc,

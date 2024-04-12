@@ -2510,11 +2510,24 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset, bool f_dead)
   const char *pair = _pairs[pairId].name;
   char *l = Safe_strdup (aopGetLitWordLong (left, offset, FALSE));
   char *base_str = Safe_strdup (aopGetLitWordLong (left, 0, FALSE));
-  const char *base = base_str;
+
+  //emitDebug (";fetchLitPair %s",  pair);
 
   wassert (pair);
 
-  emitDebug (";fetchLitPair %s",  pair);
+  const char *base = base_str;
+
+  // Make offset from aopGetLitWordLong explicit.
+  if (strchr (base_str, '+') && base_str[0] == '(' && base_str[1] == '_' && strchr (base_str, ' '))
+    {
+      long xoffset = strtol(strchr (base_str, '+') + 1, 0, 0);
+      if (abs(offset < 10000) && labs(xoffset) < 10000l)
+        {
+          *(strchr (base_str, ' ')) = 0;
+          base++;
+          offset += xoffset;
+        }
+    }
 
   if (isPtr (pair))
     {
@@ -4667,7 +4680,7 @@ skip_byte:
 static void
 genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool hl_dead_global, bool de_dead_global, bool iy_dead_global, bool f_dead)
 {
-  emitDebug ("; genMove_o size %d", size);
+  emitDebug ("; genMove_o size %d result type %d source type %d hl_dead %d", size, result->type, source->type, hl_dead_global);
   wassert (result->size >= roffset + size);
 
   if (aopSame (result, roffset, source, soffset, size))
@@ -4810,6 +4823,15 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         (source->type == AOP_LIT && !(aopIsLitVal (source, soffset + i, 2, 0x0000) && zeroed_a) || source->type == AOP_IMMD))
         {
           fetchLitPair (getPairId_o(result, roffset + i), source, soffset + i, f_dead);
+          i += 2;
+          continue;
+        }
+      else if (!IS_SM83 && i + 1 < size &&
+        (result->type == AOP_IY || result->type == AOP_DIR || result->type == AOP_HL) &&
+        source->type == AOP_IMMD && hl_dead)
+        {
+          genMove_o (ASMOP_HL, 0, source, soffset + i, 2, a_dead, true, false, iy_dead, f_dead);
+          genMove_o (result, roffset + i, ASMOP_HL, 0, 2, a_dead, true, false, iy_dead, f_dead);
           i += 2;
           continue;
         }
@@ -11607,17 +11629,6 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
 
         if (isRegDead (A_IDX, ic) && left_aop->regs[A_IDX] <= i && right_aop->regs[A_IDX] <= i && (result_aop->regs[A_IDX] < 0 || result_aop->regs[A_IDX] >= i))
           a_free = true;
-
-        if (pushed_a && (aopInReg (left_aop, i, A_IDX) || aopInReg (right_aop, i, A_IDX)))
-          {
-            if (result_aop->regs[A_IDX] >= 0 && result_aop->regs[A_IDX] < i)
-              UNIMPLEMENTED;
-            _pop (PAIR_AF);
-            if (!isRegDead (A_IDX, ic))
-              _push (PAIR_AF);
-            else
-              pushed_a = false;
-          }
             
         // normal case
         // result = left ^ right
@@ -11625,6 +11636,16 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
           {
             int end;
             for (end = i; end < size && aopIsLitVal (right_aop, end, 1, 0x00); end++);
+            if (pushed_a && left_aop->type == AOP_REG && left_aop->regs[A_IDX] >= i && left_aop->regs[A_IDX] < end)
+              {
+                if (result_aop->regs[A_IDX] >= 0 && result_aop->regs[A_IDX] < i)
+                  UNIMPLEMENTED;
+                _pop (PAIR_AF);
+                if (!isRegDead (A_IDX, ic))
+                  _push (PAIR_AF);
+                else
+                  pushed_a = false;
+              }
             genMove_o (result_aop, i, left_aop, i, end - i, a_free, hl_free, !isPairInUse (PAIR_DE, ic), true, true);
             if (result_aop->type == AOP_REG &&
               (left_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] >= end || right_aop->regs[result_aop->aopu.aop_reg[i]->rIdx] >= end))
@@ -11669,6 +11690,17 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
             cost (1, 2);
             i++;
             continue;
+          }
+
+        if (pushed_a && (aopInReg (left_aop, i, A_IDX) || aopInReg (right_aop, i, A_IDX)))
+          {
+            if (result_aop->regs[A_IDX] >= 0 && result_aop->regs[A_IDX] < i)
+              UNIMPLEMENTED;
+            _pop (PAIR_AF);
+            if (!isRegDead (A_IDX, ic))
+              _push (PAIR_AF);
+            else
+              pushed_a = false;
           }
 
         // faster than result <- left, anl result,right
@@ -11738,7 +11770,7 @@ genEor (const iCode *ic, iCode *ifx, asmop *result_aop, asmop *left_aop, asmop *
      }
 
   if (pushed_a)
-     _pop (PAIR_AF);
+    _pop (PAIR_AF);
 }
 
 /*-----------------------------------------------------------------*/

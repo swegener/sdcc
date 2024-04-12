@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Small z80 codegen improvements, RFE #904.
+	* support/regression/tests/bug-3727.c:
+	  Regression test (for now disabled) for not-yet fixed bug #3727.
 
 2024-03-31 Philipp Klaus Krause <philipp@colecovision.eu>
 

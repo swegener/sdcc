@@ -7825,10 +7825,11 @@ genPlus (iCode * ic)
           /* Can't do it */
         }
     }
-  else if (!maskedtopbyte && getPairId (IC_RESULT (ic)->aop) == PAIR_HL && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && IC_RIGHT (ic)->aop->type == AOP_LIT)
+  else if (!maskedtopbyte && size == 2 && getPairId (ic->result->aop) == PAIR_HL && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) &&
+    (ic->right->aop->type == AOP_LIT || ic->right->aop->type == AOP_IMMD || ic->left->aop->type == AOP_IMMD && (ic->right->aop->type == AOP_HL || ic->right->aop->type == AOP_IY)))
     {
       PAIR_ID extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
-      genMove_o (ASMOP_HL, 0, ic->left->aop, 0, 2, isRegDead (A_IDX, ic), true, isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic), true);
+      genMove (ASMOP_HL, ic->left->aop, isRegDead (A_IDX, ic), true, isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
       fetchPair (extrapair, IC_RIGHT (ic)->aop);
       emit2 ("add hl, %s", _pairs[extrapair].name);
       cost2 (1 + IS_TLCS90, 11, 7, 2, 8, 8, 1, 1);

@@ -11,6 +11,8 @@
 	  src/z80/peeph.def,
 	  support/regression/tests/bug-3728.c:
 	  Fix bug #3728.
+	* support/regression/tests/bug-3727.c:
+	  Simplify regression test, as suggested by Janko Stamenović.
 
 2024-04-16 Philipp Klaus Krause <philipp@colecovision.eu>
 

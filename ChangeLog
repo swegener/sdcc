@@ -1,3 +1,10 @@
+2024-04-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/z80/peeph.def,
+	  src/z80/ralloc2.cc:
+	  Improve use of hl, towards RFE #905.
+
 2024-04-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

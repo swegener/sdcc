@@ -743,12 +743,14 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == '~' || ic->op == CALL || ic->op == RETURN || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
     ic->op == GETBYTE || ic->op == GETWORD ||
-    ic->op == ROT && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||
+    ic->op == ROT && (getSize(operandType(IC_RESULT(ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||
     !((IS_SM83 || IY_RESERVED) && (operand_on_stack(result, a, i, G) || operand_on_stack(right, a, i, G))) && (ic->op == '=' && !POINTER_SET (ic) || ic->op == CAST) ||
-    ic->op == RECEIVE || ic->op == SEND)
+    ic->op == RECEIVE || ic->op == SEND ||
+    POINTER_SET(ic) && !IS_BITVAR (operandType (result)->next))
     return(true);
 
-  if((ic->op == EQ_OP || ic->op == NE_OP) && (IS_VALOP(right) || operand_in_reg(right, ia, i, G) && !(exstk && operand_on_stack(ic->left, a, i, G)) && !isOperandInDirSpace(ic->left)))
+  if((ic->op == EQ_OP || ic->op == NE_OP) &&
+    (IS_VALOP(right) || operand_in_reg(right, ia, i, G) && !(exstk && operand_on_stack(ic->left, a, i, G)) && (!isOperandInDirSpace(ic->left) || getSize(operandType(ic->left)) == 1)))
     return(true);
 
   // Due to lack of ex hl, (sp), the generic push code generation fallback doesn't work for gbz80, so we need to be able to use hl if we can't just push a pair or use a.

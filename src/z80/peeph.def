@@ -1858,25 +1858,25 @@ replace restart {
 // canAssign('b' %2) is true, iff add a,%2 is possible.
 
 replace restart {
-	ld	c,l
-	ld	b,h
-	ld	hl,#%1
-	add	hl,bc
+	ld	c, l
+	ld	b, h
+	ld	hl, #%1
+	add	hl, bc
 } by {
 	; common peephole 119 removed loads by exploiting commutativity of addition.
-	ld	bc,#%1
-	add	hl,bc
+	ld	bc, #%1
+	add	hl, bc
 } if notUsed('bc')
 
 replace restart {
-	ld	hl,#%1
-	add	hl,%2
-	ld	bc,#%4
-	add	hl,bc
+	ld	hl, #%1
+	add	hl, %2
+	ld	bc, #%4
+	add	hl, bc
 } by {
 	; common peephole 120 removed loads by exploiting commutativity of addition.
-	ld	hl,#%1 + %4
-	add	hl,%2
+	ld	hl, #%1 + %4
+	add	hl, %2
 } if notUsed('bc')
 
 replace restart {

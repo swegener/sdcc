@@ -35,20 +35,12 @@
 
 char * strcpy ( char * d, const char * s )
 {
-#if _SDCC_Z80_STYLE_LIB_OPT
-    register char * to = d;
-    register const char * from = s;
-
-    while (*to++ = *from++) ;
-
-    return d;
-#else
     register char * d1 = d;
 
     while (*d1++ = *s++) ;
 
     return d;
-#endif
 }
 
 #endif
+

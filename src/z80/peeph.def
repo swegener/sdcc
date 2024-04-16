@@ -1265,26 +1265,6 @@ replace restart {
 	jp	C, %1
 } if notUsed('a'), notUsedFrom(%1 'a')
 
-replace restart {
-	%6	a, %1
-	jp	NZ, %2
-	%5	a, %1
-	jp	NZ, %3
-%2:
-	ld	%4, a
-	rlca
-	sbc	a, a
-} by {
-	%6	a, %1
-	jp	NZ, %2
-	%5	a, %1
-	jp	NZ, %3
-%2:
-	ld	%4, a
-	; common peephole 91 removed redundant rlca.
-	sbc	a, a
-} if notSame('a' %1), notSame(%2 %3), same(%5 'or' 'cp' 'sub'), same(%6 'sub' 'sbc')
-
 replace {
 	ld	%5, #%1
 	ld	%6, #%2

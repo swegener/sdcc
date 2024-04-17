@@ -1,7 +1,8 @@
 2024-04-17 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/discussion-1854.c,
-	  support/regression/tests/bug-3728.c:
+	  support/regression/tests/bug-3728.c,
+	  support/regression/tests/bug-3729.c:
 	  Add 2 regression tests for potential issues.
 
 2024-04-16 Philipp Klaus Krause <philipp@colecovision.eu>

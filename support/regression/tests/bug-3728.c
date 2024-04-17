@@ -1,5 +1,5 @@
 /** tests for string comparison functions, in particular for the handling of non-printable characters.
-    In ug #3728, the sign waas wrong on the strcmp result for some string with characters outside the ASCII range.
+    In bug #3728, the sign waas wrong on the strcmp result for some string with characters outside the ASCII range.
 */
 
 #include <testfwk.h>

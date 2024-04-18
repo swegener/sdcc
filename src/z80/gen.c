@@ -7432,6 +7432,13 @@ genPlusIncr (const iCode *ic)
           return TRUE;
         }
 
+      if (size == 2 && icount == 256 && ic->result->aop->type == AOP_REG && ic->left->aop->type == AOP_REG && ic->result->aop->aopu.aop_reg[0]->rIdx == ic->left->aop->aopu.aop_reg[0]->rIdx &&
+        (HAS_IYL_INST || !aopInReg (ic->result->aop, 1, IYL_IDX) && !aopInReg (ic->result->aop, 1, IYH_IDX)))
+        {
+          emit3_o (A_INC, ic->result->aop, 1, 0, 0);
+          return true;
+        }
+
       if (IS_Z80N && resultId == getPairId (IC_LEFT (ic)->aop) && resultId != PAIR_IY && icount > 3 && icount < 256 && isRegDead (A_IDX, ic)) // Saves once cycle vs. add dd, nn below.
         {
           cheapMove (ASMOP_A, 0, IC_RIGHT (ic)->aop, 0, true);
@@ -8421,7 +8428,7 @@ genPlus (iCode * ic)
           else if (!started && i == size - 1 && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, 255)))
             {
               emit3 (aopIsLitVal (rightop, i, 1, 1) ? A_INC : A_DEC, ASMOP_A, 0);
-              started = TRUE;
+              started = true;
             }
           else if (rightop->type == AOP_STL && i < 2)
             {

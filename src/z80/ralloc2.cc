@@ -554,7 +554,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(false);
 
   // For some iCodes, we can handle anything.
-  if(ic->op == '~' || ic->op == IPUSH || ic->op == LABEL || ic->op == GOTO ||
+  if(ic->op == '~' || ic->op == IPUSH || ic->op == SEND || ic->op == LABEL || ic->op == GOTO ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
     ic->op == GETBYTE || ic->op == GETWORD ||
     ic->op == ROT && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G) && IS_OP_LITERAL (IC_RIGHT (ic)) && operandLitValueUll (IC_RIGHT (ic)) * 2 == bitsForType (operandType (IC_LEFT (ic)))) ||

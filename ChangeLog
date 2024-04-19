@@ -1,6 +1,11 @@
 2024-04-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:
+	  Improve handling of register argument in a in register allocation.
+
+2024-04-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
 	  Fix generation of a redundant instruction in z80 comparison.
 
 2024-04-18 Philipp Klaus Krause <philipp@colecovision.eu>

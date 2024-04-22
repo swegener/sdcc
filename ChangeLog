@@ -1,6 +1,12 @@
 2024-04-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,
+	  support/regression/ports/ucz80-unsafe-read:
+	  Allow use 16-bit loads from memory to load 8-bit registers.
+
+2024-04-22 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
 	  src/z80/peeph.def:
 	  Improve storing of 0 into global variables.
 

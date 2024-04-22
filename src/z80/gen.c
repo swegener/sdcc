@@ -4723,6 +4723,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
     {
       bool a_dead = a_dead_global && source->regs[A_IDX] <= soffset + i && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + i);
       bool hl_dead = hl_dead_global && source->regs[L_IDX] <= soffset + i && source->regs[H_IDX] <= soffset + i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= roffset + i) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= roffset + i);
+      bool de_dead = de_dead_global && source->regs[E_IDX] <= soffset + i && source->regs[D_IDX] <= soffset + i && (result->regs[E_IDX] < 0 || result->regs[E_IDX] >= roffset + i) && (result->regs[D_IDX] < 0 || result->regs[D_IDX] >= roffset + i);
       bool iy_dead = iy_dead_global && source->regs[IYL_IDX] <= soffset + i && source->regs[IYH_IDX] <= soffset + i && (result->regs[IYL_IDX] < 0 || result->regs[IYL_IDX] >= roffset + i) && (result->regs[IYH_IDX] < 0 || result->regs[IYH_IDX] >= roffset + i);
 
       if (source->type == AOP_STL && (soffset + i) >= 2)
@@ -4852,6 +4853,33 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           continue;
         }
 
+      // 16-bit load into register might be cheaper than 8-bit, if the latter has to go through a. For bc an de it is only worth it if a would ahve to be saved.
+      if (optimize.allow_unsafe_read && !IS_SM83 && !IS_TLCS90 && result->type == AOP_REG && !aopInReg (result, roffset + i, A_IDX) &&
+        (i + 1 == size || soffset + i + 1 >= source->size) && (source->type == AOP_HL && fetchLitPair (PAIR_HL, source, soffset + i, f_dead, true) || source->type == AOP_IY))
+        {
+          bool upper = aopInReg (result, roffset + i, B_IDX) || aopInReg (result, roffset + i, D_IDX) || aopInReg (result, roffset + i, H_IDX) || aopInReg (result, roffset + i, IYH_IDX);
+          PAIR_ID pair = PAIR_INVALID;
+          if ((aopInReg (result, roffset + i, C_IDX) || aopInReg (result, roffset + i, B_IDX)) && false && !a_dead)
+            pair = PAIR_BC;
+          else if ((aopInReg (result, roffset + i, E_IDX) || aopInReg (result, roffset + i, D_IDX)) && de_dead && !a_dead)
+            pair = PAIR_DE;
+          else if ((aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, H_IDX)) && hl_dead)
+            pair = PAIR_HL;
+          else if ((aopInReg (result, roffset + i, IYL_IDX) || aopInReg (result, roffset + i, IYH_IDX)) && iy_dead)
+            pair = PAIR_IY;
+
+          if (pair != PAIR_INVALID && soffset + i - upper >= 0)
+            {
+              emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (source, soffset + i - upper, false));
+              if (pair == PAIR_HL)
+                cost2 (3, 16, 15, 11, 0, 12, 5, 5);
+              else
+                cost2 (4, 20, 18, 13, 0, 12, 6, 6);
+              i++;
+              continue;
+            }
+        }
+
       // Cache a copy of zero in a.
       if (f_dead &&
         (size > 1 && result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead && source->regs[A_IDX] <= i ||
@@ -4865,7 +4893,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           if (source->type == AOP_HL)
             {
-              emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, FALSE));
+              emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, false));
               cost2 (3, 13, 12, 9, 16, 10, 4, 4);
             }
           else if (!aopIsLitVal (source, soffset + i, 1, 0x00) || !zeroed_a)
@@ -4888,6 +4916,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           bool pushed_hl = false;
           bool via_a = false;
           bool premoved_a = false;
+
           if (!i && a_dead && // Avoid setting up hl or iy for a single byte.
             (source->type == AOP_HL && fetchLitPair (PAIR_HL, source, soffset + i, f_dead, true) || source->type == AOP_IY && fetchLitPair (PAIR_IY, source, soffset + i, f_dead, true)) &&
             result->type == AOP_REG && (i + 1 > size || soffset + i < source->size))

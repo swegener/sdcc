@@ -127,7 +127,7 @@ EXCLUDE_ucz80 += \
 	gte_20041218-1
 EXCLUDE_ucz80-resiy += \
 	gte_20041218-1
-EXCLUDE_ucz80-nmos += \
+EXCLUDE_ucz80-unsafe-read += \
 	gte_20041218-1
 EXCLUDE_ucz180-resiy += \
 	gte_20041218-1
@@ -142,7 +142,7 @@ EXCLUDE_ucz80 += \
 	gte_20091229-1
 
 # Fail
-EXCLUDE_ucz80-nmos += \
+EXCLUDE_ucz80-unsafe-read += \
 	gte_20091229-1
 
 # Fail
@@ -406,7 +406,7 @@ EXCLUDE_mcs51-medium += \
 
 ###################################################
 EXCLUDE_ucz80 += ${EXCLUDE_ARCH_z80}
-EXCLUDE_ucz80-nmos += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz80-unsafe-read += ${EXCLUDE_ARCH_z80}
 EXCLUDE_ucz80-undoc += ${EXCLUDE_ARCH_z80}
 EXCLUDE_ucz80-resiy += ${EXCLUDE_ARCH_z80}
 EXCLUDE_ucz180 += ${EXCLUDE_ARCH_z80}

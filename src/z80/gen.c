@@ -4699,6 +4699,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   emitDebug ("; genMove_o size %d result type %d source type %d hl_dead %d", size, result->type, source->type, hl_dead_global);
   wassert (result->size >= roffset + size);
 
+  a_dead_global |= result->type == AOP_REG && result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + size;
+  hl_dead_global |= result->type == AOP_REG && result->regs[L_IDX] >= roffset && result->regs[L_IDX] < roffset + size && result->regs[H_IDX] >= roffset && result->regs[H_IDX] < roffset + size;
+  de_dead_global |= result->type == AOP_REG && result->regs[E_IDX] >= roffset && result->regs[E_IDX] < roffset + size && result->regs[D_IDX] >= roffset && result->regs[D_IDX] < roffset + size;
+  iy_dead_global |= result->type == AOP_REG && result->regs[IYL_IDX] >= roffset && result->regs[IYL_IDX] < roffset + size && result->regs[IYH_IDX] >= roffset && result->regs[IYH_IDX] < roffset + size;
+  bool bc_dead_global = result->type == AOP_REG && result->regs[C_IDX] >= roffset && result->regs[C_IDX] < roffset + size && result->regs[B_IDX] >= roffset && result->regs[B_IDX] < roffset + size;
+
   if (aopSame (result, roffset, source, soffset, size))
     return;
 
@@ -4725,6 +4731,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       bool hl_dead = hl_dead_global && source->regs[L_IDX] <= soffset + i && source->regs[H_IDX] <= soffset + i && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= roffset + i) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= roffset + i);
       bool de_dead = de_dead_global && source->regs[E_IDX] <= soffset + i && source->regs[D_IDX] <= soffset + i && (result->regs[E_IDX] < 0 || result->regs[E_IDX] >= roffset + i) && (result->regs[D_IDX] < 0 || result->regs[D_IDX] >= roffset + i);
       bool iy_dead = iy_dead_global && source->regs[IYL_IDX] <= soffset + i && source->regs[IYH_IDX] <= soffset + i && (result->regs[IYL_IDX] < 0 || result->regs[IYL_IDX] >= roffset + i) && (result->regs[IYH_IDX] < 0 || result->regs[IYH_IDX] >= roffset + i);
+      bool bc_dead = bc_dead_global && source->regs[C_IDX] <= soffset + i && source->regs[B_IDX] <= soffset + i && (result->regs[C_IDX] < 0 || result->regs[C_IDX] >= roffset + i) && (result->regs[B_IDX] < 0 || result->regs[B_IDX] >= roffset + i);
 
       if (source->type == AOP_STL && (soffset + i) >= 2)
         {
@@ -4853,13 +4860,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           continue;
         }
 
-      // 16-bit load into register might be cheaper than 8-bit, if the latter has to go through a. For bc an de it is only worth it if a would ahve to be saved.
-      if (optimize.allow_unsafe_read && !IS_SM83 && !IS_TLCS90 && result->type == AOP_REG && !aopInReg (result, roffset + i, A_IDX) &&
+      // 16-bit load into register might be cheaper than 8-bit, if the latter has to go through a. For bc and de it is only worth it if a would have to be saved.
+      if ((optimize.allow_unsafe_read || i + 1 == size && soffset + i + 1 <= source->size) && !IS_SM83 && !IS_TLCS90 && result->type == AOP_REG && !aopInReg (result, roffset + i, A_IDX) &&
         (i + 1 == size || soffset + i + 1 >= source->size) && (source->type == AOP_HL && fetchLitPair (PAIR_HL, source, soffset + i, f_dead, true) || source->type == AOP_IY))
         {
           bool upper = aopInReg (result, roffset + i, B_IDX) || aopInReg (result, roffset + i, D_IDX) || aopInReg (result, roffset + i, H_IDX) || aopInReg (result, roffset + i, IYH_IDX);
           PAIR_ID pair = PAIR_INVALID;
-          if ((aopInReg (result, roffset + i, C_IDX) || aopInReg (result, roffset + i, B_IDX)) && false && !a_dead)
+          if ((aopInReg (result, roffset + i, C_IDX) || aopInReg (result, roffset + i, B_IDX)) && bc_dead && !a_dead)
             pair = PAIR_BC;
           else if ((aopInReg (result, roffset + i, E_IDX) || aopInReg (result, roffset + i, D_IDX)) && de_dead && !a_dead)
             pair = PAIR_DE;

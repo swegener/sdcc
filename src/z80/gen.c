@@ -16785,14 +16785,15 @@ genBuiltInStrchr (const iCode *ic, int nParams, operand **pparams)
     pair = PAIR_HL;
 
   if (c->aop->type == AOP_REG && c->aop->aopu.aop_reg[0]->rIdx != IYL_IDX && c->aop->aopu.aop_reg[0]->rIdx != IYH_IDX &&
+    c->aop->aopu.aop_reg[0]->rIdx != A_IDX &&
     !(pair == PAIR_HL && (c->aop->aopu.aop_reg[0]->rIdx == L_IDX || c->aop->aopu.aop_reg[0]->rIdx == H_IDX)) &&
     !(pair == PAIR_DE && (c->aop->aopu.aop_reg[0]->rIdx == E_IDX || c->aop->aopu.aop_reg[0]->rIdx == D_IDX)) &&
     !(pair == PAIR_BC && (c->aop->aopu.aop_reg[0]->rIdx == B_IDX || c->aop->aopu.aop_reg[0]->rIdx == C_IDX)))
-    direct_c = TRUE;
+    direct_c = true;
   else if (c->aop->type == AOP_LIT && optimize.codeSize)
-    direct_c = TRUE;
+    direct_c = true;
   else
-    direct_c = FALSE;
+    direct_c = false;
 
   aop_c = direct_c ? c->aop : (pair == PAIR_DE ? ASMOP_H : ASMOP_D);
 
@@ -16815,6 +16816,9 @@ genBuiltInStrchr (const iCode *ic, int nParams, operand **pparams)
   if (!direct_c)
     cheapMove (aop_c, 0, c->aop, 0, true);
   fetchPair (pair, s->aop);
+
+  if (!isRegDead (A_IDX, ic))
+    UNIMPLEMENTED;
 
   if (!regalloc_dry_run)
     emitLabel (tlbl2);

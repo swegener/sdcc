@@ -1336,6 +1336,16 @@ replace {
 	ld	%1, a
 } if same(%1 'a' 'b' 'c' 'd' 'e' 'h' 'l'), operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3)
 
+replace restart {
+	xor	a, a
+	ld	(%1), a
+	xor	a, a
+} by {
+	xor a, a
+	ld  (%1), a
+	; common peephole 94a' reused constant #0 in a.
+}
+
 replace {
 	xor	a, a
 	ld	(%1), a

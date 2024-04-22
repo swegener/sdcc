@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # as2gbmap - asxxxx to gb map file converter
 #
@@ -24,8 +24,6 @@
 #
 #  Borut Razem
 #  borut.razem@siol.net
-
-from __future__ import print_function
 
 import sys
 import os
@@ -59,7 +57,7 @@ def main():
             print("%s: can't create %s: %s" % (os.path.basename(sys.argv[1]), args[1], strerror), file=sys.stderr)
             return 1
     else:
-        fout = sys.stdout;
+        fout = sys.stdout
 
     areas = []
     modules = []
@@ -69,7 +67,7 @@ def main():
     radix = 'HEX'
     state = None
     area = None
-    
+
     # process asxxxx map file
     for line in fin:
         if re.match(r"^Hexadecimal$", line):
@@ -157,20 +155,20 @@ def main():
                 print('\tGLOBALS', file=fout)
                 for g in e['globals']:
                     print('\t\t%s\t%04X' % (g['global'], g['value']), file=fout)
-    
+
         if modules:
             print('MODULES', file=fout)
             for m in modules:
                 print('\tFILE %s' % m['file'], file=fout)
                 if m['name']:
                     print('\t\tNAME %s' % m['name'], file=fout)
-    
+
         if libraries:
             print('LIBRARIES', file=fout)
             for m in libraries:
                 print('\tLIBRARY %s' % m['library'], file=fout)
                 print('\t\tMODULE %s' % m['module'], file=fout)
-    
+
         if ubads:
             print('USERBASEDEF', file=fout)
             for m in ubads:

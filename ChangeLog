@@ -1,3 +1,10 @@
+2024-04-22 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/scripts/as2gbmap.py:
+	  Migrate as2gbmap toPyton 3, patch from Debian.
+	* src/z80/peep.c:
+	  Improve handling of function calls in notUsed(From)('iy').
+
 2024-04-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

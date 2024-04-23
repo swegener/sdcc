@@ -3657,7 +3657,7 @@ poppairwithsavedreg (PAIR_ID pair, short survivingreg, short tempreg)
 static void
 cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
 {
-#if 1
+#if 0
   emitDebug ("; cheapMove");
 #endif
 
@@ -4883,6 +4883,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               else
                 cost2 (4, 20, 18, 13, 0, 12, 6, 6);
               i++;
+              spillPair (pair);
               continue;
             }
         }
@@ -4928,10 +4929,21 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             (source->type == AOP_HL && fetchLitPair (PAIR_HL, source, soffset + i, f_dead, true) || source->type == AOP_IY && fetchLitPair (PAIR_IY, source, soffset + i, f_dead, true)) &&
             result->type == AOP_REG && (i + 1 > size || soffset + i < source->size))
             {
-              emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, false));
-              cost2 (3, 13, 12, 9, 16, 10, 4, 4);
-              via_a = true;
-              premoved_a = true;
+              if (IS_TLCS90 && result->type == AOP_REG && !aopInReg (result, roffset + i, IYL_IDX) && !aopInReg (result, roffset + i, IYH_IDX))
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld %s, !mems", aopGet (result, roffset + i, false), aopGetLitWordLong (source, soffset + i, false));
+                  cost (4, 10);
+                  i++;
+                  continue;
+                }
+              else
+                {
+                  emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, false));
+                  cost2 (3 + IS_TLCS90, 13, 12, 9, 16, 10, 4, 4);
+                  via_a = true;
+                  premoved_a = true;
+                }
             }
           else if ((requiresHL (result) && result->type != AOP_REG || requiresHL (source) && source->type != AOP_REG && soffset + i < source->size) && !hl_dead)
             {
@@ -4941,7 +4953,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               if (via_a && source->type == AOP_HL)
                 {
                   emit2 ("ld a, !mems", aopGetLitWordLong (source, soffset + i, false));
-                  cost2 (3, 13, 12, 9, 16, 10, 4, 4);
+                  cost2 (3 + IS_TLCS90, 13, 12, 9, 16, 10, 4, 4);
                   premoved_a = true;
                 }
               else
@@ -10425,6 +10437,8 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
       while (size--)
         {
           bool hl_dead = isRegDead (HL_IDX, ic) && left->aop->regs[L_IDX] < offset && left->aop->regs[H_IDX] < offset && right->aop->regs[L_IDX] < offset && right->aop->regs[H_IDX] < offset;
+          bool iy_dead = isRegDead (IY_IDX, ic) && left->aop->regs[IYL_IDX] < offset && left->aop->regs[IYH_IDX] < offset && right->aop->regs[IYL_IDX] < offset && right->aop->regs[IYH_IDX] < offset;
+
           if (aopInReg (right->aop, offset, A_IDX)  || aopInReg (right->aop, offset, HL_IDX) || aopInReg (left->aop, offset, BC_IDX) || aopInReg (left->aop, offset, DE_IDX))
             {
               operand *t = right;
@@ -10454,7 +10468,10 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
               continue;
             }
 
-          cheapMove (ASMOP_A, 0, left->aop, offset, true);
+          if (!hl_dead)
+            genMove_o (ASMOP_A, 0, left->aop, offset, 1, true, false, false, iy_dead, true);
+          else
+            cheapMove (ASMOP_A, 0, left->aop, offset, true);
           if (right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, offset) == 0 || right->aop->type == AOP_STL && offset >= 2)
             {
               emit3 (A_OR, ASMOP_A, ASMOP_A);

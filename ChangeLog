@@ -1,3 +1,8 @@
+2024-04-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Global operand handling fixes.
+
 2024-04-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

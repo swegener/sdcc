@@ -1,3 +1,8 @@
+2024-04-23 Felix Salfelder <felix AT salfelder.org>
+
+	* support/cpp/gcc/cc1_dummies.cc
+	  Amend unused function prototypes. Fixes #3725
+
 2024-04-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

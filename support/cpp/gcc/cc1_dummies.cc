@@ -65,7 +65,7 @@ int c_gimplify_expr(tree_node**, gimple**, gimple**)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
-int c_missing_noreturn_ok_p(tree_node*)
+bool c_missing_noreturn_ok_p(tree_node*)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
@@ -104,7 +104,8 @@ FILE* dump_begin(int, dump_flag*, int)
 void dump_profile_report()
 { SDCPP_DUMMY_FCT();
 }
-void dump_go_spec_init(char const*, const struct gcc_debug_hooks*)
+const struct gcc_debug_hooks *
+dump_go_spec_init(char const*, const struct gcc_debug_hooks*)
 { SDCPP_DUMMY_FCT();
 }
 bool dwarf2out_default_as_loc_support()
@@ -127,7 +128,7 @@ void finalize_plugins()
 void gcc::dump_manager::register_dumps()
 {
 }
-int get_identifier(char const*)
+tree get_identifier(char const*)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
@@ -254,7 +255,7 @@ void print_plugins_help(FILE*, char const*)
 void push_file_scope()
 { SDCPP_DUMMY_FCT();
 }
-int pushdecl(tree_node*)
+tree pushdecl(tree_node*)
 { SDCPP_DUMMY_FCT();
 	return 0;
 }
@@ -313,7 +314,7 @@ dump_manager::dump_manager()
 }
 }
 /*----------------------------------------------------------------------*/
-int after_memory_report;
+bool after_memory_report;
 FILE *dump_file = NULL;
 extern const struct attribute_spec c_common_format_attribute_table[] =
 {

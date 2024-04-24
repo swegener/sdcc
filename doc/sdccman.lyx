@@ -10856,7 +10856,53 @@ plain
 \begin_inset Quotes srd
 \end_inset
 
- char.
+ char (unless -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-fsigned-char
+\series bold
+
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fsigned-char
+\end_layout
+
+\end_inset
+
+
+\series default
+ is used).
 \end_layout
 
 \begin_layout Itemize
@@ -10915,7 +10961,9 @@ A plain int bit-field is treated as an unsigned int bit-field.
 
 \begin_layout Itemize
 There are no allowed bit-field types other than _Bool,
- signed int and unsigned int.
+ int,
+ signed int,
+ unsigned int and the bit-precise integer types.
 \end_layout
 
 \begin_layout Itemize

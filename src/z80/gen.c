@@ -7504,7 +7504,7 @@ genPlusIncr (const iCode *ic)
           return true;
         }
       else if (resultId == getPairId (ic->left->aop) &&
-        (IS_Z80N && resultId != PAIR_IY && icount > 3 ||IS_TLCS90 && (resultId == PAIR_HL || resultId == PAIR_IY) && icount > 2))
+        (IS_Z80N && resultId != PAIR_IY && icount > 3 || IS_TLCS90 && (resultId == PAIR_HL || resultId == PAIR_IY) && icount > 2))
         {
           emit2 ("add %s, !immed%s", getPairName (IC_RESULT (ic)->aop), aopGetLitWordLong (IC_RIGHT (ic)->aop, 0, false));
           cost2 (4 - IS_TLCS90, 16, 0, 0, 0, 6, 0, 0);
@@ -15529,7 +15529,7 @@ genJumpTab (const iCode *ic)
       goto genlabeltab;
 #else
       emit2 ("lda hl, hl, a");
-      cost (3 * 2, 3 * 14);
+      cost (2, 14);
       goto calculated;
 #endif
     }
@@ -15554,13 +15554,14 @@ genJumpTab (const iCode *ic)
 
   spillPair (PAIR_HL);
   if (!regalloc_dry_run)
-    {
-      emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
-      emit2 ("add hl, %s", _pairs[pair].name);
-      emit2 ("add hl, %s", _pairs[pair].name);
-      emit2 ("add hl, %s", _pairs[pair].name);
-    }
-  regalloc_dry_run_cost += 5;
+    emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
+  cost2 (3, 10, 9, 6, 12, 6, 3, 3);
+  emit2 ("add hl, %s", _pairs[pair].name);
+  cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+  emit2 ("add hl, %s", _pairs[pair].name);
+  cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+  emit2 ("add hl, %s", _pairs[pair].name);
+  cost2 (1, 11, 7, 2, 8, 8, 1, 1);
 
 calculated:
 

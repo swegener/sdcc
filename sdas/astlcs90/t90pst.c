@@ -164,6 +164,8 @@ struct  mne     mne[] = {
     {   NULL,   "push",         S_PUSH,         0,      0x50    },
     {   NULL,   "pop",          S_PUSH,         0,      0x58    },
 
+    {   NULL,   "lda",          S_LDA,          0,      0xF4    },
+
     {   NULL,   "call",         S_CALL,         0,      0x1C    },
     {   NULL,   "ret",          S_RET,          0,      0x1E    },
     {   NULL,   "reti",         S_INH1,         0,      0x1F    },

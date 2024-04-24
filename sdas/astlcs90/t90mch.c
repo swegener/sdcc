@@ -442,7 +442,7 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
 void
 machine(struct mne *mp)
 {
-  int op, t1, t2;
+  int op, t1, t2, t3;
   struct expr e1, e2;
   int rf, v1, v2;
 
@@ -473,6 +473,27 @@ machine(struct mne *mp)
       break;
 
       //////////////////////////////////////////////////////////////////////
+
+    case S_LDA:
+      t1 = addr(&e1);
+      v1 = (int) e1.e_addr;
+      comma(1);
+      t2 = addr(&e2);
+      v2 = (int) e2.e_addr;
+      comma(1);
+      t3 = addr(&e2);
+
+      if (t1 == S_R16 && (t2 == S_R16) && (v2==IX || v2==IY || v2==SP) && t3 == S_IMMED)
+        {
+          t2 = e2.e_mode = S_INDR + v2;
+
+          outab(op + v2 - IX);
+          outrb(&e2, R_SGND);
+          outab(0x38 + (v1 & 0x0F));
+          break;
+        }
+      aerr();
+      break;
 
     case S_INCX:
     case S_DECX:

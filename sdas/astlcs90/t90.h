@@ -213,6 +213,8 @@ ULE (C or Z) = 1 Result (unsigned) is <= 0
 
 #define S_CALLR 119
 
+#define	S_LDA	120
+
 // .t90
 #define	S_CPU	123
 

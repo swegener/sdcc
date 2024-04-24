@@ -1,3 +1,13 @@
+2024-04-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  Update documentation on implementation-defined behaviour.
+	* sdas/astlcs90/t90.h,
+	  sdas/astlcs90/t90mch.c,
+	  sdas/astlcs90/t90pst.c,
+	  src/z80/gen.c:
+	  Use lda for tlcs90 codegen.
+
 2024-04-23 Felix Salfelder <felix AT salfelder.org>
 
 	* support/cpp/gcc/cc1_dummies.cc

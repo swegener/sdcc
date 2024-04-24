@@ -4738,12 +4738,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           genMove_o (result, roffset + i, ASMOP_ZERO, 0, size - i, a_dead, hl_dead, false, iy_dead, f_dead);
           return;
         }
-      else if (IS_EZ80_Z80 && source->type == AOP_STL && !(soffset + i) && getPairId_o(result, roffset) != PAIR_INVALID &&
+      else if ((IS_TLCS90 || IS_EZ80_Z80) && source->type == AOP_STL && !(soffset + i) && getPairId_o(result, roffset) != PAIR_INVALID &&
         !_G.omitFramePtr && abs(fpOffset (source->aopu.aop_stk)) <= 127)
         {
-          emit2 ("lea %s, ix, !immed%d", _pairs[getPairId_o(result, roffset)].name, fpOffset (source->aopu.aop_stk));
+          emit2 (IS_TLCS90 ? "lda %s, ix, !immed%d" : "lea %s, ix, !immed%d", _pairs[getPairId_o(result, roffset)].name, fpOffset (source->aopu.aop_stk));
           spillPair (getPairId_o(result, roffset));
-          cost (3, 3);
+          cost (3, IS_TLCS90 ? 10 : 3);
           i += 2;
           continue;
         }
@@ -4781,7 +4781,11 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else if (source->type == AOP_STL)
         {
-          if (i || soffset || !hl_dead)
+          if (!hl_dead && (result->regs[L_IDX] > roffset || result->regs[H_IDX] > roffset))
+            UNIMPLEMENTED;
+          if (!hl_dead)
+            _push (PAIR_HL);
+          if (i || soffset)
             UNIMPLEMENTED;
           if (!f_dead)
             _push (PAIR_AF);
@@ -4793,6 +4797,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             _pop (PAIR_AF);
           spillPair (PAIR_HL);
           genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead, true, de_dead_global, iy_dead, f_dead);
+          if (!hl_dead)
+            _pop (PAIR_HL);
           i += 2;
           continue;
         }
@@ -7842,13 +7848,13 @@ genPlus (iCode * ic)
     }
 
   // eZ80 has lea.
-  if (IS_EZ80_Z80 && !maskedtopbyte && isPair (IC_RESULT (ic)->aop) && getPairId (IC_LEFT (ic)->aop) == PAIR_IY && IC_RIGHT (ic)->aop->type == AOP_LIT)
+  if ((IS_TLCS90 || IS_EZ80_Z80) && !maskedtopbyte && isPair (IC_RESULT (ic)->aop) && getPairId (IC_LEFT (ic)->aop) == PAIR_IY && IC_RIGHT (ic)->aop->type == AOP_LIT)
     {
        int lit = (int) ulFromVal (IC_RIGHT (ic)->aop->aopu.aop_lit);
        if (lit >= -128 && lit < 128)
          {
-           emit2 ("lea %s, iy, !immed%d", _pairs[getPairId (IC_RESULT (ic)->aop)].name, lit);
-           cost (3, 3);
+           emit2 (IS_TLCS90 ? "lda %s, iy, !immed%d" : "lea %s, iy, !immed%d", _pairs[getPairId (IC_RESULT (ic)->aop)].name, lit);
+           cost (3, IS_TLCS90 ? 10 : 3);
            spillPair (getPairId (IC_RESULT (ic)->aop));
            goto release;
          }
@@ -15137,10 +15143,10 @@ genAddrOf (const iCode * ic)
       else
         pair = (getPairId (IC_RESULT (ic)->aop) == PAIR_IY) ? PAIR_IY : PAIR_HL;
       spillPair (pair);
-      if (IS_EZ80_Z80 && in_fp_range)
+      if ((IS_TLCS90 || IS_EZ80_Z80) && in_fp_range)
         {
-          emit2 ("lea %s, ix, !immed%d", _pairs[pair].name, fp_offset);
-          cost (3, 3);
+          emit2 (IS_TLCS90 ? "lda %s, ix, !immed%d" : "lea %s, ix, !immed%d", _pairs[pair].name, fp_offset);
+          cost (3, IS_TLCS90 ? 10 : 3);
         }
       else
         setupPairFromSP (pair, sp_offset);

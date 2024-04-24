@@ -15511,6 +15511,29 @@ genJumpTab (const iCode *ic)
 
   aopOp (jtcond, ic, FALSE, FALSE);
 
+  if (!regalloc_dry_run)
+    jtab = newiTempLabel (NULL);
+
+  if (IS_TLCS90 && !aopInReg (jtcond->aop, 0, C_IDX) && !aopInReg (jtcond->aop, 0, E_IDX))
+    {
+      genMove (ASMOP_A, jtcond->aop, isRegDead (A_IDX, ic), true,isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+      if (!regalloc_dry_run)
+        emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
+      cost (3, 6);
+      emit2 ("lda hl, hl, a");
+      emit2 ("lda hl, hl, a");
+      cost (2 * 2, 2 * 14);
+#if 0 // Enable when supported in assembler
+      emit2 ("jp a(hl)");
+      cost (2, 16);
+      goto genlabeltab;
+#else
+      emit2 ("lda hl, hl, a");
+      cost (3 * 2, 3 * 14);
+      goto calculated;
+#endif
+    }
+
   // Choose extra pair DE or BC for addition
   if (jtcond->aop->type == AOP_REG && jtcond->aop->aopu.aop_reg[0]->rIdx == E_IDX && isPairDead (PAIR_DE, ic))
     pair = PAIR_DE;
@@ -15526,12 +15549,9 @@ genJumpTab (const iCode *ic)
     }
 
   cheapMove (pair == PAIR_DE ? ASMOP_E : ASMOP_C, 0, jtcond->aop, 0, true);
-  if (!regalloc_dry_run)
-    {
-      emit2 ("ld %s, !zero", _pairs[pair].h);
-      jtab = newiTempLabel (NULL);
-    }
+  emit2 ("ld %s, !zero", _pairs[pair].h);
   cost2 (2, 7, 6, 4, 8, 4, 2, 2);
+
   spillPair (PAIR_HL);
   if (!regalloc_dry_run)
     {
@@ -15541,22 +15561,25 @@ genJumpTab (const iCode *ic)
       emit2 ("add hl, %s", _pairs[pair].name);
     }
   regalloc_dry_run_cost += 5;
-  freeAsmop (IC_JTCOND (ic), NULL);
+
+calculated:
 
   if (pushed_pair)
     _pop (pair);
 
-  if (!regalloc_dry_run)
-    {
-      emit2 ("!jphl");
-      emitLabelSpill (jtab);
-    }
+  emit2 ("!jphl");
   cost2 (1 + IS_TLCS90, 4, 3, 4, 4, 8, 3, 1);
+
   /* now generate the jump labels */
+genlabeltab:
+  if (!regalloc_dry_run)
+    emitLabelSpill (jtab);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
     if (!regalloc_dry_run)
       emit2 ("jp !tlabel", labelKey2num (jtab->key));
   /*regalloc_dry_run_cost += 3 doesn't matter and might overflow cost */
+
+  freeAsmop (IC_JTCOND (ic), NULL);
 }
 
 /*-----------------------------------------------------------------*/

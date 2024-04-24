@@ -1,7 +1,4 @@
-// peeph-z80.def - Z80 peephole rules
-//
-// Some of these peepholes could be potentially moved to peeph.def, but a
-// GBZ80 expert should have a look at them before.
+// peeph-tlcs90.def - TLCS-90 peephole rules
 //
 // (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2015
 //
@@ -25,7 +22,7 @@ replace restart {
 	ld	%2 (%3), %1
 } by {
 	ld	%5 (%6), %4
-	; peephole 13 loaded %7 into %2 (%3) directly instead of going through %1.
+	; tlcs90 peephole 0 loaded %7 into %2 (%3) directly instead of going through %1.
 	ld	%2 (%3), %7
 } if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4 %1 'hl')
 
@@ -38,7 +35,7 @@ replace restart {
 	ld	a, (hl)
 	dec	hl
 	or	a, (hl)
-	; peephole 52 used hl instead of iy.
+	; tlcs90 peephole 1 used hl instead of iy.
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -49,7 +46,7 @@ replace restart {
 	inc	de
 } by {
 	inc	hl
-	; peephole 59 incremented once in hl instead of incrementing in de twice.
+	; tlcs90 peephole 2 incremented once in hl instead of incrementing in de twice.
 	add	hl, hl
 	ld	e, l
 	ld	d, h
@@ -61,7 +58,7 @@ replace restart {
 	inc	hl
 } by {
 	inc	hl
-	; peephole 60 incremented once in hl instead of incrementing in hl twice.
+	; tlcs90 peephole 3 incremented once in hl instead of incrementing in hl twice.
 	add	hl, hl
 }
 
@@ -71,7 +68,7 @@ replace restart {
 	add	a, #0x04
 } by {
 	inc	a
-	; peephole 61 incremented a once instead of adding #0x04 to a.
+	; tlcs90 peephole 4 incremented a once instead of adding #0x04 to a.
 	add	a, a
 	add	a, a
 }
@@ -83,7 +80,7 @@ replace restart {
 	inc	hl
 } by {
 	inc	hl
-	; peephole 62 incremented once in hl instead of incrementing in hl twice.
+	; tlcs90 peephole 5 incremented once in hl instead of incrementing in hl twice.
 	add	hl, hl
 	pop	de
 }
@@ -93,7 +90,7 @@ replace {
 	ld	d,#0x%2
 } by {
 	ld	de,#0x%2%1
-	; peephole 78 combined constant loads into register pair.
+	; tlcs90 peephole 6 combined constant loads into register pair.
 }
 
 replace {
@@ -101,7 +98,7 @@ replace {
 	ld	e,#0x%2
 } by {
 	ld	de,#0x%1%2
-	; peephole 79 combined constant loads into register pair.
+	; tlcs90 peephole 7 combined constant loads into register pair.
 }
 
 replace {
@@ -109,7 +106,7 @@ replace {
 	ld	h,#0x%2
 } by {
 	ld	hl,#0x%2%1
-	; peephole 80 combined constant loads into register pair.
+	; tlcs90 peephole 8 combined constant loads into register pair.
 }
 
 replace {
@@ -117,7 +114,7 @@ replace {
 	ld	l,#0x%2
 } by {
 	ld	hl,#0x%1%2
-	; peephole 81 combined constant loads into register pair.
+	; tlcs90 peephole 9 combined constant loads into register pair.
 }
 
 replace {
@@ -125,7 +122,7 @@ replace {
 	ld	b,#0x%2
 } by {
 	ld	bc,#0x%2%1
-	; peephole 82 combined constant loads into register pair.
+	; tlcs90 peephole 10 combined constant loads into register pair.
 }
 
 replace {
@@ -133,7 +130,7 @@ replace {
 	ld	c,#0x%2
 } by {
 	ld	bc,#0x%1%2
-	; peephole 83 combined constant loads into register pair.
+	; tlcs90 peephole 11 combined constant loads into register pair.
 }
 
 replace restart {
@@ -147,5 +144,5 @@ replace restart {
 	ld	a, %2 (%3)
 	adc	a, #%4
 	ld	%5, a
-	; peephole 110 loaded %6 from a directly instead of going through %1.
+	; tlcs90 peephole 12 loaded %6 from a directly instead of going through %1.
 } if notUsed(%1), notSame(%5 %1), notSame(%5 '(hl)' '(de)' '(bc)'), notSame(%5 %6), notSame(%6 '(hl)' '(de)' '(bc)'), notSame(%5 'a'), notSame(%6 'a')

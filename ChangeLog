@@ -1,3 +1,8 @@
+2024-04-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3730.c:
+	  Test for bug #3730.
+
 2024-04-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

@@ -1603,7 +1603,7 @@ static bool omit_frame_ptr(const G_t &G)
 // Adjust stack location when deciding to omit frame pointer.
 void move_parms(void)
 {
-  if(!currFunc || IS_SM83 || options.omitFramePtr || !should_omit_frame_ptr)
+  if(!currFunc || IS_SM83 || !should_omit_frame_ptr)
     return;
 
   for(value *val = FUNC_ARGS (currFunc->type); val; val = val->next)

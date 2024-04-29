@@ -14951,14 +14951,11 @@ genPointerSet (iCode *ic)
           _push (pairId);
           pushed_pair = true;
         }
-      if (requiresHL (result->aop) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && pairId != PAIR_HL && !isPairDead (PAIR_HL, ic))
-        {
-          _push (PAIR_HL);
-          fetchPairLong (pairId, result->aop, ic, 0);
-          _pop (PAIR_HL);
-        }
-      else
-        fetchPairLong (pairId, result->aop, ic, 0);
+      genMove (pairId == PAIR_HL ? ASMOP_HL : pairId == PAIR_DE ? ASMOP_DE : ASMOP_BC, result->aop,
+        isRegDead(A_IDX, ic) && right->aop->regs[A_IDX] < 0,
+        isPairDead (PAIR_HL, ic) && right->aop->regs[L_IDX] < 0 && right->aop->regs[H_IDX] < 0,
+        isPairDead (PAIR_DE, ic) && right->aop->regs[E_IDX] < 0 && right->aop->regs[D_IDX] < 0,
+        isPairDead (PAIR_IY, ic) && right->aop->regs[IYL_IDX] < 0 && right->aop->regs[IYH_IDX] < 0);
     }
   /* so hl now contains the address */
   /*freeAsmop (result, NULL, ic);*/

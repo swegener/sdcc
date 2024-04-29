@@ -1488,7 +1488,7 @@ replace restart {
 	%2	%1
 	%3	%4
 } by {
-	; common peephole 96d move %3 %4 before %2 (%1)
+	; common peephole 96d move %3 %4 before %2 %1
 	%3	%4
 	%2	%1
 } if same(%3 'inc' 'dec'), same(%4 'hl'), same(%2 'push' 'pop'), notSame(%1 %4)

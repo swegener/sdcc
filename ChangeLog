@@ -1,3 +1,8 @@
+2024-04-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  Fix an issue in the handling of register hl vs a in write via pointer.
+
 2024-04-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/ralloc2.cc:

@@ -574,6 +574,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const cfg_dying_t &dying = G[i].dying;
   const bool dying_A = result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end();
 
+  if ((ic->op == EQ_OP || ic->op == NE_OP) && getSize(operandType(ic->left)) == 1 && (operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(right, REG_A, ia, i, G)) &&
+    (ifxForOp (ic->result, ic) || dying_A))
+    return(true);
+
   if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_SM83) &&
     getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
     return(true);

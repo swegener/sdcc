@@ -1806,14 +1806,24 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
-	ld	a,(hl)
-	inc	a
-	ld	(hl),a
+	ld	%1, (hl)
+	inc	%1
+	ld	(hl), %1
 } by {
 	inc	(hl)
-	; common peephole 115 incremented in (hl) instead of going through a.
+	; common peephole 115 incremented in (hl) instead of going through %1.
 } if notUsed('a')
 
+replace restart {
+	ld	%1, (hl)
+	ld	a, %2
+	sub	a, %1
+} by {
+	ld	a, %2
+	; common peephole 115a used (hl) in comparison instead of going through %1.
+	sub	a, (hl)
+} if notVolatile(%2), notUsed(%1)
+	
 // TODO: Check for volatile?
 replace restart {
 	ld	%1, %2 (%3)

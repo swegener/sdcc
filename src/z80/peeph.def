@@ -1812,7 +1812,7 @@ replace restart {
 } by {
 	inc	(hl)
 	; common peephole 115 incremented in (hl) instead of going through %1.
-} if notUsed('a')
+} if notUsed(%1)
 
 replace restart {
 	ld	%1, (hl)

@@ -1,6 +1,12 @@
+2024-05-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peeph.def:
+	  Fix an issue in previosu commit.
+
 2024-04-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
-	* src/z80/ralloc2.cc:
+	* src/z80/ralloc2.cc,
+	  src/z80/peeph.def:
 	  Improve use of register a and (hl) in comparisons.
 
 2024-04-29 Philipp Klaus Krause <philipp@colecovision.eu>

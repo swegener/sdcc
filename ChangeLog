@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  mcs51 named address space clarifications.
+	* support/regression/tests/sha3-256.c:
+	  Test for bug #3731.
 
 2024-05-01 Philipp Klaus Krause <philipp@colecovision.eu>
 

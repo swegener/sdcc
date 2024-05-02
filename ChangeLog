@@ -1,7 +1,12 @@
+2024-05-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  mcs51 named address space clarifications.
+
 2024-05-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def:
-	  Fix an issue in previosu commit.
+	  Fix an issue in previous commit.
 
 2024-04-30 Philipp Klaus Krause <philipp@colecovision.eu>
 

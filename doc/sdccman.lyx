@@ -23080,7 +23080,49 @@ MCS51 memory
 \end_layout
 
 \begin_layout Standard
-The 8051 family of microcontrollers have a minimum of 128 bytes of internal RAM memory which is structured as follows:
+The 8051 family of microcontrollers have a minimum of 128 bytes of internal RAM memory 
+\emph on
+__data
+\emph default
+
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+data (mcs51,
+ ds390 named address space)
+\end_layout
+
+\end_inset
+
+ which is structured as follows:
 \begin_inset Newline newline
 \end_inset
 
@@ -23116,7 +23158,7 @@ bit
 \end_layout
 
 \begin_layout Standard
-Additionally some members of the MCS51 family may have up to 128 bytes of additional,
+Additionally some members of the MCS-51 family may have up to 128 bytes of additional,
  indirectly addressable,
  internal RAM memory (
 \emph on
@@ -23385,7 +23427,7 @@ interrupt
  if the first 2 banks of registers are used,
  and only four bytes are used for 
 \emph on
-data
+__data
 \emph default
  variables,
  it will position the base of the internal stack at address 20 (0x14).
@@ -23406,13 +23448,17 @@ stack
  and the 16 bytes used by the 128 bit variables,
  and 80 bytes for general purpose use.
  If any bit variables are used,
- the data variables will be placed in unused register banks and after the byte holding the last bit variable.
+ the 
+\emph on
+__data
+\emph default
+ variables will be placed in unused register banks and after the byte holding the last __bit variable.
  For example,
  if register banks 0 and 1 are used,
  and there are 9 bit variables (two bytes used),
  
 \emph on
-data
+__data
 \emph default
  variables will be placed starting from address 0x10 to 0x20 and continue at address 0x22.
  You can also use -
@@ -23455,7 +23501,7 @@ status collapsed
 
  to specify the start address of the 
 \emph on
-data
+__data
 \emph default
  and -
 \begin_inset ERT
@@ -23497,11 +23543,7 @@ status collapsed
 
  to specify the size of the total internal RAM (
 \emph on
-data
-\emph default
-+
-\emph on
-idata
+__idata
 \emph default
 ).
  
@@ -23512,7 +23554,7 @@ idata
 \end_layout
 
 \begin_layout Standard
-By default the 8051 linker will place the stack after the last byte of (i)data variables.
+By default the 8051 linker will place the stack after the last byte of __(i)data variables.
  Option -
 \begin_inset ERT
 status collapsed

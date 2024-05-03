@@ -210,9 +210,9 @@ const struct pair pairs[] = {
 void
 testSha (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Bug #3731.
+#if __STDC_ENDIAN_NATIVE__ // The implementation assumes little-endian
 #if !defined(__SDCC_ds390) // ds390 can't return struct yet.
-#if !__SDCC_mcs51 && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !( (defined (__SDCC_mos6502) || defined(__SDCC_mos65c02 )) && defined(__SDCC_STACK_AUTO) ) // Lack of memory
+#if !__SDCC_mcs51 && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     int i;
 
     for (i = 0; i < sizeof(pairs)/sizeof(pairs[0]); i++) {

@@ -1,3 +1,8 @@
+2024-05-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/sha3-256.c:
+	  SHA3-256 test assumes little endian, so disable it for other systems.
+
 2024-05-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

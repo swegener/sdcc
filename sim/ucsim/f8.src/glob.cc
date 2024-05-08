@@ -94,7 +94,7 @@ struct dis_entry disass_f8[]=
     { 0x60, 0xff, ' ', 3, "push 'a16_8'" },
     { 0x61, 0xff, ' ', 2, "push ('nsp_8')" },
     { 0x62, 0xff, ' ', 1, "push %a" },
-    { 0x63, 0xff, ' ', 1, "push zh" },
+    { 0x63, 0xff, ' ', 1, "push ('ny_8')" },
     { 0x90, 0xff, ' ', 2, "push #'i8'" },
 
     { 0xb0, 0xff, ' ', 3, "pushw 'a16_16'" },
@@ -108,7 +108,7 @@ struct dis_entry disass_f8[]=
 
     { 0x91, 0xff, ' ', 2, "xch %a,('nsp_8')" },
     { 0x92, 0xff, ' ', 1, "xch %a,('y_8')" },
-    { 0x93, 0xff, ' ', 1, "xch %L,%H," },
+    { 0x93, 0xff, ' ', 1, "xch %L,%H" },
     { 0xf4, 0xff, ' ', 1, "xchw y,('z_16')" },
     { 0xf5, 0xff, ' ', 1, "xchw z,('nsp_16')" },
 
@@ -223,35 +223,40 @@ struct dis_entry disass_f8[]=
     { 0xf2, 0xff, ' ', 2, "orw %A,('nsp_16')" },
     { 0xf3, 0xff, ' ', 1, "orw %A,x" },
 
+    { 0xfc, 0xff, ' ', 3, "xorw %A,#'i16'" },
+    { 0xfd, 0xff, ' ', 3, "xorw %A,'a16_16'" },
+    { 0xfe, 0xff, ' ', 2, "xorw %A,('nsp_16')" },
+    { 0xff, 0xff, ' ', 1, "xorw %A,x" },
+
     { 0x40, 0xff, ' ', 3, "srl 'a16_8'" },
     { 0x41, 0xff, ' ', 2, "srl ('nsp_8')" },
     { 0x42, 0xff, ' ', 1, "srl %a" },
-    { 0x43, 0xff, ' ', 1, "srl zh" },
+    { 0x43, 0xff, ' ', 1, "srl ('ny_8')" },
     { 0x44, 0xff, ' ', 3, "sll 'a16_8'" },
     { 0x45, 0xff, ' ', 2, "sll ('nsp_8')" },
     { 0x46, 0xff, ' ', 1, "sll %a" },
-    { 0x47, 0xff, ' ', 1, "sll zh" },
+    { 0x47, 0xff, ' ', 1, "sll ('ny_8')" },
     { 0x48, 0xff, ' ', 3, "rrc 'a16_8'" },
     { 0x49, 0xff, ' ', 2, "rrc ('nsp_8')" },
     { 0x4a, 0xff, ' ', 1, "rrc %a" },
-    { 0x4b, 0xff, ' ', 1, "rrc zh" },
+    { 0x4b, 0xff, ' ', 1, "rrc ('ny_8')" },
     { 0x4c, 0xff, ' ', 3, "rlc 'a16_8'" },
     { 0x4d, 0xff, ' ', 2, "rlc ('nsp_8')" },
     { 0x4e, 0xff, ' ', 1, "rlc %a" },
-    { 0x4f, 0xff, ' ', 1, "rlc zh" },
+    { 0x4f, 0xff, ' ', 1, "rlc ('ny_8')" },
 
     { 0x50, 0xff, ' ', 3, "inc 'a16_8'" },
     { 0x51, 0xff, ' ', 2, "inc ('nsp_8')" },
     { 0x52, 0xff, ' ', 1, "inc %a" },
-    { 0x53, 0xff, ' ', 1, "inc zh" },
+    { 0x53, 0xff, ' ', 1, "inc ('ny_8')" },
     { 0x54, 0xff, ' ', 3, "dec 'a16_8'" },
     { 0x55, 0xff, ' ', 2, "dec ('nsp_8')" },
     { 0x56, 0xff, ' ', 1, "dec %a" },
-    { 0x57, 0xff, ' ', 1, "dec zh" },
+    { 0x57, 0xff, ' ', 1, "dec ('ny_8')" },
     { 0x5c, 0xff, ' ', 3, "tst 'a16_8'" },
     { 0x5d, 0xff, ' ', 2, "tst ('nsp_8')" },
     { 0x5e, 0xff, ' ', 1, "tst %a" },
-    { 0x5f, 0xff, ' ', 1, "tst zh" },
+    { 0x5f, 0xff, ' ', 1, "tst ('ny_8')" },
 
     { 0xa4, 0xff, ' ', 3, "incw 'a16_16'" },
     { 0xa5, 0xff, ' ', 2, "incw ('nsp_16')" },
@@ -292,7 +297,7 @@ struct dis_entry disass_f8[]=
     { 0xe4, 0xff, ' ', 1, "sraw %A"},
     { 0xea, 0xff, ' ', 2, "addw sp,#%d"},
     { 0xeb, 0xff, ' ', 2, "addw %A,#%d"},
-    { 0xec, 0xff, ' ', 1, "xch f,(0, sp)"},
+    { 0xec, 0xff, ' ', 2, "xch f,('nsp_16')"},
     { 0xf8, 0xff, ' ', 3, "cpw %A,#'i16'"},
     { 0xf6, 0xff, ' ', 1, "incnw %A"},
     { 0xf7, 0xff, ' ', 2, "decw ('nsp_16')"},
@@ -316,7 +321,6 @@ struct dis_entry disass_f8[]=
     { 0xd5, 0xff, ' ', 2, "jrnc %r" },
     { 0xd6, 0xff, ' ', 2, "jrn %r" },
     { 0xd7, 0xff, ' ', 2, "jrnn %r" },
-    { 0xd8, 0xff, ' ', 2, "jro %r" },
     { 0xd9, 0xff, ' ', 2, "jrno %r" },
     { 0xda, 0xff, ' ', 2, "jrsge %r" },
     { 0xdb, 0xff, ' ', 2, "jrslt %r" },
@@ -364,13 +368,14 @@ u16_t tick_tab_f8[256]= {
 // Bitmasks of P_XXXX
 enum {
   // shorts for allowed prefixes
-  PN		= P_NONE,                      // none
-  PA		= P_SWAP|P_ALT1|P_ALT2|P_ALT3, // 012
-  P8		= P_ALT1,                      // 1
-  P6		= P_ALT2|P_ALT3,               // 2
-  PD		= P8|P6,                       // 12
-  P1		= P_SWAP|P8,                   // 01
-  P2		= P_SWAP|P6                    // 02
+  PN		= P_NONE,                                    // none
+  PS		= P_SWAP,                                    // 0
+  PA		= P_SWAP|P_ALT1|P_ALT2|P_ALT3|P_ALT4|P_ALT5, // 012
+  P8		= P_ALT1|P_ALT5,                             // 1
+  P6		= P_ALT2|P_ALT3|P_ALT4,                      // 2
+  PD		= P8|P6,                                     // 12
+  P1		= P_SWAP|P8,                                 // 01
+  P2		= P_SWAP|P6                                  // 02
 };
 
 u8_t allowed_prefs[256]= {
@@ -381,14 +386,14 @@ u8_t allowed_prefs[256]= {
   /* 3_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
   /* 4_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
   /* 5_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
-  /* 6_ */    PD,PD,PD,PD,  PN,P6,PN,P6,  PD,PD,PD,PD,  PD,PD,PD,PD,
+  /* 6_ */    PD,PD,PD,PD,  PA,P6,PN,P6,  PD,PD,PD,PD,  PD,PD,PD,PD,
   /* 7_ */    P2,P2,P2,P2,  PD,P2,P2,P2,  P6,P2,P2,P2,  P6,P2,P2,P2,
   /* 8_ */    PD,PD,PD,PD,  PD,PD,PA,PA,  PA,PA,PA,PD,  PD,PD,PD,PD,
   /* 9_ */    PN,PD,PD,P6,  PN,PD,PD,PD,  PD,PD,PD,PN,   0, 0, 0, 0,
   /* a_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
   /* b_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,PN,PN,  PN,PN,PN,PN,
   /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
-  /* d_ */    PN,PN,PN,PN,  PN,PN,PN,PN,  PN,PN,PN,PN,  PN,PN,PN,PN,
+  /* d_ */    PA,PN,PN,PN,  PN,PN,PN,PN,  PS,PN,PN,PN,  PN,PS,PN,PS,
   /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,P6,P6,
   /* f_ */    P6,P2,P2,P2,  PN,PN,P6,PN,  P6,PN,P6,P6,   0, 0, 0, 0
 };

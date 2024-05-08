@@ -394,21 +394,27 @@ cl_f8::exec_inst(void)
   instPC= PC;
   if (fetch(&code))
     return resBREAKPOINT;
-  while ((code & PREF_MASK) == PREF)
+  while (code == PREF_SWAPOP || code == PREF_ALT1 || code == PREF_ALT2 || code == PREF_ALT3 || code == PREF_ALT4 || code == PREF_ALT5)
     {
       switch (code)
 	{
 	case PREF_SWAPOP: // swapop
 	  prefixes|= P_SWAP;
 	  break;
-	case PREF_ALT1: // altacc
+	case PREF_ALT1: // altacc1
 	  prefixes|= P_ALT1;
 	  break;
-	case PREF_ALT2: // altacc'
+	case PREF_ALT2: // altacc2
 	  prefixes|= P_ALT2;
 	  break;
-	case PREF_ALT3: // altacc''
+	case PREF_ALT3: // altacc3
 	  prefixes|= P_ALT3;
+	  break;
+	case PREF_ALT4: // altacc4
+	  prefixes|= P_ALT4;
+	  break;
+	case PREF_ALT5: // altacc5
+	  prefixes|= P_ALT5;
 	  break;
 	}
       if (fetch(&code))
@@ -430,6 +436,16 @@ cl_f8::exec_inst(void)
     {
       acc8 = &cZL;
       acc16= &cX;
+    }
+  else if (prefixes & P_ALT4)
+    {
+      acc8 = &cYH;
+      acc16= &cZ;
+    }
+  else if (prefixes & P_ALT5)
+    {
+      acc8 = &cZH;
+      acc16= &cY;
     }
   /*
     // clear_prefixes() prepares this state

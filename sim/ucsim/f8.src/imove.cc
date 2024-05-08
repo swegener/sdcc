@@ -38,7 +38,11 @@ cl_f8::ld8_a_i(u8_t op2)
 int
 cl_f8::ld8_a_m(class cl_cell8 &m)
 {
-  acc8->W(m.R());
+  uint8_t v = m.R();
+  rF&= ~(flagN|flagZ);
+  if (v & 0x80) rF|= flagN;
+  if (!v) rF|= flagZ;
+  acc8->W(v);
   vc.rd++;
   return resGO;
 }
@@ -70,13 +74,6 @@ cl_f8::ld8_a_r(class cl_cell8 &r)
 }
 
 int
-cl_f8::LD8_YH_I(t_mem code)
-{
-  cYH.W(fetch());
-  return resGO;
-}
-
-int
 cl_f8::ldw_a_i(u16_t op2)
 {
   acc16->W(op2);
@@ -88,6 +85,9 @@ cl_f8::ldw_a_m(u16_t addr)
 {
   u16_t v= rom->read(addr);
   v+= (rom->read(addr+1))*256;
+  rF&= ~(flagN|flagZ);
+  if (v & 0x8000) rF|= flagN;
+  if (!v) rF|= flagZ;
   acc16->W(v);
   vc.rd+= 2;
   return resGO;
@@ -130,9 +130,9 @@ cl_f8::LDW_A_SP(t_mem code)
 }
 
 int
-cl_f8::XCH_F_0SP(t_mem code)
+cl_f8::XCH_F_NSP(t_mem code)
 {
-  class cl_cell8 &c= *(class cl_cell8 *)rom->get_cell(rSP);
+  class cl_cell8 &c= m_n_sp();
   u8_t t= rF;
   rF = c.R();
   vc.rd++;
@@ -182,9 +182,11 @@ cl_f8::PUSH_A(t_mem code)
 }
 
 int
-cl_f8::PUSH_ZH(t_mem code)
+cl_f8::PUSH_NY(t_mem code)
 {
-  push1(rZH); // TODO?
+  class cl_cell8 &c= m_n_y();
+  push1(c.R());
+  vc.rd++;
   return resGO;
 }
 
@@ -380,9 +382,11 @@ cl_f8::CLR_A(t_mem code)
 }
 
 int
-cl_f8::CLR_ZH(t_mem code)
+cl_f8::CLR_NY(t_mem code)
 {
-  cZH.W(0);
+  class cl_cell8 &c= m_n_y();
+  c.W(0);
+  vc.wr++;
   return resGO;
 }
 

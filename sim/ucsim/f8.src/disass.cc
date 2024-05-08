@@ -39,7 +39,7 @@ cl_f8::get_dis_entry(t_addr addr)
 {
   t_mem code= rom->get(addr);
   int i= 0;
-  while ((code & PREF_MASK)==PREF)
+  while (code == PREF_SWAPOP || code == PREF_ALT1 || code == PREF_ALT2 || code == PREF_ALT3 || code == PREF_ALT4 || code == PREF_ALT5)
     {
       i++;
       code= rom->get(addr+i);
@@ -59,7 +59,7 @@ cl_f8::inst_length(t_addr addr)
   t_addr a= addr;
   int s= 0;
   u8_t c= rom->get(a);
-  while ((c & PREF_MASK) == PREF)
+  while (c == PREF_SWAPOP || c == PREF_ALT1 || c == PREF_ALT2 || c == PREF_ALT3 || c == PREF_ALT4 || c == PREF_ALT5)
     {
       s++;
       c= rom->get(++a);
@@ -79,15 +79,19 @@ cl_f8::a8(u8_t prefs)
     return rYL;
   else if (prefs & P_ALT3)
     return rZL;
+  else if (prefs & P_ALT4)
+    return rYH;
+  else if (prefs & P_ALT5)
+    return rZH;
   return rXL;
 }
 
 u16_t
 cl_f8::a16(u8_t prefs)
 {
-  if (prefs & P_ALT2)
+  if (prefs & P_ALT3)
     return rX;
-  else if (prefs & P_ALT3)
+  else if (prefs & (P_ALT2 | P_ALT4))
     return rZ;
   return rY;
 }
@@ -101,13 +105,17 @@ cl_f8::a8_name(u8_t prefs)
     return "yl";
   else if (prefs & P_ALT3)
     return "zl";
+  else if (prefs & P_ALT4)
+    return "yh";
+  else if (prefs & P_ALT5)
+    return "zh";
   return "xl";
 }
 
 const char *
 cl_f8::a16_name(u8_t prefs)
 {
-  if (prefs & P_ALT2)
+  if (prefs & (P_ALT2 | P_ALT4))
     return "z";
   else if (prefs & P_ALT3)
     return "x";
@@ -117,7 +125,7 @@ cl_f8::a16_name(u8_t prefs)
 const char *
 cl_f8::a16h_name(u8_t prefs)
 {
-  if (prefs & P_ALT2)
+  if (prefs & (P_ALT2 | P_ALT4))
     return "zh";
   else if (prefs & P_ALT3)
     return "xh";
@@ -127,7 +135,7 @@ cl_f8::a16h_name(u8_t prefs)
 const char *
 cl_f8::a16l_name(u8_t prefs)
 {
-  if (prefs & P_ALT2)
+  if (prefs & (P_ALT2 | P_ALT4))
     return "zl";
   else if (prefs & P_ALT3)
     return "xl";
@@ -150,11 +158,28 @@ cl_f8::disassc(t_addr addr, chars *comment)
   i16_t d;
   
   code= rom->read(addr);
-  while ((code & PREF_MASK)==PREF)
+  while (code == PREF_SWAPOP || code == PREF_ALT1 || code == PREF_ALT2 || code == PREF_ALT3 || code == PREF_ALT4 || code == PREF_ALT5)
     {
-      code&= ~PREF_MASK;
-      code>>= PREF_SHIFT;
-      prefs|= (1 << code);
+      switch (code) {
+      case PREF_SWAPOP:
+        prefs = P_SWAP;
+        break;
+      case PREF_ALT1:
+        prefs = P_ALT1;
+        break;
+      case PREF_ALT2:
+        prefs = P_ALT2;
+        break;
+      case PREF_ALT3:
+        prefs = P_ALT3;
+        break;
+      case PREF_ALT4:
+        prefs = P_ALT4;
+        break;
+      case PREF_ALT5:
+        prefs = P_ALT5;
+        break;
+      }
       code= rom->read(++addr);
     }
   de= get_dis_entry(addr);

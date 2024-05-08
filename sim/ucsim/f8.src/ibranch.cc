@@ -81,11 +81,9 @@ int
 cl_f8::jr(bool cond)
 {
   i8_t d= fetch();
-  u16_t a= PC;
+  u16_t a= PC - 2;
   if (cond)
-    {
-      set_PC(a+d);
-    }
+    set_PC(a+d);
   return resGO;
 }
 
@@ -93,7 +91,7 @@ int
 cl_f8::DNJNZ(t_mem code)
 {
   i8_t d= fetch();
-  u16_t a= PC;
+  u16_t a= PC - 2;
   cYH.W(rYH-1);
   rF&= ~(flagZ|flagN);
   if (rYH==0) rF|= flagZ;

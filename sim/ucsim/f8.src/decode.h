@@ -37,7 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PREF_ALT1	0x9d
 #define PREF_ALT2	0x9e
 #define PREF_ALT3	0x9f
-
+#define PREF_ALT4	0x94
+#define PREF_ALT5	0xd8
 
 // data moves
 #define LD8_A_I		instruction_80
@@ -56,7 +57,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LD8_NNZ_A	instruction_8d
 #define LD8_Y_A		instruction_8e
 #define LD8_NY_A	instruction_8f
-#define LD8_YH_I	instruction_94
 
 #define LDW_A_I		instruction_c0
 #define LDW_A_M		instruction_c1
@@ -79,7 +79,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PUSH_M		instruction_60
 #define PUSH_NSP	instruction_61
 #define PUSH_A		instruction_62
-#define PUSH_ZH		instruction_63
+#define PUSH_NY		instruction_63
 #define PUSH_I		instruction_90
 
 #define PUSHW_M		instruction_b0
@@ -103,7 +103,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CLR_M		instruction_58
 #define CLR_NSP		instruction_59
 #define CLR_A		instruction_5a
-#define CLR_ZH		instruction_5b
+#define CLR_NY		instruction_5b
 #define CLRW_M		instruction_a0
 #define CLRW_NSP	instruction_a1
 #define CLRW_NNZ	instruction_a2
@@ -121,15 +121,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define INC_M		instruction_50
 #define INC_NSP		instruction_51
 #define INC_A		instruction_52
-#define INC_ZH		instruction_53
+#define INC_NY		instruction_53
 #define DEC_M		instruction_54
 #define DEC_NSP		instruction_55
 #define DEC_A		instruction_56
-#define DEC_ZH		instruction_57
+#define DEC_NY		instruction_57
 #define TST_M		instruction_5c
 #define TST_NSP		instruction_5d
 #define TST_A		instruction_5e
-#define TST_ZH		instruction_5f
+#define TST_NY		instruction_5f
 
 // arithmetic instructions
 #define ADD_I		instruction_10
@@ -223,22 +223,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ORW_NSP		instruction_f2
 #define ORW_X		instruction_f3
 
+#define XORW_I		instruction_fc
+#define XORW_M		instruction_fd
+#define XORW_NSP	instruction_fe
+#define XORW_X		instruction_ff
+
 #define SRL_M		instruction_40
 #define SRL_NSP		instruction_41
 #define SRL_A		instruction_42
-#define SRL_ZH		instruction_43
+#define SRL_NY		instruction_43
 #define SLL_M		instruction_44
 #define SLL_NSP		instruction_45
 #define SLL_A		instruction_46
-#define SLL_ZH		instruction_47
+#define SLL_NY		instruction_47
 #define RRC_M		instruction_48
 #define RRC_NSP		instruction_49
 #define RRC_A		instruction_4a
-#define RRC_ZH		instruction_4b
+#define RRC_NY		instruction_4b
 #define RLC_M		instruction_4c
 #define RLC_NSP		instruction_4d
 #define RLC_A		instruction_4e
-#define RLC_ZH		instruction_4f
+#define RLC_NY		instruction_4f
 
 #define INCW_M		instruction_a4
 #define INCW_NSP	instruction_a5
@@ -266,7 +271,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAD_NSP		instruction_bd
 #define MAD_NNZ		instruction_be
 #define MAD_Z		instruction_bf
-#define XCH_F_0SP	instruction_ec
+#define XCH_F_NSP	instruction_ec
 
 #define MUL		instruction_b9
 #define NEGW		instruction_fa
@@ -304,13 +309,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define JRNC		instruction_d5
 #define JRN		instruction_d6
 #define JRNN		instruction_d7
-#define JRO		instruction_d8
 #define JRNO		instruction_d9
 #define JRSGE		instruction_da
 #define JRSLT		instruction_db
-#define JRSGT		instruction_dc
 #define JRSLE		instruction_dd
-#define JRGT		instruction_de
 #define JRLE		instruction_df
 
 // other instructions

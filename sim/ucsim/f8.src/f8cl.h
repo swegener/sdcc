@@ -102,9 +102,11 @@ enum {
 enum {
   P_NONE	= 0,
   P_SWAP	= 0x01, // (0) swapop
-  P_ALT1	= 0x02, // (1) altacc    XH
-  P_ALT2	= 0x04, // (2) altacc'   YL  X
-  P_ALT3	= 0x08  // (2) altacc''  ZL  Z
+  P_ALT1	= 0x02, // (1) altacc1    XH
+  P_ALT2	= 0x04, // (2) altacc2    YL  X
+  P_ALT3	= 0x08, // (2) altacc3    ZL  Z
+  P_ALT4	= 0x10, // (2) altacc4    YH  Z
+  P_ALT5	= 0x20, // (2) altacc5    ZH
 };
 
 #define IFSWAP if (prefixes&P_SWAP)
@@ -208,7 +210,6 @@ public:
   int LD8_NNZ_A(t_mem code) { return ld8_m_a(m_nn_z()); }
   int LD8_Y_A(t_mem code)   { return ld8_m_a(m_y()); }
   int LD8_NY_A(t_mem code)  { return ld8_m_a(m_n_y()); }
-  int LD8_YH_I(t_mem code);
   // 16 bit moves
   int ldw_a_i(u16_t op2);
   int ldw_a_m(u16_t addr);
@@ -236,7 +237,7 @@ public:
   int PUSH_M(t_mem code);
   int PUSH_NSP(t_mem code);
   int PUSH_A(t_mem code);
-  int PUSH_ZH(t_mem code);
+  int PUSH_NY(t_mem code);
   int PUSH_I(t_mem code);
   int PUSHW_M(t_mem code);
   int PUSHW_NSP(t_mem code);
@@ -255,7 +256,7 @@ public:
   int CLR_M(t_mem code);
   int CLR_NSP(t_mem code);
   int CLR_A(t_mem code);
-  int CLR_ZH(t_mem code);
+  int CLR_NY(t_mem code);
   int CLRW_M(t_mem code);
   int CLRW_NSP(t_mem code);
   int CLRW_NNZ(t_mem code);
@@ -343,31 +344,31 @@ public:
   int SRL_M(t_mem code);
   int SRL_NSP(t_mem code);
   int SRL_A(t_mem code);
-  int SRL_ZH(t_mem code);
+  int SRL_NY(t_mem code);
   int SLL_M(t_mem code);
   int SLL_NSP(t_mem code);
   int SLL_A(t_mem code);
-  int SLL_ZH(t_mem code);
+  int SLL_NY(t_mem code);
   int RRC_M(t_mem code);
   int RRC_NSP(t_mem code);
   int RRC_A(t_mem code);
-  int RRC_ZH(t_mem code);
+  int RRC_NY(t_mem code);
   int RLC_M(t_mem code);
   int RLC_NSP(t_mem code);
   int RLC_A(t_mem code);
-  int RLC_ZH(t_mem code);
+  int RLC_NY(t_mem code);
   int INC_M(t_mem code);
   int INC_NSP(t_mem code);
   int INC_A(t_mem code);
-  int INC_ZH(t_mem code);
+  int INC_NY(t_mem code);
   int DEC_M(t_mem code);
   int DEC_NSP(t_mem code);
   int DEC_A(t_mem code);
-  int DEC_ZH(t_mem code);
+  int DEC_NY(t_mem code);
   int TST_M(t_mem code);
   int TST_NSP(t_mem code);
   int TST_A(t_mem code);
-  int TST_ZH(t_mem code);
+  int TST_NY(t_mem code);
   
   // 16-bit 2-op-inst
   virtual u16_t add16(u16_t a, u16_t b, int c, bool sub);
@@ -378,6 +379,9 @@ public:
   virtual u16_t or16(u16_t a, u16_t b);
   virtual int or16(u16_t opaddr);
   virtual int or16(void);
+  virtual u16_t xor16(u16_t a, u16_t b);
+  virtual int xor16(u16_t opaddr);
+  virtual int xor16(void);
   int SUBW_M  (t_mem code) { return sub16(a_mm()  , false); }
   int SUBW_NSP(t_mem code) { return sub16(a_n_sp(), false); }
   int SUBW_X  (t_mem code) { return sub16(          false); }
@@ -392,10 +396,14 @@ public:
   int ADCW_M  (t_mem code) { return add16(a_mm()  , true); }
   int ADCW_NSP(t_mem code) { return add16(a_n_sp(), true); }
   int ADCW_X  (t_mem code) { return add16(          true); }
-  int ORW_I   (t_mem code) { return or16(a_i()   ); }
-  int ORW_M   (t_mem code) { return or16(a_mm()  ); }
-  int ORW_NSP (t_mem code) { return or16(a_n_sp()); }
-  int ORW_X   (t_mem code) { return or16(        ); }
+  int ORW_I   (t_mem code) { return or16(a_i()    ); }
+  int ORW_M   (t_mem code) { return or16(a_mm()   ); }
+  int ORW_NSP (t_mem code) { return or16(a_n_sp() ); }
+  int ORW_X   (t_mem code) { return or16(         ); }
+  int XORW_I  (t_mem code) { return xor16(a_i()   ); }
+  int XORW_M  (t_mem code) { return xor16(a_mm()  ); }
+  int XORW_NSP(t_mem code) { return xor16(a_n_sp()); }
+  int XORW_X  (t_mem code) { return xor16(        ); }
 
   // 16-bit 1-op-inst
   int INCW_M(t_mem code);
@@ -426,7 +434,7 @@ public:
   int MAD_NSP(t_mem code) { return mad(m_n_sp()); }
   int MAD_NNZ(t_mem code) { return mad(m_nn_z()); }
   int MAD_Z(t_mem code)   { return mad(m_z()); }
-  int XCH_F_0SP(t_mem code);
+  int XCH_F_NSP(t_mem code);
 
   // 16-bit 0-op-inst
   int MUL(t_mem code);
@@ -465,14 +473,11 @@ public:
   virtual int JRNC(t_mem code)  { return jr(COND_NC); }
   virtual int JRN(t_mem code)   { return jr(COND_N); }
   virtual int JRNN(t_mem code)  { return jr(COND_NN); }
-  virtual int JRO(t_mem code)   { return jr(COND_O); }
-  virtual int JRNO(t_mem code)  { return jr(COND_NO); }
+  virtual int JRNO(t_mem code)  { return jr((prefixes&P_SWAP) ? COND_O : COND_NO); }
   virtual int JRSGE(t_mem code) { return jr(COND_SGE); }
   virtual int JRSLT(t_mem code) { return jr(COND_SLT); }
-  virtual int JRSGT(t_mem code) { return jr(COND_SGT); }
-  virtual int JRSLE(t_mem code) { return jr(COND_SLE); }
-  virtual int JRGT(t_mem code)  { return jr(COND_GT); }
-  virtual int JRLE(t_mem code)  { return jr(COND_LE); }
+  virtual int JRSLE(t_mem code) { return jr((prefixes&P_SWAP) ? COND_SGT : COND_SLE); }
+  virtual int JRLE(t_mem code)  { return jr((prefixes&P_SWAP) ? COND_GT : COND_LE); }
   
   // other instructions: inst.cc
   virtual int NOP(t_mem code);

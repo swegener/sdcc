@@ -312,6 +312,52 @@ cl_f8::or16(void)
   return resGO;
 }
 
+u16_t
+cl_f8::xor16(u16_t a, u16_t b)
+{
+  u16_t r= a^b;
+  rF&= ~flagOZN;
+  if (!r) rF|= flagZ;
+  if (r&0x8000) rF|= flagN;
+  // TODO flagO ?
+  cF.W(rF);
+  return r;
+}
+
+int
+cl_f8::xor16(u16_t opaddr)
+{
+  u16_t op2= read_addr(rom, opaddr);
+  vc.rd+= 2;
+  u16_t r= xor16(acc16->get(), op2);
+  IFSWAP
+    {
+      // Mem= Mem | acc;
+      rom->write(opaddr, r);
+      rom->write(opaddr+1, r>>8);
+      vc.wr+= 2;
+    }
+  else
+    {
+      // Acc= Mem | acc
+      acc16->W(r);
+    }
+  return resGO;
+}
+
+int
+cl_f8::xor16(void)
+{
+  // op2=x
+  class cl_cell16 *op1= acc16, *op2= &cX;
+  IFSWAP
+    {
+      op1= &cX;
+      op2= acc16;
+    }
+  op1->W(xor16(op1->get(), op2->get()));
+  return resGO;
+}
 
 /* 0->XXXXXXXX->C */
 
@@ -361,14 +407,17 @@ cl_f8::SRL_A(t_mem code)
 }
 
 int
-cl_f8::SRL_ZH(t_mem code)
+cl_f8::SRL_NY(t_mem code)
 {
-  u8_t v= rZH;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read();
+  vc.rd++;
   rF&= ~flagCZ;
   if (v&1) rF|= flagC;
   v>>= 1;
   if (!v) rF|= flagZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -421,14 +470,17 @@ cl_f8::SLL_A(t_mem code)
 }
 
 int
-cl_f8::SLL_ZH(t_mem code)
+cl_f8::SLL_NY(t_mem code)
 {
-  u8_t v= rZH;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read();
+  vc.rd++;
   rF&= ~flagCZ;
   if (v&0x80) rF|= flagC;
   v<<= 1;
   if (!v) rF|= flagZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -489,16 +541,19 @@ cl_f8::RRC_A(t_mem code)
 }
 
 int
-cl_f8::RRC_ZH(t_mem code)
+cl_f8::RRC_NY(t_mem code)
 {
-  u8_t v= rZH;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read();
+  vc.rd++;
   u8_t oldc= (rF&flagC)?0x80:0;
   rF&= ~flagCZ;
   if (v&1) rF|= flagC;
   v>>= 1;
   v|= oldc;
   if (!v) rF|= flagZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -559,16 +614,19 @@ cl_f8::RLC_A(t_mem code)
 }
 
 int
-cl_f8::RLC_ZH(t_mem code)
+cl_f8::RLC_NY(t_mem code)
 {
-  u8_t v= rZH;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read();
+  vc.rd++;
   u8_t oldc= (rF&flagC)?1:0;
   rF&= ~flagCZ;
   if (v&0x80) rF|= flagC;
   v<<= 1;
   v|= oldc;
   if (!v) rF|= flagZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -613,12 +671,15 @@ cl_f8::INC_A(t_mem code)
 }
 
 int
-cl_f8::INC_ZH(t_mem code)
+cl_f8::INC_NY(t_mem code)
 {
-  u8_t v= rZH+1;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read()+1;
+  vc.rd++;
   rF&= ~flagCZ;
   if (!v) rF|= flagCZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -666,13 +727,16 @@ cl_f8::DEC_A(t_mem code)
 }
 
 int
-cl_f8::DEC_ZH(t_mem code)
+cl_f8::DEC_NY(t_mem code)
 {
-  u8_t v= rZH-1;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read()-1;
+  vc.rd++;
   rF&= ~flagCZ;
   if (v!=0xff) rF|= flagC;
   if (!v) rF|= flagZ;
-  cZH.W(v);
+  c.W(v);
+  vc.wr++;
   cF.W(rF);
   return resGO;
 }
@@ -718,9 +782,11 @@ cl_f8::TST_A(t_mem code)
 }
 
 int
-cl_f8::TST_ZH(t_mem code)
+cl_f8::TST_NY(t_mem code)
 {
-  u8_t v= rZH;
+  class cl_cell8 &c= m_n_y();
+  u8_t v= c.read();
+  vc.rd++;
   rF&= ~fAll_H;
   if (v&0x80) rF|= flagN;
   if (!v) rF|= flagZ;
@@ -784,7 +850,7 @@ cl_f8::ADCW1_M(t_mem code)
   u16_t a= a_mm();
   u16_t v= read_addr(rom, a);
   vc.rd+= 2;
-  add16(v, 0, (rF&flagC)?1:0, false);
+  v = add16(v, 0, (rF&flagC)?1:0, false);
   rom->write(a  , v);
   rom->write(a+1, v>>8);
   vc.wr+= 2;
@@ -1235,11 +1301,12 @@ int
 cl_f8::SLLW_A_XL(t_mem code)
 {
   u32_t v= acc16->get();
-  rF&= ~flagCZ;
+  rF&= ~flagZN;
   v<<= rXL;
   if (v & 0x10000) rF|= flagC;
   v&= 0xffff;
   if (!v) rF|= flagZ;
+  if (v & 0x8000) rF|= flagN;
   acc16->W(v);
   cF.W(rF);
   return resGO;

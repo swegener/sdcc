@@ -269,7 +269,8 @@ cl_serial::serial_bit_cnt(void)
       while (*tr_src >= _divby)
 	{
 	  (*tr_src)-= _divby;
-	  s_tr_bit++;
+	  if (s_tr_bit < _bits)
+	    s_tr_bit++;
 	}
     }
   if (s_receiving)

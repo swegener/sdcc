@@ -224,7 +224,7 @@ int
 cl_uart::tick(int cycles)
 {
   char c;
-
+  
   if (!on)
     return 0;
 
@@ -233,7 +233,10 @@ cl_uart::tick(int cycles)
     {
       mcnt-= div;
       if (ten)
-	s_tr_bit++;
+	{
+	  if (s_tr_bit < bits)
+	    s_tr_bit++;
+	}
       if (ren)
 	s_rec_bit++;
     }
@@ -243,14 +246,18 @@ cl_uart::tick(int cycles)
   if (s_sending &&
       (s_tr_bit >= bits))
     {
-      s_sending= false;
-      //io->dd_printf("%c", s_out);
-      io->write((char*)&s_out, 1);
-      s_tr_bit-= bits;
-      if (s_tx_written)
-	restart_send();
-      else
-	finish_send();
+      cl_f *fo= io->get_fout();
+      if ((fo == NULL) || (fo->writable()))
+	{
+	  s_sending= false;
+	  //io->dd_printf("%c", s_out);
+	  io->write((char*)&s_out, 1);
+	  s_tr_bit-= bits;
+	  if (s_tx_written)
+	    restart_send();
+	  else
+	    finish_send();
+	}
     }
   if ((ren) &&
       //io->get_fin() &&

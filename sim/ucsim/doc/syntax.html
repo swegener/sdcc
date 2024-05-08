@@ -9,30 +9,42 @@
       <li><a href="#expr">Expressions</a> </li>
       <li><a href="#redir">Redirection</a> </li>
     </ul>
+    
     <h2><a name="syntax">Command syntax of <i>&micro;Csim</i></a></h2>
-    <i>&micro;Csim</i> uses a very simple command interpreter. Command can be entered
-    after <i>&micro;Csim</i> displays the prompt and interpreted when ENTER key is
-    pressed. Commands must start with the name of the command following
-    parameters. Name of the command can be abbreviated if abbreviation is
-    unique. Some commands have more than one names.
-    <p>Syntactically parameters can be a string, bit name, array, number or
-      symbol. Interpretation of these syntactical elements depends on actual
-      command. </p>
+    
+    <i>&micro;Csim</i> uses a very simple command interpreter. Command
+    can be entered after <i>&micro;Csim</i> displays the prompt and
+    interpreted when ENTER key is pressed. Commands must start with
+    the name of the command following parameters. Name of the command
+    can be abbreviated if abbreviation is unique. Some commands have
+    more than one names.
+    
+    <p>Syntactically parameters can be a string, bit name, array,
+      number or symbol. Interpretation of these syntactical elements
+      depends on actual command. </p>
+    
     <p>If the command line can not be recognized as a known command, <i>&micro;Csim</i>
       tries to evaluate the command line as an <i>expression</i>. <a href="#expr">See
-        below</a> for information about operands and operators which can be used
-      in expressions. </p>
+        below</a> for information about operands and operators which
+      can be used in expressions. </p>
+    
     <h3><a name="command_name">Command names</a></h3>
-    Name of the command must be the first word of the command line. It is not
-    necessary to enter whole name if abbreviation is unique. Help command can be
-    used to check out if a command has more names:
+    
+    Name of the command must be the first word of the command line. It
+    is not necessary to enter whole name if abbreviation is
+    unique. Help command can be used to check out if a command has
+    more names:
+
     <pre>&gt; <font color="green">help run</font>
 run [start [stop]] Go
 Names of command: <b>go r run</b>
 ...
-</pre> Some commands just groups other commands. These commands have a set of
-    so-called <i>sub-commands</i>. Sub-command must be second word in the
-    command line. For example:
+    </pre>
+
+    Some commands just groups other commands. These commands have a
+    set of so-called <i>sub-commands</i>. Sub-command must be second
+    word in the command line. For example:
+    
     <pre>&gt; <font color="green">help set</font>
 set <b>subcommand</b>     Set, see `set' command for more help
 Names of command: set
@@ -49,83 +61,118 @@ List of subcommands:
 <b>set bit</b> bitspec data   Set specified bit(s)
 <b>set hardware</b> category params...
                    Set parameters of specified hardware element
-</pre>
+    </pre>
+    
     <h3>Type of parameters</h3>
+    
     <h4><a name="string_type">String type</a></h4>
-    To distinguish strings and symbols, strings can be surrounded by (double)
-    quotes. Quotes can be omitted if command parameter is interpreted as string
-    and actual parameter start with a letter (so it doesn't look to be a number)
-    and doesn't contain space. Let's look an example:
+    
+    To distinguish strings and symbols, strings can be surrounded by
+    (double) quotes. Quotes can be omitted if command parameter is
+    interpreted as string and actual parameter start with a letter (so
+    it doesn't look to be a number) and doesn't contain space. Let's
+    look an example:
+    
     <pre>0&gt; <font color="green">set opt 7 <b>s51&gt;</b></font>
 0s51&gt;<font color="green">set opt 7 <b>".s51&gt; "</b></font>
 0.s51&gt; 
 </pre>
-    <h4><a name="bit_type">Bit type</a></h4>
-    If a parameter contains a dot (.) or a colon contained in square brackets ([...:...])
-    it is treated as a bit specification. If there is a dot the part before the dot gives
-    the memory address and part after the dot gives the bit number. The bracketed form is
+
+<h4><a name="bit_type">Bit type</a></h4>
+
+If a parameter contains a dot (.) or a colon contained in square
+    brackets ([...:...])  it is treated as a bit specification. If
+    there is a dot the part before the dot gives the memory address
+    and part after the dot gives the bit number. The bracketed form is
     used to specify a range of bits.
-    <pre>0&gt; <font color="green">dump <b>p1.1</b></font>
+
+<pre>0&gt; <font color="green">dump <b>p1.1</b></font>
       P1.1 0x90 ff 1
 0&gt; <font color="green">dump <b>0x80.1</b></font>
       P4.1 0x80 ff 1
 0&gt; 
 </pre>
-    <h4><a name="array_type">Array type</a></h4>
-    Parameters contain [ character are treated as arrays. Arrays can be used to
-    specify hardware elements. Array index selects an object if more than one
-    exists:
-    <pre>0&gt; <font color="green">info hw <b>port[0]</b></font>
+
+<h4><a name="array_type">Array type</a></h4>
+
+Parameters contain [ character are treated as arrays. Arrays can be
+    used to specify hardware elements. Array index selects an object
+    if more than one exists:
+
+<pre>0&gt; <font color="green">info hw <b>port[0]</b></font>
 port[0]
 P0    11111111 0xff 255 . (Value in SFR register)
 Pin0  11111111 0xff 255 . (Output of outside circuits)
 Port0 11111111 0xff 255 . (Value on the port pins)
 0&gt; 
 </pre>
-    <h4><a name="number_type">Number type</a></h4>
-    Some commands accept parameters which in most cases can be numbers. Numbers
-    can be entered in C-style form. If the number begins with <tt><b>0x</b></tt>
+
+<h4><a name="number_type">Number type</a></h4>
+
+Some commands accept parameters which in most cases can be
+    numbers. Numbers can be entered in C-style form. If the number
+    begins with <tt><b>0x</b></tt>
     or <tt><b>0X</b></tt> it is interpreted as a <i>hexadecimal</i> number. As
     extension to C-style, number can be started by <b><span style="font-family: monospace;">0b</span></b>,
     followed by <b><span style="font-family: monospace;">0</span></b> and <b><span
         style="font-family: monospace;">1</span></b> characters. In this case it
     is interpreted as <i>binary</i> number. If it begins with <tt><b>0</b></tt>
-    followed by digits it is interpreted as <i>octal</i> number. In other cases
-    it is interpreted as <i>decimal</i> number.<br>
-    <h4><a name="symbol_type">Symbol type</a></h4>
-    If a command parameter can not be classified in other ways (doesn't start
-    with a digit or a quote, doesn't contain dot or [) then it will be treated
-    as a <b>symbol</b>. Symbols can be interpreted in several ways.
-    <h3>Interpretation of parameters</h3>
-    <h4><a name="address_param">Address parameters</a></h4>
-    Many commands requires memory addresses as parameters. Addresses can be
-    specified using number or symbol type of parameters. Value of symbols
-    depends on processor type. For example MCS52 family of controllers defines
-    more symbols than MCS51 family.
-    <h4><a name="number_param">Number, data parameters</a></h4>
-    When a command expects a number it should get a number. <font color="red">Note</font>,
+    followed by digits it is interpreted as <i>octal</i> number. In
+other cases it is interpreted as <i>decimal</i> number.<br>
+
+<h4><a name="symbol_type">Symbol type</a></h4>
+
+    If a command parameter can not be classified in other ways
+    (doesn't start with a digit or a quote, doesn't contain dot or [)
+    then it will be treated as a <b>symbol</b>. Symbols can be interpreted in several ways.
+
+<h3>Interpretation of parameters</h3>
+
+<h4><a name="address_param">Address parameters</a></h4>
+
+Many commands requires memory addresses as parameters. Addresses can
+    be specified using number or symbol type of parameters. Value of
+    symbols depends on processor type. For example MCS52 family of
+    controllers defines more symbols than MCS51 family.
+
+<h4><a name="number_param">Number, data parameters</a></h4>
+
+When a command expects a number it should get a number. <font color="red">Note</font>,
     that symbols is not converted to number they can be used as address only!
-    <h4><a name="string_param">String parameters</a></h4>
-    Strings can be entered without quotes if they are recognized as strings (see
+
+<h4><a name="string_param">String parameters</a></h4>
+
+Strings can be entered without quotes if they are recognized as strings (see
     above) and do not contain spaces.
-    <h4><a name="data_list_param">Data list parameters</a></h4>
-    Data list can be any space separated list of numbers and strings. If you
-    include a string in the list, it is broken to list of bytes where every byte
-    is ASCII code of a string's character.
-    <pre>&gt; <font color="green">where xram "ab" 0x43</font>
+
+<h4><a name="data_list_param">Data list parameters</a></h4>
+
+Data list can be any space separated list of numbers and strings. If
+    you include a string in the list, it is broken to list of bytes
+    where every byte is ASCII code of a string's character.
+
+<pre>&gt; <font color="green">where xram "ab" 0x43</font>
 0xf961 61 62 63                abc
 &gt; 
 </pre>
-    <h4><a name="memory_param">Memory parameters</a></h4>
-    Where memory type is expected, name of the memory should be used. Most
+
+<h4><a name="memory_param">Memory parameters</a></h4>
+
+Where memory type is expected, name of the memory should be used. Most
     commands accept memory chip and address space too. See <a href="memory.html">memory
       simulation</a> for more information.
-    <h4><a name="hw_param">Hardware element parameters</a></h4>
-    Hardware elements can be specified by using arrays, where array name is name
-    of the element and the array index selects one if more than one exists.
-    <h4><a name="bit_param">Bit parameters</a></h4>
-    Bits can be specified by several ways. One way is using bit type of command
-    parameter:
+
+<h4><a name="hw_param">Hardware element parameters</a></h4>
+
+Hardware elements can be specified by using arrays, where array name
+is name of the element and the array index selects one if more than
+one exists.
+
+<h4><a name="bit_param">Bit parameters</a></h4>
+
+Bits can be specified by several ways. One way is using bit type of command
+parameter:
+
     <pre>0&gt; <font color="green">dump 0.2</font>
     0x00000.2               0
 0&gt; <font color="green">dump 0xc3.2</font>
@@ -142,17 +189,21 @@ Port0 11111111 0xff 255 . (Value on the port pins)
       0x01000[4:3] a_reg[4:3]      0b---10--- 0x02 '.'   2 ( -2)
 0&gt;
 </pre>
-    <p>Note that in the above the <code>[4:3]</code> <em>overrides</em> the
+
+<p>Note that in the above the <code>[4:3]</code> <em>overrides</em> the
     <code>[5:2]</code> defined for the var and <code>some_bits[4:3]</code>means
     bits 4 through 3 of the value stored at 0x1000. It does <em>not</em> mean
-    take the bits defined by the var and then take a subset of those bits.
-    Note also that the output does not tell us we are looking at <code>some_bit</code>
+    take the bits defined by the var and then take a subset of those
+    bits.  Note also that the output does not tell us we are looking
+    at <code>some_bit</code>
     (because we're not) but since we have a var set for the address as a whole
     it does tell us that we are looking at a subset of <code>a_reg</code>.</p>
 
     <p>In this way, any IRAM or SFR location can be addressed as the above
-    example shows.</p>
+      example shows.</p>
+    
     <p>Other way is using bit address either by value or by symbolic name: </p>
+    
     <pre>0&gt; <font color="green">dump ea</font>
      IE0.7 0xa8 00 0
 0&gt; <font color="green">dump 34</font>
@@ -160,26 +211,36 @@ Port0 11111111 0xff 255 . (Value on the port pins)
 0&gt; <font color="green">dump 0xc7</font>
    SCON1.7 0xc0 00 0
 0&gt; 
-</pre> Of course, only addressable bits can be accessed in this way.
-    <hr>
-    <h2><a name="expr">Expressions</a></h2>
-    If first word of the command line is not recognized as a known command, the
-    command line will be evaluated as an expression and the result value printed
-    (in decimal):
-    <pre>0&gt; <font color="green">12*(34+56)</font>
+    </pre>
+
+    Of course, only addressable bits can be accessed in this way.
+    
+<hr>
+
+<h2><a name="expr">Expressions</a></h2>
+
+If first word of the command line is not recognized as a known
+command, the command line will be evaluated as an expression and the
+result value printed (in decimal):
+
+<pre>0&gt; <font color="green">12*(34+56)</font>
 1080
 0&gt; 
 </pre>
     <h3>Operands</h3>
     Operands of the expressions can be
     <ul>
-      <li>number; </li>
+      <li>number (literal); </li>
       <li>memory (either address space, or memory chip); </li>
       <li>or bit</li>
     </ul>
+    
     <h4>Number operands</h4>
-    Numbers can be entered in decimal, octal (starting with 0 followed by a
-    number), or hexadecimal (started with 0x), or binary (started with 0b):
+    
+    Numbers can be entered in decimal, octal (starting with 0 followed
+    by a number), or hexadecimal (started with 0x), or binary (started
+    with 0b), or ascii code format (letter between apostrophes):
+
     <pre>0&gt; <font color="green">12</font>
 12
 0&gt; <font color="green">012</font>
@@ -188,20 +249,30 @@ Port0 11111111 0xff 255 . (Value on the port pins)
 18
 0&gt; <font color="green">0b010101</font>
 21
+0&gt; <font color="green">'A'</font>
+65
 0&gt; 
+    </pre>
 
-</pre> Numbers must be integers (floating point is not supported) and not bigger
-    than the value which can be stored as <b>long int</b>. Numbers can be
-    specified in ascii form too: <b>'a'</b>, result will be ascii code of the
-    character. This form accepts C style escapes, for example: <b>'\n'</b> or <b>'\033'</b>.
+    Numbers must be integers (floating point is not supported) and not bigger
+    than the value which can be stored as <b>long int</b>. Numbers can
+    be specified in ascii form too: <b>'a'</b>, result will be ascii
+    code of the character. This form accepts C style escapes, for
+    example: <b>'\n'</b> or <b>'\033'</b>.
+
     <h4>Memory operands</h4>
-    Memory can be an address space location or a memory chip cell. It can be
-    specified in following form:
+    
+    Memory can be an address space location or a memory chip cell. It
+    can be specified in following form:
+
     <pre>name[address]</pre>
+    
     where <i>name</i> is the name of the address space or memory chip and <i>address</i>
     is an expression specifying location (index) of the cell.
+
     <p>Registers in SFR address space can also be specified using pre-defined
       names (symbols) of the registers. </p>
+    
     <pre>0&gt; <font color="green">xram[0x543]</font>
 67
 0&gt; <font color="green">xram_chip[1347]</font>
@@ -213,15 +284,39 @@ Port0 11111111 0xff 255 . (Value on the port pins)
 0&gt; <font color="green">rom[256*dph+dpl]</font>
 88
 0&gt; 
-</pre> Value of the memory operand is always a positive integer number.
+    </pre>
+
+    <p>You can assign a symbol (name) to any memory location, this
+    name is called variable (see <a href="cmd_memory.html#var">var</a>, and <a href="cmd_general.html#info_variables">info var</a> commands). To specify memory operand, you can use variable name as well:</p>
+
+    <pre>
+0&gt; <font color="green">var rom_loc rom[0x1234]</font>
+0> <font color="green">info var rom_loc</font>
+rom_loc rom[0x1234] = 0xff,255U,255
+0&gt; <font color="green">rom_loc</font>
+255
+0&gt; <font color="green">rom_loc='A'</font>
+65
+0&gt; <font color="green">expr /c rom_loc</font>
+'A'
+0&gt;
+    </pre>
+    
+    <p>Value of the memory operand is always a positive integer number.</p>
+
     <h4>Bit operands</h4>
-    Bit operands are evaluated to 0 or 1. Any bit of any memory location can be
-    specified as bit using following form:
+
+    Bit operands are evaluated to 0 or 1. Any bit of any memory
+    location can be specified as bit using following form:
+
     <pre>memory.bitnumber</pre>
+
     where <i>memory</i> is a memory location as a memory operand and <i>bitnumber</i>
     is number of the bit within the specified memory cell specified as an
     expression. Note, that dot (.) is part of the syntax, not an operator.
+
     <p>Alternatively, name of the bit can be used to specify named SFR bits. </p>
+    
     <pre>0&gt; <font color="green">p0.3</font>
 1
 0&gt; <font color="green">xram[12*(34+56)].9-2</font>
@@ -229,7 +324,8 @@ Port0 11111111 0xff 255 . (Value on the port pins)
 0&gt; <font color="green">it0</font>
 0
 0&gt; 
-</pre>
+    </pre>
+    
     <h3>Operators</h3>
     <table border="1">
       <tbody>

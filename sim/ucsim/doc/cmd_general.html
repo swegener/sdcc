@@ -383,11 +383,21 @@ Ambiguous option name, use number instead
       not. Actual settings can be retrieved by <a href="show_error">show error</a>
       command.<br>
       <hr>
+
       <h4><a name="set_console">set console <i>interactive
-            [on|off]|noninteractive|raw|edited</i><br>
-        </a></h4>
+            [on|off]|noninteractive|raw|edited</i>
+      </a></h4>
+      
       <hr>
+
+      <h4><a name="set_console_hw">set console <i>hw</i></a></h4>
+
+      <p>Open <a href="display.html">peripheral display</a> of <i>hw</i>.</p>
+	
+      <hr>
+      
       <h4><a name="set_memory">set memory <i>memory_type address data...</i></a></h4>
+      
       This command can be used to modify content of any simulated memory. First
       parameter must be a class name to specify type of memory. Class names can
       be checked by <a href="cmd_general.html#info_memory">info memory</a>
@@ -571,112 +581,104 @@ Num Type       Disp Hit   Cnt   Address  What
           event. </dd>
       </dl>
       <hr>
+      
       <h4><a name="info_registers">info registers</a></h4>
-      This subcommand prints out full register set of the CPU. Output of this
-      command depends of type of CPU.
-      <h5>Registers of MCS51 family</h5>
-      <pre>$ <font color="#118811">ucsim_51 remoansi.hex</font> 
-ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-58659 bytes read from remoansi.hex
-&gt; <font color="#118811">sopt stopit 1</font>
-&gt; <font color="#118811">g</font>
-5
- * 000023 02 01 1c LJMP  011c
-&gt; <font color="#118811">i r</font>
-000000 18 02 16 ba 00 02 00 0a ........
-000018 4a J  ACC= 0x0a  10 .  B= 0x00   DPTR= 0x16ba @DPTR= 0x00   0 .
-000002 16 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
- * 000023 02 01 1c LJMP  011c
-&gt; </pre>
-      In first line the actual register bank is dumped out. Register banks
-      reside in internal RAM, address at the beginning of the line shows start
-      address of actual register bank selected by RS0 and RS1 bits of PSW
-      register.
-      <p>Next two lines begin with value of indirectly addressed internal RAM
-        cells. Second line shows IRAM cell pointed by R0 while third line shows
-        IRAM addressed by R1. </p>
-      <p>Second line displays some important registers. First one is the
-        accumulator. Its value dumped out in hexadecimal, decimal form and then
-        the ASCII character of its value. It is followed by value of the B
-        register which is dumped out in hexadecimal form only. Next is DPTR
-        register in hexadecimal and then external RAM cell which is addressed by
-        DPTR. This is dumped out in hexadecimal, decimal and ASCII too. </p>
-      <p>In third line you find program status word in hexadecimal and then some
-        flag bits of PSW register. Last line is disassembled instruction at PC.
-      </p>
-      <h5>Registers of AVR family</h5>
-      <pre>$ <font color="#118811">ucsim_avr test_arith.hex</font>
-ucsim 0.2.37, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-&gt; 83 words read from test_arith.hex
-83 words read from test_arith.hex
-&gt; <font color="#118811">run</font>
+      
+      This subcommand prints out full register set of the CPU. Output
+      of this command depends of type of CPU.
 
-Stop at 0x000047: (105) User stopped
-F 0x000047
+      <h5>Registers of MCS51 family</h5>
+      
+      <pre>
+0&gt; <font color="#118811">i r</font>
+     R0 R1 R2 R3 R4 R5 R6 R7
+     41 58 fc c9 8b bc 95 6b
+@R0 76 v  ACC= 0x00   0 .  B= 0x00
+@R1 73 s  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 6b 95 bc 8b c9 fc 58 41
+   DPTR= 0x0000 @DPTR= 0x83 131 .
+0x0000  ? ff       MOV    R7,A
+0&gt;
+      </pre>
+
+      In first two lines the actual register bank is dumped
+      out. Register banks reside in internal RAM, actual register bank
+      selected by RS0 and RS1 bits of PSW register.
+
+      <p>Next two lines begin with value of indirectly addressed
+        internal RAM cells and show most important internal registers,
+        A, B, PSW and flags.</p>
+      
+      <p>Next line shows the stack pointer and top of the stack.</p>
+
+      <p>Last line shows the DPTR and XRAM value where it points.</p>
+
+      <p>After register values, instruction at PC is disassembled.</p>
+      
+      <h5>Registers of AVR family</h5>
+      
+      <pre>
 &gt; <font color="#118811">i r</font>
 000000 00 2c 21 23 20 35 19 14 03 00 00 00 00 00 00 00 .,!# 5..........
 000010 00 01 1e 89 01 00 10 e2 14 00 01 10 00 00 00 00 ................
 ITHSVNZC  SREG= 0x03   3 .
 00000011  SP  = 0x000000
 X= 0x1001 [X]= 0x00   0 .  Y= 0x0000 [Y]= 0x00   0 .  Z= 0x0000 [Z]= 0x00   0 .
- * 000047 940c 0047 jmp   0x000047
+0x0000  ? 5a41      subi   r0,161
 &gt; 
-</pre> First two lines show first 32 bytes of internal RAM which is the register
+      </pre>
+
+      First two lines show first 32 bytes of internal RAM which is the register
       set of AVR controllers.
+
       <p>At the beginning of next two lines bits of status register are printed.
         These lines present hexadecimal, decimal and ASCII values of the status
         register too, and value of the stack pointer. </p>
+
       <p>Following line shows indirect addressing registers X, Y, and Z as well
         as pointed memory values. </p>
+
       <p>Last line is disassembled instruction at PC. </p>
+
       <h5>Registers of Z80 family</h5>
-      <pre>$ <font color="#118811">ucsim_z80</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
+
+      <pre>
 0&gt; <font color="#118811">i r</font>
 SZ-A--P-C  Flags= 0x00   0 .  A= 0x00   0 .
 00-0--0-0
 BC= 0x0000 [BC]= 00   0 .  DE= 0x0000 [DE]= 00   0 .  HL= 0x0000 [HL]= 00   0 .
 IX= 0x0000 [IX]= 00   0 .  IY= 0x0000 [IY]= 00   0 .  SP= 0x0000 [SP]= 00   0 .
- ? 0x0000 00          NOP
+SP limit= 0xf000
+SP= 0xffff -> 0041 58fc c98b bc95 6b72 266b c55e af85 8cd8 65df a8d9 9fa6
+0x0000  ? 41          LD     B,C
 0&gt; 
-</pre>
+      </pre>
+      
       <h5>Registers of XA family</h5>
-      <pre>$ <font color="#118811">ucsim_xa</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!
+
+      <pre>
 0&gt; <font color="#118811">i r</font>
 CA---VNZ | R0:0100 R1:0302 R2:0504 R3:0706
 00---000 | R4:0908 R5:0b0a R6:0d0c SP:0100 ES:0000  DS:0000
- ? 0x0302 02 03             ADD   R0l,[R3]
+0x0000  ? 41 58             CMP   R2h,R4l
 0&gt; 
 </pre>
-      <h5>Registers of HC08 family</h5>
-      <pre>$ <font color="#118811">ucsim_m68hc08</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
+
+<h5>Registers of HC08 family</h5>
+
+<pre>
 0&gt; <font color="#118811">i r</font>
 V--HINZC  Flags= 0x60  96 `  A= 0x00   0 .
 0--00000      H= 0x00   0 .  X= 0x00   0 .
-SP= 0x00ff [SP+1]= 00   0 .
- ? 0x0000 00 01 02    brset #0,*0x01,0x0005
+SP= 0x00ff [SP+1]= 00   0 .  Limit= $7000
+0xf17c  ? 19 ee       bclr   #4,*$ee
 0&gt; 
 </pre>
-      <hr>
-      <h4><a name="info_hardware">info hardware|hw <i>identifier</i></a></h4>
+
+<hr>
+
+<h4><a name="info_hardware">info hardware|hw <i>identifier</i></a></h4>
+
       This subcommand prints out information about a unit of the controller. <b>identifier</b>
       specifies hardware element. One form of it is a name. Names of hardware
       elements can be checked by <a href="#conf">conf</a> command. This form is

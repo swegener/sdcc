@@ -1,0 +1,184 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Peripheral displays</title>
+  </head>
+
+  <body style="background-color: white;">
+
+    <h1>Peripheral displays</h1>
+
+    <p>There are text based, interactive user intarfaces for simulated
+      peripherals, which are called <b>peripheral displays</b>. They
+      can be usefull for peripherals which can generate input data for
+      the microcontroller, such as ports (GPIO), uarts. Some displays
+      are used to show information in non-interactive way, for example <a href="#register_display">dreg</a> register display.</p>
+
+    <p>Peripheral display can be turned on using <a href="cmd_general.html#set_console_hw">set console hw</a> command where <i>hw</i> is the name of the peripheral.</p>
+
+    <pre>
+0&gt; <font color="#118811">conf</font>
+ucsim version 0.8.4
+Type of microcontroller: C52 CMOS cmos
+Controller has 14 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on timer0[0]
+   on timer1[1]
+   on uart[0]
+   on dreg[0]
+   on dport[0]
+   on port[0]
+   on port[1]
+   on port[2]
+   on port[3]
+   on irq[0]
+   on timer2[2]
+0&gt; <font color="#118811">set con dport</font>
+    </pre>
+
+    <img src="dport_s51.png" border="0">
+
+    <h2>Control simulator with peripheral display</h2>
+
+    <p>Each peripheral display interpret some control keys (a key
+      pressed while CTRL is hold). They can be used to control the
+      simulator, or the display itself.</p>
+
+    <dl>
+      
+      <dt><b>CTRL-s</b>, <b>CTRL-r</b>, <b>CTRL-g</b></dt>
+      <dd>Change run state of the simulator: start/stop
+      simulation. Actual state is displayed at the right side of the
+	first line.</dd>
+      
+      <dt><b>CTRL-t</b></dt>
+      <dd>Reset CPU.</dd>
+      
+      <dt><b>CTRL-q</b></dt>
+      <dd>Quit simulator, it is the same as the <a href="cmd_general.html#kill">kill</a> command.</dd>
+
+      <dt><b>CTRL-o</b></dt>
+      <dd>Close the display and return to the command console.</dd>
+
+      <dt><b>CTRL-l</b></dt>
+      <dd>Redraw the content of the display.</dd>
+
+      <dt><b>CTRL-n</b></dt>
+      <dd>Switch display to the next hardware element (peripheral) of
+	the microcontroller which has display feature implemented.</dd>
+      
+    </dl>
+
+    <p>Please note, that uart peripheral use a different display (<a href="#uart_display">see
+      below</a>) where control keys are not available by default, you
+    have to press a hot-key first to display the simulator control
+    menu.</p>
+
+    <p>Some peripherals can not be used to input external data into
+      the system and do not have special display implemented. When you
+      open display of them you will see the same information what you
+      can check using <a href="">info hw</a> command.</p>
+
+    <pre>
+10&gt; <font color="#118811">i h irq</font>
+Interrupts are disabled. Interrupt sources:
+  Handler  En  Pr Req Act Name
+  0x000003 dis  0 no  act external #0
+  0x00000b dis  0 no  act timer #0
+  0x000013 dis  0 no  act external #1
+  0x00001b dis  0 no  act timer #1
+  0x000023 dis  0 no  act serial receive
+  0x000023 dis  0 no  act serial transmit
+  0x00002b dis  0 no  act timer #2 EXF2
+  0x00002b dis  0 no  act timer #2 TF2
+Active interrupt service(s):
+  Pr Handler  PC       Source
+Configuration memory of irq
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+10&gt; <font color="#118811">set con irq</font>
+    </pre>
+
+    <img src="irq_s51.png" border="0">
+
+    
+    <a name="uart_display"><h2>Uart display</h2></a>
+
+    <p>Display of any uart peripheral is spcial because it acts like a
+      terminal emulator, connected to simulated uart. It doesn't have
+      control menu like other displays, but you can show it by
+      pressing a special <i>escape</i> key. This
+      escape key is CTRL-x by default, but you can configure it. </p>
+
+    <pre>
+$ <font color="#118811">ucsim_51</font>
+uCsim 0.8.4, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0> <font color="#118811">set con uart[0]</font>
+Converting console to display of uart[0]...
+uart[0] terminal display, press ^x to access control menu
+    </pre>
+
+    <img src="uart_s51.png" border="0">
+
+    <p>If the simulated uart sends a character (byte), it will be
+    printed on the screen, so that how non-ascii charaters are shown
+    is up to your terminal where the program was started.</p>
+
+    <p>Local echo is off, which means that key presses are not
+      printed, they will be received by the simulated uart.</p>
+
+    <p>If you press the escape key, you will see the control menu, as
+    shown on the above screenshot. Keys of the menu can be pressed
+    alone or by holding CTRL down.</p>
+
+    
+    <h3>Configure uart display escape charater</h3>
+
+    <p>There is a variable which holds ascii code of the escape
+      charater, to configure it you can set the appropriate variable. The variable is called</p>
+
+    <p><tt>uartX_esc_char</tt></p>
+
+    <p>where X is id number of the uart (there can be more than one
+      uarts in the controller, distinguised by their id numbers).</p>
+
+    <p>CTRL ascii codes are between 0 and 31, so for example, if you
+      are going to use CTRL-u, the easiest way to set it is:</p>
+
+    <pre>
+0&gt; <font color="#118811">expr uart0_esc_char='U'-'A'+1</font>
+21
+0&gt; <font color="#118811">set con uart[0]</font>
+Converting console to display of uart[0]...
+uart[0] terminal display, press ^u to access control menu
+    </pre>
+
+    <p>Some CTRL combinations can be recognized by the operating
+    system's terminal driver (for example ^z and ^c on linux), these
+      conbinations are not recommended to use.</p>
+
+    <p>It is also not recommended to use characters (either alone or
+      with CTRL) used on control menu, such as <b>s</b>, <b>r</b>, <b>g</b>, <b>p</b>, <b>T</b>, <b>q</b>, <b>o</b>, <b>e</b>,
+      <b>n</b>.</p>
+
+    
+    <a name="register_display"><h2>Register display</h2></a>
+
+    <p>Register set of the CPU is not a peripheral but could be
+      usefull to show that as a display. To accomplish this, all
+      simulators include a special "virtual" peripheral, called <b>dreg</b>, which, when displayed, shows the registers, the same way as the <a href="cmd_general.html#info_registers">info registers</a>
+      command.</p>
+
+    <img src="dreg_s51.png" border="0">
+
+    
+    <a name="port_display"><h2>Port display</h2></a>
+    
+    <hr>
+
+  </body>
+</html>

@@ -3,11 +3,15 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Microcontroller Simulator</title>
   </head>
-  <body style="    background-color: white;"> [ <a href="news.html">News</a> ]
-    [ <a href="#download">Download</a> ] [ <a href="#install">Installation</a>
-    ] [ <a href="#use">Usage</a> ] [ <a href="mailto:drdani@mazsola.iit.uni-miskolc.hu">Mail
-      to developer</a> ]
+  <body style="    background-color: white;">
+    [ <a href="news.html">News</a> ]
+    [ <a href="#download">Download</a> ]
+    [ <a href="#install">Installation</a> ]
+    [ <a href="#use">Usage</a> ]
+    [ <a href="mailto:dr.dkdb@gmail.com">Mail to developer</a> ]
+    
     <p> </p>
+
     <pre><tt><font size="+1">
         _____     _           
        / ____|   (_)          
@@ -56,17 +60,24 @@
       
       <h2><a name="download">Download</a></h2>
       
-      <p>There are two places where you can download <i>μCsim</i> from:</p>
+      <p>You can download <i>&micro;Csim</i> from two places:</p>
       
       <ol>
 	
 	<li>SDCC homepage. <i>&micro;Csim</i> is part of the SDCC
         (Small Device C Compiler) project. You can download source of
-        SDCC and precompiled binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.</li>
+        SDCC or precompiled binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.
+	  Please note, that SDCC binary package contains limited <i>&micro;Csim</i>,
+	  including simulators for SDCC ports only.<p>&nbsp;</p></li>
 	
-	<li><i>&micro;Csim</i> site. Standalone source package is available on the <i>&micro;Csim</i> web site:<br>
-        <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a>
-	</li>
+	<li><i>&micro;Csim</i> site. Standalone source package is
+	available on the <i>&micro;Csim</i> web site:
+          <p><a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a></p>
+
+	  <p>Home site contains precompiled Debian (i386 and amd64
+	architectures) packages for all Debian based Linux
+	distributions, Windows installer and standalone Windows
+	package.</li>
 	
       </ol>
       
@@ -106,7 +117,7 @@
         directory specified with <tt><b>--prefix=<i>dir</i></b><!-- --
 --></tt> option of <tt><b>configure</b></tt>. Note that you may have to have
         special privilege to do this if installation directory is not writable
-        by you. </li>
+        by the user. </li>
       
     </ol>
     
@@ -118,34 +129,50 @@
     </ul>
     <p><b>Features of the simulator</b> </p>
     <ul>
+      
       <li><a href="analyzer.html">Code analyzer</a>. <br>
         The simulator tries to figure out places of valid instructions in code
         area.</li>
+      
       <li><a href="cpu_types.html">Processor types</a>. <br>
         The simulator can simulate different type of microcontrollers. </li>
+      
       <li><a href="mulcons.html">Multiple consoles</a>. <br>
         The simulator can handle more than one command consoles and accepts
         command from multiple sources. It also can be driven by other programs
         such as debugger interfaces. </li>
+      
       <li><a href="serial.html">Serial interfaces</a>. <br>
         The simulator can virtually connect a terminal to serial interface of
         the simulated CPU. </li>
+      
       <li><a href="memory.html">Memory simulation</a>. <br>
         Simulated CPU provides address spaces, storage is simulated by memory
         chips, address decoders connects them together. </li>
+      
       <li><a href="simif.html">Simulator interface</a>.<br>
         This is a special interface which provides services for the simulated
         program. This services can be used to control the simulator (for example
         run/stop) and access some host features (print, file I/O).</li>
+      
       <li><a href="vcd.html">VCD file I/O</a>.<br>
         This is a special virtual hardware peripheral which can monitor changes
         of a memory location (or a bit in MCS51 where bit address space is
         available) and write out changes to a VCD file. It can also be used to
         replay events from a VCD file in order to simulate external events.</li>
+
+      <li><a href="display.html">Peripheral displays</a>. <br>Textual
+      user intarfaces which can show information about a
+      peripheral. Some of them are interactive and can be used to
+      provide external input data for the simulated system (port,
+      uart).</li>
+      
       <li><a href="syntax.html">Command syntax</a> and <a href="cmd.html">command
-          reference</a>. <br>
-        The simulator can be controlled via a command line interface. It accepts
-        simple commands. </li>
+        reference</a>, <a href="syntax.html#expr">expressions</a>. <br>
+	
+        The simulator can be controlled via a command line
+        interface. It accepts simple commands. </li>
+      
     </ul>
     <p><b>Microcontroller specific features</b> </p>
     <ul>
@@ -159,10 +186,10 @@
     <table border="0">
       <tbody>
         <tr>
-          <td><a href="mailto:drdani@mazsola.iit.uni-miskolc.hu"><img src="post.jpg"
+          <td><a href="mailto:dr.dkdb@gmail.com"><img src="post.jpg"
                 border="0" align="top"></a></td>
-          <td><i>© 1997,99 Dániel Drótos, Talker Bt.</i> <br>
-            <a href="mailto:drdani@mazsola.iit.uni-miskolc.hu">drdani@mazsola.iit.uni-miskolc.hu</a></td>
+          <td><i>&copy; 1997 Dániel Drótos</i> <br>
+            <a href="mailto:dr.dkdb@gmail.com">dr.dkdb@gmail.com</a></td>
         </tr>
       </tbody>
     </table>

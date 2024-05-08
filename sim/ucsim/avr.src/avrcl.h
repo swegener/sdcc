@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (avrcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Copyright (C) 1997 Drotos Daniel
+ * 
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

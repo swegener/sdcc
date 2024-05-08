@@ -18,7 +18,7 @@ p1516/p2223 and some AVR processors.
 uCsim is distributed in source code under GPL. It can be downloaded
 from its home site:
 
-[](http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim/)
+[](http://mazsola.iit.uni-miskolc.hu/ucsim/)
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
 complete development package with debugger (see below). It can be
@@ -118,4 +118,4 @@ Leland Morrison <>
 Johan Knol <johan.knol@iduna.nl>
 
 Maintainer of serialview: Timothy Hurman <ee62th@ee.surrey.ac.uk>
-Maintainer of other parts: Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
+Maintainer of other parts: Daniel Drotos <dr.dkdb@gmail.com>

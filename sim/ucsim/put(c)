@@ -58,7 +58,7 @@ putit()
 /*
  * Simulator of MCS51 ${1}
  *
- * Copyright (c) Drotos Daniel, Talker Bt.  ${STARTYEAR},${YEAR}
+ * Copyright (c) ${STARTYEAR} Drotos Daniel
  *
  */
 EOF

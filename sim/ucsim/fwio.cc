@@ -1,3 +1,30 @@
+/*
+ * Simulator of microcontrollers (fwio.cc)
+ *
+ * Copyright (C) 1997 Drotos Daniel
+ * 
+ * To contact author send email to dr.dkdb@gmail.com
+ *
+ */
+
+/* This file is part of microcontroller simulator: ucsim.
+
+UCSIM is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+UCSIM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with UCSIM; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA. */
+/*@1@*/
+
 // Need to define _WIN32_WINNT as 0x500 or higher for GetConsoleWindow()
 // _WIN32_WINNT will be indirectly defined from WINVER
 #ifdef WINVER
@@ -14,6 +41,7 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
+#include <fileapi.h>
 #ifdef HAVE_WINCON_H
 #include <wincon.h>
 #endif
@@ -360,6 +388,43 @@ bool
 cl_io::writable(void)
 {
   // TODO
+  switch (type)
+    {
+    case F_UNKNOWN: break;
+    case F_CHAR:
+      break;
+    case F_LISTENER: return false;
+    case F_SOCKET:
+      {
+	struct timeval tv= {0,0};
+	fd_set s;
+	FD_ZERO(&s);
+	FD_SET((SOCKET)handle, &s);
+	int ret= select(0, NULL, &s, NULL, &tv);
+	if (!FD_ISSET((SOCKET)handle, &s))
+	  return false;
+	break;
+      }
+    case F_FILE:
+      {
+	ULARGE_INTEGER s;
+	if (GetDiskFreeSpaceExA(NULL, NULL, &s, NULL))
+	  return s.QuadPart>1024;
+	break;
+      }
+    case F_PIPE:
+      break;
+    case F_CONSOLE: return true;
+    case F_SERIAL:
+      DWORD err;
+      COMSTAT comStat;
+      bool res= ClearCommError(handle, &err, &comStat);
+      if (!res)
+	return false;
+      if (comStat.cbOutQue != 0)
+	return false;
+      break;
+    }
   return true;
 }
 

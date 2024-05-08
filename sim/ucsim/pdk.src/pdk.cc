@@ -42,10 +42,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // sim
 //#include "simcl.h"
 #include "dregcl.h"
+#include "simifcl.h"
 
 // local
 #include "glob.h"
 #include "pdk16cl.h"
+#include "t16cl.h"
+#include "osccl.h"
+#include "wdtcl.h"
 //#include "portcl.h"
 //#include "regspdk.h"
 
@@ -118,20 +122,19 @@ void cl_fpp::reset(void) {
 
   PC = id;
   rA = 0;
-  for (t_addr i = 0; i < io_size; ++i) {
-    store_io(i, 0);
-  }
+  //for (t_addr i = 0; i < io_size; ++i) store_io(i, 0);
   rTMP= 0;
 }
 
 void cl_fpp::mk_hw_elements(void)
 {
   // TODO: Add hardware stuff here.
+  /*
   class cl_hw *h;
   cl_uc::mk_hw_elements();
-
   add_hw(h= new cl_dreg(this, 0, "dreg"));
   h->init();
+  */
 }
 
 void cl_fpp::make_memories(void)
@@ -633,6 +636,28 @@ cl_fppen_op::write(t_mem val)
 }
 
 
+t_mem
+cl_xtal_writer::write(t_mem val)
+{
+  u32_t u= puc->osc->frsys;
+  puc->set_xtal(u);
+  return u;
+}
+
+
+cl_mulrh_op::cl_mulrh_op(class cl_pdk *the_puc, class cl_memory_cell *acell):
+  cl_memory_operator(acell)
+{
+  puc= the_puc;
+}
+
+t_mem
+cl_mulrh_op::read(void)
+{
+  return puc->rMULRH;
+}
+
+
 /*
  * PDK uc
  */
@@ -650,18 +675,31 @@ int
 cl_pdk::init(void)
 {
   cl_uc::init();
-  class cl_fppen_op *op;
+  class cl_memory_operator *op;
   fpps[0]= mk_fpp(0);
 
   cFPPEN= sfr->get_cell(1);
+  cFPPEN->decode(&rFPPEN);
   op= new cl_fppen_op(this, cFPPEN);
   op->init();
   cFPPEN->append_operator(op);
-  reg_cell_var(cFPPEN, &rFPPEN, "FPPEN", "FPP unit Enable Register");
-  mk_cvar(sfr->get_cell(0), "FLAG", "ACC Status Flag Register");
-  mk_cvar(sfr->get_cell(0), "F", "ACC Status Flag Register");
-  mk_cvar(sfr->get_cell(2), "SP", "Stack Pointer Register");
 
+  op= new cl_mulrh_op(this, sfr->get_cell(9));
+  sfr->get_cell(9)->append_operator(op);
+  
+  mk_mvar(sfr, 0, "FLAG", "ACC Status Flag Register");
+  mk_mvar(sfr, 0, "F", "ACC Status Flag Register");
+  mk_mvar(sfr, 1, "FPPEN", "FPP unit Enable Register");
+  mk_mvar(sfr, 2, "SP", "Stack Pointer Register");
+  mk_mvar(sfr, 3, "CLKMD", "Clock Mode Register");
+  mk_mvar(sfr, 5, "INTRQ", "Interrupt Request Register");
+  mk_mvar(sfr, 6, "T16M", "Timer16 Mode Register");
+  mk_mvar(sfr, 8, "MULOP", "Multplier Operand Register");
+  mk_mvar(sfr, 8, "MISC", "MISC Register");
+  mk_mvar(sfr, 9, "MULRH", "Multplier Result High Byte Register");
+  mk_mvar(sfr, 0xa, "EOSCR", "External Oscillator Setting Register");
+  mk_mvar(sfr, 0xc, "INTEGS", "Interrupt Edge Select Register");
+  
   cact= new cl_act_cell(this);
   reg_cell_var(cact, &act, "fpp", "ID of actual FPPA");
   nuof_fpp= 1;
@@ -684,6 +722,7 @@ cl_pdk::init(void)
   rFPPEN= 1;
   single= true;
   cPC.decode(&(fpps[0]->PC));
+
   return 0;
 }
 
@@ -751,6 +790,30 @@ cl_pdk::make_memories(void)
   ad->activate(0);
 }
 
+void
+cl_pdk::mk_hw_elements(void)
+{
+  //class cl_hw *h;
+  cl_uc::mk_hw_elements();
+
+  add_hw(osc= new cl_osc(this, "osc"));
+  osc->init();
+
+  add_hw(t16= new cl_t16(this, "t16"));
+  t16->init();
+
+  add_hw(wdt= new cl_wdt(this, "wdt"));
+  wdt->init();
+
+  class cl_memory_cell *c;
+  class cl_hw *simif= get_hw("simif", 0);
+  if (simif)
+    {
+      c= simif->cfg_cell(simif_xtal);
+      c->prepend_operator(new cl_xtal_writer(this, c));
+    }
+}
+
 class cl_fpp *
 cl_pdk::mk_fpp(int id)
 {
@@ -768,6 +831,14 @@ cl_pdk::mk_fpp(int id)
   return fppa;
 }
 
+void
+cl_pdk::reset(void)
+{
+  int i;
+  mode= pm_run;
+  for (i=0; i<nuof_fpp; i++)
+    fpps[i]->reset();
+}
 
 u8_t
 cl_pdk::set_fppen(u8_t val)
@@ -851,18 +922,27 @@ cl_pdk::set_pc(int id, t_addr new_pc)
 int
 cl_pdk::exec_inst(void)
 {
+  int it, ret= resHALT;
+  if (mode == pm_pd)
+    return resHALT;
   while (!(rFPPEN & (1<<act)))
     act= (act+1)%nuof_fpp;
-  fpps[act]->pre_inst();
-  int ret= fpps[act]->exec_inst();
-  fpps[act]->post_inst();
-  tick(inst_ticks= fpps[act]->inst_ticks);
-  if (rFPPEN != 1)
+  inst_ticks= 0;
+  if (mode == pm_run)
     {
-      do
-	act= (act+1)%nuof_fpp;
-      while (!(rFPPEN & (1<<act)));
-      cPC.decode(&(fpps[act]->PC));
+      fpps[act]->pre_inst();
+      ret= fpps[act]->exec_inst();
+      fpps[act]->post_inst();
+      it= inst_ticks= fpps[act]->inst_ticks;
+      tick(it);
+      inst_ticks= it;
+      if (rFPPEN != 1)
+	{
+	  do
+	    act= (act+1)%nuof_fpp;
+	  while (!(rFPPEN & (1<<act)));
+	  cPC.decode(&(fpps[act]->PC));
+	}
     }
   PC= fpps[act]->PC;
   return ret;

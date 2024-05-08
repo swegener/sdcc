@@ -65,16 +65,16 @@ cl_simpdk::mk_controller(void)
     }
   switch (cpus_pdk[i].type)
     {
-    case CPU_PDK13:
+    case CPU_PDK13: // SYM_84B
       u= new cl_pdk(&cpus_pdk[i], this);
       return u;
-    case CPU_PDK14:
+    case CPU_PDK14: // SYM_85A
       u= new cl_pdk(&cpus_pdk[i], this);
       return u;
-    case CPU_PDK15:
+    case CPU_PDK15: // SYM_86B
       u= new cl_pdk(&cpus_pdk[i], this);
       return u;
-    case CPU_PDK16:
+    case CPU_PDK16: // SYM_83A
       u= new cl_pdk(&cpus_pdk[i], this);
       return u;
     case CPU_PDKX:

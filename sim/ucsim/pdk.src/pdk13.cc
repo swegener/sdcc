@@ -27,6 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "glob.h"
 
+#include "t16cl.h"
+#include "wdtcl.h"
+
 #include "pdk13cl.h"
 
 
@@ -80,9 +83,12 @@ cl_fpp13::execute(unsigned int code)
     // mov a, m
     cA.W(get_mem(code & 0x3F));
   } else if (CODE_MASK(0x00C1, 0x1E)) {
-    // TODO: ldt16
+    // ldt16
+    wr16(code & 0x001e, puc?(puc->t16->cnt):0);
   } else if (CODE_MASK(0x00C0, 0x1E)) {
-    // TODO: stt16
+    // stt16
+    if (puc)
+      puc->t16->cnt= rd16(code & 0x001e);
   } else if ((CODE_MASK(0x0E1, 0x1E))) {
     // idxm a, m
     cA.W(get_mem(get_mem(code & 0x1E)));
@@ -363,18 +369,19 @@ cl_fpp13::execute(unsigned int code)
   }
   else if (code == 0x0036) {
     // stopsys
-    return (resHALT);
+    if (puc) puc->mode= pm_pd;
   }
   else if (code == 0x0037) {
     // stopexe
-    return resHALT;
+    if (puc) puc->mode= pm_ps;
   }
   else if (code == 0x0035) {
     // reset
     reset();
   }
   else if (code == 0x0030) {
-    // TODO: wdreset
+    // wdreset
+    if (puc) puc->wdt->clear();
   }
   else if (code == 0x0006) {
     // ldsptl
@@ -387,7 +394,7 @@ cl_fpp13::execute(unsigned int code)
     // mul
     unsigned result = rA * get_io(0x08);
     cA.W(result & 0xFF);
-    sfr->write(0x08, (result & 0xFF00) >> 8);
+    if (puc) puc->rMULRH= result >> 8;
   } else {
     return (resINV_INST);
   }

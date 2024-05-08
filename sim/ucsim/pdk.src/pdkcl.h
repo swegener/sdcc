@@ -68,6 +68,49 @@ enum flag {
 
 #define regs8 sfr
 
+enum pdk_mode_t {
+  pm_run	= 0,
+  pm_pd		= 1, // powerdown (stopsys)
+  pm_ps		= 2, // powersave (stopexe)
+};
+
+
+struct fppinfo_t {
+  const char *part;
+  int fpp_num;
+  int ram_size;
+  int rom_size;
+  const char *arm_sym;
+  const char *ice_sym;
+};
+
+enum regaccess_t {
+  NO= 0,
+  RO= 1,
+  WO= 2,
+  RW= 3,
+  WR= RW,
+  DI= 4
+};
+
+struct reginfo_t {
+  const char *part;
+  const char *reg;
+  enum regaccess_t access;
+  int address;
+};
+
+
+class cl_xtal_writer: public cl_memory_operator
+{
+public:
+  class cl_pdk *puc;
+public:
+  cl_xtal_writer(class cl_pdk *apuc, class cl_memory_cell *acell):
+    cl_memory_operator(acell) { puc= apuc; }
+  virtual t_mem write(t_mem val);
+};
+
 
 /*
  * Base type of STM8 microcontrollers
@@ -183,22 +226,39 @@ public:
 };
 
 
+class cl_mulrh_op: public cl_memory_operator
+{
+public:
+  class cl_pdk *puc;
+public:
+  cl_mulrh_op(class cl_pdk *the_puc, class cl_memory_cell *acell);
+  virtual t_mem read(void);
+};
+
+
 class cl_pdk: public cl_uc
 {
 public:
   class cl_fpp *fpps[8];
   class cl_address_space *ram;
   class cl_address_space *regs8;
-  u8_t rFPPEN, act, nuof_fpp;
+  u8_t rFPPEN, act, nuof_fpp, rMULRH;
   bool single;
   class cl_memory_cell *cFPPEN, *cact, *cnuof_fpp;
+  class cl_osc *osc;
+  class cl_t16 *t16;
+  class cl_wdt *wdt;
+  enum pdk_mode_t mode;
 public:
   cl_pdk(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
   virtual void make_memories(void);
+  virtual void mk_hw_elements(void);
   virtual class cl_fpp *mk_fpp(int id);
-
+  virtual double def_xtal(void) { return 8000000; }
+  virtual void reset(void);
+  
   virtual u8_t set_fppen(u8_t val);
   virtual u8_t set_act(u8_t val);
   virtual u8_t set_nuof(u8_t val);

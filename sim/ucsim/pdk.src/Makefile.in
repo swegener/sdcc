@@ -25,8 +25,9 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
 		  -I$(top_srcdir)/gui.src
-CFLAGS          = @WALL_FLAG@ @CFLAGS@
-CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@
+OPT		?= 2
+CFLAGS          = @WALL_FLAG@ @CFLAGS@ -O$(OPT)
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ -O$(OPT)
 LDFLAGS         = @LDFLAGS@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
@@ -51,9 +52,10 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o port.o \
+OBJECTS_SHARED	= glob.o port.o osc.o t16.o wdt.o \
 		  inst.o \
 		  pdk13.o pdk14.o pdk15.o pdk16.o \
+		  fppinfo.o reginfo.o \
 		  sim$(TN).o $(TN).o
 OBJECTS_EXE	= s$(TN).o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

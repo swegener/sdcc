@@ -27,6 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "glob.h"
 
+#include "t16cl.h"
+#include "wdtcl.h"
+
 #include "pdk16cl.h"
 
 
@@ -119,7 +122,7 @@ cl_fpp16::execute(unsigned int code)
     case 0x003c: // mul
       u= rA * sfr->read(8);
       cA.W(u);
-      sfr->write(8, u>>8);
+      if (puc) puc->rMULRH= u >> 8;
       return resGO;
     case 0x0012: // izsn a
       cA.W(add_to(rA, 1));
@@ -158,14 +161,16 @@ cl_fpp16::execute(unsigned int code)
       return resNOT_DONE;
       return resGO;
     case 0x0036: // stopsys
-      return resHALT;
+      if (puc) puc->mode= pm_pd;
+      return resGO;
     case 0x0037: // stopexe
-      return resHALT;
+      if (puc) puc->mode= pm_ps;
+      return resGO;
     case 0x0035: // reset
       reset();
       return resGO;
     case 0x0030: // wdtreset
-      return resNOT_DONE;
+      if (puc) puc->wdt->clear();
       return resGO;
     }
 
@@ -314,10 +319,13 @@ cl_fpp16::execute(unsigned int code)
       if (code & 1)
 	{
 	  // ldt16 word
+	  wr16(code & 0x01fe, puc?(puc->t16->cnt):0);
 	}
       else
 	{
 	  // stt16 word
+	  if (puc)
+	    puc->t16->cnt= rd16(code & 0x01fe);
 	}
       return resNOT_DONE;
       return resGO;

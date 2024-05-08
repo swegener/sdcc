@@ -21,8 +21,9 @@ PICOPT		= @PICOPT@
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(srcdir)/.. \
 		  -I$(top_srcdir) \
 		  -I$(srcdir)/../sim.src -I$(srcdir)/../cmd.src
-CFLAGS          = @WALL_FLAG@ @CFLAGS@
-CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ $(PICOPT)
+OPT		?= 2
+CFLAGS          = @WALL_FLAG@ @CFLAGS@ -O$(OPT)
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ $(PICOPT) -O$(OPT)
 
 LIBS		= @LIBS@ @CURSES_LIBS@ -L$(top_builddir)
 

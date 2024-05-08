@@ -7,15 +7,11 @@ TARGET=linux
 PREFIX="${HOME}/dani"
 DD_HOSTS="p4 anb anb1 render mms box mazsola v3"
 PERF_FLAG=""
-OPT_FLAG="-O2"
 
 while [ -n "$1" ]; do
     case "$1" in
 	-p)
 	    PERF_FLAG="-pg"
-	    ;;
-	-d)
-	    OPT_FLAG="-O0 -DDEVEL"
 	    ;;
 	-w)
 	    PREFIX=${HOME}/prj/wucsim/inst
@@ -28,18 +24,9 @@ while [ -n "$1" ]; do
     shift
 done
 
-#if [ -f devel ]; then
-#    export CXXFLAGS="-O0"
-#    export CFLAGS="-g -O0"
-#fi
+export CXXFLAGS="$PERF_FLAG"
+export CFLAGS="$PERF_FLAG"
 
-export CXXFLAGS="-g $OPT_FLAG $PERF_FLAG"
-export CFLAGS="-g $OPT_FLAG $PERF_FLAG"
-
-#if [ -n "$PERF_FLAG" ]; then
-#    CXXFLAGS="${CXXFLAGS} ${PERF_FLAG}"
-#    CFLAGS="${CFLAGS} ${PERF_FLAG}"
-#fi
 
 case $TARGET in
     linux|l)
@@ -47,45 +34,19 @@ case $TARGET in
 	    :
 	fi
 	./configure --prefix=${PREFIX} \
-		    --disable-dlso \
-		    --enable-ucsim \
 		    "$@"
 	#--enable-ucsim
 	;;
-    mingw|win|w)
-	if [ -d	/usr/local/cross-tools/mingw32 ] ; then
-	    export CC=/usr/local/cross-tools/mingw32/bin/gcc
-	    export CXX=/usr/local/cross-tools/mingw32/bin/g++
-	elif [ $(hostname) = "d30" ]; then
-	    export CC=i586-mingw32msvc-gcc
-	    export CXX=i586-mingw32msvc-g++
-	    export HOST_OPT='--host=i586-mingw32msvc'
-	    export LDFLAGS='-static-libgcc -static-libstdc++'	    
-	else
-	#if echo $DD_HOSTS|grep $(hostname) >/dev/null 2>&1; then
-	    export CC=i686-w64-mingw32-gcc
-	    export CXX=i686-w64-mingw32-g++
-	    export HOST_OPT='--host=i686-w64-mingw32'
-	    export LDFLAGS='-static-libgcc -static-libstdc++'
-	fi
+    w32)
+	export CC=i686-w64-mingw32-gcc
+	export CXX=i686-w64-mingw32-g++
+	export HOST_OPT='--host=i686-w64-mingw32'
+	export LDFLAGS='-static-libgcc -static-libstdc++'
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-		    --disable-dlso \
-		    --enable-ucsim \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
-    w5)
-	export CC=i586-mingw32msvc-gcc
-	export CXX=i586-mingw32msvc-g++
-	export HOST_OPT='--host=i586-mingw32msvc'
-	export LDFLAGS='-static-libgcc -static-libstdc++'	    
-	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
-	./configure --prefix=${PREFIX} \
-		    --disable-dlso \
-		    --enable-ucsim \
-		    $HOST_OPT "$@"
-	;;	
     w64)
 	export CC=x86_64-w64-mingw32-gcc
 	export CXX=x86_64-w64-mingw32-g++
@@ -93,8 +54,6 @@ case $TARGET in
 	export LDFLAGS='-static-libgcc -static-libstdc++'
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-		    --disable-dlso \
-		    --enable-ucsim \
 		    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;

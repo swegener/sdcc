@@ -5,6 +5,17 @@ AC_INIT
 AC_CONFIG_SRCDIR(.version)
 AC_CONFIG_HEADERS([ddconfig.h:ddconfig_in.h])
 
+: ${CFLAGS="-g"}
+: ${CXXFLAGS="-g"}
+
+if test -z "$CFLAGS"; then
+    CFLAGS="-g"
+fi
+if test -z "$CXXFLAGS"; then
+    CXXFLAGS="-g"
+fi
+
+    
 def_ucsim="yes"
 def_dlso="no"
 def_mcs51_port="yes"
@@ -37,7 +48,7 @@ if test $last_root == "ucsim" ; then
 	in_sdcc="yes"
     fi
 fi
-echo "In SDCC tree: $in_sdcc"
+echo "In SDCC tree: $in_sdcc (CFLAGS=${CFLAGS}, CXXFLAGS=${CXXFLAGS})"
 
 if test $in_sdcc == "yes" ; then
     def_ucsim="no"

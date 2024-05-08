@@ -1,8 +1,10 @@
 #
-# S51 main.mk
+# uCsim main.mk
 #
-# (c) Drotos Daniel, Talker Bt. 1997,99
+# (c) 1997 Drotos Daniel
 #
+
+TN		= main
 
 STARTYEAR	= 1997
 
@@ -28,8 +30,9 @@ PICOPT		= @PICOPT@
 CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir) -I$(srcdir) \
                   -I$(top_srcdir)/$(SIMDIR) \
 		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
-CFLAGS          = @WALL_FLAG@ @CFLAGS@ -I$(top_builddir)
-CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ $(PICOPT) -I$(top_builddir)
+OPT		?= 2
+CFLAGS          = @WALL_FLAG@ @CFLAGS@ -O$(OPT) -I$(top_builddir)
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ -O$(OPT) $(PICOPT) -I$(top_builddir)
 WINSOCK_AVAIL   = @WINSOCK_AVAIL@
 LDFLAGS		= @LDFLAGS@
 
@@ -143,8 +146,14 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 libucsimutil.a: $(OBJECTS)
-	$(AR) -rc $@ $(OBJECTS)
+ifeq ($(SILENT),yes)
+	@echo LIB $(TN)-$@
+	@$(AR) -rc $@ $+ 	>>$(top_srcdir)/compile.log 2>&1
+	@$(RANLIB) $@ 		>>$(top_srcdir)/compile.log 2>&1
+else
+	$(AR) -rc $@ $+
 	$(RANLIB) $@
+endif
 
 
 ifeq ($(enable_ucsim),yes)
@@ -161,8 +170,8 @@ ucsim$(EXEEXT): $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -L$(top_builddir) $(UCSIM_LIBS) -o $@ 
 
-ftest$(EXEEXT): ftest.o libucsimutil.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -L$(top_builddir) -lucsimutil @LIBS@
+#ftest$(EXEEXT): ftest.o libucsimutil.a
+#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -L$(top_builddir) -lucsimutil @LIBS@
 
 relay$(EXEEXT): $(RELAY_OBJECTS) $(RELAY_LIB_FILES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -L$(top_builddir) $(RELAY_LIBS) -o $@
@@ -170,6 +179,7 @@ relay$(EXEEXT): $(RELAY_OBJECTS) $(RELAY_LIB_FILES)
 
 ptt: ptt.o
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpthread
+
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 

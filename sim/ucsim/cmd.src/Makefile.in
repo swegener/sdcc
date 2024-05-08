@@ -4,6 +4,8 @@
 # (c) Drotos Daniel, Talker Bt. 1997
 #
 
+TN		= cmd
+
 STARTYEAR	= 1997
 
 SHELL		= /bin/sh
@@ -25,8 +27,9 @@ DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 PICOPT		= @PICOPT@
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/sim.src -I$(top_srcdir)/gui.src
-CFLAGS          = @WALL_FLAG@ @CFLAGS@
-CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ $(PICOPT)
+OPT		?= 2
+CFLAGS          = @WALL_FLAG@ @CFLAGS@ -O$(OPT)
+CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ -O$(OPT) $(PICOPT)
 WINSOCK_AVAIL   = @WINSOCK_AVAIL@
 
 prefix          = @prefix@
@@ -113,8 +116,14 @@ cmdlex.cc: cmdlex.l cmdpars.hh
 cmdlib: $(top_builddir)/libcmd.a
 
 $(top_builddir)/libcmd.a: $(OBJECTS) $(LOCAL_OBJECTS)
-	$(AR) -rc $@ $(OBJECTS) $(LOCAL_OBJECTS)
+ifeq ($(SILENT),yes)
+	@echo LIB $(TN)-$@
+	@$(AR) -rc $@ $+
+	@$(RANLIB) $@
+else
+	$(AR) -rc $@ $+
 	$(RANLIB) $@
+endif
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

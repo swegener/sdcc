@@ -1556,15 +1556,13 @@ cl_address_space::init(void)
   unsigned int i, s= sizeof(class cl_cell32);
   cell->as= this;
   u8_t *p1= (u8_t*)cella;
-  //void *p1;
   cell->init();
   for (i= 0; i < size; i++)
     {
-      //p1= &(cella[i]);
       memcpy(p1, (void*)cell, s);
-      //cella[i].init();
       p1+= s;
     }
+  
   return 0;
 }
 

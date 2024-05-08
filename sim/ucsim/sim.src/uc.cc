@@ -645,7 +645,7 @@ cl_uc::init(void)
   build_cmdset(cs);
   irq= false;
   vcd_break= false;
-  reset();
+  //reset();
 
   return 0;
   for (i= 0; i < sim->app->in_files->count; i++)
@@ -731,6 +731,18 @@ cl_uc::mk_cvar(class cl_memory_cell *cell, chars vname, chars vdesc,
   v->init();
   v->set_by(vby);
 }
+
+void
+cl_uc::mk_mvar(class cl_memory *m, t_addr a,
+	       chars vname, chars vdesc,
+	       enum var_by vby)
+{
+  class cl_cvar *v;
+  vars->add(v= new cl_var(vname, m, a, vdesc));
+  v->init();
+  v->set_by(vby);
+}
+
 
 /*
  * Making elements
@@ -2955,7 +2967,9 @@ cl_uc::tick_hw(int cycles)
           hw= (class cl_hw *)(hws->at(i));
           if ((hw->flags & HWF_INSIDE) &&
               (hw->on))
-            hw->tick(1);
+	    {
+	      hw->tick(1);
+	    }
         }
     }
   do_extra_hw(cycles);

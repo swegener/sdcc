@@ -329,6 +329,7 @@ class cl_memory_cell: public cl_cell_data
   uchar flags;
   //class cl_memory_operator *operators;
   class cl_memory_operator **ops;
+  //u64_t fillup;
  public:
   cl_memory_cell();
   cl_memory_cell(uchar awidth);

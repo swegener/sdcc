@@ -333,6 +333,7 @@ cl_hw::new_io(class cl_f *f_in, class cl_f *f_out)
       f_in->raw();
       f_in->echo(NULL);
     }
+  io->tu_cls();
   draw_display();
   //application->get_commander()->update_active();
 }
@@ -352,6 +353,7 @@ cl_hw::new_i(class cl_f *f_in)
       f_in->echo(NULL);
       f_in->set_escape(true);
     }
+  io->tu_cls();
   draw_display();
 }
 
@@ -363,6 +365,7 @@ cl_hw::new_o(class cl_f *f_out)
     return ;
   io->tu_reset();
   io->replace_files(true, io->get_fin(), f_out);
+  io->tu_cls();
   draw_display();
 }
 
@@ -437,7 +440,9 @@ cl_hw::handle_input(int c)
       io->convert2console();
       break;
     case 'l'-'a'+1:
+      io->tu_cls();
       draw_display();
+      refresh_display(true);
       break;
     case 'n'-'a'+1:
       {

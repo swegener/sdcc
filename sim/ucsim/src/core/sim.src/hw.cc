@@ -225,10 +225,16 @@ cl_hw::cfg_help(t_addr addr)
   return "N/A";
 }
 
-void
+bool
 cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Nothing to do\n");
+  return true; // handled
+}
+
+void
+cl_hw::set_help(class cl_console_base *con)
+{
 }
 
 class cl_memory_cell *

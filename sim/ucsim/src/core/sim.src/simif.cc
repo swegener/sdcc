@@ -612,7 +612,7 @@ cl_simulator_interface::cfg_help(t_addr addr)
   return "Not used";
 }
 
-void
+bool
 cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 				class cl_console_base *con)
 {
@@ -628,14 +628,14 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
       if (!mem->is_address_space())
 	{
 	  con->dd_printf("%s is not an address space\n");
-	  return;
+	  return true;
 	}
       if (!mem->valid_address(a))
 	{
 	  con->dd_printf("Address must be between 0x%x and 0x%x\n",
 			 AU(mem->lowest_valid_address()),
 			 AU(mem->highest_valid_address()));
-	  return;
+	  return true;
 	}
       as_name= strdup(mem->get_name());
       addr= a;
@@ -647,6 +647,7 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 	  if (cell != NULL)
 	    unregister_cell(cell);
 	  cell= register_cell(as, address);
+	  return true;
 	}
     }
   else if (cmdline->syntax_match(uc, STRING STRING))
@@ -663,6 +664,7 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 	    {
 	      fout= mk_io(p2, "w");
 	    }
+	  return true;
 	}
       else if (strcmp(p1, "fin") == 0)
 	{
@@ -674,16 +676,19 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 	    {
 	      fin= mk_io(p2, "r");
 	    }
+	  return true;
 	}
     }
-  else
-    {
-      con->dd_printf("set hardware simif memory address\n");
-      con->dd_printf("set hardware simif fin \"input_file_name\"\n");
-      con->dd_printf("set hardware simif fout \"output_file_name\"\n");
-    }
+  return false;
 }
 
+void
+cl_simulator_interface::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware simif memory address\n");
+  con->dd_printf("set hardware simif fin \"input_file_name\"\n");
+  con->dd_printf("set hardware simif fout \"output_file_name\"\n");
+}
 
 t_mem
 cl_simulator_interface::read(class cl_memory_cell *cel)

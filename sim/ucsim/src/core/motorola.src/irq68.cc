@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (irq.cc)
+ * Simulator of microcontrollers (irq68.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "itsrccl.h"
 
-#include "irqcl.h"
+#include "irq68cl.h"
 
 
 /* IRQ handling peripheral */
@@ -103,4 +103,4 @@ cl_irq_hw::print_info(class cl_console_base *con)
 }
 
 
-/* End of m6800.src/irq.cc */
+/* End of m6800.src/irq58.cc */

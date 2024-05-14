@@ -1,30 +1,17 @@
-#
-# ucsim cmd.src/clean.mk
-#
 
-# Deleting all files created by building the program
-# --------------------------------------------------
-clean:
+clean: local_clean sub_clean
+
+local_clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
 
+sub_clean:
 
-# Deleting all files created by configuring or building the program
-# -----------------------------------------------------------------
-distclean: clean
+distclean: local_distclean sub_distclean
+
+local_distclean: local_clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
 	rm -f cmdpars.cc cmdpars.hh cmdlex.cc
 
-
-# Like clean but some files may still exist
-# -----------------------------------------
-mostlyclean: clean
-
-
-# Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, etc.
-# -----------------------------------------------------------------------
-realclean: distclean
-
-# End of cmd.src/clean.mk
+sub_distclean:

@@ -3,9 +3,6 @@ EXEEXT		= @EXEEXT@
 enable_mcs51_port   = @enable_mcs51_port@
 enable_avr_port     = @enable_avr_port@
 enable_z80_port     = @enable_z80_port@
-enable_gbz80_port   = @enable_gbz80_port@
-enable_r2k_port     = @enable_r2k_port@
-enable_r3ka_port    = @enable_r3ka_port@
 enable_tlcs_port    = @enable_tlcs_port@
 enable_xa_port      = @enable_xa_port@
 enable_m68hc08_port = @enable_m68hc08_port@
@@ -24,6 +21,9 @@ enable_pblaze_port  = @enable_pblaze_port@
 enable_i8085_port   = @enable_i8085_port@
 enable_f8_port      = @enable_f8_port@
 enable_i8048_port   = @enable_i8048_port@
+
+enable_serio        = @enable_serio@
+enable_ucsim        = @enable_ucsim@
 
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
@@ -53,7 +53,7 @@ ifeq ($(enable_m68hc08_port),yes)
 SM68HC08	= m68hc08.src
 else
 ifeq ($(enable_s08_port),yes)
-SS08		= m68hc08.src
+SM68HC08	= m68hc08.src
 else
 SM68HC08	=
 endif
@@ -149,17 +149,38 @@ else
 I8048		=
 endif
 
-PKGS		= $(S51) \
-		  $(SAVR) $(SZ80) \
-		  $(TLCS) \
-		  $(SM68HC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) \
-		  $(M6809) $(M6800) $(M68HC11) $(M68HC12) $(MOS6502) \
-		  $(RXK) $(PBLAZE) $(I8085) $(F8) $(I8048) \
-		  doc gui.src
+PKGS		= $(P1516) $(F8) \
+		  $(S51) $(I8048) $(I8085) $(XA) \
+		  $(SAVR) \
+		  $(SZ80) $(TLCS) $(RXK) \
+		  $(STM8) $(ST7)  \
+		  $(M6800) $(SM68HC08) $(M6809) $(M68HC11) $(M68HC12) \
+		  $(MOS6502) \
+		  $(PBLAZE) $(PDK)
 
-PKGS_ALL	= cmd.src sim.src gui.src motorola.src \
-		  s51.src avr.src z80.src tlcs.src xa.src \
+PKGS_ALL	= s51.src avr.src z80.src tlcs.src xa.src \
 		  m68hc08.src stm8.src st7.src pdk.src p1516.src \
 		  m6809.src m6800.src m68hc11.src m68hc12.src mos6502.src \
-		  rxk.src pblaze.src i8085.src f8.src i8048.src \
-		  doc
+		  rxk.src pblaze.src i8085.src f8.src i8048.src
+
+curses_ok	= @curses_ok@
+
+ifeq ($(enable_serio),yes)
+ifeq ($(curses_ok),yes)
+SERIO		= serio.src
+else
+SERIO		=
+endif
+else
+SERIO		=
+endif
+
+ifeq ($(enable_ucsim),yes)
+UCSIM		= ucsim.src
+else
+UCSIM		=
+endif
+
+APPS		= $(SERIO) $(UCSIM) relay.src
+
+APPS_ALL	= serio.src ucsim.src relay.src

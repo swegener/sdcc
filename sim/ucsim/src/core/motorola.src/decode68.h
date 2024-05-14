@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (decode.h)
+ * Simulator of microcontrollers (decode68.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef DECODE_HEADER
-#define DECODE_HEADER
+#ifndef DECODE68_HEADER
+#define DECODE68_HEADER
 
 #define NOP   instruction_01
 #define TAP   instruction_06
@@ -244,4 +244,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #endif
 
-/* End of m6800.src/decode.h */
+/* End of m6800.src/decode68.h */

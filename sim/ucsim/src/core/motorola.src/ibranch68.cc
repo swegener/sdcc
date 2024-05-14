@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (ibranch.cc)
+ * Simulator of microcontrollers (ibranch68.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -81,4 +81,4 @@ cl_m6800::JMPe(t_mem code)
 }
 
 
-/* End of m6800.src/ibranch.cc */
+/* End of m6800.src/ibranch68.cc */

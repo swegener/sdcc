@@ -31,9 +31,9 @@ docdir		= @docdir@/ucsim
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: doc
+all: docs
 
-doc: checkconf
+docs: checkconf
 
 # Compiling and installing everything and running test
 # ---------------------------------------------------

@@ -6,7 +6,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir   = @abs_top_srcdir@
 
 
-include $(abs_top_srcdir)/test-target.mk
+include $(abs_top_srcdir)/src/test-target.mk
 
 
 # The old *.mk tests here work slightly differently to those for all the

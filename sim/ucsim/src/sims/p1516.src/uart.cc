@@ -76,7 +76,7 @@ cl_uart::cfg_help(t_addr addr)
   switch (addr)
     {
     case uart_cfg_base:
-      return "Base address of ACIA registers (int, RW)";
+      return "Base address of UART registers (int, RW)";
       /*    case acia_cfg_cr:
       return "Copy of written CR value";
     case acia_cfg_sr:
@@ -191,7 +191,7 @@ cl_uart::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
   return cell->get();
 }
 
-void
+bool
 cl_uart::set_cmd(class cl_cmdline *cmdline,
 				class cl_console_base *con)
 {
@@ -209,15 +209,22 @@ cl_uart::set_cmd(class cl_cmdline *cmdline,
 	  con->dd_printf("Address must be between 0x%x and 0x%x\n",
 			 AU(uc->rom->lowest_valid_address()),
 			 AU(uc->rom->highest_valid_address()));
-	  return;
+	  return true;
 	}
       for (i= 0; i < 16; i++)
 	unregister_cell(regs[i]);
       base= a;
       init();
+      return true; // handled
     }
-  else
-    con->dd_printf("set hardware uart[%d] address\n", id);
+  return cl_serial_hw::set_cmd(cmdline, con);
+}
+
+void
+cl_uart::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware uart[%d] address\n", id);
+  cl_serial_hw::set_help(con);
 }
 
 int

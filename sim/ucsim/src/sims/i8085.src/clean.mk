@@ -1,37 +1,24 @@
-# i8085.src/clean.mk
 
-srcdir		= .
+clean: local_clean sub_clean
 
-# Deleting all files created by building the program
-# --------------------------------------------------
-clean:
+local_clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
 	rm -f si8085$(EXEEXT) si8085.exe
 	rm -f smcs6502$(EXEEXT) smcs6502.exe
 	rm -f ucsim_i8085$(EXEEXT) ucsim_i8085.exe
+
+sub_clean:
 ifneq ($(shell test -f test/Makefile && echo ok), )
-	$(MAKE) -C test clean
+	$(MAKE) -C test -f clean.mk clean
 endif
 
+distclean: local_distclean sub_distclean
 
-# Deleting all files created by configuring or building the program
-# -----------------------------------------------------------------
-distclean: clean
+local_distclean: local_clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
 	rm -f *.obj *.list *.lst *.hex
 	rm -f test/Makefile
 
-
-# Like clean but some files may still exist
-# -----------------------------------------
-mostlyclean: clean
-
-
-# Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, etc.
-# -----------------------------------------------------------------------
-realclean: distclean
-
-# End of i8085.src/clean.mk
+sub_distclean:

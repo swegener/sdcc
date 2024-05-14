@@ -2980,7 +2980,7 @@ as_fn_append ac_func_cxx_list " vfork HAVE_VFORK"
 ac_aux_files="install-sh"
 
 # Locations in which to look for auxiliary files.
-ac_aux_dir_candidates="${srcdir}${PATH_SEPARATOR}${srcdir}/..${PATH_SEPARATOR}${srcdir}/../.."
+ac_aux_dir_candidates="${srcdir}/src"
 
 # Search for a directory containing all of the required auxiliary files,
 # $ac_aux_files, from the $PATH-style list $ac_aux_dir_candidates.
@@ -3143,7 +3143,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers ddconfig.h:ddconfig_in.h"
+
+ac_config_headers="$ac_config_headers src/core/utils.src/ddconfig.h:src/core/utils.src/ddconfig_in.h"
 
 
 : ${CFLAGS="-g"}
@@ -8101,7 +8102,7 @@ printf "%s\n" "#define _M_ \"${M}\"" >>confdefs.h
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk cmd.src/Makefile motorola.src/Makefile sim.src/Makefile sim.src/test/Makefile avr.src/Makefile avr.src/test/Makefile m68hc08.src/Makefile m68hc08.src/test/Makefile m6809.src/Makefile m6809.src/test/Makefile m6800.src/Makefile m6800.src/test/Makefile m68hc11.src/Makefile m68hc11.src/test/Makefile m68hc12.src/Makefile m68hc12.src/test/Makefile mos6502.src/Makefile mos6502.src/test/Makefile rxk.src/Makefile rxk.src/test/Makefile pblaze.src/Makefile pblaze.src/test/Makefile i8085.src/Makefile i8085.src/test/Makefile f8.src/Makefile f8.src/test/Makefile i8048.src/Makefile i8048.src/test/Makefile p1516.src/Makefile p1516.src/test/Makefile pdk.src/Makefile pdk.src/test/Makefile s51.src/Makefile s51.src/test/Makefile st7.src/Makefile st7.src/test/Makefile stm8.src/Makefile stm8.src/test/Makefile tlcs.src/Makefile tlcs.src/test/Makefile xa.src/Makefile xa.src/test/Makefile z80.src/Makefile z80.src/test/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/common.mk:src/common_in.mk src/packages.mk:src/packages_in.mk src/core/cmd.src/Makefile src/core/motorola.src/Makefile src/core/utils.src/Makefile src/core/sim.src/Makefile src/core/sim.src/test/Makefile src/core/gui.src/Makefile src/sims/avr.src/Makefile src/sims/avr.src/test/Makefile src/sims/m68hc08.src/Makefile src/sims/m68hc08.src/test/Makefile src/sims/m6809.src/Makefile src/sims/m6809.src/test/Makefile src/sims/m6800.src/Makefile src/sims/m6800.src/test/Makefile src/sims/m68hc11.src/Makefile src/sims/m68hc11.src/test/Makefile src/sims/m68hc12.src/Makefile src/sims/m68hc12.src/test/Makefile src/sims/mos6502.src/Makefile src/sims/mos6502.src/test/Makefile src/sims/rxk.src/Makefile src/sims/rxk.src/test/Makefile src/sims/pblaze.src/Makefile src/sims/pblaze.src/test/Makefile src/sims/i8085.src/Makefile src/sims/i8085.src/test/Makefile src/sims/f8.src/Makefile src/sims/f8.src/test/Makefile src/sims/i8048.src/Makefile src/sims/i8048.src/test/Makefile src/sims/p1516.src/Makefile src/sims/p1516.src/test/Makefile src/sims/pdk.src/Makefile src/sims/pdk.src/test/Makefile src/sims/s51.src/Makefile src/sims/s51.src/test/Makefile src/sims/st7.src/Makefile src/sims/st7.src/test/Makefile src/sims/stm8.src/Makefile src/sims/stm8.src/test/Makefile src/sims/tlcs.src/Makefile src/sims/tlcs.src/test/Makefile src/sims/xa.src/Makefile src/sims/xa.src/test/Makefile src/sims/z80.src/Makefile src/sims/z80.src/test/Makefile src/apps/serio.src/Makefile src/apps/ucsim.src/Makefile src/apps/relay.src/Makefile docs/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8790,57 +8791,61 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "ddconfig.h") CONFIG_HEADERS="$CONFIG_HEADERS ddconfig.h:ddconfig_in.h" ;;
+    "src/core/utils.src/ddconfig.h") CONFIG_HEADERS="$CONFIG_HEADERS src/core/utils.src/ddconfig.h:src/core/utils.src/ddconfig_in.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
-    "packages.mk") CONFIG_FILES="$CONFIG_FILES packages.mk:packages_in.mk" ;;
-    "cmd.src/Makefile") CONFIG_FILES="$CONFIG_FILES cmd.src/Makefile" ;;
-    "motorola.src/Makefile") CONFIG_FILES="$CONFIG_FILES motorola.src/Makefile" ;;
-    "sim.src/Makefile") CONFIG_FILES="$CONFIG_FILES sim.src/Makefile" ;;
-    "sim.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES sim.src/test/Makefile" ;;
-    "avr.src/Makefile") CONFIG_FILES="$CONFIG_FILES avr.src/Makefile" ;;
-    "avr.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES avr.src/test/Makefile" ;;
-    "m68hc08.src/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc08.src/Makefile" ;;
-    "m68hc08.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc08.src/test/Makefile" ;;
-    "m6809.src/Makefile") CONFIG_FILES="$CONFIG_FILES m6809.src/Makefile" ;;
-    "m6809.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m6809.src/test/Makefile" ;;
-    "m6800.src/Makefile") CONFIG_FILES="$CONFIG_FILES m6800.src/Makefile" ;;
-    "m6800.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m6800.src/test/Makefile" ;;
-    "m68hc11.src/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11.src/Makefile" ;;
-    "m68hc11.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc11.src/test/Makefile" ;;
-    "m68hc12.src/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc12.src/Makefile" ;;
-    "m68hc12.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES m68hc12.src/test/Makefile" ;;
-    "mos6502.src/Makefile") CONFIG_FILES="$CONFIG_FILES mos6502.src/Makefile" ;;
-    "mos6502.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES mos6502.src/test/Makefile" ;;
-    "rxk.src/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/Makefile" ;;
-    "rxk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES rxk.src/test/Makefile" ;;
-    "pblaze.src/Makefile") CONFIG_FILES="$CONFIG_FILES pblaze.src/Makefile" ;;
-    "pblaze.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES pblaze.src/test/Makefile" ;;
-    "i8085.src/Makefile") CONFIG_FILES="$CONFIG_FILES i8085.src/Makefile" ;;
-    "i8085.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES i8085.src/test/Makefile" ;;
-    "f8.src/Makefile") CONFIG_FILES="$CONFIG_FILES f8.src/Makefile" ;;
-    "f8.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES f8.src/test/Makefile" ;;
-    "i8048.src/Makefile") CONFIG_FILES="$CONFIG_FILES i8048.src/Makefile" ;;
-    "i8048.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES i8048.src/test/Makefile" ;;
-    "p1516.src/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/Makefile" ;;
-    "p1516.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/test/Makefile" ;;
-    "pdk.src/Makefile") CONFIG_FILES="$CONFIG_FILES pdk.src/Makefile" ;;
-    "pdk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES pdk.src/test/Makefile" ;;
-    "s51.src/Makefile") CONFIG_FILES="$CONFIG_FILES s51.src/Makefile" ;;
-    "s51.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES s51.src/test/Makefile" ;;
-    "st7.src/Makefile") CONFIG_FILES="$CONFIG_FILES st7.src/Makefile" ;;
-    "st7.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES st7.src/test/Makefile" ;;
-    "stm8.src/Makefile") CONFIG_FILES="$CONFIG_FILES stm8.src/Makefile" ;;
-    "stm8.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES stm8.src/test/Makefile" ;;
-    "tlcs.src/Makefile") CONFIG_FILES="$CONFIG_FILES tlcs.src/Makefile" ;;
-    "tlcs.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES tlcs.src/test/Makefile" ;;
-    "xa.src/Makefile") CONFIG_FILES="$CONFIG_FILES xa.src/Makefile" ;;
-    "xa.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES xa.src/test/Makefile" ;;
-    "z80.src/Makefile") CONFIG_FILES="$CONFIG_FILES z80.src/Makefile" ;;
-    "z80.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES z80.src/test/Makefile" ;;
-    "gui.src/Makefile") CONFIG_FILES="$CONFIG_FILES gui.src/Makefile" ;;
-    "gui.src/serio.src/Makefile") CONFIG_FILES="$CONFIG_FILES gui.src/serio.src/Makefile" ;;
-    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/common.mk") CONFIG_FILES="$CONFIG_FILES src/common.mk:src/common_in.mk" ;;
+    "src/packages.mk") CONFIG_FILES="$CONFIG_FILES src/packages.mk:src/packages_in.mk" ;;
+    "src/core/cmd.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/cmd.src/Makefile" ;;
+    "src/core/motorola.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/motorola.src/Makefile" ;;
+    "src/core/utils.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/utils.src/Makefile" ;;
+    "src/core/sim.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/sim.src/Makefile" ;;
+    "src/core/sim.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/sim.src/test/Makefile" ;;
+    "src/core/gui.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/core/gui.src/Makefile" ;;
+    "src/sims/avr.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/avr.src/Makefile" ;;
+    "src/sims/avr.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/avr.src/test/Makefile" ;;
+    "src/sims/m68hc08.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc08.src/Makefile" ;;
+    "src/sims/m68hc08.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc08.src/test/Makefile" ;;
+    "src/sims/m6809.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m6809.src/Makefile" ;;
+    "src/sims/m6809.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m6809.src/test/Makefile" ;;
+    "src/sims/m6800.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m6800.src/Makefile" ;;
+    "src/sims/m6800.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m6800.src/test/Makefile" ;;
+    "src/sims/m68hc11.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc11.src/Makefile" ;;
+    "src/sims/m68hc11.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc11.src/test/Makefile" ;;
+    "src/sims/m68hc12.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc12.src/Makefile" ;;
+    "src/sims/m68hc12.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/m68hc12.src/test/Makefile" ;;
+    "src/sims/mos6502.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/mos6502.src/Makefile" ;;
+    "src/sims/mos6502.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/mos6502.src/test/Makefile" ;;
+    "src/sims/rxk.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/rxk.src/Makefile" ;;
+    "src/sims/rxk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/rxk.src/test/Makefile" ;;
+    "src/sims/pblaze.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/pblaze.src/Makefile" ;;
+    "src/sims/pblaze.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/pblaze.src/test/Makefile" ;;
+    "src/sims/i8085.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/i8085.src/Makefile" ;;
+    "src/sims/i8085.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/i8085.src/test/Makefile" ;;
+    "src/sims/f8.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/f8.src/Makefile" ;;
+    "src/sims/f8.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/f8.src/test/Makefile" ;;
+    "src/sims/i8048.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/i8048.src/Makefile" ;;
+    "src/sims/i8048.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/i8048.src/test/Makefile" ;;
+    "src/sims/p1516.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/p1516.src/Makefile" ;;
+    "src/sims/p1516.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/p1516.src/test/Makefile" ;;
+    "src/sims/pdk.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/pdk.src/Makefile" ;;
+    "src/sims/pdk.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/pdk.src/test/Makefile" ;;
+    "src/sims/s51.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/s51.src/Makefile" ;;
+    "src/sims/s51.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/s51.src/test/Makefile" ;;
+    "src/sims/st7.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/st7.src/Makefile" ;;
+    "src/sims/st7.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/st7.src/test/Makefile" ;;
+    "src/sims/stm8.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/stm8.src/Makefile" ;;
+    "src/sims/stm8.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/stm8.src/test/Makefile" ;;
+    "src/sims/tlcs.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/tlcs.src/Makefile" ;;
+    "src/sims/tlcs.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/tlcs.src/test/Makefile" ;;
+    "src/sims/xa.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/xa.src/Makefile" ;;
+    "src/sims/xa.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/xa.src/test/Makefile" ;;
+    "src/sims/z80.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/z80.src/Makefile" ;;
+    "src/sims/z80.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/z80.src/test/Makefile" ;;
+    "src/apps/serio.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/serio.src/Makefile" ;;
+    "src/apps/ucsim.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/ucsim.src/Makefile" ;;
+    "src/apps/relay.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/relay.src/Makefile" ;;
+    "docs/Makefile") CONFIG_FILES="$CONFIG_FILES docs/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

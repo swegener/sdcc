@@ -1,46 +1,17 @@
-# uCsim gui.src/clean.mk
+all: clean
 
-PKGS		= serio.src
-top_srcdir	= ..
+clean: local_clean sub_clean
 
-# Deleting all files created by building the program
-# --------------------------------------------------
-clean_local:
+local_clean:
 	rm -f *core *[%~] *.[oa] a
 	rm -f .[a-z]*~
 
-clean: clean_local
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk clean;\
-	done
+sub_clean:
 
+distclean: local_distclean sub_distclean
 
-# Deleting all files created by configuring or building the program
-# -----------------------------------------------------------------
-distclean_local: clean_local
+local_distclean: local_clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
 
-distclean: distclean_local
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk distclean;\
-	done
-
-
-# Like clean but some files may still exist
-# -----------------------------------------
-mostlyclean: clean_local
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg -f $(top_srcdir)/gui.src/$$pkg/clean.mk mostlyclean;\
-	done
-
-
-# Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, etc.
-# -----------------------------------------------------------------------
-realclean: distclean_local
-	@for pkg in $(PKGS); do\
-	  $(MAKE) $$pkg -f clean.mk realclean;\
-	done
-
-# End of gui.src/clean.mk
+sub_distclean:

@@ -104,7 +104,8 @@ class cl_hw: public cl_guiobj
   virtual t_mem cfg_read(t_addr addr);
   virtual const char *cfg_help(t_addr addr);
   
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
 
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem, t_addr addr);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem, t_addr addr, chars vname, chars vdesc);

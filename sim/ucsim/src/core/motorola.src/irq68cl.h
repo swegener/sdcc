@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (irqcl.h)
+ * Simulator of microcontrollers (irq68cl.h)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -52,4 +52,4 @@ class cl_irq_hw: public cl_hw
 };
 
 
-/* End of m6800.src/irqcl.h */
+/* End of m6800.src/irq68cl.h */

@@ -31,13 +31,14 @@
 
 class cl_port_id: public cl_hw
 {
-  public:
-    u8_t value;
+public:
+  u8_t value;
 
-    cl_port_id(class cl_uc *auc);
-    /*virtual int init(void);*/
-    virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-    virtual void print_info(class cl_console_base *con);
+  cl_port_id(class cl_uc *auc);
+  /*virtual int init(void);*/
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 

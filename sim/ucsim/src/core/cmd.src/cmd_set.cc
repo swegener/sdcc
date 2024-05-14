@@ -159,7 +159,8 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
   if (hw)
     {
       cmdline->shift();
-      hw->set_cmd(cmdline, con);
+      if (!hw->set_cmd(cmdline, con))
+	hw->set_help(con);
     }
   else
     con->dd_printf("Error: no hw\n");

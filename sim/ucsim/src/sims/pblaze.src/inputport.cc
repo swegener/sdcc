@@ -33,7 +33,7 @@ cl_input_port::cl_input_port(class cl_uc *auc) : cl_hw(auc, HW_PORT, 0, "input_p
   value_set = false;
 }
 
-void
+bool
 cl_input_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -42,11 +42,17 @@ cl_input_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
     {
       value = params[0]->value.number;
       value_set = true;
+      return true; // handled
     }
-  else
-    {
-      con->dd_printf("set hardware port[%d] value\n                   Set port value value\n", id);
-    }
+  return false; // unhandled
+}
+
+void
+cl_input_port::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware port[%d] value\n"
+		 "                   Set port value value\n",
+		 id);
 }
 
 void

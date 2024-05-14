@@ -366,7 +366,8 @@ class cl_simulator_interface: public cl_hw
   virtual unsigned int cfg_size(void) { return simif_nuof; }
   virtual const char *cfg_help(t_addr addr);
     
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
   virtual t_mem read(class cl_memory_cell *cel);
   virtual void write(class cl_memory_cell *cel, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);

@@ -1,206 +1,41 @@
-#
-# uCsim Makefile
-#
-# (c) Drotos Daniel 1997
-#
+all:
+	$(MAKE) -C src all
 
-STARTYEAR	= 1997
+libs:
+	$(MAKE) -C src libs
 
-SHELL		= /bin/sh
+pkgs:
+	$(MAKE) -C src pkgs
 
-include packages.mk
+sims: pkgs
 
-VPATH		= @srcdir@
-srcdir		= @srcdir@
+apps:
+	$(MAKE) -C src apps
 
-top_builddir	= @top_builddir@
-top_srcdir	= @top_srcdir@
-
-# Compiling entire program or any subproject
-# ------------------------------------------
-all: checkconf #libs apps
-	$(MAKE) libs
-	$(MAKE) apps
-
-libs: main_all cmd_src_all sim_src_all gui_src_all motorola_src_all m6800lib
-
-main_all:
-	$(MAKE) -f main.mk all
-
-cmd_src_all:
-	$(MAKE) -C cmd.src cmd.src
-
-sim_src_all:
-	$(MAKE) -C sim.src sim.src
-
-gui_src_all:
-	$(MAKE) -C gui.src gui.src
-
-motorola_src_all:
-	$(MAKE) -C motorola.src motorola.src
-
-m6800lib:
-	$(MAKE) -C m6800.src m6800lib
-
-
-apps: $(PKGS) main_app
-
-main_app:
-	$(MAKE) -f main.mk main_app
-
-
-.PHONY: $(PKGS)
-
-$(PKGS):
-	$(MAKE) -C $@ $@
-
-#main_libs: main.mk
-#	$(MAKE) -f main.mk libs
-
-
-# Compiling and installing everything and running test
-# ---------------------------------------------------
-.PHONY: install INSTALL Install
 install:
-	$(MAKE) -f main.mk install
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg install ;\
-	done
+	$(MAKE) -C src install
+	$(MAKE) -C docs install
 
-
-# Deleting all the installed files
-# --------------------------------
 uninstall:
-	$(MAKE) -f main.mk uninstall
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg uninstall ;\
-	done
+	$(MAKE) -C src uninstall
+	$(MAKE) -C docs uninstall
 
+clean: local_clean sub_clean
 
-# Deleting all files created by building the program
-# --------------------------------------------------
-clean:
-	$(MAKE) -f $(srcdir)/clean.mk clean EXEEXT=$(EXEEXT)
-	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $$(cd $(top_srcdir)&&pwd)/$$pkg/clean.mk top_srcdir=$$(cd $(top_srcdir)&&pwd) clean EXEEXT=$(EXEEXT) ;\
-	done
+local_clean:
+	rm -f *~ lib*.a
 
+sub_clean:
+	$(MAKE) -C src  -f clean.mk clean
+	$(MAKE) -C docs -f clean.mk clean
 
-# Deleting all files created by configuring or building the program
-# -----------------------------------------------------------------
-distclean: clean
-	$(MAKE) -f $(srcdir)/clean.mk distclean
-	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $$(cd $(top_srcdir)&&pwd)/$$pkg/clean.mk top_srcdir=$$(cd $(top_srcdir)&&pwd) distclean ;\
-	done
-#	@for pkg in $(PKGS) sim.src; do\
-#		if test -d $$pkg/test; then \
-#			$(MAKE) -C $$pkg/test clean ;\
-#			if test -f $$pkg/test/Makefile.in; then rm -f $$pkg/test/Makefile; fi ;\
-#		fi ;\
-#	done
-	rm -rf doc/*~ doc/*.bak doc/Makefile
-	rm -f Makefile packages.mk libtool
+distclean: local_distclean sub_distclean
 
+local_distclean: local_clean
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+	rm -f Makefile
 
-# Like clean but some files may still exist
-# -----------------------------------------
-mostlyclean: clean
-	$(MAKE) -f clean.mk mostlyclean
-	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f clean.mk mostlyclean ;\
-	done
-
-
-# Deleting everything that can reconstructed by this Makefile. It deletes
-# everything deleted by distclean plus files created by bison, etc.
-# -----------------------------------------------------------------------
-realclean: distclean
-	$(MAKE) -f clean.mk realclean
-	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f clean.mk realclean ;\
-	done
-
-
-# Performing self-test
-# --------------------
-check:
-	$(MAKE) -f main.mk check
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg check ;\
-	done
-
-# We want tests to be parallelizable so a simple shell loop is
-# not good enough.
-PKGS_TEST = $(foreach pkg, sim.src $(PKGS), $(pkg)/test)
-PKGS_BASELINE = $(patsubst %,%/baseline,$(PKGS_TEST))
-.PHONY:	test $(PKGS_TEST) baseline $(PKGS_BASELINE)
-test: $(PKGS_TEST)
-$(PKGS_TEST):
-	-@$(MAKE) --no-print-directory -C $(dir $@) test
-
-baseline: $(PKGS_BASELINE)
-$(PKGS_BASELINE):
-	-@$(MAKE) --no-print-directory -C $(patsubst %/test/baseline,%,$@) baseline
-
-
-# Performing installation test
-# ----------------------------
-installcheck:
-
-
-# Creating dependencies
-# ---------------------
-dep:
-	$(MAKE) -f main.mk dep
-	@for pkg in $(PKGS); do\
-	  $(MAKE) -C $$pkg dep ;\
-	done
-
-
-# My rules
-# --------
-putcopyright:
-	'./put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
-
-
-# Remaking configuration
-# ----------------------
-configure: configure.ac
-	@$(top_srcdir)/mkecho $(top_builddir) "RE-CREATING CONFIGURE"
-	autoconf configure.ac >configure
-	chmod 755 configure
-
-config.status: configure
-	@$(top_srcdir)/mkecho $(top_builddir) "RE-CHECKING CONFIGURATION (re-creating config.status from configure)"
-	@if [ -x ./config.status ]; then \
-	  ./config.status -recheck;\
-	else\
-	  if [ -x ./conf ]; then\
-	    ./conf;\
-	  else\
-	    ./configure;\
-	  fi\
-	fi
-
-makefiles: config.status
-	@$(top_srcdir)/mkecho $(top_builddir) "RE-MAKING MAKEFILES"
-	$(SHELL) ./config.status
-
-main.mk: $(srcdir)/main_in.mk config.status
-	@$(top_srcdir)/mkecho $(top_builddir) "RE-MAKING MAIN.MK"
-	$(SHELL) ./config.status
-
-freshconf: echo_freshconf configure main.mk ddconfig.h
-
-ddconfig.h: ddconfig_in.h config.status
-	$(SHELL) ./config.status
-
-echo_freshconf:
-	@$(top_srcdir)/mkecho $(top_builddir) "FRESHCONF"
-
-checkconf:
-	@$(top_srcdir)/mkecho $(top_builddir) "CHECKCONF"
-	@if [ -f devel ]; then $(MAKE) freshconf; fi
-
-# End of Makefile
+sub_distclean:
+	$(MAKE) -C src  -f clean.mk distclean
+	$(MAKE) -C docs -f clean.mk distclean

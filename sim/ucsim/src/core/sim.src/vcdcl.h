@@ -54,12 +54,13 @@ class cl_vcd: public cl_hw
 
   inline char get_next_var_id(void) { return var_id++; }
 
-  void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
 
-  int tick(int cycles);
+  virtual int tick(int cycles);
 
-  void report(class cl_vcd_var *var, t_mem v);
-  void print_info(class cl_console_base *con);
+  virtual void report(class cl_vcd_var *var, t_mem v);
+  virtual void print_info(class cl_console_base *con);
 
  private:
   inline void reset_next_var_id(void) { var_id = 33; }

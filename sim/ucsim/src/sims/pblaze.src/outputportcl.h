@@ -40,17 +40,17 @@ typedef map<int, list<struct output> > output_map;
 
 class cl_output_port: public cl_hw
 {
-  public:
-    u8_t value;
-    output_map outputs;
-
-    cl_output_port(class cl_uc *auc);
-    virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-    virtual void print_info(class cl_console_base *con);
-
-
-    virtual void add_output(int port, long tick, t_mem value);
-    virtual void print_outputs(char *file_name);
+public:
+  u8_t value;
+  output_map outputs;
+  
+  cl_output_port(class cl_uc *auc);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
+    
+  virtual void add_output(int port, long tick, t_mem value);
+  virtual void print_outputs(char *file_name);
 };
 
 

@@ -34,10 +34,16 @@ cl_output_port::cl_output_port(class cl_uc *auc) : cl_hw(auc, HW_PORT, 0, "outpu
 }
 
 
-void
+bool
 cl_output_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
     con->dd_printf("Output port is read-only\n", id);
+    return true; // handled
+}
+
+void
+cl_output_port::set_help(class cl_console_base *con)
+{
 }
 
 void

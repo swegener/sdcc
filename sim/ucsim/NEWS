@@ -1,15 +1,16 @@
 0.9
 
-- Intel 8048 simulator
+- Intel 8048 simulator.
 
-- New device type in z80 simulator: r800
+- New device type in z80 simulator: r800.
 
-- FPGA displays for p2223
+- FPGA displays for p2223.
 
 
 0.8.x
 
-- Bugfixes, partial implmentations of 0.9 features.
+- Bugfixes, pre-relases of 0.9: partial implmentations of
+  new features.
 
 
 0.8

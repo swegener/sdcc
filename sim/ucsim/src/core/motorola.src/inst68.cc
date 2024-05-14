@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (inst68.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -56,4 +56,4 @@ cl_m6800::SWI(t_mem code)
 }
 
 
-/* End of m6800.src/inst.cc */
+/* End of m6800.src/inst68.cc */

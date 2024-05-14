@@ -84,7 +84,8 @@ public:
   virtual int init(void);
   virtual unsigned int cfg_size(void) { return 21; }
   virtual const char *cfg_help(t_addr addr);
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
 
   virtual class cl_memory_cell *reg(class cl_memory_cell *cell_rs);
   virtual t_mem read(class cl_memory_cell *cell);

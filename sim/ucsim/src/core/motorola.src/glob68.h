@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (glob.h)
+ * Simulator of microcontrollers (glob68.h)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef GLOB_HEADER
-#define GLOB_HEADER
+#ifndef GLOB68_HEADER
+#define GLOB68_HEADER
 
 #include "stypes.h"
 
@@ -36,4 +36,4 @@ extern struct dis_entry disass_m6800[];
 
 #endif
 
-/* End of m6800.src/glob.h */
+/* End of m6800.src/glob68.h */

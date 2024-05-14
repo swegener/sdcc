@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uccl.h"
 #include "memcl.h"
 #include "itsrccl.h"
-#include "decode.h"
+#include "decode68.h"
 #include "iwrap.h"
 
 

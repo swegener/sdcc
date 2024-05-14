@@ -30,16 +30,17 @@
 
 class cl_interrupt: public cl_hw
 {
-  public:
-    bool interrupt_request;
-
-    bool preserved_flag_c;
-    bool preserved_flag_z;
-  public:
-    cl_interrupt(class cl_uc *auc);
-    virtual int init(void);
-    virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-    virtual void print_info(class cl_console_base *con);
+public:
+  bool interrupt_request;
+  
+  bool preserved_flag_c;
+  bool preserved_flag_z;
+public:
+  cl_interrupt(class cl_uc *auc);
+  virtual int init(void);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 

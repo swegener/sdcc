@@ -16,15 +16,40 @@ p1516/p2223 and some AVR processors.
 ### How to get uCsim?
 
 uCsim is distributed in source code under GPL. It can be downloaded
-from its home site:
+from its home sites:
 
-[](http://mazsola.iit.uni-miskolc.hu/ucsim/)
+* http://mazsola.iit.uni-miskolc.hu/ucsim/
+* https://github.com/danieldrotos/ucsim
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
 complete development package with debugger (see below). It can be
 downloaded from its home site (or from its mirrors):
 
-[](http://sdcc.sourceforge.net/)
+* http://sdcc.sourceforge.net/
+
+
+### Install
+
+#### Required packages
+
+* g++
+* make (GNU make is required)
+* bison
+* flex
+* libncurses-dev
+
+
+#### Compilation
+
+Download source package and unzip it. Go to root directory of the
+unzipped package and the issue following commands:
+
+* ./configure
+* make
+* sudo make install
+
+If GNU make is different from system's default make, you can try
+**gmake** command, instead of make.
 
 
 ### Mailing list
@@ -92,30 +117,30 @@ already.
 
 ### Contributors and maintainers
 
-Gunnar Holm <gunnarh@foa.nft.no>
-Sandeep Dutta <dutta@comm.mot.com>
-Salvador Eduardo Tropea <salvador@inti.gov.ar>
-Josef Wolf <jw@raven.inka.de>
-Stephane MEYER <smeyer@cea.fr>
-Larry Doolittle <LRDoolittle@lbl.gov>
-Timothy Hurman <ee62th@ee.surrey.ac.uk>
-Karl-Max Wagner <karlmax@oberland.net>
-Edmar Wienskoski Jr <edmar-w-jr@technologist.com>
-Alexandre Frey <Alexandre.Frey@trusted-logic.fr>
-Kaido Karner <kaido@tradenet.ee>
-Karl Bongers <karl@turbobit.com>
-Alexis Pavlov <alexis.pavlov@certess.com>
-Davide Zanni <davide.zanni@libero.it>
-Anton Persson <anton@omicron.se>
-Nicolas Lesser <>
-Mike Jagdis <>
-Jiri Simek <>
-Zbynek Krivka <krivka@fit.vutbr.cz>
-Vaclav Peroutka <vaclavpe@users.sourceforge.net>
-Valentin Dudouyt <valentin.dudouyt@gmail.com>
-Erik Petrich <epetrich@users.sourceforge.net>
-Leland Morrison <>
-Johan Knol <johan.knol@iduna.nl>
+    Gunnar Holm <gunnarh@foa.nft.no>,
+    Sandeep Dutta <dutta@comm.mot.com>,
+    Salvador Eduardo Tropea <salvador@inti.gov.ar>,
+    Josef Wolf <jw@raven.inka.de>,
+    Stephane MEYER <smeyer@cea.fr>,
+    Larry Doolittle <LRDoolittle@lbl.gov>,
+    Timothy Hurman <ee62th@ee.surrey.ac.uk>,
+    Karl-Max Wagner <karlmax@oberland.net>,
+    Edmar Wienskoski Jr <edmar-w-jr@technologist.com>,
+    Alexandre Frey <Alexandre.Frey@trusted-logic.fr>,
+    Kaido Karner <kaido@tradenet.ee>,
+    Karl Bongers <karl@turbobit.com>,
+    Alexis Pavlov <alexis.pavlov@certess.com>,
+    Davide Zanni <davide.zanni@libero.it>,
+    Anton Persson <anton@omicron.se>,
+    Nicolas Lesser,
+    Mike Jagdis,
+    Jiri Simek,
+    Zbynek Krivka <krivka@fit.vutbr.cz>,
+    Vaclav Peroutka <vaclavpe@users.sourceforge.net>,
+    Valentin Dudouyt <valentin.dudouyt@gmail.com>,
+    Erik Petrich <epetrich@users.sourceforge.net>,
+    Leland Morrison,
+    Johan Knol <johan.knol@iduna.nl>,
 
-Maintainer of serialview: Timothy Hurman <ee62th@ee.surrey.ac.uk>
-Maintainer of other parts: Daniel Drotos <dr.dkdb@gmail.com>
+    Maintainer of serialview: Timothy Hurman <ee62th@ee.surrey.ac.uk>,
+    Maintainer of other parts: Daniel Drotos <dr.dkdb@gmail.com>

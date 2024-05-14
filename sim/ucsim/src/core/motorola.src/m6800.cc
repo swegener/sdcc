@@ -35,8 +35,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ciacl.h"
 #include "piacl.h"
 
-#include "glob.h"
-#include "irqcl.h"
+#include "glob68.h"
+#include "irq68cl.h"
 
 #include "m6800cl.h"
 

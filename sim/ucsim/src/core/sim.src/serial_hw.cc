@@ -198,15 +198,8 @@ cl_serial_hw::init(void)
     }
   
   io->replace_files(true, fi, fo);
+  set_raw(raw);
   
-  if (fi)
-    {
-      if (!raw)
-	fi->interactive(NULL);
-      fi->raw();
-      fi->echo(NULL);
-    }
-
   menu= 0;
   
   cfg_set(serconf_on, true);
@@ -223,6 +216,21 @@ cl_serial_hw::init(void)
 
   cfg_set(serconf_able_receive, 1);
   return 0;
+}
+
+void
+cl_serial_hw::set_raw(bool raw)
+{
+  class cl_f *fi= io->get_fin();
+  if (fi)
+    {
+      if (!raw)
+	fi->interactive(NULL);
+      //else
+      fi->raw();
+      fi->echo(NULL);
+    }
+  is_raw= raw;
 }
 
 const char *
@@ -248,7 +256,7 @@ cl_serial_hw::cfg_help(t_addr addr)
   return "Not used";
 }
 
-void
+bool
 cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 		      class cl_console_base *con)
 {
@@ -271,6 +279,7 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      listener_io->init();
 	      c->add_console(listener_io);
 	    }
+	  return true;
 	}
       if (strcmp(p1, "iport")==0)
 	{
@@ -281,6 +290,7 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      listener_i->init();
 	      c->add_console(listener_i);
 	    }
+	  return true;
 	}
       if (strcmp(p1, "oport")==0)
 	{
@@ -291,7 +301,15 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      listener_o->init();
 	      c->add_console(listener_o);
 	    }
+	  return true;
 	}
+      if (strcmp(p1, "raw")==0)
+	{
+	  bool v= port;
+	  set_raw(v);
+	  return true;
+	}
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING STRING))
     {
@@ -306,6 +324,7 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      fo= mk_io(p2, "w");
 	      new_io(fi, fo);
 	    }
+	  return true;
 	}
       if (strcmp(p1, "in")==0)
 	{
@@ -317,6 +336,7 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      else
 		con->dd_cprintf("error", "Error opening file \"%s\"\n",p2);
 	    }
+	  return true;
 	}
       if (strcmp(p1, "out")==0)
 	{
@@ -325,23 +345,25 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 	      fo= mk_io(p2, "w");
 	      new_o(fo);
 	    }
+	  return true;
 	}
-      if (strcmp(p1, "raw")==0)
-	{
-	  serial_raw_option->option->set_value(p2);
-	}
+      return false;
     }
-  else
-    {
-      con->dd_printf("set hardware uart[%d] raw   0|1\n", id);
-      con->dd_printf("set hardware uart[%d] file  \"file\"\n", id);
-      con->dd_printf("set hardware uart[%d] in    \"file\"\n", id);
-      con->dd_printf("set hardware uart[%d] out   \"file\"\n", id);
-      con->dd_printf("set hardware uart[%d] port  nr\n", id);
-      con->dd_printf("set hardware uart[%d] iport nr\n", id);
-      con->dd_printf("set hardware uart[%d] oport nr\n", id);
-    }
+  return false;
 }
+
+void
+cl_serial_hw::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware uart[%d] raw   0|1\n", id);
+  con->dd_printf("set hardware uart[%d] file  \"file\"\n", id);
+  con->dd_printf("set hardware uart[%d] in    \"file\"\n", id);
+  con->dd_printf("set hardware uart[%d] out   \"file\"\n", id);
+  con->dd_printf("set hardware uart[%d] port  nr\n", id);
+  con->dd_printf("set hardware uart[%d] iport nr\n", id);
+  con->dd_printf("set hardware uart[%d] oport nr\n", id);
+}
+ 
 
 t_mem
 cl_serial_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
@@ -388,6 +410,7 @@ cl_serial_hw::make_io()
     {
       io= new cl_serial_io(this);
       application->get_commander()->add_console(io);
+      set_raw(is_raw);
     }
 }
 
@@ -412,10 +435,7 @@ cl_serial_hw::new_i(class cl_f *f_in)
   io->replace_files(true, f_in, io->get_fout());
   if (!f_in)
     return;
-  if (!raw)
-    f_in->interactive(NULL);
-  f_in->set_telnet(!raw);
-  f_in->raw();
+  set_raw(is_raw);
   if (f_in->tty)
     {
       char esc= (char)cfg_get(serconf_escape);

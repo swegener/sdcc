@@ -247,7 +247,7 @@ cl_port::set_pin(t_mem val)
     cfg->write(port_value, port_pins & ep.prev_value);
 }
 
-void
+bool
 cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -255,12 +255,17 @@ cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
   if (cmdline->syntax_match(uc, NUMBER))
     {
       set_pin(params[0]->value.number);
+      return true; // handles
     }
-  else
-    {
-      con->dd_printf("set hardware port[%d] pins_value\n                   Set port pins\n",
+  return false; // unhandled
+}
+
+void
+cl_port::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware port[%d] pins_value\n"
+		 "                   Set port pins\n",
 		     id);
-    }
 }
 
 void

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (glob.cc)
+ * Simulator of microcontrollers (glob68.cc)
  *
  * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "glob.h"
+#include "glob68.h"
 
 
 // code mask branch len mn call tick
@@ -248,4 +248,4 @@ struct dis_entry disass_m6800[]=
     { 0, 0, 0, 0, 0, 0 }
   };
 
-/* End of m6800.src/glob.cc */
+/* End of m6800.src/glob68.cc */

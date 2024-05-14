@@ -99,9 +99,9 @@
         produce a directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
       
       <li>Make sure, that following packages are installed on your
-      system: <b>make</b>,
+      system: <b>make</b> (GNU make is required),
         <b>bison</b> (or yacc), <b>flex</b> (or lex), <b>libncurses-dev</b>.
-        You will need a C and a C++ compiler as well.</li>
+        You will need a C++ compiler as well.</li>
       
       <li>Go to the directory and configure the package. Issue <tt><b>configure</b></tt>
         command. It will determine your system and produce <b>Makefile</b>.
@@ -109,9 +109,10 @@
         option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
         Executable file will be placed in <tt>bin</tt> subdirectory. </li>
       
-      <li>Compile the package with <tt><b>make</b></tt> command. </li>
+      <li>Compile the package with <tt><b>make</b></tt> command, or <b>gmake</b> if
+      GNU make has that name. </li>
       
-      <li>Install executables <b>ucsim_51</b>, <b>ucsim_avr</b>, <b>ucsim_hc08</b>, <b>ucsim_xa</b>,
+      <li>Install executables <b>ucsim_i8051</b>, <b>ucsim_avr</b>, <b>ucsim_hc08</b>, <b>ucsim_xa</b>,
         <b>ucsim_z80, etc.</b> to any directory you want. It can be done with <tt><b>make
             install</b></tt> command which will place files in installation
         directory specified with <tt><b>--prefix=<i>dir</i></b><!-- --

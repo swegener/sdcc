@@ -2326,7 +2326,7 @@ cl_uc51_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 }
 
 
-void
+bool
 cl_uc51_cpu::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -2334,7 +2334,15 @@ cl_uc51_cpu::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
   if (cmdline->syntax_match(uc, STRING))
     {
       movxri_expr= params[0]->value.string.string;
+      return true; // handled
     }
+  return false; // unhandled
+}
+
+void
+cl_uc51_cpu::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hw cpu[0] expression\n");
 }
 
 void

@@ -52,8 +52,6 @@ public:
   //virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
 
-  //virtual t_mem set_cmd(t_mem value);
-
   virtual int tick(int cycles);
   virtual void reset(void);
   

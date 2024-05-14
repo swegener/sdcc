@@ -38,20 +38,21 @@ typedef map<int, input_tick_map> input_port_map;
 
 class cl_input_port: public cl_hw
 {
-  public:
-    u8_t value;
-    bool value_set;
-    input_port_map inputs;
-
-    cl_input_port(class cl_uc *auc);
-    virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-    virtual void print_info(class cl_console_base *con);
-
-    virtual void add_input(t_mem value, int port, long tick);
-    virtual t_mem get_input(int port, long tick);
-
-  private:
-    bool contains_input(int port, long tick);
+public:
+  u8_t value;
+  bool value_set;
+  input_port_map inputs;
+  
+  cl_input_port(class cl_uc *auc);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
+  virtual void print_info(class cl_console_base *con);
+  
+  virtual void add_input(t_mem value, int port, long tick);
+  virtual t_mem get_input(int port, long tick);
+  
+private:
+  bool contains_input(int port, long tick);
 };
 
 

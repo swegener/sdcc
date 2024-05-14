@@ -65,11 +65,10 @@ public:
 
   virtual void set_pin(t_mem val);
     
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
+  virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
+  virtual void set_help(class cl_console_base *con);
 
   virtual void make_io(void) {}
-  //virtual int tick(int cycles);
   virtual void print_info(class cl_console_base *con);
 };
 

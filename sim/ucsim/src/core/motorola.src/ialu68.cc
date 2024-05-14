@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (ialu.cc)
+ * Simulator of microcontrollers (ialu68.cc)
  *
  * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
  * 
@@ -434,4 +434,4 @@ cl_m6800::DES(t_mem code)
 }
 
 
-/* End of m6800.src/ialu.cc */
+/* End of m6800.src/ialu68.cc */

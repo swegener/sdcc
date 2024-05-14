@@ -1,0 +1,34 @@
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+include $(srcdir)/objs.mk
+include ../../common.mk
+
+LOCAL_LIB_PREREQU	=
+LOCAL_LIB_OPTIONS	=
+
+APP		= $(PKG)$(EXEEXT)
+
+all: $(APP)
+
+include $(top_srcdir)/src/app.mk
+
+$(APP): $(OBJECTS) $(UCSIM_LIB_PREREQUES)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@
+
+local_install:
+	$(INSTALL) $(APP) $(DESTDIR)$(bindir)/$(APP)
+	$(STRIP) $(DESTDIR)$(bindir)/$(APP)
+
+local_uninstall:
+	rm -f $(DESTDIR)$(bindir)/$(APP)
+
+dep: Makefile.dep
+
+Makefile.dep: $(srcdir)/*.cc objs.mk #$(srcdir)/*.h
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+
+-include Makefile.dep
+include $(srcdir)/clean.mk

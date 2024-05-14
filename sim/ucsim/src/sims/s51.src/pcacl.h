@@ -59,9 +59,6 @@ public:
   //virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
 
-  //virtual t_mem set_cmd(t_mem value);
-  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
- 
   virtual int tick(int cycles);
   virtual void do_pca_counter(int cycles);
   virtual void do_pca_module(int nr);

@@ -490,7 +490,7 @@ cl_vcd::read_word(unsigned int i)
   return (c != EOF);
 }
 
-void
+bool
 cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[5]= {
@@ -550,8 +550,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.cell, -1, -1);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.cell, -1, -1);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING BIT)) // DEL|ADD
     {
@@ -561,12 +562,12 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
           if (strcmp(p1, "add") == 0)
             {
               add_var(con, params[1]->value.bit.mem, params[1]->value.bit.mem_address, params[1]->value.bit.bitnr_high, params[1]->value.bit.bitnr_low);
-              return;
+              return true;
             }
           else if (strstr(p1, "del") == p1)
             {
               del_var(con, params[1]->value.bit.mem, params[1]->value.bit.mem_address, params[1]->value.bit.bitnr_low, params[1]->value.bit.bitnr_high);
-              return;
+              return true;
             }
           else if (strcmp(p1, "new") == 0)
             {
@@ -574,14 +575,15 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
               if (uc->get_hw(id_string, nid, NULL) != NULL)
                 {
                   con->dd_printf("Already exists\n");
-                  return;
+                  return true;
                 }
               cl_hw *h= new cl_vcd(uc, nid, id_string);
               h->init();
               uc->add_hw(h);
-              return;
+              return true;
             }
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING MEMORY ADDRESS NUMBER NUMBER)) // DEL|ADD
     {
@@ -592,8 +594,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.memory.memory, params[2]->value.address, params[3]->value.number, params[4]->value.number);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.memory.memory, params[2]->value.address, params[3]->value.number, params[4]->value.number);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING MEMORY ADDRESS NUMBER)) // DEL|ADD
     {
@@ -604,8 +607,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.memory.memory, params[2]->value.address, params[3]->value.number, params[3]->value.number);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.memory.memory, params[2]->value.address, params[3]->value.number, params[3]->value.number);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING MEMORY ADDRESS)) // DEL|ADD
     {
@@ -616,8 +620,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.memory.memory, params[2]->value.address, -1, -1);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.memory.memory, params[2]->value.address, -1, -1);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING CELL NUMBER NUMBER)) // DEL|ADD
     {
@@ -628,8 +633,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.cell, params[2]->value.number, params[3]->value.number);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.cell, params[2]->value.number, params[3]->value.number);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING CELL NUMBER)) // DEL|ADD
     {
@@ -640,8 +646,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
             add_var(con, params[1]->value.cell, params[2]->value.number, params[2]->value.number);
           else if (strstr(p1, "del") == p1)
             del_var(con, params[1]->value.cell, params[2]->value.number, params[2]->value.number);
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING NUMBER STRING)) // TIMESCALE, PAUSETIME, STARTTIME
     {
@@ -680,8 +687,9 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
               event += time;
               //uc->sim->app->debug("vcd[%d]: event rescheduled to %.15f\n", cl_hw::id, event);
             }
-          return;
+          return true;
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING STRING)) // TIMESCALE AUTO, FILE, MOD
     {
@@ -692,12 +700,12 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
           !strcmp(p2, "auto"))
         {
           timescale = 0;
-          return;
+          return true;
         }
       if (started)
         {
           con->dd_printf("Already started\n");
-          return;
+          return true;
         }
       if (p1 && *p1)
         {
@@ -707,7 +715,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                 modul= chars(p2);
               else
                 con->dd_printf("Name missing\n");
-              return;
+              return true;
             }
           if ((strstr(p1, "out") == p1) ||
               (strstr(p1, "file") == p1) ||
@@ -721,9 +729,10 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                 con->dd_printf("Name missing\n");
               else if (p2 && *p2)
                 filename = strdup(p2);
-              return;
+              return true;
             }
         }
+      return false;
     }
   else if (cmdline->syntax_match(uc, STRING)) // [RE]START, PAUSE, STOP
     {
@@ -738,7 +747,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                 free(filename);
               filename = NULL;
               state = -1;
-              return;
+              return true;
             }
           if (strstr(p1, "re") == p1 ||
               strcmp(p1, "start") == 0 ||
@@ -747,12 +756,12 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
               if (!started)
                 {
                   if ((fd= open_vcd(con)) == NULL)
-                    return;
+                    return true;
 
                   if (state != -1)
                     {
                       if (!parse_header(con))
-                        return;
+                        return true;
                     }
                   else
                     {
@@ -871,7 +880,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
               if (state >= 0 || !filename || filename[0] == '|')
                 on = true;
 
-              return;
+              return true;
             }
           if (strstr(p1, "paus") == p1)
             {
@@ -913,7 +922,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                 }
               else
                 con->dd_printf("Not started");
-              return;
+              return true;
             }
           if (strcmp(p1, "stop") == 0)
             {
@@ -935,35 +944,42 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                     reset_next_var_id();
                 }
               started= paused= false;
-              return;
+              return true;
             }
           if (strcmp(p1, "break") == 0)
             {
               dobreak= !dobreak;
               con->dd_printf("Break on events %s\n", (dobreak ? "enabled" : "disabled"));
-              return;
+              return true;
             }
           if (strcmp(p1, "info") == 0)
             {
               print_info(con);
-              return;
+              return true;
             }
+	  return false;
         }
     }
 
-    con->dd_printf("set hardware vcd[id] add memory address [ [bit_high] bit_low]\n");
-    con->dd_printf("set hardware vcd[id] del[ete] memory address [ [bit_high] bit_low]\n");
-    con->dd_printf("set hardware vcd[id] timescale n [ms|us|ns|ps|fs]\n");
-    con->dd_printf("set hardware vcd[id] starttime n [ms|us|ns|ps|fs]\n");
-    con->dd_printf("set hardware vcd[id] input \"vcd_file_name\"\n");
-    con->dd_printf("set hardware vcd[id] output|file \"vcd_file_name\"\n");
-    con->dd_printf("set hardware vcd[id] mod[ule] module_name\n");
-    con->dd_printf("set hardware vcd[id] start\n");
-    con->dd_printf("set hardware vcd[id] pause\n");
-    con->dd_printf("set hardware vcd[id] [re]start\n");
-    con->dd_printf("set hardware vcd[id] stop\n");
-    con->dd_printf("set hardware vcd[id] break\n");
-    con->dd_printf("set hardware vcd[id] new id\n");
+    return false;
+}
+
+void
+cl_vcd::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware vcd[id] add memory address [ [bit_high] bit_low]\n");
+  con->dd_printf("set hardware vcd[id] del[ete] memory address [ [bit_high] bit_low]\n");
+  con->dd_printf("set hardware vcd[id] timescale n [ms|us|ns|ps|fs]\n");
+  con->dd_printf("set hardware vcd[id] starttime n [ms|us|ns|ps|fs]\n");
+  con->dd_printf("set hardware vcd[id] input \"vcd_file_name\"\n");
+  con->dd_printf("set hardware vcd[id] output|file \"vcd_file_name\"\n");
+  con->dd_printf("set hardware vcd[id] mod[ule] module_name\n");
+  con->dd_printf("set hardware vcd[id] start\n");
+  con->dd_printf("set hardware vcd[id] pause\n");
+  con->dd_printf("set hardware vcd[id] [re]start\n");
+  con->dd_printf("set hardware vcd[id] stop\n");
+  con->dd_printf("set hardware vcd[id] break\n");
+  con->dd_printf("set hardware vcd[id] new id\n");
 }
 
 void

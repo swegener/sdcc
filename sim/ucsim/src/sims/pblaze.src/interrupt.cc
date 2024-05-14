@@ -40,7 +40,7 @@ cl_interrupt::init(void)
   return(0);
 }
 
-void
+bool
 cl_interrupt::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -48,11 +48,17 @@ cl_interrupt::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
   if (cmdline->syntax_match(uc, NUMBER))
     {
       interrupt_request = params[0]->value.number != 0 ? true : false;
+      return true; // handled
     }
-  else
-    {
-      con->dd_printf("set hardware irq[%d] irq_value\n                   Set interrupt request value\n", id);
-    }
+  return false; // unhandled
+}
+
+void
+cl_interrupt::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware irq[%d] irq_value\n"
+		 "Set interrupt request value\n",
+		 id);
 }
 
 void

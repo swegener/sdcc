@@ -38,7 +38,7 @@ cl_port::init(void)
 }
 */
 
-void
+bool
 cl_port_id::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -46,11 +46,17 @@ cl_port_id::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
   if (cmdline->syntax_match(uc, NUMBER))
     {
       value = params[0]->value.number;
+      return true; // handled
     }
-  else
-    {
-      con->dd_printf("set hardware port_id[%d] value\n                   Set port id value value\n", id);
-    }
+  return false; // unhandled
+}
+
+void
+cl_port_id::set_help(class cl_console_base *con)
+{
+  con->dd_printf("set hardware port_id[%d] value\n"
+		 "                   Set port id value value\n",
+		 id);
 }
 
 void

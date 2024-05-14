@@ -11,7 +11,7 @@ main() {
 	while (n < 5000) {
 		t = 2;
 		p = 1;
-		while (t*t <= n) {
+		while (p && (t*t <= n)) {
 			if (n % t == 0)
 				p = 0;
 			t++;

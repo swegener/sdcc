@@ -14,7 +14,7 @@ else
   ifdef UCSIM_DIR
     UCPDK15A = $(UCSIM_DIR)/pdk.src/ucsim_pdk$(EXEEXT)
   else
-    UCPDK15A = $(top_builddir)/sim/ucsim/pdk.src/ucsim_pdk$(EXEEXT)
+    UCPDK15A = $(top_builddir)/sim/ucsim/src/sims/pdk.src/ucsim_pdk$(EXEEXT)
     UCPDK15B = $(top_builddir)/bin/ucsim_pdk$(EXEEXT)
   endif
 

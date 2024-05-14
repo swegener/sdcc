@@ -12,7 +12,7 @@ else
   ifdef UCSIM_DIR
     SZ80A = $(UCSIM_DIR)/z80.src/ucsim_z80$(EXEEXT)
   else
-    SZ80A = $(top_builddir)/sim/ucsim/z80.src/ucsim_z80$(EXEEXT)
+    SZ80A = $(top_builddir)/sim/ucsim/src/sims/z80.src/ucsim_z80$(EXEEXT)
     SZ80B = $(top_builddir)/bin/ucsim_z80$(EXEEXT)
   endif
 

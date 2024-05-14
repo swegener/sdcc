@@ -11,7 +11,7 @@ else
   ifdef UCSIM_DIR
     UC65 = $(UCSIM_DIR)/mos6502.src/ucsim_mos6502$(EXEEXT)
   else
-    UC65 = $(top_builddir)/sim/ucsim/mos6502.src/ucsim_mos6502$(EXEEXT)
+    UC65 = $(top_builddir)/sim/ucsim/src/sims/mos6502.src/ucsim_mos6502$(EXEEXT)
   endif
   AS = $(WINE) $(top_builddir)/bin/sdas6500$(EXEEXT)
 ifndef CROSSCOMPILING

@@ -321,18 +321,18 @@ EXCLUDE_mcs51-medium += \
 	qct_0080-arrays	
 
 # Target too slow (fails with timeout)
-EXCLUDE_ARCH_pdk += \
-	qct_0042-prime
-EXCLUDE_uc6502 += \
-	qct_0042-prime
-EXCLUDE_uc6502-stack-auto += \
-	qct_0042-prime
-EXCLUDE_ARCH_mcs51 += \
-	qct_0042-prime
-EXCLUDE_ds390 += \
-	qct_0042-prime
-EXCLUDE_ucgbz80 += \
-	qct_0042-prime
+#EXCLUDE_ARCH_pdk += \
+#	qct_0042-prime
+#EXCLUDE_uc6502 += \
+#	qct_0042-prime
+#EXCLUDE_uc6502-stack-auto += \
+#	qct_0042-prime
+#EXCLUDE_ARCH_mcs51 += \
+#	qct_0042-prime
+#EXCLUDE_ds390 += \
+#	qct_0042-prime
+#EXCLUDE_ucgbz80 += \
+#	qct_0042-prime
 
 ###################################################
 # TinyC Tests

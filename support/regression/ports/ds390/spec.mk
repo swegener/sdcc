@@ -17,7 +17,7 @@ else
   ifdef UCSIM_DIR
     S51A = $(UCSIM_DIR)/s51.src/ucsim_51$(EXEEXT)
   else
-    S51A = $(top_builddir)/sim/ucsim/s51.src/ucsim_51$(EXEEXT)
+    S51A = $(top_builddir)/sim/ucsim/src/sims/s51.src/ucsim_51$(EXEEXT)
     S51B = $(top_builddir)/bin/ucsim_51$(EXEEXT)
   endif
 

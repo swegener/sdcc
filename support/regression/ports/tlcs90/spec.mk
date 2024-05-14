@@ -12,7 +12,7 @@ else
   ifdef UCSIM_DIR
     UCTLCS90A = $(UCSIM_DIR)/tlcs.src/ucsim_tlcs$(EXEEXT)
   else
-    UCTLCS90A = $(top_builddir)/sim/ucsim/tlcs.src/ucsim_tlcs$(EXEEXT)
+    UCTLCS90A = $(top_builddir)/sim/ucsim/src/sims/tlcs.src/ucsim_tlcs$(EXEEXT)
     UCTLCS90B = $(top_builddir)/bin/ucsim_tlcs$(EXEEXT)
   endif
 

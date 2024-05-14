@@ -12,7 +12,7 @@ else
   ifdef UCSIM_DIR
     UCSTM8A = $(UCSIM_DIR)/stm8.src/ucsim_stm8$(EXEEXT)
   else
-    UCSTM8A = $(top_builddir)/sim/ucsim/stm8.src/ucsim_stm8$(EXEEXT)
+    UCSTM8A = $(top_builddir)/sim/ucsim/src/sims/stm8.src/ucsim_stm8$(EXEEXT)
     UCSTM8B = $(top_builddir)/bin/ucsim_stm8$(EXEEXT)
   endif
 

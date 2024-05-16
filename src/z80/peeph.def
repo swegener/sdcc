@@ -522,7 +522,7 @@ replace restart {
 	ld	%4, %5
 	; common peephole 38 combined pushing of %3 and %5.
 	push	%1
-} if canSplitReg(%1 %3 %4), canSplitReg(%2 %5), notUsed(%4)
+} if canSplitReg(%1 %3 %4), canSplitReg(%2 %5), canAssign(%4 %5), notUsed(%4)
 
 replace restart {
 	ld	hl, #%1

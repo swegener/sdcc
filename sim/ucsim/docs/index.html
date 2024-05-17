@@ -5,7 +5,7 @@
   </head>
   <body style="    background-color: white;">
     [ <a href="news.html">News</a> ]
-    [ <a href="#download">Download</a> ]
+    [ <a href="#download">Download</a> (<a href="https://github.com/danieldrotos/ucsim/releases/latest">latest</a>) ]
     [ <a href="#install">Installation</a> ]
     [ <a href="#use">Usage</a> ]
     [ <a href="mailto:dr.dkdb@gmail.com">Mail to developer</a> ]
@@ -28,23 +28,13 @@
     <p><b><i>&micro;Csim</i></b> can be used to simulate
       microcontrollers. It supports
 
-      <ul><li>Intel:
-	<ul><li>MCS51 family,</li>
-	  <li>MCS48,</li>
-	  <li>MCS80, MCS85</li>
-	</ul></li>
+      <ul><li>Intel (MCS51 family, MCS48, MCS80, MCS85)</li>
 	<li>XA51,</li>
 	<li>AVR core,</li>
 	<li>Z80,</li>
 	<li>TLCS90,</li>
 	<li>Rabbit (r2k, r3k, r4k, r5k)</li>
-	<li>Motorola:
-	  <ul><li>6800,</li>
-	    <li>6809,</li>
-	    <li>68hc08,</li>
-	    <li>68hc11,</li>
-	    <li>68hc12,</li>
-	  </ul></li>
+	<li>Motorola (6800, 68hc08, 6809, 68hc11, 68hc12)</li>
 	<li>6502,</li>
 	<li>ST7,</li>
 	<li>STM8,</li>
@@ -62,25 +52,27 @@
       
       <p>You can download <i>&micro;Csim</i> from two places:</p>
       
-      <ol>
+      
 	
-	<li>SDCC homepage. <i>&micro;Csim</i> is part of the SDCC
+      <p><b>SDCC homepage.</b> <i>&micro;Csim</i> is part of the SDCC
         (Small Device C Compiler) project. You can download source of
         SDCC or precompiled binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.
 	  Please note, that SDCC binary package contains limited <i>&micro;Csim</i>,
-	  including simulators for SDCC ports only.<p>&nbsp;</p></li>
+	including simulators for SDCC ports only.</p>
 	
-	<li><i>&micro;Csim</i> site. Standalone source package is
-	available on the <i>&micro;Csim</i> web site:
-          <p><a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a></p>
+      <p><b><i>&micro;Csim</i> site.</b> Standalone source package is
+	  available on the <i>&micro;Csim</i> web site:
+	
+        <a href="https://github.com/danieldrotos/ucsim/releases">https://github.com/danieldrotos/ucsim/releases</a></p>
 
 	  <p>Home site contains precompiled Debian (i386 and amd64
 	architectures) packages for all Debian based Linux
 	distributions, Windows installer and standalone Windows
-	package.</li>
-	
-      </ol>
-      
+	    package.</p>
+	  
+	  <p>Older versions are available from the archive site: <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/archive">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a></p>
+	  
+	      
       <p><!-- INSTALL --></p>
       
       <h2><a name="install">How to install</a></h2>
@@ -103,11 +95,11 @@
         <b>bison</b> (or yacc), <b>flex</b> (or lex), <b>libncurses-dev</b>.
         You will need a C++ compiler as well.</li>
       
-      <li>Go to the directory and configure the package. Issue <tt><b>configure</b></tt>
+      <li>Go to the directory and configure the package. Issue <tt><b>./configure</b></tt>
         command. It will determine your system and produce <b>Makefile</b>.
         Installation directory can be specified with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- -->
         option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
-        Executable file will be placed in <tt>bin</tt> subdirectory. </li>
+        Executable files will be placed in <tt>bin</tt> subdirectory.</li>
       
       <li>Compile the package with <tt><b>make</b></tt> command, or <b>gmake</b> if
       GNU make has that name. </li>

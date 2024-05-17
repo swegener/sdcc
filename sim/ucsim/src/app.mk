@@ -24,7 +24,12 @@ baseline:
 
 
 $(LEN): $(OBJECTS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
+ifeq ($(SILENT),yes)
+	@echo LNK-$(PKG)
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@
+else
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@
+endif
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/$(SONAME)
@@ -55,3 +60,18 @@ $(top_builddir)/libucsimutil.a:
 
 $(top_builddir)/libmotorola.a:
 	$(MAKE) -C $(top_builddir)/src/core/motorola.src libs
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h objs.mk
+ifeq ($(SILENT),yes)
+	@echo DEP-$(PKG)
+	@$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+else
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+endif
+
+-include Makefile.dep
+include $(srcdir)/clean.mk

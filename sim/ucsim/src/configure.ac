@@ -64,7 +64,11 @@ if test $in_sdcc == "yes" ; then
     def_i8085="no"
     def_i8048="no"
     def_st7="no"
+    SILENT="yes"
+else
+    SILENT="no"
 fi
+AC_SUBST(SILENT)
 
 
 AC_PROG_AWK
@@ -892,6 +896,7 @@ echo "Compile i8085     $enable_i8085_port"
 echo "Compile f8        $enable_f8_port"
 echo "Compile i8048     $enable_i8048_port"
 echo "Compile serio     $enable_serio"
+echo "v${VERSION}"
 
 #gui.src/portmon.src/Makefile
 

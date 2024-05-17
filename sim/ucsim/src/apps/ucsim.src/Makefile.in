@@ -16,7 +16,12 @@ all: $(APP)
 include $(top_srcdir)/src/app.mk
 
 $(APP): $(OBJECTS) $(UCSIM_LIB_PREREQUES)
+ifeq ($(SILENT),yes)
+	@echo LNK-$(PKG)
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@
+else
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@
+endif
 
 local_install:
 	$(INSTALL) $(APP) $(DESTDIR)$(bindir)/$(APP)
@@ -24,11 +29,3 @@ local_install:
 
 local_uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(APP)
-
-dep: Makefile.dep
-
-Makefile.dep: $(srcdir)/*.cc objs.mk $(srcdir)/*.h
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
-
--include Makefile.dep
-include $(srcdir)/clean.mk

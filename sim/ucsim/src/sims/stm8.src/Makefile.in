@@ -23,15 +23,5 @@ local_install:
 
 local_uninstall:
 
-# Creating dependencies
-# ---------------------
-dep: Makefile.dep
-
-Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h objs.mk
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
-
--include Makefile.dep
-include $(srcdir)/clean.mk
-
 
 # End of simulator Makefile

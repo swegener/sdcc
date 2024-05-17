@@ -1,7 +1,7 @@
 
 # uCsim
-## Micro-controller simulator
 
+## Micro-controller simulator
 
 
 ### What is uCsim?
@@ -9,7 +9,7 @@
 uCsim is a micro-controller simulator. It is extensible to support
 different micro-controller families. Currently it supports Intel MCS51
 family, 8080, 8085, XA, Z80, Rabbit, SM83, TLCS90, ST7, STM8, PDK,
-MC6800, MC6809, M68HC08, M68HC11, M68HC12, MOS6502, PicoBlaze, F8,
+MC6800, M68HC08, MC6809, M68HC11, M68HC12, MOS6502, PicoBlaze, F8,
 p1516/p2223 and some AVR processors.
 
 
@@ -18,8 +18,9 @@ p1516/p2223 and some AVR processors.
 uCsim is distributed in source code under GPL. It can be downloaded
 from its home sites:
 
-* http://mazsola.iit.uni-miskolc.hu/ucsim/
-* https://github.com/danieldrotos/ucsim
+* Main site: http://www.ucsim.hu
+* Latest release: https://github.com/danieldrotos/ucsim/releases/latest
+* Archive of older releases: http://mazsola.iit.uni-miskolc.hu/ucsim/archive
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
 complete development package with debugger (see below). It can be
@@ -44,9 +45,9 @@ downloaded from its home site (or from its mirrors):
 Download source package and unzip it. Go to root directory of the
 unzipped package and the issue following commands:
 
-* ./configure
-* make
-* sudo make install
+    ./configure
+    make
+    sudo make install
 
 If GNU make is different from system's default make, you can try
 **gmake** command, instead of make.
@@ -74,7 +75,9 @@ simulators. They include:
 
 - No GUI. It is not the simulator's job to do graphical representation
   of the CPU. It should be done by external programs. uCsim tries to
-  help GUI and other external tool writers.
+  help GUI and other external tool writers. In addition, the program
+  contains some simple textual interactive interfaces for generating
+  input data, e.g. for GPIO.
 
 - More than one command console. It is possible to use as many command
   interpreters as many needed. uCsim accepts commands from command
@@ -84,7 +87,8 @@ simulators. They include:
 - Simulating UART of the controller makes it possible to connect two
   instances of the simulator together via simulated serial lines. It
   is also possible to connect simulated UART to serial port of the
-  host machine.
+  host machine. Built-in terminal emulator can be used to simulate
+  interactive applications.
 
 - Profiling support. uCsim provides "virtual timers" to measure
   execution time of any part of the code. It also makes statistic

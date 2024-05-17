@@ -29,15 +29,5 @@ local_uninstall:
 	rm -f $(DESTDIR)$(bindir)/ucsim_i8051$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/s51$(EXEEXT)
 
-# Creating dependencies
-# ---------------------
-dep: Makefile.dep
-
-Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h objs.mk
-	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
-
--include Makefile.dep
-include $(srcdir)/clean.mk
-
 
 # End of simulator Makefile

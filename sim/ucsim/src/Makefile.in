@@ -48,11 +48,9 @@ motorola_lib:
 .PHONY: $(PKGS)
 
 $(PKGS):
-	@echo "Compiling package $@ ..."
 	$(MAKE) -C sims/$@ simulator
 
 $(APPS):
-	@echo "Compiling app $@ ..."
 	$(MAKE) -C apps/$@ all
 
 

@@ -1,3 +1,4 @@
+
 all:
 	$(MAKE) -C src all
 
@@ -39,3 +40,8 @@ local_distclean: local_clean
 sub_distclean:
 	$(MAKE) -C src  -f clean.mk distclean
 	$(MAKE) -C docs -f clean.mk distclean
+
+conf: configure
+
+configure: src/configure.ac
+	autoconf $< >$@

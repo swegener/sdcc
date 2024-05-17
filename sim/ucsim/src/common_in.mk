@@ -28,6 +28,7 @@ CPPFLAGS        = @CPPFLAGS@ \
 		  -I$(top_srcdir)/$(GUIDIR) \
 		  -I$(top_srcdir)/$(MOTDIR)
 
+SILENT		= @SILENT@
 OPT		?= 2
 CFLAGS          = @WALL_FLAG@ @CFLAGS@ -O$(OPT)
 CXXFLAGS        = @WALL_FLAG@ @CXXFLAGS@ -O$(OPT) $(PICOPT)
@@ -68,7 +69,12 @@ ALL_OBJECTS	= $(OBJECTS) $(LOCAL_OBJECTS)
 SOURCES		= $(patsubst %.o,%.cc,$(ALL_OBJECTS))
 
 .cc.o:
+ifeq ($(SILENT),yes)
+	@echo CXX $(PKG)-$@
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+else
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+endif
 
 .l.cc:
 	rm -f $@

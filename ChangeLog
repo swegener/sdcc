@@ -405,28 +405,17 @@
 	* src/mos6502/gen.c:
 	  Improve asmopToBool.
 
-2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
-||||||| .merge-left.r14616
-2023-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
-=======
 2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
->>>>>>> .merge-right.r14635
 
 	* src/hc08/main.c:
 	  Fix bug #3690.
 
-<<<<<<< .working
 2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/pdk/peep.c:
 	  Improve pdk notUsed() accuracy.
 
-2023-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
-||||||| .merge-left.r14616
-2023-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
-=======
 2024-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
->>>>>>> .merge-right.r14635
 
 	* src/z80/main.c:
 	  Fix bug #3693.

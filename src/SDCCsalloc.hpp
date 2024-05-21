@@ -467,5 +467,55 @@ void dump_scon(const scon_t &scon)
   boost::write_graphviz(dump_file, scon, boost::make_label_writer(name));
   delete[] name;
 }
+
+// Save stack space by merging spilt variables into spill location of stack parameters.
+// Currently handles only a single variable per function, with some additional restrictions.
+template <class SI_t>
+void mergeSpiltParms(SI_t &SI)
+{
+  for(unsigned int i = 0; i < boost::num_vertices(SI); i++)
+    {
+      symbol *psym = 0;
+      operand *parmop = 0;
+      iCode *dic = 0;
+      bitVect *defs = bitVectCopy (SI[i].sym->defs);
+
+      for(int key = bitVectFirstBit (defs); bitVectnBitsOn (defs); bitVectUnSetBit (defs, key), key = bitVectFirstBit (defs))
+        {
+          dic = (iCode *)hTabItemWithKey (iCodehTab, key);
+          if (!dic || !dic->result) // Something went wrong.
+            break;
+          if(dic->op == '=' && !POINTER_SET(dic) && IS_PARM(dic->right) && !IS_REGPARM (OP_SYMBOL(dic->right)->etype))
+            {
+              psym = OP_SYMBOL (dic->right);
+              break;
+            }
+        }
+      freeBitVect (defs);
+
+      if (!psym || bitVectnBitsOn(psym->defs) > 0 || bitVectnBitsOn(psym->uses) > 1)
+        continue;
+
+      for(iCode *ic = dic->prev; ic; ic = ic->prev)
+        {
+          if (ic->op == LABEL)
+            goto no;
+          if (isOperandEqual(ic->left, dic->result) ||
+            isOperandEqual(ic->right, dic->result) ||
+            POINTER_SET(ic) && isOperandEqual(ic->result, dic->result))
+            goto no;
+          if (ic->op == FUNCTION)
+            break;
+        }
+
+      // Merge spill location of spilt variable into stack parameter.
+      SI[i].sym->usl.spillLoc = psym;
+      SI[i].sym->stack = psym->stack; // Needed for volatile local variables.
+      remove_vertex(i, SI);
+      break;
+no:
+      ;
+    }
+}
 #endif
 

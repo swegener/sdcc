@@ -1216,7 +1216,9 @@ aopOp (operand *op, const iCode *ic, bool result)
 
             if (!regalloc_dry_run)
               {
-                aop->aopu.bytes[i].byteu.stk = (long int)(sym->usl.spillLoc->stack) + aop->size - i;
+                long int base = sym->usl.spillLoc->stack + (sym->usl.spillLoc->stack > 0 ? G.stack.param_offset : 0);
+
+                aop->aopu.bytes[i].byteu.stk = base + aop->size - i;
 
                 if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -G.stack.pushed)
                   {

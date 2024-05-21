@@ -1,3 +1,10 @@
+2024-05-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsalloc.hpp,
+	  src/stm8/ralloc2.cc,
+	  src/stm8/gen.c:
+	  Use stack parameter locations as spill locations in some simple cases.
+
 2024-05-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def,

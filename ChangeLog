@@ -2,7 +2,8 @@
 
 	* src/SDCCsalloc.hpp,
 	  src/stm8/ralloc2.cc,
-	  src/stm8/gen.c:
+	  src/stm8/gen.c,
+	  src/z80/ralloc2.cc:
 	  Use stack parameter locations as spill locations in some simple cases.
 
 2024-05-16 Philipp Klaus Krause <philipp@colecovision.eu>

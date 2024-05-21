@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   gen.c - code generator for STM8.
 
-  Copyright (C) 2012 - 2023, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2012 - 2024, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the

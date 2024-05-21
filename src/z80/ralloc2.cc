@@ -1672,7 +1672,10 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   if (USE_OLDSALLOC)
     redoStackOffsets ();
   else
-    chaitin_salloc(stack_conflict_graph); // new Chaitin-style stack allocator
+    {
+      mergeSpiltParms(stack_conflict_graph); // try to reuse parameter locations
+      chaitin_salloc(stack_conflict_graph);  // new Chaitin-style stack allocator
+    }
 
   if(options.dump_graphs && !USE_OLDSALLOC)
     dump_scon(stack_conflict_graph);

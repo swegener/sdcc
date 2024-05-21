@@ -574,7 +574,7 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
   // Try to reuse parameter locations first.
   mergeSpiltParms(stack_conflict_graph);
 
-  // The allocate the rest of the spilt variables via Chaitin's heuristic.
+  // Then allocate the rest of the spilt variables via Chaitin's heuristic.
   chaitin_salloc(stack_conflict_graph);
 
   if(options.dump_graphs)

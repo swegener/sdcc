@@ -7503,6 +7503,20 @@ genPlusIncr (const iCode *ic)
           cost (2, 8);
           return true;
         }
+      else if (icount == 255 && resultId != PAIR_IY)
+        {
+          fetchPair (resultId, IC_LEFT (ic)->aop);
+          emit3w (A_DEC, ic->result->aop, 0);
+          emit3_o (A_INC, ic->result->aop, 1, 0, 0);
+          return true;
+        }
+      else if (icount == 257 && resultId != PAIR_IY)
+        {
+          fetchPair (resultId, IC_LEFT (ic)->aop);
+          emit3w (A_INC, ic->result->aop, 0);
+          emit3_o (A_INC, ic->result->aop, 1, 0, 0);
+          return true;
+        }
       else if (resultId == getPairId (ic->left->aop) &&
         (IS_Z80N && resultId != PAIR_IY && icount > 3 || IS_TLCS90 && (resultId == PAIR_HL || resultId == PAIR_IY) && icount > 2))
         {
@@ -13414,7 +13428,10 @@ genrshTwo (const iCode *ic, operand *result, operand *left, int shCount, int sig
       if (sign)
         {
           /* Sign extend the result */
-          cheapMove (ASMOP_A, 0, result->aop, 0, true);
+          if (result->aop->type != AOP_REG && left->aop->type == AOP_REG)
+            cheapMove (ASMOP_A, 0, left->aop, 1, true);
+          else
+            cheapMove (ASMOP_A, 0, result->aop, 0, true);
           emit3 (A_RLCA, 0, 0);
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
           cheapMove (result->aop, 1, ASMOP_A, 0, true);

@@ -10257,6 +10257,9 @@ genCmpGt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
+  if (aopIsLitVal (left->aop, left->aop->size - 1, 1, 0x00) && aopIsLitVal (right->aop, right->aop->size - 1, 1, 0x00))
+    sign = 0;
+
   if (max (left->aop->size, right->aop->size) > 1)
     {
       if ((requiresHL (IC_RESULT (ic)->aop) && IC_RESULT (ic)->aop->type != AOP_REG || requiresHL (left->aop) && left->aop->type != AOP_REG || requiresHL (right->aop) && right->aop->type != AOP_REG) &&
@@ -10300,6 +10303,9 @@ genCmpLt (iCode * ic, iCode * ifx)
   aopOp (left, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
+
+  if (aopIsLitVal (left->aop, left->aop->size - 1, 1, 0x00) && aopIsLitVal (right->aop, right->aop->size - 1, 1, 0x00))
+    sign = 0;
 
   if (max (left->aop->size, right->aop->size) > 1)
     {

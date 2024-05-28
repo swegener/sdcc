@@ -1,3 +1,8 @@
+2024-05-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Use information from generalized constant propagation to optimize comparisons of signed types.
+
 2024-05-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

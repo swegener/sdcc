@@ -472,6 +472,21 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopIsLitBit - asmop from offset is val.                         */
+/* False negatives are possible.                                   */
+/*-----------------------------------------------------------------*/
+static bool
+aopIsLitBit (const asmop *aop, int boffset, bool val)
+{
+  if (!aop->valinfo.anything && boffset < 64 &&
+    ((aop->valinfo.knownbitsmask >> boffset) & 1) &&
+    ((aop->valinfo.knownbits >> boffset) & 1) == val)
+    return(true);
+
+  return (false);
+}
+
+/*-----------------------------------------------------------------*/
 /* aopIsNotLitVal - asmop from offset is not val.                  */
 /* False negatives are possible.                                   */
 /* Note that both aopIsLitVal and aopIsNotLitVal can be false for  */
@@ -10257,7 +10272,9 @@ genCmpGt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
-  if (aopIsLitVal (left->aop, left->aop->size - 1, 1, 0x00) && aopIsLitVal (right->aop, right->aop->size - 1, 1, 0x00))
+  if (!IS_BITVAR (operandType (left)) && (!IS_BITINT (operandType (left)) || !(SPEC_BITINTWIDTH (operandType (left)) % 8)) &&
+    !IS_BITVAR (operandType (right)) && (!IS_BITINT (operandType (right)) || !(SPEC_BITINTWIDTH (operandType (right)) % 8)) &&
+    aopIsLitBit (left->aop, left->aop->size * 8 - 1, false) && aopIsLitBit (right->aop, right->aop->size * 8 - 1, false))
     sign = 0;
 
   if (max (left->aop->size, right->aop->size) > 1)
@@ -10304,7 +10321,9 @@ genCmpLt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
 
-  if (aopIsLitVal (left->aop, left->aop->size - 1, 1, 0x00) && aopIsLitVal (right->aop, right->aop->size - 1, 1, 0x00))
+  if (!IS_BITVAR (operandType (left)) && (!IS_BITINT (operandType (left)) || !(SPEC_BITINTWIDTH (operandType (left)) % 8)) &&
+    !IS_BITVAR (operandType (right)) && (!IS_BITINT (operandType (right)) || !(SPEC_BITINTWIDTH (operandType (right)) % 8)) &&
+    aopIsLitBit (left->aop, left->aop->size * 8 - 1, false) && aopIsLitBit (right->aop, right->aop->size * 8 - 1, false))
     sign = 0;
 
   if (max (left->aop->size, right->aop->size) > 1)

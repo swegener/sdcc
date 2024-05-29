@@ -10090,7 +10090,12 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         {
           bool left_already_in_a = (left->aop->type == AOP_LIT && byteOfVal (left->aop->aopu.aop_lit, offset) == a_always_byte);
 
-          if (!IS_SM83 && size >= 2 && (!sign || size > 2) && !left_already_in_a &&
+          if (started && !sign && aopIsLitVal (left->aop, offset, size, 0) && aopIsLitVal (right->aop, offset, size, 0)) // Skip leading zeroes.
+            {
+              offset += size;
+              size = 0;
+            }
+          else if (!IS_SM83 && size >= 2 && (!sign || size > 2) && !left_already_in_a &&
             isPairDead (PAIR_HL, ic) &&
             (getPartPairId (left->aop, offset) == PAIR_HL || (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || left->aop->type == AOP_HL || left->aop->type == AOP_IY || IS_RAB && left->aop->type == AOP_STK) && right->aop->regs[L_IDX] < offset && right->aop->regs[H_IDX] < offset) &&
             (getPartPairId (right->aop, offset) == PAIR_DE || getPartPairId (right->aop, offset) == PAIR_BC))

@@ -7627,6 +7627,12 @@ genPlusIncr (const iCode *ic)
         {
           if (offset)
             regalloc_dry_run_state_scale /= 256.0f; // Cycle cost contribution of upper byte additions is negligible
+          if (aopIsLitVal (ic->result->aop, offset, size + 1, 0)) // Skip known leading zero result bytes.
+            {
+              offset += size;
+              size = 0;
+              break;
+            }
           if (size == 1 && getPairId_o (IC_RESULT (ic)->aop, offset) != PAIR_INVALID)
             {
               emit3w_o (A_INC, ic->result->aop, offset, 0, 0);

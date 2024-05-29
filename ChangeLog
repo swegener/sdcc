@@ -1,7 +1,7 @@
 2024-05-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:
-	  Skip leading zeroes on comparisons.
+	  Skip leading zeroes on comparisons and some increments.
 
 2024-05-28 Philipp Klaus Krause <philipp@colecovision.eu>
 

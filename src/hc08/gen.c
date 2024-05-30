@@ -2619,6 +2619,7 @@ aopOp (operand *op, iCode * ic, bool result)
   aop->size = sym->nRegs;
   for (i = 0; i < sym->nRegs; i++)
     {
+       wassert (sym->regs[i]);
        wassert (sym->regs[i] < regshc08 + 3);
        aop->aopu.aop_reg[i] = sym->regs[i];
        aop->regmask |= sym->regs[i]->mask;

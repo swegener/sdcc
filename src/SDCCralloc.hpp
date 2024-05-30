@@ -187,6 +187,9 @@ struct tree_dec_node
   unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
+#if BOOST_VERSION / 100000 == 1 && BOOST_VERSION / 100 % 1000 == 85 && BOOST_VERSION % 100 == 0
+#error boost::container::flat_multimap is broken in boost 1.85.0 (https://sourceforge.net/p/sdcc/bugs/3739/, https://github.com/boostorg/container/issues/281)
+#endif
 typedef boost::container::flat_multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t> here.
 
 struct cfg_node

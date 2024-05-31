@@ -1,3 +1,8 @@
+2024-05-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peep.c:
+	  Parse ZX Spectrum Next nextreg instruction.
+
 2024-05-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCralloc.hpp,

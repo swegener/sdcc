@@ -1747,6 +1747,9 @@ int z80instructionSize(lineNode *pl)
     ISINST(pl->line, "brlc")))
     return(2);
 
+  if(IS_Z80N && ISINST(pl->line, "nextreg"))
+    return(op2start && !STRNCASECMP(op2start, "a", 1) ? 3 : 4);
+
   if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))
     {
       int i, j;

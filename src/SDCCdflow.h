@@ -48,6 +48,7 @@ struct valinfo
 	unsigned long long knownbits;
 };
 
+bool valinfo_union (struct valinfo *v0, const struct valinfo v1);
 struct valinfo getOperandValinfo (const iCode *ic, const operand *op);
 void recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix);
 void optimizeValinfo (iCode *sic);

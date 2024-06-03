@@ -1980,6 +1980,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
       aop->size = getSize (operandType (op));
       if (!result)
         op->aop->valinfo = getOperandValinfo (ic, op);
+      else if(ic->resultvalinfo)
+        op->aop->valinfo = *ic->resultvalinfo;
       return;
     }
 
@@ -2001,6 +2003,10 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
         {
           op->aop->bcInUse = isPairInUse (PAIR_BC, ic);
         }
+      if (result && ic->resultvalinfo)
+        valinfo_union (&(op->aop->valinfo), *ic->resultvalinfo);
+      else if (result)
+        op->aop->valinfo.anything = true;
       return;
     }
 
@@ -2010,6 +2016,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
       op->aop = aopForSym (ic, OP_SYMBOL (op), requires_a);
       if (!result)
         op->aop->valinfo = getOperandValinfo (ic, op);
+      else if(ic->resultvalinfo)
+        op->aop->valinfo = *ic->resultvalinfo;
       return;
     }
 
@@ -2047,6 +2055,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
           aop->size = getSize (sym->type);
           if (!result)
             aop->valinfo = getOperandValinfo (ic, op);
+          else if(ic->resultvalinfo)
+            aop->valinfo = *ic->resultvalinfo;
           return;
         }
 
@@ -2057,6 +2067,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
           aop->size = getSize (sym->type);
           if (!result)
             aop->valinfo = getOperandValinfo (ic, op);
+          else if(ic->resultvalinfo)
+            aop->valinfo = *ic->resultvalinfo;
           return;
         }
 
@@ -2080,6 +2092,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
           aop->size = getSize (sym->type);
           if (!result)
             aop->valinfo = getOperandValinfo (ic, op);
+          else if(ic->resultvalinfo)
+            aop->valinfo = *ic->resultvalinfo;
           return;
         }
 
@@ -2088,6 +2102,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
       aop->size = getSize (sym->type);
       if (!result)
         aop->valinfo = getOperandValinfo (ic, op);
+      else if(ic->resultvalinfo)
+        aop->valinfo = *ic->resultvalinfo;
       return;
     }
 
@@ -2096,6 +2112,8 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
   aop->size = sym->nRegs;
   if (!result)
     aop->valinfo = getOperandValinfo (ic, op);
+  else if(ic->resultvalinfo)
+    aop->valinfo = *ic->resultvalinfo;
   memset (aop->regs, -1, sizeof(aop->regs));
   for (i = 0; i < sym->nRegs; i++)
     {

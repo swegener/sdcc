@@ -225,8 +225,8 @@ getOperandValinfo (const iCode *ic, const operand *op)
     return (getTypeValinfo (type, true));
 }
 
-static bool
-valinfo_union (struct valinfo *v0, const struct valinfo &v1)
+bool
+valinfo_union (struct valinfo *v0, const struct valinfo v1)
 {
   bool change = false;
   auto new_anything = v0->anything || v1.anything;

@@ -4910,8 +4910,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
 
       // Cache a copy of zero in a.
-      if (f_dead &&
-        (size > 1 && result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead && source->regs[A_IDX] <= i ||
+      if (f_dead && !zeroed_a && a_dead && source->regs[A_IDX] <= i &&
+        (size > 1 && result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) ||
         size == 1 && (result->type == AOP_HL && fetchLitPair (PAIR_HL, result, roffset + i, f_dead, true) || result->type == AOP_IY && fetchLitPair (PAIR_IY, result, roffset + i, f_dead, true)) && aopIsLitVal (source, soffset + i, 1, 0x00)))
         {
           emit3 (A_XOR, ASMOP_A, ASMOP_A);

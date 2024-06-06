@@ -1,3 +1,8 @@
+2024-06-06 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3741.c:
+	  Fix test for ports without banked function calls.
+
 2024-06-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3741.c:

@@ -11,6 +11,7 @@
 #define PR __preserves_regs(b, c, h, l)
 #else
 #define PR
+#define __banked
 #endif
 
 void mymemset(void *s, unsigned char c, unsigned int n);

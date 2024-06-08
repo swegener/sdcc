@@ -511,6 +511,7 @@ void mergeSpiltParms(SI_t &SI)
       // Merge spill location of spilt variable into stack parameter.
       SI[i].sym->usl.spillLoc = psym;
       SI[i].sym->stack = psym->stack; // Needed for volatile local variables.
+      clear_vertex(i, SI);
       remove_vertex(i, SI);
       break;
 no:

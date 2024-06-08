@@ -1,3 +1,8 @@
+2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsalloc.hpp:
+	  Fix handling of edges in vertex removal from stack conflict graph on spill location parameter merge.
+
 2024-06-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3741.c:

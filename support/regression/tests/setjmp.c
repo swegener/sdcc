@@ -1,4 +1,4 @@
-/** setjmp/longjmp tests.
+/** setjmp/longjmp tests (focusing on getting the jump right).
 */
 #include <testfwk.h>
 

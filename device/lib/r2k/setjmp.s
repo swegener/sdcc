@@ -64,6 +64,7 @@ ___setjmp:
 
 _longjmp:
 	pop	af
+	pop	de
 	push	hl
 	pop	iy
 

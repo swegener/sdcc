@@ -1,5 +1,14 @@
 2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* device/lib/r2k/setjmp.s
+	  device/lib/r2ka/setjmp.s
+	  device/lib/r3ka/setjmp.s
+	  support/regression/tests/setjmp.c,
+	  support/regression/tests/longjmp.c:
+	  Fix setjmp/longjmp return value for Rabbits.
+
+2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCsalloc.hpp:
 	  Fix handling of edges in vertex removal from stack conflict graph on spill location parameter merge.
 

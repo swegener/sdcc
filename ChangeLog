@@ -18,6 +18,8 @@
 	* support/regression/tests/bug-3730.c,
 	  support/regression/tests/bug-3740.c:
 	  Disable warnings on (intentionally) unused parameters in two regression tests.
+	* device/lib/tlcs90/setjmp.s:
+	  Fix TLCs-90 interrupt flag handling in longjmp.
 
 2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
 

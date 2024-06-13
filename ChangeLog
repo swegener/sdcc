@@ -6,6 +6,18 @@
 	  support/regression/tests/setjmp.c,
 	  support/regression/tests/longjmp.c:
 	  Fix setjmp/longjmp return value for Rabbits.
+	* device/include/string.h,
+	  device/lib/strlen.v,
+	  device/lib/strnlen.v,
+	  device/lib/strndup.c,
+	  device/lib/Makefile.in,
+	  device/lib/*/Makefile.in,
+	  device/lib/pic14/libc/Makefile.am,
+	  device/lib/pic14/libc/Makefile.in:
+	  C2Y strnlen.
+	* support/regression/tests/bug-3730.c,
+	  support/regression/tests/bug-3740.c:
+	  Disable warnings on (intentionally) unused parameters in two regression tests.
 
 2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
 

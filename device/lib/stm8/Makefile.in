@@ -45,7 +45,8 @@ STM8_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
   _startup.c \
-  _strlen.c \
+  strlen.c \
+  strnlen.c \
   _memmove.c \
   div.c \
   ldiv.c \

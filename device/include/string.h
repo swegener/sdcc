@@ -127,6 +127,9 @@ extern size_t strlen (const char *s) __preserves_regs(iyl, iyh);
 extern size_t strlen (const char *s);
 #endif
 
+/* C2Y length function: */
+extern size_t strnlen (const char *s, size_t n);
+
 #ifdef __SDCC_ds390
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
 #endif

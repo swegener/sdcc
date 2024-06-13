@@ -1,8 +1,8 @@
 /*-------------------------------------------------------------------------
-   _strlen.c - part of string library functions
+   strnlen.c - part of string library functions
  
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
-   mcs51 assembler by Frieder Ferlemann (2007)
+   Copyright (c) 2024, Philipp Klaus Krause . philipp@colecovision.eu
+
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -29,61 +29,13 @@
 
 #include <string.h>
 
-#if (!defined (__SDCC_mcs51))
+size_t strnlen (const char *s, size_t n)
+{
+  register size_t i = 0;
 
-  /* Generic routine first */
-  size_t strlen ( const char * str )
-  {
-    register int i = 0 ;
+  while (n-- && *s++)
+    i++ ;
 
-    while (*str++)
-      i++ ;
+  return i;
+}
 
-    return i;
-  }
-
-#else
-
-#if defined(__SDCC)
- #include <sdcc-lib.h>
-#endif
-
-  /* Assembler version for mcs51 */
-  size_t strlen ( const char * str ) __naked
-  {
-    str;     /* hush the compiler */
-
-    __asm
-      ; dptr holds pointer
-      ; b holds pointer memspace
-      ;
-
-      ; char *ptr = str:
-      mov     r2,dpl
-      mov     r3,dph
-      ;
-
-      ; while ( *ptr ) ptr++;
-    L00101$:
-      lcall   __gptrget
-      jz      L00102$
-      inc     dptr
-      sjmp    L00101$
-      ;
-
-    L00102$:
-      ; return ptr - str;
-      clr     c
-      mov     a,dpl
-      subb    a,r2
-      mov     dpl,a
-      ;
-      mov     a,dph
-      subb    a,r3
-      mov     dph,a
-      ;
-      _RETURN
-    __endasm;
-  }
-
-#endif

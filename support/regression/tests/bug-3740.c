@@ -3,6 +3,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 unsigned char some_param;
 unsigned char some_var;
 

@@ -1,7 +1,9 @@
-/** bug-3730.c : ?
+/** bug-3730.c : An issue in handling of parameter offsets for z80-ports when using --fomit-frame-pointer.
 */
 
 #include <testfwk.h>
+
+#pragma disable_warning 85
 
 #include <stdarg.h>
 

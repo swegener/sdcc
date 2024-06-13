@@ -133,7 +133,8 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   _spx.c \
   _startup.c \
   _strcmp.c \
-  _strlen.c \
+  strlen.c \
+  strnlen.c \
   __memcpy.c \
   memcpy.c \
   _memmove.c \
@@ -176,7 +177,8 @@ XA51_LONG = $(COMMON_LONG) \
 
 XA51_SDCC = $(COMMON_SDCC) \
   _memmove.c \
-  _strlen.c \
+  strlen.c \
+  strnlen.c \
   _heap.c \
   div.c \
   ldiv.c \

@@ -1,7 +1,8 @@
 /*-------------------------------------------------------------------------
-   strndup.c - part of string library functions
-
-   Copyright (C) 2019, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+   strlen.c - part of string library functions
+ 
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   mcs51 assembler by Frieder Ferlemann (2007)
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,17 +29,61 @@
 
 #include <string.h>
 
-#include <stdlib.h>
+#if (!defined (__SDCC_mcs51))
 
-char *strndup (const char *s, size_t n)
-{
-	size_t l = strnlen (s, n);
-	char *r = malloc (l + 1);
-	if (r)
-	{
-		memcpy (r, s, l);
-		r[l] = 0;
-	}
-	return (r);
-}
+  /* Generic routine first */
+  size_t strlen ( const char * str )
+  {
+    register size_t i = 0;
 
+    while (*str++)
+      i++ ;
+
+    return i;
+  }
+
+#else
+
+#if defined(__SDCC)
+ #include <sdcc-lib.h>
+#endif
+
+  /* Assembler version for mcs51 */
+  size_t strlen ( const char * str ) __naked
+  {
+    str;     /* hush the compiler */
+
+    __asm
+      ; dptr holds pointer
+      ; b holds pointer memspace
+      ;
+
+      ; char *ptr = str:
+      mov     r2,dpl
+      mov     r3,dph
+      ;
+
+      ; while ( *ptr ) ptr++;
+    L00101$:
+      lcall   __gptrget
+      jz      L00102$
+      inc     dptr
+      sjmp    L00101$
+      ;
+
+    L00102$:
+      ; return ptr - str;
+      clr     c
+      mov     a,dpl
+      subb    a,r2
+      mov     dpl,a
+      ;
+      mov     a,dph
+      subb    a,r3
+      mov     dph,a
+      ;
+      _RETURN
+    __endasm;
+  }
+
+#endif

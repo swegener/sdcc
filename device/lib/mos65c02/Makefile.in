@@ -59,7 +59,8 @@ M6502_SDCC = $(COMMON_SDCC) \
   _startup.c \
   _strcmp.c \
   _strcpy.c \
-  _strlen.c \
+  strlen.c \
+  strnlen.c \
   memcpy.c \
   div.c \
   ldiv.c \

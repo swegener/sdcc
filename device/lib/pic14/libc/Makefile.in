@@ -150,18 +150,19 @@ am_libc_a_OBJECTS = libc_a-__assert.$(OBJEXT) libc_a-isalnum.$(OBJEXT) \
 	libc_a-_memset.$(OBJEXT) libc_a-_strcat.$(OBJEXT) \
 	libc_a-_strchr.$(OBJEXT) libc_a-_strcmp.$(OBJEXT) \
 	libc_a-_strcpy.$(OBJEXT) libc_a-_strcspn.$(OBJEXT) \
-	libc_a-_strlen.$(OBJEXT) libc_a-_strncat.$(OBJEXT) \
-	libc_a-_strncmp.$(OBJEXT) libc_a-_strncpy.$(OBJEXT) \
-	libc_a-_strpbrk.$(OBJEXT) libc_a-_strrchr.$(OBJEXT) \
-	libc_a-_strspn.$(OBJEXT) libc_a-_strstr.$(OBJEXT) \
-	libc_a-_strtok.$(OBJEXT) libc_a-strxfrm.$(OBJEXT) \
-	libc_a-c16rtomb.$(OBJEXT) libc_a-c16stombs.$(OBJEXT) \
-	libc_a-c32rtomb.$(OBJEXT) libc_a-mbrtoc16.$(OBJEXT) \
-	libc_a-mbrtoc32.$(OBJEXT) libc_a-mbstoc16s.$(OBJEXT) \
-	libc_a-btowc.$(OBJEXT) libc_a-mbrlen.$(OBJEXT) \
-	libc_a-mbrtowc.$(OBJEXT) libc_a-mbsinit.$(OBJEXT) \
-	libc_a-wcrtomb.$(OBJEXT) libc_a-wcscmp.$(OBJEXT) \
-	libc_a-wcslen.$(OBJEXT) libc_a-wctob.$(OBJEXT)
+	libc_a-strlen.$(OBJEXT) libc_a-strnlen.$(OBJEXT) \
+	libc_a-_strncat.$(OBJEXT) libc_a-_strncmp.$(OBJEXT) \
+	libc_a-_strncpy.$(OBJEXT) libc_a-_strpbrk.$(OBJEXT) \
+	libc_a-_strrchr.$(OBJEXT) libc_a-_strspn.$(OBJEXT) \
+	libc_a-_strstr.$(OBJEXT) libc_a-_strtok.$(OBJEXT) \
+	libc_a-strxfrm.$(OBJEXT) libc_a-c16rtomb.$(OBJEXT) \
+	libc_a-c16stombs.$(OBJEXT) libc_a-c32rtomb.$(OBJEXT) \
+	libc_a-mbrtoc16.$(OBJEXT) libc_a-mbrtoc32.$(OBJEXT) \
+	libc_a-mbstoc16s.$(OBJEXT) libc_a-btowc.$(OBJEXT) \
+	libc_a-mbrlen.$(OBJEXT) libc_a-mbrtowc.$(OBJEXT) \
+	libc_a-mbsinit.$(OBJEXT) libc_a-wcrtomb.$(OBJEXT) \
+	libc_a-wcscmp.$(OBJEXT) libc_a-wcslen.$(OBJEXT) \
+	libc_a-wctob.$(OBJEXT)
 libc_a_OBJECTS = $(am_libc_a_OBJECTS)
 libce_a_AR = $(AR) $(ARFLAGS)
 libce_a_LIBADD =
@@ -176,9 +177,9 @@ am__libce_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_1 = libce_a-__assert.$(OBJEXT) libce_a-isalnum.$(OBJEXT) \
@@ -216,18 +217,19 @@ am__objects_1 = libce_a-__assert.$(OBJEXT) libce_a-isalnum.$(OBJEXT) \
 	libce_a-_memset.$(OBJEXT) libce_a-_strcat.$(OBJEXT) \
 	libce_a-_strchr.$(OBJEXT) libce_a-_strcmp.$(OBJEXT) \
 	libce_a-_strcpy.$(OBJEXT) libce_a-_strcspn.$(OBJEXT) \
-	libce_a-_strlen.$(OBJEXT) libce_a-_strncat.$(OBJEXT) \
-	libce_a-_strncmp.$(OBJEXT) libce_a-_strncpy.$(OBJEXT) \
-	libce_a-_strpbrk.$(OBJEXT) libce_a-_strrchr.$(OBJEXT) \
-	libce_a-_strspn.$(OBJEXT) libce_a-_strstr.$(OBJEXT) \
-	libce_a-_strtok.$(OBJEXT) libce_a-strxfrm.$(OBJEXT) \
-	libce_a-c16rtomb.$(OBJEXT) libce_a-c16stombs.$(OBJEXT) \
-	libce_a-c32rtomb.$(OBJEXT) libce_a-mbrtoc16.$(OBJEXT) \
-	libce_a-mbrtoc32.$(OBJEXT) libce_a-mbstoc16s.$(OBJEXT) \
-	libce_a-btowc.$(OBJEXT) libce_a-mbrlen.$(OBJEXT) \
-	libce_a-mbrtowc.$(OBJEXT) libce_a-mbsinit.$(OBJEXT) \
-	libce_a-wcrtomb.$(OBJEXT) libce_a-wcscmp.$(OBJEXT) \
-	libce_a-wcslen.$(OBJEXT) libce_a-wctob.$(OBJEXT)
+	libce_a-strlen.$(OBJEXT) libce_a-strnlen.$(OBJEXT) \
+	libce_a-_strncat.$(OBJEXT) libce_a-_strncmp.$(OBJEXT) \
+	libce_a-_strncpy.$(OBJEXT) libce_a-_strpbrk.$(OBJEXT) \
+	libce_a-_strrchr.$(OBJEXT) libce_a-_strspn.$(OBJEXT) \
+	libce_a-_strstr.$(OBJEXT) libce_a-_strtok.$(OBJEXT) \
+	libce_a-strxfrm.$(OBJEXT) libce_a-c16rtomb.$(OBJEXT) \
+	libce_a-c16stombs.$(OBJEXT) libce_a-c32rtomb.$(OBJEXT) \
+	libce_a-mbrtoc16.$(OBJEXT) libce_a-mbrtoc32.$(OBJEXT) \
+	libce_a-mbstoc16s.$(OBJEXT) libce_a-btowc.$(OBJEXT) \
+	libce_a-mbrlen.$(OBJEXT) libce_a-mbrtowc.$(OBJEXT) \
+	libce_a-mbsinit.$(OBJEXT) libce_a-wcrtomb.$(OBJEXT) \
+	libce_a-wcscmp.$(OBJEXT) libce_a-wcslen.$(OBJEXT) \
+	libce_a-wctob.$(OBJEXT)
 @ENABLE_ENHANCED_PICS_TRUE@am_libce_a_OBJECTS = $(am__objects_1)
 libce_a_OBJECTS = $(am_libce_a_OBJECTS)
 libceo_a_AR = $(AR) $(ARFLAGS)
@@ -243,9 +245,9 @@ am__libceo_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_2 = libceo_a-__assert.$(OBJEXT) libceo_a-isalnum.$(OBJEXT) \
@@ -283,18 +285,19 @@ am__objects_2 = libceo_a-__assert.$(OBJEXT) libceo_a-isalnum.$(OBJEXT) \
 	libceo_a-_memset.$(OBJEXT) libceo_a-_strcat.$(OBJEXT) \
 	libceo_a-_strchr.$(OBJEXT) libceo_a-_strcmp.$(OBJEXT) \
 	libceo_a-_strcpy.$(OBJEXT) libceo_a-_strcspn.$(OBJEXT) \
-	libceo_a-_strlen.$(OBJEXT) libceo_a-_strncat.$(OBJEXT) \
-	libceo_a-_strncmp.$(OBJEXT) libceo_a-_strncpy.$(OBJEXT) \
-	libceo_a-_strpbrk.$(OBJEXT) libceo_a-_strrchr.$(OBJEXT) \
-	libceo_a-_strspn.$(OBJEXT) libceo_a-_strstr.$(OBJEXT) \
-	libceo_a-_strtok.$(OBJEXT) libceo_a-strxfrm.$(OBJEXT) \
-	libceo_a-c16rtomb.$(OBJEXT) libceo_a-c16stombs.$(OBJEXT) \
-	libceo_a-c32rtomb.$(OBJEXT) libceo_a-mbrtoc16.$(OBJEXT) \
-	libceo_a-mbrtoc32.$(OBJEXT) libceo_a-mbstoc16s.$(OBJEXT) \
-	libceo_a-btowc.$(OBJEXT) libceo_a-mbrlen.$(OBJEXT) \
-	libceo_a-mbrtowc.$(OBJEXT) libceo_a-mbsinit.$(OBJEXT) \
-	libceo_a-wcrtomb.$(OBJEXT) libceo_a-wcscmp.$(OBJEXT) \
-	libceo_a-wcslen.$(OBJEXT) libceo_a-wctob.$(OBJEXT)
+	libceo_a-strlen.$(OBJEXT) libceo_a-strnlen.$(OBJEXT) \
+	libceo_a-_strncat.$(OBJEXT) libceo_a-_strncmp.$(OBJEXT) \
+	libceo_a-_strncpy.$(OBJEXT) libceo_a-_strpbrk.$(OBJEXT) \
+	libceo_a-_strrchr.$(OBJEXT) libceo_a-_strspn.$(OBJEXT) \
+	libceo_a-_strstr.$(OBJEXT) libceo_a-_strtok.$(OBJEXT) \
+	libceo_a-strxfrm.$(OBJEXT) libceo_a-c16rtomb.$(OBJEXT) \
+	libceo_a-c16stombs.$(OBJEXT) libceo_a-c32rtomb.$(OBJEXT) \
+	libceo_a-mbrtoc16.$(OBJEXT) libceo_a-mbrtoc32.$(OBJEXT) \
+	libceo_a-mbstoc16s.$(OBJEXT) libceo_a-btowc.$(OBJEXT) \
+	libceo_a-mbrlen.$(OBJEXT) libceo_a-mbrtowc.$(OBJEXT) \
+	libceo_a-mbsinit.$(OBJEXT) libceo_a-wcrtomb.$(OBJEXT) \
+	libceo_a-wcscmp.$(OBJEXT) libceo_a-wcslen.$(OBJEXT) \
+	libceo_a-wctob.$(OBJEXT)
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_NOOPTS_TRUE@am_libceo_a_OBJECTS = $(am__objects_2)
 libceo_a_OBJECTS = $(am_libceo_a_OBJECTS)
 libceox_a_AR = $(AR) $(ARFLAGS)
@@ -310,9 +313,9 @@ am__libceox_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_3 = libceox_a-__assert.$(OBJEXT) \
@@ -350,19 +353,19 @@ am__objects_3 = libceox_a-__assert.$(OBJEXT) \
 	libceox_a-_memmove.$(OBJEXT) libceox_a-_memset.$(OBJEXT) \
 	libceox_a-_strcat.$(OBJEXT) libceox_a-_strchr.$(OBJEXT) \
 	libceox_a-_strcmp.$(OBJEXT) libceox_a-_strcpy.$(OBJEXT) \
-	libceox_a-_strcspn.$(OBJEXT) libceox_a-_strlen.$(OBJEXT) \
-	libceox_a-_strncat.$(OBJEXT) libceox_a-_strncmp.$(OBJEXT) \
-	libceox_a-_strncpy.$(OBJEXT) libceox_a-_strpbrk.$(OBJEXT) \
-	libceox_a-_strrchr.$(OBJEXT) libceox_a-_strspn.$(OBJEXT) \
-	libceox_a-_strstr.$(OBJEXT) libceox_a-_strtok.$(OBJEXT) \
-	libceox_a-strxfrm.$(OBJEXT) libceox_a-c16rtomb.$(OBJEXT) \
-	libceox_a-c16stombs.$(OBJEXT) libceox_a-c32rtomb.$(OBJEXT) \
-	libceox_a-mbrtoc16.$(OBJEXT) libceox_a-mbrtoc32.$(OBJEXT) \
-	libceox_a-mbstoc16s.$(OBJEXT) libceox_a-btowc.$(OBJEXT) \
-	libceox_a-mbrlen.$(OBJEXT) libceox_a-mbrtowc.$(OBJEXT) \
-	libceox_a-mbsinit.$(OBJEXT) libceox_a-wcrtomb.$(OBJEXT) \
-	libceox_a-wcscmp.$(OBJEXT) libceox_a-wcslen.$(OBJEXT) \
-	libceox_a-wctob.$(OBJEXT)
+	libceox_a-_strcspn.$(OBJEXT) libceox_a-strlen.$(OBJEXT) \
+	libceox_a-strnlen.$(OBJEXT) libceox_a-_strncat.$(OBJEXT) \
+	libceox_a-_strncmp.$(OBJEXT) libceox_a-_strncpy.$(OBJEXT) \
+	libceox_a-_strpbrk.$(OBJEXT) libceox_a-_strrchr.$(OBJEXT) \
+	libceox_a-_strspn.$(OBJEXT) libceox_a-_strstr.$(OBJEXT) \
+	libceox_a-_strtok.$(OBJEXT) libceox_a-strxfrm.$(OBJEXT) \
+	libceox_a-c16rtomb.$(OBJEXT) libceox_a-c16stombs.$(OBJEXT) \
+	libceox_a-c32rtomb.$(OBJEXT) libceox_a-mbrtoc16.$(OBJEXT) \
+	libceox_a-mbrtoc32.$(OBJEXT) libceox_a-mbstoc16s.$(OBJEXT) \
+	libceox_a-btowc.$(OBJEXT) libceox_a-mbrlen.$(OBJEXT) \
+	libceox_a-mbrtowc.$(OBJEXT) libceox_a-mbsinit.$(OBJEXT) \
+	libceox_a-wcrtomb.$(OBJEXT) libceox_a-wcscmp.$(OBJEXT) \
+	libceox_a-wcslen.$(OBJEXT) libceox_a-wctob.$(OBJEXT)
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXPERIMENTAL_TRUE@@ENABLE_NOOPTS_TRUE@am_libceox_a_OBJECTS = $(am__objects_3)
 libceox_a_OBJECTS = $(am_libceox_a_OBJECTS)
 libcex_a_AR = $(AR) $(ARFLAGS)
@@ -378,9 +381,9 @@ am__libcex_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_4 = libcex_a-__assert.$(OBJEXT) libcex_a-isalnum.$(OBJEXT) \
@@ -418,18 +421,19 @@ am__objects_4 = libcex_a-__assert.$(OBJEXT) libcex_a-isalnum.$(OBJEXT) \
 	libcex_a-_memset.$(OBJEXT) libcex_a-_strcat.$(OBJEXT) \
 	libcex_a-_strchr.$(OBJEXT) libcex_a-_strcmp.$(OBJEXT) \
 	libcex_a-_strcpy.$(OBJEXT) libcex_a-_strcspn.$(OBJEXT) \
-	libcex_a-_strlen.$(OBJEXT) libcex_a-_strncat.$(OBJEXT) \
-	libcex_a-_strncmp.$(OBJEXT) libcex_a-_strncpy.$(OBJEXT) \
-	libcex_a-_strpbrk.$(OBJEXT) libcex_a-_strrchr.$(OBJEXT) \
-	libcex_a-_strspn.$(OBJEXT) libcex_a-_strstr.$(OBJEXT) \
-	libcex_a-_strtok.$(OBJEXT) libcex_a-strxfrm.$(OBJEXT) \
-	libcex_a-c16rtomb.$(OBJEXT) libcex_a-c16stombs.$(OBJEXT) \
-	libcex_a-c32rtomb.$(OBJEXT) libcex_a-mbrtoc16.$(OBJEXT) \
-	libcex_a-mbrtoc32.$(OBJEXT) libcex_a-mbstoc16s.$(OBJEXT) \
-	libcex_a-btowc.$(OBJEXT) libcex_a-mbrlen.$(OBJEXT) \
-	libcex_a-mbrtowc.$(OBJEXT) libcex_a-mbsinit.$(OBJEXT) \
-	libcex_a-wcrtomb.$(OBJEXT) libcex_a-wcscmp.$(OBJEXT) \
-	libcex_a-wcslen.$(OBJEXT) libcex_a-wctob.$(OBJEXT)
+	libcex_a-strlen.$(OBJEXT) libcex_a-strnlen.$(OBJEXT) \
+	libcex_a-_strncat.$(OBJEXT) libcex_a-_strncmp.$(OBJEXT) \
+	libcex_a-_strncpy.$(OBJEXT) libcex_a-_strpbrk.$(OBJEXT) \
+	libcex_a-_strrchr.$(OBJEXT) libcex_a-_strspn.$(OBJEXT) \
+	libcex_a-_strstr.$(OBJEXT) libcex_a-_strtok.$(OBJEXT) \
+	libcex_a-strxfrm.$(OBJEXT) libcex_a-c16rtomb.$(OBJEXT) \
+	libcex_a-c16stombs.$(OBJEXT) libcex_a-c32rtomb.$(OBJEXT) \
+	libcex_a-mbrtoc16.$(OBJEXT) libcex_a-mbrtoc32.$(OBJEXT) \
+	libcex_a-mbstoc16s.$(OBJEXT) libcex_a-btowc.$(OBJEXT) \
+	libcex_a-mbrlen.$(OBJEXT) libcex_a-mbrtowc.$(OBJEXT) \
+	libcex_a-mbsinit.$(OBJEXT) libcex_a-wcrtomb.$(OBJEXT) \
+	libcex_a-wcscmp.$(OBJEXT) libcex_a-wcslen.$(OBJEXT) \
+	libcex_a-wctob.$(OBJEXT)
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXPERIMENTAL_TRUE@am_libcex_a_OBJECTS = $(am__objects_4)
 libcex_a_OBJECTS = $(am_libcex_a_OBJECTS)
 libco_a_AR = $(AR) $(ARFLAGS)
@@ -445,9 +449,9 @@ am__libco_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_5 = libco_a-__assert.$(OBJEXT) libco_a-isalnum.$(OBJEXT) \
@@ -485,18 +489,19 @@ am__objects_5 = libco_a-__assert.$(OBJEXT) libco_a-isalnum.$(OBJEXT) \
 	libco_a-_memset.$(OBJEXT) libco_a-_strcat.$(OBJEXT) \
 	libco_a-_strchr.$(OBJEXT) libco_a-_strcmp.$(OBJEXT) \
 	libco_a-_strcpy.$(OBJEXT) libco_a-_strcspn.$(OBJEXT) \
-	libco_a-_strlen.$(OBJEXT) libco_a-_strncat.$(OBJEXT) \
-	libco_a-_strncmp.$(OBJEXT) libco_a-_strncpy.$(OBJEXT) \
-	libco_a-_strpbrk.$(OBJEXT) libco_a-_strrchr.$(OBJEXT) \
-	libco_a-_strspn.$(OBJEXT) libco_a-_strstr.$(OBJEXT) \
-	libco_a-_strtok.$(OBJEXT) libco_a-strxfrm.$(OBJEXT) \
-	libco_a-c16rtomb.$(OBJEXT) libco_a-c16stombs.$(OBJEXT) \
-	libco_a-c32rtomb.$(OBJEXT) libco_a-mbrtoc16.$(OBJEXT) \
-	libco_a-mbrtoc32.$(OBJEXT) libco_a-mbstoc16s.$(OBJEXT) \
-	libco_a-btowc.$(OBJEXT) libco_a-mbrlen.$(OBJEXT) \
-	libco_a-mbrtowc.$(OBJEXT) libco_a-mbsinit.$(OBJEXT) \
-	libco_a-wcrtomb.$(OBJEXT) libco_a-wcscmp.$(OBJEXT) \
-	libco_a-wcslen.$(OBJEXT) libco_a-wctob.$(OBJEXT)
+	libco_a-strlen.$(OBJEXT) libco_a-strnlen.$(OBJEXT) \
+	libco_a-_strncat.$(OBJEXT) libco_a-_strncmp.$(OBJEXT) \
+	libco_a-_strncpy.$(OBJEXT) libco_a-_strpbrk.$(OBJEXT) \
+	libco_a-_strrchr.$(OBJEXT) libco_a-_strspn.$(OBJEXT) \
+	libco_a-_strstr.$(OBJEXT) libco_a-_strtok.$(OBJEXT) \
+	libco_a-strxfrm.$(OBJEXT) libco_a-c16rtomb.$(OBJEXT) \
+	libco_a-c16stombs.$(OBJEXT) libco_a-c32rtomb.$(OBJEXT) \
+	libco_a-mbrtoc16.$(OBJEXT) libco_a-mbrtoc32.$(OBJEXT) \
+	libco_a-mbstoc16s.$(OBJEXT) libco_a-btowc.$(OBJEXT) \
+	libco_a-mbrlen.$(OBJEXT) libco_a-mbrtowc.$(OBJEXT) \
+	libco_a-mbsinit.$(OBJEXT) libco_a-wcrtomb.$(OBJEXT) \
+	libco_a-wcscmp.$(OBJEXT) libco_a-wcslen.$(OBJEXT) \
+	libco_a-wctob.$(OBJEXT)
 @ENABLE_NOOPTS_TRUE@am_libco_a_OBJECTS = $(am__objects_5)
 libco_a_OBJECTS = $(am_libco_a_OBJECTS)
 libcox_a_AR = $(AR) $(ARFLAGS)
@@ -512,9 +517,9 @@ am__libcox_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_6 = libcox_a-__assert.$(OBJEXT) libcox_a-isalnum.$(OBJEXT) \
@@ -552,18 +557,19 @@ am__objects_6 = libcox_a-__assert.$(OBJEXT) libcox_a-isalnum.$(OBJEXT) \
 	libcox_a-_memset.$(OBJEXT) libcox_a-_strcat.$(OBJEXT) \
 	libcox_a-_strchr.$(OBJEXT) libcox_a-_strcmp.$(OBJEXT) \
 	libcox_a-_strcpy.$(OBJEXT) libcox_a-_strcspn.$(OBJEXT) \
-	libcox_a-_strlen.$(OBJEXT) libcox_a-_strncat.$(OBJEXT) \
-	libcox_a-_strncmp.$(OBJEXT) libcox_a-_strncpy.$(OBJEXT) \
-	libcox_a-_strpbrk.$(OBJEXT) libcox_a-_strrchr.$(OBJEXT) \
-	libcox_a-_strspn.$(OBJEXT) libcox_a-_strstr.$(OBJEXT) \
-	libcox_a-_strtok.$(OBJEXT) libcox_a-strxfrm.$(OBJEXT) \
-	libcox_a-c16rtomb.$(OBJEXT) libcox_a-c16stombs.$(OBJEXT) \
-	libcox_a-c32rtomb.$(OBJEXT) libcox_a-mbrtoc16.$(OBJEXT) \
-	libcox_a-mbrtoc32.$(OBJEXT) libcox_a-mbstoc16s.$(OBJEXT) \
-	libcox_a-btowc.$(OBJEXT) libcox_a-mbrlen.$(OBJEXT) \
-	libcox_a-mbrtowc.$(OBJEXT) libcox_a-mbsinit.$(OBJEXT) \
-	libcox_a-wcrtomb.$(OBJEXT) libcox_a-wcscmp.$(OBJEXT) \
-	libcox_a-wcslen.$(OBJEXT) libcox_a-wctob.$(OBJEXT)
+	libcox_a-strlen.$(OBJEXT) libcox_a-strnlen.$(OBJEXT) \
+	libcox_a-_strncat.$(OBJEXT) libcox_a-_strncmp.$(OBJEXT) \
+	libcox_a-_strncpy.$(OBJEXT) libcox_a-_strpbrk.$(OBJEXT) \
+	libcox_a-_strrchr.$(OBJEXT) libcox_a-_strspn.$(OBJEXT) \
+	libcox_a-_strstr.$(OBJEXT) libcox_a-_strtok.$(OBJEXT) \
+	libcox_a-strxfrm.$(OBJEXT) libcox_a-c16rtomb.$(OBJEXT) \
+	libcox_a-c16stombs.$(OBJEXT) libcox_a-c32rtomb.$(OBJEXT) \
+	libcox_a-mbrtoc16.$(OBJEXT) libcox_a-mbrtoc32.$(OBJEXT) \
+	libcox_a-mbstoc16s.$(OBJEXT) libcox_a-btowc.$(OBJEXT) \
+	libcox_a-mbrlen.$(OBJEXT) libcox_a-mbrtowc.$(OBJEXT) \
+	libcox_a-mbsinit.$(OBJEXT) libcox_a-wcrtomb.$(OBJEXT) \
+	libcox_a-wcscmp.$(OBJEXT) libcox_a-wcslen.$(OBJEXT) \
+	libcox_a-wctob.$(OBJEXT)
 @ENABLE_EXPERIMENTAL_TRUE@@ENABLE_NOOPTS_TRUE@am_libcox_a_OBJECTS = $(am__objects_6)
 libcox_a_OBJECTS = $(am_libcox_a_OBJECTS)
 libcx_a_AR = $(AR) $(ARFLAGS)
@@ -579,9 +585,9 @@ am__libcx_a_SOURCES_DIST = __assert.c isalnum.c isalpha.c isblank.c \
 	mbtowc.c memfree.c memfreemax.c memmisc.c qsort.c rand.c \
 	realloc.c strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c \
 	_memcmp.c __memcpy.c memcpy.c _memmove.c _memset.c _strcat.c \
-	_strchr.c _strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c \
-	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	_strchr.c _strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c \
+	_strncat.c _strncmp.c _strncpy.c _strpbrk.c _strrchr.c \
+	_strspn.c _strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
 	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
 	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 am__objects_7 = libcx_a-__assert.$(OBJEXT) libcx_a-isalnum.$(OBJEXT) \
@@ -619,18 +625,19 @@ am__objects_7 = libcx_a-__assert.$(OBJEXT) libcx_a-isalnum.$(OBJEXT) \
 	libcx_a-_memset.$(OBJEXT) libcx_a-_strcat.$(OBJEXT) \
 	libcx_a-_strchr.$(OBJEXT) libcx_a-_strcmp.$(OBJEXT) \
 	libcx_a-_strcpy.$(OBJEXT) libcx_a-_strcspn.$(OBJEXT) \
-	libcx_a-_strlen.$(OBJEXT) libcx_a-_strncat.$(OBJEXT) \
-	libcx_a-_strncmp.$(OBJEXT) libcx_a-_strncpy.$(OBJEXT) \
-	libcx_a-_strpbrk.$(OBJEXT) libcx_a-_strrchr.$(OBJEXT) \
-	libcx_a-_strspn.$(OBJEXT) libcx_a-_strstr.$(OBJEXT) \
-	libcx_a-_strtok.$(OBJEXT) libcx_a-strxfrm.$(OBJEXT) \
-	libcx_a-c16rtomb.$(OBJEXT) libcx_a-c16stombs.$(OBJEXT) \
-	libcx_a-c32rtomb.$(OBJEXT) libcx_a-mbrtoc16.$(OBJEXT) \
-	libcx_a-mbrtoc32.$(OBJEXT) libcx_a-mbstoc16s.$(OBJEXT) \
-	libcx_a-btowc.$(OBJEXT) libcx_a-mbrlen.$(OBJEXT) \
-	libcx_a-mbrtowc.$(OBJEXT) libcx_a-mbsinit.$(OBJEXT) \
-	libcx_a-wcrtomb.$(OBJEXT) libcx_a-wcscmp.$(OBJEXT) \
-	libcx_a-wcslen.$(OBJEXT) libcx_a-wctob.$(OBJEXT)
+	libcx_a-strlen.$(OBJEXT) libcx_a-strnlen.$(OBJEXT) \
+	libcx_a-_strncat.$(OBJEXT) libcx_a-_strncmp.$(OBJEXT) \
+	libcx_a-_strncpy.$(OBJEXT) libcx_a-_strpbrk.$(OBJEXT) \
+	libcx_a-_strrchr.$(OBJEXT) libcx_a-_strspn.$(OBJEXT) \
+	libcx_a-_strstr.$(OBJEXT) libcx_a-_strtok.$(OBJEXT) \
+	libcx_a-strxfrm.$(OBJEXT) libcx_a-c16rtomb.$(OBJEXT) \
+	libcx_a-c16stombs.$(OBJEXT) libcx_a-c32rtomb.$(OBJEXT) \
+	libcx_a-mbrtoc16.$(OBJEXT) libcx_a-mbrtoc32.$(OBJEXT) \
+	libcx_a-mbstoc16s.$(OBJEXT) libcx_a-btowc.$(OBJEXT) \
+	libcx_a-mbrlen.$(OBJEXT) libcx_a-mbrtowc.$(OBJEXT) \
+	libcx_a-mbsinit.$(OBJEXT) libcx_a-wcrtomb.$(OBJEXT) \
+	libcx_a-wcscmp.$(OBJEXT) libcx_a-wcslen.$(OBJEXT) \
+	libcx_a-wctob.$(OBJEXT)
 @ENABLE_EXPERIMENTAL_TRUE@am_libcx_a_OBJECTS = $(am__objects_7)
 libcx_a_OBJECTS = $(am_libcx_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -826,11 +833,11 @@ libc_a_SOURCES = __assert.c isalnum.c isalpha.c isblank.c iscntrl.c \
 	memfree.c memfreemax.c memmisc.c qsort.c rand.c realloc.c \
 	strtol.c strtoul.c wcstombs.c wctomb.c _memchr.c _memcmp.c \
 	__memcpy.c memcpy.c _memmove.c _memset.c _strcat.c _strchr.c \
-	_strcmp.c _strcpy.c _strcspn.c _strlen.c _strncat.c _strncmp.c \
-	_strncpy.c _strpbrk.c _strrchr.c _strspn.c _strstr.c _strtok.c \
-	strxfrm.c c16rtomb.c c16stombs.c c32rtomb.c mbrtoc16.c \
-	mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c mbrtowc.c mbsinit.c \
-	wcrtomb.c wcscmp.c wcslen.c wctob.c
+	_strcmp.c _strcpy.c _strcspn.c strlen.c strnlen.c _strncat.c \
+	_strncmp.c _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+	_strstr.c _strtok.c strxfrm.c c16rtomb.c c16stombs.c \
+	c32rtomb.c mbrtoc16.c mbrtoc32.c mbstoc16s.c btowc.c mbrlen.c \
+	mbrtowc.c mbsinit.c wcrtomb.c wcscmp.c wcslen.c wctob.c
 libc_a_CFLAGS = $(AM_CFLAGS)
 @ENABLE_ENHANCED_PICS_TRUE@libce_a_SOURCES = $(libc_a_SOURCES)
 @ENABLE_ENHANCED_PICS_TRUE@libce_a_CFLAGS = $(AM_CFLAGS_E)
@@ -1426,11 +1433,17 @@ libc_a-_strcspn.o: _strcspn.c
 libc_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libc_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libc_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libc_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libc_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libc_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libc_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libc_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libc_a_CFLAGS) $(CFLAGS) -c -o libc_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -1990,11 +2003,17 @@ libce_a-_strcspn.o: _strcspn.c
 libce_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libce_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libce_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libce_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libce_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libce_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libce_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libce_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libce_a_CFLAGS) $(CFLAGS) -c -o libce_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -2554,11 +2573,17 @@ libceo_a-_strcspn.o: _strcspn.c
 libceo_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libceo_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libceo_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libceo_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libceo_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libceo_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libceo_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libceo_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceo_a_CFLAGS) $(CFLAGS) -c -o libceo_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -3118,11 +3143,17 @@ libceox_a-_strcspn.o: _strcspn.c
 libceox_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libceox_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libceox_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libceox_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libceox_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libceox_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libceox_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libceox_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libceox_a_CFLAGS) $(CFLAGS) -c -o libceox_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -3682,11 +3713,17 @@ libcex_a-_strcspn.o: _strcspn.c
 libcex_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libcex_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libcex_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libcex_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libcex_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libcex_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libcex_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libcex_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcex_a_CFLAGS) $(CFLAGS) -c -o libcex_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -4246,11 +4283,17 @@ libco_a-_strcspn.o: _strcspn.c
 libco_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libco_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libco_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libco_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libco_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libco_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libco_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libco_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libco_a_CFLAGS) $(CFLAGS) -c -o libco_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -4810,11 +4853,17 @@ libcox_a-_strcspn.o: _strcspn.c
 libcox_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libcox_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libcox_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libcox_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libcox_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libcox_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libcox_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libcox_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcox_a_CFLAGS) $(CFLAGS) -c -o libcox_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c
@@ -5374,11 +5423,17 @@ libcx_a-_strcspn.o: _strcspn.c
 libcx_a-_strcspn.obj: _strcspn.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-_strcspn.obj `if test -f '_strcspn.c'; then $(CYGPATH_W) '_strcspn.c'; else $(CYGPATH_W) '$(srcdir)/_strcspn.c'; fi`
 
-libcx_a-_strlen.o: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-_strlen.o `test -f '_strlen.c' || echo '$(srcdir)/'`_strlen.c
+libcx_a-strlen.o: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-strlen.o `test -f 'strlen.c' || echo '$(srcdir)/'`strlen.c
 
-libcx_a-_strlen.obj: _strlen.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-_strlen.obj `if test -f '_strlen.c'; then $(CYGPATH_W) '_strlen.c'; else $(CYGPATH_W) '$(srcdir)/_strlen.c'; fi`
+libcx_a-strlen.obj: strlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
+
+libcx_a-strnlen.o: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-strnlen.o `test -f 'strnlen.c' || echo '$(srcdir)/'`strnlen.c
+
+libcx_a-strnlen.obj: strnlen.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-strnlen.obj `if test -f 'strnlen.c'; then $(CYGPATH_W) 'strnlen.c'; else $(CYGPATH_W) '$(srcdir)/strnlen.c'; fi`
 
 libcx_a-_strncat.o: _strncat.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcx_a_CFLAGS) $(CFLAGS) -c -o libcx_a-_strncat.o `test -f '_strncat.c' || echo '$(srcdir)/'`_strncat.c

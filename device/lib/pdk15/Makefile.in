@@ -49,7 +49,8 @@ PDK15_SDCC = $(COMMON_SDCC) \
   _startup.c \
   _strcmp.c \
   _strcpy.c \
-  _strlen.c \
+  strlen.c \
+  strnlen.c \
   _memmove.c \
   __memcpy.c \
   memcpy.c \

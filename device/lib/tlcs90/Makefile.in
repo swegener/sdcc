@@ -45,6 +45,7 @@ Z80_SDCC = $(COMMON_SDCC) \
   lldiv.c \
   sprintf.c \
   vprintf.c \
+  strnlen.c \
   _strcmp.c \
   atomic_flag_clear.c
 

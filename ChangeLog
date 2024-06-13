@@ -13,7 +13,8 @@
 	  device/lib/Makefile.in,
 	  device/lib/*/Makefile.in,
 	  device/lib/pic14/libc/Makefile.am,
-	  device/lib/pic14/libc/Makefile.in:
+	  device/lib/pic14/libc/Makefile.in,
+	  support/regression/tests/strnlen.c:
 	  C2Y strnlen.
 	* support/regression/tests/bug-3730.c,
 	  support/regression/tests/bug-3740.c:

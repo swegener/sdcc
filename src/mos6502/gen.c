@@ -5017,7 +5017,11 @@ static void genRet (iCode * ic)
   if (bigreturn) {
     // FIXME: only up to size 8 is supported
     if(size>8)
-      emitcode("ERROR","return struct size %d is too large\n",size);
+      {
+        if (!regalloc_dry_run)
+          werror ( E_FUNC_AGGR);
+        goto jumpret;
+      }
 
     while (size--) {
       transferAopAop (AOP (left), size, m6502_aop_pass[size], 0);

@@ -1,3 +1,11 @@
+2024-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/main.c (hasExtBitOp),
+	  src/mos6502/main.c (hasExtBitOp): fix bug #3731
+	* support/regression/tests/sha3-256.c: only enabled for ports
+	  that can handle returning large structs 
+	* src/mos6502/gen.c (genRet): fail unsupported struct return better
+
 2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/r2k/setjmp.s

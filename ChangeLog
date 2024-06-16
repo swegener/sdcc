@@ -1,3 +1,8 @@
+2024-06-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/longjmp.c:
+	  Disable a test for configuration affected by known bug #3743 (-ms08 --stack-auto).
+
 2024-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/main.c (hasExtBitOp),
@@ -6,7 +11,7 @@
 	  that can handle returning large structs 
 	* src/mos6502/gen.c (genRet): fail unsupported struct return better
 
-2024-06-08 Philipp Klaus Krause <philipp@colecovision.eu>
+2024-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/r2k/setjmp.s
 	  device/lib/r2ka/setjmp.s

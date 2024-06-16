@@ -25,7 +25,7 @@ void testJmp(void)
 	if(!r)
 		g(1);
 	ASSERT(r == 1);
-
+#if !(defined (__SDCC_s08) && defined(__SDCC_STACK_AUTO)) // SDCC bug #3743
 	r = setjmp(buf);
 	if(!r)
 		g(42);
@@ -35,6 +35,7 @@ void testJmp(void)
 	if(!r)
 		g(0x5a5);
 	ASSERT(r == 0x5a5); // Ensure that we get the upper byte correct, too.
+#endif
 }
 
 #endif

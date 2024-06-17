@@ -1,3 +1,8 @@
+2024-06-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/sm83/Makefile.in:
+	  Fix strnlen build for sm83 port.
+
 2024-06-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/longjmp.c:

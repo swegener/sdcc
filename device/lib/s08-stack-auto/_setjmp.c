@@ -105,6 +105,13 @@ _longjmp:
         stx	(_longjmp_buf + 0)		; msb(buf)
         sta	(_longjmp_buf + 1)		; lsb(buf)
 
+        ; Since rv is on the current stack, we need to move it to
+        ; where we can still access it after switching stack pointer.
+        lda	3,s
+        sta	(_longjmp_PARM_2 + 0)
+        lda	4,s
+        sta	(_longjmp_PARM_2 + 1)
+
         ; restore stack pointer
         ldhx	(_longjmp_buf)
         lda	0,x

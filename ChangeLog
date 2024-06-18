@@ -1,3 +1,8 @@
+2024-06-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/s08-stack-auto/_setjmp.c: fix bug #3743
+	* support/regression/tests/longjump.c: re-enable test affected by bug
+
 2024-06-17 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/sm83/Makefile.in:

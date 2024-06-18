@@ -25,17 +25,15 @@ void testJmp(void)
 	if(!r)
 		g(1);
 	ASSERT(r == 1);
-#if !(defined (__SDCC_s08) && defined(__SDCC_STACK_AUTO)) // SDCC bug #3743
 	r = setjmp(buf);
 	if(!r)
 		g(42);
-	ASSERT(r == 42); // There ised to be a bug affecting the Rabbit ports where return values other than 0/1 were wrong.
+	ASSERT(r == 42); // There used to be a bug affecting the Rabbit ports where return values other than 0/1 were wrong.
 
 	r = setjmp(buf);
 	if(!r)
 		g(0x5a5);
 	ASSERT(r == 0x5a5); // Ensure that we get the upper byte correct, too.
-#endif
 }
 
 #endif

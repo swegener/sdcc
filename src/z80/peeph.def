@@ -2342,6 +2342,22 @@ replace restart {
 } if notUsed('de')
 
 replace restart {
+	ex	de, hl
+	push	hl
+} by {
+	; common peephole 140c removed ex before push
+	push	de
+} if notUsed('de' 'hl')
+
+replace restart {
+	ex	de, hl
+	push	de
+} by {
+	; common peephole 140d removed ex before push
+	push	hl
+} if notUsed('de' 'hl')
+
+replace restart {
 	ld	hl, #%1
 	add	hl, %2
 	ex	de, hl

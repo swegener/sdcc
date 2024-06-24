@@ -2322,6 +2322,26 @@ replace restart {
 } if notUsed('de')
 
 replace restart {
+	ex	de, hl
+	pop	de
+	add	hl, de
+} by {
+	; common peephole 140a removed ex exploiting commutativity of addition.
+	pop	hl
+	add	hl, de
+} if notUsed('de')
+
+replace restart {
+	ex	de, hl
+	pop	hl
+	add	hl, de
+} by {
+	; common peephole 140b removed ex exploiting commutativity of addition.
+	pop	de
+	add	hl, de
+} if notUsed('de')
+
+replace restart {
 	ld	hl, #%1
 	add	hl, %2
 	ex	de, hl

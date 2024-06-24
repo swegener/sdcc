@@ -1,6 +1,12 @@
+2024-06-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/z80/peeph.def:
+	  Improve handling of hl in code generation.
+
 2024-06-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
-	* device/*/ez80_z80/setjmp.s:
+	* device/lib/*/setjmp.s:
 	  Improve setjmp/longjmp for z80-related ports, patch #479 by Janko Stamenović.
 
 2024-06-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

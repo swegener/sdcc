@@ -12360,6 +12360,23 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
       genMove (IC_RESULT (ic)->aop, ASMOP_HL, true, true, isPairDead (PAIR_DE, ic), true);
       return;
     }
+  else if ((getPairId (result->aop) == PAIR_HL || getPairId (left->aop) == PAIR_HL) && isPairDead (PAIR_HL, ic) &&
+    shCount == 7 && is_signed)
+    {
+      tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+      genMove (ASMOP_HL, left->aop, isRegDead (A_IDX, ic), true, isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+      emit3w (A_ADD, ASMOP_HL, ASMOP_HL);
+      emit3 (A_LD, ASMOP_L, ASMOP_H);
+      emit3 (A_LD, ASMOP_H, ASMOP_ZERO);
+      if (!regalloc_dry_run)
+        emit2 ("jr nc,!tlabel", labelKey2num (tlbl->key));      
+      emit2 ("dec h");
+      if (!regalloc_dry_run)
+        emitLabel (tlbl);
+      cost (3, 11.5f);
+      genMove (result->aop, ASMOP_HL, isRegDead (A_IDX, ic), true, isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+      return;
+    }
 
   if (isPair (result->aop) && !offr)
     fetchPairLong (getPairId (result->aop), left->aop, ic, offl);

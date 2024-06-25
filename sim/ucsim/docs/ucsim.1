@@ -44,34 +44,37 @@ uCsim \- Micro\-controller simulator
 .br
 .B ucsim_f8
 .br
+.B ucsim_oisc
+.br
 .RS
-.B \-t cpu_type
-.B \-X freq[k|M]
-.B \-R seed
-.B \-C cfg_file
-.B \-e command
-.B \-c file
-.B \-z portnum
-.B \-Z portnum
-.B \-k portnum
-.B \-s file
-.B \-S options
-.B \-I options
-.B \-p prompt
-.B \-P
-.B \-o colors
-.B \-l
+.B \-a nr
 .B \-b
 .B \-B
+.B \-c file
+.B \-C cfg_file
+
+.B \-e command
+.B \-E
 .B \-g
 .B \-G
-.B \-E
-.B \-a nr
-.B \-w
-.B \-V
-.B \-v
-.B \-H
 .B \-h
+.B \-H
+.B \-I options
+.B \-k portnum
+.B \-l
+.B \-o colors
+.B \-p prompt
+.B \-P
+.B \-R seed
+.B \-s file
+.B \-S options
+.B \-t cpu_type
+.B \-v
+.B \-V
+.B \-w
+.B \-X freq[k|M]
+.B \-z portnum
+.B \-Z portnum
 .RE
 
 .SH DESCRIPTION
@@ -89,32 +92,16 @@ starts Zilog Z80 microprocessor simulator, etc.
 .B Options of the command
 
 .TP
-.B \-t cpu_type
-Specifies type of the controller. Use \-H to list possible values.
+.B \-a nr
+Specify size of variable space (default=256).
 
 .TP
-.B \-X freq[k|M]
-XTAL frequency in Hz, Use
-.I k
-or
-.I M
-suffix to specify frequency in kHz or MHz.
+.B \-b
+Black & white (non-color) theme.
 
 .TP
-.B \-R seed
-Set the random number generator seed.
-
-.TP
-.B \-C file
-Read initial commands from
-.I file
-and execute them.
-
-.TP
-.B \-e command
-Execute
-.I command
-at program startup (before config file).
+.B \-B
+Beep on breakpoints.
 
 .TP
 .B \-c file
@@ -123,22 +110,87 @@ Open command console on
 (use \- for std in/out).
 
 .TP
-.B \-z portnum
-Listen
-.I portnum
-for command console.
+.B \-C file
+Read initial commands from
+.I file
+and execute them.
+
 
 .TP
-.B \-Z portnum
-Listen
-.I portnum
-for command console (no console on stdio).
+.B \-e command
+Execute
+.I command
+at program startup (before config file).
+
+.TP
+.B \-E
+Go, start simulation in emulation mode.
+
+.TP
+.B \-g
+Go, start simulation.
+
+.TP
+.B \-G
+Go, start simulation, quit on stop.
+
+.TP
+.B \-h
+Print out this help and quit.
+
+.TP
+.B \-H
+Print out types of known CPUs and quit.
+
+.TP
+.B \-I options
+.I options
+is a comma separated list of options according to simulator
+interface. Known options are:
+.br
+.I if=memory[address]
+turn on interface on given memory location.
+.br
+.I in=file
+specify input file for IO.
+.br
+.I out=file
+specify output file for IO.
+.PP
 
 .TP
 .B \-k portnum
 Use
 .I localhost:portnum
 for serial I/O. This option is obsolete, use \-S instead.
+
+.TP
+.B \-l
+Use colors of the light theme (default is dark).
+.PP
+
+.TP
+.B \-o colors
+List of color specification: what=colspec,... where colspec is :
+separated list of color options e.g.: prompt=b:white:black (bold white
+on black).
+
+.TP
+.B \-p prompt
+Specify string for prompt.
+
+.TP
+.B \-P
+Prompt is a null ('\\0') character.
+.PP
+
+.TP
+.B \-q
+Quiet mode (implies -b).
+
+.TP
+.B \-R seed
+Set the random number generator seed.
 
 .TP
 .B \-s file
@@ -173,88 +225,42 @@ use localhost:nr as server for serial onput.
 perform non-interactive communication even on tty.
 
 .TP
-.B \-I options
-.I options
-is a comma separated list of options according to simulator
-interface. Known options are:
-.br
-.I if=memory[address]
-turn on interface on given memory location.
-.br
-.I in=file
-specify input file for IO.
-.br
-.I out=file
-specify output file for IO.
-.PP
-
-.TP
-.B \-p prompt
-Specify string for prompt.
-
-.TP
-.B \-P
-Prompt is a null ('\\0') character.
-.PP
-
-.TP
-.B \-o colors
-List of color specification: what=colspec,... where colspec is :
-separated list of color options e.g.: prompt=b:white:black (bold white
-on black).
-
-.TP
-.B \-l
-Use colors of the light theme (default is dark).
-.PP
-
-.TP
-.B \-b
-Black & white (non-color) theme.
-
-.TP
-.B \-B
-Beep on breakpoints.
-
-.TP
-.B \-g
-Go, start simulation.
-
-.TP
-.B \-G
-Go, start simulation, quit on stop.
-
-.TP
-.B \-E
-Go, start simulation in emulation mode.
-
-.TP
-.B \-a nr
-Specify size of variable space (default=256).
-
-.TP
-.B \-w
-Writable flash.
-
-.TP
-.B \-V
-Verbose mode.
-
-.TP
-.B \-q
-Quiet mode (implies -b).
+.B \-t cpu_type
+Specifies type of the controller. Use \-H to list possible values.
 
 .TP
 .B \-v
 Print out version number and quit.
 
 .TP
-.B \-H
-Print out types of known CPUs and quit.
+.B \-V
+Verbose mode.
 
 .TP
-.B \-h
-Print out this help and quit.
+.B \-w
+Writable flash.
+
+.TP
+.B \-X freq[k|M]
+XTAL frequency in Hz, Use
+.I k
+or
+.I M
+suffix to specify frequency in kHz or MHz.
+
+.TP
+.B \-z portnum
+Listen
+.I portnum
+for command console.
+
+.TP
+.B \-Z portnum
+Listen
+.I portnum
+for command console (no console on stdio).
+
+
 
 .SH EXAMPLES
 None yet.

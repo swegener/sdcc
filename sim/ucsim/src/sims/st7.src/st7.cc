@@ -1165,7 +1165,6 @@ cl_st7::exec_inst(void)
 		return(resINV_INST);
 	}
 	  
-  //PC= instPC;//rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

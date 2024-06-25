@@ -544,7 +544,6 @@ int cl_fpp::exec_inst(void)
   int status = execute(code);
   if (status == resINV_INST)
     {
-      //PC = instPC;//rom->inc_address(PC, -1);
       return (resINV_INST);
     }
   return (status);

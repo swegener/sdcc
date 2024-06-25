@@ -83,4 +83,4 @@ struct cpu_entry cpus_8048[]=
     {NULL, CPU_NONE, 0, "", ""}
   };
 
-/* End of i8085.src/glob.cc */
+/* End of i8048.src/glob.cc */

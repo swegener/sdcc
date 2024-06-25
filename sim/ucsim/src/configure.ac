@@ -33,6 +33,7 @@ def_pblaze="yes"
 def_i8085="yes"
 def_i8048="yes"
 def_st7="yes"
+def_oisc="yes"
 
 in_sdcc="no"
 src_root=$(dirname $0)
@@ -64,6 +65,7 @@ if test $in_sdcc == "yes" ; then
     def_i8085="no"
     def_i8048="no"
     def_st7="no"
+    def_oisc="no"
     SILENT="yes"
 else
     SILENT="no"
@@ -244,6 +246,12 @@ AC_ARG_ENABLE(i8048-port,
 	      ,
 	      enable_i8048_port=$def_i8048)
 
+AC_ARG_ENABLE(oisc-port,
+	      AS_HELP_STRING([--enable-oisc-port=ARG],
+			     [en/disable compile oisc simulator]),
+	      ,
+	      enable_oisc_port=$def_oisc)
+
 AC_ARG_ENABLE(serio,
 	      AS_HELP_STRING([--enable-serio=ARG],
 			     [en/disable compile serio GUI tool (needs curses)]),
@@ -276,6 +284,7 @@ AC_SUBST(enable_pblaze_port)
 AC_SUBST(enable_i8085_port)
 AC_SUBST(enable_f8_port)
 AC_SUBST(enable_i8048_port)
+AC_SUBST(enable_oisc_port)
 AC_SUBST(enable_serio)
 
 
@@ -862,6 +871,7 @@ src/sims/stm8.src/Makefile    src/sims/stm8.src/test/Makefile
 src/sims/tlcs.src/Makefile    src/sims/tlcs.src/test/Makefile
 src/sims/xa.src/Makefile      src/sims/xa.src/test/Makefile
 src/sims/z80.src/Makefile     src/sims/z80.src/test/Makefile
+src/sims/oisc.src/Makefile    src/sims/oisc.src/test/Makefile
 
 src/apps/serio.src/Makefile
 src/apps/ucsim.src/Makefile
@@ -895,6 +905,7 @@ echo "Compile pblaze    $enable_pblaze_port"
 echo "Compile i8085     $enable_i8085_port"
 echo "Compile f8        $enable_f8_port"
 echo "Compile i8048     $enable_i8048_port"
+echo "Compile oisc      $enable_oisc_port"
 echo "Compile serio     $enable_serio"
 echo "v${VERSION}"
 

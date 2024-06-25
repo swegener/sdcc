@@ -251,6 +251,7 @@ chars::lrip(const char *cset)
   if (skip > 0)
     allocate_string(chars_string+skip);
 }
+
 void
 chars::rrip(const char *cset)
 {
@@ -270,6 +271,20 @@ chars::rrip(const char *cset)
     }
 }
 
+void
+chars::rrip(int nuof_chars)
+{
+  if (empty()) return;
+  if (nuof_chars < 1) return;
+  int i= chars_length-1;
+  while ((i>=0) && nuof_chars)
+    {
+      chars_string[i]= 0;
+      i--;
+      nuof_chars--;
+    }
+}
+
 bool
 chars::starts_with(const char *x) const
 {
@@ -280,6 +295,17 @@ chars::starts_with(const char *x) const
   if (strstr(chars_string, x) == chars_string)
     return true;
   return false;
+}
+
+int
+chars::first_pos(char c)
+{
+  if (empty())
+    return -1;
+  char *pos= strchr(chars_string, c);
+  if (pos == NULL)
+    return -1;
+  return pos-chars_string;
 }
 
 

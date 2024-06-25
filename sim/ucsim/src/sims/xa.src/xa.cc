@@ -1194,7 +1194,6 @@ int cl_xa::exec_inst(void)
     break;
   }
 
-  //PC= instPC;//rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

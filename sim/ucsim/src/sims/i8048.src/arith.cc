@@ -157,4 +157,4 @@ CL2::anld(int addr, cl_memory_cell *op2)
 }
 
 
-/* End of i8085.src/arith.cc */
+/* End of i8048.src/arith.cc */

@@ -98,4 +98,4 @@ CL2::movp3(void)
 }
 
 
-/* End of i8085.src/move.cc */
+/* End of i8048.src/move.cc */

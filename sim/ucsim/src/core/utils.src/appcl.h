@@ -97,7 +97,8 @@ public:
   u32_t period, cyc, acyc;
   bool quiet;
   class cl_console_stdout *ocon;
-
+  int rgdb_port;
+  
 public:
   cl_app(void);
   virtual ~cl_app(void);

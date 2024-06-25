@@ -87,7 +87,7 @@ public:
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
   virtual void new_i(class cl_f *f_in);
   virtual void new_o(class cl_f *f_out);
-  virtual void set_raw(bool raw);
+  virtual void set_raw(void);
   virtual void del_listener_i(void);
   virtual void del_listener_o(void);
   virtual bool proc_input(void);

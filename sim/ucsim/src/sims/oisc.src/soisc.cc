@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (soisc.cc)
  *
  * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+// prj
+#include "globals.h"
+#include "utils.h"
 
+// local
+#include "simoisccl.h"
+#include "glob.h"
 
-/* End of i8048.src/inst.cc */
+int
+main(int argc, char *argv[])
+{
+  class cl_sim *sim;
+
+  app_start_at= dnow();
+  cpus= cpus_oisc;
+  application= new cl_app();
+  application->set_name("soisc");
+  application->init(argc, argv);
+  sim= new cl_simoisc(application);
+  if (sim->init())
+    sim->state|= SIM_QUIT;
+  application->set_simulator(sim);
+  application->run();
+  application->done();
+  delete application;
+  return 0;
+}
+
+/* End of oisc.src/soisc.cc */

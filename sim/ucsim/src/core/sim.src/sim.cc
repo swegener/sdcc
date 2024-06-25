@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "ddconfig.h"
 
+#define _WITH_DPRINTF
 #include <stdio.h>
 #include <stdlib.h>
 //#include <unistd.h>
@@ -391,5 +392,218 @@ cl_sim::mem_cell_changed(class cl_address_space *mem, t_addr addr)
     printf("JAJ sim\n");
 }
 */
+
+/*
+ * GDB server
+ ********************************************************************
+ */
+
+cl_rgdb_listener::cl_rgdb_listener(int serverport, class cl_app *the_app, cl_sim *asim):
+  cl_listen_console(serverport, the_app)
+{
+  sim= asim;
+}
+
+class cl_console_base *
+cl_rgdb_listener::mk_console(cl_f *fi, cl_f *fo)
+{
+  class cl_console_base *c;
+  c= new cl_rgdb(fi, fo, app, sim);
+  return c;
+}
+
+
+cl_rgdb::cl_rgdb(cl_f *fi, cl_f *fo, class cl_app *the_app, class cl_sim *asim):
+  cl_console(fi, fo, the_app)
+{
+  sim= asim;
+}
+
+int
+cl_rgdb::init(void)
+{
+  cl_base::init();
+  prev_quit= -1;
+  set_interactive(false);
+  set_flag(CONS_NOWELCOME, true);
+  set_cooked(false);
+  set_flag(CONS_ECHO, false);
+  thread_id_reported= false;
+  fin->echo(NULL);
+  ack= true;
+  //reply("S13");
+  return 0;
+}
+
+int
+cl_rgdb::read_line(void)
+{
+  int i, b[2]= { 0, 0 };
+  do {
+    i= fin->read(b, 1);
+    if (i < 0)
+      {
+	//return -1;
+      }
+    else if (i == 0)
+      {
+	// EOF
+	return -1;
+      }
+    else if (i > 0)
+      {
+	if (lbuf.empty())
+	  {
+	    if (b[0] == '$')
+	      lbuf+= (char)(b[0]);
+	    else if (b[0] == '+')
+	      {
+	      }
+	    else if (b[0] == '-')
+	      {
+	      }
+	    else if (b[0] == 3)
+	      {
+		// Ctrl-C from gdb
+	      }
+	  }
+	else
+	  {
+	    lbuf+= (char)(b[0]);
+	    int p= lbuf.first_pos('#');
+	    if (p >= 0)
+	      {
+		if (lbuf.len() > p+2)
+		  {
+		    return 1;
+		  }
+	      }
+	  }
+      }
+  }
+  while (i > 0);
+  return 0;
+}
+
+int
+cl_rgdb::proc_input(class cl_cmdset *cmdset)
+{
+  chars r;
+  int i= read_line();
+  if (i < 0)
+    {
+      return 1;
+    }
+  if (i == 0)
+    {
+      return 0;
+    }
+  if (ack)
+    {
+      send("+");
+    }
+  switch (lbuf.c_str()[1])
+    {
+    case 'q': case 'Q': procq(lbuf); break;
+    case 'H': reply("OK"); break;
+    case '?': reply("S13"); break;
+    case 'g': procg(); break;
+    default:
+      reply("");
+      break;
+    }
+  lbuf= 0;
+  return 0;
+}
+
+
+int
+cl_rgdb::procq(chars l)
+{
+  chars q= &(l.c_str()[2]);
+  q.rrip(3);
+  chars t= q.token(";#:");
+  chars r;
+
+  if (t == "fThreadInfo")
+    {
+      return reply("");
+      return reply("l");
+      if (!thread_id_reported)
+	{
+	  thread_id_reported= true;
+	  reply("m1");
+	}
+      else
+	reply("l");
+    }
+  else if (t == "C") reply("qC1");
+  else if (t == "Attached") reply("1");
+  else if (t == "Supported")
+    reply("PacketSize=7fff;QStartNoAckMode+;qXfer:features:read+");
+  else if (t == "TStatus") reply("");
+  else if (t == "StartNoAckMode")
+    {
+      ack= false;
+      reply("OK");
+    }
+  else if (t == "Xfer")
+    {
+      t= q.token(";#:");
+      if (t == "features")
+	{
+	  t= q.token(";#:");
+	  if (t == "read")
+	    {
+	      chars t;
+	      t= "l<?xml version=\"1.0\"?>\n"
+		"<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n"
+		"<target>\n"
+		"<architecture>ucsim</architecture>\n"
+		"<feature name=\"ucsim_feat\">\n"
+		"<reg name=\"r\" bitsize=\"8\" type=\"int8\" regnum=\"0\"/>\n"
+		"</feature>\n"
+                "</target>\n";
+		reply(t);
+	    }	      
+	}
+    }
+  else
+    reply("");
+
+  return 0;
+}
+
+
+/* Report register values */
+
+int
+cl_rgdb::procg(void)
+{
+  reply("00");
+  return 0;
+}
+
+
+int
+cl_rgdb::reply(const char *s)
+{
+  u8_t sum= 0;
+  int i;
+  for (i= 0; s[i]; i++)
+    sum+= s[i];
+  chars m;
+  m.format("$%s#%02x", s, sum);
+  send(m.c_str());
+  return 0;
+}
+
+void
+cl_rgdb::send(const char *s)
+{
+  dd_printf("%s", s);
+  fflush(NULL);
+}
+
 
 /* End of sim.src/sim.cc */

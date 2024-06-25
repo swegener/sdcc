@@ -80,6 +80,7 @@ class cl_listen_console: public cl_console
   virtual void welcome(void) {}
   virtual int proc_input(class cl_cmdset *cmdset);
   virtual bool set_cooked(bool new_val) { return false; }
+  virtual class cl_console_base *mk_console(cl_f *fi, cl_f *fo);
 };
 //#endif
 

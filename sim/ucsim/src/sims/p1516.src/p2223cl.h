@@ -53,14 +53,36 @@ public:
 };
 
 
+class cl_sfr_op: public cl_memory_operator
+{
+public:
+  class cl_p2223 *uc;
+  t_addr addr;
+public:
+  cl_sfr_op(class cl_memory_cell *acell,
+	    class cl_p2223 *the_uc,
+	    t_addr a):
+    cl_memory_operator(acell)
+  {
+    uc= the_uc;
+    addr= a;
+  }
+  virtual t_mem write(t_mem val);
+  virtual t_mem read(void);
+};
+
+
 class cl_p2223: public cl_p1516
 {
 public:
   //bool dbg_reg;
+  chars id_chars;
+  class cl_address_space *sfr;
 public:
   cl_p2223(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
+  virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);
   virtual char *disassc(t_addr addr, chars *comment);

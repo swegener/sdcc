@@ -78,6 +78,34 @@ public:
 };
 
 
+class cl_rgdb_listener: public cl_listen_console
+{
+protected:
+  class cl_sim *sim;
+public:
+  cl_rgdb_listener(int serverport, class cl_app *the_app, cl_sim *asim);
+  virtual class cl_console_base *mk_console(cl_f *fi, cl_f *fo);
+};
+
+class cl_rgdb: public cl_console
+{
+protected:
+  class cl_sim *sim;
+  bool thread_id_reported;
+  bool ack;
+public:
+  cl_rgdb(cl_f *fi, cl_f *fo, class cl_app *the_app, class cl_sim *asim);
+  virtual int init(void);
+  virtual int read_line(void);
+  virtual int proc_input(class cl_cmdset *cmdset);
+  virtual int procq(chars l);
+  virtual int procg(void);
+  virtual int reply(const char *s);
+  virtual int reply(chars s) { return reply(s.c_str()); }
+  virtual void send(const char *s);
+};
+
+
 #endif
 
 /* End of simcl.h */

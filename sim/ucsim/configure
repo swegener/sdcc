@@ -686,6 +686,7 @@ LDFLAGS
 CXXFLAGS
 CXX
 enable_serio
+enable_oisc_port
 enable_i8048_port
 enable_f8_port
 enable_i8085_port
@@ -784,6 +785,7 @@ enable_pblaze_port
 enable_i8085_port
 enable_f8_port
 enable_i8048_port
+enable_oisc_port
 enable_serio
 enable_statistic
 '
@@ -1449,6 +1451,7 @@ Optional Features:
   --enable-i8085-port=ARG en/disable compile i8085 simulator
   --disable-f8-port       do not compile simulator for f8
   --enable-i8048-port=ARG en/disable compile i8048 simulator
+  --enable-oisc-port=ARG  en/disable compile oisc simulator
   --enable-serio=ARG      en/disable compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
 
@@ -3175,6 +3178,7 @@ def_pblaze="yes"
 def_i8085="yes"
 def_i8048="yes"
 def_st7="yes"
+def_oisc="yes"
 
 in_sdcc="no"
 src_root=$(dirname $0)
@@ -3203,6 +3207,7 @@ if test $in_sdcc == "yes" ; then
     def_i8085="no"
     def_i8048="no"
     def_st7="no"
+    def_oisc="no"
     SILENT="yes"
 else
     SILENT="no"
@@ -3600,6 +3605,15 @@ else $as_nop
 fi
 
 
+# Check whether --enable-oisc-port was given.
+if test ${enable_oisc_port+y}
+then :
+  enableval=$enable_oisc_port;
+else $as_nop
+  enable_oisc_port=$def_oisc
+fi
+
+
 # Check whether --enable-serio was given.
 if test ${enable_serio+y}
 then :
@@ -3607,6 +3621,7 @@ then :
 else $as_nop
   enable_serio=$def_serio
 fi
+
 
 
 
@@ -8107,7 +8122,7 @@ printf "%s\n" "#define _M_ \"${M}\"" >>confdefs.h
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/common.mk:src/common_in.mk src/packages.mk:src/packages_in.mk src/core/cmd.src/Makefile src/core/motorola.src/Makefile src/core/utils.src/Makefile src/core/sim.src/Makefile src/core/sim.src/test/Makefile src/core/gui.src/Makefile src/sims/avr.src/Makefile src/sims/avr.src/test/Makefile src/sims/m68hc08.src/Makefile src/sims/m68hc08.src/test/Makefile src/sims/m6809.src/Makefile src/sims/m6809.src/test/Makefile src/sims/m6800.src/Makefile src/sims/m6800.src/test/Makefile src/sims/m68hc11.src/Makefile src/sims/m68hc11.src/test/Makefile src/sims/m68hc12.src/Makefile src/sims/m68hc12.src/test/Makefile src/sims/mos6502.src/Makefile src/sims/mos6502.src/test/Makefile src/sims/rxk.src/Makefile src/sims/rxk.src/test/Makefile src/sims/pblaze.src/Makefile src/sims/pblaze.src/test/Makefile src/sims/i8085.src/Makefile src/sims/i8085.src/test/Makefile src/sims/f8.src/Makefile src/sims/f8.src/test/Makefile src/sims/i8048.src/Makefile src/sims/i8048.src/test/Makefile src/sims/p1516.src/Makefile src/sims/p1516.src/test/Makefile src/sims/pdk.src/Makefile src/sims/pdk.src/test/Makefile src/sims/s51.src/Makefile src/sims/s51.src/test/Makefile src/sims/st7.src/Makefile src/sims/st7.src/test/Makefile src/sims/stm8.src/Makefile src/sims/stm8.src/test/Makefile src/sims/tlcs.src/Makefile src/sims/tlcs.src/test/Makefile src/sims/xa.src/Makefile src/sims/xa.src/test/Makefile src/sims/z80.src/Makefile src/sims/z80.src/test/Makefile src/apps/serio.src/Makefile src/apps/ucsim.src/Makefile src/apps/relay.src/Makefile docs/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/common.mk:src/common_in.mk src/packages.mk:src/packages_in.mk src/core/cmd.src/Makefile src/core/motorola.src/Makefile src/core/utils.src/Makefile src/core/sim.src/Makefile src/core/sim.src/test/Makefile src/core/gui.src/Makefile src/sims/avr.src/Makefile src/sims/avr.src/test/Makefile src/sims/m68hc08.src/Makefile src/sims/m68hc08.src/test/Makefile src/sims/m6809.src/Makefile src/sims/m6809.src/test/Makefile src/sims/m6800.src/Makefile src/sims/m6800.src/test/Makefile src/sims/m68hc11.src/Makefile src/sims/m68hc11.src/test/Makefile src/sims/m68hc12.src/Makefile src/sims/m68hc12.src/test/Makefile src/sims/mos6502.src/Makefile src/sims/mos6502.src/test/Makefile src/sims/rxk.src/Makefile src/sims/rxk.src/test/Makefile src/sims/pblaze.src/Makefile src/sims/pblaze.src/test/Makefile src/sims/i8085.src/Makefile src/sims/i8085.src/test/Makefile src/sims/f8.src/Makefile src/sims/f8.src/test/Makefile src/sims/i8048.src/Makefile src/sims/i8048.src/test/Makefile src/sims/p1516.src/Makefile src/sims/p1516.src/test/Makefile src/sims/pdk.src/Makefile src/sims/pdk.src/test/Makefile src/sims/s51.src/Makefile src/sims/s51.src/test/Makefile src/sims/st7.src/Makefile src/sims/st7.src/test/Makefile src/sims/stm8.src/Makefile src/sims/stm8.src/test/Makefile src/sims/tlcs.src/Makefile src/sims/tlcs.src/test/Makefile src/sims/xa.src/Makefile src/sims/xa.src/test/Makefile src/sims/z80.src/Makefile src/sims/z80.src/test/Makefile src/sims/oisc.src/Makefile src/sims/oisc.src/test/Makefile src/apps/serio.src/Makefile src/apps/ucsim.src/Makefile src/apps/relay.src/Makefile docs/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8847,6 +8862,8 @@ do
     "src/sims/xa.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/xa.src/test/Makefile" ;;
     "src/sims/z80.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/z80.src/Makefile" ;;
     "src/sims/z80.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/z80.src/test/Makefile" ;;
+    "src/sims/oisc.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/oisc.src/Makefile" ;;
+    "src/sims/oisc.src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/sims/oisc.src/test/Makefile" ;;
     "src/apps/serio.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/serio.src/Makefile" ;;
     "src/apps/ucsim.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/ucsim.src/Makefile" ;;
     "src/apps/relay.src/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/relay.src/Makefile" ;;
@@ -9462,6 +9479,7 @@ echo "Compile pblaze    $enable_pblaze_port"
 echo "Compile i8085     $enable_i8085_port"
 echo "Compile f8        $enable_f8_port"
 echo "Compile i8048     $enable_i8048_port"
+echo "Compile oisc      $enable_oisc_port"
 echo "Compile serio     $enable_serio"
 echo "v${VERSION}"
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (emcl.h)
  *
  * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+#ifndef EMCL_HEADER
+#define EMCL_HEADER
+
+#include "misc16cl.h"
 
 
-/* End of i8048.src/inst.cc */
+class cl_em: public cl_misc16
+{
+public:
+  u16_t rP;
+  class cl_cell16 cP;
+public:
+  cl_em(class cl_sim *asim);
+  virtual void print_regs(class cl_console_base *con);
+  virtual const char *dis_src(t_addr addr);
+  virtual const char *dis_dst(t_addr addr);
+  virtual chars dis_comment(t_addr src, t_addr dst);
+
+  virtual void init_alu(void);
+  virtual u16_t read(u16_t addr);
+  virtual u16_t write(u16_t addr, u16_t val);
+};
+
+
+#endif
+
+/* End of oisc.src/emcl.h */

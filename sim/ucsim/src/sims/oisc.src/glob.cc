@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (glob.cc)
  *
  * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+#include <stdio.h>
 
+#include "glob.h"
 
-/* End of i8048.src/inst.cc */
+struct cpu_entry cpus_oisc[]=
+  {
+    {"OISC"	, CPU_OISC, 0		, "OISC", ""},
+    {"URISC"	, CPU_URISC, 0		, "USISC", ""},
+    {"U"	, CPU_URISC, 0		, "USISC", ""},
+    {"MISC16"	, CPU_MISC16, 0		, "MISC16", ""},
+    {"M"	, CPU_MISC16, 0		, "MISC16", ""},
+    {"EM"	, CPU_EM, 0		, "EM", ""},
+    {"E"	, CPU_EM, 0		, "EM", ""},
+
+    {NULL, CPU_NONE, 0, "", ""}
+  };
+
+/* End of oisc.src/glob.cc */

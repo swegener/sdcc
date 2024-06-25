@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (glob.h)
  *
  * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+#ifndef OISC_GLOB_HEADER
+#define OISC_GLOB_HEADER
+
+#include "stypes.h"
 
 
-/* End of i8048.src/inst.cc */
+extern struct cpu_entry cpus_oisc[];
+
+
+#endif
+
+/* End of oisc.src/glob.h */

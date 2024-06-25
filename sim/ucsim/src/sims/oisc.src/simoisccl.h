@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (inst.cc)
+ * Simulator of microcontrollers (simoisccl.h)
  *
  * Copyright (C) 2022 Drotos Daniel, Talker Bt.
  * 
@@ -25,7 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+#ifndef SIMOISCCL_HEADER
+#define SIMOISCCL_HEADER
+
+#include "simcl.h"
 
 
-/* End of i8048.src/inst.cc */
+class cl_simoisc: public cl_sim
+{
+public:
+  cl_simoisc(class cl_app *the_app);
+
+  virtual class cl_uc *mk_controller(void);
+};
+
+
+#endif
+
+/* End of oisc.src/simoisccl.h */

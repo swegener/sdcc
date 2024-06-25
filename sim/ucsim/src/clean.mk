@@ -1,4 +1,3 @@
-all: clean
 
 clean: local_clean sub_clean
 

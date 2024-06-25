@@ -736,7 +736,6 @@ cl_z80::inst_cb(void)
       return (inst_cb_set(code));
     }
 
-  //PC= instPC;//rom->inc_address(PC, -1);
   return(resINV_INST);
 }
 

@@ -107,7 +107,7 @@ cl_app::init(int argc, char *argv[])
   ocon->init();
   commander= new cl_commander(this, cmdset/*, sim*/);
   commander->init();
-
+  rgdb_port= 0;
   return(0);
 }
 
@@ -288,7 +288,7 @@ print_help(const char *name)
 	 "       [-C cfg_file] [-c file] [-e command] [-s file] [-S optionlist]\n"
 	 "       [-I if_optionlist] [-o colorlist] [-a nr]\n"
 #ifdef SOCKET_AVAIL
-	 "       [-z portnum] [-Z portnum] [-k portnum]"
+	 "       [-z portnum] [-Z portnum] [-k portnum] "//"[-d portnum]"
 #endif
 	 "\n"
 	 "       [files...]\n", name);
@@ -299,15 +299,32 @@ print_help(const char *name)
                1         2         3         4         5         6         7         8
       */
      "Options:\n"
-     "  -t CPU       Type of CPU: 51, C52, 251, etc.\n"
-     "  -X freq[k|M] XTAL frequency\n"
-     "  -R seed      Set the random number generator seed value\n"
-     "  -C cfg_file  Read initial commands from `cfg_file' and execute them\n"
-     "  -e command   Execute command on startup\n"
+     "  -a nr        Specify size of variable space (default=256)\n"
+     "  -b           Black & white (non-color) theme\n"
+     "  -B           Beep on breakpoints\n"
      "  -c file      Open command console on `file' (use `-' for std in/out)\n"
-     "  -z portnum   Listen portnum for command console\n"
-     "  -Z portnum   Listen portnum for command console (no console on stdio)\n"
+     "  -C cfg_file  Read initial commands from `cfg_file' and execute them\n"
+   //"  -d portnum   Act as gdbserver, listen on portnum for gdb connections\n"
+     "  -e command   Execute command on startup\n"
+     "  -E           Go, start simulation in emulation mode\n"
+     "  -g           Go, start simulation\n"
+     "  -G           Go, start simulation, quit on stop\n"
+     "  -h           Print out this help and quit\n"
+     "  -H           Print out types of known CPUs and quit\n"
+     "  -I options   `options' is a comma separated list of options according to\n"
+     "               simulator interface. Known options are:\n"
+     "                 if=memory[address]  turn on interface on given memory location\n"
+     "                 in=file             specify input file for IO\n"
+     "                 out=file            specify output file for IO\n"
      "  -k portnum   Listen portnum for serial I/O (obsolete, use -S)\n"
+     "  -l           Use light theme (default is dark)\n"
+     "  -o colors    `colors' is a list of color specification: what=colspec,...\n"
+     "               where colspec is : separated list of color options\n"
+     "               e.g.: prompt=b:white:black (bold white on black)\n"
+     "  -p prompt    Specify string for prompt\n"
+     "  -P           Prompt is a null ('\\0') character\n"
+     "  -q           Quiet mode (implies -b)\n"
+     "  -R seed      Set the random number generator seed value\n"
      "  -s file      Connect serial interface uart0 to `file' (obsolete, use -S)\n"
      "  -S options   `options' is a comma separated list of options according to\n"
      "               serial interface. Know options are:\n"
@@ -318,29 +335,13 @@ print_help(const char *name)
      "                  iport=nr  use localhost:nr as server for serial input\n"
      "                  oport=nr  use localhost:nr as server for serial output\n"
      "                  raw       perform non-interactive communication even on tty\n"
-     "  -I options   `options' is a comma separated list of options according to\n"
-     "               simulator interface. Known options are:\n"
-     "                 if=memory[address]  turn on interface on given memory location\n"
-     "                 in=file             specify input file for IO\n"
-     "                 out=file            specify output file for IO\n"
-     "  -p prompt    Specify string for prompt\n"
-     "  -P           Prompt is a null ('\\0') character\n"
-     "  -o colors    `colors' is a list of color specification: what=colspec,...\n"
-     "               where colspec is : separated list of color options\n"
-     "               e.g.: prompt=b:white:black (bold white on black)\n"
-     "  -l           Use light theme (default is dark)\n"
-     "  -b           Black & white (non-color) theme\n"
-     "  -B           Beep on breakpoints\n"
-     "  -g           Go, start simulation\n"
-     "  -G           Go, start simulation, quit on stop\n"
-     "  -E           Go, start simulation in emulation mode\n"
-     "  -a nr        Specify size of variable space (default=256)\n"
-     "  -w           Writable flash\n"
-     "  -V           Verbose mode\n"
-     "  -q           Quiet mode (implies -b)\n"
+     "  -t CPU       Type of CPU: 51, C52, 251, etc.\n"
      "  -v           Print out version number and quit\n"
-     "  -H           Print out types of known CPUs and quit\n"
-     "  -h           Print out this help and quit\n"
+     "  -V           Verbose mode\n"
+     "  -w           Writable flash\n"
+     "  -X freq[k|M] XTAL frequency\n"
+     "  -z portnum   Listen portnum for command console\n"
+     "  -Z portnum   Listen portnum for command console (no console on stdio)\n"
      );
 }
 
@@ -392,7 +393,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 
   strcpy(opts, "qc:C:e:p:PX:vVt:s:S:I:a:whHgGEJo:blBR:_");
 #ifdef SOCKET_AVAIL
-  strcat(opts, "Z:r:k:z:");
+  strcat(opts, "Z:r:k:z:d:");
 #endif
 
   for (i= 0; i < argc; i++)
@@ -592,6 +593,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  free(s);
 	  break;
 	}
+      case 'd':
+	rgdb_port= strtol(optarg, 0, 0);
+	break;
 #endif
       case 'S':
 	{

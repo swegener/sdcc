@@ -112,7 +112,7 @@ cl_oisc::make_memories(void)
   as->init();
   address_spaces->add(as);
 
-  chip= new cl_chip8("rom_chip", 0x10000, 16);
+  chip= new cl_chip8("rom_chip", 0x10000, 16, 0);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom,
@@ -239,6 +239,7 @@ cl_oisc::inst_length(t_addr addr)
 void
 cl_oisc::reset(void)
 {
+  cl_uc::reset();
 }
 
 int
@@ -253,6 +254,7 @@ cl_oisc::exec_inst(void)
       PC+= 2;
       PC&= 0xffff;
       rom->write(dst, tmp);
+      tick(4);
     }
   return ret;
 }

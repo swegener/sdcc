@@ -128,6 +128,7 @@ void
 cl_em::init_alu(void)
 {
   cl_misc16::init_alu();
+  id_str= "Extended-MISC16";
   reg_cell_var(&cP, &rP, "P", "Pointer register");
   class cl_memory_cell *c;
   c= rom->get_cell(5); c->append_operator(new cl_op_pass(c, this));

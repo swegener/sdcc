@@ -67,6 +67,10 @@ cl_serial_hw::init(void)
   
   make_io();
   input_avail= false;
+  sending_nl= false;
+  skip_nl= false;
+  nl_value= 10;
+  nl_send_idx= 0;
   
   cs.format("serial%d_in_file", id);
   serial_in_file_option= new cl_optref(this, cs.c_str());
@@ -408,6 +412,40 @@ cl_serial_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
   return cell->get();
 }
 
+u8_t
+cl_serial_hw::get_input(void)
+{
+  if (!input_avail)
+    return 0;
+  if (!sending_nl)
+    {
+      if (!is_nl(input))
+	{
+	  input_avail= false;
+	  return input;
+	}
+      skip_nl= true;
+      sending_nl= true;
+      nl_send_idx= 0;
+    }
+  if (sending_nl)
+    {
+      u8_t v= (nl_value >> (nl_send_idx*8)) & 0xff;
+      u8_t vn= (nl_value >> ((nl_send_idx+1)*8)) & 0xff;
+      if (vn == 0)
+	{
+	  sending_nl= false;
+	  input_avail= false;
+	  nl_send_idx= 0;
+	}
+      else
+	nl_send_idx++;
+      return v;
+    }
+  input_avail= false;
+  return input;
+}
+
 void
 cl_serial_hw::make_io()
 {
@@ -566,8 +604,14 @@ cl_serial_hw::proc_input(void)
 		}
 	      else if (!input_avail)
 		{
-		  input= c;
-		  input_avail= true;
+		  if (skip_nl && is_nl(c))
+		    ;
+		  else
+		    {
+		      input= c;
+		      input_avail= true;
+		      skip_nl= false;
+		    }
 		}
 	      else
 		fin->unget(c);
@@ -580,9 +624,14 @@ cl_serial_hw::proc_input(void)
 	    {
 	      if (fin->read(&c, 1))
 		{
-		  input= c;
-		  input_avail= true;
-		  cfg_set(serconf_able_receive, 0);
+		  if (skip_nl && is_nl(c))
+		    ;
+		  else
+		    {
+		      input= c;
+		      input_avail= true;
+		      cfg_set(serconf_able_receive, 0);
+		    }
 		}
 	    }
 	}
@@ -678,6 +727,9 @@ void
 cl_serial_hw::reset(void)
 {
   cfg_set(serconf_able_receive, 1);
+  sending_nl= false;
+  nl_send_idx= 0;
+  skip_nl= false;
 }
 
 cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,

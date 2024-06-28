@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include "uartcl.h"
+
 #include "misc16cl.h"
 
 
@@ -65,6 +67,16 @@ cl_misc16::cl_misc16(class cl_sim *asim):
 }
 
 void
+cl_misc16::mk_hw_elements(void)
+{
+  class cl_hw *h;
+  cl_oisc::mk_hw_elements();
+
+  add_hw(h= new cl_uart(this, 0, 0xfffb));
+  h->init();
+}
+
+void
 cl_misc16::reset(void)
 {
   cl_oisc::reset();
@@ -78,7 +90,7 @@ cl_misc16::sub(u16_t a, u16_t b)
 
   b= ~b;
   s= a+b+1;
-  rC= (((a&b)|((a|b)&~s))&0x8000)?1:0;
+  rC= (((a&b)|((a|b)&~s))&0x8000)?0:1;
   return s;
 }
 
@@ -191,6 +203,12 @@ cl_misc16::dis_comment(t_addr src, t_addr dst)
       else s+= "; ";
       s.appendf("[src=0x%04x]=0x%04x", rA, rom->read(rA));
     }
+  else
+    {
+      if (s.nempty()) s+= ", ";
+      else s+= "; ";
+      s.appendf("[src=0x%04x]=0x%04x", src, rom->read(src));
+    }
   return s;
 }
 
@@ -204,7 +222,7 @@ cl_misc16::read(u16_t addr)
     case 1: return (PC+2)&0xffff;
     case 2: return (PC+4)&0xffff;
     case 3: return (PC+6)&0xffff;
-    case 7: return rom->read(rA);
+    case 7: return (rA==7)?rA:(rom->read(rA));
     case 8: return rA;
     }
   return rom->get(addr);
@@ -226,10 +244,30 @@ cl_misc16::write(u16_t addr, u16_t val)
     case 12: cA.W(val= rA^val); break;
     case 13: cA.W(val= rA|val); break;
     case 14: cA.W(val= rA&val); break;
-    case 15: cA.W(val= shift(rA)); break;
+    case 15: cA.W(val= shift(val)); break;
     }
   return val;
 }
+
+
+/*
+int
+cl_misc16::exec_inst(void)
+{
+  bool ret= do_brk();
+  if (!ret)
+    {
+      u16_t src= rom->read(PC);
+      u16_t dst= rom->read((PC+1) & 0xffff);
+      u16_t tmp= rom->read(src);
+      PC+= 2;
+      PC&= 0xffff;
+      rom->write(dst, tmp);
+      tick(4);
+    }
+  return ret;
+}
+*/
 
 
 /* End of oisc.src/misc16.cc */

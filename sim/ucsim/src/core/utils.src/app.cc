@@ -98,6 +98,7 @@ cl_app::init(int argc, char *argv[])
   cl_base::init();
   if (!have_real_name())
     set_name("application");
+  rgdb_port= 0;
   mk_options();
   proc_arguments(argc, argv);
   class cl_cmdset *cmdset= new cl_cmdset();
@@ -107,7 +108,6 @@ cl_app::init(int argc, char *argv[])
   ocon->init();
   commander= new cl_commander(this, cmdset/*, sim*/);
   commander->init();
-  rgdb_port= 0;
   return(0);
 }
 

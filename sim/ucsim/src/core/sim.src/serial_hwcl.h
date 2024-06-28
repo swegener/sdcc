@@ -72,6 +72,10 @@ protected:
   bool input_avail;
   char menu;
   bool is_raw;
+  bool sending_nl;
+  bool skip_nl;
+  u32_t nl_value;
+  int nl_send_idx;
 public:
   cl_serial_hw(class cl_uc *auc, int aid, chars aid_string);
   virtual ~cl_serial_hw(void);
@@ -82,6 +86,8 @@ public:
   virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual void set_help(class cl_console_base *con);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual bool is_nl(char c) { return (c=='\n') || (c=='\r'); }
+  virtual u8_t get_input(void);
 
   virtual void make_io(void);
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
@@ -94,7 +100,7 @@ public:
   virtual void refresh_display(bool force) {}
   virtual void draw_state_time(bool force) {}
   virtual void draw_display(void) {}
-
+  
   virtual void reset(void);
 };
 

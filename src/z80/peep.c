@@ -396,7 +396,9 @@ z80MightRead(const lineNode *pl, const char *what)
     {
       if(argCont(strchr(pl->line, ','), what))
         return(true);
-      if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
+      if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) &&
+        (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')) &&
+        (strchr(pl->line, '_') == 0 || strchr(pl->line, '_') > strchr(pl->line, ',')))
         return(true);
       if (!strcmp(what, "sp") && strchr(pl->line, '(')) // Assume any indirect memory access to be a stack access. This avoids optimizing out stackframe setups for local variables (bug #3173).
         return(true);

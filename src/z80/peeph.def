@@ -1341,8 +1341,8 @@ replace restart {
 	ld	(%1), a
 	xor	a, a
 } by {
-	xor a, a
-	ld  (%1), a
+	xor	a, a
+	ld	(%1), a
 	; common peephole 94a' reused constant #0 in a.
 }
 
@@ -1817,12 +1817,22 @@ replace restart {
 replace restart {
 	ld	%1, (hl)
 	ld	a, %2
-	sub	a, %1
+	%3	a, %1
 } by {
 	ld	a, %2
-	; common peephole 115a used (hl) in comparison instead of going through %1.
-	sub	a, (hl)
-} if notVolatile(%2), notUsed(%1)
+	; common peephole 115a used (hl) in in %3 instead of going through %1.
+	%3	a, (hl)
+} if notVolatile(%2), notUsed(%1), same(%3 'adc' 'and' 'add' 'cp' 'or' 'sbc' 'sub' 'xor')
+
+replace restart {
+	ld	%1, (hl)
+	xor	a, a
+	%3	a, %1
+} by {
+	xor	a, a
+	; common peephole 115b used (hl) in subtraction instead of going through %1.
+	%3	a, (hl)
+} if notUsed(%1), same(%3 'and' 'add' 'cp' 'or' 'sub' 'xor')
 	
 // TODO: Check for volatile?
 replace restart {

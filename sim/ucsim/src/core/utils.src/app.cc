@@ -1425,32 +1425,32 @@ cl_app::mk_options(void)
   o->set_value("white:red");
   
   options->new_option(o= new cl_string_option(this, "color_led_on",
-					      ""));
+					      "ON LED color on FPGA display"));
   o->init();
   o->set_value("b:green:black");
   
   options->new_option(o= new cl_string_option(this, "color_led_off",
-					      ""));
+					      "OFF LED color on FPGA display"));
   o->init();
   o->set_value("white:black");
   
   options->new_option(o= new cl_string_option(this, "color_btn_on",
-					      ""));
+					      "ON button color on FPGA display"));
   o->init();
   o->set_value("bcyan:black");
   
   options->new_option(o= new cl_string_option(this, "color_btn_off",
-					      ""));
+					      "OFF button color on FPGA display"));
   o->init();
   o->set_value("white:black");
   
   options->new_option(o= new cl_string_option(this, "color_sw_on",
-					      ""));
+					      "ON switch color on FPGA display"));
   o->init();
   o->set_value("bcyan:black");
   
   options->new_option(o= new cl_string_option(this, "color_sw_off",
-					      ""));
+					      "OFF switch color on FPGA display"));
   o->init();
   o->set_value("white:black");
   

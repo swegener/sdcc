@@ -41,7 +41,8 @@ enum serial_cfg {
   serconf_received	= 4,
   serconf_flowctrl	= 5,
   serconf_able_receive	= 6,
-  serconf_nr		= 7
+  serconf_nl		= 7,
+  serconf_nr		= 8
 };
 
 
@@ -73,7 +74,7 @@ protected:
   char menu;
   bool is_raw;
   bool sending_nl;
-  bool skip_nl;
+  int skip_nl;
   u32_t nl_value;
   int nl_send_idx;
 public:
@@ -87,6 +88,7 @@ public:
   virtual void set_help(class cl_console_base *con);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual bool is_nl(char c) { return (c=='\n') || (c=='\r'); }
+  virtual char opposite_nl(char c) { return (c=='\n')?'\r':((c=='\r')?'\n':c); }
   virtual u8_t get_input(void);
 
   virtual void make_io(void);

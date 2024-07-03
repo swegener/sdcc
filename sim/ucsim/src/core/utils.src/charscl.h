@@ -80,6 +80,8 @@ public:
   // search
   bool starts_with(const char *x) const;
   int first_pos(char c);
+  long int lint(void);
+  long int lint(int base);
 public:
   // Operators
 

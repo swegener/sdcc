@@ -181,7 +181,7 @@ cl_cia::write(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_cia::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
-  if (addr < serconf_common)
+  if (addr < serconf_nr)
     return cl_serial_hw::conf_op(cell, addr, val);
   switch ((enum acia_cfg)addr)
     {

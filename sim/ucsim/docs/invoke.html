@@ -6,8 +6,9 @@
   <body style=" background-color: white;">
     
     <h1>Starting the simulator</h1>
-
-    There are separate programs to simulate different microcontroller families:
+    
+    There are separate programs to simulate different microcontroller
+    families:
 
     <p>Intel MCS48 family is simulated by <b>ucsim_i8048</b> <br>
       Intel MCS51 family is simulated by <b>ucsim_51</b> <br>
@@ -34,22 +35,26 @@
 
     <p>The simulator can be started in the following way: </p>
 
-    <p><tt><font color="blue">$</font> ucsim_51 [-hHVvPgGEwlbB] [-p prompt] [-t CPU] [-X
-        freq[k|M]] [-R seed] [-C cfg_file] [-e command] [-c file] [-s file] [-S
-      optionlist] [-I if_optionlist] [-a nr] [-z portnum] [-Z portnum] [-k portnum] <!-- -d portnum -->[-o colorlist] [files...]</tt> </p>
+    <p><tt><font color="blue">$</font> ucsim_XXX [-bBEgGhHlPqVvw] [-a
+      nr] [-c file] [-C cfg_file] [-e command] [-I if_optionlist] [-k
+      portnum] [-o colorlist] [-p prompt] [-R seed]\n [-s file] [-S
+      optionlist] [-t CPU] [-U uartnr] [-u hw] [-X freq[k|M]]\n [-z
+      portnum] [-Z portnum] [files...]</tt> </p>
     
-    <p>Specified files must be names of Intel hex files. Simulator loads them in
-      the specified order into the ROM of the simulated system. If the file is
-      specified without extension, the simulator will try to find intel hex file
-      (filename extended with .hex), omf file (with .omf) and cdb file (with
-      .cdb extension). Simulator can interpret content of these SDCC output
+    <p>Specified files must be names of Intel hex files. Simulator
+      loads them in the specified order into the ROM of the simulated
+      system. If the file is specified without extension, the
+      simulator will try to find intel hex file (filename extended
+      with .hex), omf file (with .omf) and cdb file (with .cdb
+      extension). Simulator can interpret content of these SDCC output
       files and reads information from them.</p>
     
     <p>Options: </p>
 
     <dl>
 
-      <dt><span style="font-family: monospace;"><b>-a nr</b></span></dt>
+      <dt><span style="font-family: monospace;"><b>-a
+      nr</b></span></dt>
       
       <dd>Set size of variable space. Default is 256.</dd>
 
@@ -67,9 +72,10 @@
 
       <dt><a name="lccoption"><tt><b>-c file</b></tt></a> </dt>
 
-      <dd>Open command console on <b>file</b>. Command consoles are on standard
-        input and output by default. Using this option the console can be opened
-        on any file for example on the serial interface of the computer.</dd>
+      <dd>Open command console on <b>file</b>. Command consoles are on
+        standard input and output by default. Using this option the
+        console can be opened on any file for example on the serial
+        interface of the computer.</dd>
 
       
       <dt><span style="font-family: monospace;"><b>-C cfg_file</b></span></dt>
@@ -82,23 +88,24 @@
       <dd>Act as gdbserver, listen on <b>portnum</b> for gdb connections.</dd>
 -->
       
-      <dt><b><span style="font-family: monospace;">-e command</span></b></dt>
+      <dt><b><tt>-e command</tt></b></dt>
 
-      <dd>Execute command at program startup (before config file).</dd>
+      <dd>Execute command at program startup (before config
+      file).</dd>
 
 
       <dt><tt><b>-E</b></tt></dt>
 
-      <dd>Start simulation when the program is loaded, but use emulation
-	mode instead of normal run mode.</dd>
+      <dd>Start simulation when the program is loaded, but use
+	emulation mode instead of normal run mode.</dd>
 
 
-      <dt><span style="font-family: monospace;"><b>-g</b></span></dt>
+      <dt><tt><b>-g</b></tt></dt>
 
       <dd>Go, start simulation when the program is loaded.</dd>
 
       
-      <dt><span style="font-family: monospace;"><b>-G</b></span></dt>
+      <dt><tt><b>-G</b></tt></dt>
 
       <dd>Start simulation when the program is loaded and terminate the
         simulator when the simulation stops (maybe on breakpoint).</dd>
@@ -116,13 +123,13 @@
         used to determine CPU type using <tt><b>-t</b></tt> option. </dd>
 
 
-      <dt><span style="font-family: monospace;"><b>-I
-        if=memory[address],in=file,out=file</b></span></dt>
+      <dt><tt><b>-I if=memory[address],in=file,out=file</b></tt></dt>
 
       <dd>Specify options (as comma separated list) for the simulator interface.
-        <b>if</b> option turns on the interface and specifies address space and
-        location for use by the interface. <b>in</b> and <b>out</b> can be
-        used to specify file names to use for file IO.
+        <b>if</b> option turns on the interface and specifies address
+        space and location for use by the interface. <b>in</b>
+        and <b>out</b> can be used to specify file names to use for
+        file IO.
 	<br>See <a href="simif.html">more about simulator interface</a>.</dd>
 
 
@@ -139,10 +146,10 @@
       <dd>Use colors of light theme (default is dark)</dd>
 
 
-      <dt><span style="font-family: monospace;"><b>-o colorsetting,...<br>
-      </b></span></dt>
+      <dt><tt><b>-o colorsetting,...<br>
+      </b></tt></dt>
 
-      <dd>List of color settings in form: <span style="font-family: monospace;">what=colspec,...</span>
+      <dd>List of color settings in form: <tt>what=colspec,...</tt>
         where <i>what</i> specifies object to be colored and <i>colspec</i> is
         : separated list of color options e.g.: prompt=b:white:black (bold white
         on black).<br>
@@ -276,22 +283,41 @@
 
       <dt><tt><b>-t CPU</b></tt> </dt>
 
-      <dd>Type of CPU. Recognized types are different for different simulators,
-        for example MCS51 simulator recognizes 51, 8051, 8751, C51, 80C51,
-        87C51, 31, 8031, C31, 80C31, 52, 8052, 8752, C52, 80C52, 87C52, 32,
-        8032, C32, 80C32, 51R, 51RA, 51RB, 51RC, C51R, C51RA, C51RB, C51RC,
-        89C51R, 251, C251, DS390, DS390F. Note that recognition of a CPU type as
-        option does not mean that the simulator can simulate that kind of CPU.
-        Default type is C51. <br>
-        DS390 supports Dallas DS80C390 24 bit flat mode, dual-dptr operations,
-        etc. DS390F is the same as DS390, but it starts already in 24 bit flat
-        mode (ACON = 0xFA instead of 0xF8). DS390F is needed to run programs
+      <dd>Type of CPU. Recognized types are different for different
+        simulators, for example MCS51 simulator recognizes 51, 8051,
+        8751, C51, 80C51, 87C51, 31, 8031, C31, 80C31, 52, 8052, 8752,
+        C52, 80C52, 87C52, 32, 8032, C32, 80C32, 51R, 51RA, 51RB,
+        51RC, C51R, C51RA, C51RB, C51RC, 89C51R, 251, C251, DS390,
+        DS390F. Note that recognition of a CPU type as option does not
+        mean that the simulator can simulate that kind of CPU.
+        Default type is C51. <br> DS390 supports Dallas DS80C390 24
+        bit flat mode, dual-dptr operations, etc. DS390F is the same
+        as DS390, but it starts already in 24 bit flat mode (ACON =
+        0xFA instead of 0xF8). DS390F is needed to run programs
         compiled with sdcc -mds390.<br>
-        <span style="font-family: monospace;">-H</span> option can be used to
-        list all of recognized CPU types.<br>
-        See <a href="cpu_types.html">how to select CPU type</a>. </dd>
+        <tt>-H</tt> option can be used to list all of recognized CPU
+        types.<br>  See <a href="cpu_types.html">how to select CPU
+        type</a>. </dd>
 
 
+      <dt><tt><b>-U uartnr</b></tt></dt>
+
+      <dd>Connect console of standard io to uart as
+      a <a href="display.html#uart_display">display</a> of it. ID of
+      the uart must be specified as parameter to -U option.</dd>
+
+
+      <dt><tt><b>-u hw</b></tt></dt>
+
+      <dd>Connect console of standard io to a hardware element
+      specified as option parameter as
+      a <a href="display.html#uart_display">display</a>. Hardware
+      element can be specified in the same way as
+      in <a href="cmd_general.html#info_hardware">info hardware</a>
+      command.
+      </dd>
+
+      
       <dt><tt><b>-v</b></tt> </dt>
 
       <dd>Print out version number and stop. </dd>
@@ -299,8 +325,9 @@
 
       <dt><tt><b>-V</b></tt> </dt>
 
-      <dd>Verbose mode. The simulator notifies you about some kind of internal
-        actions for example interrupts. Messages are printed on command console.
+      <dd>Verbose mode. The simulator notifies you about some kind of
+        internal actions for example interrupts. Messages are printed
+        on command console.
       </dd>
 
 
@@ -311,9 +338,10 @@
 
       <dt><tt><b>-X freq[k|M]</b></tt> </dt>
 
-      <dd>XTAL frequency is <b>freq</b> Hertz. <b>k</b> or <b>M</b> can be
-        used to specify frequency in kHZ or MHz. Space is not allowed between
-        the number and the <b>k</b> or <b>M</b>. Default value is 11059200 Hz.
+      <dd>XTAL frequency is <b>freq</b> Hertz. <b>k</b> or <b>M</b>
+        can be used to specify frequency in kHZ or MHz. Space is not
+        allowed between the number and the <b>k</b>
+        or <b>M</b>. Default value is 11059200 Hz.
         <a name="lccoption"></a></dd>
 
       <dt><a name="lczoption"><tt><b>-z portnum</b></tt></a></dt>
@@ -322,23 +350,27 @@
 	listens on port <b>portnum</b> for incoming connections and
 	servs command consoles for clients. Port number can be changed
 	using this option.
-	<a href="cmd_general.html#q">quit</a> command exits <i>&micro;Csim</i> only
-	if not active connection is opened to this port. <a href="cmd_general.html#kill">kill</a>
-	command can be used to close all connections and quit <i>&micro;Csim</i> immediately.
+	<a href="cmd_general.html#q">quit</a> command
+	exits <i>&micro;Csim</i> only if not active connection is
+	opened to this port. <a href="cmd_general.html#kill">kill</a>
+	command can be used to close all connections and
+	quit <i>&micro;Csim</i> immediately.
       </dd>
       
       <dt><a name="ucZoption"><tt><b>-Z portnum</b></tt></a> </dt>
       
-      <dd>Listen for incoming connections on port <b>portnum</b>. Using this
-        option <i>&micro;Csim</i> can serve multiple consoles. You can
-        get a console by simply telnet into machine running <i>&micro;Csim</i>
-	to port <b>portnumber</b>.  This option is not available on
+      <dd>Listen for incoming connections on
+        port <b>portnum</b>. Using this option <i>&micro;Csim</i> can
+        serve multiple consoles. You can get a console by simply
+        telnet into machine running <i>&micro;Csim</i> to
+        port <b>portnumber</b>.  This option is not available on
         platforms which doesn't support BSD networking. If -Z option
         is used, instead of <a href="#lczoption">-z</a>, then default
-	console on stdio will not be opened, and the only way to open
-	a console is using telnet to portnum.
+        console on stdio will not be opened, and the only way to open
+        a console is using telnet to portnum.
 
-	<br> See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
+	<br> See <a href="mulcons.html">how to use multiple
+	consoles</a>. </dd>
       
 
       <!-- ----------------------------------------------------------------------------- -->

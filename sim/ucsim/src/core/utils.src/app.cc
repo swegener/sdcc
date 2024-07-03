@@ -80,6 +80,9 @@ cl_app::cl_app(void)
   period= 0;
   cyc= 0;
   acyc= 0;
+  con_hw_cath= HW_DUMMY;
+  con_hw_id= -1;
+  con_hw_name= "";
 }
 
 cl_app::~cl_app(void)
@@ -145,6 +148,48 @@ cl_app::exec_startup_cmd(void)
     exec(startup_command);
 }
 
+void
+cl_app::check_con_hw(void)
+{
+  class cl_hw *hw= 0;
+  //int hw_idx;
+  if (con_hw_id >= 0)
+    {
+      hw= sim->uc->get_hw(con_hw_cath, con_hw_id, 0);
+    }
+  else if (con_hw_name.nempty())
+    {
+      con_hw_name.start_parse();
+      chars name, id;
+      name= con_hw_name.token("[,");
+      id= con_hw_name.token("],");
+      if (id.empty())
+	hw= sim->uc->get_hw(name.c_str(), id.lint(), 0);
+      else
+	hw= sim->uc->get_hw(name.c_str(), 0);
+    }
+  else
+    return;
+  if (hw == 0)
+    {
+      fprintf(stderr, "No hw found\n");
+      return;
+    }
+  class cl_console_base *con= commander->std_console;
+  if (con == 0)
+    {
+      fprintf(stderr, "No consol on standard io\n");
+      return;
+    }
+  con->dd_printf("Converting console to display of %s[%d]...\n",
+		 hw->id_string, hw->id);
+  hw->new_io(con->get_fin(), con->get_fout());
+  if (hw->get_io())
+    con->drop_files();
+  else
+    con->dd_printf("%s[%d]: no display\n", hw->id_string, hw->id);
+}
+
 int
 cl_app::check_start_options(void)
 {
@@ -181,6 +226,7 @@ cl_app::run(void)
   read_conf_file();
   read_input_files();
   exec_startup_cmd();
+  check_con_hw();
   check_start_options();
   if (commander->consoles_prevent_quit() < 1)
     done= 1;
@@ -283,13 +329,20 @@ cl_app::done(void)
 static void
 print_help(const char *name)
 {
-  printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvPgGEwlbBq] [-p prompt] [-t CPU] [-X freq[k|M]] [-R seed]\n"
-	 "       [-C cfg_file] [-c file] [-e command] [-s file] [-S optionlist]\n"
-	 "       [-I if_optionlist] [-o colorlist] [-a nr]\n"
 #ifdef SOCKET_AVAIL
-	 "       [-z portnum] [-Z portnum] [-k portnum] "//"[-d portnum]"
+#define ZOPT "[-z portnum] [-Z portnum]"
+#define KOPT "[-k portnum]"
+#define DOPT //"[-d portnum]"
+#else
+#define ZOPT
+#define KOPT
+#define DOPT
 #endif
+  printf("%s: %s\n", name, VERSIONSTR);
+  printf("Usage: %s [-bBEgGhHlPqVvw] [-a nr] [-c file] [-C cfg_file] " DOPT "\n"
+	 "       [-e command] [-I if_optionlist] " KOPT " [-o colorlist]\n"
+	 "       [-p prompt] [-R seed] [-s file] [-S optionlist]\n"
+	 "       [-t CPU] [-U uartnr] [-u hw] [-X freq[k|M]] " ZOPT "\n"
 	 "\n"
 	 "       [files...]\n", name);
   printf
@@ -336,6 +389,8 @@ print_help(const char *name)
      "                  oport=nr  use localhost:nr as server for serial output\n"
      "                  raw       perform non-interactive communication even on tty\n"
      "  -t CPU       Type of CPU: 51, C52, 251, etc.\n"
+     "  -U uartnr    Use std console as terminal for UART id=uartnr\n"
+     "  -u hw        Use std console as display for hardware element\n"
      "  -v           Print out version number and quit\n"
      "  -V           Verbose mode\n"
      "  -w           Writable flash\n"
@@ -391,7 +446,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= false,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "qc:C:e:p:PX:vVt:s:S:I:a:whHgGEJo:blBR:_");
+  strcpy(opts, "qc:C:e:p:PX:vVt:s:S:I:a:whHgGEJo:blBR:U:u:_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:z:d:");
 #endif
@@ -866,6 +921,13 @@ cl_app::proc_arguments(int argc, char *argv[])
 	if (!options->set_value("beep_break", this, (bool)true))
 	  fprintf(stderr, "Warning: No \"debug\" option found to set "
 		  "by -B parameter\n");	
+	break;
+      case 'U':
+	con_hw_cath= HW_UART;
+	con_hw_id= strtol(optarg, 0, 0);
+	break;
+      case 'u':
+	con_hw_name= optarg;
 	break;
       case 'h':
 	print_help(get_name());

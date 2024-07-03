@@ -68,8 +68,8 @@ cl_serial_hw::init(void)
   make_io();
   input_avail= false;
   sending_nl= false;
-  skip_nl= false;
-  nl_value= 10;
+  skip_nl= 0;
+  cfg_set(serconf_nl, nl_value= 10);
   nl_send_idx= 0;
   
   cs.format("serial%d_in_file", id);
@@ -218,7 +218,7 @@ cl_serial_hw::init(void)
   uc->vars->add(pn+"received_char", cfg, serconf_received, cfg_help(serconf_received));
   uc->vars->add(pn+"flowctrl", cfg, serconf_flowctrl, cfg_help(serconf_flowctrl));
   uc->vars->add(pn+"able_receive", cfg, serconf_able_receive, cfg_help(serconf_able_receive));
-
+  uc->vars->add(pn+"nl", cfg, serconf_nl, cfg_help(serconf_nl));
   cfg_set(serconf_able_receive, 1);
   return 0;
 }
@@ -260,6 +260,8 @@ cl_serial_hw::cfg_help(t_addr addr)
       return "Flow-control simulation on/off (bool, RW)";
     case serconf_able_receive:
       return "UART enabled to receive by flow-control (bool, RW)";
+    case serconf_nl:
+      return "Characters to send as new line (int, RW)";
     }
   return "Not used";
 }
@@ -406,6 +408,9 @@ cl_serial_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	      (c <= 'z'))
 	    cell->set(c - 'a'+1);
 	}
+    case serconf_nl:
+      if (val)
+	cell->set(nl_value= (*val)&0x00ffffff);
     default:
       break;
     }
@@ -424,7 +429,7 @@ cl_serial_hw::get_input(void)
 	  input_avail= false;
 	  return input;
 	}
-      skip_nl= true;
+      skip_nl= opposite_nl(input);
       sending_nl= true;
       nl_send_idx= 0;
     }
@@ -604,13 +609,13 @@ cl_serial_hw::proc_input(void)
 		}
 	      else if (!input_avail)
 		{
-		  if (skip_nl && is_nl(c))
+		  if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
 		    ;
 		  else
 		    {
 		      input= c;
 		      input_avail= true;
-		      skip_nl= false;
+		      skip_nl= 0;
 		    }
 		}
 	      else
@@ -624,13 +629,14 @@ cl_serial_hw::proc_input(void)
 	    {
 	      if (fin->read(&c, 1))
 		{
-		  if (skip_nl && is_nl(c))
+		  if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
 		    ;
 		  else
 		    {
 		      input= c;
 		      input_avail= true;
 		      cfg_set(serconf_able_receive, 0);
+		      skip_nl= 0;
 		    }
 		}
 	    }
@@ -729,7 +735,7 @@ cl_serial_hw::reset(void)
   cfg_set(serconf_able_receive, 1);
   sending_nl= false;
   nl_send_idx= 0;
-  skip_nl= false;
+  skip_nl= 0;
 }
 
 cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,

@@ -69,6 +69,8 @@ uCsim \- Micro\-controller simulator
 .B \-s file
 .B \-S options
 .B \-t cpu_type
+.B \-U uartnr
+.B \-u hw
 .B \-v
 .B \-V
 .B \-w
@@ -227,6 +229,14 @@ perform non-interactive communication even on tty.
 .TP
 .B \-t cpu_type
 Specifies type of the controller. Use \-H to list possible values.
+
+.TP
+.B \-U uartnr
+Use std console as terminal for UART id=uartnr.
+
+.TP
+.B \-u hw
+Use std console as display for specified hw.
 
 .TP
 .B \-v

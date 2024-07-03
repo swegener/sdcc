@@ -900,7 +900,7 @@ cl_commander_base::cl_commander_base(class cl_app *the_app, class cl_cmdset *acm
 {
   app= the_app;
   cons= new cl_list(1, 1, "consoles");
-  actual_console= frozen_console= config_console= 0;
+  actual_console= frozen_console= config_console= std_console= 0;
   cmdset= acmdset;
 }
 

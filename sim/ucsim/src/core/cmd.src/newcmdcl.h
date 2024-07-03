@@ -279,7 +279,7 @@ class cl_commander_base: public cl_base
  public:
   class cl_app *app;
   class cl_list *cons;
-  class cl_console_base *actual_console, *config_console;
+  class cl_console_base *actual_console, *config_console, *std_console;
 protected: class cl_console_base *frozen_console;
 public:
   class cl_cmdset *cmdset;

@@ -308,6 +308,21 @@ chars::first_pos(char c)
   return pos-chars_string;
 }
 
+long int
+chars::lint(void)
+{
+  return lint(10);
+}
+
+long int
+chars::lint(int base)
+{
+  if (base < 2) base= 0;
+  if (base > 36) base= 36;
+  if (empty()) return 0;
+  long int l= strtol(chars_string, 0, base);
+  return l;
+}
 
 chars &
 chars::append(const char *s)

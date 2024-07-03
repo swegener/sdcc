@@ -144,7 +144,7 @@ cl_uart::write(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_uart::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
-  if (addr < serconf_common)
+  if (addr < serconf_nr+1)
     return cl_serial_hw::conf_op(cell, addr, val);
   switch ((enum uart_cfg)addr)
     {

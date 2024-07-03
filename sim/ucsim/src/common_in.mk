@@ -49,6 +49,13 @@ UCSIM_LIB_PREREQUES = \
 		  $(top_builddir)/libsim.a \
 		  $(top_builddir)/libucsimutil.a
 
+UCSIM_LIB_TARGETS = \
+		motorola_lib \
+		cmd_lib \
+		gui_lib \
+		sim_lib \
+		ucsimutil_lib
+
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@

@@ -23,7 +23,7 @@ baseline:
 	@$(MAKE) --no-print-directory -C test baseline
 
 
-$(LEN): $(OBJECTS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
+$(LEN): $(OBJECTS) $(UCSIM_LIB_TARGETS) $(LOCAL_LIB_PREREQU)
 ifeq ($(SILENT),yes)
 	@echo LNK-$(PKG)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@
@@ -44,21 +44,36 @@ endif
 $(top_builddir)/$(SONAME): $(OBJECTS_SHARED)
 	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
-otherlibs: $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
+otherlibs: $(UCSIM_LIB_TARGETS) $(LOCAL_LIB_PREREQU)
 
 $(top_builddir)/libcmd.a:
+	$(MAKE) -C $(top_builddir)/src/core/cmd.src libs
+
+cmd_lib:
 	$(MAKE) -C $(top_builddir)/src/core/cmd.src libs
 
 $(top_builddir)/libgui.a:
 	$(MAKE) -C $(top_builddir)/src/core/gui.src libs
 
+gui_lib:
+	$(MAKE) -C $(top_builddir)/src/core/gui.src libs
+
 $(top_builddir)/libsim.a:
+	$(MAKE) -C $(top_builddir)/src/core/sim.src libs
+
+sim_lib:
 	$(MAKE) -C $(top_builddir)/src/core/sim.src libs
 
 $(top_builddir)/libucsimutil.a:
 	$(MAKE) -C $(top_builddir)/src/core/utils.src libs
 
+ucsimutil_lib:
+	$(MAKE) -C $(top_builddir)/src/core/utils.src libs
+
 $(top_builddir)/libmotorola.a:
+	$(MAKE) -C $(top_builddir)/src/core/motorola.src libs
+
+motorola_lib:
 	$(MAKE) -C $(top_builddir)/src/core/motorola.src libs
 
 # Creating dependencies

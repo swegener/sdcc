@@ -1016,8 +1016,12 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
       regs.DE= regs.DE >> (regs.bc.h&31);
       break;
     case 0x2b: // bsrf de,b
-      regs.DE= ~(~regs.DE >> (regs.bc.h&31));
-      break;
+      {
+	u16_t w= ~regs.DE;
+	w>>= (regs.bc.h&31);
+	regs.DE= ~w;
+	break;
+      }
     case 0x2c: // brlc de,b
       regs.DE= (regs.DE << (regs.bc.h&15)) | (regs.DE >> (16-(regs.bc.h&15)));
       break;

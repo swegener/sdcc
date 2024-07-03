@@ -360,8 +360,8 @@ struct dis_entry disass_z80n_ed[]=
    { 0x0027, 0x00ff, ' ', 2, "TEST %b" },
    { 0x0028, 0x00ff, ' ', 1, "BSLA DE,B" },
    { 0x0029, 0x00ff, ' ', 1, "BSRA DE,B" },
-   { 0x002a, 0x00ff, ' ', 1, "BSRL DE,A" },
-   { 0x002b, 0x00ff, ' ', 1, "BSRF DE,A" },
+   { 0x002a, 0x00ff, ' ', 1, "BSRL DE,B" },
+   { 0x002b, 0x00ff, ' ', 1, "BSRF DE,B" },
    { 0x002c, 0x00ff, ' ', 1, "BRLC DE,B" },
    { 0x0098, 0x00ff, ' ', 1, "JP (C)" },
    { 0, 0, 0, 0, NULL }

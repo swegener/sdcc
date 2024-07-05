@@ -141,7 +141,7 @@ replace restart {
 } by {
 	; common peephole 9a loaded %3 from %2 directly instead of going through %1.
 	ld	%3, %2
-} if canAssign(%3 %2), notVolatile(%1), notUsed(%1), canAssign('a' %1), notSame(%1 '(hl+)' '(hl-)')
+} if canAssign(%3 %2), notVolatile(%1), notUsed(%1), canAssign('a' %1), notSame(%1 '(hl+)' '(hl-)'), operandsNotRelated(%1 %3)
 
 replace restart {
 	ld	%1, hl

@@ -342,8 +342,9 @@ newSymbol (const char *name, long scope)
   sym->usl.spillLoc = 0;
 
   // Err on the safe side, when in doubt disabling optimizations.
-  sym->funcDivFlagSafe = 0;
-  sym->funcUsesVolatile = 1;
+  sym->funcDivFlagSafe = false;
+  sym->funcUsesVolatile = true;
+  sym->funcRestartAtomicSupport = true;
 
   return sym;
 }

@@ -3146,6 +3146,30 @@ removeRedundantTemps (iCode *sic)
 }
 
 /*-----------------------------------------------------------------*/
+/* checkRestartAtomic - try to prove that no restartable           */
+/*                      atomics implementation is used from here.  */
+/*-----------------------------------------------------------------*/
+void
+checkRestartAtomic (ebbIndex *ebbi)
+{
+  if (!currFunc)
+    return;
+
+  currFunc->funcRestartAtomicSupport = false;
+  for (int i = 0; i < ebbi->count; i++)
+    {
+      eBBlock **ebbs = ebbi->bbOrder;
+      const eBBlock *ebp = ebbs[i];
+
+      for (const iCode *ic = ebp->sch; ic; ic = ic->next)
+        if (ic->op == CALL && !IS_OP_LITERAL (ic->left))
+          currFunc->funcRestartAtomicSupport |= OP_SYMBOL(ic->left)->funcRestartAtomicSupport;
+        else if (ic->op == CALL || ic->op == PCALL || ic->op == INLINEASM)
+          currFunc->funcRestartAtomicSupport = true;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
 /*                    will return an array of eBBlock pointers     */
 /*-----------------------------------------------------------------*/
@@ -3440,7 +3464,9 @@ eBBlockFromiCode (iCode *ic)
    */
   discardDeadParamReceives (ebbi->bbOrder, ebbi->count);
 
-  narrowReads(ebbi);
+  narrowReads (ebbi);
+
+  checkRestartAtomic (ebbi);
 
   /* allocate registers & generate code */
   if (!options.syntax_only)

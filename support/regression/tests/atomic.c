@@ -7,15 +7,9 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 
-#if (defined(__SDCC_mcs51) && !defined(__SDCC_MODEL_SMALL)) || defined(__SDCC_ds390)
-#define memory __idata	/* mcs51 atomic_flag must be in __data or __idata */
-#else
-#define memory
-#endif
-
-memory atomic_flag f1 = ATOMIC_FLAG_INIT;
-memory atomic_flag f2;
-memory struct { int a; atomic_flag f; } s = {0, ATOMIC_FLAG_INIT};
+atomic_flag f1 = ATOMIC_FLAG_INIT;
+atomic_flag f2;
+struct { int a; atomic_flag f; } s = {0, ATOMIC_FLAG_INIT};
 
 #endif
 

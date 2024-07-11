@@ -1,3 +1,22 @@
+2024-07-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version,
+	  device/include/stdatomic.h,
+	  device/lib/ds390/Makefile.in,
+	  device/lib/ds390/atomic_flag_test_and_set.c,
+	  device/lib/ds390/__sdcc_atomic_maybe_rollback.c,
+	  device/lib/mcs51/__sdcc_atomic_maybe_rollback.asm,
+	  device/lib/mcs51/Makefile.in,
+	  device/lib/mcs51/atomic_flag_test_and_set.asm,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/ds390/main.c,
+	  src/mcs51/gen.c,
+	  src/mcs51/main.c,
+	  support/regression/tests/atomic.c:
+	  Full atomic_flag for mcs51, ds390. Some infrastructure for lock-free atomics.
+
 2024-07-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def:

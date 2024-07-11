@@ -4958,7 +4958,7 @@ genEndFunction (iCode * ic)
       freeBitVect (rsavebits);
 
       /* weird but possible, one should better use a different priority */
-      /* if critical function then turn interrupts off */
+      /* if critical function then turn interrupts back on */
       if (IFFUNC_ISCRITICAL (ftype))
         {
           emitcode ("setb", "ea");
@@ -4970,7 +4970,11 @@ genEndFunction (iCode * ic)
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
 
-      emitcode ("reti", "");
+      wassert (currFunc);
+      if (currFunc->funcRestartAtomicSupport)
+        emitcode (options.acall_ajmp ? "ajmp" : "ljmp", "___sdcc_atomic_maybe_rollback");
+      else
+        emitcode ("reti", "");
     }
   else
     {
@@ -12297,12 +12301,12 @@ genJumpTab (iCode * ic)
       if ((AOP_TYPE (cond) == AOP_REG) || (IS_AOP_PREG (cond) && !AOP (cond)->paged && !IS_VOLATILE (operandType (cond))))
         {
           emitcode ("add", "a,%s", l);
-          if (options.acall_ajmp == 0)
+          if (!options.acall_ajmp)
             emitcode ("add", "a,%s", l);
         }
       else
         {
-          if (options.acall_ajmp == 0)
+          if (!options.acall_ajmp)
             {
               MOVB ("#0x03");
               emitcode ("mul", "ab");

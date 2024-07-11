@@ -208,14 +208,104 @@ _mcs51_genAssemblerPreamble (FILE * of)
 {
 }
 
+// Generate support code for restartable sequence implementation of atomics.
+static void
+mcs51_genAtomicSupport (struct dbuf_s *oBuf, unsigned int startaddr)
+{
+  dbuf_printf (oBuf, "; restartable atomic support routines\n");
+
+  // Support routines need to start on 8B boundary.
+  if (startaddr % 8)
+    {
+      dbuf_printf (oBuf, "\t.ds\t%d\n", 8 - startaddr % 8);
+      startaddr += (8 - startaddr % 8);
+    }
+  // Support routine block may not cross 256B boundary.
+  if (startaddr / 256 != (startaddr + 8 * 4 + 7) / 256)
+    {
+      dbuf_printf (oBuf, "\t.ds\t%d\n", 256 - startaddr % 256);
+      startaddr += 256 - startaddr % 256;
+    }
+
+  dbuf_printf (oBuf, "__sdcc_atomic_exchange_rollback_impl::\n");
+
+  // Each routine (except the last one) needs to be 8 bytes long.
+  // Restart may happen at bytes 1 to 5 of each routine.
+  dbuf_printf (oBuf, "___sdcc_atomic_exchange_pdata_impl:\n"
+                     "\tmovx\ta, @r0\n"
+                     "\tmov\tr3, a\n"
+                     "\tnop\n"
+                     "\tnop\n"
+                     "\tmov\ta, r2\n"
+                     "\tmovx\t@r0, a\n"
+                     "\tmov\ta, r3\n"
+                     "\tret\n");
+  dbuf_printf (oBuf, "___sdcc_atomic_exchange_xdata_impl:\n"
+                     "\tmovx\ta, @dptr\n"
+                     "\tmov\tr3, a\n"
+                     "\tnop\n"
+                     "\tnop\n"
+                     "\tmov\ta, r2\n"
+                     "\tmovx\t@dptr, a\n"
+                     "\tmov\ta, r3\n"
+                     "\tret\n");
+  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_idata_impl:\n"
+                     "\tmov\ta, @r0\n"
+                     "\tcjne\ta, ar2, .+#5\n"
+                     "\tmov\ta, r3\n"
+                     "\tmov\t@r0, a\n"
+                     "\tret\n"
+                     "\tnop\n");
+  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_pdata_impl:\n"
+                     "\tmovx\ta, @r0\n"
+                     "\tcjne\ta, ar2, .+#5\n"
+                     "\tmov\ta, r3\n"
+                     "\tmovx\t@r0, a\n"
+                     "\tret\n"
+                     "\tnop\n");
+  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_xdata_impl:\n"
+                     "\tmovx\ta, @dptr\n"
+                     "\tcjne\ta, ar2, .+#5\n"
+                     "\tmov\ta, r3\n"
+                     "\tmovx\t@dptr, a\n"
+                     "\tret\n\n");
+
+  // The following two routines just need to be in jnb range of the above ones, they don't have alignment requirements.
+  
+  // Store value in r2 into byte at b:dptr, return previous byte at b:dptr in a.
+  // Overwrites r0, r2, r3.
+  dbuf_printf (oBuf, "___sdcc_atomic_exchange_gptr_impl::\n"
+                     "\tjnb\tb.6, ___sdcc_atomic_exchange_xdata_impl\n"
+                     "\tmov\tr0, dpl\n"
+                     "\tjb\tb.5, ___sdcc_atomic_exchange_pdata_impl\n"
+                     "___sdcc_atomic_exchange_idata_impl:\n"
+                     "\tmov\ta, r2\n"
+                     "\txch\ta, @r0\n"
+                     "\tret\n");
+
+  // If the value of the byte at b:dptr is the value of r2, store the value
+  // of r3 into that byte. Return the new value of that byte in a.
+  // Overwrites r0, r2, r3.
+  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_gptr_impl::\n"
+                     "\tjnb\tb.6, ___sdcc_atomic_compare_exchange_xdata_impl\n"
+                     "\tmov\tr0, dpl\n"
+                     "\tjb\tb.5, ___sdcc_atomic_compare_exchange_pdata_impl\n"
+                     "\tsjmp\t___sdcc_atomic_compare_exchange_idata_impl\n");
+}
+
 /* Generate interrupt vector table. */
 static int
-_mcs51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
+_mcs51_genIVT (struct dbuf_s *oBuf, symbol **interrupts, int maxInterrupts)
 {
   int i;
+  unsigned int nextbyteaddr;
 
   dbuf_printf (oBuf, "\t%cjmp\t__sdcc_gsinit_startup\n", options.acall_ajmp?'a':'l');
-  if((options.acall_ajmp)&&(maxInterrupts)) dbuf_printf (oBuf, "\t.ds\t1\n");
+  nextbyteaddr = options.acall_ajmp ? 2 : 3;
+  if(options.acall_ajmp && maxInterrupts)
+    {
+      dbuf_printf (oBuf, "\t.ds\t1\n");
+    }
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
@@ -223,17 +313,22 @@ _mcs51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
       if (interrupts[i])
         {
           dbuf_printf (oBuf, "\t%cjmp\t%s\n", options.acall_ajmp?'a':'l', interrupts[i]->rname);
+          nextbyteaddr = 3 + 8 * i + (options.acall_ajmp ? 2 : 3);
           if ( i != maxInterrupts - 1 )
             dbuf_printf (oBuf, "\t.ds\t%d\n", options.acall_ajmp?6:5);
         }
       else
         {
           dbuf_printf (oBuf, "\treti\n");
+          nextbyteaddr = 3 + 8 * i + 1;
           if ( i != maxInterrupts - 1 )
             dbuf_printf (oBuf, "\t.ds\t7\n");
         }
     }
-  return TRUE;
+
+  mcs51_genAtomicSupport (oBuf, nextbyteaddr);
+
+  return true;
 }
 
 static void

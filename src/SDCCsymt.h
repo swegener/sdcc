@@ -338,6 +338,7 @@ typedef struct symbol
   unsigned noSpilLoc:1;             /* cannot be assigned a spil location */
   bool funcDivFlagSafe:1;           /* we know this function is safe to call with undocumented stm8 flag bit 6 set*/
   bool funcUsesVolatile:1;          /* The function accesses a volatile variable */
+  bool funcRestartAtomicSupport:1;  /* The function uses (directly or indirectly) restartable atomic support routines. */
   unsigned isstrlit;                /* is a string literal and it's usage count  */
   unsigned accuse;                  /* can be left in the accumulator
                                        On the Z80 accuse is divided into

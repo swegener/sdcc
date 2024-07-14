@@ -3,7 +3,7 @@
 
 int main()
 {
-	char * s;
+	const char * s;
 
 	s = "abc" "def";
 	if(s[0] != 'a') return 1;

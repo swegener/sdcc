@@ -285,6 +285,9 @@ EXCLUDE_mcs51-medium += \
 	gte_shiftdi-2
 EXCLUDE_mcs51-large-stack-auto += \
 	gte_loop-ivopts-2
+EXCLUDE_mcs51-xstack-auto += \
+	gte_loop-ivopts-2 \
+	gte_shiftdi-2
 EXCLUDE_uc6502-stack-auto += \
 	gte_loop-ivopts-2
 

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -65,19 +65,15 @@
 
 
 #if !defined(__SDCC_mcs51) || defined(__SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
-/* Does printf_tiny really work on ds390 and ds400?
-   If it does, enable them in the line above */
-#if defined(_SDCC_BUILD_LIB)
-/* Disable all warnings if building a library */
-#pragma disable_warning 190
-#elif defined(__SDCC_USE_XSTACK)
-#warning "printf_tiny not built, does not support --xstack"
-#elif defined(_SDCC_NO_ASM_LIB_FUNCS)
-#warning "printf_tiny not built, _SDCC_NO_ASM_LIB_FUNCS defined"
-#else
-/* Disable "ISO C forbids an empty source file" warning message */
-#pragma disable_warning 190
-#endif
+  /* Does printf_tiny really work on ds390 and ds400?
+     If it does, enable them in the line above */
+  #if defined(__SDCC_USE_XSTACK)
+    #warning "printf_tiny not built, does not support --xstack"
+  #elif defined(_SDCC_NO_ASM_LIB_FUNCS)
+    #warning "printf_tiny not built, _SDCC_NO_ASM_LIB_FUNCS defined"
+  #endif
+  /* Disable "ISO C forbids an empty source file" warning message */
+  #pragma disable_warning 190
 #else /* defines are compatible with printf_tiny */
 
 

@@ -81,7 +81,7 @@ union float_long
     long l;
   };
 
-float __ulong2fs (unsigned long a )
+float __ulong2fs (unsigned long a ) __SDCC_FLOAT_NONBANKED
 {
   unsigned char exp = (unsigned char)24 + (unsigned char)EXCESS;
   volatile union float_long fl;

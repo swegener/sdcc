@@ -40,7 +40,9 @@ void testBug(void)
 void VDP_Poke_16K( u8 dest )
 {
 #if 0 // Bug not yet fixed
-	ASSERT(dest);
+    ASSERT(dest);
+#else
+    (void)dest;
 #endif
 }
 

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -100,8 +100,7 @@ union float_long
 };
 
 /* convert float to unsigned long */
-unsigned long 
-__fs2ulong (float a1)
+unsigned long __fs2ulong (float a1) __SDCC_FLOAT_NONBANKED
 {
   volatile union float_long fl1;
   int exp;

@@ -1,9 +1,9 @@
 #include <stdio.h>
 struct wchar {
-    char *data; char mem[];
+    const char *data; char mem[];
 };
 struct wint {
-    char *data; int mem[];
+    const char *data; int mem[];
 };
 int f1char (void) {
     char s[9]="nonono";

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -48,7 +48,7 @@ ___fs2uchar:
 #else
 
 /* convert float to unsigned char */
-unsigned char __fs2uchar (float f)
+unsigned char __fs2uchar (float f) __SDCC_FLOAT_NONBANKED
 {
   unsigned long ul=__fs2ulong(f);
   if (ul>=UCHAR_MAX) return UCHAR_MAX;

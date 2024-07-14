@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -70,7 +70,7 @@ ___fssub:
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
 /* subtract two floats */
-float __fssub (float a1, float a2)
+float __fssub (float a1, float a2) __SDCC_FLOAT_NONBANKED
 {
   float neg = -a1;
   return -(neg + a2);

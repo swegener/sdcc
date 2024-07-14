@@ -3,8 +3,6 @@
 
 #include <testfwk.h>
 
-#pragma disable_warning 85
-
 #define PRN_TILE_WIDTH          20
 
 #if defined(__SDCC_z80) || defined(SDCC_sm83)
@@ -19,8 +17,8 @@ unsigned char * get_xy(unsigned char x, unsigned char y);
 unsigned char get_byte(unsigned char * addr) PR;
 void vmemcpy(unsigned char *dest, unsigned char *sour, unsigned int len);
 
-unsigned char * _VRAM8000 = (unsigned char *)0x8000;
-unsigned char * _VRAM9000 = (unsigned char *)0x9000;
+unsigned char * _VRAM8000 = (__xdata unsigned char *)0x8000;
+unsigned char * _VRAM9000 = (__xdata unsigned char *)0x9000;
 
 unsigned char some_func(unsigned char sx, unsigned char sy, unsigned char sw, unsigned char sh, unsigned char centered) __banked {
 
@@ -47,19 +45,28 @@ testBug (void)
 
 void mymemset(void *s, unsigned char c, unsigned int n)
 {
+    (void)s;
+    (void)c;
+    (void)n;
 }
 
 unsigned char * get_xy(unsigned char x, unsigned char y)
 {
-  return(0);
+    (void)x;
+    (void)y;
+    return(0);
 }
 
 unsigned char get_byte(unsigned char * addr) PR
 {
-  return(0);
+    (void)addr;
+    return(0);
 }
 
 void vmemcpy(unsigned char *dest, unsigned char *sour, unsigned int len)
 {
+    (void)dest;
+    (void)sour;
+    (void)len;
 }
 

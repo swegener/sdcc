@@ -1,10 +1,10 @@
 
-int strlen(char *);
+int strlen(const char *);
 
 int
 main(void)
 {
-	char *p;
+	const char *p;
 
 	p = "hello";
 	return strlen(p) - 5;

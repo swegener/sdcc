@@ -167,7 +167,7 @@ union float_long
   };
 
 /* add two floats */
-float __fsadd (float a1, float a2)
+float __fsadd (float a1, float a2) __SDCC_FLOAT_NONBANKED
 {
   long mant1, mant2;
   long _AUTOMEM *pfl1;

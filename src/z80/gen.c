@@ -15614,7 +15614,7 @@ genJumpTab (const iCode *ic)
       emit2 ("lda hl, hl, a");
       emit2 ("lda hl, hl, a");
       cost (2 * 2, 2 * 14);
-#if 0 // Enable when supported in assembler
+#if 0 // Enable when "jp a(hl)" supported in assembler
       emit2 ("jp a(hl)");
       cost (2, 16);
       goto genlabeltab;
@@ -15663,7 +15663,9 @@ calculated:
   cost2 (1 + IS_TLCS90, 4, 3, 4, 4, 8, 3, 1);
 
   /* now generate the jump labels */
+#if 0 // Enable when "jp a(hl)" supported in assembler
 genlabeltab:
+#endif
   if (!regalloc_dry_run)
     emitLabelSpill (jtab);
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))

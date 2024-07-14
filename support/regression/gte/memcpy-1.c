@@ -14,7 +14,7 @@ void *copy (void *o, const void *i, unsigned l)
   return memcpy (o, i, l);
 }
 
-main ()
+void main (void)
 {
   unsigned i;
   unsigned char src[MEMCPY_SIZE];

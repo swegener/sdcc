@@ -72,7 +72,7 @@ typedef unsigned char jmp_buf[3]; /* 1 for the stack pointer, 2 for the return a
         #define __SETJMP_H_STACK_PTR_SIZE 1
     #endif
 typedef unsigned char jmp_buf[2 * __SETJMP_H_STACK_PTR_SIZE + 4];
-#else
+#elif defined (__SDCC_mcs51)
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
 #endif
 

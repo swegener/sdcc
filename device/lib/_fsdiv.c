@@ -271,7 +271,7 @@ union float_long
   };
 
 /* divide two floats */
-static float __fsdiv_org (float a1, float a2)
+static float __fsdiv_org (float a1, float a2) __SDCC_FLOAT_NONBANKED
 {
   volatile union float_long fl1, fl2;
   long result;
@@ -346,7 +346,7 @@ static float __fsdiv_org (float a1, float a2)
   return (fl1.f);
 }
 
-float __fsdiv (float a1, float a2)
+float __fsdiv (float a1, float a2) __SDCC_FLOAT_NONBANKED
 {
   unsigned long _AUTOMEM *p2 = (unsigned long *) &a2;
 

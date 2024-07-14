@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
    _slong2fs.c - Floating point library in optimized assembly for 8051
- 
+
    Copyright (C) 2004, Paul Stoffregen, paul@pjrc.com
 
    This library is free software; you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -76,7 +76,8 @@ slong2fs_positive:
 #else
 
 /* convert signed long to float */
-float __slong2fs (signed long sl) {
+float __slong2fs (signed long sl) __SDCC_FLOAT_NONBANKED
+{
   if (sl<0) 
     return -__ulong2fs(-sl);
   else 

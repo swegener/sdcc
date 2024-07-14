@@ -27,18 +27,22 @@ extern void abort (void);
 void *
 dummy1 (void *x)
 {
+  (void)x;
   return "";
 }
 
 void *
 dummy2 (void *x, void *y)
 {
+  (void)x;
+  (void)y;
   exit (0);
 }
 
 struct V *
 baz (unsigned int x)
 {
+  (void)x;
   static struct V v;
   __builtin_memset (&v, 0x55, sizeof (v));
   return &v;
@@ -47,6 +51,7 @@ baz (unsigned int x)
 int
 check (void *x, struct S *y)
 {
+  (void)x;
   if (y->a || y->f.b || y->f.c || y->f.d || y->f.e)
     abort ();
   return 1;

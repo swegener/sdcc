@@ -1,3 +1,41 @@
+2024-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/setjmp.h: explicit __SDCC_mcs51 condition
+	* device/lib/_fs2schar.c,
+	* device/lib/_fs2sint.c,
+	* device/lib/_fs2slong.c,
+	* device/lib/_fs2uchar.c,
+	* device/lib/_fs2uint.c,
+	* device/lib/_fs2ulong.c,
+	* device/lib/_fsadd.c,
+	* device/lib/_fsdiv.c,
+	* device/lib/_fseq.c,
+	* device/lib/_fslt.c,
+	* device/lib/_fsmul.c,
+	* device/lib/_fsneq.c,
+	* device/lib/_fssub.c,
+	* device/lib/_schar2fs.c,
+	* device/lib/_sint2fs.c,
+	* device/lib/_slong2fs.c,
+	* device/lib/_uchar2fs.c,
+	* device/lib/_uint2fs.c,
+	* device/lib/_ulong2fs.c: __fs* explicitly marked __SDCC_FLOAT_NONBANKED
+	* device/lib/printf_tiny.c: indented #if, simplified
+	* src/z80/gen.c (genJumpTab): fixed warning
+	* support/regression/MakeList: extended EXCLUDE_mcs51-xstack-auto
+	* support/regression/compact-results.py: tidied result output
+	* support/regression/gte/loop-ivopts-2.c: cosmetics
+	* support/regression/gte/memcpy-1.c: fixed warnings
+	* support/regression/gte/20030920-1.c,
+	* support/regression/qct/0025-string.c,
+	* support/regression/qct/0027-charval.c,
+	* support/regression/qct/0059-multistring.c,
+	* support/regression/tcc/21_char_array.c,
+	* support/regression/tcc/80_flexarray.c: const pointers to fix warnings
+	* support/regression/gte/20041218-1.c,
+	* support/regression/tests/bug-3727.c: void cast unused params to fix warnings
+	* support/regression/tests/bug-3741.c: fixed warnings
+
 2024-07-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* .version,

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -78,7 +78,7 @@ fs2sint_maxval_pos:
 #else
 
 /* convert float to signed int */
-signed int __fs2sint (float f)
+signed int __fs2sint (float f) __SDCC_FLOAT_NONBANKED
 {
   signed long sl=__fs2slong(f);
   if (sl>=INT_MAX)

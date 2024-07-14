@@ -2,7 +2,7 @@
 int
 main()
 {
-	char *p;
+	const char *p;
 
 	p = "hello";
 	return p[0] - 104;

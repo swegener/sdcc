@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -105,7 +105,7 @@ fs2slong_maxval_pos:
 #else
 
 /* convert float to signed long */
-signed long __fs2slong (float f)
+signed long __fs2slong (float f) __SDCC_FLOAT_NONBANKED
 {
 
   if (!f)

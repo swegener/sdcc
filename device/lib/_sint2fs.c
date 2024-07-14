@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
    _sint2fs.c - Floating point library in optimized assembly for 8051
- 
+
    Copyright (C) 2004, Paul Stoffregen, paul@pjrc.com
 
    This library is free software; you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -51,7 +51,8 @@ ___sint2fs:
 #else
 
 /* convert signed int to float */
-float __sint2fs (signed int si) {
+float __sint2fs (signed int si) __SDCC_FLOAT_NONBANKED
+{
   return __slong2fs(si);
 }
 

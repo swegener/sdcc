@@ -7115,7 +7115,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
   int i;
   const int size = result->size;
   unsigned int shCount = right->type == AOP_LIT ? ulFromVal (right->aopu.aop_lit) : 0;
-  bool all_in_reg = TRUE;
+  bool all_in_reg = true;
 
   shiftop->size = size;
   shiftop->valinfo.anything = true;
@@ -7160,7 +7160,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
           i += 2;
         }
       // Try to shift in y instead of on stack.
-      else if (size == 2 && (aopOnStack (left, i, 2) || left->type == AOP_LIT) && aopOnStack (result, i, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
+      else if (size >= 2 && (aopOnStack (left, i, 2) || left->type == AOP_LIT) && aopOnStack (result, i, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
         shiftop->regs[YL_IDX] == -1 && shiftop->regs[YH_IDX] == -1 &&
         left->regs[YL_IDX] == -1 && left->regs[YH_IDX] == -1 && result->regs[YL_IDX] == -1 && result->regs[YH_IDX] == -1)
         {
@@ -7187,7 +7187,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
 
   for (i = 0; i < size; i++)
     if (!shiftop->aopu.bytes[i].in_reg)
-      all_in_reg = FALSE;
+      all_in_reg = false;
   shiftop->type = all_in_reg ? AOP_REG : AOP_REGSTK;
 }
 

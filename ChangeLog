@@ -3,6 +3,8 @@
 	* src/ds390/main.c,
 	  src/mcs51/main.c:
 	  Optimize atomic_exchange / atomic_flag_test_and_set.
+	* src/SDCCpeeph.c:
+	  Fix bug #3753.
 
 2024-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
 

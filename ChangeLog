@@ -1,3 +1,9 @@
+2024-07-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/ds390/main.c,
+	  src/mcs51/main.c:
+	  Optimize atomic_exchange / atomic_flag_test_and_set.
+
 2024-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/setjmp.h: explicit __SDCC_mcs51 condition

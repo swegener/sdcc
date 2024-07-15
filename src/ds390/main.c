@@ -309,20 +309,20 @@ ds390_genAtomicSupport (struct dbuf_s *oBuf, unsigned int startaddr)
 
   // Each routine (except the last one) needs to be 8 bytes long.
   // Restart may happen at bytes 1 to 5 of each routine.
-  dbuf_printf (oBuf, "___sdcc_atomic_exchange_pdata_impl:\n"
+  dbuf_printf (oBuf, "\tnop\n"
+                     "\tnop\n"
+                     "___sdcc_atomic_exchange_pdata_impl:\n"
                      "\tmovx\ta, @r0\n"
                      "\tmov\tr3, a\n"
-                     "\tnop\n"
-                     "\tnop\n"
                      "\tmov\ta, r2\n"
                      "\tmovx\t@r0, a\n"
                      "\tmov\ta, r3\n"
                      "\tret\n");
-  dbuf_printf (oBuf, "___sdcc_atomic_exchange_xdata_impl:\n"
+  dbuf_printf (oBuf, "\tnop\n"
+                     "\tnop\n"
+                     "___sdcc_atomic_exchange_xdata_impl:\n"
                      "\tmovx\ta, @dptr\n"
                      "\tmov\tr3, a\n"
-                     "\tnop\n"
-                     "\tnop\n"
                      "\tmov\ta, r2\n"
                      "\tmovx\t@dptr, a\n"
                      "\tmov\ta, r3\n"

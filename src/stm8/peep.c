@@ -875,6 +875,13 @@ stm8CondJump(const lineNode *pl)
 static bool
 stm8SurelyWritesFlag(const lineNode *pl, const char *what)
 {
+  // according to calling convention caller has to save flags
+  if(ISINST(pl->line, "ret") || ISINST(pl->line, "retf") ||
+     ISINST(pl->line, "call") || ISINST(pl->line, "callf") ||
+     ISINST(pl->line, "jp") && findSym (SymbolTab, 0, pl->line + 4) ||
+     ISINST(pl->line, "jpf") && findSym (SymbolTab, 0, pl->line + 5))
+    return true;
+
   if (!strcmp (what, "v") || !strcmp (what, "c"))
     {        
       if (ISINST (pl->line, "addw") && !strcmp (pl->line + 5, "sp"))
@@ -939,6 +946,36 @@ stm8SurelyWritesFlag(const lineNode *pl, const char *what)
         STARTSINST (pl->line, "sub")) // sub, subw
         return true;
     }
+
+  return false;
+}
+
+static bool
+callSurelyWrites (const lineNode *pl, const char *what)
+{
+  const symbol *f = 0;
+  if ((ISINST(pl->line, "call") || ISINST(pl->line, "callf")) && !strchr(pl->line, ','))
+    f = findSym (SymbolTab, 0, pl->line + 6 + ISINST(pl->line, "callf"));
+  else if ((ISINST(pl->line, "jp") || ISINST(pl->line, "jr") || ISINST(pl->line, "jpf")) && !strchr(pl->line, ','))
+    f = findSym (SymbolTab, 0, pl->line + 4 + ISINST(pl->line, "jpf"));
+
+  const bool *preserved_regs;
+
+  if(f)
+    preserved_regs = f->type->funcAttrs.preserved_regs;
+  else // Err on the safe side for jp and jr - might not be a function call, might e.g. be a jump table.
+    return (false);
+
+  if (!strcmp (what, "a"))
+    return !preserved_regs[A_IDX];
+  else if (!strcmp (what, "xl"))
+    return !preserved_regs[XL_IDX];
+  else if (!strcmp (what, "xh"))
+    return !preserved_regs[XH_IDX];
+  else if (!strcmp (what, "yl"))
+    return !preserved_regs[YL_IDX];
+  else if (!strcmp (what, "yh"))
+    return !preserved_regs[YH_IDX];
 
   return false;
 }
@@ -1035,6 +1072,9 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         return true;
     }
 
+  if (ISINST(pl->line, "call"))
+    return (callSurelyWrites (pl, what));
+
   return false;
 }
 
@@ -1120,12 +1160,27 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
 
       if(stm8UncondJump(*pl))
         {
-          *pl = findLabel (*pl);
-            if (!*pl)
-              {
-                D(("S4O_ABORT at unconditional jump\n"));
-                return S4O_ABORT;
-              }
+          lineNode *tlbl = findLabel (*pl);
+          if (!tlbl) // jp/jr could be a tail call.
+            {
+              const symbol *f = findSym (SymbolTab, 0, (*pl)->line + 4 + ISINST ((*pl)->line, "jpf"));
+              if (f && stm8IsParmInCall(f->type, what))
+                {
+                  D (("S4O_RD_OP\n"));
+                  return S4O_RD_OP;
+                }
+              else if(callSurelyWrites (*pl, what))
+                {
+                  D (("S4O_WR_OP\n"));
+                  return S4O_WR_OP;
+                }
+            }
+          *pl = tlbl;
+          if (!*pl)
+            {
+              D(("S4O_ABORT at unconditional jump\n"));
+              return S4O_ABORT;
+            }
         }
       if(stm8CondJump(*pl))
         {

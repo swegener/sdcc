@@ -5,6 +5,8 @@
 	  Optimize atomic_exchange / atomic_flag_test_and_set.
 	* src/SDCCpeeph.c:
 	  Fix bug #3753.
+	* src/stm8/peep.c:
+	  Improve stm8 notUsed() accuracy, part of RFE #936.
 
 2024-07-14 Maarten Brock <sourceforge.brock AT dse.nl>
 

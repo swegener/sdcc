@@ -534,7 +534,7 @@ bitVectDebugOn (const bitVect * bvp, FILE * of)
   for (i = 0; i < bvp->size; i++)
     {
       if (bitVectBitValue (bvp, i))
-	fprintf (of, "(%d) ", i);
+        fprintf (of, "(%d) ", i);
     }
   fprintf (of, "}\n");
 }

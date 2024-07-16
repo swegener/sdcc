@@ -53,7 +53,6 @@ ___gptr_cmp::
 	clr  c
 	xch  a,r0
 	push acc
-	push dpl
 	mov  a,@r0
 	inc  r0
 	orl  a,@r0
@@ -63,6 +62,7 @@ ___gptr_cmp::
 ; if both are NULL, return Z and NC
 	jz   00002$
 00001$:
+	push dpl
 	dec  r0
 	mov  a,dpl
 	subb a,@r0
@@ -78,8 +78,8 @@ ___gptr_cmp::
 ; p2 < p1, return NZ and C
 ; p2 = p1, return Z and NC
 ; p2 > p1, return NZ and NC
-00002$:
 	pop  dpl
+00002$:
 	xch  a,r0
 	pop  acc
 	xch  a,r0

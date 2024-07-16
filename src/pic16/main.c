@@ -1008,7 +1008,7 @@ _pic16_mangleFunctionName (const char *sz)
 
 
 static void
-_pic16_genAssemblerPreamble (FILE * of)
+_pic16_genAssemblerStart (FILE * of)
 {
   const char *name = pic16_processor_base_name();
 
@@ -1400,7 +1400,7 @@ PORT pic16_port =
   0,
   NULL,
   _pic16_keywords,
-  _pic16_genAssemblerPreamble,
+  _pic16_genAssemblerStart,
   NULL,             /* no genAssemblerEnd */
   _pic16_genIVT,
   NULL, // _pic16_genXINIT

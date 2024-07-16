@@ -944,6 +944,17 @@ _getRegByName (const char *name)
   return -1;
 }
 
+static void
+_z80_genAssemblerStart (FILE * of)
+{
+  if (!options.noOptsdccInAsm)
+    {
+      tfprintf (of, "\t!optsdcc -m%s", port->target);
+      fprintf (of, " sdcccall(%d)", options.sdcccall);
+      fprintf (of, "\n");
+    }
+}
+
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
@@ -1180,7 +1191,7 @@ PORT z80_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1314,7 +1325,7 @@ PORT z180_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1447,7 +1458,7 @@ PORT r2k_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1581,7 +1592,7 @@ PORT r2ka_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1715,7 +1726,7 @@ PORT r3ka_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1851,7 +1862,7 @@ PORT sm83_port =
   _getRegByName,
   NULL,
   _keywordsgb,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -1985,7 +1996,7 @@ PORT tlcs90_port =
   _getRegByName,
   NULL,
   _keywordstlcs90,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -2119,7 +2130,7 @@ PORT ez80_z80_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -2253,7 +2264,7 @@ PORT z80n_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */
@@ -2387,7 +2398,7 @@ PORT r800_port =
   _getRegByName,
   NULL,
   _keywords,
-  0,                            /* no assembler preamble */
+  _z80_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */
   0,                            /* no genXINIT code */

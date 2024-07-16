@@ -13,7 +13,7 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;  GNU General Public License for more details.
 ;
-;  You should have received a copy of the GNU General Public License 
+;  You should have received a copy of the GNU General Public License
 ;  along with this library; see the file COPYING. If not, write to the
 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 ;   MA 02110-1301, USA.
@@ -26,7 +26,8 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-.module u_16_16_mul
+	.module __mulsint2slong
+	.optsdcc -mz80 sdcccall(1)
 
 .globl ___muluint2ulong
 .globl ___mulsint2slong

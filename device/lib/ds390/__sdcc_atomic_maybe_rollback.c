@@ -1,5 +1,6 @@
 /*-------------------------------------------------------------------------
-;  __sdcc_atomic_maybe_rollback.c - C run-time: rollback for restartable-sequence implementation of C11 atomics
+;  __sdcc_atomic_maybe_rollback.c - C run-time: rollback for restartable
+;  sequence implementation of C11 atomics
 ;
 ;  Copyright (c) 2024, Philipp Klaus Krause
 ;
@@ -13,7 +14,7 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;  GNU General Public License for more details.
 ;
-;  You should have received a copy of the GNU General Public License 
+;  You should have received a copy of the GNU General Public License
 ;  along with this library; see the file COPYING. If not, write to the
 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 ;   MA 02110-1301, USA.
@@ -32,32 +33,35 @@ static void dummy(void) __naked
 {
 	__asm
 	.area HOME    (CODE)
+	.area GSINIT  (CODE)
+	.area GSFINAL (CODE)
+	.area HOME    (CODE)
 
 ; This relies on the restartable implementations being aligned properly.
 
 ___sdcc_atomic_maybe_rollback::
-	push psw
 	push ar0
 	mov  r0, SP
 	dec  r0
-	cjne @r0, #(__sdcc_atomic_exchange_rollback_impl >> 16), 3$
+	push psw
+	cjne @r0, #(sdcc_atomic_exchange_rollback_start >> 16), 4$
 	dec  r0
-	cjne @r0, #(__sdcc_atomic_exchange_rollback_impl >> 8), 3$
+	cjne @r0, #(sdcc_atomic_exchange_rollback_start >> 8), 4$
 	dec  r0
-	cjne @r0, #<__sdcc_atomic_exchange_rollback_impl, 0$
+	cjne @r0, #<sdcc_atomic_exchange_rollback_start, 0$
 0$:
-	jc   3$
-	cjne @r0, #__sdcc_atomic_exchange_rollback_impl+40, 1$
+	jc   4$
+	cjne @r0, #sdcc_atomic_exchange_rollback_end, 1$
 1$:
-	jnc  outer_skip
-	; we now know the interrupted routine was somewhere among the restartable implementations of
-	; atomic functions.
+	jnc  4$
+	; we now know the interrupted routine was somewhere among the
+	; restartable implementations of atomic functions.
 	push acc
 	mov  a, @r0
 	anl  a, #0x07
 	cjne a, #6, 2$
 2$:
-	jnc  4$
+	jnc  3$
 	; we actually need to restart.
 	mov  a, @r0
 	anl  a, #0xf8
@@ -65,8 +69,8 @@ ___sdcc_atomic_maybe_rollback::
 3$:	; inner skip
 	pop acc
 4$:	; outer skip
-	pop ar0
 	pop psw
+	pop ar0
 	reti
 
 	__endasm;

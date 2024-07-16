@@ -1,5 +1,6 @@
 ;--------------------------------------------------------------------------
-;  __sdcc_atomic_maybe_rollback - C run-time: rollback for restartable-sequence implementation of C11 atomics
+;  __sdcc_atomic_maybe_rollback - C run-time: rollback for restartable
+;  sequence implementation of C11 atomics
 ;
 ;  Copyright (C) 2024, Philipp Klaus Krause
 ;
@@ -43,21 +44,21 @@
 
 ; This relies on the restartable implementations being aligned properly.
 
-___sdcc_atomic_maybe_rollback::
-	push psw
+sdcc_atomic_maybe_rollback::
 	push ar0
 	mov  r0, SP
 	dec  r0
-	cjne @r0, #>__sdcc_atomic_exchange_rollback_impl, 4$
+	push psw
+	cjne @r0, #>sdcc_atomic_exchange_rollback_start, 4$
 	dec  r0
-	cjne @r0, #<__sdcc_atomic_exchange_rollback_impl, 0$
+	cjne @r0, #<sdcc_atomic_exchange_rollback_start, 0$
 0$:
 	jc   4$
-	cjne @r0, #<__sdcc_atomic_exchange_rollback_impl+40, 1$
+	cjne @r0, #<sdcc_atomic_exchange_rollback_end, 1$
 1$:
 	jnc  4$
-	; we now know the interrupted routine was somewhere among the restartable implementations of
-	; atomic functions.
+	; we now know the interrupted routine was somewhere among the
+	; restartable implementations of atomic functions.
 	push acc
 	mov  a, @r0
 	anl  a, #0x07
@@ -71,7 +72,7 @@ ___sdcc_atomic_maybe_rollback::
 3$:	; inner skip
 	pop acc
 4$:	; outer skip
-	pop ar0
 	pop psw
+	pop ar0
 	reti
 

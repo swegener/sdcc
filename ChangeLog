@@ -1,3 +1,83 @@
+2024-07-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/ds390/__sdcc_atomic_maybe_rollback.c: bugfix moved push psw,
+	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
+	  changed __sdcc_atomic_exchange_rollback_impl+40 to sdcc_atomic_exchange_rollback_end,
+	  bugfix outer_skip, 3$ & 4$
+	* device/lib/mcs51/__sdcc_atomic_maybe_rollback.asm: bugfix moved push psw,
+	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
+	  changed __sdcc_atomic_exchange_rollback_impl+40 to sdcc_atomic_exchange_rollback_end
+	* device/lib/mcs51/atomic_flag_test_and_set.asm: renamed
+	  ___sdcc_atomic_exchange_gptr_impl to sdcc_atomic_exchange_gptr_impl,
+	  use ljmp instead of lcall saving stack space,
+	  let that return in dpl instead of going through acc
+	* device/lib/mcs51/gptr_cmp.asm: moved push/pop dpl inside if
+	* device/lib/z80/__itoa.s,
+	* device/lib/z80/__ltoa.s,
+	* device/lib/z80/__mulsint2slong.s,
+	* device/lib/z80/__strreverse.s,
+	* device/lib/z80/__uitobcd.s,
+	* device/lib/z80/abs.s,
+	* device/lib/z80/atomic_flag_test_and_set.s,
+	* device/lib/z80/crt0.s,
+	* device/lib/z80/divmixed.s,
+	* device/lib/z80/divsigned.s,
+	* device/lib/z80/divunsigned.s,
+	* device/lib/z80/memcpy.s,
+	* device/lib/z80/memmove.s,
+	* device/lib/z80/modmixed.s,
+	* device/lib/z80/modsigned.s,
+	* device/lib/z80/modunsigned.s,
+	* device/lib/z80/mul.s,
+	* device/lib/z80/mulchar.s,
+	* device/lib/z80/setjmp.s,
+	* device/lib/z80/strcpy.s,
+	* device/lib/z80/strlen.s: added .module <name> & .optsdcc -mz80 sdcccall(1)
+	* device/lib/z80/__ultobcd.s: added .module <name>,
+	  added comments about odd ABI,
+	  small optimization
+	* src/SDCCerr.c (vwerror): print with newlines
+	* src/SDCCglue.c (glue): emit .module first,
+	  renamed genAssemblerPreamble to genAssemblerStart,
+	  moved mcs51_like part to genAssemblerStart,
+	  emit .optsdcc in genAssemblerStart
+	* src/SDCCopt.c (checkRestartAtomic),
+	* src/SDCCsymt.c (newSymbol): added commented out C11 check
+	* src/pic14/glue.c (picglue),
+	* src/pic16/glue.c (pic16glue),
+	* src/port.h: renamed genAssemblerPreamble to genAssemblerStart
+	* src/avr/main.c (_avr_genAssemblerPreamble): emit .optsdcc,
+	   renamed to _avr_genAssemblerStart
+	* src/ds390/main.c (_ds390_genAssemblerPreamble): emit .optsdcc,
+	  renamed to _ds390_genAssemblerStart,
+	  (ds390_genAtomicSupport): added commented out C11 check,
+	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
+	  renamed ___sdcc_atomic_exchange_<>_impl to sdcc_atomic_exchange_<>_impl,
+	  added sdcc_atomic_exchange_rollback_end,
+	  added sdcc_atomic_exchange_exit to load dpl,
+	  (_ds390_genIVT): bugfix nextbyteaddr calculations
+	* src/hc08/main.c (_hc08_genAssemblerPreamble): emit .optsdcc,
+	  renamed to _hc08_genAssemblerStart
+	* src/mcs51/gen.c (genCall, genPcall): skip saving regs & call cleanup for
+	  NoReturn destination, also use ljmp
+	* src/mcs51/main.c (_mcs51_genAssemblerPreamble): emit .optsdcc,
+	  renamed to _mcs51_genAssemblerStart,
+	  (mcs51_genAtomicSupport): added commented out C11 check,
+	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
+	  renamed ___sdcc_atomic_exchange_<>_impl to sdcc_atomic_exchange_<>_impl,
+	  added sdcc_atomic_exchange_rollback_end,
+	  added sdcc_atomic_exchange_exit to load dpl,
+	  (_mcs51_genIVT): bugfix nextbyteaddr calculations
+	* src/mos6502/main.c: emit .optsdcc,
+	  renamed <>_genAssemblerPreamble to <>_genAssemblerStart,
+	  many cosmetics
+	* src/pdk/main.c (pdk_genAssemblerStart): emit .optsdcc
+	* src/pic14/main.c (_pic14_genAssemblerPreamble),
+	* src/pic16/main.c (_pic16_genAssemblerPreamble): renamed to <>_genAssemblerStart
+	* src/z80/main.c (_z80_genAssemblerStart): new, added to emit .optsdcc,
+	  includes calling convention
+	* src/z80/mappings.i: added .optsdcc
+
 2024-07-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/ds390/main.c,

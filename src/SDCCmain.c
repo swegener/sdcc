@@ -2825,7 +2825,7 @@ main (int argc, char **argv, char **envp)
   /* finalize common options */
   finalizeOptions ();
 
-  /* When a non-default calling convetion is requested, the default stdlib and crt0 can't be used */
+  /* When a non-default calling convention is requested, the default stdlib and crt0 can't be used */
   /* This is a warning, not an error, since some users like to compile their own stdlib, and use it in the stdlib location. */
   if (options.sdcccall != port->sdcccall &&
   	(TARGET_IS_STM8 && !options.nostdlib ||

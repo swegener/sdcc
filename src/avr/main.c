@@ -119,9 +119,13 @@ _avr_getRegName (struct regs *reg)
 }
 
 static void
-_avr_genAssemblerPreamble (FILE * of)
+_avr_genAssemblerStart (FILE * of)
 {
-
+  if (!options.noOptsdccInAsm)
+    {
+      fprintf (of, "\t.optsdcc -m%s", port->target);
+      fprintf (of, "\n");
+    }
 }
 
 /* Generate interrupt vector table. */
@@ -261,7 +265,7 @@ PORT avr_port = {
 	avr_assignRegisters,
 	_avr_getRegName,
 	_avr_keywords,
-	_avr_genAssemblerPreamble,
+	_avr_genAssemblerStart,
 	NULL,				/* no genAssemblerEnd */
 	_avr_genIVT,
 	NULL, // _avr_genXINIT

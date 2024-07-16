@@ -27,6 +27,9 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
+	.module setjmp
+	.optsdcc -mz80 sdcccall(1)
+
 	.area	_CODE
 
 	.globl ___setjmp

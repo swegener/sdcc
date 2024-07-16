@@ -1872,8 +1872,8 @@ pic16glue ()
       fprintf(asmFile, "\t.file\t\"%s\"\n", fullSrcFileName);
 
     /* Let the port generate any global directives, etc. */
-    if(port->genAssemblerPreamble) {
-      port->genAssemblerPreamble(asmFile);
+    if(port->genAssemblerStart) {
+      port->genAssemblerStart(asmFile);
     }
 
     /* Put all variables into a cblock */

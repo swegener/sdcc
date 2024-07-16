@@ -38,6 +38,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "adjustsp", "add sp, #-%d" },
     { "fileprelude", "" },
     { "here", "." },
+    { "optsdcc", ".optsdcc" },
     { NULL, NULL }
 };
 
@@ -95,6 +96,7 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "here", "." },
+    { "optsdcc", ".optsdcc" },
     { NULL, NULL }
 };
 
@@ -151,6 +153,7 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
       "pop\taf"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
+    { "optsdcc", ".optsdcc" },
     { NULL, NULL }
 };
 
@@ -197,6 +200,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "equ", "EQU" },
     { "bequ", "\rb%s EQU %i" },
     { "here", "@" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -231,6 +235,7 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     { "ldahlsp", "ld hl, sp+%d" },
     { "ldaspsp", "add sp, %d" },
     { "mems", "[%s]" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -293,6 +298,7 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "bankimmeds", "!%s" },
     { "hashedbankimmeds", "!%s" },
     { "module", "; MODULE %s" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -323,6 +329,7 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     { "ldahlsp", "ldhl sp, %d" },
     { "ldaspsp", "add sp, %d" },
     { "mems", "(%s)" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -381,6 +388,7 @@ static const ASM_MAPPING _z80asm_mapping[] = {
     { "areadata", "; Aread BSS" },
     { "areacode", "; Area CODE" },
     { "areahome", "; Area HOME" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -432,6 +440,7 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
       "pop\taf"
     },
     { "adjustsp", "lda sp, (sp%+d)" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 static const ASM_MAPPING _gas_gb_mapping[] = {
@@ -471,6 +480,7 @@ static const ASM_MAPPING _gas_gb_mapping[] = {
     },
     { "adjustsp", "lda\tsp, -%d (sp)" },
     { "fileprelude", "" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 
@@ -533,6 +543,7 @@ static const ASM_MAPPING _gas_z80_mapping[] = {
 		"pop\taf"
     },
     { "adjustsp", "lda\tsp,-%d (sp)" },
+    { "optsdcc", "; optsdcc" },
     { NULL, NULL }
 };
 

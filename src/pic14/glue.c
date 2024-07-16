@@ -757,9 +757,9 @@ picglue (void)
   fprintf (asmFile, "%s\t.file\t\"%s\"\n", options.debug ? "" : ";", fullSrcFileName);
 
   /* Let the port generate any global directives, etc. */
-  if (port->genAssemblerPreamble)
+  if (port->genAssemblerStart)
     {
-      port->genAssemblerPreamble (asmFile);
+      port->genAssemblerStart (asmFile);
     }
 
   /* Put all variables into a cblock */

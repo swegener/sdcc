@@ -3156,6 +3156,9 @@ checkRestartAtomic (ebbIndex *ebbi)
     return;
 
   currFunc->funcRestartAtomicSupport = false;
+//  if (!options.std_c11)
+//    return;
+
   for (int i = 0; i < ebbi->count; i++)
     {
       eBBlock **ebbs = ebbi->bbOrder;

@@ -344,7 +344,7 @@ newSymbol (const char *name, long scope)
   // Err on the safe side, when in doubt disabling optimizations.
   sym->funcDivFlagSafe = false;
   sym->funcUsesVolatile = true;
-  sym->funcRestartAtomicSupport = true;
+  sym->funcRestartAtomicSupport = true; //options.std_c11;
 
   return sym;
 }
@@ -4748,8 +4748,9 @@ initCSupport (void)
           dbuf_init (&dbuf, 128);
           dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su], sbwd[bwd]);
           muldiv[muldivmod][bwd][su] =
-            funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[(TARGET_IS_PIC16 && muldivmod == 1 && bwd == 0 && su == 0 || (TARGET_IS_PIC14 || TARGET_IS_STM8 || TARGET_Z80_LIKE || TARGET_PDK_LIKE || TARGET_MOS6502_LIKE ) && bwd == 0) ? 1 : bwd][su % 2], multypes[bwd][su / 2], 2,
-                        options.intlong_rent);
+            funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)),
+                        multypes[(TARGET_IS_PIC16 && muldivmod == 1 && bwd == 0 && su == 0 || (TARGET_IS_PIC14 || TARGET_IS_STM8 || TARGET_Z80_LIKE || TARGET_PDK_LIKE || TARGET_MOS6502_LIKE ) && bwd == 0) ? 1 : bwd][su % 2],
+                        multypes[bwd][su / 2], 2, options.intlong_rent);
           dbuf_destroy (&dbuf);
         }
     }
@@ -4765,8 +4766,9 @@ initCSupport (void)
               dbuf_init (&dbuf, 128);
               dbuf_printf (&dbuf, "_%s%s%s", smuldivmod[muldivmod], ssu[su * 3], sbwd[bwd]);
               muldiv[muldivmod][bwd][su] =
-                funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)), multypes[(TARGET_IS_PIC16 && muldivmod == 1 && bwd == 0 && su == 0 || (TARGET_IS_STM8 || TARGET_Z80_LIKE || TARGET_PDK_LIKE) && bwd == 0) ? 1 : bwd][su], multypes[bwd][su], 2,
-                            options.intlong_rent);
+                funcOfType (_mangleFunctionName (dbuf_c_str (&dbuf)),
+                            multypes[(TARGET_IS_PIC16 && muldivmod == 1 && bwd == 0 && su == 0 || (TARGET_IS_STM8 || TARGET_Z80_LIKE || TARGET_PDK_LIKE) && bwd == 0) ? 1 : bwd][su],
+                            multypes[bwd][su], 2, options.intlong_rent);
               dbuf_destroy (&dbuf);
             }
         }

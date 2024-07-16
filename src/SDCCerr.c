@@ -702,18 +702,18 @@ vwerror (int errNum, va_list marker)
   if (errNum > NELEM (ErrTab))
     {
       fprintf (_SDCCERRG.out,
-              "Internal error: bad error number %d.", errNum);
+              "Internal error: bad error number %d.\n", errNum);
       return 0;
     }
   if (NELEM (ErrTab) != NUMBER_OF_ERROR_MESSAGES || ErrTab[errNum].errIndex != errNum)
     {
       fprintf (_SDCCERRG.out,
-              "Internal error: error table entry for %d inconsistent.", errNum);
+              "Internal error: error table entry for %d inconsistent.\n", errNum);
       return 0;
     }
 
   dbuf_init(&dbuf, 200);
-  
+
   if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!ErrTab[errNum].disabled))
     {
       if (ErrTab[errNum].errType >= ERROR_LEVEL_ERROR || _SDCCERRG.werror)

@@ -53,6 +53,12 @@ static char *pdk_keywords[] = {
 static void
 pdk_genAssemblerStart (FILE *of)
 {
+  if (!options.noOptsdccInAsm)
+    {
+      fprintf (of, "\t.optsdcc -m%s", port->target);
+      fprintf (of, "\n");
+    }
+
   fprintf (of, "\n; default segment ordering in RAM for linker\n");
   tfprintf (of, "\t!area\n", DATA_NAME);
   tfprintf (of, "\t!area\n", OVERLAY_NAME);

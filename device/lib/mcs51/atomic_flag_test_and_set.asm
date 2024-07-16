@@ -40,8 +40,6 @@
 	.area HOME    (CODE)
 
 _atomic_flag_test_and_set::
-	mov  r2, #1
-	lcall ___sdcc_atomic_exchange_gptr_impl
-	mov  dpl, a
-	ret
+	mov  r2, #0x01
+	ljmp sdcc_atomic_exchange_gptr_impl
 

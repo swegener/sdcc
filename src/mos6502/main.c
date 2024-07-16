@@ -30,14 +30,14 @@
 #include "m6502.h"
 #include "peep.h"
 
-#define OPTION_SMALL_MODEL          "--model-small"
-#define OPTION_LARGE_MODEL          "--model-large"
-//#define OPTION_XDATA_OVR            "--xdata-overlay"
-#define OPTION_XDATA_SPILL          "--no-zp-spill"
-//#define OPTION_CODE_SEG        "--codeseg"
-//#define OPTION_CONST_SEG       "--constseg"
-//#define OPTION_DATA_SEG        "--dataseg"
-#define OPTION_NO_STD_CRT0     "--no-std-crt0"
+#define OPTION_SMALL_MODEL      "--model-small"
+#define OPTION_LARGE_MODEL      "--model-large"
+//#define OPTION_XDATA_OVR        "--xdata-overlay"
+#define OPTION_XDATA_SPILL      "--no-zp-spill"
+//#define OPTION_CODE_SEG         "--codeseg"
+//#define OPTION_CONST_SEG        "--constseg"
+//#define OPTION_DATA_SEG         "--dataseg"
+#define OPTION_NO_STD_CRT0      "--no-std-crt0"
 
 extern char * iComments2;
 extern DEBUGFILE dwarf2DebugFile;
@@ -166,10 +166,11 @@ m6502_finaliseOptions (void)
   if (options.noXinitOpt)
     port->genXINIT = 0;
 
-  if (options.model == MODEL_LARGE) {
-    port->mem.default_local_map = xdata;
-    port->mem.default_globl_map = xdata;
-  }
+  if (options.model == MODEL_LARGE)
+    {
+      port->mem.default_local_map = xdata;
+      port->mem.default_globl_map = xdata;
+    }
   else
     {
       port->mem.default_local_map = data;
@@ -208,12 +209,12 @@ m6502_getRegName (const struct reg_info *reg)
 }
 
 static void
-m6502_genAssemblerPreamble (FILE * of)
+m6502_genAssemblerStart (FILE * of)
 {
   fprintf(of, ";; Ordering of segments for the linker.\n");
   tfprintf (of, "\t!area\n", DATA_NAME);
   tfprintf (of, "\t!area\n", OVERLAY_NAME);
-  //  if(options.xdata_overlay==0) 
+  //  if (options.xdata_overlay==0)
   //      tfprintf (of, "\t!area    (PAG, OVR)\n", OVERLAY_NAME);
 
   tfprintf (of, "\t!area\n", HOME_NAME);
@@ -225,17 +226,22 @@ m6502_genAssemblerPreamble (FILE * of)
 
   tfprintf (of, "\t!area\n", "_DATA");
   tfprintf (of, "\t!area\n", XIDATA_NAME);
-  //  if(options.xdata_overlay) 
+  //  if(options.xdata_overlay)
   //      tfprintf (of, "\t!area    (OVR)\n", OVERLAY_NAME);
   tfprintf (of, "\t!area\n", XDATA_NAME);
 
+  if (!options.noOptsdccInAsm)
+    {
+      fprintf (of, "\t.optsdcc -m%s", port->target);
+      fprintf (of, "\n");
+    }
 }
 
 static void
-m65c02_genAssemblerPreamble (FILE * of)
+m65c02_genAssemblerStart (FILE * of)
 {
   fprintf(of, "\t.r65c02\n\n");
-  m6502_genAssemblerPreamble (of);
+  m6502_genAssemblerStart (of);
 }
 
 static void
@@ -291,11 +297,14 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
   /* if bitwise | add & subtract then no since m6502 is pretty good at it
      so we will cse only if they are local (i.e. both ic & pdic belong to
      the same basic block */
-  if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-    /* then if they are the same Basic block then ok */
-    if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-    else return 0;
-  }
+  if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-')
+    {
+      /* then if they are the same Basic block then ok */
+      if (ic->eBBlockNum == pdic->eBBlockNum)
+        return 1;
+      else
+        return 0;
+    }
 
   /* for others it is cheaper to do the cse */
   return 1;
@@ -473,16 +482,15 @@ m6502_opcodeCompare (const void *key, const void *member)
 }
 
 
-const m6502opcodedata *m6502_getOpcodeData(const char *inst)
+const m6502opcodedata *m6502_getOpcodeData (const char *inst)
 {
-  
   return   bsearch (inst, m6502opcodeDataTable,
                     sizeof(m6502opcodeDataTable)/sizeof(m6502opcodedata),
                     sizeof(m6502opcodedata), m6502_opcodeCompare);
 }
 
 int
-m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
+m6502_opcodeSize (const m6502opcodedata *opcode, const char *arg)
 {
   switch (opcode->type)
     {
@@ -492,10 +500,10 @@ m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
     case M6502OP_IDD:
     case M6502OP_IDI:
       return 1;
-        
+
     case M6502OP_BR:  /* Branch (1 byte signed offset) */
       return 2;
-        
+
     case M6502OP_BBR:  /* Branch on bit (1 byte signed offset) */
       return 3;
 
@@ -505,7 +513,7 @@ m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
       if (arg[0] == '*') /* Zero page */
 	return 2;
       return 3;  /* absolute */
-        
+
     case M6502OP_REG: /* standard instruction */
     case M6502OP_CMP:
     case M6502OP_LD:
@@ -517,7 +525,7 @@ m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
       if (arg[0] == '[') /* indirect */
 	return 2;
       return 3; /* Otherwise, must be extended addressing mode */
-	    
+
     case M6502OP_JMP:
       return 3;
 
@@ -534,7 +542,7 @@ m6502_opcodeSize(const m6502opcodedata *opcode, const char *arg)
 /* cases we conservatively assume the 16-bit offset size.             */
 /*--------------------------------------------------------------------*/
 static int
-m6502_instructionSize(const char *inst, const char *op1, const char *op2)
+m6502_instructionSize (const char *inst, const char *op1, const char *op2)
 {
   const m6502opcodedata *opcode = m6502_getOpcodeData(inst);
 
@@ -576,12 +584,13 @@ m6502_asmLineNodeFromLineNode (lineNode *ln)
   if (*p == '=')
     return aln;
 
-  if(*p==';') {
-    op1[0]=0;
-    op2[0]=0;
-    aln->size = m6502_instructionSize(inst, op1, op2);
-    return aln;
-  }
+  if (*p==';')
+    {
+      op1[0]=0;
+      op2[0]=0;
+      aln->size = m6502_instructionSize(inst, op1, op2);
+      return aln;
+    }
 
   for (op = op1, opsize=1; *p && *p != ',' && *p != ';'; p++)
     {
@@ -590,14 +599,15 @@ m6502_asmLineNodeFromLineNode (lineNode *ln)
     }
   *op = '\0';
 
-  if (*p == ',') p++;
-  if (*p == ';') {
-    op2[0]=0;
-    aln->size = m6502_instructionSize(inst, op1, op2);
-    return aln;
-  }
+  if (*p == ',')
+    p++;
+  if (*p == ';')
+    {
+      op2[0]=0;
+      aln->size = m6502_instructionSize(inst, op1, op2);
+      return aln;
+    }
 
-  
   for (op = op2, opsize=1; *p && *p != ',' && *p != ';' ; p++)
     {
       if (!isspace(*p) && opsize < sizeof(op2))
@@ -622,17 +632,20 @@ m6502_getInstructionSize (lineNode *line)
 static const char *
 get_model (void)
 {
-  if(IS_MOS65C02) {
-    if (options.stackAuto)
-      return "mos65c02-stack-auto";
-    else
-      return "mos65c02";
-  } else {
-    if (options.stackAuto)
-      return "mos6502-stack-auto";
-    else
-      return "mos6502";
-  }
+  if (IS_MOS65C02)
+    {
+      if (options.stackAuto)
+        return "mos65c02-stack-auto";
+      else
+        return "mos65c02";
+    }
+  else
+    {
+      if (options.stackAuto)
+        return "mos6502-stack-auto";
+      else
+        return "mos6502";
+    }
 }
 
 /** $1 is always the basename.
@@ -662,11 +675,11 @@ PORT mos6502_port =
   {
     TARGET_ID_MOS6502,
     "mos6502",
-    "MOS 6502",                   /* Target name */
-    NULL,                         /* Processor name */
+    "MOS 6502",                 /* Target name */
+    NULL,                       /* Processor name */
     {
       glue,
-      false,                      /* Emit glue around main */
+      false,                    /* Emit glue around main */
       MODEL_SMALL | MODEL_LARGE,
       MODEL_LARGE,
       get_model,
@@ -674,22 +687,22 @@ PORT mos6502_port =
     {
       _asmCmd,
       NULL,
-      "-plosgffwy",               /* Options with debug */
-      "-plosgffw",                /* Options without debug */
+      "-plosgffwy",             /* Options with debug */
+      "-plosgffw",              /* Options without debug */
       0,
       ".asm",
-      NULL                        /* no do_assemble function */
+      NULL                      /* no do_assemble function */
     },
-    {                             /* Linker */
+    {                           /* Linker */
       _linkCmd,
       NULL,
       NULL,
-      ".rel",                     /* object file extension */
-      1,                          /* need linker script */
-      _crt,                       /* crt */
-      _libs_m6502,                /* libs */
+      ".rel",                   /* object file extension */
+      1,                        /* need linker script */
+      _crt,                     /* crt */
+      _libs_m6502,              /* libs */
     },
-    {                             /* Peephole optimizer */
+    {                           /* Peephole optimizer */
       _m6502_defaultRules,
       m6502_getInstructionSize,
       NULL,
@@ -705,86 +718,86 @@ PORT mos6502_port =
     /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
     // TODO: banked func ptr and bit-precise integers
     {
-      1,                          /* char */
-      2,                          /* short */
-      2,                          /* int */
-      4,                          /* long */
-      8,                          /* long long */
-      2,                          /* near ptr */
-      2,                          /* far ptr */
-      2,                          /* generic ptr */
-      2,                          /* func ptr */
-      0,                          /* banked func ptr */
-      1,                          /* bit */
-      4,                          /* float */
-      64,                         /* bit-precise integer types up to _BitInt (64) */
+      1,                        /* char */
+      2,                        /* short */
+      2,                        /* int */
+      4,                        /* long */
+      8,                        /* long long */
+      2,                        /* near ptr */
+      2,                        /* far ptr */
+      2,                        /* generic ptr */
+      2,                        /* func ptr */
+      0,                        /* banked func ptr */
+      1,                        /* bit */
+      4,                        /* float */
+      64,                       /* bit-precise integer types up to _BitInt (64) */
     },
     /* tags for generic pointers */
     { 0x00, 0x00, 0x00, 0x00 },   /* far, near, xstack, code */
     {
-      "XSEG",               /* xstack_name */
-      "STACK",              /* istack_name */
-      "CODE",               /* code */
-      "ZP      (PAG)",      /* data */
-      NULL,                 /* idata */
-      NULL,                 /* pdata */
-      "BSS",                /* xdata */
-      NULL,                 /* bit */
-      "RSEG    (ABS)",      /* reg */
-      "GSINIT",             /* static initialization */
-      "OSEG    (PAG, OVR)", /* overlay */
-      "GSFINAL",            /* gsfinal */
-      "_CODE",              /* home */
-      "DATA",               /* initialized xdata */
-      "XINIT",              /* a code copy of DATA */
-      "RODATA",             /* const_name */
-      "CABS    (ABS)",      /* cabs_name - const absolute data */
-      "DABS    (ABS)",      /* xabs_name - absolute xdata */
-      NULL,                 /* iabs_name */
-      NULL,                 // name of segment for initialized variables
-      NULL,                 // name of segment for copies of initialized variables in code space
-      NULL,                 // default location for auto vars
-      NULL,                 // default location for globl vars
-      1,                    /* CODE  is read-only */
-      false,                // doesn't matter, as port has no __sfr anyway
-      1                     /* No fancy alignments supported. */
+      "XSEG",                   /* xstack_name */
+      "STACK",                  /* istack_name */
+      "CODE",                   /* code */
+      "ZP      (PAG)",          /* data */
+      NULL,                     /* idata */
+      NULL,                     /* pdata */
+      "BSS",                    /* xdata */
+      NULL,                     /* bit */
+      "RSEG    (ABS)",          /* reg */
+      "GSINIT",                 /* static initialization */
+      "OSEG    (PAG, OVR)",     /* overlay */
+      "GSFINAL",                /* gsfinal */
+      "_CODE",                  /* home */
+      "DATA",                   /* initialized xdata */
+      "XINIT",                  /* a code copy of DATA */
+      "RODATA",                 /* const_name */
+      "CABS    (ABS)",          /* cabs_name - const absolute data */
+      "DABS    (ABS)",          /* xabs_name - absolute xdata */
+      NULL,                     /* iabs_name */
+      NULL,                     // name of segment for initialized variables
+      NULL,                     // name of segment for copies of initialized variables in code space
+      NULL,                     // default location for auto vars
+      NULL,                     // default location for globl vars
+      1,                        /* CODE  is read-only */
+      false,                    // doesn't matter, as port has no __sfr anyway
+      1                         /* No fancy alignments supported. */
     },
-    { NULL, NULL },         /* No extra areas */
-    0,                      /* default ABI revision */
-    {                       /* stack information */
-      -1,                   /* stack grows down */
-      0,                    /* bank_overhead (switch between register banks) */
-      6,                    /* isr overhead */
-      2,                    /* call overhead */
-      0,                    /* reent_overhead */
-      0,                    /* banked_overhead (switch between code banks) */
-      1,                    /* sp points to next free stack location */
+    { NULL, NULL },             /* No extra areas */
+    0,                          /* default ABI revision */
+    {                           /* stack information */
+      -1,                       /* stack grows down */
+      0,                        /* bank_overhead (switch between register banks) */
+      6,                        /* isr overhead */
+      2,                        /* call overhead */
+      0,                        /* reent_overhead */
+      0,                        /* banked_overhead (switch between code banks) */
+      1,                        /* sp points to next free stack location */
     },
     {
-      5,                    /* shifts up to 5 use support routines */
-      false,                /* do not use support routine for int x int -> long multiplication */
-      false,                /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
+      5,                        /* shifts up to 5 use support routines */
+      false,                    /* do not use support routine for int x int -> long multiplication */
+      false,                    /* do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication */
     },
     {
       m6502_emitDebuggerSymbol,
       {
 	m6502_dwarfRegNum,
-	0,                        /* cfiSame */
-	0,                        /* cfiUndef */
-	4,                        /* addressSize */
-	14,                       /* regNumRet */
-	15,                       /* regNumSP */
-	-1,                       /* regNumBP */
-	1,                        /* offsetSP */
+	0,                          /* cfiSame */
+	0,                          /* cfiUndef */
+	4,                          /* addressSize */
+	14,                         /* regNumRet */
+	15,                         /* regNumSP */
+	-1,                         /* regNumBP */
+	1,                          /* offsetSP */
       },
     },
     {
-      256,        /* maxCount */
-      2,          /* sizeofElement */
-      {8,16,32},  /* sizeofMatchJump[] */
-      {8,16,32},  /* sizeofRangeCompare[] */
-      5,          /* sizeofSubtract */
-      10,         /* sizeofDispatch */
+      256,                      /* maxCount */
+      2,                        /* sizeofElement */
+      {8,16,32},                /* sizeofMatchJump[] */
+      {8,16,32},                /* sizeofRangeCompare[] */
+      5,                        /* sizeofSubtract */
+      10,                       /* sizeofDispatch */
     },
     "_",
     m6502_init,
@@ -798,33 +811,33 @@ PORT mos6502_port =
     0,
     NULL,
     m6502_keywords,
-    m6502_genAssemblerPreamble,
-    m6502_genAssemblerEnd,        /* genAssemblerEnd */
+    m6502_genAssemblerStart,    /* genAssemblerStart */
+    m6502_genAssemblerEnd,      /* genAssemblerEnd */
     m6502_genIVT,
-    m6502_genXINIT,               /* genXINIT code */
-    0,                            /* genInitStartup */
+    m6502_genXINIT,             /* genXINIT code */
+    0,                          /* genInitStartup */
     m6502_reset_regparm,
     m6502_regparm,
-    NULL,                         /* process_pragma */
-    NULL,                         /* getMangledFunctionName */
-    _hasNativeMulFor,             /* hasNativeMulFor */
-    hasExtBitOp,                  /* hasExtBitOp */
-    oclsExpense,                  /* oclsExpense */
-    true,                         /* use_dw_for_init */
-    true,                         /* little endian */
-    0,                            /* leave lt */
-    0,                            /* leave gt */
-    1,                            /* transform <= to ! > */
-    1,                            /* transform >= to ! < */
-    1,                            /* transform != to !(a == b) */
-    0,                            /* leave == */
-    false,                        /* No array initializer support. */
-    cseCostEstimation,            /* CSE cost estimation */
-    NULL,                         /* no builtin functions */
-    GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
-    1,                            /* reset labelKey to 1 */
-    1,                            /* globals & local statics allowed */
-    3,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
+    NULL,                       /* process_pragma */
+    NULL,                       /* getMangledFunctionName */
+    _hasNativeMulFor,           /* hasNativeMulFor */
+    hasExtBitOp,                /* hasExtBitOp */
+    oclsExpense,                /* oclsExpense */
+    true,                       /* use_dw_for_init */
+    true,                       /* little endian */
+    0,                          /* leave lt */
+    0,                          /* leave gt */
+    1,                          /* transform <= to ! > */
+    1,                          /* transform >= to ! < */
+    1,                          /* transform != to !(a == b) */
+    0,                          /* leave == */
+    false,                      /* No array initializer support. */
+    cseCostEstimation,          /* CSE cost estimation */
+    NULL,                       /* no builtin functions */
+    GPOINTER,                   /* treat unqualified pointers as "generic" pointers */
+    1,                          /* reset labelKey to 1 */
+    1,                          /* globals & local statics allowed */
+    3,                          /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
     PORT_MAGIC
   };
 
@@ -832,34 +845,34 @@ PORT mos65c02_port =
   {
     TARGET_ID_MOS65C02,
     "mos65c02",
-    "WDC 65C02",                  /* Target name */
-    NULL,                         /* Processor name */
+    "WDC 65C02",                /* Target name */
+    NULL,                       /* Processor name */
     {
       glue,
-      false,                      /* Emit glue around main */
+      false,                    /* Emit glue around main */
       MODEL_SMALL | MODEL_LARGE,
       MODEL_LARGE,
-      0,                          /* model == target */
+      0,                        /* model == target */
     },
     {
       _asmCmd,
       0,
-      "-plosgffwy",               /* Options with debug */
-      "-plosgffw",                /* Options without debug */
+      "-plosgffwy",             /* Options with debug */
+      "-plosgffw",              /* Options without debug */
       0,
       ".asm",
-      NULL                        /* no do_assemble function */
+      NULL                      /* no do_assemble function */
     },
-    {                             /* Linker */
+    {                           /* Linker */
       _linkCmd,
       NULL,
       NULL,
       ".rel",
       1,
-      _crt,                       /* crt */
-      _libs_m65c02,               /* libs */
+      _crt,                     /* crt */
+      _libs_m65c02,             /* libs */
     },
-    {                             /* Peephole optimizer */
+    {                           /* Peephole optimizer */
       _m65c02_defaultRules,
       m6502_getInstructionSize,
       NULL,
@@ -874,65 +887,65 @@ PORT mos65c02_port =
     },
     /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
     {
-      1,                          /* char */
-      2,                          /* short */
-      2,                          /* int */
-      4,                          /* long */
-      8,                          /* long long */
-      2,                          /* near ptr */
-      2,                          /* far ptr */
-      2,                          /* generic ptr */
-      2,                          /* func ptr */
-      0,                          /* banked func ptr */
-      1,                          /* bit */
-      4,                          /* float */
-      64,                          /* bit-precise integer types up to _BitInt (64) */
+      1,                        /* char */
+      2,                        /* short */
+      2,                        /* int */
+      4,                        /* long */
+      8,                        /* long long */
+      2,                        /* near ptr */
+      2,                        /* far ptr */
+      2,                        /* generic ptr */
+      2,                        /* func ptr */
+      0,                        /* banked func ptr */
+      1,                        /* bit */
+      4,                        /* float */
+      64,                       /* bit-precise integer types up to _BitInt (64) */
     },
     /* tags for generic pointers */
-    { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
+    { 0x00, 0x00, 0x00, 0x00 }, /* far, near, xstack, code */
     {
-      "XSEG",               // xstack_name
-      "STACK",              // istack_name
-      "CODE",               // code
-      "ZP      (PAG)",      // data
-      NULL,                 // idata
-      NULL,                 // pdata
-      "BSS",                // xdata
-      NULL,                 // bit
-      "RSEG    (ABS)",      // reg
-      "GSINIT",             // static initialization
-      "OSEG    (PAG, OVR)", // overlay
-      "GSFINAL",            // gsfinal
-      "_CODE",              // home
-      "DATA",               // initialized xdata
-      "XINIT",              // a code copy of DATA
-      "RODATA",             // const_name - const data (code or not)
-      "CABS    (ABS)",      // cabs_name - const absolute data (code or not)
-      "DABS    (ABS)",      // xabs_name - absolute xdata
-      NULL,                 // iabs_name - absolute data
-      NULL,                 // name of segment for initialized variables
-      NULL,                 // name of segment for copies of initialized variables in code space
-      NULL,                 // default location for auto vars
-      NULL,                 // default location for globl vars
-      1,                    // code space read-only 1=yes
-      false,                // doesn't matter, as port has no __sfr anyway
-      1                     // No fancy alignments supported.
+      "XSEG",                   // xstack_name
+      "STACK",                  // istack_name
+      "CODE",                   // code
+      "ZP      (PAG)",          // data
+      NULL,                     // idata
+      NULL,                     // pdata
+      "BSS",                    // xdata
+      NULL,                     // bit
+      "RSEG    (ABS)",          // reg
+      "GSINIT",                 // static initialization
+      "OSEG    (PAG, OVR)",     // overlay
+      "GSFINAL",                // gsfinal
+      "_CODE",                  // home
+      "DATA",                   // initialized xdata
+      "XINIT",                  // a code copy of DATA
+      "RODATA",                 // const_name - const data (code or not)
+      "CABS    (ABS)",          // cabs_name - const absolute data (code or not)
+      "DABS    (ABS)",          // xabs_name - absolute xdata
+      NULL,                     // iabs_name - absolute data
+      NULL,                     // name of segment for initialized variables
+      NULL,                     // name of segment for copies of initialized variables in code space
+      NULL,                     // default location for auto vars
+      NULL,                     // default location for globl vars
+      1,                        // code space read-only 1=yes
+      false,                    // doesn't matter, as port has no __sfr anyway
+      1                         // No fancy alignments supported.
     },
     { NULL, NULL },
-    0,                      // ABI revision
+    0,                          // ABI revision
     {
-      -1,         /* direction (-1 = stack grows down) */
-      0,          /* bank_overhead (switch between register banks) */
-      4,          /* isr_overhead */
-      2,          /* call_overhead */
-      0,          /* reent_overhead */
-      0,          /* banked_overhead (switch between code banks) */
-      1           /* sp is offset by 1 from last item pushed */
+      -1,                       /* direction (-1 = stack grows down) */
+      0,                        /* bank_overhead (switch between register banks) */
+      4,                        /* isr_overhead */
+      2,                        /* call_overhead */
+      0,                        /* reent_overhead */
+      0,                        /* banked_overhead (switch between code banks) */
+      1                         /* sp is offset by 1 from last item pushed */
     },
     {
-      5,                    // Shifts up to 5 use support routines.
-      false,                // Do not use support routine for int x int -> long multiplication.
-      false,                // Do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication.
+      5,                        // Shifts up to 5 use support routines.
+      false,                    // Do not use support routine for int x int -> long multiplication.
+      false,                    // Do not use support routine for unsigned long x unsigned char -> unsigned long long multiplication.
     },
     {
       m6502_emitDebuggerSymbol,
@@ -940,20 +953,20 @@ PORT mos65c02_port =
 	m6502_dwarfRegNum,
 	NULL,
 	NULL,
-	4,                        /* addressSize */
-	14,                       /* regNumRet */
-	15,                       /* regNumSP */
-	-1,                       /* regNumBP */
-	1,                        /* offsetSP */
+	4,                          /* addressSize */
+	14,                         /* regNumRet */
+	15,                         /* regNumSP */
+	-1,                         /* regNumBP */
+	1,                          /* offsetSP */
       },
     },
     {
-      256,        /* maxCount */
-      2,          /* sizeofElement */
-      {8,16,32},  /* sizeofMatchJump[] */
-      {8,16,32},  /* sizeofRangeCompare[] */
-      5,          /* sizeofSubtract */
-      10,         /* sizeofDispatch */
+      256,                      /* maxCount */
+      2,                        /* sizeofElement */
+      {8,16,32},                /* sizeofMatchJump[] */
+      {8,16,32},                /* sizeofRangeCompare[] */
+      5,                        /* sizeofSubtract */
+      10,                       /* sizeofDispatch */
     },
     "_",
     m65c02_init,
@@ -967,32 +980,32 @@ PORT mos65c02_port =
     0,
     NULL,
     m6502_keywords,
-    m65c02_genAssemblerPreamble,
-    m6502_genAssemblerEnd,        /* genAssemblerEnd */
+    m65c02_genAssemblerStart,   /* genAssemblerStart */
+    m6502_genAssemblerEnd,      /* genAssemblerEnd */
     m6502_genIVT,
     m6502_genXINIT,
-    0,                            /* genInitStartup */
+    0,                          /* genInitStartup */
     m6502_reset_regparm,
     m6502_regparm,
-    0,                            /* process_pragma */
-    NULL,                         /* getMangledFunctionName */
-    _hasNativeMulFor,             /* hasNativeMulFor */
-    hasExtBitOp,                  /* hasExtBitOp */
-    oclsExpense,                  /* oclsExpense */
-    true,                         /* use_dw_for_init */
-    true,                         /* little endian */
-    0,                            /* leave lt */
-    0,                            /* leave gt */
-    1,                            /* transform <= to ! > */
-    1,                            /* transform >= to ! < */
-    1,                            /* transform != to !(a == b) */
-    0,                            /* leave == */
-    false,                        /* No array initializer support. */
-    cseCostEstimation,            /* CSE cost estimation */
-    NULL,                         /* no builtin functions */
-    GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
-    1,                            /* reset labelKey to 1 */
-    1,                            /* globals & local statics allowed */
-    3,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
+    0,                          /* process_pragma */
+    NULL,                       /* getMangledFunctionName */
+    _hasNativeMulFor,           /* hasNativeMulFor */
+    hasExtBitOp,                /* hasExtBitOp */
+    oclsExpense,                /* oclsExpense */
+    true,                       /* use_dw_for_init */
+    true,                       /* little endian */
+    0,                          /* leave lt */
+    0,                          /* leave gt */
+    1,                          /* transform <= to ! > */
+    1,                          /* transform >= to ! < */
+    1,                          /* transform != to !(a == b) */
+    0,                          /* leave == */
+    false,                      /* No array initializer support. */
+    cseCostEstimation,          /* CSE cost estimation */
+    NULL,                       /* no builtin functions */
+    GPOINTER,                   /* treat unqualified pointers as "generic" pointers */
+    1,                          /* reset labelKey to 1 */
+    1,                          /* globals & local statics allowed */
+    3,                          /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
     PORT_MAGIC
   };

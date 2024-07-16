@@ -249,8 +249,40 @@ _ds390_getRegName (const struct reg_info *reg)
 extern char * iComments2;
 
 static void
-_ds390_genAssemblerPreamble (FILE * of)
+_ds390_genAssemblerStart (FILE * of)
 {
+  if (!options.noOptsdccInAsm)
+    {
+      fprintf (of, "\t.optsdcc -m%s", port->target);
+
+      switch (options.model)
+        {
+        case MODEL_SMALL:
+          fprintf (of, " --model-small");
+          break;
+        case MODEL_LARGE:
+          fprintf (of, " --model-large");
+          break;
+        case MODEL_FLAT24:
+          fprintf (of, " --model-flat24");
+          break;
+        default:
+          break;
+        }
+      /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto"); */
+      if (options.useXstack)
+        fprintf (of, " --xstack");
+      /*if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent"); */
+      /*if(options.float_rent)     fprintf (asmFile, " --float-rent"); */
+      if (options.noRegParams)
+        fprintf (of, " --no-reg-params");
+      if (options.parms_in_bank1)
+        fprintf (of, " --parms-in-bank1");
+      if (options.all_callee_saves)
+        fprintf (of, " --all-callee-saves");
+      fprintf (of, "\n");
+    }
+
   fputs (iComments2, of);
   fputs ("; CPU specific extensions\n",of);
   fputs (iComments2, of);
@@ -290,6 +322,9 @@ _ds390_genAssemblerPreamble (FILE * of)
 static void
 ds390_genAtomicSupport (struct dbuf_s *oBuf, unsigned int startaddr)
 {
+//  if (!options.std_c11)
+//    return;
+
   dbuf_printf (oBuf, "; restartable atomic support routines\n");
 
   // Support routines need to start on 8B boundary.
@@ -305,70 +340,73 @@ ds390_genAtomicSupport (struct dbuf_s *oBuf, unsigned int startaddr)
       startaddr += 256 - startaddr % 256;
     }
 
-  dbuf_printf (oBuf, "__sdcc_atomic_exchange_rollback_impl::\n");
+  dbuf_printf (oBuf, "sdcc_atomic_exchange_rollback_start::\n");
 
   // Each routine (except the last one) needs to be 8 bytes long.
   // Restart may happen at bytes 1 to 5 of each routine.
   dbuf_printf (oBuf, "\tnop\n"
                      "\tnop\n"
-                     "___sdcc_atomic_exchange_pdata_impl:\n"
+                     "sdcc_atomic_exchange_pdata_impl:\n"
                      "\tmovx\ta, @r0\n"
                      "\tmov\tr3, a\n"
                      "\tmov\ta, r2\n"
                      "\tmovx\t@r0, a\n"
-                     "\tmov\ta, r3\n"
-                     "\tret\n");
+                     "\tsjmp\tsdcc_atomic_exchange_exit\n");
   dbuf_printf (oBuf, "\tnop\n"
                      "\tnop\n"
-                     "___sdcc_atomic_exchange_xdata_impl:\n"
+                     "sdcc_atomic_exchange_xdata_impl:\n"
                      "\tmovx\ta, @dptr\n"
                      "\tmov\tr3, a\n"
                      "\tmov\ta, r2\n"
                      "\tmovx\t@dptr, a\n"
-                     "\tmov\ta, r3\n"
-                     "\tret\n");
-  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_idata_impl:\n"
+                     "\tsjmp\tsdcc_atomic_exchange_exit\n");
+  dbuf_printf (oBuf, "sdcc_atomic_compare_exchange_idata_impl:\n"
                      "\tmov\ta, @r0\n"
                      "\tcjne\ta, ar2, .+#5\n"
                      "\tmov\ta, r3\n"
                      "\tmov\t@r0, a\n"
                      "\tret\n"
                      "\tnop\n");
-  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_pdata_impl:\n"
+  dbuf_printf (oBuf, "sdcc_atomic_compare_exchange_pdata_impl:\n"
                      "\tmovx\ta, @r0\n"
                      "\tcjne\ta, ar2, .+#5\n"
                      "\tmov\ta, r3\n"
                      "\tmovx\t@r0, a\n"
                      "\tret\n"
                      "\tnop\n");
-  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_xdata_impl:\n"
+  dbuf_printf (oBuf, "sdcc_atomic_compare_exchange_xdata_impl:\n"
                      "\tmovx\ta, @dptr\n"
                      "\tcjne\ta, ar2, .+#5\n"
                      "\tmov\ta, r3\n"
                      "\tmovx\t@dptr, a\n"
-                     "\tret\n\n");
+                     "\tret\n");
+  dbuf_printf (oBuf, "sdcc_atomic_exchange_rollback_end::\n\n");
 
   // The following two routines just need to be in jnb range of the above ones, they don't have alignment requirements.
-  
-  // Store value in r2 into byte at b:dptr, return previous byte at b:dptr in a.
+
+  // Store value in r2 into byte at b:dptr, return previous byte at b:dptr in dpl.
   // Overwrites r0, r2, r3.
-  dbuf_printf (oBuf, "___sdcc_atomic_exchange_gptr_impl::\n"
-                     "\tjnb\tb.6, ___sdcc_atomic_exchange_xdata_impl\n"
+  dbuf_printf (oBuf, "sdcc_atomic_exchange_gptr_impl::\n"
+                     "\tjnb\tb.6, sdcc_atomic_exchange_xdata_impl\n"
                      "\tmov\tr0, dpl\n"
-                     "\tjb\tb.5, ___sdcc_atomic_exchange_pdata_impl\n"
-                     "___sdcc_atomic_exchange_idata_impl:\n"
+                     "\tjb\tb.5, sdcc_atomic_exchange_pdata_impl\n"
+                     "sdcc_atomic_exchange_idata_impl:\n"
                      "\tmov\ta, r2\n"
                      "\txch\ta, @r0\n"
+                     "\tmov\tdpl, a\n"
+                     "\tret\n"
+                     "sdcc_atomic_exchange_exit:\n"
+                     "\tmov\tdpl, r3\n"
                      "\tret\n");
 
   // If the value of the byte at b:dptr is the value of r2, store the value
   // of r3 into that byte. Return the new value of that byte in a.
   // Overwrites r0, r2, r3.
-  dbuf_printf (oBuf, "___sdcc_atomic_compare_exchange_gptr_impl::\n"
-                     "\tjnb\tb.6, ___sdcc_atomic_compare_exchange_xdata_impl\n"
+  dbuf_printf (oBuf, "sdcc_atomic_compare_exchange_gptr_impl::\n"
+                     "\tjnb\tb.6, sdcc_atomic_compare_exchange_xdata_impl\n"
                      "\tmov\tr0, dpl\n"
-                     "\tjb\tb.5, ___sdcc_atomic_compare_exchange_pdata_impl\n"
-                     "\tsjmp\t___sdcc_atomic_compare_exchange_idata_impl\n");
+                     "\tjb\tb.5, sdcc_atomic_compare_exchange_pdata_impl\n"
+                     "\tsjmp\tsdcc_atomic_compare_exchange_idata_impl\n");
 }
 
 /* Generate interrupt vector table. */
@@ -389,16 +427,22 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
           if (interrupts[i])
             {
               dbuf_printf (oBuf, "\tljmp\t%s\n", interrupts[i]->rname);
-              nextbyteaddr = 3 + 8 * i + 3;
+              nextbyteaddr += 3;
               if ( i != maxInterrupts - 1 )
-                dbuf_printf (oBuf, "\t.ds\t5\n");
+                {
+                  dbuf_printf (oBuf, "\t.ds\t5\n");
+                  nextbyteaddr += 5;
+                }
             }
           else
             {
               dbuf_printf (oBuf, "\treti\n");
-              nextbyteaddr = 3 + 8 * i + 1;
+              nextbyteaddr += 1;
               if ( i != maxInterrupts - 1 )
-                dbuf_printf (oBuf, "\t.ds\t7\n");
+                {
+                  dbuf_printf (oBuf, "\t.ds\t7\n");
+                  nextbyteaddr += 7;
+                }
             }
         }
     }
@@ -415,13 +459,12 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
           if (interrupts[i])
             {
               dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
-              nextbyteaddr = 3 + 8 * i + 8;
             }
           else
             {
               dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
-              nextbyteaddr = 3 + 8 * i + 8;
             }
+          nextbyteaddr += 8;
         }
 
       dbuf_printf (oBuf, "__reset_vect:\n");
@@ -435,15 +478,17 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
           dbuf_printf (oBuf, "\tmov mcon,#0x90\t;10 bit stack at 0x400000\n");
           dbuf_printf (oBuf, "\tmov _ESP,#0x00\t; reinitialize the stack\n");
           dbuf_printf (oBuf, "\tmov _SP,#0x00\n");
+          nextbyteaddr += 24;
         }
       else
         {
           dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
           dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
           dbuf_printf (oBuf, "\tmov acon,#0x02\t;24 bit addresses, default 8 bit stack\n");
+          nextbyteaddr += 9;
         }
       dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");
-      nextbyteaddr += 28;
+      nextbyteaddr += options.model == MODEL_FLAT24 ? 4 : 3;
     }
 
   ds390_genAtomicSupport (oBuf, nextbyteaddr);
@@ -1202,7 +1247,7 @@ PORT ds390_port =
   0,
   NULL,
   _ds390_keywords,
-  _ds390_genAssemblerPreamble,
+  _ds390_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   _ds390_genIVT,
   _ds390_genXINIT,
@@ -1307,7 +1352,7 @@ static int _tininative_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int m
     return TRUE;
 }
 
-static void _tininative_genAssemblerPreamble (FILE * of)
+static void _tininative_genAssemblerStart (FILE * of)
 {
     fputs("$include(tini.inc)\n", of);
     fputs("$include(ds80c390.inc)\n", of);
@@ -1542,7 +1587,7 @@ PORT tininative_port =
   0,
   NULL,
   _tininative_keywords,
-  _tininative_genAssemblerPreamble,
+  _tininative_genAssemblerStart,
   _tininative_genAssemblerEnd,
   _tininative_genIVT,
   NULL,
@@ -1799,7 +1844,7 @@ PORT ds400_port =
   0,
   NULL,
   _ds390_keywords,
-  _ds390_genAssemblerPreamble,
+  _ds390_genAssemblerStart,
   NULL,                         /* no genAssemblerEnd */
   _ds400_genIVT,
   _ds390_genXINIT,

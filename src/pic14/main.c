@@ -206,7 +206,7 @@ _pic14_getRegName (const struct reg_info *reg)
 }
 
 static void
-_pic14_genAssemblerPreamble (FILE * of)
+_pic14_genAssemblerStart (FILE * of)
 {
   char * name = processor_base_name();
 
@@ -453,7 +453,7 @@ PORT pic_port =
   0,
   NULL,
   _pic14_keywords,
-  _pic14_genAssemblerPreamble,
+  _pic14_genAssemblerStart,
   NULL,         /* no genAssemblerEnd */
   _pic14_genIVT,
   NULL, // _pic14_genXINIT

@@ -358,7 +358,7 @@ typedef struct
   char **keywords;
 
   /* Write any port specific assembler output. */
-  void (*genAssemblerPreamble) (FILE * of);
+  void (*genAssemblerStart) (FILE * of);
   /* invoked at end assembler file */
   void (*genAssemblerEnd) (FILE * of);
 

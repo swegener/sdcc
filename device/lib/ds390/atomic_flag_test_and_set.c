@@ -13,7 +13,7 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;  GNU General Public License for more details.
 ;
-;  You should have received a copy of the GNU General Public License 
+;  You should have received a copy of the GNU General Public License
 ;  along with this library; see the file COPYING. If not, write to the
 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 ;   MA 02110-1301, USA.
@@ -35,9 +35,7 @@ static void dummy(void) __naked
 
 _atomic_flag_test_and_set::
 	mov  r2, #1
-	lcall ___sdcc_atomic_exchange_gptr_impl
-	mov  dpl, a
-	ret
+	ljmp sdcc_atomic_exchange_gptr_impl
 
 	__endasm;
 }

@@ -7,6 +7,7 @@
 	* device/lib/mcs51/__sdcc_atomic_maybe_rollback.asm: bugfix moved push psw,
 	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
 	  changed __sdcc_atomic_exchange_rollback_impl+40 to sdcc_atomic_exchange_rollback_end
+	* device/lib/ds390/atomic_flag_test_and_set.c,
 	* device/lib/mcs51/atomic_flag_test_and_set.asm: renamed
 	  ___sdcc_atomic_exchange_gptr_impl to sdcc_atomic_exchange_gptr_impl,
 	  use ljmp instead of lcall saving stack space,

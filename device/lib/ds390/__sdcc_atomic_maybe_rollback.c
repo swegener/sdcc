@@ -33,9 +33,6 @@ static void dummy(void) __naked
 {
 	__asm
 	.area HOME    (CODE)
-	.area GSINIT  (CODE)
-	.area GSFINAL (CODE)
-	.area HOME    (CODE)
 
 ; This relies on the restartable implementations being aligned properly.
 

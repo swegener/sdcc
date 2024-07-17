@@ -1,5 +1,10 @@
 2024-07-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/z80/__ultobcd.s: removed comments about odd ABI,
+	  added .optsdcc -mz80 sdcccall(1)
+
+2024-07-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/lib/ds390/__sdcc_atomic_maybe_rollback.c: bugfix moved push psw,
 	  renamed __sdcc_atomic_exchange_rollback_impl to sdcc_atomic_exchange_rollback_start,
 	  changed __sdcc_atomic_exchange_rollback_impl+40 to sdcc_atomic_exchange_rollback_end,

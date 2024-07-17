@@ -27,11 +27,7 @@
 ;--------------------------------------------------------------------------
 
 	.module __ultobcd
-
-; If not used from C (no prototype), then why not rename to ultobcd to
-; confine to assembly namespace?
-; Seems to use __z88dk_callee calling convention
-;	.optsdcc -mz80 sdcccall(1)
+	.optsdcc -mz80 sdcccall(1)
 
 	.area   _CODE
 

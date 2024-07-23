@@ -89,23 +89,23 @@ class StringTemplate:
             raise ValueError("delimiter argument must be a pair of strings")
         self.delimiter_width = len(self.delimiters[0])
         delimiters = list(map(re.escape, self.delimiters))
-        self.subpatstr = delimiters[0] + "[\w_]+" + delimiters[1]
+        self.subpatstr = delimiters[0] + "[\\w_]+" + delimiters[1]
         self.subpat = re.compile(self.subpatstr)
         self.substitutions = substitutions or {}
         self.set_template(template)
 
     def set_template(self, template):
         self.source = template
-    
+
     def keys(self):
         return list(self.substitutions.keys())
 
     def __setitem__(self, name, value):
         self.substitutions[name] = value
-        
+
     def __getitem__(self, name):
         return self.substitutions[name]
-      
+
     def __str__(self):
         return self._sub(self.source)
 
@@ -131,10 +131,10 @@ class StringTemplate:
         else:
             output.append(source[i:])
         return "".join(output)
-    
+
     def write(self, filename = None):
         """Emit the Document HTML to a file or standard output.
-        
+
         Will not overwrite file is it exists and is textually the same.
         In Unix you can use environment variables in filenames.
         Will print to stdout if no argument given.

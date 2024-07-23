@@ -1,3 +1,8 @@
+2024-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/cases/HTMLgen.py: fixed bad escape no longer accepted
+	  by Python 3.12
+
 2024-07-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/z80/__ultobcd.s: removed comments about odd ABI,

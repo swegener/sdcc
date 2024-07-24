@@ -1,3 +1,7 @@
+2024-07-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/wchar.c.in: added _FORTIFY_SOURCE==3 exception
+
 2024-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/cases/HTMLgen.py: fixed bad escape no longer accepted

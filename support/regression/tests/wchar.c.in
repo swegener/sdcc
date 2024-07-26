@@ -84,7 +84,7 @@ wcharstringnorestart(void)
 // However, Ubuntu decided to make _FORTIFY_SOURCE = 2 the default for GCC.
 // Ubuntu 24.04 LTS changed this to _FORTIFY_SOURCE = 3 when optimization is enabled
 // https://bugs.launchpad.net/ubuntu/+source/gcc-13/+bug/2012440
-#if !(defined(__GNUC__) && (_FORTIFY_SOURCE == 2 || _FORTIFY_SOURCE == 3)
+#if !(defined(__GNUC__) && (_FORTIFY_SOURCE == 2 || _FORTIFY_SOURCE == 3))
 	// Test for 0-terminated strings
 	ASSERT(wcstombs(mbs, wcs1, 1000) > 0);
 	ASSERT(mbstowcs(wcs2, mbs, 1000) > 0);

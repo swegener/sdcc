@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (tlcs.src/tlcscl.h)
+ * Simulator of microcontrollers (tlcscl.h)
  *
- * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

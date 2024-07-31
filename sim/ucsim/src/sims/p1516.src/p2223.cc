@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (p2223.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -59,6 +59,9 @@ cl_sfr_op::write(t_mem val)
   switch (addr)
     {
     case 0: return uc->cF.W(val);
+    case 1: return cell->get();
+    case 2: return cell->get();
+    case 3: return cell->get();
     }
   return 0;
 }
@@ -81,13 +84,13 @@ cl_sfr_op::read(void)
 	u8_t v2= strtol(s2.c_str(), 0, 10);
 	u8_t v3= strtol(s3.c_str(), 0, 10);
 	dv= (v1<<16) + (v2<<8) + (v3);
-	return dv;
+	return cell->set(dv);
 	break;
       }
-    case 2: return 7; // feat1
-    case 3: return 0; // feat2
+    case 2: return cell->set(15); // feat1
+    case 3: return cell->set(0); // feat2
     }
-  return 0;
+  return cell->set(0);
 }
 
 
@@ -164,6 +167,17 @@ CLP2::make_memories(void)
       class cl_memory_cell *c= sfr->get_cell(i);
       c->append_operator(new cl_sfr_op(c, this, i));
     }
+
+  cl_cvar *v;
+  v= new cl_var("sfr_version", sfr, 1, "CPU version (int, RO)");
+  v->init();
+  vars->add(v);
+  v= new cl_var("sfr_feat1", sfr, 2, "CPU features 1 (int, RO)");
+  v->init();
+  vars->add(v);
+  v= new cl_var("sfr_feat2", sfr, 3, "CPU features 2 (int, RO)");
+  v->init();
+  vars->add(v);
 }
 
 struct dis_entry *
@@ -459,6 +473,23 @@ CLP2::analyze(t_addr addr)
     }
 }
 
+t_addr
+CLP2::next_inst(t_addr addr)
+{
+  t_mem v= rom->read(addr);
+  if ((v & 0xf0000000) == 0xf0000000)
+    {
+      if (((v & 0x0e000000) >> 25) == 2)
+	{
+	  // CES
+	  unsigned int i= 1;
+	  while (rom->read(addr+i) != 0)
+	    i++;
+	  return addr+i+1;
+	}
+    }
+  return addr+1;
+}
 
 void
 CLP2::print_regs(class cl_console_base *con)
@@ -860,6 +891,45 @@ CLP2::inst_ext(t_mem code)
 }
 
 int
+CLP2::inst_uncond(t_mem code)
+{
+  u8_t inst;
+  inst= (code & 0x0e000000) >> 25;
+  switch (inst)
+    {
+    case 2:
+      return inst_call(code);
+    }
+  return resGO;
+}
+
+int
+CLP2::inst_call(t_mem code)
+{
+  t_addr call_a;
+  i32_t i32;
+  // CALL
+  if (code & 0x01000000)
+    {
+      u8_t d;
+      d= (code & 0x00f00000) >> 20;
+      // CALL Rd,s20
+      i32= (code & 0x000fffff);
+      if (i32 & 0x00080000)
+	i32|= 0xfff00000;
+      call_a= R[d]+i32;
+    }
+  else
+    {
+      // CALL abs
+      call_a= code & 0x00ffffff;
+    }
+  RC[14]->W(R[15]);
+  RC[15]->W(PC= call_a);
+  return resGO;
+}
+
+int
 CLP2::exec_inst(void)
 {
   t_mem code;
@@ -882,33 +952,18 @@ CLP2::exec_inst(void)
   d= (code & 0x00f00000) >> 20;
   inst= (code & 0x0e000000) >> 25;
   int ret= resGO;
-  switch (inst)
+  if ((code & 0xf0000000) == 0xf0000000)
+    {
+      ret= inst_uncond(code);
+    }
+  else switch (inst)
     {
     case 0: case 1:
       ret= inst_alu(code);
       break;
     case 2:
-      {
-	t_addr call_a;
-	i32_t i32;
-	// CALL
-	if (code & 0x01000000)
-	  {
-	    // CALL Rd,s20
-	    i32= (code & 0x000fffff);
-	    if (i32 & 0x00080000)
-	      i32|= 0xfff00000;
-	    call_a= R[d]+i32;
-	  }
-	else
-	  {
-	    // CALL abs
-	    call_a= code & 0x00ffffff;
-	  }
-	RC[14]->W(R[15]);
-	RC[15]->W(PC= call_a);
-	return resGO;
-      }
+      ret= inst_call(code);
+      break;
     case 3:
       ret= inst_ext(code);
       break;

@@ -21,3 +21,5 @@
 
 virtual bool stack_push(u32_t value);
 virtual bool stack_pop(u32_t *value);
+
+/* End of pblaze.src/stackcl.h */

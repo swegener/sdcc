@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/hwcl.h)
+ * Simulator of microcontrollers (hwcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -164,4 +164,4 @@ class cl_partner_hw: public cl_base
 
 #endif
 
-/* End of hwcl.h */
+/* End of sim.src/hwcl.h */

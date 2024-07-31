@@ -1008,3 +1008,5 @@ cl_pblaze::inst_xor(uint code, int operands)
 
   return(resGO);
 }
+
+/* End of pblaze.src/inst.cc */

@@ -92,3 +92,5 @@
 #define bmI 0x04
 
 #endif
+
+/* Emd of pblaze.src/regspblaze.h */

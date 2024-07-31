@@ -36,3 +36,5 @@ public:
 
 
 #endif
+
+/* End of pblaze.src/simpblazecl.h */

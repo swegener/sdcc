@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/serial_hw.cc)
+ * Simulator of microcontrollers (serial_hw.cc)
  *
- * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -47,6 +47,8 @@ cl_serial_hw::cl_serial_hw(class cl_uc *auc, int aid, chars aid_string):
   cl_hw(auc, HW_UART, aid, (const char *)aid_string)
 {
   listener_io= listener_i= listener_o= NULL;
+  as= NULL;
+  base= 0;
 }
 
 cl_serial_hw::~cl_serial_hw(void)
@@ -61,16 +63,29 @@ int
 cl_serial_hw::init(void)
 {
   chars cs;
+  int i;
   is_raw= false;
   
   cl_hw::init();
-  
+  regs= (cl_memory_cell**)malloc(dev_size() * sizeof(class cl_memory_cell *));
+  for (i=0; i<dev_size(); i++)
+    regs[i]= NULL;
   make_io();
   input_avail= false;
   sending_nl= false;
   skip_nl= 0;
-  cfg_set(serconf_nl, nl_value= 10);
+  cfg_set(serconf_nl, 10);
   nl_send_idx= 0;
+
+  s_sending= false;
+  s_receiving= false;
+  s_tx_written= false;
+  s_rec_bit= 0;
+  s_tr_bit= 0;
+  bits= 10;
+
+  mcnt= 0;
+  cpb= 1;
   
   cs.format("serial%d_in_file", id);
   serial_in_file_option= new cl_optref(this, cs.c_str());
@@ -220,7 +235,58 @@ cl_serial_hw::init(void)
   uc->vars->add(pn+"able_receive", cfg, serconf_able_receive, cfg_help(serconf_able_receive));
   uc->vars->add(pn+"nl", cfg, serconf_nl, cfg_help(serconf_nl));
   cfg_set(serconf_able_receive, 1);
+
   return 0;
+}
+
+void
+cl_serial_hw::map(class cl_address_space *new_as, t_addr new_base)
+{
+  int i;
+  if ((as && new_as) &&
+      ((as != new_as) || (base != new_base)))
+    {
+      for (i=0; i<dev_size(); i++)
+	{
+	  t_mem v= as->get(base+i);
+	  new_as->set(new_base+i, v);
+	}
+    }
+  if (as)
+    {
+      for (i=0; i<dev_size(); i++)
+	{
+	  unregister_cell(as->get_cell(base+i));
+	  regs[i]= NULL;
+	}
+    }
+  if (new_as)
+    {
+      for (i=0; i<dev_size(); i++)
+	regs[i]= register_cell(new_as, new_base+i);
+    }
+  i= as==NULL;
+  as= new_as;
+  base= new_base;
+  if (i)
+    reset();
+  if (var_names.nempty())
+    {
+      chars n;
+      chars pn= chars("", "uart%d_", id);
+      cl_cvar *v;
+      var_names.start_parse();
+      n= var_names.token(";");
+      i= 0;
+      while (!n.is_null())
+	{
+	  v= uc->get_var(pn+n);
+	  if (v)
+	    v->set_cell(as->get_cell(base+i));
+	  n= var_names.token(";");
+	  i++;
+	}
+    }
 }
 
 void
@@ -366,13 +432,13 @@ cl_serial_hw::set_cmd(class cl_cmdline *cmdline,
 void
 cl_serial_hw::set_help(class cl_console_base *con)
 {
-  con->dd_printf("set hardware uart[%d] raw   0|1\n", id);
-  con->dd_printf("set hardware uart[%d] file  \"file\"\n", id);
-  con->dd_printf("set hardware uart[%d] in    \"file\"\n", id);
-  con->dd_printf("set hardware uart[%d] out   \"file\"\n", id);
-  con->dd_printf("set hardware uart[%d] port  nr\n", id);
-  con->dd_printf("set hardware uart[%d] iport nr\n", id);
-  con->dd_printf("set hardware uart[%d] oport nr\n", id);
+  con->dd_printf("set hardware %s[%d] raw   0|1\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] file  \"file\"\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] in    \"file\"\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] out   \"file\"\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] port  nr\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] iport nr\n", get_name(), id);
+  con->dd_printf("set hardware %s[%d] oport nr\n", get_name(), id);
 }
  
 
@@ -410,7 +476,7 @@ cl_serial_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	}
     case serconf_nl:
       if (val)
-	cell->set(nl_value= (*val)&0x00ffffff);
+	cell->set((*val)&0x00ffffff);
     default:
       break;
     }
@@ -435,6 +501,7 @@ cl_serial_hw::get_input(void)
     }
   if (sending_nl)
     {
+      u32_t nl_value= cfg_get(serconf_nl);
       u8_t v= (nl_value >> (nl_send_idx*8)) & 0xff;
       u8_t vn= (nl_value >> ((nl_send_idx+1)*8)) & 0xff;
       if (vn == 0)
@@ -558,7 +625,6 @@ cl_serial_hw::proc_input(void)
 {
   int c;
   char esc= (char)cfg_get(serconf_escape);
-  bool run= uc->sim->state & SIM_GO;
   class cl_f *fin, *fout;
   int flw= cfg_get(serconf_flowctrl);
   int able= cfg_get(serconf_able_receive);
@@ -580,150 +646,181 @@ cl_serial_hw::proc_input(void)
       return true;
     }
   if (menu == 0)
+    proc_not_in_menu(fin, fout);
+  else
+    proc_in_menu(fin, fout);
+    
+  return true;
+}
+
+void
+cl_serial_hw::show_menu(void)
+{
+  char esc= (char)cfg_get(serconf_escape);
+  io->dd_printf("\n");
+  io->dd_cprintf("ui_title", "Simulator control menu\n");
+  io->dd_cprintf("ui_mkey", " %c      ", 'a'+esc-1);
+  io->dd_cprintf("ui_mitem", "Insert ^%c\n", 'a'+esc-1);
+  io->dd_cprintf("ui_mkey", " s,r,g  ");
+  io->dd_cprintf("ui_mitem", "Start simulation\n");
+  io->dd_cprintf("ui_mkey", " p      ");
+  io->dd_cprintf("ui_mitem", "Stop simulation\n");
+  io->dd_cprintf("ui_mkey", " T      ");
+  io->dd_cprintf("ui_mitem", "Reset CPU\n");
+  io->dd_cprintf("ui_mkey", " q      ");
+  io->dd_cprintf("ui_mitem", "Quit simulator\n");
+  io->dd_cprintf("ui_mkey", " o      ");
+  io->dd_cprintf("ui_mitem", "Close serial terminal\n");
+  io->dd_cprintf("ui_mkey", " e      ");
+  io->dd_cprintf("ui_mitem", "Exit menu\n");
+  io->dd_cprintf("ui_mkey", " n      ");
+  io->dd_cprintf("ui_mitem", "Change display\n");
+}
+
+bool
+cl_serial_hw::proc_not_in_menu(cl_f *fin, cl_f *fout)
+{
+  int c;
+  int flw= cfg_get(serconf_flowctrl);
+  int able= cfg_get(serconf_able_receive);
+  char esc= (char)cfg_get(serconf_escape);
+
+  if (fin->tty /*&& !flw*/ && esc)
     {
-      if (fin->tty && !flw)
+      if (fin->read(&c, 1))
+	{
+	  if (c == esc)
+	    {
+	      menu= 'm';
+	      show_menu();
+	    }
+	  else if (!input_avail)
+	    {
+	      if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
+		;
+	      else
+		{
+		  input= c;
+		  input_avail= true;
+		  skip_nl= 0;
+		}
+	    }
+	  else
+	    {
+	      //fin->unget(c);
+	      fprintf(stderr, "%s[%d] Character %d queued for RX, skip %d\n",
+		      get_name(), id, input, c);
+	    }
+	}
+    }
+  else if (!input_avail)
+    {
+      if (!flw ||
+	  able)
 	{
 	  if (fin->read(&c, 1))
 	    {
-	      if (c == esc)
-		{
-		  menu= 'm';
-		  io->dd_printf("\n");
-		  io->dd_cprintf("ui_title", "Simulator control menu\n");
-		  io->dd_cprintf("ui_mkey", " %c      ", 'a'+esc-1);
-		  io->dd_cprintf("ui_mitem", "Insert ^%c\n", 'a'+esc-1);
-		  io->dd_cprintf("ui_mkey", " s,r,g  ");
-		  io->dd_cprintf("ui_mitem", "Start simulation\n");
-		  io->dd_cprintf("ui_mkey", " p      ");
-		  io->dd_cprintf("ui_mitem", "Stop simulation\n");
-		  io->dd_cprintf("ui_mkey", " T      ");
-		  io->dd_cprintf("ui_mitem", "Reset CPU\n");
-		  io->dd_cprintf("ui_mkey", " q      ");
-		  io->dd_cprintf("ui_mitem", "Quit simulator\n");
-		  io->dd_cprintf("ui_mkey", " o      ");
-		  io->dd_cprintf("ui_mitem", "Close serial terminal\n");
-		  io->dd_cprintf("ui_mkey", " e      ");
-		  io->dd_cprintf("ui_mitem", "Exit menu\n");
-		  io->dd_cprintf("ui_mkey", " n      ");
-		  io->dd_cprintf("ui_mitem", "Change display\n");
-		}
-	      else if (!input_avail)
-		{
-		  if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
-		    ;
-		  else
-		    {
-		      input= c;
-		      input_avail= true;
-		      skip_nl= 0;
-		    }
-		}
+	      if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
+		;
 	      else
-		fin->unget(c);
-	    }
-	}
-      else if (!input_avail)
-	{
-	  if (!flw ||
-	      able)
-	    {
-	      if (fin->read(&c, 1))
 		{
-		  if (skip_nl /*&& is_nl(c)*/ && (c==skip_nl))
-		    ;
-		  else
-		    {
-		      input= c;
-		      input_avail= true;
-		      cfg_set(serconf_able_receive, 0);
-		      skip_nl= 0;
-		    }
+		  input= c;
+		  input_avail= true;
+		  cfg_set(serconf_able_receive, 0);
+		  skip_nl= 0;
 		}
 	    }
 	}
     }
-  else
+  return true;
+}
+
+bool
+cl_serial_hw::proc_in_menu(cl_f *fin, cl_f *fout)
+{
+  int c;
+  char esc= (char)cfg_get(serconf_escape);
+  bool run= uc->sim->state & SIM_GO;
+
+  if (fin->read(&c, 1))
     {
-      if (fin->read(&c, 1))
+      switch (menu)
 	{
-	  switch (menu)
+	case 'm':
+	  if ((c == esc-1+'a') ||
+	      (c == esc-1+'A') ||
+	      (c == esc))
 	    {
-	    case 'm':
-	      if ((c == esc-1+'a') ||
-		  (c == esc-1+'A') ||
-		  (c == esc))
+	      // insert ^esc
+	      if (run && !input_avail)
 		{
-		  // insert ^esc
-		  if (run && !input_avail)
-		    {
-		      input= esc, input_avail= true;
-		      io->dd_printf("^%c entered.\n", 'a'+esc-1);
-		    }
-		  else
-		    io->dd_printf("Control menu exited.\n");
-		  menu= 0;
+		  input= esc, input_avail= true;
+		  io->dd_printf("^%c entered.\n", 'a'+esc-1);
 		}
-	      switch (c)
-		{
-		case 'e': case 'E': case 'e'-'a'+1:
-		  // exit menu
-		  menu= 0;
-		  io->dd_printf("Control menu exited.\n");
-		  break;
-		case 's': case 'S': case 's'-'a'+1:
-		case 'r': case 'R': case 'r'-'a'+1:
-		case 'g': case 'G': case 'g'-'a'+1:
-		  // start
-		  uc->sim->start(0, 0);
-		  menu= 0;
-		  io->dd_printf("Simulation started.\n");
-		  break;
-		case 'p': case 'P': case 'p'-'a'+1:
-		  uc->sim->stop(resSIMIF);
-		  // stop
-		  menu= 0;
-		  io->dd_printf("Simulation stopped.\n");
-		  break;
-		case 'T':
-		  uc->reset();
-		  menu= 0;
-		  io->dd_printf("CPU reset.\n");
-		  break;
-		case 'q': case 'Q': case 'q'-'a'+1:
-		  // kill
-		  uc->sim->state|= SIM_QUIT;
-		  menu= 0;
-		  io->dd_printf("Exit simulator.\n");
-		  break;
-		case 'o': case 'O': case 'o'-'a'+1:
+	      else
+		io->dd_printf("Control menu exited.\n");
+	      menu= 0;
+	    }
+	  switch (c)
+	    {
+	    case 'e': case 'E': case 'e'-'a'+1:
+	      // exit menu
+	      menu= 0;
+	      io->dd_printf("Control menu exited.\n");
+	      break;
+	    case 's': case 'S': case 's'-'a'+1:
+	    case 'r': case 'R': case 'r'-'a'+1:
+	    case 'g': case 'G': case 'g'-'a'+1:
+	      // start
+	      uc->sim->start(0, 0);
+	      menu= 0;
+	      io->dd_printf("Simulation started.\n");
+	      break;
+	    case 'p': case 'P': case 'p'-'a'+1:
+	      uc->sim->stop(resSIMIF);
+	      // stop
+	      menu= 0;
+	      io->dd_printf("Simulation stopped.\n");
+	      break;
+	    case 'T':
+	      uc->reset();
+	      menu= 0;
+	      io->dd_printf("CPU reset.\n");
+	      break;
+	    case 'q': case 'Q': case 'q'-'a'+1:
+	      // kill
+	      uc->sim->state|= SIM_QUIT;
+	      menu= 0;
+	      io->dd_printf("Exit simulator.\n");
+	      break;
+	    case 'o': case 'O': case 'o'-'a'+1:
+	      {
+		// close
+		io->dd_printf("Closing terminal.\n");
+		menu= 0;
+		io->convert2console();
+		break;
+	      }
+	    case 'n': case 'N': case 'n'-'a'+1:
+	      {
+		class cl_hw *h= next_displayer();
+		if (!h)
+		  io->dd_printf("No other displayer.\n");
+		else
 		  {
-		    // close
-		    io->dd_printf("Closing terminal.\n");
-		    menu= 0;
-		    io->convert2console();
-		    break;
+		    io->tu_reset();
+		    io->tu_cls();
+		    io->pass2hw(h);
 		  }
-		case 'n': case 'N': case 'n'-'a'+1:
-		  {
-		    class cl_hw *h= next_displayer();
-		    if (!h)
-		      io->dd_printf("No other displayer.\n");
-		    else
-		      {
-			io->tu_reset();
-			io->tu_cls();
-			io->pass2hw(h);
-		      }
-		    menu= 0;
-		    break;
-		  }
-		default:
-		  menu= 0;
-		  io->dd_printf("Control menu closed (%d).\n", c);
-		  break;
-		}
+		menu= 0;
+		break;
+	      }
+	    default:
+	      menu= 0;
+	      io->dd_printf("Control menu closed (%d).\n", c);
 	      break;
 	    }
+	  break;
 	}
     }
   return true;
@@ -737,6 +834,27 @@ cl_serial_hw::reset(void)
   nl_send_idx= 0;
   skip_nl= 0;
 }
+
+bool
+cl_serial_hw::prediv_bitcnt(int cycles)
+{
+  mcnt+= cycles;
+  if (mcnt >= cpb)
+    {
+      mcnt-= cpb;
+      if (ten && (s_tr_bit < bits))
+	s_tr_bit++;
+      if (ren && (s_rec_bit < bits))
+	s_rec_bit++;
+      return true;
+    }
+  return false;
+}
+
+
+/*
+ * Network listener for UART
+ */
 
 cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,
 				       class cl_serial_hw *the_serial,

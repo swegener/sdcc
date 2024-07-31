@@ -50,3 +50,5 @@ const char* TiXmlBase::errorString[ TiXmlBase::TIXML_ERROR_STRING_COUNT ] =
 	"Error parsing CDATA.",
 	"Error when TiXmlDocument added to document, because TiXmlDocument can only be at the root.",
 };
+
+/* End of pblaze.src/tinyxmlerror.cc */

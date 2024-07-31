@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (m6800.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -727,4 +727,4 @@ cl_m6800::raddr(void)
   return (PC+a)&0xffff;
 }
 
-/* End of m6800.src/m6800.cc */
+/* End of motorola.src/m6800.cc */

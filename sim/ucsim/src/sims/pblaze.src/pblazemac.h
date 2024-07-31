@@ -44,4 +44,4 @@
 #define OPERAND(code) (EA_IMM(code) ? fetch() : get1(fetchea(code)))
 */
 
-
+/* End of pblaze.src/pblazemac.h */

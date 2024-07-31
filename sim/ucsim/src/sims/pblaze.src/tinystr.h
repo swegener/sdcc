@@ -303,3 +303,5 @@ public :
 
 #endif	// TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL
+
+/* End of pblaze.src/tinystr.h */

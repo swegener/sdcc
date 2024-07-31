@@ -63,3 +63,5 @@ cl_pblaze::stack_pop(u32_t *value) {
   else
     return false;
 }
+
+/* End of pblaze.src/stack.cc */

@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (motorola.src/ciacl.h)
+ * Simulator of microcontrollers (ciacl.h)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -50,30 +50,17 @@ class cl_serial_listener;
 class cl_cia: public cl_serial_hw
 {
  protected:
-  t_addr base;
-  class cl_memory_cell *regs[2];
-  int div;
-  int mcnt;
   class cl_it_src *is_r, *is_t;
   class cl_memory_cell *r_cr;         // Copy of written CR value
   class cl_memory_cell *r_sr;         // Simulated SR value
-  u8_t  s_in;         // Serial channel input reg
-  u8_t  s_out;        // Serial channel output reg
-  u8_t  s_txd;	      // TX data register
-  bool  s_sending;    // Transmitter is working (s_out is not empty)
-  bool  s_receiving;  // Receiver is working (s_in is shifting)
-  bool  s_tx_written; // TX data reg has been written
-  int   s_rec_bit;    // Bit counter of receiver
-  int   s_tr_bit;     // Bit counter of transmitter
-  uchar bits;         // Nr of bits to send/receive
-  bool  ren;          // Receiving is enabled
-  bool  ten;          // Transmitter is enabled
  public:
   cl_cia(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_cia(void);
   virtual int init(void);
+  virtual void prepare_rebase(t_addr new_base);
   virtual unsigned int cfg_size(void) { return 11; }
   virtual const char *cfg_help(t_addr addr);
+  virtual int dev_size(void) { return 2; }
 
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);

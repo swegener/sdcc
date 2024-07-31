@@ -58,3 +58,5 @@ cl_simpblaze::mk_controller(void)
 
   return(new cl_pblaze(&cpus_pblaze[i], this));
 }
+
+/* End of pblaze.src/simpblaze.cc */

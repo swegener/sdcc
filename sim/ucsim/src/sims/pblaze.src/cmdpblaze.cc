@@ -135,3 +135,5 @@ CMDHELP(cl_get_output_cmd,
 	"output [\"file\"]",
 	"Prints realized outputs of PicoBlaze",
 	"long help of get output")
+
+/* ENd of pbalze.src/cmdpblaze.cc */

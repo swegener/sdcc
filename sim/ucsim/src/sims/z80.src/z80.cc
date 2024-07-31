@@ -3,9 +3,9 @@
  *
  * some z80 code base from Karl Bongers karl@turbobit.com
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -43,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // sim
 //#include "simcl.h"
 #include "dregcl.h"
+#include "pc16550cl.h"
 
 // local
 #include "z80cl.h"
@@ -159,6 +160,9 @@ cl_z80::mk_hw_elements(void)
   cl_uc::mk_hw_elements();
 
   add_hw(h= new cl_dreg(this, 0, "dreg"));
+  h->init();
+
+  add_hw(h= new cl_pc16550(this, 0));
   h->init();
 }
 

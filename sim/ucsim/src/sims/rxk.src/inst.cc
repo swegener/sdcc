@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (inst.cc)
  *
- * Copyright (C) 2020,2021 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -309,4 +309,4 @@ cl_r4k::convd_pp(class cl_cell32 &pp)
 }
 
 
-/* End of m6800.src/inst.cc */
+/* End of rxk.src/inst.cc */

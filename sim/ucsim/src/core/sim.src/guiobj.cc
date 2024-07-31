@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (guiobj.cc)
  *
- * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2001 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -34,4 +34,4 @@ cl_guiobj::cl_guiobj(void):
 }
 
 
-/* End of gui.src/guiobj.cc */
+/* End of sim.src/guiobj.cc */

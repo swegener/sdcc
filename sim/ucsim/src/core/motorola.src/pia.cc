@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (motorola.src/pia.cc)
+ * Simulator of microcontrollers (pia.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

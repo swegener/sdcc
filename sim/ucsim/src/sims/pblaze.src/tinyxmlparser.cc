@@ -1640,3 +1640,4 @@ bool TiXmlText::Blank() const
 	return true;
 }
 
+/* End of pblaze.src/tinyxmlparser.cc */

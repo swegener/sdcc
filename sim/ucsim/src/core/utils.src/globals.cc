@@ -510,4 +510,4 @@ struct cpu_entry cpus_stm8[]=
   };
 
 
-/* End of globals.cc */
+/* End of utils.src/globals.cc */

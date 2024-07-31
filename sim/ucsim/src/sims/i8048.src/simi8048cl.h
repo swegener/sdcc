@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (simi8048cl.h)
  *
- * Copyright (C) 2022 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2022 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

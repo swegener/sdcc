@@ -46,4 +46,4 @@ char *strchr (), *strrchr ();
 
 #endif
 
-/* End of i_string.h */
+/* End of utils.src/i_string.h */

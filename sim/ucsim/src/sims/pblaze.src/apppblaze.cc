@@ -545,4 +545,4 @@ cl_apppblaze::proc_arguments(int argc, char *argv[])
   return(0);
 }
 
-
+/* End of pblaze.src/apppblaze.cc */

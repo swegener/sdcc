@@ -4,9 +4,9 @@
  * stm8 code base from Vaclav Peroutka vaclavpe@users.sourceforge.net
  * and Valentin Dudouyt valentin.dudouyt@gmail.com
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2015 Drotos Daniel
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 /* This file is part of microcontroller simulator: ucsim.

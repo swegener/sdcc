@@ -41,4 +41,4 @@ typedef void	(*iterator_func)(const void *, const void *);
 
 #endif
 
-/* End of pobjt.h */
+/* End of utils.src/pobjt.h */

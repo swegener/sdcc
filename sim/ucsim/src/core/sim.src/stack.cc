@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (stack.cc)
  *
- * Copyright (C) 2000,00 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2000 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

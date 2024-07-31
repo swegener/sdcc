@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (stm8.src/flashcl.h)
+ * Simulator of microcontrollers (flashcl.h)
  *
- * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -48,6 +48,14 @@ class cl_flash_as: public cl_address_space
   virtual int init(void);
 };
 
+class cl_iapsr_op: public cl_memory_operator
+{
+public:
+  cl_iapsr_op(class cl_memory_cell *acell);
+  virtual t_mem read(void);  
+};
+
+  
 enum stm8_flash_cfg {
   stm8_flash_on= 0,
   stm8_flash_nuof_cfg= 1

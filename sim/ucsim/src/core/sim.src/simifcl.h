@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/simifcl.h)
+ * Simulator of microcontrollers (simifcl.h)
  *
- * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -379,3 +379,5 @@ class cl_simulator_interface: public cl_hw
 
 
 #endif
+
+/* End of sim.src/simifcl.h */

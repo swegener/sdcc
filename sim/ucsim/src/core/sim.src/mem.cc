@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (mem.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -3026,4 +3026,4 @@ cl_mem_error_registry::cl_mem_error_registry(void)
   prev = register_error(new cl_error_class(err_error, "non_decoded", prev));
 }
 
-/* End of mem.cc */
+/* End of sim.src/mem.cc */

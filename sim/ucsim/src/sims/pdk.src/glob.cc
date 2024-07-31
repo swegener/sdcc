@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (glob.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -495,4 +495,4 @@ struct cpu_entry cpus_pdk[]=
   };
 
 
-/* glob.cc */
+/* End of pdk.src/glob.cc */

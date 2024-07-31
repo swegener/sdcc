@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (irq68.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -103,4 +103,4 @@ cl_irq_hw::print_info(class cl_console_base *con)
 }
 
 
-/* End of m6800.src/irq58.cc */
+/* End of motorola.src/irq58.cc */

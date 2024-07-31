@@ -106,4 +106,4 @@ extern chars operator+(char s, const chars &cs);
 
 #endif
 
-/* End of charscl.h */
+/* End of utils.src/charscl.h */

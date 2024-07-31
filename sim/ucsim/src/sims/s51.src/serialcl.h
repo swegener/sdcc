@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (serialcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -47,12 +47,6 @@ protected:
   class cl_address_space *sfr, *bas;
   bool there_is_t2, t2_baud;
   class cl_memory_cell *sbuf, *pcon, *scon, *scon_bits[8];
-  uchar s_in;		// Serial channel input reg
-  uchar s_out;		// Serial channel output reg
-  bool  s_sending;	// Transmitter is working
-  bool  s_receiving;	// Receiver is working
-  int   s_rec_bit;	// Bit counter of receiver
-  int   s_tr_bit;	// Bit counter of transmitter
   int   s_rec_t1;	// T1 overflows for receiving
   int   s_tr_t1;	// T1 overflows for sending
   int   s_rec_tick;	// Machine cycles for receiving

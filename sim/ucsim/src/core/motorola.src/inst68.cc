@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (inst68.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -56,4 +56,4 @@ cl_m6800::SWI(t_mem code)
 }
 
 
-/* End of m6800.src/inst68.cc */
+/* End of motorola.src/inst68.cc */

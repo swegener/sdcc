@@ -34,3 +34,5 @@ COMMAND_ON(uc,cl_get_output_cmd);
 
 
 #endif
+
+/* End of pblaze.src/cmdpblazecl.h */

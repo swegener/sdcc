@@ -55,3 +55,5 @@
   virtual int inst_test(uint code, int operands);
   virtual int inst_testcy(uint code, int operands);
   virtual int inst_xor(uint code, int operands);
+
+/* End of pblaze.src/instcl.h */

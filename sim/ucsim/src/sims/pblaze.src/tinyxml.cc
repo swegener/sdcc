@@ -1884,3 +1884,4 @@ bool TiXmlPrinter::Visit( const TiXmlUnknown& unknown )
 	return true;
 }
 
+/* End of pblaze.src/tinyxml.cc */

@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (uc.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -2759,6 +2759,15 @@ cl_uc::symbol2cell(char *sym,
   return false;
 }
 
+class cl_cvar *
+cl_uc::get_var(chars name)
+{
+  t_index i;
+  if (vars->by_name.search(name.c_str(), i))
+    return vars->by_name.at(i);
+  return NULL;
+}
+
 
 /*
  * Searching for a name in the specified table
@@ -3826,4 +3835,4 @@ cl_uc_error_registry::cl_uc_error_registry(void)
   prev = register_error(new cl_error_class(err_error, "unknown_code", prev, ERROR_OFF));
 }
 
-/* End of uc.cc */
+/* End of sim.src/uc.cc */

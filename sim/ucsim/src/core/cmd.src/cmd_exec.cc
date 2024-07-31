@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (cmd.src/cmdset.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -281,13 +281,11 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
     }
 #endif
 
-  inst_len = sim->uc->inst_length(sim->uc->PC);
-
   is_call= sim->uc->is_call(sim->uc->PC);
 
   if (is_call)
     {
-      next= sim->uc->PC + inst_len;
+      next= sim->uc->next_inst(sim->uc->PC);
       if (!sim->uc->fbrk_at(next))
 	{
 	  b= new cl_fetch_brk(sim->uc->rom,
@@ -298,22 +296,19 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 	  sim->uc->fbrk->add(b);
 	  b->activate();
 	}
-      sim->start(con, 0);
     }
-  else {
-    sim->start(con, 1);
-  }
+  sim->start(con, is_call?0:1);
   return(false);
 }
 
 CMDHELP(cl_next_cmd,
 	"next",
 	"Execute until next instruction is reached.",
-	"his command is similar to step command described above but\n"
-	"if actual instruction to execute is a subroutine call the next\n"
-	"command places a dynamic breakpoint after the call instruction\n"
-	"and starts to execute the subroutine. If the subroutine is\n"
-	"infinite the breakpoint set by next will never be reached.\n")
+	"This command is similar to step command, but if actual\n"
+	"instruction to execute is a subroutine call, the next command\n"
+	"places a dynamic breakpoint after the call instruction and\n"
+	"starts to execute the subroutine. If the subroutine is infinite\n"
+	"the breakpoint set by next will never be reached.\n")
 
 /*
  * Command: emulation
@@ -554,6 +549,7 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 	}
       w= cs.token(" \n\r\v\t");
     }
+  con->dd_color("answer");
   return(false);
 }
 

@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (tlcs.src/inst_jmp.cc)
+ * Simulator of microcontrollers (inst_jmp.cc)
  *
- * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

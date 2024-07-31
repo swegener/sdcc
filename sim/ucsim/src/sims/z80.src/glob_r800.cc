@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (glob_r800.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2024 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

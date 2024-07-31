@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/serial_hwcl.h)
+ * Simulator of microcontrollers (serial_hwcl.h)
  *
- * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2016 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -75,14 +75,36 @@ protected:
   bool is_raw;
   bool sending_nl;
   int skip_nl;
-  u32_t nl_value;
+  //u32_t nl_value;
   int nl_send_idx;
+  // common state variables
+  u8_t  s_in;         // Serial channel input reg
+  u8_t  s_out;        // Serial channel output reg
+  u8_t  s_txd;	      // TX data register
+  bool  s_sending;    // Transmitter is working (s_out is not empty)
+  bool  s_receiving;  // Receiver is working (s_in is shifting)
+  bool  s_tx_written; // TX data reg has been written
+  int   s_rec_bit;    // Bit counter of receiver
+  int   s_tr_bit;     // Bit counter of transmitter
+  uchar bits;         // Nr of bits to send/receive
+  bool  ren;          // Receiving is enabled
+  bool  ten;          // Transmitter is enabled
+  // clock divider
+  int cpb;
+  int mcnt;
+  // mapping into memory space
+  class cl_memory_cell **regs;
+  class cl_address_space *as;
+  t_addr base;
+  chars var_names;
 public:
   cl_serial_hw(class cl_uc *auc, int aid, chars aid_string);
   virtual ~cl_serial_hw(void);
   virtual int init(void);
+  virtual void map(class cl_address_space *new_as, t_addr new_base);
   virtual unsigned int cfg_size(void) { return serconf_nr; }
   virtual const char *cfg_help(t_addr addr);
+  virtual int dev_size(void) { return 1; }
   
   virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual void set_help(class cl_console_base *con);
@@ -99,11 +121,15 @@ public:
   virtual void del_listener_i(void);
   virtual void del_listener_o(void);
   virtual bool proc_input(void);
+  virtual void show_menu(void);
+  virtual bool proc_not_in_menu(cl_f *fin, cl_f *fout);
+  virtual bool proc_in_menu(cl_f *fin, cl_f *fout);
   virtual void refresh_display(bool force) {}
   virtual void draw_state_time(bool force) {}
   virtual void draw_display(void) {}
   
   virtual void reset(void);
+  virtual bool prediv_bitcnt(int cycles);
 };
 
 enum ser_listener_for

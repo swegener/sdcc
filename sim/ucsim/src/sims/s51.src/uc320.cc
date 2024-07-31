@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (uc320.cc)
  *
- * Copyright (C) 2018,18 whitequark
+ * Copyright (C) 2018 whitequark
  *
  * To contact author send email to whitequark@whitequark.org
  */

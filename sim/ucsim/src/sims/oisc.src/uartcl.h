@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (oisc.src/uartcl.h)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2024 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -38,7 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 enum uart_reg_idx
   {
-   cpb  = 0, // RW 0xfffb
+   rcpb = 0, // RW 0xfffb
    tdr  = 1, // WO 0xfffc
    tstat= 2, // RO 0xfffd
    rdr  = 3, // RO 0xfffe
@@ -52,26 +52,14 @@ enum uart_cfg
 
 class cl_uart: public cl_serial_hw
 {
- protected:
-  t_addr base;
-  class cl_memory_cell *regs[5];
-  int div;
-  int mcnt;
-  u8_t  s_in;         // Serial channel input reg
-  u8_t  s_out;        // Serial channel output reg
-  u8_t  s_txd;	      // TX data register
-  bool  s_sending;    // Transmitter is working (s_out is not empty)
-  bool  s_receiving;  // Receiver is working (s_in is shifting)
-  bool  s_tx_written; // TX data reg has been written
-  int   s_rec_bit;    // Bit counter of receiver
-  int   s_tr_bit;     // Bit counter of transmitter
  public:
   cl_uart(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_uart(void);
   virtual int init(void);
   virtual unsigned int cfg_size(void) { return serconf_nr+1; }
   virtual const char *cfg_help(t_addr addr);
-  
+  virtual int dev_size(void) { return 5; }
+
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);

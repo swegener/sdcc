@@ -293,3 +293,5 @@ struct cpu_entry cpus_pblaze[] =
 
   {NULL, CPU_NONE, 0, NULL, NULL}
 };
+
+/* End of pblaze.src/glob.cc */

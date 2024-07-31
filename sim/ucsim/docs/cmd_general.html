@@ -501,9 +501,12 @@ Simulation: stopped
       very well" calculated average value of it, and if the simulation is
       running or stopped. </p>
     <hr>
-    <h3><a name="reset">reset</a></h3>
+    
+    <h3><a name="reset">reset [hw]</a></h3>
+    
     Reset command. It resets the microcontroller. It has same effect as active
     signal on the RST pin.
+    
     <pre>$ <font color="#118811">ucsim_51 -V remoansi.hex</font>
 ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
@@ -532,6 +535,39 @@ under certain conditions; type `show c' for details.
 000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
    000000 02 01 60 LJMP  0160
 &gt; </pre>
+
+    Optional parameter can be the ID of a peripheral, a hardware
+    element. In this case the specified peripheral will be reseted only.
+
+    <pre>$ <font color="#118811">ucsim_p1516</font>
+uCsim 0.8.9, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">conf</font>
+ucsim version 0.8.9
+Type of microcontroller: p2223-2.2.1
+Controller has 17 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pi[0]
+   on pj[0]
+   on uart[0]
+   on clock[0]
+   on dport[0]
+   on oports[0]
+   on iports[0]
+   on n4ddr[0]
+   on boolean[0]
+   on logsys[0]
+0&gt; <font color="#118811">reset uart</font>
+0&gt; </pre>
+    
     <hr>
     <h3><a name="info">info</a></h3>
     This command prints out information about different things which must be

@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (glob.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -75,7 +75,11 @@ struct dis_entry disass_p1516[]=
 
 struct dis_entry disass_p2223[]=
   {
-    // Macro
+   // UNCONDITIONAL
+   { 0xf4000000, 0xff000000, ' ', 1, "ces 'ar'", true },
+   { 0xf5000000, 0xff000000, ' ', 1, "ces %d,'s20'", true },
+
+   // Macro
    { 0x00000000, 0x0fffffff, ' ', 1, "nop", false },
    { 0x00000000, 0x0fffff00, ' ', 1, "'char8'", false },
    { 0x00f00e00, 0x00f00f00, ' ', 1, "ret", false },
@@ -86,11 +90,11 @@ struct dis_entry disass_p2223[]=
    { 0x01f20000, 0x0fff0000, ' ', 1, "jmp 'j'", false },
    { 0x0d0d0000, 0x0f0f0000, ' ', 1, "push %d", false },
    { 0x0f0d0000, 0x0f0f0000, ' ', 1, "pop %d", false },
-   { 0x00f00000, 0x00f00000, ' ', 1, "jp 'jp'", false },
+   { 0x00f00000, 0x0fff0000, ' ', 1, "jp 'jp'", false },
    { 0x01040001, 0x0f0fffff, ' ', 1, "inc %d", false },
    { 0x0104ffff, 0x0f0fffff, ' ', 1, "dec %d", false },
     
-    // CALL
+   // CALL
    { 0x04000000, 0x0f000000, ' ', 1, "call 'ar'", true },
    { 0x05000000, 0x0f000000, ' ', 1, "call %d,'s20'", true },
 

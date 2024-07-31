@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (motorola.src/cia.cc)
+ * Simulator of microcontrollers (cia.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -63,8 +63,9 @@ cl_cia::init(void)
   r_cr= cfg_cell(acia_cfg_cr);
   r_sr= cfg_cell(acia_cfg_sr);
 
-  for (i= 0; i < 2; i++)
-    regs[i]= register_cell(uc->rom, base+i);
+  /*for (i= 0; i < dev_size(); i++)
+    regs[i]= register_cell(uc->rom, base+i);*/
+  map(uc->rom, base);
   regs[cr]->write(0x15);
   //pick_div();
   //pick_ctrl();
@@ -78,7 +79,7 @@ cl_cia::init(void)
   show_readable(false);
   show_writable(true);
   //cfg_set(acia_cfg_req, 'i');
-  
+
   cl_var *v;
   chars pn= chars("", "uart%d_", id);
   uc->vars->add(v= new cl_var(pn+"base", cfg, acia_cfg_base, cfg_help(acia_cfg_base)));
@@ -115,6 +116,20 @@ cl_cia::init(void)
   uc->it_sources->add(is_r);
   
   return(0);
+}
+
+void
+cl_cia::prepare_rebase(t_addr new_base)
+{
+  if (new_base != base)
+    {
+      int i;
+      for (i= 0; i < 2; i++)
+	{
+	  t_mem v= uc->rom->get(base+i);
+	  uc->rom->set(new_base+i, v);
+	}
+    }
 }
 
 const char *
@@ -191,10 +206,14 @@ cl_cia::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  int i;
 	  if (uc->rom->valid_address(*val))
 	    {
-	      for (i= 0; i < 2; i++)
+	      /*
+	      for (i= 0; i < dev_size(); i++)
 		unregister_cell(regs[i]);
+	      prepare_rebase(*val);
 	      base= *val;
 	      init();
+	      */
+	      map(uc->rom, (*val)&0xffff);
 	    }
 	}
       else
@@ -247,10 +266,14 @@ cl_cia::set_cmd(class cl_cmdline *cmdline,
 			 AU(uc->rom->highest_valid_address()));
 	  return true;
 	}
-      for (i= 0; i < 2; i++)
+      /*
+      for (i= 0; i < dev_size(); i++)
 	unregister_cell(regs[i]);
+      prepare_rebase(a);
       base= a;
       init();
+      */
+      map(uc->rom, a);
       return true; // handled
     }
   return cl_serial_hw::set_cmd(cmdline, con);
@@ -271,19 +294,7 @@ cl_cia::tick(int cycles)
   if (!on)
     return 0;
 
-  mcnt+= cycles;
-  if (mcnt >= div)
-    {
-      mcnt-= div;
-      if (ten)
-	{
-	  if (s_tr_bit < bits)
-	    s_tr_bit++;
-	}
-      if (ren)
-	s_rec_bit++;
-    }
-  else
+  if (!prediv_bitcnt(cycles))
     return 0;
   
   if (s_sending &&
@@ -398,10 +409,10 @@ cl_cia::pick_div()
 {
   switch (r_cr->get() & 0x03)
     {
-    case 0x00: div= 1; break;
-    case 0x01: div= 16; break;
-    case 0x02: div= 64; break;
-    case 0x03: /*Master reset*/ div= 1; break;
+    case 0x00: cpb= 1; break;
+    case 0x01: cpb= 16; break;
+    case 0x02: cpb= 64; break;
+    case 0x03: /*Master reset*/ cpb= 1; break;
     }
   mcnt= 0;
 }
@@ -503,7 +514,7 @@ cl_cia::print_info(class cl_console_base *con)
   con->dd_printf("CR: ");
   con->print_bin(r_cr->get(), 8);
   con->dd_printf(" 0x%02x", r_cr->get());
-  con->dd_printf(" div=%8d bits=%2d\n", div, bits);
+  con->dd_printf(" cpb=%8d bits=%2d\n", cpb, bits);
   con->dd_printf("SR: ");
   con->print_bin(u8, 8);
   con->dd_printf(" 0x%02x", u8);

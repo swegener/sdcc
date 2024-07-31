@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (itsrc.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -256,4 +256,4 @@ it_level::it_level(int alevel, uint aaddr, uint aPC, class cl_it_src *is):
 
 
 
-/* End of itsrc.cc */
+/* End of sim.src/itsrc.cc */

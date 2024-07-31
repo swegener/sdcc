@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/uccl.h)
+ * Simulator of microcontrollers (uccl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -479,6 +479,7 @@ public:
   virtual int inst_branch(t_addr addr);
   virtual bool is_call(t_addr addr);
   virtual int longest_inst(void);
+  virtual t_addr next_inst(t_addr addr) { return addr+inst_length(addr); }
   virtual const class cl_var *addr_name(t_addr addr,
 					class cl_memory *mem,
 					int bitnr_high,
@@ -508,6 +509,7 @@ public:
   virtual chars cell_name(class cl_memory_cell *cell, int bitnr_high, int bitnr_low);
   virtual chars cell_name(class cl_memory_cell *cell) { return cell_name(cell, -1, -1); }
   virtual t_addr read_addr(class cl_memory *m, t_addr start_addr);
+  virtual class cl_cvar *get_var(chars name);
   
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
@@ -559,4 +561,4 @@ public:
 
 #endif
 
-/* End of uccl.h */
+/* End of sim.src/uccl.h */

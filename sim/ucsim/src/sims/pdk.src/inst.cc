@@ -1,6 +1,12 @@
 /*
  * Simulator of microcontrollers (inst.cc)
+ *
+ * Copyright (C) 2016 Drotos Daniel
+ * 
+ * To contact author send email to dr.dkdb@gmail.com
+ *
  */
+
 /* This file is part of microcontroller simulator: ucsim.
 
 UCSIM is free software; you can redistribute it and/or modify
@@ -95,4 +101,3 @@ void cl_fpp::store_flag(flag n, int value) {
 
 
 /* End of pdk.src/inst.cc */
-

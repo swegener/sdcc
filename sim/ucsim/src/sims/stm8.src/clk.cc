@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (stm8.src/clk.cc)
+ * Simulator of microcontrollers (clk.cc)
  *
- * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

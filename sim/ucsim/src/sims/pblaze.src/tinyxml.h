@@ -1803,3 +1803,5 @@ private:
 #endif
 
 #endif
+
+/* End of pblaze.src/tinyxml.h */

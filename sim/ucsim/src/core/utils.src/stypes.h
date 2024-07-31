@@ -453,4 +453,4 @@ enum letter_case {
 
 #endif
 
-/* End of stypes.h */
+/* End of utils.src/stypes.h */

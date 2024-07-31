@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (arg.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -539,4 +539,4 @@ cl_cmd_array_arg::as_cell(class cl_uc *uc)
 }
 
 
-/* End of arg.cc */
+/* End of sim.src/arg.cc */

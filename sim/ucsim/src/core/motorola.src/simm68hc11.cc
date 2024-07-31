@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (simm68hc11.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -68,4 +68,4 @@ cl_simm68hc11::mk_controller(void)
 }
 
 
-/* End of m6800.src/simm68hc11.cc */
+/* End of motorola.src/simm68hc11.cc */

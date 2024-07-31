@@ -123,4 +123,4 @@ main(int argc, char *argv[])
   return(ret);
 }
 
-/* End of sim.src/ucsim.cc */
+/* End of apps/ucsim.cc */

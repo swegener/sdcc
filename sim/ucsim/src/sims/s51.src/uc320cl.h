@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (s51.src/uc320cl.h)
  *
- * Copyright (C) 2018,18 whitequark
+ * Copyright (C) 2018 whitequark
  *
  * To contact author send email to whitequark@whitequark.org
  *

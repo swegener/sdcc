@@ -3,9 +3,9 @@
  *  FD escaped multi-byte opcodes.
  *
  *
- * Copyright (C) 1999,2001 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999,2001 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  * some z80 code base from Karl Bongers karl@turbobit.com
  */

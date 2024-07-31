@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (oisc.src/uart.cc)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2024 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -50,18 +50,20 @@ cl_uart::init(void)
 {
   int i;
   
-  set_name("uart");
+  //set_name("uart");
   cl_serial_hw::init();
-  nl_value= 13;
-  
-  for (i= 0; i < 5; i++)
+  cfg_set(serconf_nl, 13);
+  /*  
+  for (i= 0; i < dev_size(); i++)
     regs[i]= register_cell(uc->rom, base+i);
-
-  //ten= false;
-  //ren= false;
+  */
+  map(uc->rom, base);
+  
+  ten= true;
+  ren= true;
   s_sending= false;
   s_receiving= false;
-
+  
   show_readable(false);
   show_writable(true);
 
@@ -110,15 +112,6 @@ cl_uart::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (conf(cell, val))
     return;
-  /*
-  if (cell == regs[ctrl])
-    {
-      regs[ctrl]->set(*val);
-      pick_div();
-      pick_ctrl();
-      *val= cell->get();
-    }
-  */
   if (cell == regs[rstat])
     {
       *val= regs[rstat]->get();
@@ -157,10 +150,13 @@ cl_uart::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  int i;
 	  if (uc->rom->valid_address(*val))
 	    {
-	      for (i= 0; i < 5; i++)
+	      /*
+	      for (i= 0; i < dev_size(); i++)
 		unregister_cell(regs[i]);
 	      base= *val;
 	      init();
+	      */
+	      map(uc->rom, (*val)&0xffff);
 	    }
 	}
       else
@@ -198,7 +194,7 @@ cl_uart::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 
 bool
 cl_uart::set_cmd(class cl_cmdline *cmdline,
-				class cl_console_base *con)
+		 class cl_console_base *con)
 {
   class cl_cmd_arg *params[2]= {
     cmdline->param(0),
@@ -216,10 +212,13 @@ cl_uart::set_cmd(class cl_cmdline *cmdline,
 			 AU(uc->rom->highest_valid_address()));
 	  return true;
 	}
-      for (i= 0; i < 5; i++)
+      /*
+      for (i= 0; i < dev_size(); i++)
 	unregister_cell(regs[i]);
       base= a;
       init();
+      */
+      map(uc->rom, a);
       return true; // handled
     }
   return cl_serial_hw::set_cmd(cmdline, con);
@@ -240,24 +239,11 @@ cl_uart::tick(int cycles)
   if (!on)
     return 0;
 
-  mcnt+= cycles;
-  if (mcnt >= div)
-    {
-      mcnt-= div;
-      //if (ten)
-	{
-	  if (s_tr_bit < 8)
-	    s_tr_bit++;
-	}
-      //if (ren)
-	if (s_rec_bit < 8)
-	  s_rec_bit++;
-    }
-  else
+  if (!prediv_bitcnt(cycles))
     return 0;
   
   if (s_sending &&
-      (s_tr_bit >= 8))
+      (s_tr_bit >= bits))
     {
       cl_f *fo= io->get_fout();
       if ((fo == NULL) || (fo->writable()))
@@ -292,7 +278,7 @@ cl_uart::tick(int cycles)
 	show_idle(true);
     }
   if (s_receiving &&
-      (s_rec_bit >= 8))
+      (s_rec_bit >= bits))
     {
 	{
 	  c= get_input();
@@ -353,7 +339,7 @@ cl_uart::reset(void)
 {
   show_writable(true);
   show_readable(false);
-  regs[cpb]->set(div= 217);
+  regs[rcpb]->set(cpb= 217);
   pick_div();
   pick_ctrl();
 }
@@ -368,16 +354,7 @@ cl_uart::happen(class cl_hw *where, enum hw_event he,
 void
 cl_uart::pick_div()
 {
-  /*
-  switch (r_cr->get() & 0x03)
-    {
-    case 0x00: div= 1; break;
-    case 0x01: div= 16; break;
-    case 0x02: div= 64; break;
-    case 0x03: div= 1; break;
-    }
-  */
-  div= regs[cpb]->get();
+  cpb= regs[rcpb]->get();
   mcnt= 0;
 }
 
@@ -390,6 +367,7 @@ cl_uart::pick_ctrl()
   s_rec_bit= s_tr_bit= 0;
   s_receiving= false;
   s_tx_written= false;
+  bits= 10;
 }
 
 
@@ -458,7 +436,7 @@ cl_uart::print_info(class cl_console_base *con)
   //con->dd_printf("CR: ");
   //con->print_bin(regs[ctrl]->get(), 8);
   //con->dd_printf(" 0x%02x", regs[ctrl]->get());
-  con->dd_printf("Div=%8d bits=8\n", div);
+  con->dd_printf("Cpb=%8d bits=8\n", cpb);
   con->dd_printf("RXSR: ");
   con->print_bin(ru8, 8);
   con->dd_printf(" 0x%02x", ru8);

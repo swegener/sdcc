@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (brk.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -495,4 +495,4 @@ cl_display_list::do_display(class cl_console_base *con)
 }
 
 
-/* End of brk.cc */
+/* End of sim.src/brk.cc */

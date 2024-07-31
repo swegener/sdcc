@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/guiobjcl.h)
+ * Simulator of microcontrollers (guiobjcl.h)
  *
- * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2001 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

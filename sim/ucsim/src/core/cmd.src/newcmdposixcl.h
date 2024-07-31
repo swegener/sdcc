@@ -1,10 +1,10 @@
 /*
  * Simulator of microcontrollers (cmd.src/newcmdposixcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * Copyright (C) 2006, Borut Razem - borut.razem@siol.net
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

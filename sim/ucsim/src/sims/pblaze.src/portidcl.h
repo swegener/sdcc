@@ -44,5 +44,4 @@ public:
 
 #endif
 
-
-
+/* End of pblaze.src/portidcl.h */

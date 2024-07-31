@@ -33,3 +33,5 @@ public:
 
 
 #endif
+
+/* End of pblaze.src/apppblazecl.h */

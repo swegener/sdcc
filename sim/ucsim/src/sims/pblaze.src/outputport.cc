@@ -119,5 +119,4 @@ cl_output_port::print_outputs(char *file_name) {
   }
 }
 
-
-
+/* End of pblaze.src/outputport.cc */

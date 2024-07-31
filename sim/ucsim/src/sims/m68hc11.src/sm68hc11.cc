@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (sm68hc11.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -55,4 +55,4 @@ main(int argc, char *argv[])
   return(0);
 }
 
-/* End of m6800.src/sm68hc11.cc */
+/* End of m68hc11.src/sm68hc11.cc */

@@ -66,3 +66,5 @@ cl_interrupt::print_info(class cl_console_base *con)
 {
   con->dd_printf("Interrupt request %s, interrupts %s\n", (interrupt_request ? "active" : "inactive"), ((class cl_pblaze *) uc)->sfr->get(FLAGS) & bmI ? "enabled":"disabled");
 }
+
+/* End of pblaze.src/interrupt.cc */

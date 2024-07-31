@@ -7,10 +7,10 @@
  *   IX register, while FD prefixes reference IY register.
  *   See inst_ddcb.cc and inst_fdcb.cc
  *
- * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * some z80 coding from Karl Bongers karl@turbobit.com
  *
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

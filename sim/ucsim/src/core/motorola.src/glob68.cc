@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (glob68.cc)
  *
- * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -248,4 +248,4 @@ struct dis_entry disass_m6800[]=
     { 0, 0, 0, 0, 0, 0 }
   };
 
-/* End of m6800.src/glob68.cc */
+/* End of motorola.src/glob68.cc */

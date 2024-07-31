@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (serialcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2015 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -47,21 +47,7 @@ class cl_serial: public cl_serial_hw
   bool clk_en_is_set;
   t_addr base;
   int type, txit, rxit;
-  class cl_memory_cell *regs[12];
-  int div;
-  int mcnt;
   bool    sr_read;	// last op was read of SR
-  u8_t s_in;		// Serial channel input reg
-  u8_t s_out;	// Serial channel output reg
-  u8_t s_txd;	// TX data register
-  bool    s_sending;	// Transmitter is working (s_out is not empty)
-  bool    s_receiving;	// Receiver is working (s_in is shifting)
-  bool	  s_tx_written;	// TX data reg has been written
-  int     s_rec_bit;	// Bit counter of receiver
-  int     s_tr_bit;	// Bit counter of transmitter
-  uchar   bits;		// Nr of bits to send/receive
-  bool    ren;		// Receiving is enabled
-  bool    ten;		// Transmitter is enabled
   bool    en;		// USART is enabled
  public:
   cl_serial(class cl_uc *auc,
@@ -70,6 +56,7 @@ class cl_serial: public cl_serial_hw
   virtual ~cl_serial(void);
   virtual int init(void);
   virtual unsigned int cfg_size(void) { return 10; }
+  virtual int dev_size(void) { return 12; }
 
   virtual void new_hw_added(class cl_hw *new_hw);
   virtual void added_to_uc(void);

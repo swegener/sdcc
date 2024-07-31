@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (cmd.src/cmduc.cc)
  *
- * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2001,01 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -235,13 +235,21 @@ CMDHELP(cl_pc_cmd,
 //		      class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_reset_cmd)
 {
-  uc->reset();
+  class cl_hw *hw;
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+  if (cmdline->syntax_match(uc, HW))
+    {
+      hw= params[0]->value.hw;
+      hw->reset();
+    }
+  else
+    uc->reset();
   return(0);
 }
 
 CMDHELP(cl_reset_cmd,
-	"reset",
-	"Reset processor to start state",
+	"reset [hw]",
+	"Reset processor or a hardware element to start state",
 	"")
 
 /*
@@ -259,7 +267,8 @@ COMMAND_DO_WORK_UC(cl_tick_cmd)
     cycles= params[0]->i_value;
 
   uc->tick(cycles);
-
+  uc->tick_hw(cycles);
+  
   return 0;
 }
 

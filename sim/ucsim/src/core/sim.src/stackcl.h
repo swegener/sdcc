@@ -1,9 +1,9 @@
 /*
- * Simulator of microcontrollers (sim.src/stackcl.h)
+ * Simulator of microcontrollers (stackcl.h)
  *
- * Copyright (C) 2000,00 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2000 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 

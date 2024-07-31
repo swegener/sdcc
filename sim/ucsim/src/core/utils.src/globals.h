@@ -52,4 +52,4 @@ extern struct cpu_entry cpus_stm8[];
 
 #endif
 
-/* End of globals.h */
+/* End of utils.src/globals.h */

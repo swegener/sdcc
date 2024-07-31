@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (hw.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -773,4 +773,4 @@ cl_hw_io::pass2hw(class cl_hw *new_hw)
 }
 
 
-/* End of hw.cc */
+/* End of sim.src/hw.cc */

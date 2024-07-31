@@ -1,9 +1,9 @@
 /*
  * Simulator of microcontrollers (p1516.src/uartcl.h)
  *
- * Copyright (C) @@S@@,@@Y@@ Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020 Drotos Daniel
  * 
- * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * To contact author send email to dr.dkdb@gmail.com
  *
  */
 
@@ -42,7 +42,7 @@ enum uart_reg_idx
    ctrl = 1, // RW
    rstat= 2, // RO
    tstat= 3, // RO
-   cpb  = 4, // RW
+   rcpb = 4, // RW
   };
 
 enum uart_cfg
@@ -52,22 +52,6 @@ enum uart_cfg
 
 class cl_uart: public cl_serial_hw
 {
- protected:
-  t_addr base;
-  class cl_memory_cell *regs[16];
-  int div;
-  int mcnt;
-  u8_t  s_in;         // Serial channel input reg
-  u8_t  s_out;        // Serial channel output reg
-  u8_t  s_txd;	      // TX data register
-  bool  s_sending;    // Transmitter is working (s_out is not empty)
-  bool  s_receiving;  // Receiver is working (s_in is shifting)
-  bool  s_tx_written; // TX data reg has been written
-  int   s_rec_bit;    // Bit counter of receiver
-  int   s_tr_bit;     // Bit counter of transmitter
-  uchar bits;         // Nr of bits to send/receive (fixed to 8)
-  bool  ren;          // Receiving is enabled (CTRL[0])
-  bool  ten;          // Transmitter is enabled (CTRL[1])
  public:
   cl_uart(class cl_uc *auc, int aid, t_addr abase);
   virtual ~cl_uart(void);
@@ -80,6 +64,7 @@ class cl_uart: public cl_serial_hw
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual bool set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual void set_help(class cl_console_base *con);
+  virtual int dev_size(void) { return 16; }
 
   virtual int tick(int cycles);
   virtual void start_send();

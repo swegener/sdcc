@@ -5712,6 +5712,11 @@ genPointerGet (const iCode *ic, iCode *ifx)
       if ((!bit_field || blen >= 8) &&
         (aopIsAcc8 (result->aop, i)))
         {
+          if (i + 1 < size &&
+            (!use_z && (aopInReg (result->aop, i, YL_IDX) || aopInReg (result->aop, i, YH_IDX)) ||
+            use_z && (aopInReg (result->aop, i, ZL_IDX) || aopInReg (result->aop, i, ZH_IDX))))
+            UNIMPLEMENTED;
+            
           if (!(offset + i) && !use_z && (aopInReg (result->aop, i, XL_IDX) || aopInReg (result->aop, i, XH_IDX) || aopInReg (result->aop, i, ZH_IDX)))
             {
               emit2 ("ld", "%s, (y)", aopGet (result->aop, i));

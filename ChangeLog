@@ -1,5 +1,15 @@
 2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* device/include/setjmp.h,
+	  sim/ucsim/src/sims/f8.src/decode.h,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/imove.cc,
+	  support/regression/tests/rotate.c.in:
+	  f8 fixes.
+
+2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* Merge sdcc from f8 branch to trunk.
 
 2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>

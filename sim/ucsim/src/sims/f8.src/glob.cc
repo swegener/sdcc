@@ -79,6 +79,7 @@ struct dis_entry disass_f8[]=
     { 0xc4, 0xff, ' ', 2, "ldw %A,('ny_16')" },
     { 0xc5, 0xff, ' ', 1, "ldw %A,('y_16')" },
     { 0xc6, 0xff, ' ', 1, "ldw %A,x" },
+    { 0xdc, 0xff, ' ', 1, "ldw %A,z" },
     { 0xc7, 0xff, ' ', 2, "ldw %A,#%d" },
     { 0xc8, 0xff, ' ', 3, "ldw 'a16_16',%A" },
     { 0xc9, 0xff, ' ', 2, "ldw ('nsp_16'),%A" },
@@ -125,15 +126,6 @@ struct dis_entry disass_f8[]=
     { 0xa1, 0xff, ' ', 2, "clrw ('nsp_16')" },
     { 0xa2, 0xff, ' ', 3, "clrw ('nnz_16')" },
     { 0xa3, 0xff, ' ', 1, "clrw %A" },
-
-    { 0x68, 0xff, ' ', 3, "xchb %a,'a16_b0',#0" },
-    { 0x69, 0xff, ' ', 3, "xchb %a,'a16_b1',#1" },
-    { 0x6a, 0xff, ' ', 3, "xchb %a,'a16_b2',#2" },
-    { 0x6b, 0xff, ' ', 3, "xchb %a,'a16_b3',#3" },
-    { 0x6c, 0xff, ' ', 3, "xchb %a,'a16_b4',#4" },
-    { 0x6d, 0xff, ' ', 3, "xchb %a,'a16_b5',#5" },
-    { 0x6e, 0xff, ' ', 3, "xchb %a,'a16_b6',#6" },
-    { 0x6f, 0xff, ' ', 3, "xchb %a,'a16_b7',#7" },
 
     // alu
     { 0x10, 0xff, ' ', 2, "add %a,#'i8'" },

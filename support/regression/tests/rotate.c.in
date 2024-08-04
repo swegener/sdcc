@@ -84,7 +84,7 @@ TYPE rol31(TYPE s){ return (s<<31) | (s>>(SIZE-31)); }
 #endif
 #endif
 
-static void
+void
 testRol(void)
 {
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory

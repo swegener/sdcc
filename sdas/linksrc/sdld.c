@@ -75,7 +75,8 @@ sdld_init (char *path)
     { "8051", TARGET_ID_8051, },
     { "6808", TARGET_ID_6808, },
     { "stm8", TARGET_ID_STM8, },
-    { "pdk",  TARGET_ID_PDK,   },
+    { "pdk",  TARGET_ID_PDK,  },
+    { "f8",   TARGET_ID_F8,   },
   };
   int i = NELEM (tgt);
 

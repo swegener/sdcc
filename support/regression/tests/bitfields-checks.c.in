@@ -71,6 +71,9 @@ typedef struct
 #elif defined(__SDCC_stm8)
     #define ABS_ADDR1 0x1000
     #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
 #else
     #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
         #if !defined(PORT_HOST) // Never do absolute address test with host

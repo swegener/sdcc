@@ -57,6 +57,9 @@
 #elif defined(__SDCC_pic16)
 #include <asm/pic16/features.h>
 
+#elif defined(__SDCC_f8)
+#include <asm/f8/features.h>
+
 #else
 /* PENDING */
 #include <asm/default/features.h>

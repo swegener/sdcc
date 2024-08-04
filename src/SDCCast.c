@@ -3223,7 +3223,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
   ast *parms = tree->right;
   ast *func = tree->left;
 
-  if (!TARGET_IS_STM8 && !TARGET_Z80_LIKE && !TARGET_PDK_LIKE) // Regression test gcc-torture-execute-20121108-1.c fails to build for hc08 and mcs51 (without --stack-auto)
+  if (!TARGET_IS_STM8 && !TARGET_Z80_LIKE && !TARGET_PDK_LIKE && !TARGET_IS_F8) // Regression test gcc-torture-execute-20121108-1.c fails to build for hc08 and mcs51 (without --stack-auto)
     return;
 
   if (!IS_FUNC (func->ftype) || IS_LITERAL (func->ftype) || func->type != EX_VALUE || !func->opval.val->sym)

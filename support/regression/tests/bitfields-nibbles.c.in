@@ -48,6 +48,9 @@ typedef struct
 #elif defined(__SDCC_stm8)
     #define ABS_ADDR1 0x1000
     #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
 #else
     // TODO: Make test suitable for pdk
     // mcs51 creates invalid assembler. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.

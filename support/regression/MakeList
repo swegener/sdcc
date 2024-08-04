@@ -97,6 +97,10 @@ EXCLUDE_s08 += \
 EXCLUDE_stm8 += \
    gte_20041218-1
 
+# For line-by-line comparability with stm8
+EXCLUDE_f8 += \
+   gte_20041218-1
+
 # Fail
 EXCLUDE_stm8-large += \
 	gte_20041218-1

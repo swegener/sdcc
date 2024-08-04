@@ -1,0 +1,405 @@
+// peeph.def - F8 peephole rules
+
+replace restart {
+	%1	%2, %3
+} by {
+	; peephole 0 removed dead load into %2 from %3.
+} if same(%1 'ld' 'ldw'), notUsed(%2), notVolatile(%3), notUsed('zf'), notUsed('nf')
+
+replace restart {
+	%1	%2
+} by {
+	; peephole 0a removed dead clear of %2.
+} if same(%1 'clr' 'clrw'), notUsed(%2)
+
+replace restart {
+	clrw	x
+} by {
+	clr	xl
+	; peephole 0b cleared xl instead of x.
+} if notUsed('xh')
+
+replace restart {
+	ldw	x, (%1, sp)
+} by {
+	ld	xl, (%1, sp)
+	; peephole 0c loaded xl instead of x.
+} if notUsed('xh'), notUsed('zf'), notUsed('nf')
+
+replace restart {
+	ldw	x, (y)
+} by {
+	ld	xl, (y)
+	; peephole 0d loaded xl instead of x.
+} if notUsed('xh'), notUsed('zf'), notUsed('nf')
+
+replace restart {
+	ldw	(%1, sp), %2
+	ldw	%2, (%1, sp)
+} by {
+	ldw	(%1, sp), %2
+	; peephole 1 removed redundant load from (%1, sp) into %2.
+}
+
+replace restart {
+	ldw	(%1, sp), %2
+	ldw	%2, (%1, sp)
+} by {
+	ldw	(%1, sp), %2
+	; peephole 1a removed redundant load from (%1, sp) into %2.
+}
+
+replace restart {
+	%1	%2
+} by {
+	; peephole 1b removed dead %1 %2.
+} if same(%1 'tst' 'tstw'), notVolatile(%2), notUsed('of' 'zf' 'nf' 'cf')
+
+replace restart {
+	%1	%2, %3
+	tst	%2
+} by {
+	%1	%2, %3
+	; peephole 2 removed redundant tst after %1
+} if same(%1 'and' 'or' 'xor'), notVolatile(%2)
+
+replace restart {
+	ld	%1, xl
+	tst	%1
+} by {
+	ld	%1, xl
+	tst	xl
+	; peephole 3 tested xl instead of %1
+} if notVolatile(%1)
+
+replace restart {
+	ld	xl, %1
+	tst	%1
+} by {
+	ld	xl, %1
+	tst	xl
+	; peephole 4 tested xl instead of %1
+} if notVolatile(%1)
+
+replace restart {
+	ld	(%1, sp), xl
+	tst	(%1, sp)
+} by {
+	ld	(%1, sp), xl
+	tst	xl
+	; peephole 5 tested xl instead of (%1, sp)
+}
+
+replace restart {
+	ldw	%1, y
+	tstw	%1
+} by {
+	ldw	%1, y
+	tstw	y
+	; peephole 6 tested y instead of %1
+} if notVolatile(%1)
+
+replace restart {
+	ldw	y, %1
+	tstw	%1
+} by {
+	ldw	y, %1
+	tstw	y
+	; peephole 7 tested y instead of %1
+} if notVolatile(%1)
+
+replace restart {
+	ldw	(%1, sp), y
+	tstw	(%1, sp)
+} by {
+	ldw	(%1, sp), y
+	tstw	y
+	; peephole 7 tested y instead of (%1, sp)
+}
+
+replace restart {
+	orw	%2, %3
+	tstw	%2
+} by {
+	orw	%2, %3
+	; peephole 8 removed redundant tstw after orw.
+} if notVolatile(%2), notUsed('cf')
+
+replace restart {
+	%1	%3, (%4, sp)
+	%2	%3
+} by {
+	%1	%3, (%4, sp)
+	; peephole 8a removed redundant tst(w) %3 after ld(w).
+} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
+
+replace restart {
+	%1	%3, (y)
+	%2	%3
+} by {
+	%1	%3, (y)
+	; peephole 8b removed redundant tst(w) %3 after ld(w).
+} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
+
+replace restart {
+	ld	%1, xl
+	dec	xl
+	tst	zh
+	jrnz	#%2
+} by {
+	ld	%1, xl
+	dec	xl
+	jrc	#%2
+	; peephole 9 removed tst by adjusting jump condition
+} if notVolatile(%1), notUsed('nf' 'zf'), notUsedFrom(%2 'nf' 'zf')
+
+replace restart {
+	ld	%1, xl
+	dec	xl
+	tst	zh
+	jrz	#%2
+} by {
+	ld	%1, xl
+	dec	xl
+	jrnc	#%2
+	; peephole 10 removed tst by adjusting jump condition
+} if notVolatile(%1), notUsed('nf' 'zf'), notUsedFrom(%2 'nf' 'zf')
+
+replace restart {
+	clr	%1
+	srl	%1
+} by {
+	tst	%1
+	; peephole 11 replaced clr-srl by tst.
+} if notVolatile(%1), notUsed(%1), notUsed('of')
+
+replace restart {
+	jp	#%1
+%1:
+} by {
+%1:
+	; peephole j0 removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	#%1
+%2:
+%1:
+} by {
+%2:
+%1:
+	; peephole j1 removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	#%1
+	jp	#%2
+} by {
+	jp	#%1
+	; peephole j2a removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jr	#%1
+	jp	#%2
+} by {
+	jr	#%1
+	; peephole j2b removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	#%1
+	jr	#%2
+} by {
+	jp	#%1
+	; peephole jc2 removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jr	#%1
+	jr	#%2
+} by {
+	jr	#%1
+	; peephole j2d removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace {
+	jp	#%5
+	ret
+} by {
+	jp	#%5
+	; peephole j3 removed unreachable ret.
+}
+
+replace restart {
+	jp	#%5
+	addw	sp, %1
+} by {
+	jp	#%5
+	; peephole j4 removed unreachable addw.
+}
+
+// Ensure jump-to-jump optimization of absolute jumps above is done before other jump-related optimizations.
+barrier
+
+replace restart {
+	jp	#%5
+} by {
+	ret
+	; peephole j5 replaced jump by return.
+} if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+replace restart {
+	jp	#%5
+} by {
+	jr	#%5
+	; peephole j6 changed absolute to relative unconditional jump.
+} if labelInRange(%5)
+
+replace restart {
+	jrz	#%1
+	jr	#%5
+%1:
+} by {
+	jrnz	#%5
+	; peephole j7 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrnz	#%1
+	jr	#%5
+%1:
+} by {
+	jrz	#%5
+	; peephole j8 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrc	#%1
+	jr	#%5
+%1:
+} by {
+	jrnc	#%5
+	; peephole j9 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrnc	#%1
+	jr	#%5
+%1:
+} by {
+	jrc	#%5
+	; peephole j10 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrn	#%1
+	jr	#%5
+%1:
+} by {
+	jrnn	#%5
+	; peephole j11 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrnn	#%1
+	jr	#%5
+%1:
+} by {
+	jrn	#%5
+	; peephole j12 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jro	#%1
+	jr	#%5
+%1:
+} by {
+	jrno	#%5
+	; peephole j13 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrno	#%1
+	jr	#%5
+%1:
+} by {
+	jro	#%5
+	; peephole j14 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrsge	#%1
+	jr	#%5
+%1:
+} by {
+	jrslt	#%5
+	; peephole j15 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrslt	#%1
+	jr	#%5
+%1:
+} by {
+	jrsge	#%5
+	; peephole j16 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrsgt	#%1
+	jr	#%5
+%1:
+} by {
+	jrsle	#%5
+	; peephole j17 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrsle	#%1
+	jr	#%5
+%1:
+} by {
+	jrsgt	#%5
+	; peephole j18 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrgt	#%1
+	jr	#%5
+%1:
+} by {
+	jrle	#%5
+	; peephole j19 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrle	#%1
+	jr	#%5
+%1:
+} by {
+	jrgt	#%5
+	; peephole j20 removed jr by using inverse jump logic
+%1:
+} if labelRefCountChange(%1 -1)
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+replace restart {
+%1:
+} by {
+	; peephole j21 removed unused label %1.
+} if labelRefCount(%1 0)
+

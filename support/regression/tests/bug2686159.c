@@ -10,6 +10,8 @@
 # define ADDRESS(x) (0x01A0 + 0x ## x)
 #elif defined(__SDCC_stm8)
 # define ADDRESS(x) (0x10 ## x)
+#elif defined(__SDCC_f8)
+# define ADDRESS(x) (0x30 ## x)
 #elif defined( __SDCC_pdk14) || defined( __SDCC_pdk15) // No RAM above 0x7f / 0xff.
 # define ADDRESS(x) (0x78 + 0x ## x)
 #else

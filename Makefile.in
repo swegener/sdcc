@@ -87,6 +87,11 @@ SDCC_AS        += sdas/aspdk16
 SDCC_LD        += sdcc-ldpdk
 endif
 
+ifeq ($(OPT_DISABLE_F8), 0)
+SDCC_AS        += sdas/asf8
+SDCC_LD        += sdcc-ldf8
+endif
+
 
 ifeq ($(OPT_DISABLE_UCSIM), 0)
 TARGETS        += sdcc-misc

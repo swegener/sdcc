@@ -85,6 +85,7 @@ OPT_DISABLE_PDK14    = @OPT_DISABLE_PDK14@
 OPT_DISABLE_PDK15    = @OPT_DISABLE_PDK15@
 OPT_DISABLE_MOS6502  = @OPT_DISABLE_MOS6502@
 OPT_DISABLE_MOS65C02 = @OPT_DISABLE_MOS65C02@
+OPT_DISABLE_F8       = @OPT_DISABLE_F8@
 
 SOURCES_FLOAT = $(COMMON_FLOAT) \
   _fscmp.c \
@@ -287,6 +288,10 @@ endif
 ifeq ($(OPT_DISABLE_PDK15), 0)
 TARGETS        += model-pdk15
 TARGETS        += model-pdk15-stack-auto
+endif
+
+ifeq ($(OPT_DISABLE_F8), 0)
+TARGETS        += model-f8
 endif
 
 # Compiling entire program or any subproject
@@ -522,6 +527,16 @@ model-pdk15-stack-auto:
 	  $(MAKE) MODELFLAGS="-mpdk15 --stack-auto" PORT=pdk15-stack-auto objects-pdk15 || exit 1; \
 	fi
 
+model-f8:
+	if grep '^f8$$' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-mf8" PORT=f8 objects-f8; \
+	fi
+
+objects-f8:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects
+	$(MAKE) clean_intermediate
+
 model-pic16:
 	if grep '^pic16$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic16 objects-pic16; \
@@ -676,10 +691,11 @@ install: all installdirs
 	                     $(srcdir)/mos6502 $(srcdir)/mos65c02 \
 	                     $(srcdir)/stm8 \
 	                     $(srcdir)/pdk13 $(srcdir)/pdk14 $(srcdir)/pdk15 \
+	                     $(srcdir)/f8 \
 	                     $(srcdir)/pic14 $(srcdir)/pic16 $(srcdir)/*.c $(sdcc_libdir)/src
-	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 z80 z180 ez80_z80 z80n r2k r2ka r3ka tlcs90 sm83 r800 hc08 s08 stm8 pdk13 pdk14 pdk15 $(sdcc_libdir)/src
+	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 z80 z180 ez80_z80 z80n r2k r2ka r3ka tlcs90 sm83 r800 hc08 s08 stm8 pdk13 pdk14 pdk15 f8 $(sdcc_libdir)/src
 
-	for src in $(MODELS) ds390 ds400 z80 z180 ez80_z80 z80n r2k r2ka r3ka tlcs90 sm83 r800 hc08 s08 mos6502 mos65c02 stm8 pdk13 pdk14 pdk15 pic14 pic16; do \
+	for src in $(MODELS) ds390 ds400 z80 z180 ez80_z80 z80n r2k r2ka r3ka tlcs90 sm83 r800 hc08 s08 mos6502 mos65c02 stm8 pdk13 pdk14 pdk15 f8 pic14 pic16; do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \

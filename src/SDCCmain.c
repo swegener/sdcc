@@ -376,6 +376,9 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_MOS65C02
   &mos65c02_port,
 #endif
+#if !OPT_DISABLE_F8
+  &f8_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))

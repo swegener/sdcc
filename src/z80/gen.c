@@ -7291,6 +7291,8 @@ done:
   _G.flushStatics = 1;
   _G.stack.pushed = 0;
   _G.stack.offset = 0;
+
+  emitDebug (";\tTotal %s function size at codegen: %u bytes.", sym->name, (unsigned int)regalloc_dry_run_cost);
 }
 
 /*-----------------------------------------------------------------*/
@@ -17442,7 +17444,7 @@ genZ80Code (iCode * lic)
           emit2 (";ic:%d: %s", ic->key, iLine);
           dbuf_free (iLine);
         }
-      regalloc_dry_run_cost = 0;
+      //regalloc_dry_run_cost = 0;
       regalloc_dry_run_cost_bytes = 0;
       regalloc_dry_run_cost_states = 0;
       genZ80iCode (ic);

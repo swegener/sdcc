@@ -29,3 +29,4 @@
 #define __SDCC_ATOMIC_EXTERN extern
 
 #include <stdatomic.h>
+

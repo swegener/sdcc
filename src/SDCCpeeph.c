@@ -658,7 +658,7 @@ FBYNAME (labelIsUncondJump)
       jpInst = "jmp";
       jpInst2 = "bra";
     }
-  else if (TARGET_Z80_LIKE)
+  else if (TARGET_Z80_LIKE || TARGET_IS_F8)
     {
       jpInst = "jp";
       jpInst2 = "jr";

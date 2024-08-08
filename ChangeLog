@@ -6,6 +6,8 @@
 	  Fix bug #3766.
 	* src/pic16/glue.c:
 	  Try to fix bug #3767.
+	* support/regression/tests/bug-3745.c:
+	  Regression test for bug #3745.
 
 2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>
 

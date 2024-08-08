@@ -2853,6 +2853,10 @@ comparePtrType (sym_link *dest, sym_link *src, bool mustCast, bool ignoreimplici
 {
   int res;
 
+#if 0
+  printf("comparePtrType (must cast %d): ", mustCast); printTypeChain (dest, stdout); printf(" vs. "); printTypeChain (src, 0);
+#endif
+
   if (getAddrspace (src->next) != getAddrspace (dest->next))
     mustCast = 1;
 
@@ -2864,8 +2868,10 @@ comparePtrType (sym_link *dest, sym_link *src, bool mustCast, bool ignoreimplici
     return mustCast ? -1 : 1;
   res = compareType (dest->next, src->next, ignoreimplicitintrinsic);
 
-  /* All function pointers can be cast (6.6 in the ISO C11 standard) TODO: What about address spaces? */
-  if (res == 0 && !mustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
+  /* All function pointers can be cast (6.3.2.3 in the ISO C23 standard), similar for objects. TODO: What about address spaces? */
+  if (res == 0 && !mustCast && IS_DECL (src) && IS_DECL (dest) && (IS_FUNC (src->next) == IS_FUNC (dest->next)))
+    return -1;
+  else if (res == 0 && !mustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
     return -1;
   else if (res == 1)
     return mustCast ? -1 : 1;

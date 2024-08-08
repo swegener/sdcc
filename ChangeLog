@@ -1,3 +1,10 @@
+2024-08-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  support/regression/tests/bug-3766.c:
+	  Fix bug #3766.
+
 2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/include/setjmp.h,

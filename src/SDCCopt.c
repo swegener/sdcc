@@ -1813,7 +1813,7 @@ replaceRegEqvOperand (iCode * ic, operand ** opp, int force_isaddr, int new_isad
 /* replaceRegEqv - replace all local variables with their reqv     */
 /*-----------------------------------------------------------------*/
 static void
-replaceRegEqv (ebbIndex * ebbi)
+replaceRegEqv (ebbIndex *ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -1830,6 +1830,17 @@ replaceRegEqv (ebbIndex * ebbi)
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
+          // Convert struct / union to pointer.
+          if(ic->op != ADDRESS_OF && ic->op != RETURN && ic->op != CALL && ic->op != PCALL)
+            {
+              if (ic->left && IS_AGGREGATE (operandType (ic->left)))
+                setOperandType (ic->left, aggrToPtr (operandType (ic->left), false));
+              if (ic->right && IS_AGGREGATE (operandType (ic->right)))
+                setOperandType (ic->right, aggrToPtr (operandType (ic->right), false));
+              if (ic->result && IS_AGGREGATE (operandType (ic->result)))
+                setOperandType (ic->result, aggrToPtr (operandType (ic->result), false));
+            }
+          
           if (SKIP_IC2 (ic))
             continue;
 

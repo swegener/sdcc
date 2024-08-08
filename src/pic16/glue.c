@@ -171,7 +171,6 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                         /* new version */
                         if(IS_STATIC(sym->etype)
                                 && !sym->ival) /* && !sym->level*/ {
-                          reg_info *reg;
                           sectSym *ssym;
                           int found=0;
 
@@ -183,7 +182,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                                         sym->implicit = 1;
 #endif
 
-                                reg = pic16_allocDirReg (operandFromSymbol (sym, false));
+                                reg_info *reg = pic16_allocDirReg (operandFromSymbol (sym, false));
 
                                 if(reg) {
                                   for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
@@ -1802,7 +1801,10 @@ pic16glue ()
       unsigned long ramsize = pic16 ? pic16->RAMsize : 0x200;
       symbol *sym;
 
-      reg = newReg (REG_SFR, PO_SFR_REGISTER, ramsize-1, "_sram_end", 0, 0, NULL);
+      // This used to use the global reg (see bug #3767), instead of decalring one locally.
+      // I don't know if using a local reg_info is correct here,
+      // but it makes this compile, and does not change the number of regression test failures.
+      reg_info *reg = newReg (REG_SFR, PO_SFR_REGISTER, ramsize-1, "_sram_end", 0, 0, NULL);
       addSet (&pic16_fix_udata, reg);
 
       sym = newSymbol ("sram_end", 0);

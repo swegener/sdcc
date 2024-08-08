@@ -4,6 +4,8 @@
 	  src/SDCCsymt.c,
 	  support/regression/tests/bug-3766.c:
 	  Fix bug #3766.
+	* src/pic16/glue.c:
+	  Try to fix bug #3767.
 
 2024-08-04 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -1,3 +1,8 @@
+2024-08-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/ds390/gen.c:
+	  Fix bug #3769.
+
 2024-08-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c,

@@ -11171,7 +11171,7 @@ genPointerGet (iCode * ic, iCode * pi)
 /* genPackBits - generates code for packed bit storage             */
 /*-----------------------------------------------------------------*/
 static void
-genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
+genPackBits (sym_link * etype, operand * right, const char *rname, int which_dptr, int p_type)
 {
   int offset = 0;               /* source byte offset */
   int rlen = 0;                 /* remaining bitfield length */
@@ -11213,10 +11213,13 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
                 emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
               else
                 {
+                  genSetDPTR (0);
                   MOVA (aopGet (right, 0, FALSE, FALSE, NULL));
                   emitcode ("rrc", "a");
                 }
-              emitPtrByteGet (rname, p_type, FALSE);
+              if (which_dptr == 1)
+                genSetDPTR (which_dptr);
+              emitPtrByteGet (rname, p_type, false);
               emitcode ("mov", "acc[%d],c", bstr);
             }
           else
@@ -11224,6 +11227,7 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
               bool pushedB;
               /* Case with a bitfield length < 8 and arbitrary source
                */
+              genSetDPTR (0);
               MOVA (aopGet (right, 0, FALSE, FALSE, NULL));
               /* shift and mask source value */
               AccLsh (bstr);
@@ -11231,6 +11235,8 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
 
               pushedB = pushB ();
               /* transfer A to B and get next byte */
+              if (which_dptr == 1)
+                genSetDPTR (which_dptr);
               emitPtrByteGet (rname, p_type, TRUE);
 
               emitcode ("anl", "a,#!constbyte", (unsigned)mask);
@@ -11377,7 +11383,7 @@ genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   rname = Safe_strdup (rname);
   /* if bit-field then pack the bits */
   if (bit_field)
-    genPackBits (operandType (result)->next, right, rname, POINTER);
+    genPackBits (operandType (result)->next, right, rname, -1, POINTER);
   else
     {
       /* we can just get the values */
@@ -11467,7 +11473,7 @@ genPagedPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   rname = Safe_strdup (rname);
   /* if bit-field then pack the bits */
   if (bit_field)
-    genPackBits (operandType (result)->next, right, rname, PPOINTER);
+    genPackBits (operandType (result)->next, right, rname, -1, PPOINTER);
   else
     {
       /* we can just get the values */
@@ -11539,7 +11545,7 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
         {
           genSetDPTR (AOP (result)->aopu.dptr);
         }
-      genPackBits (operandType (result)->next, right, "dptr", FPOINTER);
+      genPackBits (operandType (result)->next, right, "dptr", AOP (result)->aopu.dptr, FPOINTER);
       if (AOP_INDPTRn (result))
         {
           genSetDPTR (0);
@@ -11666,7 +11672,7 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   /* if bit-field then pack */
   if (bit_field)
     {
-      genPackBits (operandType (result)->next, right, "dptr", GPOINTER);
+      genPackBits (operandType (result)->next, right, "dptr", -1, GPOINTER);
     }
   else
     {

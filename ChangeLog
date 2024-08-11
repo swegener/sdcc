@@ -2,6 +2,12 @@
 
 	* support/regression/MakeList:
 	  Disable a test for pdk15, where it fails due to lack of memory.
+	* src/SDCCast.c,
+	  src/SDCCopt.c,
+	  src/SDCCsalloc.hpp,
+	  src/mcs51/main.c,
+	  src/z80/gen.c:
+	  A bit of code refactoring inspired by GCC 14 / clang 19 warnings.
 
 2024-08-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

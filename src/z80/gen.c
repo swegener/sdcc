@@ -11222,7 +11222,7 @@ genAnd (const iCode * ic, iCode * ifx)
             aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX) && (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i + 1, E_IDX))))
             {
               unsigned int mask = aopInReg (result->aop, i, L_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
-              bool mask_in_de = (aopInReg (left->aop, i, L_IDX) | aopInReg (left->aop, i, H_IDX));
+              bool mask_in_de = (aopInReg (left->aop, i, L_IDX) || aopInReg (left->aop, i, H_IDX));
               emit2 (mask_in_de ? "ld de, !immedword" : "ld hl, !immedword", mask);
               emit2 ("and hl, de");
               cost2 (1 + IS_TLCS90, 0, 0, 2, 0, 8, 0, 0);
@@ -11531,7 +11531,7 @@ genOr (const iCode * ic, iCode * ifx)
             aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX) && (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i + 1, E_IDX))))
             {
               unsigned int mask = aopInReg (result->aop, i, L_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
-              bool mask_in_de = (aopInReg (left->aop, i, L_IDX) | aopInReg (left->aop, i, H_IDX));
+              bool mask_in_de = (aopInReg (left->aop, i, L_IDX) || aopInReg (left->aop, i, H_IDX));
               emit2 (mask_in_de ? "ld de, !immedword" : "ld hl, !immedword", mask);
               cost2 (3, 10, 9, 6, 12, 6, 3, 3);
               emit2 ("or hl, de");
@@ -11544,7 +11544,7 @@ genOr (const iCode * ic, iCode * ifx)
             aopInReg (result->aop, i, IYH_IDX) && aopInReg (result->aop, i + 1, IYL_IDX) && (aopInReg (left->aop, i, IYH_IDX) && aopInReg (left->aop, i + 1, IYL_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i + 1, E_IDX))))
             {
               unsigned int mask = aopInReg (result->aop, i, IYL_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
-              bool mask_in_de = (aopInReg (left->aop, i, IYL_IDX) | aopInReg (left->aop, i, IYH_IDX));
+              bool mask_in_de = (aopInReg (left->aop, i, IYL_IDX) || aopInReg (left->aop, i, IYH_IDX));
               emit2 (mask_in_de ? "ld de, !immedword" : "ld iy, !immedword", mask);
               cost (3 + !mask_in_de, 6 + 2 * !mask_in_de);
               emit2 ("or iy, de");

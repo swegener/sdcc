@@ -484,7 +484,7 @@ hasSEFcalls (ast * tree)
   if (astHasVolatile(tree))
     return TRUE;
 
-  return (hasSEFcalls (tree->left) | hasSEFcalls (tree->right));
+  return (hasSEFcalls (tree->left) || hasSEFcalls (tree->right));
 }
 
 /*-----------------------------------------------------------------*/

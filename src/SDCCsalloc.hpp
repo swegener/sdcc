@@ -460,7 +460,7 @@ void dump_scon(const scon_t &scon)
       int start = scon[i].color;
       std::ostringstream os;
       os << i;
-      if (scon[i].sym->name)
+      if (scon[i].sym)
         os << " : " << scon[i].sym->name << " : " << getSize(scon[i].sym->type) << " [" << start << "," << (start + getSize(scon[i].sym->type) - 1) << "]";
       name[i] = os.str();
     }

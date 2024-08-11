@@ -354,11 +354,13 @@ _mcs51_genIVT (struct dbuf_s *oBuf, symbol **interrupts, int maxInterrupts)
     {
       if (interrupts[i])
         {
-          dbuf_printf (oBuf, "\t%cjmp\t%s\n", options.acall_ajmp?'a':'l', interrupts[i]->rname);
+          dbuf_printf (oBuf, "\t%cjmp\t%s\n", options.acall_ajmp ? 'a' : 'l', interrupts[i]->rname);
           nextbyteaddr += options.acall_ajmp ? 2 : 3;
           if ( i != maxInterrupts - 1 )
-            dbuf_printf (oBuf, "\t.ds\t%d\n", options.acall_ajmp?6:5);
-            nextbyteaddr += options.acall_ajmp ? 6 : 5;
+            {
+              dbuf_printf (oBuf, "\t.ds\t%d\n", options.acall_ajmp ? 6 : 5);
+              nextbyteaddr += options.acall_ajmp ? 6 : 5;
+            }
         }
       else
         {

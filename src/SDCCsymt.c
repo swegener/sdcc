@@ -3691,9 +3691,9 @@ processFuncArgs (symbol *func, sym_link *funcType)
       int argreg = 0;
       struct dbuf_s dbuf;
 
-      if (val->sym && val->sym->name)
+      if (val->sym)
         for (value *val2 = val->next; val2; val2 = val2->next)
-          if (val2->sym && val2->sym->name && !strcmp (val->sym->name, val2->sym->name))
+          if (val2->sym && !strcmp (val->sym->name, val2->sym->name))
             werror (E_DUPLICATE_PARAMTER_NAME, val->sym->name, funcName);
 
       dbuf_init (&dbuf, 128);

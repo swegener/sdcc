@@ -22,7 +22,7 @@ void
 testWcsto(void)
 {
 #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_mcs51) // Lack of memory
-  char *e;
+  wchar_t *e;
 
   ASSERT(wcstoul(L"", 0, 10) == 0);
   ASSERT(wcstoul(L"2", 0, 10) == 2);

@@ -9,6 +9,8 @@
 	  src/z80/gen.c,
 	  src/SDCCsymt.c:
 	  A bit of code refactoring inspired by GCC 14 / clang 19 warnings.
+	* support/regression/tests/wcsto.c:
+	  Fix an issue discovered via a GCC 14 warning.
 
 2024-08-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

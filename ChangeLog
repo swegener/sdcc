@@ -1,3 +1,8 @@
+2024-08-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/MakeList:
+	  Disable a test for pdk15, where it fails due to lack of memory.
+
 2024-08-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/ds390/gen.c:

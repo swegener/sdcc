@@ -276,6 +276,8 @@ EXCLUDE_pdk14 += \
 	gte_pr50865 \
 	gte_20001124-1 \
 	gte_991019-1
+EXCLUDE_pdk15 += \
+	gte_20001124-1
 EXCLUDE_mcs51-small += \
 	gte_loop-ivopts-2 \
 	gte_pr58984 \

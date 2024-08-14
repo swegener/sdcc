@@ -2,6 +2,8 @@
 
 	* sdccconf_in.h:
 	  Regenerate file via autoheader to fix --disable-f8-port.
+	* support/regression/tests/bug-3745.c.in:
+	  Test more qualifiers.
 
 2024-08-11 Philipp Klaus Krause <philipp@colecovision.eu>
 

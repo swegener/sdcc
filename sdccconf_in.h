@@ -94,6 +94,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
+
 /* XXX */
 #undef INCLUDE_DIR_SUFFIX
 
@@ -120,6 +123,9 @@
 
 /* XXX */
 #undef OPT_DISABLE_EZ80_Z80
+
+/* XXX */
+#undef OPT_DISABLE_F8
 
 /* XXX */
 #undef OPT_DISABLE_HC08
@@ -167,6 +173,9 @@
 #undef OPT_DISABLE_R3KA
 
 /* XXX */
+#undef OPT_DISABLE_R800
+
+/* XXX */
 #undef OPT_DISABLE_S08
 
 /* XXX */
@@ -201,9 +210,6 @@
 
 /* XXX */
 #undef OPT_DISABLE_Z80N
-
-/* XXX */
-#undef OPT_DISABLE_R800
 
 /* XXX */
 #undef OPT_ENABLE_DOC

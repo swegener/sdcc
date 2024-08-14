@@ -1,3 +1,8 @@
+2024-08-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdccconf_in.h:
+	  Regenerate file via autoheader to fix --disable-f8-port.
+
 2024-08-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/MakeList:

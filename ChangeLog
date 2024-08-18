@@ -857,6 +857,11 @@
 	* sdas/asz80/z80mch.c:
 	  Export 32-bit addresses from z80 assembler (instead of 24-bit).
 
+2024-01-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+       * src/pdk/gen.c:
+         Fix pdk code generation issues, bug #3697.
+
 2024-01-16 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/Makefile.in:
@@ -869,11 +874,6 @@
   	* src/mos6502/gen.c,
 	  src/mos6502/peep.def:
 	  Improvements in genCast(), genCopy() and loadRegFromAop().
-
-2024-01-20 Philipp Klaus Krause <philipp@colecovision.eu>
-
-       * src/pdk/gen.c:
-         Fix pdk code generation issues, bug #3697.
 
 2024-01-15 Philipp Klaus Krause <philipp@colecovision.eu>
 

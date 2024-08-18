@@ -5361,6 +5361,7 @@ genRightShift (const iCode *ic)
   else
     {
 makeloop:
+      ;
       bool xl_dead = regDead (XL_IDX, ic) && (premoved_count ? false : (right->aop->regs[XL_IDX] < 0));
       bool xh_dead = regDead (XH_IDX, ic) && (right->aop->regs[XH_IDX] < 0 || premoved_count);
       bool yl_dead = regDead (YL_IDX, ic) && (right->aop->regs[YL_IDX] < 0 || premoved_count);

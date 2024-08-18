@@ -1,3 +1,8 @@
+2024-08-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  Fix label defore declaration.
+
 2024-08-14 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdccconf_in.h:

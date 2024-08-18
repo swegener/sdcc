@@ -2,6 +2,8 @@
 
 	* src/f8/gen.c:
 	  Fix label defore declaration.
+	* src/pdk/gen.c:
+	  Fix a pdk code generation issue, part of bug #3697.
 
 2024-08-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

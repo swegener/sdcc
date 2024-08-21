@@ -1928,6 +1928,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       else // This byte is not a register-to-stack copy.
         i++;
 outer_continue:
+        ;
     }
 
   // Copy (stack-to-stack) what we can with whatever free regs we have.

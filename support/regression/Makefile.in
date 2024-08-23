@@ -412,6 +412,7 @@ clean-results:
 	done
 
 distclean: clean
+	$(MAKE) -C $(CASES_DIR) distclean
 	rm -f $(PORTS_DIR)/host/spec.mk
 	rm -f Makefile
 

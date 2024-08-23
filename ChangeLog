@@ -1,6 +1,16 @@
+2024-08-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCval.c:
+	  Fix bug #3745.
+
 2024-08-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/Makefile.in: fixed distclean for cases dir
+
+2024-08-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  Fix label at end of compound statement.
 
 2024-08-18 Philipp Klaus Krause <philipp@colecovision.eu>
 

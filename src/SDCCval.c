@@ -719,15 +719,24 @@ unsigned long
 double2ul (double val)
 {
 /*
- * See ISO/IEC 9899, chapter 6.3.1.4 Real floating and integer:
+ * See ISO/IEC 9899, chapter 6.3.1.4 Real floating and integer (still the same in ISO C 23):
  * If the value of the integral part cannot be represented by the integer type, the behavior is undefined.
- * This shows up on Mac OS X i386 platform which useus SSE unit instead of the x87 FPU for floating-point operations
+ * This shows up on Mac OS X i386 platform which uses SSE unit instead of the x87 FPU for floating-point operations
  */
 /*
  * on Mac OS X ppc (long) 2147483648.0 equals to 2147483647, so we explicitly convert it to 0x80000000
  * on other known platforms (long) 2147483648.0 equals to -2147483648
  */
   return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
+}
+
+/*-----------------------------------------------------------------*/
+/* double2ull - double to unsigned long long conversion            */
+/*-----------------------------------------------------------------*/
+unsigned long long
+double2ull (double val)
+{
+  return ((val) < 0) ? (((val) < -9223372036854775807.0) ? 0x8000000000000000ull : (unsigned long long) -((long long) -(val))) : (unsigned long long) (val);
 }
 
 /*--------------------------------------------------------------------*/
@@ -2115,7 +2124,7 @@ ullFromLit (sym_link * lit)
     return SPEC_CVAL (etype).v_ulong;
 
   if (SPEC_NOUN (etype) == V_FLOAT)
-    return double2ul (SPEC_CVAL (etype).v_float); /* FIXME: this loses bits */
+    return double2ull (SPEC_CVAL (etype).v_float);
 
   if (SPEC_NOUN (etype) == V_FIXED16X16)
     return double2ul (doubleFromFixed16x16 (SPEC_CVAL (etype).v_fixed16x16)); /* FIXME: this loses bits */

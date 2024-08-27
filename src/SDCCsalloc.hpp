@@ -468,6 +468,10 @@ void dump_scon(const scon_t &scon)
   delete[] name;
 }
 
+#if BOOST_VERSION / 100000 == 1 && BOOST_VERSION / 100 % 1000 < 81
+#error boost 1.74.0.3 (and probably earlier and later, but apparently fixed as of boost 1.81.0) bug: clear_vertex followed by remove_vertex could introduce loops into the graph (and omit non-loop edges). See SDCC bug #3772.
+#endif
+
 // Save stack space by merging spilt variables into spill location of stack parameters.
 // Currently handles only a single variable per function, with some additional restrictions.
 template <class SI_t>

@@ -1,3 +1,8 @@
+2024-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsalloc.hpp:
+	  Do not compile with older, known-to-be-broken boost.
+
 2024-08-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCval.c:

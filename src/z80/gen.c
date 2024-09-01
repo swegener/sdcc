@@ -4914,7 +4914,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           else if ((aopInReg (result, roffset + i, IYL_IDX) || aopInReg (result, roffset + i, IYH_IDX)) && iy_dead)
             pair = PAIR_IY;
 
-          if (pair != PAIR_INVALID && soffset + i - upper >= 0)
+          if (pair != PAIR_INVALID && soffset + i - upper >= 0 && (optimize.allow_unsafe_read || upper || soffset + i + 1 < source->size))
             {
               emit2 ("ld %s, !mems", _pairs[pair].name, aopGetLitWordLong (source, soffset + i - upper, false));
               if (pair == PAIR_HL)

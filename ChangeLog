@@ -1,3 +1,8 @@
+2024-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Fix an unsafe read being used even without --allow-unsafe-read.
+
 2024-08-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCsalloc.hpp:

@@ -87,6 +87,7 @@ cl_stm8::cl_stm8(struct cpu_entry *IType, class cl_sim *asim):
   cl_uc(asim)
 {
   type= IType;
+  PCmask = 0xffffff; // The STM8 has a 24-bit program counter.
   flash_ctrl= NULL;
   cSP.set_uc(this);
   cSP.decode(&regs.SP);

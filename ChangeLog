@@ -5,6 +5,8 @@
 	  src/SDCCsymt.c,
 	  support/valdiag/tests/bug-3773.c:
 	  Improve diagnostics on out-of-range absolute addresses.
+	* sim/ucsim/src/sims/stm8.src/stm8.cc:
+	  Fix stm8 program counter width.
 
 2024-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
 

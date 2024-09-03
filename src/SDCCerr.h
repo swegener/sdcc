@@ -209,7 +209,7 @@ enum {
   W_POSSBUG2                    = 179, /* possible bug, new format */
   W_COMPLEMENT                  = 180, /* ~bit can give unexpected results */
   E_SHADOWREGS_NO_ISR           = 181, /* shadowregs keyword following non-ISR function */
-  W_SFR_ABSRANGE                = 182, /* sfr at address out of range */
+  W_SFR_ABSRANGE                = 182, /* __sfr at address out of range */
   E_BANKED_WITH_CALLEESAVES     = 183, /* banked and callee-saves mixed */
   W_INVALID_INT_CONST           = 184, /* invalid integer literal string */
   W_CMP_SU_CHAR                 = 185, /* comparison of 'signed char' with 'unsigned char' requires promotion to int */
@@ -325,6 +325,8 @@ enum {
   E_NO_SKIP_TARGET              = 295, /* target label missing for skip instruction */
   W_SDCCCALL_STD_LIB_CRT0       = 296, /* non-default sdcccall specified, but default stdlib or crt0 */
   W_PEEPHOLE_RULE_LIMIT         = 297, /* peephole rule application limit reached */
+  W_DATA_ABSRANGE               = 298, /* __data at address out of range */
+  W_IDATA_ABSRANGE              = 299, /* __idata at address out of range */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

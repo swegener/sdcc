@@ -427,7 +427,7 @@ struct
   { E_SHADOWREGS_NO_ISR, ERROR_LEVEL_ERROR,
      "ISR function attribute 'shadowregs' following non-ISR function '%s'", 0 },
   { W_SFR_ABSRANGE, ERROR_LEVEL_WARNING,
-     "absolute address for sfr '%s' probably out of range.", 0 },
+     "absolute address for __sfr '%s' probably out of range.", 0 },
   { E_BANKED_WITH_CALLEESAVES, ERROR_LEVEL_ERROR,
      "Both banked and callee-saves cannot be used together.", 0 },
   { W_INVALID_INT_CONST, ERROR_LEVEL_WARNING,
@@ -659,6 +659,10 @@ struct
      "non-default sdcccall specified, but default stdlib or crt0", 0},
   { W_PEEPHOLE_RULE_LIMIT, ERROR_LEVEL_WARNING,
      "peephole rule application limit reached", 0},
+  { W_DATA_ABSRANGE, ERROR_LEVEL_WARNING,
+     "absolute address for __data '%s' probably out of range.", 0 },
+  { W_IDATA_ABSRANGE, ERROR_LEVEL_WARNING,
+     "absolute address for __idata '%s' probably out of range.", 0 },
 };
 
 /* -------------------------------------------------------------------------------

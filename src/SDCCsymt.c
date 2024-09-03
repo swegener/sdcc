@@ -2050,6 +2050,21 @@ checkSClass (symbol *sym, int isProto)
         if (((addr >> n) & 0xFF) < 0x80)
           werror (W_SFR_ABSRANGE, sym->name);
     }
+  else if (TARGET_IS_MCS51 && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_DATA)
+    {
+      if (SPEC_ADDR (sym->etype) + getSize (sym->type) - 1 > 0x7f)
+        werror (W_DATA_ABSRANGE, sym->name);
+    }
+  else if (TARGET_IS_MCS51 && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_IDATA)
+    {
+      if (SPEC_ADDR (sym->etype) + getSize (sym->type) - 1 > 0xff)
+        werror (W_IDATA_ABSRANGE, sym->name);
+    }
+  else if ((TARGET_HC08_LIKE || TARGET_MOS6502_LIKE) && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_DATA)
+    {
+      if (SPEC_ADDR (sym->etype) + getSize (sym->type) - 1 > 0xff)
+        werror (W_DATA_ABSRANGE, sym->name);
+    }
   else if (TARGET_IS_SM83 && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_SFR)
     {// Unlike the other z80-like ports, sm83 has memory mapped I/O in the 0xff00-0xffff range.
       if (SPEC_ADDR (sym->etype) < 0xff00 || SPEC_ADDR (sym->etype) > 0xffff)

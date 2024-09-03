@@ -1,3 +1,11 @@
+2024-09-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  support/valdiag/tests/bug-3773.c:
+	  Improve diagnostics on out-of-range absolute addresses.
+
 2024-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

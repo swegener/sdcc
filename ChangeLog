@@ -7,6 +7,10 @@
 	  Improve diagnostics on out-of-range absolute addresses.
 	* sim/ucsim/src/sims/stm8.src/stm8.cc:
 	  Fix stm8 program counter width.
+	* src/SDCCgenconstprop.cc,
+	  support/regression/tests/bug-3778.c,
+	  .version:
+	  Fix bug #3778.
 
 2024-09-01 Philipp Klaus Krause <philipp@colecovision.eu>
 

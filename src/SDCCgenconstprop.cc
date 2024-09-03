@@ -124,7 +124,10 @@ getTypeValinfo (sym_link *type, bool loose)
     {
       v.anything = false;
       v.min = 0;
-      v.max = (1ll << (GPTRSIZE * 8)) - 1;
+      if (IS_FUNCPTR (type))
+        v.max = (1ll << (FUNCPTRSIZE * 8)) - 1;
+      else
+        v.max = (1ll << (GPTRSIZE * 8)) - 1;
       v.knownbitsmask = ~((unsigned long long)v.max);
       if (TARGET_IS_MCS51 && IS_PTR (type) && !IS_GENPTR (type) ||
         TARGET_PDK_LIKE && IS_PTR (type) && (DCL_TYPE (type) == CPOINTER || DCL_TYPE (type) == POINTER))

@@ -1,4 +1,4 @@
-/** bug-3740.c : A segfault at compile time that only happens on some systems?
+/** bug-3741.c: A segfault at compile time that only happens on some systems?
 */
 
 #include <testfwk.h>

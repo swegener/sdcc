@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#pragma disable_warning 155
-
+#ifdef __SDCC // Allowing implicit casts from pointers to integers is an SDCC extension
+#pragma disable_warning 155 // But we still emit a warning
 {type} f(const void *p)
 {
 	return p;
@@ -21,11 +21,14 @@
 	{type} t = p;
 	return t;
 }
+#endif
 
 void testBug(void)
 {
+#ifdef __SDCC
 	char c;
 	ASSERT (f(&c));
 	ASSERT (g(&c));
+#endif
 }
 

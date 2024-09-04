@@ -7,6 +7,7 @@
 #include <testfwk.h>
 
 #pragma disable_warning 259
+#pragma disable_warning 88
 
 #ifdef __sun__
 #include <inttypes.h>
@@ -204,8 +205,8 @@ testSizeof(void)
   TEST_OP_CHAR_PTR(TEST_PTR_VAR += 1);
   TEST_OP_INT_PTR (TEST_PTR_VAR -= 1);
 
-  TEST_OP_CHAR_PTR(TEST_PTR_VAR = 1);
-  TEST_OP_INT_PTR (TEST_PTR_VAR = 1);
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR = (void *)1);
+  TEST_OP_INT_PTR (TEST_PTR_VAR = (void *)1);
 
   TEST_OP_CHAR_PTR_DAS(&TEST_VAR);
   TEST_OP_INT_PTR_DAS (&TEST_VAR);

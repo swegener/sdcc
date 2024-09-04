@@ -10,7 +10,6 @@
 #include <stdint.h>
 
 #pragma disable_warning 85
-#pragma disable_warning 88
 #pragma disable_warning 127
 
 #if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) && !(defined( __SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
@@ -44,7 +43,7 @@ uint8_t bankLockBase[16];
 
 static void *buffer;
 
-int8_t ya_mvb(char **args)
+int8_t ya_mvb(const char **args)
 {
     if ( (args[2] != NULL) && (bank_get_abs((int8_t)atoi(args[1])) != 0) && (bank_get_abs((int8_t)atoi(args[2])) != 0) )
     {
@@ -54,7 +53,7 @@ int8_t ya_mvb(char **args)
     return 1;
 }
 
-int8_t ya_loadb(char **args)
+int8_t ya_loadb(const char **args)
 {
     uint8_t * dest;
     uint32_t p1;

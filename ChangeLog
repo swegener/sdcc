@@ -2,8 +2,11 @@
 
 	* support/regression/tests/bug-3460.c.in,
 	  support/regression/tests/sizeof.c.in,
-	  support/regression/tests/bug-2854.c:
-	  Modify some testcases for implicit conversion between integers and pointers, part of bug #3770.
+	  support/regression/tests/bug-2854.c,
+	  support/regression/MakeList,
+	  support/regression/tests/bug-2776.c,
+	  support/regression/tests/implicit_int.c
+	  Fix most of bug #3770, mostly by disabling tests for host target that rely on features no longer available in current host compilers.
 
 2024-09-03 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -11,6 +11,17 @@ EXCLUDE_host += \
 
 ###############################################
 
+# Relies on feeatures of older C standards not supported by curent host compilers.
+EXCLUDE_host += \
+	qct_0026-implicitret \
+	gte_920908-2 \
+	gte_921204-1 \
+	gte_930621-1 \
+	gte_930630-1 \
+	gte_931031-1 \
+	gte_compndlit-1 \
+	tst_gcc-torture-execute-pr34176
+
 #segfault (BUG?)
 EXCLUDE_host += \
 	gte_20041218-1 \

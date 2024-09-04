@@ -18,7 +18,7 @@ struct tiny
 
 void f (int n, ...);
 
-m ()
+void m ()
 {
   struct tiny x[3];
   x[0].c = 10;

@@ -8,16 +8,18 @@
 #pragma std_c89
 #pragma disable_warning 85
 #pragma disable_warning 225
-#endif
 
 static x;
 volatile y;
+#endif
 
 void testint(void)
 {
+#ifdef __SDCC // Don't know how to set host compiler to C90 mode.
 	auto a;
 	static b;
 	register c;
 	volatile d;
+#endif
 }
 

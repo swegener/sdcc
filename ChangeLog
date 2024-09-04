@@ -1,5 +1,10 @@
 2024-09-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc:
+	  Fix a remaining aspect of bug #3778, affecting the huge memory model of mcs51.
+
+2024-09-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* support/regression/tests/bug-3460.c.in,
 	  support/regression/tests/sizeof.c.in,
 	  support/regression/tests/bug-2854.c,

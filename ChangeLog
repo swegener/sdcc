@@ -1,3 +1,9 @@
+2024-09-06 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-2645.c,
+	  support/regression/tests/bug-2663.c:
+	  Fix remaining part of bug #3770.
+
 2024-09-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:

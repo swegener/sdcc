@@ -1,3 +1,10 @@
+2024-09-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/ports/ez80-z80/spec.mk,
+	  support/regression/ports/ucz180/spec.mk,
+	  support/regression/ports/ucz180-resiy/spec.mk:
+	  Use 60s regression test timeout for most z80-related ports.
+
 2024-09-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-2645.c,

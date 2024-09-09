@@ -512,7 +512,7 @@ aopIsNotLitVal (const asmop *aop, int offset, int size, unsigned long long int v
           unsigned char knownbitsmask = aop->valinfo.knownbitsmask >> (offset * 8);
           unsigned char knownbits = aop->valinfo.knownbits >> (offset * 8);
 
-          if (knownbits & knownbitsmask != b & knownbitsmask)
+          if ((knownbits & knownbitsmask) != (b & knownbitsmask))
             return (true);
           if (!offset && aop->valinfo.min > 0 && aop->valinfo.max <= 255 &&
             (aop->valinfo.min > b || aop->valinfo.min < b))

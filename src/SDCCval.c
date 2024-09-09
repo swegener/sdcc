@@ -3110,7 +3110,7 @@ valCastLiteral (sym_link *dtype, double fval, TYPE_TARGET_ULONGLONG llval)
       wassert (SPEC_BITINTWIDTH (val->etype) >= 1);
       if (!SPEC_USIGN (val->etype)) // Sign-extend
         {
-          if (llval & ((1ull << SPEC_BITINTWIDTH (val->etype) - 1)))
+          if (llval & ((1ull << (SPEC_BITINTWIDTH (val->etype) - 1))))
             llval |= ~(0xffffffffffffffffull >> (64 - SPEC_BITINTWIDTH (val->etype)));
           else
             llval &= (0xffffffffffffffffull >> (64 - SPEC_BITINTWIDTH (val->etype) + 1));

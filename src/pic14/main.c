@@ -252,7 +252,7 @@ static bool
 hasExtBitOp (int op, sym_link *left, int right)
 {
   unsigned int lbits = bitsForType (left);
-  return (op == ROT && (right & lbits == 1 || right % lbits == lbits - 1) ||
+  return (op == ROT && ((right & lbits) == 1 || (right % lbits) == lbits - 1) ||
     op == GETABIT);
 }
 

@@ -6,6 +6,8 @@
 	  src/stm8/gen.c,
 	  src/z80/gen.c:
 	  Operator priority fixes from patch #474.
+	* device/lib/clean.mk:
+	  Fix make clean for f8 library.
 
 2024-09-08 Philipp Klaus Krause <philipp@colecovision.eu>
 

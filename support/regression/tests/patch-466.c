@@ -11,16 +11,10 @@
 uint8_t aaa;
 uint8_t bbb;
 
-#ifdef __SDCC_mcs51
-#define bit __bit
-#else
-#define bit bool
-#endif
-
 uint8_t get_bleh (uint8_t x)
 {
-  bit x0 = x != aaa;
-  bit x1 = x != bbb;
+  bool x0 = x != aaa;
+  bool x1 = x != bbb;
 
   return (!x0 | !x1) ? 0xFF : 0x00;
 }

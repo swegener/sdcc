@@ -8,6 +8,9 @@
 	  Operator priority fixes from patch #474.
 	* device/lib/clean.mk:
 	  Fix make clean for f8 library.
+	* src/mcs51/main.c,
+	  support/regression/tests/patch-466.c:
+	  Pick some bits of patch #466.
 
 2024-09-08 Philipp Klaus Krause <philipp@colecovision.eu>
 

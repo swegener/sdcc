@@ -679,6 +679,11 @@ updateOpRW (asmLineNode *aln, const char *op_in, const char *optype)
 {
   mcs51operanddata *opdat;
 
+  /* There are two bit instructions that accept negated souce bit operand,
+     where a leading '/' denotes the negation.  Ignore that here.  */
+  if (*op_in == '/')
+    op_in += 1;
+
   /* Ignore dots or brackets in operand (bit numbes) for operand table search.
      But remember that it's a bit access for special case handling.  */
   char op[32];

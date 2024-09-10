@@ -8859,8 +8859,12 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               pushed_hl = true;
             }
 
-          if (aopInReg (left, offset, A_IDX))
-            cheapMove (tmpaop, 0, right, offset, false);
+          if (aopInReg (left, offset, A_IDX) ||
+            (aopInReg (tmpaop, 0, L_IDX) || aopInReg (tmpaop, 0, H_IDX)) && requiresHL (left))
+            {
+              cheapMove (ASMOP_A, 0, left, offset, true);
+              cheapMove (tmpaop, 0, right, offset, false);
+            }
           else
             {
               cheapMove (tmpaop, 0, right, offset, true);

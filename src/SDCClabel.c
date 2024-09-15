@@ -483,7 +483,7 @@ labelUnrefLabel (iCode * ic)
 /* labelUnreach - remove unreachable code                          */
 /*-----------------------------------------------------------------*/
 int 
-labelUnreach (iCode * ic)
+labelUnreach (iCode *ic)
 {
   iCode *loop;
   iCode *tic;
@@ -539,10 +539,20 @@ labelUnreach (iCode * ic)
                     bitVectUnSetBit (OP_USES (IC_JTCOND (tic)), tic->key);
                   break;
                 default:
-                  if (IS_SYMOP (IC_LEFT (tic)) && OP_USES (IC_LEFT (tic)))
-                    bitVectUnSetBit (OP_USES (IC_LEFT (tic)), tic->key);
-                  if (IS_SYMOP (IC_RIGHT (tic)) && OP_USES (IC_RIGHT (tic)))
-                    bitVectUnSetBit (OP_USES (IC_RIGHT (tic)), tic->key);
+                  if (IS_SYMOP (tic->left))
+                    {
+                      if (OP_SYMBOL (tic->left)->isstrlit)
+                        freeStringSymbol (OP_SYMBOL (tic->left));
+                      if (OP_USES (tic->left))
+                        bitVectUnSetBit (OP_USES (tic->left), tic->key);
+                    }
+                  if (IS_SYMOP (tic->right))
+                    {
+                      if (OP_SYMBOL (tic->right)->isstrlit)
+                        freeStringSymbol (OP_SYMBOL (tic->right));
+                      if (OP_USES (tic->right))
+                        bitVectUnSetBit (OP_USES (tic->right), tic->key);
+                    }
                   if (POINTER_SET (tic))
                     {
                       if (IS_SYMOP (IC_RESULT (tic)) && OP_USES (IC_RESULT (tic)))

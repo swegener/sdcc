@@ -2127,14 +2127,18 @@ killDeadCode (ebbIndex * ebbi)
                       remiCodeFromeBBlock (ebbs[i], ic);
 
                       /* for the left & right remove the usage */
-                      if (IS_SYMOP (IC_LEFT (ic)))
+                      if (IS_SYMOP (ic->left))
                         {
-                          if (OP_SYMBOL (IC_LEFT (ic))->isstrlit)
-                            freeStringSymbol (OP_SYMBOL (IC_LEFT (ic)));
-                          bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                          if (OP_SYMBOL (ic->left)->isstrlit)
+                            freeStringSymbol (OP_SYMBOL (ic->left));
+                          bitVectUnSetBit (OP_USES (ic->left), ic->key);
                         }
-                      if (IS_SYMOP (IC_RIGHT (ic)))
-                        bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                      if (IS_SYMOP (ic->right))
+                        {
+                          if (OP_SYMBOL (ic->right)->isstrlit)
+                            freeStringSymbol (OP_SYMBOL (ic->right));
+                          bitVectUnSetBit (OP_USES (ic->right), ic->key);
+                        }
                     }
                 }
             }                   /* end of all instructions */

@@ -2,6 +2,9 @@
 
 	* sdcc/support/scripts/sdcc.nsi:
 	  Include f8 port in Windows installer.
+	* src/SDCClabel.c,
+	  src/SDCCopt.c:
+	  Improve handling of string literals in dead-code elimination, RFE #567.
 
 2024-09-10 Philipp Klaus Krause <philipp@colecovision.eu>
 

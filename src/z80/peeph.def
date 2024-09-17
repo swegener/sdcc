@@ -66,6 +66,22 @@ replace restart {
 // Should probably check for notVolatile(%2), too, but gives many false positives and no regression tests fail.
 
 replace restart {
+	adc	hl, hl
+	adc	hl, hl
+} by {
+	add	hl, hl
+	add	hl, hl
+	; common peephole 3a replaced adc by add since l is unused.
+} if notUsed('l')
+
+replace restart {
+	adc	hl, hl
+} by {
+	add	hl, hl
+	; common peephole 3b replaced adc by add since l is unused.
+} if notUsed('l')
+
+replace restart {
 	ld	%1, (%2)
 } by {
 	ld	%1, 0 (%2)

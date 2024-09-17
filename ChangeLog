@@ -1,3 +1,10 @@
+2024-09-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/z80/peeph.def,
+	  support/regression/tests/shifts3.c.in:
+	  Right shift optimization inspired by RFE #935.
+
 2024-09-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdcc/support/scripts/sdcc.nsi:

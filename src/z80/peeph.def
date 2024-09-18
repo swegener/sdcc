@@ -78,14 +78,14 @@ replace restart {
 	add	hl, hl
 	add	hl, hl
 	; common peephole 3a replaced adc by add since l is unused.
-} if notUsed('l')
+} if notUsed('l' 'zf')
 
 replace restart {
 	adc	hl, hl
 } by {
 	add	hl, hl
 	; common peephole 3b replaced adc by add since l is unused.
-} if notUsed('l')
+} if notUsed('l' 'zf')
 
 replace restart {
 	ld	%1, (%2)

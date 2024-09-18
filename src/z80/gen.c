@@ -12386,8 +12386,7 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
   // If the leading bits are all the same, we can shift the other way, and use efficient 16-bit addition for shifts.
   else if (shCount < 8 &&
     aopInReg (left->aop, 0, HL_IDX) && aopInReg (result->aop, 0, H_IDX) && isRegDead (L_IDX, ic) && isRegDead (A_IDX, ic) &&
-    shCount >= 4 + !optimize.codeSpeed && // Smaller code size for 4 and above, but at least for Z80(N), only faster from 5.
-    (!is_signed || left->aop->valinfo.min >= 0 || !IS_SM83)) // sm83 doesn't have adc hl, hl.
+    shCount >= 5 - !optimize.codeSpeed) // Smaller code size for 4 and above, but at least for Z80(N), only faster from 5.
     {
       emit3 (A_XOR, ASMOP_A, ASMOP_A);
       emit2 ("add hl, hl");

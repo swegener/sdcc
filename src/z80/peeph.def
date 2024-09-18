@@ -59,6 +59,12 @@ replace restart {
 } if same(%1 'dec' 'inc'), same(%2 'bc' 'de' 'hl' 'sp' 'ix' 'iy'), notUsed(%2)
 
 replace restart {
+	%1
+} by {
+	; common peephole 2d removed %1 due to unused result.
+} if same(%1 'rlca' 'rla' 'rrca' 'rra'), notUsed('a' 'hf' 'nf' 'cf')
+
+replace restart {
 	ld	%1, %2 + %3
 } by {
 	; common peephole 3 removed dead load from %2 + %3 into %1.
@@ -3337,6 +3343,13 @@ replace restart {
 	; common peephole 163 changed absolute to relative conditional jump.
 	jr	%1, %5
 } if same(%1 'C' 'NC' 'NZ' 'Z'), labelInRange(%5)
+
+replace restart {
+	jr	%1, %5
+%5:
+} by {
+	; common peephole 164 eliminated relative conditional jump.
+} if labelRefCountChange(%5 -1)
 
 replace {
 	dec	b

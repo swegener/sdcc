@@ -12384,36 +12384,33 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
       return;
     }
   // If the leading bits are all the same, we can shift the other way, and use efficient 16-bit addition for shifts.
-  else if (shCount < 8 && !left->aop->valinfo.anything && left->aop->valinfo.min >= (-256 << (8 - shCount)) && left->aop->valinfo.max < (256 << (8 - shCount)) &&
-    aopInReg (left->aop, 0, HL_IDX) && aopInReg (result->aop, 0, H_IDX) && aopInReg (result->aop, 1, L_IDX) &&
-    shCount >= 4 + !optimize.codeSpeed &&
+  else if (shCount < 8 &&
+    aopInReg (left->aop, 0, HL_IDX) && aopInReg (result->aop, 0, H_IDX) && isRegDead (L_IDX, ic) && isRegDead (A_IDX, ic) &&
+    shCount >= 4 + !optimize.codeSpeed && // Smaller code size for 4 and above, but at least for Z80(N), only faster from 5.
     (!is_signed || left->aop->valinfo.min >= 0 || !IS_SM83)) // sm83 doesn't have adc hl, hl.
     {
-      if (is_signed && left->aop->valinfo.min < 0)
-      {
-        tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
-        emit2 ("add hl, hl");
-        cost2 (1, 11, 7, 2, 8, 8, 1, 1);
-        if (!regalloc_dry_run)
-          emit2 ("jr nc,!tlabel", labelKey2num (tlbl->key));
-        emit2 ("inc hl"); // Doesn't affect carry.
-        cost2 (3, 12.5, 9.0, 7.0, 14.0, 8.0, 3.0, 3.0);
-        if (!regalloc_dry_run)
-        emitLabel (tlbl);
-        for (int i = 1; i < (8 - shCount); i++)
-          {
-            emit2 ("adc hl, hl");
-            cost2 (2, 15, 10, 4, 0, 8, 2, 2);
-          }
-      }
-      else
+      emit3 (A_XOR, ASMOP_A, ASMOP_A);
+      emit2 ("add hl, hl");
+      cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+      if (is_signed && (left->aop->valinfo.anything || left->aop->valinfo.min < 0))
         {
-          for (int i = 1; i < (8 - shCount); i++)
-            {
-              emit2 ("add hl, hl");
-              cost2 (1, 11, 7, 2, 8, 8, 1, 1);
-            }
+          tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          if (!regalloc_dry_run)
+            emit2 ("jr nc,!tlabel", labelKey2num (tlbl->key));
+          emit2 ("dec a");
+          cost2 (3, 11.5, 9.0, 7.0, 12.0, 7.0, 3.0, 3.0);
+          if (!regalloc_dry_run)
+            emitLabel (tlbl);
         }
+      else if (!is_signed)
+        emit3 (A_RLA, 0, 0);
+      for (int i = 1; i < (8 - shCount); i++)
+        {
+          emit2 ("add hl, hl");
+          cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+          emit3 (A_RLA, 0, 0);
+        }
+      genMove_o (result->aop, 1, ASMOP_A, 0, 1, true, false, isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic), true);
       return;
     }
 

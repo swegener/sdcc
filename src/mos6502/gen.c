@@ -3309,7 +3309,8 @@ aopOp (operand *op, const iCode * ic)
   aop->size = sym->nRegs;
   for (i = 0; i < sym->nRegs; i++)
     {
-      wassert (sym->regs[i] < regsm6502 + 3);
+      wassert (sym->regs[i] >= regsm6502 && sym->regs[i] < regsm6502 + 3);
+      wassertl (sym->regs[i], "Symbol in register, but no register assigned.");
       aop->aopu.aop_reg[i] = sym->regs[i];
       aop->regmask |= sym->regs[i]->mask;
     }

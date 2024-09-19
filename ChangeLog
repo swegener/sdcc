@@ -1,3 +1,9 @@
+2024-09-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/hc08/gen.c,
+	  src/mos6502/gen.c:
+	  Assertions to help track down bug #3781.
+
 2024-09-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def:

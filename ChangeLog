@@ -1,3 +1,8 @@
+2024-09-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Improve handling of rematerialized stack locations.
+
 2024-09-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/hc08/gen.c,

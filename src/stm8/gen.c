@@ -1704,8 +1704,7 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
 
   if (source->type == AOP_STL)
     {
-      cost (1000, 1000);
-      wassert_bt (regalloc_dry_run);
+      UNIMPLEMENTED;
       return;
     }
 
@@ -2587,6 +2586,15 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost (3 + 2 * y, 3);
           genMove_o (result, roffset, y ? ASMOP_Y : ASMOP_X, 0, size, a_dead_global, x_dead_global, y_dead_global);
         }
+      else if (soffset <= 1 && size == 1 && aopInReg (result, roffset, A_IDX))
+        {
+          if (!x_dead_global)
+            push (ASMOP_X, 0, 2);
+          genMove_o (ASMOP_X, 0, source, 0, 2, true, true, y_dead_global);
+          cheapMove (ASMOP_A, 0, ASMOP_X, soffset, false);
+          if (!x_dead_global)
+            pop (ASMOP_X, 0, 2);
+        }
       else
         {
           cost (1000, 1000);
@@ -3398,8 +3406,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else if (left_aop->type == AOP_STL || right_aop->type == AOP_STL)
         {
-          cost (1000, 1000);
-          wassert (regalloc_dry_run);
+          UNIMPLEMENTED;
           break;
         }
       else if (aopInReg (right_aop, i, A_IDX)) // Needs special handling as generic code below would overwrite a.
@@ -3936,8 +3943,7 @@ genCall (const iCode *ic)
             }
           else
             {
-              cost (500, 500);
-              wassert (regalloc_dry_run);
+              UNIMPLEMENTED;
             }
           if (!stm8IsParmInCall(ftype, "a"))
             {
@@ -4002,8 +4008,7 @@ genCall (const iCode *ic)
             {
               if (stm8IsParmInCall(ftype, "a"))
                 {
-                  cost (500, 500);
-                  wassert (regalloc_dry_run);
+                  UNIMPLEMENTED;
                 }
 
               adjustStack (prestackadjust, left->aop->regs[A_IDX] < 0, left->aop->regs[XL_IDX] < 0 && left->aop->regs[XH_IDX] < 0, left->aop->regs[YL_IDX] < 0 && left->aop->regs[YH_IDX] < 0);
@@ -4136,8 +4141,7 @@ genCall (const iCode *ic)
                 !aopInReg (result, i, YL_IDX) && !aopInReg (result, i, YH_IDX) &&
                 aopRet (ftype)->regs[result->aopu.bytes[i].byteu.reg->rIdx] > i && aopRet (ftype)->regs[result->aopu.bytes[i].byteu.reg->rIdx] < result->size)
                 {
-                  cost (300, 300);
-                  wassert (regalloc_dry_run);
+                  UNIMPLEMENTED;
                 }
 
               if (aopInReg (aopRet (ftype), i, YL_IDX) || aopInReg (aopRet (ftype), i, YH_IDX))
@@ -5978,37 +5982,60 @@ genCmp (const iCode *ic, iCode *ifx)
           if (!regDead (A_IDX, ic) && !pushed_a && !aopInReg (left->aop, i, A_IDX))
             {
               push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
+              pushed_a = true;
             }
 
-          if (i && aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && pushed_a)
+          if (right->aop->type == AOP_STL)
             {
-              pop (ASMOP_A, 0, 1);
-              pushed_a = FALSE;
-            }
-          else if (i && aopInReg (left->aop, i, A_IDX) && pushed_a)
-            {
-              emit2 ("ld", "a, (1, sp)");
+              if (aopInReg (left->aop, i, A_IDX) && !pushed_a)
+                {
+                  push (ASMOP_A, 0, 1);
+                  pushed_a = true;
+                }
+              genMove_o (ASMOP_A, 0, right->aop, i, 1, false, false, false);
+              push (ASMOP_A, 0, 1);
+              if (aopInReg (left->aop, i, A_IDX) && pushed_a)
+                {
+                  emit2 ("ld", "a, (2, sp)");
+                  cost (2, 1);
+                }
+              else
+                cheapMove (ASMOP_A, 0, left->aop, i, FALSE); 
+              emit2 (started ? "sbc" : "cp", "a, (1, sp)");
               cost (2, 1);
+              adjustStack (1, false, false, false);
             }
           else
-            cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
-
-          right_stacked = stack_aop (right->aop, i, &right_offset);
-          
-          if (right_stacked || aopInReg (right->aop, i, A_IDX))
             {
-              emit2 (started ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
-              cost (2, 1);
+              if (i && aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && pushed_a)
+                {
+                  pop (ASMOP_A, 0, 1);
+                  pushed_a = FALSE;
+                }
+              else if (i && aopInReg (left->aop, i, A_IDX) && pushed_a)
+                {
+                  emit2 ("ld", "a, (1, sp)");
+                  cost (2, 1);
+                }
+              else
+                cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+    
+              right_stacked = stack_aop (right->aop, i, &right_offset);
+              
+              if (right_stacked || aopInReg (right->aop, i, A_IDX))
+                {
+                  emit2 (started ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
+                  cost (2, 1);
+                }
+              else if (right->aop->type != AOP_STL)
+                emit3_o (started ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
+              else
+                UNIMPLEMENTED;
+              started = true;
+    
+              if (right_stacked)
+                pop (right_stacked, 0, 2);
             }
-          else if (right->aop->type != AOP_STL)
-            emit3_o (started ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
-          else
-            UNIMPLEMENTED;
-          started = true;
-
-          if (right_stacked)
-            pop (right_stacked, 0, 2);
         }
 
       if (!regDead (A_IDX, ic) && pushed_a)
@@ -7845,8 +7872,7 @@ genGetABit (const iCode *ic, iCode *ifx)
         emit3w (A_TNZW, ASMOP_Y, 0);
       else if (aopInReg (left->aop, shCount / 8, XL_IDX) || aopInReg (left->aop, shCount / 8, YL_IDX))
         {
-          wassert (regalloc_dry_run);
-          cost (200, 200);
+          UNIMPLEMENTED;
         }
       else
         emit3_o (A_TNZ, left->aop, shCount / 8, 0, 0);
@@ -9568,8 +9594,7 @@ genReceive (const iCode *ic)
     for (int i = 0; i < result->aop->size; i++)
       if (result->aop->aopu.bytes[i].in_reg && !dead_regs[result->aop->aopu.bytes[i].byteu.reg->rIdx])
         {
-          cost (500, 500);
-          wassert (regalloc_dry_run);
+          UNIMPLEMENTED;
         }
 
   genMove (result->aop, aopArg (currFunc->type, ic->argreg), dead_regs[A_IDX], dead_regs[XL_IDX] && dead_regs[XH_IDX], dead_regs[YL_IDX] && dead_regs[YH_IDX]);

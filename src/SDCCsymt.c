@@ -2886,8 +2886,6 @@ comparePtrType (sym_link *dest, sym_link *src, bool mustCast, bool ignoreimplici
   /* All function pointers can be cast (6.3.2.3 in the ISO C23 standard), similar for objects. TODO: What about address spaces? */
   if (res == 0 && !mustCast && IS_DECL (src) && IS_DECL (dest) && (IS_FUNC (src->next) == IS_FUNC (dest->next)))
     return -1;
-  else if (res == 0 && !mustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
-    return -1;
   else if (res == 1)
     return mustCast ? -1 : 1;
   else if (res == -2)

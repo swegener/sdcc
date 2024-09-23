@@ -2740,7 +2740,7 @@ optimizeStdLibCall (eBBlock ** ebbs, int count)
 /* a single step.                                                  */
 /*-----------------------------------------------------------------*/
 static void
-optimizeCastCast (eBBlock ** ebbs, int count)
+optimizeCastCast (eBBlock **ebbs, int count)
 {
   int i;
   iCode *ic;
@@ -2755,80 +2755,118 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if (ic->op == CAST && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+          if ((ic->op == CAST || ic->op == '+') && ic->result && IS_ITEMP (ic->result))
             {
-              type1 = operandType (IC_RIGHT (ic));
-              type2 = operandType (IC_RESULT (ic));
-
-              /* Look only for a cast from an integer type to an */
-              /* integer type that has no loss of bits */
-              if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
-                continue;
-              size1 = bitsForType (type1);
-              size2 = bitsForType (type2);
-              if (size2 < size1)
-                continue;
-              /* If they are the same size, they must have the same signedness */
-              if (size2 == size1 && SPEC_USIGN (type2) != SPEC_USIGN (type1))
-                continue;
+              type1 = operandType (ic->op == CAST ? ic->right : ic->left);
+              type2 = operandType (ic->result);
 
               /* There must be only one use of this first result */
-              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1 ||
-                bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) != 1)
+              if (bitVectnBitsOn (OP_USES (ic->result)) != 1 ||
+                bitVectnBitsOn (OP_DEFS (ic->result)) != 1)
                 continue;
 
               uic = hTabItemWithKey (iCodehTab,
-                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
-              if(!uic || (uic->op != CAST && uic->op != BITWISEAND))
+                        bitVectFirstBit (OP_USES (ic->result)));
+              if(!uic || !uic->result)
                 continue;
 
-              type3 = operandType (IC_RESULT (uic));
+              type3 = operandType (uic->result);
 
-              /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
-              if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
-                 continue;
-              /* Similarly for signed->unsigned->signed widening casts to ensure that negative values end up as nonnegative ones in the end. */
-              if (!SPEC_USIGN (type1) && SPEC_USIGN (type2) && !SPEC_USIGN (type3) && bitsForType (type3) > bitsForType (type2))
-                continue;
-
-              /* Special case: Second use is a bit test */
-              if (uic->op == BITWISEAND && IS_OP_LITERAL (IC_RIGHT (uic)) && ifxForOp (IC_RESULT (uic), uic))
+              if (IS_INTEGRAL (type1) && IS_INTEGRAL (type2) && IS_INTEGRAL (type3) && ic->op == CAST)
                 {
-                  unsigned long long mask = operandLitValueUll (IC_RIGHT (uic));
-
-                  /* Signed cast might set bits above the width of type1 */
-                  if (!SPEC_USIGN (type1) && (mask >> (bitsForType (type1))))
+                  size1 = bitsForType (type1);
+                  size2 = bitsForType (type2);
+                  if (size2 < size1)
                     continue;
-
-                  IC_RIGHT (uic) = operandFromValue (valCastLiteral (type1, operandLitValue (IC_RIGHT (uic)), operandLitValue (IC_RIGHT (uic))), false);
-                }
-              else if (uic->op == CAST) /* Otherwise this use must be a second cast */
-                {
-                  /* It must be a cast to another integer type that */
-                  /* has no loss of bits */
-                  type3 = operandType (IC_RESULT (uic));
-                  if (!IS_INTEGRAL (type3))
-                    continue;
-                  size3 = bitsForType (type3);
-                  if (size3 < size1)
-                     continue;
                   /* If they are the same size, they must have the same signedness */
-                  if (size3 == size2 && SPEC_USIGN (type3) != SPEC_USIGN (type2))
+                  if (size2 == size1 && SPEC_USIGN (type2) != SPEC_USIGN (type1))
                     continue;
 
-                  /* The signedness between the first and last types must match */
-                  if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
+                  /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
+                  if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
+                     continue;
+                  /* Similarly for signed->unsigned->signed widening casts to ensure that negative values end up as nonnegative ones in the end. */
+                  if (!SPEC_USIGN (type1) && SPEC_USIGN (type2) && !SPEC_USIGN (type3) && bitsForType (type3) > bitsForType (type2))
+                    continue;
+
+                  /* Special case: Second use is a bit test */
+                  if (uic->op == BITWISEAND && IS_OP_LITERAL (uic->right) && ifxForOp (uic->result, uic))
+                    {
+                      unsigned long long mask = operandLitValueUll (IC_RIGHT (uic));
+
+                      /* Signed cast might set bits above the width of type1 */
+                      if (!SPEC_USIGN (type1) && (mask >> (bitsForType (type1))))
+                        continue;
+
+                      IC_RIGHT (uic) = operandFromValue (valCastLiteral (type1, operandLitValue (uic->right), operandLitValue (uic->right)), false);
+                    }
+                  else if (uic->op == CAST) /* Otherwise this use must be a second cast */
+                    {
+                      /* It must be a cast to another integer type that */
+                      /* has no loss of bits */
+                      type3 = operandType (uic->result);
+                      if (!IS_INTEGRAL (type3))
+                        continue;
+                      size3 = bitsForType (type3);
+                      if (size3 < size1)
+                         continue;
+                      /* If they are the same size, they must have the same signedness */
+                      if (size3 == size2 && SPEC_USIGN (type3) != SPEC_USIGN (type2))
+                        continue;
+
+                      /* The signedness between the first and last types must match */
+                      if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
+                        continue;
+                    }
+                  else
+                    continue;
+                }
+              else if (IS_PTR (type1) && IS_PTR (type2))
+                {
+                  type3 = operandType (uic->result);
+                  if (ic->op == CAST && uic->op == CAST)
+                    ;
+                  else if(uic->op == '+' && IS_PTR(type3) &&
+                     getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3) &&
+                    (ic->op == CAST || ic->op == '+' && IS_OP_LITERAL (ic->right) && IS_OP_LITERAL (uic->right)))
+                    {
+                      if (ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
+                        {
+                          bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
+                          bitVectUnSetBit (OP_USES (ic->result), uic->key);
+                          bitVectUnSetBit (OP_USES (ic->op == CAST ? ic->right : ic->left), ic->key);
+                          uic->left = ic->op == CAST ? ic->right : ic->left;
+                          bitVectSetBit (OP_USES (uic->left), uic->key);
+                          if (ic->op == '+')
+                            uic->right = operandFromValue (valPlus (valPlus (constIntVal ("0ll"), OP_VALUE (ic->right), false), OP_VALUE (uic->right), true), false);
+                          remiCodeFromeBBlock (ebbs[i], ic);
+                          continue;
+                        }
+                    }
+                  else if(ic->op == '+' && uic->op == CAST && IS_PTR(type3) &&
+                    getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3))
+                    {
+                      // Change cast to assignment, change pointer type at addition.
+                      uic->op = '=';
+                      uic->left = NULL;
+                      sym = OP_SYMBOL (ic->result);
+                      sym->type = copyLinkChain (type3);
+                      sym->etype = getSpec (sym->type);
+                      continue;
+                    }
+                  else
                     continue;
                 }
               else
                 continue;
 
+
               /* Change the first cast to a simple assignment and */
               /* let the second cast do all the work */
               ic->op = '=';
-              IC_LEFT (ic) = NULL;
+              ic->left= NULL;
 
-              sym = OP_SYMBOL (IC_RESULT (ic));
+              sym = OP_SYMBOL (ic->result);
               sym->type = copyLinkChain (type1);
               sym->etype = getSpec (sym->type);
             }

@@ -136,6 +136,7 @@ same_expression (const iCode *const lic, const iCode *const ric)
   if ((isOperandEqual (lleft, rleft) && isOperandEqual (lright, rright) ||
     IS_COMMUTATIVE (lic) && isOperandEqual (lleft, rright) && isOperandEqual (lright, rleft)) &&
     (lresult && rresult && compareTypeInexact (operandType (lresult), operandType (rresult)) > 0) &&
+    (!IS_PTR(operandType (lresult)) && !IS_PTR(operandType (rresult)) || compareType (operandType (lresult), operandType (rresult), true) == 1) && // Otherwise we get confusion between bit-field and non bit-field writes into structs within a union.
     IS_FLOAT (operandType (lresult)) == IS_FLOAT (operandType (rresult)))
     return (true);
 

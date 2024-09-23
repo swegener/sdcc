@@ -10,7 +10,7 @@
 
 #include <limits.h>
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if (!defined(__SDCC_mcs51) || defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE)) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 void * a[255];
 
 void f (int m)
@@ -30,7 +30,7 @@ void f (int m)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if (!defined(__SDCC_mcs51) || defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE)) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   a[0x10] = 0;
   a[0x08] = 0;
   f (INT_MAX/2 + INT_MAX/4 + 2);

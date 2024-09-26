@@ -1740,11 +1740,11 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \begin_inset Index idx
 range none
 pageformat default
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -1760,7 +1760,7 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \end_layout
 
 \end_inset
@@ -1980,11 +1980,11 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \begin_inset Index idx
 range none
 pageformat default
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -2000,7 +2000,7 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \end_layout
 
 \end_inset
@@ -2438,11 +2438,11 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \begin_inset Index idx
 range none
 pageformat default
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -2458,7 +2458,7 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \end_layout
 
 \end_inset
@@ -9858,7 +9858,7 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \begin_inset Index idx
 range none
 pageformat default
@@ -9878,7 +9878,7 @@ status collapsed
 
 \end_inset
 
--std-c89
+-std-c90
 \end_layout
 
 \end_inset
@@ -16532,7 +16532,7 @@ status collapsed
 \labelwidthstring 00.00.0000
 
 \series bold
-c89 
+c90 
 \begin_inset Index idx
 range none
 pageformat default
@@ -16559,11 +16559,11 @@ status collapsed
 
 
 \series default
- Follow the ANSI C89 / ISO C90 standard.
+ Follow the ISO/IEC 9899 First Edition standard (ANSI C89 / ISO C90).
  Alternative spellings:
  
 \series bold
-c90
+c89
 \series default
 ,
  
@@ -16575,7 +16575,7 @@ iso9899:1990
 \labelwidthstring 00.00.0000
 
 \series bold
-c95 
+c94 
 \begin_inset Index idx
 range none
 pageformat default
@@ -16602,11 +16602,12 @@ status collapsed
 
 
 \series default
- Follow the ISO C90 standard as modified in amendment 1.
+ Follow the ISO/IEC 9899 First Edition standard as modified in amendment 1.
  Alternative spelling:
  
 \series bold
-iso9899:199409
+c95,
+ iso9899:199409
 \end_layout
 
 \begin_layout Labeling
@@ -16640,7 +16641,7 @@ status collapsed
 
 
 \series default
- Follow the ISO C99 standard.
+ Follow the ISO/IEC 9899 Second Edition standard (ISO C99).
  Alternative spelling:
  
 \series bold
@@ -16678,7 +16679,7 @@ status collapsed
 
 
 \series default
- Follow the ISO C11 standard.
+ Follow the ISO/IEC 9899 Third Edition standard (ISO C11).
  Alternative spelling:
  
 \series bold
@@ -16716,7 +16717,7 @@ status collapsed
 
 
 \series default
- Follow the ISO C17 standard.
+ Follow the ISO/IEC 9899 Fourth Edition standard (ISO C17).
  Alternative spellings:
  
 \series bold
@@ -16741,7 +16742,7 @@ c23
 \begin_inset Index idx
 range none
 pageformat default
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -16764,7 +16765,7 @@ status collapsed
 
 
 \series default
- Follow the ISO C23 standard.
+ Follow the ISO/IEC 9899 Fifth Edition standard (ISO C23).
  Alternative spelling:
  
 \series bold
@@ -16775,7 +16776,7 @@ c2x
 \labelwidthstring 00.00.0000
 
 \series bold
-sdcc89 
+sdcc90 
 \begin_inset Index idx
 range none
 pageformat default
@@ -16802,12 +16803,12 @@ status collapsed
 
 
 \series default
- Generally follow the ANSI C89 / ISO C90 standard,
+ Generally follow ANSI C89 / ISO C90,
  but allow some SDCC behaviour that conflicts with the standard.
  Alternative spelling:
  
 \series bold
-sdcc90
+sdcc89
 \end_layout
 
 \begin_layout Labeling
@@ -16841,7 +16842,7 @@ status collapsed
 
 
 \series default
- Generally follow the ISO C99 standard,
+ Generally follow ISO C99,
  but allow some SDCC behaviour that conflicts with the standard.
 \end_layout
 
@@ -16876,7 +16877,7 @@ status collapsed
 
 
 \series default
- Generally follow the ISO C11 standard,
+ Generally follow ISO C11,
  but allow some SDCC behaviour that conflicts with the standard (default).
 \end_layout
 
@@ -16911,7 +16912,7 @@ status collapsed
 
 
 \series default
- Generally follow the ISO C17 standard,
+ Generally follow ISO C17,
  but allow some SDCC behaviour that conflicts with the standard.
  Alternative spelling:
  
@@ -16950,7 +16951,7 @@ status collapsed
 
 
 \series default
- Generally follow the ISO C23 standard,
+ Generally follow ISO C23,
  but allow some SDCC behaviour that conflicts with the standard.
  Alternative spelling:
  

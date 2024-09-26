@@ -1,4 +1,4 @@
-/** bug-3778.c: Incorrect top byte on 24-bit fucntion pointers
+/** bug-3778.c: Incorrect top byte on 24-bit function pointers
 */
 
 #include <testfwk.h>
@@ -70,5 +70,4 @@ testBug(void)
 	h2();
 	ASSERT(j == 5);
 }
-
 

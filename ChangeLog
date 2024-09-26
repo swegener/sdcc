@@ -1,3 +1,9 @@
+2024-09-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx,
+	  src/SDCCmain.c:
+	  Make the official standard names and nicknames the most prominent way to refer to standards in documentation.
+
 2024-09-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c,

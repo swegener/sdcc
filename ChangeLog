@@ -1,3 +1,8 @@
+2024-09-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCmain.c:
+	  Fix an issue in command line parsing.
+
 2024-09-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx,

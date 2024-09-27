@@ -1312,7 +1312,7 @@ parseCmdLine (int argc, char **argv)
                   continue;
                 }
 
-              if (strcmp (langVer, "sdcc90" || strcmp (langVer, "sdcc89") == 0) == 0)
+              if (strcmp (langVer, "sdcc90") == 0 || strcmp (langVer, "sdcc89") == 0)
                 {
                   options.std_c95 = 0;
                   options.std_c99 = 0;

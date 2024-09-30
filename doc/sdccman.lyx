@@ -74926,7 +74926,7 @@ Rotate left with carry
 \begin_layout Plain Layout
 
 \size footnotesize
-IC_RESULT = (IC_LEFT << (sizeof(LC_LEFT)*8-1) ) | (IC_LEFT >> 1);
+IC_RESULT = (IC_LEFT << (sizeof(IC_LEFT)*8-1) ) | (IC_LEFT >> 1);
 \end_layout
 
 \end_inset

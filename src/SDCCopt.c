@@ -2826,11 +2826,12 @@ optimizeCastCast (eBBlock **ebbs, int count)
                   type3 = operandType (uic->result);
                   if (ic->op == CAST && uic->op == CAST)
                     ;
-                  else if(!TARGET_IS_MCS51 && uic->op == '+' && IS_PTR(type3) && // TODO: sprintf breaks for mcs51 with --stack-auto with this optimization enabled. Look into it!
+                  else if(uic->op == '+' && IS_PTR(type3) &&
                      getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3) &&
                     (ic->op == CAST || ic->op == '+' && IS_OP_LITERAL (ic->right) && IS_OP_LITERAL (uic->right)))
                     {
-                      if (ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
+                      // TODO: sprintf breaks for mcs51 with --stack-auto with this optimization enabled. Look into it!
+                      if (!TARGET_IS_MCS51 && ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
                         {
                           bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
                           bitVectUnSetBit (OP_USES (ic->result), uic->key);
@@ -2842,6 +2843,10 @@ optimizeCastCast (eBBlock **ebbs, int count)
                           remiCodeFromeBBlock (ebbs[i], ic);
                           continue;
                         }
+                      else if (ic->op == CAST)
+                        ;
+                      else
+                        continue;
                     }
                   else if(ic->op == '+' && uic->op == CAST && IS_PTR(type3) &&
                     getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3))

@@ -2,8 +2,9 @@
 
 	* src/SDCCopt.c:
 	  Disable an optimization while bug #3783 is being looked into.
-	* doc/sdccman.lyx:
-	  Fix a typo.
+	* doc/sdccman.lyx,
+	  src/port.h:
+	  Remove references to obsolete RLC, RRC iCode.
 
 2024-09-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -74681,7 +74681,7 @@ iCode
 \size footnotesize
 Figure II 
 \begin_inset Tabular
-<lyxtabular version="3" rows="38" columns="4">
+<lyxtabular version="3" rows="37" columns="4">
 <features islongtable="true" headBottomDL="true" longtabularalignment="center">
 <column alignment="block" valignment="top" width="13col%">
 <column alignment="left" valignment="top" width="13col%">
@@ -74847,7 +74847,7 @@ IC_RESULT = ~IC_LEFT;
 \begin_layout Plain Layout
 
 \size footnotesize
-RRC
+ROT
 \end_layout
 
 \end_inset
@@ -74858,7 +74858,7 @@ RRC
 \begin_layout Plain Layout
 
 \size footnotesize
-IC_LEFT() IC_RESULT()
+IC_LEFT() IC_RIGHT() IC_RESULT()
 \end_layout
 
 \end_inset
@@ -74869,7 +74869,7 @@ IC_LEFT() IC_RESULT()
 \begin_layout Plain Layout
 
 \size footnotesize
-Rotate right with carry
+Rotate
 \end_layout
 
 \end_inset
@@ -74880,53 +74880,7 @@ Rotate right with carry
 \begin_layout Plain Layout
 
 \size footnotesize
-IC_RESULT = (IC_LEFT << 1) | (IC_LEFT >> (sizeof(IC_LEFT)*8-1));
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-RLC
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-IC_LEFT() IC_RESULT()
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-Rotate left with carry
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-IC_RESULT = (IC_LEFT << (sizeof(IC_LEFT)*8-1) ) | (IC_LEFT >> 1);
+IC_RESULT = (IC_LEFT << IC_RIGHT) | (IC_LEFT >> (sizeof(IC_LEFT)*8-IC_RIGHT));
 \end_layout
 
 \end_inset
@@ -75007,7 +74961,7 @@ IC_LEFT()
 \begin_layout Plain Layout
 
 \size footnotesize
-Push the operand into stack
+Push the operand onto stack
 \end_layout
 
 \end_inset

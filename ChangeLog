@@ -1,3 +1,8 @@
+2024-09-30 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Disable an optimization while bug #3783 is being looked into.
+
 2024-09-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCmain.c:

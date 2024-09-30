@@ -2826,7 +2826,7 @@ optimizeCastCast (eBBlock **ebbs, int count)
                   type3 = operandType (uic->result);
                   if (ic->op == CAST && uic->op == CAST)
                     ;
-                  else if(uic->op == '+' && IS_PTR(type3) &&
+                  else if(!TARGET_IS_MCS51 && uic->op == '+' && IS_PTR(type3) && // TODO: sprintf breaks for mcs51 with --stack-auto with this optimization enabled. Look into it!
                      getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3) &&
                     (ic->op == CAST || ic->op == '+' && IS_OP_LITERAL (ic->right) && IS_OP_LITERAL (uic->right)))
                     {

@@ -394,13 +394,13 @@ typedef struct
   bool (*hasNativeMulFor) (iCode *ic, sym_link *left, sym_link *right);
 
   /** Returns true if the port has implemented certain bit
-      manipulation iCodes (ROT, SWAP, GETABIT, GETBYTE, GETWORD)
+      manipulation iCodes (ROT, GETABIT, GETBYTE, GETWORD)
       right parameter: value of right operand if in >= 0; negative if non-literal.
    */
   bool (*hasExtBitOp) (int op, sym_link *left, int right);
 
   /** Returns true if the port has implemented certain bit
-      manipulation iCodes (ROT, SWAP, GETABIT, GETBYTE, GETWORD)
+      manipulation iCodes (ROT, GETABIT, GETBYTE, GETWORD)
    */
 
   /** Returns the relative expense of accessing a particular output

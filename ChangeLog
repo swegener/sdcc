@@ -1,3 +1,9 @@
+2024-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c,
+	  src/mcs51/gen.c:
+	  Fix bug #3783.
+
 2024-09-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c:

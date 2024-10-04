@@ -2830,12 +2830,11 @@ optimizeCastCast (eBBlock **ebbs, int count)
                      getAddrspace (type1) == getAddrspace (type3) && sclsFromPtr (type1) == sclsFromPtr (type3) &&
                     (ic->op == CAST || ic->op == '+' && IS_OP_LITERAL (ic->right) && IS_OP_LITERAL (uic->right)))
                     {
-                      // TODO: sprintf breaks for mcs51 with --stack-auto with this optimization enabled. Look into it!
-                      if (!TARGET_IS_MCS51 && ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
+                      if (ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
                         {
                           bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
-                          bitVectUnSetBit (OP_USES (ic->result), uic->key);
                           bitVectUnSetBit (OP_USES (ic->op == CAST ? ic->right : ic->left), ic->key);
+                          bitVectUnSetBit (OP_USES (uic->left), uic->key);
                           uic->left = ic->op == CAST ? ic->right : ic->left;
                           bitVectSetBit (OP_USES (uic->left), uic->key);
                           if (ic->op == '+')

@@ -12261,11 +12261,26 @@ genAssign (iCode * ic)
     {
       genLiteralAssign (result, right, size, opPut);
     }
+  // Special case: 2 byte register swap.
+  else if (size == 2 && result->aop->type == AOP_REG && right->aop->type == AOP_REG &&
+    result->aop->aopu.aop_reg[0]->rIdx == right->aop->aopu.aop_reg[1]->rIdx &&
+    result->aop->aopu.aop_reg[1]->rIdx == right->aop->aopu.aop_reg[0]->rIdx)
+    {
+      emitcode ("xch", "a, %s", opGet (result, 0, false, false));
+      emitcode ("xch", "a, %s", opGet (result, 1, false, false));
+      emitcode ("xch", "a, %s", opGet (result, 0, false, false));
+    }
   else
     {
       offset = 0;
       while (size--)
         {
+          // Check for overwriting of result.
+          if (result->aop->type == AOP_REG && right->aop->type == AOP_REG)
+            for (int i = 0; i < offset; i++)
+              if (result->aop->aopu.aop_reg[i]->rIdx == right->aop->aopu.aop_reg[offset]->rIdx)
+                wassert (0);
+
           opPut(result, opGet (right, offset, FALSE, FALSE), offset);
           offset++;
         }

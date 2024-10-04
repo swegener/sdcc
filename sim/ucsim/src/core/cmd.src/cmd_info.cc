@@ -122,6 +122,7 @@ CMDHELP(cl_info_bp_cmd,
 
 /*
  * INFO REGISTERS command
+ *----------------------------------------------------------------------------
  */
 
 COMMAND_DO_WORK_UC(cl_info_reg_cmd)
@@ -132,7 +133,7 @@ COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 
 CMDHELP(cl_info_reg_cmd,
 	"info registers",
-	"List of integer registers and their contents",
+	"List of cpu registers and their contents",
 	"")
 
 /*

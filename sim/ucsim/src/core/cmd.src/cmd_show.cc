@@ -51,6 +51,7 @@ set_show_help(class cl_cmd *cmd)
 		"Long of show");
 }
 
+
 /*
  * Command: show copying
  *----------------------------------------------------------------------------
@@ -70,6 +71,7 @@ CMDHELP(cl_show_copying_cmd,
 	"Conditions for redistributing copies of uCsim",
 	"")
 
+
 /*
  * Command: show warranty
  *----------------------------------------------------------------------------
@@ -88,6 +90,7 @@ CMDHELP(cl_show_warranty_cmd,
 	"show warranty",
 	"Various kinds of warranty you do not have",
 	"")
+
 
 /*
  * Command: show option
@@ -178,10 +181,12 @@ show_error_cmd_print_node(class cl_console_base *con,
     }
 }
 
+
 /*
  * Command: show error
  *----------------------------------------------------------------------------
  */
+
 COMMAND_DO_WORK_APP(cl_show_error_cmd)
 {
   /*class cl_cmd_arg *parm= cmdline->param(0);
@@ -211,6 +216,7 @@ CMDHELP(cl_show_error_cmd,
 	"show error",
 	"Show class of errors",
 	"")
+
 
 //#include "newcmdposixcl.h"
 
@@ -275,5 +281,23 @@ CMDHELP(cl_show_console,
 	"",
 	"",
 	"");
+
+
+/*
+ * SHOW REGISTERS command
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_show_reg_cmd)
+{
+  uc->print_regs(con);
+  return(0);
+}
+
+CMDHELP(cl_show_reg_cmd,
+	"show registers",
+	"List of cpu registers and their contents",
+	"")
+
 
 /* End of cmd.src/cmd_show.cc */

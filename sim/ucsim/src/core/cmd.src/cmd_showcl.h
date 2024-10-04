@@ -49,6 +49,10 @@ COMMAND_ON(app,cl_show_error_cmd);
 COMMAND_ON(app,cl_show_console);
 
 
+// SHOW REG
+COMMAND_ON(uc,cl_show_reg_cmd);
+
+
 #endif
 
 /* End of cmd.src/cmd_showcl.h */

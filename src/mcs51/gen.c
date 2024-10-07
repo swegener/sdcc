@@ -11760,7 +11760,6 @@ genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
     {
       if (pi)
         opPut(result, rname, 0);
-      freeAsmop (NULL, aop, ic, TRUE);
     }
   else
     {
@@ -11781,8 +11780,10 @@ genNearPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
   /* done */
   if (pi)
     pi->generated = 1;
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, true);
+  if(aop)
+    freeAsmop (NULL, aop, ic, true);
+  freeAsmop (result, NULL, ic, true);
 }
 
 /*-----------------------------------------------------------------*/

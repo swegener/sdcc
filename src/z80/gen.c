@@ -4818,7 +4818,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             UNIMPLEMENTED;
           if (!hl_dead)
             _push (PAIR_HL);
-          if (i || soffset)
+          if (i + soffset > 1)
             UNIMPLEMENTED;
           if (!f_dead)
             _push (PAIR_AF);
@@ -4829,7 +4829,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           if (!f_dead)
             _pop (PAIR_AF);
           spillPair (PAIR_HL);
-          genMove_o (result, roffset, ASMOP_HL, 0, size, a_dead, true, de_dead_global, iy_dead, f_dead);
+          genMove_o (result, roffset + i, ASMOP_HL, soffset + i, size, a_dead, true, de_dead_global, iy_dead, f_dead);
           if (!hl_dead)
             _pop (PAIR_HL);
           i += 2;

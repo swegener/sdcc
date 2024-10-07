@@ -1098,9 +1098,9 @@ basicInduction (region * loopReg, ebbIndex * ebbi)
 
               /* ic will be removed by killDeadCode() too,
                  but it's a nice to see a clean dumploop now. */
+              unsetDefsAndUses (ic);
               remiCodeFromeBBlock (lBlock, ic);
               /* clear the definition */
-              bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
               bitVectUnSetBit (lBlock->defSet, ic->key);
               ic = saveic;
             }

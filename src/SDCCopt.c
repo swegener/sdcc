@@ -65,17 +65,11 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 
   ip = ic->next;                /* insertion point */
   /* remove it from the iCode */
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
 
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
-
-  if (IS_SYMOP (left))
-      bitVectUnSetBit (OP_USES (left), ic->key);
-  if (IS_SYMOP (right))
-      bitVectUnSetBit (OP_USES (right), ic->key);
-  if (IS_SYMOP (IC_RESULT (ic)))
-      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   if (IS_FLOAT (operandType (right)))
     {
@@ -277,11 +271,8 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
 
   ip = ic->next;
   /* remove it from the iCode */
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
-  if (IS_SYMOP (IC_RIGHT (ic)))
-      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-  if (IS_SYMOP (IC_RESULT (ic)))
-      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -402,11 +393,8 @@ cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
 
   ip = ic->next;
   /* remove it from the iCode */
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
-  if (IS_SYMOP (IC_RIGHT (ic)))
-      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-  if (IS_SYMOP (IC_RESULT (ic)))
-      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -514,11 +502,8 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
 
   ip = ic->next;
   /* remove it from the iCode */
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
-  if (IS_SYMOP (IC_RIGHT (ic)))
-      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-  if (IS_SYMOP (IC_RESULT (ic)))
-      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -626,11 +611,8 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
 
   ip = ic->next;
   /* remove it from the iCode */
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
-  if (IS_SYMOP (IC_RIGHT (ic)))
-      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-  if (IS_SYMOP (IC_RESULT (ic)))
-      bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
 
   /* depending on the type */
   for (bwd = 0; bwd < 4; bwd++)
@@ -996,12 +978,8 @@ found:
   // Update left and right - they might have changed due to inserted casts.
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
+  unsetDefsAndUses (ic);
   remiCodeFromeBBlock (ebp, ic);
-
-  if (IS_SYMOP (left))
-    bitVectUnSetBit (OP_USES (left), ic->key);
-  if (IS_SYMOP (right))
-    bitVectUnSetBit (OP_USES (right), ic->key);
 
   /* if int & long support routines NOT compiled as reentrant */
   if (!options.intlong_rent)
@@ -2124,21 +2102,14 @@ killDeadCode (ebbIndex * ebbi)
                   else
                     {
                       /* nothing is volatile, eliminate the iCode */
+                      unsetDefsAndUses (ic);
                       remiCodeFromeBBlock (ebbs[i], ic);
 
                       /* for the left & right remove the usage */
-                      if (IS_SYMOP (ic->left))
-                        {
-                          if (OP_SYMBOL (ic->left)->isstrlit)
-                            freeStringSymbol (OP_SYMBOL (ic->left));
-                          bitVectUnSetBit (OP_USES (ic->left), ic->key);
-                        }
-                      if (IS_SYMOP (ic->right))
-                        {
-                          if (OP_SYMBOL (ic->right)->isstrlit)
-                            freeStringSymbol (OP_SYMBOL (ic->right));
-                          bitVectUnSetBit (OP_USES (ic->right), ic->key);
-                        }
+                      if (IS_SYMOP (ic->left) && OP_SYMBOL (ic->left)->isstrlit)
+                        freeStringSymbol (OP_SYMBOL (ic->left));
+                      if (IS_SYMOP (ic->right) && OP_SYMBOL (ic->right)->isstrlit)
+                        freeStringSymbol (OP_SYMBOL (ic->right));
                     }
                 }
             }                   /* end of all instructions */
@@ -2832,13 +2803,12 @@ optimizeCastCast (eBBlock **ebbs, int count)
                     {
                       if (ic->next == uic && isOperandEqual (ic->result, uic->left)) // Eliminate ic competely.
                         {
-                          bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
-                          bitVectUnSetBit (OP_USES (ic->op == CAST ? ic->right : ic->left), ic->key);
                           bitVectUnSetBit (OP_USES (uic->left), uic->key);
                           uic->left = ic->op == CAST ? ic->right : ic->left;
                           bitVectSetBit (OP_USES (uic->left), uic->key);
                           if (ic->op == '+')
                             uic->right = operandFromValue (valPlus (valPlus (constIntVal ("0ll"), OP_VALUE (ic->right), false), OP_VALUE (uic->right), true), false);
+                          unsetDefsAndUses (ic);
                           remiCodeFromeBBlock (ebbs[i], ic);
                           continue;
                         }

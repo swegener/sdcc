@@ -2509,9 +2509,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
          then delete it and continue */
       if (ASSIGNMENT_TO_SELF (ic) && !isOperandVolatile (IC_RIGHT(ic), FALSE))
         {
-          bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-          if (IS_SYMOP (IC_RIGHT (ic)))
-            bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+          unsetDefsAndUses (ic);
           remiCodeFromeBBlock (ebb, ic);
           continue;
         }

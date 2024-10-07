@@ -4,6 +4,10 @@
 	  Fix a code generation bug in pointer write (register save/restore order).
 	* src/z80/gen.c:
 	  Improve flexibility of handling of rematerialized on-stack addresses.
+	* src/SDCCcse.c,
+	  src/SDCCloop.c,
+	  src/SDCCopt.c:
+	  unsetDefsAndUses at uses of remiCodeFromeBBlockcalls.
 
 2024-10-04 Philipp Klaus Krause <philipp@colecovision.eu>
 

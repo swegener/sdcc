@@ -3281,6 +3281,8 @@ eBBlockFromiCode (iCode *ic)
   if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_CSE, ebbi);
 
+  // optimizeCastCast (ebbi->bbOrder, ebbi->count); TODO: Enable after fixing GCSE issue. GCSE messes up some pointer types, triggered by this, resulting in the bitfields.c test failing for some targets.
+
   /* compute the data flow */
   computeDataFlow (ebbi);
 
@@ -3337,7 +3339,7 @@ eBBlockFromiCode (iCode *ic)
     }
 
   offsetFoldGet (ebbi->bbOrder, ebbi->count);
-
+  optimizeCastCast (ebbi->bbOrder, ebbi->count);
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);

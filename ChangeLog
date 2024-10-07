@@ -2,6 +2,9 @@
 
 	* src/SDCCopt.c:
 	  Optimize out some assignments followed by casts, part of RFE #937.
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Merge some offset calculations into stm8 instructions.
 
 2024-10-07 Philipp Klaus Krause <philipp@colecovision.eu>
 

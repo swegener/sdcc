@@ -647,7 +647,7 @@ static bool argCont(const char *arg, char what)
 static bool
 stm8MightReadFlag(const lineNode *pl, const char *what)
 {
-  if (strcmp (what, "c") && strcmp (what, "n") && strcmp (what, "z"))
+  if (strcmp (what, "v") && strcmp (what, "c") && strcmp (what, "n") && strcmp (what, "z"))
     return true;
 
   if (ISINST (pl->line, "push"))

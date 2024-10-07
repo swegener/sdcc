@@ -261,6 +261,40 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	incw	%1
+	incw	%1
+	%2	(%1)
+} by {
+	; peephole 10i moved addition of offset into instruction
+	%2	(0x02, %1)
+} if same(%2 'clr' 'cpl' 'rlc' 'rrc' 'sra' 'sll' 'tnz'), notUsed('v' %1)
+
+replace restart {
+	incw	%1
+	%2	(%1)
+} by {
+	; peephole 10j moved addition of offset into instruction
+	%2	(0x01, %1)
+} if same(%2 'clr' 'cpl' 'rlc' 'rrc' 'sra' 'sll' 'tnz'), notUsed('v' %1)
+
+replace restart {
+	incw	%1
+	incw	%1
+	%2	(%1)
+} by {
+	; peephole 10k moved addition of offset into instruction
+	%2	(0x02, %1)
+} if same(%2 'dec' 'inc' 'neg'), notUsed(%1)
+
+replace restart {
+	incw	%1
+	%2	(%1)
+} by {
+	; peephole 10l moved addition of offset into instruction
+	%2	(0x01, %1)
+} if same(%2 'dec' 'inc' 'neg'), notUsed(%1)
+
+replace restart {
 	ldw	(%1, sp), x
 	ldw	x, (%2, sp)
 	addw	x, (%1, sp)

@@ -2726,9 +2726,9 @@ optimizeCastCast (eBBlock **ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == CAST || ic->op == '+') && ic->result && IS_ITEMP (ic->result))
+          if ((ic->op == CAST || ic->op == '=' || ic->op == '+') && ic->result && IS_ITEMP (ic->result))
             {
-              type1 = operandType (ic->op == CAST ? ic->right : ic->left);
+              type1 = operandType ((ic->op == CAST || ic->op == '=')? ic->right : ic->left);
               type2 = operandType (ic->result);
 
               /* There must be only one use of this first result */
@@ -2743,7 +2743,17 @@ optimizeCastCast (eBBlock **ebbs, int count)
 
               type3 = operandType (uic->result);
 
-              if (IS_INTEGRAL (type1) && IS_INTEGRAL (type2) && IS_INTEGRAL (type3) && ic->op == CAST)
+              if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic) // Elimiate unnecessary assignment TODO: Enable once all regression tests pass
+                 {
+                  bitVectUnSetBit (OP_USES (uic->right), uic->key);
+                  uic->right = ic->right;
+                  if (IS_SYMOP (uic->right))
+                    bitVectSetBit (OP_USES (uic->right), uic->key);
+                  unsetDefsAndUses (ic);
+                  remiCodeFromeBBlock (ebbs[i], ic);
+                  continue;
+                }
+              else if (ic->op == CAST && IS_INTEGRAL (type1) && IS_INTEGRAL (type2) && IS_INTEGRAL (type3))
                 {
                   size1 = bitsForType (type1);
                   size2 = bitsForType (type2);

@@ -2713,35 +2713,26 @@ optimizeStdLibCall (eBBlock ** ebbs, int count)
 static void
 optimizeCastCast (eBBlock **ebbs, int count)
 {
-  int i;
-  iCode *ic;
-  iCode *uic;
-  sym_link *type1;
-  sym_link *type2;
-  sym_link *type3;
-  symbol *sym;
-  int size1, size2, size3;
-
-  for (i = 0; i < count; i++)
+  for (int i = 0; i < count; i++)
     {
-      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+      for (iCode *ic = ebbs[i]->sch; ic; ic = ic->next)
         {
           if ((ic->op == CAST || ic->op == '=' || ic->op == '+') && ic->result && IS_ITEMP (ic->result))
             {
-              type1 = operandType ((ic->op == CAST || ic->op == '=')? ic->right : ic->left);
-              type2 = operandType (ic->result);
+              sym_link *type1 = operandType ((ic->op == CAST || ic->op == '=')? ic->right : ic->left);
+              sym_link *type2 = operandType (ic->result);
 
               /* There must be only one use of this first result */
               if (bitVectnBitsOn (OP_USES (ic->result)) != 1 ||
                 bitVectnBitsOn (OP_DEFS (ic->result)) != 1)
                 continue;
 
-              uic = hTabItemWithKey (iCodehTab,
+              iCode *uic = hTabItemWithKey (iCodehTab,
                         bitVectFirstBit (OP_USES (ic->result)));
               if(!uic || !uic->result)
                 continue;
 
-              type3 = operandType (uic->result);
+              sym_link *type3 = operandType (uic->result);
 
               if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic) // Elimiate unnecessary assignment TODO: Enable once all regression tests pass
                  {
@@ -2755,8 +2746,8 @@ optimizeCastCast (eBBlock **ebbs, int count)
                 }
               else if (ic->op == CAST && IS_INTEGRAL (type1) && IS_INTEGRAL (type2) && IS_INTEGRAL (type3))
                 {
-                  size1 = bitsForType (type1);
-                  size2 = bitsForType (type2);
+                  int size1 = bitsForType (type1);
+                  int size2 = bitsForType (type2);
                   if (size2 < size1)
                     continue;
                   /* If they are the same size, they must have the same signedness */
@@ -2785,10 +2776,9 @@ optimizeCastCast (eBBlock **ebbs, int count)
                     {
                       /* It must be a cast to another integer type that */
                       /* has no loss of bits */
-                      type3 = operandType (uic->result);
                       if (!IS_INTEGRAL (type3))
                         continue;
-                      size3 = bitsForType (type3);
+                      int size3 = bitsForType (type3);
                       if (size3 < size1)
                          continue;
                       /* If they are the same size, they must have the same signedness */
@@ -2804,7 +2794,6 @@ optimizeCastCast (eBBlock **ebbs, int count)
                 }
               else if (IS_PTR (type1) && IS_PTR (type2))
                 {
-                  type3 = operandType (uic->result);
                   if (ic->op == CAST && uic->op == CAST)
                     ;
                   else if(uic->op == '+' && IS_PTR(type3) &&
@@ -2833,7 +2822,7 @@ optimizeCastCast (eBBlock **ebbs, int count)
                       // Change cast to assignment, change pointer type at addition.
                       uic->op = '=';
                       uic->left = NULL;
-                      sym = OP_SYMBOL (ic->result);
+                      symbol *sym = OP_SYMBOL (ic->result);
                       sym->type = copyLinkChain (type3);
                       sym->etype = getSpec (sym->type);
                       continue;
@@ -2850,7 +2839,7 @@ optimizeCastCast (eBBlock **ebbs, int count)
               ic->op = '=';
               ic->left= NULL;
 
-              sym = OP_SYMBOL (ic->result);
+              symbol *sym = OP_SYMBOL (ic->result);
               sym->type = copyLinkChain (type1);
               sym->etype = getSpec (sym->type);
             }

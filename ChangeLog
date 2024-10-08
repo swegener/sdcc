@@ -1,3 +1,10 @@
+2024-10-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c,
+	  src/SDCCopt.h,
+	  src/stm8/ralloc.c:
+	  Code cleanup using C99 features.
+
 2024-10-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c:

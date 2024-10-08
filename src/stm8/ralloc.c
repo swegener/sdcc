@@ -496,19 +496,16 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
 static void
 packRegisters (eBBlock * ebp)
 {
-  iCode *ic;
-  int change = 0;
-
   D (D_ALLOC, ("packRegisters: entered.\n"));
 
   for(;;)
     {
-      change = 0;
+      int change = 0;
       /* look for assignments of the form */
       /* iTempNN = TRueSym (someoperation) SomeOperand */
       /*       ....                       */
       /* TrueSym := iTempNN:1             */
-      for (ic = ebp->sch; ic; ic = ic->next)
+      for (iCode *ic = ebp->sch; ic; ic = ic->next)
         {
           /* find assignment of the form TrueSym := iTempNN:1 */
           if (ic->op == '=')
@@ -518,7 +515,7 @@ packRegisters (eBBlock * ebp)
         break;
     }
 
-  for (ic = ebp->sch; ic; ic = ic->next)
+  for (iCode *ic = ebp->sch; ic; ic = ic->next)
     {
       D (D_ALLOC, ("packRegisters: looping on ic %p\n", ic));
 
@@ -583,7 +580,6 @@ packRegisters (eBBlock * ebp)
         ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1)
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
     }
-
 }
 
 /**
@@ -592,7 +588,6 @@ packRegisters (eBBlock * ebp)
 static void
 serialRegMark (eBBlock ** ebbs, int count)
 {
-  int i;
   short int max_alloc_bytes = SHRT_MAX; // Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
 
   stm8_call_stack_size = 2; // Saving of register to stack temporarily.
@@ -600,15 +595,13 @@ serialRegMark (eBBlock ** ebbs, int count)
   D (D_ALLOC, ("serialRegMark for %s, currFunc->stack %d\n", currFunc->name, currFunc->stack));
 
   /* for all blocks */
-  for (i = 0; i < count; i++)
+  for (int i = 0; i < count; i++)
     {
-      iCode *ic;
-
       if (ebbs[i]->noPath && (ebbs[i]->entryLabel != entryLabel && ebbs[i]->entryLabel != returnLabel))
         continue;
 
       /* for all instructions do */
-      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+      for (iCode *ic = ebbs[i]->sch; ic; ic = ic->next)
         {
           if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes + 5 > stm8_call_stack_size)
             {

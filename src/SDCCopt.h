@@ -27,7 +27,6 @@
 #ifndef SDCCOPT_H
 #define SDCCOPT_H 1
 
-
 /*----------------------------------------------------------------------------*/
 eBBlock **eBBlockFromiCode (iCode *);
 void printEbbs (eBBlock **);
@@ -43,3 +42,4 @@ void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb);
 void appendCast (iCode *ic, sym_link *type, eBBlock *ebb);
 
 #endif
+

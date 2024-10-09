@@ -1,3 +1,8 @@
+2024-10-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Fix an issue in cast optimization that resulted in a -mmcs51 --model-large regression test failure.
+
 2024-10-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c,

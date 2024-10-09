@@ -2734,8 +2734,14 @@ optimizeCastCast (eBBlock **ebbs, int count)
 
               sym_link *type3 = operandType (uic->result);
 
-              if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic) // Elimiate unnecessary assignment TODO: Enable once all regression tests pass
+              if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic)
                  {
+                  if (IS_PTR (type1) && IS_PTR (type2))
+                    ;
+                  else if (IS_INTEGRAL (type1) && IS_INTEGRAL (type2) && SPEC_USIGN (type1) == SPEC_USIGN (type2))
+                    ;
+                  else // Sometimes we encounter weird assignments that change sign. E.g. signed char -> unsigned char -> int would break if we try to optimize.
+                    continue;
                   bitVectUnSetBit (OP_USES (uic->right), uic->key);
                   uic->right = ic->right;
                   if (IS_SYMOP (uic->right))

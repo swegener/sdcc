@@ -2717,7 +2717,7 @@ optimizeCastCast (eBBlock **ebbs, int count)
     {
       for (iCode *ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == CAST || ic->op == '=' || ic->op == '+') && ic->result && IS_ITEMP (ic->result))
+          if ((ic->op == CAST || ic->op == '=' || ic->op == '+' || ic->op == ADDRESS_OF) && ic->result && IS_ITEMP (ic->result))
             {
               sym_link *type1 = operandType ((ic->op == CAST || ic->op == '=')? ic->right : ic->left);
               sym_link *type2 = operandType (ic->result);
@@ -2733,8 +2733,18 @@ optimizeCastCast (eBBlock **ebbs, int count)
                 continue;
 
               sym_link *type3 = operandType (uic->result);
-
-              if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic)
+              if (ic->op == ADDRESS_OF && uic->op == CAST &&
+                IS_PTR (type2) && IS_PTR (type3) && getAddrspace (type2) == getAddrspace (type3) && sclsFromPtr (type2) == sclsFromPtr (type3) &&
+                ic->next == uic)
+                {
+                  bitVectUnSetBit (OP_DEFS (ic->result), ic->key);
+                  IC_RESULT (ic) = IC_RESULT (uic);
+                  bitVectSetBit (OP_DEFS (ic->result), ic->key);
+                  unsetDefsAndUses (uic);
+                  remiCodeFromeBBlock (ebbs[i], uic);
+                  continue;
+                }
+              else if (ic->op == '=' && !POINTER_SET(ic) && uic->op == CAST && ic->next == uic)
                  {
                   if (IS_PTR (type1) && IS_PTR (type2))
                     ;

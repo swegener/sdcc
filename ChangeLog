@@ -1,3 +1,8 @@
+2024-10-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Optimize out CAST following ADDRESS_OF, part of RFE #937.
+
 2024-10-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c:

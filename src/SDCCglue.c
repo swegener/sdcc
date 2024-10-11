@@ -1891,14 +1891,14 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
   set *tmpSet = NULL;
 
   /* fprintf(out, "\t.area\t%s\n", map->sname); */
-
+//printf("emitStaticSeg %s\n", map->sname);
   /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     addSet (&tmpSet, sym);
 
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
-    {
+    {//printf("emit symbol %s\n", sym->name);
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype) && !sym->ival)
         continue;
@@ -1942,11 +1942,13 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
             }
           /* if it has an initial value */
           if (sym->ival)
-            {
+            {//printf("ival.\n");
               if (SPEC_ABSA (sym->etype))
                 {
                   dbuf_tprintf (oBuf, "\t!org\n", SPEC_ADDR (sym->etype));
                 }
+              else if (options.const_seg && map != xinit && map != initializer)
+                dbuf_tprintf(&code->oBuf, "\t!area\n", options.const_seg);
               if (options.debug)
                 {
                   emitDebugSym (oBuf, sym);
@@ -1964,9 +1966,11 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
                 {
                   freeStringSymbol (list2val (sym->ival, TRUE)->sym);
                 }
+              if (!SPEC_ABSA (sym->etype) && options.const_seg && map != xinit && map != initializer)
+                dbuf_tprintf(oBuf, "\t!areacode\n", options.code_seg);
             }
           else
-            {
+            {//printf("no ival.\n");
               /* allocate space */
               if (options.debug)
                 {

@@ -31,11 +31,13 @@ teststrcmp (void)
   ASSERT (strcmp(s100, s0) > 0);
   ASSERT (strncmp(s100, s0, 2) > 0);
   ASSERT (memcmp(s100, s0, 2) > 0);
+#if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   ASSERT (strcmp(s200, s1) > 0);
   ASSERT (strncmp(s200, s1, 2) > 0);
   ASSERT (memcmp(s200, s1, 2) > 0);
   ASSERT (strcmp(s200, s100) > 0);
   ASSERT (strncmp(s200, s100, 2) > 0);
   ASSERT (memcmp(s200, s100, 2) > 0);
+#endif
 }
 

@@ -97,19 +97,18 @@ extern int fatalError;
 extern struct set *ovrSetSets;
 
 /* easy access macros */
-#define IN_BITSPACE(map)        (map && map->bitsp)
-#define IN_STACK(x)  (IS_SPEC(x) && (SPEC_OCLS(x) == xstack || SPEC_OCLS(x) == istack ))
-#define IN_FARSPACE(map)        (map && map->fmap)
-#define IN_DIRSPACE(map)        (map && map->direct)
-#define IN_PAGEDSPACE(map)      (map && map->paged )
-#define IN_CODESPACE(map)       (map && map->codesp)
-#define IN_REGSP(map)           (map && map->regsp)
-#define PTR_TYPE(map)           (map ? (map->ptrType ? map->ptrType : POINTER)\
-                                     : port->unqualified_pointer)
+#define IN_BITSPACE(map)    (map && map->bitsp)
+#define IN_STACK(x)         (IS_SPEC(x) && (SPEC_OCLS(x) == xstack || SPEC_OCLS(x) == istack ))
+#define IN_FARSPACE(map)    (map && map->fmap)
+#define IN_DIRSPACE(map)    (map && map->direct)
+#define IN_PAGEDSPACE(map)  (map && map->paged )
+#define IN_CODESPACE(map)   (map && map->codesp)
+#define IN_REGSP(map)       (map && map->regsp)
+#define PTR_TYPE(map)       (map ? (map->ptrType ? map->ptrType : POINTER) : port->unqualified_pointer)
 
 /* forward decls for functions    */
 memmap *allocMap (char, char, char, char, char, char, unsigned, const char *, char, int);
-void initMem ();
+void initMem (void);
 bool defaultOClass (struct symbol *);
 void allocGlobal (struct symbol *);
 void allocLocal (struct symbol *);
@@ -117,8 +116,8 @@ void allocParms (struct value *, bool smallc);
 void deallocParms (struct value *);
 void deallocLocal (struct symbol *);
 int allocVariables (struct symbol *);
-void overlay2Set ();
-void overlay2data ();
+void overlay2Set (void);
+void overlay2data (void);
 void clearStackOffsets (void);
 void redoStackOffsets (void);
 void printAllocInfo (struct symbol *, struct dbuf_s *);

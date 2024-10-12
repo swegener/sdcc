@@ -4834,58 +4834,68 @@ static void genFunction (iCode * ic)
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, m6502_reg_sp, 0);
 
-  if (IFFUNC_ISNAKED (ftype)) {
-    emitComment (ALWAYS, "naked function: no prologue.");
-    return;
-  }
+  if (IFFUNC_ISNAKED (ftype))
+    {
+      emitComment (ALWAYS, "naked function: no prologue.");
+      return;
+    }
 
   /* if this is an interrupt service routine then
-     save y  */
-  if (IFFUNC_ISISR (sym->type)) {
-    if (!inExcludeList ("y"))
-      pushReg (m6502_reg_y, false);
-  }
+     save a, x & y  */
+  if (IFFUNC_ISISR (sym->type))
+    {
+      if (!inExcludeList ("a"))
+        pushReg (m6502_reg_a, true);
+      if (!inExcludeList ("x"))
+        pushReg (m6502_reg_x, true);
+      if (!inExcludeList ("y"))
+        pushReg (m6502_reg_y, true);
+    }
 
   /* For some cases it is worthwhile to perform a RECEIVE iCode */
   /* before setting up the stack frame completely. */
   int numStackParams = 0;
   while (ric && ric->next && ric->next->op == RECEIVE)
     ric = ric->next;
-  while (ric && IC_RESULT (ric)) {
-    symbol *rsym = OP_SYMBOL (IC_RESULT (ric));
-    int rsymSize = rsym ? getSize (rsym->type) : 0;
+  while (ric && IC_RESULT (ric))
+    {
+      symbol *rsym = OP_SYMBOL (IC_RESULT (ric));
+      int rsymSize = rsym ? getSize (rsym->type) : 0;
 
-    if (rsym->isitmp) {
-      if (rsym && rsym->regType == REG_CND)
-        rsym = NULL;
-      if (rsym && (/*rsym->accuse ||*/ rsym->ruonly))
-        rsym = NULL;
-      if (rsym && (rsym->isspilt || rsym->nRegs == 0) && rsym->usl.spillLoc)
-        rsym = rsym->usl.spillLoc;
+      if (rsym->isitmp)
+        {
+          if (rsym && rsym->regType == REG_CND)
+            rsym = NULL;
+          if (rsym && (/*rsym->accuse ||*/ rsym->ruonly))
+            rsym = NULL;
+          if (rsym && (rsym->isspilt || rsym->nRegs == 0) && rsym->usl.spillLoc)
+            rsym = rsym->usl.spillLoc;
+        }
+
+      /* If the RECEIVE operand immediately spills to the first entry on the  */
+      /* stack, we can push it directly rather than use an sp relative store. */
+      if (rsym && rsym->onStack && rsym->stack == -_G.stackPushes - rsymSize)
+        {
+          int ofs;
+
+          genLine.lineElement.ic = ric;
+          emitComment (TRACEGEN, "genReceive: size=%d", rsymSize);
+          //          for (ofs = 0; ofs < rsymSize; ofs++)
+          m6502_reg_a->isFree=false;
+          for (ofs = rsymSize-1; ofs >=0; ofs--)
+            {
+              reg_info *reg = m6502_aop_pass[ofs + (ric->argreg - 1)]->aopu.aop_reg[0];
+              emitComment (TRACEGEN, "pushreg: ofs=%d", ofs);
+              pushReg (reg, true);
+              //              if (reg->rIdx == A_IDX)
+              //                accIsFree = 1;
+              stackAdjust--;
+            }
+          genLine.lineElement.ic = ic;
+          ric->generated = 1;
+        }
+      ric = (ric->prev && ric->prev->op == RECEIVE) ? ric->prev : NULL;
     }
-
-    /* If the RECEIVE operand immediately spills to the first entry on the  */
-    /* stack, we can push it directly rather than use an sp relative store. */
-    if (rsym && rsym->onStack && rsym->stack == -_G.stackPushes - rsymSize) {
-      int ofs;
-
-      genLine.lineElement.ic = ric;
-      emitComment (TRACEGEN, "genReceive: size=%d", rsymSize);
-      //          for (ofs = 0; ofs < rsymSize; ofs++)
-      m6502_reg_a->isFree=false;
-      for (ofs = rsymSize-1; ofs >=0; ofs--) {
-        reg_info *reg = m6502_aop_pass[ofs + (ric->argreg - 1)]->aopu.aop_reg[0];
-        emitComment (TRACEGEN, "pushreg: ofs=%d", ofs);
-        pushReg (reg, true);
-        //              if (reg->rIdx == A_IDX)
-        //                accIsFree = 1;
-        stackAdjust--;
-      }
-      genLine.lineElement.ic = ic;
-      ric->generated = 1;
-    }
-    ric = (ric->prev && ric->prev->op == RECEIVE) ? ric->prev : NULL;
-  }
 
   /* adjust the stack for the function */
   if (stackAdjust)
@@ -4920,25 +4930,27 @@ genEndFunction (iCode * ic)
   emitComment (TRACEGEN, __func__);
   emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
 
+  if (IFFUNC_ISNAKED (sym->type))
+    {
+      emitComment (ALWAYS, "naked function: no epilogue.");
+      if (options.debug && currFunc && !regalloc_dry_run)
+        debugFile->writeEndFunction (currFunc, ic, 0);
+      return;
+    }
 
-  if (IFFUNC_ISNAKED (sym->type)) {
-    emitComment (ALWAYS, "naked function: no epilogue.");
-    if (options.debug && currFunc && !regalloc_dry_run)
-      debugFile->writeEndFunction (currFunc, ic, 0);
-    return;
-  }
+  if (IFFUNC_ISCRITICAL (sym->type))
+    {
+      emit6502op ("plp", "");
+    }
 
-  if (IFFUNC_ISCRITICAL (sym->type)) {
-    emit6502op ("plp", "");
-  }
-
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto) {
-  }
+  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
+    {
+    }
 
   if (_G.funcHasBasePtr)
     restoreBasePtr();
 
-  if(_G.stackPushes)
+  if (_G.stackPushes)
     emitcode("ERROR","_G.stackPushes=%d in genEndFunction", _G.stackPushes);
 
   if (sym->stack)
@@ -4952,12 +4964,17 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISISR (sym->type))
     {
       if (!inExcludeList ("y"))
-        pullReg (m6502_reg_y); // TODO?
+        pullReg (m6502_reg_y);
+      if (!inExcludeList ("x"))
+        pullReg (m6502_reg_x);
+      if (!inExcludeList ("a"))
+        pullReg (m6502_reg_a);
 
       /* if debug then send end of function */
-      if (options.debug && currFunc && !regalloc_dry_run) {
-        debugFile->writeEndFunction (currFunc, ic, 1);
-      }
+      if (options.debug && currFunc && !regalloc_dry_run)
+        {
+          debugFile->writeEndFunction (currFunc, ic, 1);
+        }
 
       emit6502op ("rti", "");
     }
@@ -4968,15 +4985,18 @@ genEndFunction (iCode * ic)
           int i;
 
           /* if any registers used */
-          if (sym->regsUsed) {
-            /* save the registers used */
-            for (i = sym->regsUsed->size; i >= 0; i--)
-              {
-                if (bitVectBitValue (sym->regsUsed, i) || (m6502_ptrRegReq && (i == YX_IDX || i == YX_IDX)))
-                  // FIXME
-                  emitcode ("pop", "%s", m6502_regWithIdx (i)->name); /* Todo: Cost. Can't find this instruction in manual! */
-              }
-          }
+          if (sym->regsUsed)
+            {
+              /* save the registers used */
+              for (i = sym->regsUsed->size; i >= 0; i--)
+                {
+                  if (bitVectBitValue (sym->regsUsed, i) || (m6502_ptrRegReq && (i == YX_IDX || i == YX_IDX)))
+                    {
+                      // FIXME
+                      emitcode ("pop", "%s", m6502_regWithIdx (i)->name); /* Todo: Cost. Can't find this instruction in manual! */
+                    }
+                }
+            }
         }
 
       /* if debug then send end of function */

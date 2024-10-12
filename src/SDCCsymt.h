@@ -552,7 +552,6 @@ extern sym_link *validateLink (sym_link * l,
 #define IS_STRUCT(x)     (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
 #define IS_ABSOLUTE(x)   (IS_SPEC(x) && x->select.s.b_absadr )
 #define IS_REGISTER(x)   (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
-#define IS_RENT(x)       (IS_SPEC(x) && x->select.s._reent )
 #define IS_STATIC(x)     (IS_SPEC(x) && SPEC_STAT(x))
 #define IS_INLINE(x)     (IS_SPEC(x) && SPEC_INLINE(x))
 #define IS_NORETURN(x)   (IS_SPEC(x) && SPEC_NORETURN(x))

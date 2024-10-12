@@ -1,5 +1,19 @@
 2024-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/f8/gen.c: fixed warnings
+	* src/mos6502/gen.c (genFunction, genEndFunction): fixed bug #3787
+	* src/ds390/main.c: cosmetics
+	* src/SDCCralloc.hpp: fail for all 1.85.x
+	* src/SDCCsalloc.hpp: require Boost >= 1.79
+	* src/SDCCgenconstprop.cc,
+	* src/SDCClospre.hpp,
+	* src/SDCCnaddr.hpp: removed BOOST_VERSION = 1.60 test
+	* src/SDCCmem.c (printAllocInfoSeg): print upto 8 registers
+	* src/SDCCmem.h: Added void as parameter
+	* src/SDCCsymt.h: removed unused IS_RENT
+
+2024-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sdas/as6500/clean.mk,
 	* sdas/as6808/clean.mk,
 	* sdas/as8051/clean.mk,

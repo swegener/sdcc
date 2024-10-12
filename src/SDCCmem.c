@@ -108,7 +108,7 @@ allocMap (char rspace,          /* sfr space                   */
 /* initMem - allocates and initializes all the segments            */
 /*-----------------------------------------------------------------*/
 void
-initMem ()
+initMem (void)
 {
   /* allocate all the segments */
   /* xternal stack segment ;
@@ -504,7 +504,7 @@ defaultOClass (symbol *sym)
 /* allocDefault - assigns the output segment based on SCLASS       */
 /*-----------------------------------------------------------------*/
 bool
-allocDefault (struct symbol * sym)
+allocDefault (struct symbol *sym)
 {
   if (defaultOClass (sym))
     {
@@ -518,7 +518,7 @@ allocDefault (struct symbol * sym)
 /* allocGlobal - assigns the output segment to a global var        */
 /*-----------------------------------------------------------------*/
 void
-allocGlobal (symbol * sym)
+allocGlobal (symbol *sym)
 {
   /* symbol name is internal name  */
   if (!sym->level)              /* local statics can come here */
@@ -539,7 +539,7 @@ allocGlobal (symbol * sym)
       return;
     }
 
-  /* if this is a function then assign code space    */
+  /* if this is a function then assign code space */
   if (IS_FUNC (sym->type))
     {
       SPEC_OCLS (sym->etype) = code;
@@ -601,7 +601,7 @@ allocGlobal (symbol * sym)
               /* set the output class */
               SPEC_OCLS (sym->etype) = port->mem.default_globl_map;
             }
-          /* generate the symbol  */
+          /* generate the symbol */
           allocIntoSeg (sym);
           return;
         }
@@ -667,7 +667,7 @@ allocParms (value *val, bool smallc)
           if (lval->sym)
             lval->sym->onStack = 1;
 
-          /* choose which stack 2 use   */
+          /* choose which stack to use */
           if (options.useXstack)    /* use external stack */
             {
               /* PENDING: stack direction support */
@@ -677,7 +677,7 @@ allocParms (value *val, bool smallc)
                 xstackPtr - paramsize;
               xstackPtr -= paramsize;
             }
-          else                      /* use internal stack   */
+          else                      /* use internal stack */
             {
               
               SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = istack;
@@ -709,7 +709,7 @@ allocParms (value *val, bool smallc)
             continue;
 
           /* allocate them in the automatic space */
-          /* generate a unique name  */
+          /* generate a unique name               */
           SNPRINTF (lval->sym->rname, sizeof(lval->sym->rname),
                     "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
           strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
@@ -725,7 +725,9 @@ allocParms (value *val, bool smallc)
           SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
               port->mem.default_local_map;
           if (options.model == MODEL_SMALL ||
-            options.model == NO_MODEL && !TARGET_PIC_LIKE /* The test for NO_MODEL was introduced to fix an issue for pdk (pdk has no xdata) maybe it is the right thing to do for pic, too. But I don't know about pic*/)
+              /* The test for NO_MODEL was introduced to fix an issue for pdk (pdk has no xdata) maybe it is the right thing to do for pic, too.
+                 But I don't know about pic */
+              options.model == NO_MODEL && !TARGET_PIC_LIKE)
             {
               /* note here that we put it into the overlay segment
                  first, we will remove it from the overlay segment
@@ -757,7 +759,7 @@ allocParms (value *val, bool smallc)
 /* deallocParms - parameters are always passed on stack            */
 /*-----------------------------------------------------------------*/
 void
-deallocParms (value * val)
+deallocParms (value *val)
 {
   value *lval;
 
@@ -769,7 +771,7 @@ deallocParms (value * val)
       /* unmark is myparm */
       lval->sym->ismyparm = 0;
 
-      /* delete it from the symbol table  */
+      /* delete it from the symbol table */
       deleteSym (SymbolTab, lval->sym, lval->sym->name);
 
       if (!lval->sym->isref)
@@ -785,7 +787,7 @@ deallocParms (value * val)
       if (lval->sym->rname[0])
         {
           char buffer[SDCC_NAME_MAX];
-          symbol * argsym = lval->sym;
+          symbol *argsym = lval->sym;
 
           strncpyz (buffer, lval->sym->rname, sizeof(buffer));
           lval->sym = copySymbol (lval->sym);
@@ -814,7 +816,7 @@ deallocParms (value * val)
 /* allocLocal - allocate local variables                           */
 /*-----------------------------------------------------------------*/
 void
-allocLocal (symbol * sym)
+allocLocal (symbol *sym)
 {
   /* generate an unique name */
   SNPRINTF (sym->rname, sizeof(sym->rname),
@@ -843,7 +845,7 @@ allocLocal (symbol * sym)
   if (IS_VOLATILE (sym->type))
     sym->allocreq = 1;
 
-  /* this is automatic           */
+  /* this is automatic */
 
   /* if it's to be placed on the stack */
   if (options.stackAuto || reentrant)
@@ -876,7 +878,7 @@ allocLocal (symbol * sym)
 
   /* else depending on the storage class specified */
 
-  /* if this is a function then assign code space    */
+  /* if this is a function then assign code space */
   if (IS_FUNC (sym->type) && !sym->isitmp)
     {
       SPEC_OCLS (sym->etype) = code;
@@ -925,7 +927,7 @@ allocLocal (symbol * sym)
 /* deallocLocal - deallocates the local variables                  */
 /*-----------------------------------------------------------------*/
 void
-deallocLocal (symbol * csym)
+deallocLocal (symbol *csym)
 {
   symbol *sym;
 
@@ -956,7 +958,7 @@ deallocLocal (symbol * csym)
 /* overlay2data - moves declarations from the overlay seg to data  */
 /*-----------------------------------------------------------------*/
 void
-overlay2data ()
+overlay2data (void)
 {
   symbol *sym;
 
@@ -977,7 +979,7 @@ overlay2data ()
 /*               the set of sets containing the overlable symbols  */
 /*-----------------------------------------------------------------*/
 void
-overlay2Set ()
+overlay2Set (void)
 {
   symbol *sym;
   set *oset = NULL;
@@ -997,21 +999,21 @@ overlay2Set ()
 /* allocVariables - creates decl & assign storage class for a v    */
 /*-----------------------------------------------------------------*/
 int
-allocVariables (symbol * symChain)
+allocVariables (symbol *symChain)
 {
   symbol *sym;
   symbol *csym;
   int stack = 0;
   long saveLevel = 0;
 
-  /* go thru the symbol chain   */
+  /* go through the symbol chain */
   for (sym = symChain; sym; sym = sym->next)
     {
       /* if this is a typedef then add it */
       /* to the typedef table             */
       if (IS_TYPEDEF (sym->etype))
         {
-          /* check if the typedef already exists    */
+          /* check if the typedef already exists */
           csym = findSym (TypedefTab, NULL, sym->name);
           if (csym && csym->level == sym->level &&
             !(options.std_c11 && compareTypeExact (sym->type, csym->type, -1))) /* typedef to same type not allowed before ISO C11 */
@@ -1197,7 +1199,7 @@ redoStackOffsets (void)
 /* printAllocInfoSeg- print the allocation for a given section     */
 /*-----------------------------------------------------------------*/
 static int
-printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
+printAllocInfoSeg (memmap *map, symbol *func, struct dbuf_s *oBuf)
 {
   symbol *sym;
   int flg = FALSE;
@@ -1205,15 +1207,14 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
   if (!map || !map->syms)
     return 0;
 
-  for (sym = setFirstItem (map->syms); sym;
-       sym = setNextItem (map->syms))
+  for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
     {
       if (sym->level == 0)
         continue;
       if (sym->localof != func)
         continue;
 
-      dbuf_printf (oBuf, ";%-25s Allocated ", sym->name);
+      dbuf_printf (oBuf, ";%-13s Allocated ", sym->name);
       flg = TRUE;
 
       /* if assigned to registers */
@@ -1225,7 +1226,7 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
           if (!sym->isspilt || sym->remat)
             {
               dbuf_append_str (oBuf, "to registers ");
-              for (i = 0; i < 4 && sym->regs[i]; i++)
+              for (i = 0; i < 8 && sym->regs[i]; i++)
                 dbuf_printf (oBuf, "%s ", port->getRegName (sym->regs[i]));
               dbuf_append_char (oBuf, '\n');
               continue;
@@ -1268,9 +1269,9 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
   return flg;
 }
 
-/*-----------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 /* canOverlayLocals - returns true if the local variables can overlayed */
-/*-----------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 static bool
 canOverlayLocals (eBBlock ** ebbs, int count)
 {
@@ -1343,8 +1344,7 @@ doOverlays (eBBlock ** ebbs, int count)
        local variables in the overlay set */
     overlay2Set ();
   else
-    /* otherwise put them into data where
-       they belong */
+    /* otherwise put them into data where they belong */
     overlay2data ();
 }
 
@@ -1352,7 +1352,7 @@ doOverlays (eBBlock ** ebbs, int count)
 /* printAllocInfo - prints allocation information for a function   */
 /*-----------------------------------------------------------------*/
 void
-printAllocInfo (symbol * func, struct dbuf_s * oBuf)
+printAllocInfo (symbol *func, struct dbuf_s *oBuf)
 {
 #define BREAKLINE ";------------------------------------------------------------\n"
   int cnt = 0;

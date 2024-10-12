@@ -1608,7 +1608,7 @@ pop (const asmop *op, int offset, int size) // todo: xl_dead parameter for more 
 static void
 emit3sub_o (enum asminst inst, asmop *op0, int offset0, asmop *op1, int offset1)
 {
-  unsigned int litword1;
+  unsigned int litword1 = 0;
   if (op1->type == AOP_LIT)
     litword1 = (byteOfVal (op1->aopu.aop_lit, offset1 + 1) << 8) | byteOfVal (op1->aopu.aop_lit, offset1);
 
@@ -5062,7 +5062,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
 {
   int i;
   const int size = result->size;
-  unsigned int shCount = right->type == AOP_LIT ? ulFromVal (right->aopu.aop_lit) : 0;
+  // unsigned int shCount = right->type == AOP_LIT ? ulFromVal (right->aopu.aop_lit) : 0;
 
   shiftop->type = AOP_REGSTK;
   shiftop->size = size;
@@ -5072,7 +5072,7 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
   for (i = 0; i < size;)
     {
       bool same_2_stack = aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && left->aopu.bytes[i].byteu.stk == result->aopu.bytes[i].byteu.stk;
-      bool same_1_stack = aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && left->aopu.bytes[i].byteu.stk == result->aopu.bytes[i].byteu.stk;
+      // bool same_1_stack = aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && left->aopu.bytes[i].byteu.stk == result->aopu.bytes[i].byteu.stk;
 
       if (aopInReg (left, i, Y_IDX) && regDead (Y_IDX, ic) && result->regs[YL_IDX] == -1 && result->regs[YH_IDX] == -1)
         {

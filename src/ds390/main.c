@@ -38,17 +38,16 @@ static char _defaultRules[] =
 #define OPTION_STACK_SIZE       "--stack-size"
 
 static OPTION _ds390_options[] =
-  {
-    { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
-    { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
-    { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
-    { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
-    { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds390 arithmetic accelerator"},
-    { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
-    { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
-    { 0, NULL }
-  };
-
+{
+  { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds390 (default)" },
+  { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds390 (not supported yet)" },
+  { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
+  { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds390 (default)" },
+  { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds390 arithmetic accelerator"},
+  { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
+  { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
+  { 0, NULL }
+};
 
 /* list of key words used by msc51 */
 static char *_ds390_keywords[] =
@@ -81,19 +80,21 @@ static char *_ds390_keywords[] =
   NULL
 };
 
-static builtins __ds390_builtins[] = {
-    { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
-    { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
-    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
-    /* __builtin_inp - used to read from a memory mapped port, increment first pointer */
-    { "__builtin_inp","v",3,{"cx*","cx*","i"}},        /* void __builtin_inp        (xdata char *,xdata char *,int) */
-    /* __builtin_inp - used to write to a memory mapped port, increment first pointer */
-    { "__builtin_outp","v",3,{"cx*","cx*","i"}},       /* void __builtin_outp       (xdata char *,xdata char *,int) */
-    { "__builtin_swapw","Us",1,{"Us"}},                /* unsigned short __builtin_swapw (unsigned short) */
-    { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
-    { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
-    { NULL , NULL,0, {NULL}}                           /* mark end of table */
+static builtins __ds390_builtins[] =
+{
+  { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
+  { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+  { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
+  /* __builtin_inp - used to read from a memory mapped port, increment first pointer */
+  { "__builtin_inp","v",3,{"cx*","cx*","i"}},        /* void __builtin_inp        (xdata char *,xdata char *,int) */
+  /* __builtin_inp - used to write to a memory mapped port, increment first pointer */
+  { "__builtin_outp","v",3,{"cx*","cx*","i"}},       /* void __builtin_outp       (xdata char *,xdata char *,int) */
+  { "__builtin_swapw","Us",1,{"Us"}},                /* unsigned short __builtin_swapw (unsigned short) */
+  { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
+  { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
+  { NULL , NULL,0, {NULL}}                           /* mark end of table */
 };
+
 void ds390_assignRegisters (ebbIndex * ebbi);
 
 static int regParmFlg = 0;      /* determine if we can register a parameter */
@@ -121,32 +122,37 @@ _ds390_regparm (sym_link * l, bool reentrant)
   if (IS_STRUCT (l))
     return 0;
 
-    if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
+  if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
+    return 0;
+  if (options.parms_in_bank1 == 0)
+    {
+      /* simple can pass only the first parameter in a register */
+      if (regParmFlg)
         return 0;
-    if (options.parms_in_bank1 == 0) {
-        /* simple can pass only the first parameter in a register */
-        if (regParmFlg)
-            return 0;
 
-        regParmFlg = 1;
-        return 1;
-    } else {
-        int size = getSize(l);
-        int remain ;
+      regParmFlg = 1;
+      return 1;
+    }
+  else
+    {
+      int size = getSize(l);
+      int remain ;
 
-        /* first one goes the usual way to DPTR */
-        if (regParmFlg == 0) {
-            regParmFlg += 4 ;
-            return 1;
+      /* first one goes the usual way to DPTR */
+      if (regParmFlg == 0)
+        {
+          regParmFlg += 4 ;
+          return 1;
         }
-        /* second one onwards goes to RB1_0 thru RB1_7 */
-        remain = regParmFlg - 4;
-        if (size > (8 - remain)) {
-            regParmFlg = 12 ;
-            return 0;
+      /* second one onwards goes to RB1_0 thru RB1_7 */
+      remain = regParmFlg - 4;
+      if (size > (8 - remain))
+        {
+          regParmFlg = 12 ;
+          return 0;
         }
-        regParmFlg += size ;
-        return regParmFlg - size + 1;
+      regParmFlg += size ;
+      return regParmFlg - size + 1;
     }
 }
 
@@ -227,7 +233,6 @@ _ds390_finaliseOptions (void)
        */
       istack->fmap = 1;
       istack->ptrType = FPOINTER;
-
     }  /* MODEL_FLAT24 */
 }
 
@@ -592,23 +597,27 @@ static void _ds390_genXINIT (FILE * of)
 /* Do CSE estimation */
 static bool cseCostEstimation (iCode *ic, iCode *pdic)
 {
-    operand *result = IC_RESULT(ic);
-    //operand *right  = IC_RIGHT(ic);
-    //operand *left   = IC_LEFT(ic);
-    sym_link *result_type = operandType(result);
-    //sym_link *right_type  = (right ? operandType(right) : 0);
-    //sym_link *left_type   = (left  ? operandType(left)  : 0);
+  operand *result = IC_RESULT(ic);
+  //operand *right  = IC_RIGHT(ic);
+  //operand *left   = IC_LEFT(ic);
+  sym_link *result_type = operandType(result);
+  //sym_link *right_type  = (right ? operandType(right) : 0);
+  //sym_link *left_type   = (left  ? operandType(left)  : 0);
 
-    /* if it is a pointer then return ok for now */
-    if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
+  /* if it is a pointer then return ok for now */
+  if (IC_RESULT(ic) && IS_PTR(result_type))
+    return 1;
 
-    /* if bitwise | add & subtract then no since mcs51 is pretty good at it
-       so we will cse only if they are local (i.e. both ic & pdic belong to
-       the same basic block */
-    if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
-        /* then if they are the same Basic block then ok */
-        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
-        else return 0;
+  /* if bitwise | add & subtract then no since mcs51 is pretty good at it
+     so we will cse only if they are local (i.e. both ic & pdic belong to
+     the same basic block */
+  if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-')
+    {
+      /* then if they are the same Basic block then ok */
+      if (ic->eBBlockNum == pdic->eBBlockNum)
+        return 1;
+      else
+        return 0;
     }
 
     /* for others it is cheaper to do the cse */
@@ -730,7 +739,6 @@ instructionSize(char *inst, char *op1, char *op2)
   if (ISINST ("acall")) return 2+isflat24;
   if (ISINST ("ajmp")) return 2+isflat24;
 
-
   if (ISINST ("add") || ISINST ("addc") || ISINST ("subb") || ISINST ("xch"))
     {
       if (IS_Rn(op2) || IS_atRi(op2)) return 1;
@@ -794,11 +802,11 @@ typedef struct ds390operanddata
     int regIdx1;
     int regIdx2;
   }
-ds390operanddata;
+  ds390operanddata;
 
 static ds390operanddata ds390operandDataTable[] =
   {
-    {"acc1",   AP_IDX,   -1},
+    {"acc1",  AP_IDX,   -1},
     {"a",     A_IDX,    -1},
     {"ab",    A_IDX,    B_IDX},
     {"ac",    CND_IDX,  -1},
@@ -930,62 +938,62 @@ updateOpRW (asmLineNode *aln, char *op, char *optype, int currentDPS)
 }
 
 typedef struct ds390opcodedata
-  {
-    char name[6];
-    char class[3];
-    char pswtype[3];
-    char op1type[3];
-    char op2type[3];
-  }
+{
+  char name[6];
+  char class[3];
+  char pswtype[3];
+  char op1type[3];
+  char op2type[3];
+}
 ds390opcodedata;
 
 static ds390opcodedata ds390opcodeDataTable[] =
-  {
-    {"acall","j", "",   "",   ""},
-    {"add",  "",  "w",  "rw", "r"},
-    {"addc", "",  "rw", "rw", "r"},
-    {"ajmp", "j", "",   "",   ""},
-    {"anl",  "",  "",   "rw", "r"},
-    {"cjne", "j", "w",  "r",  "r"},
-    {"clr",  "",  "",   "w",  ""},
-    {"cpl",  "",  "",   "rw", ""},
-    {"da",   "",  "rw", "rw", ""},
-    {"dec",  "",  "",   "rw", ""},
-    {"div",  "",  "w",  "rw", ""},
-    {"djnz", "j", "",  "rw",  ""},
-    {"inc",  "",  "",   "rw", ""},
-    {"jb",   "j", "",   "r",  ""},
-    {"jbc",  "j", "",  "rw",  ""},
-    {"jc",   "j", "",   "",   ""},
-    {"jmp",  "j", "",  "",    ""},
-    {"jnb",  "j", "",   "r",  ""},
-    {"jnc",  "j", "",   "",   ""},
-    {"jnz",  "j", "",  "",    ""},
-    {"jz",   "j", "",  "",    ""},
-    {"lcall","j", "",   "",   ""},
-    {"ljmp", "j", "",   "",   ""},
-    {"mov",  "",  "",   "w",  "r"},
-    {"movc", "",  "",   "w",  "r"},
-    {"movx", "",  "",   "w",  "r"},
-    {"mul",  "",  "w",  "rw", ""},
-    {"nop",  "",  "",   "",   ""},
-    {"orl",  "",  "",   "rw", "r"},
-    {"pop",  "",  "",   "w",  ""},
-    {"push", "",  "",   "r",  ""},
-    {"ret",  "j", "",   "",   ""},
-    {"reti", "j", "",   "",   ""},
-    {"rl",   "",  "",   "rw", ""},
-    {"rlc",  "",  "rw", "rw", ""},
-    {"rr",   "",  "",   "rw", ""},
-    {"rrc",  "",  "rw", "rw", ""},
-    {"setb", "",  "",   "w",  ""},
-    {"sjmp", "j", "",   "",   ""},
-    {"subb", "",  "rw", "rw", "r"},
-    {"swap", "",  "",   "rw", ""},
-    {"xch",  "",  "",   "rw", "rw"},
-    {"xchd", "",  "",   "rw", "rw"},
-    {"xrl",  "",  "",   "rw", "r"},
-  };
+{
+  {"acall","j", "",   "",   ""},
+  {"add",  "",  "w",  "rw", "r"},
+  {"addc", "",  "rw", "rw", "r"},
+  {"ajmp", "j", "",   "",   ""},
+  {"anl",  "",  "",   "rw", "r"},
+  {"cjne", "j", "w",  "r",  "r"},
+  {"clr",  "",  "",   "w",  ""},
+  {"cpl",  "",  "",   "rw", ""},
+  {"da",   "",  "rw", "rw", ""},
+  {"dec",  "",  "",   "rw", ""},
+  {"div",  "",  "w",  "rw", ""},
+  {"djnz", "j", "",  "rw",  ""},
+  {"inc",  "",  "",   "rw", ""},
+  {"jb",   "j", "",   "r",  ""},
+  {"jbc",  "j", "",  "rw",  ""},
+  {"jc",   "j", "",   "",   ""},
+  {"jmp",  "j", "",  "",    ""},
+  {"jnb",  "j", "",   "r",  ""},
+  {"jnc",  "j", "",   "",   ""},
+  {"jnz",  "j", "",  "",    ""},
+  {"jz",   "j", "",  "",    ""},
+  {"lcall","j", "",   "",   ""},
+  {"ljmp", "j", "",   "",   ""},
+  {"mov",  "",  "",   "w",  "r"},
+  {"movc", "",  "",   "w",  "r"},
+  {"movx", "",  "",   "w",  "r"},
+  {"mul",  "",  "w",  "rw", ""},
+  {"nop",  "",  "",   "",   ""},
+  {"orl",  "",  "",   "rw", "r"},
+  {"pop",  "",  "",   "w",  ""},
+  {"push", "",  "",   "r",  ""},
+  {"ret",  "j", "",   "",   ""},
+  {"reti", "j", "",   "",   ""},
+  {"rl",   "",  "",   "rw", ""},
+  {"rlc",  "",  "rw", "rw", ""},
+  {"rr",   "",  "",   "rw", ""},
+  {"rrc",  "",  "rw", "rw", ""},
+  {"setb", "",  "",   "w",  ""},
+  {"sjmp", "j", "",   "",   ""},
+  {"subb", "",  "rw", "rw", "r"},
+  {"swap", "",  "",   "rw", ""},
+  {"xch",  "",  "",   "rw", "rw"},
+  {"xchd", "",  "",   "rw", "rw"},
+  {"xrl",  "",  "",   "rw", "r"},
+};
 
 static int
 ds390opcodeCompare (const void *key, const void *member)
@@ -1066,7 +1074,9 @@ static void
 initializeAsmLineNode (lineNode *line)
 {
   if (!line->aln)
-    line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line, 0);
+    {
+      line->aln = (asmLineNodeBase *) asmLineNodeFromLineNode (line, 0);
+    }
   else if (line->aln && !((asmLineNode *)line->aln)->initialized)
     {
       int currentDPS = ((asmLineNode *)line->aln)->currentDPS;
@@ -1298,111 +1308,123 @@ static OPTION _tininative_options[] =
 
 static void _tininative_init (void)
 {
-    asm_addTree (&asm_a390_mapping);
+  asm_addTree (&asm_a390_mapping);
 }
 
 static void _tininative_setDefaultOptions (void)
 {
-    options.model=MODEL_FLAT24;
-    options.stack10bit=1;
-    options.stackAuto = 1;
+  options.model=MODEL_FLAT24;
+  options.stack10bit=1;
+  options.stackAuto = 1;
 }
 
 static void _tininative_finaliseOptions (void)
 {
-    /* Hack-o-matic: if we are using the flat24 model,
-     * adjust pointer sizes.
-     */
-    if (options.model != MODEL_FLAT24)  {
-        options.model = MODEL_FLAT24 ;
-        fprintf(stderr,"TININative supports only MODEL FLAT24\n");
+  /* Hack-o-matic: if we are using the flat24 model,
+   * adjust pointer sizes.
+   */
+  if (options.model != MODEL_FLAT24)
+    {
+      options.model = MODEL_FLAT24 ;
+      fprintf(stderr,"TININative supports only MODEL FLAT24\n");
     }
-    port->s.far_ptr_size = 3;
-    port->s.funcptr_size = 3;
-    port->s.ptr_size = 4;
+  port->s.far_ptr_size = 3;
+  port->s.funcptr_size = 3;
+  port->s.ptr_size = 4;
 
-    port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
+  port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
-    port->stack.call_overhead += 2;     /* This acounts for the extra byte
-                                         * of return address on the stack.
-                                         * but is ugly. There must be a
-                                         * better way.
-                                         */
+  port->stack.call_overhead += 2;     /* This acounts for the extra byte
+                                       * of return address on the stack.
+                                       * but is ugly. There must be a
+                                       * better way.
+                                       */
 
-    port->mem.default_local_map = xdata;
-    port->mem.default_globl_map = xdata;
+  port->mem.default_local_map = xdata;
+  port->mem.default_globl_map = xdata;
 
-    if (!options.stack10bit) {
+  if (!options.stack10bit)
+    {
         options.stack10bit = 1;
         fprintf(stderr,"TININative supports only stack10bit \n");
     }
 
-    if (!options.stack_loc) options.stack_loc = 0x400008;
+  if (!options.stack_loc)
+    options.stack_loc = 0x400008;
 
-    /* Fixup the memory map for the stack; it is now in
-     * far space and requires a FPOINTER to access it.
-     */
-    istack->fmap = 1;
-    istack->ptrType = FPOINTER;
-    options.cc_only =1;
+  /* Fixup the memory map for the stack; it is now in
+   * far space and requires a FPOINTER to access it.
+   */
+  istack->fmap = 1;
+  istack->ptrType = FPOINTER;
+  options.cc_only =1;
 }
 
 static int _tininative_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
-    return TRUE;
+  return TRUE;
 }
 
 static void _tininative_genAssemblerStart (FILE * of)
 {
-    fputs("$include(tini.inc)\n", of);
-    fputs("$include(ds80c390.inc)\n", of);
-    fputs("$include(tinimacro.inc)\n", of);
-    fputs("$include(apiequ.inc)\n", of);
-    fputs("_bpx EQU 01Eh \t\t; _bpx (frame pointer) mapped to R7_B3:R6_B3\n", of);
-    fputs("acc1  EQU 01Dh \t\t; acc1 mapped to R5_B3\n", of);
-    /* Must be first and return 0 */
-    fputs("Lib_Native_Init:\n",of);
-    fputs("\tclr\ta\n",of);
-    fputs("\tret\n",of);
-    fputs("LibraryID:\n",of);
-    fputs("\tdb \"DS\"\n",of);
-    if (options.tini_libid) {
-        fprintf(of,"\tdb 0,0,0%02xh,0%02xh,0%02xh,0%02xh\n",
-                (options.tini_libid>>24 & 0xff),
-                (options.tini_libid>>16 & 0xff),
-                (options.tini_libid>>8 & 0xff),
-                (options.tini_libid  & 0xff));
-    } else {
-        fprintf(of,"\tdb 0,0,0,0,0,1\n");
+  fputs("$include(tini.inc)\n", of);
+  fputs("$include(ds80c390.inc)\n", of);
+  fputs("$include(tinimacro.inc)\n", of);
+  fputs("$include(apiequ.inc)\n", of);
+  fputs("_bpx EQU 01Eh \t\t; _bpx (frame pointer) mapped to R7_B3:R6_B3\n", of);
+  fputs("acc1  EQU 01Dh \t\t; acc1 mapped to R5_B3\n", of);
+  /* Must be first and return 0 */
+  fputs("Lib_Native_Init:\n",of);
+  fputs("\tclr\ta\n",of);
+  fputs("\tret\n",of);
+  fputs("LibraryID:\n",of);
+  fputs("\tdb \"DS\"\n",of);
+  if (options.tini_libid)
+    {
+      fprintf(of,"\tdb 0,0,0%02xh,0%02xh,0%02xh,0%02xh\n",
+              (options.tini_libid>>24 & 0xff),
+              (options.tini_libid>>16 & 0xff),
+              (options.tini_libid>>8 & 0xff),
+              (options.tini_libid  & 0xff));
+    }
+  else
+    {
+      fprintf(of,"\tdb 0,0,0,0,0,1\n");
     }
 
 }
+
 static void _tininative_genAssemblerEnd (FILE * of)
 {
     fputs("\tend\n",of);
 }
+
 /* tininative assembler , calls "macro", if it succeeds calls "a390" */
 static void _tininative_do_assemble (set *asmOptions)
 {
-    char *buf;
-    static const char *macroCmd[] = {
-        "macro","$1.a51",NULL
+  char *buf;
+  static const char *macroCmd[] =
+    {
+      "macro","$1.a51",NULL
     };
-    static const char *a390Cmd[] = {
-        "a390","$1.mpp",NULL
+  static const char *a390Cmd[] =
+    {
+      "a390","$1.mpp",NULL
     };
 
     buf = buildCmdLine(macroCmd, dstFileName, NULL, NULL, NULL, NULL);
-    if (sdcc_system(buf)) {
+    if (sdcc_system(buf))
+      {
         Safe_free (buf);
         exit(1);
-    }
+      }
     Safe_free (buf);
     buf = buildCmdLine(a390Cmd, dstFileName, NULL, NULL, asmOptions, NULL);
-    if (sdcc_system(buf)) {
+    if (sdcc_system(buf))
+      {
         Safe_free (buf);
         exit(1);
-    }
+      }
     Safe_free (buf);
 }
 
@@ -1436,48 +1458,49 @@ static char *_tininative_keywords[] =
   NULL
 };
 
-static builtins __tininative_builtins[] = {
-    { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
-    { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
-    { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
-    /* TINI NatLib */
-    { "NatLib_LoadByte","c",1,{"c"}},                  /* char  Natlib_LoadByte  (0 based parameter number)         */
-    { "NatLib_LoadShort","s",1,{"c"}},                 /* short Natlib_LoadShort (0 based parameter number)         */
-    { "NatLib_LoadInt","l",1,{"c"}},                   /* long  Natlib_LoadLong  (0 based parameter number)         */
-    { "NatLib_LoadPointer","cx*",1,{"c"}},             /* long  Natlib_LoadPointer  (0 based parameter number)      */
-    /* TINI StateBlock related */
-    { "NatLib_InstallImmutableStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallImmutableStateBlock(state block *,int handle) */
-    { "NatLib_InstallEphemeralStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallEphemeralStateBlock(state block *,int handle) */
-    { "NatLib_RemoveImmutableStateBlock","v",0,{NULL}},/* void NatLib_RemoveImmutableStateBlock() */
-    { "NatLib_RemoveEphemeralStateBlock","v",0,{NULL}},/* void NatLib_RemoveEphemeralStateBlock() */
-    { "NatLib_GetImmutableStateBlock","i",0,{NULL}},   /* int  NatLib_GetImmutableStateBlock () */
-    { "NatLib_GetEphemeralStateBlock","i",0,{NULL}},   /* int  NatLib_GetEphemeralStateBlock () */
-    /* Memory manager */
-    { "MM_XMalloc","i",1,{"l"}},                       /* int  MM_XMalloc (long)                */
-    { "MM_Malloc","i",1,{"i"}},                        /* int  MM_Malloc  (int)                 */
-    { "MM_ApplicationMalloc","i",1,{"i"}},             /* int  MM_ApplicationMalloc  (int)      */
-    { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)                   */
-    { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)                  */
-    { "MM_UnrestrictedPersist","c",1,{"i"}},           /* char  MM_UnrestrictedPersist  (int)   */
-    /* System functions */
-    { "System_ExecJavaProcess","c",2,{"cx*","i"}},     /* char System_ExecJavaProcess (char *,int) */
-    { "System_GetRTCRegisters","v",1,{"cx*"}},         /* void System_GetRTCRegisters (char *) */
-    { "System_SetRTCRegisters","v",1,{"cx*"}},         /* void System_SetRTCRegisters (char *) */
-    { "System_ThreadSleep","v",2,{"l","c"}},           /* void System_ThreadSleep (long,char)  */
-    { "System_ThreadSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ThreadSleep_ExitCriticalSection (long,char)  */
-    { "System_ProcessSleep","v",2,{"l","c"}},           /* void System_ProcessSleep (long,char)  */
-    { "System_ProcessSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ProcessSleep_ExitCriticalSection (long,char)  */
-    { "System_ThreadResume","c",2,{"c","c"}},          /* char System_ThreadResume(char,char)  */
-    { "System_SaveJavaThreadState","v",0,{NULL}},      /* void System_SaveJavaThreadState()    */
-    { "System_RestoreJavaThreadState","v",0,{NULL}},   /* void System_RestoreJavaThreadState() */
-    { "System_ProcessYield","v",0,{NULL}},             /* void System_ProcessYield() */
-    { "System_ProcessSuspend","v",0,{NULL}},           /* void System_ProcessSuspend() */
-    { "System_ProcessResume","v",1,{"c"}},             /* void System_ProcessResume(char) */
-    { "System_RegisterPoll","c",1,{"vF*"}},            /* char System_RegisterPoll ((void *func pointer)()) */
-    { "System_RemovePoll","c",1,{"vF*"}},              /* char System_RemovePoll ((void *func pointer)()) */
-    { "System_GetCurrentProcessId","c",0,{NULL}},      /* char System_GetCurrentProcessId() */
-    { "System_GetCurrentThreadId","c",0,{NULL}},       /* char System_GetCurrentThreadId() */
-    { NULL , NULL,0, {NULL}}                       /* mark end of table */
+static builtins __tininative_builtins[] =
+{
+  { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
+  { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+  { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int)         */
+  /* TINI NatLib */
+  { "NatLib_LoadByte","c",1,{"c"}},                  /* char  Natlib_LoadByte  (0 based parameter number)         */
+  { "NatLib_LoadShort","s",1,{"c"}},                 /* short Natlib_LoadShort (0 based parameter number)         */
+  { "NatLib_LoadInt","l",1,{"c"}},                   /* long  Natlib_LoadLong  (0 based parameter number)         */
+  { "NatLib_LoadPointer","cx*",1,{"c"}},             /* long  Natlib_LoadPointer  (0 based parameter number)      */
+  /* TINI StateBlock related */
+  { "NatLib_InstallImmutableStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallImmutableStateBlock(state block *,int handle) */
+  { "NatLib_InstallEphemeralStateBlock","c",2,{"vx*","us"}},/* char NatLib_InstallEphemeralStateBlock(state block *,int handle) */
+  { "NatLib_RemoveImmutableStateBlock","v",0,{NULL}},/* void NatLib_RemoveImmutableStateBlock() */
+  { "NatLib_RemoveEphemeralStateBlock","v",0,{NULL}},/* void NatLib_RemoveEphemeralStateBlock() */
+  { "NatLib_GetImmutableStateBlock","i",0,{NULL}},   /* int  NatLib_GetImmutableStateBlock () */
+  { "NatLib_GetEphemeralStateBlock","i",0,{NULL}},   /* int  NatLib_GetEphemeralStateBlock () */
+  /* Memory manager */
+  { "MM_XMalloc","i",1,{"l"}},                       /* int  MM_XMalloc (long)                */
+  { "MM_Malloc","i",1,{"i"}},                        /* int  MM_Malloc  (int)                 */
+  { "MM_ApplicationMalloc","i",1,{"i"}},             /* int  MM_ApplicationMalloc  (int)      */
+  { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)                   */
+  { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)                  */
+  { "MM_UnrestrictedPersist","c",1,{"i"}},           /* char  MM_UnrestrictedPersist  (int)   */
+  /* System functions */
+  { "System_ExecJavaProcess","c",2,{"cx*","i"}},     /* char System_ExecJavaProcess (char *,int) */
+  { "System_GetRTCRegisters","v",1,{"cx*"}},         /* void System_GetRTCRegisters (char *) */
+  { "System_SetRTCRegisters","v",1,{"cx*"}},         /* void System_SetRTCRegisters (char *) */
+  { "System_ThreadSleep","v",2,{"l","c"}},           /* void System_ThreadSleep (long,char)  */
+  { "System_ThreadSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ThreadSleep_ExitCriticalSection (long,char)  */
+  { "System_ProcessSleep","v",2,{"l","c"}},          /* void System_ProcessSleep (long,char)  */
+  { "System_ProcessSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ProcessSleep_ExitCriticalSection (long,char)  */
+  { "System_ThreadResume","c",2,{"c","c"}},          /* char System_ThreadResume(char,char)  */
+  { "System_SaveJavaThreadState","v",0,{NULL}},      /* void System_SaveJavaThreadState()    */
+  { "System_RestoreJavaThreadState","v",0,{NULL}},   /* void System_RestoreJavaThreadState() */
+  { "System_ProcessYield","v",0,{NULL}},             /* void System_ProcessYield() */
+  { "System_ProcessSuspend","v",0,{NULL}},           /* void System_ProcessSuspend() */
+  { "System_ProcessResume","v",1,{"c"}},             /* void System_ProcessResume(char) */
+  { "System_RegisterPoll","c",1,{"vF*"}},            /* char System_RegisterPoll ((void *func pointer)()) */
+  { "System_RemovePoll","c",1,{"vF*"}},              /* char System_RemovePoll ((void *func pointer)()) */
+  { "System_GetCurrentProcessId","c",0,{NULL}},      /* char System_GetCurrentProcessId() */
+  { "System_GetCurrentThreadId","c",0,{NULL}},       /* char System_GetCurrentThreadId() */
+  { NULL , NULL,0, {NULL}}                           /* mark end of table */
 };
 
 static const char *_a390Cmd[] =
@@ -1531,7 +1554,7 @@ PORT tininative_port =
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float, _BitInt (in bits) */
   { 1, 2, 2, 4, 8, 1, 3, 3, 3, 3, 1, 4, 64 },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
 
   {
     "XSEG    (XDATA)",
@@ -1568,12 +1591,12 @@ PORT tininative_port =
   { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { ds390_emitDebuggerSymbol },
   {
-    255/4,      /* maxCount */
-    4,          /* sizeofElement */
-    {8,12,20},  /* sizeofMatchJump[] */
-    {10,14,22}, /* sizeofRangeCompare[] */
-    4,          /* sizeofSubtract */
-    7,          /* sizeofDispatch */
+    255/4,                      /* maxCount */
+    4,                          /* sizeofElement */
+    {8,12,20},                  /* sizeofMatchJump[] */
+    {10,14,22},                 /* sizeofRangeCompare[] */
+    4,                          /* sizeofSubtract */
+    7,                          /* sizeofDispatch */
   },
   "",
   _tininative_init,
@@ -1640,23 +1663,23 @@ _ds400_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 /*---------------------------------------------------------------------------------*/
 
 static OPTION _ds400_options[] =
-  {
-    { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds400 (default)" },
-    { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds400 (not supported yet)" },
-    { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
-    { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds400 (default)" },
-    { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds400 arithmetic accelerator"},
-    { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
-    { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
-    { 0, NULL }
-  };
+{
+  { 0, OPTION_FLAT24_MODEL,   NULL, "use the flat24 model for the ds400 (default)" },
+  { 0, OPTION_STACK_8BIT,     NULL, "use the 8bit stack for the ds400 (not supported yet)" },
+  { 0, OPTION_STACK_SIZE,     &options.stack_size, "Tells the linker to allocate this space for stack", CLAT_INTEGER },
+  { 0, "--stack-10bit",       &options.stack10bit, "use the 10bit stack for ds400 (default)" },
+  { 0, "--use-accelerator",   &options.useAccelerator, "generate code for ds400 arithmetic accelerator"},
+  { 0, "--protect-sp-update", &options.protect_sp_update, "will disable interrupts during ESP:SP updates"},
+  { 0, "--parms-in-bank1",    &options.parms_in_bank1, "use Bank1 for parameter passing"},
+  { 0, NULL }
+};
 
 static void
 _ds400_finaliseOptions (void)
 {
   if (options.noXinitOpt)
     {
-      port->genXINIT=0;
+      port->genXINIT = 0;
     }
 
   // hackhack: we're a superset of the 390.
@@ -1724,20 +1747,20 @@ _ds400_finaliseOptions (void)
 
 static void _ds400_generateRomDataArea(FILE *fp, bool isMain)
 {
-    /* Only do this for the file containing main() */
-    if (isMain)
+  /* Only do this for the file containing main() */
+  if (isMain)
     {
-        fprintf(fp, "%s", iComments2);
-        fprintf(fp, "; the direct data area used by the DS80c400 ROM code.\n");
-        fprintf(fp, "%s", iComments2);
-        fprintf(fp, ".area ROMSEG (ABS,CON,DATA)\n\n");
-        fprintf(fp, ".ds 24 ; 24 bytes of directs used starting at 0x68\n\n");
+      fprintf(fp, "%s", iComments2);
+      fprintf(fp, "; the direct data area used by the DS80c400 ROM code.\n");
+      fprintf(fp, "%s", iComments2);
+      fprintf(fp, ".area ROMSEG (ABS,CON,DATA)\n\n");
+      fprintf(fp, ".ds 24 ; 24 bytes of directs used starting at 0x68\n\n");
     }
 }
 
 static void _ds400_linkRomDataArea(FILE *fp)
 {
-    fprintf(fp, "-b ROMSEG = 0x0068\n");
+  fprintf(fp, "-b ROMSEG = 0x0068\n");
 }
 
 static const char * const _libs_ds400[] = { STD_DS400_LIB, NULL, };
@@ -1789,7 +1812,7 @@ PORT ds400_port =
   { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4, 64 },
 
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
 
   {
     "XSEG    (XDATA)",
@@ -1825,12 +1848,12 @@ PORT ds400_port =
   { -1, false, false },         /* Neither int x int -> long nor unsigned long x unsigned char -> unsigned long long multiplication support routine. */
   { ds390_emitDebuggerSymbol },
   {
-    255/4,      /* maxCount */
-    4,          /* sizeofElement */
-    {8,12,20},  /* sizeofMatchJump[] */
-    {10,14,22}, /* sizeofRangeCompare[] */
-    4,          /* sizeofSubtract */
-    7,          /* sizeofDispatch */
+    255/4,                      /* maxCount */
+    4,                          /* sizeofElement */
+    {8,12,20},                  /* sizeofMatchJump[] */
+    {10,14,22},                 /* sizeofRangeCompare[] */
+    4,                          /* sizeofSubtract */
+    7,                          /* sizeofDispatch */
   },
   "_",
   _ds390_init,

@@ -122,7 +122,7 @@ endif
 ifeq ($(OPT_ENABLE_DOC), 1)
 TARGETS        += sdcc-doc
 endif
-# always install docs, which don't need to be built 
+# always install docs, which don't need to be built
 PKGS            += $(SDCC_DOC)
 
 ifeq ($(OPT_DISABLE_SDCPP), 0)

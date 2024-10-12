@@ -1,3 +1,28 @@
+2024-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/as6500/clean.mk,
+	* sdas/as6808/clean.mk,
+	* sdas/as8051/clean.mk,
+	* sdas/as8xcxxx/clean.mk,
+	* sdas/asf8/clean.mk,
+	* sdas/asgb/clean.mk,
+	* sdas/aspdk13/clean.mk,
+	* sdas/aspdk14/clean.mk,
+	* sdas/aspdk15/clean.mk,
+	* sdas/aspdk16/clean.mk,
+	* sdas/asrab/clean.mk,
+	* sdas/asstm8/clean.mk,
+	* sdas/astlcs90/clean.mk,
+	* sdas/asz80/clean.mk,
+	* sdas/linksrc/clean.mk,
+	* sdas/clean.mk,
+	* src/clean.mk,
+	* src/port-clean.mk,
+	* support/makebin/clean.mk,
+	* support/packihx/clean.mk,
+	* support/scripts/clean.mk,
+	* clean.mk: improved cleaning
+
 2024-10-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCopt.c:

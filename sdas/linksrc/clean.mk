@@ -5,7 +5,7 @@ include $(top_builddir)/Makefile.common
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f *.dep
+	rm -f *.dep *.depcc *.depcxx
 	rm -rf obj
 
 

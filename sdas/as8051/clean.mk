@@ -3,7 +3,7 @@
 include $(top_builddir)/Makefile.common
 
 clean: mostlyclean
-	rm -f *.dep
+	rm -f *.dep *.depcc *.depcxx
 	rm -f $(ASOBJECTS) $(OBJDIR)/.stamp
 	if [ -d $(OBJDIR) ]; then rmdir $(OBJDIR); fi
 

@@ -8,7 +8,7 @@ clean:
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
-	rm -f Makefile *.dep
+	rm -f Makefile *.dep *.depcc *.depcxx
 
 
 # Like clean but some files may still exist

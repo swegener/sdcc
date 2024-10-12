@@ -4,4 +4,5 @@ clean:
 	rm -f $(TARGET)
 
 distclean realclean: clean
+	rm -f *.dep *.depcc *.depcxx
 	rm -f config.* Makefile

@@ -15015,7 +15015,7 @@ genPointerSet (iCode *ic)
             {
               if (surviving_a && !pushed_a && (!aopInReg (right->aop, 0, A_IDX) || offset))
                 _push (PAIR_AF), pushed_a = TRUE;
-              cheapMove (ASMOP_A, 0, right->aop, offset, true);
+              genMove_o (ASMOP_A, 0, right->aop, offset, 1, true, false, false, false, true);
               emit2 ("ld !mems, a", _pairs[PAIR_HL].name);
               cost2 (1 + IS_TLCS90,	7, 7, 6, 8, 6, 2, 2);
               offset++;

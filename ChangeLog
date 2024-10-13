@@ -1,3 +1,9 @@
+2024-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Fix a z80 pointer write codegen bug.
+
 2024-10-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/f8/gen.c: fixed warnings

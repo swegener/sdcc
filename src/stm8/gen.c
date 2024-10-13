@@ -1846,7 +1846,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 /* genCopy - Copy the value from one reg/stk asmop to another      */
 /*-----------------------------------------------------------------*/
 static void
-genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool a_dead, bool x_dead, bool y_dead)
+genCopy (asmop *result, int roffset, asmop *const source, int soffset, int sizex, bool a_dead, bool x_dead, bool y_dead)
 {
   int i, regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
   bool assigned[8] = {false, false, false, false, false, false, false, false};
@@ -1856,6 +1856,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   D (emit2(";  genCopy", "sizex %d %d %d %d", sizex, a_dead, x_dead, y_dead));
 #endif
 
+  wassert_bt (result && source);
   wassertl_bt (n <= 8, "Invalid size for genCopy().");
   wassertl_bt (aopRS (source), "Invalid source type.");
   wassertl_bt (aopRS (result), "Invalid result type.");

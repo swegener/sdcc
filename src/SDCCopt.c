@@ -2864,6 +2864,124 @@ optimizeCastCast (eBBlock **ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* optimizeFinalCast - remove unneeded intermediate casts.         */
+/* Backends can handle wrong types onmany pointers in poiner write */
+/* and read. Exploit this to optimize out some casts. Typically    */
+/* done late (i.e. just before register allocation).               */
+/*-----------------------------------------------------------------*/
+static void
+optimizeFinalCast (ebbIndex *ebbi)
+{
+  // Apparently this triggers a bug in the mcs51 and ds390 backends.
+  // Some regression tests fail, including gcc-torture-execute-pr38236;
+  // looking into that one for -mmcs51 --model-small , register allocation
+  // puts the result of a 16-bit read from e generic pointer into dptr,
+  // which codegen can't handle (it genrated code where dpl is overwritten by
+  // the lower byte of the result, then used as pointer once more).
+  if (TARGET_MCS51_LIKE)
+    return;
+
+  for (int i = 0; i < ebbi->count; i++)
+    {
+      eBBlock **ebbs = ebbi->bbOrder;
+      eBBlock *ebp = ebbs[i];
+
+      for (iCode *ic = ebp->sch; ic; ic = ic->next)
+        {
+          if (ic->op != CAST || !IS_ITEMP (ic->result))
+            continue;
+
+          if (bitVectnBitsOn (OP_USES (ic->result)) != 1 || bitVectnBitsOn (OP_DEFS (ic->result)) != 1)
+            continue;
+
+          iCode *uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (ic->result)));
+          if(!uic || uic != ic->next ||
+            uic->op != GET_VALUE_AT_ADDRESS && !(POINTER_SET(uic) && !isOperandEqual (ic->result, uic->left) && !isOperandEqual (ic->result, uic->right) && (IS_ITEMP (ic->right) || IS_OP_LITERAL (ic->right))))
+            continue;
+
+          // Not all backends can handle multiple global operands in all operations well.
+          if (IS_OP_GLOBAL (uic->result) && IS_OP_GLOBAL (ic->right) && 
+            !TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_IS_F8)
+            continue;
+
+          if (ic->op == CAST)
+            {    
+              sym_link *type1 = operandType (ic->right);
+              sym_link *type2 = operandType (ic->left);
+
+              if (IS_INTEGRAL (type1) && IS_INTEGRAL (type2) &&
+                SPEC_NOUN (type1) == SPEC_NOUN (type2) && bitsForType (type1) == bitsForType (type2))
+                ;
+              else if (IS_PTR (type1) && IS_PTR (type2) &&
+                sclsFromPtr (type1) == sclsFromPtr (type2) &&
+                getAddrspace (type1) == getAddrspace (type2))
+                ;
+             else 
+                continue;
+
+             if (!IS_PTR (type1) || IS_BITFIELD(type1->next) || !IS_PTR (type2) || IS_BITFIELD(type2->next))
+               continue;
+            }
+
+          // Introducinvg the duplicate smbol in the commented-out parts below would fix the type.
+          // But the current backends won't propagate the rematerialization flag in their register allocators correctly if there are multiple symbols for the same iTemp.
+          if (isOperandEqual (ic->result, uic->left))
+            {
+              operand *op = operandFromOperand (ic->right);
+              /*if (IS_SYMOP (op))
+                {
+                  symbol *sym = copySymbol (OP_SYMBOL(op));
+                  sym->type = copyLinkChain (operandType (uic->left));
+                  sym->etype = getSpec (sym->type);
+                  OP_SYMBOL (op) = sym;
+                }
+              else
+                setOperandType (op, operandType (uic->left));*/
+              bitVectUnSetBit (OP_USES (uic->left), uic->key);
+              uic->left = op;
+              bitVectSetBit (OP_USES (uic->left), uic->key);
+            }
+          if (isOperandEqual (ic->result, uic->right))
+            {
+              operand *op = operandFromOperand (ic->right);
+              /*if (IS_SYMOP (op))
+                {
+                  symbol *sym = copySymbol (OP_SYMBOL(op));
+                  sym->type = copyLinkChain (operandType (uic->right));
+                  sym->etype = getSpec (sym->type);
+                  OP_SYMBOL (op) = sym;
+                }
+              else
+                setOperandType (op, operandType (uic->right));*/
+              bitVectUnSetBit (OP_USES (uic->right), uic->key);
+              uic->right = op;
+              bitVectSetBit (OP_USES (uic->right), uic->key);
+            }
+          if (POINTER_SET (uic) && isOperandEqual (ic->result, uic->result))
+            {
+              operand *op = operandFromOperand (ic->right);
+              /*if (IS_SYMOP (op))
+                {
+                  symbol *sym = copySymbol (OP_SYMBOL(op));
+                  sym->type = copyLinkChain (operandType (uic->result));
+                  sym->etype = getSpec (sym->type);
+                  OP_SYMBOL (op) = sym;
+                }
+              else
+                setOperandType (op, operandType (uic->result));*/
+              op->isaddr = uic->result->isaddr;
+              bitVectUnSetBit (OP_USES (uic->result), uic->key);
+              uic->result = op;
+              bitVectSetBit (OP_USES (uic->result), uic->key);
+            }
+
+          unsetDefsAndUses (ic);
+          remiCodeFromeBBlock (ebp, ic);
+      }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* optimizeNegation - remove unneeded intermediate negation        */
 /*-----------------------------------------------------------------*/
 static void
@@ -3482,6 +3600,8 @@ eBBlockFromiCode (iCode *ic)
         dumpEbbsToFileExt (DUMP_GENCONSTPROP, ebbi);
     }
 
+  optimizeFinalCast (ebbi);
+dumpEbbsToFileExt (DUMP_CUSTOM0, ebbi);
   /* Split any live-ranges that became non-connected in dead code elimination. */
   change = 0;
   do

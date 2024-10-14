@@ -1,3 +1,8 @@
+2024-10-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCopt.c:
+	  Optimize out some more casts, part of RFE #937.
+
 2024-10-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/stm8/gen.c,

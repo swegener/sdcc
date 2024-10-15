@@ -1,5 +1,11 @@
 2024-10-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc,
+	  src/z80/gen.c:
+	  Some improvements in optimizations based on generalized constant propagation.
+
+2024-10-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCopt.c:
 	  Optimize out some casts and assignments earlier, part of RFE #937.
 	* src/z80/gen.c:

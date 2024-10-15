@@ -661,7 +661,7 @@ valinfoCast (struct valinfo *result, sym_link *targettype, const struct valinfo 
 }
 
 static void
-recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<unsigned int>, std::set<unsigned int> > &todo, bool externchange, bool end_it_quickly)
+recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<unsigned int>, std::set<unsigned int> > &todo, bool externchange, int end_it_quickly)
 {
   iCode *const ic = G[i].ic;
   bool change = externchange;
@@ -770,7 +770,9 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
         }
 #endif
 
-      if (end_it_quickly) // Just use the very rough approximation from the type info only to speed up analysis.
+      // Just use the very rough approximation from the type info only to speed up analysis.
+      if (ic->op != '=' && ic->op != CAST && ic->op != '!' &&
+        (end_it_quickly > 1 || end_it_quickly > 0 && (ic->op == '+' || ic->op == '-')))
         {
           if (left && !(IS_INTEGRAL (operandType (left)) && bitsForType (operandType (left)) < 64 && IS_OP_LITERAL (left)))
             leftvalinfo = getTypeValinfo (operandType (left), true);
@@ -903,7 +905,7 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
   std::cout << "recomputeValinfos at " << (currFunc ? currFunc->name : "[NOFUNC]") << "\n"; std::cout.flush();
 #endif
 
-  unsigned long max_rounds = 8000; // Rapidly end analysis once this number of rounds has been exceeded.
+  unsigned long max_rounds = 18000; // Rapidly end analysis once this number of rounds has been exceeded.
 
   cfg_t G;
 
@@ -918,7 +920,7 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
       G[i].ic->valinfos = NULL;
       delete G[i].ic->resultvalinfo;
       G[i].ic->resultvalinfo = NULL;
-      recompute_node (G, i, ebbi, todo, true, false);
+      recompute_node (G, i, ebbi, todo, true, 0);
     }
 
   // Forward pass to get first approximation.
@@ -932,7 +934,8 @@ recomputeValinfos (iCode *sic, ebbIndex *ebbi, const char *suffix)
 #ifdef DEBUG_GCP_ANALYSIS
       std::cout << "Round " << round << " node " << i << " ic " << G[i].ic->key << "\n"; std::cout.flush();
 #endif
-      recompute_node (G, i, ebbi, todo, false, round >= max_rounds);
+
+      recompute_node (G, i, ebbi, todo, false, (round >= max_rounds) + (round >= max_rounds * 2));
     }
 
   // Refinement backward pass.

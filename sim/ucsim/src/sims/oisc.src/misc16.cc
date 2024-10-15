@@ -190,7 +190,7 @@ cl_misc16::dis_comment(t_addr src, t_addr dst)
   if ((dst==0) || (dst==1) || (dst==2) || (dst==4) || (dst==7) ||
       (dst==9) || (dst==11) || (dst==12) || (dst==13) || (dst==14) || (dst==15))
     {
-      uint16_t sa= src;
+      u16_t sa= src;
       if (sa == 7)
 	sa= rA;
       if (s.nempty()) s+= ", ";

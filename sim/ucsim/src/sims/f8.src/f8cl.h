@@ -221,9 +221,8 @@ public:
   int LDW_A_NSP(t_mem code)  { return ldw_a_m(a_n_sp()); }
   int LDW_A_NNZ(t_mem code)  { return ldw_a_m(a_nn_z()); }
   int LDW_A_NY(t_mem code)   { return ldw_a_m(a_n_y()); }
-  int LDW_A_AM(t_mem code)   { return ldw_a_m(a_acc16()); }
+  int LDW_A_Y(t_mem code)    { return ldw_a_m(rY); }
   int LDW_A_X(t_mem code)    { return ldw_a_r(rX); }
-  int LDW_A_Z(t_mem code)    { return ldw_a_r(rZ); }
   int LDW_A_D(t_mem code)    { return ldw_a_i(sexd()); }
   int LDW_M_A(t_mem code)    { return ldw_m_a(a_mm()); }
   int LDW_NSP_A(t_mem code)  { return ldw_m_a(a_n_sp()); }
@@ -264,6 +263,15 @@ public:
   int CLRW_NSP(t_mem code);
   int CLRW_NNZ(t_mem code);
   int CLRW_A(t_mem code);
+  int xchb(int b);
+  int XCHB_0(t_mem code) { return xchb(0); }
+  int XCHB_1(t_mem code) { return xchb(1); }
+  int XCHB_2(t_mem code) { return xchb(2); }
+  int XCHB_3(t_mem code) { return xchb(3); }
+  int XCHB_4(t_mem code) { return xchb(4); }
+  int XCHB_5(t_mem code) { return xchb(5); }
+  int XCHB_6(t_mem code) { return xchb(6); }
+  int XCHB_7(t_mem code) { return xchb(7); }
   
   // arithmetic (ALU) instructions: ialu.cc
   // 8-bit 2-op-inst

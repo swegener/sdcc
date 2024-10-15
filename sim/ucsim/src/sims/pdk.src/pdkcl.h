@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PDKCL_HEADER
 #define PDKCL_HEADER
 
+#include "stypes.h"
+
 #include "uccl.h"
 #include "itsrccl.h"
 

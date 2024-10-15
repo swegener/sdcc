@@ -1,4 +1,4 @@
-APPS		= serio ucsim relay
+APPS		= serio ucsim
 
 clean: local_clean sub_clean
 
@@ -13,6 +13,7 @@ sub_clean:
 distclean: local_distclean sub_distclean
 
 local_distclean: local_clean
+	@rm -rf relay.src
 
 sub_distclean:
 	@for app in $(APPS); do \

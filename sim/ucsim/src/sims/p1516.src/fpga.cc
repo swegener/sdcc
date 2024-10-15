@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   -------------------------------------------------------------------------
 */
 
-cl_led::cl_led(class cl_fpga *the_fpga, int ax, int ay, uint32_t amask):
+cl_led::cl_led(class cl_fpga *the_fpga, int ax, int ay, u32_t amask):
   cl_base()
 {
   fpga= the_fpga;
@@ -51,8 +51,8 @@ void
 cl_led::refresh(bool force)
 {
   class cl_hw_io *io= fpga->get_io();
-  uint32_t a= fpga->pb->get() & mask;
-  uint32_t l= last & mask;
+  u32_t a= fpga->pb->get() & mask;
+  u32_t l= last & mask;
   if (force || (a != l))
     {
       io->tu_go(x, y);
@@ -75,7 +75,7 @@ cl_led::refresh(bool force)
   -------------------------------------------------------------------------
 */
 
-cl_rgb::cl_rgb(class cl_fpga *the_fpga, int ax, int ay, uint32_t amask):
+cl_rgb::cl_rgb(class cl_fpga *the_fpga, int ax, int ay, u32_t amask):
   cl_led(the_fpga, ax, ay, amask)
 {
   last= 0;
@@ -84,11 +84,11 @@ cl_rgb::cl_rgb(class cl_fpga *the_fpga, int ax, int ay, uint32_t amask):
 void
 cl_rgb::refresh(bool force)
 {
-  uint32_t gm= mask, rm= mask<<8, bm= mask<<16;
-  uint32_t m= gm|rm|bm;
+  u32_t gm= mask, rm= mask<<8, bm= mask<<16;
+  u32_t m= gm|rm|bm;
   class cl_hw_io *io= fpga->get_io();
-  uint32_t a= fpga->pb->get() & m;
-  uint32_t l= last & m;
+  u32_t a= fpga->pb->get() & m;
+  u32_t l= last & m;
   if (force || (a != l))
     {
       int c= 0;
@@ -134,8 +134,8 @@ void
 cl_seg::refresh(bool force)
 {
   class cl_hw_io *io= fpga->get_io();
-  uint32_t sw= fpga->pj->read(), act, act_what;
-  uint32_t l, mask, a, lw;
+  u32_t sw= fpga->pj->read(), act, act_what;
+  u32_t l, mask, a, lw;
   class cl_p1516 *uc= (class cl_p1516 *)(fpga->uc);
   chars w= "non ";
   switch ((sw>>4)&0xf)
@@ -220,7 +220,7 @@ void
 cl_sw::refresh(bool force)
 {
   char c= ' ';
-  uint32_t v= 0, act, a, l;
+  u32_t v= 0, act, a, l;
   class cl_hw_io *io= fpga->get_io();
   if (!io) return;
   class cl_memory_cell *p= fpga->pjp;
@@ -294,7 +294,7 @@ void
 cl_btn::refresh(bool force)
 {
   char c= ' ';
-  uint32_t act, a, l, v= 0;
+  u32_t act, a, l, v= 0;
   class cl_hw_io *io= fpga->get_io();
   if (!io) return;
   class cl_memory_cell *p= fpga->pip;
@@ -435,8 +435,8 @@ cl_fpga::handle_input(int c)
 	return true;
   if (pjp)
     {
-      uint32_t sw= pjp->R();
-      uint32_t rx= sw&0xf;
+      u32_t sw= pjp->R();
+      u32_t rx= sw&0xf;
       //printf("c=%8x\n",c);
       switch (c)
 	{

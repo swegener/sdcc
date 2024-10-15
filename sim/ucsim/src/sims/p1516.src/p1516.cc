@@ -389,17 +389,36 @@ cl_p1516::analyze(t_addr addr)
 	return;
       set_inst_at(addr);
       if (de->branch!=' ')
-	switch (de->branch)
-	  {
-	  case 'x': case '_': // non-followable
-	    return;
-	  case 'M': // LDL0 r15,#imm
+	{
+	  switch (de->branch)
 	    {
-	      t_addr target= rom->read(addr) & 0xffff;
-	      analyze_jump(addr, target, de->branch);
-	      break;
+	    case 'x': case '_': // non-followable
+	      return;
+	    case 'M': // LDL0 r15,#imm
+	      {
+		t_addr target= code & 0xffff;
+		analyze_jump(addr, target, de->branch);
+		return;
+	      }
 	    }
-	  }
+	}
+      else
+	{
+	  if ((code & 0x07000000) != 0x02000000)
+	    {
+	      // not an ST inst, check Rd
+	      if ((code & 0x00f00000) == 0x00f00000)
+		{
+		  // if Rd==R15, this is a run-time jump, non-followable
+		  return;
+		}
+	    }
+	}
+      if (de->branch == 'c')
+	{
+	  t_addr target= code & ~0xf8000000;
+	  analyze_jump(addr, target, 's');
+	}
       addr= rom->validate_address(addr+1);
     }
 }

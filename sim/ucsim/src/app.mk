@@ -26,9 +26,9 @@ baseline:
 $(LEN): $(OBJECTS) $(UCSIM_LIB_TARGETS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
 ifeq ($(SILENT),yes)
 	@echo LNK-$(PKG)
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -lm -o $@
 else
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -lm -o $@
 endif
 
 ifeq ($(dlso_ok),yes)

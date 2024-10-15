@@ -116,7 +116,7 @@ cl_cvar::print_info(cl_console_base *con) const
   if ((MU(m) < 0x100) && isprint(MI(m)))
     con->dd_printf(",'%c'", MI(m));
   con->dd_printf("\n");
-  if (desc && desc[0])
+  if (desc.nempty())
     con->dd_printf("  %s\n", desc.c_str());
 }
 
@@ -175,7 +175,7 @@ cl_var::print_info(cl_console_base *con) const
   if ((MU(m) < 0x100) && isprint(MI(m)))
     con->dd_printf(",'%c'", MI(m));
   con->dd_printf("\n");
-  if (desc && desc[0])
+  if (desc.nempty())
     con->dd_printf("  %s\n", desc.c_str());
 }
 

@@ -38,10 +38,10 @@ class cl_led: public cl_base
 public:
   class cl_fpga *fpga;
   int x, y;
-  uint32_t mask;
-  uint32_t last;
+  u32_t mask;
+  u32_t last;
 public:
-  cl_led(class cl_fpga *the_fpga, int ax, int ay, uint32_t amask);
+  cl_led(class cl_fpga *the_fpga, int ax, int ay, u32_t amask);
   virtual void refresh(bool force);
   virtual void draw(void) {}
 };
@@ -50,7 +50,7 @@ public:
 class cl_rgb: public cl_led
 {
 public:
-  cl_rgb(class cl_fpga *the_fpga, int ax, int ay, uint32_t amask);
+  cl_rgb(class cl_fpga *the_fpga, int ax, int ay, u32_t amask);
   virtual void refresh(bool force);
 };
 
@@ -59,7 +59,7 @@ class cl_seg: public cl_led
 {
 public:
   int digit;
-  uint32_t last_what;
+  u32_t last_what;
 public:
   cl_seg(class cl_fpga *the_fpga, int ax, int ay, int adigit);
   virtual void refresh(bool force);
@@ -74,7 +74,7 @@ public:
   int x, y;
   int mask;
   char key;
-  uint32_t last;
+  u32_t last;
 public:
   cl_ibit(class cl_fpga *the_fpga, int ax, int ay, int amask, char akey);
   virtual void refresh(bool force) {}

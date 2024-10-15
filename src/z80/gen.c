@@ -3912,7 +3912,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
     (from->type == AOP_DIR ||
     from->type == AOP_SFR || to->type == AOP_SFR ||
     (to->type == AOP_HL || to->type == AOP_IY || to->type == AOP_EXSTK || to->type == AOP_STK) && (from->type == AOP_HL || from->type == AOP_IY || from->type == AOP_EXSTK || from->type == AOP_STK) ||
-    (to->type == AOP_HL || IS_SM83 && to->type == AOP_STK || to->type == AOP_EXSTK) && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))))
+    (to->type == AOP_HL || IS_SM83 && to->type == AOP_STK || to->type == AOP_EXSTK) && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))) ||
+    to->type == AOP_PAIRPTR && from->type == AOP_PAIRPTR)
     {
       if (!a_dead)
         _push (PAIR_AF);
@@ -5750,7 +5751,7 @@ restoreRegs (bool iy, bool de, bool bc, bool hl, const operand *result, const iC
 }
 
 static void
-_saveRegsForCall (const iCode *ic, bool dontsaveIY)
+_saveRegsForCall (const iCode *ic, bool saveHLifused, bool dontsaveIY)
 {
   /* Rules:
      o Stack parameters are pushed before this function enters
@@ -5777,15 +5778,19 @@ _saveRegsForCall (const iCode *ic, bool dontsaveIY)
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
 
-  if (_G.saves.saved == FALSE)
+  if (IS_FUNCPTR (dtype))
+    saveHLifused = true;
+  if (!_G.saves.saved)
     {
       const bool call_preserves_b = ftype->funcAttrs.preserved_regs[B_IDX] && !z80IsParmInCall(ftype, "b");
       const bool call_preserves_c = ftype->funcAttrs.preserved_regs[C_IDX] && !z80IsParmInCall(ftype, "c");
       const bool call_preserves_d = ftype->funcAttrs.preserved_regs[D_IDX] && !z80IsParmInCall(ftype, "d");
       const bool call_preserves_e = ftype->funcAttrs.preserved_regs[E_IDX] && !z80IsParmInCall(ftype, "e");
+      const bool call_preserves_h = ftype->funcAttrs.preserved_regs[H_IDX] && !z80IsParmInCall(ftype, "h");
+      const bool call_preserves_l = ftype->funcAttrs.preserved_regs[L_IDX] && !z80IsParmInCall(ftype, "l");
       const bool push_bc = !isRegDead (B_IDX, ic) && !call_preserves_b || !isRegDead (C_IDX, ic) && !call_preserves_c;
       const bool push_de = !isRegDead (D_IDX, ic) && !call_preserves_d || !isRegDead (E_IDX, ic) && !call_preserves_e;
-      const bool push_hl = !isRegDead (H_IDX, ic) || !isRegDead (L_IDX, ic);
+      const bool push_hl = !isRegDead (H_IDX, ic) && (!call_preserves_h || saveHLifused) || !isRegDead (L_IDX, ic) && (!call_preserves_l || saveHLifused);
       const bool push_iy = !dontsaveIY && (!isRegDead (IYH_IDX, ic) || !isRegDead (IYL_IDX, ic));
 
       if (push_hl)
@@ -5849,7 +5854,7 @@ genIpush (const iCode *ic)
       walk = walk->next; // Keep looking.
     }
   if (!regalloc_dry_run && !_G.saves.saved && !regalloc_dry_run) /* Cost is counted at CALL or PCALL instead */
-    _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
+    _saveRegsForCall (walk, true, false); /* Caller saves, and this is the first iPush. */
 
   sym_link *ftype = operandType (IC_LEFT (walk));
   if (walk->op == PCALL)
@@ -6174,7 +6179,7 @@ genPointerPush (const iCode *ic)
       walk = walk->next; // Keep looking.
     }
   if (!regalloc_dry_run && !_G.saves.saved) /* Cost is counted at CALL or PCALL instead */
-    _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
+    _saveRegsForCall (walk, true, false); /* Caller saves, and this is the first iPush. */
 
   sym_link *ftype = operandType (IC_LEFT (walk));
   if (walk->op == PCALL)
@@ -6268,7 +6273,7 @@ static void genSend (const iCode *ic)
     }
 
   if (!_G.saves.saved && !regalloc_dry_run) // Cost is counted at CALL or PCALL instead
-    _saveRegsForCall (walk, false);
+    _saveRegsForCall (walk, requiresHL (ic->left->aop) || ic->next->op != CALL, false);
 
   sym_link *ftype = IS_FUNCPTR (operandType (IC_LEFT (walk))) ? operandType (IC_LEFT (walk))->next : operandType (IC_LEFT (walk));
   asmop *argreg = aopArg (ftype, ic->argreg);
@@ -6323,7 +6328,7 @@ genCall (const iCode *ic)
   for (i = 0; i < IYH_IDX + 1; i++)
     z80_regs_preserved_in_calls_from_current_function[i] |= ftype->funcAttrs.preserved_regs[i];
 
-  _saveRegsForCall (ic, FALSE);
+  _saveRegsForCall (ic, false, false);
 
   aopOp (IC_LEFT (ic), ic, false, false);
 
@@ -8509,6 +8514,11 @@ genPlus (iCode * ic)
           cost2 (2 + IS_SM83, 12, 8, 5, 12, 12, 3, 3); // Assume branch is taken. Use cost of jr as the peephole optimizer can typically optimize this jp into jr. Do not emit jr directly to still allow jump-to-jump optimization.
           regalloc_dry_run_state_scale /= 256.0f; // Carry should be rare.
           emit3_o (A_INC, leftop, i, 0, 0);
+          i++;
+        }
+      else if (!started && !premoved && aopIsLitVal (leftop, i, 1, 0))
+        {
+          cheapMove (ic->result->aop, i, rightop, i, true);
           i++;
         }
       else
@@ -11481,7 +11491,33 @@ genOr (const iCode * ic, iCode * ifx)
             pushed_a = false;
         }
 
-      if (aopIsLitVal (left->aop, i, 1, 0x00) && !pushed_a)
+      if (!IS_SM83 && !i && size == 2 && left->aop->type == AOP_REG && right->aop->type == AOP_REG &&
+        aopIsLitVal (left->aop, 0, 1, 0x00) && aopIsLitVal (right->aop, 1, 1, 0x00) &&
+        (aopInReg (right->aop, 0, C_IDX) && aopInReg (left->aop, 1, B_IDX) || aopInReg (right->aop, 0, E_IDX) && aopInReg (left->aop, 1, D_IDX) || aopInReg (right->aop, 0, L_IDX) && aopInReg (left->aop, 1, H_IDX) || aopInReg (right->aop, 0, IYL_IDX) && aopInReg (left->aop, 1, IYH_IDX)) &&
+        (result->aop->type == AOP_DIR ||result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+        {
+          emit2 ("ld (%s), %s", result->aop->aopu.aop_dir, aopInReg (right->aop, 0, C_IDX) ? "bc" : aopInReg (right->aop, 0, E_IDX) ? "de" : aopInReg (right->aop, 0, L_IDX) ? "hl" : "iy");
+          if (aopInReg (right->aop, 0, L_IDX) && !IS_TLCS90)
+            cost2 (3, 16, 16, 13, 0, 0, 5, 5);
+          else
+            cost2 (4, 20, 19, 15, 0, 12, 6, 6);
+          i += 2;
+          continue;
+        }
+      else if (!IS_SM83 && !i && size == 2 && left->aop->type == AOP_REG && right->aop->type == AOP_REG &&
+        aopIsLitVal (left->aop, 1, 1, 0x00) && aopIsLitVal (right->aop, 0, 1, 0x00) &&
+        (aopInReg (right->aop, 1, B_IDX) && aopInReg (left->aop, 0, C_IDX) || aopInReg (right->aop, 1, D_IDX) && aopInReg (left->aop, 0, E_IDX) || aopInReg (right->aop, 1, H_IDX) && aopInReg (left->aop, 0, L_IDX) || aopInReg (right->aop, 1, IYH_IDX) && aopInReg (left->aop, 0, IYL_IDX)) &&
+        (result->aop->type == AOP_DIR ||result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+        {
+          emit2 ("ld (%s), %s", result->aop->aopu.aop_dir, aopInReg (right->aop, 1, B_IDX) ? "bc" : aopInReg (right->aop, 1, D_IDX) ? "de" : aopInReg (right->aop, 1, H_IDX) ? "hl" : "iy");
+          if (aopInReg (right->aop, 1, H_IDX) && !IS_TLCS90)
+            cost2 (3, 16, 16, 13, 0, 0, 5, 5);
+          else
+            cost2 (4, 20, 19, 15, 0, 12, 6, 6);
+          i += 2;
+          continue;
+        }
+      else if (aopIsLitVal (left->aop, i, 1, 0x00) && !pushed_a)
         {
           int end;
           for(end = i; end < size && aopIsLitVal (left->aop, end, 1, 0x00); end++);

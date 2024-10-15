@@ -2,6 +2,8 @@
 
 	* src/SDCCopt.c:
 	  Optimize out some casts and assignments earlier, part of RFE #937.
+	* src/z80/gen.c:
+	  Improve handling of parameters of z80 builtin functions.
 
 2024-10-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

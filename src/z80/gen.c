@@ -16424,7 +16424,7 @@ setupForMemcpy (const iCode *ic, const operand *to, const operand *from, const o
         {
           bool a_free = isRegDead (A_IDX, ic) && !aopInReg (from->aop, 0, A_IDX) && !aopInReg (from->aop, 1, A_IDX);
           bool iy_free = isRegDead (IY_IDX, ic) && !aopInReg (from->aop, 0, IYL_IDX) && !aopInReg (from->aop, 1, IYH_IDX) && !aopInReg (from->aop, 0, IYL_IDX) && !aopInReg (from->aop, 1, IYH_IDX);
-          genMove (ASMOP_DE, to->aop, a_free, false, true, iy_free);
+          genMove (ASMOP_DE, to->aop, a_free, from->aop->regs[L_IDX] < 0 && from->aop->regs[H_IDX] < 0, true, iy_free);
           genMove (ASMOP_HL, from->aop, isRegDead (A_IDX, ic), true, false, isRegDead (IY_IDX, ic));
         }
       /* HL is free. Write it first. */
@@ -16432,7 +16432,7 @@ setupForMemcpy (const iCode *ic, const operand *to, const operand *from, const o
         {
           bool a_free = isRegDead (A_IDX, ic) && !aopInReg (to->aop, 0, A_IDX) && !aopInReg (to->aop, 1, A_IDX);
           bool iy_free = isRegDead (IY_IDX, ic) && !aopInReg (to->aop, 0, IYL_IDX) && !aopInReg (to->aop, 1, IYH_IDX) && !aopInReg (to->aop, 0, IYL_IDX) && !aopInReg (to->aop, 1, IYH_IDX);
-          genMove (ASMOP_HL, from->aop, a_free, true, false, iy_free);
+          genMove (ASMOP_HL, from->aop, a_free, true, to->aop->regs[E_IDX] < 0 && to->aop->regs[D_IDX] < 0, iy_free);
           genMove (ASMOP_DE, to->aop, isRegDead (A_IDX, ic), false, true, isRegDead (IY_IDX, ic));
         }
       /* L is free, but H is not. */

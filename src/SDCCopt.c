@@ -3432,6 +3432,11 @@ eBBlockFromiCode (iCode *ic)
   if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_DEADCODE, ebbi);
 
+  // We want to eliminate some unnecessary short-lived temporaries now -
+  // Before they will get lifted out of loops, and have their life-ranges
+  // extended across multiple blocks.
+  optimizeCastCast (ebbi->bbOrder, ebbi->count);
+
   /* do loop optimizations */
   change += (lchange = loopOptimizations (loops, ebbi));
   if (options.dump_i_code)
@@ -3601,7 +3606,7 @@ eBBlockFromiCode (iCode *ic)
     }
 
   optimizeFinalCast (ebbi);
-dumpEbbsToFileExt (DUMP_CUSTOM0, ebbi);
+
   /* Split any live-ranges that became non-connected in dead code elimination. */
   change = 0;
   do

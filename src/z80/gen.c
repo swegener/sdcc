@@ -4,7 +4,7 @@
   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
   Copyright (C) 1999, Jean-Louis VERN.jlvern@writeme.com
   Copyright (C) 2000, Michael Hope <michaelh@juju.net.nz>
-  Copyright (C) 2011-2024, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
+  Copyright (C) 2011-2024, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, philipp@colecovision.eu)
   Copyright (C) 2021-2022, Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
   This program is free software; you can redistribute it and/or modify it
@@ -11478,7 +11478,7 @@ genOr (const iCode * ic, iCode * ifx)
       bool hl_free = isPairDead (PAIR_HL, ic) &&
         (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i && right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
         (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
-        
+
       if (isRegDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i))
         a_free = true;
 
@@ -11491,29 +11491,22 @@ genOr (const iCode * ic, iCode * ifx)
             pushed_a = false;
         }
 
-      if (!IS_SM83 && !i && size == 2 && left->aop->type == AOP_REG && right->aop->type == AOP_REG &&
-        aopIsLitVal (left->aop, 0, 1, 0x00) && aopIsLitVal (right->aop, 1, 1, 0x00) &&
-        (aopInReg (right->aop, 0, C_IDX) && aopInReg (left->aop, 1, B_IDX) || aopInReg (right->aop, 0, E_IDX) && aopInReg (left->aop, 1, D_IDX) || aopInReg (right->aop, 0, L_IDX) && aopInReg (left->aop, 1, H_IDX) || aopInReg (right->aop, 0, IYL_IDX) && aopInReg (left->aop, 1, IYH_IDX)) &&
-        (result->aop->type == AOP_DIR ||result->aop->type == AOP_HL || result->aop->type == AOP_IY))
+      if (left->aop->type == AOP_REG && right->aop->type == AOP_REG && // Try to use ld (nn), rr, etc.
+        aopIsLitVal (left->aop, i, 1, 0x00) && aopIsLitVal (right->aop, i + 1, 1, 0x00) &&
+        (aopInReg (right->aop, i, C_IDX) && aopInReg (left->aop, i + 1, B_IDX) || aopInReg (right->aop, i, E_IDX) && aopInReg (left->aop, i + 1, D_IDX) || aopInReg (right->aop, i, L_IDX) && aopInReg (left->aop, i + 1, H_IDX) || aopInReg (right->aop, i, IYL_IDX) && aopInReg (left->aop, i + 1, IYH_IDX)))
         {
-          emit2 ("ld (%s), %s", result->aop->aopu.aop_dir, aopInReg (right->aop, 0, C_IDX) ? "bc" : aopInReg (right->aop, 0, E_IDX) ? "de" : aopInReg (right->aop, 0, L_IDX) ? "hl" : "iy");
-          if (aopInReg (right->aop, 0, L_IDX) && !IS_TLCS90)
-            cost2 (3, 16, 16, 13, 0, 0, 5, 5);
-          else
-            cost2 (4, 20, 19, 15, 0, 12, 6, 6);
+          asmop *source = aopInReg (right->aop, i, C_IDX) ? ASMOP_BC : aopInReg (right->aop, i, E_IDX) ? ASMOP_DE : aopInReg (right->aop, i, L_IDX) ? ASMOP_HL : ASMOP_IY;
+          genMove_o (result->aop, i, source, 0, 2, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic), true);
           i += 2;
           continue;
         }
-      else if (!IS_SM83 && !i && size == 2 && left->aop->type == AOP_REG && right->aop->type == AOP_REG &&
-        aopIsLitVal (left->aop, 1, 1, 0x00) && aopIsLitVal (right->aop, 0, 1, 0x00) &&
-        (aopInReg (right->aop, 1, B_IDX) && aopInReg (left->aop, 0, C_IDX) || aopInReg (right->aop, 1, D_IDX) && aopInReg (left->aop, 0, E_IDX) || aopInReg (right->aop, 1, H_IDX) && aopInReg (left->aop, 0, L_IDX) || aopInReg (right->aop, 1, IYH_IDX) && aopInReg (left->aop, 0, IYL_IDX)) &&
+      else if (left->aop->type == AOP_REG && right->aop->type == AOP_REG && // Try to use ld (nn), rr, etc.
+        aopIsLitVal (left->aop, i + 1, 1, 0x00) && aopIsLitVal (right->aop, i, 1, 0x00) &&
+        (aopInReg (right->aop, i + 1, B_IDX) && aopInReg (left->aop, i, C_IDX) || aopInReg (right->aop, i + 1, D_IDX) && aopInReg (left->aop, i, E_IDX) || aopInReg (right->aop, i + 1, H_IDX) && aopInReg (left->aop, i, L_IDX) || aopInReg (right->aop, i + 1, IYH_IDX) && aopInReg (left->aop, i, IYL_IDX)) &&
         (result->aop->type == AOP_DIR ||result->aop->type == AOP_HL || result->aop->type == AOP_IY))
         {
-          emit2 ("ld (%s), %s", result->aop->aopu.aop_dir, aopInReg (right->aop, 1, B_IDX) ? "bc" : aopInReg (right->aop, 1, D_IDX) ? "de" : aopInReg (right->aop, 1, H_IDX) ? "hl" : "iy");
-          if (aopInReg (right->aop, 1, H_IDX) && !IS_TLCS90)
-            cost2 (3, 16, 16, 13, 0, 0, 5, 5);
-          else
-            cost2 (4, 20, 19, 15, 0, 12, 6, 6);
+          asmop *source = aopInReg (right->aop, i + 1, B_IDX) ? ASMOP_BC : aopInReg (right->aop, i + 1, D_IDX) ? ASMOP_DE : aopInReg (right->aop, i + 1, H_IDX) ? ASMOP_HL : ASMOP_IY;
+          genMove_o (result->aop, i, source, 0, 2, isRegDead (A_IDX, ic), isRegDead (HL_IDX, ic), isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic), true);
           i += 2;
           continue;
         }

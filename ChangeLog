@@ -1,3 +1,8 @@
+2024-10-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Generalize a byte-assembly | optimization to make better use of 16-bit stores to stack.
+
 2024-10-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc,

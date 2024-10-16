@@ -1727,8 +1727,8 @@ cl_51core::clear_sfr(void)
   sfr->write(SCON, 0);
   sfr->write(PCON, 0);
 
-  sfr->set_nuof_writes(0);
-  sfr->set_nuof_reads(0);
+  //sfr->set_nuof_writes(0);
+  //sfr->set_nuof_reads(0);
 }
 
 

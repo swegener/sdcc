@@ -53,13 +53,45 @@ public:
   }
 };
 
+static void
+m(int s)
+{
+  class cl_address_space *as;
+  class cl_memory_chip *ch;
+  double s1, s2, e, ds;
+  s1= dnow();
+  as= new cl_address_space("test64k", 0, s, 8);
+  as->init();
+  s2= dnow();
+  ch= new cl_chip8("chip64k", s, 8);
+  ch->init();
+  e= dnow();
+  ds= (double)s/1024.0/1024.0;
+  printf("as/chip creation time, size=%f M: %f C: %f\n", ds, s2-s1, e-s2);
+  delete as;
+  delete ch;
+}
+
 void
 cl_general_uc::make_memories(void)
 {
   class cl_address_space *as;
   class cl_memory_chip *ch;
   class cl_address_decoder *ad;
-
+  /*
+  printf("size of cell= %lu (cell8=%lu)\n",
+	 sizeof(class cl_memory_cell),
+	 sizeof(class cl_cell8)
+	 );
+  printf("size of cell_data= %lu\n", sizeof(class cl_cell_data));
+  printf("size of abs_base= %lu\n", sizeof(class cl_abs_base));
+  */
+  /*
+  m(0x10000);
+  m(0x100000);
+  m(0x1000000);
+  m(0x4000000);
+  */
   rom= as= new cl_address_space("nas", 0, 0x100000, 8);
   as->init();
   address_spaces->add(as);

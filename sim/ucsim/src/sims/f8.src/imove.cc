@@ -38,7 +38,7 @@ cl_f8::ld8_a_i(u8_t op2)
 int
 cl_f8::ld8_a_m(class cl_cell8 &m)
 {
-  uint8_t v = m.R();
+  u8_t v = m.R();
   rF&= ~(flagN|flagZ);
   if (v & 0x80) rF|= flagN;
   if (!v) rF|= flagZ;

@@ -45,6 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_abs_base
 {
+  virtual void abs_base_dummy() {};
 };
 
 class cl_list;

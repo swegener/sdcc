@@ -1,3 +1,8 @@
+2024-10-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3788.c:
+	  Regression test for bug #3788 (disabled until bug is fixed).
+
 2024-10-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

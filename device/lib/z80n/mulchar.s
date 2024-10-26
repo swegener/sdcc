@@ -37,32 +37,34 @@
 ; operands have different sign
 
 __muluschar:
+	; input: A_0 L_0
 	ld	e, a
-	ld	c, l
-	ld	b, #0
+	ld	h, #0
 
-        jr      signexte
+	jr      signexte  ; signextend A_0
 
 __mulsuchar:
-	ld	c, a
-	ld	b, #0
-	ld	e, l
+	; input: A_0 L_0
+	ld      e, l
+	ld	h, #0
+	ld      l, a
 
-        jr      signexte
+	jr      signexte  ; signextended L_0
 
 __mulschar:
+        ; input: A_0 L_0
         ld      e, l
-        ld      c, a
+        ld      l, a
 
         ;; Need to sign extend before going in.
         rla
         sbc     a, a
-        ld      b, a
+        ld      h, a
 signexte:
         ld      a, e
         rla
         sbc     a, a
         ld      d, a
 
-        jp      __mul16
+        jp      __mul16_HL_DE_to_DE
 

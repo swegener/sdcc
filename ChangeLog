@@ -3,6 +3,9 @@
 	* device/lib/z80n/mul.s,
 	  device/lib/z80n/mulchar.s:
 	  Z80N hardware multiplication for _mulint, patch #481 by Janko Stamenović.
+	* src/SDCCcse.c,
+	  support/regression/tests/bug-3788.c:
+	  Fix bug #3788.
 
 2024-10-18 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -38,9 +38,7 @@ void testBug( void )
 {
     (g_bits).a.MYBIT4 = 1;;
     send_loop_try( 0xa5 );
-#if 0 // Bug not yet fixed
     ASSERT (d == 0xa5);
-#endif
 }
 
 void print_special( unsigned char c )

@@ -548,7 +548,7 @@ addiCodeToeBBlock (eBBlock *ebp, iCode *ic, iCode *ip)
 /* remiCodeFromeBBlock - remove an iCode from BBlock               */
 /*-----------------------------------------------------------------*/
 void
-remiCodeFromeBBlock (eBBlock * ebb, iCode * ic)
+remiCodeFromeBBlock (eBBlock *ebb, iCode *ic)
 {
   wassert (ic->seq >= ebb->fSeq && ic->seq <= ebb->lSeq);
   if (ic->prev)

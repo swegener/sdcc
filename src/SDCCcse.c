@@ -2435,7 +2435,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         {
           pdop = NULL;
           applyToSetFTrue (cseSet, findCheaperOp, IC_LEFT (ic), &pdop, checkSign);
-          if (pdop)
+          if (pdop && !(IS_SYMOP (pdop) && IS_BITFIELD (OP_SYM_ETYPE (pdop))))
             {
               if (POINTER_GET (ic))
                 {

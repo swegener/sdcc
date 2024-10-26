@@ -1,3 +1,9 @@
+2024-10-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/z80n/mul.s,
+	  device/lib/z80n/mulchar.s:
+	  Z80N hardware multiplication for _mulint, patch #481 by Janko Stamenović.
+
 2024-10-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3788.c:

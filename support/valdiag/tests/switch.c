@@ -156,3 +156,82 @@ char foo(void)
 }
 #endif
 
+#ifdef TEST9
+_Pragma("save")
+_Pragma("std_c23")
+
+/* Error: 'case' range expressions require C2y or later */
+char foo(void)
+{
+  switch(x)
+    {
+      case 1 ... 3:     /* ERROR */
+        return 1;
+      default:
+        return 0;
+    }
+}
+
+_Pragma("restore")
+#endif
+
+#ifdef TEST10
+_Pragma("save")
+_Pragma("std_c2y")
+
+/* Same code as above, but valid in C2y */
+char foo(void)
+{
+  switch(x)
+    {
+      case 1 ... 3:
+        return 1;
+      default:
+        return 0;
+    }
+}
+
+_Pragma("restore")
+#endif
+
+#ifdef TEST11
+_Pragma("save")
+_Pragma("std_c2y")
+
+/* Error: overlap with case range */
+char foo(void)
+{
+  switch(x)
+    {
+      case 1:           /* IGNORE */
+        return 1;
+      case 1 ... 3:     /* ERROR */
+        return 3;
+      default:
+        return 0;
+    }
+}
+
+_Pragma("restore")
+#endif
+
+#ifdef TEST12
+_Pragma("save")
+_Pragma("std_c2y")
+
+/* Warning: 'case' range empty; case ignored */
+char foo(void)
+{
+  switch(x)
+    {
+      case 1:
+        return 1;
+      case 3 ... 1:     /* WARNING(SDCC) */
+        return 3;       /* IGNORE */ /* unreachable code warning */
+      default:
+        return 0;
+    }
+}
+
+_Pragma("restore")
+#endif

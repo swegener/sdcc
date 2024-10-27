@@ -327,6 +327,8 @@ enum {
   W_PEEPHOLE_RULE_LIMIT         = 297, /* peephole rule application limit reached */
   W_DATA_ABSRANGE               = 298, /* __data at address out of range */
   W_IDATA_ABSRANGE              = 299, /* __idata at address out of range */
+  W_CASE_RANGE_EMPTY            = 300, /* empty case range specified */
+  E_CASE_RANGE_C2Y              = 301, /* case range expressions require C2y or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

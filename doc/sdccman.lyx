@@ -10779,6 +10779,75 @@ pic14,
 \end_layout
 
 \begin_layout Subsection
+ISO C2y preview
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2y
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2y
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Standard
+In anticipation of the upcoming version of the language standard,
+ C2y,
+ SDCC supports the following prospective features:
+\end_layout
+
+\begin_layout Itemize
+Case range expressions as described in 
+\begin_inset CommandInset href
+LatexCommand href
+name "n3370"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3370.htm"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
 Embedded C
 \end_layout
 

@@ -1,6 +1,18 @@
 2024-10-27 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  support/regression/tests/caseranges.c,
+	  support/valdiag/tests/switch.c:
+	  Add C2y case range expressions [feature-requests:#947] based on [patches:#313], adapted to match n3370.
+
+2024-10-27 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
 	  src/SDCC.lex,
 	  src/SDCCglobl.h,
 	  src/SDCCmain.c:

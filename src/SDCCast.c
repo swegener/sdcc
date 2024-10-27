@@ -6209,9 +6209,62 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
   return rexpr;
 }
 
-/*-----------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
+/* createCaseRange - generates the parsetree for a case range statement */
+/*----------------------------------------------------------------------*/
+ast *
+createCaseRange (ast * swStat, ast * caseValLow, ast * caseValHigh, ast * stmnt)
+{
+  int cVal;
+  ast *rexpr = stmnt;
+
+  caseValLow = decorateType (resolveSymbols (caseValLow), RESULT_TYPE_NONE, true);
+  caseValHigh = decorateType (resolveSymbols (caseValHigh), RESULT_TYPE_NONE, true);
+  /* if not a constant then error  */
+  if (!IS_LITERAL (caseValLow->ftype))
+    {
+      werrorfl (caseValLow->filename, caseValLow->lineno, E_CASE_CONSTANT);
+      return NULL;
+    }
+  if (!IS_LITERAL (caseValHigh->ftype))
+    {
+      werrorfl (caseValHigh->filename, caseValLow->lineno, E_CASE_CONSTANT);
+      return NULL;
+    }
+
+  /* if not a integer than error */
+  if (!IS_LITERAL (caseValLow->ftype))
+    {
+      werrorfl (caseValLow->filename, caseValLow->lineno, E_CASE_CONSTANT);
+      return NULL;
+    }
+  if (!IS_LITERAL (caseValHigh->ftype))
+    {
+      werrorfl (caseValHigh->filename, caseValHigh->lineno, E_CASE_CONSTANT);
+      return NULL;
+    }
+
+  int cValLow = (int) ulFromVal (caseValLow->opval.val);
+  int cValHigh = (int) ulFromVal (caseValHigh->opval.val);
+  if (cValLow > cValHigh)
+    {
+      werrorfl (caseValLow->filename, caseValLow->lineno, W_CASE_RANGE_EMPTY);
+      return NULL;
+    }
+
+  for (cVal = cValLow; cVal <= cValHigh; cVal++)
+    {
+      rexpr = createCase (swStat, newAst_VALUE (valueFromLit (cVal)), rexpr);
+      if (!rexpr)
+        return NULL;
+    }
+
+  return rexpr;
+}
+
+/*------------------------------------------------------------------*/
 /* createDefault - creates the parse tree for the default statement */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 ast *
 createDefault (ast * swStat, ast * defaultVal, ast * stmnt)
 {

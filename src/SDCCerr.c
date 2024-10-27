@@ -663,6 +663,10 @@ struct
      "absolute address for __data '%s' probably out of range.", 0 },
   { W_IDATA_ABSRANGE, ERROR_LEVEL_WARNING,
      "absolute address for __idata '%s' probably out of range.", 0 },
+  { W_CASE_RANGE_EMPTY, ERROR_LEVEL_WARNING,
+     "'case' range empty; case ignored", 0 },
+  { E_CASE_RANGE_C2Y, ERROR_LEVEL_ERROR,
+     "'case' range expressions require C2y or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

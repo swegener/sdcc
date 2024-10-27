@@ -150,7 +150,7 @@ bool uselessDecl = true;
 %type <asts> postfix_expression unary_expression offsetof_member_designator cast_expression multiplicative_expression
 %type <asts> additive_expression shift_expression relational_expression equality_expression
 %type <asts> and_expression exclusive_or_expression inclusive_or_expression logical_or_expr
-%type <asts> logical_and_expr conditional_expr assignment_expr constant_expr
+%type <asts> logical_and_expr conditional_expr assignment_expr constant_expr constant_range_expr
 %type <asts> expression argument_expr_list function_definition expression_opt predefined_constant
 %type <asts> statement_list statement labeled_statement unlabeled_statement compound_statement
 %type <asts> primary_block secondary_block
@@ -434,6 +434,10 @@ expression_opt
 
 constant_expr
    : conditional_expr
+   ;
+
+constant_range_expr
+   : constant_expr ELLIPSIS constant_expr { $$ = newNode(ELLIPSIS,$1,$3); }
    ;
 
    /* C23 A.2.2 Declarations */
@@ -1870,6 +1874,16 @@ label
      {
        $$ = createLabel($1,NULL);
        $1->isitmp = 0;
+     }
+   | attribute_specifier_sequence_opt CASE constant_range_expr ':'
+     {
+       if (!options.std_c2y)
+         werror (E_CASE_RANGE_C2Y);
+
+       if (STACK_EMPTY(swStk))
+         $$ = createCaseRange(NULL,$3->left,$3->right,NULL);
+       else
+         $$ = createCaseRange(STACK_PEEK(swStk),$3->left,$3->right,NULL);
      }
    | attribute_specifier_sequence_opt CASE constant_expr ':'
      {

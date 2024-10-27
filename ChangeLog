@@ -1,3 +1,8 @@
+2024-10-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  Fix some mentions of Windows in manual.
+
 2024-10-27 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,

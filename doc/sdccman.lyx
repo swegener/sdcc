@@ -5008,7 +5008,7 @@ compile on Cygwin for Mingw32 (see also sdcc/support/scripts/sdcc_cygwin_mingw32
 \end_layout
 
 \begin_layout LyX-Code
-./configure -C 
+./configure 
 \backslash
 
 \begin_inset Newline newline
@@ -5185,27 +5185,6 @@ g++ -mno-cygwin
 \end_inset
 
  
-\end_layout
-
-\begin_layout Standard
-'configure' is quite slow on Cygwin (at least on windows before Win2000/XP).
- The option '-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--C' turns on caching,
- which gives a little bit extra speed.
- However if options are changed,
- it can be necessary to delete the config.cache file.
 \end_layout
 
 \begin_layout Section
@@ -7683,7 +7662,7 @@ SDCC sources use the unix line ending LF.
  Life is much easier,
  if you store the source tree on a drive which is mounted in binary mode.
  And use an editor which can handle LF-only line endings.
- Make sure not to commit files with windows line endings.
+ Make sure not to commit files with Windows line endings.
  The tabulator spacing
 \begin_inset Index idx
 range none
@@ -7702,6 +7681,13 @@ tabulator spacing (8 columns)
 
 \begin_layout Subsection
 Building SDCC Using Microsoft Visual C++ 2010 (MSVC)
+\end_layout
+
+\begin_layout Standard
+TODO:
+ This section is outdated.
+ Current SDCC requires features noit present in MSVC++ 2010.
+ MSVC++ 2019 or newer is required.
 \end_layout
 
 \begin_layout Standard
@@ -8142,7 +8128,7 @@ http://sdcc.sourceforge.net/snap.php
 \end_inset
 
  and execute it.
- A windows typical installer will guide you through the installation process.
+ A Windows typical installer will guide you through the installation process.
 \end_layout
 
 \begin_layout Subsection
@@ -21016,7 +21002,7 @@ status collapsed
 
 .
  Additionally,
- if you happen to have visual studio installed in your windows machine,
+ if you happen to have visual studio installed in your Windows machine,
  you can use it to compile your sources using a custom build and the SDCC -
 \emph on
 

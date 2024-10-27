@@ -833,10 +833,12 @@ enum {
    P_STD_C11,
    P_STD_C23,
    P_STD_C2X,
+   P_STD_C2Y,
    P_STD_SDCC89,
    P_STD_SDCC99,
    P_STD_SDCC11,
    P_STD_SDCC23,
+   P_STD_SDCC2Y,
    P_CODESEG,
    P_CONSTSEG
 };
@@ -1170,6 +1172,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 0;
       options.std_c11 = 0;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 0;
       break;
 
@@ -1184,6 +1187,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 0;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 0;
       break;
 
@@ -1198,6 +1202,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 1;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 0;
       break;
 
@@ -1213,6 +1218,22 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 1;
       options.std_c23 = 1;
+      options.std_c2y = 0;
+      options.std_sdcc = 0;
+      break;
+
+    case P_STD_C2Y:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 1;
+      options.std_c11 = 1;
+      options.std_c23 = 1;
+      options.std_c2y = 1;
       options.std_sdcc = 0;
       break;
 
@@ -1227,6 +1248,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 0;
       options.std_c11 = 0;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 1;
       break;
 
@@ -1241,6 +1263,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 0;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 1;
       break;
 
@@ -1255,6 +1278,7 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 1;
       options.std_c23 = 0;
+      options.std_c2y = 0;
       options.std_sdcc = 1;
       break;
 
@@ -1269,6 +1293,22 @@ doPragma (int id, const char *name, const char *cp)
       options.std_c99 = 1;
       options.std_c11 = 1;
       options.std_c23 = 1;
+      options.std_c2y = 0;
+      options.std_sdcc = 1;
+      break;
+
+    case P_STD_SDCC2Y:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 1;
+      options.std_c11 = 1;
+      options.std_c23 = 1;
+      options.std_c2y = 1;
       options.std_sdcc = 1;
       break;
 
@@ -1340,10 +1380,12 @@ static struct pragma_s pragma_tbl[] = {
   { "std_c11",           P_STD_C11,         0, doPragma },
   { "std_c23",           P_STD_C23,         0, doPragma },
   { "std_c2x",           P_STD_C2X,         1, doPragma },
+  { "std_c2y",           P_STD_C2Y,         0, doPragma },
   { "std_sdcc89",        P_STD_SDCC89,      0, doPragma },
   { "std_sdcc99",        P_STD_SDCC99,      0, doPragma },
   { "std_sdcc11",        P_STD_SDCC11,      0, doPragma },
   { "std_sdcc23",        P_STD_SDCC23,      0, doPragma },
+  { "std_sdcc2y",        P_STD_SDCC2Y,      0, doPragma },
   { "codeseg",           P_CODESEG,         0, doPragma },
   { "constseg",          P_CONSTSEG,        0, doPragma },
   { NULL,                0,                 0, NULL },

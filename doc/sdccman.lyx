@@ -16776,6 +16776,40 @@ c2x
 \labelwidthstring 00.00.0000
 
 \series bold
+c2y 
+\begin_inset Index idx
+range none
+pageformat default
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc2y
+\end_layout
+
+\end_inset
+
+
+\series default
+ Enable features anticipated for the Sixth Edition standard (currently abbreviated ISO C2y).
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
 sdcc90 
 \begin_inset Index idx
 range none
@@ -16928,7 +16962,7 @@ sdcc23
 \begin_inset Index idx
 range none
 pageformat default
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -16957,6 +16991,41 @@ status collapsed
  
 \series bold
 sdcc2x
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+sdcc2y 
+\begin_inset Index idx
+range none
+pageformat default
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc2y
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generally follow ISO C2y,
+ but allow some SDCC behaviour that conflicts with the standard.
 \end_layout
 
 \end_deeper
@@ -39798,7 +39867,7 @@ sdcc11
 
 \end_inset
 
-- Follow the C11 standard,
+- Generally follow the C11 standard,
  but allow SDCC features that conflict with the standard.
 \end_layout
 
@@ -39855,7 +39924,7 @@ std_c2x
 \begin_layout Itemize
 
 \series bold
-std_sdcc99
+std_sdcc23
 \series default
  
 \begin_inset Index idx
@@ -39895,6 +39964,97 @@ sdcc23
 \end_inset
 
 - Generally follow the C23 standard,
+ but allow SDCC features that conflict with the standard.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+std_c2
+\series default
+y
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma std
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+c2y
+\end_layout
+
+\end_inset
+
+- Follow the C2y standard and disable SDCC features that conflict with the standard.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+std_sdcc2y
+\series default
+ 
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma std
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sdcc2y
+\end_layout
+
+\end_inset
+
+- Generally follow the C2y standard,
  but allow SDCC features that conflict with the standard.
 \end_layout
 

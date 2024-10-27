@@ -1,3 +1,8 @@
+2024-10-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Small improvment in stm8 struct/union parameter passing.
+
 2024-10-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/z80n/mul.s,

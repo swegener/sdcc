@@ -3728,9 +3728,11 @@ genPointerPush (const iCode *ic)
   for(int i = 0; i < size; i++)
     {
       int o = size - 1 - i + offset;
-
-      emit2 ("ld", "a, (%d, %s)", o, use_y ? "y" : "x");
-      cost (2 + use_y, 1);
+      if (o)
+        emit2 ("ld", "a, (%d, %s)", o, use_y ? "y" : "x");
+      else
+        emit2 ("ld", "a, (%s)", use_y ? "y" : "x");
+      cost (1 + (bool)o + use_y, 1);
       push (ASMOP_A, 0, 1);
     }
 

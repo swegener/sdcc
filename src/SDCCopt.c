@@ -2895,8 +2895,17 @@ optimizeFinalCast (ebbIndex *ebbi)
             continue;
 
           iCode *uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (ic->result)));
-          if(!uic || uic != ic->next ||
+          if(!uic ||
             uic->op != GET_VALUE_AT_ADDRESS && !(POINTER_SET(uic) && !isOperandEqual (ic->result, uic->left) && !isOperandEqual (ic->result, uic->right) && (IS_ITEMP (ic->right) || IS_OP_LITERAL (ic->right))))
+            continue;
+
+          // For now only handle a use that follows immediately or nearly immediately.
+          if (ic->next && ic->next->op != LABEL && !POINTER_SET(ic->next) &&
+            (!IS_ITEMP (ic->right) || !bitVectBitValue (OP_DEFS (ic->right), ic->next->key)) &&
+            uic == ic->next->next &&
+            (!ic->next->result || IS_ITEMP (ic->next->result)))
+            ;
+          else if (uic != ic->next)
             continue;
 
           // Not all backends can handle multiple global operands in all operations well.

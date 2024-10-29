@@ -1,3 +1,8 @@
+2024-10-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3788.c:
+	  Disable a test that assuems SDCC implementation-defined behaviour for host.
+
 2024-10-27 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

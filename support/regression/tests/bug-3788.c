@@ -38,7 +38,13 @@ void testBug( void )
 {
     (g_bits).a.MYBIT4 = 1;;
     send_loop_try( 0xa5 );
+// The order of allocation of bit-fields within a unit
+// (high-order to low-order or low-order to high-order) is
+// implementation-defined. This test assumes the SDCC order,
+// It fails e.g. for powerpc64-linux-gnu.
+#ifdef __SDCC
     ASSERT (d == 0xa5);
+#endif
 }
 
 void print_special( unsigned char c )

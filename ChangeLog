@@ -2,6 +2,10 @@
 
 	* support/regression/tests/bug-3788.c:
 	  Disable a test that assuems SDCC implementation-defined behaviour for host.
+	* src/z80/peeph.def:
+	  z80 peephole optimizer rule improvements.
+	* src/z80/gen.c:
+	  Improve use of information from generalized constant propagation in z80 subtraction code generation.
 
 2024-10-27 Philipp Klaus Krause <philipp@colecovision.eu>
 

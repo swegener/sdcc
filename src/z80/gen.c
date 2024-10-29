@@ -8908,11 +8908,11 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
             }
           else if (!offset)
             {
-              if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && aopInReg (right, offset, A_IDX))
+              if (aopIsLitVal (left, offset, 1, 0x00) && aopInReg (right, offset, A_IDX))
                 emit3 (A_NEG, 0, 0);
               else
                 {
-                  if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00)
+                  if (aopIsLitVal (left, offset, 1, 0x00) && !aopInReg (left, offset, A_IDX))
                     emit3 (A_XOR, ASMOP_A, ASMOP_A);
                   else
                     cheapMove (ASMOP_A, 0, left, offset, true);
@@ -8924,7 +8924,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
                   emit3_o (A_SUB, ASMOP_A, 0, right, offset);
                 }
             }
-          else if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && size == 1) // For the last byte, we can do an optimization that results in the same value in a, but different carry.
+          else if (aopIsLitVal (left, offset, 1, 0x00) && !aopInReg (left, offset, A_IDX) && size == 1) // For the last byte, we can do an optimization that results in the same value in a, but different carry.
             {
               emit3 (A_SBC, ASMOP_A, ASMOP_A);
               emit3_o (A_SUB, ASMOP_A, 0, right, offset);
@@ -8940,7 +8940,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
               emit3_o (A_SBC, ASMOP_A, 0, right, offset);
             }
         }
-      else
+      else // right is a literal.
         {
           if (requiresHL (left) && left->type != AOP_REG && !hl_dead)
             {

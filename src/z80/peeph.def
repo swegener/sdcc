@@ -1556,12 +1556,12 @@ replace restart {
 }
 
 replace restart {
-	ld	%1,a
-	ld	a,%2
-	or	a,%1
+	ld	%1, a
+	ld	a, %2
+	or	a, %1
 } by {
-	ld	%1,a
-	or	a,%2
+	ld	%1, a
+	or	a, %2
 	; common peephole 99 removed load by reordering or arguments.
 } if notVolatile(%1), canAssign('b' %2), notSame(%1 '(hl+)' '(hl-)')
 // canAssign('b' %2) is true, iff or a,%2 is possible.
@@ -1579,11 +1579,26 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	and	a,%1
-	or	a,a
+	or	a, #0x00
 } by {
-	and	a,%1
+	or	a, a
+	; common peephole 99b removed redundant or argument.
+}
+
+replace restart {
+	and	a, %1
+	or	a, a
+} by {
+	and	a, %1
 	; common peephole 100 removed redundant or after and.
+}
+
+replace restart {
+	and	a, %1 (%2)
+	or	a, a
+} by {
+	and	a, %1 (%2)
+	; common peephole 100a removed redundant or after and.
 }
 
 replace restart {
@@ -1932,42 +1947,6 @@ replace restart {
 	ld	%3,a
 	; common peephole 121b replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
-
-replace {
-	ld	a, #%1
-	sbc	a, %3
-} by {
-	; common peephole 122a optimized carry subtraction by 0.
-	sbc	a, a
-	sub	a, %3
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notVolatile(%3), notUsed('f')
-
-replace {
-	ld	a, #%1
-	sub	a, %3
-} by {
-	; common peephole 122b optimized carry subtraction by 0.
-	xor	a, a
-	sub	a, %3
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %2), notVolatile(%3), notUsed('f')
-
-replace {
-	ld	a, #%1
-	sbc	a, %2 (ix)
-} by {
-	; common peephole 122c optimized carry subtraction by 0.
-	sbc	a, a
-	sub	a, %2 (ix)
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %3), notUsed('f')
-
-replace {
-	ld	a, #%1
-	sbc	a, %2
-} by {
-	; common peephole 122d optimized carry subtraction by 0.
-	sbc	a, a
-	sub	a, %2
-} if operandsLiteral(%1), immdInRange(0 0 '+' %1 0 %3), notUsed('f')
 
 replace restart {
 	ld	a, #%1

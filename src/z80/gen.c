@@ -1087,6 +1087,41 @@ ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2, bool coun
     case AOP_IMMD:
       wassertl (0, "Trying to assign a value to a literal");
       break;
+    case AOP_PAIRPTR:
+      switch (op2type)
+        {
+        case AOP_REG:
+          if (op1->aopu.aop_pairId == PAIR_HL)
+            {
+              cost2 (1, 7, 6, 5, 8, 6, 2, 2);
+              return (1);
+            }
+          else if (op1->aopu.aop_pairId == PAIR_IY || op1->aopu.aop_pairId == PAIR_IX)
+            {
+               cost2 (3, 19, 15, 9, 0, 10, 4, 5);
+               return (3);
+            }
+          else
+            wassert (0);
+          break;
+        case AOP_LIT:
+          if (op1->aopu.aop_pairId == PAIR_HL)
+            {
+              cost2 (2, 10, 9, 7, 12, 8, 3, 3);
+              return (2);
+            }
+          else if (op1->aopu.aop_pairId == PAIR_IY || op1->aopu.aop_pairId == PAIR_IX)
+            {
+               cost2 (4, 19, 15, 11, 0, 12, 5, 5);
+               return (4);
+            }
+          else
+            wassert (0);
+          break;
+        default:
+          wassert (0);
+        }
+      break;
     default:
       printf ("ld_cost op1: %d\n", (int) (op1type));
       wassert (0);
@@ -1130,8 +1165,10 @@ op8_cost (const asmop *op, int offset)
     case AOP_PAIRPTR:
       if (op->aopu.aop_pairId == PAIR_HL)
         cost2 (1, 7, 6, 5, 8, 6, 2, 2);
-      if (op->aopu.aop_pairId == PAIR_IY || op->aopu.aop_pairId == PAIR_IX)
+      else if (op->aopu.aop_pairId == PAIR_IY || op->aopu.aop_pairId == PAIR_IX)
         cost2 (3, 19, 15, 9, 0, 10, 4, 5);
+      else
+        wassert (0);
       return;
     default:
       printf ("op8_cost op: %d\n", (int) (op->type));

@@ -1,3 +1,9 @@
+2024-10-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3791.c:
+	  Fix bug #3791.
+
 2024-10-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3788.c:

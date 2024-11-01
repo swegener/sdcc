@@ -1815,6 +1815,12 @@ FBYNAME (operandsNotRelated)
 
       for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
         {
+          if ((strchr(op1, '(') || strchr(op1, '|')) && (strchr(op2, '(') || strchr(op2, '|'))) // Might be the same or overlapping memory locations; err on the safe side.
+            {
+              ret = false;
+              goto done;
+            }
+
           op2 = operandBaseName (op2);
           if (strcmp (op1, op2) == 0)
             {
@@ -3455,7 +3461,7 @@ reassociate_ic (lineNode *shead, lineNode *stail,
 /* replaceRule - does replacement of a matching pattern            */
 /*-----------------------------------------------------------------*/
 static void
-replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
+replaceRule (lineNode **shead, lineNode *stail, const peepRule *pr)
 {
   lineNode *cl = NULL;
   lineNode *pl = NULL, *lhead = NULL;

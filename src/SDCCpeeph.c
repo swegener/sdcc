@@ -1815,7 +1815,7 @@ FBYNAME (operandsNotRelated)
 
       for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
         {
-          if ((strchr(op1, '(') || strchr(op1, '|')) && (strchr(op2, '(') || strchr(op2, '|'))) // Might be the same or overlapping memory locations; err on the safe side.
+          if ((strchr(op1, '(') || strchr(op1, '[')) && (strchr(op2, '(') || strchr(op2, '['))) // Might be the same or overlapping memory locations; err on the safe side.
             {
               ret = false;
               goto done;

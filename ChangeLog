@@ -2,6 +2,8 @@
 
 	* src/SDCCpeeph.c:
 	  Fix bug #3792.
+	* src/SDCCopt.c:
+	  Workaround for bug #3793.
 
 2024-10-31 Philipp Klaus Krause <philipp@colecovision.eu>
 

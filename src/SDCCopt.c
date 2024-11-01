@@ -2878,7 +2878,8 @@ optimizeFinalCast (ebbIndex *ebbi)
   // puts the result of a 16-bit read from e generic pointer into dptr,
   // which codegen can't handle (it genrated code where dpl is overwritten by
   // the lower byte of the result, then used as pointer once more).
-  if (TARGET_MCS51_LIKE)
+  // This also triggers a pic16 bug resulting in invalid asm code being generated.
+  if (TARGET_MCS51_LIKE || TARGET_IS_PIC16)
     return;
 
   for (int i = 0; i < ebbi->count; i++)

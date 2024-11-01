@@ -4,6 +4,8 @@
 	  Fix bug #3792.
 	* src/SDCCopt.c:
 	  Workaround for bug #3793.
+	* src/SDCCmain.c:
+	  Fix bug #3790.
 
 2024-10-31 Philipp Klaus Krause <philipp@colecovision.eu>
 

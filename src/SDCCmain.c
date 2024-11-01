@@ -625,7 +625,7 @@ static void
 setStackSize (void)
 {
 #if defined (HAVE_SETRLIMIT) && defined (RLIMIT_STACK)
-  struct rlimit rl = {4 * 1024 * 1024, 4 * 1024 * 1024};
+  struct rlimit rl = {8 * 1024 * 1024, 8 * 1024 * 1024};
   setrlimit (RLIMIT_STACK, &rl);
 #endif
 }

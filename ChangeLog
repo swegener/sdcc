@@ -2,6 +2,16 @@
 
 	* doc/sdccman.lyx,
 	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h:
+	  Add syntactic support for K&R-style functions.
+
+2024-11-03 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
 	  src/SDCCast.c,
 	  src/SDCCerr.c,
 	  src/SDCCerr.h,

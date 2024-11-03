@@ -33,9 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # include <sys/socket.h>
 #endif
 #if defined HAVE_NEED_SELECT_H
-#if defined(HAVE_SYS_SELEC_H)
 # include <sys/select.h>
-#endif
 #endif
 #if defined HAVE_NEED_TIME_H
 # include <sys/time.h>
@@ -55,9 +53,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#if defined(HAVE_SYS_SELECT_H)
-# include <sys/select.h>
-#endif
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
@@ -447,21 +442,11 @@ check_inputs(class cl_list *active, class cl_list *avail)
 void
 msleep(int msec)
 {
-#if defined(HAVE_NANOSLEEP)
   struct timespec t;
+
   t.tv_sec= msec/1000;
   t.tv_nsec= (msec%1000)*1000000;
   nanosleep(&t, NULL);
-#elif defined(HAVE_USLEEP)
-  usleep(1000 * msec);
-#else
-  struct timeval tv;
-  fd_set readfds;
-  FD_ZERO(&readfds);
-  tv.tv_sec = msec/1000;
-  tv.tv_usec = (msec%1000)*1000;
-  select(0, &readfds, NULL, NULL, &tv);
-#endif
 }
 
 void

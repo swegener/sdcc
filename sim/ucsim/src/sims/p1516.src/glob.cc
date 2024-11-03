@@ -39,12 +39,12 @@ struct dis_entry disass_p1516[]=
    { 0x74f00000, 0xfff00000, 'M', 1, "jc    %O", false },
    { 0x54f00000, 0xfff00000, 'M', 1, "jnc   %O", false },
    { 0x04f00000, 0x1ff00000, 'M', 1, "jmp   %O", false },
-   { 0x04f00000, 0x0ff00000, 'x', 1, "jump  %O", false },
+   { 0x04f00000, 0x0ff00000, ' ', 1, "jump  %O", false },
 
    { 0x00000000, 0x0f000000, ' ', 1, "nop", false },
    { 0x01000000, 0x0f000000, ' ', 1, "ld    %d:=mem[%R]", false },
    { 0x02000000, 0x0f000000, ' ', 1, "st    mem[%R]:=%d", false },
-   { 0x03fe0000, 0x0fff0000, 'x', 1, "ret", false },
+   { 0x03fe0000, 0x0fff0000, ' ', 1, "ret", false },
    { 0x03000000, 0x0f000000, ' ', 1, "mov   %d:=%a", false },
    { 0x04000000, 0x0f000000, ' ', 1, "ldl0  %d:=%0", false },
    { 0x05000000, 0x0f000000, ' ', 1, "ldl   %d:=%l", false },
@@ -82,7 +82,7 @@ struct dis_entry disass_p2223[]=
    // Macro
    { 0x00000000, 0x0fffffff, ' ', 1, "nop", false },
    { 0x00000000, 0x0fffff00, ' ', 1, "'char8'", false },
-   { 0x00f00e00, 0x00f00f00, 'x', 1, "ret", false },
+   { 0x00f00e00, 0x00f00f00, ' ', 1, "ret", false },
    { 0x11f20000, 0xffff0000, ' ', 1, "jz 'j'", false },
    { 0x21f20000, 0xffff0000, ' ', 1, "jnz 'j'", false },
    { 0x31f20000, 0xffff0000, ' ', 1, "jc 'j'", false },

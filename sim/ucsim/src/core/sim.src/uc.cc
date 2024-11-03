@@ -1721,7 +1721,7 @@ cl_uc::read_cdb_file(cl_f *f)
 	{
 	  if (ln.len() > 5)
 	    {
-	      if ((lc[1] == ':') &&
+	      if ((ln[1] == ':') &&
 		  (lc[2] == 'G'))
 		{
 		  ln.start_parse(4);

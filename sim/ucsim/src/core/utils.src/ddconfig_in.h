@@ -160,12 +160,6 @@
 /* Define to 1 if you have the `yylex' function. */
 #undef HAVE_YYLEX
 
-/* Define to 1 if you have the `nanosleep' function. */
-#undef HAVE_NANOSLEEP
-
-/* Define to 1 if you have the `nanosleep' function. */
-#undef HAVE_USLEEP
-
 /* XXX */
 #undef HEADER_FD
 

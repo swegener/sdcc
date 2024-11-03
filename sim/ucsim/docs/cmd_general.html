@@ -204,26 +204,20 @@ under certain conditions; type `show c' for details.
     <p>show <a href="#show_copying">copying</a> <br>
       show <a href="#show_warranty">warranty</a> <br>
       show <a href="#show_option">option</a> <br>
-      show <a href="#show_error">error</a> </br>
-      show <a href="#show_registers">registers</a> </p>
-    
+      show <a href="#show_error">error</a> </p>
     <blockquote>
-      
       <h4><a name="show_copying">show copying</a></h4>
       This command can be used to list licensing information. It is first 10
       point of the version 2 of GNU General Public License. If you do not accept
       GPL simply do not use the program.
       <hr>
-      
       <h4><a name="show_warranty">show warranty</a></h4>
       This command prints out last 2 point of the license ("NO WARRANTY"
       message).
       <hr>
-      
       <h4><a name="show_option">show option</a></h4>
       This command is for development only.
       <hr>
-      
       <h4><a name="show_error">show error</a></h4>
       Errors or warnings are events which can happen in the simulated system
       during simulation. Report of that events can be turned on or off using <a
@@ -253,16 +247,8 @@ Error: non-classified [on/ON]
         <dd>state is inherited from the parent. </dd>
       </dl>
       If state is <b>ON</b> and the event happens, it is reported. If state is
-      <b>OFF</b> then the event is silently ignored.
-
-      <h4><a name="show_registers">show registers</a></h4>
-
-      This subcommand prints out full register set of the CPU, this
-      command is the same as <a href="#info_registers">info registers</a>.
-      
-    </blockquote>
+      <b>OFF</b> then the event is silently ignored. </blockquote>
     <hr>
-    
     <h3><a name="get">get</a></h3>
     This command can be used to get value of various kind of things. It requires
     a subcommand to specify what is going to be set. Known subcommands are:
@@ -634,8 +620,8 @@ Num Type       Disp Hit   Cnt   Address  What
       
       <h4><a name="info_registers">info registers</a></h4>
       
-      This subcommand prints out full register set of the CPU. The output
-      of this command depends on the type of CPU.
+      This subcommand prints out full register set of the CPU. Output
+      of this command depends of type of CPU.
 
       <h5>Registers of MCS51 family</h5>
       

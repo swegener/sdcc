@@ -138,6 +138,8 @@ cl_seg::refresh(bool force)
   u32_t l, mask, a, lw;
   class cl_p1516 *uc= (class cl_p1516 *)(fpga->uc);
   chars w= "non ";
+  bool direct= false;
+  int c= -digit + fpga->d2c_b;
   switch ((sw>>4)&0xf)
     {
     case 0: act= fpga->pa->get(); w="PA= "; break;
@@ -151,33 +153,76 @@ cl_seg::refresh(bool force)
       else
 	w.format("R%d= ", sw&0xf);
       break;
+    case 10:
+      {
+	t_addr a;
+	//act= (digit<=3)?(fpga->pd->get()):(fpga->pc->get());
+	a= 0xff02; // ODR of PC
+	a+= c/4;
+	act= fpga->uc->rom->read(a);
+	w="CD->";
+	direct= true;
+	break;
+      }
     default: act= 0;
     }
-  mask= 0xf << (digit*4);
-  act&= mask;
-  l= last & mask;
   act_what= sw & 0xff;
   if (force || (act_what != last_what))
     {
       io->tu_go(1,y+2);
       io->dd_cprintf("ui_label", "%s", w.c_str());
     }
-  if (force || (act != l) || (act_what != last_what))
+  if (!direct)
     {
-      a= act >> (digit*4);
-      a&= 0xf;	
-      int s= a*5;
-      io->tu_fgcolor(1); io->dd_printf("\033[1m");
-      io->tu_go(x, y);
-      io->dd_printf("%c%c%c", dsp[0][s], dsp[0][s+1], dsp[0][s+2]);
-      io->tu_go(x, y+1);
-      io->dd_printf("%c%c%c", dsp[1][s], dsp[1][s+1], dsp[1][s+2]);
-      io->tu_go(x, y+2);
-      io->dd_printf("%c%c%c", dsp[2][s], dsp[2][s+1], dsp[2][s+2]);
-      io->dd_printf("\033[0m");
-      io->dd_color("answer");
-      last= (last & ~mask) | act;
-      last_what= act_what;
+      mask= 0xf << (digit*4);
+      act&= mask;
+      l= last & mask;
+      if (force || (act != l) || (act_what != last_what))
+	{
+	  a= act >> (digit*4);
+	  a&= 0xf;
+	  int s= a*5;
+	  io->tu_fgcolor(1); io->dd_printf("\033[1m");
+	  io->tu_go(x, y);
+	  io->dd_printf("%c%c%c", dsp[0][s], dsp[0][s+1], dsp[0][s+2]);
+	  io->tu_go(x, y+1);
+	  io->dd_printf("%c%c%c", dsp[1][s], dsp[1][s+1], dsp[1][s+2]);
+	  io->tu_go(x, y+2);
+	  io->dd_printf("%c%c%c", dsp[2][s], dsp[2][s+1], dsp[2][s+2]);
+	  io->dd_printf("\033[0m");
+	  io->dd_color("answer");
+	  last= (last & ~mask) | act;
+	  last_what= act_what;
+	}
+    }
+  else
+    {
+      // direct
+      int sby= 0;
+      switch (c % 4)
+	{
+	case 3: mask= 0xff000000; sby= 3*8; break;
+	case 2: mask= 0x00ff0000; sby= 2*8; break;
+	case 1: mask= 0x0000ff00; sby= 1*8; break;
+	default: mask= 0x000000ff; sby= 0*8; break;
+	}
+      act&= mask;
+      l= last & mask;
+      if (force || (act != l) || (act_what != last_what))
+	{
+	  int bits= (act >> sby) & 0xff;
+	  io->tu_fgcolor(1); io->dd_printf("\033[1m");
+	  io->tu_go(x, y);
+	  io->dd_printf(" %c ", (bits&1)?'_':' ');
+	  io->tu_go(x, y+1);
+	  io->dd_printf("%c%c%c", (bits&0x20)?'|':' ', (bits&0x40)?'_':' ', (bits&2)?'|':' ');
+	  io->tu_go(x, y+2);
+	  io->dd_printf("%c%c%c", (bits&0x10)?'|':' ', (bits&8)?'_':' ', (bits&4)?'|':' ');
+	  io->dd_printf("\033[0m");
+	  io->dd_color("answer");
+	  last= (last & ~mask) | act;
+	  last_what= act_what;
+	}
     }
 }
 
@@ -382,6 +427,7 @@ cl_fpga::cl_fpga(class cl_uc *auc, int aid, chars aid_string):
       register_cell(pjp);
     }
   basey= 13; // row of leds
+  d2c_b= 7;
 }
 
 
@@ -445,6 +491,7 @@ cl_fpga::handle_input(int c)
 	case 'C': sw&= ~0xf0; sw|= 0x20; pjp->W(sw); break;
 	case 'D': sw&= ~0xf0; sw|= 0x30; pjp->W(sw); break;
 	case 'R': sw&= ~0xf0; sw|= 0x90; pjp->W(sw); break;
+	case 'S': sw&= ~0xf0; sw|= 0xa0; pjp->W(sw); break;
 	case TU_UP  : sw&= ~0xf; sw|= ((rx+1)&0xf); pjp->W(sw); break;
 	case TU_DOWN: sw&= ~0xf; sw|= ((rx-1)&0xf); pjp->W(sw); break;
 	}
@@ -543,14 +590,16 @@ cl_fpga::draw_display(void)
   for (i=0; i<8; i++)
     if (btns[i])
       btns[i]->draw();
-  io->tu_go(2+8*5-9-7+3-16,basey-7);
-  io->dd_cprintf("ui_mkey", "[ABCD] ");
+  io->tu_go(2+8*5-9-7+3-16-6,basey-7);
+  io->dd_cprintf("ui_mkey" , "[S]");
+  io->dd_cprintf("ui_mitem", "eg ");
+  io->dd_cprintf("ui_mkey" , "[ABCD] ");
   io->dd_cprintf("ui_mitem", "PX ");
-  io->dd_cprintf("ui_mkey", "[R] ");
+  io->dd_cprintf("ui_mkey" , "[R] ");
   io->dd_cprintf("ui_mitem", "RX ");
-  io->dd_cprintf("ui_mkey", "[up] ");
+  io->dd_cprintf("ui_mkey" , "[up] ");
   io->dd_cprintf("ui_mitem", "R+ ");
-  io->dd_cprintf("ui_mkey", "[dn] ");
+  io->dd_cprintf("ui_mkey" , "[dn] ");
   io->dd_cprintf("ui_mitem", "R- ");
   refresh_display(true);
 }
@@ -697,6 +746,7 @@ cl_logsys::cl_logsys(class cl_uc *auc, int aid, chars aid_string):
   cl_fpga(auc, aid, aid_string)
 {
   board= "LogSys";
+  d2c_b= 3;
 }
 
 void

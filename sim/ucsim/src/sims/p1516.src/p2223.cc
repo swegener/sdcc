@@ -458,57 +458,17 @@ CLP2::analyze(t_addr addr)
 	return;
       set_inst_at(addr);
       if (de->branch!=' ')
-	{
-	  switch (de->branch)
-	    {
-	    case 'x': case '_': // non-followable
-	      return;
-	    case 'M': // LDL0 r15,#imm
-	      {
-		t_addr target= rom->read(addr) & 0xffff;
-		analyze_jump(addr, target, de->branch);
-		return;
-	      }
-	    }
-	}
-      else
-	{
-	  if (
-	      ((code & 0x0c000000) == 0) || // ALU op
-	      ((code & 0x0a000000) == 0x0a000000) || // LD
-	      ((code & 0x0f0f0000) == 0x06000000) || // Ext LD
-	      ((code & 0x0f0f0000) == 0x06010000) || // Ext GETB/PUTB
-	      ((code & 0x0f0f0000) == 0x06020000) // Ext RDS
-	      )
-	    {
-	      // These insts modify Rd
-	      if ((code & 0x00f00000) == 0x00f00000)
-		{
-		  // if Rd==R15, this is a run-time jump, non-followable
-		  return;
-		}
-	    }
-	}
-      if ((code & 0x0e000000) == 0x04000000)
-	{
-	  // CALL or CES
-	  if ((code & 0x01000000) == 0x01000000)
-	    // indirect call, non-followable
+	switch (de->branch)
+	  {
+	  case 'x': case '_': // non-followable
 	    return;
-	  t_addr target= code & 0x00ffffff;
-	  analyze_jump(addr, target, 's');
-	}
-      if ((code & 0xfe000000) == 0xf4000000)
-	{
-	  // CES
-	  addr= rom->validate_address(addr+1);
-	  code= rom->read(addr);
-	  while (code != 0)
+	  case 'M': // LDL0 r15,#imm
 	    {
-	      addr= rom->validate_address(addr+1);
-	      code= rom->read(addr);
+	      t_addr target= rom->read(addr) & 0xffff;
+	      analyze_jump(addr, target, de->branch);
+	      break;
 	    }
-	}
+	  }
       addr= rom->validate_address(addr+1);
     }
 }

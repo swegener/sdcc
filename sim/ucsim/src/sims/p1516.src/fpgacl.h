@@ -115,6 +115,7 @@ public:
   class cl_btn *btns[8];
   int basey;
   chars board;
+  int d2c_b;
 public:
   cl_fpga(class cl_uc *auc, int aid, chars aid_string);
   virtual int init(void);

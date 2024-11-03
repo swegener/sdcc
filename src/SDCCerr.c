@@ -667,6 +667,8 @@ struct
      "'case' range empty; case ignored", 0 },
   { E_CASE_RANGE_C2Y, ERROR_LEVEL_ERROR,
      "'case' range expressions require C2y or later", 0 },
+  { E_GENERIC_WITH_TYPENAME_C2Y, ERROR_LEVEL_ERROR,
+     "generic selection based on a type name requires C2y or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

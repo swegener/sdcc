@@ -24,3 +24,19 @@ void testGeneric(void)
 #endif
 }
 
+#ifdef __SDCC
+_Pragma("save")
+_Pragma("std_c2y") // generic selection with a type name is a C2y feature
+#endif
+
+void testGenericWithType(void)
+{
+#ifdef __SDCC
+  const int i = 0;
+  ASSERT (_Generic(typeof(i), int : 0, const int : 1, default : 2) == 1);
+#endif
+}
+
+#ifdef __SDCC
+_Pragma("restore")
+#endif

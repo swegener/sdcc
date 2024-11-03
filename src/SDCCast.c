@@ -5437,10 +5437,19 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
     case GENERIC:
       {
-        sym_link *type = tree->left->ftype;
+        bool ctrl_op_is_type = (tree->left->type == EX_LINK);
+        sym_link *type = ctrl_op_is_type ? tree->left->opval.lnk : tree->left->ftype;
         ast *assoc_list;
         ast *default_expr = 0;
         ast *found_expr = 0;
+
+        if (!options.std_c2y && ctrl_op_is_type)
+          {
+            werror (E_GENERIC_WITH_TYPENAME_C2Y);
+            goto errorTreeReturn;
+          }
+
+        /* TODO: verify that 'type' is not a variably modified type */
 
         for(assoc_list = tree->right; assoc_list; assoc_list = assoc_list->left)
           {
@@ -5462,14 +5471,29 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
                 assoc_type = assoc->left->opval.lnk;
                 for (assoc_etype = assoc_type; !IS_SPEC(assoc_etype); assoc_etype = assoc_etype->next);
                 checkTypeSanity (assoc_etype, "(_Generic)");
-                if (compareType (assoc_type, type, true) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))
+                if (ctrl_op_is_type)
                   {
-                    if (found_expr)
+                    if (compareTypeExact (assoc_type, type, 0) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))
                       {
-                        werror (E_MULTIPLE_MATCHES_IN_GENERIC);
-                        goto errorTreeReturn;
+                        if (found_expr)
+                          {
+                            werror (E_MULTIPLE_MATCHES_IN_GENERIC);
+                            goto errorTreeReturn;
+                          }
+                        found_expr = assoc->right;
                       }
-                    found_expr = assoc->right;
+                  }
+                else
+                  {
+                    if (compareType (assoc_type, type, true) > 0 && !(SPEC_NOUN (getSpec (type)) == V_CHAR && getSpec (type)->select.s.b_implicit_sign != getSpec (assoc_type)->select.s.b_implicit_sign))
+                      {
+                        if (found_expr)
+                          {
+                            werror (E_MULTIPLE_MATCHES_IN_GENERIC);
+                            goto errorTreeReturn;
+                          }
+                        found_expr = assoc->right;
+                      }
                   }
               }
           }

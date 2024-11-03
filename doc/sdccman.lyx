@@ -10821,16 +10821,29 @@ In anticipation of the upcoming version of the language standard,
 \end_layout
 
 \begin_layout Itemize
-Case range expressions as described in 
 \begin_inset CommandInset href
 LatexCommand href
-name "n3370"
+name "N3260"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3260.pdf"
+literal "false"
+
+\end_inset
+
+:
+ _Generic selection expression with a type operand
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "N3370"
 target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3370.htm"
 literal "false"
 
 \end_inset
 
-.
+:
+ Case range expressions
 \end_layout
 
 \begin_layout Subsection

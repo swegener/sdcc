@@ -157,7 +157,7 @@ bool uselessDecl = true;
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement else_statement function_body string_literal_val
 %type <asts> critical_statement asm_statement label
-%type <asts> generic_selection generic_assoc_list generic_association
+%type <asts> generic_selection generic_assoc_list generic_association generic_controlling_operand
 %type <asts> implicit_block statements_and_implicit block_item_list
 %type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
@@ -186,7 +186,12 @@ predefined_constant
    ;
 
 generic_selection
-   : GENERIC '(' assignment_expr ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }
+   : GENERIC '(' generic_controlling_operand ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }
+   ;
+
+generic_controlling_operand
+   : assignment_expr
+   | type_name { $$ = newAst_LINK ($1); }
    ;
 
 generic_assoc_list

@@ -1,9 +1,20 @@
+2024-11-03 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  support/regression/tests/generic.c:
+	  Add C2y generic selection based on a type name.
+
 2024-11-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3795.c:
 	  Add a regression test for a bug encountered in z88dk.
 
 2024-11-03 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* support/regression/cases/Makefile.in:
 	  Tidy up list of excluded test cases.
 

@@ -1,5 +1,5 @@
 /* bug-3791.c
-   ARan into an assertion in z80 code generation.
+   Ran into an assertion in z80 code generation.
 */
 
 // Based on code by "Under4Mhz" licensed under GPL 2.0 or later

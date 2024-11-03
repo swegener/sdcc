@@ -72,7 +72,7 @@ struct
   { E_CANNOT_ALLOC, ERROR_LEVEL_ERROR,
      "Cannot allocate variable '%s'.", 0 },
   { E_OLD_STYLE, ERROR_LEVEL_ERROR,
-     "Old style C declaration. IGNORED '%s'", 0 },
+     "K&R-style function '%s' is not permitted in ISO C23 or later", 0 },
   { E_STACK_OUT, ERROR_LEVEL_ERROR,
      "Out of stack Space. '%s' not allocated", 0 },
   { E_INTERNAL_ERROR, ERROR_LEVEL_ERROR,
@@ -669,6 +669,8 @@ struct
      "'case' range expressions require C2y or later", 0 },
   { E_GENERIC_WITH_TYPENAME_C2Y, ERROR_LEVEL_ERROR,
      "generic selection based on a type name requires C2y or later", 0 },
+  { E_MIXED_FUNCTION_STYLES, ERROR_LEVEL_ERROR,
+     "function '%s' mixes ISO and K&R style", 0 },
 };
 
 /* -------------------------------------------------------------------------------

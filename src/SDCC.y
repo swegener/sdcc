@@ -1372,12 +1372,62 @@ function_declarator
 
           $$ = $1;
         }
-   | declarator2 '(' identifier_list ')'
+   | declarator2 '('
         {
-          werror(E_OLD_STYLE,$1->name);
+          NestLevel += LEVEL_UNIT;
+          STACK_PUSH(blockNum, currBlockno);
+          btree_add_child(currBlockno, ++blockNo);
+          currBlockno = blockNo;
+          seqPointNo++; /* not a true sequence point, but helps resolve scope */
+        }
+     identifier_list ')'
+        {
+          if (options.std_c23)
+            werror(E_OLD_STYLE,$1->name);
           
+          sym_link *funcType;
+
+          bool is_fptr = IS_FUNC($1->type); // Already a function, must be a function pointer.
+
           addDecl ($1, FUNCTION, NULL);
-          
+          funcType = $1->type;
+
+          // For a function pointer, the parameter list here is for the returned type.
+          if (is_fptr)
+            funcType = funcType->next;
+
+          while (funcType && !IS_FUNC(funcType))
+            funcType = funcType->next;
+
+          wassert (funcType);
+
+          // TODO: A K&R function does not create a prototype.
+          //    => use FUNC_NOPROTOTYPE, once prototype-less functions are
+          //       fully supported and K&R functions can be treated as such
+          funcType->funcAttrs.oldStyle = 1;
+
+          // initially give all parameters in the identifier_list the implicit type int
+          for (symbol *loop = $4; loop ; loop = loop->next) {
+              value *newVal;
+              loop->type = loop->etype = newIntLink();
+              loop->_isparm = 1;
+              newVal = symbolVal(loop);
+              newVal->next = FUNC_ARGS(funcType);
+              FUNC_ARGS(funcType) = newVal;
+          }
+
+          FUNC_SDCCCALL(funcType) = -1;
+
+          /* nest level was incremented to take care of the parms  */
+          leaveBlockScope (currBlockno);
+          NestLevel -= LEVEL_UNIT;
+          currBlockno = STACK_POP(blockNum);
+          seqPointNo++; /* not a true sequence point, but helps resolve scope */
+
+          // if this was a pointer (to a function)
+          if (!IS_FUNC($1->type))
+              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
+
           $$ = $1;
         }
    ;
@@ -2180,7 +2230,12 @@ function_definition
         }
    function_body
         {
-            $$ = createFunction($1,$3);
+            // merge kr_declaration_list from auxiliary node into function declaration
+            mergeKRDeclListIntoFuncDecl($1, (symbol *) $3->left);
+            // discard auxiliary node and keep compound_statement as function_body
+            $3 = $3->right;
+
+            $$ = createFunction($1, $3);
             if ($1 && FUNC_ISCRITICAL ($1->type))
                 inCriticalFunction = 0;
         }
@@ -2208,7 +2263,12 @@ function_definition
         }
    function_body
         {
-            $$ = createFunction($2,$4);
+            // merge kr_declaration_list from auxiliary node into function declaration
+            mergeKRDeclListIntoFuncDecl($2, (symbol *) $4->left);
+            // discard auxiliary node and keep compound_statement as function_body
+            $4 = $4->right;
+
+            $$ = createFunction($2, $4);
             if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 0;
         }
@@ -2216,10 +2276,14 @@ function_definition
 
 function_body
    : compound_statement
+     {
+       // auxiliary node transports kr_declaration_list into function_definition, where the node is discarded
+       $$ = newNode (0, NULL, $1);
+     }
    | kr_declaration_list compound_statement
      {
-       werror (E_OLD_STYLE, ($1 ? $1->name: ""));
-       exit (1);
+       // auxiliary node transports kr_declaration_list into function_definition, where the node is discarded
+       $$ = newNode (0, (ast *) $1, $2);
      }
    ;
 
@@ -2752,11 +2816,13 @@ kr_declaration_list
        if ( $1 && IS_TYPEDEF($1->etype)) {
          allocVariables ($1);
          $$ = NULL;
+         ignoreTypedefType = 0;
+         addSymChain(&$1);
        }
-       else
+       else {
+         checkTypeSanity($1->etype, $1->name);
          $$ = $1;
-       ignoreTypedefType = 0;
-       addSymChain(&$1);
+       }
      }
    | kr_declaration_list kr_declaration
      {
@@ -2766,8 +2832,11 @@ kr_declaration_list
        if ($2 && IS_TYPEDEF($2->etype)) {
          allocVariables ($2);
          $$ = $1;
+         ignoreTypedefType = 0;
+         addSymChain(&$2);
        }
        else {
+         checkTypeSanity($2->etype, $2->name);
          /* get to the end of the previous decl */
          if ( $1 ) {
            $$ = sym = $1;
@@ -2778,8 +2847,6 @@ kr_declaration_list
          else
            $$ = $2;
        }
-       ignoreTypedefType = 0;
-       addSymChain(&$2);
      }
    ;
 

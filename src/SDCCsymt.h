@@ -249,6 +249,7 @@ typedef struct sym_link
     unsigned hasFcall:1;            /* does it call other functions         */
     unsigned reent:1;               /* function is reentrant                */
     unsigned naked:1;               /* naked function                       */
+    unsigned oldStyle:1;            /* K&R function (TODO: remove, once noprototype can be used for K&R functions) */
 
     unsigned shadowregs:1;          /* function uses shadow registers (pic16 port) */
     unsigned wparam:1;              /* first byte of arguments is passed via WREG (pic16 port) */
@@ -744,6 +745,7 @@ int isVolatile (sym_link * type);
 int isRestrict (sym_link * type);
 value *aggregateToPointer (value *);
 void leaveBlockScope (int block);
+void mergeKRDeclListIntoFuncDecl (symbol *funcDecl, symbol *kr_decls);
 
 
 extern char *nounName (sym_link *);     /* noun strings */

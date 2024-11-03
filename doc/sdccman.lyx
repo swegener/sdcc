@@ -9982,55 +9982,10 @@ R style
 
 \end_inset
 
- function declarations are not supported.
-\begin_inset Separator latexpar
-\end_inset
-
-
+ functions are syntactically supported,
+ but with the semantics of ISO style functions.
 \end_layout
 
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-foo(i,j) /* this old style of function declarations */
-\begin_inset Newline newline
-\end_inset
-
-int i,j;
- /* is valid in ANSI but not valid in SDCC */
-\begin_inset Newline newline
-\end_inset
-
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
- 
-\begin_inset Newline newline
-\end_inset
-
-}
-\end_layout
-
-\end_deeper
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout

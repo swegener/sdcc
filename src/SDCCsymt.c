@@ -5035,3 +5035,80 @@ isRestrict (sym_link * type)
   else
     return DCL_PTR_RESTRICT (type);
 }
+
+/*-------------------------------------------------------------------*/
+/* mergeKRDeclListIntoFuncDecl - merge the type information from the */
+/*      declaration list between function declaration and body into  */
+/*      the function declaration, replacing the default type int     */
+/*-------------------------------------------------------------------*/
+void
+mergeKRDeclListIntoFuncDecl (symbol *funcDecl, symbol *kr_decls)
+{
+  if (kr_decls != NULL)
+    {
+      if (options.std_c23)
+        {
+          werror (E_OLD_STYLE, (funcDecl ? funcDecl->name: ""));
+          exit (1);
+        }
+
+      symbol *declLoop;
+      value *parLoop;
+
+      sym_link *funcType;
+
+      funcType = funcDecl->type;
+      while (funcType && !IS_FUNC (funcType))
+        funcType = funcType->next;
+
+      assert (funcType);
+
+      /* TODO:
+       * use FUNC_NOPROTOTYPE, once prototype-less functions are fully
+       * supported and K&R functions can be treated as such, because
+       * a function with prototype cannot have been declared in K&R style
+       */
+      if (!funcType->funcAttrs.oldStyle)
+        werror (E_MIXED_FUNCTION_STYLES, (funcDecl ? funcDecl->name: ""));
+
+      /* iterate over members of declaration list */
+      for (declLoop = kr_decls; declLoop; declLoop = declLoop->next)
+        {
+          bool found = false;
+          /* iterate over parameters */
+          for (parLoop = FUNC_ARGS (funcType); parLoop; parLoop = parLoop->next)
+            {
+              if (strcmp (declLoop->name, parLoop->sym->name) == 0)
+                found = true;
+            }
+          if (!found)
+            werror (E_ID_UNDEF, declLoop->name);
+        }
+
+      /* iterate over parameters */
+      for (parLoop = FUNC_ARGS (funcType); parLoop; parLoop = parLoop->next)
+        {
+          bool found = false;
+          /* iterate over members of declaration list */
+          for (declLoop = kr_decls; declLoop; declLoop = declLoop->next)
+            {
+              if (strcmp (declLoop->name, parLoop->sym->name) == 0)
+                {
+                  if (found)
+                    {
+                      werror (E_DUPLICATE, declLoop->name);
+                      continue;
+                    }
+                  found = true;
+                  /* delete default int type */
+                  Safe_free (parLoop->type);
+                  /* propagate type */
+                  parLoop->type = declLoop->type;
+                  parLoop->etype = declLoop->etype;
+                  parLoop->sym->type = copyLinkChain (parLoop->type);
+                  parLoop->sym->etype = getSpec (parLoop->sym->type);
+                }
+            }
+        }
+    }
+}

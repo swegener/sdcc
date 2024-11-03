@@ -330,6 +330,7 @@ enum {
   W_CASE_RANGE_EMPTY            = 300, /* empty case range specified */
   E_CASE_RANGE_C2Y              = 301, /* case range expressions require C2y or later */
   E_GENERIC_WITH_TYPENAME_C2Y   = 302, /* generic selection based on a type name requires C2y or later */
+  E_MIXED_FUNCTION_STYLES       = 303, /* function mixes ISO and K&R style */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

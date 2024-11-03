@@ -32,7 +32,7 @@ if test $last_root == "ucsim" ; then
 	in_sdcc="yes"
     fi
 fi
-echo "In SDCC tree: $in_sdcc (CFLAGS=${CFLAGS}, CXXFLAGS=${CXXFLAGS})"
+echo "SDCC tree detected: $in_sdcc (CFLAGS=${CFLAGS}, CXXFLAGS=${CXXFLAGS})"
 
 
 
@@ -70,6 +70,13 @@ AC_SUBST(docdir)
 
 ######################################################################
 
+AC_ARG_ENABLE(in-sdcc,
+	      AS_HELP_STRING([--enable-in-sdcc=ARG],
+			     [configure as in SDCC tree]),
+	      in_sdcc=$enable_in_sdcc
+	      ,
+	     )
+
 AC_ARG_ENABLE(mcs51-port,
 	      AS_HELP_STRING([--enable-mcs51-port=ARG],
 			     [feature opt passed from SDCC]),
@@ -87,6 +94,12 @@ AC_ARG_ENABLE(ds400-port,
 			     [feature opt passed from SDCC]),
 	      ,
 	      enable_ds400_port="yes")
+
+AC_ARG_ENABLE(xa51-port,
+	      AS_HELP_STRING([--enable-xa51-port=ARG],
+			     [feature opt passed from SDCC]),
+	      ,
+	      enable_xa51_port="no")
 
 AC_ARG_ENABLE(z80-port,
 	      AS_HELP_STRING([--enable-z80-port=ARG],
@@ -200,7 +213,7 @@ AC_ARG_ENABLE(pdk16-port,
 	      AS_HELP_STRING([--enable-pdk16-port=ARG],
 			     [feature opt passed from SDCC]),
 	      ,
-	      enable_pdk16_port="yes")
+	      enable_pdk16_port="no")
 
 AC_ARG_ENABLE(f8-port,
 	      AS_HELP_STRING([--enable-f8-port=ARG],
@@ -239,7 +252,6 @@ if test $in_sdcc == "yes" ; then
     def_serio="no"
     def_i8048="no"
     def_i8085="no"
-    def_xa="no"
     def_avr="no"
     def_m6800="no"
     def_m6809="no"
@@ -252,16 +264,24 @@ if test $in_sdcc == "yes" ; then
     SILENT="yes"
     
     def_mcs51="no"
+    def_xa="no"
     if test $enable_mcs51_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
     fi
     if test $enable_ds390_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
     fi
     if test $enable_ds400_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
     fi
 
+    if test $enable_xa51_port = "yes"; then
+	def_xa="yes"
+    fi
+    
     def_z80="no"
     if test $enable_z80_port = "yes"; then
 	def_z80="yes"

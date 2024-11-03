@@ -749,9 +749,11 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_in_sdcc
 enable_mcs51_port
 enable_ds390_port
 enable_ds400_port
+enable_xa51_port
 enable_z80_port
 enable_z180_port
 enable_sm83_port
@@ -1433,9 +1435,11 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-in-sdcc=ARG    configure as in SDCC tree
   --enable-mcs51-port=ARG feature opt passed from SDCC
   --enable-ds390-port=ARG feature opt passed from SDCC
   --enable-ds400-port=ARG feature opt passed from SDCC
+  --enable-xa51-port=ARG  feature opt passed from SDCC
   --enable-z80-port=ARG   feature opt passed from SDCC
   --enable-z180-port=ARG  feature opt passed from SDCC
   --enable--port=ARG      feature opt passed from SDCC
@@ -3244,7 +3248,7 @@ if test $last_root == "ucsim" ; then
 	in_sdcc="yes"
     fi
 fi
-echo "In SDCC tree: $in_sdcc (CFLAGS=${CFLAGS}, CXXFLAGS=${CXXFLAGS})"
+echo "SDCC tree detected: $in_sdcc (CFLAGS=${CFLAGS}, CXXFLAGS=${CXXFLAGS})"
 
 
 
@@ -3425,6 +3429,14 @@ fi
 
 ######################################################################
 
+# Check whether --enable-in-sdcc was given.
+if test ${enable_in_sdcc+y}
+then :
+  enableval=$enable_in_sdcc; in_sdcc=$enable_in_sdcc
+
+fi
+
+
 # Check whether --enable-mcs51-port was given.
 if test ${enable_mcs51_port+y}
 then :
@@ -3451,6 +3463,16 @@ then :
   enableval=$enable_ds400_port;
 else case e in #(
   e) enable_ds400_port="yes" ;;
+esac
+fi
+
+
+# Check whether --enable-xa51-port was given.
+if test ${enable_xa51_port+y}
+then :
+  enableval=$enable_xa51_port;
+else case e in #(
+  e) enable_xa51_port="no" ;;
 esac
 fi
 
@@ -3640,7 +3662,7 @@ if test ${enable_pdk16_port+y}
 then :
   enableval=$enable_pdk16_port;
 else case e in #(
-  e) enable_pdk16_port="yes" ;;
+  e) enable_pdk16_port="no" ;;
 esac
 fi
 
@@ -3686,7 +3708,6 @@ if test $in_sdcc == "yes" ; then
     def_serio="no"
     def_i8048="no"
     def_i8085="no"
-    def_xa="no"
     def_avr="no"
     def_m6800="no"
     def_m6809="no"
@@ -3699,14 +3720,22 @@ if test $in_sdcc == "yes" ; then
     SILENT="yes"
 
     def_mcs51="no"
+    def_xa="no"
     if test $enable_mcs51_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
     fi
     if test $enable_ds390_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
     fi
     if test $enable_ds400_port = "yes"; then
 	def_mcs51="yes"
+	def_xa="yes"
+    fi
+
+    if test $enable_xa51_port = "yes"; then
+	def_xa="yes"
     fi
 
     def_z80="no"

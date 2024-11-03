@@ -1,3 +1,7 @@
+2024-11-03 Benedikt Freisen <b.freisen AT gmx.net>
+	* support/regression/cases/Makefile.in:
+	  Tidy up list of excluded test cases.
+
 2024-11-01 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCpeeph.c:

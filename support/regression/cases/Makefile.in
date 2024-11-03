@@ -33,47 +33,52 @@ TCC_TESTS_WC = $(shell (cd $(TCC_TESTS_DIR); ls *.c))
 # GTE tests using asm (TODO: generate automatically)
 # these don't seem to work.
 GTE_SKIP_TESTS = \
-	pr51447.c \
+	20001009-2.c \
+	20020107-1.c \
+	20030222-1.c \
+	20050203-1.c \
 	20061031-1.c \
-	20061031-1.c \
-	20061220-1.c \
-	20061220-1.c \
 	20061220-1.c \
 	20071220-1.c \
 	20071220-2.c \
-	pr103376.c \
+	20080122-1.c \
+	960312-1.c \
+	990130-1.c \
 	pr103376.c \
 	pr38533.c \
 	pr40022.c \
 	pr40657.c \
 	pr41239.c \
-	pr41239.c \
-	pr41239.c \
-	pr41239.c \
+	pr43385.c \
+	pr43560.c \
+	pr44852.c \
 	pr45695.c \
 	pr46309.c \
 	pr47925.c \
+	pr49218.c \
 	pr49279.c \
+	pr49390.c \
+	pr51447.c \
 	pr51877.c \
 	pr51933.c \
+	pr52286.c \
 	pr53645-2.c \
 	pr53645.c \
-	pr56205.c \
-	pr56205.c \
 	pr56205.c \
 	pr56866.c \
 	pr57344-1.c \
 	pr57344-2.c \
 	pr57344-3.c \
 	pr57344-4.c \
+	pr58277-1.c \
 	pr58419.c \
+	pr65053-1.c \
 	pr65053-2.c \
-	pr65648.c \
 	pr65648.c \
 	pr65956.c \
 	pr68328.c \
-	pr68328.c \
 	pr69320-2.c \
+	pr69691.c \
 	pr78438.c \
 	pr78726.c \
 	pr79354.c \
@@ -86,35 +91,12 @@ GTE_SKIP_TESTS = \
 	pr85756.c \
 	pr88904.c \
 	pr93945.c \
-	pr93945.c \
 	pr94130.c \
-	pr65053-1.c \
-	20050203-1.c \
-	20080122-1.c \
-	20080122-1.c \
-	20080122-1.c \
-	pr44852.c \
-	pr49218.c \
-	pr58277-1.c \
-	pr69691.c \
-	pr43560.c \
-	20001009-2.c \
-	20020107-1.c \
-	20030222-1.c \
-	960312-1.c \
-	990130-1.c \
-	pr43385.c \
-	pr52286.c \
-	stkalign.c \
-	pr49390.c
+	stkalign.c
 
 # uses typeof. typeof was a GCC extension, which became standard in C23. RFE #738.
 GTE_SKIP_TESTS += \
 	20020412-1.c \
-	20020412-1.c \
-	builtin-types-compatible-p.c \
-	builtin-types-compatible-p.c \
-	builtin-types-compatible-p.c \
 	builtin-types-compatible-p.c \
 	va-arg-22.c
 
@@ -127,7 +109,8 @@ GTE_SKIP_TESTS += \
 
 # SDCC does not yet support compound literals (RFE #332)
 GTE_SKIP_TESTS += \
-	20000917-1.c
+	20000917-1.c \
+	20020206-2.c
 
 # Uses GCC implementation-defined long long bit-fields not supported in SDCC
 GTE_SKIP_TESTS += \
@@ -135,20 +118,14 @@ GTE_SKIP_TESTS += \
 
 # SDCC does not yet support K&R-style style functions (RFE #450)
 GTE_SKIP_TESTS += \
-	20020227-1.c \
 	20000914-1.c \
 	20000112-1.c \
 	20000808-1.c \
 	930921-1.c \
-	930921-1.c \
 	931228-1.c \
 	940115-1.c \
-	940115-1.c \
-	950221-1.c \
 	950221-1.c \
 	960209-1.c \
-	960209-1.c \
-	970923-1.c \
 	970923-1.c
 
 # __SIZE_TYPE__ something. TODO: retry
@@ -529,9 +506,10 @@ GTE_SKIP_TESTS += \
 # SDCC does not yet support omission of braces in initialization. RFE #562.
 GTE_SKIP_TESTS += \
 	20040703-1.c \
+	991201-1.c \
 	complex-3.c \
-	pr41919.c \
-	991201-1.c
+	pr33631.c \
+	pr41919.c
 
 # Uses GCC extension __builtin_classify_type
 GTE_SKIP_TESTS += \
@@ -604,6 +582,7 @@ GTE_SKIP_TESTS += pr93249.c
 
 # TODO?: __complex__, _Complex
 GTE_SKIP_TESTS += \
+	20020227-1.c \
 	20020411-1.c \
 	20010605-2.c \
 	20041201-1.c \
@@ -611,10 +590,6 @@ GTE_SKIP_TESTS += \
 
 # TODO?: printf
 GTE_SKIP_TESTS += 20020406-1.c
-
-# SDCC does not yet support compound literals (RFE #332)
-GTE_SKIP_TESTS += \
-	20020206-2.c
 
 # Initializer element is not a constant expression
 GTE_SKIP_TESTS += \
@@ -705,10 +680,6 @@ GTE_SKIP_TESTS += \
 	strct-pack-4.c \
 	struct-ret-2.c
 
-# SDCC does not yet support omission of braces in initialization. RFE #562.
-GTE_SKIP_TESTS += \
-	pr33631.c
-
 # mpn
 GTE_SKIP_TESTS += \
 	921202-1.c
@@ -737,10 +708,6 @@ GTE_SKIP_TESTS += \
 
 # use of alloca (not defined? yet?)
 GTE_SKIP_TESTS += \
-	20010122-1.c \
-	20010122-1.c \
-	20010122-1.c \
-	20010122-1.c \
 	20010122-1.c \
 	20020314-1.c \
 	20021113-1.c \
@@ -985,7 +952,6 @@ tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
 
 	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
 	@echo >> $@
-
 
 gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
 	@printf .

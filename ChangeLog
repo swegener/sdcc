@@ -1,3 +1,8 @@
+2024-11-03 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/scripts/sdcc.nsi:
+	  Do not try to include XA-51 simulator (which is no longer built by default) in Windows installer.
+
 2024-11-03 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,

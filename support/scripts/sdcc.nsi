@@ -424,7 +424,6 @@ ${Section} "ucSim application files" SEC02
   File "${SDCC_ROOT}\bin\ucsim_rxk.exe"
   File "${SDCC_ROOT}\bin\ucsim_stm8.exe"
   File "${SDCC_ROOT}\bin\ucsim_tlcs.exe"
-  File "${SDCC_ROOT}\bin\ucsim_xa.exe"
   File "${SDCC_ROOT}\bin\ucsim_z80.exe"
   File "${SDCC_ROOT}\bin\ucsim_f8.exe"
 ${SectionEnd}
@@ -1337,7 +1336,6 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\ucsim_rxk.exe"
   Delete "$INSTDIR\bin\ucsim_stm8.exe"
   Delete "$INSTDIR\bin\ucsim_tlcs.exe"
-  Delete "$INSTDIR\bin\ucsim_xa.exe"
   Delete "$INSTDIR\bin\ucsim_z80.exe"
   Delete "$INSTDIR\bin\ucsim_f8.exe"
 

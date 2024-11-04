@@ -539,8 +539,13 @@ print_line_1 (location_t src_loc, const char *special_flags, FILE *stream)
       print.src_line = LOCATION_LINE (src_loc);
       print.src_file = file_path;
 
-      fprintf (stream, "#line %u \"%s\"%s",
+#if 0 // SDCC-specific change: Emit standard #line directives instead of GCC extension.
+      fprintf (stream, "# %u \"%s\"%s",
 	       print.src_line, to_file_quoted, special_flags);
+#else
+      fprintf (stream, "#line %u \"%s\"",
+	       print.src_line, to_file_quoted);
+#endif
 
       int sysp = in_system_header_at (src_loc);
       if (sysp == 2)

@@ -1,3 +1,10 @@
+2024-11-04 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/cpp/gcc/c-family/c-ppoutput.cc:
+	  Fix bug #3794.
+	* support/valdiag/tests/bug-3014.c:
+	  Adapt test to recent K&R changes.
+
 2024-11-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/scripts/sdcc.nsi:

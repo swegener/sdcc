@@ -4,6 +4,6 @@
  */
 
 #ifdef TEST1
-void *f(a) /* ERROR */
-#endif /* IGNORE */
+void *f(a)
+#endif /* ERROR */
 

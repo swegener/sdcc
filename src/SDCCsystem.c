@@ -118,20 +118,25 @@ split_command (const char *cmd_line, char **command, char **params)
 #ifdef _WIN32
 /* WIN32 version */
 
+static bool
+file_exists (const char* path)
+{
+  DWORD attr = GetFileAttributes (path);
+  return     attr != INVALID_FILE_ATTRIBUTES
+          && 0 == (attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+
 /*
- * I don't like this solution, but unfortunately cmd.exe and command.com
- * don't accept something like this:
+ * cmd.exe via _popen doesn't accept something like this:
  * "program" "argument"
- * Cmd.exe accepts the following:
- * ""program" "argument""
- * but command.com doesn't.
- * The following is accepted by both:
- * program "argument"
- *
- * So the most portable WIN32 solution is to use GetShortPathName() for
- * program to get rid of spaces, so that quotes are not needed :-(
- * Using spawnvp() instead of system() is more portable cross platform approach,
- * but then also a substitute for _popen() should be developed...
+ * It has to be:
+ * ""program with possible spaces" "argument with spaces""
+ * or
+ * ""program with possible spaces" argument_without_spaces"
+ * (note: the first and last " are also needed).
+ * The arguments at this point already contain double quotes,
+ * if necessary, so the following code formats the line as:
+ * ""program"  arguments".
  */
 
 #define EXE_EXT ".exe"
@@ -145,12 +150,14 @@ merge_command (const char *command, const char *params)
 {
   struct dbuf_s dbuf;
 
-  /* allocate extra space for ' ' and '\0' */
-  dbuf_init (&dbuf, strlen (command) + strlen (params) + 2);
+  /* allocate extra space for '""', '"' ' and ""\0" */
+  dbuf_init (&dbuf, strlen (command) + strlen (params) + 6);
 
+  dbuf_append_str (&dbuf, "\"\"");
   dbuf_append_str (&dbuf, command);
-  dbuf_append (&dbuf, " ", 1);
+  dbuf_append_str (&dbuf, "\" ");
   dbuf_append_str (&dbuf, params);
+  dbuf_append_str (&dbuf, "\"");
 
   return dbuf_detach_c_str (&dbuf);
 }
@@ -164,9 +171,8 @@ merge_command (const char *command, const char *params)
 static const char *
 compose_command_line (const char *path, const char *command, const char *args)
 {
-  unsigned len;
+  bool cmd_exists;
   struct dbuf_s cmdPath;
-  char shortPath[PATH_MAX];
 
   dbuf_init (&cmdPath, PATH_MAX);
 
@@ -175,19 +181,17 @@ compose_command_line (const char *path, const char *command, const char *args)
   else
     dbuf_append_str (&cmdPath, command);
 
-  /* Try if cmdPath or cmdPath.exe exist by converting it to the short path name */
-  len = GetShortPathName (dbuf_c_str (&cmdPath), shortPath, sizeof shortPath);
-  assert (len < sizeof shortPath);
-  if (0 == len)
+  /* Does cmdPath or cmdPath.exe exist? */
+  cmd_exists = file_exists (dbuf_c_str (&cmdPath));
+  if (!cmd_exists)
     {
       dbuf_append_str (&cmdPath, EXE_EXT);
-      len = GetShortPathName (dbuf_c_str (&cmdPath), shortPath, sizeof shortPath);
-      assert (len < sizeof shortPath);
+      cmd_exists = file_exists (dbuf_c_str (&cmdPath));
     }
-  if (0 != len)
+  if (cmd_exists)
     {
       /* compose the command line */
-      return merge_command (shortPath, args);
+      return merge_command (dbuf_c_str (&cmdPath), args);
     }
   else
     {

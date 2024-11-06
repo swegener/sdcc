@@ -2,6 +2,9 @@
 
 	* src/SDCCralloc.hpp:
 	  Fallback to std::multimap instead of boost::container::flat_multimap for all boost up to 1.85.0.
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-3780.c:
+	  Fix bug #3780.
 
 2024-11-04 Philipp Klaus Krause <philipp@colecovision.eu>
 

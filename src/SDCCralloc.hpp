@@ -183,10 +183,17 @@ struct tree_dec_node
   unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
-#if BOOST_VERSION / 100000 == 1 && BOOST_VERSION / 100 % 1000 == 85
-#error boost::container::flat_multimap is broken in boost 1.85.0 (https://sourceforge.net/p/sdcc/bugs/3739/, https://github.com/boostorg/container/issues/281)
-#endif
+// The operand map has few entries, and is accessed often. boost::container::flat_multimap is substantially faster than std::multimap here.
+// While we found boost::container::flat_multimap bugs affecting 1.83.0 and 1.85.0, and know there is a fix in 1.86.0, we don't know which is the first broken version.
+// To actually trigger the bug also requires newer GCC / clang optimizations, so not having hit the bug in the past doesn't mean older boost isn't affected.
+// https://sourceforge.net/p/sdcc/bugs/3739/ apparently only affected boost 1.85.0. https://sourceforge.net/p/sdcc/bugs/3697/ affects boost 1.83.0, but might affect more.
+#if BOOST_VERSION / 100000 == 1 && BOOST_VERSION / 100 % 1000 >= 83 && BOOST_VERSION / 100 % 1000 <= 85
+#warning boost::container::flat_multimap is broken in boost 1.85.0 (https://sourceforge.net/p/sdcc/bugs/3739/, https://github.com/boostorg/container/issues/281) and also 1.83.0 (https://sourceforge.net/p/sdcc/bugs/3697/)
+#warning Using std::multimap fallback instead of boost::container::flat_multimap
+typedef std::multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t> here.
+#else
 typedef boost::container::flat_multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t> here.
+#endif
 
 struct cfg_node
 {
@@ -262,8 +269,8 @@ add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>,
   if (o && IS_SYMOP(o) && sym_to_index.find(std::pair<int, reg_t>(OP_SYMBOL_CONST(o)->key, 0)) != sym_to_index.end())
     {
       if (n.operands.find(OP_SYMBOL_CONST(o)->key) == n.operands.end())
-        for (k = 0; k < OP_SYMBOL_CONST(o)->nRegs; k++)
-          n.operands.insert(std::pair<int, var_t>(OP_SYMBOL_CONST(o)->key, sym_to_index[std::pair<int, reg_t>(OP_SYMBOL_CONST(o)->key, k)]));
+        for (k = 0; k < OP_SYMBOL_CONST(o)->nRegs; k++){
+          n.operands.insert(std::pair<int, var_t>(OP_SYMBOL_CONST(o)->key, sym_to_index[std::pair<int, reg_t>(OP_SYMBOL_CONST(o)->key, k)]));}
     }
 }
 

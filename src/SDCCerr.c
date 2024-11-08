@@ -671,6 +671,12 @@ struct
      "generic selection based on a type name requires C2y or later", 0 },
   { E_MIXED_FUNCTION_STYLES, ERROR_LEVEL_ERROR,
      "function '%s' mixes ISO and K&R style", 0 },
+  { E_ENUM_TYPE_SPECIFIER_C23, ERROR_LEVEL_ERROR,
+     "enum type specifiers require C23 or later", 0 },
+  { E_ENUM_UNDERLYING_TYPE, ERROR_LEVEL_ERROR,
+     "enum's underlying type must be an integer type and cannot be bit-precise or an enum", 0 },
+  { E_ENUM_TYPE_RANGE_TOO_SMALL, ERROR_LEVEL_ERROR,
+     "the enum's underlying type cannot represent all enumerator values", 0 },
 };
 
 /* -------------------------------------------------------------------------------

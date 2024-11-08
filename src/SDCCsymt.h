@@ -738,7 +738,7 @@ void changePointer (sym_link * p);
 void checkTypeSanity (sym_link * etype, const char *name);
 sym_link *typeFromStr (const char *);
 STORAGE_CLASS sclsFromPtr (sym_link * ptr);
-sym_link *newEnumType (symbol *);
+sym_link *newEnumType (symbol *enumlist, sym_link *userRequestedType);
 void promoteAnonStructs (int, structdef *);
 int isConstant (sym_link * type);
 int isVolatile (sym_link * type);

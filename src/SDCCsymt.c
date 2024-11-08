@@ -4906,20 +4906,103 @@ validateLink (sym_link * l, const char *macro, const char *args, const char sele
   return l;                     // never reached, makes compiler happy.
 }
 
+static bool
+llFitsInIntType (long long ll, sym_link *type)
+{
+  long long min = 0, max = 0;
+
+  // determine min and max values for explicitly or implicitly unsigned integers
+  if (SPEC_USIGN (type) || SPEC_NOUN (type) == V_BOOL)
+    {
+      switch (SPEC_NOUN (type))
+        {
+        case V_BOOL:
+          max = 1ll;
+          break;
+        case V_CHAR:
+          max = 0xffll;
+          break;
+        case V_INT:
+          if (SPEC_LONGLONG (type))
+            max = 0x7fffffffffffffffll;  // actual ull max would not fit and input is ll, anyway
+          else if (SPEC_LONG (type))
+            max = 0xffffffffll;
+          else
+            max = 0xffffll;
+          break;
+        default:
+          assert (0);  // not implemented for non-integer types
+        }
+    }
+  else  // determine min and max values for signed integers
+    {
+      switch (SPEC_NOUN (type))
+        {
+        case V_CHAR:
+          min = -128ll;
+          max = 127ll;
+          break;
+        case V_INT:
+          if (SPEC_LONGLONG (type))
+            {
+              min = -9223372036854775808ull;  // the "-" is not part of the literal, which does not fit in ll
+              max = 9223372036854775807ll;
+            }
+          else if (SPEC_LONG (type))
+            {
+              min = -2147483648ll;
+              max = 2147483647ll;
+            }
+          else
+            {
+              min = -32768ll;
+              max = 32767ll;
+            }
+          break;
+        default:
+          assert (0);  // not implemented for non-integer types
+        }
+    }
+
+  return ll >= min && ll <= max;
+}
+
 /*--------------------------------------------------------------------*/
 /* newEnumType - create an integer type compatible with enumerations  */
 /*--------------------------------------------------------------------*/
 sym_link *
-newEnumType (symbol *enumlist)
+newEnumType (symbol *enumlist, sym_link *userRequestedType)
 {
   long long int min, max, v;
   symbol *sym;
-  sym_link *type;
+  sym_link *type = newLink (SPECIFIER);
+  SPEC_ENUM (type) = 1;
+
+  /* Catch user-requested types that make no sense for an enum; provide fallback if none specified */
+  if (userRequestedType)
+    {
+      checkTypeSanity (userRequestedType, NULL);
+      if ((SPEC_NOUN (userRequestedType) != V_INT && SPEC_NOUN (userRequestedType) != V_CHAR && SPEC_NOUN (userRequestedType) != V_BOOL) || SPEC_ENUM (userRequestedType))
+        {
+          werror (E_ENUM_UNDERLYING_TYPE);
+          /* try to keep going */
+          SPEC_NOUN (type) = V_INT;
+          return type;
+        }
+
+      SPEC_NOUN (type) = SPEC_NOUN (userRequestedType);
+      SPEC_SIGN (type) = SPEC_SIGN (userRequestedType);
+      SPEC_USIGN (type) = SPEC_USIGN (userRequestedType);
+      SPEC_LONG (type) = SPEC_LONG (userRequestedType);
+      SPEC_LONGLONG (type) = SPEC_LONGLONG (userRequestedType);
+    }
+  else
+    {
+      SPEC_NOUN (type) = V_INT;
+    }
 
   if (!enumlist)
     {
-      type = newLink (SPECIFIER);
-      SPEC_NOUN (type) = V_INT;
       return type;
     }
 
@@ -4935,8 +5018,15 @@ newEnumType (symbol *enumlist)
         max = v;
     }
 
-  // Use the smallest integer type that is compatible with this range and not a bit-precise type.
-  type = newLink (SPECIFIER);
+  /* Figure out if everything fits in the user requested (or default int) type */
+  if (!llFitsInIntType (min, type) || !llFitsInIntType (max, type))
+    werror (userRequestedType ? E_ENUM_TYPE_RANGE_TOO_SMALL : W_ENUM_INT_RANGE_C23);
+
+  /* It does: If the type was explicitly requested, return it! */
+  if (userRequestedType)
+    return type;
+
+  /* Otherwise: Use the smallest integer type that is compatible with this range and not a bit-precise type. */
   if (min >= 0 && max <= 1)
     {
       SPEC_NOUN (type) = V_BOOL;

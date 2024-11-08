@@ -127,6 +127,12 @@ bool uselessDecl = true;
 /* For internal use (in further stages of SDCC) */
 %token GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 
+/* If an enum type specifier is another enum (invalid but syntactically possible), make sure that the next '{' is part of the inner enum.
+ * If an enum specifier is in a struct, the next ':' belongs to its enum type specifier.
+ * Reason from C23: "If an enum type specifier is present, then the longest possible sequence of tokens that can be
+ *                   interpreted as a specifier qualifier list is interpreted as part of the enum type specifier." */
+%right ENUM '{' ':'
+
 %type <yyint> Interrupt_storage
 %type <attr> attribute_specifier_sequence attribute_specifier_sequence_opt attribute_specifier attribute_list attribute attribute_opt
 %type <sym> identifier attribute_token declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
@@ -139,9 +145,10 @@ bool uselessDecl = true;
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
 %type <lnk> pointer specifier_qualifier_list type_specifier_list_ type_specifier_qualifier type_specifier typeof_specifier type_qualifier_list type_qualifier_list_opt type_qualifier type_name
+%type <lnk> type_specifier_list_without_struct_or_union type_specifier_qualifier_without_struct_or_union type_specifier_without_struct_or_union
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
-%type <lnk> function_attribute function_attributes enum_specifier enum_comma_opt
+%type <lnk> function_attribute function_attributes enum_specifier enum_comma_opt enum_type_specifier simple_typed_enum_decl
 %type <lnk> abstract_declarator direct_abstract_declarator direct_abstract_declarator_opt array_abstract_declarator function_abstract_declarator
 %type <lnk> unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
@@ -448,7 +455,12 @@ constant_range_expr
    /* C23 A.2.2 Declarations */
 
 declaration
-   : declaration_specifiers ';'
+   : simple_typed_enum_decl
+      {
+         uselessDecl = true;
+         $$ = NULL;
+      }
+   | declaration_specifiers ';'
       {
          /* Special case: if incomplete struct/union declared without name, */
          /* make sure an incomplete type for it exists in the current scope */
@@ -593,7 +605,21 @@ storage_class_specifier
                }
    ;
 
+/* NOTE:
+ * Structs and unions have been factored out to avoid parsing conflicts with
+ * enum-type-specifier, which semantically cannot be a struct or union, anyway.
+ */
+
 type_specifier
+   : type_specifier_without_struct_or_union { $$ = $1; }
+   | struct_or_union_specifier  {
+                                   uselessDecl = false;
+                                   $$ = $1;
+                                   ignoreTypedefType = 1;
+                                }
+   ;
+
+type_specifier_without_struct_or_union
    : SD_VOID   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_VOID;
@@ -670,11 +696,6 @@ type_specifier
                   $$=newLink(SPECIFIER);
                   werror (E_DECIMAL_FLOAT_UNSUPPORTED);
                }
-   | struct_or_union_specifier  {
-                                   uselessDecl = false;
-                                   $$ = $1;
-                                   ignoreTypedefType = 1;
-                                }
    | enum_specifier     {
                            cenum = NULL;
                            uselessDecl = false;
@@ -950,6 +971,13 @@ type_specifier_qualifier
    | alignment_specifier { $$ = $1; }
    ;
 
+type_specifier_qualifier_without_struct_or_union
+   : type_specifier_without_struct_or_union        { $$ = $1; }
+   | struct_or_union     { fatal (1, E_ENUM_UNDERLYING_TYPE); }
+   | type_qualifier      { $$ = $1; }
+   | alignment_specifier { $$ = $1; }
+   ;
+
 member_declarator_list
    : member_declarator
    | member_declarator_list ',' member_declarator
@@ -991,7 +1019,12 @@ member_declarator
 enum_specifier
     : ENUM '{' enumerator_list enum_comma_opt '}'
         {
-          $$ = newEnumType ($3);
+          $$ = newEnumType ($3, NULL);
+          SPEC_SCLS(getSpec($$)) = 0;
+        }
+     | ENUM enum_type_specifier '{' enumerator_list enum_comma_opt '}'
+        {
+          $$ = newEnumType ($4, $2);
           SPEC_SCLS(getSpec($$)) = 0;
         }
      | ENUM identifier '{' enumerator_list enum_comma_opt '}'
@@ -999,7 +1032,31 @@ enum_specifier
           symbol *csym;
           sym_link *enumtype;
 
-          enumtype = newEnumType ($4);
+          enumtype = newEnumType ($4, NULL);
+          SPEC_SCLS(getSpec(enumtype)) = 0;
+          $2->type = enumtype;
+
+          csym = findSymWithLevel(enumTab, $2);
+          if ((csym && csym->level == $2->level))
+            {
+              if (!options.std_c23 || compareType (csym->type, $2->type, true) <= 0)
+                {
+                  werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF, csym->name);
+                  werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+                }
+            }
+
+          /* add this to the enumerator table */
+          if (!csym)
+              addSym (enumTab, $2, $2->name, $2->level, $2->block, 0);
+          $$ = copyLinkChain(enumtype);
+        }
+     | ENUM identifier enum_type_specifier '{' enumerator_list enum_comma_opt '}'
+        {
+          symbol *csym;
+          sym_link *enumtype;
+
+          enumtype = newEnumType ($5, $3);
           SPEC_SCLS(getSpec(enumtype)) = 0;
           $2->type = enumtype;
 
@@ -1021,6 +1078,29 @@ enum_specifier
    | ENUM identifier
         {
           symbol *csym;
+
+          /* check the enumerator table */
+          if ((csym = findSymWithLevel(enumTab, $2)))
+              $$ = copyLinkChain(csym->type);
+          else
+            {
+              $$ = newLink(SPECIFIER);
+              SPEC_NOUN($$) = V_INT;
+            }
+        }
+   ;
+
+/* C23:
+ * An enum specifier of the form "enum identifier enum-type-specifier"
+ * may not appear except in a declaration of the form "enum identifier enum-type-specifier ;"
+ */
+simple_typed_enum_decl
+   : ENUM identifier enum_type_specifier ';'
+        {
+          symbol *csym;
+
+          /* let newEnumType check the enum-type-specifier and discard the returned type */
+          newEnumType (NULL, $3);
 
           /* check the enumerator table */
           if ((csym = findSymWithLevel(enumTab, $2)))
@@ -1079,6 +1159,15 @@ enumerator
               // do this now, so we can use it for the next enums in the list
               addSymChain (&$1);
             }
+        }
+   ;
+
+enum_type_specifier
+   : ':' type_specifier_list_without_struct_or_union
+        {
+          if (!options.std_c23)
+            werror (E_ENUM_TYPE_SPECIFIER_C23);
+          $$ = finalizeSpec ($2);
         }
    ;
 
@@ -2616,6 +2705,16 @@ type_specifier_list_
      /* find the spec and replace it      */
      $$ = mergeDeclSpec($1, $2, "type_specifier_list type_specifier skipped");
    }
+   ;
+
+type_specifier_list_without_struct_or_union
+   : type_specifier_qualifier_without_struct_or_union
+   | type_specifier_list_without_struct_or_union type_specifier_qualifier_without_struct_or_union
+        {
+          /* if the decl $2 is not a specifier */
+          /* find the spec and replace it      */
+          $$ = mergeDeclSpec($1, $2, "type_specifier_list type_specifier skipped");
+        }
    ;
 
 identifier_list

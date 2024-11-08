@@ -331,6 +331,9 @@ enum {
   E_CASE_RANGE_C2Y              = 301, /* case range expressions require C2y or later */
   E_GENERIC_WITH_TYPENAME_C2Y   = 302, /* generic selection based on a type name requires C2y or later */
   E_MIXED_FUNCTION_STYLES       = 303, /* function mixes ISO and K&R style */
+  E_ENUM_TYPE_SPECIFIER_C23     = 304, /* enum type specifiers require C23 or later */
+  E_ENUM_UNDERLYING_TYPE        = 305, /* enum's underlying type must be an integer type and cannot be bit-precise or an enum */
+  E_ENUM_TYPE_RANGE_TOO_SMALL   = 306, /* the enum's underlying type cannot represent all enumerator values */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -10510,10 +10510,6 @@ Qualifier-preserving standard library functions are not implemented.
 \end_layout
 
 \begin_layout Itemize
-Enhanced enumerations are not implemented.
-\end_layout
-
-\begin_layout Itemize
 constexpr is not implemented.
 \end_layout
 

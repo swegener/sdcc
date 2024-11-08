@@ -1,3 +1,15 @@
+2024-11-08 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/typed-enum.c,
+	  support/valdiag/tests/typed-enum.c:
+	  Implement C23's explicitly typed enums, see [feature-requests:#847].
+
 2024-11-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCralloc.hpp:

@@ -223,6 +223,7 @@ public:
   int LDW_A_NY(t_mem code)   { return ldw_a_m(a_n_y()); }
   int LDW_A_Y(t_mem code)    { return ldw_a_m(rY); }
   int LDW_A_X(t_mem code)    { return ldw_a_r(rX); }
+  int LDW_A_Z(t_mem code)    { return ldw_a_r(rZ); }
   int LDW_A_D(t_mem code)    { return ldw_a_i(sexd()); }
   int LDW_M_A(t_mem code)    { return ldw_m_a(a_mm()); }
   int LDW_NSP_A(t_mem code)  { return ldw_m_a(a_n_sp()); }

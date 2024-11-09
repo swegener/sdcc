@@ -89,6 +89,7 @@ struct dis_entry disass_f8[]=
     { 0xce, 0xff, ' ', 2, "ldw ('nA_16'),x" },
     { 0x70, 0xff, ' ', 1, "ldw %A, sp" },
     { 0x74, 0xff, ' ', 1, "ldw ('dsp_16'),%A" },
+    { 0xdc, 0xff, ' ', 2, "ldw %A,z" },
 
     { 0xc1, 0xed, ' ', 3, "ldi (z),'a16_16'" },
     { 0xc1, 0xcf, ' ', 3, "ldwi (z),'a16_16'" },
@@ -326,9 +327,7 @@ struct dis_entry disass_f8[]=
     { 0xd9, 0xff, ' ', 2, "jrno %r" },
     { 0xda, 0xff, ' ', 2, "jrsge %r" },
     { 0xdb, 0xff, ' ', 2, "jrslt %r" },
-    { 0xdc, 0xff, ' ', 2, "jrsgt %r" },
     { 0xdd, 0xff, ' ', 2, "jrsle %r" },
-    { 0xde, 0xff, ' ', 2, "jrgt %r" },
     { 0xdf, 0xff, ' ', 2, "jrle %r" },
     
     // other

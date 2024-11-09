@@ -2,6 +2,10 @@
 
 	* src/f8/gen.c:
 	  Fix generation of invalid asm for bit-field read.
+	* sim/ucsim/src/sims/f8.src/decode.h,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc:
+	  Fix ldw y, z f8 instruction simulation.
 
 2024-11-08 Benedikt Freisen <b.freisen AT gmx.net>
 

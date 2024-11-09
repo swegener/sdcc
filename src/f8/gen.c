@@ -4104,7 +4104,7 @@ genCmp (const iCode *ic, iCode *ifx)
 
   // To not swap operands if doing so complicates the code.
   if (ic->op == '>' && ifx && !sign &&
-    (size == 1 && aopIsOp8_2 (right->aop, 0) && aopIsAcc8 (left->aop, 0) ||
+    (size == 1 && aopAre8_2 (left->aop, 0, right->aop, 0) ||
      size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && aopIsAcc16 (left->aop, 0)))
     {
       if (size == 1)
@@ -4165,12 +4165,12 @@ genCmp (const iCode *ic, iCode *ifx)
         }
       goto return_c;
     }
-  else if (!sign && size == 1 && aopIsOp8_2 (right->aop, 0) && aopIsAcc8 (left->aop, 0))
+  else if (!sign && size == 1 && aopAre8_2 (left->aop, 0, right->aop, 0))
     emit3 (A_CP, left->aop, right->aop);
   else if (!sign && size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && aopIsAcc16 (left->aop, 0))
     emit3 (A_CPW, left->aop, right->aop);
   else if (ifx && // Use inverse jump condition.
-    (size == 1 && aopIsAcc8 (right->aop, 0) && aopIsOp8_2 (left->aop, 0) || size == 2 && aopIsAcc16 (right->aop, 0) && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)))
+    (size == 1 && aopAre8_2 (right->aop, 0, left->aop, 0) || size == 2 && aopIsAcc16 (right->aop, 0) && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)))
     {
       emit3 ((size == 1) ? A_CP : A_CPW, right->aop, left->aop);
       symbol *tlbl = 0;
@@ -4285,7 +4285,7 @@ genCmp (const iCode *ic, iCode *ifx)
               started = true;
               i += 2;
             }
-          else if ((!sign || ifx) && !started && aopIsAcc8 (left->aop, i) && aopIsOp8_2 (right->aop, i))
+          else if ((!sign || ifx) && !started && aopAre8_2 (left->aop, 0, right->aop, 0))
             {
               emit3_o (A_CP, left->aop, i, right->aop, i);
               started = true;
@@ -4503,9 +4503,10 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
         }
       else
         {
-          if (aopIsAcc8 (left->aop, i) && aopIsOp8_2 (right->aop, i))
+          if (aopAre8_2 (left->aop, i, right->aop, i) &&
+            !(aopInReg (right->aop, i, XL_IDX))) // Fall through to swapped operands below, if that is more efficient.
             emit3_o (A_CP, left->aop, i, right->aop, i);
-          else if (aopIsAcc8 (right->aop, i) && aopIsOp8_2 (left->aop, i))
+          else if (aopAre8_2 (right->aop, i, left->aop, i))
             emit3_o (A_CP, right->aop, i, left->aop, i);
           else if (xl_dead && xh_dead && !aopIsOp8_2 (right->aop, i) && left->aop->regs[XH_IDX] < i)
             {

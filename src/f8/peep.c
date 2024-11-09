@@ -103,7 +103,7 @@ static const char *leftArg (const char *arg)
 {
   while (isspace (*arg))
     arg++;
-  while (!isspace (*arg))
+  while (*arg && !isspace (*arg))
     arg++;
   while (isspace (*arg))
     arg++;

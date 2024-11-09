@@ -8,8 +8,10 @@
 	  sim/ucsim/src/sims/f8.src/glob.cc,
 	  sim/ucsim/src/sims/f8.src/ialu.cc:
 	  Fixes for two-operand 16 and 16/8 bit f8 instructions.
-	  src/f8/gen.c:
-	  Improve use of prefixed two-operand 16 and 16/8 bit f8 instructions.
+	* src/f8/gen.c:
+	  Improve use of two-operand f8 instructions.
+	* src/f8/peep.c:
+	  Fix asm argument handling buffer overflow.
 
 2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

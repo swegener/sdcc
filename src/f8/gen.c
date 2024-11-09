@@ -132,6 +132,7 @@ static const char *asminstnames[] =
   "tstw",
   "xch",
   "xor",
+  "xorw",
 };
 
 bool f8_regs_used_as_parms_in_calls_from_current_function[ZH_IDX + 1];
@@ -405,8 +406,19 @@ aopIsOp8_1 (const asmop *aop, int offset)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopAreOp8_2 - asmops at offsets can be used as 8-bit operand to
+                 two-operand instruction                          */
+/*-----------------------------------------------------------------*/
+static bool
+aopAre8_2 (const asmop *aop0, int offset0, const asmop *aop1, int offset1)
+{
+  return (aopIsAcc8 (aop0, offset0) && aopIsOp8_2 (aop1, offset1) ||
+    aopInReg (aop1, offset1, XL_IDX) && aopIsOp8_2 (aop0, offset0) && aop0->type != AOP_LIT && aop0->type != AOP_DIR);
+}
+
+/*-----------------------------------------------------------------*/
 /* aopIsAcc16 - asmop at offset can be used as left 16-bit operand 
-              to two-operand instruction                           */
+                to two-operand instruction                         */
 /*-----------------------------------------------------------------*/
 static bool
 aopIsAcc16 (const asmop *aop, int offset)
@@ -446,7 +458,8 @@ static bool
 aopAre16_2 (const asmop *aop0, int offset0, const asmop *aop1, int offset1)
 {
   return (aopIsAcc16 (aop0, offset0) && (aopIsOp16_2 (aop1, offset1) || aopIsAcc16 (aop1, offset1)) &&
-    !(aopInReg (aop0, offset0, Z_IDX) && aopInReg (aop1, offset1, X_IDX)));
+    !(aopInReg (aop0, offset0, Z_IDX) && aopInReg (aop1, offset1, X_IDX)) ||
+    aopInReg (aop1, offset1, Y_IDX) && aopIsOp16_2 (aop0, offset0) && aop0->type != AOP_LIT && aop0->type != AOP_DIR);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1128,7 +1141,7 @@ emit3_o (const enum asminst inst, asmop *op0, int offset0, asmop *op1, int offse
     return;
 
   bool wide = // Same order as in emit3cost above
-    (inst == A_SBCW || inst == A_SUBW || inst == A_ADCW || inst == A_ADDW || inst == A_ORW ||
+    (inst == A_SBCW || inst == A_SUBW || inst == A_ADCW || inst == A_ADDW || inst == A_ORW || inst == A_XORW ||
     inst == A_LDW ||
     inst == A_CLRW || inst == A_DECW || inst == A_INCW || inst == A_TSTW ||
     inst == A_RLCW || inst == A_RRCW ||
@@ -1909,7 +1922,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     {
       if (aopOnStack (result, roffset + i, 1)) // Check that we don't overwrite a still-needed byte on the stack.
         for (int j = 0; j < n; j++)
-          if (!assigned[j] && aopOnStack (source, soffset + j, 1) && result->aopu.stk_off + roffset + i == source->aopu.stk_off + soffset + j)
+          if (!assigned[j] && aopOnStack (source, soffset + j, 1) && result->aopu.bytes[roffset + i].byteu.stk == source->aopu.bytes[soffset + j].byteu.stk)
             {
               i++;
               goto outer_continue;
@@ -2695,6 +2708,9 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
     {
        bool xl_free = regDead (XL_IDX, ic) && left_aop->regs[XL_IDX] <= i && right_aop->regs[XL_IDX] <= i && (result_aop->regs[XL_IDX] < 0 || result_aop->regs[XL_IDX] >= i);
        bool xh_free = regDead (XH_IDX, ic) && left_aop->regs[XH_IDX] <= i && right_aop->regs[XH_IDX] <= i && (result_aop->regs[XH_IDX] < 0 || result_aop->regs[XH_IDX] >= i);
+       bool yl_free = regDead (YL_IDX, ic) && left_aop->regs[YL_IDX] <= i && right_aop->regs[YL_IDX] <= i && (result_aop->regs[YL_IDX] < 0 || result_aop->regs[YL_IDX] >= i);
+       bool yh_free = regDead (YH_IDX, ic) && left_aop->regs[YH_IDX] <= i && right_aop->regs[YH_IDX] <= i && (result_aop->regs[YH_IDX] < 0 || result_aop->regs[YH_IDX] >= i);
+       bool y_free = yl_free && yh_free;
 
        if (aopIsLitVal (right_aop, i, 1, 0x00))
          {
@@ -2704,35 +2720,67 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
            i = end;
            continue;
          }
+       else if (aopIsLitVal (left_aop, i, 1, 0x00))
+         {
+           int end;
+           for(end = i; end < size && aopIsLitVal (left_aop, end, 1, 0x00); end++);
+           genMove_o (result_aop, i, right_aop, i, end - i, xl_free, xh_free, false, false, true);
+           i = end;
+           continue;
+         }
 
-       if (aopSame (result_aop, i, left_aop, i, 1) && aopIsAcc8 (left_aop, i) && aopIsOp8_2 (right_aop, i))
+       if (i + 1 < size && aopAre16_2 (result_aop, i, right_aop, i) &&
+         !(aopRS (right_aop) && aopRS (result_aop) && (result_aop->aopu.bytes[i].in_reg && right_aop->regs[result_aop->aopu.bytes[i].byteu.reg->rIdx] >= i || result_aop->aopu.bytes[i + 1].in_reg && right_aop->regs[result_aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
+         {
+           genMove_o (result_aop, i, left_aop, i, 2, xl_free && right_aop->regs[XL_IDX] < i, xh_free && right_aop->regs[XH_IDX] < i, false, false, true);
+           if ((aopInReg (result_aop, i, XL_IDX) || aopInReg (result_aop, i, ZL_IDX)) &&
+             aopIsLitVal (right_aop, i + 1, 1, 0x00)) // Avoid xorw x/z, #ii, when xor xl/zl, #i will do.
+             emit3_o (A_XOR, result_aop, i, right_aop, i);
+           else
+             emit3_o (A_XORW, result_aop, i, right_aop, i);
+           i += 2;
+           continue;
+         }
+       else if (i + 1 < size && aopAre16_2 (result_aop, i, left_aop, i) && !(aopInReg (result_aop, i, Z_IDX) && aopInReg (left_aop, i, X_IDX)) &&
+         !(aopRS (left_aop) && aopRS (result_aop) && (result_aop->aopu.bytes[i].in_reg && left_aop->regs[result_aop->aopu.bytes[i].byteu.reg->rIdx] >= i || result_aop->aopu.bytes[i + 1].in_reg && left_aop->regs[result_aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
+         {
+           genMove_o (result_aop, i, right_aop, i, 2, xl_free && left_aop->regs[XL_IDX] < i, xh_free && left_aop->regs[XH_IDX] < i, false, false, true);
+           if ((aopInReg (result_aop, i, XL_IDX) || aopInReg (result_aop, i, ZL_IDX)) &&
+             aopIsLitVal (left_aop, i + 1, 1, 0x00)) // Avoid xorw x/z, #ii, when xor xl/zl, #i will do.
+             emit3_o (A_XOR, result_aop, i, left_aop, i);
+           else
+             emit3_o (A_XORW, result_aop, i, left_aop, i);
+           i += 2;
+           continue;
+         }
+       else if (i + 1 < size && y_free && aopOnStack (result_aop, i, 2) && aopOnStack (left_aop, i, 2) && aopIsOp16_2 (right_aop, i))
+         {
+           genMove_o (ASMOP_Y, 0, left_aop, i, 2, xl_free && right_aop->regs[XL_IDX] < i, xh_free && right_aop->regs[XH_IDX] < i, true, false, true);
+           emit3_o (A_XORW, ASMOP_Y, 0, right_aop, i);
+           genMove_o (result_aop, i, ASMOP_Y, 0, 2, xl_free, xh_free, true, false, true);
+           i += 2;
+           continue;
+         }
+
+
+       if (aopSame (result_aop, i, left_aop, i, 1) && aopAre8_2 (left_aop, i, right_aop, i))
          {
            emit3_o (A_XOR, result_aop, i, right_aop, i);
            i++;
            continue;
          }
-       else if (aopSame (result_aop, i, right_aop, i, 1) && aopIsAcc8 (right_aop, i) && aopIsOp8_2 (left_aop, i))
+       else if (aopSame (result_aop, i, right_aop, i, 1) && aopAre8_2 (right_aop, i, left_aop, i))
          {
            emit3_o (A_XOR, result_aop, i, left_aop, i);
            i++;
            continue;
          }
 
-       if (!xl_free)
+       if (!xl_free && aopInReg (result_aop, i, XL_IDX))
          UNIMPLEMENTED;
 
-       if (aopSame (left_aop, i, result_aop, i, 1) && aopIsAcc8 (result_aop, i) && aopIsOp8_2 (right_aop, i))
-         {
-           emit3_o (A_XOR, result_aop, i, right_aop, i);
-           i++;
-           continue;
-         }
-       else if (aopSame (right_aop, i, result_aop, i, 1) && aopIsAcc8 (result_aop, i) && aopIsOp8_2 (left_aop, i))
-         {
-           emit3_o (A_XOR, result_aop, i, left_aop, i);
-           i++;
-           continue;
-         }
+       if (!xl_free)
+         push (ASMOP_XL, 0, 1);
 
        if (aopIsOp8_2 (right_aop, i))
          {
@@ -2746,8 +2794,10 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
          }
        else
          UNIMPLEMENTED;
-
        genMove_o (result_aop, i, ASMOP_XL, 0, true, false, false, false, false, true);
+       if (!xl_free)
+         pop (ASMOP_XL, 0, 1);
+
        i++;
     }
 }
@@ -4584,8 +4634,8 @@ genOr (const iCode *ic)
            continue;
          }
 
-       if (i + 1 < size && aopIsAcc16 (result->aop, i) && aopIsOp16_2 (right->aop, i) && !(aopInReg (result->aop, i, Z_IDX) && aopInReg (right->aop, i, X_IDX)) &&
-         !(aopRS (right->aop) && (right->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] >= i || right->aop->regs[result->aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
+       if (i + 1 < size && aopAre16_2 (result->aop, i, right->aop, i) &&
+         !(aopRS (right->aop) && aopRS (result->aop) && (result->aop->aopu.bytes[i].in_reg && right->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] >= i || result->aop->aopu.bytes[i + 1].in_reg && right->aop->regs[result->aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
          {
            genMove_o (result->aop, i, left->aop, i, 2, xl_free && right->aop->regs[XL_IDX] < i, xh_free && right->aop->regs[XH_IDX] < i, false, false, true);
            if ((aopInReg (result->aop, i, XL_IDX) || aopInReg (result->aop, i, ZL_IDX)) &&
@@ -4596,8 +4646,8 @@ genOr (const iCode *ic)
            i += 2;
            continue;
          }
-       else if (i + 1 < size && aopIsAcc16 (result->aop, i) && aopIsOp16_2 (left->aop, i)  && !(aopInReg (result->aop, i, Z_IDX) && aopInReg (left->aop, i, X_IDX)) &&
-         !(aopRS (left->aop) && (left->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] >= i || left->aop->regs[result->aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
+       else if (i + 1 < size && aopAre16_2 (result->aop, i, left->aop, i) && !(aopInReg (result->aop, i, Z_IDX) && aopInReg (left->aop, i, X_IDX)) &&
+         !(aopRS (left->aop) && aopRS (result->aop) && (result->aop->aopu.bytes[i].in_reg && left->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] >= i || result->aop->aopu.bytes[i + 1].in_reg && left->aop->regs[result->aop->aopu.bytes[i + 1].byteu.reg->rIdx] >= i)))
          {
            genMove_o (result->aop, i, right->aop, i, 2, xl_free && left->aop->regs[XL_IDX] < i, xh_free && left->aop->regs[XH_IDX] < i, false, false, true);
            if ((aopInReg (result->aop, i, XL_IDX) || aopInReg (result->aop, i, ZL_IDX)) &&
@@ -4616,13 +4666,13 @@ genOr (const iCode *ic)
            i += 2;
            continue;
          }
-       else if (aopSame (result->aop, i, left->aop, i, 1) && aopIsAcc8 (left->aop, i) && aopIsOp8_2 (right->aop, i))
+       else if (aopSame (result->aop, i, left->aop, i, 1) && aopAre8_2 (left->aop, i, right->aop, i))
          {
            emit3_o (A_OR, result->aop, i, right->aop, i);
            i++;
            continue;
          }
-       else if (aopSame (result->aop, i, right->aop, i, 1) && aopIsAcc8 (right->aop, i) && aopIsOp8_2 (left->aop, i))
+       else if (aopSame (result->aop, i, right->aop, i, 1) && aopAre8_2 (right->aop, i, left->aop, i))
          {
            emit3_o (A_OR, result->aop, i, left->aop, i);
            i++;
@@ -4717,14 +4767,14 @@ genAnd (const iCode *ic, iCode *ifx)
             }
           cost (2, 1);
         }
-      /*else if (byteOfVal (right->aop->aopu.aop_lit, i) == 0x80 && // Use tstw - not yet decided if it will be in arch
+      else if (byteOfVal (right->aop->aopu.aop_lit, i) == 0x80 && // Use tstw
         aopInReg (left->aop, i, YH_IDX))
         {
           emit3 (A_TSTW, ASMOP_Y, 0);
           if (!regalloc_dry_run)
             emit2 (IC_TRUE (ifx) ? "jrnn" : "jrn", "!tlabel", labelKey2num (tlbl->key));
           cost (2, 1);
-        }*/
+        }
       else // and in xl.
         {
           if (!regDead (XL_IDX, ic))
@@ -4767,13 +4817,13 @@ genAnd (const iCode *ic, iCode *ifx)
            continue;
          }
 
-       if (aopSame (result->aop, i, left->aop, i, 1) && aopIsAcc8 (left->aop, i) && aopIsOp8_2 (right->aop, i))
+       if (aopSame (result->aop, i, left->aop, i, 1) && aopAre8_2 (left->aop, i, right->aop, i))
          {
            emit3_o (A_AND, result->aop, i, right->aop, i);
            i++;
            continue;
          }
-       else if (aopSame (result->aop, i, right->aop, i, 1) && aopIsAcc8 (right->aop, i) && aopIsOp8_2 (left->aop, i))
+       else if (aopSame (result->aop, i, right->aop, i, 1) && aopAre8_2 (right->aop, i, left->aop, i))
          {
            emit3_o (A_AND, result->aop, i, left->aop, i);
            i++;

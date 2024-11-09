@@ -387,7 +387,7 @@ u8_t allowed_prefs[256]= {
   /* 4_ */    PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,
   /* 5_ */    PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,
   /* 6_ */    PN,PN,PD,PN,  PN,PW,PN,PW,  PN,PN,PN,PN,  PN,PN,PN,PN,
-  /* 7_ */    PA,PA,PA,PA,  PA,PA,PA,PA,  PA,PA,PA,PA,  PA,PA,PA,PA, // Not correct - this line is too permissive for the 16-bti two-operand instructions.
+  /* 7_ */    PA,PA,PA,PA,  PD,PA,PA,PA,  PD,PA,PA,PA,  PD,PA,PA,PA, // Not correct - this line is too permissive for the 16-bti two-operand instructions.
   /* 8_ */    PD,PD,PD,PD,  PD,PD,PA,PA,  PA,PA,PA,PD,  PD,PD,PD,PD,
   /* 9_ */    PN,PD,PD,P6,  PN,PD,PD,PD,  PD,PD,PD,PN,   0, 0, 0, 0,
   /* a_ */    PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,
@@ -395,7 +395,7 @@ u8_t allowed_prefs[256]= {
   /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
   /* d_ */    PA,PN,PN,PN,  PN,PN,PN,PN,  PS,PN,PN,PN,  PN,PS,PN,PS,
   /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,PD,PD,
-  /* f_ */    PD,PD,PD,PD,  PN,PN,P6,PN,  P6,PN,P6,P6,  PD,PD,PD,PD // Not correct - this line is too permissive for the 16-bti two-operand instructions.
+  /* f_ */    PD,PA,PA,PA,  PN,PN,P6,PN,  P6,PN,P6,P6,  PD,PA,PA,PA // Not correct - this line is too permissive for the 16-bti two-operand instructions.
 };
 
 

@@ -5630,20 +5630,10 @@ genPointerGet (const iCode *ic, iCode *ifx)
             }
           emit3 (A_TSTW, ASMOP_Y, 0);
         }
-      else if (!wide && (y_dead || aopInReg (left->aop, 0, Y_IDX)) && regDead (XL_IDX, ic) && offset <= 255)
+      else if (!wide && (y_dead || aopInReg (left->aop, 0, Y_IDX)) && offset <= 255)
         {
           genMove (ASMOP_Y, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, regDead (Z_IDX, ic));
-          if (!offset)
-            {
-              emit2 ("ld", "xl, (y)");
-              cost (1, 1);
-            }
-          else
-            {
-              emit2 ("ld", "xl, (%u, y)", (unsigned int)offset);
-              cost (2, 1);
-            }
-          emit3 (A_TST, ASMOP_XL, 0);
+          emit2 ("tst", "(%u, y)", (unsigned int)offset);
         }
       else if (wide && regDead (Z_IDX, ic))
         {
@@ -5911,7 +5901,7 @@ genPointerSet (const iCode *ic)
     }
   else if (!bit_field && size == 2 && aopOnStackNotExt (left->aop, 0, 2) &&
     (!regalloc_dry_run || !f8_extend_stack) && // Avoid getting into a situation where stack allocation make scode generation impossible
-    (right->aop->type == AOP_DIR || aopOnStack (right->aop, 0, 2)) &&
+    (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || aopOnStack (right->aop, 0, 2)) &&
     (regDead (Y_IDX, ic) || regDead (X_IDX, ic)))
     {
       unsigned int soffset = left->aop->aopu.bytes[0].byteu.stk + G.stack.pushed;
@@ -5980,6 +5970,12 @@ genPointerSet (const iCode *ic)
               emit2 ("ld", "(%d, y), %s", i, aopGet (right->aop, i));
               cost (2 + !aopInReg (right->aop, i, XL_IDX), 1);
             }
+          continue;
+        }
+      else if (!bit_field && aopIsLitVal (right->aop, i, 1, 0x00))
+        {
+          emit2 ("clr", "(%d, y)", i);
+          cost (2, 1);
           continue;
         }
 

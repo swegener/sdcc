@@ -542,15 +542,18 @@ f8MightRead (const lineNode *pl, const char *what)
       return false;
     }
   // 8-bit 1-op inst, and some others
-  if (ISINST (pl->line, "clr") || ISINST (pl->line, "pop"))
+  if (ISINST (pl->line, "pop"))
     return false;
+  if (ISINST (pl->line, "clr"))
+    {
+      const char *larg = leftArg (pl->line);
+      return (larg[0] == '(' && argCont (larg, extra));
+    }
   if (ISINST (pl->line, "bool") || ISINST (pl->line, "dec") || ISINST (pl->line, "inc") || ISINST (pl->line, "push") || ISINST (pl->line, "rlc") || ISINST (pl->line, "rot") || ISINST (pl->line, "rrc") || ISINST (pl->line, "sll") || ISINST (pl->line, "sra") || ISINST (pl->line, "srl") || ISINST (pl->line, "tst") || ISINST (pl->line, "xchb"))
     {
       const char *larg = leftArg (pl->line);
 
-      if (larg[0] == what[0] && larg[1] == what[1] || argCont (larg, extra))
-        return true;
-      return false;
+      return (larg[0] == what[0] && larg[1] == what[1] || argCont (larg, extra));
     }
   // 16-bit 2/1-op inst, and some others.
   if (ISINST (pl->line, "clrw") || ISINST (pl->line, "popw"))

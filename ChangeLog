@@ -1,3 +1,8 @@
+2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  Fix generation of invalid asm for bit-field read.
+
 2024-11-08 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,

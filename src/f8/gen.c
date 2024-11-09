@@ -5608,7 +5608,7 @@ genPointerGet (const iCode *ic, iCode *ifx)
             }
           else
             {
-              emit2 ("ldw", "xl, (%u, y)", (unsigned int)offset);
+              emit2 ("ld", "xl, (%u, y)", (unsigned int)offset);
               cost (2, 1);
             }
         }

@@ -415,8 +415,8 @@ aopIsAcc16 (const asmop *aop, int offset)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopIsOp16_2 - asmop at offset can be used at 8-bit operand to
-                 two-operand instruction                            */
+/* aopIsOp16_2 - asmop at offset can be used as 16-bit operand to
+                 two-operand instruction                           */
 /*-----------------------------------------------------------------*/
 static bool
 aopIsOp16_2 (const asmop *aop, int offset)
@@ -428,7 +428,7 @@ aopIsOp16_2 (const asmop *aop, int offset)
 
 /*-----------------------------------------------------------------*/
 /* aopIsOp16_1 - asmop at offset can be used at 16-bit operand to
-                 one-operand instruction                            */
+                 one-operand instruction                           */
 /*-----------------------------------------------------------------*/
 static bool
 aopIsOp16_1 (const asmop *aop, int offset)
@@ -436,6 +436,30 @@ aopIsOp16_1 (const asmop *aop, int offset)
   return (aop->type == AOP_DIR && offset + 1 < aop->size ||
     aopOnStack (aop, offset, 2) ||
     aopInReg (aop, offset, Y_IDX) || aopInReg (aop, offset, X_IDX) || aopInReg (aop, offset, Z_IDX));
+}
+
+/*-----------------------------------------------------------------*/
+/* aopAreOp16_2 - asmops at offsets can be used as 16-bit operand to
+                  two-operand instruction                          */
+/*-----------------------------------------------------------------*/
+static bool
+aopAre16_2 (const asmop *aop0, int offset0, const asmop *aop1, int offset1)
+{
+  return (aopIsAcc16 (aop0, offset0) && (aopIsOp16_2 (aop1, offset1) || aopIsAcc16 (aop1, offset1)) &&
+    !(aopInReg (aop0, offset0, Z_IDX) && aopInReg (aop1, offset1, X_IDX)));
+}
+
+/*-----------------------------------------------------------------*/
+/* aopAreOpExt - asmops at offsets can be used as operands to
+                 zeor/sign extension instruction                   */
+/*-----------------------------------------------------------------*/
+static bool
+aopAreExt (const asmop *aop0, int offset0, const asmop *aop1, int offset1)
+{
+  return (
+    aopInReg (aop0, offset0, Y_IDX) && (aopInReg (aop1, offset1, XL_IDX) || aopInReg (aop1, offset1, XH_IDX) || aopInReg (aop1, offset1, ZH_IDX)) ||
+    aopInReg (aop0, offset0, X_IDX) && aopInReg (aop1, offset1, ZL_IDX) ||
+    aopInReg (aop0, offset0, Z_IDX) && (aopInReg (aop1, offset1, YL_IDX) || aopInReg (aop1, offset1, YH_IDX)));
 }
 
 // Get aop at offset as 8-bit operand.
@@ -670,10 +694,10 @@ op2w_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int 
     }
 
   if (r0Idx == Y_IDX)
-    if (r1Idx == X_IDX)
+    if (r1Idx >= 0)
       {
-        *prefixes = 0;
-        return 1;
+        *prefixes = (r1Idx != X_IDX);
+        return 1 + (r1Idx != X_IDX);
       }
     else if (op1->type == AOP_LIT || op1->type == AOP_IMMD ||
       offset1 >= op1->size ||
@@ -1850,9 +1874,11 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       }
 
   // Try to use zex.
-  if (n == 1 && sizex == 2 && /*aopIsAcc16 (result, roffset) */ aopInReg (result, roffset, Y_IDX) && aopInReg (source, soffset, XL_IDX)) // todo: reenable zex use with fixed right operand!
+  if (n == 1 && sizex == 2 && aopAreExt (result, roffset, source, soffset))
     {
-      emit2 ("zex", "%s, xl", aopGet2 (result, roffset));
+      char *s = Safe_strdup (aopGet (source, soffset)); 
+      emit2 ("zex", "%s, %s", aopGet2 (result, roffset), s);
+      Safe_free (s);
       cost (1 + !aopInReg (result, roffset, Y_IDX), 1 + !aopInReg (result, roffset, Y_IDX));
       assigned[0] = true;
       assigned[1] = true;
@@ -2836,7 +2862,8 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
 
       if (!started && !maskedword && aopSame (result_aop, i, left_aop, i, 1) && aopIsOp8_1 (left_aop, i) && // Use in-place inc / dec
-         (aopIsLitVal (right_aop, i, 1, 1) || aopIsLitVal (right_aop, i, 1, 0xffff)))
+         (aopIsLitVal (right_aop, i, 1, 1) || aopIsLitVal (right_aop, i, 1, 0xffff)) &&
+         !aopAre16_2 (left_aop, i, right_aop, i)) // Fall throught o 16-bit operation below, if that is more efficient than two 8-bit ones.
          {
            emit3_o (aopIsLitVal (right_aop, i, 1, 1) ? A_DEC : A_INC, left_aop, i, 0, 0);
            i++;
@@ -2844,7 +2871,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
            continue;
          }
 
-      if (i + 1 < size && !maskedword && aopIsOp16_2 (right_aop, i) &&
+      if (i + 1 < size && !maskedword && (aopIsOp16_2 (right_aop, i) || aopIsAcc16 (right_aop, i)) &&
         (aopInReg (left_aop, i, X_IDX) && regDead (X_IDX, ic) || aopInReg (left_aop, i, Y_IDX) && regDead (Y_IDX, ic) || aopInReg (left_aop, i, Z_IDX) && regDead (Z_IDX, ic) && !aopInReg (right_aop, i, X_IDX)))
         {
           if (aopIsLitVal (right_aop, i, 2, 0xffff))
@@ -2855,11 +2882,10 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
           i += 2;
         }
-      else if (i + 1 < size && !maskedword && aopIsOp16_2 (right_aop, i) &&
-        (aopInReg (result_aop, i, X_IDX) && regDead (X_IDX, ic) && left_aop->regs[XL_IDX] < i + 1 && left_aop->regs[XH_IDX] < i + 1 && right_aop->regs[XL_IDX] < i + 1 && right_aop->regs[XH_IDX] < i + 1 ||
-          aopInReg (result_aop, i, Y_IDX) && regDead (Y_IDX, ic) && left_aop->regs[YL_IDX] < i + 1 && left_aop->regs[YH_IDX] < i + 1 && right_aop->regs[YL_IDX] < i + 1 && right_aop->regs[YH_IDX] < i + 1||
-          aopInReg (result_aop, i, Z_IDX) && regDead (Z_IDX, ic) && !aopInReg (right_aop, i, X_IDX) && left_aop->regs[ZL_IDX] < i + 1 && left_aop->regs[ZH_IDX] < i + 1 && right_aop->regs[ZL_IDX] < i + 1 && right_aop->regs[ZH_IDX] < i + 1 ||
-          aopIsAcc16 (result_aop, i) && left_aop->type == AOP_STL))
+      else if (i + 1 < size && !maskedword && (aopIsOp16_2 (right_aop, i) || aopIsAcc16 (right_aop, i)) &&
+        (aopInReg (result_aop, i, X_IDX) && regDead (X_IDX, ic) && left_aop->regs[XL_IDX] <= i + 1 && left_aop->regs[XH_IDX] <= i + 1 && right_aop->regs[XL_IDX] < i && right_aop->regs[XH_IDX] < i ||
+          aopInReg (result_aop, i, Y_IDX) && regDead (Y_IDX, ic) && left_aop->regs[YL_IDX] <= i + 1 && left_aop->regs[YH_IDX] <= i + 1 && right_aop->regs[YL_IDX] < i && right_aop->regs[YH_IDX] < i ||
+          aopInReg (result_aop, i, Z_IDX) && regDead (Z_IDX, ic) && !aopInReg (right_aop, i, X_IDX) && left_aop->regs[ZL_IDX] <= i + 1 && left_aop->regs[ZH_IDX] <= i + 1 && right_aop->regs[ZL_IDX] < i && right_aop->regs[ZH_IDX] < i))
         {
           genMove_o (result_aop, i, left_aop, i, 2, false, false, false, false, !started);
           emit3sub_o (started ? A_SBCW : A_SUBW, result_aop, i, right_aop, i);
@@ -3798,7 +3824,7 @@ genPlus (const iCode *ic)
            continue;
          }
 
-       if (i + 1 < size && !maskedword && aopSame (result->aop, i, leftop, i, 2) && aopIsAcc16 (leftop, i) && aopIsOp16_2 (rightop, i) && !(aopInReg (result->aop, i, Z_IDX) && aopInReg (rightop, i, X_IDX))) // Use addw / adcw
+       if (i + 1 < size && !maskedword && aopSame (result->aop, i, leftop, i, 2) && aopAre16_2(leftop, i, rightop, i)) // Use addw / adcw
          {
            if (!started && aopIsLitVal (rightop, i, 2, 1))
              emit3_o (A_INCW, result->aop, i, 0, 0);
@@ -3812,7 +3838,7 @@ genPlus (const iCode *ic)
            started = true;
            continue;
          }
-       else if (i + 1 < size && !maskedword && aopSame (result->aop, i, rightop, i, 2) && aopIsAcc16 (rightop, i) && aopIsOp16_2 (leftop, i) && !(aopInReg (result->aop, i, Z_IDX) && aopInReg (leftop, i, X_IDX)))
+       else if (i + 1 < size && !maskedword && aopSame (result->aop, i, rightop, i, 2) && aopAre16_2(rightop, i, leftop, i))
          {
            wassert (!aopInReg (result->aop, i, Z_IDX) || !aopInReg (leftop, i, X_IDX));
            emit3_o (started ? A_ADCW : A_ADDW, result->aop, i, leftop, i);
@@ -5880,7 +5906,7 @@ genPointerSet (const iCode *ic)
       bool xl_dead2 = regDead (XL_IDX, ic) && (right->aop->regs[XL_IDX] <= i + 1);
       bool xh_dead2 = regDead (XH_IDX, ic) && (right->aop->regs[XH_IDX] <= i + 1);
       bool x_dead2 = xl_dead2 && xh_dead2;
-emit2 (";", "xl_dead %d", xl_dead);
+
       if (!bit_field && i + 1 < size &&
         (aopInReg (right->aop, i, X_IDX) || x_dead2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2))))
         {

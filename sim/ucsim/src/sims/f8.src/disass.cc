@@ -123,6 +123,16 @@ cl_f8::a16_name(u8_t prefs)
 }
 
 const char *
+cl_f8::r16_name(u8_t prefs)
+{
+  if (prefs & (P_ALT2))
+    return "y";
+  else if (prefs & (P_ALT3 | P_ALT5))
+    return "z";
+  return "x";
+}
+
+const char *
 cl_f8::a16h_name(u8_t prefs)
 {
   if (prefs & (P_ALT2 | P_ALT4))
@@ -363,6 +373,10 @@ cl_f8::disassc(t_addr addr, chars *comment)
 
 	    case 'A': // 16 bit accumulator, selected by prefix
 	      word->append(a16_name(prefs));
+	      break;
+
+            case 'R': // 16 bit register, corresponding to 8 bit accumulator, selected by prefix
+	      word->append(r16_name(prefs));
 	      break;
 
 	    case 'H': // upper half of 16 bit accumulator, selected by prefix

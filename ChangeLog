@@ -1,5 +1,18 @@
 2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* sdas/asf8/f8.h,
+	  sdas/asf8/f8mch.c,
+	  sim/ucsim/src/sims/f8.src/disass.cc,
+	  sim/ucsim/src/sims/f8.src/f8.cc,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/ialu.cc:
+	  Fixes for two-operand 16 and 16/8 bit f8 instructions.
+	  src/f8/gen.c:
+	  Improve use of prefixed two-operand 16 and 16/8 bit f8 instructions.
+
+2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/f8/gen.c:
 	  Fix generation of invalid asm for bit-field read.
 	* sim/ucsim/src/sims/f8.src/decode.h,
@@ -89,7 +102,7 @@
 2024-10-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3788.c:
-	  Disable a test that assuems SDCC implementation-defined behaviour for host.
+	  Disable a test that assumes SDCC implementation-defined behaviour for host.
 	* src/z80/peeph.def:
 	  z80 peephole optimizer rule improvements.
 	* src/z80/gen.c:

@@ -160,4 +160,5 @@ extern	int		setbit(int b);
 extern	int		getbit(void);
 extern	void	altacc(int reg);
 extern	void	altaccw(int reg);
+extern	void	altaccw2(int reg0, int reg1);
 

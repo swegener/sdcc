@@ -125,6 +125,7 @@ public:
   t_addr sp_limit;
   class cl_cell8 *acc8;
   class cl_cell16 *acc16;
+  class cl_cell16 *rop16; // The 16-bit register that acc8 is part of.
   int prefixes;
 public:
   cl_f8(class cl_sim *asim);
@@ -146,6 +147,7 @@ public:
   virtual u16_t a16(u8_t prefs);
   virtual const char *a8_name(u8_t prefs);
   virtual const char *a16_name(u8_t prefs);
+  virtual const char *r16_name(u8_t prefs);
   virtual const char *a16h_name(u8_t prefs);
   virtual const char *a16l_name(u8_t prefs);
   virtual char *disassc(t_addr addr, chars *comment=NULL);

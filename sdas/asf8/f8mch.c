@@ -332,20 +332,22 @@ struct mne *mp;
 		}
 		else if(t1 != S_REG)
 			aerr();
-		altaccw(r1);
 
 		switch(t2) {
 		case S_IMM:
+			altaccw(r1);
 			if(rf == S_2OPWSUB || rf == S_2OPWSBC) // Immediate operand invalid for subw and sbcw.
 				aerr();
 			outab(op | 0x00);
 			outrw(&e2, R_USGN);
 			break;
 		case S_DIR:
+			altaccw(r1);
 			outab(op | 0x01);
 			outrw(&e2, R_USGN);
 			break;
 		case S_SPREL:
+			altaccw(r1);
 			outab(op | 0x02);
 			if(ls_mode(&e1))
 				aerr();
@@ -353,10 +355,9 @@ struct mne *mp;
 				outrb(&e2, R_USGN);
 			break;
 		case S_REG:
-			if(r1 == Y && r2 == X || r1 == Z && r2 == Y || r1 == X && r2 == Z) {
-				outab(op | 0x03);
-				break;
-			}
+			altaccw2(r1,r2);
+			outab(op | 0x03);
+			break;
 		default:
 			aerr();
 		}
@@ -1273,5 +1274,20 @@ void altaccw(int reg)
 		else
 			aerr();
 	}
+}
+
+extern
+void altaccw2(int reg0, int reg1)
+{
+	if(reg0 == Y && reg1 == X)
+		;
+	else if (reg0 == Z && reg1 == Y)
+		outab(OPCODE_ALTACC2);
+	else if (reg0 == X && reg1 == Z)
+		outab(OPCODE_ALTACC3);
+	else if (reg0 == Y && reg1 == Z)
+		outab(OPCODE_ALTACC5);
+	else
+		aerr ();
 }
 

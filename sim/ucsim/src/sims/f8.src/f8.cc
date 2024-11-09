@@ -383,6 +383,7 @@ cl_f8::clear_prefixes()
   prefixes= P_NONE;
   acc8= &cXL;
   acc16= &cY;
+  rop16 = &cX;
 }
 
 int
@@ -426,26 +427,31 @@ cl_f8::exec_inst(void)
     {
       acc8 = &cXH;
       acc16= &cY;
+      rop16 = &cX;
     }
   else if (prefixes & P_ALT2)
     {
       acc8 = &cYL;
       acc16= &cZ;
+      rop16 = &cY;
     }
   else if (prefixes & P_ALT3)
     {
       acc8 = &cZL;
       acc16= &cX;
+      rop16 = &cZ;
     }
   else if (prefixes & P_ALT4)
     {
       acc8 = &cYH;
       acc16= &cZ;
+      rop16 = &cY;
     }
   else if (prefixes & P_ALT5)
     {
       acc8 = &cZH;
       acc16= &cY;
+      rop16 = &cZ;
     }
   /*
     // clear_prefixes() prepares this state

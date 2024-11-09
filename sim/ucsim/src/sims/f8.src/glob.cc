@@ -91,8 +91,8 @@ struct dis_entry disass_f8[]=
     { 0x74, 0xff, ' ', 1, "ldw ('dsp_16'),%A" },
     { 0xdc, 0xff, ' ', 2, "ldw %A,z" },
 
-    { 0xc1, 0xed, ' ', 3, "ldi (z),'a16_16'" },
-    { 0xc1, 0xcf, ' ', 3, "ldwi (z),'a16_16'" },
+    { 0xed, 0xff, ' ', 3, "ldi (z),(%A)" },
+    { 0xcf, 0xff, ' ', 3, "ldwi (z),(%A)" },
 
     { 0x60, 0xff, ' ', 3, "push 'a16_8'" },
     { 0x61, 0xff, ' ', 2, "push ('nsp_8')" },
@@ -207,29 +207,29 @@ struct dis_entry disass_f8[]=
 
     { 0x71, 0xff, ' ', 3, "subw %A,'a16_16'" },
     { 0x72, 0xff, ' ', 2, "subw %A,('nsp_16')" },
-    { 0x73, 0xff, ' ', 1, "subw %A,x" },
+    { 0x73, 0xff, ' ', 1, "subw %A,%R" },
     { 0x75, 0xff, ' ', 3, "sbcw %A,'a16_16'" },
     { 0x76, 0xff, ' ', 2, "sbcw %A,('nsp_16')" },
-    { 0x77, 0xff, ' ', 1, "sbcw %A,x" },
+    { 0x77, 0xff, ' ', 1, "sbcw %A,%R" },
 
     { 0x78, 0xff, ' ', 3, "addw %A,#'i16'" },
     { 0x79, 0xff, ' ', 3, "addw %A,'a16_16'" },
     { 0x7a, 0xff, ' ', 2, "addw %A,('nsp_16')" },
-    { 0x7b, 0xff, ' ', 1, "addw %A,x" },
+    { 0x7b, 0xff, ' ', 1, "addw %A,%R" },
     { 0x7c, 0xff, ' ', 3, "adcw %A,#'i16'" },
     { 0x7d, 0xff, ' ', 3, "adcw %A,'a16_16'" },
     { 0x7e, 0xff, ' ', 2, "adcw %A,('nsp_16')" },
-    { 0x7f, 0xff, ' ', 1, "adcw %A,x" },
+    { 0x7f, 0xff, ' ', 1, "adcw %A,%R" },
 
     { 0xf0, 0xff, ' ', 3, "orw %A,#'i16'" },
     { 0xf1, 0xff, ' ', 3, "orw %A,'a16_16'" },
     { 0xf2, 0xff, ' ', 2, "orw %A,('nsp_16')" },
-    { 0xf3, 0xff, ' ', 1, "orw %A,x" },
+    { 0xf3, 0xff, ' ', 1, "orw %A,%R" },
 
     { 0xfc, 0xff, ' ', 3, "xorw %A,#'i16'" },
     { 0xfd, 0xff, ' ', 3, "xorw %A,'a16_16'" },
     { 0xfe, 0xff, ' ', 2, "xorw %A,('nsp_16')" },
-    { 0xff, 0xff, ' ', 1, "xorw %A,x" },
+    { 0xff, 0xff, ' ', 1, "xorw %A,%R" },
 
     { 0x40, 0xff, ' ', 3, "srl 'a16_8'" },
     { 0x41, 0xff, ' ', 2, "srl ('nsp_8')" },
@@ -305,8 +305,8 @@ struct dis_entry disass_f8[]=
     { 0xf6, 0xff, ' ', 1, "incnw %A"},
     { 0xf7, 0xff, ' ', 2, "decw ('nsp_16')"},
     { 0xe5, 0xff, ' ', 1, "sllw %A,xl"},
-    { 0xee, 0xff, ' ', 1, "sex %A,xl"},
-    { 0xef, 0xff, ' ', 1, "sex %A,xl"},
+    { 0xee, 0xff, ' ', 1, "sex %A,%a"},
+    { 0xef, 0xff, ' ', 1, "zex %A,%a"},
 
     // branch
     { 0x64, 0xff, ' ', 3, "jp #'a16'" },
@@ -370,12 +370,11 @@ u16_t tick_tab_f8[256]= {
 enum {
   // shorts for allowed prefixes
   PN		= P_NONE,                                    // none
-  PS		= P_SWAP,                                    // 0
-  PA		= P_SWAP|P_ALT1|P_ALT2|P_ALT3|P_ALT4|P_ALT5, // 012
-  P8		= P_ALT1|P_ALT5,                             // 1
+  PS		= P_SWAP,                                    // swap
+  PA		= P_SWAP|P_ALT1|P_ALT2|P_ALT3|P_ALT4|P_ALT5, // any
+  PW            = P_ALT2|P_ALT3,                             // altacc16 selection only
   P6		= P_ALT2|P_ALT3|P_ALT4,                      // 2
-  PD		= P8|P6,                                     // 12
-  P1		= P_SWAP|P8,                                 // 01
+  PD		= P_ALT1|P_ALT2|P_ALT3|P_ALT4|P_ALT5,        // any except swap
   P2		= P_SWAP|P6                                  // 02
 };
 
@@ -385,18 +384,18 @@ u8_t allowed_prefs[256]= {
   /* 1_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
   /* 2_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
   /* 3_ */    PD,PA,PA,PA,  PA,PA,PA,PA,  PD,PA,PA,PA,  PA,PA,PA,PA,
-  /* 4_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
-  /* 5_ */    PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,  PD,PD,PD,PD,
-  /* 6_ */    PD,PD,PD,PD,  PA,P6,PN,P6,  PD,PD,PD,PD,  PD,PD,PD,PD,
-  /* 7_ */    P2,P2,P2,P2,  PD,P2,P2,P2,  P6,P2,P2,P2,  P6,P2,P2,P2,
+  /* 4_ */    PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,
+  /* 5_ */    PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,  PN,PN,PD,PN,
+  /* 6_ */    PN,PN,PD,PN,  PN,PW,PN,PW,  PN,PN,PN,PN,  PN,PN,PN,PN,
+  /* 7_ */    PA,PA,PA,PA,  PA,PA,PA,PA,  PA,PA,PA,PA,  PA,PA,PA,PA, // Not correct - this line is too permissive for the 16-bti two-operand instructions.
   /* 8_ */    PD,PD,PD,PD,  PD,PD,PA,PA,  PA,PA,PA,PD,  PD,PD,PD,PD,
   /* 9_ */    PN,PD,PD,P6,  PN,PD,PD,PD,  PD,PD,PD,PN,   0, 0, 0, 0,
-  /* a_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
-  /* b_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,PN,PN,  PN,PN,PN,PN,
+  /* a_ */    PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,
+  /* b_ */    PN,PN,PN,PW,  P6,P6,P6,P6,  P6,P6,PN,PN,  PN,PN,PN,PN,
   /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
   /* d_ */    PA,PN,PN,PN,  PN,PN,PN,PN,  PS,PN,PN,PN,  PN,PS,PN,PS,
-  /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,P6,P6,
-  /* f_ */    P6,P2,P2,P2,  PN,PN,P6,PN,  P6,PN,P6,P6,   0, 0, 0, 0
+  /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,PD,PD,
+  /* f_ */    PD,PD,PD,PD,  PN,PN,P6,PN,  P6,PN,P6,P6,  PD,PD,PD,PD // Not correct - this line is too permissive for the 16-bti two-operand instructions.
 };
 
 

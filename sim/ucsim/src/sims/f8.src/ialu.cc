@@ -215,7 +215,7 @@ cl_f8::add16(u16_t opaddr, bool usec)
 int
 cl_f8::add16(/*op2=x*/bool usec)
 {
-  class cl_cell16 *op1= acc16, *op2= &cX;
+  class cl_cell16 *op1= acc16, *op2= rop16;
   IFSWAP
     {
       op1= &cX;
@@ -253,7 +253,7 @@ cl_f8::sub16(u16_t opaddr, bool usec)
 int
 cl_f8::sub16(/*op2=x*/bool usec)
 {
-  class cl_cell16 *op1= acc16, *op2= &cX;
+  class cl_cell16 *op1= acc16, *op2= rop16;
   IFSWAP
     {
       op1= &cX;
@@ -302,7 +302,7 @@ int
 cl_f8::or16(void)
 {
   // op2=x
-  class cl_cell16 *op1= acc16, *op2= &cX;
+  class cl_cell16 *op1= acc16, *op2= rop16;
   IFSWAP
     {
       op1= &cX;
@@ -349,7 +349,7 @@ int
 cl_f8::xor16(void)
 {
   // op2=x
-  class cl_cell16 *op1= acc16, *op2= &cX;
+  class cl_cell16 *op1= acc16, *op2= rop16;
   IFSWAP
     {
       op1= &cX;
@@ -1302,7 +1302,7 @@ cl_f8::SLLW_A_XL(t_mem code)
 {
   u32_t v= acc16->get();
   rF&= ~flagZN;
-  v<<= rXL;
+  v<<= acc8->get();
   if (v & 0x10000) rF|= flagC;
   v&= 0xffff;
   if (!v) rF|= flagZ;
@@ -1315,7 +1315,7 @@ cl_f8::SLLW_A_XL(t_mem code)
 int
 cl_f8::SEX(t_mem code)
 {
-  u16_t v= rXL;
+  u16_t v= acc8->get();
   rF&= ~flagZN;
   if (v&0x80)
     {
@@ -1331,7 +1331,7 @@ cl_f8::SEX(t_mem code)
 int
 cl_f8::ZEX(t_mem code)
 {
-  u16_t v= rXL;
+  u16_t v= acc8->get();
   rF&= ~flagZ;
   if (!v) rF|= flagZ;
   acc16->W(v);

@@ -38,7 +38,7 @@
 
 // NOTE: strtoll has been derived from strtol
 
-#if __SDCC_LONGLONG
+#ifdef __SDCC_LONGLONG
 long long int strtoll(const char *nptr, char **endptr, int base)
 {
   const char *ptr = nptr;

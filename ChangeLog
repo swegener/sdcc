@@ -4,6 +4,12 @@
 	  src/f8/gen.c,
 	  src/f8/peeph.def:
 	  Improve code for conditional branches in f8 port.
+	* device/include/stdlib.h,
+	  device/lib/strtoll.c,
+	  device/lib/strtoull.c,
+	  device/lib/wcstoll.c,
+	  device/lib/wcstoull.c:
+	  Partial fix for bug #3798, to get atoll.
 
 2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -260,7 +260,9 @@ f8instructionSize (lineNode *pl)
 
   if (ISINST (pl->line, "xch") && larg[0] == 'f' && isSprel (rarg))
     return 1;
-
+  else if (ISINST (pl->line, "xch"))
+    return 1 + (larg[0] != 'y');
+  
   if (ISINST (pl->line, "addw") && !strncmp (larg, "sp", 2) && rarg[0] == '#')
     return 2;
 

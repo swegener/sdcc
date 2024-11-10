@@ -1,5 +1,12 @@
 2024-11-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* sim/ucsim/src/sims/f8.src/imove.cc:
+	  Fix handling of N and Z flags for 16-bit loads of immediates to registers.
+	* src/f8/main.c:
+	  Use Z flag of 16-bit load to shorten startup code.
+
+2024-11-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCpeeph.c,
 	  src/f8/gen.c,
 	  src/f8/peeph.def:

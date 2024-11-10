@@ -77,6 +77,9 @@ int
 cl_f8::ldw_a_i(u16_t op2)
 {
   acc16->W(op2);
+  rF&= ~(flagN|flagZ);
+  if (op2 & 0x8000) rF|= flagN;
+  if (!op2) rF|= flagZ;
   return resGO;
 }
 

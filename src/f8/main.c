@@ -243,7 +243,6 @@ f8_genInitStartup (FILE *of)
   
   /* Zeroing memory (required by standard for static & global variables) */
   fprintf (of, "\tldw z, #l_DATA\n");
-  fprintf (of, "\ttstw z\n");
   fprintf (of, "\tjrz\t#00002$\n");
   fprintf (of, "\tclr\txl\n");
   fprintf (of, "00001$:\n");
@@ -252,9 +251,8 @@ f8_genInitStartup (FILE *of)
   fprintf (of, "\tjrnz\t#00001$\n");
   fprintf (of, "00002$:\n");
 
-  /* Copy l_INITIALIZER bytes from s_INITIALIZER to s_INITIALIZED */  // TODO
+  /* Copy l_INITIALIZER bytes from s_INITIALIZER to s_INITIALIZED */
   fprintf (of, "\tldw\tz, #l_INITIALIZER\n");
-  fprintf (of, "\ttstw z\n");
   fprintf (of, "\tjrz\t#00004$\n");
   fprintf (of, "00003$:\n");
   fprintf (of, "\tld\txl, (s_INITIALIZER - 1, z)\n");

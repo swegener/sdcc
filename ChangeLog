@@ -5,9 +5,11 @@
 	* src/f8/main.c:
 	  Use Z flag of 16-bit load to shorten startup code.
 	* src/f8/peeph.def:
-	  Optimize out some f8 tst, tstw where N and Z flags were already set by previous instructions.
+	  Optimize out some f8 tst, tstw where N and Z flags were already set by previous instructions, optimize jumps.
 	* src/f8/peep.c:
 	  Fix calculation of relative jump distance over f8 xch instruction.
+	* src/f8/gen.c:
+	  Improve f8 code generation for conditional jumps; improve value caching.
 
 2024-11-10 Philipp Klaus Krause <philipp@colecovision.eu>
 

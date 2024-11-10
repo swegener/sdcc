@@ -2281,7 +2281,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   wassertl_bt (roffset + size <= result->size, "Trying to write beyond end of operand");
 
 #if 1
-  emit2 (";", "genMove_o size %d, xl_dead_global %d xh_dead_global %d", size, xl_dead_global, xh_dead_global);
+  D (emit2 (";", "genMove_o size %d, xl_dead_global %d xh_dead_global %d", size, xl_dead_global, xh_dead_global));
 #endif
 
   if (aopRS (result) && aopRS (source))
@@ -2381,7 +2381,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         aopInReg (source, soffset + i, Y_IDX))
         {
           emit3_o (A_LDW, result, roffset + i, source, soffset + i);
-          if (aopInReg (result, roffset + i,Y_IDX) && source->type == AOP_LIT)
+          if (aopInReg (result, roffset + i, Y_IDX) && source->type == AOP_LIT)
             val_y = byteOfVal (source->aopu.aop_lit, soffset + i) + byteOfVal (source->aopu.aop_lit, soffset + i + 1) * 256;
           i += 2;
           continue;
@@ -2407,6 +2407,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emit3_o (A_LDW, ASMOP_Y, 0, source, soffset + i);
           emit3_o (A_LDW, result, roffset + i, ASMOP_Y, 0);
+          if (source->type == AOP_LIT)
+            val_y = byteOfVal (source->aopu.aop_lit, soffset + i) + byteOfVal (source->aopu.aop_lit, soffset + i + 1) * 256;
           i += 2;
           continue;
         }
@@ -4453,6 +4455,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     {
       bool xl_dead = regDead (XL_IDX, ic) && left->aop->regs[XL_IDX] <= i && right->aop->regs[XL_IDX] <= i;
       bool xh_dead = regDead (XH_IDX, ic) && left->aop->regs[XH_IDX] <= i && right->aop->regs[XH_IDX] <= i;
+      bool x_dead2 = regDead (X_IDX, ic) && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] <= i + 1 && right->aop->regs[XH_IDX] <= i + 1;
       bool y_dead2 = regDead (Y_IDX, ic) && left->aop->regs[YL_IDX] <= i + 1 && left->aop->regs[YH_IDX] <= i + 1 && right->aop->regs[YL_IDX] <= i + 1 && right->aop->regs[YH_IDX] <= i + 1;
 
       if (i + 1 < size && aopIsOp16_1 (left->aop, i) && aopIsLitVal (right->aop, i, 2, 0x0000)) // Use tstw
@@ -4473,6 +4476,13 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
         (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
         {
           emit3_o (A_CPW, left->aop, i, right->aop, i);
+          if (tlbl_NE)
+            emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
+          i += 2;
+        }
+      else if (i + 1 < size && aopInReg (left->aop, i, X_IDX) && x_dead2 && aopOnStackNotExt (right->aop, i, 2))
+        {
+          emit3sub_o (A_SUBW, ASMOP_X, 0, right->aop, i);
           if (tlbl_NE)
             emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
           i += 2;
@@ -4507,6 +4517,14 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
           push (ASMOP_Y, 0, 2);
           emit3sub_o (A_SUBW, ASMOP_Y, 0, left->aop, i);
           pop (ASMOP_Y, 0, 2);
+          if (tlbl_NE)
+            emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
+          i += 2;
+        }
+      else if (i + 1 < size && (aopOnStack (right->aop, i, 2) || right->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i) && x_dead2)
+        {
+          genMove_o (ASMOP_X, 0, left->aop, i, 2, xl_dead && right->aop->regs[XL_IDX] < i, xh_dead && right->aop->regs[XH_IDX] < i, true, false, true);
+          emit3sub_o (A_SUBW, ASMOP_X, 0, right->aop, i);
           if (tlbl_NE)
             emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
           i += 2;
@@ -6272,9 +6290,17 @@ genAddrOf (const iCode *ic)
           
           emit2 ("ldw", "%s, sp", aopGet2 (aop, 0));
           cost (1 + !aopInReg (aop, 0, Y_IDX), 1 + !aopInReg (aop, 0, Y_IDX));
-          emit2 ("addw", "%s, #%ld", aopGet2 (aop, 0), soffset);
-          cost (2 + !aopInReg (aop, 0, Y_IDX) + (labs(soffset) > 127), 1 + !aopInReg (aop, 0, Y_IDX));
-          spillReg (C_IDX);
+          if (soffset == 1)
+            {
+              emit3 (A_INCW, ASMOP_Y, 0);
+              spillReg (C_IDX);
+            }
+          else if (soffset)
+            {
+              emit2 ("addw", "%s, #%ld", aopGet2 (aop, 0), soffset);
+              cost (2 + !aopInReg (aop, 0, Y_IDX) + (labs(soffset) > 127), 1 + !aopInReg (aop, 0, Y_IDX));
+              spillReg (C_IDX);
+            }
         }
       genMove (result->aop, aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
     }

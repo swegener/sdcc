@@ -208,6 +208,17 @@ replace restart {
 } if same(%2 'adcw' 'addw' 'cpw' 'orw' 'sbcw' 'sllw' 'subw' 'xorw'), notVolatile(%1)
 
 replace restart {
+	tstw	(%1, sp)
+	%2	#%3
+	ldw	y, (%1, sp)
+} by {
+	ldw	y, (%1, sp)
+	; peephole 16 moved ldw to replace tstw.
+	%2	#%3
+	
+} if same(%2 'jr' 'jrc' 'jrgt' 'jrle' 'jrn' 'jrnc' 'jrnn' 'jrno' 'jrnz' 'jro' 'jrsge' 'jrsgt' 'jrsle' 'jrslt' 'jrz'), notUsedFrom(%3 'y')
+
+replace restart {
 	jp	#%5
 } by {
 	jp	#%6
@@ -431,32 +442,11 @@ replace restart {
 } if labelRefCountChange(%1 -1)
 
 replace restart {
-	jrnz	#%5
+	%1	#%5
 } by {
-	jrnz	#%6
-	; peephole j8a jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
-
-replace restart {
-	jrz	#%5
-} by {
-	jrz	#%6
-	; peephole j8b jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
-
-replace restart {
-	jrnc	#%5
-} by {
-	jrnc	#%6
-	; peephole j8c jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
-
-replace restart {
-	jrc	#%5
-} by {
-	jrc	#%6
-	; peephole j8d jumped to %6 directly instead of via %5.
-} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+	%1	#%6
+	; peephole j8 jumped to %6 directly instead of via %5.
+} if same(%1 'jr' 'jrc' 'jrgt' 'jrle' 'jrn' 'jrnc' 'jrnn' 'jrno' 'jrnz' 'jro' 'jrsge' 'jrsgt' 'jrsle' 'jrslt' 'jrz'), labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 // Do the jump-to-ret optimization after all jump inversion optimizations, to optimize jr z, %1; jp %retlabel; %1: into jr nz, %retlabel instead of jr z, %1; ret; %1:.
 barrier

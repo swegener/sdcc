@@ -691,20 +691,23 @@ FBYNAME (labelIsUncondJump)
     q--;
   len = q-p;
   if (len == 0)
-    return FALSE; /* no destination? */
+    return false; /* no destination? */
 
   if (TARGET_Z80_LIKE)
     {
       while (q>p && *q!=',')
         q--;
       if (*q==',')
-        return FALSE; /* conditional jump */
+        return false; /* conditional jump */
     }
+
+  if (TARGET_IS_F8 && p[0] == '#')
+    p++;
 
   /* now put the destination in %6 */
   bindVar (6, &p, &vars);
 
-  return TRUE;
+  return true;
 }
 
 /*-----------------------------------------------------------------*/

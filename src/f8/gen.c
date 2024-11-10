@@ -1695,9 +1695,14 @@ emit3sub_o (enum asminst inst, asmop *op0, int offset0, asmop *op1, int offset1)
       case A_SBCW:
         if (op1->type == AOP_LIT)
           {
-            emit2 ("adcw", "%s, #0x%04x", aopGet2 (op0, offset0), ~litword1 & 0xffff);
-            cost (2 + !aopInReg (op0, offset0, Y_IDX), 1 + !aopInReg (op0, offset0, Y_IDX));
-            spillReg (C_IDX);
+            if (!litword1)
+              emit3_o (A_SBCW, op0, offset0, 0, 0);
+            else
+              {
+                emit2 ("adcw", "%s, #0x%04x", aopGet2 (op0, offset0), ~litword1 & 0xffff);
+                cost (2 + !aopInReg (op0, offset0, Y_IDX), 1 + !aopInReg (op0, offset0, Y_IDX));
+                spillReg (C_IDX);
+              }
           }
         //else // todo: implement when supported by assembler
         //  emit2 ("adcw", "%s, ~%s", aopGet2 (op0, offset0), aopGet2 (op1, offset1));
@@ -4135,7 +4140,12 @@ genCmp (const iCode *ic, iCode *ifx)
   if (ifx && right->aop->type == AOP_LIT && sign && aopIsLitVal (right->aop, 0, size, 0) && (aopIsOp8_1 (left->aop, size - 1) || size >= 2 && aopIsOp16_1 (left->aop, size - 2))) // Use tst(w)
     {
       if (aopIsOp8_1 (left->aop, size - 1))
-        emit3_o (A_TST, left->aop, size - 1, 0, 0);
+        {
+          if (aopInReg (left->aop, size - 1, YH_IDX)) // tstw y is cheaper than tst yh.
+            emit3 (A_TSTW, ASMOP_Y, 0);
+          else
+            emit3_o (A_TST, left->aop, size - 1, 0, 0);
+        }
       else
         emit3_o (A_TSTW, left->aop, size - 2, 0, 0);
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);

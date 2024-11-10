@@ -1,3 +1,10 @@
+2024-11-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCpeeph.c,
+	  src/f8/gen.c,
+	  src/f8/peeph.def:
+	  Improve code for conditional branches in f8 port.
+
 2024-11-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asf8/f8.h,

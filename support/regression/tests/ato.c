@@ -18,9 +18,11 @@ testAto(void)
   ASSERT (atol ("-2147483648") == -2147483648l);
   ASSERT (atol ("2147483647") == 2147483647l);
 
+#ifndef __SDCC_pdk15 // Not enough RAM
 #ifdef __SDCC_LONGLONG
   ASSERT (atoll ("-2147483648") == -2147483648l);
   ASSERT (atoll ("2147483647") == 2147483647l);
+#endif
 #endif
 #endif
 #endif

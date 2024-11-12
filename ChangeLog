@@ -1,3 +1,9 @@
+2024-11-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peeph.def,
+	  src/z80/gen.c:
+	  Unify formatting of conditional jump asm for z80-related ports.
+
 2024-11-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/ato.c:

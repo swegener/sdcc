@@ -10475,7 +10475,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
         _pop (PAIR_HL);
 
       if (!regalloc_dry_run)
-        emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
+        emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
       cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
     }
   /* if the right side is a literal then anything goes */
@@ -10554,7 +10554,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
           if (!(next_zero && a_result))
             {
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
+                emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
               cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
             }
           offset++;
@@ -10827,7 +10827,7 @@ genAndOp (const iCode * ic)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       _toBoolean (left, TRUE);
       if (!regalloc_dry_run)
-        emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
+        emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
       regalloc_dry_run_cost += 3;
       _toBoolean (right, FALSE);
       if (!regalloc_dry_run)
@@ -11032,7 +11032,7 @@ genAnd (const iCode * ic, iCode * ifx)
               emit3 (A_CP, ASMOP_A, ASMOP_A); // Clear carry.
               emit3w (A_ADC, ASMOP_HL, ASMOP_HL); // Cannot use "add hl, hl instead, since it does not affect zero flag.
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
+                emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
               emit2 ("rl de");
               regalloc_dry_run_cost += 6;
               sizel -= 4;
@@ -11183,7 +11183,7 @@ genAnd (const iCode * ic, iCode * ifx)
           if (size || ifx)  /* emit jmp only, if it is actually used */
             {
               if (!regalloc_dry_run)
-                emit2 ("jp %s,!tlabel", jumpcond, labelKey2num (tlbl->key));
+                emit2 ("jp %s, !tlabel", jumpcond, labelKey2num (tlbl->key));
               regalloc_dry_run_cost += 3;
             }
         }
@@ -11498,7 +11498,7 @@ genOr (const iCode * ic, iCode * ifx)
           if (ifx)              /* emit jmp only, if it is actually used */
             {
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
+                emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
               regalloc_dry_run_cost += 3;
             }
 

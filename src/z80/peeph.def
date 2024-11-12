@@ -1145,7 +1145,7 @@ replace {
 
 // should improve flag based optimizations
 replace restart {
-	jp	%1,%2
+	jp	%1, %2
 	jp	%2
 } by {
 	; common peephole 78 removed redundant jp
@@ -1153,41 +1153,41 @@ replace restart {
 } if labelRefCountChange(%2 -1)
 
 replace restart {
-	jp	NC,%1
+	jp	NC, %1
 	jp	%2
 %1:
 } by {
-	jp	C,%2
+	jp	C, %2
 	; common peephole 79 removed jp by using inverse jump logic
 %1:
 } if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	C,%1
+	jp	C, %1
 	jp	%2
 %1:
 } by {
-	jp	NC,%2
+	jp	NC, %2
 	; common peephole 80 removed jp by using inverse jump logic
 %1:
 } if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	NZ,%1
+	jp	NZ, %1
 	jp	%2
 %1:
 } by {
-	jp	Z,%2
+	jp	Z, %2
 	; common peephole 81 removed jp by using inverse jump logic
 %1:
 } if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
 
 replace restart {
-	jp	Z,%1
+	jp	Z, %1
 	jp	%2
 %1:
 } by {
-	jp	NZ,%2
+	jp	NZ, %2
 	; common peephole 82 removed jp by using inverse jump logic
 %1:
 } if operandsNotRelated(%2 '(hl)' '(ix)' '(iy)'), labelRefCountChange(%1 -1)
@@ -1200,9 +1200,9 @@ replace restart {
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
-	jp	%1,%5
+	jp	%1, %5
 } by {
-	jp	%1,%6
+	jp	%1, %6
 	; common peephole 84 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
@@ -1226,17 +1226,17 @@ replace restart {
 
 // A peephole that makes the code longer. Let's hope it's worth it in speed gain and further optimization potential.
 replace restart {
-	ld	a,#0x00
+	ld	a, #0x00
 %1:
-	bit	%2,a
-	jp	Z,%3
+	bit	%2, a
+	jp	Z, %3
 } by {
-	ld	a,#0x00
+	ld	a, #0x00
 	jp	%3
 	; common peephole 86 jumped directly to %3 instead of testing a first.
 %1:
-	bit	%2,a
-	jp	Z,%3
+	bit	%2, a
+	jp	Z, %3
 } if labelRefCountChange(%3 +1)
 
 replace restart {
@@ -1927,24 +1927,24 @@ replace restart {
 } if notUsed('bc')
 
 replace restart {
-	or	a,%1
-	jp	NZ,%2
-	ld	%3,#0x00
+	or	a, %1
+	jp	NZ, %2
+	ld	%3, #0x00
 } by {
-	or	a,%1
-	jp	NZ,%2
-	ld	%3,a
+	or	a, %1
+	jp	NZ, %2
+	ld	%3, a
 	; common peephole 121a replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
-	and	a,%1
-	jp	NZ,%2
-	ld	%3,#0x00
+	and	a, %1
+	jp	NZ, %2
+	ld	%3, #0x00
 } by {
-	and	a,%1
-	jp	NZ,%2
-	ld	%3,a
+	and	a, %1
+	jp	NZ, %2
+	ld	%3, a
 	; common peephole 121b replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
@@ -3290,8 +3290,10 @@ replace restart {
 	; common peephole 160 replaced jump by return.
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
+// SM83 doesn't have ret cc for all flags, but it does for all flags for which is has JP CC.
+// This rules can be dangerous for Rabbits: it might trigger a hardware bug in the Rabbit 5000.
 replace restart {
-	jp	%1,%5
+	jp	%1, %5
 } by {
 	ret	%1
 	; common peephole 161 replaced jump by return.

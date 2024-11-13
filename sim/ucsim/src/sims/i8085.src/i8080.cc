@@ -182,13 +182,14 @@ struct dis_entry *
 cl_i8080::get_dis_entry(t_addr addr)
 {
   t_mem code= rom->get(addr);
-
-  for (struct dis_entry *de = disass_8080; de && de->mnemonic; de++)
+  struct dis_entry *de;
+  
+  for (de = disass_8080; de && de->mnemonic; de++)
     {
       if ((code & de->mask) == de->code)
         return de;
     }
-  for (struct dis_entry *de = disass_common; de && de->mnemonic; de++)
+  for (de = disass_common; de && de->mnemonic; de++)
     {
       if ((code & de->mask) == de->code)
         return de;

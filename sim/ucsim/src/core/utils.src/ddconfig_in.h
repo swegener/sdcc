@@ -154,11 +154,20 @@
 /* Define to 1 if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
+/* Define to 1 if you have the `fmod' function. */
+#undef HAVE_FMOD
+
 /* XXX */
 #undef HAVE_WINSOCK2_H
 
 /* Define to 1 if you have the `yylex' function. */
 #undef HAVE_YYLEX
+
+/* Define to 1 if you have the `nanosleep' function. */
+#undef HAVE_NANOSLEEP
+
+/* Define to 1 if you have the `nanosleep' function. */
+#undef HAVE_USLEEP
 
 /* XXX */
 #undef HEADER_FD

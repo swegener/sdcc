@@ -766,6 +766,7 @@ dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
 AC_CHECK_FUNCS(yylex)
 AC_CHECK_FUNCS(nanosleep usleep)
+AC_CHECK_FUNCS(fmod)
 
 # AC_CACHE_CHECK(whether scanf knows %a, ucsim_cv_scanf_a,
 # [echo "a b" >conftest.data

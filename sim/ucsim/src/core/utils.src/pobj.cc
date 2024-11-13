@@ -83,8 +83,8 @@ int cl_base::init(void) {return(0);}
 const char *
 cl_base::get_name(const char *def) const
 {
-  if (!name)
-    return(def);
+  if (name.is_null())
+    return def;
   return(name);
 }
 

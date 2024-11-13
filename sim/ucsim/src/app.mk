@@ -23,7 +23,7 @@ baseline:
 	@$(MAKE) --no-print-directory -C test baseline
 
 
-$(LEN): $(OBJECTS) $(UCSIM_LIB_TARGETS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
+$(LEN): $(OBJECTS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
 ifeq ($(SILENT),yes)
 	@echo LNK-$(PKG)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(LOCAL_LIB_OPTIONS) $(UCSIM_LIBS) -o $@

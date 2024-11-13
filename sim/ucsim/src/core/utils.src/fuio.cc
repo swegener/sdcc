@@ -442,11 +442,22 @@ check_inputs(class cl_list *active, class cl_list *avail)
 void
 msleep(int msec)
 {
+#if defined(HAVE_NANOSLEEP)
   struct timespec t;
 
   t.tv_sec= msec/1000;
   t.tv_nsec= (msec%1000)*1000000;
   nanosleep(&t, NULL);
+#elif defined(HAVE_USLEEP)
+  usleep(1000 * msec);
+#else
+  struct timeval tv;
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  tv.tv_sec = msec/1000;
+  tv.tv_usec = (msec%1000)*1000;
+  select(0, &readfds, NULL, NULL, &tv);
+#endif
 }
 
 void

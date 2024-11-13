@@ -15,7 +15,7 @@ include ../../common.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: $(LEN)
+all: $(UCSIM_LIB_TARGETS) $(LEN)
 
 include $(top_srcdir)/src/app.mk
 

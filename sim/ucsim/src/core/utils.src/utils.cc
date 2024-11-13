@@ -39,6 +39,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sys/time.h>
 #include <time.h>
 #include <string.h>
+#ifdef HAVE_FMOD
+#include <math.h>
+#endif
 
   // prj
 #include "stypes.h"
@@ -751,6 +754,18 @@ u32_t
 urnd32()
 {
   return urnd();
+}
+
+
+double
+ddfmod(double x, double y)
+{
+#ifdef HAVE_FMOD
+  return fmod(x, y);
+#else
+  long int q= x / y;
+  return x - q * y;
+#endif  
 }
 
 

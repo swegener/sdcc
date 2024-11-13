@@ -145,7 +145,8 @@ uc_yy_set_string_to_parse(const char *str)
 {
   string_to_parse = strdup(str);
   //YY_FLUSH_BUFFER;
-  yy_flush_buffer(YY_CURRENT_BUFFER);
+  if ((YY_CURRENT_BUFFER != 0) && (YY_CURRENT_BUFFER!=NULL))
+    yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
 static const char *string_ptr = NULL;

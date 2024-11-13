@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include <errno.h>
 #include <fcntl.h>
-#include <math.h>
+//#include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
@@ -773,7 +773,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
                           timescale = 1e3;
                           while (timescale * 1.0 / uc->get_xtal() < 1.0)
                             timescale *= 1000.0;
-                          if (fmod(timescale * 1.0 / uc->get_xtal(), 1.0) > 0.0)
+                          if (ddfmod(timescale * 1.0 / uc->get_xtal(), 1.0) > 0.0)
                             timescale *= 1000.0;
                         }
 

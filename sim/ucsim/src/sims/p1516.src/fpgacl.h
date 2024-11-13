@@ -59,7 +59,7 @@ class cl_seg: public cl_led
 {
 public:
   int digit;
-  u32_t last_what;
+  u32_t last_what, last_ctrl;
 public:
   cl_seg(class cl_fpga *the_fpga, int ax, int ay, int adigit);
   virtual void refresh(bool force);
@@ -108,6 +108,7 @@ class cl_fpga: public cl_hw
 public:
   cl_cell32 *pa, *pb, *pc, *pd;
   cl_cell32 *pi, *pj;
+  cl_cell32 *bc;
   cl_memory_cell *pip, *pjp;
   class cl_led *leds[16];
   class cl_seg *segs[8];

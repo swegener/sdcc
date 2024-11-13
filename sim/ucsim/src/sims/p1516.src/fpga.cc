@@ -140,7 +140,12 @@ cl_seg::refresh(bool force)
   chars w= "non ";
   bool direct= false;
   int c= -digit + fpga->d2c_b;
-  switch ((sw>>4)&0xf)
+  u32_t b_c= fpga->bc->read(), ctr;
+  ctr= (b_c&1)?b_c:sw;
+  if (last_ctrl != ctr)
+    force= true;
+  last_ctrl= ctr;
+  switch ((ctr>>4)&0xf)
     {
     case 0: act= fpga->pa->get(); w="PA= "; break;
     case 1: act= fpga->pb->get(); w="PB= "; break;
@@ -418,6 +423,7 @@ cl_fpga::cl_fpga(class cl_uc *auc, int aid, chars aid_string):
   pd= (class cl_cell32 *)register_cell(uc->rom, 0xff03);
   pi= (class cl_cell32 *)register_cell(uc->rom, 0xff20);
   pj= (class cl_cell32 *)register_cell(uc->rom, 0xff10);
+  bc= (class cl_cell32 *)register_cell(uc->rom, 0xfff0);
   if ((uc->symbol2cell((char*)"pi_pins", &pip)))
     {
       register_cell(pip);

@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uartcl.h"
 #include "clockcl.h"
 #include "fpgacl.h"
+#include "brd_ctrlcl.h"
 
 #include "p1516cl.h"
 
@@ -198,6 +199,9 @@ cl_p1516::mk_hw_elements(void)
   add_hw(h= new cl_bool(this, 0, "boolean"));
   h->init();
   add_hw(h= new cl_logsys(this, 0, "logsys"));
+  h->init();
+
+  add_hw(bc= new cl_brd_ctrl(this, 0, "brd_ctrl"));
   h->init();
 }
 

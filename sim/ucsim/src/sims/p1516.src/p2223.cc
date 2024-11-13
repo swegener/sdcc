@@ -143,6 +143,13 @@ CLP2::id_string(void)
 }
 
 void
+CLP2::mk_hw_elements(void)
+{
+  //class cl_hw *hw;
+  cl_p1516::mk_hw_elements();
+}
+
+void
 CLP2::make_memories(void)
 {
   cl_p1516::make_memories();

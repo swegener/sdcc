@@ -82,6 +82,7 @@ public:
   cl_p2223(class cl_sim *asim);
   virtual int init(void);
   virtual const char *id_string(void);
+  virtual void mk_hw_elements(void);
   virtual void make_memories(void);
 
   virtual struct dis_entry *dis_tbl(void);

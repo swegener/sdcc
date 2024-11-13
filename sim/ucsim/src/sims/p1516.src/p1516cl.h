@@ -70,6 +70,7 @@ public:
   cl_address_space *regs;
   class cl_porto *pa, *pb, *pc, *pd;
   class cl_porti *pi, *pj;
+  class cl_brd_ctrl *bc;
   class cl_memory_chip *rom_chip;
 public:
   //class cl_address_space *rom;

@@ -1,3 +1,10 @@
+2024-11-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3231.c:
+	  Enable test for f8.
+	* support/regression/tests/gcc-torture-execute-20050826-1.c:
+	  Enable test for stm8.
+
 2024-11-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def,

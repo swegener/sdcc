@@ -12,7 +12,7 @@
 
 #if defined __SDCC_pdk14
 #define SIZE 8     // the available memory is limited
-#elif defined __SDCC_MODEL_SMALL || defined __SDCC_MODEL_MEDIUM || defined __SDCC_pdk15 || defined __SDCC_pic14
+#elif defined __SDCC_mcs51 && (__SDCC_MODEL_SMALL || defined __SDCC_MODEL_MEDIUM) || defined __SDCC_pdk15 || defined __SDCC_pic14
 #define SIZE 64     // the available memory is limited
 #else
 #define SIZE 2048

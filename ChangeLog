@@ -1,3 +1,11 @@
+2024-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/gcc-torture-execute-20000706-1.c,
+	  support/regression/tests/gcc-torture-execute-20081103-1.c,
+	  support/regression/tests/gcc-torture-execute-950607-2.c,
+	  support/regression/tests/gcc-torture-execute-pr44575.c:
+	  Enable further struct parameter tests.
+
 2024-11-14 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3231.c:

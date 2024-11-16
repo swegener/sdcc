@@ -8,12 +8,11 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports struct parameters!
-#if 0
 typedef struct {
   long int p_x, p_y;
 } Point;
 
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) &&!defined(__SDCC_pdk15) // Lack of memory
 int
 f (Point basePt, Point pt1, Point pt2)
 {
@@ -35,7 +34,7 @@ f (Point basePt, Point pt1, Point pt2)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) &&!defined(__SDCC_pdk15) // Lack of memory
   Point b, p1, p2;
   int answer;
 

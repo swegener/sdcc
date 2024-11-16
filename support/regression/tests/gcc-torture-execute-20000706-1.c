@@ -8,8 +8,6 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable once sdcc supports passing of struct as parameter!
-#if 0
 struct baz {
   int a, b, c, d, e;
 };
@@ -25,12 +23,10 @@ void foo(struct baz x, char **y)
 {
   bar(&x,6,7,8,9,10);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if 0
   struct baz x;
 
   x.a = 1;
@@ -40,6 +36,5 @@ testTortureExecute (void)
   x.e = 5;
   foo(x,(char **)0);
   return;
-#endif
 }
 

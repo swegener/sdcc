@@ -1,3 +1,8 @@
+2024-11-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/gcc-torture-execute-pr44575.c:
+	  Redisable one test that turned out to fail for z80-related ports (bug #3799).
+
 2024-11-16 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/gcc-torture-execute-20000706-1.c,

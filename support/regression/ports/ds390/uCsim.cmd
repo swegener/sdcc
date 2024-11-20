@@ -15,6 +15,6 @@ expr /n port1_on=0
 expr /n port2_on=0
 expr /n port3_on=0
 expr /n irq0_on=0
-emu
+step 100000000 vclk
 state
 quit

@@ -1,5 +1,38 @@
 2024-11-20 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* support/regression/ports/ds390/uCsim.cmd,
+	  support/regression/ports/ez80-z80/uCsim.cmd,
+	  support/regression/ports/f8/uCsim.cmd,
+	  support/regression/ports/hc08/uCsim.cmd,
+	  support/regression/ports/mcs51-common/uCsim.cmd,
+	  support/regression/ports/pdk13/uCsim.cmd,
+	  support/regression/ports/pdk14/uCsim.cmd,
+	  support/regression/ports/pdk15-stack-auto/uCsim.cmd,
+	  support/regression/ports/pdk15/uCsim.cmd,
+	  support/regression/ports/s08-stack-auto/uCsim.cmd,
+	  support/regression/ports/s08/uCsim.cmd,
+	  support/regression/ports/stm8-large/uCsim.cmd,
+	  support/regression/ports/stm8/uCsim.cmd,
+	  support/regression/ports/tlcs90/uCsim.cmd,
+	  support/regression/ports/uc6502-stack-auto/uCsim.cmd,
+	  support/regression/ports/uc6502/uCsim.cmd,
+	  support/regression/ports/uc65c02/uCsim.cmd,
+	  support/regression/ports/ucgbz80/uCsim.cmd,
+	  support/regression/ports/ucr2k/uCsim.cmd,
+	  support/regression/ports/ucr2ka/uCsim.cmd,
+	  support/regression/ports/ucr3ka/uCsim.cmd,
+	  support/regression/ports/ucr800/uCsim.cmd,
+	  support/regression/ports/ucz180-resiy/uCsim.cmd,
+	  support/regression/ports/ucz180/uCsim.cmd,
+	  support/regression/ports/ucz80-resiy/uCsim.cmd,
+	  support/regression/ports/ucz80-undoc/uCsim.cmd,
+	  support/regression/ports/ucz80-unsafe-read/uCsim.cmd,
+	  support/regression/ports/ucz80/uCsim.cmd,
+	  support/regression/ports/ucz80n/uCsim.cmd:
+	  Limit regression tests in ucsim to 100000000 vclk cycles.
+
+2024-11-20 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* device/include/wchar.h,
 	  device/lib/incl.mk,
 	  device/lib/wcsnlen.c,

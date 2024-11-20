@@ -24,6 +24,6 @@ expr /n tim22_on=0
 expr /n tim33_on=0
 expr /n tim44_on=0
 expr /n vcd0_on=0
-run
+step 100000000 vclk
 state
 quit

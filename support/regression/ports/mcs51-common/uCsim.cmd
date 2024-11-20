@@ -16,6 +16,6 @@ expr /n uart0_on=0
 expr /n dreg0_on=0
 expr /n dport0_on=0
 expr /n irq0_on=0
-emu
+step 100000000 vclk
 state
 quit

@@ -5,6 +5,6 @@ set error stack off
 
 set hw simif nas 0xffff
 
-run
+step 100000000 vclk
 state
 quit

@@ -138,6 +138,7 @@ COMMON_SDCC = \
   wcscmp.c \
   wcslen.c \
   wcsncmp.c \
+  wcsnlen.c \
   btowc.c \
   wctob.c \
   mbsinit.c \

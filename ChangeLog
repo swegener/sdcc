@@ -1,3 +1,11 @@
+2024-11-20 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/include/wchar.h,
+	  device/lib/incl.mk,
+	  device/lib/wcsnlen.c,
+	  support/regression/tests/wcsnlen.c,
+	  Derive wcsnlen from strnlen, RFE #925.
+
 2024-11-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/gcc-torture-execute-pr44575.c:

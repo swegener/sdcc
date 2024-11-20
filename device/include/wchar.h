@@ -70,6 +70,9 @@ int wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t count);
 /* C99 Miscellaneous functions (ISO C11 7.29.4.6) */
 size_t wcslen(const wchar_t *s);
 
+/* C2Y length function: */
+size_t wcsnlen (const wchar_t *s, size_t n);
+
 /* C99 Single-byte/wide character conversion functions (ISO C 11 7.29.6.1) */
 wint_t btowc(int c);
 int wctob(wint_t c);

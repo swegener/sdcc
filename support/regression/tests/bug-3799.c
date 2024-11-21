@@ -26,7 +26,7 @@ void testBug(void)
 	a[1].c[0] = 0x5a;
 	a[2].c[0] = 0xaa;
 	a[2].c[1] = 0x55;
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #3800
+#if (!defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02)) || defined(__SDCC_STACK_AUTO) // Bug #3800
 	f(a[0], a[1], a[2]); // When passing the second, the cached value for the hl register was wrong, resulting in the passed data being read at an off-by-one-byte location from a[1].
 #endif
 }

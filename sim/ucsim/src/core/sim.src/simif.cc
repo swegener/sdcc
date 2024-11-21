@@ -456,6 +456,41 @@ cl_sif_reset::produce_answer(void)
 }
 
 
+/* Command: setlimit */
+
+void
+cl_sif_setlimit::produce_answer(void)
+{
+  if (sif)
+    {
+      u32_t p= ((parameters[3]&0xff)<<24) +
+	((parameters[2]&0xff)<<16) +
+	((parameters[1]&0xff)<<8) +
+	((parameters[0]&0xff));
+      sif->uc->sim->set_limit(p);
+      sif->finish_command();
+    }
+}
+
+
+/* Command: getlimit */
+
+void
+cl_sif_getlimit::produce_answer(void)
+{
+  if (sif)
+    {
+      u32_t p= sif->uc->sim->exec_limit;
+      t_mem b[4];
+      b[0]= (p>> 0)&0xff;
+      b[1]= (p>> 8)&0xff;
+      b[2]= (p>>16)&0xff;
+      b[3]= (p>>24)&0xff;
+      set_answer(4, b);
+    }
+}
+
+
 /*
  * Virtual HW: simulator interface
  */
@@ -567,7 +602,13 @@ cl_simulator_interface::init(void)
   c->init();
   commands->add(c= new cl_sif_write(this));
   c->init();
-
+  commands->add(c= new cl_sif_reset(this));
+  c->init();
+  commands->add(c= new cl_sif_setlimit(this));
+  c->init();
+  commands->add(c= new cl_sif_getlimit(this));
+  c->init();
+  
   uc->vars->add("simif_on", cfg, simif_on, cfg_help(simif_on));
   cfg_set(simif_on, 1);
   uc->vars->add("sim_run", cfg, simif_run, cfg_help(simif_run));
@@ -584,6 +625,7 @@ cl_simulator_interface::init(void)
   //uc->vars->add("PC", cfg, simif_pc, cfg_help(simif_pc));
   uc->vars->add("sim_print", cfg, simif_print, cfg_help(simif_print));
   uc->vars->add("sim_write", cfg, simif_write, cfg_help(simif_write));
+  uc->vars->add("sim_limit", cfg, simif_limit, cfg_help(simif_limit));
 
   return(0);
 }
@@ -608,6 +650,7 @@ cl_simulator_interface::cfg_help(t_addr addr)
       //case simif_pc	: return "PC register (int, RW)";
     case simif_print	: return "Print char on stdout (int, WO)";
     case simif_write	: return "Write char to simif output (int, WO)";
+    case simif_limit    : return "Limit of instructions to simulate by run (uint, RW)";
     }
   return "Not used";
 }
@@ -858,6 +901,13 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  if (fout)
 	    fout->write(&c, 1);
 	}
+      break;
+    case simif_limit:
+      if (val)
+	{
+	  uc->sim->set_limit((u32_t)(*val));
+	}
+      cell->set(uc->sim->exec_limit);
       break;
     case simif_nuof:
       break;

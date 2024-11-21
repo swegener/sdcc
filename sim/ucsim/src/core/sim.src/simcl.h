@@ -59,6 +59,7 @@ public:
   unsigned long start_tick;
   unsigned long steps_done;
   unsigned long steps_todo; // use this if not 0
+  uint32_t      exec_limit; // max nr of instr in run/step
   
 public:
   cl_sim(class cl_app *the_app);
@@ -75,6 +76,7 @@ public:
   virtual void stop(int reason);
   virtual void change_run(int reason= resSIMIF);
   virtual int step(void);
+  virtual void set_limit(u32_t new_limit);
 };
 
 

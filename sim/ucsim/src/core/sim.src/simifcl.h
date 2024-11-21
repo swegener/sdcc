@@ -36,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hwcl.h"
 
 
-#define SIMIF_VERSION	1
+#define SIMIF_VERSION	2
 
 enum sif_command {
   DETECT_SIGN	        = '!',	// answer to detect command
@@ -83,6 +83,12 @@ enum sif_command {
   SIFCM_RESET		= 'R',	// reset CPU
   // -> R
   // <-
+  SIFCM_SETLIMIT	= 'L',  // set execution limit
+  // -> L 0 1 2 3
+  // <-
+  SIFCM_GETLIMIT	= 'l',  // get execution limit 
+  // -> l
+  // <- 0 1 2 3
 };
 
 enum sif_answer_type {
@@ -90,7 +96,8 @@ enum sif_answer_type {
   SIFAT_BYTE		= 0x01,	// just a byte
   SIFAT_ARRAY		= 0x02,	// array of some bytes
   SIFAT_STRING		= 0x03,	// a string
-  SIFAT_NONE		= 0x04	// no answer at all
+  SIFAT_NONE		= 0x04,	// no answer at all
+  SIFAT_UINT32		= 0x08  // bytes of an uint32
 };
 
 enum simif_cfg {
@@ -109,8 +116,9 @@ enum simif_cfg {
   //simif_pc		= 12, // RW
   simif_print		= 12, // W
   simif_write		= 13, // W
+  simif_limit		= 14, // RW
   
-  simif_nuof		= 14
+  simif_nuof		= 15
 };
 
 class cl_simulator_interface;
@@ -336,6 +344,32 @@ public:
     cl_sif_command(SIFCM_RESET, "reset cpu",
 		   "Reset CPU",
 		   SIFAT_NONE, 0, the_sif)
+  {}
+  virtual void produce_answer(void);
+};
+
+
+/* Command: setlimit */
+class cl_sif_setlimit: public cl_sif_command
+{
+public:
+  cl_sif_setlimit(class cl_simulator_interface *the_sif):
+    cl_sif_command(SIFCM_SETLIMIT, "set execution limit",
+		   "Set execution limit for simulation",
+		   SIFAT_NONE, 4, the_sif)
+  {}
+  virtual void produce_answer(void);
+};
+
+
+/* Command: getlimit */
+class cl_sif_getlimit: public cl_sif_command
+{
+public:
+  cl_sif_getlimit(class cl_simulator_interface *the_sif):
+    cl_sif_command(SIFCM_GETLIMIT, "get execution limit",
+		   "Get value of simulation execution limit",
+		   SIFAT_UINT32, 0, the_sif)
   {}
   virtual void produce_answer(void);
 };

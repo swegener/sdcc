@@ -122,6 +122,19 @@ cl_sim::step(void)
   return(0);
 }
 
+void
+cl_sim::set_limit(u32_t new_limit)
+{
+  exec_limit= new_limit;
+  if (exec_limit)
+    {
+      // restart instr counting
+      steps_todo= exec_limit;
+      steps_done= 0;
+    }
+}
+
+
 /*int
 cl_sim::do_cmd(char *cmdstr, class cl_console *console)
 {
@@ -155,6 +168,8 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
     start_tick= uc->ticks->get_ticks();
   steps_done= 0;
   steps_todo= steps_to_do;
+  if ((steps_todo == 0) && (uc->stop_at_time == NULL))
+    steps_todo= exec_limit;
 }
 
 void

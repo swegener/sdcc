@@ -390,9 +390,14 @@ cl_btn::handle_input(int c)
     {
       if (p)
 	{
+	  class cl_p1516 *u= (class cl_p1516 *)(fpga->uc);
 	  t_mem v= p->R();
 	  v^= mask;
 	  p->W(v);
+	  if (mask==1)
+	    u->btn_edge(0, v&mask);
+	  if (mask==2)
+	    u->btn_edge(1, v&mask);
 	}
       return true;
     }

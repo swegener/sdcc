@@ -1,6 +1,6 @@
 #include "pmon.h"
 
-const char * p12cpu_version= "2.2.9";
+const char * p12cpu_version= "2.2.11";
 
 t_mem pmon[]= {
 0x00000000, 0x01f2f03d, /* 01f2f03d //C 00000    24 jmp	cold_start */
@@ -92,7 +92,7 @@ t_mem pmon[]= {
 0x0000f055, 0x0400f497, /* 0400f497 //C 0f055   133 call	putchar */
 0x0000f056, 0x06020100, /* 06020100 //C 0f056   134 rds	r0,sver */
 0x0000f057, 0x01120001, /* 01120001 //C 0f057   135 mvzl	r1,version_main */
-0x0000f058, 0x01220001, /* 01220001 //C 0f058   136 mvzl	r2,version_sub */
+0x0000f058, 0x01220002, /* 01220002 //C 0f058   136 mvzl	r2,version_sub */
 0x0000f059, 0x0631c002, /* 0631c002 //C 0f059   137 getbz	r3,r0,2 */
 0x0000f05a, 0x0641c001, /* 0641c001 //C 0f05a   138 getbz	r4,r0,1 */
 0x0000f05b, 0x0651c000, /* 0651c000 //C 0f05b   139 getbz	r5,r0,0 */
@@ -1530,7 +1530,7 @@ t_mem pmon[]= {
 0x0000f5fd, 0x0f0d0000, /* 0f0d0000 //C 0f5fd  2020 pop	r0 */
 0x0000f5fe, 0x07f0f67f, /* 07f0f67f //C 0f5fe  2021 ld	PC,reg2 */
 0x0000f5ff, 0x0d1d0000, /* 0d1d0000 //C 0f5ff  2025 push	r1 */
-0x0000f600, 0x01020001, /* 01020001 //C 0f600  2026 mvzl	r0,version_sub */
+0x0000f600, 0x01020002, /* 01020002 //C 0f600  2026 mvzl	r0,version_sub */
 0x0000f601, 0x01120001, /* 01120001 //C 0f601  2027 mvzl	r1,version_main */
 0x0000f602, 0x07018101, /* 07018101 //C 0f602  2028 putb	r0,r1,1 */
 0x0000f603, 0x0f1d0000, /* 0f1d0000 //C 0f603  2029 pop	r1 */

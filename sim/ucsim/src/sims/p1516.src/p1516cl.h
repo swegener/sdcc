@@ -50,6 +50,13 @@ enum flags
   };
 
 
+enum res2btn_t {
+  r2b_none= 0,
+  r2b_alarmed= 1,
+  r2b_activated= 2
+};
+
+
 class cl_pc_write: public cl_memory_operator
 {
 protected:
@@ -72,6 +79,7 @@ public:
   class cl_porti *pi, *pj;
   class cl_brd_ctrl *bc;
   class cl_memory_chip *rom_chip;
+  enum res2btn_t r2b_state;
 public:
   //class cl_address_space *rom;
  public:
@@ -97,6 +105,8 @@ public:
   virtual t_mem inst_ad(t_mem ra, t_mem rb, u32_t c);
   virtual int inst_alu(t_mem code);
   virtual int exec_inst(void);
+
+  virtual void btn_edge(int btn, bool press);
 };
 
 #define SET_C(v) ( cF.W( (F&~C) | ((v)?C:0) ))

@@ -1,3 +1,10 @@
+2024-11-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3799.c,
+	  support/regression/tests/gcc-torture-execute-pr44575.c:
+	  Fix bug #3799.
+
 2024-11-20 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* support/regression/ports/ds390/uCsim.cmd,

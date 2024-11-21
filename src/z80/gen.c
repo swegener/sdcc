@@ -6247,16 +6247,32 @@ genPointerPush (const iCode *ic)
 
   genMove (ASMOP_HL, IC_LEFT (ic)->aop, true, true, swap_de ? false : isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
 
-  int size = getSize (operandType (IC_LEFT (ic))->next);
-  for(int i = 1; i < size; i++)
-    emit3w (A_INC, ASMOP_HL, 0);
+  int size = getSize (operandType (ic->left)->next);
+  if (TARGET_IS_TLCS90 && size >= (optimize.codeSpeed? 3 : 4))
+    {
+      emit2 ("add hl, !immed%d", size - 1);
+      cost (3, 6);
+    }
+  else if (isRegDead (BC_IDX, ic) && size > 5)
+    {
+      emit2 ("ld bc, !immed%d", size - 1);
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
+      emit2 ("add hl, bc");
+      cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+    }
+  else
+    for(int i = 1; i < size; i++)
+      emit3w (A_INC, ASMOP_HL, 0);
 
   for(int i = 0; i < size; i++)
     {
-      emit2 ("ld a, (hl)");
+      emit2 ("ld a, !*hl");
       cost2 (1, 7, 6, 6, 8, 6, 2, 2);
-      emit2 ("dec hl");
-      cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+      if (i + 1 < size) // Both to save an instruction on the last byte, and to ensure we get the correct value as cached for hl.
+        {
+          emit2 ("dec hl");
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+        }
       emit2 ("push af");
       cost2 (1, 11, 11, 10, 16, 8, 3, 4);
       emit2 ("inc sp");

@@ -53,14 +53,12 @@ check (int z, ...)
 void
 testTortureExecute (void)
 {
-#if 0 // Bug #3799
 #ifndef __SDCC_pdk14 // Lack of memory
   a[2].a[2] = -49026;
   check (1, a[2], a[2]);
   if (fails)
     ASSERT (0);
   return;
-#endif
 #endif
 }
 

@@ -15733,32 +15733,31 @@ genJumpTab (const iCode *ic)
 {
   symbol *jtab = NULL;
   operand *jtcond = IC_JTCOND (ic);
-  bool pushed_pair = FALSE;
+  bool pushed_pair = false;
   PAIR_ID pair;
 
-  aopOp (jtcond, ic, FALSE, FALSE);
+  aopOp (jtcond, ic, false, false);
+
+  wassert (isPairDead (PAIR_HL, ic));
 
   if (!regalloc_dry_run)
     jtab = newiTempLabel (NULL);
 
-  if (IS_TLCS90 && !aopInReg (jtcond->aop, 0, C_IDX) && !aopInReg (jtcond->aop, 0, E_IDX))
+  if (IS_TLCS90 && // Use lda hl, hl, a
+    (jtcond->aop->size == 1 || aopIsLitVal (jtcond->aop, 1, jtcond->aop->size - 1, 0)) &&
+    (isRegDead (A_IDX, ic) || aopInReg (jtcond->aop, 0, A_IDX)) &&
+    !aopInReg (jtcond->aop, 0, C_IDX) && !aopInReg (jtcond->aop, 0, E_IDX))
     {
-      genMove (ASMOP_A, jtcond->aop, isRegDead (A_IDX, ic), true,isRegDead (DE_IDX, ic), isRegDead (IY_IDX, ic));
+      
+      genMove (ASMOP_A, jtcond->aop, isRegDead (A_IDX, ic), true, isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic));
       if (!regalloc_dry_run)
         emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
-      cost (3, 6);
-      emit2 ("lda hl, hl, a");
-      emit2 ("lda hl, hl, a");
-      cost (2 * 2, 2 * 14);
-#if 0 // Enable when "jp a(hl)" supported in assembler
-      emit2 ("jp a(hl)");
-      cost (2, 16);
-      goto genlabeltab;
-#else
+      cost2 (3, 10, 9, 6, 12, 6, 3, 3);
       emit2 ("lda hl, hl, a");
       cost (2, 14);
-      goto calculated;
-#endif
+      emit2 ("ld hl, a(hl)");
+      cost (2 , 16);
+      goto jump;
     }
 
   // Choose extra pair DE or BC for addition
@@ -15772,14 +15771,11 @@ genJumpTab (const iCode *ic)
   if (!isPairDead (pair, ic))
     {
       _push (pair);
-      pushed_pair = TRUE;
+      pushed_pair = true;
     }
 
-  cheapMove (pair == PAIR_DE ? ASMOP_E : ASMOP_C, 0, jtcond->aop, 0, true);
-  emit2 ("ld %s, !zero", _pairs[pair].h);
-  cost2 (2, 7, 6, 4, 8, 4, 2, 2);
+  genMove (pair == PAIR_DE ? ASMOP_DE : ASMOP_BC, jtcond->aop, isRegDead (A_IDX, ic), true, isPairDead (PAIR_DE, ic), isPairDead (PAIR_IY, ic));
 
-  spillPair (PAIR_HL);
   if (!regalloc_dry_run)
     emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
   cost2 (3, 10, 9, 6, 12, 6, 3, 3);
@@ -15787,27 +15783,43 @@ genJumpTab (const iCode *ic)
   cost2 (1, 11, 7, 2, 8, 8, 1, 1);
   emit2 ("add hl, %s", _pairs[pair].name);
   cost2 (1, 11, 7, 2, 8, 8, 1, 1);
-  emit2 ("add hl, %s", _pairs[pair].name);
-  cost2 (1, 11, 7, 2, 8, 8, 1, 1);
+  spillPair (PAIR_HL);
 
-calculated:
+  if (IS_TLCS90 || IS_EZ80_Z80)
+    {
+      emit2 ("ld hl, (hl)");
+      cost (2, IS_TLCS90 ? 8 : 4);
+    }
+  else if (IS_RAB)
+    {
+      emit2 ("ld hl, 0(hl)");
+      cost (3, 11);
+    }
+  else
+    {
+      emit2 ("ld %s, !*hl", _pairs[pair].l);
+      cost2 (1, 7, 6, 5, 8, 6, 2, 2);
+      emit2 ("inc hl");
+      cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+      emit2 ("ld h, !*hl");
+      cost2 (1, 7, 6, 5, 8, 6, 2, 2);
+      emit3 (A_LD, ASMOP_L, pair == PAIR_DE ? ASMOP_E : ASMOP_C);
+    }
 
+jump:
   if (pushed_pair)
     _pop (pair);
 
   emit2 ("!jphl");
   cost2 (1 + IS_TLCS90, 4, 3, 4, 4, 8, 3, 1);
 
-  /* now generate the jump labels */
-#if 0 // Enable when "jp a(hl)" supported in assembler
-genlabeltab:
-#endif
   if (!regalloc_dry_run)
-    emitLabelSpill (jtab);
-  for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
-    if (!regalloc_dry_run)
-      emit2 ("jp !tlabel", labelKey2num (jtab->key));
-  /*regalloc_dry_run_cost += 3 doesn't matter and might overflow cost */
+    {
+      emitLabelSpill (jtab);
+      for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
+        emit2 (".dw !tlabel", labelKey2num (jtab->key));
+    }
+  // regalloc_dry_run_cost += 3 // doesn't matter and might overflow cost
 
   freeAsmop (IC_JTCOND (ic), NULL);
 }

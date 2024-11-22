@@ -1308,7 +1308,7 @@ PORT z180_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {9, 7, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
     9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
@@ -1441,10 +1441,10 @@ PORT r2k_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {8, 6, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
-    9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
+    8,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
   },
   "_",
   _r2k_init,
@@ -1575,10 +1575,10 @@ PORT r2ka_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {8, 6, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
-    9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
+    8,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
   },
   "_",
   _r2ka_init,
@@ -1709,10 +1709,10 @@ PORT r3ka_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {8, 6, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
-    9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
+    8,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
   },
   "_",
   _r3ka_init,
@@ -1845,7 +1845,7 @@ PORT sm83_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {9, 7, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
     9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
@@ -1979,7 +1979,7 @@ PORT tlcs90_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {9, 7, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
     9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
@@ -2113,10 +2113,10 @@ PORT ez80_z80_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {7, 5, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
-    9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
+    7,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
   },
   "_",
   _ez80_z80_init,
@@ -2247,7 +2247,7 @@ PORT z80n_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {9, 7, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
     9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/
@@ -2381,7 +2381,7 @@ PORT r800_port =
   {
     8000,                       /* maxCount */
     2,                          /* sizeofElement */
-    {9, 7, 20},                 /* sizeofMatchJump[] - Assumes operand allocated to registers */
+    {6, 7, 8},                  /* sizeofMatchJump[] - Assumes operand allocated to registers */
     {6, 9, 15},                 /* sizeofRangeCompare[] - Assumes operand allocated to registers*/
     1,                          /* sizeofSubtract - Assumes use of a single inc or dec */
     9,                          /* sizeofDispatch - Assumes operand allocated to register e or c*/

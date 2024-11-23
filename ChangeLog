@@ -1,3 +1,12 @@
+2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Improve z80 struct/union parameter passing codegen.
+	* src/SDCCcse.h,
+	  src/SDCCsymt.c,
+	  support/valdiag/tests/bug-3801.c:
+	  Fix issues found via the sparse linter, including bug #3801.
+
 2024-11-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

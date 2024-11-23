@@ -6264,21 +6264,39 @@ genPointerPush (const iCode *ic)
     for(int i = 1; i < size; i++)
       emit3w (A_INC, ASMOP_HL, 0);
 
-  for(int i = 0; i < size; i++)
+  for(int i = 0; i < size;)
     {
-      emit2 ("ld a, !*hl");
-      cost2 (1, 7, 6, 6, 8, 6, 2, 2);
+      if (i + 1 < size && isRegDead (BC_IDX, ic))
+        {
+          emit2 ("ld b, !*hl");
+          cost2 (1, 7, 6, 6, 8, 6, 2, 2);
+          emit2 ("dec hl");
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+          emit2 ("ld c, !*hl");
+          cost2 (1, 7, 6, 6, 8, 6, 2, 2);
+          emit2 ("push bc");
+          cost2 (1, 11, 11, 10, 16, 8, 3, 4);
+          _G.stack.pushed += 2;
+          i += 2;
+        }
+      else
+        {
+          emit2 ("ld a, !*hl");
+          cost2 (1, 7, 6, 6, 8, 6, 2, 2);
+          emit2 ("push af");
+          cost2 (1, 11, 11, 10, 16, 8, 3, 4);
+          emit2 ("inc sp");
+          cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+          if (!regalloc_dry_run)
+            _G.stack.pushed++;
+          i++;
+        }
+
       if (i + 1 < size) // Both to save an instruction on the last byte, and to ensure we get the correct value as cached for hl.
         {
           emit2 ("dec hl");
           cost2 (1, 6, 4, 2, 8, 4, 1, 1);
         }
-      emit2 ("push af");
-      cost2 (1, 11, 11, 10, 16, 8, 3, 4);
-      emit2 ("inc sp");
-      cost2 (1, 6, 4, 2, 8, 4, 1, 1);
-      if (!regalloc_dry_run)
-        _G.stack.pushed++;
     }
 
   if (swap_de)

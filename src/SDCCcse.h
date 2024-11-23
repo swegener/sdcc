@@ -32,14 +32,14 @@ typedef struct cseDef
   {
 
     int key;
-    operand *sym;           /* defining symbol */
-    iCode *diCode;          /* defining instruction */
-    bitVect *ancestors;     /* keys of the symbol's ancestors */
-    int fromGlobal;         /* defining symbol's value computed from a global */
-    int fromAddrTaken:1;    /* defining symbol's value computed from a */
-                            /*   symbol whose address was taken */
-    unsigned nonLocalCSE:1; /* CSE def visible outside of originating */
-                            /*   basic block */
+    operand *sym;             /* defining symbol */
+    iCode *diCode;            /* defining instruction */
+    bitVect *ancestors;       /* keys of the symbol's ancestors */
+    int fromGlobal;           /* defining symbol's value computed from a global */
+    unsigned fromAddrTaken:1; /* defining symbol's value computed from a */
+                              /*   symbol whose address was taken */
+    unsigned nonLocalCSE:1;   /* CSE def visible outside of originating */
+                              /*   basic block */
   }
 cseDef;
 

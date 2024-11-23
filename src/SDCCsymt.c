@@ -1444,7 +1444,7 @@ arraySizes (sym_link *type, const char *name)
       else
         {
           int size = ulFromVal(tval);
-          if (tval < 0)
+          if (floatFromVal(tval) < 0.0)
             {
               werror(E_NEGATIVE_ARRAY_SIZE, name);
               size = 1;

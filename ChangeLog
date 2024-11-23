@@ -7,8 +7,11 @@
 	  src/mos6502/ralloc2.cc,
 	  src/pdk/ralloc2.cc,
 	  src/stm8/ralloc2.cc,
-	  src/z80/ralloc2.cc:
+	  src/z80/ralloc2.cc,
+	  src/f8/ralloc2.cc:
 	  Fix issues found via the infer linter.
+	* src/f8/gen.c:
+	  Fixes for f8 codegen/regalloc cost function.
 
 2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -590,31 +590,24 @@ op2_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int o
   int r0Idx = ((aopRS (op0) && op0->aopu.bytes[offset0].in_reg)) ? op0->aopu.bytes[offset0].byteu.reg->rIdx : -1;
   int r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
 
+  *prefixes = 0;
+
   if (r0Idx == XL_IDX)
     if (r1Idx == XH_IDX || r1Idx == YL_IDX || r1Idx == YH_IDX || r1Idx == ZL_IDX)
-      {
-        *prefixes = 0;
-        return 1;
-      }
+      return 1;
     else if (op1->type == AOP_LIT || op1->type == AOP_IMMD ||
       offset1 >= op1->size ||
       op1->type == AOP_STK || op1->type == AOP_REGSTK && r1Idx == -1)
-      {
-        *prefixes = 0;
-        return 2;
-      }
+      return 2;
     else if (op1->type == AOP_DIR)
-      {
-        *prefixes = 0;
-        return 3;
-      }
+      return 3;
     else
       return -1;
 
   if (r0Idx == XH_IDX || r0Idx == YL_IDX || r0Idx == YH_IDX || r0Idx == ZL_IDX || r0Idx == ZH_IDX) // Try with alternate accumulator prefix.
     {
       int bytes = op2_bytes (prefixes, ASMOP_XL, 0, op1, offset1);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -623,7 +616,7 @@ op2_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int o
   if (r1Idx == XL_IDX || r1Idx == XH_IDX || r1Idx == YL_IDX || r1Idx == ZL_IDX) // Try with swap prefix
     {
       int bytes = op2_bytes (prefixes, op1, offset1, op0, offset0);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -667,6 +660,8 @@ op2w_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int 
   int r0Idx = ((aopRS (op0) && op0->aopu.bytes[offset0].in_reg)) ? op0->aopu.bytes[offset0].byteu.reg->rIdx : -1;
   int r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
 
+  *prefixes = 0;
+
   if (r0Idx >= 0)
     {
       if (!op0->aopu.bytes[offset0 + 1].in_reg || op0->aopu.bytes[offset0 + 1].byteu.reg->rIdx != r0Idx + 1)
@@ -707,35 +702,41 @@ op2w_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int 
     }
 
   if (r0Idx == Y_IDX)
-    if (r1Idx >= 0)
-      {
-        *prefixes = (r1Idx != X_IDX);
-        return 1 + (r1Idx != X_IDX);
-      }
-    else if (op1->type == AOP_LIT || op1->type == AOP_IMMD ||
-      offset1 >= op1->size ||
-      op1->type == AOP_STK || op1->type == AOP_REGSTK && r1Idx == -1 ||
-      op1->type == AOP_DIR)
-      {
-        *prefixes = 0;
+    {
+      if (r1Idx == X_IDX)
+        return 1;
+      else if (r1Idx == Z_IDX)
+        {
+          *prefixes = 1;
+          return 2;
+        }
+      else if (op1->type == AOP_STK || op1->type == AOP_REGSTK && r1Idx == -1)
+        return 2;
+      else if (op1->type == AOP_LIT || op1->type == AOP_IMMD ||
+        offset1 >= op1->size ||  op1->type == AOP_DIR)
         return 3;
-      }
-    else
-      return -1;
+      else
+        return -1;
+    }
+  else if (r0Idx == Z_IDX && r1Idx == Y_IDX || r0Idx == X_IDX && r1Idx == Z_IDX)
+    {
+      *prefixes = 1;
+      return 2;
+    }
 
   if (r0Idx == X_IDX || r0Idx == Z_IDX) // Try with alternate accumulator prefix.
     {
-      int bytes = op2_bytes (prefixes, ASMOP_Y, 0, op1, offset1);
-      if (bytes >= 0)
+      int bytes = op2w_bytes (prefixes, ASMOP_Y, 0, op1, offset1);
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
         }
     }    
-  if (r1Idx == Y_IDX || r1Idx == X_IDX || r1Idx == Z_IDX) // Try with swap prefix
+  if (r1Idx == Y_IDX) // Try with swap prefix
     {
-      int bytes = op2_bytes (prefixes, op1, offset1, op0, offset0);
-      if (bytes >= 0)
+      int bytes = op2w_bytes (prefixes, op1, offset1, op0, offset0);
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -764,43 +765,30 @@ ld_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int of
   int r0Idx = ((aopRS (op0) && offset0 < 8 && op0->aopu.bytes[offset0].in_reg)) ? op0->aopu.bytes[offset0].byteu.reg->rIdx : -1;
   int r1Idx = ((aopRS (op1) && offset1 < 8 && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
 
+  *prefixes = 0;
+
   if (r0Idx == XL_IDX)
     {
       if (r1Idx == XH_IDX || r1Idx == YL_IDX || r1Idx == YH_IDX || r1Idx == ZL_IDX || r1Idx == ZH_IDX)
-        {
-          *prefixes = 0;
-          return 1;
-        }
+        return 1;
       else if (op1->type == AOP_LIT || op1->type == AOP_IMMD ||
         offset1 >= op1->size ||
         op1->type == AOP_STK || op1->type == AOP_REGSTK && r1Idx == -1)
-        {
-          *prefixes = 0;
-          return 2;
-        }
+        return 2;
       else if (op1->type == AOP_DIR)
-        {
-          *prefixes = 0;
-          return 3;
-        }
+        return 3;
       else
         return -1;
     }
   else if (r1Idx == XL_IDX && op1->type == AOP_STK || op1->type == AOP_REGSTK && r0Idx == -1) // ld (n, sp), xl
-    {
-      *prefixes = 0;
-      return 2;
-    }
+    return 2;
   else if (r1Idx == XL_IDX && op1->type == AOP_DIR) // ld mm, xl
-    {
-      *prefixes = 0;
-      return 3;
-    }
+    return 3;
 
   if (r0Idx == XH_IDX || r0Idx == YL_IDX || r0Idx == YH_IDX || r0Idx == ZL_IDX || r0Idx == ZH_IDX) // Try with alternate accu prefix.
     {
       int bytes = ld_bytes (prefixes, ASMOP_XL, 0, op1, offset1);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -810,7 +798,7 @@ ld_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int of
     {
       bool replace1 = (r1Idx == XH_IDX || r1Idx == YL_IDX || r1Idx == ZL_IDX);
       int bytes = ld_bytes (prefixes, op0, offset0, replace1 ? ASMOP_XL : op1, replace1 ? 0 : offset1);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -819,7 +807,7 @@ ld_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int of
   if (r1Idx == XL_IDX || r1Idx == XH_IDX || r1Idx == YL_IDX || r1Idx == ZL_IDX) // Try with swap prefix
     {
       int bytes = ld_bytes (prefixes, op1, offset1, op0, offset0);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;
@@ -851,6 +839,8 @@ ldw_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int o
 {
   int r0Idx = ((aopRS (op0) && offset0 < 8 && op0->aopu.bytes[offset0].in_reg)) ? op0->aopu.bytes[offset0].byteu.reg->rIdx : -1;
   int r1Idx = ((aopRS (op1) && offset1 < 8 && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
+
+  *prefixes = 0;
 
   if (r0Idx >= 0)
     {
@@ -893,44 +883,23 @@ ldw_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int o
 
   if (r0Idx == Y_IDX)
     if (r1Idx == X_IDX || r1Idx == Z_IDX)
-      {
-        *prefixes = 0;
-        return 1;
-      }
+      return 1;
     else if (op1->type == AOP_LIT && byteOfVal (op1->aopu.aop_lit, offset1 + 1) == ((byteOfVal (op1->aopu.aop_lit, offset1) & 0x80) ? 0xff : 0x00) || offset1 >= op1->size) // ldw y, #d
-      {
-        *prefixes = 0;
-        return 2;
-      }
+      return 2;
     else if (op1->type == AOP_LIT || op1->type == AOP_IMMD || // ldw y, #ii
       op1->type == AOP_DIR) // ldw y, mm
-      {
-        *prefixes = 0;
-        return 3;
-      }
+      return 3;
     else if (op1->type == AOP_STK || op1->type == AOP_REGSTK && r1Idx == -1) // ldw y, (n, sp)
-      {
-        *prefixes = 0;
-        return 2;
-      }
+      return 2;
     else
       return -1;
   else if (r1Idx == Y_IDX)
     if (r0Idx == X_IDX || r0Idx == Z_IDX)
-      {
-        *prefixes = 0;
-        return 1;
-      }
+      return 1;
     else if (op0->type == AOP_DIR) // ldw mm, y
-      {
-        *prefixes = 0;
-        return 3;
-      }
+      return 3;
     else if (op0->type == AOP_STK || op0->type == AOP_REGSTK && r0Idx == -1) // ldw (n, sp), y
-      {
-        *prefixes = 0;
-        return 2;
-      }
+      return 2;
 
   if(r0Idx == X_IDX && r1Idx == Z_IDX || r0Idx == Z_IDX && r1Idx == X_IDX)
     {
@@ -942,9 +911,9 @@ ldw_bytes (int *prefixes, const asmop *op0, int offset0, const asmop *op1, int o
     r1Idx == X_IDX || r1Idx == Z_IDX)
     {
       bool replace0 = (r0Idx == X_IDX || r0Idx == Z_IDX);
-      bool replace1 = (r1Idx == X_IDX || r1Idx == Z_IDX); // TODO: Each prefix can only replave one!
+      bool replace1 = (r1Idx == X_IDX || r1Idx == Z_IDX); // TODO: Each prefix can only replace one!
       int bytes = ldw_bytes (prefixes, replace0 ? ASMOP_Y : op0, replace0 ? 0 : offset0, replace1 ? ASMOP_Y : op1, replace1 ? 0 : offset1);
-      if (bytes >= 0)
+      if (bytes >= 0 && *prefixes == 0)
         {
           (*prefixes)++;
           return bytes + 1;

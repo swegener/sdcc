@@ -1,5 +1,17 @@
 2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCpeeph.c,
+	  src/hc08/ralloc2.cc,
+	  src/mos6502/ralloc2.cc,
+	  src/pdk/ralloc2.cc,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  Fix issues found via the infer linter.
+
+2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/z80/gen.c:
 	  Improve z80 struct/union parameter passing codegen.
 	* src/SDCCcse.h,

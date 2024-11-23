@@ -520,7 +520,6 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
 {
   a = *T[t].assignments.begin();
 
-  std::set<var_t>::const_iterator vi, vi_end;
   varset_t newlocal;
   std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
   a.local = newlocal;

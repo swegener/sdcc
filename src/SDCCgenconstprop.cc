@@ -285,7 +285,7 @@ dump_op_info (std::ostream &os, const iCode *ic, operand *op)
 
 // Dump cfg.
 static void
-dump_cfg_genconstprop (const cfg_t &cfg, std::string suffix)
+dump_cfg_genconstprop (const cfg_t &cfg, const std::string& suffix)
 {
   std::ofstream dump_file ((std::string (dstFileName) + ".dumpgenconstpropcfg" + suffix + (currFunc ? currFunc->rname : "__global") + ".dot").c_str());
 
@@ -761,6 +761,8 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
 
       if (resultsym)
         resultvalinfo = getTypeValinfo (operandType (IC_RESULT (ic)), true);
+      else
+        resultvalinfo.anything = true;
 
 #ifdef DEBUG_GCP_ANALYSIS
       if (localchange && resultsym)

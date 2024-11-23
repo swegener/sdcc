@@ -162,7 +162,6 @@ template <class G_t, class I_t>
 static bool Yinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const iCode *ic = G[i].ic;
-  const operand *const left = IC_LEFT(ic);
 
   const i_assignment_t &ia = a.i_assignment;
 
@@ -385,7 +384,6 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
 {
   a = *T[t].assignments.begin();
 
-  std::set<var_t>::const_iterator vi, vi_end;
   varset_t newlocal;
   std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
   a.local = newlocal;

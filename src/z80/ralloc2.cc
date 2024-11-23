@@ -455,7 +455,7 @@ static bool operand_byte_in_reg(const operand *o, int offset, reg_t r, const ass
   if(!o || !IS_SYMOP(o))
     return(false);
 
-  operand_map_t::const_iterator oi, oi2, oi3, oi_end;
+  operand_map_t::const_iterator oi, oi_end;
 
   for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); offset && oi != oi_end; offset--, oi++);
 
@@ -1370,7 +1370,6 @@ too_risky:
 
   a = *ai_best;
   
-  std::set<var_t>::const_iterator vi, vi_end;
   varset_t newlocal;
   std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
   a.local = newlocal;

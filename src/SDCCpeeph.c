@@ -555,7 +555,6 @@ FBYNAME (labelIsReturnOnly)
     pl = pl->next;
   if (!pl || !pl->line || pl->isDebug)
     return FALSE; /* next line not valid */
-  p = pl->line;
   for (p = pl->line; *p && ISCHARSPACE(*p); p++)
     ;
 

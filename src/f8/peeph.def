@@ -34,6 +34,22 @@ replace restart {
 } if notUsed('xh'), notUsed('zf'), notUsed('nf')
 
 replace restart {
+	ld	%1, (y)
+	ld	xl, %1
+} by {
+	ld	xl, (y)
+	; peephole 0e loaded xl directly instead of via %1
+} if notUsed(%1)
+
+replace restart {
+	ldw	%1, (y)
+	ldw	y, %1
+} by {
+	ldw	y, (y)
+	; peephole 0f loaded xl directly instead of via %1
+} if notUsed(%1)
+
+replace restart {
 	ldw	(%1, sp), %2
 	ldw	%2, (%1, sp)
 } by {
@@ -118,19 +134,19 @@ replace restart {
 }
 
 replace restart {
-	orw	%2, %3
+	%1	%2, %3
 	tstw	%2
 } by {
-	orw	%2, %3
-	; peephole 8 removed redundant tstw after orw.
-} if notVolatile(%2), notUsed('cf')
+	%1	%2, %3
+	; peephole 8 removed redundant tstw after %1.
+} if same(%1 'orw' 'xorw'), notVolatile(%2), notUsed('cf')
 
 replace restart {
 	%1	%3, (%4, sp)
 	%2	%3
 } by {
 	%1	%3, (%4, sp)
-	; peephole 8a removed redundant tst(w) %3 after ld(w).
+	; peephole 8a removed redundant %2 %3 after %1.
 } if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
 
 replace restart {
@@ -138,7 +154,7 @@ replace restart {
 	%2	%3
 } by {
 	%1	%3, (y)
-	; peephole 8b removed redundant tst(w) %3 after ld(w).
+	; peephole 8b removed redundant %2 %3 after %1.
 } if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
 
 replace restart {

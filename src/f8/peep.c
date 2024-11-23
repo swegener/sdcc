@@ -537,9 +537,9 @@ f8MightRead (const lineNode *pl, const char *what)
       const char *larg = leftArg (pl->line);
       const char *rarg = rightArg (pl->line);
 
-      if (larg[0] == what[0] && larg[1] == what[1] || argCont (larg, extra))
+      if (larg[0] == what[0] && larg[1] == what[1] || argCont (larg + 1, extra))
         return true;
-      if (rarg && (rarg[0] == what[0] && rarg[1] == what[1] || argCont (rarg, extra)))
+      if (rarg && (rarg[0] == what[0] && rarg[1] == what[1] || argCont (rarg + 1, extra)))
         return true;
       return false;
     }
@@ -555,7 +555,7 @@ f8MightRead (const lineNode *pl, const char *what)
     {
       const char *larg = leftArg (pl->line);
 
-      return (larg[0] == what[0] && larg[1] == what[1] || argCont (larg, extra));
+      return (larg[0] == what[0] && larg[1] == what[1] || argCont (larg + 1, extra));
     }
   // 16-bit 2/1-op inst, and some others.
   if (ISINST (pl->line, "clrw") || ISINST (pl->line, "popw"))
@@ -577,11 +577,11 @@ f8MightRead (const lineNode *pl, const char *what)
       const char *larg = leftArg (pl->line);
       const char *rarg = rightArg (pl->line);
 
-      if (rarg && (rarg[0] == what[0] && rarg[1] == what[1] || argCont (rarg, extra)))
+      if (rarg && (rarg[0] == what[0] && rarg[1] == what[1] || argCont (rarg + 1, extra)))
         return true;
       if (larg[0] == what[0] && larg[1] == what[1])
         return false;
-      if (argCont (larg, extra))
+      if (argCont (larg + 1, extra))
         return true;
       return false;
     }
@@ -609,11 +609,15 @@ f8MightRead (const lineNode *pl, const char *what)
   if (ISINST (pl->line, "call"))
     {
       const char *larg = leftArg (pl->line);
+      if (*larg == '#')
+        larg++;
+      if (*larg == '_')
+        larg++;
       const symbol *f = findSym (SymbolTab, 0, larg);
       if (*larg == extra)
         return true;
       if (f && IS_FUNC (f->type))
-        return f8IsParmInCall(f->type, what);
+        return f8IsParmInCall (f->type, what);
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
         return true; // todo: improve accuracy here.
     }

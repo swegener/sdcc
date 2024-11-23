@@ -364,6 +364,9 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
         }
     }
 
+  if (IS_VOLATILE (operandType (ic->result)) && bitsForType (operandType (IC_RESULT (dic))) > 8)
+    return 0;
+
   // Can do wide shift by 1 in place.
   if ((dic->op == LEFT_OP || dic->op == RIGHT_OP) && IS_OP_LITERAL (IC_RIGHT (dic)) && operandLitValue (IC_RIGHT (dic))  == 1 &&
     IS_SYMOP (IC_LEFT (dic)) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_LEFT (dic)) == OP_SYMBOL (IC_RESULT (ic)))
@@ -384,7 +387,7 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
      allowing wider operations here could help reduce register pressure.
      Currently, codegen can already handle more than 8 bits correctly
      (except for shifts/rotations), but the code size regresses. */
-  else if (bitsForType (operandType (IC_RESULT (dic))) > 8 /*&& (dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == ROT)*/)
+  else if (bitsForType (operandType (IC_RESULT (dic))) > 16 /*&& (dic->op == LEFT_OP || dic->op == RIGHT_OP || dic->op == ROT)*/)
     return 0;
 
   /* found the definition */

@@ -1,5 +1,12 @@
 2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/f8/peep.c,
+	  src/f8/peeph.def,
+	  src/f8/ralloc.c:
+	  Various f8 improvements.
+
+2024-11-23 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCgenconstprop.cc,
 	  src/SDCCnaddr.hpp,
 	  src/SDCCpeeph.c,

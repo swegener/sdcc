@@ -76,8 +76,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LDW_DSP_A	instruction_74
 #define LDW_A_Z         instruction_dc
 
-#define LDI_Z_Y         instruction_ed
-#define LDWI_Z_Y        instruction_cf
+#define LDI_Y_Z         instruction_ed
+#define LDWI_Y_Z        instruction_cf
 
 #define PUSH_M		instruction_60
 #define PUSH_NSP	instruction_61

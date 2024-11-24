@@ -91,8 +91,8 @@ struct dis_entry disass_f8[]=
     { 0x74, 0xff, ' ', 1, "ldw ('dsp_16'),%A" },
     { 0xdc, 0xff, ' ', 2, "ldw %A,z" },
 
-    { 0xed, 0xff, ' ', 3, "ldi (z),(%A)" },
-    { 0xcf, 0xff, ' ', 3, "ldwi (z),(%A)" },
+    { 0xed, 0xff, ' ', 3, "ldi (%A),(z)" },
+    { 0xcf, 0xff, ' ', 3, "ldwi (%A),(z)" },
 
     { 0x60, 0xff, ' ', 3, "push 'a16_8'" },
     { 0x61, 0xff, ' ', 2, "push ('nsp_8')" },

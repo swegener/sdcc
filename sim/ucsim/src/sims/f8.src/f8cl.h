@@ -237,8 +237,8 @@ public:
   int LDW_NNAM_X(t_mem code) { return ldw_m_r(a_nn_acc16(), rX); }
   int LDW_DSP_A(t_mem code);
   // other moves
-  int LDI_Z_Y(t_mem code);
-  int LDWI_Z_Y(t_mem code);
+  int LDI_Y_Z(t_mem code);
+  int LDWI_Y_Z(t_mem code);
   int PUSH_M(t_mem code);
   int PUSH_NSP(t_mem code);
   int PUSH_A(t_mem code);

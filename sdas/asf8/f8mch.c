@@ -527,9 +527,9 @@ opw:
 		t2 = addr(&e2);
 		r2 = rcode;
 
-		if (t1 == S_IX && r1 == Z && t2 == S_IX)
+		if (t1 == S_IX && t2 == S_IX && r2 == Z)
 		{
-			altaccw(r2);
+			altaccw(r1);
 			outab(op);
 		}
 		else

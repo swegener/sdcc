@@ -159,10 +159,10 @@ cl_f8::LDW_DSP_A(t_mem code)
 }
 
 int
-cl_f8::LDI_Z_Y(t_mem code)
+cl_f8::LDI_Y_Z(t_mem code)
 {
-  u8_t v= rom->read(acc16->get());
-  rom->write(rZ++, v);
+  u8_t v= rom->read(rZ++);
+  rom->write(acc16->get(), v);
   rF&= ~(flagN|flagZ);
   if (v & 0x80) rF|= flagN;
   if (!v) rF|= flagZ;
@@ -172,13 +172,13 @@ cl_f8::LDI_Z_Y(t_mem code)
 }
 
 int
-cl_f8::LDWI_Z_Y(t_mem code)
+cl_f8::LDWI_Y_Z(t_mem code)
 {
   u16_t addr = acc16->get();
-  u16_t v= rom->read(addr);
-  v+= (rom->read(addr+1))*256;
-  rom->write(rZ++, v);
-  rom->write(rZ++, v >> 8);
+  u16_t v= rom->read(rZ++);
+  v+= (rom->read(rZ++))*256;
+  rom->write(addr, v);
+  rom->write(addr+1, v >> 8);
   rF&= ~(flagN|flagZ);
   if (v & 0x8000) rF|= flagN;
   if (!v) rF|= flagZ;

@@ -1,5 +1,14 @@
 2024-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* sdas/asf8/f8mch.c,
+	  sim/ucsim/src/sims/f8.src/decode.h,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/imove.cc:
+	  ldi, ldwi operand swap.
+
+2024-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/SDCCsymt.c:
 	  Fix printing of C23 nullptr in diagnostics.
 	* sim/ucsim/src/sims/f8.src/ialu.cc,

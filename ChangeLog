@@ -2,6 +2,9 @@
 
 	* src/SDCCsymt.c:
 	  Fix printing of C23 nullptr in diagnostics.
+	* sim/ucsim/src/sims/f8.src/ialu.cc,
+	  src/f8/peeph.def:
+	  Change f8 n flag semantics for 8-bit shifts. Fix some flag issues in f8 peephole optimizer rules.
 
 2024-11-24 Maarten Brock <sourceforge.brock AT dse.nl>
 

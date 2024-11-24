@@ -4,7 +4,7 @@ replace restart {
 	%1	%2, %3
 } by {
 	; peephole 0 removed dead load into %2 from %3.
-} if same(%1 'ld' 'ldw'), notUsed(%2), notVolatile(%3), notUsed('zf'), notUsed('nf')
+} if same(%1 'ld' 'ldw'), notUsed(%2), notVolatile(%3), notUsed('nf' 'zf')
 
 replace restart {
 	%1	%2
@@ -24,14 +24,14 @@ replace restart {
 } by {
 	ld	xl, (%1, sp)
 	; peephole 0c loaded xl instead of x.
-} if notUsed('xh'), notUsed('zf'), notUsed('nf')
+} if notUsed('xh'), notUsed('nf' 'zf')
 
 replace restart {
 	ldw	x, (y)
 } by {
 	ld	xl, (y)
 	; peephole 0d loaded xl instead of x.
-} if notUsed('xh'), notUsed('zf'), notUsed('nf')
+} if notUsed('xh'), notUsed('nf' 'zf')
 
 replace restart {
 	ld	%1, (y)
@@ -69,7 +69,7 @@ replace restart {
 	%1	%2
 } by {
 	; peephole 1b removed dead %1 %2.
-} if same(%1 'tst' 'tstw'), notVolatile(%2), notUsed('of' 'zf' 'nf' 'cf')
+} if same(%1 'tst' 'tstw'), notVolatile(%2), notUsed('cf' 'zf' 'nf' 'of')
 
 replace restart {
 	%1	%2, %3
@@ -139,7 +139,7 @@ replace restart {
 } by {
 	%1	%2, %3
 	; peephole 8 removed redundant tstw after %1.
-} if same(%1 'orw' 'xorw'), notVolatile(%2), notUsed('cf')
+} if same(%1 'orw' 'xorw'), notVolatile(%2), notUsed('cf' 'of')
 
 replace restart {
 	%1	%3, (%4, sp)
@@ -147,7 +147,7 @@ replace restart {
 } by {
 	%1	%3, (%4, sp)
 	; peephole 8a removed redundant %2 %3 after %1.
-} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
+} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf' 'of')
 
 replace restart {
 	%1	%3, (y)
@@ -155,7 +155,7 @@ replace restart {
 } by {
 	%1	%3, (y)
 	; peephole 8b removed redundant %2 %3 after %1.
-} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf')
+} if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf' 'of')
 
 replace restart {
 	ld	%1, xl
@@ -167,7 +167,7 @@ replace restart {
 	dec	xl
 	jrc	#%2
 	; peephole 9 removed tst by adjusting jump condition
-} if notVolatile(%1), notUsed('nf' 'zf'), notUsedFrom(%2 'nf' 'zf')
+} if notVolatile(%1), notUsed('cf' 'nf' 'zf' 'of'), notUsedFrom(%2 'cf' 'nf' 'zf' 'of')
 
 replace restart {
 	ld	%1, xl
@@ -179,7 +179,7 @@ replace restart {
 	dec	xl
 	jrnc	#%2
 	; peephole 10 removed tst by adjusting jump condition
-} if notVolatile(%1), notUsed('nf' 'zf'), notUsedFrom(%2 'nf' 'zf')
+} if notVolatile(%1), notUsed('cf' 'nf' 'zf' 'of'), notUsedFrom(%2 'cf' 'nf' 'zf' 'of')
 
 replace restart {
 	clr	%1
@@ -187,7 +187,7 @@ replace restart {
 } by {
 	tst	%1
 	; peephole 11 replaced clr-srl by tst.
-} if notVolatile(%1), notUsed(%1), notUsed('of')
+} if notVolatile(%1), notUsed(%1), notUsed('cf' 'of')
 
 replace restart {
 	%2	%1
@@ -195,8 +195,7 @@ replace restart {
 } by {
 	%2	%1
 	; peephole 12 removed redundant tst.
-} if same(%2 'da' 'dec' 'inc' 'tst'), notVolatile(%1)
-; todo: add 'sll' 'sra' 'srl' 'rlc' 'rrc', if it is decided that they alter n flag!
+} if same(%2 'da' 'dec' 'inc' 'sll' 'sra' 'srl' 'tst' 'rlc' 'rrc'), notVolatile(%1), notUsed('cf' 'of')
 
 replace restart {
 	%2	%1
@@ -204,7 +203,7 @@ replace restart {
 } by {
 	%2	%1
 	; peephole 13 removed redundant tstw.
-} if same(%2 'adcw' 'decw' 'incw' 'mul' 'negw' 'rlcw' 'sbcw' 'sllw' 'sraw' 'srlw' 'rrcw' 'sbcw' 'tstw'), notVolatile(%1)
+} if same(%2 'adcw' 'decw' 'incw' 'mul' 'negw' 'rlcw' 'sbcw' 'sllw' 'sraw' 'srlw' 'rrcw' 'sbcw' 'tstw'), notVolatile(%1), notUsed('cf' 'of')
 
 replace restart {
 	%2	%1, %3
@@ -212,7 +211,7 @@ replace restart {
 } by {
 	%2	%1, %3
 	; peephole 14 removed redundant tst.
-} if same(%2 'adc' 'add' 'and' 'cp' 'or' 'rot' 'sbc' 'sub' 'xor'), notVolatile(%1)
+} if same(%2 'adc' 'add' 'and' 'cp' 'or' 'rot' 'sbc' 'sub' 'xor'), notVolatile(%1), notUsed('cf' 'of')
 
 ; addw sp, #d does not set flags, but there is no tstw sp, either.
 replace restart {
@@ -221,7 +220,7 @@ replace restart {
 } by {
 	%2	%1, %3
 	; peephole 15 removed redundant tstw.
-} if same(%2 'adcw' 'addw' 'cpw' 'orw' 'sbcw' 'sllw' 'subw' 'xorw'), notVolatile(%1)
+} if same(%2 'adcw' 'addw' 'cpw' 'orw' 'sbcw' 'sllw' 'subw' 'xorw'), notVolatile(%1), notUsed('cf' 'of')
 
 replace restart {
 	tstw	(%1, sp)
@@ -232,7 +231,7 @@ replace restart {
 	; peephole 16 moved ldw to replace tstw.
 	%2	#%3
 	
-} if same(%2 'jr' 'jrc' 'jrgt' 'jrle' 'jrn' 'jrnc' 'jrnn' 'jrno' 'jrnz' 'jro' 'jrsge' 'jrsgt' 'jrsle' 'jrslt' 'jrz'), notUsedFrom(%3 'y')
+} if same(%2 'jr' 'jrc' 'jrgt' 'jrle' 'jrn' 'jrnc' 'jrnn' 'jrno' 'jrnz' 'jro' 'jrsge' 'jrsgt' 'jrsle' 'jrslt' 'jrz'), notUsedFrom(%3 'y' 'cf' 'of'), notUsed('cf' 'of')
 
 replace restart {
 	jp	#%5

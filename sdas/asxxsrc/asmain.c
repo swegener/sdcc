@@ -187,7 +187,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     c               character from argument string
  *              int     i               argument loop counter
  *              area *  ap              pointer to area structure
- *		def *	dp		pointer to def structure
+ *              def *   dp              pointer to def structure
  *
  *      global variables:
  *              int     aflag           -a, make all symbols global flag
@@ -205,8 +205,8 @@ search_path_fopen(const char *filename, const char *mode)
  *              int *   cp              pointer to assembler output array cb[]
  *              int *   cpt             pointer to assembler relocation type
  *                                      output array cbt[]
- *		time_t	curtim		current time string pointer
- *		def *	defp		pointer to a def structure
+ *              time_t  curtim          current time string pointer
+ *              def *   defp            pointer to a def structure
  *              char    eb[]            array of generated error codes
  *              char *  ep              pointer into error list array eb[]
  *              int     fflag           -f(f), relocations flagged flag
@@ -282,7 +282,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              char *  strcpy()        c_library
  *              VOID    symglob()       assym.c
  *              VOID    syminit()       assym.c
- *		time_t	time()		c_library
+ *              time_t  time()          c_library
  *              VOID    usage()         asmain.c
  *
  *      side effects:
@@ -301,17 +301,17 @@ main(int argc, char *argv[])
         char *q;
         int c, i;
         struct area *ap;
-	struct def *dp;
+        struct def *dp;
 
         /* sdas specific */
         /* sdas initialization */
         sdas_init(argv[0]);
         /* end sdas specific */
 
-	if (argc == 1) {
-		usage();
-		exit(ER_NONE);
-	}
+        if (argc == 1) {
+                usage();
+                exit(ER_NONE);
+        }
 
         if (intsiz() < 4) {
                 fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
@@ -328,20 +328,20 @@ main(int argc, char *argv[])
                 if (*p == '-') {
                         if (asmc != NULL) {
                                 usage();
-				fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
+                                fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
                                 asexit(ER_FATAL);
                         }
                         ++p;
                         while ((c = *p++) != 0) {
                                 switch(c) {
-				/*
-				 * -h   Show the help list
-				 */
-				case 'h':
-				case 'H':
-					usage();
-					exit(ER_NONE);
-					break;
+                                /*
+                                 * -h   Show the help list
+                                 */
+                                case 'h':
+                                case 'H':
+                                        usage();
+                                        exit(ER_NONE);
+                                        break;
 
 //                                case 'i':
                                 /* TODO: collides with new Insert assembler line */
@@ -351,42 +351,46 @@ main(int argc, char *argv[])
                                                 ++p;
                                         break;
 
-				/*
-				 * Output:
-				 *   -l   Create list   file/outfile[.lst]
-				 *   -o   Create object file/outfile[.rel]
-				 *   -s   Create symbol file/outfile[.sym]
-				 */
-                                case 'l':
-                                case 'L':
-                                        ++lflag;
-                                        break;
-
+                                /*
+                                 * Output:
+                                 *   -o   Create object file/outfile[.rel]
+                                 */
                                 case 'o':
                                 case 'O':
                                         ++oflag;
                                         break;
 
+                                /*
+                                 * Create Listing Output
+                                 */
+                                case 'l':
+                                case 'L':
+                                        ++lflag;
+                                        break;
+
+                                /*
+                                 * Create Symbol Output
+                                 */
                                 case 's':
                                 case 'S':
                                         ++sflag;
                                         break;
 
-				/*
-				 * Listing:
-				 *   -d   Decimal listing
-				 *   -q   Octal   listing
-				 *   -x   Hex     listing (default)
-				 *   -b   Display .define substitutions in listing
-				 *   -bb  and display without .define substitutions
-				 *   -c   Disable instruction cycle count in listing
-				 *   -f   Flag relocatable references by  `   in listing file
-				 *   -ff  Flag relocatable references by mode in listing file
-				 *   -k   Disable error output to listing file
-				 *   -p   Disable automatic listing pagination
-				 *   -u   Disable .list/.nlist processing
-				 *   -w   Wide listing format for symbol table
-				 */
+                                /*
+                                 * Listing:
+                                 *   -d   Decimal listing
+                                 *   -q   Octal   listing
+                                 *   -x   Hex     listing (default)
+                                 *   -b   Display .define substitutions in listing
+                                 *   -bb  and display without .define substitutions
+                                 *   -c   Disable instruction cycle count in listing
+                                 *   -f   Flag relocatable references by  `   in listing file
+                                 *   -ff  Flag relocatable references by mode in listing file
+                                 *   -k   Disable error output to listing file
+                                 *   -p   Disable automatic listing pagination
+                                 *   -u   Disable .list/.nlist processing
+                                 *   -w   Wide listing format for symbol table
+                                 */
                                 case 'd':
                                 case 'D':
                                         xflag = 2;
@@ -409,12 +413,17 @@ main(int argc, char *argv[])
 
                                 case 'c':
                                 case 'C':
-                                        cflag = 1;      /* Cycle counts in listing */
+                                        ++cflag;        /* Cycle counts in listing */
                                         break;
 
                                 case 'f':
                                 case 'F':
                                         ++fflag;
+                                        break;
+
+                                case 'k':
+                                case 'K':
+//                                      ++kflag;        /* not yet implemented */
                                         break;
 
                                 case 'p':
@@ -432,21 +441,21 @@ main(int argc, char *argv[])
                                         ++wflag;
                                         break;
 
-				/*
-				 * Assembly Processing Options:",
-				 *   -v   Enable out of range signed / unsigned errors
-				 */
-				case 'v':
-				case 'V':
-					++vflag;
-					break;
+                                /*
+                                 * Assembly Processing Options:",
+                                 *   -v   Enable out of range signed / unsigned errors
+                                 */
+                                case 'v':
+                                case 'V':
+                                        ++vflag;
+                                        break;
 
-				/*
-				 * Symbol Options:
-				 *   -a   All user symbols made global
-				 *   -g   Undefined symbols made global
-				 *   -z   Disable case sensitivity for symbols
-				 */
+                                /*
+                                 * Symbol Options:
+                                 *   -a   All user symbols made global
+                                 *   -g   Undefined symbols made global
+                                 *   -z   Disable case sensitivity for symbols
+                                 */
                                 case 'a':
                                 case 'A':
                                         ++aflag;
@@ -457,7 +466,8 @@ main(int argc, char *argv[])
                                         ++gflag;
                                         break;
 
-                                case 'n':
+//                                case 'n':
+                                /* TODO: collides with new Specify number of assembler scanning passes */
                                 case 'N':
                                         nflag = 1;
                                         break;
@@ -467,11 +477,11 @@ main(int argc, char *argv[])
                                         ++zflag;
                                         break;
 
-				/*
-				 * Debug Options:
-				 *   -j   Enable NoICE Debug Symbols
-				 *   -y   Enable SDCC  Debug Symbols
-				 */
+                                /*
+                                 * Debug Options:
+                                 *   -j   Enable NoICE Debug Symbols
+                                 *   -y   Enable SDCC  Debug Symbols
+                                 */
 #if NOICE
                                 case 'j':               /* NoICE Debug  JLH */
                                 case 'J':
@@ -487,17 +497,21 @@ main(int argc, char *argv[])
                                         break;
 #endif
 
-				/*
-				 * Unlisted Options:
-				 *   -r   list line numbers in .hst help file
-				 *   -rr  list line numbers of NON listed lines
-				 *   -t   show internal block allocations
-				 */
+                                /*
+                                 * Unlisted Options:
+                                 *   -r   list line numbers in .hst help file
+                                 *   -rr  list line numbers of NON listed lines
+                                 *   -t   show internal block allocations
+                                 */
+                                case 'r':
+                                case 'R':
+//                                      ++rflag;        /* not yet implemented */
+                                        break;
 
-				case 't':
-				case 'T':
-					++tflag;
-					break;
+                                case 't':
+                                case 'T':
+                                        ++tflag;
+                                        break;
 
                                 /*
                                         * Unknown Options:
@@ -556,7 +570,7 @@ main(int argc, char *argv[])
                 tfp = afile(q, "sym", 1);
         exprmasks(2);
         syminit();
-	curtim = time(NULL);
+        curtim = time(NULL);
         for (pass=0; pass<3; ++pass) {
                 aserr = 0;
                 if (gflag && pass == 1)
@@ -565,11 +579,11 @@ main(int argc, char *argv[])
                         allglob();
                 if (oflag && pass == 2)
                         outgsd();
-		dp = defp;
-		while (dp) {
-			dp->d_dflag = 0;
-			dp = dp->d_dp;
-		}
+                dp = defp;
+                while (dp) {
+                        dp->d_dflag = 0;
+                        dp = dp->d_dp;
+                }
                 flevel = 0;
                 tlevel = 0;
                 lnlist = LIST_NORM;
@@ -689,14 +703,14 @@ intsiz(void)
  *              FILE *  lfp             list output file handle
  *              FILE *  ofp             relocation output file handle
  *              FILE *  tfp             symbol table output file handle
- *		FILE *	stdout		standard output handle
- *		int	maxinc		maximum include file level
- *		int	maxmcr		maximum macro expansion level
- *		int	mcrblk		macro allocation in 1K blocks
+ *              FILE *  stdout          standard output handle
+ *              int     maxinc          maximum include file level
+ *              int     maxmcr          maximum macro expansion level
+ *              int     mcrblk          macro allocation in 1K blocks
  *
  *      functions called:
  *              int     fclose()        c_library
- *		int	fprintf()	c_library
+ *              int     fprintf()       c_library
  *              VOID    exit()          c_library
  *
  *      side effects:
@@ -732,13 +746,13 @@ asexit(int i)
         }
         /* end sdas specific */
 
-	if (tflag) {
-		fprintf(stderr, "?ASxxxx-Info-maxinc(include file level)    = %3d\n", maxinc);
-		fprintf(stderr, "?ASxxxx-Info-maxmcr(macro expansion level) = %3d\n", maxmcr);
-		//fprintf(stderr, "?ASxxxx-Info-asmblk(1K Byte Allocations)   = %3d\n", asmblk);
-		fprintf(stderr, "?ASxxxx-Info-mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
-		fprintf(stderr, "\n");
-	}
+        if (tflag) {
+                fprintf(stderr, "?ASxxxx-Info-maxinc(include file level)    = %3d\n", maxinc);
+                fprintf(stderr, "?ASxxxx-Info-maxmcr(macro expansion level) = %3d\n", maxmcr);
+                //fprintf(stderr, "?ASxxxx-Info-asmblk(1K Byte Allocations)   = %3d\n", asmblk);
+                fprintf(stderr, "?ASxxxx-Info-mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
+                fprintf(stderr, "\n");
+        }
 
         exit(i);
 }
@@ -760,7 +774,7 @@ asexit(int i)
  *              int     c               character from assembler-source
  *                                      text line
  *              area *  ap              pointer to an area structure
- *		def *	dp		pointer to a  definition structure
+ *              def *   dp              pointer to a  definition structure
  *              expr    e1              expression structure
  *              char    id[]            id string
  *              char    opt[]           options string
@@ -810,15 +824,15 @@ asexit(int i)
  *      functions called:
  *              a_uint  absexpr()       asexpr.c
  *              area *  alookup()       assym.c
- *		def *	dlookup()	assym.c
+ *              def *   dlookup()       assym.c
  *              VOID    clrexpr()       asexpr.c
  *              int     digit()         asexpr.c
  *              char    endline()       aslex.c
  *              VOID    equate()        asmain.c
  *              VOID    err()           assubr.c
  *              VOID    expr()          asexpr.c
- *              FILE *  fopen()         c_library
- *		int	fseek()		c_library
+ *              FILE *  search_path_fopen()     asmain.c
+ *              int     fseek()         c_library
  *              int     get()           aslex.c
  *              VOID    getid()         aslex.c
  *              int     getmap()        aslex.c
@@ -856,7 +870,7 @@ asmbl(void)
         struct tsym *tp;
         int c;
         struct area  *ap;
-	struct def *dp;
+        struct def *dp;
         struct expr e1;
         char id[NCPS];
         char equ[NCPS];
@@ -919,37 +933,37 @@ loop:
                         n = 10*n + d;
                         c = get();
                 }
-                if (c != '$' || get() != ':')
+                if (c != '$' || get() != ':') {
                         qerr();
-
-		tp = symp->s_tsym;
-		while (tp) {
-			if (n == tp->t_num) {
-				if (pass == 0) {
-					tp->t_flg |= S_MDF;
-				}
-				break;
-			}
-			tp = tp->t_lnk;
-		}
-		if (tp == NULL) {
-			tp=(struct tsym *) new (sizeof(struct tsym));
-			tp->t_area = dot.s_area;
-			tp->t_addr = dot.s_addr;
-			tp->t_lnk = symp->s_tsym;
-			tp->t_num = n;
-			tp->t_flg = 0;
-			symp->s_tsym = tp;
-		}
-		if (tp->t_flg & S_MDF)
-			err('m');
-		phase(tp->t_area, tp->t_addr);
-		fuzz = tp->t_addr - dot.s_addr;
-		tp->t_area = dot.s_area;
-		tp->t_addr = dot.s_addr;
-		lmode = ALIST;
-		goto loop;
-	}
+                }
+                tp = symp->s_tsym;
+                while (tp) {
+                        if (n == tp->t_num) {
+                                if (pass == 0) {
+                                        tp->t_flg |= S_MDF;
+                                }
+                                break;
+                        }
+                        tp = tp->t_lnk;
+                }
+                if (tp == NULL) {
+                        tp=(struct tsym *) new (sizeof(struct tsym));
+                        tp->t_area = dot.s_area;
+                        tp->t_addr = dot.s_addr;
+                        tp->t_lnk = symp->s_tsym;
+                        tp->t_num = n;
+                        tp->t_flg = 0;
+                        symp->s_tsym = tp;
+                }
+                if (tp->t_flg & S_MDF)
+                        err('m');
+                phase(tp->t_area, tp->t_addr);
+                fuzz = tp->t_addr - dot.s_addr;
+                tp->t_area = dot.s_area;
+                tp->t_addr = dot.s_addr;
+                lmode = ALIST;
+                goto loop;
+        }
         /*
          * If the first character is a letter then assume a label,
          * symbol, assembler directive, or assembler mnemonic is
@@ -963,6 +977,7 @@ loop:
                 }
         }
         getid(id, c);
+        /* Skip white space to next character */
         c = getnb();
         /*
          * If the next character is a : then a label is being processed.
@@ -1040,12 +1055,14 @@ loop:
                  * Alternates for =, ==, and =:
                  */
                 equ_ip = ip;     /* Save current char pointer for case equate not found. */
-                getid(equ, -1);
-                if ((mp = mlookup(equ)) == NULL || mp->m_type != S_EQU) {
-                        ip = equ_ip;
-                } else {
-                        equate(id, &e1, mp->m_valu);
-                        goto loop;
+                if (more() && (ctype[c = getnb()] == LETTER)) {
+                        getid(equ, c);
+                        if ((mp = mlookup(equ)) == NULL || mp->m_type != S_EQU) {
+                                ip = equ_ip;
+                        } else {
+                                equate(id, &e1, mp->m_valu);
+                                goto loop;
+                        }
                 }
         }
         /*
@@ -1131,50 +1148,55 @@ loop:
                                         case O_IFLE:    n = (((v_sint) n) <= 0);        break;
                                         }
                                         break;
-				case O_IFB:	/* .if b,.... */
-				case O_IFNB:	/* .if nb,.... */
-					n = comma(0) ? 0 : 1;
-					if (n) {
-						getxstr(id);
-						if (*id == '\0') {
-							n = 0;
-						}
-						comma(0);
-					}
-					switch (mp->m_valu) {
-					default:
-					case O_IFB:	n = (((v_sint) n) == 0);	break;
-					case O_IFNB:	n = (((v_sint) n) != 0);	break;
-					}
-					break;
-				case O_IFDEF:	/* .if def,.... */
-				case O_IFNDEF:	/* .if ndef,.... */
-					getid(id, -1);
-					if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
-						n = 1;
-					} else
-					if ((sp = slookup(id)) != NULL) {
-						n = (sp->s_type == S_USER) ? 1 : 0;
-					} else {
-						n = 0;
-					}
-					switch (mp->m_valu) {
-					default:
-					case O_IFDEF:	n = (((v_sint) n) != 0);	break;
-					case O_IFNDEF:	n = (((v_sint) n) == 0);	break;
-					}
-					break;
-				case O_IFIDN:	/* .if idn,.... */
-				case O_IFDIF:	/* .if dif,.... */
-					getxstr(id);
-					getxstr(equ);
-					n = symeq(id, equ, zflag);
-					switch (mp->m_valu) {
-					default:
-					case O_IFIDN:	n = (((v_sint) n) != 0);	break;
-					case O_IFDIF:	n = (((v_sint) n) == 0);	break;
-					}
-					break;
+
+                                case O_IFB:     /* .if b,.... */
+                                case O_IFNB:    /* .if nb,.... */
+                                        n = comma(0) ? 0 : 1;
+                                        if (n) {
+                                                getxstr(id);
+                                                if (*id == '\0') {
+                                                        n = 0;
+                                                }
+                                                comma(0);
+                                        }
+                                        switch (mp->m_valu) {
+                                        default:
+                                        case O_IFB:     n = (((v_sint) n) == 0);    break;
+                                        case O_IFNB:    n = (((v_sint) n) != 0);    break;
+                                        }
+                                        break;
+
+                                case O_IFDEF:   /* .if def,.... */
+                                case O_IFNDEF:  /* .if ndef,.... */
+                                        getid(id, -1);
+                                        if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
+                                                n = 1;
+                                        } else
+                                        if ((sp = slookup(id)) != NULL) {
+                                                n = (sp->s_type == S_USER) ? 1 : 0;
+                                        } else {
+                                                n = 0;
+                                        }
+                                        switch (mp->m_valu) {
+                                        default:
+                                        case O_IFDEF:   n = (((v_sint) n) != 0);    break;
+                                        case O_IFNDEF:  n = (((v_sint) n) == 0);    break;
+                                        }
+                                        break;
+
+                                case O_IFIDN:   /* .if idn,.... */
+                                case O_IFDIF:   /* .if dif,.... */
+                                        getxstr(id);
+                                        comma(0);
+                                        getxstr(equ);
+                                        n = symeq(id, equ, zflag);
+                                        switch (mp->m_valu) {
+                                        default:
+                                        case O_IFIDN:   n = (((v_sint) n) != 0);    break;
+                                        case O_IFDIF:   n = (((v_sint) n) == 0);    break;
+                                        }
+                                        break;
+
                                 case O_IFF:     /* .if f */
                                 case O_IFT:     /* .if t */
                                 case O_IFTF:    /* .if tf */
@@ -1333,52 +1355,53 @@ loop:
                                 }
                                 break;
 
-			case O_IIFB:	/* .iif b,.... */
-			case O_IIFNB:	/* .iif nb,.... */
-				n = comma(0) ? 0 : 1;
-				if (n) {
-					getxstr(id);
-					if (*id == '\0') {
-						n = 0;
-					}
-					comma(0);
-				}
-				switch (mp->m_valu) {
-				default:
-				case O_IIFB:	n = (((v_sint) n) == 0);	break;
-				case O_IIFNB:	n = (((v_sint) n) != 0);	break;
-				}
-				break;
+                        case O_IIFB:    /* .iif b,.... */
+                        case O_IIFNB:   /* .iif nb,.... */
+                                n = comma(0) ? 0 : 1;
+                                if (n) {
+                                        getxstr(id);
+                                        if (*id == '\0') {
+                                                n = 0;
+                                        }
+                                        comma(0);
+                                }
+                                switch (mp->m_valu) {
+                                default:
+                                case O_IIFB:    n = (((v_sint) n) == 0);        break;
+                                case O_IIFNB:   n = (((v_sint) n) != 0);        break;
+                                }
+                                break;
 
-			case O_IIFDEF:	/* .iif def,.... */
-			case O_IIFNDEF:	/* .iif ndef,.... */
-				getid(id, -1);
-				if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
-					n = 1;
-				} else
-				if ((sp = slookup(id)) != NULL) {
-					n = (sp->s_type == S_USER) ? 1 : 0;
-				} else {
-					n = 0;
-				}
-				switch (mp->m_valu) {
-				default:
-				case O_IIFDEF:	n = (((v_sint) n) != 0);	break;
-				case O_IIFNDEF:	n = (((v_sint) n) == 0);	break;
-				}
-				break;
+                        case O_IIFDEF:  /* .iif def,.... */
+                        case O_IIFNDEF: /* .iif ndef,.... */
+                                getid(id, -1);
+                                if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
+                                        n = 1;
+                                } else
+                                if ((sp = slookup(id)) != NULL) {
+                                        n = (sp->s_type == S_USER) ? 1 : 0;
+                                } else {
+                                        n = 0;
+                                }
+                                switch (mp->m_valu) {
+                                default:
+                                case O_IIFDEF:  n = (((v_sint) n) != 0);        break;
+                                case O_IIFNDEF: n = (((v_sint) n) == 0);        break;
+                                }
+                                break;
 
-			case O_IIFIDN:	/* .iif idn,.... */
-			case O_IIFDIF:	/* .iif dif,.... */
-				getxstr(id);
-				getxstr(equ);
-				n = symeq(id, equ, zflag);
-				switch (mp->m_valu) {
-				default:
-				case O_IIFIDN:	n = (((v_sint) n) != 0);	break;
-				case O_IIFDIF:	n = (((v_sint) n) == 0);	break;
-				}
-				break;
+                        case O_IIFIDN:  /* .iif idn,.... */
+                        case O_IIFDIF:  /* .iif dif,.... */
+                                getxstr(id);
+                                comma(0);
+                                getxstr(equ);
+                                n = symeq(id, equ, zflag);
+                                switch (mp->m_valu) {
+                                default:
+                                case O_IIFIDN:  n = (((v_sint) n) != 0);        break;
+                                case O_IIFDIF:  n = (((v_sint) n) == 0);        break;
+                                }
+                                break;
 
                         default:
                                 n = 0;
@@ -1572,8 +1595,8 @@ loop:
                 break;
 
         case S_INCL:
-		switch(mp->m_valu) {
-		case I_CODE:
+                switch(mp->m_valu) {
+                case I_CODE:
                         lmode = SLIST;
                         if (incfil > maxinc) {
                                 maxinc = incfil;
@@ -1621,7 +1644,7 @@ loop:
                         /*
                          * Insert Count
                          */
-#ifdef	LONGINT
+#ifdef  LONGINT
                         cnt = 0x7FFFFFFFl;
 #else
                         cnt = 0x7FFFFFFF;
@@ -1632,8 +1655,8 @@ loop:
                         /*
                          * Open File
                          */
-                        if ((fp = fopen(fn, "rb")) == NULL) {
-				xerr('i', "File not found.");
+                        if ((fp = search_path_fopen(fn, "rb")) == NULL) {
+                                xerr('i', "File not found.");
                                 break;
                         }
                         /*
@@ -1641,7 +1664,7 @@ loop:
                          */
                         fseek(fp, skp, SEEK_SET);
                         if (fread(&c, 1, 1, fp) != 1) {
-				xerr('i', "Offset past End-Of-File.");
+                                xerr('i', "Offset past End-Of-File.");
                                 break;
                         }
                         fseek(fp, skp, SEEK_SET);
@@ -1662,9 +1685,9 @@ loop:
                         fclose(fp);
                         break;
 
-		default:
-			xerr('i', "Internal ___PST.C Error.");
-			break;
+                default:
+                        xerr('i', "Internal ___PST.C Error.");
+                        break;
                 }
                 break;
 
@@ -1719,7 +1742,7 @@ loop:
                 break;
 
         case S_ORG:
-                if (dot.s_area->a_flag & A_ABS) {
+                if ((dot.s_area->a_flag & A_ABS) == A_ABS) {
                         char buf[NCPS];
 
                         outall();
@@ -1746,15 +1769,25 @@ loop:
 
         case S_RADIX:
                 if (more()) {
-                        switch (ccase[getnb()]) {
- 			case 'b':	radix = 2;	break;	/* B */
-			case '@':				/* @ */
-			case 'o':				/* O */
-			case 'q':	radix = 8;	break;	/* Q */
-			case 'd':	radix = 10;	break;	/* D */
-			case 'h':				/* H */
-			case 'x':	radix = 16;	break;	/* X */
-			default:				/* 2, 8, 10, 16 */
+                        switch (ccase[getnb() & 0x7F]) {
+                        case 'b':       radix = 2;      break;  /* B */
+                        case '@':                               /* @ */
+                        case 'o':                               /* O */
+                        case 'q':       radix = 8;      break;  /* Q */
+                        case 'd':       radix = 10;     break;  /* D */
+                        case 'h':                               /* H */
+                        case 'x':       radix = 16;     break;  /* X */
+                        default:                                /* 2, 8, 10, 16 */
+                                unget(c);
+                                expr(&e1, 0);
+                                if (is_abs(&e1)) {
+                                        v = e1.e_addr;
+                                        if ((v == 2) || (v == 8) ||
+                                           (v == 10) || (v == 16)) {
+                                                radix = (int) v;
+                                                break;
+                                        }
+                                }
                                 radix = 10;
                                 qerr();
                                 break;
@@ -1932,60 +1965,60 @@ loop:
                 }
                 break;
 
-	case S_DEFINE:
-		/*
-		 * Extract the .(un)define key word.
-		 */
-		getid(id, -1);
+        case S_DEFINE:
+                /*
+                 * Extract the .(un)define key word.
+                 */
+                getid(id, -1);
 
-		switch(mp->m_valu) {
-		case O_DEF:
-			/*
-			 * Extract the substitution string
-			 */
-			comma(0);
-			*opt = 0;
-			if (more()) {
-				getdstr(opt, NCPS);
-			}
-			/*
-			 * Verify the definition or
-			 * add a new definition.
-			 */
-			dp = dlookup(id);
-			if (dp) {
-				if (!symeq(opt, dp->d_define, zflag)) {
-					if (dp->d_dflag) {
-						err('m');
-					}
-					dp->d_define = strsto(opt);
-				}
-				dp->d_dflag = 1;
-			} else {
-				dp = (struct def *) new (sizeof(struct def));
-				dp->d_dp = defp;
-				dp->d_id = strsto(id);
-				dp->d_define = strsto(opt);
-				dp->d_dflag = 1;
-				defp = dp;
-			}
-			break;
+                switch(mp->m_valu) {
+                case O_DEF:
+                        /*
+                         * Extract the substitution string
+                         */
+                        comma(0);
+                        *opt = 0;
+                        if (more()) {
+                                getdstr(opt, NCPS);
+                        }
+                        /*
+                         * Verify the definition or
+                         * add a new definition.
+                         */
+                        dp = dlookup(id);
+                        if (dp) {
+                                if (!symeq(opt, dp->d_define, zflag)) {
+                                        if (dp->d_dflag) {
+                                                err('m');
+                                        }
+                                        dp->d_define = strsto(opt);
+                                }
+                                dp->d_dflag = 1;
+                        } else {
+                                dp = (struct def *) new (sizeof(struct def));
+                                dp->d_dp = defp;
+                                dp->d_id = strsto(id);
+                                dp->d_define = strsto(opt);
+                                dp->d_dflag = 1;
+                                defp = dp;
+                        }
+                        break;
 
-		case O_UNDEF:
-			/*
-			 * Find and undefine the definition.
-			 */
-			dp = dlookup(id);
-			if (dp) {
-				dp->d_dflag = 0;
-			}
-			break;
+                case O_UNDEF:
+                        /*
+                         * Find and undefine the definition.
+                         */
+                        dp = dlookup(id);
+                        if (dp) {
+                                dp->d_dflag = 0;
+                        }
+                        break;
 
-		default:
-			break;
-		}
-		lmode = SLIST;
-		break;
+                default:
+                        break;
+                }
+                lmode = SLIST;
+                break;
 
         case S_BOUNDARY:
                 switch(mp->m_valu) {
@@ -2017,29 +2050,29 @@ loop:
                 }
                 break;
 
-	case S_MSG:
-		lmode = SLIST;
-		/*
-		 * Print the .msg message
-		 */
-		getdstr(fn, FILSPC+FILSPC);
-		if (pass == 2) {
-			printf("%s\n", fn);
-		}
-		break;
+        case S_MSG:
+                lmode = SLIST;
+                /*
+                 * Print the .msg message
+                 */
+                getdstr(fn, FILSPC+FILSPC);
+                if (pass == 2) {
+                        printf("%s\n", fn);
+                }
+                break;
 
-	case S_ERROR:
-		clrexpr(&e1);
-		if (more()) {
-			expr(&e1, 0);
-		}
-		if (e1.e_addr != 0) {
-			err('e');
-		}
-		lmode = ELIST;
-//		eqt_area = NULL;
-		laddr = e1.e_addr;
-		break;
+        case S_ERROR:
+                clrexpr(&e1);
+                if (more()) {
+                        expr(&e1, 0);
+                }
+                if (e1.e_addr != 0) {
+                        err('e');
+                }
+                lmode = ELIST;
+//              eqt_area = NULL;
+                laddr = e1.e_addr;
+                break;
 
         case S_MACRO:
                 lmode = SLIST;
@@ -2209,30 +2242,30 @@ FILE *
 afile(char *fn, char *ft, int wf)
 {
         FILE *fp;
-	char *frmt;
+        char *frmt;
 
         afilex(fn, ft);
 
-	/*
-	 * Select (Binary) Read/Write
-	 */
-	switch(wf) {
-	default:
-	case 0:	frmt = "r";	break;
+        /*
+         * Select (Binary) Read/Write
+         */
+        switch(wf) {
+        default:
+        case 0: frmt = "r";     break;
         /* open file -- use "b" flag to write LF line endings on all host platforms */
-	/* this is currently set to match old sdas behavior */
-	case 1:	frmt = "wb";	break;
-#ifdef	DECUS
-	case 2:	frmt = "rn";	break;
-	case 3:	frmt = "wn";	break;
+        /* this is currently set to match old sdas behavior */
+        case 1: frmt = "wb";    break;
+#ifdef  DECUS
+        case 2: frmt = "rn";    break;
+        case 3: frmt = "wn";    break;
 #else
-	case 2:	frmt = "rb";	break;
-	case 3:	frmt = "wb";	break;
+        case 2: frmt = "rb";    break;
+        case 3: frmt = "wb";    break;
 #endif
-	}
+        }
 
-	if ((fp = fopen(afntmp, frmt)) == NULL) {
-	    fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afntmp);
+        if ((fp = fopen(afntmp, frmt)) == NULL) {
+            fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afntmp);
             asexit(ER_FATAL);
         }
 
@@ -2472,18 +2505,18 @@ phase(struct area *ap, a_uint a)
 }
 
 char *usetxt[] = {
-	"Usage: [-Options] [-Option with arg] file",
-	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
-	"  -h   or NO ARGUMENTS  Show this help list",
-	"Input:",
+        "Usage: [-Options] [-Option with arg] file",
+        "Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
+        "  -h   or NO ARGUMENTS  Show this help list",
+        "Input:",
         "  -I   Add the named directory to the include file",
         "       search path.  This option may be used more than once.",
         "       Directories are searched in the order given.",
-	"Output:",
-	"  -l   Create list   file/outfile[.lst]",
-	"  -o   Create object file/outfile[.rel]",
-	"  -s   Create symbol file/outfile[.sym]",
-	"Listing:",
+        "Output:",
+        "  -l   Create list   file/outfile[.lst]",
+        "  -o   Create object file/outfile[.rel]",
+        "  -s   Create symbol file/outfile[.sym]",
+        "Listing:",
         "  -d   Decimal listing",
         "  -q   Octal   listing",
         "  -x   Hex     listing (default)",
@@ -2495,15 +2528,15 @@ char *usetxt[] = {
         "  -p   Disable automatic listing pagination",
         "  -u   Disable .list/.nlist processing",
         "  -w   Wide listing format for symbol table",
-	"Assembly:",
-	"  -v   Enable out of range signed / unsigned errors",
-	"Symbols:",
+        "Assembly:",
+        "  -v   Enable out of range signed / unsigned errors",
+        "Symbols:",
         "  -a   All user symbols made global",
         "  -g   Undefined symbols made global",
         "  -n   Don't resolve global assigned value symbols",
         "  -z   Disable case sensitivity for symbols",
 #if (NOICE || SDCDB)
-	"Debugging:",
+        "Debugging:",
 #if NOICE
         "  -j   Enable NoICE Debug Symbols",
 #endif
@@ -2543,8 +2576,8 @@ usage()
         fprintf(stderr, "\n%s Assembler %s  (%s)\n\n", is_sdas() ? "sdas" : "ASxxxx", VERSION, cpu);
         fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
         fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
-	for (dp = usetxt; *dp; dp++) {
+        for (dp = usetxt; *dp; dp++) {
                 fprintf(stderr, "%s\n", *dp);
-	}
+        }
 }
 

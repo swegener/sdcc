@@ -2999,8 +2999,8 @@ checkPtrCast (sym_link *newType, sym_link *orgType, bool implicit, bool orgIsNul
             }
           else
             {
-              // shouldn't do that with float, array or structure unless to void
-              if (!IS_VOID (getSpec (newType)) && !(IS_CODEPTR (newType) && IS_FUNC (newType->next) && IS_FUNC (orgType)))
+              // shouldn't do that with float, array or structure unless to void, but from nullptr is fine
+              if (!IS_VOID (getSpec (newType)) && !(IS_CODEPTR (newType) && IS_FUNC (newType->next) && IS_FUNC (orgType)) && !orgIsNullPtrConstant)
                 {
                   errors += werror (E_INCOMPAT_TYPES);
                 }

@@ -1,3 +1,9 @@
+2024-11-24 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-3802.c:
+	  Fix bug #3802.
+
 2024-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asf8/f8mch.c,

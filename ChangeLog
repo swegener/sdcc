@@ -1,3 +1,8 @@
+2024-11-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCsymt.c:
+	  Fix printing of C23 nullptr in diagnostics.
+
 2024-11-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxsrc/asmain.c: applied patch #483 to use search path for

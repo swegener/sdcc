@@ -4059,6 +4059,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
               dbuf_append_str (dbuf, "double");
               break;
 
+            case V_NULLPTR:
+              dbuf_append_str (dbuf, "nullptr_t");
+              break;
+
             default:
               dbuf_append_str (dbuf, "unknown type");
               break;

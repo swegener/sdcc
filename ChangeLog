@@ -1,3 +1,9 @@
+2024-11-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/Makefile.in
+	  support/regression/ports/*/spec.mk:
+	  Since we have the cycle timeout now, the realtime-timeout has become less important. So don't bother maintaining is separately at the port level.
+
 2024-11-24 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCast.c,

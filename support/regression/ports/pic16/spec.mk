@@ -1,8 +1,5 @@
 # Regression test specification for the pic16 target running with gpsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 25
-
 # path to gpsim
 ifdef GPSIM_PATH
   GPSIM := $(WINE) $(GPSIM_PATH)/gpsim$(EXEEXT)

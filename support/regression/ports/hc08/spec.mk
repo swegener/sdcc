@@ -1,8 +1,5 @@
 # Regression test specification for the hc08 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 70
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   UCHC08C = $(SDCC_BIN_PATH)/ucsim_m68hc08$(EXEEXT)

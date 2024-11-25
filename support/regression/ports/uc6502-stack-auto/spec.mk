@@ -2,7 +2,6 @@
 
 # simulation timeout in cycles
 SIM_CYCLES = 1000000000
-SIM_TIMEOUT = 30
 
 ifdef SDCC_BIN_PATH
   AS = $(SDCC_BIN_PATH)/sdas6500$(EXEEXT)

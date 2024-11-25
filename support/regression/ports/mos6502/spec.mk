@@ -2,7 +2,6 @@
 
 # simulation timeout in cycles
 SIM_CYCLES = 1000000000
-SIM_TIMEOUT = 30
 
 # path to sim65
 EMU = $(WINE) sim65 -c -v -x $(SIM_CYCLES)

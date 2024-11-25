@@ -1,8 +1,5 @@
 # Regression test specification for the pdk14 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 30
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   UCPDK14C = $(SDCC_BIN_PATH)/ucsim_pdk$(EXEEXT)

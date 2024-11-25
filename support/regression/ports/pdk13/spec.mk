@@ -1,8 +1,5 @@
 # Regression test specification for the pdk13 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 30
-
 EMU_PORT_FLAG = -tPDK13
 
 # path to uCsim

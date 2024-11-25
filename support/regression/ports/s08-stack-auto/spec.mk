@@ -1,8 +1,5 @@
 # Regression test specification for the s08 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 70
-
 EMU_PORT_FLAG=-thcs08
 
 # path to uCsim

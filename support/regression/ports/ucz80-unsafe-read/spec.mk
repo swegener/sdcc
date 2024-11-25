@@ -1,8 +1,5 @@
 # Regression test specification for the z80 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 60
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   UCZ80C = $(SDCC_BIN_PATH)/ucsim_z80$(EXEEXT)

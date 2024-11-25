@@ -1,8 +1,5 @@
 # Common regression test specification for the mcs51 targets running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 80
-
 EMU_PORT_FLAG = -t32
 EMU_FLAGS = -S in=$(DEV_NULL),out=-
 PORT_BASE = mcs51-common

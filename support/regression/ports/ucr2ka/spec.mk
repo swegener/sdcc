@@ -1,8 +1,5 @@
 # Regression test specification for the z80 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 40
-
 EMU_PORT_FLAG=-tr2k
 
 # path to uCsim

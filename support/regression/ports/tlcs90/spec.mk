@@ -1,8 +1,5 @@
 # Regression test specification for the tlcs90 target running with uCsim
 
-# simulation timeout in seconds
-SIM_TIMEOUT = 40
-
 # path to uCsim
 ifdef SDCC_BIN_PATH
   UCTLCS90C = $(SDCC_BIN_PATH)/ucsim_tlcs$(EXEEXT)

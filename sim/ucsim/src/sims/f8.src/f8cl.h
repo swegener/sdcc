@@ -184,8 +184,6 @@ public:
   virtual u16_t a_y(void);
   virtual u16_t a_n_y();
   virtual u16_t a_acc16(void);
-  virtual u16_t a_n_acc16(void);
-  virtual u16_t a_nn_acc16(void);
   
   virtual void clear_prefixes();
   virtual int exec_inst(void);
@@ -232,9 +230,8 @@ public:
   int LDW_NNZ_A(t_mem code)  { return ldw_m_a(a_nn_z()); }
   int LDW_X_A(t_mem code)    { cX.W(acc16->get()); return resGO; }
   int LDW_Z_A(t_mem code)    { cZ.W(acc16->get()); return resGO; }
-  int LDW_AM_X(t_mem code)   { return ldw_m_r(a_acc16(), rX); }
-  int LDW_NAM_X(t_mem code)  { return ldw_m_r(a_n_acc16(), rX); }
-  int LDW_NNAM_X(t_mem code) { return ldw_m_r(a_nn_acc16(), rX); }
+  int LDW_AM_X(t_mem code)   { return ldw_m_r(a_acc16(), rop16->get()); }
+  int LDW_NAM_X(t_mem code)  { return ldw_m_r(a_n_y(), rop16->get()); }
   int LDW_DSP_A(t_mem code);
   // other moves
   int LDI_Y_Z(t_mem code);

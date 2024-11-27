@@ -361,22 +361,6 @@ cl_f8::a_acc16(void)
   return acc16->get();
 }
 
-u16_t
-cl_f8::a_n_acc16(void)
-{
-  u8_t n= fetch();
-  return n + acc16->get();
-}
-
-u16_t
-cl_f8::a_nn_acc16(void)
-{
-  u16_t nn= fetch();
-  nn+= fetch()*256;
-  return nn + acc16->get();
-}
-
-
 void
 cl_f8::clear_prefixes()
 {

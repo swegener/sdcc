@@ -5848,6 +5848,7 @@ genPointerSet (const iCode *ic)
   int bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
 
   bool pushed_y = false;
+  bool pushed_xl = false;
 
   D (emit2 ("; genPointerSet", ""));
 
@@ -5897,7 +5898,7 @@ genPointerSet (const iCode *ic)
       goto release;
     }
   else if (!bit_field && size == 2 && aopOnStackNotExt (left->aop, 0, 2) &&
-    (!regalloc_dry_run || !f8_extend_stack) && // Avoid getting into a situation where stack allocation make scode generation impossible
+    (!regalloc_dry_run || !f8_extend_stack) && // Avoid getting into a situation where stack allocation makes code generation impossible
     (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || aopOnStack (right->aop, 0, 2)) &&
     (regDead (Y_IDX, ic) || regDead (X_IDX, ic)))
     {
@@ -5955,7 +5956,16 @@ genPointerSet (const iCode *ic)
           blen -= 8;
           continue;
         }
-      else if ((!bit_field || blen >= 8) && (aopInReg (right->aop, i, XL_IDX) || aopInReg (right->aop, i, XH_IDX)))
+      else if (!bit_field && i + 1 < size && aopInReg (right->aop, i, Z_IDX))
+        {
+          emit2 ("ldw", i ? "(%d, y), z" : "(y), z", i);
+          cost (2 + (bool)i, 2);
+          i++;
+          blen -= 8;
+          continue;
+        }
+      else if ((!bit_field || blen >= 8) &&
+        (aopInReg (right->aop, i, XL_IDX) || aopInReg (right->aop, i, XH_IDX) || aopInReg (right->aop, i, ZL_IDX) || aopInReg (right->aop, i, ZH_IDX)))
         {
           if (!i)
             {
@@ -5981,7 +5991,10 @@ genPointerSet (const iCode *ic)
           unsigned char bval = (byteOfVal (right->aop->aopu.aop_lit, i) << bstr) & ((0xff >> (8 - blen)) << bstr);
 
           if (!xl_dead)
-            UNIMPLEMENTED;
+            {
+              push (ASMOP_XL, 0, 1);
+              pushed_xl = true;
+            }
 
           if (!i)
             {
@@ -6009,14 +6022,17 @@ genPointerSet (const iCode *ic)
           goto store;
         }
 
-      if (xl_dead)
-        genMove_o (ASMOP_XL, 0, right->aop, i, 1, true, false, false, false, true);
-      else
-        UNIMPLEMENTED;
+      if (!xl_dead)
+        {
+          push (ASMOP_XL, 0, 1);
+          pushed_xl = true;
+        }
+            
+      genMove_o (ASMOP_XL, 0, right->aop, i, 1, true, false, false, false, true);
 
       if (bit_field && blen < 8)
         {
-          if (!regDead (XL_IDX, ic) || !regDead (XH_IDX, ic))
+          if (!regDead (XH_IDX, ic))
             UNIMPLEMENTED;
           if (bstr <= 1)
             for (int j = 0; j < bstr; j++)
@@ -6054,6 +6070,12 @@ store:
         {
           emit2 ("ld", "(%d, y), xl", i);
           cost (2, 1);
+        }
+
+      if (pushed_xl)
+        {
+          pop (ASMOP_XL, 0, 1);
+          pushed_xl = false;
         }
     }
 
@@ -6892,9 +6914,6 @@ genF8Code (iCode *lic)
   memset(f8_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (ZH_IDX + 1));
   memset(f8_regs_used_as_parms_in_pcalls_from_current_function, 0, sizeof(bool) * (ZH_IDX + 1));
 
-  regalloc_dry_run_cost_bytes = 0;
-  regalloc_dry_run_cost_cycles = 0;
-
   spillAllRegs ();
 
   for (ic = lic; ic; ic = ic->next)
@@ -6921,6 +6940,9 @@ genF8Code (iCode *lic)
           cln = ic->lineno;
         }
 
+      regalloc_dry_run_cost_bytes = 0;
+      regalloc_dry_run_cost_cycles = 0;
+
       if (options.iCodeInAsm)
         {
           const char *iLine = printILine (ic);
@@ -6936,7 +6958,7 @@ genF8Code (iCode *lic)
       fprintf (stderr, "ic %d: (op %d) stack %d\n", ic->key, ic->op, G.stack.pushed);
 #endif
 
-#if 0
+#if 1
       D (emit2 (";", "Cost for generated ic %d : (%d, %f)", ic->key, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_cycles));
 #endif
     }

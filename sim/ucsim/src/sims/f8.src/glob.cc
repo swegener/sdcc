@@ -77,7 +77,7 @@ struct dis_entry disass_f8[]=
     { 0xc2, 0xff, ' ', 2, "ldw %A,('nsp_16')" },
     { 0xc3, 0xff, ' ', 3, "ldw %A,('nnz_16')" },
     { 0xc4, 0xff, ' ', 2, "ldw %A,('ny_16')" },
-    { 0xc5, 0xff, ' ', 1, "ldw %A,('y_16')" },
+    { 0xc5, 0xff, ' ', 1, "ldw %A,(%A)" },
     { 0xc6, 0xff, ' ', 1, "ldw %A,x" },
     { 0xc7, 0xff, ' ', 2, "ldw %A,#%d" },
     { 0xc8, 0xff, ' ', 3, "ldw 'a16_16',%A" },
@@ -85,8 +85,8 @@ struct dis_entry disass_f8[]=
     { 0xca, 0xff, ' ', 3, "ldw ('nnz_16'),%A" },
     { 0xcb, 0xff, ' ', 1, "ldw x,%A" },
     { 0xcc, 0xff, ' ', 1, "ldw z,%A" },
-    { 0xcd, 0xff, ' ', 1, "ldw (%A),x" },
-    { 0xce, 0xff, ' ', 2, "ldw ('nA_16'),x" },
+    { 0xcd, 0xff, ' ', 1, "ldw (%A),%R" },
+    { 0xce, 0xff, ' ', 2, "ldw ('nA_16'),%R" },
     { 0x70, 0xff, ' ', 1, "ldw %A, sp" },
     { 0x74, 0xff, ' ', 1, "ldw ('dsp_16'),%A" },
     { 0xdc, 0xff, ' ', 2, "ldw %A,z" },
@@ -392,7 +392,7 @@ u8_t allowed_prefs[256]= {
   /* 9_ */    PN,PD,PD,P6,  PN,PD,PD,PD,  PD,PD,PD,PN,   0, 0, 0, 0,
   /* a_ */    PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,  PN,PN,PN,PW,
   /* b_ */    PN,PN,PN,PW,  P6,P6,P6,P6,  P6,P6,PN,PN,  PN,PN,PN,PN,
-  /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,
+  /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,PD,PW,P6, // Not correct - this line is too permissive for the ldw(y), x and ldw (n, y), x instructions.
   /* d_ */    PA,PN,PN,PN,  PN,PN,PN,PN,  PS,PN,PN,PN,  PN,PS,PN,PS,
   /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN, 0,PD,PD,
   /* f_ */    PD,PA,PA,PA,  PN,PN,P6,PN,  P6,PN,P6,P6,  PD,PA,PA,PA // Not correct - this line is too permissive for the 16-bti two-operand instructions.

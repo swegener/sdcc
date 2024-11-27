@@ -10022,10 +10022,8 @@ genSTM8Code (iCode *lic)
           cln = ic->lineno;
         }
 
-#if 0
       regalloc_dry_run_cost_bytes = 0;
       regalloc_dry_run_cost_cycles = 0;
-#endif
 
       if (options.iCodeInAsm)
         {

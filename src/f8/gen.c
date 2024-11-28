@@ -6030,7 +6030,21 @@ genPointerSet (const iCode *ic)
             
       genMove_o (ASMOP_XL, 0, right->aop, i, 1, true, false, false, false, true);
 
-      if (bit_field && blen < 8)
+      if (!i && bit_field && blen < 8)
+        {
+          if (bstr <= 1)
+            for (int j = 0; j < bstr; j++)
+              emit3 (A_SLL, ASMOP_XL, 0);
+          else
+            {
+              emit2 ("rot", "xl, #%d", bstr);
+              cost (2, 1);
+            }
+          emit2 ("msk", "(y), xl, #0x%02x", (0xff >> (8 - blen)) << bstr);
+          cost (2, 1);
+          goto pop;
+        }
+      else if (bit_field && blen < 8)
         {
           if (!regDead (XH_IDX, ic))
             UNIMPLEMENTED;
@@ -6059,7 +6073,6 @@ genPointerSet (const iCode *ic)
           emit2 ("or", "xl, xh");
           cost (1, 1);
         }
-
 store:
       if (!i)
         {
@@ -6071,7 +6084,7 @@ store:
           emit2 ("ld", "(%d, y), xl", i);
           cost (2, 1);
         }
-
+pop:
       if (pushed_xl)
         {
           pop (ASMOP_XL, 0, 1);

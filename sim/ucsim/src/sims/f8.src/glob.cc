@@ -282,7 +282,7 @@ struct dis_entry disass_f8[]=
     { 0x96, 0xff, ' ', 1, "sra %a" },
     { 0x97, 0xff, ' ', 1, "daa %a" },
     { 0x98, 0xff, ' ', 1, "bool %a" },
-    { 0xb8, 0xff, ' ', 2, "msk %L,%H,#'i8'" },
+    { 0xb8, 0xff, ' ', 2, "msk (%A),%a,#'i8'" },
     { 0xbc, 0xff, ' ', 3, "mad x,'a16_8',yl" },
     { 0xbd, 0xff, ' ', 2, "mad x,('nsp_8'),yl" },
     { 0xbe, 0xff, ' ', 3, "mad x,('nnz_8'),yl" },

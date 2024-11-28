@@ -1075,26 +1075,26 @@ int
 cl_f8::BOOL_A(t_mem code)
 {
   u8_t v= acc8->get();
-  if (v==0) // TODO: what is TRUE?
-    rF|= flagZ; // TODO: need negate?
+  if (v==0)
+    rF|= flagZ;
   else
     rF&= ~flagZ;
   cF.W(rF);
   v= v?1:0;
-  acc8->W(v); // TODO: needed?
+  acc8->W(v);
   return resGO;
 }
 
 int
 cl_f8::MSK(t_mem code)
 {
-  // yl = (yl & i) | (yh & ~i) - really a 16-bit inst
-  REGPAIR(a,A,h,l);
-  a.A= acc16->get();
+  // (y) <- (xl & i) | ((y) & ~i)
+  u8_t v= read_addr(rom, acc16->get());
   u8_t i= fetch();
-  u8_t r= (a.r.l & i) | (a.r.h & ~i);
-  a.r.l= r;
-  acc16->W(a.A);
+  rF&= ~flagZ;
+  rF|= !!(v & i);
+  u8_t r= (acc8->get() & i) | (v & ~i);
+  rom->write(acc16->get(), r);
   return resGO;
 }
 
@@ -1142,7 +1142,7 @@ cl_f8::BOOLW(t_mem code)
 {
   u16_t v= (acc16->get())?1:0;
   rF&= ~flagZ;
-  if (!v) rF|= flagZ; // TODO, need negate?
+  if (!v) rF|= flagZ;
   acc16->W(v);
   cF.W(rF);
   return resGO;

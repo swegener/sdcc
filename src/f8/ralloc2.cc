@@ -526,6 +526,9 @@ iCode *f8_ralloc2_cc(ebbIndex *ebbi)
 
   f8RegFix (ebbs, count);
 
+  // Try to reuse parameter locations first.
+  mergeSpiltParms(stack_conflict_graph);
+
   chaitin_salloc(stack_conflict_graph);
 
   if(options.dump_graphs)

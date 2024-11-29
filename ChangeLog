@@ -1,5 +1,11 @@
 2024-11-29 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/f8/gen.c,
+	  src/f8/ralloc2.cc:
+	  Small f8 codegen and stack allocation improvements.
+
+2024-11-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/f8/gen.c:
 	  Improve f8 code generation for pointer access and left shift.
 	* src/f8/ralloc.c,

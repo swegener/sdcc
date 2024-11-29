@@ -303,7 +303,7 @@ aopOnStack (const asmop *aop, int offset, int size)
   int i;
   long int stk_base;
 
-  if (!size)
+  if (size <= 0)
     return (true);
 
   if (!(aop->type == AOP_STK || aop->type == AOP_REGSTK))
@@ -332,6 +332,8 @@ aopOnStack (const asmop *aop, int offset, int size)
 static bool
 aopOnStackNotExt (const asmop *aop, int offset, int size)
 {
+  if (size <= 0)
+    return (true);
   return (aopOnStack (aop, offset, size) && (!size || aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run)); // Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
 }
 
@@ -1409,7 +1411,7 @@ aopOp (operand *op, const iCode *ic, bool result)
 
             if (!regalloc_dry_run)
               {
-                aop->aopu.bytes[i].byteu.stk = (long int)(sym->usl.spillLoc->stack) + i;
+                aop->aopu.bytes[i].byteu.stk = (long int)(sym->usl.spillLoc->stack) + (sym->usl.spillLoc->stack > 0 ? G.stack.param_offset : 0) + i;
 
                 if (sym->usl.spillLoc->stack + i < -G.stack.pushed)
                   {
@@ -3130,7 +3132,14 @@ genIpush (const iCode * ic)
   int size = left->aop->size;
   for (int i = size - 1; i >= 0;)
     {
-      if (i > 0 && (aopIsOp16_1 (left->aop, i - 1) || left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD))
+      if (i > 0 && aopIsLitVal (left->aop, i - 1, 2, 0x0000) && regDead (Y_IDX, ic) &&
+        (left->aop->regs[YL_IDX] < 0 || left->aop->regs[YL_IDX] >= i) && (left->aop->regs[YH_IDX] < 0 || left->aop->regs[YH_IDX] >= i))
+        {
+          emit3 (A_CLRW, ASMOP_Y, 0);
+          push (ASMOP_Y, 0, 2);
+          i -= 2;
+        }
+      else if (i > 0 && (aopIsOp16_1 (left->aop, i - 1) || left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD))
         {
           push (left->aop, i - 1, 2);
           i -= 2;
@@ -3915,6 +3924,14 @@ genPlus (const iCode *ic)
          {
            wassert (!aopInReg (result->aop, i, Z_IDX) || !aopInReg (leftop, i, X_IDX));
            emit3_o (started ? A_ADCW : A_ADDW, result->aop, i, leftop, i);
+           i += 2;
+           started = true;
+           continue;
+         }
+       else if (aopSame (result->aop, i, leftop, i, 2) && aopOnStackNotExt (result->aop, i, 2) && y_free2)
+         {
+           genMove_o (ASMOP_Y, 0, rightop, i, 2, xl_free2, false, true, false, !started);
+           emit3_o (started ? A_ADCW : A_ADDW, result->aop, i, ASMOP_Y, 0);
            i += 2;
            started = true;
            continue;
@@ -5802,11 +5819,18 @@ genPointerGet (const iCode *ic, iCode *ifx)
     ;
   else if (y_dead && (size >= 2 && aopInReg (result->aop, size - 2, Y_IDX) || result->aop->regs[YL_IDX] < 0 && result->aop->regs[YH_IDX] < 0))
     {
-      genMove (ASMOP_Y, left->aop, false, false, y_dead, false);
+      if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
+        {
+          emit2 ("ldw", "y, %s+%d", aopGet2 (left->aop, 0), offset);
+          cost (3, 1);
+          offset = 0;
+        }
+      else
+        genMove (ASMOP_Y, left->aop, false, false, y_dead, false);
       if ((unsigned)offset + size - 1 >= 255)
         {
           emit2 ("addw", "y, #%ld", offset);
-          cost (3, 1);
+          cost (2 + (offset > 127), 1);
           spillReg (C_IDX);
           offset = 0;
         }
@@ -5816,7 +5840,7 @@ genPointerGet (const iCode *ic, iCode *ifx)
 
   if (blockmove)
     {
-      wassert (!bit_field && !offset);
+      wassert (!bit_field && !offset && use_z);
       pointToSym (ASMOP_Y, OP_SYMBOL_CONST (result), 0,  regDead (XL_IDX, ic), regDead (XH_IDX, ic), false, regDead (Z_IDX, ic));
       for(int i = 0; i < size;)
         if (i + 1 < size)
@@ -5838,6 +5862,14 @@ genPointerGet (const iCode *ic, iCode *ifx)
           }
       goto release;
     }
+  else if (size == 4 && !use_z && !bit_field && !offset &&
+    aopInReg (result->aop, 0, Y_IDX) && (aopInReg (result->aop, 2, X_IDX) || aopInReg (result->aop, 2, Z_IDX)))
+    {
+      emit2 ("ldw", "%s, (2, y)", aopGet2 (result->aop, 2));
+      emit2 ("ldw", "y, (y)");
+      cost (4, 2);
+      goto release;
+    }
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
@@ -5851,7 +5883,7 @@ genPointerGet (const iCode *ic, iCode *ifx)
         {
           asmop *taop = ASMOP_Y;
           if ((aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) && x_dead &&
-            !(i + 2 == size && regDead (Y_IDX, ic)))
+            !(use_z && regDead (Y_IDX, ic)) && !(i + 2 == size && regDead (Y_IDX, ic)))
             taop = ASMOP_X;
           else if (aopInReg (result->aop, i, X_IDX))
             taop = ASMOP_X;
@@ -6312,11 +6344,12 @@ genIfx (const iCode *ic)
         pop (ASMOP_Y, 0, 2);
       goto jump;
     }
-  else if (size == 4 && !IS_FLOAT(type) && regDead (Y_IDX, ic) &&
-    aopOnStack (cond->aop, 0, 2) && aopIsOp16_2 (cond->aop, 2) && cond->aop->regs[XL_IDX] < 0 && cond->aop->regs[XH_IDX] < 0)
+  else if (size >= 4 && !(size % 2) && !IS_FLOAT(type) && regDead (Y_IDX, ic) &&
+    aopOnStack (cond->aop, 0, 2) && aopIsOp16_2 (cond->aop, 2) && cond->aop->regs[XL_IDX] < 2 && cond->aop->regs[XH_IDX] < 2 && aopOnStackNotExt (cond->aop, 4, size - 4))
     {
       genMove_o (ASMOP_Y, 0, cond->aop, 0, 2, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, false, true);
-      emit3_o (A_ORW, ASMOP_Y, 0, cond->aop, 2);
+      for (int i = 2; i < size; i += 2)
+        emit3_o (A_ORW, ASMOP_Y, 0, cond->aop, i);
       goto jump;
     }
 

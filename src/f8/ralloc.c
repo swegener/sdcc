@@ -66,32 +66,6 @@ noOverLap (set *itmpStack, symbol *fsym)
 }
 
 /*-----------------------------------------------------------------*/
-/* isFree - will return 1 if the a free spil location is found     */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (isFreeF8)
-{
-  symbol *sym = item;
-  V_ARG (symbol **, sloc);
-  V_ARG (symbol *, fsym);
-
-  /* if already found */
-  if (*sloc)
-    return 0;
-
-  /* if it is free && and the itmp assigned to
-     this does not have any overlapping live ranges
-     with the one currently being assigned and
-     the size can be accomodated  */
-  if (sym->isFree && noOverLap (sym->usl.itmpStack, fsym) && getSize (sym->type) >= getSize (fsym->type))
-    {
-      *sloc = sym;
-      return 1;
-    }
-
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
 static symbol *

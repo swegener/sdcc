@@ -1,3 +1,11 @@
+2024-11-29 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  Improve f8 code generation for pointer access and left shift.
+	* src/f8/ralloc.c,
+	  src/stm8/ralloc.c:
+	  Code cleanup.
+
 2024-11-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sim/ucsim/src/sims/f8.src/glob.cc,

@@ -684,6 +684,9 @@ iCode *pdk_ralloc2_cc(ebbIndex *ebbi)
 
   if (reentrant)
     {
+      // Try to reuse parameter locations first.
+      mergeSpiltParms(spilt_conflict_graph);
+
       chaitin_salloc(spilt_conflict_graph);
 
       if(options.dump_graphs)

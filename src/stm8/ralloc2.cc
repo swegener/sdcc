@@ -567,7 +567,7 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 
   stm8_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph);
 
-  stm8RegFix (ebbs, count);
+  stm8RegFix(ebbs, count);
 
   // Try to reuse parameter locations first.
   mergeSpiltParms(stack_conflict_graph);

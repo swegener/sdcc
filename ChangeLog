@@ -2,6 +2,8 @@
 
 	* src/pdk/ralloc2.cc:
 	  pdk stack allocation improvement.
+	* src/f8/gen.c:
+	  Fix a corner case in f8 block move codegen optimization.
 
 2024-11-29 Philipp Klaus Krause <philipp@colecovision.eu>
 

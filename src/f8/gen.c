@@ -2298,7 +2298,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   wassertl_bt (result->type != AOP_IMMD, "Trying to write to immediate.");
   wassertl_bt (roffset + size <= result->size, "Trying to write beyond end of operand");
 
-#if 1
+#if 0
   D (emit2 (";", "genMove_o size %d, xl_dead_global %d xh_dead_global %d", size, xl_dead_global, xh_dead_global));
 #endif
 
@@ -5805,7 +5805,7 @@ genPointerGet (const iCode *ic, iCode *ifx)
       genMove (ASMOP_Z, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, true);
       if (offset)
         {
-          emit2 ("addw", "y, #%ld", offset);
+          emit2 ("addw", "z, #%ld", offset);
           cost (3, 1);
           spillReg (C_IDX);
           offset = 0;

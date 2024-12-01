@@ -1,3 +1,8 @@
+2024-12-01 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCCast.c:
+	  Fix typeofOp not using the actual decorated tree.
+
 2024-11-30 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/pdk/ralloc2.cc:

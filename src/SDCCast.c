@@ -5977,16 +5977,19 @@ alignofOp (sym_link *type)
 }
 
 /*-----------------------------------------------------------------*/
-/* sizeofOp - processes typeof for expression                      */
+/* typeofOp - processes typeof for expression                      */
 /*-----------------------------------------------------------------*/
 sym_link *
 typeofOp (ast *tree)
 {
   ++noAlloc;
-  decorateType (resolveSymbols (tree), RESULT_TYPE_NONE, false);
+  tree = decorateType (resolveSymbols (tree), RESULT_TYPE_NONE, false);
   --noAlloc;
   sym_link *type = copyLinkChain (tree->ftype);
-  SPEC_SCLS (type) = 0;
+  sym_link *spec_type;
+  for (spec_type = type; !IS_SPEC (spec_type); spec_type = spec_type->next);
+  SPEC_SCLS (spec_type) = 0;
+  SPEC_STAT (spec_type) = 0;
   return type;
 }
 

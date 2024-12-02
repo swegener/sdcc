@@ -4771,8 +4771,9 @@ skip_byte:
 static void
 genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool hl_dead_global, bool de_dead_global, bool iy_dead_global, bool f_dead)
 {
-  emitDebug ("; genMove_o size %d result type %d source type %d hl_dead %d", size, result->type, source->type, hl_dead_global);
+  wassert (result);
   wassert (result->size >= roffset + size);
+  emitDebug ("; genMove_o size %d result type %d source type %d hl_dead %d", size, result->type, source->type, hl_dead_global);
 
   a_dead_global |= result->type == AOP_REG && result->regs[A_IDX] >= roffset && result->regs[A_IDX] < roffset + size;
   hl_dead_global |= result->type == AOP_REG && result->regs[L_IDX] >= roffset && result->regs[L_IDX] < roffset + size && result->regs[H_IDX] >= roffset && result->regs[H_IDX] < roffset + size;
@@ -5102,6 +5103,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 static void
 genMove (asmop *result, asmop *source, bool a_dead, bool hl_dead, bool de_dead, bool iy_dead)
 {
+  wassert (result);
   genMove_o (result, 0, source, 0, result->size, a_dead, hl_dead, de_dead, iy_dead, true);
 }
 

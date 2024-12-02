@@ -1,5 +1,12 @@
 2024-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/f8/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Some assertions to catch bugs like #3803 a bit earlier.
+
+2024-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* sdas/asf8/f8mch.c,
 	  sim/ucsim/src/sims/f8.src/glob.cc,
 	  sim/ucsim/src/sims/f8.src/imove.cc,

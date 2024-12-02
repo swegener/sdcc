@@ -2554,6 +2554,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   long val_x = -1;
   long val_y = -1;
 
+  wassert_bt (result);
   wassertl_bt (result->type != AOP_LIT, "Trying to write to literal.");
   wassertl_bt (result->type != AOP_IMMD, "Trying to write to immediate.");
   wassertl_bt (roffset + size <= result->size, "Trying to write beyond end of operand");
@@ -2753,6 +2754,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 static void
 genMove (asmop *result, asmop *source, bool a_dead, bool x_dead, bool y_dead)
 {
+  wassert (result);
   genMove_o (result, 0, source, 0, result->size, a_dead, x_dead, y_dead);
 }
 

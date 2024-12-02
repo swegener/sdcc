@@ -7,6 +7,9 @@
 	  src/f8/peep.c,
 	  support/regression/tests/largeoddstruct.c.in:
 	  Change destination operand to y-relative for f8 ld(w)i instruction.
+	* src/z80/gen.c,
+	  src/z80/peeph.def:
+	  Safeguards against accidential use of ld r, r instructions for Rabbits.
 
 2024-12-01 Benedikt Freisen <b.freisen AT gmx.net>
 

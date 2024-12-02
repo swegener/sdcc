@@ -3013,13 +3013,24 @@ replace restart {
 	ex	de,hl
 } if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r2ka' 'r3ka' 'tlcs90'), notUsed('de')
 
+// We want this one, even if it doesn't trigger in regression tests, since it is geh last line
+// of defence against ld r, r in the compiler. ld r, r is not just an inefficiency, but dangerous
+// for Rabbits. ld r, r support is inconsistent among Rabbits, and even otherwise binary-compatible
+// Rabbits differ in their support for it.
+replace restart
+{
+	ld	%1, %1
+} by {
+	; common peephole 158 removed redundant ld %1, %1.
+} if notVolatile(%1)
+
 barrier
 
 // Should be one of the last ones. Opens the code to further peephole optimization.
 replace restart {
 %1:
 } by {
-	; common peephole 158 removed unused label %1.
+	; common peephole 159 removed unused label %1.
 } if labelRefCount(%1 0)
 
 // Ensure that all rules above see only jp, not jr.
@@ -3083,4 +3094,3 @@ replace {
 	djnz	%5
 } if isPort('z80' 'ez80_z80' 'z180' 'z80n' 'r2k' 'r2ka' 'r3ka' 'tlcs90')
 
-barrier

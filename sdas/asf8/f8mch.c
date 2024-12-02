@@ -527,14 +527,18 @@ opw:
 		t2 = addr(&e2);
 		r2 = rcode;
 
-		if (t1 == S_IX && t2 == S_IX && r2 == Z)
+		if (t1 == S_YREL && r2 == Z)
 		{
-			altaccw(r1);
 			outab(op);
+			if(ls_mode(&e1))
+				aerr();
+			else
+				outrb(&e1, R_USGN);
 		}
 		else
 			aerr();
 		break;
+
 	case S_LDW:
 		t1 = addr(&e1);
 		r1 = rcode;

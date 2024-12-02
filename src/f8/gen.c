@@ -3198,7 +3198,7 @@ genPointerPush (const iCode *ic)
       for(int i = size - 1; i >= 0;)
         {
           int o = i + offset;
-          if (i >= 2)
+          if (i > 0)
             {
               emit2 ("pushw", "(%d, z)", o - 1);
               cost (3, 1);
@@ -5845,19 +5845,14 @@ genPointerGet (const iCode *ic, iCode *ifx)
       for(int i = 0; i < size;)
         if (i + 1 < size)
           {
-            emit2 ("ldwi", "(y), (z)");
-            cost (1, 1);
-            if(i + 2 <size)
-              {
-                emit2 ("addw", "y, #2");
-                cost (2, 1);
-              }
+            emit2 ("ldwi", "(%d, y), (z)", i);
+            cost (2, 1);
             i += 2;
           }
         else
           {
-            emit2 ("ldi", "(y), (z)");
-            cost (1, 1);
+            emit2 ("ldi", "(%d, y), (z)", i);
+            cost (2, 1);
             i++;
           }
       goto release;
@@ -6056,7 +6051,7 @@ genPointerSet (const iCode *ic)
       goto release;
     }
 
-  if (!bit_field && size >= 4 && regDead (Y_IDX, ic) && regDead (Z_IDX, ic) &&
+  if (!bit_field && size >= 4 && (regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) && regDead (Z_IDX, ic) &&
     (aopOnStack(right->aop, 0, size) || right->aop->type == AOP_DIR))
     {
       genMove (ASMOP_Y, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, true);
@@ -6064,19 +6059,14 @@ genPointerSet (const iCode *ic)
       for(int i = 0; i < size;)
         if (i + 1 < size)
           {
-            emit2 ("ldwi", "(y), (z)");
-            cost (1, 1);
-            if(i + 2 <size)
-              {
-                emit2 ("addw", "y, #2");
-                cost (2, 1);
-              }
+            emit2 ("ldwi", "(%i, y), (z)", i);
+            cost (2, 1);
             i += 2;
           }
         else
           {
-            emit2 ("ldi", "(y), (z)");
-            cost (1, 1);
+            emit2 ("ldi", "(%i, y), (z)", i);
+            cost (2, 1);
             i++;
           }
      goto release;

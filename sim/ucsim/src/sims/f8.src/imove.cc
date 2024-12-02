@@ -162,7 +162,7 @@ int
 cl_f8::LDI_Y_Z(t_mem code)
 {
   u8_t v= rom->read(rZ++);
-  rom->write(acc16->get(), v);
+  rom->write(a_n_y(), v);
   rF&= ~(flagN|flagZ);
   if (v & 0x80) rF|= flagN;
   if (!v) rF|= flagZ;
@@ -174,7 +174,7 @@ cl_f8::LDI_Y_Z(t_mem code)
 int
 cl_f8::LDWI_Y_Z(t_mem code)
 {
-  u16_t addr = acc16->get();
+  u16_t addr = a_n_y();
   u16_t v= rom->read(rZ++);
   v+= (rom->read(rZ++))*256;
   rom->write(addr, v);

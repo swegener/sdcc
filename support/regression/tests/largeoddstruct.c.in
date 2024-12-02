@@ -1,0 +1,76 @@
+/*  Test large structs of odd size
+    Some ports use blockmoveinstructions for handling large objects, in particular
+    for assignment, read and write via pointers, passing as parameters and returning.
+    Sometimes the code path is sloghtly different for objects of odd size.
+    bitintsize: 8, 40, 56
+ */
+
+#include <testfwk.h>
+
+struct largeoddstruct
+{
+	unsigned char c0;
+	unsigned _BitInt({bitintsize}) bi;
+	unsigned char c1;
+};
+
+
+const struct largeoddstruct struct0 = {0xaa, 23, 0x55};
+struct largeoddstruct struct1 = {0xa5, 42, 0x5a};
+
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mos6502) && !defined (__SDCC_mos65c02) // struct return not yet supported
+struct largeoddstruct f0(void)
+{
+	return (struct0);
+}
+
+struct largeoddstruct f1(void)
+{
+	return (struct1);
+}
+#endif
+#if 0 // segfault
+struct largeoddstruct f2(struct largeoddstruct *p)
+{
+	return (*p);
+}
+#endif
+void f3(struct largeoddstruct *p)
+{
+	struct1 = *p;
+}
+
+void compare0(struct largeoddstruct s0)
+{
+	ASSERT(s0.c0 == 0xaa);
+	ASSERT(s0.bi == 23);
+	ASSERT(s0.c1 == 0x55);
+}
+
+void compare1(struct largeoddstruct s1)
+{
+	ASSERT(s1.c0 == 0xa5);
+	ASSERT(s1.bi == 42);
+	ASSERT(s1.c1 == 0x5a);
+}
+
+void testLargeOddStruct (void)
+{
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mos6502) && !defined (__SDCC_mos65c02) // struct return not yet supported
+	struct largeoddstruct s;
+	s = f0();
+	compare0 (s);
+
+	s = f1();
+	compare1 (s);
+#endif
+#if 0
+	s = f2(&struct1);
+	compare1 (s);
+#endif
+#ifndef __SDCC_ds390
+	f3(&struct0);
+	compare0 (struct1);
+#endif
+}
+

@@ -321,13 +321,8 @@ f8instructionSize (lineNode *pl)
         return 4;
     }
 
-  if (ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi"))
-    {
-      if (!strncmp (rarg, "(y)", 3))
-        return 1;
-      else
-        return 2;
-    }
+  if ((ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi")) && isYrel (larg))
+    return 2;
 
   if (ISINST (pl->line, "ldw"))
     {
@@ -441,7 +436,7 @@ f8MightReadFlag (const lineNode *pl, const char *what)
     return !strcmp (what, "cf");
   if (ISINST (pl->line, "clrw") || ISINST (pl->line, "incw") || ISINST (pl->line, "pushw") || ISINST (pl->line, "sraw") || ISINST (pl->line, "srlw") || ISINST (pl->line, "sllw") || ISINST (pl->line, "tstw"))
     return false;
-  if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw"))
+  if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw") || ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi"))
     return false;
   if (ISINST (pl->line, "bool") || ISINST (pl->line, "cax") || ISINST (pl->line, "mad") || ISINST (pl->line, "msk") || ISINST (pl->line, "pop") || ISINST (pl->line, "rot") || ISINST (pl->line, "sra") || ISINST (pl->line, "thrd"))
     return false;
@@ -560,7 +555,7 @@ f8MightRead (const lineNode *pl, const char *what)
   // 16-bit 2/1-op inst, and some others.
   if (ISINST (pl->line, "clrw") || ISINST (pl->line, "popw"))
     return false;
-  if (ISINST (pl->line, "adcw") || ISINST (pl->line, "addw") || ISINST (pl->line, "boolw") || ISINST (pl->line, "cpw") || ISINST (pl->line, "decw") || ISINST (pl->line, "incw") || ISINST (pl->line, "mul") || ISINST (pl->line, "negw") || ISINST (pl->line, "orw") || ISINST (pl->line, "pushw") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrcw") || ISINST (pl->line, "sllw") || ISINST (pl->line, "sraw") || ISINST (pl->line, "srlw") || ISINST (pl->line, "subw") || ISINST (pl->line, "sbcw") || ISINST (pl->line, "tstw"))
+  if (ISINST (pl->line, "adcw") || ISINST (pl->line, "addw") || ISINST (pl->line, "boolw") || ISINST (pl->line, "cpw") || ISINST (pl->line, "decw") || ISINST (pl->line, "incw") || ISINST (pl->line, "mul") || ISINST (pl->line, "negw") || ISINST (pl->line, "orw") || ISINST (pl->line, "pushw") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrcw") || ISINST (pl->line, "sllw") || ISINST (pl->line, "sraw") || ISINST (pl->line, "srlw") || ISINST (pl->line, "subw") || ISINST (pl->line, "sbcw") || ISINST (pl->line, "tstw") || ISINST (pl->line, "xorw"))
     {
       const char *larg = leftArg (pl->line);
       const char *rarg = rightArg (pl->line);
@@ -586,16 +581,18 @@ f8MightRead (const lineNode *pl, const char *what)
       return false;
     }
   // ldw
+  if (ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi"))
+    return (extra == 'y' || extra == 'z');
   if (ISINST (pl->line, "ldw"))
     {
       const char *larg = leftArg (pl->line);
       const char *rarg = rightArg (pl->line);
 
-      if (rarg && argCont (rarg, extra))
+      if (rarg && (rarg[0] == what[0] && rarg[1] == what[1] || argCont (rarg + 1, extra)))
         return true;
-      if (larg[0] == extra)
+      if (larg[0] == what[0] && larg[1] == what[1])
         return false;
-      if (argCont (larg, extra))
+      if (argCont (larg + 1, extra))
         return true;
       return false;
     }
@@ -695,6 +692,8 @@ f8SurelyWritesFlag (const lineNode *pl, const char *what)
         return (!strcmp (what, "zf") || !strcmp (what, "nf"));
       return false;
     }
+  if (ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi"))
+    return (!strcmp (what, "zf") || !strcmp (what, "nf"));
   // 8-bit 0-op inst.
   if (ISINST (pl->line, "bool") || ISINST (pl->line, "cax"))
     return !strcmp (what, "zf");
@@ -784,6 +783,8 @@ f8SurelyWrites (const lineNode *pl, const char *what)
     return (pl->line[3] == what[0] && pl->line[4] == what[1]);
   if (ISINST (pl->line, "ldw"))
     return (pl->line[4] == extra);
+  if (ISINST (pl->line, "ldi") || ISINST (pl->line, "ldwi"))
+    return false;
   if (ISINST (pl->line, "xch"))
     {
       const char *larg = leftArg (pl->line);

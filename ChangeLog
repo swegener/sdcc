@@ -1,3 +1,13 @@
+2024-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asf8/f8mch.c,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/imove.cc,
+	  src/f8/gen.c,
+	  src/f8/peep.c,
+	  support/regression/tests/largeoddstruct.c.in:
+	  Change destination operand to y-relative for f8 ld(w)i instruction.
+
 2024-12-01 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCast.c:

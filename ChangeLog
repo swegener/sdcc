@@ -1,7 +1,7 @@
 2024-12-03 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/largeoddstruct.c.in:
-	  Disable test for host, since we can't assume C23 support in host compilers yet.
+	  Disable test for host, since we can't assume C23 support in host compilers yet. Disable for -mmcs51 --stack-auto, due to bug #3804.
 
 2024-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
 

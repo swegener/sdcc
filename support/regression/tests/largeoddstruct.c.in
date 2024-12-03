@@ -58,6 +58,7 @@ void compare1(struct largeoddstruct s1)
 
 void testLargeOddStruct (void)
 {
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) // Bug #3804
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 #if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mos6502) && !defined (__SDCC_mos65c02) // struct return not yet supported
 	struct largeoddstruct s;
@@ -74,6 +75,7 @@ void testLargeOddStruct (void)
 #ifndef __SDCC_ds390
 	f3(&struct0);
 	compare0 (struct1);
+#endif
 #endif
 #endif
 }

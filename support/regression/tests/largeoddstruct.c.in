@@ -2,15 +2,16 @@
     Some ports use blockmoveinstructions for handling large objects, in particular
     for assignment, read and write via pointers, passing as parameters and returning.
     Sometimes the code path is sloghtly different for objects of odd size.
-    bitintsize: 8, 40, 56
+    width: 8, 40, 56
  */
 
 #include <testfwk.h>
 
+#if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 struct largeoddstruct
 {
 	unsigned char c0;
-	unsigned _BitInt({bitintsize}) bi;
+	unsigned _BitInt({width}) bi;
 	unsigned char c1;
 };
 
@@ -53,9 +54,11 @@ void compare1(struct largeoddstruct s1)
 	ASSERT(s1.bi == 42);
 	ASSERT(s1.c1 == 0x5a);
 }
+#endif
 
 void testLargeOddStruct (void)
 {
+#if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 #if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mos6502) && !defined (__SDCC_mos65c02) // struct return not yet supported
 	struct largeoddstruct s;
 	s = f0();
@@ -71,6 +74,7 @@ void testLargeOddStruct (void)
 #ifndef __SDCC_ds390
 	f3(&struct0);
 	compare0 (struct1);
+#endif
 #endif
 }
 

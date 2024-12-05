@@ -420,7 +420,7 @@ static bool
 aopAre8_2 (const asmop *aop0, int offset0, const asmop *aop1, int offset1)
 {
   return (aopIsAcc8 (aop0, offset0) && aopIsOp8_2 (aop1, offset1) ||
-    aopInReg (aop1, offset1, XL_IDX) && aopIsOp8_2 (aop0, offset0) && aop0->type != AOP_LIT && aop0->type != AOP_DIR);
+    aopInReg (aop1, offset1, XL_IDX) && aopIsOp8_2 (aop0, offset0) && aop0->type != AOP_LIT && aop0->type != AOP_IMMD);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2334,6 +2334,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       const bool z_dead = z_dead_global &&
         (!aopRS (result) || (result->regs[ZL_IDX] >= (roffset + i) || result->regs[ZL_IDX] < 0) && (result->regs[ZH_IDX] >= (roffset + i) || result->regs[ZH_IDX] < roffset)) &&
         (!aopRS (source) || source->regs[ZL_IDX] <= i + 1 && source->regs[ZH_IDX] <= i + 1);
+
+      if (aopSame (result, roffset + i, source, soffset + i, 1))
+        {
+          i++;
+          continue;
+        }
 
       // Rematerialized stack location
       if (source->type == AOP_STL)

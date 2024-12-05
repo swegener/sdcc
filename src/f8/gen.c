@@ -1660,7 +1660,13 @@ emit3sub_o (enum asminst inst, asmop *op0, int offset0, asmop *op1, int offset1)
           UNIMPLEMENTED;
         break;
       case A_SUBW:
-        if (op1->type == AOP_LIT && (~litword1 & 0xffff) + 1 <= 0xffff)
+        if (op1->type == AOP_LIT && (~litword1 & 0xffff) + 1 == 0x0001)
+          {
+            emit3_o (A_INCW, op0, offset0, 0, 0);
+            spillReg (C_IDX);
+            break;
+          }
+        else if (op1->type == AOP_LIT && (~litword1 & 0xffff) + 1 <= 0xffff)
           {
             emit2 ("addw", "%s, #0x%04x", aopGet2 (op0, offset0), (~litword1 & 0xffff) + 1);
             cost (2 + !aopInReg (op0, offset0, Y_IDX), 1 + !aopInReg (op0, offset0, Y_IDX));

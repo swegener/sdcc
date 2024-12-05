@@ -1,7 +1,7 @@
 2024-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/f8/gen.c:
-	  Improve f8 codegen for some bitwise operations.
+	  Improve f8 codegen for some operations.
 
 2024-12-03 Philipp Klaus Krause <philipp@colecovision.eu>
 

@@ -828,7 +828,7 @@ status open
 \begin_layout Plain Layout
 Incomplete support in the hc08,
  s08,
- mod6502,
+ mos6502,
  pic14 and pic16 backends.
 \end_layout
 
@@ -24752,7 +24752,7 @@ _
 
 \end_inset
 
-data (hc08 named address space)
+data (mos6502 named address space)
 \end_layout
 
 \end_inset
@@ -24812,7 +24812,7 @@ _
 
 \end_inset
 
-xdata (hc08 named address space)
+xdata (mos6502 named address space)
 \end_layout
 
 \end_inset
@@ -26513,7 +26513,7 @@ name "sec:Parameters-and-Local-Variables"
 
 \begin_layout Standard
 Automatic (local) variables and parameters to functions are placed on the stack for most targets.
- For MCS51/DS390/HC08/S08/PDK13/PDK14/PDK15 they can either be placed on the stack or in data-space.
+ For MCS51/DS390/HC08/S08/MOS6502/PDK13/PDK14/PDK15 they can either be placed on the stack or in data-space.
  The default action of the compiler is to place these variables in the internal RAM (for small model) or external RAM (for medium or large model).
  This in fact makes them similar to 
 \emph on
@@ -26695,7 +26695,7 @@ unsigned char foo(char i) __reentrant
 \end_layout
 
 \begin_layout Standard
-Since stack space on 8051 is limited,
+Since stack space on 8051 and MOS6502 is limited,
  and accessing the stack is slow for the Padauk,
  the 
 \emph on
@@ -56289,6 +56289,54 @@ status collapsed
 
  and provide your own crt0.rel.
  When using a custom crt0.rel it needs to be listed first when linking.
+\end_layout
+
+\begin_layout Subsection
+Hooking up interrupts
+\end_layout
+
+\begin_layout Standard
+ISR can be written in C using SDCC.
+ However,
+ to hook interrupts is necessary to customize crt0.asm and have the interrupt vectors point to the C functions.
+\end_layout
+
+\begin_layout Subsection
+Reentrancy
+\end_layout
+
+\begin_layout Standard
+Due to the very limited stack space,
+ the MOS6502 port by default generates non-reentrant code.
+ Re-entrant functions should be declared using the __reentrant keyword.
+ Alternatively the entire program can be compiled using –stack-auto.
+ On the MOS6502 re-entrant code is,
+ in general,
+ much less efficient.
+\end_layout
+
+\begin_layout Subsection
+Code and Data placement
+\end_layout
+
+\begin_layout Standard
+The compiler can pass segment location to the linker.
+ On the MOS6502 the following switches are supported:
+\end_layout
+
+\begin_layout Standard
+–code-loc:
+ start address of the code segment
+\end_layout
+
+\begin_layout Standard
+–data-loc:
+ start address of the zero page
+\end_layout
+
+\begin_layout Standard
+–xram-loc:
+ start address of the data segment
 \end_layout
 
 \begin_layout Chapter

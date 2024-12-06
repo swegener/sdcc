@@ -5716,15 +5716,21 @@ handle_bitfield_topbyte_in_xl (int blen, int bstr, bool sign_extend, bool xh_dea
     return;
 
   // Sign-extend
-  if (!xh_dead)
-    UNIMPLEMENTED;
   symbol *const tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
-  emit2 ("ld", "xh, xl");
-  emit2 ("and", "xh, #0x%02x", 0x80 >> (8 - blen));
-  cost (4, 2);
-  if (tlbl)
-    emit2 ("jrz", "#!tlabel", labelKey2num (tlbl->key));
-  cost (2, 0);
+  if (blen == 1) //The and above already set the z flag
+    {
+      if (tlbl)
+        emit2 ("jrz", "#!tlabel", labelKey2num (tlbl->key));
+      cost (2, 0);
+    }
+  else if (blen != 1) 
+    {
+      emit2 ("cp", "xl, #0x%02x", 0x80 >> (8 - blen));
+      cost (2, 1);
+      if (tlbl)
+        emit2 ("jrnc", "#!tlabel", labelKey2num (tlbl->key));
+      cost (2, 0);
+    }
   emit2 ("or", "xl, #0x%02x", (0xff00 >> (8 - blen)) & 0xff);
   cost (2, 1);
   emitLabel (tlbl);
@@ -6191,7 +6197,7 @@ genPointerSet (const iCode *ic)
       bool xh_dead2 = regDead (XH_IDX, ic) && (right->aop->regs[XH_IDX] <= i + 1);
       bool x_dead2 = xl_dead2 && xh_dead2;
 
-      if (!bit_field && i + 1 < size &&
+      if ((!bit_field || blen >= 16) && i + 1 < size &&
         (aopInReg (right->aop, i, X_IDX) || x_dead2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2))))
         {
           genMove_o (ASMOP_X, 0, right->aop, i, 2, true, true, false, false, true);
@@ -6201,7 +6207,7 @@ genPointerSet (const iCode *ic)
           blen -= 8;
           continue;
         }
-      else if (!bit_field && i + 1 < size && aopInReg (right->aop, i, Z_IDX))
+      else if ((!bit_field || blen >= 16) && i + 1 < size && aopInReg (right->aop, i, Z_IDX))
         {
           emit2 ("ldw", i ? "(%d, y), z" : "(y), z", i);
           cost (2 + (bool)i, 2);
@@ -6224,7 +6230,7 @@ genPointerSet (const iCode *ic)
             }
           continue;
         }
-      else if (!bit_field && aopIsLitVal (right->aop, i, 1, 0x00))
+      else if ((!bit_field || blen >= 8) && aopIsLitVal (right->aop, i, 1, 0x00))
         {
           emit2 ("clr", "(%d, y)", i);
           cost (2, 1);

@@ -44,7 +44,7 @@ __divuint:
 	incw	y
 	subw	z, (2, sp)
 	jrc	#2$
-	addw	y, #-1
+	sbcw	y	; add -1
 	addw	z, (2, sp)
 2$:
 

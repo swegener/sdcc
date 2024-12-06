@@ -1,3 +1,9 @@
+2024-12-06 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/f8/_divuint.s,
+	  src/f8/peeph.def:
+	  Save a few bytes in f8 division support routines.
+
 2024-02-29 Gabriele Gorla <gorlik@yahoo.com>
 
 	* doc/sdccman.lyx:

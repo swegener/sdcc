@@ -158,16 +158,28 @@ replace restart {
 } if same(%1 'ld' 'ldw'), same(%2 'tst' 'tstw'), notUsed('cf' 'of')
 
 replace restart {
-	ld	%1, xl
-	dec	xl
-	tst	zh
-	jrnz	#%2
+	ld	%1, %2
+	dec	%2
+	tst	%1
+	jrnz	#%5
 } by {
-	ld	%1, xl
-	dec	xl
-	jrc	#%2
-	; peephole 9 removed tst by adjusting jump condition
-} if notVolatile(%1), notUsed('cf' 'nf' 'zf' 'of'), notUsedFrom(%2 'cf' 'nf' 'zf' 'of')
+	ld	%1, %2
+	dec	%2
+	jrc	#%5
+	; peephole 9a removed tst by adjusting jump condition
+} if notVolatile(%1), notVolatile(%2), notUsed('cf' 'nf' 'zf' 'of'), notUsedFrom(%5 'cf' 'nf' 'zf' 'of')
+
+replace restart {
+	ld	%1, %2
+	dec	%2
+	tst	%1
+	jrz	#%5
+} by {
+	ld	%1, %2
+	dec	%2
+	jrnc	#%5
+	; peephole 9b removed tst by adjusting jump condition
+} if notVolatile(%1), notVolatile(%2), notUsed('cf' 'nf' 'zf' 'of'), notUsedFrom(%5 'cf' 'nf' 'zf' 'of')
 
 replace restart {
 	ld	%1, xl
@@ -232,6 +244,22 @@ replace restart {
 	%2	#%3
 	
 } if same(%2 'jr' 'jrc' 'jrgt' 'jrle' 'jrn' 'jrnc' 'jrnn' 'jrno' 'jrnz' 'jro' 'jrsge' 'jrsgt' 'jrsle' 'jrslt' 'jrz'), notUsedFrom(%3 'y' 'cf' 'of'), notUsed('cf' 'of')
+
+replace restart {
+	clr	xh
+	clr	xl
+} by {
+	clrw	x
+	; peephole 17a merged clr into clrw
+}
+
+replace restart {
+	clr	xl
+	clr	xh
+} by {
+	clrw	x
+	; peephole 17b merged clr into clrw
+}
 
 replace restart {
 	jp	#%5

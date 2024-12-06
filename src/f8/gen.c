@@ -1810,11 +1810,25 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 
           // Do two bytes at once, if possible.
           if (i > 0 && !assigned[i - 1] && aopOnStack (result, roffset + i - 1, 1) && aopOnStack (source, soffset + i - 1, 1) &&
-            (y_free || (xl_free && xh_free))) // Prefer y, since it is cheaper. Using x is still cheaper than using xl twice below, though.
+            (y_free || z_free || (xl_free && xh_free))) // Prefer y, since it is cheaper. Using z or x is still cheaper than using xl twice below, though.
             {
-              asmop *taop = y_free ? ASMOP_Y : ASMOP_X;
+              asmop *taop = y_free ? ASMOP_Y : z_free ? ASMOP_Z : ASMOP_X;
               emit3_o (A_LDW, taop, 0, source, soffset + i - 1);
               emit3_o (A_LDW, result, roffset + i - 1, taop, 0);
+              assigned[i] = true;
+              assigned[i - 1] = true;
+              (*size) -= 2;
+              i -= 2;
+              continue;
+            }
+          else if (!xl_free && really_do_it_now && i > 0 && !assigned[i - 1] && aopOnStack (result, roffset + i - 1, 1) && aopOnStack (source, soffset + i - 1, 1))
+            {
+              if (!y_free)
+                push (ASMOP_Y, 0, 2);
+              emit3_o (A_LDW, ASMOP_Y, 0, source, soffset + i - 1);
+              emit3_o (A_LDW, result, roffset + i - 1, ASMOP_Y, 0);
+              if (!y_free)
+                pop (ASMOP_Y, 0, 2);
               assigned[i] = true;
               assigned[i - 1] = true;
               (*size) -= 2;
@@ -1865,11 +1879,25 @@ outer_continue_down:
 
           // Do two bytes at once, if possible.
           if (i + 1 < n && !assigned[i + 1] && aopOnStack (result, roffset + i + 1, 1) && aopOnStack (source, soffset + i + 1, 1) &&
-            (y_free || (xl_free && xh_free))) // Prefer y, since it is cheaper. Using x is still cheaper than using xl twice below, though.
+            (y_free || z_free || (xl_free && xh_free))) // Prefer y, since it is cheaper. Using x is still cheaper than using xl twice below, though.
             {
-              asmop *taop = y_free ? ASMOP_Y : ASMOP_X;
+              asmop *taop = y_free ? ASMOP_Y : z_free ? ASMOP_Z : ASMOP_X;
               emit3_o (A_LDW, taop, 0, source, soffset + i);
               emit3_o (A_LDW, result, roffset + i, taop, 0);
+              assigned[i] = true;
+              assigned[i + 1] = true;
+              (*size) -= 2;
+              i += 2;
+              continue;
+            }
+          else if (!xl_free && really_do_it_now && i + 1 < n && !assigned[i + 1] && aopOnStack (result, roffset + i + 1, 1) && aopOnStack (source, soffset + i + 1, 1))
+            {
+              if (!y_free)
+                push (ASMOP_Y, 0, 2);
+              emit3_o (A_LDW, ASMOP_Y, 0, source, soffset + i);
+              emit3_o (A_LDW, result, roffset + i, ASMOP_Y, 0);
+              if (!y_free)
+                pop (ASMOP_Y, 0, 2);
               assigned[i] = true;
               assigned[i + 1] = true;
               (*size) -= 2;
@@ -5487,18 +5515,35 @@ shifted:
   bool maskedtopbyte = (topbytemask != 0xff);
   if (maskedtopbyte)
     {
-      bool pushed_xl = false;
-      if (!regDead (XL_IDX, ic) || result->aop->regs[XL_IDX] >= 0 && result->aop->regs[XL_IDX] != result->aop->size - 1)
+      if (topbytemask == 0x7f && aopOnStackNotExt (result->aop, result->aop->size - 1, 1))
         {
-          push (ASMOP_XL, 0, 1);
-          pushed_xl = true;
+          emit3_o (A_SLL, result->aop, result->aop->size - 1, 0, 0);
+          emit3_o (A_SRL, result->aop, result->aop->size - 1, 0, 0);
         }
-      genMove_o (ASMOP_XL, 0, result->aop, result->aop->size - 1, 1, true, false, false, false, true);
-      emit2 ("and", "xl, #0x%02x", topbytemask);
-      cost (2, 1);
-      genMove_o (result->aop, result->aop->size - 1, ASMOP_XL, 0, 1, true, false, false, false, true);
-      if (pushed_xl)
-        pop (ASMOP_XL, 0, 1);
+      else
+        {
+          bool pushed_xl = false;
+          if (!regDead (XL_IDX, ic) || result->aop->regs[XL_IDX] >= 0 && result->aop->regs[XL_IDX] != result->aop->size - 1)
+            {
+              push (ASMOP_XL, 0, 1);
+              pushed_xl = true;
+            }
+          if (aopOnStack (result->aop, result->aop->size - 1, 1) || result->aop->type == AOP_DIR)
+            {
+              emit2 ("ld", "xl, #0x%02x", topbytemask);
+              cost (2, 1);
+              emit3_o (A_AND, result->aop, result->aop->size - 1, ASMOP_XL, 0);
+            }
+          else
+            {
+              genMove_o (ASMOP_XL, 0, result->aop, result->aop->size - 1, 1, true, false, false, false, true);
+              emit2 ("and", "xl, #0x%02x", topbytemask);
+              cost (2, 1);
+              genMove_o (result->aop, result->aop->size - 1, ASMOP_XL, 0, 1, true, false, false, false, true);
+            }
+          if (pushed_xl)
+            pop (ASMOP_XL, 0, 1);
+        }
     }
 
   freeAsmop (left);

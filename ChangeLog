@@ -4,7 +4,7 @@
 	  src/f8/peeph.def:
 	  Save a few bytes in f8 division support routines.
 	* src/f8/gen.c:
-	  Improve f8 codegen for bit-fields.
+	  f8 codegen improvements.
 
 2024-02-29 Gabriele Gorla <gorlik@yahoo.com>
 

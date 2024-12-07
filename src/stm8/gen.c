@@ -8633,10 +8633,13 @@ genPointerGet (const iCode *ic)
           cost (2, 1);
         }
 
-      if (bit_field && blen <= 8 && !SPEC_USIGN (getSpec (operandType (result)))) // Sign extension for partial byte of signed bit-field
-        {  
-          emit2 ("bcp", "a, #0x%02x", 0x80 >> (8 - blen));
-          cost (2, 1);
+      if (bit_field && blen < 8 && !SPEC_USIGN (getSpec (operandType (result)))) // Sign extension for partial byte of signed bit-field
+        {
+          if (blen != 1) // The and above already set the z flag for blen == 1.
+            {
+              emit2 ("bcp", "a, #0x%02x", 0x80 >> (8 - blen));
+              cost (2, 1);
+            }
           if (tlbl)
             emit2 ("jreq", "!tlabel", labelKey2num (tlbl->key));
           cost (2, 0);

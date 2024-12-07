@@ -1153,6 +1153,7 @@ emit3_o (const enum asminst inst, asmop *op0, int offset0, asmop *op1, int offse
     case A_SEX:
     case A_XCH:
     case A_XOR:
+    case A_XORW:
       break;
     default:
       G.c = -1;
@@ -1663,7 +1664,11 @@ emit3sub_o (enum asminst inst, asmop *op0, int offset0, asmop *op1, int offset1)
         if (op1->type == AOP_LIT && (~litword1 & 0xffff) + 1 == 0x0001)
           {
             emit3_o (A_INCW, op0, offset0, 0, 0);
-            spillReg (C_IDX);
+            break;
+          }
+        else if (op1->type == AOP_LIT && litword1 == 0x0000 && G.c == 0)
+          {
+            emit3_o (A_SBCW, op0, offset0, 0, 0);
             break;
           }
         else if (op1->type == AOP_LIT && (~litword1 & 0xffff) + 1 <= 0xffff)
@@ -2843,7 +2848,7 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
            i += 2;
            continue;
          }
-       else if (i + 1 < size && y_free && aopOnStack (result_aop, i, 2) && aopOnStack (left_aop, i, 2) && aopIsOp16_2 (right_aop, i))
+       else if (i + 1 < size && y_free && aopOnStack (result_aop, i, 2) && (aopOnStack (left_aop, i, 2) || left_aop->type == AOP_DIR) && aopIsOp16_2 (right_aop, i))
          {
            genMove_o (ASMOP_Y, 0, left_aop, i, 2, xl_free && right_aop->regs[XL_IDX] < i, xh_free && right_aop->regs[XH_IDX] < i, true, false, true);
            emit3_o (A_XORW, ASMOP_Y, 0, right_aop, i);
@@ -2863,6 +2868,16 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
          {
            emit3_o (A_XOR, result_aop, i, left_aop, i);
            i++;
+           continue;
+         }
+       else if (i + 1 < size && !y_free && aopOnStack (result_aop, i, 2) && (aopOnStack (left_aop, i, 2) || left_aop->type == AOP_DIR) && aopIsOp16_2 (right_aop, i))
+         {
+           push (ASMOP_Y, 0, 2);
+           genMove_o (ASMOP_Y, 0, left_aop, i, 2, xl_free && right_aop->regs[XL_IDX] < i, xh_free && right_aop->regs[XH_IDX] < i, true, false, true);
+           emit3_o (A_XORW, ASMOP_Y, 0, right_aop, i);
+           genMove_o (result_aop, i, ASMOP_Y, 0, 2, xl_free, xh_free, true, false, true);
+           pop (ASMOP_Y, 0, 2);
+           i += 2;
            continue;
          }
 
@@ -4020,7 +4035,7 @@ genPlus (const iCode *ic)
            continue;
          }
        else if (i + 1 < size && !maskedword && aopIsOp16_2 (rightop, i) && // Use addw / adcw in y
-         (aopInReg (result->aop, i, Y_IDX) || y_free2 && aopOnStack (leftop, i, 2) && aopOnStack (result->aop, i, 2)))
+         (aopInReg (result->aop, i, Y_IDX) || y_free2 && (aopOnStack (leftop, i, 2) || leftop->type == AOP_DIR) && aopOnStack (result->aop, i, 2)))
          {
            genMove_o (ASMOP_Y, 0, leftop, i, 2, xl_free2 && rightop->regs[XL_IDX] < i, false, true, false, !started);
            if (!started && aopIsLitVal (rightop, i, 2, 0x0001))
@@ -4035,7 +4050,7 @@ genPlus (const iCode *ic)
            continue;
          }
        else if (i + 1 < size && !maskedword && aopIsOp16_2 (leftop, i) &&
-         (aopInReg (result->aop, i, Y_IDX) || y_free2 && aopOnStack (rightop, i, 2) && aopOnStack (result->aop, i, 2)))
+         (aopInReg (result->aop, i, Y_IDX) || y_free2 && (aopOnStack (rightop, i, 2) || rightop->type == AOP_DIR) && aopOnStack (result->aop, i, 2)))
          {
            genMove_o (ASMOP_Y, 0, rightop, i, 2, xl_free2 && leftop->regs[XL_IDX] < i, false, true, false, !started);
            if (started && aopIsLitVal (leftop, i, 2, 0x0000))
@@ -4630,6 +4645,16 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
           i += 2;
         }
+      else if (!xl_dead && i + 1 < size && aopIsOp16_2 (right->aop, i))
+        {
+          push (ASMOP_Y, 0, 2);
+          genMove_o (ASMOP_Y, 0, left->aop, i, 2, false, xh_dead && right->aop->regs[XH_IDX] < i, true, false, true);
+          emit3sub_o (A_SUBW, ASMOP_Y, 0, right->aop, i);
+          pop (ASMOP_Y, 0, 2);
+          if (tlbl_NE)
+            emit2 ("jrnz", "#!tlabel", labelKey2num (tlbl_NE->key));
+          i += 2;
+        }
       else
         {
           if (aopAre8_2 (left->aop, i, right->aop, i) &&
@@ -4788,7 +4813,7 @@ genOr (const iCode *ic)
            i += 2;
            continue;
          }
-       else if (i + 1 < size && y_free && aopOnStack (result->aop, i, 2) && aopOnStack (left->aop, i, 2) && aopIsOp16_2 (right->aop, i))
+       else if (i + 1 < size && y_free && aopOnStack (result->aop, i, 2) && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i))
          {
            genMove_o (ASMOP_Y, 0, left->aop, i, 2, xl_free && right->aop->regs[XL_IDX] < i, xh_free && right->aop->regs[XH_IDX] < i, true, false, true);
            emit3_o (A_ORW, ASMOP_Y, 0, right->aop, i);
@@ -4806,6 +4831,16 @@ genOr (const iCode *ic)
          {
            emit3_o (A_OR, result->aop, i, left->aop, i);
            i++;
+           continue;
+         }
+       else if (i + 1 < size && !y_free && aopOnStack (result->aop, i, 2) && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i))
+         {
+           push (ASMOP_Y, 0, 2);
+           genMove_o (ASMOP_Y, 0, left->aop, i, 2, xl_free && right->aop->regs[XL_IDX] < i, xh_free && right->aop->regs[XH_IDX] < i, true, false, true);
+           emit3_o (A_ORW, ASMOP_Y, 0, right->aop, i);
+           genMove_o (result->aop, i, ASMOP_Y, 0, 2, xl_free, xh_free, true, false, true);
+           pop (ASMOP_Y, 0, 2);
+           i += 2;
            continue;
          }
 
@@ -5515,7 +5550,12 @@ shifted:
   bool maskedtopbyte = (topbytemask != 0xff);
   if (maskedtopbyte)
     {
-      if (topbytemask == 0x7f && aopOnStackNotExt (result->aop, result->aop->size - 1, 1))
+      if (aopIsAcc8 (result->aop, result->aop->size - 1))
+        {
+          emit2 ("and", "%s, #0x%02x", aopGet (result->aop, result->aop->size - 1), topbytemask);
+          cost (2 + !aopInReg (result->aop, result->aop->size - 1, XL_IDX), 1);
+        }
+      else if (topbytemask == 0x7f && aopOnStackNotExt (result->aop, result->aop->size - 1, 1))
         {
           emit3_o (A_SLL, result->aop, result->aop->size - 1, 0, 0);
           emit3_o (A_SRL, result->aop, result->aop->size - 1, 0, 0);
@@ -5762,7 +5802,7 @@ handle_bitfield_topbyte_in_xl (int blen, int bstr, bool sign_extend, bool xh_dea
 
   // Sign-extend
   symbol *const tlbl = (regalloc_dry_run ? 0 : newiTempLabel (0));
-  if (blen == 1) //The and above already set the z flag
+  if (blen == 1) // The and above already set the z flag.
     {
       if (tlbl)
         emit2 ("jrz", "#!tlabel", labelKey2num (tlbl->key));

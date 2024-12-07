@@ -1,3 +1,13 @@
+2024-12-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  f8 codegen improvements.
+	* src/stm8/gen.c:
+	  stm8 codegen improvements for some reads of signed bit-fields.
+	* src/f8/peeph.def,
+	  src/f8/peep.c:
+	  f8 optimizations for string handling.
+
 2024-12-06 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/f8/_divuint.s,

@@ -1169,7 +1169,7 @@ optimizeNarrowOpNet (iCode *ic)
             }
           else if ((uic->op == LEFT_OP || uic->op == RIGHT_OP || uic->op == ROT) && !isOperandEqual (uic->left, op))
             ;
-          else if ((uic->op == LEFT_OP || uic->op == RIGHT_OP || uic->op == UNARYMINUS || uic->op == '~') && isOperandEqual (uic->left, op)) // Not ROT, since the size affects emantics.
+          else if ((uic->op == LEFT_OP || uic->op == RIGHT_OP || uic->op == UNARYMINUS || uic->op == '~') && isOperandEqual (uic->left, op)) // Not ROT, since the size affects semantics.
             {
               if (net.find(uic->result) == net.end())
                 {

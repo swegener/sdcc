@@ -262,6 +262,26 @@ replace restart {
 }
 
 replace restart {
+	ld	%1, (%2)
+	incw	%2
+	tst	%1
+} by {
+	ld	%1, (%2)
+	incnw	%2
+	; peephole 18a removed tst by using incnw.
+} if notUsed('cf' 'of')
+
+replace restart {
+	ldw	%1, (%2)
+	incw	%2
+	tstw	%1
+} by {
+	ldw	%1, (%2)
+	incnw	%2
+	; peephole 18b removed tstw by using incnw.
+} if notUsed('cf' 'of')
+
+replace restart {
 	jp	#%5
 } by {
 	jp	#%6

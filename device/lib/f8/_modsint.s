@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  _divuint.s
+;  _modsint.s
 ;
-;  Copyright (c) 2023, Philipp Klaus Krause
+;  Copyright (C) 2023-2024, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,31 +26,33 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-.globl __divuint
+	.globl __modsint
+	.globl __divuint
 
-.area CODE
+	.area CODE
 
-; _divuint (int x, int y)
-; Return quotient in y, remainder in z.
-__divuint:
+; _modsint (int x, int y)
+__modsint:
+	ld	xl, yh
+	tst	xl
+	jrnn	x_nonnegative
+	negw	y
+x_nonnegative:
 
-	clrw	z
-	ld	xl, #0x10
+	ldw	z, (2, sp)
+	jrnn	y_nonnegative
+	negw	z
+y_nonnegative:
 
-1$:
-
-	sllw	y
-	rlcw	z
-
-	incw	y
-	subw	z, (2, sp)
-	jrc	#2$
-	sbcw	y	; add -1
-	addw	z, (2, sp)
-2$:
-
-	dec	xl
-	jrnz	#1$
+	push	xl
+	pushw	z
+	call	#__divuint
+	ldw	y, z
+	tst	(2, sp)
+	jrnn	return_nonnegative
+	negw	y
+return_nonnegative:
+	addw	sp, #3
 
 	ret
 

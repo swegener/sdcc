@@ -32,6 +32,7 @@
 	.area CODE
 
 ; _divsint (int x, int y)
+; Return quotient in y, remainder in z.
 __divsint:
 	ld	xl, yh
 	tst	xl

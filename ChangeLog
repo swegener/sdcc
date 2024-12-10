@@ -1,5 +1,10 @@
 2024-12-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/f8/gen.c:
+	  f8 carry bit caching fix. Some f8 code generation improvements.
+
+2024-12-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/f8/peeph.def:
 	  Optimize out some more redundant loads for f8.
 

@@ -70,6 +70,7 @@ enum asminst
   A_ORW,
   A_RLC,
   A_RLCW,
+  A_ROT,
   A_RRC,
   A_RRCW,
   A_SBC,
@@ -115,6 +116,7 @@ static const char *asminstnames[] =
   "orw",
   "rlc",
   "rlcw",
+  "rot",
   "rrc",
   "rrcw",
   "sbc",
@@ -1028,6 +1030,7 @@ emit3cost (enum asminst inst, const asmop *op0, int offset0, const asmop *op1, i
     op_cost (op0, offset0);
     break;
   case A_BOOL:
+  case A_ROT:
   case A_SRA:
     if (aopInReg (op0, offset0, XL_IDX))
       cost (1, 1);
@@ -1150,6 +1153,7 @@ emit3_o (const enum asminst inst, asmop *op0, int offset0, asmop *op1, int offse
     case A_LDW:
     case A_OR:
     case A_ORW:
+    case A_ROT:
     case A_SEX:
     case A_XCH:
     case A_XOR:
@@ -4833,7 +4837,8 @@ genOr (const iCode *ic)
            i++;
            continue;
          }
-       else if (i + 1 < size && !y_free && aopOnStack (result->aop, i, 2) && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i))
+       else if (i + 1 < size && !y_free && aopOnStack (result->aop, i, 2) && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i) &&
+         !(aopSame (result->aop, i, left->aop, i, 1) && (aopIsLitVal (left->aop, i + 1, 1, 0xff) || aopIsLitVal (right->aop, i + 1, 1, 0xff)))) // Avoid this path that saves and restores y if using xl is cheaper.
          {
            push (ASMOP_Y, 0, 2);
            genMove_o (ASMOP_Y, 0, left->aop, i, 2, xl_free && right->aop->regs[XL_IDX] < i, xh_free && right->aop->regs[XH_IDX] < i, true, false, true);
@@ -5200,6 +5205,10 @@ static void emitLeftShift (asmop *aop, int offset, int size, bool rlc, bool xl_d
 {
   wassert (offset >= 0);
 
+#if 0
+  emit2(";", "emitLeftShift G.c %d topbit %d", G.c, topbit);
+#endif
+
   for (int i = 0; i < size;)
     {
       int ri = i + offset;
@@ -5467,7 +5476,7 @@ genLeftShift (const iCode *ic)
             int topbit = -1;
             if (!v.anything)
               {
-                unsigned long long topbitmask = 1ull << (size * 8);
+                unsigned long long topbitmask = 1ull << (size * 8 - 1);
                 if (v.knownbitsmask & topbitmask)
                   topbit = (bool)(v.knownbits & topbitmask);
                 v.knownbitsmask <<= 1;
@@ -5679,6 +5688,12 @@ genRightShift (const iCode *ic)
       bool xl_free = regDead (XL_IDX, ic);
       if (rlc)
         emitLeftShift (shiftop, 0, size, true, xl_free, &xl_pushed, -1);
+      else if (size == 1 && !sign && shCount >= 4 && aopIsAcc8 (shiftop, 0))
+        {
+          emit2 ("rot", "%s, #%d", aopGet (shiftop, 0), 8 - shCount);
+          emit2 ("and", "%s, #0x%02x", aopGet (shiftop, 0), 0xff >> shCount);
+          cost (4 + 2 * !aopInReg (shiftop, 0, XL_IDX), 2);
+        }
       else
         for (int c = 0; c < shCount; c++)
           {
@@ -7271,7 +7286,7 @@ genF8Code (iCode *lic)
           emit2 ("; ic:", "%d: %s", ic->key, iLine);
           dbuf_free (iLine);
         }
-#if 1
+#if 0
       D (emit2 (";", "count: %f, G.c %d", ic->count, G.c));
 #endif
       genF8iCode(ic);

@@ -50,25 +50,33 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ldw	(%1, sp), %2
-	ldw	%2, (%1, sp)
+	%1	(%3, sp), %2
+	%1	%2, (%3, sp)
 } by {
-	ldw	(%1, sp), %2
-	; peephole 1 removed redundant load from (%1, sp) into %2.
+	%1	(%3, sp), %2
+	; peephole 1 removed redundant %1 from (%3, sp) into %2.
+} if same(%1 'ld' 'ldw'), notUsed('nf' 'zf')
+
+replace restart {
+	push	%1
+	ld	(0, sp), %1
+} by {
+	push	%1
+	; peephole 1b removed redundant ld.
 }
 
 replace restart {
-	ldw	(%1, sp), %2
-	ldw	%2, (%1, sp)
+	pushw	%1
+	ldw	(0, sp), %1
 } by {
-	ldw	(%1, sp), %2
-	; peephole 1a removed redundant load from (%1, sp) into %2.
+	pushw	%1
+	; peephole 1c removed redundant ldw.
 }
 
 replace restart {
 	%1	%2
 } by {
-	; peephole 1b removed dead %1 %2.
+	; peephole 1d removed dead %1 %2.
 } if same(%1 'tst' 'tstw'), notVolatile(%2), notUsed('cf' 'zf' 'nf' 'of')
 
 replace restart {

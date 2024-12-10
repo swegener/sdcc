@@ -1,3 +1,8 @@
+2024-12-10 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/peeph.def:
+	  Optimize out some more redundant loads for f8.
+
 2024-12-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/f8/_modsint.s,

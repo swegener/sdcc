@@ -7271,8 +7271,8 @@ genF8Code (iCode *lic)
           emit2 ("; ic:", "%d: %s", ic->key, iLine);
           dbuf_free (iLine);
         }
-#if 0
-      emit2 (";", "count: %f", ic->count);
+#if 1
+      D (emit2 (";", "count: %f, G.c %d", ic->count, G.c));
 #endif
       genF8iCode(ic);
 

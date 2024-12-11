@@ -112,8 +112,8 @@ struct dis_entry disass_f8[]=
     { 0x91, 0xff, ' ', 2, "xch %a,('nsp_8')" },
     { 0x92, 0xff, ' ', 1, "xch %a,('y_8')" },
     { 0x93, 0xff, ' ', 1, "xch %L,%H" },
-    { 0xf4, 0xff, ' ', 1, "xchw y,('z_16')" },
-    { 0xf5, 0xff, ' ', 1, "xchw z,('nsp_16')" },
+    { 0xf4, 0xff, ' ', 1, "xchw %R,('%A')" },
+    { 0xf5, 0xff, ' ', 1, "xchw %A,('nsp_16')" },
 
     { 0x9b, 0xff, ' ', 1, "cax ('y_8'),xh,yl" },
     { 0xf9, 0xff, ' ', 1, "caxw ('y_16'),z,x" },
@@ -395,7 +395,7 @@ u8_t allowed_prefs[256]= {
   /* c_ */    P6,P6,P6,P6,  P6,P6,P6,P6,  P6,P6,P6,P6,  P6,PD,PW,PN, // Not correct - this line is too permissive for the ldw (y), x and ldw (n, y), x instructions.
   /* d_ */    PA,PN,PN,PN,  PN,PN,PN,PN,  PS,PN,PN,PN,  PN,PS,PN,PS,
   /* e_ */    P6,P6,P6,P6,  P6,P6,PN,PN,  PN,P6,PN,P6,  PN,PN,PD,PD,
-  /* f_ */    PD,PA,PA,PA,  PN,PN,P6,PN,  P6,PN,P6,P6,  PD,PA,PA,PA // Not correct - this line is too permissive for the 16-bti two-operand instructions.
+  /* f_ */    PD,PA,PA,PA,  PW,PW,P6,PN,  P6,PN,P6,P6,  PD,PA,PA,PA // Not correct - this line is too permissive for the 16-bit two-operand instructions.
 };
 
 

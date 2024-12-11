@@ -1,5 +1,14 @@
 2024-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* sim/ucsim/src/sims/f8.src/decode.h,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/imove.cc,
+	  src/f8/gen.c:
+	  f8 xchw instruction fixes.
+
+2024-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/f8/gen.c,
 	  src/f8/peeph.def:
 	  Improve code for f8 bit-field access. Improve code for f8 extended stack access.

@@ -251,8 +251,8 @@ public:
   int XCH_A_NSP(t_mem code);
   int XCH_A_Y(t_mem code);
   int XCH_A_A(t_mem code);
-  int XCHW_Y_Z(t_mem code);
-  int XCHW_Z_NSP(t_mem code);
+  int XCHW_X_Y(t_mem code);
+  int XCHW_Y_NSP(t_mem code);
   int CAX(t_mem code);
   int CAXW(t_mem code);
   int CLR_M(t_mem code);

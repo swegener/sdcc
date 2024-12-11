@@ -3605,24 +3605,25 @@ restore:
 static void
 genCritical (iCode *ic)
 {
-#if 0
+  push (ASMOP_X, 0, 2);
+  push (ASMOP_Y, 0, 2);
   emit2 ("ldw", "y, #0x0010");
   cost (3, 1);
   emit3 (A_CLRW, ASMOP_X, 0);
   emit2 ("xchw", "x, (y)");
   cost (1, 1);
-  push (ASMOP_X, 0, 2);
-#endif
+  pop (ASMOP_Y, 0, 2);
+  emit2 ("xchw", "x, (0, sp)");
+  cost (1, 1);
 }
 
 static void
 genEndCritical (iCode *ic)
 {
-#if 0
-  pop (ASMOP_Y, 0, 2);
+  emit2 ("xchw", "y, (0, sp)");
   emit2 ("ldw", "0x0010, y");
-  cost (3, 1);
-#endif
+  cost (5, 2);
+  pop (ASMOP_Y, 0, 2);
 }
 
 /*-----------------------------------------------------------------*/

@@ -278,6 +278,14 @@ replace restart {
 }
 
 replace restart {
+	clr	(%1, sp)
+	clr	(%2, sp)
+} by {
+	clrw	(%1, sp)
+	; peephole 17c merged clr to clrw
+} if immdInRange(1 1 '-' %2 %1 %3)
+
+replace restart {
 	ld	%1, (%2)
 	incw	%2
 	tst	%1

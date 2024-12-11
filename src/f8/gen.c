@@ -3603,15 +3603,26 @@ restore:
 /*---------------------------------------------------------------------*/
 
 static void
-genCritical (iCode * ic)
+genCritical (iCode *ic)
 {
-  // TODO
+#if 0
+  emit2 ("ldw", "y, #0x0010");
+  cost (3, 1);
+  emit3 (A_CLRW, ASMOP_X, 0);
+  emit2 ("xchw", "x, (y)");
+  cost (1, 1);
+  push (ASMOP_X, 0, 2);
+#endif
 }
 
 static void
-genEndCritical (iCode * ic)
+genEndCritical (iCode *ic)
 {
-  // TODO
+#if 0
+  pop (ASMOP_Y, 0, 2);
+  emit2 ("ldw", "0x0010, y");
+  cost (3, 1);
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -3661,8 +3672,7 @@ genFunction (iCode *ic)
       G.stack.size = f8_call_stack_size + (sym->stack ? sym->stack : 0);
       D (emit2 (";", "Setup z as frame pointer."));
       emit2 ("ldw", "z, sp");
-      cost (6, 2);
-      spillReg (C_IDX);
+      cost (2, 1);
     }
 
   bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);

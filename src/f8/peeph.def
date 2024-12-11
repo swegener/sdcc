@@ -290,6 +290,15 @@ replace restart {
 } if notUsed('cf' 'of')
 
 replace restart {
+	ldw	%1, #%2
+	ld	%3, %2
+} by {
+	ldw	%1, #%2
+	; peephole 19 reused adddress in %1.
+	ld	%3, (%1)
+}
+
+replace restart {
 	jp	#%5
 } by {
 	jp	#%6

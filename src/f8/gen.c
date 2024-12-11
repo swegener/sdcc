@@ -6379,8 +6379,7 @@ genPointerSet (const iCode *ic)
       cost (3 + !aopInReg (right->aop, 0, XL_IDX), 1);
       goto release;
     }
-
-  if (!bit_field && size >= 4 && (regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) && regDead (Z_IDX, ic) &&
+  else if (!bit_field && size >= 4 && (regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) && regDead (Z_IDX, ic) &&
     (aopOnStack(right->aop, 0, size) || right->aop->type == AOP_DIR))
     {
       genMove (ASMOP_Y, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, true);
@@ -6398,7 +6397,30 @@ genPointerSet (const iCode *ic)
             cost (2, 1);
             i++;
           }
-     goto release;
+      goto release;
+    }
+  else if ((left->aop->type == AOP_IMMD || left->aop->type == AOP_LIT) && regDead (XL_IDX, ic) &&
+    bit_field && blen <= 8 && right->aop->type == AOP_LIT && (byteOfVal (right->aop->aopu.aop_lit, 0) == 0x00 || byteOfVal (right->aop->aopu.aop_lit, 0) == (0xff >> (8 - blen))))
+    {
+      unsigned char bval = (byteOfVal (right->aop->aopu.aop_lit, 0) << bstr) & ((0xff >> (8 - blen)) << bstr);
+      if (byteOfVal (right->aop->aopu.aop_lit, 0) == 0x00)
+        {
+          emit2 ("ld", "xl, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
+          if (left->aop->type == AOP_LIT)
+            emit2 ("and", "0x%02x%02x, xl", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
+          else
+            emit2 ("and", "%s+%d, xl", left->aop->aopu.immd, left->aop->aopu.immd_off);
+        }
+      else
+        {
+          emit2 ("ld", "xl, #0x%02x", bval);
+          if (left->aop->type == AOP_LIT)
+            emit2 ("or", "0x%02x%02x, xl", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
+          else
+            emit2 ("or", "%s+%d, xl", left->aop->aopu.immd, left->aop->aopu.immd_off);
+        }
+      cost (5, 2);
+      goto release;
     }
 
   if (aopInReg (left->aop, 0, Y_IDX))

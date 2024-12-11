@@ -140,7 +140,7 @@ static const char *asminstnames[] =
 bool f8_regs_used_as_parms_in_calls_from_current_function[ZH_IDX + 1];
 bool f8_regs_used_as_parms_in_pcalls_from_current_function[ZH_IDX + 1];
 
-static struct asmop asmop_xl, asmop_xh, asmop_x, asmop_y, asmop_z, asmop_xy, asmop_xly, asmop_zero, asmop_one, asmop_mone, asmop_f;
+static struct asmop asmop_xl, asmop_xh, asmop_x, asmop_y, asmop_z, asmop_xy, asmop_xly, asmop_yx, asmop_zero, asmop_one, asmop_mone, asmop_f;
 static struct asmop *const ASMOP_XL = &asmop_xl;
 static struct asmop *const ASMOP_XH = &asmop_xh;
 static struct asmop *const ASMOP_X = &asmop_x;
@@ -148,6 +148,7 @@ static struct asmop *const ASMOP_Y = &asmop_y;
 static struct asmop *const ASMOP_Z = &asmop_z;
 static struct asmop *const ASMOP_XY = &asmop_xy;
 static struct asmop *const ASMOP_XLY = &asmop_xly;
+static struct asmop *const ASMOP_YX = &asmop_yx;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_MONE = &asmop_mone;
@@ -181,6 +182,7 @@ f8_init_asmops (void)
   f8_init_reg_asmop(&asmop_y, (const signed char[]){YL_IDX, YH_IDX, -1});
   f8_init_reg_asmop(&asmop_z, (const signed char[]){ZL_IDX, ZH_IDX, -1});
   f8_init_reg_asmop(&asmop_xy, (const signed char[]){YL_IDX, YH_IDX, XL_IDX, XH_IDX, -1});
+  f8_init_reg_asmop(&asmop_yx, (const signed char[]){XL_IDX, XH_IDX, YL_IDX, YH_IDX, -1});
   f8_init_reg_asmop(&asmop_xly, (const signed char[]){YL_IDX, YH_IDX, XL_IDX, -1});
 
   asmop_zero.type = AOP_LIT;
@@ -5387,6 +5389,131 @@ init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop
 }
 
 /*-----------------------------------------------------------------*/
+/* genRot - generates code for rotation                            */
+/*-----------------------------------------------------------------*/
+static void
+genRot (const iCode *ic)
+{
+  operand *right = IC_RIGHT (ic);
+  operand *left = IC_LEFT (ic);
+  operand *result = IC_RESULT (ic);
+
+  D (emit2 ("; genRot", ""));
+
+  wassert (!(bitsForType (operandType (left)) % 8));
+  wassert (IS_OP_LITERAL (right));
+
+  aopOp (left, ic, false);
+  aopOp (right, ic, false);
+  aopOp (result, ic, true);
+
+  int size = result->aop->size;
+  int s = operandLitValueUll (right) % bitsForType (operandType (left));
+
+  if (size == 1)
+    {
+      bool pushed_xl = false;
+      asmop *rotaop = ASMOP_XL;
+      if (aopSame (result->aop, 0, left->aop, 0, 1) && aopIsAcc8 (left->aop, 0) ||
+        aopInReg (left->aop, 0, XL_IDX) && regDead (XL_IDX, ic))
+        rotaop = left->aop;
+      else if (aopIsAcc8 (result->aop, 0))
+        rotaop = result->aop;
+      if (!regDead (XL_IDX, ic) && aopInReg (rotaop, 0, XL_IDX))
+        {
+          push (ASMOP_XL, 0, 1);
+          pushed_xl = true;
+        }
+      genMove (rotaop, left->aop, regDead (XL_IDX, ic) || pushed_xl, regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+      emit2 ("rot", "%s, #%d", aopGet(rotaop, 0), s);
+      genMove (result->aop, rotaop, regDead (XL_IDX, ic) || pushed_xl, regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+      if (pushed_xl)
+        pop (ASMOP_XL, 0, 1);
+    }
+  else if (size == 2)
+    {
+      asmop *rotaop = ASMOP_Y;
+      if (aopSame (result->aop, 0, left->aop, 0, 2) && aopIsAcc16 (left->aop, 0))
+        rotaop = left->aop;
+      else if (regDead (Y_IDX, ic))
+        rotaop = ASMOP_Y;
+      else
+        UNIMPLEMENTED;
+      genMove (rotaop, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+      while (s)
+        if (s >= 8 && s <= 9)
+          {
+            emit3_o (A_XCH, rotaop, 0, rotaop, 1);
+            s -= 8;
+          }
+        else
+          {
+            emit3 (A_SLLW, rotaop, 0);
+            emit3 (A_ADCW, rotaop, 0);
+            s--;
+          }
+      genMove (result->aop, rotaop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+    }
+  else if (size == 4)
+    {
+      if (s != 16)
+        UNIMPLEMENTED;
+      asmop rotaop;
+      signed char idxarray[5];
+      if (result->aop->type == AOP_REGSTK &&
+        result->aop->aopu.bytes[0].in_reg && result->aop->aopu.bytes[1].in_reg && result->aop->aopu.bytes[2].in_reg && result->aop->aopu.bytes[3].in_reg)
+        {
+          idxarray[0] = result->aop->aopu.bytes[2].byteu.reg->rIdx;
+          idxarray[1] = result->aop->aopu.bytes[3].byteu.reg->rIdx;
+          idxarray[2] = result->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[3] = result->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[4] = -1;
+          f8_init_reg_asmop (&rotaop, idxarray);
+          genMove (&rotaop, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+        }
+      else if (left->aop->type == AOP_REGSTK &&
+        left->aop->aopu.bytes[0].in_reg && left->aop->aopu.bytes[1].in_reg && left->aop->aopu.bytes[2].in_reg && left->aop->aopu.bytes[3].in_reg)
+        {
+          idxarray[0] = left->aop->aopu.bytes[2].byteu.reg->rIdx;
+          idxarray[1] = left->aop->aopu.bytes[3].byteu.reg->rIdx;
+          idxarray[2] = left->aop->aopu.bytes[0].byteu.reg->rIdx;
+          idxarray[3] = left->aop->aopu.bytes[1].byteu.reg->rIdx;
+          idxarray[4] = -1;
+          f8_init_reg_asmop (&rotaop, idxarray);
+          genMove (result->aop, &rotaop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), regDead (Y_IDX, ic), regDead (Z_IDX, ic));
+        }
+      else
+        {
+          if (!regDead (X_IDX, ic))
+            push (ASMOP_X, 0, 2);
+          if (!regDead (Y_IDX, ic))
+            push (ASMOP_Y, 0, 2);
+
+          genMove (ASMOP_XY, left->aop, true, true, true, regDead (Z_IDX, ic));
+          genMove (result->aop, ASMOP_YX, true, true, true, regDead (Z_IDX, ic));
+ 
+          if (!regDead (X_IDX, ic) && (result->aop->regs[XL_IDX] >= 0 || result->aop->regs[XH_IDX] >= 0) ||
+            !regDead (Y_IDX, ic) && (result->aop->regs[YL_IDX] >= 0 || result->aop->regs[YH_IDX] >= 0))
+            {
+              cost (300, 300);
+              wassertl (regalloc_dry_run, "Swap result partially in non-dead x/y not implemented.");
+            }
+
+          if (!regDead (Y_IDX, ic))
+            pop (ASMOP_Y, 0, 2);
+          if (!regDead (X_IDX, ic))
+            pop (ASMOP_X, 0, 2);
+        }
+    }
+  else
+    UNIMPLEMENTED;
+
+  freeAsmop (left);
+  freeAsmop (result);
+  freeAsmop (right);
+}
+
+/*-----------------------------------------------------------------*/
 /* genLeftShift - generates code for left shift                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -7142,7 +7269,7 @@ genF8iCode (iCode *ic)
       break;
  
     case ROT:
-      wassertl (0, "Unimplemented iCode");
+      genRot (ic);
       break;
 
     case LEFT_OP:

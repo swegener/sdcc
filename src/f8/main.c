@@ -305,7 +305,30 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 static bool
 hasExtBitOp (int op, sym_link *left, int right)
 {
-  return (op == GETABIT || op == GETBYTE || op == GETWORD);
+  int size = getSize (left);
+
+  switch (op)
+    {
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
+      return (true);
+    case ROT:
+      {
+        unsigned int lbits = bitsForType (left);
+        if (lbits % 8)
+          return (false);
+        if (size == 1)
+          return (true);
+        if (size == 2 && right % 8 <= 3)
+          return (true);
+        if ((size <= 2 || size == 4) && lbits == right * 2)
+          return (true);
+      }
+      return (false);
+    }
+
+  return (false);
 }
 
 /** $1 is always the basename.

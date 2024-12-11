@@ -1,3 +1,9 @@
+2024-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/main.c,
+	  src/f8/gen.c:
+	  Improve f8 codegen for rotations.
+
 2024-12-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/f8/gen.c:

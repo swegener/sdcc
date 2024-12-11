@@ -2,7 +2,7 @@
 
 	* src/f8/gen.c,
 	  src/f8/peeph.def:
-	  Improve code for f8 bit-field access.
+	  Improve code for f8 bit-field access. Improve code for f8 extended stack access.
 
 2024-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
 

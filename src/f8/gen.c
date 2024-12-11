@@ -522,12 +522,12 @@ aopGet(const asmop *aop, int offset)
         {
           long int eoffset;
           if (offset < 8)
-            eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + G.stack.size - 256l;
+            eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk);
           else
-            eoffset = (long int)(aop->aopu.bytes[0].byteu.stk) + offset + G.stack.size - 256l;
+            eoffset = (long int)(aop->aopu.bytes[0].byteu.stk) + offset;
 
-          wassertl_bt (regalloc_dry_run || f8_extend_stack, "Extended stack access, but z not prepared for extended stack access.");
-          wassertl_bt (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
+          wassertl_bt (regalloc_dry_run || f8_extend_stack, "Extended stack access, but z not setup as frame pointer.");
+          wassertl_bt (regalloc_dry_run || eoffset >= -G.stack.size && eoffset <= 0xffffl - G.stack.size, "Stack access out of extended stack range."); // Stack > 64K.
 
           SNPRINTF (buffer, sizeof(buffer), "(%u, z)", (unsigned)eoffset);
         }
@@ -3659,9 +3659,8 @@ genFunction (iCode *ic)
   if (f8_extend_stack) // Setup for extended stack access.
     {
       G.stack.size = f8_call_stack_size + (sym->stack ? sym->stack : 0);
-      D (emit2 (";", "Setup z for extended stack access."));
+      D (emit2 (";", "Setup z as frame pointer."));
       emit2 ("ldw", "z, sp");
-      emit2 ("addw", "z, #%ld", (~(G.stack.size - 256) + 1) & 0xffff);
       cost (6, 2);
       spillReg (C_IDX);
     }

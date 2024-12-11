@@ -80,6 +80,14 @@ replace restart {
 } if same(%1 'tst' 'tstw'), notVolatile(%2), notUsed('cf' 'zf' 'nf' 'of')
 
 replace restart {
+	ldw	%1, y
+	ldw	y, %1
+} by {
+	ldw	%1, y
+	; peephole 1e removed redundant ldw.
+} if same(%1 'x' 'z' 'sp')
+
+replace restart {
 	%1	%2, %3
 	tst	%2
 } by {
@@ -298,6 +306,15 @@ replace restart {
 	ld	%3, (%1)
 }
 
+replace restart {
+	ldw	%1, sp
+	ldw	y, sp
+} by {
+	ldw	y, sp
+	; peephole 20 used sp from y.
+	ldw	%1, y
+}
+      
 replace restart {
 	jp	#%5
 } by {

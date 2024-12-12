@@ -242,7 +242,7 @@ f8_genInitStartup (FILE *of)
   fprintf (of, "__sdcc_init_data:\n");
   
   /* Zeroing memory (required by standard for static & global variables) */
-  fprintf (of, "\tldw z, #l_DATA\n");
+  fprintf (of, "\tldw\tz, #l_DATA\n");
   fprintf (of, "\tjrz\t#00002$\n");
   fprintf (of, "\tclr\txl\n");
   fprintf (of, "00001$:\n");

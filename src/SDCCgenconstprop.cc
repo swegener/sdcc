@@ -758,6 +758,8 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
       break;
     default:
       G[*out] = *ic->valinfos;
+      if (ic->resultvalinfo)
+        G[*out].map[ic->result->key] = *ic->resultvalinfo;
 
       if (resultsym)
         resultvalinfo = getTypeValinfo (operandType (IC_RESULT (ic)), true);
@@ -784,7 +786,7 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
 
       if (!localchange) // Input didn't change. No need to recompute result.
         resultsym = 0;
-      else if (IS_OP_VOLATILE (IC_RESULT (ic))) // No point trying to find out what we write to a volatile operand. At the next use, it could be anything, anyway.
+      else if (IS_OP_VOLATILE (ic->result)) // No point trying to find out what we write to a volatile operand. At the next use, it could be anything, anyway.
         ;
       else if (ic->op == '!')
         {
@@ -889,7 +891,7 @@ recompute_node (cfg_t &G, unsigned int i, ebbIndex *ebbi, std::pair<std::queue<u
           if (!ic->resultvalinfo)
             ic->resultvalinfo = new struct valinfo;
           *ic->resultvalinfo = resultvalinfo;
-          G[*out].map[resultsym->key] = resultvalinfo;
+          G[*out].map[ic->result->key] = resultvalinfo;
         }
       if (todo.second.find (boost::target(*out, G)) == todo.second.end())
         {

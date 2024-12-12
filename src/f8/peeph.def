@@ -88,6 +88,24 @@ replace restart {
 } if same(%1 'x' 'z' 'sp')
 
 replace restart {
+	ldw	%1, y
+	ldw	(%2, sp), %1
+} by {
+	ldw	%1, y
+	ldw	(%2, sp), y
+	; peephole 1f loaded (%2, sp) from y instead of %1.
+}
+
+replace restart {
+	ldw	(%2, sp), y
+	ldw	%1, (%2, sp)
+} by {
+	ldw	(%2, sp), y
+	ldw	%1, y
+	; peephole 1g loaded %1 from y instead of (%2, sp).
+} if same(%1 'x' 'z')
+
+replace restart {
 	%1	%2, %3
 	tst	%2
 } by {

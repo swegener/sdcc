@@ -1,3 +1,11 @@
+2024-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc,
+	  src/f8/gen.c,
+	  src/f8/main.c,
+	  src/f8/peeph.def:
+	  Various improvements, mostly for bitwise operations.
+
 2024-12-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sim/ucsim/src/sims/f8.src/decode.h,

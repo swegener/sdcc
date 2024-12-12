@@ -2895,17 +2895,17 @@ genEor (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 
        if (aopIsOp8_2 (right_aop, i))
          {
-           genMove_o (ASMOP_XL, 0, left_aop, i, true, xh_free, false, false, false, true);
+           genMove_o (ASMOP_XL, 0, left_aop, i, 1, true, xh_free, y_free, false, true);
            emit3_o (A_XOR, ASMOP_XL, 0, right_aop, i);
          }
        else if (aopIsOp8_2 (left_aop, i))
          {
-           genMove_o (ASMOP_XL, 0, right_aop, i, true, xh_free, false, false, false, true);
+           genMove_o (ASMOP_XL, 0, right_aop, i, 1, true, xh_free, y_free, false, true);
            emit3_o (A_XOR, ASMOP_XL, 0, left_aop, i);
          }
        else
          UNIMPLEMENTED;
-       genMove_o (result_aop, i, ASMOP_XL, 0, true, false, false, false, false, true);
+       genMove_o (result_aop, i, ASMOP_XL, 0, 1, true, xh_free, y_free, false, true);
        if (!xl_free)
          pop (ASMOP_XL, 0, 1);
 
@@ -4338,7 +4338,11 @@ genCmp (const iCode *ic, iCode *ifx)
 
       for (int i = 0; i < size;)
         {
-          if (((!sign || ifx) && i + 1 < size || i + 2 < size) && !started && // Try to use cpw
+          if (!sign && i + 2 < size && !started && aopIsLitVal (right->aop, i, 2, 0x0000))
+            {
+              i += 2;
+            }
+          else if (((!sign || ifx) && i + 1 < size || i + 2 < size) && !started && // Try to use cpw
             (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) &&
             (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) || aopInReg (left->aop, i, Z_IDX)))
             {
@@ -4429,7 +4433,7 @@ genCmp (const iCode *ic, iCode *ifx)
               started = true;
               i += 2;
             }
-          else if ((!sign || ifx) && !started && aopAre8_2 (left->aop, 0, right->aop, 0))
+          else if ((!sign || ifx) && !started && aopAre8_2 (left->aop, i, right->aop, i))
             {
               emit3_o (A_CP, left->aop, i, right->aop, i);
               started = true;
@@ -4829,6 +4833,30 @@ genOr (const iCode *ic)
            i += 2;
            continue;
          }
+       else if (i + 1 < size && (aopIsAcc8 (left->aop, i) || aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopSame (result->aop, i, left->aop, i, 2) && aopIsLitVal (right->aop, i, 2, 0x0001) &&
+         !left->aop->valinfo.anything && (left->aop->valinfo.knownbitsmask & (1ull << i * 8)) && !(left->aop->valinfo.knownbits & (1ull << i * 8)))
+         {
+           if (aopInReg (left->aop, i, YL_IDX))
+             emit3 (A_INCW, ASMOP_Y, 0);
+           else
+             emit3_o (A_INC, result->aop, i, 0, 0);
+           i += 2;
+           continue;
+         }
+       else if (i + 1 < size && y_free && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopSame (result->aop, i, left->aop, i, 2))
+         {
+           genMove_o (ASMOP_Y, 0, right->aop, i, 2, xl_free, xh_free, true, false, true);
+           emit3_o (A_ORW, result->aop, i, ASMOP_Y, 0);
+           i += 2;
+           continue;
+         }
+       else if (i + 1 < size && y_free && (aopOnStack (right->aop, i, 2) || right->aop->type == AOP_DIR) && aopSame (result->aop, i, right->aop, i, 2))
+         {
+           genMove_o (ASMOP_Y, 0, left->aop, i, 2, xl_free, xh_free, true, false, true);
+           emit3_o (A_ORW, result->aop, i, ASMOP_Y, 0);
+           i += 2;
+           continue;
+         }
        else if (i + 1 < size && y_free && aopOnStack (result->aop, i, 2) && (aopOnStack (left->aop, i, 2) || left->aop->type == AOP_DIR) && aopIsOp16_2 (right->aop, i))
          {
            genMove_o (ASMOP_Y, 0, left->aop, i, 2, xl_free && right->aop->regs[XL_IDX] < i, xh_free && right->aop->regs[XH_IDX] < i, true, false, true);
@@ -4991,15 +5019,18 @@ genAnd (const iCode *ic, iCode *ifx)
 
   for (int i = 0; i < size;)
     {
-       bool xl_free = regDead (XL_IDX, ic) && left->aop->regs[XL_IDX] <= i && right->aop->regs[XL_IDX] <= i && (result->aop->regs[XL_IDX] < 0 || result->aop->regs[XL_IDX] >= i);
-       bool xh_free = regDead (XH_IDX, ic) && left->aop->regs[XH_IDX] <= i && right->aop->regs[XH_IDX] <= i && (result->aop->regs[XH_IDX] < 0 || result->aop->regs[XH_IDX] >= i);
+       const bool xl_free = regDead (XL_IDX, ic) && left->aop->regs[XL_IDX] <= i && right->aop->regs[XL_IDX] <= i && (result->aop->regs[XL_IDX] < 0 || result->aop->regs[XL_IDX] >= i);
+       const bool xh_free = regDead (XH_IDX, ic) && left->aop->regs[XH_IDX] <= i && right->aop->regs[XH_IDX] <= i && (result->aop->regs[XH_IDX] < 0 || result->aop->regs[XH_IDX] >= i);
+       const bool yl_free = regDead (YL_IDX, ic) && left->aop->regs[YL_IDX] <= i && right->aop->regs[YL_IDX] <= i && (result->aop->regs[YL_IDX] < 0 || result->aop->regs[YL_IDX] >= i);
+       const bool yh_free = regDead (YH_IDX, ic) && left->aop->regs[YH_IDX] <= i && right->aop->regs[YH_IDX] <= i && (result->aop->regs[YH_IDX] < 0 || result->aop->regs[YH_IDX] >= i);
+       const bool y_free = yl_free && yh_free;
 
        if (aopIsLitVal (right->aop, i, 1, 0x00) || aopIsLitVal (right->aop, i, 1, 0xff))
          {
            unsigned int bytelit = aopIsLitVal (right->aop, i, 1, 0x00) ? 0x00 : 0xff;
            int end;
            for(end = i; end < size && aopIsLitVal (right->aop, end, 1, bytelit); end++);
-           genMove_o (result->aop, i, bytelit == 0x00 ? ASMOP_ZERO : left->aop, i, end - i, xl_free, xh_free, false, false, true);
+           genMove_o (result->aop, i, bytelit == 0x00 ? ASMOP_ZERO : left->aop, i, end - i, xl_free, xh_free, y_free, false, true);
            i = end;
            continue;
          }
@@ -5008,7 +5039,7 @@ genAnd (const iCode *ic, iCode *ifx)
            unsigned int bytelit = aopIsLitVal (left->aop, i, 1, 0x00) ? 0x00 : 0xff;
            int end;
            for (end = i; end < size && aopIsLitVal (left->aop, end, 1, bytelit); end++);
-           genMove_o (result->aop, i, bytelit == 0x00 ? ASMOP_ZERO : right->aop, i, end - i, xl_free, xh_free, false, false, true);
+           genMove_o (result->aop, i, bytelit == 0x00 ? ASMOP_ZERO : right->aop, i, end - i, xl_free, xh_free, y_free, false, true);
            i = end;
            continue;
          }
@@ -5031,12 +5062,12 @@ genAnd (const iCode *ic, iCode *ifx)
 
        if (aopIsOp8_2 (right->aop, i))
          {
-           genMove_o (ASMOP_XL, 0, left->aop, i, true, xh_free, false, false, false, true);
+           genMove_o (ASMOP_XL, 0, left->aop, i, 1, true, xh_free, y_free, false, true);
            emit3_o (A_AND, ASMOP_XL, 0, right->aop, i);
          }
        else if (aopIsOp8_2 (left->aop, i))
          {
-           genMove_o (ASMOP_XL, 0, right->aop, i, true, xh_free, false, false, false, true);
+           genMove_o (ASMOP_XL, 0, right->aop, i, 1, true, xh_free, y_free, false, true);
            emit3_o (A_AND, ASMOP_XL, 0, left->aop, i);
          }
        else
@@ -5044,12 +5075,12 @@ genAnd (const iCode *ic, iCode *ifx)
 
        if (i + 1 < size && aopIsLitVal (right->aop, i + 1, 1, 0xff) && aopInReg (left->aop, i + 1, XH_IDX))
          {
-           genMove_o (result->aop, i, ASMOP_X, 0, 2, true, true, false, false, true);
+           genMove_o (result->aop, i, ASMOP_X, 0, 2, true, true, y_free, false, true);
            i += 2;
          }
        else
          {
-           genMove_o (result->aop, i, ASMOP_XL, 0, 1, true, xh_free, false, false, true);
+           genMove_o (result->aop, i, ASMOP_XL, 0, 1, true, xh_free, y_free, false, true);
            i++;
          }
     }

@@ -2,6 +2,8 @@
 
 	* src/SDCCicode.c:
 	  Do not propagate volatile qualifier to iTemp in implicit casts.
+	* src/f8/gen.c:
+	  f8 assigment codegen improvement.
 
 2024-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

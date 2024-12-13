@@ -2367,6 +2367,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       const bool xh_dead = xh_dead_global &&
         (!aopRS (result) || (result->regs[XH_IDX] >= (roffset + i) || result->regs[XH_IDX] < roffset)) &&
         (!aopRS (source) || source->regs[XH_IDX] <= i);
+      const bool x_dead = xl_dead && xh_dead;
       const bool y_dead = y_dead_global &&
         (!aopRS (result) || (result->regs[YL_IDX] >= (roffset + i) || result->regs[YL_IDX] < 0) && (result->regs[YH_IDX] >= (roffset + i) || result->regs[YH_IDX] < roffset)) &&
         (!aopRS (source) || source->regs[YL_IDX] <= i + 1 && source->regs[YH_IDX] <= i + 1);
@@ -2482,6 +2483,28 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emit3_o (A_LDW, ASMOP_Y, 0, source, soffset + i);
           emit3_o (A_LDW, result, roffset + i, ASMOP_Y, 0);
+          if (source->type == AOP_LIT)
+            val_y = byteOfVal (source->aopu.aop_lit, soffset + i) + byteOfVal (source->aopu.aop_lit, soffset + i + 1) * 256;
+          i += 2;
+          continue;
+        }
+      else if (i + 1 < size && x_dead &&
+        (result->type == AOP_DIR || aopOnStack (result, roffset + i, 2)) &&
+        (source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_LIT || source->type == AOP_IMMD || aopOnStack (source, soffset + i, 2)))
+        {
+          emit3_o (A_LDW, ASMOP_X, 0, source, soffset + i);
+          emit3_o (A_LDW, result, roffset + i, ASMOP_X, 0);
+          if (source->type == AOP_LIT)
+            val_y = byteOfVal (source->aopu.aop_lit, soffset + i) + byteOfVal (source->aopu.aop_lit, soffset + i + 1) * 256;
+          i += 2;
+          continue;
+        }
+      else if (i + 1 < size && x_dead &&
+        (result->type == AOP_DIR || aopOnStack (result, roffset + i, 2)) &&
+        (source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_LIT || source->type == AOP_IMMD || aopOnStack (source, soffset + i, 2)))
+        {
+          emit3_o (A_LDW, ASMOP_Z, 0, source, soffset + i);
+          emit3_o (A_LDW, result, roffset + i, ASMOP_Z, 0);
           if (source->type == AOP_LIT)
             val_y = byteOfVal (source->aopu.aop_lit, soffset + i) + byteOfVal (source->aopu.aop_lit, soffset + i + 1) * 256;
           i += 2;

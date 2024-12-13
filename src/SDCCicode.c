@@ -3397,7 +3397,17 @@ checkTypes (operand * left, operand * right)
     }
 
   if (always_cast || compareType (ltype, rtype, false) == -1)
-    right = geniCodeCast (ltype, right, TRUE);
+    {
+      if (IS_VOLATILE (ltype)) // Don't propagate volatile to right side - we don't want volatile iTemps.
+        {
+          ltype = copyLinkChain (ltype);
+          if (IS_DECL(ltype))
+            DCL_PTR_VOLATILE (ltype) = 0;
+          else
+            SPEC_VOLATILE (ltype) = 0;
+        }
+      right = geniCodeCast (ltype, right, TRUE);
+    }
   checkPtrQualifiers (ltype, rtype, !right->isConstElimnated);
   return right;
 }

@@ -4527,6 +4527,11 @@ genCmp (const iCode *ic, iCode *ifx)
     {
       emit3 (A_RLC, ASMOP_XL, 0);
       emit3 (A_XOR, ASMOP_XL, ASMOP_ONE);
+      if (regDead (XL_IDX, ic) || pushed_xl)
+        {
+          emit3 (A_AND, ASMOP_XL, ASMOP_ONE);
+          goto return_xl;
+        }
       emit3 (A_RRC, ASMOP_XL, 0);
     }
 

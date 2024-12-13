@@ -774,7 +774,7 @@ f8SurelyWrites (const lineNode *pl, const char *what)
   // 16-bit 2/1-op inst, and some others.
   if (ISINST (pl->line, "pushw") || ISINST (pl->line, "tstw"))
     return false;
-  if (ISINST (pl->line, "adcw") || ISINST (pl->line, "addw") || ISINST (pl->line, "boolw") || ISINST (pl->line, "clrw") || ISINST (pl->line, "cpw") || ISINST (pl->line, "decw") || ISINST (pl->line, "incw") || ISINST (pl->line, "mul") || ISINST (pl->line, "negw") || ISINST (pl->line, "orw") || ISINST (pl->line, "popw") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrcw") || ISINST (pl->line, "sex") || ISINST (pl->line, "sllw") || ISINST (pl->line, "sraw") || ISINST (pl->line, "srlw") || ISINST (pl->line, "subw") || ISINST (pl->line, "sbcw") || ISINST (pl->line, "incnw") || ISINST (pl->line, "zex"))
+  if (ISINST (pl->line, "adcw") || ISINST (pl->line, "addw") || ISINST (pl->line, "boolw") || ISINST (pl->line, "clrw") || ISINST (pl->line, "cpw") || ISINST (pl->line, "decw") || ISINST (pl->line, "incw") || ISINST (pl->line, "mul") || ISINST (pl->line, "negw") || ISINST (pl->line, "orw") || ISINST (pl->line, "popw") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrcw") || ISINST (pl->line, "sex") || ISINST (pl->line, "sllw") || ISINST (pl->line, "sraw") || ISINST (pl->line, "srlw") || ISINST (pl->line, "subw") || ISINST (pl->line, "sbcw") || ISINST (pl->line, "incnw") || ISINST (pl->line, "xorw") || ISINST (pl->line, "zex"))
     {
       const char *larg = leftArg (pl->line);
       return (larg[0] == extra);

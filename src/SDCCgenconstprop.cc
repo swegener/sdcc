@@ -1004,6 +1004,9 @@ optimizeValinfoConst (iCode *sic)
 static void
 reTypeOp (operand *op, sym_link *newtype)
 {
+#if 0
+  std::cout << "reType Op to "; std::cout.flush(); printTypeChain (newtype, 0);
+#endif
   if (IS_OP_LITERAL (op))
     {
       op->svt.valOperand = valCastLiteral (newtype, operandLitValue (op), operandLitValueUll (op));
@@ -1099,12 +1102,12 @@ optimizeNarrowOpNet (iCode *ic)
               wassert (isOperandEqual (dic->result, op));
               if (net.find(dic->left) == net.end() && IS_PTR (operandType (ic->result)) == IS_PTR (operandType (dic->left)))
                 {
-                  net.insert (dic->left),
+                  net.insert (dic->left);
                   checknet.insert (dic->left);
                 }
               if (net.find(dic->right) == net.end() && IS_PTR (operandType (ic->result)) == IS_PTR (operandType (dic->right)))
                 {
-                  net.insert (dic->right),
+                  net.insert (dic->right);
                   checknet.insert (dic->right);
                 }
             }
@@ -1131,7 +1134,7 @@ optimizeNarrowOpNet (iCode *ic)
                   valinfo_union (&v, getOperandValinfo (uic, uic->right));
                   if (net.find(uic->right) == net.end())
                     {
-                      net.insert (uic->right),
+                      net.insert (uic->right);
                       checknet.insert (uic->right);
                     }
                 }
@@ -1140,33 +1143,36 @@ optimizeNarrowOpNet (iCode *ic)
                   valinfo_union (&v, getOperandValinfo (uic, uic->left));
                   if (net.find(uic->left) == net.end())
                     {
-                      net.insert (uic->left),
+                      net.insert (uic->left);
                       checknet.insert (uic->left);
                     }
                 }
             }
           else if (uic->op == '+' || uic->op == '-' || uic->op == '^' || uic->op == '|' || uic->op == BITWISEAND)
             {
-              if (isOperandEqual (uic->left, op) && !isOperandEqual (uic->right, op) && !IS_PTR (operandType (ic->result)))
+              if (isOperandEqual (uic->left, op) && !IS_PTR (operandType (uic->result)))
                 {
                   if (net.find(uic->right) == net.end())
                     {
-                      net.insert (uic->right),
+                      net.insert (uic->right);
                       checknet.insert (uic->right);
                     }
                 }
-              if (!isOperandEqual (uic->left, op) && isOperandEqual (uic->right, op) && !IS_PTR (operandType (ic->result)))
+              if (isOperandEqual (uic->right, op) && !IS_PTR (operandType (uic->result)) )
                 {
                   if (net.find(uic->left) == net.end())
                     {
-                      net.insert (uic->left),
+                      net.insert (uic->left);
                       checknet.insert (uic->left);
                     }
                 }
-              if (net.find(uic->result) == net.end())
+              if (IS_PTR (operandType (ic->result)) == IS_PTR (operandType (uic->result)))
                 {
-                  net.insert (uic->result),
-                  checknet.insert (uic->result);
+                  if(net.find(uic->result) == net.end())
+                  {
+                    net.insert (uic->result);
+                    checknet.insert (uic->result);
+                  }
                 }
             }
           else if ((uic->op == LEFT_OP || uic->op == RIGHT_OP || uic->op == ROT) && !isOperandEqual (uic->left, op))
@@ -1175,7 +1181,7 @@ optimizeNarrowOpNet (iCode *ic)
             {
               if (net.find(uic->result) == net.end())
                 {
-                  net.insert (uic->result),
+                  net.insert (uic->result);
                   checknet.insert (uic->result);
                 }
             }

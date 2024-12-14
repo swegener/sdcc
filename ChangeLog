@@ -7,6 +7,10 @@
 	  Make mcs51, hc08 and s08 list --i-code-in-asm list ic->key prominently, instead of ic->seq (ic->key is more useful for debugging, and used by all other ports).
 	* src/SDCCgenconstprop.cc:
 	  Fix bug #3806.
+	* src/f8/gen.c:
+	  Improve f8 codegen.
+	* src/f8/peeph.def:
+	  Optimize out f8 pop(w)/push(w) pairs.
 
 2024-12-13 Philipp Klaus Krause <philipp@colecovision.eu>
 

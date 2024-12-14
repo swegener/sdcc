@@ -13,6 +13,20 @@ replace restart {
 } if same(%1 'clr' 'clrw'), notUsed(%2)
 
 replace restart {
+	pop	%1
+	push	%1
+} by {
+	; peephole 0a' removed dead pop / push pair.
+} if notUsed(%1)
+
+replace restart {
+	popw	%1
+	pushw	%1
+} by {
+	; peephole 0a'' removed dead popw / pushw pair.
+} if notUsed(%1)
+
+replace restart {
 	clrw	x
 } by {
 	clr	xl

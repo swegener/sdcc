@@ -4140,7 +4140,7 @@ genPlus (const iCode *ic)
        bool y_dead = regDead (Y_IDX, ic) &&
          leftop->regs[YL_IDX] <= i && leftop->regs[YH_IDX] <= i && rightop->regs[YL_IDX] < i && rightop->regs[YH_IDX] < i &&
          (result->aop->regs[YL_IDX] < 0 || result->aop->regs[YL_IDX] >= i) && (result->aop->regs[YH_IDX] < 0 || result->aop->regs[YH_IDX] >= i);
-       genMove_o (ASMOP_XL, 0, leftop, i, true, false, y_dead, false, false, !started);
+       genMove_o (ASMOP_XL, 0, leftop, i, 1, true, false, y_dead, false, !started);
        if (aopIsOp8_2 (rightop, i))
          {
            if (!started && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, -1))) // Use inc / dec
@@ -6080,6 +6080,12 @@ genPointerGet (const iCode *ic, iCode *ifx)
           emit2 (wide ? "tstw" : "tst", offset ? "%s+%d" : "%s+%d", left->aop->aopu.immd, (int)(left->aop->aopu.immd_off + offset));
           cost (3 + wide ? !aopInReg (result->aop, 0, Y_IDX) : !aopInReg (result->aop, 0, XL_IDX), 1);
         }
+      else if (wide && left->aop->type == AOP_STL)
+        {
+          struct asmop stackop_impl;
+          init_stackop (&stackop_impl, size, left->aop->aopu.stk_off + offset);
+          emit3 (A_TSTW, &stackop_impl, 0);
+        }
       else if (wide && aopInReg (left->aop, 0, Z_IDX))
         {
           emit2 ("tstw", "(%u, z)", (unsigned int)offset);
@@ -6098,7 +6104,6 @@ genPointerGet (const iCode *ic, iCode *ifx)
               emit2 ("ldw", "y, (%u, y)", (unsigned int)offset);
               cost (2 + (offset > 255), 1);
             }
-          emit3 (A_TSTW, ASMOP_Y, 0);
         }
       else if (!wide && (y_dead || aopInReg (left->aop, 0, Y_IDX)) && offset <= 255)
         {
@@ -6126,7 +6131,7 @@ genPointerGet (const iCode *ic, iCode *ifx)
       wassert (blen <= 8);
       if (!regDead (XL_IDX, ic))
         UNIMPLEMENTED;
-      if (left->aop->type == AOP_LIT)
+      else if (left->aop->type == AOP_LIT)
         emit2 ("ld", offset ? "xl, 0x%02x%02x+%d" : "xl, 0x%02x%02x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), (int)(offset));
       else if (left->aop->type == AOP_IMMD)
         emit2 ("ld", offset ? "xl, %s+%d" : "xl, %s+%d", left->aop->aopu.immd, (int)(left->aop->aopu.immd_off + offset));

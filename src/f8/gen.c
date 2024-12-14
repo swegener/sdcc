@@ -7037,24 +7037,36 @@ genCast (const iCode *ic)
           emit2 ("sex", "y, xl");
           cost (1, 1);
         }
-      emit3_o (A_LD, ASMOP_X, 0, ASMOP_Y, 1);
 
-      for (int i = right->aop->size; i < result->aop->size; i++)
+      if (!masktopbyte && right->aop->size + 1 == result->aop->size)
+        genMove_o (result->aop, right->aop->size, ASMOP_Y, 1, 1, true, false, true, false, true);
+      else if (!masktopbyte && right->aop->size + 2 == result->aop->size && result->aop->regs[YL_IDX] < 0 &&
+        (aopInReg (result->aop, right->aop->size, Y_IDX) || aopOnStack (result->aop, right->aop->size, 2) || result->aop->type == AOP_DIR))
         {
-          bool pushed_xl = false;
-          if (masktopbyte && i + 1 == result->aop->size)
+          emit3_o (A_LD, ASMOP_Y, 0, ASMOP_Y, 1);
+          genMove_o (result->aop, right->aop->size, ASMOP_Y, 0, 2, true, false, true, false, true);
+        }
+      else
+        {
+          emit3_o (A_LD, ASMOP_X, 0, ASMOP_Y, 1);
+
+          for (int i = right->aop->size; i < result->aop->size; i++)
             {
-              if (result->aop->regs[XL_IDX] >= 0 && result->aop->regs[XL_IDX] < i)
+              bool pushed_xl = false;
+              if (masktopbyte && i + 1 == result->aop->size)
                 {
-                  push (ASMOP_XL, 0, 1);
-                  pushed_xl = true;
+                  if (result->aop->regs[XL_IDX] >= 0 && result->aop->regs[XL_IDX] < i)
+                    {
+                      push (ASMOP_XL, 0, 1);
+                      pushed_xl = true;
+                    }
+                  emit2 ("and", "xl, #0x%02x", topbytemask);
+                  cost (2, 1);
                 }
-              emit2 ("and", "xl, #0x%02x", topbytemask);
-              cost (2, 1);
+              genMove_o (result->aop, i, ASMOP_XL, 0, 1, false, false, false, false, true);
+              if (pushed_xl)
+                pop (ASMOP_XL, 0, 1);
             }
-          genMove_o (result->aop, i, ASMOP_XL, 0, 1, false, false, false, false, true);
-          if (pushed_xl)
-            pop (ASMOP_XL, 0, 1);
         }
     }
 

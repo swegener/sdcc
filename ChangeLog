@@ -2,6 +2,9 @@
 
 	* support/regression/tests/typeof_retfptr.c:
 	  Test for a function pointer idiom becoming popular with C23.
+	* src/mcs51/gen.c,
+	  src/hc08/gen.c:
+	  Make mcs51, hc08 and s08 list --i-code-in-asm list ic->key prominently, instead of ic->seq (ic->key is more useful for debugging, and used by all other ports).
 
 2024-12-13 Philipp Klaus Krause <philipp@colecovision.eu>
 

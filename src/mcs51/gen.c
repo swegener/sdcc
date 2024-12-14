@@ -13023,7 +13023,7 @@ gen51Code (iCode * lic)
             }
 #endif
           iLine = printILine (ic);
-          emitcode (";", "[%s] ic:%d: %s", regsInUse, ic->seq, iLine);
+          emitcode (";", "[%s] ic:%d: %s", regsInUse, ic->key, iLine);
           dbuf_free (iLine);
         }
       /* if the result is marked as

@@ -11279,7 +11279,7 @@ genhc08Code (iCode *lic)
           regsSurv[2] = (bitVectBitValue (ic->rSurv, X_IDX)) ? 'x' : '-';
           regsSurv[3] = 0;
           iLine = printILine (ic);
-          emitcode ("", "; [%s] ic:%d: %s", regsSurv, ic->seq, printILine (ic));
+          emitcode ("", "; [%s] ic:%d: %s", regsSurv, ic->key, iLine);
           dbuf_free (iLine);
         }
 

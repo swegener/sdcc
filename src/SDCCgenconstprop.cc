@@ -1070,6 +1070,7 @@ optimizeNarrowOpNet (iCode *ic)
   checknet.insert (ic->result);
 
   struct valinfo v = *(ic->resultvalinfo);
+  unsigned int ptropwidth = 0; // Width of pointers that an integer net is added to (only bits within address space count, not tag bits).
 
 #if 0
   std::cout << "optimizeNarrowOpNet at ic " << ic->key << ": " << OP_SYMBOL (ic->result)->name << "\n"; std::cout.flush();
@@ -1150,6 +1151,26 @@ optimizeNarrowOpNet (iCode *ic)
             }
           else if (uic->op == '+' || uic->op == '-' || uic->op == '^' || uic->op == '|' || uic->op == BITWISEAND)
             {
+              if (!IS_PTR (operandType (op)) && IS_PTR (operandType (uic->result)) && v.min < 0) // Avoid breaking the addition of signed offsets to pointers (bug #3807).
+                {
+                  unsigned int pwidth = bitsForType (operandType (uic->result));
+                  // mcs51 has 24 bit pointers, but at most 16 bits in each individual address space.
+                  if (TARGET_IS_MCS51 && pwidth > 16)
+                    pwidth = 16;
+                  if (TARGET_IS_DS390 && pwidth > 24)
+                    pwidth = 24;
+                  // The pdk ports are actually named for the maximum number of address bits in their biggest address space.
+                  else if (TARGET_IS_PDK13 && pwidth > 13)
+                    pwidth = 13;
+                  else if (TARGET_IS_PDK14 && pwidth > 14)
+                    pwidth = 14;
+                  else if (TARGET_IS_PDK15 && pwidth > 15)
+                    pwidth = 15;
+                  else if (TARGET_IS_PDK16 && pwidth > 16)
+                    pwidth = 16;
+                  if (pwidth > ptropwidth)
+                    ptropwidth = pwidth;
+                }
               if (isOperandEqual (uic->left, op) && !IS_PTR (operandType (uic->result)))
                 {
                   if (net.find(uic->right) == net.end())
@@ -1223,6 +1244,8 @@ optimizeNarrowOpNet (iCode *ic)
       if (my_stdc_bit_width (-v.min) > width)
         width = my_stdc_bit_width (-v.min);
       width++; // Add one for the "sign bit".
+      if (ptropwidth > width)
+        width = ptropwidth;
       width = ((width + 7) & (-8)); // Round up to multiple of 8.
       if (width >= bitsForType (operandType (ic->result)))
         return;

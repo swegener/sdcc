@@ -574,6 +574,16 @@ opw:
 			outab(0x70);
 			break;
 		}
+		else if(t1 == S_REG && t2 == S_IX && (r1 == X && r2 == Y || r1 == Z && r2 == Y || r1 == Z && r2 == X || r1 == Y && r2 == Z)) { // ldw x, (y)
+			if (r1 == Z && r2 == Y)
+				outab (OPCODE_ALTACC5);
+			else if (r1 == Z && r2 == X)
+				outab (OPCODE_ALTACC3);
+			else if (r1 == Y && r2 == Z)
+				outab (OPCODE_ALTACC2);
+			outab (0xde);
+			break;
+		}
 		else if(t1 == S_REG) {
 			altaccw(r1);
 			switch(t2) {
@@ -697,15 +707,14 @@ opw:
 		t2 = addr(&e2);
 		r2 = rcode;
 
-        if (t1 == S_REG && r1 == F && t2 == S_SPREL) // xch f, (n, sp)
-          {
-            outab(0xec);
-            if(ls_mode(&e2))
+		if (t1 == S_REG && r1 == F && t2 == S_SPREL) { // xch f, (n, sp)
+			outab(0xec);
+			if(ls_mode(&e2))
 				aerr();
 			else
 				outrb(&e2, R_USGN);
-            break;
-          }
+			break;
+		}
 
 		if (t1 != S_REG)
 			aerr();

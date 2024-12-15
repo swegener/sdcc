@@ -6,6 +6,8 @@
 	  Rabbit cipher regression test.
 	* src/f8/gen.c:
 	  Improve f8 addition codegen.
+	* sdas/asf8/f8mch.c:
+	  Assembler support for ldw x, (y) f8 instruction.
 
 2024-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

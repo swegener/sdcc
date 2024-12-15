@@ -4115,6 +4115,16 @@ genPlus (const iCode *ic)
            started = true;
            continue;
          }
+       else if (!maskedbyte && aopSame (result->aop, i, leftop, i, 1) && aopAre8_2 (leftop, i, rightop, i))
+         {
+            if (!started && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, -1))) // Use inc / dec
+             emit3_o (aopIsLitVal (rightop, i, 1, 1) ? A_INC : A_DEC, leftop, i, 0, 0);
+           else
+             emit3_o (started ? A_ADC : A_ADD, leftop, i, rightop, i);
+           i++;
+           started = true;
+           continue;
+         }
        else if (xl_free && aopInReg (rightop, i, XL_IDX) && aopIsOp8_2 (leftop, i))
          {
            if (!started && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, -1))) // Use inc / dec

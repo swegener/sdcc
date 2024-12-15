@@ -1,7 +1,11 @@
-2024-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
+2024-12-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:
 	  Fix bug #3807.
+	* support/regression/tests/rabbit.c:
+	  Rabbit cipher regression test.
+	* src/f8/gen.c:
+	  Improve f8 addition codegen.
 
 2024-12-14 Philipp Klaus Krause <philipp@colecovision.eu>
 

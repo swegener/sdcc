@@ -63,7 +63,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LDW_A_NSP	instruction_c2
 #define LDW_A_NNZ	instruction_c3
 #define LDW_A_NY	instruction_c4
-#define LDW_A_Y		instruction_c5
+#define LDW_A_AM	instruction_c5
 #define LDW_A_X		instruction_c6
 #define LDW_A_D		instruction_c7
 #define LDW_M_A		instruction_c8
@@ -75,6 +75,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LDW_NAM_X	instruction_ce
 #define LDW_DSP_A	instruction_74
 #define LDW_A_Z         instruction_dc
+#define LDW_X_AM        instruction_de
 
 #define LDI_Y_Z         instruction_ed
 #define LDWI_Y_Z        instruction_cf

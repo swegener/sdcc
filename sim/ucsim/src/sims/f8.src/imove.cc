@@ -116,6 +116,19 @@ cl_f8::ldw_m_r(u16_t addr, u16_t r)
 }
 
 int
+cl_f8::ldw_r_m(u16_t addr)
+{
+  u16_t v= rom->read(addr);
+  v+= (rom->read(addr+1))*256;
+  rF&= ~(flagN|flagZ);
+  if (v & 0x8000) rF|= flagN;
+  if (!v) rF|= flagZ;
+  rop16->W(v);
+  vc.rd+= 2;
+  return resGO;
+}
+
+int
 cl_f8::ldw_a_r(u16_t r)
 {
   acc16->W(r);

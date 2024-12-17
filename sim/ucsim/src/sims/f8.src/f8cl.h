@@ -216,12 +216,13 @@ public:
   int ldw_m_a(u16_t addr);
   int ldw_m_r(u16_t addr, u16_t r);
   int ldw_a_r(u16_t r);
+  int ldw_r_m(u16_t addr);
   int LDW_A_I(t_mem code)    { return ldw_a_i(fetch16()); }
   int LDW_A_M(t_mem code)    { return ldw_a_m(a_mm()); }
   int LDW_A_NSP(t_mem code)  { return ldw_a_m(a_n_sp()); }
   int LDW_A_NNZ(t_mem code)  { return ldw_a_m(a_nn_z()); }
   int LDW_A_NY(t_mem code)   { return ldw_a_m(a_n_y()); }
-  int LDW_A_Y(t_mem code)    { return ldw_a_m(rY); }
+  int LDW_A_AM(t_mem code)   { return ldw_a_m(acc16->get()); }
   int LDW_A_X(t_mem code)    { return ldw_a_r(rX); }
   int LDW_A_Z(t_mem code)    { return ldw_a_r(rZ); }
   int LDW_A_D(t_mem code)    { return ldw_a_i(sexd()); }
@@ -233,6 +234,7 @@ public:
   int LDW_AM_X(t_mem code)   { return ldw_m_r(a_acc16(), rop16->get()); }
   int LDW_NAM_X(t_mem code)  { return ldw_m_r(a_n_y(), rop16->get()); }
   int LDW_DSP_A(t_mem code);
+  int LDW_X_AM(t_mem code)   { return ldw_r_m(acc16->get()); }
   // other moves
   int LDI_Y_Z(t_mem code);
   int LDWI_Y_Z(t_mem code);

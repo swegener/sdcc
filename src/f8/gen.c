@@ -6211,8 +6211,20 @@ genPointerGet (const iCode *ic, iCode *ifx)
       i = 1;
       goto extend_bitfield;
     }
+  else if (!bit_field && size == 2 && !offset && aopIsAcc16 (result->aop, 0) && aopIsAcc16 (left->aop, 0) &&
+    !(aopInReg (result->aop, 0, Y_IDX) && aopInReg (left->aop, 0, X_IDX) || aopInReg (result->aop, 0, X_IDX) && aopInReg (left->aop, 0, Z_IDX)))
+    {
+      if (!regalloc_dry_run) // Save time of memory (de)allocation.
+        {
+          char *laopstr = Safe_strdup (aopGet2 (left->aop, 0));
+          emit2 ("ldw", "%s, (%s)", aopGet2 (result->aop, 0), laopstr);
+          Safe_free (laopstr);
+        }
+      cost (((aopInReg (result->aop, 0, X_IDX) || aopInReg (result->aop, 0, Y_IDX)) && aopInReg (left->aop, 0, Y_IDX)) ? 1 : 2, 1);
+      goto release;
+    }
 
-  if (!bit_field && size >= 4 + (bool)offset && (aopOnStack(result->aop, 0, size) || result->aop->type == AOP_DIR) &&
+  if (!bit_field && size >= 4 + (bool)offset && (aopOnStack (result->aop, 0, size) || result->aop->type == AOP_DIR) &&
     regDead (Y_IDX, ic) && regDead (Z_IDX, ic))
     {
       genMove (ASMOP_Z, left->aop, regDead (XL_IDX, ic), regDead (XH_IDX, ic), true, true);
@@ -6230,7 +6242,9 @@ genPointerGet (const iCode *ic, iCode *ifx)
     use_z = true;
   else if (aopInReg (left->aop, 0, Y_IDX) && (unsigned)offset + size - 1 <= 255 && (size >= 2 && aopInReg (result->aop, size - 2, Y_IDX) || result->aop->regs[YL_IDX] < 0 && result->aop->regs[YH_IDX] < 0))
     ;
-  else if (y_dead && (size >= 2 && aopInReg (result->aop, size - 2, Y_IDX) || result->aop->regs[YL_IDX] < 0 && result->aop->regs[YH_IDX] < 0))
+  else if (y_dead && (size >= 2 && aopInReg (result->aop, size - 2, Y_IDX) ||
+                      size >= 4 && !bit_field && aopInReg (result->aop, size - 4, Y_IDX) && aopIsAcc16 (result->aop, size - 2) ||
+                      result->aop->regs[YL_IDX] < 0 && result->aop->regs[YH_IDX] < 0 ))
     {
       if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
         {
@@ -6270,14 +6284,6 @@ genPointerGet (const iCode *ic, iCode *ifx)
           }
       goto release;
     }
-  else if (size == 4 && !use_z && !bit_field && !offset &&
-    aopInReg (result->aop, 0, Y_IDX) && (aopInReg (result->aop, 2, X_IDX) || aopInReg (result->aop, 2, Z_IDX)))
-    {
-      emit2 ("ldw", "%s, (2, y)", aopGet2 (result->aop, 2));
-      emit2 ("ldw", "y, (y)");
-      cost (4, 2);
-      goto release;
-    }
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
@@ -6285,6 +6291,15 @@ genPointerGet (const iCode *ic, iCode *ifx)
       bool xh_dead = regDead (XH_IDX, ic) && (result->aop->regs[XH_IDX] < 0 || result->aop->regs[XH_IDX] >= i);
       bool x_dead = xl_dead && xh_dead;
 
+      if (i + 4 == size && !use_z && !bit_field &&
+        aopInReg (result->aop, i, Y_IDX) && (aopInReg (result->aop, i + 2, X_IDX) || aopInReg (result->aop, i + 2, Z_IDX)))
+        {
+          emit2 ("ldw", "%s, (%d, y)", aopGet2 (result->aop, i + 2), offset + i + 2);
+          emit2 ("ldw", (offset + i) ? "y, (%d, y)" : "y, (y)", offset + i);
+          cost (4 + (bool)(offset + i), 2);
+          i += 4;
+          continue;
+        }
       if ((!bit_field && i + 2 <= size || blen >= 16) &&
         (aopInReg (result->aop, i, Y_IDX) || aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Z_IDX) ||
           (i + 2 == size && regDead (Y_IDX, ic) || x_dead) && (aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR)))
@@ -6298,15 +6313,15 @@ genPointerGet (const iCode *ic, iCode *ifx)
           else if (aopInReg (result->aop, i, Z_IDX))
             taop = ASMOP_Z;
 
-          if (!(offset + i) && !use_z && aopInReg (taop, i, Y_IDX))
+          if (!(offset + i) && !use_z && aopIsAcc16 (taop, i))
             {
               emit2 ("ldw", "%s, (y)", aopGet2 (taop, 0));
-              cost (1, 1);
+              cost (1 + aopInReg (taop, i, Z_IDX), 1);
             }
           else
             {
               emit2 ("ldw", use_z ? "%s, (%d, z)" : "%s, (%d, y)", aopGet2 (taop, 0), (int)(offset + i));
-              cost (2 + (use_z || offset + i > 255), 1);
+              cost (2 + (use_z || offset + i > 255) + !aopInReg (taop, 0, Y_IDX), 1);
             }
           genMove_o (result->aop, i, taop, 0, 2, xl_dead, false, true, false, true);
           i++, blen -= 8;

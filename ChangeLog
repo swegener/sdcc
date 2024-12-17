@@ -1,3 +1,13 @@
+2024-12-17 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sim/ucsim/src/sims/f8.src/decode.h,
+	  sim/ucsim/src/sims/f8.src/f8cl.h,
+	  sim/ucsim/src/sims/f8.src/glob.cc,
+	  sim/ucsim/src/sims/f8.src/imove.cc:
+	  Fixes for f8 ldw instruction simulation.
+	* src/f8/gen.c:
+	  Improve use of ldw instructions in f8 codegen.
+
 2024-12-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:

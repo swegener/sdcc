@@ -17,7 +17,7 @@ the binary kits.
 
 See the share/sdcc/doc directory for more documentation.
 
-See http://sdcc.sourceforge.net/ for the latest information on sdcc.
+See https://sdcc.sourceforge.net/ for the latest information on sdcc.
 
 
 Licenses:
@@ -49,7 +49,7 @@ See:
 
  http://www.gnu.org/copyleft/gpl.html
 
- http://sourceforge.net/apps/trac/sdcc/wiki/SDCC%20Library%20Licenses
+ https://sourceforge.net/p/sdcc/wiki/SDCC%20Library%20Licenses/
 
 
 Support:
@@ -58,13 +58,13 @@ SDCC compiler suite is a collaborative effort between a group of
 volunteers. Please feel free to report bugs via the Sourceforge bug
 tracker, or to ask questions on the user mailing list. See:
 
- http://sourceforge.net/tracker/?atid=100599&group_id=599&func=browse
+ https://sourceforge.net/p/sdcc/_list/tickets
 
- http://sourceforge.net/mail/?group_id=599
+ https://sourceforge.net/p/sdcc/mailman/
 
 Notes:
-* The ds400, pic14 and pic16 are currently experimental, but work is in
-progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
+* The ds400, f8, pic14 and pic16 are currently experimental, but work is in
+progress. Please check https://sdcc.sourceforge.net/snap.php for snapshots.
 * The TININative, avr and xa51 targets are no longer maintained.
 
 
@@ -113,7 +113,7 @@ SDCC includes code from:
 * John Hartman <noice AT noicedebugger.com>
    Porting ASXXXX and ASLINK for 8051.
 * Dmitry S. Obukhov <dso AT usa.net>
-   malloc and serial I/O routines.
+   serial I/O routines.
 * Pascal Felber
    Some of the Z80 related files are borrowed from the Gameboy
    Development Kit (GBDK).

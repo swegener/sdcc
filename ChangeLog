@@ -1,3 +1,9 @@
+2024-12-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* device/lib/r2k/crt0.s,
+	  device/lib/r2ka/crt0.s:
+	  Fix comment in Rabbit 2000(A) startup code.
+
 2024-12-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/README.txt:

@@ -4,6 +4,8 @@
 	  Enable use of ldir for r2k and r2ka in a few cases that are not affected by the wait-state bug.
 	* src/z80/gen.c:
 	  Improve Rabbit negation codegen.
+	* support/regression/tests/sieve.c:
+	  Regression test based on historic Byte magazine sieve of Eratosthenes benchmark.
 
 2024-12-19 Philipp Klaus Krause <philipp@colecovision.eu>
 

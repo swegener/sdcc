@@ -5537,11 +5537,9 @@ genNot (const iCode * ic)
   else if (IS_RAB && left->aop->size == 2 && aopInReg (left->aop, 0, HL_IDX) && isPairDead (PAIR_HL, ic))
     {
       emit2 ("bool hl");
-      emit2 ("xor a, a");
-      emit2 ("rr hl");
-      emit2 ("ccf");
-      emit2 ("rla");
-      cost (5, 10);
+      emit2 ("ld a, l");
+      emit2 ("xor a, #0x01");
+      cost (4, 8);
       cheapMove (result->aop, 0, ASMOP_A, 0, true);
       goto release;
     }

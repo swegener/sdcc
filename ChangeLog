@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Enable use of ldir for r2k and r2ka in a few cases that are not affected by the wait-state bug.
+	* src/z80/gen.c:
+	  Improve Rabbit negation codegen.
 
 2024-12-19 Philipp Klaus Krause <philipp@colecovision.eu>
 

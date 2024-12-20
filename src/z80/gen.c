@@ -7500,7 +7500,7 @@ genRet (const iCode *ic)
         }
       while (--size);
     }
-  // gbz80 doesn't have have ldir. r2k and r2ka have an ldir wait state bug that affects copies between different types of memory.
+  // gbz80 doesn't have have ldir. Rabbit 2000 to Rabbit 3000 (i.e. r2k and r2ka port) have an ldir wait state bug that affects copies between different types of memory.
   else if (!IS_SM83 && IC_LEFT (ic)->aop->type == AOP_STK || IC_LEFT (ic)->aop->type == AOP_EXSTK
            || (IC_LEFT (ic)->aop->type == AOP_DIR || IC_LEFT (ic)->aop->type == AOP_IY) && !(IS_R2K || IS_R2KA))
     {
@@ -14320,8 +14320,9 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
-  /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_SM83 && !IS_R2K && !IS_R2KA && !bit_field && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
+  // Using ldir is cheapest for large memory-to-memory transfers.
+  // sm83 doesn't have ldir. Rabbit 2000 to Rabbit 3000 (i.e. r2k and r2ka ports) have a wait-state bug breaking ldir between different types of memory.
+  if (!IS_SM83 && (!IS_R2K && !IS_R2KA || left->aop->type == AOP_STL) && !bit_field && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -15033,8 +15034,9 @@ genPointerSet (iCode *ic)
       goto release;
     }
 
-  /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_SM83 && !IS_R2K && !IS_R2KA && (right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && size > 2)
+  // Using ldir is cheapest for large memory-to-memory transfers.
+  // sm83 doesn't have ldir. Rabbit 2000 to Rabbit 3000 (i.e. r2k and r2ka ports) have a wait-state bug breaking ldir between different types of memory.
+  if (!IS_SM83 && (!IS_R2K && !IS_R2KA || result->aop->type == AOP_STL) && (right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -15598,7 +15600,7 @@ genAssign (const iCode *ic)
           if (!regalloc_dry_run && result->aop->aopu.aop_stk > right->aop->aopu.aop_stk && result->aop->aopu.aop_stk < right->aop->aopu.aop_stk + size)
             down = true;
 
-      if (!IS_SM83 && !down && // sm83 doesn't have ldir, r2k and r2ka ldir is affected by a wait state bug when copying between different types of memory.
+      if (!IS_SM83 && !down && // sm83 doesn't have ldir, Rabbit 2000 to Rabbit 3000 (i.e. r2k and r2ka ports) ldir is affected by a wait state bug when copying between different types of memory.
           (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK || result->aop->type == AOP_DIR
            || result->aop->type == AOP_IY) && (right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK
                || right->aop->type == AOP_DIR || right->aop->type == AOP_IY) && size >= 2)
@@ -15690,7 +15692,7 @@ genAssign (const iCode *ic)
                 pointPairToAop (PAIR_HL, right->aop, 0);
 
               if (size <= 2 + (!IS_RAB && optimize.codeSpeed) ||
-                // Early Rabbits have a wait state bug when ldir copies between different types of memory.
+                // Early Rabbits (up to Rabbit 3000) have a wait state bug when ldir copies between different types of memory.
                 (IS_R2K || IS_R2KA) && !((right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK)))
                 for(int i = 0; i < size; i++)
                   {
@@ -16642,6 +16644,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
   else
     {
       symbol *tlbl = 0;
+      bool to_from_stack = isOperandOnStack (to) && isOperandOnStack (from);
       if (count->aop->type != AOP_REG) // If in reg: Has been fetched early by setupForMemcpy() above.
         fetchPair (PAIR_BC, count->aop);
       if (count->aop->type != AOP_LIT)
@@ -16655,7 +16658,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
             }
           cost2 (3, 10, 6, 7, 12, 10, 3, 3); // For cycle cost, assume that n is non-zero.
         }
-      if ((IS_R2K || IS_R2KA) && optimize.codeSpeed && n != UINT_MAX) // Work around ldir wait state bug, but care for speed
+      if ((IS_R2K || IS_R2KA) && !to_from_stack && optimize.codeSpeed && n != UINT_MAX) // Work around Rabbit 2000 to Rabbit 3000 ldir wait state bug, but care for speed
         {
           wassert (n > 3);
           if (n % 2)
@@ -16675,7 +16678,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
             }
           regalloc_dry_run_cost += 3;         
         }
-      else if (IS_R2K || IS_R2KA) // Work around ldir wait state bug.
+      else if ((IS_R2K || IS_R2KA) && !to_from_stack) // Work around Rabbit 2000 to Rabbit 3000 ldir wait state bug.
         {
           if (!regalloc_dry_run)
             {
@@ -16872,17 +16875,17 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
       if (live_HL)
         {
           _push (PAIR_HL);
-          saved_HL = TRUE;
+          saved_HL = true;
         }
       if (live_DE)
         {
           _push (PAIR_DE);
-          saved_DE = TRUE;
+          saved_DE = true;
         }
       if (live_BC)
         {
           _push (PAIR_BC);
-          saved_BC = TRUE;
+          saved_BC = true;
         }
       if (indirect_c)
         {
@@ -16891,42 +16894,29 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
         }
       else
         {
-		  setupForMemset (ic, dst, c, direct_c);
+          setupForMemset (ic, dst, c, direct_c);
 
-		  if (!regalloc_dry_run)
-		    emit2 ("ld !*hl, %s", aopGet (direct_c ? c->aop : ASMOP_A, 0, FALSE));
-		  regalloc_dry_run_cost += (direct_c && c->aop->type == AOP_LIT) ? 2 : 1;
-		  if (ulFromVal (n->aop->aopu.aop_lit) <= 1)
-		    goto done;
+          if (!regalloc_dry_run)
+            emit2 ("ld !*hl, %s", aopGet (direct_c ? c->aop : ASMOP_A, 0, FALSE));
+          regalloc_dry_run_cost += (direct_c && c->aop->type == AOP_LIT) ? 2 : 1;
+          if (ulFromVal (n->aop->aopu.aop_lit) <= 1)
+            goto done;
 
-		  emit2 ("ld e, l");
-		  emit2 ("ld d, h");
-		  regalloc_dry_run_cost += 2;
-		  if (!IS_R3KA || optimize.codeSpeed)
-		    {
-		      emit2 ("inc de");
-		      regalloc_dry_run_cost++;
-		      preinc = TRUE;
-		    }
+          emit3 (A_LD, ASMOP_E, ASMOP_L);
+          emit3 (A_LD, ASMOP_D, ASMOP_H);
+          if (!IS_R3KA || optimize.codeSpeed)
+            {
+              emit2 ("inc de");
+              cost2 (1, 6, 4, 2, 8, 4, 1, 1);
+              preinc = true;
+            }
         }
       emit2 ("ld bc, !immedword", (unsigned)(size - preinc));
       cost2 (3, 10, 9, 6, 12, 6, 3, 3);
-      if (IS_R2K || IS_R2KA) // Work around ldir wait state bug that affects copies between different types of memory.
-        {
-          if (!regalloc_dry_run)
-            {
-              const symbol *tlbl2 = newiTempLabel (0);
-              emitLabel (tlbl2);
-              emit2("ldi");
-              emit2 ("jp LO, !tlabel", labelKey2num (tlbl2->key));
-            }
-          regalloc_dry_run_cost += 5;
-        }
-      else
-        {
-          emit2 (IS_R3KA ? "lsidr" : "ldir");
-          regalloc_dry_run_cost += 2;
-        }
+      // The Rabbit 2000 to Rabbit 3000 (i.e. r2ka and r2ka port) have a ldir wait state bug that affects copies between different types of memory.
+      // That is not a problem here, as we copy within an object, and thus within one memory.
+      emit2 (IS_R3KA ? "lsidr" : "ldir");
+      regalloc_dry_run_cost += 2;
     }
 
 done:

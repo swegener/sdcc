@@ -1,3 +1,8 @@
+2024-12-20 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Enable use of ldir for r2k and r2ka in a few cases that are not affected by the wait-state bug.
+
 2024-12-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* device/lib/r2k/crt0.s,

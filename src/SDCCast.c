@@ -1114,10 +1114,7 @@ createIvalStruct (ast *sym, sym_link *type, initList *ilist, ast *rootValue)
   sym_link *etype = getSpec (type);
 
   if (ilist && ilist->type != INIT_DEEP)
-    {
-      werror (E_INIT_STRUCT, "");
-      return NULL;
-    }
+    return createIvalType (sym, type, ilist);
 
   initList *iloop = ilist ? ilist->init.deep : NULL;
 

@@ -1,3 +1,10 @@
+2024-12-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCast.c,
+	  support/regression/tests/structinit.c.in,
+	  .version:
+	  struct / union in initializer, RFE #901.
+
 2024-12-20 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:

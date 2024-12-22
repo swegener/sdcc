@@ -131,7 +131,7 @@ unsigned long int wcstoul(const wchar_t *nptr, wchar_t **endptr, int base)
       if (ret < oldret)
         range_error = true;
       ret += (unsigned char)digit;
-#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul support)
+#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul and ckd_add)
 #endif
     }
 

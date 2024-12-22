@@ -1,3 +1,10 @@
+2024-12-22 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/lib/strtoull.c,
+	  device/lib/wcstoul.c,
+	  device/lib/wcstoull.c:
+	  Hackfix and re-enable strtoull and wcstoull, see bug #3798.
+
 2024-12-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCast.c,

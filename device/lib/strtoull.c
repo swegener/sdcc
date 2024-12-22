@@ -32,13 +32,13 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#ifdef __SDCC_LONGLONG
+#if 0
 #include <stdckdint.h>
 #endif
 #include <limits.h>
 #include <errno.h>
 
-#if 0 // Bug 3798
+#ifdef __SDCC_LONGLONG
 static signed char _isdigit(const char c, unsigned char base)
 {
   unsigned char v;
@@ -122,10 +122,17 @@ unsigned long long int strtoull(const char *nptr, char **endptr, int base)
       if (digit < 0)
         break;
 
+#if 0
       range_error |= ckd_mul (&ret, ret, b);
       range_error |= ckd_add (&ret, ret, digit);
-
+#else
+      unsigned long long int oldret = ret;
+      ret *= b;
+      if (ret < oldret)
+        range_error = true;
       ret += (unsigned char)digit;
+#warning INEXACT RANGE ERROR CHECK WILL NOT REPORT ALL OVERFLOWS (fix by implementing ckd_mul and ckd_add for unsigned long long)
+#endif
     }
 
   if (endptr)
@@ -140,4 +147,3 @@ unsigned long long int strtoull(const char *nptr, char **endptr, int base)
   return (neg ? -ret : ret);
 }
 #endif
-

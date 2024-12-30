@@ -14,7 +14,7 @@
 #define sizepl 8191
 char flags[sizepl];
 #endif
-void testSieve() {
+void testSieve (void) {
 #if !defined (__SDCC_mcs51) && !defined (__SDCC_sm83) && !defined (__SDCC_pdk13) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15) && !defined (__SDCC_pdk16) && !defined (__SDCC_stm8) && !defined (__SDCC_f8) // Lack of data memory
     int i, prime, k, count, iter; 
     for (iter = 1; iter <= 10; iter ++) {

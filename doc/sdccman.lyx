@@ -9816,7 +9816,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899
+https://www.open-std.org/jtc1/sc22/wg14/www/projects#9899
 \end_layout
 
 \end_inset
@@ -9831,20 +9831,19 @@ ISO C90 and ANSI C89
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
-status collapsed
+
+\begin_inset Flex Code
+status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c90
 \end_layout
 
 \end_inset
 
--std-c90
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -9878,8 +9877,8 @@ status collapsed
 
 \end_layout
 
-\begin_layout Standard
-Deviations from standard compliance:
+\begin_layout Subsubsection*
+Deviations from standard compliance
 \end_layout
 
 \begin_layout Itemize
@@ -9926,19 +9925,16 @@ struct s { char x } a[] = {{1},
 
 \end_deeper
 \begin_layout Itemize
-'double
-\begin_inset Index idx
-range none
-pageformat default
-status collapsed
+\begin_inset Flex Code
+status open
 
 \begin_layout Plain Layout
-double (not supported)
+float
 \end_layout
 
 \end_inset
 
-' precision floating point 
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -9950,10 +9946,39 @@ Floating point support
 
 \end_inset
 
-not supported.
- Instead a warning is emitted,
- and float is used instead.
- long double is treated the same.
+ is substituted for (
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+long
+\end_layout
+
+\end_inset
+
+) 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+range none
+pageformat default
+status collapsed
+
+\begin_layout Plain Layout
+double (not supported)
+\end_layout
+
+\end_inset
+
+ and a warning is emitted.
 \end_layout
 
 \begin_layout Itemize
@@ -9986,8 +10011,8 @@ R style
  but with the semantics of ISO style functions.
 \end_layout
 
-\begin_layout Standard
-Some features of this standard are not supported in some ports:
+\begin_layout Subsubsection*
+Features missing in some ports
 \end_layout
 
 \begin_layout Itemize
@@ -10017,8 +10042,11 @@ union
 
 \end_inset
 
- cannot be passed as function parameters;
- hc08,
+ cannot be passed as function parameters
+\end_layout
+
+\begin_layout Itemize
+hc08,
  s08,
  mos6502,
  pic14,
@@ -10066,7 +10094,7 @@ struct
 \series default
  
 \family typewriter
-s parms) /* invalid in SDCC although allowed in ANSI */
+s parms) /* unsupported in these SDCC ports */
 \begin_inset Newline newline
 \end_inset
 
@@ -10131,7 +10159,7 @@ struct s rets;
 \end_inset
 
 return rets;
- /* is invalid in SDCC although allowed in ANSI */
+ /* unsupported in these SDCC ports */
 \begin_inset Newline newline
 \end_inset
 
@@ -10175,20 +10203,19 @@ ISO C95
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
-status collapsed
+
+\begin_inset Flex Code
+status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c95
 \end_layout
 
 \end_inset
 
--std-c95
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10216,6 +10243,10 @@ status collapsed
 
 \series default
  to compile in this mode.
+\end_layout
+
+\begin_layout Subsubsection*
+Implementation status
 \end_layout
 
 \begin_layout Standard
@@ -10230,20 +10261,19 @@ ISO C99
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
-status collapsed
+
+\begin_inset Flex Code
+status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c99
 \end_layout
 
 \end_inset
 
--std-c99
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10271,6 +10301,10 @@ status collapsed
 
 \series default
  to compile in this mode.
+\end_layout
+
+\begin_layout Subsubsection*
+Deviations from standard compliance
 \end_layout
 
 \begin_layout Standard
@@ -10288,25 +10322,26 @@ Objects of variably-modified types.
 \end_layout
 
 \begin_layout Itemize
-ptrdiff_t has 16 bits,
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ptrdiff_t
+\end_layout
+
+\end_inset
+
+ has 16 bits,
  while the standard requires at least 17 bits.
 \end_layout
 
-\begin_layout Standard
-Some features of this standard are not supported in some ports:
+\begin_layout Subsubsection*
+Features missing in some ports
 \end_layout
 
 \begin_layout Itemize
-pic14,
- pic16:
- there is no support for data types long long,
- unsigned long long,
- int_fast64_t,
- int_least64_t,
- int64_t,
- uint_fast64_t,
- uint_least64_t,
- uint64_t.
+pic14:
+ there is no support for 64 bit integer types.
  
 \end_layout
 
@@ -10317,20 +10352,19 @@ ISO C11 and ISO C17
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
+
+\begin_inset Flex Code
 status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c11
 \end_layout
 
 \end_inset
 
--std-c11
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10360,9 +10394,15 @@ status collapsed
  to compile in this mode.
 \end_layout
 
+\begin_layout Subsubsection*
+Implementation status
+\end_layout
+
 \begin_layout Standard
 Except for the issues mentioned in the section above,
  this standard is supported.
+ Note:
+ Variably-modified types became optional in this version.
 \end_layout
 
 \begin_layout Subsection
@@ -10372,20 +10412,19 @@ ISO C23
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
+
+\begin_inset Flex Code
 status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c23
 \end_layout
 
 \end_inset
 
--std-c23
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10415,8 +10454,8 @@ status collapsed
  to compile in this mode.
 \end_layout
 
-\begin_layout Standard
-Deviations from standard compliance:
+\begin_layout Subsubsection*
+Deviations from standard compliance
 \end_layout
 
 \begin_layout Itemize
@@ -10463,19 +10502,16 @@ struct s { char x } a[] = {{1},
 
 \end_deeper
 \begin_layout Itemize
-'double
-\begin_inset Index idx
-range none
-pageformat default
-status collapsed
+\begin_inset Flex Code
+status open
 
 \begin_layout Plain Layout
-double (not supported)
+float
 \end_layout
 
 \end_inset
 
-' precision floating point 
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10487,10 +10523,39 @@ Floating point support
 
 \end_inset
 
-not supported.
- Instead a warning is emitted,
- and float is used instead.
- long double is treated the same.
+ is substituted for (
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+long
+\end_layout
+
+\end_inset
+
+) 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+range none
+pageformat default
+status collapsed
+
+\begin_layout Plain Layout
+double (not supported)
+\end_layout
+
+\end_inset
+
+ and a warning is emitted.
 \end_layout
 
 \begin_layout Itemize
@@ -10502,7 +10567,27 @@ Support for attributes is slightly incomplete.
 \end_layout
 
 \begin_layout Itemize
-Checked integer arithmetic is not supported for (unsigned) long long.
+Checked integer arithmetic is not supported for (
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+unsigned
+\end_layout
+
+\end_inset
+
+) 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+long long
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Itemize
@@ -10510,11 +10595,20 @@ Qualifier-preserving standard library functions are not implemented.
 \end_layout
 
 \begin_layout Itemize
-constexpr is not implemented.
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+constexpr
 \end_layout
 
-\begin_layout Standard
-Some features of this standard are not supported in some ports:
+\end_inset
+
+ is not implemented.
+\end_layout
+
+\begin_layout Subsubsection*
+Features missing in some ports
 \end_layout
 
 \begin_layout Itemize
@@ -10544,8 +10638,11 @@ union
 
 \end_inset
 
- cannot be passed as function parameters;
- hc08,
+ cannot be passed as function parameters
+\end_layout
+
+\begin_layout Itemize
+hc08,
  s08,
  mos6502,
  pic14,
@@ -10593,7 +10690,7 @@ struct
 \series default
  
 \family typewriter
-s parms) /* invalid in SDCC although allowed in ANSI */
+s parms) /* unsupported in these SDCC ports */
 \begin_inset Newline newline
 \end_inset
 
@@ -10658,7 +10755,7 @@ struct s rets;
 \end_inset
 
 return rets;
- /* is invalid in SDCC although allowed in ANSI */
+ /* unsupported in these SDCC ports */
 \begin_inset Newline newline
 \end_inset
 
@@ -10696,23 +10793,25 @@ stack-auto
 \end_layout
 
 \begin_layout Itemize
-pic14,
- pic16:
- there is no support for data types long long,
- unsigned long long,
- int_fast64_t,
- int_least64_t,
- int64_t,
- uint_fast64_t,
- uint_least64_t,
- uint64_t.
+pic14:
+ there is no support for 64 bit integer types.
  
 \end_layout
 
 \begin_layout Itemize
 pic14,
  pic16:
- _BitInt is not supported.
+ 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+_BitInt
+\end_layout
+
+\end_inset
+
+ is not supported.
 \end_layout
 
 \begin_layout Subsection
@@ -10722,20 +10821,19 @@ ISO C2y preview
 \begin_layout Standard
 Use 
 \series bold
--
-\begin_inset ERT
+
+\begin_inset Flex Code
 status open
 
 \begin_layout Plain Layout
 
-
-\backslash
-/
+\series bold
+--std-c2y
 \end_layout
 
 \end_inset
 
--std-c2y
+
 \begin_inset Index idx
 range none
 pageformat default
@@ -10765,6 +10863,10 @@ status collapsed
  to compile in this mode.
 \end_layout
 
+\begin_layout Subsubsection*
+Implementation status
+\end_layout
+
 \begin_layout Standard
 In anticipation of the upcoming version of the language standard,
  C2y,
@@ -10781,7 +10883,17 @@ literal "false"
 \end_inset
 
 :
- _Generic selection expression with a type operand
+ 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+_Generic
+\end_layout
+
+\end_inset
+
+ selection expression with a type operand
 \end_layout
 
 \begin_layout Itemize

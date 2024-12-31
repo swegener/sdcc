@@ -1,3 +1,13 @@
+2024-12-31 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Update section 3.1 "Standard Compliance" and improve readability.
+	* support/scripts/sdcclogo.svg,
+	  support/scripts/sdcclogo_bakedtext.svg,
+	  support/scripts/sdcclogo_simplified.svg,
+	  support/scripts/sdcclogo_simplified_bakedtext.svg:
+	  Add logo SVGs for future use, see RFE #813.
+
 2024-12-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,

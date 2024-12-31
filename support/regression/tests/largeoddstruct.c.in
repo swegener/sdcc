@@ -1,7 +1,8 @@
 /*  Test large structs of odd size
-    Some ports use blockmoveinstructions for handling large objects, in particular
+    Some ports use block move instructions for handling large objects, in particular
     for assignment, read and write via pointers, passing as parameters and returning.
-    Sometimes the code path is sloghtly different for objects of odd size.
+    Sometimes the code path is slightly different for objects of odd size, which is
+    not covered well in other tests.
     width: 8, 40, 56
  */
 
@@ -30,7 +31,7 @@ struct largeoddstruct f1(void)
 	return (struct1);
 }
 #endif
-#if 0 // segfault
+#if 0 // Bug #3803.
 struct largeoddstruct f2(struct largeoddstruct *p)
 {
 	return (*p);
@@ -58,7 +59,6 @@ void compare1(struct largeoddstruct s1)
 
 void testLargeOddStruct (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) // Bug #3804
 #if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
 #if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_ds390) && !defined (__SDCC_mos6502) && !defined (__SDCC_mos65c02) // struct return not yet supported
 	struct largeoddstruct s;
@@ -72,10 +72,9 @@ void testLargeOddStruct (void)
 	s = f2(&struct1);
 	compare1 (s);
 #endif
-#ifndef __SDCC_ds390
+#ifndef __SDCC_ds390 // struct return support incomplete for ds390
 	f3(&struct0);
 	compare0 (struct1);
-#endif
 #endif
 #endif
 }

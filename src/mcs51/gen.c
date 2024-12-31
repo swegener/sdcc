@@ -5161,7 +5161,7 @@ genRet (iCode *ic)
 
   if (bigreturn)
     {
-      bool framepointer = (IFFUNC_ISREENT (currFunc->type) || options.stackAuto) && !options.omitFramePtr;
+      bool framepointer = (IFFUNC_ISREENT (currFunc->type) || options.stackAuto) && !options.omitFramePtr && (currFunc->stack || FUNC_HASSTACKPARM (currFunc->type)); // This needs to match the logic in genFunction - could be factored out, but there is a major rewrite ofmcs51 codegenplanned anyaway, at which time we might consider porting the frame pointer omission mechanism from the z80 port instead.
       asmop *aop = newAsmop (0);
       reg_info *preg = getFreePtr (ic, aop, false);
       const char *bp = options.useXstack ? (framepointer ? "_bpx" : "_spx") : (framepointer ? "_bp" : "sp");

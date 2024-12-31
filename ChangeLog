@@ -1,5 +1,13 @@
 2024-12-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* .version,
+	  doc/INSTALL.txt,
+	  doc/sdccman.lyx,
+	  sdcc.spec:
+	  Prepare for SDCC 4.5.0 release.
+
+2024-12-31 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/mcs51/gen.c,
 	  support/regression/tests/largeoddstruct.c.in:
 	  Fix bug #3804.

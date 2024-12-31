@@ -273,7 +273,7 @@ ompiler) is free open source,
 Sandeep Dutta
 \series default
  designed for 8 bit Microprocessors.
- The current version targets Intel MCS51 based Microprocessors (8031,
+ The current version targets Intel MCS-51 based Microprocessors (8031,
  8032,
  8051,
  8052
@@ -295,14 +295,17 @@ status collapsed
 ,
  etc.),
  Dallas DS80C390 variants,
- NXP (formerly Freescale/Motorola) HC08 based (hc08,
- s08),
+ NXP (formerly Freescale/Motorola) HC08 based (HC08,
+ S08),
  Zilog Z80 based MCUs (Z80,
  Z180,
  eZ80 in Z80 mode,
  SM83,
  Rabbit 2000/3000,
- Rabbit 3000A 
+ Rabbit 3000A ,
+ Toshiba TLCS-90,
+ Zilog eZ80 in Z80 mode,
+ ASCII R800
 \begin_inset Index idx
 range none
 pageformat default
@@ -319,9 +322,6 @@ Z80,
 \end_inset
 
 ),
- Toshiba TLCS-90,
- Zilog eZ80 in Z80 mode,
- ASCII R800,
  STMicroelectronics STM8 
 \begin_inset Index idx
 range none
@@ -336,7 +336,7 @@ STM8
 
 ,
  Padauk PDK14 and PDK15.
- It can be retargeted for other microprocessors,
+ It can be retargeted for other microprocessors;
  support for Padauk PDK13 and MOS6502 is under development,
  whereas Microchip PIC is currently unmaintained.
  The entire source code for the compiler is distributed under GPL.
@@ -826,10 +826,7 @@ _BitInt
 status open
 
 \begin_layout Plain Layout
-Incomplete support in the hc08,
- s08,
- mos6502,
- pic14 and pic16 backends.
+Incomplete support in the pic14 and pic16 backends.
 \end_layout
 
 \end_inset

@@ -1,3 +1,27 @@
+2024-01-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCicode.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/MakeList,
+	  support/regression/tests/bug-3601.c:
+	  Fix bug #3601.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3814.c:
+	  Fix z80 part of bug #3814.
+
+2024-01-08 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/strnlen.c,
+	  support/regression/tests/wcsnlen.c:
+	  Fix bug #3812.
+
+2024-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* sdas/asf8/f8mch.c,
+	  sim/ucsim/src/sims/f8.src/glob.cc:
+	  f8 ldw instruction fixes for assembler and simulator.
+
 2024-12-31 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* .version,

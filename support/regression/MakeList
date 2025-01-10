@@ -45,10 +45,6 @@ EXCLUDE_s08-stack-auto += \
 # Bug #3600
 EXCLUDE_s08-stack-auto += \
 	tst_gcc-torture-execute-930628-1
-	
-# Bug #3601
-EXCLUDE_s08-stack-auto += \
-	gte_20091229-1
 
 # possibly unsupported.
 EXCLUDE_host += \
@@ -91,17 +87,7 @@ EXCLUDE_ARCH_mos6502 += \
 	gte_memcpy-1
 
 # Failure
-EXCLUDE_ARCH_mos6502 += \
-	gte_20091229-1
-
-# Failure
 EXCLUDE_ucr3ka += \
-	gte_20041218-1 \
-	gte_20091229-1
-
-# Failure
-EXCLUDE_s08 += \
-	gte_20091229-1 \
 	gte_20041218-1
 
 # Failure
@@ -118,24 +104,20 @@ EXCLUDE_stm8-large += \
 
 # Failure
 EXCLUDE_ucr2k += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Failure
 EXCLUDE_ucr2ka += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Fail
 EXCLUDE_ucgbz80 += \
 	gte_20041218-1 \
-	gte_20091229-1 \
 	gte_pr97404
 
 # Fail
 EXCLUDE_ucz180 += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # abnormal stop
 EXCLUDE_ucz80 += \
@@ -149,60 +131,39 @@ EXCLUDE_ucz180-resiy += \
 
 # Fail
 EXCLUDE_ucz180-resiy += \
-	gte_20091229-1 \
 	gte_pr97404
-
-# Fail
-EXCLUDE_ucz80 += \
-	gte_20091229-1
-
-# Fail
-EXCLUDE_ucz80-unsafe-read += \
-	gte_20091229-1
-
-# Fail
-EXCLUDE_ucr800 += \
-	gte_20091229-1
 
 # Failure
 EXCLUDE_hc08 += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Failure
 EXCLUDE_ucz80n += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Failure
 EXCLUDE_ARCH_z80 += \
 	gte_pr97404
 
-# Failure
-EXCLUDE_ucz80-resiy += \
-	gte_20091229-1
-
 # Fail
 EXCLUDE_ucz80-undoc += \
-	gte_20091229-1 \
 	gte_20041218-1
 
 # Stack overflow
 EXCLUDE_pdk14 += \
 	gte_20091229-1
+
 # misc Failure
 EXCLUDE_pdk15-stack-auto += \
 	gte_pr33669
 
 # misc Failure
 EXCLUDE_ucrxk3a += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # abnormal stop
 EXCLUDE_ez80-z80 += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Failure
 EXCLUDE_ARCH_mcs51 += \
@@ -212,8 +173,7 @@ EXCLUDE_ARCH_mcs51 += \
 
 # Failure
 EXCLUDE_tlcs90 += \
-	gte_20041218-1 \
-	gte_20091229-1
+	gte_20041218-1
 
 # Bug?
 EXCLUDE_pdk15-stack-auto += \

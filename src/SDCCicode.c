@@ -2290,7 +2290,7 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType, bool pt
    
   if (IS_LITERAL (retype) &&
       (!IS_FLOAT (letype) && !IS_FIXED (letype) && IS_UNSIGNED (letype) || ptrdiffdiv) &&
-      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0))
+      ((p2 = powof2 ((TYPE_TARGET_ULONGLONG) ullFromVal (OP_VALUE (right)))) > 0))
     {
       ic = newiCode (RIGHT_OP, left, operandFromLit (p2));      /* right shift */
     }
@@ -2300,7 +2300,8 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType, bool pt
   else if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) && !IS_UNSIGNED (letype) &&
-      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0) &&
+      floatFromVal (OP_VALUE (right)) >= 0 &&
+      ((p2 = powof2 ((TYPE_TARGET_ULONGLONG) ullFromVal (OP_VALUE (right)))) > 0) &&
       (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_MOS6502_LIKE))
     {
       operand *tmp;

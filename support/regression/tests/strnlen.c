@@ -12,6 +12,7 @@ char hello3[] = "hello3";
 void
 testStr(void)
 {
+#if  defined(__SDCC) || (_POSIX_C_SOURCE >= 200809L) || (__STDC_VERSION_STRING_H__ > 202311L) // strnlen is a C2Y function previously vailable in POSIX.
   const char hello4[] = "hello4";
   const char hello5[7];
 
@@ -45,6 +46,7 @@ testStr(void)
   ASSERT(strnlen(hello3, 7) == 6);
   ASSERT(strnlen(hello4, 7) == 6);
   ASSERT(strnlen(hello5, 7) == 6);
+#endif
 #endif
 }
 

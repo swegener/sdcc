@@ -9947,7 +9947,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         }
       else if (ifx && size == 1 && !sign && aopInReg (right->aop, 0, A_IDX) && left->aop->type == AOP_LIT && ullFromVal (left->aop->aopu.aop_lit) < 255)
         {
-          emit2 ("cp a, !immedbyte", ullFromVal (left->aop->aopu.aop_lit) + 1);
+          emit2 ("cp a, !immedbyte", (unsigned int)(ullFromVal (left->aop->aopu.aop_lit) + 1));
           cost2 (2, 7, 6, 4, 8, 6, 2, 2);
           result_in_carry = true;
           inv = true;

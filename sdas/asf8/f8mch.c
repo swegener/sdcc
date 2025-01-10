@@ -555,8 +555,8 @@ opw:
 			break;
 		}
 		else if(t1 == S_REG && r1 == X && t2 == S_REG && r2 == Z) {
-			outab(OPCODE_ALTACC3);
-			outab(0xdc);
+			outab(OPCODE_ALTACC2);
+			outab(0xcb);
 			break;
 		}
 		else if(t1 == S_REG && r1 == Z && t2 == S_REG && r2 == X) {

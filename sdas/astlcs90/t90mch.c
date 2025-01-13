@@ -362,7 +362,7 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
     {
       outab(0xf8 + v1);
       outab(op);
-      outab(v2);
+      outrb(e2, 0);
       return 1;
     }
 
@@ -417,7 +417,7 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
           outab(0xef);
           outab(v1 & 0xFF);
           outab(op);
-          outab(v2);
+          outrb(e2, 0);
           return 1;
         }
       else
@@ -425,7 +425,7 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
           outab(0xeb);
           outrw(e1, 0);
           outab(op);
-          outab(v2);
+          outrb(e2, 0);
           return 1;
         }
     }

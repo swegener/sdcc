@@ -1362,7 +1362,7 @@ adjustStack (int n)
       emit6502op ("tsx", "");
       transferRegReg (m6502_reg_x, m6502_reg_a, true);
       emitSetCarry(0);
-      emit6502op ("adc", IMMDFMT, n&0xff);
+      emit6502op ("adc", IMMDFMT, (unsigned int)n & 0xff);
       transferRegReg (m6502_reg_a, m6502_reg_x, true);
       emit6502op ("txs", "");
       _G.stackPushes -= n;
@@ -1816,7 +1816,7 @@ loadRegFromConst (reg_info * reg, int c)
     else if (m6502_reg_x->isLitConst && m6502_reg_x->litConst == c)
       transferRegReg (m6502_reg_x, reg, false);
     else {
-      emit6502op ("lda", IMMDFMT, c);
+      emit6502op ("lda", IMMDFMT, (unsigned int)c);
     }
     break;
   case X_IDX:
@@ -1845,7 +1845,7 @@ loadRegFromConst (reg_info * reg, int c)
     */
     else
       {
-        emit6502op ("ldx", IMMDFMT, c);
+        emit6502op ("ldx", IMMDFMT, (unsigned int)c);
       }
     break;
   case Y_IDX:
@@ -1875,7 +1875,7 @@ loadRegFromConst (reg_info * reg, int c)
     */
     else
       {
-        emit6502op ("ldy", IMMDFMT, c);
+        emit6502op ("ldy", IMMDFMT, (unsigned int)c);
       }
     break;
   case XA_IDX:
@@ -8624,7 +8624,7 @@ static void bitAConst(int val)
   wassertl (val >= 0 && val <= 0xff, "bitAConst()");
   if (IS_MOS65C02)
     {
-      emit6502op ("bit", IMMDFMT, val);
+      emit6502op ("bit", IMMDFMT, (unsigned)val);
     } 
   else 
     {
@@ -8639,7 +8639,7 @@ static void bitAConst(int val)
       else
         {
           storeRegTemp (m6502_reg_a, true);
-          emit6502op ("and", IMMDFMT, val);
+          emit6502op ("and", IMMDFMT, (unsigned)val);
           loadRegTempNoFlags (m6502_reg_a, true);
         }
     }
@@ -9288,11 +9288,11 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
 	  loadRegFromConst(m6502_reg_y, yoff + offset);
 	  emit6502op ("lda", INDFMT_IY);
 	  if ((mask | litval) != 0xff) {
-	    emit6502op ("and", IMMDFMT, mask);
+	    emit6502op ("and", IMMDFMT, (unsigned int)mask);
 	  }
 	  if (litval)
 	    {
-	      emit6502op ("ora", IMMDFMT, litval);
+	      emit6502op ("ora", IMMDFMT, (unsigned int)litval);
 	    }
 	  loadRegFromConst(m6502_reg_y, yoff + offset);
 	  emit6502op ("sta", INDFMT_IY);
@@ -9308,12 +9308,12 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
 	loadRegFromAop (m6502_reg_a, AOP (right), 0);
       /* shift and mask source value */
       AccLsh (bstr);
-      emit6502op ("and", IMMDFMT, (~mask) & 0xff);
+      emit6502op ("and", IMMDFMT, (unsigned int)(~mask) & 0xffu);
       storeRegTemp (m6502_reg_a, true);
 
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op("lda", INDFMT_IY);
-      emit6502op("and", IMMDFMT, mask);
+      emit6502op("and", IMMDFMT, (unsigned int)mask);
       emit6502op ("ora", TEMPFMT, _G.tempOfs-1);
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op ("sta", INDFMT_IY);
@@ -9354,10 +9354,10 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
 	loadRegFromConst(m6502_reg_y, yoff + offset);
 	emit6502op ("lda", INDFMT_IY);
 	if ((mask | litval) != 0xff) {
-	  emit6502op ("and", IMMDFMT, mask);
+	  emit6502op ("and", IMMDFMT, (unsigned int)mask);
 	}
 	if (litval) {
-	  emit6502op ("ora", IMMDFMT, litval);
+	  emit6502op ("ora", IMMDFMT, (unsigned int)litval);
 	}
 	m6502_dirtyReg (m6502_reg_a);
 	//          storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
@@ -9373,14 +9373,14 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
 	pullReg (m6502_reg_a);
       else
 	loadRegFromAop (m6502_reg_a, AOP (right), offset);
-      emit6502op ("and", IMMDFMT, (~mask) & 0xff);
+      emit6502op ("and", IMMDFMT, (unsigned int)(~mask) & 0xffu);
       pushReg (m6502_reg_a, true);
 
       // FIXME: works but ugly
       //      loadRegIndexed(m6502_reg_a, litOffset+offset, rematOffset);
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op ("lda", INDFMT_IY);
-      emit6502op ("and", IMMDFMT, mask);
+      emit6502op ("and", IMMDFMT, (unsigned int)mask);
       //      emit6502op ("ora19", "1,s");
       storeRegTemp(m6502_reg_a, true);
       emit6502op("pla","");
@@ -9468,10 +9468,10 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
       needpulla = pushRegIfSurv (m6502_reg_a);
       loadRegFromAop (m6502_reg_a, derefaop, 0);
       if ((mask | litval) != 0xff) {
-        emit6502op ("and", IMMDFMT, mask);
+        emit6502op ("and", IMMDFMT, (unsigned int)mask);
       }
       if (litval) {
-        emit6502op ("ora", IMMDFMT, litval);
+        emit6502op ("ora", IMMDFMT, (unsigned int)litval);
       }
       m6502_dirtyReg (m6502_reg_a);
       storeRegToAop (m6502_reg_a, derefaop, 0);
@@ -9486,11 +9486,11 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
     loadRegFromAop (m6502_reg_a, AOP (right), 0);
     /* shift and mask source value */
     AccLsh (bstr);
-    emit6502op ("and", IMMDFMT, (~mask) & 0xff);
+    emit6502op ("and", IMMDFMT, (unsigned int)(~mask) & 0xffu);
     storeRegTemp(m6502_reg_a, true);
     
     loadRegFromAop (m6502_reg_a, derefaop, 0);
-    emit6502op("and", IMMDFMT, mask);
+    emit6502op("and", IMMDFMT, (unsigned int)mask);
     emit6502op ("ora", TEMPFMT, _G.tempOfs - 1);
     storeRegToAop (m6502_reg_a, derefaop, 0);
     
@@ -9519,10 +9519,10 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
       needpulla = pushRegIfSurv (m6502_reg_a);
       loadRegFromAop (m6502_reg_a, derefaop, offset);
       if ((mask | litval) != 0xff) {
-        emit6502op ("and", IMMDFMT, mask);
+        emit6502op ("and", IMMDFMT, (unsigned int)mask);
       }
       if (litval) {
-        emit6502op ("ora", IMMDFMT, litval);
+        emit6502op ("ora", IMMDFMT, (unsigned int)litval);
       }
       m6502_dirtyReg (m6502_reg_a);
       storeRegToAop (m6502_reg_a, derefaop, offset);
@@ -9535,11 +9535,11 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
      */
     needpulla = pushRegIfSurv (m6502_reg_a);
     loadRegFromAop (m6502_reg_a, AOP (right), offset);
-    emit6502op ("and", IMMDFMT, (~mask) & 0xff);
+    emit6502op ("and", IMMDFMT, (unsigned int)(~mask) & 0xffu);
     storeRegTemp (m6502_reg_a, true);
     
     loadRegFromAop (m6502_reg_a, derefaop, offset);
-    emit6502op("and", IMMDFMT, mask);
+    emit6502op("and", IMMDFMT, (unsigned int)mask);
     emit6502op ("ora", TEMPFMT, _G.tempOfs - 1);
     storeRegToAop (m6502_reg_a, derefaop, offset);
     pullOrFreeReg (m6502_reg_a, needpulla);
@@ -9886,7 +9886,7 @@ static void genAddrOf (iCode * ic)
       if (offset)
 	{
 	  emitSetCarry(0);
-	  emit6502op ("adc", IMMDFMT, offset&0xff);
+	  emit6502op ("adc", IMMDFMT, (unsigned int)offset & 0xffu);
 	}
       if(IS_AOP_XA(AOP(result)))
 	{

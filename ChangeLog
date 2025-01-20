@@ -1,16 +1,31 @@
-2024-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
+2025-01-19 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  Improve Rabbit port documentation.
+
+2025-01-18 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* support/regression/Makefile.in:
+	  Check if python is available when running tests. Patch by Felix Salfelder, see bug #3646.
+
+2025-01-18 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* sdas/asxxsrc/asmain.c:
+	  Apply patch #485 by bbbbbr to properly document the -N flag.
+
+2025-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mos6502/gen.c:
 	  Fix mos6502 part of bug #3814.
 	* sdas/astlcs90/t90mch.c:
 	  Fix bug #3815.
 
-2024-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
+2025-01-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3601.c:
 	  Commit fix for typo in disabling of test for low-memory devices.
 
-2024-01-09 Philipp Klaus Krause <philipp@colecovision.eu>
+2025-01-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCicode.c,
 	  src/SDCCsymt.c,
@@ -22,13 +37,13 @@
 	  support/regression/tests/bug-3814.c:
 	  Fix z80 part of bug #3814.
 
-2024-01-08 Philipp Klaus Krause <philipp@colecovision.eu>
+2025-01-08 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/strnlen.c,
 	  support/regression/tests/wcsnlen.c:
 	  Fix bug #3812.
 
-2024-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
+2025-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asf8/f8mch.c,
 	  sim/ucsim/src/sims/f8.src/glob.cc:

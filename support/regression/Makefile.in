@@ -358,6 +358,7 @@ port-dirs:
 # Files shared between all ports need to be built by the test-common target,
 # which should always be built before the port specific targets.
 test-common: $(TMP_DIR)/timeout
+	@[ "$(PYTHON)" != ":" ] || ( echo "need python" >&2; exit 1 )
 	$(MAKE) -C cases
 
 ifdef PORT

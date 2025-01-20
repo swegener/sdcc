@@ -236,7 +236,7 @@ search_path_fopen(const char *filename, const char *mode)
  *              int     lnlist          current LIST-NLIST state
  *              int     lop             current line number on page
  *              int     maxinc          maximum include file nesting counter
- *              int     nflag           -n, don't resolve global assigned value symbols flag
+ *              int     nflag           -N, don't resolve global assigned value symbols flag
  *              int     oflag           -o, generate relocatable output flag
  *              int     jflag           -j, generate debug info flag
  *              int     page            current page number
@@ -2533,7 +2533,7 @@ char *usetxt[] = {
         "Symbols:",
         "  -a   All user symbols made global",
         "  -g   Undefined symbols made global",
-        "  -n   Don't resolve global assigned value symbols",
+        "  -N   Don't resolve global assigned value symbols",
         "  -z   Disable case sensitivity for symbols",
 #if (NOICE || SDCDB)
         "Debugging:",

@@ -14434,7 +14434,7 @@ genPointerGet (const iCode *ic)
           rightval = 0;
         }
       else
-        fetchPair (pair, left->aop);
+        fetchPairLong (pair, left->aop, ic, 0);
     }
 
   /* if bit then unpack */

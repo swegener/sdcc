@@ -1,3 +1,10 @@
+2025-01-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/scripts/sdcc.nsi:
+	  Fix bug #3820 via patch by Janko Stamenović.
+	* src/z80/gen.c:
+	  Fix bug #3821.
+
 2025-01-19 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

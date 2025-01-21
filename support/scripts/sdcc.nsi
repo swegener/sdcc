@@ -640,6 +640,10 @@ ${Section} "SDCC library sources" SEC25
   File "${DEV_ROOT}\lib\src\z80\*.s"
 #  File "${DEV_ROOT}\lib\src\z80\Makefile"
 
+  SetOutPath "$INSTDIR\lib\src\z80n"
+  File "${DEV_ROOT}\lib\src\z80n\*.s"
+#  File "${DEV_ROOT}\lib\src\z80n\Makefile"
+
   SetOutPath "$INSTDIR\lib\src\z180"
   File "${DEV_ROOT}\lib\src\z180\*.s"
 #  File "${DEV_ROOT}\lib\src\z180\Makefile"

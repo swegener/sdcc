@@ -8646,7 +8646,8 @@ Documentation
 \end_layout
 
 \begin_layout Standard
-Currently reading the document in PDF format is recommended,
+Currently,
+ reading the document in PDF format is recommended,
  as for unknown reason the hyperlinks are working there whereas in the HTML version they are not
 \begin_inset Foot
 status collapsed
@@ -12203,12 +12204,27 @@ status collapsed
 \begin_inset Newline newline
 \end_inset
 
-Alternatively,
+Note that in this case,
+ 
+\begin_inset Flex Strong
+status open
+
+\begin_layout Plain Layout
+the source file being compiled is always linked in first
+\end_layout
+
+\end_inset
+
+,
+ regardless of its position in the command line.
+ This can be problematic when a custom CRT is supplied as object file.
+ As an alternative to the above,
  
 \emph on
 foomain.c
 \emph default
- can be separately compiled as well:
+ can be compiled separately,
+ and the resulting object file can then be linked with the other object files using a separate command:
 \family sans
 \series bold
 
@@ -12242,20 +12258,22 @@ sdcc foomain.rel foo1.rel foo2.rel
 
 \family default
 \series default
+
+\begin_inset Flex Strong
+status open
+
+\begin_layout Plain Layout
 The file containing the 
 \emph on
 main()
 \emph default
- function 
-\noun on
-must
-\noun default
- be the 
-\noun on
-first
-\noun default
- file specified in the command line,
- since the linkage editor processes file in the order they are presented to it.
+ function must be the first file specified in the command line
+\end_layout
+
+\end_inset
+
+,
+ since the linkage editor processes object files in the order they are presented to it.
  The linker is invoked from SDCC using a script file with extension .lnk
 \begin_inset Index idx
 range none

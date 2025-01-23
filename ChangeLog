@@ -1,3 +1,9 @@
+2025-01-22 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/peeph.def,
+	  support/regression/tests/bug-3824.c:
+	  Fix bug #3824.
+
 2025-01-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/scripts/sdcc.nsi:

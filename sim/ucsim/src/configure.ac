@@ -318,12 +318,12 @@ if test $in_sdcc == "yes" ; then
 	def_rxk="yes"
     fi
 
-    def_68hc08="no"
+    def_m68hc08="no"
     if test $enable_hc08_port = "yes"; then
-	def_68hc08="yes"
+	def_m68hc08="yes"
     fi
     if test $enable_s08_port = "yes"; then
-	def_68hc08="yes"
+	def_m68hc08="yes"
     fi
 
     def_mos6502="no"

@@ -3083,6 +3083,7 @@ replace restart {
 	jr	%1, %5
 %5:
 } by {
+%5:
 	; common peephole 164 eliminated relative conditional jump.
 } if labelRefCountChange(%5 -1)
 

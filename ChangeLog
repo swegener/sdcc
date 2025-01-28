@@ -1,3 +1,8 @@
+2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version:
+	  Start of post-4.5.0 development.
+
 2025-01-22 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/peeph.def,

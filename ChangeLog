@@ -1,5 +1,10 @@
 2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* doc/sdccman.lyx:
+	  Fix a typo in the manual (abbr. of Rabbit 2000 revision A).
+
+2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* Merge next branch to trunk.
 
 2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>

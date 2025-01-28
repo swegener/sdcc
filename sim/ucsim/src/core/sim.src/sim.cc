@@ -485,7 +485,7 @@ cl_rgdb::read_line(void)
 	else
 	  {
 	    lbuf+= (char)(b[0]);
-	    int p= lbuf.first_pos('#');
+	    int p= lbuf.pos('#');
 	    if (p >= 0)
 	      {
 		if (lbuf.len() > p+2)

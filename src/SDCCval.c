@@ -1264,9 +1264,21 @@ constIntVal (const char *s)
           llval = sepStrToUll (s + 2, &p, 2);
         }
       else if (s[1] == 'x' || s[1] == 'X')
-        llval = sepStrToUll (s + 2, &p, 16);
+        {
+          llval = sepStrToUll (s + 2, &p, 16);
+        }
+      else if (s[1] == 'o' || s[1] == 'O')
+        {
+          if (!options.std_sdcc && !options.std_c2y)
+            werror (W_PREFIXED_OCTAL_C2Y);
+          llval = sepStrToUll (s + 2, &p, 8);
+        }
       else
-        llval = sepStrToUll (s, &p, 8);
+        {
+          llval = sepStrToUll (s, &p, 8);
+          if (llval != 0 && options.std_c2y)
+            werror (W_OCTAL_DEPRECATED_C2Y);
+        }
       dval = (double)(unsigned long long int) llval;
       decimal = FALSE;
     }
@@ -1891,6 +1903,12 @@ charVal (const char *s)
         case '6':
         case '7':
           return constCharacterVal (octalEscape (&s), type);
+
+        case 'o':
+          if (options.std_c2y && s[1] == '{')
+            return constCharacterVal (delimitedOctalEscape (&s), type);
+          else
+            return constCharacterVal (*s, type);
 
         case 'x':
           return constCharacterVal (hexEscape (&s), type);

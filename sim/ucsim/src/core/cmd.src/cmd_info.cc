@@ -71,7 +71,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 	    sa= v->get_name();
 	  else
 	    sa= "cell";	  
-	  sa.substr(0,8);
+	  sa.keep(0,8);
 	}
       con->dd_printf("%-3d %-10s %s %-5d %-5d %8s %-5s ", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
@@ -99,7 +99,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 	    sa= v->get_name();
 	  else
 	    sa= "cell";
-	  sa.substr(0,8);
+	  sa.keep(0,8);
 	}
       con->dd_printf("%-3d %-10s %s %-5d %-5d %8s %s\n", eb->nr,
 		     "event", (eb->perm==brkFIX)?"keep":"del ",

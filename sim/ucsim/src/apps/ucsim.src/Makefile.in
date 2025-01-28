@@ -15,7 +15,7 @@ all: $(APP)
 
 include $(top_srcdir)/src/app.mk
 
-$(APP): $(OBJECTS) $(UCSIM_LIB_TARGETS)
+$(APP): $(OBJECTS) $(UCSIM_LIB_PREREQUES) $(LOCAL_LIB_PREREQU)
 ifeq ($(SILENT),yes)
 	@echo LNK-$(PKG)
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@

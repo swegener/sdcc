@@ -695,6 +695,7 @@ value *checkStructIval (symbol *, value *);
 value *checkArrayIval (sym_link *, value *);
 value *checkIval (sym_link *, value *);
 unsigned int getSize (sym_link *);
+unsigned int getLength (sym_link *);
 unsigned int bitsForType (sym_link *);
 sym_link *newBitIntLink (unsigned int width);
 sym_link *newIntLink ();
@@ -746,6 +747,7 @@ int isRestrict (sym_link * type);
 value *aggregateToPointer (value *);
 void leaveBlockScope (int block);
 void mergeKRDeclListIntoFuncDecl (symbol *funcDecl, symbol *kr_decls);
+symbol *prepareDeclarationSymbol (attribute *attr, sym_link *declSpecs, symbol *initDeclList);
 
 
 extern char *nounName (sym_link *);     /* noun strings */

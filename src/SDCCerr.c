@@ -337,7 +337,7 @@ struct
   { W_ESC_SEQ_OOR_FOR_CHAR, ERROR_LEVEL_WARNING,
      "escape sequence out of range for char.", 0 },
   { E_INVALID_HEX, ERROR_LEVEL_ERROR,
-     "\\x used with no following hex digits.", 0 },
+     "\\x used without valid hexadecimal digits.", 0 },
   { W_FUNCPTR_IN_USING_ISR, ERROR_LEVEL_WARNING,
      "call via function pointer in ISR using non-zero register bank.\n"
      "            Cannot determine which register bank to save.", 0 },
@@ -677,6 +677,18 @@ struct
      "enum's underlying type must be an integer type and cannot be bit-precise or an enum", 0 },
   { E_ENUM_TYPE_RANGE_TOO_SMALL, ERROR_LEVEL_ERROR,
      "the enum's underlying type cannot represent all enumerator values", 0 },
+  { E_LENGTHOF_INVALID_TYPE, ERROR_LEVEL_ERROR,
+     "_Lengthof applied to an incomplete or non-array type", 0 },
+  { W_PREFIXED_OCTAL_C2Y, ERROR_LEVEL_WARNING,
+     "prefixed octal integer constants require ISO C2y or later", 0 },
+  { W_OCTAL_DEPRECATED_C2Y, ERROR_LEVEL_WARNING,
+     "unprefixed octal integer constants are deprecated as of ISO C2y", 0 },
+  { E_CLOSING_BRACE, ERROR_LEVEL_ERROR,
+     "invalid character or end of string encountered before '}'", 0 },
+  { E_INVALID_OCTAL, ERROR_LEVEL_ERROR,
+     "\\o{...} used without valid octal digits.", 0 },
+  { E_SELECTION_DECLARATION_C2Y, ERROR_LEVEL_ERROR,
+     "declaration within selection header requires ISO C2y or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

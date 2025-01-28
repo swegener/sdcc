@@ -3616,6 +3616,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         dtr = tree->right;
         break;
       case SIZEOF:
+      case LENGTHOF:
       case TYPEOF:
       case TYPEOF_UNQUAL:
         /* don't allocate string if it is a sizeof argument */
@@ -5354,6 +5355,28 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
 
         return tree;
       }
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
+      /*          _Lengthof         */
+      /*----------------------------*/
+    case LENGTHOF:            /* evaluate without code generation, analogous to sizeof */
+      {
+        /* change the type to a integer */
+        struct dbuf_s dbuf;
+        int length = getLength (tree->right->ftype);
+
+        dbuf_init (&dbuf, 128);
+        dbuf_printf (&dbuf, "%d", length);
+        if (!length && !IS_VOID (tree->right->ftype))
+          werrorfl (tree->filename, tree->lineno, E_LENGTHOF_INVALID_TYPE);
+        tree->type = EX_VALUE;
+        tree->opval.val = constVal (dbuf_c_str (&dbuf));
+        dbuf_destroy (&dbuf);
+        tree->right = tree->left = NULL;
+        TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
+
+        return tree;
+      }
     case TYPEOF:
     case TYPEOF_UNQUAL:
       {
@@ -5950,6 +5973,31 @@ sizeofOp (sym_link *type)
   dbuf_printf (&dbuf, "%d", size = getSize (type));
   if (!size && !IS_VOID (type))
     werror (E_SIZEOF_INCOMPLETE_TYPE);
+
+  /* now convert into value  */
+  val = constVal (dbuf_c_str (&dbuf));
+  dbuf_destroy (&dbuf);
+  return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* lengthofOp - processes _Lengthof operation                      */
+/*-----------------------------------------------------------------*/
+value *
+lengthofOp (sym_link *type)
+{
+  struct dbuf_s dbuf;
+  value *val;
+  int length;
+
+  /* make sure the type is complete and sane */
+  checkTypeSanity (type, "(_Lengthof)");
+
+  /* get the length and convert it to character  */
+  dbuf_init (&dbuf, 128);
+  dbuf_printf (&dbuf, "%d", length = getLength (type));
+  if (!length && !IS_VOID (type))
+    werror (E_LENGTHOF_INVALID_TYPE);
 
   /* now convert into value  */
   val = constVal (dbuf_c_str (&dbuf));

@@ -1218,7 +1218,11 @@ cl_app::mk_options(void)
   options->new_option(o= new cl_bool_option(this, "black_and_white",
 					    "Non-color console (-b)"));
   o->init();
-  o->set_value((bool)false);
+  char *no_color= getenv("NO_COLOR");
+  bool bw= false;
+  if ((no_color != NULL) && (no_color[0] != '\0'))
+    bw= true;
+  o->set_value((bool)bw);
   
   options->new_option(o= new cl_bool_option(this, "null_prompt",
 					    "Use \\0 as prompt (-P)"));

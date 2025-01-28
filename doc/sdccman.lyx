@@ -10897,6 +10897,66 @@ _Generic
 \begin_layout Itemize
 \begin_inset CommandInset href
 LatexCommand href
+name "N3353"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3353.htm"
+literal "false"
+
+\end_inset
+
+:
+ Obsolete Octal and Provide New,
+ Proper Escape Sequences
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "N3356"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3356.htm"
+literal "false"
+
+\end_inset
+
+:
+ 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+if
+\end_layout
+
+\end_inset
+
+ Declarations
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+name "N3369"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3369.pdf"
+literal "false"
+
+\end_inset
+
+:
+ The
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+_Lengthof
+\end_layout
+
+\end_inset
+
+ Operator
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
 name "N3370"
 target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3370.htm"
 literal "false"

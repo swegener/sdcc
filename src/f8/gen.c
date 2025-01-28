@@ -2102,32 +2102,6 @@ outer_continue:
           }
       }
 
-  // Try to use ldw y, x
-  {
-    const int il = result->regs[YL_IDX] - roffset;
-    const int ih = result->regs[YH_IDX] - roffset;
-    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
-    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
-    const bool yl_dead = y_dead_global && source->regs[YL_IDX] < soffset;
-    if (source->regs[YL_IDX] < soffset && source->regs[YH_IDX] < soffset &&
-      (assign_l && assign_h || yl_dead && il < 0 && assign_h))
-    {
-      emit3 (A_LDW, ASMOP_Y, ASMOP_X);
-      if (assign_l)
-        {
-          assigned[il] = true;
-          regsize--;
-          size--;
-        }
-      if (assign_h)
-        {
-          assigned[ih] = true;
-          regsize--;
-          size--;
-        }
-    }
-  }
-
   // Try to use ldw x, y
   {
     const int il = result->regs[XL_IDX] - roffset;
@@ -2154,14 +2128,41 @@ outer_continue:
     }
   }
 
+  // Try to use ldw y, x
+  {
+    const int il = result->regs[YL_IDX] - roffset;
+    const int ih = result->regs[YH_IDX] - roffset;
+    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
+    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
+    const bool yl_dead = y_dead_global && source->regs[YL_IDX] < soffset;
+    const bool yh_dead = y_dead_global && source->regs[YH_IDX] < soffset;
+    if (source->regs[YL_IDX] < soffset && source->regs[YH_IDX] < soffset &&
+      (assign_l && assign_h || yl_dead && il < 0 && assign_h || yh_dead && ih < 0 && assign_l))
+    {
+      emit3 (A_LDW, ASMOP_Y, ASMOP_X);
+      if (assign_l)
+        {
+          assigned[il] = true;
+          regsize--;
+          size--;
+        }
+      if (assign_h)
+        {
+          assigned[ih] = true;
+          regsize--;
+          size--;
+        }
+    }
+  }
+
   // Try to use ldw y, z
   {
     const int il = result->regs[YL_IDX] - roffset;
     const int ih = result->regs[YH_IDX] - roffset;
     const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, ZL_IDX));
     const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, ZH_IDX));
-    const bool yl_dead = z_dead_global && source->regs[YL_IDX] < soffset;
-    const bool yh_dead = z_dead_global && source->regs[YH_IDX] < soffset;
+    const bool yl_dead = y_dead_global && source->regs[YL_IDX] < soffset;
+    const bool yh_dead = y_dead_global && source->regs[YH_IDX] < soffset;
     if (source->regs[YL_IDX] < soffset && source->regs[YH_IDX] < soffset &&
       (assign_l && assign_h || yl_dead && il < 0 && assign_h || yh_dead && ih < 0 && assign_l))
     {
@@ -2181,7 +2182,7 @@ outer_continue:
     }
   }
 
-   // Try to use ldw z, y
+  // Try to use ldw z, y
   {
     const int il = result->regs[ZL_IDX] - roffset;
     const int ih = result->regs[ZH_IDX] - roffset;
@@ -2207,7 +2208,60 @@ outer_continue:
         }
     }
   }
-  
+
+  // Try to use ldw x, z
+  {
+    const int il = result->regs[XL_IDX] - roffset;
+    const int ih = result->regs[XH_IDX] - roffset;
+    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, ZL_IDX));
+    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, ZH_IDX));
+    const bool xl_dead = xl_dead_global && source->regs[XL_IDX] < soffset;
+    if (source->regs[XL_IDX] < soffset && source->regs[XH_IDX] < soffset &&
+      (assign_l && assign_h || xl_dead && il < 0 && assign_h))
+    {
+      emit3 (A_LDW, ASMOP_X, ASMOP_Z);
+      if (assign_l)
+        {
+          assigned[il] = true;
+          regsize--;
+          size--;
+        }
+      if (assign_h)
+        {
+          assigned[ih] = true;
+          regsize--;
+          size--;
+        }
+    }
+  }
+
+  // Try to use ldw z, x
+  {
+    const int il = result->regs[ZL_IDX] - roffset;
+    const int ih = result->regs[ZH_IDX] - roffset;
+    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
+    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
+    const bool zl_dead = z_dead_global && source->regs[ZL_IDX] < soffset;
+    const bool zh_dead = z_dead_global && source->regs[ZH_IDX] < soffset;
+    if (source->regs[ZL_IDX] < soffset && source->regs[ZH_IDX] < soffset &&
+      (assign_l && assign_h || zl_dead && il < 0 && assign_h || zh_dead && ih < 0 && assign_l))
+    {
+      emit3 (A_LDW, ASMOP_Z, ASMOP_X);
+      if (assign_l)
+        {
+          assigned[il] = true;
+          regsize--;
+          size--;
+        }
+      if (assign_h)
+        {
+          assigned[ih] = true;
+          regsize--;
+          size--;
+        }
+    }
+  }
+
   while (regsize)
     {
       int i;
@@ -4720,9 +4774,9 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             emit3_o (A_CP, left->aop, i, right->aop, i);
           else if (aopAre8_2 (right->aop, i, left->aop, i))
             emit3_o (A_CP, right->aop, i, left->aop, i);
-          else if (xl_dead && xh_dead && !aopIsOp8_2 (right->aop, i) && left->aop->regs[XH_IDX] < i)
+          else if (xl_dead && xh_dead && !aopIsOp8_2 (right->aop, i) && !aopInReg(left->aop, i, XH_IDX))
             {
-              genMove_o (ASMOP_XH, 0, right->aop, i, 1, true, true, false, false, true);
+              genMove_o (ASMOP_XH, 0, right->aop, i, 1, !aopInReg(left->aop, i, XL_IDX), true, false, false, true);
               genMove_o (ASMOP_XL, 0, left->aop, i, 1, true, false, false, false, true);
               emit3 (A_CP, ASMOP_XL, ASMOP_XH);
             }

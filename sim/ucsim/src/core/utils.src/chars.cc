@@ -120,8 +120,12 @@ chars::deallocate_string(void)
 }
 
 
+/*
+ * Content of the object
+ */
+
 char
-chars::c(int idx)
+chars::c(int idx) const
 {
   if (!chars_string)
     return 0;
@@ -130,199 +134,10 @@ chars::c(int idx)
   return chars_string[idx];
 }
 
-chars
-chars::token(const char *delims) const
-{
-  chars c= (char*)NULL;
 
-  if (!delims || !*delims)
-    return c;
-  if (pars_pos >= chars_length)
-    return c;
-  if (chars_length < 1)
-    return c;
-
-  int l;
-  // skip initial delims first;
-  l= strspn(&chars_string[pars_pos], delims);
-  pars_pos+= l;
-  if (pars_pos >= chars_length)
-    return c;
-  // skip chars not in delims: search token end
-  l= strcspn(&chars_string[pars_pos], delims);
-  if (l > 0)
-    {
-      // found
-      int i;
-      for (i= pars_pos; i < pars_pos+l; i++)
-	c+= chars_string[i];
-      pars_pos= i;
-      // skip delims at end
-      l= strspn(&chars_string[pars_pos], delims);
-      pars_pos+= l;
-      return c;
-    }
-  // not found more
-  return c;
-}
-
-unsigned int
-chars::htoi(void)
-{
-  unsigned int v= 0;
-  int i, x;
-  if (!chars_string)
-    return 0;
-  for (i= 0; chars_string[i]; i++)
-    {
-      char c= toupper(chars_string[i]);
-      if ((c>='0') && (c<='9'))
-	x= c-'0';
-      else if ((c>='A') && (c<='F'))
-	x= 10+c-'A';
-      else
-	x= 0;
-      v<<= 4;
-      v|= x;
-    }
-  return v;
-}
-
-unsigned long long int
-chars::htoll(void)
-{
-  unsigned long long int v= 0;
-  int i, x;
-  if (!chars_string)
-    return 0;
-  for (i= 0; chars_string[i]; i++)
-    {
-      char c= toupper(chars_string[i]);
-      if ((c>='0') && (c<='9'))
-	x= c-'0';
-      else if ((c>='A') && (c<='F'))
-	x= 10+c-'A';
-      else
-	return v;//x= 0;
-      v<<= 4;
-      v|= x;
-    }
-  return v;
-}
-
-
-void
-chars::ltrim(void)
-{
-  char *p= chars_string;
-  if (empty())
-    return;
-  while (*p && isspace(*p))
-    p++;
-  allocate_string(p);
-}
-
-void
-chars::rtrim(void)
-{
-  int i;
-  if (empty())
-    return;
-  i= chars_length-1;
-  while (i>=0)
-    {
-      if (isspace(chars_string[i]))
-	chars_string[i]= 0;
-      else
-	break;
-      i--;
-    }
-}
-
-void
-chars::lrip(const char *cset)
-{
-  int skip;
-  if (empty())
-    return;
-  if (!cset || !*cset)
-    return;
-  skip= strspn(chars_string, cset);
-  if (skip > 0)
-    allocate_string(chars_string+skip);
-}
-
-void
-chars::rrip(const char *cset)
-{
-  if (empty())
-    return;
-  if (!cset || !*cset)
-    return;
-  int i= chars_length-1;
-  while (i>=0)
-    {
-      char c= chars_string[i];
-      if (strchr(cset, c) != NULL)
-	chars_string[i]= 0;
-      else
-	break;
-      i--;
-    }
-}
-
-void
-chars::rrip(int nuof_chars)
-{
-  if (empty()) return;
-  if (nuof_chars < 1) return;
-  int i= chars_length-1;
-  while ((i>=0) && nuof_chars)
-    {
-      chars_string[i]= 0;
-      i--;
-      nuof_chars--;
-    }
-}
-
-bool
-chars::starts_with(const char *x) const
-{
-  if (empty() ||
-      !x ||
-      !*x)
-    return false;
-  if (strstr(chars_string, x) == chars_string)
-    return true;
-  return false;
-}
-
-int
-chars::first_pos(char c)
-{
-  if (empty())
-    return -1;
-  char *pos= strchr(chars_string, c);
-  if (pos == NULL)
-    return -1;
-  return pos-chars_string;
-}
-
-long int
-chars::lint(void)
-{
-  return lint(10);
-}
-
-long int
-chars::lint(int base)
-{
-  if (base < 2) base= 0;
-  if (base > 36) base= 36;
-  if (empty()) return 0;
-  long int l= strtol(chars_string, 0, base);
-  return l;
-}
+/*
+ * Create content in the object
+ */
 
 chars &
 chars::append(const char *s)
@@ -450,7 +265,17 @@ chars::format(const char *format, ...)
   return *this;
 }
 
-chars &
+
+/*
+ * Get properies of the object
+ */
+
+
+/*
+ * Change content of the object
+ */
+
+void
 chars::uppercase(void)
 {
   if (!dynamic)
@@ -458,28 +283,34 @@ chars::uppercase(void)
 
   for (int i= 0; i < chars_length; i++)
     chars_string[i]= toupper(chars_string[i]);
-
-  return *this;
 }
 
-chars &
-chars::subst(const char *what, char with)
+void
+chars::lowercase(void)
 {
   if (!dynamic)
     allocate_string(chars_string);
 
   for (int i= 0; i < chars_length; i++)
-    if (strchr(what, chars_string[i]))
-      chars_string[i] = with;
-
-  return *this;
+    chars_string[i]= tolower(chars_string[i]);
 }
 
-chars &
-chars::substr(int start, int maxlen)
+void
+chars::replace(const char *any_in_set, char with)
+{
+  if (!dynamic)
+    allocate_string(chars_string);
+
+  for (int i= 0; i < chars_length; i++)
+    if (strchr(any_in_set, chars_string[i]))
+      chars_string[i] = with;
+}
+
+void
+chars::keep(int start, int maxlen)
 {
   if (!chars_string)
-    return *this;
+    return ;
 
   char *s= (char*)malloc(maxlen+1);
   int i, l;
@@ -490,7 +321,313 @@ chars::substr(int start, int maxlen)
   chars_string= s;
   chars_length= l;
   dynamic= true;
-  return *this;
+}
+
+void
+chars::ltrim(void)
+{
+  char *p= chars_string;
+  if (empty())
+    return;
+  while (*p && isspace(*p))
+    p++;
+  allocate_string(p);
+}
+
+void
+chars::rtrim(void)
+{
+  int i;
+  if (empty())
+    return;
+  i= chars_length-1;
+  while (i>=0)
+    {
+      if (isspace(chars_string[i]))
+	chars_string[i]= 0;
+      else
+	break;
+      i--;
+    }
+}
+
+void
+chars::lrip(const char *cset)
+{
+  int skip;
+  if (empty())
+    return;
+  if (!cset || !*cset)
+    return;
+  skip= strspn(chars_string, cset);
+  if (skip > 0)
+    allocate_string(chars_string+skip);
+}
+
+void
+chars::rrip(const char *cset)
+{
+  if (empty())
+    return;
+  if (!cset || !*cset)
+    return;
+  int i= chars_length-1;
+  while (i>=0)
+    {
+      char c= chars_string[i];
+      if (strchr(cset, c) != NULL)
+	{
+	  chars_string[i]= 0;
+	  chars_length--;
+	}
+      else
+	break;
+      i--;
+    }
+}
+
+void
+chars::rrip(int nuof_chars)
+{
+  if (empty()) return;
+  if (nuof_chars < 1) return;
+  int i= chars_length-1;
+  while ((i>=0) && nuof_chars)
+    {
+      chars_string[i]= 0;
+      i--;
+      nuof_chars--;
+      chars_length--;
+    }
+}
+
+
+/*
+ * Parsing content of the object
+ */
+
+chars
+chars::token(const char *delims) const
+{
+  chars c= (char*)NULL;
+
+  if (!delims || !*delims)
+    return c;
+  if (pars_pos >= chars_length)
+    return c;
+  if (chars_length < 1)
+    return c;
+
+  int l;
+  // skip initial delims first;
+  l= strspn(&chars_string[pars_pos], delims);
+  pars_pos+= l;
+  if (pars_pos >= chars_length)
+    return c;
+  // skip chars not in delims: search token end
+  l= strcspn(&chars_string[pars_pos], delims);
+  if (l > 0)
+    {
+      // found
+      int i;
+      for (i= pars_pos; i < pars_pos+l; i++)
+	c+= chars_string[i];
+      pars_pos= i;
+      // skip delims at end
+      l= strspn(&chars_string[pars_pos], delims);
+      pars_pos+= l;
+      return c;
+    }
+  // not found more
+  return c;
+}
+
+chars
+chars::substr(int start, int len)
+{
+  chars c= (char*)NULL;
+  if (empty() || (start >= chars_length))
+    return c;
+  int i, l= len+start;
+  for (i= start; chars_string[i] && (i < l); i++)
+    c+= chars_string[i];
+  return c;
+}
+
+unsigned int
+chars::htoi(void) const
+{
+  unsigned int v= 0;
+  int i, x;
+  if (!chars_string)
+    return 0;
+  for (i= 0; chars_string[i]; i++)
+    {
+      char c= toupper(chars_string[i]);
+      if ((c>='0') && (c<='9'))
+	x= c-'0';
+      else if ((c>='A') && (c<='F'))
+	x= 10+c-'A';
+      else
+	x= 0;
+      v<<= 4;
+      v|= x;
+    }
+  return v;
+}
+
+unsigned long long int
+chars::htoll(void) const
+{
+  unsigned long long int v= 0;
+  int i, x;
+  if (!chars_string)
+    return 0;
+  for (i= 0; chars_string[i]; i++)
+    {
+      char c= toupper(chars_string[i]);
+      if ((c>='0') && (c<='9'))
+	x= c-'0';
+      else if ((c>='A') && (c<='F'))
+	x= 10+c-'A';
+      else
+	return v;//x= 0;
+      v<<= 4;
+      v|= x;
+    }
+  return v;
+}
+
+long int
+chars::lint(void) const
+{
+  return lint(10);
+}
+
+long int
+chars::lint(int base) const
+{
+  if (base < 2) base= 0;
+  if (base > 36) base= 36;
+  if (empty()) return 0;
+  long int l= strtol(chars_string, 0, base);
+  return l;
+}
+
+
+/*
+ * Search text/char in the object
+ */
+
+bool
+chars::starts_with(const char *x) const
+{
+  if (empty() ||
+      !x ||
+      !*x)
+    return false;
+  if (strstr(chars_string, x) == chars_string)
+    return true;
+  return false;
+}
+
+bool
+chars::starts_with(chars x) const
+{
+  if (empty() ||
+      x.empty())
+    return false;
+  if (strstr(chars_string, x.c_str()) == chars_string)
+    return true;
+  return false;
+}
+
+bool
+chars::contains(const char *x) const
+{
+  if (empty() ||
+      !x ||
+      !*x)
+    return false;
+  if (strstr(chars_string, x) != NULL)
+    return true;
+  return false;
+}
+
+bool
+chars::contains(chars x) const
+{
+  if (empty() ||
+      x.empty())
+    return false;
+  if (strstr(chars_string, x.c_str()) != NULL)
+    return true;
+  return false;
+}
+
+bool
+chars::icontains(const char *x) const
+{
+  if (empty() ||
+      !x ||
+      !*x)
+    return false;
+  chars s1= chars_string;
+  chars s2= x;
+  s1.uppercase();
+  s2.uppercase();
+  return s1.contains(s2);
+}
+
+bool
+chars::icontains(chars x) const
+{
+  if (empty() ||
+      x.empty())
+    return false;
+  chars s1= chars_string;
+  chars s2= x;
+  s1.uppercase();
+  s2.uppercase();
+  return s1.contains(s2);
+}
+
+int
+chars::pos(char c) const
+{
+  if (empty())
+    return -1;
+  char *p= strchr(chars_string, c);
+  if (p == NULL)
+    return -1;
+  return p-chars_string;
+}
+
+int
+chars::pos(chars x) const
+{
+  if (empty() || x.empty())
+    return -1;
+  const char *p= strstr(chars_string, x.c_str());
+  if (p == NULL)
+    return -1;
+  return p-chars_string;
+}
+
+int
+chars::ipos(chars x) const
+{
+  if (empty() || x.empty())
+    return -1;
+  chars h= c_str();
+  chars n= x;
+  h.uppercase();
+  n.uppercase();
+  const char *s= h.c_str();
+  const char *p= strstr(s, x.c_str());
+  if (p == NULL)
+    return -1;
+  return p-s;
 }
 
 
@@ -514,7 +651,7 @@ chars::operator=(const chars &cs)
 // Arithmetic operators
 
 chars
-chars::operator+(char c) const
+chars::operator+(char c)
 {
   char b[2];
   b[0]= c;
@@ -524,7 +661,7 @@ chars::operator+(char c) const
 }
 
 chars
-chars::operator+(const char *s) const
+chars::operator+(const char *s)
 {
   chars temp(chars_string);
   return(temp.append(s));

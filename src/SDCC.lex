@@ -30,6 +30,7 @@ HC  '?[a-fA-F0-9]
 BC  '?[01]
 
 D       [0-9]
+O       [0-7]
 H       [a-fA-F0-9]
 B       [01]
 L       [a-zA-Z_$]
@@ -201,6 +202,9 @@ static void checkCurrFile (const char *s);
 "typeof"                { count (); TKEYWORD2X (TYPEOF); }
 "typeof_unqual"         { count (); TKEYWORD2X (TYPEOF_UNQUAL); }
 
+ /* C2y */
+"_Lengthof"             { count (); return LENGTHOF; }
+
  /* SDCC-specific intrinsic named address spaces (as per Embedded C TS) */
 "__code"                { count (); TKEYWORD (CODE); }
 "__data"                { count (); TKEYWORD (DATA); }
@@ -274,7 +278,7 @@ static void checkCurrFile (const char *s);
 
 [1-9]{DC}*({IS}|{WB})?       { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
 0[xX]{H}{HC}*({IS}|{WB})?    { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
-0{OC}*({IS}|{WB})?           { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+0([oO]{O})?{OC}*({IS}|{WB})? { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
 0[bB]{B}{BC}*({IS}|{WB})?    { count (); yylval.val = constIntVal (yytext); return CONSTANT; } /* C23 binary integer constant. All standard version warnings on integer constants are done in constIntVal. */
 {CP}?'(\\.|[^\\'])+'         { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
 {D}+{E}{FS}?                 { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }

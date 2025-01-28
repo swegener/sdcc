@@ -1,5 +1,9 @@
 2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* Merge next branch to trunk.
+
+2025-01-28 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* .version:
 	  Start of post-4.5.0 development.
 
@@ -26,6 +30,17 @@
 	* doc/sdccman.lyx:
 	  Improve Rabbit port documentation.
 
+2025-01-19 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/if-decl.c:
+	  Implement if-declarations (C2y, n3356, see RFE #979).
+
 2025-01-18 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* support/regression/Makefile.in:
@@ -35,6 +50,32 @@
 
 	* sdas/asxxsrc/asmain.c:
 	  Apply patch #485 by bbbbbr to properly document the -N flag.
+
+2025-01-18 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCutil.c,
+	  src/SDCCutil.h,
+	  src/SDCCval.c,
+	  support/regression/tests/octal.c:
+	  Implement new octal and escape sequence syntax (C2y, n3353, see RFE #977).
+
+2025-01-18 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/lengthof.c:
+	  Implement the _Lengthof operator (C2y, n3369, see RFE #978).
 
 2025-01-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -67,6 +108,11 @@
 	  Fix bug #3812.
 
 2025-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c:
+	  Improve ldw use in f8 codegen.
+
+2024-01-02 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* sdas/asf8/f8mch.c,
 	  sim/ucsim/src/sims/f8.src/glob.cc:

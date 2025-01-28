@@ -279,14 +279,10 @@ cl_console_base::dd_printf(const char *format, ...)
   return(ret);
 }
 
-int
-cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
+bool
+cl_console_base::opt_bw(void)
 {
-  va_list ap;
-  int ret= 0;
   bool bw= false;
-  char *cc;
-  chars cce;
   class cl_f *fo= get_fout();
   class cl_option *o= application->options->get_option("black_and_white");
   
@@ -298,6 +294,19 @@ cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
     bw= true;
   if (non_color())
     bw= true;
+  return bw;
+}
+
+int
+cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
+{
+  va_list ap;
+  int ret= 0;
+  bool bw= opt_bw();
+  char *cc;
+  chars cce;
+  class cl_f *fo= get_fout();
+  class cl_option *o;
   
   o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
@@ -436,19 +445,10 @@ cl_console_base::cmd_do_cprint(const char *color_name, const char *format, va_li
 {
   int ret;
   class cl_f *fo= get_fout(), *fi= get_fin();
-  bool bw= false;
+  bool bw= opt_bw();
   char *cc;
   chars cce;
-  class cl_option *o= application->options->get_option("black_and_white");
-  
-  if (o) o->get_value(&bw);
-  if (!fo ||
-      (fo &&
-      !fo->tty)
-      )
-    bw= true;
-  if (non_color())
-    bw= true;
+  class cl_option *o;
       
   o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
@@ -587,9 +587,12 @@ cl_console_base::tu_mouse_off(void)
 void
 cl_console_base::tu_reset(void)
 {
-  tu_mouse_off();
-  //dd_printf("\033c"); // terminal reset
-  dd_printf("\033[!p"); // soft terminal reset
+  if (!opt_bw())
+    {
+      tu_mouse_off();
+      //dd_printf("\033c"); // terminal reset
+      dd_printf("\033[!p"); // soft terminal reset
+    }
 }
 
 /*void

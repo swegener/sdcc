@@ -153,6 +153,7 @@ void free_pragma_token (struct pragma_token_s *token);
 unsigned long int hexEscape (const char **src);
 unsigned long int universalEscape (const char **src, unsigned int n);
 unsigned long int octalEscape (const char **src);
+unsigned long int delimitedOctalEscape (const char **src);
 const char *copyStr (const char *src, size_t *size);
 
 void getPrefixSuffix(const char *);

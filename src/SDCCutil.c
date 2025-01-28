@@ -870,8 +870,15 @@ hexEscape (const char **src)
 {
   char *s;
   unsigned long value;
+  bool delimited = false;
 
   ++*src;                       /* Skip over the 'x' */
+
+  if (options.std_c2y && **src == '{')
+    {
+      delimited = true;
+      ++*src;
+    }
 
   value = strtoul (*src, &s, 16);
 
@@ -882,6 +889,15 @@ hexEscape (const char **src)
     }
 
   *src = s;
+
+  if (delimited)
+    {
+      if (**src == '}')
+        ++*src;
+      else
+        /* non-hex character or end of string encountered before '}' */
+        werror (E_CLOSING_BRACE);
+    }
 
   return value;
 }
@@ -904,24 +920,33 @@ universalEscape (const char **str, unsigned int n)
       werror (W_UNIVERSAL_C95);
     }
 
-  ++*str;                       /* Skip over the 'u'  or 'U' */
-
-  for (digits = 0; digits < n; ++digits)
+  if (options.std_c2y && (*str)[0] == 'u' && (*str)[1] == '{')
     {
-      if (**str >= '0' && **str <= '9')
-        {
-          value = (value << 4) + (**str - '0');
-          ++*str;
-        }
-      else if (tolower((unsigned char)(**str)) >= 'a' && (tolower((unsigned char)(**str)) <= 'f'))
-        {
-          value = (value << 4) + (tolower((unsigned char)(**str)) - 'a' + 10);
-          ++*str;
-        }
-      else
-          break;
+      value = hexEscape (str);
+      digits = n;
     }
-  if (digits != n || value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060 || value >= 0xd800 && 0xdfff >= value ||
+  else
+    {
+      ++*str;                   /* Skip over the 'u'  or 'U' */
+
+      for (digits = 0; digits < n; ++digits)
+        {
+          if (**str >= '0' && **str <= '9')
+            {
+              value = (value << 4) + (**str - '0');
+              ++*str;
+            }
+          else if (tolower((unsigned char)(**str)) >= 'a' && (tolower((unsigned char)(**str)) <= 'f'))
+            {
+              value = (value << 4) + (tolower((unsigned char)(**str)) - 'a' + 10);
+              ++*str;
+            }
+          else
+            break;
+        }
+    }
+
+  if (digits != n || (value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060) || (value >= 0xd800 && 0xdfff >= value) ||
     value > 0x10ffff) // Additional diagnostic required in C23, but since it is just a warning, we enable it even for older standards.
     {
       werror (W_INVALID_UNIVERSAL, s);
@@ -954,6 +979,34 @@ octalEscape (const char **str)
           break;
         }
     }
+
+  return value;
+}
+
+unsigned long int
+delimitedOctalEscape (const char **src)
+{
+  char *s;
+  unsigned long value;
+
+  /* Skip over the "o{" which has already been checked by the caller */
+  *src += 2;
+
+  value = strtoul (*src, &s, 8);
+
+  if (s == *src)
+    {
+      /* no valid octal found */
+      werror (E_INVALID_OCTAL);
+    }
+
+  *src = s;
+
+  if (**src == '}')
+    ++*src;
+  else
+    /* non-hex character or end of string encountered before '}' */
+    werror (E_CLOSING_BRACE);
 
   return value;
 }
@@ -1041,6 +1094,18 @@ copyStr (const char *src, size_t *size)
             case '7':
               c = octalEscape (&src);
               --src;
+              break;
+
+            case 'o':
+              if (options.std_c2y && src[1] == '{')
+                {
+                  c = delimitedOctalEscape (&src);
+                  --src;
+                }
+              else
+                {
+                  c = *src;
+                }
               break;
 
             case 'x':

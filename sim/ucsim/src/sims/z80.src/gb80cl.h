@@ -39,11 +39,30 @@ const t_addr  lr35902_rom_size  = 0x6000;
 const t_addr  lr35902_ram_start = 0xA000;
 const t_addr  lr35902_ram_size  = 0x5F80;
 
+class cl_f_write: public cl_memory_operator
+{
+public:
+  cl_f_write(class cl_memory_cell *acell):
+    cl_memory_operator(acell)
+  {}
+  virtual t_mem write(t_mem val);
+};
+
+class cl_af_write: public cl_memory_operator
+{
+public:
+  cl_af_write(class cl_memory_cell *acell):
+    cl_memory_operator(acell)
+  {}
+  virtual t_mem write(t_mem val);
+};
+  
 class cl_gb80: public cl_z80
 {
 public:
   cl_gb80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
+  virtual void reset(void);
   virtual const char *id_string(void);
   
   virtual void mk_hw_elements(void);

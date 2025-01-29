@@ -47,6 +47,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define uint32 t_addr
 //#define uint8 unsigned char
 
+t_mem
+cl_f_write::write(t_mem val)
+{
+  return val&0xf0;
+}
+
+t_mem
+cl_af_write::write(t_mem val)
+{
+  return val&0xfff0;
+}
+
 /*******************************************************************/
 
 cl_gb80::cl_gb80(struct cpu_entry *Itype, class cl_sim *asim):
@@ -73,6 +85,14 @@ cl_gb80::init(void)
   ttab_cb= gb_ttab_cb;
 
   return(0);
+}
+
+void
+cl_gb80::reset(void)
+{
+  cl_z80::reset();
+  regs.raf.F= 0;
+  regs.ralt_af.aF= 0;
 }
 
 const char *
@@ -118,7 +138,10 @@ cl_gb80::make_memories(void)
 
   ram= rom;
   rom->altname= "xram";
-    
+
+  class cl_memory_cell *c;
+  class cl_memory_operator *fw;
+
   regs8= new cl_address_space("regs8", 0, 16, 8);
   regs8->init();
   regs8->get_cell(0)->decode((t_mem*)&regs.raf.A);
@@ -130,6 +153,11 @@ cl_gb80::make_memories(void)
   regs8->get_cell(6)->decode((t_mem*)&regs.hl.h);
   regs8->get_cell(7)->decode((t_mem*)&regs.hl.l);
 
+  c= regs8->get_cell(1);
+  fw= new cl_f_write(c);
+  fw->init();
+  c->append_operator(fw);
+
   regs8->get_cell(8)->decode((t_mem*)&regs.ralt_af.aA);
   regs8->get_cell(9)->decode((t_mem*)&regs.ralt_af.aF);
   regs8->get_cell(10)->decode((t_mem*)&regs.a_bc.h);
@@ -138,6 +166,11 @@ cl_gb80::make_memories(void)
   regs8->get_cell(13)->decode((t_mem*)&regs.a_de.l);
   regs8->get_cell(14)->decode((t_mem*)&regs.a_hl.h);
   regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.l);
+
+  c= regs8->get_cell(9);
+  fw= new cl_f_write(c);
+  fw->init();
+  c->append_operator(fw);
 
   regs16= new cl_address_space("regs16", 0, 11, 16);
   regs16->init();
@@ -153,6 +186,11 @@ cl_gb80::make_memories(void)
   regs16->get_cell(8)->decode((t_mem*)&regs.aBC);
   regs16->get_cell(9)->decode((t_mem*)&regs.aDE);
   regs16->get_cell(10)->decode((t_mem*)&regs.aHL);
+  
+  c= regs16->get_cell(0);
+  fw= new cl_af_write(c);
+  fw->init();
+  c->append_operator(fw);
 
   address_spaces->add(regs8);
   address_spaces->add(regs16);
@@ -652,7 +690,10 @@ cl_gb80::exec_inst(void)
     case 0xff: res= (inst_rst(code)); break;
     }
 
-
+  // hardwire low bits to 0
+  regs.raf.F&= 0xf0;
+  regs.ralt_af.aF&= 0xf0;
+  
   tickt(code);
   
   if (res >= 0)

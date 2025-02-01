@@ -1436,9 +1436,10 @@ function_declarator
           currBlockno = STACK_POP(blockNum);
           seqPointNo++; /* not a true sequence point, but helps resolve scope */
 
-          // if this was a pointer (to a function)
-          if (!IS_FUNC($1->type))
-              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
+          // NOTE: Removed to fix bug 3822. It is unclear whether this was leftover code or still served a purpose.
+          // // if this was a pointer (to a function)
+          // if (!IS_FUNC($1->type))
+          //     cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
 
           $$ = $1;
         }
@@ -1494,9 +1495,10 @@ function_declarator
           currBlockno = STACK_POP(blockNum);
           seqPointNo++; /* not a true sequence point, but helps resolve scope */
 
-          // if this was a pointer (to a function)
-          if (!IS_FUNC($1->type))
-              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
+          // NOTE: Removed to fix bug 3822. It is unclear whether this was leftover code or still served a purpose.
+          // // if this was a pointer (to a function)
+          // if (!IS_FUNC($1->type))
+          //     cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
 
           $$ = $1;
         }

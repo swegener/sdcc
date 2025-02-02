@@ -66,6 +66,7 @@ int
 cl_sim::init(void)
 {
   cl_base::init();
+  exec_limit= 0;
   build_cmdset(app->get_commander()->cmdset);
   if (!(uc= mk_controller()))
     return(1);

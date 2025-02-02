@@ -246,7 +246,7 @@ strispn(char *s, char c)
   return p-s;
 }
 
-/* Return true if "serach_in" string ends with string "what" */
+/* Return true if "search_in" string ends with string "what" */
 
 bool
 strend(const char *search_in, const char *what)
@@ -286,15 +286,15 @@ valid_sym_name(char *s)
 bool
 filename_has_ext(class cl_f *f, const char *ext)
 {
-  const char *n;
+  chars n, e= ext;
   if (!f)
     return false;
   n= f->get_file_name();
-  if (!n ||
-      !*n)
+  if (n.empty())
     return false;
-
-  if (strend(n, ext))
+  n.lowercase();
+  e.lowercase();
+  if (strend(n.c_str(), e.c_str()))
     return true;
 
   return false;
@@ -303,20 +303,9 @@ filename_has_ext(class cl_f *f, const char *ext)
 bool
 is_hex_file(class cl_f *f)
 {
-  const char *n;
-  if (!f)
-    return false;
-  n= f->get_file_name();
-  if (!n ||
-      !*n)
-    return false;
-
-  if (strend(n, ".ihx") ||
-      strend(n, ".hex") ||
-      strend(n, ".ihex"))
-    return true;
-
-  return false;
+  return filename_has_ext(f, ".ihx") ||
+    filename_has_ext(f, ".hex") ||
+    filename_has_ext(f, ".ihex") ;
 }
 
 bool

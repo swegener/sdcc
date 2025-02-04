@@ -8,7 +8,7 @@
   Copyright (C) 2003, Erik Petrich
   Hacked for the MOS6502:
   Copyright (C) 2020, Steven Hugg  hugg@fasterlight.com
-  Copyright (C) 2021-2024, Gabriele Gorla
+  Copyright (C) 2021-2025, Gabriele Gorla
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -2173,9 +2173,9 @@ storeRegToFullAop (reg_info *reg, asmop *aop, bool isSigned)
       if (size == 1) {
         storeRegToAop (m6502_reg_a, aop, 0);
       } else {
+        storeRegToAop (reg, aop, 0);
         if(size>2)
           {
-            storeRegToAop (reg, aop, 0);
             if(aop->type!=AOP_SOF)
               {
                 storeRegSignToUpperAop (m6502_reg_x, aop, 2, isSigned);
@@ -5142,7 +5142,6 @@ static void genGoto (iCode * ic)
   emit6502op ("jmp", "%05d$", safeLabelNum (IC_LABEL (ic)));
 }
 
-
 /**************************************************************************
  * genPlusIncr :- does addition with increment if possible
  *************************************************************************/
@@ -5967,8 +5966,6 @@ genCmp (iCode * ic, iCode * ifx)
       else
         m6502_freeReg(m6502_reg_a);
 
-      //   freeAsmop (result, NULL);
-
       if (!bit)
         {
           inst = branchInstCmp (opcode, sign);
@@ -6011,6 +6008,7 @@ genCmp (iCode * ic, iCode * ifx)
       storeRegToFullAop (m6502_reg_a, AOP (result), false);
       loadOrFreeRegTemp (m6502_reg_a, needloada);
     }
+
   freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);

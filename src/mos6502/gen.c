@@ -1743,10 +1743,10 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
           storeRegTemp(m6502_reg_a, false);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
           doTSX();
-          emit6502op ("sta", aopAdrStr (aop, loffset + 1, false));
+      emit6502op ("sta", aopAdrStr (aop, loffset + 1, false));
           //        pullReg(m6502_reg_a);
           loadRegTemp(m6502_reg_a);
-          emit6502op ("sta", aopAdrStr (aop, loffset, false));
+      emit6502op ("sta", aopAdrStr (aop, loffset, false));
           loadOrFreeRegTemp(m6502_reg_x, needpullx);
           break;
         case YX_IDX:
@@ -2173,13 +2173,19 @@ storeRegToFullAop (reg_info *reg, asmop *aop, bool isSigned)
       if (size == 1) {
         storeRegToAop (m6502_reg_a, aop, 0);
       } else {
-        storeRegToAop (reg, aop, 0);
-        if(aop->type!=AOP_SOF) {
-          storeRegSignToUpperAop (m6502_reg_x, aop, 2, isSigned);
-        } else {
-          loadRegFromAop(m6502_reg_a, aop, 1);
-          storeRegSignToUpperAop (m6502_reg_a, aop, 2, isSigned);
-        }
+        if(size>2)
+          {
+            storeRegToAop (reg, aop, 0);
+            if(aop->type!=AOP_SOF)
+              {
+                storeRegSignToUpperAop (m6502_reg_x, aop, 2, isSigned);
+              } else {
+                storeRegTemp(m6502_reg_a, true);
+                loadRegFromAop(m6502_reg_a, aop, 1);
+                storeRegSignToUpperAop (m6502_reg_a, aop, 2, isSigned);
+                loadRegTemp(m6502_reg_a);
+              }
+          }
       }
       break;
     case YX_IDX:

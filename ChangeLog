@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-3831.c:
 	  Regression test for bug #3831.
+	* support/scripts/sdcclogo.png:
+	  Pixel graphics version of new logo created by Benedikt Freisen, as used for SourceForge project.
 
 2025-02-04 Gabriele Gorla <gorlik@yahoo.com>
 

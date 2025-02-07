@@ -374,6 +374,16 @@ conditional_expr
                         $$ = newNode(':',$4,$6);
                         $$ = newNode('?',$1,$$);
                      }
+   | logical_or_expr '?' { seqPointNo++;} ':' conditional_expr
+                     {
+                        if (!options.std_sdcc)
+                          werror (E_SYNTAX_ERROR);
+                        $$ = newNode(':',$1,$5);
+                        $$ = newNode('?',$1,$$);
+                        /* use a temporary variable to prevent the duplication of side effects, if applicable */
+                        if (hasSEFcalls ($$->left))
+                          $$->left = replaceAstWithTemporary (&$$->right->left);
+                     }
    ;
 
 assignment_expr

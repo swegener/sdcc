@@ -378,7 +378,7 @@ removePostIncDecOps (ast * tree)
 /*            an AST which assigns the original value to the       */
 /*            temporary.                                           */
 /*-----------------------------------------------------------------*/
-static ast *
+ast *
 replaceAstWithTemporary (ast ** treeptr)
 {
   symbol *sym = newSymbol (genSymName (NestLevel), NestLevel);

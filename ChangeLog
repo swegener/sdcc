@@ -1,3 +1,11 @@
+2025-02-07 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  support/regression/tests/cond-omit-2nd.c:
+	  Allow conditional operator with omitted second operand.
+
 2025-02-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

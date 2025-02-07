@@ -10528,7 +10528,8 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             }
 
           // Test for 0 can be done more efficiently using or
-          if (!byteOfVal (right->aop->aopu.aop_lit, offset))
+          if (!byteOfVal (right->aop->aopu.aop_lit, offset) &&
+            (!a_result || left->aop->type != AOP_STL && left->aop->type != AOP_SFR))
             {
               if (!a_result)
                 {
@@ -10705,7 +10706,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 /* gencjne - compare and jump if not equal                         */
 /*-----------------------------------------------------------------*/
 static void
-gencjne (operand * left, operand * right, symbol * lbl, const iCode *ic)
+gencjne (operand *left, operand *right, symbol *lbl, const iCode *ic)
 {
   symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
   PAIR_ID pop;
@@ -10729,14 +10730,14 @@ gencjne (operand * left, operand * right, symbol * lbl, const iCode *ic)
 /* genCmpEq - generates code for equal to                          */
 /*-----------------------------------------------------------------*/
 static void
-genCmpEq (iCode * ic, iCode * ifx)
+genCmpEq (iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   bool hl_touched;
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
+  aopOp ((left = ic->left), ic, false, false);
+  aopOp ((right = ic->right), ic, false, false);
+  aopOp ((result = ic->result), ic, true, false);
 
   hl_touched = (IC_LEFT (ic)->aop->type == AOP_HL || IC_RIGHT (ic)->aop->type == AOP_HL || IS_SM83
                 && IC_LEFT (ic)->aop->type == AOP_STK || IS_SM83 && IC_RIGHT (ic)->aop->type == AOP_STK);

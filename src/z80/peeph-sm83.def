@@ -267,17 +267,6 @@ replace {
 	xor	a, a
 }
 
-//TODO: fails for unknown reasons
-//replace {
-//	ld	%1, #%2
-//	push	%1
-//} by {
-//	; sm83 peephole 17b pushed #%2 faster
-//	xor	a, a
-//	rra
-//	push	af
-//} if operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3), notUsed(%1 'af')
-
 replace {
 	ld	%1, #%2
 	push	%1

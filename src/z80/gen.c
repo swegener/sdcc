@@ -5983,10 +5983,8 @@ genIpush (const iCode *ic)
               cost2 (1, 11, 11, 10, 16, 8, 3, 4);
             d = 2;
           }
-#if 0 // Fails regression tests. Simulator issue regarding flags?
-        // gbz80 flag handling differs from other z80 variants, allowing this hack to push a 16-bit zero.
-        else if (size >= 2 && IS_SM83 && a_free &&
-          IC_LEFT (ic)->aop->type == AOP_LIT && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 2) && !byteOfVal (IC_LEFT(ic)->aop->aopu.aop_lit, size - 1))
+        // sm83 flag handling differs from other z80 variants, allowing this hack to push a 16-bit zero.
+        else if (size >= 2 && IS_SM83 && a_free && aopIsLitVal (ic->left->aop, size - 2, 2, 0x0000))
           {
             emit2 ("xor a, a"); // Resets all flags except for z
             emit2 ("rra");      // Resets z (and since a is already 0, c stays reset)
@@ -5994,7 +5992,6 @@ genIpush (const iCode *ic)
             regalloc_dry_run_cost += 3;
             d = 2;
           }
-#endif
         else if (size >= 2 &&
           (hl_free || de_free || bc_free ||
           aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || b_free && aopInReg (IC_LEFT (ic)->aop, size - 2, C_IDX) ||

@@ -1,6 +1,12 @@
 2025-02-07 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,
+	  src/z80/peeph-sm83.def:
+	  Use sm83 bits for optimized 16-bit zero push.
+
+2025-02-07 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
 	  support/regression/tests/bug-3830.c:
 	  Fix bug #3830.
 

@@ -1,3 +1,8 @@
+2025-02-07 Gabriele Gorla <gorlik@yahoo.com>
+
+	* device/lib/mos6502/_setjmp.s:
+	  minor size and speed improvements to longjmp()
+
 2025-02-07 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCC.y,

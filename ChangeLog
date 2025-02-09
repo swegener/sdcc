@@ -1,7 +1,18 @@
+2025-02-07 Gabriele Gorla <gorlik@yahoo.com>
+
+	* device/lib/mos6502/_divulong.s:
+	  minor improvements to divulong
+	  
 2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:
 	  Basic null pointer optimization.
+
+2025-02-09 Gabriele Gorla <gorlik@yahoo.com>
+
+	* device/lib/mos6502-stack-auto/_setjmp.s,
+	  device/lib/mos6502-stack-auto/_setjmp.c:
+	  fix longjmp() for mos6502-stack-auto.
 
 2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 

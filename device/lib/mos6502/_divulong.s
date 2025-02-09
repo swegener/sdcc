@@ -2,7 +2,7 @@
 ;   _divulong.s - routine for 32 bit unsigned long division
 ;
 ;   Copyright (C) 1998, Ullrich von Bassewitz
-;   Copyright (C) 2022, Gabriele Gorla
+;   Copyright (C) 2022-25, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -67,8 +67,6 @@ __modslong_PARM_2:
 	.define res3 "___SDCC_m6502_ret3"
 	.define den  "__divulong_PARM_2"
 	.define rem  "___SDCC_m6502_ret4"
-	.define s1  "___SDCC_m6502_ret0"
-	.define s2  "___SDCC_m6502_ret1"
 	
 ;--------------------------------------------------------
 ; code
@@ -82,10 +80,10 @@ __divulong:
 	rts
 
 ___udivmod32:
-        ldx	__divulong_PARM_1+3
-        stx	*res3
-        ldx	__divulong_PARM_1+2
+        ldx	*__divulong_PARM_1+2
         stx	*res2
+        ldx	*__divulong_PARM_1+3
+        stx	*res3
 
 	lda     #0
         sta     *rem+0

@@ -1,5 +1,10 @@
 2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/SDCCgenconstprop.cc:
+	  Basic null pointer optimization.
+
+2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/f8/gen.c,
 	  src/pdk/gen.c,
 	  src/stm8/gen.c,
@@ -7,7 +12,7 @@
 	  valinfo for predefined asmops.
 	* src/SDCCdflow.h,
 	  src/SDCCgenconstprop.cc:
-	  Prepare for null pointer optmization.
+	  Prepare for null pointer optimization.
 
 2025-02-07 Gabriele Gorla <gorlik@yahoo.com>
 

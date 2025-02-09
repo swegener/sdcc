@@ -1,3 +1,9 @@
+2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3834.c:
+	  Fix bug #3834.
+
 2025-02-07 Gabriele Gorla <gorlik@yahoo.com>
 
 	* device/lib/mos6502/_divulong.s:

@@ -15300,10 +15300,10 @@ genPointerSet (iCode *ic)
           }
     }
 release:
-  if (pushed_pair)
-    _pop (pairId);
   if (pushed_a)
     _pop (PAIR_AF);
+  if (pushed_pair)
+    _pop (pairId);
 
   freeAsmop (right, NULL);
   freeAsmop (result, NULL);

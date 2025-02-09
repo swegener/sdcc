@@ -13,6 +13,12 @@ SAS = $(top_builddir)/bin/sdas6500
 # override PORTDIR defined by super (parent) makefile
 override PORTDIR = ../build/mos6502-stack-auto
 
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
+
 include $(srcdir)/../incl.mk
 
 MOS6502_FLOAT = $(COMMON_FLOAT)
@@ -48,18 +54,17 @@ MOS6502_LONGLONG = $(COMMON_LONGLONG) \
 MOS6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
-  __memcpy.c \
   _heap.c \
   _memmove.c \
-  _spx.c \
   _startup.c \
   _strcmp.c \
   _strcpy.c \
   strlen.c \
   strnlen.c \
+  __memcpy.c \
+  memcpy.c \
   div.c \
   ldiv.c \
-  memcpy.c \
   sprintf.c \
   vprintf.c \
   atomic_flag_clear.c
@@ -97,12 +102,6 @@ else
     endif
   endif
 endif
-
-%.rel: %.s
-	@# TODO: sdas should place it\'s output in the current dir
-	test $(srcdir) = . || cp $< .
-	-$(AS) $(ASFLAGS) $(notdir $<)
-	test $(srcdir) = . || rm $(notdir $<)
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

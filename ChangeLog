@@ -1,3 +1,14 @@
+2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/gen.c,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c:
+	  valinfo for predefined asmops.
+	* src/SDCCdflow.h,
+	  src/SDCCgenconstprop.cc:
+	  Prepare for null pointer optmization.
+
 2025-02-07 Gabriele Gorla <gorlik@yahoo.com>
 
 	* device/lib/mos6502/_setjmp.s:

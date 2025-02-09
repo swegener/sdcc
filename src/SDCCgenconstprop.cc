@@ -101,6 +101,7 @@ getTypeValinfo (sym_link *type, bool loose)
   struct valinfo v;
   v.anything = true;
   v.nothing = false;
+  v.nonnull = false;
   // Initialize all members of v, to ensure we don't read uninitalized memory later.
   v.min = v.max = 0ll;
   v.knownbitsmask = 0ull;
@@ -183,6 +184,7 @@ getOperandValinfo (const iCode *ic, const operand *op)
   struct valinfo v;
   v.anything = true;
   v.nothing = false;
+  v.nonnull = false;
   v.min = v.max = 0;
   v.knownbitsmask = 0ull;
   v.knownbits = 0ull;
@@ -232,6 +234,9 @@ valinfo_union (struct valinfo *v0, const struct valinfo v1)
   auto new_nothing = v0->nothing && v1.nothing;
   change |= (v0->nothing != new_nothing);
   v0->nothing = new_nothing;
+  auto new_nonnull = v0->nonnull && v1.nonnull;
+  change |= (v0->nonnull != new_nonnull);
+  v0->nonnull = new_nonnull;
   auto new_min = std::min (v0->min, v1.min);
   change |= (v0->min != new_min);
   v0->min = new_min;
@@ -386,6 +391,7 @@ valinfoPlus (struct valinfo *result, sym_link *resulttype, const struct valinfo 
           result->knownbitsmask |= (left.knownbitsmask & 0x8000ull);
           result->knownbits = result->knownbits & ~0x8000ull | left.knownbits & 0x8000ull;
         }
+      result->nonnull |= left.nonnull;
     }
   if (!left.anything && !right.anything &&
     left.min >= 0 && right.min >= 0)
@@ -430,6 +436,7 @@ valinfoMinus (struct valinfo *result, sym_link *resulttype, const struct valinfo
           result->knownbitsmask |= (left.knownbitsmask & 0x8000ull);
           result->knownbits = result->knownbits & ~0x8000ull | left.knownbits & 0x8000ull;
         }
+      result->nonnull |= left.nonnull;
     }
   // todo: rewrite using ckd_sub when we can assume host compiler has c2x support!
   if (!left.anything && !right.anything &&

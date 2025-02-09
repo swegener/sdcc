@@ -299,18 +299,30 @@ z80_init_asmops (void)
   z80_init_reg_asmop(&asmop_iy, (const signed char[]){IYL_IDX, IYH_IDX, -1});
   z80_init_reg_asmop(&asmop_hlbc, (const signed char[]){C_IDX, B_IDX, L_IDX, H_IDX, -1});
   z80_init_reg_asmop(&asmop_debc, (const signed char[]){C_IDX, B_IDX, E_IDX, D_IDX, -1});
-  
+
   asmop_zero.type = AOP_LIT;
-  asmop_zero.aopu.aop_lit = constVal ("0");
   asmop_zero.size = 1;
-  memset (asmop_zero.regs, -1, 9);
-  asmop_zero.valinfo.anything = true;
+  memset (asmop_zero.regs, -1, sizeof(asmop_zero.regs));
+  asmop_zero.aopu.aop_lit = constVal ("0");
+  asmop_zero.valinfo.anything = false;
+  asmop_zero.valinfo.nothing = true;
+  asmop_zero.valinfo.nonnull = false;
+  asmop_zero.valinfo.min = 0;
+  asmop_zero.valinfo.max = 0;
+  asmop_zero.valinfo.knownbitsmask = 0xffffffffffffffffull;
+  asmop_zero.valinfo.knownbits = 0;
 
   asmop_one.type = AOP_LIT;
-  asmop_one.aopu.aop_lit = constVal ("1");
   asmop_one.size = 1;
-  memset (asmop_one.regs, -1, 9);
-  asmop_one.valinfo.anything = true;
+  memset (asmop_one.regs, -1, sizeof(asmop_one.regs));
+  asmop_one.aopu.aop_lit = constVal ("1");
+  asmop_zero.valinfo.anything = false;
+  asmop_zero.valinfo.nothing = true;
+  asmop_zero.valinfo.nonnull = true;
+  asmop_zero.valinfo.min = 1;
+  asmop_zero.valinfo.max = 1;
+  asmop_zero.valinfo.knownbitsmask = 0xffffffffffffffffull;
+  asmop_zero.valinfo.knownbits = 1;
 
   asmop_mone.type = AOP_LIT;
   asmop_mone.aopu.aop_lit = constVal ("-1");

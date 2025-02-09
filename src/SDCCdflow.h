@@ -43,6 +43,7 @@ struct valinfos;
 struct valinfo
 {
 	bool nothing, anything;
+	bool nonnull; // For pointers
 	long long int min, max;
 	unsigned long long knownbitsmask;
 	unsigned long long knownbits;

@@ -4,6 +4,8 @@
 	  Improve storeRegToAop(), shiftLLong() and shiftRLong().
 	  Add some debugging messages and indentation cleanups.
 	  genCmp() and genRRC() improvements.
+	* support/ports/uc6502-stack-auto/spec.mk
+	  add --i-code-in-asm to generated output.
 
 2025-02-09 Gabriele Gorla <gorlik@yahoo.com>
 

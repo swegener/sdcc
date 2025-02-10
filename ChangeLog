@@ -2,6 +2,7 @@
 
 	* src/mos6502/gen.c:
 	  Improve storeRegToAop(), shiftLLong() and shiftRLong().
+	  Add some debugging messages and indentation cleanups.
 
 2025-02-09 Gabriele Gorla <gorlik@yahoo.com>
 

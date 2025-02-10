@@ -3816,7 +3816,7 @@ asmopToBool (asmop *aop, bool resultInA)
             {
 	      if (!(m6502_reg_x->isLitConst && m6502_reg_x->litConst==0 ) )
 		emit6502op ("bne", "%05d$", safeLabelNum (tlbl));
-	      emit6502op ("cmp", "#0x00");
+              emitCpz(A_IDX);
             }
           else
 #endif
@@ -5891,10 +5891,18 @@ genCmp (iCode * ic, iCode * ifx)
     {
       if (AOP_TYPE (right) == AOP_LIT && ullFromVal (AOP (right)->aopu.aop_lit) == 0 && opcode=='>')
         {
-          // FIXME: this is unsafe in some corner cases as the branches need carry
-          // even if it's always set.
+#if 1
+          symbol *tlbl3 = safeNewiTempLabel (NULL);
+          emitCpz(A_IDX);
+          emitBranch ("beq", tlbl3);
+          loadRegFromConst (m6502_reg_a, 1);
+          safeEmitLabel (tlbl3);
+          goto release;
+#else
+          // in some corner cases the branches need carry
           if(!emitCpz(A_IDX))
             emit6502op("sec","");
+#endif
         }
       else
         {
@@ -6024,6 +6032,7 @@ genCmp (iCode * ic, iCode * ifx)
       loadOrFreeRegTemp (m6502_reg_a, needloada);
     }
 
+release:
   freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);
@@ -7233,33 +7242,30 @@ static void genRRC (iCode * ic)
   offset = size - 1;
 
   shift = "lsr";
-  if(IS_AOP_XA(AOP(result))&&IS_AOP_XA(AOP(left)))
+  if(IS_AOP_XA(AOP(left)))
     {
       storeRegTempAlways(m6502_reg_x, true);
       emit6502op("lsr", TEMPFMT, _G.tempOfs-1);
       emit6502op("ror", "a");
-      storeRegTemp(m6502_reg_a, true);
-      loadRegFromConst(m6502_reg_a, 0);
-      emit6502op("ror", "a");
-      emit6502op ("ora", TEMPFMT, _G.tempOfs-2);
-      transferRegReg(m6502_reg_a, m6502_reg_x, true);
-      loadRegTemp(m6502_reg_a);
-      loadRegTemp(NULL);
-      goto release;
-    }
-  else if(IS_AOP_XA(AOP(left)))
-    {
-      // TODO: optimize if the result is in DIR or EXT
-      storeRegTempAlways(m6502_reg_x, true);
-      emit6502op("lsr", TEMPFMT, _G.tempOfs-1);
-      emit6502op("ror", "a");
-      storeRegTemp(m6502_reg_a, true);
-      loadRegFromConst(m6502_reg_a, 0);
-      emit6502op("ror", "a");
-      emit6502op ("ora", TEMPFMT, _G.tempOfs-2);
-      storeRegToAop(m6502_reg_a, AOP(result), 1);
-      loadRegTemp(m6502_reg_a);
-      storeRegToAop(m6502_reg_a, AOP(result), 0);
+      if(AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_EXT )
+        {
+          // optimization if the result is in DIR or EXT
+          storeRegToAop(m6502_reg_a, AOP(result), 0);
+	  loadRegFromConst(m6502_reg_a, 0);
+	  emit6502op("ror", "a");
+          emit6502op ("ora", TEMPFMT, _G.tempOfs-1);
+          storeRegToAop(m6502_reg_a, AOP(result), 1);
+	}
+      else
+	{
+	  storeRegTemp(m6502_reg_a, true);
+	  loadRegFromConst(m6502_reg_a, 0);
+	  emit6502op("ror", "a");
+	  emit6502op ("ora", TEMPFMT, _G.tempOfs-2);
+	  storeRegToAop(m6502_reg_a, AOP(result), 1);
+	  loadRegTemp(m6502_reg_a);
+	  storeRegToAop(m6502_reg_a, AOP(result), 0);
+        }
       loadRegTemp(NULL);
       goto release;
     }

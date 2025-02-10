@@ -9867,7 +9867,7 @@ static void genAddrOf (iCode * ic)
   operand *result = IC_RESULT (ic);
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   int size, offset;
-  bool needpulla, needpullx;
+  bool needloada, needloadx;
   struct dbuf_s dbuf;
 
   emitComment (TRACEGEN, __func__);
@@ -9879,8 +9879,8 @@ static void genAddrOf (iCode * ic)
      variable */
   if (sym->onStack)
     {
-      needpulla = pushRegIfSurv (m6502_reg_a);
-      needpullx = pushRegIfSurv (m6502_reg_x);
+      needloada = storeRegTempIfSurv (m6502_reg_a);
+      needloadx = storeRegTempIfSurv (m6502_reg_x);
       /* if it has an offset then we need to compute it */
       doTSX();
       offset = _G.stackOfs + _G.tsxStackPushes + _G.stackPushes + sym->stack + 1;
@@ -9902,8 +9902,8 @@ static void genAddrOf (iCode * ic)
 	  loadRegFromConst(m6502_reg_a, 0x01); // stack top = 0x100
 	  storeRegToAop (m6502_reg_a, AOP (result), 1);
 	}
-      pullOrFreeReg (m6502_reg_x, needpullx);
-      pullOrFreeReg (m6502_reg_a, needpulla);
+      loadOrFreeRegTemp (m6502_reg_x, needloadx);
+      loadOrFreeRegTemp (m6502_reg_a, needloada);
       goto release;
     }
 

@@ -1,3 +1,8 @@
+2025-02-09 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Fix gcc-torture-execute-931102, pr42833 and pr51466 for mos6502-stack-auto.
+
 2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

@@ -1,3 +1,8 @@
+2025-02-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3830.c:
+	  Disable test for ports where it fails due to known bug #3836.
+
 2025-02-09 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:

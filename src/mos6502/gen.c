@@ -3162,9 +3162,11 @@ aopOp (operand *op, const iCode * ic)
             emitComment (VVDBG|TRACE_AOP, "    asmop symbol: %s [%d:%d] - %d",
                          OP_SYMBOL (op)->name, OP_SYMBOL (op)->stack, op->aop->size,
                          op->aop->aopu.aop_stk );
-            // FIXME: ugly fix to correct stack offset for some symbols
-            // Should find the source of the bug
-            op->aop->aopu.aop_stk = OP_SYMBOL (op)->stack;
+            // FIXME FIXME: the following is incorrect but fixes failures in gte991019-1
+            // change the stack offset for some symbols
+            // enabling the workaround breaks shifts3 and muldiv_long_*_volatile
+            // Should find the source of the gte bug
+            // op->aop->aopu.aop_stk = OP_SYMBOL (op)->stack;
           }
         }
       return;

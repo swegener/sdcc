@@ -1,3 +1,9 @@
+2025-02-13 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Remove incorrect workaround for gte-991019-1.
+	  Fix shifts3 and muldiv failures on mos6502-stack-auto.
+
 2025-02-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/bug-3830.c:

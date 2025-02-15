@@ -1725,8 +1725,11 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         case A_IDX:
           emitComment (TRACE_STACK|VVDBG, "      %s: A [%d, %d]",
                        __func__, aop->aopu.aop_stk, loffset);
-          needloadx = storeRegTempIfUsed(m6502_reg_x);
-          doTSX();
+          if(m6502_reg_x->aop != &tsxaop)
+            {
+              needloadx = storeRegTempIfUsed(m6502_reg_x);
+              doTSX();
+            }
           emit6502op ("sta", aopAdrStr (aop, loffset, false));
           loadOrFreeRegTemp(m6502_reg_x, needloadx);
           break;
@@ -2242,9 +2245,9 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       return;
     }
 
-  emitComment (TRACE_AOP|VVDBG, "    transferAopAop from (%s, %d, %x)",
+  emitComment (TRACE_AOP|VVDBG, "    transferAopAop from (%s, %d, 0x%x)",
                aopName (srcaop), srcofs, srcaop->regmask);
-  emitComment (TRACE_AOP|VVDBG, "    transferAopAop   to (%s, %d, %x)",
+  emitComment (TRACE_AOP|VVDBG, "    transferAopAop   to (%s, %d, 0x%x)",
                aopName (dstaop), dstofs, dstaop->regmask);
 
   if (dstofs >= dstaop->size)
@@ -2277,11 +2280,13 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   // TODO: pick reg based on if can load op?
   if (!reg)
     {
-      reg = getFreeByteReg();
+      if(srcaop->type != AOP_SOF && dstaop->type != AOP_SOF)
+        reg = getFreeByteReg();
+
       if (reg == NULL)
         {
-          pushReg (m6502_reg_a, true);
-          needpula = true;
+//          needpula = pushRegIfUsed (m6502_reg_a);
+          needpula = storeRegTempIfSurv (m6502_reg_a);
           reg = m6502_reg_a;
         }
     }
@@ -2292,7 +2297,8 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   storeRegToAop (reg, dstaop, dstofs);
 
   if (!keepreg)
-    pullOrFreeReg (reg, needpula);
+//    pullOrFreeReg (reg, needpula);
+    loadOrFreeRegTemp (reg, needpula);
 }
 
 #if 0
@@ -3562,6 +3568,8 @@ static int aopPreparePreserveFlags = 0;
 // TODO: make sure this is called before/after aopAdrStr if indexing might be used
 static void aopAdrPrepare (asmop * aop, int loffset)
 {
+  emitComment (TRACE_AOP, "%s", __func__ );
+
   aopPreparePreserveFlags = 0;
   if (loffset > (aop->size - 1))
     return;
@@ -3581,9 +3589,13 @@ static void aopAdrPrepare (asmop * aop, int loffset)
     if (!m6502_reg_x->isFree) {
       // FIXME: check if used/dead is ok
       // aopPrepareStoreTemp = storeRegTempIfSurv(m6502_reg_x);
-      storeRegTemp(m6502_reg_x, true);
-      aopPrepareStoreTemp = true;
-      // m6502_reg_x->isFree=true;
+      if (m6502_reg_x->aop != &tsxaop)
+        {
+          emitComment (TRACE_AOP, "    aopAdrPrepare: x!=tsxaop");
+          storeRegTemp(m6502_reg_x, true);
+          aopPrepareStoreTemp = true;
+          // m6502_reg_x->isFree=true;
+        }
     }
 
     doTSX();
@@ -3621,6 +3633,9 @@ static const char * aopAdrStr (asmop * aop, int loffset, bool bit16)
   char *rs;
   int offset = loffset; // SEH: aop->size - 1 - loffset - (bit16 ? 1 : 0);
   int xofs;
+
+  emitComment(VVDBG|TRACEGEN,"      %s: size=%d offs=%d",
+    __func__, aop->size, offset);
 
   /* offset is greater than
      size then zero */
@@ -8700,7 +8715,8 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
-  needpulla = pushRegIfSurv (m6502_reg_a);
+//  needpulla = pushRegIfSurv (m6502_reg_a);
+  needpulla = storeRegTempIfSurv (m6502_reg_a);
 
   if (!IS_AOP_YX (AOP (left)))
     {
@@ -8721,7 +8737,7 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
     //      emit6502op("php", "");//TODO
     pullOrFreeReg (m6502_reg_y, needpully);
     pullOrFreeReg (m6502_reg_x, needpullx);
-    pullOrFreeReg (m6502_reg_a, needpulla);
+    loadOrFreeRegTemp (m6502_reg_a, needpulla);
     //      emit6502op("plp", "");
     genIfxJump (ifx, "z");
     return;
@@ -8795,7 +8811,7 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
   }
   pullOrFreeReg (m6502_reg_y, needpully);
   pullOrFreeReg (m6502_reg_x, needpullx);
-  pullOrFreeReg (m6502_reg_a, needpulla);
+  loadOrFreeRegTemp (m6502_reg_a, needpulla);
 }
 
 /**************************************************************************

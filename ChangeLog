@@ -1,3 +1,8 @@
+2025-02-15 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve code generation for stack accesses.
+
 2025-02-15 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* doc/sdccman.lyx,
@@ -14,7 +19,7 @@
 	* device/lib/mos6502/div.s,
 	  device/lib/mos6502/ldiv.s,
 	  device/lib/mos6502/_divuint.s,
-	  device/lib/mos6502/_divuling.s:
+	  device/lib/mos6502/_divulong.s:
 	  Implement div and ldiv in assembly.
 
 2025-02-13 Gabriele Gorla <gorlik@yahoo.com>

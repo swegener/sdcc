@@ -1,8 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _divuint.s - routine for division of 16 bit unsigned int
+;   ldiv.s - implementation on std C library ldiv
 ;
-;   Copyright (C) 1998, Ullrich von Bassewitz
-;   Copyright (C) 2022, Gabriele Gorla
+;   Copyright (C) 2025, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -27,99 +26,69 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _divuint
-
+	.module ldiv
+	
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __divuint_PARM_2
-	.globl __divsint_PARM_2
-	.globl __moduint_PARM_2
-	.globl __modsint_PARM_2
-	.globl _div_PARM_2
-	.globl __divuint
-	.globl ___udivmod16
-
-;--------------------------------------------------------
-; overlayable function parameters in zero page
-;--------------------------------------------------------
-	.area	OSEG    (PAG, OVR)
-__divuint_PARM_2:
-__divsint_PARM_2:
-__moduint_PARM_2:
-__modsint_PARM_2:
-_div_PARM_2:
-	.ds 2
+	.globl _ldiv
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define res "___SDCC_m6502_ret0"
-	.define den "__divuint_PARM_2"
-	.define rem "___SDCC_m6502_ret2"
-	.define s1  "___SDCC_m6502_ret4"
-	.define s2  "___SDCC_m6502_ret5"
+	.define res0 "__divslong_PARM_1+0"
+	.define res1 "__divslong_PARM_1+1"
+	.define res2 "___SDCC_m6502_ret2"
+	.define res3 "___SDCC_m6502_ret3"
+	.define den  "__divslong_PARM_2"
+	.define rem  "___SDCC_m6502_ret4"
+	.define s1   "___SDCC_m6502_ret0"
+	.define s2   "___SDCC_m6502_ret1"
 
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
-
-__divuint:
-	jsr	___udivmod16
-	lda	*res+0
-	ldx	*res+1
-	rts
-
-___udivmod16:
-	sta	*res+0
-	stx	*res+1
-
-	lda	#0
-	sta	*rem+1
-	ldy	#16
-;	ldx	__divuint_PARM_2+1
-;	beq	div16x8
-next_bit:
-	asl	*res+0
-	rol	*res+1
-	rol	a
-	rol	*rem+1
-
-	tax
-	cmp	*den+0
-	lda	*rem+1
-	sbc	*den+1
-	bcc	L1
-	sta	*rem+1
+_ldiv:
+	jsr	___sdivmod32
+	lda	*s1
+	bpl	rempos
+; neg res
+	sec
+	ldx	#0x00
+	sbc	*rem+0
+    sta *rem+0
 	txa
-	sbc	*den+0
-	tax
-	inc	*res+0
-L1:
+	sbc	*rem+1
+    sta *rem+1
 	txa
-	dey
-	bne	next_bit
-	sta	*rem+0
+	sbc	*rem+2
+	sta	*rem+2
+	txa
+	sbc	*rem+3
+	sta	*rem+3
+rempos:	
+	lda	*s1
+	eor	*s2
+	bpl	pos
+; neg res
+	sec
+	txa
+	sbc	*res0
+	tay
+	txa
+	sbc	*res1
+	tax
+	lda	#0x00
+	sbc	*res2
+	sta	*res2
+	lda	#0x00
+	sbc	*res3
+	sta	*res3
+	tya
 	rts
-
-;div16x8:
-;LL0:
-;	asl	*___SDCC_m6502_ret0+0
-;	rol	*___SDCC_m6502_ret0+1
-;	rol	a
-;	bcs	LL1
-;	cmp	__divuint_PARM_2+0
-;	bcc	LL2
-;LL1:
-;	sbc	__divuint_PARM_2+0
-;	inc	*___SDCC_m6502_ret0+0
-;LL2:
-;	dey
-;	bne	LL0
-;	sta	*___SDCC_m6502_ret2+0
-;
-;	lda	*___SDCC_m6502_ret0+0
-;	ldx	*___SDCC_m6502_ret0+1
-;	rts
+pos:
+	lda	*res0
+	ldx	*res1
+	rts
 

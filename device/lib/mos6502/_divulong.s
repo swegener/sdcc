@@ -32,14 +32,16 @@
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl __divulong_PARM_2
 	.globl __divulong_PARM_1
-	.globl __divslong_PARM_2
+	.globl __divulong_PARM_2
 	.globl __divslong_PARM_1
-	.globl __modulong_PARM_2
+	.globl __divslong_PARM_2
 	.globl __modulong_PARM_1
-	.globl __modslong_PARM_2
+	.globl __modulong_PARM_2
 	.globl __modslong_PARM_1
+	.globl __modslong_PARM_2
+	.globl _ldiv_PARM_1
+	.globl _ldiv_PARM_2
 	.globl __divulong
 	.globl ___udivmod32
 
@@ -51,11 +53,13 @@ __divulong_PARM_1:
 __divslong_PARM_1:
 __modulong_PARM_1:
 __modslong_PARM_1:
+_ldiv_PARM_1:
 	.ds 4
 __divulong_PARM_2:
 __divslong_PARM_2:
 __modulong_PARM_2:
 __modslong_PARM_2:
+_ldiv_PARM_2:
 	.ds 4
 
 ;--------------------------------------------------------

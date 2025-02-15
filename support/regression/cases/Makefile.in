@@ -107,11 +107,6 @@ GTE_SKIP_TESTS += \
 	va-arg-8.c \
 	980608-1.c
 
-# SDCC does not yet support compound literals (RFE #332)
-GTE_SKIP_TESTS += \
-	20000917-1.c \
-	20020206-2.c
-
 # Uses GCC implementation-defined long long bit-fields not supported in SDCC
 GTE_SKIP_TESTS += \
 	991118-1.c
@@ -208,6 +203,7 @@ GTE_SKIP_TESTS += \
 GTE_SKIP_TESTS += \
 	20000801-3.c \
 	20000822-1.c \
+	20000917-1.c \
 	20010904-2.c \
 	20020320-1.c \
 	20030109-1.c \
@@ -757,10 +753,6 @@ QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
 ##############
 # Tiny C tests
 
-# SDCC does not yet support compound literals (RFE #332)
-TCC_SKIP_TESTS += \
-	94_generic.c
-
 # Uses POSIX threads
 TCC_SKIP_TESTS += \
 	106_versym.c \
@@ -797,6 +789,7 @@ TCC_SKIP_TESTS += \
 	88_codeopt.c \
 	89_nocode_wanted.c \
 	90_struct-init.c \
+	94_generic.c \
 	95_bitfields.c \
 	98_al_ax_extend.c \
 	99_fastcall.c

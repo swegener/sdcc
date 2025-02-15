@@ -1,3 +1,14 @@
+2025-02-15 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCsymt.h,
+	  support/regression/cases/Makefile.in,
+	  support/regression/tests/compound-literal.c:
+	  Implement compound literals (C99, see RFE #332).
+
 2025-02-14 Gabriele Gorla <gorlik@yahoo.com>
 
 	* device/lib/mos6502/div.s,

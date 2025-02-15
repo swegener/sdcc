@@ -167,7 +167,7 @@ bool uselessDecl = true;
 %type <asts> generic_selection generic_assoc_list generic_association generic_controlling_operand
 %type <asts> implicit_block statements_and_implicit block_item_list
 %type <dsgn> designator designator_list designation designation_opt
-%type <ilist> initializer initializer_list
+%type <ilist> initializer initializer_list braced_initializer
 %type <yyint> unary_operator assignment_operator struct_or_union
 %type <yystr> asm_string_literal
 
@@ -238,32 +238,32 @@ postfix_expression
                       { $$ = newNode(INC_OP,$1,NULL);}
    | postfix_expression DEC_OP
                       { $$ = newNode(DEC_OP,$1,NULL); }
-   | '(' type_name ')' '{' initializer_list '}'
+   | '(' /* TODO (C23): storage_class_specifiers_opt */ type_name ')' braced_initializer
                       {
-                        /* if (!options.std_c99) */
+                        if (!options.std_c99)
                           werror(E_COMPOUND_LITERALS_C99);
 
-                        /* TODO: implement compound literals (C99) */
-                        $$ = newAst_VALUE (valueFromLit (0));
+                        /* create anonymous variable with the provided initializer list */
+                        symbol *sym = newSymbol(genSymName(NestLevel), NestLevel);
+                        /* imitate "init_declarator" */
+                        sym->ival = $4;
+                        /* NOTE: Do not increment seqPointNo here, because the initializer is part of a
+                                 compound literal. See Annex C.1 "Known Sequence Points" paragraph 4. */
+
+                        /* add the specifier list to the id */
+                        symbol *sym1 = prepareDeclarationSymbol(NULL, $2, sym);
+
+                        /* mark as temporary symbol for compound literal, so that gatherImplicitVariables
+                           can attach it to a block, and add the temporary symbol to the symbol table */
+                        sym1->iscomplit = 1;
+                        addSymChain(&sym1);
+                        /* allocate memory for the symbol where no block handling does it */
+                        if (NestLevel == 0)
+                          allocVariables(sym1);
+
+                        /* use the anonymous variable in the AST */
+                        $$ = newAst_VALUE(symbolVal(sym1));
                       }
-   | '(' type_name ')' '{' initializer_list ',' '}'
-     {
-       // if (!options.std_c99)
-         werror(E_COMPOUND_LITERALS_C99);
-
-       // TODO: implement compound literals (C99)
-       $$ = newAst_VALUE (valueFromLit (0));
-     }
-   | '(' type_name ')' '{' '}'
-     {
-       if (!options.std_c23)
-         werror(W_EMPTY_INIT_C23);
-       // if (!options.std_c99)
-         werror(E_COMPOUND_LITERALS_C99);
-
-       // TODO: implement compound literals (C99)
-       $$ = newAst_VALUE (valueFromLit (0));
-     }
    ;
 
 argument_expr_list
@@ -1758,7 +1758,11 @@ function_abstract_declarator
 
 initializer
    : assignment_expr                { $$ = newiList(INIT_NODE,$1); }
-   | '{' '}'
+   | braced_initializer
+   ;
+
+braced_initializer
+   : '{' '}'
      {
        if (!options.std_c23)
          werror(W_EMPTY_INIT_C23);

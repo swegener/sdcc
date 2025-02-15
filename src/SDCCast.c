@@ -2888,6 +2888,23 @@ gatherImplicitVariables (ast * tree, ast * block)
             }
         }
     }
+  if (tree->type == EX_VALUE && IS_AST_SYM_VALUE (tree) && AST_SYMBOL (tree)->iscomplit)
+    {
+      /* attach the compound literal temporary symbol to the surrounding block, if one exists */
+      symbol *tempsym = AST_SYMBOL (tree);
+      if (block != NULL)
+        {
+          symbol **decl = &(block->values.sym);
+
+          while (*decl)
+            {
+              wassert (*decl != tempsym);  /* should not already be in list */
+              decl = &((*decl)->next);
+            }
+
+          *decl = tempsym;
+        }
+    }
   if (tree->type == EX_VALUE && !(IS_LITERAL (tree->opval.val->etype)) &&
       tree->opval.val->type == NULL && tree->opval.val->sym && tree->opval.val->sym->infertype)
     {

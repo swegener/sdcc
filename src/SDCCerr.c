@@ -572,7 +572,7 @@ struct
   { E_ATTRIBUTE_C23, ERROR_LEVEL_ERROR,
     "attribute requires C23 or later", 0},
   { E_COMPOUND_LITERALS_C99, ERROR_LEVEL_ERROR,
-    "compound literals require ISO C99 or later and are not implemented", 0},
+    "compound literals require ISO C99 or later", 0},
   { E_THREAD_LOCAL, ERROR_LEVEL_ERROR,
     "thread-local storage is not implemented", 0},
   { E_ENUM_COMMA_C99,  ERROR_LEVEL_ERROR,

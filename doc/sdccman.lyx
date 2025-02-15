@@ -10311,11 +10311,6 @@ In addition to what is mentioned in the section above,
 \end_layout
 
 \begin_layout Itemize
-Compound literals.
- 
-\end_layout
-
-\begin_layout Itemize
 Objects of variably-modified types.
 \end_layout
 
@@ -10557,7 +10552,7 @@ double (not supported)
 \end_layout
 
 \begin_layout Itemize
-Compound literals are not supported.
+Compound literals cannot have storage class specifiers.
 \end_layout
 
 \begin_layout Itemize

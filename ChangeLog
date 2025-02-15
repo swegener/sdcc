@@ -2,6 +2,8 @@
 
 	* src/mos6502/gen.c:
 	  Improve code generation for stack accesses.
+	* src/mos6502/peeph.def:
+	  Additional peephole rules.
 
 2025-02-15 Benedikt Freisen <b.freisen AT gmx.net>
 

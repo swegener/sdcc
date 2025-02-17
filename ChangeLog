@@ -2,6 +2,7 @@
 
 	* src/mos6502/gen.c:
 	  Several improvements to stack code generation.
+	  Improvements in genCmp() and genCast().
 	
 2025-02-15 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -570,6 +570,14 @@ replace restart {
 } if notVolatile(%2)
 
 replace restart {
+	lda	%2, %3
+	sta	%2, %3
+} by {
+	lda	%2, %3
+	; Peephole store 1a - removed redundant sta %2, %3
+} if notVolatile(%2)
+
+replace restart {
 	lda	%2
 	%1
 	sta	%2

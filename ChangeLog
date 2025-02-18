@@ -1,9 +1,11 @@
 2025-02-17 Gabriele Gorla <gorlik@yahoo.com>
 
 	* support/regression/tests/gcc-touture-execute-2010030-1.c:
-      Disable gcc-touture-execute-2010030-1 for mos6502-stack-auto
+      Disable gcc-touture-execute-2010030-1 for mos6502-stack-auto.
     * src/mos6502/gen.c:
       Improve loadRegFromAop().
+   	* src/mos6502/peeph.def:
+	  Additional peephole rule for store after load at the same address.
 
 2025-02-16 Gabriele Gorla <gorlik@yahoo.com>
 

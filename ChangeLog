@@ -2,6 +2,8 @@
 
 	* support/regression/tests/gcc-touture-execute-2010030-1.c:
       Disable gcc-touture-execute-2010030-1 for mos6502-stack-auto
+    * src/mos6502/gen.c:
+      Improve loadRegFromAop().
 
 2025-02-16 Gabriele Gorla <gorlik@yahoo.com>
 

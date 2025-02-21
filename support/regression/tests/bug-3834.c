@@ -63,3 +63,5 @@ void testBug( void ) {
     ASSERT(words[4] == 1);
 }
 
+extern void VDP_CommandLMMV(u16 dx, u16 dy, u16 nx, u8 col);
+

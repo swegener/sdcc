@@ -1,3 +1,8 @@
+2025-02-21 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/bug-3834.c:
+	  Provide required external definition of inline function.
+
 2025-02-17 Gabriele Gorla <gorlik@yahoo.com>
 
 	* support/regression/tests/gcc-touture-execute-2010030-1.c:

@@ -504,9 +504,9 @@ PORT f8_port =
   0,                            /* leave gt */
   1,                            /* transform <= to ! > */
   1,                            /* transform >= to ! < */
-  1,                            /* transform != to !(a == b) */
-  0,                            /* leave == */
-  FALSE,                        /* Array initializer support. */
+  false,                        // leave !=
+  false,                        // leave ==
+  false,                        // Array initializer support
   0,                            /* no CSE cost estimation yet */
   NULL,                         /* builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */

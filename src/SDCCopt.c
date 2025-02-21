@@ -3005,7 +3005,8 @@ optimizeNegation (eBBlock **ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if (ic->op == '!' && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+          if ((ic->op == '!' || (ic->op == EQ_OP || ic->op == NE_OP) && IS_OP_LITERAL (ic->right) && isEqualVal (OP_VALUE (ic->right), 0)) &&
+            IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               /* There must be only one use of this first result */
               if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
@@ -3019,20 +3020,30 @@ optimizeNegation (eBBlock **ebbs, int count)
               /* Todo: Optimize case where use is another negation */
               else if(uic->op == IFX) /* Remove negation by inverting jump targets */
                 {
-                  IC_LEFT (uic) = IC_LEFT (ic);
-                  IC_LEFT (ic) = 0;
-                  IC_RIGHT (ic) = IC_RESULT (ic);
+                  bool invert = ic->op == '!' || ic->op == EQ_OP;
+                  bitVectUnSetBit (OP_USES (uic->left), uic->key);
+                  uic->left = ic->left;
+                  bitVectSetBit (OP_USES (uic->left), uic->key);
+                  
+                  // Make ic assignment to self, which will be optimized out.
+                  bitVectUnSetBit (OP_USES (ic->left), ic->key);
+                  ic->left = 0;
+                  ic->right = IC_RESULT (ic);
+                  bitVectSetBit (OP_USES (ic->right), ic->key);
                   ic->op = '=';
 
-                  if (IC_TRUE (uic))
+                  if (invert)
                     {
-                      IC_FALSE (uic) = IC_TRUE (uic);
-                      IC_TRUE (uic) = 0;
-                    }
-                  else
-                    {
-                      IC_TRUE (uic) = IC_FALSE (uic);
-                      IC_FALSE (uic) = 0;
+                      if (IC_TRUE (uic))
+                        {
+                          IC_FALSE (uic) = IC_TRUE (uic);
+                          IC_TRUE (uic) = 0;
+                        }
+                      else
+                        {
+                          IC_TRUE (uic) = IC_FALSE (uic);
+                          IC_FALSE (uic) = 0;
+                        }
                     }
                 }
             }

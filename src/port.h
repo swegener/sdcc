@@ -408,11 +408,11 @@ typedef struct
    */
   int (*oclsExpense) (struct memmap * oclass);
 
-  /** If TRUE, then tprintf and !dw will be used for some initalisers
+  /** If true, then tprintf and !dw will be used for some initalisers
    */
   bool use_dw_for_init;
 
-  /** TRUE for targets with little endian byte ordering, FALSE for
+  /** true for targets with little endian byte ordering, false for
       targets with big endian byte ordering.
    */
   bool little_endian;

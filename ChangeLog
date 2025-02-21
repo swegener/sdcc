@@ -2,6 +2,11 @@
 
 	* support/regression/tests/bug-3834.c:
 	  Provide required external definition of inline function.
+	* src/SDCCopt.c,
+	  src/f8/main.c,
+	  src/port.h,
+	  src/stm8/main.c:
+	  Simplify equality operator handling.
 
 2025-02-17 Gabriele Gorla <gorlik@yahoo.com>
 

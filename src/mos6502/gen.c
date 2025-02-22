@@ -3565,87 +3565,6 @@ static asmop * aopDerefAop (asmop * aop, int offset)
   return newaop;
 }
 
-/**************************************************************************
- * aopOpExtToIdx - attempt to convert AOP_EXT to AOP_IDX
- *************************************************************************/
-static void
-aopOpExtToIdx(asmop * result, asmop *left, asmop *right)
-{
-#if 0
-  int accesses=0;
-  int resultAccesses=0;
-  int leftAccesses=0;
-  int rightAccesses=0;
-  asmop * winner;
-  int winnerAccesses;
-
-  return; //TODO: makes things worse often
-
-  if (!m6502_reg_x->isFree || !m6502_reg_y->isFree)
-    return;
-
-  /* Need to replace at least two extended mode accesses with indexed */
-  /* to break even with the extra cost of loading YX. Do a quick check */
-  /* to see if anything is using extended mode at all. */
-  if (result && result->type == AOP_EXT)
-    accesses += result->size;
-  if (left && left->type == AOP_EXT)
-    accesses += left->size;
-  if (right && right->type == AOP_EXT)
-    accesses += right->size;
-  if (accesses<2)
-    return;
-
-  /* If an operand is already using or going to Y or X then we cannot */
-  /* use indexed addressing mode at the same time. */
-  if (result && (IS_AOP_WITH_Y (result) || IS_AOP_WITH_X (result)))
-    return;
-  if (left && (IS_AOP_WITH_Y (left) || IS_AOP_WITH_X (left)))
-    return;
-  if (right && (IS_AOP_WITH_Y (right) || IS_AOP_WITH_X (right)))
-    return;
-
-  /* Decide which is the best asmop to make indexed. */
-  if (result && result->type == AOP_EXT) {
-    resultAccesses = result->size;
-    if (result->op && left && left->op && result->op->key == left->op->key)
-      resultAccesses += result->size;
-    if (result->op && right && right->op && result->op->key == right->op->key)
-      resultAccesses += result->size;
-  }
-  if (left && left->type == AOP_EXT) {
-    leftAccesses = left->size;
-    if (left->op && right && right->op && left->op->key == right->op->key)
-      leftAccesses += left->size;
-  }
-  if (right && right->type == AOP_EXT) {
-    rightAccesses = right->size;
-  }
-
-  winner = result; winnerAccesses = resultAccesses;
-  if (leftAccesses > winnerAccesses) {
-    winnerAccesses = leftAccesses;
-    winner = left;
-  }
-  if (rightAccesses > winnerAccesses) {
-    winnerAccesses = rightAccesses;
-    winner = right;
-  }
-
-  /* Make sure there were enough accesses of a single variable to be worthwhile. */
-  if (winnerAccesses < 2)
-    return;
-
-  if (winner->op && result && result->op && winner->op->key == result->op->key)
-    result->type = AOP_IDX;
-  if (winner->op && left && left->op && winner->op->key == left->op->key)
-    left->type = AOP_IDX;
-  if (winner->op && right && right->op && winner->op->key == right->op->key)
-    right->type = AOP_IDX;
-  loadRegFromImm (m6502_reg_yx, winner->aopu.aop_dir);
-#endif
-}
-
 // is it safe to aopAdrStr?
 static bool isAddrSafe(operand* op, reg_info* reg)
 {
@@ -3827,16 +3746,7 @@ static const char * aopAdrStr (asmop * aop, int loffset, bool bit16)
 #endif
     }
   case AOP_IDX:
-#if 0
-    xofs = offset; /* For now, assume yx points to the base address of operand */
-    // TODO: slow
-    storeRegTemp (m6502_reg_yx, true);
-    if (m6502_reg_y->aop == &tsxaop) {
-      loadRegFromConst(m6502_reg_y, offset);
-      return "ERROR [REGTEMP],y"; // TODO: what if != 0 tempOfs?
-    } else
-#endif
-      return "ERROR"; // TODO: error
+      return "ERROR - AOP_IDX"; // TODO: error
   default:
     break;
   }
@@ -4082,10 +3992,6 @@ static void genCopy (operand * result, operand * source)
       return;
     }
 #endif
-
-  // TODO?
-  //  if (IS_MOS6502 && (size > 2))
-  //    aopOpExtToIdx (AOP (result), NULL, AOP (source));
 
   /* general case */
   emitComment (TRACEGEN|VVDBG, "      genCopy (general case)", "");
@@ -5339,8 +5245,6 @@ static bool genPlusIncr (iCode * ic)
   if(icount < 0 )
     return false;
 
-  aopOpExtToIdx (AOP (result), AOP (left), NULL);
-
   if (size > 1)
     tlbl = safeNewiTempLabel (NULL);
 
@@ -5421,9 +5325,6 @@ static void genPlus (iCode * ic)
     goto release;
 
   emitComment (TRACEGEN|VVDBG, "    %s - Can't Inc", __func__);
-
-
-  aopOpExtToIdx (AOP (result), AOP (left), AOP (right));
 
   size = AOP_SIZE (result);
 
@@ -5562,8 +5463,6 @@ static bool genMinusDec (iCode * ic)
 
   emitComment (TRACEGEN|VVDBG, "     genMinusDec");
 
-  aopOpExtToIdx (AOP (result), AOP (left), NULL);
-
   rmwWithAop ("dec", AOP (result), 0);
 
   return true;
@@ -5626,10 +5525,8 @@ genMinus (iCode * ic)
     goto release;
 
   emitComment (TRACEGEN|VVDBG, "    %s - Can't Dec", __func__);
-  aopOpExtToIdx (AOP (result), AOP (left), AOP (right));
 
   size = AOP_SIZE (result);
-
 
   leftOp = AOP (left);
   rightOp = AOP (right);

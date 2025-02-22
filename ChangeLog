@@ -2,6 +2,7 @@
 
     * src/mos6502/gen.c:
       Replace direct access to _G.tempOfs with a function.
+      Remove AOP_IDX dead code.
 
 2025-02-21 Philipp Klaus Krause <philipp@colecovision.eu>
 

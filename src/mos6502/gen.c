@@ -129,7 +129,6 @@ static char *TEMPFMT_IND = "[REGTEMP+%d]";
 static char *DPTRFMT = "*(DPTR+%d)";
 static char *INDFMT_IY = "[DPTR],y";
 
-
 const int STACK_TOP = 0x100;
 
 
@@ -178,6 +177,28 @@ safeLabelNum(symbol * a)
 
   emitcode("ERROR","  %s : called with NULL symbol", __func__ );
   return 0;
+}
+
+/**************************************************************************
+ * Returns the last regtemp location
+ *
+ * @return last temp offset
+ *************************************************************************/
+
+int getLastTempOfs()
+{
+  return _G.tempOfs-1;
+}
+
+/**************************************************************************
+ * Returns the last register affecting the flag
+ *
+ * @return last register
+ *************************************************************************/
+
+int getLastFlag()
+{
+  return _G.lastflag;
 }
 
 /**************************************************************************
@@ -423,11 +444,12 @@ emit6502op (const char *inst, const char *fmt, ...)
 
       if(opcode->flags&0x82) // zero and negative flags
         _G.lastflag=opcode->dest;
+
       if(opcode->flags&0x01)
-        { // carry flag
+        {
+          // carry flag
           _G.carryValid=0;
         }
-
 
       // mark the destination register dirty as necessary
       // transfers are handled in the instruction generator
@@ -1058,6 +1080,9 @@ loadRegTempAt (reg_info * reg, int offset)
   int regidx = reg->rIdx;
   char loadOp[4] = "ld?";
   
+  if (offset<0)
+    emitcode("ERROR", " %s - reg temp stack underflow", __func__);
+
   if(_G.tempAttr[offset].isLiteral)
     {
       loadRegFromConst(reg, _G.tempAttr[offset].literalValue);
@@ -2444,7 +2469,7 @@ accopWithAop (char *accop, asmop *aop, int loffset)
           // TODO FIXME: does this need forcestore ?
 	  //          storeRegTempAlways (aop->aopu.aop_reg[loffset], false);
           storeRegTemp (aop->aopu.aop_reg[loffset], false);
-          emitRegTempOp( accop, _G.tempOfs - 1);
+          emitRegTempOp( accop, getLastTempOfs() );
           loadRegTemp(NULL);
         }
       else
@@ -5229,10 +5254,11 @@ static void genLabel (iCode * ic)
 
   /* For the high level labels we cannot depend on any */
   /* register's contents. Amnesia time.                */
-  for (i = A_IDX; i < SP_IDX; i++) {
-    m6502_dirtyReg (m6502_regWithIdx (i));
-    m6502_useReg (m6502_regWithIdx (i));
-  }
+  for (i = A_IDX; i < SP_IDX; i++)
+    {
+      m6502_dirtyReg (m6502_regWithIdx (i));
+      m6502_useReg (m6502_regWithIdx (i));
+    }
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeLabel (IC_LABEL (ic), ic);
@@ -5675,7 +5701,7 @@ genMinus (iCode * ic)
 	if (carry) {
 	  emitSetCarry(1);
 	}
-	emitRegTempOp("sbc", _G.tempOfs-1 );
+	emitRegTempOp("sbc", getLastTempOfs() );
 	loadRegTemp (NULL);
       }
     else
@@ -6072,9 +6098,9 @@ genCmp (iCode * ic, iCode * ifx)
               loadRegFromAop (m6502_reg_a, AOP (left), offset);
               if (!strcmp(sub, "sub")) {
                 emitSetCarry(1);
-		emitRegTempOp("sbc", _G.tempOfs-1 );
+		emitRegTempOp("sbc", getLastTempOfs() );
               } else {
-		emitRegTempOp(sub, _G.tempOfs-1 );
+		emitRegTempOp(sub, getLastTempOfs() );
               }
               if(!needloada) loadRegTemp(NULL);
             }
@@ -6561,7 +6587,7 @@ genAnd (iCode * ic, iCode * ifx)
             {
               // FIXME: this can be improved for 65C02
               storeRegTempAlways(m6502_reg_a, false);
-              emit6502op ("bit", TEMPFMT, _G.tempOfs - 1);
+              emit6502op ("bit", TEMPFMT, getLastTempOfs() );
               loadRegTemp(NULL);
               genIfxJump(ifx, "v");
               goto release; 
@@ -6573,7 +6599,7 @@ genAnd (iCode * ic, iCode * ifx)
               // FIXME: this can be improved for 65C02
               loadRegFromAop (freereg, AOP(right), 0);
               storeRegTempAlways(freereg, true);
-              emit6502op ("bit", TEMPFMT, _G.tempOfs - 1);
+              emit6502op ("bit", TEMPFMT, getLastTempOfs() );
               loadRegTemp(NULL);
             }
 	  else
@@ -7361,7 +7387,7 @@ static void genRRC (iCode * ic)
   if(IS_AOP_XA(AOP(left)))
     {
       storeRegTempAlways(m6502_reg_x, true);
-      emit6502op("lsr", TEMPFMT, _G.tempOfs-1);
+      emit6502op("lsr", TEMPFMT, getLastTempOfs() );
       emit6502op("ror", "a");
       if(AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_EXT )
         {
@@ -7369,7 +7395,7 @@ static void genRRC (iCode * ic)
           storeRegToAop(m6502_reg_a, AOP(result), 0);
 	  loadRegFromConst(m6502_reg_a, 0);
 	  emit6502op("ror", "a");
-          emit6502op ("ora", TEMPFMT, _G.tempOfs-1);
+          emit6502op ("ora", TEMPFMT, getLastTempOfs() );
           storeRegToAop(m6502_reg_a, AOP(result), 1);
 	}
       else
@@ -7377,7 +7403,7 @@ static void genRRC (iCode * ic)
 	  storeRegTemp(m6502_reg_a, true);
 	  loadRegFromConst(m6502_reg_a, 0);
 	  emit6502op("ror", "a");
-	  emit6502op ("ora", TEMPFMT, _G.tempOfs-2);
+	  emit6502op ("ora", TEMPFMT, getLastTempOfs()-1 );
 	  storeRegToAop(m6502_reg_a, AOP(result), 1);
 	  loadRegTemp(m6502_reg_a);
 	  storeRegToAop(m6502_reg_a, AOP(result), 0);
@@ -7477,7 +7503,7 @@ static void genRLC (iCode * ic)
   emit6502op ("rol", "a");
   if (resultInA)
     {
-      emit6502op("ora", TEMPFMT, _G.tempOfs-1);
+      emit6502op("ora", TEMPFMT, getLastTempOfs() );
       loadRegTemp(NULL);
     }
   else
@@ -7618,8 +7644,8 @@ static void reg16Lsh (reg_info *msb_reg, int shCount)
   switch (shCount) {
   case 7:
     storeRegTempAlways(msb_reg, true);
-    emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
-    dirtyRegTemp(_G.tempOfs - 1);
+    emit6502op ("lsr", TEMPFMT, getLastTempOfs() );
+    dirtyRegTemp(getLastTempOfs() );
     rmwWithReg ("ror", m6502_reg_a);
     transferRegReg (m6502_reg_a, msb_reg, false);
     loadRegFromConst (m6502_reg_a, 0);
@@ -7635,8 +7661,8 @@ static void reg16Lsh (reg_info *msb_reg, int shCount)
 
     for (i = 0; i < shCount; i++) {
       rmwWithReg ("asl", m6502_reg_a);
-      emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
-      dirtyRegTemp(_G.tempOfs - 1);
+      emit6502op ("rol", TEMPFMT, getLastTempOfs() );
+      dirtyRegTemp(getLastTempOfs() );
     }
     loadRegTemp(msb_reg);
 
@@ -7688,8 +7714,8 @@ static void XAccSRsh (int shCount)
       {
 	// TODO: this is so bad
 	emit6502op ("cpx", "#0x80");
-	emit6502op ("ror", TEMPFMT, _G.tempOfs - 1);
-	dirtyRegTemp(_G.tempOfs - 1);
+	emit6502op ("ror", TEMPFMT, getLastTempOfs() );
+	dirtyRegTemp(getLastTempOfs() );
 	rmwWithReg ("ror", m6502_reg_a);
       }
     loadRegTemp(m6502_reg_x);
@@ -7727,8 +7753,8 @@ static void XAccRsh (int shCount, bool sign)
   case 7:
     storeRegTempAlways(m6502_reg_x, true);
     rmwWithReg ("rol", m6502_reg_a);
-    emit6502op ("rol", TEMPFMT, _G.tempOfs - 1);
-    dirtyRegTemp(_G.tempOfs - 1);
+    emit6502op ("rol", TEMPFMT, getLastTempOfs() );
+    dirtyRegTemp(getLastTempOfs() );
     loadRegFromConst (m6502_reg_a, 0);
     rmwWithReg ("rol", m6502_reg_a);
     transferRegReg(m6502_reg_a, m6502_reg_x, true);
@@ -7742,8 +7768,8 @@ static void XAccRsh (int shCount, bool sign)
     storeRegTempAlways(m6502_reg_x, true);
     for (i = 0; i < shCount; i++)
       {
-        emit6502op ("lsr", TEMPFMT, _G.tempOfs - 1);
-        dirtyRegTemp(_G.tempOfs - 1);
+        emit6502op ("lsr", TEMPFMT, getLastTempOfs() );
+        dirtyRegTemp(getLastTempOfs() );
         rmwWithReg ("ror", m6502_reg_a);
       }
     loadRegTemp(m6502_reg_x);
@@ -8232,7 +8258,7 @@ static void genLeftShift (iCode * ic)
     emitComment (TRACEGEN|VVDBG, "  count is not a register");
     bool needpully = pushRegIfUsed (m6502_reg_y);
     loadRegFromAop (m6502_reg_y, AOP (right), 0);
-    count_offset=_G.tempOfs;
+    count_offset=getLastTempOfs();
     storeRegTemp (m6502_reg_y, true);
     pullOrFreeReg(m6502_reg_y, needpully);
   }
@@ -8265,7 +8291,7 @@ static void genLeftShift (iCode * ic)
   } else {
     emit6502op ("dec", TEMPFMT, count_offset);
     // FIXME: could keep it literal
-    dirtyRegTemp(_G.tempOfs - 1);
+    dirtyRegTemp(getLastTempOfs() );
     emitBranch ("bmi", tlbl1);
   }
 
@@ -8283,7 +8309,7 @@ static void genLeftShift (iCode * ic)
   } else {
     emit6502op("dec", TEMPFMT, count_offset );
     // FIXME: could keep it literal
-    dirtyRegTemp(_G.tempOfs - 1);
+    dirtyRegTemp(getLastTempOfs() );
     emit6502op("bpl", "%05d$", safeLabelNum (tlbl));
   }
 
@@ -8663,8 +8689,8 @@ static void genRightShift (iCode * ic)
     emitComment (TRACEGEN|VVDBG, "  count is not a register");
     bool needpully = pushRegIfUsed (m6502_reg_y);
     loadRegFromAop (m6502_reg_y, AOP (right), 0);
-    count_offset=_G.tempOfs;
     storeRegTemp (m6502_reg_y, true);
+    count_offset=getLastTempOfs();
     pullOrFreeReg(m6502_reg_y, needpully);
   }
 
@@ -8695,7 +8721,7 @@ static void genRightShift (iCode * ic)
   } else {
     emit6502op ("dec", TEMPFMT, count_offset);
     // could keep it literal
-    dirtyRegTemp(_G.tempOfs - 1);
+    dirtyRegTemp(getLastTempOfs() );
     emitBranch ("bmi", tlbl1);
   }
 
@@ -8713,7 +8739,7 @@ static void genRightShift (iCode * ic)
   } else {
     emit6502op("dec", TEMPFMT, count_offset );
     // FIXME: could keep it literal
-    dirtyRegTemp(_G.tempOfs - 1);
+    dirtyRegTemp(getLastTempOfs() );
     emit6502op("bpl", "%05d$", safeLabelNum (tlbl));
   }
 
@@ -8777,7 +8803,7 @@ static void bitAConst(int val)
         {
           loadRegFromConst(reg,val);
           storeRegTempAlways (reg, true);
-          emit6502op ("bit", TEMPFMT, _G.tempOfs-1);
+          emit6502op ("bit", TEMPFMT, getLastTempOfs() );
           loadRegTemp(NULL);
         }
       else
@@ -9478,7 +9504,7 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op("lda", INDFMT_IY);
       emit6502op("and", IMMDFMT, (unsigned int)mask);
-      emit6502op ("ora", TEMPFMT, _G.tempOfs-1);
+      emit6502op ("ora", TEMPFMT, getLastTempOfs() );
       loadRegFromConst(m6502_reg_y, yoff + offset);
       emit6502op ("sta", INDFMT_IY);
       //      loadRegTemp (m6502_reg_a);
@@ -9549,7 +9575,7 @@ static void genPackBits (operand * result, operand * left, sym_link * etype, ope
       storeRegTemp(m6502_reg_a, true);
       emit6502op("pla","");
       emit6502op("pha","");
-      emit6502op("ora", TEMPFMT, _G.tempOfs-1);
+      emit6502op("ora", TEMPFMT, getLastTempOfs() );
       loadRegTemp(NULL);
       //      storeRegIndexed (m6502_reg_a, litOffset+offset, rematOffset);
       loadRegFromConst(m6502_reg_y, yoff + offset);
@@ -9655,7 +9681,7 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
     
     loadRegFromAop (m6502_reg_a, derefaop, 0);
     emit6502op("and", IMMDFMT, (unsigned int)mask);
-    emit6502op ("ora", TEMPFMT, _G.tempOfs - 1);
+    emit6502op ("ora", TEMPFMT, getLastTempOfs() );
     storeRegToAop (m6502_reg_a, derefaop, 0);
     
     pullOrFreeReg (m6502_reg_a, needpulla);
@@ -9704,7 +9730,7 @@ static void genPackBitsImmed (operand * result, operand * left, sym_link * etype
     
     loadRegFromAop (m6502_reg_a, derefaop, offset);
     emit6502op("and", IMMDFMT, (unsigned int)mask);
-    emit6502op ("ora", TEMPFMT, _G.tempOfs - 1);
+    emit6502op ("ora", TEMPFMT, getLastTempOfs() );
     storeRegToAop (m6502_reg_a, derefaop, offset);
     pullOrFreeReg (m6502_reg_a, needpulla);
     loadRegTemp (NULL);
@@ -9805,7 +9831,8 @@ static void genPointerSet (iCode * ic)
       // use [aa,x] if only 1 byte and offset is 0
       loadRegFromAop (m6502_reg_a, AOP (right), 0);
       emit6502op ("sta", "[%s,x]", aopAdrStr ( AOP(result), 0, true ) );
-    } else
+    } 
+    else
       { }
 #endif
     needpulla = storeRegTempIfSurv (m6502_reg_a);
@@ -9913,15 +9940,17 @@ static void genPointerSet (iCode * ic)
   int aloc, xloc, yloc;
   deadA = m6502_reg_a->isDead;
 
-  aloc = _G.tempOfs;
   if(IS_AOP_WITH_A(AOP(right))) needpulla = storeRegTempIfUsed (m6502_reg_a);
   else needpulla = storeRegTempIfSurv (m6502_reg_a);
-  xloc = _G.tempOfs;
+  aloc = getLastTempOfs();
+
   if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF ) needpullx = storeRegTempIfUsed (m6502_reg_x);
   else needpullx = storeRegTempIfSurv (m6502_reg_x);
-  yloc = _G.tempOfs;
+  xloc = getLastTempOfs();
+
   if(IS_AOP_WITH_Y(AOP(right))) needpully = storeRegTempIfUsed (m6502_reg_y);
   else needpully = storeRegTempIfSurv (m6502_reg_y);
+  yloc = getLastTempOfs();
 
   /* if bit-field then pack */
   if (bit_field)
@@ -10226,7 +10255,7 @@ static void genJumpTab (iCode * ic)
     loadRegTemp(NULL);
     if (needpullind) pullReg(indreg);
     if (needpulla) pullReg(m6502_reg_a);
-    emit6502op ("jmp", TEMPFMT_IND, _G.tempOfs);
+    emit6502op ("jmp", TEMPFMT_IND, getLastTempOfs()+1);
 
     m6502_dirtyReg (m6502_reg_a);
     m6502_dirtyReg (m6502_reg_x);
@@ -10960,8 +10989,8 @@ genm6502Code (iCode *lic)
       emitComment (REGOPS|VVDBG, "  forgot to free xa");
     */
 
-    if (_G.tempOfs != 0)
-      emitcode("ERROR", "; forgot to free temp stack (%d)", _G.tempOfs);
+    if (getLastTempOfs() != -1 )
+      emitcode("ERROR", "; forgot to free temp stack (%d)", getLastTempOfs());
   }
 
   if (options.debug)

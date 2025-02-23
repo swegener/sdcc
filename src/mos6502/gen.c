@@ -1418,7 +1418,6 @@ adjustStack (int n)
     {
       // FIXME: A is incorrectly marked free and makes many regression fail
       bool needloada=storeRegTempIfUsed (m6502_reg_a);
-      //  bool needloada=storeRegTempIfSurv(m6502_reg_a);
       //  bool needloada = true;
       //  storeRegTemp(m6502_reg_a, true);
 
@@ -1673,10 +1672,10 @@ getFreeByteReg()
 {
   if (m6502_reg_a->isFree)
     return m6502_reg_a;
-  else if (m6502_reg_x->isFree)
-    return m6502_reg_x;
   else if (m6502_reg_y->isFree)
     return m6502_reg_y;
+  else if (m6502_reg_x->isFree)
+    return m6502_reg_x;
   else
     return NULL;
 }
@@ -1687,10 +1686,10 @@ getDeadByteReg()
 {
   if (m6502_reg_a->isDead)
     return m6502_reg_a;
-  else if (m6502_reg_x->isDead)
-    return m6502_reg_x;
   else if (m6502_reg_y->isDead)
     return m6502_reg_y;
+  else if (m6502_reg_x->isDead)
+    return m6502_reg_x;
   else
     return NULL;
 }
@@ -1799,6 +1798,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
               doTSX();
             }
           emit6502op ("sta", aopAdrStr (aop, loffset, false));
+          m6502_freeReg(m6502_reg_a);
           loadOrFreeRegTemp(m6502_reg_x, needloadx);
           break;
         case X_IDX:
@@ -1812,7 +1812,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         case XA_IDX:
           // options.stackAuto 
           //        pushReg(m6502_reg_a, true);
-          needloadx = storeRegTempIfSurv(m6502_reg_x);
+          needloadx = storeRegTempIfUsed(m6502_reg_x);
           storeRegTemp(m6502_reg_a, false);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
           doTSX();
@@ -1823,8 +1823,8 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
           loadOrFreeRegTemp(m6502_reg_x, needloadx);
           break;
         case YX_IDX:
-          needloada = storeRegTempIfSurv(m6502_reg_a);
-          needloadx = storeRegTempIfSurv(m6502_reg_x);
+          needloada = storeRegTempIfUsed(m6502_reg_a);
+          needloadx = storeRegTempIfUsed(m6502_reg_x);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
           doTSX();
           emit6502op ("sta", aopAdrStr (aop, loffset, false));
@@ -2080,8 +2080,8 @@ storeConstToAop (int c, asmop * aop, int loffset)
         }
       else 
         {
-          bool needpulla = pushRegIfSurv (m6502_reg_a);
-	  //          bool needpulla = storeRegTempIfSurv (m6502_reg_a);
+          bool needpulla = pushRegIfUsed(m6502_reg_a);
+	  //          bool needpulla = storeRegTempIfUsed (m6502_reg_a);
           loadRegFromConst (m6502_reg_a, c);
           storeRegToAop (m6502_reg_a, aop, loffset);
 	  //          loadOrFreeRegTemp (m6502_reg_a, needpulla);
@@ -2336,6 +2336,16 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       return;
     }
 
+#if 0
+    // same stack offset, no transfer
+    if(srcaop->type == AOP_SOF && dstaop->type == AOP_SOF)
+        if( (srcaop->aopu.aop_stk+srcofs) == (dstaop->aopu.aop_stk+dstofs) )
+          {
+            emitComment (TRACE_AOP|VVDBG, "    transferAopAop  AOP_SOF same offset");
+            return;
+          }
+#endif
+
   if (srcaop->type == AOP_LIT)
     {
       storeConstToAop (byteOfVal (srcaop->aopu.aop_lit, srcofs), dstaop, dstofs);
@@ -2360,6 +2370,7 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
 
       if (reg == NULL)
         {
+          // used vs. surv triggers failure on bug 3556 in stack-auto
 	  //          needpula = pushRegIfUsed (m6502_reg_a);
           needpula = storeRegTempIfSurv (m6502_reg_a);
           reg = m6502_reg_a;
@@ -3908,7 +3919,7 @@ asmopToBool (asmop *aop, bool resultInA)
 
     default:
       if (!resultInA)
-        needloada = storeRegTempIfSurv(m6502_reg_a);
+        needloada = storeRegTempIfUsed(m6502_reg_a);
 
       loadRegFromAop (m6502_reg_a, aop, offset--);
       if (isFloat)
@@ -3991,6 +4002,37 @@ static void genCopy (operand * result, operand * source)
       loadRegFromAop (m6502_reg_xa, AOP(source), 0);
       return;
     }
+#endif
+
+#if 0
+  if(AOP_TYPE (source) == AOP_SOF || AOP_TYPE(result) == AOP_SOF)
+  {
+    bool save_a, save_x;
+      save_a = storeRegTempIfSurv(m6502_reg_a);
+      save_x = storeRegTempIfSurv(m6502_reg_x);
+  offset=size-1;
+  while (offset>=0)
+    {
+
+      if(offset >= srcsize)
+      {
+          loadRegFromConst (m6502_reg_a, 0);
+          storeRegToAop (m6502_reg_a, AOP(result), offset);
+          m6502_reg_a->isFree=true;
+      }
+      else
+      {
+        loadRegFromAop (m6502_reg_a, AOP(source), offset);
+        storeRegToAop (m6502_reg_a, AOP(result), offset);
+        m6502_reg_a->isFree=true;
+      }
+      offset--;
+    }
+  loadOrFreeRegTemp(m6502_reg_x, save_x);
+  loadOrFreeRegTemp(m6502_reg_a, save_a);
+
+  return;
+  }
 #endif
 
   /* general case */
@@ -4377,7 +4419,8 @@ static void unsaveRegisters (iCode *ic)
 /**************************************************************************
  * pushSide
  *************************************************************************/
-static void pushSide (operand *oper, int size, iCode *ic)
+static void
+pushSide (operand *oper, int size, iCode *ic)
 {
   int offset = 0;
   //  bool xIsFree = m6502_reg_x->isFree;
@@ -7688,7 +7731,9 @@ static void shiftL1Left2Result (operand * left, int offl, operand * result, int 
     while (shCount--)
       rmwWithAop ("asl", AOP (result), 0);
   } else {
-    bool needpulla = pushRegIfSurv (m6502_reg_a);
+    // FIXME: this should be IfUsed but has a code size and perf regression
+    // likely the register is incorrectly marked used from the calling function
+    bool needpulla = pushRegIfSurv(m6502_reg_a);
     loadRegFromAop (m6502_reg_a, AOP (left), offl);
     /* shift left accumulator */
     AccLsh (shCount);
@@ -8295,7 +8340,7 @@ static void genrshTwo (operand * result, operand * left, int shCount, int sign)
 static void
 shiftRLong (operand * left, int offl, operand * result, int sign)
 {
-  bool needloada = storeRegTempIfSurv (m6502_reg_a);
+  bool needloada = storeRegTempIfUsed (m6502_reg_a);
   bool needloadx = false;
   char *first_op = "ERR";
 
@@ -8335,7 +8380,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 	}
       break;
     case MSB16:
-      needloadx = storeRegTempIfSurv (m6502_reg_x);
+      needloadx = storeRegTempIfUsed (m6502_reg_x);
 
       loadRegFromConst(m6502_reg_x,0);
       loadRegFromAop (m6502_reg_a, AOP (left), 3);
@@ -10286,8 +10331,7 @@ static void genCast (iCode * ic)
   
   offset = 0;
   size = AOP_SIZE (right);
-  if (AOP_SIZE (result) < size)
-    size = AOP_SIZE (result);
+
   while (size)
     {
       if (size == 1 && signExtend)

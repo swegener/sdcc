@@ -1,3 +1,8 @@
+2025-02-23 Gabriele Gorla <gorlik@yahoo.com>
+
+    * src/mos6502/gen.c:
+      Remove dead/redundant code.
+
 2025-02-22 Gabriele Gorla <gorlik@yahoo.com>
 
     * src/mos6502/gen.c:

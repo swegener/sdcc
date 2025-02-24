@@ -636,10 +636,16 @@ static bool argCont(const char *arg, char what)
     arg += 2; // Skip hex prefix to avoid false x positive.
 
   if (strlen(arg) == 0)
-    return FALSE;
+    return false;
 
-  if (arg[0] == '_' && what == 'a') // The STM8 has no a-relative addressing modes.
-    return FALSE;
+  if (arg[0] == '_')
+    {
+      if (what == 'a') // The STM8 has no a-relative addressing modes.
+        return false;
+      arg = strchr(arg, ','); // Skip over user-defined variable names.
+      if (!arg)
+        return false;
+    }
 
   return (strchr(arg, what) != NULL);
 }

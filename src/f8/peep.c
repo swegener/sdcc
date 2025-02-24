@@ -506,6 +506,13 @@ static bool argCont(const char *arg, char what)
   if (strlen(arg) == 0)
     return false;
 
+  if (arg[0] == '_')
+    {
+      arg = strchr(arg, ','); // Skip over user-defined variable names.
+      if (!arg)
+        return false;
+    }
+
   return (strchr(arg, what));
 }
 

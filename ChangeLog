@@ -1,3 +1,9 @@
+2025-02-24 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/f8/peep.c,
+	  src/stm8/peep.c:
+	  Improve notUsed accuracy based on patch #487 by Mike Vand.
+
 2025-02-23 Gabriele Gorla <gorlik@yahoo.com>
 
     * src/mos6502/gen.c:

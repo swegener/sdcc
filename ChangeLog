@@ -2,6 +2,7 @@
 
     * src/mos6502/gen.c:
       Remove dead/redundant code.
+      Improve loadRegFromAop, genRightShift and genLeftShift.
 
 2025-02-22 Gabriele Gorla <gorlik@yahoo.com>
 

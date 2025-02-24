@@ -8276,7 +8276,7 @@ genLeftShift (iCode * ic)
     loadRegTemp(NULL);
   }
 
-  if (x_in_regtempgenLeftShift)
+  if (x_in_regtemp)
     loadRegTemp(m6502_reg_x);
 
   if (maskedtopbyte) {

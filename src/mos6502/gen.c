@@ -5224,13 +5224,13 @@ static bool genPlusIncr (iCode * ic)
   unsigned int offset;
   symbol *tlbl = NULL;
 
-  emitComment (TRACEGEN, __func__);
-
   /* will try to generate an increment */
   /* if the right side is not a literal
      we cannot */
   if (AOP_TYPE (right) != AOP_LIT)
     return false;
+
+  emitComment (TRACEGEN, __func__);
 
   icount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -5395,13 +5395,16 @@ static void genPlus (iCode * ic)
       loadRegFromAop (m6502_reg_a, AOP(left), offset);
     if (clc)
       emitSetCarry(0);
-    if (!mayskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) ) {
+    if (!mayskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
+    {
       accopWithAop ("adc", AOP(right), offset);
       if (!size && maskedtopbyte)
         emit6502op ("and", IMMDFMT, topbytemask);
       mayskip = false;
       skip = false;
-    } else {
+    }
+    else
+    {
       skip = true;
     }
     if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX) {
@@ -5441,13 +5444,13 @@ static bool genMinusDec (iCode * ic)
   //  int offset;
   symbol *tlbl;
 
-  emitComment (TRACEGEN, __func__);
-
   /* will try to generate an increment */
   /* if the right side is not a literal
      we cannot */
   if (AOP_TYPE (right) != AOP_LIT)
     return false;
+
+  emitComment (TRACEGEN, __func__);
 
   icount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
   // TODO: genPlusIncr has a lot more, can merge?
@@ -7800,19 +7803,21 @@ static void shiftRLeftOrResult (operand * left, int offl, operand * result, int 
 }
 
 /**************************************************************************
- * genlshOne - left shift a one byte quantity by known count
+ * genlsh8 - left shift a one byte quantity by known count
  *************************************************************************/
-static void genlshOne (operand * result, operand * left, int shCount)
+static void
+genlsh8 (operand * result, operand * left, int shCount)
 {
-  emitComment (TRACEGEN, __func__);
+  emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
   shiftL1Left2Result (left, LSB, result, LSB, shCount);
 }
 
 /**************************************************************************
- * genlshTwo - left shift two bytes by known amount != 0
+ * genlsh16 - left shift two bytes by known amount != 0
  *************************************************************************/
-static void genlshTwo (operand * result, operand * left, int shCount)
+static void
+genlsh16 (operand * result, operand * left, int shCount)
 {
   bool needpulla, needpullx;
 
@@ -7821,7 +7826,7 @@ static void genlshTwo (operand * result, operand * left, int shCount)
     (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
   bool maskedtopbyte = (topbytemask != 0xff);
 
-  emitComment (TRACEGEN, __func__);
+  emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
   /* if shCount >= 8 */
   if (shCount >= 8) {
@@ -7949,11 +7954,11 @@ static void shiftLLong (operand * left, operand * result, int offr)
 }
 
 /**************************************************************************
- * genlshFour - shift four byte by a known amount != 0
+ * genlsh32 - shift four byte by a known amount != 0
  *************************************************************************/
-static void genlshFour (operand * result, operand * left, int shCount)
+static void
+genlsh32 (operand * result, operand * left, int shCount)
 {
-  emitComment (TRACEGEN, __func__);
   emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
   sym_link *resulttype = operandType (result);
@@ -8101,13 +8106,13 @@ static void genLeftShiftLiteral (operand * left, operand * right, operand * resu
   } else {
     switch (size) {
     case 1:
-      genlshOne (result, left, shCount);
+      genlsh8 (result, left, shCount);
       break;
     case 2:
-      genlshTwo (result, left, shCount);
+      genlsh16 (result, left, shCount);
       break;
     case 4:
-      genlshFour (result, left, shCount);
+      genlsh32 (result, left, shCount);
       break;
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
@@ -8301,12 +8306,14 @@ genLeftShift (iCode * ic)
 }
 
 /**************************************************************************
- * genrshOne - right shift a one byte quantity by known count
+ * genrsh8 - right shift a one byte quantity by known count
  *************************************************************************/
-static void genrshOne (operand * result, operand * left, int shCount, int sign)
+static void
+genrsh8 (operand * result, operand * left, int shCount, int sign)
 {
   bool needpulla;
-  emitComment (TRACEGEN, __func__);
+
+  emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
   if (shCount==0) return;
   needpulla = pushRegIfSurv (m6502_reg_a);
   loadRegFromAop (m6502_reg_a, AOP (left), 0);
@@ -8316,12 +8323,13 @@ static void genrshOne (operand * result, operand * left, int shCount, int sign)
 }
 
 /**************************************************************************
- * genrshTwo - right shift two bytes by known amount != 0
+ * genrsh16 - right shift two bytes by known amount != 0
  *************************************************************************/
-static void genrshTwo (operand * result, operand * left, int shCount, int sign)
+static void
+genrsh16 (operand * result, operand * left, int shCount, int sign)
 {
   bool needpulla, needpullx;
-  emitComment (TRACEGEN, __func__);
+  emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
   /* if shCount >= 8 */
   if (shCount >= 8) {
@@ -8430,16 +8438,16 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 }
 
 /**************************************************************************
- * genrshFour - shift four byte by a known amount != 0
+ * genrsh32 - shift four byte by a known amount != 0
  *************************************************************************/
-static void genrshFour (operand * result, operand * left, int shCount, int sign)
+static void
+genrsh32 (operand * result, operand * left, int shCount, int sign)
 {
   bool needloada = false;
   bool needloadx = false;
 
   /* TODO: handle cases where left == result */
 
-  emitComment (TRACEGEN, __func__);
   emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
   /* if shifting more that 3 bytes */
@@ -8550,15 +8558,15 @@ static void genRightShiftLiteral (operand * left, operand * right, operand * res
   } else {
     switch (size) {
     case 1:
-      genrshOne (result, left, shCount, sign);
+      genrsh8 (result, left, shCount, sign);
       break;
 
     case 2:
-      genrshTwo (result, left, shCount, sign);
+      genrsh16 (result, left, shCount, sign);
       break;
 
     case 4:
-      genrshFour (result, left, shCount, sign);
+      genrsh32 (result, left, shCount, sign);
       break;
     default:
       wassertl (0, "Invalid operand size in right shift.");

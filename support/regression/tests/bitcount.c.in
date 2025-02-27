@@ -5,7 +5,7 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC // Todo: Enable for all C23 implementations
+#if __STDC_VERSION_STDBIT_H__ >= 202311L
 #pragma std_c23
 #include <stdbit.h>
 #endif
@@ -15,7 +15,7 @@ volatile {type} i, j;
 void
 testCount(void)
 {
-#ifdef __SDCC // Todo: Enable for all C23 implementations
+#if __STDC_VERSION_STDBIT_H__ >= 202311L
 	i = 0x10;
 	j = ~i;
 	ASSERT (stdc_count_ones(i) == 1);

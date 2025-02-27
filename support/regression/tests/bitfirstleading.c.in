@@ -5,7 +5,7 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC // Todo: Enable for all C23 implementations
+#if __STDC_VERSION_STDBIT_H__ >= 202311L
 #pragma std_c23
 #include <stdbit.h>
 #endif
@@ -19,8 +19,7 @@ volatile {type} i;
 void
 testTrailing(void)
 {
-#ifdef __SDCC // Todo: Enable for all C23 implementations
-
+#if __STDC_VERSION_STDBIT_H__ >= 202311L
 	i = 0x0;
 	ASSERT (stdc_first_leading_one(i) == 0);
 	ASSERT (stdc_first_leading_zero(i) == 1);

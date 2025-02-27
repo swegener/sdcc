@@ -150,12 +150,12 @@ COMMON_SDCC = \
   gets.c \
   __assert.c \
   time.c \
-  __stdc_count_leading_zeros.c \
-  __stdc_count_trailing_onesull.c \
+  __stdc_leading_zeros.c \
+  __stdc_trailing_ones.c \
   __stdc_first_leading_one.c \
-  __stdc_first_trailing_oneull.c \
-  __stdc_count_onesull.c \
-  __stdc_bit_widthull.c \
+  __stdc_first_trailing_one.c \
+  __stdc_count_ones.c \
+  __stdc_bit_width.c \
   __stdc_bit_ceilull.c
 
 MODELS = small medium large huge

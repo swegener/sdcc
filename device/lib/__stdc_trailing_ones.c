@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   __stdc_count_leading_zeros.c - part of bit and byte utilitites
+   __stdc_trailing_ones.c - part of bit and byte utilitites
 
-   Copyright (C) 2022, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+   Copyright (c) 2022, Philipp Klaus Krause . philipp@colecovision.eu
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -30,14 +30,18 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <assert.h>
 
 static_assert(INT_FAST8_MAX >= ULLONG_WIDTH, "Unsuitable return type");
 
-int_fast8_t __stdc_count_leading_zeros(unsigned long long value, uint_fast8_t width)
+unsigned _BitInt(8) __stdc_count_trailing_ones(unsigned long long value)
 {
-	for(int_fast8_t i = width - 1; i >= 0; i--)
+	int_fast8_t count = 0;
+	for(uint_fast8_t i = 0; i < ULLONG_WIDTH; i++)
 		if(value & (1ull << i))
-			return (width - i - 1);
-	return width;
+			count++;
+		else
+			break;
+	return count;
 }
 

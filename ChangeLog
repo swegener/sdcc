@@ -1,3 +1,23 @@
+2025-02-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* .version,
+	  device/include/stdbit.h,
+	  device/lib/__stdc_bit_ceilull.c,
+	  device/lib/__stdc_first_leading_one.c,
+	  device/lib/incl.mk,
+	  device/lib/__stdc_bit_width.c,
+	  device/lib/__stdc_count_ones.c,
+	  device/lib/__stdc_first_trailing_one.c,
+	  device/lib/__stdc_leading_zeros.c,
+	  device/lib/__stdc_trailing_ones.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/bitcount.c.in,
+	  support/regression/tests/bitcountleading.c.in,
+	  support/regression/tests/bitcounttrailing.c.in,
+	  support/regression/tests/bitfirst.c.in,
+	  support/regression/tests/bitfirstleading.c.in:
+	  Make the C23 standard library bit and byte utilities (stdbit.h) more closely follow the final ISO C23 standard instead of the 2022 C2X draft.
+
 2025-02-24 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/f8/peep.c,

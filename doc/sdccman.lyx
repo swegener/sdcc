@@ -3159,6 +3159,11 @@ In 4.4.1,
  the address width in .rel files was increased from 24 bits to 32 bits for the z80 (and related) ports.
 \end_layout
 
+\begin_layout Itemize
+In 4.5.2,
+ the C23 standard library bit and byte utilities (stdbit.h) more closely follow the final ISO C23 standard instead of the 2022 C2X draft.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

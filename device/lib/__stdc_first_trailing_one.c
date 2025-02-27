@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   __stdc_first_trailing_oneull.c - part of bit and byte utilitites
+   __stdc_first_trailing_one.c - part of bit and byte utilitites
 
-   Copyright (C) 2022, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+   Copyright (c) 2022-2025, Philipp Klaus Krause . philipp@colecovision.eu
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -33,7 +33,7 @@
 
 static_assert(INT_FAST8_MAX >= ULLONG_WIDTH, "Unsuitable return type");
 
-int_fast8_t __stdc_first_trailing_oneull(unsigned long long value)
+unsigned _BitInt(8) __stdc_first_trailing_one(unsigned long long value)
 {
 	for(uint_fast8_t i = 0; i < ULLONG_WIDTH; i++)
 		if(value & (1ull << i))

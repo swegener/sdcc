@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   __stdc_bit_widthull.c - part of bit and byte utilitites
+   __stdc_bit_ceilhull.c - part of bit and byte utilitites
 
-   Copyright (C) 2022, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
+   Copyright (c) 2022-2025, Philipp Klaus Krause . philipp@colecovision.eu
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

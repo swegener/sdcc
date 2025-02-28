@@ -10200,11 +10200,52 @@ stack-auto
 \end_layout
 
 \begin_layout Subsection
-ISO C95
+ISO C94 (aka ISO C95)
 \end_layout
 
 \begin_layout Standard
 Use 
+\series bold
+
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+--std-c94
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+range none
+pageformat default
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c94
+\end_layout
+
+\end_inset
+
+
+\series default
+ or 
 \series bold
 
 \begin_inset Flex Code

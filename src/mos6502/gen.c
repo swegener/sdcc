@@ -2209,6 +2209,8 @@ storeRegToFullAop (reg_info *reg, asmop *aop, bool isSigned)
     case X_IDX:
     case Y_IDX:
 #if 0
+      // FIXME: this optimization reduce code size but increase runtime
+      // should conditionally add it when optmizing for size
       if ( IS_AOP_XA(aop) && regidx==A_IDX )
         {
           loadRegFromConst(m6502_reg_x,0);
@@ -3844,8 +3846,19 @@ asmopToBool (asmop *aop, bool resultInA)
         }
       else if (IS_AOP_XA (aop))
         {
-	  // FIXME: this optimization makes the code smaller (expected) and slower (unexpected)
 #if 0
+	  // FIXME: this optimization makes the code smaller and slower
+	  // should consider for size optimization
+
+	  if(m6502_reg_a->isDead && _G.lastflag!=A_IDX && _G.lastflag!=X_IDX)
+	    {
+	      storeRegTemp(m6502_reg_x, false);
+	      emitRegTempOp( "ora", getLastTempOfs() );
+	      loadRegTemp (NULL);
+	    }
+	  else
+#endif
+
           if(_G.lastflag==X_IDX) 
             {
 	      if (!(m6502_reg_x->isLitConst && m6502_reg_x->litConst==0 ) )
@@ -3853,7 +3866,6 @@ asmopToBool (asmop *aop, bool resultInA)
               emitCpz(A_IDX);
             }
           else
-#endif
             {
               emitCpz(A_IDX);
               if( !(m6502_reg_x->isLitConst && m6502_reg_x->litConst==0))
@@ -4057,7 +4069,8 @@ static void genCopy (operand * result, operand * source)
 /**************************************************************************
  * genNot - generate code for ! operation
  *************************************************************************/
-static void genNot (iCode * ic)
+static void
+genNot (iCode * ic)
 {
   operand *left = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
@@ -5174,7 +5187,7 @@ static void genLabel (iCode * ic)
 
 
   for(i=0;i<NUM_TEMP_REGS;i++)
-    _G.tempAttr[i].isLiteral=0;
+    dirtyRegTemp(i);
 
   _G.DPTRAttr[0].isLiteral=0;
   _G.DPTRAttr[1].isLiteral=0;
@@ -5241,7 +5254,8 @@ static bool genPlusIncr (iCode * ic)
     return false;
 
 #if 1
-  if(IS_AOP_XA (AOP (result)) && icount >=0 ) {
+  if(IS_AOP_XA (AOP (result)) && icount >=0 )
+ {
     loadRegFromAop (m6502_reg_xa, AOP (left), 0);
     if(icount) {
       tlbl = safeNewiTempLabel (NULL);
@@ -5267,7 +5281,8 @@ static bool genPlusIncr (iCode * ic)
 
   if (size==1 && AOP(result)->type==AOP_REG) {
     // if it's in a 8-bit register try to do small adjust
-    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount)) return true;
+    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount))
+       return true;
   }
 
   if(icount < 0 )
@@ -5311,15 +5326,16 @@ static bool genPlusIncr (iCode * ic)
 /**************************************************************************
  * genPlus - generates code for addition
  *************************************************************************/
-static void genPlus (iCode * ic)
+static void
+genPlus (iCode * ic)
 {
   operand *right  = IC_RIGHT (ic);
   operand *left   = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
 
+  bool carry = true;
   int size, offset = 0;
-  bool clc = true;
-  bool needpulla;
+  bool needpulla = false;
   bool earlystore = false;
   bool delayedstore = false;
   bool mayskip = true;
@@ -5328,8 +5344,6 @@ static void genPlus (iCode * ic)
   unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
     (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
   bool maskedtopbyte = (topbytemask != 0xff);
-
-  /* special cases :- */
 
   emitComment (TRACEGEN, __func__);
 
@@ -5347,8 +5361,6 @@ static void genPlus (iCode * ic)
       left = t;
     }
 
-  /* if I can do an increment instead
-     of add then GOOD for ME */
   if (!maskedtopbyte && genPlusIncr (ic))
     goto release;
 
@@ -5364,11 +5376,11 @@ static void genPlus (iCode * ic)
        && operandLitValue (right) <= 255
        && AOP_TYPE(result) != AOP_SOF )
     {
-
       if (sameRegs(AOP(result),AOP(left)))
         {
+	  symbol *skipInc = safeNewiTempLabel (NULL);
+
           emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
-          symbol *skipInc = safeNewiTempLabel (NULL);
           needpulla = pushRegIfSurv (m6502_reg_a);
           emitSetCarry(0);
           loadRegFromAop (m6502_reg_a, AOP(left), 0);
@@ -5393,20 +5405,21 @@ static void genPlus (iCode * ic)
       pullReg (m6502_reg_a);
     else
       loadRegFromAop (m6502_reg_a, AOP(left), offset);
-    if (clc)
+    if (carry)
       emitSetCarry(0);
+
     if (!mayskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
-    {
-      accopWithAop ("adc", AOP(right), offset);
-      if (!size && maskedtopbyte)
-        emit6502op ("and", IMMDFMT, topbytemask);
-      mayskip = false;
-      skip = false;
-    }
+      {
+	accopWithAop ("adc", AOP(right), offset);
+	if (!size && maskedtopbyte)
+	  emit6502op ("and", IMMDFMT, topbytemask);
+	mayskip = false;
+	skip = false;
+      }
     else
-    {
-      skip = true;
-    }
+      {
+	skip = true;
+      }
     if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX) {
       pushReg (m6502_reg_a, true);
       delayedstore = true;
@@ -5416,18 +5429,19 @@ static void genPlus (iCode * ic)
     offset++;
     m6502_freeReg (m6502_reg_a);
     if (!skip)
-      clc = false;              /* further adds must propagate carry */
+      carry = false;              /* further adds must propagate carry */
   }
   if (delayedstore)
     pullReg (m6502_reg_a);
+
   pullOrFreeReg (m6502_reg_a, needpulla);
 
   wassert (!earlystore || !delayedstore);
 
  release:
-  freeAsmop (result, NULL);
-  freeAsmop (right, NULL);
   freeAsmop (left, NULL);
+  freeAsmop (right, NULL);
+  freeAsmop (result, NULL);
 }
 
 /**************************************************************************
@@ -5538,8 +5552,6 @@ genMinus (iCode * ic)
     (0xff >> (8 - SPEC_BITINTWIDTH (resulttype) % 8)) : 0xff;
   bool maskedtopbyte = (topbytemask != 0xff);
 
-  asmop *leftOp, *rightOp;
-
   emitComment (TRACEGEN, __func__);
 
   aopOp (left, ic);
@@ -5548,10 +5560,6 @@ genMinus (iCode * ic)
 
   printIC(ic);
 
-
-  /* special cases :- */
-  /* if I can do an decrement instead
-     of subtract then GOOD for ME */
   if (!maskedtopbyte && genMinusDec (ic))
     goto release;
 
@@ -5559,17 +5567,17 @@ genMinus (iCode * ic)
 
   size = AOP_SIZE (result);
 
-  leftOp = AOP (left);
-  rightOp = AOP (right);
   offset = 0;
 
   if ( size==2 && AOP_TYPE (right) == AOP_LIT && !maskedtopbyte
        && operandLitValue (right) >= 0
        && operandLitValue (right) <= 255
-       && sameRegs(AOP(result),AOP(left))
-       && AOP_TYPE(result) != AOP_SOF ) {
+       && AOP_TYPE(result) != AOP_SOF
+       && sameRegs(AOP(result),AOP(left)) )
+    {
     symbol *skipDec = safeNewiTempLabel (NULL);
 
+    emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
     needpulla = pushRegIfSurv (m6502_reg_a);
     emitSetCarry(1);
     loadRegFromAop (m6502_reg_a, AOP(left), 0);
@@ -5586,27 +5594,34 @@ genMinus (iCode * ic)
     goto release;
   }
 
-#if 0
-  // FIXME: this makes several regression fail in stack-auto
-  if ( size==2 && IS_AOP_XA (AOP(left)) && !IS_AOP_XA(AOP(result)) &&
+//  if ( IS_AOP_XA(AOP(left)) && AOP_TYPE(result) == AOP_SOF)
+  if ( IS_AOP_XA (AOP(left)) && !IS_AOP_XA(AOP(result)) &&
        (AOP_TYPE(result) == AOP_SOF || AOP_TYPE(right) == AOP_SOF) )
-    {
-      storeRegTemp (m6502_reg_x, true);
+  {
+      bool restore_a = pushRegIfSurv(m6502_reg_a);
+      bool restore_x = !m6502_reg_x->isDead;
+      storeRegTemp(m6502_reg_x, true);
       emitSetCarry(1);
-      accopWithAop ("sbc", rightOp, 0);
+      accopWithAop ("sbc", AOP (right), 0);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
-      loadRegTemp (m6502_reg_a);
-      accopWithAop ("sbc", rightOp, 1);
+      loadRegTempAt(m6502_reg_a, getLastTempOfs() );
+      accopWithAop ("sbc", AOP (right), 1);
       storeRegToAop (m6502_reg_a, AOP (result), 1);
-    }
-#endif
 
+      if(restore_x)
+        loadRegTemp(m6502_reg_x);
+      else
+        loadRegTemp(NULL);
 
-  if (IS_AOP_A (rightOp)) {
+      pullOrFreeReg (m6502_reg_a, restore_a);
+      goto release;
+  }
+
+  if (IS_AOP_A (AOP(right))) {
     // op - a = neg(a - op) = not(a - op) + 1 = not(a - op - 1)
     needpulla = pushRegIfSurv (m6502_reg_a);
     emitSetCarry(0);
-    accopWithAop ("sbc", leftOp, offset);
+    accopWithAop ("sbc", AOP(left) , offset);
     emit6502op("eor", "#0xff");
     if (maskedtopbyte)
       emit6502op ("and", IMMDFMT, topbytemask);
@@ -5625,7 +5640,7 @@ genMinus (iCode * ic)
     if (AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX)
       {
 	storeRegTemp (m6502_reg_a, true);
-	loadRegFromAop (m6502_reg_a, leftOp, offset);
+	loadRegFromAop (m6502_reg_a, AOP(left), offset);
 	if (carry) {
 	  emitSetCarry(1);
 	}
@@ -5636,11 +5651,11 @@ genMinus (iCode * ic)
       {
 	emitComment (TRACEGEN|VVDBG, "    - default path");
 
-	loadRegFromAop (m6502_reg_a, leftOp, offset);
-	if (carry) {
+	loadRegFromAop (m6502_reg_a, AOP(left), offset);
+	if (carry)
 	  emitSetCarry(1);
-	}
-	accopWithAop ("sbc", rightOp, offset);
+
+	accopWithAop ("sbc", AOP(right), offset);
       }
     if (!size && maskedtopbyte)
       emit6502op ("and", IMMDFMT, topbytemask);
@@ -7754,12 +7769,9 @@ static void shiftL2Left2Result (operand * left, int offl, operand * result, int 
 
   if (!IS_AOP_XA (AOP (left)) && !IS_AOP_A (AOP (left)))
     needpula = pushRegIfUsed (m6502_reg_a);
-  else
-    needpula = false;
+
   if (!IS_AOP_XA (AOP (left)))
     needpulx = pushRegIfUsed (m6502_reg_x);
-  else
-    needpulx = false;
 
   loadRegFromAop (m6502_reg_xa, AOP (left), offl);
 
@@ -7773,7 +7785,8 @@ static void shiftL2Left2Result (operand * left, int offl, operand * result, int 
       rmwWithReg ("ror", m6502_reg_a);
       break;
     default:
-      for (i = 0; i < shCount; i++) {
+      for (i = 0; i < shCount; i++)
+      {
 	rmwWithReg ("asl", m6502_reg_a);
 	rmwWithReg ("rol", m6502_reg_x);
       }
@@ -7782,7 +7795,6 @@ static void shiftL2Left2Result (operand * left, int offl, operand * result, int 
 
   pullOrFreeReg (m6502_reg_x, needpulx);
   pullOrFreeReg (m6502_reg_a, needpula);
-
 }
 
 
@@ -7858,13 +7870,17 @@ genlsh16 (operand * result, operand * left, int shCount)
         }
       } else {
         needpulla = storeRegTempIfSurv (m6502_reg_a);
-        transferAopAop (AOP (left), 1, AOP(result), 1);
         loadRegFromAop (m6502_reg_a, AOP (left), 0);
-        while(shCount--) {
           emit6502op ("asl", "a");
-          rmwWithAop ("rol", AOP (result), 1);
+      	storeRegToAop (m6502_reg_a, AOP (result), 0);
+      	loadRegFromAop (m6502_reg_a, AOP (left), 1);
+        emit6502op ("rol", "a");
+        while(--shCount)
+        {
+	  rmwWithAop ("asl", AOP (result), 0);
+	  emit6502op ("rol", "a");
         }
-        storeRegToAop (m6502_reg_a, AOP (result), 0);
+	storeRegToAop (m6502_reg_a, AOP (result), 1);
         loadOrFreeRegTemp (m6502_reg_a, needpulla);
       }
     } else {
@@ -7900,7 +7916,8 @@ genlsh16 (operand * result, operand * left, int shCount)
  * shiftLLong - shift left one long from left to result
  * offr = LSB or MSB16
  *************************************************************************/
-static void shiftLLong (operand * left, operand * result, int offr)
+static void
+shiftLLong (operand * left, operand * result, int offr)
 {
   bool needpulla = false;
   bool needloadx = false;
@@ -7971,7 +7988,8 @@ genlsh32 (operand * result, operand * left, int shCount)
   /* TODO: deal with the &result == &left case */
 
   /* if shifting more that 3 bytes */
-  if (shCount >= 24) {
+  if (shCount >= 24)
+  {
     shCount -= 24;
     if (shCount)
       /* lowest order of left goes to the highest
@@ -7983,7 +8001,9 @@ genlsh32 (operand * result, operand * left, int shCount)
     storeConstToAop (0, AOP (result), MSB16);
     storeConstToAop (0, AOP (result), MSB24);
     return;
-  } else if (shCount >= 16) {
+  }
+  else if (shCount >= 16)
+ {
     /* more than two bytes */
     /* lower order two bytes goes to higher order two bytes */
     shCount -= 16;
@@ -8064,7 +8084,8 @@ genlsh32 (operand * result, operand * left, int shCount)
 /**************************************************************************
  * genRot - generates code for rotation
  *************************************************************************/
-static void genRot (iCode *ic)
+static void
+genRot (iCode *ic)
 {
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
@@ -9190,7 +9211,8 @@ static void genPointerGet (iCode * ic, iCode * ifx)
   aopOp (left, ic);
 
   /* if left is rematerialisable */
-  if (AOP_TYPE (left) == AOP_IMMD || AOP_TYPE (left) == AOP_LIT) {
+  if (AOP_TYPE (left) == AOP_IMMD || AOP_TYPE (left) == AOP_LIT)
+  {
     /* if result is not bit variable type */
     if (!IS_BITVAR (retype))
       genDataPointerGet (left, right, result, ic, ifx);
@@ -9280,21 +9302,28 @@ static void genPointerGet (iCode * ic, iCode * ifx)
             }
           }
         }
-      } else {
+      }
+       else
+        {
         // otherwise use [aa],y
-        if (IS_AOP_XA(AOP(result))) {
+	if (IS_AOP_XA(AOP(result)))
+         {
           // reverse order so A is last
           emitComment (TRACEGEN|VVDBG, "        %s: dest XA", __func__);
-          for (int i=size-1; i>=0; i--) {
+	  for (int i=size-1; i>=0; i--)
+           {
             loadRegFromConst(m6502_reg_y, litOffset + i);
             emit6502op ("lda", "[%s],y", aopAdrStr ( AOP(left), 0, true ) );
             storeRegToAop (m6502_reg_a, AOP (result), i);
           }
-        } else {
+	}
+        else
+        {
           // forward order
           emitComment (TRACEGEN|VVDBG, "        %s: dest generic", __func__);
           if (!IS_AOP_WITH_A(AOP(result))) needpulla = storeRegTempIfSurv (m6502_reg_a);
-          for (int i=0; i<size; i++) {
+	  for (int i=0; i<size; i++)
+            {
             loadRegFromConst(m6502_reg_y, litOffset + i);
             emit6502op ("lda", "[%s],y", aopAdrStr ( AOP(left), 0, true ) );
             storeRegToAop (m6502_reg_a, AOP (result), i);
@@ -10355,7 +10384,9 @@ static void genCast (iCode * ic)
                __func__, signExtend?"YES":"NO");
 
   // if the result size is <= source just copy
-  if(AOP_SIZE (result) <= AOP_SIZE (right) ) 
+  if( (AOP_SIZE (result) <= AOP_SIZE (right))  
+            || ((!signExtend) && !IS_AOP_A(AOP(right))) 
+      )
     {
       genCopy (result, right);
       goto release;

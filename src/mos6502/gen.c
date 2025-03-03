@@ -7453,7 +7453,7 @@ static void genRLC (iCode * ic)
   int size, offset;
   char *shift;
   bool resultInA = false;
-  //  bool needpula = false;
+  bool needpulla = false;
 
   emitComment (TRACEGEN, __func__);
 
@@ -7490,6 +7490,7 @@ static void genRLC (iCode * ic)
 
   /* now we need to put the carry into the
      lowest order byte of the result */
+  needpulla=pushRegIfSurv(m6502_reg_a);
   offset = 0;
   loadRegFromConst(m6502_reg_a, 0);
   emit6502op ("rol", "a");
@@ -7504,7 +7505,7 @@ static void genRLC (iCode * ic)
     }
   storeRegToAop (m6502_reg_a, AOP (result), offset);
 
-  //  pullOrFreeReg (m6502_reg_a, needpula);
+  pullOrFreeReg (m6502_reg_a, needpulla);
 
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);

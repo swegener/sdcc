@@ -2,6 +2,7 @@
 
     * src/mos6502/gen.c:
       Replace emitCpz with emitCmp. Replace label macros with functions.
+      Fix bug in genRLC.
 
 2025-03-02 Gabriele Gorla <gorlik@yahoo.com>
 

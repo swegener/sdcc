@@ -2,6 +2,7 @@
 
     * src/mos6502/gen.c:
       Improve genPlus, genMinus and genlsh16.
+      Several cosmetic changes to match sdcc coding style.
 
 2025-02-28 Philipp Klaus Krause <philipp@colecovision.eu>
 

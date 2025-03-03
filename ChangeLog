@@ -1,3 +1,8 @@
+2025-03-03 Gabriele Gorla <gorlik@yahoo.com>
+
+    * src/mos6502/gen.c:
+      Replace emitCpz with emitCmp. Replace label macros with functions.
+
 2025-03-02 Gabriele Gorla <gorlik@yahoo.com>
 
     * src/mos6502/gen.c:

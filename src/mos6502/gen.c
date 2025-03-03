@@ -148,10 +148,6 @@ const int STACK_TOP = 0x100;
 #define IS_AOPOFS_X(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_X))
 #define IS_AOPOFS_Y(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_Y))
 
-#define safeNewiTempLabel(a) ((regalloc_dry_run)?0:newiTempLabel(a))
-#define safeEmitLabel(a) do { if(!regalloc_dry_run && a) emitLabel(a); _G.lastflag=-1; _G.carryValid=0; } while(0)
-
-
 #define LSB     0
 #define MSB16   1
 #define MSB24   2
@@ -161,6 +157,31 @@ const int STACK_TOP = 0x100;
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
 #define AOP_OP(aop) aop->op
+
+symbol *
+safeNewiTempLabel(const char * a)
+{
+  if(regalloc_dry_run) return NULL;
+  else return newiTempLabel(a);
+}
+
+/**************************************************************************
+ * Returns the number for the label
+ *
+ * @param a  pointer to the label symbol
+ * @return label number
+ *************************************************************************/
+void
+safeEmitLabel(symbol * a)
+{ 
+  if(!regalloc_dry_run)
+    {
+      if (a) emitLabel(a);
+      else emitcode(";ERROR","  %s : called with NULL symbol", __func__ );
+    }
+  _G.lastflag=-1;
+  _G.carryValid=0;
+}
 
 /**************************************************************************
  * Returns the number for the label
@@ -199,6 +220,13 @@ int getLastTempOfs()
 int getLastFlag()
 {
   return _G.lastflag;
+}
+
+void
+setLastFlag(int reg_idx)
+{
+  // should check for out of bound
+  _G.lastflag=reg_idx;
 }
 
 /**************************************************************************
@@ -704,29 +732,34 @@ emitSetCarry(int c)
 }
 
 /**************************************************************************
- * emitCpz - emit CMP/CPX/CPY with #0x00 if necessary
+ * emitCmp - emit CMP/CPX/CPY with immediate if necessary
  *
- * @param reg_idx register index
- * @return return true if the instruction was necessary 
+ * @param reg pointer to register
+ * @param val immediate to compare with
+ * @return true if the instruction was necessary 
  *************************************************************************/
 static bool
-emitCpz (int reg_idx)
+emitCmp (reg_info *reg, unsigned char v)
 {
-  if(_G.lastflag==reg_idx) return false;
+  if(!reg)
+    emitcode ("ERROR", "  %s - reg is NULL", __func__);
 
-  switch(reg_idx)
+  if(v==0 && _G.lastflag==reg->rIdx)
+    return false;
+
+  switch(reg->rIdx)
     {
     case A_IDX:
-      emit6502op("cmp", "#0x00");
+      emit6502op("cmp", "#0x%02x", v);
       break;
     case X_IDX:
-      emit6502op("cpx", "#0x00");
+      emit6502op("cpx", "#0x%02x", v);
       break;
     case Y_IDX:
-      emit6502op("cpy", "#0x00");
+      emit6502op("cpy", "#0x%02x", v);
       break;
     default:
-      emitcode ("ERROR", "illegal %d reg_idx in emitCpz", reg_idx);
+      emitcode ("ERROR", " %s - illegal %d reg_idx", __func__, reg->rIdx);
       break;
     }
   return true;
@@ -1657,19 +1690,33 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
 }
 
 /**************************************************************************
+ * Find a free index register
+ *
+ * @return pointer to reg_info or NULL if no index register is available
+ *************************************************************************/
+static reg_info*
+getFreeIdxReg()
+{
+  if (m6502_reg_y->isFree)
+    return m6502_reg_y;
+  else if (m6502_reg_x->isFree)
+    return m6502_reg_x;
+  else
+    return NULL;
+}
+
+/**************************************************************************
  * Find any free 8-bit register
+ *
+ * @return pointer to reg_info or NULL if no register is available
  *************************************************************************/
 static reg_info*
 getFreeByteReg()
 {
   if (m6502_reg_a->isFree)
     return m6502_reg_a;
-  else if (m6502_reg_y->isFree)
-    return m6502_reg_y;
-  else if (m6502_reg_x->isFree)
-    return m6502_reg_x;
   else
-    return NULL;
+    return getFreeIdxReg();
 }
 
 // TODO: move more to this one?
@@ -2626,10 +2673,10 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
       // TODO: this sucks
       if (!strcmp("asr", rmwop))
         {
-          emit6502op("pha", "");
+          pushReg(m6502_reg_a, true);
           emit6502op("lda", aopAdrStr(aop, loffset, false)); // load
-          emit6502op("cmp", "#0x80");
-          emit6502op("pla", "");
+          emitCmp (m6502_reg_a, 0x80);
+          pullReg(m6502_reg_a);
           rmwop = "ror";
         }
       emit6502op (rmwop, aopAdrStr(aop, loffset, false));
@@ -3798,7 +3845,7 @@ asmopToBool (asmop *aop, bool resultInA)
           // result -> flags
           if (aop->type==AOP_REG)
             {
-              emitCpz(aop->aopu.aop_reg[0]->rIdx);
+	      emitCmp(aop->aopu.aop_reg[0], 0);
             }
           else
             {
@@ -3823,7 +3870,7 @@ asmopToBool (asmop *aop, bool resultInA)
   if (resultInA && size == 1 && !IS_AOP_A(aop) /*_G.lastflag!=A_IDX*/)
     {
       loadRegFromAop (m6502_reg_a, aop, 0);
-      emit6502op ("cmp", "#0x01");
+      emitCmp(m6502_reg_a, 0x01);
       loadRegFromConst (m6502_reg_a, 0);
       rmwWithReg ("rol", m6502_reg_a);
       return;
@@ -3831,8 +3878,10 @@ asmopToBool (asmop *aop, bool resultInA)
 #endif
 
   if(resultInA && size==1) {
-    if(IS_AOP_A(aop)) emitCpz(A_IDX);
-    else loadRegFromAop (m6502_reg_a, aop, 0);
+    if(IS_AOP_A(aop))
+      emitCmp(m6502_reg_a, 0);
+    else
+      loadRegFromAop (m6502_reg_a, aop, 0);
     goto end;
   }
 
@@ -3841,7 +3890,7 @@ asmopToBool (asmop *aop, bool resultInA)
     case AOP_REG:
       if (size==1)
         {  // A, X or Y
-          emitCpz(aop->aopu.aop_reg[0]->rIdx);
+	  emitCmp(aop->aopu.aop_reg[0], 0);
           return;
         }
       else if (IS_AOP_XA (aop))
@@ -3863,11 +3912,11 @@ asmopToBool (asmop *aop, bool resultInA)
 	      {
 		if (!(m6502_reg_x->isLitConst && m6502_reg_x->litConst==0 ) )
 		  emit6502op ("bne", "%05d$", safeLabelNum (tlbl));
-		emitCpz(A_IDX);
+		emitCmp(m6502_reg_a, 0);
 	      }
 	    else
 	      {
-		emitCpz(A_IDX);
+		emitCmp(m6502_reg_a, 0);
 		if( !(m6502_reg_x->isLitConst && m6502_reg_x->litConst==0))
 		  {
 		    emit6502op ("bne", "%05d$", safeLabelNum (tlbl));
@@ -3875,15 +3924,15 @@ asmopToBool (asmop *aop, bool resultInA)
 		    //          if(m6502_reg_a->isDead) 
 		    //            transferRegReg(m6502_reg_x, m6502_reg_a, true);
 		    //          else 
-		    emitCpz(X_IDX);
+		    emitCmp(m6502_reg_x, 0);
 		  }
 	      }
         }
       else if (IS_AOP_YX (aop))
         {
-          emitCpz(X_IDX);
+	  emitCmp(m6502_reg_x, 0);
           emit6502op ("bne", "%05d$", safeLabelNum (tlbl));
-          emitCpz(Y_IDX); // FIXME: needed?
+	  emitCmp(m6502_reg_y, 0); // FIXME: needed?
         }
       else
         {
@@ -5959,14 +6008,14 @@ genCmp (iCode * ic, iCode * ifx)
   else if (!sign && size == 1 && IS_AOP_X (AOP (left)) && isAddrSafe(right, m6502_reg_x) )
     {
       //    if (AOP_TYPE (right) == AOP_LIT && ullFromVal (AOP (right)->aopu.aop_lit) == 0)
-      //     emitCpz(X_IDX);
+      //     emitCmp(m6502_reg_x, 0);
       //   else
       accopWithAop ("cpx", AOP (right), offset);
     }
   else if (!sign && size == 1 && IS_AOP_Y (AOP (left)) && isAddrSafe(right, m6502_reg_y) )
     {
       //   if (AOP_TYPE (right) == AOP_LIT && ullFromVal (AOP (right)->aopu.aop_lit) == 0)
-      //    emitCpz(Y_IDX);
+      //    emitCmp(m6502_reg_y, 0);
       //   else
       accopWithAop ("cpy", AOP (right), offset);
     }
@@ -5976,14 +6025,14 @@ genCmp (iCode * ic, iCode * ifx)
         {
 #if 1
           symbol *tlbl3 = safeNewiTempLabel (NULL);
-          emitCpz(A_IDX);
+	  emitCmp(m6502_reg_a, 0);
           emitBranch ("beq", tlbl3);
           loadRegFromConst (m6502_reg_a, 1);
           safeEmitLabel (tlbl3);
           goto release;
 #else
           // in some corner cases the branches need carry
-          if(!emitCpz(A_IDX))
+	  if(!emitCmp(m6502_reg_a, 0))
             emit6502op("sec","");
 #endif
         }
@@ -6521,7 +6570,7 @@ genAnd (iCode * ic, iCode * ifx)
         {
           if(isLit && bitpos==7)
             {
-              emitCpz(A_IDX);
+	      emitCmp(m6502_reg_a, 0);
               genIfxJump (ifx, "n");
               goto release;
             }
@@ -6769,7 +6818,7 @@ genOr (iCode * ic, iCode * ifx)
 
       if( isLit && lit==0x00 ) 
 	{
-	  emitCpz(A_IDX);
+	  emitCmp(m6502_reg_a, 0);
 	  genIfxJump (ifx, "z");
 	  goto release;
 	}
@@ -6998,7 +7047,7 @@ genXor (iCode * ic, iCode * ifx)
 
       if( isLit && lit==0x00 ) 
 	{
-	  emitCpz(A_IDX);
+	  emitCmp(m6502_reg_a, 0);
 	  genIfxJump (ifx, "z");
 	  goto release;
 	}
@@ -7018,7 +7067,7 @@ genXor (iCode * ic, iCode * ifx)
 	  loadRegFromAop (m6502_reg_a, AOP (left), offset);
 	  if (bytemask == 0x00)
 	    {
-	      emitCpz(A_IDX);
+	      emitCmp(m6502_reg_a, 0);
 	    }
 	  else
 	    {
@@ -7525,7 +7574,7 @@ static void AccSRsh (int shCount)
   }
   // TODO: optimize? (asr?)
   for (i = 0; i < shCount; i++) {
-    emit6502op ("cmp", "#0x80");
+    emitCmp (m6502_reg_a, 0x80);
     emit6502op ("ror", "a");
   }
 }
@@ -8468,7 +8517,7 @@ genLeftShift (iCode * ic)
 
   if (countreg)
     {
-      emitCpz(countreg->rIdx);
+      emitCmp(countreg, 0);
       emitBranch ("beq", tlbl1);
     }
   else
@@ -8967,7 +9016,7 @@ genRightShift (iCode * ic)
 
   if (countreg)
     {
-      emitCpz(countreg->rIdx);
+      emitCmp(countreg, 0);
       emitBranch ("beq", tlbl1);
     }
   else
@@ -9365,7 +9414,7 @@ static void genUnpackBitsImmed (operand * left, operand *right, operand * result
 	  if (AOP_TYPE (result) == AOP_REG && AOP(result)->aopu.aop_reg[offset]->rIdx == A_IDX)
 	    assigned_a = true;
 	} else {
-	emitCpz(A_IDX);
+	emitCmp(m6502_reg_a, 0);
       }
       offset++;
     }
@@ -10561,17 +10610,14 @@ static bool genAssignLit (operand * result, operand * right)
 static void
 genAssign (iCode * ic)
 {
-  operand *result, *right;
+  operand *right  = IC_RIGHT (ic);
+  operand *result = IC_RESULT (ic);
 
   emitComment (TRACEGEN, __func__);
-
-  result = IC_RESULT (ic);
-  right = IC_RIGHT (ic);
 
   aopOp (right, ic);
   aopOp (result, ic);
   printIC(ic);
-
 
   if (!genAssignLit (result, right))
     genCopy (result, right);
@@ -10749,7 +10795,7 @@ static void genCast (iCode * ic)
       if (signExtend)
         {
           symbol *tlbl = safeNewiTempLabel (NULL);
-          emitCpz(A_IDX);
+	  emitCmp(m6502_reg_a, 0);
           emitBranch ("bpl", tlbl);
           storeConstToAop (0xff, AOP (result), 1);
           safeEmitLabel (tlbl);

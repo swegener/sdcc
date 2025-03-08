@@ -92,7 +92,7 @@ bool uselessDecl = true;
 
 %token <yychar> IDENTIFIER TYPE_NAME ADDRSPACE_NAME
 %token <val> CONSTANT
-%token SIZEOF LENGTHOF OFFSETOF
+%token SIZEOF COUNTOF OFFSETOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
 %token ATTR_START TOK_SEP
@@ -286,8 +286,8 @@ unary_expression
        }
    | SIZEOF unary_expression        { $$ = newNode (SIZEOF, NULL, $2); }
    | SIZEOF '(' type_name ')'       { $$ = newAst_VALUE (sizeofOp ($3)); }
-   | LENGTHOF unary_expression      { $$ = newNode (LENGTHOF, NULL, $2); }
-   | LENGTHOF '(' type_name ')'     { $$ = newAst_VALUE (lengthofOp ($3)); }
+   | COUNTOF unary_expression       { $$ = newNode (COUNTOF, NULL, $2); }
+   | COUNTOF '(' type_name ')'      { $$ = newAst_VALUE (countofOp ($3)); }
    | ALIGNOF '(' type_name ')'      { $$ = newAst_VALUE (alignofOp ($3)); }
    | OFFSETOF '(' type_name ',' offsetof_member_designator ')' { $$ = offsetofOp($3, $5); }
    | ROT '(' unary_expression ',' unary_expression ')'         { $$ = newNode (ROT, $3, $5); }

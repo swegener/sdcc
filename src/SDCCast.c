@@ -3633,7 +3633,7 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
         dtr = tree->right;
         break;
       case SIZEOF:
-      case LENGTHOF:
+      case COUNTOF:
       case TYPEOF:
       case TYPEOF_UNQUAL:
         /* don't allocate string if it is a sizeof argument */
@@ -5374,18 +5374,18 @@ decorateType (ast *tree, RESULT_TYPE resultType, bool reduceTypeAllowed)
       }
       /*------------------------------------------------------------------*/
       /*----------------------------*/
-      /*          _Lengthof         */
+      /*          _Countof          */
       /*----------------------------*/
-    case LENGTHOF:            /* evaluate without code generation, analogous to sizeof */
+    case COUNTOF:              /* evaluate without code generation, analogous to sizeof */
       {
         /* change the type to a integer */
         struct dbuf_s dbuf;
-        int length = getLength (tree->right->ftype);
+        int length = getElemCount (tree->right->ftype);
 
         dbuf_init (&dbuf, 128);
         dbuf_printf (&dbuf, "%d", length);
         if (!length && !IS_VOID (tree->right->ftype))
-          werrorfl (tree->filename, tree->lineno, E_LENGTHOF_INVALID_TYPE);
+          werrorfl (tree->filename, tree->lineno, E_COUNTOF_INVALID_TYPE);
         tree->type = EX_VALUE;
         tree->opval.val = constVal (dbuf_c_str (&dbuf));
         dbuf_destroy (&dbuf);
@@ -5998,23 +5998,23 @@ sizeofOp (sym_link *type)
 }
 
 /*-----------------------------------------------------------------*/
-/* lengthofOp - processes _Lengthof operation                      */
+/* countofOp - processes _Countof operation                        */
 /*-----------------------------------------------------------------*/
 value *
-lengthofOp (sym_link *type)
+countofOp (sym_link *type)
 {
   struct dbuf_s dbuf;
   value *val;
-  int length;
+  int count;
 
   /* make sure the type is complete and sane */
-  checkTypeSanity (type, "(_Lengthof)");
+  checkTypeSanity (type, "(_Countof)");
 
-  /* get the length and convert it to character  */
+  /* get the element count and convert it to character  */
   dbuf_init (&dbuf, 128);
-  dbuf_printf (&dbuf, "%d", length = getLength (type));
-  if (!length && !IS_VOID (type))
-    werror (E_LENGTHOF_INVALID_TYPE);
+  dbuf_printf (&dbuf, "%d", count = getElemCount (type));
+  if (!count && !IS_VOID (type))
+    werror (E_COUNTOF_INVALID_TYPE);
 
   /* now convert into value  */
   val = constVal (dbuf_c_str (&dbuf));

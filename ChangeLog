@@ -1,3 +1,19 @@
+2025-03-08 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* device/include/stdcountof.h,
+	  doc/sdccman.lyx,
+	  src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/countof.c,
+	  support/regression/tests/lengthof.c:
+	  Rename _Lengthof to _Countof/countof (C2y, n3469, see RFE #978).
+
 2025-03-04 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCralloc.hpp,

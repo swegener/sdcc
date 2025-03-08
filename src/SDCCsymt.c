@@ -1217,10 +1217,10 @@ getSize (sym_link * p)
 }
 
 /*------------------------------------------------------------------*/
-/* getLength - returns the number of elements in an array type      */
+/* getElemCount - returns the number of elements in an array type   */
 /*------------------------------------------------------------------*/
 unsigned int
-getLength (sym_link * p)
+getElemCount (sym_link * p)
 {
   /* if nothing return 0 */
   if (!p)

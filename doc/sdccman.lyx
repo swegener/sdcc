@@ -10992,7 +10992,27 @@ _Lengthof
 
 \end_inset
 
- Operator
+ Operator (Note:
+ renamed to 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+_Countof
+\end_layout
+
+\end_inset
+
+ following 
+\begin_inset CommandInset href
+LatexCommand href
+name "N3469"
+target "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3469.htm"
+literal "false"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize

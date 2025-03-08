@@ -198,7 +198,7 @@ ast *removeIncDecOps (ast *);
 ast *removePreIncDecOps (ast *);
 ast *removePostIncDecOps (ast *);
 value *sizeofOp (sym_link *);
-value *lengthofOp (sym_link *);
+value *countofOp (sym_link *);
 value *alignofOp (sym_link *);
 sym_link *typeofOp (ast *tree);
 ast *offsetofOp (sym_link * type, ast * snd);

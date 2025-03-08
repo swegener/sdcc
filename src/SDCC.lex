@@ -203,7 +203,8 @@ static void checkCurrFile (const char *s);
 "typeof_unqual"         { count (); TKEYWORD2X (TYPEOF_UNQUAL); }
 
  /* C2y */
-"_Lengthof"             { count (); return LENGTHOF; }
+"_Countof"              { count (); return COUNTOF; }
+"_Lengthof"             { count (); return COUNTOF; }  /* kept for compatibility with earlier drafts */
 
  /* SDCC-specific intrinsic named address spaces (as per Embedded C TS) */
 "__code"                { count (); TKEYWORD (CODE); }

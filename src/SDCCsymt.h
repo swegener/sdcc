@@ -696,7 +696,7 @@ value *checkStructIval (symbol *, value *);
 value *checkArrayIval (sym_link *, value *);
 value *checkIval (sym_link *, value *);
 unsigned int getSize (sym_link *);
-unsigned int getLength (sym_link *);
+unsigned int getElemCount (sym_link *);
 unsigned int bitsForType (sym_link *);
 sym_link *newBitIntLink (unsigned int width);
 sym_link *newIntLink ();

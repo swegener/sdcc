@@ -57,6 +57,7 @@ extern FILE *junkFile;
 #define  BIT_NAME          port->mem.bit_name
 #define  REG_NAME          port->mem.reg_name
 #define  STATIC_NAME       port->mem.static_name
+#define  GSFINAL_NAME      port->mem.post_static_name
 #define  HOME_NAME         port->mem.home_name
 #define  OVERLAY_NAME      port->mem.overlay_name
 #define  CONST_NAME        port->mem.const_name

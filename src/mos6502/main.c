@@ -211,7 +211,15 @@ m6502_getRegName (const struct reg_info *reg)
 static void
 m6502_genAssemblerStart (FILE * of)
 {
-  fprintf(of, ";; Ordering of segments for the linker.\n");
+  if (!options.noOptsdccInAsm)
+    {
+      fprintf (of, "\t.optsdcc -m%s\n", port->target);
+    }
+  fprintf (of, "\n");
+
+  fprintf(of, ";--------------------------------------------------------\n");
+  fprintf(of, ";  Ordering of segments for the linker.\n");
+  fprintf(of, ";--------------------------------------------------------\n");
   tfprintf (of, "\t!area\n", DATA_NAME);
   tfprintf (of, "\t!area\n", OVERLAY_NAME);
   //  if (options.xdata_overlay==0)
@@ -219,7 +227,7 @@ m6502_genAssemblerStart (FILE * of)
 
   tfprintf (of, "\t!area\n", HOME_NAME);
   tfprintf (of, "\t!area\n", STATIC_NAME);
-  tfprintf (of, "\t!area\n", "GSFINAL");
+  tfprintf (of, "\t!area\n", GSFINAL_NAME);
   tfprintf (of, "\t!area\n", CODE_NAME);
   tfprintf (of, "\t!area\n", CONST_NAME);
   tfprintf (of, "\t!area\n", XINIT_NAME);
@@ -229,18 +237,12 @@ m6502_genAssemblerStart (FILE * of)
   //  if(options.xdata_overlay)
   //      tfprintf (of, "\t!area    (OVR)\n", OVERLAY_NAME);
   tfprintf (of, "\t!area\n", XDATA_NAME);
-
-  if (!options.noOptsdccInAsm)
-    {
-      fprintf (of, "\t.optsdcc -m%s", port->target);
-      fprintf (of, "\n");
-    }
 }
 
 static void
 m65c02_genAssemblerStart (FILE * of)
 {
-  fprintf(of, "\t.r65c02\n\n");
+  fprintf(of, "\t.r65c02\n");
   m6502_genAssemblerStart (of);
 }
 
@@ -325,7 +327,7 @@ hasExtBitOp (int op, sym_link *left, int right)
         if (lbits > (unsigned)port->support.shift*8)
           return false;
         if (right % lbits  == 1 || right % lbits == lbits - 1)
-          return (true);
+          return true;
       }
       return false;
     }

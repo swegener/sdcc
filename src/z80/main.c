@@ -953,6 +953,20 @@ _z80_genAssemblerStart (FILE * of)
       fprintf (of, " sdcccall(%d)", options.sdcccall);
       fprintf (of, "\n");
     }
+
+  if (TARGET_IS_Z180)
+    fprintf (of, "\t.hd64\n");
+  else if (TARGET_IS_R3KA)
+    fprintf (of, "\t.r3k\n");
+  else if (TARGET_IS_EZ80_Z80)
+    fprintf (of, "\t.ez80\n");
+  else if (TARGET_IS_Z80N)
+    fprintf (of, "\t.zxn\n");
+  else if (TARGET_IS_R800)
+    fprintf (of, "\t.r800\n");
+  else if (TARGET_IS_Z80 && options.allow_undoc_inst)
+    fprintf (of, "\t.allow_undocumented\n");
+
 }
 
 static bool

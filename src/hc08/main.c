@@ -208,22 +208,24 @@ _hc08_genAssemblerStart (FILE * of)
   mainExists->block=0;
 
   if (!options.noOptsdccInAsm)
-    {
-      fprintf (of, "\t.optsdcc -m%s", port->target);
-      fprintf (of, "\n");
-    }
+    fprintf (of, "\t.optsdcc -m%s\n", port->target);
 
-  fprintf (of, "\t.area %s\n",HOME_NAME);
-  fprintf (of, "\t.area GSINIT0 (CODE)\n");
-  fprintf (of, "\t.area %s\n",port->mem.static_name);
-  fprintf (of, "\t.area %s\n",port->mem.post_static_name);
-  fprintf (of, "\t.area %s\n",CODE_NAME);
-  fprintf (of, "\t.area %s\n",port->mem.xinit_name);
-  fprintf (of, "\t.area %s\n",port->mem.const_name);
-  fprintf (of, "\t.area %s\n",port->mem.data_name);
-  fprintf (of, "\t.area %s\n",port->mem.overlay_name);
-  fprintf (of, "\t.area %s\n",port->mem.xdata_name);
-  fprintf (of, "\t.area %s\n",port->mem.xidata_name);
+  if (TARGET_IS_S08)
+    fprintf (of, "\t.cs08\n");
+
+  fprintf (of, "\n");
+
+  tfprintf (of, "\t!area\n",HOME_NAME);
+  tfprintf (of, "\t.area GSINIT0 (CODE)\n");
+  tfprintf (of, "\t!area\n",STATIC_NAME);
+  tfprintf (of, "\t!area\n",GSFINAL_NAME);
+  tfprintf (of, "\t!area\n",CODE_NAME);
+  tfprintf (of, "\t!area\n",XINIT_NAME);
+  tfprintf (of, "\t!area\n",CONST_NAME);
+  tfprintf (of, "\t!area\n",DATA_NAME);
+  tfprintf (of, "\t!area\n",OVERLAY_NAME);
+  tfprintf (of, "\t!area\n",XDATA_NAME);
+  tfprintf (of, "\t!area\n",XIDATA_NAME);
 
   if ((mainExists=findSymWithLevel(SymbolTab, mainExists)))
     {

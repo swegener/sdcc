@@ -5050,6 +5050,11 @@ genAnd (const iCode *ic, iCode *ifx)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
 
       wassertl (right->aop->type == AOP_LIT, "Code generation for bitwise and can only jump on literal operand");
+
+      // No point checking the upper bytes. They can only be nonzero if the topmost bit of the lower bytes is already.
+      if (left->aop->size < size)
+        size = left->aop->size;
+
       // Find the non-zero byte.
       for (j = 0, nonzero = 0, i = -1; j < size; j++)
         if (byteOfVal (right->aop->aopu.aop_lit, j))

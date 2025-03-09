@@ -6595,9 +6595,9 @@ static void
 genAnd (const iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
-  int size, i, j, omitbyte = -1;
-  bool pushed_a = FALSE;
-  bool result_in_a = FALSE;
+  int i, j, omitbyte = -1;
+  bool pushed_a = false;
+  bool result_in_a = false;
 
   D (emit2 ("; genAnd", ""));
 
@@ -6605,7 +6605,7 @@ genAnd (const iCode *ic, iCode *ifx)
   aopOp ((right = IC_RIGHT (ic)), ic, false);
   aopOp ((result = IC_RESULT (ic)), ic, true);
 
-  size = getSize (operandType (result));
+  int size = getSize (operandType (result));
 
   /* Prefer literal operand on right */
   if (left->aop->type == AOP_LIT ||
@@ -6623,6 +6623,10 @@ genAnd (const iCode *ic, iCode *ifx)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
 
       wassertl (right->aop->type == AOP_LIT, "Code generation for bitwise and can only jump on literal operands");
+
+      // No point checking the upper bytes. They can only be nonzero if the topmost bit of the lower bytes is already.
+      if (left->aop->size < size)
+        size = left->aop->size;
 
       // Find the non-zero byte.
       for (j = 0, nonzero = 0, i = -1; j < size; j++)

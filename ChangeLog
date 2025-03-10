@@ -1,3 +1,17 @@
+2025-03-10 Gabriele Gorla <gorlik@yahoo.com>
+
+    * src/mos6502/gen.c:
+      Rewrite genrsh32.
+      
+2025-03-09 Gabriele Gorla <gorlik@yahoo.com>
+
+    * src/z80/main.c,
+      src/mos6502/main.c,
+      src/hc08/main.c,
+      src/SDCCglue.c,
+      src/SDCCmem.h:
+      Move port specific assembler directives to genAssemblerStart.
+
 2025-03-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/stm8/gen.c,

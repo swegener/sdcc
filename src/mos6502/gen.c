@@ -5737,47 +5737,48 @@ genMinus (iCode * ic)
 
   needpulla = storeRegTempIfSurv (m6502_reg_a);
 
-  while (size--) {
-    if (earlystore &&
-        (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX ||
-         AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX))
-      pullReg (m6502_reg_a);
-    if (AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX)
-      {
-	storeRegTemp (m6502_reg_a, true);
-	loadRegFromAop (m6502_reg_a, AOP(left), offset);
-	if (carry) {
-	  emitSetCarry(1);
+  while (size--)
+    {
+      if (earlystore &&
+	  (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX ||
+	   AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX))
+	pullReg (m6502_reg_a);
+      if (AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX)
+	{
+	  storeRegTemp (m6502_reg_a, true);
+	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
+	  if (carry) {
+	    emitSetCarry(1);
+	  }
+	  emitRegTempOp("sbc", getLastTempOfs() );
+	  loadRegTemp (NULL);
 	}
-	emitRegTempOp("sbc", getLastTempOfs() );
-	loadRegTemp (NULL);
-      }
-    else
-      {
-	emitComment (TRACEGEN|VVDBG, "    - default path");
+      else
+	{
+	  emitComment (TRACEGEN|VVDBG, "    - default path");
 
-	loadRegFromAop (m6502_reg_a, AOP(left), offset);
-	if (carry)
-	  emitSetCarry(1);
+	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
+	  if (carry)
+	    emitSetCarry(1);
 
-	accopWithAop ("sbc", AOP(right), offset);
-      }
-    if (!size && maskedtopbyte)
-      emit6502op ("and", IMMDFMT, topbytemask);
-    if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
-      {
-	emitComment (TRACEGEN|VVDBG, "    - push");
-	pushReg (m6502_reg_a, true);
-	delayedstore = true;
-      }
-    else
-      {
-	emitComment (TRACEGEN|VVDBG, "    - store");
-	storeRegToAop (m6502_reg_a, AOP (result), offset);
-      }
-    offset++;
-    carry = false;
-  }
+	  accopWithAop ("sbc", AOP(right), offset);
+	}
+      if (!size && maskedtopbyte)
+	emit6502op ("and", IMMDFMT, topbytemask);
+      if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
+	{
+	  emitComment (TRACEGEN|VVDBG, "    - push");
+	  pushReg (m6502_reg_a, true);
+	  delayedstore = true;
+	}
+      else
+	{
+	  emitComment (TRACEGEN|VVDBG, "    - store");
+	  storeRegToAop (m6502_reg_a, AOP (result), offset);
+	}
+      offset++;
+      carry = false;
+    }
   if(delayedstore)
     pullReg (m6502_reg_a);
   loadOrFreeRegTemp (m6502_reg_a, needpulla);
@@ -8747,11 +8748,13 @@ genLeftShift (iCode * ic)
 static void
 genrsh8 (operand * result, operand * left, int shCount, int sign)
 {
-  bool needpulla;
+  bool needpulla = false;;
 
   emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
-  if (shCount==0) return;
-  needpulla = pushRegIfSurv (m6502_reg_a);
+  if (shCount==0)
+    return;
+  if(!IS_AOP_A(AOP(result)))
+    needpulla = pushRegIfSurv (m6502_reg_a);
   loadRegFromAop (m6502_reg_a, AOP (left), 0);
   AccRsh (shCount, sign);
   storeRegToFullAop (m6502_reg_a, AOP (result), sign);
@@ -8798,37 +8801,564 @@ genrsh16 (operand * result, operand * left, int shCount, int sign)
 }
 
 /**************************************************************************
- * shiftRLong - shift right one long from left to result
- * offl = LSB or MSB16
+ * shiftRLongInPlace - shift left one long in place
+ *
+ * @param result pointer to the dst aop
+ * @param shift  number of shifts (must be >=0 and <8)
+ * @param ofs    LSB to begin the shift (must be >=0 and <4)
+ * @param msb_in_a MSB is already in A
  *************************************************************************/
 static void
-shiftRLong (operand * left, int offl, operand * result, int sign)
+shiftRLongInPlace (operand * result, int shift, int ofs, int sign, bool msb_in_a)
 {
-  bool needloada = storeRegTempIfUsed (m6502_reg_a);
-  bool needloadx = false;
-  char *first_op = "ERR";
+  int i;
 
-  switch(offl)
+  if(shift==0)
+    return;
+
+#if 0
+  if(!msb_in_a && shift==1 /*|| (shift==2 && AOP_TYPE(result)==AOP_DIR) */ )
     {
-    case LSB:
-      first_op = (sign) ? "ror" : "lsr";
-      if(sign  || ! sameRegs (AOP (left), AOP (result)))
-        {
-	  loadRegFromAop (m6502_reg_a, AOP (left), 3);
-	  if(sign)
-	      emitCmp(m6502_reg_a, 0x80);     
-        }
-
-      if(sameRegs (AOP (left), AOP (result)))
-        {
-          rmwWithAop (first_op, AOP(result), 3);
-          rmwWithAop ("ror", AOP(result), 2);      
-          rmwWithAop ("ror", AOP(result), 1);      
-          rmwWithAop ("ror", AOP(result), 0);      
-        }
+      while(shift--)
+	{
+	  rmwWithAop ("lsr", AOP(result), 3-ofs);
+          for(i=2-ofs;i>=0;i--)
+	    {
+	      rmwWithAop ("ror", AOP(result), i);
+	    }
+	}
       else
 	{
-	  rmwWithReg (first_op, m6502_reg_a);
+
+	  if(!lsb_in_a)
+	    loadRegFromAop (m6502_reg_a, AOP (result), 0);
+	  while(shift)
+	    {
+	      if(ofs<3)
+		rmwWithAop ("lsr", AOP(result), ofs);
+	      if(ofs<2)
+		rmwWithAop ("ror", AOP(result), ofs+1);
+	      if(ofs<1)
+		rmwWithAop ("ror", AOP(result), ofs+2);
+
+	      if(ofs==3)
+		rmwWithReg ("lsr", m6502_reg_a);
+	      else
+		rmwWithReg ("ror", m6502_reg_a);
+	      --shift;
+	    }
+	  if(!lsb_in_a)
+	    storeRegToAop (m6502_reg_a, AOP (result), 0);
+	}
+    }
+#else
+  if(!msb_in_a)
+    loadRegFromAop (m6502_reg_a, AOP (result), 3-ofs);
+
+  while(shift)
+    {
+      if(sign)
+	{
+	  emitCmp(m6502_reg_a, 0x80);
+	  rmwWithReg ("ror", m6502_reg_a);
+	}
+      else
+	rmwWithReg ("lsr", m6502_reg_a);
+      for(i=2-ofs;i>=0;i--)
+	rmwWithAop ("ror", AOP(result), i);
+
+      --shift;
+    }
+  if(!msb_in_a)
+    storeRegToAop (m6502_reg_a, AOP (result), 3-ofs);
+#endif
+}
+
+/**************************************************************************
+ * shiftRLong1 - shift right one long from left to result
+ *
+ * @param left  pointer to the src aop
+ * @param result  pointer to the dst aop
+ * @param shift  number of shifts (must be >=16 and <24)
+ *************************************************************************/
+static void
+shiftRLong1 (operand * left, operand * result, int shift, int sign)
+{
+
+  bool needpulla = false;
+
+  wassertl(shift>=24, "shiftRLong3 - shift<24");
+  wassertl(shift<32, "shiftRLong3 - shift>=32");
+
+  needpulla = pushRegIfUsed (m6502_reg_a);
+
+  if (shift>29)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      emit6502op ("asl", "a");
+
+      if(shift!=31)
+	storeRegTemp(m6502_reg_a, true);
+      if(sign)
+	{
+	  //	  signExtendA();
+	  //  emit6502op ("asl", "a");
+	  loadRegFromConst (m6502_reg_a, 0);
+	  emit6502op ("adc", "#0xff");
+	  emit6502op ("eor", "#0xff");
+	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	}
+      else
+	{
+	  //	  rmwWithReg ("asl", m6502_reg_a);
+	  loadRegFromConst(m6502_reg_a, 0);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  rmwWithReg ("rol", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+	}
+
+      if(shift!=31)
+        {
+	  while(shift!=31)
+	    {
+	      emitRegTempOp( "rol", getLastTempOfs() );
+	      rmwWithAop ("rol", AOP (result), 0);
+              shift++;
+	    }
+	  loadRegTemp(NULL);
+        }
+
+      goto release;
+    }
+  else if(shift==24)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      //	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+      shift=0;
+    }
+  else
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      if(sign)
+	{
+	  emitCmp(m6502_reg_a, 0x80);     
+	  rmwWithReg ("ror", m6502_reg_a);
+        }
+      else
+	rmwWithReg ("lsr", m6502_reg_a);
+
+      shift-=25;
+    }
+
+  shiftRLongInPlace (result, shift, 3, sign, true);
+  storeRegToAop (m6502_reg_a, AOP (result), 0);
+
+  if(sign)
+    {
+      signExtendA();
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 3);
+
+    }
+  else
+    {
+      storeConstToAop (0, AOP (result), 1);
+      storeConstToAop (0, AOP (result), 2);
+      storeConstToAop (0, AOP (result), 3);
+    }
+
+
+
+ release:
+  pullOrFreeReg (m6502_reg_a, needpulla);
+}
+
+/**************************************************************************
+ * shiftRLong2 - shift right one long from left to result
+ *
+ * @param left  pointer to the src aop
+ * @param result  pointer to the dst aop
+ * @param shift  number of shifts (must be >=16 and <24)
+ *************************************************************************/
+static void
+shiftRLong2 (operand * left, operand * result, int shift, int sign)
+{
+
+  bool needpulla = false;
+
+  wassertl(shift>=16, "shiftRLong3 - shift<16");
+  wassertl(shift<24, "shiftRLong3 - shift>23");
+
+  needpulla = pushRegIfUsed (m6502_reg_a);
+
+  if(shift>20)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      rmwWithReg ("rol", m6502_reg_a);
+      if(shift!=23)
+	storeRegTemp(m6502_reg_a, true);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegFromConst (m6502_reg_a, 0);
+      if(sign)
+	{
+	  emit6502op ("adc", "#0xff");
+	  emit6502op ("eor", "#0xff");
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	}
+      else
+	{
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+          rmwWithReg ("rol", m6502_reg_a);
+          storeRegToAop (m6502_reg_a, AOP (result), 1);
+	}
+
+      if(shift!=23)
+        {
+	  while(shift!=23)
+	    {
+	      emitRegTempOp( "rol", getLastTempOfs() );
+	      rmwWithAop ("rol", AOP (result), 0);
+	      rmwWithAop ("rol", AOP (result), 1);
+              shift++;
+	    }
+	  loadRegTemp(NULL);
+        }
+
+      goto release;
+    }
+  else if(shift==16)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      shift=0;
+    }
+  else
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      if(sign)
+	{
+	  emitCmp(m6502_reg_a, 0x80);
+	  rmwWithReg ("ror", m6502_reg_a);
+	}
+      else
+	rmwWithReg ("lsr", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+
+
+      shift-=17;
+      loadRegFromAop (m6502_reg_a, AOP (result), 1);
+ 
+    }
+
+  shiftRLongInPlace (result, shift, 2, sign, false);
+
+  if(sign)
+    {
+      signExtendA();
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 3);
+
+    }
+  else
+    {
+      storeConstToAop (0, AOP (result), 2);
+      storeConstToAop (0, AOP (result), 3);
+    }
+
+ release:
+  pullOrFreeReg (m6502_reg_a, needpulla);
+}
+
+/**************************************************************************
+ * shiftRLong3 - shift right one long from left to result
+ *
+ * @param left  pointer to the src aop
+ * @param result  pointer to the dst aop
+ * @param shift  number of shifts (must be >0 and <8)
+ *************************************************************************/
+static void
+shiftRLong3 (operand * left, operand * result, int shift, int sign)
+{
+
+  bool needpulla = false;
+  bool needpullx = false;
+
+  wassertl(shift>=8, "shiftRLong3 - shift<8");
+  wassertl(shift<16, "shiftRLong3 - shift>15");
+
+  needpulla = pushRegIfUsed (m6502_reg_a);
+
+  if(shift>12)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 1);
+      rmwWithReg ("rol", m6502_reg_a);
+      if(shift!=15)
+	storeRegTemp(m6502_reg_a, true);
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      if(sign)
+	{
+	  loadRegFromConst(m6502_reg_a, 0);
+	  emit6502op("adc", "#0xff");
+	  emit6502op("eor", "#0xff");
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	}
+      else
+	{
+          loadRegFromConst(m6502_reg_a, 0);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3); // out of order store
+	  rmwWithReg ("rol", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	}
+
+      if(shift!=15)
+        {
+	  while(shift!=15)
+	    {
+	      emitRegTempOp( "rol", getLastTempOfs() );
+	      rmwWithAop ("rol", AOP (result), 0);
+	      rmwWithAop ("rol", AOP (result), 1);
+	      rmwWithAop ("rol", AOP (result), 2);
+              shift++;
+	    }
+	  loadRegTemp(NULL);
+        }
+
+      goto release;
+    }
+  else if(shift==8)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 1);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      shift=0;
+    }
+  else if (shift==9 && sameRegs (AOP (left), AOP (result)) && sign)
+    {
+      needpullx = storeRegTempIfUsed (m6502_reg_x);
+      loadRegFromConst(m6502_reg_x, 0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      //            if(sign)
+      //              {
+      symbol *tlbl = safeNewiTempLabel (NULL);
+
+      emitCmp(m6502_reg_a, 0x80);
+      emitBranch ("bcc", tlbl);
+      rmwWithReg ("dec", m6502_reg_x);
+      safeEmitLabel(tlbl);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_x, AOP (result), 3);
+      //              }
+      //            else
+      //	      rmwWithReg ("lsr", m6502_reg_a);
+
+      loadRegFromAop (m6502_reg_x, AOP (left), 2);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+      transferRegReg(m6502_reg_x, m6502_reg_a, true);
+      rmwWithReg ("ror", m6502_reg_a);
+      loadRegFromAop (m6502_reg_x, AOP (left), 1);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      transferRegReg(m6502_reg_x, m6502_reg_a, true);
+      rmwWithReg ("ror", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+
+      goto release;
+    }
+  else
+    {
+      if(!sameRegs (AOP (left), AOP (result)) && shift==12)
+	{
+	  loadRegFromAop (m6502_reg_a, AOP (left), 3);
+	  rmwWithReg ("lsr", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  loadRegFromAop (m6502_reg_a, AOP (left), 2);
+          rmwWithReg ("ror", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  loadRegFromAop (m6502_reg_a, AOP (left), 1);
+          rmwWithReg ("ror", m6502_reg_a);
+	  //	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+          shift-=9;
+	  for(int i=0;i<shift;i++)
+	    {
+	      rmwWithAop ("lsr", AOP(result), 2);
+	      rmwWithAop ("ror", AOP(result), 1);
+	      rmwWithReg ("ror", m6502_reg_a);
+	    }
+	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+          if(sign)
+	    {
+	      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+	      signExtendA();
+	      storeRegToAop (m6502_reg_a, AOP (result), 3);
+	      emit6502op("and", "#0xf0");
+	      rmwWithAop ("ora", AOP(result), 2);
+	      storeRegToAop (m6502_reg_a, AOP (result), 2);          
+	    }
+          else
+	    {
+	      storeConstToAop (0, AOP (result), 3);
+	    }
+	  goto release;
+	}
+      else if(!sameRegs (AOP (left), AOP (result)))
+	{
+	  loadRegFromAop (m6502_reg_a, AOP (left), 3);
+	  if(sign)
+	    {
+	      emitCmp(m6502_reg_a, 0x80);
+	      rmwWithReg ("ror", m6502_reg_a);
+	    }
+	  else
+	    rmwWithReg ("lsr", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  loadRegFromAop (m6502_reg_a, AOP (left), 2);
+	  rmwWithReg ("ror", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  loadRegFromAop (m6502_reg_a, AOP (left), 1);
+	  rmwWithReg ("ror", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+	}
+      else
+        {
+          needpullx = storeRegTempIfUsed (m6502_reg_x);
+	  loadRegFromAop (m6502_reg_a, AOP (left), 3);
+	  if(sign)
+	    {
+	      emitCmp(m6502_reg_a, 0x80);
+	      rmwWithReg ("ror", m6502_reg_a);
+	    }
+	  else
+	    rmwWithReg ("lsr", m6502_reg_a);
+
+	  loadRegFromAop (m6502_reg_x, AOP (left), 2);
+	  storeRegToAop (m6502_reg_a, AOP (result), 2);
+	  transferRegReg(m6502_reg_x, m6502_reg_a, true);
+	  rmwWithReg ("ror", m6502_reg_a);
+	  loadRegFromAop (m6502_reg_x, AOP (left), 1);
+	  storeRegToAop (m6502_reg_a, AOP (result), 1);
+	  transferRegReg(m6502_reg_x, m6502_reg_a, true);
+	  rmwWithReg ("ror", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+        }
+      shift-=9;
+    }
+  shiftRLongInPlace (result, shift, 1, sign, false);
+
+  if(sign)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (result), 2);
+      signExtendA();
+      storeRegToAop (m6502_reg_a, AOP (result), 3);
+    }
+  else
+    {
+      storeConstToAop (0, AOP (result), 3);
+    }
+
+ release:
+  loadOrFreeRegTemp(m6502_reg_x, needpullx);
+  pullOrFreeReg (m6502_reg_a, needpulla);
+}
+
+/**************************************************************************
+ * shiftRLong4 - shift right one long from left to result
+ *
+ * @param left  pointer to the src aop
+ * @param result  pointer to the dst aop
+ * @param shift  number of shifts (must be >0 and <8)
+ *************************************************************************/
+static void
+shiftRLong4 (operand * left, operand * result, int shift, int sign)
+{
+  bool needpulla = false;
+  bool needpullx = false;
+
+  wassertl(shift>0, "shiftRLong4 - shift==0");
+  wassertl(shift<8, "shiftRLong4 - shift>=8");
+
+  needpulla = pushRegIfUsed (m6502_reg_a);
+
+  if(shift>4)
+    {
+      loadRegFromAop (m6502_reg_a, AOP (left), 0);
+      rmwWithReg ("rol", m6502_reg_a);
+      if (shift!=7)
+	storeRegTemp(m6502_reg_a, true);
+      loadRegFromAop (m6502_reg_a, AOP (left), 1);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegFromAop (m6502_reg_a, AOP (left), 2);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+      loadRegFromAop (m6502_reg_a, AOP (left), 3);
+      rmwWithReg ("rol", m6502_reg_a);
+      storeRegToAop (m6502_reg_a, AOP (result), 2);
+
+      if (sign)
+	{
+	  loadRegFromConst(m6502_reg_a, 0);
+	  emit6502op("adc", "#0xff");
+	  emit6502op("eor", "#0xff");
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	}
+      else
+	{
+	  loadRegFromConst(m6502_reg_a, 0);
+	  rmwWithReg ("rol", m6502_reg_a);
+	  storeRegToAop (m6502_reg_a, AOP (result), 3);
+	}
+
+      if(shift!=7)
+	{
+          while(shift!=7)
+	    {
+	      emitRegTempOp( "rol", getLastTempOfs() );
+	      rmwWithAop ("rol", AOP (result), 0);
+	      rmwWithAop ("rol", AOP (result), 1);
+	      rmwWithAop ("rol", AOP (result), 2);
+	      rmwWithAop ("rol", AOP (result), 3);
+	      shift++;
+	    }
+          loadRegTemp(NULL);
+        }
+
+    }
+  else
+    {
+      if(!sameRegs (AOP (left), AOP (result)))
+	{ 
+	  loadRegFromAop (m6502_reg_a, AOP (left), 3);
+          if(sign)
+            {
+              emitCmp(m6502_reg_a, 0x80);
+              rmwWithReg ("ror", m6502_reg_a);
+	    }
+          else
+	    rmwWithReg ("lsr", m6502_reg_a);
 	  storeRegToAop (m6502_reg_a, AOP (result), 3);
 	  loadRegFromAop (m6502_reg_a, AOP (left), 2);
 	  rmwWithReg ("ror", m6502_reg_a);
@@ -8839,45 +9369,19 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 	  loadRegFromAop (m6502_reg_a, AOP (left), 0);
 	  rmwWithReg ("ror", m6502_reg_a);
 	  storeRegToAop (m6502_reg_a, AOP (result), 0);
-	}
-      break;
-    case MSB16:
-      needloadx = storeRegTempIfUsed (m6502_reg_x);
-
-      loadRegFromConst(m6502_reg_x,0);
-      loadRegFromAop (m6502_reg_a, AOP (left), 3);
-      if(sign)
-	{
-	  symbol *tlbl = safeNewiTempLabel (NULL);
-	  emitSetCarry(0);
-	  emit6502op("bpl","%05d$", safeLabelNum (tlbl));
-	  emitSetCarry(1);
-	  loadRegFromConst(m6502_reg_x,0xff);
-	  safeEmitLabel(tlbl);
-	  rmwWithReg ("ror", m6502_reg_a);
+          shiftRLongInPlace (result, shift-1, 0, sign, false);
+	  //          storeRegToAop (m6502_reg_a, AOP (result), 0);
 	}
       else
 	{
-	  rmwWithReg ("lsr", m6502_reg_a);
-	}
-      storeRegToAop (m6502_reg_x, AOP (result), 3);
-
-      loadRegFromAop (m6502_reg_x, AOP (left), 2);
-      storeRegToAop (m6502_reg_a, AOP (result), 2);
-      transferRegReg(m6502_reg_x, m6502_reg_a, true);
-      rmwWithReg ("ror", m6502_reg_a);
-
-      loadRegFromAop (m6502_reg_x, AOP (left), 1);
-      storeRegToAop (m6502_reg_a, AOP (result), 1);
-      transferRegReg(m6502_reg_x, m6502_reg_a, true);
-      rmwWithReg ("ror", m6502_reg_a);
-      storeRegToAop (m6502_reg_a, AOP (result), 0);
-      break;
-      //   default:
-      // error
+	  //  loadRegFromAop (m6502_reg_a, AOP (left), 0);
+          shiftRLongInPlace (result, shift, 0, sign, false);
+	  //  storeRegToAop (m6502_reg_a, AOP (result), 0);
+        }
     }
-  loadOrFreeRegTemp (m6502_reg_x, needloadx);
-  loadOrFreeRegTemp (m6502_reg_a, needloada);
+
+  loadOrFreeRegTemp(m6502_reg_x, needpullx);
+  pullOrFreeReg (m6502_reg_a, needpulla);
 }
 
 /**************************************************************************
@@ -8886,86 +9390,24 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 static void
 genrsh32 (operand * result, operand * left, int shCount, int sign)
 {
-  bool needloada = false;
-  bool needloadx = false;
-
-  /* TODO: handle cases where left == result */
-
   emitComment (TRACEGEN, "  %s - shift=%d", __func__, shCount);
 
-  /* if shifting more that 3 bytes */
   if (shCount >= 24)
     {
-      needloada = storeRegTempIfSurv (m6502_reg_a);
-      loadRegFromAop (m6502_reg_a, AOP (left), 3);
-      AccRsh (shCount - 24, sign);
-      storeRegToFullAop (m6502_reg_a, AOP (result), sign);
+      shiftRLong1(left, result, shCount, sign);
     }
   else if (shCount >= 16)
     {
-      needloada = storeRegTempIfSurv (m6502_reg_a);
-      needloadx = storeRegTempIfSurv (m6502_reg_x);
-      loadRegFromAop (m6502_reg_xa, AOP (left), 2);
-      XAccRsh (shCount - 16, sign);
-      storeRegToFullAop (m6502_reg_xa, AOP (result), sign);
+      shiftRLong2(left, result, shCount, sign);
     }
   else if (shCount >= 8)
     {
-      if (shCount == 8)
-        {
-          needloada = storeRegTempIfSurv (m6502_reg_a);
-          transferAopAop (AOP (left), 1, AOP (result), 0);
-          transferAopAop (AOP (left), 2, AOP (result), 1);
-          loadRegFromAop (m6502_reg_a, AOP (left), 3);
-          storeRegToAop (m6502_reg_a, AOP (result), 2);
-          storeRegSignToUpperAop (m6502_reg_a, AOP (result), 3, sign);
-        }
-      else if (shCount == 9)
-        {
-          shiftRLong (left, MSB16, result, sign);
-          return;
-        }
-      else
-        {
-          needloada = storeRegTempIfSurv (m6502_reg_a);
-          needloadx = storeRegTempIfSurv (m6502_reg_x);
-          loadRegFromAop (m6502_reg_xa, AOP (left), 1);
-          XAccRsh (shCount - 8, false);
-          storeRegToAop (m6502_reg_xa, AOP (result), 0);
-          loadRegFromAop (m6502_reg_x, AOP (left), 3);
-          loadRegFromConst (m6502_reg_a, 0);
-          XAccRsh (shCount - 8, sign);
-          accopWithAop ("ora", AOP (result), 1);
-          storeRegToAop (m6502_reg_xa, AOP (result), 1);
-          storeRegSignToUpperAop (m6502_reg_x, AOP (result), 3, sign);
-        }
+      shiftRLong3(left, result, shCount, sign);
     }
   else
     {
-      /* 1 <= shCount <= 7 */
-      if (shCount == 1)
-        {
-          shiftRLong (left, LSB, result, sign);
-          return;
-        }
-      else
-        {
-          needloada = storeRegTempIfSurv (m6502_reg_a);
-          needloadx = storeRegTempIfSurv (m6502_reg_x);
-          loadRegFromAop (m6502_reg_xa, AOP (left), 0);
-          XAccRsh (shCount, false);
-          storeRegToAop (m6502_reg_xa, AOP (result), 0);
-          loadRegFromAop (m6502_reg_a, AOP (left), 2);
-          AccLsh (8 - shCount);
-          accopWithAop ("ora", AOP (result), 1);
-          storeRegToAop (m6502_reg_a, AOP (result), 1);
-          loadRegFromAop (m6502_reg_xa, AOP (left), 2);
-          XAccRsh (shCount, sign);
-          storeRegToAop (m6502_reg_xa, AOP (result), 2);
-        }
+      shiftRLong4(left, result, shCount, sign);
     }
-  loadOrFreeRegTemp (m6502_reg_x, needloadx);
-  loadOrFreeRegTemp (m6502_reg_a, needloada);
 }
 
 /**************************************************************************

@@ -113,7 +113,7 @@ static const char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 static void aopAdrUnprepare (asmop * aop, int loffset);
 static void updateiTempRegisterUse (operand * op);
 static void rmwWithReg (char *rmwop, reg_info * reg);
-static void doTSX(void);
+static void emitTSX(void);
 static char * aopName (asmop * aop);
 
 static asmop *m6502_aop_pass[8];
@@ -533,6 +533,13 @@ emit6502op (const char *inst, const char *fmt, ...)
             {
               _G.carryValid=1;
               _G.carry=1;
+              break;
+            }
+          if(!strcmp(inst,"tsx") || !strcmp(inst,"txs") )
+            {
+              m6502_dirtyReg (m6502_reg_x);
+              m6502_reg_x->aop = &tsxaop;
+              _G.tsxStackPushes = _G.stackPushes;
               break;
             }
           break;
@@ -1428,19 +1435,25 @@ adjustStack (int n)
 
   if (n <= -8 || n >= 8)
     {
+      bool restore_a = false;
+      bool restore_x = false;
+
       // TODO: too big, consider subroutine
-      storeRegTemp(m6502_reg_xa, true);
+      restore_x = storeRegTempIfUsed(m6502_reg_x);
+      restore_a = storeRegTempIfUsed(m6502_reg_a);
+
       //    bool needloada=storeRegTempIfUsed(m6502_reg_xa);
+      // FIXME: can avoid TSX if add current TSX offset to n below
       emit6502op ("tsx", "");
       transferRegReg (m6502_reg_x, m6502_reg_a, true);
       emitSetCarry(0);
-      emit6502op ("adc", IMMDFMT, (unsigned int)n & 0xff);
+      emit6502op ("adc", IMMDFMT, (unsigned int)(n & 0xff));
       transferRegReg (m6502_reg_a, m6502_reg_x, true);
-      emit6502op ("txs", "");
       _G.stackPushes -= n;
+      emit6502op ("txs", "");
       n = 0;
-      loadRegTemp(m6502_reg_xa);
-      //    loadOrFreeRegTemp(m6502_reg_xa, needloada);
+      loadOrFreeRegTemp(m6502_reg_a, restore_a);
+      loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
   while (n < 0)
     {
@@ -1835,7 +1848,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
           if(m6502_reg_x->aop != &tsxaop)
             {
               needloadx = storeRegTempIfUsed(m6502_reg_x);
-              doTSX();
+              emitTSX();
             }
           emit6502op ("sta", aopAdrStr (aop, loffset, false));
           m6502_freeReg(m6502_reg_a);
@@ -1855,7 +1868,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
           needloadx = storeRegTempIfUsed(m6502_reg_x);
           storeRegTemp(m6502_reg_a, false);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
-          doTSX();
+          emitTSX();
 	  emit6502op ("sta", aopAdrStr (aop, loffset + 1, false));
           //        pullReg(m6502_reg_a);
           loadRegTemp(m6502_reg_a);
@@ -1866,7 +1879,7 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
           needloada = storeRegTempIfUsed(m6502_reg_a);
           needloadx = storeRegTempIfUsed(m6502_reg_x);
           transferRegReg (m6502_reg_x, m6502_reg_a, true);
-          doTSX();
+          emitTSX();
           emit6502op ("sta", aopAdrStr (aop, loffset, false));
           transferRegReg (m6502_reg_y, m6502_reg_a, true);
           emit6502op ("sta", aopAdrStr (aop, loffset + 1, false));
@@ -2692,29 +2705,41 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
       {
         emitComment (TRACE_AOP, "  rmwWithAop AOP_SOF");
         // TODO: does anything but A make sense here?
-        reg_info * reg = getFreeByteReg();
-        if (!reg) reg = m6502_reg_a;
+	//        reg_info * reg = getFreeByteReg();
+	//        if (!reg)
+	//            reg = m6502_reg_a;
         int offset = loffset; // SEH: aop->size - 1 - loffset;
         offset += _G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + 1;
-        //    if ((offset > 0xff) || (offset < 0))
-        {
-          emitComment (TRACE_AOP, "  rmwWithAop large offset");
-          /* Unfortunately, the rmw class of instructions only support a */
-          /* single byte stack pointer offset and we need two. */
-          needpull = pushRegIfUsed (reg);
-          loadRegFromAop (reg, aop, loffset);
-          rmwWithReg (rmwop, reg);
-          if (strcmp ("tst", rmwop)) //TODO: no tst
-            storeRegToAop (reg, aop, loffset);
-          pullOrFreeReg (reg, needpull);
-          break;
-        }
+#if 0
+        if ((offset > 0x1ff) || (offset < 0))
+	  {
+	    emitComment (TRACE_AOP, "  rmwWithAop large offset");
+	    /* Unfortunately, the rmw class of instructions only support a */
+	    /* single byte stack pointer offset and we need two. */
+	    needpull = pushRegIfUsed (reg);
+	    loadRegFromAop (reg, aop, loffset);
+	    rmwWithReg (rmwop, reg);
+	    if (strcmp ("tst", rmwop)) //TODO: no tst
+	      storeRegToAop (reg, aop, loffset);
+	    pullOrFreeReg (reg, needpull);
+	    break;
+	  }
+#endif
         /* If the offset is small enough, fall through to default case */
       }
     default:
       emitComment (TRACE_AOP, "  rmwWithAop small offset ");
-      // TODO: [aa],y dosn't work with inc/dec
-      //      emitcode (rmwop, "%s ;type %d", aopAdrStr (aop, loffset, false), aop->type);
+      // FIXME: figure out if asr handling should be here
+      // or if asr should be generated at all by the codegen
+      if (!strcmp ("asr", rmwop))
+        {
+	  bool restore_a = false;
+	  restore_a = storeRegTempIfUsed(m6502_reg_a);
+	  loadRegFromAop (m6502_reg_a, aop, loffset);
+	  emitCmp(m6502_reg_a, 0x80);
+	  loadOrFreeRegTemp(m6502_reg_a, restore_a);
+	  rmwop="ror";
+        }
       emit6502op (rmwop, aopAdrStr (aop, loffset, false));
     }
 
@@ -2973,7 +2998,7 @@ tsxUseful(const iCode *ic)
 #endif
 
 static void
-doTSX()
+emitTSX()
 {
   emitComment (TRACE_STACK|VVDBG, "%s: stackOfs=%d tsx=%d stackpush=%d",
                __func__, _G.stackOfs, _G.tsxStackPushes, _G.stackPushes);
@@ -2984,11 +3009,8 @@ doTSX()
 
   // put stack pointer in X
   if(!m6502_reg_x->isFree)
-    emitcode("ERROR","doTSX called with X in use");
+    emitcode("ERROR","emitTSX called with X in use");
   emit6502op ("tsx", "");
-  m6502_dirtyReg (m6502_reg_x);
-  m6502_reg_x->aop = &tsxaop;
-  _G.tsxStackPushes = _G.stackPushes;
 }
 
 // TODO: make these subroutines
@@ -2996,8 +3018,8 @@ static void saveBasePtr()
 {
 #if 0
   storeRegTemp (m6502_reg_x, true); // TODO: only when used?
-  // TODO: if X is free should we call doTSX() to mark X=S?
-  doTSX();
+  // TODO: if X is free should we call emitTSX() to mark X=S?
+  emitTSX();
   emit6502op ("stx", BASEPTR);
   _G.baseStackPushes = _G.stackPushes;
   loadRegTemp (m6502_reg_x);
@@ -3077,7 +3099,7 @@ static asmop * aopForSym (const iCode * ic, symbol * sym)
 	if (!tsxUseful (ic))
 	  return aop;
 	// transfer S to X
-	doTSX();
+	emitTSX();
       }
 #endif
       return aop;
@@ -3675,7 +3697,7 @@ static void aopAdrPrepare (asmop * aop, int loffset)
         }
     }
 
-    doTSX();
+    emitTSX();
 #endif
     aopPreparePreserveFlags = 1; // TODO: also need to make sure flags are needed by caller
   }
@@ -3785,7 +3807,9 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 	    {
 	      m6502_dirtyReg(m6502_reg_x);
 	    }
-	  doTSX();
+          // FIXME: this is usually redundant as it is explicitly called
+          // before calling aopAdrStr
+	  emitTSX();
 	  // hc08's tsx returns +1, ours returns +0
 	  //DD( emitcode( "", "; %d + %d + %d + %d + 1", _G.stackOfs, _G.tsxStackPushes, aop->aopu.aop_stk, offset ));
 	  xofs = STACK_TOP + _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset + 1;
@@ -4552,12 +4576,30 @@ assignResultValue (operand * oper)
       return;
     }
 
-  while (size--)
+  if(AOP_TYPE(oper)==AOP_SOF && size>1)
     {
-      transferAopAop (m6502_aop_pass[offset], 0, AOP (oper), offset);
-      if (m6502_aop_pass[offset]->type == AOP_REG)
-        m6502_freeReg (m6502_aop_pass[offset]->aopu.aop_reg[0]);
-      offset++;
+      int i;
+      storeRegTemp(m6502_reg_x, true);
+      for(i=0;i<size;i++)
+	{
+	  if (i==1)
+	    {
+	      loadRegTemp(m6502_reg_a);
+	      storeRegToAop (m6502_reg_a, AOP (oper), i);
+	    }
+	  else
+	    transferAopAop (m6502_aop_pass[i], 0, AOP (oper), i);
+	}  
+    }
+  else
+    {
+      while (size--)
+	{
+	  transferAopAop (m6502_aop_pass[offset], 0, AOP (oper), offset);
+	  if (m6502_aop_pass[offset]->type == AOP_REG)
+	    m6502_freeReg (m6502_aop_pass[offset]->aopu.aop_reg[0]);
+	  offset++;
+	}
     }
 }
 
@@ -4987,16 +5029,14 @@ genFunction (iCode * ic)
   genLine.lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
 
-  /*
-    if(ric && ric->argreg)
+  if(ric && ric->argreg)
     {
-    m6502_useReg(m6502_reg_a);
-    m6502_reg_a->isDead=0;
-    // FIXME: check if X is a parameter
-    m6502_useReg(m6502_reg_x);
-    m6502_reg_x->isDead=0;
+      m6502_useReg(m6502_reg_a);
+      m6502_reg_a->isDead=0;
+      // FIXME: check if X is a parameter
+      m6502_useReg(m6502_reg_x);
+      m6502_reg_x->isDead=0;
     }
-  */
 
   _G.stackOfs = 0;
   _G.stackPushes = 0;
@@ -5076,6 +5116,7 @@ genFunction (iCode * ic)
 
   _G.stackOfs = sym->stack;
   _G.stackPushes = 0;
+  _G.tsxStackPushes = 0;
   _G.funcHasBasePtr = 0;
   // TODO: how to see if needed? how to count params?
   if ( stackAdjust || sym->stack || numStackParams || IFFUNC_ISREENT(sym->type) )
@@ -5129,7 +5170,9 @@ genEndFunction (iCode * ic)
   if (sym->stack)
     {
       //  if (sym->regsUsed && sym->regsUsed->size)
+      // FIXME: need to figure out how to get the exact registers needed by the function return
       m6502_useReg(m6502_reg_a);
+      m6502_useReg(m6502_reg_x);
       _G.stackPushes += sym->stack;
       adjustStack (sym->stack);
     }
@@ -5243,11 +5286,27 @@ static void genRet (iCode * ic)
     }
 
     offset = size - 1;
-    while (size--) {
-      if (!(delayed_x && !offset))
-        transferAopAop (AOP (left), offset, m6502_aop_pass[offset], 0);
-      offset--;
-    }
+    if(size>1 && AOP_TYPE(left)==AOP_SOF)
+      {
+	int i;
+	for(i=size-1;i>1;i--)
+	  {
+            loadRegFromAop(m6502_reg_a, AOP(left), i);
+            storeRegToAop(m6502_reg_a, m6502_aop_pass[i], 0);
+	  }
+	loadRegFromAop(m6502_reg_a, AOP(left), 1);
+	storeRegTemp(m6502_reg_a, true);
+	loadRegFromAop(m6502_reg_a, AOP(left), 0);
+	loadRegTemp(m6502_reg_x);
+      }
+    else
+      {
+	while (size--) {
+	  if (!(delayed_x && !offset))
+	    transferAopAop (AOP (left), offset, m6502_aop_pass[offset], 0);
+	  offset--;
+	}
+      }
 
     if (delayed_x)
       pullReg (m6502_reg_a);
@@ -8601,7 +8660,8 @@ genLeftShift (iCode * ic)
   /* load the count register */
   if (m6502_reg_y->isDead && !IS_AOP_WITH_Y (AOP (result)) && !IS_AOP_WITH_Y (AOP (left)))
     countreg = m6502_reg_y;
-  else if (m6502_reg_x->isDead && !IS_AOP_WITH_X (AOP (result)) && !IS_AOP_WITH_X (AOP (left)))
+  else if (m6502_reg_x->isDead && !IS_AOP_WITH_X (AOP (result)) && !IS_AOP_WITH_X (AOP (left))
+           && AOP_TYPE(left)!=AOP_SOF && AOP_TYPE(result)!=AOP_SOF)
     countreg = m6502_reg_x;
   else if (m6502_reg_a->isDead && !IS_AOP_WITH_A (AOP (result)) && !IS_AOP_WITH_A (AOP (left)))
     countreg = m6502_reg_a;
@@ -9539,7 +9599,8 @@ genRightShift (iCode * ic)
   /* load the count register */
   if (m6502_reg_y->isDead && !IS_AOP_WITH_Y (AOP (result)) && !IS_AOP_WITH_Y (AOP (left)))
     countreg = m6502_reg_y;
-  else if (m6502_reg_x->isDead && !IS_AOP_WITH_X (AOP (result)) && !IS_AOP_WITH_X (AOP (left)))
+  else if (m6502_reg_x->isDead && !IS_AOP_WITH_X (AOP (result)) && !IS_AOP_WITH_X (AOP (left))
+           && AOP_TYPE(left)!=AOP_SOF && AOP_TYPE(result)!=AOP_SOF )
     countreg = m6502_reg_x;
   else if (m6502_reg_a->isDead && !IS_AOP_WITH_A (AOP (result)) && !IS_AOP_WITH_A (AOP (left)))
     countreg = m6502_reg_a;
@@ -11077,7 +11138,7 @@ static void genAddrOf (iCode * ic)
       needloada = storeRegTempIfSurv (m6502_reg_a);
       needloadx = storeRegTempIfSurv (m6502_reg_x);
       /* if it has an offset then we need to compute it */
-      doTSX();
+      emitTSX();
       offset = _G.stackOfs + _G.tsxStackPushes + _G.stackPushes + sym->stack + 1;
       if(smallAdjustReg(m6502_reg_x, offset))
 	offset=0;

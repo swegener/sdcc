@@ -1,3 +1,8 @@
+2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx:
+	  Optimize the page format for on-screen reading.
+
 2025-03-11 Gabriele Gorla <gorlik@yahoo.com>
 
     * src/mos6502/gen.c:

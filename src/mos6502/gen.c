@@ -617,6 +617,7 @@ emit6502op (const char *inst, const char *fmt, ...)
                    _G.stackPushes );
         }
 
+      // FIXME: figure out how to align the comments in the asm output
       snprintf(verboseFmt, 512, "%s \t; %s %s %s",
                fmt, dstring[0], dstring[1], dstring[2]);
       va_emitcode (inst, verboseFmt, ap);
@@ -2818,14 +2819,17 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       else
         {
           emitComment (TRACEGEN|VVDBG, "  %s: not AOP_REG", __func__);
-          if(savea) transferRegReg(m6502_reg_a, m6502_reg_y, true);
+          if(savea)
+             transferRegReg(m6502_reg_a, m6502_reg_y, true);
           // FIXME: save/restore x if SOF
           loadRegFromAop(m6502_reg_a, AOP(op), 0);
           storeRegToDPTR(m6502_reg_a, 0);
           loadRegFromAop(m6502_reg_a, AOP(op), 1);
           storeRegToDPTR(m6502_reg_a, 1);
-          if(savea) transferRegReg(m6502_reg_y, m6502_reg_a, true);
-          else m6502_freeReg(m6502_reg_a);
+          if(savea)
+            transferRegReg(m6502_reg_y, m6502_reg_a, true);
+          else
+             m6502_freeReg(m6502_reg_a);
         }
       return offset;
     }
@@ -4426,7 +4430,6 @@ static void genUminus (iCode * ic)
   pullOrFreeReg (m6502_reg_a, needpula);
 
  release:
-  /* release the aops */
   freeAsmop (result, NULL);
   freeAsmop (left, NULL);
 }
@@ -5094,7 +5097,7 @@ genFunction (iCode * ic)
           genLine.lineElement.ic = ric;
           emitComment (TRACEGEN, "genReceive: size=%d", rsymSize);
           //          for (ofs = 0; ofs < rsymSize; ofs++)
-          m6502_reg_a->isFree=false;
+	  m6502_useReg (m6502_reg_a);
           for (ofs = rsymSize-1; ofs >=0; ofs--)
             {
               reg_info *reg = m6502_aop_pass[ofs + (ric->argreg - 1)]->aopu.aop_reg[0];
@@ -5636,9 +5639,11 @@ static bool genMinusDec (iCode * ic)
   if(icount>255) return false;
 
 #if 1
-  if(IS_AOP_XA (AOP (result)) && icount >=0 ) {
+  if(IS_AOP_XA (AOP (result)) && icount >=0 )
+  {
     loadRegFromAop (m6502_reg_xa, AOP (left), 0);
-    if(icount) {
+    if(icount)
+    {
       tlbl = safeNewiTempLabel (NULL);
       emitSetCarry (1);
       accopWithAop ("sbc", AOP (right), 0);
@@ -8560,6 +8565,7 @@ static void
 genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * ic)
 {
   int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+  bool restore_x = false;
   int size;
 
   emitComment (TRACEGEN, __func__);
@@ -8582,6 +8588,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
     } 
   else
     {
+    if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
+       restore_x=storeRegTempIfUsed(m6502_reg_x);
       switch (size)
 	{
 	case 1:
@@ -8597,6 +8605,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
 	  break;
 	}
+     loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
 
   freeAsmop (right, NULL);
@@ -9477,6 +9486,7 @@ static void
 genRightShiftLiteral (operand * left, operand * right, operand * result, iCode * ic, int sign)
 {
   int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+  bool restore_x = false;
   int size;
 
   emitComment (TRACEGEN, __func__);
@@ -9511,6 +9521,9 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
     }
   else
     {
+    if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
+       restore_x=storeRegTempIfUsed(m6502_reg_x);
+
       switch (size)
 	{
 	case 1:
@@ -9528,6 +9541,7 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
 	  wassertl (0, "Invalid operand size in right shift.");
 	  break;
 	}
+    loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);

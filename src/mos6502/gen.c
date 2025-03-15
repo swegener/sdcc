@@ -1589,12 +1589,6 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       return;
     }
 
-#if 0
-  /* If operand is volatile, we cannot optimize. */
-  if (!aop->op || isOperandVolatile (aop->op, false))
-    goto forceload;
-
-
   /* If this register already has this offset of the operand
      then we need only mark it as in use. */
   if (reg->aop && reg->aop->op && aop->op && operandsEqu (reg->aop->op, aop->op) && (reg->aopofs == loffset))
@@ -1603,6 +1597,11 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       emitComment (REGOPS, "  already had correct value for %s", reg->name);
       return;
     }
+
+#if 0
+  /* If operand is volatile, we cannot optimize. */
+  if (!aop->op || isOperandVolatile (aop->op, false))
+    goto forceload;
 
   /* TODO: check to see if we can transfer from another register */
 
@@ -6612,6 +6611,10 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
       loadOrFreeRegTemp (m6502_reg_a, needloada);
     }
 
+   m6502_dirtyReg (m6502_reg_a);
+  _G.DPTRAttr[0].aop=NULL;
+  _G.DPTRAttr[1].aop=NULL;
+
   freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);
@@ -9424,6 +9427,7 @@ shiftRLong3 (operand * left, operand * result, int shift, int sign)
 	  transferRegReg(m6502_reg_x, m6502_reg_a, true);
 	  rmwWithReg ("ror", m6502_reg_a);
 	  storeRegToAop (m6502_reg_a, AOP (result), 0);
+          m6502_dirtyReg(m6502_reg_x);
         }
       shift-=9;
     }
@@ -9719,7 +9723,7 @@ genRightShift (iCode * ic)
     }
   if(countreg)
     {
-      countreg->isFree = false;
+      m6502_useReg(countreg);
       loadRegFromAop (countreg, AOP (right), 0);
     }
   else
@@ -9819,6 +9823,7 @@ genRightShift (iCode * ic)
   // After loop, countreg is 0
   if (countreg)
     {
+      m6502_dirtyReg(countreg);
       countreg->isLitConst = 1;
       countreg->litConst = 0;
     }

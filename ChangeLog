@@ -6,6 +6,7 @@
       Prepare for register tracking.
       Improve genRRC.
       Improve genPlus.
+      Enable simple register tracking.
 
 2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
 

@@ -1663,13 +1663,44 @@ parameter_declaration
           $$ = symbolVal ($2);
           ignoreTypedefType = 0;
         }
-   | type_name
+   | declaration_specifiers abstract_declarator  /* analogous to type_name */
         {
+          /* go to the end of the list */
+          sym_link *p;
+
+          if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
+            {
+              werror (E_STORAGE_CLASS_FOR_PARAMETER, "type name");
+            }
+          pointerTypes ($2,$1);
+          for (p = $2; p && p->next; p = p->next)
+            ;
+          if (!p)
+            {
+              werror(E_SYNTAX_ERROR, yytext);
+            }
+          else
+            {
+              p->next = $1;
+            }
+
+          $$ = newValue ();
+          $$->type = $2;
+          $$->etype = getSpec ($$->type);
+          ignoreTypedefType = 0;
+        }
+   | declaration_specifiers  /* analogous to type_name */
+        {
+          if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
+            {
+              werror (E_STORAGE_CLASS_FOR_PARAMETER, "type name");
+            }
+
           $$ = newValue ();
           $$->type = $1;
           $$->etype = getSpec ($$->type);
           ignoreTypedefType = 0;
-         }
+        }
    ;
 
 abstract_declarator
@@ -2772,7 +2803,7 @@ identifier_list
    ;
 
 type_name
-   : declaration_specifiers
+   : specifier_qualifier_list
         {
           if (IS_SPEC ($1) && !IS_VALID_PARAMETER_STORAGE_CLASS_SPEC ($1))
             {
@@ -2780,7 +2811,7 @@ type_name
             }
           $$ = $1; ignoreTypedefType = 0;
         }
-   | declaration_specifiers abstract_declarator
+   | specifier_qualifier_list abstract_declarator
         {
           /* go to the end of the list */
           sym_link *p;

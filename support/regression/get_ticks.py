@@ -18,7 +18,7 @@ ticks = 0
 for line in lines:
     # 'n words read from ...', where = # bytes in hex file
     if (re.search(r'words read from', line)):
-        (data, post) = re.split(r'words', line, 1)
+        (data, post) = re.split(r'words', line, maxsplit=1)
         data = re.sub(r'[^0-9]',' ',data).strip().split();
         if len(data)>0:
           bytes = int(data[-1])

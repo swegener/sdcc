@@ -1,3 +1,10 @@
+2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCC.y:
+	  Change parameter_declaration and type_name productions to match the C standard.
+	* support/regression/get_ticks.py:
+	  Address a deprecation warning.
+
 2025-03-15 Gabriele Gorla <gorlik@yahoo.com>
 
     * src/mos6502/gen.c:

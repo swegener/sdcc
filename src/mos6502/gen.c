@@ -61,6 +61,8 @@ struct attr_t
 {
   bool isLiteral;
   unsigned char literalValue;
+  struct asmop *aop;		/* last operand */
+  int aopofs;			/* last operand offset */
 };
 
 // keep this in sync with _temp.s in the library
@@ -351,6 +353,10 @@ regInfoStr()
                                                 (m6502_reg_a->isFree)?'-':'U',
                                                 (m6502_reg_a->isDead)?'-':'L',
                                                 _G.tsxStackPushes - _G.stackPushes );
+  else if(m6502_reg_a->aop) snprintf(regstring[0],10,"A:%c%c:A%+-3d",
+                                                (m6502_reg_a->isFree)?'-':'U',
+                                                (m6502_reg_a->isDead)?'-':'L',
+                                                m6502_reg_a->aopofs );
   else snprintf(regstring[0],10,"A:%c%c:??? ",
                 (m6502_reg_a->isFree)?'-':'U',
                 (m6502_reg_a->isDead)?'-':'L');
@@ -363,6 +369,10 @@ regInfoStr()
                                                 (m6502_reg_x->isFree)?'-':'U',
                                                 (m6502_reg_x->isDead)?'-':'L',
                                                 _G.tsxStackPushes - _G.stackPushes );
+  else if(m6502_reg_x->aop) snprintf(regstring[1],10,"X:%c%c:A%+-3d",
+                                                (m6502_reg_x->isFree)?'-':'U',
+                                                (m6502_reg_x->isDead)?'-':'L',
+                                                m6502_reg_x->aopofs );
   else snprintf(regstring[1],10,"X:%c%c:??? ",
                 (m6502_reg_x->isFree)?'-':'U',
                 (m6502_reg_x->isDead)?'-':'L');
@@ -375,6 +385,10 @@ regInfoStr()
                                                 (m6502_reg_y->isFree)?'-':'U',
                                                 (m6502_reg_y->isDead)?'-':'L',
                                                 _G.tsxStackPushes - _G.stackPushes );
+  else if(m6502_reg_y->aop) snprintf(regstring[2],10,"Y:%c%c:A%+-3d",
+                                                (m6502_reg_y->isFree)?'-':'U',
+                                                (m6502_reg_y->isDead)?'-':'L',
+                                                m6502_reg_y->aopofs );
   else snprintf(regstring[2],10,"Y:%c%c:??? ",
                 (m6502_reg_y->isFree)?'-':'U',
                 (m6502_reg_y->isDead)?'-':'L');
@@ -962,9 +976,11 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
       error = 1;
     }
   
-  if(error) emitcode("ERROR", "bad combo in transferRegReg 0x%02x -> 0x%02x", srcidx, dstidx);
+  if(error)
+    emitcode("ERROR", "bad combo in transferRegReg 0x%02x -> 0x%02x", srcidx, dstidx);
   //  emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
 
+  m6502_dirtyReg (dreg);
   m6502_useReg (dreg);
 
   if(sreg->isLitConst)
@@ -972,15 +988,13 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
       dreg->isLitConst = sreg->isLitConst;
       dreg->litConst = sreg->litConst;
     }
-  else
+  else if(sreg->aop)
     {
-      m6502_dirtyReg (dreg);
+      dreg->aop = sreg->aop;
+      dreg->aopofs = sreg->aopofs;
     }
-  //  emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
-  dreg->aop = sreg->aop;
-  dreg->aopofs = sreg->aopofs;
 
-  //  emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
+  emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
   if (freesrc)
     m6502_freeReg (sreg);
 }
@@ -1625,7 +1639,6 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       {
         loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset));
       }
-    // no such thing as ldx aa,x
     else if (aop->type == AOP_SOF && regidx != A_IDX)
       {
         bool needloada = storeRegTempIfUsed(m6502_reg_a);
@@ -1642,6 +1655,11 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
         emit6502op (regidx == A_IDX ? "lda" : regidx == X_IDX ? "ldx" : "ldy", l);
         aopAdrUnprepare(aop, loffset);
         m6502_dirtyReg (reg);
+        if( !isOperandVolatile (aop->op, false))
+          {
+            reg->aopofs = loffset;
+            reg->aop = aop;
+          }
       }
     break;
   case XA_IDX:
@@ -2776,6 +2794,8 @@ storeRegToDPTR(reg_info *reg, int dofs)
 
   _G.DPTRAttr[dofs].isLiteral=reg->isLitConst;
   _G.DPTRAttr[dofs].literalValue=reg->litConst;
+  _G.DPTRAttr[dofs].aop=reg->aop;
+  _G.DPTRAttr[dofs].aopofs=reg->aopofs;
 
   m6502_freeReg(reg);
 }
@@ -4835,6 +4855,10 @@ genCall (iCode * ic)
   m6502_dirtyReg (m6502_reg_a);
   m6502_dirtyReg (m6502_reg_x);
   m6502_dirtyReg (m6502_reg_y);
+  _G.DPTRAttr[0].isLiteral=0;
+  _G.DPTRAttr[1].isLiteral=0;
+  _G.DPTRAttr[0].aop=NULL;
+  _G.DPTRAttr[1].aop=NULL;
   _G.lastflag=-1;
   _G.carryValid=0;
 
@@ -4938,6 +4962,10 @@ genPcall (iCode * ic)
   m6502_dirtyReg (m6502_reg_a);
   m6502_dirtyReg (m6502_reg_x);
   m6502_dirtyReg (m6502_reg_y);
+  _G.DPTRAttr[0].isLiteral=0;
+  _G.DPTRAttr[1].isLiteral=0;
+  _G.DPTRAttr[0].aop=NULL;
+  _G.DPTRAttr[1].aop=NULL;
   _G.lastflag=-1;
   _G.carryValid=0;
 
@@ -5341,6 +5369,8 @@ static void genLabel (iCode * ic)
 
   _G.DPTRAttr[0].isLiteral=0;
   _G.DPTRAttr[1].isLiteral=0;
+  _G.DPTRAttr[0].aop=NULL;
+  _G.DPTRAttr[1].aop=NULL;
 
   _G.lastflag=-1;
   _G.carryValid=0;
@@ -6103,10 +6133,15 @@ genCmp (iCode * ic, iCode * ifx)
   /* need register operand on left, prefer literal operand on right */
   if ((AOP_TYPE (right) == AOP_REG) || AOP_TYPE (left) == AOP_LIT)
     {
-      operand *temp = left;
-      left = right;
-      right = temp;
-      opcode = exchangedCmp (opcode);
+      // don't swap if left is A
+      // FIXME: not sure if this is necessary
+      if(!((AOP_TYPE (left) == AOP_REG) && AOP (left)->aopu.aop_reg[0]->rIdx == A_IDX))
+        {
+          operand *temp = left;
+          left = right;
+          right = temp;
+          opcode = exchangedCmp (opcode);
+        }
     }
   // TODO: special case for compare with 0
 
@@ -6414,23 +6449,26 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
 	loadRegTempNoFlags(m6502_reg_a, true);
     }
   else
-
     // TODO: could clobber A if reg = XA?
     {
       offset = 0;
       while (size--)
 	{
-	  if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == X_IDX && isAddrSafe(right, m6502_reg_x))
+	  if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == X_IDX 
+              && isAddrSafe(right, m6502_reg_x))
 	    accopWithAop ("cpx", AOP (right), offset);
-	  else if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == Y_IDX && isAddrSafe(right, m6502_reg_y))
+	  else if (AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == Y_IDX
+                  && isAddrSafe(right, m6502_reg_y))
 	    accopWithAop ("cpy", AOP (right), offset);
 	  else 
 	    {
 	      emitComment (TRACEGEN|VVDBG, "      genCmpEQorNE can't cpx or cpy");
 
 	      // TODO? why do we push when we could cpx?
-	      if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX)) {
-		if(AOP_TYPE(right) == AOP_REG) {
+	      if (!(AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx == A_IDX))
+              {
+		if(AOP_TYPE(right) == AOP_REG)
+                {
 		  emitComment (TRACEGEN|VVDBG, "   genCmpEQorNE right is reg: %s",AOP (right)->aopu.aop_reg[offset]->name);
 		}
 

@@ -3,6 +3,7 @@
     * src/mos6502/gen.c:
       Improve genLeftShiftLiteral and genRightShiftLiteral.
       Improve genReceive.
+      Prepare for register tracking.
 
 2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
 

@@ -414,22 +414,35 @@ opInfo(char str[64], operand *op)
   int size = 0;
   char *type = "";
   
-  if(op) {
-    if(AOP(op)) size=AOP_SIZE(op);
-    if(AOP(op)) type=aopName(AOP(op));
+  if(op)
+    {
+      if(AOP(op))
+        size=AOP_SIZE(op);
+      if(AOP(op))
+        type=aopName(AOP(op));
   }
 
-  if(op==0) {
+  if(op==0)
+    {
     snprintf(str, 64, "---");
-  } else if(IS_SYMOP(op)) {
-    if (snprintf(str, 64, "SYM:%s(%s:%d)", op->svt.symOperand->rname, type, size) >= 64) {
+    }
+  else if(IS_SYMOP(op))
+    {
+      if (snprintf(str, 64, "SYM:%s(%s:%d)", op->svt.symOperand->rname, type, size) >= 64)
+        {
       str[63] = 0; // ridiculous workaround to silence GCC warning ‘%s’ directive output may be truncated
     }
-  } else if(IS_VALOP(op)) {
+    }
+  else if(IS_VALOP(op))
+    {
     snprintf(str, 64, "VAL(%s:%d)", type, size);
-  } else if(IS_TYPOP(op)) {
+    }
+  else if(IS_TYPOP(op))
+    {
     snprintf(str, 64, "TYP");
-  } else {
+    }
+  else
+    {
     snprintf(str, 64, "???");
   }
 
@@ -1641,7 +1654,7 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       }
     else if (aop->type == AOP_SOF && regidx != A_IDX)
       {
-        bool needloada = storeRegTempIfUsed(m6502_reg_a);
+        bool needloada = storeRegTempIfUsed(m6502_reg_a); // FIXME: maybe push?
         loadRegFromAop(m6502_reg_a, aop, loffset);
         transferRegReg(m6502_reg_a, reg, false);
         loadOrFreeRegTemp(m6502_reg_a,needloada);
@@ -4375,7 +4388,7 @@ static void genUminus (iCode * ic)
       rmwWithReg ("neg", m6502_reg_a);
       if (maskedtopbyte)
 	emit6502op ("and", IMMDFMT, topbytemask);
-      m6502_freeReg (m6502_reg_a);
+//      m6502_freeReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), SPEC_USIGN (operandType (left)));
       pullOrFreeReg (m6502_reg_a, needpula);
       goto release;
@@ -7615,24 +7628,23 @@ static void genRRC (iCode * ic)
       storeRegTempAlways(m6502_reg_x, true);
       emit6502op("lsr", TEMPFMT, getLastTempOfs() );
       emit6502op("ror", "a");
-      if(AOP_TYPE (result) == AOP_DIR || AOP_TYPE (result) == AOP_EXT )
+      if(IS_AOP_XA(AOP(result)) )
         {
-          // optimization if the result is in DIR or EXT
-          storeRegToAop(m6502_reg_a, AOP(result), 0);
-	  loadRegFromConst(m6502_reg_a, 0);
-	  emit6502op("ror", "a");
-          emit6502op ("ora", TEMPFMT, getLastTempOfs() );
-          storeRegToAop(m6502_reg_a, AOP(result), 1);
-	}
-      else
-	{
 	  storeRegTemp(m6502_reg_a, true);
 	  loadRegFromConst(m6502_reg_a, 0);
 	  emit6502op("ror", "a");
 	  emit6502op ("ora", TEMPFMT, getLastTempOfs()-1 );
-	  storeRegToAop(m6502_reg_a, AOP(result), 1);
+	  transferRegReg(m6502_reg_a, m6502_reg_x, true);
 	  loadRegTemp(m6502_reg_a);
+	}
+      else
+	{
+	  // optimization if the result is in DIR or EXT
 	  storeRegToAop(m6502_reg_a, AOP(result), 0);
+	  loadRegFromConst(m6502_reg_a, 0);
+	  emit6502op("ror", "a");
+	  emit6502op ("ora", TEMPFMT, getLastTempOfs() );
+	  storeRegToAop(m6502_reg_a, AOP(result), 1);
         }
       loadRegTemp(NULL);
       goto release;
@@ -8724,6 +8736,8 @@ genLeftShift (iCode * ic)
       countreg->isFree = false;
       emitComment (TRACEGEN|VVDBG, "  load countreg");
       loadRegFromAop (countreg, AOP (right), 0);
+      if(IS_AOP_XA(AOP(right)))
+         m6502_freeReg(m6502_reg_xa);
     }
   else
     {

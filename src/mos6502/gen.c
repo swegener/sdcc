@@ -2787,7 +2787,10 @@ storeRegToDPTR(reg_info *reg, int dofs)
 
   if(reg->isLitConst && _G.DPTRAttr[dofs].isLiteral
      && reg->litConst == _G.DPTRAttr[dofs].literalValue )
-    return;
+    {
+      emitComment (TRACEGEN, " %s: DPTR has same literal", __func__);
+      return;
+    }
 
   switch(regidx)
     {
@@ -5607,6 +5610,42 @@ genPlus (iCode * ic)
       goto release;
     }
 #endif
+
+  if ( IS_AOP_XA (AOP(result)) && IS_AOP_XA(AOP(left)) && AOP_TYPE(right) == AOP_SOF )
+    {
+      storeRegTemp(m6502_reg_x, true);
+      emitSetCarry(0);
+      accopWithAop ("adc", AOP (right), 0);
+      pushReg(m6502_reg_a, true);
+      loadRegTemp(m6502_reg_a);
+      accopWithAop ("adc", AOP (right), 1);
+      transferRegReg(m6502_reg_a, m6502_reg_x, true);
+      pullReg(m6502_reg_a);
+      goto release;
+    }
+
+  if ( IS_AOP_XA (AOP(left)) && !IS_AOP_XA(AOP(result)) &&
+       (AOP_TYPE(result) == AOP_SOF || AOP_TYPE(right) == AOP_SOF) )
+    {
+      bool restore_a = pushRegIfSurv(m6502_reg_a);
+      bool restore_x = !m6502_reg_x->isDead;
+      storeRegTemp(m6502_reg_x, true);
+      emitSetCarry(0);
+      accopWithAop ("adc", AOP (right), 0);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      loadRegTempAt(m6502_reg_a, getLastTempOfs() );
+      accopWithAop ("adc", AOP (right), 1);
+      storeRegToAop (m6502_reg_a, AOP (result), 1);
+
+      if(restore_x)
+        loadRegTemp(m6502_reg_x);
+      else
+        loadRegTemp(NULL);
+
+      pullOrFreeReg (m6502_reg_a, restore_a);
+
+      goto release;
+    }
 
   needpulla = pushRegIfSurv (m6502_reg_a);
 
@@ -8733,7 +8772,7 @@ genLeftShift (iCode * ic)
     }
   if(countreg)
     {
-      countreg->isFree = false;
+      m6502_useReg (countreg);
       emitComment (TRACEGEN|VVDBG, "  load countreg");
       loadRegFromAop (countreg, AOP (right), 0);
       if(IS_AOP_XA(AOP(right)))
@@ -8826,6 +8865,7 @@ genLeftShift (iCode * ic)
   // After loop, countreg is 0
   if (countreg)
     {
+      m6502_dirtyReg(countreg);
       countreg->isLitConst = 1;
       countreg->litConst = 0;
     }

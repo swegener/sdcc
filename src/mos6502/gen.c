@@ -11533,27 +11533,35 @@ genReceive (iCode * ic)
   emitComment (TRACEGEN|VVDBG, "  %s: size=%d regmask=%x",
                __func__, size, AOP (result)->regmask );
 
-  if (ic->argreg && IS_AOP_YX (AOP (result)) && (offset + (ic->argreg - 1)) == 0)
+  if(ic->argreg)
     {
-      transferRegReg (m6502_reg_xa, m6502_reg_yx, true);
-    }
-  else if (ic->argreg)
-    {
-      while (size--)
-	{
-	  if (AOP_TYPE (result) == AOP_REG && !(offset + (ic->argreg - 1)) 
-	      && AOP (result)->aopu.aop_reg[0]->rIdx == X_IDX && size)
-	    {
-	      storeRegTemp (m6502_reg_a, true);
-	      delayed_x = true;
-	    }
-	  else
-	    transferAopAop (m6502_aop_pass[offset + (ic->argreg - 1)], 0, AOP (result), offset);
-	  // FIXME: this freereg is likely wrong
-	  if (m6502_aop_pass[offset]->type == AOP_REG)
-	    m6502_freeReg (m6502_aop_pass[offset]->aopu.aop_reg[0]);
-	  offset++;
-	}
+      if (AOP_TYPE(result)==AOP_SOF && size>1 )
+        {
+          storeRegTemp (m6502_reg_x, true);
+          storeRegToAop (m6502_reg_a, AOP (result), 0);
+          loadRegTemp (m6502_reg_a);
+          storeRegToAop (m6502_reg_a, AOP (result), 1);
+          if(size==3)
+            storeRegToAop (m6502_reg_y, AOP (result), 2);
+       }
+     else
+      {
+        while (size--)
+	  {
+	    if (AOP_TYPE (result) == AOP_REG && !(offset + (ic->argreg - 1)) 
+	        && AOP (result)->aopu.aop_reg[0]->rIdx == X_IDX && size)
+	      {
+	        storeRegTemp (m6502_reg_a, true);
+	        delayed_x = true;
+	      }
+	    else
+	      transferAopAop (m6502_aop_pass[offset + (ic->argreg - 1)], 0, AOP (result), offset);
+	    // FIXME: this freereg is likely wrong
+	    if (m6502_aop_pass[offset]->type == AOP_REG)
+	      m6502_freeReg (m6502_aop_pass[offset]->aopu.aop_reg[0]);
+	    offset++;
+          }
+      }
     }
 
   if (delayed_x)

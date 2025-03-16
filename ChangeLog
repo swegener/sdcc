@@ -15,13 +15,13 @@
 
 2025-03-15 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Improve genLeftShiftLiteral and genRightShiftLiteral.
-      Improve genReceive.
-      Prepare for register tracking.
-      Improve genRRC.
-      Improve genPlus.
-      Enable simple register tracking.
+	* src/mos6502/gen.c:
+	  Improve genLeftShiftLiteral and genRightShiftLiteral.
+	  Improve genReceive.
+	  Prepare for register tracking.
+	  Improve genRRC.
+	  Improve genPlus.
+	  Enable simple register tracking.
 
 2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
 
@@ -30,22 +30,22 @@
 
 2025-03-11 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Improve stack management.
+	* src/mos6502/gen.c:
+	  Improve stack management.
 
 2025-03-10 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Rewrite genrsh32.
-      
+	* src/mos6502/gen.c:
+	  Rewrite genrsh32.
+
 2025-03-09 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/z80/main.c,
-      src/mos6502/main.c,
-      src/hc08/main.c,
-      src/SDCCglue.c,
-      src/SDCCmem.h:
-      Move port specific assembler directives to genAssemblerStart.
+	* src/z80/main.c,
+	  src/mos6502/main.c,
+	  src/hc08/main.c,
+	  src/SDCCglue.c,
+	  src/SDCCmem.h:
+	  Move port specific assembler directives to genAssemblerStart.
 
 2025-03-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -55,8 +55,8 @@
 
 2025-03-08 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      More cosmetic changes to match sdcc coding style.
+	* src/mos6502/gen.c:
+	  More cosmetic changes to match sdcc coding style.
 
 2025-03-08 Benedikt Freisen <b.freisen AT gmx.net>
 
@@ -82,17 +82,17 @@
 
 2025-03-03 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Replace emitCpz with emitCmp. Replace label macros with functions.
-      Fix bug in genRLC.
-      Improve genCmp.
+	* src/mos6502/gen.c:
+	  Replace emitCpz with emitCmp. Replace label macros with functions.
+	  Fix bug in genRLC.
+	  Improve genCmp.
 
 2025-03-02 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Improve genPlus, genMinus and genlsh16.
-      Several cosmetic changes to match sdcc coding style.
-      Rewrite genlsh32.
+	* src/mos6502/gen.c:
+	  Improve genPlus, genMinus and genlsh16.
+	  Several cosmetic changes to match sdcc coding style.
+	  Rewrite genlsh32.
 
 2025-02-28 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -127,17 +127,17 @@
 
 2025-02-23 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Remove dead/redundant code.
-      Improve loadRegFromAop, genRightShift and genLeftShift.
-      Rename multiple shift functions.
+	* src/mos6502/gen.c:
+	  Remove dead/redundant code.
+	  Improve loadRegFromAop, genRightShift and genLeftShift.
+	  Rename multiple shift functions.
 
 2025-02-22 Gabriele Gorla <gorlik@yahoo.com>
 
-    * src/mos6502/gen.c:
-      Replace direct access to _G.tempOfs with a function.
-      Remove AOP_IDX dead code.
-      Replace several instances of storeRegTempIfSurv with storeRegTempIfUsed.
+	* src/mos6502/gen.c:
+	  Replace direct access to _G.tempOfs with a function.
+	  Remove AOP_IDX dead code.
+	  Replace several instances of storeRegTempIfSurv with storeRegTempIfUsed.
 
 2025-02-21 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -152,10 +152,10 @@
 2025-02-17 Gabriele Gorla <gorlik@yahoo.com>
 
 	* support/regression/tests/gcc-touture-execute-2010030-1.c:
-      Disable gcc-touture-execute-2010030-1 for mos6502-stack-auto.
-    * src/mos6502/gen.c:
-      Improve loadRegFromAop().
-   	* src/mos6502/peeph.def:
+	  Disable gcc-touture-execute-2010030-1 for mos6502-stack-auto.
+	* src/mos6502/gen.c:
+	  Improve loadRegFromAop().
+	* src/mos6502/peeph.def:
 	  Additional peephole rule for store after load at the same address.
 
 2025-02-16 Gabriele Gorla <gorlik@yahoo.com>
@@ -163,7 +163,7 @@
 	* src/mos6502/gen.c:
 	  Several improvements to stack code generation.
 	  Improvements in genCmp() and genCast().
-	
+
 2025-02-15 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:
@@ -225,7 +225,7 @@
 
 	* device/lib/mos6502/_divulong.s:
 	  minor improvements to divulong
-	  
+
 2025-02-09 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:
@@ -599,11 +599,11 @@
 2024-02-29 Gabriele Gorla <gorlik@yahoo.com>
 
 	* doc/sdccman.lyx:
-      additional documentation for the MOS6502 port. Addresses:
-      - bug #3749
-      - bug #3787
-      - support req #199
-      - feature request #931
+	  additional documentation for the MOS6502 port. Addresses:
+	  - bug #3749
+	  - bug #3787
+	  - support req #199
+	  - feature request #931
 
 2024-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -1584,7 +1584,7 @@
 	* src/hc08/main.c (hasExtBitOp),
 	  src/mos6502/main.c (hasExtBitOp): fix bug #3731
 	* support/regression/tests/sha3-256.c: only enabled for ports
-	  that can handle returning large structs 
+	  that can handle returning large structs
 	* src/mos6502/gen.c (genRet): fail unsupported struct return better
 
 2024-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
@@ -2111,8 +2111,8 @@
 
 	* src/mos6502/gen.c:
 	  Refactor asmopToBool().
-  	* src/mos6502/gen.c:
-  	  Improvements to genAnd().
+	* src/mos6502/gen.c:
+	  Improvements to genAnd().
 
 2024-01-27 Gabriele Gorla <gorlik@yahoo.com>
 
@@ -2129,8 +2129,8 @@
 
 	* src/mos6502/ralloc.c:
 	  Small cleanup of m6502_dirtyReg.
-   	* src/mos6502/gen.c:
-   	  Imporvements to genCmp.
+	* src/mos6502/gen.c:
+	  Imporvements to genCmp.
 
 2024-01-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -2160,7 +2160,7 @@
 
 	* src/mos6502/peep.def:
 	  Fix bug in peephole load 12 rule.
-  	* src/mos6502/gen.c,
+	* src/mos6502/gen.c,
 	  src/mos6502/peep.def:
 	  Improvements in genCast(), genCopy() and loadRegFromAop().
 
@@ -2197,11 +2197,11 @@
 	  support/regression/tests/lonesha256.c,
 	  support/regression/tests/tinyaes.c.in:
 	  disable tests failing in the mos6502-stack-auto port due to stack size limitation.
-  	* src/mos6502/main.c:
+	* src/mos6502/main.c:
 	  Rearrange memory segments to support systems without ROM space.
-   	* src/mos6502/gen.c,
-   	  src/mos6502/ralloc.h:
-   	  Remove dead code to support registers in reverse order.
+	* src/mos6502/gen.c,
+	  src/mos6502/ralloc.h:
+	  Remove dead code to support registers in reverse order.
 
 2024-01-12 Gabriele Gorla <gorlik@yahoo.com>
 
@@ -2234,7 +2234,7 @@
 
 	* src/mos6502/gen.c:
 	  Additional carry flag tracking optimizations.
-  	* src/mos6502/gen.c:
+	* src/mos6502/gen.c:
 	  Improve debug messages.
 
 2024-01-08 Philipp Klaus Krause <philipp@colecovision.eu>
@@ -2252,10 +2252,10 @@
 
 	* src/mos6502/gen.c:
 	  replace all instances of emitLabel() with safeEmitLabel().
- 	* src/mos6502/gen.c,
- 	  src/mos6502/main.c:
- 	  enable last operation flag tracking.
-   	* src/mos6502/gen.c:
+	* src/mos6502/gen.c,
+	  src/mos6502/main.c:
+	  enable last operation flag tracking.
+	* src/mos6502/gen.c:
 	  enable carry flag tracking.
 
 2024-01-03 Philipp Klaus Krause <philipp@colecovision.eu>
@@ -2391,8 +2391,8 @@
 
 2023-12-17 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/main.c
-  	  fix bra in the opcode table. Use strncmp in the opcode search to support 65C02 bit manipulation instructions.
+	* src/mos6502/main.c
+	  fix bra in the opcode table. Use strncmp in the opcode search to support 65C02 bit manipulation instructions.
 	* src/mos6502/gen.c
 	  fix wrong offset for struct return in mos6502-stack-auto port
 	  indentation changes
@@ -2415,23 +2415,23 @@
 
 2023-12-12 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/gen.c
-  	  fix bug3223041 regression failure for mos6502-stack-auto port
-  	  fix bug3531687 regression failure for mos6502-stack-auto port
-  	* device/lib/mos65c02/Makefile.in,
-  	  device/lib/mos65c02/__memcpy.s,
-  	  device/lib/mos65c02/_memcmp.s,
-  	  device/lib/mos65c02/_memset.s,
-  	  device/lib/mos65c02/_mullong.s,
-  	  device/lib/mos65c02/_mulschar.s,
-  	  device/lib/mos65c02/_muluchar.s,
-  	  device/lib/mos65c02/_setjmp.s,
-  	  device/lib/mos65c02/_strcmp.s,
-  	  device/lib/mos65c02/_strcpy.s,
-  	  device/lib/mos65c02/_strlen.s,
-  	  device/lib/mos65c02/abs.s,
-  	  device/lib/mos65c02/crt0.s,
-  	  device/lib/mos65c02/memcpy.s
+	* src/mos6502/gen.c
+	  fix bug3223041 regression failure for mos6502-stack-auto port
+	  fix bug3531687 regression failure for mos6502-stack-auto port
+	* device/lib/mos65c02/Makefile.in,
+	  device/lib/mos65c02/__memcpy.s,
+	  device/lib/mos65c02/_memcmp.s,
+	  device/lib/mos65c02/_memset.s,
+	  device/lib/mos65c02/_mullong.s,
+	  device/lib/mos65c02/_mulschar.s,
+	  device/lib/mos65c02/_muluchar.s,
+	  device/lib/mos65c02/_setjmp.s,
+	  device/lib/mos65c02/_strcmp.s,
+	  device/lib/mos65c02/_strcpy.s,
+	  device/lib/mos65c02/_strlen.s,
+	  device/lib/mos65c02/abs.s,
+	  device/lib/mos65c02/crt0.s,
+	  device/lib/mos65c02/memcpy.s
 	  add mos6502 improvements to mos65c02 port
 
 2023-12-12 Philipp Klaus Krause <philipp@colecovision.eu>
@@ -2475,30 +2475,30 @@
 
 2023-12-07 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* device/lib/mos6502/memcpy.s,
-  	  device/lib/mos6502/_memcmp.s,
-  	  device/lib/mos6502/_setjmp.s,
-  	  device/lib/mos6502/Makefile.in
-  	  optimize memcpy, memcmp amd setjump implemetations
+	* device/lib/mos6502/memcpy.s,
+	  device/lib/mos6502/_memcmp.s,
+	  device/lib/mos6502/_setjmp.s,
+	  device/lib/mos6502/Makefile.in
+	  optimize memcpy, memcmp amd setjump implemetations
 
 2023-12-06 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* device/lib/mos6502/_muluchar.s,
-  	  device/lib/mos6502/_mulschar.s
-  	  use ZP instead of absolute address
-   	* device/lib/mos6502/_strcpy.s,
-  	  device/lib/mos6502/_strcmp.s
-  	  use DPTR instead of temp
-   	* device/lib/mos6502/_strlen.s
+	* device/lib/mos6502/_muluchar.s,
+	  device/lib/mos6502/_mulschar.s
+	  use ZP instead of absolute address
+	* device/lib/mos6502/_strcpy.s,
+	  device/lib/mos6502/_strcmp.s
+	  use DPTR instead of temp
+	* device/lib/mos6502/_strlen.s
 	  implement strlen in asm
-   	* device/lib/mos6502/_memset.s,
-   	  device/lib/mos6502/crt0.s
-   	  implement memset in asm
-   	* device/lib/mos6502/abs.s,
-   	  device/lib/mos6502/abs.c
-   	  rename abs.c to abs.s
-   	* doc/sdccman.lyx
-   	  add mos6502 port documentation to SDCC manual
+	* device/lib/mos6502/_memset.s,
+	  device/lib/mos6502/crt0.s
+	  implement memset in asm
+	* device/lib/mos6502/abs.s,
+	  device/lib/mos6502/abs.c
+	  rename abs.c to abs.s
+	* doc/sdccman.lyx
+	  add mos6502 port documentation to SDCC manual
 
 2023-12-05 Philipp Klaus Krause <philipp@colecovision.eu>
 
@@ -2510,18 +2510,18 @@
 
 2023-12-04 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* device/lib/mos6502/_setjump.c,
-  	  device/lib/mos65c02/_setjump.c,
-  	  device/lib/mos6502-stack-auto/_setjump.c
-  	  Reduce ZP usage in setjump.
-  	* device/lib/mos6502/_ret01.s,
-  	  device/lib/mos6502/_ret23.s,
+	* device/lib/mos6502/_setjump.c,
+	  device/lib/mos65c02/_setjump.c,
+	  device/lib/mos6502-stack-auto/_setjump.c
+	  Reduce ZP usage in setjump.
+	* device/lib/mos6502/_ret01.s,
+	  device/lib/mos6502/_ret23.s,
 	  device/lib/mos6502/_ret4567.s,
 	  device/lib/mos65c02/_ret01.s,
-  	  device/lib/mos65c02/_ret23.s,
+	  device/lib/mos65c02/_ret23.s,
 	  device/lib/mos65c02/_ret4567.s,
 	  device/lib/mos6502-stack-auto/_ret01.s,
-  	  device/lib/mos6502-stack-auto/_ret23.s,
+	  device/lib/mos6502-stack-auto/_ret23.s,
 	  device/lib/mos6502-stack-auto/_ret4567.s
 	  Remove unnecessary .optsdcc directive.
 	* src/SDCCmem.c,
@@ -2532,59 +2532,59 @@
 
 2023-12-03 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/gen.c
+	* src/mos6502/gen.c
 	  Fix bug #3511
 	* src/mos6502/gen.c,
 	  src/SDCCsymt.c
-  	  Add limited support to return aggregates to mos6502 port.
-  	* device/lib/div.c,
-  	  device/lib/ldiv.c,
-  	  device/include/stdlib.h
-  	  Add div and ldiv to the mos6502 standard library.
-  	* device/lib/_divulonglong.c
-  	  Trivial spelling fix.
-  	* sdas/as6500/r6500.h,
-  	  sdas/as6500/r65adr.c,
-  	  sdas/as6500/r65mch.c,
-  	  sdas/as6500/pst.c
-  	  Merge several minor changes from upstream asxxxx 5.50
-  	* support/regression/MakeList,
-  	  support/regression/tests/bigstack.c.in,
-  	  support/regression/tests/div.c,
-  	  support/regression/tests/gcc-roture-execute-20131127-1.c
-  	  Enable additional tests for mos6502.
+	  Add limited support to return aggregates to mos6502 port.
+	* device/lib/div.c,
+	  device/lib/ldiv.c,
+	  device/include/stdlib.h
+	  Add div and ldiv to the mos6502 standard library.
+	* device/lib/_divulonglong.c
+	  Trivial spelling fix.
+	* sdas/as6500/r6500.h,
+	  sdas/as6500/r65adr.c,
+	  sdas/as6500/r65mch.c,
+	  sdas/as6500/pst.c
+	  Merge several minor changes from upstream asxxxx 5.50
+	* support/regression/MakeList,
+	  support/regression/tests/bigstack.c.in,
+	  support/regression/tests/div.c,
+	  support/regression/tests/gcc-roture-execute-20131127-1.c
+	  Enable additional tests for mos6502.
 
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/gen.c,
-  	  support/regression/tests/structreturn.c.in,
+	* src/mos6502/gen.c,
+	  support/regression/tests/structreturn.c.in,
 	  support/regression/tests/gcc-torture-execute-va-arg-4.c,
-  	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-23.c,
 	  support/regression/tests/gcc-torture-execute-struct-ret-1.c,
-  	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
+	  support/regression/tests/gcc-torture-execute-strct-varg-1.c,
 	  support/regression/tests/gcc-torture-execute-pr60017.c,
-  	  support/regression/tests/gcc-torture-execute-920625-1.c,
+	  support/regression/tests/gcc-torture-execute-920625-1.c,
 	  support/regression/tests/funptrsstructreturn.c,
-  	  support/regression/tests/div.c,
+	  support/regression/tests/div.c,
 	  support/regression/tests/bug-3385.c,
 	  support/regression/tests/bug-3368.c,
 	  support/regression/tests/bug-2776.c,
 	  support/regression/tests/bigreturn-remat.c.in,
 	  support/regression/MakeList,
-  	  Implement IPUSH_VALUE_AT_ADDRESS iCode and enable corresponding regression tests.
-  	  Disable failing tests for mos65c02.
+	  Implement IPUSH_VALUE_AT_ADDRESS iCode and enable corresponding regression tests.
+	  Disable failing tests for mos65c02.
 	* src/mos6502/gen.c
 	  Make sure result is a register before dereferencing the pointer (fix bug #3631)
 
 2023-12-02 Gabriele Gorla <gorlik@yahoo.com>
 
-  	* src/mos6502/main.c
+	* src/mos6502/main.c
 	  Correct opcode ordering.
 	  Fix get_model() reporting.
-   	* src/mos6502/gen.c
+	* src/mos6502/gen.c
 	  Make mos65c02 register transfer code use phx/phy/plx/ply.
-   	* src/mos6502/gen.c,
-   	  src/hc08/gen.c
+	* src/mos6502/gen.c,
+	  src/hc08/gen.c
 	  Reformat comments to match other ports.
 
 2023-12-02 Philipp Klaus Krause <philipp@colecovision.eu>
@@ -2624,7 +2624,7 @@
 	  support/regression/ports/uc65c02/support.c,
 	  support/regression/ports/uc65c02/spec.mk
 	  Add regression for mos65c02 using uCsim.
-  	* src/mos6502/main.c
+	* src/mos6502/main.c
 	  Add crt to mos65c02 link step by default.
 	* src/mos6502/gen.c
 	  Implement GenAnd and GenOr for mos65c02.
@@ -7361,7 +7361,7 @@
 	  device/lib/hc08/Makefile.in,
 	  device/lib/mos6502/Makefile.in,
 	  device/lib/mos65c02/Makefile.in,
-  	  device/lib/mos6502-stack-auto/Makefinle.in:
+	  device/lib/mos6502-stack-auto/Makefinle.in:
 	  Enable div and ldviv for mos6502 and hc08/s08 ports.
 	* src/mos6502/gen.c,
 	  src/mos6502/main.c:
@@ -7768,10 +7768,10 @@
 	* support/regression/tests/bug3475630.c,
 	  support/regression/tests/bug2094505.c:
 	  Adjust tests parameters for stack-auto.
-  	* src/mos6502/gen.c,
+	* src/mos6502/gen.c,
 	  src/mos6502/main.c,
 	  src/mos6502/ralloc2.cc:
-  	  Use DPTR instead of YX for indexed addressing.
+	  Use DPTR instead of YX for indexed addressing.
 
 2022-03-07 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
@@ -8251,8 +8251,8 @@
 
 	* src/mos6502/gen.c:
 	  Fix corner cases in genPointerSet.
-  	* src/mos6502/gen.c:
-  	  Add peephole rules to remove redundnat php/plp.
+	* src/mos6502/gen.c:
+	  Add peephole rules to remove redundnat php/plp.
 
 2022-02-08 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
@@ -9212,7 +9212,7 @@
 
 	* src/stm8/gen.c:
 	  Improve wide left shift by literal.
-	  
+
 2021-10-12 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* src/f8/gen.c,
@@ -9521,12 +9521,12 @@
 
     * sim/ucsim/pdk.src/inst.cc
     Fix bug in pdk15 simulation (introduced in [r12557]).
-    
+
 2021/07/28 Visenri
 
     * support/regression/compact-results.py
       Fix parsing of test name.
-      
+
 2021/07/27 Visenri
 
     * src/pdk/gen.c
@@ -9685,7 +9685,7 @@
       support/regression/tests/sizeof.c
       Removed empty definition of __data for pdk from testfwk.h.
       Added tests for SIZEOF operator.
-      
+
 2021-07-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClospre.hpp: fix bug #3166
@@ -9912,7 +9912,7 @@
 2021-06-08 Visenri
 	* src/SDCCpeeph.c:
 	  Fixed buffer overflow in operand string in "immdInRange" function.
-	  
+
 2021-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

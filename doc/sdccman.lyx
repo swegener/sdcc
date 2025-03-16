@@ -10598,10 +10598,6 @@ double (not supported)
 \end_layout
 
 \begin_layout Itemize
-Compound literals cannot have storage class specifiers.
-\end_layout
-
-\begin_layout Itemize
 Support for attributes is slightly incomplete.
 \end_layout
 
@@ -10982,7 +10978,7 @@ literal "false"
 \end_inset
 
 :
- The
+ The 
 \begin_inset Flex Code
 status open
 

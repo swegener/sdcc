@@ -689,6 +689,8 @@ struct
      "\\o{...} used without valid octal digits.", 0 },
   { E_SELECTION_DECLARATION_C2Y, ERROR_LEVEL_ERROR,
      "declaration within selection header requires ISO C2y or later", 0 },
+  { E_COMPLIT_SCLASS_C23, ERROR_LEVEL_ERROR,
+    "compound literals with storage class specifier require ISO C23 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

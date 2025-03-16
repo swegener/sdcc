@@ -1,3 +1,11 @@
+2025-03-16 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* doc/sdccman.lyx,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h:
+	  Add support for storage class specifiers in compound literals (C23, RFE #332).
+
 2025-03-15 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCC.y:

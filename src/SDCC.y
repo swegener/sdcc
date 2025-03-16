@@ -147,7 +147,7 @@ bool uselessDecl = true;
 %type <lnk> pointer specifier_qualifier_list type_specifier_list_ type_specifier_qualifier type_specifier typeof_specifier type_qualifier_list type_qualifier_list_opt type_qualifier type_name
 %type <lnk> type_specifier_list_without_struct_or_union type_specifier_qualifier_without_struct_or_union type_specifier_without_struct_or_union
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
-%type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
+%type <lnk> storage_class_specifiers storage_class_specifiers_ declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier enum_comma_opt enum_type_specifier simple_typed_enum_decl
 %type <lnk> abstract_declarator direct_abstract_declarator direct_abstract_declarator_opt array_abstract_declarator function_abstract_declarator
 %type <lnk> unqualified_pointer
@@ -238,7 +238,7 @@ postfix_expression
                       { $$ = newNode(INC_OP,$1,NULL);}
    | postfix_expression DEC_OP
                       { $$ = newNode(DEC_OP,$1,NULL); }
-   | '(' /* TODO (C23): storage_class_specifiers_opt */ type_name ')' braced_initializer
+   | '(' type_name ')' braced_initializer
                       {
                         if (!options.std_c99)
                           werror(E_COMPOUND_LITERALS_C99);
@@ -252,6 +252,33 @@ postfix_expression
 
                         /* add the specifier list to the id */
                         symbol *sym1 = prepareDeclarationSymbol(NULL, $2, sym);
+
+                        /* mark as temporary symbol for compound literal, so that gatherImplicitVariables
+                           can attach it to a block, and add the temporary symbol to the symbol table */
+                        sym1->iscomplit = 1;
+                        addSymChain(&sym1);
+                        /* allocate memory for the symbol where no block handling does it */
+                        if (NestLevel == 0)
+                          allocVariables(sym1);
+
+                        /* use the anonymous variable in the AST */
+                        $$ = newAst_VALUE(symbolVal(sym1));
+                      }
+   | '(' storage_class_specifiers type_name ')' braced_initializer
+                      {
+                        if (!options.std_c23)
+                          werror(E_COMPLIT_SCLASS_C23);
+
+                        /* create anonymous variable with the provided initializer list */
+                        symbol *sym = newSymbol(genSymName(NestLevel), NestLevel);
+                        /* imitate "init_declarator" */
+                        sym->ival = $5;
+                        /* NOTE: Do not increment seqPointNo here, because the initializer is part of a
+                                 compound literal. See Annex C.1 "Known Sequence Points" paragraph 4. */
+
+                        /* add the specifier list to the id */
+                        sym_link *merged = finalizeSpec(mergeDeclSpec($2, $3, "storage_class_specifiers type_name"));
+                        symbol *sym1 = prepareDeclarationSymbol(NULL, merged, sym);
 
                         /* mark as temporary symbol for compound literal, so that gatherImplicitVariables
                            can attach it to a block, and add the temporary symbol to the symbol table */
@@ -561,6 +588,17 @@ simple_declaration
          symbol *sym1 = prepareDeclarationSymbol (NULL, $1, $2);
          uselessDecl = true;
          $$ = sym1;
+      }
+   ;
+
+storage_class_specifiers
+   : storage_class_specifiers_ { $$ = finalizeSpec($1); };
+
+storage_class_specifiers_
+   : storage_class_specifier { $$ = $1; }
+   | storage_class_specifier storage_class_specifiers_
+      {
+         $$ = mergeDeclSpec($1, $2, "storage_class_specifier storage_class_specifiers - skipped");
       }
    ;
 

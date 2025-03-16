@@ -4819,9 +4819,8 @@ genCall (iCode * ic)
 					       OP_SYMBOL (left)->rname : OP_SYMBOL (left)->name));
     }
 
-  m6502_dirtyReg (m6502_reg_a);
-  m6502_dirtyReg (m6502_reg_x);
-  m6502_dirtyReg (m6502_reg_y);
+  m6502_dirtyAllRegs ();
+
   _G.DPTRAttr[0].isLiteral=0;
   _G.DPTRAttr[1].isLiteral=0;
   _G.DPTRAttr[0].aop=NULL;
@@ -4926,9 +4925,8 @@ genPcall (iCode * ic)
       emit6502op ("jsr", "0x%04X", ulFromVal (OP_VALUE (left)));
     }
 
-  m6502_dirtyReg (m6502_reg_a);
-  m6502_dirtyReg (m6502_reg_x);
-  m6502_dirtyReg (m6502_reg_y);
+  m6502_dirtyAllRegs ();
+
   _G.DPTRAttr[0].isLiteral=0;
   _G.DPTRAttr[1].isLiteral=0;
   _G.DPTRAttr[0].aop=NULL;
@@ -5348,11 +5346,7 @@ static void genLabel (iCode * ic)
 
   /* For the high level labels we cannot depend on any */
   /* register's contents. Amnesia time.                */
-  for (i = 0; i < HW_REG_SIZE; i++)
-    {
-      m6502_dirtyReg (m6502_regWithIdx (i));
-      //      m6502_useReg (m6502_regWithIdx (i));
-    }
+  m6502_dirtyAllRegs();
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeLabel (IC_LABEL (ic), ic);
@@ -9089,8 +9083,6 @@ shiftRLong1 (operand * left, operand * result, int shift, int sign)
       storeConstToAop (0, AOP (result), 3);
     }
 
-
-
  release:
   pullOrFreeReg (m6502_reg_a, needpulla);
 }
@@ -11389,12 +11381,8 @@ static void genJumpTab (iCode * ic)
     if (needpulla) pullReg(m6502_reg_a);
     emit6502op ("jmp", TEMPFMT_IND, getLastTempOfs()+1);
 
-    m6502_dirtyReg (m6502_reg_a);
-    m6502_dirtyReg (m6502_reg_x);
-    m6502_dirtyReg (m6502_reg_y);
-    m6502_freeReg (m6502_reg_a);
-    m6502_freeReg (m6502_reg_x);
-    m6502_freeReg (m6502_reg_y);
+    m6502_dirtyAllRegs();
+    m6502_freeAllRegs ();
   }
 
   /* now generate the jump labels */
@@ -11760,17 +11748,18 @@ genm6502iCode (iCode *ic)
       return;
     }
 
-  for (i = 0; i < HW_REG_SIZE; i++)
-    {
-      reg = m6502_regWithIdx (i);
-      m6502_freeReg (reg);
+  m6502_freeAllRegs ();
+
+//  for (i = 0; i < HW_REG_SIZE; i++)
+//    {
       // if (reg->aop)
       //   emitcode ("", "; %s = %s offset %d", reg->name, aopName (reg->aop), reg->aopofs);
+      //  reg->isLitConst = 0; //
+//    }
+
       // FIXME: removing the following generates worse code
       if (regalloc_dry_run)
-	m6502_dirtyReg (reg);
-      //  reg->isLitConst = 0; //
-    }
+	  m6502_dirtyAllRegs ();
 
   if (ic->op == IFX)
     updateiTempRegisterUse (IC_COND (ic));
@@ -12060,13 +12049,10 @@ genm6502Code (iCode *lic)
   int cln = 0;
   int clevel = 0;
   int cblock = 0;
-  int i;
 
   regalloc_dry_run = false;
 
-  for (i = 0; i < HW_REG_SIZE; i++)
-      m6502_dirtyReg (m6502_regWithIdx (i));
-
+  m6502_dirtyAllRegs ();
   _G.tempOfs = 0;
 
   /* print the allocation information */

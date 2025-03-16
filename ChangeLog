@@ -6,6 +6,7 @@
 	  src/mos6502/ralloc.h,
 	  src/mos6502/ralloc2.cc:
 	  Always use freeReg, useReg and dirtyReg.
+	  Implement dirtyAllRegs and freeAllRegs.
 
 2025-03-16 Benedikt Freisen <b.freisen AT gmx.net>
 

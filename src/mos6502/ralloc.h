@@ -116,7 +116,10 @@ extern reg_info *m6502_reg_sp;
 reg_info *m6502_regWithIdx (int);
 void m6502_useReg (reg_info * reg);
 void m6502_freeReg (reg_info * reg);
+void m6502_freeAllRegs ();
 void m6502_dirtyReg (reg_info * reg);
+void m6502_dirtyAllRegs ();
+
 bitVect *m6502_rUmaskForOp (operand * op);
 
 const m6502opcodedata *m6502_getOpcodeData(const char *inst);

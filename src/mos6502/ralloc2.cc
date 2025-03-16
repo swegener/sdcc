@@ -27,7 +27,6 @@
 extern "C"
 {
   #include "ralloc.h"
-  #include "gen.h"
   float drym6502iCode (iCode *ic);
   bool m6502_assignment_optimal;
 }

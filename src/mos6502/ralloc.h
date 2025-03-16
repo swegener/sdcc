@@ -59,6 +59,7 @@ enum
 #define M6502MASK_XA (M6502MASK_X | M6502MASK_A)
 //#define M6502MASK_YA (M6502MASK_Y | M6502MASK_A)
 #define M6502MASK_YX (M6502MASK_Y | M6502MASK_X)
+#define HW_REG_SIZE (Y_IDX+1)
     
 /* definition for the registers */
 typedef struct reg_info

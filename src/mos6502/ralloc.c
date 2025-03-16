@@ -149,6 +149,109 @@ m6502_freeReg (reg_info * reg)
 }
 
 /*-----------------------------------------------------------------*/
+/* m6502_useReg - marks a register  as used                        */
+/*-----------------------------------------------------------------*/
+void
+m6502_useReg (reg_info * reg)
+{
+  reg->isFree = 0;
+
+  switch (reg->rIdx)
+    {
+    case A_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isFree = 0;
+      //        m6502_reg_ya->aop = NULL;
+      //        m6502_reg_ya->isFree = 0;
+      break;
+    case X_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isFree = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isFree = 0;
+      break;
+    case Y_IDX:
+      //        m6502_reg_ya->aop = NULL;
+      //        m6502_reg_ya->isFree = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isFree = 0;
+      break;
+    case XA_IDX:
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isFree = 0;
+      m6502_reg_a->aop = NULL;
+      m6502_reg_a->isFree = 0;
+      break;
+      //      case YA_IDX:
+      //        m6502_reg_y->aop = NULL;
+      //        m6502_reg_y->isFree = 0;
+      //        m6502_reg_a->aop = NULL;
+      //        m6502_reg_a->isFree = 0;
+      //        break;
+    case YX_IDX:
+      m6502_reg_y->aop = NULL;
+      m6502_reg_y->isFree = 0;
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isFree = 0;
+      break;
+    default:
+      break;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* m6502_dirtyReg - marks a register as dirty                      */
+/*-----------------------------------------------------------------*/
+void
+m6502_dirtyReg (reg_info * reg)
+{
+  reg->aop = NULL;
+  reg->isLitConst=0;
+
+  switch (reg->rIdx)
+    {
+    case A_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isLitConst = 0;
+      //	m6502_reg_ya->aop = NULL;
+      //	m6502_reg_ya->isLitConst = 0;
+      break;
+    case X_IDX:
+      m6502_reg_xa->aop = NULL;
+      m6502_reg_xa->isLitConst = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isLitConst = 0;
+      break;
+    case Y_IDX:
+      //      m6502_reg_ya->aop = NULL;
+      //	m6502_reg_ya->isLitConst = 0;
+      m6502_reg_yx->aop = NULL;
+      m6502_reg_yx->isLitConst = 0;
+      break;
+    case XA_IDX:
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isLitConst = 0;
+      m6502_reg_a->aop = NULL;
+      m6502_reg_a->isLitConst = 0;
+      break;
+      //      case YA_IDX:
+      //        m6502_reg_y->aop = NULL;
+      //	m6502_reg_y->isLitConst = 0;
+      //        m6502_reg_a->aop = NULL;
+      //	m6502_reg_a->isLitConst = 0;
+      break;
+    case YX_IDX:
+      m6502_reg_y->aop = NULL;
+      m6502_reg_y->isLitConst = 0;
+      m6502_reg_x->aop = NULL;
+      m6502_reg_x->isLitConst = 0;
+      break;
+    default:
+      break;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* noOverLap - will iterate through the list looking for over lap  */
 /*-----------------------------------------------------------------*/
 static int
@@ -1480,109 +1583,6 @@ m6502_assignRegisters (ebbIndex *ebbi)
   }
 
   return;
-}
-
-/*-----------------------------------------------------------------*/
-/* m6502_useReg - marks a register  as used                        */
-/*-----------------------------------------------------------------*/
-void
-m6502_useReg (reg_info * reg)
-{
-  reg->isFree = 0;
-
-  switch (reg->rIdx)
-    {
-    case A_IDX:
-      m6502_reg_xa->aop = NULL;
-      m6502_reg_xa->isFree = 0;
-      //        m6502_reg_ya->aop = NULL;
-      //        m6502_reg_ya->isFree = 0;
-      break;
-    case X_IDX:
-      m6502_reg_xa->aop = NULL;
-      m6502_reg_xa->isFree = 0;
-      m6502_reg_yx->aop = NULL;
-      m6502_reg_yx->isFree = 0;
-      break;
-    case Y_IDX:
-      //        m6502_reg_ya->aop = NULL;
-      //        m6502_reg_ya->isFree = 0;
-      m6502_reg_yx->aop = NULL;
-      m6502_reg_yx->isFree = 0;
-      break;
-    case XA_IDX:
-      m6502_reg_x->aop = NULL;
-      m6502_reg_x->isFree = 0;
-      m6502_reg_a->aop = NULL;
-      m6502_reg_a->isFree = 0;
-      break;
-      //      case YA_IDX:
-      //        m6502_reg_y->aop = NULL;
-      //        m6502_reg_y->isFree = 0;
-      //        m6502_reg_a->aop = NULL;
-      //        m6502_reg_a->isFree = 0;
-      //        break;
-    case YX_IDX:
-      m6502_reg_y->aop = NULL;
-      m6502_reg_y->isFree = 0;
-      m6502_reg_x->aop = NULL;
-      m6502_reg_x->isFree = 0;
-      break;
-    default:
-      break;
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* m6502_dirtyReg - marks a register as dirty                      */
-/*-----------------------------------------------------------------*/
-void
-m6502_dirtyReg (reg_info * reg)
-{
-  reg->aop = NULL;
-  reg->isLitConst=0;
-
-  switch (reg->rIdx)
-    {
-    case A_IDX:
-      m6502_reg_xa->aop = NULL;
-      m6502_reg_xa->isLitConst = 0;
-      //	m6502_reg_ya->aop = NULL;
-      //	m6502_reg_ya->isLitConst = 0;
-      break;
-    case X_IDX:
-      m6502_reg_xa->aop = NULL;
-      m6502_reg_xa->isLitConst = 0;
-      m6502_reg_yx->aop = NULL;
-      m6502_reg_yx->isLitConst = 0;
-      break;
-    case Y_IDX:
-      //      m6502_reg_ya->aop = NULL;
-      //	m6502_reg_ya->isLitConst = 0;
-      m6502_reg_yx->aop = NULL;
-      m6502_reg_yx->isLitConst = 0;
-      break;
-    case XA_IDX:
-      m6502_reg_x->aop = NULL;
-      m6502_reg_x->isLitConst = 0;
-      m6502_reg_a->aop = NULL;
-      m6502_reg_a->isLitConst = 0;
-      break;
-      //      case YA_IDX:
-      //        m6502_reg_y->aop = NULL;
-      //	m6502_reg_y->isLitConst = 0;
-      //        m6502_reg_a->aop = NULL;
-      //	m6502_reg_a->isLitConst = 0;
-      break;
-    case YX_IDX:
-      m6502_reg_y->aop = NULL;
-      m6502_reg_y->isLitConst = 0;
-      m6502_reg_x->aop = NULL;
-      m6502_reg_x->isLitConst = 0;
-      break;
-    default:
-      break;
-    }
 }
 
 /*-----------------------------------------------------------------*/

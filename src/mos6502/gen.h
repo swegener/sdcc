@@ -21,6 +21,48 @@
 #ifndef SDCCGENM6502_H
 #define SDCCGENM6502_H
 
+// keep this in sync with _temp.s in the library
+#define NUM_TEMP_REGS 8
+
+enum debug_messages {
+  ALWAYS=0x01,
+  VASM=0x02,
+  TRACEGEN=0x04,
+  DEEPTRACE=0x08,
+  COST=0x10,
+  REGALLOC=0x20,
+  REGOPS=0x40,
+  TRACE_AOP=0x80,
+  TRACE_STACK=0x100,
+  VVDBG=0x80000000,
+  DEBUG_ALL=0x7fffffff
+};
+
+//#define DBG_MSG (REGALLOC)
+#define DBG_MSG (REGALLOC|TRACEGEN/*|COST*/)
+//#define DBG_MSG (REGALLOC|TRACEGEN|REGOPS/*|COST*/)
+//#define DBG_MSG (REGALLOC|TRACEGEN|TRACE_STACK/*|COST*/)
+//#define DBG_MSG (DEBUG_ALL/*|VVDBG*/)
+//#define DBG_MSG ((DEBUG_ALL|VVDBG)&~COST)
+
+#define DEBUG_UNIMPLEMENTED
+
+#define LSB     0
+#define MSB16   1
+#define MSB24   2
+#define MSB32   3
+
+#define AOP(op) op->aop
+#define AOP_TYPE(op) AOP(op)->type
+#define AOP_SIZE(op) AOP(op)->size
+#define AOP_OP(aop) aop->op
+
+#define IS_AOP_A(x) ((x)->regmask == M6502MASK_A)
+#define IS_AOP_X(x) ((x)->regmask == M6502MASK_X)
+#define IS_AOP_Y(x) ((x)->regmask == M6502MASK_Y)
+#define IS_AOP_XA(x) ((x)->regmask == M6502MASK_XA)
+#define IS_AOP_YX(x) ((x)->regmask == M6502MASK_YX)
+
 typedef enum
   {
   AOP_INVALID,
@@ -61,6 +103,15 @@ typedef struct asmop
     } aopu;
   }
 asmop;
+
+struct attr_t
+{
+  bool isLiteral;
+  unsigned char literalValue;
+  operand *op;
+  struct asmop *aop;		/* last operand */
+  int aopofs;			/* last operand offset */
+};
 
 void genm6502Code (iCode *);
 void m6502_emitDebuggerSymbol (const char *);

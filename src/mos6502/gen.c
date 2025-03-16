@@ -30,43 +30,11 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-enum debug_messages {
-  ALWAYS=0x01,
-  VASM=0x02,
-  TRACEGEN=0x04,
-  DEEPTRACE=0x08,
-  COST=0x10,
-  REGALLOC=0x20,
-  REGOPS=0x40,
-  TRACE_AOP=0x80,
-  TRACE_STACK=0x100,
-  VVDBG=0x80000000,
-  DEBUG_ALL=0x7fffffff
-};
-
-//#define DBG_MSG (REGALLOC)
-#define DBG_MSG (REGALLOC|TRACEGEN/*|COST*/)
-//#define DBG_MSG (DEBUG_ALL/*|VVDBG*/)
-//#define DBG_MSG ((DEBUG_ALL|VVDBG)&~COST)
-
-#define DEBUG_UNIMPLEMENTED
-
 extern int allocInfo;
 
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_bytes;
 static float regalloc_dry_run_cost_cycles;
-
-struct attr_t
-{
-  bool isLiteral;
-  unsigned char literalValue;
-  struct asmop *aop;		/* last operand */
-  int aopofs;			/* last operand offset */
-};
-
-// keep this in sync with _temp.s in the library
-#define NUM_TEMP_REGS 8
 
 static struct
 {
@@ -137,11 +105,6 @@ const int STACK_TOP = 0x100;
 #define RESULTONSTACK(x)                        \
   (IC_RESULT(x) && IC_RESULT(x)->aop &&         \
    IC_RESULT(x)->aop->type == AOP_STK )
-#define IS_AOP_A(x) ((x)->regmask == M6502MASK_A)
-#define IS_AOP_X(x) ((x)->regmask == M6502MASK_X)
-#define IS_AOP_Y(x) ((x)->regmask == M6502MASK_Y)
-#define IS_AOP_XA(x) ((x)->regmask == M6502MASK_XA)
-#define IS_AOP_YX(x) ((x)->regmask == M6502MASK_YX)
 #define IS_AOP_WITH_A(x) (((x)->regmask & M6502MASK_A) != 0)
 #define IS_AOP_WITH_X(x) (((x)->regmask & M6502MASK_X) != 0)
 #define IS_AOP_WITH_Y(x) (((x)->regmask & M6502MASK_Y) != 0)
@@ -149,16 +112,6 @@ const int STACK_TOP = 0x100;
 #define IS_AOPOFS_A(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_A))
 #define IS_AOPOFS_X(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_X))
 #define IS_AOPOFS_Y(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_Y))
-
-#define LSB     0
-#define MSB16   1
-#define MSB24   2
-#define MSB32   3
-
-#define AOP(op) op->aop
-#define AOP_TYPE(op) AOP(op)->type
-#define AOP_SIZE(op) AOP(op)->size
-#define AOP_OP(aop) aop->op
 
 symbol *
 safeNewiTempLabel(const char * a)
@@ -537,7 +490,8 @@ emit6502op (const char *inst, const char *fmt, ...)
                 }
             }
 #endif
-          if(dst_reg) m6502_dirtyReg (dst_reg);
+          if(dst_reg)
+            m6502_dirtyReg (dst_reg);
           break;
         case M6502OP_CMP:
           if(!strcmp(fmt,"#0x00"))
@@ -2457,7 +2411,7 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       if (reg == NULL)
         {
           // FIXME: used vs. surv triggers failure on bug 3556 in stack-auto
-          // seemd to not affect the bug anymore (?)
+          // seems to not affect the bug anymore (?)
 	  //          needpula = pushRegIfUsed (m6502_reg_a);
           needpula = storeRegTempIfUsed (m6502_reg_a);
           reg = m6502_reg_a;
@@ -3871,13 +3825,11 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 #endif
 	}
     case AOP_IDX:
-      return "ERROR - AOP_IDX"; // TODO: error
+      return "ERROR - aopAdrStr: AOP_IDX ";
     default:
       break;
     }
-
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopAdrStr got unsupported aop->type");
-  exit (1);
+      return "ERROR - aopAdrStr: unknown aop type";
 }
 
 /**************************************************************************
@@ -3895,7 +3847,7 @@ asmopToBool (asmop *aop, bool resultInA)
   bool needloada = false;
   bool isFloat;
 
-  emitComment (TRACE_AOP, "asmopToBool resultinA %s", resultInA?"yes":"no");
+  emitComment (TRACE_AOP, "  %s resultinA: %s", __func__, resultInA?"yes":"no");
 
   wassert (aop);
   type = operandType (AOP_OP (aop));
@@ -4123,7 +4075,7 @@ genCopy (operand * result, operand * source)
       return;
     }
 
-#if 0
+#if 1
   if(AOP_TYPE (source) == AOP_SOF || AOP_TYPE(result) == AOP_SOF)
     {
       bool save_a, save_x;
@@ -4137,13 +4089,13 @@ genCopy (operand * result, operand * source)
 	    {
 	      loadRegFromConst (m6502_reg_a, 0);
 	      storeRegToAop (m6502_reg_a, AOP(result), offset);
-	      m6502_reg_a->isFree=true;
+	      m6502_freeReg(m6502_reg_a);
 	    }
 	  else
 	    {
 	      loadRegFromAop (m6502_reg_a, AOP(source), offset);
 	      storeRegToAop (m6502_reg_a, AOP(result), offset);
-	      m6502_reg_a->isFree=true;
+	      m6502_freeReg(m6502_reg_a);
 	    }
 	  offset--;
 	}
@@ -4176,7 +4128,7 @@ genCopy (operand * result, operand * source)
   offset=size-1;
 
   while ( offset >= srcsize )
-    {
+   {
       storeConstToAop (0, AOP (result), offset);
       offset--;
     }
@@ -4184,7 +4136,7 @@ genCopy (operand * result, operand * source)
     {
       transferAopAop (AOP (source), offset, AOP (result), offset);
       offset--;
-    }
+   }
 #endif
 }
 
@@ -4340,7 +4292,7 @@ genUminusFloat (operand * op, operand * result)
   needpula = pushRegIfSurv (m6502_reg_a);
   loadRegFromAop (m6502_reg_a, AOP (op), offset);
   emit6502op ("eor", "#0x80");
-  m6502_useReg (m6502_reg_a);
+//  m6502_useReg (m6502_reg_a);
   storeRegToAop (m6502_reg_a, AOP (result), offset);
   pullOrFreeReg (m6502_reg_a, needpula);
 }
@@ -5396,10 +5348,10 @@ static void genLabel (iCode * ic)
 
   /* For the high level labels we cannot depend on any */
   /* register's contents. Amnesia time.                */
-  for (i = A_IDX; i < SP_IDX; i++)
+  for (i = 0; i < HW_REG_SIZE; i++)
     {
       m6502_dirtyReg (m6502_regWithIdx (i));
-      m6502_useReg (m6502_regWithIdx (i));
+      //      m6502_useReg (m6502_regWithIdx (i));
     }
 
   if (options.debug && !regalloc_dry_run)
@@ -8125,7 +8077,7 @@ genlsh16 (operand * result, operand * left, int shCount)
       if (maskedtopbyte)
 	emit6502op ("and", IMMDFMT, topbytemask);
       storeRegToAop (m6502_reg_a, AOP (result), 1);
-      storeConstToAop (0, AOP (result), LSB);
+      storeConstToAop (0, AOP (result), 0);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto done; // Top byte is 0, doesn't need masking.
     }
@@ -9963,7 +9915,7 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
       emit6502op("lda", INDFMT_IY);
       AccRsh (bstr, false);
       emit6502op ("and", IMMDFMT, ((unsigned char) - 1) >> (8 - blen));
-      m6502_reg_a->isFree=false;
+      m6502_useReg(m6502_reg_a);
       if (!SPEC_USIGN (etype))
 	{
 	  /* signed bitfield */
@@ -11196,14 +11148,18 @@ static void genIfx (iCode * ic, iCode * popIc)
   
   /* If the condition is a literal, we can just do an unconditional */
   /* branch or no branch */
-  if (AOP_TYPE (cond) == AOP_LIT) {
+  if (AOP_TYPE (cond) == AOP_LIT)
+    {
     unsigned long long lit = ullFromVal (AOP (cond)->aopu.aop_lit);
     freeAsmop (cond, NULL);
     
-    if (lit) {
+      if (lit)
+        {
       if (IC_TRUE (ic))
         emitBranch ("jmp", IC_TRUE (ic));
-    } else {
+        }
+      else
+        {
       if (IC_FALSE (ic))
         emitBranch ("jmp", IC_FALSE (ic));
     }
@@ -11212,7 +11168,8 @@ static void genIfx (iCode * ic, iCode * popIc)
   }
 
   /* evaluate the operand */
-  if (AOP_TYPE (cond) != AOP_CRY) {
+  if (AOP_TYPE (cond) != AOP_CRY)
+    {
     emitComment (TRACEGEN|VVDBG, "     genIfx - !AOP_CRY");
     asmopToBool (AOP (cond), false);
   }
@@ -11803,7 +11760,7 @@ genm6502iCode (iCode *ic)
       return;
     }
 
-  for (i = 0; i < m6502_nRegs; i++)
+  for (i = 0; i < HW_REG_SIZE; i++)
     {
       reg = m6502_regWithIdx (i);
       m6502_freeReg (reg);
@@ -11833,15 +11790,14 @@ genm6502iCode (iCode *ic)
       updateiTempRegisterUse (right);
     }
 
-  // FIXME: this is broken when reordering registers
-  for (i = A_IDX; i <= Y_IDX; i++)
+  for (i = 0; i < HW_REG_SIZE; i++)
     {
       if (bitVectBitValue (ic->rSurv, i))
         {
           m6502_regWithIdx (i)->isDead = false;
-          m6502_regWithIdx (i)->isFree = false;
+          m6502_useReg(m6502_regWithIdx (i));
         } else
-        m6502_regWithIdx (i)->isDead = true;
+	m6502_regWithIdx (i)->isDead = true;
     }
 
   /* depending on the operation */
@@ -12104,12 +12060,13 @@ genm6502Code (iCode *lic)
   int cln = 0;
   int clevel = 0;
   int cblock = 0;
+  int i;
 
   regalloc_dry_run = false;
 
-  m6502_dirtyReg (m6502_reg_a);
-  m6502_dirtyReg (m6502_reg_y);
-  m6502_dirtyReg (m6502_reg_x);
+  for (i = 0; i < HW_REG_SIZE; i++)
+      m6502_dirtyReg (m6502_regWithIdx (i));
+
   _G.tempOfs = 0;
 
   /* print the allocation information */

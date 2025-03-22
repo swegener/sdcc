@@ -1,5 +1,10 @@
 2025-03-16 Gabriele Gorla <gorlik@yahoo.com>
 
+	* src/mos6502/gen.c:
+	  Improve register tracking.
+
+2025-03-16 Gabriele Gorla <gorlik@yahoo.com>
+
 	* src/mos6502/gen.c,
 	  src/mos6502/gen.h,
 	  src/mos6502/ralloc.c,

@@ -10,6 +10,7 @@
   	  Implement fsadd and fssub in assembly.
   	* src/mos6502/gen.c:
   	  Restore regs from DPTR in genPointerGet.
+  	  Enable XA=A+op optimization in genPlus.
 
 2025-03-22 Gabriele Gorla <gorlik@yahoo.com>
 

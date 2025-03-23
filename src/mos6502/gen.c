@@ -5640,9 +5640,6 @@ genPlus (iCode * ic)
         }
     }
 
-#if 0
-  // FIXME: this optimization improves significantly the aes benchmark
-  // but makes the regression test slower
   if ( IS_AOP_XA(AOP(result)) && IS_AOP_A(AOP(left)) && AOP_TYPE(right) != AOP_SOF) 
     {
       symbol *skipInc = safeNewiTempLabel (NULL);
@@ -5655,7 +5652,6 @@ genPlus (iCode * ic)
       safeEmitLabel (skipInc);
       goto release;
     }
-#endif
 
   if ( IS_AOP_XA (AOP(result)) && IS_AOP_XA(AOP(left)) && AOP_TYPE(right) == AOP_SOF )
     {

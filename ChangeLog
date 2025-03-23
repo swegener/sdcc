@@ -5,6 +5,9 @@
   	* device/lib/mos6502/strlen.s,
   	  device/lib/mos6502/_strlen.s:
   	  Fix incorrect file name.
+  	* device/lib/mos6502/_strchr.s,
+  	  device/lib/mos6502/_strrchr.s:
+  	  Implement strchr and strrchr in assembly.
 
 2025-03-21 Gabriele Gorla <gorlik@yahoo.com>
 

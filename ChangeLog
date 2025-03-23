@@ -5,6 +5,9 @@
   	  Small strcmp and strrchr in fixes.
    	* device/lib/_fsadd.c:
    	  Remove redundant sign check.
+  	* device/lib/mos6502/_fsadd.s,
+  	  device/lib/mos6502/_fssub.s:
+  	  Implement fsadd and fssub in assembly.
 
 2025-03-22 Gabriele Gorla <gorlik@yahoo.com>
 

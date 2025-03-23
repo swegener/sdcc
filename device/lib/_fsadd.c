@@ -30,6 +30,7 @@
 #define __SDCC_FLOAT_LIB
 #include <float.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <sdcc-lib.h>
 
 #ifdef FLOAT_ASM_MCS51
@@ -160,6 +161,9 @@ fsadd_direct_entry:
 ** uunet!motown!pipeline!phw
 */
 
+#define getulong(a) (*((uint32_t *)(&a)))
+#define getuchar(a) (*((uint8_t *)(&a)))
+
 union float_long
   {
     float f;
@@ -188,7 +192,7 @@ float __fsadd (float a1, float a2) __SDCC_FLOAT_NONBANKED
   exp1 = EXP (*pfl1);
   mant1 = MANT (*pfl1) << 4;
   if (SIGN(*pfl1))
-  if (*pfl1 & 0x80000000)
+//  if (*pfl1 & 0x80000000)
     mant1 = -mant1;
   /* check for zero args */
   if (!*pfl1)

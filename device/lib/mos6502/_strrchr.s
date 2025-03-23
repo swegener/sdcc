@@ -66,7 +66,7 @@ loop:
     beq found
     cpy #0x00
     bne loop
-;    dec *DPTR+1
+    dec *DPTR+1
     dex
     bne loop
 

@@ -5334,7 +5334,7 @@ static void genRet (iCode * ic)
     if(size>8)
       {
         if (!regalloc_dry_run)
-          werror ( E_FUNC_AGGR);
+          emitcode("ERROR","  %s: return size>8 not supported", __func__);
         goto jumpret;
       }
 
@@ -5395,7 +5395,8 @@ static void genRet (iCode * ic)
  jumpret:
   /* generate a jump to the return label
      if the next is not the return statement */
-  if (!(ic->next && ic->next->op == LABEL && IC_LABEL (ic->next) == returnLabel)) {
+  if (!(ic->next && ic->next->op == LABEL && IC_LABEL (ic->next) == returnLabel))
+  {
     emit6502op ("jmp", "%05d$", safeLabelNum (returnLabel));
   }
 }
@@ -6555,9 +6556,17 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
 		//                  storeRegTemp (m6502_reg_a, true);
 		//                  needloada = true;
 		needloada = storeRegTempIfSurv(m6502_reg_a);
-		loadRegFromAop (m6502_reg_a, AOP (left), offset);
+		//loadRegFromAop (m6502_reg_a, AOP (left), offset);
 	      }
-	      accopWithAop ("ucp", AOP (right), offset);
+              if(m6502_reg_x->aop&&sameRegs(m6502_reg_x->aop, AOP(left))&&m6502_reg_x->aopofs==offset)
+                {
+                   accopWithAop ("cpx", AOP (right), offset);
+                }
+              else
+                {
+		loadRegFromAop (m6502_reg_a, AOP (left), offset);
+	        accopWithAop ("ucp", AOP (right), offset);
+	      }
 	      loadRegTempNoFlags (m6502_reg_a, needloada);
 	      needloada = false;
 	    }

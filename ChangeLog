@@ -1,4 +1,9 @@
-2025-03-16 Gabriele Gorla <gorlik@yahoo.com>
+2025-03-22 Gabriele Gorla <gorlik@yahoo.com>
+
+	* src/mos6502/gen.c:
+	  Improve genCmpEQorNE.
+	  
+2025-03-21 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:
 	  Improve register tracking.

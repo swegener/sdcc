@@ -2,7 +2,10 @@
 
 	* src/mos6502/gen.c:
 	  Improve genCmpEQorNE.
-	  
+  	* device/lib/mos6502/strlen.s,
+  	  device/lib/mos6502/_strlen.s:
+  	  Fix incorrect file name.
+
 2025-03-21 Gabriele Gorla <gorlik@yahoo.com>
 
 	* src/mos6502/gen.c:

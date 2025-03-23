@@ -108,11 +108,25 @@ replace restart {
        bne	%2
 } by {
 	bne	%2
-	; Peephole genIfx - skipped second bne
+	; Peephole genIfx 1 - skipped chain bne
         txa
 %1:
         bne	%2
 } if labelInRange(%2), labelRefCountChange(%1 -1), labelRefCountChange(%2 +1)
+
+replace restart {
+	bne	%1
+        %3	#0x00
+%1:
+	bne	%2
+} by {
+	bne	%2
+	; Peephole genIfx 1a - skipped chain bne
+        %3	#0x00
+%1:
+        bne	%2
+} if same(%3 'cmp' 'cpx' 'cpy'), labelInRange(%2), labelRefCountChange(%1 -1), labelRefCountChange(%2 +1)
+
 
 replace restart {
 	ldx %2
@@ -170,6 +184,46 @@ replace restart {
 	txa
 }
 
+replace restart {
+	ldx %2
+	lda %1
+        sta %1
+        stx %2
+} by {
+	; Peephole setupDPTR 1 - removed sta/stx
+	ldx %2
+	lda %1
+}
+
+replace restart {
+	ldx %2
+	lda %1
+} by {
+	; Peephole setupDPTR 2 - removed lda/ldx
+} if notUsed('a' 'x')
+
+replace restart {
+	ldx %1
+        clc
+        tsx
+} by {
+	; Peephole genPlus 1 - removed useless ldx %1
+        clc
+        tsx
+}
+
+replace restart {
+	ldx %1
+        clc
+        adc %2
+        tsx
+} by {
+	; Peephole genPlus 1a - removed useless ldx %1
+        clc
+	adc %2
+        tsx
+}
+
 ////////////////////////////////////////////////////////
 // Remove unnecessary loads
 ////////////////////////////////////////////////////////
@@ -193,18 +247,18 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
-        sta	%1, %2
-	lda     %1, %2
+        sta	%1,%2
+	lda     %1,%2
 } by {
-        sta	%1, %2
-    ; Peephole load 2 - removed redundant lda %1, %2
+        sta	%1,%2
+    ; Peephole load 2 - removed redundant lda %1,%2
 } if notVolatile(%1), notUsed('n' 'z')
 
 replace restart {
-        sta	%1, %2
-	lda     %1, %2
+        sta	%1,%2
+	lda     %1,%2
 } by {
-        sta	%1, %2
+        sta	%1,%2
         ora	#0x00
     ; Peephole load 2a - replaced redundant lda by ora
 } if notVolatile(%1)
@@ -225,33 +279,54 @@ replace restart {
     ; Peephole load 4 - eliminated redundant ldy %1
 } if notVolatile(%1), notUsed('n' 'z')
 
+replace restart {
+	lda     %1
+        sta	%3
+	lda     %1
+} by {
+        lda	%1
+        sta	%3
+    ; Peephole load 5 - removed redundant lda %1
+} if notVolatile(%1)
+
+
+replace restart {
+	lda     %1,%2
+        sta	%3,%2
+	lda     %1,%2
+} by {
+        lda	%1,%2
+        sta	%3,%2
+    ; Peephole load 5a - removed redundant lda %1,%2
+} if notVolatile(%1)
+
 ////////////////////////////////////////////////////////
 // Remove dead loads
 ////////////////////////////////////////////////////////
 
 replace restart {
-        lda	%2, %4
+        lda	%2,%4
         lda	%3
 } by {
-    ; Peephole load 5 - eliminated dead lda %2, %4
+    ; Peephole load 5 - eliminated dead lda %2,%4
 	lda	%3
 } if notVolatile(%2)
 
 
 replace restart {
         lda	%2
-        lda	%3, %4
+        lda	%3,%4
 } by {
     ; Peephole load 6 - eliminated dead lda %2
-	lda	%3, %4
+	lda	%3,%4
 } if notVolatile(%2)
 
 replace restart {
-        lda	%2, %4
-        lda	%3, %5
+        lda	%2,%4
+        lda	%3,%5
 } by {
-    ; Peephole load 7 - eliminated dead lda %2, %4
-	lda	%3, %5
+    ; Peephole load 7 - eliminated dead lda %2,%4
+	lda	%3,%5
 } if notVolatile(%2)
 
 
@@ -322,10 +397,21 @@ replace restart {
 	%1
 	lda	%2
 } by {
-	; Peephole load 15 - removed dead lda
+	; Peephole load 15 - removed dead lda %3
 	%1 
 	lda	%2
 } if notSame(%1 'pha' 'php' 'tax' 'tay'), notVolatile(%3)
+
+replace restart {
+	lda	%3
+	%1
+	lda	%2,%4
+} by {
+	; Peephole load 15a - removed dead lda %3
+	%1 
+	lda	%2,%4
+} if notSame(%1 'pha' 'php' 'tax' 'tay'), notVolatile(%3)
+
 
 replace restart {
 	ldx	%3
@@ -570,11 +656,11 @@ replace restart {
 } if notVolatile(%2)
 
 replace restart {
-	lda	%2, %3
-	sta	%2, %3
+	lda	%2,%3
+	sta	%2,%3
 } by {
-	lda	%2, %3
-	; Peephole store 1a - removed redundant sta %2, %3
+	lda	%2,%3
+	; Peephole store 1a - removed redundant sta %2,%3
 } if notVolatile(%2)
 
 replace restart {
@@ -614,6 +700,16 @@ replace restart {
 	%1
 	; Peephole store 5 - removed redundant stx %2
 } if notSame(%1 'tax' 'inx' 'dex'), notVolatile(%2)
+
+replace restart {
+	ldx	%2
+	%1      %3
+	stx	%2
+} by {
+	ldx	%2
+	%1      %3
+	; Peephole store 5a - removed redundant stx %2
+} if notSame(%1 'jsr' 'jmp' 'bne' 'beq' 'bcc' 'bcs' 'bvc' 'bvs' 'bpl' 'bmi' 'bra'), notVolatile(%2)
 
 replace restart {
 	ldy	%2

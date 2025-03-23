@@ -3,6 +3,8 @@
   	* device/lib/mos6502/_strcmp.s,
   	  device/lib/mos6502/_strrchr.s:
   	  Small strcmp and strrchr in fixes.
+   	* device/lib/_fsadd.c:
+   	  Remove redundant sign check.
 
 2025-03-22 Gabriele Gorla <gorlik@yahoo.com>
 

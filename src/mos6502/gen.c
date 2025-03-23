@@ -182,6 +182,17 @@ dirtyReg(reg_info *reg, asmop *aop, int offset)
           m6502_reg_y->aop = NULL;
         }
     }
+
+  if(_G.DPTRAttr[0].aop && sameRegs(_G.DPTRAttr[0].aop, aop) && _G.DPTRAttr[0].aopofs==offset)
+   {
+     _G.DPTRAttr[0].aop=NULL;
+   }
+
+  if(_G.DPTRAttr[1].aop && sameRegs(_G.DPTRAttr[1].aop, aop) && _G.DPTRAttr[1].aopofs==offset)
+   {
+      _G.DPTRAttr[1].aop=NULL;
+   }
+
 }
 
 
@@ -2819,6 +2830,13 @@ storeRegToDPTR(reg_info *reg, int dofs)
       m6502_freeReg(reg);
       return;
     }
+
+  if ( reg->aop && _G.DPTRAttr[dofs].aop && sameRegs (reg->aop, _G.DPTRAttr[dofs].aop) 
+         && (reg->aopofs == dofs) )
+   {
+      emitComment (TRACEGEN, " %s: DPTR already has result", __func__);
+      return;
+   }
 
   switch(regidx)
     {
@@ -9943,15 +9961,14 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
   int offset = 0;               /* result byte offset */
   int rsize;                    /* result size */
   int rlen = 0;                 /* remaining bitfield length */
-  sym_link *etype;              /* bitfield type information */
   unsigned blen;                /* bitfield length */
   unsigned bstr;                /* bitfield starting bit within byte */
+  sym_link *etype;              /* bitfield type information */
+  int litOffset = 0;
+  char * rematOffset = NULL;
   bool needpulla = false;
   bool needpully = false;
   bool needpullx = false;
-  int litOffset = 0;
-  char * rematOffset = NULL;
-
   emitComment (TRACEGEN, __func__);
 
   decodePointerOffset (right, &litOffset, &rematOffset);
@@ -9965,8 +9982,8 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
 
   if (!IS_AOP_YX (AOP (left)))
     {
-      needpullx = pushRegIfSurv (m6502_reg_x);
-      needpully = pushRegIfSurv (m6502_reg_y);
+      needpullx = storeRegTempIfSurv (m6502_reg_x);
+      needpully = storeRegTempIfSurv (m6502_reg_y);
     }
 
   int yoff= setupDPTR(left, litOffset, rematOffset, false);
@@ -9982,14 +9999,17 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
 	  emit6502op ("and", IMMDFMT, (((unsigned char) - 1) >> (8 - blen)) << bstr);
 	}
       //      emit6502op("php", "");//TODO
-      pullOrFreeReg (m6502_reg_y, needpully);
-      pullOrFreeReg (m6502_reg_x, needpullx);
+      loadOrFreeRegTemp (m6502_reg_y, needpully);
+      loadOrFreeRegTemp (m6502_reg_x, needpullx);
       loadOrFreeRegTemp (m6502_reg_a, needpulla);
       //      emit6502op("plp", "");
+      emit6502op("ERROR", "%s: unimplemented ifx & blen<=8",__func__);
       genIfxJump (ifx, "z");
       return;
     }
-  wassert (!ifx);
+
+    if(ifx)
+      emit6502op("ERROR", "%s: unimplemented ifx",__func__);
 
   /* If the bitfield length is less than a byte */
   if (blen < 8)
@@ -10013,8 +10033,8 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
       goto finish;
     }
 
-  /* Bit field did not fit in a byte. Copy all
-     but the partial byte at the end.  */
+  /* Bit length is greater than 7 bits. In this case, copy  */
+  /* all except the partial byte at the end                 */
   for (rlen = blen; rlen >= 8; rlen -= 8)
     {
       loadRegFromConst(m6502_reg_y, yoff + offset);
@@ -10066,8 +10086,8 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
 	    storeRegToAop (m6502_reg_a, AOP (result), offset++);
 	}
     }
-  pullOrFreeReg (m6502_reg_y, needpully);
-  pullOrFreeReg (m6502_reg_x, needpullx);
+  loadOrFreeRegTemp (m6502_reg_y, needpully);
+  loadOrFreeRegTemp (m6502_reg_x, needpullx);
   loadOrFreeRegTemp (m6502_reg_a, needpulla);
 }
 

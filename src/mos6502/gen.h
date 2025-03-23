@@ -108,7 +108,6 @@ struct attr_t
 {
   bool isLiteral;
   unsigned char literalValue;
-  operand *op;
   struct asmop *aop;		/* last operand */
   int aopofs;			/* last operand offset */
 };

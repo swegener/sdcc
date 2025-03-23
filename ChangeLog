@@ -2,6 +2,7 @@
 
 	* src/mos6502/gen.c:
 	  Improve genCmpEQorNE.
+	  Implement DPTR tracking.
   	* device/lib/mos6502/strlen.s,
   	  device/lib/mos6502/_strlen.s:
   	  Fix incorrect file name.

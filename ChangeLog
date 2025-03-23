@@ -8,6 +8,8 @@
   	* device/lib/mos6502/_fsadd.s,
   	  device/lib/mos6502/_fssub.s:
   	  Implement fsadd and fssub in assembly.
+  	* src/mos6502/gen.c:
+  	  Restore regs from DPTR in genPointerGet.
 
 2025-03-22 Gabriele Gorla <gorlik@yahoo.com>
 

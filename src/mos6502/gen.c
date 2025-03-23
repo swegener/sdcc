@@ -10602,9 +10602,26 @@ static void genPointerGet (iCode * ic, iCode * ifx)
         goto release;
       }
 
+  bool restore_a_from_dptr = false;
+  bool restore_x_from_dptr = false;
+  bool needloadx = false;
+  bool need_x = false;
+
+  need_x= (AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF);
+
+  if(IS_AOP_XA(AOP(left)) && !rematOffset)
+    {
+      restore_a_from_dptr = !m6502_reg_a->isDead;
+      if(need_x)
+         restore_x_from_dptr = !m6502_reg_x->isDead;
+    }
+  else
+    {
   needpulla = storeRegTempIfSurv (m6502_reg_a);
+      if(need_x)
+            needloadx = storeRegTempIfSurv(m6502_reg_x);
+    }
   bool needloady = storeRegTempIfSurv(m6502_reg_y);
-  bool needloadx = storeRegTempIfSurv(m6502_reg_x);
 
   int yoff = setupDPTR(left, litOffset, rematOffset, false);
 
@@ -10627,12 +10644,18 @@ static void genPointerGet (iCode * ic, iCode * ifx)
           storeRegToAop (m6502_reg_a, AOP (result), offset);
         }
     }
-  loadOrFreeRegTemp (m6502_reg_x, needloadx);
   loadOrFreeRegTemp (m6502_reg_y, needloady);
+  loadOrFreeRegTemp (m6502_reg_x, needloadx);
   loadOrFreeRegTemp (m6502_reg_a, needpulla);
+
+  if(restore_x_from_dptr)
+    emit6502op ("ldx", "*(DPTR+1)");
+  if(restore_a_from_dptr)
+    emit6502op ("lda", "*(DPTR+0)");
 
  release:
   freeAsmop (left, NULL);
+  freeAsmop (right, NULL);
   freeAsmop (result, NULL);
 
   if (ifx && !ifx->generated)
@@ -11887,7 +11910,7 @@ genm6502iCode (iCode *ic)
       if (bitVectBitValue (ic->rSurv, i))
         {
           m6502_regWithIdx (i)->isDead = false;
-          m6502_useReg(m6502_regWithIdx (i));
+	  m6502_regWithIdx (i)->isFree = false;
         } else
 	m6502_regWithIdx (i)->isDead = true;
     }

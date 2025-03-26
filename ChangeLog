@@ -1,3 +1,8 @@
+2025-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* doc/sdccman.lyx:
+	  Document current f8 calling convention.
+
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
 
   	* device/lib/mos6502/_strcmp.s,

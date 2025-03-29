@@ -1,3 +1,8 @@
+2025-03-29 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCC.y:
+	  Reduce code duplication in kr_declaration.
+
 2025-03-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* doc/sdccman.lyx:

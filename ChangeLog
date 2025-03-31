@@ -1,3 +1,7 @@
+2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
+  	* device/lib/mos6502/_mulint.s:
+  	  Reimplement mulint.
+
 2025-03-29 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCC.y:

@@ -1,8 +1,7 @@
 ;-------------------------------------------------------------------------
 ;   _mulint.s - routine for multiplication of 16 bit (unsigned) int
 ;
-;   Copyright (C) 2009, Ullrich von Bassewitz
-;   Copyright (C) 2022, Gabriele Gorla
+;   Copyright (C) 2025, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -45,38 +44,56 @@ __mulint_PARM_2:
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
-	.define tmp "___SDCC_m6502_ret2"
-
+	.define res0 "___SDCC_m6502_ret0"
+	.define res1 "___SDCC_m6502_ret1"
+	.define P1   "___SDCC_m6502_ret2"
+	
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 
 __mulint:
-	sta	*___SDCC_m6502_ret0
-	stx	*___SDCC_m6502_ret1
-	lda	#0
-	sta	*tmp
-	ldy	#16
-	lsr	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-next_bit:
-	bcc	skip
-	clc
-	adc	*__mulint_PARM_2+0
-	tax
-	lda	*__mulint_PARM_2+1
-	adc	*tmp
-	sta	*tmp
+	eor #0xff
+	sta *P1+0
 	txa
-skip:
-	ror	*tmp
-	ror	a
-	ror	*___SDCC_m6502_ret1
-	ror	*___SDCC_m6502_ret0
-	dey
-	bne	next_bit
+	eor #0xff
+	sta *P1+1
 
-	lda	*___SDCC_m6502_ret0
-	ldx	*___SDCC_m6502_ret1
+	ldx #0
+	stx *res0
+;	stx *res1
+
+	ldy #8
+loop1:
+	lsr *P1+0
+	bcs skip1
+	lda *res0
+	adc *__mulint_PARM_2+0
+	sta *res0
+	txa
+	adc	*__mulint_PARM_2+1
+	tax
+skip1:
+	asl	*__mulint_PARM_2+0
+	rol	*__mulint_PARM_2+1
+    dey
+    bne loop1
+
+	txa
+;	ldy #8
+loop2:
+	lsr *P1+1
+	bcs skip2
+	adc *__mulint_PARM_2+1
+skip2:
+	asl *__mulint_PARM_2+1
+	bne loop2
+;	dey
+;	bne loop2
+
+	tax
+;	sta *res1
+	lda *res0
+;	ldx *res1
 	rts

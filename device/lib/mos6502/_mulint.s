@@ -54,46 +54,39 @@ __mulint_PARM_2:
 	.area CODE
 
 __mulint:
-	eor #0xff
+	eor #0xff	; invert P1 to avoid clc in the add loops
 	sta *P1+0
 	txa
 	eor #0xff
 	sta *P1+1
 
-	ldx #0
-	stx *res0
-;	stx *res1
+	lda #0x00	; set result to 0
+	sta *res0
 
-	ldy #8
+	ldy #0x08	; first 8 bits
 loop1:
 	lsr *P1+0
-	bcs skip1
+	bcs skip1	; add if necessary
+	tax
 	lda *res0
 	adc *__mulint_PARM_2+0
 	sta *res0
 	txa
-	adc	*__mulint_PARM_2+1
-	tax
+	adc *__mulint_PARM_2+1
 skip1:
-	asl	*__mulint_PARM_2+0
-	rol	*__mulint_PARM_2+1
-    dey
-    bne loop1
+	asl *__mulint_PARM_2+0 ; shift P2
+	rol *__mulint_PARM_2+1
+	dey
+	bne loop1
 
-	txa
-;	ldy #8
 loop2:
 	lsr *P1+1
 	bcs skip2
 	adc *__mulint_PARM_2+1
 skip2:
 	asl *__mulint_PARM_2+1
-	bne loop2
-;	dey
-;	bne loop2
+	bne loop2	; second loop ends when P2 is completely shifted out
 
 	tax
-;	sta *res1
 	lda *res0
-;	ldx *res1
 	rts

@@ -1,4 +1,10 @@
+2025-04-05 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* device/lib/mos6502/_mulint.s:
+  	  Minor mulint improvement.
+
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
+
   	* device/lib/mos6502/_mulint.s:
   	  Reimplement mulint.
 

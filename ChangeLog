@@ -5,6 +5,7 @@
   	* src/mos6502/gen.c:
 	  Add tracking for XA register.
 	  Cleanup literal register debug printing.
+	  Additional register tracking.
 
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
 

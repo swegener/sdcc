@@ -115,6 +115,36 @@ const int STACK_TOP = 0x100;
 #define IS_AOPOFS_X(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_X))
 #define IS_AOPOFS_Y(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_Y))
 
+/**************************************************************************
+ * returns the register containing the AOP or null if not found
+ *
+ * @param aop pointer to aop
+ * @param offset offset of the aop
+ * @return reg pointer or NULL if not found
+ *************************************************************************/
+static reg_info*
+findRegAop (asmop * aop, int loffset)
+{
+  reg_info *ret=NULL;
+
+  if (m6502_reg_a->aop && m6502_reg_a->aop->op && aop->op
+      && operandsEqu (m6502_reg_a->aop->op, aop->op) && (m6502_reg_a->aopofs == loffset))
+    {
+      ret=m6502_reg_a;
+    }
+  else if (m6502_reg_x->aop && m6502_reg_x->aop->op && aop->op
+      && operandsEqu (m6502_reg_x->aop->op, aop->op) && (m6502_reg_x->aopofs == loffset))
+    {
+      ret=m6502_reg_x;
+    }
+  else if (m6502_reg_y->aop && m6502_reg_y->aop->op && aop->op
+      && operandsEqu (m6502_reg_y->aop->op, aop->op) && (m6502_reg_y->aopofs == loffset))
+    {
+      ret=m6502_reg_y;
+    }
+
+  return ret;
+}
 
 /**************************************************************************
  * Keeps track of last aop for the register
@@ -163,6 +193,14 @@ dirtyRegAop(reg_info *reg, asmop *aop, int offset)
 {
   emitComment (REGOPS|VVDBG, " %s - reg=%08x  asmop=%08d off=%d",
             __func__, reg, aop, offset);
+
+  if(reg==m6502_reg_xa)
+    {
+      dirtyRegAop(m6502_reg_a, aop, offset);
+      dirtyRegAop(m6502_reg_x, aop, offset+1);
+      return;
+    }
+
   if(reg!=m6502_reg_a && m6502_reg_a->aop)
     {
       if(sameRegs (m6502_reg_a->aop, aop) 
@@ -1665,39 +1703,22 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       return;
     }
 
-#if 0
+#if 1
   /* If operand is volatile, we cannot optimize. */
   if (!aop->op || isOperandVolatile (aop->op, false))
     goto forceload;
 
-  /* TODO: check to see if we can transfer from another register */
-
-  if (m6502_reg_hy>aop && m6502_reg_y->aop->op && aop->op
-      && operandsEqu (m6502_reg_y->aop->op, aop->op) && (m6502_reg_y->aopofs == loffset))
+  /* check to see if we can transfer from another register */
+  if(reg!=m6502_reg_xa)
     {
-      emitComment (REGOPS, "  found correct value for %s in h", reg->name);
-      transferRegReg (m6502_reg_y, reg, false);
-      m6502_useReg (reg);
-      return;
-    }
-
-
-  if (m6502_reg_x->aop && m6502_reg_x->aop->op && aop->op
-      && operandsEqu (m6502_reg_x->aop->op, aop->op) && (m6502_reg_x->aopofs == loffset))
-    {
-      emitComment (REGOPS, "  found correct value for %s in x", reg->name);
-      transferRegReg (m6502_reg_x, reg, false);
-      m6502_useReg (reg);
-      return;
-    }
-
-  if (m6502_reg_a->aop && m6502_reg_a->aop->op && aop->op
-      && operandsEqu (m6502_reg_a->aop->op, aop->op) && (m6502_reg_a->aopofs == loffset))
-    {
-      emitComment (REGOPS, "  found correct value for %s in a", reg->name);
-      transferRegReg (m6502_reg_a, reg, false);
-      m6502_useReg (reg);
-      return;
+    reg_info *srcreg=findRegAop(aop, loffset);
+    if(srcreg)
+      {
+        emitComment (REGOPS, "  found correct value for %s in %s", reg->name, srcreg->name);
+        transferRegReg (srcreg, reg, false);
+        m6502_useReg (reg);
+        return;
+      }
     }
 
  forceload:
@@ -1988,13 +2009,13 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
     }
 
   if(!reg->isLitConst)
-  {
- // emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - looking for stale reg", __func__);
- // emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - reg_a->aop=%08x aop=%08x aop->op=%08x", 
-//               __func__, m6502_reg_a->aop, aop, aop->op);
+    {
+//      emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - looking for stale reg", __func__);
+//      emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - reg_a->aop=%08x aop=%08x aop->op=%08x", 
+//                   __func__, m6502_reg_a->aop, aop, aop->op);
       dirtyRegAop(reg, aop, loffset);
       regTrackAop(reg, aop, loffset);
-          }
+    }
 }
 
 /**************************************************************************
@@ -4171,16 +4192,28 @@ genCopy (operand * result, operand * source)
   if (sameRegs (AOP (source), AOP (result)) && srcsize == size )
     return;
 
+  if(IS_AOP_XA (AOP (result)) )
+    {
+      loadRegFromAop (m6502_reg_xa, AOP(source), 0);
+      return;
+    }
+
   if (IS_AOP_XA (AOP (source)) && size <= 2  )
     {
       storeRegToAop (m6502_reg_xa, AOP (result), 0);
       return;
     }
 
-  if(IS_AOP_XA (AOP (result)) )
+  if(size==2)
     {
-      loadRegFromAop (m6502_reg_xa, AOP(source), 0);
-      return;
+      reg_info *reg0=findRegAop(AOP(source), 0);
+      reg_info *reg1=findRegAop(AOP(source), 1);
+      if(reg0&&reg1)
+        {
+	      storeRegToAop (reg0, AOP(result), 0);
+	      storeRegToAop (reg1, AOP(result), 1);
+           return;
+        }
     }
 
 #if 1

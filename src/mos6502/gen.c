@@ -405,10 +405,10 @@ regInfoStr()
   char regstring[3][10];
   char *flagreg;
 
-  if(m6502_reg_a->isLitConst) snprintf(regstring[0],10,"A:%c%c:#%02x ",
+  if(m6502_reg_a->isLitConst) snprintf(regstring[0],10,"A:%c%c:#%02X ",
                                        (m6502_reg_a->isFree)?'-':'U',
                                        (m6502_reg_a->isDead)?'-':'L',
-                                       m6502_reg_a->litConst );
+                                       m6502_reg_a->litConst&0xff );
   else if(m6502_reg_a->aop == &tsxaop) snprintf(regstring[0],10,"A:%c%c:S%+-3d",
                                                 (m6502_reg_a->isFree)?'-':'U',
                                                 (m6502_reg_a->isDead)?'-':'L',
@@ -421,10 +421,10 @@ regInfoStr()
                 (m6502_reg_a->isFree)?'-':'U',
                 (m6502_reg_a->isDead)?'-':'L');
   
-  if(m6502_reg_x->isLitConst) snprintf(regstring[1],10,"X:%c%c:#%02x ",
+  if(m6502_reg_x->isLitConst) snprintf(regstring[1],10,"X:%c%c:#%02X ",
                                        (m6502_reg_x->isFree)?'-':'U',
                                        (m6502_reg_x->isDead)?'-':'L',
-                                       m6502_reg_x->litConst );
+                                       m6502_reg_x->litConst&0xff  );
   else if(m6502_reg_x->aop == &tsxaop) snprintf(regstring[1],10,"X:%c%c:S%+-3d",
                                                 (m6502_reg_x->isFree)?'-':'U',
                                                 (m6502_reg_x->isDead)?'-':'L',
@@ -437,10 +437,10 @@ regInfoStr()
                 (m6502_reg_x->isFree)?'-':'U',
                 (m6502_reg_x->isDead)?'-':'L');
   
-  if(m6502_reg_y->isLitConst) snprintf(regstring[2],10,"Y:%c%c:#%02x ",
+  if(m6502_reg_y->isLitConst) snprintf(regstring[2],10,"Y:%c%c:#%02X ",
                                        (m6502_reg_y->isFree)?'-':'U',
                                        (m6502_reg_y->isDead)?'-':'L',
-                                       m6502_reg_y->litConst );
+                                       m6502_reg_y->litConst&0xff );
   else if(m6502_reg_y->aop == &tsxaop) snprintf(regstring[2],10,"Y:%c%c:S%+-3d",
                                                 (m6502_reg_y->isFree)?'-':'U',
                                                 (m6502_reg_y->isDead)?'-':'L',

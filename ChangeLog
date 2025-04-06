@@ -4,6 +4,7 @@
   	  Minor mulint improvement.
   	* src/mos6502/gen.c:
 	  Add tracking for XA register.
+	  Cleanup literal register debug printing.
 
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -734,23 +734,23 @@ emit6502op (const char *inst, const char *fmt, ...)
     
       if (DBG_MSG&COST)
         {
-          snprintf(dstring[0], 64, "sz=%d cl=%f p=%f",
+          snprintf(dstring[0], 64, " sz=%d cl=%f p=%f",
                    isize, cycles, probability);
         }
     
       if (DBG_MSG&REGALLOC)
         {
-          snprintf(dstring[1], 64, "%s",
+          snprintf(dstring[1], 64, " %s",
                    regInfoStr() );
         }
       if (DBG_MSG&TRACE_STACK)
         {
-          snprintf(dstring[2], 64, "stkpush=%d",
+          snprintf(dstring[2], 64, " stkpush=%d",
                    _G.stackPushes );
         }
 
       // FIXME: figure out how to align the comments in the asm output
-      snprintf(verboseFmt, 512, "%s \t; %s %s %s",
+      snprintf(verboseFmt, 512, "%s \t;%s%s%s",
                fmt, dstring[0], dstring[1], dstring[2]);
       va_emitcode (inst, verboseFmt, ap);
     }
@@ -2212,27 +2212,30 @@ storeConstToAop (int c, asmop * aop, int loffset)
           break;
         }
     default:
-      if (m6502_reg_y->isFree && aop->type != AOP_SOF)
+      if(aop->type != AOP_SOF)
         {
-          loadRegFromConst (m6502_reg_y, c);
-          storeRegToAop (m6502_reg_y, aop, loffset);
-          m6502_freeReg (m6502_reg_y);
-        } 
-      else if (m6502_reg_x->isFree && aop->type != AOP_SOF) 
-        {
-          loadRegFromConst (m6502_reg_x, c);
-          storeRegToAop (m6502_reg_x, aop, loffset);
-          m6502_freeReg (m6502_reg_x);
+          // prefer X if literal!=0 && X does not contain tsx offset 
+          if(c!=0 && m6502_reg_x->isFree && m6502_reg_x->aop != &tsxaop)
+            {
+              loadRegFromConst (m6502_reg_x, c);
+              storeRegToAop (m6502_reg_x, aop, loffset);
+              m6502_freeReg (m6502_reg_x);
+              return;
+            }
+          else if(m6502_reg_y->isFree)
+            {
+              loadRegFromConst (m6502_reg_y, c);
+              storeRegToAop (m6502_reg_y, aop, loffset);
+              m6502_freeReg (m6502_reg_y);
+              return;
+            }
         }
-      else 
-        {
-          bool needpulla = pushRegIfUsed(m6502_reg_a);
-	  //          bool needpulla = storeRegTempIfUsed (m6502_reg_a);
-          loadRegFromConst (m6502_reg_a, c);
-          storeRegToAop (m6502_reg_a, aop, loffset);
-	  //          loadOrFreeRegTemp (m6502_reg_a, needpulla);
-          pullOrFreeReg (m6502_reg_a, needpulla);
-        }
+      bool needpulla = pushRegIfUsed(m6502_reg_a);
+      // bool needpulla = storeRegTempIfUsed (m6502_reg_a);
+      loadRegFromConst (m6502_reg_a, c);
+      storeRegToAop (m6502_reg_a, aop, loffset);
+      // loadOrFreeRegTemp (m6502_reg_a, needpulla);
+      pullOrFreeReg (m6502_reg_a, needpulla);
     }
 }
 
@@ -11430,8 +11433,6 @@ static bool genAssignLit (operand * result, operand * right)
   int size;
   int offset,offset2;
 
-  emitComment (TRACEGEN, __func__);
-
   /* Make sure this is a literal assignment */
   if (AOP_TYPE (right) != AOP_LIT)
     return false;
@@ -11449,6 +11450,8 @@ static bool genAssignLit (operand * result, operand * right)
   size = AOP_SIZE (result);
   if (size > sizeof(assigned))
     return false;
+
+  emitComment (TRACEGEN, __func__);
 
   for (offset=0; offset<size; offset++)
     {

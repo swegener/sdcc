@@ -124,20 +124,31 @@ const int STACK_TOP = 0x100;
  * @param offset offset of the aop
  *************************************************************************/
 void
-regTrack(reg_info *reg, asmop *aop, int offset)
+regTrackAop(reg_info *reg, asmop *aop, int offset)
 {
   if(!reg)
     emitcode(";ERROR","  %s : called with NULL reg", __func__ );
   if(!aop)
     emitcode(";ERROR","  %s : called with NULL aop", __func__ );
-  //  if(!aop->op)
-  //    emitcode(";ERROR","  %s : called with NULL aop->op", __func__ );
 
-  //  emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, "  reg %s = A %d", reg->name, offset);
-
-  reg->aop = aop;
-  reg->aop->op = aop->op;
-  reg->aopofs = offset;
+//  emitComment (ALWAYS /*REGOPS|VVDBG*/, "  reg %s = A %d", reg->name, offset);
+  switch(reg->rIdx)
+    {
+    case A_IDX:
+    case X_IDX:
+    case Y_IDX:
+      reg->aop = aop;
+      reg->aop->op = aop->op;
+      reg->aopofs = offset;
+      break;
+   case XA_IDX:
+      regTrackAop(m6502_reg_a, aop, offset);
+      regTrackAop(m6502_reg_x, aop, offset+1);
+      break;
+    default:
+      emitcode ("ERROR", " %s - illegal register %s", __func__, reg->name);
+      break;
+    }
 }
 
 /**************************************************************************
@@ -148,37 +159,34 @@ regTrack(reg_info *reg, asmop *aop, int offset)
  * @param offset offset of the aop
  *************************************************************************/
 void
-dirtyReg(reg_info *reg, asmop *aop, int offset)
+dirtyRegAop(reg_info *reg, asmop *aop, int offset)
 {
-  emitComment (TRACE_AOP|VVDBG, " %s - reg=%08x  asmop=%08d off=%d",
+  emitComment (REGOPS|VVDBG, " %s - reg=%08x  asmop=%08d off=%d",
             __func__, reg, aop, offset);
   if(reg!=m6502_reg_a && m6502_reg_a->aop)
     {
-      //  emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - considering A", __func__);
       if(sameRegs (m6502_reg_a->aop, aop) 
          && (m6502_reg_a->aopofs == offset) )
         {
-          emitComment (TRACE_AOP|VVDBG, "  marking A stale");
+          emitComment (REGOPS|VVDBG, "  marking A stale");
           m6502_reg_a->aop = NULL;
         }
     }
   if(reg!=m6502_reg_x && m6502_reg_x->aop)
     {
-      //  emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - considering X", __func__);
       if(sameRegs (m6502_reg_x->aop, aop) 
          && (m6502_reg_x->aopofs == offset) )
         {
-          emitComment (TRACE_AOP|VVDBG, "  marking X stale");
+          emitComment (REGOPS|VVDBG, "  marking X stale");
           m6502_reg_x->aop = NULL;
         }
     }
   if(reg!=m6502_reg_y && m6502_reg_y->aop)
     {
-      //  emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - considering Y", __func__);
       if(sameRegs (m6502_reg_y->aop, aop) 
          && (m6502_reg_y->aopofs == offset) )
         {
-          emitComment (TRACE_AOP|VVDBG, "  marking Y stale");
+          emitComment (REGOPS|VVDBG, "  marking Y stale");
           m6502_reg_y->aop = NULL;
         }
     }
@@ -1062,7 +1070,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
     }
   else if(sreg->aop)
     {
-      regTrack(dreg, sreg->aop, sreg->aopofs);
+      regTrackAop(dreg, sreg->aop, sreg->aopofs);
     }
 
   emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
@@ -1728,7 +1736,7 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
         m6502_dirtyReg (reg);
         if( !isOperandVolatile (aop->op, false))
           {
-             regTrack(reg, aop, loffset);
+             regTrackAop(reg, aop, loffset);
           }
       }
     break;
@@ -1984,8 +1992,8 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
  // emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - looking for stale reg", __func__);
  // emitComment (ALWAYS /*TRACE_AOP|VVDBG*/, " %s - reg_a->aop=%08x aop=%08x aop->op=%08x", 
 //               __func__, m6502_reg_a->aop, aop, aop->op);
-      dirtyReg(reg, aop, loffset);
-      regTrack(reg, aop, loffset);
+      dirtyRegAop(reg, aop, loffset);
+      regTrackAop(reg, aop, loffset);
           }
 }
 
@@ -2765,7 +2773,7 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
           rmwop = "ror";
         }
       emit6502op (rmwop, aopAdrStr(aop, loffset, false));
-      dirtyReg(NULL, aop, loffset);
+      dirtyRegAop(NULL, aop, loffset);
       break;
     case AOP_DUMMY:
       break;
@@ -2809,7 +2817,7 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
 	  rmwop="ror";
         }
       emit6502op (rmwop, aopAdrStr (aop, loffset, false));
-      dirtyReg(NULL, aop, loffset);
+      dirtyRegAop(NULL, aop, loffset);
     }
 
 }

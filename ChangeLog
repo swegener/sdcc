@@ -2,6 +2,8 @@
 
   	* device/lib/mos6502/_mulint.s:
   	  Minor mulint improvement.
+  	* src/mos6502/gen.c:
+	  Add tracking for XA register.
 
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
 

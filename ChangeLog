@@ -6,6 +6,8 @@
 	  Add tracking for XA register.
 	  Cleanup literal register debug printing.
 	  Additional register tracking.
+   	* src/mos6502/peeph.def:
+   	  Remove several rules made obsolete by register tracking.
 
 2025-03-23 Gabriele Gorla <gorlik@yahoo.com>
 

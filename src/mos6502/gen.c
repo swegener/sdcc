@@ -10576,7 +10576,14 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	    idx_reg='M';
 	  }
 
-        if(AOP_TYPE(result)==AOP_REG)
+        if(IS_AOP_XA(AOP(result)))
+          {
+            if(idx_reg=='A')
+              transferRegReg(m6502_reg_a, m6502_reg_y, true);
+            idx_reg='y';
+            dst_reg="lda";
+          }
+        else if(AOP_TYPE(result)==AOP_REG)
 	  {
 	    switch(AOP(result)->aopu.aop_reg[0]->rIdx)
 	      {
@@ -10597,13 +10604,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 
         if(idx_reg=='A' || idx_reg=='M')
 	  {
-	    if(dst_reg[2]=='y')
-	      {
-		px = storeRegTempIfSurv(m6502_reg_x);
-		loadRegFromAop(m6502_reg_x, AOP(left), 0 );
-		idx_reg='x';
-	      }
-	    else if(dst_reg[2]=='x')
+            if(dst_reg[2]=='x')
 	      {
 		py = storeRegTempIfSurv(m6502_reg_y);
 		loadRegFromAop(m6502_reg_y, AOP(left), 0 );
@@ -10612,9 +10613,9 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	    else
 	      {
 		// FIXME: should check for a free reg to avoid saving if possible
-		py = storeRegTempIfSurv(m6502_reg_y);
-		loadRegFromAop(m6502_reg_y, AOP(left), 0 );
-		idx_reg='y';
+		px = storeRegTempIfSurv(m6502_reg_x);
+		loadRegFromAop(m6502_reg_x, AOP(left), 0 );
+		idx_reg='x';
 	      }
 
 	  }
@@ -10628,12 +10629,24 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 		       rematOffset, litOffset, hi_offset, idx_reg );
 
 	    storeRegToAop (m6502_reg_a, AOP (result), 0);
+            if(AOP_SIZE(result)==2)
+              {
+	    emit6502op("lda", "(%s+%d+0x%04x),%c",
+		       rematOffset, litOffset+1, hi_offset, idx_reg );
+	    storeRegToAop (m6502_reg_a, AOP (result), 1);
+              }
 	    loadOrFreeRegTemp(m6502_reg_a,pa);
 	  }
 	else
 	  {
 	    emit6502op(dst_reg, "(%s+%d+0x%04x),%c",
 		       rematOffset, litOffset, hi_offset, idx_reg );
+            if(IS_AOP_XA(AOP(result)))
+              {
+	    emit6502op("ldx", "(%s+%d+0x%04x),%c",
+		       rematOffset, litOffset+1, hi_offset, idx_reg );
+                 
+              }
 	  }
 
         loadOrFreeRegTemp(m6502_reg_x,px);

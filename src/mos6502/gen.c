@@ -1096,7 +1096,6 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   
   if(error)
     emitcode("ERROR", "bad combo in transferRegReg 0x%02x -> 0x%02x", srcidx, dstidx);
-  //  emitComment (REGOPS, "  %s %s", __func__, regInfoStr() );
 
   m6502_dirtyReg (dreg);
   m6502_useReg (dreg);
@@ -2924,11 +2923,19 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
   if (!rematOfs && offset >= 0 && offset <= 0xff)
     {
       // no remat and 8-bit offset
+      reg_info *reg0=findRegAop(AOP(op), 0);
+      reg_info *reg1=findRegAop(AOP(op), 1);
+
       if(AOP_TYPE(op) == AOP_REG)
 	{
 	  emitComment (TRACEGEN|VVDBG, " %s: AOP_REG", __func__);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[0], 0);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[1], 1);
+	}
+      else if(reg0&&reg1)
+        {
+          storeRegToDPTR(reg0, 0);
+          storeRegToDPTR(reg1, 1);
 	}
       else
         {
@@ -10405,6 +10412,8 @@ static void genPointerGet (iCode * ic, iCode * ifx)
     ifx = NULL;
 
   aopOp (left, ic);
+  aopOp (right, ic);
+  aopOp (result, ic);
 
   /* if left is rematerialisable */
   if (AOP_TYPE (left) == AOP_IMMD || AOP_TYPE (left) == AOP_LIT)
@@ -10414,10 +10423,8 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	genDataPointerGet (left, right, result, ic, ifx);
       else
 	genUnpackBitsImmed (left, right, result, ic, ifx);
-      return;
+      goto release;
     }
-
-  aopOp (result, ic);
 
   /* if bit then unpack */
   if (IS_BITVAR (retype))
@@ -10425,9 +10432,6 @@ static void genPointerGet (iCode * ic, iCode * ifx)
       genUnpackBits (result, left, right, ifx);
       goto release;
     }
-
-  // TODO?
-  aopOp (right, ic);
 
   decodePointerOffset (right, &litOffset, &rematOffset);
 
@@ -10438,8 +10442,10 @@ static void genPointerGet (iCode * ic, iCode * ifx)
   if (litOffset & 0x8000)
     litOffset = 0x10000 - litOffset;
 
-  emitComment (TRACEGEN|VVDBG, "      %s (%s) size=%d loff=%d rmoff=%s",
+  emitComment (TRACEGEN|VVDBG, "  %s src: %s size=%d loff=%d rmoff=%s",
                __func__, aopName(AOP(left)), size, litOffset, rematOffset );
+  emitComment (TRACEGEN|VVDBG, "  %s dst: %s size=%d",
+               __func__, aopName(AOP(result)), AOP_SIZE(result) );
 
   if(AOP_TYPE (left) == AOP_REG)
     {
@@ -10456,7 +10462,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	  else
 	    sprintf(hstring,"??");
 	}
-      emitComment (TRACEGEN|VVDBG, "      %s (%s) = 0x%s%s",
+      emitComment (TRACEGEN|VVDBG, "    %s (%s) = 0x%s%s",
                    __func__, aopName(AOP(left)), hstring, lstring );
 
     }
@@ -10484,7 +10490,8 @@ static void genPointerGet (iCode * ic, iCode * ifx)
       if (sameRegs(AOP(left), AOP(result)) )
 	{
 	  // pointer and destination is the same - need avoid overwriting
-	  emitComment (TRACEGEN|VVDBG, "        %s - sameregs", __func__);
+          // FIXME: this only works for size=2 which is likely ok as pointers are size 2
+	  emitComment (TRACEGEN|VVDBG, "    %s - sameregs", __func__);
 	  needpulla = storeRegTempIfSurv (m6502_reg_a);
 	  for (int i=size-1; i>=0; i--)
 	    {
@@ -10515,7 +10522,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	  if (IS_AOP_XA(AOP(result)))
 	    {
 	      // reverse order so A is last
-	      emitComment (TRACEGEN|VVDBG, "        %s: dest XA", __func__);
+	      emitComment (TRACEGEN|VVDBG, "    %s: dest XA", __func__);
 	      for (int i=size-1; i>=0; i--)
 		{
 		  loadRegFromConst(m6502_reg_y, litOffset + i);
@@ -10526,7 +10533,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 	  else
 	    {
 	      // forward order
-	      emitComment (TRACEGEN|VVDBG, "        %s: dest generic", __func__);
+	      emitComment (TRACEGEN|VVDBG, "    %s: dest generic", __func__);
 	      if (!IS_AOP_WITH_A(AOP(result))) needpulla = storeRegTempIfSurv (m6502_reg_a);
 	      for (int i=0; i<size; i++)
 		{
@@ -10553,7 +10560,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
         (AOP_SIZE(left) == 1|| AOP(left)->aopu.aop_reg[1]->isLitConst ))
 #endif
       {
-        emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
+        emitComment (TRACEGEN|VVDBG,"    %s - absolute with 8-bit index", __func__);
         unsigned int hi_offset=0;
         char *dst_reg;
         char idx_reg;
@@ -10604,7 +10611,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
 
         if(idx_reg=='A' || idx_reg=='M')
 	  {
-            if(dst_reg[2]=='x')
+            if(dst_reg[2]=='x' || m6502_reg_x->aop==&tsxaop)
 	      {
 		py = storeRegTempIfSurv(m6502_reg_y);
 		loadRegFromAop(m6502_reg_y, AOP(left), 0 );

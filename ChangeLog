@@ -1,3 +1,8 @@
+2025-04-17 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/gen.c:
+  	  Improved DPTR tracking and cleanup genPointerGet.
+
 2025-04-11 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

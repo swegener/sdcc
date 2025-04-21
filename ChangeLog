@@ -4,6 +4,8 @@
   	  Add intrinsic named address space to library functions implemented in asm.
   	* support/regression/tests/float_single.c.in:
   	  Add support for non-reentrant float library.
+  	* device/include/math.h:
+  	  Make the math library non-reentrant by default on mos6502/65c02 and HC08/S08.
 
 2025-04-17 Gabriele Gorla <gorlik@yahoo.com>
 

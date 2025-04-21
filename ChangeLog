@@ -2,6 +2,8 @@
 
   	* device/include/string.h:
   	  Add intrinsic named address space to library functions implemented in asm.
+  	* support/regression/tests/float_single.c.in:
+  	  Add support for non-reentrant float library.
 
 2025-04-17 Gabriele Gorla <gorlik@yahoo.com>
 

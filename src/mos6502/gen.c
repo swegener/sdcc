@@ -4214,21 +4214,23 @@ genCopy (operand * result, operand * source)
       return;
     }
 
-  if(size==2)
+  if(size==2 && AOP_TYPE(result) != AOP_SOF)
     {
       reg_info *reg0=findRegAop(AOP(source), 0);
       reg_info *reg1=findRegAop(AOP(source), 1);
       if(reg0&&reg1)
         {
-	      storeRegToAop (reg0, AOP(result), 0);
-	      storeRegToAop (reg1, AOP(result), 1);
-           return;
+          emitComment (TRACEGEN|VVDBG, "      %s (regtrack)", __func__);
+	  storeRegToAop (reg0, AOP(result), 0);
+	  storeRegToAop (reg1, AOP(result), 1);
+          return;
         }
     }
 
 #if 1
   if(AOP_TYPE (source) == AOP_SOF || AOP_TYPE(result) == AOP_SOF)
     {
+      emitComment (TRACEGEN|VVDBG, "      %s (SOF)", __func__);
       bool save_a, save_x;
       save_a = storeRegTempIfSurv(m6502_reg_a);
       save_x = storeRegTempIfSurv(m6502_reg_x);
@@ -8042,7 +8044,8 @@ static void reg16Lsh (reg_info *msb_reg, int shCount)
     /* the fastest and shortest.                                           */
     storeRegTempAlways(msb_reg, true);
 
-    for (i = 0; i < shCount; i++) {
+    for (i = 0; i < shCount; i++)
+    {
       rmwWithReg ("asl", m6502_reg_a);
       emit6502op ("rol", TEMPFMT, getLastTempOfs() );
       dirtyRegTemp(getLastTempOfs() );
@@ -8717,6 +8720,7 @@ genlsh32 (operand * result, operand * left, int shCount)
     {
       shiftLLong4 (left, result, shCount);
     }
+  
   if (maskedtopbyte)
     {
       bool in_a = (result->aop->type == AOP_REG && result->aop->aopu.aop_reg[1]->rIdx == A_IDX);
@@ -8802,7 +8806,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
      loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
 
-  freeAsmop (right, NULL);
+//  freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);
 }

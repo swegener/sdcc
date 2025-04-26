@@ -1,3 +1,12 @@
+2025-04-26 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* device/lib/mos6502/_fslib.s,
+  	  device/lib/mos6502/_fsadd.s,
+  	  device/lib/mos6502/_fsmul.s,
+  	  device/lib/mos6502/Makefile.in,
+  	  support/regression/tests/bug1805702.c:
+  	  Implement _fsmul in assembly. Separate common fp code in _fslib.s.
+
 2025-04-22 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

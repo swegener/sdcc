@@ -31,62 +31,45 @@
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl ___fsadd_PARM_2
-	.globl ___fsadd_PARM_1
-	.globl ___fssub_PARM_2
-	.globl ___fssub_PARM_1
 	.globl ___fsadd
+
 ;--------------------------------------------------------
 ; ZP ram data
 ;--------------------------------------------------------
 	.area ZP      (PAG)
+
 ;--------------------------------------------------------
 ; overlayable items in ram
 ;--------------------------------------------------------
 	.area	OSEG    (PAG, OVR)
-___fs_PARM_1:
-___fsadd_PARM_1:
-___fssub_PARM_1:
-	.ds 4
-	
-___fs_PARM_2:
-___fsadd_PARM_2:
-___fssub_PARM_2:
-	.ds 4
-	
-;--------------------------------------------------------
-; uninitialized external ram data
-;--------------------------------------------------------
-	.area BSS
 
 ;--------------------------------------------------------
 ; local aliases
 ;--------------------------------------------------------
 	.define sh1   "___SDCC_m6502_ret0"
 	.define sh2   "___SDCC_m6502_ret1"
+	.define res0  "___SDCC_m6502_ret0"
+	.define res1  "___SDCC_m6502_ret1"
 	.define res2  "___SDCC_m6502_ret2"
 	.define res3  "___SDCC_m6502_ret3"
 	.define s1    "___SDCC_m6502_ret4"
 	.define exp1  "___SDCC_m6502_ret5"
 	.define s2    "___SDCC_m6502_ret6"
 	.define exp2  "___SDCC_m6502_ret7"
-	.define rneg  "___SDCC_m6502_ret7"
 		
 ;--------------------------------------------------------
 ; code
 ;--------------------------------------------------------
 	.area CODE
 ;------------------------------------------------------------
-;	../_fsadd.c: 173: float __fsadd (float f1, float f2) __SDCC_FLOAT_NONBANKED
 
 ___fsadd:
-
 ; check if PARM_1 is zero
 	lda	*(___fsadd_PARM_1 + 3)
 	and	#0x7F
 	ora	*(___fsadd_PARM_1 + 2)
-	ora	*(___fsadd_PARM_1 + 1)
-	ora	*___fsadd_PARM_1
+;	ora	*(___fsadd_PARM_1 + 1)
+;	ora	*___fsadd_PARM_1
 	bne	p1_not0
 	
 ; return PARM_2
@@ -104,8 +87,8 @@ p1_not0:
 	lda	*(___fsadd_PARM_2 + 3)
 	and	#0x7F
 	ora	*(___fsadd_PARM_2 + 2)
-	ora	*(___fsadd_PARM_2 + 1)
-	ora	*___fsadd_PARM_2
+;	ora	*(___fsadd_PARM_2 + 1)
+;	ora	*___fsadd_PARM_2
 	bne	p2_not0
 
 ; return PARM_1
@@ -120,64 +103,43 @@ ret_p1:
 p2_not0:
 
 	ldy	#0x00
-	
-; get exp1
-	lda	*(___fsadd_PARM_1 + 0x0002)
-	rol	a
-	lda	*(___fsadd_PARM_1 + 0x0003)
-	rol	a
-	sta *exp1
-; get sign1 - sign is 0x80
-	tya
-	ror a
-	sta *s1
-	
-; get exp2
-	lda	*(___fsadd_PARM_2 + 0x0002)
-	rol	a
-	lda	*(___fsadd_PARM_2 + 0x0003)
-	rol	a
-	sta *exp2
-; get sign2 - sign is 0x80
-	tya
-	ror a
-	sta *s2
+	jsr	___fs_unpack_2P
 	
 ; compute exponent difference
 	sec
-	lda *exp1
-	sbc *exp2
-;	sta expd
+	lda	*exp1
+	sbc	*exp2
+;	sta	expd
 
 ;   lda expd
  ; a=expd, y=0
-    bpl pos_diff
-    ; negative expenent difference
+	bpl	pos_diff
+    ; negative exponent difference
     ; expd=-eppd
     eor	#0xff
 	clc
 	adc	#0x01
 	; check for overflow
-;	cmp #26
-;	bmi skip_p2
-;	jmp ret_p2
+;	cmp	#26
+;	bmi	skip_p2
+;	jmp	ret_p2
 skip_p2:
-    sty *sh2
-    sta *sh1
-    clc
-    adc *exp1
-    sta *exp1
-    jmp done    
+	sty	*sh2
+	sta	*sh1
+	clc
+	adc	*exp1
+	sta	*exp1
+	jmp	done    
 pos_diff:
 	; check for overflow
-;	cmp #26
-;	bmi skip_p1
-;	jmp ret_p1
+;	cmp	#26
+;	bmi	skip_p1
+;	jmp	ret_p1
 skip_p1:
-    sty *sh1
-    sta *sh2
-done:
+	sty	*sh1
+	sta	*sh2
 
+done:
 	ldx	#0x01
 ; PARM_1 is now mantissa
 	asl	*(___fsadd_PARM_1 + 0)
@@ -217,18 +179,20 @@ done:
 
 ; Y is still 0
 ; rneg and exp2 share the same location
-	sty	*rneg
-	lda *s1
-	and *s2
-	beq not_both_negative
-	sta *rneg
-	bne end
+;	sty	*rneg  ; Y is still 0
+	ldx	#0x00   ; rneg is in X
+	lda	*s1
+	and	*s2
+	beq	not_both_negative
+;	sta	*rneg
+	tax            ; rneg is in X
+	bne	end
 not_both_negative:
-    lda *s1
-    beq skip2
+	lda	*s1
+	beq	skip2
 ; Y is still 0
 	sec
-    tya
+	tya
 	sbc	*___fsadd_PARM_1
 	sta	*___fsadd_PARM_1
 	tya
@@ -241,8 +205,8 @@ not_both_negative:
 	sbc	*(___fsadd_PARM_1 + 3)
 	sta	*(___fsadd_PARM_1 + 3)  
 skip2:
-    lda *s2
-    beq end	
+	lda	*s2
+	beq	end	
 	sec
     tya
 	sbc	*___fsadd_PARM_2
@@ -258,123 +222,99 @@ skip2:
 	sta	*(___fsadd_PARM_2 + 3)
 end:
 
+; sh1 and sh2 are no longer needed
+; reuse res0 and res1 for the result
+
 ; add the mantissa
 	clc
 	lda	*___fsadd_PARM_1
 	adc	*___fsadd_PARM_2
-	sta	*___fsadd_PARM_1
+	sta	*res0
 	lda	*(___fsadd_PARM_1 + 1)
 	adc	*(___fsadd_PARM_2 + 1)
-	sta	*(___fsadd_PARM_1 + 1)
+	sta	*res1
 	lda	*(___fsadd_PARM_1 + 2)
 	adc	*(___fsadd_PARM_2 + 2)
-	sta	*(___fsadd_PARM_1 + 2)
+	sta	*res2
 	lda	*(___fsadd_PARM_1 + 3)
 	adc	*(___fsadd_PARM_2 + 3)
-	sta	*(___fsadd_PARM_1 + 3)
+	sta	*res3
 
 ; is result 0?
-;   lda	*(___fsadd_PARM_1 + 3)
-	ora	*(___fsadd_PARM_1 + 2)
-	ora	*(___fsadd_PARM_1 + 1)
-	ora	*___fsadd_PARM_1
+;   lda	*res3
+	ora	*res2
+	ora	*res1
+	ora	*res0
 	bne	res_not_zero
-; return 0
-ret_zero:
-	; Y is still 0
-    ;    tya
-    tax
-	sta	*___SDCC_m6502_ret2
-	sta	*___SDCC_m6502_ret3
-	rts
-	
+	jmp	___fs_ret_zero  
+
 res_not_zero:
-    bit *(___fsadd_PARM_1 + 3)
-    bpl res_pos
+	bit	*res3
+	bpl	res_pos
     ; result is negative
-    ldx #0x80
-    stx *rneg
+	ldx	#0x80
+;    stx *rneg
 	sec
-    tya
-	sbc	*___fsadd_PARM_1
-	sta	*___fsadd_PARM_1
 	tya
-	sbc	*(___fsadd_PARM_1 + 1)
-	sta	*(___fsadd_PARM_1 + 1)
+	sbc	*res0
+	sta	*res0
 	tya
-	sbc	*(___fsadd_PARM_1 + 2)
-	sta	*(___fsadd_PARM_1 + 2)
+	sbc	*res1
+	sta	*res1
 	tya
-	sbc	*(___fsadd_PARM_1 + 3)
-	sta	*(___fsadd_PARM_1 + 3)  
+	sbc	*res2
+	sta	*res2
+	tya
+	sbc	*res3
+	sta	*res3  
 res_pos:
 
 
 normalize:
-	lda	*(___fsadd_PARM_1 + 3)
-    bne norm_done
-;	../_fsadd.c: 236: mant1 <<= 1;
-	asl	*___fsadd_PARM_1
-	rol	*(___fsadd_PARM_1 + 1)
-	rol	*(___fsadd_PARM_1 + 2)
-	rol	*(___fsadd_PARM_1 + 3)
-;	../_fsadd.c: 237: exp1--;
-    dec *exp1
+	lda	*res3
+	bne	norm_done
+	asl	*res0
+	rol	*res1
+	rol	*res2
+	rol	*res3
+	dec	*exp1
 	bne	normalize
-	lda #0x00
-	jmp ret_zero
+	jmp	___fs_ret_zero
+
 norm_done:
 
 round:
-	lda	*(___fsadd_PARM_1 + 3)
-	and #0xfe
+	lda	*res3
+	and	#0xfe
 	beq	end_round
-	lda	*___fsadd_PARM_1
+	lda	*res0
 	and	#0x01
 	beq	add_end
-	inc	*___fsadd_PARM_1
+	inc	*res0
 	bne	add_end
-	inc	*(___fsadd_PARM_1 + 1)
+	inc	*res1
 	bne	add_end
-	inc	*(___fsadd_PARM_1 + 2)
+	inc	*res2
 	bne	add_end
-	inc	*(___fsadd_PARM_1 + 3)
+	inc	*res3
 add_end:
 
-;	../_fsadd.c: 244: mant1 >>= 1;
-	lsr	*(___fsadd_PARM_1 + 3)
-	ror	*(___fsadd_PARM_1 + 2)
-	ror	*(___fsadd_PARM_1 + 1)
-	ror	*___fsadd_PARM_1
-;	../_fsadd.c: 245: exp1++;
-    inc *exp1
-    bne round
-    
-; return infinite
-	lda	#0x7f
-	ora *rneg
-	sta	*___SDCC_m6502_ret3
-	lda	#0x80
-	sta	*___SDCC_m6502_ret2
-	lda	#0x00
-	tax
-	rts
+	lsr	*res3
+	ror	*res2
+	ror	*res1
+	ror	*res0
+	inc	*exp1
+	bne	round
+;    	lda	*rneg
+	txa     ; rneg is in X
+	jmp 	___fs_ret_inf ; return infinite
+
 end_round:
     
-	lsr	*(___fsadd_PARM_1 + 2)
-	ror	*(___fsadd_PARM_1 + 1)
-	ror	*___fsadd_PARM_1
+	lsr	*res2
+	ror	*res1
+	ror	*res0
 
-; pack
-    lda *exp1
-    lsr a
-    ora *rneg
-	sta	*___SDCC_m6502_ret3
-    lda #0x00
-    ror a
-    ora *(___fsadd_PARM_1 + 2)
-	sta	*___SDCC_m6502_ret2
-    ldx *(___fsadd_PARM_1 + 1)
-    lda *(___fsadd_PARM_1 + 0)
-	rts
+	stx	*s1
+	jmp	___fs_pack_ret
 

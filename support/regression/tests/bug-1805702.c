@@ -23,9 +23,9 @@ test(void)
 #define __nonbanked
 #endif
 
-float __fsmul (float, float) __nonbanked;
+float __fsdiv (float, float) __nonbanked;
 
-float __fsmul (float a1, float a2) __nonbanked {
+float __fsdiv (float a1, float a2) __nonbanked {
   /* just for testing... */
   return (a1 + a2);
 }

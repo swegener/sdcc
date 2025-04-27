@@ -8,6 +8,14 @@
   	  Implement _fsmul in assembly. Separate common fp code in _fslib.s.
   	* device/lib/mos6502/memcpy.s:
   	  Change to more readable labels.
+  	* device/lib/mos6502/__sdcc_regs.s,
+  	  device/lib/mos6502/_temp.s,
+  	  device/lib/mos6502/_dptr.s,
+  	  device/lib/mos6502/_ret01.s,
+  	  device/lib/mos6502/_ret23.s,
+  	  device/lib/mos6502/_ret4567.s,
+  	  device/lib/mos6502/Makefile.in:
+  	  Combine internal registers to save ZP space.
 
 2025-04-22 Gabriele Gorla <gorlik@yahoo.com>
 

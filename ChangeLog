@@ -6,6 +6,8 @@
   	  device/lib/mos6502/Makefile.in,
   	  support/regression/tests/bug1805702.c:
   	  Implement _fsmul in assembly. Separate common fp code in _fslib.s.
+  	* device/lib/mos6502/memcpy.s:
+  	  Change to more readable labels.
 
 2025-04-22 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -16,6 +16,8 @@
   	  device/lib/mos6502/_ret4567.s,
   	  device/lib/mos6502/Makefile.in:
   	  Combine internal registers to save ZP space.
+   	* device/lib/mos6502/fabsf.s:
+   	  Implement fabsf in assembly.
 
 2025-04-22 Gabriele Gorla <gorlik@yahoo.com>
 

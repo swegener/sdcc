@@ -21,8 +21,8 @@
 #ifndef SDCCGENM6502_H
 #define SDCCGENM6502_H
 
-// keep this in sync with _temp.s in the library
-#define NUM_TEMP_REGS 8
+// keep this in sync with __sdcc_regs.s in the library
+#define NUM_TEMP_REGS 6
 
 enum debug_messages {
   ALWAYS=0x01,

@@ -2,6 +2,8 @@
 
   	* device/lib/mos6502/Makefile.in:
   	  Fixed build warning.
+   	* src/mos6502/gen.h:
+   	  Change REGTEMP size to 6
   	
 2025-04-26 Gabriele Gorla <gorlik@yahoo.com>
 

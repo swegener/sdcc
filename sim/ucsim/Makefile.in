@@ -13,6 +13,7 @@ sims: pkgs
 apps:
 	$(MAKE) -C src apps
 
+.PHONY: install INSTALL Install
 install:
 	$(MAKE) -C src install
 	$(MAKE) -C docs install

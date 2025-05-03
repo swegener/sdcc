@@ -11,6 +11,7 @@ AR		= @AR@
 LEX		= @LEX@
 YACC		= @YACC@
 transform	= @program_transform_name@
+SED		= @SED@
 
 UTLDIR		= src/core/utils.src
 SIMDIR		= src/core/sim.src

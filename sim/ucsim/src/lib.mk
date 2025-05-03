@@ -8,6 +8,7 @@ libs: $(top_builddir)/lib$(PKG).a
 # -----------------------------------
 installdirs:
 
+.PHONY: install INSTALL Install
 install:
 
 uninstall:

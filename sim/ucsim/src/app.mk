@@ -1,6 +1,7 @@
 simulator: $(LOCAL_TARGETS) $(LEN)
 
 
+.PHONY: install INSTALL Install
 install: all installdirs local_install
 	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/$(LEN)
 	$(STRIP) $(DESTDIR)$(bindir)/$(LEN)

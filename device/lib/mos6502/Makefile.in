@@ -21,8 +21,7 @@ override PORTDIR = ../build/mos6502
 
 include $(srcdir)/../incl.mk
 
-MOS6502_FLOAT = $(COMMON_FLOAT) \
-  _floatlib.s
+MOS6502_FLOAT = $(COMMON_FLOAT)
 
 MOS6502_INT = $(COMMON_INT) \
   _muluchar.c \

@@ -2900,7 +2900,7 @@ storeRegToDPTR(reg_info *reg, int dofs)
 static int
 setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 {
-  emitComment (TRACEGEN, __func__);
+  emitComment (TRACEGEN, "  %s - off=%d remat=%s savea=%d", __func__, offset, rematOfs, savea?1:0);
 
   /* The rematerialized offset may have a "#" prefix; skip over it */
   if (rematOfs && rematOfs[0] == '#')
@@ -2928,7 +2928,7 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 
       if(AOP_TYPE(op) == AOP_REG)
 	{
-	  emitComment (TRACEGEN|VVDBG, " %s: AOP_REG", __func__);
+	  emitComment (TRACEGEN|VVDBG, "    %s: AOP_REG", __func__);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[0], 0);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[1], 1);
 	}
@@ -2939,7 +2939,7 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 	}
       else
         {
-          emitComment (TRACEGEN|VVDBG, "  %s: not AOP_REG", __func__);
+          emitComment (TRACEGEN|VVDBG, "    %s: not AOP_REG", __func__);
           if(savea)
              transferRegReg(m6502_reg_a, m6502_reg_y, true);
           // FIXME: save/restore x if SOF
@@ -2957,7 +2957,7 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
   else
     {
       // general case
-      emitComment (TRACEGEN|VVDBG, "  %s: general case", __func__);
+      emitComment (TRACEGEN|VVDBG, "    %s: general case", __func__);
 
       if(!rematOfs) rematOfs="0";
 
@@ -4135,13 +4135,15 @@ asmopToBool (asmop *aop, bool resultInA)
 
     default:
       if (!resultInA)
+        // TODO: this could be IfSurv but A should be first instead of last.
         needloada = storeRegTempIfUsed(m6502_reg_a);
 
       loadRegFromAop (m6502_reg_a, aop, offset--);
       if (isFloat)
         emit6502op ("and", "#0x7F");
-      else if(getLastFlag()!=m6502_reg_a->rIdx && size==1)
-        emitCmp(m6502_reg_a, 0x00);
+      else
+        if(getLastFlag()!=A_IDX && size==1)
+          emitCmp(m6502_reg_a, 0x00);
 
       while (--size)
         accopWithAop ("ora", aop, offset--);
@@ -4651,6 +4653,8 @@ static void unsaveRegisters (iCode *ic)
 
 /**************************************************************************
  * pushSide
+ * store oper to the RegTemp Stack
+ * TODO: change function name
  *************************************************************************/
 static void
 pushSide (operand *oper, int size, iCode *ic)
@@ -5538,7 +5542,7 @@ static bool genPlusIncr (iCode * ic)
   if (AOP_TYPE (right) != AOP_LIT)
     return false;
 
-  emitComment (TRACEGEN, __func__);
+  emitComment (TRACEGEN, "  %s", __func__);
 
   icount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
 
@@ -5808,10 +5812,9 @@ static bool genMinusDec (iCode * ic)
   if (AOP_TYPE (right) != AOP_LIT)
     return false;
 
-  emitComment (TRACEGEN, __func__);
-
   icount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
   // TODO: genPlusIncr has a lot more, can merge?
+  emitComment (TRACEGEN, "  %s - size=%d  icount=%d", __func__, size, icount);
 
   if(icount>255) return false;
 
@@ -5835,6 +5838,21 @@ static bool genMinusDec (iCode * ic)
 
   if (!sameRegs (AOP (left), AOP (result)))
     return false;
+
+  if(icount==1 && size==2 && aopCanIncDec(AOP(result)) )
+    {
+      reg_info *reg = getFreeByteReg();
+      if(reg)
+        {
+          tlbl = safeNewiTempLabel (NULL);
+          loadRegFromAop (reg, AOP (left), 0);
+          emitBranch ("bne", tlbl);
+          rmwWithAop ("dec", AOP (result), 1);
+          safeEmitLabel (tlbl);
+          rmwWithAop ("dec", AOP (result), 0);
+          return true;
+        }
+    }
 
   if (size != 1)
     return false;

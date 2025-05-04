@@ -2926,6 +2926,15 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       reg_info *reg0=findRegAop(AOP(op), 0);
       reg_info *reg1=findRegAop(AOP(op), 1);
 
+#if 1
+      if ( AOP(op) && _G.DPTRAttr[0].aop && _G.DPTRAttr[1].aop 
+           && sameRegs (AOP(op), _G.DPTRAttr[0].aop) )
+        {
+          // do nothing
+	  emitComment (TRACEGEN, "  %s: DPTR already has correct value", __func__);
+        }
+      else 
+#endif
       if(AOP_TYPE(op) == AOP_REG)
 	{
 	  emitComment (TRACEGEN|VVDBG, "    %s: AOP_REG", __func__);
@@ -5833,7 +5842,7 @@ static bool genMinusDec (iCode * ic)
       m6502_dirtyReg(m6502_reg_x);
     }
     return true;
-  }
+    }
 #endif
 
   if (!sameRegs (AOP (left), AOP (result)))

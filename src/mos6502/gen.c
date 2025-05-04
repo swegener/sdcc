@@ -5845,6 +5845,31 @@ static bool genMinusDec (iCode * ic)
     }
 #endif
 
+#if 1
+  if(icount==1 && size==1 && !sameRegs (AOP (left), AOP (result)))
+    {
+      reg_info *reg = NULL;
+      if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
+        {
+          if(m6502_reg_y->isFree)
+            reg=m6502_reg_y;
+        }
+      else 
+        reg=getFreeIdxReg();
+
+      if(reg)
+        {
+          loadRegFromAop (reg, AOP (left), 0);
+          if(reg==m6502_reg_x)
+            emit6502op ("dex", "");
+          else
+            emit6502op ("dey", "");
+          storeRegToAop (reg, AOP (result), 0);
+          return true;
+        }
+    }
+#endif
+
   if (!sameRegs (AOP (left), AOP (result)))
     return false;
 

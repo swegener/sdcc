@@ -2,6 +2,8 @@
 
   	* src/mos6502/gen.c:
   	  Improve genMinusDec.
+  	  Skip writing to DPTR if it already has the correct value.
+  	  Additional genMinusDec improvements.
 
 2025-05-03 Gabriele Gorla <gorlik@yahoo.com>
 

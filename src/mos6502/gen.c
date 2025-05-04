@@ -11142,9 +11142,9 @@ static void genPointerSet (iCode * ic)
   operand *left = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
   int size, offset;
-  bool needpulla = false;
-  bool needpullx = false;
-  bool needpully = false;
+  bool needloada = false;
+  bool needloadx = false;
+  bool needloady = false;
   bool deadA = false;
   int litOffset = 0;
   char *rematOffset = NULL;
@@ -11178,8 +11178,12 @@ static void genPointerSet (iCode * ic)
 
   decodePointerOffset (left, &litOffset, &rematOffset);
 
-  emitComment (TRACEGEN|VVDBG, "      genPointerSet (%s), size=%d, litoffset=%d, rematoffset=%s",
-               aopName(AOP(right)), size, litOffset, rematOffset );
+  emitComment (TRACEGEN|VVDBG, "    %s  - *( reg=%s + litoffset=%d + rematoffset=%s) =",
+               __func__, aopName(AOP(result)),  litOffset, rematOffset );
+  emitComment (TRACEGEN|VVDBG, "                       %s, size=%d",
+               aopName(AOP(right)), size );
+
+
 
   // shortcut for [aa],y (or [aa,x]) if already in zero-page
   // and we're not storing to the same pointer location
@@ -11199,8 +11203,8 @@ static void genPointerSet (iCode * ic)
       else
 	{ }
 #endif
-      needpulla = storeRegTempIfSurv (m6502_reg_a);
-      needpully = storeRegTempIfUsed (m6502_reg_y);
+      needloada = storeRegTempIfSurv (m6502_reg_a);
+      needloady = storeRegTempIfUsed (m6502_reg_y);
     
       emitComment (TRACEGEN|VVDBG,"   %s - ptr already in zp ", __func__);
     
@@ -11238,11 +11242,11 @@ static void genPointerSet (iCode * ic)
         && ( AOP_SIZE(result) == 1 || AOP(result)->aopu.aop_reg[1]->isLitConst ) )
 #endif
       {
-        emitComment (TRACEGEN|VVDBG,"   %s - absolute with 8-bit index", __func__);
-        emitComment(TRACEGEN|VVDBG," reg : %d  size:%d", AOP(result)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(result) );
+        emitComment (TRACEGEN|VVDBG,"  %s - absolute with 8-bit index", __func__);
+        emitComment (TRACEGEN|VVDBG,"    reg : %d  size:%d", AOP(result)->aopu.aop_reg[0]->rIdx,  AOP_SIZE(result) );
         
-        emitComment (TRACEGEN|VVDBG,"AOP TYPE(result)=%d",AOP_TYPE (result));
-        emitComment (TRACEGEN|VVDBG,"AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
+        emitComment (TRACEGEN|VVDBG,"    AOP TYPE(result)=%d",AOP_TYPE (result));
+        emitComment (TRACEGEN|VVDBG,"    AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
         unsigned int hi_offset=0;
         bool src_reg_is_y = false;
         char idx_reg;
@@ -11308,20 +11312,26 @@ static void genPointerSet (iCode * ic)
       }
 
   // general case
-  emitComment (TRACEGEN|VVDBG,"   %s - general case ", __func__);
-  int aloc, xloc, yloc;
+  emitComment (TRACEGEN|VVDBG,"  %s - general case ", __func__);
+  int aloc=0, xloc=0, yloc=0;
   deadA = m6502_reg_a->isDead;
 
-  if(IS_AOP_WITH_A(AOP(right))) needpulla = storeRegTempIfUsed (m6502_reg_a);
-  else needpulla = storeRegTempIfSurv (m6502_reg_a);
+  if(IS_AOP_WITH_A(AOP(right)))
+    needloada = storeRegTempIfUsed (m6502_reg_a);
+  else
+    needloada = storeRegTempIfSurv (m6502_reg_a);
   aloc = getLastTempOfs();
 
-  if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF ) needpullx = storeRegTempIfUsed (m6502_reg_x);
-  else needpullx = storeRegTempIfSurv (m6502_reg_x);
+  if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF )
+    needloadx = storeRegTempIfUsed (m6502_reg_x);
+  else
+    needloadx = storeRegTempIfSurv (m6502_reg_x);
   xloc = getLastTempOfs();
 
-  if(IS_AOP_WITH_Y(AOP(right))) needpully = storeRegTempIfUsed (m6502_reg_y);
-  else needpully = storeRegTempIfSurv (m6502_reg_y);
+  if(IS_AOP_WITH_Y(AOP(right)))
+    needloady = storeRegTempIfUsed (m6502_reg_y);
+  else
+    needloady = storeRegTempIfSurv (m6502_reg_y);
   yloc = getLastTempOfs();
 
   /* if bit-field then pack */
@@ -11329,7 +11339,7 @@ static void genPointerSet (iCode * ic)
     {
       emitComment (TRACEGEN|VVDBG," %s : bitvar", __func__ );
 
-      if(needpulla && IS_AOP_WITH_A (AOP(right)))
+      if(needloada && IS_AOP_WITH_A (AOP(right)))
         loadRegTempAt(m6502_reg_a, aloc);
       genPackBits (result, left, operandType (result)->next, right);
       goto release;
@@ -11349,10 +11359,10 @@ static void genPointerSet (iCode * ic)
     loadRegTempAt(m6502_reg_a, aloc);
 
   if(IS_AOP_WITH_X (AOP(right)))
-    if(needpullx) loadRegTempAt(m6502_reg_x, xloc);
+    if(needloadx) loadRegTempAt(m6502_reg_x, xloc);
 
   if(IS_AOP_WITH_Y (AOP(right)))
-    if(needpully) loadRegTempAt(m6502_reg_y, yloc);
+    if(needloady) loadRegTempAt(m6502_reg_y, yloc);
 
   for (offset=0; offset<size; offset++) {
     loadRegFromAop (m6502_reg_a, AOP (right), offset);
@@ -11364,14 +11374,14 @@ static void genPointerSet (iCode * ic)
   freeAsmop (result, NULL);
   freeAsmop (right, NULL);
 
-  loadOrFreeRegTemp (m6502_reg_y, needpully);
-  loadOrFreeRegTemp (m6502_reg_x, needpullx);
+  loadOrFreeRegTemp (m6502_reg_y, needloady);
+  loadOrFreeRegTemp (m6502_reg_x, needloadx);
 
   if(deadA) {
-    if(needpulla) loadRegTemp(NULL);
+    if(needloada) loadRegTemp(NULL);
     m6502_freeReg(m6502_reg_a);
   } else {
-    loadOrFreeRegTemp (m6502_reg_a, needpulla);
+    loadOrFreeRegTemp (m6502_reg_a, needloada);
   }
     
 }

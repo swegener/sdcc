@@ -4,6 +4,8 @@
   	  Fixed build warning.
    	* src/mos6502/gen.h:
    	  Change REGTEMP size to 6
+  	* support/regression/tests/float_single.c.in:
+  	  Fix host regression failures.
   	
 2025-04-26 Gabriele Gorla <gorlik@yahoo.com>
 

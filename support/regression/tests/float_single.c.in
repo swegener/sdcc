@@ -6,6 +6,11 @@
 #include <testfwk.h>
 #include <math.h>
 
+// fix test-host
+#ifndef _FLOAT_FUNC_REENTRANT
+#define _FLOAT_FUNC_REENTRANT
+#endif
+
 #if 0
 #   include <stdio.h>
 #   define DEBUG(x) x      /* only for "make test-host" */

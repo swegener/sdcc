@@ -5,6 +5,7 @@
   	  Skip writing to DPTR if it already has the correct value.
   	  Additional genMinusDec improvements.
   	  Renamed several variables in genPointerSet.
+  	  Allow register tracking on partial DPTR.
 
 2025-05-03 Gabriele Gorla <gorlik@yahoo.com>
 

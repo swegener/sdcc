@@ -2941,21 +2941,30 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[0], 0);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[1], 1);
 	}
-      else if(reg0&&reg1)
-        {
-          storeRegToDPTR(reg0, 0);
-          storeRegToDPTR(reg1, 1);
-	}
       else
         {
           emitComment (TRACEGEN|VVDBG, "    %s: not AOP_REG", __func__);
+
+          if(reg0)
+            storeRegToDPTR(reg0, 0);
+          if(reg1)
+            storeRegToDPTR(reg1, 1);
+          if(reg0&&reg1)
+            return offset;
+
           if(savea)
              transferRegReg(m6502_reg_a, m6502_reg_y, true);
           // FIXME: save/restore x if SOF
-          loadRegFromAop(m6502_reg_a, AOP(op), 0);
-          storeRegToDPTR(m6502_reg_a, 0);
-          loadRegFromAop(m6502_reg_a, AOP(op), 1);
-          storeRegToDPTR(m6502_reg_a, 1);
+          if(!reg0)
+            {
+              loadRegFromAop(m6502_reg_a, AOP(op), 0);
+              storeRegToDPTR(m6502_reg_a, 0);
+            }
+          if(!reg1)
+            {
+              loadRegFromAop(m6502_reg_a, AOP(op), 1);
+              storeRegToDPTR(m6502_reg_a, 1);
+            }
           if(savea)
             transferRegReg(m6502_reg_y, m6502_reg_a, true);
           else

@@ -1,4 +1,9 @@
-2025-04-04 Gabriele Gorla <gorlik@yahoo.com>
+2025-05-06 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/gen.c:
+  	  More DPTR optimizations.
+  	  
+2025-05-04 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:
   	  Improve genMinusDec.

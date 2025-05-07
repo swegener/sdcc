@@ -2952,6 +2952,35 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
           if(reg0&&reg1)
             return offset;
 
+      if(AOP(op)->type != AOP_SOF)
+            {
+              reg_info *reg = NULL;
+
+                if(m6502_reg_x->isFree && m6502_reg_x->aop!=&tsxaop )
+                  reg=m6502_reg_x;
+                else if(m6502_reg_a->isFree && !savea)
+                  reg=m6502_reg_a;
+                else if(m6502_reg_y->isFree)
+                  reg=m6502_reg_y;
+                else
+	          emitComment (TRACEGEN|VVDBG, "    %s: can't find a free register", __func__);
+
+              if(reg)
+                {
+              if(!reg0)
+                {
+                  loadRegFromAop(reg, AOP(op), 0);
+                  storeRegToDPTR(reg, 0);
+                }
+              if(!reg1)
+                {
+                  loadRegFromAop(reg, AOP(op), 1);
+                  storeRegToDPTR(reg, 1);
+                }
+              return offset;
+            }
+          }
+
           if(savea)
              transferRegReg(m6502_reg_a, m6502_reg_y, true);
           // FIXME: save/restore x if SOF
@@ -2969,8 +2998,8 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
             transferRegReg(m6502_reg_y, m6502_reg_a, true);
           else
              m6502_freeReg(m6502_reg_a);
-        }
       return offset;
+      }
     }
   else
     {

@@ -2,7 +2,9 @@
 
   	* src/mos6502/gen.c:
   	  Prefer X over Y for getFreeReg.
-
+  	* src/mos6502/peeph.def:
+  	  Fix Bug-3090 regression.
+  	  
 2025-05-06 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

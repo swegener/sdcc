@@ -25,27 +25,47 @@ replace restart {
 	sta	%6
 }
 
-// TODO: Enable when notUsed() gets implemented!
-//replace restart {
-//	lda	%1
-//	ldx	%2
-//	clc
-//	adc	%3
-//	sta	%4
-//	txa
-//	adc	%5
-//	sta	%6
-//} by {
-//	lda	%1
-//	; Peephole genpointer XA   - eliminated ldx
-//	clc
-//	adc	%3
-//	sta	%4
-//	lda	%2
-//	; Peephole genpointer XA   - replaced txa with lda
-//	adc	%5
-//	sta	%6
-//} if notUsed('x')
+replace restart {
+	lda	%1
+	ldx	%2
+	clc
+	adc	%3
+	sta	%4
+	txa
+	adc	%5
+	sta	%6
+} by {
+	lda	%1
+	; Peephole genpointer XA   - eliminated ldx %2
+	clc
+	adc	%3
+	sta	%4
+	lda	%2
+	; Peephole genpointer XA   - replaced txa with lda %2
+	adc	%5
+	sta	%6
+} if notUsed('x')
+
+replace restart {
+	ldx %2
+	lda %1
+	clc
+	adc %3
+	sta %5
+	txa
+	adc %4
+	sta %6
+} by {
+	; Peephole gen/setPointerGet - removed ldx %2
+	lda %1
+	clc
+	adc %3
+	sta %5
+	lda %2
+	; Peephole gen/setPointerGet   - replaced txa with lda %2
+	adc %4
+	sta %6
+}  if notUsed('x')
 
 replace restart {
 	bne	%1
@@ -72,27 +92,6 @@ replace restart {
 %1:
         bne	%2
 } if same(%3 'cmp' 'cpx' 'cpy'), labelInRange(%2), labelRefCountChange(%1 -1), labelRefCountChange(%2 +1)
-
-
-replace restart {
-	ldx %2
-	lda %1
-	clc
-	adc %3
-	sta %5
-	txa
-	adc %4
-	sta %6
-} by {
-	; Peephole gen/setPointerGet - removed ldx %2
-	lda %1
-	clc
-	adc %3
-	sta %5
-	lda %2
-	adc %4
-	sta %6
-}
 
 replace restart {
 	ldx	%2

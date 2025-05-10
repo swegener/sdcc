@@ -1,3 +1,8 @@
+2025-05-09 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/gen.c:
+  	  Prefer X over Y for getFreeReg.
+
 2025-05-06 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

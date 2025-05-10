@@ -1828,11 +1828,17 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
 static reg_info*
 getFreeIdxReg()
 {
-  if (m6502_reg_y->isFree)
+  if (m6502_reg_x->isFree && m6502_reg_x->aop!=&tsxaop)
+    {
+        return m6502_reg_x;
+    }
+  else if (m6502_reg_y->isFree)
+    {
     return m6502_reg_y;
+    }
   else if (m6502_reg_x->isFree)
     return m6502_reg_x;
-  else
+
     return NULL;
 }
 
@@ -11174,7 +11180,8 @@ static void genDataPointerSet (operand * left, operand * right, operand * result
 /**************************************************************************
  * genPointerSet - stores the value into a pointer location
  *************************************************************************/
-static void genPointerSet (iCode * ic)
+static void
+genPointerSet (iCode * ic)
 {
   operand *right  = IC_RIGHT (ic);
   operand *left = IC_LEFT (ic);
@@ -11375,7 +11382,7 @@ static void genPointerSet (iCode * ic)
   /* if bit-field then pack */
   if (bit_field)
     {
-      emitComment (TRACEGEN|VVDBG," %s : bitvar", __func__ );
+      emitComment (TRACEGEN|VVDBG,"    %s : bitvar", __func__ );
 
       if(needloada && IS_AOP_WITH_A (AOP(right)))
         loadRegTempAt(m6502_reg_a, aloc);

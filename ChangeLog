@@ -3,6 +3,8 @@
   	* src/mos6502/gen.c:
   	  Save A in genPointerSet only when necessary.
   	  Restore registers from DPTR when possible in genPointerSet.
+   	* src/mos6502/peeph.def:
+  	  Transform lda+tax+lda into ldx+lda.
 
 2025-05-09 Gabriele Gorla <gorlik@yahoo.com>
 

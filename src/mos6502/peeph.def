@@ -245,6 +245,26 @@ replace restart {
     ; Peephole load 5a - removed redundant lda %1,%2
 } if notVolatile(%1)
 
+replace restart {
+	lda	%1
+	tax
+	lda	%2
+} by {
+	; Peephole load 6 - replaced lda %1 + tax with ldx %1
+	ldx	%1
+	lda	%2
+}
+
+replace restart {
+	lda	%1
+	tay
+	lda	%2
+} by {
+	; Peephole load 6a - replaced lda %1 + tay with ldy %1
+	ldy	%1
+	lda	%2
+}
+
 ////////////////////////////////////////////////////////
 // Remove dead loads
 ////////////////////////////////////////////////////////

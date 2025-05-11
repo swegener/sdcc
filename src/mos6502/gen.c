@@ -2932,16 +2932,13 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       reg_info *reg0=findRegAop(AOP(op), 0);
       reg_info *reg1=findRegAop(AOP(op), 1);
 
-#if 1
       if ( AOP(op) && _G.DPTRAttr[0].aop && _G.DPTRAttr[1].aop 
            && sameRegs (AOP(op), _G.DPTRAttr[0].aop) )
         {
           // do nothing
-	  emitComment (TRACEGEN, "  %s: DPTR already has correct value", __func__);
+	  emitComment (TRACEGEN|VVDBG, "  %s: DPTR already has correct value", __func__);
         }
-      else 
-#endif
-      if(AOP_TYPE(op) == AOP_REG)
+      else if(AOP_TYPE(op) == AOP_REG)
 	{
 	  emitComment (TRACEGEN|VVDBG, "    %s: AOP_REG", __func__);
 	  storeRegToDPTR(AOP(op)->aopu.aop_reg[0], 0);
@@ -2949,6 +2946,8 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
 	}
       else
         {
+          reg_info *reg = NULL;
+
           emitComment (TRACEGEN|VVDBG, "    %s: not AOP_REG", __func__);
 
           if(reg0)
@@ -2958,21 +2957,21 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
           if(reg0&&reg1)
             return offset;
 
-      if(AOP(op)->type != AOP_SOF)
-            {
-              reg_info *reg = NULL;
-
                 if(m6502_reg_x->isFree && m6502_reg_x->aop!=&tsxaop )
                   reg=m6502_reg_x;
                 else if(m6502_reg_a->isFree && !savea)
                   reg=m6502_reg_a;
                 else if(m6502_reg_y->isFree)
                   reg=m6502_reg_y;
-                else
-	          emitComment (TRACEGEN|VVDBG, "    %s: can't find a free register", __func__);
 
-              if(reg)
-                {
+          // FIXME: save/restore x if SOF
+
+          if(AOP(op)->type == AOP_SOF || reg==NULL)
+            reg=m6502_reg_a;
+
+          if(savea)
+             transferRegReg(m6502_reg_a, m6502_reg_y, true);
+
               if(!reg0)
                 {
                   loadRegFromAop(reg, AOP(op), 0);
@@ -2982,23 +2981,6 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
                 {
                   loadRegFromAop(reg, AOP(op), 1);
                   storeRegToDPTR(reg, 1);
-                }
-              return offset;
-            }
-          }
-
-          if(savea)
-             transferRegReg(m6502_reg_a, m6502_reg_y, true);
-          // FIXME: save/restore x if SOF
-          if(!reg0)
-            {
-              loadRegFromAop(m6502_reg_a, AOP(op), 0);
-              storeRegToDPTR(m6502_reg_a, 0);
-            }
-          if(!reg1)
-            {
-              loadRegFromAop(m6502_reg_a, AOP(op), 1);
-              storeRegToDPTR(m6502_reg_a, 1);
             }
           if(savea)
             transferRegReg(m6502_reg_y, m6502_reg_a, true);
@@ -10509,7 +10491,7 @@ static void genPointerGet (iCode * ic, iCode * ifx)
   bool needpulla = false;
 
   emitComment (TRACEGEN, __func__);
-  // result = right (remat+literal_offset) + left (register offset)
+  // result = *(left (register offset) + right (remat+literal_offset) )
 
   size = getSize (operandType (result));
   if (size > 1)
@@ -11194,6 +11176,8 @@ genPointerSet (iCode * ic)
   bool needloada = false;
   bool needloadx = false;
   bool needloady = false;
+  bool restore_a_from_dptr=false;
+  bool restore_x_from_dptr=false;
   bool deadA = false;
   int litOffset = 0;
   char *rematOffset = NULL;
@@ -11202,7 +11186,7 @@ genPointerSet (iCode * ic)
 
   emitComment (TRACEGEN, __func__);
 
-  // *(result (reg) + left (rematoffset+litoffset) = right
+  // *(result (reg) + left (rematoffset+litoffset)) = right
 
 
   aopOp (result, ic);
@@ -11364,23 +11348,35 @@ genPointerSet (iCode * ic)
   emitComment (TRACEGEN|VVDBG,"  %s - general case ", __func__);
   int aloc=0, xloc=0, yloc=0;
   deadA = m6502_reg_a->isDead;
+  bool need_x = false;
 
-  if(IS_AOP_A(AOP(right)) && AOP_TYPE(result)!=AOP_SOF && !rematOffset && litOffset<255)
+  need_x= (AOP_TYPE(right)==AOP_SOF);
+
+  if(IS_AOP_XA(AOP(result)) && !rematOffset)
     {
-      // do nothing: no need to save a in this case
+      restore_a_from_dptr = !m6502_reg_a->isDead;
+      if(need_x)
+         restore_x_from_dptr = !m6502_reg_x->isDead;
     }
-  else if(IS_AOP_WITH_A(AOP(right)))
-    needloada = storeRegTempIfUsed (m6502_reg_a);
   else
-    needloada = storeRegTempIfSurv (m6502_reg_a);
-  aloc = getLastTempOfs();
+    {
+      if(IS_AOP_A(AOP(right)) && AOP_TYPE(result)!=AOP_SOF && !rematOffset && litOffset<255)
+        {
+          // do nothing: no need to save a in this case
+        }
+      else if(IS_AOP_WITH_A(AOP(right)))
+        needloada = storeRegTempIfUsed (m6502_reg_a);
+      else
+        needloada = storeRegTempIfSurv (m6502_reg_a);
+      aloc = getLastTempOfs();
 
-  if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF )
-    needloadx = storeRegTempIfUsed (m6502_reg_x);
-  else
+      if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF )
+        needloadx = storeRegTempIfUsed (m6502_reg_x);
+      else
 //    if(AOP_TYPE(result)==AOP_SOF || AOP_TYPE(right)==AOP_SOF)
-      needloadx = storeRegTempIfSurv (m6502_reg_x);
-  xloc = getLastTempOfs();
+        needloadx = storeRegTempIfSurv (m6502_reg_x);
+      xloc = getLastTempOfs();
+    } 
 
   if(IS_AOP_WITH_Y(AOP(right)))
     needloady = storeRegTempIfUsed (m6502_reg_y);
@@ -11442,6 +11438,11 @@ genPointerSet (iCode * ic)
   } else {
     loadOrFreeRegTemp (m6502_reg_a, needloada);
   }
+
+  if(restore_x_from_dptr)
+    emit6502op ("ldx", "*(DPTR+1)");
+  if(restore_a_from_dptr)
+    emit6502op ("lda", "*(DPTR+0)");
     
 }
 

@@ -2,6 +2,7 @@
 
   	* src/mos6502/gen.c:
   	  Save A in genPointerSet only when necessary.
+  	  Restore registers from DPTR when possible in genPointerSet.
 
 2025-05-09 Gabriele Gorla <gorlik@yahoo.com>
 

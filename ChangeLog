@@ -1,3 +1,8 @@
+2025-05-10 Gabriele Gorla <gorlik@yahoo.com>
+
+  	* src/mos6502/gen.c:
+  	  Save A in genPointerSet only when necessary.
+
 2025-05-09 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

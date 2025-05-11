@@ -3004,17 +3004,19 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
             transferRegReg(m6502_reg_y, m6502_reg_a, true);
           else
              m6502_freeReg(m6502_reg_a);
-      return offset;
       }
+      return offset;
     }
   else
     {
       // general case
       emitComment (TRACEGEN|VVDBG, "    %s: general case", __func__);
 
-      if(!rematOfs) rematOfs="0";
+      if(!rematOfs)
+        rematOfs="0";
 
-      if(savea) transferRegReg(m6502_reg_a, m6502_reg_y, true);
+      if(savea)
+        transferRegReg(m6502_reg_a, m6502_reg_y, true);
 
       emitSetCarry(0);
       loadRegFromAop(m6502_reg_a, AOP(op), 0);
@@ -3023,8 +3025,10 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       loadRegFromAop(m6502_reg_a, AOP(op), 1);
       emit6502op ("adc", "#>(%s+%d)", rematOfs, offset);
       storeRegToDPTR(m6502_reg_a, 1);
-      if(savea) transferRegReg(m6502_reg_y, m6502_reg_a, true);
-      else m6502_freeReg(m6502_reg_a);
+      if(savea)
+        transferRegReg(m6502_reg_y, m6502_reg_a, true);
+      else
+        m6502_freeReg(m6502_reg_a);
       return 0;
     }
 }
@@ -11361,7 +11365,11 @@ genPointerSet (iCode * ic)
   int aloc=0, xloc=0, yloc=0;
   deadA = m6502_reg_a->isDead;
 
-  if(IS_AOP_WITH_A(AOP(right)))
+  if(IS_AOP_A(AOP(right)) && AOP_TYPE(result)!=AOP_SOF && !rematOffset && litOffset<255)
+    {
+      // do nothing: no need to save a in this case
+    }
+  else if(IS_AOP_WITH_A(AOP(right)))
     needloada = storeRegTempIfUsed (m6502_reg_a);
   else
     needloada = storeRegTempIfSurv (m6502_reg_a);
@@ -11370,7 +11378,8 @@ genPointerSet (iCode * ic)
   if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF )
     needloadx = storeRegTempIfUsed (m6502_reg_x);
   else
-    needloadx = storeRegTempIfSurv (m6502_reg_x);
+//    if(AOP_TYPE(result)==AOP_SOF || AOP_TYPE(right)==AOP_SOF)
+      needloadx = storeRegTempIfSurv (m6502_reg_x);
   xloc = getLastTempOfs();
 
   if(IS_AOP_WITH_Y(AOP(right)))
@@ -11401,15 +11410,19 @@ genPointerSet (iCode * ic)
 
   int yoff = setupDPTR(result, litOffset, rematOffset, false);
   if(IS_AOP_WITH_A (AOP(right)))
-    loadRegTempAt(m6502_reg_a, aloc);
+    if(needloada)
+      loadRegTempAt(m6502_reg_a, aloc);
 
   if(IS_AOP_WITH_X (AOP(right)))
-    if(needloadx) loadRegTempAt(m6502_reg_x, xloc);
+    if(needloadx)
+      loadRegTempAt(m6502_reg_x, xloc);
 
   if(IS_AOP_WITH_Y (AOP(right)))
-    if(needloady) loadRegTempAt(m6502_reg_y, yloc);
+    if(needloady)
+      loadRegTempAt(m6502_reg_y, yloc);
 
-  for (offset=0; offset<size; offset++) {
+  for (offset=0; offset<size; offset++)
+    {
     loadRegFromAop (m6502_reg_a, AOP (right), offset);
     loadRegFromConst(m6502_reg_y, yoff + offset);
     emit6502op("sta", INDFMT_IY);
@@ -11423,7 +11436,8 @@ genPointerSet (iCode * ic)
   loadOrFreeRegTemp (m6502_reg_x, needloadx);
 
   if(deadA) {
-    if(needloada) loadRegTemp(NULL);
+    if(needloada)
+      loadRegTemp(NULL);
     m6502_freeReg(m6502_reg_a);
   } else {
     loadOrFreeRegTemp (m6502_reg_a, needloada);

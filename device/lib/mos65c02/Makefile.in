@@ -21,9 +21,9 @@ override PORTDIR = ../build/mos65c02
 
 include $(srcdir)/../incl.mk
 
-M6502_FLOAT = $(COMMON_FLOAT)
+MOS6502_FLOAT = $(COMMON_FLOAT)
 
-M6502_INT = $(COMMON_INT) \
+MOS6502_INT = $(COMMON_INT) \
   _muluchar.c \
   _mulschar.c \
   _mulint.c \
@@ -36,11 +36,11 @@ M6502_INT = $(COMMON_INT) \
   _moduint.c \
   _modsint.c
 
-M6502_LONG = $(COMMON_LONG) \
+MOS6502_LONG = $(COMMON_LONG) \
   _divulong.c \
   _mullong.c
 
-M6502_LONGLONG = $(COMMON_LONGLONG) \
+MOS6502_LONGLONG = $(COMMON_LONGLONG) \
   _srulonglong.c \
   _srslonglong.c \
   _slulonglong.c \
@@ -51,7 +51,7 @@ M6502_LONGLONG = $(COMMON_LONGLONG) \
   _modslonglong.c \
   _modulonglong.c
 
-M6502_SDCC = $(COMMON_SDCC) \
+MOS6502_SDCC = $(COMMON_SDCC) \
   __itoa.c \
   __ltoa.c \
   _heap.c \
@@ -68,10 +68,11 @@ M6502_SDCC = $(COMMON_SDCC) \
   vprintf.c \
   atomic_flag_clear.c
 
-M6502SOURCES = $(addprefix ../,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
-M6502OBJECTS = $(patsubst %.c,%.rel,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
+MOS6502SOURCES = $(addprefix ../,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_LONG) $(MOS6502_LONGLONG) $(MOS6502_SDCC))
+MOS6502OBJECTS = $(patsubst %.c,%.rel,$(MOS6502_FLOAT) $(MOS6502_INT) $(MOS6502_LONG) $(MOS6502_LONGLONG) $(MOS6502_SDCC))
 
-OBJ = _dptr.rel _temp.rel _ret01.rel _ret23.rel _ret4567.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
+OBJ = __sdcc_regs.rel __sdcc_indirect_jsr.rel\
+      _setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = mos65c02.lib
 AS = $(SAS)
@@ -84,20 +85,20 @@ all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.rel
 $(PORTDIR)/crt0.rel: crt0.rel
 	cp crt0.rel $(PORTDIR)/crt0.rel
 
-$(PORTDIR)/$(LIB): $(OBJ) $(M6502OBJECTS) Makefile
+$(PORTDIR)/$(LIB): $(OBJ) $(MOS6502OBJECTS) Makefile
 ifeq ($(LIB_TYPE), SDCCLIB)
 	rm -f $@; \
-	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(M6502OBJECTS)
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(MOS6502OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(SDAR) -rcSD $@ $(OBJ) $(M6502OBJECTS)
+	$(SDAR) -rcSD $@ $(OBJ) $(MOS6502OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(SDAR) -rcD $@ $(OBJ) $(M6502OBJECTS)
+	$(SDAR) -rcD $@ $(OBJ) $(MOS6502OBJECTS)
     else
 	rm -f $@
-	for i in $(basename $(OBJ) $(M6502OBJECTS)); do echo $$i >>$@; done
-	cp $(OBJ) $(M6502OBJECTS) $(PORTDIR)
+	for i in $(basename $(OBJ) $(MOS6502OBJECTS)); do echo $$i >>$@; done
+	cp $(OBJ) $(MOS6502OBJECTS) $(PORTDIR)
     endif
   endif
 endif

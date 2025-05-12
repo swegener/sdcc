@@ -3,7 +3,22 @@
   	* device/lib/mos6502/_fslt.s,
   	  device/lib/mos6502/_fslib.s:
   	  Implement fslt in assembly.
-  	
+  	* device/lib/mos65c02/_temp.s,
+  	  device/lib/mos65c02/_ret4567.s,
+  	  device/lib/mos65c02/_ret23.s,
+  	  device/lib/mos65c02/_ret01.s,
+  	  device/lib/mos65c02/_dptr.s,
+   	  device/lib/mos6502/__sdcc_regs.s,
+   	  device/lib/mos6502/Makefile.in,   	  
+  	  device/lib/mos6502-stack-auto/_temp.s,
+  	  device/lib/mos6502-stack-auto/_ret4567.s,
+  	  device/lib/mos6502-stack-auto/_ret23.s,
+  	  device/lib/mos6502-stack-auto/_ret01.s,
+  	  device/lib/mos6502-stack-auto/_dptr.s,
+   	  device/lib/mos6502-stack-auto/__sdcc_regs.s,
+   	  device/lib/mos6502-stack-auto/Makefile.in:
+   	  Reduce mos65c02 and mos6502-stack-auto ZP footprint.
+ 	
 2025-05-10 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/gen.c:

@@ -1,7 +1,7 @@
 ;-------------------------------------------------------------------------
-;   _floatlib.s - common code for floating point support
+;   _fslt.s - routine for floating point comparison
 ;
-;   Copyright (C) 2025, Gabriele Gorla 
+;   Copyright (C) 2025, Gabriele Gorla
 ;
 ;   This library is free software; you can redistribute it and/or modify it
 ;   under the terms of the GNU General Public License as published by the
@@ -26,48 +26,12 @@
 ;   might be covered by the GNU General Public License.
 ;-------------------------------------------------------------------------
 
-	.module _floatlib
-	
+	.module _fslt
+
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl _float_PARM_1
-	.globl ___fsadd_PARM_1
-	.globl ___fssub_PARM_1
-	.globl ___fsmul_PARM_1
-	.globl ___fslt_PARM_1
-	.globl _fabsf_PARM_1
-
-	.globl _float_PARM_2
-	.globl ___fsadd_PARM_2
-	.globl ___fssub_PARM_2
-	.globl ___fsmul_PARM_2
-	.globl ___fslt_PARM_2
-	
-	.globl ___fs_ret_zero
-	.globl ___fs_ret_inf
-	.globl ___fs_pack_ret
-	.globl ___fs_unpack_2P
-	.globl ___fs_unpack_1P
-
-;--------------------------------------------------------
-; overlayable items in ram
-;--------------------------------------------------------
-	.area	OSEG    (PAG, OVR)
-_float_PARM_1:
-_fabsf_PARM_1:
-___fsadd_PARM_1:
-___fssub_PARM_1:
-___fsmul_PARM_1:
-___fslt_PARM_1:
-	.ds 4
-	
-_float_PARM_2:
-___fsadd_PARM_2:
-___fssub_PARM_2:
-___fsmul_PARM_2:
-___fslt_PARM_2:
-	.ds 4
+	.globl ___fslt
 
 ;--------------------------------------------------------
 ; local aliases
@@ -85,53 +49,64 @@ ___fslt_PARM_2:
 ; code
 ;--------------------------------------------------------
 	.area CODE
+;------------------------------------------------------------
 
-___fs_unpack_2P:	
-	lda	*(_float_PARM_2 + 2) ; get exp2
-	rol	a
-	lda	*(_float_PARM_2 + 3)
-	rol	a
-	sta	*exp2
-	tya			; get sign2 - sign is 0x80
-	ror	a
-	sta	*s2
+___fslt:
+	ldy	#0x00
+	sty	*res0
+	jsr 	___fs_unpack_2P
 
-___fs_unpack_1P:
-	lda	*(_float_PARM_1 + 2) ; get exp1
-	rol	a
-	lda	*(_float_PARM_1 + 3)
-	rol	a
-	sta	*exp1
-	tya			; get sign1 - sign is 0x80 
-	ror	a
-	sta	*s1
-	rts
-	
-___fs_ret_zero:
-	lda	#0x00
-	tax
-	sta	*___SDCC_m6502_ret2
-	sta	*___SDCC_m6502_ret3
-	rts
-	
-___fs_ret_inf:
-	ora	#0x7f		; A contains sign
-	sta	*___SDCC_m6502_ret3
-	lda	#0x80
-	sta	*___SDCC_m6502_ret2
-	lda	#0x00
-	tax
+	lda 	*exp1
+	ora 	*exp2
+	bne 	not_denorm
+	ora	*(___fslt_PARM_1 + 0)
+	ora	*(___fslt_PARM_2 + 0)
+	ora	*(___fslt_PARM_1 + 1)
+	ora	*(___fslt_PARM_2 + 1)
+	ora	*(___fslt_PARM_1 + 2)
+	ora	*(___fslt_PARM_2 + 2)
+	beq 	ret
+not_denorm:
+	lda	*s1
+	eor 	*s2
+	beq 	same_sign
+	lda 	*s1
+	beq 	ret
+	lda 	#0x01
+ret:
 	rts
 
-___fs_pack_ret:
-	lda	*exp1
-	lsr	a
-	ora	*s1
-	sta	*___SDCC_m6502_ret3
-	lda	#0x00
-	ror	a
-	ora	*___SDCC_m6502_ret2
-	sta	*___SDCC_m6502_ret2
-	ldx	*res1
-	lda	*res0
+same_sign:
+	lda 	*s1
+	beq 	both_pos
+	inc 	*res0
+both_pos:
+	sec
+	lda	*___fslt_PARM_1
+	sbc	*___fslt_PARM_2
+	sta	*___fslt_PARM_1
+	lda	*(___fslt_PARM_1 + 1)
+	sbc	*(___fslt_PARM_2 + 1)
+	sta	*(___fslt_PARM_1 + 1)
+	lda	*(___fslt_PARM_1 + 2)
+	sbc	*(___fslt_PARM_2 + 2)
+	sta	*(___fslt_PARM_1 + 2)
+	lda	*(___fslt_PARM_1 + 3)
+	sbc	*(___fslt_PARM_2 + 3)
+	sta	*(___fslt_PARM_1 + 3)
+	bvc	00150$
+	bpl	00149$
+	bmi	00109$
+00150$:
+	bpl	00109$
+00149$:
+	iny
+00109$:
+	lda	*___fslt_PARM_1
+	ora	*(___fslt_PARM_1 + 1)
+	ora	*(___fslt_PARM_1 + 2)
+	ora	*(___fslt_PARM_1 + 3)
+	beq 	ret
+	tya
+	eor 	*res0
 	rts

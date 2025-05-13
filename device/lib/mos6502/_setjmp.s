@@ -32,7 +32,7 @@
 ;--------------------------------------------------------
 ; exported symbols
 ;--------------------------------------------------------
-	.globl ___setjmp    ; 
+	.globl ___setjmp
         .globl _longjmp
         .globl _longjmp_PARM_2
 	
@@ -107,7 +107,7 @@ _longjmp:
         lda	*(rv + 0)
         ldx	*(rv + 1)
         ora	*(rv + 1)
-        bne	0001$
+        bne	ret
         lda	#0x01
-0001$:
+ret:
         rts

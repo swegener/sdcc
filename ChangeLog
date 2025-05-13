@@ -9,6 +9,9 @@
   	  device/lib/mos65c02/_milint.s,
   	  device/lib/mos65c02/memcpy.s:
   	  Update mos65c02 library based on mos6502 improvements.
+  	* device/lib/mos6502/_setjmp.s,
+  	  device/lib/mos6502/_fsmul.s:
+  	  Minor cleanup.
   	
 2025-05-12 Gabriele Gorla <gorlik@yahoo.com>
 

@@ -12,6 +12,8 @@
   	* device/lib/mos6502/_setjmp.s,
   	  device/lib/mos6502/_fsmul.s:
   	  Minor cleanup.
+  	* src/mos6502/gen.c:
+  	  Improve handling of volatile in loadRegFromAop().
   	
 2025-05-12 Gabriele Gorla <gorlik@yahoo.com>
 

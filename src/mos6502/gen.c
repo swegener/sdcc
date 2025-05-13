@@ -1537,8 +1537,8 @@ pushRegIfSurv (reg_info *reg)
     {
       pushReg (reg, true);
       return true;
-    } else
-    return false;
+    }
+  return false;
 }
 
 /**************************************************************************
@@ -1693,6 +1693,10 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       return;
     }
 
+  /* If operand is volatile, we cannot optimize. */
+  if (!aop->op || isOperandVolatile (aop->op, false))
+    goto forceload;
+
   /* If this register already has this offset of the operand
      then we need only mark it as in use. */
   if (reg->aop && reg->aop->op && aop->op && operandsEqu (reg->aop->op, aop->op) && (reg->aopofs == loffset))
@@ -1701,11 +1705,6 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       emitComment (REGOPS, "  already had correct value for %s", reg->name);
       return;
     }
-
-#if 1
-  /* If operand is volatile, we cannot optimize. */
-  if (!aop->op || isOperandVolatile (aop->op, false))
-    goto forceload;
 
   /* check to see if we can transfer from another register */
   if(reg!=m6502_reg_xa)
@@ -1721,8 +1720,6 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
     }
 
  forceload:
-#endif
-
   switch (regidx) {
   case A_IDX:
   case X_IDX:
@@ -1740,6 +1737,7 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       }
     else if (aop->type == AOP_SOF && regidx != A_IDX)
       {
+        // TODO: add support for ldy aaaa,x
         bool needloada = storeRegTempIfUsed(m6502_reg_a); // FIXME: maybe push?
         loadRegFromAop(m6502_reg_a, aop, loffset);
         transferRegReg(m6502_reg_a, reg, false);
@@ -1828,18 +1826,15 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
 static reg_info*
 getFreeIdxReg()
 {
+  // TODO: add reentrant and stack auto
   if (m6502_reg_x->isFree && m6502_reg_x->aop!=&tsxaop)
-    {
-        return m6502_reg_x;
-    }
+    return m6502_reg_x;
   else if (m6502_reg_y->isFree)
-    {
     return m6502_reg_y;
-    }
-  else if (m6502_reg_x->isFree)
+  else if(m6502_reg_x->isFree)
     return m6502_reg_x;
 
-    return NULL;
+  return NULL;
 }
 
 /**************************************************************************
@@ -4650,7 +4645,7 @@ static void saveRegisters (iCode *lic)
   // make sure not to clobber A
   // TODO: why does isUsed not set?
   // TODO: only clobbered if m6502_reg_a->isFree
-  // TODO: 65C02
+
   bool clobbers_a = !IS_MOS65C02
     && (bitVectBitValue(ic->rSurv, X_IDX) || bitVectBitValue(ic->rSurv, Y_IDX))
     && !bitVectBitValue(ic->rSurv, A_IDX);
@@ -4675,7 +4670,7 @@ static void unsaveRegisters (iCode *ic)
   emitComment (REGOPS, "; unsaveRegisters");
 
   // TODO: only clobbered if m6502_reg_a->isFree
-  // TODO: 65C02
+
   bool clobbers_a = !IS_MOS65C02
     && (bitVectBitValue(ic->rSurv, X_IDX) || bitVectBitValue(ic->rSurv, Y_IDX))
     && !bitVectBitValue(ic->rSurv, A_IDX);
@@ -5444,13 +5439,13 @@ static void genRet (iCode * ic)
   const bool bigreturn = IS_STRUCT (operandType (left));
 
   if (bigreturn) {
-    // FIXME: only up to size 8 is supported
-    if(size>8)
-      {
-        if (!regalloc_dry_run)
-          emitcode("ERROR","  %s: return size>8 not supported", __func__);
-        goto jumpret;
-      }
+      // FIXME: only up to size 8 is supported
+      if(size>8)
+        {
+          if (!regalloc_dry_run)
+            emitcode("ERROR","  %s: return size>8 not supported", __func__);
+          goto jumpret;
+        }
 
     while (size--) {
       transferAopAop (AOP (left), size, m6502_aop_pass[size], 0);
@@ -5458,8 +5453,8 @@ static void genRet (iCode * ic)
     }
     //      emitcode("ERROR","*** end return");
 
-    goto jumpret;
-  }
+      goto jumpret;
+    }
 
   if (AOP_TYPE (left) == AOP_LIT) {
     /* If returning a literal, we can load the bytes of the return value */
@@ -11373,7 +11368,7 @@ genPointerSet (iCode * ic)
       if(IS_AOP_WITH_X(AOP(right)) && AOP_TYPE(result)==AOP_SOF )
         needloadx = storeRegTempIfUsed (m6502_reg_x);
       else
-//    if(AOP_TYPE(result)==AOP_SOF || AOP_TYPE(right)==AOP_SOF)
+//   if(AOP_TYPE(result)==AOP_SOF || AOP_TYPE(right)==AOP_SOF)
         needloadx = storeRegTempIfSurv (m6502_reg_x);
       xloc = getLastTempOfs();
     } 
@@ -12422,7 +12417,7 @@ genm6502Code (iCode *lic)
     emitComment (TRACEGEN, "Raw cost for generated ic %d : (%d, %f) count=%f", ic->key, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_cycles, ic->count);
 
     // TODO: should be asserts?
-    /*
+#if 1
       if (!m6502_reg_a->isFree)
       emitComment (REGOPS|VVDBG, "  forgot to free a");
       if (!m6502_reg_x->isFree)
@@ -12433,7 +12428,7 @@ genm6502Code (iCode *lic)
       emitComment (REGOPS|VVDBG, "  forgot to free yx");
       if (!m6502_reg_xa->isFree)
       emitComment (REGOPS|VVDBG, "  forgot to free xa");
-    */
+#endif
 
     if (getLastTempOfs() != -1 )
       emitcode("ERROR", "; forgot to free temp stack (%d)", getLastTempOfs());

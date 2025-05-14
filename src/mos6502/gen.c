@@ -4175,8 +4175,7 @@ asmopToBool (asmop *aop, bool resultInA)
       loadRegFromAop (m6502_reg_a, aop, offset--);
       if (isFloat)
         emit6502op ("and", "#0x7F");
-      else
-        if(getLastFlag()!=A_IDX && size==1)
+      else if(getLastFlag()!=A_IDX && size==1)
           emitCmp(m6502_reg_a, 0x00);
 
       while (--size)
@@ -5126,9 +5125,10 @@ genPcall (iCode * ic)
   _G.carryValid=0;
 
   /* do we need to recompute the base ptr? */
-  if (_G.funcHasBasePtr) {
-    saveBasePtr();
-  }
+  if (_G.funcHasBasePtr)
+    {
+      saveBasePtr();
+    }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (result) &&
@@ -5438,7 +5438,8 @@ static void genRet (iCode * ic)
   size = AOP_SIZE (left);
   const bool bigreturn = IS_STRUCT (operandType (left));
 
-  if (bigreturn) {
+  if (bigreturn)
+    {
       // FIXME: only up to size 8 is supported
       if(size>8)
         {
@@ -5447,12 +5448,10 @@ static void genRet (iCode * ic)
           goto jumpret;
         }
 
-    while (size--) {
-      transferAopAop (AOP (left), size, m6502_aop_pass[size], 0);
-      //   offset--;
-    }
-    //      emitcode("ERROR","*** end return");
+      for(offset=size-1; offset>=2; offset--)
+        transferAopAop (AOP (left), offset, m6502_aop_pass[offset], 0);
 
+      loadRegFromAop(m6502_reg_xa, AOP (left), 0);
       goto jumpret;
     }
 
@@ -11276,7 +11275,7 @@ genPointerSet (iCode * ic)
         emitComment (TRACEGEN|VVDBG,"    AOP TYPE(result)=%d",AOP_TYPE (result));
         emitComment (TRACEGEN|VVDBG,"    AOP(result) reg=%d",AOP(result)->aopu.aop_reg[0]->rIdx);
         unsigned int hi_offset=0;
-        bool src_reg_is_y = false;
+        char src_reg = 0;
         char idx_reg;
         bool px = false;
         bool py = false;
@@ -11307,23 +11306,28 @@ genPointerSet (iCode * ic)
 	    idx_reg='M';
 	  }
         
+        emitComment (TRACEGEN|VVDBG,"    idx_reg=%c",idx_reg);
+
+        if(AOP_TYPE(right)==AOP_REG
+           && AOP(right)->aopu.aop_reg[0]->rIdx == X_IDX )
+          src_reg = 'x';
         if(AOP_TYPE(right)==AOP_REG
            && AOP(right)->aopu.aop_reg[0]->rIdx == Y_IDX )
-          src_reg_is_y = true;
+          src_reg = 'y';
         
         if(idx_reg=='A' || idx_reg=='M')
 	  {
-	    if(src_reg_is_y)
-	      {
-		px = storeRegTempIfSurv(m6502_reg_x);
-		loadRegFromAop(m6502_reg_x, AOP(result), 0 );
-		idx_reg='x';
-	      }
-	    else
+	    if(src_reg=='x')
 	      {
 		py = storeRegTempIfSurv(m6502_reg_y);
 		loadRegFromAop(m6502_reg_y, AOP(result), 0 );
 		idx_reg='y';
+	      }
+	    else
+	      {
+		px = storeRegTempIfSurv(m6502_reg_x);
+		loadRegFromAop(m6502_reg_x, AOP(result), 0 );
+		idx_reg='x';
 	      }
 	  }
         

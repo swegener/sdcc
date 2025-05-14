@@ -14,6 +14,7 @@
   	  Minor cleanup.
   	* src/mos6502/gen.c:
   	  Improve handling of volatile in loadRegFromAop().
+  	  Improve register selection in genPointerSet().
   	
 2025-05-12 Gabriele Gorla <gorlik@yahoo.com>
 

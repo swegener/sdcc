@@ -1137,13 +1137,13 @@ emitRegTempOp( char *op, int offset)
   //           __func__, op, offset, _G.tempAttr[offset].isLiteral,
   // _G.tempAttr[offset].literalValue );
  
-  if(!_G.tempAttr[offset].isLiteral)
+  if(_G.tempAttr[offset].isLiteral)
     {
-      emit6502op(op, TEMPFMT, offset);
+      emit6502op(op, IMMDFMT, _G.tempAttr[offset].literalValue );
     }
   else
     {
-      emit6502op(op, IMMDFMT, _G.tempAttr[offset].literalValue );
+      emit6502op(op, TEMPFMT, offset);
     }
 }
 
@@ -1183,6 +1183,14 @@ storeRegTempi (reg_info * reg, bool freereg, bool force)
       storeOp[2]=reg->name[0];
       _G.tempAttr[_G.tempOfs].isLiteral=reg->isLitConst;
       _G.tempAttr[_G.tempOfs].literalValue=reg->litConst;
+      _G.tempAttr[_G.tempOfs].aop=reg->aop;
+      _G.tempAttr[_G.tempOfs].aopofs=reg->aopofs;
+      if(reg->aop && !force && (reg->aop->type==AOP_DIR || reg->aop->type==AOP_EXT) )
+        {
+          emitComment(ALWAYS, "  %s: store from %s+%d",__func__,
+                      reg->aop->aopu.aop_dir, reg->aopofs);
+        }
+      else 
       if(!reg->isLitConst || force)
         emit6502op (storeOp, TEMPFMT, _G.tempOfs);
       _G.tempOfs++;
@@ -1267,6 +1275,14 @@ loadRegTempAt (reg_info * reg, int offset)
     case X_IDX:
     case Y_IDX:
       loadOp[2]=reg->name[0];
+      if(_G.tempAttr[offset].aop && (_G.tempAttr[offset].aop->type==AOP_DIR || _G.tempAttr[offset].aop->type==AOP_EXT))
+        {
+          emitComment(ALWAYS, "  %s: should load from %s+%d", __func__,
+                      _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs);
+          emit6502op (loadOp, "%s(%s+%d)", (_G.tempAttr[offset].aop->type==AOP_DIR)?"*":"",
+           _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs );
+        }
+      else
       emit6502op (loadOp, TEMPFMT, offset);
       break;
     default:
@@ -1361,6 +1377,7 @@ static void
 dirtyRegTemp (int temp_reg_idx)
 {
   _G.tempAttr[temp_reg_idx].isLiteral=false;
+  _G.tempAttr[temp_reg_idx].aop=NULL;
 }
 
 /**************************************************************************
@@ -2633,8 +2650,12 @@ accopWithAop (char *accop, asmop *aop, int loffset)
       if (loffset < aop->size)
         {
           // TODO FIXME: does this need forcestore ?
-	  //          storeRegTempAlways (aop->aopu.aop_reg[loffset], false);
-          storeRegTemp (aop->aopu.aop_reg[loffset], false);
+          // FIXME FIXME: use regtemp tracking
+	  if(aop->aopu.aop_reg[loffset]->isLitConst)
+            storeRegTemp (aop->aopu.aop_reg[loffset], true);
+          else
+            storeRegTempAlways (aop->aopu.aop_reg[loffset], true);
+
           emitRegTempOp( accop, getLastTempOfs() );
           loadRegTemp(NULL);
         }
@@ -4496,7 +4517,7 @@ static void genUminus (iCode * ic)
   int offset, size;
   sym_link *optype;
   bool carry = true;
-  bool needpula;
+  bool needpula=false;
 
   emitComment (TRACEGEN, __func__);
   printIC(ic);
@@ -4532,7 +4553,6 @@ static void genUminus (iCode * ic)
 	emit6502op ("and", IMMDFMT, topbytemask);
 //      m6502_freeReg (m6502_reg_a);
       storeRegToFullAop (m6502_reg_a, AOP (result), SPEC_USIGN (operandType (left)));
-      pullOrFreeReg (m6502_reg_a, needpula);
       goto release;
     }
 
@@ -4585,12 +4605,11 @@ static void genUminus (iCode * ic)
         pullReg (result0);
       if (left1 == m6502_reg_a)
         pullNull (1);
-      pullOrFreeReg (m6502_reg_a, needpula);
       goto release;
     }
 
   needpula = pushRegIfSurv (m6502_reg_a);
-  while (size--)
+  for(offset=0; offset<size; offset++)
     {
       loadRegFromConst (m6502_reg_a, 0);
       if (carry)
@@ -4598,13 +4617,13 @@ static void genUminus (iCode * ic)
 	  emitSetCarry(1);
 	}
       accopWithAop ("sbc", AOP (left), offset);
-      storeRegToAop (m6502_reg_a, AOP(result), offset++);
+      storeRegToAop (m6502_reg_a, AOP(result), offset);
       carry = false;
     }
   //  storeRegSignToUpperAop (m6502_reg_a, AOP(result), offset, SPEC_USIGN (operandType (left)));
-  pullOrFreeReg (m6502_reg_a, needpula);
 
  release:
+  pullOrFreeReg (m6502_reg_a, needpula);
   freeAsmop (result, NULL);
   freeAsmop (left, NULL);
 }
@@ -4688,6 +4707,7 @@ static void unsaveRegisters (iCode *ic)
  * pushSide
  * store oper to the RegTemp Stack
  * TODO: change function name
+ * TODO: consider using DPTR
  *************************************************************************/
 static void
 pushSide (operand *oper, int size, iCode *ic)
@@ -4700,8 +4720,8 @@ pushSide (operand *oper, int size, iCode *ic)
   if (AOP_TYPE (oper) == AOP_REG)
     {
       /* The operand is in registers; we can push them directly */
-      storeRegTemp(AOP (oper)->aopu.aop_reg[0], true);
-      storeRegTemp(AOP (oper)->aopu.aop_reg[1], true);
+      storeRegTempAlways(AOP (oper)->aopu.aop_reg[0], true);
+      storeRegTempAlways(AOP (oper)->aopu.aop_reg[1], true);
     }
   else
     {
@@ -4714,7 +4734,7 @@ pushSide (operand *oper, int size, iCode *ic)
       for (offset=0; offset<size; offset++)
 	{
 	  loadRegFromAop (m6502_reg_a, AOP (oper), offset);
-	  storeRegTemp (m6502_reg_a, true);
+	  storeRegTempAlways(m6502_reg_a, true);
 	}
       pullOrFreeReg(m6502_reg_x, needloadx);
       pullOrFreeReg(m6502_reg_a, needloada);
@@ -4797,7 +4817,8 @@ genIpush (iCode * ic)
 
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
-  if (!ic->parmPush) {
+  if (!ic->parmPush)
+  {
     /* and the item is spilt then do nothing */
     if (OP_SYMBOL (left)->isspilt)
       return;
@@ -5455,20 +5476,25 @@ static void genRet (iCode * ic)
       goto jumpret;
     }
 
-  if (AOP_TYPE (left) == AOP_LIT) {
+  if (AOP_TYPE (left) == AOP_LIT)
+    {
     /* If returning a literal, we can load the bytes of the return value */
     /* in any order. By loading A and X first, any other bytes that match */
     /* can use the shorter sta and stx instructions. */
     offset = 0;
-    while (size--) {
+      while (size--)
+        {
       transferAopAop (AOP (left), offset, m6502_aop_pass[offset], 0);
       offset++;
     }
-  } else {
+    }
+  else
+    {
     /* Take care when swapping a and x */
-    if (AOP_TYPE (left) == AOP_REG && size > 1 && AOP (left)->aopu.aop_reg[0]->rIdx == X_IDX) {
+      if (AOP_TYPE (left) == AOP_REG && size > 1 && AOP (left)->aopu.aop_reg[0]->rIdx == X_IDX)
+        {
       delayed_x = true;
-      pushReg (m6502_reg_x, true);
+      storeRegTemp (m6502_reg_x, true);
     }
 
     offset = size - 1;
@@ -5487,7 +5513,8 @@ static void genRet (iCode * ic)
       }
     else
       {
-	while (size--) {
+	while (size--)
+        {
 	  if (!(delayed_x && !offset))
 	    transferAopAop (AOP (left), offset, m6502_aop_pass[offset], 0);
 	  offset--;
@@ -5495,7 +5522,7 @@ static void genRet (iCode * ic)
       }
 
     if (delayed_x)
-      pullReg (m6502_reg_a);
+      loadRegTemp (m6502_reg_a);
   }
 
   freeAsmop (left, NULL);
@@ -6062,7 +6089,12 @@ genMinus (iCode * ic)
 	pullReg (m6502_reg_a);
       if (AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX)
 	{
-	  storeRegTemp (m6502_reg_a, true);
+	  if(m6502_reg_a->isLitConst)
+	    storeRegTemp (m6502_reg_a, true);
+          else
+            storeRegTempAlways (m6502_reg_a, true);
+          // TODO: add temp tracking
+
 	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
 	  if (carry) {
 	    emitSetCarry(1);
@@ -7406,8 +7438,10 @@ genOr (iCode * ic, iCode * ifx)
           }
         if(bmask0==0xff)
           storeConstToAop(0xff, AOP(result), 0);
-        else {
-          if(needpulla) loadRegTemp(m6502_reg_a);
+        else
+          {
+            if(needpulla)
+              loadRegTemp(m6502_reg_a);
           else
 	    {
 	      loadRegFromAop (m6502_reg_a, AOP (left), 0);
@@ -10107,6 +10141,7 @@ static void genUnpackBits (operand * result, operand * left, operand * right, iC
   //  needpulla = pushRegIfSurv (m6502_reg_a);
   needpulla = storeRegTempIfSurv (m6502_reg_a);
 
+  // TODO: enable restoring from DPTR
   if (!IS_AOP_YX (AOP (left)))
     {
       needpullx = storeRegTempIfSurv (m6502_reg_x);
@@ -10448,7 +10483,8 @@ static void genDataPointerGet (operand * left, operand * right, operand * result
 
   if (IS_AOP_YX (AOP (result)))
     loadRegFromAop (m6502_reg_yx, derefaop, 0);
-  else while (size--) {
+  else while (size--)
+    {
       if (!ifx)
         transferAopAop (derefaop, size, AOP (result), size);
       else

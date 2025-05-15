@@ -2,6 +2,8 @@
 
   	* src/mos6502/peeph.def:
   	  Remove dead XY rule. Add genPlus/Minus optimization.
+   	* src/mos6502/gen.c:
+   	  Enable tracking of regTemp loads/stores.
   	  
 2025-05-13 Gabriele Gorla <gorlik@yahoo.com>
 

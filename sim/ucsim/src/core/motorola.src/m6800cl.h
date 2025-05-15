@@ -86,7 +86,8 @@ struct cc_tip {
 
 
 //  Flag bit masks
-enum {
+enum flags68_t {
+  mNON  = 0x00,
   mC	= 0x01,
   flagC	= 0x01,
   mO	= 0x02,
@@ -113,11 +114,11 @@ enum {
 #define ifVC	(!(rF&mV))
 #define ifEQ	(rF&mZ)
 #define ifNE	(!(rF&mZ))
-#define ifLT	( (rF&mN) ^ ((rF&mV)?mN:0) )
-#define ifLE	( (rF&mZ) | (((rF&mN)?mZ:0) ^ ((rF&mV)?mZ:0)) )
+#define ifLT	( (rF&mN) ^ ((rF&mV)?mN:mNON) )
+#define ifLE	( (rF&mZ) | (((rF&mN)?mZ:mNON) ^ ((rF&mV)?mZ:mNON)) )
 #define ifGE	(!ifLT)
 #define ifGT	(!ifLE)
-#define ifLS	( ((rF&mC)?mZ:0) | (rF&mZ) )
+#define ifLS	( ((rF&mC)?mZ:mNON) | (rF&mZ) )
 #define ifHI	(!ifLS)
 #define ifA	(true)
 #define ifN	(false)

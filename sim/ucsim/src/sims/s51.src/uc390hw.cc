@@ -63,7 +63,7 @@ cl_uc390_hw::init(void)
       cell_mcnt1= register_cell (sfr, MCNT1);
       cell_ma= register_cell (sfr, MA   );
       cell_mb= register_cell (sfr, MB   );
-      cell_mc= register_cell (sfr, MC   );
+      cell_mc= register_cell (sfr, SFR_MC   );
       cell_wdcon= register_cell (sfr, WDCON);
       cell_c1c= register_cell (sfr, C1C  );
     }

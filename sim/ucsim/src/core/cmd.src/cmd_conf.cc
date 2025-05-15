@@ -41,7 +41,9 @@ set_conf_help(class cl_cmd *cmd)
 {
   cmd->set_help("conf [subcommand]",
 		"Information about simulator",
-		"Long of conf");
+		"Show information about the simulator's version, type of the\n"
+		"simulated microcontroller/cpu, and list simulated hardware\n"
+		"elements, peripherals");
 }
 
 /*
@@ -78,7 +80,7 @@ cl_conf_cmd::do_work(class cl_uc *uc,
 
 CMDHELP(cl_conf_cmd,
 	"conf",
-	"Configuration",
+	"Show simulator configuration",
 	"")
 
 
@@ -126,7 +128,7 @@ COMMAND_DO_WORK_APP(cl_conf_objects_cmd)
 CMDHELP(cl_conf_objects_cmd,
 	"conf objects",
 	"Show object tree",
-	"")
+	"Internal command for developers only!")
 
 
 /*
@@ -176,7 +178,7 @@ COMMAND_DO_WORK_APP(cl_jaj_cmd)
 
 CMDHELP(cl_jaj_cmd,
 	"jaj [val]",
-	"Jaj",
+	"Internal command for developers",
 	"")
 
 /* End of cmd.src/cmd_conf.cc */

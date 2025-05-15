@@ -102,5 +102,17 @@ cl_bus::latch(u8_t val)
   out_ff->set(val);
 }
 
+void
+cl_bus::orl(u8_t val)
+{
+  out_ff->set(out_ff->get() | val);
+}
+
+void
+cl_bus::anl(u8_t val)
+{
+  out_ff->set(out_ff->get() & val);
+}
+
 
 /* End of i8048.src/bus.cc */

@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdlib.h>
+
 #include "glob.h"
 
 #include "t16cl.h"
@@ -36,7 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_fpp16::cl_fpp16(int aid, class cl_pdk *the_puc, class cl_sim *asim):
   cl_fpp15(aid, the_puc, asim)
 {
-  type= new struct cpu_entry;
+  type= (struct cpu_entry*)malloc(sizeof(struct cpu_entry));
   type->type= CPU_PDK16;
 }
 

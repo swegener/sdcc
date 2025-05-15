@@ -48,7 +48,8 @@ enum timer_confs
     tcfg_tflag	= 6,
     tcfg_ien	= 7,
     tcfg_eni	= 7,
-    tcfg_nuof	= 8
+    tcfg_irq    = 8,
+    tcfg_nuof	= 9
   };
 
 class cl_timer: public cl_hw
@@ -56,7 +57,9 @@ class cl_timer: public cl_hw
  public:
   unsigned int pre, pre16, tmr;
   enum timer_modes mode;
-  bool int_enabled, overflow_flag, timer_flag;
+  u8_t int_enabled, int_request;
+  C8 cint_enabled, cint_request;
+  bool overflow_flag, timer_flag;
  public:
   cl_timer(class cl_uc *auc);
   virtual int init(void);

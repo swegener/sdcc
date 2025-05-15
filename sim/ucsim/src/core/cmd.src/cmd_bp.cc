@@ -216,13 +216,13 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 
 CMDHELP(cl_break_cmd,
 	"break addr [hit [if expr]] | break mem_type r|w addr [hit [if expr]]",
-	"Set fix or event breakpoint",
-	"Fix breakpoint stops execution if instruction fetch happens at the\n"
-	"specified address. If the first parameter is an address then fix\n"
-	"breakpoint is created. Address can be a number or a name of a \n"
-	"variable. In this case variable must point to an address space,\n"
-	"otherwise fetch breakpoint is created.\n"
-	"Fetch breakpoint will be hit if read or write operation happens\n"
+	"Set fix fetch or event breakpoint",
+	"Fix breakpoint stops execution if instruction fetch or a read or\n"
+	"write event happens at the specified address. If the first parameter\n"
+	"is an address then fetch breakpoint is created. Address can be a\n"
+	"number or a name of a variable. In this case variable must point to\n"
+	"an address space otherwise event breakpoint is created.\n"
+	"Event breakpoint will be hit if read or write operation happens\n"
 	"at the specified address in the specified address space during\n"
 	"the instruction execution.\n"
 	"`Hit' parameter can be used to specify how many times the breakpoint\n"
@@ -230,6 +230,26 @@ CMDHELP(cl_break_cmd,
 	"`Expr' parameter can specify an expression which is evaluated\n"
 	"at every hit of the breakpint and it will be accepted only when\n"
 	"the result is true.")
+
+CMDHELP(cl_tbreak_cmd,
+	"tbreak addr [hit [if expr]] | tbreak mem_type r|w addr [hit [if expr]]",
+	"Set temporary fetch or event breakpoint",
+	"Temporary breakpoint stops execution if instruction fetch or a\n"
+	"read or write event happens at the specified address. When the\n"
+	"breakpoint is accpeted it is deleted automatically.\n"
+	"If the first parameter is an address then fetch breakpoint is created.\n"
+	"Address can be a number or a name of a variable. In this case\n"
+	"variable must point to an address space, otherwise event breakpoint\n"
+	"is created.\n"
+	"Event breakpoint will be hit if read or write operation happens\n"
+	"at the specified address in the specified address space during\n"
+	"the instruction execution.\n"
+	"`Hit' parameter can be used to specify how many times the breakpoint\n"
+	"must be hit before acception.\n"
+	"`Expr' parameter can specify an expression which is evaluated\n"
+	"at every hit of the breakpint and it will be accepted only when\n"
+	"the result is true.")
+
 
 void
 cl_break_cmd::do_fetch(class cl_uc *uc,

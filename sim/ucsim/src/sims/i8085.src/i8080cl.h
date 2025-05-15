@@ -74,6 +74,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 enum {
+  flagNON= 0,
   flagC	= 0x01,
   flagP	= 0x04,
   flagA	= 0x10,
@@ -91,10 +92,10 @@ enum {
 };
 
 #define ADDV(  a,b,r) (((a)&(b)&~(r))|(~(a)&~(b)&(r)))
-#define ADDV8( a,b,c) ((ADDV(a,b,c)&0x80)?flagV:0)
-#define ADDV16(a,b,c) ((ADDV(a,b,c)&0x8000)?flagV:0)
-#define X5(r)         (((rF&flagV)?flagK:0)^(((r)&0x80)?flagK:0))
-#define X516(r)       (((rF&flagV)?flagK:0)^(((r)&0x8000)?flagK:0))
+#define ADDV8( a,b,c) ((ADDV(a,b,c)&0x80)?flagV:flagNON)
+#define ADDV16(a,b,c) ((ADDV(a,b,c)&0x8000)?flagV:flagNON)
+#define X5(r)         (((rF&flagV)?flagK:flagNON)^(((r)&0x80)?flagK:flagNON))
+#define X516(r)       (((rF&flagV)?flagK:flagNON)^(((r)&0x8000)?flagK:flagNON))
 
 
 /*

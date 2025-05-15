@@ -31,8 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "dregcl.h"
 
-#include "glob.h"
-
 #include "i8020cl.h"
 
 /*
@@ -63,6 +61,20 @@ cl_i8020::cl_i8020(class cl_sim *asim):
   bus= NULL;
 }
 
+cl_i8020::cl_i8020(class cl_sim *asim,
+		   unsigned int rom_siz,
+		   unsigned int ram_siz):
+  cl_uc(asim)
+{
+  PCmask= 0xfff;
+  ram_size= ram_siz;
+  rom_size= rom_siz;
+  info_ch= '1';
+  timer= NULL;
+  inner_rom= rom_size;
+  bus= NULL;
+}
+
 int
 cl_i8020::init(void)
 {
@@ -71,13 +83,6 @@ cl_i8020::init(void)
   o= new cl_pc_op(&cPC);
   o->init();
   cPC.append_operator(o);
-
-  cflagF1.init();
-  cflagF1.decode(&flagF1);
-  o= new cl_bool_op(&cflagF1);
-  o->init();
-  cflagF1.append_operator(o);
-  cflagF1.set_mask(1);
 
   cmb.init();
   cmb.decode(&mb);
@@ -88,9 +93,6 @@ cl_i8020::init(void)
 
   cl_uc::init();
 
-  mk_cvar(&cflagF1, "F1", "CPU flag F1");
-  mk_cvar(&cmb, "DBF", "CPU code bank selector");
-  mk_cvar(&cmb, "A11", "CPU code bank selector");
   reg_cell_var(&cA, &rA, "ACC", "Accumulator");
 
   // prepare tables
@@ -114,6 +116,7 @@ cl_i8020::init(void)
 	uc_itab[i]= uc_itab[0x100];
       }
   //reset();
+  make_irq_sources();
   return 0;
 }
 
@@ -173,6 +176,13 @@ cl_i8020::mk_hw_elements(void)
   timer->init();
   add_hw(timer);
 
+  /*
+  irq= new cl_irq(this);
+  irq->init();
+  add_hw(irq);
+  */
+  ints= NULL;
+  
   bus= new cl_bus(this);
   bus->init();
 
@@ -193,6 +203,16 @@ cl_i8020::mk_hw_elements(void)
   h= new cl_dreg(this, 0, "dreg");
   h->init();
   add_hw(h);
+
+  mk_dport();
+}
+
+void
+cl_i8020::mk_dport(void)
+{
+  dport= new cl_port_ui(this, 0, "dport");
+  dport->init();
+  add_hw(dport);
 }
 
 void
@@ -423,6 +443,37 @@ cl_i8020::inst_length(t_addr addr)
 }
 
 void
+cl_i8020::analyze(t_addr addr)
+{
+  uint code;
+  struct dis_entry *tabl;
+  t_addr a;
+
+  code= rom->get(addr);
+  tabl= get_dis_entry(addr);
+  while (!inst_at(addr) && tabl)
+    {
+      set_inst_at(addr);
+      switch (tabl->branch)
+	{
+	  // break after CALL, return after JMP
+	case 'i': // conditional jump a8
+	  a= addr&0x0f00;
+	  a+= rom->get(addr+1);
+	  analyze_jump(addr, a, 'j');
+	  break;
+	case ' ': break;
+	case '_': return;
+	default: return;
+	}
+      addr= rom->validate_address(addr+tabl->length);
+      code= rom->get(addr);
+      tabl= get_dis_entry(addr);
+    }
+}
+
+
+void
 cl_i8020::print_regs(class cl_console_base *con)
 {
   int start, stop, i;
@@ -442,7 +493,7 @@ cl_i8020::print_regs(class cl_console_base *con)
   con->dd_cprintf("dump_number", "    0x%02x ", psw);
   con->dd_color("dump_number");
   con->print_bin(psw, 8);
-  con->dd_printf("    DBF=%d F1=%d", mb, flagF1);
+  //con->dd_printf("    DBF=%d", mb);
   con->dd_printf("\n");
   // show indirectly addressed IRAM and some basic regs
   start= R[0]->get();
@@ -485,7 +536,7 @@ cl_i8020::print_regs(class cl_console_base *con)
 }
 
 void
-cl_i8020::push(void)
+cl_i8020::push(bool pushf)
 {
   u8_t spb= psw&7;
   u8_t spa= (spb+1)&7;
@@ -493,7 +544,8 @@ cl_i8020::push(void)
   iram->write(ib, PC);
   WR;
   u8_t h= (PC>>8) & 0xf;
-  h|= (psw & 0xf0);
+  if (pushf)
+    h|= (psw & 0xf0);
   iram->write(ib+1, h);
   WR;
   psw&= ~7;
@@ -546,6 +598,7 @@ void
 cl_i8020::reset(void)
 {
   cl_uc::reset();
+  in_isr= false;
   // 1) PC=0
   cPC.W(0);
   // 2) SP=0, 3) regbank=0
@@ -558,11 +611,9 @@ cl_i8020::reset(void)
   ports->write(1, 0xff);
   ports->write(2, 0xff);
   // 7) disbale irq
-  ien= 0;
   // 8) stop timer
   // 9) clear timer flag
   // 10) Clear F0, F1
-  cflagF1.W(0);
   // 11) disable clock output from T0
 }
 
@@ -587,6 +638,27 @@ CL2::read_ir(int regnr)
   return iram->read(a);
 }
 
+int
+CL2::priority_of(uchar nuof)
+{
+  if (nuof==0) return 2;
+  if (nuof==1) return 1;
+  return 0;
+}
+
+int
+CL2::accept_it(class it_level *il)
+{
+  if (il) delete il;
+  return resGO;
+}
+
+
+/****************************************************************************
+
+                                  8021
+
+*****************************************************************************/
 
 cl_i8021::cl_i8021(class cl_sim *asim):
   cl_i8020(asim)
@@ -596,6 +668,66 @@ cl_i8021::cl_i8021(class cl_sim *asim):
   info_ch= '1';
 }
 
+cl_i8021::cl_i8021(class cl_sim *asim,
+		   unsigned int rom_siz,
+		   unsigned int ram_siz):
+  cl_i8020(asim)
+{
+  rom_size= rom_siz;
+  ram_size= ram_siz;
+  info_ch= '1';
+}
+
+int
+cl_i8021::init(void)
+{
+  cl_i8020::init();
+  return 0;
+}
+
+void
+cl_i8021::mk_dport(void)
+{
+  cl_i8020::mk_dport();
+  
+  class cl_port_data d;
+  d.init();
+  d.width= 8;
+
+  d.set_name("P0");
+  d.cell_dir= NULL;
+  d.cell_p  = p0->pcell;
+  d.cell_in = p0->cfg_cell(port_pin);
+  d.keyset  = keysets[0];
+  d.basx    = 1;
+  d.basy    = 6;
+  dport->add_port(&d, 0);
+
+  d.set_name("P1");
+  d.cell_dir= NULL;
+  d.cell_p  = p1->pcell;
+  d.cell_in = p1->cfg_cell(port_pin);
+  d.keyset  = keysets[1];
+  d.basx    = 1+20;
+  d.basy    = 6;
+  dport->add_port(&d, 1);
+
+  d.set_name("P2");
+  d.cell_dir= NULL;
+  d.cell_p  = p2->pcell;
+  d.cell_in = p2->cfg_cell(port_pin);
+  d.keyset  = keysets[2];
+  d.basx    = 1+20+20;
+  d.basy    = 6;
+  dport->add_port(&d, 2);
+}
+
+
+/****************************************************************************
+
+                                  8022
+
+*****************************************************************************/
 
 cl_i8022::cl_i8022(class cl_sim *asim):
   cl_i8021(asim)
@@ -605,20 +737,113 @@ cl_i8022::cl_i8022(class cl_sim *asim):
   info_ch= '2';
 }
 
+cl_i8022::cl_i8022(class cl_sim *asim,
+		   unsigned int rom_siz,
+		   unsigned int ram_siz):
+  cl_i8021(asim)
+{
+  rom_size= rom_siz;
+  ram_size= ram_siz;
+  info_ch= '2';
+}
+
+int
+cl_i8022::init(void)
+{
+  cl_i8021::init();
+  return 0;
+}
+
+void
+cl_i8022::make_irq_sources(void)
+{
+  class cl_it_src *is;
+
+  /*
+    In 8022, external interrupt source is T0 pin!
+   */
+  it_sources->add
+    (
+     is= new cl_it_src
+     (this, 0,
+      &ints->cene, 1, // enable cell/mask
+      &((class cl_i8020_cpu*)cpu)->cpins, ipm_t0, // requ cell/mask
+      3, // addr
+      false, //clr
+      false, // indirect
+      "External", // name
+      1 // poll_priority
+      ));
+  is->init();
+  is->src_value= 0; // External is low level
+
+  it_sources->add
+    (
+     is= new cl_it_src
+     (this, 1,
+      &timer->cint_enabled, 1, // enable cell/mask
+      &timer->cint_request, 1, // requ cell/mask
+      7, // addr
+      true, //clr
+      false, // indirect
+      "Timer", // name
+      2 // poll_priority
+      ));
+  is->init();
+}
+
+void
+cl_i8022::mk_hw_elements(void)
+{
+  cl_i8021::mk_hw_elements();
+  class cl_hw *h;
+
+  ints= new cl_ints(this);
+  ints->init();
+  add_hw(ints);
+}
+
+int
+cl_i8022::accept_it(class it_level *il)
+{
+  in_isr= true;
+  // no tracking needed
+  push(false);
+  PC= il->addr;
+  delete il;
+  return resGO;
+}
+
+int
+cl_i8022::RETI(MP)
+{
+  in_isr= false;
+  return RET(code);
+}
+
+
+/**************************************************************************/
+
 cl_i8020_cpu::cl_i8020_cpu(class cl_uc *auc):
   cl_hw(auc, HW_CPU, 0, "cpu")
 {
+  ipins= 0;
 }
 
 int
 cl_i8020_cpu::init(void)
 {
+  class cl_i8020 *u= (class cl_i8020 *)uc;
+  cl_var *v;
+  
   cl_hw::init();
 
-  cl_var *v;
-  uc->vars->add(v= new cl_var("T0", cfg, i8020cpu_t0,
-			      cfg_help(i8020cpu_t0)));
-  v->init();
+  if (u->info_ch != '1')
+    {
+      uc->vars->add(v= new cl_var("T0", cfg, i8020cpu_t0,
+				  cfg_help(i8020cpu_t0)));
+      v->init();
+    }
   uc->vars->add(v= new cl_var("T1", cfg, i8020cpu_t1,
 			      cfg_help(i8020cpu_t1)));
   v->init();
@@ -626,15 +851,29 @@ cl_i8020_cpu::init(void)
 			      cfg_help(i8020cpu_inner)));
   v->init();
 
+  cpins.decode(&ipins);
   return 0;
+}
+
+void
+cl_i8020_cpu::reset(void)
+{
+  ipins|= ipm_t0;
+  ipins|= ipm_t1;
+  ipins|= ipm_int;
+  ipins|= ipm_wr;
 }
 
 const char *
 cl_i8020_cpu::cfg_help(t_addr addr)
 {
+  class cl_i8020 *u= (class cl_i8020 *)uc;
   switch (addr)
     {
-    case i8020cpu_t0: return "T0 input pin (bool, RW)";
+    case i8020cpu_t0:
+      if (u->info_ch == '1')
+	return "Not used";
+      return "T0 input pin (bool, RW)";
     case i8020cpu_t1: return "T1 input pin (bool, RW)";
     case i8020cpu_inner: return "Size of inner code memory (int, RW)";
     }
@@ -649,26 +888,38 @@ cl_i8020_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     cell->set(*val);
   switch ((enum i8020cpu_confs)addr)
     {
+    case i8020cpu_inner:
+      if (val)
+	u->set_inner(*val);
+      cell->set(u->get_inner());
+      break;
     case i8020cpu_t0:
       if (val)
-	*val= (*val)?1:0;
+	{
+	  *val= (*val)?1:0;
+	  ipins&= ~ipm_t0;
+	  ipins|= (*val)?ipm_t0:0;
+	}
+      else
+	cell->set((ipins & ipm_t0)?1:0);
       break;
     case i8020cpu_t1:
       if (val)
 	{
 	  *val= (*val)?1:0;
-	  if ((cell->get() != 0) &&
-	      (*val == 0) &&
-	      (u->timer != NULL))
+	  ipins&= ~ipm_t1;
+	  ipins|= (*val)?ipm_t1:0;
+	  if (u->timer)
 	    {
-	      u->timer->do_counter(1);
+	      if ((cell->get() != 0) &&
+		  (*val == 0))
+		{
+		  u->timer->do_counter(1);
+		}
 	    }
 	}
-      break;
-    case i8020cpu_inner:
-      if (val)
-	u->set_inner(*val);
-      cell->set(u->get_inner());
+      else
+	cell->set((ipins & ipm_t1)?1:0);
       break;
     case i8020cpu_nuof: break;
     }

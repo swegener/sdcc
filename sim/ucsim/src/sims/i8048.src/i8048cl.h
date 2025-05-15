@@ -46,24 +46,39 @@ public:
 
 class cl_i8048: public cl_i8020
 {
+public:
+  u8_t flagF1;
+  class cl_bit_cell8 cflagF1;
  public:
   cl_i8048(class cl_sim *asim);
   cl_i8048(class cl_sim *asim,
 	   unsigned int rom_siz,
 	   unsigned int ram_siz);
   virtual int init(void);
+  virtual void reset(void);
+  virtual void make_irq_sources(void);
   virtual void mk_hw_elements(void);
+  virtual void mk_dport(void);
   virtual class cl_memory_operator *make_flagop(void);
+  virtual void make_cpu_hw(void);
   virtual void decode_regs(void);
   virtual u8_t movxrd(u8_t addr);
   virtual void movxwr(u8_t addr, u8_t val);
+  virtual int orlbus(u8_t i8);
+  virtual int anlbus(u8_t i8);
+  virtual int call(MP);
+  virtual int accept_it(class it_level *il);
+  virtual void print_regs(class cl_console_base *con);
   // 48 specific insts to implement:
+  int ENTCNTI(MP);
+  int DISTCNTI(MP);
   int OUTLB(MP);
   int INS(MP);
   int JNT0(MP) { return jif(cpu->cfg_read(i8020cpu_t0)==0); }
   int JT0 (MP) { return jif(cpu->cfg_read(i8020cpu_t0)!=0); }
   int JF0 (MP) { return jif(psw & flagF0); }
   int JF1 (MP) { return jif(cflagF1.R() != 0); }
+  int JNI(MP);
   int MOVXAIR0(MP) { RD; cA.W(movxrd(R[0]->R())); return resGO; }
   int MOVXAIR1(MP) { RD; cA.W(movxrd(R[1]->R())); return resGO; }
   int MOVXIR0A(MP) { WR; movxwr(R[0]->R(), rA); return resGO; }
@@ -78,6 +93,32 @@ class cl_i8048: public cl_i8020
   int MOVFA(MP) { cF.W(rA); return resGO; }
   int SELMB0(MP) { mb= 0; return resGO; }
   int SELMB1(MP) { mb= 1; return resGO; }
+  int ENT0CLK(MP) { return resGO; }
+  int ORLBUSI8(MP) { return orlbus(fetch()); }
+  int ANLBUSI8(MP) { return anlbus(fetch()); }
+  int ORLP1I8(MP);
+  int ORLP2I8(MP);
+  int ANLP1I8(MP);
+  int ANLP2I8(MP);
+  int RETR(MP);
+};
+
+
+enum i8048cpu_confs
+  {
+    i8048cpu_int	= i8020cpu_nuof+0,
+    i8048cpu_nuof	= i8020cpu_nuof+1
+  };
+
+
+class cl_i8048_cpu: public cl_i8020_cpu
+{
+public:
+  cl_i8048_cpu(class cl_uc *auc);
+  virtual int init(void);
+  virtual unsigned int cfg_size(void) { return i8048cpu_nuof; }
+  virtual const char *cfg_help(t_addr addr);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 };
 
 

@@ -59,7 +59,7 @@ enum { NUOF_PORT_UIS= 16 };
 class cl_port_ui: public cl_hw
 {
  public:
-  class cl_port_data pd[16];
+  class cl_port_data pd[NUOF_PORT_UIS];
   int act_port;
  public:
   cl_port_ui(class cl_uc *auc, int aid, chars aid_string);

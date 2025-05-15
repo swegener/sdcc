@@ -193,7 +193,7 @@ cl_rxk::rot8left(class cl_cell8 &dest, u8_t op)
   u8_t a7;
   a7= op&0x80;
   dest.W((op<<1) | (a7?1:0));
-  f.W((rF & ~flagC) | (a7?flagC:0));
+  f.W((rF & ~flagC) | (a7?flagC:flagNON));
   tick(1);
   return resGO;
 }
@@ -282,7 +282,7 @@ cl_rxk::rot9left(class cl_cell8 &dest, u8_t op)
   u8_t a7, c= rF&flagC;
   a7= op&0x80;
   dest.W((op<<1) | (c?1:0));
-  f.W((rF & ~flagC) | (a7?flagC:0));
+  f.W((rF & ~flagC) | (a7?flagC:flagNON));
   tick(1);
   return resGO;
 }
@@ -369,7 +369,7 @@ cl_rxk::rot8right(class cl_cell8 &dest, u8_t op)
   u8_t a0;
   a0= op&0x01;
   dest.W((op>>1) | (a0?0x80:0));
-  f.W((rF & ~flagC) | (a0?flagC:0));
+  f.W((rF & ~flagC) | (a0?flagC:flagNON));
   tick(1);
   return resGO;
 }
@@ -458,7 +458,7 @@ cl_rxk::rot9right(class cl_cell8 &dest, u8_t op)
   u8_t a0, c= rF&flagC;
   a0= op&0x01;
   dest.W((op>>1) | (c?0x80:0));
-  f.W((rF & ~flagC) | (a0?flagC:0));
+  f.W((rF & ~flagC) | (a0?flagC:flagNON));
   tick(1);
   return resGO;
 }

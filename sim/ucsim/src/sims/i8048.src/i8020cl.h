@@ -37,6 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "timercl.h"
 #include "buscl.h"
 #include "portcl.h"
+#include "intscl.h"
+#include "itsrccl.h"
 
 
 enum {
@@ -59,6 +61,8 @@ enum {
 #define MP  t_mem code
 #define CL2 cl_i8020
 #define CL4 cl_i8048
+#define CL8 cl_i8048
+#define CL1 cl_i8041
 
 #define RD   (vc.rd++)
 #define WR   (vc.wr++)
@@ -68,11 +72,19 @@ enum {
 
 enum i8020cpu_confs
   {
-    i8020cpu_t0		= 0,
-    i8020cpu_t1		= 1,
-    i8020cpu_inner	= 2,
+    i8020cpu_inner	= 0,
+    i8020cpu_t0		= 1,
+    i8020cpu_t1		= 2,
     i8020cpu_nuof	= 3
   };
+
+// Input Pin Masks
+enum ipm_t {
+  ipm_t0	= 1,
+  ipm_t1	= 2,
+  ipm_int	= 4,
+  ipm_wr	= 8
+};
 
 
 /*
@@ -110,12 +122,12 @@ class cl_i8020: public cl_uc
 protected:
   unsigned int ram_size, rom_size, inner_rom;
   const char *id_str;
-  char info_ch;
  public:
+  char info_ch;
   u8_t psw;
   class cl_cell8 *cpsw;
-  u8_t flagF1, mb, rA, ien;
-  class cl_bit_cell8 cflagF1, cmb;
+  u8_t mb, rA;
+  class cl_bit_cell8 cmb;
   class cl_address_space *regs, *aspsw, *iram, *ports, *xram;
   class cl_cell8 cA, *R[8];
   class cl_memory_chip *rom_chip, *iram_chip, *ports_chip, *xram_chip;
@@ -124,8 +136,14 @@ protected:
   class cl_qport *p0, *p1;
   class cl_p2 *p2;
   class cl_pext *pext;
+  class cl_ints *ints;
+  class cl_port_ui *dport;
+  bool in_isr; // true during ISR
  public:
   cl_i8020(class cl_sim *asim);
+  cl_i8020(class cl_sim *asim,
+	   unsigned int rom_siz,
+	   unsigned int ram_siz);
   virtual int init(void);
   virtual double def_xtal(void) { return 11000000; }
   virtual void set_inner(unsigned int inner) { inner_rom= inner; }
@@ -136,7 +154,9 @@ protected:
   virtual t_mem fetch(void);
   virtual class cl_memory_operator *make_flagop(void);
   virtual void make_cpu_hw(void);
+  virtual void make_irq_sources(void) {}
   virtual void mk_hw_elements(void);
+  virtual void mk_dport(void);
   virtual void make_memories(void);
   virtual void make_address_spaces(void);
   virtual void make_chips(void);
@@ -148,10 +168,14 @@ protected:
   virtual struct dis_entry *dis_entry_of(u8_t code);
   virtual char *disassc(t_addr addr, chars *comment);
   virtual int inst_length(t_addr addr);
+  virtual void analyze(t_addr addr);
   virtual void print_regs(class cl_console_base *con);
   virtual i8_t *tick_tab(t_mem code) { return tick_tab20; }
-
-  virtual void push(void);
+  virtual bool it_enabled(void) { return !in_isr; }
+  virtual int priority_of(uchar nuof);
+  virtual int priority_main(void) { return 0; }
+  virtual int accept_it(class it_level *il);
+  virtual void push(bool pushf);
   virtual u16_t pop(bool popf);
   virtual void stack_check_overflow(t_addr sp_after);
   
@@ -186,12 +210,8 @@ protected:
   
   /* Other instructions */
   int NOP(MP) { return resGO; }
-  int DISI(MP) { ien= 0; return resGO; }
-  int ENI(MP) { ien= 1; return resGO; }
   int CLRF0(MP) { cF.W(rF & ~flagF0); return resGO; }
   /* Timer */
-  int ENTCNTI(MP);
-  int DISTCNTI(MP);
   int JTF(MP);
   int MOVAT(MP);
   int MOVTA(MP);
@@ -390,9 +410,17 @@ protected:
   int MOVR5I8(MP) { R[5]->W(fetch()); return resGO; }
   int MOVR6I8(MP) { R[6]->W(fetch()); return resGO; }
   int MOVR7I8(MP) { R[7]->W(fetch()); return resGO; }
+
+  int OUTLP0A(MP) { WR; out(0); return resGO; }
+  int OUTLP1A(MP) { WR; out(1); return resGO; }
+  int OUTLP2A(MP) { WR; out(2); return resGO; }
   
   // 21,22 specific instructions to implement
   int INP0(MP) { return in(0); }
+
+  // Work if irq controller is present
+  int DISI(MP);
+  int ENI(MP);
 };
 
 
@@ -400,24 +428,43 @@ class cl_i8021: public cl_i8020
 {
  public:
   cl_i8021(class cl_sim *asim);
+  cl_i8021(class cl_sim *asim,
+	   unsigned int rom_siz,
+	   unsigned int ram_siz);
+  virtual int init(void);
+  virtual void mk_dport(void);
 };
 
 class cl_i8022: public cl_i8021
 {
  public:
   cl_i8022(class cl_sim *asim);
+  cl_i8022(class cl_sim *asim,
+	   unsigned int rom_siz,
+	   unsigned int ram_siz);
+  virtual int init(void);
+  virtual void make_irq_sources(void);
+  virtual void mk_hw_elements(void);
+  virtual int accept_it(class it_level *il);
   //virtual void make_cpu_hw(void);
   // 8022 specific instructions
   int JNT0(MP) { return jif(cpu->cfg_read(i8020cpu_t0)==0); }
   int JT0 (MP) { return jif(cpu->cfg_read(i8020cpu_t0)!=0); }
+  int ENTCNTI(MP);
+  int DISTCNTI(MP);
+  int RETI(MP);
 };
 
 
 class cl_i8020_cpu: public cl_hw
 {
 public:
+  u8_t ipins;
+  C8 cpins;
+public:
   cl_i8020_cpu(class cl_uc *auc);
   virtual int init(void);
+  virtual void reset(void);
   virtual unsigned int cfg_size(void) { return i8020cpu_nuof; }
   virtual const char *cfg_help(t_addr addr);
 

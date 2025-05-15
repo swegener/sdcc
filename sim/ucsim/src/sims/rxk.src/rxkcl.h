@@ -84,6 +84,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define raL    (aJKHL.r32.r16l.r.L)
 
 enum {
+  flagNON= 0,
   flagS = 0x80,
   flagZ = 0x40,
   flagL = 0x04,

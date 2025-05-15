@@ -32,16 +32,17 @@
       <ul><li>Intel (MCS51 family, MCS48, MCS80, MCS85)</li>
 	<li>XA51,</li>
 	<li>AVR core,</li>
-	<li>Z80,</li>
+	<li>Z80 (Z80, Z180, GB80, EZ80, Z80N, R800),</li>
 	<li>TLCS90,</li>
 	<li>Rabbit (r2k, r3k, r4k, r5k)</li>
 	<li>Motorola (6800, 68hc08, 6809, 68hc11, 68hc12)</li>
-	<li>6502,</li>
+	<li>MOS6502,</li>
 	<li>ST7,</li>
 	<li>STM8,</li>
-	<li>Padauk,</li>
+	<li>Padauk (pdk13, pdk14, pdk15, pdk16)</li>
 	<li>PicoBlaze,</li>
-	<li><a href="http://mazsola.iit.uni-miskolc.hu/d/softproc">p1516, p2223</a> soft processors,</li>
+	<li><a href="https://danieldrotos.github.io/p12dev/">p1516,
+	p2223</a> soft processors,</li>
 	<li>F8 soft processor,</li>
 	<li>OISC processors (URISC, MISC16)</li>
       </ul>
@@ -79,8 +80,9 @@
       
       <h2><a name="install">How to install</a></h2>
       
-      <p>UNIX version is distributed in source, pre-compiled debian
-	stable package for i386 and amd64 architecture.</p>
+      <p>UNIX version is distributed in source, as well as
+	in pre-compiled debian stable packages for i386 and amd64
+	architectures.</p>
 
       <p>Windows version distributed as a setup executable and as a
 	portable zip package.</p>
@@ -90,29 +92,35 @@
     <ol>
 
       <li>Get archive file, uncompress and untar it. These steps will
-        produce a directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
+        produce a directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the
+        version number. </li>
       
       <li>Make sure, that following packages are installed on your
       system: <b>make</b> (GNU make is required),
         <b>bison</b> (or yacc), <b>flex</b> (or lex), <b>libncurses-dev</b>.
         You will need a C++ compiler as well.</li>
       
-      <li>Go to the directory and configure the package. Issue <tt><b>./configure</b></tt>
-        command. It will determine your system and produce <b>Makefile</b>.
-        Installation directory can be specified with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- -->
-        option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
-        Executable files will be placed in <tt>bin</tt> subdirectory.</li>
+      <li>Go to the directory and configure the
+        package. Issue <tt><b>./configure</b></tt> command. It will
+        determine your system and produce <b>Makefile</b>.
+        Installation directory can be specified
+        with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- --> option to
+        the <tt><b>configure</b></tt>. Default directory
+        is <tt>/usr/local</tt>.  Executable files will be placed
+        in <tt>bin</tt> subdirectory.</li>
       
-      <li>Compile the package with <tt><b>make</b></tt> command, or <b>gmake</b> if
-      GNU make has that name. </li>
+      <li>Compile the package with <tt><b>make</b></tt> command,
+      or <b>gmake</b> if GNU make has that name. </li>
       
-      <li>Install executables <b>ucsim_i8051</b>, <b>ucsim_avr</b>, <b>ucsim_hc08</b>, <b>ucsim_xa</b>,
-        <b>ucsim_z80, etc.</b> to any directory you want. It can be done with <tt><b>make
-            install</b></tt> command which will place files in installation
-        directory specified with <tt><b>--prefix=<i>dir</i></b><!-- --
---></tt> option of <tt><b>configure</b></tt>. Note that you may have to have
-        special privilege to do this if installation directory is not writable
-        by the user. </li>
+      <li>Install
+      executables <b>ucsim_i8051</b>, <b>ucsim_avr</b>, <b>ucsim_hc08</b>, <b>ucsim_xa</b>, <b>ucsim_z80,
+      etc.</b> to any directory you want. It can be done
+      with <tt><b>make install</b></tt> command which will place files
+      in installation directory specified
+      with <tt><b>--prefix=<i>dir</i></b><!-- -- --></tt> option
+      of <tt><b>configure</b></tt>. Note that you may have to have
+      special privilege to do this if installation directory is not
+      writable by the user. </li>
       
     </ol>
     
@@ -162,7 +170,8 @@
       provide external input data for the simulated system (port,
       uart).</li>
       
-      <li><a href="syntax.html">Command syntax</a> and <a href="cmd.html">command
+      <li><a href="syntax.html">Command syntax</a>
+        and <a href="cmd.html">command
         reference</a>, <a href="syntax.html#expr">expressions</a>. <br>
 	
         The simulator can be controlled via a command line

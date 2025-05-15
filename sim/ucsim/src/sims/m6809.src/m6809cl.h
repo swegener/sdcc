@@ -63,16 +63,17 @@ struct reg_t {
 
 enum flags
   {
-   flagC= 1,
-   flagV= 2,
-   flagO= 2,
-   flagZ= 4,
-   flagN= 8,
-   flagS= 8,
-   flagI= 16,
-   flagH= 32,
-   flagF= 64,
-   flagE= 128
+    flagNON= 0,
+    flagC= 1,
+    flagV= 2,
+    flagO= 2,
+    flagZ= 4,
+    flagN= 8,
+    flagS= 8,
+    flagI= 16,
+    flagH= 32,
+    flagF= 64,
+    flagE= 128
   };
 
 class cl_m6809_src_base;
@@ -158,11 +159,11 @@ public:
   virtual bool it_enabled(void) { return true; }
 };
 
-#define SET_C(v) ( (reg.CC)= ((reg.CC)&~flagC) | ((v)?flagC:0) )
-#define SET_Z(v) ( (reg.CC)= ((reg.CC)&~flagZ) | ((v==0)?flagZ:0) )
-#define SET_S(v) ( (reg.CC)= ((reg.CC)&~flagS) | ((v)?flagS:0) )
-#define SET_O(v) ( (reg.CC)= ((reg.CC)&~flagV) | ((v)?flagV:0) )
-#define SET_H(v) ( (reg.CC)= ((reg.CC)&~flagH) | ((v)?flagH:0) )
+#define SET_C(v) ( (reg.CC)= ((reg.CC)&~flagC) | ((v)?flagC:flagNON) )
+#define SET_Z(v) ( (reg.CC)= ((reg.CC)&~flagZ) | ((v==0)?flagZ:flagNON) )
+#define SET_S(v) ( (reg.CC)= ((reg.CC)&~flagS) | ((v)?flagS:flagNON) )
+#define SET_O(v) ( (reg.CC)= ((reg.CC)&~flagV) | ((v)?flagV:flagNON) )
+#define SET_H(v) ( (reg.CC)= ((reg.CC)&~flagH) | ((v)?flagH:flagNON) )
 
   
 #endif

@@ -65,9 +65,9 @@ cl_flash_as::cl_flash_as(const char *id, t_addr astart, t_addr asize):
   start_address= astart;
   decoders= new cl_decoder_list(2, 2, false);
   cella= (class cl_memory_cell *)malloc(size * sizeof(class cl_memory_cell));
-  int s1= sizeof(class cl_memory_cell);
+  /*int s1= sizeof(class cl_memory_cell);
   int s2= sizeof(class cl_flash_cell);
-  printf("s1=%d s2=%d\n", s1, s2);
+  printf("s1=%d s2=%d\n", s1, s2);*/
   //cell->init();
   t_addr i;
   for (i= 0; i < size; i++)

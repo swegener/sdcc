@@ -877,10 +877,10 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
   cmdset->add(cmd= new cl_hole_cmd("hole", 0));
   cmd->init();
   
-  cmdset->add(cmd= new cl_break_cmd("break", 0));
+  cmdset->add(cmd= new cl_tbreak_cmd("tbreak", 0));
   cmd->init();
 
-  cmdset->add(cmd= new cl_tbreak_cmd("tbreak", 0));
+  cmdset->add(cmd= new cl_break_cmd("break", 0));
   cmd->init();
 
   cmdset->add(cmd= new cl_clear_cmd("clear", 0));
@@ -2257,7 +2257,7 @@ cl_uc::analyze_jump(t_addr addr, t_addr target, char type, unsigned int bit)
   // If we didn't know the target was code we do now, but don't cross
   // into bankers - we don't know what bank would be selected at
   // execution time.
-  class cl_address_decoder *ad;
+  class cl_address_decoder *ad= NULL;
   if (!inst_at(target) && (ad = rom->get_decoder_of(target)) && !ad->is_banker())
     analyze(target);
 }
@@ -2817,7 +2817,7 @@ cl_uc::get_name_entry(struct name_entry tabl[], char *name)
 chars
 cl_uc::cell_name(class cl_memory_cell *cell, int bitnr_high, int bitnr_low)
 {
-  class cl_address_space *as;
+  class cl_address_space *as= NULL;
   t_addr addr;
   int i;
 

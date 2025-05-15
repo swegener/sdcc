@@ -67,7 +67,7 @@ cl_osc::init(void)
 	      cfg_help(osc_freq_eosc));
   cfg_cell(osc_freq_eosc)->decode(&fre);
 
-  fre= puc->get_xtal();
+  fre= (unsigned int)(puc->get_xtal());
   frh= 16000000;
   frl= 24000;
   reset();

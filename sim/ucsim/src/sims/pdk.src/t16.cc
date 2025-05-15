@@ -90,7 +90,7 @@ cl_t16::recalc(void)
   mask= 1<<((v&7)+8);
   pre= 0;
   if (src)
-    last= *src;
+    last= (u32_t)(*src);
 }
 
 void
@@ -154,7 +154,7 @@ cl_t16::tick(int cycles)
 {
   if (src)
     {
-      t_mem act= *src;
+      t_mem act= (t_mem)(*src);
       if (act != last)
 	{
 	  int d= act - last, i;

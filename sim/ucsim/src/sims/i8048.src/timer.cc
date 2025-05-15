@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "i8020cl.h"
+#include "i8048cl.h"
 
 #include "timercl.h"
 
@@ -49,6 +49,9 @@ cl_timer::init(void)
   uc->vars->add("timer0_overflow", cfg, tcfg_ovflag, cfg_help(tcfg_ovflag));
   uc->vars->add("timer0_flag", cfg, tcfg_tflag, cfg_help(tcfg_tflag));
   uc->vars->add("timer0_int_enabled", cfg, tcfg_ien, cfg_help(tcfg_ien));
+  uc->vars->add("timer0_int_request", cfg, tcfg_irq, cfg_help(tcfg_irq));
+  cint_enabled.decode(&int_enabled);
+  cint_request.decode(&int_request);
   return 0;
 }
 
@@ -60,6 +63,7 @@ cl_timer::reset(void)
   int_enabled= 0;
   overflow_flag= 0;
   timer_flag= 0;
+  int_request= 0;
 }
 
 void
@@ -155,6 +159,7 @@ cl_timer::cfg_help(t_addr addr)
     case tcfg_ovflag: return "Overflow flag (bool, RW)";
     case tcfg_tflag: return "Timer flag (bool, RW)";
     case tcfg_ien: return "Enable of interrupt request (bool, RW)";
+    case tcfg_irq: return "Interrupt request (bool, RW)";
     }
   return "Not used";
 }
@@ -195,6 +200,13 @@ cl_timer::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	}
       cell->set(int_enabled?1:0);
       break;
+    case tcfg_irq:
+      if (val)
+	{
+	  int_request= (*val)?1:0;
+	}
+      cell->set(int_request);
+      break;
     case tcfg_tflag:
       if (val)
 	timer_flag= (*val)?1:0;
@@ -211,7 +223,7 @@ cl_timer::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 
 
 int
-CL2::ENTCNTI(MP)
+cl_i8022::ENTCNTI(MP)
 {
   if (timer)
     timer->int_enabled= 1;
@@ -219,12 +231,33 @@ CL2::ENTCNTI(MP)
 }
 
 int
-CL2::DISTCNTI(MP)
+CL4::ENTCNTI(MP)
+{
+  if (timer)
+    timer->int_enabled= 1;
+  return resGO;
+}
+
+int
+cl_i8022::DISTCNTI(MP)
 {
   if (timer)
     {
       timer->int_enabled= 0;
       timer->overflow_flag= 0;
+      timer->int_request= 0;
+    }
+  return resGO;
+}
+
+int
+CL4::DISTCNTI(MP)
+{
+  if (timer)
+    {
+      timer->int_enabled= 0;
+      timer->overflow_flag= 0;
+      timer->int_request= 0;
     }
   return resGO;
 }

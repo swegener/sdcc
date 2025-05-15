@@ -1,6 +1,6 @@
 #define NOP instruction_00
 #define OUTLB instruction_02
-#define OUTDBB instruction_02
+#define OUTDBBA instruction_02
 #define ADDI8 instruction_03
 #define JMP0 instruction_04
 #define ENI instruction_05
@@ -31,7 +31,7 @@
 #define INCR7 instruction_1f
 #define XCHIR0 instruction_20
 #define XCHIR1 instruction_21
-#define INDBB instruction_22
+#define INADBB instruction_22
 #define MOVAI8 instruction_23
 #define JMP1 instruction_24
 #define ENTCNTI instruction_25
@@ -52,6 +52,8 @@
 #define DISTCNTI instruction_35
 #define JT0 instruction_36
 #define CPLA instruction_37
+#define OUTLP1A instruction_39
+#define OUTLP2A instruction_3a
 #define MOVDP4A instruction_3c
 #define MOVDP5A instruction_3d
 #define MOVDP6A instruction_3e
@@ -106,6 +108,7 @@
 #define ADCIR1 instruction_71
 #define JB3 instruction_72
 #define CALL3 instruction_74
+#define ENT0CLK instruction_75
 #define JF1 instruction_76
 #define RR instruction_77
 #define ADCR0 instruction_78
@@ -121,18 +124,29 @@
 #define RET instruction_83
 #define JMP4 instruction_84
 #define CLRF0 instruction_85
+#define JNI instruction_86
+#define JOBF instruction_86
+#define ORLBUSI8 instruction_88
+#define ORLP1I8 instruction_89
+#define ORLP2I8 instruction_8a
 #define ORLDP4A instruction_8c
 #define ORLDP5A instruction_8d
 #define ORLDP6A instruction_8e
 #define ORLDP7A instruction_8f
 #define MOVXIR0A instruction_90
+#define OUTLP0A instruction_90
+#define MOVSTSA instruction_90
 #define MOVXIR1A instruction_91
 #define JB4 instruction_92
 #define RETR instruction_93
+#define RETI instruction_93
 #define CALL4 instruction_94
 #define CPLF0 instruction_95
 #define JNZ instruction_96
 #define CLRC instruction_97
+#define ANLBUSI8 instruction_98
+#define ANLP1I8 instruction_99
+#define ANLP2I8 instruction_9a
 #define ANLDP4A instruction_9c
 #define ANLDP5A instruction_9d
 #define ANLDP6A instruction_9e
@@ -184,6 +198,7 @@
 #define XRLI8 instruction_d3
 #define CALL6 instruction_d4
 #define SELRB1 instruction_d5
+#define JNIBF instruction_d6
 #define MOVFA instruction_d7
 #define XRLR0 instruction_d8
 #define XRLR1 instruction_d9
@@ -196,6 +211,7 @@
 #define MOVP3AIA instruction_e3
 #define JMP7 instruction_e4
 #define SELMB0 instruction_e5
+#define ENDMA instruction_e5
 #define JNC instruction_e6
 #define RL instruction_e7
 #define DJNZR0 instruction_e8
@@ -211,6 +227,7 @@
 #define JB7 instruction_f2
 #define CALL7 instruction_f4
 #define SELMB1 instruction_f5
+#define ENFLAGS instruction_f5
 #define JC instruction_f6
 #define RLC instruction_f7
 #define MOVAR0 instruction_f8

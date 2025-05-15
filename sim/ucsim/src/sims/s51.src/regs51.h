@@ -98,7 +98,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MCNT1   0xd2
 #define MA      0xd3 /* MA register from math accelerator */
 #define MB      0xd4 /* MB register from math accelerator */
-#define MC      0xd5 /* MC register from math accelerator */
+#define SFR_MC  0xd5 /* MC register from math accelerator */
 #define CCON	0xd8 /* */
 #define CMOD	0xd9 /* */
 #define WDCON	0xd8 /* */

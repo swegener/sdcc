@@ -45,26 +45,10 @@ CL2::call(MP)
   u16_t a= (code&0xe0)<<3;
   a+= fetch();
   if (A11) a|= 0x800;
-  push();
+  push(false);
   PC= a;
   return resGO;
 }
-
-int
-CL2::RET(MP)
-{
-  PC= pop(false);
-  return resGO;
-}
-
-/*
-int
-CL2::RETR(MP)
-{
-  PC= pop(true);
-  return resGO;
-}
-*/
 
 int
 CL2::jb(MP)
@@ -160,6 +144,13 @@ CL2::JT1(MP)
   return resGO;
 }
 */
+
+int
+CL2::RET(MP)
+{
+  PC= pop(false);
+  return resGO;
+}
 
 int
 CL2::JMPPIA(MP)

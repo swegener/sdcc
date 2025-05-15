@@ -308,7 +308,7 @@ CMDHELP(cl_next_cmd,
 	"instruction to execute is a subroutine call, the next command\n"
 	"places a dynamic breakpoint after the call instruction and\n"
 	"starts to execute the subroutine. If the subroutine is infinite\n"
-	"the breakpoint set by next will never be reached.\n")
+	"the breakpoint set by next will never be reached.")
 
 /*
  * Command: emulation
@@ -323,8 +323,9 @@ COMMAND_DO_WORK_SIM(cl_emu_cmd)
 
 CMDHELP(cl_emu_cmd,
 	"emulation",
-	"Start execution in emulation mode.",
-	"")
+	"Start simulation in emulation mode.",
+	"In this mode, every user input is skipped, simulation can\n"
+	"be stopped by a breakpoint or via the simulator interafce.")
 
 
 /*
@@ -365,7 +366,7 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 	  cmd_found)
 	{
 	  int names;
-	  con->dd_printf("Names of command:");
+	  con->dd_printf("Alternate name(s) of command:");
 	  for (names= 0; names < cmd_found->names->count; names++)
 	    con->dd_printf(" %s", cmd_found->names->at(names));
 	  con->dd_printf("\n");
@@ -573,7 +574,7 @@ CMDHELP(cl_expression_cmd,
 	" /c ascii character in C style escape: \'\\5137\'\n"
 	" /n print nothing\n"
 	"If more format characters are specified then result is printed in all\n"
-	"requested format.\n"
+	"requested formats.\n"
 	)
 
 
@@ -609,7 +610,8 @@ COMMAND_DO_WORK_APP(cl_echo_cmd)
 CMDHELP(cl_echo_cmd,
 	"echo params...",
 	"Print parameters",
-	"");
+	"Print all parameters \"as is\", separated by one space character.\n"
+	"Quoted strings are printed as one parameter, without the quotes.");
 
 
 COMMAND_DO_WORK_APP(cl_dev_cmd)
@@ -654,7 +656,10 @@ COMMAND_DO_WORK_UC(cl_hist_cmd)
 CMDHELP(cl_hist_cmd,
 	"history",
 	"Execution history",
-	"")
+	"List or manage execution history. For details, see help of\n"
+	"the subcommands.\n"
+	"Without parameter, the history command prints out last 10\n"
+	"elements recorded.")
 
 
 /*
@@ -678,7 +683,9 @@ COMMAND_DO_WORK_UC(cl_hist_info_cmd)
 CMDHELP(cl_hist_info_cmd,
 	"history info",
 	"Information about execution history",
-	"")
+	"Print information about history collection. \"len\" is size\n"
+	"of the buffer, \"used\" is number of filled slots (recorded\n"
+	"elements), and \"insts\" is number of instructions recorded")
 
 
 /*
@@ -701,7 +708,7 @@ COMMAND_DO_WORK_UC(cl_hist_clear_cmd)
 CMDHELP(cl_hist_clear_cmd,
 	"history clear",
 	"Clear execution history",
-	"")
+	"Delete all recorded elements from the history buffer.")
 
 
 /*
@@ -729,7 +736,7 @@ COMMAND_DO_WORK_UC(cl_hist_list_cmd)
 CMDHELP(cl_hist_list_cmd,
 	"history list [nr]",
 	"List last `nr' elements of execution history",
-	"")
+	"If number is not specified, it defaults to 10.")
 
 
 /* End of cmd.src/cmd_exec.cc */

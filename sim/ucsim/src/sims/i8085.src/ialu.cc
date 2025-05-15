@@ -184,7 +184,7 @@ cl_i8080::xra(u8_t op)
 int
 cl_i8080::RLC(t_mem code)
 {
-  u8_t newc= (rA&0x80)?flagC:0;
+  u8_t newc= (rA&0x80)?flagC:flagNON;
   u8_t newa= rA<<1;
   if (newc)
     newa|= 1;
@@ -199,7 +199,7 @@ cl_i8080::RLC(t_mem code)
 int
 cl_i8080::RRC(t_mem code)
 {
-  u8_t newc= (rA&1)?flagC:0;
+  u8_t newc= (rA&1)?flagC:flagNON;
   u8_t newa= rA>>1;
   if (newc)
     newa|= 0x80;
@@ -214,7 +214,7 @@ int
 cl_i8080::RAL(t_mem code)
 {
   bool oldc= rF&flagC;
-  u8_t newc= (rA&0x80)?flagC:0;
+  u8_t newc= (rA&0x80)?flagC:flagNON;
   u8_t newa= rA<<1;
   if (oldc)
     newa|= 1;
@@ -230,7 +230,7 @@ int
 cl_i8080::RAR(t_mem code)
 {
   bool oldc= rF&flagC;
-  u8_t newc= (rA&1)?flagC:0;
+  u8_t newc= (rA&1)?flagC:flagNON;
   u8_t newa= rA>>1;
   if (oldc)
     newa|= 0x80;

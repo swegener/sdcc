@@ -30,6 +30,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 
 
+struct {
+  int t;
+  unsigned int rom_siz;
+  unsigned int ram_siz;
+}
+  mem_sizes[]= {
+  { CPU_I8021,   1024,  64 },
+  { CPU_I8022,   2048,  64 },
+  { CPU_I8035,   4096,  64 },
+  { CPU_I8039,   4096, 128 },
+  { CPU_I8040,   4096, 256 },
+  { CPU_I8041,   1024,  64 },
+  { CPU_I8041A,  1024,  64 },
+  { CPU_I8041AH, 1024, 128 },
+  { CPU_I8042,   2048, 128 },
+  { CPU_I8042AH, 2048, 256 },
+  { CPU_I80C42,  4096, 256 },
+  { CPU_I80L42,  4096, 256 },
+  { CPU_I8048,   1024,  64 },
+  { CPU_I8049,   2048, 128 },
+  { CPU_I8050,   4096, 256 },
+  { 0, 0, 0 }
+};
+
 cl_simi8048::cl_simi8048(class cl_app *the_app):
   cl_sim(the_app)
 {}
@@ -56,61 +80,55 @@ cl_simi8048::mk_controller(void)
 	      "Use -H option to see known types.\n");
       return(NULL);
     }
-  switch (cpus_8048[i].type)
+  int j;
+  unsigned int roms= 0, rams= 0;
+  for (j= 0; mem_sizes[j].t; j++)
     {
-    case CPU_I8021:
-      uc= new cl_i8021(this);
+      if (mem_sizes[j].t == cpus_8048[i].type)
+	{
+	  roms= mem_sizes[j].rom_siz;
+	  rams= mem_sizes[j].ram_siz;
+	}
+    }
+  if (cpus_8048[i].type & CPU_MCS21)
+    {
+      if (!roms || !rams)
+	uc= new cl_i8021(this);
+      else
+	uc= new cl_i8021(this, roms, rams);
       uc->set_id(cpus_8048[i].type_help);
       uc->type= &cpus_8048[i];
       return uc;
-    case CPU_I8022:
-      uc= new cl_i8022(this);
+    }
+  else if (cpus_8048[i].type & CPU_MCS22)
+    {
+      if (!roms || !rams)
+	uc= new cl_i8022(this);
+      else
+	uc= new cl_i8022(this, roms, rams);
       uc->set_id(cpus_8048[i].type_help);
       uc->type= &cpus_8048[i];
       return uc;
-    case CPU_I8048:
-      uc= new cl_i8048(this);
+    }
+  else  if (cpus_8048[i].type & CPU_MCS48)
+    {
+      if (!roms || !rams)
+	uc= new cl_i8048(this);
+      else
+	uc= new cl_i8048(this, roms, rams);
       uc->set_id(cpus_8048[i].type_help);
       uc->type= &cpus_8048[i];
       return uc;
-    case CPU_I8049:
-      uc= new cl_i8048(this, 2048, 128);
+    }
+  else if (cpus_8048[i].type & CPU_MCS41)
+    {
+      if (!roms || !rams)
+	uc= new cl_i8041(this);
+      else
+	uc= new cl_i8041(this, roms, rams);
       uc->set_id(cpus_8048[i].type_help);
       uc->type= &cpus_8048[i];
       return uc;
-    case CPU_I8050:
-      uc= new cl_i8048(this, 4096, 256);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    case CPU_I8035:
-      uc= new cl_i8048(this, 4096, 64);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    case CPU_I8039:
-      uc= new cl_i8048(this, 4096, 128);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    case CPU_I8040:
-      uc= new cl_i8048(this, 4096, 256);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    case CPU_I8041:
-      uc= new cl_i8041(this, 4096, 256);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    case CPU_I8041A:
-      uc= new cl_i8041A(this, 4096, 256);
-      uc->set_id(cpus_8048[i].type_help);
-      uc->type= &cpus_8048[i];
-      return uc;
-    default:
-      fprintf(stderr, "Unknown processor type\n");
-      return NULL;
     }
   return NULL;
 }

@@ -1121,7 +1121,7 @@ cl_m6809::inst_add8(t_mem code, u8_t *acc, u8_t op, bool c, bool store, bool inv
 
   if (c) { ++res, ++o; }
   
-  reg.CC= ~(flagH|flagV|flagS|flagZ|flagC);
+  reg.CC= (u8_t)(~(flagH|flagV|flagS|flagZ|flagC));
   if ((d & 0xf) + (o & 0xf) > 0xf)  reg.CC|= flagH;
   if ((res < -128) || (res > +127)) reg.CC|= flagV;
   if (d + o > 0xff)                 reg.CC|= flagC;
@@ -1151,7 +1151,7 @@ cl_m6809::inst_add16(t_mem code, u16_t *acc, u16_t op, bool c,
     res++;
   r= res;
   
-  reg.CC= ~(flagV|flagS|flagZ|flagC);
+  reg.CC= (u8_t)(~(flagV|flagS|flagZ|flagC));
   //if ((res < (int)(0x8000)) || (res > (int)(0x7fff)))
   if (is_sub)
     {

@@ -752,7 +752,8 @@ ddfmod(double x, double y)
 #ifdef HAVE_FMOD
   return fmod(x, y);
 #else
-  long int q= x / y;
+  long int q;
+  q= (long int)(x / y);
   return x - q * y;
 #endif  
 }

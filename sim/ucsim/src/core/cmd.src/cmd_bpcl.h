@@ -59,6 +59,8 @@ public:
   cl_tbreak_cmd(const char *aname,
 		int  can_rep):
     cl_break_cmd(aname, can_rep) {perm=brkDYNAMIC;}
+  virtual void set_help();
+  //virtual void set_help(const char *usage_hlp, const char *short_hlp, const char *long_hlp);
 };
 
 // CLEAR

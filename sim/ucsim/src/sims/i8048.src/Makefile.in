@@ -15,7 +15,12 @@ include ../../common.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: $(LEN)
+all: preped_headers $(LEN)
+
+preped_headers: $(srcdir)/aliases.h
+
+$(srcdir)/aliases.h: $(srcdir)/decode.h $(srcdir)/gen.h $(srcdir)/genal.h
+	$(CXXCPP) -P genal.h | $(SED) '/./s/^/#/' >$(srcdir)/aliases.h
 
 include $(top_srcdir)/src/app.mk
 

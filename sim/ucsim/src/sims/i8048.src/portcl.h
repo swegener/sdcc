@@ -66,17 +66,23 @@ class cl_qport: public cl_hw
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
-
+  virtual t_mem get_odr(void);
+  virtual void set_odr(t_mem val);
+  
   virtual void print_info(class cl_console_base *con);
 };
 
 
 class cl_p2: public cl_qport
 {
+public:
+  u8_t flags41;
  public:
   cl_p2(class cl_uc *auc, int aid,
 	class cl_address_space *apas, t_addr aaddr,
 	enum port_widths awidth);
+  virtual t_mem read(class cl_memory_cell *cell);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual void set_low(u8_t val);
 };
 

@@ -350,6 +350,8 @@ class cl_memory_cell: public cl_cell_data
   virtual void decode(class cl_memory_chip *chip, t_addr addr);
   virtual void decode(void *data_ptr);
   virtual void decode(void *data_ptr, t_mem bit_mask);
+  virtual void decode(class cl_memory_cell *src_cell)
+  { decode(src_cell->get_data()); }
   
   virtual t_mem read(void);
   virtual t_mem R(void) { return read(); }
@@ -378,6 +380,9 @@ class cl_memory_cell: public cl_cell_data
   virtual void print_operators(const char *pre, class cl_console_base *con);
 };
 
+typedef class cl_memory_cell MCELL;
+typedef class cl_memory_cell *MCELLP;
+
 /*
 class cl_bit_cell: public cl_memory_cell
 {
@@ -399,6 +404,9 @@ class cl_cell8: public cl_memory_cell
   virtual void d(t_mem v);
   virtual void dl(t_mem v);
 };
+
+typedef class cl_cell8 C8;
+typedef class cl_cell8 *CP8;
 
 class cl_bit_cell8: public cl_memory_cell
 {
@@ -422,6 +430,9 @@ class cl_cell16: public cl_memory_cell
   virtual void dl(t_mem v);
 };
 
+typedef class cl_cell16 C16;
+typedef class cl_cell16 *CP16;
+
 class cl_bit_cell16: public cl_memory_cell
 {
  public:
@@ -442,6 +453,9 @@ class cl_cell32: public cl_memory_cell
   virtual void d(t_mem v);
   virtual void dl(t_mem v);
 };
+
+typedef class cl_cell32 C32;
+typedef class cl_cell32 *CP32;
 
 class cl_mc32: public cl_cell32
 {

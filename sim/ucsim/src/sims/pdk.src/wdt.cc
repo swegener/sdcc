@@ -73,7 +73,7 @@ cl_wdt::recalc(void)
 {
   run= mod->get() & 2;
   set_len();
-  last= puc->osc->ilrc;
+  last= (u32_t)(puc->osc->ilrc);
 }
 
 void
@@ -140,7 +140,7 @@ cl_wdt::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 int
 cl_wdt::tick(int cycles)
 {
-  t_mem act= puc->osc->ilrc;
+  t_mem act= (t_mem)(puc->osc->ilrc);
   if (run && (act != last))
     {
       int d= act - last, i;

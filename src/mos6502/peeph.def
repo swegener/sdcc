@@ -3,29 +3,6 @@
 ////////////////////////////////////////////////////////
 
 replace restart {
-	ldx	%1
-	ldy	%2
-	clc
-	txa
-	adc	%3
-	sta	%4
-	tya
-	adc     %5
-	sta	%6
-} by {
-    ; Peephole genpointer YX   - eliminated ldx/ldy
-	lda	%1
-    ; Peephole genpointer YX   - replaced txa with lda
-	clc
-	adc	%3
-	sta	%4
-	lda	%2
-    ; Peephole genpointer YX   - replaced tya with lda
-	adc	%5
-	sta	%6
-}
-
-replace restart {
 	lda	%1
 	ldx	%2
 	clc
@@ -168,6 +145,25 @@ replace restart {
 	adc %2
         tsx
 }
+
+// this rule should be implemented by fusing add/minus followed by assign icode
+replace restart {
+	pha
+	txa
+	%1 %2
+        tax
+	pla
+	sta %3
+	stx %4
+} by {
+	; genPlus/Minus 2 - removed pha/pla
+	sta %3
+	txa
+	%1 %2
+	sta %4
+        tax
+	lda %3
+} if same(%1 'adc' 'sbc')
 
 ////////////////////////////////////////////////////////
 // Remove unnecessary loads
@@ -486,6 +482,16 @@ replace restart {
 	tay
 } if notSame(%1 'sty' 'cpy' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
 
+replace restart {
+	tax
+        %1 %2
+	ldx %3
+} by {
+	; Peephole regop 11 - removed dead tax
+        %1 %2
+	ldx %3
+} if notSame(%1 'stx' 'cpx' 'bne' 'beq' 'bpl' 'bmi' 'jsr' 'jmp')
+
 ////////////////////////////////////////////////////////
 // Remove redundant/unnecessary stack operations
 ////////////////////////////////////////////////////////
@@ -507,6 +513,25 @@ replace restart {
 	; Peephole stack 1a - removed dead pla/pha followed by lda
 	lda	%1,x
 }
+
+replace restart {
+	pla
+	pha
+	ldx	%1
+	lda	%2
+} by {
+	; Peephole stack 1b - removed dead pla/pha followed by lda
+	ldx	%1
+	lda	%2
+}
+
+//replace restart {
+//	pla
+//	pha
+//} by {
+//	; Peephole stack 1c - removed dead pla/pha followed by lda
+//} if notUsed('a')
+
 replace restart {
 	pla
 	pha

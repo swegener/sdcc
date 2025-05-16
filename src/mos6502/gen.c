@@ -1133,13 +1133,16 @@ updateCFA (void)
 static void
 emitRegTempOp( char *op, int offset)
 {
-  //  emitcode(";", "%s : op %s at ofs %d isLit %d const = 0x%02x",
-  //           __func__, op, offset, _G.tempAttr[offset].isLiteral,
-  // _G.tempAttr[offset].literalValue );
- 
   if(_G.tempAttr[offset].isLiteral)
     {
       emit6502op(op, IMMDFMT, _G.tempAttr[offset].literalValue );
+    }
+  else if(_G.tempAttr[offset].aop && (_G.tempAttr[offset].aop->type==AOP_DIR || _G.tempAttr[offset].aop->type==AOP_EXT))
+    {
+      emitComment(REGOPS|VVDBG, "  %s: %s with %s+%d", __func__,
+                     op, _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs);
+      emit6502op (op, "%s(%s+%d)", (_G.tempAttr[offset].aop->type==AOP_DIR)?"*":"",
+           _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs );
     }
   else
     {
@@ -1185,14 +1188,20 @@ storeRegTempi (reg_info * reg, bool freereg, bool force)
       _G.tempAttr[_G.tempOfs].literalValue=reg->litConst;
       _G.tempAttr[_G.tempOfs].aop=reg->aop;
       _G.tempAttr[_G.tempOfs].aopofs=reg->aopofs;
-      if(reg->aop && !force && (reg->aop->type==AOP_DIR || reg->aop->type==AOP_EXT) )
+      if(reg->isLitConst && !force)
         {
-          emitComment(ALWAYS, "  %s: store from %s+%d",__func__,
+        emitComment(REGOPS|VVDBG, "  %s: virtual store literal 0x%02x",__func__,
+                      reg->litConst);
+        }
+      else if(reg->aop && !force && (reg->aop->type==AOP_DIR || reg->aop->type==AOP_EXT) )
+        {
+          emitComment(REGOPS|VVDBG, "  %s: virtual store %s+%d",__func__,
                       reg->aop->aopu.aop_dir, reg->aopofs);
         }
       else 
-      if(!reg->isLitConst || force)
+        {    
         emit6502op (storeOp, TEMPFMT, _G.tempOfs);
+        }
       _G.tempOfs++;
       break;
     case XA_IDX:
@@ -1277,7 +1286,7 @@ loadRegTempAt (reg_info * reg, int offset)
       loadOp[2]=reg->name[0];
       if(_G.tempAttr[offset].aop && (_G.tempAttr[offset].aop->type==AOP_DIR || _G.tempAttr[offset].aop->type==AOP_EXT))
         {
-          emitComment(ALWAYS, "  %s: should load from %s+%d", __func__,
+          emitComment(REGOPS|VVDBG, "  %s: should load from %s+%d", __func__,
                       _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs);
           emit6502op (loadOp, "%s(%s+%d)", (_G.tempAttr[offset].aop->type==AOP_DIR)?"*":"",
            _G.tempAttr[offset].aop->aopu.aop_dir, _G.tempAttr[offset].aopofs );
@@ -2649,13 +2658,7 @@ accopWithAop (char *accop, asmop *aop, int loffset)
     {
       if (loffset < aop->size)
         {
-          // TODO FIXME: does this need forcestore ?
-          // FIXME FIXME: use regtemp tracking
-	  if(aop->aopu.aop_reg[loffset]->isLitConst)
-            storeRegTemp (aop->aopu.aop_reg[loffset], true);
-          else
-            storeRegTempAlways (aop->aopu.aop_reg[loffset], true);
-
+          storeRegTemp (aop->aopu.aop_reg[loffset], true);
           emitRegTempOp( accop, getLastTempOfs() );
           loadRegTemp(NULL);
         }
@@ -6089,12 +6092,7 @@ genMinus (iCode * ic)
 	pullReg (m6502_reg_a);
       if (AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx == A_IDX)
 	{
-	  if(m6502_reg_a->isLitConst)
-	    storeRegTemp (m6502_reg_a, true);
-          else
-            storeRegTempAlways (m6502_reg_a, true);
-          // TODO: add temp tracking
-
+          storeRegTemp (m6502_reg_a, true);
 	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
 	  if (carry) {
 	    emitSetCarry(1);
@@ -6512,7 +6510,7 @@ genCmp (iCode * ic, iCode * ifx)
             {
               emitComment (TRACEGEN|VVDBG, "   GenCmp - REG_A");
 	      if(!needloada)
-		storeRegTempAlways(m6502_reg_a, true);
+		storeRegTemp(m6502_reg_a, true);
               loadRegFromAop (m6502_reg_a, AOP (left), offset);
 	      if (!strcmp(sub, "sub"))
 		{

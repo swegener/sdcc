@@ -4,6 +4,7 @@
   	  Remove dead XY rule. Add genPlus/Minus optimization.
    	* src/mos6502/gen.c:
    	  Enable tracking of regTemp loads/stores.
+  	  Enable tracking of other regTemp operations.
   	  
 2025-05-13 Gabriele Gorla <gorlik@yahoo.com>
 

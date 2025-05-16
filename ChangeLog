@@ -1,3 +1,8 @@
+2025-05-16 Gabriele Gorla <gorlik@yahoo.com>
+
+   	* src/mos6502/gen.c:
+   	  Small genPointerGet improvement.
+
 2025-05-15 Gabriele Gorla <gorlik@yahoo.com>
 
   	* src/mos6502/peeph.def:

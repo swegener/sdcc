@@ -115,6 +115,10 @@ const int STACK_TOP = 0x100;
 #define IS_AOPOFS_X(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_X))
 #define IS_AOPOFS_Y(x,o) (((x)->type == AOP_REG) && ((x)->aopu.aop_reg[o]->mask == M6502MASK_Y))
 
+
+#define IS_SAME_DPTR_OP(op) (AOP(op) && _G.DPTRAttr[0].aop && _G.DPTRAttr[1].aop \
+           && sameRegs (AOP(op), _G.DPTRAttr[0].aop))
+
 /**************************************************************************
  * returns the register containing the AOP or null if not found
  *
@@ -2951,8 +2955,7 @@ setupDPTR(operand *op, int offset, char * rematOfs, bool savea)
       reg_info *reg0=findRegAop(AOP(op), 0);
       reg_info *reg1=findRegAop(AOP(op), 1);
 
-      if ( AOP(op) && _G.DPTRAttr[0].aop && _G.DPTRAttr[1].aop 
-           && sameRegs (AOP(op), _G.DPTRAttr[0].aop) )
+      if ( IS_SAME_DPTR_OP(op) )
         {
           // do nothing
 	  emitComment (TRACEGEN|VVDBG, "  %s: DPTR already has correct value", __func__);
@@ -11379,7 +11382,8 @@ genPointerSet (iCode * ic)
 
   // general case
   emitComment (TRACEGEN|VVDBG,"  %s - general case ", __func__);
-  int aloc=0, xloc=0, yloc=0;
+  int aloc=0, xloc=0;
+  int yloc=0;
   deadA = m6502_reg_a->isDead;
   bool need_x = false;
 
@@ -11393,9 +11397,16 @@ genPointerSet (iCode * ic)
     }
   else
     {
-      if(IS_AOP_A(AOP(right)) && AOP_TYPE(result)!=AOP_SOF && !rematOffset && litOffset<255)
+
+      if(IS_SAME_DPTR_OP(result) && IS_AOP_A(AOP(right)) && !rematOffset && litOffset<255)
         {
           // do nothing: no need to save a in this case
+          emitComment (TRACEGEN|VVDBG,"    %s : skip saving A", __func__ );
+        }
+      else if(AOP_TYPE(result)!=AOP_SOF && IS_AOP_A(AOP(right)) && !rematOffset && litOffset<255)
+        {
+          // do nothing: no need to save a in this case
+          emitComment (TRACEGEN|VVDBG,"    %s : skip saving A2", __func__ );
         }
       else if(IS_AOP_WITH_A(AOP(right)))
         needloada = storeRegTempIfUsed (m6502_reg_a);

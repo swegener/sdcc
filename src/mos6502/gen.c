@@ -10785,12 +10785,20 @@ static void genPointerGet (iCode * ic, iCode * ifx)
   bool need_x = false;
 
   need_x= (AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF);
+  bool use_dptr = true;
+  asmop *ptr_aop = m6502_reg_a->aop;
+  int yoff;
 
   if(IS_AOP_XA(AOP(left)) && !rematOffset)
     {
-      restore_a_from_dptr = !m6502_reg_a->isDead;
-      if(need_x)
-         restore_x_from_dptr = !m6502_reg_x->isDead;
+      if(ptr_aop && ptr_aop->type==AOP_DIR)
+        use_dptr=false;
+      else
+        {
+          restore_a_from_dptr = !m6502_reg_a->isDead;
+          if(need_x)
+            restore_x_from_dptr = !m6502_reg_x->isDead;
+        }
     }
   else
     {
@@ -10800,24 +10808,36 @@ static void genPointerGet (iCode * ic, iCode * ifx)
     }
   bool needloady = storeRegTempIfSurv(m6502_reg_y);
 
-  int yoff = setupDPTR(left, litOffset, rematOffset, false);
+  if(use_dptr)
+    yoff = setupDPTR(left, litOffset, rematOffset, false);
+  else
+    yoff=litOffset;
 
   emitComment (TRACEGEN|VVDBG, "        %s: generic path", __func__);
 
   if (IS_AOP_XA (AOP (result)))
     {
       loadRegFromConst(m6502_reg_y, yoff + 1);
+      if(use_dptr)
       emit6502op ("lda", INDFMT_IY);
+      else
+        emit6502op("lda", "[%s],y", ptr_aop->aopu.aop_dir);
       transferRegReg(m6502_reg_a, m6502_reg_x, true);
       loadRegFromConst(m6502_reg_y, yoff + 0);
+      if(use_dptr)
       emit6502op ("lda", INDFMT_IY);
+      else
+        emit6502op("lda", "[%s],y", ptr_aop->aopu.aop_dir);
     }
   else
     {
       for (offset=0; offset<size; offset++)
         {
           loadRegFromConst(m6502_reg_y, yoff + offset);
+      if(use_dptr)
           emit6502op ("lda", INDFMT_IY);
+      else
+        emit6502op("lda", "[%s],y", ptr_aop->aopu.aop_dir);
           storeRegToAop (m6502_reg_a, AOP (result), offset);
         }
     }
@@ -11388,12 +11408,20 @@ genPointerSet (iCode * ic)
   bool need_x = false;
 
   need_x= (AOP_TYPE(right)==AOP_SOF);
+  bool use_dptr = true;
+  asmop *ptr_aop = m6502_reg_a->aop;
+  int yoff;
 
   if(IS_AOP_XA(AOP(result)) && !rematOffset)
     {
-      restore_a_from_dptr = !m6502_reg_a->isDead;
-      if(need_x)
-         restore_x_from_dptr = !m6502_reg_x->isDead;
+      if(ptr_aop && ptr_aop->type==AOP_DIR)
+        use_dptr=false;
+      else
+        {
+          restore_a_from_dptr = !m6502_reg_a->isDead;
+          if(need_x)
+            restore_x_from_dptr = !m6502_reg_x->isDead;
+        }
     }
   else
     {
@@ -11448,7 +11476,11 @@ genPointerSet (iCode * ic)
     }
 #endif
 
-  int yoff = setupDPTR(result, litOffset, rematOffset, false);
+  if(use_dptr)
+    yoff = setupDPTR(result, litOffset, rematOffset, false);
+  else
+    yoff=litOffset;
+
   if(IS_AOP_WITH_A (AOP(right)))
     if(needloada)
       loadRegTempAt(m6502_reg_a, aloc);
@@ -11465,7 +11497,10 @@ genPointerSet (iCode * ic)
     {
     loadRegFromAop (m6502_reg_a, AOP (right), offset);
     loadRegFromConst(m6502_reg_y, yoff + offset);
+      if(use_dptr)
     emit6502op("sta", INDFMT_IY);
+      else
+        emit6502op("sta", "[%s],y", ptr_aop->aopu.aop_dir);
   }
 
  release:

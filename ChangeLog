@@ -1,3 +1,8 @@
+2025-05-19 Gabriele Gorla <gorlik@yahoo.com>
+
+   	* src/mos6502/gen.c:
+   	  Additional DPTR optimizations.
+
 2025-05-16 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/gen.c:

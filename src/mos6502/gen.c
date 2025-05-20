@@ -3559,7 +3559,7 @@ aopOp (operand *op, const iCode * ic)
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
       op->aop = aop;
-      aop->op = op; // asmopToBool needs the op to check thetype of the literal.
+      aop->op = op; // asmopToBool needs the op to check the type of the literal.
       return;
     }
 
@@ -9794,18 +9794,12 @@ genrsh32 (operand * result, operand * left, int shCount, int sign)
  * genRightShiftLiteral - right shifting by known count
  *************************************************************************/
 static void
-genRightShiftLiteral (operand * left, operand * right, operand * result, iCode * ic, int sign)
+genRightShiftLiteral (operand * left, operand * result, int shCount, int sign)
 {
-  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   bool restore_x = false;
   int size;
 
   emitComment (TRACEGEN, __func__);
-
-  freeAsmop (right, NULL);
-
-  aopOp (left, ic);
-  aopOp (result, ic);
 
 #if VIEW_SIZE
   emitComment (TRACEGEN|VVDBG, "  shift right ", "result %d, left %d", AOP_SIZE (result), AOP_SIZE (left));
@@ -9854,8 +9848,6 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
 	}
     loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
-  freeAsmop (left, NULL);
-  freeAsmop (result, NULL);
 }
 
 // TODO: can refactor lots of left shift with right shift
@@ -9872,9 +9864,7 @@ genRightShift (iCode * ic)
 
   int size, offset;
   symbol *tlbl, *tlbl1;
-  char *shift;
   bool sign;
-  asmop *aopResult;
   reg_info *countreg = NULL;
   int count_offset=0;
   bool restore_y = false;
@@ -9894,14 +9884,19 @@ genRightShift (iCode * ic)
      is that the sign does not get propagated */
 
   aopOp (right, ic);
+  aopOp (left, ic);
+  aopOp (result, ic);
+
+  printIC(ic);
 
   /* if the shift count is known then do it
      as efficiently as possible */
   if (AOP_TYPE (right) == AOP_LIT &&
       (getSize (operandType (result)) == 1 || getSize (operandType (result)) == 2 || getSize (operandType (result)) == 4))
     {
-      genRightShiftLiteral (left, right, result, ic, sign);
-      return;
+      int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
+      genRightShiftLiteral (left, result, shCount, sign);
+      goto release;
     }
 
   /* shift count is unknown then we have to form
@@ -9909,11 +9904,6 @@ genRightShift (iCode * ic)
      only the lower order byte since shifting
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
-
-  aopOp (result, ic);
-  aopOp (left, ic);
-  aopResult = AOP (result);
-  printIC(ic);
 
   // TODO
 #if 0
@@ -9936,19 +9926,11 @@ genRightShift (iCode * ic)
       restore_y=true;
       countreg = m6502_reg_y;
     }
-  if(countreg)
+
+  if(countreg && IS_AOP_WITH_A(AOP (right)))
     {
       m6502_useReg(countreg);
       loadRegFromAop (countreg, AOP (right), 0);
-    }
-  else
-    {
-      emitComment (TRACEGEN|VVDBG, "  count is not a register");
-      bool needpulla = pushRegIfUsed (m6502_reg_a);
-      loadRegFromAop (m6502_reg_a, AOP (right), 0);
-      storeRegTemp (m6502_reg_a, true);
-      count_offset=getLastTempOfs();
-      pullOrFreeReg(m6502_reg_a, needpulla);
     }
 
   /* now move the left to the result if they are not the
@@ -9958,24 +9940,15 @@ genRightShift (iCode * ic)
     {
       loadRegFromAop (m6502_reg_yx, AOP (left), 0);
     }
-  else if (!sameRegs (AOP (left), aopResult))
+  else if (!sameRegs (AOP (left), AOP(result)))
     {
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
 	{
-	  transferAopAop (AOP (left), offset, aopResult, offset);
+	  transferAopAop (AOP (left), offset, AOP(result), offset);
 	  offset++;
 	}
-    }
-  freeAsmop (left, NULL);
-  AOP (result) = aopResult;
-
-  if(IS_AOP_XA (AOP (result)))
-    {  
-      storeRegTempAlways(m6502_reg_x, true);
-      dirtyRegTemp (getLastTempOfs());
-      x_in_regtemp = true;
     }
 
   tlbl = safeNewiTempLabel (NULL);
@@ -9985,19 +9958,38 @@ genRightShift (iCode * ic)
 
   if (countreg)
     {
+      if(!IS_AOP_WITH_A(AOP (right)))
+        {
+          m6502_useReg(countreg);
+          loadRegFromAop (countreg, AOP (right), 0);
+        }
       emitCmp(countreg, 0);
       emitBranch ("beq", tlbl1);
     }
   else
     {
+      emitComment (TRACEGEN|VVDBG, "  count is not a register");
+      bool needpulla = pushRegIfUsed (m6502_reg_a);
+      loadRegFromAop (m6502_reg_a, AOP (right), 0);
+      storeRegTemp (m6502_reg_a, true);
+      count_offset=getLastTempOfs();
+      pullOrFreeReg(m6502_reg_a, needpulla);
       emit6502op ("dec", TEMPFMT, count_offset);
       // could keep it literal
       dirtyRegTemp(getLastTempOfs() );
       emitBranch ("bmi", tlbl1);
     }
 
-  safeEmitLabel (tlbl);
+  if(IS_AOP_XA (AOP (result)))
+    {  
+      storeRegTempAlways(m6502_reg_x, true);
+      dirtyRegTemp (getLastTempOfs());
+      x_in_regtemp = true;
+    }
+  else
+    loadRegFromAop (m6502_reg_a, AOP (result), size-1);
 
+  safeEmitLabel (tlbl);
 
   if(IS_AOP_XA (AOP (result)))
     {
@@ -10013,11 +10005,18 @@ genRightShift (iCode * ic)
     }
   else
     {
-      shift = sign ? "asr" : "lsr";
-      for (offset = size - 1; offset >= 0; offset--) {
-	rmwWithAop (shift, AOP (result), offset);
-	shift = "ror";
-      }
+      if(sign)
+        {
+          emitCmp(m6502_reg_a, 0x80);
+          rmwWithReg ("ror", m6502_reg_a);
+        }
+      else
+        rmwWithReg ("lsr", m6502_reg_a);
+
+      for (offset = size - 2; offset >= 0; offset--)
+        {
+	  rmwWithAop ("ror", AOP (result), offset);
+        }
     }
 
   if (countreg)
@@ -10028,20 +10027,12 @@ genRightShift (iCode * ic)
   else
     {
       emit6502op("dec", TEMPFMT, count_offset );
-      // FIXME: could keep it literal
       dirtyRegTemp(getLastTempOfs() );
       emit6502op("bpl", "%05d$", safeLabelNum (tlbl));
     }
 
-  safeEmitLabel (tlbl1);
-
-  // After loop, countreg is 0
-  if (countreg)
-    {
-      m6502_dirtyReg(countreg);
-      countreg->isLitConst = 1;
-      countreg->litConst = 0;
-    }
+  if(!IS_AOP_XA (AOP (result)))
+    storeRegToAop (m6502_reg_a, AOP (result), size-1);
 
   if (!countreg)
     loadRegTemp(NULL);
@@ -10049,11 +10040,23 @@ genRightShift (iCode * ic)
   if (x_in_regtemp)
     loadRegTemp(m6502_reg_x);
 
+  safeEmitLabel (tlbl1);
+
+  // After loop, countreg is always 0
+  if (countreg)
+    {
+      m6502_dirtyReg(countreg);
+      countreg->isLitConst = 1;
+      countreg->litConst = 0;
+    }
+
   if(restore_y)
     loadRegTemp(m6502_reg_y);
 
-  freeAsmop (result, NULL);
+release:
   freeAsmop (right, NULL);
+  freeAsmop (left, NULL);
+  freeAsmop (result, NULL);
 }
 
 /**************************************************************************

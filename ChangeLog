@@ -1,3 +1,8 @@
+2025-05-20 Gabriele Gorla <gorlik@yahoo.com>
+
+   	* src/mos6502/gen.c:
+   	  genRightShift improvements.
+   	  
 2025-05-19 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/gen.c:

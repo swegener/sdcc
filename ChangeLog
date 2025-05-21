@@ -1,3 +1,18 @@
+2025-05-21 Gabriele Gorla <gorlik@yahoo.com>
+
+   	* src/mos6502/gen.h,
+   	  src/mos6502/gen.c,
+   	  src/mos6502/genand.c,
+   	  src/mos6502/genor.c,
+   	  src/mos6502/genxor.c,
+   	  src/mos6502/genplus.c,
+   	  src/mos6502/genminus.c,
+   	  src/mos6502/genlshift.c,
+  	  src/mos6502/genrshift.c,
+   	  src/mos6502/stackops.c,
+   	  src/mos6502/tempops.c:
+   	  Code refactoring to improve maintainability.
+   	  
 2025-05-20 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/gen.c:

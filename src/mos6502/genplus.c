@@ -34,17 +34,17 @@
  * genPlusIncr :- does addition with increment if possible
  *************************************************************************/
 static bool
-genPlusIncr (iCode * ic)
+genPlusInc (iCode * ic)
 {
   operand *right  = IC_RIGHT (ic);
   operand *left   = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
 
   int icount;
-  bool needpula;
   unsigned int size = AOP_SIZE (result);
-  unsigned int offset;
   symbol *tlbl = NULL;
+  bool needpula;
+  unsigned int offset;
 
   /* will try to generate an increment */
   /* if the right side is not a literal
@@ -53,7 +53,7 @@ genPlusIncr (iCode * ic)
     return false;
 
   icount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
-  // TODO: genPlusIncr has a lot more, can merge?
+
 //  emitComment (TRACEGEN, "  %s - size=%d  icount=%d", __func__, size, icount);
   emitComment (TRACEGEN, "  %s", __func__);
 
@@ -63,7 +63,7 @@ genPlusIncr (iCode * ic)
   if (icount>255)
     return false;
 
-#if 1
+
   if(IS_AOP_XA (AOP (result)) && icount >=0 )
     {
       loadRegFromAop (m6502_reg_xa, AOP (left), 0);
@@ -79,18 +79,43 @@ genPlusIncr (iCode * ic)
         }
       return true;
     }
-#endif
 
   if (!sameRegs (AOP (left), AOP (result)))
+    {
+      if (icount==1 && size==1 )
+        {
+          reg_info *src_reg = (AOP_TYPE(left)==AOP_REG)? AOP(left)->aopu.aop_reg[0] :NULL;
+          reg_info *dst_reg = (AOP_TYPE(result)==AOP_REG)? AOP(result)->aopu.aop_reg[0] :NULL;
+
+	  if(src_reg)
+	    {
+	      if(dst_reg && dst_reg!=m6502_reg_a)
+		{
+		  transferRegReg (src_reg, dst_reg, src_reg->isDead);
+		  rmwWithReg ("inc", dst_reg);
+		  return true;  
+		}
+	      if(src_reg->isDead /* && src_reg!=m6502_reg_a */ )
+		{
+		  rmwWithReg ("inc", src_reg);
+	          storeRegToAop (src_reg, AOP (result), 0);
+		  return true;  
+		}
+	    }
+	}
     return false;
+  }
+
+  // sameRegs
 
   // TODO: can inc blah,x
   if (!aopCanIncDec (AOP (result)))
     return false;
 
-  emitComment (TRACEGEN|VVDBG, "   genPlusIncr");
+  emitComment (TRACEGEN|VVDBG, "    %s", __func__);
 
-  if (size==1 && AOP(result)->type==AOP_REG) {
+  if (size==1 && AOP(result)->type==AOP_REG)
+  {
     // if it's in a 8-bit register try to do small adjust
     if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount))
       return true;
@@ -102,12 +127,15 @@ genPlusIncr (iCode * ic)
   if (size > 1)
     tlbl = safeNewiTempLabel (NULL);
 
-  if (icount == 1) {
+  if (icount == 1)
+   {
     needpula = false;
     rmwWithAop ("inc", AOP (result), 0);
     if (size > 1)
       emitBranch ("bne", tlbl);
-  } else {
+  }
+ else
+ {
     if (!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)))
       needpula = pushRegIfUsed (m6502_reg_a);
     else
@@ -144,13 +172,12 @@ genPlus (iCode * ic)
   operand *left   = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
 
-  bool carry = true;
+  bool init_carry = true;
   int size, offset = 0;
   bool needpulla = false;
   bool earlystore = false;
   bool delayedstore = false;
-  bool mayskip = true;
-  bool skip = false;
+  bool opskip = true;
 
   sym_link *resulttype = operandType (IC_RESULT (ic));
   unsigned topbytemask = (IS_BITINT (resulttype) && SPEC_USIGN (resulttype) && (SPEC_BITINTWIDTH (resulttype) % 8)) ?
@@ -173,7 +200,7 @@ genPlus (iCode * ic)
       left = t;
     }
 
-  if (!maskedtopbyte && genPlusIncr (ic))
+  if (!maskedtopbyte && genPlusInc (ic))
     goto release;
 
   emitComment (TRACEGEN|VVDBG, "    %s - Can't Inc", __func__);
@@ -186,11 +213,10 @@ genPlus (iCode * ic)
   if ( size==2 && AOP_TYPE (right) == AOP_LIT
        && operandLitValue (right) >= 0
        && operandLitValue (right) <= 255
-       && AOP_TYPE(result) != AOP_SOF )
+       && AOP_TYPE(result) != AOP_SOF
+       && sameRegs(AOP(result),AOP(left)) )
     {
-      if (sameRegs(AOP(result),AOP(left)))
-        {
-	  symbol *skipInc = safeNewiTempLabel (NULL);
+      symbol *skiplabel = safeNewiTempLabel (NULL);
 
           emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
           needpulla = pushRegIfSurv (m6502_reg_a);
@@ -198,16 +224,15 @@ genPlus (iCode * ic)
           loadRegFromAop (m6502_reg_a, AOP(left), 0);
           accopWithAop ("adc", AOP(right), 0);
           storeRegToAop (m6502_reg_a, AOP (result), 0);
-          emitBranch ("bcc", skipInc);
+      emitBranch ("bcc", skiplabel);
           rmwWithAop ("inc", AOP(result), 1);
           if(IS_AOP_WITH_X(AOP(result)))
             m6502_dirtyReg(m6502_reg_x);
           if(IS_AOP_WITH_Y(AOP(result)))
             m6502_dirtyReg(m6502_reg_y);
-          safeEmitLabel (skipInc);
+      safeEmitLabel (skiplabel);
           pullOrFreeReg (m6502_reg_a, needpulla);
           goto release;
-        }
     }
 
   if ( IS_AOP_XA(AOP(result)) && IS_AOP_A(AOP(left)) && AOP_TYPE(right) != AOP_SOF) 
@@ -260,36 +285,35 @@ genPlus (iCode * ic)
 
   needpulla = pushRegIfSurv (m6502_reg_a);
 
-  while (size--) {
+  while (size--)
+   {
     if (earlystore && offset == 1)
       pullReg (m6502_reg_a);
     else
       loadRegFromAop (m6502_reg_a, AOP(left), offset);
-    if (carry)
+    if (init_carry)
       emitSetCarry(0);
 
-    if (!mayskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
+    if (!opskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
       {
 	accopWithAop ("adc", AOP(right), offset);
 	if (!size && maskedtopbyte)
 	  emit6502op ("and", IMMDFMT, topbytemask);
-	mayskip = false;
-	skip = false;
+	opskip = false;
+      }
+    if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
+      {
+      pushReg (m6502_reg_a, true);
+      delayedstore = true;
       }
     else
       {
-	skip = true;
-      }
-    if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX) {
-      pushReg (m6502_reg_a, true);
-      delayedstore = true;
-    } else {
       storeRegToAop (m6502_reg_a, AOP (result), offset);
     }
     offset++;
     m6502_freeReg (m6502_reg_a);
-    if (!skip)
-      carry = false;              /* further adds must propagate carry */
+    if (!opskip)
+      init_carry = false;
   }
   if (delayedstore)
     pullReg (m6502_reg_a);

@@ -881,10 +881,12 @@ emitCmp (reg_info *reg, unsigned char v)
 bool
 smallAdjustReg (reg_info *reg, int n)
 {
-  int regidx = reg->rIdx;
   emitComment (REGOPS, __func__ );
 
-  if( (regidx!=X_IDX) && (regidx!=Y_IDX) && !IS_MOS65C02)
+  if(n==0)
+    return true;
+
+  if( (reg!=m6502_reg_x) && (reg!=m6502_reg_y) && !IS_MOS65C02)
     return false;
   
   if (n <= -4 || n >= 4)
@@ -2191,11 +2193,6 @@ rmwWithReg (char *rmwop, reg_info * reg)
           emitSetCarry (0);
           emit6502op ("adc", "#0x01");
         }
-      else if (!strcmp(rmwop, "asr"))
-        {
-          emit6502op ("cmp", "#0x80");
-          emit6502op ("ror", "a");
-        }
       else if (!strcmp(rmwop, "bit"))
         { // TODO???
 	  emitcode("ERROR", "   %s : called with unsupported opcode: %s", __func__, rmwop);
@@ -2276,15 +2273,6 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
     case AOP_DIR:
     case AOP_EXT:
       emitComment (TRACE_AOP, "  rmwWithAop DIR/EXT");
-      // TODO: this sucks
-      if (!strcmp("asr", rmwop))
-        {
-          pushReg(m6502_reg_a, true);
-          emit6502op("lda", aopAdrStr(aop, loffset, false)); // load
-          emitCmp (m6502_reg_a, 0x80);
-          pullReg(m6502_reg_a);
-          rmwop = "ror";
-        }
       emit6502op (rmwop, aopAdrStr(aop, loffset, false));
       dirtyRegAop(NULL, aop, loffset);
       break;
@@ -2320,15 +2308,6 @@ rmwWithAop (char *rmwop, asmop * aop, int loffset)
       emitComment (TRACE_AOP, "  rmwWithAop small offset ");
       // FIXME: figure out if asr handling should be here
       // or if asr should be generated at all by the codegen
-      if (!strcmp ("asr", rmwop))
-        {
-	  bool restore_a = false;
-	  restore_a = storeRegTempIfUsed(m6502_reg_a);
-	  loadRegFromAop (m6502_reg_a, aop, loffset);
-	  emitCmp(m6502_reg_a, 0x80);
-	  loadOrFreeRegTemp(m6502_reg_a, restore_a);
-	  rmwop="ror";
-        }
       emit6502op (rmwop, aopAdrStr (aop, loffset, false));
       dirtyRegAop(NULL, aop, loffset);
     }

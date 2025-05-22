@@ -42,7 +42,6 @@ genMinusDec (iCode * ic)
 
   int icount;
   unsigned int size = AOP_SIZE (result);
-  //  int offset;
   symbol *tlbl = NULL;
 
   /* will try to generate an increment */
@@ -52,7 +51,7 @@ genMinusDec (iCode * ic)
     return false;
 
   icount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
-  // TODO: genPlusIncr has a lot more, can merge?
+
   emitComment (TRACEGEN, "  %s - size=%d  icount=%d", __func__, size, icount);
 
   if (icount>255 && ((icount&0xff)!=0) )
@@ -60,16 +59,17 @@ genMinusDec (iCode * ic)
 
   if (icount>255)
     {
+#if 0
       int bcount = icount>>8;
       if (!IS_AOP_XA (AOP (result)) || bcount>4 )
         return false;
 
       while (bcount--)
         emit6502op ("dex", "");
-      return true;
+#endif
+      return false;
     }
 
-#if 1
   if(IS_AOP_XA (AOP (result)) && icount >=0 )
   {
     loadRegFromAop (m6502_reg_xa, AOP (left), 0);
@@ -85,34 +85,49 @@ genMinusDec (iCode * ic)
       }
     return true;
     }
-#endif
-
-#if 1
-  if(icount==1 && size==1 && !sameRegs (AOP (left), AOP (result)))
-    {
-      reg_info *reg = NULL;
-      if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
-        {
-          if(m6502_reg_y->isFree)
-            reg=m6502_reg_y;
-        }
-      else 
-        reg=getFreeIdxReg();
-
-      if(reg)
-        {
-          loadRegFromAop (reg, AOP (left), 0);
-          if(reg==m6502_reg_x)
-            emit6502op ("dex", "");
-          else
-            emit6502op ("dey", "");
-          storeRegToAop (reg, AOP (result), 0);
-          return true;
-        }
-    }
-#endif
 
   if (!sameRegs (AOP (left), AOP (result)))
+    {
+      if (icount==1 && size==1 )
+        {
+          reg_info *src_reg = (AOP_TYPE(left)==AOP_REG)? AOP(left)->aopu.aop_reg[0] :NULL;
+          reg_info *dst_reg = (AOP_TYPE(result)==AOP_REG)? AOP(result)->aopu.aop_reg[0] :NULL;
+
+	  if(src_reg)
+	    {
+	      if(dst_reg && dst_reg!=m6502_reg_a)
+		{
+		  transferRegReg (src_reg, dst_reg, src_reg->isDead);
+		  rmwWithReg ("dec", dst_reg);
+		  return true;  
+		}
+	      if(src_reg->isDead /* && src_reg!=m6502_reg_a */ )
+		{
+		  rmwWithReg ("dec", src_reg);
+	          storeRegToAop (src_reg, AOP (result), 0);
+		  return true;  
+		}
+	    }
+	}
+      return false;
+    }
+
+  // sameRegs
+
+  // TODO: can inc blah,x
+  if (!aopCanIncDec (AOP (result)))
+    return false;
+
+  emitComment (TRACEGEN|VVDBG, "    %s", __func__);
+
+  if (size==1 && AOP(result)->type==AOP_REG)
+  {
+    // if it's in a 8-bit register try to do small adjust
+    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], -icount))
+      return true;
+  }
+
+  if (icount < 0)
     return false;
 
   if(icount==1 && size==2 && aopCanIncDec(AOP(result)) )
@@ -130,28 +145,14 @@ genMinusDec (iCode * ic)
         }
     }
 
-  if (size != 1)
+  if (size != 1|| icount>1)
     return false;
-
-  // TODO: can inc blah,x
-  if (!aopCanIncDec (AOP (result)))
-    return false;
-
-  // do dex/dey and inx/iny if icount is negative
-  if (/*size==1 && */ AOP(result)->type==AOP_REG) {
-    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0],-icount))
-      return true;
-  }
-
-  if ((icount > 1) || (icount < 0))
-    return false;
-
-  emitComment (TRACEGEN|VVDBG, "     genMinusDec");
 
   rmwWithAop ("dec", AOP (result), 0);
 
-  return true;
-}
+      return true;
+  }
+
 /**************************************************************************
  * genMinus - generates code for subtraction
  *************************************************************************/
@@ -162,7 +163,7 @@ genMinus (iCode * ic)
   operand *left   = IC_LEFT (ic);
   operand *result = IC_RESULT (ic);
 
-  bool carry = true;
+  bool init_carry = true;
   int size, offset = 0;
   bool needpulla = false;
   bool earlystore = false;
@@ -196,7 +197,7 @@ genMinus (iCode * ic)
        && AOP_TYPE(result) != AOP_SOF
        && sameRegs(AOP(result),AOP(left)) )
     {
-      symbol *skipDec = safeNewiTempLabel (NULL);
+      symbol *skiplabel = safeNewiTempLabel (NULL);
 
       emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
       needpulla = pushRegIfSurv (m6502_reg_a);
@@ -204,13 +205,13 @@ genMinus (iCode * ic)
       loadRegFromAop (m6502_reg_a, AOP(left), 0);
       accopWithAop ("sbc", AOP(right), 0);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
-      emitBranch ("bcs", skipDec);
+      emitBranch ("bcs", skiplabel);
       rmwWithAop ("dec", AOP(result), 1);
       if(IS_AOP_WITH_X(AOP(result)))
 	m6502_dirtyReg(m6502_reg_x);
       if(IS_AOP_WITH_Y(AOP(result)))
 	m6502_dirtyReg(m6502_reg_y);
-      safeEmitLabel (skipDec);
+      safeEmitLabel (skiplabel);
       pullOrFreeReg (m6502_reg_a, needpulla);
       goto release;
     }
@@ -238,7 +239,8 @@ genMinus (iCode * ic)
       goto release;
     }
 
-  if (IS_AOP_A (AOP(right))) {
+  if (IS_AOP_A (AOP(right)))
+  {
     // op - a = neg(a - op) = not(a - op) + 1 = not(a - op - 1)
     needpulla = pushRegIfSurv (m6502_reg_a);
     emitSetCarry(0);
@@ -263,9 +265,9 @@ genMinus (iCode * ic)
 	{
 	  storeRegTemp (m6502_reg_a, true);
 	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
-	  if (carry) {
+	  if (init_carry)
 	    emitSetCarry(1);
-	  }
+
 	  emitRegTempOp("sbc", getLastTempOfs() );
 	  loadRegTemp (NULL);
 	}
@@ -274,7 +276,7 @@ genMinus (iCode * ic)
 	  emitComment (TRACEGEN|VVDBG, "    - default path");
 
 	  loadRegFromAop (m6502_reg_a, AOP(left), offset);
-	  if (carry)
+	  if (init_carry)
 	    emitSetCarry(1);
 
 	  accopWithAop ("sbc", AOP(right), offset);
@@ -293,7 +295,7 @@ genMinus (iCode * ic)
 	  storeRegToAop (m6502_reg_a, AOP (result), offset);
 	}
       offset++;
-      carry = false;
+      init_carry = false;
     }
   if(delayedstore)
     pullReg (m6502_reg_a);

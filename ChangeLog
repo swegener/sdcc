@@ -1,3 +1,9 @@
+2025-05-23 Gabriele Gorla <gorlik@yahoo.com>
+
+   	* src/mos6502/peeph.def:
+   	  Improve load after load and store after store rules.
+   	
+   	
 2025-05-21 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/gen.h,
@@ -12,6 +18,10 @@
    	  src/mos6502/stackops.c,
    	  src/mos6502/tempops.c:
    	  Code refactoring to improve maintainability.
+ 	* src/mos6502/gen.c,
+   	  src/mos6502/genplus.c,
+   	  src/mos6502/genminus.c:
+   	  genPlus and genMinus improvements.
    	  
 2025-05-20 Gabriele Gorla <gorlik@yahoo.com>
 

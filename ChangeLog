@@ -4,7 +4,9 @@
    	  Improve load after load and store after store rules.
  	* src/mos6502/stackops.c:
  	  Implement multiple code paths for adjustStack and select the fastest.
-   	
+   	* src/mos6502/gen.c:   	
+   	  save A only when sendSet is not empty.
+   	  
 2025-05-21 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/gen.h,

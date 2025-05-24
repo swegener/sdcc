@@ -2,7 +2,8 @@
 
    	* src/mos6502/peeph.def:
    	  Improve load after load and store after store rules.
-   	
+ 	* src/mos6502/stackops.c:
+ 	  Implement multiple code paths for adjustStack and select the fastest.
    	
 2025-05-21 Gabriele Gorla <gorlik@yahoo.com>
 

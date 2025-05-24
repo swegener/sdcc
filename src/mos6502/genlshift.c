@@ -41,25 +41,25 @@ void AccLsh (int shCount)
 
   if(shCount==7)
     {
-    emit6502op ("ror", "a");
-    loadRegFromConst(m6502_reg_a, 0);
-    emit6502op ("ror", "a");
-    /* total: 6 cycles, 4 bytes */
+      emit6502op ("ror", "a");
+      loadRegFromConst(m6502_reg_a, 0);
+      emit6502op ("ror", "a");
+      /* total: 6 cycles, 4 bytes */
     }
   else if(shCount==6)
     {
-    emit6502op ("ror", "a");
-    emit6502op ("ror", "a");
-    emit6502op ("ror", "a");
-    emit6502op ("and", "#0xc0");
-    /* total: 8 cycles, 5 bytes */
+      emit6502op ("ror", "a");
+      emit6502op ("ror", "a");
+      emit6502op ("ror", "a");
+      emit6502op ("and", "#0xc0");
+      /* total: 8 cycles, 5 bytes */
     }
   else
     {
       /* asl a is 2 cycles and 1 byte, so an unrolled loop is the   */
       /* fastest and shortest (shCount<6).                            */
       for (i = 0; i < shCount; i++)
-      emit6502op ("asl", "a");
+	emit6502op ("asl", "a");
     }
 }
 
@@ -96,12 +96,12 @@ void XAccLsh (reg_info *msb_reg, int shCount)
       /* the fastest and shortest.                                           */
       storeRegTempAlways(msb_reg, true);
       for (i = 0; i < shCount; i++)
-      {
-        rmwWithReg ("asl", m6502_reg_a);
-        emit6502op ("rol", TEMPFMT, getLastTempOfs() );
-        dirtyRegTemp(getLastTempOfs() );
-      }
-    loadRegTemp(msb_reg);
+	{
+	  rmwWithReg ("asl", m6502_reg_a);
+	  emit6502op ("rol", TEMPFMT, getLastTempOfs() );
+	  dirtyRegTemp(getLastTempOfs() );
+	}
+      loadRegTemp(msb_reg);
     }
 }
 
@@ -129,15 +129,15 @@ genlsh8 (operand * result, operand * left, int shCount)
     }
   else
     {
-  if(!IS_AOP_A(AOP(result)))
-    needpulla = pushRegIfSurv (m6502_reg_a);
-  loadRegFromAop (m6502_reg_a, AOP (left), 0);
-  AccLsh (shCount);
+      if(!IS_AOP_A(AOP(result)))
+	needpulla = pushRegIfSurv (m6502_reg_a);
+      loadRegFromAop (m6502_reg_a, AOP (left), 0);
+      AccLsh (shCount);
       if (maskedbyte)
 	emit6502op ("and", IMMDFMT, bytemask);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
       pullOrFreeReg (m6502_reg_a, needpulla);
-   }
+    }
 }
 
 /**************************************************************************
@@ -282,8 +282,8 @@ shiftLLongInPlace (operand * result, int shift, int ofs, bool msb_in_a)
         storeRegToAop (m6502_reg_a, AOP (result), 3);
 
 #else
-  if(!msb_in_a)
-      loadRegFromAop (m6502_reg_a, AOP (result), ofs);
+      if(!msb_in_a)
+	loadRegFromAop (m6502_reg_a, AOP (result), ofs);
 
       while(shift)
 	{
@@ -293,8 +293,8 @@ shiftLLongInPlace (operand * result, int shift, int ofs, bool msb_in_a)
 
 	  --shift;
 	}
-  if(!msb_in_a)
-      storeRegToAop (m6502_reg_a, AOP (result), ofs);
+      if(!msb_in_a)
+	storeRegToAop (m6502_reg_a, AOP (result), ofs);
 #endif
     }
 }
@@ -455,7 +455,7 @@ shiftLLong3 (operand * left, operand * result, int shift)
   //  if(!idx)
   //    idx=m6502_reg_x;
 
- if(shift==8)
+  if(shift==8)
     {
       //      transferAopAop (AOP (left), 2, AOP (result), 3);
       //      transferAopAop (AOP (left), 1, AOP (result), 2);
@@ -698,8 +698,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
     } 
   else
     {
-    if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
-       restore_x=storeRegTempIfUsed(m6502_reg_x);
+      if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
+	restore_x=storeRegTempIfUsed(m6502_reg_x);
 
       switch (size)
 	{
@@ -716,10 +716,10 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
 	  break;
 	}
-     loadOrFreeRegTemp(m6502_reg_x, restore_x);
+      loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
 
-//  freeAsmop (right, NULL);
+  //  freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);
 }
@@ -798,7 +798,7 @@ genLeftShift (iCode * ic)
       emitComment (TRACEGEN|VVDBG, "  load countreg");
       loadRegFromAop (countreg, AOP (right), 0);
       if(IS_AOP_XA(AOP(right)))
-         m6502_freeReg(m6502_reg_xa);
+	m6502_freeReg(m6502_reg_xa);
     }
   else
     {

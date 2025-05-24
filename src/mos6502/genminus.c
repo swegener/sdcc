@@ -71,19 +71,19 @@ genMinusDec (iCode * ic)
     }
 
   if(IS_AOP_XA (AOP (result)) && icount >=0 )
-  {
-    loadRegFromAop (m6502_reg_xa, AOP (left), 0);
-    if (icount)
-      {
-        tlbl = safeNewiTempLabel (NULL);
-        emitSetCarry (1);
-        accopWithAop ("sbc", AOP (right), 0);
-        emitBranch ("bcs", tlbl);
-        emit6502op ("dex", "");
-        safeEmitLabel (tlbl);
-        m6502_dirtyReg(m6502_reg_x);
-      }
-    return true;
+    {
+      loadRegFromAop (m6502_reg_xa, AOP (left), 0);
+      if (icount)
+	{
+	  tlbl = safeNewiTempLabel (NULL);
+	  emitSetCarry (1);
+	  accopWithAop ("sbc", AOP (right), 0);
+	  emitBranch ("bcs", tlbl);
+	  emit6502op ("dex", "");
+	  safeEmitLabel (tlbl);
+	  m6502_dirtyReg(m6502_reg_x);
+	}
+      return true;
     }
 
   if (!sameRegs (AOP (left), AOP (result)))
@@ -121,11 +121,11 @@ genMinusDec (iCode * ic)
   emitComment (TRACEGEN|VVDBG, "    %s", __func__);
 
   if (size==1 && AOP(result)->type==AOP_REG)
-  {
-    // if it's in a 8-bit register try to do small adjust
-    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], -icount))
-      return true;
-  }
+    {
+      // if it's in a 8-bit register try to do small adjust
+      if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], -icount))
+	return true;
+    }
 
   if (icount < 0)
     return false;
@@ -150,8 +150,8 @@ genMinusDec (iCode * ic)
 
   rmwWithAop ("dec", AOP (result), 0);
 
-      return true;
-  }
+  return true;
+}
 
 /**************************************************************************
  * genMinus - generates code for subtraction
@@ -240,18 +240,18 @@ genMinus (iCode * ic)
     }
 
   if (IS_AOP_A (AOP(right)))
-  {
-    // op - a = neg(a - op) = not(a - op) + 1 = not(a - op - 1)
-    needpulla = pushRegIfSurv (m6502_reg_a);
-    emitSetCarry(0);
-    accopWithAop ("sbc", AOP(left) , offset);
-    emit6502op("eor", "#0xff");
-    if (maskedtopbyte)
-      emit6502op ("and", IMMDFMT, topbytemask);
-    storeRegToAop (m6502_reg_a, AOP (result), offset);
-    pullOrFreeReg (m6502_reg_a, needpulla);
-    goto release;
-  }
+    {
+      // op - a = neg(a - op) = not(a - op) + 1 = not(a - op - 1)
+      needpulla = pushRegIfSurv (m6502_reg_a);
+      emitSetCarry(0);
+      accopWithAop ("sbc", AOP(left) , offset);
+      emit6502op("eor", "#0xff");
+      if (maskedtopbyte)
+	emit6502op ("and", IMMDFMT, topbytemask);
+      storeRegToAop (m6502_reg_a, AOP (result), offset);
+      pullOrFreeReg (m6502_reg_a, needpulla);
+      goto release;
+    }
 
   needpulla = storeRegTempIfSurv (m6502_reg_a);
 

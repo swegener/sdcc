@@ -228,58 +228,71 @@ pullOrFreeReg (reg_info * reg, bool needpull)
 void
 adjustStack (int n)
 {
+  bool restore_a = false;
+  bool restore_x = false;
+  char *inst=NULL;
+
+  int sa_cycle = (m6502_reg_a->isFree)?0:6;
+  int sx_cycle = (m6502_reg_x->isFree)?0:6;
+  int abs_n = (n>0)?n:-n;
+
   emitComment (REGOPS, __func__ );
   emitComment (REGOPS, "  %s reg:  %s", __func__, regInfoStr());
 
-  if (n <= -8 || n >= 8)
+  // unrolled PHA      1b, 3c x n
+  // unrolled PLA      1b, 4c x n + 4b, 6c if A is used
+  // unrolled INX/DEX  1b, 2c x n + 4b, 4c + 4b, 6c if X is used
+  // ADC               5b, 8c + 4b, 4c + 4b, 6c if A is used + 4b, 6c if X is used
+  
+  // TODO: implement optimize for space
+  int stack = (n>0) ? 4*abs_n + sa_cycle : 3*abs_n ; // PLA : PHA
+  int incdec = 2*abs_n + 4 + sx_cycle ; // INC : DEC
+  int adc = 12 + sa_cycle + sx_cycle;
+
+  if(m6502_reg_x->aop==&tsxaop)
     {
-      bool restore_a = false;
-      bool restore_x = false;
+      adc-=2;
+      incdec-=2;
+    }
 
-      // TODO: too big, consider subroutine
+  emitComment (ALWAYS /*REGOPS|VVDBG*/, "  %s : cycles stk:%d  incdec:%d  adc:%d", __func__,
+               stack, incdec, adc);
+
+  if(stack<=incdec && stack<=adc)
+    {
+     inst = (n>0) ? "pla" : "pha";
+     if(n>0)
+       restore_a=storeRegTempIfUsed (m6502_reg_a);
+
+      while((abs_n--)>0)
+        emit6502op(inst, "");
+
+      loadOrFreeRegTemp(m6502_reg_a, restore_a);
+    }
+  else
+    {
       restore_x = storeRegTempIfUsed(m6502_reg_x);
-      restore_a = storeRegTempIfUsed(m6502_reg_a);
 
-      //    bool needloada=storeRegTempIfUsed(m6502_reg_xa);
-
-      if(m6502_reg_x->aop!=&tsxaop)
-        emit6502op ("tsx", "");
+      if(incdec<=adc)
+        {
+          inst = (n>0) ? "inx" : "dex";
+          emitTSX();
+          while((abs_n--)>0)
+            emit6502op(inst, "");
+        }
       else
         {
-        // FIXME: can avoid TSX if add current TSX offset to n
-        if((_S.tsxStackPushes - _S.stackPushes) != 0)
-          emitcode("ERROR:","%s  n=%d, tsxSP=%d, SP=%d", __func__, n, _S.tsxStackPushes, _S.stackPushes );
-//        n+=(_S.tsxStackPushes - _S.stackPushes);
+          restore_a = storeRegTempIfUsed(m6502_reg_a);
+          emitTSX();
+          transferRegReg (m6502_reg_x, m6502_reg_a, true);
+          emitSetCarry(0);
+          emit6502op ("adc", IMMDFMT, (unsigned int)(n & 0xff));
+          transferRegReg (m6502_reg_a, m6502_reg_x, true);
         }
-      transferRegReg (m6502_reg_x, m6502_reg_a, true);
-      emitSetCarry(0);
-      emit6502op ("adc", IMMDFMT, (unsigned int)(n & 0xff));
-      transferRegReg (m6502_reg_a, m6502_reg_x, true);
       _S.stackPushes -= n;
       emit6502op ("txs", "");
-      n = 0;
       loadOrFreeRegTemp(m6502_reg_a, restore_a);
       loadOrFreeRegTemp(m6502_reg_x, restore_x);
-    }
-  while (n < 0)
-    {
-      emit6502op ("pha", "");      /* 1 byte,  3 cycles */
-      n++;
-    }
-
-  if (n > 0)
-    {
-      // FIXME: A is incorrectly marked free and makes many regression fail
-      bool needloada=storeRegTempIfUsed (m6502_reg_a);
-      //  bool needloada = true;
-      //  storeRegTemp(m6502_reg_a, true);
-
-      while (n > 0)
-        {
-          emit6502op ("pla", "");      /* 1 byte,  4 cycles */
-          n--;
-        }
-      loadOrFreeRegTemp(m6502_reg_a, needloada);
     }
   updateCFA ();
 }

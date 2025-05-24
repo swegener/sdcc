@@ -54,7 +54,7 @@ genPlusInc (iCode * ic)
 
   icount = (unsigned int) ulFromVal (AOP (right)->aopu.aop_lit);
 
-//  emitComment (TRACEGEN, "  %s - size=%d  icount=%d", __func__, size, icount);
+  //  emitComment (TRACEGEN, "  %s - size=%d  icount=%d", __func__, size, icount);
   emitComment (TRACEGEN, "  %s", __func__);
 
   emitComment (TRACEGEN|VVDBG, "  %s: icount = %d, sameRegs=%d",
@@ -103,8 +103,8 @@ genPlusInc (iCode * ic)
 		}
 	    }
 	}
-    return false;
-  }
+      return false;
+    }
 
   // sameRegs
 
@@ -115,11 +115,11 @@ genPlusInc (iCode * ic)
   emitComment (TRACEGEN|VVDBG, "    %s", __func__);
 
   if (size==1 && AOP(result)->type==AOP_REG)
-  {
-    // if it's in a 8-bit register try to do small adjust
-    if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount))
-      return true;
-  }
+    {
+      // if it's in a 8-bit register try to do small adjust
+      if(smallAdjustReg(AOP(result)->aopu.aop_reg[0], icount))
+	return true;
+    }
 
   if(icount < 0 )
     return false;
@@ -128,25 +128,25 @@ genPlusInc (iCode * ic)
     tlbl = safeNewiTempLabel (NULL);
 
   if (icount == 1)
-   {
-    needpula = false;
-    rmwWithAop ("inc", AOP (result), 0);
-    if (size > 1)
-      emitBranch ("bne", tlbl);
-  }
- else
- {
-    if (!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)))
-      needpula = pushRegIfUsed (m6502_reg_a);
-    else
+    {
       needpula = false;
-    loadRegFromAop (m6502_reg_a, AOP (result), 0);
-    emitSetCarry(0);
-    accopWithAop ("adc", AOP (right), 0);
-    storeRegToAop (m6502_reg_a, AOP (result), 0);
-    if (size > 1)
-      emitBranch ("bcc", tlbl);
-  }
+      rmwWithAop ("inc", AOP (result), 0);
+      if (size > 1)
+	emitBranch ("bne", tlbl);
+    }
+  else
+    {
+      if (!IS_AOP_A (AOP (result)) && !IS_AOP_XA (AOP (result)))
+	needpula = pushRegIfUsed (m6502_reg_a);
+      else
+	needpula = false;
+      loadRegFromAop (m6502_reg_a, AOP (result), 0);
+      emitSetCarry(0);
+      accopWithAop ("adc", AOP (right), 0);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
+      if (size > 1)
+	emitBranch ("bcc", tlbl);
+    }
   for (offset = 1; offset < size; offset++) {
     rmwWithAop ("inc", AOP (result), offset);
     if(AOP(result)->type==AOP_REG) m6502_dirtyReg(AOP(result)->aopu.aop_reg[offset]);
@@ -218,21 +218,21 @@ genPlus (iCode * ic)
     {
       symbol *skiplabel = safeNewiTempLabel (NULL);
 
-          emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
-          needpulla = pushRegIfSurv (m6502_reg_a);
-          emitSetCarry(0);
-          loadRegFromAop (m6502_reg_a, AOP(left), 0);
-          accopWithAop ("adc", AOP(right), 0);
-          storeRegToAop (m6502_reg_a, AOP (result), 0);
+      emitComment (TRACEGEN|VVDBG, "    %s: size==2 && AOP_LIT", __func__);
+      needpulla = pushRegIfSurv (m6502_reg_a);
+      emitSetCarry(0);
+      loadRegFromAop (m6502_reg_a, AOP(left), 0);
+      accopWithAop ("adc", AOP(right), 0);
+      storeRegToAop (m6502_reg_a, AOP (result), 0);
       emitBranch ("bcc", skiplabel);
-          rmwWithAop ("inc", AOP(result), 1);
-          if(IS_AOP_WITH_X(AOP(result)))
-            m6502_dirtyReg(m6502_reg_x);
-          if(IS_AOP_WITH_Y(AOP(result)))
-            m6502_dirtyReg(m6502_reg_y);
+      rmwWithAop ("inc", AOP(result), 1);
+      if(IS_AOP_WITH_X(AOP(result)))
+	m6502_dirtyReg(m6502_reg_x);
+      if(IS_AOP_WITH_Y(AOP(result)))
+	m6502_dirtyReg(m6502_reg_y);
       safeEmitLabel (skiplabel);
-          pullOrFreeReg (m6502_reg_a, needpulla);
-          goto release;
+      pullOrFreeReg (m6502_reg_a, needpulla);
+      goto release;
     }
 
   if ( IS_AOP_XA(AOP(result)) && IS_AOP_A(AOP(left)) && AOP_TYPE(right) != AOP_SOF) 
@@ -286,35 +286,35 @@ genPlus (iCode * ic)
   needpulla = pushRegIfSurv (m6502_reg_a);
 
   while (size--)
-   {
-    if (earlystore && offset == 1)
-      pullReg (m6502_reg_a);
-    else
-      loadRegFromAop (m6502_reg_a, AOP(left), offset);
-    if (init_carry)
-      emitSetCarry(0);
+    {
+      if (earlystore && offset == 1)
+	pullReg (m6502_reg_a);
+      else
+	loadRegFromAop (m6502_reg_a, AOP(left), offset);
+      if (init_carry)
+	emitSetCarry(0);
 
-    if (!opskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
-      {
-	accopWithAop ("adc", AOP(right), offset);
-	if (!size && maskedtopbyte)
-	  emit6502op ("and", IMMDFMT, topbytemask);
-	opskip = false;
-      }
-    if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
-      {
-      pushReg (m6502_reg_a, true);
-      delayedstore = true;
-      }
-    else
-      {
-      storeRegToAop (m6502_reg_a, AOP (result), offset);
+      if (!opskip || AOP_TYPE (right) != AOP_LIT || (byteOfVal (AOP (right)->aopu.aop_lit, offset) != 0x00) )
+	{
+	  accopWithAop ("adc", AOP(right), offset);
+	  if (!size && maskedtopbyte)
+	    emit6502op ("and", IMMDFMT, topbytemask);
+	  opskip = false;
+	}
+      if (size && AOP_TYPE (result) == AOP_REG && AOP (result)->aopu.aop_reg[offset]->rIdx == A_IDX)
+	{
+	  pushReg (m6502_reg_a, true);
+	  delayedstore = true;
+	}
+      else
+	{
+	  storeRegToAop (m6502_reg_a, AOP (result), offset);
+	}
+      offset++;
+      m6502_freeReg (m6502_reg_a);
+      if (!opskip)
+	init_carry = false;
     }
-    offset++;
-    m6502_freeReg (m6502_reg_a);
-    if (!opskip)
-      init_carry = false;
-  }
   if (delayedstore)
     pullReg (m6502_reg_a);
 

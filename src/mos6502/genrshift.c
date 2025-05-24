@@ -61,7 +61,7 @@ static void AccSRsh (int shCount)
     }
   else
     {
-      // TODO: optimize? (asr?)
+      // TODO: optimize?
       for (i = 0; i < shCount; i++)
         {
           emitCmp (m6502_reg_a, 0x80);
@@ -87,10 +87,10 @@ void AccRsh (int shCount, bool sign)
   /* For shift counts of 6 and 7, the unrolled loop is never optimal.      */
   if (shCount==7)
     {
-    emit6502op ("rol", "a");
-    loadRegFromConst(m6502_reg_a, 0);
-    emit6502op ("rol", "a");
-    /* total: 6 cycles, 4 bytes */
+      emit6502op ("rol", "a");
+      loadRegFromConst(m6502_reg_a, 0);
+      emit6502op ("rol", "a");
+      /* total: 6 cycles, 4 bytes */
     }
   else if(shCount==6)
     {
@@ -147,12 +147,11 @@ static void XAccSRsh (int shCount)
     break;
 
   default:
-    /* asrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
-    /* the fastest and shortest.                                           */
+    // TODO: handle when X is litconst
     storeRegTempAlways(m6502_reg_x, true);
     for (i = 0; i < shCount; i++)
       {
-	// TODO: this is so bad
+	// TODO: see if theree is a better way
 	emit6502op ("cpx", "#0x80");
 	emit6502op ("ror", TEMPFMT, getLastTempOfs() );
 	dirtyRegTemp(getLastTempOfs() );
@@ -229,12 +228,12 @@ genrsh8 (operand * result, operand * left, int shCount, int sign)
     }
   else
     {
-  if(!IS_AOP_A(AOP(result)))
-    needpulla = pushRegIfSurv (m6502_reg_a);
-  loadRegFromAop (m6502_reg_a, AOP (left), 0);
-  AccRsh (shCount, sign);
-  storeRegToFullAop (m6502_reg_a, AOP (result), sign);
-  pullOrFreeReg (m6502_reg_a, needpulla);
+      if(!IS_AOP_A(AOP(result)))
+	needpulla = pushRegIfSurv (m6502_reg_a);
+      loadRegFromAop (m6502_reg_a, AOP (left), 0);
+      AccRsh (shCount, sign);
+      storeRegToFullAop (m6502_reg_a, AOP (result), sign);
+      pullOrFreeReg (m6502_reg_a, needpulla);
     }
 }
 
@@ -572,7 +571,7 @@ shiftRLong3 (operand * left, operand * result, int shift, int sign)
 
   needpulla = pushRegIfUsed (m6502_reg_a);
 
- if(shift==8)
+  if(shift==8)
     {
       loadRegFromAop (m6502_reg_a, AOP (left), 1);
       storeRegToAop (m6502_reg_a, AOP (result), 0);
@@ -911,8 +910,8 @@ genRightShiftLiteral (operand * left, operand * result, int shCount, int sign)
     }
   else
     {
-    if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
-       restore_x=storeRegTempIfUsed(m6502_reg_x);
+      if(AOP_TYPE(left)==AOP_SOF || AOP_TYPE(result)==AOP_SOF)
+	restore_x=storeRegTempIfUsed(m6502_reg_x);
 
       switch (size)
 	{
@@ -929,7 +928,7 @@ genRightShiftLiteral (operand * left, operand * result, int shCount, int sign)
 	  wassertl (0, "Invalid operand size in right shift.");
 	  break;
 	}
-    loadOrFreeRegTemp(m6502_reg_x, restore_x);
+      loadOrFreeRegTemp(m6502_reg_x, restore_x);
     }
 }
 
@@ -1070,7 +1069,7 @@ genRightShift (iCode * ic)
       x_in_regtemp = true;
     }
   else
-      loadRegFromAop (m6502_reg_a, AOP (result), size-1);
+    loadRegFromAop (m6502_reg_a, AOP (result), size-1);
 
   safeEmitLabel (tlbl);
 
@@ -1136,7 +1135,7 @@ genRightShift (iCode * ic)
   if(restore_y)
     loadRegTemp(m6502_reg_y);
 
-release:
+ release:
   freeAsmop (right, NULL);
   freeAsmop (left, NULL);
   freeAsmop (result, NULL);

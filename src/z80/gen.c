@@ -6767,12 +6767,12 @@ genCall (const iCode *ic)
             {
               int rst = ftype->funcAttrs.z88dk_shortcall_rst;
               int value = ftype->funcAttrs.z88dk_shortcall_val;
-              emit2 ("rst !constbyte", (unsigned)rst);
+              emit2 ("rst !immedbyte", (unsigned)rst);
               cost2 (1, 11, 11, 8, 16, 0, 5, 4);
               if (value < 256)
-                emit2 ("defb !constbyte\n", (unsigned)value);
+                emit2 ("defb !immedbyte\n", (unsigned)value);
               else
-                emit2 ("defw !constword\n", (unsigned)value);
+                emit2 ("defw !immedword\n", (unsigned)value);
               regalloc_dry_run_cost_bytes += 2 + (value >= 256);
             }
           else
@@ -7822,7 +7822,7 @@ outBitAcc (operand * result)
       if (!regalloc_dry_run)
         {
           emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
-          emit2 ("ld a, !one");
+          emit2 ("ld a, !immedbyte", 1);
           emitLabel (tlbl);
         }
       // Assume that both values are equally likely.
@@ -10725,10 +10725,10 @@ gencjne (operand *left, operand *right, symbol *lbl, const iCode *ic)
   /* PENDING: ?? */
   if (!regalloc_dry_run)
     {
-      emit2 ("ld a,!one");
+      emit2 ("ld a, !immedbyte", 1);
       emit2 ("jp !tlabel", labelKey2num (tlbl->key));
       emitLabelSpill (lbl);
-      emit2 ("xor a,a");
+      emit2 ("xor a, a");
       emitLabel (tlbl);
     }
   regalloc_dry_run_cost += 6;

@@ -175,7 +175,6 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "globalfunctionlabeldef", "%s::" },
     { "zero", "$00" },
-    { "one", "$01" },
     { "area", "SECTION FRAGMENT \"_%s\",ROM0" },
     { "areadata", "SECTION FRAGMENT \"%F_DATA\",%s" },
     { "areacode", "SECTION FRAGMENT \"%F_CODE\",%s" },
@@ -187,8 +186,6 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "dw", "DW" },
     { "dws", "DW %s" },
     { "immed", "" },
-    { "constbyte", "$%02X" },
-    { "constword", "$%04X" },
     { "immedword", "$%04X" },
     { "immedbyte", "$%02X" },
     { "hashedstr", "%s" },
@@ -276,7 +273,6 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "globalfunctionlabeldef", "%s::" },
     { "zero", "$00" },
-    { "one", "$01" },
     { "area", "%s\tGROUP" },
     { "areacode", "_CODE\tGROUP" },
     { "areadata", "_DATA\tGROUP" },
@@ -288,8 +284,6 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "dw", "DW" },
     { "dws", "DW %s" },
     { "immed", "" },
-    { "constbyte", "0x%02X" },
-    { "constword", "0x%04X" },
     { "immedword", "0x%04X" },
     { "immedbyte", "0x%02X" },
     { "hashedstr", "%s" },
@@ -365,7 +359,6 @@ static const ASM_MAPPING _z80asm_mapping[] = {
     { "functionlabeldef", ".%s" },
     { "globalfunctionlabeldef", ".%s" },
     { "zero", "$00" },
-    { "one", "$01" },
     { "ascii", "DEFM \"%s\"" },
     { "ds", "DEFS %d" },
     { "db", "DEFB" },
@@ -373,14 +366,11 @@ static const ASM_MAPPING _z80asm_mapping[] = {
     { "dw", "DEFW" },
     { "dws", "DEFB %s" },
     { "immed", "" },
-    { "constbyte", "$%02X" },
-    { "constword", "$%04X" },
     { "immedword", "$%04X" },
     { "immedbyte", "$%02X" },
     { "hashedstr", "%s" },
     { "lsbimmeds", "%s ~ $FF" },
     { "msbimmeds", "%s / 256" },
-
     { "bankimmeds", "BANK(%s)" },
     { "hashedbankimmeds", "BANK(%s)" },
     { "module", "MODULE %s" },
@@ -444,13 +434,15 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
     { NULL, NULL }
 };
 static const ASM_MAPPING _gas_gb_mapping[] = {
-    { "immed", "#"},
-    { "zero", "#0x00"},
-    { "one", "#0x01"},
+    { "immed", ""},
+    { "zero", "0x00"},
     { "area", ".area\t%s" },
     { "areacode", ".area\t%s"},
     { "areadata", ".area\t%s"},
     { "areahome", ".area\t%s"},
+    { "immedword", "0x%04x"},
+    { "immedbyte", "0x%02x"},
+    { "hashedstr", "%s"},
     { "functionlabeldef", "%s:" },
     { "globalfunctionlabeldef", "%s:" },
     { "*hl", "(hl)" },
@@ -466,13 +458,13 @@ static const ASM_MAPPING _gas_gb_mapping[] = {
     { "enter", "" },
     { "enters", "" },
     { "enterx", "add\tsp, #-%d" },
-    { "pusha", 
+    { "pusha",
       "push\taf\n"
       "push\tbc\n"
       "push\tde\n"
       "push\thl"
     },
-    { "popa", 
+    { "popa",
       "pop\thl\n"
       "pop\tde\n"
       "pop\tbc\n"
@@ -485,50 +477,47 @@ static const ASM_MAPPING _gas_gb_mapping[] = {
 };
 
 static const ASM_MAPPING _gas_z80_mapping[] = {
-    {"immed", "#"},
-    {"zero", "#0x00"},
-    {"one", "#0x01"},
+    {"immed", ""},
+    {"zero", "0x00"},
     {"area", ".area\t%s"},
     {"areacode", ".area\t%s"},
     {"areadata", ".area\t%s"},
     {"areahome", ".area\t%s"},
-    {"constbyte", "0x%02x"},
-    {"constword", "0x%04x"},
-    {"immedword", "#0x%04x"},
-    {"immedbyte", "#0x%02x"},
-    {"hashedstr", "#%s"},
+    {"immedword", "0x%04x"},
+    {"immedbyte", "0x%02x"},
+    {"hashedstr", "%s"},
     {"bankimmeds", "%s >> 16"},
     { "*ixx", "%d (ix)" },
     { "*iyx", "%d (iy)" },
     { "*hl", "(hl)" },
     { "di", "di" },
     { "ei", "ei" },
-    { "ldahli", 
+    { "ldahli",
 		"ld\ta,(hl)\n"
 		"inc\thl" },
-    { "ldahld", 
+    { "ldahld",
 		"ld\ta,(hl)\n"
 		"dec\thl" },
-    { "lldahli", 
+    { "lldahli",
 		"ld\t(hl),a\n"
 		"inc\thl" },
-    { "lldahld", 
+    { "lldahld",
 		"ld\t(hl),a\n"
 		"dec\thl" },
-    { "ldahlsp", 
+    { "ldahlsp",
 		"ld\thl, #%d\n"
 		"add\thl, sp" },
-    { "ldaspsp", 
+    { "ldaspsp",
 		"ld\tiy,#%d\n"
 		"add\tiy,sp\n"
 		"ld\tsp,iy" },
     { "mems", "(%s)" },
-    { "enter", 
+    { "enter",
 		"push\tix\n"
 		"ld\tix,#0\n"
 		"add\tix,sp" },
     { "enters", "call\t___sdcc_enter_ix\n" },
-    { "pusha", 
+    { "pusha",
       		"push\taf\n"
       		"push\tbc\n"
       		"push\tde\n"

@@ -4,6 +4,9 @@
 	  src/pic14/gen.h,
 	  src/pic14/genarith.c:
 	  Fix pic14 side of bug #3851.
+	* src/z80/gen.c,
+	  src/z80/mappings.i:
+	  GAS syntax support fixes, partly from parts of patch #484 by Atirut Wattanamongkol.
 
 2025-05-23 Gabriele Gorla <gorlik@yahoo.com>
 

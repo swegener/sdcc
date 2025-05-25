@@ -552,10 +552,10 @@ pic14_sameRegs (asmop * aop1, asmop * aop2)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopOp - allocates an asmop for an operand  :                    */
+/* pic14AopOp - allocates an asmop for an operand  :               */
 /*-----------------------------------------------------------------*/
 void
-aopOp (operand * op, iCode * ic, bool result)
+pic14AopOp (operand *op, iCode *ic, bool result)
 {
   asmop *aop;
   symbol *sym;
@@ -713,10 +713,10 @@ aopOp (operand * op, iCode * ic, bool result)
 }
 
 /*-----------------------------------------------------------------*/
-/* freeAsmop - free up the asmop given to an operand               */
-/*----------------------------------------------------------------*/
+/* pic14FreeAsmop - free up the asmop given to an operand          */
+/*-----------------------------------------------------------------*/
 void
-freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
+pic14FreeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
 {
   asmop *aop;
 
@@ -1549,8 +1549,8 @@ genNot (iCode * ic)
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* assign asmOps to operand & result */
-  aopOp (IC_LEFT (ic), ic, FALSE);
-  aopOp (IC_RESULT (ic), ic, TRUE);
+  pic14AopOp (ic->left, ic, false);
+  pic14AopOp (ic->result, ic, true);
 
   DEBUGpic14_AopType (__LINE__, IC_LEFT (ic), NULL, IC_RESULT (ic));
   /* if in bit space then a special case */
@@ -1592,8 +1592,8 @@ genNot (iCode * ic)
 
 release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
+  pic14FreeAsmop (ic->result, NULL, ic, true);
 }
 
 
@@ -1609,8 +1609,8 @@ genCpl (iCode * ic)
   FENTRY;
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   /* if both are in bit space then
      a special case */
@@ -1632,13 +1632,13 @@ genCpl (iCode * ic)
       emitpcode (POC_MOVWF, popGet (AOP (result), offset));
       offset++;
     }
-  addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
+  pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
 
 
 release:
   /* release the aops */
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1680,8 +1680,8 @@ genUminus (iCode * ic)
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* assign asmops */
-  aopOp (IC_LEFT (ic), ic, FALSE);
-  aopOp (IC_RESULT (ic), ic, TRUE);
+  pic14AopOp (ic->left, ic, false);
+  pic14AopOp (ic->result, ic, true);
 
   /* if both in bit space then special
      case */
@@ -1727,8 +1727,8 @@ genUminus (iCode * ic)
 
 release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
+  pic14FreeAsmop (ic->result, NULL, ic, true);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2141,17 +2141,17 @@ genCall (iCode * ic)
       for (sic = setFirstItem (_G.sendSet); sic; sic = setNextItem (_G.sendSet))
         {
 
-          aopOp (IC_LEFT (sic), sic, FALSE);
-          pseudoStkPtr += AOP_SIZE (IC_LEFT (sic));
-          freeAsmop (IC_LEFT (sic), NULL, sic, FALSE);
+          pic14AopOp (sic->left, sic, false);
+          pseudoStkPtr += AOP_SIZE (sic->left);
+          pic14FreeAsmop (sic->left, NULL, sic, false);
         }
 
       for (sic = setFirstItem (_G.sendSet); sic; sic = setNextItem (_G.sendSet))
         {
           int size, offset = 0;
 
-          aopOp (IC_LEFT (sic), sic, FALSE);
-          size = AOP_SIZE (IC_LEFT (sic));
+          pic14AopOp (ic->left, sic, false);
+          size = AOP_SIZE (sic->left);
 
           while (size--)
             {
@@ -2171,7 +2171,7 @@ genCall (iCode * ic)
               mov2w_op (IC_LEFT (sic), offset);
               offset++;
             }
-          freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+          pic14FreeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
         }
       _G.sendSet = NULL;
     }
@@ -2230,14 +2230,14 @@ genCall (iCode * ic)
        (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
       _G.accInUse++;
-      aopOp (IC_RESULT (ic), ic, FALSE);
+      pic14AopOp (ic->result, ic, false);
       _G.accInUse--;
 
       assignResultValue (ic);
 
       DEBUGpic14_emitcode ("; ", "%d left %s", __LINE__, AopType (AOP_TYPE (IC_RESULT (ic))));
 
-      freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+      pic14FreeAsmop (ic->result, NULL, ic, true);
     }
 
   /* if register bank was saved then pop them */
@@ -2276,8 +2276,8 @@ genPcall (iCode * ic)
   if (currFunc && dtype && IFFUNC_ISISR (currFunc->type) && (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)))
     saverbank (FUNC_REGBANK (dtype), ic, TRUE);
 
-  left = IC_LEFT (ic);
-  aopOp (left, ic, FALSE);
+  left = ic->left;
+  pic14AopOp (left, ic, false);
   DEBUGpic14_AopType (__LINE__, left, NULL, NULL);
 
   poc = (op_isLitLike (IC_LEFT (ic)) ? POC_MOVLW : POC_MOVFW);
@@ -2320,7 +2320,7 @@ genPcall (iCode * ic)
 
   emitpLabel (blbl->key);
 
-  freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
   /* if we need to assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
@@ -2328,14 +2328,14 @@ genPcall (iCode * ic)
     {
 
       _G.accInUse++;
-      aopOp (IC_RESULT (ic), ic, FALSE);
+      pic14AopOp (ic->result, ic, false);
       _G.accInUse--;
 
       GpseudoStkPtr = 0;
 
       assignResultValue (ic);
 
-      freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+      pic14FreeAsmop (ic->result, NULL, ic, true);
     }
 
   /* if register bank was saved then unsave them */
@@ -2732,15 +2732,15 @@ genRet (iCode * ic)
 
   /* we have something to return then
      move the return value into place */
-  aopOp (IC_LEFT (ic), ic, FALSE);
-  size = AOP_SIZE (IC_LEFT (ic));
+  pic14AopOp (ic->left, ic, false);
+  size = AOP_SIZE (ic->left);
 
   for (offset = 0; offset < size; offset++)
     {
       pass_argument (IC_LEFT (ic), offset, size - 1 - offset);
     }
 
-  freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
 jumpret:
   /* generate a jump to the return label
@@ -2904,7 +2904,7 @@ genMultOneByte (operand * left, operand * right, operand * result)
     }                           // for
 
   /* now (zero-/sign) extend the result to its size */
-  addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
+  pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
 }
 
 /*-----------------------------------------------------------------*/
@@ -2921,9 +2921,9 @@ genMult (iCode * ic)
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
 
@@ -2946,9 +2946,9 @@ genMult (iCode * ic)
   assert (0);
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3065,7 +3065,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
     }
 
   /* now performed the signed/unsigned division -- extend result */
-  addSign (result, 1, sign);
+  pic14AddSign (result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3081,9 +3081,9 @@ genDiv (iCode * ic)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   /* special cases first */
   /* both are bits */
@@ -3103,9 +3103,9 @@ genDiv (iCode * ic)
   /* should have been converted to function call */
   assert (0);
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3198,7 +3198,7 @@ genModOneByte (operand * left, operand * right, operand * result)
     }
 
   /* now we performed the signed/unsigned modulus -- extend result */
-  addSign (result, 1, sign);
+  pic14AddSign (result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3214,9 +3214,9 @@ genMod (iCode * ic)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   /* if both are of size == 1 */
   if (AOP_SIZE (left) == 1 && AOP_SIZE (right) == 1)
@@ -3229,9 +3229,9 @@ genMod (iCode * ic)
   assert (0);
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3628,15 +3628,15 @@ genCmpGt (iCode * ic, iCode * ifx)
     }
 
   /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   genCmp (right, left, result, ifx, sign);
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3664,15 +3664,15 @@ genCmpLt (iCode * ic, iCode * ifx)
     }
 
   /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   genCmp (left, right, result, ifx, sign);
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3694,9 +3694,9 @@ genCmpEq (iCode * ic, iCode * ifx)
   else
     DEBUGpic14_emitcode ("; ifx is null", "");
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
 
@@ -3831,9 +3831,9 @@ genCmpEq (iCode * ic, iCode * ifx)
   if (ifx)
     ifx->generated = TRUE;
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3850,9 +3850,9 @@ genAndOp (iCode * ic)
   /* note here that && operations that are in an
      if statement are taken away by backPatchLabels
      only those used in arthmetic operations remain */
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, FALSE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, false);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
 
@@ -3875,9 +3875,9 @@ genAndOp (iCode * ic)
   /*         pic14_outBitAcc(result); */
   /*     } */
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 
@@ -3901,9 +3901,9 @@ genOrOp (iCode * ic)
      only those used in arthmetic operations remain */
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, FALSE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, false);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
 
@@ -3922,9 +3922,9 @@ genOrOp (iCode * ic)
   emitSKPZ;
   emitpcode (POC_INCF, popGet (AOP (result), 0));
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4022,9 +4022,9 @@ genAnd (iCode * ic, iCode * ifx)
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   resolveIfx (&rIfx, ifx);
 
@@ -4306,9 +4306,9 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4324,9 +4324,9 @@ genOr (iCode * ic, iCode * ifx)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
 
@@ -4587,9 +4587,9 @@ genOr (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4606,9 +4606,9 @@ genXor (iCode * ic, iCode * ifx)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   resolveIfx (&rIfx, ifx);
 
@@ -4867,9 +4867,9 @@ genXor (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4947,8 +4947,8 @@ genRRC (iCode * ic)
   /* rotate right with carry */
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (result, ic, false);
 
   DEBUGpic14_AopType (__LINE__, left, NULL, result);
 
@@ -4972,8 +4972,8 @@ genRRC (iCode * ic)
         }
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4991,8 +4991,8 @@ genRLC (iCode * ic)
   /* rotate right with carry */
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (left, ic, false);
+ pic14AopOp (result, ic, false);
 
   DEBUGpic14_AopType (__LINE__, left, NULL, result);
 
@@ -5022,8 +5022,8 @@ genRLC (iCode * ic)
     }
 
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 static void
@@ -5038,9 +5038,9 @@ genGetABit (iCode * ic)
   right = IC_RIGHT (ic);
   result = IC_RESULT (ic);
 
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
   offset = shCount / 8;
@@ -5071,9 +5071,9 @@ genGetABit (iCode * ic)
       emitpcode (POC_CLRF, popGet (AOP (result), i));
     }                           // for
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5567,7 +5567,7 @@ shiftRight_Left2ResultLit (operand * left, operand * result, int shCount, int si
           break;
         }                       // switch
 
-  addSign (result, size, sign);
+  pic14AddSign (result, size, sign);
   }
 }
 
@@ -5647,9 +5647,9 @@ genGenericShift (iCode * ic, int shiftRight)
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
 
-  aopOp (right, ic, FALSE);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (result, ic, false);
 
   /* if the shift count is known then do it
      as efficiently as possible */
@@ -5689,7 +5689,7 @@ genGenericShift (iCode * ic, int shiftRight)
           mov2w (AOP (left), size);
           movwf (AOP (result), size);
         }
-      addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (left)));
+      pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (left)));
     }
 
   tlbl = newiTempLabel (NULL);
@@ -5743,9 +5743,9 @@ genGenericShift (iCode * ic, int shiftRight)
 
   emitpLabel (tlbl1->key);
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6111,7 +6111,7 @@ manage_signs:
       }
 
     if (AOP_SIZE(result) > ++offset)
-        addSign (result, offset, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+        pic14AddSign (result, offset, !SPEC_USIGN (OP_SYM_ETYPE (left)));
 }
 
 /*-----------------------------------------------------------------*/
@@ -6202,7 +6202,7 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
                 emitpcode (POC_INCF, popGet (AOP (result), 0));
               else
                 emitpcode (POC_DECF, popGet (AOP (result), 0));
-              addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+              pic14AddSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
             } // if
         }
     }
@@ -6230,7 +6230,7 @@ genDataPointerGet (operand * left, operand * result, iCode * ic)
    * address, but different types. for the pic code, we could omit
    * the following
    */
-  aopOp (result, ic, TRUE);
+  pic14AopOp (result, ic, true);
 
   if (pic14_sameRegs (AOP (left), AOP (result)))
     goto release;
@@ -6250,8 +6250,8 @@ genDataPointerGet (operand * left, operand * result, iCode * ic)
     }
 
 release:
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 #endif
 
@@ -6270,7 +6270,7 @@ genNearPointerGet (operand * left, operand * result, iCode * ic)
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
 
-  aopOp (left, ic, FALSE);
+  pic14AopOp (left, ic, false);
 
   /* if left is rematerialisable and
      result is not bit variable type and
@@ -6284,7 +6284,7 @@ genNearPointerGet (operand * left, operand * result, iCode * ic)
     }
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (result, ic, false);
 
   /* Check if can access directly instead of via a pointer */
   if ((AOP_TYPE (left) == AOP_PCODE) && (AOP (left)->aopu.pcop->type == PO_IMMEDIATE))
@@ -6302,8 +6302,8 @@ genNearPointerGet (operand * left, operand * result, iCode * ic)
     }
 
   /* done */
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 
 }
 
@@ -6315,8 +6315,8 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
 {
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (result, ic, false);
 
 
   DEBUGpic14_AopType (__LINE__, left, NULL, result);
@@ -6330,8 +6330,8 @@ genGenPointerGet (operand * left, operand * result, iCode * ic)
       emitPtrGet (result, left, GPOINTER, 0, 0);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 
 }
 
@@ -6349,8 +6349,8 @@ genConstPointerGet (operand * left, operand * result, iCode * ic)
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (left, ic, false);
+  pic14AopOp (result, ic, false);
 
   DEBUGpic14_AopType (__LINE__, left, NULL, result);
 
@@ -6365,8 +6365,8 @@ genConstPointerGet (operand * left, operand * result, iCode * ic)
       emitPtrGet (result, left, CPOINTER, 0, 0);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 
 }
 
@@ -6783,7 +6783,7 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (right, ic, FALSE);
+  pic14AopOp (right, ic, false);
 
   assert (IS_SYMOP (result));
   assert (IS_PTR (OP_SYM_TYPE (result)));
@@ -6836,8 +6836,8 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
     }
   }
 
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6854,7 +6854,7 @@ genNearPointerSet (operand * right, operand * result, iCode * ic)
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (result, ic, false);
 
 #if 1
   /* if the result is rematerializable &
@@ -6868,7 +6868,7 @@ genNearPointerSet (operand * right, operand * result, iCode * ic)
 #endif
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (right, ic, FALSE);
+  pic14AopOp (right, ic, false);
   DEBUGpic14_AopType (__LINE__, NULL, right, result);
 
   /* Check if can access directly instead of via a pointer */
@@ -6889,8 +6889,8 @@ genNearPointerSet (operand * right, operand * result, iCode * ic)
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
   /* done */
 
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6903,8 +6903,8 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, false);
 
 
   DEBUGpic14_AopType (__LINE__, right, NULL, result);
@@ -6918,8 +6918,8 @@ genGenPointerSet (operand * right, operand * result, iCode * ic)
       emitPtrPut (right, result, GPOINTER, 0, 0);
     }
 
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7008,7 +7008,7 @@ genIfx (iCode * ic, iCode * popIc)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
-  aopOp (cond, ic, FALSE);
+  pic14AopOp (cond, ic, false);
 
   /* get the value into acc */
   if (AOP_TYPE (cond) != AOP_CRY)
@@ -7067,7 +7067,7 @@ genIfx (iCode * ic, iCode * popIc)
   ic->generated = TRUE;
 
   /* the result is now in the accumulator */
-  freeAsmop (cond, NULL, ic, TRUE);
+  pic14FreeAsmop (cond, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7085,9 +7085,9 @@ genAddrOf (iCode * ic)
 
   //aopOp(IC_RESULT(ic),ic,FALSE);
 
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
+  pic14AopOp ((left = ic->left), ic, false);
+  pic14AopOp ((right = ic->right), ic, false);
+  pic14AopOp ((result = ic->result), ic, true);
 
   DEBUGpic14_AopType (__LINE__, left, right, result);
   assert (IS_SYMOP (left));
@@ -7155,8 +7155,8 @@ genAddrOf (iCode * ic)
       movwf (AOP (result), 2);
     }
 
-  freeAsmop (left, NULL, ic, FALSE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (left, NULL, ic, FALSE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 
 }
 
@@ -7180,8 +7180,8 @@ genAssign (iCode * ic)
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
     return;
 
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, true);
 
   DEBUGpic14_AopType (__LINE__, NULL, right, result);
 
@@ -7302,11 +7302,11 @@ genAssign (iCode * ic)
 
   /* now (zero-/sign) extend the result to its size */
   if (AOP_SIZE(result) > offset)
-    addSign (result, offset, !SPEC_USIGN (operandType (right)));
+    pic14AddSign (result, offset, !SPEC_USIGN (operandType (right)));
 
 release:
-  freeAsmop (right, NULL, ic, FALSE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, FALSE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7321,7 +7321,7 @@ genJumpTab (iCode * ic)
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
 
-  aopOp (IC_JTCOND (ic), ic, FALSE);
+  pic14AopOp (IC_JTCOND (ic), ic, false);
   /* get the condition into accumulator */
   l = aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE);
   MOVA (l);
@@ -7343,7 +7343,7 @@ genJumpTab (iCode * ic)
   emitpcode (POC_MOVWF, popCopyReg (&pc_pcl));
   emitpLabel (jtab->key);
 
-  freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
 
   /* now generate the jump labels */
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
@@ -7373,8 +7373,8 @@ genCast (iCode * ic)
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
     return;
 
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  pic14AopOp (right, ic, false);
+  pic14AopOp (result, ic, false);
 
   DEBUGpic14_AopType (__LINE__, NULL, right, result);
 
@@ -7506,7 +7506,7 @@ genCast (iCode * ic)
               movwf (AOP (result), size++);
             }
         }
-      addSign (result, size, 0);
+      pic14AddSign (result, size, 0);
       goto release;
     }
 
@@ -7568,11 +7568,11 @@ genCast (iCode * ic)
       offset++;
     }
 
-  addSign (result, AOP_SIZE (right), !SPEC_USIGN (rtype));
+  pic14AddSign (result, AOP_SIZE (right), !SPEC_USIGN (rtype));
 
 release:
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
+  pic14FreeAsmop (right, NULL, ic, TRUE);
+  pic14FreeAsmop (result, NULL, ic, TRUE);
 
 }
 
@@ -7607,12 +7607,12 @@ genDjnz (iCode * ic, iCode * ifx)
     return 0;
 
   /* otherwise we can save BIG */
-  aopOp (IC_RESULT (ic), ic, FALSE);
+  pic14AopOp (ic->result, ic, false);
 
   emitpcode (POC_DECFSZ, popGet (AOP (IC_RESULT (ic)), 0));
   emitpcode (POC_GOTO, popGetLabel (IC_TRUE (ifx)->key));
 
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (ic->result, NULL, ic, true);
   ifx->generated = TRUE;
   return 1;
 }
@@ -7637,7 +7637,7 @@ genReceive (iCode * ic)
                                          fReturn[fReturnSizePic - offset - 1] : "acc"));
           offset++;
         }
-      aopOp (IC_RESULT (ic), ic, FALSE);
+      pic14AopOp (ic->result, ic, false);
       size = AOP_SIZE (IC_RESULT (ic));
       offset = 0;
       while (size--)
@@ -7650,13 +7650,13 @@ genReceive (iCode * ic)
   else
     {
       _G.accInUse++;
-      aopOp (IC_RESULT (ic), ic, FALSE);
+      pic14AopOp (ic->result, ic, false);
       _G.accInUse--;
       GpseudoStkPtr = ic->parmBytes;    // address used arg on stack
       assignResultValue (ic);
     }
 
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  pic14FreeAsmop (ic->result, NULL, ic, true);
 }
 
 /*-----------------------------------------------------------------*/

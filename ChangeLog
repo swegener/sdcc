@@ -1,3 +1,10 @@
+2025-05-25 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/pic14/gen.c,
+	  src/pic14/gen.h,
+	  src/pic14/genarith.c:
+	  Fix pic14 side of bug #3851.
+
 2025-05-23 Gabriele Gorla <gorlik@yahoo.com>
 
    	* src/mos6502/peeph.def:

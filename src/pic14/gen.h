@@ -157,8 +157,8 @@ pCodeOp *popGetLit(unsigned int lit);
 
 void aopPut (asmop *aop, const char *s, int offset);
 void pic14_outAcc(operand *result);
-void aopOp (operand *op, iCode *ic, bool result);
-void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
+void pic14AopOp (operand *op, iCode *ic, bool result);
+void pic14FreeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 void mov2w (asmop *aop, int offset);
 void mov2w_op (operand * op, int offset);
 int op_isLitLike (operand *op);
@@ -169,7 +169,7 @@ int op_isLitLike (operand *op);
 const char *AopType(short type);
 const char *pCodeOpType(pCodeOp *pcop);
 void genPlus (iCode *ic);
-void addSign(operand *result, int offset, int sign);
+void pic14AddSign (operand *result, int offset, int sign);
 void genMinus (iCode *ic);
 
 #endif

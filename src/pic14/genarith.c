@@ -691,7 +691,7 @@ out:
     {
       size = pic14_getDataSize(left);
     } // if
-  addSign(result, size, 0);
+  pic14AddSign (result, size, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -707,9 +707,9 @@ void genPlus (iCode *ic)
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
         FENTRY;
         
-        aopOp (IC_LEFT(ic),ic,FALSE);
-        aopOp (IC_RIGHT(ic),ic,FALSE);
-        aopOp (IC_RESULT(ic),ic,TRUE);
+        pic14AopOp (ic->left, ic, false);
+        pic14AopOp (ic->right, ic, false);
+        pic14AopOp (ic->result, ic, true);
         
         DEBUGpic14_AopType(__LINE__,IC_LEFT(ic),IC_RIGHT(ic),IC_RESULT(ic));
         
@@ -1073,15 +1073,15 @@ void genPlus (iCode *ic)
         //adjustArithmeticResult(ic);
         
 release:
-        freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+        pic14FreeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        pic14FreeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        pic14FreeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/
-/* addSign - propagate sign bit to higher bytes                    */
+/* pic14AddSign - propagate sign bit to higher bytes               */
 /*-----------------------------------------------------------------*/
-void addSign(operand *result, int offset, int sign)
+void pic14AddSign (operand *result, int offset, int sign)
 {
         int size = (pic14_getDataSize(result) - offset);
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -1121,9 +1121,9 @@ void genMinus (iCode *ic)
 
         FENTRY;
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-        aopOp (IC_LEFT(ic),ic,FALSE);
-        aopOp (IC_RIGHT(ic),ic,FALSE);
-        aopOp (IC_RESULT(ic),ic,TRUE);
+        pic14AopOp (ic->left, ic, false);
+        pic14AopOp (ic->right, ic, false);
+        pic14AopOp (ic->result, ic, true);
         
         if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY  &&
                 AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT) {
@@ -1674,7 +1674,7 @@ void genMinus (iCode *ic)
 
                 /* Sign extend the result if needed */
                 if (size > opsize)
-                        addSign(IC_RESULT(ic), opsize, !(SPEC_USIGN (operandType (IC_LEFT(ic))) && SPEC_USIGN (operandType (IC_RIGHT(ic)))));
+                        pic14AddSign(IC_RESULT(ic), opsize, !(SPEC_USIGN (operandType (IC_LEFT(ic))) && SPEC_USIGN (operandType (IC_RIGHT(ic)))));
         } // if
 
         if(AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) {
@@ -1688,8 +1688,8 @@ void genMinus (iCode *ic)
         //    adjustArithmeticResult(ic);
         
 release:
-        freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+        pic14FreeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        pic14FreeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        pic14FreeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
 }
 

@@ -1137,7 +1137,7 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
       goto convert;
     }
 
-  if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N || TARGET_IS_R800) && (!strcmp (bif->name, "__builtin_memcpy") || !strcmp (bif->name, "__builtin_strncpy") || !strcmp (bif->name, "__builtin_memset")))
+  if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_RABBIT_LIKE || TARGET_IS_EZ80 || TARGET_IS_Z80N || TARGET_IS_R800) && (!strcmp (bif->name, "__builtin_memcpy") || !strcmp (bif->name, "__builtin_strncpy") || !strcmp (bif->name, "__builtin_memset")))
     {
       /* Replace iff return value is used or last parameter is not an integer constant (except for memcpy, where non-integers can be handled). */
       if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && (IS_OP_LITERAL (IC_LEFT (lastparam)) || !strcmp (bif->name, "__builtin_memcpy")))
@@ -2911,7 +2911,7 @@ optimizeFinalCast (ebbIndex *ebbi)
 
           // Not all backends can handle multiple global operands in all operations well.
           if (IS_OP_GLOBAL (uic->result) && IS_OP_GLOBAL (ic->right) && 
-            !TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_IS_F8)
+            !TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_F8_LIKE)
             continue;
 
           if (ic->op == CAST)
@@ -3059,7 +3059,7 @@ offsetFoldGet (eBBlock **ebbs, int count)
   iCode *ic;
   iCode *uic;
 
-  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_IS_F8)
+  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_F8_LIKE)
     return;
 
   for (i = 0; i < count; i++)
@@ -3111,7 +3111,7 @@ offsetFoldUse (eBBlock **ebbs, int count)
   iCode *ic;
   iCode *uic;
 
-  if (!(TARGET_Z80_LIKE && !TARGET_IS_SM83) && !TARGET_IS_STM8 && !TARGET_IS_F8) // All z80-related targets except sm83 support non-zero right operand. stm8 also supports it.
+  if (!(TARGET_Z80_LIKE && !TARGET_IS_SM83) && !TARGET_IS_STM8 && !TARGET_F8_LIKE) // All z80-related targets except sm83 support non-zero right operand. stm8 also supports it.
     return;
 
   for (i = 0; i < count; i++)
@@ -3517,7 +3517,7 @@ eBBlockFromiCode (iCode *ic)
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
   shortenLiveRanges (ic, ebbi);
   guessCounts (ic, ebbi);
-  if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8 || TARGET_IS_F8)) /* For mcs51, we get a code size regression with lospre enabled, since the backend can't deal well with the added temporaries */
+  if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8 || TARGET_F8_LIKE)) /* For mcs51, we get a code size regression with lospre enabled, since the backend can't deal well with the added temporaries */
     {
       lospre (ic, ebbi);
       if (options.dump_i_code)

@@ -3237,7 +3237,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
   ast *parms = tree->right;
   ast *func = tree->left;
 
-  if (!TARGET_IS_STM8 && !TARGET_Z80_LIKE && !TARGET_PDK_LIKE && !TARGET_IS_F8) // Regression test gcc-torture-execute-20121108-1.c fails to build for hc08 and mcs51 (without --stack-auto)
+  if (!TARGET_IS_STM8 && !TARGET_Z80_LIKE && !TARGET_PDK_LIKE && !TARGET_F8_LIKE) // Regression test gcc-torture-execute-20121108-1.c fails to build for hc08 and mcs51 (without --stack-auto)
     return;
 
   if (!IS_FUNC (func->ftype) || IS_LITERAL (func->ftype) || func->type != EX_VALUE || !func->opval.val->sym)
@@ -3329,7 +3329,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       size_t minlength; // Minimum string length for replacement.
       if (TARGET_IS_STM8)
         minlength = optimize.codeSize ? SIZE_MAX : 12;
-      else if (TARGET_IS_RABBIT)
+      else if (TARGET_RABBIT_LIKE)
         minlength = optimize.codeSize ? SIZE_MAX : (optimize.codeSpeed ? 8 : 24);
       else // TODO:Check for other targets when memcpy() is a better choice than strcpy;
         minlength = SIZE_MAX;

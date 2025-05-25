@@ -958,7 +958,7 @@ _z80_genAssemblerStart (FILE * of)
     fprintf (of, "\t.hd64\n");
   else if (TARGET_IS_R3KA)
     fprintf (of, "\t.r3k\n");
-  else if (TARGET_IS_EZ80_Z80)
+  else if (TARGET_IS_EZ80)
     fprintf (of, "\t.ez80\n");
   else if (TARGET_IS_Z80N)
     fprintf (of, "\t.zxn\n");
@@ -2042,7 +2042,7 @@ PORT tlcs90_port =
 
 PORT ez80_z80_port =
 {
-  TARGET_ID_EZ80_Z80,
+  TARGET_ID_EZ80,
   "ez80_z80",
   "eZ80-Z80",                   /* Target name */
   NULL,                         /* Processor name */

@@ -7,7 +7,7 @@
 
 #include <testfwk.h>
 
-#if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pdk16) && !defined(__SDCC_pic14) && (!defined(__SDCC_mcs51) || (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE)) && defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_z80) && !defined(__SDCC_z180) /* We need at least 2.5 KB of memory, which no pdk port has; for msc51, hc08, s08 we get a DSEG length error - i.e. too much memoryused for local variables in __near - this shouldimprove when we have Chaitin-style allocation there (RFE #958), any maybe some otehr optimizations - z80, z180: fails, probably a bug in codegen */
+#if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pdk16) && !defined(__SDCC_pic14) && (!defined(__SDCC_mcs51) || (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE)) && defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_ds390) /* We need at least 2.5 KB of memory, which no pdk port has; for msc51, hc08, s08 we get a DSEG length error - i.e. too much memoryused for local variables in __near - this should improve when we have Chaitin-style allocation there (RFE #958), any maybe some otehr optimizations - z80, z180, ds390: fails, possibly a bug in codegen */
 
 // coremark.h content below.
 

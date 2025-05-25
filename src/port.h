@@ -11,31 +11,35 @@
 #include "dbuf.h"
 
 #define TARGET_ID_MCS51    1
-#define TARGET_ID_SM83     2
-#define TARGET_ID_Z80      3
-#define TARGET_ID_AVR      4
-#define TARGET_ID_DS390    5
-#define TARGET_ID_PIC14    6
-#define TARGET_ID_PIC16    7
-#define TARGET_ID_DS400    10
-#define TARGET_ID_HC08     11
-#define TARGET_ID_Z180     12
-#define TARGET_ID_R2K      13
-#define TARGET_ID_R3KA     14
-#define TARGET_ID_S08      15
-#define TARGET_ID_STM8     16
-#define TARGET_ID_TLCS90   17
-#define TARGET_ID_EZ80_Z80 18
-#define TARGET_ID_PDK13    19
-#define TARGET_ID_PDK14    20
-#define TARGET_ID_PDK15    21
-#define TARGET_ID_PDK16    22
-#define TARGET_ID_Z80N     23
-#define TARGET_ID_R2KA     24
-#define TARGET_ID_MOS6502  25
-#define TARGET_ID_MOS65C02 26
-#define TARGET_ID_R800     27
-#define TARGET_ID_F8       28
+#define TARGET_ID_DS390    2
+#define TARGET_ID_DS400    3
+#define TARGET_ID_Z80      4
+#define TARGET_ID_Z80N     5
+#define TARGET_ID_Z180     6
+#define TARGET_ID_SM83     7
+#define TARGET_ID_TLCS90   8
+#define TARGET_ID_EZ80     9
+#define TARGET_ID_R2K      10
+#define TARGET_ID_R2KA     11
+#define TARGET_ID_R3KA     12
+#define TARGET_ID_R4K      13
+#define TARGET_ID_R5K      14
+#define TARGET_ID_R6K      15
+#define TARGET_ID_R800     16
+#define TARGET_ID_HC08     17
+#define TARGET_ID_S08      18
+#define TARGET_ID_STM8     19
+#define TARGET_ID_PDK13    20
+#define TARGET_ID_PDK14    21
+#define TARGET_ID_PDK15    22
+#define TARGET_ID_PDK16    23
+#define TARGET_ID_MOS6502  24
+#define TARGET_ID_MOS65C02 25
+#define TARGET_ID_F8       26
+#define TARGET_ID_F8L      27
+#define TARGET_ID_PIC14    28
+#define TARGET_ID_PIC16    29
+#define TARGET_ID_AVR      30
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -44,16 +48,17 @@
 #define TARGET_IS_AVR      (port->id == TARGET_ID_AVR)
 #define TARGET_IS_DS390    (port->id == TARGET_ID_DS390)
 #define TARGET_IS_DS400    (port->id == TARGET_ID_DS400)
-#define TARGET_IS_PIC14    (port->id == TARGET_ID_PIC14)
-#define TARGET_IS_PIC16    (port->id == TARGET_ID_PIC16)
 #define TARGET_IS_Z80      (port->id == TARGET_ID_Z80)
 #define TARGET_IS_Z180     (port->id == TARGET_ID_Z180)
 #define TARGET_IS_R2K      (port->id == TARGET_ID_R2K)
 #define TARGET_IS_R2KA     (port->id == TARGET_ID_R2KA)
 #define TARGET_IS_R3KA     (port->id == TARGET_ID_R3KA)
+#define TARGET_IS_R4K      (port->id == TARGET_ID_R4K)
+#define TARGET_IS_R5K      (port->id == TARGET_ID_R5K)
+#define TARGET_IS_R6K      (port->id == TARGET_ID_R6K)
 #define TARGET_IS_SM83     (port->id == TARGET_ID_SM83)
 #define TARGET_IS_TLCS90   (port->id == TARGET_ID_TLCS90)
-#define TARGET_IS_EZ80_Z80 (port->id == TARGET_ID_EZ80_Z80)
+#define TARGET_IS_EZ80     (port->id == TARGET_ID_EZ80)
 #define TARGET_IS_Z80N     (port->id == TARGET_ID_Z80N)
 #define TARGET_IS_R800     (port->id == TARGET_ID_R800)
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
@@ -66,14 +71,18 @@
 #define TARGET_IS_MOS6502  (port->id == TARGET_ID_MOS6502)
 #define TARGET_IS_MOS65C02 (port->id == TARGET_ID_MOS65C02)
 #define TARGET_IS_F8       (port->id == TARGET_ID_F8)
+#define TARGET_IS_F8L      (port->id == TARGET_ID_F8L)
+#define TARGET_IS_PIC14    (port->id == TARGET_ID_PIC14)
+#define TARGET_IS_PIC16    (port->id == TARGET_ID_PIC16)
 
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
-#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_SM83 || TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA || TARGET_IS_TLCS90 || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N || TARGET_IS_R800)
-#define TARGET_IS_RABBIT   (TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA)
+#define TARGET_RABBIT_LIKE (TARGET_IS_R2K || TARGET_IS_R2KA || TARGET_IS_R3KA || TARGET_IS_R4K || TARGET_IS_R5K || TARGET_IS_R6K)
+#define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_SM83 || TARGET_IS_TLCS90 || TARGET_IS_EZ80 || TARGET_IS_Z80N || TARGET_IS_R800 || TARGET_RABBIT_LIKE)
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08 || TARGET_IS_S08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
 #define TARGET_PDK_LIKE    (TARGET_IS_PDK13 || TARGET_IS_PDK14 || TARGET_IS_PDK15 || TARGET_IS_PDK16)
-#define TARGET_MOS6502_LIKE  (TARGET_IS_MOS6502 || TARGET_IS_MOS65C02)
+#define TARGET_MOS6502_LIKE (TARGET_IS_MOS6502 || TARGET_IS_MOS65C02)
+#define TARGET_F8_LIKE     (TARGET_IS_F8 || TARGET_IS_F8L)
 
 /* is using sdas / sdld assembler / linker */
 #define IS_SDASLD          (TARGET_Z80_LIKE || TARGET_MCS51_LIKE || TARGET_HC08_LIKE)

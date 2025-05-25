@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) /* We need at least 5KB of memory */
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pdk16) && !defined(__SDCC_pic14) /* We need at least 5 KB of memory */
 
 #pragma disable_warning 84
 #pragma disable_warning 85

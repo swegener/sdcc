@@ -7,6 +7,9 @@
 	* src/z80/gen.c,
 	  src/z80/mappings.i:
 	  GAS syntax support fixes, partly from parts of patch #484 by Atirut Wattanamongkol.
+	* support/regression/tests/dhrystone.c,
+	  support/regression/tests/coremark.c:
+	  Add test based on Coremark.
 
 2025-05-23 Gabriele Gorla <gorlik@yahoo.com>
 

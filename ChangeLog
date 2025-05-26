@@ -1,3 +1,8 @@
+2025-05-26 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/coremark.c:
+	  Disable Coremark test for mos65(c)02, due to lack of ZP memory.
+
 2025-05-25 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/pic14/gen.c,

@@ -5,6 +5,10 @@
 	* configure.ac,
 	  configure:
 	  Fix a typo (and regenerate the configure script with autoconf 2.72).
+	* support/valdiag/Makefile.in,
+	  support/valdiag/valdiag.py,
+	  support/valdiag/tests/bug-2798.c:
+	  Include f8 port in diagnostics regression testing.
 
 2025-05-25 Philipp Klaus Krause <philipp@colecovision.eu>
 

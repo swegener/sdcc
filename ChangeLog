@@ -1,3 +1,8 @@
+2025-05-27 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* support/regression/tests/coremark.c.in:
+	  Disable console output in Coremark test to reduce memory usage, cover more memory types.
+
 2025-05-26 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* support/regression/tests/coremark.c:

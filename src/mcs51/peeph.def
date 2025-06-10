@@ -330,57 +330,7 @@ replace {
 %1:
 } if labelRefCountChange(%1 -1)
 
-replace {
-	jc	%1
-	ljmp	%5
-%1:
-} by {
-	;	Peephole 108.a	removed ljmp by inverse jump logic
-	jnc	%5
-%1:
-} if labelInRange(%5), labelRefCountChange(%1 -1)
-
-replace {
-	jz	%1
-	ljmp	%5
-%1:
-} by {
-	;	Peephole 108.b	removed ljmp by inverse jump logic
-	jnz	%5
-%1:
-} if labelInRange(%5), labelRefCountChange(%1 -1)
-
-replace {
-	jnz	%1
-	ljmp	%5
-%1:
-} by {
-	;	Peephole 108.c	removed ljmp by inverse jump logic
-	jz	%5
-%1:
-} if labelInRange(%5), labelRefCountChange(%1 -1)
-
-replace {
-	jb	%1,%2
-	ljmp	%5
-%2:
-} by {
-	;	Peephole 108.d	removed ljmp by inverse jump logic
-	jnb	%1,%5
-%2:
-} if labelInRange(%5), labelRefCountChange(%2 -1)
-
-replace {
-	jnb	%1,%2
-	ljmp	%5
-%2:
-} by {
-	;	Peephole 108.e	removed ljmp by inverse jump logic
-	jb	%1,%5
-%2:
-} if labelInRange(%5), labelRefCountChange(%2 -1)
-
-replace {
+replace restart {
 	ljmp	%5
 %1:
 } by {
@@ -388,6 +338,56 @@ replace {
 	sjmp	%5
 %1:
 } if labelInRange(%5)
+
+replace {
+	jc	%1
+	sjmp	%5
+%1:
+} by {
+	;	Peephole 108.a	removed sjmp by inverse jump logic
+	jnc	%5
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+	jz	%1
+	sjmp	%5
+%1:
+} by {
+	;	Peephole 108.b	removed sjmp by inverse jump logic
+	jnz	%5
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+	jnz	%1
+	sjmp	%5
+%1:
+} by {
+	;	Peephole 108.c	removed sjmp by inverse jump logic
+	jz	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	jb	%1,%2
+	sjmp	%5
+%2:
+} by {
+	;	Peephole 108.d	removed sjmp by inverse jump logic
+	jnb	%1,%5
+%2:
+} if labelInRange(%5), labelRefCountChange(%2 -1)
+
+replace {
+	jnb	%1,%2
+	sjmp	%5
+%2:
+} by {
+	;	Peephole 108.e	removed sjmp by inverse jump logic
+	jb	%1,%5
+%2:
+} if labelInRange(%5), labelRefCountChange(%2 -1)
 
 replace {
 	clr	a

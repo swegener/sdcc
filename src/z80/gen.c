@@ -9318,9 +9318,23 @@ genMultOneChar (const iCode * ic)
           cost (2, 14);
           goto store_hl;
         }
-      else
-        UNIMPLEMENTED;
-      return;
+    }
+  else if (IS_TLCS90 && isRegDead (HL_IDX, ic))
+    {
+      if (aopInReg (ic->left->aop, 0, L_IDX) && (aopInReg (ic->right->aop, 0, C_IDX) || aopInReg (ic->right->aop, 0, B_IDX) || aopInReg (ic->right->aop, 0, E_IDX) || aopInReg (ic->right->aop, 0, D_IDX) || aopInReg (ic->right->aop, 0, H_IDX) || ic->right->aop->type == AOP_STK || ic->right->aop->type == AOP_DIR))
+        {
+          if (!regalloc_dry_run)
+            emit2 ("mul hl, %s", aopGet (ic->right->aop, 0, false));
+          cost (2 + (ic->right->aop->type == AOP_STK) + 2 * (ic->right->aop->type == AOP_DIR), ic->right->aop->type == AOP_REG ? 16 : 22);
+          goto store_hl;
+        }
+      else if (aopInReg (ic->right->aop, 0, L_IDX) && (aopInReg (ic->left->aop, 0, C_IDX) || aopInReg (ic->left->aop, 0, B_IDX) || aopInReg (ic->left->aop, 0, E_IDX) || aopInReg (ic->left->aop, 0, D_IDX) || aopInReg (ic->left->aop, 0, H_IDX) || ic->left->aop->type == AOP_STK || ic->left->aop->type == AOP_DIR))
+        {
+          if (!regalloc_dry_run)
+            emit2 ("mul hl, %s", aopGet (ic->left->aop, 0, false));
+          cost (2 + (ic->left->aop->type == AOP_STK) + 2 * (ic->left->aop->type == AOP_DIR), ic->left->aop->type == AOP_REG ? 16 : 22);
+          goto store_hl;
+        }
     }
 
   if (!isPairDead (PAIR_DE, ic))
@@ -9354,6 +9368,12 @@ genMultOneChar (const iCode * ic)
       emit3 (A_LD, ASMOP_L, ASMOP_E);
       emit2 ("mlt hl");
       cost2 (2, 8, 17, 0, 0, 0, 6, 0);
+    }
+  else if (IS_TLCS90)
+    {
+      emit3 (A_LD, ASMOP_L, ASMOP_E);
+      emit2 ("mul hl, h");
+      cost (2, 16);
     }
   else if (IS_RAB && !IS_R2K) // A wait state bug makes mul unuseable in most scenarios on the original Rabbit 2000.
     {
@@ -9415,38 +9435,48 @@ genMultTwoChar (const iCode *ic)
 {
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
-  wassert (IS_RAB && !IS_R2K); // mul instruction is broken on Rabbit 2000.
+  wassert (IS_RAB && !IS_R2K || IS_R800); // mul instruction is broken on original Rabbit 2000.
+  wassert (isPairDead (PAIR_HL, ic));
   
   bool save_bc = !isPairDead(PAIR_BC, ic);
-  bool save_de = !isPairDead(PAIR_DE, ic) && getPairId (left->aop) != PAIR_DE && getPairId (right->aop) != PAIR_DE;
+  bool save_de = !isPairDead(PAIR_DE, ic) && (IS_R800 || getPairId (left->aop) != PAIR_DE && getPairId (right->aop) != PAIR_DE);
 
   if (save_bc)
     _push (PAIR_BC);
   if (save_de)
     _push (PAIR_DE);
     
-  if (getPairId (left->aop) == PAIR_BC || getPairId (right->aop) == PAIR_DE)
+  if (getPairId (left->aop) == PAIR_BC || getPairId (right->aop) == (IS_RAB ? PAIR_DE : PAIR_HL))
     {
       if (right->aop->regs[C_IDX] >= 0 || right->aop->regs[B_IDX] >= 0)
         UNIMPLEMENTED;
       genMove (ASMOP_BC, left->aop, isRegDead (A_IDX, ic), right->aop->regs[L_IDX] < 0 && right->aop->regs[H_IDX] < 0, right->aop->regs[E_IDX] < 0 && right->aop->regs[D_IDX] < 0, true);
-      genMove (ASMOP_DE, right->aop, isRegDead (A_IDX, ic), true, true, true);
+      genMove (IS_RAB ? ASMOP_DE : ASMOP_HL, right->aop, isRegDead (A_IDX, ic), true, save_de || isPairDead(PAIR_DE, ic), isPairDead(PAIR_IY, ic));
     }
   else
     {
       if (left->aop->regs[C_IDX] >= 0 || left->aop->regs[B_IDX] >= 0)
         UNIMPLEMENTED;
       genMove (ASMOP_BC, right->aop, isRegDead (A_IDX, ic), left->aop->regs[L_IDX] < 0 && left->aop->regs[H_IDX] < 0, left->aop->regs[E_IDX] < 0 && left->aop->regs[D_IDX] < 0, true);
-      genMove (ASMOP_DE, left->aop, isRegDead (A_IDX, ic), true, true, true);
+      genMove (IS_RAB ? ASMOP_DE : ASMOP_HL, left->aop, isRegDead (A_IDX, ic), true, save_de || isPairDead(PAIR_DE, ic), isPairDead(PAIR_IY, ic));
     }
 
-  emit2 ("mul");
-  cost (1, 12);
+  if (IS_R800)
+    {
+      emit2 ("multuw hl, bc");
+      cost (2, 36);
+    }
+  else
+    {
+      emit2 ("mul");
+      cost (1, 12);
+    }
+  spillPair (PAIR_HL);
 
   if (save_de)
     _pop (PAIR_DE);
 
-  genMove (ic->result->aop, ASMOP_HLBC, isRegDead (A_IDX, ic), isPairDead (PAIR_HL, ic), true, true);
+  genMove (ic->result->aop, IS_RAB ? ASMOP_HLBC : ASMOP_DEHL, isRegDead (A_IDX, ic), true, isPairDead(PAIR_DE, ic), isPairDead(PAIR_IY, ic));
 
   if (save_bc)
     {
@@ -9490,7 +9520,7 @@ genMult (iCode *ic)
       IC_LEFT (ic) = t;
     }
 
-  if (IS_RAB && !IS_R2K && IC_RIGHT (ic)->aop->type != AOP_LIT && !byteResult && IC_LEFT (ic)->aop->size == 2 && IC_RIGHT (ic)->aop->size == 2)
+  if ((IS_RAB && !IS_R2K || IS_R800) && IC_RIGHT (ic)->aop->type != AOP_LIT && !byteResult && IC_LEFT (ic)->aop->size == 2 && IC_RIGHT (ic)->aop->size == 2)
     {
       genMultTwoChar (ic);
       goto release;

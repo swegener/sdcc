@@ -1,3 +1,11 @@
+2025-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c,
+	  src/z80/main.c:
+	  Improve tlcs90 and r800 multiplication.
+	* sim/ucsim/src/sims/z80.src/r800.cc:
+	  Fix multuw.
+
 2025-06-10 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/mcs51/peeph.def:

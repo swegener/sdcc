@@ -10649,7 +10649,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             {
               asmop *rightpairaop = (isPairDead (PAIR_DE, ic) && left->aop->regs[E_IDX] < offset && left->aop->regs[D_IDX] < offset) ? ASMOP_DE : ASMOP_BC;
               emit3w_o (A_LD, rightpairaop, 0, right->aop, offset);
-              emit3 (A_OR, ASMOP_A, ASMOP_A);
+              emit3 (A_CP, ASMOP_A, ASMOP_A);
               emit3w (A_SBC, ASMOP_HL, rightpairaop);
               offset++;
               size -= 2;

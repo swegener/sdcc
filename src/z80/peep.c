@@ -405,10 +405,19 @@ z80MightRead(const lineNode *pl, const char *what)
       return(false);
     }
 
-  //ld a, #0x00
-  if((ISINST(pl->line, "xor") || ISINST(pl->line, "sub")) &&
-     (!strcmp(pl->line+4, "a, a") || !strcmp(pl->line+4, "a,a") || (!strchr(pl->line, ',') && !strcmp(pl->line+4, "a"))))
-    return(false);
+
+  // Sometimes the result and flags do not depend on the operands.
+  if(ISINST(pl->line, "cp") ||
+    ISINST(pl->line, "sbc") ||
+    ISINST(pl->line, "sbc") ||
+    ISINST(pl->line, "xor"))
+    {
+      const char *arg = pl->line + 3;
+      while(isspace(*arg))
+        arg++;
+      if (!strncmp(arg, "a, a", 4) || !strncmp(arg, "hl, hl", 6) || !strncmp(arg, "iy, iy", 6))
+        return(false);
+    }
 
   //ld a, #0x00
   if(!strcmp(pl->line, "and\ta, #0x00") || !strcmp(pl->line, "and\ta,#0x00") || !strcmp(pl->line, "and\t#0x00"))

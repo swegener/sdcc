@@ -781,6 +781,31 @@ emit2 (const char *szFormat, ...)
     }
 }
 
+// An absolute local jump within the function to the label target with (optional) condition, assuming
+// that the branch is taken with given probability, and possibly optimized into a relative (jr) jump later.
+// If target is null, calculate costs only.
+static void
+emitJP (const symbol *target, const char *condition, float probability, bool assume_jr)
+{
+  if (target)
+    {
+      wassert (currFunc);
+      if (condition)
+        {
+          emit2 ("jp %s, !tlabel", condition, labelKey2num (target->key));
+        }
+      else
+        {
+          emit2 ("jp !tlabel", labelKey2num (target->key));
+        }
+    }
+
+  if (assume_jr)
+    cost2 (2, 12, 8, 5, 12, 8, 3, 3);
+  else
+    cost2 (3, 10, 9, 7, 16, 8, 4, 3);
+}
+
 static PAIR_ID
 getPartPairId (const asmop *aop, int offset)
 {
@@ -1347,6 +1372,15 @@ emit3wCost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
       return;
     case A_EX:
       cost2 (1, 4, 3, 2, 0, 2, 1, 1);
+      return;
+    case A_LD:
+      if (op2->type == AOP_LIT || op2->type == AOP_IMMD)
+        if (aopInReg (op1, offset1, IY_IDX))
+          cost2 (4, 14, 12, 8, 0, 6, 4, 4);
+        else
+          cost2 (3, 10, 9, 6, 12, 6, 3, 3);
+      else
+        wassertl (0, "Tried get cost for 16-bit ld with unknown right operand");
       return;
     default:
       wassertl (0, "Tried get cost for unknown instruction");
@@ -10555,10 +10589,10 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
   /* if the right side is a literal then anything goes */
   else if (right->aop->type == AOP_LIT)
     {
-      while (size--)
+      while (size)
         {
           bool pushed_hl = false;
-          bool next_zero = size && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
+          bool next_zero = (size > 1) && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
 
           if(requiresHL (left->aop) && left->aop->type != AOP_REG && !isPairDead(PAIR_HL, ic))
             {
@@ -10567,8 +10601,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             }
 
           // Test for 0 can be done more efficiently using or
-          if (!byteOfVal (right->aop->aopu.aop_lit, offset) &&
-            (!a_result || left->aop->type != AOP_STL && left->aop->type != AOP_SFR))
+          if (!byteOfVal (right->aop->aopu.aop_lit, offset))
             {
               if (!a_result)
                 {
@@ -10577,28 +10610,30 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
                 }
               else
                 emit3_o (A_OR, ASMOP_A, 0, left->aop, offset);
-
-              a_result = TRUE;
+              size--;
+              a_result = true;
             }
           else if ((aopInReg (left->aop, 0, A_IDX) && isRegDead (A_IDX, ic) ||
             left->aop->type == AOP_REG && left->aop->aopu.aop_reg[offset]->rIdx != IYL_IDX && left->aop->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, left->aop->aopu.aop_reg[offset]->rIdx)) &&
             byteOfVal (right->aop->aopu.aop_lit, offset) == 0x01 && !next_zero)
             {
               emit3_o (A_DEC, left->aop, offset, 0, 0);
+              size--;
               a_result = aopInReg (left->aop, 0, A_IDX);
             }
-          else if (isRegDead (A_IDX, ic) && left->aop->regs[A_IDX] < offset && size && byteOfVal (right->aop->aopu.aop_lit, offset) == 0xff &&
+          else if (isRegDead (A_IDX, ic) && left->aop->regs[A_IDX] < offset && size >= 2 && byteOfVal (right->aop->aopu.aop_lit, offset) == 0xff &&
             (left->aop->type == AOP_REG || left->aop->type == AOP_STK) &&
             byteOfVal (right->aop->aopu.aop_lit, offset) == byteOfVal (right->aop->aopu.aop_lit, offset + 1))
             {
               cheapMove (ASMOP_A, 0, left->aop, offset, true);
-              while (byteOfVal (right->aop->aopu.aop_lit, offset + 1) == 0xff && size)
+              while (byteOfVal (right->aop->aopu.aop_lit, offset + 1) == 0xff && size > 1)
                 {
                   emit3_o (A_AND, ASMOP_A, 0, left->aop, ++offset);
                   size--;
                 }
               emit3 (A_INC, ASMOP_A, 0);
-              next_zero = size && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
+              size--;
+              next_zero = (size > 1) && !byteOfVal (right->aop->aopu.aop_lit, offset + 1);
               a_result = true;
             }
           else if ((aopInReg (left->aop, 0, A_IDX) && isRegDead (A_IDX, ic) ||
@@ -10606,7 +10641,19 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             byteOfVal (right->aop->aopu.aop_lit, offset) == 0xff && !next_zero)
             {
               emit3_o (A_INC, left->aop, offset, 0, 0);
+              size--;
               a_result = aopInReg (left->aop, 0, A_IDX);
+            }
+          else if (!IS_SM83 && size >= 2 && aopInReg (left->aop, offset, HL_IDX) && isRegDead (HL_IDX, ic) && isRegDead (DE_IDX, ic) && !next_zero &&
+            (isPairDead (PAIR_DE, ic) && left->aop->regs[E_IDX] < offset && left->aop->regs[D_IDX] < offset || isPairDead (PAIR_BC, ic) && left->aop->regs[C_IDX] < offset && left->aop->regs[B_IDX] < offset))
+            {
+              asmop *rightpairaop = (isPairDead (PAIR_DE, ic) && left->aop->regs[E_IDX] < offset && left->aop->regs[D_IDX] < offset) ? ASMOP_DE : ASMOP_BC;
+              emit3w_o (A_LD, rightpairaop, 0, right->aop, offset);
+              emit3 (A_OR, ASMOP_A, ASMOP_A);
+              emit3w (A_SBC, ASMOP_HL, rightpairaop);
+              offset++;
+              size -= 2;
+              a_result = false;
             }
           else
             {
@@ -10618,7 +10665,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
                 emit3 (A_INC, ASMOP_A, 0);
               else
                 emit3_o (A_SUB, ASMOP_A, 0, right->aop, offset);
-
+              size--;
               a_result = true;
             }
 
@@ -10627,11 +10674,7 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 
           // Only emit jump now if there is no following test for 0 (which would just or to a current result in a)
           if (!(next_zero && a_result))
-            {
-              if (!regalloc_dry_run)
-                emit2 ("jp NZ, !tlabel", labelKey2num (lbl->key));
-              cost2 (3, 10.0f, 7.5f, 7.0f, 14.0f,  11.0f, 3.5f, 3.0f); // Assume both branches equally likely, cp not optimzed into jr.
-            }
+            emitJP (lbl, "NZ", 0.5f, false);
           offset++;
         }
     }

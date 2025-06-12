@@ -1,3 +1,8 @@
+2025-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/z80/gen.c:
+	  Improve comparison codegen.
+
 2025-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c,

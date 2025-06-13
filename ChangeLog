@@ -1,9 +1,14 @@
+2025-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/SDCCgenconstprop.cc:
+	  Improve generalized constant propagation analysis for 64-bit types.
+
 2025-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/z80/gen.c:
 	  Improve comparison codegen.
 	* src/z80/peep.c:
-	  Improve handing of operations that do not depend on their operands.
+	  Improve handling of operations that do not depend on their operands.
 
 2025-06-11 Philipp Klaus Krause <philipp@colecovision.eu>
 

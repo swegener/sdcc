@@ -646,6 +646,7 @@ valinfoCast (struct valinfo *result, sym_link *targettype, const struct valinfo 
   else if (!right.anything && (IS_INTEGRAL (targettype) || genptrtarget) && 
     (!result->anything && right.min >= result->min && right.max <= result->max || result->anything))
     {
+      result->anything = false;
       result->min = right.min;
       result->max = right.max;
       if (result->min >= 0)

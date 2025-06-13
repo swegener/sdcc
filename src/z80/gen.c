@@ -13513,6 +13513,7 @@ genLeftShift (const iCode *ic)
 
   started = false;
   regalloc_dry_run_state_scale = shift_by_lit ? shiftcount : 2;
+
   while (size)
     {
       if (size >= 2 && offset + 1 >= byteshift &&
@@ -13824,6 +13825,7 @@ genRightShift (const iCode * ic)
   int shiftcount = 0;
   int byteoffset = 0;
   bool save_a;
+  bool shift_bytewise = false;
 
   symbol *tlbl = 0, *tlbl1 = 0;
 
@@ -13947,9 +13949,25 @@ genRightShift (const iCode * ic)
       emit2 ("ld %s, !immedbyte", countreg == A_IDX ? "a" : regsZ80[countreg].name, (unsigned)shiftcount);
       cost2 (2, 7, 6, 4, 8, 4, 2, 2);
     }
+  else if (!optimize.codeSize && !shift_by_lit && !aopIsNotLitVal (right->aop, 0, 1, 0) &&
+    !right->aop->valinfo.anything && (right->aop->valinfo.knownbitsmask & 0x7) == 0x7 && !(right->aop->valinfo.knownbits & 0x7))
+    {
+      shift_bytewise = true;
+      emit2 ("srl %s", regsZ80[countreg].name);
+      cost2 (2, 8, 7, 4, 8, 4, 2, 2);
+      emit2 ("srl %s", regsZ80[countreg].name);
+      cost2 (2, 8, 7, 4, 8, 4, 2, 2);
+      emit2 ("srl %s", regsZ80[countreg].name);
+      cost2 (2, 8, 7, 4, 8, 4, 2, 2);
+      emit2 ("inc %s", regsZ80[countreg].name);
+      cost2 (1, 4, 4, 2, 4, 2, 1, 1);
+      if (!regalloc_dry_run)
+        emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+      cost2 (3, 10, 9, 8, 16, 8, 4, 3);
+    }
   else if (!shift_by_lit && !aopIsNotLitVal (right->aop, 0, 1, 0))
     {
-      emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
+      emit2 ("inc %s", regsZ80[countreg].name);
       cost2 (1, 4, 4, 2, 4, 2, 1, 1);
       if (!regalloc_dry_run)
         emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
@@ -13960,36 +13978,40 @@ genRightShift (const iCode * ic)
 
   if (!shift_by_one && requiresHL (shiftop))
     spillPair (PAIR_HL);
-    
+
   regalloc_dry_run_state_scale = shift_by_lit ? shiftcount : 2;
-  while (size)
-    {
-      if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && shiftop->type == AOP_REG &&
-        (getPartPairId (shiftop, offset - 1) == PAIR_HL || getPartPairId (shiftop, offset - 1) == PAIR_DE))
-        {
-          if (first)
-            {
-              emit3 (A_CP, ASMOP_A, ASMOP_A);
-              first = 0;
-            }
-          emit2 (shiftop->aopu.aop_reg[offset - 1]->rIdx == L_IDX ? "rr hl" : "rr de");
-          cost (1, 2);
-          size -= 2, offset -= 2;
-        }
-      else if (!is_signed && first && byteoffset--) // Skip known 0 bytes
-        size--, offset--;
-      else if (first)
-        {
-          emit3_o (is_signed ? A_SRA : A_SRL, shiftop, offset, 0, 0);
-          first = 0;
+
+  if (shift_bytewise)
+    genMove_o (shiftop, 0, shiftop, 1, result->aop->size, isRegDead (A_IDX, ic) && countreg != A_IDX, isRegDead (HL_IDX, ic) && countreg != L_IDX && countreg != H_IDX, false, false, true);
+  else
+    while (size)
+      {
+        if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && shiftop->type == AOP_REG &&
+          (getPartPairId (shiftop, offset - 1) == PAIR_HL || getPartPairId (shiftop, offset - 1) == PAIR_DE))
+          {
+            if (first)
+              {
+                emit3 (A_CP, ASMOP_A, ASMOP_A);
+                first = 0;
+              }
+            emit2 (shiftop->aopu.aop_reg[offset - 1]->rIdx == L_IDX ? "rr hl" : "rr de");
+            cost (1, 2);
+            size -= 2, offset -= 2;
+          }
+        else if (!is_signed && first && byteoffset--) // Skip known 0 bytes
           size--, offset--;
-        }
-      else
-        {
-          emit3_o (A_RR, shiftop, offset, 0, 0);
-          size--, offset--;
-        }
-    }
+        else if (first)
+          {
+            emit3_o (is_signed ? A_SRA : A_SRL, shiftop, offset, 0, 0);
+            first = 0;
+            size--, offset--;
+          }
+        else
+          {
+            emit3_o (A_RR, shiftop, offset, 0, 0);
+            size--, offset--;
+          }
+      }
 
   if (!shift_by_one)
     {

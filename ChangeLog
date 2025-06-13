@@ -2,6 +2,8 @@
 
 	* src/SDCCgenconstprop.cc:
 	  Improve generalized constant propagation analysis for 64-bit types.
+	* src/z80/gen.c:
+	  Use generalized constant propagation results in >> codegen.
 
 2025-06-12 Philipp Klaus Krause <philipp@colecovision.eu>
 

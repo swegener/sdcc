@@ -1,3 +1,8 @@
+2025-06-14 Philipp Klaus Krause <philipp@colecovision.eu>
+
+	* src/port.h:
+	  Make port id an enum instead of a macro.
+
 2025-06-13 Philipp Klaus Krause <philipp@colecovision.eu>
 
 	* src/SDCCgenconstprop.cc:

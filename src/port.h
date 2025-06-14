@@ -10,36 +10,38 @@
 #include "SDCCpeeph.h"
 #include "dbuf.h"
 
-#define TARGET_ID_MCS51    1
-#define TARGET_ID_DS390    2
-#define TARGET_ID_DS400    3
-#define TARGET_ID_Z80      4
-#define TARGET_ID_Z80N     5
-#define TARGET_ID_Z180     6
-#define TARGET_ID_SM83     7
-#define TARGET_ID_TLCS90   8
-#define TARGET_ID_EZ80     9
-#define TARGET_ID_R2K      10
-#define TARGET_ID_R2KA     11
-#define TARGET_ID_R3KA     12
-#define TARGET_ID_R4K      13
-#define TARGET_ID_R5K      14
-#define TARGET_ID_R6K      15
-#define TARGET_ID_R800     16
-#define TARGET_ID_HC08     17
-#define TARGET_ID_S08      18
-#define TARGET_ID_STM8     19
-#define TARGET_ID_PDK13    20
-#define TARGET_ID_PDK14    21
-#define TARGET_ID_PDK15    22
-#define TARGET_ID_PDK16    23
-#define TARGET_ID_MOS6502  24
-#define TARGET_ID_MOS65C02 25
-#define TARGET_ID_F8       26
-#define TARGET_ID_F8L      27
-#define TARGET_ID_PIC14    28
-#define TARGET_ID_PIC16    29
-#define TARGET_ID_AVR      30
+enum target {
+  TARGET_ID_MCS51 = 1,
+  TARGET_ID_DS390,
+  TARGET_ID_DS400,
+  TARGET_ID_Z80,
+  TARGET_ID_Z80N,
+  TARGET_ID_Z180,
+  TARGET_ID_SM83,
+  TARGET_ID_TLCS90,
+  TARGET_ID_EZ80,
+  TARGET_ID_R2K,
+  TARGET_ID_R2KA,
+  TARGET_ID_R3KA,
+  TARGET_ID_R4K,
+  TARGET_ID_R5K,
+  TARGET_ID_R6K,
+  TARGET_ID_R800,
+  TARGET_ID_HC08,
+  TARGET_ID_S08,
+  TARGET_ID_STM8,
+  TARGET_ID_PDK13,
+  TARGET_ID_PDK14,
+  TARGET_ID_PDK15,
+  TARGET_ID_PDK16,
+  TARGET_ID_MOS6502,
+  TARGET_ID_MOS65C02,
+  TARGET_ID_F8,
+  TARGET_ID_F8L,
+  TARGET_ID_PIC14,
+  TARGET_ID_PIC16,
+  TARGET_ID_AVR      
+};
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -115,7 +117,7 @@ int process_pragma_tbl (const struct pragma_s *pragma_tbl, const char *s);
 typedef struct
 {
   /** Unique id for this target */
-  const int id;
+  enum target id;
   /** Target name used for -m */
   const char *const target;
 

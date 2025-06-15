@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  r800 wide multiplication register saving fix.
+	* support/regression/tests/bug-3855.c:
+	  Regression test for bug #3855 (disabled for now, since bug is not yet fixed).
 
 2025-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
 

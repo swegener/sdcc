@@ -9475,11 +9475,21 @@ genMultTwoChar (const iCode *ic)
   bool save_bc = !isPairDead(PAIR_BC, ic);
   bool save_de = !isPairDead(PAIR_DE, ic) && (IS_R800 || getPairId (left->aop) != PAIR_DE && getPairId (right->aop) != PAIR_DE);
 
-  if (save_bc)
-    _push (PAIR_BC);
-  if (save_de)
-    _push (PAIR_DE);
-    
+  if (IS_R800)
+    {
+      if (save_de)
+        _push (PAIR_DE);
+      if (save_bc)
+        _push (PAIR_BC);
+    }
+  else
+    {
+      if (save_bc)
+        _push (PAIR_BC);
+      if (save_de)
+        _push (PAIR_DE);
+    }
+
   if (getPairId (left->aop) == PAIR_BC || getPairId (right->aop) == (IS_RAB ? PAIR_DE : PAIR_HL))
     {
       if (right->aop->regs[C_IDX] >= 0 || right->aop->regs[B_IDX] >= 0)
@@ -9499,27 +9509,52 @@ genMultTwoChar (const iCode *ic)
     {
       emit2 ("multuw hl, bc");
       cost (2, 36);
+      spillPair (PAIR_BC);
     }
   else
     {
       emit2 ("mul");
       cost (1, 12);
+      spillPair (PAIR_DE);
     }
   spillPair (PAIR_HL);
 
-  if (save_de)
-    _pop (PAIR_DE);
+  if (IS_R800)
+    {
+      if (save_bc)
+        _pop (PAIR_BC);
+    }
+  else
+    {
+      if (save_de)
+        _pop (PAIR_DE);
+    }
 
   genMove (ic->result->aop, IS_RAB ? ASMOP_HLBC : ASMOP_DEHL, isRegDead (A_IDX, ic), true, isPairDead(PAIR_DE, ic), isPairDead(PAIR_IY, ic));
 
-  if (save_bc)
+  if (IS_R800)
     {
-      if (ic->result->aop->regs[B_IDX] >= 0)
-        poppairwithsavedreg (PAIR_BC, B_IDX, -1);
-      else if (ic->result->aop->regs[C_IDX] >= 0)
-        poppairwithsavedreg (PAIR_BC, C_IDX, -1);
-      else
-        _pop (PAIR_BC);
+      if (save_de)
+        {
+          if (ic->result->aop->regs[D_IDX] >= 0)
+            poppairwithsavedreg (PAIR_DE, D_IDX, -1);
+          else if (ic->result->aop->regs[E_IDX] >= 0)
+            poppairwithsavedreg (PAIR_DE, E_IDX, -1);
+          else
+            _pop (PAIR_DE);
+        }
+    }
+  else
+    {
+      if (save_bc)
+        {
+          if (ic->result->aop->regs[B_IDX] >= 0)
+            poppairwithsavedreg (PAIR_BC, B_IDX, -1);
+          else if (ic->result->aop->regs[C_IDX] >= 0)
+            poppairwithsavedreg (PAIR_BC, C_IDX, -1);
+          else
+            _pop (PAIR_BC);
+        }
     }
 }
 

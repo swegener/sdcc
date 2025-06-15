@@ -1,5 +1,10 @@
 2025-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/z80/gen.c:
+	  r800 wide multiplication register saving fix.
+
+2025-06-15 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* configure.ac,
 	  configure:
 	  Disable mos6502, mos65c02 and pic14 port by default (until bugs #3851, #3853 are fixed).

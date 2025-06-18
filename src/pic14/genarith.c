@@ -707,9 +707,9 @@ void pic14GenPlus (iCode *ic)
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
         FENTRY;
         
-        aopOp (IC_LEFT(ic),ic,FALSE);
-        aopOp (IC_RIGHT(ic),ic,FALSE);
-        aopOp (IC_RESULT(ic),ic,TRUE);
+        pic14AopOp (ic->left,ic,false);
+        pic14AopOp (ic->right,ic,false);
+        pic14AopOp (ic->result,ic,true);
         
         DEBUGpic14_AopType(__LINE__,IC_LEFT(ic),IC_RIGHT(ic),IC_RESULT(ic));
         
@@ -1121,9 +1121,9 @@ void pic14GenMinus (iCode *ic)
 
         FENTRY;
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-        aopOp (IC_LEFT(ic),ic,FALSE);
-        aopOp (IC_RIGHT(ic),ic,FALSE);
-        aopOp (IC_RESULT(ic),ic,TRUE);
+        pic14AopOp (ic->left,ic,false);
+        pic14AopOp (ic->right,ic,false);
+        pic14AopOp (ic->result,ic,true);
         
         if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY  &&
                 AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT) {

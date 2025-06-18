@@ -1,11 +1,18 @@
 2025-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* configure.ac,
+	  configure,
+	  support/valdiag/Makefile.in:
+	  Reenable mos6502 and mos65c02 port by default.
+
+2025-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* src/pic14/gen.c,
 	  src/pic14/gen.h,
 	  src/pic14/genarith.c,
 	  configure.ac,
 	  configure:
-	  Replace attempted pic14 side fix of bug #3851, that made pic14 library build segfault, and reenable pci14 port build.
+	  Replace attempted pic14 side fix of bug #3851, that made pic14 library build segfault, and reenable pic14 port build.
 
 2025-06-17 Philipp Klaus Krause <philipp@colecovision.eu>
 

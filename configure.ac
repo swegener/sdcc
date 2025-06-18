@@ -800,8 +800,8 @@ AC_DO_PORT(pdk13,    pdk,    PDK13,    [Excludes the PDK13 port])
 AC_DO_PORT(pdk14,    pdk,    PDK14,    [Excludes the PDK14 port])
 AC_DO_PORT(pdk15,    pdk,    PDK15,    [Excludes the PDK15 port])
 AC_DO_PORT_ENABLER(pdk16,    pdk,    PDK16,    [Includes the PDK16 port])
-AC_DO_PORT_ENABLER(mos6502,  mos6502,MOS6502,  [Includes the MOS6502 port])
-AC_DO_PORT_ENABLER(mos65c02, mos6502,MOS65C02, [Includes the MOS65C02 port])
+AC_DO_PORT(mos6502,  mos6502,MOS6502,  [Includes the MOS6502 port])
+AC_DO_PORT(mos65c02, mos6502,MOS65C02, [Includes the MOS65C02 port])
 AC_DO_PORT(f8,       f8,     F8,       [Excludes the f8 port])
 
 # Unsupported targets

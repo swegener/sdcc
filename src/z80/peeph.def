@@ -296,6 +296,14 @@ replace restart {
 } if notVolatile(%1), notUsed(%1), same(%4 'add' 'adc' 'sub' 'sbc' 'and' 'or' 'xor')
 
 replace restart {
+	ld	%2, %1
+	%3	a, %2
+} by {
+	; common peephole 22a used %1 in %3 directly instead of going through %2.
+	%3	a, %1
+} if notVolatile(%2), notUsed(%2), notSame('a' %2), same(%3 'add' 'adc' 'sub' 'sbc' 'and' 'or' 'xor'), canAssign(%1 'b')
+
+replace restart {
 	ld	l, %1
 	ld	h, %2
 	ld	a, (hl)

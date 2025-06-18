@@ -9039,7 +9039,9 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
                   emit3_o (A_SUB, ASMOP_A, 0, right, offset);
                 }
             }
-          else if (aopIsLitVal (left, offset, 1, 0x00) && !aopInReg (left, offset, A_IDX) && size == 1) // For the last byte, we can do an optimization that results in the same value in a, but different carry.
+          else if (offset && aopIsLitVal (left, offset, 1, 0x00) && aopIsLitVal (right, offset, 1, 0x00))
+            emit3 (A_SBC, ASMOP_A, ASMOP_A);
+          else if (offset && size == 1 && aopIsLitVal (left, offset, 1, 0x00) && !aopInReg (left, offset, A_IDX)) // For the last byte, we can do an optimization that results in the same value in a, but different carry.
             {
               emit3 (A_SBC, ASMOP_A, ASMOP_A);
               emit3_o (A_SUB, ASMOP_A, 0, right, offset);

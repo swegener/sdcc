@@ -1,5 +1,11 @@
 2025-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
 
+	* src/z80/gen.c,
+	  src/z80/peeph.def:
+	  Minor optimizations for subtractions.
+
+2025-06-18 Philipp Klaus Krause <philipp@colecovision.eu>
+
 	* configure.ac,
 	  configure,
 	  support/valdiag/Makefile.in:

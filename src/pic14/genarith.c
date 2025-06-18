@@ -695,9 +695,9 @@ out:
 }
 
 /*-----------------------------------------------------------------*/
-/* genPlus - generates code for addition                           */
+/* pic14GenPlus - generates code for addition                      */
 /*-----------------------------------------------------------------*/
-void genPlus (iCode *ic)
+void pic14GenPlus (iCode *ic)
 {
         int size, offset = 0;
         int sign;
@@ -1111,7 +1111,7 @@ void pic14AddSign(operand *result, int offset, int sign)
 /*-----------------------------------------------------------------*/
 /* genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
-void genMinus (iCode *ic)
+void pic14GenMinus (iCode *ic)
 {
         int size, opsize, offset = 0, same=0;
         unsigned long lit = 0L;

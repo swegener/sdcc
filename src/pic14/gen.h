@@ -168,8 +168,9 @@ int op_isLitLike (operand *op);
  */
 const char *AopType(short type);
 const char *pCodeOpType(pCodeOp *pcop);
-void genPlus (iCode *ic);
+void pic14GenPlus (iCode *ic);
 void pic14AddSign (operand *result, int offset, int sign);
-void genMinus (iCode *ic);
+void pic14GenMinus (iCode *ic);
 
 #endif
+

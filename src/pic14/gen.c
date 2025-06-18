@@ -7799,12 +7799,12 @@ genpic14Code (iCode * lic)
           break;
 
         case '+':
-          genPlus (ic);
+          pic14GenPlus (ic);
           break;
 
         case '-':
           if (!genDjnz (ic, ifxForOp (IC_RESULT (ic), ic)))
-            genMinus (ic);
+            pic14GenMinus (ic);
           break;
 
         case '*':

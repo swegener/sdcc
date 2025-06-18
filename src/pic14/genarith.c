@@ -1073,9 +1073,9 @@ void pic14GenPlus (iCode *ic)
         //adjustArithmeticResult(ic);
         
 release:
-        freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+        pic14FreeAsmop(ic->left,NULL,ic,(!RESULTONSTACK(ic)));
+        pic14FreeAsmop(ic->right,NULL,ic,(!RESULTONSTACK(ic)));
+        pic14FreeAsmop(ic->result,NULL,ic,true);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1688,8 +1688,8 @@ void pic14GenMinus (iCode *ic)
         //    adjustArithmeticResult(ic);
         
 release:
-        freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RIGHT(ic),NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-        freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+        pic14FreeAsmop(ic->left,NULL,ic,(!RESULTONSTACK(ic)));
+        pic14FreeAsmop(ic->right,NULL,ic,(!RESULTONSTACK(ic)));
+        pic14FreeAsmop(ic->result,NULL,ic,true);
 }
 

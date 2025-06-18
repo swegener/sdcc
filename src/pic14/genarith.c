@@ -691,7 +691,7 @@ out:
     {
       size = pic14_getDataSize(left);
     } // if
-  addSign(result, size, 0);
+  pic14AddSign(result, size, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1079,9 +1079,9 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* addSign - propagate sign bit to higher bytes                    */
+/* pic14AddSign - propagate sign bit to higher bytes               */
 /*-----------------------------------------------------------------*/
-void addSign(operand *result, int offset, int sign)
+void pic14AddSign(operand *result, int offset, int sign)
 {
         int size = (pic14_getDataSize(result) - offset);
         DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -1674,7 +1674,7 @@ void genMinus (iCode *ic)
 
                 /* Sign extend the result if needed */
                 if (size > opsize)
-                        addSign(IC_RESULT(ic), opsize, !(SPEC_USIGN (operandType (IC_LEFT(ic))) && SPEC_USIGN (operandType (IC_RIGHT(ic)))));
+                        pic14AddSign(ic->result, opsize, !(SPEC_USIGN (operandType (ic->left)) && SPEC_USIGN (operandType (ic->right))));
         } // if
 
         if(AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) {

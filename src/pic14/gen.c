@@ -1632,7 +1632,7 @@ genCpl (iCode * ic)
       emitpcode (POC_MOVWF, popGet (AOP (result), offset));
       offset++;
     }
-  addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
+  pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
 
 
 release:
@@ -2904,7 +2904,7 @@ genMultOneByte (operand * left, operand * right, operand * result)
     }                           // for
 
   /* now (zero-/sign) extend the result to its size */
-  addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
+  pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (result)));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3065,7 +3065,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
     }
 
   /* now performed the signed/unsigned division -- extend result */
-  addSign (result, 1, sign);
+  pic14AddSign (result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3198,7 +3198,7 @@ genModOneByte (operand * left, operand * right, operand * result)
     }
 
   /* now we performed the signed/unsigned modulus -- extend result */
-  addSign (result, 1, sign);
+  pic14AddSign (result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5567,7 +5567,7 @@ shiftRight_Left2ResultLit (operand * left, operand * result, int shCount, int si
           break;
         }                       // switch
 
-  addSign (result, size, sign);
+  pic14AddSign (result, size, sign);
   }
 }
 
@@ -5689,7 +5689,7 @@ genGenericShift (iCode * ic, int shiftRight)
           mov2w (AOP (left), size);
           movwf (AOP (result), size);
         }
-      addSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (left)));
+      pic14AddSign (result, AOP_SIZE (left), !SPEC_USIGN (operandType (left)));
     }
 
   tlbl = newiTempLabel (NULL);
@@ -6111,7 +6111,7 @@ manage_signs:
       }
 
     if (AOP_SIZE(result) > ++offset)
-        addSign (result, offset, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+        pic14AddSign (result, offset, !SPEC_USIGN (OP_SYM_ETYPE (left)));
 }
 
 /*-----------------------------------------------------------------*/
@@ -6202,7 +6202,7 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
                 emitpcode (POC_INCF, popGet (AOP (result), 0));
               else
                 emitpcode (POC_DECF, popGet (AOP (result), 0));
-              addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+              pic14AddSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
             } // if
         }
     }
@@ -7302,7 +7302,7 @@ genAssign (iCode * ic)
 
   /* now (zero-/sign) extend the result to its size */
   if (AOP_SIZE(result) > offset)
-    addSign (result, offset, !SPEC_USIGN (operandType (right)));
+    pic14AddSign (result, offset, !SPEC_USIGN (operandType (right)));
 
 release:
   freeAsmop (right, NULL, ic, FALSE);
@@ -7506,7 +7506,7 @@ genCast (iCode * ic)
               movwf (AOP (result), size++);
             }
         }
-      addSign (result, size, 0);
+      pic14AddSign (result, size, 0);
       goto release;
     }
 
@@ -7568,7 +7568,7 @@ genCast (iCode * ic)
       offset++;
     }
 
-  addSign (result, AOP_SIZE (right), !SPEC_USIGN (rtype));
+  pic14AddSign (result, AOP_SIZE (right), !SPEC_USIGN (rtype));
 
 release:
   freeAsmop (right, NULL, ic, TRUE);

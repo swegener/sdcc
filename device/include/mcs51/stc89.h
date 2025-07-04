@@ -62,6 +62,8 @@
  *   Reset Value: xxxx,xx00
  */
 SFR(AUXR, 0x8E);
+#define EXTRAM 0x01 /* Enable external RAM */
+#define ALEOFF 0x02 /* Disable ALE signal */
 
 /*
  * Auxiliary Register 1
@@ -69,6 +71,8 @@ SFR(AUXR, 0x8E);
  *   Reset Value: 0xxx,0xx0
  */
 SFR(AUXR1, 0xA2);
+#define GF2    0x01 /* General purpose flag 2 */
+#define DPS    0x04 /* Data pointer select */
 
 /* Slave Address for Serial Communication
  *   Reset Value: 0000,0000
@@ -81,6 +85,14 @@ SFR(SADDR, 0xA9);
  *   Reset Value: 0000,0000
  */
 SFR(IPH, 0xB7);
+#define PX3H 0x01 /* External Interrupt 3 Priority */
+#define PX2H 0x02 /* External Interrupt 2 Priority */
+#define PT2H 0x04 /* Timer/Counter 2 Priority */
+#define PSH  0x08 /* Serial Port Priority */
+#define PT1H 0x10 /* Timer/Counter 1 Priority */
+#define PX1H 0x20 /* External Interrupt 1 Priority */
+#define PT0H 0x40 /* Timer/Counter 0 Priority */
+#define PX0H 0x80 /* External Interrupt 0 Priority */
 
 /* Slave Address Mask for Serial Communication 
  *   Reset Value: 0000,0000
@@ -92,6 +104,15 @@ SFR(SADEN, 0xB9);
  *   Reset Value: 0000,0000
  */
 SFR(XICON, 0xC0);
+SBIT(PX3,	0xC0,	0);
+SBIT(EX3,	0xC0,	1);
+SBIT(IE3,	0xC0,	2);
+SBIT(IT3,	0xC0,	3);
+SBIT(PX2,	0xC0,	4);
+SBIT(EX2,	0xC0,	5);
+SBIT(HE2,	0xC0,	6);
+SBIT(IT2,	0xC0,	7);
+
 
 /* Timer/Counter 2 registers are compatible with AT89x52 */
 
@@ -105,8 +126,18 @@ SFR(T2CON, 0xC8);
  *   Bit Mapping: - - - - - - T2OE DCEN
  *   Reset Value: xxxx,xx00
  */
-SFR(T2MOD, 0xC9);
+SBIT(CP_RL2,	0xC8,	0);
+SBIT(C_T2,		0xC8,	1);
+SBIT(TR2,		0xC8,	2);
+SBIT(EXEN2,		0xC8,	3);
+SBIT(TCLK,		0xC8,	4);
+SBIT(RCLK,		0xC8,	5);
+SBIT(EXF2,		0xC8,	6);
+SBIT(TF2,		0xC8,	7);
 
+SFR(T2MOD, 0xC9);
+#define T2OE 0x01 /* Timer/Counter 2 Output Enable */
+#define DCEN 0x02 /* Timer/Counter 2 Dual Capture Enable */
 /* Timer/Counter 2 Reload/Capture Low Byte
  *   Reset Value: 0000,0000
  */
